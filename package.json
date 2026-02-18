@@ -1,0 +1,21 @@
+{
+  "name": "complihub360-alpha",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CompliHub360 - AI-Driven Compliance Platform",
+  "workspaces": [
+    "packages/*",
+    "services/*",
+    "ui/*"
+  ],
+  "scripts": {
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write .",
+    "build": "npm run build --workspaces --if-present"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.4",
+    "typescript": "^5.3.3"
+  }
+}
