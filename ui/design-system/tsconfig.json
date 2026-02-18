@@ -9,7 +9,11 @@
                 "./src/*"
             ]
         },
-        "jsx": "react-jsx"
+        "jsx": "react-jsx",
+        "types": [
+            "vite/client",
+            "vitest/globals"
+        ]
     },
     "include": [
         "src"
