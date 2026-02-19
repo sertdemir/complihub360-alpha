@@ -1,4 +1,12 @@
-[
-    "packages/types",
-    "ui/design-system"
-]
+{
+    "extends": "./tsconfig.base.json",
+    "files": [],
+    "references": [
+        {
+            "path": "./packages/types"
+        },
+        {
+            "path": "./ui/design-system"
+        }
+    ]
+}
