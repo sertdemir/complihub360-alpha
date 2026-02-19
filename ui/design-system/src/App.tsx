@@ -2,7 +2,7 @@ import { BaseButton } from "./components/primitives/BaseButton";
 import { AppShell } from "./components/layout/AppShell";
 import { DashboardHeader } from "./components/layout/DashboardHeader";
 import { ComplianceStatus } from "./components/feedback/ComplianceStatus";
-import { RiskOverviewPanel } from "./components/feedback/RiskOverviewPanel";
+import { RiskOverviewPanel } from "./components/dashboard/RiskOverviewPanel";
 import { RiskTable } from "./components/dashboard/RiskTable";
 
 function App() {
@@ -22,7 +22,6 @@ function App() {
                 {/* Compliance Status Section */}
                 <section className="space-y-4">
                     <h2 className="text-xl font-semibold text-white/90">System Status</h2>
-
                     <div className="flex flex-col gap-2 p-4 border border-white/10 rounded-lg bg-white/5">
                         <div className="flex items-center justify-between border-b border-white/5 pb-2 mb-2">
                             <span className="text-sm font-medium text-white/60">Module</span>
@@ -33,12 +32,10 @@ function App() {
                             <span className="text-sm">GDPR Core</span>
                             <ComplianceStatus level="high" />
                         </div>
-
                         <div className="flex items-center justify-between">
                             <span className="text-sm">SOC2 Controls</span>
                             <ComplianceStatus level="medium" />
                         </div>
-
                         <div className="flex items-center justify-between">
                             <span className="text-sm">ISO 27001</span>
                             <ComplianceStatus level="low" />
@@ -89,7 +86,6 @@ function App() {
                     <h2 className="text-xl font-semibold text-white/90">
                         Component Library (Primitives)
                     </h2>
-
                     <div className="flex gap-4">
                         <BaseButton variant="primary">Primary Action</BaseButton>
                         <BaseButton variant="secondary">Secondary</BaseButton>
