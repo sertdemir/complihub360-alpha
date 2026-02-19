@@ -2,6 +2,8 @@ import { BaseButton } from "./components/primitives/BaseButton";
 import { AppShell } from "./components/layout/AppShell";
 import { DashboardHeader } from "./components/layout/DashboardHeader";
 import { ComplianceStatus } from "./components/feedback/ComplianceStatus";
+import { RiskOverviewPanel } from "./components/feedback/RiskOverviewPanel";
+import { RiskTable } from "./components/dashboard/RiskTable";
 
 function App() {
     return (
@@ -40,17 +42,42 @@ function App() {
                     </div>
                 </section>
 
-                {/* BaseButton Demo (Keep existing) */}
-                <section className="space-y-4 pt-8 border-t border-white/10">
-                    <h2 className="text-xl font-semibold text-white/90">Component Library (Primitives)</h2>
-                    <div className="flex gap-4">
-                        <BaseButton variant="primary">Primary Action</BaseButton>
-                        <BaseButton variant="secondary">Secondary</BaseButton>
-                        <BaseButton variant="ghost">Dismiss</BaseButton>
-                    </div>
+                {/* Risk Overview Panel */}
+                <section className="space-y-4">
+                    <RiskOverviewPanel
+                        risks={[
+                            { id: "1", category: "Vendor Risk", level: "High" },
+                            { id: "2", category: "Cloud Config", level: "Medium" },
+                            { id: "3", category: "Policy Gaps", level: "Low" },
+                        ]}
+                    />
                 </section>
-            </div>
-        </AppShell>
+
+            </section>
+
+            {/* Risk Register Table */}
+            <section className="space-y-4">
+                <RiskTable
+                    risks={[
+                        { id: "101", description: "S3 Bucket Public Access Block disabled", category: "Infrastructure", date: "2024-02-18" },
+                        { id: "102", description: "Root user MFA not enabled", category: "IAM", date: "2024-02-15" },
+                        { id: "103", description: "Unrotated API Key (90+ days)", category: "Security", date: "2024-01-20" }
+                    ]}
+                    onExport={() => console.log("Export triggered")}
+                />
+            </section>
+
+            {/* BaseButton Demo (Keep existing) */}
+            <section className="space-y-4 pt-8 border-t border-white/10">
+                <h2 className="text-xl font-semibold text-white/90">Component Library (Primitives)</h2>
+                <div className="flex gap-4">
+                    <BaseButton variant="primary">Primary Action</BaseButton>
+                    <BaseButton variant="secondary">Secondary</BaseButton>
+                    <BaseButton variant="ghost">Dismiss</BaseButton>
+                </div>
+            </section>
+        </div>
+        </AppShell >
     );
 }
 

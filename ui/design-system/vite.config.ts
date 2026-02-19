@@ -4,9 +4,11 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
     plugins: [react()],
+    cacheDir: './.vite',
     test: {
         globals: true,
         environment: 'happy-dom',
         setupFiles: './src/test/setup.ts',
+        pool: 'forks',
     },
 });
