@@ -9,6 +9,6 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "@complihub/agent-core": "workspace:*"
+        "@complihub/agent-core": "*"
     }
 }

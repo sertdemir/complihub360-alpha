@@ -1,5 +1,17 @@
 {
     "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@complihub/agent-core": [
+                "packages/agent-core/src"
+            ],
+            "@complihub/agent-registry": [
+                "packages/agent-registry/src"
+            ],
+            "@complihub/task-orchestrator": [
+                "packages/task-orchestrator/src"
+            ]
+        },
         "target": "ESNext",
         "module": "ESNext",
         "moduleResolution": "Node",

@@ -1,0 +1,35 @@
+0 verbose cli /opt/homebrew/Cellar/node/22.2.0/bin/node /opt/homebrew/bin/npm
+1 info using npm@10.7.0
+2 info using node@v22.2.0
+3 silly config:load:file:/opt/homebrew/lib/node_modules/npm/npmrc
+4 silly config:load:file:/Users/salurdesign/Documents/UX/CompliHub360/plattform/complihub360-alpha/.npmrc
+5 silly config:load:file:/Users/salurdesign/.npmrc
+6 silly config:load:file:/opt/homebrew/etc/npmrc
+7 verbose title npm install
+8 verbose argv "install" "--cache" "./.npm-cache"
+9 verbose logfile logs-max:10 dir:/Users/salurdesign/Documents/UX/CompliHub360/plattform/complihub360-alpha/.npm-cache/_logs/2026-02-20T10_54_23_913Z-
+10 verbose logfile /Users/salurdesign/Documents/UX/CompliHub360/plattform/complihub360-alpha/.npm-cache/_logs/2026-02-20T10_54_23_913Z-debug-0.log
+11 silly logfile done cleaning log files
+12 verbose shrinkwrap failed to load /Users/salurdesign/Documents/UX/CompliHub360/plattform/complihub360-alpha EPERM: operation not permitted, open '/Users/salurdesign/Documents/UX/CompliHub360/plattform/complihub360-alpha/node_modules/.package-lock.json'
+13 silly idealTree buildDeps
+14 silly placeDep ROOT @complihub/agent-registry@0.1.0 OK for: complihub360-alpha@0.1.0 want: file:/Users/salurdesign/Documents/UX/CompliHub360/plattform/complihub360-alpha/packages/agent-registry
+15 verbose stack Error: Unsupported URL Type "workspace:": workspace:*
+15 verbose stack     at unsupportedURLType (/opt/homebrew/lib/node_modules/npm/node_modules/npm-package-arg/lib/npa.js:310:15)
+15 verbose stack     at fromURL (/opt/homebrew/lib/node_modules/npm/node_modules/npm-package-arg/lib/npa.js:367:13)
+15 verbose stack     at Function.resolve (/opt/homebrew/lib/node_modules/npm/node_modules/npm-package-arg/lib/npa.js:83:12)
+15 verbose stack     at #nodeFromEdge (/opt/homebrew/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/build-ideal-tree.js:1054:22)
+15 verbose stack     at #buildDepStep (/opt/homebrew/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/build-ideal-tree.js:923:35)
+15 verbose stack     at #buildDepStep (/opt/homebrew/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/build-ideal-tree.js:1041:30)
+16 verbose cwd /Users/salurdesign/Documents/UX/CompliHub360/plattform/complihub360-alpha
+17 verbose Darwin 25.0.0
+18 verbose node v22.2.0
+19 verbose npm  v10.7.0
+20 error code EUNSUPPORTEDPROTOCOL
+21 error Unsupported URL Type "workspace:": workspace:*
+22 verbose exit 1
+23 verbose code 1
+24 silly unfinished npm timer reify 1771584864049
+25 silly unfinished npm timer reify:loadTrees 1771584864050
+26 silly unfinished npm timer idealTree:buildDeps 1771584864089
+27 silly unfinished npm timer idealTree:packages/agent-registry 1771584864092
+28 error A complete log of this run can be found in: /Users/salurdesign/Documents/UX/CompliHub360/plattform/complihub360-alpha/.npm-cache/_logs/2026-02-20T10_54_23_913Z-debug-0.log

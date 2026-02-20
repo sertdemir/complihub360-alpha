@@ -24,8 +24,16 @@ export interface AgentContext {
     repoRoot?: string;
 }
 
+export interface AgentCapability {
+    name: string;
+    description?: string;
+    inputSchema?: unknown;
+    outputSchema?: unknown;
+}
+
 export interface Agent {
     id: AgentId;
     displayName: string;
+    capabilities?: AgentCapability[];
     run: (input: TaskInput, ctx: AgentContext) => Promise<TaskResult>;
 }
