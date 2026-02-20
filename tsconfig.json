@@ -3,10 +3,16 @@
     "files": [],
     "references": [
         {
-            "path": "./packages/types"
+            "path": "packages/agent-core"
         },
         {
-            "path": "./ui/design-system"
+            "path": "packages/agent-registry"
+        },
+        {
+            "path": "packages/policy-engine"
+        },
+        {
+            "path": "packages/task-orchestrator"
         }
     ]
 }

@@ -16,6 +16,9 @@
         },
         {
             "path": "../agent-registry"
+        },
+        {
+            "path": "../policy-engine"
         }
     ]
 }
