@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BaseButton } from "../primitives/BaseButton";
 import type { ComplianceCheckRequest, ComplianceCheckResponse, ComplianceCheckFinding } from "@complihub360/types";
+import { runComplianceCheck } from "../../api/compliance";
 
 export function ComplianceCheckForm() {
     const [isLoading, setIsLoading] = useState(false);
@@ -25,18 +26,7 @@ export function ComplianceCheckForm() {
         };
 
         try {
-            const res = await fetch("http://localhost:3001/api/compliance/check", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(requestData)
-            });
-
-            if (!res.ok) {
-                const errorData = await res.json().catch(() => ({}));
-                throw new Error(errorData.error || `HTTP error ${res.status}`);
-            }
-
-            const data = await res.json() as ComplianceCheckResponse;
+            const data = await runComplianceCheck(requestData);
             setResult(data);
         } catch (err) {
             setError(err instanceof Error ? err.message : "Unknown error occurred");
@@ -137,8 +127,8 @@ export function ComplianceCheckForm() {
                                             <div className="flex justify-between">
                                                 <span className="font-semibold text-white/90">{f.title}</span>
                                                 <span className={`text-xs px-2 py-0.5 rounded-full ${f.severity === 'high' ? 'bg-red-500/20 text-red-400' :
-                                                        f.severity === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
-                                                            'bg-blue-500/20 text-blue-400'
+                                                    f.severity === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                                                        'bg-blue-500/20 text-blue-400'
                                                     }`}>
                                                     {f.severity}
                                                 </span>

@@ -47,6 +47,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         return;
     }
 
+    if (req.method === 'GET' && req.url === '/health') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true }));
+        return;
+    }
+
     if (req.method === 'POST' && req.url === '/api/compliance/check') {
         let body = '';
         req.on('data', chunk => { body += chunk.toString(); });
