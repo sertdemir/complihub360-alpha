@@ -1,0 +1,16 @@
+{
+    "appId": "__APP_ID__",
+    "name": "__APP_NAME__",
+    "version": "1.0.0",
+    "locales": [
+        "en"
+    ],
+    "features": {
+        "search": true
+    },
+    "policy": {
+        "mode": "strict",
+        "source": "file"
+    },
+    "enabledAgents": []
+}

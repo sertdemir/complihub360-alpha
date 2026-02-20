@@ -6,7 +6,9 @@
     "types": "dist/index.d.ts",
     "scripts": {
         "build": "tsc -b",
-        "typecheck": "tsc --noEmit""dependencies": {
-            "@complihub360/types": "*"
-        }
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@complihub360/types": "*"
     }
+}
