@@ -2,7 +2,7 @@ import { createServer, IncomingMessage, ServerResponse } from "http";
 import { Orchestrator } from "@complihub/task-orchestrator";
 import { createDefaultRegistry } from "@complihub/agent-registry";
 import { DefaultPolicyEngine } from "@complihub/policy-engine";
-import { createTaskContext, ComplianceCheckRequest } from "@complihub360/types";
+import { createTaskContext, ComplianceCheckRequest, type TaskContext } from "@complihub360/types";
 
 // 1. Setup Dependencies
 const registry = createDefaultRegistry();
@@ -18,9 +18,8 @@ const policyEngine = new DefaultPolicyEngine(policyStore);
 const orchestrator = new Orchestrator(registry, {}, policyEngine);
 
 // Register the agent executable
-// Wait, Orchestrator expects executable agents. Our registry has the record.
-import { complianceCheckAgent } from "../../packages/agent-core/src/compliance-agent";
-import type { AgentId } from "../../packages/agent-core/src/types";
+import { complianceCheckAgent } from "@complihub/agent-core";
+import type { AgentId } from "@complihub/agent-core";
 
 orchestrator.registerExecutable({
     id: "compliance-check-agent" as AgentId,
@@ -29,9 +28,9 @@ orchestrator.registerExecutable({
         const input = { title: "Compliance Check", payload: context.payload as Record<string, unknown> };
         const res = await complianceCheckAgent.run(input, { correlationId: context.correlationId });
         if (res.status === "failed") {
-            return { ok: false, durationMs: 0, agentId: "compliance-check-agent", error: { name: "AgentRunError", message: res.error?.message || "unknown" } };
+            return { ok: false, durationMs: 0, agentId: "compliance-check-agent" as AgentId, error: { name: "AgentRunError", message: res.error?.message || "unknown" } };
         }
-        return { ok: true, durationMs: 0, agentId: "compliance-check-agent", data: res.data };
+        return { ok: true, durationMs: 0, agentId: "compliance-check-agent" as AgentId, data: res.data };
     }
 });
 

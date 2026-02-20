@@ -10,6 +10,7 @@
         "dev": "tsx watch src/index.ts"
     },
     "dependencies": {
+        "@complihub/agent-core": "*",
         "@complihub/agent-registry": "*",
         "@complihub/policy-engine": "*",
         "@complihub/task-orchestrator": "*",
