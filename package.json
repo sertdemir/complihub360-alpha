@@ -2,6 +2,9 @@
   "name": "complihub360-alpha",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "description": "CompliHub360 - AI-Driven Compliance Platform",
   "workspaces": [
     "packages/*",

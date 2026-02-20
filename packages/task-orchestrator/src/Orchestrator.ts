@@ -1,4 +1,5 @@
-import type { AgentId, PolicyContext } from "@complihub/agent-core";
+import type { AgentId } from "@complihub/agent-core";
+import { type PolicyContext, createPolicyContext } from "@complihub360/types";
 import type { AgentRegistry } from "@complihub/agent-registry";
 import type { ExecutableAgent, TaskContext, ExecutionResult, Middleware, ExecutionOptions, ExecutionObserver } from "./types";
 import { composeMiddlewares } from "./middleware";
@@ -65,16 +66,11 @@ export class Orchestrator {
         }
 
         let clampedExecutionMs = options?.timeoutMs;
-        const policyCtx: PolicyContext = {
-            tenantId: context.tenantId,
-            correlationId: context.correlationId,
-            requestId: context.requestId,
+        const policyCtx: PolicyContext = createPolicyContext(context, {
             agentId,
-            timestamp: new Date(),
-            payload: context.payload,
             intent: options?.intent,
             capability: options?.capability
-        };
+        });
 
         if (this.policyEngine) {
             const decision = this.policyEngine.evaluate(policyCtx);
@@ -178,12 +174,7 @@ export class Orchestrator {
         }
 
         if (this.policyEngine) {
-            this.policyEngine.release({
-                tenantId: context.tenantId,
-                correlationId: context.correlationId,
-                requestId: context.requestId,
-                timestamp: new Date()
-            });
+            this.policyEngine.release(createPolicyContext(context));
         }
 
         this.notifyObservers(agentId, context, start, Date.now(), result.ok, result.ok ? undefined : result.error, options);
@@ -197,6 +188,7 @@ export class Orchestrator {
         const event = {
             agentId,
             tenantId: context.tenantId,
+            appId: context.appId,
             intent: options?.intent,
             capability: options?.capability,
             startedAt: start,

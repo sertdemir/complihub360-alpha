@@ -49,6 +49,7 @@ export interface Agent {
 export type ExecutionEvent = {
     agentId: AgentId;
     tenantId: string;
+    appId: string;
     intent?: string;
     capability?: string;
     startedAt: number;
@@ -67,16 +68,7 @@ export interface PolicyDecision {
     metadata?: Record<string, any>;
 }
 
-export interface PolicyContext {
-    tenantId: string;
-    correlationId: string;
-    requestId: string;
-    agentId?: AgentId;
-    capability?: string;
-    intent?: string;
-    timestamp: Date;
-    payload?: unknown;
-}
+export type { PolicyContext, TaskContext } from "@complihub360/types";
 
 export interface TenantPolicy {
     allowedAgents?: AgentId[];

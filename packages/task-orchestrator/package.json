@@ -11,6 +11,7 @@
     "dependencies": {
         "@complihub/agent-core": "*",
         "@complihub/agent-registry": "*",
-        "@complihub/policy-engine": "*"
+        "@complihub/policy-engine": "*",
+        "@complihub360/types": "*"
     }
 }

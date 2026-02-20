@@ -3,6 +3,7 @@ import type { AgentId } from "@complihub/agent-core";
 import { Orchestrator } from "./Orchestrator";
 import { composeMiddlewares } from "./middleware";
 import type { TaskContext, ExecutionResult, Middleware, ExecutableAgent } from "./types";
+import { createMockTaskContext } from "@complihub360/types";
 
 // Mock Registry for Test
 class MockRegistry {
@@ -34,18 +35,7 @@ class MockRegistry {
     getByCapability(name: string) { return []; }
 }
 
-function createMockContext(overrides?: Partial<TaskContext>): TaskContext {
-    return {
-        requestId: "req-1",
-        payload: {},
-        timestamp: new Date(),
-        correlationId: "test-correlation-1",
-        tenantId: "tenant-a",
-        ...overrides
-    };
-}
-
-const mockCtx = createMockContext();
+const mockCtx = createMockTaskContext();
 
 async function runTests() {
     console.log("--- Running Orchestrator Tests ---");
@@ -183,7 +173,7 @@ async function runTests() {
 
     // Test observer triggers on failure
     orchObs.registerExecutable({ id: "fail-agent" as AgentId, execute: async () => ({ ok: false, durationMs: 0, error: { name: "Err", message: "Failed", code: "FAILED" }, agentId: "fail-agent" as AgentId }) });
-    let failCtx = createMockContext({ requestId: "req-fail", correlationId: "fail-id" });
+    let failCtx = createMockTaskContext({ requestId: "req-fail", correlationId: "fail-id" });
     await orchObs.execute("fail-agent" as AgentId, failCtx);
 
     assert.strictEqual(observedEvents.length, 2);
@@ -248,7 +238,7 @@ async function runTests() {
     assert.strictEqual(!policyRes2.ok && policyRes2.error.code, "POLICY_DENIED");
 
     // 3. Payload Limit Exceeded
-    const policyRes3 = await orchPolicy.execute("policy-agent" as AgentId, createMockContext({ payload: { size: 150 } }));
+    const policyRes3 = await orchPolicy.execute("policy-agent" as AgentId, createMockTaskContext({ payload: { size: 150 } }));
     assert.strictEqual(policyRes3.ok, false);
     assert.strictEqual(!policyRes3.ok && policyRes3.error.code, "POLICY_DENIED");
     assert.ok(!policyRes3.ok && policyRes3.error.message.includes("Payload too large"));

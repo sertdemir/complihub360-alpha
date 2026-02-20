@@ -1,12 +1,6 @@
 import type { AgentId, ExecutionEvent } from "@complihub/agent-core"
 
-export interface TaskContext {
-    requestId: string;
-    correlationId: string;
-    tenantId: string;
-    payload: unknown;
-    timestamp: Date;
-}
+export type { TaskContext } from "@complihub360/types";
 
 // Ensure error is serializable
 export interface ExecutionError {

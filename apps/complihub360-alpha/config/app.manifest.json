@@ -1,0 +1,21 @@
+{
+    "appId": "complihub360-alpha",
+    "name": "CompliHub360 Alpha",
+    "locales": [
+        "de",
+        "en",
+        "es",
+        "tr"
+    ],
+    "features": {
+        "search": true,
+        "solveHub": true,
+        "primaryCtaRequest": true,
+        "providerIngest": true,
+        "magicLink": true
+    },
+    "policy": {
+        "mode": "strict",
+        "source": "file"
+    }
+}
