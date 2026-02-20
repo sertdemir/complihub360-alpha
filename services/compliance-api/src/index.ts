@@ -57,6 +57,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         let body = '';
         req.on('data', chunk => { body += chunk.toString(); });
         req.on('end', async () => {
+            console.log(`[DEV] Incoming POST /api/compliance/check | Body:`, body);
             try {
                 const requestData = JSON.parse(body) as ComplianceCheckRequest;
 
@@ -84,7 +85,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     }
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3005;
 server.listen(PORT, () => {
     console.log(`Compliance API running on port ${PORT}`);
 });

@@ -7,7 +7,11 @@ export default defineConfig({
     cacheDir: './.vite',
     server: {
         proxy: {
-            '/api': 'http://127.0.0.1:3001'
+            '/api': {
+                target: 'http://localhost:3001',
+                changeOrigin: true,
+                secure: false,
+            }
         }
     },
     test: {
