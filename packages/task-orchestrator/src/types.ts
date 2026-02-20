@@ -1,6 +1,7 @@
 import type { AgentId, ExecutionEvent } from "@complihub/agent-core"
 
-export type { TaskContext } from "@complihub360/types";
+import type { TaskContext } from "@complihub360/types";
+export type { TaskContext };
 
 // Ensure error is serializable
 export interface ExecutionError {

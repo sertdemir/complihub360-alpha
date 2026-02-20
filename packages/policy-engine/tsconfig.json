@@ -13,6 +13,9 @@
     "references": [
         {
             "path": "../agent-core"
+        },
+        {
+            "path": "../types"
         }
     ]
 }

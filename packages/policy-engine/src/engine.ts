@@ -20,7 +20,7 @@ export class DefaultPolicyEngine implements PolicyEngine {
         }
 
         // 1. Check Denied Constraints (Highest Priority)
-        if (ctx.agentId && policy.deniedAgents?.includes(ctx.agentId)) {
+        if (ctx.agentId && policy.deniedAgents?.includes(ctx.agentId as AgentId)) {
             return { allowed: false, reason: `Agent '${ctx.agentId}' is explicitly denied by tenant policy.` };
         }
         if (ctx.capability && policy.deniedCapabilities?.includes(ctx.capability)) {
@@ -31,7 +31,7 @@ export class DefaultPolicyEngine implements PolicyEngine {
         }
 
         // 2. Check Explicit Allows (If configured, act as allowlist)
-        if (ctx.agentId && policy.allowedAgents && !policy.allowedAgents.includes(ctx.agentId)) {
+        if (ctx.agentId && policy.allowedAgents && !policy.allowedAgents.includes(ctx.agentId as AgentId)) {
             return { allowed: false, reason: `Agent '${ctx.agentId}' is not in tenant allowlist.` };
         }
         if (ctx.capability && policy.allowedCapabilities && !policy.allowedCapabilities.includes(ctx.capability)) {
