@@ -2,7 +2,7 @@ import type { PolicyContext, PolicyDecision, TenantPolicy, AgentId } from "@comp
 import { InMemoryLimiter } from "./inMemoryLimiter";
 
 export interface PolicyEngine {
-    evaluate(ctx: PolicyContext): PolicyDecision;
+    evaluate(ctx: PolicyContext, request?: any, findings?: any[]): PolicyDecision;
     acquire(ctx: PolicyContext): boolean;
     release(ctx: PolicyContext): void;
 }
@@ -12,7 +12,7 @@ export class DefaultPolicyEngine implements PolicyEngine {
 
     constructor(private store: Map<string, TenantPolicy>) { }
 
-    public evaluate(ctx: PolicyContext): PolicyDecision {
+    public evaluate(ctx: PolicyContext, request?: any, findings?: any[]): PolicyDecision {
         const policy = this.store.get(ctx.tenantId);
 
         if (!policy) {
@@ -58,6 +58,15 @@ export class DefaultPolicyEngine implements PolicyEngine {
         // 4. Rate Limiting Check
         if (!this.limiter.checkRateLimit(ctx.tenantId, policy.rateLimit)) {
             return { allowed: false, reason: `Tenant rate limit exceeded.` };
+        }
+
+        // 5. Compliance Findings Check (VS1 specific rule)
+        if (findings && findings.length > 0 && request && request.tags) {
+            const hasHigh = findings.some((f: any) => f.severity === "high");
+            const isPublic = request.tags.includes("public");
+            if (hasHigh && isPublic) {
+                return { allowed: false, reason: "Compliance deny: 'high' finding in a 'public' context." };
+            }
         }
 
         // If we reached here, action is allowed. Add metadata clamp if timeout is set.

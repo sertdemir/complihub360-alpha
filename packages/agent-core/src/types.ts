@@ -3,7 +3,8 @@ export type AgentId =
     | "repo-engineer"
     | "ui-builder"
     | "qa-sentinel"
-    | "knowledge-librarian";
+    | "knowledge-librarian"
+    | "compliance-check-agent";
 
 export type TaskStatus = "queued" | "running" | "succeeded" | "failed";
 

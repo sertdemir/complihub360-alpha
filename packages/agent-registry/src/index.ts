@@ -45,3 +45,19 @@ export class AgentRegistry {
         return !!agent.capabilities?.some(cap => cap.name === capability);
     }
 }
+
+export function createDefaultRegistry(): AgentRegistry {
+    const registry = new AgentRegistry();
+    registry.register({
+        id: "compliance-check-agent" as AgentId,
+        name: "Compliance Check Agent",
+        version: "1.0.0",
+        capabilities: [
+            {
+                name: "compliance_check",
+                description: "Analyzes text for basic compliance rules."
+            }
+        ]
+    });
+    return registry;
+}

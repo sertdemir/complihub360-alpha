@@ -20,7 +20,9 @@
     "format": "prettier --write .",
     "build": "tsc -b",
     "typecheck": "tsc -b",
-    "clean": "tsc -b --clean"
+    "clean": "tsc -b --clean",
+    "dev:ui": "npm run dev --workspace=@vs1-demo/ui",
+    "dev:service": "npm run dev --workspace=@complihub/compliance-api"
   },
   "devDependencies": {
     "eslint": "^8.56.0",

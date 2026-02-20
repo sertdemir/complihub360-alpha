@@ -4,6 +4,7 @@ import { DashboardHeader } from "./components/layout/DashboardHeader";
 import { ComplianceStatus } from "./components/feedback/ComplianceStatus";
 import { RiskOverviewPanel } from "./components/dashboard/RiskOverviewPanel";
 import { RiskTable } from "./components/dashboard/RiskTable";
+import { ComplianceCheckForm } from "./components/dashboard/ComplianceCheckForm";
 
 function App() {
     return (
@@ -80,6 +81,9 @@ function App() {
                         onExport={() => console.log("Export triggered")}
                     />
                 </section>
+
+                {/* VS1 Compliance Check form */}
+                <ComplianceCheckForm />
 
                 {/* BaseButton Demo (Keep existing) */}
                 <section className="space-y-4 pt-8 border-t border-white/10">

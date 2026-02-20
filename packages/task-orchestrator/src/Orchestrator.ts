@@ -1,6 +1,7 @@
 import type { AgentId } from "@complihub/agent-core";
 import { type PolicyContext, createPolicyContext } from "@complihub360/types";
 import type { AgentRegistry } from "@complihub/agent-registry";
+import type { ComplianceCheckRequest, ComplianceCheckResponse, ComplianceCheckFinding } from "@complihub360/types";
 import type { ExecutableAgent, TaskContext, ExecutionResult, Middleware, ExecutionOptions, ExecutionObserver } from "./types";
 import { composeMiddlewares } from "./middleware";
 import { IntentRouter } from "./IntentRouter";
@@ -259,5 +260,66 @@ export class Orchestrator {
                 agentId: "task-orchestrator" as AgentId
             };
         }
+    }
+
+    public async runComplianceCheck(request: ComplianceCheckRequest, fallbackCtx: TaskContext): Promise<ComplianceCheckResponse> {
+        const correlationId = fallbackCtx.correlationId || `corr-${Date.now()}`;
+        const requestId = fallbackCtx.requestId || `req-${Date.now()}`;
+
+        const ctx: TaskContext = {
+            ...fallbackCtx,
+            correlationId,
+            requestId,
+            tenantId: request.tenantId,
+            appId: request.appId,
+            payload: request
+        };
+
+        const agents = this.registry.getByCapability("compliance_check", request.tenantId);
+        if (agents.length === 0) {
+            return {
+                requestId,
+                correlationId,
+                decision: "denied",
+                reason: "No compliance_check agent found",
+                findings: []
+            };
+        }
+
+        const agentId = agents[0].id;
+        const result = await this.execute(agentId, ctx, { capability: "compliance_check" });
+
+        let findings: ComplianceCheckFinding[] = [];
+        if (result.ok && result.data && (result.data as any).findings) {
+            findings = (result.data as any).findings;
+        } else if (!result.ok) {
+            return {
+                requestId,
+                correlationId,
+                decision: "denied",
+                reason: `Agent failed: ${result.error.message}`,
+                findings: []
+            };
+        }
+
+        let decisionStr: "allowed" | "denied" = "allowed";
+        let reason: string | undefined;
+
+        if (this.policyEngine) {
+            const policyCtx = createPolicyContext(ctx, { agentId, capability: "compliance_check" });
+            const evalResult = this.policyEngine.evaluate(policyCtx, request, findings);
+            if (!evalResult.allowed) {
+                decisionStr = "denied";
+                reason = evalResult.reason;
+            }
+        }
+
+        return {
+            requestId,
+            correlationId,
+            decision: decisionStr,
+            reason,
+            findings
+        };
     }
 }
