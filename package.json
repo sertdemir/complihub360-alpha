@@ -11,17 +11,18 @@
     "services/*",
     "ui/*"
   ],
-  "lint": "eslint . --ext .ts,.tsx",
-  "test": "npm run test --if-present --workspaces",
-  "create:app": "node template/scripts/create-app.js",
-  "format": "prettier --write .",
-  "build": "tsc -b",
-  "typecheck": "tsc -b",
-  "clean": "tsc -b --clean"
-},
-"devDependencies": {
-  "eslint": "^8.56.0",
-  "prettier": "^3.2.4",
-  "typescript": "^5.3.3"
-}
+  "scripts": {
+    "lint": "eslint . --ext .ts,.tsx",
+    "test": "npm run test --if-present --workspaces",
+    "create:app": "node template/scripts/create-app.js",
+    "format": "prettier --write .",
+    "build": "tsc -b",
+    "typecheck": "tsc -b",
+    "clean": "tsc -b --clean"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.4",
+    "typescript": "^5.3.3"
+  }
 }
