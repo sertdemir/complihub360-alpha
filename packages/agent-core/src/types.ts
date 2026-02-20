@@ -24,11 +24,18 @@ export interface AgentContext {
     repoRoot?: string;
 }
 
+export type IntentDescriptor = {
+    intent: string;
+    tags?: string[];
+    priority?: number;
+}
+
 export interface AgentCapability {
     name: string;
     description?: string;
     inputSchema?: unknown;
     outputSchema?: unknown;
+    supportedIntents?: IntentDescriptor[];
 }
 
 export interface Agent {

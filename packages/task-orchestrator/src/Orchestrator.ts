@@ -2,6 +2,7 @@ import type { AgentId } from "@complihub/agent-core";
 import type { AgentRegistry } from "@complihub/agent-registry";
 import type { ExecutableAgent, TaskContext, ExecutionResult, Middleware, ExecutionOptions } from "./types";
 import { composeMiddlewares } from "./middleware";
+import { IntentRouter } from "./IntentRouter";
 
 export interface LifecycleHooks {
     beforeExecute?: (agentId: AgentId, context: TaskContext) => void | Promise<void>;
@@ -113,5 +114,59 @@ export class Orchestrator {
         }
 
         return result;
+    }
+
+    public async executeByCapability(capability: string, context: TaskContext, options?: ExecutionOptions): Promise<ExecutionResult> {
+        const start = Date.now();
+        const agents = this.registry.getByCapability(capability);
+
+        if (agents.length === 0) {
+            return {
+                ok: false,
+                error: {
+                    name: "CapabilityError",
+                    message: `No agent found with capability '${capability}'.`,
+                    code: "CAPABILITY_NOT_FOUND"
+                },
+                durationMs: Date.now() - start,
+                agentId: "task-orchestrator" as AgentId
+            };
+        }
+
+        if (agents.length > 1) {
+            return {
+                ok: false,
+                error: {
+                    name: "CapabilityError",
+                    message: `Multiple agents found with capability '${capability}'. Cannot resolve unambiguously.`,
+                    code: "AMBIGUOUS_CAPABILITY"
+                },
+                durationMs: Date.now() - start,
+                agentId: "task-orchestrator" as AgentId
+            };
+        }
+
+        return this.execute(agents[0].id, context, options);
+    }
+
+    public async executeByIntent(intent: string, context: TaskContext, options?: ExecutionOptions): Promise<ExecutionResult> {
+        const start = Date.now();
+        const router = new IntentRouter(this.registry);
+
+        try {
+            const agent = router.route(intent);
+            return await this.execute(agent.id, context, options);
+        } catch (e) {
+            return {
+                ok: false,
+                error: {
+                    name: "IntentRoutingError",
+                    message: e instanceof Error ? e.message : String(e),
+                    code: "INTENT_NOT_FOUND"
+                },
+                durationMs: Date.now() - start,
+                agentId: "task-orchestrator" as AgentId
+            };
+        }
     }
 }
