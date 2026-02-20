@@ -1,0 +1,16 @@
+{
+    "appId": "vs1-demo",
+    "name": "Vertical Slice 1 Demo",
+    "version": "1.0.0",
+    "locales": [
+        "en"
+    ],
+    "features": {
+        "search": true
+    },
+    "policy": {
+        "mode": "strict",
+        "source": "file"
+    },
+    "enabledAgents": []
+}

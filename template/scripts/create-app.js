@@ -1,10 +1,7 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import readline from 'node:readline';
+const fs = require('node:fs');
+const path = require('node:path');
+const readline = require('node:readline');
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, '../../');
 const TEMPLATE_DIR = path.join(REPO_ROOT, 'template/apps/example-app');
 
@@ -39,17 +36,20 @@ function copyRecursiveSync(src, dest, tokenAppId, tokenAppName) {
 async function run() {
     console.log("--- CompliHub360 App Scaffolder ---\n");
 
-    const appId = await question("App ID (kebab-case, e.g. my-new-app): ");
+    const appId = process.argv[2] || await question("App ID (kebab-case, e.g. my-new-app): ");
     if (!appId || !/^[a-z0-9-]+$/.test(appId)) {
         console.error("Invalid App ID. Must be kebab-case lowercase.");
         process.exit(1);
     }
 
-    const appName = await question("App Name (e.g. My New App): ");
+    const appName = process.argv[3] || await question("App Name (e.g. My New App): ");
     if (!appName) {
         console.error("App Name is required.");
         process.exit(1);
     }
+
+    let includeService = process.argv[4] || await question("Include service? (y/n): ");
+    includeService = includeService.toLowerCase().trim() === 'y';
 
     rl.close();
 
@@ -62,6 +62,13 @@ async function run() {
 
     console.log(`\nScaffolding into: apps/${appId}...`);
     copyRecursiveSync(TEMPLATE_DIR, targetDir, appId, appName);
+
+    if (!includeService) {
+        const servicesDir = path.join(targetDir, 'services');
+        if (fs.existsSync(servicesDir)) {
+            fs.rmSync(servicesDir, { recursive: true, force: true });
+        }
+    }
 
     // Update root package.json if not already wildcarded
     const rootPkgPath = path.join(REPO_ROOT, 'package.json');

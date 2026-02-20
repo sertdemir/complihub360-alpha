@@ -1,0 +1,16 @@
+{
+    "appId": "demo-app",
+    "name": "Demo App",
+    "version": "1.0.0",
+    "locales": [
+        "en"
+    ],
+    "features": {
+        "search": true
+    },
+    "policy": {
+        "mode": "strict",
+        "source": "file"
+    },
+    "enabledAgents": []
+}

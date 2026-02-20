@@ -13,6 +13,9 @@
         },
         {
             "path": "packages/task-orchestrator"
+        },
+        {
+            "path": "packages/types"
         }
     ]
 }

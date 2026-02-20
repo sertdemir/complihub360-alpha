@@ -9,7 +9,9 @@
   "workspaces": [
     "packages/*",
     "services/*",
-    "ui/*"
+    "ui/*",
+    "apps/demo-app/*",
+    "apps/vs1-demo/*"
   ],
   "scripts": {
     "lint": "eslint . --ext .ts,.tsx",

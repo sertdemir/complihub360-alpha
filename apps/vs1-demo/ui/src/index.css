@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-white font-sans;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-wide;
+  }
+}
+
+@layer components {
+  /* Tactical Glass Base Styles */
+  .glass-panel {
+    @apply bg-surface/50 backdrop-blur-md border border-border rounded-lg;
+  }
+}
