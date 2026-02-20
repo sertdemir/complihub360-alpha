@@ -42,5 +42,52 @@ export interface Agent {
     id: AgentId;
     displayName: string;
     capabilities?: AgentCapability[];
+    tenantIds?: string[];
     run: (input: TaskInput, ctx: AgentContext) => Promise<TaskResult>;
+}
+
+export type ExecutionEvent = {
+    agentId: AgentId;
+    tenantId: string;
+    intent?: string;
+    capability?: string;
+    startedAt: number;
+    finishedAt: number;
+    durationMs: number;
+    success: boolean;
+    error?: {
+        name: string;
+        message: string;
+    };
+};
+
+export interface PolicyDecision {
+    allowed: boolean;
+    reason?: string;
+    metadata?: Record<string, any>;
+}
+
+export interface PolicyContext {
+    tenantId: string;
+    correlationId: string;
+    requestId: string;
+    agentId?: AgentId;
+    capability?: string;
+    intent?: string;
+    timestamp: Date;
+    payload?: unknown;
+}
+
+export interface TenantPolicy {
+    allowedAgents?: AgentId[];
+    deniedAgents?: AgentId[];
+    allowedCapabilities?: string[];
+    deniedCapabilities?: string[];
+    allowedIntents?: string[];
+    deniedIntents?: string[];
+    maxPayloadBytes?: number;
+    maxExecutionMs?: number;
+    rateLimit?: { windowMs: number; max: number };
+    concurrencyLimit?: number;
+    modelAllowList?: string[];
 }

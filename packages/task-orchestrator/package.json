@@ -10,6 +10,7 @@
     },
     "dependencies": {
         "@complihub/agent-core": "*",
-        "@complihub/agent-registry": "*"
+        "@complihub/agent-registry": "*",
+        "@complihub/policy-engine": "*"
     }
 }

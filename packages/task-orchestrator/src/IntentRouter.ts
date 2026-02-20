@@ -3,8 +3,13 @@ import type { AgentRegistry, RegisteredAgent } from "@complihub/agent-registry";
 export class IntentRouter {
     constructor(private registry: AgentRegistry) { }
 
-    public route(intent: string): RegisteredAgent {
-        const agents = this.registry.list();
+    public route(intent: string, tenantId?: string): RegisteredAgent {
+        const allAgents = this.registry.list();
+        const agents = allAgents.filter(agent => {
+            if (tenantId && agent.tenantIds && !agent.tenantIds.includes(tenantId)) return false;
+            return true;
+        });
+
         let bestScore = -1;
         let candidates: RegisteredAgent[] = [];
 

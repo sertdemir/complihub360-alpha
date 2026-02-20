@@ -1,7 +1,9 @@
-import type { AgentId } from "@complihub/agent-core"
+import type { AgentId, ExecutionEvent } from "@complihub/agent-core"
 
 export interface TaskContext {
     requestId: string;
+    correlationId: string;
+    tenantId: string;
     payload: unknown;
     timestamp: Date;
 }
@@ -29,4 +31,10 @@ export type Middleware = (context: TaskContext, next: MiddlewareNext, agentId: A
 export interface ExecutionOptions {
     signal?: AbortSignal;
     timeoutMs?: number;
+    intent?: string;
+    capability?: string;
+}
+
+export interface ExecutionObserver {
+    onExecution(event: ExecutionEvent): void;
 }

@@ -34,7 +34,18 @@ class MockRegistry {
     getByCapability(name: string) { return []; }
 }
 
-const mockCtx: TaskContext = { requestId: "req-1", payload: {}, timestamp: new Date() };
+function createMockContext(overrides?: Partial<TaskContext>): TaskContext {
+    return {
+        requestId: "req-1",
+        payload: {},
+        timestamp: new Date(),
+        correlationId: "test-correlation-1",
+        tenantId: "tenant-a",
+        ...overrides
+    };
+}
+
+const mockCtx = createMockContext();
 
 async function runTests() {
     console.log("--- Running Orchestrator Tests ---");
@@ -151,6 +162,103 @@ async function runTests() {
     assert.strictEqual(!missingIntentRes.ok && missingIntentRes.error.code, "INTENT_NOT_FOUND");
 
     console.log("✅ Intent routing scoring and fallback successfully verified");
+
+    // TEST 7: Execution Observability
+    let observedEvents: any[] = [];
+    const orchObs = new Orchestrator(new MockRegistry() as any);
+    orchObs.addObserver({
+        onExecution: (event) => observedEvents.push(event)
+    });
+
+    orchObs.registerExecutable({ id: "exact-match-agent" as AgentId, execute: async () => ({ ok: true, durationMs: 0, agentId: "exact-match-agent" as AgentId }) });
+
+    // Test observer triggers on success with meta tags
+    await orchObs.executeByIntent("analyze_code", mockCtx);
+    assert.strictEqual(observedEvents.length, 1);
+    assert.strictEqual(observedEvents[0].agentId, "exact-match-agent");
+    assert.strictEqual(observedEvents[0].success, true);
+    assert.strictEqual(observedEvents[0].intent, "analyze_code");
+    assert.ok(observedEvents[0].startedAt > 0);
+    assert.ok(observedEvents[0].finishedAt >= observedEvents[0].startedAt);
+
+    // Test observer triggers on failure
+    orchObs.registerExecutable({ id: "fail-agent" as AgentId, execute: async () => ({ ok: false, durationMs: 0, error: { name: "Err", message: "Failed", code: "FAILED" }, agentId: "fail-agent" as AgentId }) });
+    let failCtx = createMockContext({ requestId: "req-fail", correlationId: "fail-id" });
+    await orchObs.execute("fail-agent" as AgentId, failCtx);
+
+    assert.strictEqual(observedEvents.length, 2);
+    assert.strictEqual(observedEvents[1].agentId, "fail-agent");
+    assert.strictEqual(observedEvents[1].success, false);
+    assert.strictEqual(observedEvents[1].error.message, "Failed");
+
+    console.log("✅ Execution observability and audit tracking successfully verified");
+
+    // TEST 8: Tenant Isolation
+    const tenantRegistry = {
+        get: (id: string) => {
+            if (id === "global-agent") return { id, name: "Global", version: "1" };
+            if (id === "tenant-a-agent") return { id, name: "A", version: "1", tenantIds: ["tenant-a"] };
+            return undefined;
+        }
+    };
+    const orchTenant = new Orchestrator(tenantRegistry as any);
+    orchTenant.registerExecutable({ id: "global-agent" as AgentId, execute: async () => ({ ok: true, durationMs: 0, agentId: "global-agent" as AgentId }) });
+    orchTenant.registerExecutable({ id: "tenant-a-agent" as AgentId, execute: async () => ({ ok: true, durationMs: 0, agentId: "tenant-a-agent" as AgentId }) });
+
+    // Global agent can be executed by anyone
+    const resGlobal = await orchTenant.execute("global-agent" as AgentId, { ...mockCtx, tenantId: "tenant-b" });
+    assert.strictEqual(resGlobal.ok, true);
+
+    // Tenant A agent executed by Tenant A
+    const resTenantA = await orchTenant.execute("tenant-a-agent" as AgentId, { ...mockCtx, tenantId: "tenant-a" });
+    assert.strictEqual(resTenantA.ok, true);
+
+    // Tenant A agent executed by Tenant B -> Failure
+    const resTenantB = await orchTenant.execute("tenant-a-agent" as AgentId, { ...mockCtx, tenantId: "tenant-b" });
+    assert.strictEqual(resTenantB.ok, false);
+    assert.strictEqual(!resTenantB.ok && resTenantB.error.code, "TENANT_MISMATCH");
+
+    console.log("✅ Tenant isolation routing securely verified");
+
+    // TEST 9: Policy Engine Integration
+    const mockPolicyEngine = {
+        evaluate: (ctx: any) => {
+            if (ctx.capability === "forbidden-cap") return { allowed: false, reason: "Capability denied" };
+            if (ctx.payload && (ctx.payload as any).size > 100) return { allowed: false, reason: "Payload too large" };
+            return { allowed: true };
+        },
+        acquire: (ctx: any) => {
+            if (ctx.agentId === "concurrent-agent") return false;
+            return true;
+        },
+        release: (ctx: any) => { }
+    };
+
+    const orchPolicy = new Orchestrator(new MockRegistry() as any, {}, mockPolicyEngine as any);
+    orchPolicy.registerExecutable({ id: "policy-agent" as AgentId, execute: async () => ({ ok: true, durationMs: 0, agentId: "policy-agent" as AgentId }) });
+    orchPolicy.registerExecutable({ id: "concurrent-agent" as AgentId, execute: async () => ({ ok: true, durationMs: 0, agentId: "concurrent-agent" as AgentId }) });
+
+    // 1. Allowed Execution
+    const policyRes1 = await orchPolicy.execute("policy-agent" as AgentId, mockCtx);
+    assert.strictEqual(policyRes1.ok, true);
+
+    // 2. Denied Capability
+    const policyRes2 = await orchPolicy.execute("policy-agent" as AgentId, mockCtx, { capability: "forbidden-cap" });
+    assert.strictEqual(policyRes2.ok, false);
+    assert.strictEqual(!policyRes2.ok && policyRes2.error.code, "POLICY_DENIED");
+
+    // 3. Payload Limit Exceeded
+    const policyRes3 = await orchPolicy.execute("policy-agent" as AgentId, createMockContext({ payload: { size: 150 } }));
+    assert.strictEqual(policyRes3.ok, false);
+    assert.strictEqual(!policyRes3.ok && policyRes3.error.code, "POLICY_DENIED");
+    assert.ok(!policyRes3.ok && policyRes3.error.message.includes("Payload too large"));
+
+    // 4. Concurrency Blocked
+    const policyRes4 = await orchPolicy.execute("concurrent-agent" as AgentId, mockCtx);
+    assert.strictEqual(policyRes4.ok, false);
+    assert.strictEqual(!policyRes4.ok && policyRes4.error.code, "CONCURRENCY_LIMITED");
+
+    console.log("✅ Policy Engine Guardrails natively verified");
 }
 
 runTests().catch(e => {

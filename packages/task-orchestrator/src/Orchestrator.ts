@@ -1,8 +1,9 @@
-import type { AgentId } from "@complihub/agent-core";
+import type { AgentId, PolicyContext } from "@complihub/agent-core";
 import type { AgentRegistry } from "@complihub/agent-registry";
-import type { ExecutableAgent, TaskContext, ExecutionResult, Middleware, ExecutionOptions } from "./types";
+import type { ExecutableAgent, TaskContext, ExecutionResult, Middleware, ExecutionOptions, ExecutionObserver } from "./types";
 import { composeMiddlewares } from "./middleware";
 import { IntentRouter } from "./IntentRouter";
+import type { PolicyEngine } from "@complihub/policy-engine";
 
 export interface LifecycleHooks {
     beforeExecute?: (agentId: AgentId, context: TaskContext) => void | Promise<void>;
@@ -13,14 +14,20 @@ export interface LifecycleHooks {
 export class Orchestrator {
     private executableAgents = new Map<string, ExecutableAgent>();
     private middlewares: Middleware[] = [];
+    private observers: ExecutionObserver[] = [];
 
     constructor(
         private registry: AgentRegistry,
-        private hooks: LifecycleHooks = {}
+        private hooks: LifecycleHooks = {},
+        private policyEngine?: PolicyEngine
     ) { }
 
     public use(middleware: Middleware): void {
         this.middlewares.push(middleware);
+    }
+
+    public addObserver(observer: ExecutionObserver): void {
+        this.observers.push(observer);
     }
 
     public registerExecutable(agent: ExecutableAgent): void {
@@ -31,22 +38,79 @@ export class Orchestrator {
     }
 
     public async execute(agentId: AgentId, context: TaskContext, options?: ExecutionOptions): Promise<ExecutionResult> {
+        const start = Date.now();
         const agent = this.executableAgents.get(agentId);
+        const registered = this.registry.get(agentId);
 
-        if (!agent) {
+        if (!agent || !registered) {
+            const error = { name: "AgentNotFoundError", message: `Agent with id '${agentId}' not found or not registered for execution.` };
+            this.notifyObservers(agentId, context, start, Date.now(), false, error, options);
             return {
                 ok: false,
-                error: { name: "AgentNotFoundError", message: `Agent with id '${agentId}' not found or not registered for execution.` },
+                error,
                 durationMs: 0,
                 agentId
             };
+        }
+
+        if (registered.tenantIds && !registered.tenantIds.includes(context.tenantId)) {
+            const error = { name: "TenantIsolationError", message: `Agent with id '${agentId}' is not permitted to execute for tenant '${context.tenantId}'.`, code: "TENANT_MISMATCH" };
+            this.notifyObservers(agentId, context, start, Date.now(), false, error, options);
+            return {
+                ok: false,
+                error,
+                durationMs: 0,
+                agentId
+            };
+        }
+
+        let clampedExecutionMs = options?.timeoutMs;
+        const policyCtx: PolicyContext = {
+            tenantId: context.tenantId,
+            correlationId: context.correlationId,
+            requestId: context.requestId,
+            agentId,
+            timestamp: new Date(),
+            payload: context.payload,
+            intent: options?.intent,
+            capability: options?.capability
+        };
+
+        if (this.policyEngine) {
+            const decision = this.policyEngine.evaluate(policyCtx);
+            if (!decision.allowed) {
+                const error = { name: "PolicyDeniedError", message: decision.reason || "Execution denied by policy engine.", code: "POLICY_DENIED" };
+                this.notifyObservers(agentId, context, start, Date.now(), false, error, options);
+                return {
+                    ok: false,
+                    error,
+                    durationMs: 0,
+                    agentId
+                };
+            }
+
+            if (!this.policyEngine.acquire(policyCtx)) {
+                const error = { name: "PolicyConcurrencyError", message: "Concurrency limit exceeded for tenant.", code: "CONCURRENCY_LIMITED" };
+                this.notifyObservers(agentId, context, start, Date.now(), false, error, options);
+                return {
+                    ok: false,
+                    error,
+                    durationMs: 0,
+                    agentId
+                };
+            }
+
+            if (decision.metadata?.clampedExecutionMs) {
+                clampedExecutionMs = clampedExecutionMs
+                    ? Math.min(clampedExecutionMs, decision.metadata.clampedExecutionMs)
+                    : decision.metadata.clampedExecutionMs;
+            }
         }
 
         if (this.hooks.beforeExecute) {
             await this.hooks.beforeExecute(agentId, context);
         }
 
-        const start = Date.now();
         const chain = composeMiddlewares(this.middlewares);
 
         const executionPromise = chain(context, async () => {
@@ -55,11 +119,11 @@ export class Orchestrator {
 
         let result: ExecutionResult;
 
-        if (options?.timeoutMs) {
+        if (clampedExecutionMs) {
             const timeoutPromise = new Promise<ExecutionResult>((_, reject) => {
                 setTimeout(() => {
                     reject(new Error("Execution timed out"));
-                }, options.timeoutMs);
+                }, clampedExecutionMs);
             });
 
             try {
@@ -113,12 +177,47 @@ export class Orchestrator {
             await this.hooks.afterExecute(agentId, context, result);
         }
 
+        if (this.policyEngine) {
+            this.policyEngine.release({
+                tenantId: context.tenantId,
+                correlationId: context.correlationId,
+                requestId: context.requestId,
+                timestamp: new Date()
+            });
+        }
+
+        this.notifyObservers(agentId, context, start, Date.now(), result.ok, result.ok ? undefined : result.error, options);
+
         return result;
+    }
+
+    private notifyObservers(agentId: AgentId, context: TaskContext, start: number, end: number, success: boolean, error?: { name: string, message: string }, options?: ExecutionOptions) {
+        if (this.observers.length === 0) return;
+
+        const event = {
+            agentId,
+            tenantId: context.tenantId,
+            intent: options?.intent,
+            capability: options?.capability,
+            startedAt: start,
+            finishedAt: end,
+            durationMs: end - start,
+            success,
+            error
+        };
+
+        for (const obs of this.observers) {
+            try {
+                obs.onExecution(event);
+            } catch (e) {
+                console.error(`Observer failed during onExecution for agent ${agentId}:`, e);
+            }
+        }
     }
 
     public async executeByCapability(capability: string, context: TaskContext, options?: ExecutionOptions): Promise<ExecutionResult> {
         const start = Date.now();
-        const agents = this.registry.getByCapability(capability);
+        const agents = this.registry.getByCapability(capability, context.tenantId);
 
         if (agents.length === 0) {
             return {
@@ -146,7 +245,7 @@ export class Orchestrator {
             };
         }
 
-        return this.execute(agents[0].id, context, options);
+        return this.execute(agents[0].id, context, { ...options, capability });
     }
 
     public async executeByIntent(intent: string, context: TaskContext, options?: ExecutionOptions): Promise<ExecutionResult> {
@@ -154,8 +253,8 @@ export class Orchestrator {
         const router = new IntentRouter(this.registry);
 
         try {
-            const agent = router.route(intent);
-            return await this.execute(agent.id, context, options);
+            const agent = router.route(intent, context.tenantId);
+            return await this.execute(agent.id, context, { ...options, intent });
         } catch (e) {
             return {
                 ok: false,

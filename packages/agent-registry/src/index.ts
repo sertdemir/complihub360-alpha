@@ -9,6 +9,7 @@ export interface RegisteredAgent {
     description?: string;
     version: string;
     capabilities?: AgentCapability[];
+    tenantIds?: string[];
 }
 
 export class AgentRegistry {
@@ -29,10 +30,13 @@ export class AgentRegistry {
         return Array.from(this.agents.values());
     }
 
-    public getByCapability(name: string): RegisteredAgent[] {
-        return this.list().filter(agent =>
-            agent.capabilities?.some(cap => cap.name === name)
-        );
+    public getByCapability(name: string, tenantId?: string): RegisteredAgent[] {
+        return this.list().filter(agent => {
+            const hasCap = agent.capabilities?.some(cap => cap.name === name);
+            if (!hasCap) return false;
+            if (tenantId && agent.tenantIds && !agent.tenantIds.includes(tenantId)) return false;
+            return true;
+        });
     }
 
     public hasCapability(agentId: AgentId, capability: string): boolean {

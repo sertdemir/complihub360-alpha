@@ -10,6 +10,9 @@
             ],
             "@complihub/task-orchestrator": [
                 "packages/task-orchestrator/src"
+            ],
+            "@complihub/policy-engine": [
+                "packages/policy-engine/src"
             ]
         },
         "target": "ESNext",
