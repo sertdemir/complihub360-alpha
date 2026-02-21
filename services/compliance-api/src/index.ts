@@ -188,6 +188,13 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     return;
                 }
 
+                if (!requestData.text || typeof requestData.text !== 'string' || requestData.text.trim() === '') {
+                    res.setHeader('x-correlation-id', correlationId);
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'text is required and must be a non-empty string', correlationId }));
+                    return;
+                }
+
                 if (requestData.tags !== undefined && (!Array.isArray(requestData.tags) || requestData.tags.some(t => typeof t !== 'string'))) {
                     res.setHeader('x-correlation-id', correlationId);
                     res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -199,7 +206,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const cleanRequestData: ComplianceCheckRequest = {
                     tenantId: requestData.tenantId,
                     appId: requestData.appId || "vs1-demo",
-                    tags: requestData.tags
+                    tags: requestData.tags,
+                    text: requestData.text
                 };
 
                 const fallbackCtx = createTaskContext({
