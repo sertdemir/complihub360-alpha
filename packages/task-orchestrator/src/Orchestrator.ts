@@ -2,9 +2,9 @@ import type { AgentId } from "@complihub/agent-core";
 import { type PolicyContext, createPolicyContext, structuredLog } from "@complihub360/types";
 import type { AgentRegistry } from "@complihub/agent-registry";
 import type { ComplianceCheckRequest, ComplianceCheckResponse, ComplianceCheckFinding } from "@complihub360/types";
-import type { ExecutableAgent, TaskContext, ExecutionResult, Middleware, ExecutionOptions, ExecutionObserver } from "./types";
-import { composeMiddlewares } from "./middleware";
-import { IntentRouter } from "./IntentRouter";
+import type { ExecutableAgent, TaskContext, ExecutionResult, Middleware, ExecutionOptions, ExecutionObserver } from "./types.js";
+import { composeMiddlewares } from "./middleware.js";
+import { IntentRouter } from "./IntentRouter.js";
 import type { PolicyEngine } from "@complihub/policy-engine";
 
 export interface LifecycleHooks {

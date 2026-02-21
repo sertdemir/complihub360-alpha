@@ -1,6 +1,6 @@
 import * as assert from "node:assert";
-import { createTaskContext, createPolicyContext } from "./context";
-import { DEFAULT_APP_ID } from "./app";
+import { createTaskContext, createPolicyContext } from "./context.js";
+import { DEFAULT_APP_ID } from "./app.js";
 
 function runTests() {
     const taskCtx = createTaskContext();

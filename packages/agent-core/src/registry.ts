@@ -1,4 +1,4 @@
-import type { Agent, AgentId } from "./types";
+import type { Agent, AgentId } from "./types.js";
 
 export class AgentRegistry {
     private agents = new Map<AgentId, Agent>();

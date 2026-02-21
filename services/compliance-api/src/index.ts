@@ -3,7 +3,7 @@ import { Orchestrator } from "@complihub/task-orchestrator";
 import { createDefaultRegistry } from "@complihub/agent-registry";
 import { DefaultPolicyEngine } from "@complihub/policy-engine";
 import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeCorrelationId, structuredLog, type AnalyticsEvent, type AlertRecord } from "@complihub360/types";
-import { startCriticalFlowMonitor } from "./monitor";
+import { startCriticalFlowMonitor } from "./monitor.js";
 
 // Local in-memory store for dev-mode analytics and alerts
 const eventStore: AnalyticsEvent[] = [];

@@ -1,5 +1,5 @@
 import type { AgentId } from "@complihub/agent-core";
-import type { TaskContext, ExecutionResult, Middleware, MiddlewareNext } from "./types";
+import type { TaskContext, ExecutionResult, Middleware, MiddlewareNext } from "./types.js";
 
 export function composeMiddlewares(middlewares: Middleware[]): Middleware {
     return async function (context: TaskContext, next: MiddlewareNext, agentId: AgentId): Promise<ExecutionResult> {

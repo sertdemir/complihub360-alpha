@@ -1,8 +1,8 @@
 import * as assert from "node:assert";
 import type { AgentId } from "@complihub/agent-core";
-import { Orchestrator } from "./Orchestrator";
-import { composeMiddlewares } from "./middleware";
-import type { TaskContext, ExecutionResult, Middleware, ExecutableAgent } from "./types";
+import { Orchestrator } from "./Orchestrator.js";
+import { composeMiddlewares } from "./middleware.js";
+import type { TaskContext, ExecutionResult, Middleware, ExecutableAgent } from "./types.js";
 import { createMockTaskContext } from "@complihub360/types";
 
 // Mock Registry for Test

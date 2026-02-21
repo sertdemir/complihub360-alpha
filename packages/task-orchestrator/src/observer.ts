@@ -1,4 +1,4 @@
-import type { ExecutionObserver } from "./types";
+import type { ExecutionObserver } from "./types.js";
 import type { ExecutionEvent } from "@complihub/agent-core";
 
 export class DefaultObserver implements ExecutionObserver {

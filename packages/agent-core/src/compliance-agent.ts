@@ -1,4 +1,4 @@
-import type { Agent, TaskInput, AgentContext, TaskResult } from "./types";
+import type { Agent, TaskInput, AgentContext, TaskResult } from "./types.js";
 import type { ComplianceCheckRequest, ComplianceCheckFinding } from "@complihub360/types";
 
 export const complianceCheckAgent: Agent = {

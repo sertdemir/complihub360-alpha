@@ -1,3 +1,3 @@
-export * from "./engine";
-export * from "./inMemoryLimiter";
-export * from "./defaultPolicies";
+export * from "./engine.js";
+export * from "./inMemoryLimiter.js";
+export * from "./defaultPolicies.js";

@@ -1,5 +1,5 @@
 import type { PolicyContext, PolicyDecision, TenantPolicy, AgentId } from "@complihub/agent-core";
-import { InMemoryLimiter } from "./inMemoryLimiter";
+import { InMemoryLimiter } from "./inMemoryLimiter.js";
 
 export interface PolicyEngine {
     evaluate(ctx: PolicyContext, request?: any, findings?: any[]): PolicyDecision;

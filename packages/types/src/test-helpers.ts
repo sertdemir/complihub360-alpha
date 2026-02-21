@@ -1,5 +1,5 @@
-import { TaskContext, PolicyContext, createTaskContext, createPolicyContext } from "./context";
-import { DEFAULT_APP_ID } from "./app";
+import { TaskContext, PolicyContext, createTaskContext, createPolicyContext } from "./context.js";
+import { DEFAULT_APP_ID } from "./app.js";
 
 export function createMockTaskContext(overrides?: Partial<TaskContext>): TaskContext {
     return createTaskContext({

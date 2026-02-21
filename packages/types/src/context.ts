@@ -1,4 +1,4 @@
-import { DEFAULT_APP_ID } from "./app";
+import { DEFAULT_APP_ID } from "./app.js";
 
 export interface TaskContext {
     appId: string;
