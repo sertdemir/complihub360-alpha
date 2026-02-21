@@ -1,5 +1,5 @@
 import type { AgentId } from "@complihub/agent-core";
-import { type PolicyContext, createPolicyContext } from "@complihub360/types";
+import { type PolicyContext, createPolicyContext, structuredLog } from "@complihub360/types";
 import type { AgentRegistry } from "@complihub/agent-registry";
 import type { ComplianceCheckRequest, ComplianceCheckResponse, ComplianceCheckFinding } from "@complihub360/types";
 import type { ExecutableAgent, TaskContext, ExecutionResult, Middleware, ExecutionOptions, ExecutionObserver } from "./types";
@@ -313,6 +313,14 @@ export class Orchestrator {
                 reason = evalResult.reason;
             }
         }
+
+        structuredLog('info', 'Compliance decision', {
+            correlationId,
+            tenantId: ctx.tenantId,
+            agentId,
+            decision: decisionStr,
+            reason
+        });
 
         return {
             requestId,

@@ -1,0 +1,26 @@
+/**
+ * Core event names supported by the telemetry system.
+ * Designed to track the primary KPIs without collecting PII.
+ */
+export type AnalyticsEventName =
+    | "search_submitted"
+    | "results_rendered"
+    | "secondary_clicked"
+    | "primary_clicked"         // Main KPI
+    | "primary_request_submitted"
+    | "provider_confirmed";
+
+/**
+ * Standard telemetry event envelope.
+ * Strictly avoids PII.
+ */
+export interface AnalyticsEvent {
+    eventId: string;           // UUID
+    timestamp: string;         // ISO-8601
+    sessionId: string;         // UUID (anonymous browser session)
+    userId?: string;           // Obfuscated / UUID only
+    correlationId: string;     // Observability trace
+    tenantId?: string;
+    eventName: AnalyticsEventName;
+    properties: Record<string, any>;
+}

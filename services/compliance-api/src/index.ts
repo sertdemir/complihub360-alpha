@@ -2,7 +2,10 @@ import { createServer, IncomingMessage, ServerResponse } from "http";
 import { Orchestrator } from "@complihub/task-orchestrator";
 import { createDefaultRegistry } from "@complihub/agent-registry";
 import { DefaultPolicyEngine } from "@complihub/policy-engine";
-import { createTaskContext, ComplianceCheckRequest, type TaskContext } from "@complihub360/types";
+import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeCorrelationId, structuredLog, type AnalyticsEvent } from "@complihub360/types";
+
+// Local in-memory store for dev-mode analytics
+const eventStore: AnalyticsEvent[] = [];
 
 // 1. Setup Dependencies
 const registry = createDefaultRegistry();
@@ -54,10 +57,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     }
 
     if (req.method === 'POST' && req.url === '/api/compliance/check') {
+        const correlationId = normalizeCorrelationId(req.headers['x-correlation-id']);
+        const startTime = Date.now();
+
         let body = '';
         req.on('data', chunk => { body += chunk.toString(); });
         req.on('end', async () => {
-            console.log(`[DEV] Incoming POST /api/compliance/check | Body:`, body);
+            structuredLog('info', 'Incoming compliance check request', { correlationId, route: req.url, method: req.method });
+
             try {
                 const requestData = JSON.parse(body) as ComplianceCheckRequest;
 
@@ -67,16 +74,52 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 
                 const fallbackCtx = createTaskContext({
                     tenantId: requestData.tenantId,
-                    appId: requestData.appId
+                    appId: requestData.appId,
+                    correlationId
                 });
 
                 const responseData = await orchestrator.runComplianceCheck(requestData, fallbackCtx);
 
+                res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify(responseData));
+                structuredLog('info', 'Compliance check request completed', { correlationId, route: req.url, status: 200, latencyMs: Date.now() - startTime });
             } catch (err) {
+                res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(400, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ error: err instanceof Error ? err.message : String(err) }));
+                structuredLog('error', 'Compliance check request failed', { correlationId, route: req.url, status: 400, error: err instanceof Error ? err.message : String(err) });
+            }
+        });
+    } else if (req.method === 'POST' && req.url === '/api/events') {
+        const correlationId = normalizeCorrelationId(req.headers['x-correlation-id']);
+
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', () => {
+            try {
+                const eventData = JSON.parse(body) as AnalyticsEvent;
+                // Add server receive timestamp if client clock is missing/trusted less
+                const recordedEvent = {
+                    ...eventData,
+                    serverTimestamp: new Date().toISOString()
+                };
+
+                eventStore.push(recordedEvent);
+
+                structuredLog('info', 'Analytics Event Processed', {
+                    correlationId,
+                    eventId: recordedEvent.eventId,
+                    eventName: recordedEvent.eventName
+                });
+
+                res.setHeader('x-correlation-id', correlationId);
+                res.writeHead(202, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, id: recordedEvent.eventId }));
+            } catch (err) {
+                res.setHeader('x-correlation-id', correlationId);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Invalid event payload' }));
             }
         });
     } else {

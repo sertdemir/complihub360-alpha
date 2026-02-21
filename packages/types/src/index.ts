@@ -25,3 +25,5 @@ export * from './app';
 export * from './context';
 export * from './compliance';
 export * from './test-helpers';
+export * from './observability';
+export * from './analytics';
