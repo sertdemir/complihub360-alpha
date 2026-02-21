@@ -21,9 +21,9 @@ export interface EventEnvelope<T> {
     };
 }
 
-export * from './app';
-export * from './context';
-export * from './compliance';
-export * from './test-helpers';
-export * from './observability';
-export * from './analytics';
+export * from './app.js';
+export * from './context.js';
+export * from './compliance.js';
+export * from './test-helpers.js';
+export * from './observability.js';
+export * from './analytics.js';
