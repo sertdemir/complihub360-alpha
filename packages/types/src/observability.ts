@@ -27,14 +27,57 @@ export function attachCorrelationId(headers: Headers | Record<string, string>, c
 }
 
 /**
+ * Extended metadata context specifically for formatting robust Error logs.
+ */
+export interface ErrorContext extends Record<string, any> {
+    correlationId: string;
+    route?: string;
+    errorCode?: string;
+    stack?: string;
+    severity?: 'low' | 'medium' | 'high' | 'critical';
+}
+
+/**
+ * Recursively redacts PII from logging metadata.
+ */
+export function redactPII(obj: any, seen = new WeakSet()): any {
+    if (obj === null || typeof obj !== 'object') {
+        return obj;
+    }
+    if (seen.has(obj)) {
+        return '[Circular]';
+    }
+    seen.add(obj);
+
+    if (Array.isArray(obj)) {
+        return obj.map(item => redactPII(item, seen));
+    }
+
+    const redactedContext: Record<string, any> = {};
+    const sensitiveKeys = ['password', 'email', 'secret', 'token', 'authorization', 'api_key', 'apikey'];
+
+    for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            const lowerKey = key.toLowerCase();
+            if (sensitiveKeys.some(sk => lowerKey.includes(sk))) {
+                redactedContext[key] = '[REDACTED]';
+            } else {
+                redactedContext[key] = redactPII(obj[key], seen);
+            }
+        }
+    }
+    return redactedContext;
+}
+
+/**
  * Outputs a machine-readable, structured JSON log line.
  */
-export function structuredLog(level: 'info' | 'warn' | 'error', message: string, meta: Record<string, any> = {}): void {
+export function structuredLog(level: 'info' | 'warn' | 'error', message: string, meta: Record<string, any> | ErrorContext = {}): void {
     const logEntry = {
         timestamp: new Date().toISOString(),
         level,
         message,
-        ...meta
+        ...redactPII(meta)
     };
 
     const logString = JSON.stringify(logEntry);

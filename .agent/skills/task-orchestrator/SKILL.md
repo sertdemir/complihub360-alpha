@@ -30,3 +30,6 @@ description: Routes user requests to appropriate agents, decomposes tasks, enfor
    - Changes
    - Verification results
    - READY / NOT READY
+
+6. Handle Monitoring Events:
+   - When a monitoring `ALERT` event is emitted: Log a structured escalation record.

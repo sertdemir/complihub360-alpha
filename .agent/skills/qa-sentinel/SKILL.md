@@ -14,4 +14,7 @@ Must run:
 - npm run test --workspaces --if-present
 
 If any fails:
-Return error and trigger fix loop.
+
+1. Classify error type (e.g., TypeError, missing module, build error)
+2. Suggest fix category
+3. Return structured error report and trigger fix loop.

@@ -9,10 +9,10 @@ import { startCriticalFlowMonitor } from "./monitor";
 const eventStore: AnalyticsEvent[] = [];
 const alertStore: AlertRecord[] = [];
 
-// Security Hardening: Rate limiting state (dev only)
+// Security Hardening: Rate limiting state
 const ipRateLimits = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT_MAX = parseInt(process.env.RATE_LIMIT_MAX || "100", 10);
-const RATE_LIMIT_WINDOW_MS = parseInt(process.env.RATE_LIMIT_WINDOW_MS || "60000", 10);
+const RATE_LIMIT_MAX = 100;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 
 // Start Background Critical Flow Monitor
 startCriticalFlowMonitor(eventStore, alertStore);
@@ -49,10 +49,24 @@ orchestrator.registerExecutable({
 
 // 2. HTTP Server
 const server = createServer(async (req: IncomingMessage, res: ServerResponse) => {
-    // Simple CORS
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    // 2.a Strict Security Headers
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+
+    // 2.b Strict CORS
+    const origin = req.headers.origin || '';
+    const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',').map(o => o.trim());
+
+    // We only set Allow-Origin if it matches the configured allowed list, or in dev/fallback mode
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    } else if (process.env.NODE_ENV !== 'production') {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+    }
+
     res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-correlation-id');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-correlation-id, Authorization, x-api-key');
 
     if (req.method === 'OPTIONS') {
         res.writeHead(204);
@@ -62,30 +76,51 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 
     const correlationId = normalizeCorrelationId(req.headers['x-correlation-id']);
 
-    // Security Hardening: In-memory Rate Limit (dev only)
-    if (process.env.NODE_ENV !== 'production') {
-        const ip = req.socket.remoteAddress || 'unknown';
-        const now = Date.now();
-        const limitStats = ipRateLimits.get(ip) || { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
+    // 2.c API Key Authentication (Skip for /health and /ready)
+    if (req.url !== '/health' && req.url !== '/ready') {
+        const expectedApiKey = process.env.API_KEY;
+        if (expectedApiKey) {
+            const authHeader = req.headers['authorization'];
+            const apiKeyHeader = req.headers['x-api-key'];
 
-        if (now > limitStats.resetAt) {
-            limitStats.count = 0;
-            limitStats.resetAt = now + RATE_LIMIT_WINDOW_MS;
+            const providedKey = apiKeyHeader || (authHeader && authHeader.startsWith('Bearer ') ? authHeader.substring(7) : null);
+
+            if (!providedKey || providedKey !== expectedApiKey) {
+                res.setHeader('x-correlation-id', correlationId);
+                res.writeHead(401, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    errorCode: 'UNAUTHORIZED',
+                    message: 'Missing or invalid API key',
+                    correlationId
+                }));
+                return;
+            }
         }
+    }
 
-        limitStats.count++;
-        ipRateLimits.set(ip, limitStats);
+    // 2.d Security Hardening: Production Rate Limiting
+    const forwardedFor = req.headers['x-forwarded-for'];
+    const ip = typeof forwardedFor === 'string' ? forwardedFor.split(',')[0].trim() : (req.socket.remoteAddress || 'unknown');
+    const now = Date.now();
+    const limitStats = ipRateLimits.get(ip) || { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
 
-        if (limitStats.count > RATE_LIMIT_MAX) {
-            res.setHeader('x-correlation-id', correlationId);
-            res.writeHead(429, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({
-                errorCode: 'RATE_LIMIT_EXCEEDED',
-                message: 'Too many requests',
-                correlationId
-            }));
-            return;
-        }
+    if (now > limitStats.resetAt) {
+        limitStats.count = 0;
+        limitStats.resetAt = now + RATE_LIMIT_WINDOW_MS;
+    }
+
+    limitStats.count++;
+    ipRateLimits.set(ip, limitStats);
+
+    if (limitStats.count > RATE_LIMIT_MAX) {
+        res.setHeader('x-correlation-id', correlationId);
+        res.writeHead(429, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+            errorCode: 'RATE_LIMIT_EXCEEDED',
+            message: 'Too many requests',
+            correlationId
+        }));
+        return;
     }
 
     if (req.method === 'GET' && req.url === '/health') {
@@ -109,7 +144,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     if (req.method === 'POST' && req.url === '/api/compliance/check') {
         const startTime = Date.now();
 
-        const MAX_PAYLOAD_SIZE = 1024 * 1024; // 1MB
+        // 2.e Reduce Payload Limit
+        const MAX_PAYLOAD_SIZE = 100 * 1024; // 100KB
         let payloadSize = 0;
         let isTooLarge = false;
         let body = '';
@@ -122,7 +158,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 req.destroy();
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(413, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ errorCode: 'PAYLOAD_TOO_LARGE', message: 'Payload exceeds 1MB limit', correlationId }));
+                res.end(JSON.stringify({ errorCode: 'PAYLOAD_TOO_LARGE', message: 'Payload exceeds 100KB limit', correlationId }));
                 return;
             }
             body += chunk.toString();
@@ -132,10 +168,19 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             if (isTooLarge) return;
             structuredLog('info', 'Incoming compliance check request', { correlationId, route: req.url, method: req.method });
 
+            let requestData: ComplianceCheckRequest;
             try {
-                const requestData = JSON.parse(body) as ComplianceCheckRequest;
+                // 2.f Handle JSON Parsing errors explicitly
+                requestData = JSON.parse(body);
+            } catch (err) {
+                res.setHeader('x-correlation-id', correlationId);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INVALID_JSON', message: 'Invalid JSON payload', correlationId }));
+                return;
+            }
 
-                // Security Hardening: Request Validation
+            try {
+                // Security Hardening: Request Validation and Explicit Destructuring
                 if (!requestData.tenantId || typeof requestData.tenantId !== 'string' || requestData.tenantId.trim() === '') {
                     res.setHeader('x-correlation-id', correlationId);
                     res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -150,16 +195,20 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     return;
                 }
 
-                // Fallback for missing fields in minimal requests
-                requestData.appId = requestData.appId || "vs1-demo";
+                // Discard unwanted properties to prevent prototype pollution / mass assignment
+                const cleanRequestData: ComplianceCheckRequest = {
+                    tenantId: requestData.tenantId,
+                    appId: requestData.appId || "vs1-demo",
+                    tags: requestData.tags
+                };
 
                 const fallbackCtx = createTaskContext({
-                    tenantId: requestData.tenantId,
-                    appId: requestData.appId,
+                    tenantId: cleanRequestData.tenantId,
+                    appId: cleanRequestData.appId,
                     correlationId
                 });
 
-                const responseData = await orchestrator.runComplianceCheck(requestData, fallbackCtx);
+                const responseData = await orchestrator.runComplianceCheck(cleanRequestData, fallbackCtx);
 
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -186,7 +235,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             }
         });
     } else if (req.method === 'POST' && req.url === '/api/events') {
-        const MAX_PAYLOAD_SIZE = 1024 * 1024; // 1MB
+        const MAX_PAYLOAD_SIZE = 100 * 1024; // 100KB
         let payloadSize = 0;
         let isTooLarge = false;
         let body = '';
@@ -199,7 +248,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 req.destroy();
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(413, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ errorCode: 'PAYLOAD_TOO_LARGE', message: 'Payload exceeds 1MB limit', correlationId }));
+                res.end(JSON.stringify({ errorCode: 'PAYLOAD_TOO_LARGE', message: 'Payload exceeds 100KB limit', correlationId }));
                 return;
             }
             body += chunk.toString();
@@ -207,8 +256,18 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 
         req.on('end', () => {
             if (isTooLarge) return;
+
+            let eventData: AnalyticsEvent;
             try {
-                const eventData = JSON.parse(body) as AnalyticsEvent;
+                eventData = JSON.parse(body);
+            } catch (err) {
+                res.setHeader('x-correlation-id', correlationId);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INVALID_JSON', message: 'Invalid JSON payload', correlationId }));
+                return;
+            }
+
+            try {
                 // Add server receive timestamp if client clock is missing/trusted less
                 const recordedEvent = {
                     ...eventData,

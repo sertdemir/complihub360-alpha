@@ -24,7 +24,11 @@
     "typecheck:root": "tsc -b",
     "clean": "tsc -b --clean",
     "dev:ui": "npm run dev --workspace=@vs1-demo/ui",
-    "dev:service": "npm run dev --workspace=@complihub/compliance-api"
+    "dev:service": "npm run dev --workspace=@complihub/compliance-api",
+    "release:patch": "npm version patch",
+    "release:minor": "npm version minor",
+    "preversion": "npm run typecheck && npm run test",
+    "version": "node scripts/generate-changelog.js && git add CHANGELOG.md"
   },
   "devDependencies": {
     "eslint": "^8.56.0",
