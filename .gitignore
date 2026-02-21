@@ -15,3 +15,7 @@ node_modules/
 **/node_modules/
 **/.vite/
 **/dist/
+
+# typescript cache
+*.tsbuildinfo
+**/*.tsbuildinfo
