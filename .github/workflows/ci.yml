@@ -32,7 +32,10 @@ jobs:
         # we fallback to a standard npm install to ensure resilient CI builds.
         run: npm ci || npm install
 
-      - name: Run Typecheck
+      - name: Build Core Dependencies
+        run: npm run build:root
+
+      - name: Run Workspace Typechecks
         run: npm run typecheck
 
       - name: Run Build
