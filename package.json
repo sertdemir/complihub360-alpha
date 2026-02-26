@@ -25,6 +25,7 @@
     "clean": "tsc -b --clean",
     "dev:ui": "npm run dev --workspace=@vs1-demo/ui",
     "dev:service": "npm run dev --workspace=@complihub/compliance-api",
+    "dev:board": "npm run dev --workspace=@complihub/dev-board",
     "release:patch": "npm version patch",
     "release:minor": "npm version minor",
     "preversion": "npm run typecheck && npm run test",
