@@ -9,7 +9,7 @@ The CompliHub360 project involves multiple autonomous agents working on a codeba
 
 1. **Adopt a 5-Layer Agent Model:** Orchestration (L0), Governance (L1), Implementation (L2), Verification (L3), Knowledge (L4).
 2. **Enforce STRICT "Neutral Mode":** Until Phase 1, UI must use strictly grayscale/white/opacity tokens. No brand colors. Structure over style.
-3. **No New Dependencies:** Explicit blocking of `npm install` without Policy-Guard approval.
+3. **No New Dependencies:** Explicit blocking of `npm install` without Policy-Master approval.
 4. **Contract-Based Interaction:** Agents have defined inputs/outputs and "Forbidden Actions".
 
 **Consequences:**
