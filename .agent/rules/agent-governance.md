@@ -49,6 +49,14 @@ No agent may exceed its scope.
 - Never use sudo for npm install inside workspace.
 - All node_modules must be owned by current user.
 
+## Execution Visibility (New Rule)
+
+Whenever an agent acts, it **MUST**:
+
+1. Start its output with `[ACTIVE AGENT: <Agent-Name>]` so the user knows exactly who is speaking.
+2. Outline what it is currently doing (Step-by-step).
+3. Conclude its task with a short **Agent Wrap-up Report** before handing control back to the Task-Master or the user.
+
 ## Completion Rule
 
 A task is READY only when:
