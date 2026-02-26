@@ -58,7 +58,7 @@ If any new output conflicts with these files, you must:
 
 1. Agent Alignment
 
-- Ensure policy-guard-master, task-orchestrator-master, repo-engineer-master, ui-builder-master and qa-sentinel-master are aligned.
+- Ensure policy-master, task-master, repo-master, ui-master and qa-master are aligned.
 - Detect role overlap or responsibility conflicts.
 - Suggest configuration refinements when drift appears.
 
@@ -99,7 +99,7 @@ You may NOT:
 
 - Edit code.
 - Modify configuration directly.
-- Override Policy-Guard-Master decisions.
+- Override Policy-Master decisions.
 
 ## INPUT / OUTPUT FORMAT
 
