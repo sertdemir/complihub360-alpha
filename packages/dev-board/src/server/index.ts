@@ -15,15 +15,15 @@ const WORKSPACE_ROOT = path.resolve(process.cwd(), '../..');
 const TICKETS_DIR = path.join(WORKSPACE_ROOT, '.tickets');
 
 async function ensureDirs() {
-    const dirs = ['todo', 'doing', 'review', 'done', 'archive'];
+    const dirs = ['todo', 'doing', 'waiting', 'review', 'done', 'archive'];
     for (const dir of dirs) {
         await fs.mkdir(path.join(TICKETS_DIR, dir), { recursive: true }).catch(() => { });
     }
 }
 
-app.get('/api/tickets', async (req, res) => {
+app.get('/api/tickets', async (_req, res) => {
     try {
-        const statuses = ['todo', 'doing', 'review', 'done'];
+        const statuses = ['todo', 'doing', 'waiting', 'review', 'done'];
         const tickets = [];
 
         for (const status of statuses) {
@@ -33,10 +33,31 @@ app.get('/api/tickets', async (req, res) => {
             for (const file of files) {
                 if (!file.endsWith('.md')) continue;
                 const content = await fs.readFile(path.join(dirPath, file), 'utf-8');
+
+                // Parse basic frontmatter (epic and title)
+                const epicMatch = content.match(/^epic:\s*"?([^"\n]+)"?/m);
+                const epic = epicMatch ? epicMatch[1] : null;
+                const titleMatch = content.match(/^title:\s*"?([^"\n]+)"?/m);
+                const title = titleMatch ? titleMatch[1] : file.replace('.md', '');
+
+                // Parse Agent Audit Log list items
+                let auditLog = [];
+                const auditLogIndex = content.indexOf('## Agent Audit Log');
+                if (auditLogIndex !== -1) {
+                    const logSection = content.substring(auditLogIndex);
+                    const listMatches = logSection.matchAll(/-\s+\[(.*?)\]\s+\*\*([^*]+)\*\*:\s+(.*?)$/gm);
+                    for (const match of listMatches) {
+                        auditLog.push({ timestamp: match[1], agent: match[2], action: match[3] });
+                    }
+                }
+
                 tickets.push({
                     id: file.replace('.md', ''),
                     status,
-                    content
+                    epic,
+                    title,
+                    content,
+                    auditLog
                 });
             }
         }
@@ -70,12 +91,12 @@ ${description}
 const runningApps: Record<string, ChildProcess> = {};
 
 app.post('/api/apps/start', (req, res) => {
-    const { name, appPath } = req.body;
+    const { name, appPath, port } = req.body;
     if (!runningApps[name]) {
         const vitePath = path.join(WORKSPACE_ROOT, 'node_modules', 'vite', 'bin', 'vite.js');
         const targetCwd = path.join(WORKSPACE_ROOT, appPath);
 
-        const child = spawn('node', [vitePath], {
+        const child = spawn('node', [vitePath, '--port', String(port), '--strictPort'], {
             cwd: targetCwd,
             stdio: 'ignore'
         });
@@ -111,7 +132,7 @@ app.post('/api/archive', async (req, res) => {
         const archiveDir = path.join(TICKETS_DIR, 'archive', month);
         await fs.mkdir(archiveDir, { recursive: true }).catch(() => { });
 
-        const statuses = ['todo', 'doing', 'review', 'done'];
+        const statuses = ['todo', 'doing', 'waiting', 'review', 'done'];
         let foundPath = '';
         for (const s of statuses) {
             const p = path.join(TICKETS_DIR, s, `${ticketId}.md`);
