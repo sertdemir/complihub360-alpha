@@ -98,6 +98,18 @@ To ensure valid code generation via Stitch/MCP:
 3. **Isolation:**
     - Stitch generated code ("Screens") must be isolated in `features/` or `pages/` and verified against the token system.
 
+4. **Mandatory Stitch Prompt Injection:**
+    - Every time an agent calls `mcp_StitchMCP_generate_screen_from_text` or `mcp_StitchMCP_edit_screens`, the following constraint block MUST be appended to the prompt to force Stitch into compliance:
+
+    ```text
+    DESIGN CONSTRAINTS (MANDATORY):
+    - Theme: STRICT MONOCHROME (Neutral/Slate palette only). 
+    - Colors: Canvas background MUST be #09090b. Card/Surface backgrounds MUST be #18181b. Borders MUST be 1px solid #27272a.
+    - Accents: NO primary brand colors. No red/green/yellow status colors. Use grayscale text/icons only.
+    - Typography: Inter font family. Clean hierarchy.
+    - Structure: 12-column grid. No top navigation bars unless explicitly requested (assume injection into an existing App Shell). No drop shadows, use 1px borders for depth.
+    ```
+
 ## 6. RISK ANALYSIS
 
 - **Risk:** Premature Branding.
