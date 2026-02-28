@@ -70,9 +70,15 @@ ${description}
 const runningApps: Record<string, ChildProcess> = {};
 
 app.post('/api/apps/start', (req, res) => {
-    const { name, workspace } = req.body;
+    const { name, appPath } = req.body;
     if (!runningApps[name]) {
-        const child = spawn('npm', ['run', 'dev', `--workspace=${workspace}`], { cwd: WORKSPACE_ROOT, stdio: 'ignore' });
+        const vitePath = path.join(WORKSPACE_ROOT, 'node_modules', 'vite', 'bin', 'vite.js');
+        const targetCwd = path.join(WORKSPACE_ROOT, appPath);
+
+        const child = spawn('node', [vitePath], {
+            cwd: targetCwd,
+            stdio: 'ignore'
+        });
         runningApps[name] = child;
     }
     res.json({ success: true });

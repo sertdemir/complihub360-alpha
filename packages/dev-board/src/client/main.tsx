@@ -51,8 +51,8 @@ function App() {
                 <div>
                     <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Apps</h2>
                     <div className="space-y-3">
-                        <AppControl name="vs1-demo" port={5173} workspace="@vs1-demo/ui" />
-                        <AppControl name="design-system" port={5174} workspace="@complihub360/ui" />
+                        <AppControl name="vs1-demo" port={5173} appPath="apps/vs1-demo/ui" />
+                        <AppControl name="design-system" port={5174} appPath="ui/design-system" />
                     </div>
                 </div>
             </div>
@@ -158,7 +158,7 @@ function App() {
     );
 }
 
-function AppControl({ name, port, workspace }: { name: string, port: number, workspace: string }) {
+function AppControl({ name, port, appPath }: { name: string, port: number, appPath: string }) {
     const [running, setRunning] = useState(false);
 
     const toggle = async () => {
@@ -166,7 +166,7 @@ function AppControl({ name, port, workspace }: { name: string, port: number, wor
             await fetch('/api/apps/stop', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) });
             setRunning(false);
         } else {
-            await fetch('/api/apps/start', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, workspace }) });
+            await fetch('/api/apps/start', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, appPath }) });
             setRunning(true);
         }
     };
