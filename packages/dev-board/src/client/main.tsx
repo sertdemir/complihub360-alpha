@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Play, Square, LayoutDashboard, GitBranch, Archive, ExternalLink, Clock, User, ChevronDown, ChevronRight } from 'lucide-react';
+import { Play, Square, LayoutDashboard, GitBranch, Archive, ExternalLink, Clock, User, ChevronDown, ChevronRight, Bot } from 'lucide-react';
 import './index.css';
 
 const STATUSES = ['todo', 'doing', 'waiting', 'review', 'done'];
@@ -185,12 +185,26 @@ function TicketCard({ ticket, onSelect, onBranch, onArchive }: any) {
             <h4 className="font-semibold text-slate-200 line-clamp-3 leading-snug pr-6">
                 {ticket.title}
             </h4>
-            {ticket.auditLog && ticket.auditLog.length > 0 && (
-                <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-500 font-mono">
-                    <User className="w-3.5 h-3.5" />
-                    <span>{ticket.auditLog[ticket.auditLog.length - 1].agent}</span>
-                </div>
-            )}
+            <div className="mt-4 flex flex-col gap-2 text-xs font-mono">
+                {ticket.auditLog && ticket.auditLog.length > 0 && (
+                    <div className="flex items-center justify-between text-slate-500 bg-slate-900/50 px-2 py-1.5 rounded" title="Creator">
+                        <span className="text-[10px] uppercase tracking-wider font-semibold opacity-70">Creator</span>
+                        <div className="flex items-center gap-1.5">
+                            <Bot className="w-3.5 h-3.5" />
+                            <span>{ticket.auditLog[0].agent}</span>
+                        </div>
+                    </div>
+                )}
+                {ticket.assignee && (
+                    <div className="flex items-center justify-between text-emerald-400 bg-emerald-950/20 border border-emerald-900/30 px-2 py-1.5 rounded" title="Assignee">
+                        <span className="text-[10px] uppercase tracking-wider font-semibold opacity-70">Assignee</span>
+                        <div className="flex items-center gap-1.5">
+                            <User className="w-3.5 h-3.5" />
+                            <span>{ticket.assignee}</span>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
