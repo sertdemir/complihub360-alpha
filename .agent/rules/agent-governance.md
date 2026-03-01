@@ -57,6 +57,15 @@ Whenever an agent acts, it **MUST**:
 2. Outline what it is currently doing (Step-by-step).
 3. Conclude its task with a short **Agent Wrap-up Report** before handing control back to the Task-Master or the user.
 
+## Ticket Lifecycle & Documentation (New Rule)
+
+Whenever an agent begins, progresses, or completes work on a ticket, it **MUST**:
+
+1. Move the markdown ticket file to the appropriate folder (`.tickets/doing`, `.tickets/waiting`, `.tickets/review`, `.tickets/done`).
+2. Update the `status:` field in the frontmatter of the ticket file.
+3. Append a new section `## Agent Result / Execution` to the ticket content, detailing exactly what was done, the outcome, and any relevant links or command outputs.
+4. Append an entry to the `## Agent Audit Log` at the bottom of the ticket in the format: `- [TIMESTAMP] **[AGENT-NAME]**: [ACTION] (Status: [STATUS])`.
+
 ## Completion Rule
 
 A task is READY only when:
