@@ -39,6 +39,8 @@ app.get('/api/tickets', async (_req, res) => {
                 const epic = epicMatch ? epicMatch[1] : null;
                 const titleMatch = content.match(/^title:\s*"?([^"\n]+)"?/m);
                 const title = titleMatch ? titleMatch[1] : file.replace('.md', '');
+                const assigneeMatch = content.match(/^assignee:\s*"?([^"\n]+)"?/m);
+                const assignee = assigneeMatch ? assigneeMatch[1] : null;
 
                 // Parse Agent Audit Log list items
                 let auditLog = [];
@@ -56,6 +58,7 @@ app.get('/api/tickets', async (_req, res) => {
                     status,
                     epic,
                     title,
+                    assignee,
                     content,
                     auditLog
                 });

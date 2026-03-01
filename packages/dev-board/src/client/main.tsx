@@ -179,7 +179,7 @@ function TicketCard({ ticket, onSelect, onBranch, onArchive }: any) {
                 <span className="text-xs font-mono text-emerald-400 font-medium">{ticket.id}</span>
                 <div className="flex gap-1 absolute top-3 right-3">
                     {ticket.status === 'todo' && <button onClick={(e) => { e.stopPropagation(); onBranch(); }} className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-slate-700 rounded text-slate-400 transition-all" title="Create Branch"><GitBranch className="w-3.5 h-3.5" /></button>}
-                    {ticket.status === 'done' && <button onClick={(e) => { e.stopPropagation(); onArchive(); }} className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-slate-700 rounded text-slate-400 transition-all" title="Archive"><Archive className="w-3.5 h-3.5" /></button>}
+                    <button onClick={(e) => { e.stopPropagation(); onArchive(); }} className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-slate-700 rounded text-slate-400 transition-all" title="Archive"><Archive className="w-3.5 h-3.5" /></button>
                 </div>
             </div>
             <h4 className="font-semibold text-slate-200 line-clamp-3 leading-snug pr-6">
