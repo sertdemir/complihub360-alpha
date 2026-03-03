@@ -1,0 +1,89 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Automation Event Payload Schemas",
+    "definitions": {
+        "DocumentUploadedPayload": {
+            "type": "object",
+            "properties": {
+                "document_id": {
+                    "type": "string"
+                },
+                "storage_ref": {
+                    "type": "string",
+                    "description": "Reference in Raw Vault only"
+                },
+                "country": {
+                    "type": "string"
+                },
+                "doc_type": {
+                    "type": "string"
+                },
+                "engagement_id": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "document_id",
+                "storage_ref",
+                "country",
+                "engagement_id"
+            ]
+        },
+        "DocumentSanitizedReadyPayload": {
+            "type": "object",
+            "properties": {
+                "document_id": {
+                    "type": "string"
+                },
+                "sanitized_storage_ref": {
+                    "type": "string"
+                },
+                "risk_score": {
+                    "type": "number"
+                },
+                "redaction_report": {
+                    "type": "object",
+                    "properties": {
+                        "countsByType": {
+                            "type": "object"
+                        },
+                        "appliedRules": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "required": [
+                "document_id",
+                "sanitized_storage_ref",
+                "risk_score"
+            ]
+        },
+        "AIProcessingRequestedPayload": {
+            "type": "object",
+            "properties": {
+                "document_id": {
+                    "type": "string"
+                },
+                "sanitized_storage_ref": {
+                    "type": "string",
+                    "description": "MUST reference Sanitized Vault"
+                },
+                "task_type": {
+                    "type": "string"
+                },
+                "engagement_id": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "document_id",
+                "sanitized_storage_ref",
+                "task_type"
+            ]
+        }
+    }
+}
