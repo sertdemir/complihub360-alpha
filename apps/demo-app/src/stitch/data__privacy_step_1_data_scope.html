@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#121212",
+                        "background-light": "#f7f7f7",
+                        "background-dark": "#191919",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .segmented-control input:checked + label {
+            background-color: #121212;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<header class="sticky top-0 z-50 w-full bg-white dark:bg-background-dark border-b border-slate-200 dark:border-slate-800">
+<div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="bg-primary text-white p-1 rounded">
+<span class="material-symbols-outlined text-xl">security</span>
+</div>
+<h1 class="text-lg font-bold tracking-tight">CompliHub360</h1>
+</div>
+<nav class="hidden md:flex items-center gap-8 text-sm font-medium">
+<a class="hover:text-primary transition-colors" href="#">Product</a>
+<a class="hover:text-primary transition-colors" href="#">Solutions</a>
+<a class="hover:text-primary transition-colors" href="#">Resources</a>
+<a class="hover:text-primary transition-colors" href="#">Pricing</a>
+</nav>
+<button class="px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-semibold hover:bg-slate-50 transition-colors">
+                Login / Sign up
+            </button>
+</div>
+</header>
+<main class="min-h-[calc(100vh-64px)] py-12 px-6 flex flex-col items-center">
+<div class="w-full max-w-[720px]">
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+<div class="p-8 md:p-12">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full mb-6">
+<span class="material-symbols-outlined text-sm">flag</span>
+<span class="text-xs font-bold uppercase tracking-wider">United States</span>
+</div>
+<h2 class="text-3xl font-bold mb-8 text-slate-900 dark:text-white">Data collection scope</h2>
+<div class="space-y-10">
+<div class="flex flex-col gap-4">
+<label class="text-base font-medium text-slate-700 dark:text-slate-300">Do you process personal data?
+<div class="segmented-control flex p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit">
+<div class="relative flex items-center">
+<input checked="" class="hidden peer" id="q1-yes" name="q1" type="radio"/>
+<label class="px-8 py-2 text-sm font-semibold rounded-md cursor-pointer transition-all peer-checked:bg-primary peer-checked:text-white text-slate-600 dark:text-slate-400" for="q1-yes">Yes</label>
+</div>
+<div class="relative flex items-center">
+<input class="hidden peer" id="q1-no" name="q1" type="radio"/>
+<label class="px-8 py-2 text-sm font-semibold rounded-md cursor-pointer transition-all peer-checked:bg-primary peer-checked:text-white text-slate-600 dark:text-slate-400" for="q1-no">No</label>
+</div>
+</div>
+</label></div>
+<div class="flex flex-col gap-4">
+<label class="text-base font-medium text-slate-700 dark:text-slate-300">Do you process sensitive data (health, biometric, political)?
+<div class="segmented-control flex p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit">
+<div class="relative flex items-center">
+<input class="hidden peer" id="q2-yes" name="q2" type="radio"/>
+<label class="px-8 py-2 text-sm font-semibold rounded-md cursor-pointer transition-all peer-checked:bg-primary peer-checked:text-white text-slate-600 dark:text-slate-400" for="q2-yes">Yes</label>
+</div>
+<div class="relative flex items-center">
+<input checked="" class="hidden peer" id="q2-no" name="q2" type="radio"/>
+<label class="px-8 py-2 text-sm font-semibold rounded-md cursor-pointer transition-all peer-checked:bg-primary peer-checked:text-white text-slate-600 dark:text-slate-400" for="q2-no">No</label>
+</div>
+</div>
+</label></div>
+<div class="flex flex-col gap-4">
+<label class="text-base font-medium text-slate-700 dark:text-slate-300">Do you collect children’s data?
+<div class="segmented-control flex p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit">
+<div class="relative flex items-center">
+<input class="hidden peer" id="q3-yes" name="q3" type="radio"/>
+<label class="px-8 py-2 text-sm font-semibold rounded-md cursor-pointer transition-all peer-checked:bg-primary peer-checked:text-white text-slate-600 dark:text-slate-400" for="q3-yes">Yes</label>
+</div>
+<div class="relative flex items-center">
+<input checked="" class="hidden peer" id="q3-no" name="q3" type="radio"/>
+<label class="px-8 py-2 text-sm font-semibold rounded-md cursor-pointer transition-all peer-checked:bg-primary peer-checked:text-white text-slate-600 dark:text-slate-400" for="q3-no">No</label>
+</div>
+</div>
+</label></div>
+</div>
+</div>
+<div class="border-t border-slate-100 dark:border-slate-800 p-6 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50">
+<button class="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-sm">arrow_back</span>
+                        Back
+                    </button>
+<div class="flex flex-col items-center gap-2">
+<span class="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400">Step 1 of 4</span>
+<div class="flex gap-1">
+<div class="h-1.5 w-6 bg-primary rounded-full"></div>
+<div class="h-1.5 w-6 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+<div class="h-1.5 w-6 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+<div class="h-1.5 w-6 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+</div>
+</div>
+<button class="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold bg-primary text-white rounded-lg hover:opacity-90 transition-opacity">
+                        Continue
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+<div class="mt-8 flex justify-center gap-6 text-xs text-slate-400 font-medium">
+<a class="hover:text-slate-600 transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-slate-600 transition-colors" href="#">Terms of Service</a>
+<a class="hover:text-slate-600 transition-colors" href="#">Contact Support</a>
+</div>
+</div>
+</main>
+</body></html>
