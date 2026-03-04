@@ -34,3 +34,4 @@ We need to resolve these host permission issues and re-run the verification gate
 ## Agent Audit Log
 
 - [2026-03-03T23:05:00] **Task-Master**: Created ticket for QA-Master (Status: TODO)
+- [2026-03-04T23:10:00] **QA-Master**: Attempted to `sudo chown` and `npm install` but completely blocked by `sandbox-exec` permission restrictions. Host-level `sudo` intervention by user required.
