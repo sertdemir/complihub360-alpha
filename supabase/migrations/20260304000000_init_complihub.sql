@@ -5,7 +5,7 @@ create extension if not exists vector;
 create extension if not exists "uuid-ossp";
 
 -- 1. Users Table
-create table public.users (
+create table if not exists public.users (
   id uuid primary key references auth.users(id) on delete cascade,
   email text not null,
   role text not null default 'guest' check (role in ('guest', 'registered', 'admin')),
@@ -17,11 +17,13 @@ create table public.users (
 
 -- Enable RLS for Users
 alter table public.users enable row level security;
+drop policy if exists "Users can read own data" on public.users;
 create policy "Users can read own data" on public.users for select using (auth.uid() = id);
+drop policy if exists "Users can update own data" on public.users;
 create policy "Users can update own data" on public.users for update using (auth.uid() = id);
 
 -- 2. Providers Table
-create table public.providers (
+create table if not exists public.providers (
   provider_key text primary key,
   name text not null,
   website_url text,
@@ -38,11 +40,13 @@ create table public.providers (
 
 -- Enable RLS for Providers
 alter table public.providers enable row level security;
+drop policy if exists "Providers are globally readable" on public.providers;
 create policy "Providers are globally readable" on public.providers for select using (true);
+drop policy if exists "Only Admins can update providers" on public.providers;
 create policy "Only Admins can update providers" on public.providers for update using (auth.jwt()->>'role' = 'admin');
 
 -- 3. Engagement Requests Table
-create table public.engagement_requests (
+create table if not exists public.engagement_requests (
   id uuid primary key default uuid_generate_v4(),
   user_id uuid references public.users(id),
   provider_key text references public.providers(provider_key),
@@ -57,15 +61,17 @@ create table public.engagement_requests (
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
-create index idx_engagement_requests_provider on public.engagement_requests(provider_key, status);
+create index if not exists idx_engagement_requests_provider on public.engagement_requests(provider_key, status);
 
 -- Enable RLS for Engagement Requests
 alter table public.engagement_requests enable row level security;
+drop policy if exists "Users can read own requests" on public.engagement_requests;
 create policy "Users can read own requests" on public.engagement_requests for select using (auth.uid() = user_id);
+drop policy if exists "Users can embed own requests" on public.engagement_requests;
 create policy "Users can embed own requests" on public.engagement_requests for insert with check (auth.uid() = user_id);
 
 -- 4. Event Log Table
-create table public.event_log (
+create table if not exists public.event_log (
   id uuid primary key default uuid_generate_v4(),
   type text not null,
   actor_id uuid,
@@ -73,13 +79,14 @@ create table public.event_log (
   timestamp timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
-create index idx_event_log_type on public.event_log(type);
+create index if not exists idx_event_log_type on public.event_log(type);
 
 alter table public.event_log enable row level security;
+drop policy if exists "Event log is append only for users" on public.event_log;
 create policy "Event log is append only for users" on public.event_log for insert with check (auth.uid() = actor_id);
 
 -- 5. Knowledge Chunks Table (RAG Vector Database)
-create table public.knowledge_chunks (
+create table if not exists public.knowledge_chunks (
   id uuid primary key default uuid_generate_v4(),
   content text not null,
   metadata jsonb not null,
@@ -87,7 +94,8 @@ create table public.knowledge_chunks (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
-create index on public.knowledge_chunks using hnsw (embedding vector_cosine_ops);
+create index if not exists idx_knowledge_chunks_embedding on public.knowledge_chunks using hnsw (embedding vector_cosine_ops);
 
 alter table public.knowledge_chunks enable row level security;
+drop policy if exists "Knowledge Chunks are globally readable" on public.knowledge_chunks;
 create policy "Knowledge Chunks are globally readable" on public.knowledge_chunks for select using (true);
