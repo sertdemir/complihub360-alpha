@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CompliHub360 Results Overview</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#0a7ff5",
+          "background-light": "#f5f7f8",
+          "background-dark": "#101922",
+        },
+        fontFamily: {
+          "display": ["Inter", "sans-serif"]
+        },
+        borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+      },
+    },
+  }
+</script>
+<style>
+  body {
+    font-family: 'Inter', sans-serif;
+  }
+</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- TopNavBar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-3 sticky top-0 z-10">
+<div class="flex items-center gap-8 w-full max-w-[1440px] mx-auto">
+<div class="flex items-center gap-4 text-primary">
+<div class="size-6 flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">policy</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-[-0.015em]">CompliHub360</h2>
+</div>
+<label class="flex flex-col min-w-40 !h-10 w-full max-w-xl mx-auto hidden md:flex">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full border border-slate-300 dark:border-slate-700 focus-within:border-primary dark:focus-within:border-primary transition-colors">
+<div class="text-slate-500 dark:text-slate-400 flex border-none bg-slate-50 dark:bg-slate-800 items-center justify-center pl-4 rounded-l-lg border-r-0">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-white focus:outline-0 focus:ring-0 border-none bg-slate-50 dark:bg-slate-800 h-full placeholder:text-slate-500 dark:placeholder:text-slate-400 px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal" placeholder="Search compliance requirements..." value="GDPR data retention policies for fintech"/>
+</div>
+</label>
+<div class="flex items-center justify-end gap-4 ml-auto">
+<button class="p-2 text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors hidden sm:block">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-slate-200 dark:border-slate-700" data-alt="User profile avatar image" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDU9hlPPZZCFgsGzgIzMJijWVDXMrcuY6dSVeA-sDUICE_Jf7MoGm2s-GD1hlAhlHFEMskpXO4vKcPVdwkHMtywuNYUKngC9OLbApciGfIKZ7cDLG-FlnlE6NuDjti9jh9lAh-CG_IVfEzG-e1rxTWki_GF73j5_HKvm2gcadqtKzqGPxdmYLLGkge-qlwRgfX9g2KzkfnBIl-YxJc7jEub0YfmDAk0eQXXnrTfV9pm-PPe8J2ZE9ZAfV6Po6vdL6MRNlA3jarVhYs");'></div>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<div class="flex flex-1 w-full max-w-[1440px] mx-auto px-4 sm:px-6 py-6 gap-6 flex-col lg:flex-row">
+<!-- Left Pane: Results -->
+<div class="flex-1 flex flex-col min-w-0">
+<!-- Tabs -->
+<div class="pb-4 border-b border-slate-200 dark:border-slate-800 sticky top-[65px] bg-background-light dark:bg-background-dark z-10 pt-2">
+<div class="flex gap-6 overflow-x-auto no-scrollbar">
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-primary text-primary pb-3 pt-2 whitespace-nowrap" href="#">
+<p class="text-sm font-bold leading-normal tracking-[0.015em]">Overview (AI)</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600 pb-3 pt-2 transition-colors whitespace-nowrap" href="#">
+<p class="text-sm font-semibold leading-normal tracking-[0.015em]">Laws &amp; Regulations</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600 pb-3 pt-2 transition-colors whitespace-nowrap" href="#">
+<p class="text-sm font-semibold leading-normal tracking-[0.015em]">Articles &amp; Tutorials</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600 pb-3 pt-2 transition-colors whitespace-nowrap" href="#">
+<p class="text-sm font-semibold leading-normal tracking-[0.015em]">Actionable Tips</p>
+</a>
+</div>
+</div>
+<div class="py-6 flex flex-col gap-6">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<h1 class="text-slate-900 dark:text-white tracking-tight text-3xl font-bold leading-tight">Compliance Overview</h1>
+<div class="flex gap-3 flex-wrap">
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 px-4 border border-amber-200 dark:border-amber-800/50">
+<span class="material-symbols-outlined text-sm">warning</span>
+<p class="text-sm font-semibold leading-normal">Risk Level: Medium</p>
+</div>
+</div>
+</div>
+<p class="text-slate-600 dark:text-slate-400 text-base font-normal leading-relaxed">
+            AI Summary based on your query regarding GDPR data retention policies for fintech companies operating within the EU.
+          </p>
+<!-- AI Summary Content -->
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-sm">
+<div class="prose prose-slate dark:prose-invert max-w-none">
+<h3 class="text-xl font-semibold mb-4 text-slate-900 dark:text-white">Key Findings</h3>
+<ul class="space-y-4 list-none pl-0">
+<li class="flex gap-4">
+<span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold">1</span>
+<div>
+<strong class="text-slate-900 dark:text-slate-100 block mb-1">Storage Limitation Principle</strong>
+<p class="text-slate-600 dark:text-slate-300 m-0">Personal data must not be kept longer than necessary for the purposes for which it is processed. Fintechs must define clear retention periods. <a class="text-primary hover:underline font-medium" href="#">[Article 5(1)(e) GDPR]</a></p>
+</div>
+</li>
+<li class="flex gap-4">
+<span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold">2</span>
+<div>
+<strong class="text-slate-900 dark:text-slate-100 block mb-1">Financial Records Exemptions</strong>
+<p class="text-slate-600 dark:text-slate-300 m-0">While GDPR requires minimization, national laws often mandate retaining financial records for 5-10 years for tax and AML (Anti-Money Laundering) purposes, overriding immediate deletion requests. <a class="text-primary hover:underline font-medium" href="#">[AMLD5 Guidelines]</a></p>
+</div>
+</li>
+<li class="flex gap-4">
+<span class="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold">3</span>
+<div>
+<strong class="text-slate-900 dark:text-slate-100 block mb-1">Right to Erasure (Right to be Forgotten)</strong>
+<p class="text-slate-600 dark:text-slate-300 m-0">Users can request data deletion, but fintechs must balance this against legal obligations to retain transaction histories. <a class="text-primary hover:underline font-medium" href="#">[Article 17 GDPR]</a></p>
+</div>
+</li>
+</ul>
+<div class="mt-8 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-800">
+<h4 class="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Recommended Immediate Action</h4>
+<p class="text-slate-700 dark:text-slate-300 m-0">Review and update your Data Retention Policy document to explicitly map specific data categories to their legal retention requirements (e.g., AML vs. Marketing data).</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Pane: Sticky Sidebar -->
+<div class="w-full lg:w-1/3 xl:w-[400px] flex-shrink-0">
+<div class="sticky top-[88px] flex flex-col gap-4">
+<h2 class="text-slate-900 dark:text-white text-xl font-bold leading-tight px-1">Top Matching Providers</h2>
+<div class="flex flex-col gap-4">
+<!-- Provider Card 1 -->
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm hover:border-primary/50 transition-colors">
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-primary font-bold text-lg">
+                    S
+                  </div>
+<div>
+<h3 class="text-slate-900 dark:text-white font-semibold">SecureComply Inc.</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400">Fintech Data Specialists</p>
+</div>
+</div>
+<div class="flex items-center gap-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-1 rounded text-xs font-bold">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                  98%
+                </div>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 mb-4 line-clamp-2">Specialized legal consulting firm with deep expertise in EU financial regulations and GDPR alignment.</p>
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                Request Proposal
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<!-- Provider Card 2 -->
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm hover:border-primary/50 transition-colors">
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-primary font-bold text-lg">
+                    L
+                  </div>
+<div>
+<h3 class="text-slate-900 dark:text-white font-semibold">LexTech Solutions</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400">Compliance Software</p>
+</div>
+</div>
+<div class="flex items-center gap-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-1 rounded text-xs font-bold">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                  95%
+                </div>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 mb-4 line-clamp-2">Automated data retention mapping software tailored for banking and fintech platforms.</p>
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                Request Proposal
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<!-- Provider Card 3 -->
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm hover:border-primary/50 transition-colors">
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-primary font-bold text-lg">
+                    G
+                  </div>
+<div>
+<h3 class="text-slate-900 dark:text-white font-semibold">Global Data Law</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400">Legal Advisory</p>
+</div>
+</div>
+<div class="flex items-center gap-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-1 rounded text-xs font-bold">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                  89%
+                </div>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 mb-4 line-clamp-2">Global law firm providing comprehensive data protection officer (DPO) services and audits.</p>
+<button class="w-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700">
+                View Profile
+              </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>
