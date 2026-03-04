@@ -32,4 +32,6 @@ export interface RedactOptions {
 export interface RedactionResult {
     sanitizedText: string;
     report: RedactionReport;
+    sanitized_ready: boolean;
+    classification: 'public' | 'internal' | 'confidential' | 'restricted';
 }

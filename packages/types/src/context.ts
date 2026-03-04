@@ -9,6 +9,13 @@ export interface TaskContext {
     payload?: unknown;
 }
 
+export interface PrivacyFlags {
+    sanitized_ready: boolean;
+    consent_allowAI: boolean;
+    classification: 'public' | 'internal' | 'confidential' | 'restricted';
+    countryCode: string;
+}
+
 export interface PolicyContext {
     appId: string;
     tenantId: string;
@@ -19,6 +26,7 @@ export interface PolicyContext {
     capability?: string;
     intent?: string;
     payload?: unknown;
+    privacyFlags?: PrivacyFlags;
     metadata?: Record<string, any>;
 }
 

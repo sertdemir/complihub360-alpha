@@ -10,7 +10,9 @@ export function redactText(text: string, options: RedactOptions = { profile: 'st
     if (options.profile === 'none') {
         return {
             sanitizedText: text,
-            report: { countsByType: {}, appliedRules: [], riskScore: 0 }
+            report: { countsByType: {}, appliedRules: [], riskScore: 0 },
+            sanitized_ready: false, // Disabling redaction explicitly refuses 'sanitized_ready' flag
+            classification: 'internal' // Better safe than public
         };
     }
 
@@ -44,13 +46,24 @@ export function redactText(text: string, options: RedactOptions = { profile: 'st
 
     const riskScore = calculateDeterministicRiskScore(countsByType);
 
+    let classification: 'public' | 'internal' | 'confidential' | 'restricted' = 'public';
+    if (riskScore > 80) {
+        classification = 'restricted';
+    } else if (riskScore > 40) {
+        classification = 'confidential';
+    } else if (riskScore > 10) {
+        classification = 'internal';
+    }
+
     return {
         sanitizedText,
         report: {
             countsByType,
             appliedRules: Array.from(appliedRules),
             riskScore
-        }
+        },
+        sanitized_ready: true,
+        classification
     };
 }
 

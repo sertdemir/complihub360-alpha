@@ -1,5 +1,6 @@
 import type { PolicyContext, PolicyDecision, TenantPolicy, AgentId } from "@complihub/agent-core";
 import { InMemoryLimiter } from "./inMemoryLimiter.js";
+import { getCountryPolicy } from "./countryMatrix.js";
 
 export interface PolicyEngine {
     evaluate(ctx: PolicyContext, request?: any, findings?: any[]): PolicyDecision;
@@ -66,6 +67,31 @@ export class DefaultPolicyEngine implements PolicyEngine {
             const isPublic = request.tags.includes("public");
             if (hasHigh && isPublic) {
                 return { allowed: false, reason: "Compliance deny: 'high' finding in a 'public' context." };
+            }
+        }
+
+        // 6. Security Hardening: Deterministic AI Gate
+        if (ctx.intent === "AI_PROCESSING") {
+            if (!ctx.privacyFlags) {
+                return { allowed: false, reason: "AI Gate Deny: Missing privacy context." };
+            }
+
+            if (!ctx.privacyFlags.sanitized_ready) {
+                return { allowed: false, reason: "AI Gate Deny: Payload is not sanitized." };
+            }
+
+            if (ctx.privacyFlags.classification === 'restricted') {
+                return { allowed: false, reason: "AI Gate Deny: Payload classification is restricted." };
+            }
+
+            const countryPolicy = getCountryPolicy(ctx.privacyFlags.countryCode);
+
+            if (!countryPolicy.allowAI) {
+                return { allowed: false, reason: `AI Gate Deny: AI processing disabled for country '${ctx.privacyFlags.countryCode}'.` };
+            }
+
+            if (countryPolicy.requireExplicitConsent && !ctx.privacyFlags.consent_allowAI) {
+                return { allowed: false, reason: `AI Gate Deny: Explicit consent required for country '${ctx.privacyFlags.countryCode}'.` };
             }
         }
 
