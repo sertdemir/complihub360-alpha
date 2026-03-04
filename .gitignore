@@ -19,3 +19,16 @@ node_modules/
 # typescript cache
 *.tsbuildinfo
 **/*.tsbuildinfo
+# .env should never be committed to git
+.env
+.env.*
+
+# Supabase local state
+supabase/.temp
+supabase/.branch
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm-cache/
