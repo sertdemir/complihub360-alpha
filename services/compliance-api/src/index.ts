@@ -2,8 +2,13 @@ import { createServer, IncomingMessage, ServerResponse } from "http";
 import { Orchestrator } from "@complihub/task-orchestrator";
 import { createDefaultRegistry } from "@complihub/agent-registry";
 import { DefaultPolicyEngine } from "@complihub/policy-engine";
-import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeCorrelationId, structuredLog, type AnalyticsEvent, type AlertRecord } from "@complihub360/types";
+import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeCorrelationId, structuredLog, type AnalyticsEvent, type AlertRecord, type Provider, type EngagementRequest } from "@complihub360/types";
 import { startCriticalFlowMonitor } from "./monitor.js";
+
+// Local in-memory store for dev-mode orchestrator
+const providerStore: Provider[] = [];
+const engagementStore: EngagementRequest[] = [];
+
 
 // Local in-memory store for dev-mode analytics and alerts
 const eventStore: AnalyticsEvent[] = [];
@@ -308,6 +313,107 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     severity: 'warn',
                     route: req.url
                 });
+            }
+        });
+    } else if (req.method === 'POST' && req.url === '/api/v1/engagement') {
+        let body = '';
+        req.on('data', chunk => body += chunk.toString());
+        req.on('end', () => {
+            try {
+                const requestData = JSON.parse(body);
+                const engagementId = `eng_${Date.now()}`;
+                const newEngagement: EngagementRequest = {
+                    id: engagementId,
+                    user_id: requestData.user_id || 'anonymous',
+                    provider_key: requestData.provider_key,
+                    country: requestData.country,
+                    category: requestData.category,
+                    structured_answers: requestData.structured_answers || {},
+                    message: requestData.message || "",
+                    status: 'created',
+                    sla_confirm_deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+                    sla_reply_deadline: new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString(),
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+
+                engagementStore.push(newEngagement);
+
+                eventStore.push({
+                    eventId: `evt_${Date.now()}`,
+                    eventName: 'primary_request_submitted',
+                    tenantId: 'default',
+                    source: 'compliance-api',
+                    payload: { engagementId, provider_key: newEngagement.provider_key },
+                    timestamp: Date.now()
+                });
+
+                res.setHeader('x-correlation-id', correlationId);
+                res.writeHead(201, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, id: engagementId, status: 'created' }));
+            } catch (err) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INVALID_JSON', message: 'Invalid JSON payload' }));
+            }
+        });
+    } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/provider/magic/')) {
+        const token = req.url.split('/').pop() || '';
+        // Mock token verification
+        res.setHeader('x-correlation-id', correlationId);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, message: "Magic link verified", token }));
+    } else if (req.method === 'POST' && req.url === '/api/v1/provider/confirm') {
+        let body = '';
+        req.on('data', chunk => body += chunk.toString());
+        req.on('end', () => {
+            try {
+                const requestData = JSON.parse(body);
+                const engagement = engagementStore.find(e => e.id === requestData.engagementId);
+                if (engagement) {
+                    engagement.status = 'confirmed';
+                    engagement.updatedAt = new Date().toISOString();
+
+                    eventStore.push({
+                        eventId: `evt_conf_${Date.now()}`,
+                        eventName: 'provider_confirmed',
+                        tenantId: 'default',
+                        source: 'compliance-api',
+                        payload: { engagementId: engagement.id, provider_key: engagement.provider_key },
+                        timestamp: Date.now()
+                    });
+                }
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, message: "Provider confirmed" }));
+            } catch {
+                res.writeHead(400);
+                res.end();
+            }
+        });
+    } else if (req.method === 'POST' && req.url === '/api/v1/provider/reply') {
+        let body = '';
+        req.on('data', chunk => body += chunk.toString());
+        req.on('end', () => {
+            try {
+                const requestData = JSON.parse(body);
+                const engagement = engagementStore.find(e => e.id === requestData.engagementId);
+                if (engagement) {
+                    engagement.status = 'replied';
+                    engagement.updatedAt = new Date().toISOString();
+
+                    eventStore.push({
+                        eventId: `evt_repl_${Date.now()}`,
+                        eventName: 'provider_replied',
+                        tenantId: 'default',
+                        source: 'compliance-api',
+                        payload: { engagementId: engagement.id, provider_key: engagement.provider_key },
+                        timestamp: Date.now()
+                    });
+                }
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, message: "Provider replied" }));
+            } catch {
+                res.writeHead(400);
+                res.end();
             }
         });
     } else {

@@ -27,3 +27,4 @@ export * from './compliance.js';
 export * from './test-helpers.js';
 export * from './observability.js';
 export * from './analytics.js';
+export * from './engagement.js';
