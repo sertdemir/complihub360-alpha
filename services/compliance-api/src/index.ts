@@ -2,7 +2,7 @@ import { createServer, IncomingMessage, ServerResponse } from "http";
 import { Orchestrator } from "@complihub/task-orchestrator";
 import { createDefaultRegistry } from "@complihub/agent-registry";
 import { DefaultPolicyEngine } from "@complihub/policy-engine";
-import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeCorrelationId, structuredLog, type AnalyticsEvent, type AlertRecord, type Provider, type EngagementRequest } from "@complihub360/types";
+import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeCorrelationId, structuredLog, type AnalyticsEvent, type AlertRecord } from "@complihub360/types";
 import { startCriticalFlowMonitor } from "./monitor.js";
 
 import { supabaseApi } from "./supabase.js";
@@ -254,7 +254,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             body += chunk.toString();
         });
 
-        req.on('end', () => {
+        req.on('end', async () => {
             if (isTooLarge) return;
 
             let eventData: AnalyticsEvent;
@@ -275,7 +275,6 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 };
 
                 await supabaseApi.insert('event_log', {
-                    id: recordedEvent.eventId,
                     type: recordedEvent.eventName,
                     actor_id: null,
                     payload: recordedEvent
