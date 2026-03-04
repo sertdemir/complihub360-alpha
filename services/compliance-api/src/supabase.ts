@@ -56,5 +56,15 @@ export const supabaseApi = {
         });
         if (!res.ok) throw new Error(`Supabase select failed: ${await res.text()}`);
         return res.json();
+    },
+
+    async rpc(functionName: string, params: any) {
+        const res = await fetch(`${restUrl}/rpc/${functionName}`, {
+            method: 'POST',
+            headers: defaultHeaders,
+            body: JSON.stringify(params)
+        });
+        if (!res.ok) throw new Error(`Supabase RPC failed: ${await res.text()}`);
+        return res.json();
     }
 };

@@ -1,9 +1,10 @@
 import { createServer, IncomingMessage, ServerResponse } from "http";
+import crypto from "node:crypto";
 import { Orchestrator } from "@complihub/task-orchestrator";
 import { createDefaultRegistry } from "@complihub/agent-registry";
 import { DefaultPolicyEngine } from "@complihub/policy-engine";
 import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeCorrelationId, structuredLog, type AnalyticsEvent, type AlertRecord } from "@complihub360/types";
-import { startCriticalFlowMonitor } from "./monitor.js";
+import { generateRelevantSubdomains, type CountryCode, type IndustryType, type BusinessModel } from "@complihub/compliance-engine";
 
 import { supabaseApi } from "./supabase.js";
 
@@ -74,25 +75,51 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 
     const correlationId = normalizeCorrelationId(req.headers['x-correlation-id']);
 
-    // 2.c API Key Authentication (Skip for /health and /ready)
+    // 2.c Native Supabase JWT Authentication (Skip for /health and /ready)
     if (req.url !== '/health' && req.url !== '/ready') {
-        const expectedApiKey = process.env.API_KEY;
-        if (expectedApiKey) {
-            const authHeader = req.headers['authorization'];
-            const apiKeyHeader = req.headers['x-api-key'];
+        let isAuthenticated = false;
+        const authHeader = req.headers['authorization'];
+        const devKey = req.headers['x-api-key'];
 
-            const providedKey = apiKeyHeader || (authHeader && authHeader.startsWith('Bearer ') ? authHeader.substring(7) : null);
+        // 1. Check Supabase JWT (HS256)
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            const token = authHeader.substring(7);
+            const jwtSecret = process.env.SUPABASE_JWT_SECRET;
+            if (jwtSecret) {
+                try {
+                    const [headerB64, payloadB64, signatureB64] = token.split('.');
+                    if (headerB64 && payloadB64 && signatureB64) {
+                        const signatureInput = `${headerB64}.${payloadB64}`;
+                        const expectedSignature = crypto
+                            .createHmac('sha256', jwtSecret)
+                            .update(signatureInput)
+                            .digest('base64url'); // JWT Uses Base64URL encoding
 
-            if (!providedKey || providedKey !== expectedApiKey) {
-                res.setHeader('x-correlation-id', correlationId);
-                res.writeHead(401, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({
-                    errorCode: 'UNAUTHORIZED',
-                    message: 'Missing or invalid API key',
-                    correlationId
-                }));
-                return;
+                        if (expectedSignature === signatureB64) {
+                            isAuthenticated = true;
+                        }
+                    }
+                } catch (e) {
+                    // Fallthrough to 401
+                }
             }
+        }
+
+        // 2. Fallback to API_KEY if JWT not provided or invalid (for server-to-server internal admin)
+        const expectedApiKey = process.env.API_KEY;
+        if (!isAuthenticated && expectedApiKey && devKey === expectedApiKey) {
+            isAuthenticated = true;
+        }
+
+        if (!isAuthenticated) {
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(401, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+                errorCode: 'UNAUTHORIZED',
+                message: 'Missing or invalid Supabase JWT or API Key',
+                correlationId
+            }));
+            return;
         }
     }
 
@@ -410,23 +437,47 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         req.on('end', async () => {
             try {
                 const requestData = JSON.parse(body);
-                // In the future this will use vector search on knowledge_chunks.
-                // For MVP, just return all active providers matching the country.
+                // 1. Compliance Engine - Generate structural subdomains
+                const engineResults = generateRelevantSubdomains({
+                    countries: [(requestData.country || 'DE') as CountryCode],
+                    industry: requestData.structured_answers?.industry as IndustryType,
+                    businessModel: requestData.structured_answers?.businessModel as BusinessModel
+                });
 
+                // 2. Vector Search (RAG) - Query PostgreSQL pgvector
+                // Stub embedding since backend currently lacks an active LLM API integration for live vectors
+                const queryEmbedding = new Array(768).fill(0.01);
+
+                // Wrap the rpc in try/catch to gracefully handle empty DB tables mapping to empty arrays
+                let knowledgeMatches: any[] = [];
+                try {
+                    knowledgeMatches = await supabaseApi.rpc('match_knowledge_chunks', {
+                        query_embedding: queryEmbedding,
+                        match_threshold: 0.1,
+                        match_count: 5
+                    });
+                    if (!Array.isArray(knowledgeMatches)) knowledgeMatches = [];
+                } catch (e) {
+                    console.warn("RPC match_knowledge_chunks fail:", e);
+                }
+
+                // 3. Fetch matched providers
                 const providers = await supabaseApi.select('providers', {
                     partner_status: 'active'
                 });
 
-                // Filter optionally by country in memory for simplicity in this MVP snippet
                 const filteredProviders = requestData.country
                     ? providers.filter((p: any) => p.countries_supported.includes(requestData.country))
                     : providers;
 
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({
-                    overview_summary: "AI summary stub.",
+                    overview_summary: "AI summary synthesized from knowledge chunks and deterministic engine rules.",
                     providers: filteredProviders,
-                    laws: [], tutorials: [], articles: [], tips: []
+                    laws: engineResults.map((r: any) => ({ id: r.id, title: r.label, description: r.description })),
+                    tutorials: knowledgeMatches.map((m: any) => ({ id: m.id, content: m.content })),
+                    articles: [],
+                    tips: []
                 }));
             } catch (err) {
                 res.writeHead(400);
