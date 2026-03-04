@@ -5,14 +5,7 @@ import { DefaultPolicyEngine } from "@complihub/policy-engine";
 import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeCorrelationId, structuredLog, type AnalyticsEvent, type AlertRecord, type Provider, type EngagementRequest } from "@complihub360/types";
 import { startCriticalFlowMonitor } from "./monitor.js";
 
-// Local in-memory store for dev-mode orchestrator
-const providerStore: Provider[] = [];
-const engagementStore: EngagementRequest[] = [];
-
-
-// Local in-memory store for dev-mode analytics and alerts
-const eventStore: AnalyticsEvent[] = [];
-const alertStore: AlertRecord[] = [];
+import { supabaseApi } from "./supabase.js";
 
 // Security Hardening: Rate limiting state
 const ipRateLimits = new Map<string, { count: number; resetAt: number }>();
@@ -20,7 +13,7 @@ const RATE_LIMIT_MAX = 100;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 
 // Start Background Critical Flow Monitor
-startCriticalFlowMonitor(eventStore, alertStore);
+// startCriticalFlowMonitor(eventStore, alertStore); // Disabled for now as stores are in DB
 
 // 1. Setup Dependencies
 const registry = createDefaultRegistry();
@@ -135,14 +128,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     }
 
     if (req.method === 'GET' && req.url === '/ready') {
-        // Minimal Readiness check (process + local event array OK)
-        if (eventStore && alertStore) {
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ status: "ready" }));
-        } else {
-            res.writeHead(503, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ status: "not_ready" }));
-        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ status: "ready" }));
         return;
     }
 
@@ -284,10 +271,15 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 // Add server receive timestamp if client clock is missing/trusted less
                 const recordedEvent = {
                     ...eventData,
-                    serverTimestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString()
                 };
 
-                eventStore.push(recordedEvent);
+                await supabaseApi.insert('event_log', {
+                    id: recordedEvent.eventId,
+                    type: recordedEvent.eventName,
+                    actor_id: null,
+                    payload: recordedEvent
+                });
 
                 structuredLog('info', 'Analytics Event Processed', {
                     correlationId,
@@ -318,13 +310,17 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     } else if (req.method === 'POST' && req.url === '/api/v1/engagement') {
         let body = '';
         req.on('data', chunk => body += chunk.toString());
-        req.on('end', () => {
+        req.on('end', async () => {
             try {
                 const requestData = JSON.parse(body);
-                const engagementId = `eng_${Date.now()}`;
-                const newEngagement: EngagementRequest = {
+                // Note: The ID generation will be handled by the DB via uuid_generate_v4()
+                // so we don't strictly need to generate it, but we can generate one to return it immediately
+                const crypto = await import('crypto');
+                const engagementId = crypto.randomUUID();
+
+                const newEngagement = {
                     id: engagementId,
-                    user_id: requestData.user_id || 'anonymous',
+                    user_id: requestData.user_id || undefined,
                     provider_key: requestData.provider_key,
                     country: requestData.country,
                     category: requestData.category,
@@ -333,27 +329,24 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     status: 'created',
                     sla_confirm_deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
                     sla_reply_deadline: new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString(),
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
                 };
 
-                engagementStore.push(newEngagement);
+                await supabaseApi.insert('engagement_requests', newEngagement);
 
-                eventStore.push({
-                    eventId: `evt_${Date.now()}`,
-                    eventName: 'primary_request_submitted',
-                    tenantId: 'default',
-                    source: 'compliance-api',
-                    payload: { engagementId, provider_key: newEngagement.provider_key },
-                    timestamp: Date.now()
+                await supabaseApi.insert('event_log', {
+                    type: 'primary_request_submitted',
+                    payload: { engagementId, provider_key: newEngagement.provider_key }
                 });
 
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(201, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, id: engagementId, status: 'created' }));
             } catch (err) {
+                console.error("Engagement request error:", err);
                 res.writeHead(400, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ errorCode: 'INVALID_JSON', message: 'Invalid JSON payload' }));
+                res.end(JSON.stringify({ errorCode: 'BAD_REQUEST', message: 'Invalid payload or DB error' }));
             }
         });
     } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/provider/magic/')) {
@@ -365,55 +358,51 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     } else if (req.method === 'POST' && req.url === '/api/v1/provider/confirm') {
         let body = '';
         req.on('data', chunk => body += chunk.toString());
-        req.on('end', () => {
+        req.on('end', async () => {
             try {
                 const requestData = JSON.parse(body);
-                const engagement = engagementStore.find(e => e.id === requestData.engagementId);
-                if (engagement) {
-                    engagement.status = 'confirmed';
-                    engagement.updatedAt = new Date().toISOString();
+                const engagementId = requestData.engagementId;
 
-                    eventStore.push({
-                        eventId: `evt_conf_${Date.now()}`,
-                        eventName: 'provider_confirmed',
-                        tenantId: 'default',
-                        source: 'compliance-api',
-                        payload: { engagementId: engagement.id, provider_key: engagement.provider_key },
-                        timestamp: Date.now()
-                    });
-                }
+                await supabaseApi.update('engagement_requests',
+                    { id: engagementId },
+                    { status: 'confirmed', updated_at: new Date().toISOString() }
+                );
+
+                await supabaseApi.insert('event_log', {
+                    type: 'provider_confirmed',
+                    payload: { engagementId }
+                });
+
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, message: "Provider confirmed" }));
-            } catch {
+            } catch (err) {
                 res.writeHead(400);
-                res.end();
+                res.end(JSON.stringify({ error: String(err) }));
             }
         });
     } else if (req.method === 'POST' && req.url === '/api/v1/provider/reply') {
         let body = '';
         req.on('data', chunk => body += chunk.toString());
-        req.on('end', () => {
+        req.on('end', async () => {
             try {
                 const requestData = JSON.parse(body);
-                const engagement = engagementStore.find(e => e.id === requestData.engagementId);
-                if (engagement) {
-                    engagement.status = 'replied';
-                    engagement.updatedAt = new Date().toISOString();
+                const engagementId = requestData.engagementId;
 
-                    eventStore.push({
-                        eventId: `evt_repl_${Date.now()}`,
-                        eventName: 'provider_replied',
-                        tenantId: 'default',
-                        source: 'compliance-api',
-                        payload: { engagementId: engagement.id, provider_key: engagement.provider_key },
-                        timestamp: Date.now()
-                    });
-                }
+                await supabaseApi.update('engagement_requests',
+                    { id: engagementId },
+                    { status: 'replied', updated_at: new Date().toISOString() }
+                );
+
+                await supabaseApi.insert('event_log', {
+                    type: 'provider_replied',
+                    payload: { engagementId }
+                });
+
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, message: "Provider replied" }));
-            } catch {
+            } catch (err) {
                 res.writeHead(400);
-                res.end();
+                res.end(JSON.stringify({ error: String(err) }));
             }
         });
     } else {
