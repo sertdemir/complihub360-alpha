@@ -405,6 +405,35 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.end(JSON.stringify({ error: String(err) }));
             }
         });
+    } else if (req.method === 'POST' && req.url === '/api/v1/search') {
+        let body = '';
+        req.on('data', chunk => body += chunk.toString());
+        req.on('end', async () => {
+            try {
+                const requestData = JSON.parse(body);
+                // In the future this will use vector search on knowledge_chunks.
+                // For MVP, just return all active providers matching the country.
+
+                const providers = await supabaseApi.select('providers', {
+                    partner_status: 'active'
+                });
+
+                // Filter optionally by country in memory for simplicity in this MVP snippet
+                const filteredProviders = requestData.country
+                    ? providers.filter((p: any) => p.countries_supported.includes(requestData.country))
+                    : providers;
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    overview_summary: "AI summary stub.",
+                    providers: filteredProviders,
+                    laws: [], tutorials: [], articles: [], tips: []
+                }));
+            } catch (err) {
+                res.writeHead(400);
+                res.end(JSON.stringify({ error: String(err) }));
+            }
+        });
     } else {
         res.setHeader('x-correlation-id', correlationId);
         res.writeHead(404, { 'Content-Type': 'application/json' });
