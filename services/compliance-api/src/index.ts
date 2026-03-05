@@ -169,7 +169,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         let isTooLarge = false;
         let body = '';
 
-        req.on('data', chunk => {
+        req.on('data', (chunk: any) => {
             if (isTooLarge) return;
             payloadSize += chunk.length;
             if (payloadSize > MAX_PAYLOAD_SIZE) {
@@ -267,7 +267,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         let isTooLarge = false;
         let body = '';
 
-        req.on('data', chunk => {
+        req.on('data', (chunk: any) => {
             if (isTooLarge) return;
             payloadSize += chunk.length;
             if (payloadSize > MAX_PAYLOAD_SIZE) {
@@ -335,7 +335,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         });
     } else if (req.method === 'POST' && req.url === '/api/v1/engagement') {
         let body = '';
-        req.on('data', chunk => body += chunk.toString());
+        req.on('data', (chunk: any) => body += chunk.toString());
         req.on('end', async () => {
             try {
                 const requestData = JSON.parse(body);
@@ -383,7 +383,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         res.end(JSON.stringify({ ok: true, message: "Magic link verified", token }));
     } else if (req.method === 'POST' && req.url === '/api/v1/provider/confirm') {
         let body = '';
-        req.on('data', chunk => body += chunk.toString());
+        req.on('data', (chunk: any) => body += chunk.toString());
         req.on('end', async () => {
             try {
                 const requestData = JSON.parse(body);
@@ -408,7 +408,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         });
     } else if (req.method === 'POST' && req.url === '/api/v1/provider/reply') {
         let body = '';
-        req.on('data', chunk => body += chunk.toString());
+        req.on('data', (chunk: any) => body += chunk.toString());
         req.on('end', async () => {
             try {
                 const requestData = JSON.parse(body);
@@ -433,7 +433,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         });
     } else if (req.method === 'POST' && req.url === '/api/v1/search') {
         let body = '';
-        req.on('data', chunk => body += chunk.toString());
+        req.on('data', (chunk: any) => body += chunk.toString());
         req.on('end', async () => {
             try {
                 const requestData = JSON.parse(body);
