@@ -3,7 +3,8 @@ import type { ComplianceCheckRequest, ComplianceCheckResponse } from "@complihub
 
 export async function runComplianceCheck(req: ComplianceCheckRequest): Promise<ComplianceCheckResponse> {
     const correlationId = generateCorrelationId();
-    const res = await fetch("/api/compliance/check", {
+    const baseUrl = import.meta.env.VITE_API_URL || '';
+    const res = await fetch(`${baseUrl}/api/compliance/check`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
