@@ -6,16 +6,18 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 COPY tsconfig.json tsconfig.base.json ./
 
-# Copy packages and services
+# Copy all source code
 COPY packages/ ./packages/
 COPY services/ ./services/
+COPY apps/ ./apps/
+COPY ui/ ./ui/
 
 # Install dependencies for the whole workspace
 # This accurately symlinks all workspaces into /app/node_modules
 RUN npm install
 
-# Build the compliance-api workspace natively
-RUN npm run build --workspace=@complihub/compliance-api
+# Build all workspaces
+RUN npm run build
 
 # Define required environment variables
 ENV NODE_ENV=production
