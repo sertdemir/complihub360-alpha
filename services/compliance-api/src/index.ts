@@ -214,7 +214,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     return;
                 }
 
-                if (requestData.tags !== undefined && (!Array.isArray(requestData.tags) || requestData.tags.some(t => typeof t !== 'string'))) {
+                if (requestData.tags !== undefined && (!Array.isArray(requestData.tags) || requestData.tags.some((t: any) => typeof t !== 'string'))) {
                     res.setHeader('x-correlation-id', correlationId);
                     res.writeHead(400, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'tags must be an array of strings', correlationId }));
