@@ -9,7 +9,7 @@
     ],
     "scripts": {
         "dev": "vite",
-        "build": "tsc && vite build",
+        "build": "npm run build:root --prefix ../../.. && tsc && vite build",
         "preview": "vite preview",
         "test": "vitest",
         "lint": "eslint . --ext .ts,.tsx"
