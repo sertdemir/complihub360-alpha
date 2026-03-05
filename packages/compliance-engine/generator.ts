@@ -1,6 +1,6 @@
-import { ComplianceDomain, DomainTemplateLibrary, ComplianceSubdomainTemplate } from './domain-schema';
-import { CountryCode, CountryRiskProfile, getCountryRiskProfile } from './country-profile';
-import { calculateBusinessModifier, IndustryType, BusinessModel } from './business-modifier';
+import { ComplianceDomain, DomainTemplateLibrary, ComplianceSubdomainTemplate } from './domain-schema.js';
+import { CountryCode, CountryRiskProfile, getCountryRiskProfile } from './country-profile.js';
+import { calculateBusinessModifier, IndustryType, BusinessModel } from './business-modifier.js';
 
 export interface GeneratorContext {
     countries: CountryCode[];

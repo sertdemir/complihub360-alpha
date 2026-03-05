@@ -21,6 +21,9 @@
             "path": "../../packages/agent-registry"
         },
         {
+            "path": "../../packages/compliance-engine"
+        },
+        {
             "path": "../../packages/policy-engine"
         },
         {

@@ -12,6 +12,7 @@
     "dependencies": {
         "@complihub/agent-core": "*",
         "@complihub/agent-registry": "*",
+        "@complihub/compliance-engine": "*",
         "@complihub/policy-engine": "*",
         "@complihub/task-orchestrator": "*",
         "@complihub360/types": "*"

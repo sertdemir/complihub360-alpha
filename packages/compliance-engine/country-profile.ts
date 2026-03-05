@@ -1,4 +1,4 @@
-import { ComplianceDomain } from './domain-schema';
+import { ComplianceDomain } from './domain-schema.js';
 
 export type CountryCode = 'DE' | 'FR' | 'US' | 'UK';
 

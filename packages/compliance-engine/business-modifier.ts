@@ -1,4 +1,4 @@
-import { ComplianceDomain } from './domain-schema';
+import { ComplianceDomain } from './domain-schema.js';
 
 export enum IndustryType {
     GENERIC_ECOMMERCE = 'GENERIC_ECOMMERCE',
