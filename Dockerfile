@@ -26,6 +26,9 @@ WORKDIR /app
 COPY --from=builder /app/services/compliance-api/dist ./services/compliance-api/dist
 COPY --from=builder /app/services/compliance-api/package.json ./services/compliance-api/package.json
 
+# Copy all internal packages so that symlinks in node_modules do not break
+COPY --from=builder /app/packages ./packages
+
 # Copy all node_modules (required since standard workspaces link local deps inside node_modules)
 COPY --from=builder /app/node_modules ./node_modules
 COPY package.json package-lock.json* ./
