@@ -32,6 +32,7 @@
     "version": "node scripts/generate-changelog.js && git add CHANGELOG.md"
   },
   "devDependencies": {
+    "@types/node": "^22.0.0",
     "eslint": "^8.56.0",
     "prettier": "^3.2.4",
     "typescript": "^5.9.3"
