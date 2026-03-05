@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Copy the monorepo configuration
 COPY package.json package-lock.json* ./
-COPY tsconfig.json ./
+COPY tsconfig.json tsconfig.base.json ./
 
 # Copy packages and services
 COPY packages/ ./packages/

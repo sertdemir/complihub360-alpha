@@ -1,5 +1,5 @@
 import { createServer, IncomingMessage, ServerResponse } from "http";
-import crypto from "node:crypto";
+import * as crypto from "node:crypto";
 import { Orchestrator } from "@complihub/task-orchestrator";
 import { createDefaultRegistry } from "@complihub/agent-registry";
 import { DefaultPolicyEngine } from "@complihub/policy-engine";
@@ -451,20 +451,21 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 // Wrap the rpc in try/catch to gracefully handle empty DB tables mapping to empty arrays
                 let knowledgeMatches: any[] = [];
                 try {
-                    knowledgeMatches = await supabaseApi.rpc('match_knowledge_chunks', {
+                    const rpcResponse = await supabaseApi.rpc('match_knowledge_chunks', {
                         query_embedding: queryEmbedding,
                         match_threshold: 0.1,
                         match_count: 5
                     });
+                    knowledgeMatches = (rpcResponse as any)?.data as any[] || rpcResponse as any[] || [];
                     if (!Array.isArray(knowledgeMatches)) knowledgeMatches = [];
                 } catch (e) {
                     console.warn("RPC match_knowledge_chunks fail:", e);
                 }
 
                 // 3. Fetch matched providers
-                const providers = await supabaseApi.select('providers', {
+                const providers = (await supabaseApi.select('providers', {
                     partner_status: 'active'
-                });
+                })) as any[];
 
                 const filteredProviders = requestData.country
                     ? providers.filter((p: any) => p.countries_supported.includes(requestData.country))

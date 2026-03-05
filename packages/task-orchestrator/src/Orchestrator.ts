@@ -178,7 +178,7 @@ export class Orchestrator {
             this.policyEngine.release(createPolicyContext(context));
         }
 
-        this.notifyObservers(agentId, context, start, Date.now(), result.ok, result.ok ? undefined : result.error, options);
+        this.notifyObservers(agentId, context, start, Date.now(), result.ok, result.ok ? undefined : (result as any).error, options);
 
         return result;
     }
@@ -297,7 +297,7 @@ export class Orchestrator {
                 requestId,
                 correlationId,
                 decision: "denied",
-                reason: `Agent failed: ${result.error.message}`,
+                reason: `Agent failed: ${(result as any).error?.message || "Unknown error"}`,
                 findings: []
             };
         }
