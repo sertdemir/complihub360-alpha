@@ -4,6 +4,8 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
+    console.error("DEBUG - Available process.env keys:", Object.keys(process.env).filter(k => k.startsWith('SUPABASE') || k === 'PORT' || k === 'NODE_ENV').join(', '));
+    console.error("DEBUG - supabaseUrl exists?", !!supabaseUrl, "supabaseKey exists?", !!supabaseKey);
     throw new Error("Missing Supabase environment variables!");
 }
 
