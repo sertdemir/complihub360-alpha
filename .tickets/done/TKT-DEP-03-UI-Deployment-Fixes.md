@@ -30,3 +30,4 @@ The user's objective was to deploy the `@vs1-demo/ui` application to Railway. Ho
 - [2026-03-05T23:00:00Z] **Repo-Engineer**: Added root compile step to UI build scripts (Status: DONE)
 - [2026-03-05T23:15:00Z] **Repo-Engineer**: Added start scripts to UI package.jsons for production serving (Status: DONE)
 - [2026-03-05T23:25:00Z] **Repo-Engineer**: Updated Dockerfile to include apps/ and ui/ folders for Railway container build (Status: DONE)
+- [2026-03-06T12:30:00Z] **Repo-Engineer**: Set custom start command `npm --prefix apps/vs1-demo/ui run start` to bypass aggressive Docker layer caching on root package.json. UI is live on Railway. (Status: VERIFIED)
