@@ -11,7 +11,7 @@
         "dev": "vite",
         "build": "npm run build:root --prefix ../../.. && tsc && vite build",
         "preview": "vite preview",
-        "start": "vite preview",
+        "start": "node server.js",
         "test": "vitest",
         "lint": "eslint . --ext .ts,.tsx"
     },
