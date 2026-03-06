@@ -26,6 +26,8 @@
     "dev:ui": "npm run dev --workspace=@vs1-demo/ui",
     "dev:service": "npm run dev --workspace=@complihub/compliance-api",
     "dev:board": "npm run dev --workspace=@complihub/dev-board",
+    "start:ui": "npm run start --workspace=@vs1-demo/ui",
+    "start:api": "npm run start --workspace=@complihub/compliance-api",
     "release:patch": "npm version patch",
     "release:minor": "npm version minor",
     "preversion": "npm run typecheck && npm run test",
