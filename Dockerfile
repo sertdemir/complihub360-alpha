@@ -21,9 +21,6 @@ RUN npm run build
 
 # Define required environment variables
 ENV NODE_ENV=production
-ENV PORT=3005
-
-EXPOSE 3005
 
 # Start exactly what got built
 CMD ["node", "services/compliance-api/dist/index.js"]

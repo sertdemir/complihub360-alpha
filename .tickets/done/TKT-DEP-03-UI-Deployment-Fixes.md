@@ -32,3 +32,4 @@ The user's objective was to deploy the `@vs1-demo/ui` application to Railway. Ho
 - [2026-03-05T23:25:00Z] **Repo-Engineer**: Updated Dockerfile to include apps/ and ui/ folders for Railway container build (Status: DONE)
 - [2026-03-06T12:30:00Z] **Repo-Engineer**: Set custom start command `npm --prefix apps/vs1-demo/ui run start` to bypass aggressive Docker layer caching on root package.json. UI is live on Railway. (Status: VERIFIED)
 - [2026-03-06T12:35:00Z] **Repo-Engineer**: Replaced `vite preview` start script with `npx -y serve` to reliably bind to Railway's proxy constraints (`0.0.0.0` and `$PORT`). (Status: VERIFIED)
+- [2026-03-06T12:45:00Z] **Repo-Engineer**: Removed hardcoded `EXPOSE 3005` and `ENV PORT=3005` from root Dockerfile. This forces Railway to dynamically inject `$PORT` and route traffic to the same port `serve` binds to, preventing the 502 Bad Gateway. (Status: PENDING DEPLOY)
