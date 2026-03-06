@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PORT = process.env.PORT || 4173;
+const PORT = 4173; // Hardcoded to match Railway's explicit Edge Router proxy setting
 const DIST_DIR = path.join(__dirname, 'dist');
 
 const MIME_TYPES = {
