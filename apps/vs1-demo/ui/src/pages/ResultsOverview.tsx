@@ -69,6 +69,27 @@ export function ResultsOverview() {
                                     CompliHub360
                                 </h2>
                             </div>
+                            
+                            <nav className="hidden md:flex items-center gap-6">
+                                <a 
+                                    className="text-slate-500 dark:text-slate-400 hover:text-[#0a7ff5] transition-colors text-sm font-medium cursor-pointer"
+                                    onClick={() => navigate("/services")}
+                                >
+                                    Services
+                                </a>
+                                <a 
+                                    className="text-slate-500 dark:text-slate-400 hover:text-[#0a7ff5] transition-colors text-sm font-medium cursor-pointer"
+                                    onClick={() => navigate("/countries")}
+                                >
+                                    Countries
+                                </a>
+                                <a 
+                                    className="text-slate-500 dark:text-slate-400 hover:text-[#0a7ff5] transition-colors text-sm font-medium cursor-pointer"
+                                    onClick={() => navigate("/advisory")}
+                                >
+                                    Advisory
+                                </a>
+                            </nav>
 
                             {/* Search */}
                             <div className="flex flex-col min-w-40 h-10 w-full max-w-xl mx-auto hidden md:flex">
