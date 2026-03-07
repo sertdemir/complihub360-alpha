@@ -82,7 +82,7 @@ export function CountriesPage() {
                         >
                             Countries
                         </a>
-                        <a className="text-slate-400 hover:text-slate-100 transition-colors text-sm font-medium leading-normal cursor-pointer" href="#">Advisory</a>
+                        <a className="text-slate-400 hover:text-slate-100 transition-colors text-sm font-medium leading-normal cursor-pointer" onClick={() => navigate("/advisory")}>Advisory</a>
                     </nav>
 
                     <div className="flex gap-3 items-center">
