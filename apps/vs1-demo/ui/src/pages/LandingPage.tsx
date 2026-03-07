@@ -16,7 +16,7 @@ export function LandingPage() {
                         </div>
                         <div className="flex flex-1 justify-end gap-8">
                             <nav className="hidden md:flex items-center gap-9">
-                                <a className="text-slate-400 hover:text-slate-100 transition-colors text-sm font-medium leading-normal" href="#">Services</a>
+                                <a className="text-slate-400 hover:text-slate-100 transition-colors text-sm font-medium leading-normal cursor-pointer" onClick={() => navigate("/services")}>Services</a>
                                 <a className="text-slate-400 hover:text-slate-100 transition-colors text-sm font-medium leading-normal" href="#">Countries</a>
                                 <a className="text-slate-400 hover:text-slate-100 transition-colors text-sm font-medium leading-normal" href="#">Advisory</a>
                             </nav>
