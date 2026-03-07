@@ -29,16 +29,18 @@ const DOMAIN_LINKS: Record<string, string> = {
     [ComplianceDomain.ONGOING_MONITORING]: "#",
 };
 
-// Generate Categories from the DomainTemplateLibrary
-const CATEGORIES = Object.entries(DomainTemplateLibrary).map(([domain, templates]) => {
-    const mainTemplate = (templates as any[])[0];
-    return {
+// Map domain keys to individual cards by flattening the DomainTemplateLibrary
+const CATEGORIES = Object.entries(DomainTemplateLibrary).flatMap(([domain, templates]) => {
+    return (templates as any[]).map(template => ({
         icon: DOMAIN_ICONS[domain] || "policy",
-        label: domain.charAt(0) + domain.slice(1).toLowerCase().replace("_", " "),
+        label: template.label,
+        domain: domain,
         badge: domain === ComplianceDomain.TAX ? "Trending" : null,
-        desc: mainTemplate?.description || "Compliance frameworks and regulatory mapping.",
+        desc: template.description,
         href: DOMAIN_LINKS[domain] || "#",
-    };
+        models: template.applicableBusinessModels || [],
+        risk: template.riskWeight || 5
+    }));
 });
 
 const JURISDICTIONS = [
@@ -107,34 +109,35 @@ export function ServicesPage() {
     return (
         <div className="min-h-screen bg-[#060b14] text-slate-100 font-['Inter',sans-serif] flex flex-col">
 
-            {/* Navigation */}
-            <header className="sticky top-0 z-50 flex items-center justify-between px-8 py-4 border-b border-slate-800/80 bg-[#060b14]/95 backdrop-blur-sm">
+            {/* Navigation - EXACTLY matched to original LandingPage aesthetics */}
+            <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-800 px-10 py-4 max-w-7xl mx-auto w-full bg-[#060b14]">
                 <div
-                    className="flex items-center gap-3 cursor-pointer"
+                    className="flex items-center gap-4 cursor-pointer"
                     onClick={() => navigate("/")}
                 >
-                    <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center">
-                        <span className="material-symbols-outlined text-cyan-400 text-[18px]">verified_user</span>
+                    <div className="size-6 text-[#137fec] flex items-center justify-center">
+                        <span className="material-symbols-outlined text-[24px]">verified_user</span>
                     </div>
-                    <span className="text-white font-bold text-lg tracking-tight">CompliHub360</span>
+                    <h2 className="text-slate-100 text-xl font-bold leading-tight tracking-[-0.015em]">CompliHub360</h2>
                 </div>
 
-                <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-                    <button onClick={() => navigate("/services")} className="text-cyan-400 border-b border-cyan-400 pb-0.5">Services</button>
-                    <button className="text-slate-400 hover:text-white transition-colors">Countries</button>
-                    <button className="text-slate-400 hover:text-white transition-colors">Advisory</button>
-                </nav>
+                <div className="flex flex-1 justify-end gap-8">
+                    <nav className="hidden md:flex items-center gap-9">
+                        <a className="text-slate-400 hover:text-slate-100 transition-colors text-sm font-medium leading-normal cursor-pointer" onClick={() => navigate("/")}>Services</a>
+                        <a className="text-slate-400 hover:text-slate-100 transition-colors text-sm font-medium leading-normal cursor-pointer" href="#">Countries</a>
+                        <a className="text-slate-400 hover:text-slate-100 transition-colors text-sm font-medium leading-normal cursor-pointer" href="#">Advisory</a>
+                    </nav>
 
-                <div className="flex items-center gap-3">
-                    <button className="text-slate-400 hover:text-white text-sm font-medium transition-colors px-4 py-2">
-                        Login
-                    </button>
-                    <button
-                        onClick={() => navigate("/dashboard")}
-                        className="px-5 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-900 text-sm font-bold rounded-lg transition-colors"
-                    >
-                        Sign Up
-                    </button>
+                    <div className="flex gap-3 items-center">
+                        <button className="text-slate-400 hover:text-slate-100 text-sm font-medium leading-normal transition-colors px-4 py-2">
+                            Login
+                        </button>
+                        <button
+                            onClick={() => navigate("/dashboard")}
+                            className="flex items-center justify-center overflow-hidden rounded-lg h-10 px-6 bg-[#137fec] hover:bg-[#137fec]/90 transition-colors text-white text-sm font-bold leading-normal tracking-[0.015em]">
+                            Sign Up
+                        </button>
+                    </div>
                 </div>
             </header>
 
@@ -166,7 +169,7 @@ export function ServicesPage() {
 
                         <button
                             onClick={() => navigate("/wizard")}
-                            className="inline-flex items-center gap-2 px-8 py-3.5 bg-cyan-500 hover:bg-cyan-400 text-slate-900 rounded-xl font-bold text-base transition-all hover:scale-105 shadow-lg shadow-cyan-500/20"
+                            className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#137fec] hover:bg-[#137fec]/90 text-white rounded-xl font-bold text-base transition-all hover:scale-105 shadow-lg shadow-[#137fec]/20"
                         >
                             Launch Wizard
                             <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
@@ -224,35 +227,66 @@ export function ServicesPage() {
             </section>
 
             {/* Category Cards */}
-            <section className="px-8 pb-20 max-w-4xl mx-auto w-full">
-                <h2 className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-6">
-                    Browse Intelligence Categories
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <section className="px-8 pb-20 max-w-6xl mx-auto w-full">
+                <header className="flex items-center justify-between mb-8 px-2">
+                    <div>
+                        <h2 className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">
+                            Global Compliance Services
+                        </h2>
+                        <p className="text-slate-500 text-sm">Comprehensive modules for international expansion.</p>
+                    </div>
+                    <div className="flex items-center gap-2 text-slate-500 text-[11px] font-medium uppercase tracking-wider">
+                        <span className="w-2 h-2 rounded-full bg-cyan-500/40" />
+                        {CATEGORIES.length} Active Modules
+                    </div>
+                </header>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {CATEGORIES.map(cat => (
                         <a
                             key={cat.label}
                             href={cat.href}
                             onClick={e => { if (cat.href.startsWith("/")) { e.preventDefault(); navigate(cat.href); } }}
-                            className="group block p-6 bg-slate-900/50 border border-slate-700/50 rounded-2xl hover:border-cyan-500/40 hover:bg-slate-800/50 transition-all duration-200 backdrop-blur-sm"
+                            className="group block p-6 bg-slate-900/40 border border-slate-800/60 rounded-2xl hover:border-cyan-500/40 hover:bg-slate-800/40 transition-all duration-300 backdrop-blur-sm relative overflow-hidden"
                         >
-                            <div className="flex items-start justify-between mb-4">
-                                <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            {/* Decorative gradient corner */}
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-cyan-500/5 to-transparent pointer-events-none" />
+
+                            <div className="flex items-start justify-between mb-5">
+                                <div className="w-12 h-12 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-center group-hover:border-cyan-500/30 transition-colors">
                                     <span className="material-symbols-outlined text-cyan-400 text-[24px]">{cat.icon}</span>
                                 </div>
-                                {cat.badge && (
-                                    <span className="px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[11px] font-bold uppercase tracking-wider">
-                                        {cat.badge}
+                                <div className="flex flex-col items-end gap-2">
+                                    {cat.badge && (
+                                        <span className="px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-bold uppercase tracking-wider">
+                                            {cat.badge}
+                                        </span>
+                                    )}
+                                    <span className={`text-[10px] font-bold uppercase tracking-wider ${cat.risk > 7 ? 'text-red-400' : 'text-slate-500'}`}>
+                                        Risk: {cat.risk}/10
                                     </span>
-                                )}
+                                </div>
                             </div>
+
                             <h3 className="text-white font-semibold text-lg mb-2 group-hover:text-cyan-50 transition-colors">
                                 {cat.label}
                             </h3>
-                            <p className="text-slate-400 text-sm leading-relaxed">{cat.desc}</p>
-                            <div className="mt-4 flex items-center gap-1 text-cyan-400/60 group-hover:text-cyan-400 transition-colors text-sm font-medium">
-                                <span>Explore</span>
-                                <span className="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                            <p className="text-slate-400 text-sm leading-relaxed mb-4 line-clamp-2">{cat.desc}</p>
+
+                            <div className="flex flex-wrap gap-1.5 mb-6">
+                                {cat.models.slice(0, 3).map((m: string) => (
+                                    <span key={m} className="px-2 py-0.5 rounded-md bg-slate-800/50 border border-slate-700/50 text-slate-500 text-[10px] whitespace-nowrap">
+                                        {m.replace('_', ' ')}
+                                    </span>
+                                ))}
+                            </div>
+
+                            <div className="flex items-center justify-between pt-4 border-t border-slate-800/50">
+                                <div className="flex items-center gap-1.5 text-cyan-400/60 group-hover:text-cyan-400 transition-colors text-xs font-bold uppercase tracking-widest">
+                                    <span>Configure</span>
+                                    <span className="material-symbols-outlined text-[14px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                                </div>
+                                <span className="text-slate-600 text-[10px] font-mono">{cat.domain}</span>
                             </div>
                         </a>
                     ))}
