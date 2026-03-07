@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { EngagementModal } from "../components/EngagementModal";
 
 type TabId = "overview" | "laws" | "articles" | "tips";
 
@@ -41,9 +42,16 @@ export function ResultsOverview() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<TabId>("overview");
     const [query, setQuery] = useState("GDPR data retention policies for fintech");
+    const [modalProvider, setModalProvider] = useState<string | null>(null);
 
     return (
         <div className="bg-[#f5f7f8] dark:bg-[#101922] text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-['Inter',sans-serif]">
+            {modalProvider && (
+                <EngagementModal
+                    providerName={modalProvider}
+                    onClose={() => setModalProvider(null)}
+                />
+            )}
             <div className="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
                 <div className="layout-container flex h-full grow flex-col">
 
@@ -104,8 +112,8 @@ export function ResultsOverview() {
                                             key={tab.id}
                                             onClick={() => setActiveTab(tab.id)}
                                             className={`flex flex-col items-center justify-center border-b-[3px] pb-3 pt-2 whitespace-nowrap transition-colors text-sm font-semibold tracking-[0.015em] ${activeTab === tab.id
-                                                    ? "border-b-[#0a7ff5] text-[#0a7ff5] font-bold"
-                                                    : "border-b-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                                                ? "border-b-[#0a7ff5] text-[#0a7ff5] font-bold"
+                                                : "border-b-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                                                 }`}
                                         >
                                             {tab.label}
@@ -213,7 +221,10 @@ export function ResultsOverview() {
                                             </div>
                                             <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 line-clamp-2">{p.desc}</p>
                                             {p.primary ? (
-                                                <button className="w-full bg-[#0a7ff5] hover:bg-[#0a7ff5]/90 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                                <button
+                                                    onClick={() => setModalProvider(p.name)}
+                                                    className="w-full bg-[#0a7ff5] hover:bg-[#0a7ff5]/90 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                                                >
                                                     Request Proposal
                                                     <span className="material-symbols-outlined text-sm">arrow_forward</span>
                                                 </button>
