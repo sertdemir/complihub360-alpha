@@ -16,6 +16,7 @@
         "lint": "eslint . --ext .ts,.tsx"
     },
     "dependencies": {
+        "@complihub/compliance-engine": "*",
         "@complihub360/types": "*",
         "@complihub360/ui": "*",
         "clsx": "^2.1.0",

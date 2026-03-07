@@ -12,7 +12,8 @@ function App() {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<LandingPage />} />
+                <Route path="/" element={<ServicesPage />} />
+                <Route path="/landing" element={<LandingPage />} />
                 <Route path="/services" element={<ServicesPage />} />
                 <Route path="/wizard" element={<WizardStep1 />} />
                 <Route path="/wizard/2" element={<WizardStep2 />} />

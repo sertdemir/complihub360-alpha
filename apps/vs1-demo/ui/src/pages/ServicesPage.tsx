@@ -1,45 +1,57 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { 
+    ComplianceDomain, 
+    DomainTemplateLibrary 
+} from "@complihub/compliance-engine/domain-schema";
+import { 
+    CountryRiskMatrix, 
+    CountryCode 
+} from "@complihub/compliance-engine/country-profile";
 
-const CATEGORIES = [
-    {
-        icon: "payments",
-        label: "Tax & VAT",
-        badge: "Trending",
-        desc: "Cross-border tax regulations, VAT compliance, and automated reporting systems for global trade.",
-        href: "/wizard",
-    },
-    {
-        icon: "admin_panel_settings",
-        label: "Data Privacy",
-        badge: null,
-        desc: "GDPR, CCPA, and regional data handling frameworks with intelligent user consent management.",
-        href: "/privacy",
-    },
-    {
-        icon: "ads_click",
-        label: "Marketing & SEO",
-        badge: null,
-        desc: "Digital advertising standards, cookie governance, and content liability rules for publishers.",
-        href: "#",
-    },
-    {
-        icon: "balance",
-        label: "Corporate Law",
-        badge: null,
-        desc: "Legal entity formation, labor law adherence, and corporate governance oversight in 150+ countries.",
-        href: "#",
-    },
-];
+// Map domain keys to material symbols
+const DOMAIN_ICONS: Record<string, string> = {
+    [ComplianceDomain.TAX]: "payments",
+    [ComplianceDomain.PRODUCT]: "inventory_2",
+    [ComplianceDomain.MARKETING]: "ads_click",
+    [ComplianceDomain.DATA]: "admin_panel_settings",
+    [ComplianceDomain.CORPORATE]: "balance",
+    [ComplianceDomain.ONGOING_MONITORING]: "visibility"
+};
+
+// Map domain keys to primary wizard routes or #
+const DOMAIN_LINKS: Record<string, string> = {
+    [ComplianceDomain.TAX]: "/wizard",
+    [ComplianceDomain.DATA]: "/privacy",
+    [ComplianceDomain.PRODUCT]: "#",
+    [ComplianceDomain.MARKETING]: "#",
+    [ComplianceDomain.CORPORATE]: "#",
+    [ComplianceDomain.ONGOING_MONITORING]: "#",
+};
+
+// Generate Categories from the DomainTemplateLibrary
+const CATEGORIES = Object.entries(DomainTemplateLibrary).map(([domain, templates]) => {
+    const mainTemplate = (templates as any[])[0];
+    return {
+        icon: DOMAIN_ICONS[domain] || "policy",
+        label: domain.charAt(0) + domain.slice(1).toLowerCase().replace("_", " "),
+        badge: domain === ComplianceDomain.TAX ? "Trending" : null,
+        desc: mainTemplate?.description || "Compliance frameworks and regulatory mapping.",
+        href: DOMAIN_LINKS[domain] || "#",
+    };
+});
 
 const JURISDICTIONS = [
     "Global Jurisdiction",
-    "European Union",
-    "United States",
-    "Germany",
-    "United Kingdom",
-    "Australia",
-    "Canada",
+    ...Object.keys(CountryRiskMatrix).map(code => {
+        const names: Record<string, string> = {
+            DE: "Germany",
+            FR: "France",
+            US: "United States",
+            UK: "United Kingdom"
+        };
+        return names[code] || code;
+    })
 ];
 
 /* Orbital/glow SVG graphic for the hero */

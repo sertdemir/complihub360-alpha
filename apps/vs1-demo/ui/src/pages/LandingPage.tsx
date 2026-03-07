@@ -8,7 +8,7 @@ export function LandingPage() {
             <div className="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
                 <div className="layout-container flex h-full grow flex-col">
                     <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-800 px-10 py-4 max-w-7xl mx-auto w-full">
-                        <div className="flex items-center gap-4 text-slate-100">
+                        <div className="flex items-center gap-4 text-slate-100 cursor-pointer" onClick={() => navigate("/")}>
                             <div className="size-6 text-[#137fec] flex items-center justify-center">
                                 <span className="material-symbols-outlined text-[24px]">verified_user</span>
                             </div>
