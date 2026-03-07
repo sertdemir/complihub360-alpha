@@ -1,5 +1,4 @@
 import { type ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
 import { cn } from "../../utils/cn";
 
 interface AppShellProps {
@@ -9,7 +8,6 @@ interface AppShellProps {
 }
 
 export function AppShell({ children, title = "CompliHub360", className }: AppShellProps) {
-    const navigate = useNavigate();
     return (
         <div className={cn("min-h-screen grid grid-cols-[240px_1fr] bg-background text-slate-100", className)}>
             {/* Sidebar */}
@@ -18,30 +16,16 @@ export function AppShell({ children, title = "CompliHub360", className }: AppShe
                     {title}
                 </div>
                 <nav className="flex-1 space-y-1">
+                    {/* Placeholder Nav Items */}
                     <div className="px-2 py-1 text-sm font-medium text-slate-400">Main</div>
-                    <div 
-                        className="rounded-md px-2 py-2 text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors cursor-pointer"
-                        onClick={() => navigate("/")}
-                    >
-                        Search
+                    <div className="rounded-md bg-white/5 px-2 py-2 text-sm font-medium text-white">
+                        Dashboard
                     </div>
-                    <div 
-                        className="rounded-md px-2 py-2 text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors cursor-pointer"
-                        onClick={() => navigate("/services")}
-                    >
-                        Services
+                    <div className="rounded-md px-2 py-2 text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors cursor-pointer">
+                        Projects
                     </div>
-                    <div 
-                        className="rounded-md px-2 py-2 text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors cursor-pointer"
-                        onClick={() => navigate("/countries")}
-                    >
-                        Countries
-                    </div>
-                    <div 
-                        className="rounded-md px-2 py-2 text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors cursor-pointer"
-                        onClick={() => navigate("/advisory")}
-                    >
-                        Advisory
+                    <div className="rounded-md px-2 py-2 text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors cursor-pointer">
+                        Settings
                     </div>
                 </nav>
                 <div className="text-xs text-slate-600 px-2">

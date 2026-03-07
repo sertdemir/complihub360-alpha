@@ -29,32 +29,19 @@ const DOMAIN_LINKS: Record<string, string> = {
     [ComplianceDomain.ONGOING_MONITORING]: "#",
 };
 
-// Map domain keys to descriptions
-const DOMAIN_DESCRIPTIONS: Record<string, string> = {
-    [ComplianceDomain.TAX]: "Navigate cross-border VAT obligations, registration thresholds, and marketplace taxation rules. We orchestrate your tax likelihood assessment and connect you with verified specialists for safe global expansion.",
-    [ComplianceDomain.PRODUCT]: "Manage Extended Producer Responsibility (EPR) and packaging laws across jurisdictions. Ensure your products and packaging meet localized environmental standards to prevent border rejections and fines.",
-    [ComplianceDomain.MARKETING]: "Validate advertising claims, SEO, and influencer marketing compliance. Protect your budget by ensuring your digital campaigns follow competitive and consumer protection laws in sensitive industries.",
-    [ComplianceDomain.DATA]: "Achieve GDPR/CCPA compliance with privacy audits and secure tracking assessments. Our strict privacy pipeline sanitizes your data before AI processing, linking you with certified DPOs.",
-    [ComplianceDomain.CORPORATE]: "Strategic legal entity formation and cross-border structuring. Select the correct corporate form in new markets to ensure long-term stability, liability protection, and operational handlers.",
-    [ComplianceDomain.ONGOING_MONITORING]: "Your Compliance Operating System. Benefit from continuous regulatory tracking, automated partner SLA monitoring, and maturity audits to maintain long-term regulatory safety.",
-};
-
-// Organized services by domain
-const ORGANIZED_SERVICES = Object.entries(DomainTemplateLibrary).map(([domain, templates]) => ({
-    id: domain,
-    label: domain.replace('_', ' '),
-    description: DOMAIN_DESCRIPTIONS[domain] || "Specialized compliance modules for this domain.",
-    icon: DOMAIN_ICONS[domain] || "policy",
-    items: (templates as any[]).map(template => ({
-        id: template.id,
+// Map domain keys to individual cards by flattening the DomainTemplateLibrary
+const CATEGORIES = Object.entries(DomainTemplateLibrary).flatMap(([domain, templates]) => {
+    return (templates as any[]).map(template => ({
+        icon: DOMAIN_ICONS[domain] || "policy",
         label: template.label,
+        domain: domain,
         badge: domain === ComplianceDomain.TAX ? "Trending" : null,
         desc: template.description,
         href: DOMAIN_LINKS[domain] || "#",
         models: template.applicableBusinessModels || [],
         risk: template.riskWeight || 5
-    }))
-}));
+    }));
+});
 
 const JURISDICTIONS = [
     "Global Jurisdiction",
@@ -119,19 +106,11 @@ export function ServicesPage() {
     const [jurisdiction, setJurisdiction] = useState("Global Jurisdiction");
     const [query, setQuery] = useState("");
 
-    const handleServicesClick = () => {
-        if (window.location.pathname === "/" || window.location.pathname === "/services") {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        } else {
-            navigate("/");
-        }
-    };
-
     return (
         <div className="min-h-screen bg-[#060b14] text-slate-100 font-['Inter',sans-serif] flex flex-col">
 
             {/* Navigation - EXACTLY matched to original LandingPage aesthetics */}
-            <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-800 px-10 py-4 max-w-7xl mx-auto w-full bg-[#060b14] sticky top-0 z-50 backdrop-blur-md bg-opacity-90">
+            <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-800 px-10 py-4 max-w-7xl mx-auto w-full bg-[#060b14]">
                 <div
                     className="flex items-center gap-4 cursor-pointer"
                     onClick={() => navigate("/")}
@@ -144,9 +123,9 @@ export function ServicesPage() {
 
                 <div className="flex flex-1 justify-end gap-8">
                     <nav className="hidden md:flex items-center gap-9">
-                        <a className="text-slate-400 hover:text-slate-100 transition-colors text-sm font-medium leading-normal cursor-pointer" onClick={handleServicesClick}>Services</a>
-                        <a className="text-slate-400 hover:text-slate-100 transition-colors text-sm font-medium leading-normal cursor-pointer" onClick={() => navigate("/countries")}>Countries</a>
-                        <a className="text-slate-400 hover:text-slate-100 transition-colors text-sm font-medium leading-normal cursor-pointer" onClick={() => navigate("/advisory")}>Advisory</a>
+                        <a className="text-slate-400 hover:text-slate-100 transition-colors text-sm font-medium leading-normal cursor-pointer" onClick={() => navigate("/")}>Services</a>
+                        <a className="text-slate-400 hover:text-slate-100 transition-colors text-sm font-medium leading-normal cursor-pointer" href="#">Countries</a>
+                        <a className="text-slate-400 hover:text-slate-100 transition-colors text-sm font-medium leading-normal cursor-pointer" href="#">Advisory</a>
                     </nav>
 
                     <div className="flex gap-3 items-center">
@@ -247,71 +226,72 @@ export function ServicesPage() {
                 </div>
             </section>
 
-            {/* Categorized Services */}
-            <div className="px-8 pb-20 max-w-6xl mx-auto w-full space-y-16">
-                {ORGANIZED_SERVICES.map(domain => (
-                    <section key={domain.id} className="space-y-8">
-                        <header className="flex flex-col gap-2 px-2 border-l-2 border-cyan-500/50 pl-6">
-                            <div className="flex items-center gap-3">
-                                <span className="material-symbols-outlined text-cyan-400 text-[28px]">{domain.icon}</span>
-                                <h2 className="text-white text-2xl font-bold tracking-tight">{domain.label}</h2>
+            {/* Category Cards */}
+            <section className="px-8 pb-20 max-w-6xl mx-auto w-full">
+                <header className="flex items-center justify-between mb-8 px-2">
+                    <div>
+                        <h2 className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">
+                            Global Compliance Services
+                        </h2>
+                        <p className="text-slate-500 text-sm">Comprehensive modules for international expansion.</p>
+                    </div>
+                    <div className="flex items-center gap-2 text-slate-500 text-[11px] font-medium uppercase tracking-wider">
+                        <span className="w-2 h-2 rounded-full bg-cyan-500/40" />
+                        {CATEGORIES.length} Active Modules
+                    </div>
+                </header>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {CATEGORIES.map(cat => (
+                        <a
+                            key={cat.label}
+                            href={cat.href}
+                            onClick={e => { if (cat.href.startsWith("/")) { e.preventDefault(); navigate(cat.href); } }}
+                            className="group block p-6 bg-slate-900/40 border border-slate-800/60 rounded-2xl hover:border-cyan-500/40 hover:bg-slate-800/40 transition-all duration-300 backdrop-blur-sm relative overflow-hidden"
+                        >
+                            {/* Decorative gradient corner */}
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-cyan-500/5 to-transparent pointer-events-none" />
+
+                            <div className="flex items-start justify-between mb-5">
+                                <div className="w-12 h-12 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-center group-hover:border-cyan-500/30 transition-colors">
+                                    <span className="material-symbols-outlined text-cyan-400 text-[24px]">{cat.icon}</span>
+                                </div>
+                                <div className="flex flex-col items-end gap-2">
+                                    {cat.badge && (
+                                        <span className="px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-bold uppercase tracking-wider">
+                                            {cat.badge}
+                                        </span>
+                                    )}
+                                    <span className={`text-[10px] font-bold uppercase tracking-wider ${cat.risk > 7 ? 'text-red-400' : 'text-slate-500'}`}>
+                                        Risk: {cat.risk}/10
+                                    </span>
+                                </div>
                             </div>
-                            <p className="text-slate-400 text-sm max-w-2xl">{domain.description}</p>
-                        </header>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {domain.items.map(cat => (
-                                <a
-                                    key={cat.id}
-                                    href={cat.href}
-                                    onClick={e => { if (cat.href.startsWith("/")) { e.preventDefault(); navigate(cat.href); } }}
-                                    className="group block p-6 bg-slate-900/40 border border-slate-800/60 rounded-2xl hover:border-cyan-500/40 hover:bg-slate-800/40 transition-all duration-300 backdrop-blur-sm relative overflow-hidden"
-                                >
-                                    {/* Decorative gradient corner */}
-                                    <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-cyan-500/5 to-transparent pointer-events-none" />
+                            <h3 className="text-white font-semibold text-lg mb-2 group-hover:text-cyan-50 transition-colors">
+                                {cat.label}
+                            </h3>
+                            <p className="text-slate-400 text-sm leading-relaxed mb-4 line-clamp-2">{cat.desc}</p>
 
-                                    <div className="flex items-start justify-between mb-5">
-                                        <div className="w-12 h-12 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-center group-hover:border-cyan-500/30 transition-colors">
-                                            <span className="material-symbols-outlined text-cyan-400 text-[24px]">{domain.icon}</span>
-                                        </div>
-                                        <div className="flex flex-col items-end gap-2">
-                                            {cat.badge && (
-                                                <span className="px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-bold uppercase tracking-wider">
-                                                    {cat.badge}
-                                                </span>
-                                            )}
-                                            <span className={`text-[10px] font-bold uppercase tracking-wider ${cat.risk > 7 ? 'text-red-400' : 'text-slate-500'}`}>
-                                                Risk: {cat.risk}/10
-                                            </span>
-                                        </div>
-                                    </div>
+                            <div className="flex flex-wrap gap-1.5 mb-6">
+                                {cat.models.slice(0, 3).map((m: string) => (
+                                    <span key={m} className="px-2 py-0.5 rounded-md bg-slate-800/50 border border-slate-700/50 text-slate-500 text-[10px] whitespace-nowrap">
+                                        {m.replace('_', ' ')}
+                                    </span>
+                                ))}
+                            </div>
 
-                                    <h3 className="text-white font-semibold text-lg mb-2 group-hover:text-cyan-50 transition-colors">
-                                        {cat.label}
-                                    </h3>
-                                    <p className="text-slate-400 text-sm leading-relaxed mb-4 line-clamp-2">{cat.desc}</p>
-
-                                    <div className="flex flex-wrap gap-1.5 mb-6">
-                                        {cat.models.slice(0, 3).map((m: string) => (
-                                            <span key={m} className="px-2 py-0.5 rounded-md bg-slate-800/50 border border-slate-700/50 text-slate-500 text-[10px] whitespace-nowrap">
-                                                {m.replace('_', ' ')}
-                                            </span>
-                                        ))}
-                                    </div>
-
-                                    <div className="flex items-center justify-between pt-4 border-t border-slate-800/50">
-                                        <div className="flex items-center gap-1.5 text-cyan-400/60 group-hover:text-cyan-400 transition-colors text-xs font-bold uppercase tracking-widest">
-                                            <span>Configure</span>
-                                            <span className="material-symbols-outlined text-[14px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                                        </div>
-                                        <span className="text-slate-600 text-[10px] font-mono">{domain.id}</span>
-                                    </div>
-                                </a>
-                            ))}
-                        </div>
-                    </section>
-                ))}
-            </div>
+                            <div className="flex items-center justify-between pt-4 border-t border-slate-800/50">
+                                <div className="flex items-center gap-1.5 text-cyan-400/60 group-hover:text-cyan-400 transition-colors text-xs font-bold uppercase tracking-widest">
+                                    <span>Configure</span>
+                                    <span className="material-symbols-outlined text-[14px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                                </div>
+                                <span className="text-slate-600 text-[10px] font-mono">{cat.domain}</span>
+                            </div>
+                        </a>
+                    ))}
+                </div>
+            </section>
 
             {/* Footer */}
             <footer className="border-t border-slate-800 px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
