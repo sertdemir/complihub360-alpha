@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { LandingPage } from "./pages/LandingPage";
 import { ServicesPage } from "./pages/ServicesPage";
 import { WizardStep1 } from "./pages/WizardStep1";
 import { WizardStep2 } from "./pages/WizardStep2";
@@ -11,7 +12,7 @@ function App() {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<ServicesPage />} />
+                <Route path="/" element={<LandingPage />} />
                 <Route path="/services" element={<ServicesPage />} />
                 <Route path="/wizard" element={<WizardStep1 />} />
                 <Route path="/wizard/2" element={<WizardStep2 />} />
