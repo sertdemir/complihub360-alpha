@@ -24,13 +24,19 @@ export function WizardStep0() {
     const [additionalMarkets, setAdditionalMarkets] = useState<string[]>(profile.markets);
 
     const preCountry = searchParams.get("country") || "";
+    const preCategory = searchParams.get("category") || "";
     const [primaryCountry, setPrimaryCountry] = useState(profile.country || preCountry);
 
     const handleNext = () => {
         if (!primaryCountry) return;
         dispatch({ type: "SET_COUNTRY", payload: primaryCountry });
         dispatch({ type: "SET_MARKETS", payload: [primaryCountry, ...additionalMarkets.filter(m => m !== primaryCountry)] });
-        navigate("/wizard/category");
+        if (preCategory) {
+            dispatch({ type: "SET_CATEGORY", payload: preCategory as any });
+            navigate(`/wizard/${preCategory}`);
+        } else {
+            navigate("/wizard/category");
+        }
     };
 
     return (
