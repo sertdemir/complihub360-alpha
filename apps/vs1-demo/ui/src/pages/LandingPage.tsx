@@ -56,20 +56,30 @@ export function LandingPage() {
                 </div>
                 <div className="w-full max-w-5xl">
                     <h3 className="text-slate-100 text-xl font-semibold mb-6">Browse Categories</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {[
-                            { icon: "account_balance", title: "Tax & VAT", desc: "Cross-border tax regulations, VAT compliance, and reporting." },
-                            { icon: "shield_locked", title: "Data Privacy", desc: "GDPR, CCPA, data handling policies, and user consent." },
-                            { icon: "campaign", title: "Marketing & SEO", desc: "Advertising standards, cookie laws, and digital marketing rules." },
-                            { icon: "gavel", title: "Corporate Law", desc: "Entity formation, labor laws, and general corporate governance." },
+                            { icon: "account_balance", title: "Tax & VAT", desc: "Cross-border tax obligations, VAT registration and marketplace tax rules.", category: "tax-vat" },
+                            { icon: "inventory_2", title: "Product & Packaging", desc: "EPR registration, packaging obligations, and product category rules.", category: "epr" },
+                            { icon: "shield_locked", title: "Data & Privacy", desc: "GDPR, CCPA, tracking consent, and personal data processing.", category: "data-privacy" },
+                            { icon: "campaign", title: "Marketing & SEO", desc: "Advertising standards, health claims, cookie laws, and influencer rules.", category: "marketing-seo" },
+                            { icon: "business_center", title: "Corporate & Structure", desc: "Legal entity formation, foreign registration, and business structure.", category: "corporate" },
+                            { icon: "verified_user", title: "Full Support", desc: "End-to-end compliance management across all categories.", category: "full-support" },
                         ].map(cat => (
-                            <a key={cat.title} className="group block p-6 bg-slate-900 border border-slate-800 rounded-xl hover:border-[#137fec]/50 hover:bg-slate-800/50 transition-all duration-200" href="#">
+                            <button
+                                key={cat.category}
+                                onClick={() => navigate(`/wizard?category=${cat.category}`)}
+                                className="group text-left p-6 bg-slate-900 border border-slate-800 rounded-xl hover:border-[#137fec]/50 hover:bg-slate-800/50 transition-all duration-200"
+                            >
                                 <div className="h-12 w-12 rounded-lg bg-[#137fec]/10 text-[#137fec] flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                                     <span className="material-symbols-outlined">{cat.icon}</span>
                                 </div>
                                 <h4 className="text-slate-100 font-semibold text-lg mb-2">{cat.title}</h4>
                                 <p className="text-slate-400 text-sm">{cat.desc}</p>
-                            </a>
+                                <div className="mt-4 flex items-center gap-1.5 text-xs font-medium text-[#137fec]">
+                                    Start wizard
+                                    <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                                </div>
+                            </button>
                         ))}
                     </div>
                 </div>

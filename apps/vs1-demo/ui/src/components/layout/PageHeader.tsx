@@ -49,12 +49,12 @@ export function PageHeader() {
                 <div className="flex items-center gap-3 shrink-0">
                     <button
                         className="text-slate-400 hover:text-slate-100 text-sm font-medium px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
-                        onClick={() => navigate("/dashboard")}
+                        onClick={() => navigate("/login")}
                     >
                         Log in
                     </button>
                     <button
-                        onClick={() => navigate("/dashboard")}
+                        onClick={() => navigate("/register")}
                         className="flex items-center gap-2 h-9 px-5 bg-[#137fec] hover:bg-[#137fec]/80 transition-colors text-white text-sm font-semibold rounded-lg"
                     >
                         Sign up free
