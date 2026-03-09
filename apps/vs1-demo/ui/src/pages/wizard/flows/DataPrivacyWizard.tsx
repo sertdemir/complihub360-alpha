@@ -12,32 +12,32 @@ const TRACKING_TOOLS = [
     { value: "google_ads", label: "Google Ads Conversion", icon: "ads_click" },
     { value: "linkedin_insight", label: "LinkedIn Insight Tag", icon: "work" },
     { value: "hotjar", label: "Hotjar / Clarity", icon: "touch_app" },
-    { value: "klaviyo", label: "Klaviyo / E-Mail-Marketing", icon: "mail" },
+    { value: "klaviyo", label: "Klaviyo / Email Marketing", icon: "mail" },
     { value: "hubspot", label: "HubSpot / CRM", icon: "contacts" },
-    { value: "no_tools", label: "Keine der oben genannten", icon: "block" },
+    { value: "no_tools", label: "None of the above", icon: "block" },
 ];
 
 const DATA_CATEGORIES = [
-    { value: "email_addresses", label: "E-Mail-Adressen", icon: "mail" },
-    { value: "purchase_history", label: "Kaufhistorie / Bestelldaten", icon: "shopping_cart" },
-    { value: "location_data", label: "Standortdaten", icon: "location_on" },
-    { value: "ip_addresses", label: "IP-Adressen / Cookies", icon: "dns" },
-    { value: "health_data", label: "Gesundheitsdaten", icon: "favorite" },
-    { value: "financial_data", label: "Finanzdaten / Zahlungsdaten", icon: "credit_card" },
-    { value: "behavioral_data", label: "Nutzerverhalten & Klicks", icon: "mouse" },
-    { value: "none", label: "Keine personenbezogenen Daten", icon: "person_off" },
+    { value: "email_addresses", label: "Email addresses", icon: "mail" },
+    { value: "purchase_history", label: "Purchase history / order data", icon: "shopping_cart" },
+    { value: "location_data", label: "Location data", icon: "location_on" },
+    { value: "ip_addresses", label: "IP addresses / cookies", icon: "dns" },
+    { value: "health_data", label: "Health data", icon: "favorite" },
+    { value: "financial_data", label: "Financial / payment data", icon: "credit_card" },
+    { value: "behavioral_data", label: "User behavior & click tracking", icon: "mouse" },
+    { value: "none", label: "No personal data", icon: "person_off" },
 ];
 
 const PROCESSING_LOCATIONS = [
-    { value: "eu_only", label: "Nur EU / EWR", description: "Alle Server und Tools liegen in der EU oder dem EWR.", icon: "language" },
-    { value: "us_transfers", label: "USA-Datenübertragung", description: "Ich nutze US-Dienste (Google, Meta, AWS US etc.).", icon: "flight_takeoff" },
-    { value: "mixed", label: "Gemischt / Unbekannt", description: "Ich bin mir nicht sicher, wo alle Tools verarbeiten.", icon: "help" },
+    { value: "eu_only", label: "EU / EEA only", description: "All servers and tools are located within the EU or EEA.", icon: "language" },
+    { value: "us_transfers", label: "US data transfers", description: "I use US-based services (Google, Meta, AWS US, etc.).", icon: "flight_takeoff" },
+    { value: "mixed", label: "Mixed / Unknown", description: "I'm not sure where all tools are processing data.", icon: "help" },
 ];
 
 const CONSENT_STATUS = [
-    { value: "yes_full", label: "Ja — vollständiges Consent-Management", description: "Cookie-Banner mit Opt-In aktiv (z.B. Cookiebot, OneTrust).", icon: "verified" },
-    { value: "yes_basic", label: "Ja — einfaches Cookie-Banner", description: "Hinweis-Banner ohne richtiges Opt-In implementiert.", icon: "info" },
-    { value: "no", label: "Nein — kein Consent-Tool", description: "Keine aktive Einwilligungsverwaltung vorhanden.", icon: "cancel" },
+    { value: "yes_full", label: "Yes — full consent management", description: "Cookie banner with opt-in active (e.g. Cookiebot, OneTrust).", icon: "verified" },
+    { value: "yes_basic", label: "Yes — basic cookie banner", description: "Notice banner without proper opt-in implemented.", icon: "info" },
+    { value: "no", label: "No — no consent tool", description: "No active consent management in place.", icon: "cancel" },
 ];
 
 export function DataPrivacyWizard() {
@@ -56,27 +56,27 @@ export function DataPrivacyWizard() {
 
     const steps = [
         {
-            label: "EU-Kundschaft",
+            label: "EU Customers",
             isValid: !!euCustomers,
             content: (
                 <div className="flex flex-col gap-6">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-100">Hast du Kunden in der EU / im EWR?</h1>
+                        <h1 className="text-2xl font-bold text-slate-100">Do you have customers in the EU / EEA?</h1>
                         <p className="text-slate-400 text-sm mt-2">
-                            Die DSGVO gilt für jedes Unternehmen, das personenbezogene Daten von EU-Bürgern verarbeitet — unabhängig vom Firmensitz.
+                            GDPR applies to any company processing personal data of EU citizens — regardless of where your company is based.
                         </p>
                     </div>
                     <YesNoToggle value={euCustomers} onChange={setEuCustomers} />
                     {euCustomers === "no" && (
                         <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs leading-relaxed">
                             <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">check_circle</span>
-                            Ohne EU-Kundschaft gilt die DSGVO nicht direkt. Lokale Datenschutzgesetze (z.B. CCPA) können trotzdem relevant sein.
+                            Without EU customers, GDPR doesn't apply directly. Local data protection laws (e.g. CCPA) may still be relevant.
                         </div>
                     )}
                     {euCustomers === "yes" && (
                         <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs leading-relaxed">
                             <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">info</span>
-                            Die DSGVO ist für dich verpflichtend. Bußgelder können bis zu 4% des weltweiten Jahresumsatzes betragen.
+                            GDPR is mandatory for you. Fines can reach up to 4% of global annual turnover or €20M — whichever is higher.
                         </div>
                     )}
                 </div>
@@ -88,9 +88,9 @@ export function DataPrivacyWizard() {
             content: (
                 <div className="flex flex-col gap-5">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-100">Welche Daten erfasst du von Nutzern?</h1>
+                        <h1 className="text-2xl font-bold text-slate-100">What data do you collect from users?</h1>
                         <p className="text-slate-400 text-sm mt-2">
-                            Verschiedene Datenkategorien erfordern unterschiedliche Schutzmaßnahmen. Gesundheits- und Finanzdaten sind besonders sensibel.
+                            Different data categories require different safeguards. Health and financial data are especially sensitive under GDPR Article 9.
                         </p>
                     </div>
                     <MultiSelectChips
@@ -104,7 +104,7 @@ export function DataPrivacyWizard() {
                     {dataCategories.includes("health_data") && (
                         <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs leading-relaxed">
                             <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">warning</span>
-                            <strong>Gesundheitsdaten sind besondere Datenkategorien (Art. 9 DSGVO).</strong> Hierfür gelten verschärfte Anforderungen: explizite Einwilligung, Datenschutz-Folgenabschätzung (DSFA) und regelmäßige Audits.
+                            <strong>Health data is a special category (GDPR Art. 9).</strong> Stricter requirements apply: explicit consent, data protection impact assessment (DPIA), and regular audits are mandatory.
                         </div>
                     )}
                 </div>
@@ -116,9 +116,9 @@ export function DataPrivacyWizard() {
             content: (
                 <div className="flex flex-col gap-5">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-100">Welche Tracking- und Marketing-Tools nutzt du?</h1>
+                        <h1 className="text-2xl font-bold text-slate-100">Which tracking and marketing tools do you use?</h1>
                         <p className="text-slate-400 text-sm mt-2">
-                            Jedes Tool, das Nutzerdaten erfasst oder an Dritte überträgt, muss in deiner Datenschutzerklärung genannt und per Einwilligung aktiviert werden.
+                            Every tool that captures or transfers user data to third parties must be listed in your privacy policy and activated via consent.
                         </p>
                     </div>
                     <MultiSelectChips
@@ -129,31 +129,31 @@ export function DataPrivacyWizard() {
                     {mismatch && (
                         <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs leading-relaxed">
                             <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">warning</span>
-                            <strong>Widerspruch erkannt:</strong> Du nutzt Tracking-Tools, hast aber angegeben, keine personenbezogenen Daten zu erfassen. Tracking-Pixel übertragen per Definition Nutzerdaten (IP, Verhalten).
+                            <strong>Contradiction detected:</strong> You use tracking tools but indicated you collect no personal data. Tracking pixels inherently transmit user data (IP, behavior).
                         </div>
                     )}
                     {usesUSTools && (
                         <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs leading-relaxed">
                             <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">flight_takeoff</span>
-                            US-Dienste (Google, Meta, TikTok) übertragen Daten in die USA. Dies erfordert Standardvertragsklauseln (SCCs) und einen Verarbeitungsvertrag (DPA).
+                            US services (Google, Meta, TikTok) transfer data to the United States. This requires Standard Contractual Clauses (SCCs) and a Data Processing Agreement (DPA).
                         </div>
                     )}
                 </div>
             ),
         },
         {
-            label: "Consent & Verarbeitung",
+            label: "Consent & Processing",
             isValid: !!processingLocation && !!consentStatus,
             content: (
                 <div className="flex flex-col gap-7">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-100">Datenverarbeitung & Einwilligungsmanagement</h1>
+                        <h1 className="text-2xl font-bold text-slate-100">Data processing & consent management</h1>
                         <p className="text-slate-400 text-sm mt-2">
-                            Zwei kritische DSGVO-Anforderungen: Wo liegen deine Daten, und holst du rechtsgültige Einwilligung ein?
+                            Two critical GDPR requirements: where is your data stored, and are you collecting valid consent?
                         </p>
                     </div>
                     <div>
-                        <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">Wo werden deine Daten verarbeitet?</p>
+                        <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">Where is your data processed?</p>
                         <SingleSelectCardGroup
                             options={PROCESSING_LOCATIONS}
                             value={processingLocation}
@@ -161,7 +161,7 @@ export function DataPrivacyWizard() {
                         />
                     </div>
                     <div className="border-t border-slate-800 pt-5">
-                        <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">Nutzt du ein Consent-Management-Tool?</p>
+                        <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">Do you use a consent management tool?</p>
                         <SingleSelectCardGroup
                             options={CONSENT_STATUS}
                             value={consentStatus}
@@ -171,7 +171,7 @@ export function DataPrivacyWizard() {
                     {noConsent && hasRisk && (
                         <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs leading-relaxed">
                             <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">error</span>
-                            <strong>Hohes DSGVO-Risiko:</strong> Du verwendest Tracking-Tools ohne Einwilligungsbanner. Jeder Seitenaufruf eines EU-Nutzers stellt eine Datenschutzverletzung dar. Sofortiger Handlungsbedarf.
+                            <strong>High GDPR risk:</strong> You're using tracking tools without a consent banner. Every EU visitor to your site constitutes a data protection violation. Immediate action required.
                         </div>
                     )}
                 </div>

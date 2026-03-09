@@ -7,30 +7,30 @@ import { YesNoToggle } from "../../../components/wizard/questions/YesNoToggle";
 import { CountryMultiSelect } from "../../../components/wizard/questions/CountryMultiSelect";
 
 const ENTITY_TYPES = [
-    { value: "no_entity", label: "Kein Unternehmen / Einzelperson", description: "Du operierst als Privatperson oder Freiberufler.", icon: "person" },
-    { value: "kleingewerbe", label: "Kleingewerbe / Nebengewerbe", description: "Gewerbeanmeldung mit § 19 UStG-Option (Kleinunternehmer).", icon: "emoji_objects" },
-    { value: "einzelunternehmen", label: "Einzelunternehmen / e.K.", description: "Vollhaftung, im Handelsregister eingetragen oder nicht.", icon: "person_play" },
-    { value: "limited", label: "GmbH / Ltd. / SARL", description: "Kapitalgesellschaft mit beschränkter Haftung.", icon: "business" },
-    { value: "ug", label: "UG (haftungsbeschränkt)", description: "Günstige Gründungsform mit 1€ Mindestkapital.", icon: "savings" },
-    { value: "foreign_company", label: "Ausländische Gesellschaft", description: "Du bist im Ausland registriert und in DE tätig.", icon: "public" },
+    { value: "no_entity", label: "No company / Sole individual", description: "You operate as a private person or freelancer.", icon: "person" },
+    { value: "kleingewerbe", label: "Small trade / Side business", description: "Business registration with small business rule option (§ 19 UStG).", icon: "emoji_objects" },
+    { value: "einzelunternehmen", label: "Sole trader / e.K.", description: "Full personal liability, with or without commercial register entry.", icon: "person_play" },
+    { value: "limited", label: "GmbH / Ltd. / SARL", description: "Limited liability company with shared capital.", icon: "business" },
+    { value: "ug", label: "UG (limited liability)", description: "Affordable incorporation with €1 minimum share capital.", icon: "savings" },
+    { value: "foreign_company", label: "Foreign company", description: "You are registered abroad but operating in Germany / EU.", icon: "public" },
 ];
 
 const EXPANSION_GOALS = [
-    { value: "new_eu_office", label: "Niederlassung in EU eröffnen", icon: "location_city" },
-    { value: "holding", label: "Holdingstruktur aufbauen", icon: "account_tree" },
-    { value: "banking_eu", label: "EU-Bankkonto / IBAN eröffnen", icon: "account_balance" },
-    { value: "trademark_eu", label: "EU-Marke anmelden", icon: "verified" },
-    { value: "employee_eu", label: "EU-Mitarbeiter einstellen", icon: "group_add" },
-    { value: "vat_registration", label: "USt-Registrierung", icon: "receipt_long" },
-    { value: "company_sale", label: "Unternehmensverkauf / M&A", icon: "handshake" },
-    { value: "nothing_yet", label: "Noch keine konkreten Pläne", icon: "schedule" },
+    { value: "new_eu_office", label: "Open a branch in the EU", icon: "location_city" },
+    { value: "holding", label: "Build a holding structure", icon: "account_tree" },
+    { value: "banking_eu", label: "Open EU bank account / IBAN", icon: "account_balance" },
+    { value: "trademark_eu", label: "Register EU trademark", icon: "verified" },
+    { value: "employee_eu", label: "Hire EU employees", icon: "group_add" },
+    { value: "vat_registration", label: "VAT registration", icon: "receipt_long" },
+    { value: "company_sale", label: "Company sale / M&A", icon: "handshake" },
+    { value: "nothing_yet", label: "No concrete plans yet", icon: "schedule" },
 ];
 
 const URGENCY = [
-    { value: "immediate", label: "Sofort — ich stehe vor einem konkreten Problem", description: "Fristen, Behördenanfrage, Behebung.", icon: "emergency" },
-    { value: "3_months", label: "Innerhalb von 3 Monaten", description: "Geplanter Schritt, Gründung oder Expansion steht bevor.", icon: "event" },
-    { value: "6_months", label: "In 6+ Monaten", description: "Strategische Planung, kein akuter Druck.", icon: "calendar_month" },
-    { value: "exploring", label: "Nur informieren", description: "Ich sammle Informationen, kein konkreter Termin.", icon: "explore" },
+    { value: "immediate", label: "Immediately — I have a concrete issue", description: "Deadline, authority request, remediation needed.", icon: "emergency" },
+    { value: "3_months", label: "Within 3 months", description: "A planned step, incorporation or expansion is upcoming.", icon: "event" },
+    { value: "6_months", label: "In 6+ months", description: "Strategic planning, no immediate pressure.", icon: "calendar_month" },
+    { value: "exploring", label: "Just researching", description: "I'm gathering information, no concrete timeline.", icon: "explore" },
 ];
 
 export function CorporateWizard() {
@@ -47,41 +47,41 @@ export function CorporateWizard() {
 
     const steps = [
         {
-            label: "Aktuelle Struktur",
+            label: "Current Structure",
             isValid: !!entityType,
             content: (
                 <div className="flex flex-col gap-5">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-100">Wie ist dein Unternehmen aktuell aufgestellt?</h1>
+                        <h1 className="text-2xl font-bold text-slate-100">How is your company currently structured?</h1>
                         <p className="text-slate-400 text-sm mt-2">
-                            Die Rechtsform bestimmt Haftung, Steuerstruktur und Expansionsmöglichkeiten. Wir helfen dir, die optimale Struktur zu finden.
+                            Your legal form determines liability, tax structure, and expansion options. We'll help you find the optimal structure.
                         </p>
                     </div>
                     <SingleSelectCardGroup options={ENTITY_TYPES} value={entityType} onChange={setEntityType} />
                     {noEntity && (
                         <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs leading-relaxed">
                             <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">tips_and_updates</span>
-                            Für Skalierung empfehlen wir eine GmbH oder UG: Haftungsbeschränkung, professionelles Auftreten, Beteiligungsmöglichkeiten und steuerliche Optimierung.
+                            For scaling, we recommend a GmbH or UG: liability protection, professional image, equity participation options, and tax optimization opportunities.
                         </div>
                     )}
                     {foreignEntity && (
                         <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs leading-relaxed">
                             <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">flag</span>
-                            Ausländische Gesellschaften brauchen ab bestimmten Tätigkeiten in DE eine Niederlassung, Steuernummer und ggf. Gewerberegistrierung. Wir klären deinen genauen Status.
+                            Foreign companies may need a local branch, tax number, and trade registration depending on their activities in Germany / EU. We'll clarify your exact status.
                         </div>
                     )}
                 </div>
             ),
         },
         {
-            label: "Expansionspläne",
+            label: "Expansion Goals",
             isValid: expansionGoals.length > 0,
             content: (
                 <div className="flex flex-col gap-5">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-100">Was möchtest du aufbauen oder klären?</h1>
+                        <h1 className="text-2xl font-bold text-slate-100">What do you want to build or clarify?</h1>
                         <p className="text-slate-400 text-sm mt-2">
-                            Damit wir die richtigen Experten für dich finden. Mehrfachauswahl möglich.
+                            Select all that apply. This helps us match you with the right experts.
                         </p>
                     </div>
                     <MultiSelectChips
@@ -95,12 +95,12 @@ export function CorporateWizard() {
                     {expansionGoals.includes("holding") && (
                         <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs leading-relaxed">
                             <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">account_tree</span>
-                            Holdingstrukturen ermöglichen erhebliche Steuervorteile bei Dividendenausschüttungen (§ 8b KStG: 95% steuerfrei). Wir zeigen dir passende Strukturen.
+                            Holding structures unlock significant tax benefits on dividend distributions (§ 8b KStG: 95% tax-exempt). We'll show you the right structures for your situation.
                         </div>
                     )}
                     {expansionGoals.includes("new_eu_office") && (
                         <div className="mt-2">
-                            <p className="text-xs text-slate-400 mb-3">In welche EU-Länder möchtest du expandieren?</p>
+                            <p className="text-xs text-slate-400 mb-3">Which EU countries are you expanding into?</p>
                             <CountryMultiSelect
                                 primaryCountry={profile.country}
                                 value={expandsTo}
@@ -115,35 +115,35 @@ export function CorporateWizard() {
             ),
         },
         {
-            label: "Akutes Problem?",
+            label: "Acute Issue?",
             isValid: !!hasLegalIssue,
             content: (
                 <div className="flex flex-col gap-6">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-100">Gibt es ein akutes rechtliches Problem?</h1>
+                        <h1 className="text-2xl font-bold text-slate-100">Is there an acute legal issue?</h1>
                         <p className="text-slate-400 text-sm mt-2">
-                            Abmahnungen, Behördenanfragen, Steuerprüfungen oder Vertragsstreitigkeiten erfordern sofortige Bearbeitung.
+                            Warning letters, authority requests, tax audits, or contract disputes require immediate attention.
                         </p>
                     </div>
                     <YesNoToggle value={hasLegalIssue} onChange={setHasLegalIssue} />
                     {hasLegalIssue === "yes" && (
                         <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs leading-relaxed">
                             <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">emergency</span>
-                            <strong>Wir priorisieren dein Anliegen.</strong> Bitte beschreibe im nächsten Schritt kurz die Situation. Unser Team vermittelt innerhalb von 24h einen passenden Anwalt oder Steuerberater.
+                            <strong>We'll prioritize your case.</strong> Please describe the situation briefly in the next step. Our team will connect you with the right attorney or advisor within 24 hours.
                         </div>
                     )}
                 </div>
             ),
         },
         {
-            label: "Zeitrahmen",
+            label: "Timeline",
             isValid: !!urgency,
             content: (
                 <div className="flex flex-col gap-5">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-100">Wie dringend ist dein Handlungsbedarf?</h1>
+                        <h1 className="text-2xl font-bold text-slate-100">How urgent is your need to act?</h1>
                         <p className="text-slate-400 text-sm mt-2">
-                            Damit wir die richtigen Ressourcen und Reaktionszeiten für dich einplanen können.
+                            This helps us allocate the right resources and response times for your situation.
                         </p>
                     </div>
                     <SingleSelectCardGroup

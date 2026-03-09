@@ -73,8 +73,8 @@ export function WizardFlowShell({
                                         <span className="material-symbols-outlined text-[#137fec] text-xl">checklist</span>
                                     </div>
                                     <div>
-                                        <h1 className="text-xl font-bold text-slate-100">Antworten bestätigen</h1>
-                                        <p className="text-slate-400 text-xs">Prüfe alle Angaben bevor wir din Ergebnis generieren.</p>
+                                        <h1 className="text-xl font-bold text-slate-100">Confirm your answers</h1>
+                                        <p className="text-slate-400 text-xs">Review all details before we generate your results.</p>
                                     </div>
                                 </div>
                                 <WizardReviewPanel
@@ -97,7 +97,7 @@ export function WizardFlowShell({
                         <div className="px-8 py-4 border-t border-slate-800 bg-slate-900/50">
                             <button onClick={onBack} className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-200 transition-colors">
                                 <span className="material-symbols-outlined text-base">arrow_back</span>
-                                Zurück
+                                Back
                             </button>
                         </div>
                     )}

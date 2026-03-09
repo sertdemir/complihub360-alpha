@@ -6,35 +6,35 @@ import { MultiSelectChips } from "../../../components/wizard/questions/MultiSele
 import { RangeSelector } from "../../../components/wizard/questions/RangeSelector";
 
 const TEAM_SIZES = [
-    { value: "solo", label: "Solo / 1 Person", sublabel: "Solopreneur / Freelancer" },
-    { value: "micro", label: "2 – 10 Personen", sublabel: "Micro-Team / Startup" },
-    { value: "small", label: "11 – 50 Personen", sublabel: "KMU / Scale-up" },
-    { value: "medium", label: "50+ Personen", sublabel: "Mittelstand / Enterprise" },
+    { value: "solo", label: "Solo / 1 person", sublabel: "Solopreneur / Freelancer" },
+    { value: "micro", label: "2 – 10 people", sublabel: "Micro-team / Startup" },
+    { value: "small", label: "11 – 50 people", sublabel: "SME / Scale-up" },
+    { value: "medium", label: "50+ people", sublabel: "Mid-market / Enterprise" },
 ];
 
 const PRIORITY_AREAS = [
-    { value: "tax-vat", label: "Steuer & USt", icon: "account_balance" },
-    { value: "epr", label: "EPR / Produktpflichten", icon: "inventory_2" },
-    { value: "data-privacy", label: "Datenschutz & DSGVO", icon: "shield_locked" },
-    { value: "marketing-seo", label: "Marketing & Werbung", icon: "campaign" },
-    { value: "corporate", label: "Unternehmensstruktur", icon: "business_center" },
-    { value: "employment", label: "Arbeitsrecht & HR", icon: "group" },
-    { value: "contracts", label: "Vertragsrecht & AGB", icon: "description" },
-    { value: "customs", label: "Zoll & Import/Export", icon: "flight_takeoff" },
+    { value: "tax-vat", label: "Tax & VAT", icon: "account_balance" },
+    { value: "epr", label: "EPR / Product obligations", icon: "inventory_2" },
+    { value: "data-privacy", label: "Data protection & GDPR", icon: "shield_locked" },
+    { value: "marketing-seo", label: "Marketing & Advertising", icon: "campaign" },
+    { value: "corporate", label: "Corporate structure", icon: "business_center" },
+    { value: "employment", label: "Employment law & HR", icon: "group" },
+    { value: "contracts", label: "Contract law & T&Cs", icon: "description" },
+    { value: "customs", label: "Customs & import/export", icon: "flight_takeoff" },
 ];
 
 const MATURITY_LEVELS = [
-    { value: "none", label: "Noch nichts", description: "Keine systematische Compliance vorhanden. Wir starten bei Null.", icon: "radio_button_unchecked" },
-    { value: "basic", label: "Basics vorhanden", description: "Impressum, Datenschutzerklärung, einfaches Cookie-Banner.", icon: "pending" },
-    { value: "structured", label: "Strukturiert & dokumentiert", description: "Interne Prozesse, SOP-Dokumentation, teilweise spezialisierte Tools.", icon: "task_alt" },
-    { value: "advanced", label: "Fortgeschritten", description: "Automatisiertes Monitoring, DPO bestellt, ISO/SOC2 in Vorbereitung.", icon: "verified" },
+    { value: "none", label: "Nothing in place", description: "No systematic compliance yet. We start from scratch together.", icon: "radio_button_unchecked" },
+    { value: "basic", label: "Basics covered", description: "Imprint, privacy policy, simple cookie banner.", icon: "pending" },
+    { value: "structured", label: "Structured & documented", description: "Internal processes, SOP documentation, some specialized tools.", icon: "task_alt" },
+    { value: "advanced", label: "Advanced", description: "Automated monitoring, DPO appointed, ISO/SOC2 in progress.", icon: "verified" },
 ];
 
 const SUPPORT_PREFERENCES = [
-    { value: "expert_matching", label: "Experte vermitteln", description: "Ich will mit einem spezialisierten Anwalt oder Berater verbunden werden.", icon: "person_search" },
-    { value: "self_check", label: "Selbst prüfen mit Checkliste", description: "Gibt mir eine strukturierte To-Do-Liste, die ich selbst abarbeiten kann.", icon: "checklist" },
-    { value: "full_service", label: "Vollständige Übernahme", description: "Komplette Compliance-Begleitung durch einen Managed-Service.", icon: "support_agent" },
-    { value: "monitoring", label: "Laufendes Monitoring", description: "Regelmäßige Berichte und automatische Alerts bei Änderungen.", icon: "monitoring" },
+    { value: "expert_matching", label: "Match me with an expert", description: "I want to be connected with a specialized attorney or advisor.", icon: "person_search" },
+    { value: "self_check", label: "Self-check with a checklist", description: "Give me a structured to-do list I can work through myself.", icon: "checklist" },
+    { value: "full_service", label: "Full managed service", description: "Complete compliance support handled by a managed service.", icon: "support_agent" },
+    { value: "monitoring", label: "Ongoing monitoring", description: "Regular reports and automatic alerts when regulations change.", icon: "monitoring" },
 ];
 
 export function FullSupportWizard() {
@@ -50,14 +50,14 @@ export function FullSupportWizard() {
 
     const steps = [
         {
-            label: "Team & Größe",
+            label: "Team Size",
             isValid: !!teamSize,
             content: (
                 <div className="flex flex-col gap-5">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-100">Wie groß ist dein Unternehmen?</h1>
+                        <h1 className="text-2xl font-bold text-slate-100">How large is your company?</h1>
                         <p className="text-slate-400 text-sm mt-2">
-                            Größe bestimmt, welche Compliance-Pflichten automatisch entstehen (z.B. Datenschutzbeauftragter ab 20 Personen, LkSG ab 1.000 Mitarbeitern).
+                            Size determines which compliance obligations automatically apply (e.g. Data Protection Officer required at 20+ people, Supply Chain Act at 1,000+ employees).
                         </p>
                     </div>
                     <RangeSelector
@@ -71,42 +71,42 @@ export function FullSupportWizard() {
                     {teamSize === "medium" && (
                         <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs leading-relaxed">
                             <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">group</span>
-                            Ab 50+ Mitarbeitern greifen das LkSG (Lieferkettensorgfalt), die Pflicht zur betrieblichen Altersvorsorge und ggf. Betriebsräte. Wir erstellen dir eine vollständige Compliance-Roadmap.
+                            With 50+ employees, the Supply Chain Due Diligence Act (LkSG), company pension obligations, and potentially works councils apply. We'll create a complete compliance roadmap for you.
                         </div>
                     )}
                 </div>
             ),
         },
         {
-            label: "Compliance-Reife",
+            label: "Compliance Maturity",
             isValid: !!maturity,
             content: (
                 <div className="flex flex-col gap-5">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-100">Wie ist deine aktuelle Compliance-Situation?</h1>
+                        <h1 className="text-2xl font-bold text-slate-100">What is your current compliance situation?</h1>
                         <p className="text-slate-400 text-sm mt-2">
-                            Eine ehrliche Einschätzung hilft uns, die richtigen Prioritäten und den realistischen Aufwand zu bestimmen.
+                            An honest assessment helps us set the right priorities and determine realistic effort.
                         </p>
                     </div>
                     <SingleSelectCardGroup options={MATURITY_LEVELS} value={maturity} onChange={setMaturity} />
                     {maturity === "none" && (
                         <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs leading-relaxed">
                             <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">info</span>
-                            Kein Problem — wir starten gemeinsam mit den wichtigsten Maßnahmen und bauen Compliance schrittweise auf. Priorität haben Datenschutz, Impressum und USt.
+                            No problem — we'll start with the most important measures together and build compliance step by step. Top priorities: data protection, imprint, and VAT.
                         </div>
                     )}
                 </div>
             ),
         },
         {
-            label: "Prioritätsbereiche",
+            label: "Priority Areas",
             isValid: priorityAreas.length > 0,
             content: (
                 <div className="flex flex-col gap-5">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-100">Welche Bereiche sind für dich am wichtigsten?</h1>
+                        <h1 className="text-2xl font-bold text-slate-100">Which areas matter most to you?</h1>
                         <p className="text-slate-400 text-sm mt-2">
-                            Wähle alle relevanten Bereiche. Wir priorisieren nach Risiko und Dringlichkeit.
+                            Select all relevant areas. We'll prioritize by risk and urgency.
                         </p>
                     </div>
                     <MultiSelectChips
@@ -120,21 +120,21 @@ export function FullSupportWizard() {
                     {highPriority && (
                         <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs leading-relaxed">
                             <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">tips_and_updates</span>
-                            Bei vielen Bereichen empfehlen wir eine Compliance-Roadmap: priorisierte To-Do-Liste mit klaren Meilensteinen und verantwortlichen Experten für jeden Bereich.
+                            With many areas to cover, we recommend a Compliance Roadmap: a prioritized to-do list with clear milestones and responsible experts for each domain.
                         </div>
                     )}
                 </div>
             ),
         },
         {
-            label: "Art der Unterstützung",
+            label: "Support Type",
             isValid: !!supportType,
             content: (
                 <div className="flex flex-col gap-5">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-100">Wie möchtest du unterstützt werden?</h1>
+                        <h1 className="text-2xl font-bold text-slate-100">How would you like to be supported?</h1>
                         <p className="text-slate-400 text-sm mt-2">
-                            Von der schnellen Checkliste bis hin zum vollständigen Managed Service — wir passen unsere Empfehlungen an deinen Bedarf an.
+                            From a quick checklist to a fully managed service — we tailor our recommendations to your needs.
                         </p>
                     </div>
                     <SingleSelectCardGroup
@@ -148,7 +148,7 @@ export function FullSupportWizard() {
                     {isLowMaturity && supportType === "self_check" && (
                         <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs leading-relaxed">
                             <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">info</span>
-                            Bei geringer Compliance-Reife empfehlen wir mind. eine Erstberatung mit einem Experten — Checklisten helfen erst, wenn man weiß, was man überprüfen muss.
+                            With low compliance maturity, we recommend at least one expert consultation — checklists only help once you know what to check.
                         </div>
                     )}
                 </div>
