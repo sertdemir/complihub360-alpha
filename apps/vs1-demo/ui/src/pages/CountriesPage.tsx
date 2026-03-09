@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { PageHeader } from "../components/layout/PageHeader";
+import { PageFooter } from "../components/layout/PageFooter";
 
 export function CountriesPage() {
     const navigate = useNavigate();
@@ -64,38 +66,7 @@ export function CountriesPage() {
 
     return (
         <div className="min-h-screen bg-[#060b14] text-slate-100 font-['Inter',sans-serif] flex flex-col">
-            {/* Header */}
-            <header className="flex items-center justify-between border-b border-white/5 px-10 py-4 max-w-7xl mx-auto w-full bg-[#060b14]/50 backdrop-blur-md sticky top-0 z-50">
-                <div className="flex items-center gap-4 cursor-pointer" onClick={() => navigate("/")}>
-                    <div className="size-6 text-[#137fec] flex items-center justify-center">
-                        <span className="material-symbols-outlined text-[24px]">verified_user</span>
-                    </div>
-                    <h2 className="text-slate-100 text-xl font-bold leading-tight tracking-[-0.015em]">CompliHub360</h2>
-                </div>
-
-                <div className="flex flex-1 justify-end gap-8">
-                    <nav className="hidden md:flex items-center gap-9">
-                        <a className="text-slate-400 hover:text-slate-100 transition-colors text-sm font-medium leading-normal cursor-pointer" onClick={() => navigate("/services")}>Services</a>
-                        <a 
-                            className="text-slate-100 transition-colors text-sm font-medium leading-normal cursor-pointer"
-                            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                        >
-                            Countries
-                        </a>
-                        <a className="text-slate-400 hover:text-slate-100 transition-colors text-sm font-medium leading-normal cursor-pointer" onClick={() => navigate("/advisory")}>Advisory</a>
-                    </nav>
-
-                    <div className="flex gap-3 items-center">
-                        <button className="text-slate-400 hover:text-white transition-colors text-sm font-medium px-4">Login</button>
-                        <button 
-                            onClick={() => navigate("/dashboard")}
-                            className="h-10 px-6 bg-[#137fec] hover:bg-[#137fec]/90 transition-all rounded-lg text-sm font-bold tracking-wide shadow-lg shadow-blue-500/20"
-                        >
-                            Get Started
-                        </button>
-                    </div>
-                </div>
-            </header>
+            <PageHeader />
 
             <main className="flex-1">
                 {/* Hero Section */}
@@ -248,23 +219,7 @@ export function CountriesPage() {
                 </section>
             </main>
 
-            {/* Footer */}
-            <footer className="border-t border-white/5 px-10 py-12 bg-[#060b14]">
-                <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-                    <div className="flex items-center gap-4 opacity-50">
-                        <span className="material-symbols-outlined">verified_user</span>
-                        <span className="font-bold">CompliHub360</span>
-                    </div>
-                    <div className="flex gap-10 text-slate-500 text-sm">
-                        <a href="#" className="hover:text-slate-300 transition-colors">Privacy Policy</a>
-                        <a href="#" className="hover:text-slate-300 transition-colors">Terms of Service</a>
-                        <a href="#" className="hover:text-slate-300 transition-colors">Legal Mentions</a>
-                    </div>
-                    <div className="text-slate-600 text-xs tracking-widest uppercase">
-                        © 2026 CompliHub360 Orchestration Layer
-                    </div>
-                </div>
-            </footer>
+            <PageFooter />
         </div>
     );
 }

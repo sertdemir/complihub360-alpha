@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { PageHeader } from "../components/layout/PageHeader";
+import { PageFooter } from "../components/layout/PageFooter";
 import { 
     ComplianceDomain, 
 } from "@complihub/compliance-engine";
@@ -92,36 +94,7 @@ export function ServicesPage() {
 
     return (
         <div className="min-h-screen bg-[#060b14] text-slate-100 font-['Inter',sans-serif] flex flex-col">
-            {/* Header */}
-            <header className="flex items-center justify-between border-b border-white/5 px-10 py-4 max-w-7xl mx-auto w-full bg-[#060b14]/50 backdrop-blur-md sticky top-0 z-50">
-                <div className="flex items-center gap-4 cursor-pointer" onClick={() => navigate("/")}>
-                    <div className="size-6 text-[#137fec] flex items-center justify-center">
-                        <span className="material-symbols-outlined text-[24px]">verified_user</span>
-                    </div>
-                    <h2 className="text-slate-100 text-xl font-bold leading-tight tracking-[-0.015em]">CompliHub360</h2>
-                </div>
-
-                <div className="flex flex-1 justify-end gap-8">
-                    <nav className="hidden md:flex items-center gap-9">
-                        <a 
-                            className="text-slate-100 transition-colors text-sm font-medium leading-normal cursor-pointer"
-                            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                        >
-                            Services
-                        </a>
-                        <a className="text-slate-400 hover:text-slate-100 transition-colors text-sm font-medium leading-normal cursor-pointer" onClick={() => navigate("/countries")}>Countries</a>
-                        <a className="text-slate-400 hover:text-slate-100 transition-colors text-sm font-medium leading-normal cursor-pointer" onClick={() => navigate("/advisory")}>Advisory</a>
-                    </nav>
-
-                    <div className="flex gap-3 items-center">
-                        <button
-                            onClick={() => navigate("/dashboard")}
-                            className="flex items-center justify-center rounded-lg h-9 px-5 bg-[#137fec] hover:bg-[#137fec]/90 transition-colors text-white text-sm font-bold">
-                            Dashboard
-                        </button>
-                    </div>
-                </div>
-            </header>
+            <PageHeader />
 
             {/* Hero Section */}
             <section className="relative h-[600px] flex items-center justify-center overflow-hidden border-b border-white/5">
@@ -268,18 +241,7 @@ export function ServicesPage() {
                 </div>
             </section>
 
-            {/* Footer */}
-            <footer className="max-w-7xl mx-auto px-10 py-12 w-full flex flex-col md:flex-row items-center justify-between gap-8 text-slate-600 text-xs">
-                <div className="flex items-center gap-4">
-                    <span className="font-bold text-slate-400">CompliHub360</span>
-                    <span>/ Orchestrator Marketplace Model v1.0</span>
-                </div>
-                <div className="flex gap-8 uppercase tracking-widest font-bold">
-                    <a href="#" className="hover:text-white transition-colors">Privacy</a>
-                    <a href="#" className="hover:text-white transition-colors">Legal Terms</a>
-                    <a href="#" className="hover:text-white transition-colors">Partner Program</a>
-                </div>
-            </footer>
+            <PageFooter />
         </div>
     );
 }

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { PageHeader } from '../components/layout/PageHeader';
+import { PageFooter } from '../components/layout/PageFooter';
 
 const AdvisoryPage: React.FC = () => {
     const navigate = useNavigate();
@@ -47,50 +49,8 @@ const AdvisoryPage: React.FC = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-[#050A15] text-slate-100 font-sans selection:bg-[#137fec]/30 selection:text-white">
-            {/* Navigation Header */}
-            <header 
-                className={`fixed top-0 w-full z-50 transition-all duration-300 border-b ${
-                    scrolled ? 'bg-[#050A15]/80 backdrop-blur-xl border-slate-800/50 py-3 shadow-2xl' : 'bg-transparent border-transparent py-5'
-                }`}
-            >
-                <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-                    <div 
-                        className="flex items-center gap-2 cursor-pointer group"
-                        onClick={() => navigate('/')}
-                    >
-                        <div className="h-9 w-9 bg-gradient-to-br from-[#137fec] to-[#0ea5e9] rounded-lg flex items-center justify-center shadow-lg shadow-[#137fec]/20 group-hover:scale-110 transition-transform">
-                            <span className="material-symbols-outlined text-white text-xl">security</span>
-                        </div>
-                        <span className="text-xl font-bold tracking-tight text-white group-hover:text-[#137fec] transition-colors">
-                            CompliHub<span className="text-[#137fec]">360</span>
-                        </span>
-                    </div>
-
-                    <nav className="hidden md:flex items-center gap-8">
-                        {navLinks.map((link) => (
-                            <a
-                                key={link.name}
-                                className={`transition-all text-sm font-medium leading-normal cursor-pointer ${
-                                    link.active 
-                                    ? 'text-[#137fec] font-semibold underline underline-offset-8 decoration-2' 
-                                    : 'text-slate-400 hover:text-white'
-                                }`}
-                                onClick={() => navigate(link.path)}
-                            >
-                                {link.name}
-                            </a>
-                        ))}
-                    </nav>
-
-                    <button 
-                        onClick={() => navigate('/')}
-                        className="bg-slate-800/50 hover:bg-slate-700 border border-slate-700 text-white px-5 py-2 rounded-full text-sm font-medium transition-all hover:shadow-lg active:scale-95"
-                    >
-                        Search Platform
-                    </button>
-                </div>
-            </header>
+        <div className="min-h-screen bg-[#050A15] text-slate-100 font-sans selection:bg-[#137fec]/30 selection:text-white flex flex-col">
+            <PageHeader />
 
             <main className="pt-20">
                 {/* Hero Section */}
@@ -242,18 +202,7 @@ const AdvisoryPage: React.FC = () => {
                 </section>
             </main>
 
-            {/* Simple Footer */}
-            <footer className="px-6 py-12 border-t border-slate-900 flex flex-col items-center gap-4">
-                <div className="flex items-center gap-2 grayscale brightness-200 opacity-50">
-                    <div className="h-6 w-6 bg-slate-100 rounded flex items-center justify-center">
-                        <span className="material-symbols-outlined text-slate-900 text-sm">security</span>
-                    </div>
-                    <span className="text-sm font-bold tracking-tight text-white">
-                        CompliHub360
-                    </span>
-                </div>
-                <p className="text-xs text-slate-600">© 2026 CompliHub360. All rights reserved.</p>
-            </footer>
+            <PageFooter />
         </div>
     );
 };
