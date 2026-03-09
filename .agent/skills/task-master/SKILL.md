@@ -61,6 +61,24 @@ Maintain System Memory (Local)
 
 ## WORKFLOW RULES
 
+### 🎫 TICKET LIFECYCLE — MANDATORY (NON-NEGOTIABLE)
+
+**OPEN (before any code):**
+1. For every task received, immediately create a ticket file in `.tickets/doing/` using the format from `.tickets/TEMPLATE.md`.
+2. Naming convention: `TKT-<AREA>-<NN>.md` where AREA = UI, API, ENG, SEC, OPS, etc.
+3. Set `status: doing` in frontmatter.
+4. Append initial `## Agent Audit Log` entry: `- [TIMESTAMP] **Task-Master**: Created ticket. (Status: doing)`
+5. NO implementation may start before the ticket file exists in `.tickets/doing/`.
+
+**CLOSE (before READY):**
+6. Move ticket file from `.tickets/doing/` → `.tickets/done/`.
+7. Update `status: done` in frontmatter.
+8. Append `## Agent Result / Execution` section with summary of what was done.
+9. Append final audit log entry for every agent that acted.
+10. Only after ticket is filed in `.tickets/done/` may Task-Master declare **READY**.
+
+> **Why this matters:** Without tickets, work is invisible. The audit log is the single source of truth for what changed, who did it, and when. Missing tickets = governance failure.
+
 - Always output a structured result.
 - Always end with a single clear "NEXT STEP" that the user can execute immediately.
 - Never invent product scope beyond CompliHub360.
