@@ -4,6 +4,7 @@ import { WizardHeader } from "../../components/wizard/WizardHeader";
 import { WizardStepper } from "../../components/wizard/WizardStepper";
 import { WizardFooter } from "../../components/wizard/WizardFooter";
 import { MultiSelectChips } from "../../components/wizard/questions/MultiSelectChips";
+import { Typography } from "../../components/ui/Typography";
 
 interface ChipOption { value: string; label: string; icon?: string; }
 
@@ -74,19 +75,19 @@ export function WizardRiskStep() {
     const headline = CATEGORY_HEADLINE[profile.category] || "What are your main risk areas?";
 
     return (
-        <div className="bg-[#0b1117] min-h-screen flex flex-col text-slate-100 font-['Inter',sans-serif]">
+        <div className="bg-neutral-50 min-h-screen flex flex-col text-neutral-900 font-['Inter',sans-serif]">
             <WizardHeader />
             <main className="flex-1 flex flex-col items-center justify-center px-4 py-10">
-                <div className="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden">
+                <div className="w-full max-w-3xl bg-white border border-neutral-200 rounded-2xl shadow-lg ring-1 ring-black/5 overflow-hidden">
                     <WizardStepper currentStep={5} totalSteps={6} stepLabel="Risk Signals" />
-                    <div className="px-8 py-6 flex flex-col gap-6">
-                        <div>
-                            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-100">
+                    <div className="px-8 py-8 flex flex-col gap-6">
+                        <div className="flex flex-col gap-2">
+                            <Typography variant="h2">
                                 {headline}
-                            </h1>
-                            <p className="text-slate-400 text-sm mt-2">
+                            </Typography>
+                            <Typography variant="body" className="text-neutral-600">
                                 Select all that apply — this helps us calculate your risk level and find the best providers.
-                            </p>
+                            </Typography>
                         </div>
                         <MultiSelectChips
                             options={options}
@@ -94,9 +95,11 @@ export function WizardRiskStep() {
                             onChange={v => dispatch({ type: "SET_RISK_SIGNALS", payload: v })}
                         />
                         {profile.riskSignals.length > 0 && (
-                            <div className="p-3 rounded-lg bg-slate-800 border border-slate-700 text-xs text-slate-400 flex items-center gap-2">
-                                <span className="material-symbols-outlined text-[#137fec] text-sm">info</span>
-                                {profile.riskSignals.length} risk signal{profile.riskSignals.length > 1 ? "s" : ""} detected — we'll weight provider results accordingly.
+                            <div className="p-4 rounded-lg bg-primary-50 border border-primary-200 text-xs text-primary-900 flex items-center gap-3">
+                                <span className="material-symbols-outlined text-primary-600 text-[18px]">info</span>
+                                <div>
+                                    <span className="font-semibold">{profile.riskSignals.length} risk signal{profile.riskSignals.length > 1 ? "s" : ""}</span> detected — we'll weight provider results accordingly.
+                                </div>
                             </div>
                         )}
                     </div>

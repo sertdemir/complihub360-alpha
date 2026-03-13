@@ -1,3 +1,6 @@
+import { OptionCard } from "../../ui/OptionCard";
+import { Typography } from "../../ui/Typography";
+
 interface YesNoToggleProps {
     value: "yes" | "no" | "";
     onChange: (value: "yes" | "no") => void;
@@ -7,32 +10,28 @@ interface YesNoToggleProps {
 
 export function YesNoToggle({ value, onChange, label, description }: YesNoToggleProps) {
     return (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4">
             {(label || description) && (
-                <div>
-                    {label && <p className="text-sm font-semibold text-slate-200">{label}</p>}
-                    {description && <p className="text-xs text-slate-500 mt-0.5">{description}</p>}
+                <div className="flex flex-col gap-1">
+                    {label && <Typography variant="body" weight="semibold">{label}</Typography>}
+                    {description && <Typography variant="ui-small" className="text-neutral-600">{description}</Typography>}
                 </div>
             )}
-            <div className="flex gap-3">
-                {(["yes", "no"] as const).map(opt => (
-                    <button
-                        key={opt}
-                        onClick={() => onChange(opt)}
-                        className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-2 text-sm font-semibold transition-all duration-200 ${
-                            value === opt
-                                ? opt === "yes"
-                                    ? "border-emerald-500 bg-emerald-500/10 text-emerald-400"
-                                    : "border-rose-500 bg-rose-500/10 text-rose-400"
-                                : "border-slate-700 bg-slate-900 text-slate-400 hover:border-slate-600 hover:text-slate-300"
-                        }`}
-                    >
-                        <span className="material-symbols-outlined text-lg">
-                            {opt === "yes" ? "check_circle" : "cancel"}
-                        </span>
-                        {opt === "yes" ? "Yes" : "No"}
-                    </button>
-                ))}
+            <div className="grid grid-cols-2 gap-4">
+                <OptionCard
+                    type="radio"
+                    title="Yes"
+                    icon={<span className="material-symbols-outlined text-emerald-500">check_circle</span>}
+                    selected={value === "yes"}
+                    onSelect={() => onChange("yes")}
+                />
+                <OptionCard
+                    type="radio"
+                    title="No"
+                    icon={<span className="material-symbols-outlined text-rose-500">cancel</span>}
+                    selected={value === "no"}
+                    onSelect={() => onChange("no")}
+                />
             </div>
         </div>
     );

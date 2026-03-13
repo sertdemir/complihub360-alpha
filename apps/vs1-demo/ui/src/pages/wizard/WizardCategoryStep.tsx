@@ -3,6 +3,7 @@ import { useWizard, WizardCategory } from "../../components/wizard/WizardContext
 import { WizardHeader } from "../../components/wizard/WizardHeader";
 import { WizardStepper } from "../../components/wizard/WizardStepper";
 import { WizardFooter } from "../../components/wizard/WizardFooter";
+import { Typography } from "../../components/ui/Typography";
 import { useEffect } from "react";
 
 interface CategoryCard {
@@ -60,34 +61,34 @@ const CATEGORIES: CategoryCard[] = [
 
 const COLOR_MAP: Record<string, { selected: string; icon: string; badge: string }> = {
     blue: {
-        selected: "border-blue-500 bg-blue-500/10 shadow-blue-500/10",
-        icon: "text-blue-400",
-        badge: "bg-blue-500/20 text-blue-300",
+        selected: "border-primary-500 bg-primary-50 shadow-sm ring-1 ring-primary-500",
+        icon: "text-primary-600",
+        badge: "bg-primary-100/50 text-primary-700",
     },
     orange: {
-        selected: "border-orange-500 bg-orange-500/10 shadow-orange-500/10",
-        icon: "text-orange-400",
-        badge: "bg-orange-500/20 text-orange-300",
+        selected: "border-primary-500 bg-primary-50 shadow-sm ring-1 ring-primary-500",
+        icon: "text-primary-600",
+        badge: "bg-primary-100/50 text-primary-700",
     },
     emerald: {
-        selected: "border-emerald-500 bg-emerald-500/10 shadow-emerald-500/10",
-        icon: "text-emerald-400",
-        badge: "bg-emerald-500/20 text-emerald-300",
+        selected: "border-primary-500 bg-primary-50 shadow-sm ring-1 ring-primary-500",
+        icon: "text-primary-600",
+        badge: "bg-primary-100/50 text-primary-700",
     },
     purple: {
-        selected: "border-purple-500 bg-purple-500/10 shadow-purple-500/10",
-        icon: "text-purple-400",
-        badge: "bg-purple-500/20 text-purple-300",
+        selected: "border-primary-500 bg-primary-50 shadow-sm ring-1 ring-primary-500",
+        icon: "text-primary-600",
+        badge: "bg-primary-100/50 text-primary-700",
     },
     yellow: {
-        selected: "border-yellow-500 bg-yellow-500/10 shadow-yellow-500/10",
-        icon: "text-yellow-400",
-        badge: "bg-yellow-500/20 text-yellow-300",
+        selected: "border-primary-500 bg-primary-50 shadow-sm ring-1 ring-primary-500",
+        icon: "text-primary-600",
+        badge: "bg-primary-100/50 text-primary-700",
     },
     pink: {
-        selected: "border-pink-500 bg-pink-500/10 shadow-pink-500/10",
-        icon: "text-pink-400",
-        badge: "bg-pink-500/20 text-pink-300",
+        selected: "border-primary-500 bg-primary-50 shadow-sm ring-1 ring-primary-500",
+        icon: "text-primary-600",
+        badge: "bg-primary-100/50 text-primary-700",
     },
 };
 
@@ -102,28 +103,28 @@ export function WizardCategoryStep() {
         if (cat && !profile.category) {
             dispatch({ type: "SET_CATEGORY", payload: cat });
         }
-    }, []);
+    }, [searchParams, profile.category, dispatch]);
 
     const handleSelect = (cat: WizardCategory) => {
         dispatch({ type: "SET_CATEGORY", payload: cat });
     };
 
     return (
-        <div className="bg-[#0b1117] min-h-screen flex flex-col text-slate-100 font-['Inter',sans-serif]">
+        <div className="bg-neutral-50 min-h-screen flex flex-col text-neutral-900 font-['Inter',sans-serif]">
             <WizardHeader />
             <main className="flex-1 flex flex-col items-center justify-center px-4 py-10">
-                <div className="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden">
+                <div className="w-full max-w-3xl bg-white border border-neutral-200 rounded-2xl shadow-lg ring-1 ring-black/5 overflow-hidden">
                     <WizardStepper currentStep={2} totalSteps={6} stepLabel="Compliance Category" />
-                    <div className="px-8 py-6 flex flex-col gap-6">
-                        <div>
-                            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-100">
+                    <div className="px-8 py-8 flex flex-col gap-6">
+                        <div className="flex flex-col gap-2">
+                            <Typography variant="h2">
                                 What do you need help with?
-                            </h1>
-                            <p className="text-slate-400 text-sm mt-2">
+                            </Typography>
+                            <Typography variant="body" className="text-neutral-600">
                                 Choose your primary area of concern. This determines which questions we'll ask next.
-                            </p>
+                            </Typography>
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {CATEGORIES.map(cat => {
                                 const selected = profile.category === cat.id;
                                 const colors = COLOR_MAP[cat.color];
@@ -131,28 +132,28 @@ export function WizardCategoryStep() {
                                     <button
                                         key={cat.id}
                                         onClick={() => handleSelect(cat.id)}
-                                        className={`relative flex flex-col gap-3 p-5 rounded-xl border-2 text-left transition-all duration-200 group ${
+                                        className={`relative flex flex-col gap-4 p-5 rounded-xl border transition-all duration-200 text-left ${
                                             selected
-                                                ? `${colors.selected} shadow-lg`
-                                                : "border-slate-700 bg-slate-800 hover:border-slate-600 hover:bg-slate-800/80"
+                                                ? `${colors.selected}`
+                                                : "border-neutral-200 bg-white hover:border-primary-300 hover:bg-neutral-50 shadow-sm hover:shadow-md"
                                         }`}
                                     >
-                                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${selected ? colors.badge : "bg-slate-700"}`}>
-                                            <span className={`material-symbols-outlined text-xl ${selected ? colors.icon : "text-slate-400"}`}>
+                                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center transition-colors ${selected ? colors.badge : "bg-neutral-100 text-neutral-500"}`}>
+                                            <span className={`material-symbols-outlined text-2xl`}>
                                                 {cat.icon}
                                             </span>
                                         </div>
                                         <div>
-                                            <p className={`font-semibold text-sm ${selected ? "text-slate-100" : "text-slate-300"}`}>
+                                            <Typography variant="body" weight="semibold" className={selected ? "text-primary-900" : "text-neutral-900"}>
                                                 {cat.title}
-                                            </p>
-                                            <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
+                                            </Typography>
+                                            <Typography variant="ui-small" className="text-neutral-600 mt-1">
                                                 {cat.description}
-                                            </p>
+                                            </Typography>
                                         </div>
                                         {selected && (
-                                            <div className="absolute top-3 right-3">
-                                                <span className={`material-symbols-outlined text-base ${colors.icon}`}>check_circle</span>
+                                            <div className="absolute top-4 right-4 animate-in fade-in zoom-in duration-200">
+                                                <span className={`material-symbols-outlined text-xl text-primary-500`}>check_circle</span>
                                             </div>
                                         )}
                                     </button>

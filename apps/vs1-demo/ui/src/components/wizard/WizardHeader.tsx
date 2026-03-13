@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useWizard } from "./WizardContext";
+import { Typography } from "../ui/Typography";
 
 const CATEGORY_LABELS: Record<string, string> = {
     "tax-vat": "Tax & VAT",
@@ -15,31 +16,31 @@ export function WizardHeader() {
     const { profile } = useWizard();
 
     return (
-        <header className="sticky top-0 z-50 bg-[#0b1117]/90 backdrop-blur-md border-b border-slate-800 px-6 py-3">
-            <div className="max-w-3xl mx-auto flex items-center justify-between">
+        <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-neutral-200 px-6 py-4 shadow-sm">
+            <div className="max-w-7xl mx-auto flex items-center justify-between">
                 {/* Logo */}
                 <button
                     onClick={() => navigate("/")}
                     className="flex items-center gap-2 group"
                 >
-                    <span className="material-symbols-outlined text-[#137fec] text-2xl">
+                    <span className="material-symbols-outlined text-primary-600 text-2xl">
                         verified_user
                     </span>
-                    <span className="text-slate-100 font-bold text-lg tracking-tight">
+                    <Typography variant="h3" className="tracking-tight">
                         CompliHub360
-                    </span>
+                    </Typography>
                 </button>
 
                 {/* Context Badges */}
                 <div className="flex items-center gap-2">
                     {profile.country && (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-300">
-                            <span className="material-symbols-outlined text-sm text-slate-400">location_on</span>
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-100 border border-neutral-200 text-xs font-semibold text-neutral-700">
+                            <span className="material-symbols-outlined text-sm text-neutral-500">location_on</span>
                             {profile.country}
                         </span>
                     )}
                     {profile.category && (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#137fec]/10 border border-[#137fec]/30 text-xs font-semibold text-[#137fec]">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-50 border border-primary-200 text-xs font-semibold text-primary-700">
                             {CATEGORY_LABELS[profile.category]}
                         </span>
                     )}
@@ -48,7 +49,7 @@ export function WizardHeader() {
                 {/* Exit link */}
                 <button
                     onClick={() => navigate("/results")}
-                    className="text-xs font-medium text-slate-400 hover:text-slate-200 flex items-center gap-1 transition-colors"
+                    className="text-sm font-medium text-neutral-500 hover:text-neutral-900 flex items-center gap-1 transition-colors"
                 >
                     <span className="material-symbols-outlined text-base">arrow_forward</span>
                     Skip to results

@@ -4,6 +4,7 @@ import { WizardFlowShell } from "../../../components/wizard/WizardFlowShell";
 import { SingleSelectCardGroup } from "../../../components/wizard/questions/SingleSelectCardGroup";
 import { MultiSelectChips } from "../../../components/wizard/questions/MultiSelectChips";
 import { YesNoToggle } from "../../../components/wizard/questions/YesNoToggle";
+import { Typography } from "../../../components/ui/Typography";
 
 const PRODUCT_CATEGORIES = [
     { value: "electronics", label: "Electronics / Electrical Equipment", icon: "devices" },
@@ -49,17 +50,17 @@ export function EprWizard() {
             isValid: !!sellsPhysical,
             content: (
                 <div className="flex flex-col gap-6">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-100">Do you sell physical products?</h1>
-                        <p className="text-slate-400 text-sm mt-2">
+                    <div className="flex flex-col gap-2">
+                        <Typography variant="h2">Do you sell physical products?</Typography>
+                        <Typography variant="body" className="text-neutral-600">
                             EPR (Extended Producer Responsibility) only applies to businesses that place physical goods or packaging on the market.
-                        </p>
+                        </Typography>
                     </div>
                     <YesNoToggle value={sellsPhysical} onChange={setSellsPhysical} />
                     {sellsPhysical === "no" && (
-                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs leading-relaxed">
-                            <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">check_circle</span>
-                            EPR obligations generally don't apply to purely digital products and services. You can still continue the wizard to be certain.
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-emerald-600 shrink-0">check_circle</span>
+                            <span>EPR obligations generally don't apply to purely digital products and services. You can still continue the wizard to be certain.</span>
                         </div>
                     )}
                 </div>
@@ -69,12 +70,12 @@ export function EprWizard() {
             label: "Product Categories",
             isValid: productCategories.length > 0,
             content: (
-                <div className="flex flex-col gap-5">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-100">Which product categories are you active in?</h1>
-                        <p className="text-slate-400 text-sm mt-2">
+                <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-2">
+                        <Typography variant="h2">Which product categories are you active in?</Typography>
+                        <Typography variant="body" className="text-neutral-600">
                             EPR requirements differ significantly by category. Electronics and batteries are subject to WEEE/ElektroG, textiles to supply chain due diligence laws.
-                        </p>
+                        </Typography>
                     </div>
                     <MultiSelectChips
                         options={PRODUCT_CATEGORIES}
@@ -85,15 +86,15 @@ export function EprWizard() {
                         }}
                     />
                     {productCategories.includes("electronics") && (
-                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs leading-relaxed">
-                            <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">bolt</span>
-                            Electrical equipment — WEEE / ElektroG: mandatory registration in the LUCID directory and at stif.de. Take-back obligations for old devices apply.
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-primary-50 border border-primary-200 text-primary-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-primary-600 shrink-0">bolt</span>
+                            <span>Electrical equipment — WEEE / ElektroG: mandatory registration in the LUCID directory and at stif.de. Take-back obligations for old devices apply.</span>
                         </div>
                     )}
                     {productCategories.includes("textiles") && (
-                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs leading-relaxed">
-                            <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">checkroom</span>
-                            For textiles, the German Supply Chain Due Diligence Act (LkSG) applies above certain thresholds. France already has an extended textile EPR scheme.
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-indigo-50 border border-indigo-100 text-indigo-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-indigo-600 shrink-0">checkroom</span>
+                            <span>For textiles, the German Supply Chain Due Diligence Act (LkSG) applies above certain thresholds. France already has an extended textile EPR scheme.</span>
                         </div>
                     )}
                 </div>
@@ -103,12 +104,12 @@ export function EprWizard() {
             label: "Your Role",
             isValid: !!role,
             content: (
-                <div className="flex flex-col gap-5">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-100">What is your role in the supply chain?</h1>
-                        <p className="text-slate-400 text-sm mt-2">
+                <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-2">
+                        <Typography variant="h2">What is your role in the supply chain?</Typography>
+                        <Typography variant="body" className="text-neutral-600">
                             EPR obligations depend heavily on your role. Importers and manufacturers bear the primary responsibility.
-                        </p>
+                        </Typography>
                     </div>
                     <SingleSelectCardGroup
                         options={ROLES}
@@ -116,9 +117,9 @@ export function EprWizard() {
                         onChange={setRole}
                     />
                     {isImporter && hasHighRisk && (
-                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs leading-relaxed">
-                            <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">error</span>
-                            <strong>High risk:</strong> As an importer of electronics / batteries, you are fully responsible for take-back, disposal, and registration. Marketplace suspension is possible without proof of compliance.
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-rose-50 border border-rose-100 text-rose-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-rose-600 shrink-0">error</span>
+                            <span><strong>High risk:</strong> As an importer of electronics / batteries, you are fully responsible for take-back, disposal, and registration. Marketplace suspension is possible without proof of compliance.</span>
                         </div>
                     )}
                 </div>
@@ -128,12 +129,12 @@ export function EprWizard() {
             label: "EPR Status",
             isValid: !!eprStatus,
             content: (
-                <div className="flex flex-col gap-5">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-100">Are you already EPR-registered?</h1>
-                        <p className="text-slate-400 text-sm mt-2">
+                <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-2">
+                        <Typography variant="h2">Are you already EPR-registered?</Typography>
+                        <Typography variant="body" className="text-neutral-600">
                             In Germany, manufacturers / importers are required to register in the LUCID portal (packaging) and the electronics register (stif.de).
-                        </p>
+                        </Typography>
                     </div>
                     <SingleSelectCardGroup
                         options={EPR_STATUS}
@@ -141,15 +142,15 @@ export function EprWizard() {
                         onChange={setEprStatus}
                     />
                     {noEprRisk && (
-                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs leading-relaxed">
-                            <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">warning</span>
-                            <strong>Urgent action required:</strong> Missing registration can lead to warnings, marketplace suspensions (Amazon, Zalando) and fines up to €100,000. Let's resolve this quickly.
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-rose-50 border border-rose-100 text-rose-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-rose-600 shrink-0">warning</span>
+                            <span><strong>Urgent action required:</strong> Missing registration can lead to warnings, marketplace suspensions (Amazon, Zalando) and fines up to €100,000. Let's resolve this quickly.</span>
                         </div>
                     )}
                     {eprStatus === "registered_de" && (
-                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs leading-relaxed">
-                            <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">check_circle</span>
-                            Great! We'll still verify that your registrations are complete for all categories and target markets.
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-emerald-600 shrink-0">check_circle</span>
+                            <span>Great! We'll still verify that your registrations are complete for all categories and target markets.</span>
                         </div>
                     )}
                 </div>

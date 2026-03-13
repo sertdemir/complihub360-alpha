@@ -4,6 +4,7 @@ import { WizardFlowShell } from "../../../components/wizard/WizardFlowShell";
 import { SingleSelectCardGroup } from "../../../components/wizard/questions/SingleSelectCardGroup";
 import { MultiSelectChips } from "../../../components/wizard/questions/MultiSelectChips";
 import { YesNoToggle } from "../../../components/wizard/questions/YesNoToggle";
+import { Typography } from "../../../components/ui/Typography";
 
 const INDUSTRIES = [
     { value: "ecommerce_general", label: "E-Commerce / Online Retail", description: "General product trade without regulated goods categories.", icon: "shopping_bag" },
@@ -63,24 +64,24 @@ export function MarketingSeoWizard() {
             label: "Industry",
             isValid: !!industry,
             content: (
-                <div className="flex flex-col gap-5">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-100">What industry are you in?</h1>
-                        <p className="text-slate-400 text-sm mt-2">
+                <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-2">
+                        <Typography variant="h2">What industry are you in?</Typography>
+                        <Typography variant="body" className="text-neutral-600">
                             Certain industries are subject to stricter advertising and marketing regulations — especially health and financial services.
-                        </p>
+                        </Typography>
                     </div>
                     <SingleSelectCardGroup options={INDUSTRIES} value={industry} onChange={setIndustry} />
                     {industry === "health_supplements" && (
-                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs leading-relaxed">
-                            <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">warning</span>
-                            Dietary supplements: only approved health claims on the EU authorised list (HCVO/Regulation 1924/2006) are permitted. Claims like "boosts immunity" without authorization are banned and actively prosecuted.
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-rose-50 border border-rose-100 text-rose-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-rose-600 shrink-0">warning</span>
+                            <span>Dietary supplements: only approved health claims on the EU authorised list (HCVO/Regulation 1924/2006) are permitted. Claims like "boosts immunity" without authorization are banned and actively prosecuted.</span>
                         </div>
                     )}
                     {industry === "finance_fintech" && (
-                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs leading-relaxed">
-                            <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">warning</span>
-                            Financial advertising may require regulatory authorization. Return promises without risk disclosures are prohibited under applicable securities and investment law.
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-rose-50 border border-rose-100 text-rose-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-rose-600 shrink-0">warning</span>
+                            <span>Financial advertising may require regulatory authorization. Return promises without risk disclosures are prohibited under applicable securities and investment law.</span>
                         </div>
                     )}
                 </div>
@@ -90,12 +91,12 @@ export function MarketingSeoWizard() {
             label: "Ad Claims",
             isValid: claimTypes.length > 0,
             content: (
-                <div className="flex flex-col gap-5">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-100">What types of claims do you use in your marketing?</h1>
-                        <p className="text-slate-400 text-sm mt-2">
+                <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-2">
+                        <Typography variant="h2">What types of claims do you use in your marketing?</Typography>
+                        <Typography variant="body" className="text-neutral-600">
                             Many standard claims are legally risky or require specific evidence. We'll show you where concrete risks exist.
-                        </p>
+                        </Typography>
                     </div>
                     <MultiSelectChips
                         options={CLAIM_TYPES}
@@ -106,15 +107,15 @@ export function MarketingSeoWizard() {
                         }}
                     />
                     {hasHealthClaims && (
-                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs leading-relaxed">
-                            <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">error</span>
-                            <strong>Critical:</strong> Health claims in your industry are only permitted if they appear on the EU approved list. Violations attract warning letters with claim values from €20,000+.
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-rose-50 border border-rose-100 text-rose-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-rose-600 shrink-0">error</span>
+                            <span><strong>Critical:</strong> Health claims in your industry are only permitted if they appear on the EU approved list. Violations attract warning letters with claim values from €20,000+.</span>
                         </div>
                     )}
                     {hasEcoClaims && (
-                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs leading-relaxed">
-                            <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">eco</span>
-                            Greenwashing: EU Directive 2024/825 prohibits blanket environmental promises without substantiation. Terms like "sustainable", "carbon neutral", "eco-friendly" must be verifiable.
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-primary-50 border border-primary-200 text-primary-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-primary-600 shrink-0">eco</span>
+                            <span>Greenwashing: EU Directive 2024/825 prohibits blanket environmental promises without substantiation. Terms like "sustainable", "carbon neutral", "eco-friendly" must be verifiable.</span>
                         </div>
                     )}
                 </div>
@@ -124,30 +125,32 @@ export function MarketingSeoWizard() {
             label: "Marketing Channels",
             isValid: channels.length > 0,
             content: (
-                <div className="flex flex-col gap-5">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-100">Which channels do you use to promote your products?</h1>
-                        <p className="text-slate-400 text-sm mt-2">
+                <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-2">
+                        <Typography variant="h2">Which channels do you use to promote your products?</Typography>
+                        <Typography variant="body" className="text-neutral-600">
                             Each channel has its own compliance requirements: ad labeling, privacy rules, and industry-specific restrictions.
-                        </p>
+                        </Typography>
                     </div>
                     <MultiSelectChips options={CHANNELS} value={channels} onChange={setChannels} />
                     {channels.includes("influencer") && (
-                        <div className="mt-2">
-                            <p className="text-xs text-slate-400 mb-3">Do you use influencers for posts that appear organic (free products without labeling)?</p>
+                        <div className="flex flex-col gap-4">
+                            <Typography variant="body" className="text-neutral-600">
+                                Do you use influencers for posts that appear organic (free products without labeling)?
+                            </Typography>
                             <YesNoToggle value={usesInfluencer} onChange={setUsesInfluencer} />
                         </div>
                     )}
                     {hasInfluencer && (
-                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs leading-relaxed">
-                            <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">campaign</span>
-                            Influencer posts must be labeled as advertising — including free product placements without payment (#ad, #sponsored). Missing labels create legal risk for both the influencer and the brand.
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-primary-50 border border-primary-200 text-primary-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-primary-600 shrink-0">campaign</span>
+                            <span>Influencer posts must be labeled as advertising — including free product placements without payment (#ad, #sponsored). Missing labels create legal risk for both the influencer and the brand.</span>
                         </div>
                     )}
                     {channels.includes("email_marketing") && (
-                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs leading-relaxed">
-                            <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">mail</span>
-                            Double opt-in is required in Germany. Sending emails without documented consent is a GDPR and competition law violation.
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-indigo-50 border border-indigo-100 text-indigo-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-indigo-600 shrink-0">mail</span>
+                            <span>Double opt-in is required in Germany. Sending emails without documented consent is a GDPR and competition law violation.</span>
                         </div>
                     )}
                 </div>
@@ -157,24 +160,24 @@ export function MarketingSeoWizard() {
             label: "Cookie Compliance",
             isValid: !!cookieStatus,
             content: (
-                <div className="flex flex-col gap-5">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-100">How is your cookie consent implemented?</h1>
-                        <p className="text-slate-400 text-sm mt-2">
+                <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-2">
+                        <Typography variant="h2">How is your cookie consent implemented?</Typography>
+                        <Typography variant="body" className="text-neutral-600">
                             Since the BGH Planet49 ruling (2020) and the TTDSG (2021), genuine opt-in consent for non-essential cookies is mandatory in Germany and across the EU.
-                        </p>
+                        </Typography>
                     </div>
                     <SingleSelectCardGroup options={COOKIE_STATUS} value={cookieStatus} onChange={setCookieStatus} />
                     {noCookieBanner && (
-                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs leading-relaxed">
-                            <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">error</span>
-                            <strong>Immediate action required:</strong> Without cookie consent, tracking cookies are placed illegally. Every EU user visit constitutes a GDPR violation. Warning letters and DPA complaints are likely.
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-rose-50 border border-rose-100 text-rose-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-rose-600 shrink-0">error</span>
+                            <span><strong>Immediate action required:</strong> Without cookie consent, tracking cookies are placed illegally. Every EU user visit constitutes a GDPR violation. Warning letters and DPA complaints are likely.</span>
                         </div>
                     )}
                     {outdatedBanner && (
-                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs leading-relaxed">
-                            <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">warning</span>
-                            Opt-out is no longer legally compliant. Since the BGH ruling in 2020, consent must be active (opt-in). Recommendation: upgrade to an opt-in CMP.
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-primary-50 border border-primary-200 text-primary-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-primary-600 shrink-0">warning</span>
+                            <span>Opt-out is no longer legally compliant. Since the BGH ruling in 2020, consent must be active (opt-in). Recommendation: upgrade to an opt-in CMP.</span>
                         </div>
                     )}
                 </div>

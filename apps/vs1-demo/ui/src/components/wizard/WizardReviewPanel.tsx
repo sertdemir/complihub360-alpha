@@ -1,5 +1,7 @@
 import { useWizard } from "../../components/wizard/WizardContext";
 import { useNavigate } from "react-router-dom";
+import { Button } from "../ui/Button";
+import { Typography } from "../ui/Typography";
 
 const CATEGORY_LABELS: Record<string, string> = {
     "tax-vat": "Tax & VAT",
@@ -48,14 +50,14 @@ function ReviewRow({ label, value, stepPath }: ReviewRowProps) {
     const displayValue = Array.isArray(value) ? value.join(", ") : value;
     if (!displayValue) return null;
     return (
-        <div className="flex items-start justify-between py-3 border-b border-slate-800 last:border-0 gap-4">
+        <div className="flex items-start justify-between py-3 border-b border-neutral-200 last:border-0 gap-4">
             <div className="flex flex-col gap-0.5">
-                <span className="text-xs font-semibold uppercase tracking-widest text-slate-500">{label}</span>
-                <span className="text-sm font-medium text-slate-200">{displayValue}</span>
+                <Typography variant="caption" className="text-neutral-500">{label}</Typography>
+                <Typography variant="body" weight="medium" className="text-neutral-900">{displayValue}</Typography>
             </div>
             <button
                 onClick={() => navigate(stepPath)}
-                className="text-xs text-[#137fec] hover:underline shrink-0 mt-1"
+                className="text-xs text-primary-600 hover:text-primary-700 font-medium hover:underline shrink-0 mt-1 transition-colors"
             >
                 Edit
             </button>
@@ -73,7 +75,7 @@ export function WizardReviewPanel({ onGenerateResults, isGuest = true }: WizardR
 
     return (
         <div className="flex flex-col gap-6">
-            <div className="bg-slate-800/50 rounded-xl border border-slate-700 divide-y divide-slate-800 overflow-hidden">
+            <div className="bg-neutral-50 rounded-xl border border-neutral-200 divide-y divide-neutral-200 overflow-hidden px-4">
                 <ReviewRow label="Primary Country" value={profile.country} stepPath="/wizard" />
                 <ReviewRow label="Additional Markets" value={profile.markets.filter(m => m !== profile.country)} stepPath="/wizard" />
                 <ReviewRow label="Compliance Category" value={CATEGORY_LABELS[profile.category] || ""} stepPath="/wizard/category" />
@@ -87,18 +89,19 @@ export function WizardReviewPanel({ onGenerateResults, isGuest = true }: WizardR
             </div>
 
             {/* CTA */}
-            <button
+            <Button
+                variant="primary"
                 onClick={onGenerateResults}
-                className="w-full py-3.5 bg-[#137fec] hover:bg-[#137fec]/90 text-white rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg shadow-[#137fec]/20 transition-all"
+                className="w-full gap-2 py-3"
             >
-                <span className="material-symbols-outlined text-lg">auto_awesome</span>
+                <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
                 Generate My Compliance Results
-            </button>
+            </Button>
 
             {isGuest && (
-                <p className="text-center text-xs text-slate-500">
-                    <span className="material-symbols-outlined text-sm align-middle mr-1">lock</span>
-                    <a href="/register?next=wizard/review" className="text-[#137fec] hover:underline">
+                <p className="text-center text-xs text-neutral-500">
+                    <span className="material-symbols-outlined text-[14px] align-middle mr-1">lock</span>
+                    <a href="/register?next=wizard/review" className="text-primary-600 hover:text-primary-700 hover:underline transition-colors">
                         Register
                     </a>{" "}
                     to save and edit these answers later in your dashboard.

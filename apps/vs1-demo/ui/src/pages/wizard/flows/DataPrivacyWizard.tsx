@@ -4,6 +4,7 @@ import { WizardFlowShell } from "../../../components/wizard/WizardFlowShell";
 import { YesNoToggle } from "../../../components/wizard/questions/YesNoToggle";
 import { MultiSelectChips } from "../../../components/wizard/questions/MultiSelectChips";
 import { SingleSelectCardGroup } from "../../../components/wizard/questions/SingleSelectCardGroup";
+import { Typography } from "../../../components/ui/Typography";
 
 const TRACKING_TOOLS = [
     { value: "ga4", label: "Google Analytics 4", icon: "analytics" },
@@ -60,23 +61,23 @@ export function DataPrivacyWizard() {
             isValid: !!euCustomers,
             content: (
                 <div className="flex flex-col gap-6">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-100">Do you have customers in the EU / EEA?</h1>
-                        <p className="text-slate-400 text-sm mt-2">
+                    <div className="flex flex-col gap-2">
+                        <Typography variant="h2">Do you have customers in the EU / EEA?</Typography>
+                        <Typography variant="body" className="text-neutral-600">
                             GDPR applies to any company processing personal data of EU citizens — regardless of where your company is based.
-                        </p>
+                        </Typography>
                     </div>
                     <YesNoToggle value={euCustomers} onChange={setEuCustomers} />
                     {euCustomers === "no" && (
-                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs leading-relaxed">
-                            <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">check_circle</span>
-                            Without EU customers, GDPR doesn't apply directly. Local data protection laws (e.g. CCPA) may still be relevant.
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-emerald-600 shrink-0">check_circle</span>
+                            <span>Without EU customers, GDPR doesn't apply directly. Local data protection laws (e.g. CCPA) may still be relevant.</span>
                         </div>
                     )}
                     {euCustomers === "yes" && (
-                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs leading-relaxed">
-                            <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">info</span>
-                            GDPR is mandatory for you. Fines can reach up to 4% of global annual turnover or €20M — whichever is higher.
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-primary-50 border border-primary-200 text-primary-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-primary-600 shrink-0">info</span>
+                            <span>GDPR is mandatory for you. Fines can reach up to 4% of global annual turnover or €20M — whichever is higher.</span>
                         </div>
                     )}
                 </div>
@@ -86,12 +87,12 @@ export function DataPrivacyWizard() {
             label: "Data Categories",
             isValid: dataCategories.length > 0,
             content: (
-                <div className="flex flex-col gap-5">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-100">What data do you collect from users?</h1>
-                        <p className="text-slate-400 text-sm mt-2">
+                <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-2">
+                        <Typography variant="h2">What data do you collect from users?</Typography>
+                        <Typography variant="body" className="text-neutral-600">
                             Different data categories require different safeguards. Health and financial data are especially sensitive under GDPR Article 9.
-                        </p>
+                        </Typography>
                     </div>
                     <MultiSelectChips
                         options={DATA_CATEGORIES}
@@ -102,9 +103,9 @@ export function DataPrivacyWizard() {
                         }}
                     />
                     {dataCategories.includes("health_data") && (
-                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs leading-relaxed">
-                            <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">warning</span>
-                            <strong>Health data is a special category (GDPR Art. 9).</strong> Stricter requirements apply: explicit consent, data protection impact assessment (DPIA), and regular audits are mandatory.
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-rose-50 border border-rose-100 text-rose-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-rose-600 shrink-0">warning</span>
+                            <span><strong>Health data is a special category (GDPR Art. 9).</strong> Stricter requirements apply: explicit consent, data protection impact assessment (DPIA), and regular audits are mandatory.</span>
                         </div>
                     )}
                 </div>
@@ -114,12 +115,12 @@ export function DataPrivacyWizard() {
             label: "Tracking & Tools",
             isValid: trackingTools.length > 0,
             content: (
-                <div className="flex flex-col gap-5">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-100">Which tracking and marketing tools do you use?</h1>
-                        <p className="text-slate-400 text-sm mt-2">
+                <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-2">
+                        <Typography variant="h2">Which tracking and marketing tools do you use?</Typography>
+                        <Typography variant="body" className="text-neutral-600">
                             Every tool that captures or transfers user data to third parties must be listed in your privacy policy and activated via consent.
-                        </p>
+                        </Typography>
                     </div>
                     <MultiSelectChips
                         options={TRACKING_TOOLS}
@@ -127,15 +128,15 @@ export function DataPrivacyWizard() {
                         onChange={setTrackingTools}
                     />
                     {mismatch && (
-                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs leading-relaxed">
-                            <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">warning</span>
-                            <strong>Contradiction detected:</strong> You use tracking tools but indicated you collect no personal data. Tracking pixels inherently transmit user data (IP, behavior).
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-rose-50 border border-rose-100 text-rose-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-rose-600 shrink-0">warning</span>
+                            <span><strong>Contradiction detected:</strong> You use tracking tools but indicated you collect no personal data. Tracking pixels inherently transmit user data (IP, behavior).</span>
                         </div>
                     )}
                     {usesUSTools && (
-                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs leading-relaxed">
-                            <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">flight_takeoff</span>
-                            US services (Google, Meta, TikTok) transfer data to the United States. This requires Standard Contractual Clauses (SCCs) and a Data Processing Agreement (DPA).
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-primary-50 border border-primary-200 text-primary-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-primary-600 shrink-0">flight_takeoff</span>
+                            <span>US services (Google, Meta, TikTok) transfer data to the United States. This requires Standard Contractual Clauses (SCCs) and a Data Processing Agreement (DPA).</span>
                         </div>
                     )}
                 </div>
@@ -145,23 +146,27 @@ export function DataPrivacyWizard() {
             label: "Consent & Processing",
             isValid: !!processingLocation && !!consentStatus,
             content: (
-                <div className="flex flex-col gap-7">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-100">Data processing & consent management</h1>
-                        <p className="text-slate-400 text-sm mt-2">
+                <div className="flex flex-col gap-8">
+                    <div className="flex flex-col gap-2">
+                        <Typography variant="h2">Data processing & consent management</Typography>
+                        <Typography variant="body" className="text-neutral-600">
                             Two critical GDPR requirements: where is your data stored, and are you collecting valid consent?
-                        </p>
+                        </Typography>
                     </div>
                     <div>
-                        <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">Where is your data processed?</p>
+                        <Typography variant="caption" weight="semibold" className="text-neutral-500 mb-4 block">
+                            WHERE IS YOUR DATA PROCESSED?
+                        </Typography>
                         <SingleSelectCardGroup
                             options={PROCESSING_LOCATIONS}
                             value={processingLocation}
                             onChange={setProcessingLocation}
                         />
                     </div>
-                    <div className="border-t border-slate-800 pt-5">
-                        <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">Do you use a consent management tool?</p>
+                    <div className="border-t border-neutral-100 pt-8">
+                        <Typography variant="caption" weight="semibold" className="text-neutral-500 mb-4 block">
+                            DO YOU USE A CONSENT MANAGEMENT TOOL?
+                        </Typography>
                         <SingleSelectCardGroup
                             options={CONSENT_STATUS}
                             value={consentStatus}
@@ -169,9 +174,9 @@ export function DataPrivacyWizard() {
                         />
                     </div>
                     {noConsent && hasRisk && (
-                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs leading-relaxed">
-                            <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">error</span>
-                            <strong>High GDPR risk:</strong> You're using tracking tools without a consent banner. Every EU visitor to your site constitutes a data protection violation. Immediate action required.
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-rose-50 border border-rose-100 text-rose-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-rose-600 shrink-0">error</span>
+                            <span><strong>High GDPR risk:</strong> You're using tracking tools without a consent banner. Every EU visitor to your site constitutes a data protection violation. Immediate action required.</span>
                         </div>
                     )}
                 </div>

@@ -5,6 +5,7 @@ import { SingleSelectCardGroup } from "../../../components/wizard/questions/Sing
 import { MultiSelectChips } from "../../../components/wizard/questions/MultiSelectChips";
 import { CountryMultiSelect } from "../../../components/wizard/questions/CountryMultiSelect";
 import { RangeSelector } from "../../../components/wizard/questions/RangeSelector";
+import { Typography } from "../../../components/ui/Typography";
 
 interface TaxVatState {
     sellingModel: string;
@@ -59,12 +60,12 @@ export function TaxVatWizard() {
             label: "Sales Model",
             isValid: !!local.sellingModel,
             content: (
-                <div className="flex flex-col gap-5">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-100">How do you sell your products?</h1>
-                        <p className="text-slate-400 text-sm mt-2">
+                <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-2">
+                        <Typography variant="h2">How do you sell your products?</Typography>
+                        <Typography variant="body" className="text-neutral-600">
                             Your sales channel determines which VAT registration obligations apply.
-                        </p>
+                        </Typography>
                     </div>
                     <SingleSelectCardGroup
                         options={SELLING_MODELS}
@@ -72,9 +73,9 @@ export function TaxVatWizard() {
                         onChange={v => setLocal(s => ({ ...s, sellingModel: v }))}
                     />
                     {local.sellingModel === "marketplace" && (
-                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs leading-relaxed">
-                            <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">info</span>
-                            Marketplaces like Amazon DE report your sales directly to tax authorities. You still need your own VAT ID.
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-primary-50 border border-primary-200 text-primary-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-primary-600 shrink-0">info</span>
+                            <span>Marketplaces like Amazon DE report your sales directly to tax authorities. You still need your own VAT ID.</span>
                         </div>
                     )}
                 </div>
@@ -85,12 +86,12 @@ export function TaxVatWizard() {
             isValid: true,
             isOptional: true,
             content: (
-                <div className="flex flex-col gap-5">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-100">Which countries do you sell to?</h1>
-                        <p className="text-slate-400 text-sm mt-2">
+                <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-2">
+                        <Typography variant="h2">Which countries do you sell to?</Typography>
+                        <Typography variant="body" className="text-neutral-600">
                             Beyond a certain revenue per country, local VAT registration is required. EU OSS threshold: €10,000 / year.
-                        </p>
+                        </Typography>
                     </div>
                     <CountryMultiSelect
                         primaryCountry={profile.country}
@@ -101,9 +102,9 @@ export function TaxVatWizard() {
                         }}
                     />
                     {local.additionalMarkets.length >= 3 && (
-                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs leading-relaxed">
-                            <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">tips_and_updates</span>
-                            With 3+ EU countries, we recommend OSS registration — it replaces individual registrations in each member state.
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-primary-50 border border-primary-200 text-primary-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-primary-600 shrink-0">tips_and_updates</span>
+                            <span>With 3+ EU countries, we recommend OSS registration — it replaces individual registrations in each member state.</span>
                         </div>
                     )}
                 </div>
@@ -113,12 +114,12 @@ export function TaxVatWizard() {
             label: "Annual Revenue",
             isValid: !!local.revenueThreshold,
             content: (
-                <div className="flex flex-col gap-5">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-100">What is your cross-border annual revenue?</h1>
-                        <p className="text-slate-400 text-sm mt-2">
+                <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-2">
+                        <Typography variant="h2">What is your cross-border annual revenue?</Typography>
+                        <Typography variant="body" className="text-neutral-600">
                             The EU OSS threshold is €10,000 / year. Above this, VAT registration is required in the destination country.
-                        </p>
+                        </Typography>
                     </div>
                     <RangeSelector
                         bands={REVENUE_THRESHOLDS}
@@ -129,9 +130,9 @@ export function TaxVatWizard() {
                         }}
                     />
                     {local.revenueThreshold === "10k_85k" && (
-                        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs leading-relaxed">
-                            <span className="material-symbols-outlined text-sm mt-0.5 shrink-0">warning</span>
-                            You are approaching the VAT registration threshold. We recommend an initial consultation before crossing it.
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-primary-50 border border-primary-200 text-primary-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-primary-600 shrink-0">warning</span>
+                            <span>You are approaching the VAT registration threshold. We recommend an initial consultation before crossing it.</span>
                         </div>
                     )}
                 </div>
@@ -141,20 +142,22 @@ export function TaxVatWizard() {
             label: "Product Type",
             isValid: !!local.goodsType,
             content: (
-                <div className="flex flex-col gap-5">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-100">What do you sell?</h1>
-                        <p className="text-slate-400 text-sm mt-2">
+                <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-2">
+                        <Typography variant="h2">What do you sell?</Typography>
+                        <Typography variant="body" className="text-neutral-600">
                             Digital services are taxed at the customer's location. Physical goods follow shipping and destination country rules.
-                        </p>
+                        </Typography>
                     </div>
                     <SingleSelectCardGroup
                         options={GOODS_TYPES}
                         value={local.goodsType}
                         onChange={v => setLocal(s => ({ ...s, goodsType: v }))}
                     />
-                    <div className="mt-1">
-                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Special situations (optional)</p>
+                    <div className="border-t border-neutral-100 pt-6">
+                        <Typography variant="caption" weight="semibold" className="text-neutral-500 mb-4 block">
+                            SPECIAL SITUATIONS (OPTIONAL)
+                        </Typography>
                         <MultiSelectChips
                             options={VAT_RISK_SIGNALS}
                             value={profile.riskSignals}

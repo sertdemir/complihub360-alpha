@@ -25,8 +25,8 @@ export function MultiSelectChips({ options, value, onChange }: MultiSelectChipsP
                         onClick={() => toggle(opt.value)}
                         className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-sm font-medium transition-all duration-200 ${
                             selected
-                                ? "bg-[#137fec] border-[#137fec] text-white shadow-md shadow-[#137fec]/20"
-                                : "bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-500 hover:text-slate-300"
+                                ? "bg-primary-500 border-primary-500 text-white shadow-sm shadow-primary-500/20"
+                                : "bg-white border-neutral-300 text-neutral-600 hover:border-neutral-400 hover:bg-neutral-50 hover:text-neutral-900"
                         }`}
                     >
                         {opt.icon && (

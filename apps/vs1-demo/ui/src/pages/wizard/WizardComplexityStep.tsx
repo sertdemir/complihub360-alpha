@@ -5,6 +5,7 @@ import { WizardStepper } from "../../components/wizard/WizardStepper";
 import { WizardFooter } from "../../components/wizard/WizardFooter";
 import { RangeSelector } from "../../components/wizard/questions/RangeSelector";
 import { SingleSelectCardGroup } from "../../components/wizard/questions/SingleSelectCardGroup";
+import { Typography } from "../../components/ui/Typography";
 
 const REVENUE_BANDS = [
     { value: "lt-10k", label: "< €10k", sublabel: "per year" },
@@ -35,24 +36,26 @@ export function WizardComplexityStep() {
     };
 
     return (
-        <div className="bg-[#0b1117] min-h-screen flex flex-col text-slate-100 font-['Inter',sans-serif]">
+        <div className="bg-neutral-50 min-h-screen flex flex-col text-neutral-900 font-['Inter',sans-serif]">
             <WizardHeader />
             <main className="flex-1 flex flex-col items-center justify-center px-4 py-10">
-                <div className="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden">
+                <div className="w-full max-w-3xl bg-white border border-neutral-200 rounded-2xl shadow-lg ring-1 ring-black/5 overflow-hidden">
                     <WizardStepper currentStep={6} totalSteps={6} stepLabel="Complexity & Intent" />
-                    <div className="px-8 py-6 flex flex-col gap-8">
+                    <div className="px-8 py-8 flex flex-col gap-8">
                         {/* Revenue */}
-                        <div className="flex flex-col gap-4">
-                            <div>
-                                <h1 className="text-2xl font-bold tracking-tight text-slate-100">
+                        <div className="flex flex-col gap-6">
+                            <div className="flex flex-col gap-2">
+                                <Typography variant="h2">
                                     Last step — tell us your scale & goal.
-                                </h1>
-                                <p className="text-slate-400 text-sm mt-1">
+                                </Typography>
+                                <Typography variant="body" className="text-neutral-600">
                                     This helps rank providers by relevance and match the right service tier.
-                                </p>
+                                </Typography>
                             </div>
                             <div>
-                                <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">Annual Revenue</p>
+                                <Typography variant="caption" weight="semibold" className="text-neutral-500 mb-4 block">
+                                    ANNUAL REVENUE
+                                </Typography>
                                 <RangeSelector
                                     bands={REVENUE_BANDS}
                                     value={profile.revenueBand}
@@ -62,8 +65,10 @@ export function WizardComplexityStep() {
                         </div>
 
                         {/* Intent */}
-                        <div className="border-t border-slate-800 pt-6">
-                            <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">What do you need right now?</p>
+                        <div className="border-t border-neutral-200 pt-8">
+                            <Typography variant="caption" weight="semibold" className="text-neutral-500 mb-4 block">
+                                WHAT DO YOU NEED RIGHT NOW?
+                            </Typography>
                             <SingleSelectCardGroup
                                 options={INTENTS}
                                 value={profile.intent}
@@ -72,22 +77,27 @@ export function WizardComplexityStep() {
                         </div>
 
                         {/* Urgency */}
-                        <div className="border-t border-slate-800 pt-6">
-                            <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-3">How urgent is this?</p>
-                            <div className="flex flex-wrap gap-2">
-                                {URGENCIES.map(u => (
-                                    <button
-                                        key={u.value}
-                                        onClick={() => dispatch({ type: "SET_URGENCY", payload: u.value as "today" | "week" | "month" | "researching" })}
-                                        className={`px-4 py-2 rounded-full border text-sm font-medium transition-all ${
-                                            profile.urgency === u.value
-                                                ? "bg-[#137fec] border-[#137fec] text-white"
-                                                : "border-slate-700 text-slate-400 hover:border-slate-600"
-                                        }`}
-                                    >
-                                        {u.label}
-                                    </button>
-                                ))}
+                        <div className="border-t border-neutral-200 pt-8">
+                            <Typography variant="caption" weight="semibold" className="text-neutral-500 mb-4 block">
+                                HOW URGENT IS THIS?
+                            </Typography>
+                            <div className="flex flex-wrap gap-3">
+                                {URGENCIES.map(u => {
+                                    const isSelected = profile.urgency === u.value;
+                                    return (
+                                        <button
+                                            key={u.value}
+                                            onClick={() => dispatch({ type: "SET_URGENCY", payload: u.value as "today" | "week" | "month" | "researching" })}
+                                            className={`px-5 py-2.5 rounded-full border text-sm font-medium transition-all ${
+                                                isSelected
+                                                    ? "bg-primary-600 border-primary-600 text-white shadow-sm ring-2 ring-primary-100 ring-offset-1"
+                                                    : "border-neutral-200 text-neutral-600 hover:border-primary-300 hover:bg-neutral-50"
+                                            }`}
+                                        >
+                                            {u.label}
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </div>
                     </div>

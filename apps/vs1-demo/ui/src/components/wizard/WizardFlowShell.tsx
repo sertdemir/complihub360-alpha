@@ -5,6 +5,8 @@ import { WizardHeader } from "../../components/wizard/WizardHeader";
 import { WizardStepper } from "../../components/wizard/WizardStepper";
 import { WizardFooter } from "../../components/wizard/WizardFooter";
 import { WizardReviewPanel } from "../../components/wizard/WizardReviewPanel";
+import { Typography } from "../ui/Typography";
+import { Button } from "../ui/Button";
 
 interface FlowStep {
     label: string;
@@ -39,27 +41,29 @@ export function WizardFlowShell({
     const totalSteps = steps.length;
 
     return (
-        <div className="bg-[#0b1117] min-h-screen flex flex-col text-slate-100 font-['Inter',sans-serif]">
+        <div className="bg-neutral-50 min-h-screen flex flex-col text-neutral-900">
             <WizardHeader />
             <main className="flex-1 flex flex-col items-center justify-center px-4 py-10">
-                <div className="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden">
+                <div className="w-full max-w-3xl bg-white border border-neutral-200 rounded-2xl shadow-lg ring-1 ring-black/5 overflow-hidden">
                     <WizardStepper
                         currentStep={Math.min(currentStep + 1, totalSteps + 1)}
                         totalSteps={totalSteps + 1}
                         stepLabel={isReviewStep ? "Review" : steps[currentStep]?.label ?? ""}
                     />
-                    <div className="px-8 py-6 flex flex-col gap-6">
+                    <div className="px-8 py-8 flex flex-col gap-6">
                         {!isReviewStep && (
                             <>
                                 {(title || subtitle) && (
-                                    <div>
+                                    <div className="flex flex-col gap-2">
                                         {title && (
-                                            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-100">
+                                            <Typography variant="h2">
                                                 {title}
-                                            </h1>
+                                            </Typography>
                                         )}
                                         {subtitle && (
-                                            <p className="text-slate-400 text-sm mt-2">{subtitle}</p>
+                                            <Typography variant="body" className="text-neutral-600">
+                                                {subtitle}
+                                            </Typography>
                                         )}
                                     </div>
                                 )}
@@ -69,12 +73,12 @@ export function WizardFlowShell({
                         {isReviewStep && (
                             <>
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-[#137fec]/10 border border-[#137fec]/30 flex items-center justify-center shrink-0">
-                                        <span className="material-symbols-outlined text-[#137fec] text-xl">checklist</span>
+                                    <div className="w-10 h-10 rounded-full bg-primary-50 border border-primary-200 flex items-center justify-center shrink-0">
+                                        <span className="material-symbols-outlined text-primary-600 text-xl">checklist</span>
                                     </div>
-                                    <div>
-                                        <h1 className="text-xl font-bold text-slate-100">Confirm your answers</h1>
-                                        <p className="text-slate-400 text-xs">Review all details before we generate your results.</p>
+                                    <div className="flex flex-col gap-1">
+                                        <Typography variant="h3">Confirm your answers</Typography>
+                                        <Typography variant="ui-small" className="text-neutral-600">Review all details before we generate your results.</Typography>
                                     </div>
                                 </div>
                                 <WizardReviewPanel
@@ -94,11 +98,11 @@ export function WizardFlowShell({
                         />
                     )}
                     {isReviewStep && (
-                        <div className="px-8 py-4 border-t border-slate-800 bg-slate-900/50">
-                            <button onClick={onBack} className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-200 transition-colors">
+                        <div className="px-8 py-4 border-t border-neutral-200 bg-neutral-50">
+                            <Button variant="ghost" onClick={onBack} className="gap-2">
                                 <span className="material-symbols-outlined text-base">arrow_back</span>
                                 Back
-                            </button>
+                            </Button>
                         </div>
                     )}
                 </div>
