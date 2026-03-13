@@ -87,7 +87,7 @@ export default {
                 'h3': ['1.25rem', { lineHeight: '1.2' }],     // 20px
                 'body': ['1rem', { lineHeight: '1.6' }],      // 16px - Refined for readability
                 'ui-small': ['0.875rem', { lineHeight: '1.4' }], // 14px - Refined for UI
-                'caption': ['0.75rem', { letterSpacing: '0.04em', lineHeight: '1.4' }], // 12px
+                'caption': ['0.875rem', { letterSpacing: '0.04em', lineHeight: '1.4' }], // 14px - Enforced minimum size for readability
             },
             spacing: {
                 '1': '4px',

@@ -15,9 +15,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const baseClasses = 'inline-flex items-center justify-center font-sans font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none rounded-md';
     
     const sizeClasses: Record<ButtonSize, string> = {
-      sm: 'h-8 px-3 text-ui-small', // 32px height
-      md: 'h-10 px-4 text-body', // 40px height
-      lg: 'h-12 px-6 text-body', // 48px height
+      sm: 'h-8 px-3 text-body', // 32px height, 16px text per guidelines
+      md: 'h-10 px-4 text-body', // 40px height, 16px text
+      lg: 'h-12 px-6 text-body', // 48px height, 16px text
     };
 
     const variantClasses: Record<ButtonVariant, string> = {
