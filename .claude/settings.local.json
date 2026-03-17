@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__paper__get_basic_info",
+      "mcp__paper__write_html",
+      "mcp__paper__finish_working_on_nodes",
+      "Bash(find /Users/salurdesign/Documents/UX/CompliHub360/plattform/complihub360-alpha/apps -name \"Paper*\" -o -name \"paper*\" 2>/dev/null | head -20)",
+      "Bash(grep -r \"Paper\" /Users/salurdesign/Documents/UX/CompliHub360/plattform/complihub360-alpha --include=\"*.tsx\" --include=\"*.ts\" --include=\"*.json\" --exclude-dir=node_modules 2>/dev/null | grep -v \"paperclip\" | grep -v \"node_modules\" | head -20)",
+      "Bash(grep -r \"Paper\\\\|paper\" /Users/salurdesign/Documents/UX/CompliHub360/plattform/complihub360-alpha/*.md /Users/salurdesign/Documents/UX/CompliHub360/plattform/complihub360-alpha/apps/*/README.md 2>/dev/null | head -20)",
+      "Bash(grep -r \"\\\\\"name\\\\\":\" /Users/salurdesign/Documents/UX/CompliHub360/plattform/complihub360-alpha/apps/*/package.json 2>/dev/null | grep -v node_modules)",
+      "Bash(cd /Users/salurdesign/Documents/UX/CompliHub360/plattform/complihub360-alpha/apps/vs1-demo/ui && npx tsc --noEmit 2>&1 | head -50)",
+      "Bash(npx vite:*)",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s --max-time 5 -X POST http://127.0.0.1:29979/mcp \\\\\n  -H \"Content-Type: application/json\" \\\\\n  -H \"Accept: application/json, text/event-stream\" \\\\\n  -d '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{},\"clientInfo\":{\"name\":\"test\",\"version\":\"1.0\"}}}' 2>&1)",
+      "Bash(SESSION_ID=\"d19ef8a8-2a99-421c-b1f0-6c431d39b8a0\"\n\ncurl -s --max-time 10 -X POST http://127.0.0.1:29979/mcp \\\\\n  -H \"Content-Type: application/json\" \\\\\n  -H \"Accept: application/json, text/event-stream\" \\\\\n  -H \"mcp-session-id: $SESSION_ID\" \\\\\n  -d '{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"tools/call\",\"params\":{\"name\":\"get_basic_info\",\"arguments\":{}}}' 2>&1 | \\\\\n  python3 -c \"\nimport sys, json\nraw = sys.stdin.read\\(\\)\nfor line in raw.split\\('\\\\n'\\):\n    if line.startswith\\('data: '\\):\n        try:\n            obj = json.loads\\(line[6:]\\)\n            result = obj.get\\('result',{}\\)\n            content = result.get\\('content',[]\\)\n            for c in content:\n                print\\(c.get\\('text',''\\)\\)\n        except: pass\n\")",
+      "Bash(SESSION_ID=\"d19ef8a8-2a99-421c-b1f0-6c431d39b8a0\"\n\ncurl -s --max-time 15 -X POST http://127.0.0.1:29979/mcp \\\\\n  -H \"Content-Type: application/json\" \\\\\n  -H \"Accept: application/json, text/event-stream\" \\\\\n  -H \"mcp-session-id: $SESSION_ID\" \\\\\n  -d '{\"jsonrpc\":\"2.0\",\"id\":4,\"method\":\"tools/call\",\"params\":{\"name\":\"get_font_family_info\",\"arguments\":{\"familyNames\":[\"IBM Plex Sans\",\"IBM Plex Serif\"]}}}' 2>&1 | \\\\\n  python3 -c \"\nimport sys, json\nraw = sys.stdin.read\\(\\)\nfor line in raw.split\\('\\\\n'\\):\n    if line.startswith\\('data: '\\):\n        try:\n            obj = json.loads\\(line[6:]\\)\n            content = obj.get\\('result',{}\\).get\\('content',[]\\)\n            for c in content: print\\(c.get\\('text',''\\)\\)\n        except: pass\n\")",
+      "Bash(npx tsc:*)",
+      "Bash(npm run:*)",
+      "mcp__paper__get_screenshot",
+      "mcp__paper__get_tree_summary",
+      "mcp__paper__get_jsx",
+      "Bash(python3:*)"
+    ]
+  }
+}
