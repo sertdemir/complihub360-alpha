@@ -31,7 +31,9 @@ import { Button } from '../components/ui/Button';
 import { Card, CardContent } from '../components/ui/Card';
 import { Typography } from '../components/ui/Typography';
 import { Input } from '../components/ui/Input';
-
+import { HeroSection } from '../components/layout/HeroSection';
+import { RiskSnapshotTeaser } from '../components/feedback/RiskSnapshotTeaser';
+import { ComplianceStepper } from '../components/feedback/ComplianceStepper';
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface NavLink {
@@ -1191,11 +1193,12 @@ export function LandingPage() {
     <div className="bg-background min-h-screen flex flex-col font-sans text-neutral-900 antialiased">
       <LandingNav />
       <main>
-        <HeroZone />
+        <HeroSection />
+        <RiskSnapshotTeaser />
         <SocialProofStrip />
         <UspZone />
         <ServicesZone />
-        <AiEngineZone />
+        <ComplianceStepper />
         <ValueProgressionZone />
         <TestimonialsZone />
         <DossierExportZone />

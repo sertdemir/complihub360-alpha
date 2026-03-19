@@ -7,64 +7,65 @@ export default {
         extend: {
             colors: {
                 primary: {
-                    50: '#E6F1F1',
-                    100: '#BFE0E0',
-                    200: '#99CECE',
-                    300: '#73BDBD',
-                    400: '#4DABAB',
-                    500: '#097070', // Petrol - Base Brand Primary
-                    600: '#075C5C',
-                    700: '#054848',
-                    800: '#043333',
-                    900: '#021F1F',
-                    950: '#010F0F',
+                    50: '#E8F5E9', // Pastel Green Surface
+                    100: '#C8E6C9',
+                    200: '#A5D6A7',
+                    300: '#81C784',
+                    400: '#66BB6A',
+                    500: '#004D40', // Deep Forest Green - Base Brand Primary
+                    600: '#003E33',
+                    700: '#002E26',
+                    800: '#001F1A',
+                    900: '#000F0D',
+                    950: '#000504',
                 },
                 accent: {
-                    50: '#F7F0D6',
-                    100: '#F1E8CC',
-                    200: '#EBDFA3',
-                    300: '#E4D57A',
-                    400: '#DCCC51',
-                    500: '#D3B454', // Gold - Base Accent
-                    600: '#B89B3E',
-                    700: '#9C8434',
-                    800: '#7D6827',
-                    900: '#5F4B19',
-                    950: '#3E300E',
+                    50: '#FDF8E6',
+                    100: '#FBEBBA',
+                    200: '#F8D882',
+                    300: '#F4C44A',
+                    400: '#E6A514',
+                    500: '#D4AF37', // Gold - Base Accent
+                    600: '#BCA033',
+                    700: '#8E7321',
+                    800: '#69551A',
+                    900: '#4D3E14',
+                    950: '#2F260A',
                 },
                 neutral: {
                     50: '#FAFAFA', 
                     100: '#F4F4F5',
-                    200: '#E2DADA', // Surface Muted
+                    200: '#E5E7EB', // Standard Light Mode border
                     300: '#D4D4D8',
                     400: '#A1A1AA',
                     500: '#71717A',
                     600: '#5F5A5A', // Muted Text
                     700: '#3F3F46',
                     800: '#27272A',
-                    900: '#2B2B2B', // Dark Text / Headings
+                    900: '#0F172A', // Dark Slate Header
                     950: '#18181B',
                 },
+                'brand-surface': '#E8F5E9',
                 'warm-grey': '#EFE8E8', // Premium Neutral
                 'soft-blue': '#C3DDDC', // Data / Structure Background
                 success: {
-                    bg: '#E6F4F1',
-                    500: '#3C8C7A',
-                    700: '#2B6658',
+                    bg: '#D1FAE5',
+                    500: '#10B981', // Emerald
+                    700: '#047857',
                 },
                 warning: {
-                    bg: '#F7F0D6',
-                    500: '#C59E38',
-                    700: '#8B6D21',
+                    bg: '#FEF3C7',
+                    500: '#F59E0B', // Amber
+                    700: '#B45309',
                 },
                 error: {
-                    bg: '#F7E6E6',
-                    500: '#B55353',
-                    700: '#8C3E3E',
+                    bg: '#FEE2E2',
+                    500: '#EF4444', // Rose
+                    700: '#B91C1C',
                 },
-                background: '#FAFAFA',
+                background: '#FFFFFF',
                 surface: '#FFFFFF',
-                border: '#D4D4D8', 
+                border: '#E5E7EB', 
             },
             screens: {
                 'sm': '320px',    // Mobile S
@@ -77,7 +78,7 @@ export default {
                 'desktop-xl': '1920px',
             },
             fontFamily: {
-                sans: ['"IBM Plex Sans"', 'sans-serif'],
+                sans: ['"Inter"', 'sans-serif'],
                 serif: ['"IBM Plex Serif"', 'serif'],
             },
             fontSize: {
