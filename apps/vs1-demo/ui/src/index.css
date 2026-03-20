@@ -8,6 +8,41 @@
   :root {
     --fluid-h1: clamp(1.75rem, 2.5vw, 2.25rem);
     --fluid-body: clamp(0.9375rem, 1.2vw, 1rem);
+
+    /* shadcn CSS Variables — mapped to CompliHub360 brand tokens */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 168 100% 15%;       /* #004D40 Deep Forest Green */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+    --accent: 43 64% 52%;          /* #D4AF37 Gold */
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 168 100% 15%;          /* matches primary */
+    --radius: 0.5rem;
+    --chart-1: 168 100% 15%;
+    --chart-2: 43 64% 52%;
+    --chart-3: 160 84% 39%;
+    --chart-4: 38 92% 50%;
+    --chart-5: 0 84% 60%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 168 100% 15%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 168 100% 15%;
   }
 
   body {
