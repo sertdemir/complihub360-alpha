@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   type LucideIcon,
   Sparkles,
@@ -17,29 +18,24 @@ import {
   Database,
   Globe,
   FileText,
-  AlertTriangle,
   Clock,
-  Users,
-  Download,
+  LayoutDashboard,
   Mail,
   Check,
   CircleDot,
-  Link,
-  AlertCircle,
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
-import { Card, CardContent } from '../components/ui/Card';
+import { Card } from '../components/ui/Card';
 import { Typography } from '../components/ui/Typography';
 import { Input } from '../components/ui/Input';
 import { HeroSection } from '../components/layout/HeroSection';
 import { RiskSnapshotTeaser } from '../components/feedback/RiskSnapshotTeaser';
 import { ComplianceStepper } from '../components/feedback/ComplianceStepper';
+import { ServicesAccordion } from '../components/layout/ServicesAccordion';
+import { BackgroundDepth } from '../components/layout/BackgroundDepth';
+import { RiskResolutionZone } from '../components/feedback/RiskResolutionZone';
+import { TestimonialTicker } from '../components/feedback/TestimonialTicker';
 // ─── Types ────────────────────────────────────────────────────────────────────
-
-interface NavLink {
-  label: string;
-  path: string;
-}
 
 interface TrustBadge {
   icon: LucideIcon;
@@ -69,6 +65,13 @@ interface ServiceItem {
   iconBgCls: string;
 }
 
+interface AiStat {
+  label: string;
+  numericEnd?: number;
+  suffix?: string;
+  staticValue?: string;
+}
+
 interface AiStep {
   step: string;
   icon: LucideIcon;
@@ -77,6 +80,9 @@ interface AiStep {
   stepLabelCls: string;
   iconBgCls: string;
   cardCls: string;
+  dotActiveCls: string;
+  panelCls: string;
+  stats: AiStat[];
 }
 
 interface TierFeature {
@@ -113,10 +119,40 @@ interface GroundedSource {
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
-const NAV_LINKS: NavLink[] = [
-  { label: 'Services', path: '/services' },
-  { label: 'Countries', path: '/countries' },
-  { label: 'Advisory', path: '/advisory' },
+const HEADER_MENU = [
+  {
+    id: 'platform',
+    label: 'Platform',
+    items: [
+      { title: 'The AI Engine', desc: 'Secure data extraction & mapping', path: '/platform#engine' },
+      { title: 'Partner Matching', desc: 'From risk to local execution', path: '/platform#matching' },
+      { title: 'Global Coverage', desc: 'UK, EU, Germany & US', path: '/platform#coverage' },
+      { title: 'For Partner Firms', desc: 'Lead generation for advisors', path: '/platform#partners' },
+    ]
+  },
+  {
+    id: 'solutions',
+    label: 'Solutions',
+    items: [
+      { title: 'Founders & CEOs', desc: 'Minimise risk & scale faster', path: '/solutions#founders' },
+      { title: 'Operations Teams', desc: 'Automate daily compliance', path: '/solutions#operations' },
+      { title: 'In-House Counsel', desc: 'Cut research time by 90%', path: '/solutions#counsel' },
+    ]
+  },
+  {
+    id: 'areas',
+    label: 'Compliance Areas',
+    path: '/compliance',
+    items: []
+  },
+  {
+    id: 'resources',
+    label: 'Resources',
+    items: [
+      { title: 'Customer Stories', desc: 'See real compliance outcomes', path: '/resources#stories' },
+      { title: 'Guides & Whitepapers', desc: 'In-depth market deep-dives', path: '/resources#guides' },
+    ]
+  }
 ];
 
 const TRUST_BADGES: TrustBadge[] = [
@@ -233,24 +269,45 @@ const AI_STEPS: AiStep[] = [
     stepLabelCls: 'text-primary-400',
     iconBgCls: 'bg-primary-100 text-primary-600',
     cardCls: 'bg-primary-50 border-primary-200',
+    dotActiveCls: 'bg-primary-500 border-primary-300 ring-primary-200',
+    panelCls: 'bg-primary-50 border-primary-200',
+    stats: [
+      { label: 'Entity fields extracted', numericEnd: 12 },
+      { label: 'Markets detected', numericEnd: 3 },
+      { label: 'Processing time', staticValue: '< 2 s' },
+    ],
   },
   {
     step: '02',
     icon: Lock,
-    title: 'PII Redaction Pipeline',
+    title: 'Live Validations',
     body: 'Local AI models strip all Personally Identifiable Information — names, emails, tax IDs, phone numbers — before the anonymised schema is passed to the mapping engine.',
     stepLabelCls: 'text-primary-600',
     iconBgCls: 'bg-soft-blue text-primary-700',
     cardCls: 'border border-[#97C5C4]',
+    dotActiveCls: 'bg-[#97C5C4] border-[#97C5C4]/60 ring-[#97C5C4]/30',
+    panelCls: 'bg-white border-[#97C5C4]',
+    stats: [
+      { label: 'Live validations run', numericEnd: 47 },
+      { label: 'PII fields removed', numericEnd: 100, suffix: '%' },
+      { label: 'Bytes stored on server', numericEnd: 0 },
+    ],
   },
   {
     step: '03',
     icon: ShieldCheck,
-    title: 'Regulatory Mapping',
-    body: 'The engine cross-references your anonymised profile with live country-specific risk matrices, obligation thresholds, and deadline calendars to produce a structured dossier.',
+    title: 'Dossier Generation & Matching',
+    body: 'The engine cross-references your anonymised profile with live country-specific risk matrices and produces a structured dossier matched to vetted local experts.',
     stepLabelCls: 'text-success-700',
     iconBgCls: 'bg-success-bg text-success-500',
     cardCls: 'bg-success-bg border-success-500/30',
+    dotActiveCls: 'bg-success-500 border-success-300 ring-success-200',
+    panelCls: 'bg-success-bg border-success-500/30',
+    stats: [
+      { label: 'Dossier pages generated', numericEnd: 3 },
+      { label: 'Expert match accuracy', numericEnd: 98, suffix: '%' },
+      { label: 'Average match time', staticValue: '< 24 h' },
+    ],
   },
 ];
 
@@ -341,14 +398,24 @@ const GROUNDED_SOURCES: GroundedSource[] = [
 
 function LandingNav() {
   const navigate = useNavigate();
-  const location = useLocation();
+  const [activeMenu, setActiveMenu] = useState<string | null>(null);
+
+  // Close menu on scroll
+  useEffect(() => {
+    const handleScroll = () => setActiveMenu(null);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-neutral-200 bg-surface/90 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-6">
+    <header 
+      className="sticky top-0 z-50 w-full border-b border-neutral-200 bg-surface/90 backdrop-blur-md"
+      onMouseLeave={() => setActiveMenu(null)}
+    >
+      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-6 relative">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 shrink-0"
+          className="flex items-center gap-2 shrink-0 z-10"
           aria-label="CompliHub360 Home"
         >
           <div className="w-6 h-6 bg-primary-500 rounded-sm flex items-center justify-center">
@@ -359,25 +426,31 @@ function LandingNav() {
           </span>
         </button>
 
-        <nav className="hidden tablet:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
-          {NAV_LINKS.map((link) => (
-            <button
-              key={link.path}
-              onClick={() => navigate(link.path)}
-              className={`px-4 py-2 rounded-md text-ui-small font-medium transition-colors ${
-                location.pathname === link.path
-                  ? 'text-primary-600 bg-primary-50'
-                  : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-              }`}
+        <nav className="hidden tablet:flex items-center h-full gap-2 absolute left-1/2 -translate-x-1/2">
+          {HEADER_MENU.map((menu) => (
+            <div 
+              key={menu.id} 
+              className="h-full flex items-center"
+              onMouseEnter={() => menu.items.length > 0 ? setActiveMenu(menu.id) : setActiveMenu(null)}
             >
-              {link.label}
-            </button>
+              <button
+                onClick={() => menu.path ? navigate(menu.path) : undefined}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-ui-small font-semibold transition-colors ${
+                  activeMenu === menu.id
+                    ? 'text-primary-700 bg-primary-50'
+                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                }`}
+              >
+                {menu.label}
+                {menu.items.length > 0 && <ChevronDown size={14} className={`transition-transform duration-200 ${activeMenu === menu.id ? 'rotate-180 text-primary-600' : 'text-neutral-400'}`} />}
+              </button>
+            </div>
           ))}
         </nav>
 
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-3 shrink-0 z-10">
           <button
-            className="hidden tablet:inline-flex text-neutral-600 hover:text-neutral-900 text-ui-small font-medium px-4 py-2 rounded-md hover:bg-neutral-100 transition-colors"
+            className="hidden tablet:inline-flex text-neutral-600 hover:text-neutral-900 text-ui-small font-semibold px-4 py-2 rounded-md hover:bg-neutral-100 transition-colors"
             onClick={() => navigate('/login')}
           >
             Log in
@@ -387,6 +460,46 @@ function LandingNav() {
           </Button>
         </div>
       </div>
+
+      <AnimatePresence>
+        {activeMenu && (
+          <motion.div
+            initial={{ opacity: 0, y: -5, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, y: -5, height: 0 }}
+            transition={{ duration: 0.15, ease: 'easeInOut' }}
+            className="absolute top-16 left-0 w-full bg-white border-b border-neutral-200 shadow-xl overflow-hidden pointer-events-auto"
+          >
+            <div className="max-w-7xl mx-auto px-6 py-8">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+                {HEADER_MENU.find(m => m.id === activeMenu)?.items.map((item) => (
+                  <button
+                    key={item.title}
+                    onClick={() => {
+                      navigate(item.path);
+                      setActiveMenu(null);
+                    }}
+                    className="text-left group flex items-start gap-4 p-3 -m-3 rounded-xl hover:bg-neutral-50 transition-colors"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-primary-50 flex items-center justify-center shrink-0 border border-primary-100 group-hover:bg-white group-hover:border-primary-200 group-hover:shadow-sm transition-all">
+                      <LayoutDashboard size={18} className="text-primary-600" />
+                    </div>
+                    <div className="mt-0.5">
+                      <Typography variant="ui-small" weight="bold" className="text-neutral-900 flex items-center gap-1 mb-1 group-hover:text-primary-700 transition-colors">
+                        {item.title}
+                        <ArrowRight size={14} className="opacity-0 -translate-x-2 w-0 group-hover:w-auto overflow-hidden group-hover:opacity-100 group-hover:translate-x-0 transition-all text-primary-500" />
+                      </Typography>
+                      <Typography variant="caption" className="text-neutral-500 block normal-case tracking-normal">
+                        {item.desc}
+                      </Typography>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
@@ -540,45 +653,113 @@ function SocialProofStrip() {
 
 function UspZone() {
   return (
-    <section className="bg-surface py-10 desktop-s:py-12">
+    <section className="bg-transparent py-16 desktop-s:py-24 relative z-10">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-10">
+
+        {/* Header */}
+        <motion.div
+          className="text-center mb-14"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.55 }}
+        >
           <Typography variant="caption" className="text-primary-500 mb-3 block">
             Why CompliHub360?
           </Typography>
           <Typography variant="h1" weight="bold" className="text-neutral-900">
             Built different, by design
           </Typography>
+        </motion.div>
+
+        {/* Process track + cards */}
+        <div className="flex flex-col tablet:flex-row items-stretch">
+          {USP_ITEMS.reduce<React.ReactNode[]>((acc, { icon: Icon, title, body, bullets, cardCls, iconCls, bulletCls }, index) => {
+
+            acc.push(
+              <motion.div
+                key={title}
+                className={`flex-1 border rounded-xl p-7 flex flex-col ${cardCls}`}
+                initial={{ opacity: 0, y: 32 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ duration: 0.5, delay: index * 0.18 }}
+                whileHover={{ y: -3, transition: { duration: 0.2 } }}
+              >
+                {/* Step number */}
+                <motion.span
+                  className="text-[11px] font-semibold text-neutral-400 tracking-[0.18em] tabular-nums mb-3 block"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.18 + 0.25 }}
+                >
+                  {String(index + 1).padStart(2, '0')}
+                </motion.span>
+
+                {/* Icon */}
+                <motion.div
+                  className={`w-12 h-12 rounded-lg flex items-center justify-center mb-5 shrink-0 ${iconCls}`}
+                  initial={{ scale: 0.7, opacity: 0 }}
+                  whileInView={{ scale: 1, opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ type: 'spring', stiffness: 260, damping: 18, delay: index * 0.18 + 0.08 }}
+                >
+                  <Icon size={22} />
+                </motion.div>
+
+                <Typography variant="h3" weight="bold" className="text-neutral-900 mb-3">
+                  {title}
+                </Typography>
+                <Typography variant="body" className="text-neutral-600 mb-6 flex-1">
+                  {body}
+                </Typography>
+
+                <ul className="space-y-2">
+                  {bullets.map((bullet, bi) => (
+                    <motion.li
+                      key={bullet}
+                      className="flex items-center gap-2"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.3, delay: index * 0.18 + 0.38 + bi * 0.07 }}
+                    >
+                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${bulletCls}`} />
+                      <Typography variant="ui-small" className="text-neutral-700">
+                        {bullet}
+                      </Typography>
+                    </motion.li>
+                  ))}
+                </ul>
+              </motion.div>
+            );
+
+            if (index < USP_ITEMS.length - 1) {
+              acc.push(
+                <div
+                  key={`connector-${index}`}
+                  className="hidden tablet:flex flex-col items-center justify-center gap-1 px-2 shrink-0 self-center"
+                >
+                  <motion.div
+                    className="flex items-center"
+                    initial={{ opacity: 0, scaleX: 0 }}
+                    whileInView={{ opacity: 1, scaleX: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.45, delay: index * 0.18 + 0.32, ease: 'easeOut' }}
+                    style={{ transformOrigin: 'left' }}
+                  >
+                    <div className="w-5 h-px bg-neutral-300" />
+                    <ArrowRight size={13} className="text-neutral-400 -ml-0.5" />
+                  </motion.div>
+                </div>
+              );
+            }
+
+            return acc;
+          }, [])}
         </div>
 
-        <div className="grid tablet:grid-cols-3 gap-6">
-          {USP_ITEMS.map(({ icon: Icon, title, body, bullets, cardCls, iconCls, bulletCls }) => (
-            <div
-              key={title}
-              className={`border rounded-xl p-7 flex flex-col ${cardCls}`}
-            >
-              <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-5 shrink-0 ${iconCls}`}>
-                <Icon size={22} />
-              </div>
-              <Typography variant="h3" weight="bold" className="text-neutral-900 mb-3">
-                {title}
-              </Typography>
-              <Typography variant="body" className="text-neutral-600 mb-6 flex-1">
-                {body}
-              </Typography>
-              <ul className="space-y-2">
-                {bullets.map((bullet) => (
-                  <li key={bullet} className="flex items-center gap-2">
-                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${bulletCls}`} />
-                    <Typography variant="ui-small" className="text-neutral-700">
-                      {bullet}
-                    </Typography>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
       </div>
     </section>
   );
@@ -659,11 +840,90 @@ function ServicesZone() {
 
 // ─── Zone 5: AI Engine ────────────────────────────────────────────────────────
 
+function CountUp({ target, suffix = '', duration = 1.1 }: { target: number; suffix?: string; duration?: number }) {
+  const [count, setCount] = useState(0);
+  const rafRef = useRef<number | null>(null);
+  const startRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    setCount(0);
+    startRef.current = null;
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+
+    const tick = (ts: number) => {
+      if (!startRef.current) startRef.current = ts;
+      const progress = Math.min((ts - startRef.current) / (duration * 1000), 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(eased * target));
+      if (progress < 1) rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+  }, [target, duration]);
+
+  return <>{count}{suffix}</>;
+}
+
 function AiEngineZone() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [hasStarted, setHasStarted] = useState(false);
+  const [activeStation, setActiveStation] = useState<number>(-1);
+  const [hoveredStation, setHoveredStation] = useState<number | null>(null);
+
+  const displayStation = hoveredStation !== null ? hoveredStation : activeStation;
+  const showPanel = displayStation >= 0;
+
+  // Grid-based positions: 3 equal columns → centres at 1/6, 3/6, 5/6 of container
+  const n = AI_STEPS.length;
+  const stationPct = (i: number) => ((2 * i + 1) / (2 * n)) * 100;
+  const trackStart = stationPct(0);                                          // 16.67%
+  const travelPct  = activeStation >= 0 ? stationPct(activeStation) : trackStart;
+  const fillPct    = Math.max(0, travelPct - trackStart);                    // 0 / 33.33 / 66.67%
+
+  // Start auto-cycle when section enters viewport
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setHasStarted(true); },
+      { threshold: 0.35 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Auto-cycle: -1 → 0 → 1 → 2 → 0 → ...
+  useEffect(() => {
+    if (!hasStarted || hoveredStation !== null) return;
+    timerRef.current = setTimeout(() => {
+      setActiveStation(prev => prev >= AI_STEPS.length - 1 ? 0 : prev + 1);
+    }, activeStation === -1 ? 600 : 3000);
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [hasStarted, activeStation, hoveredStation]);
+
+  const handleHoverEnter = (index: number) => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    setHoveredStation(index);
+  };
+
+  const handleHoverLeave = () => {
+    setHoveredStation(null);
+  };
+
   return (
-    <section className="bg-surface py-10 desktop-s:py-12">
+    <section ref={sectionRef} className="bg-surface py-10 desktop-s:py-12">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-10">
+
+        {/* Header */}
+        <motion.div
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.55 }}
+        >
           <Typography variant="caption" className="text-primary-500 mb-3 block">
             The AI Engine
           </Typography>
@@ -673,38 +933,140 @@ function AiEngineZone() {
           <Typography variant="body" className="text-neutral-600 max-w-xl mx-auto">
             Our privacy-first AI pipeline has three stages — each designed to maximise output quality while minimising your data exposure.
           </Typography>
+        </motion.div>
+
+        {/* Pipeline — dot row isolated in h-12 so top-1/2 = exact dot centre for every element */}
+        <div className="max-w-xl mx-auto mb-2 select-none">
+
+          {/* ── Dot row (h-12 = 48px) ── all absolute elements share top-1/2 -translate-y-1/2 */}
+          <div className="relative h-12">
+
+            {/* Base track */}
+            <div
+              className="absolute top-1/2 -translate-y-1/2 h-px bg-neutral-200 pointer-events-none"
+              style={{ left: `${trackStart}%`, right: `${100 - stationPct(n - 1)}%` }}
+            />
+
+            {/* Filled track */}
+            <motion.div
+              className="absolute top-1/2 -translate-y-1/2 h-px bg-primary-300 origin-left pointer-events-none"
+              style={{ left: `${trackStart}%` }}
+              animate={{ width: `${fillPct}%` }}
+              transition={{ duration: 0.75, ease: 'easeInOut' }}
+            />
+
+            {/* Traveling dot */}
+            <motion.div
+              className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-primary-400 shadow-sm z-30 pointer-events-none"
+              animate={{
+                left: `${travelPct}%`,
+                x: '-50%',
+                opacity: activeStation >= 0 ? 1 : 0,
+              }}
+              transition={{ duration: 0.75, ease: 'easeInOut' }}
+            />
+
+            {/* Station dots */}
+            {AI_STEPS.map(({ step, icon: Icon, dotActiveCls, iconBgCls }, index) => {
+              const isActive = displayStation === index;
+              return (
+                <div
+                  key={step}
+                  className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-20 cursor-pointer"
+                  style={{ left: `${stationPct(index)}%` }}
+                  onMouseEnter={() => handleHoverEnter(index)}
+                  onMouseLeave={handleHoverLeave}
+                >
+                  <motion.div
+                    className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-colors duration-300 ${
+                      isActive ? `${dotActiveCls} ring-4` : 'bg-white border-neutral-300'
+                    }`}
+                    animate={{ scale: isActive ? 1.12 : 1 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+                  >
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isActive ? iconBgCls : 'bg-neutral-100 text-neutral-400'}`}>
+                      <Icon size={15} />
+                    </div>
+                  </motion.div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* ── Label row — separate grid below the dot row ── */}
+          <div className="grid grid-cols-3 mt-4">
+            {AI_STEPS.map(({ step, title }, index) => {
+              const isActive = displayStation === index;
+              return (
+                <div
+                  key={step}
+                  className="flex justify-center cursor-pointer"
+                  onMouseEnter={() => handleHoverEnter(index)}
+                  onMouseLeave={handleHoverLeave}
+                >
+                  <Typography
+                    variant="ui-small"
+                    className={`text-center font-medium transition-colors duration-300 max-w-[90px] leading-tight line-clamp-2 ${isActive ? 'text-neutral-800' : 'text-neutral-400'}`}
+                  >
+                    {title}
+                  </Typography>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
-        <div className="grid desktop-s:grid-cols-3 gap-5">
-          {AI_STEPS.map(({ step, icon: Icon, title, body, stepLabelCls, iconBgCls, cardCls }, index) => (
-            <div key={step} className="relative">
-              {/* Connector */}
-              {index < AI_STEPS.length - 1 && (
-                <div className="hidden desktop-s:flex absolute -right-3 top-14 z-10 w-6 items-center justify-center">
-                  <ArrowRight size={18} className="text-neutral-300" />
-                </div>
-              )}
-              <div className={`border rounded-xl p-6 h-full flex flex-col ${cardCls}`}>
-                <div className="flex items-start gap-3 mb-5">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${iconBgCls}`}>
-                    <Icon size={18} />
-                  </div>
-                  <div>
-                    <Typography variant="caption" className={`block mb-1 normal-case tracking-normal font-semibold ${stepLabelCls}`}>
-                      Step {step}
+        {/* Content panel — px-10 = 40px horizontal padding away from outermost dots */}
+        <div className="mt-8 min-h-[160px] px-10">
+          <AnimatePresence mode="wait">
+            {showPanel && (
+              <motion.div
+                key={displayStation}
+                className={`border rounded-xl p-7 ${AI_STEPS[displayStation].panelCls}`}
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.35, ease: 'easeOut' }}
+              >
+                <div className="flex flex-col desktop-s:flex-row gap-6 desktop-s:items-start">
+                  {/* Left: label + body */}
+                  <div className="flex-1">
+                    <Typography
+                      variant="caption"
+                      className={`block mb-1 normal-case tracking-normal font-semibold ${AI_STEPS[displayStation].stepLabelCls}`}
+                    >
+                      Step {AI_STEPS[displayStation].step}
                     </Typography>
-                    <Typography variant="h3" weight="bold" className="text-neutral-900">
-                      {title}
+                    <Typography variant="h3" weight="bold" className="text-neutral-900 mb-2">
+                      {AI_STEPS[displayStation].title}
+                    </Typography>
+                    <Typography variant="ui-small" className="text-neutral-600 leading-relaxed max-w-md">
+                      {AI_STEPS[displayStation].body}
                     </Typography>
                   </div>
+
+                  {/* Right: stats */}
+                  <div className="flex gap-8 shrink-0 desktop-s:pt-1">
+                    {AI_STEPS[displayStation].stats.map((stat) => (
+                      <div key={stat.label} className="flex flex-col items-center text-center">
+                        <span className="text-3xl font-bold text-neutral-900 tabular-nums leading-none mb-1">
+                          {stat.staticValue
+                            ? stat.staticValue
+                            : <CountUp target={stat.numericEnd ?? 0} suffix={stat.suffix ?? ''} />
+                          }
+                        </span>
+                        <Typography variant="ui-small" className="text-neutral-500 max-w-[80px] leading-tight">
+                          {stat.label}
+                        </Typography>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <Typography variant="ui-small" className="text-neutral-600 leading-relaxed">
-                  {body}
-                </Typography>
-              </div>
-            </div>
-          ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
+
       </div>
     </section>
   );
@@ -716,7 +1078,7 @@ function ValueProgressionZone() {
   const navigate = useNavigate();
 
   return (
-    <section className="bg-background py-10 desktop-s:py-12">
+    <section className="bg-transparent py-16 desktop-s:py-24 relative z-10">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-10">
           <Typography variant="caption" className="text-primary-500 mb-3 block">
@@ -815,250 +1177,7 @@ function ValueProgressionZone() {
   );
 }
 
-// ─── Zone 7: Testimonials ─────────────────────────────────────────────────────
-
-function TestimonialsZone() {
-  return (
-    <section className="bg-neutral-50 py-10 desktop-s:py-12">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-10">
-          <Typography variant="caption" className="text-primary-500 mb-3 block">
-            Real Results
-          </Typography>
-          <Typography variant="h1" weight="bold" className="text-neutral-900">
-            Trusted by founders and<br className="hidden tablet:block" /> operations teams
-          </Typography>
-        </div>
-
-        <div className="grid tablet:grid-cols-2 gap-6 max-w-4xl mx-auto">
-          {TESTIMONIALS.map(({ persona, name, role, quote, result, resultIcon: ResultIcon, resultCls, tag }) => (
-            <Card key={name} className="p-7 flex flex-col">
-              <div className="flex items-center justify-between mb-6">
-                <Typography variant="caption" className="text-neutral-400 block normal-case tracking-normal">
-                  {persona}
-                </Typography>
-                <span className={`inline-flex items-center gap-1.5 text-caption font-bold px-3 py-1 rounded-md normal-case tracking-normal ${resultCls}`}>
-                  <ResultIcon size={13} />
-                  {result}
-                </span>
-              </div>
-
-              <blockquote className="relative text-body text-neutral-700 leading-relaxed flex-1 pl-5 mb-7">
-                <span className="absolute left-0 -top-1 text-4xl text-neutral-200 font-serif leading-none select-none">"</span>
-                {quote}
-              </blockquote>
-
-              <div className="flex items-center gap-3 pt-5 border-t border-neutral-100">
-                <div className="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center shrink-0">
-                  <Users size={18} className="text-primary-500" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <Typography variant="ui-small" weight="bold" className="text-neutral-900">
-                    {name}
-                  </Typography>
-                  <Typography variant="caption" className="text-neutral-500 block normal-case tracking-normal truncate">
-                    {role}
-                  </Typography>
-                </div>
-                <span className="hidden desktop-s:inline-block text-caption text-neutral-400 bg-neutral-50 border border-neutral-200 px-2 py-1 rounded-md shrink-0 normal-case tracking-normal whitespace-nowrap">
-                  {tag}
-                </span>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── Zone 8: Dossier-Export & Lead Funnel ────────────────────────────────────
-
-function DossierExportZone() {
-  const navigate = useNavigate();
-
-  const findings = [
-    { label: 'VAT Registration threshold exceeded', detail: 'Mandatory registration — HMRC threshold £85,000', level: 'error' as const },
-    { label: 'EPR Packaging Producer Obligation', detail: 'PRN registration required by Q1 2025', level: 'warning' as const },
-    { label: 'MTD for VAT — Digital Records Gap', detail: 'Phase 2 compliance gap in current workflow', level: 'warning' as const },
-    { label: 'UK GDPR — Privacy Policy', detail: 'Meets baseline UK GDPR requirements', level: 'success' as const },
-  ];
-
-  const findingBadge: Record<'error' | 'warning' | 'success', { dot: string; badge: string; label: string }> = {
-    error:   { dot: 'bg-error-500',   badge: 'bg-error-bg text-error-500',     label: 'Action Req.' },
-    warning: { dot: 'bg-warning-500', badge: 'bg-warning-bg text-warning-500', label: 'Review' },
-    success: { dot: 'bg-success-500', badge: 'bg-success-bg text-success-500', label: 'Compliant' },
-  };
-
-  return (
-    <section className="bg-primary-900 py-10 desktop-s:py-12">
-      <div className="max-w-7xl mx-auto px-6 grid desktop-s:grid-cols-2 gap-10 items-start">
-
-        {/* Left — Risk Snapshot */}
-        <div>
-          <Typography variant="caption" className="text-primary-300 mb-3 block normal-case tracking-normal">
-            Sample Output — Page 1 of 3
-          </Typography>
-          <Typography variant="h1" weight="bold" className="text-white mb-3">
-            UK Compliance<br />Risk Snapshot
-          </Typography>
-          <Typography variant="body" className="text-primary-300 mb-7">
-            You have your risk profile. Now fix it. Here is what a typical UK expansion dossier looks like — and the three paths to resolving it.
-          </Typography>
-
-          {/* Risk level bar */}
-          <div className="bg-primary-800 border border-primary-700 rounded-xl p-5 mb-4">
-            <div className="flex items-center justify-between mb-3">
-              <Typography variant="caption" className="text-primary-300 block normal-case tracking-normal">
-                Overall Risk Level
-              </Typography>
-              <span className="flex items-center gap-2 font-bold text-error-500">
-                <AlertTriangle size={18} />
-                <span className="text-h3 leading-none">High</span>
-              </span>
-            </div>
-            <div className="w-full h-1.5 bg-primary-700 rounded-full overflow-hidden">
-              <div className="h-full w-3/4 bg-error-500 rounded-full" />
-            </div>
-            <div className="flex justify-between mt-2">
-              {['Low', 'Medium', 'High', 'Critical'].map((l) => (
-                <Typography key={l} variant="caption" className={`block normal-case tracking-normal ${l === 'High' ? 'text-error-500 font-bold' : 'text-primary-400'}`}>
-                  {l}
-                </Typography>
-              ))}
-            </div>
-          </div>
-
-          {/* Key findings */}
-          <div className="bg-primary-800 border border-primary-700 rounded-xl p-5">
-            <Typography variant="ui-small" weight="semibold" className="text-white mb-4 block">
-              Key Findings
-            </Typography>
-            <ul className="divide-y divide-primary-700">
-              {findings.map(({ label, detail, level }) => {
-                const { dot, badge, label: badgeLabel } = findingBadge[level];
-                return (
-                  <li key={label} className="flex items-start gap-3 py-3 first:pt-0 last:pb-0">
-                    <span className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${dot}`} />
-                    <div className="flex-1 min-w-0">
-                      <Typography variant="ui-small" weight="semibold" className="text-white block">
-                        {label}
-                      </Typography>
-                      <Typography variant="caption" className="text-primary-300 block normal-case tracking-normal">
-                        {detail}
-                      </Typography>
-                    </div>
-                    <span className={`text-caption font-bold px-2 py-0.5 rounded-md shrink-0 normal-case tracking-normal ${badge}`}>
-                      {badgeLabel}
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        </div>
-
-        {/* Right — Sources + Lead Funnel */}
-        <div className="flex flex-col gap-4">
-          {/* Grounded Sources */}
-          <div className="bg-primary-800 border border-primary-700 rounded-xl p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <Link size={16} className="text-primary-300" />
-              <Typography variant="ui-small" weight="semibold" className="text-white block">
-                Grounded Sources
-              </Typography>
-            </div>
-            <ul className="space-y-2">
-              {GROUNDED_SOURCES.map(({ title, ref, type }) => (
-                <li key={ref} className="flex items-start gap-3 bg-primary-700/50 rounded-md p-3">
-                  <span className="w-1 h-1 rounded-full bg-primary-300 mt-2 shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <Typography variant="ui-small" weight="semibold" className="text-white truncate block">
-                      {title}
-                    </Typography>
-                    <Typography variant="caption" className="text-primary-300 block normal-case tracking-normal">
-                      {ref}
-                    </Typography>
-                  </div>
-                  <span className="text-caption text-primary-400 bg-primary-700 px-2 py-0.5 rounded-md shrink-0 normal-case tracking-normal">
-                    {type}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Export CTA card */}
-          <div className="bg-surface rounded-xl p-6 shadow-md">
-            <Typography variant="h3" weight="bold" className="text-neutral-900 mb-1">
-              You have your risk profile.
-            </Typography>
-            <Typography variant="ui-small" className="text-neutral-600 mb-5 block">
-              Choose how you want to resolve it.
-            </Typography>
-
-            {/* Page previews */}
-            <div className="grid grid-cols-3 gap-2 mb-5">
-              {[
-                { page: 'Page 1', label: 'Risk Snapshot', locked: false },
-                { page: 'Page 2', label: 'Action Plan', locked: true },
-                { page: 'Page 3', label: 'Expert Match', locked: true },
-              ].map(({ page, label, locked }) => (
-                <div
-                  key={page}
-                  className={`rounded-md border p-3 text-center ${locked ? 'bg-neutral-50 border-neutral-200' : 'bg-primary-50 border-primary-200'}`}
-                >
-                  {locked ? (
-                    <Lock size={20} className="text-neutral-300 mx-auto mb-1" />
-                  ) : (
-                    <FileText size={20} className="text-primary-500 mx-auto mb-1" />
-                  )}
-                  <Typography variant="caption" className={`block font-bold normal-case tracking-normal ${locked ? 'text-neutral-400' : 'text-neutral-700'}`}>
-                    {page}
-                  </Typography>
-                  <Typography variant="caption" className={`block normal-case tracking-normal ${locked ? 'text-neutral-400' : 'text-neutral-500'}`}>
-                    {label}
-                  </Typography>
-                </div>
-              ))}
-            </div>
-
-            {/* CTA 1 — Guest */}
-            <Button variant="secondary" fullWidth className="mb-3 justify-center gap-2">
-              <Download size={16} />
-              Export PDF — Guest Preview
-            </Button>
-
-            {/* Divider */}
-            <div className="flex items-center gap-3 mb-3">
-              <div className="flex-1 h-px bg-neutral-200" />
-              <Typography variant="caption" className="text-neutral-400 shrink-0 normal-case tracking-normal">or unlock more</Typography>
-              <div className="flex-1 h-px bg-neutral-200" />
-            </div>
-
-            {/* CTA 2 — Register */}
-            <Button variant="primary" fullWidth className="mb-3 justify-center" onClick={() => navigate('/register')}>
-              Create Profile — Unlock Action Plan
-            </Button>
-
-            {/* CTA 3 — Expert */}
-            <button
-              onClick={() => navigate('/register?intent=expert')}
-              className="w-full h-10 bg-accent-500 hover:bg-accent-600 text-neutral-900 font-bold text-ui-small rounded-md transition-colors flex items-center justify-center gap-2 mb-4"
-            >
-              Request Expert Support
-              <ArrowRight size={15} />
-            </button>
-
-            <Typography variant="caption" className="text-neutral-400 text-center block normal-case tracking-normal leading-relaxed">
-              Expert Support connects you with a verified local tax or legal specialist who executes the action plan on your behalf.
-            </Typography>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
+// ─── Legacy Zones Removed ──────────────────────────────────────────────────────
 
 // ─── Landing Footer ───────────────────────────────────────────────────────────
 
@@ -1186,22 +1305,23 @@ function LandingFooter() {
   );
 }
 
-// ─── Main Export ──────────────────────────────────────────────────────────────
+import { TrustedLogosTicker } from '../components/layout/TrustedLogosTicker';
 
 export function LandingPage() {
   return (
-    <div className="bg-background min-h-screen flex flex-col font-sans text-neutral-900 antialiased">
+    <div className="bg-transparent min-h-screen flex flex-col font-sans text-neutral-900 antialiased relative z-0">
+      <BackgroundDepth />
       <LandingNav />
       <main>
         <HeroSection />
+        <TrustedLogosTicker />
         <RiskSnapshotTeaser />
-        <SocialProofStrip />
         <UspZone />
-        <ServicesZone />
+        <AiEngineZone />
+        <ServicesAccordion />
         <ComplianceStepper />
-        <ValueProgressionZone />
-        <TestimonialsZone />
-        <DossierExportZone />
+        <RiskResolutionZone />
+        <TestimonialTicker />
       </main>
       <LandingFooter />
     </div>

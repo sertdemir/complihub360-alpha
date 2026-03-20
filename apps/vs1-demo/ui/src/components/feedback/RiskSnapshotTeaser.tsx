@@ -1,70 +1,158 @@
-import { useState } from 'react';
-import { AlertCircle, ShieldAlert } from 'lucide-react';
+import { BarChart3, ShieldCheck, Eye, EyeOff, FileText, Database, Sparkles, TrendingUp } from 'lucide-react';
 import { Typography } from '../ui/Typography';
 
+export function animateRiskSnapshot() { } // Keeping exports clean
+
 export function RiskSnapshotTeaser() {
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
-    <section className="bg-background py-6">
+    <section className="bg-primary-50/50 border-y border-primary-100 py-16 desktop-s:py-24 relative z-10">
       <div className="max-w-7xl mx-auto px-6">
-        <div 
-          className="bg-primary-500 rounded-xl p-6 desktop-s:p-8 text-white relative overflow-hidden transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg group"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          {/* Background decoration */}
-          <div className="absolute right-0 top-0 w-64 h-64 bg-primary-400/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+        <div className="grid grid-cols-1 desktop-s:grid-cols-12 gap-12 lg:gap-16 items-start">
+          
+          {/* Left Column: Text & Features */}
+          <div className="desktop-s:col-span-4 flex flex-col">
+            <Typography variant="h2" weight="bold" className="text-neutral-900 mb-6 leading-[1.15]">
+              How our <span className="text-primary-600">AI</span> works
+            </Typography>
+            <Typography variant="body" className="text-neutral-600 mb-10 text-lg leading-relaxed">
+              Complete transparency on how we process your data, integrate live sources, and deliver the perfect expert match.
+            </Typography>
 
-          <div className="flex flex-col desktop-s:flex-row items-center justify-between gap-6 relative z-10">
-            <div className="flex items-center gap-5">
-              <div className="w-14 h-14 bg-primary-600 rounded-full flex items-center justify-center shrink-0 border border-primary-400 shadow-inner">
-                <ShieldAlert size={26} className="text-accent-500" />
-              </div>
-              <div>
-                <Typography variant="caption" className="text-primary-100 mb-1 font-semibold uppercase tracking-wider block">
-                  Live Teaser
-                </Typography>
-                <Typography variant="h3" weight="bold" className="text-white mb-1">
-                  Compliance Risk Snapshot
-                </Typography>
-                <Typography variant="ui-small" className="text-primary-100 max-w-lg">
-                  Hover to reveal a dummy analysis of potential regulatory exposure for cross-border operations.
-                </Typography>
-              </div>
-            </div>
-
-            <div className="bg-primary-600 rounded-lg p-5 border border-primary-400 w-full desktop-s:w-auto min-w-[300px] transition-all duration-300 relative overflow-hidden h-24 flex items-center shadow-inner">
-              
-              {/* Default State */}
-              <div className={`absolute inset-0 transition-all duration-500 flex flex-col items-center justify-center gap-2 ${isHovered ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
-                <Typography variant="ui-small" className="text-primary-100">
-                  Global Exposure Risk
-                </Typography>
-                <div className="w-24 h-2 bg-primary-700 rounded-full overflow-hidden relative">
-                   <div className="absolute left-0 top-0 h-full bg-accent-500 w-1/3 animate-pulse"></div>
+            <div className="flex flex-col gap-4">
+              {/* Feature 1 */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-100 flex gap-5 items-start shadow-sm">
+                <div className="w-14 h-14 bg-primary-50 rounded-xl flex items-center justify-center shrink-0">
+                  <Eye size={24} className="text-primary-600" />
                 </div>
-                <Typography variant="caption" className="text-accent-300">Hover to scan...</Typography>
-              </div>
-
-              {/* Hover State */}
-              <div className={`absolute inset-0 p-5 transition-all duration-500 flex justify-between items-center ${isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-110 pointer-events-none'}`}>
                 <div className="flex flex-col">
-                   <Typography variant="caption" className="text-primary-200 block mb-1">Risk Level</Typography>
-                   <div className="flex items-center gap-2">
-                     <AlertCircle size={18} className="text-warning-500" />
-                     <Typography variant="body" weight="bold" className="text-warning-500 leading-none">Medium</Typography>
-                   </div>
-                </div>
-                <div className="h-full w-px bg-primary-400/50 mx-4" />
-                <div className="flex flex-col text-right">
-                   <Typography variant="caption" className="text-primary-200 block mb-1">Issues Found</Typography>
-                   <Typography variant="body" weight="bold" className="text-white leading-none">3 Obligations</Typography>
+                  <Typography variant="body" weight="bold" className="text-neutral-900 mb-1">
+                    What the AI sees
+                  </Typography>
+                  <Typography variant="ui-small" className="text-neutral-500">
+                    Public footprints, operational metadata, and target market jurisdictions.
+                  </Typography>
                 </div>
               </div>
 
+              {/* Feature 2 */}
+              <div className="bg-white rounded-2xl p-5 border border-neutral-100 flex gap-5 items-start shadow-sm">
+                <div className="w-14 h-14 bg-success-50 rounded-xl flex items-center justify-center shrink-0">
+                  <EyeOff size={24} className="text-success-600" />
+                </div>
+                <div className="flex flex-col">
+                  <Typography variant="body" weight="bold" className="text-neutral-900 mb-1">
+                    What it never sees
+                  </Typography>
+                  <Typography variant="ui-small" className="text-neutral-500">
+                    No PII, no sensitive financials. All inputs are strictly anonymized.
+                  </Typography>
+                </div>
+              </div>
             </div>
           </div>
+
+          {/* Right Column: AI Engine Visualization (Light Bento Grid) */}
+          <div className="desktop-s:col-span-8 flex flex-col gap-4">
+            
+            <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
+              {/* Header Box (span 3) */}
+              <div className="sm:col-span-3 bg-white rounded-[32px] p-8 border border-neutral-200/70 shadow-sm relative overflow-hidden flex flex-col justify-between">
+                <div>
+                  <Typography variant="caption" className="text-primary-500 font-bold uppercase tracking-widest block mb-2">
+                    Intelligence Engine
+                  </Typography>
+                  <Typography variant="h3" weight="bold" className="text-neutral-900">
+                    Dossier Generation & Matching
+                  </Typography>
+                </div>
+                <div className="mt-8 flex items-center justify-between">
+                  <div>
+                    <Typography variant="caption" className="text-neutral-400 uppercase tracking-widest block mb-1">
+                      System Status
+                    </Typography>
+                    <Typography variant="ui-small" className="text-primary-600 font-mono font-medium flex items-center gap-2">
+                       <span className="w-2 h-2 rounded-full bg-success-500 animate-pulse"></span>
+                       Secure & Grounded
+                    </Typography>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 1: Regulatory Sources (span 2) */}
+              <div className="sm:col-span-2 bg-white rounded-[32px] p-8 border border-neutral-200/70 shadow-sm flex flex-col group">
+                <Typography variant="caption" className="text-neutral-400 font-bold uppercase tracking-wide block mb-4">
+                  Live Validations
+                </Typography>
+                <div className="flex items-baseline gap-1 mb-4">
+                  <span className="text-primary-600 text-5xl font-bold tracking-tight group-hover:scale-105 transition-transform origin-left">2.4</span>
+                  <span className="text-neutral-400 text-xl font-medium">M+</span>
+                </div>
+                <Typography variant="ui-small" className="text-neutral-500 mb-4 h-10 leading-tight">
+                  Regulatory signals grounded in official government APIs.
+                </Typography>
+                <div className="flex items-center gap-2 mt-auto pt-2">
+                  <Database size={14} className="text-primary-500" />
+                  <Typography variant="ui-small" weight="bold" className="text-primary-600">
+                    Sources verified
+                  </Typography>
+                </div>
+              </div>
+
+              {/* Card 2: Dossier Precision (span 2) */}
+              <div className="sm:col-span-2 bg-white rounded-[32px] p-8 border border-neutral-200/70 shadow-sm flex flex-col group">
+                <Typography variant="caption" className="text-neutral-400 font-bold uppercase tracking-wide block mb-4">
+                  Dossier Structure
+                </Typography>
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-neutral-900 text-5xl font-bold tracking-tight group-hover:scale-105 transition-transform origin-left">100</span>
+                  <span className="text-neutral-400 text-xl font-medium">%</span>
+                </div>
+                <Typography variant="ui-small" className="text-neutral-500 mb-4 h-10 leading-tight">
+                  Standardized legal brief format expected by top-tier firms.
+                </Typography>
+                <div className="flex items-center gap-2 mt-auto pt-2">
+                  <FileText size={14} className="text-primary-500" />
+                  <Typography variant="ui-small" weight="bold" className="text-primary-600">
+                    Execution-ready
+                  </Typography>
+                </div>
+              </div>
+
+              {/* Card 3: Match Improvement (span 3) */}
+              <div className="sm:col-span-3 bg-white rounded-[32px] p-8 border border-neutral-200/70 shadow-sm flex flex-col group relative overflow-hidden">
+                <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-primary-50 rounded-full blur-3xl opacity-50 pointer-events-none" />
+                <Typography variant="caption" className="text-neutral-400 font-bold uppercase tracking-wide block mb-4 relative z-10">
+                  Match Precision
+                </Typography>
+                <div className="flex items-baseline mb-4 relative z-10">
+                  <span className="text-primary-600 text-5xl font-bold tracking-tight group-hover:scale-105 transition-transform origin-left">85</span>
+                  <span className="text-neutral-400 text-xl font-medium">%</span>
+                </div>
+                <Typography variant="ui-small" className="text-neutral-500 mb-4 max-w-sm leading-relaxed relative z-10">
+                  Faster response times from vetted compliance partners compared to traditional discovery.
+                </Typography>
+                <div className="flex items-center gap-2 mt-auto pt-2 relative z-10">
+                   <TrendingUp size={14} className="text-primary-500" />
+                   <Typography variant="ui-small" weight="bold" className="text-primary-600">
+                     Higher conversion
+                   </Typography>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Banner */}
+            <div className="bg-white rounded-[32px] p-6 lg:p-8 border border-neutral-200/70 shadow-sm flex flex-col sm:flex-row items-start sm:items-center gap-5">
+              <div className="w-12 h-12 rounded-2xl bg-primary-50 flex items-center justify-center shrink-0">
+                 <Sparkles size={20} className="text-primary-600" />
+              </div>
+              <Typography variant="body" className="text-neutral-600">
+                <span className="text-neutral-900 font-bold">Why it matters: </span>
+                Structured AI dossiers eliminate costly "discovery hours" and map your exact footprint to the right local expert, saving weeks of back-and-forth.
+              </Typography>
+            </div>
+             
+          </div>
+
         </div>
       </div>
     </section>

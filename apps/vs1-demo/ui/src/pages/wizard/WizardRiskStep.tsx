@@ -79,7 +79,7 @@ export function WizardRiskStep() {
             <WizardHeader />
             <main className="flex-1 flex flex-col items-center justify-center px-4 py-10">
                 <div className="w-full max-w-3xl bg-white border border-neutral-200 rounded-2xl shadow-lg ring-1 ring-black/5 overflow-hidden">
-                    <WizardStepper currentStep={5} totalSteps={6} stepLabel="Risk Signals" />
+                    <WizardStepper currentStep={3} totalSteps={5} stepLabel="Risk Signals" />
                     <div className="px-8 py-8 flex flex-col gap-6">
                         <div className="flex flex-col gap-2">
                             <Typography variant="h2">

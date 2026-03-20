@@ -40,7 +40,7 @@ export function WizardComplexityStep() {
             <WizardHeader />
             <main className="flex-1 flex flex-col items-center justify-center px-4 py-10">
                 <div className="w-full max-w-3xl bg-white border border-neutral-200 rounded-2xl shadow-lg ring-1 ring-black/5 overflow-hidden">
-                    <WizardStepper currentStep={6} totalSteps={6} stepLabel="Complexity & Intent" />
+                    <WizardStepper currentStep={4} totalSteps={5} stepLabel="Complexity & Intent" />
                     <div className="px-8 py-8 flex flex-col gap-8">
                         {/* Revenue */}
                         <div className="flex flex-col gap-6">

@@ -1,5 +1,6 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { useWizard } from "../../components/wizard/WizardContext";
 import { WizardHeader } from "../../components/wizard/WizardHeader";
 import { WizardStepper } from "../../components/wizard/WizardStepper";
@@ -26,6 +27,12 @@ interface WizardFlowShellProps {
     subtitle?: string;
 }
 
+const slideVariants = {
+    enter: (dir: number) => ({ x: dir > 0 ? 40 : -40, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (dir: number) => ({ x: dir > 0 ? -40 : 40, opacity: 0 }),
+};
+
 export function WizardFlowShell({
     steps,
     currentStep,
@@ -37,75 +44,116 @@ export function WizardFlowShell({
 }: WizardFlowShellProps) {
     const navigate = useNavigate();
     const { profile } = useWizard();
+    const [direction, setDirection] = useState(1);
     const isReviewStep = currentStep === steps.length;
     const totalSteps = steps.length;
+
+    const handleNext = () => {
+        setDirection(1);
+        onNext();
+    };
+
+    const handleBack = () => {
+        setDirection(-1);
+        if (currentStep === 0) {
+            navigate("/wizard/category");
+        } else {
+            onBack();
+        }
+    };
+
+    const handleSkip = () => {
+        setDirection(1);
+        onSkip?.();
+    };
 
     return (
         <div className="bg-neutral-50 min-h-screen flex flex-col text-neutral-900">
             <WizardHeader />
             <main className="flex-1 flex flex-col items-center justify-center px-4 py-10">
-                <div className="w-full max-w-3xl bg-white border border-neutral-200 rounded-2xl shadow-lg ring-1 ring-black/5 overflow-hidden">
+                <motion.div 
+                    layout
+                    transition={{ layout: { duration: 0.4, ease: [0.25, 1, 0.5, 1] } }}
+                    className="w-full max-w-3xl bg-white border border-neutral-200 rounded-2xl shadow-lg ring-1 ring-black/5 overflow-hidden flex flex-col"
+                >
                     <WizardStepper
                         currentStep={Math.min(currentStep + 1, totalSteps + 1)}
                         totalSteps={totalSteps + 1}
                         stepLabel={isReviewStep ? "Review" : steps[currentStep]?.label ?? ""}
                     />
-                    <div className="px-8 py-8 flex flex-col gap-6">
-                        {!isReviewStep && (
-                            <>
-                                {(title || subtitle) && (
-                                    <div className="flex flex-col gap-2">
-                                        {title && (
-                                            <Typography variant="h2">
-                                                {title}
-                                            </Typography>
+
+                    {/* Animated content area */}
+                    <div className="relative overflow-hidden w-full flex-1">
+                        <AnimatePresence mode="popLayout" custom={direction} initial={false}>
+                            <motion.div
+                                key={currentStep}
+                                custom={direction}
+                                variants={slideVariants}
+                                initial="enter"
+                                animate="center"
+                                exit="exit"
+                                transition={{ duration: 0.4, ease: [0.25, 1, 0.5, 1] }}
+                                className="w-full px-8 py-8 flex flex-col gap-6"
+                            >
+                                {!isReviewStep && (
+                                    <>
+                                        {(title || subtitle) && (
+                                            <div className="flex flex-col gap-2">
+                                                {title && (
+                                                    <Typography variant="h2">
+                                                        {title}
+                                                    </Typography>
+                                                )}
+                                                {subtitle && (
+                                                    <Typography variant="body" className="text-neutral-600">
+                                                        {subtitle}
+                                                    </Typography>
+                                                )}
+                                            </div>
                                         )}
-                                        {subtitle && (
-                                            <Typography variant="body" className="text-neutral-600">
-                                                {subtitle}
-                                            </Typography>
-                                        )}
-                                    </div>
+                                        {steps[currentStep]?.content}
+                                    </>
                                 )}
-                                {steps[currentStep]?.content}
-                            </>
-                        )}
-                        {isReviewStep && (
-                            <>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-primary-50 border border-primary-200 flex items-center justify-center shrink-0">
-                                        <span className="material-symbols-outlined text-primary-600 text-xl">checklist</span>
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <Typography variant="h3">Confirm your answers</Typography>
-                                        <Typography variant="ui-small" className="text-neutral-600">Review all details before we generate your results.</Typography>
-                                    </div>
-                                </div>
-                                <WizardReviewPanel
-                                    onGenerateResults={() => navigate("/results", { state: { searchProfile: profile } })}
-                                    isGuest={true}
-                                />
-                            </>
-                        )}
+                                {isReviewStep && (
+                                    <>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-primary-50 border border-primary-200 flex items-center justify-center shrink-0">
+                                                <span className="material-symbols-outlined text-primary-600 text-xl">checklist</span>
+                                            </div>
+                                            <div className="flex flex-col gap-1">
+                                                <Typography variant="h3">Confirm your answers</Typography>
+                                                <Typography variant="ui-small" className="text-neutral-600">Review all details before we generate your results.</Typography>
+                                            </div>
+                                        </div>
+                                        <WizardReviewPanel
+                                            onGenerateResults={() => navigate("/results", { state: { searchProfile: profile } })}
+                                            isGuest={true}
+                                        />
+                                    </>
+                                )}
+                            </motion.div>
+                        </AnimatePresence>
                     </div>
+
+                    {/* Fixed footer */}
                     {!isReviewStep && (
                         <WizardFooter
-                            onBack={currentStep === 0 ? () => navigate("/wizard/category") : onBack}
-                            onNext={onNext}
-                            onSkip={steps[currentStep]?.isOptional ? onSkip : undefined}
+                            onBack={handleBack}
+                            onNext={handleNext}
+                            onSkip={steps[currentStep]?.isOptional ? handleSkip : undefined}
                             nextDisabled={!steps[currentStep]?.isValid}
                             showBack={true}
                         />
                     )}
                     {isReviewStep && (
                         <div className="px-8 py-4 border-t border-neutral-200 bg-neutral-50">
-                            <Button variant="ghost" onClick={onBack} className="gap-2">
+                            <Button variant="ghost" onClick={handleBack} className="gap-2">
                                 <span className="material-symbols-outlined text-base">arrow_back</span>
                                 Back
                             </Button>
                         </div>
                     )}
-                </div>
+                </motion.div>
             </main>
         </div>
     );

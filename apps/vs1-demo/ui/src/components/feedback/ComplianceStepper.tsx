@@ -1,125 +1,193 @@
-import { FileText, Lock, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Search, FileText, Users, Calendar, Rocket, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Typography } from '../ui/Typography';
 
-const AI_STEPS = [
+const FUNNEL_STEPS = [
   {
     step: '01',
-    icon: FileText,
-    title: 'Smart Context Ingestion',
-    body: 'The AI translates your unstructured business context into a validated structured schema — extracting entity type, industry, revenue bands, and market intent.',
+    icon: Search,
+    title: 'Assessment',
+    body: 'Our AI scans your target footprint and flags exact regulatory gaps instantly.',
   },
   {
     step: '02',
-    icon: Lock,
-    title: 'PII Redaction Pipeline',
-    body: 'Local AI models strip all Personally Identifiable Information — names, emails, tax IDs, phone numbers — before the anonymised schema is passed to the mapping engine.',
+    icon: FileText,
+    title: 'Dossier',
+    body: 'A structured, anonymised legal brief with all mandatory registrations and operational shifts.',
   },
   {
     step: '03',
-    icon: ShieldCheck,
-    title: 'Verified Compliance Dossier',
-    body: 'The engine cross-references your anonymised profile with live country-specific risk matrices to produce a structured, verifiable compliance dossier ready for action.',
+    icon: Users,
+    title: 'Matching',
+    body: 'We algorithmically pair your dossier with pre-vetted local partners who know your gaps.',
+  },
+  {
+    step: '04',
+    icon: Calendar,
+    title: 'Appointment',
+    body: 'Book a strategy call directly with an expert who already understands your case.',
+  },
+  {
+    step: '05',
+    icon: Rocket,
+    title: 'Execution',
+    body: 'Your partner executes registrations, filings, and structural setups locally.',
   },
 ];
 
-const containerVariants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.25,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
-};
+// Icon circle diameter in px — must match top offset of the track line
+const ICON_SIZE = 56; // w-14 h-14
+const ICON_CENTER = ICON_SIZE / 2; // 28px
 
 export function ComplianceStepper() {
   return (
-    <section className="bg-surface py-12 desktop-s:py-20 relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-primary-50/50 rounded-bl-[100px] pointer-events-none" />
+    <section className="bg-transparent py-16 desktop-s:py-24 relative overflow-hidden z-10 border-b border-neutral-200/50">
+      {/* Background Glow */}
+      <div className="absolute top-[-20%] right-[-5%] w-[800px] h-[800px] bg-primary-100/40 rounded-full blur-[120px] pointer-events-none opacity-80" />
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="text-center mb-16">
+      <div className="max-w-[1400px] mx-auto px-6 relative z-10">
+
+        {/* ── Header ── */}
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.55 }}
+        >
           <Typography variant="caption" className="text-primary-500 mb-4 block font-bold tracking-widest uppercase">
-            The AI Engine
+            The Partner Journey
           </Typography>
-          <Typography variant="h1" weight="bold" className="text-neutral-900 mb-6 whitespace-pre-line tracking-tight">
-            {"From raw context to a structured\ncompliance dossier"}
+          <Typography variant="h1" weight="bold" className="text-neutral-900 mb-6 tracking-tight">
+            From unknown risk to<br />local execution
           </Typography>
           <Typography variant="body" className="text-neutral-600 max-w-2xl mx-auto">
-            Our privacy-first AI pipeline has three stages — each designed to maximise output quality while minimising your data exposure.
+            Our 5-step funnel ensures you don't just identify the problem — you solve it with the right local experts immediately.
           </Typography>
-        </div>
+        </motion.div>
 
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          className="grid desktop-s:grid-cols-3 gap-8 relative"
-        >
-          {AI_STEPS.map(({ step, icon: Icon, title, body }, index) => {
-            const isLast = index === AI_STEPS.length - 1;
-            // The last step is highlighted differently to show the tangible output requested in Stitch design
-            const cardBg = isLast ? 'bg-brand-surface border-primary-200 shadow-md ring-1 ring-primary-500/10' : 'bg-white border-neutral-200';
-            const iconBg = isLast ? 'bg-primary-500 text-accent-500 shadow-inner' : 'bg-neutral-50 border border-neutral-100 text-primary-600';
+        {/* ── Stepper ── */}
+        {/* Outer wrapper is relative so the track line can be absolutely positioned */}
+        <div className="relative">
 
-            return (
-              <motion.div key={step} variants={itemVariants} className="relative group flex flex-col">
-                
-                {/* Connecting Line (Desktop) */}
-                {!isLast && (
-                  <div className="hidden desktop-s:block absolute left-[calc(100%-1rem)] top-[36px] w-[calc(100%+2rem)] h-0.5 bg-gradient-to-r from-neutral-200 to-neutral-200 z-0 opacity-60 pointer-events-none group-hover:opacity-100 transition-opacity" />
-                )}
+          {/* Track line — centres align with grid column centres.
+              Column centre = (containerWidth − 4 × gap) / 10
+              With gap-x-6 = 1.5 rem per gap, 4 gaps = 6 rem → calc((100% − 6rem) / 10).
+              Only rendered at desktop-m (1280px) where the 5-col grid is active.   */}
+          <div
+            className="hidden desktop-m:block absolute z-0 pointer-events-none"
+            style={{
+              top: ICON_CENTER,
+              left: 'calc((100% - 6rem) / 10)',
+              right: 'calc((100% - 6rem) / 10)',
+              height: 1,
+            }}
+          >
+            {/* Grey base */}
+            <div className="absolute inset-0 bg-neutral-200" />
+            {/* Animated primary fill */}
+            <motion.div
+              className="absolute inset-0 bg-primary-200 origin-left"
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.1, ease: 'easeInOut', delay: 0.3 }}
+            />
+          </div>
 
-                <div className={`relative z-10 border rounded-2xl p-8 h-full flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${cardBg}`}>
-                  <div className="flex items-start gap-5 mb-6">
-                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center shrink-0 transition-colors ${iconBg}`}>
-                      <Icon size={26} />
-                    </div>
-                    <div>
-                      <Typography variant="caption" className={`block mb-1.5 font-bold tracking-widest ${isLast ? 'text-primary-700' : 'text-neutral-400'}`}>
-                        STEP {step}
-                      </Typography>
-                      <Typography variant="h3" weight="bold" className="text-neutral-900 leading-tight">
-                        {title}
-                      </Typography>
-                    </div>
-                  </div>
-                  <Typography variant="body" className="text-neutral-600 leading-relaxed flex-1">
+          {/* Grid */}
+          <div className="grid grid-cols-1 tablet:grid-cols-2 desktop-s:grid-cols-3 desktop-m:grid-cols-5 gap-x-6 gap-y-10">
+            {FUNNEL_STEPS.map(({ step, icon: Icon, title, body }, index) => {
+              const isLast = index === FUNNEL_STEPS.length - 1;
+
+              return (
+                <motion.div
+                  key={step}
+                  className="relative z-10 flex flex-col items-center text-center"
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-60px' }}
+                  transition={{ duration: 0.45, delay: index * 0.1 }}
+                >
+                  {/* Icon circle — sits ON the track line */}
+                  <motion.div
+                    className={`w-14 h-14 rounded-full border-2 flex items-center justify-center shrink-0 mb-5 ${
+                      isLast
+                        ? 'bg-primary-500 border-primary-500 text-accent-500'
+                        : 'bg-white border-neutral-200 text-primary-600'
+                    }`}
+                    initial={{ scale: 0.65, opacity: 0 }}
+                    whileInView={{ scale: 1, opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 260,
+                      damping: 18,
+                      delay: index * 0.1 + 0.15,
+                    }}
+                  >
+                    <Icon size={20} />
+                  </motion.div>
+
+                  {/* Step label */}
+                  <motion.span
+                    className={`text-[11px] font-bold tracking-widest uppercase mb-1 block ${
+                      isLast ? 'text-primary-600' : 'text-neutral-400'
+                    }`}
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 + 0.25 }}
+                  >
+                    Step {step}
+                  </motion.span>
+
+                  {/* Title */}
+                  <Typography variant="h3" weight="bold" className="text-neutral-900 mb-2 leading-tight">
+                    {title}
+                  </Typography>
+
+                  {/* Description */}
+                  <Typography variant="ui-small" className="text-neutral-500 leading-relaxed">
                     {body}
                   </Typography>
 
-                  {/* Visual tangibility for 'Verified Dossier' */}
+                  {/* Execution status widget */}
                   {isLast && (
-                     <div className="mt-8 pt-8 border-t border-primary-200/60">
-                        <div className="bg-white rounded-lg border border-neutral-200 p-5 shadow-sm flex flex-col gap-3 group/card hover:border-primary-300 transition-colors cursor-pointer">
-                           <div className="flex items-center justify-between">
-                             <div className="flex items-center gap-2.5">
-                               <div className="w-2.5 h-2.5 rounded-full bg-warning-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
-                               <Typography variant="ui-small" className="text-neutral-500 font-medium">EPR Packaging DE</Typography>
-                             </div>
-                             <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-neutral-100 text-neutral-500 uppercase tracking-wider">Preview</span>
-                           </div>
-                           <div className="flex items-center justify-between mt-1">
-                             <Typography variant="body" weight="bold" className="text-neutral-900">Registration Overdue</Typography>
-                             <div className="w-6 h-6 rounded-full bg-primary-50 flex items-center justify-center group-hover/card:bg-primary-100 transition-colors">
-                               <ArrowRight size={14} className="text-primary-600" />
-                             </div>
-                           </div>
+                    <motion.div
+                      className="mt-5 w-full"
+                      initial={{ opacity: 0, y: 8 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: index * 0.1 + 0.45 }}
+                    >
+                      <div className="bg-white rounded-xl border border-neutral-200 p-4 shadow-sm hover:border-primary-300 hover:shadow-md transition-all cursor-pointer">
+                        <div className="flex items-center gap-2 mb-2">
+                          <motion.div
+                            className="w-2 h-2 rounded-full bg-success-500 shrink-0"
+                            animate={{ scale: [1, 1.7, 1], opacity: [1, 0.5, 1] }}
+                            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                          />
+                          <Typography variant="ui-small" className="text-neutral-500 text-xs font-medium">
+                            Partner Assigned
+                          </Typography>
                         </div>
-                     </div>
+                        <div className="flex items-center justify-between">
+                          <Typography variant="body" weight="bold" className="text-neutral-900 text-sm">
+                            Action Plan Active
+                          </Typography>
+                          <div className="w-5 h-5 rounded-full bg-primary-50 hover:bg-primary-100 transition-colors flex items-center justify-center shrink-0">
+                            <ArrowRight size={11} className="text-primary-600" />
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
                   )}
-                </div>
-              </motion.div>
-            );
-          })}
-        </motion.div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </section>
   );

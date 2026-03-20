@@ -1,8 +1,6 @@
 import React from 'react';
 import { Card } from './Card';
 import { Typography } from './Typography';
-import { Radio } from './Radio';
-import { Checkbox } from './Checkbox';
 
 export interface OptionCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onSelect'> {
   title: string;
@@ -17,7 +15,7 @@ export interface OptionCardProps extends Omit<React.HTMLAttributes<HTMLDivElemen
 }
 
 export const OptionCard = React.forwardRef<HTMLDivElement, OptionCardProps>(
-  ({ className = '', title, description, icon, selected = false, type = 'radio', name, value = '', disabled = false, onSelect, ...props }, ref) => {
+  ({ className = '', title, description, icon, selected = false, name, value = '', disabled = false, onSelect, ...props }, ref) => {
     
     const handleCardClick = () => {
       if (!disabled && onSelect) {
@@ -25,13 +23,11 @@ export const OptionCard = React.forwardRef<HTMLDivElement, OptionCardProps>(
       }
     };
 
-    const InputComponent = type === 'radio' ? Radio : Checkbox;
-
     return (
       <Card
         ref={ref}
         onClick={handleCardClick}
-        className={`relative flex items-start gap-4 p-5 transition-all cursor-pointer ${
+        className={`relative flex flex-col gap-1 p-5 transition-all cursor-pointer ${
           disabled 
             ? 'opacity-50 cursor-not-allowed bg-neutral-50 border-neutral-200'
             : selected 
@@ -40,32 +36,24 @@ export const OptionCard = React.forwardRef<HTMLDivElement, OptionCardProps>(
         } ${className}`}
         {...props}
       >
-        <div className="pt-0.5">
-            <InputComponent 
-              name={name} 
-              value={value} 
-              checked={selected} 
-              disabled={disabled} 
-              readOnly 
-              tabIndex={-1} 
-              className="pointer-events-none" 
-            />
-        </div>
-        <div className="flex flex-col gap-1">
-          {icon && (
-            <div className="mb-1">
-              {icon}
-            </div>
-          )}
-          <Typography variant="body" weight="medium" className={selected ? 'text-primary-900' : 'text-neutral-900'}>
-            {title}
+        {selected && (
+          <div className="absolute top-3 right-3">
+            <span className="material-symbols-outlined text-primary-600 text-lg">check_circle</span>
+          </div>
+        )}
+        {icon && (
+          <div className="mb-1">
+            {icon}
+          </div>
+        )}
+        <Typography variant="body" weight="medium" className={selected ? 'text-primary-900' : 'text-neutral-900'}>
+          {title}
+        </Typography>
+        {description && (
+          <Typography variant="ui-small" className={selected ? 'text-primary-700' : 'text-neutral-600'}>
+            {description}
           </Typography>
-          {description && (
-            <Typography variant="ui-small" className={selected ? 'text-primary-700' : 'text-neutral-600'}>
-              {description}
-            </Typography>
-          )}
-        </div>
+        )}
       </Card>
     );
   }

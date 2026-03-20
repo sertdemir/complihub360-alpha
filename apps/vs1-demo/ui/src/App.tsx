@@ -3,13 +3,16 @@ import { WizardProvider } from "./components/wizard/WizardContext";
 import { LandingPage } from "./pages/LandingPage";
 import { ServicesPage } from "./pages/ServicesPage";
 import { CountriesPage } from "./pages/CountriesPage";
+import { PlatformPage } from "./pages/PlatformPage";
+import { SolutionsPage } from "./pages/SolutionsPage";
+import { ComplianceAreasPage } from "./pages/ComplianceAreasPage";
+import { ResourcesPage } from "./pages/ResourcesPage";
 import AdvisoryPage from "./pages/AdvisoryPage";
 import { ResultsOverview } from "./pages/ResultsOverview";
 import { Dashboard } from "./pages/Dashboard";
 // Wizard Shell Steps
-import { WizardStep0 } from "./pages/WizardStep1";
-import { WizardCategoryStep } from "./pages/wizard/WizardCategoryStep";
-import { WizardReviewStep } from "./pages/wizard/WizardReviewStep";
+import { WizardPreGateFlow } from "./pages/wizard/WizardPreGateFlow";
+import { GenericWizardFlow } from "./pages/wizard/GenericWizardFlow";
 // Individualized Category Wizards
 import { TaxVatWizard } from "./pages/wizard/flows/TaxVatWizard";
 import { DataPrivacyWizard } from "./pages/wizard/flows/DataPrivacyWizard";
@@ -27,10 +30,9 @@ function WizardRoutes() {
     return (
         <WizardProvider>
             <Routes>
-                {/* Step 0: Country Gate → redirects to category flow */}
-                <Route path="/" element={<WizardStep0 />} />
-                {/* Generic category picker (when entering without category) */}
-                <Route path="/category" element={<WizardCategoryStep />} />
+                {/* Pre-Gate: Country & Category Selection */}
+                <Route path="/" element={<WizardPreGateFlow />} />
+                <Route path="/category" element={<WizardPreGateFlow />} />
                 {/* 6 individualized category-specific flows */}
                 <Route path="/tax-vat" element={<TaxVatWizard />} />
                 <Route path="/data-privacy" element={<DataPrivacyWizard />} />
@@ -38,8 +40,12 @@ function WizardRoutes() {
                 <Route path="/marketing-seo" element={<MarketingSeoWizard />} />
                 <Route path="/corporate" element={<CorporateWizard />} />
                 <Route path="/full-support" element={<FullSupportWizard />} />
-                {/* Legacy/shared review step */}
-                <Route path="/review" element={<WizardReviewStep />} />
+                {/* Generic flow: Context → Markets → Risk → Complexity → Review */}
+                <Route path="/context" element={<GenericWizardFlow />} />
+                <Route path="/markets" element={<GenericWizardFlow />} />
+                <Route path="/risk" element={<GenericWizardFlow />} />
+                <Route path="/complexity" element={<GenericWizardFlow />} />
+                <Route path="/review" element={<GenericWizardFlow />} />
             </Routes>
         </WizardProvider>
     );
@@ -53,6 +59,10 @@ function App() {
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/services" element={<ServicesPage />} />
                 <Route path="/countries" element={<CountriesPage />} />
+                <Route path="/platform" element={<PlatformPage />} />
+                <Route path="/solutions" element={<SolutionsPage />} />
+                <Route path="/compliance" element={<ComplianceAreasPage />} />
+                <Route path="/resources" element={<ResourcesPage />} />
                 <Route path="/advisory" element={<AdvisoryPage />} />
                 <Route path="/results" element={<ResultsOverview />} />
                 <Route path="/dashboard" element={<Dashboard />} />
