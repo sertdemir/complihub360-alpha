@@ -1,34 +1,37 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, ChevronDown, ArrowRight, ShieldCheck, Zap, Rocket } from 'lucide-react';
+import { ChevronDown, ArrowRight, ShieldCheck, Zap, Rocket } from 'lucide-react';
 import { Typography } from '../ui/Typography';
-import { Card } from '../ui/Card';
+import { HeroMeshBackground } from './HeroMeshBackground';
 
 const SCENARIOS = [
-  { 
+  {
     segments: [
       { text: "Your Compliance " },
       { text: "Shortcut", highlight: true },
       { text: " to Global Markets" }
     ],
-    text: 'Identify regulatory gaps instantly and match with vetted local experts for seamless execution.' 
+    text: 'Identify regulatory gaps instantly and match with vetted local experts for seamless execution.',
+    cta: 'Find my compliance shortcut',
   },
-  { 
+  {
     segments: [
       { text: "From Regulatory Risk to " },
       { text: "Action Plan", highlight: true },
       { text: " in Minutes" }
     ],
-    text: 'Translate local fragmentation into a clear roadmap. We help you understand faster and decide safer.' 
+    text: 'Translate local fragmentation into a clear roadmap. We help you understand faster and decide safer.',
+    cta: 'Build my action plan now',
   },
-  { 
+  {
     segments: [
       { text: "The Fastest Way to " },
       { text: "Local Compliance Experts", highlight: true }
     ],
-    text: 'Stop guessing. Get your customized assessment and connect with the right partner firm immediately.' 
-  }
+    text: 'Stop guessing. Get your customized assessment and connect with the right partner firm immediately.',
+    cta: 'Connect with an expert now',
+  },
 ];
 
 export function HeroSection() {
@@ -36,10 +39,13 @@ export function HeroSection() {
   const [country, setCountry] = useState('uk');
   const [category, setCategory] = useState('tax-vat');
   const [sliderIndex, setSliderIndex] = useState(0);
+  const pausedRef = useRef(false);
 
   useEffect(() => {
     const id = setInterval(() => {
-      setSliderIndex((prev) => (prev + 1) % SCENARIOS.length);
+      if (!pausedRef.current) {
+        setSliderIndex((prev) => (prev + 1) % SCENARIOS.length);
+      }
     }, 5500);
     return () => clearInterval(id);
   }, []);
@@ -50,7 +56,27 @@ export function HeroSection() {
 
   return (
     <section className="bg-transparent relative pt-16 desktop-s:pt-28 pb-16 desktop-s:pb-24 overflow-hidden z-10">
-      <div className="w-full max-w-[1440px] mx-auto px-6 flex flex-col items-center text-center">
+
+      {/* ── Mesh Animation ──────────────────────────────────────── */}
+      <HeroMeshBackground />
+
+      {/* ── Depth Layer ─────────────────────────────────────────── */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        {/* Linear gradient bottom → top, slowly drifting */}
+        <motion.div
+          className="absolute -left-[5%] -right-[5%] -bottom-[15%] h-[130%]"
+          animate={{ y: ['0%', '-4%', '2%', '-3%', '0%'] }}
+          transition={{ duration: 30, repeat: Infinity, ease: 'easeInOut' }}
+          style={{
+            background: 'linear-gradient(to top, rgba(0,62,51,0.18) 0%, rgba(102,187,106,0.20) 45%, rgba(244,196,74,0.08) 75%, transparent 100%)',
+          }}
+        />
+        {/* Edge vignette — darkens corners for depth */}
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 10%, transparent 40%, rgba(0,0,0,0.05) 100%)' }} />
+      </div>
+      {/* ──────────────────────────────────────────────────────────── */}
+
+      <div className="w-full max-w-[1440px] mx-auto px-6 flex flex-col items-center text-center relative z-10">
         
         {/* Top Content (Centered) */}
         <div className="flex flex-col items-center w-full">
@@ -95,8 +121,37 @@ export function HeroSection() {
           </div>
         </div>
 
+        {/* ── CTA Button — rhythmisch mit Titel ─────────────────── */}
+        <div className="flex justify-center w-full mb-4 relative group">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={sliderIndex}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 1.2, ease: [0.45, 0, 0.55, 1], delay: 0.36 }}
+              className="relative w-full sm:w-auto min-w-[256px] rounded-xl p-[1px] overflow-hidden shadow-[0_0_40px_rgba(250,204,21,0.2)] group-hover:shadow-[0_0_60px_rgba(250,204,21,0.4)] transition-shadow duration-500"
+            >
+              <span
+                className="absolute inset-[-100%] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_50%,#facc15_100%)] pointer-events-none"
+                style={{ animation: 'spin 8s linear infinite' }}
+              />
+              <button
+                onClick={() => navigate('/register?intent=expert')}
+                onMouseEnter={() => { pausedRef.current = true; }}
+                onMouseLeave={() => { pausedRef.current = false; }}
+                className="relative flex items-center justify-center w-full h-[50px] sm:h-[62px] px-8 bg-primary-950 hover:bg-primary-900 text-white font-semibold text-base sm:text-xl rounded-[12px] transition-all gap-3 group-hover:bg-primary-900"
+              >
+                {SCENARIOS[sliderIndex].cta}
+                <ArrowRight size={22} className="text-accent-400 group-hover:translate-x-1 transition-transform" />
+              </button>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* ── Input Container ────────────────────────────────────── */}
         {/* Light Green Master Container for Funnel, CTA, and Pills */}
-        <div className="w-full max-w-[1100px] rounded-[32px] p-6 sm:p-8 lg:p-10 shadow-xl relative z-20 mb-4 flex flex-col items-center border border-primary-200 bg-primary-100 overflow-hidden transform-gpu">
+        <div className="w-full max-w-[1100px] rounded-[32px] p-6 sm:p-8 lg:p-10 shadow-xl relative z-20 mb-4 flex flex-col items-center border border-white/50 bg-white/30 backdrop-blur-xl overflow-hidden transform-gpu">
 
           <div className="relative z-10 w-full flex flex-col items-center pt-2">
 
@@ -157,25 +212,7 @@ export function HeroSection() {
               </div>
             </div>
 
-            {/* 2) MAIN CONVERSION: Request Expert Match (Animated Ghost Button) */}
-            <div className="flex justify-center w-full mb-6 relative group">
-              <div className="relative w-full sm:w-auto min-w-[256px] rounded-xl p-[1px] overflow-hidden shadow-[0_0_40px_rgba(250,204,21,0.2)] group-hover:shadow-[0_0_60px_rgba(250,204,21,0.4)] transition-shadow duration-500">
-                {/* Spinning gradient */}
-                <span
-                  className="absolute inset-[-100%] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_50%,#facc15_100%)] pointer-events-none"
-                  style={{ animation: 'spin 8s linear infinite' }}
-                />
-                {/* Inner Button */}
-                <button
-                  onClick={() => navigate('/register?intent=expert')}
-                  className="relative flex items-center justify-center w-full h-[50px] sm:h-[62px] px-8 bg-primary-950 hover:bg-primary-900 text-white font-semibold text-base sm:text-xl rounded-[12px] transition-all gap-3 group-hover:bg-primary-900"
-                >
-                  Request expert match instantly <ArrowRight size={22} className="text-accent-400 group-hover:translate-x-1 transition-transform" />
-                </button>
-              </div>
-            </div>
-
-            {/* 3) Outcome USPs (Clean Icons) */}
+            {/* 2) Outcome USPs (Clean Icons) */}
             <ul className="grid grid-cols-3 gap-4 md:gap-12 w-full max-w-2xl mx-auto mt-6 mb-2">
               <li className="flex flex-col items-center justify-start gap-4 text-center group cursor-default">
                 <Zap size={44} className="text-primary-700 group-hover:text-primary-600 transition-colors" strokeWidth={1.5} />

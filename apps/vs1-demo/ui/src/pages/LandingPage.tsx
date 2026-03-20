@@ -456,7 +456,7 @@ function LandingNav() {
             Log in
           </button>
           <Button variant="primary" size="sm" onClick={() => navigate('/register')}>
-            Get Started Free
+            Sign up for free
           </Button>
         </div>
       </div>
