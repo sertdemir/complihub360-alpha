@@ -22,130 +22,127 @@ export function LoginPage() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setTimeout(() => navigate("/dashboard"), 1200);
+        setTimeout(() => navigate("/dashboard"), 1000);
     };
 
     return (
-        <div className="bg-neutral-50 min-h-screen flex flex-col">
-            {/* Auth Header */}
+        <div className="min-h-screen bg-neutral-50 flex flex-col">
+            {/* Header */}
             <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-neutral-200 px-6 py-4 shadow-sm">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    <button
-                        onClick={() => navigate("/")}
-                        className="flex items-center gap-2 group"
-                    >
-                        <span className="material-symbols-outlined text-primary-600 text-2xl">
-                            verified_user
-                        </span>
-                        <Typography variant="h3" className="tracking-tight">
-                            CompliHub360
-                        </Typography>
+                    <button onClick={() => navigate("/")} className="flex items-center gap-2">
+                        <span className="material-symbols-outlined text-primary-600 text-2xl">verified_user</span>
+                        <Typography variant="h3" className="tracking-tight">CompliHub360</Typography>
                     </button>
-                    <Link
-                        to="/register"
-                        className="text-sm font-medium text-neutral-500 hover:text-neutral-900 flex items-center gap-1 transition-colors"
-                    >
-                        Create account
-                        <span className="material-symbols-outlined text-base">arrow_forward</span>
+                    <Link to="/register" className="text-sm font-medium text-neutral-500 hover:text-neutral-900 transition-colors flex items-center gap-1">
+                        Konto erstellen <span className="material-symbols-outlined text-base">arrow_forward</span>
                     </Link>
                 </div>
             </header>
 
-            {/* Main Content */}
-            <main className="flex-1 flex flex-col items-center justify-center px-4 py-10">
+            {/* Content */}
+            <div className="flex-1 flex items-center justify-center px-6 py-16">
                 <motion.div
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, y: 20, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
                     transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
-                    className="w-full max-w-md"
+                    className="w-full max-w-lg"
                 >
-                    <div className="bg-white border border-neutral-200 rounded-2xl shadow-lg ring-1 ring-black/5 overflow-hidden">
-                        {/* Card Header */}
-                        <div className="px-8 pt-8 pb-2 text-center">
-                            <Typography variant="h2" className="text-neutral-900">
-                                Willkommen zurück
-                            </Typography>
-                            <Typography variant="body" className="text-neutral-500 mt-1">
-                                Melden Sie sich an, um auf Ihr Compliance-Dashboard zuzugreifen.
-                            </Typography>
-                        </div>
+                    {/* Brand mark */}
+                    <div className="text-center mb-8">
+                        <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: 0.1, type: "spring", stiffness: 200, damping: 15 }}
+                            className="mx-auto w-16 h-16 rounded-2xl bg-primary-500 flex items-center justify-center mb-5 shadow-lg shadow-primary-500/20"
+                        >
+                            <span className="material-symbols-outlined text-white text-3xl">shield</span>
+                        </motion.div>
+                        <Typography variant="h1" weight="bold" className="text-neutral-900 mb-2" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
+                            Willkommen zurück
+                        </Typography>
+                        <Typography variant="body" className="text-neutral-500">
+                            Melden Sie sich an, um auf Ihr Compliance-Dashboard zuzugreifen.
+                        </Typography>
+                    </div>
 
-                        <div className="px-8 py-6 flex flex-col gap-5">
+                    {/* Card */}
+                    <div className="bg-white border border-neutral-200 rounded-2xl shadow-lg ring-1 ring-black/5 overflow-hidden">
+                        <form onSubmit={handleSubmit} className="p-8">
                             {/* Google SSO */}
                             <button
                                 type="button"
-                                onClick={() => navigate("/dashboard")}
-                                className="w-full flex items-center justify-center gap-3 py-3 rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-700 text-sm font-semibold hover:bg-neutral-100 hover:border-neutral-300 transition-all"
+                                className="w-full flex items-center justify-center gap-3 py-3.5 rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-700 text-sm font-semibold hover:bg-neutral-100 hover:border-neutral-300 transition-all shadow-sm"
                             >
                                 <GoogleIcon />
                                 Mit Google fortfahren
                             </button>
 
-                            {/* Divider */}
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 my-6">
                                 <div className="flex-1 h-px bg-neutral-200" />
                                 <span className="text-xs text-neutral-400 font-medium">oder mit E-Mail</span>
                                 <div className="flex-1 h-px bg-neutral-200" />
                             </div>
 
-                            {/* Form */}
-                            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                                <div className="flex flex-col gap-1.5">
-                                    <label className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
-                                        E-Mail
+                            {/* Email */}
+                            <div className="flex flex-col gap-1.5 mb-4">
+                                <label htmlFor="login-email" className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
+                                    E-Mail
+                                </label>
+                                <input
+                                    id="login-email"
+                                    type="email"
+                                    required
+                                    value={email}
+                                    onChange={e => setEmail(e.target.value)}
+                                    placeholder="name@unternehmen.de"
+                                    className="w-full px-4 py-3 rounded-xl bg-neutral-50 border border-neutral-200 text-neutral-900 text-sm placeholder-neutral-400 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all"
+                                />
+                            </div>
+
+                            {/* Password */}
+                            <div className="flex flex-col gap-1.5 mb-6">
+                                <div className="flex items-center justify-between">
+                                    <label htmlFor="login-password" className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
+                                        Passwort
                                     </label>
-                                    <input
-                                        id="login-email"
-                                        type="email"
-                                        required
-                                        value={email}
-                                        onChange={e => setEmail(e.target.value)}
-                                        placeholder="name@unternehmen.de"
-                                        className="w-full px-4 py-3 rounded-xl bg-neutral-50 border border-neutral-200 text-neutral-900 text-sm placeholder-neutral-400 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all"
-                                    />
+                                    <button type="button" className="text-xs text-primary-500 hover:text-primary-600 font-medium transition-colors">
+                                        Passwort vergessen?
+                                    </button>
                                 </div>
+                                <input
+                                    id="login-password"
+                                    type="password"
+                                    required
+                                    value={password}
+                                    onChange={e => setPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    className="w-full px-4 py-3 rounded-xl bg-neutral-50 border border-neutral-200 text-neutral-900 text-sm placeholder-neutral-400 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all"
+                                />
+                            </div>
 
-                                <div className="flex flex-col gap-1.5">
-                                    <div className="flex justify-between items-center">
-                                        <label className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
-                                            Passwort
-                                        </label>
-                                        <a href="#" className="text-xs text-primary-500 hover:text-primary-600 hover:underline font-medium transition-colors">
-                                            Passwort vergessen?
-                                        </a>
-                                    </div>
-                                    <input
-                                        id="login-password"
-                                        type="password"
-                                        required
-                                        value={password}
-                                        onChange={e => setPassword(e.target.value)}
-                                        placeholder="••••••••"
-                                        className="w-full px-4 py-3 rounded-xl bg-neutral-50 border border-neutral-200 text-neutral-900 text-sm placeholder-neutral-400 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all"
-                                    />
-                                </div>
+                            {/* Submit */}
+                            <Button
+                                variant="primary"
+                                size="lg"
+                                fullWidth
+                                disabled={loading || !email || !password}
+                                className="rounded-xl"
+                            >
+                                {loading ? (
+                                    <span className="flex items-center justify-center gap-2">
+                                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        Wird angemeldet...
+                                    </span>
+                                ) : (
+                                    "Anmelden"
+                                )}
+                            </Button>
+                        </form>
 
-                                <Button
-                                    type="submit"
-                                    variant="primary"
-                                    fullWidth
-                                    size="lg"
-                                    disabled={loading}
-                                    className="mt-1 rounded-xl"
-                                >
-                                    {loading ? (
-                                        <span className="flex items-center gap-2">
-                                            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                            Anmeldung läuft...
-                                        </span>
-                                    ) : (
-                                        "Anmelden"
-                                    )}
-                                </Button>
-                            </form>
-
-                            {/* Footer Link */}
-                            <p className="text-center text-sm text-neutral-500">
+                        {/* Footer */}
+                        <div className="bg-neutral-50 border-t border-neutral-200 px-8 py-4 text-center">
+                            <p className="text-sm text-neutral-500">
                                 Noch kein Konto?{" "}
                                 <Link to="/register" className="text-primary-500 hover:text-primary-600 hover:underline font-semibold transition-colors">
                                     Kostenlos registrieren
@@ -154,14 +151,14 @@ export function LoginPage() {
                         </div>
                     </div>
 
-                    {/* Legal */}
+                    {/* Trust */}
                     <p className="text-center text-xs text-neutral-400 mt-6">
                         Mit der Anmeldung stimmen Sie unseren{" "}
-                        <a href="#" className="hover:text-neutral-600 underline">AGB</a> und der{" "}
-                        <a href="#" className="hover:text-neutral-600 underline">Datenschutzerklärung</a> zu.
+                        <a href="#" className="underline hover:text-neutral-600">AGB</a> und der{" "}
+                        <a href="#" className="underline hover:text-neutral-600">Datenschutzerklärung</a> zu.
                     </p>
                 </motion.div>
-            </main>
+            </div>
         </div>
     );
 }

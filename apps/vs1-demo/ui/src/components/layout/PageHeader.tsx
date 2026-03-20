@@ -57,7 +57,7 @@ export function PageHeader() {
                         onClick={() => navigate("/register")}
                         className="flex items-center gap-2 h-9 px-5 bg-[#137fec] hover:bg-[#137fec]/80 transition-colors text-white text-sm font-semibold rounded-lg"
                     >
-                        Sign up free
+                        Sign up for free
                     </button>
                 </div>
             </div>

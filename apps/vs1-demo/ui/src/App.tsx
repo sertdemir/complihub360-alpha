@@ -23,6 +23,7 @@ import { FullSupportWizard } from "./pages/wizard/flows/FullSupportWizard";
 // Auth
 import { LoginPage } from "./pages/auth/LoginPage";
 import { RegisterPage } from "./pages/auth/RegisterPage";
+import { EmailVerificationPage } from "./pages/auth/EmailVerificationPage";
 
 /** All wizard routes share one WizardProvider instance per "session" via navigation.
  *  Each category-level route renders its own individualized multi-step wizard. */
@@ -69,6 +70,7 @@ function App() {
                 {/* Auth */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
+                <Route path="/verify-email" element={<EmailVerificationPage />} />
                 {/* Wizard — all flows nested under /wizard/* with shared WizardProvider */}
                 <Route path="/wizard/*" element={<WizardRoutes />} />
             </Routes>
