@@ -33,16 +33,6 @@ export function LanguageSwitcher() {
   const handleLanguageChange = (lng: string) => {
     i18n.changeLanguage(lng);
     setIsOpen(false);
-    
-    // Update the URL to reflect the new language
-    const pathParts = location.pathname.split('/');
-    if (pathParts.length > 1 && LANGUAGES.some(l => l.code === pathParts[1])) {
-      pathParts[1] = lng;
-      navigate(pathParts.join('/') + location.search + location.hash);
-    } else {
-      // If no valid language prefix is found, prepend it
-      navigate(`/${lng}${location.pathname}${location.search}${location.hash}`);
-    }
   };
 
   return (

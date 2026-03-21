@@ -78,7 +78,20 @@
       }
     },
     "companies": "Innovativen Unternehmen vertrauen uns",
-    "scroll": "Plattform entdecken"
+    "scroll": "Plattform entdecken",
+    "funnel": {
+      "countryLabel": "Zielmarkt",
+      "countryUk": "Vereinigtes Königreich",
+      "countryEu": "Europäische Union",
+      "countryGlobal": "Global / Andere",
+      "categoryLabel": "Compliance Kategorie",
+      "catTaxVat": "Steuern & USt",
+      "catEpr": "EPR Verpackung",
+      "catPrivacy": "Datenschutz",
+      "catMarketing": "Marketing & SEO",
+      "catCorporate": "Unternehmensgründung",
+      "cta": "Jetzt qualifizieren"
+    }
   },
   "landing": {
     "services": {
@@ -133,7 +146,7 @@
       "feature2Title": "Was sie niemals sieht",
       "feature2Desc": "Keine personenbezogenen Daten, keine sensiblen Finanzdaten. Alle Eingaben werden streng anonymisiert.",
       "bannerWhy": "Warum es wichtig ist:",
-      "bannerDesc": "Strukturierte KI-Dossiers eliminieren kostspielige „Discovery-Stunden" und ordnen Ihren genauen Fußabdruck dem richtigen lokalen Experten zu — und sparen wochenlange Abstimmung.",
+      "bannerDesc": "Strukturierte KI-Dossiers eliminieren kostspielige „Discovery-Stunden\" und ordnen Ihren genauen Fußabdruck dem richtigen lokalen Experten zu — und sparen wochenlange Abstimmung.",
       "card1Overline": "Live-Validierungen",
       "card1Desc": "Regulatorische Signale, verankert in offiziellen Behörden-APIs.",
       "card1Foot": "Quellen verifiziert",

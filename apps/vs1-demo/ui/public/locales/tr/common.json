@@ -78,7 +78,20 @@
       }
     },
     "companies": "Yenilikçi şirketler tarafından güveniliyor",
-    "scroll": "Platformu Keşfet"
+    "scroll": "Platformu Keşfet",
+    "funnel": {
+      "countryLabel": "Hedef Pazar",
+      "countryUk": "Birleşik Krallık",
+      "countryEu": "Avrupa Birliği",
+      "countryGlobal": "Küresel / Diğer",
+      "categoryLabel": "Uyumluluk Kategorisi",
+      "catTaxVat": "Vergi ve KDV",
+      "catEpr": "EPR Ambalaj",
+      "catPrivacy": "Veri Gizliliği",
+      "catMarketing": "Pazarlama ve SEO",
+      "catCorporate": "Kurumsal Kurulum",
+      "cta": "Şimdi nitele"
+    }
   },
   "landing": {
     "services": {

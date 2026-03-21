@@ -78,7 +78,20 @@
       }
     },
     "companies": "La confianza de empresas innovadoras",
-    "scroll": "Explorar Plataforma"
+    "scroll": "Explorar Plataforma",
+    "funnel": {
+      "countryLabel": "Mercado Objetivo",
+      "countryUk": "Reino Unido",
+      "countryEu": "Unión Europea",
+      "countryGlobal": "Global / Otro",
+      "categoryLabel": "Categoría de Cumplimiento",
+      "catTaxVat": "Impuestos e IVA",
+      "catEpr": "EPR Embalaje",
+      "catPrivacy": "Privacidad de Datos",
+      "catMarketing": "Marketing y SEO",
+      "catCorporate": "Configuración Corporativa",
+      "cta": "Califica ahora"
+    }
   },
   "landing": {
     "services": {

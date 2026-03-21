@@ -78,7 +78,20 @@
       }
     },
     "companies": "Trusted by innovative companies",
-    "scroll": "Explore Platform"
+    "scroll": "Explore Platform",
+    "funnel": {
+      "countryLabel": "Target Market",
+      "countryUk": "United Kingdom",
+      "countryEu": "European Union",
+      "countryGlobal": "Global / Other",
+      "categoryLabel": "Compliance Category",
+      "catTaxVat": "Tax & VAT",
+      "catEpr": "EPR Packaging",
+      "catPrivacy": "Data Privacy",
+      "catMarketing": "Marketing & SEO",
+      "catCorporate": "Corporate Setup",
+      "cta": "Qualify now"
+    }
   },
   "landing": {
     "services": {
