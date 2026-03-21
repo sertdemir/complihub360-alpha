@@ -8,7 +8,7 @@
     "signup": "Ücretsiz kayıt ol",
     "items": {
       "aiEngine": {
-        "title": "Yapay Zeka Motorsu",
+        "title": "Yapay Zeka Motoru",
         "desc": "Güvenli veri çıkarımı ve eşleme"
       },
       "partnerMatching": {
@@ -82,153 +82,240 @@
   },
   "landing": {
     "services": {
-      "badge": "Özel Odak",
-      "title": "Rolünüz İçin Tasarlandı",
-      "coreDomains": "Temel Alanlar",
+      "badge": "Özel Uyumluluk",
+      "title": "Kim olursanız olun neleri kapsıyoruz",
+      "coreDomains": "Kapsanan Temel Alanlar",
       "founder": {
-        "title": "Kurucular İçin",
+        "title": "Kurucular ve CEO'lar İçin",
         "tags": [
-          "Ürün Lansmanları",
-          "Yatırıma Hazırlık",
-          "Pazara Giriş"
+          "Vergi ve KDV Kaydı",
+          "Şirket Kurulumu",
+          "Temel Gizlilik"
         ],
-        "description": "Yeni bir pazara girmeden önce yasal engeller hakkında netlik kazanın. Hızlı, eyleme geçirilebilir ve uygun maliyetli."
+        "description": "Hukuki yük olmadan yeni pazarlara açılın. Taahhüt vermeden önce vergiler, KDV ve şirket yapısı hakkında anında netlik elde edin."
       },
       "ops": {
-        "title": "Operasyonlar İçin",
+        "title": "Operasyonlar ve Genişleme İçin",
         "tags": [
-          "Günlük Uyum",
-          "Risk İzleme",
-          "Tedarikçi Kontrolleri"
+          "EPR ve Ambalaj",
+          "Tedarik Zinciri ESG",
+          "Pazarlama Standartları"
         ],
-        "description": "Gündelik işleri otomatikleştirin. Sınır ötesi veri gizliliği ve istihdam farklılıkları hakkında net yanıtlar alın."
+        "description": "Tedarik zincirinizin ve ürün lansmanlarınızın riskini azaltın. Karmaşık EPR ambalaj kurallarında, pazarlama standartlarında ve operasyonel uyumda yol alın."
       },
       "advisors": {
-        "title": "Kurum İçi Danışmanlar İçin",
+        "title": "Kurum İçi Hukuk Danışmanları İçin",
         "tags": [
-          "İlk Değerlendirme",
-          "Politika Taslakları",
-          "Mevzuat Güncellemeleri"
+          "Küresel Gizlilik Eşlemesi",
+          "Mevzuat Kayması Uyarıları",
+          "Uyumluluk Denetimleri"
         ],
-        "description": "Araştırma süresini %90 azaltın. İlk taslaklar için yapay zeka motorumuzu kullanın, ardından onay için uzman avukatlara atayın."
+        "description": "Küresel mevzuat değişikliklerini manuel olarak takip etmeyi bırakın. Tek bir panelden 27'den fazla yargı bölgesini denetlemek için yapay zeka destekli harita sistemimizi kullanın."
       },
       "partners": {
-        "title": "Ortaklar İçin",
+        "title": "Partner Firmalar İçin",
         "tags": [
-          "Müşteri Kazanımı",
-          "Nitelikli İstihbarat",
-          "Müşteri Başarısı"
+          "Ön Taramadan Geçmiş Leads",
+          "Uygulamaya Hazır Dosyalar",
+          "Partner Ağı API'leri"
         ],
-        "description": "Uyum ihtiyaçlarını halihazırda belirlemiş, niyet oranı yüksek işletmelerle bağlantı kurun."
+        "description": "Yüksek kaliteli, önceden yapılandırılmış müşteri dosyaları alın. Sıkıcı ilk keşif görüşmeleri yerine yüksek değerli uzman uygulamasına odaklanın."
       },
-      "builtForRole": "Rolünüz İçin Tasarlandı",
-      "cta": "Sizin için doğru kurulumu bulun"
+      "builtForRole": "Rolünüz için tasarlandı",
+      "cta": "Özelleştirilmiş değerlendirmeyi başlat"
     },
     "snapshot": {
-      "headerOverline": "Canlı Çıktı",
-      "headerTitle": "Anında Risk Tespiti",
-      "description": "İşletme ayrıntılarınızı girin ve ana uyumluluk konularında hemen trafik lambası risk derecelendirmesi alın.",
-      "feature1Title": "Akıllı Kontroller",
-      "feature1Desc": "Anında KDV eşiklerini, EPR gereksinimlerini ve veri gizliliği kurallarını kontrol eder.",
-      "feature2Title": "Net Derecelendirme",
-      "feature2Desc": "Hangi alanların kritik (Kırmızı) hangilerinin uyumlu (Yeşil) olduğunu tam olarak görün.",
-      "bannerWhy": "Neden Önemli?",
-      "bannerDesc": "Ambalaj yasalarındaki kırmızı bayrak, mallarınızın gümrükte kalmasına neden olabilir. Biz bunu önceden yakalarız.",
-      "card1Overline": "Vergi / KDV",
-      "card1Desc": "Eşiğe yaklaşıyor",
-      "card1Foot": "Dikkat gerektirir",
-      "card2Overline": "Veri Gizliliği",
-      "card2Desc": "Çerez politikası eksik",
-      "card2Foot": "Kritik",
-      "card3Overline": "EPR Ambalaj",
-      "card3Desc": "Tamamen uyumlu",
-      "card3Foot": "Her şey yolunda",
-      "statusValue": "İşlem Gerekiyor",
+      "headerOverline": "Zeka Motoru",
+      "headerTitle": "Dosya Oluşturma ve Eşleştirme",
+      "description": "Verilerinizi nasıl işlediğimiz, canlı kaynakları nasıl entegre ettiğimiz ve mükemmel uzman eşleşmesini nasıl sunduğumuz hakkında tam şeffaflık.",
+      "feature1Title": "Yapay zekanın gördükleri",
+      "feature1Desc": "Kamuya açık izler, operasyonel meta veriler ve hedef pazar yargı bölgeleri.",
+      "feature2Title": "Hiç görmediği şeyler",
+      "feature2Desc": "PII yok, hassas finansal bilgi yok. Tüm girdiler kesinlikle anonimleştirilir.",
+      "bannerWhy": "Neden önemli:",
+      "bannerDesc": "Yapılandırılmış yapay zeka dosyaları maliyetli 'keşif saatlerini' ortadan kaldırır ve tam izinizi doğru yerel uzmana eşler — haftalarca süren gidip gelmeyi önler.",
+      "card1Overline": "Canlı Doğrulamalar",
+      "card1Desc": "Resmi devlet API'lerinde temellendirilen mevzuat sinyalleri.",
+      "card1Foot": "Kaynaklar doğrulandı",
+      "card2Overline": "Dosya Yapısı",
+      "card2Desc": "Üst düzey firmaların beklediği standartlaştırılmış hukuki brifing formatı.",
+      "card2Foot": "Uygulamaya hazır",
+      "card3Overline": "Eşleştirme Hassasiyeti",
+      "card3Desc": "Geleneksel keşifle karşılaştırıldığında doğrulanmış uyumluluk ortaklarından daha hızlı yanıt süreleri.",
+      "card3Foot": "Daha yüksek dönüşüm",
+      "statusValue": "Güvenli ve Temelli",
       "systemStatus": "Sistem Durumu",
-      "titleEnd": "Risk Özeti"
+      "titleStart": "Yapay zekamızın",
+      "titleEnd": "nasıl çalıştığı"
     },
     "stepper": {
-      "badge": "Nasıl Çalışır?",
-      "titleEnd": "Saatler İçinde Riskten Çözüme",
+      "badge": "Partner Yolculuğu",
+      "titleStart": "Bilinmeyen riskten",
+      "titleEnd": "yerel uygulamaya",
       "stepLabel": "ADIM",
       "step1": {
-        "title": "Senaryonuzu Girin",
-        "body": "Yapay zekaya ne sattığınızı, nereye sattığınızı ve mevcut kurulumunuzu 2 dakikadan kısa sürede anlatın."
+        "title": "Değerlendirme",
+        "body": "Yapay zekamız hedef izinizi tarar ve tam mevzuat boşluklarını anında işaretler."
       },
       "step2": {
-        "title": "Riskleri Anında Görün",
-        "body": "Sistemimiz verilerinizi canlı mevzuatlarla eşleştirir ve kırmızı ile yeşil bölgeleri işaretler."
+        "title": "Dosya",
+        "body": "Tüm zorunlu kayıtlar ve operasyonel değişikliklerle yapılandırılmış, anonimleştirilmiş bir hukuki brifing."
       },
       "step3": {
-        "title": "Aksiyon Planı Edinin",
-        "body": "Nelerin düzeltilmesi gerektiğine dair adım adım bir kontrol listesi alın."
+        "title": "Eşleştirme",
+        "body": "Dosyanızı boşluklarınızı bilen ön elemeden geçmiş yerel partnerlerle algoritmik olarak eşleştiriyoruz."
       },
       "step4": {
-        "title": "Uzmanlarla Eşleşin",
-        "body": "Gerekirse, onaylı yerel avukatlarla veya mali müşavirlerle anında bağlantı kurun."
+        "title": "Randevu",
+        "body": "Durumunuzu zaten anlayan bir uzmanla doğrudan strateji görüşmesi rezervasyonu yapın."
       },
       "step5": {
-        "title": "Uyumlu Kalın",
-        "body": "Yasadaki değişiklikleri izleyin ve uyarılar alın."
+        "title": "Uygulama",
+        "body": "Partneriniz yerel olarak kayıtları, başvuruları ve yapısal kurulumları gerçekleştirir."
       },
       "actionPlanActive": "Aksiyon Planı Aktif",
       "partnerAssigned": "Ortak Atandı",
-      "description": "Uluslararası uyumluluğu yönetmenin çok daha hızlı bir yolu."
+      "description": "5 adımlı hunimiz sadece sorunu tespit etmenizi değil — doğru yerel uzmanlarla hemen çözmenizi sağlar."
     },
-    "servicesZone": {
-      "badge": "Hizmet Dökümü",
-      "title2": "Temel Uyumluluk Alanları",
-      "description": "Biz dört kritik ayağa odaklanıyoruz.",
-      "ctaCardTitle": "Nelerin geçerli olduğundan emin değil misiniz?",
-      "ctaCardDesc": "Öğrenmek için 2 dakikalık profil oluşturma testini yapın.",
-      "ctaButton": "Teşhisi Başlat"
+    "uspZone": {
+      "badge": "Neden CompliHub360?",
+      "title": "Farklı tasarlanmış, tasarım gereği"
     },
-    "heroZone": {
-      "badge": "CompliHub360 Sözü",
-      "titleStart": "Uluslararası Pazarlara",
-      "titleHighlight": "Kısa Yol",
-      "titleEnd": " ",
-      "description": "Yasal boşlukları hemen tespit edin ve yerel uzmanlarla bağlantı kurun.",
-      "ctaButton": "Uyumluluk Kısayolumu Bul",
-      "ctaSub": "2 dakika sürer. Kredi kartı gerekmez.",
-      "cardTitle": "Anında Risk Kontrolü",
-      "cardDesc": "Pazarı ve kategoriyi girin ve hemen riskleri görün."
-    },
+    "uspItems": [
+      {
+        "title": "Proaktif, reaktif değil",
+        "body": "Mevzuatları manuel olarak aramayı bırakın. CompliHub360 iş bağlamınızı önceliklendirilmiş, ülkeye özgü bir eylem planına eşler — ceza almadan önce.",
+        "bullets": [
+          "Dakikalar içinde kişiselleştirilmiş risk profili",
+          "Önceliklendirilmiş yükümlülükler, ham yasa dökümü değil",
+          "UK, AB ve çok pazarlı senaryoları kapsar"
+        ]
+      },
+      {
+        "title": "Mimaride gizlilik önceliği",
+        "body": "Hassas şirket verileriniz — adlar, e-postalar, vergi kimlikleri — tarayıcınızdan yapılandırılmamış olarak hiç çıkmaz. Yerel yapay zeka modelleri, herhangi bir analiz sunucularımıza ulaşmadan önce tüm kişisel verileri sansürler.",
+        "bullets": [
+          "Bulut işlemeden önce yerel PII sansürü",
+          "Sunucularımızda sıfır ham PII depolandı",
+          "Tasarım gereği UK GDPR ve CCPA uyumlu"
+        ]
+      },
+      {
+        "title": "Uçtan uca orkestrasyon",
+        "body": "Tam uyumluluk yaşam döngüsünü yönetiyoruz — öz değerlendirmeden doğrulanmış uzman eşleştirmeye kadar. Otomatik SLA watchdog'umuz sağlayıcı yanıtlarını takip eder, böylece asla beklemezsiniz.",
+        "bullets": [
+          "Öz değerlendirmeden uzman devrine",
+          "Otomatik SLA watchdog ve e-posta takibi",
+          "Doğrulanmış yerel uzman ağı"
+        ]
+      }
+    ],
     "aiEngine": {
-      "badge": "Yapay Zeka Analizi",
-      "title2": "Yapay Zeka Uyumluluk Motoru",
-      "description": "Benzersiz motorumuz düzenleyici değişiklikleri sizin yerinize okur.",
+      "badge": "Yapay Zeka Motoru",
+      "title1": "Ham bağlamdan yapılandırılmış bir",
+      "title2": "uyumluluk dosyasına",
+      "description": "Gizlilik öncelikli yapay zeka boru hattımızın üç aşaması var — her biri veri maruziyetinizi en aza indirirken çıktı kalitesini en üst düzeye çıkarmak için tasarlandı.",
       "step": "Adım"
     },
+    "aiSteps": [
+      {
+        "title": "Akıllı Bağlam Alımı",
+        "body": "Yapay zeka, yapılandırılmamış iş bağlamınızı doğrulanmış yapılandırılmış bir şemaya çevirir — varlık türünü, sektörü, gelir bantlarını ve pazar niyetini çıkarır.",
+        "stats": [
+          {
+            "label": "Çıkarılan varlık alanları"
+          },
+          {
+            "label": "Tespit edilen pazarlar"
+          },
+          {
+            "label": "İşleme süresi",
+            "staticValue": "< 2 sn"
+          }
+        ]
+      },
+      {
+        "title": "Canlı Doğrulamalar",
+        "body": "Yerel yapay zeka modelleri, anonimleştirilmiş şema eşleme motoruna geçmeden önce tüm Kişisel Tanımlayıcı Bilgileri — adlar, e-postalar, vergi kimlikleri, telefon numaraları — kaldırır.",
+        "stats": [
+          {
+            "label": "Yürütülen canlı doğrulamalar"
+          },
+          {
+            "label": "Kaldırılan PII alanları"
+          },
+          {
+            "label": "Sunucuda depolanan bayt"
+          }
+        ]
+      },
+      {
+        "title": "Dosya Oluşturma ve Eşleştirme",
+        "body": "Motor, anonimleştirilmiş profilinizi canlı ülkeye özgü risk matrisleriyle çapraz referanslar ve doğrulanmış yerel uzmanlarla eşleştirilmiş yapılandırılmış bir dosya üretir.",
+        "stats": [
+          {
+            "label": "Oluşturulan dosya sayfaları"
+          },
+          {
+            "label": "Uzman eşleştirme doğruluğu"
+          },
+          {
+            "label": "Ortalama eşleştirme süresi",
+            "staticValue": "< 24 sa"
+          }
+        ]
+      }
+    ],
+    "servicesZone": {
+      "badge": "Ne kapsıyoruz",
+      "title1": "Altı uyumluluk alanı,",
+      "title2": "tek platform",
+      "description": "Her alan ülkeye özgü gereksinimlere eşlenir ve mevzuat değiştikçe güncellenir.",
+      "ctaCardTitle": "Uçtan uca kapsama mı ihtiyacınız var?",
+      "ctaCardDesc": "Full Support paketimiz, özel bir uyumluluk yöneticisi ve birleşik bir eylem planıyla altı alanın tamamını kapsar.",
+      "ctaButton": "Full Support'u keşfet"
+    },
+    "heroZone": {
+      "badge": "Yapay Zeka Destekli Danışmanlık Sistemi",
+      "titleStart": "Uyumluluk",
+      "titleHighlight": "Pusulası",
+      "titleEnd": "Brexit Sonrası UK İçin",
+      "description": "Vergi ve KDV yükümlülüklerini ve EPR gereksinimlerini hassasiyetle yönetin. Mevzuat parçalanmasını yapılandırılmış bir Eylem Planına dönüştürün — maks. 5 adımda.",
+      "ctaButton": "Maks. 5 adımda nitelendirin",
+      "ctaSub": "Hesap gerekmez · 3 dakikadan kısa sürede sonuçlar",
+      "cardTitle": "Nitelendirmenizi başlatın",
+      "cardDesc": "Kişiselleştirilmiş bir uyumluluk dosyası almak için pazarınızı ve kategorinizi seçin."
+    },
     "valueProgression": {
-      "badge": "Değer Teklifi",
-      "title2": "Neden Bizi Seçiyorlar",
-      "description": "Geleneksel hukuki danışmanlık haftalar sürer. Biz dakikalar içinde hallediyoruz.",
+      "badge": "Erişim Seviyeleri",
+      "title1": "Ne kadar çok paylaşırsanız, o kadar çok",
+      "title2": "kilidini açarsınız",
+      "description": "Misafir olarak ücretsiz başlayın. Tam Eylem Planınızın kilidini açmak için kaydolun. Nitelikli lead almak için Partner olarak katılın.",
       "mostPopular": "En Popüler"
     },
     "socialProof": {
-      "title": "Yenilikçi Ekipler Tarafından Güveniliyor"
+      "title": "Şu şirketlerin uyumluluk ekipleri tarafından güvenilir"
     },
     "footer": {
       "platform": "Platform",
       "platformLinks": [
-        "Ana Sayfa",
-        "Çözümler",
-        "Fiyatlandırma",
-        "Ortaklar"
+        "Hizmetler",
+        "Ülkeler",
+        "Danışmanlık",
+        "Uyumluluk Sihirbazı"
       ],
       "legal": "Yasal",
       "legalLinks": [
         "Gizlilik Politikası",
         "Hizmet Şartları",
         "Çerez Politikası",
-        "Sorumluluk Reddi"
+        "GDPR Uyumluluğu"
       ],
-      "copyright": "CompliHub360",
-      "description": "Küresel uyumluluğa giden kısayolunuz.",
-      "privacyBadge": "Önce Gizlilik",
+      "copyright": "© {{year}} CompliHub360. Tüm hakları saklıdır.",
+      "description": "Akıllı uyumluluk pusulası. Yapay zeka odaklı hassasiyet ve gizlilik öncelikli mimariyle küresel mevzuat karmaşıklığında yol alın.",
+      "privacyBadge": "Önce gizlilik · Onay olmadan PII depolanmaz",
       "subscribeButton": "Abone Ol",
-      "subscribed": "Abone Olundu!"
+      "subscribed": "Uyumluluk Bültenine abone olundu"
     },
     "resolution": {
       "badge": "Örnek Çıktı — Sayfa 1 / 3",
@@ -348,7 +435,7 @@
     "businessTypes": {
       "ecommerce": {
         "label": "E-Ticaret Markası",
-        "desc": "Web siteniz veya pazar yeri üzerinden vlastı ürünlerinizi satın."
+        "desc": "Web siteniz veya pazar yeri üzerinden kendi ürünlerinizi satın."
       },
       "marketplace": {
         "label": "Pazar Yeri Satıcısı",
