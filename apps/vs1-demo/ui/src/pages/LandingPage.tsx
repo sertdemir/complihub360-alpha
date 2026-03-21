@@ -19,7 +19,6 @@ import {
   Globe,
   FileText,
   Clock,
-  LayoutDashboard,
   Mail,
   Check,
   CircleDot,
@@ -118,42 +117,6 @@ interface GroundedSource {
 }
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
-
-const HEADER_MENU = [
-  {
-    id: 'platform',
-    label: 'Platform',
-    items: [
-      { title: 'The AI Engine', desc: 'Secure data extraction & mapping', path: '/platform#engine' },
-      { title: 'Partner Matching', desc: 'From risk to local execution', path: '/platform#matching' },
-      { title: 'Global Coverage', desc: 'UK, EU, Germany & US', path: '/platform#coverage' },
-      { title: 'For Partner Firms', desc: 'Lead generation for advisors', path: '/platform#partners' },
-    ]
-  },
-  {
-    id: 'solutions',
-    label: 'Solutions',
-    items: [
-      { title: 'Founders & CEOs', desc: 'Minimise risk & scale faster', path: '/solutions#founders' },
-      { title: 'Operations Teams', desc: 'Automate daily compliance', path: '/solutions#operations' },
-      { title: 'In-House Counsel', desc: 'Cut research time by 90%', path: '/solutions#counsel' },
-    ]
-  },
-  {
-    id: 'areas',
-    label: 'Compliance Areas',
-    path: '/compliance',
-    items: []
-  },
-  {
-    id: 'resources',
-    label: 'Resources',
-    items: [
-      { title: 'Customer Stories', desc: 'See real compliance outcomes', path: '/resources#stories' },
-      { title: 'Guides & Whitepapers', desc: 'In-depth market deep-dives', path: '/resources#guides' },
-    ]
-  }
-];
 
 const TRUST_BADGES: TrustBadge[] = [
   { icon: ShieldCheck, text: 'Privacy-first architecture' },
@@ -393,116 +356,6 @@ const GROUNDED_SOURCES: GroundedSource[] = [
   { title: 'Making Tax Digital — Phase 2', ref: 'HMRC MTD for VAT', type: 'Directive' },
   { title: 'Product Safety & Standards Post-Brexit', ref: 'OPSS Guidance 2024', type: 'Guidance' },
 ];
-
-// ─── Zone 0: Navigation ───────────────────────────────────────────────────────
-
-function LandingNav() {
-  const navigate = useNavigate();
-  const [activeMenu, setActiveMenu] = useState<string | null>(null);
-
-  // Close menu on scroll
-  useEffect(() => {
-    const handleScroll = () => setActiveMenu(null);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  return (
-    <header 
-      className="sticky top-0 z-50 w-full border-b border-neutral-200 bg-surface/90 backdrop-blur-md"
-      onMouseLeave={() => setActiveMenu(null)}
-    >
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-6 relative">
-        <button
-          onClick={() => navigate('/')}
-          className="flex items-center gap-2 shrink-0 z-10"
-          aria-label="CompliHub360 Home"
-        >
-          <div className="w-6 h-6 bg-primary-500 rounded-sm flex items-center justify-center">
-            <CircleDot size={14} className="text-white" />
-          </div>
-          <span className="font-sans font-bold text-neutral-900 tracking-tight">
-            CompliHub<span className="text-primary-500">360</span>
-          </span>
-        </button>
-
-        <nav className="hidden tablet:flex items-center h-full gap-2 absolute left-1/2 -translate-x-1/2">
-          {HEADER_MENU.map((menu) => (
-            <div 
-              key={menu.id} 
-              className="h-full flex items-center"
-              onMouseEnter={() => menu.items.length > 0 ? setActiveMenu(menu.id) : setActiveMenu(null)}
-            >
-              <button
-                onClick={() => menu.path ? navigate(menu.path) : undefined}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-ui-small font-semibold transition-colors ${
-                  activeMenu === menu.id
-                    ? 'text-primary-700 bg-primary-50'
-                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-                }`}
-              >
-                {menu.label}
-                {menu.items.length > 0 && <ChevronDown size={14} className={`transition-transform duration-200 ${activeMenu === menu.id ? 'rotate-180 text-primary-600' : 'text-neutral-400'}`} />}
-              </button>
-            </div>
-          ))}
-        </nav>
-
-        <div className="flex items-center gap-3 shrink-0 z-10">
-          <button
-            className="hidden tablet:inline-flex text-neutral-600 hover:text-neutral-900 text-ui-small font-semibold px-4 py-2 rounded-md hover:bg-neutral-100 transition-colors"
-            onClick={() => navigate('/login')}
-          >
-            Log in
-          </button>
-          <Button variant="primary" size="sm" onClick={() => navigate('/register')}>
-            Sign up for free
-          </Button>
-        </div>
-      </div>
-
-      <AnimatePresence>
-        {activeMenu && (
-          <motion.div
-            initial={{ opacity: 0, y: -5, height: 0 }}
-            animate={{ opacity: 1, y: 0, height: 'auto' }}
-            exit={{ opacity: 0, y: -5, height: 0 }}
-            transition={{ duration: 0.15, ease: 'easeInOut' }}
-            className="absolute top-16 left-0 w-full bg-white border-b border-neutral-200 shadow-xl overflow-hidden pointer-events-auto"
-          >
-            <div className="max-w-7xl mx-auto px-6 py-8">
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-                {HEADER_MENU.find(m => m.id === activeMenu)?.items.map((item) => (
-                  <button
-                    key={item.title}
-                    onClick={() => {
-                      navigate(item.path);
-                      setActiveMenu(null);
-                    }}
-                    className="text-left group flex items-start gap-4 p-3 -m-3 rounded-xl hover:bg-neutral-50 transition-colors"
-                  >
-                    <div className="w-10 h-10 rounded-lg bg-primary-50 flex items-center justify-center shrink-0 border border-primary-100 group-hover:bg-white group-hover:border-primary-200 group-hover:shadow-sm transition-all">
-                      <LayoutDashboard size={18} className="text-primary-600" />
-                    </div>
-                    <div className="mt-0.5">
-                      <Typography variant="ui-small" weight="bold" className="text-neutral-900 flex items-center gap-1 mb-1 group-hover:text-primary-700 transition-colors">
-                        {item.title}
-                        <ArrowRight size={14} className="opacity-0 -translate-x-2 w-0 group-hover:w-auto overflow-hidden group-hover:opacity-100 group-hover:translate-x-0 transition-all text-primary-500" />
-                      </Typography>
-                      <Typography variant="caption" className="text-neutral-500 block normal-case tracking-normal">
-                        {item.desc}
-                      </Typography>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
-  );
-}
 
 // ─── Zone 1: Hero & Intent-Gate ───────────────────────────────────────────────
 
@@ -867,58 +720,43 @@ function CountUp({ target, suffix = '', duration = 1.1 }: { target: number; suff
 
 function AiEngineZone() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
-  const [activeStation, setActiveStation] = useState<number>(-1);
-  const [hoveredStation, setHoveredStation] = useState<number | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const displayStation = hoveredStation !== null ? hoveredStation : activeStation;
-  const showPanel = displayStation >= 0;
-
-  // Grid-based positions: 3 equal columns → centres at 1/6, 3/6, 5/6 of container
-  const n = AI_STEPS.length;
-  const stationPct = (i: number) => ((2 * i + 1) / (2 * n)) * 100;
-  const trackStart = stationPct(0);                                          // 16.67%
-  const travelPct  = activeStation >= 0 ? stationPct(activeStation) : trackStart;
-  const fillPct    = Math.max(0, travelPct - trackStart);                    // 0 / 33.33 / 66.67%
-
-  // Start auto-cycle when section enters viewport
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) setHasStarted(true); },
-      { threshold: 0.35 }
+      { threshold: 0.25 }
     );
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
 
-  // Auto-cycle: -1 → 0 → 1 → 2 → 0 → ...
   useEffect(() => {
-    if (!hasStarted || hoveredStation !== null) return;
+    if (!hasStarted) return;
     timerRef.current = setTimeout(() => {
-      setActiveStation(prev => prev >= AI_STEPS.length - 1 ? 0 : prev + 1);
-    }, activeStation === -1 ? 600 : 3000);
+      setActiveIndex(prev => (prev + 1) % AI_STEPS.length);
+    }, 6000);
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, [hasStarted, activeStation, hoveredStation]);
+  }, [hasStarted, activeIndex]);
 
-  const handleHoverEnter = (index: number) => {
+  const handleSelect = (index: number) => {
+    setActiveIndex(index);
     if (timerRef.current) clearTimeout(timerRef.current);
-    setHoveredStation(index);
   };
 
-  const handleHoverLeave = () => {
-    setHoveredStation(null);
-  };
+  const CIRCUMFERENCE = 2 * Math.PI * 48; // r=48
 
   return (
-    <section ref={sectionRef} className="bg-surface py-10 desktop-s:py-12">
+    <section ref={sectionRef} className="bg-surface py-16 desktop-s:py-24">
       <div className="max-w-7xl mx-auto px-6">
 
         {/* Header */}
         <motion.div
-          className="text-center mb-12"
+          className="text-center mb-16"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
@@ -935,138 +773,126 @@ function AiEngineZone() {
           </Typography>
         </motion.div>
 
-        {/* Pipeline — dot row isolated in h-12 so top-1/2 = exact dot centre for every element */}
-        <div className="max-w-xl mx-auto mb-2 select-none">
+        {/* Left stepper + Right bento */}
+        <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-8 lg:gap-12 items-start">
 
-          {/* ── Dot row (h-12 = 48px) ── all absolute elements share top-1/2 -translate-y-1/2 */}
-          <div className="relative h-12">
-
-            {/* Base track */}
-            <div
-              className="absolute top-1/2 -translate-y-1/2 h-px bg-neutral-200 pointer-events-none"
-              style={{ left: `${trackStart}%`, right: `${100 - stationPct(n - 1)}%` }}
-            />
-
-            {/* Filled track */}
-            <motion.div
-              className="absolute top-1/2 -translate-y-1/2 h-px bg-primary-300 origin-left pointer-events-none"
-              style={{ left: `${trackStart}%` }}
-              animate={{ width: `${fillPct}%` }}
-              transition={{ duration: 0.75, ease: 'easeInOut' }}
-            />
-
-            {/* Traveling dot */}
-            <motion.div
-              className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-primary-400 shadow-sm z-30 pointer-events-none"
-              animate={{
-                left: `${travelPct}%`,
-                x: '-50%',
-                opacity: activeStation >= 0 ? 1 : 0,
-              }}
-              transition={{ duration: 0.75, ease: 'easeInOut' }}
-            />
-
-            {/* Station dots */}
-            {AI_STEPS.map(({ step, icon: Icon, dotActiveCls, iconBgCls }, index) => {
-              const isActive = displayStation === index;
+          {/* ── Left: Minimal step nav ── */}
+          <div className="flex flex-col gap-2">
+            {AI_STEPS.map(({ step, icon: Icon, title, iconBgCls, stepLabelCls }, index) => {
+              const isActive = activeIndex === index;
               return (
                 <div
                   key={step}
-                  className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-20 cursor-pointer"
-                  style={{ left: `${stationPct(index)}%` }}
-                  onMouseEnter={() => handleHoverEnter(index)}
-                  onMouseLeave={handleHoverLeave}
+                  className={`flex items-center gap-3 px-4 py-3.5 rounded-xl cursor-pointer transition-all duration-300 ${
+                    isActive
+                      ? 'bg-white shadow-md border border-primary-200'
+                      : 'hover:bg-white/60 border border-transparent'
+                  }`}
+                  onClick={() => handleSelect(index)}
                 >
-                  <motion.div
-                    className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-colors duration-300 ${
-                      isActive ? `${dotActiveCls} ring-4` : 'bg-white border-neutral-300'
-                    }`}
-                    animate={{ scale: isActive ? 1.12 : 1 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-                  >
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isActive ? iconBgCls : 'bg-neutral-100 text-neutral-400'}`}>
-                      <Icon size={15} />
-                    </div>
-                  </motion.div>
+                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-300 ${isActive ? iconBgCls : 'bg-neutral-100 text-neutral-400'}`}>
+                    <Icon size={18} />
+                  </div>
+                  <div className="min-w-0">
+                    <span className={`text-[9px] font-bold tracking-[0.2em] uppercase block transition-colors duration-300 ${isActive ? stepLabelCls : 'text-neutral-400'}`}>
+                      Step {step}
+                    </span>
+                    <span className={`font-semibold text-sm leading-tight block transition-colors duration-300 ${isActive ? 'text-neutral-900' : 'text-neutral-500'}`}>
+                      {title}
+                    </span>
+                  </div>
                 </div>
               );
             })}
           </div>
 
-          {/* ── Label row — separate grid below the dot row ── */}
-          <div className="grid grid-cols-3 mt-4">
-            {AI_STEPS.map(({ step, title }, index) => {
-              const isActive = displayStation === index;
-              return (
-                <div
-                  key={step}
-                  className="flex justify-center cursor-pointer"
-                  onMouseEnter={() => handleHoverEnter(index)}
-                  onMouseLeave={handleHoverLeave}
-                >
-                  <Typography
-                    variant="ui-small"
-                    className={`text-center font-medium transition-colors duration-300 max-w-[90px] leading-tight line-clamp-2 ${isActive ? 'text-neutral-800' : 'text-neutral-400'}`}
-                  >
-                    {title}
-                  </Typography>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Content panel — px-10 = 40px horizontal padding away from outermost dots */}
-        <div className="mt-8 min-h-[160px] px-10">
+          {/* ── Right: Bento grid ── */}
           <AnimatePresence mode="wait">
-            {showPanel && (
-              <motion.div
-                key={displayStation}
-                className={`border rounded-xl p-7 ${AI_STEPS[displayStation].panelCls}`}
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.35, ease: 'easeOut' }}
-              >
-                <div className="flex flex-col desktop-s:flex-row gap-6 desktop-s:items-start">
-                  {/* Left: label + body */}
-                  <div className="flex-1">
-                    <Typography
-                      variant="caption"
-                      className={`block mb-1 normal-case tracking-normal font-semibold ${AI_STEPS[displayStation].stepLabelCls}`}
-                    >
-                      Step {AI_STEPS[displayStation].step}
-                    </Typography>
-                    <Typography variant="h3" weight="bold" className="text-neutral-900 mb-2">
-                      {AI_STEPS[displayStation].title}
-                    </Typography>
-                    <Typography variant="ui-small" className="text-neutral-600 leading-relaxed max-w-md">
-                      {AI_STEPS[displayStation].body}
-                    </Typography>
-                  </div>
+            <motion.div
+              key={activeIndex}
+              className="grid grid-cols-3 grid-rows-[auto_auto] gap-4"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+            >
+              {/* Top row: text box spanning all 3 columns */}
+              <div className={`col-span-3 border rounded-2xl p-7 ${AI_STEPS[activeIndex].panelCls}`}>
+                <Typography
+                  variant="caption"
+                  className={`block mb-1.5 normal-case tracking-normal font-semibold ${AI_STEPS[activeIndex].stepLabelCls}`}
+                >
+                  Step {AI_STEPS[activeIndex].step}
+                </Typography>
+                <Typography variant="h3" weight="bold" className="text-neutral-900 mb-3">
+                  {AI_STEPS[activeIndex].title}
+                </Typography>
+                <Typography variant="body" className="text-neutral-600 leading-relaxed max-w-2xl">
+                  {AI_STEPS[activeIndex].body}
+                </Typography>
+              </div>
 
-                  {/* Right: stats */}
-                  <div className="flex gap-8 shrink-0 desktop-s:pt-1">
-                    {AI_STEPS[displayStation].stats.map((stat) => (
-                      <div key={stat.label} className="flex flex-col items-center text-center">
-                        <span className="text-3xl font-bold text-neutral-900 tabular-nums leading-none mb-1">
-                          {stat.staticValue
-                            ? stat.staticValue
-                            : <CountUp target={stat.numericEnd ?? 0} suffix={stat.suffix ?? ''} />
-                          }
+              {/* Bottom row: 3 ring boxes, one per stat */}
+              {AI_STEPS[activeIndex].stats.map((stat, i) => {
+                const ringValue = stat.numericEnd !== undefined
+                  ? Math.min(stat.numericEnd, 100)
+                  : 75;
+                const stepColorSets = [
+                  ['hsl(var(--primary))', 'hsl(160, 38%, 50%)', 'hsl(142, 50%, 45%)'],
+                  ['hsl(168, 40%, 52%)', 'hsl(168, 30%, 58%)', 'hsl(168, 50%, 42%)'],
+                  ['hsl(142, 58%, 42%)', 'hsl(142, 48%, 50%)', 'hsl(142, 68%, 35%)'],
+                ];
+                const color = stepColorSets[activeIndex]?.[i] || 'hsl(var(--primary))';
+
+                return (
+                  <motion.div
+                    key={stat.label}
+                    className={`border rounded-2xl p-5 flex flex-col items-center justify-center ${AI_STEPS[activeIndex].cardCls}`}
+                    initial={{ opacity: 0, scale: 0.85 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.4, delay: 0.1 + i * 0.1, ease: 'easeOut' }}
+                  >
+                    <div className="relative w-[100px] h-[100px] mb-3">
+                      <svg viewBox="0 0 120 120" className="w-full h-full -rotate-90">
+                        <circle
+                          cx="60" cy="60" r="48"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="8"
+                          className="text-neutral-200/40"
+                        />
+                        <motion.circle
+                          cx="60" cy="60" r="48"
+                          fill="none"
+                          stroke={color}
+                          strokeWidth="8"
+                          strokeLinecap="round"
+                          strokeDasharray={CIRCUMFERENCE}
+                          initial={{ strokeDashoffset: CIRCUMFERENCE }}
+                          animate={{
+                            strokeDashoffset: hasStarted
+                              ? CIRCUMFERENCE * (1 - ringValue / 100)
+                              : CIRCUMFERENCE,
+                          }}
+                          transition={{ duration: 1.2, ease: [0.45, 0, 0.55, 1], delay: 0.15 + i * 0.15 }}
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-xl font-bold text-neutral-900 tabular-nums leading-none">
+                          {stat.staticValue ?? `${stat.numericEnd}${stat.suffix ?? ''}`}
                         </span>
-                        <Typography variant="ui-small" className="text-neutral-500 max-w-[80px] leading-tight">
-                          {stat.label}
-                        </Typography>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            )}
+                    </div>
+                    <span className="text-xs font-medium text-neutral-500 text-center leading-tight max-w-[120px]">
+                      {stat.label}
+                    </span>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
           </AnimatePresence>
-        </div>
 
+        </div>
       </div>
     </section>
   );
@@ -1305,16 +1131,13 @@ function LandingFooter() {
   );
 }
 
-import { TrustedLogosTicker } from '../components/layout/TrustedLogosTicker';
 
 export function LandingPage() {
   return (
     <div className="bg-transparent min-h-screen flex flex-col font-sans text-neutral-900 antialiased relative z-0">
       <BackgroundDepth />
-      <LandingNav />
       <main>
         <HeroSection />
-        <TrustedLogosTicker />
         <RiskSnapshotTeaser />
         <UspZone />
         <AiEngineZone />

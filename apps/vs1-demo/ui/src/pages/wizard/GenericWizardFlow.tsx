@@ -342,13 +342,12 @@ export function GenericWizardFlow() {
     const currentConfig = stepConfigs[step];
 
     return (
-        <div className="bg-neutral-50 min-h-screen flex flex-col text-neutral-900 font-['Inter',sans-serif]">
-            <WizardHeader />
-            <main className="flex-1 flex flex-col items-center justify-center px-4 py-10">
+        <div className="w-full flex flex-col items-center justify-center text-neutral-900 font-['Inter',sans-serif]">
+            <main className="w-full flex flex-col items-center justify-center px-4 py-8">
                 <motion.div 
                     layout
                     transition={{ layout: { duration: 0.4, ease: [0.25, 1, 0.5, 1] } }}
-                    className="w-full max-w-3xl bg-white border border-neutral-200 rounded-2xl shadow-lg ring-1 ring-black/5 overflow-hidden flex flex-col"
+                    className="w-full max-w-3xl bg-white border border-white/20 rounded-2xl shadow-2xl ring-1 ring-black/5 overflow-hidden flex flex-col"
                 >
                     <WizardStepper
                         currentStep={step + 1}

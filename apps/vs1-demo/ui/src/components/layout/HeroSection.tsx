@@ -1,11 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ArrowRight, ShieldCheck, Zap, Rocket } from 'lucide-react';
+import { type LucideIcon, ChevronDown, ArrowRight, ShieldCheck, Zap, Rocket } from 'lucide-react';
 import { Typography } from '../ui/Typography';
 import { HeroMeshBackground } from './HeroMeshBackground';
 
-const SCENARIOS = [
+interface Usp { icon: LucideIcon; text: string; }
+
+const SCENARIOS: {
+  segments: { text: string; highlight?: boolean }[];
+  text: string;
+  cta: string;
+  usps: Usp[];
+}[] = [
   {
     segments: [
       { text: "Your Compliance " },
@@ -14,6 +21,11 @@ const SCENARIOS = [
     ],
     text: 'Identify regulatory gaps instantly and match with vetted local experts for seamless execution.',
     cta: 'Find my compliance shortcut',
+    usps: [
+      { icon: Zap,         text: 'Instant gap analysis' },
+      { icon: ShieldCheck, text: 'Vetted local experts' },
+      { icon: Rocket,      text: 'Fast execution' },
+    ],
   },
   {
     segments: [
@@ -23,6 +35,11 @@ const SCENARIOS = [
     ],
     text: 'Translate local fragmentation into a clear roadmap. We help you understand faster and decide safer.',
     cta: 'Build my action plan now',
+    usps: [
+      { icon: Zap,         text: 'Understand faster' },
+      { icon: ShieldCheck, text: 'Decide safer' },
+      { icon: Rocket,      text: 'Clear roadmap' },
+    ],
   },
   {
     segments: [
@@ -31,6 +48,11 @@ const SCENARIOS = [
     ],
     text: 'Stop guessing. Get your customized assessment and connect with the right partner firm immediately.',
     cta: 'Connect with an expert now',
+    usps: [
+      { icon: Rocket,      text: 'Match instantly' },
+      { icon: ShieldCheck, text: 'Pre-qualified experts' },
+      { icon: Zap,         text: 'Custom assessment' },
+    ],
   },
 ];
 
@@ -55,7 +77,7 @@ export function HeroSection() {
   };
 
   return (
-    <section className="bg-transparent relative pt-16 desktop-s:pt-28 pb-16 desktop-s:pb-24 overflow-hidden z-10">
+    <section className="bg-transparent relative min-h-screen flex flex-col justify-center pt-28 desktop-s:pt-36 pb-16 desktop-s:pb-24 overflow-hidden z-10">
 
       {/* ── Mesh Animation ──────────────────────────────────────── */}
       <HeroMeshBackground />
@@ -80,8 +102,28 @@ export function HeroSection() {
         
         {/* Top Content (Centered) */}
         <div className="flex flex-col items-center w-full">
+
+          {/* USP ROW — above title, fades with scenario */}
+          <AnimatePresence mode="wait">
+            <motion.ul
+              key={sliderIndex}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 1.0, ease: [0.45, 0, 0.55, 1] }}
+              className="flex items-center justify-center gap-6 md:gap-10 mb-6 flex-wrap"
+            >
+              {SCENARIOS[sliderIndex].usps.map((usp, i) => (
+                <li key={i} className="flex items-center gap-2 text-neutral-600">
+                  <usp.icon size={16} className="text-primary-600 shrink-0" strokeWidth={2} />
+                  <span className="text-sm font-medium whitespace-nowrap">{usp.text}</span>
+                </li>
+              ))}
+            </motion.ul>
+          </AnimatePresence>
+
           {/* Title & Description Fade Container */}
-          <div className="w-full mb-4 min-h-[300px] md:min-h-[340px] flex flex-col justify-start items-center">
+          <div className="w-full mb-2 min-h-[150px] md:min-h-[170px] flex flex-col justify-start items-center">
 
             {/* FADE TITLE */}
             <AnimatePresence mode="wait">
@@ -122,7 +164,7 @@ export function HeroSection() {
         </div>
 
         {/* ── CTA Button — rhythmisch mit Titel ─────────────────── */}
-        <div className="flex justify-center w-full mb-4 relative group">
+        <div className="flex justify-center w-full mb-[108px] relative group">
           <AnimatePresence mode="wait">
             <motion.div
               key={sliderIndex}
@@ -151,18 +193,12 @@ export function HeroSection() {
 
         {/* ── Input Container ────────────────────────────────────── */}
         {/* Light Green Master Container for Funnel, CTA, and Pills */}
-        <div className="w-full max-w-[1100px] rounded-[32px] p-6 sm:p-8 lg:p-10 shadow-xl relative z-20 mb-4 flex flex-col items-center border border-white/50 bg-white/30 backdrop-blur-xl overflow-hidden transform-gpu">
+        <div className="w-full max-w-[1100px] rounded-[32px] py-3 px-3.5 sm:py-4 sm:px-[1.1rem] lg:py-5 lg:px-[1.375rem] shadow-xl relative z-20 mb-3 sm:mb-4 lg:mb-5 flex flex-col items-center border border-white/50 bg-white/30 backdrop-blur-xl overflow-hidden transform-gpu">
 
-          <div className="relative z-10 w-full flex flex-col items-center pt-2">
-
-            {/* PROMPT TO TEST */}
-            <div className="text-center mb-8 px-4">
-              <h3 className="text-2xl sm:text-3xl font-display font-bold text-primary-950 mb-2 leading-tight">Test your compliance readiness</h3>
-              <p className="text-primary-800 font-medium text-lg max-w-2xl mx-auto">Select your market and challenge to start the free assessment.</p>
-            </div>
+          <div className="relative z-10 w-full flex flex-col items-center">
 
             {/* 1) Funnel Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1.8fr_auto] gap-4 lg:gap-6 items-start w-full mb-10">
+            <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1.8fr_auto] gap-4 lg:gap-6 items-start w-full">
               {/* Target Market */}
               <div className="w-full flex flex-col items-start gap-2">
                 <label className="text-[11px] font-bold text-primary-700 tracking-wider uppercase ml-1">I need to comply in</label>
@@ -212,21 +248,30 @@ export function HeroSection() {
               </div>
             </div>
 
-            {/* 2) Outcome USPs (Clean Icons) */}
-            <ul className="grid grid-cols-3 gap-4 md:gap-12 w-full max-w-2xl mx-auto mt-6 mb-2">
-              <li className="flex flex-col items-center justify-start gap-4 text-center group cursor-default">
-                <Zap size={44} className="text-primary-700 group-hover:text-primary-600 transition-colors" strokeWidth={1.5} />
-                <span className="font-medium text-primary-950 text-base md:text-lg whitespace-nowrap">Understand faster</span>
-              </li>
-              <li className="flex flex-col items-center justify-start gap-4 text-center group cursor-default">
-                <ShieldCheck size={44} className="text-primary-700 group-hover:text-primary-600 transition-colors" strokeWidth={1.5} />
-                <span className="font-medium text-primary-950 text-base md:text-lg whitespace-nowrap">Decide safer</span>
-              </li>
-              <li className="flex flex-col items-center justify-start gap-4 text-center group cursor-default">
-                <Rocket size={44} className="text-primary-700 group-hover:text-primary-600 transition-colors" strokeWidth={1.5} />
-                <span className="font-medium text-primary-950 text-base md:text-lg whitespace-nowrap">Match instantly</span>
-              </li>
-            </ul>
+          </div>
+        </div>
+
+        {/* ── Logo Ticker ────────────────────────────────────────── */}
+        <div className="w-full max-w-[1100px] mx-auto mt-16 overflow-hidden relative z-10">
+          <div className="relative w-full flex overflow-hidden mx-auto">
+
+            <motion.div
+              animate={{ x: ["0%", "-33.333333%"] }}
+              transition={{ repeat: Infinity, ease: "linear", duration: 30 }}
+              className="flex items-center gap-20 w-max"
+            >
+              {[...Array(3)].flatMap((_, setIndex) =>
+                ['Deloitte', 'KPMG', 'Baker McKenzie', 'DLA Piper', 'Grant Thornton', 'BDO'].map((name, i) => (
+                  <span
+                    key={`${name}-${setIndex}-${i}`}
+                    className="text-3xl md:text-4xl font-bold text-neutral-400/50 whitespace-nowrap shrink-0 hover:text-neutral-600 transition-colors duration-500 cursor-default select-none"
+                    style={{ fontFamily: '"IBM Plex Serif", serif' }}
+                  >
+                    {name}
+                  </span>
+                ))
+              )}
+            </motion.div>
           </div>
         </div>
       </div>

@@ -1,4 +1,8 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, useLocation, Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { X } from "lucide-react";
+import { GlobalNav } from "./components/layout/GlobalNav";
 import { WizardProvider } from "./components/wizard/WizardContext";
 import { LandingPage } from "./pages/LandingPage";
 import { ServicesPage } from "./pages/ServicesPage";
@@ -52,10 +56,23 @@ function WizardRoutes() {
     );
 }
 
-function App() {
+function AppContent() {
+    const location = useLocation();
+    const [bgLocation, setBgLocation] = useState(location);
+
+    useEffect(() => {
+        if (!location.pathname.startsWith("/wizard")) {
+            setBgLocation(location);
+        }
+    }, [location]);
+
+    const isWizardRoute = location.pathname.startsWith("/wizard");
+
     return (
-        <Router>
-            <Routes>
+        <>
+            <GlobalNav />
+            {/* Render the background location for main routes if a wizard is open */}
+            <Routes location={isWizardRoute ? bgLocation : location}>
                 {/* Public pages */}
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/services" element={<ServicesPage />} />
@@ -71,9 +88,43 @@ function App() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/verify-email" element={<EmailVerificationPage />} />
-                {/* Wizard — all flows nested under /wizard/* with shared WizardProvider */}
-                <Route path="/wizard/*" element={<WizardRoutes />} />
             </Routes>
+
+            {/* Wizard Overlay */}
+            <AnimatePresence>
+                {isWizardRoute && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="fixed inset-0 z-[100] bg-neutral-900/60 backdrop-blur-xl overflow-y-auto w-full h-full"
+                    >
+                        <div className="absolute top-6 right-6 z-50">
+                            <Link 
+                                to={bgLocation.pathname} 
+                                className="w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white backdrop-blur-md transition-all shadow-xl hover:scale-105"
+                                aria-label="Close Wizard"
+                            >
+                                <X size={24} />
+                            </Link>
+                        </div>
+                        <div className="min-h-full py-12 px-4 flex flex-col items-center justify-center">
+                            <Routes location={location}>
+                                <Route path="/wizard/*" element={<WizardRoutes />} />
+                            </Routes>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </>
+    );
+}
+
+function App() {
+    return (
+        <Router>
+            <AppContent />
         </Router>
     );
 }

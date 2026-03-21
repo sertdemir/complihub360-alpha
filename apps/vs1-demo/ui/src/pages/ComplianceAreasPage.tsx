@@ -2,11 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import {
-  CircleDot,
   ChevronDown,
   ChevronRight,
   ArrowRight,
-  LayoutDashboard,
   Receipt,
   Recycle,
   ShieldCheck,
@@ -17,43 +15,8 @@ import {
   Globe,
   Zap,
 } from 'lucide-react';
-import { Button } from '../components/ui/Button';
 import { Typography } from '../components/ui/Typography';
 
-// ─── Shared Nav ───────────────────────────────────────────────────────────────
-
-const HEADER_MENU = [
-  {
-    id: 'platform', label: 'Platform',
-    items: [
-      { title: 'The AI Engine', desc: 'Secure data extraction & mapping', path: '/platform#engine' },
-      { title: 'Partner Matching', desc: 'From risk to local execution', path: '/platform#matching' },
-      { title: 'Global Coverage', desc: 'UK, EU, Germany & US', path: '/platform#coverage' },
-      { title: 'For Partner Firms', desc: 'Lead generation for advisors', path: '/platform#partners' },
-    ]
-  },
-  {
-    id: 'solutions', label: 'Solutions',
-    items: [
-      { title: 'Founders & CEOs', desc: 'Minimise risk & scale faster', path: '/solutions#founders' },
-      { title: 'Operations Teams', desc: 'Automate daily compliance', path: '/solutions#operations' },
-      { title: 'In-House Counsel', desc: 'Cut research time by 90%', path: '/solutions#counsel' },
-    ]
-  },
-  {
-    id: 'areas',
-    label: 'Compliance Areas',
-    path: '/compliance',
-    items: []
-  },
-  {
-    id: 'resources', label: 'Resources',
-    items: [
-      { title: 'Customer Stories', desc: 'See real compliance outcomes', path: '/resources#stories' },
-      { title: 'Guides & Whitepapers', desc: 'In-depth market deep-dives', path: '/resources#guides' },
-    ]
-  }
-];
 
 // ─── Compliance Area Data ─────────────────────────────────────────────────────
 
@@ -301,70 +264,6 @@ function ComplianceCard({ area, index, defaultOpen = false }: { area: typeof COM
   );
 }
 
-// ─── Nav ──────────────────────────────────────────────────────────────────────
-
-function ComplianceNav() {
-  const navigate = useNavigate();
-  const [activeMenu, setActiveMenu] = useState<string | null>(null);
-
-  useEffect(() => {
-    const handleScroll = () => setActiveMenu(null);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  return (
-    <header className="sticky top-0 z-50 w-full border-b border-neutral-200 bg-surface/90 backdrop-blur-md" onMouseLeave={() => setActiveMenu(null)}>
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-6 relative">
-        <button onClick={() => navigate('/')} className="flex items-center gap-2 shrink-0 z-10" aria-label="Home">
-          <div className="w-6 h-6 bg-primary-500 rounded-sm flex items-center justify-center"><CircleDot size={14} className="text-white" /></div>
-          <span className="font-sans font-bold text-neutral-900 tracking-tight">CompliHub<span className="text-primary-500">360</span></span>
-        </button>
-
-        <nav className="hidden tablet:flex items-center h-full gap-2 absolute left-1/2 -translate-x-1/2">
-          {HEADER_MENU.map((menu) => (
-            <div key={menu.id} className="h-full flex items-center" onMouseEnter={() => menu.items.length > 0 ? setActiveMenu(menu.id) : setActiveMenu(null)}>
-              <button onClick={() => menu.path ? navigate(menu.path) : undefined} className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-ui-small font-semibold transition-colors ${activeMenu === menu.id ? 'text-primary-700 bg-primary-50' : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'}`}>
-                {menu.label}
-                {menu.items.length > 0 && <ChevronDown size={14} className={`transition-transform duration-200 ${activeMenu === menu.id ? 'rotate-180 text-primary-600' : 'text-neutral-400'}`} />}
-              </button>
-            </div>
-          ))}
-        </nav>
-
-        <div className="flex items-center gap-3 shrink-0 z-10">
-          <button className="hidden tablet:inline-flex text-neutral-600 hover:text-neutral-900 text-ui-small font-semibold px-4 py-2 rounded-md hover:bg-neutral-100 transition-colors" onClick={() => navigate('/login')}>Log in</button>
-          <Button variant="primary" size="sm" onClick={() => navigate('/register')}>Get Started Free</Button>
-        </div>
-      </div>
-
-      <AnimatePresence>
-        {activeMenu && (
-          <motion.div initial={{ opacity: 0, y: -5, height: 0 }} animate={{ opacity: 1, y: 0, height: 'auto' }} exit={{ opacity: 0, y: -5, height: 0 }} transition={{ duration: 0.15, ease: 'easeInOut' }} className="absolute top-16 left-0 w-full bg-white border-b border-neutral-200 shadow-xl overflow-hidden pointer-events-auto">
-            <div className="max-w-7xl mx-auto px-6 py-8">
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-                {HEADER_MENU.find(m => m.id === activeMenu)?.items.map((item) => (
-                  <button key={item.title} onClick={() => { navigate(item.path); setActiveMenu(null); }} className="text-left group flex items-start gap-4 p-3 -m-3 rounded-xl hover:bg-neutral-50 transition-colors">
-                    <div className="w-10 h-10 rounded-lg bg-primary-50 flex items-center justify-center shrink-0 border border-primary-100 group-hover:bg-white group-hover:border-primary-200 group-hover:shadow-sm transition-all">
-                      <LayoutDashboard size={18} className="text-primary-600" />
-                    </div>
-                    <div className="mt-0.5">
-                      <Typography variant="ui-small" weight="bold" className="text-neutral-900 flex items-center gap-1 mb-1 group-hover:text-primary-700 transition-colors">
-                        {item.title}
-                        <ArrowRight size={14} className="opacity-0 -translate-x-2 w-0 group-hover:w-auto overflow-hidden group-hover:opacity-100 group-hover:translate-x-0 transition-all text-primary-500" />
-                      </Typography>
-                      <Typography variant="caption" className="text-neutral-500 block normal-case tracking-normal">{item.desc}</Typography>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
-  );
-}
 
 // ─── Anchor Bar ───────────────────────────────────────────────────────────────
 
@@ -469,8 +368,6 @@ export function ComplianceAreasPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <ComplianceNav />
-
       {/* Hero */}
       <section className="py-16 desktop-s:py-20 bg-background">
         <div className="max-w-7xl mx-auto px-6">
