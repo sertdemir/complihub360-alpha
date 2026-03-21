@@ -98,7 +98,7 @@ function AppContent() {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="fixed inset-0 z-[100] bg-neutral-900/60 backdrop-blur-xl overflow-y-auto w-full h-full"
+                        className="fixed inset-0 z-[100] bg-white/5 backdrop-blur-[32px] overflow-y-auto w-full h-full"
                     >
                         <div className="absolute top-6 right-6 z-50">
                             <Link 
