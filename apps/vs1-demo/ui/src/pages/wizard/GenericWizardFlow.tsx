@@ -347,7 +347,7 @@ export function GenericWizardFlow() {
                 <motion.div 
                     layout
                     transition={{ layout: { duration: 0.4, ease: [0.25, 1, 0.5, 1] } }}
-                    className="w-full max-w-3xl bg-white border border-white/20 rounded-2xl shadow-2xl ring-1 ring-black/5 overflow-hidden flex flex-col"
+                    className="w-full max-w-3xl bg-white border border-white/20 rounded-2xl shadow-2xl ring-1 ring-black/5 overflow-hidden flex flex-col wizard-card cursor-auto"
                 >
                     <WizardStepper
                         currentStep={step + 1}

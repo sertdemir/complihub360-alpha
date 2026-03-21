@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
 import { GlobalNav } from "./components/layout/GlobalNav";
 import { WizardProvider } from "./components/wizard/WizardContext";
 import { LandingPage } from "./pages/LandingPage";
@@ -58,6 +57,7 @@ function WizardRoutes() {
 
 function AppContent() {
     const location = useLocation();
+    const navigate = useNavigate();
     const [bgLocation, setBgLocation] = useState(location);
 
     useEffect(() => {
@@ -98,17 +98,15 @@ function AppContent() {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="fixed inset-0 z-[100] bg-white/5 backdrop-blur-[32px] overflow-y-auto w-full h-full"
+                        className="fixed inset-0 z-[100] bg-white/40 backdrop-blur-xl overflow-y-auto w-full h-full"
+                        style={{ cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" fill="white" stroke="%23E5E5E5" stroke-width="1"/><path d="M14 14L26 26" stroke="%23171717" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 26L26 14" stroke="%23171717" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>') 20 20, pointer` }}
+                        onClick={(e) => {
+                            if (!(e.target as HTMLElement).closest('.wizard-card')) {
+                                const targetPath = bgLocation.pathname.startsWith('/wizard') ? '/' : bgLocation.pathname;
+                                navigate(targetPath);
+                            }
+                        }}
                     >
-                        <div className="absolute top-6 right-6 z-50">
-                            <Link 
-                                to={bgLocation.pathname} 
-                                className="w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white backdrop-blur-md transition-all shadow-xl hover:scale-105"
-                                aria-label="Close Wizard"
-                            >
-                                <X size={24} />
-                            </Link>
-                        </div>
                         <div className="min-h-full py-12 px-4 flex flex-col items-center justify-center">
                             <Routes location={location}>
                                 <Route path="/wizard/*" element={<WizardRoutes />} />
