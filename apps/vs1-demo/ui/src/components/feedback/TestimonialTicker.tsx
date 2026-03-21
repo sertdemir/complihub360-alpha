@@ -1,66 +1,74 @@
 import { Clock, ShieldCheck, Quote, Star, TrendingUp } from 'lucide-react';
 import { Typography } from '../ui/Typography';
+import { useTranslation } from 'react-i18next';
+import { TFunction } from 'i18next';
 
-const ALL_TESTIMONIALS = [
+const getAllTestimonials = (t: TFunction) => [
   {
     id: 'u1',
-    persona: 'U1 — E-Commerce Founder',
-    name: 'Sarah K.',
-    role: 'Founder & CEO, D2C Brand',
-    quote: 'We saved 3 weeks of legal research in 30 minutes. CompliHub360 flagged our EPR packaging obligation early. The structured dossier was sent to our solicitor the same day, preventing a €20k compliance penalty.',
-    result: 'Prevented €20k Penalty',
+    persona: t('landing.testimonials.u1.persona', 'U1 — E-Commerce Founder'),
+    name: t('landing.testimonials.u1.name', 'Sarah K.'),
+    role: t('landing.testimonials.u1.role', 'Founder & CEO, D2C Brand'),
+    quote: t('landing.testimonials.u1.quote', 'We saved 3 weeks of legal research in 30 minutes. CompliHub360 flagged our EPR packaging obligation early. The structured dossier was sent to our solicitor the same day, preventing a €20k compliance penalty.'),
+    result: t('landing.testimonials.u1.result', 'Prevented €20k Penalty'),
     resultIcon: ShieldCheck,
     resultCls: 'bg-success-100 text-success-800 border-success-200',
-    tag: 'E-Commerce · EPR + VAT',
+    tag: t('landing.testimonials.u1.tag', 'E-Commerce · EPR + VAT')
   },
   {
     id: 'u2',
-    persona: 'U2 — SaaS Operations Manager',
-    name: 'Marcus L.',
-    role: 'Head of Operations, B2B SaaS',
-    quote: 'Navigating post-Brexit UK GDPR differences was stalling our enterprise deals. CompliHub360 gave us a grounded, cited analysis we could defend in front of our board. We closed our biggest deal 40% faster.',
-    result: 'Deal Closed 40% Faster',
+    persona: t('landing.testimonials.u2.persona', 'U2 — SaaS Operations Manager'),
+    name: t('landing.testimonials.u2.name', 'Marcus L.'),
+    role: t('landing.testimonials.u2.role', 'Head of Operations, B2B SaaS'),
+    quote: t('landing.testimonials.u2.quote', 'Navigating post-Brexit UK GDPR differences was stalling our enterprise deals. CompliHub360 gave us a grounded, cited analysis we could defend in front of our board. We closed our biggest deal 40% faster.'),
+    result: t('landing.testimonials.u2.result', 'Deal Closed 40% Faster'),
     resultIcon: TrendingUp,
     resultCls: 'bg-accent-100 text-accent-800 border-accent-200',
-    tag: 'SaaS · UK GDPR',
+    tag: t('landing.testimonials.u2.tag', 'SaaS · UK GDPR')
   },
   {
     id: 'u3',
-    persona: 'U3 — Agency Director',
-    name: 'Elena R.',
-    role: 'Managing Director, Creative Hub',
-    quote: 'We were expanding into Germany. The AI mapped exactly what was needed for a subsidiary versus a branch, saving us over €15k in consulting fees and 2 months of waiting for preliminary legal advice.',
-    result: 'Saved €15k in Consulting',
+    persona: t('landing.testimonials.u3.persona', 'U3 — Agency Director'),
+    name: t('landing.testimonials.u3.name', 'Elena R.'),
+    role: t('landing.testimonials.u3.role', 'Managing Director, Creative Hub'),
+    quote: t('landing.testimonials.u3.quote', 'We were expanding into Germany. The AI mapped exactly what was needed for a subsidiary versus a branch, saving us over €15k in consulting fees and 2 months of waiting for preliminary legal advice.'),
+    result: t('landing.testimonials.u3.result', 'Saved €15k in Consulting'),
     resultIcon: TrendingUp,
     resultCls: 'bg-primary-100 text-primary-800 border-primary-200',
-    tag: 'Agency · Corporate',
+    tag: t('landing.testimonials.u3.tag', 'Agency · Corporate')
   },
   {
     id: 'u4',
-    persona: 'U4 — FinTech Compliance',
-    name: 'David P.',
-    role: 'Compliance Officer, FinPay',
-    quote: 'The speed at which CompliHub360 mapped our product against FCA thresholds was astonishing. Having live references to legislation built immense trust, allowing us to launch our UK pilot 3 months ahead of schedule.',
-    result: 'Launched 3 Months Early',
+    persona: t('landing.testimonials.u4.persona', 'U4 — FinTech Compliance'),
+    name: t('landing.testimonials.u4.name', 'David P.'),
+    role: t('landing.testimonials.u4.role', 'Compliance Officer, FinPay'),
+    quote: t('landing.testimonials.u4.quote', 'The speed at which CompliHub360 mapped our product against FCA thresholds was astonishing. Having live references to legislation built immense trust, allowing us to launch our UK pilot 3 months ahead of schedule.'),
+    result: t('landing.testimonials.u4.result', 'Launched 3 Months Early'),
     resultIcon: Clock,
     resultCls: 'bg-neutral-100 text-neutral-800 border-neutral-300',
-    tag: 'FinTech · Regulatory',
+    tag: t('landing.testimonials.u4.tag', 'FinTech · Regulatory')
   }
 ];
 
 // Duplicate for the infinite loop ticker effect
-const TICKER_ITEMS = [...ALL_TESTIMONIALS, ...ALL_TESTIMONIALS];
+const getTickerItems = (t: TFunction) => {
+  const items = getAllTestimonials(t);
+  return [...items, ...items];
+};
 
 export function TestimonialTicker() {
+  const { t } = useTranslation('common');
+  const TICKER_ITEMS = getTickerItems(t);
+
   return (
     <section className="bg-white py-16 desktop-s:py-24 relative overflow-hidden z-20 border-y border-neutral-200">
       
       <div className="max-w-7xl mx-auto px-6 mb-12 text-center">
         <Typography variant="caption" className="text-primary-500 font-bold uppercase tracking-widest block mb-4">
-          Real Results
+          {t('landing.testimonials.badge', 'Real Results')}
         </Typography>
         <Typography variant="h1" weight="bold" className="text-neutral-900 tracking-tight">
-          Trusted by founders and<br/>operations teams
+          {t('landing.testimonials.titleStart', 'Trusted by founders and')}<br/>{t('landing.testimonials.titleEnd', 'operations teams')}
         </Typography>
       </div>
 

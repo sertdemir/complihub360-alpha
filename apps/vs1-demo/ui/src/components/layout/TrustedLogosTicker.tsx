@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 const PARTNERS = [
   { name: 'Deloitte', domain: 'deloitte.com' },
@@ -13,10 +14,12 @@ const PARTNERS = [
 const TICKER_ITEMS = [...PARTNERS, ...PARTNERS, ...PARTNERS];
 
 export function TrustedLogosTicker() {
+  const { t } = useTranslation('common');
+
   return (
     <section className="bg-white py-12 desktop-s:py-16 overflow-hidden flex flex-col items-center relative z-20 border-b border-neutral-100">
       <p className="text-[11px] font-bold text-neutral-400 tracking-[0.2em] uppercase mb-10 text-center px-6">
-        Trusted by compliance teams at
+        {t('landing.trustedLogos.trustedBy', 'Trusted by compliance teams at')}
       </p>
 
       {/* Ticker Container */}

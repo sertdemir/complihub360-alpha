@@ -1,0 +1,593 @@
+{
+  "nav": {
+    "platform": "Plattform",
+    "solutions": "Lösungen",
+    "complianceAreas": "Compliance-Bereiche",
+    "resources": "Ressourcen",
+    "login": "Login",
+    "signup": "Kostenlos starten",
+    "items": {
+      "aiEngine": {
+        "title": "Die KI Engine",
+        "desc": "Sichere Datenextraktion & Mapping"
+      },
+      "partnerMatching": {
+        "title": "Partner Matching",
+        "desc": "Vom Risiko zur lokalen Umsetzung"
+      },
+      "globalCoverage": {
+        "title": "Globale Abdeckung",
+        "desc": "UK, EU, DACH & USA"
+      },
+      "forPartners": {
+        "title": "Für Partnerkanzleien",
+        "desc": "Lead-Generierung für Berater"
+      },
+      "founders": {
+        "title": "Gründer & CEOs",
+        "desc": "Risiken minimieren & schneller skalieren"
+      },
+      "operations": {
+        "title": "Operations Teams",
+        "desc": "Tägliche Compliance automatisieren"
+      },
+      "counsel": {
+        "title": "In-house Counsel",
+        "desc": "Recherchezeit um 90% reduzieren"
+      },
+      "stories": {
+        "title": "Erfolgsgeschichten",
+        "desc": "Echte Compliance-Erfolge"
+      },
+      "guides": {
+        "title": "Guides & Whitepaper",
+        "desc": "Detaillierte Marktanalysen"
+      }
+    }
+  },
+  "hero": {
+    "scenarios": {
+      "shortcut": {
+        "seg1": "Ihre Compliance ",
+        "seg2": "Abkürzung",
+        "seg3": " zu globalen Märkten",
+        "text": "Identifizieren Sie rechtliche Lücken sofort und finden Sie geprüfte lokale Experten für die Umsetzung.",
+        "cta": "Finde meine Compliance-Abkürzung",
+        "usp1": "Sofortige Analyse",
+        "usp2": "Geprüfte lokale Experten",
+        "usp3": "Schnelle Umsetzung"
+      },
+      "actionPlan": {
+        "seg1": "Vom regulatorischen Risiko zum ",
+        "seg2": "Aktionsplan",
+        "seg3": " in Minuten",
+        "text": "Verwandeln Sie lokale Fragmentierung in eine klare Roadmap. Schneller verstehen und sicherer entscheiden.",
+        "cta": "Erstelle jetzt meinen Aktionsplan",
+        "usp1": "Schneller verstehen",
+        "usp2": "Sicherer entscheiden",
+        "usp3": "Klare Roadmap"
+      },
+      "experts": {
+        "seg1": "Der schnellste Weg zu ",
+        "seg2": "lokalen Compliance-Experten",
+        "text": "Kein Raten mehr. Holen Sie sich eine maßgeschneiderte Einschätzung und vernetzen Sie sich sofort.",
+        "cta": "Jetzt mit Experten vernetzen",
+        "usp1": "Sofortiges Matching",
+        "usp2": "Geprüfte Experten",
+        "usp3": "Maßgeschneidertes Assessment"
+      }
+    },
+    "companies": "Innovativen Unternehmen vertrauen uns",
+    "scroll": "Plattform entdecken"
+  },
+  "landing": {
+    "services": {
+      "badge": "Maßgeschneiderte Compliance",
+      "title": "Was wir abdecken — für jede Rolle",
+      "coreDomains": "Abgedeckte Kernbereiche",
+      "founder": {
+        "title": "Für Gründer & CEOs",
+        "tags": [
+          "Steuer- & USt-Registrierung",
+          "Unternehmensaufbau",
+          "Basis-Datenschutz"
+        ],
+        "description": "Erschließen Sie neue Märkte ohne juristischen Overhead. Erhalten Sie sofortige Klarheit über Steuern, USt und Unternehmensstruktur, bevor Sie sich festlegen."
+      },
+      "ops": {
+        "title": "Für Operations & Expansion",
+        "tags": [
+          "EPR & Verpackung",
+          "Lieferketten-ESG",
+          "Marketing-Standards"
+        ],
+        "description": "Reduzieren Sie Risiken in Ihrer Lieferkette und bei Produktlaunches. Navigieren Sie komplexe EPR-Verpackungsregeln, Marketing-Standards und operative Compliance."
+      },
+      "advisors": {
+        "title": "Für In-house Counsel",
+        "tags": [
+          "Globales Datenschutz-Mapping",
+          "Meldungen bei regulatorischen Änderungen",
+          "Compliance-Audits"
+        ],
+        "description": "Hören Sie auf, globale regulatorische Veränderungen manuell zu verfolgen. Nutzen Sie unsere KI-gestützte Analyse, um 27+ Jurisdiktionen über ein einziges Dashboard zu überwachen."
+      },
+      "partners": {
+        "title": "Für Partnerkanzleien",
+        "tags": [
+          "Vorgeprüfte Leads",
+          "Umsetzungsfertige Dossiers",
+          "Partner-Netzwerk-APIs"
+        ],
+        "description": "Empfangen Sie hochqualifizierte, vorstrukturierte Mandantendossiers. Konzentrieren Sie sich auf hochwertige Fachberatung statt auf aufwändige Erstgespräche."
+      },
+      "builtForRole": "Für Ihre Rolle entwickelt",
+      "cta": "Maßgeschneidertes Assessment starten"
+    },
+    "snapshot": {
+      "headerOverline": "Intelligence Engine",
+      "headerTitle": "Dossier-Erstellung & Matching",
+      "description": "Vollständige Transparenz darüber, wie wir Ihre Daten verarbeiten, Live-Quellen integrieren und das perfekte Experten-Match liefern.",
+      "feature1Title": "Was die KI sieht",
+      "feature1Desc": "Öffentliche Präsenz, operative Metadaten und Zielmarkt-Jurisdiktionen.",
+      "feature2Title": "Was sie niemals sieht",
+      "feature2Desc": "Keine personenbezogenen Daten, keine sensiblen Finanzdaten. Alle Eingaben werden streng anonymisiert.",
+      "bannerWhy": "Warum es wichtig ist:",
+      "bannerDesc": "Strukturierte KI-Dossiers eliminieren kostspielige „Discovery-Stunden" und ordnen Ihren genauen Fußabdruck dem richtigen lokalen Experten zu — und sparen wochenlange Abstimmung.",
+      "card1Overline": "Live-Validierungen",
+      "card1Desc": "Regulatorische Signale, verankert in offiziellen Behörden-APIs.",
+      "card1Foot": "Quellen verifiziert",
+      "card2Overline": "Dossier-Struktur",
+      "card2Desc": "Standardisiertes juristisches Briefformat, wie es von Top-Kanzleien erwartet wird.",
+      "card2Foot": "Umsetzungsbereit",
+      "card3Overline": "Match-Präzision",
+      "card3Desc": "Schnellere Reaktionszeiten von geprüften Compliance-Partnern im Vergleich zur traditionellen Suche.",
+      "card3Foot": "Höhere Konversion",
+      "statusValue": "Sicher & Fundiert",
+      "systemStatus": "Systemstatus",
+      "titleStart": "Wie unsere",
+      "titleEnd": "funktioniert"
+    },
+    "stepper": {
+      "badge": "Die Partner Journey",
+      "titleStart": "Vom unbekannten Risiko zur",
+      "titleEnd": "lokalen Umsetzung",
+      "stepLabel": "SCHRITT",
+      "step1": {
+        "title": "Assessment",
+        "body": "Unsere KI scannt Ihren Zielmarkt und markiert regulatorische Lücken sofort und präzise."
+      },
+      "step2": {
+        "title": "Dossier",
+        "body": "Ein strukturiertes, anonymisiertes Rechtsgutachten mit allen Pflichtregistrierungen und operativen Anpassungen."
+      },
+      "step3": {
+        "title": "Matching",
+        "body": "Wir ordnen Ihr Dossier algorithmisch vorgeprüften lokalen Partnern zu, die Ihre Lücken kennen."
+      },
+      "step4": {
+        "title": "Termin",
+        "body": "Buchen Sie direkt einen Strategiegespräch mit einem Experten, der Ihren Fall bereits kennt."
+      },
+      "step5": {
+        "title": "Umsetzung",
+        "body": "Ihr Partner führt Registrierungen, Einreichungen und strukturelle Aufstellungen lokal durch."
+      },
+      "actionPlanActive": "Aktionsplan aktiv",
+      "partnerAssigned": "Partner zugewiesen",
+      "description": "Unser 5-stufiger Funnel stellt sicher, dass Sie das Problem nicht nur identifizieren — sondern es sofort mit den richtigen lokalen Experten lösen."
+    },
+    "uspZone": {
+      "badge": "Warum CompliHub360?",
+      "title": "Anders konzipiert, von Grund auf"
+    },
+    "uspItems": [
+      {
+        "title": "Proaktiv, nicht reaktiv",
+        "body": "Hören Sie auf, manuell nach Vorschriften zu suchen. CompliHub360 ordnet Ihren Geschäftskontext einem priorisierten, länderspezifischen Aktionsplan zu — bevor Sie eine Strafe riskieren.",
+        "bullets": [
+          "Personalisiertes Risikoprofil in Minuten",
+          "Priorisierte Pflichten, kein roher Gesetzesdump",
+          "Abdeckung UK, EU & Multi-Markt-Szenarien"
+        ]
+      },
+      {
+        "title": "Datenschutz als Architekturprinzip",
+        "body": "Ihre sensiblen Unternehmensdaten — Namen, E-Mails, Steuer-IDs — verlassen Ihren Browser nie unstrukturiert. Lokale KI-Modelle schwärzen alle personenbezogenen Daten, bevor eine Analyse unsere Server erreicht.",
+        "bullets": [
+          "Lokale PII-Schwärzung vor der Cloud-Verarbeitung",
+          "Null rohe PII auf unseren Servern gespeichert",
+          "UK DSGVO & CCPA-konform by Design"
+        ]
+      },
+      {
+        "title": "End-to-End-Orchestrierung",
+        "body": "Wir verwalten den gesamten Compliance-Lebenszyklus — von der Selbsteinschätzung bis zum geprüften Experten-Matching. Unser automatisierter SLA-Watchdog verfolgt Anbieterantworten, damit Sie nie warten müssen.",
+        "bullets": [
+          "Von der Selbsteinschätzung zur Experten-Übergabe",
+          "Automatisierter SLA-Watchdog & E-Mail-Tracking",
+          "Verifiziertes lokales Expertennetzwerk"
+        ]
+      }
+    ],
+    "aiEngine": {
+      "badge": "Die KI Engine",
+      "title1": "Vom rohen Kontext zu einem strukturierten",
+      "title2": "Compliance-Dossier",
+      "description": "Unsere datenschutzorientierte KI-Pipeline hat drei Stufen — jede darauf ausgelegt, die Ausgabequalität zu maximieren und gleichzeitig Ihre Datenexposition zu minimieren.",
+      "step": "Schritt"
+    },
+    "aiSteps": [
+      {
+        "title": "Intelligente Kontexterfassung",
+        "body": "Die KI übersetzt Ihren unstrukturierten Geschäftskontext in ein validiertes strukturiertes Schema — und extrahiert Unternehmenstyp, Branche, Umsatzbänder und Marktabsicht.",
+        "stats": [
+          {
+            "label": "Extrahierte Entitätsfelder"
+          },
+          {
+            "label": "Erkannte Märkte"
+          },
+          {
+            "label": "Verarbeitungszeit",
+            "staticValue": "< 2 s"
+          }
+        ]
+      },
+      {
+        "title": "Live-Validierungen",
+        "body": "Lokale KI-Modelle entfernen alle personenbezogenen Daten — Namen, E-Mails, Steuer-IDs, Telefonnummern — bevor das anonymisierte Schema an die Mapping-Engine übergeben wird.",
+        "stats": [
+          {
+            "label": "Durchgeführte Live-Validierungen"
+          },
+          {
+            "label": "Entfernte PII-Felder"
+          },
+          {
+            "label": "Auf Server gespeicherte Bytes"
+          }
+        ]
+      },
+      {
+        "title": "Dossier-Erstellung & Matching",
+        "body": "Die Engine vergleicht Ihr anonymisiertes Profil mit Live-länderspezifischen Risikomatrizen und erstellt ein strukturiertes Dossier, das geprüften lokalen Experten zugeordnet wird.",
+        "stats": [
+          {
+            "label": "Generierte Dossier-Seiten"
+          },
+          {
+            "label": "Experten-Match-Genauigkeit"
+          },
+          {
+            "label": "Durchschnittliche Match-Zeit",
+            "staticValue": "< 24 h"
+          }
+        ]
+      }
+    ],
+    "servicesZone": {
+      "badge": "Was wir abdecken",
+      "title1": "Sechs Compliance-Bereiche,",
+      "title2": "eine Plattform",
+      "description": "Jeder Bereich wird länderspezifischen Anforderungen zugeordnet und bei Änderungen der Vorschriften aktualisiert.",
+      "ctaCardTitle": "End-to-End-Abdeckung benötigt?",
+      "ctaCardDesc": "Unser Full-Support-Paket deckt alle sechs Bereiche mit einem dedizierten Compliance-Manager und einem einheitlichen Aktionsplan ab.",
+      "ctaButton": "Full Support erkunden"
+    },
+    "heroZone": {
+      "badge": "KI-gestütztes Beratungssystem",
+      "titleStart": "Ihre Compliance",
+      "titleHighlight": "Kompass",
+      "titleEnd": "für Post-Brexit UK",
+      "description": "Navigieren Sie Steuer- & USt-Pflichten und EPR-Anforderungen mit Präzision. Übersetzen Sie regulatorische Fragmentierung in einen strukturierten Aktionsplan — in max. 5 Schritten.",
+      "ctaButton": "In max. 5 Schritten qualifizieren",
+      "ctaSub": "Kein Konto erforderlich · Ergebnisse in unter 3 Minuten",
+      "cardTitle": "Qualifizierung starten",
+      "cardDesc": "Markt und Kategorie auswählen, um ein personalisiertes Compliance-Dossier zu erhalten."
+    },
+    "valueProgression": {
+      "badge": "Zugangsstufen",
+      "title1": "Je mehr Sie teilen, desto mehr",
+      "title2": "schalten Sie frei",
+      "description": "Starten Sie kostenlos als Gast. Registrieren Sie sich, um Ihren vollständigen Aktionsplan freizuschalten. Werden Sie Partner, um qualifizierte Leads zu erhalten.",
+      "mostPopular": "Am beliebtesten"
+    },
+    "socialProof": {
+      "title": "Vertraut von Compliance-Teams bei"
+    },
+    "footer": {
+      "platform": "Plattform",
+      "platformLinks": [
+        "Dienste",
+        "Länder",
+        "Beratung",
+        "Compliance-Wizard"
+      ],
+      "legal": "Rechtliches",
+      "legalLinks": [
+        "Datenschutz",
+        "AGB",
+        "Cookie-Richtlinie",
+        "DSGVO-Konformität"
+      ],
+      "copyright": "© {{year}} CompliHub360. Alle Rechte vorbehalten.",
+      "description": "Ihr intelligenter Compliance-Kompass. Navigieren Sie globale regulatorische Komplexität mit KI-gestützter Präzision und einer datenschutzorientierten Architektur.",
+      "privacyBadge": "Datenschutz zuerst · Keine PII ohne Zustimmung gespeichert",
+      "subscribeButton": "Abonnieren",
+      "subscribed": "Compliance-Digest abonniert"
+    },
+    "resolution": {
+      "badge": "Beispielausgabe — Seite 1 von 3",
+      "titleStart": "UK Compliance",
+      "titleEnd": "Risiko-Schnappschuss",
+      "description": "Sie haben Ihr Risikoprofil. Jetzt beheben Sie es. So sieht ein typisches UK-Expansionsdossier aus — und die drei Wege zur Lösung.",
+      "risk": {
+        "title": "Gesamtrisikostufe",
+        "highLevel": "Hoch",
+        "low": "Niedrig",
+        "medium": "Mittel",
+        "high": "Hoch",
+        "critical": "Kritisch"
+      },
+      "findings": {
+        "title": "Wichtigste Erkenntnisse",
+        "item1Title": "Umsatzsteuerschwelle überschritten",
+        "item1Desc": "Pflichtregistrierung — HMRC-Schwelle £85.000",
+        "item2Title": "EPR Verpackungshersteller-Verpflichtung",
+        "item2Desc": "PRN-Registrierung bis Q1 2025 erforderlich",
+        "item3Title": "MTD für VAT — Lücke in digitalen Aufzeichnungen",
+        "item3Desc": "Phase 2 Compliance-Lücke im aktuellen Workflow",
+        "item4Title": "UK GDPR — Datenschutzrichtlinie",
+        "item4Desc": "Erfüllt grundlegende UK GDPR-Anforderungen"
+      },
+      "status": {
+        "actionReq": "Aktion Erf.",
+        "review": "Prüfen",
+        "compliant": "Konform"
+      },
+      "unlock": {
+        "title": "Sie haben Ihr Risikoprofil.",
+        "subtitle": "Wählen Sie, wie Sie es lösen möchten.",
+        "page1Label": "Seite 1",
+        "page1Value": "Risiko-Schnappschuss",
+        "page2Label": "Seite 2",
+        "page2Value": "Aktionsplan",
+        "page3Label": "Seite 3",
+        "page3Value": "Experten-Match"
+      },
+      "cta": {
+        "primary": "Profil erstellen — Aktionsplan freischalten",
+        "secondary": "Weiter zum Experten-Match"
+      },
+      "or": "oder",
+      "disclaimer": "Das Experten-Match verbindet Sie mit einem verifizierten lokalen Steuer- oder Rechtsexperten, der den Aktionsplan in Ihrem Namen ausführt."
+    },
+    "testimonials": {
+      "badge": "Echte Ergebnisse",
+      "titleStart": "Vertraut von Gründern und",
+      "titleEnd": "Operations-Teams",
+      "u1": {
+        "persona": "U1 — E-Commerce Gründerin",
+        "name": "Sarah K.",
+        "role": "Gründerin & CEO, D2C Marke",
+        "quote": "Wir haben 3 Wochen juristische Recherche in 30 Minuten gespart. CompliHub360 hat unsere EPR-Verpackungspflicht frühzeitig erkannt. Das strukturierte Dossier ging am selben Tag an unseren Anwalt und verhinderte eine Compliance-Strafe von 20.000 €.",
+        "result": "20.000 € Strafe verhindert",
+        "tag": "E-Commerce · EPR + VAT"
+      },
+      "u2": {
+        "persona": "U2 — SaaS Operations Manager",
+        "name": "Marcus L.",
+        "role": "Leiter Operations, B2B SaaS",
+        "quote": "Das Navigieren durch die UK GDPR-Unterschiede nach dem Brexit brachte unsere Enterprise-Deals zum Stillstand. CompliHub360 gab uns eine fundierte, zitierte Analyse, die wir vor unserem Vorstand verteidigen konnten. Wir haben unseren größten Deal 40% schneller abgeschlossen.",
+        "result": "Deal 40% schneller abgeschlossen",
+        "tag": "SaaS · UK GDPR"
+      },
+      "u3": {
+        "persona": "U3 — Agenturdirektorin",
+        "name": "Elena R.",
+        "role": "Geschäftsführerin, Creative Hub",
+        "quote": "Wir expandierten nach Deutschland. Die KI hat genau abgebildet, was für eine Tochtergesellschaft im Vergleich zu einer Niederlassung erforderlich war, und uns über 15.000 € an Beratungskosten und 2 Monate Wartezeit auf vorläufige Rechtsberatung erspart.",
+        "result": "15.000 € an Beratung gespart",
+        "tag": "Agentur · Corporate"
+      },
+      "u4": {
+        "persona": "U4 — FinTech Compliance",
+        "name": "David P.",
+        "role": "Compliance-Beauftragter, FinPay",
+        "quote": "Die Geschwindigkeit, mit der CompliHub360 unser Produkt gegen FCA-Schwellenwerte abgeglichen hat, war erstaunlich. Live-Verweise auf die Gesetzgebung bauten enormes Vertrauen auf und ermöglichten es uns, unser UK-Pilotprojekt 3 Monate vor dem Zeitplan zu starten.",
+        "result": "3 Monate früher gestartet",
+        "tag": "FinTech · Regulatorik"
+      }
+    },
+    "trustedLogos": {
+      "trustedBy": "Vertraut von Compliance-Teams bei"
+    }
+  },
+  "components": {
+    "engagementModal": {
+      "title": "Angebot von {{providerName}} anfordern",
+      "market": "Markt: {{market}}",
+      "category": "Kategorie: {{category}}",
+      "detailsLabel": "Zusätzliche Details",
+      "optional": "Optional",
+      "detailsPlaceholder": "Fügen Sie spezifische Anforderungen, Zeitpläne oder Kontext für den Anbieter hinzu...",
+      "privacyNotice": "Geschützt durch das AI Privacy Gate. Ihre Anfrage wird anonymisiert, bis Sie sich entscheiden, Ihre Identität gegenüber dem Anbieter offenzulegen.",
+      "cancel": "Abbrechen",
+      "submit": "Anfrage senden",
+      "sent": "Gesendet!"
+    }
+  },
+  "wizard": {
+    "reviewPanel": {
+      "primaryCountry": "Hauptland",
+      "additionalMarkets": "Weitere Märkte",
+      "category": "Compliance-Kategorie",
+      "businessType": "Geschäftstyp",
+      "marketScope": "Marktabdeckung",
+      "riskSignals": "Risikosignale",
+      "revenue": "Jahresumsatz",
+      "intent": "Absicht",
+      "generateCTA": "Meine Compliance-Ergebnisse generieren",
+      "register": "Registrieren",
+      "registerDesc": "um diese Antworten später in Ihrem Dashboard zu speichern und zu bearbeiten."
+    },
+    "businessTypes": {
+      "ecommerce": {
+        "label": "E-Commerce Marke",
+        "desc": "Eigener Verkauf über Website oder Marktplatz."
+      },
+      "marketplace": {
+        "label": "Marktplatz-Verkäufer",
+        "desc": "Verkauf via Amazon, Shopify, eBay, Etsy, etc."
+      },
+      "saas": {
+        "label": "SaaS / Software",
+        "desc": "Digitale Produkte, Abos oder Software."
+      },
+      "agency": {
+        "label": "Agentur / Berater",
+        "desc": "Dienstleistungen oder Beratung für Kunden."
+      },
+      "other": {
+        "label": "Sonstiges",
+        "desc": "Erzählen Sie uns mehr über Ihr Geschäft."
+      }
+    },
+    "marketScopes": {
+      "local": {
+        "label": "Nur lokal",
+        "desc": "Ich agiere nur in meinem Hauptland."
+      },
+      "eu": {
+        "label": "EU / Europa",
+        "desc": "Ich verkaufe oder agiere in mehreren EU-Ländern."
+      },
+      "global": {
+        "label": "Global",
+        "desc": "Ich agiere auch außerhalb Europas."
+      }
+    },
+    "revenueBands": {
+      "lt10k": "< 10.000 €",
+      "mid1": "10.000–100.000 €",
+      "mid2": "100.000–1 Mio. €",
+      "gt1m": "> 1 Mio. €",
+      "perYear": "pro Jahr"
+    },
+    "intents": {
+      "selfCheck": {
+        "label": "Schneller Selbst-Check",
+        "desc": "Sofortiges Feedback zu Basis-Anforderungen."
+      },
+      "expert": {
+        "label": "Expertenrat",
+        "desc": "Sprechen Sie mit einem Spezialisten für komplexe Fälle."
+      },
+      "fullService": {
+        "label": "Full-Service",
+        "desc": "End-to-End-Management durch unser Team."
+      }
+    },
+    "urgencies": {
+      "today": "Heute",
+      "week": "Diese Woche",
+      "month": "Diesen Monat",
+      "researching": "Recherchiere nur"
+    },
+    "riskSignals": {
+      "taxVat": {
+        "marketplace": "Marktplatz-Verkäufer",
+        "crossBorder": "Grenzüberschreitender Versand",
+        "warehouse": "Lager im Ausland",
+        "digitalGoods": "Digitale Güter / Services",
+        "highVolume": "Hohes Transaktionsvolumen",
+        "vatRegistered": "Bereits USt-registriert"
+      },
+      "epr": {
+        "physicalGoods": "Verkauft physische Güter",
+        "ownPackaging": "Nutzt eigene Verpackung",
+        "dropshipper": "Dropshipper / White-Label",
+        "electronics": "Kategorie Elektronik",
+        "importer": "Importiert von außerhalb EU",
+        "recyclingFee": "Zahlt keine Recyclinggebühr"
+      },
+      "privacy": {
+        "ga4": "Google Analytics (GA4)",
+        "metaPixel": "Meta Pixel",
+        "tiktokPixel": "TikTok Pixel",
+        "emailMarketing": "E-Mail-Marketing",
+        "crmTool": "CRM / Kontaktdaten",
+        "noConsent": "Kein Consent-Management"
+      },
+      "marketing": {
+        "healthClaims": "Gesundheits- / Nahrungsergänzungs-Aussagen",
+        "guaranteed": "\"Garantiert\" oder \"#1\" Aussagen",
+        "googleAds": "Google Ads",
+        "metaAds": "Meta / Facebook Ads",
+        "influencer": "Influencer Marketing",
+        "cookiePopup": "Kein Cookie-Consent"
+      },
+      "corporate": {
+        "individual": "Noch keine juristische Person",
+        "foreign": "Gründung im Ausland",
+        "multiEntity": "Mehrere juristische Personen",
+        "remoteTeam": "Remote / internationales Team",
+        "investorReady": "Vorbereitung auf Investments"
+      },
+      "full": {
+        "multiCountry": "Aktiv in 3+ Ländern",
+        "allCategories": "Mehrere Compliance-Bereiche",
+        "fastNeeded": "Dringend / schnelle Lösung",
+        "noTeam": "Kein In-house Compliance",
+        "auditNeeded": "Compliance-Audit benötigt"
+      }
+    },
+    "headlines": {
+      "taxVat": "Was sind Ihre steuerlichen Hauptrisikofaktoren?",
+      "epr": "Was sind Ihre Hauptsituationen bei Verpackung / Produkten?",
+      "privacy": "Welche Daten-Tools oder Praktiken treffen auf Sie zu?",
+      "marketing": "Was sind Ihre Haupt-Marketing-Risiken?",
+      "corporate": "Was beschreibt Ihre Unternehmenssituation am besten?",
+      "fullSupport": "Was sind Ihre größten Herausforderungen?",
+      "default": "Was sind Ihre Hauptrisikobereiche?"
+    },
+    "steps": {
+      "context": {
+        "label": "Geschäftskontext",
+        "title": "Wie würden Sie Ihr Geschäft beschreiben?",
+        "subtitle": "Dies hilft uns, die richtigen Compliance-Fragen für Ihre Situation anzupassen.",
+        "freeTextLabel": "Erzählen Sie uns mehr über Ihr Geschäft",
+        "freeTextDesc": "Optional — hilft uns, die relevantesten Anbieter vorzuschlagen.",
+        "freeTextPlaceholder": "z.B. Ich betreibe ein Dropshipping-Business in der EU..."
+      },
+      "markets": {
+        "label": "Marktabdeckung",
+        "title": "Wo verkaufen oder agieren Sie?",
+        "subtitle": "Compliance-Anforderungen unterscheiden sich stark je nach Operationsgebiet.",
+        "globalNotice": "Compliance-Regeln außerhalb der EU unterscheiden sich stark. Erwägen Sie unser Full-Support-Paket für breitere Abdeckung.",
+        "showMarkets": "Spezifische weitere Märkte auswählen (Optional)",
+        "hideMarkets": "Spezifische Märkte ausblenden"
+      },
+      "risk": {
+        "label": "Risikosignale",
+        "subtitle": "Wählen Sie alle zutreffenden aus — das hilft uns, Ihr Risiko zu berechnen und die besten Anbieter zu finden.",
+        "signalsDetected": "Risikosignale",
+        "signalsWeight": "erkannt — wir werden die Anbieter-Ergebnisse entsprechend gewichten."
+      },
+      "complexity": {
+        "label": "Komplexität & Absicht",
+        "title": "Letzter Schritt — verraten Sie uns Ihre Größe & Ihr Ziel.",
+        "subtitle": "Das hilft dabei, Anbieter nach Relevanz zu ordnen und die passende Service-Stufe zu finden.",
+        "revenueLabel": "JAHRESUMSATZ",
+        "intentLabel": "WAS BRAUCHEN SIE GERADE?",
+        "urgencyLabel": "WIE DRINGEND IST DAS?"
+      }
+    },
+    "review": "Überprüfen",
+    "reviewAnswers": "Antworten überprüfen",
+    "reviewDesc": "Bestätigen Sie, dass alles richtig aussieht, bevor wir Ihre Ergebnisse generieren.",
+    "reviewAnswersButton": "Antworten überprüfen",
+    "backToPrevious": "Zurück zum vorherigen Schritt"
+  }
+}

@@ -1,63 +1,66 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { type LucideIcon, ChevronDown, ArrowRight, ShieldCheck, Zap, Rocket } from 'lucide-react';
 import { Typography } from '../ui/Typography';
 import { HeroMeshBackground } from './HeroMeshBackground';
 
 interface Usp { icon: LucideIcon; text: string; }
 
-const SCENARIOS: {
-  segments: { text: string; highlight?: boolean }[];
-  text: string;
-  cta: string;
-  usps: Usp[];
-}[] = [
-  {
-    segments: [
-      { text: "Your Compliance " },
-      { text: "Shortcut", highlight: true },
-      { text: " to Global Markets" }
-    ],
-    text: 'Identify regulatory gaps instantly and match with vetted local experts for seamless execution.',
-    cta: 'Find my compliance shortcut',
-    usps: [
-      { icon: Zap,         text: 'Instant gap analysis' },
-      { icon: ShieldCheck, text: 'Vetted local experts' },
-      { icon: Rocket,      text: 'Fast execution' },
-    ],
-  },
-  {
-    segments: [
-      { text: "From Regulatory Risk to " },
-      { text: "Action Plan", highlight: true },
-      { text: " in Minutes" }
-    ],
-    text: 'Translate local fragmentation into a clear roadmap. We help you understand faster and decide safer.',
-    cta: 'Build my action plan now',
-    usps: [
-      { icon: Zap,         text: 'Understand faster' },
-      { icon: ShieldCheck, text: 'Decide safer' },
-      { icon: Rocket,      text: 'Clear roadmap' },
-    ],
-  },
-  {
-    segments: [
-      { text: "The Fastest Way to " },
-      { text: "Local Compliance Experts", highlight: true }
-    ],
-    text: 'Stop guessing. Get your customized assessment and connect with the right partner firm immediately.',
-    cta: 'Connect with an expert now',
-    usps: [
-      { icon: Rocket,      text: 'Match instantly' },
-      { icon: ShieldCheck, text: 'Pre-qualified experts' },
-      { icon: Zap,         text: 'Custom assessment' },
-    ],
-  },
-];
-
 export function HeroSection() {
+  const { t, i18n } = useTranslation('common');
+  const currentLang = i18n.resolvedLanguage || 'en';
   const navigate = useNavigate();
+
+  const SCENARIOS: {
+    segments: { text: string; highlight?: boolean }[];
+    text: string;
+    cta: string;
+    usps: Usp[];
+  }[] = [
+    {
+      segments: [
+        { text: t('hero.scenarios.shortcut.seg1', "Your Compliance ") },
+        { text: t('hero.scenarios.shortcut.seg2', "Shortcut"), highlight: true },
+        { text: t('hero.scenarios.shortcut.seg3', " to Global Markets") }
+      ],
+      text: t('hero.scenarios.shortcut.text', 'Identify regulatory gaps instantly and match with vetted local experts for seamless execution.'),
+      cta: t('hero.scenarios.shortcut.cta', 'Find my compliance shortcut'),
+      usps: [
+        { icon: Zap,         text: t('hero.scenarios.shortcut.usp1', 'Instant gap analysis') },
+        { icon: ShieldCheck, text: t('hero.scenarios.shortcut.usp2', 'Vetted local experts') },
+        { icon: Rocket,      text: t('hero.scenarios.shortcut.usp3', 'Fast execution') },
+      ],
+    },
+    {
+      segments: [
+        { text: t('hero.scenarios.actionPlan.seg1', "From Regulatory Risk to ") },
+        { text: t('hero.scenarios.actionPlan.seg2', "Action Plan"), highlight: true },
+        { text: t('hero.scenarios.actionPlan.seg3', " in Minutes") }
+      ],
+      text: t('hero.scenarios.actionPlan.text', 'Translate local fragmentation into a clear roadmap. We help you understand faster and decide safer.'),
+      cta: t('hero.scenarios.actionPlan.cta', 'Build my action plan now'),
+      usps: [
+        { icon: Zap,         text: t('hero.scenarios.actionPlan.usp1', 'Understand faster') },
+        { icon: ShieldCheck, text: t('hero.scenarios.actionPlan.usp2', 'Decide safer') },
+        { icon: Rocket,      text: t('hero.scenarios.actionPlan.usp3', 'Clear roadmap') },
+      ],
+    },
+    {
+      segments: [
+        { text: t('hero.scenarios.experts.seg1', "The Fastest Way to ") },
+        { text: t('hero.scenarios.experts.seg2', "Local Compliance Experts"), highlight: true }
+      ],
+      text: t('hero.scenarios.experts.text', 'Stop guessing. Get your customized assessment and connect with the right partner firm immediately.'),
+      cta: t('hero.scenarios.experts.cta', 'Connect with an expert now'),
+      usps: [
+        { icon: Rocket,      text: t('hero.scenarios.experts.usp1', 'Match instantly') },
+        { icon: ShieldCheck, text: t('hero.scenarios.experts.usp2', 'Pre-qualified experts') },
+        { icon: Zap,         text: t('hero.scenarios.experts.usp3', 'Custom assessment') },
+      ],
+    },
+  ];
   const [country, setCountry] = useState('uk');
   const [category, setCategory] = useState('tax-vat');
   const [sliderIndex, setSliderIndex] = useState(0);
@@ -201,16 +204,16 @@ export function HeroSection() {
             <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1.8fr_auto] gap-4 lg:gap-6 items-start w-full">
               {/* Target Market */}
               <div className="w-full flex flex-col items-start gap-2">
-                <label className="text-[11px] font-bold text-primary-700 tracking-wider uppercase ml-1">I need to comply in</label>
+                <label className="text-[11px] font-bold text-primary-700 tracking-wider uppercase ml-1">{t('hero.funnel.countryLabel')}</label>
                 <div className="relative w-full">
                   <select
                     value={country}
                     onChange={(e) => setCountry(e.target.value)}
                     className="w-full appearance-none bg-white border border-primary-300 rounded-xl h-14 px-4 pr-10 text-body text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary-600 transition-all cursor-pointer shadow-sm hover:shadow-md"
                   >
-                    <option value="uk">🇬🇧 United Kingdom</option>
-                    <option value="eu">🇪🇺 European Union</option>
-                    <option value="global">🌐 Global / Multi-Market</option>
+                    <option value="uk">{t('hero.funnel.countryUk')}</option>
+                    <option value="eu">{t('hero.funnel.countryEu')}</option>
+                    <option value="global">{t('hero.funnel.countryGlobal')}</option>
                   </select>
                   <ChevronDown size={20} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500" />
                 </div>
@@ -218,18 +221,18 @@ export function HeroSection() {
 
               {/* Compliance Category */}
               <div className="w-full flex flex-col items-start gap-2">
-                <label className="text-[11px] font-bold text-primary-700 tracking-wider uppercase ml-1">My biggest challenge is</label>
+                <label className="text-[11px] font-bold text-primary-700 tracking-wider uppercase ml-1">{t('hero.funnel.categoryLabel')}</label>
                 <div className="relative w-full">
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                     className="w-full appearance-none bg-white border border-primary-300 rounded-xl h-14 px-4 pr-10 text-body text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary-600 transition-all cursor-pointer shadow-sm hover:shadow-md"
                   >
-                    <option value="tax-vat">Tax & VAT — Cross-border limits</option>
-                    <option value="epr">EPR / Packaging — Producer Responsibility</option>
-                    <option value="data-privacy">Data & Privacy — GDPR</option>
-                    <option value="marketing-seo">Marketing & Advertising Standards</option>
-                    <option value="corporate">Corporate & Legal Structure</option>
+                    <option value="tax-vat">{t('hero.funnel.catTaxVat')}</option>
+                    <option value="epr">{t('hero.funnel.catEpr')}</option>
+                    <option value="data-privacy">{t('hero.funnel.catPrivacy')}</option>
+                    <option value="marketing-seo">{t('hero.funnel.catMarketing')}</option>
+                    <option value="corporate">{t('hero.funnel.catCorporate')}</option>
                   </select>
                   <ChevronDown size={20} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500" />
                 </div>
@@ -242,7 +245,7 @@ export function HeroSection() {
                   onClick={handleQualify}
                   className="w-full lg:w-auto min-w-[260px] h-14 px-8 bg-primary-700 hover:bg-primary-800 text-white border border-primary-700 hover:border-primary-800 font-semibold text-lg rounded-xl transition-all flex items-center justify-center gap-3 whitespace-nowrap shadow-sm hover:shadow-md"
                 >
-                  Start free assessment
+                  {t('hero.funnel.cta')}
                   <ArrowRight size={20} />
                 </button>
               </div>

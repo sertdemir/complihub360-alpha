@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import {
   type LucideIcon,
   Sparkles,
@@ -361,11 +362,12 @@ const GROUNDED_SOURCES: GroundedSource[] = [
 
 function HeroZone() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation('common');
   const [country, setCountry] = useState('uk');
   const [category, setCategory] = useState('tax-vat');
 
   const handleQualify = () => {
-    navigate(`/wizard?category=${category}&country=${country}`);
+    navigate(`/${i18n.resolvedLanguage || 'en'}/wizard?category=${category}&country=${country}`);
   };
 
   return (
@@ -376,25 +378,24 @@ function HeroZone() {
         <div>
           <div className="inline-flex items-center gap-2 bg-accent-50 border border-accent-200 text-accent-700 text-caption font-semibold px-3 py-1 rounded-md mb-6">
             <Sparkles size={14} />
-            AI-Powered Advisory System
+            {t('landing.heroZone.badge', 'AI-Powered Advisory System')}
           </div>
 
           <Typography variant="display" weight="bold" className="text-neutral-900 leading-tight mb-5">
-            Your Compliance{' '}
-            <span className="text-primary-500">Compass</span>{' '}
-            for Post-Brexit UK
+            {t('landing.heroZone.titleStart', 'Your Compliance')}{' '}
+            <span className="text-primary-500">{t('landing.heroZone.titleHighlight', 'Compass')}</span>{' '}
+            {t('landing.heroZone.titleEnd', 'for Post-Brexit UK')}
           </Typography>
 
           <Typography variant="body" className="text-neutral-600 max-w-md mb-7">
-            Navigate Tax &amp; VAT obligations and EPR requirements with precision.
-            Translate regulatory fragmentation into a structured Action Plan — in max.&nbsp;5&nbsp;steps.
+            {t('landing.heroZone.description', 'Navigate Tax & VAT obligations and EPR requirements with precision. Translate regulatory fragmentation into a structured Action Plan — in max. 5 steps.')}
           </Typography>
 
           <ul className="flex flex-wrap gap-5">
-            {TRUST_BADGES.map(({ icon: Icon, text }) => (
-              <li key={text} className="flex items-center gap-1.5 text-ui-small text-neutral-500">
+            {TRUST_BADGES.map(({ icon: Icon, text }, i) => (
+              <li key={i} className="flex items-center gap-1.5 text-ui-small text-neutral-500">
                 <Icon size={14} className="text-success-500 shrink-0" />
-                {text}
+                {t(`landing.trustBadges.${i}`, text)}
               </li>
             ))}
           </ul>
@@ -403,17 +404,17 @@ function HeroZone() {
         {/* Right — Intent-Gate */}
         <Card className="shadow-md p-7">
           <Typography variant="h3" weight="bold" className="text-neutral-900 mb-1">
-            Start your qualification
+            {t('landing.heroZone.cardTitle', 'Start your qualification')}
           </Typography>
           <Typography variant="ui-small" className="text-neutral-500 mb-6">
-            Select your market and category to receive a personalised compliance dossier.
+            {t('landing.heroZone.cardDesc', 'Select your market and category to receive a personalised compliance dossier.')}
           </Typography>
 
           <div className="space-y-4 mb-6">
             {/* Country */}
             <div>
               <label className="block text-ui-small font-semibold text-neutral-700 mb-1.5">
-                Target Market
+                {t('hero.funnel.countryLabel', 'Target Market')}
               </label>
               <div className="relative">
                 <select
@@ -422,11 +423,9 @@ function HeroZone() {
                   className="w-full appearance-none bg-neutral-50 border border-neutral-300 rounded-md h-10 px-4 pr-10 text-body text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors cursor-pointer"
                   aria-label="Select target market"
                 >
-                  <option value="uk">🇬🇧 United Kingdom (Post-Brexit)</option>
-                  <option value="eu">🇪🇺 European Union</option>
-                  <option value="de">🇩🇪 Germany</option>
-                  <option value="us">🇺🇸 United States</option>
-                  <option value="global">🌐 Global / Multi-Market</option>
+                  <option value="uk">{t('hero.funnel.countryUk', '🇬🇧 United Kingdom (Post-Brexit)')}</option>
+                  <option value="eu">{t('hero.funnel.countryEu', '🇪🇺 European Union')}</option>
+                  <option value="global">{t('hero.funnel.countryGlobal', '🌐 Global / Multi-Market')}</option>
                 </select>
                 <ChevronDown
                   size={16}
@@ -438,7 +437,7 @@ function HeroZone() {
             {/* Category */}
             <div>
               <label className="block text-ui-small font-semibold text-neutral-700 mb-1.5">
-                Compliance Category
+                {t('hero.funnel.categoryLabel', 'Compliance Category')}
               </label>
               <div className="relative">
                 <select
@@ -447,11 +446,11 @@ function HeroZone() {
                   className="w-full appearance-none bg-neutral-50 border border-neutral-300 rounded-md h-10 px-4 pr-10 text-body text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors cursor-pointer"
                   aria-label="Select compliance category"
                 >
-                  <option value="tax-vat">Tax &amp; VAT — Cross-border obligations</option>
-                  <option value="epr">EPR / Packaging — Producer Responsibility</option>
-                  <option value="data-privacy">Data &amp; Privacy — UK GDPR</option>
-                  <option value="marketing-seo">Marketing &amp; Advertising Standards</option>
-                  <option value="corporate">Corporate &amp; Legal Structure</option>
+                  <option value="tax-vat">{t('hero.funnel.catTaxVat', 'Tax & VAT — Cross-border obligations')}</option>
+                  <option value="epr">{t('hero.funnel.catEpr', 'EPR / Packaging — Producer Responsibility')}</option>
+                  <option value="data-privacy">{t('hero.funnel.catPrivacy', 'Data & Privacy — UK GDPR')}</option>
+                  <option value="marketing-seo">{t('hero.funnel.catMarketing', 'Marketing & Advertising Standards')}</option>
+                  <option value="corporate">{t('hero.funnel.catCorporate', 'Corporate & Legal Structure')}</option>
                 </select>
                 <ChevronDown
                   size={16}
@@ -466,11 +465,11 @@ function HeroZone() {
             className="w-full h-12 bg-accent-500 hover:bg-accent-600 text-neutral-900 font-bold text-body rounded-md transition-colors flex items-center justify-center gap-2 shadow-sm"
           >
             <ArrowRight size={18} />
-            Qualify in max. 5 Steps
+            {t('landing.heroZone.ctaButton', 'Qualify in max. 5 Steps')}
           </button>
 
           <Typography variant="caption" className="text-neutral-400 text-center mt-3 block normal-case tracking-normal">
-            No account required · Results in under 3 minutes
+            {t('landing.heroZone.ctaSub', 'No account required · Results in under 3 minutes')}
           </Typography>
         </Card>
       </div>
@@ -481,11 +480,12 @@ function HeroZone() {
 // ─── Zone 2: Social Proof Strip ───────────────────────────────────────────────
 
 function SocialProofStrip() {
+  const { t } = useTranslation('common');
   return (
     <section className="bg-primary-50 border-y border-primary-100 py-6">
       <div className="max-w-7xl mx-auto px-6">
         <Typography variant="caption" className="text-neutral-500 text-center mb-5 block">
-          Trusted by compliance teams at
+          {t('landing.socialProof.title', 'Trusted by compliance teams at')}
         </Typography>
         <ul className="flex flex-wrap items-center justify-center gap-4 desktop-s:gap-7">
           {PARTNERS.map(({ name }) => (
@@ -505,6 +505,7 @@ function SocialProofStrip() {
 // ─── Zone 3: Core USPs ────────────────────────────────────────────────────────
 
 function UspZone() {
+  const { t } = useTranslation('common');
   return (
     <section className="bg-transparent py-16 desktop-s:py-24 relative z-10">
       <div className="max-w-7xl mx-auto px-6">
@@ -518,10 +519,10 @@ function UspZone() {
           transition={{ duration: 0.55 }}
         >
           <Typography variant="caption" className="text-primary-500 mb-3 block">
-            Why CompliHub360?
+            {t('landing.uspZone.badge', 'Why CompliHub360?')}
           </Typography>
           <Typography variant="h1" weight="bold" className="text-neutral-900">
-            Built different, by design
+            {t('landing.uspZone.title', 'Built different, by design')}
           </Typography>
         </motion.div>
 
@@ -562,10 +563,10 @@ function UspZone() {
                 </motion.div>
 
                 <Typography variant="h3" weight="bold" className="text-neutral-900 mb-3">
-                  {title}
+                  {t(`landing.uspItems.${index}.title`, title)}
                 </Typography>
                 <Typography variant="body" className="text-neutral-600 mb-6 flex-1">
-                  {body}
+                  {t(`landing.uspItems.${index}.body`, body)}
                 </Typography>
 
                 <ul className="space-y-2">
@@ -580,7 +581,7 @@ function UspZone() {
                     >
                       <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${bulletCls}`} />
                       <Typography variant="ui-small" className="text-neutral-700">
-                        {bullet}
+                        {t(`landing.uspItems.${index}.bullets.${bi}`, bullet)}
                       </Typography>
                     </motion.li>
                   ))}
@@ -622,6 +623,7 @@ function UspZone() {
 
 function ServicesZone() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation('common');
 
   return (
     <section className="bg-neutral-50 py-10 desktop-s:py-12">
@@ -629,38 +631,38 @@ function ServicesZone() {
         <div className="flex flex-col desktop-s:flex-row desktop-s:items-end justify-between mb-10 gap-4">
           <div>
             <Typography variant="caption" className="text-primary-500 mb-3 block">
-              What we cover
+              {t('landing.servicesZone.badge', 'What we cover')}
             </Typography>
             <Typography variant="h1" weight="bold" className="text-neutral-900">
-              Six compliance domains,<br className="hidden desktop-s:block" /> one platform
+              {t('landing.servicesZone.title1', 'Six compliance domains,')}<br className="hidden desktop-s:block" /> {t('landing.servicesZone.title2', 'one platform')}
             </Typography>
           </div>
           <Typography variant="body" className="text-neutral-600 desktop-s:max-w-xs desktop-s:text-right">
-            Each domain is mapped to country-specific requirements and updated as regulations change.
+            {t('landing.servicesZone.description', 'Each domain is mapped to country-specific requirements and updated as regulations change.')}
           </Typography>
         </div>
 
         <div className="grid tablet:grid-cols-2 desktop-s:grid-cols-3 gap-4">
-          {SERVICE_ITEMS.map(({ icon: Icon, title, description, tags, tagCls, iconBgCls }) => (
+          {SERVICE_ITEMS.map(({ icon: Icon, title, description, tags, tagCls, iconBgCls }, index) => (
             <Card key={title} className="p-7 flex flex-col">
               <div className="flex items-center gap-4 mb-4">
                 <div className={`w-11 h-11 rounded-lg flex items-center justify-center shrink-0 ${iconBgCls}`}>
                   <Icon size={20} />
                 </div>
                 <Typography variant="h3" weight="bold" className="text-neutral-900">
-                  {title}
+                  {t(`landing.serviceItems.${index}.title`, title)}
                 </Typography>
               </div>
               <Typography variant="ui-small" className="text-neutral-600 leading-relaxed mb-5 flex-1">
-                {description}
+                {t(`landing.serviceItems.${index}.description`, description)}
               </Typography>
               <div className="flex flex-wrap gap-2">
-                {tags.map((tag) => (
+                {tags.map((tag, ti) => (
                   <span
                     key={tag}
                     className={`text-caption font-semibold px-3 py-1 rounded-pill normal-case tracking-normal ${tagCls}`}
                   >
-                    {tag}
+                    {t(`landing.serviceItems.${index}.tags.${ti}`, tag)}
                   </span>
                 ))}
               </div>
@@ -671,17 +673,17 @@ function ServicesZone() {
           <div className="bg-primary-500 rounded-xl p-7 flex flex-col justify-between">
             <div>
               <Typography variant="h3" weight="bold" className="text-white mb-3">
-                Need end-to-end coverage?
+                {t('landing.servicesZone.ctaCardTitle', 'Need end-to-end coverage?')}
               </Typography>
               <Typography variant="ui-small" className="text-primary-200 leading-relaxed mb-7">
-                Our Full Support package covers all six domains with a dedicated compliance manager and a unified action plan.
+                {t('landing.servicesZone.ctaCardDesc', 'Our Full Support package covers all six domains with a dedicated compliance manager and a unified action plan.')}
               </Typography>
             </div>
             <button
-              onClick={() => navigate('/wizard?category=full-support')}
+              onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/wizard?category=full-support`)}
               className="h-11 bg-accent-500 hover:bg-accent-600 text-neutral-900 font-bold text-ui-small rounded-md transition-colors flex items-center justify-center gap-2"
             >
-              Explore Full Support
+              {t('landing.servicesZone.ctaButton', 'Explore Full Support')}
               <ArrowRight size={16} />
             </button>
           </div>
@@ -719,6 +721,7 @@ function CountUp({ target, suffix = '', duration = 1.1 }: { target: number; suff
 }
 
 function AiEngineZone() {
+  const { t } = useTranslation('common');
   const sectionRef = useRef<HTMLDivElement>(null);
   const [hasStarted, setHasStarted] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -763,13 +766,13 @@ function AiEngineZone() {
           transition={{ duration: 0.55 }}
         >
           <Typography variant="caption" className="text-primary-500 mb-3 block">
-            The AI Engine
+            {t('landing.aiEngine.badge', 'The AI Engine')}
           </Typography>
           <Typography variant="h1" weight="bold" className="text-neutral-900 mb-4">
-            From raw context to a structured<br className="hidden tablet:block" /> compliance dossier
+            {t('landing.aiEngine.title1', 'From raw context to a structured')}<br className="hidden tablet:block" /> {t('landing.aiEngine.title2', 'compliance dossier')}
           </Typography>
           <Typography variant="body" className="text-neutral-600 max-w-xl mx-auto">
-            Our privacy-first AI pipeline has three stages — each designed to maximise output quality while minimising your data exposure.
+            {t('landing.aiEngine.description', 'Our privacy-first AI pipeline has three stages — each designed to maximise output quality while minimising your data exposure.')}
           </Typography>
         </motion.div>
 
@@ -795,10 +798,10 @@ function AiEngineZone() {
                   </div>
                   <div className="min-w-0">
                     <span className={`text-[9px] font-bold tracking-[0.2em] uppercase block transition-colors duration-300 ${isActive ? stepLabelCls : 'text-neutral-400'}`}>
-                      Step {step}
+                      {t('landing.aiEngine.step', 'Step')} {step}
                     </span>
                     <span className={`font-semibold text-sm leading-tight block transition-colors duration-300 ${isActive ? 'text-neutral-900' : 'text-neutral-500'}`}>
-                      {title}
+                      {t(`landing.aiSteps.${index}.title`, title)}
                     </span>
                   </div>
                 </div>
@@ -822,13 +825,13 @@ function AiEngineZone() {
                   variant="caption"
                   className={`block mb-1.5 normal-case tracking-normal font-semibold ${AI_STEPS[activeIndex].stepLabelCls}`}
                 >
-                  Step {AI_STEPS[activeIndex].step}
+                  {t('landing.aiEngine.step', 'Step')} {AI_STEPS[activeIndex].step}
                 </Typography>
                 <Typography variant="h3" weight="bold" className="text-neutral-900 mb-3">
-                  {AI_STEPS[activeIndex].title}
+                  {t(`landing.aiSteps.${activeIndex}.title`, AI_STEPS[activeIndex].title)}
                 </Typography>
                 <Typography variant="body" className="text-neutral-600 leading-relaxed max-w-2xl">
-                  {AI_STEPS[activeIndex].body}
+                  {t(`landing.aiSteps.${activeIndex}.body`, AI_STEPS[activeIndex].body)}
                 </Typography>
               </div>
 
@@ -879,12 +882,12 @@ function AiEngineZone() {
                       </svg>
                       <div className="absolute inset-0 flex items-center justify-center">
                         <span className="text-xl font-bold text-neutral-900 tabular-nums leading-none">
-                          {stat.staticValue ?? `${stat.numericEnd}${stat.suffix ?? ''}`}
+                          {stat.staticValue ? t(`landing.aiSteps.${activeIndex}.stats.${i}.staticValue`, stat.staticValue) : `${stat.numericEnd}${stat.suffix ?? ''}`}
                         </span>
                       </div>
                     </div>
                     <span className="text-xs font-medium text-neutral-500 text-center leading-tight max-w-[120px]">
-                      {stat.label}
+                      {t(`landing.aiSteps.${activeIndex}.stats.${i}.label`, stat.label)}
                     </span>
                   </motion.div>
                 );
@@ -902,24 +905,25 @@ function AiEngineZone() {
 
 function ValueProgressionZone() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation('common');
 
   return (
     <section className="bg-transparent py-16 desktop-s:py-24 relative z-10">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-10">
           <Typography variant="caption" className="text-primary-500 mb-3 block">
-            Access Tiers
+            {t('landing.valueProgression.badge', 'Access Tiers')}
           </Typography>
           <Typography variant="h1" weight="bold" className="text-neutral-900 mb-4">
-            The more you share, the more<br className="hidden tablet:block" /> you unlock
+            {t('landing.valueProgression.title1', 'The more you share, the more')}<br className="hidden tablet:block" /> {t('landing.valueProgression.title2', 'you unlock')}
           </Typography>
           <Typography variant="body" className="text-neutral-600">
-            Start for free as a Guest. Register to unlock your full Action Plan. Join as a Partner to receive qualified leads.
+            {t('landing.valueProgression.description', 'Start for free as a Guest. Register to unlock your full Action Plan. Join as a Partner to receive qualified leads.')}
           </Typography>
         </div>
 
         <div className="grid tablet:grid-cols-3 gap-5 items-stretch">
-          {VALUE_TIERS.map(({ badgeLabel, badgeCls, title, description, features, cta, highlighted }) => (
+          {VALUE_TIERS.map(({ badgeLabel, badgeCls, title, description, features, cta, highlighted }, index) => (
             <div
               key={badgeLabel}
               className={`relative rounded-xl p-8 flex flex-col ${
@@ -931,13 +935,13 @@ function ValueProgressionZone() {
               {highlighted && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent-500 rounded-pill px-4 py-1">
                   <Typography variant="caption" className="text-neutral-900 font-bold block normal-case tracking-normal">
-                    Most Popular
+                    {t('landing.valueProgression.mostPopular', 'Most Popular')}
                   </Typography>
                 </div>
               )}
 
               <span className={`inline-flex self-start items-center gap-1.5 text-caption font-bold px-3 py-1 rounded-md mb-5 normal-case tracking-normal ${badgeCls}`}>
-                {badgeLabel}
+                {t(`landing.valueTiers.${index}.badgeLabel`, badgeLabel)}
               </span>
 
               <Typography
@@ -945,17 +949,17 @@ function ValueProgressionZone() {
                 weight="bold"
                 className={`mb-2 ${highlighted ? 'text-white' : 'text-neutral-900'}`}
               >
-                {title}
+                {t(`landing.valueTiers.${index}.title`, title)}
               </Typography>
               <Typography
                 variant="ui-small"
                 className={`mb-6 leading-relaxed ${highlighted ? 'text-primary-200' : 'text-neutral-600'}`}
               >
-                {description}
+                {t(`landing.valueTiers.${index}.description`, description)}
               </Typography>
 
               <ul className="space-y-3 flex-1 mb-7">
-                {features.map(({ text, available }) => (
+                {features.map(({ text, available }, fi) => (
                   <li key={text} className="flex items-center gap-2.5">
                     {available ? (
                       <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${highlighted ? 'bg-primary-700' : 'bg-primary-50'}`}>
@@ -973,7 +977,7 @@ function ValueProgressionZone() {
                         : 'text-neutral-400'
                       }
                     >
-                      {text}
+                      {t(`landing.valueTiers.${index}.features.${fi}`, text)}
                     </Typography>
                   </li>
                 ))}
@@ -981,18 +985,18 @@ function ValueProgressionZone() {
 
               {highlighted ? (
                 <button
-                  onClick={() => navigate('/register')}
+                  onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/register`)}
                   className="w-full h-11 bg-accent-500 hover:bg-accent-600 text-neutral-900 font-bold text-ui-small rounded-md transition-colors"
                 >
-                  {cta}
+                  {t(`landing.valueTiers.${index}.cta`, cta)}
                 </button>
               ) : (
                 <Button
                   variant={badgeLabel === 'Partner' ? 'outline' : 'secondary'}
                   fullWidth
-                  onClick={() => navigate(badgeLabel === 'Partner' ? '/register?role=partner' : '/wizard')}
+                  onClick={() => navigate(badgeLabel === 'Partner' ? `/${i18n.resolvedLanguage || 'en'}/register?role=partner` : `/${i18n.resolvedLanguage || 'en'}/wizard`)}
                 >
-                  {cta}
+                  {t(`landing.valueTiers.${index}.cta`, cta)}
                 </Button>
               )}
             </div>
@@ -1009,6 +1013,7 @@ function ValueProgressionZone() {
 
 function LandingFooter() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation('common');
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
@@ -1019,21 +1024,21 @@ function LandingFooter() {
 
   const footerLinks = [
     {
-      heading: 'Platform',
+      heading: t('landing.footer.platform', 'Platform'),
       links: [
-        { label: 'Services', path: '/services' },
-        { label: 'Countries', path: '/countries' },
-        { label: 'Advisory', path: '/advisory' },
-        { label: 'Compliance Wizard', path: '/wizard' },
+        { label: t('landing.footer.platformLinks.0', 'Services'), path: '/services' },
+        { label: t('landing.footer.platformLinks.1', 'Countries'), path: '/countries' },
+        { label: t('landing.footer.platformLinks.2', 'Advisory'), path: '/advisory' },
+        { label: t('landing.footer.platformLinks.3', 'Compliance Wizard'), path: '/wizard' },
       ],
     },
     {
-      heading: 'Legal',
+      heading: t('landing.footer.legal', 'Legal'),
       links: [
-        { label: 'Privacy Policy', path: '#' },
-        { label: 'Terms of Service', path: '#' },
-        { label: 'Cookie Policy', path: '#' },
-        { label: 'GDPR Compliance', path: '#' },
+        { label: t('landing.footer.legalLinks.0', 'Privacy Policy'), path: '#' },
+        { label: t('landing.footer.legalLinks.1', 'Terms of Service'), path: '#' },
+        { label: t('landing.footer.legalLinks.2', 'Cookie Policy'), path: '#' },
+        { label: t('landing.footer.legalLinks.3', 'GDPR Compliance'), path: '#' },
       ],
     },
   ];
@@ -1047,7 +1052,7 @@ function LandingFooter() {
           <div className="tablet:col-span-2">
             <button
               className="flex items-center gap-2 mb-3"
-              onClick={() => navigate('/')}
+              onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}`)}
               aria-label="CompliHub360 Home"
             >
               <div className="w-5 h-5 bg-accent-500 rounded-sm flex items-center justify-center">
@@ -1059,13 +1064,13 @@ function LandingFooter() {
             </button>
 
             <Typography variant="ui-small" className="text-primary-300 max-w-xs leading-relaxed mb-5 block">
-              Your intelligent compliance compass. Navigate global regulatory complexity with AI-driven precision and a privacy-first architecture.
+              {t('landing.footer.description', 'Your intelligent compliance compass. Navigate global regulatory complexity with AI-driven precision and a privacy-first architecture.')}
             </Typography>
 
             {subscribed ? (
               <div className="flex items-center gap-2 text-success-500 text-ui-small font-medium">
                 <CheckCircle size={16} />
-                Subscribed to the Compliance Digest
+                {t('landing.footer.subscribed', 'Subscribed to the Compliance Digest')}
               </div>
             ) : (
               <form onSubmit={handleSubscribe} className="flex gap-2">
@@ -1082,7 +1087,7 @@ function LandingFooter() {
                   className="h-10 px-4 bg-accent-500 hover:bg-accent-600 text-neutral-900 font-semibold text-ui-small rounded-md transition-colors shrink-0 flex items-center gap-1.5"
                 >
                   <Mail size={14} />
-                  Subscribe
+                  {t('landing.footer.subscribeButton', 'Subscribe')}
                 </button>
               </form>
             )}
@@ -1101,7 +1106,7 @@ function LandingFooter() {
                       onClick={(e) => {
                         if (path.startsWith('/')) {
                           e.preventDefault();
-                          navigate(path);
+                          navigate(`/${i18n.resolvedLanguage || 'en'}${path}`);
                         }
                       }}
                       className="text-ui-small text-primary-300 hover:text-white transition-colors"
@@ -1117,12 +1122,12 @@ function LandingFooter() {
 
         <div className="pt-6 border-t border-primary-900 flex flex-col tablet:flex-row items-center justify-between gap-3">
           <Typography variant="caption" className="text-primary-400 block normal-case tracking-normal">
-            © {new Date().getFullYear()} CompliHub360. All rights reserved.
+            {t('landing.footer.copyright', '© {{year}} CompliHub360. All rights reserved.', { year: new Date().getFullYear() })}
           </Typography>
           <div className="flex items-center gap-1.5">
             <ShieldCheck size={13} className="text-accent-500" />
             <Typography variant="caption" className="text-primary-400 block normal-case tracking-normal">
-              Privacy-first · No PII stored without consent
+              {t('landing.footer.privacyBadge', 'Privacy-first · No PII stored without consent')}
             </Typography>
           </div>
         </div>

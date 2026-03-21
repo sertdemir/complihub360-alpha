@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface EngagementModalProps {
     providerName?: string;
@@ -15,6 +16,7 @@ export function EngagementModal({
     onClose,
     onSubmit,
 }: EngagementModalProps) {
+    const { t } = useTranslation('common');
     const [details, setDetails] = useState("");
     const [submitted, setSubmitted] = useState(false);
 
@@ -31,7 +33,7 @@ export function EngagementModal({
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200 dark:border-slate-800">
                     <h2 className="text-slate-900 dark:text-white text-lg font-semibold tracking-tight">
-                        Request Proposal from {providerName}
+                        {t('components.engagementModal.title', 'Request Proposal from {{providerName}}', { providerName })}
                     </h2>
                     <button
                         onClick={onClose}
@@ -47,25 +49,25 @@ export function EngagementModal({
                     <div className="flex flex-wrap gap-2 p-3 rounded-lg bg-slate-200/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50">
                         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-slate-300/50 dark:bg-slate-700 text-sm font-medium text-slate-800 dark:text-slate-200">
                             <span className="material-symbols-outlined text-[16px] text-[#137fec]">public</span>
-                            <span>Market: {market}</span>
+                            <span>{t('components.engagementModal.market', 'Market: {{market}}', { market })}</span>
                         </div>
                         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-slate-300/50 dark:bg-slate-700 text-sm font-medium text-slate-800 dark:text-slate-200">
                             <span className="material-symbols-outlined text-[16px] text-[#137fec]">account_balance</span>
-                            <span>Category: {category}</span>
+                            <span>{t('components.engagementModal.category', 'Category: {{category}}', { category })}</span>
                         </div>
                     </div>
 
                     {/* Textarea */}
                     <div className="flex flex-col gap-2">
                         <label className="text-sm font-medium text-slate-700 dark:text-slate-300" htmlFor="engagement-details">
-                            Additional Details{" "}
-                            <span className="text-slate-500 font-normal">(Optional)</span>
+                            {t('components.engagementModal.detailsLabel', 'Additional Details')}{" "}
+                            <span className="text-slate-500 font-normal">({t('components.engagementModal.optional', 'Optional')})</span>
                         </label>
                         <textarea
                             id="engagement-details"
                             value={details}
                             onChange={e => setDetails(e.target.value)}
-                            placeholder="Add any specific requirements, timelines, or context for the provider..."
+                            placeholder={t('components.engagementModal.detailsPlaceholder', 'Add any specific requirements, timelines, or context for the provider...')}
                             className="w-full resize-y min-h-[120px] rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950/50 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-[#137fec] focus:ring-1 focus:ring-[#137fec] p-3 text-sm transition-shadow outline-none"
                         />
                     </div>
@@ -73,7 +75,7 @@ export function EngagementModal({
                     {/* Privacy notice */}
                     <div className="flex items-start gap-2 text-slate-500 dark:text-slate-400 text-xs">
                         <span className="material-symbols-outlined text-[16px] shrink-0">shield</span>
-                        <p>Protected by AI Privacy Gate. Your request is anonymized until you choose to reveal your identity to the provider.</p>
+                        <p>{t('components.engagementModal.privacyNotice', 'Protected by AI Privacy Gate. Your request is anonymized until you choose to reveal your identity to the provider.')}</p>
                     </div>
                 </div>
 
@@ -83,7 +85,7 @@ export function EngagementModal({
                         onClick={onClose}
                         className="px-4 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
                     >
-                        Cancel
+                        {t('components.engagementModal.cancel', 'Cancel')}
                     </button>
                     <button
                         onClick={handleSubmit}
@@ -93,7 +95,7 @@ export function EngagementModal({
                                 : "bg-[#137fec] hover:bg-[#137fec]/90"
                             }`}
                     >
-                        <span>{submitted ? "Sent!" : "Submit Request"}</span>
+                        <span>{submitted ? t('components.engagementModal.sent', 'Sent!') : t('components.engagementModal.submit', 'Submit Request')}</span>
                         <span className="material-symbols-outlined text-[18px]">
                             {submitted ? "check" : "send"}
                         </span>

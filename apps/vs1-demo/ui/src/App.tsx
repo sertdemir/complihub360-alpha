@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, useParams, Navigate, Outlet } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
+import { supportedLngs } from "./i18n/config";
 import { GlobalNav } from "./components/layout/GlobalNav";
 import { WizardProvider } from "./components/wizard/WizardContext";
 import { LandingPage } from "./pages/LandingPage";
@@ -28,8 +30,6 @@ import { LoginPage } from "./pages/auth/LoginPage";
 import { RegisterPage } from "./pages/auth/RegisterPage";
 import { EmailVerificationPage } from "./pages/auth/EmailVerificationPage";
 
-/** All wizard routes share one WizardProvider instance per "session" via navigation.
- *  Each category-level route renders its own individualized multi-step wizard. */
 function WizardRoutes() {
     return (
         <WizardProvider>
@@ -55,39 +55,65 @@ function WizardRoutes() {
     );
 }
 
+function RootRedirect() {
+    const { i18n } = useTranslation();
+    return <Navigate to={`/${i18n.resolvedLanguage || 'en'}`} replace />;
+}
+
+function LocaleLayout() {
+    const { locale } = useParams();
+    const { i18n } = useTranslation();
+
+    useEffect(() => {
+        if (locale && supportedLngs.includes(locale) && i18n.resolvedLanguage !== locale) {
+            i18n.changeLanguage(locale);
+        }
+    }, [locale, i18n]);
+
+    if (!locale || !supportedLngs.includes(locale)) {
+        return <Navigate to={`/${i18n.resolvedLanguage || 'en'}`} replace />;
+    }
+
+    return <Outlet />;
+}
+
 function AppContent() {
     const location = useLocation();
     const navigate = useNavigate();
     const [bgLocation, setBgLocation] = useState(location);
 
+    const isWizardRoute = /^\/[a-z]{2}\/wizard/.test(location.pathname) || location.pathname.startsWith("/wizard");
+
     useEffect(() => {
-        if (!location.pathname.startsWith("/wizard")) {
+        if (!isWizardRoute) {
             setBgLocation(location);
         }
-    }, [location]);
-
-    const isWizardRoute = location.pathname.startsWith("/wizard");
+    }, [location, isWizardRoute]);
 
     return (
         <>
             <GlobalNav />
             {/* Render the background location for main routes if a wizard is open */}
             <Routes location={isWizardRoute ? bgLocation : location}>
-                {/* Public pages */}
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/services" element={<ServicesPage />} />
-                <Route path="/countries" element={<CountriesPage />} />
-                <Route path="/platform" element={<PlatformPage />} />
-                <Route path="/solutions" element={<SolutionsPage />} />
-                <Route path="/compliance" element={<ComplianceAreasPage />} />
-                <Route path="/resources" element={<ResourcesPage />} />
-                <Route path="/advisory" element={<AdvisoryPage />} />
-                <Route path="/results" element={<ResultsOverview />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                {/* Auth */}
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-                <Route path="/verify-email" element={<EmailVerificationPage />} />
+                <Route path="/:locale" element={<LocaleLayout />}>
+                    {/* Public pages */}
+                    <Route index element={<LandingPage />} />
+                    <Route path="services" element={<ServicesPage />} />
+                    <Route path="countries" element={<CountriesPage />} />
+                    <Route path="platform" element={<PlatformPage />} />
+                    <Route path="solutions" element={<SolutionsPage />} />
+                    <Route path="compliance" element={<ComplianceAreasPage />} />
+                    <Route path="resources" element={<ResourcesPage />} />
+                    <Route path="advisory" element={<AdvisoryPage />} />
+                    <Route path="results" element={<ResultsOverview />} />
+                    <Route path="dashboard" element={<Dashboard />} />
+                    {/* Auth */}
+                    <Route path="login" element={<LoginPage />} />
+                    <Route path="register" element={<RegisterPage />} />
+                    <Route path="verify-email" element={<EmailVerificationPage />} />
+                </Route>
+                <Route path="/" element={<RootRedirect />} />
+                <Route path="*" element={<RootRedirect />} />
             </Routes>
 
             {/* Wizard Overlay */}
@@ -102,13 +128,17 @@ function AppContent() {
                         style={{ cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" fill="white" stroke="%23E5E5E5" stroke-width="1"/><path d="M14 14L26 26" stroke="%23171717" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 26L26 14" stroke="%23171717" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>') 20 20, pointer` }}
                         onClick={(e) => {
                             if (!(e.target as HTMLElement).closest('.wizard-card')) {
-                                const targetPath = bgLocation.pathname.startsWith('/wizard') ? '/' : bgLocation.pathname;
-                                navigate(targetPath);
+                                const targetPath = (/^\/[a-z]{2}\/wizard/.test(bgLocation.pathname) || bgLocation.pathname.startsWith('/wizard')) && bgLocation.pathname !== location.pathname
+                                    ? `/${bgLocation.pathname.split('/')[1]}` 
+                                    : bgLocation.pathname;
+                                navigate(targetPath || '/');
                             }
                         }}
                     >
                         <div className="min-h-full py-12 px-4 flex flex-col items-center justify-center">
                             <Routes location={location}>
+                                <Route path="/:locale/wizard/*" element={<WizardRoutes />} />
+                                {/* For backward compatibility if someone opens /wizard directly */}
                                 <Route path="/wizard/*" element={<WizardRoutes />} />
                             </Routes>
                         </div>

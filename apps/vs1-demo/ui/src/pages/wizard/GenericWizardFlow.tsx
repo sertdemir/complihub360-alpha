@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
+import { TFunction } from "i18next";
 import { useWizard, BusinessType, RevenueBand } from "../../components/wizard/WizardContext";
 import { WizardHeader } from "../../components/wizard/WizardHeader";
 import { WizardStepper } from "../../components/wizard/WizardStepper";
@@ -16,100 +18,100 @@ import type { WizardCategory } from "../../components/wizard/WizardContext";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
-const BUSINESS_TYPES = [
-    { value: "ecommerce", label: "E-Commerce Brand", description: "Sell own products via your website or marketplace.", icon: "storefront" },
-    { value: "marketplace", label: "Marketplace Seller", description: "Sell via Amazon, Shopify, eBay, Etsy, etc.", icon: "shopping_bag" },
-    { value: "saas", label: "SaaS / Software", description: "Digital products, subscriptions, or software services.", icon: "cloud" },
-    { value: "agency", label: "Agency / Consultant", description: "Services, consulting, or creative work for clients.", icon: "groups" },
-    { value: "other", label: "Other", description: "Tell us a bit more about your business.", icon: "more_horiz" },
+const getBusinessTypes = (t: TFunction) => [
+    { value: "ecommerce", label: t('wizard.businessTypes.ecommerce.label', "E-Commerce Brand"), description: t('wizard.businessTypes.ecommerce.desc', "Sell own products via your website or marketplace."), icon: "storefront" },
+    { value: "marketplace", label: t('wizard.businessTypes.marketplace.label', "Marketplace Seller"), description: t('wizard.businessTypes.marketplace.desc', "Sell via Amazon, Shopify, eBay, Etsy, etc."), icon: "shopping_bag" },
+    { value: "saas", label: t('wizard.businessTypes.saas.label', "SaaS / Software"), description: t('wizard.businessTypes.saas.desc', "Digital products, subscriptions, or software services."), icon: "cloud" },
+    { value: "agency", label: t('wizard.businessTypes.agency.label', "Agency / Consultant"), description: t('wizard.businessTypes.agency.desc', "Services, consulting, or creative work for clients."), icon: "groups" },
+    { value: "other", label: t('wizard.businessTypes.other.label', "Other"), description: t('wizard.businessTypes.other.desc', "Tell us a bit more about your business."), icon: "more_horiz" },
 ];
 
-const MARKET_SCOPES = [
-    { value: "local", label: "Local Only", description: "I only operate within my primary country.", icon: "home" },
-    { value: "eu", label: "EU / Europe", description: "I sell to or operate across multiple EU countries.", icon: "public" },
-    { value: "global", label: "Global", description: "I operate in markets outside Europe.", icon: "travel_explore" },
+const getMarketScopes = (t: TFunction) => [
+    { value: "local", label: t('wizard.marketScopes.local.label', "Local Only"), description: t('wizard.marketScopes.local.desc', "I only operate within my primary country."), icon: "home" },
+    { value: "eu", label: t('wizard.marketScopes.eu.label', "EU / Europe"), description: t('wizard.marketScopes.eu.desc', "I sell to or operate across multiple EU countries."), icon: "public" },
+    { value: "global", label: t('wizard.marketScopes.global.label', "Global"), description: t('wizard.marketScopes.global.desc', "I operate in markets outside Europe."), icon: "travel_explore" },
 ];
 
-const REVENUE_BANDS = [
-    { value: "lt-10k", label: "< €10k", sublabel: "per year" },
-    { value: "10k-100k", label: "€10k–100k", sublabel: "per year" },
-    { value: "100k-1m", label: "€100k–1M", sublabel: "per year" },
-    { value: "gt-1m", label: "> €1M", sublabel: "per year" },
+const getRevenueBands = (t: TFunction) => [
+    { value: "lt-10k", label: t('wizard.revenueBands.lt10k', "< €10k"), sublabel: t('wizard.revenueBands.perYear', "per year") },
+    { value: "10k-100k", label: t('wizard.revenueBands.mid1', "€10k–100k"), sublabel: t('wizard.revenueBands.perYear', "per year") },
+    { value: "100k-1m", label: t('wizard.revenueBands.mid2', "€100k–1M"), sublabel: t('wizard.revenueBands.perYear', "per year") },
+    { value: "gt-1m", label: t('wizard.revenueBands.gt1m', "> €1M"), sublabel: t('wizard.revenueBands.perYear', "per year") },
 ];
 
-const INTENTS = [
-    { value: "self-check", label: "Quick self-check", description: "Get immediate feedback on basic requirements.", icon: "fact_check" },
-    { value: "expert", label: "Expert advice", description: "Speak with a specialist for complex cases.", icon: "psychology" },
-    { value: "full-service", label: "Full service", description: "End-to-end management by our team.", icon: "verified_user" },
+const getIntents = (t: TFunction) => [
+    { value: "self-check", label: t('wizard.intents.selfCheck.label', "Quick self-check"), description: t('wizard.intents.selfCheck.desc', "Get immediate feedback on basic requirements."), icon: "fact_check" },
+    { value: "expert", label: t('wizard.intents.expert.label', "Expert advice"), description: t('wizard.intents.expert.desc', "Speak with a specialist for complex cases."), icon: "psychology" },
+    { value: "full-service", label: t('wizard.intents.fullService.label', "Full service"), description: t('wizard.intents.fullService.desc', "End-to-end management by our team."), icon: "verified_user" },
 ];
 
-const URGENCIES = [
-    { value: "today", label: "Today" },
-    { value: "week", label: "This week" },
-    { value: "month", label: "This month" },
-    { value: "researching", label: "Just researching" },
+const getUrgencies = (t: TFunction) => [
+    { value: "today", label: t('wizard.urgencies.today', "Today") },
+    { value: "week", label: t('wizard.urgencies.week', "This week") },
+    { value: "month", label: t('wizard.urgencies.month', "This month") },
+    { value: "researching", label: t('wizard.urgencies.researching', "Just researching") },
 ];
 
 interface ChipOption { value: string; label: string; icon?: string; }
 
-const RISK_SIGNALS: Record<WizardCategory | string, ChipOption[]> = {
+const getRiskSignals = (t: TFunction): Record<WizardCategory | string, ChipOption[]> => ({
     "tax-vat": [
-        { value: "marketplace_seller", label: "Marketplace seller", icon: "shopping_bag" },
-        { value: "cross_border_shipping", label: "Cross-border shipping", icon: "local_shipping" },
-        { value: "warehouse_abroad", label: "Warehouse abroad", icon: "warehouse" },
-        { value: "digital_goods", label: "Digital goods / services", icon: "cloud" },
-        { value: "high_volume", label: "High transaction volume", icon: "trending_up" },
-        { value: "vat_registered", label: "Already VAT registered", icon: "receipt_long" },
+        { value: "marketplace_seller", label: t('wizard.riskSignals.taxVat.marketplace', "Marketplace seller"), icon: "shopping_bag" },
+        { value: "cross_border_shipping", label: t('wizard.riskSignals.taxVat.crossBorder', "Cross-border shipping"), icon: "local_shipping" },
+        { value: "warehouse_abroad", label: t('wizard.riskSignals.taxVat.warehouse', "Warehouse abroad"), icon: "warehouse" },
+        { value: "digital_goods", label: t('wizard.riskSignals.taxVat.digitalGoods', "Digital goods / services"), icon: "cloud" },
+        { value: "high_volume", label: t('wizard.riskSignals.taxVat.highVolume', "High transaction volume"), icon: "trending_up" },
+        { value: "vat_registered", label: t('wizard.riskSignals.taxVat.vatRegistered', "Already VAT registered"), icon: "receipt_long" },
     ],
     "epr": [
-        { value: "physical_goods", label: "Sells physical goods", icon: "inventory_2" },
-        { value: "own_packaging", label: "Uses custom packaging", icon: "package_2" },
-        { value: "dropshipper", label: "Dropshipper / unbranded", icon: "swap_horiz" },
-        { value: "electronics", label: "Electronics category", icon: "devices" },
-        { value: "importer", label: "Imports from outside EU", icon: "flight_land" },
-        { value: "recycling_fee", label: "Not paying recycling fee", icon: "recycling" },
+        { value: "physical_goods", label: t('wizard.riskSignals.epr.physicalGoods', "Sells physical goods"), icon: "inventory_2" },
+        { value: "own_packaging", label: t('wizard.riskSignals.epr.ownPackaging', "Uses custom packaging"), icon: "package_2" },
+        { value: "dropshipper", label: t('wizard.riskSignals.epr.dropshipper', "Dropshipper / unbranded"), icon: "swap_horiz" },
+        { value: "electronics", label: t('wizard.riskSignals.epr.electronics', "Electronics category"), icon: "devices" },
+        { value: "importer", label: t('wizard.riskSignals.epr.importer', "Imports from outside EU"), icon: "flight_land" },
+        { value: "recycling_fee", label: t('wizard.riskSignals.epr.recyclingFee', "Not paying recycling fee"), icon: "recycling" },
     ],
     "data-privacy": [
-        { value: "ga4", label: "Google Analytics (GA4)", icon: "analytics" },
-        { value: "meta_pixel", label: "Meta Pixel", icon: "thumb_up" },
-        { value: "tiktok_pixel", label: "TikTok Pixel", icon: "music_note" },
-        { value: "email_marketing", label: "Email marketing", icon: "mail" },
-        { value: "crm_tool", label: "CRM / contact data", icon: "contacts" },
-        { value: "no_consent_banner", label: "No consent management", icon: "block" },
+        { value: "ga4", label: t('wizard.riskSignals.privacy.ga4', "Google Analytics (GA4)"), icon: "analytics" },
+        { value: "meta_pixel", label: t('wizard.riskSignals.privacy.metaPixel', "Meta Pixel"), icon: "thumb_up" },
+        { value: "tiktok_pixel", label: t('wizard.riskSignals.privacy.tiktokPixel', "TikTok Pixel"), icon: "music_note" },
+        { value: "email_marketing", label: t('wizard.riskSignals.privacy.emailMarketing', "Email marketing"), icon: "mail" },
+        { value: "crm_tool", label: t('wizard.riskSignals.privacy.crmTool', "CRM / contact data"), icon: "contacts" },
+        { value: "no_consent_banner", label: t('wizard.riskSignals.privacy.noConsent', "No consent management"), icon: "block" },
     ],
     "marketing-seo": [
-        { value: "health_claims", label: "Health / supplement claims", icon: "medication" },
-        { value: "guaranteed_claims", label: '"Guaranteed" or "#1" claims', icon: "workspace_premium" },
-        { value: "google_ads", label: "Google Ads", icon: "ads_click" },
-        { value: "meta_ads", label: "Meta / Facebook Ads", icon: "thumb_up" },
-        { value: "influencer", label: "Influencer marketing", icon: "star" },
-        { value: "cookie_popup", label: "No cookie consent", icon: "block" },
+        { value: "health_claims", label: t('wizard.riskSignals.marketing.healthClaims', "Health / supplement claims"), icon: "medication" },
+        { value: "guaranteed_claims", label: t('wizard.riskSignals.marketing.guaranteed', '"Guaranteed" or "#1" claims'), icon: "workspace_premium" },
+        { value: "google_ads", label: t('wizard.riskSignals.marketing.googleAds', "Google Ads"), icon: "ads_click" },
+        { value: "meta_ads", label: t('wizard.riskSignals.marketing.metaAds', "Meta / Facebook Ads"), icon: "thumb_up" },
+        { value: "influencer", label: t('wizard.riskSignals.marketing.influencer', "Influencer marketing"), icon: "star" },
+        { value: "cookie_popup", label: t('wizard.riskSignals.marketing.cookiePopup', "No cookie consent"), icon: "block" },
     ],
     "corporate": [
-        { value: "individual_seller", label: "No legal entity yet", icon: "person" },
-        { value: "foreign_register", label: "Registering abroad", icon: "flight_takeoff" },
-        { value: "multi_entity", label: "Multiple entities", icon: "account_tree" },
-        { value: "remote_team", label: "Remote / international team", icon: "groups" },
-        { value: "investor_ready", label: "Preparing for investment", icon: "trending_up" },
+        { value: "individual_seller", label: t('wizard.riskSignals.corporate.individual', "No legal entity yet"), icon: "person" },
+        { value: "foreign_register", label: t('wizard.riskSignals.corporate.foreign', "Registering abroad"), icon: "flight_takeoff" },
+        { value: "multi_entity", label: t('wizard.riskSignals.corporate.multiEntity', "Multiple entities"), icon: "account_tree" },
+        { value: "remote_team", label: t('wizard.riskSignals.corporate.remoteTeam', "Remote / international team"), icon: "groups" },
+        { value: "investor_ready", label: t('wizard.riskSignals.corporate.investorReady', "Preparing for investment"), icon: "trending_up" },
     ],
     "full-support": [
-        { value: "multi_country", label: "Operating in 3+ countries", icon: "public" },
-        { value: "all_categories", label: "Multiple compliance areas", icon: "category" },
-        { value: "fast_needed", label: "Urgent / fast turnaround", icon: "bolt" },
-        { value: "no_team", label: "No in-house compliance", icon: "person_off" },
-        { value: "audit_needed", label: "Need compliance audit", icon: "fact_check" },
+        { value: "multi_country", label: t('wizard.riskSignals.full.multiCountry', "Operating in 3+ countries"), icon: "public" },
+        { value: "all_categories", label: t('wizard.riskSignals.full.allCategories', "Multiple compliance areas"), icon: "category" },
+        { value: "fast_needed", label: t('wizard.riskSignals.full.fastNeeded', "Urgent / fast turnaround"), icon: "bolt" },
+        { value: "no_team", label: t('wizard.riskSignals.full.noTeam', "No in-house compliance"), icon: "person_off" },
+        { value: "audit_needed", label: t('wizard.riskSignals.full.auditNeeded', "Need compliance audit"), icon: "fact_check" },
     ],
     "": [],
-};
+});
 
-const CATEGORY_HEADLINE: Record<string, string> = {
-    "tax-vat": "What are your main tax risk factors?",
-    "epr": "What are your main packaging or product situations?",
-    "data-privacy": "Which data tools or practices apply to you?",
-    "marketing-seo": "What are your main marketing risk areas?",
-    "corporate": "What best describes your corporate situation?",
-    "full-support": "What are your main challenges?",
-};
+const getCategoryHeadline = (t: TFunction): Record<string, string> => ({
+    "tax-vat": t('wizard.headlines.taxVat', "What are your main tax risk factors?"),
+    "epr": t('wizard.headlines.epr', "What are your main packaging or product situations?"),
+    "data-privacy": t('wizard.headlines.privacy', "Which data tools or practices apply to you?"),
+    "marketing-seo": t('wizard.headlines.marketing', "What are your main marketing risk areas?"),
+    "corporate": t('wizard.headlines.corporate', "What best describes your corporate situation?"),
+    "full-support": t('wizard.headlines.fullSupport', "What are your main challenges?"),
+});
 
 // ─── Slide variants ───────────────────────────────────────────────────────────
 
@@ -122,6 +124,7 @@ const slideVariants = {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function GenericWizardFlow() {
+    const { t } = useTranslation('common');
     const navigate = useNavigate();
     const { profile, dispatch } = useWizard();
     const [step, setStep] = useState(0);
@@ -131,8 +134,16 @@ export function GenericWizardFlow() {
 
     const totalSteps = 5; // Context, Markets, Risk, Complexity, Review
 
+    const BUSINESS_TYPES = getBusinessTypes(t);
+    const MARKET_SCOPES = getMarketScopes(t);
+    const REVENUE_BANDS = getRevenueBands(t);
+    const INTENTS = getIntents(t);
+    const URGENCIES = getUrgencies(t);
+    const RISK_SIGNALS = getRiskSignals(t);
+    const CATEGORY_HEADLINE = getCategoryHeadline(t);
+
     const riskOptions = RISK_SIGNALS[profile.category] || [];
-    const riskHeadline = CATEGORY_HEADLINE[profile.category] || "What are your main risk areas?";
+    const riskHeadline = CATEGORY_HEADLINE[profile.category] || t('wizard.headlines.default', "What are your main risk areas?");
 
     const handleTypeChange = (val: string) => {
         dispatch({ type: "SET_BUSINESS_TYPE", payload: val as BusinessType });
@@ -157,14 +168,14 @@ export function GenericWizardFlow() {
 
     const stepConfigs = [
         {
-            label: "Business Context",
+            label: t('wizard.steps.context.label', "Business Context"),
             isValid: !!profile.businessType,
             content: (
                 <div className="flex flex-col gap-6">
                     <div className="flex flex-col gap-2">
-                        <Typography variant="h2">How would you describe your business?</Typography>
+                        <Typography variant="h2">{t('wizard.steps.context.title', "How would you describe your business?")}</Typography>
                         <Typography variant="body" className="text-neutral-600">
-                            This helps us tailor the right compliance questions for your situation.
+                            {t('wizard.steps.context.subtitle', "This helps us tailor the right compliance questions for your situation.")}
                         </Typography>
                     </div>
                     <SingleSelectCardGroup
@@ -175,11 +186,11 @@ export function GenericWizardFlow() {
                     {(profile.businessType === "other" || noteOpen) && (
                         <div className="animate-in fade-in slide-in-from-bottom-2 duration-200">
                             <FreeText
-                                label="Tell us more about your business"
-                                description="Optional — helps us suggest the most relevant providers."
+                                label={t('wizard.steps.context.freeTextLabel', "Tell us more about your business")}
+                                description={t('wizard.steps.context.freeTextDesc', "Optional — helps us suggest the most relevant providers.")}
                                 value={profile.businessTypeNote}
                                 onChange={v => dispatch({ type: "SET_BUSINESS_TYPE_NOTE", payload: v })}
-                                placeholder="e.g. I run a drop-shipping business across EU markets..."
+                                placeholder={t('wizard.steps.context.freeTextPlaceholder', "e.g. I run a drop-shipping business across EU markets...")}
                             />
                         </div>
                     )}
@@ -187,14 +198,14 @@ export function GenericWizardFlow() {
             ),
         },
         {
-            label: "Market Scope",
+            label: t('wizard.steps.markets.label', "Market Scope"),
             isValid: !!profile.marketScope,
             content: (
                 <div className="flex flex-col gap-6">
                     <div className="flex flex-col gap-2">
-                        <Typography variant="h2">Where do you sell or operate?</Typography>
+                        <Typography variant="h2">{t('wizard.steps.markets.title', "Where do you sell or operate?")}</Typography>
                         <Typography variant="body" className="text-neutral-600">
-                            Compliance requirements differ significantly based on your operating scope.
+                            {t('wizard.steps.markets.subtitle', "Compliance requirements differ significantly based on your operating scope.")}
                         </Typography>
                     </div>
                     <SingleSelectCardGroup
@@ -205,7 +216,7 @@ export function GenericWizardFlow() {
                     {profile.marketScope === "global" && (
                         <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-primary-50 border border-primary-200 text-primary-900 text-xs">
                             <span className="material-symbols-outlined text-[18px] text-primary-600 shrink-0">tips_and_updates</span>
-                            <span>Compliance rules differ significantly outside the EU. Consider our Full Support package for broader coverage.</span>
+                            <span>{t('wizard.steps.markets.globalNotice', "Compliance rules differ significantly outside the EU. Consider our Full Support package for broader coverage.")}</span>
                         </div>
                     )}
                     <AnimatePresence>
@@ -224,7 +235,7 @@ export function GenericWizardFlow() {
                                     <span className="material-symbols-outlined text-[20px]">
                                         {showAdditionalMarkets ? "remove_circle_outline" : "add_circle_outline"}
                                     </span>
-                                    {showAdditionalMarkets ? "Hide specific markets" : "Select specific additional markets (Optional)"}
+                                    {showAdditionalMarkets ? t('wizard.steps.markets.hideMarkets', "Hide specific markets") : t('wizard.steps.markets.showMarkets', "Select specific additional markets (Optional)")}
                                 </button>
                                 
                                 <AnimatePresence>
@@ -251,7 +262,7 @@ export function GenericWizardFlow() {
             ),
         },
         {
-            label: "Risk Signals",
+            label: t('wizard.steps.risk.label', "Risk Signals"),
             isValid: true,
             isOptional: true,
             content: (
@@ -259,7 +270,7 @@ export function GenericWizardFlow() {
                     <div className="flex flex-col gap-2">
                         <Typography variant="h2">{riskHeadline}</Typography>
                         <Typography variant="body" className="text-neutral-600">
-                            Select all that apply — this helps us calculate your risk level and find the best providers.
+                            {t('wizard.steps.risk.subtitle', "Select all that apply — this helps us calculate your risk level and find the best providers.")}
                         </Typography>
                     </div>
                     <MultiSelectChips
@@ -271,7 +282,7 @@ export function GenericWizardFlow() {
                         <div className="p-4 rounded-lg bg-primary-50 border border-primary-200 text-xs text-primary-900 flex items-center gap-3">
                             <span className="material-symbols-outlined text-primary-600 text-[18px]">info</span>
                             <div>
-                                <span className="font-semibold">{profile.riskSignals.length} risk signal{profile.riskSignals.length > 1 ? "s" : ""}</span> detected — we'll weight provider results accordingly.
+                                <span className="font-semibold">{profile.riskSignals.length} {t('wizard.steps.risk.signalsDetected', "risk signals")}</span> {t('wizard.steps.risk.signalsWeight', "detected — we'll weight provider results accordingly.")}
                             </div>
                         </div>
                     )}
@@ -279,20 +290,20 @@ export function GenericWizardFlow() {
             ),
         },
         {
-            label: "Complexity & Intent",
+            label: t('wizard.steps.complexity.label', "Complexity & Intent"),
             isValid: !!profile.revenueBand,
             content: (
                 <div className="flex flex-col gap-8">
                     <div className="flex flex-col gap-6">
                         <div className="flex flex-col gap-2">
-                            <Typography variant="h2">Last step — tell us your scale & goal.</Typography>
+                            <Typography variant="h2">{t('wizard.steps.complexity.title', "Last step — tell us your scale & goal.")}</Typography>
                             <Typography variant="body" className="text-neutral-600">
-                                This helps rank providers by relevance and match the right service tier.
+                                {t('wizard.steps.complexity.subtitle', "This helps rank providers by relevance and match the right service tier.")}
                             </Typography>
                         </div>
                         <div>
                             <Typography variant="caption" weight="semibold" className="text-neutral-500 mb-4 block">
-                                ANNUAL REVENUE
+                                {t('wizard.steps.complexity.revenueLabel', "ANNUAL REVENUE")}
                             </Typography>
                             <RangeSelector
                                 bands={REVENUE_BANDS}
@@ -303,7 +314,7 @@ export function GenericWizardFlow() {
                     </div>
                     <div className="border-t border-neutral-200 pt-8">
                         <Typography variant="caption" weight="semibold" className="text-neutral-500 mb-4 block">
-                            WHAT DO YOU NEED RIGHT NOW?
+                            {t('wizard.steps.complexity.intentLabel', "WHAT DO YOU NEED RIGHT NOW?")}
                         </Typography>
                         <SingleSelectCardGroup
                             options={INTENTS}
@@ -313,7 +324,7 @@ export function GenericWizardFlow() {
                     </div>
                     <div className="border-t border-neutral-200 pt-8">
                         <Typography variant="caption" weight="semibold" className="text-neutral-500 mb-4 block">
-                            HOW URGENT IS THIS?
+                            {t('wizard.steps.complexity.urgencyLabel', "HOW URGENT IS THIS?")}
                         </Typography>
                         <div className="flex flex-wrap gap-3">
                             {URGENCIES.map(u => {
@@ -352,7 +363,7 @@ export function GenericWizardFlow() {
                     <WizardStepper
                         currentStep={step + 1}
                         totalSteps={totalSteps}
-                        stepLabel={isReview ? "Review" : currentConfig?.label ?? ""}
+                        stepLabel={isReview ? t('wizard.review', "Review") : currentConfig?.label ?? ""}
                     />
 
                     <div className="relative overflow-hidden w-full flex-1">
@@ -375,9 +386,9 @@ export function GenericWizardFlow() {
                                                 <span className="material-symbols-outlined text-primary-600 text-2xl">checklist</span>
                                             </div>
                                             <div className="flex flex-col gap-1">
-                                                <Typography variant="h2">Review your answers</Typography>
+                                                <Typography variant="h2">{t('wizard.reviewAnswers', "Review your answers")}</Typography>
                                                 <Typography variant="body" className="text-neutral-600">
-                                                    Confirm everything looks right before we generate your results.
+                                                    {t('wizard.reviewDesc', "Confirm everything looks right before we generate your results.")}
                                                 </Typography>
                                             </div>
                                         </div>
@@ -394,7 +405,7 @@ export function GenericWizardFlow() {
                             onNext={handleNext}
                             onSkip={currentConfig?.isOptional ? () => { setDirection(1); setStep(s => s + 1); } : undefined}
                             nextDisabled={!currentConfig?.isValid}
-                            nextLabel={step === 3 ? "Review Answers" : undefined}
+                            nextLabel={step === 3 ? t('wizard.reviewAnswersButton', "Review Answers") : undefined}
                         />
                     )}
                     {isReview && (
@@ -404,7 +415,7 @@ export function GenericWizardFlow() {
                                 className="flex items-center gap-2 text-sm font-medium text-neutral-500 hover:text-primary-600 transition-colors group"
                             >
                                 <span className="material-symbols-outlined text-[18px] group-hover:-translate-x-0.5 transition-transform">arrow_back</span>
-                                Back to previous step
+                                {t('wizard.backToPrevious', "Back to previous step")}
                             </button>
                         </div>
                     )}

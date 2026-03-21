@@ -1,43 +1,61 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Building2, Settings, ArrowRight, CheckCircle2, Rocket, ShieldCheck } from 'lucide-react';
 import { Typography } from '../ui/Typography';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
+import { TFunction } from 'i18next';
 
-const AUDIENCES = [
+const getAudiences = (t: TFunction) => [
   {
     id: 'founder',
     icon: Rocket,
-    title: 'For Founders & CEOs',
-    description: 'Scale into new markets without the legal overhead. Get instant clarity on tax, VAT, and corporate structure before you commit.',
-    tags: ['Tax & VAT Registration', 'Corporate Setup', 'Baseline Privacy'],
+    title: t('landing.services.founder.title', 'For Founders & CEOs'),
+    description: t('landing.services.founder.description', 'Scale into new markets without the legal overhead. Get instant clarity on tax, VAT, and corporate structure before you commit.'),
+    tags: [
+      t('landing.services.founder.tags.0', 'Tax & VAT Registration'),
+      t('landing.services.founder.tags.1', 'Corporate Setup'),
+      t('landing.services.founder.tags.2', 'Baseline Privacy')
+    ],
     animation: { y: [0, -8, 0] },
     transition: { duration: 6, repeat: Infinity, ease: "easeInOut" }
   },
   {
     id: 'ops',
     icon: Settings,
-    title: 'For Operations & Expansion',
-    description: 'De-risk your supply chain and product launches. Navigate complex EPR packaging rules, marketing standards, and operational compliance.',
-    tags: ['EPR & Packaging', 'Supply Chain ESG', 'Marketing Standards'],
+    title: t('landing.services.ops.title', 'For Operations & Expansion'),
+    description: t('landing.services.ops.description', 'De-risk your supply chain and product launches. Navigate complex EPR packaging rules, marketing standards, and operational compliance.'),
+    tags: [
+      t('landing.services.ops.tags.0', 'EPR & Packaging'),
+      t('landing.services.ops.tags.1', 'Supply Chain ESG'),
+      t('landing.services.ops.tags.2', 'Marketing Standards')
+    ],
     animation: { rotate: [0, 360] },
     transition: { duration: 45, repeat: Infinity, ease: "linear" }
   },
   {
     id: 'advisors',
     icon: ShieldCheck,
-    title: 'For In-House Counsel',
-    description: 'Stop manually tracking global regulatory drift. Use our AI-mapped intelligence to oversee 27+ jurisdictions from a single dashboard.',
-    tags: ['Global Privacy Mapping', 'Regulatory Drift Alerts', 'Compliance Audits'],
+    title: t('landing.services.advisors.title', 'For In-House Counsel'),
+    description: t('landing.services.advisors.description', 'Stop manually tracking global regulatory drift. Use our AI-mapped intelligence to oversee 27+ jurisdictions from a single dashboard.'),
+    tags: [
+      t('landing.services.advisors.tags.0', 'Global Privacy Mapping'),
+      t('landing.services.advisors.tags.1', 'Regulatory Drift Alerts'),
+      t('landing.services.advisors.tags.2', 'Compliance Audits')
+    ],
     animation: { scale: [1, 1.05, 1], y: [0, -3, 0] },
     transition: { duration: 8, repeat: Infinity, ease: "easeInOut" }
   },
   {
     id: 'partners',
     icon: Building2,
-    title: 'For Partner Firms',
-    description: 'Receive highly qualified, pre-structured client dossiers. Focus on high-value expert execution rather than tedious initial discovery calls.',
-    tags: ['Pre-vetted Leads', 'Execution-ready Dossiers', 'Partner Network APIs'],
+    title: t('landing.services.partners.title', 'For Partner Firms'),
+    description: t('landing.services.partners.description', 'Receive highly qualified, pre-structured client dossiers. Focus on high-value expert execution rather than tedious initial discovery calls.'),
+    tags: [
+      t('landing.services.partners.tags.0', 'Pre-vetted Leads'),
+      t('landing.services.partners.tags.1', 'Execution-ready Dossiers'),
+      t('landing.services.partners.tags.2', 'Partner Network APIs')
+    ],
     animation: { rotate: [0, -10, 8, -5, 4, 0] },
     transition: { duration: 12, repeat: Infinity, ease: "easeInOut" }
   }
@@ -45,25 +63,27 @@ const AUDIENCES = [
 
 export function ServicesAccordion() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation('common');
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const activeAudience = AUDIENCES[activeIndex];
+  const audiences = useMemo(() => getAudiences(t), [t, i18n.language]);
+  const activeAudience = audiences[activeIndex];
   const ActiveIcon = activeAudience.icon;
 
   return (
     <section className="bg-transparent border-y border-neutral-200/50 py-16 desktop-s:py-24 relative z-10 w-full overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
         <Typography variant="caption" className="text-primary-500 mb-3 block font-bold uppercase tracking-widest text-center desktop-s:text-left">
-          Tailored Compliance
+          {t('landing.services.badge', 'Tailored Compliance')}
         </Typography>
         <Typography variant="h1" weight="bold" className="text-neutral-900 mb-12 text-center desktop-s:text-left tracking-tight">
-          What we cover, whoever you are
+          {t('landing.services.title', 'What we cover, whoever you are')}
         </Typography>
 
         <div className="grid desktop-s:grid-cols-12 gap-8 items-stretch min-h-[500px]">
           {/* Left Side: Accordion Triggers */}
           <div className="desktop-s:col-span-5 flex flex-col gap-3">
-            {AUDIENCES.map((audience, index) => {
+            {audiences.map((audience, index) => {
               const isActive = index === activeIndex;
               const Icon = audience.icon;
               return (
@@ -126,7 +146,7 @@ export function ServicesAccordion() {
                  <div className="tablet:col-span-3 bg-white rounded-[32px] p-8 border border-neutral-200/70 shadow-sm flex flex-col justify-center relative overflow-hidden">
                    <div className="absolute top-0 right-0 w-48 h-48 bg-brand-surface rounded-bl-[100px] z-0 pointer-events-none opacity-40" />
                    <Typography variant="h2" weight="bold" className="text-neutral-900 mb-4 tracking-tight relative z-10">
-                     Built for your role
+                     {t('landing.services.builtForRole', 'Built for your role')}
                    </Typography>
                    <Typography variant="body" className="text-neutral-600 leading-relaxed text-lg relative z-10">
                      {activeAudience.description}
@@ -136,7 +156,7 @@ export function ServicesAccordion() {
                  {/* Bottom Left: Integrations */}
                  <div className="tablet:col-span-3 bg-white rounded-[32px] p-8 border border-neutral-200/70 shadow-sm flex flex-col justify-center">
                    <Typography variant="caption" className="text-neutral-400 mb-6 uppercase tracking-widest block font-bold">
-                     Core Domains Covered
+                     {t('landing.services.coreDomains', 'Core Domains Covered')}
                    </Typography>
                    <ul className="grid grid-cols-1 gap-y-4">
                      {activeAudience.tags.map(tag => (
@@ -151,7 +171,7 @@ export function ServicesAccordion() {
                  {/* Bottom Right: CTA */}
                  <div 
                     className="tablet:col-span-2 bg-primary-900 rounded-[32px] p-8 border border-primary-800 shadow-xl flex flex-col items-center justify-center text-center relative overflow-hidden group cursor-pointer" 
-                    onClick={() => navigate('/register')}
+                    onClick={() => navigate(`/${i18n.language}/register`)}
                  >
                    <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-accent-500/20 rounded-full blur-2xl transition-all duration-500 group-hover:bg-accent-500/40" />
                    <div className="absolute inset-0 bg-primary-800/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -161,7 +181,7 @@ export function ServicesAccordion() {
                         <ArrowRight size={28} />
                       </div>
                       <Typography variant="body" weight="bold" className="text-white">
-                        Start your tailored assessment
+                        {t('landing.services.cta', 'Start your tailored assessment')}
                       </Typography>
                    </div>
                  </div>

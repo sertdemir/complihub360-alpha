@@ -1,37 +1,39 @@
 import { Search, FileText, Users, Calendar, Rocket, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Typography } from '../ui/Typography';
+import { useTranslation } from 'react-i18next';
+import { TFunction } from 'i18next';
 
-const FUNNEL_STEPS = [
+const getFunnelSteps = (t: TFunction) => [
   {
     step: '01',
     icon: Search,
-    title: 'Assessment',
-    body: 'Our AI scans your target footprint and flags exact regulatory gaps instantly.',
+    title: t('landing.stepper.step1.title', 'Assessment'),
+    body: t('landing.stepper.step1.body', 'Our AI scans your target footprint and flags exact regulatory gaps instantly.'),
   },
   {
     step: '02',
     icon: FileText,
-    title: 'Dossier',
-    body: 'A structured, anonymised legal brief with all mandatory registrations and operational shifts.',
+    title: t('landing.stepper.step2.title', 'Dossier'),
+    body: t('landing.stepper.step2.body', 'A structured, anonymised legal brief with all mandatory registrations and operational shifts.'),
   },
   {
     step: '03',
     icon: Users,
-    title: 'Matching',
-    body: 'We algorithmically pair your dossier with pre-vetted local partners who know your gaps.',
+    title: t('landing.stepper.step3.title', 'Matching'),
+    body: t('landing.stepper.step3.body', 'We algorithmically pair your dossier with pre-vetted local partners who know your gaps.'),
   },
   {
     step: '04',
     icon: Calendar,
-    title: 'Appointment',
-    body: 'Book a strategy call directly with an expert who already understands your case.',
+    title: t('landing.stepper.step4.title', 'Appointment'),
+    body: t('landing.stepper.step4.body', 'Book a strategy call directly with an expert who already understands your case.'),
   },
   {
     step: '05',
     icon: Rocket,
-    title: 'Execution',
-    body: 'Your partner executes registrations, filings, and structural setups locally.',
+    title: t('landing.stepper.step5.title', 'Execution'),
+    body: t('landing.stepper.step5.body', 'Your partner executes registrations, filings, and structural setups locally.'),
   },
 ];
 
@@ -40,6 +42,9 @@ const ICON_SIZE = 56; // w-14 h-14
 const ICON_CENTER = ICON_SIZE / 2; // 28px
 
 export function ComplianceStepper() {
+  const { t } = useTranslation('common');
+  const funnelSteps = getFunnelSteps(t);
+
   return (
     <section className="bg-transparent py-16 desktop-s:py-24 relative overflow-hidden z-10 border-b border-neutral-200/50">
       {/* Background Glow */}
@@ -56,13 +61,13 @@ export function ComplianceStepper() {
           transition={{ duration: 0.55 }}
         >
           <Typography variant="caption" className="text-primary-500 mb-4 block font-bold tracking-widest uppercase">
-            The Partner Journey
+            {t('landing.stepper.badge', 'The Partner Journey')}
           </Typography>
           <Typography variant="h1" weight="bold" className="text-neutral-900 mb-6 tracking-tight">
-            From unknown risk to<br />local execution
+            {t('landing.stepper.titleStart', 'From unknown risk to')}<br />{t('landing.stepper.titleEnd', 'local execution')}
           </Typography>
           <Typography variant="body" className="text-neutral-600 max-w-2xl mx-auto">
-            Our 5-step funnel ensures you don't just identify the problem — you solve it with the right local experts immediately.
+            {t('landing.stepper.description', 'Our 5-step funnel ensures you don\'t just identify the problem — you solve it with the right local experts immediately.')}
           </Typography>
         </motion.div>
 
@@ -97,8 +102,8 @@ export function ComplianceStepper() {
 
           {/* Grid */}
           <div className="grid grid-cols-1 tablet:grid-cols-2 desktop-s:grid-cols-3 desktop-m:grid-cols-5 gap-x-6 gap-y-10">
-            {FUNNEL_STEPS.map(({ step, icon: Icon, title, body }, index) => {
-              const isLast = index === FUNNEL_STEPS.length - 1;
+            {funnelSteps.map(({ step, icon: Icon, title, body }, index) => {
+              const isLast = index === funnelSteps.length - 1;
 
               return (
                 <motion.div
@@ -139,7 +144,7 @@ export function ComplianceStepper() {
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 + 0.25 }}
                   >
-                    Step {step}
+                    {t('landing.stepper.stepLabel', 'Step')} {step}
                   </motion.span>
 
                   {/* Title */}
@@ -169,12 +174,12 @@ export function ComplianceStepper() {
                             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                           />
                           <Typography variant="ui-small" className="text-neutral-500 text-xs font-medium">
-                            Partner Assigned
+                            {t('landing.stepper.partnerAssigned', 'Partner Assigned')}
                           </Typography>
                         </div>
                         <div className="flex items-center justify-between">
                           <Typography variant="body" weight="bold" className="text-neutral-900 text-sm">
-                            Action Plan Active
+                            {t('landing.stepper.actionPlanActive', 'Action Plan Active')}
                           </Typography>
                           <div className="w-5 h-5 rounded-full bg-primary-50 hover:bg-primary-100 transition-colors flex items-center justify-center shrink-0">
                             <ArrowRight size={11} className="text-primary-600" />
