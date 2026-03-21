@@ -1,68 +1,29 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '../common/LanguageSwitcher';
 import {
   type LucideIcon,
   CircleDot, ChevronDown, ArrowRight,
-  Zap, Users, Globe, Building2,
+  Zap, Users, Globe as GlobeIcon, Building2,
   Rocket, Layers, Scale,
   MessageSquare, FileText,
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Typography } from '../ui/Typography';
 
-const HEADER_MENU: {
-  id: string;
-  label: string;
-  path?: string;
-  items: { icon: LucideIcon; anim: object; title: string; desc: string; path: string }[];
-}[] = [
-  {
-    id: 'platform',
-    label: 'Platform',
-    items: [
-      { icon: Zap,       anim: { scale: 1.2, rotate: 15 },        title: 'The AI Engine',     desc: 'Secure data extraction & mapping', path: '/platform#engine' },
-      { icon: Users,     anim: { scale: 1.15, y: -3 },            title: 'Partner Matching',  desc: 'From risk to local execution',     path: '/platform#matching' },
-      { icon: Globe,     anim: { scale: 1.1, rotate: 20 },        title: 'Global Coverage',   desc: 'UK, EU, Germany & US',             path: '/platform#coverage' },
-      { icon: Building2, anim: { scale: 1.15, y: -2 },            title: 'For Partner Firms', desc: 'Lead generation for advisors',     path: '/platform#partners' },
-    ],
-  },
-  {
-    id: 'solutions',
-    label: 'Solutions',
-    items: [
-      { icon: Rocket, anim: { scale: 1.2, y: -6, rotate: -8 },   title: 'Founders & CEOs',   desc: 'Minimise risk & scale faster',  path: '/solutions#founders' },
-      { icon: Layers, anim: { scale: 1.15, y: -3 },               title: 'Operations Teams',  desc: 'Automate daily compliance',     path: '/solutions#operations' },
-      { icon: Scale,  anim: { scale: 1.1, rotate: -12 },          title: 'In-House Counsel',  desc: 'Cut research time by 90%',      path: '/solutions#counsel' },
-    ],
-  },
-  {
-    id: 'areas',
-    label: 'Compliance Areas',
-    path: '/compliance',
-    items: [],
-  },
-  {
-    id: 'resources',
-    label: 'Resources',
-    items: [
-      { icon: MessageSquare, anim: { scale: 1.15, y: -2, x: 2 }, title: 'Customer Stories',     desc: 'See real compliance outcomes', path: '/resources#stories' },
-      { icon: FileText,      anim: { scale: 1.15, y: -3 },        title: 'Guides & Whitepapers', desc: 'In-depth market deep-dives',   path: '/resources#guides' },
-    ],
-  },
-];
-
-// Routes where the global nav should not render
 const HIDDEN_PATHS = ['/login', '/register', '/verify-email', '/dashboard'];
 
 export function GlobalNav() {
+  const { t, i18n } = useTranslation('common');
+  const currentLang = i18n.resolvedLanguage || 'en';
   const navigate = useNavigate();
   const location = useLocation();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
-  const isHidden =
-    HIDDEN_PATHS.includes(location.pathname) ||
-    location.pathname.startsWith('/wizard');
+  const pathWithoutLang = location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
+  const isHidden = HIDDEN_PATHS.includes(pathWithoutLang) || pathWithoutLang.startsWith('/wizard');
 
   useEffect(() => {
     const handleScroll = () => setActiveMenu(null);
@@ -77,6 +38,56 @@ export function GlobalNav() {
     };
   }, []);
 
+  const navTo = (path: string) => {
+    setActiveMenu(null);
+    if (path.startsWith('/')) {
+      navigate(`/${currentLang}${path}`);
+    } else {
+      navigate(path);
+    }
+  };
+
+  const HEADER_MENU: {
+    id: string;
+    label: string;
+    path?: string;
+    items: { icon: LucideIcon; anim: any; title: string; desc: string; path: string }[];
+  }[] = [
+    {
+      id: 'platform',
+      label: t('nav.platform', 'Platform'),
+      items: [
+        { icon: Zap,       anim: { scale: 1.2, rotate: 15 },        title: t('nav.items.aiEngine.title'),     desc: t('nav.items.aiEngine.desc'), path: '/platform#engine' },
+        { icon: Users,     anim: { scale: 1.15, y: -3 },            title: t('nav.items.partnerMatching.title'),  desc: t('nav.items.partnerMatching.desc'),     path: '/platform#matching' },
+        { icon: GlobeIcon, anim: { scale: 1.1, rotate: 20 },        title: t('nav.items.globalCoverage.title'),   desc: t('nav.items.globalCoverage.desc'),             path: '/platform#coverage' },
+        { icon: Building2, anim: { scale: 1.15, y: -2 },            title: t('nav.items.forPartners.title'), desc: t('nav.items.forPartners.desc'),     path: '/platform#partners' },
+      ],
+    },
+    {
+      id: 'solutions',
+      label: t('nav.solutions', 'Solutions'),
+      items: [
+        { icon: Rocket, anim: { scale: 1.2, y: -6, rotate: -8 },   title: t('nav.items.founders.title'),   desc: t('nav.items.founders.desc'),  path: '/solutions#founders' },
+        { icon: Layers, anim: { scale: 1.15, y: -3 },               title: t('nav.items.operations.title'),  desc: t('nav.items.operations.desc'),     path: '/solutions#operations' },
+        { icon: Scale,  anim: { scale: 1.1, rotate: -12 },          title: t('nav.items.counsel.title'),  desc: t('nav.items.counsel.desc'),      path: '/solutions#counsel' },
+      ],
+    },
+    {
+      id: 'areas',
+      label: t('nav.complianceAreas', 'Compliance Areas'),
+      path: '/compliance',
+      items: [],
+    },
+    {
+      id: 'resources',
+      label: t('nav.resources', 'Resources'),
+      items: [
+        { icon: MessageSquare, anim: { scale: 1.15, y: -2, x: 2 }, title: t('nav.items.stories.title'),     desc: t('nav.items.stories.desc'), path: '/resources#stories' },
+        { icon: FileText,      anim: { scale: 1.15, y: -3 },        title: t('nav.items.guides.title'), desc: t('nav.items.guides.desc'),   path: '/resources#guides' },
+      ],
+    },
+  ];
+
   if (isHidden) return null;
 
   return (
@@ -87,7 +98,7 @@ export function GlobalNav() {
 
         {/* Logo */}
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navTo('/')}
           className="flex items-center gap-2 shrink-0 px-2"
           aria-label="CompliHub360 Home"
         >
@@ -108,7 +119,7 @@ export function GlobalNav() {
             <div key={menu.id} className="flex items-center">
               <button
                 onClick={() => {
-                  if (menu.path) navigate(menu.path);
+                  if (menu.path) navTo(menu.path);
                   else setActiveMenu(activeMenu === menu.id ? null : menu.id);
                 }}
                 className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
@@ -134,14 +145,16 @@ export function GlobalNav() {
 
         {/* Actions */}
         <div className="flex items-center gap-1">
+          <LanguageSwitcher />
+          
           <button
-            className="text-neutral-600 hover:text-neutral-900 text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-neutral-100/80 transition-colors"
-            onClick={() => navigate('/login')}
+            className="text-neutral-600 hover:text-neutral-900 text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-neutral-100/80 transition-colors ml-1"
+            onClick={() => navTo('/login')}
           >
-            Log in
+            {t('nav.login', 'Log in')}
           </button>
-          <Button variant="primary" size="sm" onClick={() => navigate('/register')}>
-            Sign up for free
+          <Button variant="primary" size="sm" onClick={() => navTo('/register')}>
+            {t('nav.signup', 'Sign up for free')}
           </Button>
         </div>
       </div>
@@ -153,7 +166,7 @@ export function GlobalNav() {
             initial={{ opacity: 0, y: -8, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.97 }}
-            transition={{ duration: 0.18, ease: 'easeOut' }}
+            transition={{ duration: 0.18, ease: 'easeOut' } as any}
             className="pointer-events-auto mt-2 w-full max-w-[1100px] mx-4 rounded-2xl bg-white/40 backdrop-blur-xl border border-white/50 shadow-[0_4px_32px_rgba(0,0,0,0.08)] overflow-hidden"
           >
             <div className="px-8 py-6">
@@ -161,13 +174,13 @@ export function GlobalNav() {
                 {HEADER_MENU.find(m => m.id === activeMenu)?.items.map((item) => (
                   <button
                     key={item.title}
-                    onClick={() => { navigate(item.path); setActiveMenu(null); }}
+                    onClick={() => navTo(item.path)}
                     className="text-left group flex items-start gap-3 p-3 -m-3 rounded-xl hover:bg-neutral-100/60 transition-colors"
                   >
                     <motion.div
                       className="flex items-start justify-center shrink-0 pt-0.5"
                       whileHover={item.anim}
-                      transition={{ type: 'spring', stiffness: 300, damping: 18 }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 18 } as any}
                     >
                       <item.icon size={32} className="text-primary-600 group-hover:text-primary-500 transition-colors" strokeWidth={1.5} />
                     </motion.div>
