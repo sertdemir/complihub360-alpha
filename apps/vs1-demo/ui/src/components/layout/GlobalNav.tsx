@@ -95,7 +95,7 @@ export function GlobalNav() {
 
       {/* ── Full Width Header ─────────────────────────────────── */}
       <div className="pointer-events-auto w-full bg-white/40 backdrop-blur-xl border-b border-white/50 shadow-[0_4px_32px_rgba(0,0,0,0.08)]">
-        <div className="flex items-center justify-between gap-3 px-7 py-6 w-full max-w-[1100px] mx-auto whitespace-nowrap">
+        <div className="flex items-center justify-between gap-6 px-6 lg:px-10 py-6 w-full max-w-7xl mx-auto whitespace-nowrap">
 
         {/* Logo */}
         <button
@@ -112,10 +112,10 @@ export function GlobalNav() {
         </button>
 
         {/* Divider */}
-        <div className="w-px h-5 bg-neutral-200 mx-1 shrink-0" />
+        <div className="w-px h-5 bg-neutral-200 shrink-0 hidden md:block" />
 
         {/* Nav */}
-        <nav className="flex items-center gap-0.5">
+        <nav className="flex items-center justify-center flex-1 gap-2 md:gap-8 overflow-x-auto">
           {HEADER_MENU.map((menu) => (
             <div key={menu.id} className="flex items-center">
               <button
@@ -142,7 +142,7 @@ export function GlobalNav() {
         </nav>
 
         {/* Divider */}
-        <div className="w-px h-5 bg-neutral-200 mx-1 shrink-0" />
+        <div className="w-px h-5 bg-neutral-200 shrink-0 hidden md:block" />
 
         {/* Actions */}
         <div className="flex items-center gap-1">
