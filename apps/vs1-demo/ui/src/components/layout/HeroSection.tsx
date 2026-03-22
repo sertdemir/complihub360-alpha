@@ -166,33 +166,7 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* ── CTA Button — rhythmisch mit Titel ─────────────────── */}
-        <div className="flex justify-center w-full mb-[108px] relative group">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={sliderIndex}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16 }}
-              transition={{ duration: 1.2, ease: [0.45, 0, 0.55, 1], delay: 0.36 }}
-              className="relative w-full sm:w-auto min-w-[256px] rounded-xl p-[1px] overflow-hidden shadow-[0_0_40px_rgba(250,204,21,0.2)] group-hover:shadow-[0_0_60px_rgba(250,204,21,0.4)] transition-shadow duration-500"
-            >
-              <span
-                className="absolute inset-[-100%] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_50%,#facc15_100%)] pointer-events-none"
-                style={{ animation: 'spin 8s linear infinite' }}
-              />
-              <button
-                onClick={() => navigate('/register?intent=expert')}
-                onMouseEnter={() => { pausedRef.current = true; }}
-                onMouseLeave={() => { pausedRef.current = false; }}
-                className="relative flex items-center justify-center w-full h-[50px] sm:h-[62px] px-8 bg-primary-950 hover:bg-primary-900 text-white font-semibold text-base sm:text-xl rounded-[12px] transition-all gap-3 group-hover:bg-primary-900"
-              >
-                {SCENARIOS[sliderIndex].cta}
-                <ArrowRight size={22} className="text-accent-400 group-hover:translate-x-1 transition-transform" />
-              </button>
-            </motion.div>
-          </AnimatePresence>
-        </div>
+
 
         {/* ── Input Container ────────────────────────────────────── */}
         {/* Light Green Master Container for Funnel, CTA, and Pills */}
@@ -251,6 +225,23 @@ export function HeroSection() {
               </div>
             </div>
 
+          </div>
+        </div>
+
+        {/* ── CTA Button (Static, below input) ─────────────────── */}
+        <div className="flex justify-center w-full mb-[108px] relative group z-20 mt-8">
+          <div className="relative w-full sm:w-auto min-w-[256px] rounded-xl p-[1px] overflow-hidden shadow-[0_0_40px_rgba(250,204,21,0.2)] group-hover:shadow-[0_0_60px_rgba(250,204,21,0.4)] transition-shadow duration-500">
+            <span
+              className="absolute inset-[-100%] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_50%,#facc15_100%)] pointer-events-none"
+              style={{ animation: 'spin 8s linear infinite' }}
+            />
+            <button
+              onClick={() => navigate('/register?intent=expert')}
+              className="relative flex items-center justify-center w-full h-[50px] sm:h-[62px] px-8 bg-primary-950 hover:bg-primary-900 text-white font-semibold text-base sm:text-xl rounded-[12px] transition-all gap-3 group-hover:bg-primary-900"
+            >
+              {t('hero.cta.primary', 'Request expert match instantly')}
+              <ArrowRight size={22} className="text-accent-400 group-hover:translate-x-1 transition-transform" />
+            </button>
           </div>
         </div>
 

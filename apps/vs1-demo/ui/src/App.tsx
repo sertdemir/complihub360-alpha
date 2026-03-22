@@ -15,7 +15,16 @@ import { ResourcesPage } from "./pages/ResourcesPage";
 import AdvisoryPage from "./pages/AdvisoryPage";
 import { ResultsOverview } from "./pages/ResultsOverview";
 import { DashboardHome } from "./pages/dashboard/DashboardHome";
+import { UserDossiers } from "./pages/dashboard/UserDossiers";
+import { DossierDetail } from "./pages/dashboard/DossierDetail";
+import { KnowledgeCenter } from "./pages/dashboard/KnowledgeCenter";
+import { UserWorkspace } from "./pages/dashboard/UserWorkspace";
+import { UserMessages } from "./pages/dashboard/UserMessages";
 import { PartnerDashboardHome } from "./pages/partner-dashboard/PartnerDashboardHome";
+import { LeadInbox } from "./pages/partner-dashboard/LeadInbox";
+import { LeadDetail } from "./pages/partner-dashboard/LeadDetail";
+import { PartnerProfile } from "./pages/partner-dashboard/PartnerProfile";
+import { ActiveClients } from "./pages/partner-dashboard/ActiveClients";
 // Wizard Shell Steps
 import { WizardPreGateFlow } from "./pages/wizard/WizardPreGateFlow";
 import { GenericWizardFlow } from "./pages/wizard/GenericWizardFlow";
@@ -110,10 +119,19 @@ function AppContent() {
                     
                     {/* User Dashboard Routes */}
                     <Route path="dashboard" element={<DashboardHome />} />
+                    <Route path="dashboard/sessions" element={<UserDossiers />} />
+                    <Route path="dashboard/sessions/:id" element={<DossierDetail />} />
+                    <Route path="dashboard/knowledge" element={<KnowledgeCenter />} />
+                    <Route path="dashboard/workspace" element={<UserWorkspace />} />
+                    <Route path="dashboard/messages" element={<UserMessages />} />
                     <Route path="dashboard/*" element={<DashboardHome />} />
                     
                     {/* Partner Dashboard Routes */}
                     <Route path="partner-dashboard" element={<PartnerDashboardHome />} />
+                    <Route path="partner-dashboard/leads" element={<LeadInbox />} />
+                    <Route path="partner-dashboard/leads/:id" element={<LeadDetail />} />
+                    <Route path="partner-dashboard/clients" element={<ActiveClients />} />
+                    <Route path="partner-dashboard/profile" element={<PartnerProfile />} />
                     <Route path="partner-dashboard/*" element={<PartnerDashboardHome />} />
                     
                     {/* Auth */}

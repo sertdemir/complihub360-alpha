@@ -95,7 +95,7 @@ export function GlobalNav() {
 
       {/* ── Full Width Header ─────────────────────────────────── */}
       <div className="pointer-events-auto w-full bg-white/40 backdrop-blur-xl border-b border-white/50 shadow-[0_4px_32px_rgba(0,0,0,0.08)]">
-        <div className="flex items-center justify-between gap-3 px-7 h-14 w-full max-w-[1100px] mx-auto whitespace-nowrap">
+        <div className="flex items-center justify-between gap-3 px-7 py-6 w-full max-w-[1100px] mx-auto whitespace-nowrap">
 
         {/* Logo */}
         <button

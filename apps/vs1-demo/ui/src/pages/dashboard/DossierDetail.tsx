@@ -46,7 +46,7 @@ export function DossierDetail() {
           </button>
           <div className="flex-1">
             <h1 className="text-2xl font-semibold text-gray-900">
-              {t(`compliance.${session.category}.title`, session.category)} Dossier
+              {t(`compliance.${session.category}.title`, session.category) as string} Dossier
             </h1>
             <p className="text-sm text-gray-500 mt-1">
                Ref: {session.id} | Erstellt am: {new Date(session.createdAt).toLocaleDateString()}
