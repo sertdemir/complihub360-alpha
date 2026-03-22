@@ -28,7 +28,7 @@ export function UserDossiers() {
                     </div>
                     <div>
                       <h3 className="text-lg font-medium text-gray-900">
-                        {t(`compliance.${session.category}.title`, session.category) as string}
+                        {String(t(`compliance.${session.category}.title`, { defaultValue: session.category }))}
                       </h3>
                       <p className="text-sm text-gray-500">
                         Target: {session.targetMarkets.join(', ')} | Status: {session.status} | {new Date(session.createdAt).toLocaleDateString()}
