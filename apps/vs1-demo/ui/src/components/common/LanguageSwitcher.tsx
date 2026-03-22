@@ -31,8 +31,12 @@ export function LanguageSwitcher() {
   }, []);
 
   const handleLanguageChange = (lng: string) => {
-    i18n.changeLanguage(lng);
     setIsOpen(false);
+    const pathParts = location.pathname.split('/');
+    const targetPath = (pathParts.length > 1 && LANGUAGES.some(l => l.code === pathParts[1]))
+      ? '/' + lng + pathParts.slice(2).join('/') + location.search + location.hash
+      : '/' + lng + location.pathname + location.search + location.hash;
+    navigate(targetPath);
   };
 
   return (
@@ -52,7 +56,7 @@ export function LanguageSwitcher() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 top-full mt-2 w-36 bg-white/90 backdrop-blur-xl border border-neutral-200/50 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.08)] overflow-hidden z-[100]"
+            className="absolute right-0 top-full mt-2 w-36 bg-white/90 backdrop-blur-xl border border-neutral-200/50 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.08)] overflow-hidden z-[100] pointer-events-auto"
           >
             <div className="py-1">
               {LANGUAGES.map((lng) => (
