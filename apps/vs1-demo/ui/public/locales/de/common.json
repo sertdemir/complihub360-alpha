@@ -446,7 +446,7 @@
       "pain2Desc": "Compliance-Anbieter kalt anzuschreiben und wochenlang auf vage Antworten zu warten ist keine Strategie. Es ist ein Haftungsrisiko.",
       "pain3Title": "Wir lösen das",
       "pain3Desc": "Unser KI-Assistent erfasst Ihren Kontext in 4–5 Schritten, kartiert jurisdiktionsgebundene Risiken und verbindet Sie mit SLA-gesicherten Spezialisten innerhalb von 24–48 Stunden.",
-      "diagramTitle": "Der „Sicher expandieren"-Pfad",
+      "diagramTitle": "Der \u201eSicher expandieren\u201c-Pfad",
       "node1Label": "Länder-Gate",
       "node1Desc": "Zielmarkt auswählen",
       "node2Label": "Adaptiver Assistent",
@@ -666,7 +666,7 @@
       "ob4": "Bewertung der Dropshipper-Verantwortung",
       "cov1": "Produkt- & Verpackungsassistent – bewertet Handelsrolle, Zielmärkte, Produktkategorien",
       "cov2": "Berechnet epr_required_likelihood pro Jurisdiktion",
-      "cov3": "Intelligente Randfall-Behandlung: „Annehme Ja"-Sicherheitslogik für unsichere Dropshipper"
+      "cov3": "Intelligente Randfall-Behandlung: \u201eAnnehme Ja\u201c-Sicherheitslogik f\u00fcr unsichere Dropshipper"
     },
     "privacy": {
       "title": "Daten & Datenschutz",
@@ -759,7 +759,7 @@
     "feature4Tag1": "Echtzeit-Assessment",
     "feature4Tag2": "Kuratiertes Matching",
     "transparencyTitle": "Transparenz und Grenzen unserer KI",
-    "transparencyQuote": "„Unsere KI ersetzt nicht Ihren Anwalt. Sie macht Ihren Anwalt 10x effizienter, indem sie perfekt vorstrukturierte digitale Dossiers bereitstellt."",
+    "transparencyQuote": "\u201eUnsere KI ersetzt nicht Ihren Anwalt. Sie macht Ihren Anwalt 10x effizienter, indem sie perfekt vorstrukturierte digitale Dossiers bereitstellt.\u201c",
     "check1": "Fokus auf strukturierte Orientierung & Dossier-Orchestrierung.",
     "check2": "Fundierter Abruf aus offiziellen, validierten Quellen.",
     "cross1": "Keine verbindliche Rechtsberatung – das obliegt zugelassenen Anwaltskanzleien.",

@@ -4,9 +4,9 @@ import { DashboardLayout } from '../../components/dashboard/DashboardLayout';
 
 export function PartnerDashboardHome() {
   const { t } = useTranslation();
-  const leads = useDashboardStore((state) => state.leadRequests);
+  const leads = useDashboardStore((state: any) => state.leadRequests);
 
-  const activeLeads = leads.filter(l => l.status === 'new' || l.status === 'viewed').length;
+  const activeLeads = leads.filter((l: any) => l.status === 'new' || l.status === 'viewed').length;
 
   return (
     <DashboardLayout type="partner">

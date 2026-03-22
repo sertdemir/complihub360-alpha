@@ -79,7 +79,7 @@ export const useDashboardStore = create<DashboardState>()(
       sessions: initialSessions,
       leadRequests: initialLeads,
       
-      saveSession: (sessionData) => set((state) => {
+      saveSession: (sessionData: Omit<SavedSession, 'id' | 'createdAt' | 'updatedAt'>) => set((state: DashboardState) => {
         const newSession: SavedSession = {
           ...sessionData,
           id: `sess-${Math.random().toString(36).substr(2, 9)}`,
@@ -89,11 +89,11 @@ export const useDashboardStore = create<DashboardState>()(
         return { sessions: [newSession, ...state.sessions] };
       }),
       
-      deleteSession: (id) => set((state) => ({
+      deleteSession: (id: string) => set((state: DashboardState) => ({
         sessions: state.sessions.filter(s => s.id !== id)
       })),
       
-      createLeadRequest: (sessionId, providerId, providerName) => set((state) => {
+      createLeadRequest: (sessionId: string, providerId: string, providerName: string) => set((state: DashboardState) => {
         const newLead: LeadRequest = {
           id: `lead-${Math.random().toString(36).substr(2, 9)}`,
           sessionId,
@@ -106,7 +106,7 @@ export const useDashboardStore = create<DashboardState>()(
         return { leadRequests: [newLead, ...state.leadRequests] };
       }),
       
-      updateLeadStatus: (requestId, status) => set((state) => ({
+      updateLeadStatus: (requestId: string, status: LeadStatus) => set((state: DashboardState) => ({
         leadRequests: state.leadRequests.map(lead => 
           lead.id === requestId ? { ...lead, status } : lead
         )

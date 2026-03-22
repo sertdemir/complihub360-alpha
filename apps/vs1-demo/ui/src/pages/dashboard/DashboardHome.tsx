@@ -4,7 +4,7 @@ import { DashboardLayout } from '../../components/dashboard/DashboardLayout';
 
 export function DashboardHome() {
   const { t } = useTranslation();
-  const sessions = useDashboardStore((state) => state.sessions);
+  const sessions = useDashboardStore((state: any) => state.sessions);
 
   return (
     <DashboardLayout type="user">

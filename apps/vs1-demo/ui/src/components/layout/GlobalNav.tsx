@@ -91,10 +91,11 @@ export function GlobalNav() {
   if (isHidden) return null;
 
   return (
-    <header className="fixed top-5 inset-x-0 z-50 flex flex-col items-center pointer-events-none">
+    <header className="fixed top-0 inset-x-0 z-50 flex flex-col items-center pointer-events-none">
 
-      {/* ── Floating Glass Pill ─────────────────────────────────── */}
-      <div className="pointer-events-auto flex items-center justify-between gap-3 px-7 h-12 w-full max-w-[1100px] mx-4 rounded-2xl bg-white/40 backdrop-blur-xl border border-white/50 shadow-[0_4px_32px_rgba(0,0,0,0.08)] whitespace-nowrap">
+      {/* ── Full Width Header ─────────────────────────────────── */}
+      <div className="pointer-events-auto w-full bg-white/40 backdrop-blur-xl border-b border-white/50 shadow-[0_4px_32px_rgba(0,0,0,0.08)]">
+        <div className="flex items-center justify-between gap-3 px-7 h-14 w-full max-w-[1100px] mx-auto whitespace-nowrap">
 
         {/* Logo */}
         <button
@@ -156,6 +157,7 @@ export function GlobalNav() {
           <Button variant="primary" size="sm" onClick={() => navTo('/register')}>
             {t('nav.signup', 'Sign up for free')}
           </Button>
+        </div>
         </div>
       </div>
 

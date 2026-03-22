@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion, useInView } from 'framer-motion';
 import {
   ArrowRight,
@@ -108,14 +109,15 @@ function StatCard({ value, label, delay }: { value: string; label: string; delay
 // ─── Animated Data Flow Diagram ───────────────────────────────────────────────
 
 function DataFlowDiagram() {
+  const { t } = useTranslation('common');
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-60px' });
 
   const nodes = [
-    { label: 'Business Context', sub: 'Wizard Input', icon: FileSearch, x: 0 },
-    { label: 'PII Redaction', sub: 'Privacy Gate', icon: EyeOff, x: 1 },
-    { label: 'AI Analysis', sub: 'Grounded RAG', icon: Brain, x: 2 },
-    { label: 'Risk Dossier', sub: 'Structured Output', icon: FileText, x: 3 },
+    { label: t('platform.engine.node1Label', 'Business Context'), sub: t('platform.engine.node1Sub', 'Wizard Input'), icon: FileSearch, x: 0 },
+    { label: t('platform.engine.node2Label', 'PII Redaction'), sub: t('platform.engine.node2Sub', 'Privacy Gate'), icon: EyeOff, x: 1 },
+    { label: t('platform.engine.node3Label', 'AI Analysis'), sub: t('platform.engine.node3Sub', 'Grounded RAG'), icon: Brain, x: 2 },
+    { label: t('platform.engine.node4Label', 'Risk Dossier'), sub: t('platform.engine.node4Sub', 'Structured Output'), icon: FileText, x: 3 },
   ];
 
   return (
@@ -176,15 +178,16 @@ function DataFlowDiagram() {
 // ─── Animated Funnel Diagram ──────────────────────────────────────────────────
 
 function FunnelDiagram() {
+  const { t } = useTranslation('common');
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-60px' });
 
   const steps = [
-    { label: 'Assessment', detail: 'Structured intent capture', width: '100%', color: 'bg-primary-100 border-primary-300 text-primary-800' },
-    { label: 'Dossier', detail: 'Anonymized risk profile', width: '85%', color: 'bg-primary-200 border-primary-400 text-primary-900' },
-    { label: 'Matching', detail: 'Jurisdiction-bound ranking', width: '70%', color: 'bg-primary-300 border-primary-500 text-primary-900' },
-    { label: 'Appointment', detail: 'SLA-enforced response', width: '55%', color: 'bg-primary-500 border-primary-600 text-white' },
-    { label: 'Execution', detail: 'Local expert delivery', width: '40%', color: 'bg-primary-700 border-primary-800 text-white' },
+    { label: t('platform.matching.funnel1Label', 'Assessment'), detail: t('platform.matching.funnel1Detail', 'Structured intent capture'), width: '100%', color: 'bg-primary-100 border-primary-300 text-primary-800' },
+    { label: t('platform.matching.funnel2Label', 'Dossier'), detail: t('platform.matching.funnel2Detail', 'Anonymized risk profile'), width: '85%', color: 'bg-primary-200 border-primary-400 text-primary-900' },
+    { label: t('platform.matching.funnel3Label', 'Matching'), detail: t('platform.matching.funnel3Detail', 'Jurisdiction-bound ranking'), width: '70%', color: 'bg-primary-300 border-primary-500 text-primary-900' },
+    { label: t('platform.matching.funnel4Label', 'Appointment'), detail: t('platform.matching.funnel4Detail', 'SLA-enforced response'), width: '55%', color: 'bg-primary-500 border-primary-600 text-white' },
+    { label: t('platform.matching.funnel5Label', 'Execution'), detail: t('platform.matching.funnel5Detail', 'Local expert delivery'), width: '40%', color: 'bg-primary-700 border-primary-800 text-white' },
   ];
 
   return (
@@ -214,13 +217,14 @@ function FunnelDiagram() {
 // ─── Country Coverage Map (Code-based) ────────────────────────────────────────
 
 function CoverageGrid() {
+  const { t } = useTranslation('common');
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-60px' });
 
   const markets = [
-    { flag: '🇬🇧', country: 'United Kingdom', status: 'Live', domains: ['VAT & MTD', 'EPR Packaging', 'UK GDPR', 'Corporate'], color: 'border-primary-300 bg-primary-50' },
-    { flag: '🇩🇪', country: 'Germany', status: 'Live', domains: ['USt-VA', 'VerpackG', 'DSGVO', 'GmbH Setup'], color: 'border-primary-300 bg-primary-50' },
-    { flag: '🇪🇺', country: 'European Union', status: 'Live', domains: ['EU VAT OSS', 'WEEE', 'GDPR', 'CSRD/ESG'], color: 'border-primary-300 bg-primary-50' },
+    { flag: '🇬🇧', country: 'United Kingdom', status: t('platform.coverage.marketStatusLive', 'Live'), domains: ['VAT & MTD', 'EPR Packaging', 'UK GDPR', 'Corporate'], color: 'border-primary-300 bg-primary-50' },
+    { flag: '🇩🇪', country: 'Germany', status: t('platform.coverage.marketStatusLive', 'Live'), domains: ['USt-VA', 'VerpackG', 'DSGVO', 'GmbH Setup'], color: 'border-primary-300 bg-primary-50' },
+    { flag: '🇪🇺', country: 'European Union', status: t('platform.coverage.marketStatusLive', 'Live'), domains: ['EU VAT OSS', 'WEEE', 'GDPR', 'CSRD/ESG'], color: 'border-primary-300 bg-primary-50' },
     { flag: '🇺🇸', country: 'United States', status: 'Q3 2026', domains: ['Sales Tax', 'EPA Compliance', 'CCPA', 'LLC/Corp'], color: 'border-neutral-200 bg-neutral-50 opacity-70' },
   ];
 
@@ -242,7 +246,7 @@ function CoverageGrid() {
               </Typography>
             </div>
             <span className={`text-xs font-bold px-2.5 py-1 rounded-md ${
-              m.status === 'Live' ? 'bg-success-bg text-success-500' : 'bg-neutral-100 text-neutral-500'
+              m.status === t('platform.coverage.marketStatusLive', 'Live') ? 'bg-success-bg text-success-500' : 'bg-neutral-100 text-neutral-500'
             }`}>
               {m.status}
             </span>
@@ -263,14 +267,15 @@ function CoverageGrid() {
 // ─── Magic Link Workflow (Code-based Diagram) ─────────────────────────────────
 
 function MagicLinkFlow() {
+  const { t } = useTranslation('common');
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-60px' });
 
   const steps = [
-    { icon: FileText, label: 'Structured Dossier', desc: 'Pre-qualified lead arrives' },
-    { icon: Mail, label: 'Magic Link Email', desc: 'Secure, time-bound access' },
-    { icon: Link2, label: 'One-Click Review', desc: 'No portal. No password.' },
-    { icon: CheckCircle, label: 'Confirm & Reply', desc: 'SLA timer stops' },
+    { icon: FileText, label: t('platform.partners.flow1Label', 'Structured Dossier'), desc: t('platform.partners.flow1Desc', 'Pre-qualified lead arrives') },
+    { icon: Mail, label: t('platform.partners.flow2Label', 'Magic Link Email'), desc: t('platform.partners.flow2Desc', 'Secure, time-bound access') },
+    { icon: Link2, label: t('platform.partners.flow3Label', 'One-Click Review'), desc: t('platform.partners.flow3Desc', 'No portal. No password.') },
+    { icon: CheckCircle, label: t('platform.partners.flow4Label', 'Confirm & Reply'), desc: t('platform.partners.flow4Desc', 'SLA timer stops') },
   ];
 
   return (
@@ -308,13 +313,14 @@ function MagicLinkFlow() {
 // ─── Anchor Navigation Bar ────────────────────────────────────────────────────
 
 function AnchorBar() {
+  const { t } = useTranslation('common');
   const [active, setActive] = useState('engine');
 
   const anchors = [
-    { id: 'engine', label: 'AI Engine' },
-    { id: 'matching', label: 'Partner Matching' },
-    { id: 'coverage', label: 'Global Coverage' },
-    { id: 'partners', label: 'For Partners' },
+    { id: 'engine', label: t('platform.anchorEngine', 'AI Engine') },
+    { id: 'matching', label: t('platform.anchorMatching', 'Partner Matching') },
+    { id: 'coverage', label: t('platform.anchorCoverage', 'Global Coverage') },
+    { id: 'partners', label: t('platform.anchorPartners', 'For Partners') },
   ];
 
   useEffect(() => {
@@ -357,19 +363,21 @@ function AnchorBar() {
 // ─── SECTION 1: AI ENGINE ─────────────────────────────────────────────────────
 
 function EngineSection() {
+  const { t } = useTranslation('common');
+
   return (
     <Section id="engine" className="py-16 desktop-s:py-24 bg-background">
       <div className="max-w-7xl mx-auto px-6">
         {/* Hero */}
         <div className="max-w-3xl mb-14">
           <Typography variant="caption" className="text-primary-500 mb-3 block font-semibold">
-            The AI Engine
+            {t('platform.engine.overline', 'The AI Engine')}
           </Typography>
           <Typography variant="display" weight="bold" className="text-neutral-900 mb-5 leading-tight">
-            From Regulatory Uncertainty<br className="hidden tablet:block" /> to Structured Action
+            {t('platform.engine.title', 'From Regulatory Uncertainty to Structured Action')}
           </Typography>
           <Typography variant="body" className="text-neutral-600 text-lg leading-relaxed max-w-2xl">
-            Compliance data is fragmented and unstructured. Our AI acts as a cognitive Advisory Layer — extracting your business intent and mapping it to concrete legal realities. No hallucinations. Every output grounded in verified sources.
+            {t('platform.engine.body', 'Compliance data is fragmented and unstructured. Our AI acts as a cognitive Advisory Layer — extracting your business intent and mapping it to concrete legal realities. No hallucinations. Every output grounded in verified sources.')}
           </Typography>
         </div>
 
@@ -389,10 +397,10 @@ function EngineSection() {
               <Brain size={22} className="text-primary-600" />
             </div>
             <Typography variant="h3" weight="bold" className="text-neutral-900 mb-3">
-              Adaptive Intent Mapping
+              {t('platform.engine.card1Title', 'Adaptive Intent Mapping')}
             </Typography>
             <Typography variant="body" className="text-neutral-600 leading-relaxed">
-              You don't need to know which laws to search for. Our Wizard captures your context in 4–5 steps and generates a structured Search Profile automatically.
+              {t('platform.engine.card1Body', 'You don\'t need to know which laws to search for. Our Wizard captures your context in 4–5 steps and generates a structured Search Profile automatically.')}
             </Typography>
           </motion.div>
 
@@ -407,10 +415,10 @@ function EngineSection() {
               <EyeOff size={22} className="text-error-500" />
             </div>
             <Typography variant="h3" weight="bold" className="text-neutral-900 mb-3">
-              Privacy Redaction Pipeline
+              {t('platform.engine.card2Title', 'Privacy Redaction Pipeline')}
             </Typography>
             <Typography variant="body" className="text-neutral-600 leading-relaxed">
-              Before any document touches our AI, it passes through a local Redaction Pipeline — automatically masking PII like names, emails, and phone numbers.
+              {t('platform.engine.card2Body', 'Before any document touches our AI, it passes through a local Redaction Pipeline — automatically masking PII like names, emails, and phone numbers.')}
             </Typography>
           </motion.div>
 
@@ -425,19 +433,19 @@ function EngineSection() {
               <ShieldCheck size={22} className="text-success-500" />
             </div>
             <Typography variant="h3" weight="bold" className="text-neutral-900 mb-3">
-              Triple AI Gate
+              {t('platform.engine.card3Title', 'Triple AI Gate')}
             </Typography>
             <Typography variant="body" className="text-neutral-600 leading-relaxed">
-              The AI only activates if three strict conditions are met: document is sanitized, user has given explicit consent, and it's not classified as restricted.
+              {t('platform.engine.card3Body', 'The AI only activates if three strict conditions are met: document is sanitized, user has given explicit consent, and it\'s not classified as restricted.')}
             </Typography>
           </motion.div>
         </div>
 
         {/* Trust bar */}
         <div className="flex flex-wrap justify-center gap-8 mt-12 pt-8 border-t border-neutral-100">
-          <StatCard value="0" label="PII stored in AI layer" delay={0} />
-          <StatCard value="100%" label="Source-grounded outputs" delay={0.1} />
-          <StatCard value="<2 min" label="Full risk profile" delay={0.2} />
+          <StatCard value="0" label={t('platform.engine.stat1Label', 'PII stored in AI layer')} delay={0} />
+          <StatCard value="100%" label={t('platform.engine.stat2Label', 'Source-grounded outputs')} delay={0.1} />
+          <StatCard value="<2 min" label={t('platform.engine.stat3Label', 'Full risk profile')} delay={0.2} />
         </div>
       </div>
     </Section>
@@ -447,6 +455,8 @@ function EngineSection() {
 // ─── SECTION 2: PARTNER MATCHING ──────────────────────────────────────────────
 
 function MatchingSection() {
+  const { t } = useTranslation('common');
+
   return (
     <Section id="matching" className="py-16 desktop-s:py-24 bg-neutral-50">
       <div className="max-w-7xl mx-auto px-6">
@@ -454,39 +464,39 @@ function MatchingSection() {
           {/* Left */}
           <div>
             <Typography variant="caption" className="text-primary-500 mb-3 block font-semibold">
-              Partner Matching
+              {t('platform.matching.overline', 'Partner Matching')}
             </Typography>
             <Typography variant="display" weight="bold" className="text-neutral-900 mb-5 leading-tight">
-              Verified Specialists.<br />Orchestrated Accountability.
+              {t('platform.matching.title', 'Verified Specialists. Orchestrated Accountability.')}
             </Typography>
             <Typography variant="body" className="text-neutral-600 text-lg leading-relaxed mb-8">
-              We're not a directory. We're an orchestrator. We don't just give you a list of names — we control the engagement to ensure accountability, from first contact to successful resolution.
+              {t('platform.matching.body', "We're not a directory. We're an orchestrator. We don't just give you a list of names — we control the engagement to ensure accountability, from first contact to successful resolution.")}
             </Typography>
 
             <div className="space-y-1">
               <PipelineStep
-                step={1} title="Jurisdiction-Bound Matching"
-                desc="Connects you only with specialists verified for your target country and compliance category."
+                step={1} title={t('platform.matching.step1Title', 'Jurisdiction-Bound Matching')}
+                desc={t('platform.matching.step1Desc', 'Connects you only with specialists verified for your target country and compliance category.')}
                 icon={Globe} color="bg-primary-500" delay={0}
               />
               <PipelineStep
-                step={2} title="Structured Engagement Request"
-                desc="Your anonymized compliance dossier is sent directly to the partner — no cold emails, no blank inquiries."
+                step={2} title={t('platform.matching.step2Title', 'Structured Engagement Request')}
+                desc={t('platform.matching.step2Desc', 'Your anonymized compliance dossier is sent directly to the partner — no cold emails, no blank inquiries.')}
                 icon={FileText} color="bg-primary-600" delay={0.1}
               />
               <PipelineStep
-                step={3} title="SLA-Enforced Response"
-                desc="Partners must confirm receipt within 24h and reply within 48h. Our automated Watchdog enforces this."
+                step={3} title={t('platform.matching.step3Title', 'SLA-Enforced Response')}
+                desc={t('platform.matching.step3Desc', 'Partners must confirm receipt within 24h and reply within 48h. Our automated Watchdog enforces this.')}
                 icon={Clock} color="bg-primary-700" delay={0.2}
               />
               <PipelineStep
-                step={4} title="Automated Downgrade System"
-                desc="Repeated SLA breaches trigger an automatic downgrade. You only engage with responsive, top-tier professionals."
+                step={4} title={t('platform.matching.step4Title', 'Automated Downgrade System')}
+                desc={t('platform.matching.step4Desc', 'Repeated SLA breaches trigger an automatic downgrade. You only engage with responsive, top-tier professionals.')}
                 icon={AlertTriangle} color="bg-error-500" delay={0.3}
               />
               <PipelineStep
-                step={5} title="Priority Rewards"
-                desc="High-performing partners earn priority placement and premium badges through our Ranking Engine."
+                step={5} title={t('platform.matching.step5Title', 'Priority Rewards')}
+                desc={t('platform.matching.step5Desc', 'High-performing partners earn priority placement and premium badges through our Ranking Engine.')}
                 icon={Award} color="bg-accent-600" delay={0.4}
               />
             </div>
@@ -495,7 +505,7 @@ function MatchingSection() {
           {/* Right: Funnel Diagram */}
           <div>
             <Typography variant="ui-small" weight="bold" className="text-neutral-400 uppercase tracking-widest mb-6 block text-center">
-              The Risk-to-Execution Funnel
+              {t('platform.matching.funnelTitle', 'The Risk-to-Execution Funnel')}
             </Typography>
             <FunnelDiagram />
           </div>
@@ -508,18 +518,20 @@ function MatchingSection() {
 // ─── SECTION 3: GLOBAL COVERAGE ───────────────────────────────────────────────
 
 function CoverageSection() {
+  const { t } = useTranslation('common');
+
   return (
     <Section id="coverage" className="py-16 desktop-s:py-24 bg-background">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center max-w-3xl mx-auto mb-14">
           <Typography variant="caption" className="text-primary-500 mb-3 block font-semibold">
-            Global Coverage
+            {t('platform.coverage.overline', 'Global Coverage')}
           </Typography>
           <Typography variant="display" weight="bold" className="text-neutral-900 mb-5 leading-tight">
-            Localized Security for<br className="hidden tablet:block" /> Global Expansion
+            {t('platform.coverage.title', 'Localized Security for Global Expansion')}
           </Typography>
           <Typography variant="body" className="text-neutral-600 text-lg leading-relaxed">
-            Your business crosses borders — your compliance should too. Every question, risk, and matched expert is tailored to the laws of your target market.
+            {t('platform.coverage.body', 'Your business crosses borders — your compliance should too. Every question, risk, and matched expert is tailored to the laws of your target market.')}
           </Typography>
         </div>
 
@@ -534,16 +546,16 @@ function CoverageSection() {
           className="mt-12 bg-primary-900 rounded-2xl p-8 text-center"
         >
           <Typography variant="h3" weight="bold" className="text-white mb-3">
-            Dynamic Country Policy Matrix
+            {t('platform.coverage.matrixTitle', 'Dynamic Country Policy Matrix')}
           </Typography>
           <Typography variant="body" className="text-primary-300 mb-6 max-w-xl mx-auto">
-            Data privacy laws differ across borders. Our platform adapts data residency, retention, and AI eligibility rules per jurisdiction — defaulting to strict GDPR standards for European markets.
+            {t('platform.coverage.matrixBody', 'Data privacy laws differ across borders. Our platform adapts data residency, retention, and AI eligibility rules per jurisdiction — defaulting to strict GDPR standards for European markets.')}
           </Typography>
           <div className="grid grid-cols-3 gap-4 max-w-md mx-auto">
             {[
-              { label: 'Data Residency', val: 'Geo-fenced' },
-              { label: 'Retention Policy', val: 'Country-specific' },
-              { label: 'AI Eligibility', val: 'Dynamic gates' },
+              { label: t('platform.coverage.matrix1Label', 'Data Residency'), val: t('platform.coverage.matrix1Val', 'Geo-fenced') },
+              { label: t('platform.coverage.matrix2Label', 'Retention Policy'), val: t('platform.coverage.matrix2Val', 'Country-specific') },
+              { label: t('platform.coverage.matrix3Label', 'AI Eligibility'), val: t('platform.coverage.matrix3Val', 'Dynamic gates') },
             ].map(r => (
               <div key={r.label} className="bg-primary-800 border border-primary-700 rounded-xl p-4">
                 <Typography variant="ui-small" weight="bold" className="text-accent-400 block mb-1">
@@ -564,6 +576,7 @@ function CoverageSection() {
 // ─── SECTION 4: FOR PARTNER FIRMS ─────────────────────────────────────────────
 
 function PartnersSection() {
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
 
   return (
@@ -573,21 +586,21 @@ function PartnersSection() {
           {/* Left */}
           <div>
             <Typography variant="caption" className="text-accent-600 mb-3 block font-semibold">
-              For Partner Firms
+              {t('platform.partners.overline', 'For Partner Firms')}
             </Typography>
             <Typography variant="display" weight="bold" className="text-neutral-900 mb-5 leading-tight">
-              Pre-Qualified Clients.<br />Zero Friction.
+              {t('platform.partners.title', 'Pre-Qualified Clients. Zero Friction.')}
             </Typography>
             <Typography variant="body" className="text-neutral-600 text-lg leading-relaxed mb-8">
-              Stop wasting billable hours on unqualified leads and unstructured cold emails. CompliHub360 sends you highly qualified, structured business clients ready to act.
+              {t('platform.partners.body', 'Stop wasting billable hours on unqualified leads and unstructured cold emails. CompliHub360 sends you highly qualified, structured business clients ready to act.')}
             </Typography>
 
             {/* Key benefits */}
             <div className="space-y-5 mb-10">
               {[
-                { icon: FileText, title: 'Structured Dossiers', desc: 'Receive business context, target markets, and specific regulatory risks — evaluate mandates instantly.' },
-                { icon: Link2, title: 'Magic Link Workflow', desc: 'Secure, time-bound one-click access. No portal to maintain, no password to remember.' },
-                { icon: TrendingUp, title: 'Performance-Based Growth', desc: 'Transparent flat engagement fee. Great SLA performance earns priority placement and premium badges.' },
+                { icon: FileText, title: t('platform.partners.benefit1Title', 'Structured Dossiers'), desc: t('platform.partners.benefit1Desc', 'Receive business context, target markets, and specific regulatory risks — evaluate mandates instantly.') },
+                { icon: Link2, title: t('platform.partners.benefit2Title', 'Magic Link Workflow'), desc: t('platform.partners.benefit2Desc', 'Secure, time-bound one-click access. No portal to maintain, no password to remember.') },
+                { icon: TrendingUp, title: t('platform.partners.benefit3Title', 'Performance-Based Growth'), desc: t('platform.partners.benefit3Desc', 'Transparent flat engagement fee. Great SLA performance earns priority placement and premium badges.') },
               ].map(({ icon: Icon, title, desc }) => (
                 <div key={title} className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-lg bg-accent-50 border border-accent-200 flex items-center justify-center shrink-0">
@@ -606,7 +619,7 @@ function PartnersSection() {
             </div>
 
             <Button variant="primary" onClick={() => navigate('/register?intent=partner')} className="shadow-md">
-              Apply as Partner Firm
+              {t('platform.partners.cta', 'Apply as Partner Firm')}
               <ArrowRight size={18} className="ml-2" />
             </Button>
           </div>
@@ -614,15 +627,15 @@ function PartnersSection() {
           {/* Right: Magic Link Flow */}
           <div>
             <Typography variant="ui-small" weight="bold" className="text-neutral-400 uppercase tracking-widest mb-6 block text-center">
-              The Magic Link Workflow
+              {t('platform.partners.flowTitle', 'The Magic Link Workflow')}
             </Typography>
             <MagicLinkFlow />
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4 mt-8">
-              <StatCard value="24h" label="Max confirmation time" delay={0} />
-              <StatCard value="48h" label="Max reply window" delay={0.1} />
-              <StatCard value="€0" label="Platform subscription" delay={0.2} />
+              <StatCard value="24h" label={t('platform.partners.stat1Label', 'Max confirmation time')} delay={0} />
+              <StatCard value="48h" label={t('platform.partners.stat2Label', 'Max reply window')} delay={0.1} />
+              <StatCard value="€0" label={t('platform.partners.stat3Label', 'Platform subscription')} delay={0.2} />
             </div>
           </div>
         </div>
@@ -634,29 +647,30 @@ function PartnersSection() {
 // ─── Final CTA ────────────────────────────────────────────────────────────────
 
 function PlatformCTA() {
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
 
   return (
     <section className="py-16 desktop-s:py-24 bg-primary-900">
       <div className="max-w-3xl mx-auto px-6 text-center">
         <Typography variant="display" weight="bold" className="text-white mb-5">
-          Ready to simplify compliance?
+          {t('platform.cta.title', 'Ready to simplify compliance?')}
         </Typography>
         <Typography variant="body" className="text-primary-300 mb-10 text-lg">
-          Start your free assessment and get a structured risk profile in under 2 minutes.
+          {t('platform.cta.body', 'Start your free assessment and get a structured risk profile in under 2 minutes.')}
         </Typography>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button
             onClick={() => navigate('/register')}
             className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-white text-primary-900 font-bold text-base shadow-lg hover:bg-neutral-100 transition-colors"
           >
-            Start Free Assessment
+            {t('platform.cta.btnAssessment', 'Start Free Assessment')}
           </button>
           <button
             onClick={() => navigate('/register?intent=expert')}
             className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border-2 border-primary-400 text-white font-bold text-base hover:bg-primary-800 transition-colors"
           >
-            Skip to Expert Match
+            {t('platform.cta.btnExpert', 'Skip to Expert Match')}
             <ArrowRight size={18} />
           </button>
         </div>
@@ -668,10 +682,12 @@ function PlatformCTA() {
 // ─── Footer ───────────────────────────────────────────────────────────────────
 
 function PlatformFooter() {
+  const { t } = useTranslation('common');
+
   return (
     <footer className="bg-neutral-900 py-10 text-center">
       <Typography variant="caption" className="text-neutral-500 block normal-case tracking-normal">
-        © {new Date().getFullYear()} CompliHub360. Built in Berlin.
+        {t('platform.footer.copyright', '© {{year}} CompliHub360. Built in Berlin.', { year: new Date().getFullYear() })}
       </Typography>
     </footer>
   );

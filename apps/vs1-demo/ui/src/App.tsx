@@ -14,7 +14,8 @@ import { ComplianceAreasPage } from "./pages/ComplianceAreasPage";
 import { ResourcesPage } from "./pages/ResourcesPage";
 import AdvisoryPage from "./pages/AdvisoryPage";
 import { ResultsOverview } from "./pages/ResultsOverview";
-import { Dashboard } from "./pages/Dashboard";
+import { DashboardHome } from "./pages/dashboard/DashboardHome";
+import { PartnerDashboardHome } from "./pages/partner-dashboard/PartnerDashboardHome";
 // Wizard Shell Steps
 import { WizardPreGateFlow } from "./pages/wizard/WizardPreGateFlow";
 import { GenericWizardFlow } from "./pages/wizard/GenericWizardFlow";
@@ -106,7 +107,15 @@ function AppContent() {
                     <Route path="resources" element={<ResourcesPage />} />
                     <Route path="advisory" element={<AdvisoryPage />} />
                     <Route path="results" element={<ResultsOverview />} />
-                    <Route path="dashboard" element={<Dashboard />} />
+                    
+                    {/* User Dashboard Routes */}
+                    <Route path="dashboard" element={<DashboardHome />} />
+                    <Route path="dashboard/*" element={<DashboardHome />} />
+                    
+                    {/* Partner Dashboard Routes */}
+                    <Route path="partner-dashboard" element={<PartnerDashboardHome />} />
+                    <Route path="partner-dashboard/*" element={<PartnerDashboardHome />} />
+                    
                     {/* Auth */}
                     <Route path="login" element={<LoginPage />} />
                     <Route path="register" element={<RegisterPage />} />
