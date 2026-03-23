@@ -13,6 +13,7 @@ import { SolutionsPage } from "./pages/SolutionsPage";
 import { ComplianceAreasPage } from "./pages/ComplianceAreasPage";
 import { ResourcesPage } from "./pages/ResourcesPage";
 import AdvisoryPage from "./pages/AdvisoryPage";
+import { AiGovernancePage } from "./pages/AiGovernancePage";
 import { ResultsOverview } from "./pages/ResultsOverview";
 import { DashboardHome } from "./pages/dashboard/DashboardHome";
 import { UserDossiers } from "./pages/dashboard/UserDossiers";
@@ -115,6 +116,7 @@ function AppContent() {
                     <Route path="compliance" element={<ComplianceAreasPage />} />
                     <Route path="resources" element={<ResourcesPage />} />
                     <Route path="advisory" element={<AdvisoryPage />} />
+                    <Route path="ai-governance" element={<AiGovernancePage />} />
                     <Route path="results" element={<ResultsOverview />} />
                     
                     {/* User Dashboard Routes */}

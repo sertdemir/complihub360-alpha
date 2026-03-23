@@ -86,6 +86,12 @@ export function GlobalNav() {
         { icon: FileText,      anim: { scale: 1.15, y: -3 },        title: t('nav.items.guides.title'), desc: t('nav.items.guides.desc'),   path: '/resources#guides' },
       ],
     },
+    {
+      id: 'ai-governance',
+      label: t('nav.aiGovernance', 'AI Governance'),
+      path: '/ai-governance',
+      items: [],
+    },
   ];
 
   if (isHidden) return null;
