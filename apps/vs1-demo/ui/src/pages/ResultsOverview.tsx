@@ -46,7 +46,7 @@ export function ResultsOverview() {
     }, [profile]);
 
     return (
-        <div className="min-h-screen bg-neutral-50 font-sans">
+        <div className="min-h-screen bg-neutral-50 font-sans pt-24">
             {modalProvider && (
                 <EngagementModal
                     providerName={modalProvider}
