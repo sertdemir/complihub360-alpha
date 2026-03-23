@@ -7,21 +7,11 @@ import { EngagementModal } from "../components/EngagementModal";
 import { getSearchResults, SearchResults, LawInfo, ArticleInfo, TipInfo, ProviderInfo } from "../services/resultsService";
 import { SearchProfile } from "../components/wizard/WizardContext";
 
-type TabId = "overview" | "laws" | "articles" | "tips";
-
-const TABS: { id: TabId; label: string; icon: string }[] = [
-    { id: "overview", label: "Overview (AI)", icon: "auto_awesome" },
-    { id: "laws", label: "Laws & Regulations", icon: "account_balance" },
-    { id: "articles", label: "Articles & Tutorials", icon: "menu_book" },
-    { id: "tips", label: "Actionable Tips", icon: "lightbulb" },
-];
-
 export function ResultsOverview() {
     const navigate = useNavigate();
     const location = useLocation();
     const profile = location.state?.searchProfile as SearchProfile | undefined;
 
-    const [activeTab, setActiveTab] = useState<TabId>("overview");
     const [modalProvider, setModalProvider] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [results, setResults] = useState<SearchResults | null>(null);
@@ -72,7 +62,7 @@ export function ResultsOverview() {
             {!loading && results && (
                 <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 py-8">
                     {/* Page Header */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
                         <div className="flex flex-col gap-1">
                             <Typography variant="h1" weight="bold">
                                 Compliance Overview
@@ -84,39 +74,136 @@ export function ResultsOverview() {
                         <RiskBadge level={results.riskLevel} />
                     </div>
 
-                    {/* Tabs */}
-                    <div className="border-b border-neutral-200 mb-6">
-                        <div className="flex gap-1 overflow-x-auto -mb-px">
-                            {TABS.map(tab => (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
-                                    className={`flex items-center gap-2 px-4 py-3 border-b-2 text-ui-small font-medium whitespace-nowrap transition-colors ${
-                                        activeTab === tab.id
-                                            ? "border-primary-500 text-primary-500"
-                                            : "border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300"
-                                    }`}
-                                >
-                                    <span className="material-symbols-outlined text-[18px]">{tab.icon}</span>
-                                    {tab.label}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
                     {/* Content + Sidebar */}
-                    <div className="flex flex-col lg:flex-row gap-8">
-                        {/* Main Content */}
-                        <div className="flex-1 min-w-0">
-                            {activeTab === "overview" && <OverviewTab results={results} />}
-                            {activeTab === "laws" && <LawsTab laws={results.laws} />}
-                            {activeTab === "articles" && <ArticlesTab articles={results.articles} />}
-                            {activeTab === "tips" && <TipsTab tips={results.tips} />}
+                    <div className="flex flex-col lg:flex-row gap-10">
+                        {/* Main Content — all sections stacked */}
+                        <div className="flex-1 min-w-0 flex flex-col gap-10">
+
+                            {/* ─── Section 1: Key Findings ─────────────────────── */}
+                            <section>
+                                <SectionHeader icon="auto_awesome" title="Key Findings" />
+                                <Card>
+                                    <CardContent className="pt-6">
+                                        <ul className="space-y-5 list-none pl-0">
+                                            {results.findings.map(item => (
+                                                <li key={item.n} className="flex gap-4">
+                                                    <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary-50 text-primary-500 flex items-center justify-center font-bold text-ui-small border border-primary-200">
+                                                        {item.n}
+                                                    </span>
+                                                    <div>
+                                                        <Typography variant="body" weight="semibold" as="strong" className="block mb-1">
+                                                            {item.title}
+                                                        </Typography>
+                                                        <Typography variant="ui-small" className="text-neutral-600">
+                                                            {item.text}{" "}
+                                                            <a className="text-primary-500 hover:underline font-medium" href="#">
+                                                                {item.ref}
+                                                            </a>
+                                                        </Typography>
+                                                    </div>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                        <div className="mt-8 p-4 bg-accent-50 rounded-lg border border-accent-200">
+                                            <Typography variant="caption" weight="semibold" className="text-accent-700 mb-2 block">
+                                                Recommended Immediate Action
+                                            </Typography>
+                                            <Typography variant="ui-small" className="text-neutral-700">
+                                                {results.actionRecommendation}
+                                            </Typography>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </section>
+
+                            {/* ─── Section 2: Laws & Regulations ──────────────── */}
+                            {results.laws.length > 0 && (
+                                <section>
+                                    <SectionHeader icon="account_balance" title="Laws & Regulations" />
+                                    <div className="flex flex-col gap-3">
+                                        {results.laws.map((law, idx) => (
+                                            <Card key={idx}>
+                                                <CardContent className="pt-5">
+                                                    <div className="flex justify-between items-start gap-4">
+                                                        <div className="flex items-start gap-3">
+                                                            <div className="w-9 h-9 rounded-md bg-primary-50 border border-primary-200 flex items-center justify-center shrink-0">
+                                                                <span className="material-symbols-outlined text-lg text-primary-500">account_balance</span>
+                                                            </div>
+                                                            <div>
+                                                                <Typography variant="body" weight="semibold">{law.title}</Typography>
+                                                                <Typography variant="ui-small" className="text-neutral-500 mt-0.5">{law.description}</Typography>
+                                                            </div>
+                                                        </div>
+                                                        <span className="shrink-0 px-2 py-1 bg-neutral-100 text-neutral-600 rounded-sm text-caption font-semibold">
+                                                            {law.level}
+                                                        </span>
+                                                    </div>
+                                                </CardContent>
+                                            </Card>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* ─── Section 3: Articles & Tutorials ────────────── */}
+                            {results.articles.length > 0 && (
+                                <section>
+                                    <SectionHeader icon="menu_book" title="Articles & Tutorials" />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {results.articles.map((article, idx) => (
+                                            <Card key={idx} className="hover:shadow-md transition-shadow cursor-pointer flex flex-col justify-between">
+                                                <CardContent className="pt-5 flex-1">
+                                                    <Typography variant="body" weight="semibold" className="mb-2 line-clamp-2">
+                                                        {article.title}
+                                                    </Typography>
+                                                    <Typography variant="ui-small" className="text-neutral-500 line-clamp-3">
+                                                        {article.excerpt}
+                                                    </Typography>
+                                                </CardContent>
+                                                <div className="flex items-center gap-2 text-caption text-neutral-400 px-6 pb-4 pt-2 border-t border-neutral-100">
+                                                    <span className="material-symbols-outlined text-[14px]">schedule</span>
+                                                    {article.readTime}
+                                                </div>
+                                            </Card>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* ─── Section 4: Actionable Tips ─────────────────── */}
+                            {results.tips.length > 0 && (
+                                <section>
+                                    <SectionHeader icon="lightbulb" title="Actionable Tips" />
+                                    <div className="flex flex-col gap-3">
+                                        {results.tips.map((tip, idx) => {
+                                            const iconMap = { action: "build", warning: "warning", info: "lightbulb" };
+                                            const bgMap = {
+                                                action: "bg-primary-50 text-primary-500 border-primary-200",
+                                                warning: "bg-warning-bg text-warning-700 border-warning-500/30",
+                                                info: "bg-neutral-100 text-neutral-600 border-neutral-200",
+                                            };
+                                            return (
+                                                <Card key={idx}>
+                                                    <CardContent className="pt-5 flex items-start gap-4">
+                                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 border ${bgMap[tip.type]}`}>
+                                                            <span className="material-symbols-outlined text-[20px]">{iconMap[tip.type]}</span>
+                                                        </div>
+                                                        <div>
+                                                            <Typography variant="body" weight="semibold" className="mb-1">{tip.title}</Typography>
+                                                            <Typography variant="ui-small" className="text-neutral-500">{tip.description}</Typography>
+                                                        </div>
+                                                    </CardContent>
+                                                </Card>
+                                            );
+                                        })}
+                                    </div>
+                                </section>
+                            )}
                         </div>
 
                         {/* Provider Sidebar */}
                         <aside className="w-full lg:w-[360px] shrink-0">
-                            <div className="sticky top-24 flex flex-col gap-4">
+                            <div className="sticky top-28 flex flex-col gap-4">
                                 <Typography variant="h3" weight="semibold" className="px-1">
                                     Top Matching Providers
                                 </Typography>
@@ -132,7 +219,16 @@ export function ResultsOverview() {
     );
 }
 
-// ─── Sub-Components ───────────────────────────────────────────────────────────
+// ─── Shared Sub-Components ────────────────────────────────────────────────────
+
+function SectionHeader({ icon, title }: { icon: string; title: string }) {
+    return (
+        <div className="flex items-center gap-2 mb-4">
+            <span className="material-symbols-outlined text-[20px] text-primary-500">{icon}</span>
+            <Typography variant="h3" weight="semibold">{title}</Typography>
+        </div>
+    );
+}
 
 function RiskBadge({ level }: { level: "Low" | "Medium" | "High" }) {
     const styles = {
@@ -146,130 +242,6 @@ function RiskBadge({ level }: { level: "Low" | "Medium" | "High" }) {
         <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-pill border text-ui-small font-semibold ${styles[level]}`}>
             <span className="material-symbols-outlined text-[16px]">{icons[level]}</span>
             Risk Level: {level}
-        </div>
-    );
-}
-
-function OverviewTab({ results }: { results: SearchResults }) {
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Key Findings</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <ul className="space-y-5 list-none pl-0">
-                    {results.findings.map(item => (
-                        <li key={item.n} className="flex gap-4">
-                            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary-50 text-primary-500 flex items-center justify-center font-bold text-ui-small border border-primary-200">
-                                {item.n}
-                            </span>
-                            <div>
-                                <Typography variant="body" weight="semibold" as="strong" className="block mb-1">
-                                    {item.title}
-                                </Typography>
-                                <Typography variant="ui-small" className="text-neutral-600">
-                                    {item.text}{" "}
-                                    <a className="text-primary-500 hover:underline font-medium" href="#">
-                                        {item.ref}
-                                    </a>
-                                </Typography>
-                            </div>
-                        </li>
-                    ))}
-                </ul>
-
-                <div className="mt-8 p-4 bg-accent-50 rounded-lg border border-accent-200">
-                    <Typography variant="caption" weight="semibold" className="text-accent-700 mb-2 block">
-                        Recommended Immediate Action
-                    </Typography>
-                    <Typography variant="ui-small" className="text-neutral-700">
-                        {results.actionRecommendation}
-                    </Typography>
-                </div>
-            </CardContent>
-        </Card>
-    );
-}
-
-function LawsTab({ laws }: { laws: LawInfo[] }) {
-    if (laws.length === 0) return <EmptyState text="No laws found mapping directly to your profile." />;
-
-    return (
-        <div className="flex flex-col gap-4">
-            {laws.map((law, idx) => (
-                <Card key={idx}>
-                    <CardContent className="pt-5">
-                        <div className="flex justify-between items-start gap-4">
-                            <div className="flex items-start gap-3">
-                                <div className="w-9 h-9 rounded-md bg-primary-50 border border-primary-200 flex items-center justify-center shrink-0">
-                                    <span className="material-symbols-outlined text-lg text-primary-500">account_balance</span>
-                                </div>
-                                <div>
-                                    <Typography variant="body" weight="semibold">{law.title}</Typography>
-                                    <Typography variant="ui-small" className="text-neutral-500 mt-0.5">{law.description}</Typography>
-                                </div>
-                            </div>
-                            <span className="shrink-0 px-2 py-1 bg-neutral-100 text-neutral-600 rounded-sm text-caption font-semibold">
-                                {law.level}
-                            </span>
-                        </div>
-                    </CardContent>
-                </Card>
-            ))}
-        </div>
-    );
-}
-
-function ArticlesTab({ articles }: { articles: ArticleInfo[] }) {
-    if (articles.length === 0) return <EmptyState text="No articles currently map to your specific scenario." />;
-
-    return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {articles.map((article, idx) => (
-                <Card key={idx} className="hover:shadow-md transition-shadow cursor-pointer flex flex-col justify-between">
-                    <CardContent className="pt-5 flex-1">
-                        <Typography variant="body" weight="semibold" className="mb-2 line-clamp-2">
-                            {article.title}
-                        </Typography>
-                        <Typography variant="ui-small" className="text-neutral-500 line-clamp-3">
-                            {article.excerpt}
-                        </Typography>
-                    </CardContent>
-                    <div className="flex items-center gap-2 text-caption text-neutral-400 px-6 pb-4 pt-2 border-t border-neutral-100">
-                        <span className="material-symbols-outlined text-[14px]">schedule</span>
-                        {article.readTime}
-                    </div>
-                </Card>
-            ))}
-        </div>
-    );
-}
-
-function TipsTab({ tips }: { tips: TipInfo[] }) {
-    if (tips.length === 0) return <EmptyState text="No actionable tips found for your specific profile yet." />;
-
-    const iconMap = { action: "build", warning: "warning", info: "lightbulb" };
-    const bgMap = {
-        action: "bg-primary-50 text-primary-500 border-primary-200",
-        warning: "bg-warning-bg text-warning-700 border-warning-500/30",
-        info: "bg-neutral-100 text-neutral-600 border-neutral-200",
-    };
-
-    return (
-        <div className="flex flex-col gap-4">
-            {tips.map((tip, idx) => (
-                <Card key={idx}>
-                    <CardContent className="pt-5 flex items-start gap-4">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 border ${bgMap[tip.type]}`}>
-                            <span className="material-symbols-outlined text-[20px]">{iconMap[tip.type]}</span>
-                        </div>
-                        <div>
-                            <Typography variant="body" weight="semibold" className="mb-1">{tip.title}</Typography>
-                            <Typography variant="ui-small" className="text-neutral-500">{tip.description}</Typography>
-                        </div>
-                    </CardContent>
-                </Card>
-            ))}
         </div>
     );
 }
@@ -312,14 +284,5 @@ function ProviderCard({ provider, onRequest }: { provider: ProviderInfo; onReque
                 )}
             </CardContent>
         </Card>
-    );
-}
-
-function EmptyState({ text }: { text: string }) {
-    return (
-        <div className="py-12 text-center border-2 border-dashed border-neutral-200 rounded-xl">
-            <span className="material-symbols-outlined text-3xl text-neutral-300 mb-2 block">search_off</span>
-            <Typography variant="ui-small" className="text-neutral-400">{text}</Typography>
-        </div>
     );
 }
