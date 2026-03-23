@@ -8,7 +8,7 @@ import {
   CircleDot, ChevronDown, ArrowRight,
   Zap, Users, Globe as GlobeIcon, Building2,
   Rocket, Layers, Scale,
-  MessageSquare, FileText,
+  MessageSquare, FileText, ShieldCheck
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Typography } from '../ui/Typography';
@@ -84,13 +84,8 @@ export function GlobalNav() {
       items: [
         { icon: MessageSquare, anim: { scale: 1.15, y: -2, x: 2 }, title: t('nav.items.stories.title'),     desc: t('nav.items.stories.desc'), path: '/resources#stories' },
         { icon: FileText,      anim: { scale: 1.15, y: -3 },        title: t('nav.items.guides.title'), desc: t('nav.items.guides.desc'),   path: '/resources#guides' },
+        { icon: ShieldCheck,   anim: { scale: 1.1, rotate: 10 },    title: t('nav.aiGovernance', 'AI Governance'), desc: t('nav.aiGovDesc', 'Our framework for transparent and compliant AI.'), path: '/ai-governance' },
       ],
-    },
-    {
-      id: 'ai-governance',
-      label: t('nav.aiGovernance', 'AI Governance'),
-      path: '/ai-governance',
-      items: [],
     },
   ];
 

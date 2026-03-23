@@ -132,10 +132,10 @@ export function WizardPreGateFlow() {
 
     useEffect(() => {
         const cat = searchParams.get("category") as WizardCategory | null;
-        if (cat && !profile.category) {
-            dispatch({ type: "SET_CATEGORY", payload: cat });
+        if (cat && profile.categories.length === 0) {
+            dispatch({ type: "SET_CATEGORIES", payload: [cat] });
         }
-    }, [searchParams, profile.category, dispatch]);
+    }, [searchParams, profile.categories.length, dispatch]);
 
     const handleNextCountry = () => {
         if (!primaryCountry) return;
@@ -143,7 +143,7 @@ export function WizardPreGateFlow() {
         dispatch({ type: "SET_MARKETS", payload: [primaryCountry, ...additionalMarkets] });
         
         if (preCategory) {
-            dispatch({ type: "SET_CATEGORY", payload: preCategory as any });
+            dispatch({ type: "SET_CATEGORIES", payload: [preCategory as any] });
             navigate(`/wizard/${preCategory}`);
         } else {
             setDirection(1);
@@ -153,12 +153,20 @@ export function WizardPreGateFlow() {
     };
 
     const handleSelectCategory = (cat: WizardCategory) => {
-        dispatch({ type: "SET_CATEGORY", payload: cat });
+        if (profile.categories.includes(cat)) {
+            dispatch({ type: "SET_CATEGORIES", payload: profile.categories.filter(c => c !== cat) });
+        } else {
+            dispatch({ type: "SET_CATEGORIES", payload: [...profile.categories, cat] });
+        }
     };
 
     const handleNextCategory = () => {
-        if (!profile.category) return;
-        navigate(`/wizard/${profile.category}`);
+        if (profile.categories.length === 0) return;
+        if (profile.categories.length === 1) {
+            navigate(`/wizard/${profile.categories[0]}`);
+        } else {
+            navigate(`/wizard/full-support`);
+        }
     };
 
     const handleBackCategory = () => {
@@ -249,7 +257,7 @@ export function WizardPreGateFlow() {
                                                         <span className="material-symbols-outlined text-[20px]">
                                                             {showAdditionalMarkets ? "remove_circle_outline" : "add_circle_outline"}
                                                         </span>
-                                                        {showAdditionalMarkets ? "Hide specific markets" : "Select specific additional markets (Optional)"}
+                                                        {showAdditionalMarkets ? "Hide additional countries" : "In which other countries are you currently selling or storing products? (Optional)"}
                                                     </button>
                                                     
                                                     <AnimatePresence>
@@ -291,7 +299,7 @@ export function WizardPreGateFlow() {
                                         </div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             {CATEGORIES.map(cat => {
-                                                const selected = profile.category === cat.id;
+                                                const selected = profile.categories.includes(cat.id);
                                                 const colors = COLOR_MAP[cat.color];
                                                 return (
                                                     <button
@@ -342,7 +350,7 @@ export function WizardPreGateFlow() {
                         <WizardFooter
                             onBack={handleBackCategory}
                             onNext={handleNextCategory}
-                            nextDisabled={!profile.category}
+                            nextDisabled={profile.categories.length === 0}
                         />
                     )}
                 </motion.div>

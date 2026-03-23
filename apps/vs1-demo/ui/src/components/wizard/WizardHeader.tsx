@@ -39,9 +39,9 @@ export function WizardHeader() {
                             {profile.country}
                         </span>
                     )}
-                    {profile.category && (
+                    {profile.categories.length > 0 && (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-50 border border-primary-200 text-xs font-semibold text-primary-700">
-                            {CATEGORY_LABELS[profile.category]}
+                            {profile.categories.map(c => CATEGORY_LABELS[c]).join(', ')}
                         </span>
                     )}
                 </div>

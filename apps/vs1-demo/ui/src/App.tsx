@@ -166,7 +166,9 @@ function AppContent() {
                     >
                         <div className="min-h-full py-12 px-4 flex flex-col items-center justify-center">
                             <Routes location={location}>
-                                <Route path="/:locale/wizard/*" element={<WizardRoutes />} />
+                                <Route path="/:locale" element={<LocaleLayout />}>
+                                    <Route path="wizard/*" element={<WizardRoutes />} />
+                                </Route>
                                 {/* For backward compatibility if someone opens /wizard directly */}
                                 <Route path="/wizard/*" element={<WizardRoutes />} />
                             </Routes>

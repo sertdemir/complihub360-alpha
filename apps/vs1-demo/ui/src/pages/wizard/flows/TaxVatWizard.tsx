@@ -4,13 +4,14 @@ import { TFunction } from "i18next";
 import { useWizard } from "../../../components/wizard/WizardContext";
 import { WizardFlowShell } from "../../../components/wizard/WizardFlowShell";
 import { SingleSelectCardGroup } from "../../../components/wizard/questions/SingleSelectCardGroup";
+import { MultiSelectCardGroup } from "../../../components/wizard/questions/MultiSelectCardGroup";
 import { MultiSelectChips } from "../../../components/wizard/questions/MultiSelectChips";
 import { CountryMultiSelect } from "../../../components/wizard/questions/CountryMultiSelect";
 import { RangeSelector } from "../../../components/wizard/questions/RangeSelector";
 import { Typography } from "../../../components/ui/Typography";
 
 interface TaxVatState {
-    sellingModel: string;
+    sellingModels: string[];
     additionalMarkets: string[];
     revenueThreshold: string;
     goodsType: string;
@@ -50,7 +51,7 @@ export function TaxVatWizard() {
     const { profile, dispatch } = useWizard();
     const [step, setStep] = useState(0);
     const [local, setLocal] = useState<TaxVatState>({
-        sellingModel: "",
+        sellingModels: [],
         additionalMarkets: [],
         revenueThreshold: "",
         goodsType: "",
@@ -63,10 +64,14 @@ export function TaxVatWizard() {
     const REVENUE_THRESHOLDS = getRevenueThresholds(t);
     const VAT_RISK_SIGNALS = getVatRiskSignals(t);
 
+    const isUkOnly = local.additionalMarkets.length === 1 && (local.additionalMarkets[0] === "GB" || local.additionalMarkets[0] === "UK");
+    const includesUk = local.additionalMarkets.includes("GB") || local.additionalMarkets.includes("UK");
+    const includesEu = local.additionalMarkets.some(m => m !== "GB" && m !== "UK");
+
     const steps = [
         {
             label: t('wizard.taxVat.steps.salesModel.label', "Sales Model"),
-            isValid: !!local.sellingModel,
+            isValid: local.sellingModels.length > 0,
             content: (
                 <div className="flex flex-col gap-6">
                     <div className="flex flex-col gap-2">
@@ -75,12 +80,12 @@ export function TaxVatWizard() {
                             {t('wizard.taxVat.steps.salesModel.subtitle', "Your sales channel determines which VAT registration obligations apply.")}
                         </Typography>
                     </div>
-                    <SingleSelectCardGroup
+                    <MultiSelectCardGroup
                         options={SELLING_MODELS}
-                        value={local.sellingModel}
-                        onChange={v => setLocal(s => ({ ...s, sellingModel: v }))}
+                        value={local.sellingModels}
+                        onChange={v => setLocal(s => ({ ...s, sellingModels: v }))}
                     />
-                    {local.sellingModel === "marketplace" && (
+                    {local.sellingModels.includes("marketplace") && (
                         <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-primary-50 border border-primary-200 text-primary-900 text-xs">
                             <span className="material-symbols-outlined text-[18px] text-primary-600 shrink-0">info</span>
                             <span>{t('wizard.taxVat.steps.salesModel.marketplaceNotice', "Marketplaces like Amazon DE report your sales directly to tax authorities. You still need your own VAT ID.")}</span>
@@ -126,7 +131,10 @@ export function TaxVatWizard() {
                     <div className="flex flex-col gap-2">
                         <Typography variant="h2">{t('wizard.taxVat.steps.revenue.title', "What is your cross-border annual revenue?")}</Typography>
                         <Typography variant="body" className="text-neutral-600">
-                            {t('wizard.taxVat.steps.revenue.subtitle', "The EU OSS threshold is €10,000 / year. Above this, VAT registration is required in the destination country.")}
+                            {isUkOnly 
+                                ? t('wizard.taxVat.steps.revenue.subtitleUk', "The UK VAT registration threshold is £90,000 / year. Above this, UK VAT registration is required.")
+                                : t('wizard.taxVat.steps.revenue.subtitle', "The EU OSS threshold is €10,000 / year. Above this, VAT registration is required in the destination country.")
+                            }
                         </Typography>
                     </div>
                     <RangeSelector
@@ -137,10 +145,16 @@ export function TaxVatWizard() {
                             dispatch({ type: "SET_REVENUE_BAND", payload: v as any });
                         }}
                     />
-                    {local.revenueThreshold === "10k_85k" && (
+                    {local.revenueThreshold === "10k_85k" && includesEu && (
                         <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-primary-50 border border-primary-200 text-primary-900 text-xs">
                             <span className="material-symbols-outlined text-[18px] text-primary-600 shrink-0">warning</span>
                             <span>{t('wizard.taxVat.steps.revenue.thresholdNotice', "You are approaching the VAT registration threshold. We recommend an initial consultation before crossing it.")}</span>
+                        </div>
+                    )}
+                    {local.revenueThreshold === "10k_85k" && isUkOnly && (
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-primary-50 border border-primary-200 text-primary-900 text-xs">
+                            <span className="material-symbols-outlined text-[18px] text-primary-600 shrink-0">warning</span>
+                            <span>{t('wizard.taxVat.steps.revenue.ukThresholdNotice', "The UK VAT threshold is £90,000. Depending on your sales, you might not need to register immediately, but keep an eye on it.")}</span>
                         </div>
                     )}
                 </div>
@@ -183,7 +197,7 @@ export function TaxVatWizard() {
             currentStep={step}
             categoryRoute="/wizard/tax-vat"
             onNext={() => {
-                if (step === 0) dispatch({ type: "SET_BUSINESS_TYPE", payload: local.sellingModel === "b2b_wholesale" ? "other" : "marketplace" });
+                if (step === 0) dispatch({ type: "SET_BUSINESS_TYPE", payload: local.sellingModels.includes("b2b_wholesale") && local.sellingModels.length === 1 ? "other" : "marketplace" });
                 setStep(s => s + 1);
             }}
             onBack={() => setStep(s => s - 1)}

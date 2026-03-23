@@ -71,8 +71,12 @@ export function WizardRiskStep() {
     const navigate = useNavigate();
     const { profile, dispatch } = useWizard();
 
-    const options = RISK_SIGNALS[profile.category] || [];
-    const headline = CATEGORY_HEADLINE[profile.category] || "What are your main risk areas?";
+    const options = Array.from(new Map(
+        profile.categories.flatMap(cat => RISK_SIGNALS[cat] || []).map(opt => [opt.value, opt])
+    ).values());
+    const headline = profile.categories.length === 1 
+        ? (CATEGORY_HEADLINE[profile.categories[0]] || "What are your main risk areas?")
+        : "What are your main risk areas?";
 
     return (
         <div className="bg-neutral-50 min-h-screen flex flex-col text-neutral-900 font-['Inter',sans-serif]">

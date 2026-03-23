@@ -35,7 +35,7 @@ This plan implements Phase 1 updates for the CompliHub360 platform, covering UI 
 - **Agent**: frontend-specialist
 - **Skill**: frontend-design
 - **INPUT**: `LandingPage.tsx`
-- **OUTPUT**: Moved Partner section up, highlighted "Orkastor", added Video Placeholder.
+- **OUTPUT**: Moved Partner section up, added Video Placeholder.
 - **VERIFY**: Elements are visible above the fold on Desktop preview.
 
 ### Task 3: Wizard Multi-Select (Categories & Sales Channels)

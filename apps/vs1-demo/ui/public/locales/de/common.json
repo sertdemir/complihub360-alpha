@@ -43,7 +43,9 @@
         "title": "Guides & Whitepaper",
         "desc": "Detaillierte Marktanalysen"
       }
-    }
+    },
+    "aiGovernance": "KI Governance",
+    "aiGovDesc": "Unser Framework für transparente und rechtskonforme KI."
   },
   "hero": {
     "scenarios": {
@@ -446,7 +448,7 @@
       "pain2Desc": "Compliance-Anbieter kalt anzuschreiben und wochenlang auf vage Antworten zu warten ist keine Strategie. Es ist ein Haftungsrisiko.",
       "pain3Title": "Wir lösen das",
       "pain3Desc": "Unser KI-Assistent erfasst Ihren Kontext in 4–5 Schritten, kartiert jurisdiktionsgebundene Risiken und verbindet Sie mit SLA-gesicherten Spezialisten innerhalb von 24–48 Stunden.",
-      "diagramTitle": "Der \u201eSicher expandieren\u201c-Pfad",
+      "diagramTitle": "Der „Sicher expandieren“-Pfad",
       "node1Label": "Länder-Gate",
       "node1Desc": "Zielmarkt auswählen",
       "node2Label": "Adaptiver Assistent",
@@ -666,7 +668,7 @@
       "ob4": "Bewertung der Dropshipper-Verantwortung",
       "cov1": "Produkt- & Verpackungsassistent – bewertet Handelsrolle, Zielmärkte, Produktkategorien",
       "cov2": "Berechnet epr_required_likelihood pro Jurisdiktion",
-      "cov3": "Intelligente Randfall-Behandlung: \u201eAnnehme Ja\u201c-Sicherheitslogik f\u00fcr unsichere Dropshipper"
+      "cov3": "Intelligente Randfall-Behandlung: „Annehme Ja“-Sicherheitslogik für unsichere Dropshipper"
     },
     "privacy": {
       "title": "Daten & Datenschutz",
@@ -759,7 +761,7 @@
     "feature4Tag1": "Echtzeit-Assessment",
     "feature4Tag2": "Kuratiertes Matching",
     "transparencyTitle": "Transparenz und Grenzen unserer KI",
-    "transparencyQuote": "\u201eUnsere KI ersetzt nicht Ihren Anwalt. Sie macht Ihren Anwalt 10x effizienter, indem sie perfekt vorstrukturierte digitale Dossiers bereitstellt.\u201c",
+    "transparencyQuote": "„Unsere KI ersetzt nicht Ihren Anwalt. Sie macht Ihren Anwalt 10x effizienter, indem sie perfekt vorstrukturierte digitale Dossiers bereitstellt.“",
     "check1": "Fokus auf strukturierte Orientierung & Dossier-Orchestrierung.",
     "check2": "Fundierter Abruf aus offiziellen, validierten Quellen.",
     "cross1": "Keine verbindliche Rechtsberatung – das obliegt zugelassenen Anwaltskanzleien.",
@@ -946,5 +948,32 @@
     "reviewDesc": "Bestätigen Sie, dass alles richtig aussieht, bevor wir Ihre Ergebnisse generieren.",
     "reviewAnswersButton": "Antworten überprüfen",
     "backToPrevious": "Zurück zum vorherigen Schritt"
+  },
+  "aiGov": {
+    "trustCenter": "CompliHub360 Trust Center",
+    "heroTitle": "KI Governance Framework",
+    "heroDesc": "Wir glauben an verantwortungsvolle Innovation. Unsere Plattform integriert KI streng im Rahmen globaler Vorschriften, Ethik und Transparenz. Entdecken Sie, wie wir die 6 Dimensionen der KI-Governance umsetzen.",
+    "dimTitle": "Die 6 Dimensionen der KI Governance",
+    "dimDesc": "Ein umfassender Ansatz zum Aufbau vertrauenswürdiger KI-Systeme für Unternehmens-Compliance.",
+    "dimEthicsTitle": "Ethische Richtlinien",
+    "dimEthicsDesc": "Unsere KI-Funktionen respektieren die menschliche Autonomie und sollen Experten ergänzen, nicht ersetzen. Wir verhindern systemische Vorurteile durch kontinuierliche Überwachung.",
+    "dimTranspTitle": "Transparenz & Erklärbarkeit",
+    "dimTranspDesc": "Nutzer haben das Recht zu wissen, wann sie mit einer KI interagieren. Jedes KS-generierte Ergebnis auf CompliHub360 ist klar gekennzeichnet und seine Datenquellen sind nachvollziehbar.",
+    "dimOrgTitle": "Organisatorische Verantwortung",
+    "dimOrgDesc": "Klare Governance-Richtlinien definieren, wer KI-Funktionen einsetzen, darauf zugreifen und diese prüfen darf. Wir führen umfassende Audit-Protokolle für alle KI-Interaktionen.",
+    "dimTechTitle": "Technische Robustheit",
+    "dimTechDesc": "Unsere Infrastruktur gewährleistet null Ausfallzeiten und belastbare Fallbacks. Dedizierte Privacy Gates bereinigen alle Eingaben, bevor sie ein LLM erreichen.",
+    "dimRegTitle": "Regulatorische Compliance",
+    "dimRegDesc": "Entwickelt für den EU AI Act und ISO 42001. Wir verankern globale Standards direkt in unserem Code und priorisieren strenge EU- und UK-Datenschutzregeln.",
+    "dimRiskTitle": "Risikomanagement",
+    "dimRiskDesc": "Kontinuierliche Risikobewertung von KI-Modellen. Wir stufen Funktionen nach Risikostufen ein (z. B. EU AI Act High-Risk vs. Minimal-Risk) und wenden proportionale Sicherheitskontrollen an.",
+    "featTitle": "Aktive KI-Funktionen auf CompliHub360",
+    "featDesc": "Wie wir KI heute nutzen, eingebettet in unser strenges Governance-Framework.",
+    "featPrivacyTitle": "Privacy Redaction Pipeline",
+    "featPrivacyDesc": "Bevor jeglicher Geschäftskontext analysiert wird, entfernen unsere lokalen NLP-Modelle alle personenbezogenen Daten (PII). E-Mails, Namen und Telefonnummern verlassen niemals unsere sicheren europäischen Server.",
+    "featIntentTitle": "Intent Analysis Engine",
+    "featIntentDesc": "Wandelt unstrukturierte Kundeneingaben in ein strukturiertes Risikoprofil um. Die KI ist auf die Analyse des Compliance-Kontexts beschränkt und kann keine rechtsverbindlichen Entscheidungen treffen.",
+    "featGateTitle": "Dreifacher KI-Gate-Validator",
+    "featGateDesc": "Jede KI-Aktion muss drei Prüfungen bestehen: Datenbereinigung, ausdrückliche Zustimmung und Domänenbeschränkung. Schlägt eine Prüfung fehl, greift der Workflow auf einen deterministischen Nicht-KI-Prozess zurück."
   }
 }

@@ -6,6 +6,7 @@ import { WizardStepper } from "../../components/wizard/WizardStepper";
 import { WizardFooter } from "../../components/wizard/WizardFooter";
 import { SingleSelectCardGroup } from "../../components/wizard/questions/SingleSelectCardGroup";
 import { FreeText } from "../../components/wizard/questions/FreeText";
+import { YesNoToggle } from "../../components/wizard/questions/YesNoToggle";
 import { Typography } from "../../components/ui/Typography";
 
 const BUSINESS_TYPES = [
@@ -51,7 +52,7 @@ export function WizardContextStep() {
                             onChange={handleTypeChange}
                         />
                         {(profile.businessType === "other" || noteOpen) && (
-                            <div className="animate-in fade-in slide-in-from-bottom-2 duration-200">
+                            <div className="animate-in fade-in slide-in-from-bottom-2 duration-200 mb-6">
                                 <FreeText
                                     label="Tell us more about your business"
                                     description="Optional — helps us suggest the most relevant providers."
@@ -61,6 +62,20 @@ export function WizardContextStep() {
                                 />
                             </div>
                         )}
+                        <div className="pt-6 border-t border-neutral-100">
+                            <div className="flex flex-col gap-2 mb-4">
+                                <Typography variant="h3" className="font-semibold text-lg">
+                                    Already have a provider?
+                                </Typography>
+                                <Typography variant="body" className="text-sm text-neutral-600">
+                                    Are you looking to switch from your current compliance service provider?
+                                </Typography>
+                            </div>
+                            <YesNoToggle
+                                value={profile.existingProvider ? "yes" : "no"}
+                                onChange={(val: "yes" | "no") => dispatch({ type: "SET_EXISTING_PROVIDER", payload: val === "yes" })}
+                            />
+                        </div>
                     </div>
                     <WizardFooter
                         onBack={() => navigate("/wizard/category")}

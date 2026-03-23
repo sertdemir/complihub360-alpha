@@ -170,7 +170,7 @@ export function HeroSection() {
 
         {/* ── Input Container ────────────────────────────────────── */}
         {/* Light Green Master Container for Funnel, CTA, and Pills */}
-        <div className="w-full max-w-[1100px] rounded-[32px] py-3 px-3.5 sm:py-4 sm:px-[1.1rem] lg:py-5 lg:px-[1.375rem] shadow-xl relative z-20 mb-3 sm:mb-4 lg:mb-5 flex flex-col items-center border border-white/50 bg-white/30 backdrop-blur-xl overflow-hidden transform-gpu">
+        <div className="w-full max-w-[1100px] rounded-[32px] py-3 px-3.5 sm:py-4 sm:px-[1.1rem] lg:py-5 lg:px-[1.375rem] shadow-xl relative z-20 mt-12 md:mt-20 mb-3 sm:mb-4 lg:mb-5 flex flex-col items-center border border-white/50 bg-white/30 backdrop-blur-xl overflow-hidden transform-gpu">
 
           <div className="relative z-10 w-full flex flex-col items-center">
 
@@ -229,7 +229,7 @@ export function HeroSection() {
         </div>
 
         {/* ── CTA Button (Static, below input) ─────────────────── */}
-        <div className="flex justify-center w-full mb-[108px] relative group z-20 mt-8">
+        <div className="flex justify-center w-full mb-10 md:mb-14 relative group z-20 mt-4">
           <div className="relative w-full sm:w-auto min-w-[256px] rounded-xl p-[1px] overflow-hidden shadow-[0_0_40px_rgba(250,204,21,0.2)] group-hover:shadow-[0_0_60px_rgba(250,204,21,0.4)] transition-shadow duration-500">
             <span
               className="absolute inset-[-100%] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_50%,#facc15_100%)] pointer-events-none"

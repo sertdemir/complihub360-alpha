@@ -43,7 +43,9 @@
         "title": "Rehberler ve Raporlar",
         "desc": "Pazar detaylarına derinlemesine bakış"
       }
-    }
+    },
+    "aiGovernance": "Yapay Zeka Yönetişimi",
+    "aiGovDesc": "Şeffaf ve uyumlu yapay zeka için çerçevemiz."
   },
   "hero": {
     "scenarios": {
@@ -946,5 +948,32 @@
     "reviewDesc": "Sonuçlarınızı oluşturmadan önce her şeyin doğru göründüğünü onaylayın.",
     "reviewAnswersButton": "Cevapları İncele",
     "backToPrevious": "Önceki adıma dön"
+  },
+  "aiGov": {
+    "trustCenter": "CompliHub360 Trust Center",
+    "heroTitle": "Yapay Zeka Yönetişimi Çerçevesi",
+    "heroDesc": "Sorumlu inovasyona inanıyoruz. Platformumuz, yapay zekayı küresel düzenlemeler, etik ve şeffaflık sınırları içinde sıkı bir şekilde entegre eder. Yapay Zeka Yönetişiminin 6 boyutunu nasıl uyguladığımızı keşfedin.",
+    "dimTitle": "Yapay Zeka Yönetişiminin 6 Boyutu",
+    "dimDesc": "Kurumsal uyumluluk için güvenilir yapay zeka sistemleri oluşturmaya yönelik kapsamlı bir yaklaşım.",
+    "dimEthicsTitle": "Etik Kurallar",
+    "dimEthicsDesc": "Yapay zeka özelliklerimiz insan özerkliğine saygı duyar ve profesyonellerin yerini almak değil, onları desteklemek için tasarlanmıştır. Sürekli izleme ile sistemik önyargıları önleriz.",
+    "dimTranspTitle": "Şeffaflık ve Açıklanabilirlik",
+    "dimTranspDesc": "Kullanıcılar bir yapay zeka ile etkileşime girdiklerinde bunu bilmeyi hak ederler. Üretilen her sonuç açıkça işaretlenir ve veri kaynakları izlenebilir.",
+    "dimOrgTitle": "Kurumsal Hesap Verebilirlik",
+    "dimOrgDesc": "Yapay zeka özelliklerini kimin devreye alabileceğini, erişebileceğini ve denetleyebileceğini net yönetişim hatları belirler. Tüm yapay zeka etkileşimleri için kapsamlı denetim günlükleri (audit logs) tutuyoruz.",
+    "dimTechTitle": "Teknik Sağlamlık",
+    "dimTechDesc": "Altyapımız sıfır kesinti süresi ve dayanıklı yedekler sağlar. Özel Gizlilik Kapıları, herhangi bir LLM'ye ulaşmadan önce tüm girdileri temizler.",
+    "dimRegTitle": "Mevzuat Uyumluluğu",
+    "dimRegDesc": "AB Yapay Zeka Yasası (EU AI Act) ve ISO 42001 için oluşturulmuştur. Küresel standartları doğrudan kodumuza haritalıyor, sıkı AB ve Birleşik Krallık kurallarını önceliklendiriyoruz.",
+    "dimRiskTitle": "Risk Yönetimi",
+    "dimRiskDesc": "Yapay zeka modellerinin sürekli risk değerlendirmesi. Özellikleri risk seviyelerine göre sınıflandırır ve orantılı güvenlik kontrolleri uygularız.",
+    "featTitle": "CompliHub360'taki Aktif Yapay Zeka Özellikleri",
+    "featDesc": "Bugün yapay zekadan nasıl yararlandığımız, sıkı yönetişim çerçevemizle sarmalanmış durumda.",
+    "featPrivacyTitle": "Gizlilik Redaksiyon Hattı",
+    "featPrivacyDesc": "Herhangi bir iş bağlamı analiz edilmeden önce, yerel NLP modellerimiz tüm Kişisel Olarak Tanımlanabilir Bilgileri (PII) çıkarır. E-postalar, isimler ve telefon numaraları güvenli Avrupa sunucularımızdan asla çıkmaz.",
+    "featIntentTitle": "Niyet Analizi Motoru",
+    "featIntentDesc": "Yapılandırılmamış müşteri girdisini yapılandırılmış bir risk profiline dönüştürür. Yapay zeka yalnızca uyumluluk bağlamını analiz etmekle sınırlıdır ve yasal olarak bağlayıcı kararlar alamaz.",
+    "featGateTitle": "Üçlü Yapay Zeka Kapısı Doğrulayıcı",
+    "featGateDesc": "Her yapay zeka eylemi üç kontrolden geçmelidir: Veri Temizliği, Açık Rıza ve Etki Alanı Kısıtlaması. Herhangi bir kontrol başarısız olursa, iş akışı yapay zeka olmayan deterministik bir sürece geri döner."
   }
 }

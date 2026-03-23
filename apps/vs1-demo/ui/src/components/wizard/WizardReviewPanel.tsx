@@ -87,7 +87,7 @@ export function WizardReviewPanel({ onGenerateResults, isGuest = true }: WizardR
             <div className="bg-neutral-50 rounded-xl border border-neutral-200 divide-y divide-neutral-200 overflow-hidden px-4">
                 <ReviewRow label={t('wizard.reviewPanel.primaryCountry', "Primary Country")} value={profile.country} stepPath="/wizard" />
                 <ReviewRow label={t('wizard.reviewPanel.additionalMarkets', "Additional Markets")} value={profile.markets.filter(m => m !== profile.country)} stepPath="/wizard" />
-                <ReviewRow label={t('wizard.reviewPanel.category', "Compliance Category")} value={CATEGORY_LABELS[profile.category] || ""} stepPath="/wizard/category" />
+                <ReviewRow label={t('wizard.reviewPanel.category', "Compliance Category")} value={profile.categories.map(c => CATEGORY_LABELS[c]).join(', ')} stepPath="/wizard/category" />
                 <ReviewRow label={t('wizard.reviewPanel.businessType', "Business Type")} value={BUSINESS_LABELS[profile.businessType] || ""} stepPath="/wizard/context" />
                 <ReviewRow label={t('wizard.reviewPanel.marketScope', "Market Scope")} value={SCOPE_LABELS[profile.marketScope] || ""} stepPath="/wizard/markets" />
                 {profile.riskSignals.length > 0 && (

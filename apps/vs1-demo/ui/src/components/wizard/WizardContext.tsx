@@ -30,7 +30,7 @@ export type Urgency = "today" | "week" | "month" | "researching" | "";
 export interface SearchProfile {
     country: string;
     markets: string[];
-    category: WizardCategory;
+    categories: WizardCategory[];
     businessType: BusinessType;
     businessTypeNote: string;
     marketScope: "local" | "eu" | "global" | "";
@@ -39,12 +39,13 @@ export interface SearchProfile {
     intent: Intent;
     urgency: Urgency;
     note: string;
+    existingProvider: boolean;
 }
 
 const DEFAULT_PROFILE: SearchProfile = {
     country: "",
     markets: [],
-    category: "",
+    categories: [],
     businessType: "",
     businessTypeNote: "",
     marketScope: "",
@@ -53,12 +54,13 @@ const DEFAULT_PROFILE: SearchProfile = {
     intent: "",
     urgency: "",
     note: "",
+    existingProvider: false,
 };
 
 type WizardAction =
     | { type: "SET_COUNTRY"; payload: string }
     | { type: "SET_MARKETS"; payload: string[] }
-    | { type: "SET_CATEGORY"; payload: WizardCategory }
+    | { type: "SET_CATEGORIES"; payload: WizardCategory[] }
     | { type: "SET_BUSINESS_TYPE"; payload: BusinessType }
     | { type: "SET_BUSINESS_TYPE_NOTE"; payload: string }
     | { type: "SET_MARKET_SCOPE"; payload: "local" | "eu" | "global" }
@@ -67,13 +69,14 @@ type WizardAction =
     | { type: "SET_INTENT"; payload: Intent }
     | { type: "SET_URGENCY"; payload: Urgency }
     | { type: "SET_NOTE"; payload: string }
+    | { type: "SET_EXISTING_PROVIDER"; payload: boolean }
     | { type: "RESET" };
 
 function wizardReducer(state: SearchProfile, action: WizardAction): SearchProfile {
     switch (action.type) {
         case "SET_COUNTRY": return { ...state, country: action.payload };
         case "SET_MARKETS": return { ...state, markets: action.payload };
-        case "SET_CATEGORY": return { ...state, category: action.payload, riskSignals: [] };
+        case "SET_CATEGORIES": return { ...state, categories: action.payload, riskSignals: [] };
         case "SET_BUSINESS_TYPE": return { ...state, businessType: action.payload };
         case "SET_BUSINESS_TYPE_NOTE": return { ...state, businessTypeNote: action.payload };
         case "SET_MARKET_SCOPE": return { ...state, marketScope: action.payload };
@@ -82,6 +85,7 @@ function wizardReducer(state: SearchProfile, action: WizardAction): SearchProfil
         case "SET_INTENT": return { ...state, intent: action.payload };
         case "SET_URGENCY": return { ...state, urgency: action.payload };
         case "SET_NOTE": return { ...state, note: action.payload };
+        case "SET_EXISTING_PROVIDER": return { ...state, existingProvider: action.payload };
         case "RESET": return DEFAULT_PROFILE;
         default: return state;
     }

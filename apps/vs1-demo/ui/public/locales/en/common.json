@@ -43,7 +43,9 @@
         "title": "Guides & Whitepapers",
         "desc": "In-depth market deep-dives"
       }
-    }
+    },
+    "aiGovernance": "AI Governance",
+    "aiGovDesc": "Our framework for transparent and compliant AI."
   },
   "hero": {
     "scenarios": {
@@ -946,5 +948,32 @@
     "reviewDesc": "Confirm everything looks right before we generate your results.",
     "reviewAnswersButton": "Review Answers",
     "backToPrevious": "Back to previous step"
+  },
+  "aiGov": {
+    "trustCenter": "CompliHub360 Trust Center",
+    "heroTitle": "AI Governance Framework",
+    "heroDesc": "We believe in responsible innovation. Our platform integrates AI strictly within the bounds of global regulations, ethics, and transparency. Discover how we implement the 6 dimensions of AI Governance.",
+    "dimTitle": "The 6 Dimensions of AI Governance",
+    "dimDesc": "A comprehensive approach to building trustworthy AI systems for enterprise compliance.",
+    "dimEthicsTitle": "Ethical Guidelines",
+    "dimEthicsDesc": "Our AI features respect human autonomy and are designed to augment professionals, not replace them. We prevent systemic bias through continuous monitoring.",
+    "dimTranspTitle": "Transparency & Explainability",
+    "dimTranspDesc": "Users deserve to know when they are interacting with AI. Every AI-generated output on CompliHub360 is clearly marked, and its data sources are traceable.",
+    "dimOrgTitle": "Organizational Accountability",
+    "dimOrgDesc": "Clear governance pipelines dictate who can deploy, access, and audit AI features. We maintain comprehensive audit logs for all AI interactions.",
+    "dimTechTitle": "Technical Robustness",
+    "dimTechDesc": "Our infrastructure ensures zero downtime and resilient fallbacks. Dedicated Privacy Gates sanitize all inputs before they reach any LLM.",
+    "dimRegTitle": "Regulatory Compliance",
+    "dimRegDesc": "Built for the EU AI Act and ISO 42001. We map global standards directly into our Code, prioritizing strict EU and UK privacy rules.",
+    "dimRiskTitle": "Risk Management",
+    "dimRiskDesc": "Continuous risk assessment of AI models. We classify features by risk tiers (e.g., EU AI Act High-Risk vs. Minimal-Risk) and apply proportional security controls.",
+    "featTitle": "Active AI Features on CompliHub360",
+    "featDesc": "How we leverage AI today, wrapped in our strict governance framework.",
+    "featPrivacyTitle": "Privacy Redaction Pipeline",
+    "featPrivacyDesc": "Before any business context is analyzed, our local NLP models strip out all Personally Identifiable Information (PII). Emails, names, and phone numbers never leave our secure European servers.",
+    "featIntentTitle": "Intent Analysis Engine",
+    "featIntentDesc": "Transforms unstructured client input into a structured risk profile. The AI is restricted to analyzing compliance context and cannot make binding legal decisions on its own.",
+    "featGateTitle": "Triple AI Gate Validator",
+    "featGateDesc": "Every AI action must pass three checks: Data Sanitization, Explicit Consent, and Domain Restriction. If any check fails, the workflow gracefully falls back to a deterministic, non-AI process."
   }
 }

@@ -43,7 +43,9 @@
         "title": "Guías y Reportes",
         "desc": "Análisis profundo de los mercados"
       }
-    }
+    },
+    "aiGovernance": "Gobernanza de IA",
+    "aiGovDesc": "Nuestro marco para una IA transparente y conforme a la ley."
   },
   "hero": {
     "scenarios": {
@@ -946,5 +948,32 @@
     "reviewDesc": "Confirme que todo se ve bien antes de generar sus resultados.",
     "reviewAnswersButton": "Revisar Respuestas",
     "backToPrevious": "Volver al paso anterior"
+  },
+  "aiGov": {
+    "trustCenter": "CompliHub360 Trust Center",
+    "heroTitle": "Marco de Gobernanza de IA",
+    "heroDesc": "Creemos en la innovación responsable. Nuestra plataforma integra la IA estrictamente dentro de los límites de las regulaciones globales, la ética y la transparencia. Descubra cómo implementamos las 6 dimensiones de la Gobernanza de IA.",
+    "dimTitle": "Las 6 Dimensiones de la Gobernanza de IA",
+    "dimDesc": "Un enfoque integral para construir sistemas de IA confiables para el cumplimiento empresarial.",
+    "dimEthicsTitle": "Pautas Éticas",
+    "dimEthicsDesc": "Nuestras características de IA respetan la autonomía humana y están diseñadas para aumentar a los profesionales, no para reemplazarlos. Prevenimos el sesgo sistémico mediante monitoreo continuo.",
+    "dimTranspTitle": "Transparencia y Explicabilidad",
+    "dimTranspDesc": "Los usuarios merecen saber cuándo interactúan con IA. Cada resultado generado por IA está claramente marcado y sus fuentes de datos son rastreables.",
+    "dimOrgTitle": "Responsabilidad Organizacional",
+    "dimOrgDesc": "Las pautas de gobernanza claras dictan quién puede implementar, acceder y auditar las características de IA. Mantenemos registros de auditoría completos para todas las interacciones de IA.",
+    "dimTechTitle": "Robustez Técnica",
+    "dimTechDesc": "Nuestra infraestructura garantiza cero tiempo de inactividad y alternativas resilientes. Las Privacy Gates dedican a sanitizar todas las entradas antes de que lleguen a cualquier LLM.",
+    "dimRegTitle": "Cumplimiento Normativo",
+    "dimRegDesc": "Desarrollado para la Ley de IA de la UE y la norma ISO 42001. Mapeamos estándares globales directamente en nuestro código, priorizando las estrictas reglas de privacidad de la UE y el Reino Unido.",
+    "dimRiskTitle": "Gestión de Riesgos",
+    "dimRiskDesc": "Evaluación continua de riesgos de los modelos de IA. Clasificamos las características por niveles de riesgo y aplicamos controles de seguridad proporcionales.",
+    "featTitle": "Características activas de IA en CompliHub360",
+    "featDesc": "Cómo aprovechamos la IA hoy, envuelta en nuestro estricto marco de gobernanza.",
+    "featPrivacyTitle": "Pipeline de Redacción de Privacidad",
+    "featPrivacyDesc": "Antes de analizar cualquier contexto comercial, nuestros modelos eliminan toda la Información de Identificación Personal (PII). Los correos electrónicos, nombres y números de teléfono nunca salen de nuestros servidores europeos seguros.",
+    "featIntentTitle": "Motor de Análisis de Intenciones",
+    "featIntentDesc": "Transforma la entrada no estructurada del cliente en un perfil de riesgo estructurado. La IA está restringida y no puede tomar decisiones legales vinculantes por sí sola.",
+    "featGateTitle": "Validador Triple de Puertas de IA",
+    "featGateDesc": "Cada acción de IA debe pasar tres controles: Sanitización de datos, Consentimiento explícito y Restricción de dominio. Si falla algún control, el flujo de trabajo recurre elegantemente a un proceso determinista sin IA."
   }
 }

@@ -13,6 +13,7 @@ import { MultiSelectChips } from "../../components/wizard/questions/MultiSelectC
 import { CountryMultiSelect } from "../../components/wizard/questions/CountryMultiSelect";
 import { RangeSelector } from "../../components/wizard/questions/RangeSelector";
 import { FreeText } from "../../components/wizard/questions/FreeText";
+import { YesNoToggle } from "../../components/wizard/questions/YesNoToggle";
 import { Typography } from "../../components/ui/Typography";
 import type { WizardCategory } from "../../components/wizard/WizardContext";
 
@@ -142,8 +143,13 @@ export function GenericWizardFlow() {
     const RISK_SIGNALS = getRiskSignals(t);
     const CATEGORY_HEADLINE = getCategoryHeadline(t);
 
-    const riskOptions = RISK_SIGNALS[profile.category] || [];
-    const riskHeadline = CATEGORY_HEADLINE[profile.category] || t('wizard.headlines.default', "What are your main risk areas?");
+    const riskOptions = Array.from(new Map(
+        profile.categories.flatMap(cat => RISK_SIGNALS[cat] || []).map(opt => [opt.value, opt])
+    ).values());
+    
+    const riskHeadline = profile.categories.length === 1 
+        ? (CATEGORY_HEADLINE[profile.categories[0]] || t('wizard.headlines.default', "What are your main risk areas?"))
+        : t('wizard.headlines.default', "What are your main risk areas?");
 
     const handleTypeChange = (val: string) => {
         dispatch({ type: "SET_BUSINESS_TYPE", payload: val as BusinessType });
@@ -184,7 +190,7 @@ export function GenericWizardFlow() {
                         onChange={handleTypeChange}
                     />
                     {(profile.businessType === "other" || noteOpen) && (
-                        <div className="animate-in fade-in slide-in-from-bottom-2 duration-200">
+                        <div className="animate-in fade-in slide-in-from-bottom-2 duration-200 mb-6">
                             <FreeText
                                 label={t('wizard.steps.context.freeTextLabel', "Tell us more about your business")}
                                 description={t('wizard.steps.context.freeTextDesc', "Optional — helps us suggest the most relevant providers.")}
@@ -194,6 +200,20 @@ export function GenericWizardFlow() {
                             />
                         </div>
                     )}
+                    <div className="pt-6 border-t border-neutral-100">
+                        <div className="flex flex-col gap-2 mb-4">
+                            <Typography variant="h3" className="font-semibold text-lg">
+                                Already have a provider?
+                            </Typography>
+                            <Typography variant="body" className="text-sm text-neutral-600">
+                                Are you looking to switch from your current compliance service provider?
+                            </Typography>
+                        </div>
+                        <YesNoToggle
+                            value={profile.existingProvider ? "yes" : "no"}
+                            onChange={(val: "yes" | "no") => dispatch({ type: "SET_EXISTING_PROVIDER", payload: val === "yes" })}
+                        />
+                    </div>
                 </div>
             ),
         },
