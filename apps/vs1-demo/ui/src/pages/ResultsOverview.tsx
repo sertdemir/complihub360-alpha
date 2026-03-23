@@ -1,34 +1,32 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { Typography } from "../components/ui/Typography";
+import { Button } from "../components/ui/Button";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../components/ui/Card";
 import { EngagementModal } from "../components/EngagementModal";
-import { getSearchResults, SearchResults, Finding, LawInfo, ArticleInfo, TipInfo, ProviderInfo } from "../services/resultsService";
+import { getSearchResults, SearchResults, LawInfo, ArticleInfo, TipInfo, ProviderInfo } from "../services/resultsService";
 import { SearchProfile } from "../components/wizard/WizardContext";
 
 type TabId = "overview" | "laws" | "articles" | "tips";
 
-const TABS: { id: TabId; label: string }[] = [
-    { id: "overview", label: "Overview (AI)" },
-    { id: "laws", label: "Laws & Regulations" },
-    { id: "articles", label: "Articles & Tutorials" },
-    { id: "tips", label: "Actionable Tips" },
+const TABS: { id: TabId; label: string; icon: string }[] = [
+    { id: "overview", label: "Overview (AI)", icon: "auto_awesome" },
+    { id: "laws", label: "Laws & Regulations", icon: "account_balance" },
+    { id: "articles", label: "Articles & Tutorials", icon: "menu_book" },
+    { id: "tips", label: "Actionable Tips", icon: "lightbulb" },
 ];
 
 export function ResultsOverview() {
     const navigate = useNavigate();
     const location = useLocation();
-    
-    // Extract profile from router state (passed from wizard)
     const profile = location.state?.searchProfile as SearchProfile | undefined;
 
     const [activeTab, setActiveTab] = useState<TabId>("overview");
     const [modalProvider, setModalProvider] = useState<string | null>(null);
-
-    // Data state
     const [loading, setLoading] = useState(true);
     const [results, setResults] = useState<SearchResults | null>(null);
 
     useEffect(() => {
-        // Fetch dynamic results based on the wizard profile
         let isMounted = true;
         setLoading(true);
 
@@ -44,317 +42,284 @@ export function ResultsOverview() {
                 if (isMounted) setLoading(false);
             });
 
-        return () => {
-            isMounted = false;
-        };
+        return () => { isMounted = false; };
     }, [profile]);
 
     return (
-        <div className="bg-[#f5f7f8] dark:bg-[#101922] text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-['Inter',sans-serif]">
+        <div className="min-h-screen bg-neutral-50 font-sans">
             {modalProvider && (
                 <EngagementModal
                     providerName={modalProvider}
                     onClose={() => setModalProvider(null)}
                 />
             )}
-            <div className="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
-                <div className="layout-container flex h-full grow flex-col">
 
-                    {/* Top Nav */}
-                    <header className="flex items-center justify-between whitespace-nowrap border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-3 sticky top-0 z-10">
-                        <div className="flex items-center gap-8 w-full max-w-[1440px] mx-auto">
-                            <div
-                                className="flex items-center gap-4 text-[#0a7ff5] cursor-pointer"
-                                onClick={() => navigate("/")}
-                            >
-                                <div className="size-6 flex items-center justify-center">
-                                    <span className="material-symbols-outlined text-2xl">policy</span>
-                                </div>
-                                <h2 className="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-[-0.015em]">
-                                    CompliHub360
-                                </h2>
-                            </div>
+            {/* Loading State */}
+            {loading && (
+                <div className="flex flex-col items-center justify-center py-32 px-4">
+                    <div className="w-16 h-16 rounded-full bg-primary-50 border-2 border-primary-200 flex items-center justify-center mb-6 animate-pulse">
+                        <span className="material-symbols-outlined text-3xl text-primary-500">search</span>
+                    </div>
+                    <Typography variant="h2" weight="semibold" className="mb-2 text-center">
+                        Generating Compliance Overview…
+                    </Typography>
+                    <Typography variant="body" className="text-neutral-500 text-center max-w-md">
+                        Connecting to legal databases and processing your wizard profile.
+                    </Typography>
+                </div>
+            )}
 
-                            {/* Search */}
-                            <div className="flex flex-col min-w-40 h-10 w-full max-w-xl mx-auto hidden md:flex">
-                                <div className="flex w-full flex-1 items-stretch rounded-lg h-full border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 transition-colors">
-                                    <div className="text-slate-500 dark:text-slate-400 flex items-center justify-center">
-                                        <span className="material-symbols-outlined">search</span>
-                                    </div>
-                                    <div className="flex items-center pl-3 w-full text-sm text-slate-700 dark:text-slate-300 truncate">
-                                        {loading ? "Analyzing profile..." : (results?.queryText || "Search compliance requirements...")}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center justify-end gap-4 ml-auto">
-                                <button className="p-2 text-slate-500 dark:text-slate-400 hover:text-[#0a7ff5] transition-colors hidden sm:block">
-                                    <span className="material-symbols-outlined">notifications</span>
-                                </button>
-                                <div
-                                    className="w-10 h-10 rounded-full border-2 border-slate-200 dark:border-slate-700 bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 font-bold cursor-pointer"
-                                    onClick={() => navigate("/dashboard")}
-                                >
-                                    U
-                                </div>
-                            </div>
+            {!loading && results && (
+                <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 py-8">
+                    {/* Page Header */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                        <div className="flex flex-col gap-1">
+                            <Typography variant="h1" weight="bold">
+                                Compliance Overview
+                            </Typography>
+                            <Typography variant="body" className="text-neutral-500">
+                                AI Summary based on your provided context: <span className="font-semibold text-neutral-700">{results.queryText}</span>
+                            </Typography>
                         </div>
-                    </header>
+                        <RiskBadge level={results.riskLevel} />
+                    </div>
 
-                    {/* Main Content */}
-                    <div className="flex flex-1 w-full max-w-[1440px] mx-auto px-4 sm:px-6 py-6 gap-6 flex-col lg:flex-row">
-                        
-                        {/* Loading State */}
-                        {loading && (
-                            <div className="flex-1 flex flex-col items-center justify-center py-24 min-w-0">
-                                <span className="material-symbols-outlined text-4xl text-[#0a7ff5] animate-spin mb-4">progress_activity</span>
-                                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Generating AI Compliance Overview...</h2>
-                                <p className="text-slate-500 mt-2">Connecting to legal databases and processing your wizard profile.</p>
+                    {/* Tabs */}
+                    <div className="border-b border-neutral-200 mb-6">
+                        <div className="flex gap-1 overflow-x-auto -mb-px">
+                            {TABS.map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`flex items-center gap-2 px-4 py-3 border-b-2 text-ui-small font-medium whitespace-nowrap transition-colors ${
+                                        activeTab === tab.id
+                                            ? "border-primary-500 text-primary-500"
+                                            : "border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300"
+                                    }`}
+                                >
+                                    <span className="material-symbols-outlined text-[18px]">{tab.icon}</span>
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Content + Sidebar */}
+                    <div className="flex flex-col lg:flex-row gap-8">
+                        {/* Main Content */}
+                        <div className="flex-1 min-w-0">
+                            {activeTab === "overview" && <OverviewTab results={results} />}
+                            {activeTab === "laws" && <LawsTab laws={results.laws} />}
+                            {activeTab === "articles" && <ArticlesTab articles={results.articles} />}
+                            {activeTab === "tips" && <TipsTab tips={results.tips} />}
+                        </div>
+
+                        {/* Provider Sidebar */}
+                        <aside className="w-full lg:w-[360px] shrink-0">
+                            <div className="sticky top-24 flex flex-col gap-4">
+                                <Typography variant="h3" weight="semibold" className="px-1">
+                                    Top Matching Providers
+                                </Typography>
+                                {results.providers.map(p => (
+                                    <ProviderCard key={p.name} provider={p} onRequest={() => setModalProvider(p.name)} />
+                                ))}
                             </div>
-                        )}
-
-                        {!loading && results && (
-                            <>
-                                {/* Left Pane */}
-                                <div className="flex-1 flex flex-col min-w-0">
-                                    {/* Tabs */}
-                                    <div className="pb-4 border-b border-slate-200 dark:border-slate-800 sticky top-[65px] bg-[#f5f7f8] dark:bg-[#101922] z-10 pt-2">
-                                        <div className="flex gap-6 overflow-x-auto">
-                                            {TABS.map(tab => (
-                                                <button
-                                                    key={tab.id}
-                                                    onClick={() => setActiveTab(tab.id)}
-                                                    className={`flex flex-col items-center justify-center border-b-[3px] pb-3 pt-2 whitespace-nowrap transition-colors text-sm font-semibold tracking-[0.015em] ${activeTab === tab.id
-                                                        ? "border-b-[#0a7ff5] text-[#0a7ff5] font-bold"
-                                                        : "border-b-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
-                                                        }`}
-                                                >
-                                                    {tab.label}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Content Routing based on Tabs */}
-                                    <div className="py-6 flex flex-col gap-6">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                            <h1 className="text-slate-900 dark:text-white tracking-tight text-3xl font-bold leading-tight">
-                                                Compliance Overview
-                                            </h1>
-                                            {results.riskLevel === "High" && (
-                                                <div className="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 px-4 border border-red-200 dark:border-red-800/50">
-                                                    <span className="material-symbols-outlined text-sm">error</span>
-                                                    <p className="text-sm font-semibold leading-normal">Risk Level: High</p>
-                                                </div>
-                                            )}
-                                            {results.riskLevel === "Medium" && (
-                                                <div className="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 px-4 border border-amber-200 dark:border-amber-800/50">
-                                                    <span className="material-symbols-outlined text-sm">warning</span>
-                                                    <p className="text-sm font-semibold leading-normal">Risk Level: Medium</p>
-                                                </div>
-                                            )}
-                                            {results.riskLevel === "Low" && (
-                                                <div className="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-4 border border-green-200 dark:border-green-800/50">
-                                                    <span className="material-symbols-outlined text-sm">check_circle</span>
-                                                    <p className="text-sm font-semibold leading-normal">Risk Level: Low</p>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <p className="text-slate-600 dark:text-slate-400 text-base font-normal leading-relaxed">
-                                            AI Summary based on your provided context: <span className="font-semibold text-slate-800 dark:text-slate-200">{results.queryText}</span>.
-                                        </p>
-
-                                        {/* Tab Content Rendering */}
-                                        {activeTab === "overview" && <OverviewTabContent results={results} />}
-                                        {activeTab === "laws" && <LawsTabContent laws={results.laws} />}
-                                        {activeTab === "articles" && <ArticlesTabContent articles={results.articles} />}
-                                        {activeTab === "tips" && <TipsTabContent tips={results.tips} />}
-
-                                    </div>
-                                </div>
-
-                                {/* Right Pane: Provider Sidebar */}
-                                <div className="w-full lg:w-1/3 xl:w-[400px] flex-shrink-0">
-                                    <div className="sticky top-[88px] flex flex-col gap-4">
-                                        <h2 className="text-slate-900 dark:text-white text-xl font-bold leading-tight px-1">
-                                            Top Matching Providers
-                                        </h2>
-                                        <div className="flex flex-col gap-4">
-                                            {results.providers.map(p => (
-                                                <div
-                                                    key={p.name}
-                                                    className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm hover:border-[#0a7ff5]/50 transition-colors"
-                                                >
-                                                    <div className="flex justify-between items-start mb-3">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="w-10 h-10 rounded bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[#0a7ff5] font-bold text-lg">
-                                                                {p.initial}
-                                                            </div>
-                                                            <div>
-                                                                <h3 className="text-slate-900 dark:text-white font-semibold">{p.name}</h3>
-                                                                <p className="text-xs text-slate-500 dark:text-slate-400">{p.type}</p>
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex items-center gap-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-1 rounded text-xs font-bold">
-                                                            <span className="material-symbols-outlined text-[14px]">check_circle</span>
-                                                            {p.match}%
-                                                        </div>
-                                                    </div>
-                                                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 line-clamp-2">{p.desc}</p>
-                                                    {p.primary ? (
-                                                        <button
-                                                            onClick={() => setModalProvider(p.name)}
-                                                            className="w-full bg-[#0a7ff5] hover:bg-[#0a7ff5]/90 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
-                                                        >
-                                                            Request Proposal
-                                                            <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                                                        </button>
-                                                    ) : (
-                                                        <button className="w-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700">
-                                                            View Profile
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            </>
-                        )}
-
+                        </aside>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }
 
-// --------------------------------------------------------------------------------------
-// Sub-Components for Tabs
-// --------------------------------------------------------------------------------------
+// ─── Sub-Components ───────────────────────────────────────────────────────────
 
-function OverviewTabContent({ results }: { results: SearchResults }) {
+function RiskBadge({ level }: { level: "Low" | "Medium" | "High" }) {
+    const styles = {
+        Low:    "bg-success-bg text-success-700 border-success-500/30",
+        Medium: "bg-warning-bg text-warning-700 border-warning-500/30",
+        High:   "bg-error-bg text-error-700 border-error-500/30",
+    };
+    const icons = { Low: "check_circle", Medium: "warning", High: "error" };
+
     return (
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-sm">
-            <div className="max-w-none">
-                <h3 className="text-xl font-semibold mb-4 text-slate-900 dark:text-white">Key Findings</h3>
-                <ul className="space-y-4 list-none pl-0">
+        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-pill border text-ui-small font-semibold ${styles[level]}`}>
+            <span className="material-symbols-outlined text-[16px]">{icons[level]}</span>
+            Risk Level: {level}
+        </div>
+    );
+}
+
+function OverviewTab({ results }: { results: SearchResults }) {
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Key Findings</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <ul className="space-y-5 list-none pl-0">
                     {results.findings.map(item => (
                         <li key={item.n} className="flex gap-4">
-                            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-[#0a7ff5]/10 text-[#0a7ff5] flex items-center justify-center font-bold">
+                            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary-50 text-primary-500 flex items-center justify-center font-bold text-ui-small border border-primary-200">
                                 {item.n}
                             </span>
                             <div>
-                                <strong className="text-slate-900 dark:text-slate-100 block mb-1">{item.title}</strong>
-                                <p className="text-slate-600 dark:text-slate-300 m-0">
+                                <Typography variant="body" weight="semibold" as="strong" className="block mb-1">
+                                    {item.title}
+                                </Typography>
+                                <Typography variant="ui-small" className="text-neutral-600">
                                     {item.text}{" "}
-                                    <a className="text-[#0a7ff5] hover:underline font-medium" href="#">
+                                    <a className="text-primary-500 hover:underline font-medium" href="#">
                                         {item.ref}
                                     </a>
-                                </p>
+                                </Typography>
                             </div>
                         </li>
                     ))}
                 </ul>
-                <div className="mt-8 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-800">
-                    <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+
+                <div className="mt-8 p-4 bg-accent-50 rounded-lg border border-accent-200">
+                    <Typography variant="caption" weight="semibold" className="text-accent-700 mb-2 block">
                         Recommended Immediate Action
-                    </h4>
-                    <p className="text-slate-700 dark:text-slate-300 m-0">
+                    </Typography>
+                    <Typography variant="ui-small" className="text-neutral-700">
                         {results.actionRecommendation}
-                    </p>
+                    </Typography>
                 </div>
-            </div>
-        </div>
+            </CardContent>
+        </Card>
     );
 }
 
-function LawsTabContent({ laws }: { laws: LawInfo[] }) {
+function LawsTab({ laws }: { laws: LawInfo[] }) {
+    if (laws.length === 0) return <EmptyState text="No laws found mapping directly to your profile." />;
+
     return (
         <div className="flex flex-col gap-4">
             {laws.map((law, idx) => (
-                <div key={idx} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
-                    <div className="flex justify-between items-start gap-4">
-                        <div className="flex flex-col gap-1">
-                            <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                                <span className="material-symbols-outlined text-[#0a7ff5] text-[20px]">account_balance</span>
-                                {law.title}
-                            </h3>
-                            <p className="text-slate-600 dark:text-slate-400 text-sm">{law.description}</p>
+                <Card key={idx}>
+                    <CardContent className="pt-5">
+                        <div className="flex justify-between items-start gap-4">
+                            <div className="flex items-start gap-3">
+                                <div className="w-9 h-9 rounded-md bg-primary-50 border border-primary-200 flex items-center justify-center shrink-0">
+                                    <span className="material-symbols-outlined text-lg text-primary-500">account_balance</span>
+                                </div>
+                                <div>
+                                    <Typography variant="body" weight="semibold">{law.title}</Typography>
+                                    <Typography variant="ui-small" className="text-neutral-500 mt-0.5">{law.description}</Typography>
+                                </div>
+                            </div>
+                            <span className="shrink-0 px-2 py-1 bg-neutral-100 text-neutral-600 rounded-sm text-caption font-semibold">
+                                {law.level}
+                            </span>
                         </div>
-                        <span className="shrink-0 px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded text-xs font-semibold">
-                            {law.level}
-                        </span>
-                    </div>
-                </div>
+                    </CardContent>
+                </Card>
             ))}
-            {laws.length === 0 && (
-                <div className="text-slate-500 py-8 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
-                    No laws found mapping directly to your profile.
-                </div>
-            )}
         </div>
     );
 }
 
-function ArticlesTabContent({ articles }: { articles: ArticleInfo[] }) {
+function ArticlesTab({ articles }: { articles: ArticleInfo[] }) {
+    if (articles.length === 0) return <EmptyState text="No articles currently map to your specific scenario." />;
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {articles.map((article, idx) => (
-                <div key={idx} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer flex flex-col justify-between">
-                    <div>
-                        <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-2 line-clamp-2">
+                <Card key={idx} className="hover:shadow-md transition-shadow cursor-pointer flex flex-col justify-between">
+                    <CardContent className="pt-5 flex-1">
+                        <Typography variant="body" weight="semibold" className="mb-2 line-clamp-2">
                             {article.title}
-                        </h3>
-                        <p className="text-slate-600 dark:text-slate-400 text-sm line-clamp-3 mb-4">
+                        </Typography>
+                        <Typography variant="ui-small" className="text-neutral-500 line-clamp-3">
                             {article.excerpt}
-                        </p>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
+                        </Typography>
+                    </CardContent>
+                    <div className="flex items-center gap-2 text-caption text-neutral-400 px-6 pb-4 pt-2 border-t border-neutral-100">
                         <span className="material-symbols-outlined text-[14px]">schedule</span>
                         {article.readTime}
                     </div>
-                </div>
+                </Card>
             ))}
-            {articles.length === 0 && (
-                <div className="text-slate-500 py-8 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl col-span-full">
-                    No articles currently map to your specific scenario.
-                </div>
-            )}
         </div>
     );
 }
 
-function TipsTabContent({ tips }: { tips: TipInfo[] }) {
+function TipsTab({ tips }: { tips: TipInfo[] }) {
+    if (tips.length === 0) return <EmptyState text="No actionable tips found for your specific profile yet." />;
+
+    const iconMap = { action: "build", warning: "warning", info: "lightbulb" };
+    const bgMap = {
+        action: "bg-primary-50 text-primary-500 border-primary-200",
+        warning: "bg-warning-bg text-warning-700 border-warning-500/30",
+        info: "bg-neutral-100 text-neutral-600 border-neutral-200",
+    };
+
     return (
         <div className="flex flex-col gap-4">
             {tips.map((tip, idx) => (
-                <div key={idx} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm flex items-start gap-4">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-                        tip.type === 'action' ? 'bg-[#0a7ff5]/10 text-[#0a7ff5]' : 
-                        tip.type === 'warning' ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30' : 
-                        'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
-                    }`}>
-                        <span className="material-symbols-outlined text-[20px]">
-                            {tip.type === 'action' ? 'build' : tip.type === 'warning' ? 'warning' : 'lightbulb'}
-                        </span>
-                    </div>
-                    <div>
-                        <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-1">
-                            {tip.title}
-                        </h3>
-                        <p className="text-slate-600 dark:text-slate-400 text-sm">
-                            {tip.description}
-                        </p>
-                    </div>
-                </div>
+                <Card key={idx}>
+                    <CardContent className="pt-5 flex items-start gap-4">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 border ${bgMap[tip.type]}`}>
+                            <span className="material-symbols-outlined text-[20px]">{iconMap[tip.type]}</span>
+                        </div>
+                        <div>
+                            <Typography variant="body" weight="semibold" className="mb-1">{tip.title}</Typography>
+                            <Typography variant="ui-small" className="text-neutral-500">{tip.description}</Typography>
+                        </div>
+                    </CardContent>
+                </Card>
             ))}
-            {tips.length === 0 && (
-                <div className="text-slate-500 py-8 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
-                    No actionable tips found for your specific profile yet.
+        </div>
+    );
+}
+
+function ProviderCard({ provider, onRequest }: { provider: ProviderInfo; onRequest: () => void }) {
+    return (
+        <Card className="hover:border-primary-300 transition-colors">
+            <CardContent className="pt-5">
+                <div className="flex justify-between items-start mb-3">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-md bg-primary-50 border border-primary-200 flex items-center justify-center text-primary-500 font-bold text-h3">
+                            {provider.initial}
+                        </div>
+                        <div>
+                            <Typography variant="ui-small" weight="semibold" as="h4" className="text-neutral-900">
+                                {provider.name}
+                            </Typography>
+                            <Typography variant="caption" className="text-neutral-400 normal-case tracking-normal">
+                                {provider.type}
+                            </Typography>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-1 bg-success-bg text-success-700 px-2 py-1 rounded-sm text-caption font-bold">
+                        <span className="material-symbols-outlined text-[14px]">check_circle</span>
+                        {provider.match}%
+                    </div>
                 </div>
-            )}
+                <Typography variant="ui-small" className="text-neutral-500 mb-4 line-clamp-2">
+                    {provider.desc}
+                </Typography>
+                {provider.primary ? (
+                    <Button variant="primary" fullWidth onClick={onRequest} className="gap-2">
+                        Request Proposal
+                        <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                    </Button>
+                ) : (
+                    <Button variant="outline" fullWidth className="gap-2">
+                        View Profile
+                    </Button>
+                )}
+            </CardContent>
+        </Card>
+    );
+}
+
+function EmptyState({ text }: { text: string }) {
+    return (
+        <div className="py-12 text-center border-2 border-dashed border-neutral-200 rounded-xl">
+            <span className="material-symbols-outlined text-3xl text-neutral-300 mb-2 block">search_off</span>
+            <Typography variant="ui-small" className="text-neutral-400">{text}</Typography>
         </div>
     );
 }
