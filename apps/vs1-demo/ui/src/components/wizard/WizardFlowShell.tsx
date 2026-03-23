@@ -125,7 +125,10 @@ export function WizardFlowShell({
                                             </div>
                                         </div>
                                         <WizardReviewPanel
-                                            onGenerateResults={() => navigate("/results", { state: { searchProfile: profile } })}
+                                            onGenerateResults={() => {
+                                                const locale = window.location.pathname.split('/')[1] || 'en';
+                                                navigate(`/${locale}/results`, { state: { searchProfile: profile } });
+                                            }}
                                             isGuest={true}
                                         />
                                     </>

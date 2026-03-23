@@ -10,7 +10,8 @@ export function WizardReviewStep() {
     const { profile } = useWizard();
 
     const handleGenerate = () => {
-        navigate("/results", { state: { searchProfile: profile } });
+        const locale = window.location.pathname.split('/')[1] || 'en';
+        navigate(`/${locale}/results`, { state: { searchProfile: profile } });
     };
 
     return (

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Typography } from "../../components/ui/Typography";
 import { Button } from "../../components/ui/Button";
@@ -538,6 +538,7 @@ function BenefitsPanel({ role }: { role: Role }) {
 
 export function RegisterPage() {
     const navigate = useNavigate();
+    const location = useLocation();
     const [role, setRole] = useState<Role>("user");
     const [step, setStep] = useState(0);
     const [direction, setDirection] = useState(1);
@@ -564,7 +565,17 @@ export function RegisterPage() {
         if (isLastStep) {
             setLoading(true);
             const email = role === "user" ? userData.email : partnerData.email;
-            setTimeout(() => navigate("/verify-email", { state: { email } }), 1000);
+            localStorage.setItem("is_logged_in", "true");
+            const queryParams = new URLSearchParams(location.search);
+            const redirectTarget = queryParams.get("redirect");
+
+            setTimeout(() => {
+                if (redirectTarget) {
+                    navigate(redirectTarget);
+                } else {
+                    navigate("/verify-email", { state: { email } });
+                }
+            }, 1000);
         } else {
             setDirection(1);
             setStep(s => s + 1);

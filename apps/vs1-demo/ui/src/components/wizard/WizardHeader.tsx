@@ -48,7 +48,10 @@ export function WizardHeader() {
 
                 {/* Exit link */}
                 <button
-                    onClick={() => navigate("/results")}
+                    onClick={() => {
+                        const locale = window.location.pathname.split('/')[1] || 'en';
+                        navigate(`/${locale}/results`);
+                    }}
                     className="text-sm font-medium text-neutral-500 hover:text-neutral-900 flex items-center gap-1 transition-colors"
                 >
                     <span className="material-symbols-outlined text-base">arrow_forward</span>

@@ -79,6 +79,16 @@ export function HeroSection() {
     navigate(`/wizard?category=${category}&country=${country}`);
   };
 
+  const handleRequestExpert = () => {
+    const isLogged = localStorage.getItem("is_logged_in") === "true";
+    const wizUrl = `/wizard?category=${category}&country=${country}&intent=expert`;
+    if (isLogged) {
+      navigate(wizUrl);
+    } else {
+      navigate(`/register?intent=expert&redirect=${encodeURIComponent(wizUrl)}`);
+    }
+  };
+
   return (
     <section className="bg-transparent relative min-h-screen flex flex-col justify-center pt-28 desktop-s:pt-36 pb-16 desktop-s:pb-24 overflow-hidden z-10">
 
