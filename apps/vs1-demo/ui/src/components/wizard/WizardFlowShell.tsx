@@ -126,7 +126,9 @@ export function WizardFlowShell({
                                         </div>
                                         <WizardReviewPanel
                                             onGenerateResults={() => {
-                                                const locale = window.location.pathname.split('/')[1] || 'en';
+                                                const locale = window.location.pathname.match(/^\/([a-z]{2})\//) 
+                                                    ? window.location.pathname.split('/')[1] 
+                                                    : 'en';
                                                 navigate(`/${locale}/results`, { state: { searchProfile: profile } });
                                             }}
                                             isGuest={true}
