@@ -35,3 +35,13 @@ yarn-error.log*
 
 *storybook.log
 storybook-static
+
+# Python virtual environments
+*-env/
+*-env2/
+test-env/
+.notebooklm-mcp-env/
+venv/
+.venv/
+__pycache__/
+*.py[cod]
