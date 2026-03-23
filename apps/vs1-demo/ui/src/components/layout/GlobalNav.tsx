@@ -101,7 +101,7 @@ export function GlobalNav() {
 
       {/* ── Full Width Header ─────────────────────────────────── */}
       <div className="pointer-events-auto w-full bg-white/40 backdrop-blur-xl border-b border-white/50 shadow-[0_4px_32px_rgba(0,0,0,0.08)]">
-        <div className="flex items-center justify-between gap-6 px-6 lg:px-10 py-6 w-full max-w-7xl mx-auto whitespace-nowrap">
+        <div className="flex items-center justify-between gap-2 md:gap-4 px-4 md:px-6 lg:px-10 py-4 lg:py-6 w-full max-w-7xl mx-auto">
 
         {/* Logo */}
         <button
@@ -121,7 +121,7 @@ export function GlobalNav() {
         <div className="w-px h-5 bg-neutral-200 shrink-0 hidden md:block" />
 
         {/* Nav */}
-        <nav className="flex items-center justify-center flex-1 gap-2 md:gap-8 overflow-x-auto">
+        <nav className="flex items-center justify-center flex-1 gap-1 md:gap-4 lg:gap-6 min-w-0 overflow-hidden">
           {HEADER_MENU.map((menu) => (
             <div key={menu.id} className="flex items-center">
               <button
@@ -129,7 +129,7 @@ export function GlobalNav() {
                   if (menu.path) navTo(menu.path);
                   else setActiveMenu(activeMenu === menu.id ? null : menu.id);
                 }}
-                className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                className={`flex items-center gap-1 px-2 md:px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${
                   activeMenu === menu.id
                     ? 'text-primary-700 bg-primary-50'
                     : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100/80'
@@ -151,11 +151,11 @@ export function GlobalNav() {
         <div className="w-px h-5 bg-neutral-200 shrink-0 hidden md:block" />
 
         {/* Actions */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 shrink-0">
           <LanguageSwitcher />
-          
+
           <button
-            className="text-neutral-600 hover:text-neutral-900 text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-neutral-100/80 transition-colors ml-1"
+            className="text-neutral-600 hover:text-neutral-900 text-xs font-semibold px-2 md:px-3 py-1.5 rounded-lg hover:bg-neutral-100/80 transition-colors whitespace-nowrap"
             onClick={() => navTo('/login')}
           >
             {t('nav.login', 'Log in')}
