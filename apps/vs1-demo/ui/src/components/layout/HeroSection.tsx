@@ -123,7 +123,7 @@ export function HeroSection() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 1.0, ease: [0.45, 0, 0.55, 1] }}
+              transition={{ duration: 1.25, ease: [0.45, 0, 0.55, 1] }}
               className="flex items-center justify-center gap-6 md:gap-10 mb-6 flex-wrap"
             >
               {SCENARIOS[sliderIndex].usps.map((usp, i) => (
@@ -145,7 +145,7 @@ export function HeroSection() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 1.2, ease: [0.45, 0, 0.55, 1] }}
+                transition={{ duration: 1.5, ease: [0.45, 0, 0.55, 1] }}
                 className="font-bold text-6xl md:text-7xl lg:text-[90px] tracking-tighter text-neutral-900 leading-[1.05] mb-6 w-full max-w-[1200px] text-center"
                 style={{ fontFamily: '"IBM Plex Serif", serif' }}
               >
@@ -165,7 +165,7 @@ export function HeroSection() {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 1.2, ease: [0.45, 0, 0.55, 1], delay: 0.18 }}
+                  transition={{ duration: 1.5, ease: [0.45, 0, 0.55, 1], delay: 0.225 }}
                 >
                   <Typography variant="body" className="text-neutral-600 max-w-2xl text-lg leading-relaxed text-center">
                     {SCENARIOS[sliderIndex].text}

@@ -1,19 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../common/LanguageSwitcher';
+import { useAuthStore } from '../../store/useAuthStore';
 import {
   type LucideIcon,
   CircleDot, ChevronDown, ArrowRight,
   Zap, Users, Globe as GlobeIcon, Building2,
   Rocket, Layers, Scale,
-  MessageSquare, FileText, ShieldCheck
+  MessageSquare, FileText, ShieldCheck,
+  LogOut, LayoutDashboard, User
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Typography } from '../ui/Typography';
 
-const HIDDEN_PATHS = ['/login', '/register', '/verify-email', '/dashboard'];
+const HIDDEN_PATHS = ['/login', '/register', '/verify-email'];
 
 export function GlobalNav() {
   const { t, i18n } = useTranslation('common');
@@ -21,14 +23,18 @@ export function GlobalNav() {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const { isLoggedIn, role, userName, logout } = useAuthStore();
 
   const pathWithoutLang = location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
   const isHidden = HIDDEN_PATHS.includes(pathWithoutLang) || pathWithoutLang.startsWith('/wizard');
 
   useEffect(() => {
-    const handleScroll = () => setActiveMenu(null);
+    const handleScroll = () => { setActiveMenu(null); setUserMenuOpen(false); };
     const handleClick = (e: MouseEvent) => {
       if (!(e.target as Element).closest('header')) setActiveMenu(null);
+      if (userMenuRef.current && !(e.target as Element).closest('.user-menu-trigger')) setUserMenuOpen(false);
     };
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('click', handleClick);
@@ -96,7 +102,7 @@ export function GlobalNav() {
 
       {/* ── Full Width Header ─────────────────────────────────── */}
       <div className="pointer-events-auto w-full bg-white/40 backdrop-blur-xl border-b border-white/50 shadow-[0_4px_32px_rgba(0,0,0,0.08)]">
-        <div className="flex items-center justify-between gap-2 md:gap-4 px-4 md:px-6 lg:px-10 py-4 lg:py-6 w-full max-w-7xl mx-auto">
+        <div className="flex items-center justify-between gap-2 md:gap-4 py-4 lg:py-6 w-full max-w-[1440px] mx-auto pl-4 pr-8">
 
         {/* Logo */}
         <button
@@ -146,18 +152,81 @@ export function GlobalNav() {
         <div className="w-px h-5 bg-neutral-200 shrink-0 hidden md:block" />
 
         {/* Actions */}
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-1 shrink-0 h-10">
           <LanguageSwitcher />
 
-          <button
-            className="text-neutral-600 hover:text-neutral-900 text-xs font-semibold px-2 md:px-3 py-1.5 rounded-lg hover:bg-neutral-100/80 transition-colors whitespace-nowrap"
-            onClick={() => navTo('/login')}
-          >
-            {t('nav.login', 'Log in')}
-          </button>
-          <Button variant="primary" size="sm" onClick={() => navTo('/register')}>
-            {t('nav.signup', 'Sign up for free')}
-          </Button>
+          {isLoggedIn ? (
+            <div className="relative user-menu-trigger" ref={userMenuRef}>
+              <button
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-neutral-100/80 transition-colors"
+              >
+                <div className="w-7 h-7 rounded-full bg-primary-500 flex items-center justify-center text-white text-xs font-bold">
+                  {(userName || 'U').charAt(0).toUpperCase()}
+                </div>
+                <span className="text-xs font-semibold text-neutral-700 hidden md:block">
+                  {userName || (role === 'partner' ? 'Partner' : 'User')}
+                </span>
+                <ChevronDown
+                  size={12}
+                  className={`transition-transform duration-200 text-neutral-400 ${userMenuOpen ? 'rotate-180' : ''}`}
+                />
+              </button>
+
+              <AnimatePresence>
+                {userMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -4, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -4, scale: 0.95 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 top-full mt-2 w-52 bg-white border border-neutral-200 rounded-xl shadow-lg ring-1 ring-black/5 overflow-hidden z-50"
+                  >
+                    <div className="px-4 py-3 border-b border-neutral-100">
+                      <p className="text-sm font-semibold text-neutral-900">{userName || 'User'}</p>
+                      <p className="text-xs text-neutral-500 mt-0.5">{role === 'partner' ? 'Beratungspartner' : 'Unternehmen'}</p>
+                    </div>
+                    <div className="py-1">
+                      <button
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          const dashPath = role === 'partner' ? '/partner-dashboard' : '/dashboard';
+                          navTo(dashPath);
+                        }}
+                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors"
+                      >
+                        <LayoutDashboard size={16} className="text-neutral-400" />
+                        Mein Dashboard
+                      </button>
+                      <button
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          logout();
+                          navTo('/');
+                        }}
+                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                      >
+                        <LogOut size={16} />
+                        Abmelden
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <>
+              <button
+                className="text-neutral-600 hover:text-neutral-900 text-xs font-semibold px-2 md:px-3 py-1.5 rounded-lg hover:bg-neutral-100/80 transition-colors whitespace-nowrap"
+                onClick={() => navTo('/login')}
+              >
+                {t('nav.login', 'Log in')}
+              </button>
+              <Button variant="primary" size="sm" onClick={() => navTo('/register')}>
+                {t('nav.signup', 'Sign up for free')}
+              </Button>
+            </>
+          )}
         </div>
         </div>
       </div>

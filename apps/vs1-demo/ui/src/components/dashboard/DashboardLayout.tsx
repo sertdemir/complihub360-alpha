@@ -16,12 +16,16 @@ export function DashboardLayout({ children, type }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-[#FDFDFB] flex flex-col">
-      {/* GlobalNav is rendered at the app root level outside out Outlet for most pages */}
       <div className="flex flex-1 pt-16">
-        <DashboardSidebar type={type} locale={locale} />
-        <main className="flex-1 ml-64 p-8 overflow-y-auto max-w-7xl">
-          {children}
-        </main>
+        {/* Centered wrapper for sidebar + content */}
+        <div className="flex w-full max-w-[1440px] mx-auto">
+          <DashboardSidebar type={type} locale={locale} />
+          <main className="flex-1 overflow-y-auto">
+            <div className="pl-6 pr-8 py-8">
+              {children}
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   );

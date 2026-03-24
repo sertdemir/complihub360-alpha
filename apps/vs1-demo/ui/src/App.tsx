@@ -40,6 +40,7 @@ import { FullSupportWizard } from "./pages/wizard/flows/FullSupportWizard";
 import { LoginPage } from "./pages/auth/LoginPage";
 import { RegisterPage } from "./pages/auth/RegisterPage";
 import { EmailVerificationPage } from "./pages/auth/EmailVerificationPage";
+import { AuthGuard } from "./components/auth/AuthGuard";
 
 function WizardRoutes() {
     return (
@@ -119,22 +120,26 @@ function AppContent() {
                     <Route path="ai-governance" element={<AiGovernancePage />} />
                     <Route path="results" element={<ResultsOverview />} />
                     
-                    {/* User Dashboard Routes */}
-                    <Route path="dashboard" element={<DashboardHome />} />
-                    <Route path="dashboard/sessions" element={<UserDossiers />} />
-                    <Route path="dashboard/sessions/:id" element={<DossierDetail />} />
-                    <Route path="dashboard/knowledge" element={<KnowledgeCenter />} />
-                    <Route path="dashboard/workspace" element={<UserWorkspace />} />
-                    <Route path="dashboard/messages" element={<UserMessages />} />
-                    <Route path="dashboard/*" element={<DashboardHome />} />
+                    {/* User Dashboard Routes (Auth Guarded) */}
+                    <Route element={<AuthGuard requiredRole="user" />}>
+                        <Route path="dashboard" element={<DashboardHome />} />
+                        <Route path="dashboard/sessions" element={<UserDossiers />} />
+                        <Route path="dashboard/sessions/:id" element={<DossierDetail />} />
+                        <Route path="dashboard/knowledge" element={<KnowledgeCenter />} />
+                        <Route path="dashboard/workspace" element={<UserWorkspace />} />
+                        <Route path="dashboard/messages" element={<UserMessages />} />
+                        <Route path="dashboard/*" element={<DashboardHome />} />
+                    </Route>
                     
-                    {/* Partner Dashboard Routes */}
-                    <Route path="partner-dashboard" element={<PartnerDashboardHome />} />
-                    <Route path="partner-dashboard/leads" element={<LeadInbox />} />
-                    <Route path="partner-dashboard/leads/:id" element={<LeadDetail />} />
-                    <Route path="partner-dashboard/clients" element={<ActiveClients />} />
-                    <Route path="partner-dashboard/profile" element={<PartnerProfile />} />
-                    <Route path="partner-dashboard/*" element={<PartnerDashboardHome />} />
+                    {/* Partner Dashboard Routes (Auth Guarded) */}
+                    <Route element={<AuthGuard requiredRole="partner" />}>
+                        <Route path="partner-dashboard" element={<PartnerDashboardHome />} />
+                        <Route path="partner-dashboard/leads" element={<LeadInbox />} />
+                        <Route path="partner-dashboard/leads/:id" element={<LeadDetail />} />
+                        <Route path="partner-dashboard/clients" element={<ActiveClients />} />
+                        <Route path="partner-dashboard/profile" element={<PartnerProfile />} />
+                        <Route path="partner-dashboard/*" element={<PartnerDashboardHome />} />
+                    </Route>
                     
                     {/* Auth */}
                     <Route path="login" element={<LoginPage />} />

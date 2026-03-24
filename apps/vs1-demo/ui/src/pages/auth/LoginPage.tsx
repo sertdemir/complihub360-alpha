@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { Typography } from "../../components/ui/Typography";
 import { Button } from "../../components/ui/Button";
+import { useAuthStore, type UserRole } from "../../store/useAuthStore";
 
 const GoogleIcon = () => (
     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
@@ -16,14 +18,18 @@ const GoogleIcon = () => (
 export function LoginPage() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { i18n } = useTranslation();
+    const lang = i18n.resolvedLanguage || 'en';
+    const login = useAuthStore(s => s.login);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [role, setRole] = useState<UserRole>("user");
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        localStorage.setItem("is_logged_in", "true");
+        login(role, email.split('@')[0]);
         const queryParams = new URLSearchParams(location.search);
         const redirectTarget = queryParams.get("redirect");
 
@@ -31,7 +37,8 @@ export function LoginPage() {
              if (redirectTarget) {
                  navigate(redirectTarget);
              } else {
-                 navigate("/dashboard");
+                 const target = role === 'partner' ? `/${lang}/partner-dashboard` : `/${lang}/dashboard`;
+                 navigate(target);
              }
         }, 1000);
     };
@@ -80,6 +87,24 @@ export function LoginPage() {
                     {/* Card */}
                     <div className="bg-white border border-neutral-200 rounded-2xl shadow-lg ring-1 ring-black/5 overflow-hidden">
                         <form onSubmit={handleSubmit} className="p-8">
+                            {/* Role Toggle */}
+                            <div className="flex items-center bg-neutral-100 rounded-xl p-1 mb-6">
+                                {(["user", "partner"] as UserRole[]).map(r => (
+                                    <button
+                                        key={r}
+                                        type="button"
+                                        onClick={() => setRole(r)}
+                                        className={`flex-1 py-2.5 rounded-lg text-sm font-semibold text-center transition-all ${
+                                            role === r
+                                                ? "bg-white text-neutral-900 shadow-sm"
+                                                : "text-neutral-500 hover:text-neutral-700"
+                                        }`}
+                                    >
+                                        {r === "user" ? "🏢 Unternehmen" : "🤝 Partner"}
+                                    </button>
+                                ))}
+                            </div>
+
                             {/* Google SSO */}
                             <button
                                 type="button"

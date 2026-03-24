@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { Typography } from "../../components/ui/Typography";
 import { Button } from "../../components/ui/Button";
+import { useAuthStore } from "../../store/useAuthStore";
 
 /* ─── Types ──────────────────────────────────────────────────────────────────── */
 
@@ -539,6 +541,9 @@ function BenefitsPanel({ role }: { role: Role }) {
 export function RegisterPage() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { i18n } = useTranslation();
+    const lang = i18n.resolvedLanguage || 'en';
+    const authLogin = useAuthStore(s => s.login);
     const [role, setRole] = useState<Role>("user");
     const [step, setStep] = useState(0);
     const [direction, setDirection] = useState(1);
@@ -558,14 +563,14 @@ export function RegisterPage() {
             const d = role === "user" ? userData : partnerData;
             return d.name && d.email && d.password.length >= 8 && d.consent;
         }
-        return true; // Steps 2 and 3 are validated more loosely
+        return true;
     };
 
     const handleNext = () => {
         if (isLastStep) {
             setLoading(true);
-            const email = role === "user" ? userData.email : partnerData.email;
-            localStorage.setItem("is_logged_in", "true");
+            const name = role === "user" ? userData.name : partnerData.name;
+            authLogin(role, name);
             const queryParams = new URLSearchParams(location.search);
             const redirectTarget = queryParams.get("redirect");
 
@@ -573,7 +578,8 @@ export function RegisterPage() {
                 if (redirectTarget) {
                     navigate(redirectTarget);
                 } else {
-                    navigate("/verify-email", { state: { email } });
+                    const target = role === 'partner' ? `/${lang}/partner-dashboard` : `/${lang}/dashboard`;
+                    navigate(target);
                 }
             }, 1000);
         } else {
