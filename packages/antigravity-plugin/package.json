@@ -1,0 +1,21 @@
+{
+    "name": "@complihub/antigravity-plugin",
+    "version": "0.1.0",
+    "private": true,
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc -b",
+        "typecheck": "tsc --noEmit",
+        "test": "vitest run"
+    },
+    "dependencies": {
+        "@complihub/agent-core": "*",
+        "@complihub/agent-registry": "*",
+        "@complihub/task-orchestrator": "*",
+        "@complihub360/types": "*"
+    },
+    "devDependencies": {
+        "vitest": "^3.0.0"
+    }
+}

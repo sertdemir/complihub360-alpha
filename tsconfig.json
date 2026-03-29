@@ -18,6 +18,9 @@
             "path": "packages/types"
         },
         {
+            "path": "packages/antigravity-plugin"
+        },
+        {
             "path": "services/compliance-api"
         }
     ]
