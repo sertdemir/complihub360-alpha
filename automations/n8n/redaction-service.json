@@ -1,0 +1,101 @@
+{
+  "name": "Redaction Service (Local LLM)",
+  "nodes": [
+    {
+      "parameters": {
+        "queue": "document_sanitize_requested"
+      },
+      "id": "trigger-node-1",
+      "name": "RabbitMQ / N8N Queue Trigger",
+      "type": "n8n-nodes-base.rabbitmqTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:11434/api/generate",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "llama3"
+            },
+            {
+              "name": "prompt",
+              "value": "Extract the text from the following document and replace any Personally Identifiable Information (PII) like Names, IBANs, or Emails with [REDACTED_NAME], [REDACTED_IBAN], etc. Ensure strict JSON output.\\n\\n{{$json[\"raw_document_text\"]}}"
+            },
+            {
+              "name": "stream",
+              "value": false
+            },
+            {
+              "name": "format",
+              "value": "json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ollama-http-node",
+      "name": "Ollama Local LLM API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "queue": "document_sanitized_ready",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "sanitized_text",
+              "value": "={{$json[\"response\"]}}"
+            },
+            {
+              "name": "status",
+              "value": "PII_REMOVED"
+            }
+          ]
+        }
+      },
+      "id": "emit-sanitized-ready",
+      "name": "Emit Sanitized Event",
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1,
+      "position": [650, 300]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "RabbitMQ / N8N Queue Trigger": {
+      "main": [
+        [
+          {
+            "node": "Ollama Local LLM API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Local LLM API": {
+      "main": [
+        [
+          {
+            "node": "Emit Sanitized Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "v1-0-redaction-ollama"
+}

@@ -9,6 +9,13 @@ Index of recurring jobs and asynchronous workflows within the n8n automation eng
 - **SLA**: Immediate
 - **Security Check**: Emits audit log for storage entry.
 
+## 5. Redaction Service (`redaction-service.json`)
+
+- **Trigger**: `document_sanitize_requested`
+- **Action**: Extracts text from Raw Vault document and calls a self-hosted local LLM (e.g., Ollama) to identify and redact PII via strict structured JSON output. Fires `document_sanitized_ready`.
+- **SLA**: Immediate
+- **Security Check**: Enforces Zero Data Retention by processing strictly on the local self-hosted instance without external APIs.
+
 ## 2. AI Processing Gate (`ai-processing-gate.json`)
 
 - **Trigger**: `ai_processing_requested`

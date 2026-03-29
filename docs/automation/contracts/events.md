@@ -5,8 +5,8 @@ This document defines the core domain events used by the CompliHub360 Automation
 ## Core Events
 
 - `document_uploaded`: Emitted when a document is uploaded. Raw file is stored in Raw Vault.
-- `document_sanitize_requested`: Instructs the Redaction Service to process the raw document.
-- `document_sanitized_ready`: Emitted by Redaction Service when a sanitized document is available in the Sanitized Vault.
+- `document_sanitize_requested`: Instructs the Redaction Service to process the raw document securely via local LLM masking.
+- `document_sanitized_ready`: Emitted by Redaction Service when a sanitized document (PII redacted via AI) is available in the Sanitized Vault.
 - `ai_processing_requested`: Indicates an AI task is initiated. MUST ONLY run after `document_sanitized_ready` and MUST ONLY consume sanitized artifacts.
 - `ai_artifact_created`: Emitted when AI processing completes and a new artifact (e.g., summary, extraction) is generated.
 - `retention_job_ran`: Periodic event indicating a retention sweep execution.
