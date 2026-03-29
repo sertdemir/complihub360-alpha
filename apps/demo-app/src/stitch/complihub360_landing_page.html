@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CompliHub360 Landing Page</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#0b1117",
+                        "slate-800": "#1e293b",
+                        "slate-900": "#0f172a",
+                        "slate-100": "#f1f5f9",
+                        "slate-400": "#94a3b8",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col antialiased">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-800 px-10 py-4 max-w-7xl mx-auto w-full">
+<div class="flex items-center gap-4 text-slate-100">
+<div class="size-6 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[24px]">verified_user</span>
+</div>
+<h2 class="text-slate-100 text-xl font-bold leading-tight tracking-[-0.015em]">CompliHub360</h2>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<nav class="hidden md:flex items-center gap-9">
+<a class="text-slate-400 hover:text-slate-100 transition-colors text-sm font-medium leading-normal" href="#">Services</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors text-sm font-medium leading-normal" href="#">Countries</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors text-sm font-medium leading-normal" href="#">Advisory</a>
+</nav>
+<div class="flex gap-3 items-center">
+<button class="text-slate-400 hover:text-slate-100 text-sm font-medium leading-normal transition-colors px-4 py-2">
+                        Login
+                    </button>
+<button class="flex items-center justify-center overflow-hidden rounded-lg h-10 px-6 bg-primary hover:bg-primary/90 transition-colors text-white text-sm font-bold leading-normal tracking-[0.015em]">
+                        Sign Up
+                    </button>
+</div>
+</div>
+</header>
+<main class="flex-1 flex flex-col items-center justify-center px-4 md:px-10 py-16 md:py-24 max-w-5xl mx-auto w-full">
+<div class="text-center max-w-3xl mb-12">
+<h1 class="text-slate-100 tracking-tight text-4xl md:text-6xl font-extrabold leading-tight mb-6">
+                    Compliance Orchestrated for Global Scale.
+                </h1>
+<p class="text-slate-400 text-lg md:text-xl font-normal leading-relaxed">
+                    Navigate tax, privacy, and legal risks across markets with precision.
+                </p>
+</div>
+<div class="w-full max-w-4xl bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-lg mb-16">
+<div class="flex flex-col md:flex-row gap-4">
+<div class="flex flex-col md:w-1/4">
+<label class="text-slate-400 text-sm font-medium mb-2 pl-1 block">Country Context</label>
+<div class="relative">
+<select class="form-select appearance-none w-full bg-background-dark border border-slate-800 text-slate-100 rounded-lg h-12 px-4 pr-10 focus:ring-primary focus:border-primary transition-colors cursor-pointer">
+<option value="de">Germany (DE)</option>
+<option value="eu">European Union (EU)</option>
+<option value="uk">United Kingdom (UK)</option>
+<option value="us">United States (US)</option>
+<option value="global">Global Default</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col md:w-3/4">
+<label class="text-slate-400 text-sm font-medium mb-2 pl-1 block">Search Compliance Knowledge</label>
+<div class="flex gap-3 flex-col md:flex-row">
+<div class="relative flex-1">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="form-input block w-full pl-10 pr-4 h-12 bg-background-dark border border-slate-800 rounded-lg text-slate-100 placeholder-slate-500 focus:ring-primary focus:border-primary transition-colors" placeholder="Search compliance records, policies, or requirements..." type="text"/>
+</div>
+<button class="h-12 px-6 bg-primary hover:bg-primary/90 text-white rounded-lg font-semibold flex items-center justify-center gap-2 transition-colors shrink-0">
+<span class="material-symbols-outlined text-[20px]">magic_button</span>
+                                Start Wizard
+                            </button>
+</div>
+</div>
+</div>
+</div>
+<div class="w-full max-w-5xl">
+<h3 class="text-slate-100 text-xl font-semibold mb-6">Browse Categories</h3>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<a class="group block p-6 bg-slate-900 border border-slate-800 rounded-xl hover:border-primary/50 hover:bg-slate-800/50 transition-all duration-200" href="#">
+<div class="h-12 w-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">account_balance</span>
+</div>
+<h4 class="text-slate-100 font-semibold text-lg mb-2">Tax &amp; VAT</h4>
+<p class="text-slate-400 text-sm">Cross-border tax regulations, VAT compliance, and reporting.</p>
+</a>
+<a class="group block p-6 bg-slate-900 border border-slate-800 rounded-xl hover:border-primary/50 hover:bg-slate-800/50 transition-all duration-200" href="#">
+<div class="h-12 w-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">shield_locked</span>
+</div>
+<h4 class="text-slate-100 font-semibold text-lg mb-2">Data Privacy</h4>
+<p class="text-slate-400 text-sm">GDPR, CCPA, data handling policies, and user consent.</p>
+</a>
+<a class="group block p-6 bg-slate-900 border border-slate-800 rounded-xl hover:border-primary/50 hover:bg-slate-800/50 transition-all duration-200" href="#">
+<div class="h-12 w-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">campaign</span>
+</div>
+<h4 class="text-slate-100 font-semibold text-lg mb-2">Marketing &amp; SEO</h4>
+<p class="text-slate-400 text-sm">Advertising standards, cookie laws, and digital marketing rules.</p>
+</a>
+<a class="group block p-6 bg-slate-900 border border-slate-800 rounded-xl hover:border-primary/50 hover:bg-slate-800/50 transition-all duration-200" href="#">
+<div class="h-12 w-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">gavel</span>
+</div>
+<h4 class="text-slate-100 font-semibold text-lg mb-2">Corporate Law</h4>
+<p class="text-slate-400 text-sm">Entity formation, labor laws, and general corporate governance.</p>
+</a>
+</div>
+</div>
+</main>
+</div>
+</div>
+</body></html>

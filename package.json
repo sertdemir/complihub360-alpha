@@ -1,0 +1,42 @@
+{
+  "name": "complihub360-alpha",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "description": "CompliHub360 - AI-Driven Compliance Platform",
+  "workspaces": [
+    "packages/*",
+    "services/*",
+    "ui/*",
+    "apps/demo-app/*",
+    "apps/vs1-demo/*"
+  ],
+  "scripts": {
+    "lint": "eslint . --ext .ts,.tsx",
+    "test": "npm run test --if-present --workspaces",
+    "create:app": "node template/scripts/create-app.js",
+    "format": "prettier --write .",
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "build:root": "npx tsc -b",
+    "typecheck:root": "npx tsc -b",
+    "clean": "npx tsc -b --clean",
+    "dev:ui": "npm run dev --workspace=@vs1-demo/ui",
+    "dev:service": "npm run dev --workspace=@complihub/compliance-api",
+    "dev:board": "npm run dev --workspace=@complihub/dev-board",
+    "start:ui": "npm run start --workspace=@vs1-demo/ui",
+    "start:api": "npm run start --workspace=@complihub/compliance-api",
+    "release:patch": "npm version patch",
+    "release:minor": "npm version minor",
+    "preversion": "npm run typecheck && npm run test",
+    "version": "node scripts/generate-changelog.js && git add CHANGELOG.md"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.4",
+    "typescript": "^5.9.3"
+  }
+}

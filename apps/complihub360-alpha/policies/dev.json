@@ -1,0 +1,15 @@
+{
+    "appId": "complihub360-alpha",
+    "tenants": {
+        "*": {
+            "allowedCapabilities": [
+                "*"
+            ],
+            "deniedCapabilities": [],
+            "rateLimitPerMinute": 120,
+            "concurrencyLimit": 10,
+            "maxPayloadBytes": 50000,
+            "maxExecutionMs": 15000
+        }
+    }
+}

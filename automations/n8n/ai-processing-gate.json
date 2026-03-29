@@ -1,0 +1,97 @@
+{
+    "name": "AI Processing Gate",
+    "nodes": [
+        {
+            "parameters": {
+                "eventName": "ai_processing_requested"
+            },
+            "name": "Webhook Trigger",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                200,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "string": [
+                        {
+                            "value1": "={{ $json[\"body\"][\"sanitized_storage_ref\"] }}",
+                            "operation": "startsWith",
+                            "value2": "sanitized://"
+                        }
+                    ]
+                }
+            },
+            "name": "Security Gate",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                400,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "http://audit-service/log",
+                "body": "={{ {\n  action: \"AI_PROCESSING_REQUEST\",\n  documentId: $json[\"body\"][\"document_id\"]\n} }}"
+            },
+            "name": "Log Audit",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 1,
+            "position": [
+                600,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "http://alerting-service/send",
+                "body": "={{ {\n  level: \"critical\",\n  message: \"Attempted AI processing on unsafe reference\",\n  documentId: $json[\"body\"][\"document_id\"]\n} }}"
+            },
+            "name": "Alert Security",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 1,
+            "position": [
+                600,
+                400
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Security Gate",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Security Gate": {
+            "main": [
+                [
+                    {
+                        "node": "Log Audit",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Alert Security",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {}
+}

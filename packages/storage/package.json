@@ -1,0 +1,13 @@
+{
+    "name": "@complihub360/storage",
+    "version": "1.0.0",
+    "main": "src/index.ts",
+    "types": "src/index.ts",
+    "dependencies": {},
+    "devDependencies": {
+        "typescript": "^5.0.0"
+    },
+    "scripts": {
+        "build": "tsc"
+    }
+}

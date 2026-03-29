@@ -1,0 +1,24 @@
+{
+    "extends": "./tsconfig.base.json",
+    "files": [],
+    "references": [
+        {
+            "path": "packages/agent-core"
+        },
+        {
+            "path": "packages/agent-registry"
+        },
+        {
+            "path": "packages/policy-engine"
+        },
+        {
+            "path": "packages/task-orchestrator"
+        },
+        {
+            "path": "packages/types"
+        },
+        {
+            "path": "services/compliance-api"
+        }
+    ]
+}

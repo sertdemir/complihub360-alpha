@@ -1,0 +1,979 @@
+{
+  "nav": {
+    "platform": "Platform",
+    "solutions": "Solutions",
+    "complianceAreas": "Compliance Areas",
+    "resources": "Resources",
+    "login": "Log in",
+    "signup": "Sign up for free",
+    "items": {
+      "aiEngine": {
+        "title": "The AI Engine",
+        "desc": "Secure data extraction & mapping"
+      },
+      "partnerMatching": {
+        "title": "Partner Matching",
+        "desc": "From risk to local execution"
+      },
+      "globalCoverage": {
+        "title": "Global Coverage",
+        "desc": "UK, EU, Germany & US"
+      },
+      "forPartners": {
+        "title": "For Partner Firms",
+        "desc": "Lead generation for advisors"
+      },
+      "founders": {
+        "title": "Founders & CEOs",
+        "desc": "Minimise risk & scale faster"
+      },
+      "operations": {
+        "title": "Operations Teams",
+        "desc": "Automate daily compliance"
+      },
+      "counsel": {
+        "title": "In-House Counsel",
+        "desc": "Cut research time by 90%"
+      },
+      "stories": {
+        "title": "Customer Stories",
+        "desc": "See real compliance outcomes"
+      },
+      "guides": {
+        "title": "Guides & Whitepapers",
+        "desc": "In-depth market deep-dives"
+      }
+    },
+    "aiGovernance": "AI Governance",
+    "aiGovDesc": "Our framework for transparent and compliant AI."
+  },
+  "hero": {
+    "scenarios": {
+      "shortcut": {
+        "seg1": "Your Compliance ",
+        "seg2": "Shortcut",
+        "seg3": " to Global Markets",
+        "text": "Identify regulatory gaps instantly and match with vetted local experts for seamless execution.",
+        "cta": "Find my compliance shortcut",
+        "usp1": "Instant gap analysis",
+        "usp2": "Vetted local experts",
+        "usp3": "Fast execution"
+      },
+      "actionPlan": {
+        "seg1": "From Regulatory Risk to ",
+        "seg2": "Action Plan",
+        "seg3": " in Minutes",
+        "text": "Translate local fragmentation into a clear roadmap. We help you understand faster and decide safer.",
+        "cta": "Build my action plan now",
+        "usp1": "Understand faster",
+        "usp2": "Decide safer",
+        "usp3": "Clear roadmap"
+      },
+      "experts": {
+        "seg1": "The Fastest Way to ",
+        "seg2": "Local Compliance Experts",
+        "text": "Stop guessing. Get your customized assessment and connect with the right partner firm immediately.",
+        "cta": "Connect with an expert now",
+        "usp1": "Match instantly",
+        "usp2": "Pre-qualified experts",
+        "usp3": "Custom assessment"
+      }
+    },
+    "companies": "Trusted by innovative companies",
+    "scroll": "Explore Platform",
+    "funnel": {
+      "countryLabel": "Target Market",
+      "countryUk": "United Kingdom",
+      "countryEu": "European Union",
+      "countryGlobal": "Global / Other",
+      "categoryLabel": "Compliance Category",
+      "catTaxVat": "Tax & VAT",
+      "catEpr": "EPR Packaging",
+      "catPrivacy": "Data Privacy",
+      "catMarketing": "Marketing & SEO",
+      "catCorporate": "Corporate Setup",
+      "cta": "Qualify now"
+    }
+  },
+  "landing": {
+    "services": {
+      "badge": "Tailored Compliance",
+      "title": "What we cover, whoever you are",
+      "coreDomains": "Core Domains Covered",
+      "founder": {
+        "title": "For Founders & CEOs",
+        "tags": [
+          "Tax & VAT Registration",
+          "Corporate Setup",
+          "Baseline Privacy"
+        ],
+        "description": "Scale into new markets without the legal overhead. Get instant clarity on tax, VAT, and corporate structure before you commit."
+      },
+      "ops": {
+        "title": "For Operations & Expansion",
+        "tags": [
+          "EPR & Packaging",
+          "Supply Chain ESG",
+          "Marketing Standards"
+        ],
+        "description": "De-risk your supply chain and product launches. Navigate complex EPR packaging rules, marketing standards, and operational compliance."
+      },
+      "advisors": {
+        "title": "For In-House Counsel",
+        "tags": [
+          "Global Privacy Mapping",
+          "Regulatory Drift Alerts",
+          "Compliance Audits"
+        ],
+        "description": "Stop manually tracking global regulatory drift. Use our AI-mapped intelligence to oversee 27+ jurisdictions from a single dashboard."
+      },
+      "partners": {
+        "title": "For Partner Firms",
+        "tags": [
+          "Pre-vetted Leads",
+          "Execution-ready Dossiers",
+          "Partner Network APIs"
+        ],
+        "description": "Receive highly qualified, pre-structured client dossiers. Focus on high-value expert execution rather than tedious initial discovery calls."
+      },
+      "builtForRole": "Built for your role",
+      "cta": "Start your tailored assessment"
+    },
+    "snapshot": {
+      "headerOverline": "Intelligence Engine",
+      "headerTitle": "Dossier Generation & Matching",
+      "description": "Complete transparency on how we process your data, integrate live sources, and deliver the perfect expert match.",
+      "feature1Title": "What the AI sees",
+      "feature1Desc": "Public footprints, operational metadata, and target market jurisdictions.",
+      "feature2Title": "What it never sees",
+      "feature2Desc": "No PII, no sensitive financials. All inputs are strictly anonymized.",
+      "bannerWhy": "Why it matters:",
+      "bannerDesc": "Structured AI dossiers eliminate costly \"discovery hours\" and map your exact footprint to the right local expert, saving weeks of back-and-forth.",
+      "card1Overline": "Live Validations",
+      "card1Desc": "Regulatory signals grounded in official government APIs.",
+      "card1Foot": "Sources verified",
+      "card2Overline": "Dossier Structure",
+      "card2Desc": "Standardized legal brief format expected by top-tier firms.",
+      "card2Foot": "Execution-ready",
+      "card3Overline": "Match Precision",
+      "card3Desc": "Faster response times from vetted compliance partners compared to traditional discovery.",
+      "card3Foot": "Higher conversion",
+      "statusValue": "Secure & Grounded",
+      "systemStatus": "System Status",
+      "titleStart": "How our",
+      "titleEnd": "works"
+    },
+    "stepper": {
+      "badge": "The Partner Journey",
+      "titleStart": "From unknown risk to",
+      "titleEnd": "local execution",
+      "stepLabel": "Step",
+      "step1": {
+        "title": "Assessment",
+        "body": "Our AI scans your target footprint and flags exact regulatory gaps instantly."
+      },
+      "step2": {
+        "title": "Dossier",
+        "body": "A structured, anonymised legal brief with all mandatory registrations and operational shifts."
+      },
+      "step3": {
+        "title": "Matching",
+        "body": "We algorithmically pair your dossier with pre-vetted local partners who know your gaps."
+      },
+      "step4": {
+        "title": "Appointment",
+        "body": "Book a strategy call directly with an expert who already understands your case."
+      },
+      "step5": {
+        "title": "Execution",
+        "body": "Your partner executes registrations, filings, and structural setups locally."
+      },
+      "actionPlanActive": "Action Plan Active",
+      "partnerAssigned": "Partner Assigned",
+      "description": "Our 5-step funnel ensures you don't just identify the problem — you solve it with the right local experts immediately."
+    },
+    "uspZone": {
+      "badge": "Why CompliHub360?",
+      "title": "Built different, by design"
+    },
+    "uspItems": [
+      {
+        "title": "Proactive, not reactive",
+        "body": "Stop manually searching for regulations. CompliHub360 maps your business context to a prioritised, country-specific action plan — before you face a penalty.",
+        "bullets": [
+          "Personalised risk profile in minutes",
+          "Prioritised obligations, not a raw law dump",
+          "Covers UK, EU & multi-market scenarios"
+        ]
+      },
+      {
+        "title": "Privacy-first by architecture",
+        "body": "Your sensitive corporate data — names, emails, tax IDs — never leaves your browser unstructured. Local AI models redact all PII before any analysis reaches our servers.",
+        "bullets": [
+          "Local PII redaction before cloud processing",
+          "Zero raw PII stored on our servers",
+          "UK GDPR & CCPA compliant by design"
+        ]
+      },
+      {
+        "title": "End-to-end orchestration",
+        "body": "We manage the full compliance lifecycle — from self-assessment to vetted expert matching. Our automated SLA watchdog tracks provider responses so you are never left waiting.",
+        "bullets": [
+          "Self-assessment to expert handoff",
+          "Automated SLA watchdog & email tracking",
+          "Verified local expert network"
+        ]
+      }
+    ],
+    "aiEngine": {
+      "badge": "The AI Engine",
+      "title1": "From raw context to a structured",
+      "title2": "compliance dossier",
+      "description": "Our privacy-first AI pipeline has three stages — each designed to maximise output quality while minimising your data exposure.",
+      "step": "Step"
+    },
+    "aiSteps": [
+      {
+        "title": "Smart Context Ingestion",
+        "body": "The AI translates your unstructured business context into a validated structured schema — extracting entity type, industry, revenue bands, and market intent.",
+        "stats": [
+          {
+            "label": "Entity fields extracted"
+          },
+          {
+            "label": "Markets detected"
+          },
+          {
+            "label": "Processing time",
+            "staticValue": "< 2 s"
+          }
+        ]
+      },
+      {
+        "title": "Live Validations",
+        "body": "Local AI models strip all Personally Identifiable Information — names, emails, tax IDs, phone numbers — before the anonymised schema is passed to the mapping engine.",
+        "stats": [
+          {
+            "label": "Live validations run"
+          },
+          {
+            "label": "PII fields removed"
+          },
+          {
+            "label": "Bytes stored on server"
+          }
+        ]
+      },
+      {
+        "title": "Dossier Generation & Matching",
+        "body": "The engine cross-references your anonymised profile with live country-specific risk matrices and produces a structured dossier matched to vetted local experts.",
+        "stats": [
+          {
+            "label": "Dossier pages generated"
+          },
+          {
+            "label": "Expert match accuracy"
+          },
+          {
+            "label": "Average match time",
+            "staticValue": "< 24 h"
+          }
+        ]
+      }
+    ],
+    "servicesZone": {
+      "badge": "What we cover",
+      "title1": "Six compliance domains,",
+      "title2": "one platform",
+      "description": "Each domain is mapped to country-specific requirements and updated as regulations change.",
+      "ctaCardTitle": "Need end-to-end coverage?",
+      "ctaCardDesc": "Our Full Support package covers all six domains with a dedicated compliance manager and a unified action plan.",
+      "ctaButton": "Explore Full Support"
+    },
+    "heroZone": {
+      "badge": "AI-Powered Advisory System",
+      "titleStart": "Your Compliance",
+      "titleHighlight": "Compass",
+      "titleEnd": "for Post-Brexit UK",
+      "description": "Navigate Tax & VAT obligations and EPR requirements with precision. Translate regulatory fragmentation into a structured Action Plan — in max. 5 steps.",
+      "ctaButton": "Qualify in max. 5 Steps",
+      "ctaSub": "No account required · Results in under 3 minutes",
+      "cardTitle": "Start your qualification",
+      "cardDesc": "Select your market and category to receive a personalised compliance dossier."
+    },
+    "valueProgression": {
+      "badge": "Access Tiers",
+      "title1": "The more you share, the more",
+      "title2": "you unlock",
+      "description": "Start for free as a Guest. Register to unlock your full Action Plan. Join as a Partner to receive qualified leads.",
+      "mostPopular": "Most Popular"
+    },
+    "socialProof": {
+      "title": "Trusted by compliance teams at"
+    },
+    "footer": {
+      "platform": "Platform",
+      "platformLinks": [
+        "Services",
+        "Countries",
+        "Advisory",
+        "Compliance Wizard"
+      ],
+      "legal": "Legal",
+      "legalLinks": [
+        "Privacy Policy",
+        "Terms of Service",
+        "Cookie Policy",
+        "GDPR Compliance"
+      ],
+      "copyright": "© {{year}} CompliHub360. All rights reserved.",
+      "description": "Your intelligent compliance compass. Navigate global regulatory complexity with AI-driven precision and a privacy-first architecture.",
+      "privacyBadge": "Privacy-first · No PII stored without consent",
+      "subscribeButton": "Subscribe",
+      "subscribed": "Subscribed to the Compliance Digest"
+    },
+    "resolution": {
+      "badge": "Sample Output — Page 1 of 3",
+      "titleStart": "UK Compliance",
+      "titleEnd": "Risk Snapshot",
+      "description": "You have your risk profile. Now fix it. Here is what a typical UK expansion dossier looks like — and the three paths to resolving it.",
+      "risk": {
+        "title": "Overall Risk Level",
+        "highLevel": "High",
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "critical": "Critical"
+      },
+      "findings": {
+        "title": "Key Findings",
+        "item1Title": "VAT Registration threshold exceeded",
+        "item1Desc": "Mandatory registration — HMRC threshold £85,000",
+        "item2Title": "EPR Packaging Producer Obligation",
+        "item2Desc": "PRN registration required by Q1 2025",
+        "item3Title": "MTD for VAT — Digital Records Gap",
+        "item3Desc": "Phase 2 compliance gap in current workflow",
+        "item4Title": "UK GDPR — Privacy Policy",
+        "item4Desc": "Meets baseline UK GDPR requirements"
+      },
+      "status": {
+        "actionReq": "Action Req.",
+        "review": "Review",
+        "compliant": "Compliant"
+      },
+      "unlock": {
+        "title": "You have your risk profile.",
+        "subtitle": "Choose how you want to resolve it.",
+        "page1Label": "Page 1",
+        "page1Value": "Risk Snapshot",
+        "page2Label": "Page 2",
+        "page2Value": "Action Plan",
+        "page3Label": "Page 3",
+        "page3Value": "Expert Match"
+      },
+      "cta": {
+        "primary": "Create Profile — Unlock Action Plan",
+        "secondary": "Skip to Expert Match"
+      },
+      "or": "or",
+      "disclaimer": "Expert Match connects you with a verified local tax or legal specialist who executes the action plan on your behalf."
+    },
+    "testimonials": {
+      "badge": "Real Results",
+      "titleStart": "Trusted by founders and",
+      "titleEnd": "operations teams",
+      "u1": {
+        "persona": "U1 — E-Commerce Founder",
+        "name": "Sarah K.",
+        "role": "Founder & CEO, D2C Brand",
+        "quote": "We saved 3 weeks of legal research in 30 minutes. CompliHub360 flagged our EPR packaging obligation early. The structured dossier was sent to our solicitor the same day, preventing a €20k compliance penalty.",
+        "result": "Prevented €20k Penalty",
+        "tag": "E-Commerce · EPR + VAT"
+      },
+      "u2": {
+        "persona": "U2 — SaaS Operations Manager",
+        "name": "Marcus L.",
+        "role": "Head of Operations, B2B SaaS",
+        "quote": "Navigating post-Brexit UK GDPR differences was stalling our enterprise deals. CompliHub360 gave us a grounded, cited analysis we could defend in front of our board. We closed our biggest deal 40% faster.",
+        "result": "Deal Closed 40% Faster",
+        "tag": "SaaS · UK GDPR"
+      },
+      "u3": {
+        "persona": "U3 — Agency Director",
+        "name": "Elena R.",
+        "role": "Managing Director, Creative Hub",
+        "quote": "We were expanding into Germany. The AI mapped exactly what was needed for a subsidiary versus a branch, saving us over €15k in consulting fees and 2 months of waiting for preliminary legal advice.",
+        "result": "Saved €15k in Consulting",
+        "tag": "Agency · Corporate"
+      },
+      "u4": {
+        "persona": "U4 — FinTech Compliance",
+        "name": "David P.",
+        "role": "Compliance Officer, FinPay",
+        "quote": "The speed at which CompliHub360 mapped our product against FCA thresholds was astonishing. Having live references to legislation built immense trust, allowing us to launch our UK pilot 3 months ahead of schedule.",
+        "result": "Launched 3 Months Early",
+        "tag": "FinTech · Regulatory"
+      }
+    },
+    "trustedLogos": {
+      "trustedBy": "Trusted by compliance teams at"
+    }
+  },
+  "components": {
+    "engagementModal": {
+      "title": "Request Proposal from {{providerName}}",
+      "market": "Market: {{providerName}}",
+      "category": "Category: {{category}}",
+      "detailsLabel": "Additional Details",
+      "optional": "Optional",
+      "detailsPlaceholder": "Add any specific requirements, timelines, or context for the provider...",
+      "privacyNotice": "Protected by AI Privacy Gate. Your request is anonymized until you choose to reveal your identity to the provider.",
+      "cancel": "Cancel",
+      "submit": "Submit Request",
+      "sent": "Sent!"
+    }
+  },
+  "solutions": {
+    "anchorFounders": "Founders & CEOs",
+    "anchorOperations": "Operations Teams",
+    "anchorCounsel": "In-House Counsel",
+    "founders": {
+      "overline": "For Founders & CEOs",
+      "title": "From Regulatory Uncertainty to Confident Expansion",
+      "body": "Founders need speed and clarity — not academic legal explanations. CompliHub360 translates regulatory chaos into safe, actionable business decisions so you can scale across borders without surprises.",
+      "cta": "Start Your Expansion Check",
+      "pain1Title": "The Cross-Border Blind Spot",
+      "pain1Desc": "Expanding internationally? VAT thresholds, EPR packaging laws, and GDPR differ by country. One missed registration can mean fines.",
+      "pain2Title": "The Unreliable Expert Trap",
+      "pain2Desc": "Cold-emailing compliance providers and waiting weeks for vague replies is not a strategy. It's a liability.",
+      "pain3Title": "We Fix This",
+      "pain3Desc": "Our AI Wizard captures your context in 4–5 steps, maps jurisdiction-bound risks, and connects you to SLA-enforced specialists within 24–48h.",
+      "diagramTitle": "The \"Expand Safely\" Path",
+      "node1Label": "Country Gate",
+      "node1Desc": "Select target market",
+      "node2Label": "Adaptive Wizard",
+      "node2Desc": "Business model & context",
+      "node3Label": "Risk Engine",
+      "node3Desc": "Calculate risk level",
+      "node4Label": "Partner Match",
+      "node4Desc": "1-Click engagement",
+      "stat1Label": "Steps to risk profile",
+      "stat2Label": "Max confirmation time",
+      "stat3Label": "Max reply window",
+      "stat4Label": "Regulatory surprises"
+    },
+    "operations": {
+      "overline": "For Operations Teams",
+      "title": "Centralize, Track & Master Compliance Ops",
+      "body": "Operations managers and agency operators need structured knowledge and a unified system — not scattered government sites and chaotic email threads. CompliHub360 gives you a single control center for cross-border compliance.",
+      "card1Title": "Scattered Research",
+      "card1Problem": "Information on advertising restrictions, EPR, and tax laws is fragmented across unstructured government sites.",
+      "card1Solution": "Our Knowledge Hub aggregates source-backed laws, tutorials, and guides — all tailored to your exact search profile.",
+      "card2Title": "Loss of Continuity",
+      "card2Problem": "Tracking provider requests, saved sessions, and legal updates is chaotic without a unified system.",
+      "card2Solution": "The Dashboard Control Center lets you save sessions, track engagement statuses in real-time, and monitor tasks.",
+      "card3Title": "Reporting Friction",
+      "card3Problem": "Summarizing regulatory exposure for stakeholders is manual, time-consuming work.",
+      "card3Solution": "One-click PDF export: Risk Snapshot, Action Plan, and Source Index — ready for internal circulation.",
+      "panel1Title": "Session Grid",
+      "panel1Desc": "Saved risk profiles by country",
+      "panel2Title": "Active Requests",
+      "panel2Desc": "Provider engagement status",
+      "panel3Title": "Export Engine",
+      "panel3Desc": "PDF reports for stakeholders",
+      "statusDraft": "Draft",
+      "statusSubmitted": "Submitted",
+      "statusConfirmed": "Confirmed",
+      "item1": "Risk Snapshot",
+      "item2": "Action Plan",
+      "item3": "Source Index",
+      "stat1Label": "Engagement lifecycle visibility",
+      "stat2Label": "PDF report export",
+      "stat3Label": "Saved compliance sessions"
+    },
+    "counsel": {
+      "overline": "For In-House Counsel",
+      "title": "Defensible Intelligence. Secure Orchestration.",
+      "body": "Legal professionals demand strict data privacy and zero AI hallucinations. CompliHub360 is a secure, EU-AI-Act ready infrastructure layer that accelerates legal research and safely structures external mandates.",
+      "cta": "Try Secure Research",
+      "benefit1Title": "Zero Hallucinations",
+      "benefit1Desc": "Every summary, risk label, and tip is directly backed by links to official, validated legal sources and authorities. No invented claims.",
+      "benefit2Title": "Privacy-First Architecture",
+      "benefit2Desc": "Documents pass through a local PII Redaction Pipeline. Names, emails, and phone numbers are masked before any AI processing.",
+      "benefit3Title": "Structured Engagement Dossiers",
+      "benefit3Desc": "Replace vague emails with structured compliance dossiers sent to verified local counsel — accelerating the mandate process.",
+      "privacyGateTitle": "The Privacy-First AI Gate",
+      "stage1Label": "Document Upload",
+      "stage1Desc": "Restricted Vault",
+      "stage2Label": "PII Redaction",
+      "stage2Desc": "Local masking engine",
+      "stage3Label": "AI Eligibility Gate",
+      "stage3Desc": "Policy & consent check",
+      "stage4Label": "Grounded Output",
+      "stage4Desc": "Source-backed summary",
+      "codeCommentBefore": "// Before redaction",
+      "codeCommentAfter": "// After redaction",
+      "stat1Label": "PII masked before AI",
+      "stat2Label": "Source-linked outputs"
+    },
+    "cta": {
+      "title": "Which role fits you?",
+      "body": "No matter your function — our platform adapts to your compliance reality.",
+      "btnAssessment": "Start Free Assessment",
+      "btnPlatform": "Explore Platform"
+    },
+    "footer": {
+      "copyright": "© {{year}} CompliHub360. Built in Berlin."
+    }
+  },
+  "platform": {
+    "anchorEngine": "AI Engine",
+    "anchorMatching": "Partner Matching",
+    "anchorCoverage": "Global Coverage",
+    "anchorPartners": "For Partners",
+    "engine": {
+      "overline": "The AI Engine",
+      "title": "From Regulatory Uncertainty to Structured Action",
+      "body": "Compliance data is fragmented and unstructured. Our AI acts as a cognitive Advisory Layer — extracting your business intent and mapping it to concrete legal realities. No hallucinations. Every output grounded in verified sources.",
+      "node1Label": "Business Context",
+      "node1Sub": "Wizard Input",
+      "node2Label": "PII Redaction",
+      "node2Sub": "Privacy Gate",
+      "node3Label": "AI Analysis",
+      "node3Sub": "Grounded RAG",
+      "node4Label": "Risk Dossier",
+      "node4Sub": "Structured Output",
+      "card1Title": "Adaptive Intent Mapping",
+      "card1Body": "You don't need to know which laws to search for. Our Wizard captures your context in 4–5 steps and generates a structured Search Profile automatically.",
+      "card2Title": "Privacy Redaction Pipeline",
+      "card2Body": "Before any document touches our AI, it passes through a local Redaction Pipeline — automatically masking PII like names, emails, and phone numbers.",
+      "card3Title": "Triple AI Gate",
+      "card3Body": "The AI only activates if three strict conditions are met: document is sanitized, user has given explicit consent, and it's not classified as restricted.",
+      "stat1Label": "PII stored in AI layer",
+      "stat2Label": "Source-grounded outputs",
+      "stat3Label": "Full risk profile"
+    },
+    "matching": {
+      "overline": "Partner Matching",
+      "title": "Verified Specialists. Orchestrated Accountability.",
+      "body": "We're not a directory. We're an orchestrator. We don't just give you a list of names — we control the engagement to ensure accountability, from first contact to successful resolution.",
+      "funnelTitle": "The Risk-to-Execution Funnel",
+      "step1Title": "Jurisdiction-Bound Matching",
+      "step1Desc": "Connects you only with specialists verified for your target country and compliance category.",
+      "step2Title": "Structured Engagement Request",
+      "step2Desc": "Your anonymized compliance dossier is sent directly to the partner — no cold emails, no blank inquiries.",
+      "step3Title": "SLA-Enforced Response",
+      "step3Desc": "Partners must confirm receipt within 24h and reply within 48h. Our automated Watchdog enforces this.",
+      "step4Title": "Automated Downgrade System",
+      "step4Desc": "Repeated SLA breaches trigger an automatic downgrade. You only engage with responsive, top-tier professionals.",
+      "step5Title": "Priority Rewards",
+      "step5Desc": "High-performing partners earn priority placement and premium badges through our Ranking Engine.",
+      "funnel1Label": "Assessment",
+      "funnel1Detail": "Structured intent capture",
+      "funnel2Label": "Dossier",
+      "funnel2Detail": "Anonymized risk profile",
+      "funnel3Label": "Matching",
+      "funnel3Detail": "Jurisdiction-bound ranking",
+      "funnel4Label": "Appointment",
+      "funnel4Detail": "SLA-enforced response",
+      "funnel5Label": "Execution",
+      "funnel5Detail": "Local expert delivery"
+    },
+    "coverage": {
+      "overline": "Global Coverage",
+      "title": "Localized Security for Global Expansion",
+      "body": "Your business crosses borders — your compliance should too. Every question, risk, and matched expert is tailored to the laws of your target market.",
+      "matrixTitle": "Dynamic Country Policy Matrix",
+      "matrixBody": "Data privacy laws differ across borders. Our platform adapts data residency, retention, and AI eligibility rules per jurisdiction — defaulting to strict GDPR standards for European markets.",
+      "matrix1Val": "Geo-fenced",
+      "matrix1Label": "Data Residency",
+      "matrix2Val": "Country-specific",
+      "matrix2Label": "Retention Policy",
+      "matrix3Val": "Dynamic gates",
+      "matrix3Label": "AI Eligibility",
+      "marketStatusLive": "Live"
+    },
+    "partners": {
+      "overline": "For Partner Firms",
+      "title": "Pre-Qualified Clients. Zero Friction.",
+      "body": "Stop wasting billable hours on unqualified leads and unstructured cold emails. CompliHub360 sends you highly qualified, structured business clients ready to act.",
+      "benefit1Title": "Structured Dossiers",
+      "benefit1Desc": "Receive business context, target markets, and specific regulatory risks — evaluate mandates instantly.",
+      "benefit2Title": "Magic Link Workflow",
+      "benefit2Desc": "Secure, time-bound one-click access. No portal to maintain, no password to remember.",
+      "benefit3Title": "Performance-Based Growth",
+      "benefit3Desc": "Transparent flat engagement fee. Great SLA performance earns priority placement and premium badges.",
+      "cta": "Apply as Partner Firm",
+      "flowTitle": "The Magic Link Workflow",
+      "flow1Label": "Structured Dossier",
+      "flow1Desc": "Pre-qualified lead arrives",
+      "flow2Label": "Magic Link Email",
+      "flow2Desc": "Secure, time-bound access",
+      "flow3Label": "One-Click Review",
+      "flow3Desc": "No portal. No password.",
+      "flow4Label": "Confirm & Reply",
+      "flow4Desc": "SLA timer stops",
+      "stat1Label": "Max confirmation time",
+      "stat2Label": "Max reply window",
+      "stat3Label": "Platform subscription"
+    },
+    "cta": {
+      "title": "Ready to simplify compliance?",
+      "body": "Start your free assessment and get a structured risk profile in under 2 minutes.",
+      "btnAssessment": "Start Free Assessment",
+      "btnExpert": "Skip to Expert Match"
+    },
+    "footer": {
+      "copyright": "© {{year}} CompliHub360. Built in Berlin."
+    }
+  },
+  "compliance": {
+    "heroOverline": "Compliance Areas",
+    "heroTitle": "Find Your Regulatory Challenge. Start Here.",
+    "heroBody": "Each compliance area is a gateway to your specific assessment. Identify your topic, understand the risks, and get matched with a verified specialist — all in under 5 minutes.",
+    "anchorTax": "Tax & VAT",
+    "anchorEpr": "EPR & Packaging",
+    "anchorPrivacy": "Data & Privacy",
+    "anchorCorporate": "Corporate Structure",
+    "riskLabel": "Risk",
+    "whoAffected": "Who is affected",
+    "keyObligations": "Key Obligations",
+    "whatWeCover": "What CompliHub360 Covers",
+    "activeMarkets": "Active Markets",
+    "startAssessment": "Start {{title}} Assessment",
+    "riskAtGlance": "Risk at a Glance",
+    "tax": {
+      "title": "Tax & VAT",
+      "risk": "High",
+      "headline": "Cross-Border VAT, Delivery Thresholds & Digital Taxation",
+      "description": "Managing cross-border VAT obligations, delivery thresholds, and digital taxation rules across international jurisdictions — including OSS and MTD frameworks.",
+      "affected": "Cross-border e-commerce operators selling physical or digital products via marketplaces (Amazon) or independent shops (Shopify).",
+      "ob1": "Monitoring international delivery thresholds",
+      "ob2": "Determining when local VAT registration becomes mandatory",
+      "ob3": "Navigating varying tax rules for physical vs. digital goods",
+      "ob4": "OSS registration & reporting",
+      "cov1": "Dedicated Tax & VAT Wizard — captures sales model, legal seat, revenue, and target markets",
+      "cov2": "Calculates precise vat_likelihood per jurisdiction",
+      "cov3": "Orchestrates matching to specialized VAT consultants by case complexity"
+    },
+    "epr": {
+      "title": "EPR & Packaging",
+      "risk": "High",
+      "headline": "Extended Producer Responsibility, VerpackG & Recycling Targets",
+      "description": "Highly fragmented local environmental regulations, packaging laws (VerpackG), and recycling targets (PRN) that differ drastically by country.",
+      "affected": "E-commerce merchants, manufacturers, resellers, and dropshippers selling physical goods with packaging across borders.",
+      "ob1": "Understanding country-specific packaging & environmental laws",
+      "ob2": "Determining registration by product category (electronics, apparel, cosmetics)",
+      "ob3": "Adhering to local recycling targets to avoid fines",
+      "ob4": "Dropshipper responsibility assessment",
+      "cov1": "Product & Packaging Wizard — assesses commercial role, target markets, product categories",
+      "cov2": "Calculates epr_required_likelihood per jurisdiction",
+      "cov3": "Intelligent edge-case handling: \"Assume Yes\" safety logic for uncertain dropshippers"
+    },
+    "privacy": {
+      "title": "Data & Privacy",
+      "risk": "Critical",
+      "headline": "GDPR, UK GDPR, Cookie Compliance & Data Transfers",
+      "description": "Compliance with EU DSGVO (GDPR), UK GDPR, cookie consent management, and the strict regulations governing international data transfers.",
+      "affected": "Software founders, SaaS expansion managers, and businesses collecting personal data or using tracking tools while expanding globally.",
+      "ob1": "Implementing valid consent management",
+      "ob2": "Legally securing international data transfers (EU ↔ US)",
+      "ob3": "Managing tracking tool compliance (GA4, Meta, TikTok)",
+      "ob4": "Cookie banner & privacy policy requirements",
+      "cov1": "Data & Privacy Wizard — analyzes target customers, processing locations, tracking stack",
+      "cov2": "Calculates privacy_risk_level based on actual tool exposure",
+      "cov3": "Platform itself uses a local PII Redaction Pipeline — zero raw data in AI layer"
+    },
+    "corporate": {
+      "title": "Corporate Structure",
+      "risk": "Medium",
+      "headline": "International Company Setup, Legal Form & Local Substance",
+      "description": "Navigating international company setup, choosing the correct legal form, establishing local substance, and handling corporate registrations in new jurisdictions.",
+      "affected": "Individuals or companies planning to register legal entities, expand teams, or establish corporate presence in foreign markets.",
+      "ob1": "Selecting appropriate corporate structure per target country",
+      "ob2": "Fulfilling local registration & documentation requirements",
+      "ob3": "Establishing local substance and governance",
+      "ob4": "Team complexity assessment",
+      "cov1": "Corporate & Structure Wizard — evaluates current status, desired markets, team complexity",
+      "cov2": "Determines entity_need_level per jurisdiction",
+      "cov3": "Intelligent routing to educational guide paths for uncertain founders"
+    },
+    "cta": {
+      "title": "Not sure which area applies?",
+      "body": "Our Wizard asks the right questions and routes you to the correct assessment automatically.",
+      "btn": "Start General Assessment"
+    },
+    "footer": {
+      "copyright": "© {{year}} CompliHub360. Built in Berlin."
+    }
+  },
+  "resources": {
+    "tabStories": "Customer Stories",
+    "tabGuides": "Guides & Whitepapers",
+    "stories": {
+      "overline": "Customer Stories",
+      "title": "Real Compliance Outcomes, Not Marketing Claims",
+      "body": "See how businesses like yours used CompliHub360 to navigate complex cross-border compliance — from uncertainty to resolution.",
+      "challengeLabel": "Challenge",
+      "outcomeLabel": "Outcome"
+    },
+    "guides": {
+      "overline": "Guides & Whitepapers",
+      "title": "Knowledge That Builds Compliance Confidence",
+      "body": "In-depth market deep-dives, regulatory breakdowns, and practical checklists — curated by our compliance intelligence engine and reviewed by specialists.",
+      "kbTitle": "Living Knowledge Base",
+      "kbBody": "Every platform update, new compliance rule, or partner integration triggers a dedicated content update. Our guides are evergreen — automatically maintained and verified against the latest regulatory sources.",
+      "kbCta": "Get Notified"
+    },
+    "cta": {
+      "title": "Ready to become compliant?",
+      "body": "Join businesses that turned compliance uncertainty into structured action plans.",
+      "btnAssessment": "Start Free Assessment",
+      "btnPlatform": "Explore Platform"
+    },
+    "footer": {
+      "copyright": "© {{year}} CompliHub360. Built in Berlin."
+    }
+  },
+  "advisory": {
+    "heroBadge": "ADVANCED COGNITIVE LAYER",
+    "heroTitle": "Your intelligent compliance compass: The cognitive",
+    "heroTitleHighlight": "Advisory Layer",
+    "heroBody": "Translating unstructured regulatory uncertainty into clear, actionable understanding. We bridge the gap between your business and the complex legal world.",
+    "heroCta1": "Free Compliance Check",
+    "heroCta2": "Explore Methodology",
+    "featuresTitle": "How our intelligent navigation works",
+    "featuresBody": "Going far beyond a traditional directory, our Advisory Layer operates as a cognitive OS for global compliance.",
+    "feature1Title": "Adaptive Compliance-Wizard",
+    "feature1Desc": "Intent Structuring: Instead of static filters, our wizard captures your specific business context in 4-5 dynamic steps, translating uncertainty into a structured search profile.",
+    "feature1Tag1": "Intent-Based",
+    "feature1Tag2": "Dynamic Flow",
+    "feature2Title": "Privacy-First Redaction Pipeline",
+    "feature2Desc": "Data security is built into the architecture. All PII is automatically and locally anonymized before any AI analysis, ensuring no confidential data ever leaves your control.",
+    "feature2Tag1": "Local Anonymization",
+    "feature2Tag2": "PII-Safe",
+    "feature3Title": "Grounded Intelligence",
+    "feature3Desc": "Our AI is strictly grounded in official, validated legal sources. Every recommendation and summary includes direct links to the regulatory documentation it's based on.",
+    "feature3Tag1": "Hallucination-Free",
+    "feature3Tag2": "Source-Linked",
+    "feature4Title": "Risk-Based Decision Engine",
+    "feature4Desc": "Continuous risk calculation based on your profile inputs. Connects your context with our database to generate curated checklists and verified provider matches.",
+    "feature4Tag1": "Real-time Assessment",
+    "feature4Tag2": "Curated Matching",
+    "transparencyTitle": "Transparency and limits of our AI",
+    "transparencyQuote": "\"Our AI does not replace your lawyer. It makes your lawyer 10x more efficient by providing perfectly pre-structured digital dossiers.\"",
+    "check1": "Focus on structured orientation & dossier orchestration.",
+    "check2": "Grounded retrieval from official, validated sources.",
+    "cross1": "No binding legal advice—that belongs to licensed law firms.",
+    "matrixTitle": "Country Policy Matrix",
+    "matrixBody": "Every data process follows a strict individual policy matrix matched to local data residency and privacy standards.",
+    "pipelineRaw": "RAW DATA",
+    "pipelineLabel": "REDACTION PIPELINE",
+    "pipelineDoc": "User Document",
+    "pipelineAnon": "Anonymized Dossier",
+    "pipelineReady": "AI READY",
+    "pipelineNote": "Your AI never sees plaintext PII. Local extraction only.",
+    "ctaTitle": "Ready for clarity?",
+    "ctaBody": "Stop searching through static directories. Start navigating your compliance journey with our cognitive intelligent operating system.",
+    "ctaBtn": "Start Search Now"
+  },
+  "wizard": {
+    "reviewPanel": {
+      "primaryCountry": "Primary Country",
+      "additionalMarkets": "Additional Markets",
+      "category": "Compliance Category",
+      "businessType": "Business Type",
+      "marketScope": "Market Scope",
+      "riskSignals": "Risk Signals",
+      "revenue": "Annual Revenue",
+      "intent": "Intent",
+      "generateCTA": "Generate My Compliance Results",
+      "register": "Register",
+      "registerDesc": "to save and edit these answers later in your dashboard."
+    },
+    "businessTypes": {
+      "ecommerce": {
+        "label": "E-Commerce Brand",
+        "desc": "Sell own products via your website or marketplace."
+      },
+      "marketplace": {
+        "label": "Marketplace Seller",
+        "desc": "Sell via Amazon, Shopify, eBay, Etsy, etc."
+      },
+      "saas": {
+        "label": "SaaS / Software",
+        "desc": "Digital products, subscriptions, or software services."
+      },
+      "agency": {
+        "label": "Agency / Consultant",
+        "desc": "Services, consulting, or creative work for clients."
+      },
+      "other": {
+        "label": "Other",
+        "desc": "Tell us a bit more about your business."
+      }
+    },
+    "marketScopes": {
+      "local": {
+        "label": "Local Only",
+        "desc": "I only operate within my primary country."
+      },
+      "eu": {
+        "label": "EU / Europe",
+        "desc": "I sell to or operate across multiple EU countries."
+      },
+      "global": {
+        "label": "Global",
+        "desc": "I operate in markets outside Europe."
+      }
+    },
+    "revenueBands": {
+      "lt10k": "< €10k",
+      "mid1": "€10k–100k",
+      "mid2": "€100k–1M",
+      "gt1m": "> €1M",
+      "perYear": "per year"
+    },
+    "intents": {
+      "selfCheck": {
+        "label": "Quick self-check",
+        "desc": "Get immediate feedback on basic requirements."
+      },
+      "expert": {
+        "label": "Expert advice",
+        "desc": "Speak with a specialist for complex cases."
+      },
+      "fullService": {
+        "label": "Full service",
+        "desc": "End-to-end management by our team."
+      }
+    },
+    "urgencies": {
+      "today": "Today",
+      "week": "This week",
+      "month": "This month",
+      "researching": "Just researching"
+    },
+    "riskSignals": {
+      "taxVat": {
+        "marketplace": "Marketplace seller",
+        "crossBorder": "Cross-border shipping",
+        "warehouse": "Warehouse abroad",
+        "digitalGoods": "Digital goods / services",
+        "highVolume": "High transaction volume",
+        "vatRegistered": "Already VAT registered"
+      },
+      "epr": {
+        "physicalGoods": "Sells physical goods",
+        "ownPackaging": "Uses custom packaging",
+        "dropshipper": "Dropshipper / unbranded",
+        "electronics": "Electronics category",
+        "importer": "Imports from outside EU",
+        "recyclingFee": "Not paying recycling fee"
+      },
+      "privacy": {
+        "ga4": "Google Analytics (GA4)",
+        "metaPixel": "Meta Pixel",
+        "tiktokPixel": "TikTok Pixel",
+        "emailMarketing": "Email marketing",
+        "crmTool": "CRM / contact data",
+        "noConsent": "No consent management"
+      },
+      "marketing": {
+        "healthClaims": "Health / supplement claims",
+        "guaranteed": "\"Guaranteed\" or \"#1\" claims",
+        "googleAds": "Google Ads",
+        "metaAds": "Meta / Facebook Ads",
+        "influencer": "Influencer marketing",
+        "cookiePopup": "No cookie consent"
+      },
+      "corporate": {
+        "individual": "No legal entity yet",
+        "foreign": "Registering abroad",
+        "multiEntity": "Multiple entities",
+        "remoteTeam": "Remote / international team",
+        "investorReady": "Preparing for investment"
+      },
+      "full": {
+        "multiCountry": "Operating in 3+ countries",
+        "allCategories": "Multiple compliance areas",
+        "fastNeeded": "Urgent / fast turnaround",
+        "noTeam": "No in-house compliance",
+        "auditNeeded": "Need compliance audit"
+      }
+    },
+    "headlines": {
+      "taxVat": "What are your main tax risk factors?",
+      "epr": "What are your main packaging or product situations?",
+      "privacy": "Which data tools or practices apply to you?",
+      "marketing": "What are your main marketing risk areas?",
+      "corporate": "What best describes your corporate situation?",
+      "fullSupport": "What are your main challenges?",
+      "default": "What are your main risk areas?"
+    },
+    "steps": {
+      "context": {
+        "label": "Business Context",
+        "title": "How would you describe your business?",
+        "subtitle": "This helps us tailor the right compliance questions for your situation.",
+        "freeTextLabel": "Tell us more about your business",
+        "freeTextDesc": "Optional — helps us suggest the most relevant providers.",
+        "freeTextPlaceholder": "e.g. I run a drop-shipping business across EU markets..."
+      },
+      "markets": {
+        "label": "Market Scope",
+        "title": "Where do you sell or operate?",
+        "subtitle": "Compliance requirements differ significantly based on your operating scope.",
+        "globalNotice": "Compliance rules differ significantly outside the EU. Consider our Full Support package for broader coverage.",
+        "showMarkets": "Select specific additional markets (Optional)",
+        "hideMarkets": "Hide specific markets"
+      },
+      "risk": {
+        "label": "Risk Signals",
+        "subtitle": "Select all that apply — this helps us calculate your risk level and find the best providers.",
+        "signalsDetected": "risk signals",
+        "signalsWeight": "detected — we'll weight provider results accordingly."
+      },
+      "complexity": {
+        "label": "Complexity & Intent",
+        "title": "Last step — tell us your scale & goal.",
+        "subtitle": "This helps rank providers by relevance and match the right service tier.",
+        "revenueLabel": "ANNUAL REVENUE",
+        "intentLabel": "WHAT DO YOU NEED RIGHT NOW?",
+        "urgencyLabel": "HOW URGENT IS THIS?"
+      }
+    },
+    "review": "Review",
+    "reviewAnswers": "Review your answers",
+    "reviewDesc": "Confirm everything looks right before we generate your results.",
+    "reviewAnswersButton": "Review Answers",
+    "backToPrevious": "Back to previous step"
+  },
+  "aiGov": {
+    "trustCenter": "CompliHub360 Trust Center",
+    "heroTitle": "AI Governance Framework",
+    "heroDesc": "We believe in responsible innovation. Our platform integrates AI strictly within the bounds of global regulations, ethics, and transparency. Discover how we implement the 6 dimensions of AI Governance.",
+    "dimTitle": "The 6 Dimensions of AI Governance",
+    "dimDesc": "A comprehensive approach to building trustworthy AI systems for enterprise compliance.",
+    "dimEthicsTitle": "Ethical Guidelines",
+    "dimEthicsDesc": "Our AI features respect human autonomy and are designed to augment professionals, not replace them. We prevent systemic bias through continuous monitoring.",
+    "dimTranspTitle": "Transparency & Explainability",
+    "dimTranspDesc": "Users deserve to know when they are interacting with AI. Every AI-generated output on CompliHub360 is clearly marked, and its data sources are traceable.",
+    "dimOrgTitle": "Organizational Accountability",
+    "dimOrgDesc": "Clear governance pipelines dictate who can deploy, access, and audit AI features. We maintain comprehensive audit logs for all AI interactions.",
+    "dimTechTitle": "Technical Robustness",
+    "dimTechDesc": "Our infrastructure ensures zero downtime and resilient fallbacks. Dedicated Privacy Gates sanitize all inputs before they reach any LLM.",
+    "dimRegTitle": "Regulatory Compliance",
+    "dimRegDesc": "Built for the EU AI Act and ISO 42001. We map global standards directly into our Code, prioritizing strict EU and UK privacy rules.",
+    "dimRiskTitle": "Risk Management",
+    "dimRiskDesc": "Continuous risk assessment of AI models. We classify features by risk tiers (e.g., EU AI Act High-Risk vs. Minimal-Risk) and apply proportional security controls.",
+    "featTitle": "Active AI Features on CompliHub360",
+    "featDesc": "How we leverage AI today, wrapped in our strict governance framework.",
+    "featPrivacyTitle": "Privacy Redaction Pipeline",
+    "featPrivacyDesc": "Before any business context is analyzed, our local NLP models strip out all Personally Identifiable Information (PII). Emails, names, and phone numbers never leave our secure European servers.",
+    "featIntentTitle": "Intent Analysis Engine",
+    "featIntentDesc": "Transforms unstructured client input into a structured risk profile. The AI is restricted to analyzing compliance context and cannot make binding legal decisions on its own.",
+    "featGateTitle": "Triple AI Gate Validator",
+    "featGateDesc": "Every AI action must pass three checks: Data Sanitization, Explicit Consent, and Domain Restriction. If any check fails, the workflow gracefully falls back to a deterministic, non-AI process."
+  }
+}

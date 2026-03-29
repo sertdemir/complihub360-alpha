@@ -1,0 +1,47 @@
+name: "CI"
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+    tags:
+      - 'v*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality-gates:
+    name: "quality-gates"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.12.0'
+          cache: 'npm'
+
+      - name: Install dependencies
+        # npm ci can sometimes be unreliable with complex local workspace linking
+        # we fallback to a standard npm install to ensure resilient CI builds.
+        run: npm ci || npm install
+
+      - name: Build Core Dependencies
+        run: npm run build:root
+
+      - name: Run Workspace Typechecks
+        run: npm run typecheck
+
+      - name: Run Build
+        run: npm run build
+
+      - name: Run Tests
+        run: npm run test --workspaces --if-present
