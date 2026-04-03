@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Shield base - Primary Green -->
+  <path d="M32 4L8 16v16c0 14.4 10.24 27.84 24 32 13.76-4.16 24-17.6 24-32V16L32 4z" fill="#004D40"/>
+  <!-- Shield inner highlight -->
+  <path d="M32 8L12 18.4v13.6c0 12.32 8.53 23.84 20 27.44V8z" fill="#003E33"/>
+  <!-- Circular arc - Accent Gold (360 motif) -->
+  <path d="M32 12c-11.05 0-20 8.95-20 20h4c0-8.84 7.16-16 16-16V12z" fill="#D4AF37" opacity="0.9"/>
+  <path d="M52 32c0-11.05-8.95-20-20-20v4c8.84 0 16 7.16 16 16h4z" fill="#D4AF37" opacity="0.6"/>
+  <!-- Checkmark - Accent Gold -->
+  <path d="M22 32l7 7 13-14" stroke="#D4AF37" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Dynamic swoosh arrow (forward motion) -->
+  <path d="M44 20l4-4m0 0l-4-1m4 1l-1 4" stroke="#D4AF37" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

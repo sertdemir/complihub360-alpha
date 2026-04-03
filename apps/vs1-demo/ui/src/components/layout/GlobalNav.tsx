@@ -6,7 +6,7 @@ import { LanguageSwitcher } from '../common/LanguageSwitcher';
 import { useAuthStore } from '../../store/useAuthStore';
 import {
   type LucideIcon,
-  CircleDot, ChevronDown, ArrowRight,
+  ChevronDown, ArrowRight,
   Zap, Users, Globe as GlobeIcon, Building2,
   Rocket, Layers, Scale,
   MessageSquare, FileText, ShieldCheck,
@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Typography } from '../ui/Typography';
+import { Logo } from '../common/Logo';
 
 const HIDDEN_PATHS = ['/login', '/register', '/verify-email'];
 
@@ -107,15 +108,10 @@ export function GlobalNav() {
         {/* Logo */}
         <button
           onClick={() => navTo('/')}
-          className="flex items-center gap-2 shrink-0 px-2"
+          className="shrink-0 px-2"
           aria-label="CompliHub360 Home"
         >
-          <div className="w-5 h-5 bg-primary-500 rounded-sm flex items-center justify-center">
-            <CircleDot size={12} className="text-white" />
-          </div>
-          <span className="font-sans font-bold text-neutral-900 tracking-tight text-sm">
-            CompliHub<span className="text-primary-500">360</span>
-          </span>
+          <Logo size="sm" />
         </button>
 
         {/* Divider */}
