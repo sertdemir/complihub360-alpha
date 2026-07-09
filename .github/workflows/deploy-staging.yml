@@ -1,0 +1,60 @@
+# Staging auto-deploy — builds the vs1-demo UI and rsyncs it to the Hostinger
+# VPS (same target as scripts/deploy-staging.sh). Requires two repo secrets:
+#   VPS_SSH_KEY      — private key of the dedicated CI deploy keypair
+#   STAGING_API_KEY  — x-api-key baked into the frontend bundle
+# Until both exist, runs fail at the SSH step — that is expected, not a bug.
+name: Deploy Staging
+
+on:
+  push:
+    branches: [main, security/backend-p0-remediation]
+    paths:
+      - 'apps/vs1-demo/ui/**'
+      - 'packages/**'
+      - '.github/workflows/deploy-staging.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install workspace dependencies
+        run: npm ci
+
+      - name: Build workspace packages (UI imports their dist/)
+        run: |
+          for p in packages/*; do
+            npm run build --workspace "$p" --if-present
+          done
+
+      - name: Build frontend
+        env:
+          VITE_DEV_API_KEY: ${{ secrets.STAGING_API_KEY }}
+        run: |
+          npm run build --workspace apps/vs1-demo/ui
+          printf 'User-agent: *\nDisallow: /\n' > apps/vs1-demo/ui/dist/robots.txt
+
+      - name: Deploy via rsync
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$VPS_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H 76.13.159.221 >> ~/.ssh/known_hosts 2>/dev/null
+          rsync -az --delete -e "ssh -i ~/.ssh/deploy_key" \
+            apps/vs1-demo/ui/dist/ root@76.13.159.221:/docker/complihub/site/
+          ssh -i ~/.ssh/deploy_key root@76.13.159.221 'chmod -R a+rX /docker/complihub/site'
+
+      - name: Verify
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" https://staging.complihub360.com/)
+          if [ "$code" != "401" ]; then echo "Unexpected status $code" && exit 1; fi
+          echo "✓ Staging up (auth wall active)"
