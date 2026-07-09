@@ -7,6 +7,20 @@ import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeC
 import { generateRelevantSubdomains, type CountryCode, type IndustryType, type BusinessModel } from "@complihub/compliance-engine";
 
 import { supabaseApi } from "./supabase.js";
+import { redactText } from "@complihub360/redaction";
+
+// P0 #1: shared magic-link verification — SHA-256 hash lookup, engagement +
+// action match, expiry, single-use (burned before the state mutation).
+async function verifyAndBurnMagicToken(engagementId: string, action: 'confirm' | 'reply' | 'decline', rawToken: string): Promise<boolean> {
+    if (!rawToken || typeof rawToken !== 'string') return false;
+    const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+    const rows = (await supabaseApi.select('magic_link_tokens', { token_hash: tokenHash, engagement_id: engagementId, action }, { limit: 1 })) as
+        Array<{ id: string; expires_at: string; used_at: string | null }>;
+    const row = rows[0];
+    if (!row || row.used_at !== null || new Date(row.expires_at).getTime() < Date.now()) return false;
+    await supabaseApi.update('magic_link_tokens', { id: row.id }, { used_at: new Date().toISOString() });
+    return true;
+}
 
 // Security Hardening: Rate limiting state
 const ipRateLimits = new Map<string, { count: number; resetAt: number }>();
@@ -81,26 +95,39 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         const authHeader = req.headers['authorization'];
         const devKey = req.headers['x-api-key'];
 
-        // 1. Check Supabase JWT (HS256)
+        // 1. Verify the Supabase access token (HS256): algorithm + signature + exp/nbf + role.
         if (authHeader && authHeader.startsWith('Bearer ')) {
             const token = authHeader.substring(7);
             const jwtSecret = process.env.SUPABASE_JWT_SECRET;
-            if (jwtSecret) {
+            const parts = token.split('.');
+            if (jwtSecret && parts.length === 3) {
                 try {
-                    const [headerB64, payloadB64, signatureB64] = token.split('.');
-                    if (headerB64 && payloadB64 && signatureB64) {
-                        const signatureInput = `${headerB64}.${payloadB64}`;
+                    const [headerB64, payloadB64, signatureB64] = parts;
+                    const header = JSON.parse(Buffer.from(headerB64, 'base64url').toString('utf8'));
+                    // Pin the algorithm — reject alg:none and RS/ES "confusion" tokens.
+                    if (header.alg === 'HS256') {
                         const expectedSignature = crypto
                             .createHmac('sha256', jwtSecret)
-                            .update(signatureInput)
-                            .digest('base64url'); // JWT Uses Base64URL encoding
-
-                        if (expectedSignature === signatureB64) {
-                            isAuthenticated = true;
+                            .update(`${headerB64}.${payloadB64}`)
+                            .digest('base64url'); // JWT uses Base64URL encoding
+                        const sigBuf = Buffer.from(signatureB64);
+                        const expBuf = Buffer.from(expectedSignature);
+                        // Constant-time comparison to avoid signature timing leaks.
+                        if (sigBuf.length === expBuf.length && crypto.timingSafeEqual(sigBuf, expBuf)) {
+                            const payload = JSON.parse(Buffer.from(payloadB64, 'base64url').toString('utf8'));
+                            const nowSec = Math.floor(Date.now() / 1000);
+                            const notExpired = typeof payload.exp !== 'number' || payload.exp > nowSec;
+                            const active = typeof payload.nbf !== 'number' || payload.nbf <= nowSec;
+                            const role = typeof payload.role === 'string' ? payload.role : '';
+                            // Reject the public anon key (role 'anon'): it ships to browsers and is
+                            // NOT a per-user credential. Only real, unexpired user/service tokens pass.
+                            if (notExpired && active && role && role !== 'anon') {
+                                isAuthenticated = true;
+                            }
                         }
                     }
                 } catch (e) {
-                    // Fallthrough to 401
+                    // Malformed token → fall through to 401
                 }
             }
         }
@@ -333,6 +360,225 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 });
             }
         });
+    } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/requests')) {
+        // Provider request inbox — the first dashboard read endpoint. Auth is
+        // enforced by the global guard above; rows come straight from
+        // engagement_requests (newest first, capped at 50).
+        try {
+            const rows = await supabaseApi.select('engagement_requests', {}, { order: 'created_at.desc', limit: 50 });
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ok: true, requests: rows }));
+        } catch (err) {
+            structuredLog('error', 'Requests list failed', { correlationId, errorCode: 'ERR_REQUESTS_LIST', severity: 'error', route: req.url });
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Failed to load requests', correlationId }));
+        }
+    } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/metrics')) {
+        // Provider performance KPIs computed from engagement_requests. Transition
+        // timestamps don't exist yet (only created_at/updated_at), so the time
+        // averages are approximations until per-transition events land.
+        try {
+            const rows = (await supabaseApi.select('engagement_requests', {}, { order: 'created_at.desc', limit: 500 })) as
+                Array<{ status: string; created_at: string; updated_at?: string; sla_confirm_deadline?: string }>;
+            const total = rows.length;
+            const confirmed = rows.filter(r => r.status === 'confirmed' || r.status === 'replied').length;
+            const replied = rows.filter(r => r.status === 'replied').length;
+            const expired = rows.filter(r => r.status === 'expired').length;
+            const avgMs = (subset: typeof rows) => {
+                const ds = subset
+                    .filter(r => r.updated_at)
+                    .map(r => new Date(r.updated_at as string).getTime() - new Date(r.created_at).getTime())
+                    .filter(d => d > 0);
+                return ds.length ? ds.reduce((a, b) => a + b, 0) / ds.length : null;
+            };
+            const metrics = {
+                total,
+                confirm_rate: total ? confirmed / total : null,
+                reply_rate: confirmed ? replied / confirmed : null,
+                sla_breach_rate: total ? expired / total : null,
+                avg_confirm_ms: avgMs(rows.filter(r => r.status === 'confirmed' || r.status === 'replied')),
+                avg_reply_ms: avgMs(rows.filter(r => r.status === 'replied')),
+            };
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ok: true, metrics }));
+        } catch (err) {
+            structuredLog('error', 'Metrics failed', { correlationId, errorCode: 'ERR_METRICS', severity: 'error', route: req.url });
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Failed to compute metrics', correlationId }));
+        }
+    } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/notifications')) {
+        // Aggregated event feed straight from event_log (newest first). The
+        // table's time column is `timestamp` (init migration) — alias it to
+        // created_at in the response for the FE mappers.
+        try {
+            const rows = (await supabaseApi.select('event_log', {}, { order: 'timestamp.desc', limit: 50 })) as
+                Array<{ timestamp?: string; created_at?: string }>;
+            const notifications = rows.map(r => ({ ...r, created_at: r.created_at || r.timestamp }));
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ok: true, notifications }));
+        } catch (err) {
+            structuredLog('error', 'Notifications list failed', { correlationId, errorCode: 'ERR_NOTIFICATIONS', severity: 'error', route: req.url });
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Failed to load notifications', correlationId }));
+        }
+    } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/admin/stats')) {
+        // Admin control center: one aggregated read across engagements, the
+        // audit log and the privacy pipeline. Approximations share the caveats
+        // of /metrics (no per-transition timestamps yet).
+        try {
+            const dayStart = new Date(); dayStart.setUTCHours(0, 0, 0, 0);
+            const engagements = (await supabaseApi.select('engagement_requests', {}, { order: 'created_at.desc', limit: 500 })) as
+                Array<{ id: string; provider_key: string; country: string; category: string; status: string; created_at: string; updated_at?: string; sla_confirm_deadline?: string; sla_reply_deadline?: string }>;
+            const events = (await supabaseApi.select('event_log', {}, { order: 'timestamp.desc', limit: 100 })) as
+                Array<{ type: string; payload?: Record<string, unknown>; timestamp?: string; created_at?: string }>;
+            const documents = (await supabaseApi.select('documents', {}, { order: 'created_at.desc', limit: 200 })) as
+                Array<{ classification: string; sanitized_ready: boolean; consent_ai?: boolean; ai_allowed: boolean; redaction_report?: { countsByType?: Record<string, number> } }>;
+
+            const total = engagements.length;
+            const confirmedPlus = engagements.filter(r => r.status === 'confirmed' || r.status === 'replied');
+            const requestsToday = engagements.filter(r => new Date(r.created_at) >= dayStart).length;
+            const avgMs = (subset: typeof engagements) => {
+                const ds = subset.filter(r => r.updated_at)
+                    .map(r => new Date(r.updated_at as string).getTime() - new Date(r.created_at).getTime())
+                    .filter(d => d > 0);
+                return ds.length ? Math.round(ds.reduce((a, b) => a + b, 0) / ds.length) : null;
+            };
+            const now = Date.now();
+            const OPEN_CONFIRM = ['created', 'delivered', 'viewed'];
+            const watchlist = engagements
+                .filter(r => OPEN_CONFIRM.includes(r.status) || r.status === 'confirmed')
+                .map(r => {
+                    const deadline = OPEN_CONFIRM.includes(r.status) ? r.sla_confirm_deadline : r.sla_reply_deadline;
+                    return { id: r.id, provider_key: r.provider_key, country: r.country, category: r.category, status: r.status, deadline, msLeft: deadline ? new Date(deadline).getTime() - now : null };
+                })
+                .sort((a, b) => (a.msLeft ?? Infinity) - (b.msLeft ?? Infinity))
+                .slice(0, 10);
+            const redacted = documents.reduce((s, d) => s + Object.values(d.redaction_report?.countsByType || {}).reduce((a, b) => a + b, 0), 0);
+            const consentGiven = documents.filter(d => d.consent_ai === true).length;
+            const stats = {
+                requestsToday,
+                requestsTotal: total,
+                confirmRate: total ? confirmedPlus.length / total : null,
+                replyRate: confirmedPlus.length ? engagements.filter(r => r.status === 'replied').length / confirmedPlus.length : null,
+                avgConfirmMs: avgMs(confirmedPlus),
+                breaches: engagements.filter(r => r.status === 'expired').length + watchlist.filter(w => (w.msLeft ?? 1) < 0).length,
+            };
+            const privacy = {
+                uploads: documents.length,
+                piiRedacted: redacted,
+                consentRate: documents.length ? consentGiven / documents.length : null,
+                aiBlocks: events.filter(e => e.type === 'document_ai_blocked').length,
+            };
+            const security = {
+                invalidTokenBlocks: events.filter(e => /invalid_token|magic.*(invalid|expired|used)/i.test(e.type)).length,
+                aiGateBlocks: events.filter(e => e.type === 'document_ai_blocked').length,
+            };
+            const feed = events.slice(0, 12).map(e => ({ ...e, created_at: e.created_at || e.timestamp }));
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ok: true, stats, watchlist, privacy, security, events: feed }));
+        } catch (err) {
+            structuredLog('error', 'Admin stats failed', { correlationId, errorCode: 'ERR_ADMIN_STATS', severity: 'error', route: req.url });
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Failed to compute admin stats', correlationId }));
+        }
+    } else if (req.method === 'POST' && req.url === '/api/v1/document/upload') {
+        // P0 #5: document upload runs through the redaction pipeline BEFORE any
+        // persistence — only sanitized content is stored; raw text is discarded
+        // here (raw-vault storage is a separate, later concern). The AI gate
+        // (sanitized_ready + ai_allowed) is derived from the redaction result.
+        let body = '';
+        req.on('data', (chunk: any) => body += chunk.toString());
+        req.on('end', async () => {
+            try {
+                const requestData = JSON.parse(body);
+                const { filename, mimeType, text, engagementId, userId } = requestData;
+                if (!filename || typeof filename !== 'string' || !text || typeof text !== 'string') {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'filename and text are required', correlationId }));
+                    return;
+                }
+                // Consent gate (Art. 6(1)(a) / Art. 7 GDPR): AI eligibility requires
+                // an explicit opt-in with this upload — absence or anything other
+                // than boolean true counts as NO consent. The document is still
+                // stored (sanitized); it just never becomes ai_allowed.
+                const consentAI = requestData.consentAI === true;
+                const redaction = redactText(text, { profile: 'strict' });
+                const aiAllowed = redaction.sanitized_ready && redaction.classification !== 'restricted' && consentAI;
+                const inserted = (await supabaseApi.insert('documents', {
+                    engagement_id: engagementId || null,
+                    user_id: userId || null,
+                    filename,
+                    mime_type: mimeType || null,
+                    content_sanitized: redaction.sanitizedText,
+                    redaction_report: redaction.report,
+                    classification: redaction.classification,
+                    sanitized_ready: redaction.sanitized_ready,
+                    consent_ai: consentAI,
+                    ai_allowed: aiAllowed
+                })) as Array<{ id: string }>;
+                const documentId = inserted?.[0]?.id;
+                await supabaseApi.insert('event_log', {
+                    type: 'document_uploaded',
+                    payload: { documentId, filename, classification: redaction.classification, sanitized_ready: redaction.sanitized_ready, consentAI, riskScore: redaction.report.riskScore }
+                });
+                res.setHeader('x-correlation-id', correlationId);
+                res.writeHead(201, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, id: documentId, sanitized_ready: redaction.sanitized_ready, consent_ai: consentAI, ai_allowed: aiAllowed, classification: redaction.classification, report: redaction.report }));
+            } catch (err) {
+                structuredLog('error', 'Document upload failed', { correlationId, errorCode: 'ERR_DOC_UPLOAD', severity: 'error', route: req.url });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Document upload failed', correlationId }));
+            }
+        });
+    } else if (req.method === 'POST' && req.url === '/api/v1/document/request-ai') {
+        // P0 #5: the AI gate — a document may only enter any AI flow when the
+        // privacy pipeline marked it sanitized_ready AND ai_allowed.
+        let body = '';
+        req.on('data', (chunk: any) => body += chunk.toString());
+        req.on('end', async () => {
+            try {
+                const { documentId } = JSON.parse(body);
+                if (!documentId) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'documentId is required', correlationId }));
+                    return;
+                }
+                const rows = (await supabaseApi.select('documents', { id: documentId }, { limit: 1 })) as
+                    Array<{ id: string; sanitized_ready: boolean; consent_ai: boolean; ai_allowed: boolean; classification: string; content_sanitized: string }>;
+                const doc = rows[0];
+                if (!doc) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Document not found', correlationId }));
+                    return;
+                }
+                // Defense in depth: ai_allowed already encodes consent at upload
+                // time, but the gate re-checks each condition so a later data fix
+                // or consent withdrawal (consent_ai=false) is honored immediately.
+                if (!doc.sanitized_ready || !doc.consent_ai || !doc.ai_allowed) {
+                    const reason = !doc.consent_ai ? 'NO_CONSENT' : 'NOT_SANITIZED';
+                    await supabaseApi.insert('event_log', { type: 'document_ai_blocked', payload: { documentId, classification: doc.classification, reason } });
+                    res.writeHead(403, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'PRIVACY_GATE', reason, message: 'Document is not cleared for AI processing', classification: doc.classification, correlationId }));
+                    return;
+                }
+                await supabaseApi.insert('event_log', { type: 'document_ai_requested', payload: { documentId } });
+                res.setHeader('x-correlation-id', correlationId);
+                res.writeHead(202, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, id: documentId, status: 'queued', message: 'Document accepted for AI processing (sanitized content only)' }));
+            } catch (err) {
+                structuredLog('error', 'Document AI request failed', { correlationId, errorCode: 'ERR_DOC_AI', severity: 'error', route: req.url });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Document AI request failed', correlationId }));
+            }
+        });
     } else if (req.method === 'POST' && req.url === '/api/v1/engagement') {
         let body = '';
         req.on('data', (chunk: any) => body += chunk.toString());
@@ -354,12 +600,30 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     message: requestData.message || "",
                     status: 'created',
                     sla_confirm_deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-                    sla_reply_deadline: new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString(),
+                    // Contract (Provider Flows §6.1 / Marketplace Ops §5.1): reply SLA is 48h, not 72h.
+                    sla_reply_deadline: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString()
                 };
 
                 await supabaseApi.insert('engagement_requests', newEngagement);
+
+                // P0 #1: issue signed, expiring, single-use magic-link tokens
+                // (one per provider action). Only the SHA-256 hash is stored;
+                // the raw tokens go into the e-mail links.
+                const nodeCrypto = await import('node:crypto');
+                const magicLinks: Record<string, string> = {};
+                for (const action of ['confirm', 'reply', 'decline'] as const) {
+                    const rawToken = nodeCrypto.randomBytes(32).toString('base64url');
+                    const tokenHash = nodeCrypto.createHash('sha256').update(rawToken).digest('hex');
+                    await supabaseApi.insert('magic_link_tokens', {
+                        engagement_id: engagementId,
+                        action,
+                        token_hash: tokenHash,
+                        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+                    });
+                    magicLinks[action] = `?id=${engagementId}&token=${rawToken}`;
+                }
 
                 await supabaseApi.insert('event_log', {
                     type: 'primary_request_submitted',
@@ -368,7 +632,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(201, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ ok: true, id: engagementId, status: 'created' }));
+                res.end(JSON.stringify({ ok: true, id: engagementId, status: 'created', magicLinks }));
             } catch (err) {
                 console.error("Engagement request error:", err);
                 res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -376,11 +640,25 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             }
         });
     } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/provider/magic/')) {
+        // P0 #1: real token lookup — hash, match, expiry + single-use check.
         const token = req.url.split('/').pop() || '';
-        // Mock token verification
-        res.setHeader('x-correlation-id', correlationId);
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ ok: true, message: "Magic link verified", token }));
+        try {
+            const nodeCrypto = await import('node:crypto');
+            const tokenHash = nodeCrypto.createHash('sha256').update(token).digest('hex');
+            const rows = (await supabaseApi.select('magic_link_tokens', { token_hash: tokenHash }, { limit: 1 })) as
+                Array<{ engagement_id: string; action: string; expires_at: string; used_at: string | null }>;
+            const row = rows[0];
+            const valid = !!row && row.used_at === null && new Date(row.expires_at).getTime() > Date.now();
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(valid ? 200 : 403, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(valid
+                ? { ok: true, engagementId: row.engagement_id, action: row.action, expiresAt: row.expires_at }
+                : { ok: false, errorCode: 'INVALID_TOKEN', message: 'Magic link invalid, expired or already used' }));
+        } catch (err) {
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Token verification failed', correlationId }));
+        }
     } else if (req.method === 'POST' && req.url === '/api/v1/provider/confirm') {
         let body = '';
         req.on('data', (chunk: any) => body += chunk.toString());
@@ -388,6 +666,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             try {
                 const requestData = JSON.parse(body);
                 const engagementId = requestData.engagementId;
+
+                // P0 #1: a valid single-use magic token is mandatory.
+                const tokenOk = await verifyAndBurnMagicToken(engagementId, 'confirm', requestData.token);
+                if (!tokenOk) {
+                    res.writeHead(403, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'INVALID_TOKEN', message: 'Magic link invalid, expired or already used' }));
+                    return;
+                }
 
                 await supabaseApi.update('engagement_requests',
                     { id: engagementId },
@@ -413,6 +699,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             try {
                 const requestData = JSON.parse(body);
                 const engagementId = requestData.engagementId;
+
+                // P0 #1: a valid single-use magic token is mandatory.
+                const tokenOk = await verifyAndBurnMagicToken(engagementId, 'reply', requestData.token);
+                if (!tokenOk) {
+                    res.writeHead(403, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'INVALID_TOKEN', message: 'Magic link invalid, expired or already used' }));
+                    return;
+                }
 
                 await supabaseApi.update('engagement_requests',
                     { id: engagementId },

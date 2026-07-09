@@ -45,3 +45,16 @@ venv/
 .venv/
 __pycache__/
 *.py[cod]
+
+# Session artifacts (screenshots land in repo root during design verification)
+/*.png
+.playwright-mcp/
+.DS_Store
+
+# Claude workspace internals — only skills + launch config are project assets
+.claude/*
+!.claude/skills/
+!.claude/launch.json
+
+# Accidental early-session scaffold (5 files, superseded by the real repo layout)
+apps/complihub360-alpha/

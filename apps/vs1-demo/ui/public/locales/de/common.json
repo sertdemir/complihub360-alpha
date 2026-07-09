@@ -634,7 +634,9 @@
     "anchorTax": "Steuer & USt",
     "anchorEpr": "EPR & Verpackung",
     "anchorPrivacy": "Daten & Datenschutz",
+    "anchorMarketing": "Marketing & SEO",
     "anchorCorporate": "Unternehmensstruktur",
+    "anchorFullsupport": "Full Support",
     "riskLabel": "Risiko",
     "whoAffected": "Wer ist betroffen",
     "keyObligations": "Wesentliche Pflichten",
@@ -642,19 +644,197 @@
     "activeMarkets": "Aktive Märkte",
     "startAssessment": "{{title}}-Assessment starten",
     "riskAtGlance": "Risiko auf einen Blick",
+    "country": {
+      "label": "Ihr Hauptmarkt",
+      "hint": "Filtert aktive Märkte und personalisiert Risikoprioritäten."
+    },
+    "kpi": {
+      "jurisdictions": "Abgedeckte Jurisdiktionen",
+      "domains": "Compliance-Bereiche",
+      "time": "Geführtes Assessment",
+      "specialists": "Verifiziertes Spezialisten-Netzwerk"
+    },
+    "jtbd": {
+      "overline": "Wählen Sie Ihr Ziel",
+      "title": "Welchen Fortschritt möchten Sie erzielen?",
+      "body": "CompliHub360 leitet Sie zum richtigen Werkzeug – basierend auf der Aufgabe, die Sie erledigen müssen, nicht auf einem Feature.",
+      "expand": {
+        "title": "Sicher expandieren",
+        "body": "Pflichten identifizieren, bevor Sie einen neuen Markt betreten.",
+        "cta": "Geführtes Assessment starten"
+      },
+      "validate": {
+        "title": "Risiko validieren",
+        "body": "Prüfen, ob eine Kampagne, ein Produkt oder eine Aussage konform ist.",
+        "cta": "Risiko-Check starten"
+      },
+      "specialist": {
+        "title": "Spezialisten finden",
+        "body": "Vermittlung zu einem verifizierten Experten für Ihren Fall.",
+        "cta": "Bereiche durchsehen"
+      },
+      "research": {
+        "title": "Erst recherchieren",
+        "body": "Strukturierte Leitfäden lesen, bevor Sie jemanden kontaktieren.",
+        "cta": "Bibliothek öffnen"
+      },
+      "maintain": {
+        "title": "Compliance aufrechterhalten",
+        "body": "Pflichten, Warnungen und Verlängerungen über Zeit verfolgen.",
+        "cta": "Dashboard öffnen"
+      }
+    },
+    "regulations": {
+      "label": "Wichtige Verordnungen"
+    },
+    "fines": {
+      "label": "Was auf dem Spiel steht",
+      "authoritiesLabel": "Durchgesetzt von:"
+    },
+    "specialists": {
+      "label": "Verifizierte Spezialisten",
+      "count": "{{count}} verifizierte Spezialisten"
+    },
+    "teaser": {
+      "label": "Schnellstart"
+    },
+    "risk": {
+      "subtitle": "Sortiert nach typischer Priorität über Märkte hinweg.",
+      "priorityBadge": "Priorität für {{country}}",
+      "hint": {
+        "DE": "In Deutschland erhöhen BfDI-Durchsetzung und VerpackG zusammen die Priorität von Datenschutz und EPR.",
+        "FR": "Frankreich: Die CNIL ist seit Jahren der aktivste GDPR-Durchsetzer der EU – Datenschutz steht an erster Stelle.",
+        "IT": "Italien: Garante beim Datenschutz plus komplexes USt-Regime – Steuer und Datenschutz erfordern parallele Aufmerksamkeit.",
+        "ES": "Spanien: AEAT (Steuer) und AEPD (Datenschutz) veröffentlichen quartalsweise Durchsetzungsbulletins.",
+        "UK": "UK: ICO (Datenschutz) und HMRC (USt) – UK GDPR bleibt angeglichen, weicht aber bei Angemessenheits­entscheidungen ab.",
+        "US": "USA: FTC-Werberichtlinien, Datenschutz auf Bundesstaaten-Ebene (CCPA/CPRA) und Sales-Tax-Nexus verschieben Prioritäten.",
+        "CH": "Schweiz: revFADP verlangt EU-Vertreter – Datenschutz gilt auch von außen."
+      }
+    },
+    "matrix": {
+      "title": "Side-by-side: Alle Bereiche auf einen Blick",
+      "body": "Schnell-Vergleich für Recherchierende und Entscheider. Nach Risiko sortieren, um zuerst zu triagieren.",
+      "area": "Compliance-Bereich",
+      "disclaimer": "Indikative Spannen basierend auf öffentlichen regulatorischen Quellen. Die tatsächliche Exposition hängt von Ihrem Fall ab – über den Wizard für genaue Empfehlungen prüfen.",
+      "col": {
+        "risk": "Risiko",
+        "time": "Handlungsfrist",
+        "fine": "Typische Exposition",
+        "markets": "Aktive Märkte",
+        "effort": "Aufwand"
+      },
+      "tax": {
+        "risk": "Hoch",
+        "time": "Innerhalb 30 Tagen ab Schwelle",
+        "fine": "50–300% der hinterzogenen Steuer + Zinsen",
+        "markets": "EU OSS · UK · US Nexus",
+        "effort": "Mittel"
+      },
+      "epr": {
+        "risk": "Hoch",
+        "time": "Vor Markteintritt",
+        "fine": "bis 2% Jahresumsatz",
+        "markets": "DE · FR · IT · ES · UK",
+        "effort": "Mittel"
+      },
+      "privacy": {
+        "risk": "Kritisch",
+        "time": "Sofort",
+        "fine": "bis 20M € / 4% globaler Umsatz",
+        "markets": "EU · UK · CH · US",
+        "effort": "Hoch"
+      },
+      "marketing": {
+        "risk": "Mittel",
+        "time": "Vor Kampagnenstart",
+        "fine": "5k–500k € + Produktrücknahme",
+        "markets": "EU · UK",
+        "effort": "Niedrig–Mittel"
+      },
+      "corporate": {
+        "risk": "Mittel",
+        "time": "Strategisch (3–12 Monate)",
+        "fine": "Steuer-Exposition + Entitäts-Risiko",
+        "markets": "EU · UK · US · CH",
+        "effort": "Hoch"
+      },
+      "fullsupport": {
+        "risk": "Gebündelt",
+        "time": "Nach Anfrage",
+        "fine": "Abdeckung über alle Bereiche",
+        "markets": "Alle unterstützten Märkte",
+        "effort": "Verwaltet"
+      }
+    },
+    "howItWorks": {
+      "overline": "Orchestrierung, kein Verzeichnis",
+      "title": "Von Unsicherheit zu strukturiertem Handeln – in vier Schritten",
+      "body": "CompliHub360 steuert den Engagement-Funnel und erzwingt Antwort-Verantwortlichkeit. Sie behalten durchgängig die Kontrolle.",
+      "stepLabel": "Schritt {{num}}",
+      "define": {
+        "title": "Definieren",
+        "body": "Wählen Sie Land und Compliance-Bereich. Wir verankern den regulatorischen Kontext zuerst."
+      },
+      "assess": {
+        "title": "Bewerten",
+        "body": "4–5 präzise Fragen übersetzen Ihre Situation in ein strukturiertes Suchprofil."
+      },
+      "match": {
+        "title": "Matchen",
+        "body": "Verifizierte Spezialisten werden nach Relevanz, Reaktionszeit und Qualität gerankt."
+      },
+      "engage": {
+        "title": "Anfragen",
+        "body": "Senden Sie eine strukturierte Anfrage. Verfolgen Sie Bestätigungen und SLAs vom Dashboard aus."
+      }
+    },
+    "resourceTeaser": {
+      "overline": "Lieber zuerst recherchieren?",
+      "title": "Lesen Sie, bevor Sie Kontakt aufnehmen",
+      "body": "Strukturiertes Wissen für sorgfältige Recherchierende. Jeder Leitfaden basiert auf offiziellen, validierten regulatorischen Quellen.",
+      "openCta": "Öffnen",
+      "library": {
+        "title": "Compliance-Bibliothek",
+        "body": "Kuratierte Verordnungen, offizielle Quellen und strukturierte Leitfäden für jeden Bereich."
+      },
+      "countries": {
+        "title": "Länder-Leitfäden",
+        "body": "Jurisdiktionsspezifische Übersichten – DE, FR, IT, ES, UK, CH, US."
+      },
+      "tutorials": {
+        "title": "Tutorials & Walkthroughs",
+        "body": "Schritt-für-Schritt-Playbooks für gängige Compliance-Szenarien."
+      }
+    },
     "tax": {
       "title": "Steuer & USt",
       "risk": "Hoch",
       "headline": "Grenzüberschreitende Umsatzsteuer, Lieferschwellen & digitale Besteuerung",
       "description": "Verwaltung grenzüberschreitender Umsatzsteuerpflichten, Lieferschwellen und Regeln zur digitalen Besteuerung in internationalen Jurisdiktionen – einschließlich OSS- und MTD-Rahmenwerken.",
       "affected": "Grenzüberschreitende E-Commerce-Betreiber, die physische oder digitale Produkte über Marktplätze (Amazon) oder unabhängige Shops (Shopify) verkaufen.",
+      "personaFit": "Ideal für: Cross-Border E-Commerce",
       "ob1": "Überwachung internationaler Lieferschwellen",
       "ob2": "Bestimmung, wann eine lokale Umsatzsteuer-Registrierung obligatorisch wird",
       "ob3": "Navigieren unterschiedlicher Steuerregeln für physische vs. digitale Güter",
       "ob4": "OSS-Registrierung & Meldung",
       "cov1": "Dedizierter Steuer & USt-Assistent – erfasst Vertriebsmodell, Rechtssitz, Umsatz und Zielmärkte",
       "cov2": "Berechnet präzise vat_likelihood pro Jurisdiktion",
-      "cov3": "Orchestriert Matching mit spezialisierten Umsatzsteuerberatern nach Fallkomplexität"
+      "cov3": "Orchestriert Matching mit spezialisierten Umsatzsteuerberatern nach Fallkomplexität",
+      "regulations": {
+        "r1": "EU-MwSt-Richtlinie 2006/112/EG",
+        "r2": "OSS / IOSS-Verfahren",
+        "r3": "UK MTD for VAT"
+      },
+      "fines": {
+        "headline": "Typischerweise 50–300% der hinterzogenen Steuer plus Zinsen; grenzüberschreitende Prüfungen üblich.",
+        "authorities": "BZSt · HMRC · IRS · AEAT · Agenzia Entrate"
+      },
+      "teaser": {
+        "question": "In wie viele EU-Märkte verkaufen Sie?",
+        "o1": "1 Markt",
+        "o2": "2–4 Märkte",
+        "o3": "5+ Märkte"
+      }
     },
     "epr": {
       "title": "EPR & Verpackung",
@@ -662,13 +842,29 @@
       "headline": "Erweiterte Herstellerverantwortung, VerpackG & Recyclingziele",
       "description": "Stark fragmentierte lokale Umweltvorschriften, Verpackungsgesetze (VerpackG) und Recyclingziele (PRN), die sich je nach Land stark unterscheiden.",
       "affected": "E-Commerce-Händler, Hersteller, Wiederverkäufer und Dropshipper, die physische Waren mit Verpackung grenzüberschreitend verkaufen.",
+      "personaFit": "Ideal für: Hersteller & Reseller",
       "ob1": "Verständnis länderspezifischer Verpackungs- & Umweltgesetze",
       "ob2": "Bestimmung der Registrierung nach Produktkategorie (Elektronik, Bekleidung, Kosmetik)",
       "ob3": "Einhaltung lokaler Recyclingziele zur Vermeidung von Bußgeldern",
       "ob4": "Bewertung der Dropshipper-Verantwortung",
       "cov1": "Produkt- & Verpackungsassistent – bewertet Handelsrolle, Zielmärkte, Produktkategorien",
       "cov2": "Berechnet epr_required_likelihood pro Jurisdiktion",
-      "cov3": "Intelligente Randfall-Behandlung: „Annehme Ja“-Sicherheitslogik für unsichere Dropshipper"
+      "cov3": "Intelligente Randfall-Behandlung: „Annehme Ja“-Sicherheitslogik für unsichere Dropshipper",
+      "regulations": {
+        "r1": "PPWR (EU) 2024/1781",
+        "r2": "VerpackG (DE)",
+        "r3": "WEEE 2012/19/EU"
+      },
+      "fines": {
+        "headline": "Bis zu 2% des Jahresumsatzes plus Marktzugangs-Sperren für nicht registrierte Hersteller.",
+        "authorities": "ZSVR · ADEME · CONAI · Environment Agency"
+      },
+      "teaser": {
+        "question": "Versenden Sie physische Waren grenzüberschreitend?",
+        "o1": "Ja, regelmäßig",
+        "o2": "Manchmal",
+        "o3": "Noch nicht – in Planung"
+      }
     },
     "privacy": {
       "title": "Daten & Datenschutz",
@@ -676,13 +872,59 @@
       "headline": "DSGVO, UK GDPR, Cookie-Compliance & Datenübertragungen",
       "description": "Compliance mit EU-DSGVO (GDPR), UK GDPR, Cookie-Einwilligungsmanagement und den strengen Vorschriften für internationale Datenübertragungen.",
       "affected": "Software-Gründer, SaaS-Expansionsmanager und Unternehmen, die personenbezogene Daten sammeln oder Tracking-Tools bei der globalen Expansion nutzen.",
+      "personaFit": "Ideal für: SaaS & datengetriebene Marken",
       "ob1": "Implementierung eines gültigen Einwilligungsmanagements",
       "ob2": "Rechtliche Absicherung internationaler Datenübertragungen (EU ↔ USA)",
       "ob3": "Verwaltung der Tracking-Tool-Compliance (GA4, Meta, TikTok)",
       "ob4": "Cookie-Banner & Datenschutzrichtlinien-Anforderungen",
       "cov1": "Daten- & Datenschutzassistent – analysiert Zielkunden, Verarbeitungsstandorte, Tracking-Stack",
       "cov2": "Berechnet privacy_risk_level basierend auf tatsächlicher Tool-Exposition",
-      "cov3": "Plattform selbst verwendet eine lokale PII-Schwärzungs-Pipeline – keine Rohdaten in der KI-Schicht"
+      "cov3": "Plattform selbst verwendet eine lokale PII-Schwärzungs-Pipeline – keine Rohdaten in der KI-Schicht",
+      "regulations": {
+        "r1": "DSGVO (EU 2016/679)",
+        "r2": "ePrivacy-Richtlinie 2002/58/EG",
+        "r3": "UK GDPR · revFADP (CH) · CCPA/CPRA (US)"
+      },
+      "fines": {
+        "headline": "Bis zu 20M € oder 4% des globalen Jahresumsatzes (Art. 83 DSGVO), je nachdem was höher ist.",
+        "authorities": "BfDI · CNIL · ICO · Garante · AEPD · EDÖB"
+      },
+      "teaser": {
+        "question": "Verarbeiten Sie personenbezogene Daten von EU-Bürgern?",
+        "o1": "Ja",
+        "o2": "Unsicher",
+        "o3": "Nein"
+      }
+    },
+    "marketing": {
+      "title": "Marketing & SEO",
+      "risk": "Mittel",
+      "headline": "Werbeaussagen, Health & Sustainability, Verbraucherschutz",
+      "description": "Grenzüberschreitende Werbe-Compliance: medizinische & gesundheitliche Aussagen, Vergleichswerbung, Nachhaltigkeitsaussagen, Influencer-Regeln und DSA-Pflichten.",
+      "affected": "Agenturen, E-Commerce-Marken, Nahrungsergänzungs- & Gesundheitsanbieter, Finanzdienstleister-Marketer und alle Unternehmen mit grenzüberschreitendem SEO oder Paid Ads.",
+      "personaFit": "Ideal für: Agenturen & DTC-Marken",
+      "ob1": "Vermeidung irreführender oder unbelegter Aussagen",
+      "ob2": "Genehmigungen für Health-, Finanz- & Nachhaltigkeitsaussagen",
+      "ob3": "Influencer-Marketing & Sponsored-Content-Kennzeichnung",
+      "ob4": "DSA / DMA Notice-and-Action-Pflichten",
+      "cov1": "Marketing & SEO-Assistent – erfasst Branchensensibilität, Aussagentypen, Kanäle",
+      "cov2": "Berechnet marketing_risk_level + markiert Hochrisiko-Aussagenmuster",
+      "cov3": "Routet zu Spezialisten in Werberecht und Verbraucherschutz",
+      "regulations": {
+        "r1": "UCPD 2005/29/EG (Unlautere Geschäftspraktiken)",
+        "r2": "DSA (EU) 2022/2065",
+        "r3": "Green-Claims-Richtlinie · ASA UK · UWG (DE)"
+      },
+      "fines": {
+        "headline": "5k–500k € pro Verstoß plus Produkt- oder Kampagnenrücknahme.",
+        "authorities": "Wettbewerbszentrale · DGCCRF · ASA · AGCM · FTC"
+      },
+      "teaser": {
+        "question": "Treffen Sie Health- oder Finanzaussagen in Werbung?",
+        "o1": "Ja",
+        "o2": "Nur Vergleichswerbung",
+        "o3": "Nein"
+      }
     },
     "corporate": {
       "title": "Unternehmensstruktur",
@@ -690,18 +932,65 @@
       "headline": "Internationale Unternehmensgründung, Rechtsform & lokale Substanz",
       "description": "Navigation internationaler Unternehmensgründung, Wahl der richtigen Rechtsform, Aufbau lokaler Substanz und Handhabung von Unternehmensregistrierungen in neuen Jurisdiktionen.",
       "affected": "Einzelpersonen oder Unternehmen, die juristische Einheiten registrieren, Teams erweitern oder Unternehmenspräsenz in ausländischen Märkten aufbauen möchten.",
+      "personaFit": "Ideal für: Internationale Expansionsteams",
       "ob1": "Auswahl der geeigneten Unternehmensstruktur pro Zielland",
       "ob2": "Erfüllung lokaler Registrierungs- & Dokumentationsanforderungen",
       "ob3": "Aufbau lokaler Substanz und Governance",
       "ob4": "Bewertung der Team-Komplexität",
       "cov1": "Unternehmens- & Strukturassistent – bewertet aktuellen Status, gewünschte Märkte, Team-Komplexität",
       "cov2": "Bestimmt entity_need_level pro Jurisdiktion",
-      "cov3": "Intelligente Weiterleitung zu Bildungsleitfaden-Pfaden für unsichere Gründer"
+      "cov3": "Intelligente Weiterleitung zu Bildungsleitfaden-Pfaden für unsichere Gründer",
+      "regulations": {
+        "r1": "GwG (DE) · 6. AML-Richtlinie (EU) 2018/1673",
+        "r2": "HGB · Companies Act 2006 (UK)",
+        "r3": "Transparenz wirtschaftlich Berechtigter (EU 2015/849)"
+      },
+      "fines": {
+        "headline": "Persönliche Haftung + rückwirkende Steuer-Exposition bei fehlender Substanz/Struktur.",
+        "authorities": "Lokale Handelsregister · Finanzbehörden · Geldwäsche-Aufseher"
+      },
+      "teaser": {
+        "question": "Planen Sie eine Entity-Gründung im Ausland?",
+        "o1": "Ja, dieses Jahr",
+        "o2": "Optionen werden geprüft",
+        "o3": "Nein"
+      }
+    },
+    "fullsupport": {
+      "title": "Full Support",
+      "risk": "Gebündelt",
+      "headline": "Bereichsübergreifende Compliance – ein koordinierter Engagement-Prozess",
+      "description": "Wenn Pflichten mehrere Bereiche umfassen (Steuer + Datenschutz + EPR + Marketing), orchestriert Full Support alles unter einem strukturierten Engagement mit einem Senior-Partner.",
+      "affected": "Operatoren mit Multi-Domain-Exposition: regulierte Branchen, Cross-Border-SaaS, Marktplätze, Multi-Produkt-Marken oder Scaleups in 3+ Märkten.",
+      "personaFit": "Ideal für: Bereichsübergreifende Compliance",
+      "ob1": "Koordination mehrerer regulatorischer Streams parallel",
+      "ob2": "Lückenlose Audit-Trails über Bereiche hinweg",
+      "ob3": "Compliance-Roadmap mit Wachstumsplänen abgleichen",
+      "ob4": "SLA-gestützte Reaktion und Eskalation",
+      "cov1": "Full Support-Assistent – erfasst Unternehmensgröße, Märkte, Priorität, aktuelle Reife",
+      "cov2": "Routet zu Senior-Partnern mit bereichsübergreifender Kapazität und SLA-Zusagen",
+      "cov3": "Single-Point-of-Contact-Engagement statt mehreren isolierten Anfragen",
+      "regulations": {
+        "r1": "Abdeckung über alle gelisteten Bereichsverordnungen",
+        "r2": "Laufendes regulatorisches Monitoring",
+        "r3": "Koordiniertes Response-Framework"
+      },
+      "fines": {
+        "headline": "Aggregierte Exposition über alle Bereiche – Full Support reduziert blinde Flecken und übersehene Pflichten.",
+        "authorities": "Alle für Ihren Betrieb relevanten Behörden"
+      },
+      "teaser": {
+        "question": "Wie viele Compliance-Bereiche betreffen Sie?",
+        "o1": "2",
+        "o2": "3",
+        "o3": "4 oder mehr"
+      }
     },
     "cta": {
       "title": "Nicht sicher, welcher Bereich zutrifft?",
       "body": "Unser Assistent stellt die richtigen Fragen und leitet Sie automatisch zum richtigen Assessment weiter.",
-      "btn": "Allgemeines Assessment starten"
+      "btn": "Allgemeines Assessment starten",
+      "fullSupportBtn": "Oder mit Full Support sprechen"
     },
     "footer": {
       "copyright": "© {{year}} CompliHub360. Gebaut in Berlin."

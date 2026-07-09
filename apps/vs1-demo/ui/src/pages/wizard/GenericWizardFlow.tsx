@@ -164,7 +164,8 @@ export function GenericWizardFlow() {
     const handleBack = () => {
         setDirection(-1);
         if (step === 0) {
-            navigate("/wizard/category");
+            const locale = window.location.pathname.match(/^\/([a-z]{2})(?=\/|$)/)?.[1] || 'en';
+            navigate(`/${locale}/wizard/category`);
         } else {
             setStep(s => s - 1);
         }

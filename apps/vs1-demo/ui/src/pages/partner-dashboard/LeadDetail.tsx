@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDashboardStore } from '../../store/useDashboardStore';
 import { DashboardLayout } from '../../components/dashboard/DashboardLayout';
-import { ResultsOverview } from '../ResultsOverview';
 import { ArrowLeft, CheckCircle, Clock, ShieldAlert, Lock, User, FileText } from 'lucide-react';
 
 export function LeadDetail() {
@@ -153,7 +152,9 @@ export function LeadDetail() {
            </div>
            
            <div className={`mt-4 ${!isAccepted ? 'pointer-events-none' : ''}`}>
-             <ResultsOverview />
+             <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-8 text-center text-sm text-neutral-500">
+               The client&rsquo;s anonymised risk dossier will appear here.
+             </div>
            </div>
         </div>
 

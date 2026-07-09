@@ -20,7 +20,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        // compliance-api (services/compliance-api) binds PORT 3005 by default.
+        target: process.env.VITE_API_PROXY_TARGET || 'http://localhost:3005',
         changeOrigin: true,
         secure: false
       }

@@ -56,7 +56,8 @@ export function WizardFlowShell({
     const handleBack = () => {
         setDirection(-1);
         if (currentStep === 0) {
-            navigate("/wizard/category");
+            const locale = window.location.pathname.match(/^\/([a-z]{2})(?=\/|$)/)?.[1] || 'en';
+            navigate(`/${locale}/wizard/category`);
         } else {
             onBack();
         }
@@ -115,14 +116,10 @@ export function WizardFlowShell({
                                 )}
                                 {isReviewStep && (
                                     <>
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-full bg-primary-50 border border-primary-200 flex items-center justify-center shrink-0">
-                                                <span className="material-symbols-outlined text-primary-600 text-xl">checklist</span>
-                                            </div>
-                                            <div className="flex flex-col gap-1">
-                                                <Typography variant="h3">Confirm your answers</Typography>
-                                                <Typography variant="ui-small" className="text-neutral-600">Review all details before we generate your results.</Typography>
-                                            </div>
+                                        <div className="flex flex-col items-center gap-2 text-center">
+                                            <Typography variant="caption" className="font-semibold uppercase tracking-[0.14em] text-neutral-500">Step 4 of 4</Typography>
+                                            <Typography variant="h2">Your situation, summarized.</Typography>
+                                            <Typography variant="body" className="text-neutral-600">Here's what we'll use. Edit anything you need, then generate your risk map.</Typography>
                                         </div>
                                         <WizardReviewPanel
                                             onGenerateResults={() => {

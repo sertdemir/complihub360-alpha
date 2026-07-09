@@ -1,0 +1,12 @@
+export { HomeHero } from './HomeHero';
+export { RiskMapSection } from './RiskMapSection';
+export { MatchmakingDifference } from './MatchmakingDifference';
+export { TwoReflexes } from './TwoReflexes';
+export { DomainsKnows } from './DomainsKnows';
+export { HowItActs } from './HowItActs';
+export { BrandCodePreview } from './BrandCodePreview';
+export { BeyondAssessment } from './BeyondAssessment';
+export { HomeFaq } from './HomeFaq';
+export { EntryDoor } from './EntryDoor';
+export { NewsletterBand } from './NewsletterBand';
+export { SiteFooter } from './SiteFooter';

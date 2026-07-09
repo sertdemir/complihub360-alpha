@@ -2,7 +2,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDashboardStore } from '../../store/useDashboardStore';
 import { DashboardLayout } from '../../components/dashboard/DashboardLayout';
-import { ResultsOverview } from '../ResultsOverview';
 import { ArrowLeft, Send } from 'lucide-react';
 
 export function DossierDetail() {
@@ -61,10 +60,8 @@ export function DossierDetail() {
           </button>
         </div>
 
-        {/* This re-uses the actual Results view, but we'd pass the session data as context normally. */}
-        {/* For demo, we just render the placeholder ResultsOverview component. */}
-        <div className="mt-8">
-           <ResultsOverview />
+        <div className="mt-8 rounded-xl border border-neutral-200 bg-neutral-50 p-8 text-center text-sm text-neutral-500">
+          The compliance result for this dossier will appear here.
         </div>
       </div>
     </DashboardLayout>

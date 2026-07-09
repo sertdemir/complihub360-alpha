@@ -15,7 +15,8 @@
         "@complihub/compliance-engine": "*",
         "@complihub/policy-engine": "*",
         "@complihub/task-orchestrator": "*",
-        "@complihub360/types": "*"
+        "@complihub360/types": "*",
+        "@complihub360/redaction": "*"
     },
     "devDependencies": {
         "typescript": "^5.0.0",

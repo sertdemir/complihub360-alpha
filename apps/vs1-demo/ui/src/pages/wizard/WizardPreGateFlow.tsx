@@ -117,6 +117,10 @@ export function WizardPreGateFlow() {
     const [searchParams] = useSearchParams();
     const { profile, dispatch } = useWizard();
 
+    // Wizard routes live under /:locale/wizard — keep the locale on every hop so
+    // navigation never falls through to the catch-all redirect (→ home).
+    const locale = location.pathname.match(/^\/([a-z]{2})(?=\/|$)/)?.[1] || 'en';
+
     const [step, setStep] = useState(() => location.pathname.includes('/category') ? 1 : 0);
     const [direction, setDirection] = useState(1);
 
@@ -144,11 +148,11 @@ export function WizardPreGateFlow() {
         
         if (preCategory) {
             dispatch({ type: "SET_CATEGORIES", payload: [preCategory as any] });
-            navigate(`/wizard/${preCategory}`);
+            navigate(`/${locale}/wizard/${preCategory}`);
         } else {
             setDirection(1);
             setStep(1);
-            window.history.replaceState(null, "", "/wizard/category");
+            window.history.replaceState(null, "", `/${locale}/wizard/category`);
         }
     };
 
@@ -163,16 +167,16 @@ export function WizardPreGateFlow() {
     const handleNextCategory = () => {
         if (profile.categories.length === 0) return;
         if (profile.categories.length === 1) {
-            navigate(`/wizard/${profile.categories[0]}`);
+            navigate(`/${locale}/wizard/${profile.categories[0]}`);
         } else {
-            navigate(`/wizard/full-support`);
+            navigate(`/${locale}/wizard/full-support`);
         }
     };
 
     const handleBackCategory = () => {
         setDirection(-1);
         setStep(0);
-        window.history.replaceState(null, "", "/wizard");
+        window.history.replaceState(null, "", `/${locale}/wizard`);
     };
 
     const isCategory = step === 1;

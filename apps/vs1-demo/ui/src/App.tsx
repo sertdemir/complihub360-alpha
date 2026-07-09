@@ -3,18 +3,24 @@ import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, usePa
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { supportedLngs } from "./i18n/config";
-import { GlobalNav } from "./components/layout/GlobalNav";
+import { SiteHeader } from "./components/layout/SiteHeader";
 import { WizardProvider } from "./components/wizard/WizardContext";
 import { LandingPage } from "./pages/LandingPage";
+import { HomePage } from "./pages/HomePage";
 import { ServicesPage } from "./pages/ServicesPage";
 import { CountriesPage } from "./pages/CountriesPage";
 import { PlatformPage } from "./pages/PlatformPage";
 import { SolutionsPage } from "./pages/SolutionsPage";
 import { ComplianceAreasPage } from "./pages/ComplianceAreasPage";
+import { ProvidersPage } from "./pages/ProvidersPage";
+import { ResultsRiskMap } from "./pages/ResultsRiskMap";
 import { ResourcesPage } from "./pages/ResourcesPage";
 import AdvisoryPage from "./pages/AdvisoryPage";
 import { AiGovernancePage } from "./pages/AiGovernancePage";
-import { ResultsOverview } from "./pages/ResultsOverview";
+import { PrivacyPage, ImprintPage } from "./pages/legal/LegalPages";
+import { AdminOverviewPage } from "./pages/admin/AdminOverviewPage";
+import { AdminEventsPage } from "./pages/admin/AdminEventsPage";
+import { AdminComingSoonPage } from "./pages/admin/AdminComingSoonPage";
 import { DashboardHome } from "./pages/dashboard/DashboardHome";
 import { UserDossiers } from "./pages/dashboard/UserDossiers";
 import { DossierDetail } from "./pages/dashboard/DossierDetail";
@@ -25,6 +31,21 @@ import { PartnerDashboardHome } from "./pages/partner-dashboard/PartnerDashboard
 import { LeadInbox } from "./pages/partner-dashboard/LeadInbox";
 import { LeadDetail } from "./pages/partner-dashboard/LeadDetail";
 import { PartnerProfile } from "./pages/partner-dashboard/PartnerProfile";
+import { RequestsPage } from "./pages/provider/RequestsPage";
+import { PerformancePage } from "./pages/provider/PerformancePage";
+import { CoveragePage } from "./pages/provider/CoveragePage";
+import { BillingPage } from "./pages/provider/BillingPage";
+import { SettingsPage } from "./pages/provider/SettingsPage";
+import { NotificationsPage } from "./pages/provider/NotificationsPage";
+import { UserHomePage } from "./pages/user/UserHomePage";
+import { SessionsPage } from "./pages/user/SessionsPage";
+import { UserRequestsPage } from "./pages/user/UserRequestsPage";
+import { WorkbenchPage } from "./pages/user/WorkbenchPage";
+import { UserNotificationsPage } from "./pages/user/UserNotificationsPage";
+import { SavedProvidersPage } from "./pages/user/SavedProvidersPage";
+import { ExportsPage } from "./pages/user/ExportsPage";
+import { ComingSoonPage } from "./pages/user/ComingSoonPage";
+import { LibraryPage } from "./pages/user/LibraryPage";
 import { ActiveClients } from "./pages/partner-dashboard/ActiveClients";
 // Wizard Shell Steps
 import { WizardPreGateFlow } from "./pages/wizard/WizardPreGateFlow";
@@ -38,33 +59,20 @@ import { CorporateWizard } from "./pages/wizard/flows/CorporateWizard";
 import { FullSupportWizard } from "./pages/wizard/flows/FullSupportWizard";
 // Auth
 import { LoginPage } from "./pages/auth/LoginPage";
+import { ProviderOnboardingPage } from "./pages/onboarding/ProviderOnboardingPage";
 import { RegisterPage } from "./pages/auth/RegisterPage";
 import { EmailVerificationPage } from "./pages/auth/EmailVerificationPage";
+import { AuthCallbackPage } from "./pages/auth/AuthCallbackPage";
+import { ResetPasswordPage } from "./pages/auth/ResetPasswordPage";
 import { AuthGuard } from "./components/auth/AuthGuard";
 
+// ⚠️ Old route-based wizard is DISABLED. The assessment now runs inline in the
+// landing page (EntryDoor → AnimatedWizard: Markets → Operations → Domains →
+// Review → /results). Any legacy /wizard URL redirects to the locale home so the
+// old pre-gate / category flows never render.
 function WizardRoutes() {
-    return (
-        <WizardProvider>
-            <Routes>
-                {/* Pre-Gate: Country & Category Selection */}
-                <Route path="/" element={<WizardPreGateFlow />} />
-                <Route path="/category" element={<WizardPreGateFlow />} />
-                {/* 6 individualized category-specific flows */}
-                <Route path="/tax-vat" element={<TaxVatWizard />} />
-                <Route path="/data-privacy" element={<DataPrivacyWizard />} />
-                <Route path="/epr" element={<EprWizard />} />
-                <Route path="/marketing-seo" element={<MarketingSeoWizard />} />
-                <Route path="/corporate" element={<CorporateWizard />} />
-                <Route path="/full-support" element={<FullSupportWizard />} />
-                {/* Generic flow: Context → Markets → Risk → Complexity → Review */}
-                <Route path="/context" element={<GenericWizardFlow />} />
-                <Route path="/markets" element={<GenericWizardFlow />} />
-                <Route path="/risk" element={<GenericWizardFlow />} />
-                <Route path="/complexity" element={<GenericWizardFlow />} />
-                <Route path="/review" element={<GenericWizardFlow />} />
-            </Routes>
-        </WizardProvider>
-    );
+    const { i18n } = useTranslation();
+    return <Navigate to={`/${i18n.resolvedLanguage || 'en'}`} replace />;
 }
 
 function RootRedirect() {
@@ -92,9 +100,20 @@ function LocaleLayout() {
 function AppContent() {
     const location = useLocation();
     const navigate = useNavigate();
-    const [bgLocation, setBgLocation] = useState(location);
 
     const isWizardRoute = /^\/[a-z]{2}\/wizard/.test(location.pathname) || location.pathname.startsWith("/wizard");
+
+    // The wizard renders as an overlay over a "background" page. If the app is
+    // opened directly on a wizard URL there is no background yet — fall back to
+    // the locale home so the overlay (and its close/backdrop) behave correctly.
+    const [bgLocation, setBgLocation] = useState(() => {
+        const wiz = /^\/[a-z]{2}\/wizard/.test(location.pathname) || location.pathname.startsWith("/wizard");
+        if (wiz) {
+            const loc = location.pathname.match(/^\/([a-z]{2})(?=\/|$)/)?.[1] || "en";
+            return { ...location, pathname: `/${loc}`, search: "", hash: "" };
+        }
+        return location;
+    });
 
     useEffect(() => {
         if (!isWizardRoute) {
@@ -104,26 +123,39 @@ function AppContent() {
 
     return (
         <>
-            <GlobalNav />
+            <SiteHeader />
             {/* Render the background location for main routes if a wizard is open */}
             <Routes location={isWizardRoute ? bgLocation : location}>
                 <Route path="/:locale" element={<LocaleLayout />}>
                     {/* Public pages */}
-                    <Route index element={<LandingPage />} />
+                    {/* Index = new User/Entrepreneur landing (HomePage). Old marketing landing kept at /home-old. */}
+                    <Route index element={<HomePage />} />
+                    <Route path="home-old" element={<LandingPage />} />
                     <Route path="services" element={<ServicesPage />} />
                     <Route path="countries" element={<CountriesPage />} />
                     <Route path="platform" element={<PlatformPage />} />
                     <Route path="solutions" element={<SolutionsPage />} />
                     <Route path="compliance" element={<ComplianceAreasPage />} />
+                    <Route path="providers" element={<ProvidersPage />} />
                     <Route path="resources" element={<ResourcesPage />} />
                     <Route path="advisory" element={<AdvisoryPage />} />
                     <Route path="ai-governance" element={<AiGovernancePage />} />
-                    <Route path="results" element={<ResultsOverview />} />
-                    
+                    <Route path="results" element={<ResultsRiskMap />} />
+                    {/* Legal (launch requirement: Art. 13 GDPR + Impressumspflicht) */}
+                    <Route path="privacy" element={<PrivacyPage />} />
+                    <Route path="imprint" element={<ImprintPage />} />
                     {/* User Dashboard Routes (Auth Guarded) */}
                     <Route element={<AuthGuard requiredRole="user" />}>
-                        <Route path="dashboard" element={<DashboardHome />} />
-                        <Route path="dashboard/sessions" element={<UserDossiers />} />
+                        <Route path="dashboard" element={<UserHomePage />} />
+                        <Route path="dashboard/sessions" element={<SessionsPage />} />
+                        <Route path="dashboard/requests" element={<UserRequestsPage />} />
+                        <Route path="dashboard/workbench/:domain" element={<WorkbenchPage />} />
+                        <Route path="dashboard/notifications" element={<UserNotificationsPage />} />
+                        <Route path="dashboard/saved-providers" element={<SavedProvidersPage />} />
+                        <Route path="dashboard/exports" element={<ExportsPage />} />
+                        <Route path="dashboard/alerts" element={<ComingSoonPage page="alerts" />} />
+                        <Route path="dashboard/calendar" element={<ComingSoonPage page="calendar" />} />
+                        <Route path="dashboard/library" element={<LibraryPage />} />
                         <Route path="dashboard/sessions/:id" element={<DossierDetail />} />
                         <Route path="dashboard/knowledge" element={<KnowledgeCenter />} />
                         <Route path="dashboard/workspace" element={<UserWorkspace />} />
@@ -133,18 +165,41 @@ function AppContent() {
                     
                     {/* Partner Dashboard Routes (Auth Guarded) */}
                     <Route element={<AuthGuard requiredRole="partner" />}>
-                        <Route path="partner-dashboard" element={<PartnerDashboardHome />} />
+                        {/* Post-login landing = the new provider workspace. The legacy
+                            Partner Hub stays reachable at /partner-dashboard/home-old. */}
+                        <Route path="partner-dashboard" element={<Navigate to="requests" replace />} />
+                        <Route path="partner-dashboard/home-old" element={<PartnerDashboardHome />} />
+                        <Route path="partner-dashboard/requests" element={<RequestsPage />} />
+                        <Route path="partner-dashboard/performance" element={<PerformancePage />} />
+                        <Route path="partner-dashboard/coverage" element={<CoveragePage />} />
+                        <Route path="partner-dashboard/billing" element={<BillingPage />} />
+                        <Route path="partner-dashboard/settings" element={<SettingsPage />} />
+                        <Route path="partner-dashboard/notifications" element={<NotificationsPage />} />
                         <Route path="partner-dashboard/leads" element={<LeadInbox />} />
                         <Route path="partner-dashboard/leads/:id" element={<LeadDetail />} />
                         <Route path="partner-dashboard/clients" element={<ActiveClients />} />
                         <Route path="partner-dashboard/profile" element={<PartnerProfile />} />
                         <Route path="partner-dashboard/*" element={<PartnerDashboardHome />} />
                     </Route>
-                    
+
+                    {/* Admin Control Center (Auth Guarded · dev entry: /login?as=admin) */}
+                    <Route element={<AuthGuard requiredRole="admin" />}>
+                        <Route path="admin" element={<AdminOverviewPage />} />
+                        <Route path="admin/events" element={<AdminEventsPage />} />
+                        <Route path="admin/providers" element={<AdminComingSoonPage />} />
+                        <Route path="admin/security" element={<AdminComingSoonPage />} />
+                        <Route path="admin/privacy" element={<AdminComingSoonPage />} />
+                        <Route path="admin/alerts" element={<AdminComingSoonPage />} />
+                        <Route path="admin/status" element={<AdminComingSoonPage />} />
+                    </Route>
+
                     {/* Auth */}
                     <Route path="login" element={<LoginPage />} />
+                    <Route path="partner-onboarding" element={<ProviderOnboardingPage />} />
                     <Route path="register" element={<RegisterPage />} />
                     <Route path="verify-email" element={<EmailVerificationPage />} />
+                    <Route path="auth/callback" element={<AuthCallbackPage />} />
+                    <Route path="reset-password" element={<ResetPasswordPage />} />
                 </Route>
                 <Route path="/" element={<RootRedirect />} />
                 <Route path="*" element={<RootRedirect />} />

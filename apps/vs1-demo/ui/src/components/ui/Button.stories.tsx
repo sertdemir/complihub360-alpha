@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { Plus, ArrowRight, Settings } from 'lucide-react';
 import { Button } from './Button';
 
 const meta = {
@@ -11,7 +12,7 @@ const meta = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['primary', 'secondary', 'ghost', 'outline', 'danger'],
+      options: ['primary', 'secondary', 'ghost', 'outline', 'danger', 'success', 'info'],
     },
     size: {
       control: 'select',
@@ -21,6 +22,12 @@ const meta = {
       control: 'boolean',
     },
     fullWidth: {
+      control: 'boolean',
+    },
+    loading: {
+      control: 'boolean',
+    },
+    iconOnly: {
       control: 'boolean',
     },
   },
@@ -74,3 +81,71 @@ export const Disabled: Story = {
         children: 'Not Allowed',
     }
 }
+
+export const Success: Story = {
+  args: {
+    variant: 'success',
+    children: 'Approve',
+  },
+};
+
+export const Info: Story = {
+  args: {
+    variant: 'info',
+    children: 'Learn More',
+  },
+};
+
+export const Variants: Story = {
+  render: () => (
+    <div className="flex flex-wrap items-center gap-3">
+      <Button variant="primary">Primary</Button>
+      <Button variant="secondary">Secondary</Button>
+      <Button variant="ghost">Ghost</Button>
+      <Button variant="outline">Outline</Button>
+      <Button variant="success">Success</Button>
+      <Button variant="danger">Error</Button>
+      <Button variant="info">Info</Button>
+      <Button variant="accent">View ranking impact</Button>
+    </div>
+  ),
+};
+
+export const Loading: Story = {
+  render: () => (
+    <div className="flex items-center gap-3">
+      <Button loading>Saving…</Button>
+      <Button variant="secondary" loading>Loading</Button>
+      <Button variant="success" loading>Approving</Button>
+    </div>
+  ),
+};
+
+export const WithIcons: Story = {
+  render: () => (
+    <div className="flex items-center gap-3">
+      <Button iconLeft={<Plus size={16} />}>Add Item</Button>
+      <Button variant="secondary" iconRight={<ArrowRight size={16} />}>Next</Button>
+      <Button iconOnly aria-label="Settings"><Settings size={16} /></Button>
+    </div>
+  ),
+};
+
+export const DarkVariants: Story = {
+  parameters: { layout: 'fullscreen' },
+  render: () => (
+    <div className="dark flex min-h-screen flex-wrap items-center gap-3 bg-[#1F2937] p-8">
+      <Button variant="primary">Primary</Button>
+      <Button variant="secondary">Secondary</Button>
+      <Button variant="ghost">Ghost</Button>
+      <Button variant="outline">Outline</Button>
+      <Button variant="success">Success</Button>
+      <Button variant="danger">Error</Button>
+      <Button variant="info">Info</Button>
+      <Button variant="accent">Explore expansion</Button>
+      <Button loading>Saving…</Button>
+      <Button iconLeft={<Plus size={16} />}>Add</Button>
+      <Button iconOnly aria-label="Settings"><Settings size={16} /></Button>
+    </div>
+  ),
+};
