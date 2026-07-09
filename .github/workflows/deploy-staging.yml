@@ -1,4 +1,4 @@
-# Staging auto-deploy — builds the vs1-demo UI and rsyncs it to the Hostinger
+# Staging auto-deploy (v1.0) — builds the vs1-demo UI and rsyncs it to the Hostinger
 # VPS (same target as scripts/deploy-staging.sh). Requires two repo secrets:
 #   VPS_SSH_KEY      — private key of the dedicated CI deploy keypair
 #   STAGING_API_KEY  — x-api-key baked into the frontend bundle
