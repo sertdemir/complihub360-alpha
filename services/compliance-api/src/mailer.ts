@@ -1,5 +1,6 @@
 import { supabaseApi } from './supabase.js';
 import { structuredLog } from '@complihub360/types';
+import { redactText } from '@complihub360/redaction';
 
 // ─── Magic-link mailer ────────────────────────────────────────────────────────
 // Two modes, decided by env at send time:
@@ -30,12 +31,16 @@ function actionUrl(action: string, query: string): string {
 }
 
 function renderText(m: MagicLinkMail): string {
+    // Anonymized dossier stage (Addendum 2026-07-10): the e-mail carries the
+    // REDACTED message only — requester identity never travels via e-mail.
+    const redacted = m.message ? redactText(m.message, { profile: 'strict' }).sanitizedText : '—';
     return [
         `New engagement request on CompliHub360`,
         ``,
         `Provider: ${m.providerName}`,
         `Scope: ${m.country} · ${m.category}`,
-        `Message: ${m.message || '—'}`,
+        `Message (anonymized): ${redacted}`,
+        `Requester identity: unlocked after you confirm.`,
         ``,
         `Confirm (24h SLA): ${actionUrl('confirm', m.magicLinks.confirm)}`,
         `Reply:             ${actionUrl('reply', m.magicLinks.reply)}`,

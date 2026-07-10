@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { LogoMark } from '../../components/ui/Logo';
 import { Button } from '../../components/ui/Button';
 import { Tag } from '../../components/ui/Tag';
-import { verifyMagicToken, actOnEngagement } from '../../api/engagement';
+import { verifyMagicToken, actOnEngagement, type EngagementDossier, type UnlockedDossier } from '../../api/engagement';
 
 // ─── Provider magic-link action page ─────────────────────────────────────────
 // Target of the e-mailed links (?id=…&token=…&action=confirm|reply|decline).
@@ -27,11 +27,13 @@ export function ProviderMagicActionPage() {
   const [phase, setPhase] = useState<Phase>('verifying');
   const [engagementId, setEngagementId] = useState('');
   const [message, setMessage] = useState('');
+  const [dossier, setDossier] = useState<EngagementDossier | null>(null);
+  const [unlocked, setUnlocked] = useState<UnlockedDossier | null>(null);
 
   useEffect(() => {
     if (!token) { setPhase('invalid'); return; }
     verifyMagicToken(token)
-      .then((info) => { setEngagementId(info.engagementId); setPhase('ready'); })
+      .then((info) => { setEngagementId(info.engagementId); setDossier(info.dossier); setPhase('ready'); })
       .catch(() => setPhase('invalid'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -39,12 +41,15 @@ export function ProviderMagicActionPage() {
   const act = async () => {
     setPhase('working');
     try {
-      await actOnEngagement(action, engagementId, token, action === 'reply' ? message : undefined);
+      const u = await actOnEngagement(action, engagementId, token, action === 'reply' ? message : undefined);
+      setUnlocked(u);
       setPhase('done');
     } catch {
       setPhase('invalid');
     }
   };
+
+  const answers = dossier ? Object.entries(dossier.structured_answers).filter(([k]) => k !== 'source') : [];
 
   const [pre, post] = copy.title.split(copy.gold);
 
@@ -74,10 +79,32 @@ export function ProviderMagicActionPage() {
             <h1 className="font-serif text-[24px] font-semibold text-fg">
               {pre}<span className="text-fg-accent">{copy.gold}</span>{post}
             </h1>
-            <div className="mt-3 flex items-center gap-2">
+            <div className="mt-3 flex flex-wrap items-center gap-2">
               <Tag tone="neutral">Request {engagementId.slice(0, 8).toUpperCase()}</Tag>
-              <Tag tone="brand">single-use link</Tag>
+              {dossier && <Tag tone="brand">{dossier.country} · {dossier.category}</Tag>}
+              <Tag tone="neutral">single-use link</Tag>
             </div>
+            {dossier && (
+              <div className="mt-4 rounded-lg border border-white/10 bg-white/[0.03] p-4">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">Anonymized dossier</p>
+                {answers.length > 0 && (
+                  <dl className="mt-2 space-y-1">
+                    {answers.map(([k, v]) => (
+                      <div key={k} className="flex gap-2 text-[12px]">
+                        <dt className="min-w-[110px] capitalize text-fg-tertiary">{k.replace(/_/g, ' ')}</dt>
+                        <dd className="text-fg-secondary">{Array.isArray(v) ? v.join(', ') : String(v)}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
+                <p className="mt-3 border-l-2 border-fg-brand/40 pl-3 text-[12px] italic leading-relaxed text-fg-secondary">
+                  “{dossier.message_redacted || '—'}”
+                </p>
+                <p className="mt-3 text-[11px] text-fg-tertiary">
+                  🔒 Requester identity unlocks when you confirm — names and contact details are masked until then.
+                </p>
+              </div>
+            )}
             {action === 'reply' && (
               <textarea
                 rows={4}
@@ -106,6 +133,19 @@ export function ProviderMagicActionPage() {
           <>
             <h1 className="font-serif text-[24px] font-semibold text-fg">Done ✓</h1>
             <p className="mt-2 text-[13px] leading-relaxed text-fg-secondary">{copy.done}</p>
+            {unlocked && (
+              <div className="mt-4 rounded-lg border border-fg-accent/30 bg-fg-accent/5 p-4">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-accent">🔓 Dossier unlocked</p>
+                <p className="mt-2 border-l-2 border-fg-accent/40 pl-3 text-[12px] italic leading-relaxed text-fg-secondary">
+                  “{unlocked.message || '—'}”
+                </p>
+                <p className="mt-2 text-[12px] text-fg-secondary">
+                  {unlocked.requester_identity.company || unlocked.requester_identity.email
+                    ? `${unlocked.requester_identity.company ?? ''}${unlocked.requester_identity.company && unlocked.requester_identity.email ? ' · ' : ''}${unlocked.requester_identity.email ?? ''}`
+                    : 'Requester contact will appear in your partner dashboard thread.'}
+                </p>
+              </div>
+            )}
             <p className="mt-4 text-[12px] text-fg-tertiary">You can close this window or open your partner dashboard.</p>
           </>
         )}

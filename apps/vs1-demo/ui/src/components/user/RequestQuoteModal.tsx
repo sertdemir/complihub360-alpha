@@ -39,7 +39,14 @@ export function RequestQuoteModal({ provider, country, category, domainLabel, on
         country,
         category,
         message,
-        structured_answers: { source: 'workbench', domain: domainLabel },
+        // The anonymized dossier the provider sees before confirming
+        // (Addendum 2026-07-10) — situational context, no identity.
+        structured_answers: {
+          source: 'workbench',
+          domain: domainLabel,
+          markets: [country],
+          timeline: 'next quarter',
+        },
       });
       setPhase('done');
       setTimeout(onClose, 2200);
@@ -100,8 +107,9 @@ export function RequestQuoteModal({ provider, country, category, domainLabel, on
                 />
               </div>
               <p className="text-[11px] leading-relaxed text-fg-tertiary">
-                Your structured session context is shared with this provider (Art. 6(1)(b) GDPR — contract initiation).
-                Uploaded documents are never shared automatically.
+                Your situational context is shared <span className="font-medium text-fg-secondary">anonymized</span> — names and
+                contact details in your message are masked. Your identity is revealed only after the provider confirms
+                (Art. 6(1)(b) GDPR — contract initiation). Uploaded documents are never shared automatically.
               </p>
               {phase === 'error' && (
                 <p className="rounded-lg border border-error-500/30 bg-error-500/10 px-3 py-2 text-[12px] text-error-500">

@@ -26,10 +26,27 @@ export async function createEngagement(input: CreateEngagementInput): Promise<Cr
   return { id: res.id, status: res.status };
 }
 
+// Anonymized dossier (Addendum 2026-07-10): what the provider sees BEFORE
+// confirming — situational context + redacted message, never identity.
+export interface EngagementDossier {
+  country: string;
+  category: string;
+  structured_answers: Record<string, unknown>;
+  message_redacted: string;
+  created_at?: string;
+  sla_confirm_deadline?: string;
+}
+
+export interface UnlockedDossier {
+  message: string;
+  requester_identity: { company: string | null; email: string | null };
+}
+
 export interface MagicTokenInfo {
   ok: boolean;
   action: 'confirm' | 'reply' | 'decline';
   engagementId: string;
+  dossier: EngagementDossier | null;
 }
 
 export async function verifyMagicToken(token: string): Promise<MagicTokenInfo> {
@@ -41,9 +58,10 @@ export async function actOnEngagement(
   engagementId: string,
   token: string,
   message?: string,
-): Promise<void> {
-  await apiFetch(`/api/v1/provider/${action}`, {
+): Promise<UnlockedDossier | null> {
+  const res = await apiFetch<{ ok: boolean; unlocked?: UnlockedDossier | null }>(`/api/v1/provider/${action}`, {
     method: 'POST',
     body: JSON.stringify({ engagementId, token, ...(message ? { message } : {}) }),
   });
+  return res.unlocked ?? null;
 }

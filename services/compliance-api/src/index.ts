@@ -669,10 +669,29 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 Array<{ engagement_id: string; action: string; expires_at: string; used_at: string | null }>;
             const row = rows[0];
             const valid = !!row && row.used_at === null && new Date(row.expires_at).getTime() > Date.now();
+            // Anonymized dossier (Addendum 2026-07-10): situational context +
+            // redacted message. Requester identity is NEVER in this response —
+            // it unlocks only via the confirm action.
+            let dossier: Record<string, unknown> | null = null;
+            if (valid) {
+                const eng = (await supabaseApi.select('engagement_requests', { id: row.engagement_id }, { limit: 1 })) as
+                    Array<{ country: string; category: string; message?: string; structured_answers?: Record<string, unknown>; created_at: string; sla_confirm_deadline?: string }>;
+                if (eng[0]) {
+                    const redacted = redactText(eng[0].message || '', { profile: 'strict' });
+                    dossier = {
+                        country: eng[0].country,
+                        category: eng[0].category,
+                        structured_answers: eng[0].structured_answers || {},
+                        message_redacted: redacted.sanitizedText,
+                        created_at: eng[0].created_at,
+                        sla_confirm_deadline: eng[0].sla_confirm_deadline,
+                    };
+                }
+            }
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(valid ? 200 : 403, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify(valid
-                ? { ok: true, engagementId: row.engagement_id, action: row.action, expiresAt: row.expires_at }
+                ? { ok: true, engagementId: row.engagement_id, action: row.action, expiresAt: row.expires_at, dossier }
                 : { ok: false, errorCode: 'INVALID_TOKEN', message: 'Magic link invalid, expired or already used' }));
         } catch (err) {
             res.setHeader('x-correlation-id', correlationId);
@@ -705,8 +724,26 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     payload: { engagementId }
                 });
 
+                // Dossier unlock (Addendum 2026-07-10): confirming reveals the
+                // unredacted message + requester identity. Disclosure is an
+                // auditable moment (dossier_unlocked).
+                const engRows = (await supabaseApi.select('engagement_requests', { id: engagementId }, { limit: 1 })) as
+                    Array<{ message?: string; structured_answers?: Record<string, unknown> & { requester_email?: string; company?: string } }>;
+                const eng = engRows[0];
+                const unlocked = eng ? {
+                    message: eng.message || '',
+                    requester_identity: {
+                        company: eng.structured_answers?.company ?? null,
+                        email: eng.structured_answers?.requester_email ?? null,
+                    },
+                } : null;
+                await supabaseApi.insert('event_log', {
+                    type: 'dossier_unlocked',
+                    payload: { engagementId }
+                });
+
                 res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ ok: true, message: "Provider confirmed" }));
+                res.end(JSON.stringify({ ok: true, message: "Provider confirmed", unlocked }));
             } catch (err) {
                 res.writeHead(400);
                 res.end(JSON.stringify({ error: String(err) }));
