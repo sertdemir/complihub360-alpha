@@ -29,8 +29,12 @@ jobs:
         run: npm ci
 
       - name: Build workspace packages (UI imports their dist/)
+        # Dependency order matters on a fresh checkout: types is the root of
+        # the graph (types → agent-core → registry/policy → orchestrator).
         run: |
-          for p in packages/*; do
+          for p in packages/types packages/compliance-engine packages/agent-core \
+                   packages/agent-registry packages/policy-engine packages/task-orchestrator \
+                   services/redaction; do
             npm run build --workspace "$p" --if-present
           done
 
@@ -40,6 +44,7 @@ jobs:
         run: |
           npm run build --workspace apps/vs1-demo/ui
           printf 'User-agent: *\nDisallow: /\n' > apps/vs1-demo/ui/dist/robots.txt
+          echo "{\"sha\":\"$GITHUB_SHA\",\"builtAt\":\"$(date -u +%FT%TZ)\"}" > apps/vs1-demo/ui/dist/build-info.json
 
       - name: Deploy via rsync
         env:
