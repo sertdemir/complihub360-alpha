@@ -11,6 +11,11 @@ export interface CreateEngagementInput {
   category: string;
   message: string;
   structured_answers?: Record<string, unknown>;
+  /** Wave A: link the wizard session (the dossier source). */
+  session_id?: string;
+  /** Identity fields — stored server-side, revealed only via dossier unlock. */
+  requester_email?: string;
+  company?: string;
 }
 
 export interface CreateEngagementResult {

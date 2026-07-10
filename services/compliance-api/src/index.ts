@@ -428,6 +428,57 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Failed to load notifications', correlationId }));
         }
+    } else if (req.method === 'POST' && req.url === '/api/v1/session') {
+        // Wave A1: persist a wizard session (guest via guest_key, later adopted
+        // by the account). The session is the user-side dossier source.
+        let body = '';
+        req.on('data', (chunk: any) => body += chunk.toString());
+        req.on('end', async () => {
+            try {
+                const d = JSON.parse(body);
+                if (!d.guest_key && !d.user_id) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'guest_key or user_id required', correlationId }));
+                    return;
+                }
+                const inserted = (await supabaseApi.insert('sessions', {
+                    user_id: d.user_id || null,
+                    guest_key: d.guest_key || null,
+                    country: d.country || null,
+                    markets: d.markets || [],
+                    categories: d.categories || [],
+                    answers: d.answers || {},
+                    risk_summary: d.risk_summary || null,
+                })) as Array<{ id: string }>;
+                await supabaseApi.insert('event_log', { type: 'session_saved', payload: { sessionId: inserted?.[0]?.id, guest: !d.user_id } });
+                res.setHeader('x-correlation-id', correlationId);
+                res.writeHead(201, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, id: inserted?.[0]?.id }));
+            } catch (err) {
+                structuredLog('error', 'Session save failed', { correlationId, errorCode: 'ERR_SESSION', severity: 'error', route: req.url });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Session save failed', correlationId }));
+            }
+        });
+    } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/sessions')) {
+        // List sessions for a guest key (registered listing lands with real auth).
+        try {
+            const u = new URL(req.url, 'http://localhost');
+            const guestKey = u.searchParams.get('guest_key');
+            if (!guestKey) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'guest_key required', correlationId }));
+                return;
+            }
+            const rows = await supabaseApi.select('sessions', { guest_key: guestKey }, { order: 'created_at.desc', limit: 20 });
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ok: true, sessions: rows }));
+        } catch (err) {
+            structuredLog('error', 'Sessions list failed', { correlationId, errorCode: 'ERR_SESSIONS', severity: 'error', route: req.url });
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Sessions list failed', correlationId }));
+        }
     } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/admin/stats')) {
         // Admin control center: one aggregated read across engagements, the
         // audit log and the privacy pipeline. Approximations share the caveats
@@ -594,10 +645,17 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const newEngagement = {
                     id: engagementId,
                     user_id: requestData.user_id || undefined,
+                    // Wave A7: link the wizard session + carry the requester
+                    // identity (revealed only via the dossier unlock).
+                    session_id: requestData.session_id || undefined,
                     provider_key: requestData.provider_key,
                     country: requestData.country,
                     category: requestData.category,
-                    structured_answers: requestData.structured_answers || {},
+                    structured_answers: {
+                        ...(requestData.structured_answers || {}),
+                        ...(requestData.requester_email ? { requester_email: requestData.requester_email } : {}),
+                        ...(requestData.company ? { company: requestData.company } : {}),
+                    },
                     message: requestData.message || "",
                     status: 'created',
                     sla_confirm_deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
@@ -678,10 +736,13 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     Array<{ country: string; category: string; message?: string; structured_answers?: Record<string, unknown>; created_at: string; sla_confirm_deadline?: string }>;
                 if (eng[0]) {
                     const redacted = redactText(eng[0].message || '', { profile: 'strict' });
+                    // Identity keys live inside structured_answers for the unlock
+                    // stage — they must NEVER appear in the anonymized dossier.
+                    const { requester_email: _re, company: _co, ...anonAnswers } = (eng[0].structured_answers || {}) as Record<string, unknown>;
                     dossier = {
                         country: eng[0].country,
                         category: eng[0].category,
-                        structured_answers: eng[0].structured_answers || {},
+                        structured_answers: anonAnswers,
                         message_redacted: redacted.sanitizedText,
                         created_at: eng[0].created_at,
                         sla_confirm_deadline: eng[0].sla_confirm_deadline,

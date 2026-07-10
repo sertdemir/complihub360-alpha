@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Tag } from '../ui/Tag';
 import { createEngagement } from '../../api/engagement';
+import { lastSessionId } from '../../api/sessions';
 
 // ─── Request Quote modal (App-Workspace, always dark) ────────────────────────
 // The real funnel entry: message + explicit send → POST /api/v1/engagement.
@@ -39,6 +40,7 @@ export function RequestQuoteModal({ provider, country, category, domainLabel, on
         country,
         category,
         message,
+        session_id: lastSessionId() ?? undefined,
         // The anonymized dossier the provider sees before confirming
         // (Addendum 2026-07-10) — situational context, no identity.
         structured_answers: {

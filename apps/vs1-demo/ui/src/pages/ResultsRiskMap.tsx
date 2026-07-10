@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
+import { saveWizardSession } from '../api/sessions';
 import { Lock, Check, Info, ArrowRight, ShieldCheck } from 'lucide-react';
 import { Logo } from '../components/ui/Logo';
 import { RiskBadge, type RiskLevel } from '../components/ui/RiskBadge';
@@ -141,6 +142,17 @@ export function ResultsRiskMap() {
   const location = useLocation();
   const profile = location.state?.searchProfile as SearchProfile | undefined;
   const [saveOpen, setSaveOpen] = useState(false);
+
+  // Wave A1: arriving from the wizard persists the session (the editable
+  // dossier). Guest-anchored via guest_key; fire-and-forget — the page renders
+  // regardless, and a failed save just means no resume anchor.
+  const savedRef = useRef(false);
+  useEffect(() => {
+    if (!profile || savedRef.current) return;
+    savedRef.current = true;
+    saveWizardSession(profile).catch(() => { /* offline/demo — non-fatal */ });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="min-h-screen bg-surface">
