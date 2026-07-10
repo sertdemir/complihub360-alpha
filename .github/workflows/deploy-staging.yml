@@ -53,10 +53,16 @@ jobs:
           mkdir -p ~/.ssh
           echo "$VPS_SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H 76.13.159.221 >> ~/.ssh/known_hosts 2>/dev/null
-          rsync -az --delete -e "ssh -i ~/.ssh/deploy_key" \
+          # Diagnose without leaking: key fingerprint proves the secret is a
+          # valid private key; nc proves port 22 is reachable from GitHub.
+          ssh-keygen -lf ~/.ssh/deploy_key || { echo "::error::VPS_SSH_KEY secret is not a valid private key"; exit 1; }
+          nc -zv -w 10 76.13.159.221 22 || { echo "::error::Port 22 on the VPS is not reachable from GitHub runners (firewall?)"; exit 1; }
+          # keyscan is best-effort; accept-new covers the first connection.
+          ssh-keyscan -T 10 -H 76.13.159.221 >> ~/.ssh/known_hosts || true
+          SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15"
+          rsync -az --delete -e "ssh $SSH_OPTS" \
             apps/vs1-demo/ui/dist/ root@76.13.159.221:/docker/complihub/site/
-          ssh -i ~/.ssh/deploy_key root@76.13.159.221 'chmod -R a+rX /docker/complihub/site'
+          ssh $SSH_OPTS root@76.13.159.221 'chmod -R a+rX /docker/complihub/site'
 
       - name: Verify
         run: |
