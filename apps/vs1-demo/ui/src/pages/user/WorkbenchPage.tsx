@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { UserShell } from '../../components/user/UserShell';
 import { RequestQuoteModal, type QuoteProvider } from '../../components/user/RequestQuoteModal';
+import { DocUploadDrawer } from '../../components/user/DocUploadDrawer';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { KPICircleCard } from '../../components/ui/KPICircleCard';
@@ -94,6 +95,7 @@ export function WorkbenchPage() {
   const meta = DOMAIN_META[key];
   const steps = meta.steps.length ? meta.steps : STEPS;
   const [quoteFor, setQuoteFor] = useState<(QuoteProvider & { country: string }) | null>(null);
+  const [uploadOpen, setUploadOpen] = useState(false);
   return (
     <UserShell activeDomain={meta.name}>
       <div className="mx-auto max-w-[1140px] space-y-6">
@@ -111,6 +113,7 @@ export function WorkbenchPage() {
           </div>
           <div className="mt-1 flex shrink-0 items-center gap-4">
             <a href="#" className="text-[12px] font-medium text-fg underline underline-offset-2">Refine existing</a>
+            <Button size="sm" variant="secondary" onClick={() => setUploadOpen(true)}>Upload document</Button>
             <Button size="sm">Start new</Button>
           </div>
         </div>
@@ -179,6 +182,7 @@ export function WorkbenchPage() {
           </div>
         </div>
       </div>
+      <DocUploadDrawer open={uploadOpen} onClose={() => setUploadOpen(false)} domainLabel={meta.name} />
       {quoteFor && (
         <RequestQuoteModal
           provider={quoteFor}
