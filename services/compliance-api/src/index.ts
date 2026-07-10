@@ -7,6 +7,7 @@ import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeC
 import { generateRelevantSubdomains, type CountryCode, type IndustryType, type BusinessModel } from "@complihub/compliance-engine";
 
 import { supabaseApi } from "./supabase.js";
+import { sendMagicLinkMail } from "./mailer.js";
 import { redactText } from "@complihub360/redaction";
 
 // P0 #1: shared magic-link verification — SHA-256 hash lookup, engagement +
@@ -630,6 +631,25 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     payload: { engagementId, provider_key: newEngagement.provider_key }
                 });
 
+                // Funnel: deliver the magic links to the provider (Resend if
+                // configured, e-mail outbox log otherwise). Fire-and-forget —
+                // the engagement + tokens exist regardless of delivery.
+                (async () => {
+                    const provRows = (await supabaseApi.select('providers', { provider_key: newEngagement.provider_key }, { limit: 1 })) as
+                        Array<{ name: string; contact_email?: string | null }>;
+                    await sendMagicLinkMail({
+                        engagementId,
+                        providerKey: newEngagement.provider_key,
+                        providerName: provRows[0]?.name || newEngagement.provider_key,
+                        contactEmail: provRows[0]?.contact_email ?? null,
+                        country: newEngagement.country,
+                        category: newEngagement.category,
+                        message: newEngagement.message,
+                        magicLinks,
+                        correlationId,
+                    });
+                })().catch(() => { /* logged inside the mailer */ });
+
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(201, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, id: engagementId, status: 'created', magicLinks }));
@@ -720,6 +740,39 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, message: "Provider replied" }));
+            } catch (err) {
+                res.writeHead(400);
+                res.end(JSON.stringify({ error: String(err) }));
+            }
+        });
+    } else if (req.method === 'POST' && req.url === '/api/v1/provider/decline') {
+        let body = '';
+        req.on('data', (chunk: any) => body += chunk.toString());
+        req.on('end', async () => {
+            try {
+                const requestData = JSON.parse(body);
+                const engagementId = requestData.engagementId;
+
+                // Same magic-token contract as confirm/reply.
+                const tokenOk = await verifyAndBurnMagicToken(engagementId, 'decline', requestData.token);
+                if (!tokenOk) {
+                    res.writeHead(403, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'INVALID_TOKEN', message: 'Magic link invalid, expired or already used' }));
+                    return;
+                }
+
+                await supabaseApi.update('engagement_requests',
+                    { id: engagementId },
+                    { status: 'declined', updated_at: new Date().toISOString() }
+                );
+
+                await supabaseApi.insert('event_log', {
+                    type: 'provider_declined',
+                    payload: { engagementId }
+                });
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, message: "Provider declined" }));
             } catch (err) {
                 res.writeHead(400);
                 res.end(JSON.stringify({ error: String(err) }));

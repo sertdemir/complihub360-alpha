@@ -47,5 +47,9 @@ export function SiteHeader() {
   if (localeOk && seg[1] === 'admin') {
     return null;
   }
+  // Provider magic-link action page (standalone interstitial) — no header.
+  if (localeOk && seg[1] === 'provider' && seg[2] === 'action') {
+    return null;
+  }
   return <GlobalNav />;
 }

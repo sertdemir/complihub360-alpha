@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { UserShell } from '../../components/user/UserShell';
+import { RequestQuoteModal, type QuoteProvider } from '../../components/user/RequestQuoteModal';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { KPICircleCard } from '../../components/ui/KPICircleCard';
@@ -79,10 +81,11 @@ const THRESHOLDS = [
   { country: 'AT', amount: '€11k', of: 'of €100k', status: 'SAFE', tone: 'success' as const, pct: 11, color: 'brand' as const },
 ];
 
+// key = provider_key in the DB (seeded on staging) — the FK the POST needs.
 const PROVIDERS = [
-  { initials: 'SB', name: 'Studio Bianchi SRL', meta: 'Milano, IT', sub: 'Italian VAT registration + fiscal representation · DE·IT bilingual · avg. reply 18h · Request quote' },
-  { initials: 'EV', name: 'EU-wide VAT compliance · O…', meta: 'Hamburg, DE', sub: 'Schmidt & Partner · OSS/IOSS setup · 12 years cross-border tax · 8 EU offices' },
-  { initials: 'MT', name: 'Madrid Tax Consulta…', meta: 'Madrid, ES', sub: 'Iberian VAT (ES/PT) · monthly filing · marketplace optimization · Request quote' },
+  { key: 'studio-bianchi', country: 'IT', initials: 'SB', name: 'Studio Bianchi SRL', meta: 'Milano, IT', sub: 'Italian VAT registration + fiscal representation · DE·IT bilingual · avg. reply 18h · Request quote' },
+  { key: 'schmidt-partner', country: 'DE', initials: 'EV', name: 'EU-wide VAT compliance · O…', meta: 'Hamburg, DE', sub: 'Schmidt & Partner · OSS/IOSS setup · 12 years cross-border tax · 8 EU offices' },
+  { key: 'madrid-tax', country: 'ES', initials: 'MT', name: 'Madrid Tax Consulta…', meta: 'Madrid, ES', sub: 'Iberian VAT (ES/PT) · monthly filing · marketplace optimization · Request quote' },
 ];
 
 export function WorkbenchPage() {
@@ -90,6 +93,7 @@ export function WorkbenchPage() {
   const key = (domain && domain in DOMAIN_META ? domain : 'tax-vat') as DomainKey;
   const meta = DOMAIN_META[key];
   const steps = meta.steps.length ? meta.steps : STEPS;
+  const [quoteFor, setQuoteFor] = useState<(QuoteProvider & { country: string }) | null>(null);
   return (
     <UserShell activeDomain={meta.name}>
       <div className="mx-auto max-w-[1140px] space-y-6">
@@ -158,11 +162,16 @@ export function WorkbenchPage() {
             <div className="space-y-2.5">
               {PROVIDERS.map((p) => (
                 <EntityCard
-                  key={p.initials}
+                  key={p.key}
                   avatar={<span className="grid h-9 w-9 place-items-center rounded-full bg-[#004d40]/40 text-[11px] font-bold text-[#2cc0ad]">{p.initials}</span>}
                   name={p.name}
                   badge={<Tag tone="brand">✓ PARTNER</Tag>}
                   meta={<span className="block text-[11px] leading-relaxed">{p.sub}</span>}
+                  trailing={
+                    <Button variant="accent" size="sm" onClick={() => setQuoteFor({ key: p.key, name: p.name, meta: p.meta, country: p.country })}>
+                      Request quote
+                    </Button>
+                  }
                   interactive
                 />
               ))}
@@ -170,6 +179,15 @@ export function WorkbenchPage() {
           </div>
         </div>
       </div>
+      {quoteFor && (
+        <RequestQuoteModal
+          provider={quoteFor}
+          country={quoteFor.country}
+          category={key === 'tax-vat' ? 'vat' : key.replace(/-/g, '_')}
+          domainLabel={meta.name}
+          onClose={() => setQuoteFor(null)}
+        />
+      )}
     </UserShell>
   );
 }
