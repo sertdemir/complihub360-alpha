@@ -4,7 +4,7 @@ import { useAuthStore } from '../../store/useAuthStore';
 import { useTranslation } from 'react-i18next';
 import {
   Home, LayoutGrid, FolderClosed, Mail, Bell, BookOpen, Bookmark, Download,
-  TriangleAlert, Calendar, Search, Settings, Landmark, Package, ShieldCheck, Megaphone, Building2, Headset,
+  TriangleAlert, Calendar, Search, LogOut, Landmark, Package, ShieldCheck, Megaphone, Building2, Headset,
 } from 'lucide-react';
 import { Sidebar, SidebarGroup, NavItem, DomainBar, DomainTab } from '../ui/AppShell';
 import { LogoMark } from '../ui/Logo';
@@ -69,7 +69,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
   const locale = i18n.resolvedLanguage || 'en';
   const location = useLocation();
   // Real session identity when present; the design fixture only as fallback.
-  const { userName, user } = useAuthStore();
+  const { userName, user, logout } = useAuthStore();
   const displayName = userName || 'Alex Weber';
   const displaySub = user?.email || 'Acme GmbH';
   const initials = displayName.split(/[\s._-]+/).map((p) => p[0]).join('').slice(0, 2).toUpperCase();
@@ -93,7 +93,15 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
                 <p className="text-[10px] text-fg-tertiary">{displaySub}</p>
               </div>
             </div>
-            <Settings size={15} className="text-fg-tertiary" />
+            <button
+              type="button"
+              aria-label="Sign out"
+              title="Sign out"
+              onClick={async () => { await logout(); window.location.href = `/${locale}/login`; }}
+              className="text-fg-tertiary transition-colors hover:text-fg"
+            >
+              <LogOut size={15} />
+            </button>
           </div>
         }
       >
