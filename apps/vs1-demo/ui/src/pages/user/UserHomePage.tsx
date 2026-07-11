@@ -1,5 +1,6 @@
 import { Play, ArrowRight } from 'lucide-react';
 import { UserShell } from '../../components/user/UserShell';
+import { useAuthStore } from '../../store/useAuthStore';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { RequestCard } from '../../components/ui/RequestCard';
@@ -50,13 +51,14 @@ function SectionHeader({ title, count }: { title: string; count: string }) {
 }
 
 export function UserHomePage() {
+  const firstName = (useAuthStore((st) => st.userName) || 'Alex').split(/[\s._-]+/)[0];
   return (
     <UserShell activeDomain="Tax & VAT">
       <div className="mx-auto max-w-[1140px] space-y-7">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="font-serif text-[32px] font-bold leading-tight text-fg">
-              Welcome back, <span className="text-fg-accent">Alex</span>.
+              Welcome back, <span className="text-fg-accent">{firstName}</span>.
             </h1>
             <p className="mt-1 text-body-sm text-fg-secondary">
               3 active requests · 2 sessions need a refresh · last activity 2h ago

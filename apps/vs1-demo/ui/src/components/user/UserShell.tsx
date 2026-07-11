@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { useAuthStore } from '../../store/useAuthStore';
 import { useTranslation } from 'react-i18next';
 import {
   Home, LayoutGrid, FolderClosed, Mail, Bell, BookOpen, Bookmark, Download,
@@ -67,6 +68,11 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
   const { i18n } = useTranslation();
   const locale = i18n.resolvedLanguage || 'en';
   const location = useLocation();
+  // Real session identity when present; the design fixture only as fallback.
+  const { userName, user } = useAuthStore();
+  const displayName = userName || 'Alex Weber';
+  const displaySub = user?.email || 'Acme GmbH';
+  const initials = displayName.split(/[\s._-]+/).map((p) => p[0]).join('').slice(0, 2).toUpperCase();
   const base = `/${locale}`;
 
   return (
@@ -81,10 +87,10 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
         footer={
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-2.5">
-              <span className="grid h-8 w-8 place-items-center rounded-full bg-[#d4af37] text-[11px] font-bold text-[#101411]">AW</span>
+              <span className="grid h-8 w-8 place-items-center rounded-full bg-[#d4af37] text-[11px] font-bold text-[#101411]">{initials}</span>
               <div className="leading-tight">
-                <p className="text-[12px] font-semibold text-fg">Alex Weber</p>
-                <p className="text-[10px] text-fg-tertiary">Acme GmbH</p>
+                <p className="text-[12px] font-semibold text-fg">{displayName}</p>
+                <p className="text-[10px] text-fg-tertiary">{displaySub}</p>
               </div>
             </div>
             <Settings size={15} className="text-fg-tertiary" />

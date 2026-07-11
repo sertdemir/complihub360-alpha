@@ -37,5 +37,6 @@
       "runtimeArgs": ["--prefix", "packages/dev-board", "run", "dev"],
       "port": 3334
     }
-  ]
+  ],
+  "autoVerify": true
 }
