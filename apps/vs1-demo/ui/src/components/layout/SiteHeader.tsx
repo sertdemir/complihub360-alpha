@@ -51,5 +51,9 @@ export function SiteHeader() {
   if (localeOk && seg[1] === 'provider' && seg[2] === 'action') {
     return null;
   }
+  // Auth flow pages (own dark split shell) — no marketing header on top.
+  if (localeOk && seg[1] === 'auth') {
+    return null;
+  }
   return <GlobalNav />;
 }
