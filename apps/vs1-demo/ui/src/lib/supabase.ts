@@ -9,6 +9,13 @@ const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 export const isSupabaseConfigured = Boolean(url && anonKey);
 
 /**
+ * Demo login availability. Defaults to "only when real auth is absent";
+ * staging sets VITE_DEMO_LOGIN=1 to keep the one-click stakeholder logins
+ * alongside real auth. Never set the flag in production builds.
+ */
+export const isDemoLoginEnabled = !isSupabaseConfigured || import.meta.env.VITE_DEMO_LOGIN === '1';
+
+/**
  * The Supabase client, or null when env is not configured.
  *
  * Security model:

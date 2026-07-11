@@ -11,10 +11,15 @@ SSH_KEY="$HOME/.ssh/complihub_vps"
 HOST="root@76.13.159.221"
 
 echo "→ Building frontend…"
-# Bake the staging x-api-key into the bundle (overrides .env.local's dev key).
+# Bake the staging x-api-key + public Supabase values into the bundle.
+# VITE_DEMO_LOGIN=1 keeps the one-click stakeholder logins alongside real auth.
 # shellcheck disable=SC1091
 source "$REPO_ROOT/.env.staging"
-cd "$UI" && VITE_DEV_API_KEY="$STAGING_API_KEY" npm run build --silent
+cd "$UI" && VITE_DEV_API_KEY="$STAGING_API_KEY" \
+  VITE_SUPABASE_URL="$SUPABASE_URL" \
+  VITE_SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
+  VITE_DEMO_LOGIN=1 \
+  npm run build --silent
 printf 'User-agent: *\nDisallow: /\n' > "$UI/dist/robots.txt"
 
 echo "→ Syncing to VPS…"

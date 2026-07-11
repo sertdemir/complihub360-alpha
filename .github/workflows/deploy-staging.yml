@@ -41,6 +41,11 @@ jobs:
       - name: Build frontend
         env:
           VITE_DEV_API_KEY: ${{ secrets.STAGING_API_KEY }}
+          # Public by design (browser-safe anon key); demo flag keeps the
+          # one-click stakeholder logins alongside real auth on staging.
+          VITE_SUPABASE_URL: https://kqylqwogxbiwpnomkzsn.supabase.co
+          VITE_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtxeWxxd29neGJpd3Bub21renNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1NDI1MjgsImV4cCI6MjA5OTExODUyOH0.sReK_846Tx-fawVO71Ojy5zJ3uF7Y4xvxGH0Md45Ptk
+          VITE_DEMO_LOGIN: '1'
         run: |
           npm run build --workspace apps/vs1-demo/ui
           printf 'User-agent: *\nDisallow: /\n' > apps/vs1-demo/ui/dist/robots.txt

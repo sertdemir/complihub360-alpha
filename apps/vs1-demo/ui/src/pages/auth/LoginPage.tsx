@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { ArrowRight, Mail, EyeOff, AlertTriangle } from "lucide-react";
 import { Logo } from "../../components/ui/Logo";
 import { useAuthStore } from "../../store/useAuthStore";
-import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { supabase, isSupabaseConfigured, isDemoLoginEnabled } from "../../lib/supabase";
 
 // ─── Auth · Figma 1839:2 / 1842:2288 / 1853:2 / 1855:2 / 1856:2 / 1857:3 ─────
 // One dark split-screen shell, several views driven by a small state machine:
@@ -173,7 +173,7 @@ export function LoginPage() {
     // Dev entry for the admin workspace (no public admin login UI by design):
     // /:locale/login?as=admin — only active with the demo-auth fallback.
     useEffect(() => {
-        if (params.get("as") === "admin" && !isSupabaseConfigured) {
+        if (params.get("as") === "admin" && isDemoLoginEnabled) {
             login("admin", "admin");
             navigate(`/${lang}/admin`);
         }
@@ -372,7 +372,7 @@ export function LoginPage() {
                                     </p>
                                     <button
                                         type="button"
-                                        onClick={() => { if (!isSupabaseConfigured) finishLogin("user"); else window.location.href = "mailto:"; }}
+                                        onClick={() => { if (isDemoLoginEnabled) finishLogin("user"); else window.location.href = "mailto:"; }}
                                         className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-accent-500 px-5 py-3.5 text-[15px] font-semibold text-primary-950 transition-transform duration-200 hover:-translate-y-0.5"
                                     >
                                         Open Mail App <ArrowRight size={16} />
@@ -425,7 +425,7 @@ export function LoginPage() {
                                     </p>
                                     <button
                                         type="button"
-                                        onClick={() => { if (!isSupabaseConfigured) finishLogin("partner"); else window.location.href = "mailto:"; }}
+                                        onClick={() => { if (isDemoLoginEnabled) finishLogin("partner"); else window.location.href = "mailto:"; }}
                                         className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-[#0e6450] px-5 py-3.5 text-[15px] font-semibold text-white transition-transform duration-200 hover:-translate-y-0.5"
                                     >
                                         Open Mail App <ArrowRight size={16} />

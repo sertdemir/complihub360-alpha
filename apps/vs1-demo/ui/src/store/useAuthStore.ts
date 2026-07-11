@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { Session, User } from '@supabase/supabase-js';
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { supabase, isSupabaseConfigured, isDemoLoginEnabled } from '../lib/supabase';
 
 export type UserRole = 'user' | 'partner' | 'admin';
 
@@ -64,8 +64,9 @@ export const useAuthStore = create<AuthState>((set) => ({
     }),
 
   login: (role, userName) => {
-    // Dev fallback only — keep the preview usable before Supabase env is wired.
-    if (!isSupabaseConfigured) {
+    // Demo login — persists whenever the demo flag allows it, so staging's
+    // one-click stakeholder logins survive real-auth activation.
+    if (isDemoLoginEnabled) {
       localStorage.setItem('demo_is_logged_in', 'true');
       localStorage.setItem('demo_user_role', role);
       if (userName) localStorage.setItem('demo_user_name', userName);
@@ -86,11 +87,23 @@ export const useAuthStore = create<AuthState>((set) => ({
 
 // ─── One-time initialisation ──────────────────────────────────────────────────
 if (isSupabaseConfigured && supabase) {
-  // Real auth: hydrate from the persisted session, then track changes.
+  // Real auth: hydrate from the persisted session, then track changes. An
+  // absent Supabase session must NOT clobber an active demo login (staging
+  // runs both worlds side by side).
+  const demoActive = () => isDemoLoginEnabled && localStorage.getItem('demo_is_logged_in') === 'true';
+  const hydrateDemo = () =>
+    useAuthStore.setState({
+      isLoggedIn: true,
+      role: (localStorage.getItem('demo_user_role') as UserRole) || null,
+      userName: localStorage.getItem('demo_user_name'),
+      loading: false,
+    });
   supabase.auth.getSession().then(({ data }) => {
+    if (!data.session && demoActive()) { hydrateDemo(); return; }
     useAuthStore.getState().setSession(data.session);
   });
   supabase.auth.onAuthStateChange((_event, session) => {
+    if (!session && demoActive()) { hydrateDemo(); return; }
     useAuthStore.getState().setSession(session);
   });
 } else {
