@@ -81,6 +81,20 @@ function SystemFooter({ className = "" }: { className?: string }) {
     );
 }
 
+// Explicit, labelled stakeholder demo entry — rendered only when the
+// VITE_DEMO_LOGIN flag allows it (staging). Real auth stays untouched.
+function DemoLoginRow({ role, onEnter }: { role: "user" | "partner"; onEnter: (r: "user" | "partner") => void }) {
+    return (
+        <button
+            type="button"
+            onClick={() => onEnter(role)}
+            className="mt-4 w-full rounded-xl border border-dashed border-white/20 px-5 py-2.5 text-[13px] font-medium text-white/60 transition-colors hover:border-white/40 hover:text-white"
+        >
+            Demo ansehen — ohne Konto als {role === "partner" ? "Partner" : "Unternehmen"} eintreten
+        </button>
+    );
+}
+
 function BackToSignIn({ onClick }: { onClick: () => void }) {
     return (
         <p className="mt-6 text-center">
@@ -491,6 +505,7 @@ export function LoginPage() {
                                         Send magic-link <ArrowRight size={16} />
                                     </button>
                                     <GoogleButton onClick={() => handleOAuth("user")} />
+                                    {isDemoLoginEnabled && <DemoLoginRow role="user" onEnter={finishLogin} />}
                                     <p className="mt-6 text-center text-[14px] text-white/60">
                                         New here?{" "}
                                         <button type="button" onClick={() => navigate(`/${lang}`)} className="font-semibold text-accent-400 hover:text-accent-300">
@@ -544,6 +559,7 @@ export function LoginPage() {
                                         Sign in <ArrowRight size={16} />
                                     </button>
                                     <GoogleButton onClick={() => handleOAuth("partner")} />
+                                    {isDemoLoginEnabled && <DemoLoginRow role="partner" onEnter={finishLogin} />}
                                     <p className="mt-6 text-center text-[14px] text-white/60">
                                         Not a Partner yet?{" "}
                                         <button type="button" onClick={() => navigate(`/${lang}/providers`)} className="font-semibold text-accent-400 hover:text-accent-300">
