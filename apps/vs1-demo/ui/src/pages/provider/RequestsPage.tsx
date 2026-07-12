@@ -81,6 +81,10 @@ export function RequestsPage() {
   const [filter, setFilter] = useState<string>('confirm');
   const [bannerOpen, setBannerOpen] = useState(true);
   const [threadFor, setThreadFor] = useState<string | null>(null);
+  // Deep-link support (search drawer, notification links): ?thread=<uuid>
+  const [searchParams, setSearchParams] = useSearchParams();
+  const deepThread = searchParams.get('thread');
+  if (deepThread && threadFor !== deepThread) setThreadFor(deepThread);
   // Live data when the compliance-api answers; the design fixture otherwise.
   const { data: requests } = useApiData(fetchProviderRequests, REQUESTS);
   const activeMatch = FILTERS.find((f) => f.key === filter)?.match;
@@ -151,7 +155,7 @@ export function RequestsPage() {
         </div>
         )}
       </div>
-      <ThreadDrawer open={!!threadFor} engagementId={threadFor} viewer="provider" onClose={() => setThreadFor(null)} />
+      <ThreadDrawer open={!!threadFor} engagementId={threadFor} viewer="provider" onClose={() => { setThreadFor(null); if (deepThread) setSearchParams({}, { replace: true }); }} />
     </ProviderShell>
   );
 }

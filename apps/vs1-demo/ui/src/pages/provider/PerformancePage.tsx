@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { ProviderShell } from '../../components/provider/ProviderShell';
+import { RankingImpactDrawer } from '../../components/provider/ProviderDrawers';
 import { KPICard } from '../../components/ui/Cards';
 import { Card } from '../../components/ui/Card';
 import { ProgressBar } from '../../components/ui/Progress';
@@ -36,6 +38,7 @@ const TRUST = [
 ];
 
 export function PerformancePage() {
+  const [rankingOpen, setRankingOpen] = useState(false);
   // Live KPIs when the compliance-api answers; the design fixture otherwise.
   const { data: kpis } = useApiData(fetchPerformanceKpis, KPIS);
   return (
@@ -64,7 +67,7 @@ export function PerformancePage() {
               <h2 className="text-[16px] font-semibold text-fg">Ranking transparency</h2>
               <p className="mt-0.5 text-[12px] text-fg-secondary">Where you stand · what affects it · last 7-day change history</p>
             </div>
-            <a href="#" className="shrink-0 text-[12px] font-medium text-fg-brand underline-offset-2 hover:underline">Why this matters</a>
+            <button type="button" onClick={() => setRankingOpen(true)} className="shrink-0 text-[12px] font-medium text-fg-brand underline-offset-2 hover:underline">Why this matters</button>
           </div>
           <div className="mt-5 grid gap-8 lg:grid-cols-[240px,1fr]">
             <div>
@@ -105,6 +108,7 @@ export function PerformancePage() {
           </div>
         </div>
       </div>
+      <RankingImpactDrawer open={rankingOpen} onClose={() => setRankingOpen(false)} />
     </ProviderShell>
   );
 }

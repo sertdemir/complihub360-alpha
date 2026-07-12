@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { ProviderShell } from '../../components/provider/ProviderShell';
+import { RankingImpactDrawer } from '../../components/provider/ProviderDrawers';
 import { Banner } from '../../components/ui/Banner';
 import { Button } from '../../components/ui/Button';
 import { FilterChip } from '../../components/ui/Badge';
@@ -48,6 +50,7 @@ const SLA = [
 ];
 
 export function CoveragePage() {
+  const [rankingOpen, setRankingOpen] = useState(false);
   return (
     <ProviderShell>
       <div className="mx-auto max-w-[1140px] space-y-6">
@@ -55,7 +58,7 @@ export function CoveragePage() {
           <h1 className="font-serif text-[30px] font-bold leading-tight text-fg">Coverage</h1>
           <div className="mt-1 flex shrink-0 items-center gap-4">
             <a href="#" className="text-[12px] font-medium text-fg underline underline-offset-2">Preview public profile</a>
-            <Button size="sm">View ranking impact</Button>
+            <Button size="sm" onClick={() => setRankingOpen(true)}>View ranking impact</Button>
           </div>
         </div>
         <p className="-mt-4 max-w-4xl text-body-sm leading-relaxed text-fg-secondary">
@@ -133,6 +136,7 @@ export function CoveragePage() {
           </p>
         </section>
       </div>
+      <RankingImpactDrawer open={rankingOpen} onClose={() => setRankingOpen(false)} />
     </ProviderShell>
   );
 }
