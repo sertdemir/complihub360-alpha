@@ -24,6 +24,10 @@ const WIDTH: Record<DrawerSize, string> = {
 export interface DrawerProps {
   open: boolean;
   onClose: () => void;
+  /** Force dark theming — required when the drawer is opened from an
+      always-dark workspace: the portal mounts on document.body, OUTSIDE the
+      shell's `.dark` scope, so it would otherwise pick up light variables. */
+  forceDark?: boolean;
   side?: DrawerSide;
   size?: DrawerSize;
   title?: React.ReactNode;
@@ -36,7 +40,7 @@ export interface DrawerProps {
   className?: string;
 }
 
-export function Drawer({ open, onClose, side = 'right', size = 'md', title, eyebrow, headerExtra, footer, children, className }: DrawerProps) {
+export function Drawer({ open, onClose, side = 'right', size = 'md', title, eyebrow, headerExtra, footer, children, className, forceDark = false }: DrawerProps) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
@@ -55,7 +59,7 @@ export function Drawer({ open, onClose, side = 'right', size = 'md', title, eyeb
   return createPortal(
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-[100]">
+        <div className={cn('fixed inset-0 z-[100]', forceDark && 'dark')}>
           <motion.div
             className="absolute inset-0 bg-black/30 backdrop-blur-[var(--drawer-scrim-blur)]"
             onClick={onClose}

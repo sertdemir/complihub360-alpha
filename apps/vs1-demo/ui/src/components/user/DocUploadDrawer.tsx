@@ -61,6 +61,7 @@ export function DocUploadDrawer({ open, onClose, domainLabel }: DocUploadDrawerP
 
   return (
     <Drawer
+      forceDark
       open={open}
       onClose={() => { reset(); onClose(); }}
       side="right"
