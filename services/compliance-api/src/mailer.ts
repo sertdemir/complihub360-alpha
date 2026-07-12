@@ -62,7 +62,7 @@ function renderHtml(m: MagicLinkMail): string {
     return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0b1620;padding:40px 16px;"><tr><td align="center">
 <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;">
 <tr><td style="padding:0 8px 24px 8px;"><table role="presentation" cellpadding="0" cellspacing="0"><tr>
-<td valign="middle" style="width:34px;height:34px;border:2px solid #d4af37;border-radius:50%;text-align:center;font-family:Georgia,serif;font-size:11px;font-weight:bold;color:#d4af37;">360&#176;</td>
+<td valign="middle" style="width:40px;"><img src="https://kqylqwogxbiwpnomkzsn.supabase.co/storage/v1/object/public/assets/logo-mark-email.png" width="40" height="39" alt="CompliHub360" style="display:block;border:0;"/></td>
 <td valign="middle" style="padding-left:10px;font-family:Helvetica,Arial,sans-serif;"><span style="font-size:16px;font-weight:bold;color:#ffffff;">CompliHub</span><br/><span style="font-size:10px;letter-spacing:1.5px;color:#8b96a5;text-transform:uppercase;">Compliance. Simplified.</span></td>
 </tr></table></td></tr>
 <tr><td style="background-color:#1f2937;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:36px 32px;">
