@@ -26,6 +26,7 @@ export interface ProviderRequest {
   tag?: string;
   meta: string;
   sla?: string;
+  createdAt?: string; // raw ISO — C1 new-since-last-seen banner
   action: { label: string; variant: 'accent' | 'primary' | 'ghost' };
 }
 
@@ -70,6 +71,7 @@ export async function fetchProviderRequests(): Promise<ProviderRequest[]> {
         tag: [r.country, r.category].filter(Boolean).join(' · ') || undefined,
         meta: r.message || '',
         sla: m.status === 'active' ? undefined : slaLeft(r.status === 'confirmed' ? r.sla_reply_deadline : r.sla_confirm_deadline),
+        createdAt: r.created_at,
         action: m.action,
       };
     });

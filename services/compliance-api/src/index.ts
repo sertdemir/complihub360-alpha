@@ -428,6 +428,41 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Failed to load notifications', correlationId }));
         }
+    } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/reads')) {
+        // C1: read-state watermark for a viewer key. Unread = newer than this.
+        try {
+            const u = new URL(req.url, 'http://localhost');
+            const viewer = u.searchParams.get('viewer') || 'provider-notifications';
+            const rows = (await supabaseApi.select('notification_reads', { viewer })) as Array<{ last_seen_at: string }>;
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ok: true, viewer, last_seen_at: rows[0]?.last_seen_at ?? null }));
+        } catch (err) {
+            structuredLog('error', 'Read-state fetch failed', { correlationId, errorCode: 'ERR_READS', severity: 'error', route: req.url });
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Failed to load read state', correlationId }));
+        }
+    } else if (req.method === 'POST' && req.url === '/api/v1/reads') {
+        // C1: "Mark all seen" — move the viewer's watermark to now (upsert).
+        let readsBody = '';
+        req.on('data', (chunk: any) => readsBody += chunk.toString());
+        req.on('end', async () => {
+            try {
+                const d = readsBody ? JSON.parse(readsBody) : {};
+                const viewer = d.viewer || 'provider-notifications';
+                const now = new Date().toISOString();
+                const updated = (await supabaseApi.update('notification_reads', { viewer }, { last_seen_at: now })) as unknown[];
+                if (!updated.length) await supabaseApi.insert('notification_reads', { viewer, last_seen_at: now });
+                res.setHeader('x-correlation-id', correlationId);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, viewer, last_seen_at: now }));
+            } catch (err) {
+                structuredLog('error', 'Read-state update failed', { correlationId, errorCode: 'ERR_READS', severity: 'error', route: req.url });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Failed to mark seen', correlationId }));
+            }
+        });
     } else if (req.method === 'POST' && req.url === '/api/v1/session') {
         // Wave A1: persist a wizard session (guest via guest_key, later adopted
         // by the account). The session is the user-side dossier source.

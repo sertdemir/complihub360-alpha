@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Mail, LineChart, Globe, ReceiptEuro, Settings, Bell, CircleHelp, Search } from 'lucide-react';
@@ -6,6 +6,8 @@ import { Sidebar, SidebarGroup, NavItem } from '../ui/AppShell';
 import { LogoMark } from '../ui/Logo';
 import { PartnerStatusBadge, AvailabilityPill } from '../ui/ProviderBadges';
 import { SearchDrawer, HelpDrawer } from './ProviderDrawers';
+import { fetchProviderRequests } from '../../api/requests';
+import { fetchUnreadCount } from '../../api/notifications';
 import { cn } from '../../lib/utils';
 
 // ─── ProviderShell ────────────────────────────────────────────────────────────
@@ -18,7 +20,7 @@ const NAV = [
   {
     group: 'Pipeline',
     items: [
-      { to: 'requests', label: 'Requests', icon: Mail, count: '0' },
+      { to: 'requests', label: 'Requests', icon: Mail },
       { to: 'performance', label: 'Performance', icon: LineChart },
     ],
   },
@@ -33,7 +35,7 @@ const NAV = [
     group: 'Account',
     items: [
       { to: 'settings', label: 'Settings', icon: Settings },
-      { to: 'notifications', label: 'Notifications', icon: Bell, count: '1' },
+      { to: 'notifications', label: 'Notifications', icon: Bell },
       { to: 'help', label: 'Help & support', icon: CircleHelp },
     ],
   },
@@ -46,6 +48,21 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
   const base = `/${locale}/partner-dashboard`;
   const [searchOpen, setSearchOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  // C1: live sidebar badges — open confirms + unread notifications. Badge stays
+  // hidden until the API answers (fixture mode shows no counts).
+  const [counts, setCounts] = useState<{ requests?: number; unread?: number }>({});
+  useEffect(() => {
+    fetchProviderRequests()
+      .then((rs) => setCounts((c) => ({ ...c, requests: rs.filter((r) => r.status === 'awaiting-confirm').length })))
+      .catch(() => {});
+    fetchUnreadCount()
+      .then((n) => setCounts((c) => ({ ...c, unread: n })))
+      .catch(() => {});
+  }, []);
+  const badgeFor = (to: string): string | undefined => {
+    const n = to === 'requests' ? counts.requests : to === 'notifications' ? counts.unread : undefined;
+    return n ? String(n) : undefined;
+  };
 
   return (
     <div className="dark flex h-screen bg-[#1F2937] text-fg">
@@ -84,7 +101,7 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
               }
               return (
                 <NavLink key={it.to} to={`${base}/${it.to}`}>
-                  <NavItem icon={<Icon size={16} />} label={it.label} count={it.count} active={active} />
+                  <NavItem icon={<Icon size={16} />} label={it.label} count={badgeFor(it.to)} active={active} />
                 </NavLink>
               );
             })}

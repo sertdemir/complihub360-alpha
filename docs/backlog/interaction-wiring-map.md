@@ -46,7 +46,7 @@ Alle 16 Drawer existieren in Figma (Section `▣ DRAWERS`) und die `Drawer`-Komp
 |---|---|---|---|---|---|
 | B1 | „Reply"-Action auf Request-Card | /requests | ⛔ | **Reply/Proposal-Drawer** (2649:2): Nachricht + optional Proposal (Preis/Timeline/Deliverables, Provider Flows §5) → POST provider/reply | Thread-/Proposal-Felder in API |
 | B2 | „Open"-Action auf Request-Card | /requests | ⛔ | Request-Detail (Thread) — Drawer, zeigt Dossier + Verlauf | GET engagement/:id |
-| B3 | Glocke (Topbar) | Shell | ⛔ | **Bell-Popover** (2653:148): letzte Events + Mark read | Read-State (C1) |
+| B3 | Glocke (Topbar) | Shell | ⛔ | **Bell-Popover** (2653:148): letzte Events + Mark read | C1 ✅ — entsperrt |
 | B4 | Topbar-Suche | Shell | ⛔ | **Search-Drawer** (2651:2) über Requests/Clients | GET requests?q= |
 | B5 | „Add market" | /coverage | ⛔ | **Add-Market-Drawer** (2651:50) → PATCH provider coverage | PATCH providers |
 | B6 | „View ranking impact" | /coverage, /performance | ⛔ | **Ranking-Impact-Drawer** (2653:50), read-only | — |
@@ -70,7 +70,7 @@ Alle 16 Drawer existieren in Figma (Section `▣ DRAWERS`) und die `Drawer`-Komp
 
 | # | Element | Ort | Ist | Soll | Abhängigkeit |
 |---|---|---|---|---|---|
-| C1 | „Mark all seen/read" | Provider /requests, /notifications | ⛔ | Read-State pro User persistieren; Chip-/Badge-Counts live statt statisch | `notification_reads` o. Ä. |
+| C1 | „Mark all seen/read" | Provider /requests, /notifications | ✅ | `notification_reads`-Watermark pro Viewer-Key + GET/POST /api/v1/reads; Notifications-Chips + Sidebar-Badges + Requests-Banner live | — |
 | C2 | Availability-Pill / „End early" (OOO) | Provider-Shell, /requests | 🟡 nur ?state-Demo | Toggle → PATCH provider availability + Banner echt | PATCH providers |
 | C3 | „Update payment method" | /billing | ⛔ | Stripe-Portal-Link (Spec: Stripe-issued) | Stripe-Account (User-Schritt) |
 | C4 | „Preview public profile" | /requests OOO-State | ⛔ | Route zur Public-Profile-Seite (C-4, einzige Full-Page-Ausnahme) | Seite bauen |

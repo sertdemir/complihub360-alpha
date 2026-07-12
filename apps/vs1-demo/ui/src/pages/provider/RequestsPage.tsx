@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Inbox } from 'lucide-react';
 import { Moon, ChevronDown } from 'lucide-react';
@@ -11,6 +11,9 @@ import { ThreadDrawer } from '../../components/shared/ThreadDrawer';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { useApiData } from '../../lib/useApiData';
 import { fetchProviderRequests } from '../../api/requests';
+import { fetchLastSeen, markSeen, isUnread } from '../../api/reads';
+
+const REQUESTS_VIEWER = 'provider-requests';
 
 // ─── Provider /requests ───────────────────────────────────────────────────────
 // Mirrors the Figma screen "Provider Dashboard v1 · /requests (Desktop)"
@@ -86,9 +89,25 @@ export function RequestsPage() {
   const deepThread = searchParams.get('thread');
   if (deepThread && threadFor !== deepThread) setThreadFor(deepThread);
   // Live data when the compliance-api answers; the design fixture otherwise.
-  const { data: requests } = useApiData(fetchProviderRequests, REQUESTS);
+  const { data: requests, source, loading } = useApiData(fetchProviderRequests, REQUESTS);
   const activeMatch = FILTERS.find((f) => f.key === filter)?.match;
   const list = requests.filter((r) => !activeMatch || r.status === activeMatch);
+
+  // C1: the "new requests" banner counts rows newer than the seen-watermark.
+  const [lastSeen, setLastSeen] = useState<string | null>(null);
+  const [seenLoaded, setSeenLoaded] = useState(false);
+  useEffect(() => {
+    fetchLastSeen(REQUESTS_VIEWER)
+      .then((v) => { setLastSeen(v); setSeenLoaded(true); })
+      .catch(() => {});
+  }, []);
+  const liveBanner = source === 'api' && seenLoaded;
+  const newCount = liveBanner
+    ? requests.filter((r) => 'createdAt' in r && isUnread((r as { createdAt?: string }).createdAt, lastSeen)).length
+    : 0;
+  const markRequestsSeen = async () => {
+    try { setLastSeen(await markSeen(REQUESTS_VIEWER)); } catch { /* keep banner */ }
+  };
 
   return (
     <ProviderShell>
@@ -98,7 +117,16 @@ export function RequestsPage() {
             New requests are paused and re-routed · your ranking is frozen while away · SLA timers resume on return.
           </Banner>
         )}
-        {bannerOpen && demoState !== 'ooo' && (
+        {liveBanner && newCount > 0 && demoState !== 'ooo' && (
+          <Banner
+            status="info"
+            title={`${newCount} new request${newCount === 1 ? '' : 's'} since you last checked`}
+            action={<Button size="sm" variant="secondary" onClick={markRequestsSeen}>Mark all seen</Button>}
+          >
+            Magic-link emails sent · they'll appear here too
+          </Banner>
+        )}
+        {!loading && source === 'fixture' && bannerOpen && demoState !== 'ooo' && (
           <Banner
             status="info"
             title="2 new requests since you last checked · 12 min ago"

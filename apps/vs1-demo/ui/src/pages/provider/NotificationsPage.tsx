@@ -5,11 +5,14 @@ import { FilterChip } from '../../components/ui/Badge';
 import { Tag } from '../../components/ui/Tag';
 import { Card } from '../../components/ui/Card';
 import { useApiData } from '../../lib/useApiData';
-import { fetchNotifications } from '../../api/notifications';
+import { fetchNotificationsFeed, NOTIFICATIONS_VIEWER, type FeedItem } from '../../api/notifications';
+import { markSeen } from '../../api/reads';
 
 // ─── Provider /notifications ──────────────────────────────────────────────────
 // Mirrors "Provider Dashboard v1 · /notifications (Desktop)": aggregated event
-// feed grouped by day, filter chips, per-event type tag + action link. Fixture.
+// feed grouped by day, filter chips, per-event type tag + action link.
+// C1: unread comes from the read-state watermark; chips carry live counts and
+// actually filter; "Mark all read" persists the watermark.
 
 type Feed = {
   day: string;
@@ -42,19 +45,52 @@ const FEED: Feed[] = [
   },
 ];
 
-const FILTERS = ['All · 42', 'Unread · 2', 'Requests · 18', 'SLA · 8', 'Governance · 1', 'Billing · 6', 'System · 9'];
+const KIND_CHIPS: { key: FeedItem['kind']; label: string }[] = [
+  { key: 'request', label: 'Requests' },
+  { key: 'sla', label: 'SLA' },
+  { key: 'billing', label: 'Billing' },
+  { key: 'review', label: 'Reviews' },
+  { key: 'system', label: 'System' },
+];
 
 export function NotificationsPage() {
-  const [filter, setFilter] = useState('All · 42');
+  const [filter, setFilter] = useState<'all' | 'unread' | FeedItem['kind']>('all');
+  // C1: once "Mark all read" ran, everything renders as read without a refetch.
+  const [allSeen, setAllSeen] = useState(false);
+  const [marking, setMarking] = useState(false);
   // Live event feed when the compliance-api answers; the design fixture otherwise.
-  const { data: feed } = useApiData(fetchNotifications, FEED);
+  const { data } = useApiData(fetchNotificationsFeed, { groups: FEED, lastSeen: null });
+
+  const withReadState = data.groups.map((g) => ({
+    ...g,
+    items: g.items.map((i) => (allSeen ? { ...i, unread: false } : i)),
+  }));
+  const flat = withReadState.flatMap((g) => g.items);
+  const unreadCount = flat.filter((i) => i.unread).length;
+  const matches = (i: (typeof flat)[number]) =>
+    filter === 'all' ? true : filter === 'unread' ? !!i.unread : i.kind === filter;
+  const visible = withReadState
+    .map((g) => ({ ...g, items: g.items.filter(matches) }))
+    .filter((g) => g.items.length > 0);
+
+  const markAllRead = async () => {
+    setMarking(true);
+    try {
+      await markSeen(NOTIFICATIONS_VIEWER);
+    } catch { /* fixture mode: still clear locally */ }
+    setAllSeen(true);
+    setMarking(false);
+  };
+
   return (
     <ProviderShell>
       <div className="mx-auto max-w-[1140px] space-y-5">
         <div className="flex items-start justify-between gap-4">
           <h1 className="font-serif text-[30px] font-bold leading-tight text-fg">Notifications</h1>
           <div className="mt-1 flex shrink-0 items-center gap-2.5">
-            <Button size="sm" variant="secondary">Mark all read</Button>
+            <Button size="sm" variant="secondary" onClick={markAllRead} disabled={marking || unreadCount === 0}>
+              {marking ? '…' : 'Mark all read'}
+            </Button>
             <Button size="sm" variant="ghost">Preferences</Button>
           </div>
         </div>
@@ -64,12 +100,23 @@ export function NotificationsPage() {
         </p>
 
         <div className="flex flex-wrap items-center gap-2">
-          {FILTERS.map((f) => (
-            <FilterChip key={f} size="sm" selected={filter === f} onClick={() => setFilter(f)}>{f}</FilterChip>
+          <FilterChip size="sm" selected={filter === 'all'} onClick={() => setFilter('all')}>
+            All · {flat.length}
+          </FilterChip>
+          <FilterChip size="sm" selected={filter === 'unread'} onClick={() => setFilter('unread')}>
+            Unread · {unreadCount}
+          </FilterChip>
+          {KIND_CHIPS.filter((c) => flat.some((i) => i.kind === c.key)).map((c) => (
+            <FilterChip key={c.key} size="sm" selected={filter === c.key} onClick={() => setFilter(c.key)}>
+              {c.label} · {flat.filter((i) => i.kind === c.key).length}
+            </FilterChip>
           ))}
         </div>
 
-        {feed.map((group) => (
+        {visible.length === 0 && (
+          <p className="text-[13px] text-fg-tertiary">Nothing here — try another filter.</p>
+        )}
+        {visible.map((group) => (
           <section key={group.day} className="space-y-2.5">
             <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{group.day}</p>
             {group.items.map((n) => (
