@@ -50,6 +50,41 @@ function renderText(m: MagicLinkMail): string {
     ].join('\n');
 }
 
+// Branded HTML (same shell as the Supabase auth templates: dark slate card,
+// serif headline with ONE gold word, gold primary CTA). Table-based + inline
+// styles, no external images — see docs/email-templates/.
+function renderHtml(m: MagicLinkMail): string {
+    const redacted = m.message ? redactText(m.message, { profile: 'strict' }).sanitizedText : '—';
+    const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const btn = (label: string, url: string, primary: boolean) => primary
+        ? `<a href="${url}" style="display:block;background-color:#d4af37;border-radius:12px;padding:14px 24px;text-align:center;font-family:Helvetica,Arial,sans-serif;font-size:15px;font-weight:bold;color:#101411;text-decoration:none;">${label} &rarr;</a>`
+        : `<a href="${url}" style="display:inline-block;border:1px solid rgba(255,255,255,0.25);border-radius:10px;padding:10px 18px;font-family:Helvetica,Arial,sans-serif;font-size:13px;font-weight:bold;color:#e5e7eb;text-decoration:none;">${label}</a>`;
+    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0b1620;padding:40px 16px;"><tr><td align="center">
+<table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;">
+<tr><td style="padding:0 8px 24px 8px;"><table role="presentation" cellpadding="0" cellspacing="0"><tr>
+<td valign="middle" style="width:34px;height:34px;border:2px solid #d4af37;border-radius:50%;text-align:center;font-family:Georgia,serif;font-size:11px;font-weight:bold;color:#d4af37;">360&#176;</td>
+<td valign="middle" style="padding-left:10px;font-family:Helvetica,Arial,sans-serif;"><span style="font-size:16px;font-weight:bold;color:#ffffff;">CompliHub</span><br/><span style="font-size:10px;letter-spacing:1.5px;color:#8b96a5;text-transform:uppercase;">Compliance. Simplified.</span></td>
+</tr></table></td></tr>
+<tr><td style="background-color:#1f2937;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:36px 32px;">
+<div style="font-family:Georgia,serif;font-size:26px;line-height:1.25;font-weight:bold;color:#ffffff;">New <span style="color:#d4af37;">engagement</span> request.</div>
+<div style="padding-top:12px;font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#aeb8c4;">A matched client requests your services. Please confirm within <strong style="color:#ffffff;">24 hours</strong>.</div>
+<div style="margin-top:22px;background-color:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:18px 20px;font-family:Helvetica,Arial,sans-serif;font-size:13px;line-height:1.8;color:#aeb8c4;">
+<span style="font-size:10px;letter-spacing:1.2px;color:#77828f;text-transform:uppercase;">Anonymized dossier</span><br/>
+<strong style="color:#e5e7eb;">Scope:</strong> ${esc(m.country)} &middot; ${esc(m.category)}<br/>
+<strong style="color:#e5e7eb;">Message:</strong> <em>&ldquo;${esc(redacted)}&rdquo;</em><br/>
+<span style="color:#77828f;">&#128274; Requester identity unlocks after you confirm.</span>
+</div>
+<div style="padding-top:24px;">${btn('Confirm engagement', actionUrl('confirm', m.magicLinks.confirm), true)}</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+<td style="padding-top:12px;" align="left">${btn('Reply to client', actionUrl('reply', m.magicLinks.reply), false)}</td>
+<td style="padding-top:12px;" align="right">${btn('Decline', actionUrl('decline', m.magicLinks.decline), false)}</td>
+</tr></table>
+<div style="margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.08);font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#77828f;">&#128274;&nbsp; Each link works <strong style="color:#aeb8c4;">once</strong> and expires after 24 hours.<br/>&#9200;&nbsp; Fast confirmations improve your partner ranking.</div>
+</td></tr>
+<tr><td style="padding:24px 8px 0 8px;font-family:Helvetica,Arial,sans-serif;font-size:11px;line-height:1.7;color:#5b6673;">CompliHub360 &mdash; the orchestration layer between compliance complexity and operational reality.<br/>You received this e-mail because your firm is a listed provider on complihub360.com.</td></tr>
+</table></td></tr></table>`;
+}
+
 export async function sendMagicLinkMail(m: MagicLinkMail): Promise<void> {
     const subject = `New request · ${m.country} ${m.category} — please confirm within 24h`;
     const text = renderText(m);
@@ -76,7 +111,7 @@ export async function sendMagicLinkMail(m: MagicLinkMail): Promise<void> {
         const res = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ from: MAIL_FROM, to: [m.contactEmail], subject, text }),
+            body: JSON.stringify({ from: MAIL_FROM, to: [m.contactEmail], subject, text, html: renderHtml(m) }),
         });
         const body = await res.json().catch(() => ({}));
         await supabaseApi.insert('event_log', {
