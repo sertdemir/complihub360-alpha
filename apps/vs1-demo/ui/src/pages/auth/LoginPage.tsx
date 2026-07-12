@@ -386,7 +386,7 @@ export function LoginPage() {
                                     </p>
                                     <button
                                         type="button"
-                                        onClick={() => { if (isDemoLoginEnabled) finishLogin("user"); else window.location.href = "mailto:"; }}
+                                        onClick={() => { window.location.href = "mailto:"; }}
                                         className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-accent-500 px-5 py-3.5 text-[15px] font-semibold text-primary-950 transition-transform duration-200 hover:-translate-y-0.5"
                                     >
                                         Open Mail App <ArrowRight size={16} />
@@ -439,7 +439,7 @@ export function LoginPage() {
                                     </p>
                                     <button
                                         type="button"
-                                        onClick={() => { if (isDemoLoginEnabled) finishLogin("partner"); else window.location.href = "mailto:"; }}
+                                        onClick={() => { window.location.href = "mailto:"; }}
                                         className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-[#0e6450] px-5 py-3.5 text-[15px] font-semibold text-white transition-transform duration-200 hover:-translate-y-0.5"
                                     >
                                         Open Mail App <ArrowRight size={16} />
