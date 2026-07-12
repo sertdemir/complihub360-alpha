@@ -479,6 +479,56 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Sessions list failed', correlationId }));
         }
+    } else if (req.method === 'GET' && /^\/api\/v1\/engagement\/[0-9a-f-]{36}$/.test(req.url || '')) {
+        // Wave B: engagement detail + thread — one payload for the Thread-Drawer
+        // on both sides (provider /requests · user /requests).
+        const engagementId = (req.url || '').split('/').pop() as string;
+        try {
+            const eng = (await supabaseApi.select('engagement_requests', { id: engagementId }, { limit: 1 })) as Array<Record<string, unknown>>;
+            if (!eng[0]) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Engagement not found', correlationId }));
+                return;
+            }
+            const messages = await supabaseApi.select('engagement_messages', { engagement_id: engagementId }, { order: 'created_at.asc', limit: 100 });
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ok: true, engagement: eng[0], messages }));
+        } catch (err) {
+            structuredLog('error', 'Engagement detail failed', { correlationId, errorCode: 'ERR_ENGAGEMENT_DETAIL', severity: 'error', route: req.url });
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Engagement detail failed', correlationId }));
+        }
+    } else if (req.method === 'POST' && /^\/api\/v1\/engagement\/[0-9a-f-]{36}\/message$/.test(req.url || '')) {
+        // Thread message from the dashboards (author user|provider). Magic-link
+        // replies land here too via the provider/reply handler.
+        const engagementId = (req.url || '').split('/')[4];
+        let body = '';
+        req.on('data', (chunk: any) => body += chunk.toString());
+        req.on('end', async () => {
+            try {
+                const d = JSON.parse(body);
+                if (!d.body || typeof d.body !== 'string' || !['user', 'provider'].includes(d.author)) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'author (user|provider) and body required', correlationId }));
+                    return;
+                }
+                const inserted = (await supabaseApi.insert('engagement_messages', {
+                    engagement_id: engagementId, author: d.author, body: d.body,
+                })) as Array<{ id: string; created_at: string }>;
+                await supabaseApi.insert('event_log', {
+                    type: 'engagement_message_posted',
+                    payload: { engagementId, author: d.author },
+                });
+                res.setHeader('x-correlation-id', correlationId);
+                res.writeHead(201, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, id: inserted?.[0]?.id, created_at: inserted?.[0]?.created_at }));
+            } catch (err) {
+                structuredLog('error', 'Thread message failed', { correlationId, errorCode: 'ERR_THREAD_MSG', severity: 'error', route: req.url });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Thread message failed', correlationId }));
+            }
+        });
     } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/admin/stats')) {
         // Admin control center: one aggregated read across engagements, the
         // audit log and the privacy pipeline. Approximations share the caveats
@@ -684,6 +734,13 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     magicLinks[action] = `?id=${engagementId}&token=${rawToken}`;
                 }
 
+                // Wave B: the requester's opening message seeds the thread.
+                if (newEngagement.message) {
+                    await supabaseApi.insert('engagement_messages', {
+                        engagement_id: engagementId, author: 'user', body: newEngagement.message,
+                    }).catch(() => { /* thread is best-effort at creation time */ });
+                }
+
                 await supabaseApi.insert('event_log', {
                     type: 'primary_request_submitted',
                     payload: { engagementId, provider_key: newEngagement.provider_key }
@@ -830,6 +887,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     { id: engagementId },
                     { status: 'replied', updated_at: new Date().toISOString() }
                 );
+
+                // Wave B: the reply text joins the engagement thread so both
+                // dashboards show one shared history.
+                if (requestData.message && typeof requestData.message === 'string') {
+                    await supabaseApi.insert('engagement_messages', {
+                        engagement_id: engagementId, author: 'provider', body: requestData.message,
+                    });
+                }
 
                 await supabaseApi.insert('event_log', {
                     type: 'provider_replied',

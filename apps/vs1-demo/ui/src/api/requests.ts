@@ -74,3 +74,51 @@ export async function fetchProviderRequests(): Promise<ProviderRequest[]> {
       };
     });
 }
+
+// ─── User-side view of the same engagement rows (wiring map B11) ─────────────
+export interface UserRequestRow {
+  uuid: string;
+  id: string;               // display line
+  status: RequestStatus;
+  statusLabel: string;
+  company: string;
+  partner?: boolean;
+  meta: string;
+  action: { label: string; variant: 'accent' | 'secondary' };
+  bucket: 'confirm' | 'confirmed' | 'replied' | 'overdue' | 'active';
+}
+
+const USER_VIEW: Record<string, Pick<UserRequestRow, 'status' | 'statusLabel' | 'action' | 'bucket'>> = {
+  created:   { status: 'awaiting-confirm', statusLabel: 'Awaiting confirmation', action: { label: 'Send reminder', variant: 'accent' }, bucket: 'confirm' },
+  delivered: { status: 'awaiting-confirm', statusLabel: 'Awaiting confirmation', action: { label: 'Send reminder', variant: 'accent' }, bucket: 'confirm' },
+  viewed:    { status: 'awaiting-confirm', statusLabel: 'Awaiting confirmation', action: { label: 'Send reminder', variant: 'accent' }, bucket: 'confirm' },
+  confirmed: { status: 'active', statusLabel: 'Provider confirmed', action: { label: 'View thread', variant: 'secondary' }, bucket: 'confirmed' },
+  replied:   { status: 'awaiting-reply', statusLabel: 'Provider replied', action: { label: 'Open thread', variant: 'secondary' }, bucket: 'replied' },
+  declined:  { status: 'active', statusLabel: 'Declined', action: { label: 'View request', variant: 'secondary' }, bucket: 'overdue' },
+  expired:   { status: 'awaiting-confirm', statusLabel: 'Expired', action: { label: 'View request', variant: 'secondary' }, bucket: 'overdue' },
+};
+
+const PROVIDER_NAMES: Record<string, string> = {
+  'studio-bianchi': 'Studio Bianchi SRL',
+  'schmidt-partner': 'Schmidt & Partner',
+  'madrid-tax': 'Madrid Tax Consultants',
+  'dahlmann-cpa': 'Dahlmann CPA',
+};
+
+export async function fetchUserRequests(): Promise<UserRequestRow[]> {
+  const { requests } = await apiFetch<{ ok: boolean; requests: EngagementRow[] }>('/api/v1/requests');
+  return requests.map((r) => {
+    const v = USER_VIEW[r.status] ?? USER_VIEW.created;
+    return {
+      uuid: r.id,
+      id: `RQ-${r.id.slice(0, 4).toUpperCase()} · sent ${relTime(r.created_at)}`,
+      status: v.status,
+      statusLabel: v.statusLabel,
+      company: PROVIDER_NAMES[r.provider_key] ?? r.provider_key,
+      partner: true,
+      meta: `↗ ${r.category} · ${r.country}`,
+      action: v.action,
+      bucket: v.bucket,
+    };
+  });
+}

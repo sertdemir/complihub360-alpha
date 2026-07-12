@@ -7,6 +7,7 @@ import { Banner } from '../../components/ui/Banner';
 import { FilterChip } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { RequestCard, type RequestStatus } from '../../components/ui/RequestCard';
+import { ThreadDrawer } from '../../components/shared/ThreadDrawer';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { useApiData } from '../../lib/useApiData';
 import { fetchProviderRequests } from '../../api/requests';
@@ -79,6 +80,7 @@ export function RequestsPage() {
   const demoState = params.get('state');
   const [filter, setFilter] = useState<string>('confirm');
   const [bannerOpen, setBannerOpen] = useState(true);
+  const [threadFor, setThreadFor] = useState<string | null>(null);
   // Live data when the compliance-api answers; the design fixture otherwise.
   const { data: requests } = useApiData(fetchProviderRequests, REQUESTS);
   const activeMatch = FILTERS.find((f) => f.key === filter)?.match;
@@ -143,12 +145,13 @@ export function RequestsPage() {
               tag={r.tag}
               meta={r.meta}
               slaValue={r.sla}
-              action={<Button size="sm" variant={r.action.variant}>{r.action.label}</Button>}
+              action={<Button size="sm" variant={r.action.variant} onClick={() => setThreadFor(r.id)}>{r.action.label}</Button>}
             />
           ))}
         </div>
         )}
       </div>
+      <ThreadDrawer open={!!threadFor} engagementId={threadFor} viewer="provider" onClose={() => setThreadFor(null)} />
     </ProviderShell>
   );
 }

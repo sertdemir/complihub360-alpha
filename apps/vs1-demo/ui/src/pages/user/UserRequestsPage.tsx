@@ -4,6 +4,9 @@ import { UserShell } from '../../components/user/UserShell';
 import { Button } from '../../components/ui/Button';
 import { FilterChip } from '../../components/ui/Badge';
 import { RequestCard, type RequestStatus } from '../../components/ui/RequestCard';
+import { ThreadDrawer } from '../../components/shared/ThreadDrawer';
+import { useApiData } from '../../lib/useApiData';
+import { fetchUserRequests } from '../../api/requests';
 
 // ─── User Dashboard · Requests / Lead Center ──────────────────────────────────
 // Mirrors "User Dashboard v1 · Requests / Lead Center (Desktop)" (2051:54):
@@ -11,6 +14,7 @@ import { RequestCard, type RequestStatus } from '../../components/ui/RequestCard
 // link meta. Design fixture data.
 
 type Fixture = {
+  uuid?: string;
   id: string; status: RequestStatus; statusLabel: string; company: string;
   partner?: boolean; meta: string; action: { label: string; variant: 'accent' | 'secondary' };
   bucket: 'confirm' | 'confirmed' | 'replied' | 'overdue' | 'active';
@@ -39,7 +43,9 @@ const FILTERS = [
 
 export function UserRequestsPage() {
   const [filter, setFilter] = useState<string>('all');
-  const list = REQUESTS.filter((r) => filter === 'all' || r.bucket === filter || (filter === 'confirm' && r.bucket === 'overdue' && false));
+  const [threadFor, setThreadFor] = useState<string | null>(null);
+  const { data: rows } = useApiData<Fixture[]>(fetchUserRequests, REQUESTS);
+  const list = rows.filter((r) => filter === 'all' || r.bucket === filter);
 
   return (
     <UserShell activeDomain="Tax & VAT">
@@ -80,7 +86,7 @@ export function UserRequestsPage() {
               company={r.company}
               tag={r.partner ? 'PARTNER' : undefined}
               meta={r.meta}
-              action={<Button size="sm" variant={r.action.variant}>{r.action.label}</Button>}
+              action={<Button size="sm" variant={r.action.variant} onClick={() => r.uuid && setThreadFor(r.uuid)}>{r.action.label}</Button>}
             />
           ))}
         </div>
@@ -89,6 +95,7 @@ export function UserRequestsPage() {
           ● Average partner response on your workspace: 22h · 87% confirm within SLA · last 30 days
         </p>
       </div>
+      <ThreadDrawer open={!!threadFor} engagementId={threadFor} viewer="user" onClose={() => setThreadFor(null)} />
     </UserShell>
   );
 }
