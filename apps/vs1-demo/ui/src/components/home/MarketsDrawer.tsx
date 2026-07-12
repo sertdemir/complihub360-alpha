@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Search, Check, ArrowRight } from 'lucide-react';
 
@@ -472,7 +473,20 @@ export function SaveProgressContent({ onClose, copy = SAVE_PROGRESS_COPY }: { on
         <button
           type="button"
           disabled={!sent && !valid}
-          onClick={() => (sent ? onClose() : setSent(true))}
+          onClick={async () => {
+            if (sent) { onClose(); return; }
+            // Real magic-link signup (Wave A2): the link returns to /results,
+            // where the saved profile (localStorage) rebuilds the page and the
+            // fresh session unlocks the partner matches.
+            if (isSupabaseConfigured && supabase) {
+              const lang = document.documentElement.lang || 'en';
+              await supabase.auth.signInWithOtp({
+                email,
+                options: { emailRedirectTo: `${window.location.origin}/${lang}/results` },
+              }).catch(() => { /* rate-limit etc. — sent state still shows guidance */ });
+            }
+            setSent(true);
+          }}
           className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-brand px-5 py-3 text-[15px] font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-40"
         >
           {sent ? 'Done' : copy.cta} <ArrowRight size={17} />

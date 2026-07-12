@@ -22,12 +22,14 @@ interface RequestQuoteModalProps {
   country: string;
   category: string;
   domainLabel: string;
+  /** Identity for the dossier unlock (from the real session, if present). */
+  requesterEmail?: string;
   onClose: () => void;
 }
 
 type Phase = 'form' | 'sending' | 'done' | 'error';
 
-export function RequestQuoteModal({ provider, country, category, domainLabel, onClose }: RequestQuoteModalProps) {
+export function RequestQuoteModal({ provider, country, category, domainLabel, requesterEmail, onClose }: RequestQuoteModalProps) {
   const [message, setMessage] = useState('');
   const [phase, setPhase] = useState<Phase>('form');
   const [errText, setErrText] = useState('');
@@ -41,6 +43,7 @@ export function RequestQuoteModal({ provider, country, category, domainLabel, on
         category,
         message,
         session_id: lastSessionId() ?? undefined,
+        requester_email: requesterEmail,
         // The anonymized dossier the provider sees before confirming
         // (Addendum 2026-07-10) — situational context, no identity.
         structured_answers: {

@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { saveWizardSession } from '../api/sessions';
+import { useAuthStore } from '../store/useAuthStore';
+import { RequestQuoteModal, type QuoteProvider } from '../components/user/RequestQuoteModal';
 import { Lock, Check, Info, ArrowRight, ShieldCheck } from 'lucide-react';
 import { Logo } from '../components/ui/Logo';
 import { RiskBadge, type RiskLevel } from '../components/ui/RiskBadge';
@@ -112,6 +114,13 @@ const STATS = [
 
 const MATCHES = ['94% match', '88% match', '81% match'];
 
+// Real partners behind the unlock (seeded provider_keys on staging).
+const PARTNERS = [
+  { key: 'studio-bianchi', name: 'Studio Bianchi SRL', meta: 'Milano, IT', match: '94% match', sub: 'Italian VAT registration + fiscal representation · DE·IT bilingual' },
+  { key: 'schmidt-partner', name: 'Schmidt & Partner', meta: 'Hamburg, DE', match: '88% match', sub: 'OSS/IOSS setup · 12 years cross-border tax · 8 EU offices' },
+  { key: 'madrid-tax', name: 'Madrid Tax Consultants', meta: 'Madrid, ES', match: '81% match', sub: 'Iberian VAT (ES/PT) · monthly filing · marketplace optimization' },
+];
+
 function StatePill({ state, onAnswer }: { state: State; onAnswer: () => void }) {
   if (state.kind === 'confirmed') {
     return (
@@ -140,8 +149,17 @@ function StatePill({ state, onAnswer }: { state: State; onAnswer: () => void }) 
 
 export function ResultsRiskMap() {
   const location = useLocation();
-  const profile = location.state?.searchProfile as SearchProfile | undefined;
+  // Profile survives the magic-link roundtrip via localStorage (Wave A2):
+  // router state is lost when the user returns from the e-mail.
+  const stateProfile = location.state?.searchProfile as SearchProfile | undefined;
+  const storedProfile = (() => {
+    try { return JSON.parse(localStorage.getItem('ch360_last_profile') || 'null') as SearchProfile | null; }
+    catch { return null; }
+  })();
+  const profile = stateProfile ?? storedProfile ?? undefined;
   const [saveOpen, setSaveOpen] = useState(false);
+  const { isLoggedIn, user } = useAuthStore();
+  const [quoteFor, setQuoteFor] = useState<(QuoteProvider & { country: string; category: string }) | null>(null);
 
   // Wave A1: arriving from the wizard persists the session (the editable
   // dossier). Guest-anchored via guest_key; fire-and-forget — the page renders
@@ -150,6 +168,7 @@ export function ResultsRiskMap() {
   useEffect(() => {
     if (!profile || savedRef.current) return;
     savedRef.current = true;
+    localStorage.setItem('ch360_last_profile', JSON.stringify(profile));
     saveWizardSession(profile).catch(() => { /* offline/demo — non-fatal */ });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -246,29 +265,58 @@ export function ResultsRiskMap() {
                 We&rsquo;ve found who can act on this.
               </h2>
             </div>
-            <button
-              type="button"
-              onClick={() => setSaveOpen(true)}
-              className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-fg-brand transition-colors hover:text-brand"
-            >
-              <Lock size={14} /> Unlock matches with a free account <ArrowRight size={14} />
-            </button>
+            {isLoggedIn ? (
+              <span className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-fg-brand">
+                <Check size={14} strokeWidth={3} /> Matches unlocked
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setSaveOpen(true)}
+                className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-fg-brand transition-colors hover:text-brand"
+              >
+                <Lock size={14} /> Unlock matches with a free account <ArrowRight size={14} />
+              </button>
+            )}
           </div>
 
           <div className="mt-6 grid gap-5 sm:grid-cols-3">
-            {MATCHES.map((m) => (
-              <div
-                key={m}
-                className="flex flex-col items-center gap-4 rounded-2xl border border-stroke-subtle bg-surface-secondary px-6 py-8"
-              >
-                <Lock size={22} className="text-fg-tertiary" />
-                <div className="w-full space-y-2">
-                  <div className="mx-auto h-2.5 w-3/4 rounded-full bg-neutral-200" />
-                  <div className="mx-auto h-2.5 w-1/2 rounded-full bg-neutral-200" />
-                </div>
-                <span className="text-[15px] font-bold text-fg-brand">{m}</span>
-              </div>
-            ))}
+            {isLoggedIn
+              ? PARTNERS.map((pt) => (
+                  <div
+                    key={pt.key}
+                    className="flex flex-col gap-3 rounded-2xl border border-stroke-subtle bg-surface-secondary px-6 py-7"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="text-[16px] font-bold text-fg">{pt.name}</p>
+                        <p className="text-[12px] text-fg-tertiary">{pt.meta}</p>
+                      </div>
+                      <span className="shrink-0 rounded-full bg-brand-light px-2.5 py-1 text-[12px] font-bold text-fg-brand">{pt.match}</span>
+                    </div>
+                    <p className="text-[13px] leading-relaxed text-fg-secondary">{pt.sub}</p>
+                    <button
+                      type="button"
+                      onClick={() => setQuoteFor({ key: pt.key, name: pt.name, meta: pt.meta, country: profile?.country || 'DE', category: 'vat' })}
+                      className="mt-auto inline-flex items-center justify-center gap-2 rounded-xl bg-accent-500 px-4 py-2.5 text-[14px] font-semibold text-primary-950 transition-transform duration-200 hover:-translate-y-0.5"
+                    >
+                      Request quote <ArrowRight size={15} />
+                    </button>
+                  </div>
+                ))
+              : MATCHES.map((m) => (
+                  <div
+                    key={m}
+                    className="flex flex-col items-center gap-4 rounded-2xl border border-stroke-subtle bg-surface-secondary px-6 py-8"
+                  >
+                    <Lock size={22} className="text-fg-tertiary" />
+                    <div className="w-full space-y-2">
+                      <div className="mx-auto h-2.5 w-3/4 rounded-full bg-neutral-200" />
+                      <div className="mx-auto h-2.5 w-1/2 rounded-full bg-neutral-200" />
+                    </div>
+                    <span className="text-[15px] font-bold text-fg-brand">{m}</span>
+                  </div>
+                ))}
           </div>
         </div>
       </main>
@@ -294,6 +342,16 @@ export function ResultsRiskMap() {
       </section>
 
       <FreeAccountDrawer open={saveOpen} onClose={() => setSaveOpen(false)} />
+      {quoteFor && (
+        <RequestQuoteModal
+          provider={quoteFor}
+          country={quoteFor.country}
+          category={quoteFor.category}
+          domainLabel="Tax & VAT"
+          requesterEmail={user?.email}
+          onClose={() => setQuoteFor(null)}
+        />
+      )}
     </div>
   );
 }
