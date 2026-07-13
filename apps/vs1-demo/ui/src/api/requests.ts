@@ -87,7 +87,9 @@ export interface UserRequestRow {
   partner?: boolean;
   meta: string;
   action: { label: string; variant: 'accent' | 'secondary' };
-  bucket: 'confirm' | 'confirmed' | 'replied' | 'overdue' | 'active';
+  bucket: 'confirm' | 'confirmed' | 'replied' | 'overdue' | 'active' | 'closed';
+  /** Raw engagement status — the B14 actions drawer gates remind/withdraw on it. */
+  rawStatus?: string;
 }
 
 const USER_VIEW: Record<string, Pick<UserRequestRow, 'status' | 'statusLabel' | 'action' | 'bucket'>> = {
@@ -98,6 +100,7 @@ const USER_VIEW: Record<string, Pick<UserRequestRow, 'status' | 'statusLabel' | 
   replied:   { status: 'awaiting-reply', statusLabel: 'Provider replied', action: { label: 'Open thread', variant: 'secondary' }, bucket: 'replied' },
   declined:  { status: 'active', statusLabel: 'Declined', action: { label: 'View request', variant: 'secondary' }, bucket: 'overdue' },
   expired:   { status: 'awaiting-confirm', statusLabel: 'Expired', action: { label: 'View request', variant: 'secondary' }, bucket: 'overdue' },
+  withdrawn: { status: 'active', statusLabel: 'Withdrawn', action: { label: 'View thread', variant: 'secondary' }, bucket: 'closed' },
 };
 
 const PROVIDER_NAMES: Record<string, string> = {
@@ -121,6 +124,7 @@ export async function fetchUserRequests(): Promise<UserRequestRow[]> {
       meta: `↗ ${r.category} · ${r.country}`,
       action: v.action,
       bucket: v.bucket,
+      rawStatus: r.status,
     };
   });
 }

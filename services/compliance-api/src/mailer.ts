@@ -24,6 +24,8 @@ export interface MagicLinkMail {
     message: string;
     magicLinks: Record<string, string>; // action → "?id=…&token=…"
     correlationId: string;
+    /** B14: manual reminder re-send — same mail with fresh links, urgent subject. */
+    reminder?: boolean;
 }
 
 function actionUrl(action: string, query: string): string {
@@ -83,7 +85,9 @@ function renderHtml(m: MagicLinkMail): string {
 }
 
 export async function sendMagicLinkMail(m: MagicLinkMail): Promise<void> {
-    const subject = `New request · ${m.country} ${m.category} — please confirm within 24h`;
+    const subject = m.reminder
+        ? `Reminder · ${m.country} ${m.category} — the client is waiting for your confirmation`
+        : `New request · ${m.country} ${m.category} — please confirm within 24h`;
     const text = renderText(m);
     const apiKey = process.env.RESEND_API_KEY;
 

@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, MoreHorizontal } from 'lucide-react';
 import { UserShell } from '../../components/user/UserShell';
 import { Button } from '../../components/ui/Button';
 import { FilterChip } from '../../components/ui/Badge';
 import { RequestCard, type RequestStatus } from '../../components/ui/RequestCard';
 import { ThreadDrawer } from '../../components/shared/ThreadDrawer';
+import { RequestActionsDrawer, type RequestActionsTarget } from '../../components/user/RequestActionsDrawer';
 import { useApiData } from '../../lib/useApiData';
 import { fetchUserRequests } from '../../api/requests';
 
@@ -18,7 +19,8 @@ type Fixture = {
   uuid?: string;
   id: string; status: RequestStatus; statusLabel: string; company: string;
   partner?: boolean; meta: string; action: { label: string; variant: 'accent' | 'secondary' };
-  bucket: 'confirm' | 'confirmed' | 'replied' | 'overdue' | 'active';
+  bucket: 'confirm' | 'confirmed' | 'replied' | 'overdue' | 'active' | 'closed';
+  rawStatus?: string;
 };
 
 const REQUESTS: Fixture[] = [
@@ -50,7 +52,15 @@ export function UserRequestsPage() {
   const deepThread = searchParams.get('thread');
   if (deepThread && threadFor !== deepThread) setThreadFor(deepThread);
   const { data: rows } = useApiData<Fixture[]>(fetchUserRequests, REQUESTS);
-  const list = rows.filter((r) => filter === 'all' || r.bucket === filter);
+  // B14: "⋯" actions drawer + local override after a withdraw (no refetch API).
+  const [actionsFor, setActionsFor] = useState<RequestActionsTarget | null>(null);
+  const [withdrawnIds, setWithdrawnIds] = useState<Set<string>>(new Set());
+  const effective = rows.map((r) =>
+    r.uuid && withdrawnIds.has(r.uuid)
+      ? { ...r, status: 'active' as RequestStatus, statusLabel: 'Withdrawn', bucket: 'closed' as const, rawStatus: 'withdrawn' }
+      : r,
+  );
+  const list = effective.filter((r) => filter === 'all' || r.bucket === filter);
 
   return (
     <UserShell activeDomain="Tax & VAT">
@@ -91,7 +101,21 @@ export function UserRequestsPage() {
               company={r.company}
               tag={r.partner ? 'PARTNER' : undefined}
               meta={r.meta}
-              action={<Button size="sm" variant={r.action.variant} onClick={() => r.uuid && setThreadFor(r.uuid)}>{r.action.label}</Button>}
+              action={
+                <div className="flex items-center gap-1.5">
+                  <Button size="sm" variant={r.action.variant} onClick={() => r.uuid && setThreadFor(r.uuid)}>{r.action.label}</Button>
+                  {r.uuid && (
+                    <button
+                      type="button"
+                      aria-label="Request actions"
+                      onClick={() => setActionsFor({ uuid: r.uuid!, idLine: r.id, company: r.company, statusLabel: String(r.statusLabel), rawStatus: r.rawStatus })}
+                      className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-white/10 text-fg-tertiary transition-colors hover:border-white/25 hover:text-fg"
+                    >
+                      <MoreHorizontal size={15} />
+                    </button>
+                  )}
+                </div>
+              }
             />
           ))}
         </div>
@@ -101,6 +125,12 @@ export function UserRequestsPage() {
         </p>
       </div>
       <ThreadDrawer open={!!threadFor} engagementId={threadFor} viewer="user" onClose={() => { setThreadFor(null); if (deepThread) setSearchParams({}, { replace: true }); }} />
+      <RequestActionsDrawer
+        target={actionsFor}
+        onClose={() => setActionsFor(null)}
+        onOpenThread={(uuid) => setThreadFor(uuid)}
+        onWithdrawn={(uuid) => setWithdrawnIds((prev) => new Set(prev).add(uuid))}
+      />
     </UserShell>
   );
 }

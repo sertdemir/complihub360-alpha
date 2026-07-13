@@ -564,6 +564,104 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Thread message failed', correlationId }));
             }
         });
+    } else if (req.method === 'POST' && /^\/api\/v1\/engagement\/[0-9a-f-]{36}\/remind$/.test(req.url || '')) {
+        // B14: manual reminder — re-issue fresh single-use magic links and send
+        // the mail again with an urgent subject. Only while awaiting confirm.
+        const engagementId = (req.url || '').split('/')[4];
+        try {
+            const eng = (await supabaseApi.select('engagement_requests', { id: engagementId }, { limit: 1 })) as
+                Array<{ id: string; provider_key: string; country: string; category: string; message: string; status: string }>;
+            if (!eng[0]) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Engagement not found', correlationId }));
+                return;
+            }
+            if (!['created', 'delivered', 'viewed'].includes(eng[0].status)) {
+                res.writeHead(409, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INVALID_STATE', message: `Cannot remind in status '${eng[0].status}'`, correlationId }));
+                return;
+            }
+            const nodeCrypto = await import('node:crypto');
+            const magicLinks: Record<string, string> = {};
+            for (const action of ['confirm', 'reply', 'decline'] as const) {
+                const rawToken = nodeCrypto.randomBytes(32).toString('base64url');
+                const tokenHash = nodeCrypto.createHash('sha256').update(rawToken).digest('hex');
+                await supabaseApi.insert('magic_link_tokens', {
+                    engagement_id: engagementId,
+                    action,
+                    token_hash: tokenHash,
+                    expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+                });
+                magicLinks[action] = `?id=${engagementId}&token=${rawToken}`;
+            }
+            await supabaseApi.insert('event_log', {
+                type: 'sla_reminder_sent',
+                payload: { engagementId, provider_key: eng[0].provider_key, manual: true },
+            });
+            await supabaseApi.insert('engagement_messages', {
+                engagement_id: engagementId, author: 'system', body: 'Reminder sent — the provider received a fresh confirmation link.',
+            }).catch(() => { /* thread note is best-effort */ });
+            (async () => {
+                const provRows = (await supabaseApi.select('providers', { provider_key: eng[0].provider_key }, { limit: 1 })) as
+                    Array<{ name: string; contact_email?: string | null }>;
+                await sendMagicLinkMail({
+                    engagementId,
+                    providerKey: eng[0].provider_key,
+                    providerName: provRows[0]?.name || eng[0].provider_key,
+                    contactEmail: provRows[0]?.contact_email ?? null,
+                    country: eng[0].country,
+                    category: eng[0].category,
+                    message: eng[0].message,
+                    magicLinks,
+                    correlationId,
+                    reminder: true,
+                });
+            })().catch(() => { /* logged inside the mailer */ });
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ok: true, id: engagementId, reminded: true }));
+        } catch (err) {
+            structuredLog('error', 'Reminder failed', { correlationId, errorCode: 'ERR_REMIND', severity: 'error', route: req.url });
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Reminder failed', correlationId }));
+        }
+    } else if (req.method === 'POST' && /^\/api\/v1\/engagement\/[0-9a-f-]{36}\/withdraw$/.test(req.url || '')) {
+        // B14: the requester withdraws an open request. Terminal state; all
+        // open magic links are invalidated so the mailed buttons stop working.
+        const engagementId = (req.url || '').split('/')[4];
+        try {
+            const eng = (await supabaseApi.select('engagement_requests', { id: engagementId }, { limit: 1 })) as
+                Array<{ id: string; status: string }>;
+            if (!eng[0]) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Engagement not found', correlationId }));
+                return;
+            }
+            if (!['created', 'delivered', 'viewed'].includes(eng[0].status)) {
+                res.writeHead(409, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INVALID_STATE', message: `Cannot withdraw in status '${eng[0].status}'`, correlationId }));
+                return;
+            }
+            const now = new Date().toISOString();
+            await supabaseApi.update('engagement_requests', { id: engagementId }, { status: 'withdrawn', updated_at: now });
+            // Burn every still-open token for this engagement.
+            const tokens = (await supabaseApi.select('magic_link_tokens', { engagement_id: engagementId })) as
+                Array<{ id: string; used_at: string | null }>;
+            for (const t of tokens.filter(t => !t.used_at)) {
+                await supabaseApi.update('magic_link_tokens', { id: t.id }, { used_at: now });
+            }
+            await supabaseApi.insert('event_log', { type: 'engagement_withdrawn', payload: { engagementId } });
+            await supabaseApi.insert('engagement_messages', {
+                engagement_id: engagementId, author: 'system', body: 'Request withdrawn by the client — all pending action links were deactivated.',
+            }).catch(() => { /* thread note is best-effort */ });
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ok: true, id: engagementId, status: 'withdrawn' }));
+        } catch (err) {
+            structuredLog('error', 'Withdraw failed', { correlationId, errorCode: 'ERR_WITHDRAW', severity: 'error', route: req.url });
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Withdraw failed', correlationId }));
+        }
     } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/admin/stats')) {
         // Admin control center: one aggregated read across engagements, the
         // audit log and the privacy pipeline. Approximations share the caveats

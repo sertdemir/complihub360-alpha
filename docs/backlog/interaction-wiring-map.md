@@ -62,7 +62,7 @@ Alle 16 Drawer existieren in Figma (Section `▣ DRAWERS`) und die `Drawer`-Komp
 | B11 | „Open thread" auf Request-Card | /requests, Home | ⛔ | **Request-Thread-Drawer** (2654:2): Verlauf + Antworten | GET engagement/:id + Thread |
 | B12 | Dokument-Upload-CTA | Workbench/Session | ⛔ | **Doc-Upload-Drawer** (2654:49) — **mit Consent-Checkbox → POST document/upload (API existiert komplett!)** | keine — API fertig ✔ |
 | B13 | Session-Row „⋯"-Menü | /sessions | ⛔ | **Session-Actions-Drawer** (2654:89): rename/duplicate/archive | sessions-Tabelle (A1) |
-| B14 | Request-Card „⋯" | /requests | ⛔ | **Request-Actions-Drawer** (2654:135): remind/withdraw | Reminder-Endpoint |
+| B14 | Request-Card „⋯" | /requests | ✅ | Request-Actions-Drawer: Remind (frische Magic-Links + Reminder-Mail + sla_reminder_sent), Withdraw (Status 'withdrawn', Tokens verbrannt, 2-Stufen-Confirm), Open thread; Gating auf offene Status | — |
 | B15 | „Configure alerts" | Workbench, Notifications | ⛔ | **Configure-Alerts-Drawer** (Board 2073:164) | alert-prefs-Schema |
 | B16 | Topbar-/Sidebar-Suche | Shell | ⛔ | **Search-Drawer** (2654:176) | Such-Endpoint |
 

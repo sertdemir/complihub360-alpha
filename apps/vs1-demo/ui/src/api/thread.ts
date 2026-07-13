@@ -37,3 +37,12 @@ export async function postThreadMessage(id: string, author: 'user' | 'provider',
     body: JSON.stringify({ author, body }),
   });
 }
+
+// ─── Request actions (wiring map B14) ────────────────────────────────────────
+export async function remindEngagement(id: string): Promise<void> {
+  await apiFetch(`/api/v1/engagement/${id}/remind`, { method: 'POST', body: '{}' });
+}
+
+export async function withdrawEngagement(id: string): Promise<void> {
+  await apiFetch(`/api/v1/engagement/${id}/withdraw`, { method: 'POST', body: '{}' });
+}
