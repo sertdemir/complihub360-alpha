@@ -73,9 +73,9 @@ const REQUESTS: Fixture[] = [
 ];
 
 const FILTERS = [
-  { key: 'confirm', label: 'Awaiting confirmation · 3', match: 'awaiting-confirm' },
-  { key: 'reply', label: 'Awaiting reply · 2', match: 'awaiting-reply' },
-  { key: 'active', label: 'Active · 1', match: 'active' },
+  { key: 'confirm', label: 'Awaiting confirmation', match: 'awaiting-confirm' },
+  { key: 'reply', label: 'Awaiting reply', match: 'awaiting-reply' },
+  { key: 'active', label: 'Active', match: 'active' },
 ] as const;
 
 export function RequestsPage() {
@@ -170,7 +170,7 @@ export function RequestsPage() {
         <div className="flex items-center gap-2">
           {FILTERS.map((f) => (
             <FilterChip key={f.key} selected={filter === f.key} onClick={() => setFilter(f.key)}>
-              {f.label}
+              {f.label} · {requests.filter((r) => r.status === f.match).length}
             </FilterChip>
           ))}
           <button type="button" className="ml-auto flex items-center gap-1 text-[12px] text-fg-tertiary transition-colors hover:text-fg">

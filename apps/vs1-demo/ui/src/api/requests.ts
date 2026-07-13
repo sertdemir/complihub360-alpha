@@ -11,6 +11,7 @@ export interface EngagementRow {
   country?: string;
   category?: string;
   message?: string;
+  structured_answers?: { company?: string; requester_email?: string } & Record<string, unknown>;
   status: 'created' | 'delivered' | 'confirmed' | 'replied' | 'declined' | 'expired' | string;
   sla_confirm_deadline?: string;
   sla_reply_deadline?: string;
@@ -34,9 +35,14 @@ export interface ProviderRequest {
 const STATUS_MAP: Record<string, { status: RequestStatus; label: string; action: ProviderRequest['action'] }> = {
   created: { status: 'awaiting-confirm', label: 'Awaiting confirm', action: { label: 'Open · confirm', variant: 'accent' } },
   delivered: { status: 'awaiting-confirm', label: 'Awaiting confirm', action: { label: 'Open · confirm', variant: 'accent' } },
+  viewed: { status: 'awaiting-confirm', label: 'Awaiting confirm', action: { label: 'Open · confirm', variant: 'accent' } },
   confirmed: { status: 'awaiting-reply', label: 'Awaiting reply', action: { label: 'Reply', variant: 'primary' } },
   replied: { status: 'active', label: 'Active', action: { label: 'View', variant: 'ghost' } },
 };
+
+// Dossier rule (Addendum 2026-07-10): the requester identity unlocks only
+// after the provider confirms — before that the card stays anonymized.
+const UNLOCKED_STATUSES = new Set(['confirmed', 'replied']);
 
 function relTime(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
@@ -67,7 +73,9 @@ export async function fetchProviderRequests(): Promise<ProviderRequest[]> {
         idLine: `RQ-${r.id.slice(0, 4).toUpperCase()} · ${relTime(r.created_at)}`,
         status: m.status,
         statusLabel: m.label,
-        company: r.provider_key,
+        company: UNLOCKED_STATUSES.has(r.status)
+          ? r.structured_answers?.company ?? 'Requester'
+          : '🔒 Anonymized · unlocks on confirm',
         tag: [r.country, r.category].filter(Boolean).join(' · ') || undefined,
         meta: r.message || '',
         sla: m.status === 'active' ? undefined : slaLeft(r.status === 'confirmed' ? r.sla_reply_deadline : r.sla_confirm_deadline),
