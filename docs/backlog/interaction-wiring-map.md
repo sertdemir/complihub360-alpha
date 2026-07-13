@@ -72,7 +72,7 @@ Alle 16 Drawer existieren in Figma (Section `▣ DRAWERS`) und die `Drawer`-Komp
 |---|---|---|---|---|---|
 | C1 | „Mark all seen/read" | Provider /requests, /notifications | ✅ | `notification_reads`-Watermark pro Viewer-Key + GET/POST /api/v1/reads; Notifications-Chips + Sidebar-Badges + Requests-Banner live | — |
 | C2 | Availability-Pill / „End early" (OOO) | Provider-Shell, /requests | ✅ | providers.availability/ooo_until + PATCH /provider/:key/availability; Pill klickbar (ConfirmDrawer), OOO-Banner echt mit End early, Sync via CustomEvent, persistiert | — |
-| C3 | „Update payment method" | /billing | 🟡 | Anbindung KOMPLETT (POST /provider/:key/billing-portal: Customer-ensure + Portal-Session, stripe_customer_id, Redirect im FE, 503-Hinweis ohne Key) — es fehlt NUR STRIPE_SECRET_KEY | User-Schritt: docs/stripe-setup.md |
+| C3 | „Update payment method" | /billing | ✅ | LIVE via Stripe-Sandbox (Restricted Key auf VPS): Portal-Session + Customer-lazy-create verifiziert, Portal gebrandet; Sandbox bis 2026-07-20 claimen (docs/stripe-setup.md) | Claim = User-Schritt |
 | C4 | „Preview public profile" | /requests OOO-State | ⛔ | Route zur Public-Profile-Seite (C-4, einzige Full-Page-Ausnahme) | Seite bauen |
 | C5 | „Replace" (Avatar), Settings-Rows | /settings | ⛔ | Upload/Drawer je Zeile | Storage |
 | C6 | „Resume" / „Start new" / „Refine existing" | User Home, Workbench | ✅ | Resume → /results (ch360_last_profile); Start new → /wizard frisch; Refine → /wizard?refine=1 = vorbefüllt + Start im Review-Schritt (Edit springt mit erhaltener Auswahl zurück) | — |

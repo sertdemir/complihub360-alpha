@@ -1,9 +1,14 @@
 # Stripe-Anbindung (C3) — Setup-Anleitung
 
-**Stand:** Die komplette Billing-Portal-Anbindung ist gebaut und deployed. Es fehlt
-nur noch der Stripe-Account + API-Key. Ohne Key antwortet die API mit
-`503 STRIPE_NOT_CONFIGURED` und die Billing-Seite zeigt einen Hinweis statt eines
-toten Buttons.
+**Stand (2026-07-13):** LIVE auf Staging über eine anonyme **Stripe-Sandbox**
+(Account `acct_1Tspe4PiuS3HfybD`, Restricted Key auf dem VPS in
+`/docker/complihub-api/.env`). „Update payment method" auf /billing öffnet das
+echte Stripe-Portal (Branding „CompliHub360 — Partner Billing"). Der Customer
+`dahlmann-cpa` → `cus_UsbYmsQbvZ8Tqk` wurde automatisch angelegt.
+
+⚠️ **Die Sandbox läuft am 2026-07-20 ab**, wenn sie nicht vorher in einen echten
+Stripe-Account überführt wird („claimen"). Die Claim-URL liegt NICHT im Repo —
+Claude hat sie in der Session; alternativ `stripe sandbox claim` mit dem Key.
 
 ## Was schon funktioniert
 
@@ -15,26 +20,17 @@ toten Buttons.
 - „Update payment method" auf /billing ruft den Endpoint auf und redirectet
 - Event `billing_portal_opened` im Event-Log
 
-## Dein Schritt (einmalig, ~10 Minuten)
+## Dein Schritt (einmalig, ~5 Minuten): Sandbox claimen
 
-1. **Account**: [dashboard.stripe.com](https://dashboard.stripe.com) → Konto anlegen
-   (Business: CompliHub360). Für Staging reicht der **Test-Modus** — keine
-   Verifizierung nötig.
-2. **API-Key holen**: Dashboard → Developers → API keys → **Secret key** des
-   Test-Modus kopieren (beginnt mit `sk_test_…`).
-3. **Billing-Portal aktivieren**: Dashboard → Settings → Billing → **Customer
-   portal** → einmal „Save" klicken (Default-Konfiguration reicht; sonst kommt
-   „No configuration provided").
-4. **Key auf den VPS**:
-   ```bash
-   ssh -i ~/.ssh/complihub_vps root@76.13.159.221
-   echo 'STRIPE_SECRET_KEY=sk_test_…' >> /docker/complihub-api/.env
-   cd /docker/complihub-api && docker compose up -d --force-recreate api
-   ```
-   (`restart` reicht NICHT — env_file wird nur bei recreate neu gelesen.)
-5. **Test**: Partner-Dashboard → Billing → „Update payment method" → du landest
-   im Stripe-Portal (Test-Modus-Banner oben). In `providers.stripe_customer_id`
-   steht danach die `cus_…`-ID.
+1. Claim-URL öffnen (von Claude in der Session ausgegeben) → mit deinem
+   Stripe-Login (oder neuem Konto, Business: CompliHub360) bestätigen.
+   Danach gehört die Sandbox inkl. Portal-Konfiguration + Customer deinem Account
+   und läuft nicht mehr ab.
+2. Fertig — Keys und Konfiguration bleiben gültig, nichts weiter nötig.
+
+**Best Practices (bereits umgesetzt):** Restricted Key (`rk…`) statt Secret Key ·
+Key nur in der VPS-.env (nicht im Repo) · Portal-Konfiguration per API angelegt
+(`bpc_1TsqL5PiuS3HfybDMKRcsmzO`).
 
 ## Später (Produktion)
 
