@@ -33,3 +33,19 @@ export async function fetchInvoices(providerKey: string = DEMO_PROVIDER_KEY): Pr
   const res = await apiFetch<{ ok: boolean; invoices: Invoice[] }>(`/api/v1/provider/${providerKey}/invoices`);
   return res.invoices;
 }
+
+// ─── Stripe billing portal (wiring map C3) ───────────────────────────────────
+// Resolves to the portal URL, or 'not-configured' while STRIPE_SECRET_KEY is
+// missing on the API (503) — the page shows an honest note instead of a dead end.
+export async function openBillingPortal(providerKey: string = DEMO_PROVIDER_KEY): Promise<string | 'not-configured'> {
+  try {
+    const res = await apiFetch<{ ok: boolean; url: string }>(`/api/v1/provider/${providerKey}/billing-portal`, {
+      method: 'POST',
+      body: '{}',
+    });
+    return res.url;
+  } catch (e) {
+    if (e && typeof e === 'object' && 'status' in e && (e as { status: number }).status === 503) return 'not-configured';
+    throw e;
+  }
+}

@@ -7,7 +7,7 @@ import { Table, THead, TBody, TR, TH, TD } from '../../components/ui/Table';
 import { Tag } from '../../components/ui/Tag';
 import { InvoiceDetailDrawer } from '../../components/provider/InvoiceDetailDrawer';
 import { useApiData } from '../../lib/useApiData';
-import { fetchInvoices, euro, type Invoice } from '../../api/billing';
+import { fetchInvoices, openBillingPortal, euro, type Invoice } from '../../api/billing';
 
 // ─── Provider /billing ────────────────────────────────────────────────────────
 // Mirrors "Provider Dashboard v1 · /billing (Desktop · payment-failed)"
@@ -57,6 +57,24 @@ const STATUS_META: Record<Invoice['status'], { label: string; tone: 'success' | 
 export function BillingPage() {
   const { data: invoices } = useApiData(fetchInvoices, FIXTURE);
   const [detail, setDetail] = useState<Invoice | null>(null);
+  // C3: "Update payment method" → Stripe billing portal; honest note until
+  // STRIPE_SECRET_KEY lands on the API.
+  const [portalBusy, setPortalBusy] = useState(false);
+  const [portalNote, setPortalNote] = useState('');
+  const updatePayment = async () => {
+    setPortalBusy(true); setPortalNote('');
+    try {
+      const target = await openBillingPortal();
+      if (target === 'not-configured') {
+        setPortalNote('Stripe wird gerade angebunden — Zahlungsmethoden lassen sich verwalten, sobald das Billing-Portal live ist.');
+      } else {
+        window.location.href = target;
+      }
+    } catch {
+      setPortalNote('Das Billing-Portal ist gerade nicht erreichbar — bitte später erneut versuchen.');
+    }
+    setPortalBusy(false);
+  };
 
   const latest = invoices[0];
   const failed = invoices.find((i) => i.status === 'failed');
@@ -85,10 +103,13 @@ export function BillingPage() {
           <Banner
             status="error"
             title={`Payment failed on ${failed.invoice_number} · grace period running`}
-            action={<Button size="sm" variant="danger">Update payment method</Button>}
+            action={<Button size="sm" variant="danger" onClick={updatePayment} disabled={portalBusy}>{portalBusy ? '…' : 'Update payment method'}</Button>}
           >
             Retry or update your payment method to avoid workspace lock. Click the invoice row for the full breakdown.
           </Banner>
+        )}
+        {portalNote && (
+          <p className="rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-[12px] text-fg-secondary">{portalNote}</p>
         )}
 
         <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">

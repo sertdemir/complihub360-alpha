@@ -634,6 +634,59 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Availability update failed', correlationId }));
             }
         });
+    } else if (req.method === 'POST' && /^\/api\/v1\/provider\/[a-z0-9-]+\/billing-portal$/.test(req.url || '')) {
+        // C3: Stripe billing portal (spec: Stripe-issued invoices + payment
+        // methods). Lazily creates the Stripe customer on first use. Returns
+        // 503 with a clear code until STRIPE_SECRET_KEY is configured.
+        const providerKey = (req.url || '').split('/')[4];
+        try {
+            const stripeKey = process.env.STRIPE_SECRET_KEY;
+            if (!stripeKey) {
+                res.writeHead(503, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'STRIPE_NOT_CONFIGURED', message: 'Stripe is not connected yet', correlationId }));
+                return;
+            }
+            const rows = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as
+                Array<{ name: string; contact_email?: string | null; stripe_customer_id?: string | null }>;
+            if (!rows[0]) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId }));
+                return;
+            }
+            const stripe = async (path: string, params: Record<string, string>) => {
+                const resp = await fetch(`https://api.stripe.com/v1/${path}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${stripeKey}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams(params).toString(),
+                });
+                const body = await resp.json();
+                if (!resp.ok) throw new Error(`Stripe ${path}: ${(body as { error?: { message?: string } }).error?.message || resp.status}`);
+                return body as Record<string, unknown>;
+            };
+            let customerId = rows[0].stripe_customer_id ?? null;
+            if (!customerId) {
+                const customer = await stripe('customers', {
+                    name: rows[0].name || providerKey,
+                    ...(rows[0].contact_email ? { email: rows[0].contact_email } : {}),
+                    'metadata[provider_key]': providerKey,
+                });
+                customerId = String(customer.id);
+                await supabaseApi.update('providers', { provider_key: providerKey }, { stripe_customer_id: customerId });
+            }
+            const appUrl = (process.env.PUBLIC_APP_URL || 'https://staging.complihub360.com').replace(/\/$/, '');
+            const session = await stripe('billing_portal/sessions', {
+                customer: customerId,
+                return_url: `${appUrl}/en/partner-dashboard/billing`,
+            });
+            await supabaseApi.insert('event_log', { type: 'billing_portal_opened', payload: { providerKey } });
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ok: true, url: session.url }));
+        } catch (err) {
+            structuredLog('error', 'Billing portal failed', { correlationId, errorCode: 'ERR_BILLING_PORTAL', severity: 'error', route: req.url });
+            res.writeHead(502, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'STRIPE_ERROR', message: 'Stripe request failed', correlationId }));
+        }
     } else if (req.method === 'POST' && /^\/api\/v1\/provider\/[a-z0-9-]+\/change-email$/.test(req.url || '')) {
         // B8: request a contact-email change. A single-use verify link (1h)
         // goes to the NEW address; nothing changes until it is clicked.
