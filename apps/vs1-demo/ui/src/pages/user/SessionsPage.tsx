@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { UserShell } from '../../components/user/UserShell';
 import { Button } from '../../components/ui/Button';
 import { FilterChip } from '../../components/ui/Badge';
@@ -21,6 +22,7 @@ type Row = {
   title: string; riskLine: string; risk: SessionRisk;
 };
 
+// Design fixture (demo data — stays in the original language).
 const SESSIONS: Row[] = [
   { country: 'IT', domain: 'Tax & VAT', needsRefresh: true, updated: '· Updated 2h ago', title: 'VAT registration · Italy', riskLine: '● High risk · threshold reached · 1 markets', risk: 'high' },
   { country: 'FR', domain: 'Product & Packaging', updated: '· Updated 1d ago', title: 'EPR registration · France', riskLine: '● Medium risk · deadline Q3 2026 · 1 markets', risk: 'medium' },
@@ -36,54 +38,63 @@ const DOMAIN_LABEL: Record<string, string> = {
   epr: 'Product & Packaging', packaging: 'Product & Packaging',
 };
 
-function relTime(iso: string): string {
+// Canonical English domain label → userws translation key (display only).
+const DOMAIN_KEY: Record<string, string> = {
+  'Tax & VAT': 'taxVat', 'Product & Packaging': 'productPackaging', 'Data & Privacy': 'dataPrivacy',
+  'Marketing & SEO': 'marketingSeo', 'Corporate & Structure': 'corporateStructure', 'Full Support': 'fullSupport',
+};
+
+function relTime(iso: string, t: TFunction): string {
   const h = Math.floor((Date.now() - new Date(iso).getTime()) / 3_600_000);
-  if (h < 1) return '· Updated just now';
-  if (h < 24) return `· Updated ${h}h ago`;
+  if (h < 1) return t('sessions.updatedJustNow');
+  if (h < 24) return t('sessions.updatedHoursAgo', { count: h });
   const d = Math.floor(h / 24);
-  return `· Updated ${d}d ago`;
+  return t('sessions.updatedDaysAgo', { count: d });
 }
 
-function toRow(s: SessionRowData): Row {
+function toRow(s: SessionRowData, t: TFunction): Row {
   const cat = s.categories?.[0] ?? 'compliance';
   const domain = DOMAIN_LABEL[cat.toLowerCase()] ?? cat.replace(/^./, (c) => c.toUpperCase());
   const level = (s.risk_summary?.level ?? 'low').toLowerCase();
   const risk: SessionRisk = level === 'high' ? 'high' : level === 'medium' ? 'medium' : 'low';
   const markets = s.markets?.length || 1;
+  const riskKey = risk === 'high' ? 'riskLineHigh' : risk === 'medium' ? 'riskLineMedium' : 'riskLineLow';
   return {
     id: s.id,
     country: (s.country ?? '—').toUpperCase(),
     domain,
-    updated: relTime(s.updated_at),
+    updated: relTime(s.updated_at, t),
     title: s.label || `${cat} · ${(s.country ?? '').toUpperCase()}`,
-    riskLine: `● ${risk.replace(/^./, (c) => c.toUpperCase())} risk · ${markets} market${markets === 1 ? '' : 's'}`,
+    riskLine: t(`sessions.${riskKey}`, { count: markets }),
     risk,
   };
 }
 
 export function SessionsPage() {
   const navigate = useNavigate();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation('userws');
   const locale = i18n.resolvedLanguage || 'en';
   const [filter, setFilter] = useState('all');
   const [live, setLive] = useState<Row[] | null>(null);
   const [actionsFor, setActionsFor] = useState<SessionActionsTarget | null>(null);
 
+  const tDomain = (label: string) => (DOMAIN_KEY[label] ? t(`domain.${DOMAIN_KEY[label]}`) : label);
+
   const reload = useCallback(() => {
     fetchSessions()
-      .then((rows) => setLive(rows.filter((r) => r.status === 'active').map(toRow)))
+      .then((rows) => setLive(rows.filter((r) => r.status === 'active').map((r) => toRow(r, t))))
       .catch(() => { /* keep fixture */ });
-  }, []);
+  }, [t]);
   useEffect(() => { reload(); }, [reload]);
 
   const rows = live && live.length > 0 ? live : SESSIONS;
   const isLive = live !== null && live.length > 0;
 
   const FILTERS = [
-    { key: 'all', label: `All · ${rows.length}`, match: (_s: Row) => true },
+    { key: 'all', label: t('sessions.filterAll', { count: rows.length }), match: (_s: Row) => true },
     ...['Tax & VAT', 'Data & Privacy', 'Product & Packaging']
       .filter((d) => rows.some((s) => s.domain === d))
-      .map((d) => ({ key: d, label: `${d} · ${rows.filter((s) => s.domain === d).length}`, match: (s: Row) => s.domain === d })),
+      .map((d) => ({ key: d, label: `${tDomain(d)} · ${rows.filter((s) => s.domain === d).length}`, match: (s: Row) => s.domain === d })),
   ];
   const match = FILTERS.find((f) => f.key === filter)?.match ?? (() => true);
   const list = rows.filter(match);
@@ -94,13 +105,13 @@ export function SessionsPage() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="font-serif text-[32px] font-bold leading-tight text-fg">
-              Your compliance <span className="text-fg-accent">sessions</span>.
+              <Trans t={t} i18nKey="sessions.title" components={{ accent: <span className="text-fg-accent" /> }} />
             </h1>
             <p className="mt-1 text-body-sm text-fg-secondary">
-              {rows.length} session{rows.length === 1 ? '' : 's'} saved{isLive ? '' : ' · 2 need a refresh · last updated 2h ago'}
+              {t('sessions.subSaved', { count: rows.length })}{isLive ? '' : t('sessions.subFixtureSuffix')}
             </p>
           </div>
-          <Button className="mt-1 shrink-0" onClick={() => navigate(`/${locale}/wizard`)}>Start new search</Button>
+          <Button className="mt-1 shrink-0" onClick={() => navigate(`/${locale}/wizard`)}>{t('shared.startNewSearch')}</Button>
         </div>
 
         <div className="flex items-center gap-2">
@@ -110,7 +121,7 @@ export function SessionsPage() {
             </FilterChip>
           ))}
           <button type="button" className="ml-auto flex items-center gap-1 text-[12px] text-fg-tertiary transition-colors hover:text-fg">
-            Sort: Last updated <ChevronDown size={12} />
+            {t('shared.sortLastUpdated')} <ChevronDown size={12} />
           </button>
         </div>
 
@@ -119,14 +130,14 @@ export function SessionsPage() {
             <SessionRow
               key={s.id ?? s.title}
               country={s.country}
-              domain={s.domain}
-              status={s.needsRefresh ? 'Needs refresh' : undefined}
+              domain={tDomain(s.domain)}
+              status={s.needsRefresh ? t('sessions.needsRefresh') : undefined}
               updated={s.updated}
               title={s.title}
               riskLine={s.riskLine}
               risk={s.risk}
               onMenu={s.id ? () => setActionsFor({ id: s.id!, title: s.title, domain: s.domain, country: s.country }) : () => {}}
-              action={<Button size="sm" variant="accent" onClick={() => navigate(`/${locale}/results`)}>Open</Button>}
+              action={<Button size="sm" variant="accent" onClick={() => navigate(`/${locale}/results`)}>{t('shared.open')}</Button>}
             />
           ))}
         </div>

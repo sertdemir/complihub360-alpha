@@ -1,5 +1,6 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Check } from 'lucide-react';
 import { Container } from '../ui/Container';
 import { SectionEyebrow, GoldWord } from '../providers/SectionHeading';
@@ -9,31 +10,22 @@ import { SectionEyebrow, GoldWord } from '../providers/SectionHeading';
 // only fix one." Two alternating rows, each a cream visual card (topographic map
 // / curated network, petrol footer band) + a lead paragraph with a checklist.
 
-type Item = { title: string; desc: string };
+// Checklist copy lives in twoReflexes.row1.* / twoReflexes.row2.* ('home' ns).
+const ROW1_COUNT = 4;
+const ROW2_COUNT = 2;
 
-const ROW1: Item[] = [
-  { title: 'Risk-prioritized, not exhaustive', desc: 'Critical to Low. Four to twelve items at any time. Not 200-page checklists.' },
-  { title: 'Sourced from the regulators themselves', desc: 'Every entry links to the official notice, registry page, or case law it draws from.' },
-  { title: 'Updated against drift', desc: 'Rules change. The map updates when a deadline moves, a regulator clarifies, or a registry opens.' },
-  { title: 'Plain language by default', desc: 'If a clause needs a paragraph to explain, the paragraph is what you see — not the clause.' },
-];
-
-const ROW2: Item[] = [
-  { title: 'Verified by us, not self-listed', desc: 'Each Verified Partner is vetted on coverage, response time, and named real outcomes — not a directory.' },
-  { title: 'Shared accountability built-in', desc: 'Every engagement is contractual. Partners accept responsibility for the matter, not just the advice.' },
-];
-
-function Checklist({ items }: { items: Item[] }) {
+function Checklist({ baseKey, count }: { baseKey: string; count: number }) {
+  const { t } = useTranslation('home');
   return (
     <ul className="mt-6 space-y-5">
-      {items.map((it) => (
-        <li key={it.title} className="flex gap-3">
+      {Array.from({ length: count }, (_, i) => (
+        <li key={i} className="flex gap-3">
           <span className="mt-0.5 grid h-[22px] w-[22px] shrink-0 place-items-center rounded-full bg-brand-light text-fg-brand">
             <Check size={13} strokeWidth={3} />
           </span>
           <div>
-            <p className="text-[15px] font-bold text-fg">{it.title}</p>
-            <p className="mt-1 text-[13px] leading-relaxed text-fg-secondary">{it.desc}</p>
+            <p className="text-[15px] font-bold text-fg">{t(`${baseKey}.${i}.title`)}</p>
+            <p className="mt-1 text-[13px] leading-relaxed text-fg-secondary">{t(`${baseKey}.${i}.desc`)}</p>
           </div>
         </li>
       ))}
@@ -92,19 +84,18 @@ function Row({ card, body, cardSide }: { card: ReactNode; body: ReactNode; cardS
 }
 
 export function TwoReflexes() {
+  const { t } = useTranslation('home');
   return (
     <section id="why-the-gap" className="bg-surface py-20 lg:py-28">
       <Container size="xl">
         {/* Title block */}
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
-          <SectionEyebrow tone="brand">Why this gap persists</SectionEyebrow>
+          <SectionEyebrow tone="brand">{t('twoReflexes.eyebrow')}</SectionEyebrow>
           <h2 className="font-serif text-[2rem] font-semibold leading-tight tracking-tight text-fg sm:text-[2.5rem]">
-            Regulation is fragmented. Specialists are siloed. <GoldWord>Both</GoldWord> stay broken if you only fix one.
+            {t('twoReflexes.title.pre')}<GoldWord>{t('twoReflexes.title.gold')}</GoldWord>{t('twoReflexes.title.post')}
           </h2>
           <p className="max-w-2xl text-body leading-relaxed text-fg-secondary">
-            Every market has its own thresholds, registers, and watchdogs. Every advisor knows a slice. The platforms
-            that map the rules don&rsquo;t know the people. The directories of people don&rsquo;t read the rules.
-            CompliHub is built to close both halves at once.
+            {t('twoReflexes.subtitle')}
           </p>
         </div>
 
@@ -113,8 +104,8 @@ export function TwoReflexes() {
             cardSide="left"
             card={
               <ReflexCard
-                title="The map nobody draws."
-                label="The gap, mapped"
+                title={t('twoReflexes.card1.title')}
+                label={t('twoReflexes.card1.label')}
                 image="/img/reflex-map.png"
                 imageW={418}
                 imageH={293}
@@ -124,10 +115,9 @@ export function TwoReflexes() {
             body={
               <div>
                 <p className="text-body leading-relaxed text-fg-secondary">
-                  Every public dashboard tells you what the rules say. None of them tell you what&rsquo;s at stake for
-                  your operation, in priority order, with the source still attached.
+                  {t('twoReflexes.row1Lead')}
                 </p>
-                <Checklist items={ROW1} />
+                <Checklist baseKey="twoReflexes.row1" count={ROW1_COUNT} />
               </div>
             }
           />
@@ -135,8 +125,8 @@ export function TwoReflexes() {
             cardSide="right"
             card={
               <ReflexCard
-                title="The network nobody curates."
-                label="The gap, networked"
+                title={t('twoReflexes.card2.title')}
+                label={t('twoReflexes.card2.label')}
                 image="/img/reflex-network.png"
                 imageW={418}
                 imageH={299}
@@ -146,10 +136,9 @@ export function TwoReflexes() {
             body={
               <div>
                 <p className="text-body leading-relaxed text-fg-secondary">
-                  Directories list everyone. They vet no one. We vet on coverage, response, and outcomes — and bind
-                  each engagement to shared responsibility.
+                  {t('twoReflexes.row2Lead')}
                 </p>
-                <Checklist items={ROW2} />
+                <Checklist baseKey="twoReflexes.row2" count={ROW2_COUNT} />
               </div>
             }
           />

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { Logo } from '../../components/ui/Logo';
 
@@ -8,6 +9,7 @@ import { Logo } from '../../components/ui/Logo';
 // same public dark surface as the magic-link action page.
 
 export function ConfirmEmailPage() {
+  const { t } = useTranslation('providerws');
   const [params] = useSearchParams();
   const { locale = 'en' } = useParams();
   const token = params.get('token') || '';
@@ -38,30 +40,30 @@ export function ConfirmEmailPage() {
     <div className="dark flex min-h-screen items-center justify-center bg-[#0b1620] px-4">
       <div className="w-full max-w-[440px] rounded-2xl border border-white/10 bg-[#1f2937] p-8 text-center shadow-[0_18px_50px_-12px_rgba(0,0,0,0.65)]">
         <div className="mb-6 flex justify-center"><Logo lockup="horizontal" tone="on-petrol" markClassName="h-9" /></div>
-        {state === 'working' && <p className="text-[14px] text-fg-secondary">Confirming your new address…</p>}
+        {state === 'working' && <p className="text-[14px] text-fg-secondary">{t('confirmEmail.working')}</p>}
         {state === 'done' && (
           <>
             <CheckCircle2 size={36} className="mx-auto text-fg-brand" />
             <h1 className="mt-4 font-serif text-[24px] font-bold text-fg">
-              Address <span className="text-fg-accent">confirmed</span>.
+              {t('confirmEmail.doneTitlePre')}<span className="text-fg-accent">{t('confirmEmail.doneTitleGold')}</span>{t('confirmEmail.doneTitlePost')}
             </h1>
             <p className="mt-2 text-[13px] leading-relaxed text-fg-secondary">
-              {email} is now the contact address — new requests, reminders and invoices go there.
+              {t('confirmEmail.doneBody', { email })}
             </p>
             <Link to={`/${locale}/partner-dashboard/settings`} className="mt-6 inline-block rounded-xl bg-[#d4af37] px-6 py-3 text-[14px] font-bold text-[#101411]">
-              Back to settings →
+              {t('confirmEmail.backToSettings')}
             </Link>
           </>
         )}
         {state === 'failed' && (
           <>
             <XCircle size={36} className="mx-auto text-error-500" />
-            <h1 className="mt-4 font-serif text-[24px] font-bold text-fg">This link doesn't work anymore.</h1>
+            <h1 className="mt-4 font-serif text-[24px] font-bold text-fg">{t('confirmEmail.failedTitle')}</h1>
             <p className="mt-2 text-[13px] leading-relaxed text-fg-secondary">
-              It was already used or has expired (links are valid for 1 hour). Request the change again from Settings — the current address stays active.
+              {t('confirmEmail.failedBody')}
             </p>
             <Link to={`/${locale}/partner-dashboard/settings`} className="mt-6 inline-block rounded-xl border border-white/20 px-6 py-3 text-[14px] font-semibold text-fg">
-              Open settings
+              {t('confirmEmail.openSettings')}
             </Link>
           </>
         )}

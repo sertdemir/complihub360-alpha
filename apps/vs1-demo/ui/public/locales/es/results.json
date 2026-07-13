@@ -1,0 +1,114 @@
+{
+  "topbar": {
+    "guestBadge": "Mapa de invitado · caduca en 30 min",
+    "exportPdf": "Exportar PDF",
+    "saveMap": "Guardar este mapa"
+  },
+  "header": {
+    "eyebrow": "Su Risk Map",
+    "title": "Esto es lo que le aplica.",
+    "subtitleProfile": "Basado en su evaluación. {{total}} ámbitos en alcance.",
+    "subtitleDefault": "Basado en Alemania · Reino Unido · Países Bajos. E-commerce D2C, €2M—€5M de facturación. VAT · EPR · Privacidad en alcance."
+  },
+  "stats": {
+    "0": { "label": "obligaciones identificadas" },
+    "1": { "label": "exposición total" },
+    "2": { "label": "plazo mediano" },
+    "3": { "label": "Verified Partners disponibles" }
+  },
+  "table": {
+    "severity": "Gravedad",
+    "obligation": "Obligación",
+    "market": "Mercado",
+    "due": "Vence",
+    "state": "Estado"
+  },
+  "severity": {
+    "critical": "Crítica",
+    "high": "Alta",
+    "medium": "Media",
+    "low": "Baja"
+  },
+  "state": {
+    "confirmed": "Confirmada",
+    "likely": "Probable",
+    "answer": "Responder {{total}} preguntas"
+  },
+  "obligations": {
+    "0": {
+      "title": "Declaración trimestral OSS",
+      "detail": "Última presentación: Q1 2025 · Sanción: €5.000 + 1 %/mes · UStG §18i (OSS)",
+      "market": "DE · NL",
+      "due": "30 abr",
+      "dueSub": "6 días"
+    },
+    "1": {
+      "title": "Registro de IVA — UK",
+      "detail": "Se requiere comprobar el umbral post-Brexit · Sanción: hasta £20.000 · UK VATA 1994 §3",
+      "market": "UK",
+      "due": "15 may",
+      "dueSub": "21 días"
+    },
+    "2": {
+      "title": "Registro de envases EPR (LUCID)",
+      "detail": "Estatus de productor por confirmar · Sanción: hasta €50.000 · VerpackG Art. 9 Abs. 1",
+      "market": "DE",
+      "due": "02 may",
+      "dueSub": "8 días"
+    },
+    "3": {
+      "title": "Renovación del registro EPR (PackUK)",
+      "detail": "Última presentación: abr 2024 · Sanción: 4 % de los ingresos en UK · UK Packaging Regs. 2023 §7",
+      "market": "UK",
+      "due": "15 may",
+      "dueSub": "21 días"
+    },
+    "4": {
+      "title": "Banner de cookies + registros de consentimiento",
+      "detail": "Usuarios B2C en la UE → obligatorio · RGPD Art. 6/7 · TTDSG §25",
+      "market": "Toda la UE",
+      "due": "Continuo",
+      "dueSub": "Activo"
+    },
+    "5": {
+      "title": "EIPD para píxeles de seguimiento",
+      "detail": "Depende del stack de seguimiento · RGPD Art. 35",
+      "market": "Toda la UE",
+      "due": "—",
+      "dueSub": "Depende de las herramientas"
+    },
+    "6": {
+      "title": "Mecanismo de inversión del sujeto pasivo",
+      "detail": "Aplica solo si la cuota B2B transfronteriza es >0 · UStG §13b",
+      "market": "DE · NL",
+      "due": "—",
+      "dueSub": "Depende del mix B2B"
+    },
+    "7": {
+      "title": "Actualización del titular real",
+      "detail": "Última presentación: mar 2025 · Sanción: €1.000–5.000 · GwG §20 Abs. 1",
+      "market": "DE",
+      "due": "30 jun",
+      "dueSub": "continuo"
+    }
+  },
+  "partners": {
+    "eyebrow": "3 Verified Partners encontrados",
+    "title": "Hemos encontrado quién puede actuar sobre esto.",
+    "unlocked": "Coincidencias desbloqueadas",
+    "unlockCta": "Desbloquee las coincidencias con una cuenta gratuita",
+    "match": "{{pct}} de coincidencia",
+    "requestQuote": "Solicitar presupuesto",
+    "0": { "sub": "Registro de IVA italiano + representación fiscal · bilingüe DE·IT" },
+    "1": { "sub": "Configuración OSS/IOSS · 12 años de fiscalidad transfronteriza · 8 oficinas en la UE" },
+    "2": { "sub": "IVA ibérico (ES/PT) · presentación mensual · optimización de marketplaces" }
+  },
+  "cta": {
+    "title": "Guarde este mapa. Desbloquee los partners.",
+    "body": "Cuenta gratuita. Sin tarjeta de crédito. Acceso de miembro fundador hasta el lanzamiento de la Beta.",
+    "button": "Crear cuenta gratuita"
+  },
+  "quote": {
+    "domainTaxVat": "Impuestos e IVA"
+  }
+}

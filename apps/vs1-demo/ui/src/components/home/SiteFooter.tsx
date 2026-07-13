@@ -1,68 +1,86 @@
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Logo } from '../ui/Logo';
+import { supportedLngs } from '../../i18n/config';
 
 // ─── S10 — Site footer · Figma 1212:11 ──────────────────────────────────────
 // Light four-column footer closing the landing page: brand + positioning, the
 // link columns (with BETA tags), the markets-covered line, the not-a-law-firm
-// disclaimer, and the legal bottom bar.
+// disclaimer, and the legal bottom bar. Copy lives in footer.* ('home' ns).
 
-type Link = { label: string; href: string; beta?: boolean };
-type Column = { title: string; links: Link[] };
+type Link = { key: string; href: string; beta?: boolean };
+type Column = { key: string; links: Link[] };
 
 const COLUMNS: Column[] = [
   {
-    title: 'Platform',
+    key: 'platform',
     links: [
-      { label: 'How it works', href: '#how-it-works' },
-      { label: 'Start Assessment', href: '#entry-door' },
-      { label: 'Example Result', href: '#' },
-      { label: 'For Providers', href: '/providers' },
+      { key: 'howItWorks', href: '#how-it-works' },
+      { key: 'startAssessment', href: '#entry-door' },
+      { key: 'exampleResult', href: '#' },
+      { key: 'forProviders', href: '/providers' },
     ],
   },
   {
-    title: 'Solutions',
+    key: 'solutions',
     links: [
-      { label: 'VAT & Tax', href: '#' },
-      { label: 'Product & Packaging', href: '#' },
-      { label: 'Data Privacy', href: '#' },
-      { label: 'Marketing & Advertising', href: '#' },
-      { label: 'Corporate Structure', href: '#' },
-      { label: 'Full Support', href: '#' },
+      { key: 'vatTax', href: '#' },
+      { key: 'productPackaging', href: '#' },
+      { key: 'dataPrivacy', href: '#' },
+      { key: 'marketingAdvertising', href: '#' },
+      { key: 'corporateStructure', href: '#' },
+      { key: 'fullSupport', href: '#' },
     ],
   },
   {
-    title: 'Resources',
+    key: 'resources',
     links: [
-      { label: 'Compliance News', href: '#', beta: true },
-      { label: 'Knowledge Library', href: '#', beta: true },
-      { label: 'Country Guides', href: '#' },
-      { label: 'Tutorials', href: '#' },
-      { label: 'Compliance Glossary', href: '#' },
+      { key: 'complianceNews', href: '#', beta: true },
+      { key: 'knowledgeLibrary', href: '#', beta: true },
+      { key: 'countryGuides', href: '#' },
+      { key: 'tutorials', href: '#' },
+      { key: 'glossary', href: '#' },
     ],
   },
   {
-    title: 'Company',
+    key: 'company',
     links: [
-      { label: 'About', href: '#' },
-      { label: 'Trust & Security', href: '#' },
-      { label: 'Contact', href: '#' },
-      { label: 'Careers', href: '#' },
+      { key: 'about', href: '#' },
+      { key: 'trustSecurity', href: '#' },
+      { key: 'contact', href: '#' },
+      { key: 'careers', href: '#' },
     ],
   },
 ];
 
 const LEGAL: Link[] = [
-  { label: 'Privacy Policy', href: '/privacy' },
-  { label: 'Terms (AGB)', href: '#' },
-  { label: 'Impressum', href: '/imprint' },
-  { label: 'Cookie Settings', href: '#' },
-  { label: 'Sub-Processors', href: '#' },
+  { key: 'privacy', href: '/privacy' },
+  { key: 'terms', href: '#' },
+  { key: 'imprint', href: '/imprint' },
+  { key: 'cookies', href: '#' },
+  { key: 'subProcessors', href: '#' },
 ];
 
 export function SiteFooter() {
+  const { t, i18n } = useTranslation('home');
+  const location = useLocation();
+  const navigate = useNavigate();
+
   // Locale-prefix internal links (/privacy → /de/privacy) so legal pages open
   // in the language the visitor is browsing in.
-  const locale = window.location.pathname.match(/^\/([a-z]{2})(?=\/|$)/)?.[1] || 'en';
+  const locale = i18n.resolvedLanguage || 'en';
   const localize = (href: string) => (href.startsWith('/') ? `/${locale}${href}` : href);
+
+  // Same path-rewrite mechanism as the global LanguageSwitcher: swap (or add)
+  // the /:locale prefix and navigate — LocaleLayout then calls changeLanguage.
+  const switchLanguage = (lng: string) => {
+    const pathParts = location.pathname.split('/');
+    const targetPath = (pathParts.length > 1 && supportedLngs.includes(pathParts[1]))
+      ? '/' + lng + pathParts.slice(2).join('/') + location.search + location.hash
+      : '/' + lng + location.pathname + location.search + location.hash;
+    navigate(targetPath);
+  };
+
   return (
     <footer className="border-t border-stroke-subtle bg-surface">
       <div className="mx-auto w-full max-w-[1440px] px-4 md:px-6 lg:px-6">
@@ -71,31 +89,42 @@ export function SiteFooter() {
           <div className="lg:col-span-4">
             <Logo lockup="horizontal" tone="on-light" href="/" markClassName="h-9" />
             <p className="mt-5 max-w-xs text-[14px] leading-relaxed text-fg-secondary">
-              The orchestration layer between compliance complexity and operational reality.
+              {t('footer.tagline')}
             </p>
             <div className="mt-6 flex items-center gap-2 text-[13px] font-semibold">
-              <button type="button" className="text-fg">EN</button>
-              <span className="text-fg-tertiary">·</span>
-              <button type="button" className="text-fg-tertiary transition-colors hover:text-fg">DE</button>
+              {supportedLngs.map((lng, i) => (
+                <span key={lng} className="flex items-center gap-2">
+                  {i > 0 && <span className="text-fg-tertiary">·</span>}
+                  <button
+                    type="button"
+                    onClick={() => switchLanguage(lng)}
+                    className={lng === locale ? 'text-fg' : 'text-fg-tertiary transition-colors hover:text-fg'}
+                  >
+                    {lng.toUpperCase()}
+                  </button>
+                </span>
+              ))}
             </div>
-            <p className="mt-6 text-[12px] text-fg-tertiary">Not a law firm. We orchestrate verified specialists.</p>
+            <p className="mt-6 text-[12px] text-fg-tertiary">{t('footer.notLawFirm')}</p>
           </div>
 
           <nav className="grid grid-cols-2 gap-8 sm:grid-cols-4 lg:col-span-8">
             {COLUMNS.map((col) => (
-              <div key={col.title}>
-                <h3 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">{col.title}</h3>
+              <div key={col.key}>
+                <h3 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">
+                  {t(`footer.columns.${col.key}.title`)}
+                </h3>
                 <ul className="mt-4 space-y-3">
                   {col.links.map((l) => (
-                    <li key={l.label}>
+                    <li key={l.key}>
                       <a
                         href={l.href}
                         className="inline-flex items-center gap-2 text-[14px] text-fg-secondary transition-colors hover:text-fg"
                       >
-                        {l.label}
+                        {t(`footer.columns.${col.key}.links.${l.key}`)}
                         {l.beta && (
                           <span className="rounded-full bg-accent-50 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.06em] text-accent-700 ring-1 ring-inset ring-accent-200">
-                            Beta
+                            {t('footer.beta')}
                           </span>
                         )}
                       </a>
@@ -110,25 +139,23 @@ export function SiteFooter() {
         {/* Markets + legal disclaimer */}
         <div className="border-t border-stroke-subtle py-10 text-center">
           <p className="mx-auto max-w-2xl text-[14px] text-fg-secondary">
-            Markets we cover today:{' '}
-            <span className="font-semibold text-fg">Germany · United Kingdom · Netherlands · France · Italy · Spain</span>. More
-            countries rolling out through 2026.
+            {t('footer.markets.pre')}
+            <span className="font-semibold text-fg">{t('footer.markets.list')}</span>
+            {t('footer.markets.post')}
           </p>
           <p className="mx-auto mt-5 max-w-3xl text-[12px] leading-relaxed text-fg-tertiary">
-            CompliHub360 is an orchestration platform — not a law firm. Legal, tax, and regulatory advice is delivered by
-            Verified Partners under their own professional liability. We do not provide Rechtsberatung within the meaning
-            of §§ RDG / StBerG.
+            {t('footer.disclaimer')}
           </p>
         </div>
 
         {/* Bottom bar */}
         <div className="flex flex-col gap-4 border-t border-stroke-subtle py-6 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-[13px] text-fg-tertiary">© 2026 CompliHub360.</p>
+          <p className="text-[13px] text-fg-tertiary">{t('footer.copyright')}</p>
           <ul className="flex flex-wrap gap-x-6 gap-y-2">
             {LEGAL.map((l) => (
-              <li key={l.label}>
+              <li key={l.key}>
                 <a href={localize(l.href)} className="text-[13px] text-fg-tertiary transition-colors hover:text-fg">
-                  {l.label}
+                  {t(`footer.legal.${l.key}`)}
                 </a>
               </li>
             ))}

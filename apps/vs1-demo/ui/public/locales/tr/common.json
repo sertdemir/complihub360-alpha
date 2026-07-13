@@ -634,7 +634,9 @@
     "anchorTax": "Vergi ve KDV",
     "anchorEpr": "EPR ve Ambalaj",
     "anchorPrivacy": "Veri ve Gizlilik",
+    "anchorMarketing": "Pazarlama ve SEO",
     "anchorCorporate": "Kurumsal Yapı",
+    "anchorFullsupport": "Full Support",
     "riskLabel": "Risk",
     "whoAffected": "Kimler etkilenir",
     "keyObligations": "Temel Yükümlülükler",
@@ -642,19 +644,197 @@
     "activeMarkets": "Aktif Pazarlar",
     "startAssessment": "{{title}} Değerlendirmesini Başlatın",
     "riskAtGlance": "Riske Kısa Bakış",
+    "country": {
+      "label": "Birincil pazarınız",
+      "hint": "Aktif pazarları filtreler ve risk önceliklerini kişiselleştirir."
+    },
+    "kpi": {
+      "jurisdictions": "Kapsanan Yargı Bölgeleri",
+      "domains": "Uyumluluk Alanları",
+      "time": "Rehberli Değerlendirme",
+      "specialists": "Doğrulanmış Uzman Ağı"
+    },
+    "jtbd": {
+      "overline": "Hedefinizi seçin",
+      "title": "Hangi ilerlemeyi kaydetmek istiyorsunuz?",
+      "body": "CompliHub360 sizi, ihtiyaç duyduğunuzu düşündüğünüz özelliğe göre değil, tamamlamanız gereken işe göre doğru araca yönlendirir.",
+      "expand": {
+        "title": "Güvenle Büyüyün",
+        "body": "Yeni bir pazara girmeden önce yükümlülüklerinizi belirleyin.",
+        "cta": "Rehberli değerlendirmeyi başlatın"
+      },
+      "validate": {
+        "title": "Riski Doğrulayın",
+        "body": "Bir kampanyanın, ürünün veya iddianın mevzuata uygun olup olmadığını kontrol edin.",
+        "cta": "Risk kontrolü yapın"
+      },
+      "specialist": {
+        "title": "Uzman Bulun",
+        "body": "Vakanız için doğrulanmış bir uzmanla eşleşin.",
+        "cta": "Alanlara göz atın"
+      },
+      "research": {
+        "title": "Önce Araştırın",
+        "body": "Kimseyle iletişime geçmeden önce yapılandırılmış rehberleri okuyun.",
+        "cta": "Kütüphaneyi açın"
+      },
+      "maintain": {
+        "title": "Uyumluluğu Sürdürün",
+        "body": "Yükümlülükleri, uyarıları ve yenilemeleri zaman içinde takip edin.",
+        "cta": "Paneli açın"
+      }
+    },
+    "regulations": {
+      "label": "Temel Düzenlemeler"
+    },
+    "fines": {
+      "label": "Neler Risk Altında",
+      "authoritiesLabel": "Uygulayan kurumlar:"
+    },
+    "specialists": {
+      "label": "Doğrulanmış Uzmanlar",
+      "count": "{{count}} doğrulanmış uzman"
+    },
+    "teaser": {
+      "label": "Hızlı başlangıç"
+    },
+    "risk": {
+      "subtitle": "Pazarlar genelindeki tipik önceliğe göre sıralanmıştır.",
+      "priorityBadge": "{{country}} için öncelik",
+      "hint": {
+        "DE": "Almanya'da BfDI yaptırımları ve VerpackG birlikte Gizlilik ile EPR'nin önceliğini yükseltir.",
+        "FR": "Fransa: CNIL, AB'de GDPR'ı en aktif uygulayan otorite olmuştur — Gizlilik ilk sırada yer alır.",
+        "IT": "İtalya: Gizlilikte Garante ve karmaşık KDV rejimi, Vergi ile Gizliliğin paralel olarak ele alınmasını gerektirir.",
+        "ES": "İspanya: AEAT (vergi) ve AEPD (gizlilik) her çeyrek yaptırım bültenleri yayımlar.",
+        "UK": "Birleşik Krallık: ICO (gizlilik) ve HMRC (KDV) — UK GDPR uyumlu kalmakla birlikte yeterlilik konusunda ayrışıyor.",
+        "US": "ABD: FTC pazarlama yönergeleri, eyalet düzeyinde gizlilik (CCPA/CPRA) ve satış vergisi bağı (nexus) öncelikleri değiştirir.",
+        "CH": "İsviçre: revFADP, AB temsilcisi atanmasını zorunlu kılar — Gizlilik ülke dışından bile geçerlidir."
+      }
+    },
+    "matrix": {
+      "title": "Yan yana: tüm alanlar bir bakışta",
+      "body": "Araştırmacılar ve karar vericiler için hızlı karşılaştırma. Önceliklendirmek için riske göre sıralayın.",
+      "area": "Uyumluluk Alanı",
+      "disclaimer": "Kamuya açık düzenleyici kaynaklara dayanan gösterge niteliğinde aralıklar. Nihai risk, özel durumunuza bağlıdır — kesin yönlendirme için değerlendirmeyi asistan üzerinden yapın.",
+      "col": {
+        "risk": "Risk",
+        "time": "Harekete Geçme Süresi",
+        "fine": "Tipik Risk Tutarı",
+        "markets": "Aktif Pazarlar",
+        "effort": "Efor"
+      },
+      "tax": {
+        "risk": "Yüksek",
+        "time": "Eşiği aştıktan sonra 30 gün içinde",
+        "fine": "Kaçırılan verginin %50–300'ü + faiz",
+        "markets": "EU OSS · UK · US Nexus",
+        "effort": "Orta"
+      },
+      "epr": {
+        "risk": "Yüksek",
+        "time": "Pazara girişten önce",
+        "fine": "yıllık cironun %2'sine kadar",
+        "markets": "DE · FR · IT · ES · UK",
+        "effort": "Orta"
+      },
+      "privacy": {
+        "risk": "Kritik",
+        "time": "Derhal",
+        "fine": "20M €'ya / küresel cironun %4'üne kadar",
+        "markets": "EU · UK · CH · US",
+        "effort": "Yüksek"
+      },
+      "marketing": {
+        "risk": "Orta",
+        "time": "Kampanya lansmanından önce",
+        "fine": "5.000–500.000 € + ürün geri çekme",
+        "markets": "EU · UK",
+        "effort": "Düşük–Orta"
+      },
+      "corporate": {
+        "risk": "Orta",
+        "time": "Stratejik (3–12 ay)",
+        "fine": "Vergi riski + tüzel kişilik riski",
+        "markets": "EU · UK · US · CH",
+        "effort": "Yüksek"
+      },
+      "fullsupport": {
+        "risk": "Paket",
+        "time": "Talep üzerine",
+        "fine": "Tüm alanları kapsayan koruma",
+        "markets": "Desteklenen tüm pazarlar",
+        "effort": "Yönetilen"
+      }
+    },
+    "howItWorks": {
+      "overline": "Orkestrasyon, dizin değil",
+      "title": "Belirsizlikten yapılandırılmış eyleme — dört adımda",
+      "body": "CompliHub360 etkileşim hunisini yönetir ve yanıt hesap verebilirliğini güvence altına alır. Kontrol baştan sona sizde kalır.",
+      "stepLabel": "Adım {{num}}",
+      "define": {
+        "title": "Tanımlayın",
+        "body": "Ülkenizi ve uyumluluk alanınızı seçin. Önce düzenleyici bağlamı sabitleriz."
+      },
+      "assess": {
+        "title": "Değerlendirin",
+        "body": "4–5 net soru, durumunuzu yapılandırılmış bir arama profiline dönüştürür."
+      },
+      "match": {
+        "title": "Eşleşin",
+        "body": "Doğrulanmış uzmanlar; ilgililik, yanıt hızı ve kalite puanına göre sıralanır."
+      },
+      "engage": {
+        "title": "Harekete Geçin",
+        "body": "Tek bir yapılandırılmış talep gönderin. Onayları ve SLA'ları panelinizden takip edin."
+      }
+    },
+    "resourceTeaser": {
+      "overline": "Önce araştırmayı mı tercih ediyorsunuz?",
+      "title": "İletişime geçmeden önce okuyun",
+      "body": "Titiz araştırmacılar için yapılandırılmış bilgi. Her rehber resmi, doğrulanmış düzenleyici kaynaklara dayanır.",
+      "openCta": "Aç",
+      "library": {
+        "title": "Uyumluluk Kütüphanesi",
+        "body": "Her alan için derlenmiş düzenlemeler, resmi kaynaklar ve yapılandırılmış rehberler."
+      },
+      "countries": {
+        "title": "Ülke Rehberleri",
+        "body": "Yargı bölgesine özel genel bakışlar — DE, FR, IT, ES, UK, CH, US."
+      },
+      "tutorials": {
+        "title": "Eğitimler ve Uygulamalı Rehberler",
+        "body": "Yaygın uyumluluk senaryoları için adım adım kılavuzlar."
+      }
+    },
     "tax": {
       "title": "Vergi ve KDV",
       "risk": "Yüksek",
       "headline": "Sınır ötesi KDV, teslimat eşikleri ve dijital vergilendirme",
       "description": "OSS ve MTD çerçeveleri dahil olmak üzere uluslararası yargı bölgelerinde sınır ötesi KDV yükümlülüklerinin, teslimat eşiklerinin ve dijital vergilendirme kurallarının yönetimi.",
       "affected": "Pazar yerleri (Amazon) veya bağımsız mağazalar (Shopify) aracılığıyla fiziksel veya dijital ürünler satan sınır ötesi e-ticaret operatörleri.",
+      "personaFit": "En uygun: Sınır ötesi e-ticaret",
       "ob1": "Uluslararası teslimat eşiklerinin izlenmesi",
       "ob2": "Yerel KDV kaydının zorunlu hale geldiği zamanı belirleme",
       "ob3": "Fiziksel ve dijital mallar için farklı vergi kurallarında yol alma",
       "ob4": "OSS kaydı ve raporlama",
       "cov1": "Özel Vergi ve KDV Asistanı — satış modelini, hukuki yeri, geliri ve hedef pazarları yakalar",
       "cov2": "Yargı bölgesi başına hassas vat_likelihood hesaplar",
-      "cov3": "Vaka karmaşıklığına göre uzman KDV danışmanlarıyla eşleştirmeyi düzenler"
+      "cov3": "Vaka karmaşıklığına göre uzman KDV danışmanlarıyla eşleştirmeyi düzenler",
+      "regulations": {
+        "r1": "AB KDV Direktifi 2006/112/AT",
+        "r2": "OSS / IOSS rejimleri",
+        "r3": "UK MTD for VAT"
+      },
+      "fines": {
+        "headline": "Genellikle kaçırılan verginin %50–300'ü artı faiz; sınır ötesi denetimler yaygındır.",
+        "authorities": "BZSt · HMRC · IRS · AEAT · Agenzia Entrate"
+      },
+      "teaser": {
+        "question": "Kaç AB pazarına satış yapıyorsunuz?",
+        "o1": "1 pazar",
+        "o2": "2–4 pazar",
+        "o3": "5+ pazar"
+      }
     },
     "epr": {
       "title": "EPR ve Ambalaj",
@@ -662,13 +842,29 @@
       "headline": "Genişletilmiş Üretici Sorumluluğu, VerpackG ve geri dönüşüm hedefleri",
       "description": "Ülkeye göre büyük ölçüde farklılık gösteren, oldukça parçalı yerel çevre düzenlemeleri, ambalaj yasaları (VerpackG) ve geri dönüşüm hedefleri (PRN).",
       "affected": "Sınırlar ötesinde ambalajlı fiziksel ürünler satan e-ticaret satıcıları, üreticiler, yeniden satıcılar ve dropshipper'lar.",
+      "personaFit": "En uygun: Üreticiler ve satıcılar",
       "ob1": "Ülkeye özgü ambalaj ve çevre yasalarını anlama",
       "ob2": "Ürün kategorisine göre kaydı belirleme (elektronik, giyim, kozmetik)",
       "ob3": "Para cezasından kaçınmak için yerel geri dönüşüm hedeflerine uyma",
       "ob4": "Dropshipper sorumluluk değerlendirmesi",
       "cov1": "Ürün ve Ambalaj Asistanı — ticari rolü, hedef pazarları, ürün kategorilerini değerlendirir",
       "cov2": "Yargı bölgesi başına epr_required_likelihood hesaplar",
-      "cov3": "Akıllı uç durum yönetimi: Belirsiz dropshipper'lar için «Evet Varsay» güvenlik mantığı"
+      "cov3": "Akıllı uç durum yönetimi: Belirsiz dropshipper'lar için «Evet Varsay» güvenlik mantığı",
+      "regulations": {
+        "r1": "PPWR (AB) 2024/1781",
+        "r2": "VerpackG (DE)",
+        "r3": "WEEE 2012/19/AB"
+      },
+      "fines": {
+        "headline": "Yıllık cironun %2'sine kadar ceza; kayıtsız üreticiler için ayrıca pazara giriş engelleri.",
+        "authorities": "ZSVR · ADEME · CONAI · Environment Agency"
+      },
+      "teaser": {
+        "question": "Fiziksel ürünleri sınır ötesine gönderiyor musunuz?",
+        "o1": "Evet, düzenli olarak",
+        "o2": "Bazen",
+        "o3": "Henüz değil — planlıyoruz"
+      }
     },
     "privacy": {
       "title": "Veri ve Gizlilik",
@@ -676,13 +872,59 @@
       "headline": "GDPR, UK GDPR, çerez uyumu ve veri transferleri",
       "description": "AB GDPR, UK GDPR, çerez onay yönetimi ve uluslararası veri transferlerini düzenleyen katı mevzuata uyum.",
       "affected": "Küresel genişleme sürecinde kişisel veri toplayan veya izleme araçları kullanan yazılım kurucuları, SaaS genişleme yöneticileri ve işletmeler.",
+      "personaFit": "En uygun: SaaS ve veri odaklı markalar",
       "ob1": "Geçerli onay yönetimini uygulama",
       "ob2": "Uluslararası veri transferlerini hukuki olarak güvence altına alma (AB ↔ ABD)",
       "ob3": "İzleme aracı uyumluluğunu yönetme (GA4, Meta, TikTok)",
       "ob4": "Çerez banner ve gizlilik politikası gereksinimleri",
       "cov1": "Veri ve Gizlilik Asistanı — hedef müşterileri, işleme konumlarını, izleme yığınını analiz eder",
       "cov2": "Gerçek araç maruziyetine dayalı privacy_risk_level hesaplar",
-      "cov3": "Platform yerel bir PII Düzeltme Hattı kullanır — YZ katmanında ham veri yok"
+      "cov3": "Platform yerel bir PII Düzeltme Hattı kullanır — YZ katmanında ham veri yok",
+      "regulations": {
+        "r1": "GDPR (AB 2016/679)",
+        "r2": "ePrivacy Direktifi 2002/58/AT",
+        "r3": "UK GDPR · revFADP (CH) · CCPA/CPRA (US)"
+      },
+      "fines": {
+        "headline": "20M €'ya veya küresel yıllık cironun %4'üne kadar (GDPR md. 83) — hangisi daha yüksekse.",
+        "authorities": "BfDI · CNIL · ICO · Garante · AEPD · EDÖB"
+      },
+      "teaser": {
+        "question": "AB'de ikamet edenlerin kişisel verilerini işliyor musunuz?",
+        "o1": "Evet",
+        "o2": "Emin değilim",
+        "o3": "Hayır"
+      }
+    },
+    "marketing": {
+      "title": "Pazarlama ve SEO",
+      "risk": "Orta",
+      "headline": "Reklam İddiaları, Sağlık ve Sürdürülebilirlik, Tüketicinin Korunması",
+      "description": "Sınır ötesi reklam uyumluluğu: tıbbi ve sağlık iddiaları, karşılaştırmalı reklamlar, sürdürülebilirlik beyanları, influencer kuralları ve DSA kapsamındaki dijital hizmet yükümlülükleri.",
+      "affected": "Ajanslar, e-ticaret markaları, takviye ve sağlık ürünü satıcıları, finansal hizmet pazarlamacıları ve sınır ötesinde ücretli reklam veya organik SEO yürüten tüm işletmeler.",
+      "personaFit": "En uygun: Ajanslar ve DTC markaları",
+      "ob1": "Yanıltıcı veya dayanaksız iddialardan kaçınmak",
+      "ob2": "Sağlık, finans ve sürdürülebilirlik iddiaları için onaylar",
+      "ob3": "Influencer pazarlaması ve sponsorlu içerik bildirimi",
+      "ob4": "DSA / DMA bildirim ve eylem yükümlülükleri",
+      "cov1": "Pazarlama ve SEO Asistanı — sektör hassasiyetini, iddia türlerini ve kanalları kaydeder",
+      "cov2": "marketing_risk_level değerini hesaplar ve yüksek riskli iddia kalıplarını işaretler",
+      "cov3": "Sizi reklam hukuku ve tüketicinin korunması alanındaki uzmanlara yönlendirir",
+      "regulations": {
+        "r1": "UCPD 2005/29/AT (Haksız Ticari Uygulamalar)",
+        "r2": "DSA (AB) 2022/2065",
+        "r3": "Green Claims Direktifi taslağı · ASA UK · UWG (DE)"
+      },
+      "fines": {
+        "headline": "İhlal başına 5.000–500.000 €, ayrıca ürün veya kampanya geri çekme kararları.",
+        "authorities": "Wettbewerbszentrale · DGCCRF · ASA · AGCM · FTC"
+      },
+      "teaser": {
+        "question": "Reklamlarınızda sağlık veya finans iddialarında bulunuyor musunuz?",
+        "o1": "Evet",
+        "o2": "Yalnızca karşılaştırmalı iddialar",
+        "o3": "Hayır"
+      }
     },
     "corporate": {
       "title": "Kurumsal Yapı",
@@ -690,18 +932,65 @@
       "headline": "Uluslararası şirket kuruluşu, hukuki form ve yerel alt yapı",
       "description": "Uluslararası şirket kuruluşunda yol alma, doğru hukuki formu seçme, yerel alt yapı oluşturma ve yeni yargı bölgelerinde kurumsal kayıtları yönetme.",
       "affected": "Yabancı pazarlarda hukuki kuruluşlar kaydetmeyi, ekipleri genişletmeyi veya kurumsal varlık oluşturmayı planlayan bireyler veya şirketler.",
+      "personaFit": "En uygun: Uluslararası büyüme ekipleri",
       "ob1": "Hedef ülke başına uygun kurumsal yapıyı seçme",
       "ob2": "Yerel kayıt ve dokümantasyon gereksinimlerini yerine getirme",
       "ob3": "Yerel alt yapı ve yönetişim oluşturma",
       "ob4": "Ekip karmaşıklığı değerlendirmesi",
       "cov1": "Kurumsal ve Yapı Asistanı — mevcut durumu, istenen pazarları, ekip karmaşıklığını değerlendirir",
       "cov2": "Yargı bölgesi başına entity_need_level belirler",
-      "cov3": "Belirsiz kurucular için eğitim rehberi yollarına akıllı yönlendirme"
+      "cov3": "Belirsiz kurucular için eğitim rehberi yollarına akıllı yönlendirme",
+      "regulations": {
+        "r1": "GwG (DE) · 6. AML Direktifi (AB) 2018/1673",
+        "r2": "HGB · Companies Act 2006 (UK)",
+        "r3": "Gerçek lehdar şeffaflığı (AB 2015/849)"
+      },
+      "fines": {
+        "headline": "Yapı veya yerel varlık eksikse kişisel sorumluluk + geriye dönük vergi riski.",
+        "authorities": "Yerel ticaret sicilleri · Vergi otoriteleri · AML denetçileri"
+      },
+      "teaser": {
+        "question": "Yurt dışında bir şirket kurmayı planlıyor musunuz?",
+        "o1": "Evet, bu yıl",
+        "o2": "Seçenekleri değerlendiriyoruz",
+        "o3": "Hayır"
+      }
+    },
+    "fullsupport": {
+      "title": "Full Support",
+      "risk": "Paket",
+      "headline": "Alanlar Arası Uyumluluk — Tek Koordineli Süreç",
+      "description": "Yükümlülükler birden fazla kategoriye yayıldığında (Vergi + Gizlilik + EPR + Pazarlama), Full Support hepsini kıdemli bir partner eşliğinde tek bir yapılandırılmış süreçte yönetir.",
+      "affected": "Çok kategorili riske sahip işletmeler: düzenlemeye tabi sektörler, sınır ötesi SaaS, pazar yerleri, çok ürünlü markalar veya 3+ pazara açılan scale-up şirketler.",
+      "personaFit": "En uygun: Alanlar arası uyumluluk",
+      "ob1": "Birden fazla düzenleyici süreci paralel olarak koordine etmek",
+      "ob2": "Kategoriler genelinde denetim kayıtlarını sürdürmek",
+      "ob3": "Uyumluluk yol haritasını büyüme planlarıyla hizalamak",
+      "ob4": "SLA güvenceli yanıt ve eskalasyon",
+      "cov1": "Full Support Asistanı — işletme büyüklüğünü, pazarları, öncelikli hedefi ve mevcut olgunluğu kaydeder",
+      "cov2": "Sizi alanlar arası kapasiteye ve SLA taahhütlerine sahip kıdemli partnerlere yönlendirir",
+      "cov3": "Tek temas noktalı süreç; birden fazla bağımsız talep değil",
+      "regulations": {
+        "r1": "Listelenen tüm alan düzenlemelerini kapsar",
+        "r2": "Sürekli mevzuat takibi",
+        "r3": "Koordineli yanıt çerçevesi"
+      },
+      "fines": {
+        "headline": "Tüm alanlarda toplam risk — Full Support kör noktaları ve gözden kaçan yükümlülükleri azaltır.",
+        "authorities": "Faaliyetinizle ilgili tüm otoriteler"
+      },
+      "teaser": {
+        "question": "Kaç uyumluluk alanı sizi etkiliyor?",
+        "o1": "2",
+        "o2": "3",
+        "o3": "4 veya daha fazla"
+      }
     },
     "cta": {
       "title": "Hangi alanın geçerli olduğundan emin değil misiniz?",
       "body": "Asistanımız doğru soruları sorar ve sizi otomatik olarak doğru değerlendirmeye yönlendirir.",
-      "btn": "Genel Değerlendirme Başlatın"
+      "btn": "Genel Değerlendirme Başlatın",
+      "fullSupportBtn": "Veya Full Support ile görüşün"
     },
     "footer": {
       "copyright": "© {{year}} CompliHub360. Berlin'de yapıldı."

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ArrowRight, Check } from 'lucide-react';
 import { FreeAccountDrawer } from './MarketsDrawer';
 
@@ -8,6 +9,7 @@ import { FreeAccountDrawer } from './MarketsDrawer';
 // mechanism as the wizard's "Save progress").
 
 export function NewsletterBand() {
+  const { t } = useTranslation('home');
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
@@ -21,21 +23,20 @@ export function NewsletterBand() {
           <div className="max-w-lg">
             <span className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-fg-brand">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-current opacity-70" />
-              Stay current
+              {t('newsletter.eyebrow')}
             </span>
             <h2 className="mt-2 font-serif text-[1.6rem] font-bold leading-tight tracking-tight text-fg">
-              When a regulation moves, you&rsquo;ll know.
+              {t('newsletter.title')}
             </h2>
             <p className="mt-2 text-[14px] leading-relaxed text-fg-secondary">
-              One brief per month. New thresholds, deadlines, and authoritative source links — for the markets you
-              operate in. No promotional content.
+              {t('newsletter.desc')}
             </p>
           </div>
 
           {/* Right — email + Subscribe */}
           {subscribed ? (
             <div className="flex shrink-0 items-center gap-2 rounded-xl border border-stroke-subtle bg-surface-secondary px-4 py-3 text-[14px] font-semibold text-fg-brand lg:w-[380px]">
-              <Check size={16} strokeWidth={2.5} /> You&rsquo;re on the list — check your inbox.
+              <Check size={16} strokeWidth={2.5} /> {t('newsletter.success')}
             </div>
           ) : (
             <form
@@ -49,15 +50,15 @@ export function NewsletterBand() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@yourcompany.com"
-                aria-label="Email address"
+                placeholder={t('newsletter.placeholder')}
+                aria-label={t('newsletter.emailAria')}
                 className="min-w-0 flex-1 rounded-xl border border-stroke px-4 py-3 text-[15px] text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-brand"
               />
               <button
                 type="submit"
                 className="shrink-0 rounded-xl bg-brand px-5 py-3 text-[15px] font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5"
               >
-                Subscribe
+                {t('newsletter.subscribe')}
               </button>
             </form>
           )}
@@ -66,14 +67,14 @@ export function NewsletterBand() {
         {/* Below — privacy line + free-account link */}
         <div className="mt-3 flex flex-col items-start gap-2 px-1 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-[12px] text-fg-tertiary">
-            We use your email only for the brief. Unsubscribe in one click. See our privacy policy.
+            {t('newsletter.privacy')}
           </p>
           <button
             type="button"
             onClick={() => setAccountOpen(true)}
             className="inline-flex items-center gap-1 text-[13px] font-semibold text-fg-brand transition-colors hover:text-brand"
           >
-            Or unlock real-time alerts with a free account <ArrowRight size={14} />
+            {t('newsletter.accountLink')} <ArrowRight size={14} />
           </button>
         </div>
       </div>

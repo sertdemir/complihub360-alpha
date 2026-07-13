@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
+import { Trans, useTranslation } from 'react-i18next';
 import { Button } from '../ui/Button';
 import { Tag } from '../ui/Tag';
 import { createEngagement } from '../../api/engagement';
@@ -29,10 +30,20 @@ interface RequestQuoteModalProps {
 
 type Phase = 'form' | 'sending' | 'done' | 'error';
 
+// Canonical English domain label → userws translation key (display only —
+// the POST payload keeps the canonical domainLabel).
+const DOMAIN_KEY: Record<string, string> = {
+  'Tax & VAT': 'taxVat', 'Product & Packaging': 'productPackaging', 'Data & Privacy': 'dataPrivacy',
+  'Marketing & SEO': 'marketingSeo', 'Corporate & Structure': 'corporateStructure', 'Full Support': 'fullSupport',
+};
+
 export function RequestQuoteModal({ provider, country, category, domainLabel, requesterEmail, onClose }: RequestQuoteModalProps) {
+  const { t } = useTranslation('userws');
   const [message, setMessage] = useState('');
   const [phase, setPhase] = useState<Phase>('form');
   const [errText, setErrText] = useState('');
+
+  const domainDisplay = DOMAIN_KEY[domainLabel] ? t(`domain.${DOMAIN_KEY[domainLabel]}`) : domainLabel;
 
   const submit = async () => {
     setPhase('sending');
@@ -56,7 +67,7 @@ export function RequestQuoteModal({ provider, country, category, domainLabel, re
       setPhase('done');
       setTimeout(onClose, 2200);
     } catch (e) {
-      setErrText(e instanceof Error ? e.message : 'Request failed');
+      setErrText(e instanceof Error ? e.message : t('requestQuote.requestFailed'));
       setPhase('error');
     }
   };
@@ -72,23 +83,22 @@ export function RequestQuoteModal({ provider, country, category, domainLabel, re
         <div className="flex items-start justify-between border-b border-white/10 px-6 py-5">
           <div>
             <h2 className="font-serif text-[20px] font-semibold text-fg">
-              Request <span className="text-fg-accent">quote</span>
+              <Trans t={t} i18nKey="requestQuote.title" components={{ accent: <span className="text-fg-accent" /> }} />
             </h2>
             <p className="mt-0.5 text-[12px] text-fg-tertiary">
-              {provider.name}{provider.meta ? ` · ${provider.meta}` : ''} — {domainLabel} · {country} {category}
+              {provider.name}{provider.meta ? ` · ${provider.meta}` : ''} — {domainDisplay} · {country} {category}
             </p>
           </div>
-          <button type="button" aria-label="Close" onClick={onClose} className="text-fg-tertiary transition-colors hover:text-fg">
+          <button type="button" aria-label={t('requestQuote.close')} onClick={onClose} className="text-fg-tertiary transition-colors hover:text-fg">
             <X size={18} />
           </button>
         </div>
 
         {phase === 'done' ? (
           <div className="px-6 py-10 text-center">
-            <p className="text-[15px] font-semibold text-fg">Request sent ✓</p>
+            <p className="text-[15px] font-semibold text-fg">{t('requestQuote.sentTitle')}</p>
             <p className="mx-auto mt-2 max-w-sm text-[13px] text-fg-secondary">
-              {provider.name} has been notified and has 24h to confirm. You will find the request under
-              <span className="font-medium text-fg"> Requests</span>.
+              <Trans t={t} i18nKey="requestQuote.sentBody" values={{ name: provider.name }} components={{ em: <span className="font-medium text-fg" /> }} />
             </p>
           </div>
         ) : (
@@ -96,36 +106,34 @@ export function RequestQuoteModal({ provider, country, category, domainLabel, re
             <div className="space-y-4 px-6 py-5">
               <div className="flex items-center gap-2">
                 <Tag tone="brand">✓ VERIFIED PARTNER</Tag>
-                <Tag tone="neutral">24h confirm SLA</Tag>
+                <Tag tone="neutral">{t('requestQuote.slaTag')}</Tag>
               </div>
               <div>
                 <label htmlFor="quote-msg" className="mb-1.5 block text-[12px] font-medium text-fg-secondary">
-                  Your message to the provider
+                  {t('requestQuote.messageLabel')}
                 </label>
                 <textarea
                   id="quote-msg"
                   rows={4}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Briefly describe your situation — markets, revenue band, timeline …"
+                  placeholder={t('requestQuote.messagePlaceholder')}
                   className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-[13px] text-fg placeholder:text-fg-tertiary focus:border-fg-brand focus:outline-none"
                 />
               </div>
               <p className="text-[11px] leading-relaxed text-fg-tertiary">
-                Your situational context is shared <span className="font-medium text-fg-secondary">anonymized</span> — names and
-                contact details in your message are masked. Your identity is revealed only after the provider confirms
-                (Art. 6(1)(b) GDPR — contract initiation). Uploaded documents are never shared automatically.
+                <Trans t={t} i18nKey="requestQuote.privacyNote" components={{ em: <span className="font-medium text-fg-secondary" /> }} />
               </p>
               {phase === 'error' && (
                 <p className="rounded-lg border border-error-500/30 bg-error-500/10 px-3 py-2 text-[12px] text-error-500">
-                  Sending failed: {errText} — please try again.
+                  {t('requestQuote.sendError', { error: errText })}
                 </p>
               )}
             </div>
             <div className="flex items-center justify-end gap-2 border-t border-white/10 px-6 py-4">
-              <Button variant="ghost" size="sm" onClick={onClose}>Cancel</Button>
+              <Button variant="ghost" size="sm" onClick={onClose}>{t('shared.cancel')}</Button>
               <Button variant="accent" size="sm" onClick={submit} disabled={phase === 'sending' || message.trim().length < 10}>
-                {phase === 'sending' ? 'Sending…' : 'Send request'}
+                {phase === 'sending' ? t('requestQuote.sending') : t('requestQuote.sendRequest')}
               </Button>
             </div>
           </>

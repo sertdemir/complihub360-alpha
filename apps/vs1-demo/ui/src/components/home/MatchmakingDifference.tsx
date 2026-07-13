@@ -1,5 +1,6 @@
 import { motion, useInView, useReducedMotion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Star } from 'lucide-react';
 import { Container } from '../ui/Container';
 import { Avatar } from '../ui/Avatar';
@@ -12,44 +13,21 @@ import { SectionEyebrow, GoldWord } from '../providers/SectionHeading';
 // Three overlapping verified-partner match cards + the 4-step "How it works"
 // timeline (steps 3 petrol · 4 gold). Soft gray band with a subtle dot field.
 
+// Person names, initials, match % and ratings stay in code (fixture identity);
+// place / specialty / tags / covers / response / engagements come from
+// matchmaking.matches.<index>.* in the 'home' namespace.
 const MATCHES = [
-  {
-    initials: 'ML',
-    name: 'M. Lang',
-    place: 'Munich, DE',
-    specialty: 'VAT & OSS Specialist',
-    tags: ['UStG §18i (OSS)', 'DE · NL · FR'],
-    match: '94% match',
-    covers: 'covers your 2 Critical priorities',
-    meta: ['24h response', '4.8', '142 prior engagements'],
-  },
-  {
-    initials: 'SW',
-    name: 'S. Whitcomb',
-    place: 'London, UK',
-    specialty: 'UK Packaging Compliance',
-    tags: ['UK Packaging Regs.', 'PackUK · EPR renewal'],
-    match: '88% match',
-    covers: 'covers your 1 High priority',
-    meta: ['21h response', '4.9', '86 prior engagements'],
-  },
-  {
-    initials: 'AD',
-    name: 'A. Dubois',
-    place: 'Paris, FR',
-    specialty: 'Cross-Border EPR Counsel',
-    tags: ['VerpackG', 'LUCID · cross-border'],
-    match: '81% match',
-    covers: 'covers your 1 Medium priority',
-    meta: ['36h response', '4.7', '211 prior engagements'],
-  },
+  { index: 0, initials: 'ML', name: 'M. Lang', pct: 94, rating: '4.8' },
+  { index: 1, initials: 'SW', name: 'S. Whitcomb', pct: 88, rating: '4.9' },
+  { index: 2, initials: 'AD', name: 'A. Dubois', pct: 81, rating: '4.7' },
 ] as const;
 
+// Titles + descriptions come from matchmaking.steps.<index>.* in 'home'.
 const STEPS = [
-  { n: 1, title: 'Start your assessment', desc: '4–5 questions. Under 2 minutes. No account needed.', tone: 'idle' },
-  { n: 2, title: 'See your risk map', desc: 'Anonymous preview, structured, source-cited.', tone: 'idle' },
-  { n: 3, title: 'Sign up to see matches', desc: 'Provider matching is reserved for registered accounts.', tone: 'brand' },
-  { n: 4, title: 'Get structured handovers', desc: 'Provider responds via Magic-Link in 24–48h. No discovery call.', tone: 'gold' },
+  { n: 1, tone: 'idle' },
+  { n: 2, tone: 'idle' },
+  { n: 3, tone: 'brand' },
+  { n: 4, tone: 'gold' },
 ] as const;
 
 // Fixed dot constellation (deterministic) — subtle depth on the band edges.
@@ -69,6 +47,8 @@ function DotField({ className = '' }: { className?: string }) {
 }
 
 function MatchCard({ m, className = '' }: { m: (typeof MATCHES)[number]; className?: string }) {
+  const { t } = useTranslation('home');
+  const base = `matchmaking.matches.${m.index}`;
   return (
     <div className={`w-full rounded-2xl border border-stroke-subtle bg-surface px-5 py-4 shadow-[0_30px_70px_-30px_rgba(2,22,17,0.3)] ${className}`}>
       <div className="flex items-start justify-between gap-3">
@@ -76,27 +56,28 @@ function MatchCard({ m, className = '' }: { m: (typeof MATCHES)[number]; classNa
           <Avatar size="md" initials={m.initials} tone="soft" />
           <div>
             <p className="text-[15px] font-semibold leading-tight text-fg">{m.name}</p>
-            <p className="text-[12px] text-fg-secondary">{m.place}</p>
+            <p className="text-[12px] text-fg-secondary">{t(`${base}.place`)}</p>
           </div>
         </div>
-        <PartnerStatusBadge status="verified" styleVariant="solid" label="Verified" />
+        <PartnerStatusBadge status="verified" styleVariant="solid" label={t('badge.verified')} />
       </div>
-      <p className="mt-3 border-b border-stroke-subtle pb-2.5 text-[13px] text-fg-secondary">{m.specialty}</p>
+      <p className="mt-3 border-b border-stroke-subtle pb-2.5 text-[13px] text-fg-secondary">{t(`${base}.specialty`)}</p>
       <div className="mt-2.5 flex flex-wrap gap-1.5">
-        {m.tags.map((t) => (
-          <Tag key={t} tone="neutral">{t}</Tag>
+        {[0, 1].map((i) => (
+          <Tag key={i} tone="neutral">{t(`${base}.tags.${i}`)}</Tag>
         ))}
       </div>
-      <p className="mt-3 text-[16px] font-bold text-fg-brand">{m.match}</p>
-      <p className="text-[12px] text-fg-secondary">{m.covers}</p>
+      <p className="mt-3 text-[16px] font-bold text-fg-brand">{t('risk.match', { pct: m.pct })}</p>
+      <p className="text-[12px] text-fg-secondary">{t(`${base}.covers`)}</p>
       <p className="mt-3 flex items-center gap-1.5 border-t border-stroke-subtle pt-2.5 text-[11px] text-fg-tertiary">
-        {m.meta[0]} · {m.meta[1]} <Star size={10} className="-ml-0.5 fill-accent-500 text-accent-500" /> · {m.meta[2]}
+        {t(`${base}.response`)} · {m.rating} <Star size={10} className="-ml-0.5 fill-accent-500 text-accent-500" /> · {t(`${base}.engagements`)}
       </p>
     </div>
   );
 }
 
 export function MatchmakingDifference() {
+  const { t } = useTranslation('home');
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
   const stepsRef = useRef<HTMLDivElement>(null);
@@ -125,15 +106,13 @@ export function MatchmakingDifference() {
       <Container size="2xl" className="relative">
         {/* Heading */}
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
-          <SectionEyebrow tone="brand">The difference</SectionEyebrow>
+          <SectionEyebrow tone="brand">{t('matchmaking.eyebrow')}</SectionEyebrow>
           <h2 className="font-serif text-[2rem] font-semibold leading-tight tracking-tight text-fg sm:text-[2.5rem]">
-            Other tools tell you what&rsquo;s wrong.
-            <br className="hidden sm:block" /> We <GoldWord>connect</GoldWord> you with who fixes it. Save time and money.
+            {t('matchmaking.title.line1')}
+            <br className="hidden sm:block" /> {t('matchmaking.title.pre')}<GoldWord>{t('matchmaking.title.gold')}</GoldWord>{t('matchmaking.title.post')}
           </h2>
           <p className="max-w-2xl text-body leading-relaxed text-fg-secondary">
-            Risk maps are public — every compliance dashboard offers one. What makes CompliHub360 different is what
-            comes after: verified providers across countries and domains, pre-vetted, response-tracked, with
-            structured handovers. You don&rsquo;t search. We match.
+            {t('matchmaking.subtitle')}
           </p>
         </div>
 
@@ -164,7 +143,7 @@ export function MatchmakingDifference() {
         {/* How it works timeline */}
         <div className="mt-20 lg:mt-24">
           <p className="mx-auto text-center text-[13px] font-semibold uppercase tracking-[0.14em] text-fg-secondary">
-            How it works <span className="mx-1 text-fg-tertiary">·</span> From assessment to matched specialist
+            {t('matchmaking.howItWorks.label')} <span className="mx-1 text-fg-tertiary">·</span> {t('matchmaking.howItWorks.sub')}
           </p>
           <div ref={stepsRef} className="relative mx-auto mt-10 grid max-w-5xl grid-cols-2 gap-x-5 gap-y-10 lg:grid-cols-4 lg:gap-6">
             {/* connector line (desktop) */}
@@ -189,8 +168,8 @@ export function MatchmakingDifference() {
                 >
                   {s.n}
                 </span>
-                <p className="mt-4 text-[15px] font-bold text-fg">{s.title}</p>
-                <p className="mt-2 max-w-[240px] text-[13px] leading-relaxed text-fg-secondary">{s.desc}</p>
+                <p className="mt-4 text-[15px] font-bold text-fg">{t(`matchmaking.steps.${i}.title`)}</p>
+                <p className="mt-2 max-w-[240px] text-[13px] leading-relaxed text-fg-secondary">{t(`matchmaking.steps.${i}.desc`)}</p>
               </motion.div>
             ))}
           </div>

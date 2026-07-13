@@ -1,5 +1,6 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Check, ArrowRight } from 'lucide-react';
 import { Container } from '../ui/Container';
 import { Typography } from '../ui/Typography';
@@ -10,21 +11,18 @@ import { Reveal } from './SectionHeading';
 // ─── S6 — Register as (Provider) · Figma 1801:837 ─────────────────────────────
 // GOLD apply/beta-cohort CTA band. Highlighted headline word is WHITE here
 // (gold-on-gold would vanish). Practice-profile picker + lightweight intake form.
+// Copy lives in the 'providersLp' namespace; selection state stores stable keys.
 
-const PROFILES = [
-  { key: 'solo', title: 'Solo Specialist', desc: 'Independent practice · single-domain depth' },
-  { key: 'boutique', title: 'Boutique Firm', desc: '3–10 specialists · multi-domain' },
-  { key: 'network', title: 'Mid-sized / Network', desc: '10+ specialists · multi-country' },
-] as const;
-
-const AREAS = ['VAT & Tax', 'EPR & Packaging', 'GDPR & Privacy', 'Marketing Compliance', 'Corporate & Filings'] as const;
+const PROFILE_KEYS = ['solo', 'boutique', 'network'] as const;
+const AREA_KEYS = ['vatTax', 'eprPackaging', 'gdprPrivacy', 'marketing', 'corporate'] as const;
 const COUNTRIES = ['DE', 'UK', 'NL', 'FR', 'IT', 'ES', 'US', 'TR'] as const;
 
 export function RegisterSection() {
+  const { t } = useTranslation('providersLp');
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
   const [profile, setProfile] = useState('boutique');
-  const [areas, setAreas] = useState<string[]>(['VAT & Tax', 'EPR & Packaging']);
+  const [areas, setAreas] = useState<string[]>(['vatTax', 'eprPackaging']);
   const [countries, setCountries] = useState<string[]>(['DE', 'UK', 'NL']);
 
   const toggle = (list: string[], set: (v: string[]) => void, v: string) =>
@@ -36,15 +34,13 @@ export function RegisterSection() {
         {/* Heading */}
         <Reveal className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
           <span className="text-caption font-sans font-semibold uppercase tracking-[0.14em] text-primary-900/80">
-            Apply · beta cohort closing at 100 partners
+            {t('register.eyebrow')}
           </span>
           <Typography variant="h2" weight="semibold" className="!text-[2rem] leading-tight tracking-tight text-primary-900 sm:!text-[2.5rem]">
-            Apply as the kind of <span className="text-white">partner</span> you are.
+            {t('register.title.pre')} <span className="text-white">{t('register.title.gold')}</span>
+            {t('register.title.post')}
           </Typography>
-          <p className="max-w-2xl text-base leading-relaxed text-primary-900/80">
-            Pick a practice profile. Add your email. We onboard founding partners in person — a 15-minute call to
-            align on coverage and SLA. No upfront commitment until you accept your first request.
-          </p>
+          <p className="max-w-2xl text-base leading-relaxed text-primary-900/80">{t('register.lead')}</p>
         </Reveal>
 
         {/* Picker + form */}
@@ -57,20 +53,20 @@ export function RegisterSection() {
         >
           {/* Practice profiles */}
           <div className="flex flex-col gap-4">
-            {PROFILES.map((p) => {
-              const active = p.key === profile;
+            {PROFILE_KEYS.map((key) => {
+              const active = key === profile;
               return (
                 <button
-                  key={p.key}
+                  key={key}
                   type="button"
-                  onClick={() => setProfile(p.key)}
+                  onClick={() => setProfile(key)}
                   className={`flex items-center justify-between rounded-xl bg-white p-4 text-left shadow-sm transition-all ${
                     active ? 'ring-2 ring-primary-600' : 'ring-1 ring-transparent hover:ring-neutral-200'
                   }`}
                 >
                   <span>
-                    <span className="block text-[16px] font-semibold text-neutral-900">{p.title}</span>
-                    <span className="block text-[13px] text-neutral-500">{p.desc}</span>
+                    <span className="block text-[16px] font-semibold text-neutral-900">{t(`register.profiles.${key}.title`)}</span>
+                    <span className="block text-[13px] text-neutral-500">{t(`register.profiles.${key}.desc`)}</span>
                   </span>
                   {active && <Check size={20} className="shrink-0 text-primary-600" strokeWidth={2.5} />}
                 </button>
@@ -80,15 +76,15 @@ export function RegisterSection() {
 
           {/* Intake form */}
           <div className="rounded-2xl bg-white p-6 shadow-sm sm:p-8">
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-neutral-400">Work email</p>
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-neutral-400">{t('register.form.emailLabel')}</p>
             <div className="mt-2">
-              <Input type="email" placeholder="you@yourfirm.com" />
+              <Input type="email" placeholder={t('register.form.emailPlaceholder')} />
             </div>
-            <p className="mt-2 text-[12px] text-neutral-400">We'll send a magic-link to verify your identity.</p>
+            <p className="mt-2 text-[12px] text-neutral-400">{t('register.form.emailHint')}</p>
 
-            <p className="mt-6 text-[10px] font-semibold uppercase tracking-wide text-neutral-400">Practice areas · multi-select</p>
+            <p className="mt-6 text-[10px] font-semibold uppercase tracking-wide text-neutral-400">{t('register.form.areasLabel')}</p>
             <div className="mt-2 flex flex-wrap gap-2">
-              {AREAS.map((a) => {
+              {AREA_KEYS.map((a) => {
                 const on = areas.includes(a);
                 return (
                   <button
@@ -99,13 +95,13 @@ export function RegisterSection() {
                       on ? 'border-primary-500 bg-primary-50 text-primary-700' : 'border-neutral-200 text-neutral-600 hover:border-neutral-300'
                     }`}
                   >
-                    {a}
+                    {t(`register.form.areas.${a}`)}
                   </button>
                 );
               })}
             </div>
 
-            <p className="mt-6 text-[10px] font-semibold uppercase tracking-wide text-neutral-400">Countries you cover · multi-select</p>
+            <p className="mt-6 text-[10px] font-semibold uppercase tracking-wide text-neutral-400">{t('register.form.countriesLabel')}</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {COUNTRIES.map((c) => {
                 const on = countries.includes(c);
@@ -122,7 +118,7 @@ export function RegisterSection() {
                   </button>
                 );
               })}
-              <span className="rounded-full border border-dashed border-neutral-300 px-3 py-1.5 text-[13px] font-medium text-neutral-400">+ Add</span>
+              <span className="rounded-full border border-dashed border-neutral-300 px-3 py-1.5 text-[13px] font-medium text-neutral-400">{t('register.form.addChip')}</span>
             </div>
           </div>
         </motion.div>
@@ -130,12 +126,10 @@ export function RegisterSection() {
         {/* CTA + footnotes */}
         <Reveal className="mt-10 flex flex-col items-center gap-4 text-center">
           <Button size="lg" className="px-8">
-            Apply for Beta cohort <ArrowRight size={18} className="ml-2" />
+            {t('register.cta')} <ArrowRight size={18} className="ml-2" />
           </Button>
-          <p className="text-[13px] text-primary-900/70">No credit card · 15-min onboarding call · We respond within 1 business day</p>
-          <p className="text-[13px] font-semibold uppercase tracking-wide text-primary-900">
-            23 of 100 · Founding spots claimed · Review-cycle is rolling
-          </p>
+          <p className="text-[13px] text-primary-900/70">{t('register.footnote')}</p>
+          <p className="text-[13px] font-semibold uppercase tracking-wide text-primary-900">{t('register.spots')}</p>
         </Reveal>
       </Container>
     </section>

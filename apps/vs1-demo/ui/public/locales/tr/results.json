@@ -1,0 +1,114 @@
+{
+  "topbar": {
+    "guestBadge": "Misafir haritası · 30 dk içinde sona erer",
+    "exportPdf": "PDF olarak dışa aktar",
+    "saveMap": "Bu haritayı kaydedin"
+  },
+  "header": {
+    "eyebrow": "Risk Map'iniz",
+    "title": "Sizin için geçerli olanlar.",
+    "subtitleProfile": "Değerlendirmenize dayanmaktadır. Kapsamda {{total}} alan bulunuyor.",
+    "subtitleDefault": "Almanya · Birleşik Krallık · Hollanda temel alınmıştır. D2C e-ticaret, €2M—€5M ciro. Kapsamda VAT · EPR · Gizlilik."
+  },
+  "stats": {
+    "0": { "label": "tespit edilen yükümlülük" },
+    "1": { "label": "toplam risk tutarı" },
+    "2": { "label": "medyan son tarih" },
+    "3": { "label": "hazır Verified Partner" }
+  },
+  "table": {
+    "severity": "Önem",
+    "obligation": "Yükümlülük",
+    "market": "Pazar",
+    "due": "Son Tarih",
+    "state": "Durum"
+  },
+  "severity": {
+    "critical": "Kritik",
+    "high": "Yüksek",
+    "medium": "Orta",
+    "low": "Düşük"
+  },
+  "state": {
+    "confirmed": "Onaylandı",
+    "likely": "Muhtemel",
+    "answer": "{{total}} soruyu yanıtlayın"
+  },
+  "obligations": {
+    "0": {
+      "title": "OSS üç aylık beyanı",
+      "detail": "Son beyan: Q1 2025 · Ceza: €5.000 + aylık %1 · UStG §18i (OSS)",
+      "market": "DE · NL",
+      "due": "30 Nis",
+      "dueSub": "6 gün"
+    },
+    "1": {
+      "title": "KDV kaydı — UK",
+      "detail": "Brexit sonrası eşik kontrolü gerekli · Ceza: £20.000'e kadar · UK VATA 1994 §3",
+      "market": "UK",
+      "due": "15 May",
+      "dueSub": "21 gün"
+    },
+    "2": {
+      "title": "EPR ambalaj kaydı (LUCID)",
+      "detail": "Üretici statüsü teyit edilmeli · Ceza: €50.000'e kadar · VerpackG Art. 9 Abs. 1",
+      "market": "DE",
+      "due": "02 May",
+      "dueSub": "8 gün"
+    },
+    "3": {
+      "title": "EPR kayıt yenileme (PackUK)",
+      "detail": "Son beyan: Nis 2024 · Ceza: UK cirosunun %4'ü · UK Packaging Regs. 2023 §7",
+      "market": "UK",
+      "due": "15 May",
+      "dueSub": "21 gün"
+    },
+    "4": {
+      "title": "Çerez bildirimi + onay kayıtları",
+      "detail": "AB'deki B2C kullanıcılar → zorunlu · GDPR Md. 6/7 · TTDSG §25",
+      "market": "AB genelinde",
+      "due": "Sürekli",
+      "dueSub": "Aktif"
+    },
+    "5": {
+      "title": "İzleme pikselleri için DPIA",
+      "detail": "İzleme altyapısına bağlı · GDPR Md. 35",
+      "market": "AB genelinde",
+      "due": "—",
+      "dueSub": "Araçlara bağlı"
+    },
+    "6": {
+      "title": "Ters vergilendirme mekanizması",
+      "detail": "Yalnızca sınır ötesi B2B payı >0 ise geçerli · UStG §13b",
+      "market": "DE · NL",
+      "due": "—",
+      "dueSub": "B2B oranına bağlı"
+    },
+    "7": {
+      "title": "Gerçek faydalanıcı güncellemesi",
+      "detail": "Son bildirim: Mar 2025 · Ceza: €1.000–5.000 · GwG §20 Abs. 1",
+      "market": "DE",
+      "due": "30 Haz",
+      "dueSub": "sürekli"
+    }
+  },
+  "partners": {
+    "eyebrow": "3 Verified Partner eşleşti",
+    "title": "Bu konuda kimin harekete geçebileceğini bulduk.",
+    "unlocked": "Eşleşmeler açıldı",
+    "unlockCta": "Eşleşmeleri ücretsiz bir hesapla açın",
+    "match": "{{pct}} uyum",
+    "requestQuote": "Teklif isteyin",
+    "0": { "sub": "İtalya KDV kaydı + mali temsilcilik · DE·IT iki dilli" },
+    "1": { "sub": "OSS/IOSS kurulumu · 12 yıllık sınır ötesi vergi deneyimi · 8 AB ofisi" },
+    "2": { "sub": "İber KDV'si (ES/PT) · aylık beyan · pazar yeri optimizasyonu" }
+  },
+  "cta": {
+    "title": "Bu haritayı kaydedin. Partnerlerin kilidini açın.",
+    "body": "Ücretsiz hesap. Kredi kartı gerekmez. Beta lansmanına kadar kurucu üye erişimi.",
+    "button": "Ücretsiz hesap oluşturun"
+  },
+  "quote": {
+    "domainTaxVat": "Vergi & KDV"
+  }
+}

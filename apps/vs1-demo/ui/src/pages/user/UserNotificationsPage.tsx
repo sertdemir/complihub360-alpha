@@ -13,6 +13,7 @@ import { fetchNotificationsFeed, USER_NOTIFICATIONS_VIEWER, type FeedGroup, type
 // Mirrors "User · Notifications (Desktop)" (2675:3): filter chips + day-grouped
 // feed rows (type tag + time + detail). Live event feed with its own C1
 // read-state; rows with an engagement deep-link (C12) open the request thread.
+// Fixture feed rows are demo data and stay untranslated.
 
 const FIXTURE: FeedGroup[] = [
   { day: 'Today', items: [
@@ -39,23 +40,27 @@ const KIND_TONE: Record<FeedItem['kind'], 'brand' | 'success' | 'warning' | 'neu
   system: 'neutral',
 };
 
-const KIND_CHIPS: { key: FeedItem['kind']; label: string }[] = [
-  { key: 'request', label: 'Requests' },
-  { key: 'sla', label: 'SLA' },
-  { key: 'billing', label: 'Billing' },
-  { key: 'review', label: 'Reviews' },
-  { key: 'system', label: 'System' },
+const KIND_CHIPS: { key: FeedItem['kind']; labelKey: string }[] = [
+  { key: 'request', labelKey: 'chipRequests' },
+  { key: 'sla', labelKey: 'chipSla' },
+  { key: 'billing', labelKey: 'chipBilling' },
+  { key: 'review', labelKey: 'chipReviews' },
+  { key: 'system', labelKey: 'chipSystem' },
 ];
 
 export function UserNotificationsPage() {
   const navigate = useNavigate();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation('userws');
   const locale = i18n.resolvedLanguage || 'en';
   const [filter, setFilter] = useState<'all' | 'unread' | FeedItem['kind']>('all');
   const { data } = useApiData(
     () => fetchNotificationsFeed(USER_NOTIFICATIONS_VIEWER),
     { groups: FIXTURE, lastSeen: null },
   );
+
+  // Day headers come from the feed ("Today"/"Yesterday") — translate known ones.
+  const tDay = (day: string) =>
+    day === 'Today' ? t('notifications.dayToday') : day === 'Yesterday' ? t('notifications.dayYesterday') : day;
 
   const flat = data.groups.flatMap((g) => g.items);
   const matches = (i: FeedItem) =>
@@ -74,35 +79,35 @@ export function UserNotificationsPage() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="font-serif text-[32px] font-bold leading-tight text-fg">
-              <span className="text-fg-accent">Notifications</span>
+              <span className="text-fg-accent">{t('notifications.title')}</span>
             </h1>
-            <p className="mt-1 text-body-sm text-fg-secondary">Your alerts, request updates and monitoring events · newest first</p>
+            <p className="mt-1 text-body-sm text-fg-secondary">{t('notifications.sub')}</p>
           </div>
           <button type="button" className="mt-2 flex shrink-0 items-center gap-1.5 text-[12px] text-fg-secondary transition-colors hover:text-fg">
-            <Bookmark size={13} /> Bookmarks (12)
+            <Bookmark size={13} /> {t('shared.bookmarks')}
           </button>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           <FilterChip size="sm" selected={filter === 'all'} onClick={() => setFilter('all')}>
-            All · {flat.length}
+            {t('notifications.filterAll', { count: flat.length })}
           </FilterChip>
           <FilterChip size="sm" selected={filter === 'unread'} onClick={() => setFilter('unread')}>
-            Unread · {flat.filter((i) => i.unread).length}
+            {t('notifications.filterUnread', { count: flat.filter((i) => i.unread).length })}
           </FilterChip>
           {KIND_CHIPS.filter((c) => flat.some((i) => i.kind === c.key)).map((c) => (
             <FilterChip key={c.key} size="sm" selected={filter === c.key} onClick={() => setFilter(c.key)}>
-              {c.label} · {flat.filter((i) => i.kind === c.key).length}
+              {t(`notifications.${c.labelKey}`)} · {flat.filter((i) => i.kind === c.key).length}
             </FilterChip>
           ))}
         </div>
 
         {visible.length === 0 && (
-          <p className="text-[13px] text-fg-tertiary">Nothing here — try another filter.</p>
+          <p className="text-[13px] text-fg-tertiary">{t('notifications.empty')}</p>
         )}
         {visible.map((group) => (
           <section key={group.day} className="space-y-2.5">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{group.day}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{tDay(group.day)}</p>
             {group.items.map((n) => (
               <EntityCard
                 key={`${n.event}-${n.title}-${n.time}`}

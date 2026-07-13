@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Download } from 'lucide-react';
 import { SectionEyebrow, GoldWord } from '../providers/SectionHeading';
 
@@ -31,26 +32,22 @@ function Label({ children }: { children: React.ReactNode }) {
   return <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">{children}</p>;
 }
 
-const TIMELINE = [
-  { date: 'Apr 24', label: 'Request sent' },
-  { date: 'Apr 25', label: 'Partner accepted · 21h' },
-  { date: 'Apr 28', label: 'Proposal received' },
-  { date: 'May 02', label: 'Scope agreed' },
-];
+// Timeline copy lives in howItActs.panel3.timeline.<index>.* ('home' ns).
+const TIMELINE_COUNT = 4;
 
 export function HowItActs() {
+  const { t } = useTranslation('home');
   return (
     <section id="engagement" className="bg-surface-secondary py-20 lg:py-28">
       <div className="mx-auto w-full max-w-[1320px] px-4 md:px-6 lg:px-10">
         {/* Heading (left-aligned) */}
         <div className="max-w-2xl">
-          <SectionEyebrow tone="brand">Inside one engagement</SectionEyebrow>
+          <SectionEyebrow tone="brand">{t('howItActs.eyebrow')}</SectionEyebrow>
           <h2 className="mt-4 font-serif text-[2rem] font-semibold leading-tight tracking-tight text-fg sm:text-[2.75rem]">
-            What happens <GoldWord>between</GoldWord> the match and the resolution.
+            {t('howItActs.title.pre')}<GoldWord>{t('howItActs.title.gold')}</GoldWord>{t('howItActs.title.post')}
           </h2>
           <p className="mt-5 text-body leading-relaxed text-fg-secondary">
-            Once you&rsquo;re matched, three things stop being assumptions: what it costs, when you&rsquo;ll hear back,
-            and what you take with you. Each is set before the first email.
+            {t('howItActs.subtitle')}
           </p>
         </div>
 
@@ -64,56 +61,56 @@ export function HowItActs() {
         >
           <Card
             n="01"
-            title="Cost, before you commit."
-            desc="Every Verified Partner publishes a fixed estimate before you accept the engagement. No discovery calls just to find out what something costs."
+            title={t('howItActs.cards.0.title')}
+            desc={t('howItActs.cards.0.desc')}
             panel={
               <div className="divide-y divide-stroke">
                 <div className="pb-3">
-                  <Label>Estimated cost</Label>
-                  <p className="mt-1 text-[15px] font-semibold text-fg">€2,400 — €3,800</p>
+                  <Label>{t('howItActs.panel1.estCost')}</Label>
+                  <p className="mt-1 text-[15px] font-semibold text-fg">{t('howItActs.panel1.estValue')}</p>
                 </div>
                 <div className="py-3">
-                  <Label>Scope</Label>
-                  <p className="mt-1 text-[14px] font-medium text-fg">OSS quarterly returns · DE + NL + FR</p>
+                  <Label>{t('howItActs.panel1.scope')}</Label>
+                  <p className="mt-1 text-[14px] font-medium text-fg">{t('howItActs.panel1.scopeValue')}</p>
                 </div>
                 <div className="pt-3">
-                  <Label>Approval</Label>
-                  <p className="mt-1 text-[14px] font-medium text-fg">Set before any work begins</p>
+                  <Label>{t('howItActs.panel1.approval')}</Label>
+                  <p className="mt-1 text-[14px] font-medium text-fg">{t('howItActs.panel1.approvalValue')}</p>
                 </div>
               </div>
             }
           />
           <Card
             n="02"
-            title="Response, on the clock."
-            desc="24–48h to first response, or we route to the next available partner — automatically. The clock is part of the contract, not a promise."
+            title={t('howItActs.cards.1.title')}
+            desc={t('howItActs.cards.1.desc')}
             panel={
               <div>
-                <Label>Initial response SLA</Label>
+                <Label>{t('howItActs.panel2.label')}</Label>
                 <p className="mt-2 text-[2rem] font-bold leading-none text-fg-brand">&le; 48h</p>
                 <p className="mt-3 text-[13px] leading-relaxed text-fg-secondary">
-                  Auto-routed to the next partner if missed. Contractually agreed.
+                  {t('howItActs.panel2.note')}
                 </p>
               </div>
             }
           />
           <Card
             n="03"
-            title="A trail you keep."
-            desc="Every step is logged on a private timeline — request, reply, agreed scope, deliverables. Yours to keep, exportable any time, in any format your auditor needs."
+            title={t('howItActs.cards.2.title')}
+            desc={t('howItActs.cards.2.desc')}
             panel={
               <div>
                 <ul className="space-y-2.5">
-                  {TIMELINE.map((t) => (
-                    <li key={t.label} className="flex items-center gap-3 text-[13px]">
+                  {Array.from({ length: TIMELINE_COUNT }, (_, i) => (
+                    <li key={i} className="flex items-center gap-3 text-[13px]">
                       <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
-                      <span className="w-12 shrink-0 font-semibold text-fg">{t.date}</span>
-                      <span className="text-fg-secondary">{t.label}</span>
+                      <span className="w-12 shrink-0 font-semibold text-fg">{t(`howItActs.panel3.timeline.${i}.date`)}</span>
+                      <span className="text-fg-secondary">{t(`howItActs.panel3.timeline.${i}.label`)}</span>
                     </li>
                   ))}
                 </ul>
                 <p className="mt-4 flex items-center gap-1.5 border-t border-stroke pt-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-brand">
-                  Export <Download size={12} /> <span className="text-fg-tertiary">PDF · CSV · API</span>
+                  {t('howItActs.panel3.export')} <Download size={12} /> <span className="text-fg-tertiary">PDF · CSV · API</span>
                 </p>
               </div>
             }

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown } from 'lucide-react';
 import { ProviderShell } from '../../components/provider/ProviderShell';
 import { RankingImpactDrawer } from '../../components/provider/ProviderDrawers';
@@ -14,45 +15,50 @@ import { fetchPerformanceKpis } from '../../api/metrics';
 // cards · ranking-transparency panel (current rank + what moves it) · trust-
 // score breakdown bars. Design fixture data until the metrics API lands.
 
-const KPIS = [
-  { label: 'CONFIRM_RATE', value: '87%', trend: { value: '+5%', direction: 'up' as const, label: 'of routed requests confirmed' } },
-  { label: 'REPLY_RATE', value: '78%', trend: { value: '+4%', direction: 'up' as const, label: 'confirmed → reply sent' } },
-  { label: 'AVG_CONFIRM_TIME', value: '4h 12m', trend: { value: '—', direction: 'neutral' as const, label: 'top-quartile <2h' } },
-  { label: 'AVG_REPLY_TIME', value: '18h', trend: { value: '—', direction: 'neutral' as const, label: 'top-quartile <12h' } },
-  { label: 'SLA_BREACH_RATE', value: '3%', trend: { value: '—', direction: 'neutral' as const, label: 'last 30d · target <5%' } },
-];
+// KPI codes (CONFIRM_RATE, …) are canonical metric identifiers and stay
+// untranslated; only the trend captions are localized.
+function buildKpiFixture(t: (k: string) => string) {
+  return [
+    { label: 'CONFIRM_RATE', value: '87%', trend: { value: '+5%', direction: 'up' as const, label: t('performance.kpiConfirmRateNote') } },
+    { label: 'REPLY_RATE', value: '78%', trend: { value: '+4%', direction: 'up' as const, label: t('performance.kpiReplyRateNote') } },
+    { label: 'AVG_CONFIRM_TIME', value: '4h 12m', trend: { value: '—', direction: 'neutral' as const, label: t('performance.kpiAvgConfirmNote') } },
+    { label: 'AVG_REPLY_TIME', value: '18h', trend: { value: '—', direction: 'neutral' as const, label: t('performance.kpiAvgReplyNote') } },
+    { label: 'SLA_BREACH_RATE', value: '3%', trend: { value: '—', direction: 'neutral' as const, label: t('performance.kpiSlaBreachNote') } },
+  ];
+}
 
 const RANK_FACTORS = [
-  { factor: 'Response time', move: '+3 positions', tone: 'brand' as const, note: 'avg_confirm_time dropped 18% in 30d' },
-  { factor: 'Acceptance rate', move: '+1 position', tone: 'brand' as const, note: 'confirm_rate +5% vs prior period' },
-  { factor: 'Match quality (client reviews)', move: '+1 position', tone: 'brand' as const, note: '4.7/5 across 12 new reviews' },
-  { factor: 'Coverage breadth', move: 'no change', tone: 'neutral' as const, note: '2 markets · 3 domains (DE focus)' },
+  { factorKey: 'performance.factorResponseTime', moveKey: 'performance.movePlus3', tone: 'brand' as const, noteKey: 'performance.factorResponseTimeNote' },
+  { factorKey: 'performance.factorAcceptanceRate', moveKey: 'performance.movePlus1', tone: 'brand' as const, noteKey: 'performance.factorAcceptanceRateNote' },
+  { factorKey: 'performance.factorMatchQuality', moveKey: 'performance.movePlus1', tone: 'brand' as const, noteKey: 'performance.factorMatchQualityNote' },
+  { factorKey: 'performance.factorCoverageBreadth', moveKey: 'performance.moveNoChange', tone: 'neutral' as const, noteKey: 'performance.factorCoverageBreadthNote' },
 ];
 
+// avg_confirm_time / confirm_rate are canonical metric ids — kept as-is.
 const TRUST = [
-  { label: 'Profile completeness', value: '100%', pct: 100, color: 'accent' as const },
-  { label: 'Project completion (no cancels)', value: '96%', pct: 96, color: 'accent' as const },
-  { label: 'Client satisfaction', value: '4.7/5', pct: 94, color: 'accent' as const },
-  { label: 'avg_confirm_time', value: '4h 12m', pct: 82, color: 'brand' as const },
-  { label: 'confirm_rate', value: '87%', pct: 84, color: 'brand' as const },
+  { labelKey: 'performance.trustProfileCompleteness', label: undefined, value: '100%', pct: 100, color: 'accent' as const },
+  { labelKey: 'performance.trustProjectCompletion', label: undefined, value: '96%', pct: 96, color: 'accent' as const },
+  { labelKey: 'performance.trustClientSatisfaction', label: undefined, value: '4.7/5', pct: 94, color: 'accent' as const },
+  { labelKey: undefined, label: 'avg_confirm_time', value: '4h 12m', pct: 82, color: 'brand' as const },
+  { labelKey: undefined, label: 'confirm_rate', value: '87%', pct: 84, color: 'brand' as const },
 ];
 
 export function PerformancePage() {
+  const { t } = useTranslation('providerws');
   const [rankingOpen, setRankingOpen] = useState(false);
   // Live KPIs when the compliance-api answers; the design fixture otherwise.
-  const { data: kpis } = useApiData(fetchPerformanceKpis, KPIS);
+  const { data: kpis } = useApiData(fetchPerformanceKpis, buildKpiFixture(t));
   return (
     <ProviderShell>
       <div className="mx-auto max-w-[1140px] space-y-6">
         <div className="flex items-start justify-between gap-4">
-          <h1 className="font-serif text-[30px] font-bold leading-tight text-fg">Performance</h1>
+          <h1 className="font-serif text-[30px] font-bold leading-tight text-fg">{t('performance.title')}</h1>
           <button type="button" className="mt-2 flex shrink-0 items-center gap-1 text-[12px] text-fg-secondary transition-colors hover:text-fg">
-            Range: 30d <ChevronDown size={12} />
+            {t('performance.range30d')} <ChevronDown size={12} />
           </button>
         </div>
         <p className="-mt-4 max-w-3xl text-body-sm leading-relaxed text-fg-secondary">
-          Canonical KPIs from Provider Flows §12 + ranking transparency. Pre-downgrade warnings surface here AND as a
-          sticky banner across all tabs (§7.2).
+          {t('performance.subtitle')}
         </p>
 
         <div className="grid grid-cols-2 gap-3 xl:grid-cols-5">
@@ -64,25 +70,25 @@ export function PerformancePage() {
         <Card styleVariant="filled" className="p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 className="text-[16px] font-semibold text-fg">Ranking transparency</h2>
-              <p className="mt-0.5 text-[12px] text-fg-secondary">Where you stand · what affects it · last 7-day change history</p>
+              <h2 className="text-[16px] font-semibold text-fg">{t('performance.rankingTitle')}</h2>
+              <p className="mt-0.5 text-[12px] text-fg-secondary">{t('performance.rankingSub')}</p>
             </div>
-            <button type="button" onClick={() => setRankingOpen(true)} className="shrink-0 text-[12px] font-medium text-fg-brand underline-offset-2 hover:underline">Why this matters</button>
+            <button type="button" onClick={() => setRankingOpen(true)} className="shrink-0 text-[12px] font-medium text-fg-brand underline-offset-2 hover:underline">{t('performance.whyThisMatters')}</button>
           </div>
           <div className="mt-5 grid gap-8 lg:grid-cols-[240px,1fr]">
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">Current rank · DE · VAT</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{t('performance.currentRankLabel')}</p>
               <p className="mt-1 font-serif text-[44px] font-bold leading-none text-fg-brand">#3</p>
-              <p className="mt-2 text-[12px] text-fg-secondary">of 47 verified partners · <span className="text-fg-brand">↑ from #5 (last week)</span></p>
+              <p className="mt-2 text-[12px] text-fg-secondary">{t('performance.rankOf')} <span className="text-fg-brand">{t('performance.rankUpFrom')}</span></p>
             </div>
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">What moves your rank</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{t('performance.whatMovesRank')}</p>
               <div className="mt-2 divide-y divide-white/5">
                 {RANK_FACTORS.map((r) => (
-                  <div key={r.factor} className="flex items-center gap-3 py-2">
-                    <span className="w-56 shrink-0 text-[13px] text-fg">{r.factor}</span>
-                    <Tag tone={r.tone}>{r.move}</Tag>
-                    <span className="truncate text-[12px] text-fg-tertiary">{r.note}</span>
+                  <div key={r.factorKey} className="flex items-center gap-3 py-2">
+                    <span className="w-56 shrink-0 text-[13px] text-fg">{t(r.factorKey)}</span>
+                    <Tag tone={r.tone}>{t(r.moveKey)}</Tag>
+                    <span className="truncate text-[12px] text-fg-tertiary">{t(r.noteKey)}</span>
                   </div>
                 ))}
               </div>
@@ -92,19 +98,22 @@ export function PerformancePage() {
 
         <div>
           <h2 className="text-[15px] font-semibold text-fg">
-            Trust score breakdown · <span className="text-fg-accent">94 / 100</span>
+            {t('performance.trustTitle')} · <span className="text-fg-accent">94 / 100</span>
           </h2>
-          <p className="mt-0.5 text-[12px] text-fg-secondary">Composite of 5 signals · improve lowest to climb fastest</p>
+          <p className="mt-0.5 text-[12px] text-fg-secondary">{t('performance.trustSub')}</p>
           <div className="mt-4 space-y-4">
-            {TRUST.map((t) => (
-              <div key={t.label}>
-                <div className="mb-1.5 flex items-baseline justify-between">
-                  <span className="text-[12px] font-medium text-fg">{t.label}</span>
-                  <span className="text-[12px] font-medium text-fg-brand">{t.value}</span>
+            {TRUST.map((tr) => {
+              const label = tr.labelKey ? t(tr.labelKey) : tr.label!;
+              return (
+                <div key={label}>
+                  <div className="mb-1.5 flex items-baseline justify-between">
+                    <span className="text-[12px] font-medium text-fg">{label}</span>
+                    <span className="text-[12px] font-medium text-fg-brand">{tr.value}</span>
+                  </div>
+                  <ProgressBar value={tr.pct} size="sm" color={tr.color} />
                 </div>
-                <ProgressBar value={t.pct} size="sm" color={t.color} />
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Trans, useTranslation } from 'react-i18next';
 import { UserShell } from '../../components/user/UserShell';
 import { RequestQuoteModal, type QuoteProvider } from '../../components/user/RequestQuoteModal';
 import { DocUploadDrawer } from '../../components/user/DocUploadDrawer';
@@ -16,7 +17,8 @@ import { Tag } from '../../components/ui/Tag';
 // Mirrors "User Dashboard v1 · Tax & VAT domain (Desktop)" (2051:60): gauge
 // header (risk / registration likelihood / EU exposure) · recommended next
 // steps · threshold risk monitoring · recommended providers. This page is the
-// TEMPLATE for all six domain workbenches — content comes from the fixture.
+// TEMPLATE for all six domain workbenches — content comes from the fixture
+// (step/provider rows are demo data and stay untranslated).
 
 type DomainKey = 'tax-vat' | 'product-packaging' | 'data-privacy' | 'marketing-seo' | 'corporate-structure' | 'full-support';
 
@@ -77,11 +79,20 @@ const STEPS = [
 ];
 
 const THRESHOLDS = [
-  { country: 'IT', amount: '€145k', of: 'of €100k', status: 'HIGH', tone: 'error' as const, pct: 100, color: 'error' as const },
-  { country: 'ES', amount: '€76k', of: 'of €100k', status: 'CAUTION', tone: 'warning' as const, pct: 76, color: 'warning' as const },
-  { country: 'FR', amount: '€31k', of: 'of €100k', status: 'SAFE', tone: 'success' as const, pct: 31, color: 'brand' as const },
-  { country: 'AT', amount: '€11k', of: 'of €100k', status: 'SAFE', tone: 'success' as const, pct: 11, color: 'brand' as const },
+  { country: 'IT', amount: '€145k', limit: '€100k', status: 'HIGH', tone: 'error' as const, pct: 100, color: 'error' as const },
+  { country: 'ES', amount: '€76k', limit: '€100k', status: 'CAUTION', tone: 'warning' as const, pct: 76, color: 'warning' as const },
+  { country: 'FR', amount: '€31k', limit: '€100k', status: 'SAFE', tone: 'success' as const, pct: 31, color: 'brand' as const },
+  { country: 'AT', amount: '€11k', limit: '€100k', status: 'SAFE', tone: 'success' as const, pct: 11, color: 'brand' as const },
 ];
+
+const THRESHOLD_STATUS_KEY: Record<string, string> = { HIGH: 'statusHigh', CAUTION: 'statusCaution', SAFE: 'statusSafe' };
+
+// Canonical English domain label → userws translation key (display only —
+// DOMAIN_META.name stays canonical for routing / activeDomain matching / API).
+const DOMAIN_KEY: Record<string, string> = {
+  'Tax & VAT': 'taxVat', 'Product & Packaging': 'productPackaging', 'Data & Privacy': 'dataPrivacy',
+  'Marketing & SEO': 'marketingSeo', 'Corporate & Structure': 'corporateStructure', 'Full Support': 'fullSupport',
+};
 
 // key = provider_key in the DB (seeded on staging) — the FK the POST needs.
 const PROVIDERS = [
@@ -93,9 +104,11 @@ const PROVIDERS = [
 export function WorkbenchPage() {
   const { domain, locale = 'en' } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation('userws');
   const key = (domain && domain in DOMAIN_META ? domain : 'tax-vat') as DomainKey;
   const meta = DOMAIN_META[key];
   const steps = meta.steps.length ? meta.steps : STEPS;
+  const domainDisplay = DOMAIN_KEY[meta.name] ? t(`domain.${DOMAIN_KEY[meta.name]}`) : meta.name;
   const [quoteFor, setQuoteFor] = useState<(QuoteProvider & { country: string }) | null>(null);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [alertsOpen, setAlertsOpen] = useState(false);
@@ -107,63 +120,63 @@ export function WorkbenchPage() {
             <span className="grid h-10 w-10 place-items-center rounded-full bg-[#d4af37]/15 text-[16px] text-[#d4af37]">€</span>
             <div>
               <h1 className="font-serif text-[28px] font-bold leading-tight text-fg">
-                {meta.name} <span className="text-fg-accent">exposure</span> overview.
+                <Trans t={t} i18nKey="workbench.title" values={{ domain: domainDisplay }} components={{ accent: <span className="text-fg-accent" /> }} />
               </h1>
               <p className="mt-0.5 text-[12px] text-fg-secondary">
-                4 countries tracked · 3 sessions · 2 active requests · 4 documents missing · last refresh 2h ago
+                {t('workbench.sub')}
               </p>
             </div>
           </div>
           <div className="mt-1 flex shrink-0 items-center gap-4">
-            <button type="button" onClick={() => navigate(`/${locale}/wizard?refine=1`)} className="text-[12px] font-medium text-fg underline underline-offset-2">Refine existing</button>
-            <Button size="sm" variant="secondary" onClick={() => setUploadOpen(true)}>Upload document</Button>
-            <Button size="sm" onClick={() => navigate(`/${locale}/wizard`)}>Start new</Button>
+            <button type="button" onClick={() => navigate(`/${locale}/wizard?refine=1`)} className="text-[12px] font-medium text-fg underline underline-offset-2">{t('workbench.refineExisting')}</button>
+            <Button size="sm" variant="secondary" onClick={() => setUploadOpen(true)}>{t('workbench.uploadDocument')}</Button>
+            <Button size="sm" onClick={() => navigate(`/${locale}/wizard`)}>{t('workbench.startNew')}</Button>
           </div>
         </div>
 
         <div className="grid gap-3 lg:grid-cols-3">
-          <KPICircleCard label="Compliance risk" value={82} valueLabel="HIGH" color="error" trend={{ value: meta.riskSub, direction: 'neutral' }} />
-          <KPICircleCard label="Registration likelihood" value={85} valueLabel="85%" color="warning" trend={{ value: 'Mandatory in 2 markets', direction: 'neutral' }} />
-          <KPICircleCard label="Total EU exposure" value={68} valueLabel="€280k" color="brand" trend={{ value: '4 active markets · projected Q4 2026', direction: 'neutral' }} />
+          <KPICircleCard label={t('workbench.kpiRisk')} value={82} valueLabel={t('workbench.kpiRiskValue')} color="error" trend={{ value: meta.riskSub, direction: 'neutral' }} />
+          <KPICircleCard label={t('workbench.kpiLikelihood')} value={85} valueLabel="85%" color="warning" trend={{ value: t('workbench.kpiLikelihoodTrend'), direction: 'neutral' }} />
+          <KPICircleCard label={t('workbench.kpiExposure')} value={68} valueLabel="€280k" color="brand" trend={{ value: t('workbench.kpiExposureTrend'), direction: 'neutral' }} />
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[1fr,360px]">
           <div className="space-y-6">
             <section className="space-y-3">
               <div className="flex items-baseline justify-between">
-                <h2 className="text-[15px] font-semibold text-fg">Recommended next steps <span className="text-fg-brand">4</span></h2>
-                <a href="#" className="text-[12px] text-fg-secondary underline-offset-2 hover:underline">See full plan</a>
+                <h2 className="text-[15px] font-semibold text-fg">{t('workbench.nextSteps')} <span className="text-fg-brand">4</span></h2>
+                <a href="#" className="text-[12px] text-fg-secondary underline-offset-2 hover:underline">{t('workbench.seeFullPlan')}</a>
               </div>
               <Stepper orientation="vertical" size="sm" current={0} steps={steps} />
             </section>
 
             <section className="space-y-3">
               <div className="flex items-baseline justify-between">
-                <h2 className="text-[15px] font-semibold text-fg">Threshold risk monitoring</h2>
-                <button type="button" onClick={() => setAlertsOpen(true)} className="text-[12px] text-fg-brand underline-offset-2 hover:underline">Configure alerts</button>
+                <h2 className="text-[15px] font-semibold text-fg">{t('workbench.thresholdMonitoring')}</h2>
+                <button type="button" onClick={() => setAlertsOpen(true)} className="text-[12px] text-fg-brand underline-offset-2 hover:underline">{t('workbench.configureAlerts')}</button>
               </div>
               <Card styleVariant="filled" className="space-y-3.5 p-4">
-                {THRESHOLDS.map((t) => (
-                  <div key={t.country} className="flex items-center gap-3">
-                    <span className="w-7 shrink-0 text-[12px] font-semibold text-fg">{t.country}</span>
+                {THRESHOLDS.map((row) => (
+                  <div key={row.country} className="flex items-center gap-3">
+                    <span className="w-7 shrink-0 text-[12px] font-semibold text-fg">{row.country}</span>
                     <div className="min-w-0 flex-1">
-                      <ProgressBar value={t.pct} size="sm" color={t.color} />
+                      <ProgressBar value={row.pct} size="sm" color={row.color} />
                     </div>
-                    <span className="w-14 shrink-0 text-right text-[12px] font-medium text-fg">{t.amount}</span>
-                    <span className="w-16 shrink-0 text-[10px] text-fg-tertiary">{t.of}</span>
-                    <Tag tone={t.tone}>{t.status}</Tag>
-                    <a href="#" className="shrink-0 text-[11px] text-fg-secondary underline-offset-2 hover:underline">Detail</a>
+                    <span className="w-14 shrink-0 text-right text-[12px] font-medium text-fg">{row.amount}</span>
+                    <span className="w-16 shrink-0 text-[10px] text-fg-tertiary">{t('workbench.ofLimit', { limit: row.limit })}</span>
+                    <Tag tone={row.tone}>{t(`workbench.${THRESHOLD_STATUS_KEY[row.status]}`)}</Tag>
+                    <a href="#" className="shrink-0 text-[11px] text-fg-secondary underline-offset-2 hover:underline">{t('workbench.detail')}</a>
                   </div>
                 ))}
-                <p className="pt-1 text-[10px] text-fg-tertiary">● Safe (under threshold)  ● Caution (approaching)  ● High risk (exceeded)</p>
+                <p className="pt-1 text-[10px] text-fg-tertiary">{t('workbench.legend')}</p>
               </Card>
             </section>
           </div>
 
           <div className="space-y-3">
             <div className="flex items-baseline justify-between">
-              <h2 className="text-[15px] font-semibold text-fg">Recommended providers <span className="text-fg-brand">3</span></h2>
-              <a href="#" className="text-[12px] text-fg-secondary underline-offset-2 hover:underline">See all</a>
+              <h2 className="text-[15px] font-semibold text-fg">{t('workbench.recommendedProviders')} <span className="text-fg-brand">3</span></h2>
+              <a href="#" className="text-[12px] text-fg-secondary underline-offset-2 hover:underline">{t('shared.seeAll')}</a>
             </div>
             <div className="space-y-2.5">
               {PROVIDERS.map((p) => (
@@ -175,7 +188,7 @@ export function WorkbenchPage() {
                   meta={<span className="block text-[11px] leading-relaxed">{p.sub}</span>}
                   trailing={
                     <Button variant="accent" size="sm" onClick={() => setQuoteFor({ key: p.key, name: p.name, meta: p.meta, country: p.country })}>
-                      Request quote
+                      {t('workbench.requestQuote')}
                     </Button>
                   }
                   interactive

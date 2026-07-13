@@ -1,5 +1,6 @@
 import { Play, ArrowRight } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Trans, useTranslation } from 'react-i18next';
 import { generateRiskMapPdf } from '../../lib/riskMapPdf';
 import { OBLIGATIONS, STATS } from '../ResultsRiskMap';
 import { UserShell } from '../../components/user/UserShell';
@@ -43,12 +44,22 @@ const RISK_META: Record<string, string> = {
   high: 'text-[#e0556b]', medium: 'text-[#e6a514]', low: 'text-fg-tertiary',
 };
 
+// Fixture UI labels → userws keys (display only; fixture data stays original).
+const STATUS_KEY: Record<string, string> = {
+  'Awaiting confirmation': 'awaitingConfirmation', 'Active': 'active',
+  'Provider replied': 'providerReplied', 'Provider confirmed': 'providerConfirmed', 'Withdrawn': 'withdrawn',
+};
+const ACTION_KEY: Record<string, string> = {
+  'Send reminder': 'sendReminder', 'Open thread': 'openThread', 'View thread': 'viewThread', 'View request': 'viewRequest',
+};
+
 function SectionHeader({ title, count }: { title: string; count: string }) {
+  const { t } = useTranslation('userws');
   return (
     <div className="flex items-baseline gap-2">
       <h2 className="text-[15px] font-semibold text-fg">{title}</h2>
       <span className="text-[13px] font-semibold text-fg-brand">{count}</span>
-      <a href="#" className="ml-auto text-[12px] text-fg-secondary underline-offset-2 hover:underline">See all</a>
+      <a href="#" className="ml-auto text-[12px] text-fg-secondary underline-offset-2 hover:underline">{t('shared.seeAll')}</a>
     </div>
   );
 }
@@ -57,7 +68,10 @@ export function UserHomePage() {
   // C6: Resume -> results with the stored profile · Start new -> fresh wizard.
   const navigate = useNavigate();
   const { locale = 'en' } = useParams();
+  const { t } = useTranslation('userws');
   const hasProfile = !!localStorage.getItem('ch360_last_profile');
+  const tStatus = (label: string) => (STATUS_KEY[label] ? t(`status.${STATUS_KEY[label]}`) : label);
+  const tAction = (label: string) => (ACTION_KEY[label] ? t(`actions.${ACTION_KEY[label]}`) : label);
   // A6: same PII-free PDF snapshot as on /results, from the resume panel.
   const exportPdf = () => {
     let profile = null;
@@ -79,13 +93,13 @@ export function UserHomePage() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="font-serif text-[32px] font-bold leading-tight text-fg">
-              Welcome back, <span className="text-fg-accent">{firstName}</span>.
+              <Trans t={t} i18nKey="home.title" values={{ name: firstName }} components={{ accent: <span className="text-fg-accent" /> }} />
             </h1>
             <p className="mt-1 text-body-sm text-fg-secondary">
-              3 active requests · 2 sessions need a refresh · last activity 2h ago
+              {t('home.sub')}
             </p>
           </div>
-          <Button className="mt-1 shrink-0" onClick={() => navigate(`/${locale}/wizard`)}>Start new search</Button>
+          <Button className="mt-1 shrink-0" onClick={() => navigate(`/${locale}/wizard`)}>{t('shared.startNewSearch')}</Button>
         </div>
 
         <Card styleVariant="filled" className="flex items-center gap-4 border border-[#d4af37]/25 p-5">
@@ -93,36 +107,36 @@ export function UserHomePage() {
             <Play size={16} fill="currentColor" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-accent">Resume where you left off</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-accent">{t('home.resumeEyebrow')}</p>
             <p className="mt-0.5 text-[16px] font-semibold text-fg">VAT registration · Italy</p>
-            <p className="mt-0.5 text-[12px] text-fg-tertiary">Wizard step 4 of 5 · last edit 2h ago · Tax & VAT · DE → IT</p>
+            <p className="mt-0.5 text-[12px] text-fg-tertiary">{t('home.resumeMeta')}</p>
           </div>
           <div className="flex shrink-0 items-center gap-4">
-            <button type="button" onClick={() => navigate(`/${locale}/results`)} className="text-[12px] font-medium text-fg underline underline-offset-2">View results</button>
-            <button type="button" onClick={exportPdf} className="text-[12px] font-medium text-fg underline underline-offset-2">Export PDF</button>
-            <Button size="sm" variant="accent" onClick={() => navigate(hasProfile ? `/${locale}/results` : `/${locale}/wizard`)}>Resume <ArrowRight size={14} className="ml-1" /></Button>
+            <button type="button" onClick={() => navigate(`/${locale}/results`)} className="text-[12px] font-medium text-fg underline underline-offset-2">{t('home.viewResults')}</button>
+            <button type="button" onClick={exportPdf} className="text-[12px] font-medium text-fg underline underline-offset-2">{t('home.exportPdf')}</button>
+            <Button size="sm" variant="accent" onClick={() => navigate(hasProfile ? `/${locale}/results` : `/${locale}/wizard`)}>{t('home.resume')} <ArrowRight size={14} className="ml-1" /></Button>
           </div>
         </Card>
 
         <section className="space-y-3">
-          <SectionHeader title="Active requests" count="3" />
+          <SectionHeader title={t('home.activeRequests')} count="3" />
           <div className="space-y-2.5">
             {REQUESTS.map((r) => (
               <RequestCard
                 key={r.company}
                 idLine={r.id}
                 status={r.status}
-                statusLabel={r.statusLabel}
+                statusLabel={tStatus(r.statusLabel)}
                 company={r.company}
                 meta={r.meta}
-                action={<Button size="sm" variant={r.action.variant}>{r.action.label}</Button>}
+                action={<Button size="sm" variant={r.action.variant}>{tAction(r.action.label)}</Button>}
               />
             ))}
           </div>
         </section>
 
         <section className="space-y-3">
-          <SectionHeader title="Saved sessions" count="6" />
+          <SectionHeader title={t('home.savedSessions')} count="6" />
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             {SESSIONS.map((s) => (
               <DomainCard

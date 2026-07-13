@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BellRing, MessageSquare, XCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
 import { Tag } from '../ui/Tag';
@@ -28,7 +29,14 @@ interface RequestActionsDrawerProps {
 
 const OPEN_STATUSES = ['created', 'delivered', 'viewed'];
 
+// Status labels arrive as English strings (fixture or api) — display mapping only.
+const STATUS_KEY: Record<string, string> = {
+  'Awaiting confirmation': 'awaitingConfirmation', 'Active': 'active',
+  'Provider replied': 'providerReplied', 'Provider confirmed': 'providerConfirmed', 'Withdrawn': 'withdrawn',
+};
+
 export function RequestActionsDrawer({ target, onClose, onOpenThread, onWithdrawn }: RequestActionsDrawerProps) {
+  const { t } = useTranslation('userws');
   const [busy, setBusy] = useState<'remind' | 'withdraw' | null>(null);
   const [reminded, setReminded] = useState(false);
   const [confirmWithdraw, setConfirmWithdraw] = useState(false);
@@ -39,6 +47,7 @@ export function RequestActionsDrawer({ target, onClose, onOpenThread, onWithdraw
   }, [target?.uuid]);
 
   const actionable = !!target?.rawStatus && OPEN_STATUSES.includes(target.rawStatus);
+  const tStatus = (label: string) => (STATUS_KEY[label] ? t(`status.${STATUS_KEY[label]}`) : label);
 
   const remind = async () => {
     if (!target) return;
@@ -47,7 +56,7 @@ export function RequestActionsDrawer({ target, onClose, onOpenThread, onWithdraw
       await remindEngagement(target.uuid);
       setReminded(true);
     } catch {
-      setError('Reminder failed — try again in a moment.');
+      setError(t('requestActions.remindError'));
     }
     setBusy(null);
   };
@@ -60,7 +69,7 @@ export function RequestActionsDrawer({ target, onClose, onOpenThread, onWithdraw
       onWithdrawn(target.uuid);
       onClose();
     } catch {
-      setError('Withdraw failed — try again in a moment.');
+      setError(t('requestActions.withdrawError'));
     }
     setBusy(null);
   };
@@ -72,15 +81,15 @@ export function RequestActionsDrawer({ target, onClose, onOpenThread, onWithdraw
       onClose={onClose}
       side="right"
       size="md"
-      eyebrow={target ? `REQUEST ${target.idLine.split(' ')[0].replace('RQ-', '')}` : 'REQUEST'}
-      title="Request actions"
+      eyebrow={target ? t('requestActions.eyebrow', { id: target.idLine.split(' ')[0].replace('RQ-', '') }) : t('requestActions.eyebrowFallback')}
+      title={t('requestActions.title')}
     >
       {target && (
         <div className="space-y-4">
           <div className="rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3">
             <p className="text-[13px] font-semibold text-fg">{target.company}</p>
             <div className="mt-1.5 flex items-center gap-2">
-              <Tag tone={actionable ? 'warning' : 'neutral'}>{target.statusLabel}</Tag>
+              <Tag tone={actionable ? 'warning' : 'neutral'}>{tStatus(target.statusLabel)}</Tag>
               <span className="text-[11px] text-fg-tertiary">{target.idLine}</span>
             </div>
           </div>
@@ -90,18 +99,18 @@ export function RequestActionsDrawer({ target, onClose, onOpenThread, onWithdraw
             <div className="flex items-start gap-3">
               <BellRing size={16} className="mt-0.5 shrink-0 text-fg-accent" />
               <div className="min-w-0 flex-1">
-                <p className="text-[13px] font-semibold text-fg">Send reminder</p>
+                <p className="text-[13px] font-semibold text-fg">{t('requestActions.remindTitle')}</p>
                 <p className="mt-0.5 text-[11px] leading-relaxed text-fg-tertiary">
-                  Re-sends the request mail with fresh confirmation links · reminders don't hurt the provider's ranking, missed confirms do.
+                  {t('requestActions.remindDesc')}
                 </p>
               </div>
               <Button size="sm" variant="accent" onClick={remind} disabled={!actionable || busy !== null || reminded}>
-                {busy === 'remind' ? '…' : reminded ? 'Sent ✓' : 'Remind'}
+                {busy === 'remind' ? '…' : reminded ? t('requestActions.remindSent') : t('requestActions.remind')}
               </Button>
             </div>
             {reminded && (
               <p className="mt-2.5 rounded-md border border-fg-brand/30 bg-fg-brand/10 px-3 py-2 text-[11px] text-fg-secondary">
-                Reminder delivered — the provider received a fresh 24h confirmation link. A note was added to the thread.
+                {t('requestActions.remindedNote')}
               </p>
             )}
           </div>
@@ -110,10 +119,10 @@ export function RequestActionsDrawer({ target, onClose, onOpenThread, onWithdraw
           <div className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/[0.03] p-4">
             <MessageSquare size={16} className="mt-0.5 shrink-0 text-fg-brand" />
             <div className="min-w-0 flex-1">
-              <p className="text-[13px] font-semibold text-fg">Open thread</p>
-              <p className="mt-0.5 text-[11px] leading-relaxed text-fg-tertiary">Full history — your opening message, replies and system notes.</p>
+              <p className="text-[13px] font-semibold text-fg">{t('requestActions.threadTitle')}</p>
+              <p className="mt-0.5 text-[11px] leading-relaxed text-fg-tertiary">{t('requestActions.threadDesc')}</p>
             </div>
-            <Button size="sm" variant="secondary" onClick={() => { onClose(); onOpenThread(target.uuid); }}>Open</Button>
+            <Button size="sm" variant="secondary" onClick={() => { onClose(); onOpenThread(target.uuid); }}>{t('shared.open')}</Button>
           </div>
 
           {/* Withdraw */}
@@ -121,20 +130,20 @@ export function RequestActionsDrawer({ target, onClose, onOpenThread, onWithdraw
             <div className="flex items-start gap-3">
               <XCircle size={16} className="mt-0.5 shrink-0 text-error-500" />
               <div className="min-w-0 flex-1">
-                <p className="text-[13px] font-semibold text-fg">Withdraw request</p>
+                <p className="text-[13px] font-semibold text-fg">{t('requestActions.withdrawTitle')}</p>
                 <p className="mt-0.5 text-[11px] leading-relaxed text-fg-tertiary">
-                  Ends this request permanently and deactivates every mailed action link. Can't be undone.
+                  {t('requestActions.withdrawDesc')}
                 </p>
               </div>
               {!confirmWithdraw ? (
                 <Button size="sm" variant="ghost" onClick={() => setConfirmWithdraw(true)} disabled={!actionable || busy !== null}>
-                  Withdraw
+                  {t('requestActions.withdraw')}
                 </Button>
               ) : (
                 <div className="flex shrink-0 items-center gap-2">
-                  <Button size="sm" variant="ghost" onClick={() => setConfirmWithdraw(false)} disabled={busy !== null}>Keep</Button>
+                  <Button size="sm" variant="ghost" onClick={() => setConfirmWithdraw(false)} disabled={busy !== null}>{t('requestActions.keep')}</Button>
                   <Button size="sm" variant="accent" onClick={withdraw} disabled={busy !== null}>
-                    {busy === 'withdraw' ? '…' : 'Yes, withdraw'}
+                    {busy === 'withdraw' ? '…' : t('requestActions.confirmWithdraw')}
                   </Button>
                 </div>
               )}
@@ -143,7 +152,7 @@ export function RequestActionsDrawer({ target, onClose, onOpenThread, onWithdraw
 
           {!actionable && (
             <p className="text-[11px] leading-relaxed text-fg-tertiary">
-              Remind and withdraw are only available while the request awaits the provider's confirmation.
+              {t('requestActions.notActionable')}
             </p>
           )}
           {error && (

@@ -634,7 +634,9 @@
     "anchorTax": "Impuestos e IVA",
     "anchorEpr": "EPR y Embalaje",
     "anchorPrivacy": "Datos y Privacidad",
+    "anchorMarketing": "Marketing y SEO",
     "anchorCorporate": "Estructura Corporativa",
+    "anchorFullsupport": "Full Support",
     "riskLabel": "Riesgo",
     "whoAffected": "A quién afecta",
     "keyObligations": "Obligaciones Clave",
@@ -642,19 +644,197 @@
     "activeMarkets": "Mercados Activos",
     "startAssessment": "Iniciar evaluación de {{title}}",
     "riskAtGlance": "Riesgo de un vistazo",
+    "country": {
+      "label": "Su mercado principal",
+      "hint": "Filtra los mercados activos y personaliza las prioridades de riesgo."
+    },
+    "kpi": {
+      "jurisdictions": "Jurisdicciones cubiertas",
+      "domains": "Áreas de cumplimiento",
+      "time": "Evaluación guiada",
+      "specialists": "Red de especialistas verificados"
+    },
+    "jtbd": {
+      "overline": "Elija su objetivo",
+      "title": "¿Qué progreso desea lograr?",
+      "body": "CompliHub360 le dirige a la herramienta adecuada según la tarea que necesita resolver — no según la función que cree necesitar.",
+      "expand": {
+        "title": "Expandirse con seguridad",
+        "body": "Identifique sus obligaciones antes de entrar en un nuevo mercado.",
+        "cta": "Iniciar evaluación guiada"
+      },
+      "validate": {
+        "title": "Validar el riesgo",
+        "body": "Compruebe si una campaña, un producto o una afirmación cumple la normativa.",
+        "cta": "Ejecutar verificación de riesgo"
+      },
+      "specialist": {
+        "title": "Encontrar especialista",
+        "body": "Reciba la asignación de un experto verificado para su caso.",
+        "cta": "Explorar áreas"
+      },
+      "research": {
+        "title": "Investigar primero",
+        "body": "Lea guías estructuradas antes de contactar con nadie.",
+        "cta": "Abrir biblioteca"
+      },
+      "maintain": {
+        "title": "Mantener el cumplimiento",
+        "body": "Supervise obligaciones, alertas y renovaciones a lo largo del tiempo.",
+        "cta": "Abrir panel"
+      }
+    },
+    "regulations": {
+      "label": "Normativas clave"
+    },
+    "fines": {
+      "label": "Qué está en juego",
+      "authoritiesLabel": "Aplicado por:"
+    },
+    "specialists": {
+      "label": "Especialistas verificados",
+      "count": "{{count}} especialistas verificados"
+    },
+    "teaser": {
+      "label": "Inicio rápido"
+    },
+    "risk": {
+      "subtitle": "Ordenado por prioridad típica en los distintos mercados.",
+      "priorityBadge": "Prioridad para {{country}}",
+      "hint": {
+        "DE": "En Alemania, la actividad sancionadora del BfDI y la VerpackG elevan conjuntamente la prioridad de Privacidad y EPR.",
+        "FR": "Francia: la CNIL ha sido la autoridad de la UE más activa en la aplicación del RGPD — Privacidad ocupa el primer lugar.",
+        "IT": "Italia: el Garante en materia de privacidad más un régimen de IVA complejo exigen atención paralela a Impuestos y Privacidad.",
+        "ES": "España: la AEAT (impuestos) y la AEPD (privacidad) publican boletines de sanciones trimestralmente.",
+        "UK": "Reino Unido: ICO (privacidad) y HMRC (IVA) — el UK GDPR sigue alineado, pero diverge en materia de adecuación.",
+        "US": "EE. UU.: las directrices publicitarias de la FTC, la privacidad a nivel estatal (CCPA/CPRA) y el nexo del impuesto sobre ventas modifican las prioridades.",
+        "CH": "Suiza: la revFADP exige representantes en la UE — Privacidad aplica incluso desde fuera."
+      }
+    },
+    "matrix": {
+      "title": "Comparativa: todas las áreas de un vistazo",
+      "body": "Comparación rápida para investigadores y responsables de decisión. Ordene por riesgo para priorizar.",
+      "area": "Área de cumplimiento",
+      "disclaimer": "Rangos indicativos basados en referencias regulatorias públicas. La exposición final depende de su caso específico — evalúelo con el asistente para obtener una orientación precisa.",
+      "col": {
+        "risk": "Riesgo",
+        "time": "Plazo para actuar",
+        "fine": "Exposición típica",
+        "markets": "Mercados activos",
+        "effort": "Esfuerzo"
+      },
+      "tax": {
+        "risk": "Alto",
+        "time": "Dentro de los 30 días tras superar el umbral",
+        "fine": "50–300% del impuesto evadido + intereses",
+        "markets": "EU OSS · UK · US Nexus",
+        "effort": "Medio"
+      },
+      "epr": {
+        "risk": "Alto",
+        "time": "Antes de la entrada al mercado",
+        "fine": "hasta el 2% de la facturación anual",
+        "markets": "DE · FR · IT · ES · UK",
+        "effort": "Medio"
+      },
+      "privacy": {
+        "risk": "Crítico",
+        "time": "Inmediato",
+        "fine": "hasta 20M € / 4% de la facturación global",
+        "markets": "EU · UK · CH · US",
+        "effort": "Alto"
+      },
+      "marketing": {
+        "risk": "Medio",
+        "time": "Antes del lanzamiento de la campaña",
+        "fine": "5.000–500.000 € + retirada del producto",
+        "markets": "EU · UK",
+        "effort": "Bajo–Medio"
+      },
+      "corporate": {
+        "risk": "Medio",
+        "time": "Estratégico (3–12 meses)",
+        "fine": "Exposición fiscal + riesgo de la entidad",
+        "markets": "EU · UK · US · CH",
+        "effort": "Alto"
+      },
+      "fullsupport": {
+        "risk": "Combinado",
+        "time": "Bajo petición",
+        "fine": "Cobertura en todas las áreas",
+        "markets": "Todos los mercados soportados",
+        "effort": "Gestionado"
+      }
+    },
+    "howItWorks": {
+      "overline": "Orquestación, no un directorio",
+      "title": "De la incertidumbre a la acción estructurada — en cuatro pasos",
+      "body": "CompliHub360 controla el embudo de contratación y garantiza la responsabilidad de respuesta. Usted mantiene el control de principio a fin.",
+      "stepLabel": "Paso {{num}}",
+      "define": {
+        "title": "Definir",
+        "body": "Elija su país y su área de cumplimiento. Primero anclamos el contexto regulatorio."
+      },
+      "assess": {
+        "title": "Evaluar",
+        "body": "4–5 preguntas precisas traducen su situación en un perfil de búsqueda estructurado."
+      },
+      "match": {
+        "title": "Emparejar",
+        "body": "Los especialistas verificados se clasifican por relevancia, velocidad de respuesta y puntuación de calidad."
+      },
+      "engage": {
+        "title": "Contratar",
+        "body": "Envíe una única solicitud estructurada. Siga confirmaciones y SLA desde su panel."
+      }
+    },
+    "resourceTeaser": {
+      "overline": "¿Prefiere investigar primero?",
+      "title": "Lea antes de contactar",
+      "body": "Conocimiento estructurado para el investigador meticuloso. Cada guía se basa en fuentes regulatorias oficiales y validadas.",
+      "openCta": "Abrir",
+      "library": {
+        "title": "Biblioteca de Cumplimiento",
+        "body": "Normativas seleccionadas, fuentes oficiales y guías estructuradas para cada área."
+      },
+      "countries": {
+        "title": "Guías por país",
+        "body": "Resúmenes por jurisdicción — DE, FR, IT, ES, UK, CH, US."
+      },
+      "tutorials": {
+        "title": "Tutoriales y guías prácticas",
+        "body": "Manuales paso a paso para escenarios de cumplimiento habituales."
+      }
+    },
     "tax": {
       "title": "Impuestos e IVA",
       "risk": "Alto",
       "headline": "IVA transfronterizo, umbrales de entrega y fiscalidad digital",
       "description": "Gestión de obligaciones de IVA transfronterizo, umbrales de entrega y reglas de fiscalidad digital en jurisdicciones internacionales — incluidos los marcos OSS y MTD.",
       "affected": "Operadores de comercio electrónico transfronterizo que venden productos físicos o digitales a través de marketplaces (Amazon) o tiendas independientes (Shopify).",
+      "personaFit": "Ideal para: e-commerce transfronterizo",
       "ob1": "Monitoreo de umbrales de entrega internacionales",
       "ob2": "Determinar cuándo el registro local de IVA se vuelve obligatorio",
       "ob3": "Navegar las diferentes reglas fiscales para bienes físicos vs. digitales",
       "ob4": "Registro e informes OSS",
       "cov1": "Asistente dedicado de Impuestos e IVA — captura modelo de ventas, sede legal, ingresos y mercados objetivo",
       "cov2": "Calcula la vat_likelihood precisa por jurisdicción",
-      "cov3": "Orquesta el emparejamiento con consultores especializados en IVA según la complejidad del caso"
+      "cov3": "Orquesta el emparejamiento con consultores especializados en IVA según la complejidad del caso",
+      "regulations": {
+        "r1": "Directiva del IVA de la UE 2006/112/CE",
+        "r2": "Regímenes OSS / IOSS",
+        "r3": "UK MTD for VAT"
+      },
+      "fines": {
+        "headline": "Normalmente el 50–300% del impuesto evadido más intereses; las auditorías transfronterizas son habituales.",
+        "authorities": "BZSt · HMRC · IRS · AEAT · Agenzia Entrate"
+      },
+      "teaser": {
+        "question": "¿A cuántos mercados de la UE vende?",
+        "o1": "1 mercado",
+        "o2": "2–4 mercados",
+        "o3": "5+ mercados"
+      }
     },
     "epr": {
       "title": "EPR y Embalaje",
@@ -662,13 +842,29 @@
       "headline": "Responsabilidad Extendida del Productor, VerpackG y objetivos de reciclaje",
       "description": "Regulaciones ambientales locales altamente fragmentadas, leyes de embalaje (VerpackG) y objetivos de reciclaje (PRN) que difieren drásticamente por país.",
       "affected": "Comerciantes de e-commerce, fabricantes, revendedores y dropshippers que venden bienes físicos con embalaje a través de fronteras.",
+      "personaFit": "Ideal para: fabricantes y revendedores",
       "ob1": "Comprender las leyes de embalaje y medio ambiente específicas por país",
       "ob2": "Determinar el registro por categoría de producto (electrónica, ropa, cosméticos)",
       "ob3": "Cumplir los objetivos de reciclaje locales para evitar multas",
       "ob4": "Evaluación de responsabilidad del dropshipper",
       "cov1": "Asistente de Producto y Embalaje — evalúa rol comercial, mercados objetivo, categorías de producto",
       "cov2": "Calcula la epr_required_likelihood por jurisdicción",
-      "cov3": "Manejo inteligente de casos extremos: lógica de seguridad «Asumir Sí» para dropshippers inciertos"
+      "cov3": "Manejo inteligente de casos extremos: lógica de seguridad «Asumir Sí» para dropshippers inciertos",
+      "regulations": {
+        "r1": "PPWR (UE) 2024/1781",
+        "r2": "VerpackG (DE)",
+        "r3": "WEEE 2012/19/UE"
+      },
+      "fines": {
+        "headline": "Hasta el 2% de la facturación anual, además de bloqueos de entrada al mercado para productores no registrados.",
+        "authorities": "ZSVR · ADEME · CONAI · Environment Agency"
+      },
+      "teaser": {
+        "question": "¿Envía productos físicos al extranjero?",
+        "o1": "Sí, con regularidad",
+        "o2": "A veces",
+        "o3": "Todavía no — está previsto"
+      }
     },
     "privacy": {
       "title": "Datos y Privacidad",
@@ -676,13 +872,59 @@
       "headline": "GDPR, UK GDPR, cumplimiento de cookies y transferencias de datos",
       "description": "Cumplimiento con el GDPR de la UE, UK GDPR, gestión del consentimiento de cookies y las estrictas regulaciones que rigen las transferencias internacionales de datos.",
       "affected": "Fundadores de software, gerentes de expansión de SaaS y empresas que recopilan datos personales o utilizan herramientas de seguimiento durante su expansión global.",
+      "personaFit": "Ideal para: SaaS y marcas orientadas a datos",
       "ob1": "Implementar una gestión de consentimiento válida",
       "ob2": "Asegurar legalmente las transferencias de datos internacionales (UE ↔ EE. UU.)",
       "ob3": "Gestionar el cumplimiento de herramientas de seguimiento (GA4, Meta, TikTok)",
       "ob4": "Requisitos de banner de cookies y política de privacidad",
       "cov1": "Asistente de Datos y Privacidad — analiza clientes objetivo, ubicaciones de procesamiento, stack de seguimiento",
       "cov2": "Calcula el privacy_risk_level basado en la exposición real de herramientas",
-      "cov3": "La propia plataforma usa un Pipeline local de redacción de PII — cero datos en bruto en la capa de IA"
+      "cov3": "La propia plataforma usa un Pipeline local de redacción de PII — cero datos en bruto en la capa de IA",
+      "regulations": {
+        "r1": "RGPD (UE 2016/679)",
+        "r2": "Directiva ePrivacy 2002/58/CE",
+        "r3": "UK GDPR · revFADP (CH) · CCPA/CPRA (US)"
+      },
+      "fines": {
+        "headline": "Hasta 20M € o el 4% de la facturación anual global (art. 83 RGPD), la cifra que sea mayor.",
+        "authorities": "BfDI · CNIL · ICO · Garante · AEPD · EDÖB"
+      },
+      "teaser": {
+        "question": "¿Trata datos personales de residentes en la UE?",
+        "o1": "Sí",
+        "o2": "No estoy seguro",
+        "o3": "No"
+      }
+    },
+    "marketing": {
+      "title": "Marketing y SEO",
+      "risk": "Medio",
+      "headline": "Afirmaciones publicitarias, salud y sostenibilidad, protección del consumidor",
+      "description": "Cumplimiento publicitario transfronterizo: afirmaciones médicas y de salud, publicidad comparativa, declaraciones de sostenibilidad, normas para influencers y obligaciones de servicios digitales bajo la DSA.",
+      "affected": "Agencias, marcas de e-commerce, vendedores de suplementos y productos de salud, comercializadores de servicios financieros y cualquier negocio con publicidad de pago o SEO orgánico transfronterizo.",
+      "personaFit": "Ideal para: agencias y marcas DTC",
+      "ob1": "Evitar afirmaciones engañosas o sin fundamento",
+      "ob2": "Aprobación de afirmaciones de salud, finanzas y sostenibilidad",
+      "ob3": "Divulgación de marketing de influencers y contenido patrocinado",
+      "ob4": "Obligaciones de notificación y acción bajo DSA / DMA",
+      "cov1": "Asistente de Marketing y SEO — captura la sensibilidad del sector, los tipos de afirmaciones y los canales",
+      "cov2": "Calcula marketing_risk_level y señala patrones de afirmaciones de alto riesgo",
+      "cov3": "Le dirige a especialistas en derecho publicitario y protección del consumidor",
+      "regulations": {
+        "r1": "UCPD 2005/29/CE (prácticas comerciales desleales)",
+        "r2": "DSA (UE) 2022/2065",
+        "r3": "Propuesta de Directiva Green Claims · ASA UK · UWG (DE)"
+      },
+      "fines": {
+        "headline": "5.000–500.000 € por infracción, además de órdenes de retirada de productos o campañas.",
+        "authorities": "Wettbewerbszentrale · DGCCRF · ASA · AGCM · FTC"
+      },
+      "teaser": {
+        "question": "¿Hace afirmaciones de salud o financieras en sus anuncios?",
+        "o1": "Sí",
+        "o2": "Solo afirmaciones comparativas",
+        "o3": "No"
+      }
     },
     "corporate": {
       "title": "Estructura Corporativa",
@@ -690,18 +932,65 @@
       "headline": "Constitución internacional de empresas, forma jurídica y sustancia local",
       "description": "Navegar la constitución internacional de empresas, elegir la forma jurídica correcta, establecer sustancia local y gestionar los registros corporativos en nuevas jurisdicciones.",
       "affected": "Personas o empresas que planean registrar entidades legales, expandir equipos o establecer presencia corporativa en mercados extranjeros.",
+      "personaFit": "Ideal para: equipos de expansión internacional",
       "ob1": "Seleccionar la estructura corporativa adecuada por país objetivo",
       "ob2": "Cumplir los requisitos locales de registro y documentación",
       "ob3": "Establecer sustancia local y gobernanza",
       "ob4": "Evaluación de la complejidad del equipo",
       "cov1": "Asistente Corporativo y de Estructura — evalúa el estado actual, mercados deseados, complejidad del equipo",
       "cov2": "Determina el entity_need_level por jurisdicción",
-      "cov3": "Enrutamiento inteligente a rutas de guías educativas para fundadores indecisos"
+      "cov3": "Enrutamiento inteligente a rutas de guías educativas para fundadores indecisos",
+      "regulations": {
+        "r1": "GwG (DE) · 6.ª Directiva AML (UE) 2018/1673",
+        "r2": "HGB · Companies Act 2006 (UK)",
+        "r3": "Transparencia de titularidad real (UE 2015/849)"
+      },
+      "fines": {
+        "headline": "Responsabilidad personal + exposición fiscal retroactiva si faltan sustancia o estructura.",
+        "authorities": "Registros mercantiles locales · Autoridades fiscales · Supervisores AML"
+      },
+      "teaser": {
+        "question": "¿Tiene previsto registrar una entidad en el extranjero?",
+        "o1": "Sí, este año",
+        "o2": "Explorando opciones",
+        "o3": "No"
+      }
+    },
+    "fullsupport": {
+      "title": "Full Support",
+      "risk": "Combinado",
+      "headline": "Cumplimiento multidominio — un único encargo coordinado",
+      "description": "Cuando las obligaciones abarcan varias categorías (Impuestos + Privacidad + EPR + Marketing), Full Support las orquesta todas en un único encargo estructurado con un socio sénior.",
+      "affected": "Operadores con exposición multicategoría: sectores regulados, SaaS transfronterizo, marketplaces, marcas multiproducto o scaleups que se expanden a 3+ mercados.",
+      "personaFit": "Ideal para: cumplimiento multidominio",
+      "ob1": "Coordinar varios frentes regulatorios en paralelo",
+      "ob2": "Mantener registros de auditoría en todas las categorías",
+      "ob3": "Alinear la hoja de ruta de cumplimiento con los planes de crecimiento",
+      "ob4": "Respuesta y escalado respaldados por SLA",
+      "cov1": "Asistente de Full Support — captura el tamaño del negocio, los mercados, el objetivo prioritario y la madurez actual",
+      "cov2": "Le dirige a socios sénior con capacidad multidominio y compromisos de SLA",
+      "cov3": "Encargo con un único punto de contacto, no múltiples solicitudes aisladas",
+      "regulations": {
+        "r1": "Cobertura de todas las normativas de las áreas listadas",
+        "r2": "Supervisión regulatoria continua",
+        "r3": "Marco de respuesta coordinado"
+      },
+      "fines": {
+        "headline": "Exposición agregada en todas las áreas — Full Support reduce los puntos ciegos y las obligaciones omitidas.",
+        "authorities": "Todas las autoridades relevantes para su operación"
+      },
+      "teaser": {
+        "question": "¿Cuántas áreas de cumplimiento le afectan?",
+        "o1": "2",
+        "o2": "3",
+        "o3": "4 o más"
+      }
     },
     "cta": {
       "title": "¿No estás seguro de qué área aplica?",
       "body": "Nuestro Asistente hace las preguntas correctas y te dirige automáticamente a la evaluación correcta.",
-      "btn": "Iniciar evaluación general"
+      "btn": "Iniciar evaluación general",
+      "fullSupportBtn": "O hable con Full Support"
     },
     "footer": {
       "copyright": "© {{year}} CompliHub360. Construido en Berlín."

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { ArrowRight } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { GoldWord } from '../providers/SectionHeading';
@@ -15,6 +16,7 @@ import { PartnerStatusBadge } from '../ui/ProviderBadges';
 const item = { hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0 } };
 
 function CodeCard({ label, demo, title, desc }: { label: string; demo: ReactNode; title: string; desc: string }) {
+  const { t } = useTranslation('home');
   return (
     <motion.article
       variants={item}
@@ -38,7 +40,7 @@ function CodeCard({ label, demo, title, desc }: { label: string; demo: ReactNode
       </div>
 
       <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-fg-brand transition-opacity duration-300 group-hover:opacity-0">
-        Hover to see
+        {t('brandCode.hoverCue')}
         <ArrowRight size={13} />
       </span>
     </motion.article>
@@ -48,46 +50,50 @@ function CodeCard({ label, demo, title, desc }: { label: string; demo: ReactNode
 // ── Demo previews (reused Compass components) ────────────────────────────────
 
 function RiskScaleDemo() {
+  const { t } = useTranslation('home');
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <RiskBadge level="low" styleVariant="soft" size="sm">Low</RiskBadge>
-      <RiskBadge level="medium" styleVariant="soft" size="sm">Medium</RiskBadge>
-      <RiskBadge level="high" styleVariant="soft" size="sm">High</RiskBadge>
-      <RiskBadge level="critical" styleVariant="soft" size="sm">Critical</RiskBadge>
+      <RiskBadge level="low" styleVariant="soft" size="sm">{t('risk.severity.low')}</RiskBadge>
+      <RiskBadge level="medium" styleVariant="soft" size="sm">{t('risk.severity.medium')}</RiskBadge>
+      <RiskBadge level="high" styleVariant="soft" size="sm">{t('risk.severity.high')}</RiskBadge>
+      <RiskBadge level="critical" styleVariant="soft" size="sm">{t('risk.severity.critical')}</RiskBadge>
     </div>
   );
 }
 
 function WizardPathDemo() {
+  const { t } = useTranslation('home');
   return (
     <div>
       <div className="flex items-center gap-1.5">
         <span className="h-1.5 w-7 rounded-full bg-brand" />
         <span className="rounded-full bg-accent-500 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.06em] text-primary-900">
-          Step 2 of 4
+          {t('brandCode.demo.step')}
         </span>
         <span className="h-1.5 w-7 rounded-full bg-neutral-200" />
         <span className="h-1.5 w-7 rounded-full bg-neutral-200" />
       </div>
-      <p className="mt-3 text-[13px] font-medium text-fg">Where do you sell?</p>
+      <p className="mt-3 text-[13px] font-medium text-fg">{t('brandCode.demo.question')}</p>
     </div>
   );
 }
 
 function VerifiedPartnerDemo() {
+  const { t } = useTranslation('home');
   return (
     <div className="flex items-center gap-3">
       <Avatar size="md" initials="MP" tone="soft" />
       <div className="min-w-0 flex-1">
         <p className="truncate text-[14px] font-bold text-fg">Müller &amp; Partner KG</p>
-        <p className="truncate text-[12px] text-fg-secondary">VAT specialist · Germany &amp; Austria</p>
+        <p className="truncate text-[12px] text-fg-secondary">{t('brandCode.demo.partnerSpecialty')}</p>
       </div>
-      <PartnerStatusBadge status="verified" styleVariant="solid" label="Verified" />
+      <PartnerStatusBadge status="verified" styleVariant="solid" label={t('badge.verified')} />
     </div>
   );
 }
 
 export function BrandCodePreview() {
+  const { t } = useTranslation('home');
   return (
     <section id="brand-code" className="relative overflow-hidden bg-brand py-20 lg:py-28">
       {/* Soft petrol-light glow (Figma "Petrol inner light") */}
@@ -107,14 +113,13 @@ export function BrandCodePreview() {
         >
           <span className="inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-accent-400">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-current" />
-            The way we communicate
+            {t('brandCode.eyebrow')}
           </span>
           <h2 className="mt-4 font-serif text-[2rem] font-semibold leading-tight tracking-tight text-white sm:text-[2.75rem]">
-            <GoldWord>Three</GoldWord> quiet defaults.
+            <GoldWord>{t('brandCode.title.gold')}</GoldWord>{t('brandCode.title.post')}
           </h2>
           <p className="mt-5 text-body leading-relaxed text-white/75">
-            Compliance products usually shout. We shouldn&rsquo;t have to. Risk doesn&rsquo;t need red. Decisions don&rsquo;t
-            need a 20-step funnel. Partners don&rsquo;t need a marketplace. Hover each card to see what we did instead.
+            {t('brandCode.subtitle')}
           </p>
         </motion.div>
 
@@ -127,22 +132,22 @@ export function BrandCodePreview() {
           viewport={{ once: true, margin: '-80px' }}
         >
           <CodeCard
-            label="Code 02 — Risk in petrol"
+            label={t('brandCode.cards.0.label')}
             demo={<RiskScaleDemo />}
-            title="No red. Ever."
-            desc="Risk levels from low to critical, expressed in petrol tones — never red. The product never tries to scare you into action."
+            title={t('brandCode.cards.0.title')}
+            desc={t('brandCode.cards.0.desc')}
           />
           <CodeCard
-            label="Code 04 — The wizard's path"
+            label={t('brandCode.cards.1.label')}
             demo={<WizardPathDemo />}
-            title="One question at a time."
-            desc="The wizard's gold pill stepper marks where you are without overwhelming. The path forward is always one decision wide."
+            title={t('brandCode.cards.1.title')}
+            desc={t('brandCode.cards.1.desc')}
           />
           <CodeCard
-            label="Brand mark — Verified Partner"
+            label={t('brandCode.cards.2.label')}
             demo={<VerifiedPartnerDemo />}
-            title="A quiet sign of accountability."
-            desc="Verified Partners are vetted advisors who accept shared responsibility for your matter. The gold mark is restraint, not promotion."
+            title={t('brandCode.cards.2.title')}
+            desc={t('brandCode.cards.2.desc')}
           />
         </motion.div>
       </div>

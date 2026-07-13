@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Bookmark, Play, FileText, BookOpen, Wrench, Radio } from 'lucide-react';
+import { Trans, useTranslation } from 'react-i18next';
 import { UserShell } from '../../components/user/UserShell';
 import { FilterChip } from '../../components/ui/Badge';
 import { Tag } from '../../components/ui/Tag';
@@ -7,7 +8,8 @@ import { Card } from '../../components/ui/Card';
 
 // ─── User Dashboard · Library (Knowledge Hub) ─────────────────────────────────
 // Mirrors "User · Library (Desktop)": TYPE + DOMAIN filter rows and the
-// knowledge grid (videos · articles · webinars · guides · tools). Fixture data.
+// knowledge grid (videos · articles · webinars · guides · tools). Fixture data
+// (item rows are demo content and stay untranslated).
 
 type ItemType = 'VIDEO' | 'ARTICLE' | 'WEBINAR' | 'GUIDE' | 'TOOL';
 
@@ -30,15 +32,16 @@ const ITEMS: { title: string; source: string; type: ItemType; domain: string }[]
   { title: 'When does Partita IVA become mandatory?', source: 'Studio Bianchi · 6 min read', type: 'ARTICLE', domain: 'TAX & VAT' },
 ];
 
-const TYPE_FILTERS = [
-  { key: 'all', label: 'All · 212' }, { key: 'VIDEO', label: 'Videos · 84' }, { key: 'ARTICLE', label: 'Articles · 76' },
-  { key: 'WEBINAR', label: 'Webinars · 18' }, { key: 'GUIDE', label: 'Guides · 26' }, { key: 'TOOL', label: 'Tools · 8' },
+const TYPE_FILTERS: { key: string; labelKey: string }[] = [
+  { key: 'all', labelKey: 'filterAll' }, { key: 'VIDEO', labelKey: 'filterVideos' }, { key: 'ARTICLE', labelKey: 'filterArticles' },
+  { key: 'WEBINAR', labelKey: 'filterWebinars' }, { key: 'GUIDE', labelKey: 'filterGuides' }, { key: 'TOOL', labelKey: 'filterTools' },
 ];
-const DOMAIN_FILTERS = ['All domains · 212', 'Tax & VAT · 68', 'Privacy · 42', 'Packaging · 31', 'Marketing · 28', 'Corporate · 24'];
+const DOMAIN_FILTER_KEYS = ['filterAllDomains', 'filterTaxVat', 'filterPrivacy', 'filterPackaging', 'filterMarketing', 'filterCorporate'];
 
 export function LibraryPage() {
+  const { t } = useTranslation('userws');
   const [typeFilter, setTypeFilter] = useState('all');
-  const [domainFilter, setDomainFilter] = useState(DOMAIN_FILTERS[0]);
+  const [domainFilter, setDomainFilter] = useState(DOMAIN_FILTER_KEYS[0]);
   const list = ITEMS.filter((i) => typeFilter === 'all' || i.type === typeFilter);
 
   return (
@@ -47,26 +50,26 @@ export function LibraryPage() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="font-serif text-[32px] font-bold leading-tight text-fg">
-              Knowledge <span className="text-fg-accent">library</span>.
+              <Trans t={t} i18nKey="library.title" components={{ accent: <span className="text-fg-accent" /> }} />
             </h1>
-            <p className="mt-1 text-body-sm text-fg-secondary">212 items · 84 videos · 76 articles · 18 webinars · 26 guides · 8 tools</p>
+            <p className="mt-1 text-body-sm text-fg-secondary">{t('library.sub')}</p>
           </div>
           <button type="button" className="mt-2 flex shrink-0 items-center gap-1.5 text-[12px] text-fg-secondary transition-colors hover:text-fg">
-            <Bookmark size={13} /> Bookmarks (12)
+            <Bookmark size={13} /> {t('shared.bookmarks')}
           </button>
         </div>
 
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="w-14 text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">Type</span>
+            <span className="w-14 text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{t('library.rowType')}</span>
             {TYPE_FILTERS.map((f) => (
-              <FilterChip key={f.key} size="sm" selected={typeFilter === f.key} onClick={() => setTypeFilter(f.key)}>{f.label}</FilterChip>
+              <FilterChip key={f.key} size="sm" selected={typeFilter === f.key} onClick={() => setTypeFilter(f.key)}>{t(`library.${f.labelKey}`)}</FilterChip>
             ))}
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="w-14 text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">Domain</span>
-            {DOMAIN_FILTERS.map((f) => (
-              <FilterChip key={f} size="sm" selected={domainFilter === f} onClick={() => setDomainFilter(f)}>{f}</FilterChip>
+            <span className="w-14 text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{t('library.rowDomain')}</span>
+            {DOMAIN_FILTER_KEYS.map((f) => (
+              <FilterChip key={f} size="sm" selected={domainFilter === f} onClick={() => setDomainFilter(f)}>{t(`library.${f}`)}</FilterChip>
             ))}
           </div>
         </div>

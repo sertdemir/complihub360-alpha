@@ -17,13 +17,21 @@ i18n
   .init({
     fallbackLng: 'en',
     supportedLngs,
+    // Region auto-detection: browsers report regional tags (de-DE, de-AT,
+    // es-MX, tr-TR). Without these two options such tags fail the
+    // supportedLngs check and silently fall back to English — with them the
+    // device/region language maps onto our four locales automatically.
+    load: 'languageOnly',
+    nonExplicitSupportedLngs: true,
     debug: false,
-    
-    // We use a custom language detector config to check URL path first
+
+    // Priority: explicit URL locale beats the user's saved choice beats the
+    // device/region language. Once the toggle is used, localStorage wins.
     detection: {
       order: ['path', 'localStorage', 'navigator'],
       lookupFromPathIndex: 0,
       caches: ['localStorage'],
+      convertDetectedLanguage: (lng: string) => lng.split('-')[0],
     },
 
     backend: {

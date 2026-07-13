@@ -1,4 +1,5 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   Check,
@@ -30,72 +31,65 @@ import type { SearchProfile, WizardCategory, BusinessType } from '../wizard/Wiza
 // clicks the footer button to advance — stepping through Markets → Operations →
 // Domains and looping. Light desktop wizard (Figma 2463:2242). Mode-aware tokens.
 
-type Card = { id: string; icon?: LucideIcon; title: string; desc: string };
+// Copy lives in the 'home' namespace: wizard.cards.<key>.{title,desc},
+// wizard.steps.<key>.{title,subtitle}, wizard.rail.<key>, wizard.footer.<key>.
+type Card = { id: string; key: string; icon?: LucideIcon };
 
 type StepDef = {
   rail: number;
-  stepLabel: string;
-  title: string;
-  subtitle: string;
+  key: 'markets' | 'operations' | 'domains';
   cards: Card[];
-  pills?: { caption: string; items: string[] };
   picks: string[]; // ids clicked in order, then the footer
-  footer: string;
+  footerKey: 'next' | 'skipRoute';
 };
 
-const RAIL = ['Markets', 'Operations', 'Domains', 'Review'];
+const RAIL = ['markets', 'operations', 'domains', 'review'] as const;
 
 const STEPS: StepDef[] = [
   {
     rail: 0,
-    stepLabel: 'Step 1 of 4',
-    title: 'Where do you operate?',
-    subtitle: 'Multi-select. We map regulations against the markets you sell into.',
+    key: 'markets',
     cards: [
-      { id: 'Germany', title: 'Germany', desc: 'Primary VAT regime · LUCID register' },
-      { id: 'United Kingdom', title: 'United Kingdom', desc: 'Post-Brexit packaging + VAT' },
-      { id: 'Netherlands', title: 'Netherlands', desc: 'VAT + WEEE register' },
-      { id: 'France', title: 'France', desc: 'EPR + AGEC compliance' },
-      { id: 'Italy', title: 'Italy', desc: 'VAT + REACH' },
-      { id: 'Spain', title: 'Spain', desc: 'VAT + ecodesign' },
-      { id: 'United States', title: 'United States', desc: 'Sales-tax nexus · marketplace facilitator' },
-      { id: 'Türkiye', title: 'Türkiye', desc: 'VAT (KDV) · e-fatura / e-arşiv' },
-      { id: 'Others', title: 'Others', desc: 'Open country list →' },
+      { id: 'Germany', key: 'germany' },
+      { id: 'United Kingdom', key: 'unitedKingdom' },
+      { id: 'Netherlands', key: 'netherlands' },
+      { id: 'France', key: 'france' },
+      { id: 'Italy', key: 'italy' },
+      { id: 'Spain', key: 'spain' },
+      { id: 'United States', key: 'unitedStates' },
+      { id: 'Türkiye', key: 'turkiye' },
+      { id: 'Others', key: 'others' },
     ],
     picks: ['Germany', 'United Kingdom', 'Netherlands'],
-    footer: 'Next',
+    footerKey: 'next',
   },
   {
     rail: 1,
-    stepLabel: 'Step 2 of 4',
-    title: 'What do your operations look like?',
-    subtitle: 'We scope the regulations that apply to your operation, not just your market.',
+    key: 'operations',
     cards: [
-      { id: 'D2C e-commerce', icon: ShoppingCart, title: 'D2C e-commerce', desc: 'Direct-to-consumer online sales' },
-      { id: 'B2B / wholesale', icon: Boxes, title: 'B2B / wholesale', desc: 'Sell to businesses or distributors' },
-      { id: 'Marketplace', icon: Store, title: 'Marketplace', desc: 'You connect buyers + sellers' },
-      { id: 'SaaS / digital', icon: Cloud, title: 'SaaS / digital', desc: 'Software, no physical shipment' },
-      { id: 'Hybrid', icon: Layers, title: 'Hybrid', desc: 'Mix of B2B and B2C channels' },
-      { id: 'Other', icon: MoreHorizontal, title: 'Other', desc: 'Tell us in a sentence' },
+      { id: 'D2C e-commerce', key: 'd2cEcommerce', icon: ShoppingCart },
+      { id: 'B2B / wholesale', key: 'b2bWholesale', icon: Boxes },
+      { id: 'Marketplace', key: 'marketplace', icon: Store },
+      { id: 'SaaS / digital', key: 'saasDigital', icon: Cloud },
+      { id: 'Hybrid', key: 'hybrid', icon: Layers },
+      { id: 'Other', key: 'other', icon: MoreHorizontal },
     ],
     picks: ['D2C e-commerce'],
-    footer: 'Next',
+    footerKey: 'next',
   },
   {
     rail: 2,
-    stepLabel: 'Step 3 of 4',
-    title: 'Which compliance areas concern you?',
-    subtitle: 'Multi-select. We prioritize the obligations in these domains.',
+    key: 'domains',
     cards: [
-      { id: 'VAT & Tax', icon: BarChart3, title: 'VAT & Tax', desc: 'Cross-border VAT, OSS/IOSS, thresholds' },
-      { id: 'EPR & Packaging', icon: Globe, title: 'EPR & Packaging', desc: 'Producer responsibility, registers' },
-      { id: 'GDPR & Privacy', icon: Shield, title: 'GDPR & Privacy', desc: 'DPIA, RoPA, processor agreements' },
-      { id: 'Marketing', icon: MessageSquare, title: 'Marketing', desc: 'Consent, cookies, dark-pattern audits' },
-      { id: 'Corporate', icon: Building2, title: 'Corporate', desc: 'Annual statements, beneficial owners' },
-      { id: 'Full Coverage', icon: ShieldCheck, title: 'Full Coverage', desc: 'Cross-domain partner routing' },
+      { id: 'VAT & Tax', key: 'vatTax', icon: BarChart3 },
+      { id: 'EPR & Packaging', key: 'eprPackaging', icon: Globe },
+      { id: 'GDPR & Privacy', key: 'gdprPrivacy', icon: Shield },
+      { id: 'Marketing', key: 'marketing', icon: MessageSquare },
+      { id: 'Corporate', key: 'corporate', icon: Building2 },
+      { id: 'Full Coverage', key: 'fullCoverage', icon: ShieldCheck },
     ],
     picks: ['VAT & Tax', 'EPR & Packaging', 'GDPR & Privacy'],
-    footer: 'Skip & route',
+    footerKey: 'skipRoute',
   },
 ];
 
@@ -162,6 +156,7 @@ function buildProfile(selected: Set<string>, extraMarkets: string[]): SearchProf
 
 // Review summary row (Step 4 · Figma 1660:162) — label + value + Edit.
 function SummaryRow({ label, value, onEdit }: { label: string; value: string[]; onEdit: () => void }) {
+  const { t } = useTranslation('home');
   return (
     <div className="flex items-start justify-between gap-4 border-b border-stroke-subtle py-5 last:border-0">
       <div className="min-w-0 text-left">
@@ -173,13 +168,14 @@ function SummaryRow({ label, value, onEdit }: { label: string; value: string[]; 
         onClick={onEdit}
         className="shrink-0 text-[13px] font-semibold text-fg-brand transition-colors hover:text-brand"
       >
-        Edit
+        {t('wizard.review.edit')}
       </button>
     </div>
   );
 }
 
 function StepRail({ current, spacious = false }: { current: number; spacious?: boolean }) {
+  const { t } = useTranslation('home');
   // Fixed-width nodes + equal flex connectors → the rail is symmetric, so it
   // (and the "Step X of 4" label below) centers truly under the window.
   return (
@@ -207,7 +203,7 @@ function StepRail({ current, spacious = false }: { current: number; spacious?: b
                   (state === 'upcoming' ? 'text-fg-tertiary' : 'text-fg')
                 }
               >
-                {label}
+                {t(`wizard.rail.${label}`)}
               </span>
             </div>
             {i < RAIL.length - 1 && <span className="mx-3 mb-4 h-px flex-1 bg-stroke" />}
@@ -238,6 +234,7 @@ export function AnimatedWizard({
   /** C6 "Refine existing": pre-selects the cards and opens on the Review step. */
   initialProfile?: SearchProfile;
 }) {
+  const { t } = useTranslation('home');
   const reduced = useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
   const targets = useRef(new Map<string, HTMLElement | null>());
@@ -352,13 +349,17 @@ export function AnimatedWizard({
   // Hero (compact) shows 6 cards; the spacious Figma layout shows the full set.
   const cards = sp ? step.cards : step.cards.slice(0, 6);
 
+  // Drawer market ids are single words, so the i18n key is just the lowercase id.
+  const marketLabel = (id: string) => t(`marketsDrawer.markets.${id.toLowerCase()}.name`, { defaultValue: id });
+  const cardTitle = (c: Card) => t(`wizard.cards.${c.key}.title`);
+
   // Review summary (Step 4) derived from the user's selections.
   const reviewMarkets = [
-    ...STEPS[0].cards.filter((c) => c.id !== 'Others' && selected.has(c.id)).map((c) => c.title),
-    ...extraMarkets,
+    ...STEPS[0].cards.filter((c) => c.id !== 'Others' && selected.has(c.id)).map(cardTitle),
+    ...extraMarkets.map(marketLabel),
   ];
-  const reviewOps = STEPS[1].cards.filter((c) => selected.has(c.id)).map((c) => c.title);
-  const reviewDomains = STEPS[2].cards.filter((c) => selected.has(c.id)).map((c) => c.title);
+  const reviewOps = STEPS[1].cards.filter((c) => selected.has(c.id)).map(cardTitle);
+  const reviewDomains = STEPS[2].cards.filter((c) => selected.has(c.id)).map(cardTitle);
   const editStep = (i: number) => {
     setStepIndex(i);
     setActive(null);
@@ -396,7 +397,7 @@ export function AnimatedWizard({
               (interactive ? ' transition-colors hover:text-brand' : '')
             }
           >
-            Save progress <ChevronRight size={sp ? 14 : 12} />
+            {t('wizard.saveProgress')} <ChevronRight size={sp ? 14 : 12} />
           </button>
         </div>
       )}
@@ -411,7 +412,7 @@ export function AnimatedWizard({
         <div className={sp ? 'mx-auto w-full max-w-[880px]' : 'contents'}>
           <div className={sp ? 'text-center' : 'mt-5 text-left'}>
             <h3 className={'font-serif font-bold leading-tight text-fg ' + (sp ? 'text-[38px]' : 'text-[24px]')}>
-              {isReview ? 'Your situation, summarized.' : step.title}
+              {isReview ? t('wizard.review.title') : t(`wizard.steps.${step.key}.title`)}
             </h3>
             <p
               className={
@@ -419,9 +420,7 @@ export function AnimatedWizard({
                 (sp ? 'mx-auto mt-3 max-w-xl text-[16px]' : 'mt-2 max-w-md text-[12px]')
               }
             >
-              {isReview
-                ? "Here’s what we’ll use. Edit anything you need, then generate your risk map."
-                : step.subtitle}
+              {isReview ? t('wizard.review.subtitle') : t(`wizard.steps.${step.key}.subtitle`)}
             </p>
           </div>
 
@@ -429,12 +428,12 @@ export function AnimatedWizard({
           {isReview && (
             <>
               <div className="mx-auto mt-9 max-w-[640px] rounded-2xl border-2 border-accent-400 bg-surface px-6">
-                <SummaryRow label="Markets" value={reviewMarkets} onEdit={() => editStep(0)} />
-                <SummaryRow label="Operations" value={reviewOps} onEdit={() => editStep(1)} />
-                <SummaryRow label="Compliance domains" value={reviewDomains} onEdit={() => editStep(2)} />
+                <SummaryRow label={t('wizard.review.markets')} value={reviewMarkets} onEdit={() => editStep(0)} />
+                <SummaryRow label={t('wizard.review.operations')} value={reviewOps} onEdit={() => editStep(1)} />
+                <SummaryRow label={t('wizard.review.domains')} value={reviewDomains} onEdit={() => editStep(2)} />
               </div>
               <p className="mt-8 text-center text-[14px] text-fg-tertiary">
-                Anonymous · No account required to see your risk map · Processed in ~4 seconds
+                {t('wizard.review.trust')}
               </p>
             </>
           )}
@@ -478,10 +477,10 @@ export function AnimatedWizard({
                               key={id}
                               className="inline-flex items-center gap-1 rounded-full bg-brand-light px-2 py-0.5 text-[12px] font-medium text-fg-brand"
                             >
-                              {id}
+                              {marketLabel(id)}
                               <button
                                 type="button"
-                                aria-label={`Remove ${id}`}
+                                aria-label={t('wizard.removeMarket', { market: marketLabel(id) })}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   applyExtraMarkets(extraMarkets.filter((x) => x !== id));
@@ -505,7 +504,7 @@ export function AnimatedWizard({
                       ) : c.id === 'Others' ? null : interactive && COUNTRY_INFO[c.id] ? (
                         <button
                           type="button"
-                          aria-label={`About ${c.title}`}
+                          aria-label={t('wizard.aboutMarket', { market: cardTitle(c) })}
                           onClick={(e) => {
                             e.stopPropagation();
                             setInfoCountry(c.id);
@@ -520,10 +519,10 @@ export function AnimatedWizard({
                     </span>
                   </div>
                   <p className={'font-semibold leading-tight text-fg ' + (sp ? 'mt-3 text-[16px]' : 'mt-2.5 text-[13px]')}>
-                    {c.title}
+                    {cardTitle(c)}
                   </p>
                   <p className={'leading-snug text-fg-secondary ' + (sp ? 'mt-1 text-[14px]' : 'mt-1 text-[11px]')}>
-                    {c.desc}
+                    {t(`wizard.cards.${c.key}.desc`)}
                   </p>
                 </div>
               );
@@ -531,33 +530,10 @@ export function AnimatedWizard({
           </div>
           )}
 
-          {/* Optional pills */}
-          {!isReview && step.pills && (
-            <div className="mt-5">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-fg-tertiary">{step.pills.caption}</p>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {step.pills.items.map((p) => {
-                  const on = selected.has(p);
-                  return (
-                    <span
-                      key={p}
-                      ref={setTarget(p)}
-                      className={
-                        'rounded-full border px-3 py-1.5 text-[12px] font-medium transition-colors duration-200 ' +
-                        (on ? 'border-stroke-brand bg-brand-light/50 text-fg-brand' : 'border-stroke text-fg-secondary')
-                      }
-                    >
-                      {p}
-                    </span>
-                  );
-                })}
-              </div>
-            </div>
-          )}
           {/* Compact: route hint sits in the body; spacious moves it into the footer. */}
           {!sp && (
             <p className="mx-auto mt-auto pt-4 text-center text-[11px] text-fg-tertiary">
-              Not sure? Skip and we'll route based on your business model and markets.
+              {t('wizard.skipHint')}
             </p>
           )}
         </div>
@@ -572,7 +548,7 @@ export function AnimatedWizard({
       >
         {sp && !isReview && (
           <p className="pointer-events-none absolute left-1/2 hidden -translate-x-1/2 px-4 text-center text-[13px] text-fg-tertiary lg:block">
-            Not sure? Skip and we&rsquo;ll route based on your business model and markets.
+            {t('wizard.skipHint')}
           </p>
         )}
         {interactive ? (
@@ -586,7 +562,7 @@ export function AnimatedWizard({
                 (sp ? 'text-[14px]' : 'text-[13px]')
               }
             >
-              <ArrowLeft size={sp ? 16 : 15} /> Back
+              <ArrowLeft size={sp ? 16 : 15} /> {t('wizard.back')}
             </button>
             <button
               type="button"
@@ -597,19 +573,19 @@ export function AnimatedWizard({
                 (isReview ? ' bg-accent-500 text-primary-950' : ' bg-brand text-fg-on-brand')
               }
             >
-              {isReview ? 'Generate my risk map' : 'Next'} <ArrowRight size={sp ? 16 : 14} />
+              {isReview ? t('wizard.generate') : t('wizard.footer.next')} <ArrowRight size={sp ? 16 : 14} />
             </button>
           </>
         ) : (
           <>
             <span className="flex items-center gap-1.5 text-[13px] font-medium text-fg-tertiary">
-              <ArrowLeft size={15} /> Back
+              <ArrowLeft size={15} /> {t('wizard.back')}
             </span>
             <span
               ref={setTarget(FOOTER)}
               className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2 text-[13px] font-semibold text-fg-on-brand"
             >
-              {step.footer} <ArrowRight size={14} />
+              {t(`wizard.footer.${step.footerKey}`)} <ArrowRight size={14} />
             </span>
           </>
         )}

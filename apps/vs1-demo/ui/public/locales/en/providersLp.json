@@ -1,0 +1,322 @@
+{
+  "hero": {
+    "eyebrow": "For verified partners · Beta",
+    "title": {
+      "pre": "The compliance work you",
+      "gold": "actually",
+      "post": " want."
+    },
+    "sub": "Pre-qualified by user-completed risk maps. You pay only when you accept the request. No upfront fee. Founding cohort closing at 100 partners.",
+    "ctaPrimary": "Apply for Beta cohort",
+    "ctaSecondary": "See how matching works",
+    "chip": {
+      "noFee": "No upfront fee",
+      "payOnAccept": "Pay on accepted requests",
+      "badge": "Founding-Partner badge"
+    },
+    "chipMobile": {
+      "noFee": "No upfront fee · no subscription",
+      "payOnAccept": "Pay only on accepted engagements",
+      "badge": "Founding-Partner badge through Beta"
+    },
+    "specialistsLabel": "Founding specialist profiles",
+    "specialist": {
+      "vat": {
+        "title": "VAT & Tax specialist",
+        "desc": "Cross-border returns, OSS / IOSS, marketplace facilitator nexus, distance-selling thresholds."
+      },
+      "epr": {
+        "title": "EPR & Packaging consultant",
+        "desc": "Producer registries, ecomodulation, post-Brexit splits, take-back schemes."
+      },
+      "gdpr": {
+        "title": "GDPR & Privacy lawyer",
+        "desc": "DPIA, RoPA, processor agreements, breach response, transfer impact assessments."
+      }
+    },
+    "inboxTitle": "Partner Inbox",
+    "inboxActive": "ACTIVE · 3",
+    "inboxArchive": "ARCHIVE",
+    "sampleLabel": "One incoming request · sample",
+    "sampleNote": "Dashboard-only · One-click Accept · Pay $100 on accept"
+  },
+  "matchmaking": {
+    "eyebrow": "Matchmaking",
+    "title": {
+      "pre": "Leads come",
+      "gold": "pre-scoped",
+      "post": ". You see what fits."
+    },
+    "tagline": "Less time explaining. More time closing.",
+    "lead": "Every request that lands in your inbox arrives with structure — country scope, business model, revenue band, prioritized obligations, and statutory citations. We filter by your coverage and category, rank Partner-tier providers first, and route only what fits your practice.",
+    "coldLabel": "Without CompliHub · typical cold inbound",
+    "structuredLabel": "With CompliHub · every request arrives structured",
+    "fromLabel": "From: {{email}}",
+    "cold": {
+      "0": {
+        "subject": "Quick question about GDPR",
+        "body": "\"Hi, do you do GDPR audits? Need someone urgently. When can you hop on a call to walk us through everything?\""
+      },
+      "1": {
+        "subject": "VAT help needed",
+        "body": "\"We’re expanding to a few EU countries. Can you tell us what we need? Also, what do you charge?\""
+      },
+      "2": {
+        "subject": "(no subject)",
+        "body": "\"hello packaging compliance question can you help thanks\""
+      }
+    },
+    "note": "Founding partners decide their own coverage scope. We never push a request outside your declared expertise."
+  },
+  "dashboard": {
+    "eyebrow": "One-stop-dashboard",
+    "title": {
+      "pre": "Every active engagement, in",
+      "gold": "one",
+      "post": " place."
+    },
+    "lead": "Inbox, active engagements, response history, billing, profile settings — all in one workspace. Click Accept once. We hand the lead over with full structured context. From there, it's your relationship.",
+    "panels": {
+      "inbox": {
+        "caption": "Inbox · new requests",
+        "title": "Inbox · 3 new",
+        "filter": "Filter ▾"
+      },
+      "active": {
+        "caption": "Active engagement · post-accept"
+      },
+      "coverage": {
+        "caption": "Profile · coverage settings"
+      }
+    },
+    "features": {
+      "0": {
+        "title": "Full context on accept",
+        "desc": "When you accept, the user's risk map, statutory citations, and timeline arrive structured — ready to act on."
+      },
+      "1": {
+        "title": "SLA reminders built-in",
+        "desc": "24h confirm, 48h reply. We ping you before you breach. Repeated breaches → downgrade warning."
+      },
+      "2": {
+        "title": "Coverage stays under your control",
+        "desc": "Edit categories + jurisdictions anytime. Auto-pause when your active queue fills. No surprise requests."
+      }
+    },
+    "note": "On Accept, we hand the lead over — full context, structured. From there, it's your relationship. We step out of the way."
+  },
+  "performance": {
+    "eyebrow": "Performance Tracker",
+    "title": {
+      "pre": "Stay Top-Tier. We tell you",
+      "gold": "how",
+      "post": " — before you slip."
+    },
+    "tagline": "Earn visibility through performance, not advertising spend.",
+    "lead": "We track only what's in your control: how fast you respond, how often you accept, how reliably you meet SLA. Outcome stays between you and the client. Your tier ranking, breach count, and projected standing — visible to you in real-time, with 7-day early-warning if you're trending toward downgrade.",
+    "features": {
+      "0": {
+        "title": "Real-time SLA timers",
+        "desc": "See your 24h confirm and 48h reply countdowns live. The same timer the user sees on their side."
+      },
+      "1": {
+        "title": "Tier badge that travels",
+        "desc": "Founding-Partner status appears in your profile and on every request a user sees. Carries social proof, not just a vanity mark."
+      },
+      "2": {
+        "title": "7-day early-warning",
+        "desc": "If you're trending toward downgrade, we ping you a week ahead with concrete actions. No silent demotions."
+      }
+    },
+    "note": "Founding partners get the badge. Top performers keep their tier. Everyone sees the same numbers — there's no hidden ranking."
+  },
+  "channels": {
+    "eyebrow": "Two channels · pick what fits",
+    "title": {
+      "pre": "Two paths to leads. Both",
+      "gold": "transparent",
+      "post": "."
+    },
+    "lead": "Provider monetization is layered. The affiliate channel is open to every provider — pay per click, list-as-found. The engagement channel is partner-tier exclusive — pay only when you accept a structured request. Pick one, run both, or upgrade later.",
+    "pricingLabel": "Pricing",
+    "affiliate": {
+      "tag": "Open to all providers",
+      "title": "Affiliate Link",
+      "desc": "Visibility-only. Drive traffic to your own site from your listing in CompliHub results.",
+      "listingMeta": "Munich · VAT & OSS specialist",
+      "listingBadge": "Sponsored",
+      "listingVisit": "Visit →",
+      "priceUnit": "per click on Visit website",
+      "points": {
+        "0": "No application or approval required",
+        "1": "Pay only for click-throughs",
+        "2": "Available immediately on sign-up"
+      },
+      "cta": "Set up affiliate link",
+      "footnote": "Pause or disable from your dashboard anytime · no minimum commitment"
+    },
+    "engagement": {
+      "tag": "Partner-tier · sign-up to unlock",
+      "title": "Engagement Requests",
+      "desc": "Pre-qualified, structured leads in your inbox. Risk-free until you accept.",
+      "priceUnit": "per accepted request · not per inquiry",
+      "points": {
+        "0": "Pre-qualified by user-completed risk maps",
+        "1": "Pay only when you accept (not on receive)",
+        "2": "Founding-Partner badge + tier ranking included"
+      },
+      "lockNote": "Apply for Beta cohort to unlock this channel",
+      "cta": "Apply for Beta cohort",
+      "footnote": "Decline freely · we only bill on accept · pause incoming anytime"
+    },
+    "note": "Both channels show the same outcome: a user reaches you. The difference is who sets the friction — and who knows what they're getting."
+  },
+  "faq": {
+    "eyebrow": "Before you apply",
+    "title": {
+      "pre": "The things you'd ask.",
+      "gold": "Answered",
+      "post": "."
+    },
+    "items": {
+      "0": {
+        "q": "What does it cost to participate?",
+        "a": "Two channels, both transparent. Affiliate Link is €2 per click — open to all providers, no application. Engagement Requests are €92 (≈ $100) per accepted request, partner-tier only. No subscription, no monthly fee, no minimum spend. You pay only on action — clicks or accepts. Cancel or pause anytime."
+      },
+      "1": {
+        "q": "How are leads pre-qualified?",
+        "a": "Every request comes from a user who completed a structured compliance assessment — country scope, business model, revenue band, and prioritized obligations with statutory citations. We match against your declared coverage and category, then rank Partner-tier providers first."
+      },
+      "2": {
+        "q": "What happens after I accept a request?",
+        "a": "On Accept, we transfer the full request package to you — user profile, prioritized obligations, statutory citations, direct contact details. That's it. We don't track the engagement outcome. From there, it's your relationship in your preferred tooling. You'll see the engagement in your Active tab for your own reference. We bill the accept fee within 24h."
+      },
+      "3": {
+        "q": "Can I decline a request without penalty?",
+        "a": "Yes. Decline any request with no fee and no tier impact — we only bill on accept. Declining requests outside your declared scope simply tells us to route differently next time."
+      },
+      "4": {
+        "q": "How do I qualify for Partner-tier?",
+        "a": "Partner-tier is currently invite + Beta-cohort based. Consistent acceptance, fast SLA response, and verified credentials move you up. Founding-Partner status is granted to the first cohort and carries a badge that travels with every request a user sees."
+      },
+      "5": {
+        "q": "What if I miss SLA?",
+        "a": "We confirm in 24h, reply in 48h. Miss one and we flag it on your dashboard with a heads-up. Repeated breaches trigger a Tier-2 review — but only after a 7-day early-warning with concrete actions. No silent demotions."
+      },
+      "6": {
+        "q": "Can I share access with my team?",
+        "a": "Today the workspace is single-login. Team seats with role-based permissions are on the Beta roadmap, so colleagues can triage and respond under one partner account."
+      },
+      "7": {
+        "q": "When am I billed?",
+        "a": "Affiliate clicks are billed monthly in arrears. Engagement accepts are billed within 24h of acceptance. No upfront cost, no subscription — you only ever pay for a click or an accept."
+      }
+    },
+    "contactPre": "Couldn't find it? Email",
+    "contactPost": "— we answer within 1 business day."
+  },
+  "register": {
+    "eyebrow": "Apply · beta cohort closing at 100 partners",
+    "title": {
+      "pre": "Apply as the kind of",
+      "gold": "partner",
+      "post": " you are."
+    },
+    "lead": "Pick a practice profile. Add your email. We onboard founding partners in person — a 15-minute call to align on coverage and SLA. No upfront commitment until you accept your first request.",
+    "profiles": {
+      "solo": {
+        "title": "Solo Specialist",
+        "desc": "Independent practice · single-domain depth"
+      },
+      "boutique": {
+        "title": "Boutique Firm",
+        "desc": "3–10 specialists · multi-domain"
+      },
+      "network": {
+        "title": "Mid-sized / Network",
+        "desc": "10+ specialists · multi-country"
+      }
+    },
+    "form": {
+      "emailLabel": "Work email",
+      "emailPlaceholder": "you@yourfirm.com",
+      "emailHint": "We'll send a magic-link to verify your identity.",
+      "areasLabel": "Practice areas · multi-select",
+      "areas": {
+        "vatTax": "VAT & Tax",
+        "eprPackaging": "EPR & Packaging",
+        "gdprPrivacy": "GDPR & Privacy",
+        "marketing": "Marketing Compliance",
+        "corporate": "Corporate & Filings"
+      },
+      "countriesLabel": "Countries you cover · multi-select",
+      "addChip": "+ Add"
+    },
+    "cta": "Apply for Beta cohort",
+    "footnote": "No credit card · 15-min onboarding call · We respond within 1 business day",
+    "spots": "23 of 100 · Founding spots claimed · Review-cycle is rolling"
+  },
+  "footer": {
+    "newsletter": {
+      "eyebrow": "Partner brief",
+      "title": {
+        "pre": "When demand opens, you'll be",
+        "gold": "first",
+        "post": " to know."
+      },
+      "lead": "One partner-brief per month. New jurisdictions joining Beta, upcoming demand spikes in markets we cover, regulatory shifts that affect your inbox. No promotional content.",
+      "emailPlaceholder": "you@yourcompany.com",
+      "subscribe": "Subscribe",
+      "privacyNote": "We use your email only for the brief. Unsubscribe in one click. See our privacy policy.",
+      "applyLink": "Or apply for the Beta cohort →"
+    },
+    "brandTagline": "The orchestration layer between compliance complexity and verified specialist capacity.",
+    "brandDisclaimer": "Not a law firm. We orchestrate verified specialists.",
+    "nav": {
+      "platform": {
+        "title": "Platform",
+        "howItWorks": "How it works",
+        "startAssessment": "Start Assessment",
+        "exampleResult": "Example Result",
+        "forProviders": "For Providers"
+      },
+      "solutions": {
+        "title": "Solutions",
+        "vatTax": "VAT & Tax",
+        "productPackaging": "Product & Packaging",
+        "dataPrivacy": "Data Privacy",
+        "marketingAdvertising": "Marketing & Advertising",
+        "corporateStructure": "Corporate Structure",
+        "fullSupport": "Full Support"
+      },
+      "resources": {
+        "title": "Resources",
+        "complianceNews": "Compliance News",
+        "knowledgeLibrary": "Knowledge Library",
+        "countryGuides": "Country Guides",
+        "tutorials": "Tutorials",
+        "glossary": "Compliance Glossary"
+      },
+      "company": {
+        "title": "Company",
+        "about": "About",
+        "trustSecurity": "Trust & Security",
+        "contact": "Contact",
+        "careers": "Careers"
+      }
+    },
+    "betaBadge": "Beta",
+    "marketsPre": "Markets we cover today:",
+    "marketsList": "Germany · United Kingdom · Netherlands · France · Italy · Spain",
+    "marketsPost": ". More countries rolling out through 2026.",
+    "legalDisclaimer": "CompliHub360 is an orchestration platform — not a law firm. Legal, tax, and regulatory advice is delivered by Verified Partners under their own professional liability. We do not provide Rechtsberatung within the meaning of §§ RDG / StBerG.",
+    "copyright": "© 2026 CompliHub360.",
+    "legal": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms (AGB)",
+      "impressum": "Impressum",
+      "cookies": "Cookie Settings",
+      "subProcessors": "Sub-Processors"
+    }
+  }
+}

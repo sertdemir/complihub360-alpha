@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ProviderShell } from '../../components/provider/ProviderShell';
 import { RankingImpactDrawer } from '../../components/provider/ProviderDrawers';
 import { AddMarketDrawer } from '../../components/provider/AddMarketDrawer';
@@ -13,44 +14,46 @@ import { Card } from '../../components/ui/Card';
 // public identity · markets + languages chips · domain cards · gold expansion
 // banner · SLA target picker. Design fixture data until the profile API lands.
 
-function SectionHeader({ title, sub }: { title: string; sub: string }) {
+function SectionHeader({ title, sub, editLabel }: { title: string; sub: string; editLabel: string }) {
   return (
     <div className="flex items-start justify-between gap-4">
       <div>
         <h2 className="text-[15px] font-semibold text-fg">{title}</h2>
         <p className="mt-0.5 text-[12px] text-fg-tertiary">{sub}</p>
       </div>
-      <a href="#" className="shrink-0 text-[12px] font-medium text-fg-brand underline-offset-2 hover:underline">Edit</a>
+      <a href="#" className="shrink-0 text-[12px] font-medium text-fg-brand underline-offset-2 hover:underline">{editLabel}</a>
     </div>
   );
 }
 
+// Rank figures are design-fixture data; the visible labels come from providerws.
 const MARKETS = [
-  { label: '✓ Germany · rank #3 of 47', selected: true },
-  { label: '✓ Austria · rank #5 of 18', selected: true },
-  { label: 'Netherlands', selected: false },
-  { label: 'Switzerland', selected: false },
-  { label: '+ Add market', selected: false },
+  { labelKey: 'coverage.marketGermany', selected: true },
+  { labelKey: 'coverage.marketAustria', selected: true },
+  { labelKey: 'coverage.marketNetherlands', selected: false },
+  { labelKey: 'coverage.marketSwitzerland', selected: false },
 ];
 
 const DOMAINS = [
-  { eyebrow: 'VAT', title: 'VAT & Indirect Tax', meta: '8 active engagements · rank #3' },
-  { eyebrow: 'EPR', title: 'Producer Responsibility', meta: '3 active · rank #2 (top-tier)' },
-  { eyebrow: 'DAT', title: 'Data Privacy', meta: '1 active · rank #14 (improving)' },
+  { eyebrow: 'VAT', titleKey: 'coverage.domainVatTitle', metaKey: 'coverage.domainVatMeta' },
+  { eyebrow: 'EPR', titleKey: 'coverage.domainEprTitle', metaKey: 'coverage.domainEprMeta' },
+  { eyebrow: 'DAT', titleKey: 'coverage.domainDatTitle', metaKey: 'coverage.domainDatMeta' },
 ];
 
+// Language names stay endonyms (Deutsch, English, …) — they are not translated.
 const LANGUAGES = [
   { label: '✓ Deutsch', selected: true }, { label: '✓ English', selected: true }, { label: '✓ Italiano', selected: true },
   { label: 'Français', selected: false }, { label: 'Español', selected: false }, { label: 'Nederlands', selected: false }, { label: 'Polski', selected: false },
 ];
 
 const SLA = [
-  { title: 'Confirm within 6h', sub: 'top-tier', selected: false },
-  { title: 'Confirm within 12h', sub: 'recommended', selected: true },
-  { title: 'Confirm within 24h', sub: 'standard', selected: false },
+  { titleKey: 'coverage.sla6hTitle', subKey: 'coverage.sla6hSub', selected: false },
+  { titleKey: 'coverage.sla12hTitle', subKey: 'coverage.sla12hSub', selected: true },
+  { titleKey: 'coverage.sla24hTitle', subKey: 'coverage.sla24hSub', selected: false },
 ];
 
 export function CoveragePage() {
+  const { t } = useTranslation('providerws');
   const [rankingOpen, setRankingOpen] = useState(false);
   // B5: "+ Add market" → drawer; freshly added markets show as pending chips.
   const [addOpen, setAddOpen] = useState(false);
@@ -59,24 +62,22 @@ export function CoveragePage() {
     <ProviderShell>
       <div className="mx-auto max-w-[1140px] space-y-6">
         <div className="flex items-start justify-between gap-4">
-          <h1 className="font-serif text-[30px] font-bold leading-tight text-fg">Coverage</h1>
+          <h1 className="font-serif text-[30px] font-bold leading-tight text-fg">{t('coverage.title')}</h1>
           <div className="mt-1 flex shrink-0 items-center gap-4">
-            <a href="#" className="text-[12px] font-medium text-fg underline underline-offset-2">Preview public profile</a>
-            <Button size="sm" onClick={() => setRankingOpen(true)}>View ranking impact</Button>
+            <a href="#" className="text-[12px] font-medium text-fg underline underline-offset-2">{t('coverage.previewProfile')}</a>
+            <Button size="sm" onClick={() => setRankingOpen(true)}>{t('coverage.viewRankingImpact')}</Button>
           </div>
         </div>
         <p className="-mt-4 max-w-4xl text-body-sm leading-relaxed text-fg-secondary">
-          Your public profile + matching weights. Every edit affects search ranking and lead routing within 60 seconds.
-          Adding a market triggers 2-business-day re-verification before it goes live.
+          {t('coverage.subtitle')}
         </p>
 
-        <Banner status="brand" title="Current search rank: #3 of 47 verified DE partners · last 30 days">
-          Adding markets, removing domains, or changing SLA-target each shifts your ranking within ~60 sec.
-          Verification re-check required for new markets.
+        <Banner status="brand" title={t('coverage.rankBannerTitle')}>
+          {t('coverage.rankBannerBody')}
         </Banner>
 
         <section className="space-y-3">
-          <SectionHeader title="Public identity" sub="How clients see you in search results" />
+          <SectionHeader title={t('coverage.publicIdentityTitle')} sub={t('coverage.publicIdentitySub')} editLabel={t('coverage.edit')} />
           <Card styleVariant="outlined" className="flex items-center gap-4 p-4">
             <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#d4af37] text-[13px] font-bold text-[#101411]">DC</span>
             <div className="min-w-0">
@@ -90,38 +91,37 @@ export function CoveragePage() {
         </section>
 
         <section className="space-y-3">
-          <SectionHeader title="Markets covered" sub="2 active · adding a market = 2-BD re-verification + ranking re-index" />
+          <SectionHeader title={t('coverage.marketsTitle')} sub={t('coverage.marketsSub')} editLabel={t('coverage.edit')} />
           <div className="flex flex-wrap items-center gap-2.5">
-            {MARKETS.filter((m) => !m.label.startsWith('+')).map((m) => (
-              <FilterChip key={m.label} selected={m.selected}>{m.label}</FilterChip>
+            {MARKETS.map((m) => (
+              <FilterChip key={m.labelKey} selected={m.selected}>{t(m.labelKey)}</FilterChip>
             ))}
             {pending.map((c) => (
-              <FilterChip key={c} selected>{`⏳ ${c} · verification pending`}</FilterChip>
+              <FilterChip key={c} selected>{t('coverage.pendingMarketChip', { code: c })}</FilterChip>
             ))}
-            <FilterChip selected={false} onClick={() => setAddOpen(true)}>+ Add market</FilterChip>
+            <FilterChip selected={false} onClick={() => setAddOpen(true)}>{t('coverage.addMarketChip')}</FilterChip>
           </div>
         </section>
 
         <section className="space-y-3">
-          <SectionHeader title="Compliance domains handled" sub="3 active · each domain has independent ranking weight" />
+          <SectionHeader title={t('coverage.domainsTitle')} sub={t('coverage.domainsSub')} editLabel={t('coverage.edit')} />
           <div className="grid gap-3 lg:grid-cols-3">
             {DOMAINS.map((d) => (
-              <DomainCard key={d.eyebrow} {...d} interactive />
+              <DomainCard key={d.eyebrow} eyebrow={d.eyebrow} title={t(d.titleKey)} meta={t(d.metaKey)} interactive />
             ))}
           </div>
         </section>
 
         <Banner
           status="accent"
-          title="Expanding into Customs & Excise (CST) would unlock rank-#1 contender position"
-          action={<Button size="sm" variant="accent">Explore expansion</Button>}
+          title={t('coverage.expansionBannerTitle')}
+          action={<Button size="sm" variant="accent">{t('coverage.exploreExpansion')}</Button>}
         >
-          14 customers ran Risk Maps last month with DE + CST coverage gaps · only 4 partners cover both · adding CST
-          &gt; est. €18-24k MRR + likely top-3 in CST domain.
+          {t('coverage.expansionBannerBody')}
         </Banner>
 
         <section className="space-y-3">
-          <SectionHeader title="Languages spoken" sub="Clients filter partners by language · affects matching" />
+          <SectionHeader title={t('coverage.languagesTitle')} sub={t('coverage.languagesSub')} editLabel={t('coverage.edit')} />
           <div className="flex flex-wrap items-center gap-2">
             {LANGUAGES.map((l) => (
               <FilterChip key={l.label} size="sm" selected={l.selected}>{l.label}</FilterChip>
@@ -130,17 +130,17 @@ export function CoveragePage() {
         </section>
 
         <section className="space-y-3">
-          <SectionHeader title="SLA target" sub="How fast you commit to confirm · directly affects your ranking" />
+          <SectionHeader title={t('coverage.slaTitle')} sub={t('coverage.slaSub')} editLabel={t('coverage.edit')} />
           <div className="grid gap-3 lg:grid-cols-3">
             {SLA.map((s) => (
-              <Card key={s.title} styleVariant="outlined" interactive selected={s.selected} className="p-4">
-                <p className={s.selected ? 'text-[14px] font-semibold text-fg-brand' : 'text-[14px] font-semibold text-fg'}>{s.title}</p>
-                <p className="mt-0.5 text-[11px] text-fg-tertiary">{s.sub}</p>
+              <Card key={s.titleKey} styleVariant="outlined" interactive selected={s.selected} className="p-4">
+                <p className={s.selected ? 'text-[14px] font-semibold text-fg-brand' : 'text-[14px] font-semibold text-fg'}>{t(s.titleKey)}</p>
+                <p className="mt-0.5 text-[11px] text-fg-tertiary">{t(s.subKey)}</p>
               </Card>
             ))}
           </div>
           <p className="text-[11px] text-fg-tertiary">
-            Faster targets lift your rank — but missing them hurts your trust score. Pick what you can reliably hit.
+            {t('coverage.slaNote')}
           </p>
         </section>
       </div>

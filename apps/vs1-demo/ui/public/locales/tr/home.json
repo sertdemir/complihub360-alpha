@@ -1,0 +1,821 @@
+{
+  "badge": {
+    "verified": "Doğrulanmış"
+  },
+  "risk": {
+    "severity": {
+      "low": "Düşük",
+      "medium": "Orta",
+      "high": "Yüksek",
+      "critical": "Kritik"
+    },
+    "state": {
+      "confirmed": "Onaylandı",
+      "likely": "Muhtemel",
+      "action": "2 soruyu yanıtlayın"
+    },
+    "table": {
+      "severity": "Önem",
+      "obligation": "Yükümlülük",
+      "market": "Pazar",
+      "due": "Vade",
+      "state": "Durum"
+    },
+    "match": "%{{pct}} eşleşme"
+  },
+  "drawer": {
+    "close": "Kapat",
+    "whatWeCover": "Neleri kapsıyoruz",
+    "whenThisMatters": "Ne zaman önemli",
+    "continues": "6 dakikalık değerlendirmede devam eder.",
+    "seeIfApplies": "Bunun size uygulanıp uygulanmadığını görün"
+  },
+  "hero": {
+    "eyebrow": "Operasyon sorumluları için",
+    "title": {
+      "pre": "Tek başınıza yürütmemeniz ",
+      "gold": "gereken",
+      "post": " uyum işleri."
+    },
+    "subtitleDesktop": "CompliHub360, Avrupa pazarlarındaki operasyonlarınız için geçerli kuralları haritalar ve bir işin uygulanması gerektiğinde sizi doğrulanmış bir uzmanla buluşturur. İlk Risk Map'inize altı dakika. Hesap gerekmez.",
+    "subtitleMobile": "CompliHub360, Avrupa pazarlarındaki kuralları haritalar ve bir işin uygulanması gerektiğinde sizi doğrulanmış bir uzmanla buluşturur. İlk Risk Map'inize altı dakika. Hesap gerekmez.",
+    "cta": {
+      "start": "Değerlendirmenizi başlatın",
+      "showMap": "Örnek bir Risk Map görün",
+      "closeMap": "Risk Map'i kapat"
+    },
+    "trust": ["Anonim", "Kredi kartı gerekmez", "Sonuçlar tarayıcınızda"],
+    "visualCaption": "Altı dakika · 4 soru · Hesap gerekmez",
+    "preview": {
+      "context": "Sınır ötesi lansman — DE → UK + NL",
+      "steps": ["Pazarlar", "Alanlar", "Hacim", "Özet"],
+      "stepLabel": "Adım 2 / 4",
+      "title": "Hangi uyum alanları kapsamda?",
+      "subtitle": "Uygun olanların tümünü seçin. Yalnızca kapsamınızla ilgili mevzuatı haritalarız.",
+      "domains": ["KDV ve Vergi", "EPR ve Ambalaj", "GDPR ve Gizlilik", "Pazarlama Uyumu"],
+      "selectedCount": "2 seçildi · 2 kaldı",
+      "back": "Geri",
+      "continue": "Devam"
+    }
+  },
+  "heroWizard": {
+    "mobileAlt": "CompliHub uyum sihirbazı — «Alanlar» adımı (mobil)"
+  },
+  "wizard": {
+    "rail": {
+      "markets": "Pazarlar",
+      "operations": "Faaliyet",
+      "domains": "Alanlar",
+      "review": "Özet"
+    },
+    "saveProgress": "İlerlemeyi kaydet",
+    "steps": {
+      "markets": {
+        "title": "Nerede faaliyet gösteriyorsunuz?",
+        "subtitle": "Çoklu seçim. Mevzuatı, satış yaptığınız pazarlarla eşleştiririz."
+      },
+      "operations": {
+        "title": "Operasyonlarınız nasıl görünüyor?",
+        "subtitle": "Yalnızca pazarınıza değil, faaliyetinize uygulanan mevzuatı kapsama alırız."
+      },
+      "domains": {
+        "title": "Hangi uyum alanları sizi ilgilendiriyor?",
+        "subtitle": "Çoklu seçim. Bu alanlardaki yükümlülükleri önceliklendiririz."
+      }
+    },
+    "cards": {
+      "germany": { "title": "Almanya", "desc": "Birincil KDV rejimi · LUCID sicili" },
+      "unitedKingdom": { "title": "Birleşik Krallık", "desc": "Brexit sonrası ambalaj + KDV" },
+      "netherlands": { "title": "Hollanda", "desc": "KDV + WEEE sicili" },
+      "france": { "title": "Fransa", "desc": "EPR + AGEC uyumu" },
+      "italy": { "title": "İtalya", "desc": "KDV + REACH" },
+      "spain": { "title": "İspanya", "desc": "KDV + ekotasarım" },
+      "unitedStates": { "title": "Amerika Birleşik Devletleri", "desc": "Sales tax nexus · marketplace facilitator" },
+      "turkiye": { "title": "Türkiye", "desc": "KDV · e-fatura / e-arşiv" },
+      "others": { "title": "Diğerleri", "desc": "Ülke listesini açın →" },
+      "d2cEcommerce": { "title": "D2C e-ticaret", "desc": "Tüketiciye doğrudan çevrimiçi satış" },
+      "b2bWholesale": { "title": "B2B / toptan", "desc": "İşletmelere veya distribütörlere satış" },
+      "marketplace": { "title": "Pazar yeri", "desc": "Alıcılar ile satıcıları buluşturuyorsunuz" },
+      "saasDigital": { "title": "SaaS / dijital", "desc": "Yazılım, fiziksel sevkiyat yok" },
+      "hybrid": { "title": "Hibrit", "desc": "B2B ve B2C kanallarının karışımı" },
+      "other": { "title": "Diğer", "desc": "Tek cümleyle anlatın" },
+      "vatTax": { "title": "KDV ve Vergi", "desc": "Sınır ötesi KDV, OSS/IOSS, eşikler" },
+      "eprPackaging": { "title": "EPR ve Ambalaj", "desc": "Üretici sorumluluğu, siciller" },
+      "gdprPrivacy": { "title": "GDPR ve Gizlilik", "desc": "DPIA, RoPA, veri işleme sözleşmeleri" },
+      "marketing": { "title": "Pazarlama", "desc": "Onay, çerezler, dark pattern denetimleri" },
+      "corporate": { "title": "Kurumsal", "desc": "Yıllık beyanlar, gerçek faydalanıcılar" },
+      "fullCoverage": { "title": "Tam Kapsam", "desc": "Alanlar arası partner yönlendirmesi" }
+    },
+    "footer": {
+      "next": "İleri",
+      "skipRoute": "Atla ve yönlendir"
+    },
+    "review": {
+      "title": "Durumunuz, özetlendi.",
+      "subtitle": "Kullanacağımız bilgiler bunlar. Gerekirse düzenleyin, ardından Risk Map'inizi oluşturun.",
+      "markets": "Pazarlar",
+      "operations": "Faaliyet",
+      "domains": "Uyum alanları",
+      "edit": "Düzenle",
+      "trust": "Anonim · Risk Map'inizi görmek için hesap gerekmez · ~4 saniyede işlenir"
+    },
+    "skipHint": "Emin değil misiniz? Atlayın; iş modelinize ve pazarlarınıza göre yönlendirelim.",
+    "back": "Geri",
+    "generate": "Risk Map'imi oluştur",
+    "removeMarket": "{{market}} seçimini kaldır",
+    "aboutMarket": "{{market}} hakkında"
+  },
+  "marketsDrawer": {
+    "header": "Pazarlar",
+    "title": "Diğer pazarlar",
+    "count": "{{selected}} seçildi · {{total}} mevcut",
+    "desc": "Ana listenin dışında. Faaliyet gösterdiğiniz pazarları seçin — mevzuatlarını haritalar ve sizi doğru Verified Partner'a yönlendiririz.",
+    "searchPlaceholder": "Ada veya ülke koduna göre arayın",
+    "european": "Avrupa pazarları",
+    "expanding": "Kapsam genişliyor",
+    "noMatch": "“{{query}}” ile eşleşen pazar yok.",
+    "footNote": "Seçimleriniz Risk Map'inize eklenir. 4. adımda dilediğiniz zaman düzenleyebilirsiniz.",
+    "add_one": "{{count}} pazar ekle",
+    "add_other": "{{count}} pazar ekle",
+    "done": "Tamam",
+    "markets": {
+      "switzerland": { "name": "İsviçre", "desc": "MwSt · AB üyesi değil · kayıt eşiği" },
+      "austria": { "name": "Avusturya", "desc": "AB-KDV · OSS · EPR" },
+      "belgium": { "name": "Belçika", "desc": "AB-KDV · EPR (bölgesel)" },
+      "sweden": { "name": "İsveç", "desc": "AB-KDV · FTI sicili · EPR" },
+      "denmark": { "name": "Danimarka", "desc": "AB-KDV · DRS · EPR" },
+      "poland": { "name": "Polonya", "desc": "AB-KDV · JPK_VAT · EPR ROP" },
+      "czechia": { "name": "Çekya", "desc": "AB-KDV · EPR · EET" },
+      "romania": { "name": "Romanya", "desc": "AB-KDV · SAF-T · e-Factura" },
+      "norway": { "name": "Norveç", "desc": "AB dışı · VOEC rejimi" },
+      "ireland": { "name": "İrlanda", "desc": "AB-KDV · düşük vergili SaaS" },
+      "finland": { "name": "Finlandiya", "desc": "AB-KDV · OSS · EPR" },
+      "portugal": { "name": "Portekiz", "desc": "AB-KDV · SAF-T dosya biçimi" }
+    }
+  },
+  "countryInfo": {
+    "header": "Pazar",
+    "drawerLabel": "Pazar ayrıntısı",
+    "activeRegime": "Geçerli rejim: {{regime}}",
+    "countries": {
+      "germany": {
+        "name": "Almanya",
+        "regime": "VAT · OSS · LUCID · GwG",
+        "intro": "Almanya %19 standart KDV uygular; €10,000 üzerindeki sınır ötesi B2C satışlar için OSS zorunludur. EPR kaydı, ambalaj, pil ve WEEE için ayrı akışlarla LUCID (Verpackungsregister) üzerinden merkezî olarak yürütülür. Karşılaşacağınız başlıca yasalar UStG, VerpackG ve GwG'dir.",
+        "cover": [
+          "KDV kaydı · OSS / IOSS üç aylık beyanları",
+          "EPR LUCID kaydı + yıllık raporlama",
+          "VerpackG ekomodülasyon katkıları",
+          "Gerçek faydalanıcı sicil bildirimleri (GwG)",
+          "Uzaktan satış eşiği takibi",
+          "Ters vergilendirme mekanizması (UStG §13b)"
+        ],
+        "matters": [
+          "Almanya'ya fiziksel ürün gönderiyorsunuz",
+          "Sınır ötesi B2C ciroeniz €10,000 eşiğini aşıyor",
+          "Amazon FBA-DE'ye veya bir Alman pazar yerine katılıyorsunuz"
+        ]
+      },
+      "unitedKingdom": {
+        "name": "Birleşik Krallık",
+        "regime": "UK VAT · Packaging EPR · WEEE · PPT",
+        "intro": "Brexit sonrasında Birleşik Krallık, AB OSS'sinin dışındadır. Birleşik Krallık tüketicilerine satış yapmaya başladığınızda UK VAT kaydı yaptırırsınız; pazar yerleri çoğu zaman varsayılan tedarikçi sayılır. Ambalaj EPR'si ve WEEE, AB kayıtlarından ayrı ulusal programlar üzerinden yürür.",
+        "cover": [
+          "UK VAT kaydı ve beyanları",
+          "Pazar yerleri için deemed supplier kuralları",
+          "Ambalaj EPR (pEPR) raporlaması",
+          "WEEE ve pil kaydı",
+          "İthalat KDV'si (postponed accounting)",
+          "Plastic Packaging Tax (PPT)"
+        ],
+        "matters": [
+          "Brexit sonrasında Birleşik Krallık tüketicilerine satış yapıyorsunuz",
+          "Büyük Britanya'ya ürün ithal ediyorsunuz",
+          "Birleşik Krallık pazarına ambalaj sunuyorsunuz"
+        ]
+      },
+      "netherlands": {
+        "name": "Hollanda",
+        "regime": "EU-VAT · OSS · WEEE · UPV",
+        "intro": "Hollanda, sınır ötesi B2C için OSS ile standart AB KDV'sini uygular. Üretici sorumluluğu; ambalaj (Afvalfonds / UPV), elektronik (WEEE) ve pilleri kapsar — her biri kendi kayıt ve raporlama takvimine sahiptir.",
+        "cover": [
+          "AB-KDV kaydı · OSS beyanları",
+          "Ambalaj UPV / Afvalfonds raporlaması",
+          "WEEE (NL) kaydı",
+          "Pil ve akü yükümlülükleri",
+          "Uzaktan satış eşiği takibi",
+          "Topluluk içi teslimat KDV'si"
+        ],
+        "matters": [
+          "Hollanda'ya B2C satış yapıyorsunuz",
+          "Hollandalı tüketicilere ambalajlı ürün gönderiyorsunuz",
+          "Hollanda'daki bir depoda stok tutuyorsunuz"
+        ]
+      },
+      "france": {
+        "name": "Fransa",
+        "regime": "EU-VAT · OSS · EPR (AGEC) · Triman",
+        "intro": "Fransa, OSS ile AB KDV'sini ve AGEC yasası kapsamında en geniş EPR rejimlerinden birini uygular — ambalaj, elektronik, mobilya, tekstil ve daha fazlası; her biri benzersiz bir kimlik (IDU) ve eco-organisme ile. Ekomodülasyon ve onarılabilirlik puanları giderek daha çok uygulanıyor.",
+        "cover": [
+          "AB-KDV kaydı · OSS beyanları",
+          "EPR kaydı ve benzersiz kimlikler (IDU)",
+          "AGEC ekomodülasyon katkıları",
+          "WEEE ve pil programları",
+          "Triman ve ayrıştırma bilgisi etiketlemesi",
+          "Onarılabilirlik / dayanıklılık endeksi"
+        ],
+        "matters": [
+          "Fransa'ya B2C satış yapıyorsunuz",
+          "Fransız pazarına ambalaj veya EEE sunuyorsunuz",
+          "Fransız tüketicilere tekstil, mobilya veya oyuncak satıyorsunuz"
+        ]
+      },
+      "italy": {
+        "name": "İtalya",
+        "regime": "EU-VAT · OSS · CONAI · REACH",
+        "intro": "İtalya, OSS ile AB KDV'sini uygular ve birçok işlem için zorunlu e-fatura (SdI) ister. Ambalaj EPR'si, çevresel etiketleme yükümlülükleriyle birlikte CONAI üzerinden yürür; REACH ise ürünlerdeki kimyasal içeriğe uygulanır.",
+        "cover": [
+          "AB-KDV kaydı · OSS beyanları",
+          "Gerekli olduğunda SdI e-faturası",
+          "CONAI ambalaj katkıları",
+          "Çevresel etiketleme (CONAI)",
+          "WEEE ve pil kaydı",
+          "REACH madde yükümlülükleri"
+        ],
+        "matters": [
+          "İtalya'ya B2C satış yapıyorsunuz",
+          "İtalyan pazarına ambalaj sunuyorsunuz",
+          "Düzenlemeye tabi kimyasal içerikli ürünler gönderiyorsunuz"
+        ]
+      },
+      "spain": {
+        "name": "İspanya",
+        "regime": "EU-VAT · OSS · EPR · Plastic tax",
+        "intro": "İspanya, OSS ile AB KDV'sini uygular ve 1055/2022 sayılı Kraliyet Kararnamesi ile ambalaj EPR'sini plastik ambalaj vergisi dâhil olacak şekilde genişletmiştir. Ekotasarım ve SCIP yükümlülükleri birçok ürün kategorisine uygulanır.",
+        "cover": [
+          "AB-KDV kaydı · OSS beyanları",
+          "Ambalaj EPR kaydı ve raporlaması",
+          "Plastik ambalaj vergisi (impuesto)",
+          "WEEE ve pil programları",
+          "Ekotasarım gereklilikleri",
+          "SCIP / madde bildirimleri"
+        ],
+        "matters": [
+          "İspanya'ya B2C satış yapıyorsunuz",
+          "İspanyol pazarına plastik ambalaj sunuyorsunuz",
+          "ES'ye EEE veya düzenlemeye tabi ürünler gönderiyorsunuz"
+        ]
+      },
+      "unitedStates": {
+        "name": "Amerika Birleşik Devletleri",
+        "regime": "Sales tax · Nexus · Marketplace facilitator",
+        "intro": "ABD'de KDV yoktur; ekonomik nexus eşiklerini aştığınızda eyalet düzeyinde sales tax uygulanır (çoğunlukla eyalet başına $100k veya 200 işlem). Marketplace facilitator yasaları çoğu eyalette tahsilatı platformlara devreder.",
+        "cover": [
+          "Ekonomik nexus takibi (eyalet bazında)",
+          "Sales tax kaydı ve beyanı",
+          "Marketplace facilitator kuralları",
+          "Ürün vergilendirilebilirliği eşleştirmesi",
+          "Muafiyet belgesi yönetimi",
+          "Use tax yükümlülükleri"
+        ],
+        "matters": [
+          "Birden fazla eyalette ABD tüketicilerine satış yapıyorsunuz",
+          "Bir eyaletin ekonomik nexus eşiğini aşıyorsunuz",
+          "Bir ABD pazar yerinde satış yapıyorsunuz"
+        ]
+      },
+      "turkiye": {
+        "name": "Türkiye",
+        "regime": "KDV · e-Fatura · e-Arşiv",
+        "intro": "Türkiye, birçok mükellef için zorunlu e-fatura ve e-arşiv uygulamalarıyla birlikte KDV uygular. Sınır ötesi dijital ve mal akışlarının kendi kayıt ve tevkifat kuralları vardır; para birimi TRY'dir.",
+        "cover": [
+          "KDV kaydı ve beyanları",
+          "e-Fatura / e-Arşiv uyumu",
+          "Dijital hizmet KDV'si (uygulanabildiği durumlarda)",
+          "Tevkifat kuralları",
+          "Gümrük ve ithalat KDV'si",
+          "TRY para birimi yönetimi"
+        ],
+        "matters": [
+          "Türk tüketicilere satış yapıyorsunuz",
+          "e-Fatura kapsamında fatura düzenliyorsunuz",
+          "Türkiye'ye dijital hizmet sağlıyorsunuz"
+        ]
+      }
+    }
+  },
+  "account": {
+    "saveProgress": {
+      "eyebrow": "Ücretsiz hesap",
+      "title": "İlerlemenizi kaydedin",
+      "desc": "Risk Map'inizi saklayın, Verified Partner'larla eşleşin ve kurallar değiştiğinde bildirim alın — ücretsiz, kredi kartı gerekmez. Size e-postayla bir Magic-Link göndeririz; hatırlamanız gereken bir şifre olmaz.",
+      "benefits": ["Kaydedilmiş Risk Map dosyanız", "Verified Partner eşleştirmesi", "Mevzuat değiştiğinde bildirimler"],
+      "confirm": "İlerlemeniz güvende.",
+      "cta": "Ücretsiz hesap oluşturun"
+    },
+    "freeAccount": {
+      "eyebrow": "Ücretsiz hesap",
+      "title": "Gerçek zamanlı bildirimler, ücretsiz",
+      "desc": "Pazarlarınızda bir mevzuat değiştiği anda gerçek zamanlı bildirimler alın — ayrıca kaydedilmiş Risk Map'iniz ve Verified Partner eşleştirmesi. Ücretsiz, kredi kartı gerekmez. Size e-postayla bir Magic-Link göndeririz; şifre yoktur.",
+      "benefits": ["Gerçek zamanlı mevzuat bildirimleri", "Kaydedilmiş Risk Map dosyanız", "Verified Partner eşleştirmesi"],
+      "confirm": "Ücretsiz hesabınızın kurulumunu tamamlamak için bağlantıya tıklayın.",
+      "cta": "Ücretsiz hesap oluşturun"
+    },
+    "workEmail": "İş e-postası",
+    "emailPlaceholder": "siz@sirketiniz.com",
+    "checkInbox": "Gelen kutunuzu kontrol edin",
+    "sentTo": {
+      "pre": "Magic-Link'i şu adrese gönderdik: ",
+      "post": "."
+    },
+    "footNote": "20 saniye sürer · Şifre yok · Kredi kartı yok.",
+    "done": "Tamam",
+    "drawerLabel": "İlerlemenizi kaydedin"
+  },
+  "riskMapPreview": {
+    "guestNote": "Misafir haritası · 30 dk içinde sona erer",
+    "eyebrow": "Risk Map'iniz",
+    "title": "Size uygulananlar bunlar.",
+    "stats": [
+      { "value": "8", "label": "yükümlülük" },
+      { "value": "€25k", "label": "toplam risk" },
+      { "value": "14 gün", "label": "medyan vade" },
+      { "value": "3", "label": "partner hazır" }
+    ],
+    "rows": [
+      { "title": "OSS üç aylık beyanı", "detail": "Son beyan: Q1 2025 · Ceza: €5,000 + aylık %1 · UStG §18i", "market": "DE · NL", "due": "30 Nis", "dueSub": "6 gün" },
+      { "title": "KDV kaydı — UK", "detail": "Brexit sonrası eşik kontrolü · €20,000'a kadar · VATA §3", "market": "UK", "due": "15 May", "dueSub": "21 gün" },
+      { "title": "EPR ambalaj kaydı (LUCID)", "detail": "Üretici statüsü doğrulanacak · €50,000'a kadar · VerpackG", "market": "DE", "due": "02 May", "dueSub": "8 gün" },
+      { "title": "EPR kayıt yenilemesi (PackUK)", "detail": "Son beyan: Nis 2024 · UK cirosunun %4'ü · Packaging Regs", "market": "UK", "due": "15 May", "dueSub": "21 gün" },
+      { "title": "Çerez bandı + onay kayıtları", "detail": "AB'de B2C kullanıcılar için zorunlu · GDPR Art. 6/7 · TTDSG §25", "market": "AB genelinde", "due": "Sürekli", "dueSub": "Canlı" },
+      { "title": "İzleme pikselleri için DPIA", "detail": "İzleme altyapısına bağlı · GDPR Art. 35", "market": "AB genelinde", "due": "—", "dueSub": "Araçlara bağlı" },
+      { "title": "Ters vergilendirme mekanizması", "detail": "Sınır ötesi B2B payı >0 · UStG §13b", "market": "DE · NL", "due": "—", "dueSub": "Dağılıma bağlı" }
+    ]
+  },
+  "riskMap": {
+    "eyebrow": "Bir Risk Map böyle görünür · anonimleştirilmiş örnek",
+    "title": {
+      "pre": "Size ",
+      "gold": "uygulananlar",
+      "post": " bunlar."
+    },
+    "subtitle": "Almanya · Birleşik Krallık · Hollanda temel alınmıştır. D2C e-ticaret, €2M—€5M ciro. Kapsamda KDV · EPR · Gizlilik.",
+    "stats": [
+      { "value": "8", "label": "Tespit edilen yükümlülük" },
+      { "value": "€25k", "label": "Toplam risk" },
+      { "value": "14 gün", "label": "Medyan vade" },
+      { "value": "3", "label": "Verified Partner hazır" }
+    ],
+    "rows": [
+      { "title": "OSS üç aylık beyanı", "detail": "Son beyan: Q1 2025 · Ceza: €5,000 + aylık %1 · UStG §18i (OSS)", "market": "DE · NL", "due": "30 Nis", "dueSub": "6 gün" },
+      { "title": "KDV kaydı — UK", "detail": "Brexit sonrası eşik kontrolü gerekli · Ceza: €20,000'a kadar · UK VATA 1994 §3", "market": "UK", "due": "15 May", "dueSub": "21 gün" },
+      { "title": "EPR ambalaj kaydı (LUCID)", "detail": "Üretici statüsü doğrulanacak · Ceza: €50,000'a kadar · VerpackG Art. 9 Abs. 1", "market": "DE", "due": "02 May", "dueSub": "8 gün" },
+      { "title": "EPR kayıt yenilemesi (PackUK)", "detail": "Son beyan: Nis 2024 · Ceza: UK cirosunun %4'ü · UK Packaging Regs. 2023 §7", "market": "UK", "due": "15 May", "dueSub": "21 gün" },
+      { "title": "Çerez bandı + onay kayıtları", "detail": "AB'de B2C kullanıcılar → zorunlu · GDPR Art. 6/7 · TTDSG §25", "market": "AB genelinde", "due": "Sürekli", "dueSub": "Canlı" },
+      { "title": "İzleme pikselleri için DPIA", "detail": "İzleme altyapısına bağlı · GDPR Art. 35", "market": "AB genelinde", "due": "—", "dueSub": "Araçlara bağlı" },
+      { "title": "Ters vergilendirme mekanizması", "detail": "Yalnızca sınır ötesi B2B payı >0 ise geçerli · UStG §13b", "market": "DE · NL", "due": "—", "dueSub": "B2B dağılımına bağlı" },
+      { "title": "Gerçek faydalanıcı güncellemesi", "detail": "Son bildirim: Mar 2025 · Ceza: €1,000–5,000 · GwG §20 Abs. 1", "market": "DE", "due": "30 Haz", "dueSub": "sürekli" }
+    ],
+    "partnersEyebrow": "3 Verified Partner eşleşti",
+    "partnersTitle": "Bunu kimin çözebileceğini bulduk.",
+    "unlock": "Eşleşmeleri ücretsiz hesapla açın →",
+    "save": {
+      "title": "Bu haritayı kaydedin. Partner'ların kilidini açın.",
+      "subtitle": "Ücretsiz hesap. Kredi kartı gerekmez. Beta lansmanına kadar kurucu üye erişimi.",
+      "cta": "Ücretsiz hesap oluşturun"
+    }
+  },
+  "matchmaking": {
+    "eyebrow": "Fark",
+    "title": {
+      "line1": "Diğer araçlar size neyin yanlış olduğunu söyler.",
+      "pre": "Biz sizi çözecek kişiyle ",
+      "gold": "buluştururuz",
+      "post": ". Zamandan ve paradan tasarruf edin."
+    },
+    "subtitle": "Risk haritaları herkese açık — her uyum panosu bir tane sunar. CompliHub360'ı farklı kılan sonrasıdır: ülkeler ve alanlar genelinde doğrulanmış, önceden incelenmiş, yanıt süreleri izlenen ve yapılandırılmış devirlerle çalışan sağlayıcılar. Siz aramazsınız. Biz eşleştiririz.",
+    "matches": [
+      {
+        "place": "Münih, DE",
+        "specialty": "KDV ve OSS Uzmanı",
+        "tags": ["UStG §18i (OSS)", "DE · NL · FR"],
+        "covers": "2 kritik önceliğinizi kapsıyor",
+        "response": "24 saatte yanıt",
+        "engagements": "142 önceki iş"
+      },
+      {
+        "place": "Londra, UK",
+        "specialty": "Birleşik Krallık Ambalaj Uyumu",
+        "tags": ["UK Packaging Regs.", "PackUK · EPR yenilemesi"],
+        "covers": "1 yüksek önceliğinizi kapsıyor",
+        "response": "21 saatte yanıt",
+        "engagements": "86 önceki iş"
+      },
+      {
+        "place": "Paris, FR",
+        "specialty": "Sınır Ötesi EPR Danışmanlığı",
+        "tags": ["VerpackG", "LUCID · sınır ötesi"],
+        "covers": "1 orta önceliğinizi kapsıyor",
+        "response": "36 saatte yanıt",
+        "engagements": "211 önceki iş"
+      }
+    ],
+    "howItWorks": {
+      "label": "Nasıl çalışır",
+      "sub": "Değerlendirmeden eşleşen uzmana"
+    },
+    "steps": [
+      { "title": "Değerlendirmenizi başlatın", "desc": "4–5 soru. 2 dakikadan kısa. Hesap gerekmez." },
+      { "title": "Risk Map'inizi görün", "desc": "Anonim ön izleme, yapılandırılmış, kaynak atıflı." },
+      { "title": "Eşleşmeleri görmek için kaydolun", "desc": "Sağlayıcı eşleştirmesi kayıtlı hesaplara ayrılmıştır." },
+      { "title": "Yapılandırılmış devirler alın", "desc": "Sağlayıcı 24–48 saat içinde Magic-Link ile yanıt verir. Discovery call yok." }
+    ]
+  },
+  "twoReflexes": {
+    "eyebrow": "Bu boşluk neden sürüyor",
+    "title": {
+      "pre": "Mevzuat parçalı. Uzmanlar silolarda. ",
+      "gold": "İkisi de",
+      "post": " yalnızca birini düzeltirseniz bozuk kalır."
+    },
+    "subtitle": "Her pazarın kendi eşikleri, sicilleri ve denetçileri var. Her danışman bir dilimi bilir. Kuralları haritalayan platformlar insanları tanımaz. İnsan dizinleri kuralları okumaz. CompliHub her iki yarıyı aynı anda kapatmak için kuruldu.",
+    "card1": {
+      "title": "Kimsenin çizmediği harita.",
+      "label": "Boşluk, haritalandı"
+    },
+    "card2": {
+      "title": "Kimsenin derlemediği ağ.",
+      "label": "Boşluk, ağa bağlandı"
+    },
+    "row1Lead": "Her açık pano size kuralların ne dediğini söyler. Hiçbiri, operasyonunuz için nelerin risk altında olduğunu öncelik sırasıyla ve kaynağı ekli hâlde söylemez.",
+    "row2Lead": "Dizinler herkesi listeler. Kimseyi denetlemez. Biz kapsamı, yanıt süresini ve sonuçları denetleriz — ve her işi ortak sorumluluğa bağlarız.",
+    "row1": [
+      { "title": "Riske göre önceliklendirilmiş, kapsamlı değil", "desc": "Kritikten düşüğe. Her an dört ila on iki madde. 200 sayfalık kontrol listeleri yok." },
+      { "title": "Kaynağı doğrudan düzenleyiciler", "desc": "Her kayıt, dayandığı resmî duyuruya, sicil sayfasına veya içtihada bağlanır." },
+      { "title": "Eskimeye karşı güncel", "desc": "Kurallar değişir. Bir vade kaydığında, bir düzenleyici açıklama yaptığında veya bir sicil açıldığında harita güncellenir." },
+      { "title": "Varsayılan olarak yalın dil", "desc": "Bir madde açıklanmak için bir paragraf gerektiriyorsa, gördüğünüz paragraftır — madde değil." }
+    ],
+    "row2": [
+      { "title": "Kendi kaydıyla değil, bizim doğrulamamızla", "desc": "Her Verified Partner kapsam, yanıt süresi ve belgelenmiş gerçek sonuçlar üzerinden denetlenir — bir dizin değildir." },
+      { "title": "Ortak sorumluluk baştan kurulu", "desc": "Her iş sözleşmeyle bağlanır. Partner'lar yalnızca tavsiyenin değil, işin sorumluluğunu üstlenir." }
+    ]
+  },
+  "domains": {
+    "eyebrow": "Neleri biliyoruz",
+    "title": {
+      "pre": "Altı alan. ",
+      "gold": "Tek",
+      "post": " tutarlı harita."
+    },
+    "subtitle": "Kimsenin çizmediği harita — çizildi. Altı alan, uçtan uca, geçerli oldukları pazarlar ve beraberinde gelen yükümlülüklerle.",
+    "cardCta": "Ayrıntı için tıklayın",
+    "drawerEyebrow": "Alan",
+    "drawerAria": "{{domain}} ayrıntısı",
+    "activeIn": "Geçerli olduğu pazarlar:",
+    "items": [
+      {
+        "title": "KDV ve Vergi",
+        "markets": "DE · UK · NL · FR · IT · ES",
+        "desc": "Sınır ötesi KDV, OSS/IOSS, topluluk içi teslimat, uzaktan satış eşikleri.",
+        "intro": "Sınır ötesi KDV, OSS/IOSS, topluluk içi teslimat, uzaktan satış eşikleri. Altı pazar; altı KDV rejimi, altı kayıt eşiği, altı beyan takvimi demektir. Her birini izleriz.",
+        "cover": [
+          "OSS / IOSS üç aylık beyanları",
+          "Uzaktan satış eşiği takibi",
+          "Topluluk içi teslimat KDV'si",
+          "Ters vergilendirme mekanizması",
+          "Pazar bazında KDV kayıtları",
+          "İkili ÇVÖ anlaşmalarının etkileri"
+        ],
+        "matters": [
+          "İlk kez başka bir AB pazarına B2C satış yapıyorsunuz",
+          "Sınır ötesi B2C satışlarda €10,000 eşiğini aşıyorsunuz",
+          "Lojistik modelinizi değiştiriyorsunuz (ör. UK deposu ekliyorsunuz)"
+        ]
+      },
+      {
+        "title": "EPR ve Ambalaj",
+        "markets": "DE · UK · NL · FR · AT · BE",
+        "desc": "Genişletilmiş üretici sorumluluğu, ambalaj sicilleri, geri alma programları, ekomodülasyon.",
+        "intro": "Ambalaj, pil ve elektronikte genişletilmiş üretici sorumluluğu. Her pazar kendi sicilini, ücret tarifesini ve raporlama takvimini işletir. Nereye ve ne zaman kaydolacağınızı haritalarız.",
+        "cover": [
+          "LUCID / ulusal ambalaj sicilleri",
+          "Geri alma ve geri dönüşüm yükümlülükleri",
+          "Ekomodülasyon ücret kademeleri",
+          "WEEE ve pil kaydı",
+          "Yıllık raporlama hacimleri",
+          "Yetkili temsilci gereklilikleri"
+        ],
+        "matters": [
+          "Yeni bir AB pazarına fiziksel ürün gönderiyorsunuz",
+          "AB tüketicilerine ambalajlı ürün satıyorsunuz",
+          "Yeni bir ürün kategorisi ekliyorsunuz (ör. elektronik)"
+        ]
+      },
+      {
+        "title": "GDPR ve Gizlilik",
+        "markets": "AB GENELİ · BREXIT SONRASI UK",
+        "desc": "Veri koruma etki değerlendirmeleri, RoPA, veri işleme sözleşmeleri, ilgili kişi hakları.",
+        "intro": "AB'de ve Brexit sonrası Birleşik Krallık'ta veri koruma. İşleme kayıtlarından uluslararası aktarımlara kadar, yalnızca merkezinizi değil, verinizi izleyen yükümlülükleri ortaya koyarız.",
+        "cover": [
+          "Yüksek riskli işleme için DPIA'lar",
+          "İşleme faaliyetleri kaydı (RoPA)",
+          "Veri işleyen / alt işleyen sözleşmeleri",
+          "Uluslararası aktarım mekanizmaları",
+          "Erişim ve silme taleplerinin yönetimi",
+          "İhlal bildirim süreleri"
+        ],
+        "matters": [
+          "AB/UK'de yerleşik kişilerin kişisel verilerini işliyorsunuz",
+          "Yeni bir izleme veya analitik aracı ekliyorsunuz",
+          "AB/UK dışına veri aktarıyorsunuz"
+        ]
+      },
+      {
+        "title": "Pazarlama Uyumu",
+        "markets": "AB GENELİ · EPRIVACY",
+        "desc": "Çerez bantları, onay kayıtları, e-posta pazarlaması, dark pattern denetimleri.",
+        "intro": "ePrivacy ve tüketici hukuku kapsamında onay ve dürüst pazarlama kuralları. Çerez duvarları, opt-in'ler ve dark pattern incelemeleri pazara göre değişir — her düzenleyicinin fiilen neyi uyguladığını izleriz.",
+        "cover": [
+          "Çerez onay bandının geçerliliği",
+          "Onay kayıtları ve kanıtları",
+          "E-posta / SMS opt-in kuralları",
+          "Dark pattern denetimleri",
+          "Influencer ve reklam beyanı",
+          "Abonelikten çıkma ve bastırma listesi yönetimi"
+        ],
+        "matters": [
+          "AB'ye ücretli pazarlama yürütüyorsunuz",
+          "Bir e-posta veya SMS programı başlatıyorsunuz",
+          "Onay akışınızı yeniden tasarlıyorsunuz"
+        ]
+      },
+      {
+        "title": "Kurumsal ve Bildirimler",
+        "markets": "DE · AT · CH",
+        "desc": "Yıllık beyanlar, şeffaflık sicili, gerçek faydalanıcı bildirimleri, grup içi sözleşmeler.",
+        "intro": "DACH bölgesinde şirket düzeyindeki yükümlülükler. Yıllık beyanlar, gerçek faydalanıcı şeffaflığı ve grup içi sözleşmelerin her birinin kendi vadeleri ve yaptırımları vardır.",
+        "cover": [
+          "Yıllık finansal tablolar",
+          "Şeffaflık / UBO sicil bildirimleri",
+          "Gerçek faydalanıcı güncellemeleri",
+          "Grup içi sözleşme dokümantasyonu",
+          "Yerel temsil gereklilikleri",
+          "Bildirim vadelerinin takibi"
+        ],
+        "matters": [
+          "Yerel bir şirket veya şube işletiyorsunuz",
+          "Ortaklık yapınız değişiyor",
+          "Yerel bir denetim eşiğini aşıyorsunuz"
+        ]
+      },
+      {
+        "title": "Tam Uyum Kapsamı",
+        "markets": "TÜM ALANLAR · TÜM PAZARLAR",
+        "desc": "Bir dosya alanları aştığında, yalnızca kendi dilimini değil tamamını kapatan partner'lara yönlendiririz.",
+        "intro": "Bazı dosyalar tek kutuya sığmaz. Bir yükümlülük aynı anda KDV, EPR, gizlilik ve bildirimleri kapsıyorsa, tamamını kapatan bir partner ekibini tek sorumluluk noktasıyla koordine ederiz.",
+        "cover": [
+          "Alanlar arası dosya yönlendirmesi",
+          "Tek sorumluluk noktası",
+          "Koordineli partner ekipleri",
+          "Sıralı yükümlülük yönetimi",
+          "Ortak vade takibi",
+          "Tek sözleşme ilişkisi"
+        ],
+        "matters": [
+          "Tek bir değişiklik birden çok alanda yükümlülük doğuruyor",
+          "Yeni bir pazara uçtan uca giriyorsunuz",
+          "Beş tedarikçiye değil, tek ekibe ihtiyacınız var"
+        ]
+      }
+    ]
+  },
+  "howItActs": {
+    "eyebrow": "Bir işin içinden",
+    "title": {
+      "pre": "Eşleşme ile çözüm ",
+      "gold": "arasında",
+      "post": " neler olur."
+    },
+    "subtitle": "Eşleştiğiniz anda üç şey varsayım olmaktan çıkar: maliyeti, ne zaman yanıt alacağınız ve elinizde ne kalacağı. Hepsi ilk e-postadan önce belirlenir.",
+    "cards": [
+      {
+        "title": "Taahhütten önce maliyet.",
+        "desc": "Her Verified Partner, işi kabul etmenizden önce sabit bir tahmin yayımlar. Yalnızca fiyatı öğrenmek için discovery call yok."
+      },
+      {
+        "title": "Yanıt, saat işlerken.",
+        "desc": "İlk yanıt için 24–48 saat; aşılırsa bir sonraki uygun partner'a otomatik yönlendiririz. Saat sözleşmenin parçasıdır, bir vaat değil."
+      },
+      {
+        "title": "Sizde kalan bir kayıt.",
+        "desc": "Her adım özel bir zaman çizelgesine işlenir — talep, yanıt, mutabık kalınan kapsam, teslimatlar. Sizindir; her an, denetçinizin istediği her biçimde dışa aktarılabilir."
+      }
+    ],
+    "panel1": {
+      "estCost": "Tahmini maliyet",
+      "estValue": "€2,400 — €3,800",
+      "scope": "Kapsam",
+      "scopeValue": "OSS üç aylık beyanları · DE + NL + FR",
+      "approval": "Onay",
+      "approvalValue": "Herhangi bir çalışma başlamadan önce belirlenir"
+    },
+    "panel2": {
+      "label": "İlk yanıt SLA'sı",
+      "note": "Aşılırsa bir sonraki partner'a otomatik yönlendirme. Sözleşmeyle güvence altında."
+    },
+    "panel3": {
+      "timeline": [
+        { "date": "24 Nis", "label": "Talep gönderildi" },
+        { "date": "25 Nis", "label": "Partner kabul etti · 21s" },
+        { "date": "28 Nis", "label": "Teklif alındı" },
+        { "date": "02 May", "label": "Kapsam üzerinde anlaşıldı" }
+      ],
+      "export": "Dışa aktar"
+    }
+  },
+  "brandCode": {
+    "eyebrow": "İletişim biçimimiz",
+    "title": {
+      "gold": "Üç",
+      "post": " sessiz ilke."
+    },
+    "subtitle": "Uyum ürünleri genellikle bağırır. Bizim buna ihtiyacımız yok. Risk kırmızıya ihtiyaç duymaz. Kararlar 20 adımlı bir huniye ihtiyaç duymaz. Partner'lar bir pazar yerine ihtiyaç duymaz. Bunun yerine ne yaptığımızı görmek için kartların üzerine gelin.",
+    "hoverCue": "Görmek için üzerine gelin",
+    "cards": [
+      {
+        "label": "Kod 02 — Petrol tonunda risk",
+        "title": "Kırmızı yok. Asla.",
+        "desc": "Düşükten kritiğe risk seviyeleri, petrol tonlarıyla ifade edilir — asla kırmızıyla değil. Ürün sizi hiçbir zaman korkutarak harekete geçirmeye çalışmaz."
+      },
+      {
+        "label": "Kod 04 — Sihirbazın yolu",
+        "title": "Her seferinde tek soru.",
+        "desc": "Sihirbazın altın adım göstergesi, bunaltmadan nerede olduğunuzu işaretler. İleriye giden yol her zaman tek karar genişliğindedir."
+      },
+      {
+        "label": "Marka işareti — Verified Partner",
+        "title": "Sorumluluğun sessiz işareti.",
+        "desc": "Verified Partner'lar, dosyanız için ortak sorumluluk üstlenen, denetlenmiş danışmanlardır. Altın işaret özdenetimdir, tanıtım değil."
+      }
+    ],
+    "demo": {
+      "step": "Adım 2 / 4",
+      "question": "Nerede satış yapıyorsunuz?",
+      "partnerSpecialty": "KDV uzmanı · Almanya ve Avusturya"
+    }
+  },
+  "beyond": {
+    "eyebrow": "Değerlendirmenin ötesinde",
+    "title": {
+      "pre": "Tek seferlik kontrolden, uyumla ilgili her şeyin ",
+      "gold": "ana üssüne",
+      "post": "."
+    },
+    "subtitle": "Değerlendirme ücretsizdir. Sonrasında gelenler — çalışma alanınız, canlı haberler, uzman içeriği, partner'larınız — CompliHub'ı geri döndüğünüz yer yapar.",
+    "pills": {
+      "live": "Bugün kullanılabilir",
+      "beta": "Beta ile geliyor"
+    },
+    "stats": [
+      { "label": "Risk Map", "value": "8 öncelik" },
+      { "label": "Aktif işler", "value": "2" },
+      { "label": "Eşleşen Verified Partner", "value": "3" },
+      { "label": "Kayıt girdileri", "value": "47" }
+    ],
+    "news": [
+      { "tag": "DE · VAT", "text": "OSS eşiği Q3 için güncellendi" },
+      { "tag": "UK · EPR", "text": "PackUK 2026 sicilini açıyor" }
+    ],
+    "workspace": {
+      "title": "Haritanız. Partner'larınız. Kaydınız. Kalıcı.",
+      "desc": "Değerlendirme, kaydedilmiş bir dosyaya dönüşür. İş zaman çizelgeniz panonuzda yaşar. Sağlayıcı ilişkileri, uyum kaydı, Risk Map — hepsi tek yerde, hepsi sizin."
+    },
+    "newsCard": {
+      "title": "Sizi etkileyen gelişmeler.",
+      "desc": "Düzenleyiciler faaliyet gösterdiğiniz pazarlarda harekete geçtiğinde gerçek zamanlı bildirimler. Alana göre derlenmiş, operasyonunuza göre daraltılmış."
+    },
+    "learn": {
+      "meta": "Web semineri · 24 dk",
+      "video": "D2C için sınır ötesi KDV",
+      "title": "İşin uzmanlarından öğrenin.",
+      "desc": "Düzenleyicilerle web seminerleri. Uzmanlardan eğitimler. YouTube'dan tanıyacağınız isimler."
+    },
+    "footnote": "Çalışma alanı bugün kullanılabilir. Haber ve içerik kitaplığı Beta ile geliyor — erken kaydolanlar kurucu üye erişimi kazanır."
+  },
+  "faq": {
+    "label": "Sık sorulanlar",
+    "title": {
+      "pre": "Muhtemelen ",
+      "gold": "merak ettikleriniz",
+      "post": "."
+    },
+    "items": [
+      {
+        "q": "Değerlendirme gerçekten ücretsiz mi?",
+        "a": "Evet. Hesap yok, kredi kartı yok. Sonunda yapılandırılmış bir Risk Map alırsınız. Sonrasında kaydolmak — haritayı saklamak, sağlayıcılarla eşleşmek, bildirim almak için — isteğe bağlı bir sonraki adımdır."
+      },
+      {
+        "q": "Bana hukuki danışmanlık mı veriyorsunuz?",
+        "a": "Hayır. CompliHub yükümlülükleri haritalar ve operasyonunuza muhtemelen neyin uygulanacağını gösterir — bu hukuki danışmanlık değildir. Bir konu bağlayıcı görüş gerektirdiğinde, sizi bunu verebilecek bir Verified Partner ile buluştururuz."
+      },
+      {
+        "q": "Verified Partner'lar nasıl denetleniyor?",
+        "a": "Her partner; alan kapsamı, yanıt süresi ve belgelenmiş gerçek sonuçlar üzerinden bizim tarafımızdan incelenir — kendi kaydını oluşturan bir dizin değildir. Her iş sözleşmeye bağlıdır ve dosya için ortak sorumluluk içerir."
+      },
+      {
+        "q": "Bir iş ne kadara mal olur?",
+        "a": "Her Verified Partner, siz kabul etmeden önce sabit bir tahmin yayımlar — yalnızca fiyatı öğrenmek için discovery call yok. Aralığı ve kapsamı önceden görür, herhangi bir çalışma başlamadan onaylarsınız."
+      },
+      {
+        "q": "Verilerim nasıl işleniyor?",
+        "a": "Değerlendirme tarayıcınızda çalışır ve hesap gerektirmez. Kaydolursanız dosyanız AB veri koruma kurallarına göre, şifrelenmiş olarak saklanır; talimatınız olmadan asla satılmaz veya paylaşılmaz."
+      },
+      {
+        "q": "Pazarım henüz kapsanmıyorsa ne olur?",
+        "a": "Nerede faaliyet gösterdiğinizi bize bildirin. Pazarları sürekli ekliyoruz ve erken kaydolanlar önceliğin belirlenmesine katkıda bulunuyor — pazarınız yayına girdiği anda size haber veririz."
+      }
+    ]
+  },
+  "entryDoor": {
+    "journey": ["6 dk", "Risk Map", "Kayıt", "Çalışma alanı"],
+    "eyebrow": "Buradan başlayın",
+    "title": {
+      "pre": "Tek değerlendirme. Tek sonuç. Yol ",
+      "highlight": "okunur",
+      "post": " hâle gelir."
+    },
+    "subtitle": "Altı dakika. Hesap gerekmez. Operasyonlarınızı fiilen geçerli olan mevzuatla eşleştirir ve bir sonraki adımınızı gösteririz.",
+    "cta": "Değerlendirmenizi başlatın"
+  },
+  "newsletter": {
+    "eyebrow": "Güncel kalın",
+    "title": "Bir mevzuat değiştiğinde haberiniz olur.",
+    "desc": "Ayda bir bülten. Yeni eşikler, vadeler ve güvenilir kaynak bağlantıları — faaliyet gösterdiğiniz pazarlar için. Tanıtım içeriği yok.",
+    "placeholder": "siz@sirketiniz.com",
+    "emailAria": "E-posta adresi",
+    "subscribe": "Abone olun",
+    "success": "Listedesiniz — gelen kutunuzu kontrol edin.",
+    "privacy": "E-postanızı yalnızca bülten için kullanırız. Tek tıkla abonelikten çıkabilirsiniz. Gizlilik politikamıza bakın.",
+    "accountLink": "Veya gerçek zamanlı bildirimleri ücretsiz hesapla açın"
+  },
+  "footer": {
+    "tagline": "Uyum karmaşıklığı ile operasyonel gerçeklik arasındaki orkestrasyon katmanı.",
+    "notLawFirm": "Bir hukuk bürosu değiliz. Doğrulanmış uzmanları orkestre ederiz.",
+    "beta": "Beta",
+    "columns": {
+      "platform": {
+        "title": "Platform",
+        "links": {
+          "howItWorks": "Nasıl çalışır",
+          "startAssessment": "Değerlendirmeyi başlat",
+          "exampleResult": "Örnek sonuç",
+          "forProviders": "Sağlayıcılar için"
+        }
+      },
+      "solutions": {
+        "title": "Çözümler",
+        "links": {
+          "vatTax": "KDV ve Vergi",
+          "productPackaging": "Ürün ve Ambalaj",
+          "dataPrivacy": "Veri Gizliliği",
+          "marketingAdvertising": "Pazarlama ve Reklam",
+          "corporateStructure": "Kurumsal Yapı",
+          "fullSupport": "Tam Destek"
+        }
+      },
+      "resources": {
+        "title": "Kaynaklar",
+        "links": {
+          "complianceNews": "Uyum Haberleri",
+          "knowledgeLibrary": "Bilgi Kitaplığı",
+          "countryGuides": "Ülke Rehberleri",
+          "tutorials": "Eğitimler",
+          "glossary": "Uyum Sözlüğü"
+        }
+      },
+      "company": {
+        "title": "Şirket",
+        "links": {
+          "about": "Hakkımızda",
+          "trustSecurity": "Güven ve Güvenlik",
+          "contact": "İletişim",
+          "careers": "Kariyer"
+        }
+      }
+    },
+    "markets": {
+      "pre": "Bugün kapsadığımız pazarlar: ",
+      "list": "Almanya · Birleşik Krallık · Hollanda · Fransa · İtalya · İspanya",
+      "post": ". 2026 boyunca daha fazla ülke ekleniyor."
+    },
+    "disclaimer": "CompliHub360 bir orkestrasyon platformudur — hukuk bürosu değildir. Hukuki, vergisel ve mevzuata ilişkin danışmanlık, kendi mesleki sorumlulukları altında Verified Partner'lar tarafından verilir. §§ RDG / StBerG anlamında Rechtsberatung sunmuyoruz.",
+    "copyright": "© 2026 CompliHub360.",
+    "legal": {
+      "privacy": "Gizlilik Politikası",
+      "terms": "Koşullar (AGB)",
+      "imprint": "Künye (Impressum)",
+      "cookies": "Çerez Ayarları",
+      "subProcessors": "Alt İşleyenler"
+    }
+  }
+}

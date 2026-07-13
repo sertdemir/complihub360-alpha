@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { saveWizardSession } from '../api/sessions';
 import { generateRiskMapPdf } from '../lib/riskMapPdf';
 import { useAuthStore } from '../store/useAuthStore';
@@ -113,27 +114,30 @@ export const STATS = [
   { value: '3', label: 'Verified Partners ready' },
 ];
 
-const MATCHES = ['94% match', '88% match', '81% match'];
+const MATCHES = ['94%', '88%', '81%'];
 
 // Real partners behind the unlock (seeded provider_keys on staging).
+// `match` holds the raw percentage; the "match" wording is translated at render.
+// `sub` keeps the English ground truth; rendering translates via results:partners.<i>.sub.
 const PARTNERS = [
-  { key: 'studio-bianchi', name: 'Studio Bianchi SRL', meta: 'Milano, IT', match: '94% match', sub: 'Italian VAT registration + fiscal representation · DE·IT bilingual' },
-  { key: 'schmidt-partner', name: 'Schmidt & Partner', meta: 'Hamburg, DE', match: '88% match', sub: 'OSS/IOSS setup · 12 years cross-border tax · 8 EU offices' },
-  { key: 'madrid-tax', name: 'Madrid Tax Consultants', meta: 'Madrid, ES', match: '81% match', sub: 'Iberian VAT (ES/PT) · monthly filing · marketplace optimization' },
+  { key: 'studio-bianchi', name: 'Studio Bianchi SRL', meta: 'Milano, IT', match: '94%', sub: 'Italian VAT registration + fiscal representation · DE·IT bilingual' },
+  { key: 'schmidt-partner', name: 'Schmidt & Partner', meta: 'Hamburg, DE', match: '88%', sub: 'OSS/IOSS setup · 12 years cross-border tax · 8 EU offices' },
+  { key: 'madrid-tax', name: 'Madrid Tax Consultants', meta: 'Madrid, ES', match: '81%', sub: 'Iberian VAT (ES/PT) · monthly filing · marketplace optimization' },
 ];
 
 function StatePill({ state, onAnswer }: { state: State; onAnswer: () => void }) {
+  const { t } = useTranslation('results');
   if (state.kind === 'confirmed') {
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-light px-3 py-1 text-[13px] font-semibold text-fg-brand">
-        <Check size={13} strokeWidth={3} /> Confirmed
+        <Check size={13} strokeWidth={3} /> {t('state.confirmed')}
       </span>
     );
   }
   if (state.kind === 'likely') {
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full border border-stroke px-3 py-1 text-[13px] font-medium text-fg-secondary">
-        <Info size={13} /> Likely
+        <Info size={13} /> {t('state.likely')}
       </span>
     );
   }
@@ -143,12 +147,13 @@ function StatePill({ state, onAnswer }: { state: State; onAnswer: () => void }) 
       onClick={onAnswer}
       className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-3.5 py-2 text-[13px] font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5"
     >
-      Answer {state.count} questions <ArrowRight size={14} />
+      {t('state.answer', { total: state.count })} <ArrowRight size={14} />
     </button>
   );
 }
 
 export function ResultsRiskMap() {
+  const { t } = useTranslation('results');
   const location = useLocation();
   // Profile survives the magic-link roundtrip via localStorage (Wave A2):
   // router state is lost when the user returns from the e-mail.
@@ -199,21 +204,21 @@ export function ResultsRiskMap() {
           <Logo lockup="horizontal" tone="on-light" href="/" markClassName="h-9" />
           <div className="flex items-center gap-4">
             <span className="hidden items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary sm:inline-flex">
-              <Lock size={13} /> Guest map · expires in 30 min
+              <Lock size={13} /> {t('topbar.guestBadge')}
             </span>
             <button
               type="button"
               onClick={exportPdf}
               className="inline-flex items-center gap-2 rounded-xl border border-stroke px-4 py-2.5 text-[14px] font-semibold text-fg transition-colors hover:border-fg-brand"
             >
-              <Download size={15} /> Export PDF
+              <Download size={15} /> {t('topbar.exportPdf')}
             </button>
             <button
               type="button"
               onClick={() => setSaveOpen(true)}
               className="inline-flex items-center gap-2 rounded-xl bg-accent-500 px-5 py-2.5 text-[14px] font-semibold text-primary-950 transition-transform duration-200 hover:-translate-y-0.5"
             >
-              Save this map <ArrowRight size={15} />
+              {t('topbar.saveMap')} <ArrowRight size={15} />
             </button>
           </div>
         </div>
@@ -222,14 +227,14 @@ export function ResultsRiskMap() {
       <main className="mx-auto w-full max-w-[1440px] px-4 pb-20 md:px-8 lg:px-16">
         {/* Header */}
         <div className="mx-auto mt-14 max-w-3xl text-center">
-          <span className="text-[12px] font-semibold uppercase tracking-[0.16em] text-fg-brand">Your risk map</span>
+          <span className="text-[12px] font-semibold uppercase tracking-[0.16em] text-fg-brand">{t('header.eyebrow')}</span>
           <h1 className="mt-3 font-serif text-[2.75rem] font-bold leading-[1.05] tracking-tight text-fg sm:text-[3.25rem]">
-            Here&rsquo;s what applies to you.
+            {t('header.title')}
           </h1>
           <p className="mt-4 text-[15px] leading-relaxed text-fg-secondary">
             {profile?.country
-              ? `Based on your assessment. ${profile.categories?.length ?? 0} domains in scope.`
-              : 'Based on Germany · United Kingdom · Netherlands. D2C e-commerce, €2M—€5M revenue. VAT · EPR · Privacy in scope.'}
+              ? t('header.subtitleProfile', { total: profile.categories?.length ?? 0 })
+              : t('header.subtitleDefault')}
           </p>
         </div>
 
@@ -239,7 +244,7 @@ export function ResultsRiskMap() {
             <div key={s.label} className="flex items-center">
               {i > 0 && <span className="mr-8 hidden h-8 w-px bg-stroke-subtle sm:block" />}
               <span className="text-[1.5rem] font-bold text-fg">{s.value}</span>
-              <span className="ml-2 text-[14px] text-fg-secondary">{s.label}</span>
+              <span className="ml-2 text-[14px] text-fg-secondary">{t(`stats.${i}.label`, { defaultValue: s.label })}</span>
             </div>
           ))}
         </div>
@@ -247,30 +252,30 @@ export function ResultsRiskMap() {
         {/* Obligations table */}
         <div className="mt-12 overflow-hidden rounded-2xl border border-stroke-subtle">
           <div className="grid grid-cols-[100px_1fr_120px_110px_160px] gap-4 border-b border-stroke-subtle bg-surface-secondary px-6 py-3.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">
-            <span>Severity</span>
-            <span>Obligation</span>
-            <span>Market</span>
-            <span>Due</span>
-            <span className="text-right">State</span>
+            <span>{t('table.severity')}</span>
+            <span>{t('table.obligation')}</span>
+            <span>{t('table.market')}</span>
+            <span>{t('table.due')}</span>
+            <span className="text-right">{t('table.state')}</span>
           </div>
-          {OBLIGATIONS.map((o) => (
+          {OBLIGATIONS.map((o, i) => (
             <div
               key={o.title}
               className="grid grid-cols-[100px_1fr_120px_110px_160px] items-center gap-4 border-b border-stroke-subtle px-6 py-5 last:border-b-0 transition-colors hover:bg-surface-secondary/50"
             >
               <span>
                 <RiskBadge level={o.severity as RiskLevel} styleVariant="soft" size="sm">
-                  {o.severity.charAt(0).toUpperCase() + o.severity.slice(1)}
+                  {t(`severity.${o.severity}`, { defaultValue: o.severity.charAt(0).toUpperCase() + o.severity.slice(1) })}
                 </RiskBadge>
               </span>
               <span className="min-w-0">
-                <span className="block text-[15px] font-bold text-fg">{o.title}</span>
-                <span className="mt-0.5 block text-[12px] leading-relaxed text-fg-brand">{o.detail}</span>
+                <span className="block text-[15px] font-bold text-fg">{t(`obligations.${i}.title`, { defaultValue: o.title })}</span>
+                <span className="mt-0.5 block text-[12px] leading-relaxed text-fg-brand">{t(`obligations.${i}.detail`, { defaultValue: o.detail })}</span>
               </span>
-              <span className="text-[14px] text-fg-secondary">{o.market}</span>
+              <span className="text-[14px] text-fg-secondary">{t(`obligations.${i}.market`, { defaultValue: o.market })}</span>
               <span>
-                <span className="block text-[14px] font-semibold text-fg">{o.due}</span>
-                <span className="block text-[12px] text-fg-tertiary">{o.dueSub}</span>
+                <span className="block text-[14px] font-semibold text-fg">{t(`obligations.${i}.due`, { defaultValue: o.due })}</span>
+                <span className="block text-[12px] text-fg-tertiary">{t(`obligations.${i}.dueSub`, { defaultValue: o.dueSub })}</span>
               </span>
               <span className="flex justify-end">
                 <StatePill state={o.state} onAnswer={() => setSaveOpen(true)} />
@@ -284,15 +289,15 @@ export function ResultsRiskMap() {
           <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-fg-brand">
-                3 Verified Partners matched
+                {t('partners.eyebrow')}
               </span>
               <h2 className="mt-2 font-serif text-[1.75rem] font-bold leading-tight text-fg">
-                We&rsquo;ve found who can act on this.
+                {t('partners.title')}
               </h2>
             </div>
             {isLoggedIn ? (
               <span className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-fg-brand">
-                <Check size={14} strokeWidth={3} /> Matches unlocked
+                <Check size={14} strokeWidth={3} /> {t('partners.unlocked')}
               </span>
             ) : (
               <button
@@ -300,14 +305,14 @@ export function ResultsRiskMap() {
                 onClick={() => setSaveOpen(true)}
                 className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-fg-brand transition-colors hover:text-brand"
               >
-                <Lock size={14} /> Unlock matches with a free account <ArrowRight size={14} />
+                <Lock size={14} /> {t('partners.unlockCta')} <ArrowRight size={14} />
               </button>
             )}
           </div>
 
           <div className="mt-6 grid gap-5 sm:grid-cols-3">
             {isLoggedIn
-              ? PARTNERS.map((pt) => (
+              ? PARTNERS.map((pt, i) => (
                   <div
                     key={pt.key}
                     className="flex flex-col gap-3 rounded-2xl border border-stroke-subtle bg-surface-secondary px-6 py-7"
@@ -317,15 +322,15 @@ export function ResultsRiskMap() {
                         <p className="text-[16px] font-bold text-fg">{pt.name}</p>
                         <p className="text-[12px] text-fg-tertiary">{pt.meta}</p>
                       </div>
-                      <span className="shrink-0 rounded-full bg-brand-light px-2.5 py-1 text-[12px] font-bold text-fg-brand">{pt.match}</span>
+                      <span className="shrink-0 rounded-full bg-brand-light px-2.5 py-1 text-[12px] font-bold text-fg-brand">{t('partners.match', { pct: pt.match })}</span>
                     </div>
-                    <p className="text-[13px] leading-relaxed text-fg-secondary">{pt.sub}</p>
+                    <p className="text-[13px] leading-relaxed text-fg-secondary">{t(`partners.${i}.sub`, { defaultValue: pt.sub })}</p>
                     <button
                       type="button"
                       onClick={() => setQuoteFor({ key: pt.key, name: pt.name, meta: pt.meta, country: profile?.country || 'DE', category: 'vat' })}
                       className="mt-auto inline-flex items-center justify-center gap-2 rounded-xl bg-accent-500 px-4 py-2.5 text-[14px] font-semibold text-primary-950 transition-transform duration-200 hover:-translate-y-0.5"
                     >
-                      Request quote <ArrowRight size={15} />
+                      {t('partners.requestQuote')} <ArrowRight size={15} />
                     </button>
                   </div>
                 ))
@@ -339,7 +344,7 @@ export function ResultsRiskMap() {
                       <div className="mx-auto h-2.5 w-3/4 rounded-full bg-neutral-200" />
                       <div className="mx-auto h-2.5 w-1/2 rounded-full bg-neutral-200" />
                     </div>
-                    <span className="text-[15px] font-bold text-fg-brand">{m}</span>
+                    <span className="text-[15px] font-bold text-fg-brand">{t('partners.match', { pct: m })}</span>
                   </div>
                 ))}
           </div>
@@ -351,17 +356,17 @@ export function ResultsRiskMap() {
         <div className="mx-auto max-w-2xl px-4 text-center">
           <ShieldCheck size={26} className="mx-auto text-fg-brand" />
           <h2 className="mt-4 font-serif text-[2rem] font-bold leading-tight tracking-tight text-fg">
-            Save this map. Unlock the partners.
+            {t('cta.title')}
           </h2>
           <p className="mx-auto mt-3 max-w-md text-[15px] leading-relaxed text-fg-secondary">
-            Free account. No credit card. Founding-member access through Beta launch.
+            {t('cta.body')}
           </p>
           <button
             type="button"
             onClick={() => setSaveOpen(true)}
             className="mt-8 inline-flex items-center gap-2 rounded-xl bg-accent-500 px-7 py-3.5 text-[15px] font-semibold text-primary-950 shadow-[0_18px_34px_-14px_rgba(212,175,55,0.6)] transition-transform duration-200 hover:-translate-y-0.5"
           >
-            Create free account <ArrowRight size={17} />
+            {t('cta.button')} <ArrowRight size={17} />
           </button>
         </div>
       </section>
@@ -372,7 +377,7 @@ export function ResultsRiskMap() {
           provider={quoteFor}
           country={quoteFor.country}
           category={quoteFor.category}
-          domainLabel="Tax & VAT"
+          domainLabel={t('quote.domainTaxVat')}
           requesterEmail={user?.email}
           onClose={() => setQuoteFor(null)}
         />

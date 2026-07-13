@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Trans, useTranslation } from "react-i18next";
 import { Typography } from "../../components/ui/Typography";
 import { Button } from "../../components/ui/Button";
 
 export function EmailVerificationPage() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { t } = useTranslation("auth");
     const email = (location.state as { email?: string })?.email || "ihre@email.de";
 
     const [cooldown, setCooldown] = useState(0);
@@ -34,7 +36,7 @@ export function EmailVerificationPage() {
                         <Typography variant="h3" className="tracking-tight">CompliHub360</Typography>
                     </button>
                     <Link to="/login" className="text-sm font-medium text-neutral-500 hover:text-neutral-900 transition-colors flex items-center gap-1">
-                        Anmelden <span className="material-symbols-outlined text-base">arrow_forward</span>
+                        {t("verify.signIn")} <span className="material-symbols-outlined text-base">arrow_forward</span>
                     </Link>
                 </div>
             </header>
@@ -65,12 +67,15 @@ export function EmailVerificationPage() {
                         </motion.div>
 
                         <Typography variant="h2" weight="bold" className="text-neutral-900 mb-2">
-                            E-Mail bestätigen
+                            {t("verify.title")}
                         </Typography>
                         <Typography variant="body" className="text-neutral-500 mb-6 leading-relaxed">
-                            Wir haben eine Bestätigungs-E-Mail an{" "}
-                            <span className="font-semibold text-neutral-900">{email}</span>{" "}
-                            gesendet. Bitte klicken Sie auf den Link in der E-Mail, um Ihr Konto zu aktivieren.
+                            <Trans
+                                t={t}
+                                i18nKey="verify.body"
+                                values={{ email }}
+                                components={{ em: <span className="font-semibold text-neutral-900" /> }}
+                            />
                         </Typography>
 
                         {/* Info box */}
@@ -78,8 +83,8 @@ export function EmailVerificationPage() {
                             <div className="flex items-start gap-3">
                                 <span className="material-symbols-outlined text-neutral-400 text-xl mt-0.5">info</span>
                                 <div className="text-xs text-neutral-500 leading-relaxed space-y-1">
-                                    <p>Prüfen Sie auch Ihren <span className="font-semibold text-neutral-700">Spam-Ordner</span>, falls die E-Mail nicht ankommt.</p>
-                                    <p>Der Link ist <span className="font-semibold text-neutral-700">24 Stunden</span> gültig.</p>
+                                    <p><Trans t={t} i18nKey="verify.spamHint" components={{ b: <span className="font-semibold text-neutral-700" /> }} /></p>
+                                    <p><Trans t={t} i18nKey="verify.validHint" components={{ b: <span className="font-semibold text-neutral-700" /> }} /></p>
                                 </div>
                             </div>
                         </div>
@@ -96,17 +101,17 @@ export function EmailVerificationPage() {
                             {cooldown > 0 ? (
                                 <span className="flex items-center gap-2">
                                     <span className="material-symbols-outlined text-base">schedule</span>
-                                    Erneut senden in {cooldown}s
+                                    {t("verify.resendIn", { seconds: cooldown })}
                                 </span>
                             ) : resent ? (
                                 <span className="flex items-center gap-2">
                                     <span className="material-symbols-outlined text-base text-primary-500">check</span>
-                                    Erneut gesendet — nochmal versuchen?
+                                    {t("verify.resentRetry")}
                                 </span>
                             ) : (
                                 <span className="flex items-center gap-2">
                                     <span className="material-symbols-outlined text-base">send</span>
-                                    E-Mail erneut senden
+                                    {t("verify.resend")}
                                 </span>
                             )}
                         </Button>
@@ -117,7 +122,7 @@ export function EmailVerificationPage() {
                             className="inline-flex items-center gap-1 text-xs text-neutral-400 hover:text-neutral-600 transition-colors"
                         >
                             <span className="material-symbols-outlined text-sm">edit</span>
-                            Andere E-Mail verwenden
+                            {t("verify.changeEmail")}
                         </Link>
                     </div>
 
@@ -130,7 +135,7 @@ export function EmailVerificationPage() {
                         >
                             <span className="text-xs text-success-500 font-medium flex items-center justify-center gap-1.5">
                                 <span className="material-symbols-outlined text-sm">check_circle</span>
-                                Bestätigungs-E-Mail wurde erneut gesendet.
+                                {t("verify.resentToast")}
                             </span>
                         </motion.div>
                     )}

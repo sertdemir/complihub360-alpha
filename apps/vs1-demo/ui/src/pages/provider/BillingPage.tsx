@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ProviderShell } from '../../components/provider/ProviderShell';
 import { Banner } from '../../components/ui/Banner';
 import { Button } from '../../components/ui/Button';
@@ -47,14 +48,15 @@ const FIXTURE: Invoice[] = [
     ] },
 ];
 
-const STATUS_META: Record<Invoice['status'], { label: string; tone: 'success' | 'error' | 'warning' | 'neutral' }> = {
-  paid: { label: 'paid', tone: 'success' },
-  failed: { label: 'failed · grace', tone: 'error' },
-  open: { label: 'open', tone: 'warning' },
-  void: { label: 'void', tone: 'neutral' },
+const STATUS_META: Record<Invoice['status'], { labelKey: string; tone: 'success' | 'error' | 'warning' | 'neutral' }> = {
+  paid: { labelKey: 'billing.statusPaid', tone: 'success' },
+  failed: { labelKey: 'billing.statusFailedGrace', tone: 'error' },
+  open: { labelKey: 'billing.statusOpen', tone: 'warning' },
+  void: { labelKey: 'billing.statusVoid', tone: 'neutral' },
 };
 
 export function BillingPage() {
+  const { t } = useTranslation('providerws');
   const { data: invoices } = useApiData(fetchInvoices, FIXTURE);
   const [detail, setDetail] = useState<Invoice | null>(null);
   // C3: "Update payment method" → Stripe billing portal; honest note until
@@ -66,12 +68,12 @@ export function BillingPage() {
     try {
       const target = await openBillingPortal();
       if (target === 'not-configured') {
-        setPortalNote('Stripe wird gerade angebunden — Zahlungsmethoden lassen sich verwalten, sobald das Billing-Portal live ist.');
+        setPortalNote(t('billing.portalNotConfigured'));
       } else {
         window.location.href = target;
       }
     } catch {
-      setPortalNote('Das Billing-Portal ist gerade nicht erreichbar — bitte später erneut versuchen.');
+      setPortalNote(t('billing.portalUnavailable'));
     }
     setPortalBusy(false);
   };
@@ -80,32 +82,32 @@ export function BillingPage() {
   const failed = invoices.find((i) => i.status === 'failed');
   const ytd = invoices.filter((i) => i.period.startsWith('2026')).reduce((n, i) => n + i.amount_cents, 0);
   const kpis = [
-    { label: 'THIS MONTH (RUNNING)', value: '€1,438', trend: { value: '—', direction: 'neutral' as const, label: '14 confirms + 17 clicks' } },
-    { label: 'LAST INVOICE', value: latest ? euro(latest.amount_cents) : '—',
+    { label: t('billing.kpiThisMonth'), value: '€1,438', trend: { value: '—', direction: 'neutral' as const, label: t('billing.kpiThisMonthTrend') } },
+    { label: t('billing.kpiLastInvoice'), value: latest ? euro(latest.amount_cents) : '—',
       trend: latest?.status === 'failed'
-        ? { value: '↘', direction: 'down' as const, label: `${latest.invoice_number} · payment FAILED` }
+        ? { value: '↘', direction: 'down' as const, label: `${latest.invoice_number} · ${t('billing.kpiPaymentFailed')}` }
         : { value: '—', direction: 'neutral' as const, label: latest ? `${latest.invoice_number} · ${latest.status}` : '' } },
-    { label: 'NEXT INVOICE', value: '2026-08-01', trend: { value: '—', direction: 'neutral' as const, label: 'monthly on the 1st' } },
-    { label: 'YTD', value: euro(ytd), trend: { value: '↗', direction: 'up' as const, label: `across ${invoices.length} months` } },
+    { label: t('billing.kpiNextInvoice'), value: '2026-08-01', trend: { value: '—', direction: 'neutral' as const, label: t('billing.kpiMonthlyFirst') } },
+    { label: t('billing.kpiYtd'), value: euro(ytd), trend: { value: '↗', direction: 'up' as const, label: t('billing.kpiAcrossMonths', { count: invoices.length }) } },
   ];
 
   return (
     <ProviderShell>
       <div className="mx-auto max-w-[1140px] space-y-6">
         <div>
-          <h1 className="font-serif text-[30px] font-bold leading-tight text-fg">Billing</h1>
+          <h1 className="font-serif text-[30px] font-bold leading-tight text-fg">{t('billing.title')}</h1>
           <p className="mt-1 max-w-3xl text-body-sm leading-relaxed text-fg-secondary">
-            Stripe-issued invoices · monthly on the 1st · pricing: €92 per confirm + €2 per affiliate click + €0 subscription.
+            {t('billing.subtitle')}
           </p>
         </div>
 
         {failed && (
           <Banner
             status="error"
-            title={`Payment failed on ${failed.invoice_number} · grace period running`}
-            action={<Button size="sm" variant="danger" onClick={updatePayment} disabled={portalBusy}>{portalBusy ? '…' : 'Update payment method'}</Button>}
+            title={t('billing.paymentFailedBanner', { invoice: failed.invoice_number })}
+            action={<Button size="sm" variant="danger" onClick={updatePayment} disabled={portalBusy}>{portalBusy ? '…' : t('billing.updatePaymentMethod')}</Button>}
           >
-            Retry or update your payment method to avoid workspace lock. Click the invoice row for the full breakdown.
+            {t('billing.paymentFailedBody')}
           </Banner>
         )}
         {portalNote && (
@@ -120,17 +122,17 @@ export function BillingPage() {
 
         <section className="space-y-3">
           <div>
-            <h2 className="text-[15px] font-semibold text-fg">Invoice history</h2>
-            <p className="mt-0.5 text-[12px] text-fg-tertiary">Click any row for line items + totals</p>
+            <h2 className="text-[15px] font-semibold text-fg">{t('billing.historyTitle')}</h2>
+            <p className="mt-0.5 text-[12px] text-fg-tertiary">{t('billing.historyHint')}</p>
           </div>
           <Table>
             <THead>
               <TR>
-                <TH>Invoice</TH>
-                <TH>Period</TH>
-                <TH numeric>Total</TH>
-                <TH>Status</TH>
-                <TH>Actions</TH>
+                <TH>{t('billing.colInvoice')}</TH>
+                <TH>{t('billing.colPeriod')}</TH>
+                <TH numeric>{t('billing.colTotal')}</TH>
+                <TH>{t('billing.colStatus')}</TH>
+                <TH>{t('billing.colActions')}</TH>
               </TR>
             </THead>
             <TBody>
@@ -141,8 +143,8 @@ export function BillingPage() {
                     <TD bold>{inv.invoice_number}</TD>
                     <TD>{inv.period}</TD>
                     <TD numeric>{euro(inv.amount_cents)}</TD>
-                    <TD><Tag tone={m.tone}>{m.label}</Tag></TD>
-                    <TD className="text-fg-secondary">{inv.status === 'failed' ? 'Update payment · Retry' : 'View details'}</TD>
+                    <TD><Tag tone={m.tone}>{t(m.labelKey)}</Tag></TD>
+                    <TD className="text-fg-secondary">{inv.status === 'failed' ? t('billing.rowActionFailed') : t('billing.rowActionView')}</TD>
                   </TR>
                 );
               })}

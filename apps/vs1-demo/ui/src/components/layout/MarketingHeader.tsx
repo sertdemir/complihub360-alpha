@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Globe, Menu, X } from 'lucide-react';
+import { Check, Globe, Menu, X } from 'lucide-react';
 import { Logo } from '../ui/Logo';
 import { ThemeToggle } from '../ui/ThemeToggle';
 
@@ -103,6 +103,80 @@ function AudienceSwitch({
   );
 }
 
+// Language menu — same four locales and URL-segment logic as
+// components/common/LanguageSwitcher (GlobalNav). Navigation happens via plain
+// hrefs (like every other link in this header), so the component stays
+// router-free (Storybook-safe); the /:locale route in App.tsx picks up the new
+// segment and calls i18n.changeLanguage.
+const LANGUAGES = [
+  { code: 'en', label: 'English' },
+  { code: 'de', label: 'Deutsch' },
+  { code: 'es', label: 'Español' },
+  { code: 'tr', label: 'Türkçe' },
+] as const;
+
+function LanguageMenu({ buttonClass }: { buttonClass: string }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', onDown);
+    return () => document.removeEventListener('mousedown', onDown);
+  }, [open]);
+
+  const { pathname, search, hash } = window.location;
+  const parts = pathname.split('/');
+  const hasLocale = parts.length > 1 && LANGUAGES.some((l) => l.code === parts[1]);
+  const current = hasLocale ? parts[1] : 'en';
+  const hrefFor = (lng: string) =>
+    (hasLocale ? ['', lng, ...parts.slice(2)].join('/') : `/${lng}${pathname}`) + search + hash;
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        aria-label="Language"
+        aria-expanded={open}
+        aria-haspopup="menu"
+        onClick={() => setOpen((v) => !v)}
+        className={buttonClass}
+      >
+        <Globe size={20} />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 8 }}
+            transition={{ duration: 0.15 }}
+            role="menu"
+            className="absolute right-0 top-full z-[100] mt-2 w-36 overflow-hidden rounded-md border-thin border-stroke-subtle bg-surface py-1 shadow-lg"
+          >
+            {LANGUAGES.map((lng) => (
+              <a
+                key={lng.code}
+                role="menuitem"
+                href={hrefFor(lng.code)}
+                onClick={() => setOpen(false)}
+                className={`flex items-center justify-between px-4 py-2 text-body-sm font-medium transition-colors hover:bg-surface-secondary ${
+                  current === lng.code ? 'text-fg-brand' : 'text-fg-secondary'
+                }`}
+              >
+                {lng.label}
+                {current === lng.code && <Check size={14} />}
+              </a>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 // Track which section is in view (scroll-spy).
 function useScrollSpy(ids: string[]): string | null {
   const [active, setActive] = useState<string | null>(ids[0] ?? null);
@@ -187,9 +261,7 @@ export function MarketingHeader({
           </nav>
           <span className={`h-6 w-px ${inverse ? 'bg-white/20' : 'bg-stroke-subtle'}`} />
           <ThemeToggle inverse={inverse} size={36} />
-          <button aria-label="Language" className={`grid h-9 w-9 place-items-center rounded-md ${inverse ? 'text-fg-inverse' : 'text-fg-secondary'}`}>
-            <Globe size={20} />
-          </button>
+          <LanguageMenu buttonClass={`grid h-9 w-9 place-items-center rounded-md ${inverse ? 'text-fg-inverse' : 'text-fg-secondary'}`} />
           <a
             href={loginHref}
             className={`inline-flex h-[40px] items-center whitespace-nowrap rounded-md border-thin px-4 text-body-sm font-semibold ${
@@ -207,9 +279,7 @@ export function MarketingHeader({
           <Logo tone={inverse ? 'on-petrol' : 'on-light'} />
           <div className="flex items-center gap-2">
             <ThemeToggle inverse={inverse} size={40} />
-            <button aria-label="Language" className={`grid h-[40px] w-[40px] place-items-center rounded-md ${inverse ? 'text-fg-inverse' : 'text-fg-secondary'}`}>
-              <Globe size={20} />
-            </button>
+            <LanguageMenu buttonClass={`grid h-[40px] w-[40px] place-items-center rounded-md ${inverse ? 'text-fg-inverse' : 'text-fg-secondary'}`} />
             <button
               aria-label={open ? 'Close menu' : 'Open menu'}
               aria-expanded={open}

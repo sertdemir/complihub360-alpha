@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Inbox } from 'lucide-react';
 import { Moon, ChevronDown } from 'lucide-react';
 import { ProviderShell } from '../../components/provider/ProviderShell';
@@ -33,6 +34,9 @@ type Fixture = {
   action: { label: string; variant: 'accent' | 'primary' | 'ghost' };
 };
 
+// Fixture rows: company names, RQ-IDs, tags and meta descriptions are request
+// data and stay verbatim. statusLabel / action.label are re-mapped to localized
+// strings at render (also covers api-delivered rows via defaultValue).
 const REQUESTS: Fixture[] = [
   {
     id: 'RQ-0234 · 12 min ago', status: 'awaiting-confirm', statusLabel: 'Awaiting confirm',
@@ -73,12 +77,30 @@ const REQUESTS: Fixture[] = [
 ];
 
 const FILTERS = [
-  { key: 'confirm', label: 'Awaiting confirmation', match: 'awaiting-confirm' },
-  { key: 'reply', label: 'Awaiting reply', match: 'awaiting-reply' },
-  { key: 'active', label: 'Active', match: 'active' },
+  { key: 'confirm', labelKey: 'requests.filterAwaitingConfirmation', match: 'awaiting-confirm' },
+  { key: 'reply', labelKey: 'requests.filterAwaitingReply', match: 'awaiting-reply' },
+  { key: 'active', labelKey: 'requests.filterActive', match: 'active' },
 ] as const;
 
+// status → localized status label (defaultValue = raw label from fixture/api).
+const STATUS_LABEL_KEY: Record<RequestStatus, string> = {
+  'awaiting-confirm': 'requests.statusAwaitingConfirm',
+  'awaiting-reply': 'requests.statusAwaitingReply',
+  'active': 'requests.statusActive',
+};
+
+// action label → localized button label (defaultValue = raw label).
+// api ships the dossier-anonymized company as a fixed English label.
+const ANON_COMPANY = '\u{1F512} Anonymized \u00b7 unlocks on confirm';
+
+const ACTION_LABEL_KEY: Record<string, string> = {
+  'Open · confirm': 'requests.actionOpenConfirm',
+  'Reply': 'requests.actionReply',
+  'View': 'requests.actionView',
+};
+
 export function RequestsPage() {
+  const { t } = useTranslation('providerws');
   // Demo states (Figma: OOO + First-Request-empty): append ?state=ooo | empty.
   const [params] = useSearchParams();
   const demoState = params.get('state');
@@ -125,65 +147,64 @@ export function RequestsPage() {
         {(ooo || demoState === 'ooo') && (
           <Banner
             status="brand"
-            title="Out of office active"
-            action={<Button size="sm" variant="secondary" onClick={() => setAvailability('available').catch(() => {})}>End early</Button>}
+            title={t('requests.oooBannerTitle')}
+            action={<Button size="sm" variant="secondary" onClick={() => setAvailability('available').catch(() => {})}>{t('requests.oooEndEarly')}</Button>}
           >
-            New requests are paused and re-routed · your ranking is frozen while away · SLA timers resume on return.
+            {t('requests.oooBannerBody')}
           </Banner>
         )}
         {liveBanner && newCount > 0 && demoState !== 'ooo' && (
           <Banner
             status="info"
-            title={`${newCount} new request${newCount === 1 ? '' : 's'} since you last checked`}
-            action={<Button size="sm" variant="secondary" onClick={markRequestsSeen}>Mark all seen</Button>}
+            title={t('requests.newBannerTitle', { count: newCount })}
+            action={<Button size="sm" variant="secondary" onClick={markRequestsSeen}>{t('requests.markAllSeen')}</Button>}
           >
-            Magic-link emails sent · they'll appear here too
+            {t('requests.newBannerBody')}
           </Banner>
         )}
         {!loading && source === 'fixture' && bannerOpen && demoState !== 'ooo' && (
           <Banner
             status="info"
-            title="2 new requests since you last checked · 12 min ago"
-            action={<Button size="sm" variant="secondary" onClick={() => setBannerOpen(false)}>Mark all seen</Button>}
+            title={t('requests.fixtureBannerTitle')}
+            action={<Button size="sm" variant="secondary" onClick={() => setBannerOpen(false)}>{t('requests.markAllSeen')}</Button>}
           >
-            Magic-link emails sent · they'll appear here too
+            {t('requests.newBannerBody')}
           </Banner>
         )}
 
         <div className="flex items-start justify-between gap-4">
-          <h1 className="font-serif text-[30px] font-bold leading-tight text-fg">Requests</h1>
+          <h1 className="font-serif text-[30px] font-bold leading-tight text-fg">{t('requests.title')}</h1>
           {!ooo && (
             <button
               type="button"
               onClick={() => setAvailability('ooo').catch(() => {})}
               className="mt-2 flex shrink-0 items-center gap-1.5 text-[12px] text-fg-secondary transition-colors hover:text-fg"
             >
-              <Moon size={13} /> Out of office
+              <Moon size={13} /> {t('requests.outOfOffice')}
             </button>
           )}
         </div>
         <p className="-mt-3 max-w-3xl text-body-sm leading-relaxed text-fg-secondary">
-          All requests routed to your workspace · push-anchored (email + magic-link). New requests highlighted with a
-          persistent banner until confirmed. Default filter shows requests awaiting your action.
+          {t('requests.subtitle')}
         </p>
 
         <div className="flex items-center gap-2">
           {FILTERS.map((f) => (
             <FilterChip key={f.key} selected={filter === f.key} onClick={() => setFilter(f.key)}>
-              {f.label} · {requests.filter((r) => r.status === f.match).length}
+              {t(f.labelKey)} · {requests.filter((r) => r.status === f.match).length}
             </FilterChip>
           ))}
           <button type="button" className="ml-auto flex items-center gap-1 text-[12px] text-fg-tertiary transition-colors hover:text-fg">
-            Sort: SLA urgency <ChevronDown size={12} />
+            {t('requests.sortSla')} <ChevronDown size={12} />
           </button>
         </div>
 
         {demoState === 'empty' ? (
           <EmptyState
             icon={<Inbox size={28} />}
-            title="No requests yet"
-            description="Your profile is live. New requests land here + in your inbox as magic-links — most partners receive their first request within 5 days."
-            action={<Button size="sm" variant="secondary">Preview public profile</Button>}
+            title={t('requests.emptyTitle')}
+            description={t('requests.emptyDescription')}
+            action={<Button size="sm" variant="secondary">{t('requests.previewProfile')}</Button>}
           />
         ) : (
         <div className="space-y-2.5">
@@ -192,12 +213,16 @@ export function RequestsPage() {
               key={r.id}
               idLine={'idLine' in r ? (r as { idLine: string }).idLine : r.id}
               status={r.status}
-              statusLabel={r.statusLabel}
-              company={r.company}
+              statusLabel={t(STATUS_LABEL_KEY[r.status], { defaultValue: r.statusLabel })}
+              company={r.company === ANON_COMPANY ? t('requests.companyAnonymized', { defaultValue: r.company }) : r.company}
               tag={r.tag}
               meta={r.meta}
               slaValue={r.sla}
-              action={<Button size="sm" variant={r.action.variant} onClick={() => setThreadFor(r.id)}>{r.action.label}</Button>}
+              action={
+                <Button size="sm" variant={r.action.variant} onClick={() => setThreadFor(r.id)}>
+                  {ACTION_LABEL_KEY[r.action.label] ? t(ACTION_LABEL_KEY[r.action.label], { defaultValue: r.action.label }) : r.action.label}
+                </Button>
+              }
             />
           ))}
         </div>

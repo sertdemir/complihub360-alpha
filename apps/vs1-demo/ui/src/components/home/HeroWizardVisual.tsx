@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { DomainsStep } from '../wizard-screens';
 
 // Hero visual = the REAL full compliance wizard (Domains step) rendered in DARK,
@@ -23,10 +24,11 @@ export function HeroWizardDesktop({ className = '' }: { className?: string }) {
 
 /** Mobile: the real dark wizard captured as a PNG that scales with its container. */
 export function HeroWizardMobile({ className = '' }: { className?: string }) {
+  const { t } = useTranslation('home');
   return (
     <img
       src="/img/hero-wizard-mobile.png"
-      alt="CompliHub compliance wizard — Domains step (mobile)"
+      alt={t('heroWizard.mobileAlt')}
       width={390}
       height={844}
       className={`block h-auto w-full max-w-[320px] rounded-[1.6rem] shadow-2xl ring-1 ring-black/10 ${className}`}

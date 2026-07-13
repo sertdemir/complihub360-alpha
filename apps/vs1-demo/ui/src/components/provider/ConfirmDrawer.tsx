@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TriangleAlert } from 'lucide-react';
 import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
@@ -17,6 +18,7 @@ export interface ConfirmSpec {
 }
 
 export function ConfirmDrawer({ spec, onClose }: { spec: ConfirmSpec | null; onClose: () => void }) {
+  const { t } = useTranslation('providerws');
   const [typed, setTyped] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -39,13 +41,13 @@ export function ConfirmDrawer({ spec, onClose }: { spec: ConfirmSpec | null; onC
       onClose={onClose}
       side="right"
       size="sm"
-      eyebrow="CONFIRM"
-      title={spec?.title ?? 'Are you sure?'}
+      eyebrow={t('confirmDrawer.eyebrow')}
+      title={spec?.title ?? t('confirmDrawer.fallbackTitle')}
       footer={
         <div className="flex w-full items-center justify-end gap-2">
-          <Button variant="ghost" size="sm" onClick={onClose} disabled={busy}>Cancel</Button>
+          <Button variant="ghost" size="sm" onClick={onClose} disabled={busy}>{t('confirmDrawer.cancel')}</Button>
           <Button variant="accent" size="sm" onClick={run} disabled={!armed || busy}>
-            {busy ? '…' : spec?.confirmLabel ?? 'Confirm'}
+            {busy ? '…' : spec?.confirmLabel ?? t('confirmDrawer.confirm')}
           </Button>
         </div>
       }
@@ -58,7 +60,9 @@ export function ConfirmDrawer({ spec, onClose }: { spec: ConfirmSpec | null; onC
           </div>
           {spec.keyword && (
             <div>
-              <p className="mb-1.5 text-[11px] text-fg-tertiary">Type <span className="font-semibold text-fg">{spec.keyword}</span> to confirm:</p>
+              <p className="mb-1.5 text-[11px] text-fg-tertiary">
+                {t('confirmDrawer.typePrefix')}<span className="font-semibold text-fg">{spec.keyword}</span>{t('confirmDrawer.typeSuffix')}
+              </p>
               <input
                 value={typed}
                 onChange={(e) => setTyped(e.target.value)}

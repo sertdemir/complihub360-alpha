@@ -1,0 +1,30 @@
+{
+  "draftBanner": "BORRADOR — Esta página describe el tratamiento de datos real del sistema, pero no constituye asesoramiento jurídico. Finalícela con un abogado o un generador de cumplimiento y complete los marcadores señalados antes del lanzamiento.",
+  "privacy": {
+    "title": "Política de Privacidad",
+    "updated": "Última actualización: julio de 2026 · Borrador",
+    "headings": {
+      "controller": "1. Responsable",
+      "data": "2. Datos que tratamos",
+      "purposes": "3. Fines y bases jurídicas",
+      "ai": "4. Tratamiento con IA",
+      "recipients": "5. Destinatarios y encargados",
+      "retention": "6. Conservación",
+      "rights": "7. Sus derechos",
+      "contact": "8. Contacto"
+    }
+  },
+  "imprint": {
+    "title": "Aviso legal",
+    "updated": "Información conforme al § 5 DDG (legislación alemana) · Borrador",
+    "headings": {
+      "provider": "Proveedor",
+      "representedBy": "Representado por",
+      "contact": "Contacto",
+      "register": "Inscripción registral",
+      "responsible": "Responsable conforme al § 18 (2) MStV",
+      "dispute": "Resolución de litigios de la UE",
+      "notice": "Aviso"
+    }
+  }
+}

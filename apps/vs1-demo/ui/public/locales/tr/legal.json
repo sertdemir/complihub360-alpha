@@ -1,0 +1,30 @@
+{
+  "draftBanner": "TASLAK — Bu sayfa sistemin gerçek veri işleme süreçlerini açıklar ancak hukuki danışmanlık yerine geçmez. Yayından önce bir avukatla veya uyum aracıyla son haline getirin ve işaretli yer tutucuları doldurun.",
+  "privacy": {
+    "title": "Gizlilik Politikası",
+    "updated": "Son güncelleme: Temmuz 2026 · Taslak",
+    "headings": {
+      "controller": "1. Veri sorumlusu",
+      "data": "2. İşlediğimiz veriler",
+      "purposes": "3. Amaçlar ve hukuki dayanaklar",
+      "ai": "4. Yapay zeka ile işleme",
+      "recipients": "5. Alıcılar ve veri işleyenler",
+      "retention": "6. Saklama süresi",
+      "rights": "7. Haklarınız",
+      "contact": "8. İletişim"
+    }
+  },
+  "imprint": {
+    "title": "Künye",
+    "updated": "§ 5 DDG (Alman hukuku) uyarınca bilgiler · Taslak",
+    "headings": {
+      "provider": "Sağlayıcı",
+      "representedBy": "Temsilci",
+      "contact": "İletişim",
+      "register": "Sicil kaydı",
+      "responsible": "§ 18 (2) MStV uyarınca sorumlu",
+      "dispute": "AB uyuşmazlık çözümü",
+      "notice": "Not"
+    }
+  }
+}

@@ -21,7 +21,7 @@ interface BellPopoverProps {
 
 export function BellPopover({ unread, onAllRead }: BellPopoverProps) {
   const navigate = useNavigate();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation('providerws');
   const locale = i18n.resolvedLanguage || 'en';
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<FeedItem[] | null>(null);
@@ -59,7 +59,7 @@ export function BellPopover({ unread, onAllRead }: BellPopoverProps) {
     <div ref={rootRef} className="relative">
       <button
         type="button"
-        aria-label="Notifications"
+        aria-label={t('bell.aria')}
         onClick={() => setOpen((v) => !v)}
         className={cn('relative text-fg-tertiary transition-colors hover:text-fg', open && 'text-fg')}
       >
@@ -77,21 +77,21 @@ export function BellPopover({ unread, onAllRead }: BellPopoverProps) {
           <div className="fixed inset-0 z-[90]" onClick={() => setOpen(false)} />
           <div className="absolute right-0 top-[calc(100%+10px)] z-[95] w-[380px] overflow-hidden rounded-xl border border-white/10 bg-[#1f2937] shadow-[0_18px_50px_-12px_rgba(0,0,0,0.65)]">
             <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">Notifications</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">{t('bell.header')}</p>
               <button
                 type="button"
                 onClick={markAllRead}
                 disabled={marking || unreadShown === 0}
                 className="text-[11px] font-medium text-fg-brand transition-colors hover:text-fg disabled:cursor-default disabled:text-fg-tertiary"
               >
-                {marking ? '…' : 'Mark all read'}
+                {marking ? '…' : t('bell.markAllRead')}
               </button>
             </div>
 
             <div className="max-h-[420px] overflow-y-auto">
-              {items === null && <p className="px-4 py-5 text-[12px] text-fg-tertiary">Loading…</p>}
+              {items === null && <p className="px-4 py-5 text-[12px] text-fg-tertiary">{t('bell.loading')}</p>}
               {items !== null && items.length === 0 && (
-                <p className="px-4 py-5 text-[12px] text-fg-tertiary">No notifications yet.</p>
+                <p className="px-4 py-5 text-[12px] text-fg-tertiary">{t('bell.empty')}</p>
               )}
               {items?.map((i, idx) => (
                 <button
@@ -120,7 +120,7 @@ export function BellPopover({ unread, onAllRead }: BellPopoverProps) {
                 className="w-full"
                 onClick={() => { setOpen(false); navigate(`/${locale}/partner-dashboard/notifications`); }}
               >
-                View all notifications
+                {t('bell.viewAll')}
               </Button>
             </div>
           </div>

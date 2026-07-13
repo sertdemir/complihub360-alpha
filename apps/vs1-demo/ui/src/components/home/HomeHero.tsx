@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Check, ArrowRight, Eye, EyeOff, Globe, BarChart3, Lock, MessageSquare } from 'lucide-react';
 import { Container } from '../ui/Container';
@@ -15,20 +16,21 @@ type WizardForm = 'preview' | 'desktop' | 'mobile' | 'animated';
 // "The compliance work you shouldn't be doing alone." World-map backdrop (desktop),
 // two columns: copy + use-case tabs (left) · live wizard preview (right).
 
-const TRUST = ['Anonymous', 'No credit card', 'Results in your browser'] as const;
+// Labels come from the 'home' namespace: hero.trust.*, hero.preview.steps.*, hero.preview.domains.*
+const TRUST_INDICES = [0, 1, 2] as const;
 
 const STEPS = [
-  { label: 'Markets', state: 'done' },
-  { label: 'Domains', state: 'active' },
-  { label: 'Volume', state: 'upcoming' },
-  { label: 'Review', state: 'upcoming' },
+  { index: 0, state: 'done' },
+  { index: 1, state: 'active' },
+  { index: 2, state: 'upcoming' },
+  { index: 3, state: 'upcoming' },
 ] as const;
 
 const DOMAINS = [
-  { label: 'VAT & Tax', icon: BarChart3, on: true },
-  { label: 'EPR & Packaging', icon: Globe, on: true },
-  { label: 'GDPR & Privacy', icon: Lock, on: false },
-  { label: 'Marketing Compliance', icon: MessageSquare, on: false },
+  { index: 0, icon: BarChart3, on: true },
+  { index: 1, icon: Globe, on: true },
+  { index: 2, icon: Lock, on: false },
+  { index: 3, icon: MessageSquare, on: false },
 ] as const;
 
 function HeroBackground() {
@@ -46,6 +48,7 @@ function HeroBackground() {
 }
 
 function WizardPreview({ className = '' }: { className?: string }) {
+  const { t } = useTranslation('home');
   return (
     <div className={`w-full max-w-[480px] overflow-hidden rounded-2xl border border-stroke-subtle bg-surface shadow-xl ${className}`}>
       {/* Top bar */}
@@ -53,12 +56,12 @@ function WizardPreview({ className = '' }: { className?: string }) {
         <span className="flex items-center gap-2 text-h6 font-semibold text-fg">
           <span className="h-4 w-4 rounded bg-accent-500" /> CompliHub
         </span>
-        <span className="text-[12px] text-fg-tertiary">Cross-border launch — DE → UK + NL</span>
+        <span className="text-[12px] text-fg-tertiary">{t('hero.preview.context')}</span>
       </div>
       {/* Stepper */}
       <div className="flex items-center gap-1.5 px-5 py-4">
         {STEPS.map((s, i) => (
-          <div key={s.label} className="flex flex-1 items-center gap-1.5">
+          <div key={s.index} className="flex flex-1 items-center gap-1.5">
             <span
               className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-semibold ${
                 s.state === 'done'
@@ -70,37 +73,39 @@ function WizardPreview({ className = '' }: { className?: string }) {
             >
               {s.state === 'done' ? <Check size={13} strokeWidth={3} /> : i + 1}
             </span>
-            <span className={`text-[12px] font-medium ${s.state === 'upcoming' ? 'text-fg-tertiary' : 'text-fg'}`}>{s.label}</span>
+            <span className={`text-[12px] font-medium ${s.state === 'upcoming' ? 'text-fg-tertiary' : 'text-fg'}`}>
+              {t(`hero.preview.steps.${s.index}`)}
+            </span>
             {i < STEPS.length - 1 && <span className="h-px flex-1 bg-stroke-subtle" />}
           </div>
         ))}
       </div>
       {/* Body */}
       <div className="px-5 pb-5">
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-fg-tertiary">Step 2 of 4</p>
-        <p className="mt-1 font-serif text-[19px] font-bold leading-snug text-fg">Which compliance domains are in scope?</p>
-        <p className="mt-1.5 text-body-sm text-fg-secondary">Select all that apply. We'll map only the regulations relevant to your scope.</p>
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-fg-tertiary">{t('hero.preview.stepLabel')}</p>
+        <p className="mt-1 font-serif text-[19px] font-bold leading-snug text-fg">{t('hero.preview.title')}</p>
+        <p className="mt-1.5 text-body-sm text-fg-secondary">{t('hero.preview.subtitle')}</p>
         <div className="mt-4 grid grid-cols-2 gap-2.5">
           {DOMAINS.map((dm) => (
             <span
-              key={dm.label}
+              key={dm.index}
               className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-[13px] font-medium ${
                 dm.on ? 'border-transparent bg-brand text-fg-on-brand' : 'border-stroke text-fg-secondary'
               }`}
             >
               {dm.on ? <Check size={15} strokeWidth={2.5} /> : <dm.icon size={15} />}
-              {dm.label}
+              {t(`hero.preview.domains.${dm.index}`)}
             </span>
           ))}
         </div>
       </div>
       {/* Footer */}
       <div className="flex items-center justify-between border-t border-stroke-subtle px-5 py-3.5">
-        <span className="text-[12px] text-fg-tertiary">2 selected · 2 left</span>
+        <span className="text-[12px] text-fg-tertiary">{t('hero.preview.selectedCount')}</span>
         <span className="flex items-center gap-3">
-          <span className="text-[13px] font-medium text-fg-secondary">Back</span>
+          <span className="text-[13px] font-medium text-fg-secondary">{t('hero.preview.back')}</span>
           <span className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-3.5 py-1.5 text-[13px] font-semibold text-fg-on-brand">
-            Continue <ArrowRight size={14} />
+            {t('hero.preview.continue')} <ArrowRight size={14} />
           </span>
         </span>
       </div>
@@ -171,6 +176,7 @@ function HeroVisual({ showRiskMap, className }: { showRiskMap: boolean; classNam
 }
 
 export function HomeHero({ wizard = 'desktop' }: { wizard?: WizardForm } = {}) {
+  const { t } = useTranslation('home');
   // Click toggles the hero visual between the animated wizard and the risk map.
   const [showRiskMap, setShowRiskMap] = useState(false);
   // Hero CTA opens the FULL-VIEW wizard overlay (/:locale/wizard) — the
@@ -194,25 +200,24 @@ export function HomeHero({ wizard = 'desktop' }: { wizard?: WizardForm } = {}) {
             transition={{ duration: 0.6, ease: 'easeOut' }}
             className="flex flex-col"
           >
-            <SectionEyebrow tone="brand">For operations leads</SectionEyebrow>
+            <SectionEyebrow tone="brand">{t('hero.eyebrow')}</SectionEyebrow>
             <h1 className="mt-5 font-serif text-[3.25rem] font-semibold leading-[1.1] tracking-tight text-fg">
-              The compliance work you <GoldWord>shouldn't</GoldWord> be doing alone.
+              {t('hero.title.pre')}<GoldWord>{t('hero.title.gold')}</GoldWord>{t('hero.title.post')}
             </h1>
             <p className="mt-5 max-w-[560px] text-body-lg leading-relaxed text-fg-secondary">
-              CompliHub360 maps the rules that apply to your operations across European markets, then connects you to a
-              verified specialist when something needs hands. Six minutes to your first risk map. No account required.
+              {t('hero.subtitleDesktop')}
             </p>
             <div className="mt-8 flex items-center gap-7">
-              <Button size="lg" onClick={startAssessment}>Start your assessment</Button>
+              <Button size="lg" onClick={startAssessment}>{t('hero.cta.start')}</Button>
               <button {...toggleProps} className="inline-flex items-center gap-2 text-body font-semibold text-fg-brand">
-                {showRiskMap ? 'Close risk map' : 'See an example risk map'}
+                {showRiskMap ? t('hero.cta.closeMap') : t('hero.cta.showMap')}
                 {showRiskMap ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
             <div className="mt-7 flex flex-wrap items-center gap-x-7 gap-y-2">
-              {TRUST.map((c) => (
-                <span key={c} className="inline-flex items-center gap-2 text-body-sm text-fg-secondary">
-                  <Check size={14} className="text-fg-brand" strokeWidth={2.5} /> {c}
+              {TRUST_INDICES.map((i) => (
+                <span key={i} className="inline-flex items-center gap-2 text-body-sm text-fg-secondary">
+                  <Check size={14} className="text-fg-brand" strokeWidth={2.5} /> {t(`hero.trust.${i}`)}
                 </span>
               ))}
             </div>
@@ -234,7 +239,7 @@ export function HomeHero({ wizard = 'desktop' }: { wizard?: WizardForm } = {}) {
               <HeroWizardDesktop />
             )}
             <p className="mt-5 flex items-center gap-2 text-caption text-fg-tertiary">
-              <span className="h-1.5 w-1.5 rounded-full bg-brand" /> Six minutes · 4 questions · No account required
+              <span className="h-1.5 w-1.5 rounded-full bg-brand" /> {t('hero.visualCaption')}
             </p>
           </motion.div>
         </div>
@@ -248,25 +253,24 @@ export function HomeHero({ wizard = 'desktop' }: { wizard?: WizardForm } = {}) {
           ) : (
             <HeroWizardMobile className="mx-auto mb-9" />
           )}
-          <SectionEyebrow tone="brand">For operations leads</SectionEyebrow>
+          <SectionEyebrow tone="brand">{t('hero.eyebrow')}</SectionEyebrow>
           <h1 className="mt-4 font-serif text-[2.1rem] font-semibold leading-[1.12] tracking-tight text-fg">
-            The compliance work you <GoldWord>shouldn't</GoldWord> be doing alone.
+            {t('hero.title.pre')}<GoldWord>{t('hero.title.gold')}</GoldWord>{t('hero.title.post')}
           </h1>
           <p className="mt-4 text-body leading-relaxed text-fg-secondary">
-            CompliHub360 maps the rules across European markets, then connects you to a verified specialist when
-            something needs hands. Six minutes to your first risk map. No account required.
+            {t('hero.subtitleMobile')}
           </p>
           <div className="mt-6 flex flex-col gap-3">
-            <Button size="lg" fullWidth onClick={startAssessment}>Start your assessment</Button>
+            <Button size="lg" fullWidth onClick={startAssessment}>{t('hero.cta.start')}</Button>
             <button {...toggleProps} className="inline-flex items-center justify-center gap-2 text-body font-semibold text-fg-brand">
-              {showRiskMap ? 'Close risk map' : 'See an example risk map'}
+              {showRiskMap ? t('hero.cta.closeMap') : t('hero.cta.showMap')}
               {showRiskMap ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
           <div className="mt-6 flex flex-col gap-2">
-            {TRUST.map((c) => (
-              <span key={c} className="inline-flex items-center gap-2 text-body-sm text-fg-secondary">
-                <Check size={14} className="text-fg-brand" strokeWidth={2.5} /> {c}
+            {TRUST_INDICES.map((i) => (
+              <span key={i} className="inline-flex items-center gap-2 text-body-sm text-fg-secondary">
+                <Check size={14} className="text-fg-brand" strokeWidth={2.5} /> {t(`hero.trust.${i}`)}
               </span>
             ))}
           </div>

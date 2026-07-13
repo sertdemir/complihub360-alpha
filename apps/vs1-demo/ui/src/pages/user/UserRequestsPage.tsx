@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ChevronDown, MoreHorizontal } from 'lucide-react';
+import { Trans, useTranslation } from 'react-i18next';
 import { UserShell } from '../../components/user/UserShell';
 import { Button } from '../../components/ui/Button';
 import { FilterChip } from '../../components/ui/Badge';
@@ -13,7 +14,7 @@ import { fetchUserRequests } from '../../api/requests';
 // ─── User Dashboard · Requests / Lead Center ──────────────────────────────────
 // Mirrors "User Dashboard v1 · Requests / Lead Center (Desktop)" (2051:54):
 // gold-word header · filter chips · Request Cards with PARTNER tag + session
-// link meta. Design fixture data.
+// link meta. Design fixture data (rows stay untranslated; UI labels are keyed).
 
 type Fixture = {
   uuid?: string;
@@ -37,16 +38,28 @@ const REQUESTS: Fixture[] = [
 ];
 
 const FILTERS = [
-  { key: 'all', label: 'All · 5' },
-  { key: 'confirm', label: 'Awaiting confirmation · 2' },
-  { key: 'confirmed', label: 'Confirmed · 1' },
-  { key: 'replied', label: 'Replied · 1' },
-  { key: 'overdue', label: 'Overdue · 1' },
+  { key: 'all', labelKey: 'filterAll' },
+  { key: 'confirm', labelKey: 'filterAwaitingConfirmation' },
+  { key: 'confirmed', labelKey: 'filterConfirmed' },
+  { key: 'replied', labelKey: 'filterReplied' },
+  { key: 'overdue', labelKey: 'filterOverdue' },
 ] as const;
 
+// Live/fixture UI labels → userws keys (display only; raw values untouched).
+const STATUS_KEY: Record<string, string> = {
+  'Awaiting confirmation': 'awaitingConfirmation', 'Active': 'active',
+  'Provider replied': 'providerReplied', 'Provider confirmed': 'providerConfirmed', 'Withdrawn': 'withdrawn',
+};
+const ACTION_KEY: Record<string, string> = {
+  'Send reminder': 'sendReminder', 'Open thread': 'openThread', 'View thread': 'viewThread', 'View request': 'viewRequest',
+};
+
 export function UserRequestsPage() {
+  const { t } = useTranslation('userws');
   const [filter, setFilter] = useState<string>('all');
   const [threadFor, setThreadFor] = useState<string | null>(null);
+  const tStatus = (label: string) => (STATUS_KEY[label] ? t(`status.${STATUS_KEY[label]}`) : label);
+  const tAction = (label: string) => (ACTION_KEY[label] ? t(`actions.${ACTION_KEY[label]}`) : label);
   // Deep-link support (user notifications feed, C12): ?thread=<uuid>
   const [searchParams, setSearchParams] = useSearchParams();
   const deepThread = searchParams.get('thread');
@@ -68,26 +81,26 @@ export function UserRequestsPage() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="font-serif text-[32px] font-bold leading-tight text-fg">
-              Your provider <span className="text-fg-accent">requests</span>.
+              <Trans t={t} i18nKey="requests.title" components={{ accent: <span className="text-fg-accent" /> }} />
             </h1>
             <p className="mt-1 text-body-sm text-fg-secondary">
-              5 active · 1 overdue · 12 closed this quarter · avg. reply 22h
+              {t('requests.sub')}
             </p>
           </div>
           <div className="mt-1 flex shrink-0 items-center gap-4">
-            <a href="#" className="text-[12px] font-medium text-fg underline underline-offset-2">Export CSV</a>
-            <Button size="sm">Find provider</Button>
+            <a href="#" className="text-[12px] font-medium text-fg underline underline-offset-2">{t('requests.exportCsv')}</a>
+            <Button size="sm">{t('requests.findProvider')}</Button>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           {FILTERS.map((f) => (
             <FilterChip key={f.key} size="sm" selected={filter === f.key} onClick={() => setFilter(f.key)}>
-              {f.label}
+              {t(`requests.${f.labelKey}`)}
             </FilterChip>
           ))}
           <button type="button" className="ml-auto flex items-center gap-1 text-[12px] text-fg-tertiary transition-colors hover:text-fg">
-            Sort: Last updated <ChevronDown size={12} />
+            {t('shared.sortLastUpdated')} <ChevronDown size={12} />
           </button>
         </div>
 
@@ -97,17 +110,17 @@ export function UserRequestsPage() {
               key={r.id}
               idLine={r.id}
               status={r.status}
-              statusLabel={r.statusLabel}
+              statusLabel={tStatus(r.statusLabel)}
               company={r.company}
               tag={r.partner ? 'PARTNER' : undefined}
               meta={r.meta}
               action={
                 <div className="flex items-center gap-1.5">
-                  <Button size="sm" variant={r.action.variant} onClick={() => r.uuid && setThreadFor(r.uuid)}>{r.action.label}</Button>
+                  <Button size="sm" variant={r.action.variant} onClick={() => r.uuid && setThreadFor(r.uuid)}>{tAction(r.action.label)}</Button>
                   {r.uuid && (
                     <button
                       type="button"
-                      aria-label="Request actions"
+                      aria-label={t('requests.requestActionsAria')}
                       onClick={() => setActionsFor({ uuid: r.uuid!, idLine: r.id, company: r.company, statusLabel: String(r.statusLabel), rawStatus: r.rawStatus })}
                       className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-white/10 text-fg-tertiary transition-colors hover:border-white/25 hover:text-fg"
                     >
@@ -121,7 +134,7 @@ export function UserRequestsPage() {
         </div>
 
         <p className="text-[11px] text-fg-tertiary">
-          ● Average partner response on your workspace: 22h · 87% confirm within SLA · last 30 days
+          {t('requests.footerStats')}
         </p>
       </div>
       <ThreadDrawer open={!!threadFor} engagementId={threadFor} viewer="user" onClose={() => { setThreadFor(null); if (deepThread) setSearchParams({}, { replace: true }); }} />

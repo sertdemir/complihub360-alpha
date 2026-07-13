@@ -15,7 +15,7 @@ import { fetchProviderRequests, type ProviderRequest } from '../../api/requests'
 // ── B4 · Search ──────────────────────────────────────────────────────────────
 export function SearchDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
   const navigate = useNavigate();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation('providerws');
   const locale = i18n.resolvedLanguage || 'en';
   const [q, setQ] = useState('');
   const [rows, setRows] = useState<ProviderRequest[] | null>(null);
@@ -29,11 +29,11 @@ export function SearchDrawer({ open, onClose }: { open: boolean; onClose: () => 
   const hits = (rows ?? []).filter((r) => {
     if (q.trim().length < 2) return false;
     const hay = `${r.idLine} ${r.company} ${r.tag ?? ''} ${r.meta} ${r.statusLabel}`.toLowerCase();
-    return q.toLowerCase().split(/\s+/).every((t) => hay.includes(t));
+    return q.toLowerCase().split(/\s+/).every((tk) => hay.includes(tk));
   });
 
   return (
-    <Drawer forceDark open={open} onClose={onClose} side="right" size="md" eyebrow="WORKSPACE" title="Search requests">
+    <Drawer forceDark open={open} onClose={onClose} side="right" size="md" eyebrow={t('searchDrawer.eyebrow')} title={t('searchDrawer.title')}>
       <div className="space-y-4">
         <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 focus-within:border-fg-brand">
           <Search size={15} className="shrink-0 text-fg-tertiary" />
@@ -41,16 +41,16 @@ export function SearchDrawer({ open, onClose }: { open: boolean; onClose: () => 
             autoFocus
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Request ID, client, category, country …"
+            placeholder={t('searchDrawer.placeholder')}
             className="w-full bg-transparent text-[13px] text-fg outline-none placeholder:text-fg-tertiary"
           />
         </div>
         {q.trim().length < 2 && (
-          <p className="text-[12px] text-fg-tertiary">Type at least two characters — searches your live request inbox.</p>
+          <p className="text-[12px] text-fg-tertiary">{t('searchDrawer.hint')}</p>
         )}
-        {q.trim().length >= 2 && rows === null && <p className="text-[12px] text-fg-tertiary">Loading…</p>}
+        {q.trim().length >= 2 && rows === null && <p className="text-[12px] text-fg-tertiary">{t('searchDrawer.loading')}</p>}
         {q.trim().length >= 2 && rows !== null && hits.length === 0 && (
-          <p className="text-[12px] text-fg-tertiary">No matches for “{q}”.</p>
+          <p className="text-[12px] text-fg-tertiary">{t('searchDrawer.noMatches', { query: q })}</p>
         )}
         <div className="space-y-2">
           {hits.slice(0, 8).map((r) => (
@@ -75,27 +75,28 @@ export function SearchDrawer({ open, onClose }: { open: boolean; onClose: () => 
 
 // ── B6 · Ranking impact (read-only) ──────────────────────────────────────────
 const FACTORS = [
-  { label: 'Responsiveness (confirm < 24h)', weight: 40, note: 'Ø 6.2h — your strongest lever' },
-  { label: 'Reply quality & completion', weight: 25, note: 'client-confirmed engagements' },
-  { label: 'Coverage fit (markets · languages)', weight: 20, note: '2 markets · 3 languages' },
-  { label: 'Verified-Partner standing', weight: 15, note: 'active · renews automatically' },
+  { labelKey: 'rankingImpact.factorResponsiveness', weight: 40, noteKey: 'rankingImpact.factorResponsivenessNote' },
+  { labelKey: 'rankingImpact.factorReplyQuality', weight: 25, noteKey: 'rankingImpact.factorReplyQualityNote' },
+  { labelKey: 'rankingImpact.factorCoverageFit', weight: 20, noteKey: 'rankingImpact.factorCoverageFitNote' },
+  { labelKey: 'rankingImpact.factorVerifiedStanding', weight: 15, noteKey: 'rankingImpact.factorVerifiedStandingNote' },
 ];
 
 export function RankingImpactDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation('providerws');
   return (
-    <Drawer forceDark open={open} onClose={onClose} side="right" size="md" eyebrow="RANKING" title="What moves your rank"
-      footer={<p className="text-[11px] text-fg-tertiary">Recalculated weekly · declines never lower your rank — only missed confirms do.</p>}>
+    <Drawer forceDark open={open} onClose={onClose} side="right" size="md" eyebrow={t('rankingImpact.eyebrow')} title={t('rankingImpact.title')}
+      footer={<p className="text-[11px] text-fg-tertiary">{t('rankingImpact.footer')}</p>}>
       <div className="space-y-4">
         {FACTORS.map((f) => (
-          <div key={f.label}>
+          <div key={f.labelKey}>
             <div className="mb-1.5 flex items-baseline justify-between">
-              <span className="text-[13px] font-medium text-fg">{f.label}</span>
+              <span className="text-[13px] font-medium text-fg">{t(f.labelKey)}</span>
               <span className="text-[12px] font-bold text-fg-accent">{f.weight}%</span>
             </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
               <div className="h-full rounded-full bg-[#d4af37]" style={{ width: `${f.weight}%` }} />
             </div>
-            <p className="mt-1 text-[11px] text-fg-tertiary">{f.note}</p>
+            <p className="mt-1 text-[11px] text-fg-tertiary">{t(f.noteKey)}</p>
           </div>
         ))}
       </div>
@@ -104,28 +105,30 @@ export function RankingImpactDrawer({ open, onClose }: { open: boolean; onClose:
 }
 
 // ── B10 · Help & support ─────────────────────────────────────────────────────
+const TOPICS = [
+  { titleKey: 'helpDrawer.topicSlaTitle', descKey: 'helpDrawer.topicSlaDesc' },
+  { titleKey: 'helpDrawer.topicMagicLinksTitle', descKey: 'helpDrawer.topicMagicLinksDesc' },
+  { titleKey: 'helpDrawer.topicRankingTitle', descKey: 'helpDrawer.topicRankingDesc' },
+  { titleKey: 'helpDrawer.topicBillingTitle', descKey: 'helpDrawer.topicBillingDesc' },
+];
+
 export function HelpDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const TOPICS = [
-    { t: 'How the 24h confirm SLA works', d: 'What counts, what pauses it, and how reminders escalate.' },
-    { t: 'Magic links & security', d: 'Single-use links, expiry, and why identity unlocks after confirm.' },
-    { t: 'How ranking is calculated', d: 'The four factors and their weights.' },
-    { t: 'Billing & invoices', d: 'Per-confirm pricing, Stripe invoices, payment methods.' },
-  ];
+  const { t } = useTranslation('providerws');
   return (
-    <Drawer forceDark open={open} onClose={onClose} side="right" size="md" eyebrow="SUPPORT" title="Help & support"
+    <Drawer forceDark open={open} onClose={onClose} side="right" size="md" eyebrow={t('helpDrawer.eyebrow')} title={t('helpDrawer.title')}
       footer={
         <a href="mailto:support@complihub360.com" className="w-full">
-          <Button variant="accent" size="sm" className="w-full">Contact support</Button>
+          <Button variant="accent" size="sm" className="w-full">{t('helpDrawer.contactSupport')}</Button>
         </a>
       }>
       <div className="space-y-2">
         {TOPICS.map((x) => (
-          <div key={x.t} className="rounded-lg border border-white/10 bg-white/[0.03] px-3.5 py-3">
-            <p className="text-[13px] font-semibold text-fg">{x.t}</p>
-            <p className="mt-0.5 text-[11px] leading-relaxed text-fg-tertiary">{x.d}</p>
+          <div key={x.titleKey} className="rounded-lg border border-white/10 bg-white/[0.03] px-3.5 py-3">
+            <p className="text-[13px] font-semibold text-fg">{t(x.titleKey)}</p>
+            <p className="mt-0.5 text-[11px] leading-relaxed text-fg-tertiary">{t(x.descKey)}</p>
           </div>
         ))}
-        <p className="pt-2 text-[11px] text-fg-tertiary">Median support response: 4h on business days.</p>
+        <p className="pt-2 text-[11px] text-fg-tertiary">{t('helpDrawer.medianResponse')}</p>
       </div>
     </Drawer>
   );

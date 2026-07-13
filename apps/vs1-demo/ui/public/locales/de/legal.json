@@ -1,0 +1,30 @@
+{
+  "draftBanner": "ENTWURF — Diese Seite beschreibt die tatsächliche Datenverarbeitung des Systems, ersetzt aber keine Rechtsberatung. Vor Veröffentlichung durch einen Anwalt oder Datenschutz-Generator finalisieren und die markierten Platzhalter füllen.",
+  "privacy": {
+    "title": "Datenschutzerklärung",
+    "updated": "Stand: Juli 2026 · Entwurf",
+    "headings": {
+      "controller": "1. Verantwortlicher",
+      "data": "2. Welche Daten wir verarbeiten",
+      "purposes": "3. Zwecke und Rechtsgrundlagen",
+      "ai": "4. KI-Verarbeitung",
+      "recipients": "5. Empfänger und Auftragsverarbeiter",
+      "retention": "6. Speicherdauer",
+      "rights": "7. Ihre Rechte",
+      "contact": "8. Kontakt"
+    }
+  },
+  "imprint": {
+    "title": "Impressum",
+    "updated": "Angaben gemäß § 5 DDG · Entwurf",
+    "headings": {
+      "provider": "Anbieter",
+      "representedBy": "Vertreten durch",
+      "contact": "Kontakt",
+      "register": "Registereintrag",
+      "responsible": "Verantwortlich i. S. d. § 18 Abs. 2 MStV",
+      "dispute": "EU-Streitschlichtung",
+      "notice": "Hinweis"
+    }
+  }
+}

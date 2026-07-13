@@ -11,7 +11,7 @@ import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 // DESIGNED error view on the login page (?error=expired) — no bare fallback.
 export function AuthCallbackPage() {
     const navigate = useNavigate();
-    const { i18n } = useTranslation();
+    const { t, i18n } = useTranslation("auth");
     const lang = i18n.resolvedLanguage || "en";
 
     useEffect(() => {
@@ -44,7 +44,7 @@ export function AuthCallbackPage() {
     return (
         <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#0b1620] px-6 text-center text-white">
             <Loader2 className="animate-spin text-accent-400" size={28} />
-            <p className="text-[15px] text-white/70">Signing you in…</p>
+            <p className="text-[15px] text-white/70">{t("callback.signingIn")}</p>
         </div>
     );
 }

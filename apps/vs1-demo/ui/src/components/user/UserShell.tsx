@@ -16,59 +16,65 @@ import { fetchNotificationsFeed, USER_NOTIFICATIONS_VIEWER } from '../../api/not
 // The user App-Workspace frame (always dark slate), mirroring the Figma User
 // Dashboard v2 two-axis navigation: slim left sidebar (WORKSPACE / LIBRARY /
 // SAVED / MONITORING) + global Domain Bar on top of the content column.
+// Nav copy lives in the 'userws' namespace; group/domain identifiers stay
+// canonical English (React keys + activeDomain matching).
 
 type SidebarItem = {
   to: string;
-  label: string;
+  labelKey: string;
   icon: React.ComponentType<{ size?: number | string }>;
   count?: string;
   exact?: boolean;
 };
 
-const SIDEBAR: { group: string; badge?: string; items: SidebarItem[] }[] = [
+const SIDEBAR: { group: string; groupKey: string; badgeKey?: string; items: SidebarItem[] }[] = [
   {
     group: 'Workspace',
+    groupKey: 'groupWorkspace',
     items: [
-      { to: 'dashboard', label: 'Dashboard', icon: LayoutGrid, exact: true },
-      { to: 'dashboard/sessions', label: 'Sessions', icon: FolderClosed },
-      { to: 'dashboard/requests', label: 'Requests', icon: Mail },
-      { to: 'dashboard/notifications', label: 'Notifications', icon: Bell },
+      { to: 'dashboard', labelKey: 'navDashboard', icon: LayoutGrid, exact: true },
+      { to: 'dashboard/sessions', labelKey: 'navSessions', icon: FolderClosed },
+      { to: 'dashboard/requests', labelKey: 'navRequests', icon: Mail },
+      { to: 'dashboard/notifications', labelKey: 'navNotifications', icon: Bell },
     ],
   },
   {
     group: 'Library',
-    items: [{ to: 'dashboard/library', label: 'Library', icon: BookOpen }],
+    groupKey: 'groupLibrary',
+    items: [{ to: 'dashboard/library', labelKey: 'navLibrary', icon: BookOpen }],
   },
   {
     group: 'Saved',
+    groupKey: 'groupSaved',
     items: [
-      { to: 'dashboard/saved-providers', label: 'Saved Providers', icon: Bookmark },
-      { to: 'dashboard/exports', label: 'Exports', icon: Download },
+      { to: 'dashboard/saved-providers', labelKey: 'navSavedProviders', icon: Bookmark },
+      { to: 'dashboard/exports', labelKey: 'navExports', icon: Download },
     ],
   },
   {
     group: 'Monitoring',
-    badge: 'Soon',
+    groupKey: 'groupMonitoring',
+    badgeKey: 'badgeSoon',
     items: [
-      { to: 'dashboard/alerts', label: 'Alerts', icon: TriangleAlert },
-      { to: 'dashboard/calendar', label: 'Calendar', icon: Calendar },
+      { to: 'dashboard/alerts', labelKey: 'navAlerts', icon: TriangleAlert },
+      { to: 'dashboard/calendar', labelKey: 'navCalendar', icon: Calendar },
     ],
   },
 ];
 
 const DOMAINS = [
-  { label: 'Tax & VAT', icon: Landmark, dot: 'high' as const },
-  { label: 'Product & Packaging', icon: Package, dot: 'medium' as const },
-  { label: 'Data & Privacy', icon: ShieldCheck, dot: 'medium' as const },
-  { label: 'Marketing & SEO', icon: Megaphone },
-  { label: 'Corporate & Structure', icon: Building2 },
-  { label: 'Full Support', icon: Headset },
+  { label: 'Tax & VAT', key: 'taxVat', icon: Landmark, dot: 'high' as const },
+  { label: 'Product & Packaging', key: 'productPackaging', icon: Package, dot: 'medium' as const },
+  { label: 'Data & Privacy', key: 'dataPrivacy', icon: ShieldCheck, dot: 'medium' as const },
+  { label: 'Marketing & SEO', key: 'marketingSeo', icon: Megaphone },
+  { label: 'Corporate & Structure', key: 'corporateStructure', icon: Building2 },
+  { label: 'Full Support', key: 'fullSupport', icon: Headset },
 ];
 
 const DOT: Record<'high' | 'medium', string> = { high: 'bg-red-400', medium: 'bg-amber-400' };
 
 export function UserShell({ activeDomain, children }: { activeDomain?: string; children: React.ReactNode }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation('userws');
   const locale = i18n.resolvedLanguage || 'en';
   const location = useLocation();
   // Real session identity when present; the design fixture only as fallback.
@@ -113,8 +119,8 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
             </div>
             <button
               type="button"
-              aria-label="Sign out"
-              title="Sign out"
+              aria-label={t('shell.signOut')}
+              title={t('shell.signOut')}
               onClick={async () => { await logout(); window.location.href = `/${locale}/login`; }}
               className="text-fg-tertiary transition-colors hover:text-fg"
             >
@@ -124,7 +130,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
         }
       >
         {SIDEBAR.map((g) => (
-          <SidebarGroup key={g.group} label={g.group} badge={g.badge}>
+          <SidebarGroup key={g.group} label={t(`shell.${g.groupKey}`)} badge={g.badgeKey ? t(`shell.${g.badgeKey}`) : undefined}>
             {g.items.map((it) => {
               const target = `${base}/${it.to}`;
               const active = it.exact
@@ -133,7 +139,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
               const Icon = it.icon;
               return (
                 <NavLink key={it.to} to={target}>
-                  <NavItem icon={<Icon size={16} />} label={it.label} count={it.count ?? badgeFor(it.to)} active={active} />
+                  <NavItem icon={<Icon size={16} />} label={t(`shell.${it.labelKey}`)} count={it.count ?? badgeFor(it.to)} active={active} />
                 </NavLink>
               );
             })}
@@ -149,7 +155,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
             </NavLink>
           }
           trailing={
-            <button type="button" aria-label="Search" onClick={() => setSearchOpen(true)} className="grid h-9 w-9 place-items-center rounded-lg text-fg-secondary hover:text-fg">
+            <button type="button" aria-label={t('shell.search')} onClick={() => setSearchOpen(true)} className="grid h-9 w-9 place-items-center rounded-lg text-fg-secondary hover:text-fg">
               <Search size={17} />
             </button>
           }
@@ -162,7 +168,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
                 icon={<Icon size={15} />}
                 label={
                   <span className="inline-flex items-center gap-1.5">
-                    {d.label}
+                    {t(`domain.${d.key}`)}
                     {d.dot && <span className={`h-1.5 w-1.5 rounded-full ${DOT[d.dot]}`} />}
                   </span>
                 }

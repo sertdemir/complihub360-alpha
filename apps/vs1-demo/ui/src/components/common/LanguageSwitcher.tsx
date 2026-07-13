@@ -33,8 +33,9 @@ export function LanguageSwitcher() {
   const handleLanguageChange = (lng: string) => {
     setIsOpen(false);
     const pathParts = location.pathname.split('/');
+    const rest = pathParts.slice(2).join('/');
     const targetPath = (pathParts.length > 1 && LANGUAGES.some(l => l.code === pathParts[1]))
-      ? '/' + lng + pathParts.slice(2).join('/') + location.search + location.hash
+      ? '/' + lng + (rest ? '/' + rest : '') + location.search + location.hash
       : '/' + lng + location.pathname + location.search + location.hash;
     navigate(targetPath);
   };

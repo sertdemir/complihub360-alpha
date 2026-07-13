@@ -1,0 +1,821 @@
+{
+  "badge": {
+    "verified": "Verificado"
+  },
+  "risk": {
+    "severity": {
+      "low": "Bajo",
+      "medium": "Medio",
+      "high": "Alto",
+      "critical": "Crítico"
+    },
+    "state": {
+      "confirmed": "Confirmado",
+      "likely": "Probable",
+      "action": "Responda 2 preguntas"
+    },
+    "table": {
+      "severity": "Severidad",
+      "obligation": "Obligación",
+      "market": "Mercado",
+      "due": "Vence",
+      "state": "Estado"
+    },
+    "match": "{{pct}} % de coincidencia"
+  },
+  "drawer": {
+    "close": "Cerrar",
+    "whatWeCover": "Qué cubrimos",
+    "whenThisMatters": "Cuándo es relevante",
+    "continues": "Continúa en la evaluación de 6 minutos.",
+    "seeIfApplies": "Compruebe si esto le aplica"
+  },
+  "hero": {
+    "eyebrow": "Para responsables de operaciones",
+    "title": {
+      "pre": "El trabajo de compliance que ",
+      "gold": "no debería",
+      "post": " hacer usted solo."
+    },
+    "subtitleDesktop": "CompliHub360 mapea las normas que aplican a sus operaciones en los mercados europeos y le conecta con un especialista verificado cuando algo requiere ejecución. Seis minutos hasta su primera Risk Map. Sin necesidad de cuenta.",
+    "subtitleMobile": "CompliHub360 mapea las normas en los mercados europeos y le conecta con un especialista verificado cuando algo requiere ejecución. Seis minutos hasta su primera Risk Map. Sin necesidad de cuenta.",
+    "cta": {
+      "start": "Inicie su evaluación",
+      "showMap": "Ver una Risk Map de ejemplo",
+      "closeMap": "Cerrar la Risk Map"
+    },
+    "trust": ["Anónimo", "Sin tarjeta de crédito", "Resultados en su navegador"],
+    "visualCaption": "Seis minutos · 4 preguntas · Sin necesidad de cuenta",
+    "preview": {
+      "context": "Lanzamiento transfronterizo — DE → UK + NL",
+      "steps": ["Mercados", "Áreas", "Volumen", "Revisión"],
+      "stepLabel": "Paso 2 de 4",
+      "title": "¿Qué áreas de compliance entran en el alcance?",
+      "subtitle": "Seleccione todas las que apliquen. Solo mapearemos la normativa relevante para su alcance.",
+      "domains": ["IVA e impuestos", "RAP y envases", "RGPD y privacidad", "Compliance de marketing"],
+      "selectedCount": "2 seleccionadas · 2 pendientes",
+      "back": "Atrás",
+      "continue": "Continuar"
+    }
+  },
+  "heroWizard": {
+    "mobileAlt": "Asistente de compliance de CompliHub — paso «Áreas» (móvil)"
+  },
+  "wizard": {
+    "rail": {
+      "markets": "Mercados",
+      "operations": "Actividad",
+      "domains": "Áreas",
+      "review": "Revisión"
+    },
+    "saveProgress": "Guardar progreso",
+    "steps": {
+      "markets": {
+        "title": "¿Dónde opera?",
+        "subtitle": "Selección múltiple. Contrastamos la normativa con los mercados en los que vende."
+      },
+      "operations": {
+        "title": "¿Cómo son sus operaciones?",
+        "subtitle": "Delimitamos la normativa que aplica a su actividad, no solo a su mercado."
+      },
+      "domains": {
+        "title": "¿Qué áreas de compliance le preocupan?",
+        "subtitle": "Selección múltiple. Priorizamos las obligaciones de estas áreas."
+      }
+    },
+    "cards": {
+      "germany": { "title": "Alemania", "desc": "Régimen de IVA principal · registro LUCID" },
+      "unitedKingdom": { "title": "Reino Unido", "desc": "Envases + IVA tras el Brexit" },
+      "netherlands": { "title": "Países Bajos", "desc": "IVA + registro WEEE" },
+      "france": { "title": "Francia", "desc": "RAP + cumplimiento AGEC" },
+      "italy": { "title": "Italia", "desc": "IVA + REACH" },
+      "spain": { "title": "España", "desc": "IVA + ecodiseño" },
+      "unitedStates": { "title": "Estados Unidos", "desc": "Nexo de sales tax · marketplace facilitator" },
+      "turkiye": { "title": "Turquía", "desc": "IVA (KDV) · e-fatura / e-arşiv" },
+      "others": { "title": "Otros", "desc": "Abrir lista de países →" },
+      "d2cEcommerce": { "title": "E-commerce D2C", "desc": "Venta online directa al consumidor" },
+      "b2bWholesale": { "title": "B2B / mayorista", "desc": "Venta a empresas o distribuidores" },
+      "marketplace": { "title": "Marketplace", "desc": "Usted conecta compradores + vendedores" },
+      "saasDigital": { "title": "SaaS / digital", "desc": "Software, sin envío físico" },
+      "hybrid": { "title": "Híbrido", "desc": "Mezcla de canales B2B y B2C" },
+      "other": { "title": "Otro", "desc": "Descríbalo en una frase" },
+      "vatTax": { "title": "IVA e impuestos", "desc": "IVA transfronterizo, OSS/IOSS, umbrales" },
+      "eprPackaging": { "title": "RAP y envases", "desc": "Responsabilidad del productor, registros" },
+      "gdprPrivacy": { "title": "RGPD y privacidad", "desc": "EIPD, RAT, contratos de encargo" },
+      "marketing": { "title": "Marketing", "desc": "Consentimiento, cookies, auditorías de dark patterns" },
+      "corporate": { "title": "Societario", "desc": "Cuentas anuales, titulares reales" },
+      "fullCoverage": { "title": "Cobertura completa", "desc": "Derivación a partners entre áreas" }
+    },
+    "footer": {
+      "next": "Siguiente",
+      "skipRoute": "Omitir y derivar"
+    },
+    "review": {
+      "title": "Su situación, resumida.",
+      "subtitle": "Esto es lo que usaremos. Edite lo que necesite y genere después su Risk Map.",
+      "markets": "Mercados",
+      "operations": "Actividad",
+      "domains": "Áreas de compliance",
+      "edit": "Editar",
+      "trust": "Anónimo · No se requiere cuenta para ver su Risk Map · Procesado en ~4 segundos"
+    },
+    "skipHint": "¿No está seguro? Omita el paso y derivaremos según su modelo de negocio y sus mercados.",
+    "back": "Atrás",
+    "generate": "Generar mi Risk Map",
+    "removeMarket": "Quitar {{market}}",
+    "aboutMarket": "Acerca de {{market}}"
+  },
+  "marketsDrawer": {
+    "header": "Mercados",
+    "title": "Otros mercados",
+    "count": "{{selected}} seleccionados · {{total}} disponibles",
+    "desc": "Fuera de la selección principal. Elija los mercados en los que opera: mapeamos su normativa y le derivamos al Verified Partner adecuado.",
+    "searchPlaceholder": "Buscar por nombre o código de país",
+    "european": "Mercados europeos",
+    "expanding": "Cobertura en expansión",
+    "noMatch": "Ningún mercado coincide con «{{query}}».",
+    "footNote": "Su selección se añade a su Risk Map. Editable en cualquier momento en el paso 4.",
+    "add_one": "Añadir {{count}} mercado",
+    "add_other": "Añadir {{count}} mercados",
+    "done": "Hecho",
+    "markets": {
+      "switzerland": { "name": "Suiza", "desc": "MwSt · fuera de la UE · umbral de registro" },
+      "austria": { "name": "Austria", "desc": "IVA-UE · OSS · RAP" },
+      "belgium": { "name": "Bélgica", "desc": "IVA-UE · RAP (regional)" },
+      "sweden": { "name": "Suecia", "desc": "IVA-UE · registro FTI · RAP" },
+      "denmark": { "name": "Dinamarca", "desc": "IVA-UE · DRS · RAP" },
+      "poland": { "name": "Polonia", "desc": "IVA-UE · JPK_VAT · RAP ROP" },
+      "czechia": { "name": "Chequia", "desc": "IVA-UE · RAP · EET" },
+      "romania": { "name": "Rumanía", "desc": "IVA-UE · SAF-T · e-Factura" },
+      "norway": { "name": "Noruega", "desc": "Fuera de la UE · régimen VOEC" },
+      "ireland": { "name": "Irlanda", "desc": "IVA-UE · SaaS con baja fiscalidad" },
+      "finland": { "name": "Finlandia", "desc": "IVA-UE · OSS · RAP" },
+      "portugal": { "name": "Portugal", "desc": "IVA-UE · formato de fichero SAF-T" }
+    }
+  },
+  "countryInfo": {
+    "header": "Mercado",
+    "drawerLabel": "Detalle del mercado",
+    "activeRegime": "Régimen activo: {{regime}}",
+    "countries": {
+      "germany": {
+        "name": "Alemania",
+        "regime": "VAT · OSS · LUCID · GwG",
+        "intro": "Alemania aplica un IVA general del 19 %, con OSS obligatorio para B2C transfronterizo por encima de €10,000. El registro RAP se centraliza en LUCID (Verpackungsregister), con flujos separados para envases, pilas y WEEE. UStG, VerpackG y GwG son las principales leyes con las que se encontrará.",
+        "cover": [
+          "Registro de IVA · declaraciones trimestrales OSS / IOSS",
+          "Registro RAP en LUCID + informe anual",
+          "Contribuciones de ecomodulación (VerpackG)",
+          "Declaraciones al registro de titulares reales (GwG)",
+          "Seguimiento de umbrales de venta a distancia",
+          "Mecanismo de inversión del sujeto pasivo (UStG §13b)"
+        ],
+        "matters": [
+          "Envía mercancías físicas a Alemania",
+          "Sus ingresos B2C transfronterizos superan €10,000",
+          "Se incorpora a Amazon FBA-DE o a un marketplace alemán"
+        ]
+      },
+      "unitedKingdom": {
+        "name": "Reino Unido",
+        "regime": "UK VAT · Packaging EPR · WEEE · PPT",
+        "intro": "Tras el Brexit, el Reino Unido queda fuera del OSS de la UE. Debe registrarse a efectos de UK VAT en cuanto vende a consumidores británicos, y los marketplaces suelen ser el proveedor asimilado. El RAP de envases y el WEEE funcionan mediante regímenes nacionales, separados de cualquier registro en la UE.",
+        "cover": [
+          "Registro y declaraciones de UK VAT",
+          "Reglas de proveedor asimilado en marketplaces",
+          "Informes de RAP de envases (pEPR)",
+          "Registro WEEE y de pilas",
+          "IVA a la importación (postponed accounting)",
+          "Plastic Packaging Tax (PPT)"
+        ],
+        "matters": [
+          "Vende a consumidores del Reino Unido tras el Brexit",
+          "Importa mercancías a Gran Bretaña",
+          "Pone envases en el mercado británico"
+        ]
+      },
+      "netherlands": {
+        "name": "Países Bajos",
+        "regime": "EU-VAT · OSS · WEEE · UPV",
+        "intro": "Los Países Bajos aplican el IVA estándar de la UE con OSS para B2C transfronterizo. La responsabilidad del productor cubre envases (Afvalfonds / UPV), electrónica (WEEE) y pilas, cada uno con su propio registro y calendario de informes.",
+        "cover": [
+          "Registro de IVA-UE · declaraciones OSS",
+          "Informes de envases UPV / Afvalfonds",
+          "Registro WEEE (NL)",
+          "Obligaciones de pilas y acumuladores",
+          "Seguimiento de umbrales de venta a distancia",
+          "IVA de entregas intracomunitarias"
+        ],
+        "matters": [
+          "Vende B2C hacia los Países Bajos",
+          "Envía productos envasados a consumidores neerlandeses",
+          "Mantiene stock en un almacén neerlandés"
+        ]
+      },
+      "france": {
+        "name": "Francia",
+        "regime": "EU-VAT · OSS · EPR (AGEC) · Triman",
+        "intro": "Francia aplica el IVA de la UE con OSS y uno de los regímenes RAP más amplios bajo la ley AGEC: envases, electrónica, muebles, textiles y más, cada uno con un identificador único (IDU) y un eco-organismo. La ecomodulación y los índices de reparabilidad aplican cada vez más.",
+        "cover": [
+          "Registro de IVA-UE · declaraciones OSS",
+          "Registro RAP e identificadores únicos (IDU)",
+          "Contribuciones de ecomodulación AGEC",
+          "Regímenes WEEE y de pilas",
+          "Etiquetado Triman e información de separación",
+          "Índice de reparabilidad / durabilidad"
+        ],
+        "matters": [
+          "Vende B2C hacia Francia",
+          "Pone envases o AEE en el mercado francés",
+          "Vende textiles, muebles o juguetes a consumidores franceses"
+        ]
+      },
+      "italy": {
+        "name": "Italia",
+        "regime": "EU-VAT · OSS · CONAI · REACH",
+        "intro": "Italia aplica el IVA de la UE con OSS y facturación electrónica obligatoria (SdI) para muchos flujos. El RAP de envases funciona a través de CONAI con obligaciones de etiquetado ambiental, mientras que REACH aplica al contenido químico de los productos.",
+        "cover": [
+          "Registro de IVA-UE · declaraciones OSS",
+          "Facturación electrónica SdI donde se exige",
+          "Contribuciones de envases CONAI",
+          "Etiquetado ambiental (CONAI)",
+          "Registro WEEE y de pilas",
+          "Obligaciones de sustancias REACH"
+        ],
+        "matters": [
+          "Vende B2C hacia Italia",
+          "Pone envases en el mercado italiano",
+          "Envía productos con contenido químico regulado"
+        ]
+      },
+      "spain": {
+        "name": "España",
+        "regime": "EU-VAT · OSS · EPR · Plastic tax",
+        "intro": "España aplica el IVA de la UE con OSS y ha ampliado el RAP de envases con el Real Decreto 1055/2022, incluido un impuesto a los envases de plástico. Las obligaciones de ecodiseño y SCIP aplican a muchas categorías de producto.",
+        "cover": [
+          "Registro de IVA-UE · declaraciones OSS",
+          "Registro e informes de RAP de envases",
+          "Impuesto a los envases de plástico",
+          "Regímenes WEEE y de pilas",
+          "Requisitos de ecodiseño",
+          "Notificaciones SCIP / de sustancias"
+        ],
+        "matters": [
+          "Vende B2C hacia España",
+          "Pone envases de plástico en el mercado español",
+          "Envía AEE o productos regulados a ES"
+        ]
+      },
+      "unitedStates": {
+        "name": "Estados Unidos",
+        "regime": "Sales tax · Nexus · Marketplace facilitator",
+        "intro": "EE. UU. no tiene IVA; el sales tax estatal aplica en cuanto supera los umbrales de nexo económico (a menudo $100k o 200 transacciones por estado). Las leyes de marketplace facilitator trasladan la recaudación a las plataformas en la mayoría de los estados.",
+        "cover": [
+          "Seguimiento del nexo económico (por estado)",
+          "Registro y presentación de sales tax",
+          "Reglas de marketplace facilitator",
+          "Mapeo de la tributación de productos",
+          "Gestión de certificados de exención",
+          "Obligaciones de use tax"
+        ],
+        "matters": [
+          "Vende a consumidores de EE. UU. en varios estados",
+          "Supera el umbral de nexo económico de un estado",
+          "Vende en un marketplace estadounidense"
+        ]
+      },
+      "turkiye": {
+        "name": "Turquía",
+        "regime": "KDV (VAT) · e-Fatura · e-Arşiv",
+        "intro": "Turquía aplica el KDV (IVA) con facturación electrónica obligatoria (e-Fatura) y archivo electrónico (e-Arşiv) para muchos contribuyentes. Los flujos transfronterizos digitales y de mercancías tienen sus propias reglas de registro y retención, con divisa en TRY.",
+        "cover": [
+          "Registro y declaraciones de KDV (IVA)",
+          "Cumplimiento de e-Fatura / e-Arşiv",
+          "IVA de servicios digitales (cuando aplique)",
+          "Reglas de retención (tevkifat)",
+          "Aduanas e IVA a la importación",
+          "Gestión de la divisa TRY"
+        ],
+        "matters": [
+          "Vende a consumidores turcos",
+          "Emite facturas sujetas a e-Fatura",
+          "Presta servicios digitales hacia Turquía"
+        ]
+      }
+    }
+  },
+  "account": {
+    "saveProgress": {
+      "eyebrow": "Cuenta gratuita",
+      "title": "Guarde su progreso",
+      "desc": "Conserve su Risk Map, haga match con Verified Partners y reciba avisos cuando cambien las normas — gratis, sin tarjeta de crédito. Le enviaremos un Magic-Link por correo, así no hay contraseña que recordar.",
+      "benefits": ["Su dossier de Risk Map guardado", "Matching con Verified Partners", "Avisos cuando la normativa cambia"],
+      "confirm": "Su progreso está a salvo.",
+      "cta": "Crear cuenta gratuita"
+    },
+    "freeAccount": {
+      "eyebrow": "Cuenta gratuita",
+      "title": "Avisos en tiempo real, gratis",
+      "desc": "Active avisos en tiempo real en cuanto una norma cambie en sus mercados — además de su Risk Map guardada y el matching con Verified Partners. Gratis, sin tarjeta de crédito. Le enviaremos un Magic-Link por correo; no hay contraseña.",
+      "benefits": ["Avisos regulatorios en tiempo real", "Su dossier de Risk Map guardado", "Matching con Verified Partners"],
+      "confirm": "Haga clic en el enlace para terminar de configurar su cuenta gratuita.",
+      "cta": "Crear cuenta gratuita"
+    },
+    "workEmail": "Correo de trabajo",
+    "emailPlaceholder": "usted@empresa.com",
+    "checkInbox": "Revise su bandeja de entrada",
+    "sentTo": {
+      "pre": "Hemos enviado un Magic-Link a ",
+      "post": "."
+    },
+    "footNote": "Tarda 20 segundos · Sin contraseña · Sin tarjeta de crédito.",
+    "done": "Hecho",
+    "drawerLabel": "Guarde su progreso"
+  },
+  "riskMapPreview": {
+    "guestNote": "Mapa de invitado · caduca en 30 min",
+    "eyebrow": "Su Risk Map",
+    "title": "Esto es lo que le aplica.",
+    "stats": [
+      { "value": "8", "label": "obligaciones" },
+      { "value": "€25k", "label": "exposición total" },
+      { "value": "14 días", "label": "plazo mediano" },
+      { "value": "3", "label": "partners listos" }
+    ],
+    "rows": [
+      { "title": "Declaración trimestral OSS", "detail": "Última presentación: Q1 2025 · Sanción: €5,000 + 1 %/mes · UStG §18i", "market": "DE · NL", "due": "30 abr", "dueSub": "6 días" },
+      { "title": "Registro de IVA — UK", "detail": "Comprobación de umbral tras el Brexit · hasta €20,000 · VATA §3", "market": "UK", "due": "15 may", "dueSub": "21 días" },
+      { "title": "Registro RAP de envases (LUCID)", "detail": "Condición de productor por confirmar · hasta €50,000 · VerpackG", "market": "DE", "due": "02 may", "dueSub": "8 días" },
+      { "title": "Renovación del registro RAP (PackUK)", "detail": "Última presentación: abr 2024 · 4 % de los ingresos UK · Packaging Regs", "market": "UK", "due": "15 may", "dueSub": "21 días" },
+      { "title": "Banner de cookies + registros de consentimiento", "detail": "Usuarios B2C en la UE: obligatorio · GDPR Art. 6/7 · TTDSG §25", "market": "Toda la UE", "due": "Continuo", "dueSub": "Activo" },
+      { "title": "EIPD para píxeles de seguimiento", "detail": "Depende del stack de tracking · GDPR Art. 35", "market": "Toda la UE", "due": "—", "dueSub": "Depende de las herramientas" },
+      { "title": "Inversión del sujeto pasivo", "detail": "Cuota B2B transfronteriza >0 · UStG §13b", "market": "DE · NL", "due": "—", "dueSub": "Depende del mix" }
+    ]
+  },
+  "riskMap": {
+    "eyebrow": "Así es una Risk Map · ejemplo anonimizado",
+    "title": {
+      "pre": "Esto es lo que le ",
+      "gold": "aplica",
+      "post": " a usted."
+    },
+    "subtitle": "Basado en Alemania · Reino Unido · Países Bajos. E-commerce D2C, ingresos de €2M—€5M. IVA · RAP · Privacidad en el alcance.",
+    "stats": [
+      { "value": "8", "label": "Obligaciones identificadas" },
+      { "value": "€25k", "label": "Exposición total" },
+      { "value": "14 días", "label": "Plazo mediano" },
+      { "value": "3", "label": "Verified Partners listos" }
+    ],
+    "rows": [
+      { "title": "Declaración trimestral OSS", "detail": "Última presentación: Q1 2025 · Sanción: €5,000 + 1 %/mes · UStG §18i (OSS)", "market": "DE · NL", "due": "30 abr", "dueSub": "6 días" },
+      { "title": "Registro de IVA — UK", "detail": "Se requiere comprobar el umbral tras el Brexit · Sanción: hasta €20,000 · UK VATA 1994 §3", "market": "UK", "due": "15 may", "dueSub": "21 días" },
+      { "title": "Registro RAP de envases (LUCID)", "detail": "Condición de productor por confirmar · Sanción: hasta €50,000 · VerpackG Art. 9 Abs. 1", "market": "DE", "due": "02 may", "dueSub": "8 días" },
+      { "title": "Renovación del registro RAP (PackUK)", "detail": "Última presentación: abr 2024 · Sanción: 4 % de los ingresos UK · UK Packaging Regs. 2023 §7", "market": "UK", "due": "15 may", "dueSub": "21 días" },
+      { "title": "Banner de cookies + registros de consentimiento", "detail": "Usuarios B2C en la UE → obligatorio · GDPR Art. 6/7 · TTDSG §25", "market": "Toda la UE", "due": "Continuo", "dueSub": "Activo" },
+      { "title": "EIPD para píxeles de seguimiento", "detail": "Depende del stack de tracking · GDPR Art. 35", "market": "Toda la UE", "due": "—", "dueSub": "Depende de las herramientas" },
+      { "title": "Inversión del sujeto pasivo", "detail": "Aplica solo si la cuota B2B transfronteriza es >0 · UStG §13b", "market": "DE · NL", "due": "—", "dueSub": "Depende del mix B2B" },
+      { "title": "Actualización de titulares reales", "detail": "Última presentación: mar 2025 · Sanción: €1,000–5,000 · GwG §20 Abs. 1", "market": "DE", "due": "30 jun", "dueSub": "continuo" }
+    ],
+    "partnersEyebrow": "3 Verified Partners con match",
+    "partnersTitle": "Hemos encontrado quién puede actuar sobre esto.",
+    "unlock": "Desbloquee los matches con una cuenta gratuita →",
+    "save": {
+      "title": "Guarde este mapa. Desbloquee los partners.",
+      "subtitle": "Cuenta gratuita. Sin tarjeta de crédito. Acceso de miembro fundador hasta el lanzamiento de la Beta.",
+      "cta": "Crear cuenta gratuita"
+    }
+  },
+  "matchmaking": {
+    "eyebrow": "La diferencia",
+    "title": {
+      "line1": "Otras herramientas le dicen qué está mal.",
+      "pre": "Nosotros le ",
+      "gold": "conectamos",
+      "post": " con quien lo resuelve. Ahorre tiempo y dinero."
+    },
+    "subtitle": "Las risk maps son públicas: cualquier dashboard de compliance ofrece una. Lo que distingue a CompliHub360 es lo que viene después: proveedores verificados en varios países y áreas, preseleccionados, con tiempos de respuesta medidos y traspasos estructurados. Usted no busca. Nosotros hacemos el match.",
+    "matches": [
+      {
+        "place": "Múnich, DE",
+        "specialty": "Especialista en IVA y OSS",
+        "tags": ["UStG §18i (OSS)", "DE · NL · FR"],
+        "covers": "cubre sus 2 prioridades críticas",
+        "response": "respuesta en 24h",
+        "engagements": "142 encargos previos"
+      },
+      {
+        "place": "Londres, UK",
+        "specialty": "Compliance de envases en el Reino Unido",
+        "tags": ["UK Packaging Regs.", "PackUK · renovación RAP"],
+        "covers": "cubre su 1 prioridad alta",
+        "response": "respuesta en 21h",
+        "engagements": "86 encargos previos"
+      },
+      {
+        "place": "París, FR",
+        "specialty": "Asesoría de RAP transfronteriza",
+        "tags": ["VerpackG", "LUCID · transfronterizo"],
+        "covers": "cubre su 1 prioridad media",
+        "response": "respuesta en 36h",
+        "engagements": "211 encargos previos"
+      }
+    ],
+    "howItWorks": {
+      "label": "Cómo funciona",
+      "sub": "De la evaluación al especialista adecuado"
+    },
+    "steps": [
+      { "title": "Inicie su evaluación", "desc": "4–5 preguntas. Menos de 2 minutos. Sin necesidad de cuenta." },
+      { "title": "Vea su Risk Map", "desc": "Vista previa anónima, estructurada, con fuentes citadas." },
+      { "title": "Regístrese para ver los matches", "desc": "El matching con proveedores está reservado a cuentas registradas." },
+      { "title": "Reciba traspasos estructurados", "desc": "El proveedor responde vía Magic-Link en 24–48h. Sin discovery call." }
+    ]
+  },
+  "twoReflexes": {
+    "eyebrow": "Por qué persiste esta brecha",
+    "title": {
+      "pre": "La regulación está fragmentada. Los especialistas trabajan en silos. ",
+      "gold": "Ambos",
+      "post": " siguen rotos si solo arregla uno."
+    },
+    "subtitle": "Cada mercado tiene sus propios umbrales, registros y supervisores. Cada asesor conoce una parte. Las plataformas que mapean las normas no conocen a las personas. Los directorios de personas no leen las normas. CompliHub está construido para cerrar ambas mitades a la vez.",
+    "card1": {
+      "title": "El mapa que nadie dibuja.",
+      "label": "La brecha, mapeada"
+    },
+    "card2": {
+      "title": "La red que nadie cura.",
+      "label": "La brecha, conectada"
+    },
+    "row1Lead": "Todos los dashboards públicos le dicen lo que dicen las normas. Ninguno le dice lo que está en juego para su operación, por orden de prioridad y con la fuente adjunta.",
+    "row2Lead": "Los directorios listan a todos. No verifican a nadie. Nosotros verificamos cobertura, respuesta y resultados — y vinculamos cada encargo a una responsabilidad compartida.",
+    "row1": [
+      { "title": "Priorizado por riesgo, no exhaustivo", "desc": "De crítico a bajo. Entre cuatro y doce elementos en cada momento. Sin checklists de 200 páginas." },
+      { "title": "Con origen en los propios reguladores", "desc": "Cada entrada enlaza al aviso oficial, la página del registro o la jurisprudencia de la que procede." },
+      { "title": "Actualizado frente a la deriva", "desc": "Las normas cambian. El mapa se actualiza cuando se mueve un plazo, un regulador aclara o se abre un registro." },
+      { "title": "Lenguaje claro por defecto", "desc": "Si una cláusula necesita un párrafo para explicarse, usted ve el párrafo — no la cláusula." }
+    ],
+    "row2": [
+      { "title": "Verificados por nosotros, no autoinscritos", "desc": "Cada Verified Partner se evalúa por cobertura, tiempo de respuesta y resultados reales acreditados — no es un directorio." },
+      { "title": "Responsabilidad compartida de serie", "desc": "Cada encargo es contractual. Los partners asumen la responsabilidad del asunto, no solo del consejo." }
+    ]
+  },
+  "domains": {
+    "eyebrow": "Lo que sabemos",
+    "title": {
+      "pre": "Seis áreas. ",
+      "gold": "Un",
+      "post": " mapa coherente."
+    },
+    "subtitle": "El mapa que nadie dibuja — dibujado. Seis áreas, de extremo a extremo, con los mercados en los que aplican y las obligaciones que conllevan.",
+    "cardCta": "Haga clic para ver más",
+    "drawerEyebrow": "Área",
+    "drawerAria": "Detalle de {{domain}}",
+    "activeIn": "Activo en:",
+    "items": [
+      {
+        "title": "IVA e impuestos",
+        "markets": "DE · UK · NL · FR · IT · ES",
+        "desc": "IVA transfronterizo, OSS/IOSS, entregas intracomunitarias, umbrales de venta a distancia.",
+        "intro": "IVA transfronterizo, OSS/IOSS, entregas intracomunitarias, umbrales de venta a distancia. Seis mercados significan seis regímenes de IVA, seis umbrales de registro, seis calendarios de presentación. Seguimos cada uno.",
+        "cover": [
+          "Declaraciones trimestrales OSS / IOSS",
+          "Seguimiento de umbrales de venta a distancia",
+          "IVA de entregas intracomunitarias",
+          "Mecanismo de inversión del sujeto pasivo",
+          "Registros de IVA por mercado",
+          "Implicaciones de convenios bilaterales (CDI)"
+        ],
+        "matters": [
+          "Vende B2C en otro mercado de la UE por primera vez",
+          "Supera €10,000 en ventas B2C transfronterizas",
+          "Cambia su modelo de fulfilment (p. ej., añade un almacén en UK)"
+        ]
+      },
+      {
+        "title": "RAP y envases",
+        "markets": "DE · UK · NL · FR · AT · BE",
+        "desc": "Responsabilidad ampliada del productor, registros de envases, sistemas de devolución, ecomodulación.",
+        "intro": "Responsabilidad ampliada del productor para envases, pilas y electrónica. Cada mercado tiene su propio registro, tarifas y calendario de informes. Mapeamos con quién debe registrarse y cuándo.",
+        "cover": [
+          "LUCID / registros nacionales de envases",
+          "Obligaciones de devolución y reciclaje",
+          "Tramos de tarifas de ecomodulación",
+          "Registro WEEE y de pilas",
+          "Volúmenes de informe anuales",
+          "Requisitos de representante autorizado"
+        ],
+        "matters": [
+          "Envía mercancías físicas a un nuevo mercado de la UE",
+          "Vende productos envasados a consumidores de la UE",
+          "Añade una categoría de producto (p. ej., electrónica)"
+        ]
+      },
+      {
+        "title": "RGPD y privacidad",
+        "markets": "TODA LA UE · UK POST-BREXIT",
+        "desc": "Evaluaciones de impacto, RAT, contratos de encargo, derechos de los interesados.",
+        "intro": "Protección de datos en la UE y en el Reino Unido tras el Brexit. Del registro de actividades a las transferencias internacionales, mostramos las obligaciones que siguen a sus datos — no solo a su sede.",
+        "cover": [
+          "EIPD para tratamientos de alto riesgo",
+          "Registro de actividades de tratamiento (RAT)",
+          "Contratos de encargo / subencargo",
+          "Mecanismos de transferencia internacional",
+          "Gestión de acceso y supresión",
+          "Plazos de notificación de brechas"
+        ],
+        "matters": [
+          "Trata datos personales de residentes en la UE/UK",
+          "Incorpora una nueva herramienta de tracking o analítica",
+          "Transfiere datos fuera de la UE/UK"
+        ]
+      },
+      {
+        "title": "Compliance de marketing",
+        "markets": "TODA LA UE · EPRIVACY",
+        "desc": "Banners de cookies, registros de consentimiento, e-mail marketing, auditorías de dark patterns.",
+        "intro": "Reglas de consentimiento y marketing leal bajo ePrivacy y el derecho del consumidor. Los cookie walls, los opt-ins y el escrutinio de dark patterns varían por mercado — seguimos lo que cada regulador realmente hace cumplir.",
+        "cover": [
+          "Validez del banner de consentimiento de cookies",
+          "Registros y pruebas de consentimiento",
+          "Reglas de opt-in para e-mail / SMS",
+          "Auditorías de dark patterns",
+          "Divulgación de influencers y publicidad",
+          "Gestión de bajas y listas de supresión"
+        ],
+        "matters": [
+          "Ejecuta adquisición de pago en la UE",
+          "Lanza un programa de e-mail o SMS",
+          "Rediseña su flujo de consentimiento"
+        ]
+      },
+      {
+        "title": "Societario y presentaciones",
+        "markets": "DE · AT · CH",
+        "desc": "Cuentas anuales, registro de transparencia, declaraciones de titulares reales, contratos intragrupo.",
+        "intro": "Obligaciones a nivel de entidad en la región DACH. Las cuentas anuales, la transparencia de titulares reales y los contratos intragrupo tienen sus propios plazos y sanciones.",
+        "cover": [
+          "Cuentas anuales",
+          "Declaraciones al registro de transparencia / UBO",
+          "Actualizaciones de titulares reales",
+          "Documentación de contratos intragrupo",
+          "Requisitos de representación local",
+          "Seguimiento de plazos de presentación"
+        ],
+        "matters": [
+          "Opera una entidad o sucursal local",
+          "Cambia su estructura de propiedad",
+          "Supera un umbral local de auditoría"
+        ]
+      },
+      {
+        "title": "Cobertura completa de compliance",
+        "markets": "TODAS LAS ÁREAS · TODOS LOS MERCADOS",
+        "desc": "Cuando un caso cruza áreas, lo derivamos a partners que lo cierran todo — no solo su parte.",
+        "intro": "Algunos casos no caben en una sola casilla. Cuando una obligación abarca a la vez IVA, RAP, privacidad y presentaciones, coordinamos un equipo de partners que lo cierra todo — con un único responsable.",
+        "cover": [
+          "Derivación de casos entre áreas",
+          "Un único punto de responsabilidad",
+          "Equipos de partners coordinados",
+          "Gestión secuenciada de obligaciones",
+          "Seguimiento compartido de plazos",
+          "Una sola relación contractual"
+        ],
+        "matters": [
+          "Un solo cambio activa obligaciones en varias áreas",
+          "Entra en un nuevo mercado de principio a fin",
+          "Necesita un equipo, no cinco proveedores"
+        ]
+      }
+    ]
+  },
+  "howItActs": {
+    "eyebrow": "Dentro de un encargo",
+    "title": {
+      "pre": "Lo que ocurre ",
+      "gold": "entre",
+      "post": " el match y la resolución."
+    },
+    "subtitle": "En cuanto tiene un match, tres cosas dejan de ser suposiciones: cuánto cuesta, cuándo recibirá respuesta y qué se lleva usted. Todo queda fijado antes del primer correo.",
+    "cards": [
+      {
+        "title": "El coste, antes de comprometerse.",
+        "desc": "Cada Verified Partner publica una estimación fija antes de que usted acepte el encargo. Sin discovery calls solo para saber cuánto cuesta algo."
+      },
+      {
+        "title": "La respuesta, con el reloj en marcha.",
+        "desc": "24–48h hasta la primera respuesta, o derivamos automáticamente al siguiente partner disponible. El reloj forma parte del contrato, no es una promesa."
+      },
+      {
+        "title": "Un historial que usted conserva.",
+        "desc": "Cada paso se registra en una cronología privada: solicitud, respuesta, alcance acordado, entregables. Suyo, exportable en cualquier momento, en el formato que necesite su auditor."
+      }
+    ],
+    "panel1": {
+      "estCost": "Coste estimado",
+      "estValue": "€2,400 — €3,800",
+      "scope": "Alcance",
+      "scopeValue": "Declaraciones trimestrales OSS · DE + NL + FR",
+      "approval": "Aprobación",
+      "approvalValue": "Fijada antes de empezar cualquier trabajo"
+    },
+    "panel2": {
+      "label": "SLA de primera respuesta",
+      "note": "Derivación automática al siguiente partner si se incumple. Acordado por contrato."
+    },
+    "panel3": {
+      "timeline": [
+        { "date": "24 abr", "label": "Solicitud enviada" },
+        { "date": "25 abr", "label": "Partner aceptó · 21h" },
+        { "date": "28 abr", "label": "Propuesta recibida" },
+        { "date": "02 may", "label": "Alcance acordado" }
+      ],
+      "export": "Exportar"
+    }
+  },
+  "brandCode": {
+    "eyebrow": "Cómo nos comunicamos",
+    "title": {
+      "gold": "Tres",
+      "post": " principios discretos."
+    },
+    "subtitle": "Los productos de compliance suelen gritar. Nosotros no tenemos por qué. El riesgo no necesita rojo. Las decisiones no necesitan un embudo de 20 pasos. Los partners no necesitan un marketplace. Pase el cursor por cada tarjeta para ver qué hicimos en su lugar.",
+    "hoverCue": "Pase el cursor para ver",
+    "cards": [
+      {
+        "label": "Código 02 — Riesgo en petróleo",
+        "title": "Nada de rojo. Nunca.",
+        "desc": "Niveles de riesgo de bajo a crítico, expresados en tonos petróleo — nunca en rojo. El producto nunca intenta asustarle para que actúe."
+      },
+      {
+        "label": "Código 04 — El camino del asistente",
+        "title": "Una pregunta cada vez.",
+        "desc": "El stepper dorado del asistente marca dónde está usted sin abrumar. El camino hacia delante siempre tiene el ancho de una sola decisión."
+      },
+      {
+        "label": "Marca — Verified Partner",
+        "title": "Una señal discreta de responsabilidad.",
+        "desc": "Los Verified Partners son asesores evaluados que aceptan una responsabilidad compartida por su asunto. La marca dorada es contención, no promoción."
+      }
+    ],
+    "demo": {
+      "step": "Paso 2 de 4",
+      "question": "¿Dónde vende?",
+      "partnerSpecialty": "Especialista en IVA · Alemania y Austria"
+    }
+  },
+  "beyond": {
+    "eyebrow": "Más allá de la evaluación",
+    "title": {
+      "pre": "De una comprobación puntual a la ",
+      "gold": "base",
+      "post": " de todo su compliance."
+    },
+    "subtitle": "La evaluación es gratuita. Lo que viene después — su espacio de trabajo, noticias en vivo, contenido experto, sus partners — es lo que convierte a CompliHub en el lugar al que usted vuelve.",
+    "pills": {
+      "live": "Disponible hoy",
+      "beta": "Llega con la Beta"
+    },
+    "stats": [
+      { "label": "Risk Map", "value": "8 prioridades" },
+      { "label": "Encargos activos", "value": "2" },
+      { "label": "Verified Partners con match", "value": "3" },
+      { "label": "Entradas del historial", "value": "47" }
+    ],
+    "news": [
+      { "tag": "DE · VAT", "text": "Umbral OSS actualizado para el Q3" },
+      { "tag": "UK · EPR", "text": "PackUK abre el registro de 2026" }
+    ],
+    "workspace": {
+      "title": "Su mapa. Sus partners. Su historial. Permanente.",
+      "desc": "La evaluación se convierte en un dossier guardado. Su cronología de encargos vive en su dashboard. Relaciones con proveedores, historial de compliance, Risk Map — todo en un solo lugar, todo suyo."
+    },
+    "newsCard": {
+      "title": "Novedades que le afectan.",
+      "desc": "Avisos en tiempo real cuando los reguladores se mueven en sus mercados. Curado por área, ajustado a su operación."
+    },
+    "learn": {
+      "meta": "Webinar · 24 min",
+      "video": "IVA transfronterizo para D2C",
+      "title": "Aprenda de los profesionales.",
+      "desc": "Webinars con reguladores. Tutoriales de especialistas. Expertos que reconocería de YouTube."
+    },
+    "footnote": "El espacio de trabajo está disponible hoy. Las noticias y la biblioteca de contenidos llegan con la Beta — los primeros registros obtienen acceso de miembro fundador."
+  },
+  "faq": {
+    "label": "Preguntas frecuentes",
+    "title": {
+      "pre": "Lo que ",
+      "gold": "probablemente",
+      "post": " se está preguntando."
+    },
+    "items": [
+      {
+        "q": "¿La evaluación es realmente gratuita?",
+        "a": "Sí. Sin cuenta y sin tarjeta de crédito. Al final obtiene una Risk Map estructurada. Registrarse después — para conservarla, hacer match con proveedores y recibir avisos — es el siguiente paso opcional."
+      },
+      {
+        "q": "¿Me están dando asesoramiento jurídico?",
+        "a": "No. CompliHub mapea obligaciones y muestra lo que probablemente aplica a su operación — no es asesoramiento jurídico. Cuando un asunto requiere una opinión vinculante, le conectamos con un Verified Partner que puede darla."
+      },
+      {
+        "q": "¿Cómo se verifica a los Verified Partners?",
+        "a": "Nosotros evaluamos a cada partner por cobertura de áreas, tiempo de respuesta y resultados reales acreditados — no es un directorio de autoinscripción. Cada encargo es contractual, con responsabilidad compartida por el asunto."
+      },
+      {
+        "q": "¿Cuánto cuesta un encargo?",
+        "a": "Cada Verified Partner publica una estimación fija antes de que usted acepte — sin discovery calls solo para conocer el precio. Ve el rango y el alcance por adelantado y los aprueba antes de que empiece cualquier trabajo."
+      },
+      {
+        "q": "¿Cómo se tratan mis datos?",
+        "a": "La evaluación se ejecuta en su navegador y no necesita cuenta. Si se registra, su dossier se almacena conforme a las normas de protección de datos de la UE, cifrado, y nunca se vende ni se comparte sin su instrucción."
+      },
+      {
+        "q": "¿Y si mi mercado aún no está cubierto?",
+        "a": "Díganos dónde opera. Añadimos mercados continuamente, y los primeros registros ayudan a fijar la prioridad — le avisaremos en cuanto su mercado esté disponible."
+      }
+    ]
+  },
+  "entryDoor": {
+    "journey": ["6 min", "Risk Map", "Registro", "Workspace"],
+    "eyebrow": "Empiece aquí",
+    "title": {
+      "pre": "Una evaluación. Un resultado. El camino se vuelve ",
+      "highlight": "legible",
+      "post": "."
+    },
+    "subtitle": "Seis minutos. Sin necesidad de cuenta. Contrastamos sus operaciones con la normativa que realmente aplica y le mostramos qué hacer a continuación.",
+    "cta": "Inicie su evaluación"
+  },
+  "newsletter": {
+    "eyebrow": "Manténgase al día",
+    "title": "Cuando una norma se mueva, usted lo sabrá.",
+    "desc": "Un briefing al mes. Nuevos umbrales, plazos y enlaces a fuentes oficiales — para los mercados en los que opera. Sin contenido promocional.",
+    "placeholder": "usted@suempresa.com",
+    "emailAria": "Dirección de correo electrónico",
+    "subscribe": "Suscribirse",
+    "success": "Está en la lista — revise su bandeja de entrada.",
+    "privacy": "Usamos su correo solo para el briefing. Baja con un clic. Consulte nuestra política de privacidad.",
+    "accountLink": "O active avisos en tiempo real con una cuenta gratuita"
+  },
+  "footer": {
+    "tagline": "La capa de orquestación entre la complejidad del compliance y la realidad operativa.",
+    "notLawFirm": "No somos un despacho de abogados. Orquestamos especialistas verificados.",
+    "beta": "Beta",
+    "columns": {
+      "platform": {
+        "title": "Plataforma",
+        "links": {
+          "howItWorks": "Cómo funciona",
+          "startAssessment": "Iniciar evaluación",
+          "exampleResult": "Resultado de ejemplo",
+          "forProviders": "Para proveedores"
+        }
+      },
+      "solutions": {
+        "title": "Soluciones",
+        "links": {
+          "vatTax": "IVA e impuestos",
+          "productPackaging": "Producto y envases",
+          "dataPrivacy": "Privacidad de datos",
+          "marketingAdvertising": "Marketing y publicidad",
+          "corporateStructure": "Estructura societaria",
+          "fullSupport": "Soporte integral"
+        }
+      },
+      "resources": {
+        "title": "Recursos",
+        "links": {
+          "complianceNews": "Noticias de compliance",
+          "knowledgeLibrary": "Biblioteca de conocimiento",
+          "countryGuides": "Guías por país",
+          "tutorials": "Tutoriales",
+          "glossary": "Glosario de compliance"
+        }
+      },
+      "company": {
+        "title": "Empresa",
+        "links": {
+          "about": "Sobre nosotros",
+          "trustSecurity": "Confianza y seguridad",
+          "contact": "Contacto",
+          "careers": "Empleo"
+        }
+      }
+    },
+    "markets": {
+      "pre": "Mercados que cubrimos hoy: ",
+      "list": "Alemania · Reino Unido · Países Bajos · Francia · Italia · España",
+      "post": ". Más países se incorporarán a lo largo de 2026."
+    },
+    "disclaimer": "CompliHub360 es una plataforma de orquestación — no un despacho de abogados. El asesoramiento jurídico, fiscal y regulatorio lo prestan Verified Partners bajo su propia responsabilidad profesional. No prestamos Rechtsberatung en el sentido de los §§ RDG / StBerG.",
+    "copyright": "© 2026 CompliHub360.",
+    "legal": {
+      "privacy": "Política de privacidad",
+      "terms": "Condiciones (AGB)",
+      "imprint": "Aviso legal (Impressum)",
+      "cookies": "Configuración de cookies",
+      "subProcessors": "Subencargados"
+    }
+  }
+}

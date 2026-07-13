@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MailCheck } from 'lucide-react';
 import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
@@ -16,6 +17,7 @@ interface ChangeEmailDrawerProps {
 }
 
 export function ChangeEmailDrawer({ open, currentEmail, onClose }: ChangeEmailDrawerProps) {
+  const { t } = useTranslation('providerws');
   const [email, setEmail] = useState('');
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
@@ -34,7 +36,7 @@ export function ChangeEmailDrawer({ open, currentEmail, onClose }: ChangeEmailDr
       });
       setSent(true);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Request failed — try again.');
+      setError(e instanceof Error ? e.message : t('changeEmail.errorFallback'));
     }
     setBusy(false);
   };
@@ -46,16 +48,16 @@ export function ChangeEmailDrawer({ open, currentEmail, onClose }: ChangeEmailDr
       onClose={onClose}
       side="right"
       size="sm"
-      eyebrow="SETTINGS"
-      title="Change contact e-mail"
+      eyebrow={t('changeEmail.eyebrow')}
+      title={t('changeEmail.title')}
       footer={
         sent ? (
-          <Button variant="primary" size="sm" className="ml-auto" onClick={onClose}>Done</Button>
+          <Button variant="primary" size="sm" className="ml-auto" onClick={onClose}>{t('changeEmail.done')}</Button>
         ) : (
           <div className="flex w-full items-center justify-end gap-2">
-            <Button variant="ghost" size="sm" onClick={onClose}>Cancel</Button>
+            <Button variant="ghost" size="sm" onClick={onClose}>{t('changeEmail.cancel')}</Button>
             <Button variant="accent" size="sm" onClick={submit} disabled={!valid || busy}>
-              {busy ? '…' : 'Send verification'}
+              {busy ? '…' : t('changeEmail.sendVerification')}
             </Button>
           </div>
         )
@@ -66,22 +68,21 @@ export function ChangeEmailDrawer({ open, currentEmail, onClose }: ChangeEmailDr
           <div className="flex items-start gap-3 rounded-lg border border-fg-brand/30 bg-fg-brand/10 px-4 py-3.5">
             <MailCheck size={16} className="mt-0.5 shrink-0 text-fg-brand" />
             <p className="text-[13px] leading-relaxed text-fg-secondary">
-              Verification sent to <span className="font-semibold text-fg">{email.trim()}</span>.
-              The change applies once the link is clicked — it works one time and expires after 1 hour.
+              {t('changeEmail.sentPrefix')}<span className="font-semibold text-fg">{email.trim()}</span>{t('changeEmail.sentSuffix')}
             </p>
           </div>
           <p className="text-[11px] leading-relaxed text-fg-tertiary">
-            Until then, <span className="text-fg-secondary">{currentEmail}</span> stays the active address for requests and invoices.
+            {t('changeEmail.untilThenPrefix')}<span className="text-fg-secondary">{currentEmail}</span>{t('changeEmail.untilThenSuffix')}
           </p>
         </div>
       ) : (
         <div className="space-y-4">
           <div className="rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">Current address</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">{t('changeEmail.currentAddress')}</p>
             <p className="mt-0.5 text-[13px] font-medium text-fg">{currentEmail}</p>
           </div>
           <div>
-            <p className="mb-1.5 text-[11px] text-fg-tertiary">New address</p>
+            <p className="mb-1.5 text-[11px] text-fg-tertiary">{t('changeEmail.newAddress')}</p>
             <input
               type="email"
               autoFocus
@@ -92,8 +93,7 @@ export function ChangeEmailDrawer({ open, currentEmail, onClose }: ChangeEmailDr
             />
           </div>
           <p className="text-[11px] leading-relaxed text-fg-tertiary">
-            We send a confirmation link to the <span className="font-medium text-fg-secondary">new</span> address — nothing
-            changes until it's clicked. Request routing, reminders and invoices follow the new address afterwards.
+            {t('changeEmail.notePrefix')}<span className="font-medium text-fg-secondary">{t('changeEmail.noteNew')}</span>{t('changeEmail.noteSuffix')}
           </p>
           {error && <p className="rounded-lg border border-error-500/30 bg-error-500/10 px-3 py-2 text-[12px] text-error-500">{error}</p>}
         </div>

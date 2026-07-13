@@ -21,31 +21,31 @@ import { cn } from '../../lib/utils';
 
 const NAV = [
   {
-    group: 'Pipeline',
+    groupKey: 'shell.groupPipeline',
     items: [
-      { to: 'requests', label: 'Requests', icon: Mail },
-      { to: 'performance', label: 'Performance', icon: LineChart },
+      { to: 'requests', labelKey: 'shell.navRequests', icon: Mail },
+      { to: 'performance', labelKey: 'shell.navPerformance', icon: LineChart },
     ],
   },
   {
-    group: 'Business',
+    groupKey: 'shell.groupBusiness',
     items: [
-      { to: 'coverage', label: 'Coverage', icon: Globe },
-      { to: 'billing', label: 'Billing', icon: ReceiptEuro },
+      { to: 'coverage', labelKey: 'shell.navCoverage', icon: Globe },
+      { to: 'billing', labelKey: 'shell.navBilling', icon: ReceiptEuro },
     ],
   },
   {
-    group: 'Account',
+    groupKey: 'shell.groupAccount',
     items: [
-      { to: 'settings', label: 'Settings', icon: Settings },
-      { to: 'notifications', label: 'Notifications', icon: Bell },
-      { to: 'help', label: 'Help & support', icon: CircleHelp },
+      { to: 'settings', labelKey: 'shell.navSettings', icon: Settings },
+      { to: 'notifications', labelKey: 'shell.navNotifications', icon: Bell },
+      { to: 'help', labelKey: 'shell.navHelp', icon: CircleHelp },
     ],
   },
 ];
 
 export function ProviderShell({ children }: { children: React.ReactNode }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation('providerws');
   const locale = i18n.resolvedLanguage || 'en';
   const location = useLocation();
   const base = `/${locale}/partner-dashboard`;
@@ -79,16 +79,16 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
   const togglAvailability = () => {
     if (availability === 'available') {
       setConfirm({
-        title: 'Go out of office?',
-        consequence: 'New requests are paused and re-routed to other partners. Your ranking is frozen while away — SLA timers resume on return. End it early anytime.',
-        confirmLabel: 'Set out of office',
+        title: t('shell.oooStartTitle'),
+        consequence: t('shell.oooStartConsequence'),
+        confirmLabel: t('shell.oooStartConfirm'),
         onConfirm: async () => { await setAvailability('ooo').catch(() => {}); },
       });
     } else {
       setConfirm({
-        title: 'End out of office?',
-        consequence: 'You go back to Available — new requests route to you again and SLA timers resume immediately.',
-        confirmLabel: 'End out of office',
+        title: t('shell.oooEndTitle'),
+        consequence: t('shell.oooEndConsequence'),
+        confirmLabel: t('shell.oooEndConfirm'),
         onConfirm: async () => { await setAvailability('available').catch(() => {}); },
       });
     }
@@ -101,7 +101,7 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
           <NavLink to={base} className="flex items-center gap-2">
             <LogoMark tone="on-petrol" className="h-[22px] w-auto" />
             <span className="text-[15px] font-semibold text-white">CompliHub</span>
-            <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-fg-accent">Partner</span>
+            <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-fg-accent">{t('shell.partnerBadge')}</span>
           </NavLink>
         }
         footer={
@@ -118,20 +118,20 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
         }
       >
         {NAV.map((g) => (
-          <SidebarGroup key={g.group} label={g.group}>
+          <SidebarGroup key={g.groupKey} label={t(g.groupKey)}>
             {g.items.map((it) => {
               const active = location.pathname.includes(`/partner-dashboard/${it.to}`);
               const Icon = it.icon;
               if (it.to === 'help') {
                 return (
                   <button key={it.to} type="button" className="block w-full text-left" onClick={() => setHelpOpen(true)}>
-                    <NavItem icon={<Icon size={16} />} label={it.label} active={false} />
+                    <NavItem icon={<Icon size={16} />} label={t(it.labelKey)} active={false} />
                   </button>
                 );
               }
               return (
                 <NavLink key={it.to} to={`${base}/${it.to}`}>
-                  <NavItem icon={<Icon size={16} />} label={it.label} count={badgeFor(it.to)} active={active} />
+                  <NavItem icon={<Icon size={16} />} label={t(it.labelKey)} count={badgeFor(it.to)} active={active} />
                 </NavLink>
               );
             })}
@@ -141,12 +141,12 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-15 min-h-[60px] shrink-0 items-center justify-end gap-3 border-b border-white/10 px-6">
-          <button type="button" aria-label="Search" onClick={() => setSearchOpen(true)} className="mr-1 text-fg-tertiary transition-colors hover:text-fg">
+          <button type="button" aria-label={t('shell.searchAria')} onClick={() => setSearchOpen(true)} className="mr-1 text-fg-tertiary transition-colors hover:text-fg">
             <Search size={18} />
           </button>
           <BellPopover unread={counts.unread} onAllRead={() => setCounts((c) => ({ ...c, unread: 0 }))} />
-          <button type="button" onClick={togglAvailability} aria-label="Toggle availability" className="transition-opacity hover:opacity-80">
-            <AvailabilityPill status={availability === 'ooo' ? 'offline' : 'available'} label={availability === 'ooo' ? 'Out of office' : undefined} />
+          <button type="button" onClick={togglAvailability} aria-label={t('shell.availabilityAria')} className="transition-opacity hover:opacity-80">
+            <AvailabilityPill status={availability === 'ooo' ? 'offline' : 'available'} label={availability === 'ooo' ? t('shell.outOfOffice') : undefined} />
           </button>
           <PartnerStatusBadge status="verified" label="Verified Partner" />
         </header>

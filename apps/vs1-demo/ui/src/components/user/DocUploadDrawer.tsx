@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
 import { Tag } from '../ui/Tag';
@@ -23,7 +24,21 @@ const CLASSIFICATION_TONE: Record<UploadResult['classification'], 'success' | 'b
   restricted: 'error',
 };
 
+const CLASSIFICATION_KEY: Record<UploadResult['classification'], string> = {
+  public: 'classificationPublic',
+  internal: 'classificationInternal',
+  confidential: 'classificationConfidential',
+  restricted: 'classificationRestricted',
+};
+
+// Canonical English domain label → userws translation key (display only).
+const DOMAIN_KEY: Record<string, string> = {
+  'Tax & VAT': 'taxVat', 'Product & Packaging': 'productPackaging', 'Data & Privacy': 'dataPrivacy',
+  'Marketing & SEO': 'marketingSeo', 'Corporate & Structure': 'corporateStructure', 'Full Support': 'fullSupport',
+};
+
 export function DocUploadDrawer({ open, onClose, domainLabel }: DocUploadDrawerProps) {
+  const { t } = useTranslation('userws');
   const fileRef = useRef<HTMLInputElement>(null);
   const [filename, setFilename] = useState('');
   const [text, setText] = useState('');
@@ -31,6 +46,8 @@ export function DocUploadDrawer({ open, onClose, domainLabel }: DocUploadDrawerP
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState<UploadResult | null>(null);
+
+  const domainDisplay = DOMAIN_KEY[domainLabel] ? t(`domain.${DOMAIN_KEY[domainLabel]}`) : domainLabel;
 
   const readFile = (f: File) => {
     setFilename(f.name);
@@ -50,7 +67,7 @@ export function DocUploadDrawer({ open, onClose, domainLabel }: DocUploadDrawerP
       });
       setResult(res);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Upload failed');
+      setError(e instanceof Error ? e.message : t('docUpload.uploadFailed'));
     } finally {
       setBusy(false);
     }
@@ -66,19 +83,19 @@ export function DocUploadDrawer({ open, onClose, domainLabel }: DocUploadDrawerP
       onClose={() => { reset(); onClose(); }}
       side="right"
       size="md"
-      eyebrow={domainLabel.toUpperCase()}
-      title={result ? 'Document processed' : 'Upload document'}
+      eyebrow={domainDisplay.toUpperCase()}
+      title={result ? t('docUpload.titleProcessed') : t('docUpload.titleUpload')}
       footer={
         result ? (
           <div className="flex w-full items-center justify-between">
-            <Button variant="ghost" size="sm" onClick={reset}>Upload another</Button>
-            <Button variant="primary" size="sm" onClick={() => { reset(); onClose(); }}>Done</Button>
+            <Button variant="ghost" size="sm" onClick={reset}>{t('docUpload.uploadAnother')}</Button>
+            <Button variant="primary" size="sm" onClick={() => { reset(); onClose(); }}>{t('shared.done')}</Button>
           </div>
         ) : (
           <div className="flex w-full items-center justify-end gap-2">
-            <Button variant="ghost" size="sm" onClick={() => { reset(); onClose(); }}>Cancel</Button>
+            <Button variant="ghost" size="sm" onClick={() => { reset(); onClose(); }}>{t('shared.cancel')}</Button>
             <Button variant="accent" size="sm" onClick={submit} disabled={busy || text.trim().length < 5}>
-              {busy ? 'Sanitizing…' : 'Upload & sanitize'}
+              {busy ? t('docUpload.sanitizing') : t('docUpload.uploadSanitize')}
             </Button>
           </div>
         )
@@ -87,30 +104,30 @@ export function DocUploadDrawer({ open, onClose, domainLabel }: DocUploadDrawerP
       {result ? (
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-2">
-            <Tag tone={CLASSIFICATION_TONE[result.classification]}>{result.classification}</Tag>
-            <Tag tone={result.sanitized_ready ? 'success' : 'error'}>{result.sanitized_ready ? 'sanitized' : 'sanitization failed'}</Tag>
-            <Tag tone={result.ai_allowed ? 'success' : 'neutral'}>{result.ai_allowed ? 'AI: allowed' : 'AI: blocked'}</Tag>
+            <Tag tone={CLASSIFICATION_TONE[result.classification]}>{t(`docUpload.${CLASSIFICATION_KEY[result.classification]}`)}</Tag>
+            <Tag tone={result.sanitized_ready ? 'success' : 'error'}>{result.sanitized_ready ? t('docUpload.tagSanitized') : t('docUpload.tagSanitizationFailed')}</Tag>
+            <Tag tone={result.ai_allowed ? 'success' : 'neutral'}>{result.ai_allowed ? t('docUpload.tagAiAllowed') : t('docUpload.tagAiBlocked')}</Tag>
           </div>
           <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">Redaction report</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">{t('docUpload.redactionReport')}</p>
             {counts.length ? (
               <ul className="mt-2 space-y-1">
                 {counts.map(([type, n]) => (
                   <li key={type} className="flex justify-between text-[12px]">
                     <span className="text-fg-secondary">{type.replace(/_/g, ' ').toLowerCase()}</span>
-                    <span className="font-semibold text-fg">{n}× masked</span>
+                    <span className="font-semibold text-fg">{t('docUpload.maskedCount', { count: Number(n) })}</span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="mt-2 text-[12px] text-fg-secondary">No personal identifiers detected.</p>
+              <p className="mt-2 text-[12px] text-fg-secondary">{t('docUpload.noPii')}</p>
             )}
           </div>
           <p className="text-[11px] leading-relaxed text-fg-tertiary">
-            Only the sanitized version was stored — the original text was discarded after processing.
+            {t('docUpload.storedNote')}
             {!result.ai_allowed && (result.consent_ai
-              ? ' AI analysis stays blocked because of the content classification.'
-              : ' AI analysis stays blocked until you grant consent for this document.')}
+              ? ` ${t('docUpload.aiBlockedClassification')}`
+              : ` ${t('docUpload.aiBlockedConsent')}`)}
           </p>
         </div>
       ) : (
@@ -119,8 +136,8 @@ export function DocUploadDrawer({ open, onClose, domainLabel }: DocUploadDrawerP
             className="cursor-pointer rounded-lg border border-dashed border-white/20 bg-white/[0.02] px-4 py-6 text-center transition-colors hover:border-fg-brand/60"
             onClick={() => fileRef.current?.click()}
           >
-            <p className="text-[13px] font-medium text-fg">{filename || 'Choose a file (.txt · .md · .csv)'}</p>
-            <p className="mt-1 text-[11px] text-fg-tertiary">or paste the content below</p>
+            <p className="text-[13px] font-medium text-fg">{filename || t('docUpload.chooseFile')}</p>
+            <p className="mt-1 text-[11px] text-fg-tertiary">{t('docUpload.orPaste')}</p>
             <input ref={fileRef} type="file" accept=".txt,.md,.csv,text/plain" className="hidden"
               onChange={(e) => e.target.files?.[0] && readFile(e.target.files[0])} />
           </div>
@@ -128,22 +145,20 @@ export function DocUploadDrawer({ open, onClose, domainLabel }: DocUploadDrawerP
             rows={6}
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Paste document content — contracts, notes, invoices …"
+            placeholder={t('docUpload.pastePlaceholder')}
             className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-[13px] text-fg placeholder:text-fg-tertiary focus:border-fg-brand focus:outline-none"
           />
           <label className="flex cursor-pointer items-start gap-2.5">
             <Checkbox checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5" />
             <span className="text-[12px] leading-relaxed text-fg-secondary">
-              I consent to AI-assisted analysis of the <span className="font-medium text-fg">sanitized</span> version of this
-              document (Art. 6(1)(a) GDPR — revocable anytime). Without consent the document is stored but never touches AI.
+              <Trans t={t} i18nKey="docUpload.consent" components={{ em: <span className="font-medium text-fg" /> }} />
             </span>
           </label>
           {error && (
             <p className="rounded-lg border border-error-500/30 bg-error-500/10 px-3 py-2 text-[12px] text-error-500">{error}</p>
           )}
           <p className="text-[11px] leading-relaxed text-fg-tertiary">
-            Personal identifiers (names, e-mails, phone numbers, IBANs) are masked <span className="font-medium text-fg-secondary">before</span> anything
-            is stored. The raw text never persists.
+            <Trans t={t} i18nKey="docUpload.privacyNote" components={{ em: <span className="font-medium text-fg-secondary" /> }} />
           </p>
         </div>
       )}

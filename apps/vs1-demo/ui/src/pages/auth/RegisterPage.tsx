@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { Typography } from "../../components/ui/Typography";
 import { Button } from "../../components/ui/Button";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -51,75 +51,60 @@ const DEFAULT_PARTNER: PartnerFormData = {
 };
 
 /* ─── Constants ──────────────────────────────────────────────────────────────── */
+/* Option definitions carry stable values + i18n key segments; the user-visible
+   labels are resolved via the 'auth' namespace (register.*) inside components. */
 
-const INDUSTRIES = [
-    { value: "ecommerce", label: "E-Commerce" },
-    { value: "marketplace", label: "Marketplace" },
-    { value: "saas", label: "SaaS / Software" },
-    { value: "agency", label: "Agentur / Dienstleister" },
-    { value: "manufacturing", label: "Produktion / Handel" },
-    { value: "other", label: "Sonstiges" },
-];
+const INDUSTRY_KEYS = ["ecommerce", "marketplace", "saas", "agency", "manufacturing", "other"] as const;
 
-const COMPANY_SIZES = [
-    { value: "1-10", label: "1–10 Mitarbeiter" },
-    { value: "11-50", label: "11–50 Mitarbeiter" },
-    { value: "51-200", label: "51–200 Mitarbeiter" },
-    { value: "201+", label: "201+ Mitarbeiter" },
-];
+const COMPANY_SIZE_VALUES = ["1-10", "11-50", "51-200", "201+"] as const;
 
-const COUNTRIES = [
-    "🇩🇪 Deutschland", "🇬🇧 Großbritannien", "🇫🇷 Frankreich", "🇳🇱 Niederlande",
-    "🇦🇹 Österreich", "🇨🇭 Schweiz", "🇮🇹 Italien", "🇪🇸 Spanien",
-    "🇵🇱 Polen", "🇸🇪 Schweden", "🇺🇸 USA", "🇪🇺 EU-weit",
-];
+const COUNTRY_DEFS = [
+    { value: "de", flag: "🇩🇪" }, { value: "uk", flag: "🇬🇧" }, { value: "fr", flag: "🇫🇷" }, { value: "nl", flag: "🇳🇱" },
+    { value: "at", flag: "🇦🇹" }, { value: "ch", flag: "🇨🇭" }, { value: "it", flag: "🇮🇹" }, { value: "es", flag: "🇪🇸" },
+    { value: "pl", flag: "🇵🇱" }, { value: "se", flag: "🇸🇪" }, { value: "us", flag: "🇺🇸" }, { value: "eu", flag: "🇪🇺" },
+] as const;
 
-const COMPLIANCE_AREAS = [
-    { value: "tax-vat", label: "Steuern & USt.", icon: "account_balance" },
-    { value: "data-privacy", label: "Datenschutz & DSGVO", icon: "shield" },
-    { value: "epr", label: "EPR & Verpackung", icon: "inventory_2" },
-    { value: "marketing-seo", label: "Marketing & Werbung", icon: "campaign" },
-    { value: "corporate", label: "Gesellschaftsrecht", icon: "domain" },
-    { value: "full-support", label: "Rundum-Betreuung", icon: "support_agent" },
-];
+const COMPLIANCE_AREA_DEFS = [
+    { value: "tax-vat", tKey: "taxVat", icon: "account_balance" },
+    { value: "data-privacy", tKey: "dataPrivacy", icon: "shield" },
+    { value: "epr", tKey: "epr", icon: "inventory_2" },
+    { value: "marketing-seo", tKey: "marketingSeo", icon: "campaign" },
+    { value: "corporate", tKey: "corporate", icon: "domain" },
+    { value: "full-support", tKey: "fullSupport", icon: "support_agent" },
+] as const;
 
-const SPECIALIZATIONS = [
-    { value: "tax-vat", label: "Steuerberatung & USt." },
-    { value: "data-privacy", label: "Datenschutz & DSGVO" },
-    { value: "epr", label: "EPR & Verpackungsrecht" },
-    { value: "marketing", label: "Wettbewerbsrecht & Werbung" },
-    { value: "corporate", label: "Gesellschafts- & Handelsrecht" },
-    { value: "trade", label: "Zoll & Außenhandel" },
-];
+const SPECIALIZATION_DEFS = [
+    { value: "tax-vat", tKey: "taxVat" },
+    { value: "data-privacy", tKey: "dataPrivacy" },
+    { value: "epr", tKey: "epr" },
+    { value: "marketing", tKey: "marketing" },
+    { value: "corporate", tKey: "corporate" },
+    { value: "trade", tKey: "trade" },
+] as const;
 
-const INTENTS = [
-    { value: "self-check", label: "Selbst prüfen", desc: "Ich möchte mein Risiko selbst einschätzen" },
-    { value: "expert", label: "Experte finden", desc: "Ich suche einen Berater für mein Anliegen" },
-    { value: "full-service", label: "Komplett-Service", desc: "Ich benötige eine Rundum-Betreuung" },
-];
+const INTENT_DEFS = [
+    { value: "self-check", tKey: "selfCheck" },
+    { value: "expert", tKey: "expert" },
+    { value: "full-service", tKey: "fullService" },
+] as const;
 
-const URGENCY_OPTIONS = [
-    { value: "today", label: "Sofort", icon: "⚡" },
-    { value: "week", label: "Diese Woche", icon: "📅" },
-    { value: "month", label: "Diesen Monat", icon: "🗓️" },
-    { value: "researching", label: "Ich recherchiere", icon: "🔍" },
-];
+const URGENCY_DEFS = [
+    { value: "today", tKey: "today", icon: "⚡" },
+    { value: "week", tKey: "week", icon: "📅" },
+    { value: "month", tKey: "month", icon: "🗓️" },
+    { value: "researching", tKey: "researching", icon: "🔍" },
+] as const;
 
-/* ─── Benefits Data ──────────────────────────────────────────────────────────── */
+/* ─── Benefits Data (icons only — copy lives in auth:register.*Benefits) ─────── */
 
-const USER_BENEFITS = [
-    { icon: "speed", title: "Compliance-Check in 5 Minuten", desc: "Unser AI-Wizard analysiert Ihre Situation in wenigen Schritten." },
-    { icon: "dashboard", title: "Echtzeit-Risikoprofil", desc: "Ihr persönliches Dashboard zeigt offene Risiken und Handlungsbedarf." },
-    { icon: "group", title: "Geprüfte Experten in 30+ Ländern", desc: "SLA-basiertes Matching mit lokalen Compliance-Spezialisten." },
-    { icon: "verified", title: "Kostenlose Erstanalyse", desc: "Starten Sie ohne Risiko — zahlen Sie nur, wenn Sie Experten beauftragen." },
-];
+const USER_BENEFIT_ICONS = ["speed", "dashboard", "group", "verified"] as const;
+const PARTNER_BENEFIT_ICONS = ["trending_up", "handshake", "public", "bolt"] as const;
 
-const PARTNER_BENEFITS = [
-    { icon: "trending_up", title: "Qualifizierte Leads", desc: "Erhalten Sie vorqualifizierte Mandatsanfragen aus Ihrem Fachgebiet." },
-    { icon: "handshake", title: "SLA-basiertes Matching", desc: "Unser Algorithmus verbindet Sie mit passenden Unternehmen." },
-    { icon: "public", title: "Sichtbarkeit in 30+ Märkten", desc: "Werden Sie als verifizierter Partner in unserem Netzwerk gelistet." },
-    { icon: "bolt", title: "Kein Kaltakquise-Aufwand", desc: "Mandatszugang über strukturierte Compliance-Dossiers." },
-];
+/** Country <select>/chip options with the localized country name. */
+function useCountryOptions() {
+    const { t } = useTranslation("auth");
+    return COUNTRY_DEFS.map((c) => ({ value: c.value, label: `${c.flag} ${t(`register.countryNames.${c.value}`)}` }));
+}
 
 /* ─── Shared Components ──────────────────────────────────────────────────────── */
 
@@ -133,12 +118,13 @@ const GoogleIcon = () => (
 );
 
 function StepProgress({ current, total, label }: { current: number; total: number; label: string }) {
+    const { t } = useTranslation("auth");
     const pct = Math.round((current / total) * 100);
     return (
         <div className="flex flex-col gap-2 mb-6">
             <div className="flex justify-between items-center">
                 <Typography variant="body" weight="semibold" className="uppercase tracking-widest text-neutral-400 text-[10px]">
-                    Schritt {current} von {total}: {label}
+                    {t("register.stepProgress", { current, total, label })}
                 </Typography>
                 <Typography variant="body" weight="bold" className="text-primary-600 text-[10px]">
                     {pct}%
@@ -239,6 +225,7 @@ function MultiSelectChips({ label, options, selected, onChange }: {
 }
 
 function ConsentCheckbox({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
+    const { t } = useTranslation("auth");
     return (
         <label className="flex items-start gap-3 cursor-pointer group select-none">
             <button
@@ -253,10 +240,14 @@ function ConsentCheckbox({ checked, onChange }: { checked: boolean; onChange: (v
                 {checked && <span className="material-symbols-outlined text-white text-[12px]">check</span>}
             </button>
             <span className="text-xs text-neutral-500 leading-relaxed">
-                Ich stimme den{" "}
-                <a href="#" className="text-primary-500 hover:underline">AGB</a> und der{" "}
-                <a href="#" className="text-primary-500 hover:underline">Datenschutzerklärung</a> zu.
-                Ihre Daten werden DSGVO-konform verarbeitet.
+                <Trans
+                    t={t}
+                    i18nKey="register.consent"
+                    components={{
+                        terms: <a href="#" className="text-primary-500 hover:underline" />,
+                        privacy: <a href="#" className="text-primary-500 hover:underline" />,
+                    }}
+                />
             </span>
         </label>
     );
@@ -273,6 +264,7 @@ const slideVariants = {
 /* ─── User Wizard Steps ──────────────────────────────────────────────────────── */
 
 function UserStep1({ data, onChange }: { data: UserFormData; onChange: (d: Partial<UserFormData>) => void }) {
+    const { t } = useTranslation("auth");
     return (
         <div className="flex flex-col gap-4">
             {/* Google SSO */}
@@ -281,31 +273,35 @@ function UserStep1({ data, onChange }: { data: UserFormData; onChange: (d: Parti
                 className="w-full flex items-center justify-center gap-3 py-3 rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-700 text-sm font-semibold hover:bg-neutral-100 hover:border-neutral-300 transition-all"
             >
                 <GoogleIcon />
-                Mit Google registrieren
+                {t("register.googleSignup")}
             </button>
             <div className="flex items-center gap-3">
                 <div className="flex-1 h-px bg-neutral-200" />
-                <span className="text-xs text-neutral-400 font-medium">oder mit E-Mail</span>
+                <span className="text-xs text-neutral-400 font-medium">{t("register.orEmail")}</span>
                 <div className="flex-1 h-px bg-neutral-200" />
             </div>
-            <InputField id="reg-name" label="Vollständiger Name" required value={data.name} onChange={v => onChange({ name: v })} placeholder="Ihr Name" />
-            <InputField id="reg-email" label="E-Mail" type="email" required value={data.email} onChange={v => onChange({ email: v })} placeholder="name@unternehmen.de" />
-            <InputField id="reg-password" label="Passwort" type="password" required value={data.password} onChange={v => onChange({ password: v })} placeholder="Mind. 8 Zeichen" minLength={8} />
+            <InputField id="reg-name" label={t("register.nameLabel")} required value={data.name} onChange={v => onChange({ name: v })} placeholder={t("register.namePlaceholder")} />
+            <InputField id="reg-email" label={t("register.emailLabel")} type="email" required value={data.email} onChange={v => onChange({ email: v })} placeholder="name@unternehmen.de" />
+            <InputField id="reg-password" label={t("register.passwordLabel")} type="password" required value={data.password} onChange={v => onChange({ password: v })} placeholder={t("register.passwordPlaceholder")} minLength={8} />
             <ConsentCheckbox checked={data.consent} onChange={v => onChange({ consent: v })} />
         </div>
     );
 }
 
 function UserStep2({ data, onChange }: { data: UserFormData; onChange: (d: Partial<UserFormData>) => void }) {
+    const { t } = useTranslation("auth");
+    const countryOptions = useCountryOptions();
+    const industries = INDUSTRY_KEYS.map(k => ({ value: k, label: t(`register.industries.${k}`) }));
+    const companySizes = COMPANY_SIZE_VALUES.map((v, i) => ({ value: v, label: t(`register.companySizes.${i}`) }));
     return (
         <div className="flex flex-col gap-5">
-            <InputField id="reg-company" label="Firmenname" required value={data.companyName} onChange={v => onChange({ companyName: v })} placeholder="Muster GmbH" />
-            <SelectField id="reg-industry" label="Branche" value={data.industry} onChange={v => onChange({ industry: v })} options={INDUSTRIES} placeholder="Branche wählen…" />
-            <SelectField id="reg-size" label="Unternehmensgröße" value={data.companySize} onChange={v => onChange({ companySize: v })} options={COMPANY_SIZES} placeholder="Größe wählen…" />
-            <SelectField id="reg-country" label="Hauptsitz / Hauptmarkt" value={data.country} onChange={v => onChange({ country: v })} options={COUNTRIES.map(c => ({ value: c, label: c }))} placeholder="Land wählen…" />
+            <InputField id="reg-company" label={t("register.companyLabel")} required value={data.companyName} onChange={v => onChange({ companyName: v })} placeholder={t("register.companyPlaceholder")} />
+            <SelectField id="reg-industry" label={t("register.industryLabel")} value={data.industry} onChange={v => onChange({ industry: v })} options={industries} placeholder={t("register.industryPlaceholder")} />
+            <SelectField id="reg-size" label={t("register.sizeLabel")} value={data.companySize} onChange={v => onChange({ companySize: v })} options={companySizes} placeholder={t("register.sizePlaceholder")} />
+            <SelectField id="reg-country" label={t("register.countryLabel")} value={data.country} onChange={v => onChange({ country: v })} options={countryOptions} placeholder={t("register.countryPlaceholder")} />
             <MultiSelectChips
-                label="Zielmärkte (mehrere möglich)"
-                options={COUNTRIES.map(c => ({ value: c, label: c }))}
+                label={t("register.targetMarketsLabel")}
+                options={countryOptions}
                 selected={data.targetMarkets}
                 onChange={v => onChange({ targetMarkets: v })}
             />
@@ -314,18 +310,22 @@ function UserStep2({ data, onChange }: { data: UserFormData; onChange: (d: Parti
 }
 
 function UserStep3({ data, onChange }: { data: UserFormData; onChange: (d: Partial<UserFormData>) => void }) {
+    const { t } = useTranslation("auth");
+    const complianceAreas = COMPLIANCE_AREA_DEFS.map(a => ({ value: a.value, label: t(`register.complianceAreas.${a.tKey}`), icon: a.icon }));
+    const intents = INTENT_DEFS.map(o => ({ value: o.value, label: t(`register.intents.${o.tKey}.label`), desc: t(`register.intents.${o.tKey}.desc`) }));
+    const urgencyOptions = URGENCY_DEFS.map(o => ({ value: o.value, label: t(`register.urgencyOptions.${o.tKey}`), icon: o.icon }));
     return (
         <div className="flex flex-col gap-5">
             <MultiSelectChips
-                label="Compliance-Bereiche"
-                options={COMPLIANCE_AREAS}
+                label={t("register.complianceAreasLabel")}
+                options={complianceAreas}
                 selected={data.complianceAreas}
                 onChange={v => onChange({ complianceAreas: v })}
             />
             <div className="flex flex-col gap-2">
-                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">Was möchten Sie erreichen?</span>
+                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">{t("register.intentLabel")}</span>
                 <div className="flex flex-col gap-2">
-                    {INTENTS.map(opt => {
+                    {intents.map(opt => {
                         const active = data.intent === opt.value;
                         return (
                             <button
@@ -353,9 +353,9 @@ function UserStep3({ data, onChange }: { data: UserFormData; onChange: (d: Parti
                 </div>
             </div>
             <div className="flex flex-col gap-2">
-                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">Dringlichkeit</span>
+                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">{t("register.urgencyLabel")}</span>
                 <div className="grid grid-cols-2 gap-2">
-                    {URGENCY_OPTIONS.map(opt => {
+                    {urgencyOptions.map(opt => {
                         const active = data.urgency === opt.value;
                         return (
                             <button
@@ -380,6 +380,7 @@ function UserStep3({ data, onChange }: { data: UserFormData; onChange: (d: Parti
 /* ─── Partner Wizard Steps ───────────────────────────────────────────────────── */
 
 function PartnerStep1({ data, onChange }: { data: PartnerFormData; onChange: (d: Partial<PartnerFormData>) => void }) {
+    const { t } = useTranslation("auth");
     return (
         <div className="flex flex-col gap-4">
             <button
@@ -387,34 +388,37 @@ function PartnerStep1({ data, onChange }: { data: PartnerFormData; onChange: (d:
                 className="w-full flex items-center justify-center gap-3 py-3 rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-700 text-sm font-semibold hover:bg-neutral-100 hover:border-neutral-300 transition-all"
             >
                 <GoogleIcon />
-                Mit Google registrieren
+                {t("register.googleSignup")}
             </button>
             <div className="flex items-center gap-3">
                 <div className="flex-1 h-px bg-neutral-200" />
-                <span className="text-xs text-neutral-400 font-medium">oder mit E-Mail</span>
+                <span className="text-xs text-neutral-400 font-medium">{t("register.orEmail")}</span>
                 <div className="flex-1 h-px bg-neutral-200" />
             </div>
-            <InputField id="preg-name" label="Vollständiger Name" required value={data.name} onChange={v => onChange({ name: v })} placeholder="Ihr Name" />
-            <InputField id="preg-email" label="E-Mail" type="email" required value={data.email} onChange={v => onChange({ email: v })} placeholder="name@kanzlei.de" />
-            <InputField id="preg-password" label="Passwort" type="password" required value={data.password} onChange={v => onChange({ password: v })} placeholder="Mind. 8 Zeichen" minLength={8} />
+            <InputField id="preg-name" label={t("register.nameLabel")} required value={data.name} onChange={v => onChange({ name: v })} placeholder={t("register.namePlaceholder")} />
+            <InputField id="preg-email" label={t("register.emailLabel")} type="email" required value={data.email} onChange={v => onChange({ email: v })} placeholder="name@kanzlei.de" />
+            <InputField id="preg-password" label={t("register.passwordLabel")} type="password" required value={data.password} onChange={v => onChange({ password: v })} placeholder={t("register.passwordPlaceholder")} minLength={8} />
             <ConsentCheckbox checked={data.consent} onChange={v => onChange({ consent: v })} />
         </div>
     );
 }
 
 function PartnerStep2({ data, onChange }: { data: PartnerFormData; onChange: (d: Partial<PartnerFormData>) => void }) {
+    const { t } = useTranslation("auth");
+    const countryOptions = useCountryOptions();
+    const specializations = SPECIALIZATION_DEFS.map(s => ({ value: s.value, label: t(`register.specializations.${s.tKey}`) }));
     return (
         <div className="flex flex-col gap-5">
-            <InputField id="preg-firm" label="Kanzlei- / Firmenname" required value={data.firmName} onChange={v => onChange({ firmName: v })} placeholder="Kanzlei Muster & Partner" />
+            <InputField id="preg-firm" label={t("register.firmLabel")} required value={data.firmName} onChange={v => onChange({ firmName: v })} placeholder={t("register.firmPlaceholder")} />
             <MultiSelectChips
-                label="Spezialisierungen"
-                options={SPECIALIZATIONS}
+                label={t("register.specializationsLabel")}
+                options={specializations}
                 selected={data.specializations}
                 onChange={v => onChange({ specializations: v })}
             />
             <MultiSelectChips
-                label="Länder-Abdeckung"
-                options={COUNTRIES.map(c => ({ value: c, label: c }))}
+                label={t("register.coverageLabel")}
+                options={countryOptions}
                 selected={data.countries}
                 onChange={v => onChange({ countries: v })}
             />
@@ -423,21 +427,14 @@ function PartnerStep2({ data, onChange }: { data: PartnerFormData; onChange: (d:
 }
 
 function PartnerStep3({ data, onChange }: { data: PartnerFormData; onChange: (d: Partial<PartnerFormData>) => void }) {
-    const SLA_OPTIONS = [
-        { value: "24h", label: "Innerhalb 24 Stunden" },
-        { value: "48h", label: "Innerhalb 48 Stunden" },
-        { value: "72h", label: "Innerhalb 72 Stunden" },
-    ];
-    const CAPACITY_OPTIONS = [
-        { value: "1-5", label: "1–5 Mandate / Monat" },
-        { value: "6-15", label: "6–15 Mandate / Monat" },
-        { value: "16+", label: "16+ Mandate / Monat" },
-    ];
+    const { t } = useTranslation("auth");
+    const SLA_OPTIONS = ["24h", "48h", "72h"].map((value, i) => ({ value, label: t(`register.slaOptions.${i}`) }));
+    const CAPACITY_OPTIONS = ["1-5", "6-15", "16+"].map((value, i) => ({ value, label: t(`register.capacityOptions.${i}`) }));
 
     return (
         <div className="flex flex-col gap-5">
             <div className="flex flex-col gap-2">
-                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">Antwortzeit (SLA)</span>
+                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">{t("register.slaLabel")}</span>
                 <div className="flex flex-col gap-2">
                     {SLA_OPTIONS.map(opt => {
                         const active = data.slaResponse === opt.value;
@@ -461,21 +458,27 @@ function PartnerStep3({ data, onChange }: { data: PartnerFormData; onChange: (d:
                     })}
                 </div>
             </div>
-            <SelectField id="preg-capacity" label="Mandatskapazität" value={data.capacity} onChange={v => onChange({ capacity: v })} options={CAPACITY_OPTIONS} placeholder="Kapazität wählen…" />
-            <InputField id="preg-website" label="Website (optional)" value={data.website} onChange={v => onChange({ website: v })} placeholder="https://www.kanzlei.de" />
+            <SelectField id="preg-capacity" label={t("register.capacityLabel")} value={data.capacity} onChange={v => onChange({ capacity: v })} options={CAPACITY_OPTIONS} placeholder={t("register.capacityPlaceholder")} />
+            <InputField id="preg-website" label={t("register.websiteLabel")} value={data.website} onChange={v => onChange({ website: v })} placeholder="https://www.kanzlei.de" />
         </div>
     );
 }
 
 /* ─── Step Definitions ───────────────────────────────────────────────────────── */
 
-const USER_STEPS = ["Konto", "Unternehmen", "Compliance-Fokus"];
-const PARTNER_STEPS = ["Konto", "Kanzlei-Profil", "Engagement"];
+const STEP_COUNT = 3;
 
 /* ─── Benefits Panel ─────────────────────────────────────────────────────────── */
 
 function BenefitsPanel({ role }: { role: Role }) {
-    const benefits = role === "user" ? USER_BENEFITS : PARTNER_BENEFITS;
+    const { t } = useTranslation("auth");
+    const benefitNs = role === "user" ? "userBenefits" : "partnerBenefits";
+    const icons = role === "user" ? USER_BENEFIT_ICONS : PARTNER_BENEFIT_ICONS;
+    const benefits = icons.map((icon, i) => ({
+        icon,
+        title: t(`register.${benefitNs}.${i}.title`),
+        desc: t(`register.${benefitNs}.${i}.desc`),
+    }));
 
     return (
         <div className="hidden desktop-s:flex flex-col justify-between h-full bg-primary-900 text-white p-10 lg:p-12">
@@ -488,12 +491,12 @@ function BenefitsPanel({ role }: { role: Role }) {
             {/* Benefits */}
             <div className="flex-1 flex flex-col justify-center">
                 <Typography variant="body" weight="semibold" className="uppercase tracking-widest text-primary-400 text-[10px] mb-4">
-                    {role === "user" ? "Ihre Vorteile" : "Partner-Vorteile"}
+                    {role === "user" ? t("register.benefits.userEyebrow") : t("register.benefits.partnerEyebrow")}
                 </Typography>
                 <Typography variant="h2" weight="bold" className="text-white mb-8 leading-tight">
                     {role === "user"
-                        ? "Compliance einfach gemacht — für jedes Unternehmen."
-                        : "Neue Mandate. Ohne Kaltakquise."}
+                        ? t("register.benefits.userHeadline")
+                        : t("register.benefits.partnerHeadline")}
                 </Typography>
 
                 <AnimatePresence mode="wait">
@@ -529,7 +532,7 @@ function BenefitsPanel({ role }: { role: Role }) {
             {/* Trust signal */}
             <div className="mt-12 pt-6 border-t border-white/10">
                 <span className="text-xs text-primary-400/60">
-                    DSGVO-konform · ISO 27001 · Made in Berlin
+                    {t("register.benefits.trust")}
                 </span>
             </div>
         </div>
@@ -541,7 +544,7 @@ function BenefitsPanel({ role }: { role: Role }) {
 export function RegisterPage() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { i18n } = useTranslation();
+    const { t, i18n } = useTranslation("auth");
     const lang = i18n.resolvedLanguage || 'en';
     const authLogin = useAuthStore(s => s.login);
     const [role, setRole] = useState<Role>("user");
@@ -552,7 +555,9 @@ export function RegisterPage() {
     const [userData, setUserData] = useState<UserFormData>(DEFAULT_USER);
     const [partnerData, setPartnerData] = useState<PartnerFormData>(DEFAULT_PARTNER);
 
-    const steps = role === "user" ? USER_STEPS : PARTNER_STEPS;
+    const steps = Array.from({ length: STEP_COUNT }, (_, i) =>
+        t(`register.${role === "user" ? "userSteps" : "partnerSteps"}.${i}`)
+    );
     const isLastStep = step === steps.length - 1;
 
     const updateUser = (patch: Partial<UserFormData>) => setUserData(prev => ({ ...prev, ...patch }));
@@ -634,7 +639,7 @@ export function RegisterPage() {
                             <Typography variant="h3" className="tracking-tight">CompliHub360</Typography>
                         </button>
                         <Link to="/login" className="text-sm font-medium text-neutral-500 hover:text-neutral-900 transition-colors">
-                            Anmelden
+                            {t("register.login")}
                         </Link>
                     </div>
                 </header>
@@ -653,7 +658,7 @@ export function RegisterPage() {
                                             : "text-neutral-500 hover:text-neutral-700"
                                     }`}
                                 >
-                                    {r === "user" ? "🏢 Unternehmen" : "🤝 Beratungspartner"}
+                                    {r === "user" ? t("register.roleUser") : t("register.rolePartner")}
                                 </button>
                             ))}
                         </div>
@@ -695,7 +700,7 @@ export function RegisterPage() {
                                     disabled={step === 0}
                                 >
                                     <span className="material-symbols-outlined text-base">arrow_back</span>
-                                    Zurück
+                                    {t("register.back")}
                                 </button>
 
                                 <Button
@@ -708,16 +713,16 @@ export function RegisterPage() {
                                     {loading ? (
                                         <span className="flex items-center gap-2">
                                             <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                            Wird erstellt...
+                                            {t("register.creating")}
                                         </span>
                                     ) : isLastStep ? (
                                         <>
-                                            Konto erstellen
+                                            {t("register.createAccount")}
                                             <span className="material-symbols-outlined text-base">check</span>
                                         </>
                                     ) : (
                                         <>
-                                            Weiter
+                                            {t("register.next")}
                                             <span className="material-symbols-outlined text-base">arrow_forward</span>
                                         </>
                                     )}
@@ -727,9 +732,9 @@ export function RegisterPage() {
 
                         {/* Login Link */}
                         <p className="text-center text-sm text-neutral-500 mt-6">
-                            Bereits registriert?{" "}
+                            {t("register.alreadyRegistered")}{" "}
                             <Link to="/login" className="text-primary-500 hover:text-primary-600 hover:underline font-semibold transition-colors">
-                                Anmelden
+                                {t("register.login")}
                             </Link>
                         </p>
                     </div>
