@@ -132,3 +132,57 @@ export async function sendMagicLinkMail(m: MagicLinkMail): Promise<void> {
         } catch { /* double fault — logged above */ }
     }
 }
+
+// ─── B8: e-mail-change verification mail ─────────────────────────────────────
+// Sent to the NEW address; the change applies only after the link is clicked.
+export async function sendEmailChangeMail(p: {
+    providerKey: string;
+    providerName: string;
+    newEmail: string;
+    confirmQuery: string; // "?token=…"
+    correlationId: string;
+}): Promise<void> {
+    const url = `${PUBLIC_APP_URL}/en/provider/confirm-email${p.confirmQuery}`;
+    const subject = 'Confirm your new CompliHub360 contact address';
+    const text = [
+        `You (or someone in your firm) asked to change the contact address for ${p.providerName} on CompliHub360 to this e-mail.`,
+        ``,
+        `Confirm the change: ${url}`,
+        ``,
+        `The link works once and expires after 1 hour. If you didn't request this, ignore this e-mail — the current address stays active.`,
+    ].join('\n');
+    const html = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0b1620;padding:40px 16px;"><tr><td align="center">
+<table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;">
+<tr><td style="padding:0 8px 24px 8px;"><img src="https://kqylqwogxbiwpnomkzsn.supabase.co/storage/v1/object/public/assets/logo-lockup-email.png" width="207" height="54" alt="CompliHub360" style="display:block;border:0;"/></td></tr>
+<tr><td style="background-color:#1f2937;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:36px 32px;">
+<div style="font-family:Georgia,serif;font-size:26px;line-height:1.25;font-weight:bold;color:#ffffff;">Confirm your new <span style="color:#d4af37;">address</span>.</div>
+<div style="padding-top:12px;font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#aeb8c4;">This e-mail becomes the contact address for <strong style="color:#ffffff;">${p.providerName}</strong> once you confirm. Until then the current address stays active.</div>
+<div style="padding-top:24px;"><a href="${url}" style="display:block;background-color:#d4af37;border-radius:12px;padding:14px 24px;text-align:center;font-family:Helvetica,Arial,sans-serif;font-size:15px;font-weight:bold;color:#101411;text-decoration:none;">Confirm new address &rarr;</a></div>
+<div style="margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.08);font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#77828f;">&#128274;&nbsp; The link works <strong style="color:#aeb8c4;">once</strong> and expires after 1 hour.<br/>Didn't request this? Ignore this e-mail.</div>
+</td></tr>
+</table></td></tr></table>`;
+    const apiKey = process.env.RESEND_API_KEY;
+    try {
+        if (!apiKey) {
+            await supabaseApi.insert('event_log', {
+                type: 'email_outbox',
+                payload: { providerKey: p.providerKey, to: p.newEmail, subject, text, mode: 'log-only' },
+            });
+            return;
+        }
+        const res = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ from: MAIL_FROM, to: [p.newEmail], subject, text, html }),
+        });
+        const body = await res.json().catch(() => ({}));
+        await supabaseApi.insert('event_log', {
+            type: res.ok ? 'email_sent' : 'email_failed',
+            payload: { providerKey: p.providerKey, to: p.newEmail, subject, providerId: (body as { id?: string }).id, status: res.status },
+        });
+    } catch (err) {
+        structuredLog('error', 'Email-change mail failed', {
+            correlationId: p.correlationId, route: 'mailer', severity: 'error', errorCode: 'ERR_MAIL',
+        });
+    }
+}

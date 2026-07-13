@@ -22,6 +22,7 @@ import { AdminOverviewPage } from "./pages/admin/AdminOverviewPage";
 import { AdminEventsPage } from "./pages/admin/AdminEventsPage";
 import { AdminComingSoonPage } from "./pages/admin/AdminComingSoonPage";
 import { ProviderMagicActionPage } from "./pages/provider/ProviderMagicActionPage";
+import { ConfirmEmailPage } from "./pages/provider/ConfirmEmailPage";
 import { DashboardHome } from "./pages/dashboard/DashboardHome";
 import { UserDossiers } from "./pages/dashboard/UserDossiers";
 import { DossierDetail } from "./pages/dashboard/DossierDetail";
@@ -148,6 +149,7 @@ function AppContent() {
                     {/* Magic-link target from provider e-mails — public by design,
                         the single-use token IS the credential. */}
                     <Route path="provider/action" element={<ProviderMagicActionPage />} />
+                    <Route path="provider/confirm-email" element={<ConfirmEmailPage />} />
                     {/* User Dashboard Routes (Auth Guarded) */}
                     <Route element={<AuthGuard requiredRole="user" />}>
                         <Route path="dashboard" element={<UserHomePage />} />

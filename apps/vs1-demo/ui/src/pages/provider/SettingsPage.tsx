@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ProviderShell } from '../../components/provider/ProviderShell';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Tag } from '../../components/ui/Tag';
 import { Banner } from '../../components/ui/Banner';
 import { ConfirmDrawer, type ConfirmSpec } from '../../components/provider/ConfirmDrawer';
+import { ChangeEmailDrawer } from '../../components/provider/ChangeEmailDrawer';
+import { fetchCoverage } from '../../api/provider';
 
 // ─── Provider /settings ───────────────────────────────────────────────────────
 // Mirrors "Provider · /settings (Desktop)": settings section list (Profile
@@ -23,6 +25,12 @@ export function SettingsPage() {
   // B9: destructive workspace actions run through the Confirm drawer.
   const [confirm, setConfirm] = useState<ConfirmSpec | null>(null);
   const [paused, setPaused] = useState(false);
+  // B8: live contact address + change drawer (verify-first).
+  const [emailOpen, setEmailOpen] = useState(false);
+  const [contactEmail, setContactEmail] = useState('g.dahlmann@dahlmann-cpa.de');
+  useEffect(() => {
+    fetchCoverage().then((c) => { if ((c as { contact_email?: string }).contact_email) setContactEmail((c as { contact_email?: string }).contact_email!); }).catch(() => {});
+  }, []);
   return (
     <ProviderShell>
       <div className="mx-auto max-w-[1140px] space-y-6">
@@ -88,10 +96,10 @@ export function SettingsPage() {
                 </p>
               </div>
               <Card styleVariant="filled" className="flex items-center gap-3 p-4">
-                <p className="text-[13px] font-medium text-fg">g.dahlmann@dahlmann-cpa.de</p>
+                <p className="text-[13px] font-medium text-fg">{contactEmail}</p>
                 <Tag tone="success">✓ verified · no bounces 90d</Tag>
                 <div className="ml-auto">
-                  <Button size="sm" variant="secondary">Change email</Button>
+                  <Button size="sm" variant="secondary" onClick={() => setEmailOpen(true)}>Change email</Button>
                 </div>
               </Card>
             </div>
@@ -145,6 +153,7 @@ export function SettingsPage() {
         </div>
       </div>
       <ConfirmDrawer spec={confirm} onClose={() => setConfirm(null)} />
+      <ChangeEmailDrawer open={emailOpen} currentEmail={contactEmail} onClose={() => setEmailOpen(false)} />
     </ProviderShell>
   );
 }

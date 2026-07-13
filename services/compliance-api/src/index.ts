@@ -7,7 +7,7 @@ import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeC
 import { generateRelevantSubdomains, type CountryCode, type IndustryType, type BusinessModel } from "@complihub/compliance-engine";
 
 import { supabaseApi } from "./supabase.js";
-import { sendMagicLinkMail } from "./mailer.js";
+import { sendMagicLinkMail, sendEmailChangeMail } from "./mailer.js";
 import { redactText } from "@complihub360/redaction";
 
 // P0 #1: shared magic-link verification — SHA-256 hash lookup, engagement +
@@ -632,6 +632,98 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 structuredLog('error', 'Availability patch failed', { correlationId, errorCode: 'ERR_AVAILABILITY', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Availability update failed', correlationId }));
+            }
+        });
+    } else if (req.method === 'POST' && /^\/api\/v1\/provider\/[a-z0-9-]+\/change-email$/.test(req.url || '')) {
+        // B8: request a contact-email change. A single-use verify link (1h)
+        // goes to the NEW address; nothing changes until it is clicked.
+        const providerKey = (req.url || '').split('/')[4];
+        let ceBody = '';
+        req.on('data', (chunk: any) => ceBody += chunk.toString());
+        req.on('end', async () => {
+            try {
+                const d = JSON.parse(ceBody || '{}');
+                const newEmail = typeof d.new_email === 'string' ? d.new_email.trim().toLowerCase() : '';
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(newEmail)) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'new_email must be a valid address', correlationId }));
+                    return;
+                }
+                const rows = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as
+                    Array<{ name: string; contact_email?: string | null }>;
+                if (!rows[0]) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId }));
+                    return;
+                }
+                if ((rows[0].contact_email ?? '').toLowerCase() === newEmail) {
+                    res.writeHead(409, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'SAME_ADDRESS', message: 'This is already the contact address', correlationId }));
+                    return;
+                }
+                const nodeCrypto = await import('node:crypto');
+                const rawToken = nodeCrypto.randomBytes(32).toString('base64url');
+                const tokenHash = nodeCrypto.createHash('sha256').update(rawToken).digest('hex');
+                await supabaseApi.insert('email_change_tokens', {
+                    provider_key: providerKey,
+                    new_email: newEmail,
+                    token_hash: tokenHash,
+                    expires_at: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+                });
+                await supabaseApi.insert('event_log', {
+                    type: 'provider_email_change_requested',
+                    payload: { providerKey, newEmailDomain: newEmail.split('@')[1] },
+                });
+                (async () => {
+                    await sendEmailChangeMail({
+                        providerKey,
+                        providerName: rows[0].name || providerKey,
+                        newEmail,
+                        confirmQuery: `?token=${rawToken}`,
+                        correlationId,
+                    });
+                })().catch(() => { /* logged inside the mailer */ });
+                res.setHeader('x-correlation-id', correlationId);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, sent: true }));
+            } catch (err) {
+                structuredLog('error', 'Email change request failed', { correlationId, errorCode: 'ERR_EMAIL_CHANGE', severity: 'error', route: req.url });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Email change request failed', correlationId }));
+            }
+        });
+    } else if (req.method === 'POST' && req.url === '/api/v1/provider/confirm-email') {
+        // B8: redeem the verify token — applies the new contact address.
+        let confBody = '';
+        req.on('data', (chunk: any) => confBody += chunk.toString());
+        req.on('end', async () => {
+            try {
+                const d = JSON.parse(confBody || '{}');
+                const token = typeof d.token === 'string' ? d.token : '';
+                const nodeCrypto = await import('node:crypto');
+                const tokenHash = nodeCrypto.createHash('sha256').update(token).digest('hex');
+                const rows = (await supabaseApi.select('email_change_tokens', { token_hash: tokenHash }, { limit: 1 })) as
+                    Array<{ id: string; provider_key: string; new_email: string; expires_at: string; used_at: string | null }>;
+                const t = rows[0];
+                if (!t || t.used_at || new Date(t.expires_at).getTime() < Date.now()) {
+                    res.writeHead(403, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'INVALID_TOKEN', message: 'Link is invalid, used, or expired', correlationId }));
+                    return;
+                }
+                const now = new Date().toISOString();
+                await supabaseApi.update('email_change_tokens', { id: t.id }, { used_at: now });
+                await supabaseApi.update('providers', { provider_key: t.provider_key }, { contact_email: t.new_email, updated_at: now });
+                await supabaseApi.insert('event_log', {
+                    type: 'provider_email_changed',
+                    payload: { providerKey: t.provider_key, newEmailDomain: t.new_email.split('@')[1] },
+                });
+                res.setHeader('x-correlation-id', correlationId);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, providerKey: t.provider_key, contact_email: t.new_email }));
+            } catch (err) {
+                structuredLog('error', 'Email change confirm failed', { correlationId, errorCode: 'ERR_EMAIL_CONFIRM', severity: 'error', route: req.url });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Email change confirm failed', correlationId }));
             }
         });
     } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/alert-prefs')) {

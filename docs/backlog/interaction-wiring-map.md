@@ -51,7 +51,7 @@ Alle 16 Drawer existieren in Figma (Section `▣ DRAWERS`) und die `Drawer`-Komp
 | B5 | „Add market" | /coverage | ✅ | Add-Market-Drawer: GET/PATCH /provider/:key/coverage (countries_supported, 409 bei Duplikat), Pending-Chip „⏳ verification" | — |
 | B6 | „View ranking impact" | /coverage, /performance | ⛔ | **Ranking-Impact-Drawer** (2653:50), read-only | — |
 | B7 | Invoice-Row-Klick | /billing | ✅ | invoices-Tabelle (Seed INV-022–026) + GET /provider/:key/invoices; Zeilen live + klickbar → InvoiceDetailDrawer (Line-Items, Totale, Zahlungsdaten); Failed-Banner + KPIs (Last/YTD) abgeleitet | Stripe-PDF via C3 |
-| B8 | „Change email" | /settings | ⛔ | **Change-Email-Drawer** (2652:234) mit Verify-Schritt | Echte Auth |
+| B8 | „Change email" | /settings | ✅ | ChangeEmailDrawer (verify-first): Single-Use-Token 1h an NEUE Adresse (email_change_tokens), Änderung erst nach Klick; öffentliche /provider/confirm-email-Seite; Settings zeigt Live-contact_email | Provider-Accounts docken später an |
 | B9 | Destruktive Aktionen | /settings | ✅ | ConfirmDrawer (wiederverwendbar, Keyword-Gate für harte Fälle) + Workspace-Danger-Zone (Pause requests / Delete) | — |
 | B10 | „Help & support" | Sidebar | ✅ | HelpDrawer (4 Topics + mailto Support) auf dem Sidebar-Item | — |
 
