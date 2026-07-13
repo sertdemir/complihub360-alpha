@@ -6,9 +6,9 @@
 echte Stripe-Portal (Branding „CompliHub360 — Partner Billing"). Der Customer
 `dahlmann-cpa` → `cus_UsbYmsQbvZ8Tqk` wurde automatisch angelegt.
 
-⚠️ **Die Sandbox läuft am 2026-07-20 ab**, wenn sie nicht vorher in einen echten
-Stripe-Account überführt wird („claimen"). Die Claim-URL liegt NICHT im Repo —
-Claude hat sie in der Session; alternativ `stripe sandbox claim` mit dem Key.
+✅ **Sandbox geclaimt (2026-07-13):** Die Sandbox gehört jetzt dem Stripe-Konto
+des Users („Complihub360 Sandbox") und läuft nicht mehr ab. Verwaltung über
+dashboard.stripe.com (Sandbox-Umschalter oben links).
 
 ## Was schon funktioniert
 
@@ -20,13 +20,9 @@ Claude hat sie in der Session; alternativ `stripe sandbox claim` mit dem Key.
 - „Update payment method" auf /billing ruft den Endpoint auf und redirectet
 - Event `billing_portal_opened` im Event-Log
 
-## Dein Schritt (einmalig, ~5 Minuten): Sandbox claimen
+## Offene User-Schritte
 
-1. Claim-URL öffnen (von Claude in der Session ausgegeben) → mit deinem
-   Stripe-Login (oder neuem Konto, Business: CompliHub360) bestätigen.
-   Danach gehört die Sandbox inkl. Portal-Konfiguration + Customer deinem Account
-   und läuft nicht mehr ab.
-2. Fertig — Keys und Konfiguration bleiben gültig, nichts weiter nötig.
+Keine — Sandbox geclaimt, Integration läuft.
 
 **Best Practices (bereits umgesetzt):** Restricted Key (`rk…`) statt Secret Key ·
 Key nur in der VPS-.env (nicht im Repo) · Portal-Konfiguration per API angelegt
