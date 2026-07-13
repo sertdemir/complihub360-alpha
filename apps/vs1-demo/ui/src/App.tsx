@@ -67,14 +67,26 @@ import { EmailVerificationPage } from "./pages/auth/EmailVerificationPage";
 import { AuthCallbackPage } from "./pages/auth/AuthCallbackPage";
 import { ResetPasswordPage } from "./pages/auth/ResetPasswordPage";
 import { AuthGuard } from "./components/auth/AuthGuard";
+import { AnimatedWizard } from "./components/home/AnimatedWizard";
 
-// ⚠️ Old route-based wizard is DISABLED. The assessment now runs inline in the
-// landing page (EntryDoor → AnimatedWizard: Markets → Operations → Domains →
-// Review → /results). Any legacy /wizard URL redirects to the locale home so the
-// old pre-gate / category flows never render.
+// Full-view assessment (/:locale/wizard): the hero CTA opens the SAME 4-step
+// wizard as the Entry-Door section, but as the original full-view overlay over
+// the page (backdrop blur + click-outside closes). The old pre-gate / category
+// flows stay retired. `.wizard-card` guards against the overlay's close-click.
 function WizardRoutes() {
+    const navigate = useNavigate();
     const { i18n } = useTranslation();
-    return <Navigate to={`/${i18n.resolvedLanguage || 'en'}`} replace />;
+    const locale = i18n.resolvedLanguage || 'en';
+    return (
+        <div className="wizard-card w-full max-w-[1200px] overflow-hidden rounded-[20px] shadow-[0_50px_110px_-35px_rgba(11,11,12,0.55)]">
+            <AnimatedWizard
+                spacious
+                interactive
+                onComplete={(profile) => navigate(`/${locale}/results`, { state: { searchProfile: profile } })}
+                className="!rounded-[20px]"
+            />
+        </div>
+    );
 }
 
 function RootRedirect() {

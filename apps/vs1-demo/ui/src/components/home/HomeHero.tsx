@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Check, ArrowRight, Eye, EyeOff, Globe, BarChart3, Lock, MessageSquare } from 'lucide-react';
 import { Container } from '../ui/Container';
@@ -172,6 +173,11 @@ function HeroVisual({ showRiskMap, className }: { showRiskMap: boolean; classNam
 export function HomeHero({ wizard = 'desktop' }: { wizard?: WizardForm } = {}) {
   // Click toggles the hero visual between the animated wizard and the risk map.
   const [showRiskMap, setShowRiskMap] = useState(false);
+  // Hero CTA opens the FULL-VIEW wizard overlay (/:locale/wizard) — the
+  // embedded Entry-Door wizard stays as the in-flow fallback while scrolling.
+  const navigate = useNavigate();
+  const { locale = 'en' } = useParams();
+  const startAssessment = () => navigate(`/${locale}/wizard`);
   const toggleProps = {
     onClick: () => setShowRiskMap((v) => !v),
     'aria-pressed': showRiskMap,
@@ -197,7 +203,7 @@ export function HomeHero({ wizard = 'desktop' }: { wizard?: WizardForm } = {}) {
               verified specialist when something needs hands. Six minutes to your first risk map. No account required.
             </p>
             <div className="mt-8 flex items-center gap-7">
-              <Button size="lg">Start your assessment</Button>
+              <Button size="lg" onClick={startAssessment}>Start your assessment</Button>
               <button {...toggleProps} className="inline-flex items-center gap-2 text-body font-semibold text-fg-brand">
                 {showRiskMap ? 'Close risk map' : 'See an example risk map'}
                 {showRiskMap ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -251,7 +257,7 @@ export function HomeHero({ wizard = 'desktop' }: { wizard?: WizardForm } = {}) {
             something needs hands. Six minutes to your first risk map. No account required.
           </p>
           <div className="mt-6 flex flex-col gap-3">
-            <Button size="lg" fullWidth>Start your assessment</Button>
+            <Button size="lg" fullWidth onClick={startAssessment}>Start your assessment</Button>
             <button {...toggleProps} className="inline-flex items-center justify-center gap-2 text-body font-semibold text-fg-brand">
               {showRiskMap ? 'Close risk map' : 'See an example risk map'}
               {showRiskMap ? <EyeOff size={16} /> : <Eye size={16} />}
