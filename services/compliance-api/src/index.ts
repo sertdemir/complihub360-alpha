@@ -79,7 +79,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         res.setHeader('Access-Control-Allow-Origin', '*');
     }
 
-    res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST');
+    res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PATCH, PUT');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-correlation-id, Authorization, x-api-key');
 
     if (req.method === 'OPTIONS') {
@@ -461,6 +461,164 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 structuredLog('error', 'Read-state update failed', { correlationId, errorCode: 'ERR_READS', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Failed to mark seen', correlationId }));
+            }
+        });
+    } else if (req.method === 'PATCH' && /^\/api\/v1\/session\/[0-9a-f-]{36}$/.test(req.url || '')) {
+        // B13: rename (label) / archive (status) a saved session.
+        const sessionId = (req.url || '').split('/').pop() as string;
+        let patchBody = '';
+        req.on('data', (chunk: any) => patchBody += chunk.toString());
+        req.on('end', async () => {
+            try {
+                const d = JSON.parse(patchBody || '{}');
+                const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
+                if (typeof d.label === 'string') patch.label = d.label.slice(0, 120) || null;
+                if (d.status === 'active' || d.status === 'archived') patch.status = d.status;
+                const updated = (await supabaseApi.update('sessions', { id: sessionId }, patch)) as unknown[];
+                if (!updated.length) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Session not found', correlationId }));
+                    return;
+                }
+                await supabaseApi.insert('event_log', { type: 'session_updated', payload: { sessionId, fields: Object.keys(patch) } });
+                res.setHeader('x-correlation-id', correlationId);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, id: sessionId, session: updated[0] }));
+            } catch (err) {
+                structuredLog('error', 'Session patch failed', { correlationId, errorCode: 'ERR_SESSION_PATCH', severity: 'error', route: req.url });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Session update failed', correlationId }));
+            }
+        });
+    } else if (req.method === 'POST' && /^\/api\/v1\/session\/[0-9a-f-]{36}\/duplicate$/.test(req.url || '')) {
+        // B13: duplicate a session as an editable copy.
+        const sessionId = (req.url || '').split('/')[4];
+        try {
+            const rows = (await supabaseApi.select('sessions', { id: sessionId }, { limit: 1 })) as Array<Record<string, unknown>>;
+            if (!rows[0]) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Session not found', correlationId }));
+                return;
+            }
+            const src = rows[0];
+            const copy = (await supabaseApi.insert('sessions', {
+                user_id: src.user_id ?? null,
+                guest_key: src.guest_key ?? null,
+                country: src.country ?? null,
+                markets: src.markets ?? [],
+                categories: src.categories ?? [],
+                answers: src.answers ?? {},
+                risk_summary: src.risk_summary ?? null,
+                label: `Copy of ${String(src.label || src.country || 'session')}`.slice(0, 120),
+                status: 'active',
+            })) as Array<{ id: string }>;
+            await supabaseApi.insert('event_log', { type: 'session_duplicated', payload: { sourceId: sessionId, copyId: copy?.[0]?.id } });
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(201, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ok: true, id: copy?.[0]?.id }));
+        } catch (err) {
+            structuredLog('error', 'Session duplicate failed', { correlationId, errorCode: 'ERR_SESSION_DUP', severity: 'error', route: req.url });
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Session duplicate failed', correlationId }));
+        }
+    } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/coverage$/.test(req.url || '')) {
+        // B5: current public coverage for the Add-Market drawer.
+        const providerKey = (req.url || '').split('/')[4];
+        try {
+            const rows = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as
+                Array<{ provider_key: string; name: string; countries_supported: string[]; languages: string[]; sla_target_confirm_hours: number }>;
+            if (!rows[0]) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId }));
+                return;
+            }
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ok: true, coverage: rows[0] }));
+        } catch (err) {
+            structuredLog('error', 'Coverage fetch failed', { correlationId, errorCode: 'ERR_COVERAGE', severity: 'error', route: req.url });
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Coverage fetch failed', correlationId }));
+        }
+    } else if (req.method === 'PATCH' && /^\/api\/v1\/provider\/[a-z0-9-]+\/coverage$/.test(req.url || '')) {
+        // B5: add a market to the provider's coverage. New markets require a
+        // 2-business-day re-verification before ranking — recorded as an event.
+        const providerKey = (req.url || '').split('/')[4];
+        let covBody = '';
+        req.on('data', (chunk: any) => covBody += chunk.toString());
+        req.on('end', async () => {
+            try {
+                const d = JSON.parse(covBody || '{}');
+                const country = typeof d.add_country === 'string' ? d.add_country.trim().toUpperCase().slice(0, 2) : '';
+                if (!/^[A-Z]{2}$/.test(country)) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'add_country (ISO-2) required', correlationId }));
+                    return;
+                }
+                const rows = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as
+                    Array<{ countries_supported: string[] | null }>;
+                if (!rows[0]) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId }));
+                    return;
+                }
+                const current = rows[0].countries_supported ?? [];
+                if (current.includes(country)) {
+                    res.writeHead(409, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'ALREADY_COVERED', message: `${country} is already in your coverage`, correlationId }));
+                    return;
+                }
+                await supabaseApi.update('providers', { provider_key: providerKey }, {
+                    countries_supported: [...current, country],
+                    updated_at: new Date().toISOString(),
+                });
+                await supabaseApi.insert('event_log', {
+                    type: 'provider_coverage_updated',
+                    payload: { providerKey, added: country, verification: 'pending-2bd' },
+                });
+                res.setHeader('x-correlation-id', correlationId);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, providerKey, countries_supported: [...current, country], verification: 'pending-2bd' }));
+            } catch (err) {
+                structuredLog('error', 'Coverage patch failed', { correlationId, errorCode: 'ERR_COVERAGE_PATCH', severity: 'error', route: req.url });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Coverage update failed', correlationId }));
+            }
+        });
+    } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/alert-prefs')) {
+        // B15: alert preferences for an owner key (guest_key today).
+        try {
+            const u = new URL(req.url, 'http://localhost');
+            const owner = u.searchParams.get('owner') || 'demo-user';
+            const rows = (await supabaseApi.select('alert_prefs', { owner_key: owner })) as Array<{ prefs: Record<string, unknown> }>;
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ok: true, owner, prefs: rows[0]?.prefs ?? null }));
+        } catch (err) {
+            structuredLog('error', 'Alert prefs fetch failed', { correlationId, errorCode: 'ERR_ALERT_PREFS', severity: 'error', route: req.url });
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Alert prefs fetch failed', correlationId }));
+        }
+    } else if (req.method === 'PUT' && req.url === '/api/v1/alert-prefs') {
+        // B15: upsert alert preferences.
+        let prefsBody = '';
+        req.on('data', (chunk: any) => prefsBody += chunk.toString());
+        req.on('end', async () => {
+            try {
+                const d = JSON.parse(prefsBody || '{}');
+                const owner = typeof d.owner === 'string' && d.owner ? d.owner.slice(0, 120) : 'demo-user';
+                const prefs = d.prefs && typeof d.prefs === 'object' ? d.prefs : {};
+                const now = new Date().toISOString();
+                const updated = (await supabaseApi.update('alert_prefs', { owner_key: owner }, { prefs, updated_at: now })) as unknown[];
+                if (!updated.length) await supabaseApi.insert('alert_prefs', { owner_key: owner, prefs, updated_at: now });
+                await supabaseApi.insert('event_log', { type: 'alert_prefs_updated', payload: { owner } });
+                res.setHeader('x-correlation-id', correlationId);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, owner, prefs }));
+            } catch (err) {
+                structuredLog('error', 'Alert prefs save failed', { correlationId, errorCode: 'ERR_ALERT_PREFS', severity: 'error', route: req.url });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Alert prefs save failed', correlationId }));
             }
         });
     } else if (req.method === 'POST' && req.url === '/api/v1/session') {

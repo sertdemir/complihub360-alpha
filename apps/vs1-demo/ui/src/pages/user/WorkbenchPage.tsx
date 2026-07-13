@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { UserShell } from '../../components/user/UserShell';
 import { RequestQuoteModal, type QuoteProvider } from '../../components/user/RequestQuoteModal';
 import { DocUploadDrawer } from '../../components/user/DocUploadDrawer';
+import { ConfigureAlertsDrawer } from '../../components/user/ConfigureAlertsDrawer';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { KPICircleCard } from '../../components/ui/KPICircleCard';
@@ -96,6 +97,7 @@ export function WorkbenchPage() {
   const steps = meta.steps.length ? meta.steps : STEPS;
   const [quoteFor, setQuoteFor] = useState<(QuoteProvider & { country: string }) | null>(null);
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [alertsOpen, setAlertsOpen] = useState(false);
   return (
     <UserShell activeDomain={meta.name}>
       <div className="mx-auto max-w-[1140px] space-y-6">
@@ -137,7 +139,7 @@ export function WorkbenchPage() {
             <section className="space-y-3">
               <div className="flex items-baseline justify-between">
                 <h2 className="text-[15px] font-semibold text-fg">Threshold risk monitoring</h2>
-                <a href="#" className="text-[12px] text-fg-brand underline-offset-2 hover:underline">Configure alerts</a>
+                <button type="button" onClick={() => setAlertsOpen(true)} className="text-[12px] text-fg-brand underline-offset-2 hover:underline">Configure alerts</button>
               </div>
               <Card styleVariant="filled" className="space-y-3.5 p-4">
                 {THRESHOLDS.map((t) => (
@@ -183,6 +185,7 @@ export function WorkbenchPage() {
         </div>
       </div>
       <DocUploadDrawer open={uploadOpen} onClose={() => setUploadOpen(false)} domainLabel={meta.name} />
+      <ConfigureAlertsDrawer open={alertsOpen} onClose={() => setAlertsOpen(false)} />
       {quoteFor && (
         <RequestQuoteModal
           provider={quoteFor}

@@ -1,21 +1,27 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { UserShell } from '../../components/user/UserShell';
 import { Button } from '../../components/ui/Button';
 import { FilterChip } from '../../components/ui/Badge';
 import { SessionRow, type SessionRisk } from '../../components/ui/SessionRow';
+import { SessionActionsDrawer, type SessionActionsTarget } from '../../components/user/SessionActionsDrawer';
+import { fetchSessions, type SessionRowData } from '../../api/sessions';
 
 // ─── User Dashboard · Sessions ────────────────────────────────────────────────
 // Mirrors "User Dashboard v1 · Sessions list (Desktop)" (2051:48): gold-word
-// header · filter chips · Session Rows with country badge, domain pill,
-// NEEDS-REFRESH status, risk line + Open action. Design fixture data.
+// header · filter chips · Session Rows. Live sessions (guest_key anchor) when
+// the API answers; the design fixture otherwise. "⋯" opens the B13 actions
+// drawer (rename/duplicate/archive).
 
-type Fixture = {
+type Row = {
+  id?: string;
   country: string; domain: string; needsRefresh?: boolean; updated: string;
   title: string; riskLine: string; risk: SessionRisk;
 };
 
-const SESSIONS: Fixture[] = [
+const SESSIONS: Row[] = [
   { country: 'IT', domain: 'Tax & VAT', needsRefresh: true, updated: '· Updated 2h ago', title: 'VAT registration · Italy', riskLine: '● High risk · threshold reached · 1 markets', risk: 'high' },
   { country: 'FR', domain: 'Product & Packaging', updated: '· Updated 1d ago', title: 'EPR registration · France', riskLine: '● Medium risk · deadline Q3 2026 · 1 markets', risk: 'medium' },
   { country: 'UK', domain: 'Data & Privacy', needsRefresh: true, updated: '· Updated 3d ago', title: 'GDPR audit & DPA review', riskLine: '● High risk · cookie consent · 1 markets', risk: 'high' },
@@ -24,18 +30,63 @@ const SESSIONS: Fixture[] = [
   { country: 'DE', domain: 'Tax & VAT', updated: '· Updated 1mo ago', title: 'VAT roadmap · EU-wide', riskLine: '● Low risk · compliant · 4 markets', risk: 'low' },
 ];
 
-const FILTERS = [
-  { key: 'all', label: 'All · 6', match: () => true },
-  { key: 'refresh', label: 'Need refresh · 2', match: (s: Fixture) => !!s.needsRefresh },
-  { key: 'vat', label: 'Tax & VAT · 3', match: (s: Fixture) => s.domain === 'Tax & VAT' },
-  { key: 'privacy', label: 'Privacy · 2', match: (s: Fixture) => s.domain === 'Data & Privacy' },
-  { key: 'packaging', label: 'Packaging · 1', match: (s: Fixture) => s.domain === 'Product & Packaging' },
-];
+const DOMAIN_LABEL: Record<string, string> = {
+  vat: 'Tax & VAT', tax: 'Tax & VAT',
+  privacy: 'Data & Privacy', gdpr: 'Data & Privacy', data: 'Data & Privacy',
+  epr: 'Product & Packaging', packaging: 'Product & Packaging',
+};
+
+function relTime(iso: string): string {
+  const h = Math.floor((Date.now() - new Date(iso).getTime()) / 3_600_000);
+  if (h < 1) return '· Updated just now';
+  if (h < 24) return `· Updated ${h}h ago`;
+  const d = Math.floor(h / 24);
+  return `· Updated ${d}d ago`;
+}
+
+function toRow(s: SessionRowData): Row {
+  const cat = s.categories?.[0] ?? 'compliance';
+  const domain = DOMAIN_LABEL[cat.toLowerCase()] ?? cat.replace(/^./, (c) => c.toUpperCase());
+  const level = (s.risk_summary?.level ?? 'low').toLowerCase();
+  const risk: SessionRisk = level === 'high' ? 'high' : level === 'medium' ? 'medium' : 'low';
+  const markets = s.markets?.length || 1;
+  return {
+    id: s.id,
+    country: (s.country ?? '—').toUpperCase(),
+    domain,
+    updated: relTime(s.updated_at),
+    title: s.label || `${cat} · ${(s.country ?? '').toUpperCase()}`,
+    riskLine: `● ${risk.replace(/^./, (c) => c.toUpperCase())} risk · ${markets} market${markets === 1 ? '' : 's'}`,
+    risk,
+  };
+}
 
 export function SessionsPage() {
+  const navigate = useNavigate();
+  const { i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage || 'en';
   const [filter, setFilter] = useState('all');
+  const [live, setLive] = useState<Row[] | null>(null);
+  const [actionsFor, setActionsFor] = useState<SessionActionsTarget | null>(null);
+
+  const reload = useCallback(() => {
+    fetchSessions()
+      .then((rows) => setLive(rows.filter((r) => r.status === 'active').map(toRow)))
+      .catch(() => { /* keep fixture */ });
+  }, []);
+  useEffect(() => { reload(); }, [reload]);
+
+  const rows = live && live.length > 0 ? live : SESSIONS;
+  const isLive = live !== null && live.length > 0;
+
+  const FILTERS = [
+    { key: 'all', label: `All · ${rows.length}`, match: (_s: Row) => true },
+    ...['Tax & VAT', 'Data & Privacy', 'Product & Packaging']
+      .filter((d) => rows.some((s) => s.domain === d))
+      .map((d) => ({ key: d, label: `${d} · ${rows.filter((s) => s.domain === d).length}`, match: (s: Row) => s.domain === d })),
+  ];
   const match = FILTERS.find((f) => f.key === filter)?.match ?? (() => true);
-  const list = SESSIONS.filter(match);
+  const list = rows.filter(match);
 
   return (
     <UserShell activeDomain="Tax & VAT">
@@ -46,10 +97,10 @@ export function SessionsPage() {
               Your compliance <span className="text-fg-accent">sessions</span>.
             </h1>
             <p className="mt-1 text-body-sm text-fg-secondary">
-              6 sessions saved · 2 need a refresh · last updated 2h ago
+              {rows.length} session{rows.length === 1 ? '' : 's'} saved{isLive ? '' : ' · 2 need a refresh · last updated 2h ago'}
             </p>
           </div>
-          <Button className="mt-1 shrink-0">Start new search</Button>
+          <Button className="mt-1 shrink-0" onClick={() => navigate(`/${locale}/wizard`)}>Start new search</Button>
         </div>
 
         <div className="flex items-center gap-2">
@@ -66,7 +117,7 @@ export function SessionsPage() {
         <div className="space-y-2.5">
           {list.map((s) => (
             <SessionRow
-              key={s.title}
+              key={s.id ?? s.title}
               country={s.country}
               domain={s.domain}
               status={s.needsRefresh ? 'Needs refresh' : undefined}
@@ -74,12 +125,13 @@ export function SessionsPage() {
               title={s.title}
               riskLine={s.riskLine}
               risk={s.risk}
-              onMenu={() => {}}
-              action={<Button size="sm" variant="accent">Open</Button>}
+              onMenu={s.id ? () => setActionsFor({ id: s.id!, title: s.title, domain: s.domain, country: s.country }) : () => {}}
+              action={<Button size="sm" variant="accent" onClick={() => navigate(`/${locale}/results`)}>Open</Button>}
             />
           ))}
         </div>
       </div>
+      <SessionActionsDrawer target={actionsFor} onClose={() => setActionsFor(null)} onChanged={reload} />
     </UserShell>
   );
 }

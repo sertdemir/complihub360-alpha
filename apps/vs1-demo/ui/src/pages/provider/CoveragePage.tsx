@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ProviderShell } from '../../components/provider/ProviderShell';
 import { RankingImpactDrawer } from '../../components/provider/ProviderDrawers';
+import { AddMarketDrawer } from '../../components/provider/AddMarketDrawer';
 import { Banner } from '../../components/ui/Banner';
 import { Button } from '../../components/ui/Button';
 import { FilterChip } from '../../components/ui/Badge';
@@ -51,6 +52,9 @@ const SLA = [
 
 export function CoveragePage() {
   const [rankingOpen, setRankingOpen] = useState(false);
+  // B5: "+ Add market" → drawer; freshly added markets show as pending chips.
+  const [addOpen, setAddOpen] = useState(false);
+  const [pending, setPending] = useState<string[]>([]);
   return (
     <ProviderShell>
       <div className="mx-auto max-w-[1140px] space-y-6">
@@ -88,9 +92,13 @@ export function CoveragePage() {
         <section className="space-y-3">
           <SectionHeader title="Markets covered" sub="2 active · adding a market = 2-BD re-verification + ranking re-index" />
           <div className="flex flex-wrap items-center gap-2.5">
-            {MARKETS.map((m) => (
+            {MARKETS.filter((m) => !m.label.startsWith('+')).map((m) => (
               <FilterChip key={m.label} selected={m.selected}>{m.label}</FilterChip>
             ))}
+            {pending.map((c) => (
+              <FilterChip key={c} selected>{`⏳ ${c} · verification pending`}</FilterChip>
+            ))}
+            <FilterChip selected={false} onClick={() => setAddOpen(true)}>+ Add market</FilterChip>
           </div>
         </section>
 
@@ -137,6 +145,7 @@ export function CoveragePage() {
         </section>
       </div>
       <RankingImpactDrawer open={rankingOpen} onClose={() => setRankingOpen(false)} />
+      <AddMarketDrawer open={addOpen} onClose={() => setAddOpen(false)} onAdded={(c) => setPending((p) => (p.includes(c) ? p : [...p, c]))} />
     </ProviderShell>
   );
 }

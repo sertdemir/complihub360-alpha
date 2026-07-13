@@ -1,7 +1,10 @@
+import { useState } from 'react';
 import { ProviderShell } from '../../components/provider/ProviderShell';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Tag } from '../../components/ui/Tag';
+import { Banner } from '../../components/ui/Banner';
+import { ConfirmDrawer, type ConfirmSpec } from '../../components/provider/ConfirmDrawer';
 
 // ─── Provider /settings ───────────────────────────────────────────────────────
 // Mirrors "Provider · /settings (Desktop)": settings section list (Profile
@@ -17,6 +20,9 @@ const SECTIONS = [
 ];
 
 export function SettingsPage() {
+  // B9: destructive workspace actions run through the Confirm drawer.
+  const [confirm, setConfirm] = useState<ConfirmSpec | null>(null);
+  const [paused, setPaused] = useState(false);
   return (
     <ProviderShell>
       <div className="mx-auto max-w-[1140px] space-y-6">
@@ -89,9 +95,56 @@ export function SettingsPage() {
                 </div>
               </Card>
             </div>
+
+            {/* B9: Workspace danger zone — every action guarded by ConfirmDrawer */}
+            <div className="space-y-3">
+              <div>
+                <h2 className="text-[15px] font-semibold text-fg">Workspace</h2>
+                <p className="mt-0.5 text-[12px] text-fg-tertiary">Destructive actions — each asks for explicit confirmation</p>
+              </div>
+              {paused && (
+                <Banner status="brand" title="New requests paused" action={<Button size="sm" variant="secondary" onClick={() => setPaused(false)}>Resume</Button>}>
+                  Incoming requests are re-routed to other partners · your ranking is frozen while paused.
+                </Banner>
+              )}
+              <Card styleVariant="filled" className="divide-y divide-white/5 p-0">
+                <div className="flex items-center gap-3 px-4 py-3.5">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[13px] font-semibold text-fg">Pause new requests</p>
+                    <p className="mt-0.5 text-[11px] text-fg-tertiary">Re-routes incoming requests · ranking frozen · resume anytime</p>
+                  </div>
+                  <Button size="sm" variant="secondary" disabled={paused}
+                    onClick={() => setConfirm({
+                      title: 'Pause new requests?',
+                      consequence: 'Incoming requests will be re-routed to other partners while paused. Your ranking is frozen — it neither drops nor improves. You can resume anytime.',
+                      confirmLabel: 'Pause requests',
+                      onConfirm: () => setPaused(true),
+                    })}>
+                    {paused ? 'Paused' : 'Pause'}
+                  </Button>
+                </div>
+                <div className="flex items-center gap-3 px-4 py-3.5">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[13px] font-semibold text-error-500">Delete workspace</p>
+                    <p className="mt-0.5 text-[11px] text-fg-tertiary">Removes your public profile + all data after a 30-day grace period</p>
+                  </div>
+                  <Button size="sm" variant="ghost"
+                    onClick={() => setConfirm({
+                      title: 'Delete workspace?',
+                      consequence: 'Your public profile goes offline immediately. All engagement data is removed after a 30-day grace period — active engagements must be completed or handed over first. This cannot be undone after the grace period.',
+                      confirmLabel: 'Delete workspace',
+                      keyword: 'DELETE',
+                      onConfirm: () => { /* deletion request lands with CS until provider auth (B8) */ },
+                    })}>
+                    Delete…
+                  </Button>
+                </div>
+              </Card>
+            </div>
           </div>
         </div>
       </div>
+      <ConfirmDrawer spec={confirm} onClose={() => setConfirm(null)} />
     </ProviderShell>
   );
 }

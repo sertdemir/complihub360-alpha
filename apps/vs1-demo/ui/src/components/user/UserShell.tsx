@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,9 @@ import {
 } from 'lucide-react';
 import { Sidebar, SidebarGroup, NavItem, DomainBar, DomainTab } from '../ui/AppShell';
 import { LogoMark } from '../ui/Logo';
+import { UserSearchDrawer } from './UserSearchDrawer';
+import { fetchUserRequests } from '../../api/requests';
+import { fetchNotificationsFeed, USER_NOTIFICATIONS_VIEWER } from '../../api/notifications';
 
 // ─── UserShell ────────────────────────────────────────────────────────────────
 // The user App-Workspace frame (always dark slate), mirroring the Figma User
@@ -28,8 +31,8 @@ const SIDEBAR: { group: string; badge?: string; items: SidebarItem[] }[] = [
     items: [
       { to: 'dashboard', label: 'Dashboard', icon: LayoutGrid, exact: true },
       { to: 'dashboard/sessions', label: 'Sessions', icon: FolderClosed },
-      { to: 'dashboard/requests', label: 'Requests', icon: Mail, count: '3' },
-      { to: 'dashboard/notifications', label: 'Notifications', icon: Bell, count: '2' },
+      { to: 'dashboard/requests', label: 'Requests', icon: Mail },
+      { to: 'dashboard/notifications', label: 'Notifications', icon: Bell },
     ],
   },
   {
@@ -74,6 +77,21 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
   const displaySub = user?.email || 'Acme GmbH';
   const initials = displayName.split(/[\s._-]+/).map((p) => p[0]).join('').slice(0, 2).toUpperCase();
   const base = `/${locale}`;
+  // B16: workspace search drawer · C1: live sidebar badges (hidden in fixture mode).
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [counts, setCounts] = useState<{ requests?: number; unread?: number }>({});
+  useEffect(() => {
+    fetchUserRequests()
+      .then((rs) => setCounts((c) => ({ ...c, requests: rs.filter((r) => r.bucket === 'confirm' || r.bucket === 'replied').length })))
+      .catch(() => {});
+    fetchNotificationsFeed(USER_NOTIFICATIONS_VIEWER)
+      .then((f) => setCounts((c) => ({ ...c, unread: f.groups.reduce((n, g) => n + g.items.filter((i) => i.unread).length, 0) })))
+      .catch(() => {});
+  }, []);
+  const badgeFor = (to: string): string | undefined => {
+    const n = to === 'dashboard/requests' ? counts.requests : to === 'dashboard/notifications' ? counts.unread : undefined;
+    return n ? String(n) : undefined;
+  };
 
   return (
     <div className="dark flex h-screen bg-[#1F2937] text-fg">
@@ -115,7 +133,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
               const Icon = it.icon;
               return (
                 <NavLink key={it.to} to={target}>
-                  <NavItem icon={<Icon size={16} />} label={it.label} count={it.count} active={active} />
+                  <NavItem icon={<Icon size={16} />} label={it.label} count={it.count ?? badgeFor(it.to)} active={active} />
                 </NavLink>
               );
             })}
@@ -131,7 +149,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
             </NavLink>
           }
           trailing={
-            <button type="button" aria-label="Search" className="grid h-9 w-9 place-items-center rounded-lg text-fg-secondary hover:text-fg">
+            <button type="button" aria-label="Search" onClick={() => setSearchOpen(true)} className="grid h-9 w-9 place-items-center rounded-lg text-fg-secondary hover:text-fg">
               <Search size={17} />
             </button>
           }
@@ -155,6 +173,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
         </DomainBar>
         <main className="flex-1 overflow-y-auto px-8 py-6">{children}</main>
       </div>
+      <UserSearchDrawer open={searchOpen} onClose={() => setSearchOpen(false)} />
     </div>
   );
 }

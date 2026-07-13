@@ -44,27 +44,27 @@ Alle 16 Drawer existieren in Figma (Section `▣ DRAWERS`) und die `Drawer`-Komp
 
 | # | Auslöser | Ort | Ist | Soll → Drawer (Figma-Node) | Abhängigkeit |
 |---|---|---|---|---|---|
-| B1 | „Reply"-Action auf Request-Card | /requests | ⛔ | **Reply/Proposal-Drawer** (2649:2): Nachricht + optional Proposal (Preis/Timeline/Deliverables, Provider Flows §5) → POST provider/reply | Thread-/Proposal-Felder in API |
-| B2 | „Open"-Action auf Request-Card | /requests | ⛔ | Request-Detail (Thread) — Drawer, zeigt Dossier + Verlauf | GET engagement/:id |
+| B1 | „Reply"-Action auf Request-Card | /requests | 🟡 | Thread-Reply live (ThreadDrawer-Composer → POST /message); Proposal-Felder (Preis/Timeline/Deliverables) noch offen | Proposal-Felder in API |
+| B2 | „Open"-Action auf Request-Card | /requests | ✅ | ThreadDrawer (Verlauf + Composer) auf allen Card-Actions; Dossier-Ansicht im Drawer noch offen | — |
 | B3 | Glocke (Topbar) | Shell | ✅ | Bell-Popover: Live-Unread-Badge, letzte 7 Events (unread-Dots), Mark all read (C1-Watermark), Deep-Link auf Thread, View all → /notifications | — |
-| B4 | Topbar-Suche | Shell | ⛔ | **Search-Drawer** (2651:2) über Requests/Clients | GET requests?q= |
-| B5 | „Add market" | /coverage | ⛔ | **Add-Market-Drawer** (2651:50) → PATCH provider coverage | PATCH providers |
+| B4 | Topbar-Suche | Shell | ✅ | SearchDrawer filtert Live-Inbox (idLine/company/tag/meta/status), Treffer → ?thread-Deep-Link | — |
+| B5 | „Add market" | /coverage | ✅ | Add-Market-Drawer: GET/PATCH /provider/:key/coverage (countries_supported, 409 bei Duplikat), Pending-Chip „⏳ verification" | — |
 | B6 | „View ranking impact" | /coverage, /performance | ⛔ | **Ranking-Impact-Drawer** (2653:50), read-only | — |
 | B7 | Invoice-Row-Klick | /billing | ⛔ | **Invoice-Detail-Drawer** (2653:92) | invoices-Schema |
 | B8 | „Change email" | /settings | ⛔ | **Change-Email-Drawer** (2652:234) mit Verify-Schritt | Echte Auth |
-| B9 | Destruktive Aktionen | /settings | ⛔ | **Confirm-Drawer** (2651:90) | — |
-| B10 | „Help & support" | Sidebar | ⛔ | **Help-Drawer** (2652:2) | — |
+| B9 | Destruktive Aktionen | /settings | ✅ | ConfirmDrawer (wiederverwendbar, Keyword-Gate für harte Fälle) + Workspace-Danger-Zone (Pause requests / Delete) | — |
+| B10 | „Help & support" | Sidebar | ✅ | HelpDrawer (4 Topics + mailto Support) auf dem Sidebar-Item | — |
 
 ### User-Workspace
 
 | # | Auslöser | Ort | Ist | Soll → Drawer (Figma-Node) | Abhängigkeit |
 |---|---|---|---|---|---|
-| B11 | „Open thread" auf Request-Card | /requests, Home | ⛔ | **Request-Thread-Drawer** (2654:2): Verlauf + Antworten | GET engagement/:id + Thread |
-| B12 | Dokument-Upload-CTA | Workbench/Session | ⛔ | **Doc-Upload-Drawer** (2654:49) — **mit Consent-Checkbox → POST document/upload (API existiert komplett!)** | keine — API fertig ✔ |
-| B13 | Session-Row „⋯"-Menü | /sessions | ⛔ | **Session-Actions-Drawer** (2654:89): rename/duplicate/archive | sessions-Tabelle (A1) |
+| B11 | „Open thread" auf Request-Card | /requests, Home | ✅ | ThreadDrawer viewer="user" auf Live-Rows (fetchUserRequests, uuid) + ?thread-Deep-Link | — |
+| B12 | Dokument-Upload-CTA | Workbench/Session | ✅ | DocUploadDrawer: Datei/Paste + Consent-Checkbox → POST document/upload, Redaction-Report + AI-Gate-Tags | — |
+| B13 | Session-Row „⋯"-Menü | /sessions | ✅ | SessionActionsDrawer: rename (PATCH label)/duplicate/archive; /sessions jetzt live (guest_key) mit Fixture-Fallback | — |
 | B14 | Request-Card „⋯" | /requests | ✅ | Request-Actions-Drawer: Remind (frische Magic-Links + Reminder-Mail + sla_reminder_sent), Withdraw (Status 'withdrawn', Tokens verbrannt, 2-Stufen-Confirm), Open thread; Gating auf offene Status | — |
-| B15 | „Configure alerts" | Workbench, Notifications | ⛔ | **Configure-Alerts-Drawer** (Board 2073:164) | alert-prefs-Schema |
-| B16 | Topbar-/Sidebar-Suche | Shell | ⛔ | **Search-Drawer** (2654:176) | Such-Endpoint |
+| B15 | „Configure alerts" | Workbench, Notifications | ✅ | ConfigureAlertsDrawer: 6 Toggles, persistiert in alert_prefs (GET/PUT /alert-prefs, owner=guest_key) | — |
+| B16 | Topbar-/Sidebar-Suche | Shell | ✅ | UserSearchDrawer über Live-Requests + Sessions; Request-Treffer → ?thread-Deep-Link, Session-Treffer → /sessions | — |
 
 ## 3. WELLE C — Sekundäraktionen & Zustand
 
