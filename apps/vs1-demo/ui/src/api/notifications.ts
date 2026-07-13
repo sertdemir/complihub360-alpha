@@ -18,6 +18,7 @@ export interface FeedItem {
   time: string;
   desc: string;
   action?: string;
+  engagementId?: string; // raw uuid — deep-link into the request thread
   unread?: boolean;
   kind: 'request' | 'sla' | 'billing' | 'system' | 'review';
 }
@@ -79,6 +80,7 @@ export async function fetchNotificationsFeed(): Promise<NotificationsFeed> {
       unread: isUnread(row.created_at, lastSeen),
       kind: KIND[row.type] ?? 'system',
       action: row.payload?.engagementId ? `Open ${String(row.payload.engagementId).slice(0, 8)} →` : undefined,
+      engagementId: row.payload?.engagementId ? String(row.payload.engagementId) : undefined,
     };
     groups.set(day, [...(groups.get(day) ?? []), item]);
   }

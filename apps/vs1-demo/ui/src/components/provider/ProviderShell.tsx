@@ -6,6 +6,7 @@ import { Sidebar, SidebarGroup, NavItem } from '../ui/AppShell';
 import { LogoMark } from '../ui/Logo';
 import { PartnerStatusBadge, AvailabilityPill } from '../ui/ProviderBadges';
 import { SearchDrawer, HelpDrawer } from './ProviderDrawers';
+import { BellPopover } from './BellPopover';
 import { fetchProviderRequests } from '../../api/requests';
 import { fetchUnreadCount } from '../../api/notifications';
 import { cn } from '../../lib/utils';
@@ -114,6 +115,7 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
           <button type="button" aria-label="Search" onClick={() => setSearchOpen(true)} className="mr-1 text-fg-tertiary transition-colors hover:text-fg">
             <Search size={18} />
           </button>
+          <BellPopover unread={counts.unread} onAllRead={() => setCounts((c) => ({ ...c, unread: 0 }))} />
           <AvailabilityPill status="available" />
           <PartnerStatusBadge status="verified" label="Verified Partner" />
         </header>

@@ -46,7 +46,7 @@ Alle 16 Drawer existieren in Figma (Section `▣ DRAWERS`) und die `Drawer`-Komp
 |---|---|---|---|---|---|
 | B1 | „Reply"-Action auf Request-Card | /requests | ⛔ | **Reply/Proposal-Drawer** (2649:2): Nachricht + optional Proposal (Preis/Timeline/Deliverables, Provider Flows §5) → POST provider/reply | Thread-/Proposal-Felder in API |
 | B2 | „Open"-Action auf Request-Card | /requests | ⛔ | Request-Detail (Thread) — Drawer, zeigt Dossier + Verlauf | GET engagement/:id |
-| B3 | Glocke (Topbar) | Shell | ⛔ | **Bell-Popover** (2653:148): letzte Events + Mark read | C1 ✅ — entsperrt |
+| B3 | Glocke (Topbar) | Shell | ✅ | Bell-Popover: Live-Unread-Badge, letzte 7 Events (unread-Dots), Mark all read (C1-Watermark), Deep-Link auf Thread, View all → /notifications | — |
 | B4 | Topbar-Suche | Shell | ⛔ | **Search-Drawer** (2651:2) über Requests/Clients | GET requests?q= |
 | B5 | „Add market" | /coverage | ⛔ | **Add-Market-Drawer** (2651:50) → PATCH provider coverage | PATCH providers |
 | B6 | „View ranking impact" | /coverage, /performance | ⛔ | **Ranking-Impact-Drawer** (2653:50), read-only | — |
