@@ -1,35 +1,73 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Bookmark } from 'lucide-react';
 import { UserShell } from '../../components/user/UserShell';
 import { FilterChip } from '../../components/ui/Badge';
 import { Tag } from '../../components/ui/Tag';
 import { EntityCard } from '../../components/ui/Cards';
+import { useApiData } from '../../lib/useApiData';
+import { fetchNotificationsFeed, USER_NOTIFICATIONS_VIEWER, type FeedGroup, type FeedItem } from '../../api/notifications';
 
 // ─── User Dashboard · Notifications ───────────────────────────────────────────
 // Mirrors "User · Notifications (Desktop)" (2675:3): filter chips + day-grouped
-// feed rows (type tag + time + detail). Design fixture data.
+// feed rows (type tag + time + detail). Live event feed with its own C1
+// read-state; rows with an engagement deep-link (C12) open the request thread.
 
-const FILTERS = ['All · 212', 'Unread · 64', 'Requests · 76', 'SLA · 18', 'Billing · 26', 'System · 8'];
-
-const FEED = [
+const FIXTURE: FeedGroup[] = [
   { day: 'Today', items: [
-    { title: 'Provider replied · Studio Bianchi SRL', type: 'REQUEST', tone: 'brand' as const, time: '12 min', unread: true,
+    { title: 'Provider replied · Studio Bianchi SRL', event: 'REQUEST', kind: 'request', time: '12 min', unread: true,
       desc: 'Proposal received for VAT registration · Italy — €6,500 fixed' },
-    { title: 'SLA reminder · Lex Privacy LLP', type: 'SLA', tone: 'warning' as const, time: '4h',
+    { title: 'SLA reminder · Lex Privacy LLP', event: 'SLA', kind: 'sla', time: '4h',
       desc: 'No response in 96h — re-route to another partner available' },
-    { title: 'Risk threshold reached · Italy VAT', type: 'MONITORING', tone: 'error' as const, time: '6h',
+    { title: 'Risk threshold reached · Italy VAT', event: 'MONITORING', kind: 'system', time: '6h',
       desc: '€145k IT revenue crossed the €100k OSS threshold' },
   ]},
   { day: 'Yesterday', items: [
-    { title: 'Session refreshed · GDPR audit & DPA review', type: 'SYSTEM', tone: 'neutral' as const, time: '18:34',
+    { title: 'Session refreshed · GDPR audit & DPA review', event: 'SYSTEM', kind: 'system', time: '18:34',
       desc: 'New regulatory rules applied — review what changed' },
-    { title: 'Export ready · VAT-roadmap.pdf', type: 'EXPORT', tone: 'success' as const, time: '09:12',
+    { title: 'Export ready · VAT-roadmap.pdf', event: 'EXPORT', kind: 'review', time: '09:12',
       desc: 'Download link sent to your email · expires in 24h' },
   ]},
 ];
 
+const KIND_TONE: Record<FeedItem['kind'], 'brand' | 'success' | 'warning' | 'neutral' | 'error'> = {
+  request: 'brand',
+  sla: 'warning',
+  billing: 'neutral',
+  review: 'success',
+  system: 'neutral',
+};
+
+const KIND_CHIPS: { key: FeedItem['kind']; label: string }[] = [
+  { key: 'request', label: 'Requests' },
+  { key: 'sla', label: 'SLA' },
+  { key: 'billing', label: 'Billing' },
+  { key: 'review', label: 'Reviews' },
+  { key: 'system', label: 'System' },
+];
+
 export function UserNotificationsPage() {
-  const [filter, setFilter] = useState('All · 212');
+  const navigate = useNavigate();
+  const { i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage || 'en';
+  const [filter, setFilter] = useState<'all' | 'unread' | FeedItem['kind']>('all');
+  const { data } = useApiData(
+    () => fetchNotificationsFeed(USER_NOTIFICATIONS_VIEWER),
+    { groups: FIXTURE, lastSeen: null },
+  );
+
+  const flat = data.groups.flatMap((g) => g.items);
+  const matches = (i: FeedItem) =>
+    filter === 'all' ? true : filter === 'unread' ? !!i.unread : i.kind === filter;
+  const visible = data.groups
+    .map((g) => ({ ...g, items: g.items.filter(matches) }))
+    .filter((g) => g.items.length > 0);
+
+  const openItem = (i: FeedItem) => {
+    if (i.engagementId) navigate(`/${locale}/dashboard/requests?thread=${i.engagementId}`);
+  };
+
   return (
     <UserShell activeDomain="Tax & VAT">
       <div className="mx-auto max-w-[1140px] space-y-5">
@@ -46,23 +84,35 @@ export function UserNotificationsPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {FILTERS.map((f) => (
-            <FilterChip key={f} size="sm" selected={filter === f} onClick={() => setFilter(f)}>{f}</FilterChip>
+          <FilterChip size="sm" selected={filter === 'all'} onClick={() => setFilter('all')}>
+            All · {flat.length}
+          </FilterChip>
+          <FilterChip size="sm" selected={filter === 'unread'} onClick={() => setFilter('unread')}>
+            Unread · {flat.filter((i) => i.unread).length}
+          </FilterChip>
+          {KIND_CHIPS.filter((c) => flat.some((i) => i.kind === c.key)).map((c) => (
+            <FilterChip key={c.key} size="sm" selected={filter === c.key} onClick={() => setFilter(c.key)}>
+              {c.label} · {flat.filter((i) => i.kind === c.key).length}
+            </FilterChip>
           ))}
         </div>
 
-        {FEED.map((group) => (
+        {visible.length === 0 && (
+          <p className="text-[13px] text-fg-tertiary">Nothing here — try another filter.</p>
+        )}
+        {visible.map((group) => (
           <section key={group.day} className="space-y-2.5">
             <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{group.day}</p>
             {group.items.map((n) => (
               <EntityCard
-                key={n.title}
+                key={`${n.event}-${n.title}-${n.time}`}
                 name={n.title}
-                badge={<Tag tone={n.tone}>{n.type}</Tag>}
+                badge={<Tag tone={KIND_TONE[n.kind]}>{n.event}</Tag>}
                 meta={n.desc}
                 trailing={<span className="text-[11px] text-fg-tertiary">{n.time}</span>}
-                unread={'unread' in n ? (n as { unread?: boolean }).unread : undefined}
-                interactive
+                unread={n.unread}
+                interactive={!!n.engagementId}
+                onClick={n.engagementId ? () => openItem(n) : undefined}
                 avatar={<span className="grid h-9 w-9 place-items-center rounded-full bg-white/[0.06] text-[13px] text-fg-tertiary">🔔</span>}
               />
             ))}

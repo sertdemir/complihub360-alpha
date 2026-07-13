@@ -59,11 +59,12 @@ export interface NotificationsFeed {
 }
 
 export const NOTIFICATIONS_VIEWER = 'provider-notifications';
+export const USER_NOTIFICATIONS_VIEWER = 'user-notifications';
 
-export async function fetchNotificationsFeed(): Promise<NotificationsFeed> {
+export async function fetchNotificationsFeed(viewer: string = NOTIFICATIONS_VIEWER): Promise<NotificationsFeed> {
   const [{ notifications }, lastSeen] = await Promise.all([
     apiFetch<{ ok: boolean; notifications: EventRow[] }>('/api/v1/notifications'),
-    fetchLastSeen(NOTIFICATIONS_VIEWER),
+    fetchLastSeen(viewer),
   ]);
   if (!notifications.length) throw new Error('empty feed'); // keep the design fixture
   const groups = new Map<string, FeedItem[]>();

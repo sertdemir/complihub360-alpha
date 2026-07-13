@@ -81,7 +81,7 @@ Alle 16 Drawer existieren in Figma (Section `▣ DRAWERS`) und die `Drawer`-Komp
 | C9 | „Join early access" | Alerts/Calendar | ⛔ | Interest-Flag ins event_log | — |
 | C10 | Admin „Open watchlist"/„Escalate"/„View" | /admin | ⛔ | Scroll zur Watchlist / Reminder-Trigger / Drawer mit Engagement-Detail | Reminder-Endpoint |
 | C11 | Admin-Stubs (Providers/Security/Privacy/Alerts/Status) | /admin/* | 🟡 Stub | Verdrahten nach Figma-Vorlage (Seite „Admin") | security-Events, provider-GETs |
-| C12 | Notification-Action-Links („Open RQ-… →") | beide Feeds | ⛔ | Deep-Link auf Request-Thread (B2/B11) | B2/B11 |
+| C12 | Notification-Action-Links („Open RQ-… →") | beide Feeds | ✅ | Provider-Feed-Links + User-Feed-Karten navigieren zu ?thread=uuid (ThreadDrawer); User-Feed jetzt live mit eigenem Read-State (user-notifications) | — |
 
 ## 4. WELLE D — Polish
 

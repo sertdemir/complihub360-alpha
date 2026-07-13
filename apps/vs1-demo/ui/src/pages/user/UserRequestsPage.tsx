@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import { UserShell } from '../../components/user/UserShell';
 import { Button } from '../../components/ui/Button';
@@ -44,6 +45,10 @@ const FILTERS = [
 export function UserRequestsPage() {
   const [filter, setFilter] = useState<string>('all');
   const [threadFor, setThreadFor] = useState<string | null>(null);
+  // Deep-link support (user notifications feed, C12): ?thread=<uuid>
+  const [searchParams, setSearchParams] = useSearchParams();
+  const deepThread = searchParams.get('thread');
+  if (deepThread && threadFor !== deepThread) setThreadFor(deepThread);
   const { data: rows } = useApiData<Fixture[]>(fetchUserRequests, REQUESTS);
   const list = rows.filter((r) => filter === 'all' || r.bucket === filter);
 
@@ -95,7 +100,7 @@ export function UserRequestsPage() {
           ● Average partner response on your workspace: 22h · 87% confirm within SLA · last 30 days
         </p>
       </div>
-      <ThreadDrawer open={!!threadFor} engagementId={threadFor} viewer="user" onClose={() => setThreadFor(null)} />
+      <ThreadDrawer open={!!threadFor} engagementId={threadFor} viewer="user" onClose={() => { setThreadFor(null); if (deepThread) setSearchParams({}, { replace: true }); }} />
     </UserShell>
   );
 }

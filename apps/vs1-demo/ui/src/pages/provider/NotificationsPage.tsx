@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ProviderShell } from '../../components/provider/ProviderShell';
 import { Button } from '../../components/ui/Button';
 import { FilterChip } from '../../components/ui/Badge';
@@ -54,6 +56,9 @@ const KIND_CHIPS: { key: FeedItem['kind']; label: string }[] = [
 ];
 
 export function NotificationsPage() {
+  const navigate = useNavigate();
+  const { i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage || 'en';
   const [filter, setFilter] = useState<'all' | 'unread' | FeedItem['kind']>('all');
   // C1: once "Mark all read" ran, everything renders as read without a refetch.
   const [allSeen, setAllSeen] = useState(false);
@@ -130,7 +135,14 @@ export function NotificationsPage() {
                 </div>
                 <p className="mt-1.5 text-[12px] leading-relaxed text-fg-secondary">{n.desc}</p>
                 {n.action && (
-                  <a href="#" className="mt-2 inline-block text-[12px] font-medium text-fg-brand underline-offset-2 hover:underline">{n.action}</a>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const eng = 'engagementId' in n ? (n as FeedItem).engagementId : undefined;
+                      navigate(`/${locale}/partner-dashboard/requests${eng ? `?thread=${eng}` : ''}`);
+                    }}
+                    className="mt-2 inline-block text-[12px] font-medium text-fg-brand underline-offset-2 hover:underline"
+                  >{n.action}</button>
                 )}
               </Card>
             ))}
