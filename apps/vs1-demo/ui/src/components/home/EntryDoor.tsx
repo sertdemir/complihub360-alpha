@@ -59,7 +59,7 @@ export function EntryDoor() {
           <AnimatedWizard
             spacious
             interactive
-            onComplete={() => navigate(`/${locale}/results`)}
+            onComplete={(profile) => navigate(`/${locale}/results`, { state: { searchProfile: profile } })}
             className="!rounded-[20px]"
           />
 

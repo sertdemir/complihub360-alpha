@@ -23,6 +23,7 @@ import {
 import { X } from 'lucide-react';
 import { Logo } from '../ui/Logo';
 import { WizardDrawerLayer, COUNTRY_INFO } from './MarketsDrawer';
+import type { SearchProfile, WizardCategory, BusinessType } from '../wizard/WizardContext';
 
 // ─── AnimatedWizard — auto-playing hero key-visual ───────────────────────────
 // A fake cursor moves across the wizard, clicks option cards (they select), then
@@ -100,6 +101,45 @@ const STEPS: StepDef[] = [
 
 const FOOTER = '__footer';
 
+// A1 fix: completing the embedded wizard must hand a SearchProfile to the
+// results page — otherwise the session save (the whole funnel anchor) never
+// fires for the landing-page entry points.
+const MARKET_CODE: Record<string, string> = {
+  Germany: 'DE', 'United Kingdom': 'UK', Netherlands: 'NL', France: 'FR',
+  Italy: 'IT', Spain: 'ES', 'United States': 'US', 'Türkiye': 'TR',
+};
+const CATEGORY_CODE: Record<string, WizardCategory> = {
+  'VAT & Tax': 'tax-vat', 'EPR & Packaging': 'epr', 'GDPR & Privacy': 'data-privacy',
+  Marketing: 'marketing-seo', Corporate: 'corporate', 'Full Coverage': 'full-support',
+};
+const BUSINESS_CODE: Record<string, BusinessType> = {
+  'D2C e-commerce': 'ecommerce', 'B2B / wholesale': 'other', Marketplace: 'marketplace',
+  'SaaS / digital': 'saas', Hybrid: 'other', Other: 'other',
+};
+
+function buildProfile(selected: Set<string>, extraMarkets: string[]): SearchProfile {
+  const markets = [
+    ...STEPS[0].cards.filter((c) => c.id !== 'Others' && selected.has(c.id)).map((c) => MARKET_CODE[c.id] ?? c.id),
+    ...extraMarkets,
+  ];
+  const categories = STEPS[2].cards.filter((c) => selected.has(c.id)).map((c) => CATEGORY_CODE[c.id]).filter(Boolean);
+  const ops = STEPS[1].cards.find((c) => selected.has(c.id));
+  return {
+    country: markets[0] ?? '',
+    markets,
+    categories,
+    businessType: ops ? BUSINESS_CODE[ops.id] ?? 'other' : '',
+    businessTypeNote: ops?.id ?? '',
+    marketScope: markets.length > 1 ? 'eu' : markets.length ? 'local' : '',
+    riskSignals: [],
+    revenueBand: '',
+    intent: '',
+    urgency: '',
+    note: '',
+    existingProvider: false,
+  };
+}
+
 // Review summary row (Step 4 · Figma 1660:162) — label + value + Edit.
 function SummaryRow({ label, value, onEdit }: { label: string; value: string[]; onEdit: () => void }) {
   return (
@@ -173,7 +213,7 @@ export function AnimatedWizard({
   /** Full-width, natural-size layout with generous whitespace (Figma 1649:2). */
   spacious?: boolean;
   /** Called when the user advances past the last step (interactive mode). */
-  onComplete?: () => void;
+  onComplete?: (profile: SearchProfile) => void;
 }) {
   const reduced = useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -223,7 +263,7 @@ export function AnimatedWizard({
       setStepIndex(stepIndex + 1);
       setActive(null);
     } else {
-      onComplete?.();
+      onComplete?.(buildProfile(selected, extraMarkets));
     }
   };
   const goBack = () => {
