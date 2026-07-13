@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { saveWizardSession } from '../api/sessions';
+import { generateRiskMapPdf } from '../lib/riskMapPdf';
 import { useAuthStore } from '../store/useAuthStore';
 import { RequestQuoteModal, type QuoteProvider } from '../components/user/RequestQuoteModal';
-import { Lock, Check, Info, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Lock, Check, Info, ArrowRight, ShieldCheck, Download } from 'lucide-react';
 import { Logo } from '../components/ui/Logo';
 import { RiskBadge, type RiskLevel } from '../components/ui/RiskBadge';
 import { FreeAccountDrawer } from '../components/home/MarketsDrawer';
@@ -30,7 +31,7 @@ type Obligation = {
   state: State;
 };
 
-const OBLIGATIONS: Obligation[] = [
+export const OBLIGATIONS: Obligation[] = [
   {
     severity: 'critical',
     title: 'OSS quarterly return',
@@ -105,7 +106,7 @@ const OBLIGATIONS: Obligation[] = [
   },
 ];
 
-const STATS = [
+export const STATS = [
   { value: '8', label: 'obligations identified' },
   { value: '€25k', label: 'total exposure' },
   { value: '14 days', label: 'median deadline' },
@@ -161,6 +162,23 @@ export function ResultsRiskMap() {
   const { isLoggedIn, user } = useAuthStore();
   const [quoteFor, setQuoteFor] = useState<(QuoteProvider & { country: string; category: string }) | null>(null);
 
+  // A6 (User Flows §9): guest-allowed PDF snapshot — PII-free, with sources.
+  const exportPdf = () => {
+    generateRiskMapPdf({
+      profile,
+      stats: STATS,
+      obligations: OBLIGATIONS.map((o) => ({
+        severity: o.severity,
+        title: o.title,
+        detail: o.detail,
+        market: o.market,
+        due: o.due,
+        dueSub: o.dueSub,
+        stateLabel: o.state.kind === 'confirmed' ? 'Confirmed' : o.state.kind === 'likely' ? 'Likely' : `${o.state.count} questions open`,
+      })),
+    });
+  };
+
   // Wave A1: arriving from the wizard persists the session (the editable
   // dossier). Guest-anchored via guest_key; fire-and-forget — the page renders
   // regardless, and a failed save just means no resume anchor.
@@ -183,6 +201,13 @@ export function ResultsRiskMap() {
             <span className="hidden items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary sm:inline-flex">
               <Lock size={13} /> Guest map · expires in 30 min
             </span>
+            <button
+              type="button"
+              onClick={exportPdf}
+              className="inline-flex items-center gap-2 rounded-xl border border-stroke px-4 py-2.5 text-[14px] font-semibold text-fg transition-colors hover:border-fg-brand"
+            >
+              <Download size={15} /> Export PDF
+            </button>
             <button
               type="button"
               onClick={() => setSaveOpen(true)}

@@ -1,5 +1,7 @@
 import { Play, ArrowRight } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { generateRiskMapPdf } from '../../lib/riskMapPdf';
+import { OBLIGATIONS, STATS } from '../ResultsRiskMap';
 import { UserShell } from '../../components/user/UserShell';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Button } from '../../components/ui/Button';
@@ -56,6 +58,20 @@ export function UserHomePage() {
   const navigate = useNavigate();
   const { locale = 'en' } = useParams();
   const hasProfile = !!localStorage.getItem('ch360_last_profile');
+  // A6: same PII-free PDF snapshot as on /results, from the resume panel.
+  const exportPdf = () => {
+    let profile = null;
+    try { profile = JSON.parse(localStorage.getItem('ch360_last_profile') || 'null'); } catch { /* fixture */ }
+    generateRiskMapPdf({
+      profile,
+      stats: STATS,
+      obligations: OBLIGATIONS.map((o) => ({
+        severity: o.severity, title: o.title, detail: o.detail, market: o.market,
+        due: o.due, dueSub: o.dueSub,
+        stateLabel: o.state.kind === 'confirmed' ? 'Confirmed' : o.state.kind === 'likely' ? 'Likely' : `${o.state.count} questions open`,
+      })),
+    });
+  };
   const firstName = (useAuthStore((st) => st.userName) || 'Alex').split(/[\s._-]+/)[0];
   return (
     <UserShell activeDomain="Tax & VAT">
@@ -83,7 +99,7 @@ export function UserHomePage() {
           </div>
           <div className="flex shrink-0 items-center gap-4">
             <button type="button" onClick={() => navigate(`/${locale}/results`)} className="text-[12px] font-medium text-fg underline underline-offset-2">View results</button>
-            <a href="#" className="text-[12px] font-medium text-fg underline underline-offset-2">Export PDF</a>
+            <button type="button" onClick={exportPdf} className="text-[12px] font-medium text-fg underline underline-offset-2">Export PDF</button>
             <Button size="sm" variant="accent" onClick={() => navigate(hasProfile ? `/${locale}/results` : `/${locale}/wizard`)}>Resume <ArrowRight size={14} className="ml-1" /></Button>
           </div>
         </Card>

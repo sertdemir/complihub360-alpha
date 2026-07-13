@@ -33,7 +33,7 @@ Der im Spec definierte Kern-Funnel für Neukunden (User Flows §2–§8). Ohne i
 | A3 | Bestätigung „Track in dashboard" | Modal Step 3 | ⛔ | Registrierungs-CTA (User Flows §6.2/§8.1) → magic-link Auth, Account mit Session vorbefüllt (Wizard-Spec Z.59) | Echte Supabase-Auth |
 | A4 | Registrierungs-Prompts im Wizard (4 Stellen) | Wizard | ⛔ | Email-only magic-link, kein Passwort (Wizard-Spec) | Echte Supabase-Auth |
 | A5 | Secondary CTA (Affiliate) auf Non-Partner-Card | ResultsRiskMap | ⛔ | Neuer Tab + Affiliate-Tracking-Params, Event `secondary_clicked` (User Flows §7) | Tracking-Param-Schema |
-| A6 | „PDF Report exportieren" | ResultsRiskMap | ⛔ | Gast-erlaubter PDF-Export (User Flows §9) | PDF-Renderer |
+| A6 | „Export PDF" | Results-Topbar, User Home | ✅ | Client-seitiges Brand-PDF (jspdf, lib/riskMapPdf.ts): Risk-Map-Tabelle in Petrol-Skala, PII-Whitelist (nur Markets/Domains/Operations), kuratierte Quellenliste mit amtlichen Fundstellen, Disclaimer-Footer; Gast erlaubt (Spec §9) | — |
 | A7 | Identity-Befüllung im Dossier-Unlock | Backend | 🟡 `null` | `requester_identity` = Account-Email/Firma nach A3 | A3 |
 
 ## 2. WELLE B — Die Drawer-Welle (Dashboards bedienbar machen)
