@@ -75,7 +75,7 @@ Alle 16 Drawer existieren in Figma (Section `▣ DRAWERS`) und die `Drawer`-Komp
 | C3 | „Update payment method" | /billing | ⛔ | Stripe-Portal-Link (Spec: Stripe-issued) | Stripe-Account (User-Schritt) |
 | C4 | „Preview public profile" | /requests OOO-State | ⛔ | Route zur Public-Profile-Seite (C-4, einzige Full-Page-Ausnahme) | Seite bauen |
 | C5 | „Replace" (Avatar), Settings-Rows | /settings | ⛔ | Upload/Drawer je Zeile | Storage |
-| C6 | „Resume" / „Start new" / „Refine existing" | User Home, Workbench | ⛔ | Resume → letzte Session (A1); Start new/Refine → Wizard mit/ohne Vorbefüllung (User Flows §8.3) | A1 |
+| C6 | „Resume" / „Start new" / „Refine existing" | User Home, Workbench | ✅ | Resume → /results (ch360_last_profile); Start new → /wizard frisch; Refine → /wizard?refine=1 = vorbefüllt + Start im Review-Schritt (Edit springt mit erhaltener Auswahl zurück) | — |
 | C7 | „See full plan" / „See all" | Workbench | ⛔ | Expand inline bzw. Link auf Sessions/Provider-Liste | — |
 | C8 | Exports „Download" | /exports | ⛔ | Datei-Download (PDF-Flow §9) | A6/PDF-Renderer |
 | C9 | „Join early access" | Alerts/Calendar | ⛔ | Interest-Flag ins event_log | — |

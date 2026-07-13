@@ -74,12 +74,22 @@ import { AnimatedWizard } from "./components/home/AnimatedWizard";
 // category flows stay retired.
 function WizardRoutes() {
     const navigate = useNavigate();
+    const location = useLocation();
     const { i18n } = useTranslation();
     const locale = i18n.resolvedLanguage || 'en';
+    // C6 "Refine existing": ?refine=1 pre-fills from the last saved profile and
+    // opens on the Review step (edit from there). Fresh run otherwise.
+    const refine = new URLSearchParams(location.search).get('refine') === '1';
+    const initialProfile = (() => {
+        if (!refine) return undefined;
+        try { return JSON.parse(localStorage.getItem('ch360_last_profile') || 'null') ?? undefined; }
+        catch { return undefined; }
+    })();
     return (
         <AnimatedWizard
             spacious
             interactive
+            initialProfile={initialProfile}
             onComplete={(profile) => navigate(`/${locale}/results`, { state: { searchProfile: profile } })}
             className="min-h-screen !rounded-none !border-0"
         />

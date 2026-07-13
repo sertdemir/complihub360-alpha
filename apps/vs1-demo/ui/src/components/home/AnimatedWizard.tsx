@@ -117,6 +117,26 @@ const BUSINESS_CODE: Record<string, BusinessType> = {
   'SaaS / digital': 'saas', Hybrid: 'other', Other: 'other',
 };
 
+// C6 "Refine existing": a stored profile pre-selects the cards. Reverse of the
+// maps above — businessTypeNote carries the original card id when available.
+function selectionFromProfile(p: SearchProfile): { selected: Set<string>; extraMarkets: string[] } {
+  const sel = new Set<string>();
+  const codeToCard = Object.fromEntries(Object.entries(MARKET_CODE).map(([k, v]) => [v, k]));
+  const extra: string[] = [];
+  for (const m of p.markets ?? []) {
+    if (codeToCard[m]) sel.add(codeToCard[m]);
+    else { sel.add('Others'); extra.push(m); }
+  }
+  const catToCard = Object.fromEntries(Object.entries(CATEGORY_CODE).map(([k, v]) => [v, k]));
+  for (const c of p.categories ?? []) if (catToCard[c]) sel.add(catToCard[c]);
+  if (p.businessTypeNote && STEPS[1].cards.some((c) => c.id === p.businessTypeNote)) sel.add(p.businessTypeNote);
+  else {
+    const btToCard = Object.fromEntries(Object.entries(BUSINESS_CODE).map(([k, v]) => [v, k]));
+    if (p.businessType && btToCard[p.businessType]) sel.add(btToCard[p.businessType]);
+  }
+  return { selected: sel, extraMarkets: extra };
+}
+
 function buildProfile(selected: Set<string>, extraMarkets: string[]): SearchProfile {
   const markets = [
     ...STEPS[0].cards.filter((c) => c.id !== 'Others' && selected.has(c.id)).map((c) => MARKET_CODE[c.id] ?? c.id),
@@ -204,6 +224,7 @@ export function AnimatedWizard({
   showHeader = true,
   spacious = false,
   onComplete,
+  initialProfile,
 }: {
   className?: string;
   /** User-driven: click cards to select, Back/Next to move; no auto-play, no cursor. */
@@ -214,6 +235,8 @@ export function AnimatedWizard({
   spacious?: boolean;
   /** Called when the user advances past the last step (interactive mode). */
   onComplete?: (profile: SearchProfile) => void;
+  /** C6 "Refine existing": pre-selects the cards and opens on the Review step. */
+  initialProfile?: SearchProfile;
 }) {
   const reduced = useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -226,15 +249,16 @@ export function AnimatedWizard({
     [],
   );
 
-  const [stepIndex, setStepIndex] = useState(reduced && !interactive ? 2 : 0);
+  const prefill = initialProfile && interactive ? selectionFromProfile(initialProfile) : null;
+  const [stepIndex, setStepIndex] = useState(prefill ? STEPS.length : reduced && !interactive ? 2 : 0);
   const [selected, setSelected] = useState<Set<string>>(
-    () => new Set(reduced && !interactive ? ['VAT & Tax', 'EPR & Packaging', 'GDPR & Privacy'] : []),
+    () => prefill?.selected ?? new Set(reduced && !interactive ? ['VAT & Tax', 'EPR & Packaging', 'GDPR & Privacy'] : []),
   );
   const [active, setActive] = useState<string | null>(null);
   const [cursor, setCursor] = useState({ x: 120, y: 60 });
   const [pulse, setPulse] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [extraMarkets, setExtraMarkets] = useState<string[]>([]);
+  const [extraMarkets, setExtraMarkets] = useState<string[]>(() => prefill?.extraMarkets ?? []);
   const [infoCountry, setInfoCountry] = useState<string | null>(null);
   const [saveOpen, setSaveOpen] = useState(false);
 

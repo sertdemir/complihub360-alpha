@@ -1,4 +1,5 @@
 import { Play, ArrowRight } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { UserShell } from '../../components/user/UserShell';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Button } from '../../components/ui/Button';
@@ -51,6 +52,10 @@ function SectionHeader({ title, count }: { title: string; count: string }) {
 }
 
 export function UserHomePage() {
+  // C6: Resume -> results with the stored profile · Start new -> fresh wizard.
+  const navigate = useNavigate();
+  const { locale = 'en' } = useParams();
+  const hasProfile = !!localStorage.getItem('ch360_last_profile');
   const firstName = (useAuthStore((st) => st.userName) || 'Alex').split(/[\s._-]+/)[0];
   return (
     <UserShell activeDomain="Tax & VAT">
@@ -64,7 +69,7 @@ export function UserHomePage() {
               3 active requests · 2 sessions need a refresh · last activity 2h ago
             </p>
           </div>
-          <Button className="mt-1 shrink-0">Start new search</Button>
+          <Button className="mt-1 shrink-0" onClick={() => navigate(`/${locale}/wizard`)}>Start new search</Button>
         </div>
 
         <Card styleVariant="filled" className="flex items-center gap-4 border border-[#d4af37]/25 p-5">
@@ -77,9 +82,9 @@ export function UserHomePage() {
             <p className="mt-0.5 text-[12px] text-fg-tertiary">Wizard step 4 of 5 · last edit 2h ago · Tax & VAT · DE → IT</p>
           </div>
           <div className="flex shrink-0 items-center gap-4">
-            <a href="#" className="text-[12px] font-medium text-fg underline underline-offset-2">View results</a>
+            <button type="button" onClick={() => navigate(`/${locale}/results`)} className="text-[12px] font-medium text-fg underline underline-offset-2">View results</button>
             <a href="#" className="text-[12px] font-medium text-fg underline underline-offset-2">Export PDF</a>
-            <Button size="sm" variant="accent">Resume <ArrowRight size={14} className="ml-1" /></Button>
+            <Button size="sm" variant="accent" onClick={() => navigate(hasProfile ? `/${locale}/results` : `/${locale}/wizard`)}>Resume <ArrowRight size={14} className="ml-1" /></Button>
           </div>
         </Card>
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { UserShell } from '../../components/user/UserShell';
 import { RequestQuoteModal, type QuoteProvider } from '../../components/user/RequestQuoteModal';
 import { DocUploadDrawer } from '../../components/user/DocUploadDrawer';
@@ -91,7 +91,8 @@ const PROVIDERS = [
 ];
 
 export function WorkbenchPage() {
-  const { domain } = useParams();
+  const { domain, locale = 'en' } = useParams();
+  const navigate = useNavigate();
   const key = (domain && domain in DOMAIN_META ? domain : 'tax-vat') as DomainKey;
   const meta = DOMAIN_META[key];
   const steps = meta.steps.length ? meta.steps : STEPS;
@@ -114,9 +115,9 @@ export function WorkbenchPage() {
             </div>
           </div>
           <div className="mt-1 flex shrink-0 items-center gap-4">
-            <a href="#" className="text-[12px] font-medium text-fg underline underline-offset-2">Refine existing</a>
+            <button type="button" onClick={() => navigate(`/${locale}/wizard?refine=1`)} className="text-[12px] font-medium text-fg underline underline-offset-2">Refine existing</button>
             <Button size="sm" variant="secondary" onClick={() => setUploadOpen(true)}>Upload document</Button>
-            <Button size="sm">Start new</Button>
+            <Button size="sm" onClick={() => navigate(`/${locale}/wizard`)}>Start new</Button>
           </div>
         </div>
 
