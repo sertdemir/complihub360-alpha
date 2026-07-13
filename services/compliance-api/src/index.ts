@@ -755,13 +755,32 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'author (user|provider) and body required', correlationId }));
                     return;
                 }
+                // B1 (Provider Flows §5): optional structured proposal on a reply.
+                let proposal: Record<string, unknown> | null = null;
+                if (d.proposal && typeof d.proposal === 'object') {
+                    const p = d.proposal as Record<string, unknown>;
+                    proposal = {
+                        ...(typeof p.price_range === 'string' && p.price_range ? { price_range: p.price_range.slice(0, 120) } : {}),
+                        ...(typeof p.timeline === 'string' && p.timeline ? { timeline: p.timeline.slice(0, 120) } : {}),
+                        ...(Array.isArray(p.deliverables) ? { deliverables: p.deliverables.filter((x: unknown) => typeof x === 'string').slice(0, 10).map((x: string) => x.slice(0, 160)) } : {}),
+                        ...(typeof p.engagement_model === 'string' && p.engagement_model ? { engagement_model: p.engagement_model.slice(0, 60) } : {}),
+                    };
+                    if (!Object.keys(proposal).length) proposal = null;
+                }
                 const inserted = (await supabaseApi.insert('engagement_messages', {
                     engagement_id: engagementId, author: d.author, body: d.body,
+                    ...(proposal ? { proposal } : {}),
                 })) as Array<{ id: string; created_at: string }>;
                 await supabaseApi.insert('event_log', {
                     type: 'engagement_message_posted',
                     payload: { engagementId, author: d.author },
                 });
+                if (proposal) {
+                    await supabaseApi.insert('event_log', {
+                        type: 'proposal_submitted',
+                        payload: { engagementId, fields: Object.keys(proposal) },
+                    });
+                }
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(201, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, id: inserted?.[0]?.id, created_at: inserted?.[0]?.created_at }));

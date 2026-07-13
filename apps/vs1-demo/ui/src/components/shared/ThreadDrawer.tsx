@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
+import { FileText, X } from 'lucide-react';
 import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
 import { Tag } from '../ui/Tag';
-import { fetchEngagementDetail, postThreadMessage, type EngagementDetail } from '../../api/thread';
+import { fetchEngagementDetail, postThreadMessage, type EngagementDetail, type Proposal } from '../../api/thread';
 
 // ─── Thread drawer (Figma: Request-thread 2654:2 / Reply 2649:2) ─────────────
 // The shared engagement history, opened from BOTH workspaces. `viewer` decides
-// which side the composer posts as and how bubbles align.
+// which side the composer posts as and how bubbles align. B1: the provider can
+// attach a structured proposal (Provider Flows §5), rendered as a card for
+// both sides.
 
 interface ThreadDrawerProps {
   open: boolean;
@@ -23,7 +26,10 @@ const STATUS_TONE: Record<string, 'brand' | 'success' | 'warning' | 'neutral' | 
   replied: 'success',
   declined: 'error',
   expired: 'neutral',
+  withdrawn: 'neutral',
 };
+
+const MODELS = ['Fixed fee', 'Retainer', 'Hourly'];
 
 function relTime(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
@@ -34,26 +40,75 @@ function relTime(iso: string): string {
   return `${Math.floor(h / 24)}d ago`;
 }
 
+function ProposalCard({ p }: { p: Proposal }) {
+  return (
+    <div className="mt-2 rounded-lg border border-[#d4af37]/35 bg-[#d4af37]/[0.07] px-3 py-2.5">
+      <p className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#d4af37]">
+        <FileText size={11} /> Proposal
+      </p>
+      <div className="space-y-1 text-[12px] leading-relaxed">
+        {p.price_range && (
+          <p><span className="text-fg-tertiary">Price: </span><span className="font-semibold text-fg">{p.price_range}</span></p>
+        )}
+        {p.timeline && (
+          <p><span className="text-fg-tertiary">Timeline: </span><span className="text-fg-secondary">{p.timeline}</span></p>
+        )}
+        {p.engagement_model && (
+          <p><span className="text-fg-tertiary">Model: </span><span className="text-fg-secondary">{p.engagement_model}</span></p>
+        )}
+        {!!p.deliverables?.length && (
+          <div>
+            <p className="text-fg-tertiary">Deliverables:</p>
+            <ul className="mt-0.5 space-y-0.5">
+              {p.deliverables.map((d) => (
+                <li key={d} className="flex gap-1.5 text-fg-secondary"><span className="text-[#d4af37]">·</span>{d}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function ThreadDrawer({ open, engagementId, viewer, onClose }: ThreadDrawerProps) {
   const [detail, setDetail] = useState<EngagementDetail | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
+  // B1: proposal composer (provider only)
+  const [proposalOpen, setProposalOpen] = useState(false);
+  const [price, setPrice] = useState('');
+  const [timeline, setTimeline] = useState('');
+  const [model, setModel] = useState('');
+  const [deliverables, setDeliverables] = useState('');
 
   useEffect(() => {
     if (!open || !engagementId) return;
     setDetail(null); setLoadFailed(false);
+    setProposalOpen(false); setPrice(''); setTimeline(''); setModel(''); setDeliverables('');
     fetchEngagementDetail(engagementId)
       .then(setDetail)
       .catch(() => setLoadFailed(true));
   }, [open, engagementId]);
 
+  const buildProposal = (): Proposal | undefined => {
+    if (!proposalOpen) return undefined;
+    const p: Proposal = {
+      ...(price.trim() ? { price_range: price.trim() } : {}),
+      ...(timeline.trim() ? { timeline: timeline.trim() } : {}),
+      ...(model ? { engagement_model: model } : {}),
+      ...(deliverables.trim() ? { deliverables: deliverables.split('\n').map((d) => d.trim()).filter(Boolean).slice(0, 10) } : {}),
+    };
+    return Object.keys(p).length ? p : undefined;
+  };
+
   const send = async () => {
     if (!engagementId || draft.trim().length < 2) return;
     setSending(true);
     try {
-      await postThreadMessage(engagementId, viewer, draft.trim());
-      setDraft('');
+      await postThreadMessage(engagementId, viewer, draft.trim(), buildProposal());
+      setDraft(''); setProposalOpen(false); setPrice(''); setTimeline(''); setModel(''); setDeliverables('');
       setDetail(await fetchEngagementDetail(engagementId));
     } catch { /* keep draft for retry */ }
     setSending(false);
@@ -78,17 +133,54 @@ export function ThreadDrawer({ open, engagementId, viewer, onClose }: ThreadDraw
         </div>
       )}
       footer={
-        <div className="flex w-full items-end gap-2">
-          <textarea
-            rows={2}
-            value={draft}
-            onChange={(ev) => setDraft(ev.target.value)}
-            placeholder={`Reply to ${counterpart.toLowerCase()}…`}
-            className="flex-1 resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[13px] text-fg placeholder:text-fg-tertiary focus:border-fg-brand focus:outline-none"
-          />
-          <Button variant="accent" size="sm" onClick={send} disabled={sending || draft.trim().length < 2}>
-            {sending ? '…' : 'Send'}
-          </Button>
+        <div className="w-full space-y-2">
+          {viewer === 'provider' && proposalOpen && (
+            <div className="rounded-lg border border-[#d4af37]/30 bg-[#d4af37]/[0.05] p-3">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#d4af37]">
+                  <FileText size={11} /> Attach proposal
+                </p>
+                <button type="button" aria-label="Remove proposal" onClick={() => setProposalOpen(false)} className="text-fg-tertiary hover:text-fg">
+                  <X size={13} />
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <input value={price} onChange={(ev) => setPrice(ev.target.value)} placeholder="Price range · e.g. €4,500–6,000"
+                  className="rounded-md border border-white/10 bg-white/5 px-2.5 py-1.5 text-[12px] text-fg outline-none placeholder:text-fg-tertiary focus:border-[#d4af37]/60" />
+                <input value={timeline} onChange={(ev) => setTimeline(ev.target.value)} placeholder="Timeline · e.g. 4–6 weeks"
+                  className="rounded-md border border-white/10 bg-white/5 px-2.5 py-1.5 text-[12px] text-fg outline-none placeholder:text-fg-tertiary focus:border-[#d4af37]/60" />
+              </div>
+              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                {MODELS.map((m) => (
+                  <button key={m} type="button" onClick={() => setModel(model === m ? '' : m)}
+                    className={
+                      'rounded-full border px-2.5 py-1 text-[11px] transition-colors ' +
+                      (model === m ? 'border-[#d4af37]/60 bg-[#d4af37]/15 text-fg' : 'border-white/10 text-fg-tertiary hover:text-fg')
+                    }>
+                    {m}
+                  </button>
+                ))}
+              </div>
+              <textarea rows={2} value={deliverables} onChange={(ev) => setDeliverables(ev.target.value)}
+                placeholder={'Deliverables — one per line\ne.g. VAT registration IT\nOSS filing setup'}
+                className="mt-2 w-full resize-none rounded-md border border-white/10 bg-white/5 px-2.5 py-1.5 text-[12px] text-fg outline-none placeholder:text-fg-tertiary focus:border-[#d4af37]/60" />
+            </div>
+          )}
+          <div className="flex w-full items-end gap-2">
+            <textarea
+              rows={2}
+              value={draft}
+              onChange={(ev) => setDraft(ev.target.value)}
+              placeholder={`Reply to ${counterpart.toLowerCase()}…`}
+              className="flex-1 resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[13px] text-fg placeholder:text-fg-tertiary focus:border-fg-brand focus:outline-none"
+            />
+            {viewer === 'provider' && !proposalOpen && (
+              <Button variant="ghost" size="sm" onClick={() => setProposalOpen(true)}>+ Proposal</Button>
+            )}
+            <Button variant="accent" size="sm" onClick={send} disabled={sending || draft.trim().length < 2}>
+              {sending ? '…' : 'Send'}
+            </Button>
+          </div>
         </div>
       }
     >
@@ -119,6 +211,7 @@ export function ThreadDrawer({ open, engagementId, viewer, onClose }: ThreadDraw
                     {m.author === viewer ? 'You' : m.author} · {relTime(m.created_at)}
                   </p>
                   {m.body}
+                  {m.proposal && <ProposalCard p={m.proposal} />}
                 </div>
               </div>
             );

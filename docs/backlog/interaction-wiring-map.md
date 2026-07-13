@@ -44,7 +44,7 @@ Alle 16 Drawer existieren in Figma (Section `▣ DRAWERS`) und die `Drawer`-Komp
 
 | # | Auslöser | Ort | Ist | Soll → Drawer (Figma-Node) | Abhängigkeit |
 |---|---|---|---|---|---|
-| B1 | „Reply"-Action auf Request-Card | /requests | 🟡 | Thread-Reply live (ThreadDrawer-Composer → POST /message); Proposal-Felder (Preis/Timeline/Deliverables) noch offen | Proposal-Felder in API |
+| B1 | „Reply"-Action auf Request-Card | /requests | ✅ | ThreadDrawer-Composer + „+ Proposal" (Provider): price_range/timeline/deliverables/engagement_model auf engagement_messages.proposal, Event proposal_submitted, Gold-Card beidseitig | Attachment via Datei-Kanal später |
 | B2 | „Open"-Action auf Request-Card | /requests | ✅ | ThreadDrawer (Verlauf + Composer) auf allen Card-Actions; Dossier-Ansicht im Drawer noch offen | — |
 | B3 | Glocke (Topbar) | Shell | ✅ | Bell-Popover: Live-Unread-Badge, letzte 7 Events (unread-Dots), Mark all read (C1-Watermark), Deep-Link auf Thread, View all → /notifications | — |
 | B4 | Topbar-Suche | Shell | ✅ | SearchDrawer filtert Live-Inbox (idLine/company/tag/meta/status), Treffer → ?thread-Deep-Link | — |

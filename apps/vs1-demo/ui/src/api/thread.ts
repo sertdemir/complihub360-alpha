@@ -4,10 +4,18 @@ import { apiFetch } from './client';
 // One shared history per engagement: the requester's opening message, dashboard
 // replies from either side, and magic-link replies all land in the same thread.
 
+export interface Proposal {
+  price_range?: string;
+  timeline?: string;
+  deliverables?: string[];
+  engagement_model?: string;
+}
+
 export interface ThreadMessage {
   id: string;
   author: 'user' | 'provider' | 'system';
   body: string;
+  proposal?: Proposal | null;
   created_at: string;
 }
 
@@ -31,10 +39,10 @@ export async function fetchEngagementDetail(id: string): Promise<EngagementDetai
   return { engagement: res.engagement, messages: res.messages };
 }
 
-export async function postThreadMessage(id: string, author: 'user' | 'provider', body: string): Promise<void> {
+export async function postThreadMessage(id: string, author: 'user' | 'provider', body: string, proposal?: Proposal): Promise<void> {
   await apiFetch(`/api/v1/engagement/${id}/message`, {
     method: 'POST',
-    body: JSON.stringify({ author, body }),
+    body: JSON.stringify({ author, body, ...(proposal ? { proposal } : {}) }),
   });
 }
 
