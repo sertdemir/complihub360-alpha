@@ -1264,5 +1264,17 @@
     "featIntentDesc": "Transforma la entrada no estructurada del cliente en un perfil de riesgo estructurado. La IA está restringida y no puede tomar decisiones legales vinculantes por sí sola.",
     "featGateTitle": "Validador Triple de Puertas de IA",
     "featGateDesc": "Cada acción de IA debe pasar tres controles: Sanitización de datos, Consentimiento explícito y Restricción de dominio. Si falla algún control, el flujo de trabajo recurre elegantemente a un proceso determinista sin IA."
+  },
+  "header": {
+    "nav": {
+      "howItWorks": "Cómo funciona",
+      "whatWeKnow": "Qué cubrimos",
+      "voices": "Opiniones",
+      "pricing": "Precios",
+      "howMatchingWorks": "Cómo funciona el matching",
+      "dashboard": "Dashboard",
+      "performance": "Rendimiento",
+      "faq": "FAQ"
+    }
   }
 }

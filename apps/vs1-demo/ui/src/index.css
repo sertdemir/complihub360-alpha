@@ -298,3 +298,12 @@
     max-width: 75ch;
   }
 }
+
+/* Anchor targets clear the fixed 80px marketing header; smooth section jumps. */
+html {
+  scroll-behavior: smooth;
+}
+section[id],
+footer[id] {
+  scroll-margin-top: 96px;
+}

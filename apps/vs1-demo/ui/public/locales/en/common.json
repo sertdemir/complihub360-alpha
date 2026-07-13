@@ -1264,5 +1264,17 @@
     "featIntentDesc": "Transforms unstructured client input into a structured risk profile. The AI is restricted to analyzing compliance context and cannot make binding legal decisions on its own.",
     "featGateTitle": "Triple AI Gate Validator",
     "featGateDesc": "Every AI action must pass three checks: Data Sanitization, Explicit Consent, and Domain Restriction. If any check fails, the workflow gracefully falls back to a deterministic, non-AI process."
+  },
+  "header": {
+    "nav": {
+      "howItWorks": "How it works",
+      "whatWeKnow": "What we know",
+      "voices": "Voices",
+      "pricing": "Pricing",
+      "howMatchingWorks": "How matching works",
+      "dashboard": "Dashboard",
+      "performance": "Performance",
+      "faq": "FAQ"
+    }
   }
 }

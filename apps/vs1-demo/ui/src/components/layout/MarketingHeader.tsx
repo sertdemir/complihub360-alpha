@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Globe, Menu, X } from 'lucide-react';
 import { Logo } from '../ui/Logo';
@@ -12,7 +13,7 @@ import { ThemeToggle } from '../ui/ThemeToggle';
 // Desktop / Header Marketing (Provider) Mobile.
 
 export type Audience = 'entrepreneur' | 'provider';
-export interface Anchor { id: string; label: string }
+export interface Anchor { id: string; label: string; labelKey?: string }
 export interface CrossLink { label: string; href: string }
 
 export interface MarketingHeaderProps {
@@ -33,24 +34,27 @@ export interface MarketingHeaderProps {
   embedded?: boolean;
 }
 
+// Anchor ids point at REAL section ids on the respective landing page
+// (user LP: pricing lives in the HowItActs cost section #engagement, voices in
+// the Brand-Code section; provider LP: pricing = the two-channels section).
 const PRESETS: Record<Audience, { anchors: Anchor[]; cta: string; cross: CrossLink }> = {
   entrepreneur: {
     anchors: [
-      { id: 'how-it-works', label: 'How it works' },
-      { id: 'what-we-know', label: 'What we know' },
-      { id: 'voices', label: 'Voices' },
-      { id: 'pricing', label: 'Pricing' },
+      { id: 'how-it-works', label: 'How it works', labelKey: 'header.nav.howItWorks' },
+      { id: 'what-we-know', label: 'What we know', labelKey: 'header.nav.whatWeKnow' },
+      { id: 'brand-code', label: 'Voices', labelKey: 'header.nav.voices' },
+      { id: 'engagement', label: 'Pricing', labelKey: 'header.nav.pricing' },
     ],
     cta: 'Start your assessment',
     cross: { label: 'For Providers', href: '/providers' },
   },
   provider: {
     anchors: [
-      { id: 'matchmaking', label: 'How matching works' },
-      { id: 'dashboard', label: 'Dashboard' },
-      { id: 'performance', label: 'Performance' },
-      { id: 'pricing', label: 'Pricing' },
-      { id: 'faq', label: 'FAQ' },
+      { id: 'matchmaking', label: 'How matching works', labelKey: 'header.nav.howMatchingWorks' },
+      { id: 'dashboard', label: 'Dashboard', labelKey: 'header.nav.dashboard' },
+      { id: 'performance', label: 'Performance', labelKey: 'header.nav.performance' },
+      { id: 'channels', label: 'Pricing', labelKey: 'header.nav.pricing' },
+      { id: 'faq', label: 'FAQ', labelKey: 'header.nav.faq' },
     ],
     cta: 'Apply for beta',
     cross: { label: 'For Entrepreneurs', href: '/' },
@@ -212,6 +216,7 @@ export function MarketingHeader({
   theme = 'light',
   embedded = false,
 }: MarketingHeaderProps) {
+  const { t } = useTranslation('common');
   const preset = PRESETS[audience];
   const items = anchors ?? preset.anchors;
   const inverse = theme === 'inverse';
@@ -236,13 +241,13 @@ export function MarketingHeader({
   return (
     <header className={`${embedded ? 'relative' : 'fixed inset-x-0 top-0'} z-50 border-b ${inverse ? 'border-stroke-brand' : 'border-stroke-subtle'} transition-all ${barTone}`}>
       {/* ── Desktop ── */}
-      <div className="mx-auto hidden h-20 max-w-container-2xl items-center justify-between gap-4 px-4 lg:flex">
-        <div className="flex items-center gap-5">
+      <div className="mx-auto hidden h-20 max-w-container-2xl items-center gap-4 px-4 lg:flex">
+        <div className="flex flex-1 basis-0 items-center gap-5">
           <Logo tone={inverse ? 'on-petrol' : 'on-light'} />
           <AudienceSwitch audience={audience} userHref={userHref} providerHref={providerHref} inverse={inverse} />
         </div>
-        <div className="flex items-center gap-5">
-          <nav className="flex items-center gap-3">
+        {/* Anchor group sits truly centered between the two flex-1 side zones. */}
+        <nav className="flex items-center justify-center gap-3">
             {items.map((it) => (
               <a
                 key={it.id}
@@ -255,11 +260,11 @@ export function MarketingHeader({
                       : 'text-fg-secondary hover:text-fg'
                 }`}
               >
-                {it.label}
+                {it.labelKey ? t(it.labelKey, { defaultValue: it.label }) : it.label}
               </a>
             ))}
-          </nav>
-          <span className={`h-6 w-px ${inverse ? 'bg-white/20' : 'bg-stroke-subtle'}`} />
+        </nav>
+        <div className="flex flex-1 basis-0 items-center justify-end gap-5">
           <ThemeToggle inverse={inverse} size={36} />
           <LanguageMenu buttonClass={`grid h-9 w-9 place-items-center rounded-md ${inverse ? 'text-fg-inverse' : 'text-fg-secondary'}`} />
           <a
@@ -321,7 +326,7 @@ export function MarketingHeader({
                       active === a.id ? 'bg-brand text-fg-on-brand' : 'bg-surface-secondary text-fg'
                     }`}
                   >
-                    {a.label}
+                    {a.labelKey ? t(a.labelKey, { defaultValue: a.label }) : a.label}
                   </a>
                 ))}
               </div>

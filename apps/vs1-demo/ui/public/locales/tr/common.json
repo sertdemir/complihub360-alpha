@@ -1264,5 +1264,17 @@
     "featIntentDesc": "Yapılandırılmamış müşteri girdisini yapılandırılmış bir risk profiline dönüştürür. Yapay zeka yalnızca uyumluluk bağlamını analiz etmekle sınırlıdır ve yasal olarak bağlayıcı kararlar alamaz.",
     "featGateTitle": "Üçlü Yapay Zeka Kapısı Doğrulayıcı",
     "featGateDesc": "Her yapay zeka eylemi üç kontrolden geçmelidir: Veri Temizliği, Açık Rıza ve Etki Alanı Kısıtlaması. Herhangi bir kontrol başarısız olursa, iş akışı yapay zeka olmayan deterministik bir sürece geri döner."
+  },
+  "header": {
+    "nav": {
+      "howItWorks": "Nasıl çalışır",
+      "whatWeKnow": "Neleri kapsıyoruz",
+      "voices": "Görüşler",
+      "pricing": "Fiyatlandırma",
+      "howMatchingWorks": "Eşleştirme nasıl çalışır",
+      "dashboard": "Dashboard",
+      "performance": "Performans",
+      "faq": "SSS"
+    }
   }
 }
