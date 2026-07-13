@@ -585,6 +585,19 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Coverage update failed', correlationId }));
             }
         });
+    } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/invoices$/.test(req.url || '')) {
+        // B7: invoice history incl. line items (Stripe-issued once C3 lands).
+        const providerKey = (req.url || '').split('/')[4];
+        try {
+            const invoices = await supabaseApi.select('invoices', { provider_key: providerKey }, { order: 'period.desc', limit: 24 });
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ok: true, invoices }));
+        } catch (err) {
+            structuredLog('error', 'Invoices fetch failed', { correlationId, errorCode: 'ERR_INVOICES', severity: 'error', route: req.url });
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Invoices fetch failed', correlationId }));
+        }
     } else if (req.method === 'PATCH' && /^\/api\/v1\/provider\/[a-z0-9-]+\/availability$/.test(req.url || '')) {
         // C2: availability toggle. 'ooo' re-routes new requests + freezes rank.
         const providerKey = (req.url || '').split('/')[4];
