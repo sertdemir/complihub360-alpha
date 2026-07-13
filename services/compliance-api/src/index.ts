@@ -585,6 +585,42 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Coverage update failed', correlationId }));
             }
         });
+    } else if (req.method === 'PATCH' && /^\/api\/v1\/provider\/[a-z0-9-]+\/availability$/.test(req.url || '')) {
+        // C2: availability toggle. 'ooo' re-routes new requests + freezes rank.
+        const providerKey = (req.url || '').split('/')[4];
+        let availBody = '';
+        req.on('data', (chunk: any) => availBody += chunk.toString());
+        req.on('end', async () => {
+            try {
+                const d = JSON.parse(availBody || '{}');
+                if (!['available', 'ooo'].includes(d.status)) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: "status must be 'available' or 'ooo'", correlationId }));
+                    return;
+                }
+                const updated = (await supabaseApi.update('providers', { provider_key: providerKey }, {
+                    availability: d.status,
+                    ooo_until: d.status === 'ooo' ? (d.until ?? null) : null,
+                    updated_at: new Date().toISOString(),
+                })) as unknown[];
+                if (!updated.length) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId }));
+                    return;
+                }
+                await supabaseApi.insert('event_log', {
+                    type: 'provider_availability_changed',
+                    payload: { providerKey, status: d.status, until: d.until ?? null },
+                });
+                res.setHeader('x-correlation-id', correlationId);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, providerKey, availability: d.status, ooo_until: d.status === 'ooo' ? (d.until ?? null) : null }));
+            } catch (err) {
+                structuredLog('error', 'Availability patch failed', { correlationId, errorCode: 'ERR_AVAILABILITY', severity: 'error', route: req.url });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Availability update failed', correlationId }));
+            }
+        });
     } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/alert-prefs')) {
         // B15: alert preferences for an owner key (guest_key today).
         try {

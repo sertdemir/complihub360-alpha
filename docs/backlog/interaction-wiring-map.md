@@ -71,7 +71,7 @@ Alle 16 Drawer existieren in Figma (Section `▣ DRAWERS`) und die `Drawer`-Komp
 | # | Element | Ort | Ist | Soll | Abhängigkeit |
 |---|---|---|---|---|---|
 | C1 | „Mark all seen/read" | Provider /requests, /notifications | ✅ | `notification_reads`-Watermark pro Viewer-Key + GET/POST /api/v1/reads; Notifications-Chips + Sidebar-Badges + Requests-Banner live | — |
-| C2 | Availability-Pill / „End early" (OOO) | Provider-Shell, /requests | 🟡 nur ?state-Demo | Toggle → PATCH provider availability + Banner echt | PATCH providers |
+| C2 | Availability-Pill / „End early" (OOO) | Provider-Shell, /requests | ✅ | providers.availability/ooo_until + PATCH /provider/:key/availability; Pill klickbar (ConfirmDrawer), OOO-Banner echt mit End early, Sync via CustomEvent, persistiert | — |
 | C3 | „Update payment method" | /billing | ⛔ | Stripe-Portal-Link (Spec: Stripe-issued) | Stripe-Account (User-Schritt) |
 | C4 | „Preview public profile" | /requests OOO-State | ⛔ | Route zur Public-Profile-Seite (C-4, einzige Full-Page-Ausnahme) | Seite bauen |
 | C5 | „Replace" (Avatar), Settings-Rows | /settings | ⛔ | Upload/Drawer je Zeile | Storage |

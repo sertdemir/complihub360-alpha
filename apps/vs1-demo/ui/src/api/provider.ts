@@ -12,6 +12,24 @@ export interface ProviderCoverage {
   countries_supported: string[];
   languages: string[];
   sla_target_confirm_hours: number;
+  availability?: 'available' | 'ooo';
+  ooo_until?: string | null;
+}
+
+// C2: cross-component sync — the shell pill and the requests banner both
+// listen so a toggle anywhere updates everywhere without a reload.
+export const AVAILABILITY_EVENT = 'ch360:availability';
+
+export function broadcastAvailability(status: 'available' | 'ooo') {
+  window.dispatchEvent(new CustomEvent(AVAILABILITY_EVENT, { detail: status }));
+}
+
+export async function setAvailability(status: 'available' | 'ooo', providerKey: string = DEMO_PROVIDER_KEY): Promise<void> {
+  await apiFetch(`/api/v1/provider/${providerKey}/availability`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status }),
+  });
+  broadcastAvailability(status);
 }
 
 export async function fetchCoverage(providerKey: string = DEMO_PROVIDER_KEY): Promise<ProviderCoverage> {

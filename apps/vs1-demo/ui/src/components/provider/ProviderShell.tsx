@@ -7,8 +7,10 @@ import { LogoMark } from '../ui/Logo';
 import { PartnerStatusBadge, AvailabilityPill } from '../ui/ProviderBadges';
 import { SearchDrawer, HelpDrawer } from './ProviderDrawers';
 import { BellPopover } from './BellPopover';
+import { ConfirmDrawer, type ConfirmSpec } from './ConfirmDrawer';
 import { fetchProviderRequests } from '../../api/requests';
 import { fetchUnreadCount } from '../../api/notifications';
+import { fetchCoverage, setAvailability, AVAILABILITY_EVENT } from '../../api/provider';
 import { cn } from '../../lib/utils';
 
 // ─── ProviderShell ────────────────────────────────────────────────────────────
@@ -65,6 +67,33 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
     return n ? String(n) : undefined;
   };
 
+  // C2: live availability — the pill toggles OOO via a confirm step.
+  const [availability, setAvail] = useState<'available' | 'ooo'>('available');
+  const [confirm, setConfirm] = useState<ConfirmSpec | null>(null);
+  useEffect(() => {
+    fetchCoverage().then((c) => c.availability && setAvail(c.availability)).catch(() => {});
+    const onSync = (e: Event) => setAvail((e as CustomEvent<'available' | 'ooo'>).detail);
+    window.addEventListener(AVAILABILITY_EVENT, onSync);
+    return () => window.removeEventListener(AVAILABILITY_EVENT, onSync);
+  }, []);
+  const togglAvailability = () => {
+    if (availability === 'available') {
+      setConfirm({
+        title: 'Go out of office?',
+        consequence: 'New requests are paused and re-routed to other partners. Your ranking is frozen while away — SLA timers resume on return. End it early anytime.',
+        confirmLabel: 'Set out of office',
+        onConfirm: async () => { await setAvailability('ooo').catch(() => {}); },
+      });
+    } else {
+      setConfirm({
+        title: 'End out of office?',
+        consequence: 'You go back to Available — new requests route to you again and SLA timers resume immediately.',
+        confirmLabel: 'End out of office',
+        onConfirm: async () => { await setAvailability('available').catch(() => {}); },
+      });
+    }
+  };
+
   return (
     <div className="dark flex h-screen bg-[#1F2937] text-fg">
       <Sidebar
@@ -116,13 +145,16 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
             <Search size={18} />
           </button>
           <BellPopover unread={counts.unread} onAllRead={() => setCounts((c) => ({ ...c, unread: 0 }))} />
-          <AvailabilityPill status="available" />
+          <button type="button" onClick={togglAvailability} aria-label="Toggle availability" className="transition-opacity hover:opacity-80">
+            <AvailabilityPill status={availability === 'ooo' ? 'offline' : 'available'} label={availability === 'ooo' ? 'Out of office' : undefined} />
+          </button>
           <PartnerStatusBadge status="verified" label="Verified Partner" />
         </header>
         <main className={cn('flex-1 overflow-y-auto px-8 py-6')}>{children}</main>
       </div>
       <SearchDrawer open={searchOpen} onClose={() => setSearchOpen(false)} />
       <HelpDrawer open={helpOpen} onClose={() => setHelpOpen(false)} />
+      <ConfirmDrawer spec={confirm} onClose={() => setConfirm(null)} />
     </div>
   );
 }

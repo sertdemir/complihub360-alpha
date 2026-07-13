@@ -12,6 +12,7 @@ import { EmptyState } from '../../components/ui/EmptyState';
 import { useApiData } from '../../lib/useApiData';
 import { fetchProviderRequests } from '../../api/requests';
 import { fetchLastSeen, markSeen, isUnread } from '../../api/reads';
+import { fetchCoverage, setAvailability, AVAILABILITY_EVENT } from '../../api/provider';
 
 const REQUESTS_VIEWER = 'provider-requests';
 
@@ -109,11 +110,24 @@ export function RequestsPage() {
     try { setLastSeen(await markSeen(REQUESTS_VIEWER)); } catch { /* keep banner */ }
   };
 
+  // C2: real OOO state — banner + "End early" wired to the availability PATCH.
+  const [ooo, setOoo] = useState(false);
+  useEffect(() => {
+    fetchCoverage().then((c) => setOoo(c.availability === 'ooo')).catch(() => {});
+    const onSync = (e: Event) => setOoo((e as CustomEvent<'available' | 'ooo'>).detail === 'ooo');
+    window.addEventListener(AVAILABILITY_EVENT, onSync);
+    return () => window.removeEventListener(AVAILABILITY_EVENT, onSync);
+  }, []);
+
   return (
     <ProviderShell>
       <div className="mx-auto max-w-[1140px] space-y-5">
-        {demoState === 'ooo' && (
-          <Banner status="brand" title="Out of office active · until Mon 2026-07-14" action={<Button size="sm" variant="secondary">End early</Button>}>
+        {(ooo || demoState === 'ooo') && (
+          <Banner
+            status="brand"
+            title="Out of office active"
+            action={<Button size="sm" variant="secondary" onClick={() => setAvailability('available').catch(() => {})}>End early</Button>}
+          >
             New requests are paused and re-routed · your ranking is frozen while away · SLA timers resume on return.
           </Banner>
         )}
@@ -138,9 +152,15 @@ export function RequestsPage() {
 
         <div className="flex items-start justify-between gap-4">
           <h1 className="font-serif text-[30px] font-bold leading-tight text-fg">Requests</h1>
-          <button type="button" className="mt-2 flex shrink-0 items-center gap-1.5 text-[12px] text-fg-secondary transition-colors hover:text-fg">
-            <Moon size={13} /> Out of office
-          </button>
+          {!ooo && (
+            <button
+              type="button"
+              onClick={() => setAvailability('ooo').catch(() => {})}
+              className="mt-2 flex shrink-0 items-center gap-1.5 text-[12px] text-fg-secondary transition-colors hover:text-fg"
+            >
+              <Moon size={13} /> Out of office
+            </button>
+          )}
         </div>
         <p className="-mt-3 max-w-3xl text-body-sm leading-relaxed text-fg-secondary">
           All requests routed to your workspace · push-anchored (email + magic-link). New requests highlighted with a
