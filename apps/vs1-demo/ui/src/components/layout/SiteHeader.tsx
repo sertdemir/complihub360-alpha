@@ -32,6 +32,10 @@ export function SiteHeader() {
   if (localeOk && seg.length === 2 && (seg[1] === 'results' || seg[1] === 'partner-onboarding')) {
     return null;
   }
+  // The full-view assessment wizard (Figma 1705:262) ships its own topbar.
+  if (localeOk && seg[1] === 'wizard') {
+    return null;
+  }
   // The new provider App-Workspace pages ship the ProviderShell (own sidebar +
   // topbar, always dark) — no global header on top.
   const PROVIDER_WORKSPACE = ['requests', 'performance', 'coverage', 'billing', 'settings', 'notifications', 'help'];

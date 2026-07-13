@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, useParams, Navigate, Outlet } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { supportedLngs } from "./i18n/config";
 import { SiteHeader } from "./components/layout/SiteHeader";
@@ -69,23 +68,21 @@ import { ResetPasswordPage } from "./pages/auth/ResetPasswordPage";
 import { AuthGuard } from "./components/auth/AuthGuard";
 import { AnimatedWizard } from "./components/home/AnimatedWizard";
 
-// Full-view assessment (/:locale/wizard): the hero CTA opens the SAME 4-step
-// wizard as the Entry-Door section, but as the original full-view overlay over
-// the page (backdrop blur + click-outside closes). The old pre-gate / category
-// flows stay retired. `.wizard-card` guards against the overlay's close-click.
+// Full-view assessment (/:locale/wizard, Figma 1705:262 light + · Dark): the
+// hero CTA opens the SAME 4-step wizard as the Entry-Door section, but as a
+// dedicated full page (own topbar, no marketing header). The old pre-gate /
+// category flows stay retired.
 function WizardRoutes() {
     const navigate = useNavigate();
     const { i18n } = useTranslation();
     const locale = i18n.resolvedLanguage || 'en';
     return (
-        <div className="wizard-card w-full max-w-[1200px] overflow-hidden rounded-[20px] shadow-[0_50px_110px_-35px_rgba(11,11,12,0.55)]">
-            <AnimatedWizard
-                spacious
-                interactive
-                onComplete={(profile) => navigate(`/${locale}/results`, { state: { searchProfile: profile } })}
-                className="!rounded-[20px]"
-            />
-        </div>
+        <AnimatedWizard
+            spacious
+            interactive
+            onComplete={(profile) => navigate(`/${locale}/results`, { state: { searchProfile: profile } })}
+            className="min-h-screen !rounded-none !border-0"
+        />
     );
 }
 
@@ -113,33 +110,11 @@ function LocaleLayout() {
 
 function AppContent() {
     const location = useLocation();
-    const navigate = useNavigate();
-
-    const isWizardRoute = /^\/[a-z]{2}\/wizard/.test(location.pathname) || location.pathname.startsWith("/wizard");
-
-    // The wizard renders as an overlay over a "background" page. If the app is
-    // opened directly on a wizard URL there is no background yet — fall back to
-    // the locale home so the overlay (and its close/backdrop) behave correctly.
-    const [bgLocation, setBgLocation] = useState(() => {
-        const wiz = /^\/[a-z]{2}\/wizard/.test(location.pathname) || location.pathname.startsWith("/wizard");
-        if (wiz) {
-            const loc = location.pathname.match(/^\/([a-z]{2})(?=\/|$)/)?.[1] || "en";
-            return { ...location, pathname: `/${loc}`, search: "", hash: "" };
-        }
-        return location;
-    });
-
-    useEffect(() => {
-        if (!isWizardRoute) {
-            setBgLocation(location);
-        }
-    }, [location, isWizardRoute]);
 
     return (
         <>
             <SiteHeader />
-            {/* Render the background location for main routes if a wizard is open */}
-            <Routes location={isWizardRoute ? bgLocation : location}>
+            <Routes location={location}>
                 <Route path="/:locale" element={<LocaleLayout />}>
                     {/* Public pages */}
                     {/* Index = new User/Entrepreneur landing (HomePage). Old marketing landing kept at /home-old. */}
@@ -155,6 +130,7 @@ function AppContent() {
                     <Route path="advisory" element={<AdvisoryPage />} />
                     <Route path="ai-governance" element={<AiGovernancePage />} />
                     <Route path="results" element={<ResultsRiskMap />} />
+                    <Route path="wizard/*" element={<WizardRoutes />} />
                     {/* Legal (launch requirement: Art. 13 GDPR + Impressumspflicht) */}
                     <Route path="privacy" element={<PrivacyPage />} />
                     <Route path="imprint" element={<ImprintPage />} />
@@ -223,40 +199,6 @@ function AppContent() {
                 <Route path="*" element={<RootRedirect />} />
             </Routes>
 
-            {/* Wizard Overlay */}
-            <AnimatePresence>
-                {isWizardRoute && (
-                    <motion.div 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="fixed inset-0 z-[100] bg-white/40 backdrop-blur-xl overflow-y-auto w-full h-full"
-                        style={{
-                            cursor: isWizardRoute ? `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" fill="white" stroke="%23E5E5E5" stroke-width="1"/><path d="M14 14L26 26" stroke="%23171717" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 26L26 14" stroke="%23171717" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>') 20 20, pointer` : 'auto',
-                            pointerEvents: isWizardRoute ? 'auto' : 'none',
-                        }}
-                        onClick={(e) => {
-                            if (!(e.target as HTMLElement).closest('.wizard-card')) {
-                                const targetPath = (/^\/[a-z]{2}\/wizard/.test(bgLocation.pathname) || bgLocation.pathname.startsWith('/wizard')) && bgLocation.pathname !== location.pathname
-                                    ? `/${bgLocation.pathname.split('/')[1]}` 
-                                    : bgLocation.pathname;
-                                navigate(targetPath || '/');
-                            }
-                        }}
-                    >
-                        <div className="min-h-full py-12 px-4 flex flex-col items-center justify-center">
-                            <Routes location={location}>
-                                <Route path="/:locale" element={<LocaleLayout />}>
-                                    <Route path="wizard/*" element={<WizardRoutes />} />
-                                </Route>
-                                {/* For backward compatibility if someone opens /wizard directly */}
-                                <Route path="/wizard/*" element={<WizardRoutes />} />
-                            </Routes>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
         </>
     );
 }
