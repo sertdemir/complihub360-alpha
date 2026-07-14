@@ -14,6 +14,289 @@ import { redactText } from '@complihub360/redaction';
 const PUBLIC_APP_URL = (process.env.PUBLIC_APP_URL || 'https://staging.complihub360.com').replace(/\/$/, '');
 const MAIL_FROM = process.env.MAIL_FROM || 'CompliHub360 <onboarding@resend.dev>';
 
+// ─── i18n ─────────────────────────────────────────────────────────────────────
+// Transactional-mail copy in the four product languages (EN/DE/ES/TR), mirroring
+// the app's i18next locales. Conventions: DE = Sie, ES = usted, TR = siz;
+// product terms (CompliHub360, Verified Partner, Magic-Link) stay untranslated.
+// Unknown / missing locales fall back to 'en'.
+
+type MailLocale = 'en' | 'de' | 'es' | 'tr';
+
+const SUPPORTED_LOCALES: readonly MailLocale[] = ['en', 'de', 'es', 'tr'];
+
+function resolveLocale(locale?: string): MailLocale {
+    const base = (locale || 'en').toLowerCase().slice(0, 2) as MailLocale;
+    return SUPPORTED_LOCALES.includes(base) ? base : 'en';
+}
+
+interface MailStrings {
+    magic: {
+        // Subjects — "<label> · <country> <category> — <tail>". The reminder
+        // variant keeps the "<Reminder> ·" prefix mechanism, localized.
+        subjectNewLabel: string;
+        subjectNewTail: string;
+        reminderLabel: string;
+        subjectReminderTail: string;
+        // Plain-text body
+        textTitle: string;
+        textProviderLabel: string;
+        textScopeLabel: string;
+        textMessageLabel: string;
+        textIdentityLine: string;
+        textConfirmLabel: string;
+        textReplyLabel: string;
+        textDeclineLabel: string;
+        textOnce: string;
+        // HTML body (headline = exactly ONE gold word)
+        headlinePre: string;
+        headlineGold: string;
+        headlinePost: string;
+        introPre: string;
+        introStrong: string;
+        introPost: string;
+        dossierLabel: string;
+        scopeLabel: string;
+        messageLabel: string;
+        identityNote: string;
+        ctaConfirm: string;
+        ctaReply: string;
+        ctaDecline: string;
+        footOncePre: string;
+        footOnceStrong: string;
+        footOncePost: string;
+        footRanking: string;
+        footerTagline: string;
+        footerReason: string;
+    };
+    emailChange: {
+        subject: string;
+        textIntro: string; // {name} placeholder
+        textConfirmLabel: string;
+        textOnce: string;
+        headlinePre: string;
+        headlineGold: string;
+        headlinePost: string;
+        bodyPre: string; // …<strong>{name}</strong>…
+        bodyPost: string;
+        cta: string;
+        footOncePre: string;
+        footOnceStrong: string;
+        footOncePost: string;
+        footNotYou: string;
+    };
+}
+
+const STRINGS: Record<MailLocale, MailStrings> = {
+    en: {
+        magic: {
+            subjectNewLabel: 'New request',
+            subjectNewTail: 'please confirm within 24h',
+            reminderLabel: 'Reminder',
+            subjectReminderTail: 'the client is waiting for your confirmation',
+            textTitle: 'New engagement request on CompliHub360',
+            textProviderLabel: 'Provider',
+            textScopeLabel: 'Scope',
+            textMessageLabel: 'Message (anonymized)',
+            textIdentityLine: 'Requester identity: unlocked after you confirm.',
+            textConfirmLabel: 'Confirm (24h SLA)',
+            textReplyLabel: 'Reply',
+            textDeclineLabel: 'Decline',
+            textOnce: 'Each link works exactly once and expires after 24 hours.',
+            headlinePre: 'New ',
+            headlineGold: 'engagement',
+            headlinePost: ' request.',
+            introPre: 'A matched client requests your services. Please confirm within ',
+            introStrong: '24 hours',
+            introPost: '.',
+            dossierLabel: 'Anonymized dossier',
+            scopeLabel: 'Scope',
+            messageLabel: 'Message',
+            identityNote: 'Requester identity unlocks after you confirm.',
+            ctaConfirm: 'Confirm engagement',
+            ctaReply: 'Reply to client',
+            ctaDecline: 'Decline',
+            footOncePre: 'Each link works ',
+            footOnceStrong: 'once',
+            footOncePost: ' and expires after 24 hours.',
+            footRanking: 'Fast confirmations improve your partner ranking.',
+            footerTagline: 'CompliHub360 — the orchestration layer between compliance complexity and operational reality.',
+            footerReason: 'You received this e-mail because your firm is a listed provider on complihub360.com.',
+        },
+        emailChange: {
+            subject: 'Confirm your new CompliHub360 contact address',
+            textIntro: 'You (or someone in your firm) asked to change the contact address for {name} on CompliHub360 to this e-mail.',
+            textConfirmLabel: 'Confirm the change',
+            textOnce: "The link works once and expires after 1 hour. If you didn't request this, ignore this e-mail — the current address stays active.",
+            headlinePre: 'Confirm your new ',
+            headlineGold: 'address',
+            headlinePost: '.',
+            bodyPre: 'This e-mail becomes the contact address for ',
+            bodyPost: ' once you confirm. Until then the current address stays active.',
+            cta: 'Confirm new address',
+            footOncePre: 'The link works ',
+            footOnceStrong: 'once',
+            footOncePost: ' and expires after 1 hour.',
+            footNotYou: "Didn't request this? Ignore this e-mail.",
+        },
+    },
+    de: {
+        magic: {
+            subjectNewLabel: 'Neue Anfrage',
+            subjectNewTail: 'bitte innerhalb von 24h bestätigen',
+            reminderLabel: 'Erinnerung',
+            subjectReminderTail: 'der Mandant wartet auf Ihre Bestätigung',
+            textTitle: 'Neue Mandatsanfrage auf CompliHub360',
+            textProviderLabel: 'Anbieter',
+            textScopeLabel: 'Umfang',
+            textMessageLabel: 'Nachricht (anonymisiert)',
+            textIdentityLine: 'Identität des Anfragenden: wird nach Ihrer Bestätigung freigeschaltet.',
+            textConfirmLabel: 'Bestätigen (24h-SLA)',
+            textReplyLabel: 'Antworten',
+            textDeclineLabel: 'Ablehnen',
+            textOnce: 'Jeder Link funktioniert genau einmal und läuft nach 24 Stunden ab.',
+            headlinePre: 'Neue ',
+            headlineGold: 'Mandatsanfrage',
+            headlinePost: '.',
+            introPre: 'Ein passender Mandant fragt Ihre Leistungen an. Bitte bestätigen Sie innerhalb von ',
+            introStrong: '24 Stunden',
+            introPost: '.',
+            dossierLabel: 'Anonymisiertes Dossier',
+            scopeLabel: 'Umfang',
+            messageLabel: 'Nachricht',
+            identityNote: 'Die Identität des Anfragenden wird nach Ihrer Bestätigung freigeschaltet.',
+            ctaConfirm: 'Anfrage bestätigen',
+            ctaReply: 'Dem Mandanten antworten',
+            ctaDecline: 'Ablehnen',
+            footOncePre: 'Jeder Link funktioniert ',
+            footOnceStrong: 'einmal',
+            footOncePost: ' und läuft nach 24 Stunden ab.',
+            footRanking: 'Schnelle Bestätigungen verbessern Ihr Partner-Ranking.',
+            footerTagline: 'CompliHub360 — die Orchestrierungsschicht zwischen Compliance-Komplexität und operativer Realität.',
+            footerReason: 'Sie erhalten diese E-Mail, weil Ihre Kanzlei als Anbieter auf complihub360.com gelistet ist.',
+        },
+        emailChange: {
+            subject: 'Bestätigen Sie Ihre neue CompliHub360-Kontaktadresse',
+            textIntro: 'Sie (oder jemand aus Ihrer Kanzlei) haben darum gebeten, die Kontaktadresse für {name} auf CompliHub360 auf diese E-Mail-Adresse zu ändern.',
+            textConfirmLabel: 'Änderung bestätigen',
+            textOnce: 'Der Link funktioniert einmal und läuft nach 1 Stunde ab. Falls Sie dies nicht angefordert haben, ignorieren Sie diese E-Mail — die aktuelle Adresse bleibt aktiv.',
+            headlinePre: 'Bestätigen Sie Ihre neue ',
+            headlineGold: 'Adresse',
+            headlinePost: '.',
+            bodyPre: 'Diese E-Mail-Adresse wird nach Ihrer Bestätigung zur Kontaktadresse für ',
+            bodyPost: '. Bis dahin bleibt die aktuelle Adresse aktiv.',
+            cta: 'Neue Adresse bestätigen',
+            footOncePre: 'Der Link funktioniert ',
+            footOnceStrong: 'einmal',
+            footOncePost: ' und läuft nach 1 Stunde ab.',
+            footNotYou: 'Nicht von Ihnen angefordert? Ignorieren Sie diese E-Mail.',
+        },
+    },
+    es: {
+        magic: {
+            subjectNewLabel: 'Nueva solicitud',
+            subjectNewTail: 'le rogamos confirmar en 24h',
+            reminderLabel: 'Recordatorio',
+            subjectReminderTail: 'el cliente espera su confirmación',
+            textTitle: 'Nueva solicitud de mandato en CompliHub360',
+            textProviderLabel: 'Proveedor',
+            textScopeLabel: 'Alcance',
+            textMessageLabel: 'Mensaje (anonimizado)',
+            textIdentityLine: 'Identidad del solicitante: se desbloquea después de que usted confirme.',
+            textConfirmLabel: 'Confirmar (SLA de 24h)',
+            textReplyLabel: 'Responder',
+            textDeclineLabel: 'Rechazar',
+            textOnce: 'Cada enlace funciona exactamente una vez y caduca a las 24 horas.',
+            headlinePre: 'Nueva ',
+            headlineGold: 'solicitud',
+            headlinePost: ' de mandato.',
+            introPre: 'Un cliente compatible solicita sus servicios. Le rogamos confirmar en un plazo de ',
+            introStrong: '24 horas',
+            introPost: '.',
+            dossierLabel: 'Dossier anonimizado',
+            scopeLabel: 'Alcance',
+            messageLabel: 'Mensaje',
+            identityNote: 'La identidad del solicitante se desbloquea después de que usted confirme.',
+            ctaConfirm: 'Confirmar la solicitud',
+            ctaReply: 'Responder al cliente',
+            ctaDecline: 'Rechazar',
+            footOncePre: 'Cada enlace funciona ',
+            footOnceStrong: 'una sola vez',
+            footOncePost: ' y caduca a las 24 horas.',
+            footRanking: 'Las confirmaciones rápidas mejoran su posición como partner.',
+            footerTagline: 'CompliHub360 — la capa de orquestación entre la complejidad del compliance y la realidad operativa.',
+            footerReason: 'Usted recibe este correo porque su firma figura como proveedor en complihub360.com.',
+        },
+        emailChange: {
+            subject: 'Confirme su nueva dirección de contacto de CompliHub360',
+            textIntro: 'Usted (o alguien de su firma) solicitó cambiar la dirección de contacto de {name} en CompliHub360 a este correo electrónico.',
+            textConfirmLabel: 'Confirmar el cambio',
+            textOnce: 'El enlace funciona una sola vez y caduca en 1 hora. Si usted no solicitó este cambio, ignore este correo — la dirección actual permanece activa.',
+            headlinePre: 'Confirme su nueva ',
+            headlineGold: 'dirección',
+            headlinePost: '.',
+            bodyPre: 'Este correo se convertirá en la dirección de contacto de ',
+            bodyPost: ' una vez que usted confirme. Hasta entonces, la dirección actual permanece activa.',
+            cta: 'Confirmar la nueva dirección',
+            footOncePre: 'El enlace funciona ',
+            footOnceStrong: 'una sola vez',
+            footOncePost: ' y caduca en 1 hora.',
+            footNotYou: '¿No solicitó este cambio? Ignore este correo.',
+        },
+    },
+    tr: {
+        magic: {
+            subjectNewLabel: 'Yeni talep',
+            subjectNewTail: 'lütfen 24 saat içinde onaylayın',
+            reminderLabel: 'Hatırlatma',
+            subjectReminderTail: 'müşteri onayınızı bekliyor',
+            textTitle: 'CompliHub360 üzerinde yeni müşteri talebi',
+            textProviderLabel: 'Sağlayıcı',
+            textScopeLabel: 'Kapsam',
+            textMessageLabel: 'Mesaj (anonimleştirilmiş)',
+            textIdentityLine: 'Talep sahibinin kimliği: onayınızın ardından görünür olur.',
+            textConfirmLabel: 'Onayla (24 saat SLA)',
+            textReplyLabel: 'Yanıtla',
+            textDeclineLabel: 'Reddet',
+            textOnce: 'Her bağlantı tam olarak bir kez çalışır ve 24 saat sonra geçerliliğini yitirir.',
+            headlinePre: 'Yeni ',
+            headlineGold: 'talep',
+            headlinePost: ' aldınız.',
+            introPre: 'Size uygun bir müşteri hizmetlerinizi talep ediyor. Lütfen ',
+            introStrong: '24 saat',
+            introPost: ' içinde onaylayın.',
+            dossierLabel: 'Anonimleştirilmiş dosya',
+            scopeLabel: 'Kapsam',
+            messageLabel: 'Mesaj',
+            identityNote: 'Talep sahibinin kimliği onayınızın ardından görünür olur.',
+            ctaConfirm: 'Talebi onayla',
+            ctaReply: 'Müşteriye yanıt ver',
+            ctaDecline: 'Reddet',
+            footOncePre: 'Her bağlantı yalnızca ',
+            footOnceStrong: 'bir kez',
+            footOncePost: ' çalışır ve 24 saat sonra geçerliliğini yitirir.',
+            footRanking: 'Hızlı onaylar partner sıralamanızı iyileştirir.',
+            footerTagline: 'CompliHub360 — uyum karmaşıklığı ile operasyonel gerçeklik arasındaki orkestrasyon katmanı.',
+            footerReason: 'Bu e-postayı, firmanız complihub360.com üzerinde listelenmiş bir sağlayıcı olduğu için alıyorsunuz.',
+        },
+        emailChange: {
+            subject: 'Yeni CompliHub360 iletişim adresinizi onaylayın',
+            textIntro: 'Siz (veya firmanızdan biri), CompliHub360 üzerindeki {name} iletişim adresinin bu e-posta adresiyle değiştirilmesini talep ettiniz.',
+            textConfirmLabel: 'Değişikliği onaylayın',
+            textOnce: 'Bağlantı bir kez çalışır ve 1 saat sonra geçerliliğini yitirir. Bu talebi siz oluşturmadıysanız bu e-postayı dikkate almayın — mevcut adres aktif kalır.',
+            headlinePre: 'Yeni ',
+            headlineGold: 'adresinizi',
+            headlinePost: ' onaylayın.',
+            bodyPre: 'Onayınızın ardından bu e-posta, ',
+            bodyPost: ' için iletişim adresi olur. O zamana kadar mevcut adres aktif kalır.',
+            cta: 'Yeni adresi onayla',
+            footOncePre: 'Bağlantı yalnızca ',
+            footOnceStrong: 'bir kez',
+            footOncePost: ' çalışır ve 1 saat sonra geçerliliğini yitirir.',
+            footNotYou: 'Bu talebi siz oluşturmadıysanız bu e-postayı dikkate almayın.',
+        },
+    },
+};
+
 export interface MagicLinkMail {
     engagementId: string;
     providerKey: string;
@@ -26,36 +309,38 @@ export interface MagicLinkMail {
     correlationId: string;
     /** B14: manual reminder re-send — same mail with fresh links, urgent subject. */
     reminder?: boolean;
+    /** Mail language (en/de/es/tr). Unknown or missing → 'en'. */
+    locale?: string;
 }
 
 function actionUrl(action: string, query: string): string {
     return `${PUBLIC_APP_URL}/en/provider/action${query}&action=${action}`;
 }
 
-function renderText(m: MagicLinkMail): string {
+function renderText(m: MagicLinkMail, t: MailStrings['magic']): string {
     // Anonymized dossier stage (Addendum 2026-07-10): the e-mail carries the
     // REDACTED message only — requester identity never travels via e-mail.
     const redacted = m.message ? redactText(m.message, { profile: 'strict' }).sanitizedText : '—';
     return [
-        `New engagement request on CompliHub360`,
+        t.textTitle,
         ``,
-        `Provider: ${m.providerName}`,
-        `Scope: ${m.country} · ${m.category}`,
-        `Message (anonymized): ${redacted}`,
-        `Requester identity: unlocked after you confirm.`,
+        `${t.textProviderLabel}: ${m.providerName}`,
+        `${t.textScopeLabel}: ${m.country} · ${m.category}`,
+        `${t.textMessageLabel}: ${redacted}`,
+        t.textIdentityLine,
         ``,
-        `Confirm (24h SLA): ${actionUrl('confirm', m.magicLinks.confirm)}`,
-        `Reply:             ${actionUrl('reply', m.magicLinks.reply)}`,
-        `Decline:           ${actionUrl('decline', m.magicLinks.decline)}`,
+        `${t.textConfirmLabel}: ${actionUrl('confirm', m.magicLinks.confirm)}`,
+        `${t.textReplyLabel}: ${actionUrl('reply', m.magicLinks.reply)}`,
+        `${t.textDeclineLabel}: ${actionUrl('decline', m.magicLinks.decline)}`,
         ``,
-        `Each link works exactly once and expires after 24 hours.`,
+        t.textOnce,
     ].join('\n');
 }
 
 // Branded HTML (same shell as the Supabase auth templates: dark slate card,
 // serif headline with ONE gold word, gold primary CTA). Table-based + inline
 // styles, no external images — see docs/email-templates/.
-function renderHtml(m: MagicLinkMail): string {
+function renderHtml(m: MagicLinkMail, t: MailStrings['magic']): string {
     const redacted = m.message ? redactText(m.message, { profile: 'strict' }).sanitizedText : '—';
     const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const btn = (label: string, url: string, primary: boolean) => primary
@@ -65,30 +350,31 @@ function renderHtml(m: MagicLinkMail): string {
 <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;">
 <tr><td style="padding:0 8px 24px 8px;"><img src="https://kqylqwogxbiwpnomkzsn.supabase.co/storage/v1/object/public/assets/logo-lockup-email.png" width="207" height="54" alt="CompliHub360 — Compliance. Simplified." style="display:block;border:0;"/></td></tr>
 <tr><td style="background-color:#1f2937;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:36px 32px;">
-<div style="font-family:Georgia,serif;font-size:26px;line-height:1.25;font-weight:bold;color:#ffffff;">New <span style="color:#d4af37;">engagement</span> request.</div>
-<div style="padding-top:12px;font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#aeb8c4;">A matched client requests your services. Please confirm within <strong style="color:#ffffff;">24 hours</strong>.</div>
+<div style="font-family:Georgia,serif;font-size:26px;line-height:1.25;font-weight:bold;color:#ffffff;">${esc(t.headlinePre)}<span style="color:#d4af37;">${esc(t.headlineGold)}</span>${esc(t.headlinePost)}</div>
+<div style="padding-top:12px;font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#aeb8c4;">${esc(t.introPre)}<strong style="color:#ffffff;">${esc(t.introStrong)}</strong>${esc(t.introPost)}</div>
 <div style="margin-top:22px;background-color:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:18px 20px;font-family:Helvetica,Arial,sans-serif;font-size:13px;line-height:1.8;color:#aeb8c4;">
-<span style="font-size:10px;letter-spacing:1.2px;color:#77828f;text-transform:uppercase;">Anonymized dossier</span><br/>
-<strong style="color:#e5e7eb;">Scope:</strong> ${esc(m.country)} &middot; ${esc(m.category)}<br/>
-<strong style="color:#e5e7eb;">Message:</strong> <em>&ldquo;${esc(redacted)}&rdquo;</em><br/>
-<span style="color:#77828f;">&#128274; Requester identity unlocks after you confirm.</span>
+<span style="font-size:10px;letter-spacing:1.2px;color:#77828f;text-transform:uppercase;">${esc(t.dossierLabel)}</span><br/>
+<strong style="color:#e5e7eb;">${esc(t.scopeLabel)}:</strong> ${esc(m.country)} &middot; ${esc(m.category)}<br/>
+<strong style="color:#e5e7eb;">${esc(t.messageLabel)}:</strong> <em>&ldquo;${esc(redacted)}&rdquo;</em><br/>
+<span style="color:#77828f;">&#128274; ${esc(t.identityNote)}</span>
 </div>
-<div style="padding-top:24px;">${btn('Confirm engagement', actionUrl('confirm', m.magicLinks.confirm), true)}</div>
+<div style="padding-top:24px;">${btn(esc(t.ctaConfirm), actionUrl('confirm', m.magicLinks.confirm), true)}</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
-<td style="padding-top:12px;" align="left">${btn('Reply to client', actionUrl('reply', m.magicLinks.reply), false)}</td>
-<td style="padding-top:12px;" align="right">${btn('Decline', actionUrl('decline', m.magicLinks.decline), false)}</td>
+<td style="padding-top:12px;" align="left">${btn(esc(t.ctaReply), actionUrl('reply', m.magicLinks.reply), false)}</td>
+<td style="padding-top:12px;" align="right">${btn(esc(t.ctaDecline), actionUrl('decline', m.magicLinks.decline), false)}</td>
 </tr></table>
-<div style="margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.08);font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#77828f;">&#128274;&nbsp; Each link works <strong style="color:#aeb8c4;">once</strong> and expires after 24 hours.<br/>&#9200;&nbsp; Fast confirmations improve your partner ranking.</div>
+<div style="margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.08);font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#77828f;">&#128274;&nbsp; ${esc(t.footOncePre)}<strong style="color:#aeb8c4;">${esc(t.footOnceStrong)}</strong>${esc(t.footOncePost)}<br/>&#9200;&nbsp; ${esc(t.footRanking)}</div>
 </td></tr>
-<tr><td style="padding:24px 8px 0 8px;font-family:Helvetica,Arial,sans-serif;font-size:11px;line-height:1.7;color:#5b6673;">CompliHub360 &mdash; the orchestration layer between compliance complexity and operational reality.<br/>You received this e-mail because your firm is a listed provider on complihub360.com.</td></tr>
+<tr><td style="padding:24px 8px 0 8px;font-family:Helvetica,Arial,sans-serif;font-size:11px;line-height:1.7;color:#5b6673;">${esc(t.footerTagline)}<br/>${esc(t.footerReason)}</td></tr>
 </table></td></tr></table>`;
 }
 
 export async function sendMagicLinkMail(m: MagicLinkMail): Promise<void> {
+    const t = STRINGS[resolveLocale(m.locale)].magic;
     const subject = m.reminder
-        ? `Reminder · ${m.country} ${m.category} — the client is waiting for your confirmation`
-        : `New request · ${m.country} ${m.category} — please confirm within 24h`;
-    const text = renderText(m);
+        ? `${t.reminderLabel} · ${m.country} ${m.category} — ${t.subjectReminderTail}`
+        : `${t.subjectNewLabel} · ${m.country} ${m.category} — ${t.subjectNewTail}`;
+    const text = renderText(m, t);
     const apiKey = process.env.RESEND_API_KEY;
 
     try {
@@ -112,7 +398,7 @@ export async function sendMagicLinkMail(m: MagicLinkMail): Promise<void> {
         const res = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ from: MAIL_FROM, to: [m.contactEmail], subject, text, html: renderHtml(m) }),
+            body: JSON.stringify({ from: MAIL_FROM, to: [m.contactEmail], subject, text, html: renderHtml(m, t) }),
         });
         const body = await res.json().catch(() => ({}));
         await supabaseApi.insert('event_log', {
@@ -141,24 +427,28 @@ export async function sendEmailChangeMail(p: {
     newEmail: string;
     confirmQuery: string; // "?token=…"
     correlationId: string;
+    /** Mail language (en/de/es/tr). Unknown or missing → 'en'. */
+    locale?: string;
 }): Promise<void> {
+    const t = STRINGS[resolveLocale(p.locale)].emailChange;
     const url = `${PUBLIC_APP_URL}/en/provider/confirm-email${p.confirmQuery}`;
-    const subject = 'Confirm your new CompliHub360 contact address';
+    const subject = t.subject;
     const text = [
-        `You (or someone in your firm) asked to change the contact address for ${p.providerName} on CompliHub360 to this e-mail.`,
+        t.textIntro.replace('{name}', p.providerName),
         ``,
-        `Confirm the change: ${url}`,
+        `${t.textConfirmLabel}: ${url}`,
         ``,
-        `The link works once and expires after 1 hour. If you didn't request this, ignore this e-mail — the current address stays active.`,
+        t.textOnce,
     ].join('\n');
+    const escE = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const html = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0b1620;padding:40px 16px;"><tr><td align="center">
 <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;">
 <tr><td style="padding:0 8px 24px 8px;"><img src="https://kqylqwogxbiwpnomkzsn.supabase.co/storage/v1/object/public/assets/logo-lockup-email.png" width="207" height="54" alt="CompliHub360" style="display:block;border:0;"/></td></tr>
 <tr><td style="background-color:#1f2937;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:36px 32px;">
-<div style="font-family:Georgia,serif;font-size:26px;line-height:1.25;font-weight:bold;color:#ffffff;">Confirm your new <span style="color:#d4af37;">address</span>.</div>
-<div style="padding-top:12px;font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#aeb8c4;">This e-mail becomes the contact address for <strong style="color:#ffffff;">${p.providerName}</strong> once you confirm. Until then the current address stays active.</div>
-<div style="padding-top:24px;"><a href="${url}" style="display:block;background-color:#d4af37;border-radius:12px;padding:14px 24px;text-align:center;font-family:Helvetica,Arial,sans-serif;font-size:15px;font-weight:bold;color:#101411;text-decoration:none;">Confirm new address &rarr;</a></div>
-<div style="margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.08);font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#77828f;">&#128274;&nbsp; The link works <strong style="color:#aeb8c4;">once</strong> and expires after 1 hour.<br/>Didn't request this? Ignore this e-mail.</div>
+<div style="font-family:Georgia,serif;font-size:26px;line-height:1.25;font-weight:bold;color:#ffffff;">${escE(t.headlinePre)}<span style="color:#d4af37;">${escE(t.headlineGold)}</span>${escE(t.headlinePost)}</div>
+<div style="padding-top:12px;font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#aeb8c4;">${escE(t.bodyPre)}<strong style="color:#ffffff;">${escE(p.providerName)}</strong>${escE(t.bodyPost)}</div>
+<div style="padding-top:24px;"><a href="${url}" style="display:block;background-color:#d4af37;border-radius:12px;padding:14px 24px;text-align:center;font-family:Helvetica,Arial,sans-serif;font-size:15px;font-weight:bold;color:#101411;text-decoration:none;">${escE(t.cta)} &rarr;</a></div>
+<div style="margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.08);font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#77828f;">&#128274;&nbsp; ${escE(t.footOncePre)}<strong style="color:#aeb8c4;">${escE(t.footOnceStrong)}</strong>${escE(t.footOncePost)}<br/>${escE(t.footNotYou)}</div>
 </td></tr>
 </table></td></tr></table>`;
     const apiKey = process.env.RESEND_API_KEY;

@@ -110,5 +110,19 @@
   },
   "quote": {
     "domainTaxVat": "Impuestos e IVA"
+  },
+  "pdf": {
+    "title": "Su mapa de riesgos de cumplimiento.",
+    "generated": "Generado el {{date}} · vista previa de staging",
+    "profile": {
+      "anonymousScope": "Evaluación anónima · alcance de ejemplo",
+      "anonymous": "Evaluación anónima",
+      "markets": "Mercados",
+      "domains": "Ámbitos",
+      "operations": "Actividad"
+    },
+    "questionsOpen": "{{total}} preguntas pendientes",
+    "sources": "Fuentes",
+    "disclaimer": "CompliHub360 es una plataforma de orquestación, no un bufete de abogados. El asesoramiento legal, fiscal y regulatorio lo prestan los Verified Partners bajo su propia responsabilidad profesional."
   }
 }

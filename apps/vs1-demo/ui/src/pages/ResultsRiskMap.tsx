@@ -168,18 +168,23 @@ export function ResultsRiskMap() {
   const [quoteFor, setQuoteFor] = useState<(QuoteProvider & { country: string; category: string }) | null>(null);
 
   // A6 (User Flows §9): guest-allowed PDF snapshot — PII-free, with sources.
+  // Translated at the render point (results namespace); canonical EN fallback.
   const exportPdf = () => {
     generateRiskMapPdf({
       profile,
-      stats: STATS,
-      obligations: OBLIGATIONS.map((o) => ({
+      t,
+      stats: STATS.map((s, i) => ({ value: s.value, label: t(`stats.${i}.label`, { defaultValue: s.label }) })),
+      obligations: OBLIGATIONS.map((o, i) => ({
         severity: o.severity,
-        title: o.title,
-        detail: o.detail,
-        market: o.market,
-        due: o.due,
-        dueSub: o.dueSub,
-        stateLabel: o.state.kind === 'confirmed' ? 'Confirmed' : o.state.kind === 'likely' ? 'Likely' : `${o.state.count} questions open`,
+        title: t(`obligations.${i}.title`, { defaultValue: o.title }),
+        detail: t(`obligations.${i}.detail`, { defaultValue: o.detail }),
+        market: t(`obligations.${i}.market`, { defaultValue: o.market }),
+        due: t(`obligations.${i}.due`, { defaultValue: o.due }),
+        dueSub: t(`obligations.${i}.dueSub`, { defaultValue: o.dueSub }),
+        stateLabel:
+          o.state.kind === 'confirmed' ? t('state.confirmed', { defaultValue: 'Confirmed' })
+          : o.state.kind === 'likely' ? t('state.likely', { defaultValue: 'Likely' })
+          : t('pdf.questionsOpen', { defaultValue: '{{total}} questions open', total: o.state.count }),
       })),
     });
   };

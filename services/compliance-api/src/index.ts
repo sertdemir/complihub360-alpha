@@ -9,6 +9,7 @@ import { generateRelevantSubdomains, type CountryCode, type IndustryType, type B
 import { supabaseApi } from "./supabase.js";
 import { sendMagicLinkMail, sendEmailChangeMail } from "./mailer.js";
 import { handleAssistantChat, handleAssistantCheckout, handleAssistantVerify } from "./assistant.js";
+import { handleAuthAdopt } from "./adoption.js";
 import { handleBillingRun, syncOpenInvoices } from "./billing.js";
 import { redactText } from "@complihub360/redaction";
 
@@ -748,6 +749,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         newEmail,
                         confirmQuery: `?token=${rawToken}`,
                         correlationId,
+                        locale: typeof d.locale === 'string' ? d.locale : undefined,
                     });
                 })().catch(() => { /* logged inside the mailer */ });
                 res.setHeader('x-correlation-id', correlationId);
@@ -1280,6 +1282,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         message: newEngagement.message,
                         magicLinks,
                         correlationId,
+                        locale: typeof requestData.locale === 'string' ? requestData.locale : undefined,
                     });
                 })().catch(() => { /* logged inside the mailer */ });
 
@@ -1526,6 +1529,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     } else if (req.method === 'POST' && req.url === '/api/v1/assistant/verify') {
         // Phase ③: verify-on-return — confirms the subscription after checkout.
         handleAssistantVerify(req, res, correlationId, { userId: authUserId, email: authEmail });
+    } else if (req.method === 'POST' && req.url === '/api/v1/auth/adopt') {
+        // Signup adoption: the signed-in account claims its guest sessions (adoption.ts).
+        handleAuthAdopt(req, res, correlationId, { userId: authUserId, email: authEmail });
     } else {
         res.setHeader('x-correlation-id', correlationId);
         res.writeHead(404, { 'Content-Type': 'application/json' });

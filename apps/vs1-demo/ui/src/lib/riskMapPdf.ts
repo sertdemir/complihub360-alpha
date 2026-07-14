@@ -17,6 +17,13 @@ export interface PdfObligation {
   stateLabel: string;
 }
 
+// i18n at the render point (results namespace). Backward compatible: without
+// a translator the canonical EN defaults render, exactly as before.
+export type PdfTranslate = (key: string, options: { defaultValue: string; [key: string]: unknown }) => string;
+
+const fallbackT: PdfTranslate = (_key, { defaultValue, ...vars }) =>
+  Object.entries(vars).reduce((s, [k, v]) => s.split(`{{${k}}}`).join(String(v)), defaultValue);
+
 // Brand palette — risk lives in petrol tones, never red (Brand Code 02).
 const INK = '#0F172B';
 const MUTED = '#6B7280';
@@ -34,41 +41,54 @@ const SEVERITY_FILL: Record<PdfObligation['severity'], string> = {
 };
 
 // Curated official sources, matched against the legal refs in the details.
+// `ref`/`origin` are canonical ground truth and never translated; the patterns
+// also accept the localized statute abbreviations used in the translated
+// details (GDPR → DSGVO/RGPD · Art. → Md.) so the sources resolve in every UI
+// language.
 const SOURCES: { pattern: RegExp; ref: string; origin: string }[] = [
   { pattern: /UStG §18i/, ref: 'UStG §18i (OSS)', origin: 'Umsatzsteuergesetz — gesetze-im-internet.de/ustg' },
   { pattern: /UStG §13b/, ref: 'UStG §13b (Reverse charge)', origin: 'Umsatzsteuergesetz — gesetze-im-internet.de/ustg' },
   { pattern: /VATA 1994/, ref: 'UK VATA 1994 §3', origin: 'Value Added Tax Act 1994 — legislation.gov.uk' },
   { pattern: /VerpackG/, ref: 'VerpackG Art. 9', origin: 'Verpackungsgesetz · LUCID — verpackungsregister.org' },
   { pattern: /Packaging Regs/, ref: 'UK Packaging Regs. 2023 §7', origin: 'Packaging Waste Regulations 2023 — legislation.gov.uk' },
-  { pattern: /GDPR Art\. 6\/7/, ref: 'GDPR Art. 6 & 7', origin: 'Regulation (EU) 2016/679 — eur-lex.europa.eu' },
-  { pattern: /GDPR Art\. 35/, ref: 'GDPR Art. 35 (DPIA)', origin: 'Regulation (EU) 2016/679 — eur-lex.europa.eu' },
+  { pattern: /(GDPR|DSGVO|RGPD) (Art|Md)\. 6\/7/, ref: 'GDPR Art. 6 & 7', origin: 'Regulation (EU) 2016/679 — eur-lex.europa.eu' },
+  { pattern: /(GDPR|DSGVO|RGPD) (Art|Md)\. 35/, ref: 'GDPR Art. 35 (DPIA)', origin: 'Regulation (EU) 2016/679 — eur-lex.europa.eu' },
   { pattern: /TTDSG §25/, ref: 'TTDSG §25', origin: 'Telekommunikation-Digitale-Dienste-Datenschutz-Gesetz — gesetze-im-internet.de' },
   { pattern: /GwG §20/, ref: 'GwG §20 Abs. 1', origin: 'Geldwäschegesetz · Transparenzregister — gesetze-im-internet.de/gwg' },
 ];
 
-// jsPDF's built-in fonts speak WinAnsi — swap only glyphs outside it (arrows
-// etc.); dashes, quotes, €, § and · render fine and must survive.
+// jsPDF's built-in fonts speak WinAnsi — transliterate the Turkish glyphs
+// outside it (İ ı Ş ş Ğ ğ), swap arrows, drop the rest; dashes, quotes, €, §,
+// · and the Latin-1 accents (ä ç í ü …) render fine and must survive.
+const TRANSLIT: Record<string, string> = { İ: 'I', ı: 'i', Ş: 'S', ş: 's', Ğ: 'G', ğ: 'g' };
 function pdfSafe(s: string): string {
   return s
     .replace(/→/g, '-')
+    .replace(/[İıŞşĞğ]/g, (c) => TRANSLIT[c])
     .replace(/[^\x20-\x7E\xA0-\xFF€–—‘’“”…]/g, '');
 }
 
-function profileLine(profile?: SearchProfile | null): string {
-  if (!profile) return 'Anonymous assessment · example scope';
+function profileLine(profile: SearchProfile | null | undefined, t: PdfTranslate): string {
+  if (!profile) return t('pdf.profile.anonymousScope', { defaultValue: 'Anonymous assessment · example scope' });
   // PII whitelist — nothing else from the profile enters the PDF.
   const bits: string[] = [];
-  if (profile.markets?.length) bits.push(`Markets: ${profile.markets.join(' · ')}`);
-  if (profile.categories?.length) bits.push(`Domains: ${profile.categories.join(', ')}`);
-  if (profile.businessTypeNote || profile.businessType) bits.push(`Operations: ${profile.businessTypeNote || profile.businessType}`);
-  return bits.length ? bits.join('   ·   ') : 'Anonymous assessment';
+  if (profile.markets?.length) bits.push(`${t('pdf.profile.markets', { defaultValue: 'Markets' })}: ${profile.markets.join(' · ')}`);
+  if (profile.categories?.length) bits.push(`${t('pdf.profile.domains', { defaultValue: 'Domains' })}: ${profile.categories.join(', ')}`);
+  if (profile.businessTypeNote || profile.businessType) bits.push(`${t('pdf.profile.operations', { defaultValue: 'Operations' })}: ${profile.businessTypeNote || profile.businessType}`);
+  return bits.length ? bits.join('   ·   ') : t('pdf.profile.anonymous', { defaultValue: 'Anonymous assessment' });
 }
 
 export function generateRiskMapPdf(opts: {
   obligations: PdfObligation[];
   stats: { value: string; label: string }[];
   profile?: SearchProfile | null;
+  /** i18next `t` scoped to the `results` namespace. Omitted → canonical EN. */
+  t?: PdfTranslate;
 }): void {
+  const t = opts.t ?? fallbackT;
+  // Every translated / dynamic string goes through the WinAnsi sanitizer.
+  const L = (key: string, defaultValue: string, vars?: Record<string, unknown>) =>
+    pdfSafe(String(t(key, { defaultValue, ...vars })));
   const doc = new jsPDF({ unit: 'pt', format: 'a4' });
   const W = doc.internal.pageSize.getWidth();
   const M = 48;
@@ -88,7 +108,7 @@ export function generateRiskMapPdf(opts: {
   doc.setTextColor(GOLD).text('360', M + chWidth + 2, y);
   doc.setFont('helvetica', 'normal').setFontSize(8).setTextColor(MUTED);
   doc.text('Compliance. Simplified.', M, y + 12);
-  doc.text(`Generated ${new Date().toISOString().slice(0, 10)} · staging preview`, W - M, y, { align: 'right' });
+  doc.text(L('pdf.generated', 'Generated {{date}} · staging preview', { date: new Date().toISOString().slice(0, 10) }), W - M, y, { align: 'right' });
   y += 40;
 
   doc.setDrawColor(LINE).setLineWidth(0.75).line(M, y, W - M, y);
@@ -96,10 +116,10 @@ export function generateRiskMapPdf(opts: {
 
   // ── Title + scope ───────────────────────────────────────────────────────
   doc.setFont('times', 'bold').setFontSize(24).setTextColor(INK);
-  doc.text('Your compliance risk map.', M, y);
+  doc.text(L('pdf.title', 'Your compliance risk map.'), M, y);
   y += 20;
   doc.setFont('helvetica', 'normal').setFontSize(9).setTextColor(MUTED);
-  doc.text(profileLine(opts.profile), M, y);
+  doc.text(pdfSafe(profileLine(opts.profile, t)), M, y);
   y += 28;
 
   // ── Stats row ───────────────────────────────────────────────────────────
@@ -108,24 +128,41 @@ export function generateRiskMapPdf(opts: {
     const x = M + i * (statW + 12);
     doc.setDrawColor(LINE).setLineWidth(0.75).roundedRect(x, y, statW, 46, 6, 6);
     doc.setFont('times', 'bold').setFontSize(16).setTextColor(PETROL_DEEP);
-    doc.text(s.value, x + 12, y + 20);
+    doc.text(pdfSafe(s.value), x + 12, y + 20);
     doc.setFont('helvetica', 'normal').setFontSize(7.5).setTextColor(MUTED);
-    doc.text(s.label.toUpperCase(), x + 12, y + 34);
+    doc.text(pdfSafe(s.label).toUpperCase(), x + 12, y + 34);
   });
   y += 70;
 
   // ── Obligations table ───────────────────────────────────────────────────
   doc.setFont('helvetica', 'bold').setFontSize(8).setTextColor(MUTED);
   const cols = { sev: M, title: M + 78, market: M + 320, due: M + 396, state: M + 460 };
-  ['SEVERITY', 'OBLIGATION', 'MARKET', 'DUE', 'STATE'].forEach((h, i) => {
-    doc.text(h, Object.values(cols)[i], y);
+  [
+    L('table.severity', 'Severity'),
+    L('table.obligation', 'Obligation'),
+    L('table.market', 'Market'),
+    L('table.due', 'Due'),
+    L('table.state', 'State'),
+  ].forEach((h, i) => {
+    doc.text(h.toUpperCase(), Object.values(cols)[i], y);
   });
   y += 8;
   doc.setDrawColor(LINE).line(M, y, W - M, y);
   y += 16;
 
+  const SEVERITY_EN: Record<PdfObligation['severity'], string> = {
+    critical: 'Critical', high: 'High', medium: 'Medium', low: 'Low',
+  };
   for (const raw of opts.obligations) {
-    const o = { ...raw, title: pdfSafe(raw.title), detail: pdfSafe(raw.detail) };
+    const o = {
+      ...raw,
+      title: pdfSafe(raw.title),
+      detail: pdfSafe(raw.detail),
+      market: pdfSafe(raw.market),
+      due: pdfSafe(raw.due),
+      dueSub: pdfSafe(raw.dueSub),
+      stateLabel: pdfSafe(raw.stateLabel),
+    };
     const detailLines = doc.setFont('helvetica', 'normal').setFontSize(7.5).splitTextToSize(o.detail, 226) as string[];
     const rowH = Math.max(30, 14 + detailLines.length * 9);
     ensureRoom(rowH + 8);
@@ -134,7 +171,7 @@ export function generateRiskMapPdf(opts: {
     doc.setFillColor(SEVERITY_FILL[o.severity]);
     doc.roundedRect(cols.sev, y - 8, 58, 14, 7, 7, 'F');
     doc.setFont('helvetica', 'bold').setFontSize(7).setTextColor('#FFFFFF');
-    doc.text(o.severity.toUpperCase(), cols.sev + 29, y + 1.5, { align: 'center' });
+    doc.text(L(`severity.${o.severity}`, SEVERITY_EN[o.severity]).toUpperCase(), cols.sev + 29, y + 1.5, { align: 'center' });
 
     doc.setFont('helvetica', 'bold').setFontSize(9).setTextColor(INK);
     doc.text(o.title, cols.title, y);
@@ -159,7 +196,7 @@ export function generateRiskMapPdf(opts: {
   if (found.length) {
     ensureRoom(30 + found.length * 14);
     doc.setFont('helvetica', 'bold').setFontSize(8).setTextColor(MUTED);
-    doc.text('SOURCES', M, y);
+    doc.text(L('pdf.sources', 'Sources').toUpperCase(), M, y);
     y += 14;
     doc.setFont('helvetica', 'normal').setFontSize(8);
     for (const s of found) {
@@ -178,7 +215,7 @@ export function generateRiskMapPdf(opts: {
     doc.setDrawColor(LINE).setLineWidth(0.5).line(M, H - 48, W - M, H - 48);
     doc.setFont('helvetica', 'normal').setFontSize(7).setTextColor(MUTED);
     doc.text(
-      'CompliHub360 is an orchestration platform, not a law firm. Legal, tax and regulatory advice is delivered by Verified Partners under their own professional liability.',
+      L('pdf.disclaimer', 'CompliHub360 is an orchestration platform, not a law firm. Legal, tax and regulatory advice is delivered by Verified Partners under their own professional liability.'),
       M, H - 36, { maxWidth: W - 2 * M - 60 },
     );
     doc.text(`${p} / ${pages}`, W - M, H - 36, { align: 'right' });

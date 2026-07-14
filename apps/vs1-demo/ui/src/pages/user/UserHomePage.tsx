@@ -69,20 +69,30 @@ export function UserHomePage() {
   const navigate = useNavigate();
   const { locale = 'en' } = useParams();
   const { t } = useTranslation('userws');
+  const { t: tResults } = useTranslation('results');
   const hasProfile = !!localStorage.getItem('ch360_last_profile');
   const tStatus = (label: string) => (STATUS_KEY[label] ? t(`status.${STATUS_KEY[label]}`) : label);
   const tAction = (label: string) => (ACTION_KEY[label] ? t(`actions.${ACTION_KEY[label]}`) : label);
   // A6: same PII-free PDF snapshot as on /results, from the resume panel.
+  // Translated at the render point (results namespace); canonical EN fallback.
   const exportPdf = () => {
     let profile = null;
     try { profile = JSON.parse(localStorage.getItem('ch360_last_profile') || 'null'); } catch { /* fixture */ }
     generateRiskMapPdf({
       profile,
-      stats: STATS,
-      obligations: OBLIGATIONS.map((o) => ({
-        severity: o.severity, title: o.title, detail: o.detail, market: o.market,
-        due: o.due, dueSub: o.dueSub,
-        stateLabel: o.state.kind === 'confirmed' ? 'Confirmed' : o.state.kind === 'likely' ? 'Likely' : `${o.state.count} questions open`,
+      t: tResults,
+      stats: STATS.map((s, i) => ({ value: s.value, label: tResults(`stats.${i}.label`, { defaultValue: s.label }) })),
+      obligations: OBLIGATIONS.map((o, i) => ({
+        severity: o.severity,
+        title: tResults(`obligations.${i}.title`, { defaultValue: o.title }),
+        detail: tResults(`obligations.${i}.detail`, { defaultValue: o.detail }),
+        market: tResults(`obligations.${i}.market`, { defaultValue: o.market }),
+        due: tResults(`obligations.${i}.due`, { defaultValue: o.due }),
+        dueSub: tResults(`obligations.${i}.dueSub`, { defaultValue: o.dueSub }),
+        stateLabel:
+          o.state.kind === 'confirmed' ? tResults('state.confirmed', { defaultValue: 'Confirmed' })
+          : o.state.kind === 'likely' ? tResults('state.likely', { defaultValue: 'Likely' })
+          : tResults('pdf.questionsOpen', { defaultValue: '{{total}} questions open', total: o.state.count }),
       })),
     });
   };

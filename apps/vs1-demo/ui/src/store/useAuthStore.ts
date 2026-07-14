@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured, isDemoLoginEnabled } from '../lib/supabase';
+import { adoptGuestSessions } from '../api/adoption';
 
 export type UserRole = 'user' | 'partner' | 'admin';
 
@@ -101,10 +102,13 @@ if (isSupabaseConfigured && supabase) {
   supabase.auth.getSession().then(({ data }) => {
     if (!data.session && demoActive()) { hydrateDemo(); return; }
     useAuthStore.getState().setSession(data.session);
+    // Signup adoption (Wave A3): claim guest sessions once per account.
+    if (data.session?.user) void adoptGuestSessions(data.session.user.id);
   });
   supabase.auth.onAuthStateChange((_event, session) => {
     if (!session && demoActive()) { hydrateDemo(); return; }
     useAuthStore.getState().setSession(session);
+    if (session?.user) void adoptGuestSessions(session.user.id);
   });
 } else {
   // DEV demo fallback: hydrate the labelled demo flag (never used in prod auth).

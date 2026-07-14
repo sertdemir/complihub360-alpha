@@ -110,5 +110,19 @@
   },
   "quote": {
     "domainTaxVat": "Vergi & KDV"
+  },
+  "pdf": {
+    "title": "Uyum risk haritanız.",
+    "generated": "Oluşturulma: {{date}} · staging önizlemesi",
+    "profile": {
+      "anonymousScope": "Anonim değerlendirme · örnek kapsam",
+      "anonymous": "Anonim değerlendirme",
+      "markets": "Pazarlar",
+      "domains": "Alanlar",
+      "operations": "Faaliyet"
+    },
+    "questionsOpen": "{{total}} soru açık",
+    "sources": "Kaynaklar",
+    "disclaimer": "CompliHub360 bir orkestrasyon platformudur, hukuk bürosu değildir. Hukuki, vergisel ve düzenleyici danışmanlık, Verified Partners tarafından kendi mesleki sorumlulukları altında sunulur."
   }
 }

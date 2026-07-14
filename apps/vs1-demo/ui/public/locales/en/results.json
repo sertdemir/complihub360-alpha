@@ -110,5 +110,19 @@
   },
   "quote": {
     "domainTaxVat": "Tax & VAT"
+  },
+  "pdf": {
+    "title": "Your compliance risk map.",
+    "generated": "Generated {{date}} · staging preview",
+    "profile": {
+      "anonymousScope": "Anonymous assessment · example scope",
+      "anonymous": "Anonymous assessment",
+      "markets": "Markets",
+      "domains": "Domains",
+      "operations": "Operations"
+    },
+    "questionsOpen": "{{total}} questions open",
+    "sources": "Sources",
+    "disclaimer": "CompliHub360 is an orchestration platform, not a law firm. Legal, tax and regulatory advice is delivered by Verified Partners under their own professional liability."
   }
 }

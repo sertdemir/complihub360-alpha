@@ -110,5 +110,19 @@
   },
   "quote": {
     "domainTaxVat": "Steuern & USt."
+  },
+  "pdf": {
+    "title": "Ihre Compliance-Risikokarte.",
+    "generated": "Erstellt am {{date}} · Staging-Vorschau",
+    "profile": {
+      "anonymousScope": "Anonyme Einschätzung · Beispielumfang",
+      "anonymous": "Anonyme Einschätzung",
+      "markets": "Märkte",
+      "domains": "Bereiche",
+      "operations": "Geschäftstätigkeit"
+    },
+    "questionsOpen": "{{total}} Fragen offen",
+    "sources": "Quellen",
+    "disclaimer": "CompliHub360 ist eine Orchestrierungsplattform und keine Rechtsanwaltskanzlei. Rechts-, Steuer- und Regulierungsberatung erbringen Verified Partners in eigener beruflicher Haftung."
   }
 }
