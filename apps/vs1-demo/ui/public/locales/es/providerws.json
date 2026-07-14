@@ -89,7 +89,9 @@
     "lineItems": "Conceptos",
     "total": "Total",
     "failedNote": "Pago fallido — reintente o actualice su método de pago en Facturación para evitar el bloqueo del workspace.",
-    "pricingNote": "Modelo de precios: 92 € por encargo confirmado · 2 € por clic de afiliado · 0 € de suscripción."
+    "pricingNote": "Modelo de precios: 92 € por encargo confirmado · 2 € por clic de afiliado · 0 € de suscripción.",
+    "payAtStripe": "Pagar factura en Stripe",
+    "viewAtStripe": "Ver en Stripe"
   },
   "searchDrawer": {
     "eyebrow": "WORKSPACE",

@@ -28,8 +28,33 @@ Keine — Sandbox geclaimt, Integration läuft.
 Key nur in der VPS-.env (nicht im Repo) · Portal-Konfiguration per API angelegt
 (`bpc_1TsqL5PiuS3HfybDMKRcsmzO`).
 
+## Invoicing (seit 2026-07-15 live)
+
+**Monatslauf:** `POST /api/v1/admin/billing/run` (nur `x-api-key`, JWT-User → 403).
+Body `{"period": "YYYY-MM", "dry_run": true|false}`; ohne period = laufender Monat.
+Pro Provider und Periode entsteht EINE Stripe-Invoice (idempotent — zweiter Lauf
+überspringt): €92 je Engagement, das in der Periode confirmed/replied wurde
+(Invoice Items, `collection_method=send_invoice`, 14 Tage Ziel, Inline-Beträge —
+kein Dashboard-Produkt nötig). Die invoices-Tabelle spiegelt Nummer, Summe,
+`hosted_invoice_url` (Pay-Page) und `invoice_pdf`.
+
+**Status-Rückfluss ohne Webhook:** Die Staging-Basic-Auth blockt Stripe-Callbacks,
+deshalb synct `GET /provider/:key/invoices` offene Stripe-Invoices beim Abruf
+(paid/void/uncollectible → Tabelle). Produktion ersetzt das durch den
+`invoice.finalized`/`invoice.paid`-Webhook.
+
+**Manueller Lauf (Staging):**
+
+```bash
+source .env.staging
+curl -u "complihub:…" -X POST https://staging.complihub360.com/api/v1/admin/billing/run \
+  -H 'Content-Type: application/json' -H "x-api-key: $STAGING_API_KEY" \
+  -d '{"period":"2026-07"}'
+```
+
 ## Später (Produktion)
 
 - Live-Key statt Test-Key, gleiche Stelle.
-- Invoices aus Stripe ziehen statt der geseedeten Tabelle (Webhook
-  `invoice.finalized` → invoices-Tabelle) — separates Arbeitspaket.
+- Webhook (`invoice.paid`/`invoice.finalized`) statt Sync-on-Read, sobald die
+  API öffentlich erreichbar ist.
+- Cron für den Monatslauf am 1. (Vormonat abrechnen) — braucht VPS-Crontab.

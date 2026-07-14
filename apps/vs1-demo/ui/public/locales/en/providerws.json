@@ -89,7 +89,9 @@
     "lineItems": "Line items",
     "total": "Total",
     "failedNote": "Payment failed — retry or update your payment method in Billing to avoid a workspace lock.",
-    "pricingNote": "Pricing model: €92 per confirmed engagement · €2 per affiliate click · €0 subscription."
+    "pricingNote": "Pricing model: €92 per confirmed engagement · €2 per affiliate click · €0 subscription.",
+    "payAtStripe": "Pay invoice at Stripe",
+    "viewAtStripe": "View at Stripe"
   },
   "searchDrawer": {
     "eyebrow": "WORKSPACE",

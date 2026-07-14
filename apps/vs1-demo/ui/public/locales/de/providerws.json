@@ -89,7 +89,9 @@
     "lineItems": "Positionen",
     "total": "Gesamt",
     "failedNote": "Zahlung fehlgeschlagen — bitte erneut versuchen oder die Zahlungsmethode unter Abrechnung aktualisieren, um eine Workspace-Sperre zu vermeiden.",
-    "pricingNote": "Preismodell: 92 € pro bestätigtem Mandat · 2 € pro Affiliate-Klick · 0 € Abo."
+    "pricingNote": "Preismodell: 92 € pro bestätigtem Mandat · 2 € pro Affiliate-Klick · 0 € Abo.",
+    "payAtStripe": "Rechnung bei Stripe bezahlen",
+    "viewAtStripe": "Bei Stripe ansehen"
   },
   "searchDrawer": {
     "eyebrow": "WORKSPACE",

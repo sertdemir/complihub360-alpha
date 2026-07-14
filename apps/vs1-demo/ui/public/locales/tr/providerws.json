@@ -89,7 +89,9 @@
     "lineItems": "Kalemler",
     "total": "Toplam",
     "failedNote": "Ödeme başarısız oldu — çalışma alanı kilidini önlemek için Faturalama bölümünden yeniden deneyin veya ödeme yönteminizi güncelleyin.",
-    "pricingNote": "Fiyatlandırma modeli: onaylanan görev başına 92 € · affiliate tıklaması başına 2 € · 0 € abonelik."
+    "pricingNote": "Fiyatlandırma modeli: onaylanan görev başına 92 € · affiliate tıklaması başına 2 € · 0 € abonelik.",
+    "payAtStripe": "Faturayı Stripe’da öde",
+    "viewAtStripe": "Stripe’da görüntüle"
   },
   "searchDrawer": {
     "eyebrow": "ÇALIŞMA ALANI",

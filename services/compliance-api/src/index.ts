@@ -9,6 +9,7 @@ import { generateRelevantSubdomains, type CountryCode, type IndustryType, type B
 import { supabaseApi } from "./supabase.js";
 import { sendMagicLinkMail, sendEmailChangeMail } from "./mailer.js";
 import { handleAssistantChat, handleAssistantCheckout, handleAssistantVerify } from "./assistant.js";
+import { handleBillingRun, syncOpenInvoices } from "./billing.js";
 import { redactText } from "@complihub360/redaction";
 
 // P0 #1: shared magic-link verification — SHA-256 hash lookup, engagement +
@@ -94,6 +95,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     // Caller identity from a valid Supabase JWT (phase ③ subscription gate).
     let authUserId: string | null = null;
     let authEmail: string | null = null;
+    // True only for the server-to-server API key — gates admin-only routes.
+    let authViaApiKey = false;
 
     // 2.c Native Supabase JWT Authentication (Skip for /health and /ready)
     if (req.url !== '/health' && req.url !== '/ready') {
@@ -144,6 +147,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         const expectedApiKey = process.env.API_KEY;
         if (!isAuthenticated && expectedApiKey && devKey === expectedApiKey) {
             isAuthenticated = true;
+            authViaApiKey = true;
         }
 
         if (!isAuthenticated) {
@@ -593,9 +597,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             }
         });
     } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/invoices$/.test(req.url || '')) {
-        // B7: invoice history incl. line items (Stripe-issued once C3 lands).
+        // B7: invoice history incl. line items. Stripe-issued via the monthly
+        // billing run; open rows pull their payment status here (no webhook —
+        // the staging basic-auth wall blocks Stripe callbacks).
         const providerKey = (req.url || '').split('/')[4];
         try {
+            await syncOpenInvoices(providerKey).catch(() => { /* list still renders */ });
             const invoices = await supabaseApi.select('invoices', { provider_key: providerKey }, { order: 'period.desc', limit: 24 });
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -1513,6 +1520,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     } else if (req.method === 'POST' && req.url === '/api/v1/assistant/checkout') {
         // Phase ③: Stripe Checkout for Assistant Pro (12 $/month).
         handleAssistantCheckout(req, res, correlationId, { userId: authUserId, email: authEmail }, ip);
+    } else if (req.method === 'POST' && req.url === '/api/v1/admin/billing/run') {
+        // Monthly platform-fee run (billing.ts) — server-to-server key only.
+        handleBillingRun(req, res, correlationId, authViaApiKey);
     } else if (req.method === 'POST' && req.url === '/api/v1/assistant/verify') {
         // Phase ③: verify-on-return — confirms the subscription after checkout.
         handleAssistantVerify(req, res, correlationId, { userId: authUserId, email: authEmail });

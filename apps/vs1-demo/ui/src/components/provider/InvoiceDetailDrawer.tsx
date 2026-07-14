@@ -5,8 +5,9 @@ import { Tag } from '../ui/Tag';
 import { euro, type Invoice } from '../../api/billing';
 
 // ─── Invoice-Detail drawer (Figma 2653:92 · wiring map B7) ───────────────────
-// Line items + totals for one invoice. PDF download arrives with the Stripe
-// portal (C3) — the button says so instead of pretending.
+// Line items + totals for one invoice. Stripe-issued rows (monthly billing
+// run) link out to the hosted pay page and the PDF; legacy seeded rows keep
+// the honest disabled state.
 
 const STATUS_TONE: Record<Invoice['status'], 'success' | 'error' | 'warning' | 'neutral'> = {
   paid: 'success',
@@ -40,8 +41,23 @@ export function InvoiceDetailDrawer({ invoice, onClose }: { invoice: Invoice | n
       title={invoice?.invoice_number ?? t('invoiceDetail.fallbackTitle')}
       footer={
         <div className="flex w-full items-center justify-between gap-3">
-          <p className="text-[11px] leading-snug text-fg-tertiary">{t('invoiceDetail.pdfNote')}</p>
-          <Button variant="secondary" size="sm" disabled>{t('invoiceDetail.downloadPdf')}</Button>
+          {invoice?.hosted_invoice_url ? (
+            <>
+              <a href={invoice.invoice_pdf ?? invoice.hosted_invoice_url} target="_blank" rel="noreferrer">
+                <Button variant="secondary" size="sm">{t('invoiceDetail.downloadPdf')}</Button>
+              </a>
+              <a href={invoice.hosted_invoice_url} target="_blank" rel="noreferrer">
+                <Button variant="accent" size="sm">
+                  {invoice.status === 'open' ? t('invoiceDetail.payAtStripe') : t('invoiceDetail.viewAtStripe')}
+                </Button>
+              </a>
+            </>
+          ) : (
+            <>
+              <p className="text-[11px] leading-snug text-fg-tertiary">{t('invoiceDetail.pdfNote')}</p>
+              <Button variant="secondary" size="sm" disabled>{t('invoiceDetail.downloadPdf')}</Button>
+            </>
+          )}
         </div>
       }
     >

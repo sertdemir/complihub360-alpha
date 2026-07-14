@@ -23,6 +23,9 @@ export interface Invoice {
   issued_at: string;
   due_at?: string | null;
   paid_at?: string | null;
+  // Stripe-issued invoices (monthly billing run) carry the pay page + PDF.
+  hosted_invoice_url?: string | null;
+  invoice_pdf?: string | null;
 }
 
 export function euro(cents: number): string {
