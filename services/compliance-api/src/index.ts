@@ -8,6 +8,7 @@ import { generateRelevantSubdomains, type CountryCode, type IndustryType, type B
 
 import { supabaseApi } from "./supabase.js";
 import { sendMagicLinkMail, sendEmailChangeMail } from "./mailer.js";
+import { handleAssistantChat, handleAssistantCheckout, handleAssistantVerify } from "./assistant.js";
 import { redactText } from "@complihub360/redaction";
 
 // P0 #1: shared magic-link verification — SHA-256 hash lookup, engagement +
@@ -90,6 +91,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 
     const correlationId = normalizeCorrelationId(req.headers['x-correlation-id']);
 
+    // Caller identity from a valid Supabase JWT (phase ③ subscription gate).
+    let authUserId: string | null = null;
+    let authEmail: string | null = null;
+
     // 2.c Native Supabase JWT Authentication (Skip for /health and /ready)
     if (req.url !== '/health' && req.url !== '/ready') {
         let isAuthenticated = false;
@@ -124,6 +129,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                             // NOT a per-user credential. Only real, unexpired user/service tokens pass.
                             if (notExpired && active && role && role !== 'anon') {
                                 isAuthenticated = true;
+                                if (typeof payload.sub === 'string') authUserId = payload.sub;
+                                if (typeof payload.email === 'string') authEmail = payload.email;
                             }
                         }
                     }
@@ -1499,6 +1506,16 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.end(JSON.stringify({ error: String(err) }));
             }
         });
+    } else if (req.method === 'POST' && req.url === '/api/v1/assistant/chat') {
+        // Chatbot plan phase ②: RAG assistant over knowledge_chunks +
+        // jurisdiction_facts (assistant.ts). 503 until GEMINI_API_KEY is set.
+        handleAssistantChat(req, res, correlationId, ip, { userId: authUserId, email: authEmail });
+    } else if (req.method === 'POST' && req.url === '/api/v1/assistant/checkout') {
+        // Phase ③: Stripe Checkout for Assistant Pro (12 $/month).
+        handleAssistantCheckout(req, res, correlationId, { userId: authUserId, email: authEmail }, ip);
+    } else if (req.method === 'POST' && req.url === '/api/v1/assistant/verify') {
+        // Phase ③: verify-on-return — confirms the subscription after checkout.
+        handleAssistantVerify(req, res, correlationId, { userId: authUserId, email: authEmail });
     } else {
         res.setHeader('x-correlation-id', correlationId);
         res.writeHead(404, { 'Content-Type': 'application/json' });

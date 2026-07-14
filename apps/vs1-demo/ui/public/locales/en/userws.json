@@ -357,5 +357,24 @@
     "authorUser": "user",
     "authorProvider": "provider",
     "authorSystem": "system"
+  },
+  "assistant": {
+    "title": "VAT Assistant",
+    "beta": "Beta",
+    "intro": "Ask me about VAT rules, thresholds and deadlines in your markets (DE, UK, NL, FR, IT, ES, US, TR, AT). I answer from CompliHub’s verified knowledge base.",
+    "placeholder": "e.g. When do I have to register for VAT in Italy?",
+    "send": "Send",
+    "open": "Open assistant",
+    "close": "Close assistant",
+    "thinking": "Checking the knowledge base…",
+    "sources": "Sources",
+    "disclaimer": "General regulatory information, not legal or tax advice. For a binding assessment, engage a verified partner.",
+    "error": "That didn’t work — please try again in a moment.",
+    "notConfigured": "The assistant isn’t connected yet on this environment.",
+    "quota": "Daily free limit reached — the upgrade plan is coming soon.",
+    "upgradeTitle": "Assistant Pro",
+    "upgradeBody": "Your 5 free questions for today are used up. Assistant Pro gives you unlimited answers from the verified knowledge base — cancel anytime.",
+    "upgradeCta": "Upgrade · $12 / month",
+    "upgradeSuccess": "Assistant Pro is active — welcome aboard! Ask away."
   }
 }

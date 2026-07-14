@@ -9,6 +9,7 @@ import {
 import { Sidebar, SidebarGroup, NavItem, DomainBar, DomainTab } from '../ui/AppShell';
 import { LogoMark } from '../ui/Logo';
 import { UserSearchDrawer } from './UserSearchDrawer';
+import { AssistantWidget } from './AssistantWidget';
 import { fetchUserRequests } from '../../api/requests';
 import { fetchNotificationsFeed, USER_NOTIFICATIONS_VIEWER } from '../../api/notifications';
 
@@ -180,6 +181,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
         <main className="flex-1 overflow-y-auto px-8 py-6">{children}</main>
       </div>
       <UserSearchDrawer open={searchOpen} onClose={() => setSearchOpen(false)} />
+      <AssistantWidget />
     </div>
   );
 }

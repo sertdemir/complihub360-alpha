@@ -63,6 +63,17 @@ export const supabaseApi = {
         return res.json();
     },
 
+    // Insert-or-update on a unique column (PostgREST merge-duplicates upsert).
+    async upsert(table: string, onConflict: string, data: any) {
+        const res = await fetch(`${restUrl}/${table}?on_conflict=${onConflict}`, {
+            method: 'POST',
+            headers: { ...defaultHeaders, 'Prefer': 'resolution=merge-duplicates,return=representation' },
+            body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error(`Supabase upsert failed: ${await res.text()}`);
+        return res.json();
+    },
+
     async rpc(functionName: string, params: any) {
         const res = await fetch(`${restUrl}/rpc/${functionName}`, {
             method: 'POST',

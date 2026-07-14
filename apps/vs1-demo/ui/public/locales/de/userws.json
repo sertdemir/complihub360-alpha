@@ -357,5 +357,24 @@
     "authorUser": "Nutzer",
     "authorProvider": "Anbieter",
     "authorSystem": "System"
+  },
+  "assistant": {
+    "title": "USt-Assistent",
+    "beta": "Beta",
+    "intro": "Fragen Sie mich zu USt-Regeln, Schwellenwerten und Fristen in Ihren Märkten (DE, UK, NL, FR, IT, ES, US, TR, AT). Ich antworte aus der geprüften CompliHub-Wissensbasis.",
+    "placeholder": "z. B. Ab wann muss ich mich in Italien registrieren?",
+    "send": "Senden",
+    "open": "Assistent öffnen",
+    "close": "Assistent schließen",
+    "thinking": "Prüfe die Wissensbasis…",
+    "sources": "Quellen",
+    "disclaimer": "Allgemeine regulatorische Information, keine Rechts- oder Steuerberatung. Für eine verbindliche Einschätzung beauftragen Sie einen Verified Partner.",
+    "error": "Das hat nicht geklappt — bitte versuchen Sie es gleich erneut.",
+    "notConfigured": "Der Assistent ist in dieser Umgebung noch nicht angebunden.",
+    "quota": "Tageslimit erreicht — der Upgrade-Plan kommt in Kürze.",
+    "upgradeTitle": "Assistant Pro",
+    "upgradeBody": "Ihre 5 kostenlosen Fragen für heute sind aufgebraucht. Mit Assistant Pro erhalten Sie unbegrenzte Antworten aus der geprüften Wissensbasis — monatlich kündbar.",
+    "upgradeCta": "Upgrade · 12 $ / Monat",
+    "upgradeSuccess": "Assistant Pro ist aktiv — willkommen an Bord! Fragen Sie los."
   }
 }

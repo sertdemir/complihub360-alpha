@@ -357,5 +357,24 @@
     "authorUser": "usuario",
     "authorProvider": "proveedor",
     "authorSystem": "sistema"
+  },
+  "assistant": {
+    "title": "Asistente de IVA",
+    "beta": "Beta",
+    "intro": "Pregúnteme sobre normas de IVA, umbrales y plazos en sus mercados (DE, UK, NL, FR, IT, ES, US, TR, AT). Respondo desde la base de conocimiento verificada de CompliHub.",
+    "placeholder": "p. ej. ¿Cuándo debo registrarme a efectos de IVA en Italia?",
+    "send": "Enviar",
+    "open": "Abrir asistente",
+    "close": "Cerrar asistente",
+    "thinking": "Consultando la base de conocimiento…",
+    "sources": "Fuentes",
+    "disclaimer": "Información regulatoria general, no asesoramiento legal ni fiscal. Para una evaluación vinculante, contrate a un Verified Partner.",
+    "error": "No ha funcionado — inténtelo de nuevo en un momento.",
+    "notConfigured": "El asistente aún no está conectado en este entorno.",
+    "quota": "Límite diario alcanzado — el plan de mejora llegará pronto.",
+    "upgradeTitle": "Assistant Pro",
+    "upgradeBody": "Sus 5 preguntas gratuitas de hoy se han agotado. Con Assistant Pro obtiene respuestas ilimitadas de la base de conocimiento verificada — cancelable mensualmente.",
+    "upgradeCta": "Mejorar · 12 $ / mes",
+    "upgradeSuccess": "Assistant Pro está activo — ¡bienvenido! Pregunte lo que quiera."
   }
 }
