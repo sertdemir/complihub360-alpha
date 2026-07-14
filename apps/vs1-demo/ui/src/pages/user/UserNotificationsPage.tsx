@@ -22,7 +22,7 @@ const FIXTURE: FeedGroup[] = [
     { title: 'SLA reminder · Lex Privacy LLP', event: 'SLA', kind: 'sla', time: '4h',
       desc: 'No response in 96h — re-route to another partner available' },
     { title: 'Risk threshold reached · Italy VAT', event: 'MONITORING', kind: 'system', time: '6h',
-      desc: '€145k IT revenue crossed the €100k OSS threshold' },
+      desc: '€145k IT revenue — €10k EU-wide OSS threshold exceeded' },
   ]},
   { day: 'Yesterday', items: [
     { title: 'Session refreshed · GDPR audit & DPA review', event: 'SYSTEM', kind: 'system', time: '18:34',

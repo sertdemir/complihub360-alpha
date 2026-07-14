@@ -78,11 +78,14 @@ const STEPS = [
   { label: 'Set up quarterly OSS filing routine', description: 'OSS: DE handles EU-wide reporting · €10k cross-border threshold' },
 ];
 
+// Real thresholds (jurisdiction_facts / EY guide 03-2026): the EU distance-
+// selling threshold is €10k EU-WIDE (cumulative, not per country) — the EU row
+// aggregates IT €145k + ES €76k + FR €31k + AT €11k. UK: GBP 90k registration
+// threshold. US: USD 100k/200-transaction economic nexus per state (Wayfair).
 const THRESHOLDS = [
-  { country: 'IT', amount: '€145k', limit: '€100k', status: 'HIGH', tone: 'error' as const, pct: 100, color: 'error' as const },
-  { country: 'ES', amount: '€76k', limit: '€100k', status: 'CAUTION', tone: 'warning' as const, pct: 76, color: 'warning' as const },
-  { country: 'FR', amount: '€31k', limit: '€100k', status: 'SAFE', tone: 'success' as const, pct: 31, color: 'brand' as const },
-  { country: 'AT', amount: '€11k', limit: '€100k', status: 'SAFE', tone: 'success' as const, pct: 11, color: 'brand' as const },
+  { country: 'EU', amount: '€263k', limit: '€10k', status: 'HIGH', tone: 'error' as const, pct: 100, color: 'error' as const },
+  { country: 'UK', amount: '£78k', limit: '£90k', status: 'CAUTION', tone: 'warning' as const, pct: 87, color: 'warning' as const },
+  { country: 'US', amount: '$57k', limit: '$100k', status: 'SAFE', tone: 'success' as const, pct: 57, color: 'brand' as const },
 ];
 
 const THRESHOLD_STATUS_KEY: Record<string, string> = { HIGH: 'statusHigh', CAUTION: 'statusCaution', SAFE: 'statusSafe' };
