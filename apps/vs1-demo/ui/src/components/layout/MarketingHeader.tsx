@@ -281,7 +281,8 @@ export function MarketingHeader({
       {/* ── Mobile / Tablet (pill panel until the desktop bar fits) ── */}
       <div className="lg:hidden">
         <div className="flex h-16 items-center justify-between px-5">
-          <Logo tone={inverse ? 'on-petrol' : 'on-light'} />
+          {/* Mobile: mark only — wordmark + claim dropped to save width. */}
+          <Logo lockup="mark" tone={inverse ? 'on-petrol' : 'on-light'} />
           <div className="flex items-center gap-2">
             <ThemeToggle inverse={inverse} size={40} />
             <LanguageMenu buttonClass={`grid h-[40px] w-[40px] place-items-center rounded-md ${inverse ? 'text-fg-inverse' : 'text-fg-secondary'}`} />

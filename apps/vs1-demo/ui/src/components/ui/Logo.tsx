@@ -21,11 +21,14 @@ const NUM =
 export type LogoTone = 'on-light' | 'on-petrol' | 'mono-white' | 'mono-black';
 export type LogoLockup = 'horizontal' | 'stacked' | 'mark';
 
+// Mark fills are Tailwind `fill-*` classes (not raw attributes) so the mark can
+// flip in dark mode. 'on-light' is the only tone that adapts: in dark the mark
+// swaps (ring → Petrol, 360 → Gold) and the wordmark turns Brandgrün #097070.
 const TONE: Record<LogoTone, { ring: string; num: string; word: string; tag: string }> = {
-  'on-light': { ring: '#D4AF37', num: '#004D40', word: 'text-fg-brand', tag: 'text-fg-accent' },
-  'on-petrol': { ring: '#D4AF37', num: '#FFFFFF', word: 'text-fg-inverse', tag: 'text-fg-accent' },
-  'mono-white': { ring: '#FFFFFF', num: '#FFFFFF', word: 'text-white', tag: 'text-white' },
-  'mono-black': { ring: '#0F172A', num: '#0F172A', word: 'text-[#0F172A]', tag: 'text-[#0F172A]' },
+  'on-light': { ring: 'fill-[#D4AF37] dark:fill-[#004D40]', num: 'fill-[#004D40] dark:fill-[#D4AF37]', word: 'text-fg-brand dark:text-[#097070]', tag: 'text-fg-accent' },
+  'on-petrol': { ring: 'fill-[#D4AF37]', num: 'fill-[#FFFFFF]', word: 'text-fg-inverse', tag: 'text-fg-accent' },
+  'mono-white': { ring: 'fill-white', num: 'fill-white', word: 'text-white', tag: 'text-white' },
+  'mono-black': { ring: 'fill-[#0F172A]', num: 'fill-[#0F172A]', word: 'text-[#0F172A]', tag: 'text-[#0F172A]' },
 };
 
 export function LogoMark({ tone = 'on-light', className }: { tone?: LogoTone; className?: string }) {
@@ -38,8 +41,8 @@ export function LogoMark({ tone = 'on-light', className }: { tone?: LogoTone; cl
       aria-hidden="true"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path d={RING} fill={c.ring} />
-      <path d={NUM} fill={c.num} />
+      <path d={RING} className={c.ring} />
+      <path d={NUM} className={c.num} />
     </svg>
   );
 }
