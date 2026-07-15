@@ -72,7 +72,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const variantClasses: Record<ButtonVariant, string> = {
-      primary: 'bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700 focus:ring-primary-500',
+      // Canonical button green = flat Teal #14a89a in BOTH modes, dark ink for AA
+      // contrast — every CTA matches the wizard-footer teal, light and dark.
+      primary: 'bg-[#14a89a] text-[#04140f] hover:brightness-95 active:brightness-90 focus:ring-[#14a89a]',
       secondary:
         'bg-neutral-100 text-neutral-900 hover:bg-neutral-200 active:bg-neutral-300 focus:ring-neutral-500 dark:bg-white/10 dark:text-white dark:hover:bg-white/[0.16] dark:active:bg-white/20',
       outline:

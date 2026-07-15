@@ -570,7 +570,7 @@ export function AnimatedWizard({
               className={
                 'inline-flex items-center gap-1.5 rounded-lg font-semibold transition-transform duration-200 hover:-translate-y-0.5 ' +
                 (sp ? 'px-6 py-3 text-[15px]' : 'px-5 py-2.5 text-[13px]') +
-                (isReview ? ' bg-accent-500 text-primary-950' : ' bg-brand text-fg-on-brand')
+                ' bg-[#14a89a] text-[#04140f]'
               }
             >
               {isReview ? t('wizard.generate') : t('wizard.footer.next')} <ArrowRight size={sp ? 16 : 14} />
@@ -583,7 +583,7 @@ export function AnimatedWizard({
             </span>
             <span
               ref={setTarget(FOOTER)}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2 text-[13px] font-semibold text-fg-on-brand"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[#14a89a] px-4 py-2 text-[13px] font-semibold text-[#04140f]"
             >
               {t(`wizard.footer.${step.footerKey}`)} <ArrowRight size={14} />
             </span>

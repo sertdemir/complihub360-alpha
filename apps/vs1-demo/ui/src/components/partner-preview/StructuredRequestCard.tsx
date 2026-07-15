@@ -69,7 +69,7 @@ export function StructuredRequestCard({ request, frame = 'plain', showAccept, on
 
       {showAccept && (
         <div className="mt-4 flex items-center gap-3">
-          <Button size="sm" onClick={onAccept} className="bg-accent-500 text-primary-900 hover:bg-accent-600">
+          <Button size="sm" onClick={onAccept}>
             Accept <ArrowRight size={14} className="ml-1" />
           </Button>
           {request.feeNote && <span className="text-[12px] text-fg-tertiary">{request.feeNote}</span>}

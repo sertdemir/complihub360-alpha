@@ -94,7 +94,7 @@ export function WizardReviewPanel({ onGenerateResults, isGuest = true }: WizardR
             <button
                 type="button"
                 onClick={onGenerateResults}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-accent-500 px-6 py-3.5 text-[15px] font-semibold text-primary-900 transition-transform duration-200 hover:-translate-y-0.5"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#14a89a] px-6 py-3.5 text-[15px] font-semibold text-[#04140f] transition-transform duration-200 hover:-translate-y-0.5"
             >
                 {t('wizard.reviewPanel.generateCTA', "Generate my risk map")} <ArrowRight size={17} />
             </button>

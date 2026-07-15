@@ -100,7 +100,7 @@ function DomainDrawer({ index, onClose }: { index: number; onClose: () => void }
 
         <div className="border-t border-stroke-subtle bg-surface-secondary px-8 py-5">
           <p className="text-[13px] text-fg-tertiary">{t('drawer.continues')}</p>
-          <Button fullWidth className="mt-3 bg-accent-500 text-primary-900 hover:bg-accent-600">
+          <Button fullWidth className="mt-3">
             {t('drawer.seeIfApplies')} <ArrowRight size={16} className="ml-1.5" />
           </Button>
         </div>

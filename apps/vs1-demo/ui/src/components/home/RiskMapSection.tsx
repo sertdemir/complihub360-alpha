@@ -158,7 +158,7 @@ export function RiskMapSection() {
         <p className="mx-auto mt-2 text-[14px] text-fg-secondary">
           {t('riskMap.save.subtitle')}
         </p>
-        <Button className="mt-7 bg-accent-500 text-primary-900 hover:bg-accent-600">
+        <Button className="mt-7">
           {t('riskMap.save.cta')} <ArrowRight size={16} className="ml-1.5" />
         </Button>
       </div>

@@ -106,7 +106,7 @@ export function ChannelsSection() {
               <div className="mb-3 flex items-center gap-2 rounded-lg bg-accent-50 px-3 py-2 text-[12px] font-medium text-accent-700">
                 <Lock size={13} /> {t('channels.engagement.lockNote')}
               </div>
-              <Button fullWidth className="bg-accent-500 text-primary-900 hover:bg-accent-600">
+              <Button fullWidth>
                 {t('channels.engagement.cta')} <ArrowRight size={16} className="ml-1.5" />
               </Button>
               <p className="mt-3 text-center text-[12px] text-neutral-400">{t('channels.engagement.footnote')}</p>

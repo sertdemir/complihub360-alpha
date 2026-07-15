@@ -38,7 +38,7 @@ export function ReviewStep() {
       topbarRight={topbarRight}
       footerLeft={footerLeft}
       footerRight={
-        <Button className="bg-accent-500 text-primary-900 hover:bg-accent-600">
+        <Button>
           Generate my risk map <ArrowRight size={16} className="ml-1.5" />
         </Button>
       }
