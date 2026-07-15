@@ -1,9 +1,10 @@
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LayoutGrid, Bell, Users, Shield, Lock, Activity, Search, ScrollText } from 'lucide-react';
+import { LayoutGrid, Bell, Users, Shield, Lock, Activity, Search, ScrollText, Gauge } from 'lucide-react';
 import { Sidebar, SidebarGroup, NavItem } from '../ui/AppShell';
 import { LogoMark } from '../ui/Logo';
+import { ThemeToggle } from '../ui/ThemeToggle';
 import { cn } from '../../lib/utils';
 
 // ─── AdminShell ───────────────────────────────────────────────────────────────
@@ -16,6 +17,7 @@ const NAV = [
     group: 'Monitor',
     items: [
       { to: '', label: 'Overview', icon: LayoutGrid },
+      { to: 'cockpit', label: 'Founder Cockpit', icon: Gauge },
       { to: 'events', label: 'Events & Audit', icon: ScrollText },
     ],
   },
@@ -40,15 +42,23 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const { i18n } = useTranslation();
   const locale = i18n.resolvedLanguage || 'en';
   const location = useLocation();
+  const navigate = useNavigate();
   const base = `/${locale}/admin`;
+  const currentLang = i18n.resolvedLanguage === 'de' ? 'de' : 'en';
+  const switchLang = (lng: 'de' | 'en') => {
+    const parts = location.pathname.split('/');
+    if (parts.length > 1 && ['en', 'de', 'es', 'tr'].includes(parts[1])) parts[1] = lng;
+    void i18n.changeLanguage(lng);
+    navigate(parts.join('/') + location.search + location.hash);
+  };
 
   return (
-    <div className="dark flex h-screen bg-[#1F2937] text-fg">
+    <div className="flex h-screen bg-surface text-fg">
       <Sidebar
         logo={
           <NavLink to={base} className="flex items-center gap-2">
             <LogoMark tone="on-petrol" className="h-[22px] w-auto" />
-            <span className="text-[15px] font-semibold text-white">CompliHub</span>
+            <span className="text-[15px] font-semibold text-fg">CompliHub</span>
             <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-fg-accent">Admin</span>
           </NavLink>
         }
@@ -79,10 +89,23 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       </Sidebar>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-15 min-h-[60px] shrink-0 items-center justify-end gap-3 border-b border-white/10 px-6">
+        <header className="flex h-15 min-h-[60px] shrink-0 items-center justify-end gap-3 border-b border-stroke px-6">
           <button type="button" aria-label="Search" className="mr-1 text-fg-tertiary transition-colors hover:text-fg">
             <Search size={18} />
           </button>
+          <div className="flex items-center overflow-hidden rounded-md border border-stroke text-[11px] font-semibold">
+            {(['de', 'en'] as const).map((l) => (
+              <button
+                key={l}
+                type="button"
+                onClick={() => switchLang(l)}
+                className={cn('px-2.5 py-1 transition-colors', currentLang === l ? 'bg-surface-secondary text-fg' : 'text-fg-tertiary hover:text-fg')}
+              >
+                {l.toUpperCase()}
+              </button>
+            ))}
+          </div>
+          <ThemeToggle size={34} />
           <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/10 px-3 py-1 text-[12px] font-medium text-emerald-400 ring-1 ring-inset ring-emerald-400/30">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
             All systems up

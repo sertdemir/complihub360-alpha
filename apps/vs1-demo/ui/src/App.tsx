@@ -18,6 +18,7 @@ import AdvisoryPage from "./pages/AdvisoryPage";
 import { AiGovernancePage } from "./pages/AiGovernancePage";
 import { PrivacyPage, ImprintPage } from "./pages/legal/LegalPages";
 import { AdminOverviewPage } from "./pages/admin/AdminOverviewPage";
+import { CockpitPage } from "./pages/admin/CockpitPage";
 import { AdminEventsPage } from "./pages/admin/AdminEventsPage";
 import { AdminComingSoonPage } from "./pages/admin/AdminComingSoonPage";
 import { ProviderMagicActionPage } from "./pages/provider/ProviderMagicActionPage";
@@ -189,6 +190,7 @@ function AppContent() {
                     {/* Admin Control Center (Auth Guarded · dev entry: /login?as=admin) */}
                     <Route element={<AuthGuard requiredRole="admin" />}>
                         <Route path="admin" element={<AdminOverviewPage />} />
+                        <Route path="admin/cockpit" element={<CockpitPage />} />
                         <Route path="admin/events" element={<AdminEventsPage />} />
                         <Route path="admin/providers" element={<AdminComingSoonPage />} />
                         <Route path="admin/security" element={<AdminComingSoonPage />} />

@@ -11,6 +11,8 @@ import { sendMagicLinkMail, sendEmailChangeMail } from "./mailer.js";
 import { handleAssistantChat, handleAssistantCheckout, handleAssistantVerify } from "./assistant.js";
 import { handleAuthAdopt } from "./adoption.js";
 import { handleBillingRun, syncOpenInvoices } from "./billing.js";
+import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
+import { buildCockpit } from "./cockpit.js";
 import { redactText } from "@complihub360/redaction";
 
 // P0 #1: shared magic-link verification — SHA-256 hash lookup, engagement +
@@ -98,6 +100,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     let authEmail: string | null = null;
     // True only for the server-to-server API key — gates admin-only routes.
     let authViaApiKey = false;
+    // True when the verified JWT carries the app-level admin role (app_metadata
+    // wins over user_metadata, mirroring the frontend's roleFromUser()).
+    let authIsAdmin = false;
 
     // 2.c Native Supabase JWT Authentication (Skip for /health and /ready)
     if (req.url !== '/health' && req.url !== '/ready') {
@@ -135,6 +140,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                                 isAuthenticated = true;
                                 if (typeof payload.sub === 'string') authUserId = payload.sub;
                                 if (typeof payload.email === 'string') authEmail = payload.email;
+                                // App-level role lives in app_metadata.role (authoritative),
+                                // user_metadata.role as fallback — same precedence as the FE.
+                                const appRole = (payload.app_metadata && typeof payload.app_metadata.role === 'string' ? payload.app_metadata.role : undefined)
+                                    ?? (payload.user_metadata && typeof payload.user_metadata.role === 'string' ? payload.user_metadata.role : undefined);
+                                if (appRole === 'admin') authIsAdmin = true;
                             }
                         }
                     }
@@ -954,63 +964,24 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     } else if (req.method === 'POST' && /^\/api\/v1\/engagement\/[0-9a-f-]{36}\/remind$/.test(req.url || '')) {
         // B14: manual reminder — re-issue fresh single-use magic links and send
         // the mail again with an urgent subject. Only while awaiting confirm.
+        // Core logic lives in issueReminder() (watchers.ts) so the manual route
+        // and the autonomous SLA watcher share one code path.
         const engagementId = (req.url || '').split('/')[4];
-        try {
-            const eng = (await supabaseApi.select('engagement_requests', { id: engagementId }, { limit: 1 })) as
-                Array<{ id: string; provider_key: string; country: string; category: string; message: string; status: string }>;
-            if (!eng[0]) {
-                res.writeHead(404, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Engagement not found', correlationId }));
-                return;
-            }
-            if (!['created', 'delivered', 'viewed'].includes(eng[0].status)) {
-                res.writeHead(409, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ errorCode: 'INVALID_STATE', message: `Cannot remind in status '${eng[0].status}'`, correlationId }));
-                return;
-            }
-            const nodeCrypto = await import('node:crypto');
-            const magicLinks: Record<string, string> = {};
-            for (const action of ['confirm', 'reply', 'decline'] as const) {
-                const rawToken = nodeCrypto.randomBytes(32).toString('base64url');
-                const tokenHash = nodeCrypto.createHash('sha256').update(rawToken).digest('hex');
-                await supabaseApi.insert('magic_link_tokens', {
-                    engagement_id: engagementId,
-                    action,
-                    token_hash: tokenHash,
-                    expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-                });
-                magicLinks[action] = `?id=${engagementId}&token=${rawToken}`;
-            }
-            await supabaseApi.insert('event_log', {
-                type: 'sla_reminder_sent',
-                payload: { engagementId, provider_key: eng[0].provider_key, manual: true },
-            });
-            await supabaseApi.insert('engagement_messages', {
-                engagement_id: engagementId, author: 'system', body: 'Reminder sent — the provider received a fresh confirmation link.',
-            }).catch(() => { /* thread note is best-effort */ });
-            (async () => {
-                const provRows = (await supabaseApi.select('providers', { provider_key: eng[0].provider_key }, { limit: 1 })) as
-                    Array<{ name: string; contact_email?: string | null }>;
-                await sendMagicLinkMail({
-                    engagementId,
-                    providerKey: eng[0].provider_key,
-                    providerName: provRows[0]?.name || eng[0].provider_key,
-                    contactEmail: provRows[0]?.contact_email ?? null,
-                    country: eng[0].country,
-                    category: eng[0].category,
-                    message: eng[0].message,
-                    magicLinks,
-                    correlationId,
-                    reminder: true,
-                });
-            })().catch(() => { /* logged inside the mailer */ });
-            res.setHeader('x-correlation-id', correlationId);
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ ok: true, id: engagementId, reminded: true }));
-        } catch (err) {
+        res.setHeader('x-correlation-id', correlationId);
+        const reminderOutcome = await issueReminder(engagementId, { auto: false });
+        if (reminderOutcome === 'not_found') {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Engagement not found', correlationId }));
+        } else if (reminderOutcome === 'invalid_state') {
+            res.writeHead(409, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'INVALID_STATE', message: 'Cannot remind — request is not awaiting confirmation', correlationId }));
+        } else if (reminderOutcome === 'error') {
             structuredLog('error', 'Reminder failed', { correlationId, errorCode: 'ERR_REMIND', severity: 'error', route: req.url });
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Reminder failed', correlationId }));
+        } else {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ok: true, id: engagementId, reminded: true }));
         }
     } else if (req.method === 'POST' && /^\/api\/v1\/engagement\/[0-9a-f-]{36}\/withdraw$/.test(req.url || '')) {
         // B14: the requester withdraws an open request. Terminal state; all
@@ -1526,6 +1497,42 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     } else if (req.method === 'POST' && req.url === '/api/v1/admin/billing/run') {
         // Monthly platform-fee run (billing.ts) — server-to-server key only.
         handleBillingRun(req, res, correlationId, authViaApiKey);
+    } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/admin/cockpit')) {
+        // Founder cockpit read-model: five lenses aggregated across the live
+        // systems (cockpit.ts) — server-to-server key only.
+        res.setHeader('x-correlation-id', correlationId);
+        if (!authViaApiKey && !authIsAdmin) {
+            res.writeHead(403, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'FORBIDDEN', message: 'Cockpit is admin-only', correlationId }));
+        } else {
+            try {
+                const cockpit = await buildCockpit();
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, cockpit, correlationId }));
+            } catch (err) {
+                structuredLog('error', 'Cockpit build failed', { correlationId, errorCode: 'ERR_COCKPIT', severity: 'error', route: req.url });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Cockpit build failed', correlationId }));
+            }
+        }
+    } else if (req.method === 'POST' && req.url === '/api/v1/admin/watchers/tick') {
+        // Force one SLA-watcher tick now (Beta verification) — server-to-server
+        // key only. Runs the same pass the scheduler runs every WATCHERS_TICK_MS.
+        res.setHeader('x-correlation-id', correlationId);
+        if (!authViaApiKey) {
+            res.writeHead(403, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'FORBIDDEN', message: 'Watcher ticks are admin-only', correlationId }));
+        } else {
+            try {
+                const summary = await runWatcherTick();
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, summary, correlationId }));
+            } catch (err) {
+                structuredLog('error', 'Watcher tick failed', { correlationId, errorCode: 'ERR_WATCHER_TICK', severity: 'error', route: req.url });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Watcher tick failed', correlationId }));
+            }
+        }
     } else if (req.method === 'POST' && req.url === '/api/v1/assistant/verify') {
         // Phase ③: verify-on-return — confirms the subscription after checkout.
         handleAssistantVerify(req, res, correlationId, { userId: authUserId, email: authEmail });
@@ -1542,4 +1549,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 const PORT = process.env.PORT || 3005;
 server.listen(PORT, () => {
     console.log(`Compliance API running on port ${PORT}`);
+    // Start the autonomous SLA watchers (reminder / breach / expiry). Shadow-first
+    // by default (WATCHERS_SHADOW=true): computes and logs intended actions without
+    // sending mail or mutating state until explicitly switched live.
+    startSlaWatchers();
 });
