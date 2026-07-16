@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { AdminShell } from '../../components/admin/AdminShell';
 import { KPICircleCard, type KPIColor } from '../../components/ui/KPICircleCard';
 import { KPICard, EntityCard } from '../../components/ui/Cards';
+import { MetricCard } from '../../components/ui/MetricCard';
 import { Table, THead, TBody, TR, TH, TD } from '../../components/ui/Table';
 import { Tag, type TagProps } from '../../components/ui/Tag';
 import { Banner } from '../../components/ui/Banner';
@@ -38,6 +39,12 @@ const FIXTURE: Cockpit = {
     { type: 'engagement_expired', at: new Date(Date.now() - 15e5).toISOString(), payload: {} },
     { type: 'provider_downgraded', at: new Date(Date.now() - 2e6).toISOString(), payload: { provider_key: 'acme-x' } },
   ],
+  series: {
+    dates: ['10.07', '11.07', '12.07', '13.07', '14.07', '15.07', '16.07'],
+    requests: [3, 5, 4, 8, 6, 9, 12],
+    confirmRate: [58, 62, 60, 66, 64, 67, 68],
+    breaches: [0, 1, 0, 2, 1, 1, 2],
+  },
 };
 
 type Lang = 'de' | 'en';
@@ -53,6 +60,7 @@ const STR: Record<Lang, Record<string, string>> = {
     onTrack: 'on track', atRisk: 'at risk', breached: 'breached', awaitingReply: 'awaiting reply', noRisk: 'Nothing at risk',
     voc: 'Voice of Customer', vocNote: 'No dedicated feedback source yet — proxy signals from the engagement lifecycle.',
     declined: 'Declined', withdrawn: 'Withdrawn', remindersSent: 'Reminders sent', feed: 'Activity',
+    prevPeriod: 'vs. previous period', details: 'More details', justNow: 'updated just now',
     breachBannerTitle: 'past SLA right now', breachBannerBody: 'The watchers flagged overdue confirmations — review the at-risk list. Escalation to downgrade fires automatically at threshold.',
   },
   de: {
@@ -66,6 +74,7 @@ const STR: Record<Lang, Record<string, string>> = {
     onTrack: 'im Plan', atRisk: 'gefährdet', breached: 'verletzt', awaitingReply: 'wartet auf Antwort', noRisk: 'Nichts gefährdet',
     voc: 'Voice of Customer', vocNote: 'Noch keine dedizierte Feedback-Quelle — Proxy-Signale aus dem Engagement-Lifecycle.',
     declined: 'Abgelehnt', withdrawn: 'Zurückgezogen', remindersSent: 'Reminder gesendet', feed: 'Aktivität',
+    prevPeriod: 'vs. vorheriger Zeitraum', details: 'Weitere Details', justNow: 'gerade aktualisiert',
     breachBannerTitle: 'akut über SLA', breachBannerBody: 'Die Wächter melden überfällige Bestätigungen — prüfe die At-Risk-Liste. Eskalation zum Downgrade feuert ab Schwelle automatisch.',
   },
 };
@@ -151,9 +160,11 @@ export function CockpitPage() {
 
         <section className="flex flex-col gap-4">
           <SectionHeading>{t('engagement')}</SectionHeading>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <MetricCard label={t('newToday')} value={String(pe.engagementsToday)} compare={`${pe.engagementsTotal} ${t('total')}`} series={data.series.requests} xLabels={data.series.dates} updated={t('justNow')} detailsLabel={t('details')} />
+            <MetricCard label={t('confirmRate')} value={`${pct(pe.confirmRate)}%`} compare={t('prevPeriod')} color="#3C8C7A" series={data.series.confirmRate} xLabels={data.series.dates} updated={t('justNow')} detailsLabel={t('details')} />
+          </div>
           <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
-            <KPICard label={t('newToday')} value={String(pe.engagementsToday)} trend={{ value: `${pe.engagementsTotal} ${t('total')}`, direction: 'up' }} />
-            <KPICard label={t('confirmRate')} value={`${pct(pe.confirmRate)}%`} />
             <KPICard label={t('replyRate')} value={`${pct(pe.replyRate)}%`} trend={{ value: t('ofConfirmed'), direction: 'neutral' }} />
             <KPICard label={t('activeSessions')} value={String(pe.sessionsActive)} trend={{ value: t('wizardSessions'), direction: 'neutral' }} />
           </div>

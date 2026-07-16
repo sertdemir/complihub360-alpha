@@ -52,6 +52,7 @@ export interface Cockpit {
     atRisk: CockpitAtRisk[];
   };
   events: Array<{ type: string; at: string | null; payload?: Record<string, unknown> | null }>;
+  series: { dates: string[]; requests: number[]; confirmRate: number[]; breaches: number[] };
 }
 
 export async function fetchCockpit(): Promise<Cockpit> {

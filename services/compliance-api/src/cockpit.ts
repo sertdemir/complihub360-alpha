@@ -75,6 +75,8 @@ export interface Cockpit {
         atRisk: Array<{ id: string; provider_key: string; country: string; category: string; status: string; deadline: string | null; hoursLeft: number | null }>;
     };
     events: Array<{ type: string; at: string | null; payload?: Record<string, unknown> | null }>;
+    /** 7-day trend series for the Product & Engagement charts. */
+    series: { dates: string[]; requests: number[]; confirmRate: number[]; breaches: number[] };
 }
 
 export async function buildCockpit(): Promise<Cockpit> {
@@ -133,6 +135,21 @@ export async function buildCockpit(): Promise<Cockpit> {
     const breachedNow = watchlist.filter(w => (w.msLeft ?? 1) < 0).length;
     const provByStatus = countBy(providers, p => p.partner_status ?? "inactive");
     const totalBreachCount = providers.reduce((s, p) => s + (p.breach_count ?? 0), 0);
+
+    // ── 7-day trend series (Product & Engagement charts) ─────────────────────
+    const dayKeys: string[] = [];
+    for (let i = 6; i >= 0; i--) { const dt = new Date(); dt.setUTCHours(0, 0, 0, 0); dt.setUTCDate(dt.getUTCDate() - i); dayKeys.push(dt.toISOString().slice(0, 10)); }
+    const seriesDates = dayKeys.map(k => `${k.slice(8, 10)}.${k.slice(5, 7)}`);
+    const idxOf = (iso?: string | null) => dayKeys.indexOf((iso || "").slice(0, 10));
+    const bucket = () => new Array(7).fill(0) as number[];
+    const reqB = bucket(), confB = bucket(), breachB = bucket();
+    for (const e of engagements) {
+        const ci = idxOf(e.created_at); if (ci >= 0) reqB[ci]++;
+        const ui = idxOf(e.updated_at);
+        if (ui >= 0 && (e.status === "confirmed" || e.status === "replied")) confB[ui]++;
+        if (ui >= 0 && e.status === "expired") breachB[ui]++;
+    }
+    const series = { dates: seriesDates, requests: reqB, confirmRate: reqB.map((r, i) => (r ? Math.round((confB[i] / r) * 100) : 0)), breaches: breachB };
 
     return {
         generatedAt: new Date().toISOString(),
@@ -195,5 +212,6 @@ export async function buildCockpit(): Promise<Cockpit> {
                 ({ id, provider_key, country, category, status, deadline, hoursLeft })),
         },
         events: events.slice(0, 15).map(e => ({ type: e.type, at: eventAt(e), payload: e.payload ?? null })),
+        series,
     };
 }
