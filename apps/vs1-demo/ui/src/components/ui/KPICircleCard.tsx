@@ -3,6 +3,7 @@ import { TrendingUp, TrendingDown, Minus, type LucideIcon } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Card } from './Card';
 import { CircleProgress } from './Progress';
+import { useCountUp } from '../../lib/useCountUp';
 
 // ─── KPI Circle Card ────────────────────────────────────────────────────────
 // Mirrors the Compass "KPI Circle Card" set (680:415, Cards page). A circular
@@ -41,6 +42,8 @@ export interface KPICircleCardProps {
   color?: KPIColor;
   trend?: KPITrend;
   disabled?: boolean;
+  /** Animate the ring arc + count up the value on mount / value change. */
+  animate?: boolean;
   className?: string;
 }
 
@@ -68,10 +71,12 @@ export function KPICircleCard({
   color = 'brand',
   trend,
   disabled,
+  animate = false,
   className,
 }: KPICircleCardProps) {
   const v = Math.min(100, Math.max(0, value));
-  const display = valueLabel ?? `${Math.round(v)}%`;
+  const counted = useCountUp(v);
+  const display = valueLabel ?? `${Math.round(animate ? counted : v)}%`;
   const accent = disabled ? 'text-fg-tertiary' : ACCENT[color];
   const TrendIcon = trend ? TREND_ICON[trend.direction] : null;
 
@@ -114,6 +119,7 @@ export function KPICircleCard({
           value={v}
           size={96}
           stroke={8}
+          animate={animate}
           label={<span className={cn('text-[20px] font-bold', accent)}>{display}</span>}
           className={accent}
         />
@@ -136,6 +142,7 @@ export function KPICircleCard({
         value={v}
         size={56}
         stroke={6}
+        animate={animate}
         label={<span className={cn('text-[12px] font-bold', accent)}>{display}</span>}
         className={cn('shrink-0', accent)}
       />

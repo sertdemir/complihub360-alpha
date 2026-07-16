@@ -135,7 +135,7 @@ export function CockpitPage() {
 
         <div className="grid grid-cols-2 gap-5 md:grid-cols-3 xl:grid-cols-5">
           {gauges.map((g) => (
-            <KPICircleCard key={g.label} layout="centered" color={g.color} label={g.label} value={g.value} />
+            <KPICircleCard key={g.label} layout="centered" color={g.color} label={g.label} value={g.value} animate />
           ))}
         </div>
 

@@ -83,13 +83,24 @@ export interface CircleProgressProps {
   size?: number;
   stroke?: number;
   label?: React.ReactNode;
+  /** Animate the arc from 0 → value on mount / value change (easeOut ~1s). */
+  animate?: boolean;
   className?: string;
 }
-export function CircleProgress({ value = 0, size = 64, stroke = 6, label, className }: CircleProgressProps) {
+export function CircleProgress({ value = 0, size = 64, stroke = 6, label, animate = false, className }: CircleProgressProps) {
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const v = Math.min(100, Math.max(0, value));
-  const off = c * (1 - v / 100);
+  // When animating, the arc starts empty and eases to `v` after mount; the CSS
+  // transition on stroke-dashoffset does the work. Default (animate=false) is
+  // unchanged — offset is set immediately.
+  const [shown, setShown] = React.useState(animate ? 0 : v);
+  React.useEffect(() => {
+    if (!animate) { setShown(v); return; }
+    const id = requestAnimationFrame(() => setShown(v));
+    return () => cancelAnimationFrame(id);
+  }, [v, animate]);
+  const off = c * (1 - shown / 100);
   return (
     <div className={cn('relative inline-grid place-items-center text-fg-brand', className)} style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
@@ -105,9 +116,10 @@ export function CircleProgress({ value = 0, size = 64, stroke = 6, label, classN
           strokeDasharray={c}
           strokeDashoffset={off}
           className="transition-[stroke-dashoffset]"
+          style={animate ? { transitionDuration: '1s', transitionTimingFunction: 'cubic-bezier(0.22,1,0.36,1)' } : undefined}
         />
       </svg>
-      <span className="absolute text-[13px] font-semibold text-fg">{label ?? `${Math.round(v)}%`}</span>
+      <span className="absolute text-[13px] font-semibold text-fg">{label ?? `${Math.round(shown)}%`}</span>
     </div>
   );
 }
