@@ -1,14 +1,17 @@
 import { useTranslation } from 'react-i18next';
 import { AdminShell } from '../../components/admin/AdminShell';
-import { RadialGauge } from '../../components/ui/RadialGauge';
+import { KPICircleCard, type KPIColor } from '../../components/ui/KPICircleCard';
+import { KPICard, EntityCard } from '../../components/ui/Cards';
+import { Table, THead, TBody, TR, TH, TD } from '../../components/ui/Table';
+import { Tag, type TagProps } from '../../components/ui/Tag';
+import { Banner } from '../../components/ui/Banner';
 import { useApiData } from '../../lib/useApiData';
-import { useTheme } from '../../lib/theme';
 import { fetchCockpit, type Cockpit } from '../../api/cockpit';
-import { palette, pct, eur, relTime, toneColor, OpsSurface, OpsHeader, Card, Lens, Stat, Pill, type Lang } from '../../components/admin/opsSurface';
 
 // ─── Admin · Founder Cockpit ─────────────────────────────────────────────────
-// Live command-center: five lenses with animated ring gauges + count-up values.
-// Theme + language come from the global engine (AdminShell header controls).
+// Five lenses across the live systems, composed from Compass components:
+// KPICircleCard hero gauges + KPICard tiles + Table watchlist + audit stream.
+// Light/dark comes from the design tokens (global theme, AdminShell header).
 // Data via GET /api/v1/admin/cockpit with a design fixture fallback.
 
 const FIXTURE: Cockpit = {
@@ -37,41 +40,59 @@ const FIXTURE: Cockpit = {
   ],
 };
 
+type Lang = 'de' | 'en';
 const STR: Record<Lang, Record<string, string>> = {
   en: {
     subtitle: 'Five lenses across the live systems — platform, product, money, customer voice and the trust loop.',
     demo: 'demo data', updated: 'updated', shadow: 'Watchers · shadow', live: 'Watchers · live',
     confirmRate: 'Confirm rate', replyRate: 'Reply rate', slaOnTrack: 'SLA on-track', paidRatio: 'Invoices paid', providersActive: 'Providers active',
-    money: 'Money', invoicesOpen: 'Open invoices', paid: 'Paid', subsActive: 'Subscriptions', mrr: 'MRR · est.', overdue: 'overdue', trialing: 'trialing', pastDue: 'past due',
-    engagement: 'Product & Engagement', newToday: 'New today', total: 'total', activeSessions: 'Active sessions',
-    sla: 'SLA & Trust', breachedNow: 'Breached now', breachEvents: 'breach events', downgrades: 'downgrades', expiries: 'expiries', reminders: 'auto-reminders',
-    atRiskTitle: 'At-risk watchlist', request: 'Request', providerScope: 'Provider · Scope', state: 'State', deadline: 'Deadline',
+    money: 'Money', invoicesOpen: 'Open invoices', paid: 'Paid', subsActive: 'Subscriptions', mrr: 'MRR · est.', overdue: 'overdue', trialing: 'trialing', pastDue: 'past due', invoices: 'invoices',
+    engagement: 'Product & Engagement', newToday: 'New today', total: 'total', activeSessions: 'Active sessions', wizardSessions: 'wizard sessions', ofConfirmed: 'of confirmed',
+    sla: 'SLA & Trust', breachedNow: 'Breached now', breachEvents: 'breach events', downgrades: 'Downgrades', expiries: 'Expiries', reminders: 'Auto-reminders',
+    atRiskTitle: 'At-risk watchlist', request: 'Request', providerScope: 'Provider · Scope', timeLeft: 'Time left', state: 'State',
     onTrack: 'on track', atRisk: 'at risk', breached: 'breached', awaitingReply: 'awaiting reply', noRisk: 'Nothing at risk',
     voc: 'Voice of Customer', vocNote: 'No dedicated feedback source yet — proxy signals from the engagement lifecycle.',
     declined: 'Declined', withdrawn: 'Withdrawn', remindersSent: 'Reminders sent', feed: 'Activity',
+    breachBannerTitle: 'past SLA right now', breachBannerBody: 'The watchers flagged overdue confirmations — review the at-risk list. Escalation to downgrade fires automatically at threshold.',
   },
   de: {
     subtitle: 'Fünf Lenses über die Live-Systeme — Plattform, Produkt, Umsatz, Kundenstimme und die Vertrauensschleife.',
     demo: 'Demo-Daten', updated: 'aktualisiert', shadow: 'Wächter · Shadow', live: 'Wächter · live',
     confirmRate: 'Bestätigungsrate', replyRate: 'Antwortrate', slaOnTrack: 'SLA im Plan', paidRatio: 'Rechnungen bezahlt', providersActive: 'Anbieter aktiv',
-    money: 'Umsatz', invoicesOpen: 'Offene Rechnungen', paid: 'Bezahlt', subsActive: 'Abos', mrr: 'MRR · geschätzt', overdue: 'überfällig', trialing: 'Testphase', pastDue: 'überfällig',
-    engagement: 'Produkt & Engagement', newToday: 'Heute neu', total: 'gesamt', activeSessions: 'Aktive Sessions',
+    money: 'Umsatz', invoicesOpen: 'Offene Rechnungen', paid: 'Bezahlt', subsActive: 'Abos', mrr: 'MRR · geschätzt', overdue: 'überfällig', trialing: 'Testphase', pastDue: 'überfällig', invoices: 'Rechnungen',
+    engagement: 'Produkt & Engagement', newToday: 'Heute neu', total: 'gesamt', activeSessions: 'Aktive Sessions', wizardSessions: 'Wizard-Sessions', ofConfirmed: 'der Bestätigten',
     sla: 'SLA & Trust', breachedNow: 'Akut verletzt', breachEvents: 'Breach-Events', downgrades: 'Downgrades', expiries: 'Abläufe', reminders: 'Auto-Reminder',
-    atRiskTitle: 'At-Risk-Watchlist', request: 'Anfrage', providerScope: 'Anbieter · Bereich', state: 'Status', deadline: 'Frist',
+    atRiskTitle: 'At-Risk-Watchlist', request: 'Anfrage', providerScope: 'Anbieter · Bereich', timeLeft: 'Restzeit', state: 'Status',
     onTrack: 'im Plan', atRisk: 'gefährdet', breached: 'verletzt', awaitingReply: 'wartet auf Antwort', noRisk: 'Nichts gefährdet',
     voc: 'Voice of Customer', vocNote: 'Noch keine dedizierte Feedback-Quelle — Proxy-Signale aus dem Engagement-Lifecycle.',
     declined: 'Abgelehnt', withdrawn: 'Zurückgezogen', remindersSent: 'Reminder gesendet', feed: 'Aktivität',
+    breachBannerTitle: 'akut über SLA', breachBannerBody: 'Die Wächter melden überfällige Bestätigungen — prüfe die At-Risk-Liste. Eskalation zum Downgrade feuert ab Schwelle automatisch.',
   },
 };
 
+const pct = (v: number | null): number => (v === null ? 0 : Math.round(v * 100));
+const eur = (cents: number): string => (cents / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+const kpiColor = (frac: number): KPIColor => (frac >= 0.6 ? 'success' : frac >= 0.4 ? 'warning' : 'error');
+
+function relTime(iso: string | null | undefined, lang: Lang): string {
+  if (!iso) return '—';
+  const diff = Date.now() - new Date(iso).getTime();
+  const h = Math.floor(diff / 3_600_000);
+  const fmt = (n: number, u: string) => (lang === 'de' ? `vor ${n}${u}` : `${n}${u} ago`);
+  if (h < 1) return fmt(Math.max(1, Math.floor(diff / 60_000)), 'm');
+  if (h < 24) return fmt(h, 'h');
+  return fmt(Math.floor(h / 24), 'd');
+}
+
+function SectionHeading({ children }: { children: React.ReactNode }) {
+  return <h2 className="text-[15px] font-semibold text-fg">{children}</h2>;
+}
+
 export function CockpitPage() {
   const { i18n } = useTranslation();
-  const { theme } = useTheme();
   const { data, source } = useApiData(fetchCockpit, FIXTURE);
-
   const lang: Lang = i18n.resolvedLanguage === 'de' ? 'de' : 'en';
   const t = (k: string) => STR[lang][k] ?? k;
-  const pal = palette(theme);
 
   const { productEngagement: pe, money: mo, voiceOfCustomer: vo, slaTrust: sl } = data;
   const confirm = pe.confirmRate ?? 0;
@@ -81,98 +102,127 @@ export function CockpitPage() {
   const provTotal = sl.providers.active + sl.providers.downgraded + sl.providers.inactive;
   const provActive = provTotal ? sl.providers.active / provTotal : 0;
 
-  const gauges = [
-    { value: confirm, percent: pct(pe.confirmRate), label: t('confirmRate'), color: toneColor(confirm, pal) },
-    { value: reply, percent: pct(pe.replyRate), label: t('replyRate'), color: toneColor(reply, pal) },
-    { value: slaHealth, percent: Math.round(slaHealth * 100), label: t('slaOnTrack'), color: toneColor(slaHealth, pal) },
-    { value: paidRatio, percent: Math.round(paidRatio * 100), label: t('paidRatio'), color: pal.petrol },
-    { value: provActive, percent: Math.round(provActive * 100), label: t('providersActive'), color: toneColor(provActive, pal) },
+  const gauges: Array<{ label: string; value: number; color: KPIColor }> = [
+    { label: t('confirmRate'), value: pct(pe.confirmRate), color: kpiColor(confirm) },
+    { label: t('replyRate'), value: pct(pe.replyRate), color: kpiColor(reply) },
+    { label: t('slaOnTrack'), value: Math.round(slaHealth * 100), color: kpiColor(slaHealth) },
+    { label: t('paidRatio'), value: Math.round(paidRatio * 100), color: 'brand' },
+    { label: t('providersActive'), value: Math.round(provActive * 100), color: kpiColor(provActive) },
   ];
 
   return (
     <AdminShell>
-      <OpsSurface pal={pal}>
-        <OpsHeader
-          pal={pal}
-          accent="Founder"
-          title="Cockpit"
-          subtitle={<>
-            {t('subtitle')}
-            {source === 'fixture' && <span style={{ color: pal.faint }}> · {t('demo')}</span>}
-            <span style={{ color: pal.faint }}> · {t('updated')} {relTime(data.generatedAt, lang)}</span>
-          </>}
-          right={<Pill pal={pal} tone={data.watchersShadow ? pal.amber : pal.green}>{data.watchersShadow ? t('shadow') : t('live')}</Pill>}
-        />
-
-        <Card pal={pal} style={{ padding: '40px 28px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(190px,1fr))', gap: 28, justifyItems: 'center' }}>
-            {gauges.map((g) => (
-              <RadialGauge key={g.label} value={g.value} percent={g.percent} label={g.label} color={g.color} ink={pal.ink} muted={pal.muted} track={pal.track} size={152} />
-            ))}
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-8">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="font-serif text-[32px] font-semibold text-fg">
+              <span className="text-fg-accent">Founder</span> Cockpit
+            </h1>
+            <p className="mt-1 text-[13px] text-fg-secondary">
+              {t('subtitle')}
+              {source === 'fixture' && <span className="ml-1 text-fg-tertiary">· {t('demo')}</span>}
+              <span className="ml-1 text-fg-tertiary">· {t('updated')} {relTime(data.generatedAt, lang)}</span>
+            </p>
           </div>
-        </Card>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 20 }}>
-          <Lens pal={pal} title={t('money')}>
-            <Stat pal={pal} label={t('invoicesOpen')} value={mo.invoices.open} sub={`${eur(mo.invoices.openCents)}${mo.invoices.overdue ? ` · ${mo.invoices.overdue} ${t('overdue')}` : ''}`} subTone={mo.invoices.overdue ? pal.red : pal.muted} />
-            <Stat pal={pal} label={t('paid')} valueText={eur(mo.invoices.paidCents)} sub={`${mo.invoices.paid} ×`} />
-            <Stat pal={pal} label={t('subsActive')} value={mo.subscriptions.active} sub={mo.subscriptions.past_due ? `${mo.subscriptions.past_due} ${t('pastDue')}` : `${mo.subscriptions.trialing} ${t('trialing')}`} subTone={mo.subscriptions.past_due ? pal.red : pal.muted} />
-            <Stat pal={pal} label={t('mrr')} valueText={eur(mo.mrrEstimateCents)} />
-          </Lens>
-
-          <Lens pal={pal} title={t('engagement')}>
-            <Stat pal={pal} label={t('newToday')} value={pe.engagementsToday} sub={`${pe.engagementsTotal} ${t('total')}`} />
-            <Stat pal={pal} label={t('confirmRate')} valueText={`${pct(pe.confirmRate)}%`} />
-            <Stat pal={pal} label={t('replyRate')} valueText={`${pct(pe.replyRate)}%`} />
-            <Stat pal={pal} label={t('activeSessions')} value={pe.sessionsActive} />
-          </Lens>
-
-          <Lens pal={pal} title={t('sla')}>
-            <Stat pal={pal} label={t('breachedNow')} value={sl.breachedNow} valueTone={sl.breachedNow ? pal.red : pal.green} sub={`${sl.breachEvents} ${t('breachEvents')}`} />
-            <Stat pal={pal} label={t('downgrades')} value={sl.downgrades} valueTone={sl.downgrades ? pal.red : pal.muted} />
-            <Stat pal={pal} label={t('expiries')} value={sl.expiries} />
-            <Stat pal={pal} label={t('reminders')} value={sl.autoReminders} />
-          </Lens>
-
-          <Lens pal={pal} title={t('voc')}>
-            <Stat pal={pal} label={t('declined')} value={vo.signals.declined} />
-            <Stat pal={pal} label={t('withdrawn')} value={vo.signals.withdrawn} />
-            <Stat pal={pal} label={t('remindersSent')} value={vo.signals.remindersSent} />
-            <p style={{ fontSize: 11, color: pal.faint, lineHeight: 1.45, margin: '10px 0 0' }}>{t('vocNote')}</p>
-          </Lens>
+          <Tag tone={data.watchersShadow ? 'warning' : 'success'}>{data.watchersShadow ? t('shadow') : t('live')}</Tag>
         </div>
 
-        <Lens pal={pal} title={t('atRiskTitle')}>
-          <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr 130px 110px', fontSize: 11, textTransform: 'uppercase', letterSpacing: .5, color: pal.faint, fontWeight: 600, padding: '0 0 14px' }}>
-            <span>{t('request')}</span><span>{t('providerScope')}</span><span>{t('state')}</span><span style={{ textAlign: 'right' }}>{t('deadline')}</span>
-          </div>
-          {sl.atRisk.map((w) => {
-            const overdue = (w.hoursLeft ?? 1) < 0;
-            const soon = (w.hoursLeft ?? 99) >= 0 && (w.hoursLeft ?? 99) <= 4;
-            const stateLabel = w.status === 'confirmed' ? t('awaitingReply') : overdue ? t('breached') : soon ? t('atRisk') : t('onTrack');
-            const stateColor = w.status === 'confirmed' ? pal.amber : overdue || soon ? pal.red : pal.green;
-            const dl = w.hoursLeft === null ? '—' : overdue ? `${w.hoursLeft}h · ${t('breached')}` : `in ${w.hoursLeft}h`;
-            return (
-              <div key={w.id} style={{ display: 'grid', gridTemplateColumns: '90px 1fr 130px 110px', alignItems: 'center', fontSize: 13, padding: '13px 0', borderTop: `1px solid ${pal.line}` }}>
-                <span style={{ fontWeight: 600 }}>{w.id.slice(0, 8).toUpperCase()}</span>
-                <span style={{ color: pal.muted }}>{w.provider_key} · {w.country} {w.category}</span>
-                <span><span style={{ fontSize: 11, fontWeight: 600, padding: '2px 9px', borderRadius: 20, color: stateColor, border: `1px solid ${stateColor}55` }}>{stateLabel}</span></span>
-                <span style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums', color: overdue ? pal.red : pal.ink }}>{dl}</span>
-              </div>
-            );
-          })}
-          {sl.atRisk.length === 0 && <div style={{ padding: '12px 0', color: pal.faint, fontSize: 13, borderTop: `1px solid ${pal.line}` }}>{t('noRisk')}</div>}
-        </Lens>
+        {sl.breachedNow > 0 && (
+          <Banner status="error" title={`${sl.breachedNow} ${lang === 'de' ? 'Engagements' : 'engagements'} ${t('breachBannerTitle')}`}>
+            {t('breachBannerBody')}
+          </Banner>
+        )}
 
-        <Lens pal={pal} title={t('feed')}>
-          {data.events.slice(0, 6).map((e, i) => (
-            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '12px 0', borderTop: i ? `1px solid ${pal.line}` : 'none', fontSize: 13 }}>
-              <span>{e.type.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase())}</span>
-              <span style={{ color: pal.faint, fontVariantNumeric: 'tabular-nums' }}>{relTime(e.at, lang)}</span>
-            </div>
+        <div className="grid grid-cols-2 gap-5 md:grid-cols-3 xl:grid-cols-5">
+          {gauges.map((g) => (
+            <KPICircleCard key={g.label} layout="centered" color={g.color} label={g.label} value={g.value} />
           ))}
-        </Lens>
-      </OpsSurface>
+        </div>
+
+        <section className="flex flex-col gap-4">
+          <SectionHeading>{t('money')}</SectionHeading>
+          <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+            <KPICard label={t('invoicesOpen')} value={String(mo.invoices.open)} trend={{ value: `${eur(mo.invoices.openCents)}${mo.invoices.overdue ? ` · ${mo.invoices.overdue} ${t('overdue')}` : ''}`, direction: mo.invoices.overdue ? 'down' : 'neutral' }} />
+            <KPICard label={t('paid')} value={eur(mo.invoices.paidCents)} trend={{ value: `${mo.invoices.paid} ${t('invoices')}`, direction: 'up' }} />
+            <KPICard label={t('subsActive')} value={String(mo.subscriptions.active)} trend={{ value: mo.subscriptions.past_due ? `${mo.subscriptions.past_due} ${t('pastDue')}` : `${mo.subscriptions.trialing} ${t('trialing')}`, direction: mo.subscriptions.past_due ? 'down' : 'neutral' }} />
+            <KPICard label={t('mrr')} value={eur(mo.mrrEstimateCents)} trend={{ value: 'plan est.', direction: 'neutral' }} />
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-4">
+          <SectionHeading>{t('engagement')}</SectionHeading>
+          <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+            <KPICard label={t('newToday')} value={String(pe.engagementsToday)} trend={{ value: `${pe.engagementsTotal} ${t('total')}`, direction: 'up' }} />
+            <KPICard label={t('confirmRate')} value={`${pct(pe.confirmRate)}%`} />
+            <KPICard label={t('replyRate')} value={`${pct(pe.replyRate)}%`} trend={{ value: t('ofConfirmed'), direction: 'neutral' }} />
+            <KPICard label={t('activeSessions')} value={String(pe.sessionsActive)} trend={{ value: t('wizardSessions'), direction: 'neutral' }} />
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-4">
+          <SectionHeading>{t('sla')}</SectionHeading>
+          <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+            <KPICard label={t('breachedNow')} value={String(sl.breachedNow)} trend={{ value: `${sl.breachEvents} ${t('breachEvents')}`, direction: sl.breachedNow ? 'down' : 'neutral' }} />
+            <KPICard label={t('downgrades')} value={String(sl.downgrades)} trend={{ value: `${sl.providers.downgraded} providers`, direction: sl.downgrades ? 'down' : 'neutral' }} />
+            <KPICard label={t('expiries')} value={String(sl.expiries)} />
+            <KPICard label={t('reminders')} value={String(sl.autoReminders)} trend={{ value: 'sent', direction: 'neutral' }} />
+          </div>
+          <div>
+            <p className="mb-3 text-[12px] text-fg-tertiary">{t('atRiskTitle')} · escalation at 24h/48h</p>
+            <Table density="default">
+              <THead>
+                <TR>
+                  <TH>{t('request')}</TH>
+                  <TH>{t('providerScope')}</TH>
+                  <TH>{t('state')}</TH>
+                  <TH numeric>{t('timeLeft')}</TH>
+                </TR>
+              </THead>
+              <TBody>
+                {sl.atRisk.map((w) => {
+                  const overdue = (w.hoursLeft ?? 1) < 0;
+                  const soon = (w.hoursLeft ?? 99) >= 0 && (w.hoursLeft ?? 99) <= 4;
+                  const tone: TagProps['tone'] = w.status === 'confirmed' ? 'warning' : overdue || soon ? 'error' : 'success';
+                  const stateLabel = w.status === 'confirmed' ? t('awaitingReply') : overdue ? t('breached') : soon ? t('atRisk') : t('onTrack');
+                  const timeText = w.hoursLeft === null ? '—' : overdue ? `${w.hoursLeft}h · ${t('breached')}` : `in ${w.hoursLeft}h`;
+                  return (
+                    <TR key={w.id}>
+                      <TD bold>{w.id.slice(0, 8).toUpperCase()}</TD>
+                      <TD>{w.provider_key} · {w.country} {w.category}</TD>
+                      <TD><Tag tone={tone}>{stateLabel}</Tag></TD>
+                      <TD numeric>{timeText}</TD>
+                    </TR>
+                  );
+                })}
+                {sl.atRisk.length === 0 && <TR><TD bold>—</TD><TD>{t('noRisk')}</TD><TD>—</TD><TD numeric>—</TD></TR>}
+              </TBody>
+            </Table>
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-4">
+          <SectionHeading>{t('voc')} &amp; {t('feed')}</SectionHeading>
+          <p className="-mt-2 text-[12px] text-fg-tertiary">{t('vocNote')}</p>
+          <div className="grid gap-6 xl:grid-cols-2">
+            <div className="grid grid-cols-3 gap-4">
+              <KPICard label={t('declined')} value={String(vo.signals.declined)} />
+              <KPICard label={t('withdrawn')} value={String(vo.signals.withdrawn)} />
+              <KPICard label={t('remindersSent')} value={String(vo.signals.remindersSent)} />
+            </div>
+            <div className="flex flex-col gap-3">
+              {data.events.slice(0, 5).map((e, i) => (
+                <EntityCard
+                  key={i}
+                  name={e.type.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase())}
+                  meta={e.payload && Object.keys(e.payload).length ? Object.entries(e.payload).slice(0, 2).map(([k, v]) => `${k}: ${String(v)}`).join(' · ') : 'event'}
+                  trailing={<span className="text-[11px] text-fg-tertiary">{relTime(e.at, lang)}</span>}
+                  unread={i === 0}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      </div>
     </AdminShell>
   );
 }

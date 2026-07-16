@@ -1,15 +1,17 @@
 import { useTranslation } from 'react-i18next';
 import { AdminShell } from '../../components/admin/AdminShell';
-import { RadialGauge } from '../../components/ui/RadialGauge';
+import { KPICircleCard, type KPIColor } from '../../components/ui/KPICircleCard';
+import { KPICard, EntityCard } from '../../components/ui/Cards';
+import { Table, THead, TBody, TR, TH, TD } from '../../components/ui/Table';
+import { Tag, type TagProps } from '../../components/ui/Tag';
+import { Banner } from '../../components/ui/Banner';
 import { useApiData } from '../../lib/useApiData';
-import { useTheme } from '../../lib/theme';
 import { fetchAdminStats, type AdminStats } from '../../api/admin';
-import { palette, pct, relTime, toneColor, OpsSurface, OpsHeader, Card, Lens, Stat, Pill, type Lang } from '../../components/admin/opsSurface';
 
 // ─── Admin · Control Center ──────────────────────────────────────────────────
-// The operational overview: funnel + privacy + security gauges, an SLA watchlist
-// and the live audit stream — same animated, themeable surface as the Founder
-// Cockpit. Data via GET /api/v1/admin/stats with a design fixture fallback.
+// Operational overview composed from Compass components: KPICircleCard gauges
+// (funnel + privacy + SLA), KPICard tiles, SLA watchlist Table, audit stream.
+// Light/dark via design tokens. Data via GET /api/v1/admin/stats with a fixture.
 
 const FIXTURE: AdminStats = {
   stats: { requestsToday: 12, requestsTotal: 87, confirmRate: 0.92, replyRate: 0.81, avgConfirmMs: 6.2 * 3_600_000, breaches: 1 },
@@ -30,130 +32,163 @@ const FIXTURE: AdminStats = {
   ],
 };
 
+type Lang = 'de' | 'en';
 const STR: Record<Lang, Record<string, string>> = {
   en: {
     subtitle: 'Platform health, funnel and compliance signals — aggregated live from the audit log. Admin only.',
     demo: 'demo data', allClear: 'All on track', breaches: 'SLA breaches',
     confirmRate: 'Confirm rate', replyRate: 'Reply rate', consentRate: 'AI consent', slaOnTrack: 'SLA on-track',
-    funnel: 'Funnel', newToday: 'New today', total: 'total', avgConfirm: 'Ø confirm', breachesLabel: 'SLA breaches',
-    privacy: 'Privacy & AI Gate', uploads: 'Document uploads', pii: 'PII redacted', consent: 'AI consent rate', aiBlocks: 'AI gate blocks',
-    security: 'Security & Audit', tokenBlocks: 'Blocked magic-links', gateBlocks: 'AI gate denials', rateLimit: 'Rate limiting', rateOn: '100 req/min · on',
+    funnel: 'Funnel', newToday: 'New today', total: 'total', avgConfirm: 'Ø confirm', breachesLabel: 'SLA breaches', seeWatchlist: 'see watchlist',
+    privacy: 'Privacy & AI Gate', uploads: 'Document uploads', pii: 'PII redacted', consent: 'AI consent rate', aiBlocks: 'AI gate blocks', sanitized: 'all sanitized', explicit: 'explicit opt-in',
+    security: 'Security & Audit', tokenBlocks: 'Blocked magic-links', gateBlocks: 'AI gate denials', rateLimit: 'Rate limiting', rateOn: '100 req/min · on', auditStream: 'Audit stream',
     watchlist: 'SLA watchlist', request: 'Request', providerScope: 'Provider · Scope', state: 'State', timeLeft: 'Time left',
     onTrack: 'on track', atRisk: 'at risk', breached: 'breached', awaitingReply: 'awaiting reply', overdue: 'overdue', noOpen: 'No open requests',
-    feed: 'Audit stream',
   },
   de: {
     subtitle: 'Plattform-Gesundheit, Funnel und Compliance-Signale — live aus dem Audit-Log. Nur für Admins.',
     demo: 'Demo-Daten', allClear: 'Alles im Plan', breaches: 'SLA-Verletzungen',
     confirmRate: 'Bestätigungsrate', replyRate: 'Antwortrate', consentRate: 'KI-Einwilligung', slaOnTrack: 'SLA im Plan',
-    funnel: 'Funnel', newToday: 'Heute neu', total: 'gesamt', avgConfirm: 'Ø Bestätigung', breachesLabel: 'SLA-Verletzungen',
-    privacy: 'Privacy & AI Gate', uploads: 'Dokument-Uploads', pii: 'PII geschwärzt', consent: 'KI-Einwilligungsrate', aiBlocks: 'AI-Gate-Blocks',
-    security: 'Security & Audit', tokenBlocks: 'Blockierte Magic-Links', gateBlocks: 'AI-Gate-Ablehnungen', rateLimit: 'Rate-Limiting', rateOn: '100 req/min · aktiv',
+    funnel: 'Funnel', newToday: 'Heute neu', total: 'gesamt', avgConfirm: 'Ø Bestätigung', breachesLabel: 'SLA-Verletzungen', seeWatchlist: 'siehe Watchlist',
+    privacy: 'Privacy & AI Gate', uploads: 'Dokument-Uploads', pii: 'PII geschwärzt', consent: 'KI-Einwilligungsrate', aiBlocks: 'AI-Gate-Blocks', sanitized: 'alle bereinigt', explicit: 'explizites Opt-in',
+    security: 'Security & Audit', tokenBlocks: 'Blockierte Magic-Links', gateBlocks: 'AI-Gate-Ablehnungen', rateLimit: 'Rate-Limiting', rateOn: '100 req/min · aktiv', auditStream: 'Audit-Stream',
     watchlist: 'SLA-Watchlist', request: 'Anfrage', providerScope: 'Anbieter · Bereich', state: 'Status', timeLeft: 'Restzeit',
     onTrack: 'im Plan', atRisk: 'gefährdet', breached: 'verletzt', awaitingReply: 'wartet auf Antwort', overdue: 'überfällig', noOpen: 'Keine offenen Anfragen',
-    feed: 'Audit-Stream',
   },
 };
 
 const SIX_H = 6 * 3_600_000;
+const pct = (v: number | null): number => (v === null ? 0 : Math.round(v * 100));
+const kpiColor = (frac: number): KPIColor => (frac >= 0.6 ? 'success' : frac >= 0.4 ? 'warning' : 'error');
+
+function relTime(iso: string | undefined, lang: Lang): string {
+  if (!iso) return '—';
+  const diff = Date.now() - new Date(iso).getTime();
+  const h = Math.floor(diff / 3_600_000);
+  const fmt = (n: number, u: string) => (lang === 'de' ? `vor ${n}${u}` : `${n}${u} ago`);
+  if (h < 1) return fmt(Math.max(1, Math.floor(diff / 60_000)), 'm');
+  if (h < 24) return fmt(h, 'h');
+  return fmt(Math.floor(h / 24), 'd');
+}
+
+function SectionHeading({ children }: { children: React.ReactNode }) {
+  return <h2 className="text-[15px] font-semibold text-fg">{children}</h2>;
+}
 
 export function AdminOverviewPage() {
   const { i18n } = useTranslation();
-  const { theme } = useTheme();
   const { data, source } = useApiData(fetchAdminStats, FIXTURE);
-
   const lang: Lang = i18n.resolvedLanguage === 'de' ? 'de' : 'en';
   const t = (k: string) => STR[lang][k] ?? k;
-  const pal = palette(theme);
 
   const { stats, watchlist, privacy, security, events } = data;
   const breachedCount = watchlist.filter((w) => w.msLeft !== null && w.msLeft < 0).length;
   const slaOnTrack = watchlist.length ? 1 - breachedCount / watchlist.length : 1;
   const avgConfirmH = stats.avgConfirmMs ? `${(stats.avgConfirmMs / 3_600_000).toFixed(1)}h` : '—';
 
-  const gauges = [
-    { value: stats.confirmRate ?? 0, percent: pct(stats.confirmRate), label: t('confirmRate'), color: toneColor(stats.confirmRate ?? 0, pal) },
-    { value: stats.replyRate ?? 0, percent: pct(stats.replyRate), label: t('replyRate'), color: toneColor(stats.replyRate ?? 0, pal) },
-    { value: privacy.consentRate ?? 0, percent: pct(privacy.consentRate), label: t('consentRate'), color: toneColor(privacy.consentRate ?? 0, pal) },
-    { value: slaOnTrack, percent: Math.round(slaOnTrack * 100), label: t('slaOnTrack'), color: toneColor(slaOnTrack, pal) },
+  const gauges: Array<{ label: string; value: number; color: KPIColor }> = [
+    { label: t('confirmRate'), value: pct(stats.confirmRate), color: kpiColor(stats.confirmRate ?? 0) },
+    { label: t('replyRate'), value: pct(stats.replyRate), color: kpiColor(stats.replyRate ?? 0) },
+    { label: t('consentRate'), value: pct(privacy.consentRate), color: kpiColor(privacy.consentRate ?? 0) },
+    { label: t('slaOnTrack'), value: Math.round(slaOnTrack * 100), color: kpiColor(slaOnTrack) },
   ];
 
   return (
     <AdminShell>
-      <OpsSurface pal={pal}>
-        <OpsHeader
-          pal={pal}
-          accent="Control"
-          title="Center"
-          subtitle={<>
-            {t('subtitle')}
-            {source === 'fixture' && <span style={{ color: pal.faint }}> · {t('demo')}</span>}
-          </>}
-          right={<Pill pal={pal} tone={breachedCount ? pal.red : pal.green}>{breachedCount ? `${breachedCount} ${t('breaches')}` : t('allClear')}</Pill>}
-        />
-
-        <Card pal={pal} style={{ padding: '40px 28px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(190px,1fr))', gap: 28, justifyItems: 'center' }}>
-            {gauges.map((g) => (
-              <RadialGauge key={g.label} value={g.value} percent={g.percent} label={g.label} color={g.color} ink={pal.ink} muted={pal.muted} track={pal.track} size={152} />
-            ))}
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-8">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="font-serif text-[32px] font-semibold text-fg">
+              <span className="text-fg-accent">Control</span> Center
+            </h1>
+            <p className="mt-1 text-[13px] text-fg-secondary">
+              {t('subtitle')}
+              {source === 'fixture' && <span className="ml-1 text-fg-tertiary">· {t('demo')}</span>}
+            </p>
           </div>
-        </Card>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 20 }}>
-          <Lens pal={pal} title={t('funnel')}>
-            <Stat pal={pal} label={t('newToday')} value={stats.requestsToday} sub={`${stats.requestsTotal} ${t('total')}`} />
-            <Stat pal={pal} label={t('confirmRate')} valueText={`${pct(stats.confirmRate)}%`} />
-            <Stat pal={pal} label={t('avgConfirm')} valueText={avgConfirmH} />
-            <Stat pal={pal} label={t('breachesLabel')} value={stats.breaches} valueTone={stats.breaches ? pal.red : pal.green} />
-          </Lens>
-
-          <Lens pal={pal} title={t('privacy')}>
-            <Stat pal={pal} label={t('uploads')} value={privacy.uploads} />
-            <Stat pal={pal} label={t('pii')} value={privacy.piiRedacted} />
-            <Stat pal={pal} label={t('consent')} valueText={`${pct(privacy.consentRate)}%`} />
-            <Stat pal={pal} label={t('aiBlocks')} value={privacy.aiBlocks} valueTone={privacy.aiBlocks ? pal.amber : pal.muted} />
-          </Lens>
-
-          <Lens pal={pal} title={t('security')}>
-            <Stat pal={pal} label={t('tokenBlocks')} value={security.invalidTokenBlocks} valueTone={security.invalidTokenBlocks ? pal.amber : pal.muted} />
-            <Stat pal={pal} label={t('gateBlocks')} value={security.aiGateBlocks} valueTone={security.aiGateBlocks ? pal.amber : pal.muted} />
-            <Stat pal={pal} label={t('rateLimit')} valueText={t('rateOn')} />
-          </Lens>
+          <Tag tone={breachedCount ? 'error' : 'success'}>{breachedCount ? `${breachedCount} ${t('breaches')}` : t('allClear')}</Tag>
         </div>
 
-        <Lens pal={pal} title={t('watchlist')}>
-          <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr 130px 110px', fontSize: 11, textTransform: 'uppercase', letterSpacing: .5, color: pal.faint, fontWeight: 600, padding: '0 0 14px' }}>
-            <span>{t('request')}</span><span>{t('providerScope')}</span><span>{t('state')}</span><span style={{ textAlign: 'right' }}>{t('timeLeft')}</span>
-          </div>
-          {watchlist.map((w) => {
-            const ms = w.msLeft;
-            const overdue = ms !== null && ms < 0;
-            const soon = ms !== null && ms >= 0 && ms < SIX_H;
-            const stateLabel = w.status === 'confirmed' ? t('awaitingReply') : overdue ? t('breached') : soon ? t('atRisk') : t('onTrack');
-            const stateColor = w.status === 'confirmed' ? pal.amber : overdue || soon ? pal.red : pal.green;
-            const timeText = ms === null ? '—' : overdue ? t('overdue') : `in ${Math.round(ms / 3_600_000)}h`;
-            return (
-              <div key={w.id} style={{ display: 'grid', gridTemplateColumns: '90px 1fr 130px 110px', alignItems: 'center', fontSize: 13, padding: '13px 0', borderTop: `1px solid ${pal.line}` }}>
-                <span style={{ fontWeight: 600 }}>{w.id.slice(0, 8).toUpperCase()}</span>
-                <span style={{ color: pal.muted }}>{w.provider_key} · {w.country} {w.category}</span>
-                <span><span style={{ fontSize: 11, fontWeight: 600, padding: '2px 9px', borderRadius: 20, color: stateColor, border: `1px solid ${stateColor}55` }}>{stateLabel}</span></span>
-                <span style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums', color: overdue ? pal.red : pal.ink }}>{timeText}</span>
-              </div>
-            );
-          })}
-          {watchlist.length === 0 && <div style={{ padding: '12px 0', color: pal.faint, fontSize: 13, borderTop: `1px solid ${pal.line}` }}>{t('noOpen')}</div>}
-        </Lens>
-
-        <Lens pal={pal} title={t('feed')}>
-          {events.slice(0, 6).map((e, i) => (
-            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '12px 0', borderTop: i ? `1px solid ${pal.line}` : 'none', fontSize: 13 }}>
-              <span>{e.type.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase())}</span>
-              <span style={{ color: pal.faint, fontVariantNumeric: 'tabular-nums' }}>{relTime(e.created_at, lang)}</span>
-            </div>
+        <div className="grid grid-cols-2 gap-5 xl:grid-cols-4">
+          {gauges.map((g) => (
+            <KPICircleCard key={g.label} layout="centered" color={g.color} label={g.label} value={g.value} />
           ))}
-        </Lens>
-      </OpsSurface>
+        </div>
+
+        <section className="flex flex-col gap-4">
+          <SectionHeading>{t('funnel')}</SectionHeading>
+          <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+            <KPICard label={t('newToday')} value={String(stats.requestsToday)} trend={{ value: `${stats.requestsTotal} ${t('total')}`, direction: 'up' }} />
+            <KPICard label={t('confirmRate')} value={`${pct(stats.confirmRate)}%`} />
+            <KPICard label={t('avgConfirm')} value={avgConfirmH} trend={{ value: '~30d', direction: 'neutral' }} />
+            <KPICard label={t('breachesLabel')} value={String(stats.breaches)} trend={{ value: t('seeWatchlist'), direction: stats.breaches ? 'down' : 'neutral' }} />
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-4">
+          <SectionHeading>{t('privacy')}</SectionHeading>
+          <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+            <KPICard label={t('uploads')} value={String(privacy.uploads)} trend={{ value: t('sanitized'), direction: 'neutral' }} />
+            <KPICard label={t('pii')} value={String(privacy.piiRedacted)} trend={{ value: 'email · phone · IBAN', direction: 'neutral' }} />
+            <KPICard label={t('consent')} value={`${pct(privacy.consentRate)}%`} trend={{ value: t('explicit'), direction: 'up' }} />
+            <KPICard label={t('aiBlocks')} value={String(privacy.aiBlocks)} />
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-4">
+          <SectionHeading>{t('security')}</SectionHeading>
+          <div className="grid gap-6 xl:grid-cols-2">
+            <div className="grid grid-cols-3 gap-4">
+              <KPICard label={t('tokenBlocks')} value={String(security.invalidTokenBlocks)} />
+              <KPICard label={t('gateBlocks')} value={String(security.aiGateBlocks)} />
+              <KPICard label={t('rateLimit')} value={t('rateOn')} />
+            </div>
+            <div className="flex flex-col gap-3">
+              {events.slice(0, 4).map((e, i) => (
+                <EntityCard
+                  key={i}
+                  name={e.type.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase())}
+                  meta={e.payload && Object.keys(e.payload).length ? Object.entries(e.payload).slice(0, 2).map(([k, v]) => `${k}: ${String(v)}`).join(' · ') : t('auditStream')}
+                  trailing={<span className="text-[11px] text-fg-tertiary">{relTime(e.created_at, lang)}</span>}
+                  unread={i === 0}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-4">
+          <SectionHeading>{t('watchlist')}</SectionHeading>
+          <Table density="default">
+            <THead>
+              <TR>
+                <TH>{t('request')}</TH>
+                <TH>{t('providerScope')}</TH>
+                <TH>{t('state')}</TH>
+                <TH numeric>{t('timeLeft')}</TH>
+              </TR>
+            </THead>
+            <TBody>
+              {watchlist.map((w) => {
+                const ms = w.msLeft;
+                const overdue = ms !== null && ms < 0;
+                const soon = ms !== null && ms >= 0 && ms < SIX_H;
+                const tone: TagProps['tone'] = w.status === 'confirmed' ? 'warning' : overdue || soon ? 'error' : 'success';
+                const stateLabel = w.status === 'confirmed' ? t('awaitingReply') : overdue ? t('breached') : soon ? t('atRisk') : t('onTrack');
+                const timeText = ms === null ? '—' : overdue ? t('overdue') : `in ${Math.round(ms / 3_600_000)}h`;
+                return (
+                  <TR key={w.id}>
+                    <TD bold>{w.id.slice(0, 8).toUpperCase()}</TD>
+                    <TD>{w.provider_key} · {w.country} {w.category}</TD>
+                    <TD><Tag tone={tone}>{stateLabel}</Tag></TD>
+                    <TD numeric>{timeText}</TD>
+                  </TR>
+                );
+              })}
+              {watchlist.length === 0 && <TR><TD bold>—</TD><TD>{t('noOpen')}</TD><TD>—</TD><TD numeric>—</TD></TR>}
+            </TBody>
+          </Table>
+        </section>
+      </div>
     </AdminShell>
   );
 }
