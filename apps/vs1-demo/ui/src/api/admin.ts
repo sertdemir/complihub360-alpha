@@ -20,6 +20,18 @@ export interface AdminEventRow {
   created_at?: string;
 }
 
+export interface AdminSeries {
+  /** 7 day labels, oldest → newest, "DD.MM". */
+  dates: string[];
+  requests: number[];
+  confirmRate: number[];
+  breaches: number[];
+  uploads: number[];
+  pii: number[];
+  consent: number[];
+  aiBlocks: number[];
+}
+
 export interface AdminStats {
   stats: {
     requestsToday: number;
@@ -41,6 +53,8 @@ export interface AdminStats {
     aiGateBlocks: number;
   };
   events: AdminEventRow[];
+  /** 7-day trend series for the metric charts (absent on older API builds). */
+  series?: AdminSeries;
 }
 
 export async function fetchAdminStats(): Promise<AdminStats> {

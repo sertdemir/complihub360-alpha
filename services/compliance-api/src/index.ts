@@ -1031,7 +1031,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             const events = (await supabaseApi.select('event_log', {}, { order: 'timestamp.desc', limit: 100 })) as
                 Array<{ type: string; payload?: Record<string, unknown>; timestamp?: string; created_at?: string }>;
             const documents = (await supabaseApi.select('documents', {}, { order: 'created_at.desc', limit: 200 })) as
-                Array<{ classification: string; sanitized_ready: boolean; consent_ai?: boolean; ai_allowed: boolean; redaction_report?: { countsByType?: Record<string, number> } }>;
+                Array<{ classification: string; sanitized_ready: boolean; consent_ai?: boolean; ai_allowed: boolean; created_at?: string; redaction_report?: { countsByType?: Record<string, number> } }>;
 
             const total = engagements.length;
             const confirmedPlus = engagements.filter(r => r.status === 'confirmed' || r.status === 'replied');
@@ -1073,9 +1073,47 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 aiGateBlocks: events.filter(e => e.type === 'document_ai_blocked').length,
             };
             const feed = events.slice(0, 12).map(e => ({ ...e, created_at: e.created_at || e.timestamp }));
+
+            // ── 7-day trend series (for the Control Center metric charts) ──────
+            // Aggregated from the same in-memory reads; UTC day buckets, oldest → newest.
+            const dayKeys: string[] = [];
+            for (let i = 6; i >= 0; i--) {
+                const dt = new Date(); dt.setUTCHours(0, 0, 0, 0); dt.setUTCDate(dt.getUTCDate() - i);
+                dayKeys.push(dt.toISOString().slice(0, 10));
+            }
+            const dates = dayKeys.map(k => `${k.slice(8, 10)}.${k.slice(5, 7)}`);
+            const idxOf = (iso?: string) => dayKeys.indexOf((iso || '').slice(0, 10));
+            const bucket = () => new Array(7).fill(0) as number[];
+            const reqB = bucket(), confB = bucket(), breachB = bucket(), upB = bucket(), piiB = bucket(), aiB = bucket(), docTotB = bucket(), consB = bucket();
+            for (const e of engagements) {
+                const ci = idxOf(e.created_at); if (ci >= 0) reqB[ci]++;
+                const ui = idxOf(e.updated_at);
+                if (ui >= 0 && (e.status === 'confirmed' || e.status === 'replied')) confB[ui]++;
+                if (ui >= 0 && e.status === 'expired') breachB[ui]++;
+            }
+            for (const d of documents) {
+                const di = idxOf(d.created_at); if (di < 0) continue;
+                upB[di]++; docTotB[di]++;
+                piiB[di] += Object.values(d.redaction_report?.countsByType || {}).reduce((a, b) => a + b, 0);
+                if (d.consent_ai === true) consB[di]++;
+            }
+            for (const ev of events) {
+                if (ev.type === 'document_ai_blocked') { const ei = idxOf(ev.created_at || ev.timestamp); if (ei >= 0) aiB[ei]++; }
+            }
+            const series = {
+                dates,
+                requests: reqB,
+                confirmRate: reqB.map((r, i) => (r ? Math.round((confB[i] / r) * 100) : 0)),
+                breaches: breachB,
+                uploads: upB,
+                pii: piiB,
+                consent: docTotB.map((tt, i) => (tt ? Math.round((consB[i] / tt) * 100) : 0)),
+                aiBlocks: aiB,
+            };
+
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ ok: true, stats, watchlist, privacy, security, events: feed }));
+            res.end(JSON.stringify({ ok: true, stats, watchlist, privacy, security, events: feed, series }));
         } catch (err) {
             structuredLog('error', 'Admin stats failed', { correlationId, errorCode: 'ERR_ADMIN_STATS', severity: 'error', route: req.url });
             res.setHeader('x-correlation-id', correlationId);

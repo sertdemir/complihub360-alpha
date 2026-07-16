@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { AdminShell } from '../../components/admin/AdminShell';
 import { KPICircleCard, type KPIColor } from '../../components/ui/KPICircleCard';
 import { KPICard, EntityCard } from '../../components/ui/Cards';
+import { MetricCard } from '../../components/ui/MetricCard';
 import { Table, THead, TBody, TR, TH, TD } from '../../components/ui/Table';
 import { Tag, type TagProps } from '../../components/ui/Tag';
 import { Banner } from '../../components/ui/Banner';
@@ -40,6 +41,7 @@ const STR: Record<Lang, Record<string, string>> = {
     confirmRate: 'Confirm rate', replyRate: 'Reply rate', consentRate: 'AI consent', slaOnTrack: 'SLA on-track',
     funnel: 'Funnel', newToday: 'New today', total: 'total', avgConfirm: 'Ø confirm', breachesLabel: 'SLA breaches', seeWatchlist: 'see watchlist',
     privacy: 'Privacy & AI Gate', uploads: 'Document uploads', pii: 'PII redacted', consent: 'AI consent rate', aiBlocks: 'AI gate blocks', sanitized: 'all sanitized', explicit: 'explicit opt-in',
+    prevPeriod: 'vs. previous period', details: 'More details', justNow: 'updated just now', last7: 'last 7 days',
     security: 'Security & Audit', tokenBlocks: 'Blocked magic-links', gateBlocks: 'AI gate denials', rateLimit: 'Rate limiting', rateOn: '100 req/min · on', auditStream: 'Audit stream',
     watchlist: 'SLA watchlist', request: 'Request', providerScope: 'Provider · Scope', state: 'State', timeLeft: 'Time left',
     onTrack: 'on track', atRisk: 'at risk', breached: 'breached', awaitingReply: 'awaiting reply', overdue: 'overdue', noOpen: 'No open requests',
@@ -50,6 +52,7 @@ const STR: Record<Lang, Record<string, string>> = {
     confirmRate: 'Bestätigungsrate', replyRate: 'Antwortrate', consentRate: 'KI-Einwilligung', slaOnTrack: 'SLA im Plan',
     funnel: 'Funnel', newToday: 'Heute neu', total: 'gesamt', avgConfirm: 'Ø Bestätigung', breachesLabel: 'SLA-Verletzungen', seeWatchlist: 'siehe Watchlist',
     privacy: 'Privacy & AI Gate', uploads: 'Dokument-Uploads', pii: 'PII geschwärzt', consent: 'KI-Einwilligungsrate', aiBlocks: 'AI-Gate-Blocks', sanitized: 'alle bereinigt', explicit: 'explizites Opt-in',
+    prevPeriod: 'vs. vorheriger Zeitraum', details: 'Weitere Details', justNow: 'gerade aktualisiert', last7: 'letzte 7 Tage',
     security: 'Security & Audit', tokenBlocks: 'Blockierte Magic-Links', gateBlocks: 'AI-Gate-Ablehnungen', rateLimit: 'Rate-Limiting', rateOn: '100 req/min · aktiv', auditStream: 'Audit-Stream',
     watchlist: 'SLA-Watchlist', request: 'Anfrage', providerScope: 'Anbieter · Bereich', state: 'Status', timeLeft: 'Restzeit',
     onTrack: 'im Plan', atRisk: 'gefährdet', breached: 'verletzt', awaitingReply: 'wartet auf Antwort', overdue: 'überfällig', noOpen: 'Keine offenen Anfragen',
@@ -59,6 +62,22 @@ const STR: Record<Lang, Record<string, string>> = {
 const SIX_H = 6 * 3_600_000;
 const pct = (v: number | null): number => (v === null ? 0 : Math.round(v * 100));
 const kpiColor = (frac: number): KPIColor => (frac >= 0.6 ? 'success' : frac >= 0.4 ? 'warning' : 'error');
+
+// Demo 7-day series for the metric charts. Shown only with the design fixture;
+// live data has no per-day series yet (the /admin/stats read-model returns point
+// values), so live cards render the honest "no data" state until the backend
+// aggregates event_log by day.
+const DATES = ['10.07', '11.07', '12.07', '13.07', '14.07', '15.07', '16.07'];
+const DEMO = {
+  requests: [3, 5, 4, 8, 6, 9, 12],
+  confirm: [88, 90, 89, 93, 91, 92, 92],
+  avg: [7.1, 6.8, 6.5, 6.4, 6.3, 6.2, 6.2],
+  breaches: [0, 1, 0, 2, 1, 1, 1],
+  uploads: [10, 14, 12, 18, 20, 22, 24],
+  pii: [30, 38, 42, 50, 55, 58, 61],
+  consent: [70, 72, 74, 75, 76, 77, 78],
+  aiBlocks: [2, 3, 2, 4, 3, 5, 5],
+};
 
 function relTime(iso: string | undefined, lang: Lang): string {
   if (!iso) return '—';
@@ -84,6 +103,10 @@ export function AdminOverviewPage() {
   const breachedCount = watchlist.filter((w) => w.msLeft !== null && w.msLeft < 0).length;
   const slaOnTrack = watchlist.length ? 1 - breachedCount / watchlist.length : 1;
   const avgConfirmH = stats.avgConfirmMs ? `${(stats.avgConfirmMs / 3_600_000).toFixed(1)}h` : '—';
+  const demo = source === 'fixture' ? DEMO : undefined;
+  const live = data.series;
+  const dates = live?.dates ?? DATES;
+  const updated = t('justNow');
 
   const gauges: Array<{ label: string; value: number; color: KPIColor }> = [
     { label: t('confirmRate'), value: pct(stats.confirmRate), color: kpiColor(stats.confirmRate ?? 0) },
@@ -116,21 +139,21 @@ export function AdminOverviewPage() {
 
         <section className="flex flex-col gap-4">
           <SectionHeading>{t('funnel')}</SectionHeading>
-          <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
-            <KPICard label={t('newToday')} value={String(stats.requestsToday)} trend={{ value: `${stats.requestsTotal} ${t('total')}`, direction: 'up' }} />
-            <KPICard label={t('confirmRate')} value={`${pct(stats.confirmRate)}%`} />
-            <KPICard label={t('avgConfirm')} value={avgConfirmH} trend={{ value: '~30d', direction: 'neutral' }} />
-            <KPICard label={t('breachesLabel')} value={String(stats.breaches)} trend={{ value: t('seeWatchlist'), direction: stats.breaches ? 'down' : 'neutral' }} />
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+            <MetricCard label={t('newToday')} value={String(stats.requestsToday)} compare={`${stats.requestsTotal} ${t('total')}`} series={live?.requests ?? demo?.requests} xLabels={dates} updated={updated} detailsLabel={t('details')} />
+            <MetricCard label={t('confirmRate')} value={`${pct(stats.confirmRate)}%`} compare={t('prevPeriod')} color="#3C8C7A" series={live?.confirmRate ?? demo?.confirm} xLabels={dates} updated={updated} detailsLabel={t('details')} />
+            <MetricCard label={t('avgConfirm')} value={avgConfirmH} compare={t('last7')} series={demo?.avg} xLabels={dates} updated={updated} detailsLabel={t('details')} />
+            <MetricCard label={t('breachesLabel')} value={String(stats.breaches)} compare={t('seeWatchlist')} color="#B55353" series={live?.breaches ?? demo?.breaches} xLabels={dates} updated={updated} detailsLabel={t('details')} />
           </div>
         </section>
 
         <section className="flex flex-col gap-4">
           <SectionHeading>{t('privacy')}</SectionHeading>
-          <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
-            <KPICard label={t('uploads')} value={String(privacy.uploads)} trend={{ value: t('sanitized'), direction: 'neutral' }} />
-            <KPICard label={t('pii')} value={String(privacy.piiRedacted)} trend={{ value: 'email · phone · IBAN', direction: 'neutral' }} />
-            <KPICard label={t('consent')} value={`${pct(privacy.consentRate)}%`} trend={{ value: t('explicit'), direction: 'up' }} />
-            <KPICard label={t('aiBlocks')} value={String(privacy.aiBlocks)} />
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+            <MetricCard label={t('uploads')} value={String(privacy.uploads)} compare={t('sanitized')} series={live?.uploads ?? demo?.uploads} xLabels={dates} updated={updated} detailsLabel={t('details')} />
+            <MetricCard label={t('pii')} value={String(privacy.piiRedacted)} compare="email · phone · IBAN" color="#3C8C7A" series={live?.pii ?? demo?.pii} xLabels={dates} updated={updated} detailsLabel={t('details')} />
+            <MetricCard label={t('consent')} value={`${pct(privacy.consentRate)}%`} compare={t('explicit')} series={live?.consent ?? demo?.consent} xLabels={dates} updated={updated} detailsLabel={t('details')} />
+            <MetricCard label={t('aiBlocks')} value={String(privacy.aiBlocks)} compare={t('prevPeriod')} color="#C59E38" series={live?.aiBlocks ?? demo?.aiBlocks} xLabels={dates} updated={updated} detailsLabel={t('details')} />
           </div>
         </section>
 
