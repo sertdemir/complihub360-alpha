@@ -543,6 +543,367 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Session duplicate failed', correlationId }));
         }
+    } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/detail$/.test(req.url || '')) {
+        // Matchmaking v2 (spec §8): stage-2 ANONYMOUS provider detail. Opening it
+        // is the monetised event `provider_detail_opened`, deduped server-side to
+        // 1× per (user, provider) per rolling 30 days (spec §11 P3). Requires auth
+        // (listing sits behind the register gate). Never leaks name/contact.
+        const providerKey = (req.url || '').split('/')[4];
+        res.setHeader('x-correlation-id', correlationId);
+        if (!authUserId && !authViaApiKey) {
+            res.writeHead(401, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'UNAUTHORIZED', message: 'Login required', correlationId }));
+        } else {
+            try {
+                const rows = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[];
+                const p = rows[0];
+                if (!p || p.partner_status !== 'active') {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId }));
+                    return;
+                }
+                // Dedup: only charge if no detail-open by this user for this provider in the last 30d.
+                let charged = false;
+                try {
+                    const recent = (await supabaseApi.select('event_log', { type: 'provider_detail_opened' }, { order: 'timestamp.desc', limit: 200 })) as any[];
+                    const cutoff = Date.now() - 30 * 24 * 3600 * 1000;
+                    const dup = recent.some((e: any) => e.payload?.providerKey === providerKey
+                        && e.payload?.userId === authUserId
+                        && new Date(e.timestamp).getTime() > cutoff);
+                    if (!dup) {
+                        await supabaseApi.insert('event_log', {
+                            type: 'provider_detail_opened',
+                            payload: { providerKey, userId: authUserId, billable: true },
+                        });
+                        charged = true;
+                    }
+                } catch { /* event logging must never break the read */ }
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    ok: true,
+                    detail: {
+                        provider_key: p.provider_key,
+                        pseudonym_label: p.pseudonym_label || `Verifizierter Spezialist${p.region ? ' · ' + p.region : ''}`,
+                        region: p.region ?? null,
+                        active_since: p.active_since ?? null,
+                        specializations: p.categories || [],
+                        languages: p.languages || [],
+                        countries_supported: p.countries_supported || [],
+                        rating: p.rating != null ? Number(p.rating) : null,
+                        completed_count: p.completed_count ?? null,
+                        avg_response_hours: p.avg_response_hours != null ? Number(p.avg_response_hours) : null,
+                        billing_model: p.billing_model || 'project',
+                        pricing_table: p.pricing_table ?? null, // stage-2 reveal: full pricing
+                        is_verified: true,
+                        availability: p.availability || 'available',
+                    },
+                    detail_open_charged: charged,
+                    correlationId,
+                }));
+            } catch (err) {
+                structuredLog('error', 'Provider detail failed', { correlationId, errorCode: 'ERR_DETAIL', severity: 'error', route: req.url });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Provider detail failed', correlationId }));
+            }
+        }
+    } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/slots$/.test(req.url || '')) {
+        // Matchmaking v2: bookable slots for the scheduling page. Until the
+        // calendar-sync integration (spec §11 P4) lands, generate business-hour
+        // slots for the next 5 business days minus already-booked ones.
+        const providerKey = (req.url || '').split('/')[4];
+        res.setHeader('x-correlation-id', correlationId);
+        try {
+            const booked = (await supabaseApi.select('scheduling', { provider_key: providerKey, status: 'confirmed' }, { limit: 200 })) as any[];
+            const bookedSet = new Set(booked.map((b: any) => new Date(b.slot_start).toISOString()));
+            const slots: string[] = [];
+            const d = new Date(); d.setHours(0, 0, 0, 0);
+            let days = 0;
+            while (slots.length < 40 && days < 14) {
+                d.setDate(d.getDate() + 1);
+                const dow = d.getDay();
+                if (dow === 0 || dow === 6) continue;
+                days++;
+                for (const [h, m] of [[9, 0], [9, 30], [10, 0], [10, 30], [11, 0], [14, 0], [14, 30], [15, 0]] as const) {
+                    const s = new Date(d); s.setHours(h, m, 0, 0);
+                    const iso = s.toISOString();
+                    if (!bookedSet.has(iso)) slots.push(iso);
+                }
+            }
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ok: true, providerKey, slots, correlationId }));
+        } catch (err) {
+            structuredLog('error', 'Slots fetch failed', { correlationId, errorCode: 'ERR_SLOTS', severity: 'error', route: req.url });
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Slots fetch failed', correlationId }));
+        }
+    } else if (req.method === 'GET' && req.url === '/api/v1/bookings') {
+        // Matchmaking v2: the user's bookings ("Termine"). Identity is revealed
+        // post-booking (spec §5 stage 3), so provider name/contact ride along.
+        res.setHeader('x-correlation-id', correlationId);
+        if (!authUserId) {
+            res.writeHead(401, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'UNAUTHORIZED', message: 'Login required', correlationId }));
+        } else {
+            try {
+                const rows = (await supabaseApi.select('scheduling', { user_id: authUserId }, { order: 'slot_start.desc', limit: 100 })) as any[];
+                const provs = (await supabaseApi.select('providers', {})) as any[];
+                const byKey: Record<string, any> = {};
+                provs.forEach((p: any) => { byKey[p.provider_key] = p; });
+                const bookings = rows.map((b: any) => {
+                    const p = byKey[b.provider_key] || {};
+                    return {
+                        id: b.id,
+                        provider_key: b.provider_key,
+                        provider_name: b.identity_revealed ? (p.name ?? b.provider_key) : (p.pseudonym_label ?? 'Verifizierter Spezialist'),
+                        provider_region: p.region ?? null,
+                        slot_start: b.slot_start,
+                        slot_end: b.slot_end,
+                        status: b.status,
+                        message: b.message ?? null,
+                    };
+                });
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, bookings, correlationId }));
+            } catch (err) {
+                structuredLog('error', 'Bookings fetch failed', { correlationId, errorCode: 'ERR_BOOKINGS', severity: 'error', route: req.url });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Bookings fetch failed', correlationId }));
+            }
+        }
+    } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/bookings$/.test(req.url || '')) {
+        // Matchmaking v2: the provider's paid leads (bookings). The dossier —
+        // user identity + intake message — is included from booking time
+        // (spec §11 P7: charged at booking, value delivered immediately).
+        const providerKey = (req.url || '').split('/')[4];
+        res.setHeader('x-correlation-id', correlationId);
+        try {
+            const rows = (await supabaseApi.select('scheduling', { provider_key: providerKey }, { order: 'slot_start.desc', limit: 100 })) as any[];
+            const users = (await supabaseApi.select('users', {})) as any[];
+            const byId: Record<string, any> = {};
+            users.forEach((u: any) => { byId[u.id] = u; });
+            const bookings = rows.map((b: any) => ({
+                id: b.id,
+                slot_start: b.slot_start,
+                slot_end: b.slot_end,
+                status: b.status,
+                lead_charged: !!b.lead_charged,
+                user_email: b.user_id && byId[b.user_id] ? byId[b.user_id].email : null,
+                message: b.message ?? null,
+            }));
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ok: true, providerKey, bookings, correlationId }));
+        } catch (err) {
+            structuredLog('error', 'Provider bookings fetch failed', { correlationId, errorCode: 'ERR_PROVIDER_BOOKINGS', severity: 'error', route: req.url });
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Provider bookings fetch failed', correlationId }));
+        }
+    } else if (req.method === 'PATCH' && /^\/api\/v1\/scheduling\/[0-9a-f-]+$/.test(req.url || '')) {
+        // Cancel / mark outcome of a booking. Owner (user) or service key only.
+        // Lead fee is NOT refunded on cancel/no-show (spec §11 P7 value principle).
+        const bookingId = (req.url || '').split('/')[4];
+        res.setHeader('x-correlation-id', correlationId);
+        let patchBody = '';
+        req.on('data', (chunk: any) => patchBody += chunk.toString());
+        req.on('end', async () => {
+            try {
+                const d = JSON.parse(patchBody || '{}');
+                const status = typeof d.status === 'string' ? d.status : '';
+                if (!['cancelled', 'completed', 'no_show'].includes(status)) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'status must be cancelled|completed|no_show', correlationId }));
+                    return;
+                }
+                const rows = (await supabaseApi.select('scheduling', { id: bookingId }, { limit: 1 })) as any[];
+                const b = rows[0];
+                if (!b) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Booking not found', correlationId }));
+                    return;
+                }
+                if (!authViaApiKey && (!authUserId || b.user_id !== authUserId)) {
+                    res.writeHead(403, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'FORBIDDEN', message: 'Not your booking', correlationId }));
+                    return;
+                }
+                await supabaseApi.update('scheduling', { id: bookingId }, { status, updated_at: new Date().toISOString() });
+                const evType = status === 'cancelled' ? 'user_cancelled' : status === 'no_show' ? 'no_show' : 'outcome_check';
+                await supabaseApi.insert('event_log', { type: evType, payload: { bookingId, providerKey: b.provider_key, userId: b.user_id, status } });
+                // Outcome "completed" feeds the quality score (spec §6): bump the
+                // provider's completed_count used in the anonymous listing card.
+                if (status === 'completed') {
+                    try {
+                        const provs = (await supabaseApi.select('providers', { provider_key: b.provider_key }, { limit: 1 })) as any[];
+                        if (provs[0]) await supabaseApi.update('providers', { provider_key: b.provider_key }, { completed_count: (provs[0].completed_count || 0) + 1 });
+                    } catch { /* aggregate update must not break the outcome */ }
+                }
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, id: bookingId, status, correlationId }));
+            } catch (err) {
+                structuredLog('error', 'Booking patch failed', { correlationId, errorCode: 'ERR_BOOKING_PATCH', severity: 'error', route: req.url });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Booking patch failed', correlationId }));
+            }
+        });
+    } else if (req.method === 'POST' && req.url === '/api/v1/scheduling') {
+        // Matchmaking v2 (spec §11 P7): booking a slot IS the paid lead. On
+        // create: scheduling row + `scheduling_confirmed` + `provider_lead_charged`
+        // events + identity reveal (both sides). Charged even if a no-show occurs
+        // later — the provider receives the dossier (value) at booking time.
+        res.setHeader('x-correlation-id', correlationId);
+        if (!authUserId) {
+            res.writeHead(401, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'UNAUTHORIZED', message: 'Login required to book', correlationId }));
+        } else {
+            let schedBody = '';
+            req.on('data', (chunk: any) => schedBody += chunk.toString());
+            req.on('end', async () => {
+                try {
+                    const d = JSON.parse(schedBody || '{}');
+                    const providerKey = typeof d.provider_key === 'string' ? d.provider_key : '';
+                    const slotStart = typeof d.slot_start === 'string' ? d.slot_start : '';
+                    if (!providerKey || Number.isNaN(Date.parse(slotStart))) {
+                        res.writeHead(400, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'provider_key and slot_start (ISO) required', correlationId }));
+                        return;
+                    }
+                    const rows = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[];
+                    const p = rows[0];
+                    if (!p || p.partner_status !== 'active') {
+                        res.writeHead(404, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId }));
+                        return;
+                    }
+                    const slotEnd = new Date(Date.parse(slotStart) + 30 * 60 * 1000).toISOString();
+                    const inserted = (await supabaseApi.insert('scheduling', {
+                        provider_key: providerKey,
+                        user_id: authUserId,
+                        slot_start: slotStart,
+                        slot_end: slotEnd,
+                        status: 'confirmed',
+                        message: typeof d.message === 'string' ? d.message.slice(0, 2000) : null,
+                        lead_charged: true,
+                        identity_revealed: true,
+                    })) as any[];
+                    const booking = inserted?.[0];
+                    await supabaseApi.insert('event_log', { type: 'scheduling_confirmed', payload: { bookingId: booking?.id, providerKey, userId: authUserId, slotStart } });
+                    await supabaseApi.insert('event_log', { type: 'provider_lead_charged', payload: { bookingId: booking?.id, providerKey, userId: authUserId } });
+                    res.writeHead(201, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({
+                        ok: true,
+                        booking: { id: booking?.id, provider_key: providerKey, slot_start: slotStart, slot_end: slotEnd, status: 'confirmed' },
+                        // Stage-3 reveal: identity becomes visible at booking (spec §5).
+                        provider_identity: { name: p.name, website_url: p.website_url ?? null, contact_email: p.contact_email ?? null },
+                        correlationId,
+                    }));
+                } catch (err) {
+                    structuredLog('error', 'Scheduling create failed', { correlationId, errorCode: 'ERR_SCHEDULING', severity: 'error', route: req.url });
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Scheduling create failed', correlationId }));
+                }
+            });
+        }
+    } else if (req.method === 'POST' && req.url === '/api/v1/reviews') {
+        // Matchmaking v2 (notifications-alerts-concept §2): two-sided reviews,
+        // only from real bookings. user→provider ratings update the provider's
+        // aggregate rating (ranking quality factor); provider→user feeds the
+        // internal lead-quality signal.
+        res.setHeader('x-correlation-id', correlationId);
+        if (!authUserId && !authViaApiKey) {
+            res.writeHead(401, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'UNAUTHORIZED', message: 'Login required', correlationId }));
+        } else {
+            let revBody = '';
+            req.on('data', (chunk: any) => revBody += chunk.toString());
+            req.on('end', async () => {
+                try {
+                    const d = JSON.parse(revBody || '{}');
+                    const fromRole = d.from_role === 'provider' ? 'provider' : 'user';
+                    const rating = typeof d.rating === 'number' ? Math.max(0, Math.min(5, d.rating)) : null;
+                    if (!d.provider_key || rating === null) {
+                        res.writeHead(400, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'provider_key and rating required', correlationId }));
+                        return;
+                    }
+                    await supabaseApi.insert('reviews', {
+                        booking_id: d.booking_id ?? null,
+                        provider_key: d.provider_key,
+                        from_role: fromRole,
+                        to_role: fromRole === 'user' ? 'provider' : 'user',
+                        rating,
+                        categories: Array.isArray(d.categories) ? d.categories : [],
+                        body: typeof d.body === 'string' ? d.body.slice(0, 2000) : null,
+                        verified: true,
+                    });
+                    if (fromRole === 'user') {
+                        // Recompute the provider's aggregate rating from verified user reviews.
+                        try {
+                            const all = (await supabaseApi.select('reviews', { provider_key: d.provider_key, from_role: 'user' }, { limit: 500 })) as any[];
+                            const rated = all.filter((r: any) => r.rating != null);
+                            if (rated.length) {
+                                const avg = rated.reduce((s: number, r: any) => s + Number(r.rating), 0) / rated.length;
+                                await supabaseApi.update('providers', { provider_key: d.provider_key }, { rating: Math.round(avg * 10) / 10 });
+                            }
+                        } catch { /* aggregate must not break the write */ }
+                    }
+                    await supabaseApi.insert('event_log', { type: 'review_submitted', payload: { providerKey: d.provider_key, bookingId: d.booking_id ?? null, fromRole, rating } });
+                    res.writeHead(201, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ ok: true, correlationId }));
+                } catch (err) {
+                    structuredLog('error', 'Review submit failed', { correlationId, errorCode: 'ERR_REVIEW', severity: 'error', route: req.url });
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Review submit failed', correlationId }));
+                }
+            });
+        }
+    } else if (req.method === 'POST' && req.url === '/api/v1/provider/intake') {
+        // Matchmaking v2 (spec §10): token-gated provider intake. Providers are
+        // recruited offline/B2B and submit their package via a link; vetting is a
+        // manual admin step before partner_status becomes 'active'. The intake
+        // token is issued server-side (admin) — verified here via x-api-key OR a
+        // dedicated intake token in the body (checked against env secret).
+        res.setHeader('x-correlation-id', correlationId);
+        let intakeBody = '';
+        req.on('data', (chunk: any) => intakeBody += chunk.toString());
+        req.on('end', async () => {
+            try {
+                const d = JSON.parse(intakeBody || '{}');
+                const intakeToken = typeof d.intake_token === 'string' ? d.intake_token : '';
+                const expected = process.env.PROVIDER_INTAKE_TOKEN || '';
+                if (!authViaApiKey && (!expected || intakeToken !== expected)) {
+                    res.writeHead(403, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'FORBIDDEN', message: 'Valid intake token required', correlationId }));
+                    return;
+                }
+                const name = typeof d.name === 'string' ? d.name.trim() : '';
+                if (!name) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'name required', correlationId }));
+                    return;
+                }
+                const providerKey = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+                await supabaseApi.insert('providers', {
+                    provider_key: providerKey,
+                    name,
+                    website_url: d.website_url ?? null,
+                    partner_status: 'inactive', // vetting gate: admin flips to 'active' after review
+                    countries_supported: Array.isArray(d.countries_supported) ? d.countries_supported : [],
+                    languages: Array.isArray(d.languages) ? d.languages : [],
+                    categories: Array.isArray(d.categories) ? d.categories : [],
+                    billing_model: ['abo', 'hourly', 'project', 'mixed'].includes(d.billing_model) ? d.billing_model : 'project',
+                    pricing_table: d.pricing_table ?? null,
+                    pseudonym_label: d.pseudonym_label ?? null,
+                    region: d.region ?? null,
+                    active_since: Number.isInteger(d.active_since) ? d.active_since : null,
+                });
+                await supabaseApi.insert('event_log', { type: 'provider_intake_submitted', payload: { providerKey, certifications: Array.isArray(d.certifications) ? d.certifications.length : 0 } });
+                res.writeHead(201, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, provider_key: providerKey, status: 'in_review', correlationId }));
+            } catch (err) {
+                structuredLog('error', 'Provider intake failed', { correlationId, errorCode: 'ERR_INTAKE', severity: 'error', route: req.url });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Provider intake failed', correlationId }));
+            }
+        });
     } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/coverage$/.test(req.url || '')) {
         // B5: current public coverage for the Add-Market drawer.
         const providerKey = (req.url || '').split('/')[4];
@@ -605,6 +966,39 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 structuredLog('error', 'Coverage patch failed', { correlationId, errorCode: 'ERR_COVERAGE_PATCH', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Coverage update failed', correlationId }));
+            }
+        });
+    } else if (req.method === 'PATCH' && /^\/api\/v1\/provider\/[a-z0-9-]+\/profile$/.test(req.url || '')) {
+        // Matchmaking v2 (spec §10): provider self-service for the anonymous
+        // listing card + detail page — billing model, full pricing table and the
+        // anonymized identity fields. All provider-entered, editable any time.
+        const providerKey = (req.url || '').split('/')[4];
+        res.setHeader('x-correlation-id', correlationId);
+        let profBody = '';
+        req.on('data', (chunk: any) => profBody += chunk.toString());
+        req.on('end', async () => {
+            try {
+                const d = JSON.parse(profBody || '{}');
+                const patch: Record<string, unknown> = {};
+                if (typeof d.billing_model === 'string' && ['abo', 'hourly', 'project', 'mixed'].includes(d.billing_model)) patch.billing_model = d.billing_model;
+                if (d.pricing_table !== undefined) patch.pricing_table = d.pricing_table;
+                if (typeof d.pseudonym_label === 'string') patch.pseudonym_label = d.pseudonym_label.slice(0, 120);
+                if (typeof d.region === 'string') patch.region = d.region.slice(0, 80);
+                if (Number.isInteger(d.active_since)) patch.active_since = d.active_since;
+                if (Object.keys(patch).length === 0) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'No valid profile fields', correlationId }));
+                    return;
+                }
+                patch.updated_at = new Date().toISOString();
+                await supabaseApi.update('providers', { provider_key: providerKey }, patch);
+                await supabaseApi.insert('event_log', { type: 'provider_profile_updated', payload: { providerKey, fields: Object.keys(patch) } });
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, providerKey, updated: Object.keys(patch), correlationId }));
+            } catch (err) {
+                structuredLog('error', 'Provider profile update failed', { correlationId, errorCode: 'ERR_PROFILE', severity: 'error', route: req.url });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Profile update failed', correlationId }));
             }
         });
     } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/invoices$/.test(req.url || '')) {
@@ -1502,19 +1896,74 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     console.warn("RPC match_knowledge_chunks fail:", e);
                 }
 
-                // 3. Fetch matched providers
+                // 3. Fetch, score and anonymize matched providers.
+                //    Ranking = 0.6·Relevance + 0.3·Quality + 0.1·Priority (spec §6).
+                //    Output is ANONYMOUS: no name/website/contact — only attributes,
+                //    billing_model and a match score. Identity is revealed post-booking.
+                const country = requestData.country as string | undefined;
+                const wantedCats: string[] = requestData.structured_answers?.domains
+                    || requestData.structured_answers?.categories
+                    || requestData.domains || [];
+
                 const providers = (await supabaseApi.select('providers', {
                     partner_status: 'active'
                 })) as any[];
 
-                const filteredProviders = requestData.country
-                    ? providers.filter((p: any) => p.countries_supported.includes(requestData.country))
+                const eligible = country
+                    ? providers.filter((p: any) => (p.countries_supported || []).includes(country))
                     : providers;
+
+                const scoreOf = (p: any) => {
+                    const countryMatch = country && (p.countries_supported || []).includes(country) ? 1 : 0;
+                    const cats: string[] = p.categories || [];
+                    const catOverlap = wantedCats.length
+                        ? wantedCats.filter((c) => cats.includes(c)).length / wantedCats.length
+                        : (cats.length ? 0.5 : 0);
+                    const relevance = 0.6 * countryMatch + 0.4 * catOverlap;
+
+                    const ratingN = (p.rating != null ? Number(p.rating) : 4.5) / 5;
+                    const confN = p.confirmation_rate != null ? Number(p.confirmation_rate) : 0.8;
+                    const respN = p.avg_response_hours != null
+                        ? Math.max(0, 1 - Number(p.avg_response_hours) / 24) : 0.7;
+                    const breachN = Math.max(0, 1 - (p.breach_count || 0) * 0.1);
+                    const quality = 0.4 * ratingN + 0.3 * confN + 0.2 * respN + 0.1 * breachN;
+
+                    const priority = p.partner_status === 'active' ? 1 : 0;
+                    let total = 0.6 * relevance + 0.3 * quality + 0.1 * priority;
+                    if (p.availability === 'ooo') total *= 0.5; // out-of-office → rank frozen/low
+                    return { relevance, total };
+                };
+                const tierOf = (pct: number) => pct >= 90 ? 'high' : pct >= 75 ? 'strong' : 'moderate';
+
+                const anonProviders = eligible
+                    .map((p: any) => {
+                        const { relevance, total } = scoreOf(p);
+                        const match = Math.round(relevance * 100);
+                        return {
+                            provider_key: p.provider_key, // opaque handle for the (monetised) detail-open
+                            pseudonym_label: p.pseudonym_label
+                                || `Verifizierter Spezialist${p.region ? ' · ' + p.region : ''}`,
+                            region: p.region ?? null,
+                            active_since: p.active_since ?? null,
+                            specializations: p.categories || [],
+                            languages: p.languages || [],
+                            rating: p.rating != null ? Number(p.rating) : null,
+                            completed_count: p.completed_count ?? null,
+                            avg_response_hours: p.avg_response_hours != null ? Number(p.avg_response_hours) : null,
+                            billing_model: p.billing_model || 'project',
+                            is_verified: p.partner_status === 'active',
+                            match,                       // percentage, relevance-normalised
+                            match_tier: tierOf(match),
+                            _rank: total,
+                        };
+                    })
+                    .sort((a: any, b: any) => b._rank - a._rank)
+                    .map(({ _rank, ...pub }: any) => pub); // drop internal rank from the wire
 
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({
                     overview_summary: "AI summary synthesized from knowledge chunks and deterministic engine rules.",
-                    providers: filteredProviders,
+                    providers: anonProviders,
                     laws: engineResults.map((r: any) => ({ id: r.id, title: r.label, description: r.description })),
                     tutorials: knowledgeMatches.map((m: any) => ({ id: m.id, content: m.content })),
                     articles: [],
