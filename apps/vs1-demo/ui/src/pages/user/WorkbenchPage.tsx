@@ -12,6 +12,7 @@ import { Stepper } from '../../components/ui/Stepper';
 import { ProgressBar } from '../../components/ui/Progress';
 import { EntityCard } from '../../components/ui/Cards';
 import { Tag } from '../../components/ui/Tag';
+import { DOMAIN_I18N_KEY } from '../../lib/domains';
 
 // ─── User Dashboard · Domain Workbench (Tax & VAT) ────────────────────────────
 // Mirrors "User Dashboard v1 · Tax & VAT domain (Desktop)" (2051:60): gauge
@@ -20,7 +21,7 @@ import { Tag } from '../../components/ui/Tag';
 // TEMPLATE for all six domain workbenches — content comes from the fixture
 // (step/provider rows are demo data and stay untranslated).
 
-type DomainKey = 'tax-vat' | 'product-packaging' | 'data-privacy' | 'marketing-seo' | 'corporate-structure' | 'full-support';
+type DomainKey = 'tax-vat' | 'product-packaging' | 'data-privacy' | 'marketing-seo' | 'corporate-structure' | 'product-compliance' | 'logistics-customs' | 'legal-advisory';
 
 const DOMAIN_META: Record<DomainKey, { name: string; riskSub: string; steps: { label: string; description?: string }[] }> = {
   'tax-vat': { name: 'Tax & VAT', riskSub: '€145k IT revenue', steps: [] },
@@ -60,13 +61,31 @@ const DOMAIN_META: Record<DomainKey, { name: string; riskSub: string; steps: { l
       { label: 'Set up quarterly OSS filing routine', description: 'OSS-DE handles EU-wide reporting · €10k cross-border threshold' },
     ],
   },
-  'full-support': {
-    name: 'Full Support', riskSub: 'End-to-end',
+  'product-compliance': {
+    name: 'Product Compliance', riskSub: 'CE · GPSR',
     steps: [
-      { label: 'Kick-off call with your partner', description: '2 verified partners match · DE-IT cross-border · avg. reply 18h' },
-      { label: 'Partner maps all open obligations', description: 'Required before next sale to IT · Agenzia delle Entrate online flow' },
-      { label: 'Monthly monitoring & filing', description: 'Q3 2026 deadline · 90 days before first shipment to IT' },
-      { label: 'Set up quarterly OSS filing routine', description: 'OSS-DE handles EU-wide reporting · €10k cross-border threshold' },
+      { label: 'Verify CE-marking scope for your products', description: '2 verified partners match · DE-IT cross-border · avg. reply 18h' },
+      { label: 'Compile the technical documentation file', description: 'Required before next sale to IT · EU market-surveillance ready' },
+      { label: 'Appoint an EU responsible person (GPSR)', description: 'Q3 2026 deadline · 90 days before first shipment to IT' },
+      { label: 'Set up conformity re-checks per product change', description: 'Applies to every SKU revision · EU-wide' },
+    ],
+  },
+  'logistics-customs': {
+    name: 'Logistics & Customs', riskSub: 'Zoll · Intrastat',
+    steps: [
+      { label: 'Register an EORI number', description: '2 verified partners match · DE-IT cross-border · avg. reply 18h' },
+      { label: 'Classify goods (HS/TARIC codes)', description: 'Required before next cross-border shipment' },
+      { label: 'Set up Intrastat reporting', description: 'Monthly filing above the movement threshold' },
+      { label: 'Review Incoterms & customs valuation', description: 'Applies to marketplace + D2C shipments · EU-wide' },
+    ],
+  },
+  'legal-advisory': {
+    name: 'Legal Advisory', riskSub: 'Verträge · AGB',
+    steps: [
+      { label: 'Review terms & conditions for the target market', description: '2 verified partners match · DE-IT cross-border · avg. reply 18h' },
+      { label: 'Localize imprint & consumer-rights notices', description: 'Required before next sale to IT' },
+      { label: 'Check distance-selling & withdrawal rules', description: 'Q3 2026 deadline · consumer-protection scope' },
+      { label: 'Set up a contract-review routine', description: 'Supplier + marketplace agreements · EU-wide' },
     ],
   },
 };
@@ -92,16 +111,13 @@ const THRESHOLD_STATUS_KEY: Record<string, string> = { HIGH: 'statusHigh', CAUTI
 
 // Canonical English domain label → userws translation key (display only —
 // DOMAIN_META.name stays canonical for routing / activeDomain matching / API).
-const DOMAIN_KEY: Record<string, string> = {
-  'Tax & VAT': 'taxVat', 'Product & Packaging': 'productPackaging', 'Data & Privacy': 'dataPrivacy',
-  'Marketing & SEO': 'marketingSeo', 'Corporate & Structure': 'corporateStructure', 'Full Support': 'fullSupport',
-};
+const DOMAIN_KEY = DOMAIN_I18N_KEY;
 
 // key = provider_key in the DB (seeded on staging) — the FK the POST needs.
 const PROVIDERS = [
-  { key: 'studio-bianchi', country: 'IT', initials: 'SB', name: 'Studio Bianchi SRL', meta: 'Milano, IT', sub: 'Italian VAT registration + fiscal representation · DE·IT bilingual · avg. reply 18h · Request quote' },
-  { key: 'schmidt-partner', country: 'DE', initials: 'EV', name: 'EU-wide VAT compliance · O…', meta: 'Hamburg, DE', sub: 'Schmidt & Partner · OSS/IOSS setup · 12 years cross-border tax · 8 EU offices' },
-  { key: 'madrid-tax', country: 'ES', initials: 'MT', name: 'Madrid Tax Consulta…', meta: 'Madrid, ES', sub: 'Iberian VAT (ES/PT) · monthly filing · marketplace optimization · Request quote' },
+  { key: 'studio-bianchi', country: 'IT', initials: 'SB', name: 'Verifizierte Steuerkanzlei · Norditalien', meta: 'Norditalien', sub: 'Italian VAT registration + fiscal representation · DE·IT bilingual · avg. reply 18h · Request quote' },
+  { key: 'schmidt-partner', country: 'DE', initials: 'EV', name: 'Verifizierte Steuerberatung · Norddeutschland', meta: 'Norddeutschland', sub: 'OSS/IOSS setup · 12 years cross-border tax · 8 EU offices' },
+  { key: 'madrid-tax', country: 'ES', initials: 'MT', name: 'Verifizierter Tax-Spezialist · Spanien', meta: 'Spanien', sub: 'Iberian VAT (ES/PT) · monthly filing · marketplace optimization · Request quote' },
 ];
 
 export function WorkbenchPage() {

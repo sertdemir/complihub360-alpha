@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ProviderShell } from '../../components/provider/ProviderShell';
 import { RankingImpactDrawer } from '../../components/provider/ProviderDrawers';
@@ -15,13 +16,17 @@ import { Card } from '../../components/ui/Card';
 // banner · SLA target picker. Design fixture data until the profile API lands.
 
 function SectionHeader({ title, sub, editLabel }: { title: string; sub: string; editLabel: string }) {
+  // v2 polish: edit links point at the real self-service surface (Settings →
+  // Matchmaking panel) instead of a dead anchor.
+  const { i18n } = useTranslation('providerws');
+  const base = `/${i18n.resolvedLanguage || 'en'}/partner-dashboard/settings`;
   return (
     <div className="flex items-start justify-between gap-4">
       <div>
         <h2 className="text-[15px] font-semibold text-fg">{title}</h2>
         <p className="mt-0.5 text-[12px] text-fg-tertiary">{sub}</p>
       </div>
-      <a href="#" className="shrink-0 text-[12px] font-medium text-fg-brand underline-offset-2 hover:underline">{editLabel}</a>
+      <Link to={base} className="shrink-0 text-[12px] font-medium text-fg-brand underline-offset-2 hover:underline">{editLabel}</Link>
     </div>
   );
 }
@@ -53,7 +58,7 @@ const SLA = [
 ];
 
 export function CoveragePage() {
-  const { t } = useTranslation('providerws');
+  const { t, i18n } = useTranslation('providerws');
   const [rankingOpen, setRankingOpen] = useState(false);
   // B5: "+ Add market" → drawer; freshly added markets show as pending chips.
   const [addOpen, setAddOpen] = useState(false);
@@ -64,7 +69,7 @@ export function CoveragePage() {
         <div className="flex items-start justify-between gap-4">
           <h1 className="font-serif text-[30px] font-bold leading-tight text-fg">{t('coverage.title')}</h1>
           <div className="mt-1 flex shrink-0 items-center gap-4">
-            <a href="#" className="text-[12px] font-medium text-fg underline underline-offset-2">{t('coverage.previewProfile')}</a>
+            <Link to={`/${i18n.resolvedLanguage || 'en'}/partner-dashboard/settings`} className="text-[12px] font-medium text-fg underline underline-offset-2">{t('coverage.previewProfile')}</Link>
             <Button size="sm" onClick={() => setRankingOpen(true)}>{t('coverage.viewRankingImpact')}</Button>
           </div>
         </div>

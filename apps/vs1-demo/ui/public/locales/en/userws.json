@@ -30,10 +30,13 @@
     "dataPrivacy": "Data & Privacy",
     "marketingSeo": "Marketing & SEO",
     "corporateStructure": "Corporate & Structure",
-    "fullSupport": "Full Support"
+    "productCompliance": "Product Compliance",
+    "logisticsCustoms": "Logistics & Customs",
+    "legalAdvisory": "Legal Advisory"
   },
   "shell": {
     "groupWorkspace": "Workspace",
+    "groupDomains": "Domains",
     "groupLibrary": "Library",
     "groupSaved": "Saved",
     "groupMonitoring": "Monitoring",
@@ -41,6 +44,7 @@
     "navDashboard": "Dashboard",
     "navSessions": "Sessions",
     "navRequests": "Requests",
+    "navTermine": "Appointments",
     "navNotifications": "Notifications",
     "navLibrary": "Library",
     "navSavedProviders": "Saved Providers",
@@ -376,5 +380,44 @@
     "upgradeBody": "Your 5 free questions for today are used up. Assistant Pro gives you unlimited answers from the verified knowledge base — cancel anytime.",
     "upgradeCta": "Upgrade · $12 / month",
     "upgradeSuccess": "Assistant Pro is active — welcome aboard! Ask away."
+  },
+  "termine": {
+    "title": "Your <accent>appointments</accent>.",
+    "sub": "Booked intro calls with your specialists — identity and contact are visible since booking.",
+    "upcoming": "UPCOMING",
+    "past": "PAST",
+    "reschedule": "Reschedule",
+    "cancel": "Cancel",
+    "review": "Rate provider",
+    "emptyUpcoming": "No upcoming appointments — book one from your risk map.",
+    "emptyPast": "No past appointments yet.",
+    "status": {
+      "confirmed": "CONFIRMED",
+      "completed": "COMPLETED",
+      "cancelled": "CANCELLED",
+      "no_show": "NO-SHOW",
+      "outcome_open": "OUTCOME OPEN"
+    },
+    "outcomeQuestion": "Did the appointment take place?",
+    "outcomeYes": "Yes",
+    "outcomeNo": "No-show",
+    "reviewed": "✓ Review submitted",
+    "noShowNote": "No refund — the provider received the dossier at booking. We re-match you on request."
+  },
+  "review": {
+    "eyebrow": "REVIEW",
+    "cancel": "Cancel",
+    "submit": "Submit review",
+    "done": "✓ Submitted",
+    "ratingLabel": "Your rating",
+    "categoriesLabel": "What stood out?",
+    "cat": {
+      "expertise": "Expertise",
+      "responsiveness": "Responsiveness",
+      "value": "Value for money"
+    },
+    "bodyLabel": "Your experience (optional)",
+    "bodyPh": "How did the intro call go?",
+    "note": "Verified reviews come only from real appointments and appear anonymized on the provider profile. Your name stays private."
   }
 }

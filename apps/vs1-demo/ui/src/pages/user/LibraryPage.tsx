@@ -22,14 +22,14 @@ const ITEMS: { title: string; source: string; type: ItemType; domain: string }[]
   { title: 'GDPR cookie consent setup checklist', source: 'CompliHub Editorial · 12 steps', type: 'GUIDE', domain: 'PRIVACY' },
   { title: 'Health claims regulation: what you cannot say', source: 'Lex Marketing · 8 min read', type: 'ARTICLE', domain: 'MARKETING' },
   { title: 'DPA generator (DE/EN)', source: 'CompliHub Tools · Interactive', type: 'TOOL', domain: 'PRIVACY' },
-  { title: 'OSS vs IOSS: live Q&A with Schmidt tax experts', source: 'CompliHub Live · Mar 14 · 90 min', type: 'WEBINAR', domain: 'TAX & VAT' },
-  { title: 'EPR France: who needs to register?', source: 'PackComply GmbH · 14 min', type: 'VIDEO', domain: 'PACKAGING' },
+  { title: 'OSS vs IOSS: live Q&A with verified tax experts', source: 'CompliHub Live · Mar 14 · 90 min', type: 'WEBINAR', domain: 'TAX & VAT' },
+  { title: 'EPR France: who needs to register?', source: 'Verifizierter Partner · 14 min', type: 'VIDEO', domain: 'PACKAGING' },
   { title: 'Setting up a German GmbH from abroad', source: 'CompliHub Editorial · 22 steps', type: 'GUIDE', domain: 'CORPORATE' },
   { title: 'CONAI vs LUCID: comparison for EU sellers', source: 'CompliHub Editorial · 10 min read', type: 'ARTICLE', domain: 'PACKAGING' },
   { title: 'EU VAT threshold calculator', source: 'CompliHub Tools · Interactive', type: 'TOOL', domain: 'TAX & VAT' },
-  { title: 'GDPR audit walkthrough — recorded webinar', source: 'Lex Privacy LLP · Feb 12 · 60 min', type: 'WEBINAR', domain: 'PRIVACY' },
+  { title: 'GDPR audit walkthrough — recorded webinar', source: 'Verifizierter Partner · Feb 12 · 60 min', type: 'WEBINAR', domain: 'PRIVACY' },
   { title: 'Reverse charge mechanism explained', source: 'Tax Specialists EU · 11 min', type: 'VIDEO', domain: 'TAX & VAT' },
-  { title: 'When does Partita IVA become mandatory?', source: 'Studio Bianchi · 6 min read', type: 'ARTICLE', domain: 'TAX & VAT' },
+  { title: 'When does Partita IVA become mandatory?', source: 'Verifizierter Partner · 6 min read', type: 'ARTICLE', domain: 'TAX & VAT' },
 ];
 
 const TYPE_FILTERS: { key: string; labelKey: string }[] = [
@@ -45,7 +45,7 @@ export function LibraryPage() {
   const list = ITEMS.filter((i) => typeFilter === 'all' || i.type === typeFilter);
 
   return (
-    <UserShell activeDomain="Tax & VAT">
+    <UserShell>
       <div className="mx-auto max-w-[1140px] space-y-5">
         <div className="flex items-start justify-between gap-4">
           <div>

@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Mail, LineChart, Globe, ReceiptEuro, Settings, Bell, CircleHelp, Search } from 'lucide-react';
+import { CalendarCheck, LineChart, Globe, ReceiptEuro, Settings, Bell, CircleHelp, Search } from 'lucide-react';
 import { Sidebar, SidebarGroup, NavItem } from '../ui/AppShell';
 import { LogoMark } from '../ui/Logo';
 import { PartnerStatusBadge, AvailabilityPill } from '../ui/ProviderBadges';
 import { SearchDrawer, HelpDrawer } from './ProviderDrawers';
 import { BellPopover } from './BellPopover';
 import { ConfirmDrawer, type ConfirmSpec } from './ConfirmDrawer';
-import { fetchProviderRequests } from '../../api/requests';
+import { fetchProviderBookings } from '../../api/bookings';
 import { fetchUnreadCount } from '../../api/notifications';
-import { fetchCoverage, setAvailability, AVAILABILITY_EVENT } from '../../api/provider';
+import { fetchCoverage, setAvailability, AVAILABILITY_EVENT, DEMO_PROVIDER_KEY } from '../../api/provider';
 import { cn } from '../../lib/utils';
 
 // ─── ProviderShell ────────────────────────────────────────────────────────────
@@ -23,7 +23,8 @@ const NAV = [
   {
     groupKey: 'shell.groupPipeline',
     items: [
-      { to: 'requests', labelKey: 'shell.navRequests', icon: Mail },
+      // v2: Termine/Leads (bookings) replace the retired request/confirm pipeline.
+      { to: 'termine', labelKey: 'shell.navTermine', icon: CalendarCheck },
       { to: 'performance', labelKey: 'shell.navPerformance', icon: LineChart },
     ],
   },
@@ -55,23 +56,29 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
   // hidden until the API answers (fixture mode shows no counts).
   const [counts, setCounts] = useState<{ requests?: number; unread?: number }>({});
   useEffect(() => {
-    fetchProviderRequests()
-      .then((rs) => setCounts((c) => ({ ...c, requests: rs.filter((r) => r.status === 'awaiting-confirm').length })))
+    fetchProviderBookings(DEMO_PROVIDER_KEY)
+      .then((bs) => setCounts((c) => ({ ...c, requests: bs.filter((b) => b.status === 'confirmed').length })))
       .catch(() => {});
     fetchUnreadCount()
       .then((n) => setCounts((c) => ({ ...c, unread: n })))
       .catch(() => {});
   }, []);
   const badgeFor = (to: string): string | undefined => {
-    const n = to === 'requests' ? counts.requests : to === 'notifications' ? counts.unread : undefined;
+    const n = to === 'termine' ? counts.requests : to === 'notifications' ? counts.unread : undefined;
     return n ? String(n) : undefined;
   };
 
   // C2: live availability — the pill toggles OOO via a confirm step.
   const [availability, setAvail] = useState<'available' | 'ooo'>('available');
   const [confirm, setConfirm] = useState<ConfirmSpec | null>(null);
+  // v2 vetting (§10): the badge reflects partner_status instead of a hardcoded
+  // "verified" — a not-yet-vetted provider sees "Pending".
+  const [vetted, setVetted] = useState(true);
   useEffect(() => {
-    fetchCoverage().then((c) => c.availability && setAvail(c.availability)).catch(() => {});
+    fetchCoverage().then((c) => {
+      if (c.availability) setAvail(c.availability);
+      if (c.partner_status) setVetted(c.partner_status === 'active');
+    }).catch(() => {});
     const onSync = (e: Event) => setAvail((e as CustomEvent<'available' | 'ooo'>).detail);
     window.addEventListener(AVAILABILITY_EVENT, onSync);
     return () => window.removeEventListener(AVAILABILITY_EVENT, onSync);
@@ -148,7 +155,7 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
           <button type="button" onClick={togglAvailability} aria-label={t('shell.availabilityAria')} className="transition-opacity hover:opacity-80">
             <AvailabilityPill status={availability === 'ooo' ? 'offline' : 'available'} label={availability === 'ooo' ? t('shell.outOfOffice') : undefined} />
           </button>
-          <PartnerStatusBadge status="verified" label="Verified Partner" />
+          <PartnerStatusBadge status={vetted ? 'verified' : 'pending'} label={vetted ? 'Verified Partner' : 'Pending review'} />
         </header>
         <main className={cn('flex-1 overflow-y-auto px-8 py-6')}>{children}</main>
       </div>

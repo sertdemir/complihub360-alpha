@@ -7,13 +7,16 @@ import { Tag } from '../../components/ui/Tag';
 import { Banner } from '../../components/ui/Banner';
 import { ConfirmDrawer, type ConfirmSpec } from '../../components/provider/ConfirmDrawer';
 import { ChangeEmailDrawer } from '../../components/provider/ChangeEmailDrawer';
-import { fetchCoverage } from '../../api/provider';
+import { fetchCoverage, updateMatchmakingProfile, type BillingModel, type PricingRow } from '../../api/provider';
+import { Input } from '../../components/ui/Input';
+import { FilterChip } from '../../components/ui/Badge';
 
 // ─── Provider /settings ───────────────────────────────────────────────────────
 // Mirrors "Provider · /settings (Desktop)": settings section list (Profile
 // active) + the Profile → Public-identity detail panel. Fixture data.
 
 const SECTIONS = [
+  { key: 'matchmaking', titleKey: 'settings.sectionMatchmaking', subKey: 'settings.sectionMatchmakingSub' },
   { key: 'profile', titleKey: 'settings.sectionProfile', subKey: 'settings.sectionProfileSub' },
   { key: 'security', titleKey: 'settings.sectionSecurity', subKey: 'settings.sectionSecuritySub' },
   { key: 'notifications', titleKey: 'settings.sectionNotifications', subKey: 'settings.sectionNotificationsSub' },
@@ -54,12 +57,12 @@ export function SettingsPage() {
           </div>
 
           <div className="space-y-5">
+            <MatchmakingPanel />
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-[15px] font-semibold text-fg">{t('settings.publicIdentityTitle')}</h2>
                 <p className="mt-0.5 text-[12px] text-fg-tertiary">{t('settings.publicIdentitySub')}</p>
               </div>
-              <a href="#" className="shrink-0 text-[12px] font-medium text-fg-brand underline-offset-2 hover:underline">{t('settings.preview')}</a>
             </div>
 
             <Card styleVariant="filled" className="flex items-center gap-4 p-4">
@@ -156,5 +159,101 @@ export function SettingsPage() {
       <ConfirmDrawer spec={confirm} onClose={() => setConfirm(null)} />
       <ChangeEmailDrawer open={emailOpen} currentEmail={contactEmail} onClose={() => setEmailOpen(false)} />
     </ProviderShell>
+  );
+}
+
+// ─── Matchmaking panel (v2 §10) ──────────────────────────────────────────────
+// Provider self-service for the anonymous listing card + detail page: billing
+// model (shown on the card instead of a price), full pricing table (revealed
+// only on the monetised detail page) and the anonymized identity fields.
+function MatchmakingPanel() {
+  const { t } = useTranslation('providerws');
+  const [billing, setBilling] = useState<BillingModel>('project');
+  const [pseudonym, setPseudonym] = useState('Verifizierte Steuerkanzlei · Norditalien');
+  const [region, setRegion] = useState('Norditalien');
+  const [activeSince, setActiveSince] = useState('2015');
+  const [rows, setRows] = useState<PricingRow[]>([
+    { service: 'VAT-Erstregistrierung Italien', price: 'ab €450 · einmalig' },
+    { service: 'Laufende OSS-Betreuung', price: '€180 / Quartal' },
+    { service: 'Fachberatung (Stundensatz)', price: '€140 / Std.' },
+  ]);
+  const [saved, setSaved] = useState<'idle' | 'saving' | 'done'>('idle');
+
+  const save = async () => {
+    setSaved('saving');
+    try {
+      await updateMatchmakingProfile({
+        billing_model: billing,
+        pricing_table: rows,
+        pseudonym_label: pseudonym,
+        region,
+        active_since: parseInt(activeSince, 10) || null,
+      });
+    } catch { /* fixture mode: keep local state */ }
+    setSaved('done');
+    setTimeout(() => setSaved('idle'), 2000);
+  };
+
+  const MODELS: BillingModel[] = ['abo', 'hourly', 'project', 'mixed'];
+  return (
+    <Card styleVariant="filled" className="space-y-4 p-5">
+      <div>
+        <h2 className="text-[15px] font-semibold text-fg">{t('settings.matchmakingTitle')}</h2>
+        <p className="mt-0.5 text-[12px] text-fg-tertiary">{t('settings.matchmakingSub')}</p>
+      </div>
+      <div>
+        <p className="mb-2 text-[12px] font-medium text-fg-secondary">{t('settings.billingModelLabel')}</p>
+        <div className="flex flex-wrap gap-2">
+          {MODELS.map((m) => (
+            <FilterChip key={m} size="sm" selected={billing === m} onClick={() => setBilling(m)}>
+              {t(`settings.billingModel.${m}`)}
+            </FilterChip>
+          ))}
+        </div>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div>
+          <p className="mb-1 text-[12px] font-medium text-fg-secondary">{t('settings.pseudonymLabel')}</p>
+          <Input value={pseudonym} onChange={(e) => setPseudonym(e.target.value)} />
+        </div>
+        <div>
+          <p className="mb-1 text-[12px] font-medium text-fg-secondary">{t('settings.regionLabel')}</p>
+          <Input value={region} onChange={(e) => setRegion(e.target.value)} />
+        </div>
+        <div>
+          <p className="mb-1 text-[12px] font-medium text-fg-secondary">{t('settings.activeSinceLabel')}</p>
+          <Input value={activeSince} onChange={(e) => setActiveSince(e.target.value)} />
+        </div>
+      </div>
+      <div>
+        <div className="mb-2 flex items-center justify-between">
+          <p className="text-[12px] font-medium text-fg-secondary">{t('settings.pricingTableLabel')}</p>
+          <button
+            type="button"
+            className="text-[12px] font-medium text-fg-brand hover:underline"
+            onClick={() => setRows((r) => [...r, { service: '', price: '' }])}
+          >
+            {t('settings.pricingAddRow')}
+          </button>
+        </div>
+        <div className="space-y-2">
+          {rows.map((row, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <Input className="flex-1" value={row.service} placeholder={t('settings.pricingServicePh')}
+                onChange={(e) => setRows((r) => r.map((x, j) => (j === i ? { ...x, service: e.target.value } : x)))} />
+              <Input className="w-[180px]" value={row.price} placeholder={t('settings.pricingPricePh')}
+                onChange={(e) => setRows((r) => r.map((x, j) => (j === i ? { ...x, price: e.target.value } : x)))} />
+              <button type="button" aria-label={t('settings.pricingRemoveRow')} className="text-fg-tertiary hover:text-fg"
+                onClick={() => setRows((r) => r.filter((_, j) => j !== i))}>✕</button>
+            </div>
+          ))}
+        </div>
+        <p className="mt-2 text-[11px] text-fg-tertiary">{t('settings.pricingNoteV2')}</p>
+      </div>
+      <div className="flex items-center gap-3">
+        <Button size="sm" onClick={save} disabled={saved === 'saving'}>{t('settings.matchmakingSave')}</Button>
+        {saved === 'done' && <span className="text-[12px] text-fg-brand">{t('settings.matchmakingSaved')}</span>}
+      </div>
+    </Card>
   );
 }

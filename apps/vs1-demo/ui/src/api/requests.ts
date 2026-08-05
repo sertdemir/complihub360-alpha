@@ -111,11 +111,14 @@ const USER_VIEW: Record<string, Pick<UserRequestRow, 'status' | 'statusLabel' | 
   withdrawn: { status: 'active', statusLabel: 'Withdrawn', action: { label: 'View thread', variant: 'secondary' }, bucket: 'closed' },
 };
 
+// v2 §5 anonymity: pre-booking the user only ever sees an anonymous
+// "Verified <type> · <region>" label — the provider identity reveals only
+// after a booking (post-booking views may show clear names).
 const PROVIDER_NAMES: Record<string, string> = {
-  'studio-bianchi': 'Studio Bianchi SRL',
-  'schmidt-partner': 'Schmidt & Partner',
-  'madrid-tax': 'Madrid Tax Consultants',
-  'dahlmann-cpa': 'Dahlmann CPA',
+  'studio-bianchi': 'Verifizierte Steuerkanzlei · Norditalien',
+  'schmidt-partner': 'Verifizierte Steuerberatung · Norddeutschland',
+  'madrid-tax': 'Verifizierter Tax-Spezialist · Spanien',
+  'dahlmann-cpa': 'Verifizierter Steuerexperte · USA',
 };
 
 export async function fetchUserRequests(): Promise<UserRequestRow[]> {

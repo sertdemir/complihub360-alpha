@@ -5,6 +5,7 @@ import { Button } from '../ui/Button';
 import { Tag } from '../ui/Tag';
 import { Checkbox } from '../ui/Checkbox';
 import { uploadDocument, type UploadResult } from '../../api/documents';
+import { DOMAIN_I18N_KEY } from '../../lib/domains';
 
 // ─── Doc-Upload drawer (Figma 2654:49 · wiring map B12) ──────────────────────
 // The visible face of the privacy pipeline: text goes in, the API redacts
@@ -32,10 +33,7 @@ const CLASSIFICATION_KEY: Record<UploadResult['classification'], string> = {
 };
 
 // Canonical English domain label → userws translation key (display only).
-const DOMAIN_KEY: Record<string, string> = {
-  'Tax & VAT': 'taxVat', 'Product & Packaging': 'productPackaging', 'Data & Privacy': 'dataPrivacy',
-  'Marketing & SEO': 'marketingSeo', 'Corporate & Structure': 'corporateStructure', 'Full Support': 'fullSupport',
-};
+const DOMAIN_KEY = DOMAIN_I18N_KEY;
 
 export function DocUploadDrawer({ open, onClose, domainLabel }: DocUploadDrawerProps) {
   const { t } = useTranslation('userws');

@@ -1,5 +1,5 @@
 import { Play, ArrowRight } from 'lucide-react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { generateRiskMapPdf } from '../../lib/riskMapPdf';
 import { OBLIGATIONS, STATS } from '../ResultsRiskMap';
@@ -18,17 +18,17 @@ import { DomainCard } from '../../components/ui/DomainCard';
 const REQUESTS = [
   {
     id: '14h ago', status: 'awaiting-confirm' as const, statusLabel: 'Awaiting confirmation',
-    company: 'Studio Bianchi SRL', meta: 'VAT registration · Italy · 14h ago',
+    company: 'Verifizierte Steuerkanzlei · Norditalien', meta: 'VAT registration · Italy · 14h ago',
     action: { label: 'Send reminder', variant: 'secondary' as const },
   },
   {
     id: '2d ago', status: 'active' as const, statusLabel: 'Active',
-    company: 'PackComply GmbH', meta: 'EPR registration · France',
+    company: 'Verifizierter EPR-Spezialist · Deutschland', meta: 'EPR registration · France',
     action: { label: 'Open thread', variant: 'secondary' as const },
   },
   {
     id: '4d ago', status: 'active' as const, statusLabel: 'Active',
-    company: 'Lex Privacy LLP', meta: 'GDPR audit · UK · 4d ago',
+    company: 'Verifizierte Datenschutz-Kanzlei · UK', meta: 'GDPR audit · UK · 4d ago',
     action: { label: 'Open thread', variant: 'secondary' as const },
   },
 ];
@@ -53,13 +53,14 @@ const ACTION_KEY: Record<string, string> = {
   'Send reminder': 'sendReminder', 'Open thread': 'openThread', 'View thread': 'viewThread', 'View request': 'viewRequest',
 };
 
-function SectionHeader({ title, count }: { title: string; count: string }) {
-  const { t } = useTranslation('userws');
+function SectionHeader({ title, count, to }: { title: string; count: string; to: string }) {
+  const { t, i18n } = useTranslation('userws');
+  const base = `/${i18n.resolvedLanguage || 'en'}`;
   return (
     <div className="flex items-baseline gap-2">
       <h2 className="text-[15px] font-semibold text-fg">{title}</h2>
       <span className="text-[13px] font-semibold text-fg-brand">{count}</span>
-      <a href="#" className="ml-auto text-[12px] text-fg-secondary underline-offset-2 hover:underline">{t('shared.seeAll')}</a>
+      <Link to={`${base}/${to}`} className="ml-auto text-[12px] text-fg-secondary underline-offset-2 hover:underline">{t('shared.seeAll')}</Link>
     </div>
   );
 }
@@ -98,7 +99,7 @@ export function UserHomePage() {
   };
   const firstName = (useAuthStore((st) => st.userName) || 'Alex').split(/[\s._-]+/)[0];
   return (
-    <UserShell activeDomain="Tax & VAT">
+    <UserShell>
       <div className="mx-auto max-w-[1140px] space-y-7">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -129,7 +130,7 @@ export function UserHomePage() {
         </Card>
 
         <section className="space-y-3">
-          <SectionHeader title={t('home.activeRequests')} count="3" />
+          <SectionHeader title={t('home.activeRequests')} count={String(REQUESTS.length)} to="dashboard/requests" />
           <div className="space-y-2.5">
             {REQUESTS.map((r) => (
               <RequestCard
@@ -146,7 +147,7 @@ export function UserHomePage() {
         </section>
 
         <section className="space-y-3">
-          <SectionHeader title={t('home.savedSessions')} count="6" />
+          <SectionHeader title={t('home.savedSessions')} count={String(SESSIONS.length)} to="dashboard/sessions" />
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             {SESSIONS.map((s) => (
               <DomainCard

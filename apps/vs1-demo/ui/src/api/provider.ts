@@ -14,6 +14,7 @@ export interface ProviderCoverage {
   sla_target_confirm_hours: number;
   availability?: 'available' | 'ooo';
   ooo_until?: string | null;
+  partner_status?: 'active' | 'inactive' | 'downgraded'; // vetting state (v2 §10)
 }
 
 // C2: cross-component sync — the shell pill and the requests banner both
@@ -35,6 +36,29 @@ export async function setAvailability(status: 'available' | 'ooo', providerKey: 
 export async function fetchCoverage(providerKey: string = DEMO_PROVIDER_KEY): Promise<ProviderCoverage> {
   const res = await apiFetch<{ ok: boolean; coverage: ProviderCoverage }>(`/api/v1/provider/${providerKey}/coverage`);
   return res.coverage;
+}
+
+// ─── Matchmaking profile (v2 §10) ────────────────────────────────────────────
+// Provider self-service: billing model, full pricing table (detail page) and
+// the anonymized listing-card fields.
+export type BillingModel = 'abo' | 'hourly' | 'project' | 'mixed';
+
+export interface PricingRow { service: string; price: string }
+
+export interface MatchmakingProfile {
+  billing_model: BillingModel;
+  pricing_table: PricingRow[] | null;
+  pseudonym_label: string | null;
+  region: string | null;
+  active_since: number | null;
+}
+
+export async function updateMatchmakingProfile(patch: Partial<MatchmakingProfile>, providerKey: string = DEMO_PROVIDER_KEY): Promise<void> {
+  await apiFetch(`/api/v1/provider/${providerKey}/profile`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(patch),
+  });
 }
 
 export async function addMarket(country: string, providerKey: string = DEMO_PROVIDER_KEY): Promise<string[]> {

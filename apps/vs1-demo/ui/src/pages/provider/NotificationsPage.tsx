@@ -150,6 +150,8 @@ export function NotificationsPage() {
                     type="button"
                     onClick={() => {
                       const eng = 'engagementId' in n ? (n as FeedItem).engagementId : undefined;
+                      const booking = 'bookingId' in n ? (n as FeedItem).bookingId : undefined;
+                      if (booking) { navigate(`/${locale}/partner-dashboard/termine`); return; }
                       navigate(`/${locale}/partner-dashboard/requests${eng ? `?thread=${eng}` : ''}`);
                     }}
                     className="mt-2 inline-block text-[12px] font-medium text-fg-brand underline-offset-2 hover:underline"

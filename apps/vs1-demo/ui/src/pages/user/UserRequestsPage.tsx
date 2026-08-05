@@ -76,7 +76,7 @@ export function UserRequestsPage() {
   const list = effective.filter((r) => filter === 'all' || r.bucket === filter);
 
   return (
-    <UserShell activeDomain="Tax & VAT">
+    <UserShell>
       <div className="mx-auto max-w-[1140px] space-y-5">
         <div className="flex items-start justify-between gap-4">
           <div>

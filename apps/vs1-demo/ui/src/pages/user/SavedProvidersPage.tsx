@@ -13,9 +13,9 @@ import { EntityCard } from '../../components/ui/Cards';
 const FILTER_KEYS = ['filterAll', 'filterVat', 'filterPrivacy', 'filterPackaging', 'filterMarketing', 'filterCorporate'];
 
 const PROVIDERS = [
-  { initials: 'SB', name: 'Studio Bianchi SRL', city: 'Milano, IT',
+  { initials: 'SB', name: 'Verifizierte Steuerkanzlei · Norditalien', city: 'Norditalien',
     sub: 'VERIFIED · Italian VAT registration + fiscal representation · DE·IT bilingual' },
-  { initials: 'MT', name: 'Madrid Tax Consultancy', city: 'Madrid, ES',
+  { initials: 'MT', name: 'Verifizierter Tax-Spezialist · Spanien', city: 'Spanien',
     sub: 'VERIFIED · Iberian VAT (ES/PT) · monthly filing · marketplace optimization' },
 ];
 
@@ -23,7 +23,7 @@ export function SavedProvidersPage() {
   const { t } = useTranslation('userws');
   const [filter, setFilter] = useState('filterAll');
   return (
-    <UserShell activeDomain="Tax & VAT">
+    <UserShell>
       <div className="mx-auto max-w-[1140px] space-y-5">
         <div className="flex items-start justify-between gap-4">
           <div>

@@ -30,10 +30,13 @@
     "dataPrivacy": "Veri ve Gizlilik",
     "marketingSeo": "Pazarlama ve SEO",
     "corporateStructure": "Şirket ve Yapı",
-    "fullSupport": "Tam Destek"
+    "productCompliance": "Ürün Uygunluğu",
+    "logisticsCustoms": "Lojistik ve Gümrük",
+    "legalAdvisory": "Hukuki Danışmanlık"
   },
   "shell": {
     "groupWorkspace": "Çalışma Alanı",
+    "groupDomains": "Alanlar",
     "groupLibrary": "Kitaplık",
     "groupSaved": "Kaydedilenler",
     "groupMonitoring": "İzleme",
@@ -41,6 +44,7 @@
     "navDashboard": "Panel",
     "navSessions": "Oturumlar",
     "navRequests": "Talepler",
+    "navTermine": "Randevular",
     "navNotifications": "Bildirimler",
     "navLibrary": "Kitaplık",
     "navSavedProviders": "Kaydedilen Sağlayıcılar",
@@ -376,5 +380,44 @@
     "upgradeBody": "Bugünkü 5 ücretsiz sorunuz tükendi. Assistant Pro ile doğrulanmış bilgi tabanından sınırsız yanıt alırsınız — aylık iptal edilebilir.",
     "upgradeCta": "Yükselt · Ayda 12 $",
     "upgradeSuccess": "Assistant Pro etkin — aramıza hoş geldiniz! Sorularınızı sorabilirsiniz."
+  },
+  "termine": {
+    "title": "<accent>Randevuların</accent>.",
+    "sub": "Uzmanlarınla planlanmış ilk görüşmeler — kimlik ve iletişim, rezervasyondan itibaren görünür.",
+    "upcoming": "YAKLAŞAN",
+    "past": "GEÇMİŞ",
+    "reschedule": "Ertele",
+    "cancel": "İptal et",
+    "review": "Sağlayıcıyı değerlendir",
+    "emptyUpcoming": "Yaklaşan randevu yok — risk haritandan bir tane planla.",
+    "emptyPast": "Henüz geçmiş randevu yok.",
+    "status": {
+      "confirmed": "ONAYLANDI",
+      "completed": "TAMAMLANDI",
+      "cancelled": "İPTAL EDİLDİ",
+      "no_show": "KATILMADI",
+      "outcome_open": "SONUÇ BEKLİYOR"
+    },
+    "outcomeQuestion": "Randevu gerçekleşti mi?",
+    "outcomeYes": "Evet",
+    "outcomeNo": "Gelmedi",
+    "reviewed": "✓ Değerlendirme gönderildi",
+    "noShowNote": "İade yok — sağlayıcı dosyayı rezervasyonda aldı. İstersen seni yeniden eşleştiririz."
+  },
+  "review": {
+    "eyebrow": "DEĞERLENDİRME",
+    "cancel": "İptal",
+    "submit": "Değerlendirmeyi gönder",
+    "done": "✓ Gönderildi",
+    "ratingLabel": "Puanın",
+    "categoriesLabel": "Ne öne çıktı?",
+    "cat": {
+      "expertise": "Uzmanlık",
+      "responsiveness": "Yanıt hızı",
+      "value": "Fiyat-performans"
+    },
+    "bodyLabel": "Deneyimin (isteğe bağlı)",
+    "bodyPh": "İlk görüşme nasıl geçti?",
+    "note": "Doğrulanmış değerlendirmeler yalnızca gerçek randevulardan gelir ve sağlayıcı profilinde anonim görünür. Adın gizli kalır."
   }
 }

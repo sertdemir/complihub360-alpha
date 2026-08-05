@@ -601,6 +601,12 @@ export function RegisterPage() {
 
     const handleRoleSwitch = (newRole: Role) => {
         if (newRole === role) return;
+        // Matchmaking v2 (spec §10 / D7): providers are recruited offline and
+        // onboard via the token-gated intake link — no self-registration here.
+        if (newRole === "partner") {
+            navigate(`/${i18n.resolvedLanguage || "en"}/provider-intake`);
+            return;
+        }
         setRole(newRole);
         setStep(0);
         setDirection(1);

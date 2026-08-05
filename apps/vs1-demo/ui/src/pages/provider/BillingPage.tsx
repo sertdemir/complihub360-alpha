@@ -19,32 +19,32 @@ const FIXTURE: Invoice[] = [
   { id: 'f-026', invoice_number: 'INV-026', period: '2026-05', amount_cents: 216400, currency: 'EUR', status: 'failed',
     issued_at: '2026-06-01', due_at: '2026-06-15', paid_at: null,
     line_items: [
-      { label: 'Confirmed engagements', qty: 22, unit_cents: 9200, amount_cents: 202400 },
-      { label: 'Affiliate clicks', qty: 70, unit_cents: 200, amount_cents: 14000 },
+      { label: 'Booking leads', qty: 22, unit_cents: 9200, amount_cents: 202400 },
+      { label: 'Profile detail opens', qty: 70, unit_cents: 200, amount_cents: 14000 },
     ] },
   { id: 'f-025', invoice_number: 'INV-025', period: '2026-04', amount_cents: 189200, currency: 'EUR', status: 'paid',
     issued_at: '2026-05-01', due_at: '2026-05-15', paid_at: '2026-05-03',
     line_items: [
-      { label: 'Confirmed engagements', qty: 19, unit_cents: 9200, amount_cents: 174800 },
-      { label: 'Affiliate clicks', qty: 72, unit_cents: 200, amount_cents: 14400 },
+      { label: 'Booking leads', qty: 19, unit_cents: 9200, amount_cents: 174800 },
+      { label: 'Profile detail opens', qty: 72, unit_cents: 200, amount_cents: 14400 },
     ] },
   { id: 'f-024', invoice_number: 'INV-024', period: '2026-03', amount_cents: 152400, currency: 'EUR', status: 'paid',
     issued_at: '2026-04-01', due_at: '2026-04-15', paid_at: '2026-04-02',
     line_items: [
-      { label: 'Confirmed engagements', qty: 16, unit_cents: 9200, amount_cents: 147200 },
-      { label: 'Affiliate clicks', qty: 26, unit_cents: 200, amount_cents: 5200 },
+      { label: 'Booking leads', qty: 16, unit_cents: 9200, amount_cents: 147200 },
+      { label: 'Profile detail opens', qty: 26, unit_cents: 200, amount_cents: 5200 },
     ] },
   { id: 'f-023', invoice_number: 'INV-023', period: '2026-02', amount_cents: 173200, currency: 'EUR', status: 'paid',
     issued_at: '2026-03-01', due_at: '2026-03-15', paid_at: '2026-03-02',
     line_items: [
-      { label: 'Confirmed engagements', qty: 18, unit_cents: 9200, amount_cents: 165600 },
-      { label: 'Affiliate clicks', qty: 38, unit_cents: 200, amount_cents: 7600 },
+      { label: 'Booking leads', qty: 18, unit_cents: 9200, amount_cents: 165600 },
+      { label: 'Profile detail opens', qty: 38, unit_cents: 200, amount_cents: 7600 },
     ] },
   { id: 'f-022', invoice_number: 'INV-022', period: '2026-01', amount_cents: 160800, currency: 'EUR', status: 'paid',
     issued_at: '2026-02-01', due_at: '2026-02-15', paid_at: '2026-02-01',
     line_items: [
-      { label: 'Confirmed engagements', qty: 17, unit_cents: 9200, amount_cents: 156400 },
-      { label: 'Affiliate clicks', qty: 22, unit_cents: 200, amount_cents: 4400 },
+      { label: 'Booking leads', qty: 17, unit_cents: 9200, amount_cents: 156400 },
+      { label: 'Profile detail opens', qty: 22, unit_cents: 200, amount_cents: 4400 },
     ] },
 ];
 

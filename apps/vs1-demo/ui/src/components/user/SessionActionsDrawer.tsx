@@ -5,6 +5,7 @@ import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
 import { Tag } from '../ui/Tag';
 import { patchSession, duplicateSession } from '../../api/sessions';
+import { DOMAIN_I18N_KEY } from '../../lib/domains';
 
 // ─── Session-Actions drawer (Figma 2654:89 · wiring map B13) ─────────────────
 // The "⋯" menu on a session row: rename (label), duplicate (editable copy),
@@ -24,10 +25,7 @@ interface SessionActionsDrawerProps {
 }
 
 // Canonical English domain label → userws translation key (display only).
-const DOMAIN_KEY: Record<string, string> = {
-  'Tax & VAT': 'taxVat', 'Product & Packaging': 'productPackaging', 'Data & Privacy': 'dataPrivacy',
-  'Marketing & SEO': 'marketingSeo', 'Corporate & Structure': 'corporateStructure', 'Full Support': 'fullSupport',
-};
+const DOMAIN_KEY = DOMAIN_I18N_KEY;
 
 export function SessionActionsDrawer({ target, onClose, onChanged }: SessionActionsDrawerProps) {
   const { t } = useTranslation('userws');

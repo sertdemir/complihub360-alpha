@@ -30,10 +30,13 @@
     "dataPrivacy": "Datos y privacidad",
     "marketingSeo": "Marketing y SEO",
     "corporateStructure": "Sociedad y estructura",
-    "fullSupport": "Soporte integral"
+    "productCompliance": "Conformidad de producto",
+    "logisticsCustoms": "Logística y aduanas",
+    "legalAdvisory": "Asesoría legal"
   },
   "shell": {
     "groupWorkspace": "Espacio de trabajo",
+    "groupDomains": "Áreas",
     "groupLibrary": "Biblioteca",
     "groupSaved": "Guardado",
     "groupMonitoring": "Monitorización",
@@ -41,6 +44,7 @@
     "navDashboard": "Panel",
     "navSessions": "Sesiones",
     "navRequests": "Solicitudes",
+    "navTermine": "Citas",
     "navNotifications": "Notificaciones",
     "navLibrary": "Biblioteca",
     "navSavedProviders": "Proveedores guardados",
@@ -376,5 +380,44 @@
     "upgradeBody": "Sus 5 preguntas gratuitas de hoy se han agotado. Con Assistant Pro obtiene respuestas ilimitadas de la base de conocimiento verificada — cancelable mensualmente.",
     "upgradeCta": "Mejorar · 12 $ / mes",
     "upgradeSuccess": "Assistant Pro está activo — ¡bienvenido! Pregunte lo que quiera."
+  },
+  "termine": {
+    "title": "Tus <accent>citas</accent>.",
+    "sub": "Llamadas iniciales reservadas con tus especialistas — identidad y contacto visibles desde la reserva.",
+    "upcoming": "PRÓXIMAS",
+    "past": "PASADAS",
+    "reschedule": "Reprogramar",
+    "cancel": "Cancelar",
+    "review": "Valorar al proveedor",
+    "emptyUpcoming": "No hay citas próximas — reserva una desde tu risk map.",
+    "emptyPast": "Aún no hay citas pasadas.",
+    "status": {
+      "confirmed": "CONFIRMADA",
+      "completed": "COMPLETADA",
+      "cancelled": "CANCELADA",
+      "no_show": "NO ASISTIÓ",
+      "outcome_open": "RESULTADO PENDIENTE"
+    },
+    "outcomeQuestion": "¿Tuvo lugar la cita?",
+    "outcomeYes": "Sí",
+    "outcomeNo": "No asistió",
+    "reviewed": "✓ Valoración enviada",
+    "noShowNote": "Sin reembolso — el proveedor recibió el dossier al reservar. Te reasignamos si lo deseas."
+  },
+  "review": {
+    "eyebrow": "VALORACIÓN",
+    "cancel": "Cancelar",
+    "submit": "Enviar valoración",
+    "done": "✓ Enviada",
+    "ratingLabel": "Tu valoración",
+    "categoriesLabel": "¿Qué destacarías?",
+    "cat": {
+      "expertise": "Competencia",
+      "responsiveness": "Capacidad de respuesta",
+      "value": "Relación calidad-precio"
+    },
+    "bodyLabel": "Tu experiencia (opcional)",
+    "bodyPh": "¿Cómo fue la primera llamada?",
+    "note": "Las valoraciones verificadas provienen solo de citas reales y aparecen anonimizadas en el perfil del proveedor. Tu nombre permanece privado."
   }
 }

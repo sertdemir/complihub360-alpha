@@ -9,6 +9,7 @@ import { FilterChip } from '../../components/ui/Badge';
 import { SessionRow, type SessionRisk } from '../../components/ui/SessionRow';
 import { SessionActionsDrawer, type SessionActionsTarget } from '../../components/user/SessionActionsDrawer';
 import { fetchSessions, type SessionRowData } from '../../api/sessions';
+import { DOMAIN_I18N_KEY } from '../../lib/domains';
 
 // ─── User Dashboard · Sessions ────────────────────────────────────────────────
 // Mirrors "User Dashboard v1 · Sessions list (Desktop)" (2051:48): gold-word
@@ -39,10 +40,7 @@ const DOMAIN_LABEL: Record<string, string> = {
 };
 
 // Canonical English domain label → userws translation key (display only).
-const DOMAIN_KEY: Record<string, string> = {
-  'Tax & VAT': 'taxVat', 'Product & Packaging': 'productPackaging', 'Data & Privacy': 'dataPrivacy',
-  'Marketing & SEO': 'marketingSeo', 'Corporate & Structure': 'corporateStructure', 'Full Support': 'fullSupport',
-};
+const DOMAIN_KEY = DOMAIN_I18N_KEY;
 
 function relTime(iso: string, t: TFunction): string {
   const h = Math.floor((Date.now() - new Date(iso).getTime()) / 3_600_000);
@@ -97,10 +95,13 @@ export function SessionsPage() {
       .map((d) => ({ key: d, label: `${tDomain(d)} · ${rows.filter((s) => s.domain === d).length}`, match: (s: Row) => s.domain === d })),
   ];
   const match = FILTERS.find((f) => f.key === filter)?.match ?? (() => true);
-  const list = rows.filter(match);
+  // v2 polish: the sort control is a real toggle (newest ↔ oldest).
+  const [sortDesc, setSortDesc] = useState(true);
+  const filtered = rows.filter(match);
+  const list = sortDesc ? filtered : [...filtered].reverse();
 
   return (
-    <UserShell activeDomain="Tax & VAT">
+    <UserShell>
       <div className="mx-auto max-w-[1140px] space-y-5">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -120,8 +121,13 @@ export function SessionsPage() {
               {f.label}
             </FilterChip>
           ))}
-          <button type="button" className="ml-auto flex items-center gap-1 text-[12px] text-fg-tertiary transition-colors hover:text-fg">
-            {t('shared.sortLastUpdated')} <ChevronDown size={12} />
+          <button
+            type="button"
+            aria-pressed={!sortDesc}
+            onClick={() => setSortDesc((s) => !s)}
+            className="ml-auto flex items-center gap-1 text-[12px] text-fg-tertiary transition-colors hover:text-fg"
+          >
+            {t('shared.sortLastUpdated')} <ChevronDown size={12} className={sortDesc ? '' : 'rotate-180'} />
           </button>
         </div>
 
@@ -137,7 +143,7 @@ export function SessionsPage() {
               riskLine={s.riskLine}
               risk={s.risk}
               onMenu={s.id ? () => setActionsFor({ id: s.id!, title: s.title, domain: s.domain, country: s.country }) : () => {}}
-              action={<Button size="sm" variant="accent" onClick={() => navigate(`/${locale}/results`)}>{t('shared.open')}</Button>}
+              action={<Button size="sm" variant="accent" onClick={() => navigate(`/${locale}/results${s.id && !s.id.startsWith('fx') ? `?session=${s.id}` : ''}`)}>{t('shared.open')}</Button>}
             />
           ))}
         </div>

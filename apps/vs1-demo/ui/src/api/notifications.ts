@@ -19,6 +19,7 @@ export interface FeedItem {
   desc: string;
   action?: string;
   engagementId?: string; // raw uuid — deep-link into the request thread
+  bookingId?: string;    // v2: deep-link into the Termine page
   unread?: boolean;
   kind: 'request' | 'sla' | 'billing' | 'system' | 'review';
 }
@@ -34,6 +35,44 @@ const KIND: Record<string, FeedItem['kind']> = {
   sla_reminder_sent: 'sla',
   engagement_completed: 'system',
   client_review_posted: 'review',
+  // Matchmaking v2 lifecycle (notifications-alerts-concept §1): bookings ride
+  // on 'request' (teal), reminders/no-shows on 'sla' (warning), lead fees on
+  // 'billing', reviews on 'review'.
+  scheduling_started: 'request',
+  scheduling_confirmed: 'request',
+  provider_lead_charged: 'billing',
+  reminder_24h: 'sla',
+  reminder_1h: 'sla',
+  provider_cancelled: 'sla',
+  user_cancelled: 'system',
+  user_rescheduled: 'system',
+  outcome_check: 'system',
+  no_show: 'sla',
+  review_request: 'review',
+  review_submitted: 'review',
+  provider_detail_opened: 'billing',
+  provider_intake_submitted: 'system',
+  provider_profile_updated: 'system',
+};
+
+// Human titles for v2 events — without this, the feed would show raw
+// "reminder 24h"-style debug text (dashboard-v2 gap cluster G).
+const TITLE: Record<string, string> = {
+  scheduling_started: 'Booking started',
+  scheduling_confirmed: 'Appointment booked',
+  provider_lead_charged: 'Lead billed',
+  reminder_24h: 'Appointment reminder (24h)',
+  reminder_1h: 'Appointment reminder (1h)',
+  provider_cancelled: 'Provider cancelled the appointment',
+  user_cancelled: 'Appointment cancelled',
+  user_rescheduled: 'Appointment rescheduled',
+  outcome_check: 'Did the appointment take place?',
+  no_show: 'No-show recorded',
+  review_request: 'Please rate your appointment',
+  review_submitted: 'Review submitted',
+  provider_detail_opened: 'Profile detail opened',
+  provider_intake_submitted: 'Partner package submitted',
+  provider_profile_updated: 'Matchmaking profile updated',
 };
 
 function dayLabel(iso: string): string {
@@ -74,14 +113,17 @@ export async function fetchNotificationsFeed(viewer: string = NOTIFICATIONS_VIEW
       ? Object.entries(row.payload).map(([k, v]) => `${k}: ${String(v)}`).join(' · ')
       : '';
     const item: FeedItem = {
-      title: row.type.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase()),
+      title: TITLE[row.type] ?? row.type.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase()),
       event: row.type,
       time: timeLabel(row.created_at),
       desc: payloadBits,
       unread: isUnread(row.created_at, lastSeen),
       kind: KIND[row.type] ?? 'system',
-      action: row.payload?.engagementId ? `Open ${String(row.payload.engagementId).slice(0, 8)} →` : undefined,
+      action: row.payload?.bookingId
+        ? 'Open Termine →'
+        : row.payload?.engagementId ? `Open ${String(row.payload.engagementId).slice(0, 8)} →` : undefined,
       engagementId: row.payload?.engagementId ? String(row.payload.engagementId) : undefined,
+      bookingId: row.payload?.bookingId ? String(row.payload.bookingId) : undefined,
     };
     groups.set(day, [...(groups.get(day) ?? []), item]);
   }

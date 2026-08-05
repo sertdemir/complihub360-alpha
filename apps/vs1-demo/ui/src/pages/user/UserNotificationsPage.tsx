@@ -17,9 +17,9 @@ import { fetchNotificationsFeed, USER_NOTIFICATIONS_VIEWER, type FeedGroup, type
 
 const FIXTURE: FeedGroup[] = [
   { day: 'Today', items: [
-    { title: 'Provider replied · Studio Bianchi SRL', event: 'REQUEST', kind: 'request', time: '12 min', unread: true,
-      desc: 'Proposal received for VAT registration · Italy — €6,500 fixed' },
-    { title: 'SLA reminder · Lex Privacy LLP', event: 'SLA', kind: 'sla', time: '4h',
+    { title: 'Provider replied · Verifizierte Steuerkanzlei · Norditalien', event: 'REQUEST', kind: 'request', time: '12 min', unread: true,
+      desc: 'Proposal received for VAT registration · Italy' },
+    { title: 'SLA reminder · Verifizierte Datenschutz-Kanzlei · UK', event: 'SLA', kind: 'sla', time: '4h',
       desc: 'No response in 96h — re-route to another partner available' },
     { title: 'Risk threshold reached · Italy VAT', event: 'MONITORING', kind: 'system', time: '6h',
       desc: '€145k IT revenue — €10k EU-wide OSS threshold exceeded' },
@@ -70,11 +70,12 @@ export function UserNotificationsPage() {
     .filter((g) => g.items.length > 0);
 
   const openItem = (i: FeedItem) => {
+    if (i.bookingId) { navigate(`/${locale}/dashboard/termine`); return; }
     if (i.engagementId) navigate(`/${locale}/dashboard/requests?thread=${i.engagementId}`);
   };
 
   return (
-    <UserShell activeDomain="Tax & VAT">
+    <UserShell>
       <div className="mx-auto max-w-[1140px] space-y-5">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -116,8 +117,8 @@ export function UserNotificationsPage() {
                 meta={n.desc}
                 trailing={<span className="text-[11px] text-fg-tertiary">{n.time}</span>}
                 unread={n.unread}
-                interactive={!!n.engagementId}
-                onClick={n.engagementId ? () => openItem(n) : undefined}
+                interactive={!!n.engagementId || !!n.bookingId}
+                onClick={n.engagementId || n.bookingId ? () => openItem(n) : undefined}
                 avatar={<span className="grid h-9 w-9 place-items-center rounded-full bg-white/[0.06] text-[13px] text-fg-tertiary">🔔</span>}
               />
             ))}

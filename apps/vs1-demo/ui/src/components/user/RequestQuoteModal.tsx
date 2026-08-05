@@ -6,6 +6,7 @@ import { Button } from '../ui/Button';
 import { Tag } from '../ui/Tag';
 import { createEngagement } from '../../api/engagement';
 import { lastSessionId } from '../../api/sessions';
+import { DOMAIN_I18N_KEY } from '../../lib/domains';
 
 // ─── Request Quote modal (App-Workspace, always dark) ────────────────────────
 // The real funnel entry: message + explicit send → POST /api/v1/engagement.
@@ -32,10 +33,7 @@ type Phase = 'form' | 'sending' | 'done' | 'error';
 
 // Canonical English domain label → userws translation key (display only —
 // the POST payload keeps the canonical domainLabel).
-const DOMAIN_KEY: Record<string, string> = {
-  'Tax & VAT': 'taxVat', 'Product & Packaging': 'productPackaging', 'Data & Privacy': 'dataPrivacy',
-  'Marketing & SEO': 'marketingSeo', 'Corporate & Structure': 'corporateStructure', 'Full Support': 'fullSupport',
-};
+const DOMAIN_KEY = DOMAIN_I18N_KEY;
 
 export function RequestQuoteModal({ provider, country, category, domainLabel, requesterEmail, onClose }: RequestQuoteModalProps) {
   const { t } = useTranslation('userws');

@@ -22,7 +22,7 @@ export function ExportsPage() {
   const { t } = useTranslation('userws');
   const [filter, setFilter] = useState('filterAll');
   return (
-    <UserShell activeDomain="Tax & VAT">
+    <UserShell>
       <div className="mx-auto max-w-[1140px] space-y-5">
         <div>
           <h1 className="font-serif text-[32px] font-bold leading-tight text-fg">

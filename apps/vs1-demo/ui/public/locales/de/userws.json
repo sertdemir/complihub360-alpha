@@ -30,10 +30,13 @@
     "dataPrivacy": "Daten & Datenschutz",
     "marketingSeo": "Marketing & SEO",
     "corporateStructure": "Unternehmen & Struktur",
-    "fullSupport": "Komplettbetreuung"
+    "productCompliance": "Produkt-Compliance",
+    "logisticsCustoms": "Logistik & Zoll",
+    "legalAdvisory": "Rechtsberatung"
   },
   "shell": {
     "groupWorkspace": "Arbeitsbereich",
+    "groupDomains": "Bereiche",
     "groupLibrary": "Bibliothek",
     "groupSaved": "Gespeichert",
     "groupMonitoring": "Monitoring",
@@ -41,6 +44,7 @@
     "navDashboard": "Dashboard",
     "navSessions": "Sitzungen",
     "navRequests": "Anfragen",
+    "navTermine": "Termine",
     "navNotifications": "Benachrichtigungen",
     "navLibrary": "Bibliothek",
     "navSavedProviders": "Gespeicherte Anbieter",
@@ -376,5 +380,44 @@
     "upgradeBody": "Ihre 5 kostenlosen Fragen für heute sind aufgebraucht. Mit Assistant Pro erhalten Sie unbegrenzte Antworten aus der geprüften Wissensbasis — monatlich kündbar.",
     "upgradeCta": "Upgrade · 12 $ / Monat",
     "upgradeSuccess": "Assistant Pro ist aktiv — willkommen an Bord! Fragen Sie los."
+  },
+  "termine": {
+    "title": "Deine <accent>Termine</accent>.",
+    "sub": "Gebuchte Erstgespräche mit deinen Spezialisten — Identität und Kontakt sind seit der Buchung sichtbar.",
+    "upcoming": "KOMMEND",
+    "past": "VERGANGEN",
+    "reschedule": "Verschieben",
+    "cancel": "Stornieren",
+    "review": "Provider bewerten",
+    "emptyUpcoming": "Keine anstehenden Termine — buche einen aus deiner Risk Map.",
+    "emptyPast": "Noch keine vergangenen Termine.",
+    "status": {
+      "confirmed": "BESTÄTIGT",
+      "completed": "ABGESCHLOSSEN",
+      "cancelled": "STORNIERT",
+      "no_show": "NICHT ERSCHIENEN",
+      "outcome_open": "ERGEBNIS OFFEN"
+    },
+    "outcomeQuestion": "Hat der Termin stattgefunden?",
+    "outcomeYes": "Ja",
+    "outcomeNo": "No-Show",
+    "reviewed": "✓ Bewertung abgegeben",
+    "noShowNote": "Keine Rückerstattung — der Provider erhielt das Dossier bei Buchung. Auf Wunsch matchen wir dich neu."
+  },
+  "review": {
+    "eyebrow": "BEWERTUNG",
+    "cancel": "Abbrechen",
+    "submit": "Bewertung senden",
+    "done": "✓ Gesendet",
+    "ratingLabel": "Deine Bewertung",
+    "categoriesLabel": "Was ist aufgefallen?",
+    "cat": {
+      "expertise": "Fachkompetenz",
+      "responsiveness": "Reaktionszeit",
+      "value": "Preis-Leistung"
+    },
+    "bodyLabel": "Deine Erfahrung (optional)",
+    "bodyPh": "Wie lief das Erstgespräch?",
+    "note": "Verifizierte Bewertungen stammen nur aus echten Terminen und erscheinen anonymisiert auf dem Provider-Profil. Dein Name bleibt privat."
   }
 }
