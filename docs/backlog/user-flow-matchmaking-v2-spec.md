@@ -185,6 +185,16 @@ CompliHub360 ist ein **kuratierter Matchmaking-Marktplatz**: Ein User (Firma) kl
 
 ## 9. Monetarisierung
 
+> **Priorisierung (Beschluss 2026-08-06) — Phase 1 (primär):**
+> 1. **Detail-Open** — Klick auf die Provider-Detail-Page (Event existiert, 30d-Dedup)
+> 2. **Lead-Fee** — pro gebuchtem Termin (Event existiert)
+> 3. **Provider-Abo** — laufendes Abomodell für Provider (NEU — zusätzlich zu den Nutzungs-Events)
+> 4. **Affiliate-Link** zur Provider-Website über Profil/Detail-Page (NEU — Klick-Vergütung)
+>
+> **Spätere Phase:** 5. **Newsletter-Platzierungen** (bezahlte Provider-Slots).
+>
+> ⚠️ **Offener Klärungspunkt Affiliate vs. Anonymität:** Ein Website-Link auf der (anonymen) Detail-Page würde die Identität vor der Buchung enthüllen (§5). Optionen: (a) Affiliate-Link erst **nach** Buchung (Bestätigung/Termine-Seite), (b) maskierter Redirect ohne sichtbare Domain, (c) bewusste Ausnahme. → Entscheidung bei der Pricing-Umsetzung.
+
 - **Event A · Detail-Open:** Provider zahlt pro qualifiziertem Detail-Open. Server-seitig deduplizieren (nicht pro Reload). Preis/Modell = Produkt-Entscheidung.
 - **Event B · Scheduling-Lead:** Provider zahlt pro bestätigtem Termin (Haupt-Lead-Fee). Danach Systemgrenze.
 - Beide Events → `event_log` + Verrechnung über bestehendes Provider-Stripe-Billing.
