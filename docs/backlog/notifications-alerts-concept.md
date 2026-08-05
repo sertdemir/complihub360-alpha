@@ -34,6 +34,11 @@
 
 ## 2 · Review-/Ranking-Schleife (beidseitig)
 
+> **Verschärfung (Beschluss 2026-08-06):** Nach einem stattgefundenen Meeting gilt:
+> - **Frist: 2 Tage** für beide Seiten (ersetzt das weiche T+3d/T+7d/T+14d-Fenster).
+> - **Provider-Review = PFLICHT** — das Ranking hängt an den Bewertungen. Aufforderung per **E-Mail + Dashboard**. Reagiert der Provider nicht: **Verwarnung**, danach **Herabstufung + reduzierte Sichtbarkeit** für User (Ranking-Penalty). → natürliche Auslese.
+> - **User-Review = incentiviert, nicht erzwungen** — Framing: „Hilf uns, deinen Service zu verbessern und zu personalisieren" (schnellere Reaktion auf Missstände, besseres Matching). Aufforderung ebenfalls per E-Mail + Dashboard.
+
 - **User → Provider:** Sterne + Kategorien (Fachkompetenz / Reaktion / Preis-Leistung) + optional Text → **Provider-Quality-Score** (Ranking-Faktor, Spec §6) und die **verifizierten Reviews**, die im anonymen Listing/Detail (Stufe 1/2) als Trust-Signal erscheinen.
 - **Provider → User:** „War der Lead qualifiziert? Erschienen?" → interner **Lead-Quality-Score** (Bad-Actor-Schutz).
 - Reviews aus echten bezahlten Terminen = die einzigen „verifizierten" Reviews.
