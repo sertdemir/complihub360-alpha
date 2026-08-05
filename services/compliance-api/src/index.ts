@@ -1871,12 +1871,20 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         req.on('end', async () => {
             try {
                 const requestData = JSON.parse(body);
-                // 1. Compliance Engine - Generate structural subdomains
-                const engineResults = generateRelevantSubdomains({
-                    countries: [(requestData.country || 'DE') as CountryCode],
-                    industry: requestData.structured_answers?.industry as IndustryType,
-                    businessModel: requestData.structured_answers?.businessModel as BusinessModel
-                });
+                // 1. Compliance Engine - Generate structural subdomains.
+                //    The engine only knows a subset of country profiles — an
+                //    unknown country must not kill the search (providers are
+                //    still scored; laws just come back empty).
+                let engineResults: Array<{ id: string; label: string; description: string }> = [];
+                try {
+                    engineResults = generateRelevantSubdomains({
+                        countries: [(requestData.country || 'DE') as CountryCode],
+                        industry: requestData.structured_answers?.industry as IndustryType,
+                        businessModel: requestData.structured_answers?.businessModel as BusinessModel
+                    }) as Array<{ id: string; label: string; description: string }>;
+                } catch (engineErr) {
+                    console.warn('compliance-engine country profile missing:', String(engineErr));
+                }
 
                 // 2. Vector Search (RAG) - Query PostgreSQL pgvector
                 // Stub embedding since backend currently lacks an active LLM API integration for live vectors
