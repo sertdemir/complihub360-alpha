@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { saveWizardSession } from '../api/sessions';
+import { saveWizardSession, fetchSessions } from '../api/sessions';
+import { runSearch, type AnonProvider } from '../api/search';
+import { useApiData } from '../lib/useApiData';
+import { ProviderMatchCard } from '../components/ui/ProviderMatchCard';
 import { generateRiskMapPdf } from '../lib/riskMapPdf';
 import { useAuthStore } from '../store/useAuthStore';
-import { RequestQuoteModal, type QuoteProvider } from '../components/user/RequestQuoteModal';
 import { Lock, Check, Info, ArrowRight, ShieldCheck, Download } from 'lucide-react';
 import { Logo } from '../components/ui/Logo';
 import { RiskBadge, type RiskLevel } from '../components/ui/RiskBadge';
@@ -119,11 +121,17 @@ const MATCHES = ['94%', '88%', '81%'];
 // Real partners behind the unlock (seeded provider_keys on staging).
 // `match` holds the raw percentage; the "match" wording is translated at render.
 // `sub` keeps the English ground truth; rendering translates via results:partners.<i>.sub.
-const PARTNERS = [
-  { key: 'studio-bianchi', name: 'Studio Bianchi SRL', meta: 'Milano, IT', match: '94%', sub: 'Italian VAT registration + fiscal representation · DE·IT bilingual' },
-  { key: 'schmidt-partner', name: 'Schmidt & Partner', meta: 'Hamburg, DE', match: '88%', sub: 'OSS/IOSS setup · 12 years cross-border tax · 8 EU offices' },
-  { key: 'madrid-tax', name: 'Madrid Tax Consultants', meta: 'Madrid, ES', match: '81%', sub: 'Iberian VAT (ES/PT) · monthly filing · marketplace optimization' },
+// Phase-3 wiring: design fixture in the ANONYMOUS wire shape — replaced by the
+// live, scored /search providers when the backend answers.
+const PARTNERS_ANON: AnonProvider[] = [
+  { provider_key: 'studio-bianchi', pseudonym_label: 'Verifizierte Steuerkanzlei · Norditalien', region: 'Norditalien', active_since: 2015, specializations: ['VAT & OSS', 'E-Commerce', 'EU-weit'], languages: ['IT', 'DE', 'EN'], rating: 4.9, completed_count: 210, avg_response_hours: 3, billing_model: 'project', is_verified: true, match: 94, match_tier: 'high' },
+  { provider_key: 'schmidt-partner', pseudonym_label: 'Verifizierte Steuerberatung · Norddeutschland', region: 'Norddeutschland', active_since: 2013, specializations: ['OSS/IOSS', 'Cross-border Tax'], languages: ['DE', 'EN'], rating: 4.7, completed_count: 96, avg_response_hours: 5, billing_model: 'abo', is_verified: true, match: 88, match_tier: 'strong' },
+  { provider_key: 'madrid-tax', pseudonym_label: 'Verifizierter Tax-Spezialist · Spanien', region: 'Spanien', active_since: 2020, specializations: ['Iberian VAT', 'Marketplace'], languages: ['ES', 'EN'], rating: 4.5, completed_count: 41, avg_response_hours: 8, billing_model: 'hourly', is_verified: true, match: 81, match_tier: 'moderate' },
 ];
+
+const BILLING_LABEL: Record<AnonProvider['billing_model'], string> = {
+  abo: 'Abomodell', hourly: 'Stundenbasis', project: 'Projektbasiert', mixed: 'Gemischt',
+};
 
 function StatePill({ state, onAnswer }: { state: State; onAnswer: () => void }) {
   const { t } = useTranslation('results');
@@ -164,8 +172,24 @@ export function ResultsRiskMap() {
   })();
   const profile = stateProfile ?? storedProfile ?? undefined;
   const [saveOpen, setSaveOpen] = useState(false);
-  const { isLoggedIn, user } = useAuthStore();
-  const [quoteFor, setQuoteFor] = useState<(QuoteProvider & { country: string; category: string }) | null>(null);
+  const { isLoggedIn } = useAuthStore();
+  const navigate = useNavigate();
+  const { i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage || 'en';
+  // Phase-3 wiring: one results surface, two entrances (funnel + dashboard).
+  // ?session=<id> re-queries /search with that session's stored profile.
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get('session');
+  const { data: anonProviders } = useApiData<AnonProvider[]>(async () => {
+    let query: Parameters<typeof runSearch>[0] = profile ?? {};
+    if (sessionId) {
+      try {
+        const s = (await fetchSessions()).find((x) => x.id === sessionId);
+        if (s) query = { country: s.country ?? 'DE', categories: s.categories as SearchProfile['categories'] };
+      } catch { /* fall back to the local profile */ }
+    }
+    return (await runSearch(query)).providers;
+  }, PARTNERS_ANON);
 
   // A6 (User Flows §9): guest-allowed PDF snapshot — PII-free, with sources.
   // Translated at the render point (results namespace); canonical EN fallback.
@@ -315,29 +339,25 @@ export function ResultsRiskMap() {
             )}
           </div>
 
-          <div className="mt-6 grid gap-5 sm:grid-cols-3">
+          <div className={isLoggedIn ? 'mt-6 space-y-4' : 'mt-6 grid gap-5 sm:grid-cols-3'}>
             {isLoggedIn
-              ? PARTNERS.map((pt, i) => (
-                  <div
-                    key={pt.key}
-                    className="flex flex-col gap-3 rounded-2xl border border-stroke-subtle bg-surface-secondary px-6 py-7"
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <p className="text-[16px] font-bold text-fg">{pt.name}</p>
-                        <p className="text-[12px] text-fg-tertiary">{pt.meta}</p>
-                      </div>
-                      <span className="shrink-0 rounded-full bg-brand-light px-2.5 py-1 text-[12px] font-bold text-fg-brand">{t('partners.match', { pct: pt.match })}</span>
-                    </div>
-                    <p className="text-[13px] leading-relaxed text-fg-secondary">{t(`partners.${i}.sub`, { defaultValue: pt.sub })}</p>
-                    <button
-                      type="button"
-                      onClick={() => setQuoteFor({ key: pt.key, name: pt.name, meta: pt.meta, country: profile?.country || 'DE', category: 'vat' })}
-                      className="mt-auto inline-flex items-center justify-center gap-2 rounded-xl bg-accent-500 px-4 py-2.5 text-[14px] font-semibold text-primary-950 transition-transform duration-200 hover:-translate-y-0.5"
-                    >
-                      {t('partners.requestQuote')} <ArrowRight size={15} />
-                    </button>
-                  </div>
+              ? anonProviders.map((p) => (
+                  // v2 stage-1 anonymous listing: the scored, anonymized cards.
+                  // "Details" opens the (monetised) stage-2 detail page.
+                  <ProviderMatchCard
+                    key={p.provider_key}
+                    title={p.pseudonym_label}
+                    eyebrow={[p.region, p.active_since ? `aktiv seit ${p.active_since}` : null].filter(Boolean).join(' · ') || undefined}
+                    match={t('partners.match', { pct: `${p.match}%` })}
+                    matchTier={p.match_tier}
+                    isVerified={p.is_verified}
+                    tags={p.specializations.slice(0, 3)}
+                    countries={p.languages.join(' · ')}
+                    rating={p.rating != null ? `${p.rating} · ${p.completed_count ?? 0} Mandate` : undefined}
+                    responseTime={p.avg_response_hours != null ? `Ø ${p.avg_response_hours} Std. Antwortzeit` : undefined}
+                    billing={BILLING_LABEL[p.billing_model]}
+                    onDetails={() => navigate(`/${locale}/provider/${p.provider_key}`)}
+                  />
                 ))
               : MATCHES.map((m) => (
                   <div
@@ -377,16 +397,6 @@ export function ResultsRiskMap() {
       </section>
 
       <FreeAccountDrawer open={saveOpen} onClose={() => setSaveOpen(false)} />
-      {quoteFor && (
-        <RequestQuoteModal
-          provider={quoteFor}
-          country={quoteFor.country}
-          category={quoteFor.category}
-          domainLabel={t('quote.domainTaxVat')}
-          requesterEmail={user?.email}
-          onClose={() => setQuoteFor(null)}
-        />
-      )}
     </div>
   );
 }

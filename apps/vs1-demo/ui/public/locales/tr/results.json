@@ -11,10 +11,18 @@
     "subtitleDefault": "Almanya · Birleşik Krallık · Hollanda temel alınmıştır. D2C e-ticaret, €2M—€5M ciro. Kapsamda VAT · EPR · Gizlilik."
   },
   "stats": {
-    "0": { "label": "tespit edilen yükümlülük" },
-    "1": { "label": "toplam risk tutarı" },
-    "2": { "label": "medyan son tarih" },
-    "3": { "label": "hazır Verified Partner" }
+    "0": {
+      "label": "tespit edilen yükümlülük"
+    },
+    "1": {
+      "label": "toplam risk tutarı"
+    },
+    "2": {
+      "label": "medyan son tarih"
+    },
+    "3": {
+      "label": "hazır Verified Partner"
+    }
   },
   "table": {
     "severity": "Önem",
@@ -99,9 +107,15 @@
     "unlockCta": "Eşleşmeleri ücretsiz bir hesapla açın",
     "match": "{{pct}} uyum",
     "requestQuote": "Teklif isteyin",
-    "0": { "sub": "İtalya KDV kaydı + mali temsilcilik · DE·IT iki dilli" },
-    "1": { "sub": "OSS/IOSS kurulumu · 12 yıllık sınır ötesi vergi deneyimi · 8 AB ofisi" },
-    "2": { "sub": "İber KDV'si (ES/PT) · aylık beyan · pazar yeri optimizasyonu" }
+    "0": {
+      "sub": "İtalya KDV kaydı + mali temsilcilik · DE·IT iki dilli"
+    },
+    "1": {
+      "sub": "OSS/IOSS kurulumu · 12 yıllık sınır ötesi vergi deneyimi · 8 AB ofisi"
+    },
+    "2": {
+      "sub": "İber KDV'si (ES/PT) · aylık beyan · pazar yeri optimizasyonu"
+    }
   },
   "cta": {
     "title": "Bu haritayı kaydedin. Partnerlerin kilidini açın.",
@@ -124,5 +138,37 @@
     "questionsOpen": "{{total}} soru açık",
     "sources": "Kaynaklar",
     "disclaimer": "CompliHub360 bir orkestrasyon platformudur, hukuk bürosu değildir. Hukuki, vergisel ve düzenleyici danışmanlık, Verified Partners tarafından kendi mesleki sorumlulukları altında sunulur."
+  },
+  "detail": {
+    "back": "Sağlayıcılara dön",
+    "activeSince": "şu tarihten beri aktif",
+    "mandates": "mandat",
+    "anonNote": "Kimlik ve nitelikler CompliHub360 tarafından doğrulandı. Ad ve iletişim, rezerve edilen randevudan sonra görünür.",
+    "specsTitle": "Bu uzman hakkında",
+    "coverage": "Kapsam",
+    "languages": "Diller",
+    "pricingTitle": "Fiyat özeti",
+    "pricingSub": "ücretsiz ilk görüşmeden sonra bağlayıcı teklif.",
+    "billing": "Faturalama",
+    "pricingOnRequest": "Fiyatlar talep üzerine.",
+    "bookTitle": "Randevu al",
+    "bookSub": "Ücretsiz ilk görüşme · 30 dk · bağlayıcı değil",
+    "bookCta": "Randevu al",
+    "revealNote": "Kimlik rezervasyondan sonra görünür."
+  },
+  "schedule": {
+    "back": "Profile dön",
+    "title": "Randevu al",
+    "sub": "Ücretsiz ilk görüşme, 30 dakika, bağlayıcı değil — bir zaman seç.",
+    "summaryTitle": "Rezervasyonun",
+    "pickSlot": "Soldan bir zaman seç.",
+    "revealNote": "Rezervasyondan sonra sağlayıcının adı ve iletişimi görünür olur — takvim daveti dahil.",
+    "messagePh": "Konunu kısaca anlat (isteğe bağlı)…",
+    "confirmCta": "Bağlayıcı olarak rezerve et",
+    "freeNote": "Ücretsiz ve bağlayıcı değil · istediğin zaman iptal",
+    "doneEyebrow": "REZERVE EDİLDİ",
+    "doneTitle": "Randevun onaylandı.",
+    "revealLabel": "Uzmanın",
+    "toAppointments": "Randevularına git"
   }
 }

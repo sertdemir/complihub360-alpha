@@ -11,10 +11,18 @@
     "subtitleDefault": "Based on Germany · United Kingdom · Netherlands. D2C e-commerce, €2M—€5M revenue. VAT · EPR · Privacy in scope."
   },
   "stats": {
-    "0": { "label": "obligations identified" },
-    "1": { "label": "total exposure" },
-    "2": { "label": "median deadline" },
-    "3": { "label": "Verified Partners ready" }
+    "0": {
+      "label": "obligations identified"
+    },
+    "1": {
+      "label": "total exposure"
+    },
+    "2": {
+      "label": "median deadline"
+    },
+    "3": {
+      "label": "Verified Partners ready"
+    }
   },
   "table": {
     "severity": "Severity",
@@ -99,9 +107,15 @@
     "unlockCta": "Unlock matches with a free account",
     "match": "{{pct}} match",
     "requestQuote": "Request quote",
-    "0": { "sub": "Italian VAT registration + fiscal representation · DE·IT bilingual" },
-    "1": { "sub": "OSS/IOSS setup · 12 years cross-border tax · 8 EU offices" },
-    "2": { "sub": "Iberian VAT (ES/PT) · monthly filing · marketplace optimization" }
+    "0": {
+      "sub": "Italian VAT registration + fiscal representation · DE·IT bilingual"
+    },
+    "1": {
+      "sub": "OSS/IOSS setup · 12 years cross-border tax · 8 EU offices"
+    },
+    "2": {
+      "sub": "Iberian VAT (ES/PT) · monthly filing · marketplace optimization"
+    }
   },
   "cta": {
     "title": "Save this map. Unlock the partners.",
@@ -124,5 +138,37 @@
     "questionsOpen": "{{total}} questions open",
     "sources": "Sources",
     "disclaimer": "CompliHub360 is an orchestration platform, not a law firm. Legal, tax and regulatory advice is delivered by Verified Partners under their own professional liability."
+  },
+  "detail": {
+    "back": "Back to providers",
+    "activeSince": "active since",
+    "mandates": "mandates",
+    "anonNote": "Identity & qualifications verified by CompliHub360. Name and contact become visible after your booked appointment.",
+    "specsTitle": "About this specialist",
+    "coverage": "Coverage",
+    "languages": "Languages",
+    "pricingTitle": "Pricing overview",
+    "pricingSub": "binding offer after the free intro call.",
+    "billing": "Billing",
+    "pricingOnRequest": "Pricing on request.",
+    "bookTitle": "Book an appointment",
+    "bookSub": "Free intro call · 30 min · non-binding",
+    "bookCta": "Book appointment",
+    "revealNote": "Identity becomes visible after booking."
+  },
+  "schedule": {
+    "back": "Back to profile",
+    "title": "Book an appointment",
+    "sub": "Free intro call, 30 minutes, non-binding — pick a slot.",
+    "summaryTitle": "Your booking",
+    "pickSlot": "Pick a slot on the left.",
+    "revealNote": "After booking, the provider’s name & contact become visible — including a calendar invite.",
+    "messagePh": "Briefly describe your case (optional)…",
+    "confirmCta": "Book bindingly",
+    "freeNote": "Free & non-binding · cancel any time",
+    "doneEyebrow": "BOOKED",
+    "doneTitle": "Your appointment is confirmed.",
+    "revealLabel": "Your specialist",
+    "toAppointments": "Go to your appointments"
   }
 }

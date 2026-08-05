@@ -11,10 +11,18 @@
     "subtitleDefault": "Basado en Alemania · Reino Unido · Países Bajos. E-commerce D2C, €2M—€5M de facturación. VAT · EPR · Privacidad en alcance."
   },
   "stats": {
-    "0": { "label": "obligaciones identificadas" },
-    "1": { "label": "exposición total" },
-    "2": { "label": "plazo mediano" },
-    "3": { "label": "Verified Partners disponibles" }
+    "0": {
+      "label": "obligaciones identificadas"
+    },
+    "1": {
+      "label": "exposición total"
+    },
+    "2": {
+      "label": "plazo mediano"
+    },
+    "3": {
+      "label": "Verified Partners disponibles"
+    }
   },
   "table": {
     "severity": "Gravedad",
@@ -99,9 +107,15 @@
     "unlockCta": "Desbloquee las coincidencias con una cuenta gratuita",
     "match": "{{pct}} de coincidencia",
     "requestQuote": "Solicitar presupuesto",
-    "0": { "sub": "Registro de IVA italiano + representación fiscal · bilingüe DE·IT" },
-    "1": { "sub": "Configuración OSS/IOSS · 12 años de fiscalidad transfronteriza · 8 oficinas en la UE" },
-    "2": { "sub": "IVA ibérico (ES/PT) · presentación mensual · optimización de marketplaces" }
+    "0": {
+      "sub": "Registro de IVA italiano + representación fiscal · bilingüe DE·IT"
+    },
+    "1": {
+      "sub": "Configuración OSS/IOSS · 12 años de fiscalidad transfronteriza · 8 oficinas en la UE"
+    },
+    "2": {
+      "sub": "IVA ibérico (ES/PT) · presentación mensual · optimización de marketplaces"
+    }
   },
   "cta": {
     "title": "Guarde este mapa. Desbloquee los partners.",
@@ -124,5 +138,37 @@
     "questionsOpen": "{{total}} preguntas pendientes",
     "sources": "Fuentes",
     "disclaimer": "CompliHub360 es una plataforma de orquestación, no un bufete de abogados. El asesoramiento legal, fiscal y regulatorio lo prestan los Verified Partners bajo su propia responsabilidad profesional."
+  },
+  "detail": {
+    "back": "Volver a los proveedores",
+    "activeSince": "activo desde",
+    "mandates": "mandatos",
+    "anonNote": "Identidad y cualificación verificadas por CompliHub360. El nombre y contacto se muestran tras la cita reservada.",
+    "specsTitle": "Sobre este especialista",
+    "coverage": "Cobertura",
+    "languages": "Idiomas",
+    "pricingTitle": "Resumen de precios",
+    "pricingSub": "oferta vinculante tras la llamada inicial gratuita.",
+    "billing": "Facturación",
+    "pricingOnRequest": "Precios a petición.",
+    "bookTitle": "Reservar una cita",
+    "bookSub": "Llamada inicial gratuita · 30 min · sin compromiso",
+    "bookCta": "Reservar cita",
+    "revealNote": "La identidad se muestra tras la reserva."
+  },
+  "schedule": {
+    "back": "Volver al perfil",
+    "title": "Reservar una cita",
+    "sub": "Llamada inicial gratuita, 30 minutos, sin compromiso — elige un horario.",
+    "summaryTitle": "Tu reserva",
+    "pickSlot": "Elige un horario a la izquierda.",
+    "revealNote": "Tras la reserva, el nombre y contacto del proveedor se hacen visibles — incluida la invitación de calendario.",
+    "messagePh": "Describe brevemente tu caso (opcional)…",
+    "confirmCta": "Reservar en firme",
+    "freeNote": "Gratis y sin compromiso · cancela cuando quieras",
+    "doneEyebrow": "RESERVADO",
+    "doneTitle": "Tu cita está confirmada.",
+    "revealLabel": "Tu especialista",
+    "toAppointments": "Ir a tus citas"
   }
 }

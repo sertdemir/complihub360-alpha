@@ -29,7 +29,11 @@ export function SiteHeader() {
   }
   // The risk-map result and the partner-onboarding wizard carry their own
   // dedicated topbars — no global header.
-  if (localeOk && seg.length === 2 && (seg[1] === 'results' || seg[1] === 'partner-onboarding')) {
+  if (localeOk && seg.length === 2 && (seg[1] === 'results' || seg[1] === 'partner-onboarding' || seg[1] === 'provider-intake')) {
+    return null;
+  }
+  // Phase-3 funnel pages (stage-2 detail + scheduling) carry their own slim header.
+  if (localeOk && seg[1] === 'provider' && seg.length >= 3 && seg[2] !== 'action' && seg[2] !== 'confirm-email') {
     return null;
   }
   // The full-view assessment wizard (Figma 1705:262) ships its own topbar.
@@ -38,12 +42,12 @@ export function SiteHeader() {
   }
   // The new provider App-Workspace pages ship the ProviderShell (own sidebar +
   // topbar, always dark) — no global header on top.
-  const PROVIDER_WORKSPACE = ['requests', 'performance', 'coverage', 'billing', 'settings', 'notifications', 'help'];
+  const PROVIDER_WORKSPACE = ['requests', 'termine', 'performance', 'coverage', 'billing', 'settings', 'notifications', 'help'];
   if (localeOk && seg[1] === 'partner-dashboard' && PROVIDER_WORKSPACE.includes(seg[2])) {
     return null;
   }
   // The user App-Workspace pages (v2, own UserShell) — no global header.
-  const USER_WORKSPACE = ['sessions', 'requests', 'notifications', 'library', 'saved-providers', 'exports', 'alerts', 'calendar', 'workbench'];
+  const USER_WORKSPACE = ['sessions', 'requests', 'termine', 'notifications', 'library', 'saved-providers', 'exports', 'alerts', 'calendar', 'workbench'];
   if (localeOk && seg[1] === 'dashboard' && (seg.length === 2 || USER_WORKSPACE.includes(seg[2]))) {
     return null;
   }

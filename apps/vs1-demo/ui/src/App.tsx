@@ -23,17 +23,8 @@ import { AdminEventsPage } from "./pages/admin/AdminEventsPage";
 import { AdminComingSoonPage } from "./pages/admin/AdminComingSoonPage";
 import { ProviderMagicActionPage } from "./pages/provider/ProviderMagicActionPage";
 import { ConfirmEmailPage } from "./pages/provider/ConfirmEmailPage";
-import { DashboardHome } from "./pages/dashboard/DashboardHome";
-import { UserDossiers } from "./pages/dashboard/UserDossiers";
-import { DossierDetail } from "./pages/dashboard/DossierDetail";
-import { KnowledgeCenter } from "./pages/dashboard/KnowledgeCenter";
-import { UserWorkspace } from "./pages/dashboard/UserWorkspace";
-import { UserMessages } from "./pages/dashboard/UserMessages";
-import { PartnerDashboardHome } from "./pages/partner-dashboard/PartnerDashboardHome";
-import { LeadInbox } from "./pages/partner-dashboard/LeadInbox";
-import { LeadDetail } from "./pages/partner-dashboard/LeadDetail";
-import { PartnerProfile } from "./pages/partner-dashboard/PartnerProfile";
 import { RequestsPage } from "./pages/provider/RequestsPage";
+import { LeadsPage } from "./pages/provider/LeadsPage";
 import { PerformancePage } from "./pages/provider/PerformancePage";
 import { CoveragePage } from "./pages/provider/CoveragePage";
 import { BillingPage } from "./pages/provider/BillingPage";
@@ -42,13 +33,15 @@ import { NotificationsPage } from "./pages/provider/NotificationsPage";
 import { UserHomePage } from "./pages/user/UserHomePage";
 import { SessionsPage } from "./pages/user/SessionsPage";
 import { UserRequestsPage } from "./pages/user/UserRequestsPage";
+import { TerminePage } from "./pages/user/TerminePage";
+import { ProviderDetailPage } from "./pages/ProviderDetailPage";
+import { ProviderSchedulePage } from "./pages/ProviderSchedulePage";
 import { WorkbenchPage } from "./pages/user/WorkbenchPage";
 import { UserNotificationsPage } from "./pages/user/UserNotificationsPage";
 import { SavedProvidersPage } from "./pages/user/SavedProvidersPage";
 import { ExportsPage } from "./pages/user/ExportsPage";
 import { ComingSoonPage } from "./pages/user/ComingSoonPage";
 import { LibraryPage } from "./pages/user/LibraryPage";
-import { ActiveClients } from "./pages/partner-dashboard/ActiveClients";
 // Wizard Shell Steps
 import { WizardPreGateFlow } from "./pages/wizard/WizardPreGateFlow";
 import { GenericWizardFlow } from "./pages/wizard/GenericWizardFlow";
@@ -61,7 +54,7 @@ import { CorporateWizard } from "./pages/wizard/flows/CorporateWizard";
 import { FullSupportWizard } from "./pages/wizard/flows/FullSupportWizard";
 // Auth
 import { LoginPage } from "./pages/auth/LoginPage";
-import { ProviderOnboardingPage } from "./pages/onboarding/ProviderOnboardingPage";
+import { ProviderIntakePage } from "./pages/onboarding/ProviderIntakePage";
 import { RegisterPage } from "./pages/auth/RegisterPage";
 import { EmailVerificationPage } from "./pages/auth/EmailVerificationPage";
 import { AuthCallbackPage } from "./pages/auth/AuthCallbackPage";
@@ -95,6 +88,14 @@ function WizardRoutes() {
             className="min-h-screen !rounded-none !border-0"
         />
     );
+}
+
+// v2 cleanup: legacy v0 dashboard screens were removed — any unknown
+// dashboard/* URL now redirects into the current shell instead of falling
+// back to the old light-mode fixtures.
+function LocaleRedirect({ to }: { to: string }) {
+    const { locale } = useParams();
+    return <Navigate to={`/${locale || 'en'}/${to}`} replace />;
 }
 
 function RootRedirect() {
@@ -154,6 +155,10 @@ function AppContent() {
                         <Route path="dashboard" element={<UserHomePage />} />
                         <Route path="dashboard/sessions" element={<SessionsPage />} />
                         <Route path="dashboard/requests" element={<UserRequestsPage />} />
+                        <Route path="dashboard/termine" element={<TerminePage />} />
+                        {/* Phase-3: stage-2 detail (monetised open) + native scheduling */}
+                        <Route path="provider/:key" element={<ProviderDetailPage />} />
+                        <Route path="provider/:key/schedule" element={<ProviderSchedulePage />} />
                         <Route path="dashboard/workbench/:domain" element={<WorkbenchPage />} />
                         <Route path="dashboard/notifications" element={<UserNotificationsPage />} />
                         <Route path="dashboard/saved-providers" element={<SavedProvidersPage />} />
@@ -161,11 +166,7 @@ function AppContent() {
                         <Route path="dashboard/alerts" element={<ComingSoonPage page="alerts" />} />
                         <Route path="dashboard/calendar" element={<ComingSoonPage page="calendar" />} />
                         <Route path="dashboard/library" element={<LibraryPage />} />
-                        <Route path="dashboard/sessions/:id" element={<DossierDetail />} />
-                        <Route path="dashboard/knowledge" element={<KnowledgeCenter />} />
-                        <Route path="dashboard/workspace" element={<UserWorkspace />} />
-                        <Route path="dashboard/messages" element={<UserMessages />} />
-                        <Route path="dashboard/*" element={<DashboardHome />} />
+                        <Route path="dashboard/*" element={<LocaleRedirect to="dashboard" />} />
                     </Route>
                     
                     {/* Partner Dashboard Routes (Auth Guarded) */}
@@ -173,18 +174,14 @@ function AppContent() {
                         {/* Post-login landing = the new provider workspace. The legacy
                             Partner Hub stays reachable at /partner-dashboard/home-old. */}
                         <Route path="partner-dashboard" element={<Navigate to="requests" replace />} />
-                        <Route path="partner-dashboard/home-old" element={<PartnerDashboardHome />} />
                         <Route path="partner-dashboard/requests" element={<RequestsPage />} />
+                        <Route path="partner-dashboard/termine" element={<LeadsPage />} />
                         <Route path="partner-dashboard/performance" element={<PerformancePage />} />
                         <Route path="partner-dashboard/coverage" element={<CoveragePage />} />
                         <Route path="partner-dashboard/billing" element={<BillingPage />} />
                         <Route path="partner-dashboard/settings" element={<SettingsPage />} />
                         <Route path="partner-dashboard/notifications" element={<NotificationsPage />} />
-                        <Route path="partner-dashboard/leads" element={<LeadInbox />} />
-                        <Route path="partner-dashboard/leads/:id" element={<LeadDetail />} />
-                        <Route path="partner-dashboard/clients" element={<ActiveClients />} />
-                        <Route path="partner-dashboard/profile" element={<PartnerProfile />} />
-                        <Route path="partner-dashboard/*" element={<PartnerDashboardHome />} />
+                        <Route path="partner-dashboard/*" element={<LocaleRedirect to="partner-dashboard/requests" />} />
                     </Route>
 
                     {/* Admin Control Center (Auth Guarded · dev entry: /login?as=admin) */}
@@ -201,7 +198,10 @@ function AppContent() {
 
                     {/* Auth */}
                     <Route path="login" element={<LoginPage />} />
-                    <Route path="partner-onboarding" element={<ProviderOnboardingPage />} />
+                    {/* v2 (D7): providers onboard via the token-gated intake link —
+                        the old self-registration wizard is retired. */}
+                    <Route path="provider-intake" element={<ProviderIntakePage />} />
+                    <Route path="partner-onboarding" element={<ProviderIntakePage />} />
                     <Route path="register" element={<RegisterPage />} />
                     <Route path="verify-email" element={<EmailVerificationPage />} />
                     <Route path="auth/callback" element={<AuthCallbackPage />} />

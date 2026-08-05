@@ -11,10 +11,18 @@
     "subtitleDefault": "Basierend auf Deutschland · Vereinigtes Königreich · Niederlande. D2C-E-Commerce, €2M—€5M Umsatz. VAT · EPR · Datenschutz im Fokus."
   },
   "stats": {
-    "0": { "label": "identifizierte Pflichten" },
-    "1": { "label": "Gesamtrisiko" },
-    "2": { "label": "mediane Frist" },
-    "3": { "label": "Verified Partner bereit" }
+    "0": {
+      "label": "identifizierte Pflichten"
+    },
+    "1": {
+      "label": "Gesamtrisiko"
+    },
+    "2": {
+      "label": "mediane Frist"
+    },
+    "3": {
+      "label": "Verified Partner bereit"
+    }
   },
   "table": {
     "severity": "Schweregrad",
@@ -99,9 +107,15 @@
     "unlockCta": "Matches mit kostenlosem Konto freischalten",
     "match": "{{pct}} Übereinstimmung",
     "requestQuote": "Angebot anfordern",
-    "0": { "sub": "Italienische USt-Registrierung + Fiskalvertretung · DE·IT zweisprachig" },
-    "1": { "sub": "OSS/IOSS-Einrichtung · 12 Jahre grenzüberschreitende Steuern · 8 EU-Standorte" },
-    "2": { "sub": "Iberische USt (ES/PT) · monatliche Meldungen · Marktplatz-Optimierung" }
+    "0": {
+      "sub": "Italienische USt-Registrierung + Fiskalvertretung · DE·IT zweisprachig"
+    },
+    "1": {
+      "sub": "OSS/IOSS-Einrichtung · 12 Jahre grenzüberschreitende Steuern · 8 EU-Standorte"
+    },
+    "2": {
+      "sub": "Iberische USt (ES/PT) · monatliche Meldungen · Marktplatz-Optimierung"
+    }
   },
   "cta": {
     "title": "Karte speichern. Partner freischalten.",
@@ -124,5 +138,37 @@
     "questionsOpen": "{{total}} Fragen offen",
     "sources": "Quellen",
     "disclaimer": "CompliHub360 ist eine Orchestrierungsplattform und keine Rechtsanwaltskanzlei. Rechts-, Steuer- und Regulierungsberatung erbringen Verified Partners in eigener beruflicher Haftung."
+  },
+  "detail": {
+    "back": "Zurück zu den Providern",
+    "activeSince": "aktiv seit",
+    "mandates": "Mandate",
+    "anonNote": "Identität & Qualifikation von CompliHub360 verifiziert. Name und Kontakt werden nach dem gebuchten Termin sichtbar.",
+    "specsTitle": "Über diesen Spezialisten",
+    "coverage": "Abdeckung",
+    "languages": "Sprachen",
+    "pricingTitle": "Preisübersicht",
+    "pricingSub": "verbindliches Angebot nach dem kostenlosen Erstgespräch.",
+    "billing": "Abrechnung",
+    "pricingOnRequest": "Preise auf Anfrage.",
+    "bookTitle": "Termin buchen",
+    "bookSub": "Kostenloses Erstgespräch · 30 Min · unverbindlich",
+    "bookCta": "Termin buchen",
+    "revealNote": "Identität wird nach der Buchung sichtbar."
+  },
+  "schedule": {
+    "back": "Zurück zum Profil",
+    "title": "Termin buchen",
+    "sub": "Kostenloses Erstgespräch, 30 Minuten, unverbindlich — wähle einen Slot.",
+    "summaryTitle": "Deine Buchung",
+    "pickSlot": "Wähle links einen Slot.",
+    "revealNote": "Nach der Buchung werden Name & Kontaktdaten des Providers sichtbar — inkl. Kalendereinladung.",
+    "messagePh": "Kurz zu deinem Anliegen (optional)…",
+    "confirmCta": "Verbindlich buchen",
+    "freeNote": "Kostenlos & unverbindlich · jederzeit stornierbar",
+    "doneEyebrow": "GEBUCHT",
+    "doneTitle": "Dein Termin ist bestätigt.",
+    "revealLabel": "Dein Spezialist",
+    "toAppointments": "Zu deinen Terminen"
   }
 }
