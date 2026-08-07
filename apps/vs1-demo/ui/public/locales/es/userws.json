@@ -419,5 +419,15 @@
     "bodyLabel": "Tu experiencia (opcional)",
     "bodyPh": "¿Cómo fue la primera llamada?",
     "note": "Las valoraciones verificadas provienen solo de citas reales y aparecen anonimizadas en el perfil del proveedor. Tu nombre permanece privado."
+  },
+  "reschedule": {
+    "eyebrow": "Reprogramar cita",
+    "currentLabel": "Cita actual",
+    "pickLabel": "Elige un nuevo horario",
+    "noSlots": "No hay horarios libres — cancela y reserva de nuevo.",
+    "confirm": "Mover cita",
+    "cancel": "Cancelar",
+    "done": "Movida ✓",
+    "note": "Al reprogramar se mantienen la reserva y el dossier compartido — no se aplica una nueva tarifa de lead. El proveedor recibe la nueva hora."
   }
 }

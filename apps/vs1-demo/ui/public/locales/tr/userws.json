@@ -419,5 +419,15 @@
     "bodyLabel": "Deneyimin (isteğe bağlı)",
     "bodyPh": "İlk görüşme nasıl geçti?",
     "note": "Doğrulanmış değerlendirmeler yalnızca gerçek randevulardan gelir ve sağlayıcı profilinde anonim görünür. Adın gizli kalır."
+  },
+  "reschedule": {
+    "eyebrow": "Randevuyu ertele",
+    "currentLabel": "Mevcut randevu",
+    "pickLabel": "Yeni bir zaman seç",
+    "noSlots": "Boş zaman yok — lütfen iptal edip yeniden ayırtın.",
+    "confirm": "Randevuyu taşı",
+    "cancel": "Vazgeç",
+    "done": "Taşındı ✓",
+    "note": "Randevu taşındığında rezervasyon ve paylaşılan dosya korunur — yeni bir lead ücreti alınmaz. Sağlayıcı yeni saat hakkında bilgilendirilir."
   }
 }

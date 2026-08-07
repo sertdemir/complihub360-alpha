@@ -708,9 +708,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             try {
                 const d = JSON.parse(patchBody || '{}');
                 const status = typeof d.status === 'string' ? d.status : '';
-                if (!['cancelled', 'completed', 'no_show'].includes(status)) {
+                const newSlot = typeof d.slot_start === 'string' ? d.slot_start : '';
+                if (!newSlot && !['cancelled', 'completed', 'no_show'].includes(status)) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'status must be cancelled|completed|no_show', correlationId }));
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'status must be cancelled|completed|no_show, or slot_start for a reschedule', correlationId }));
                     return;
                 }
                 const rows = (await supabaseApi.select('scheduling', { id: bookingId }, { limit: 1 })) as any[];
@@ -723,6 +724,33 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 if (!authViaApiKey && (!authUserId || b.user_id !== authUserId)) {
                     res.writeHead(403, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ errorCode: 'FORBIDDEN', message: 'Not your booking', correlationId }));
+                    return;
+                }
+                // Reschedule path: move a confirmed booking to a new slot. Same
+                // lead — the fee was charged at booking and is NOT charged again.
+                if (newSlot) {
+                    if (b.status !== 'confirmed') {
+                        res.writeHead(409, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ errorCode: 'CONFLICT', message: 'Only confirmed bookings can be rescheduled', correlationId }));
+                        return;
+                    }
+                    const start = new Date(newSlot);
+                    if (isNaN(start.getTime()) || start.getTime() <= Date.now()) {
+                        res.writeHead(400, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'slot_start must be a future ISO timestamp', correlationId }));
+                        return;
+                    }
+                    const clash = (await supabaseApi.select('scheduling', { provider_key: b.provider_key, status: 'confirmed', slot_start: start.toISOString() }, { limit: 1 })) as any[];
+                    if (clash[0] && clash[0].id !== bookingId) {
+                        res.writeHead(409, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ errorCode: 'SLOT_TAKEN', message: 'Slot already booked', correlationId }));
+                        return;
+                    }
+                    const end = new Date(start.getTime() + 30 * 60 * 1000);
+                    await supabaseApi.update('scheduling', { id: bookingId }, { slot_start: start.toISOString(), slot_end: end.toISOString(), updated_at: new Date().toISOString() });
+                    await supabaseApi.insert('event_log', { type: 'booking_rescheduled', payload: { bookingId, providerKey: b.provider_key, userId: b.user_id, from: b.slot_start, to: start.toISOString() } });
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ ok: true, id: bookingId, status: b.status, slot_start: start.toISOString(), slot_end: end.toISOString(), correlationId }));
                     return;
                 }
                 await supabaseApi.update('scheduling', { id: bookingId }, { status, updated_at: new Date().toISOString() });

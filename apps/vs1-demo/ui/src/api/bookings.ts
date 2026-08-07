@@ -144,6 +144,16 @@ export async function markOutcome(id: string, status: 'completed' | 'no_show'): 
   });
 }
 
+// Reschedule = move the SAME lead to a new slot (no second lead fee). The
+// server validates the slot is free and in the future; 409 = slot taken.
+export async function rescheduleBooking(id: string, slotStart: string): Promise<{ slot_start: string; slot_end: string }> {
+  return apiFetch<{ ok: boolean; slot_start: string; slot_end: string }>(`/api/v1/scheduling/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ slot_start: slotStart }),
+  });
+}
+
 export async function cancelBooking(id: string): Promise<void> {
   await apiFetch(`/api/v1/scheduling/${id}`, {
     method: 'PATCH',

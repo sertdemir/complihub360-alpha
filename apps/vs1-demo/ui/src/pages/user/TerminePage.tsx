@@ -6,6 +6,7 @@ import { Tag } from '../../components/ui/Tag';
 import { useApiData } from '../../lib/useApiData';
 import { fetchUserBookings, cancelBooking, markOutcome, type UserBooking, type BookingStatus } from '../../api/bookings';
 import { ReviewDrawer, type ReviewTarget } from '../../components/user/ReviewDrawer';
+import { RescheduleDrawer, type RescheduleTarget } from '../../components/user/RescheduleDrawer';
 
 // ─── User Dashboard · Termine (bookings) ─────────────────────────────────────
 // Mirrors the Figma "User · Termine / Buchungen v2" screen: the booking IS the
@@ -70,9 +71,19 @@ export function TerminePage() {
   const [outcomes, setOutcomes] = useState<Record<string, BookingStatus>>({});
   const [reviewFor, setReviewFor] = useState<ReviewTarget | null>(null);
   const [reviewed, setReviewed] = useState<Set<string>>(new Set());
+  const [rescheduleFor, setRescheduleFor] = useState<RescheduleTarget | null>(null);
+  // Optimistic slot overrides after a successful reschedule (id → new ISO).
+  const [moved, setMoved] = useState<Record<string, string>>({});
+  const df = new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+  const tf = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' });
   const rows = data.map((r) => {
     if (cancelled.has(r.id)) return { ...r, status: 'cancelled' as BookingStatus, needsOutcome: false };
     if (outcomes[r.id]) return { ...r, status: outcomes[r.id], needsOutcome: false };
+    if (moved[r.id]) {
+      const start = new Date(moved[r.id]);
+      const end = new Date(start.getTime() + 30 * 60 * 1000);
+      return { ...r, dateLine: df.format(start), timeLine: `${tf.format(start)}–${tf.format(end)} · Video-Call`, needsOutcome: false };
+    }
     return r;
   });
   const upcoming = rows.filter((r) => r.status === 'confirmed' && !r.needsOutcome);
@@ -110,7 +121,7 @@ export function TerminePage() {
           </div>
         ) : r.status === 'confirmed' ? (
           <p className="text-[12px] text-fg-brand">
-            <button type="button" className="hover:underline">{t('termine.reschedule')}</button>
+            <button type="button" onClick={() => setRescheduleFor({ bookingId: r.id, providerKey: r.providerKey, providerName: r.provider, currentLine: `${r.dateLine} · ${r.timeLine}` })} className="hover:underline">{t('termine.reschedule')}</button>
             {' · '}
             <button type="button" onClick={() => onCancel(r.id)} className="hover:underline">{t('termine.cancel')}</button>
             {' · '}
@@ -142,6 +153,7 @@ export function TerminePage() {
         <div className="space-y-2.5">{past.length ? past.map(card) : <p className="text-body-sm text-fg-tertiary">{t('termine.emptyPast')}</p>}</div>
       </div>
       <ReviewDrawer target={reviewFor} onClose={() => setReviewFor(null)} onSubmitted={(id) => setReviewed((s) => new Set(s).add(id))} />
+      <RescheduleDrawer target={rescheduleFor} onClose={() => setRescheduleFor(null)} onRescheduled={(id, iso) => setMoved((m) => ({ ...m, [id]: iso }))} />
     </UserShell>
   );
 }

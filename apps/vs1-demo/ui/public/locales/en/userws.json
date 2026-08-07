@@ -419,5 +419,15 @@
     "bodyLabel": "Your experience (optional)",
     "bodyPh": "How did the intro call go?",
     "note": "Verified reviews come only from real appointments and appear anonymized on the provider profile. Your name stays private."
+  },
+  "reschedule": {
+    "eyebrow": "Reschedule appointment",
+    "currentLabel": "Current slot",
+    "pickLabel": "Pick a new slot",
+    "noSlots": "No free slots available — please cancel and rebook.",
+    "confirm": "Move appointment",
+    "cancel": "Cancel",
+    "done": "Moved ✓",
+    "note": "Moving the appointment keeps your booking and the shared dossier — no new lead fee applies. The provider is notified of the new time."
   }
 }

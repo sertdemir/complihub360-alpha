@@ -419,5 +419,15 @@
     "bodyLabel": "Deine Erfahrung (optional)",
     "bodyPh": "Wie lief das Erstgespräch?",
     "note": "Verifizierte Bewertungen stammen nur aus echten Terminen und erscheinen anonymisiert auf dem Provider-Profil. Dein Name bleibt privat."
+  },
+  "reschedule": {
+    "eyebrow": "Termin verschieben",
+    "currentLabel": "Aktueller Termin",
+    "pickLabel": "Neuen Slot wählen",
+    "noSlots": "Keine freien Slots verfügbar — bitte stornieren und neu buchen.",
+    "confirm": "Termin verschieben",
+    "cancel": "Abbrechen",
+    "done": "Verschoben ✓",
+    "note": "Beim Verschieben bleiben Buchung und geteiltes Dossier bestehen — es fällt keine neue Lead-Gebühr an. Der Provider wird über die neue Zeit informiert."
   }
 }
