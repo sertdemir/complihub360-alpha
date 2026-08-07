@@ -159,7 +159,7 @@
         "desc": "Beschreiben Sie es in einem Satz"
       },
       "vatTax": {
-        "title": "USt & Steuern",
+        "title": "Steuern & USt",
         "desc": "Grenzüberschreitende USt, OSS/IOSS, Schwellenwerte"
       },
       "eprPackaging": {

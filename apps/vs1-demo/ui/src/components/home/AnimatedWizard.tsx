@@ -84,7 +84,7 @@ const STEPS: StepDef[] = [
     key: 'domains',
     // Final 8 domains (decision 2026-08-04) — Full Coverage removed.
     cards: [
-      { id: 'VAT & Tax', key: 'vatTax', icon: BarChart3 },
+      { id: 'Tax & VAT', key: 'vatTax', icon: BarChart3 },
       { id: 'Product & Packaging', key: 'eprPackaging', icon: Globe },
       { id: 'Data & Privacy', key: 'gdprPrivacy', icon: Shield },
       { id: 'Marketing & SEO', key: 'marketing', icon: MessageSquare },
@@ -93,7 +93,7 @@ const STEPS: StepDef[] = [
       { id: 'Logistics & Customs', key: 'logisticsCustoms', icon: Truck },
       { id: 'Legal Advisory', key: 'legalAdvisory', icon: Scale },
     ],
-    picks: ['VAT & Tax', 'Product & Packaging', 'Data & Privacy'],
+    picks: ['Tax & VAT', 'Product & Packaging', 'Data & Privacy'],
     footerKey: 'skipRoute',
   },
 ];
@@ -108,7 +108,7 @@ const MARKET_CODE: Record<string, string> = {
   Italy: 'IT', Spain: 'ES', 'United States': 'US', 'Türkiye': 'TR',
 };
 const CATEGORY_CODE: Record<string, WizardCategory> = {
-  'VAT & Tax': 'tax-vat', 'Product & Packaging': 'product-packaging', 'Data & Privacy': 'data-privacy',
+  'Tax & VAT': 'tax-vat', 'Product & Packaging': 'product-packaging', 'Data & Privacy': 'data-privacy',
   'Marketing & SEO': 'marketing-seo', 'Corporate & Structure': 'corporate-structure',
   'Product Compliance': 'product-compliance', 'Logistics & Customs': 'logistics-customs',
   'Legal Advisory': 'legal-advisory',
@@ -256,7 +256,7 @@ export function AnimatedWizard({
   const prefill = initialProfile && interactive ? selectionFromProfile(initialProfile) : null;
   const [stepIndex, setStepIndex] = useState(prefill ? STEPS.length : reduced && !interactive ? 2 : 0);
   const [selected, setSelected] = useState<Set<string>>(
-    () => prefill?.selected ?? new Set(reduced && !interactive ? ['VAT & Tax', 'EPR & Packaging', 'GDPR & Privacy'] : []),
+    () => prefill?.selected ?? new Set(reduced && !interactive ? ['Tax & VAT', 'Product & Packaging', 'Data & Privacy'] : []),
   );
   const [active, setActive] = useState<string | null>(null);
   const [cursor, setCursor] = useState({ x: 120, y: 60 });

@@ -159,7 +159,7 @@
         "desc": "Tell us in a sentence"
       },
       "vatTax": {
-        "title": "VAT & Tax",
+        "title": "Tax & VAT",
         "desc": "Cross-border VAT, OSS/IOSS, thresholds"
       },
       "eprPackaging": {

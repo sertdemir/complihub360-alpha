@@ -159,7 +159,7 @@
         "desc": "Tek cümleyle anlatın"
       },
       "vatTax": {
-        "title": "KDV ve Vergi",
+        "title": "Vergi ve KDV",
         "desc": "Sınır ötesi KDV, OSS/IOSS, eşikler"
       },
       "eprPackaging": {

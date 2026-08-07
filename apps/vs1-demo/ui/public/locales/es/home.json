@@ -159,7 +159,7 @@
         "desc": "Descríbalo en una frase"
       },
       "vatTax": {
-        "title": "IVA e impuestos",
+        "title": "Impuestos e IVA",
         "desc": "IVA transfronterizo, OSS/IOSS, umbrales"
       },
       "eprPackaging": {
