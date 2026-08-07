@@ -22,7 +22,23 @@ export interface AnonProvider {
   match_tier: 'high' | 'strong' | 'moderate';
 }
 
-export interface SearchLaw { id: string; title: string; description: string }
+// Enriched obligation from the engine's editorial map. Older payloads carry
+// only id/title/description — consumers must treat every extra field as
+// optional and fall back to the design fixture when severity is absent.
+export interface SearchLaw {
+  id: string;
+  title: string;
+  description: string;
+  domain?: string;
+  severity?: 'critical' | 'high' | 'medium' | 'low';
+  markets?: string[];            // [] = EU-wide
+  source?: string | null;
+  penalty?: string | null;
+  penalty_max_eur?: number | null;
+  due?: string | null;
+  due_days?: number | null;
+  state?: 'confirmed' | 'likely';
+}
 
 export interface SearchResult {
   overview_summary: string;

@@ -4,7 +4,7 @@ import { Orchestrator } from "@complihub/task-orchestrator";
 import { createDefaultRegistry } from "@complihub/agent-registry";
 import { DefaultPolicyEngine } from "@complihub/policy-engine";
 import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeCorrelationId, structuredLog, type AnalyticsEvent, type AlertRecord } from "@complihub360/types";
-import { generateRelevantSubdomains, type CountryCode, type IndustryType, type BusinessModel } from "@complihub/compliance-engine";
+import { generateRelevantSubdomains, isKnownCountry, ComplianceDomain, type CountryCode, type IndustryType, type BusinessModel, type EnrichedSubdomain } from "@complihub/compliance-engine";
 
 import { supabaseApi } from "./supabase.js";
 import { sendMagicLinkMail, sendEmailChangeMail } from "./mailer.js";
@@ -1875,13 +1875,37 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 //    The engine only knows a subset of country profiles — an
                 //    unknown country must not kill the search (providers are
                 //    still scored; laws just come back empty).
-                let engineResults: Array<{ id: string; label: string; description: string }> = [];
+                let engineResults: EnrichedSubdomain[] = [];
+                // All requested markets the engine knows a profile for; unknown
+                // codes are dropped rather than killing the whole search.
+                const requestedMarkets: string[] = Array.isArray(requestData.structured_answers?.markets)
+                    ? requestData.structured_answers.markets
+                    : [];
+                const engineCountries = [...new Set([requestData.country || 'DE', ...requestedMarkets])]
+                    .filter((c): c is CountryCode => isKnownCountry(String(c)));
+                // Wizard domain slugs → engine domains (focus = user-selected;
+                // always included and marked 'confirmed' in the payload).
+                const SLUG_TO_ENGINE: Record<string, ComplianceDomain> = {
+                    'tax-vat': ComplianceDomain.TAX,
+                    'product-packaging': ComplianceDomain.PRODUCT,
+                    'product-compliance': ComplianceDomain.PRODUCT,
+                    'data-privacy': ComplianceDomain.DATA,
+                    'marketing-seo': ComplianceDomain.MARKETING,
+                    'corporate-structure': ComplianceDomain.CORPORATE,
+                    'logistics-customs': ComplianceDomain.LOGISTICS,
+                    'legal-advisory': ComplianceDomain.LEGAL,
+                };
+                const requestedSlugs: string[] = requestData.structured_answers?.domains
+                    || requestData.structured_answers?.categories
+                    || requestData.domains || [];
+                const focusDomains = [...new Set(requestedSlugs.map((s) => SLUG_TO_ENGINE[s]).filter(Boolean))];
                 try {
                     engineResults = generateRelevantSubdomains({
-                        countries: [(requestData.country || 'DE') as CountryCode],
+                        countries: engineCountries.length ? engineCountries : ['DE'],
                         industry: requestData.structured_answers?.industry as IndustryType,
-                        businessModel: requestData.structured_answers?.businessModel as BusinessModel
-                    }) as Array<{ id: string; label: string; description: string }>;
+                        businessModel: requestData.structured_answers?.businessModel as BusinessModel,
+                        focusDomains,
+                    });
                 } catch (engineErr) {
                     console.warn('compliance-engine country profile missing:', String(engineErr));
                 }
@@ -1909,9 +1933,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 //    Output is ANONYMOUS: no name/website/contact — only attributes,
                 //    billing_model and a match score. Identity is revealed post-booking.
                 const country = requestData.country as string | undefined;
-                const rawCats: string[] = requestData.structured_answers?.domains
-                    || requestData.structured_answers?.categories
-                    || requestData.domains || [];
+                const rawCats: string[] = requestedSlugs;
                 // The wizard sends the canonical final-8 domain slugs; provider
                 // rows carry legacy DB category keys. Expand slugs → DB keys so
                 // the overlap scoring matches both vocabularies.
@@ -1992,7 +2014,24 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.end(JSON.stringify({
                     overview_summary: "AI summary synthesized from knowledge chunks and deterministic engine rules.",
                     providers: anonProviders,
-                    laws: engineResults.map((r: any) => ({ id: r.id, title: r.label, description: r.description })),
+                    // Enriched obligations payload: severity + statute + penalty +
+                    // cadence from the engine's editorial map. `state` mirrors the
+                    // wizard: explicitly selected domains are 'confirmed', the
+                    // score-ranked top-up domains are 'likely'.
+                    laws: engineResults.map((r) => ({
+                        id: r.id,
+                        title: r.label,
+                        description: r.description,
+                        domain: r.domain,
+                        severity: r.severity,
+                        markets: r.markets,          // [] = EU-wide
+                        source: r.source ?? null,
+                        penalty: r.penalty ?? null,
+                        penalty_max_eur: r.penaltyMaxEur ?? null,
+                        due: r.due ?? null,
+                        due_days: r.dueDays ?? null,
+                        state: r.focus ? 'confirmed' : 'likely',
+                    })),
                     tutorials: knowledgeMatches.map((m: any) => ({ id: m.id, content: m.content })),
                     articles: [],
                     tips: []

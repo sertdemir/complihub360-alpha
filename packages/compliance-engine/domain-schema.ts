@@ -4,7 +4,19 @@ export enum ComplianceDomain {
     MARKETING = 'MARKETING',
     DATA = 'DATA',
     CORPORATE = 'CORPORATE',
-    ONGOING_MONITORING = 'ONGOING_MONITORING'
+    ONGOING_MONITORING = 'ONGOING_MONITORING',
+    LOGISTICS = 'LOGISTICS',
+    LEGAL = 'LEGAL'
+}
+
+export type ObligationSeverity = 'critical' | 'high' | 'medium' | 'low';
+
+/** Deterministic riskWeight → severity band used across the payload. */
+export function severityFromRiskWeight(weight: number): ObligationSeverity {
+    if (weight >= 9) return 'critical';
+    if (weight >= 7) return 'high';
+    if (weight >= 5) return 'medium';
+    return 'low';
 }
 
 export interface ComplianceSubdomainTemplate {
@@ -108,6 +120,50 @@ export const DomainTemplateLibrary: Record<ComplianceDomain, ComplianceSubdomain
             triggerTags: ['b2b', 'finance', 'high_value'],
             applicableBusinessModels: ['SAAS_SUBSCRIPTION', 'AGENCY', 'MARKETPLACE_SELLER'],
             riskWeight: 8,
+        }
+    ],
+    [ComplianceDomain.LOGISTICS]: [
+        {
+            id: 'log-eori',
+            label: 'EORI Registration',
+            description: 'Economic Operators Registration and Identification number required for customs declarations.',
+            triggerTags: ['physical_goods', 'import', 'export'],
+            applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER'],
+            riskWeight: 7,
+        },
+        {
+            id: 'log-customs-classification',
+            label: 'Customs Classification (HS Codes)',
+            description: 'Correct tariff classification and origin declarations for imported goods.',
+            triggerTags: ['physical_goods', 'import'],
+            applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER'],
+            riskWeight: 6,
+        },
+        {
+            id: 'log-intrastat',
+            label: 'Intrastat Declarations',
+            description: 'Statistical reporting of intra-EU goods movements above national thresholds.',
+            triggerTags: ['physical_goods', 'eu_trade'],
+            applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER'],
+            riskWeight: 5,
+        }
+    ],
+    [ComplianceDomain.LEGAL]: [
+        {
+            id: 'legal-consumer-terms',
+            label: 'Consumer Terms & Cancellation Rights',
+            description: 'Mandatory T&C contents, withdrawal rights and information duties for consumer sales.',
+            triggerTags: ['b2c', 'ecommerce'],
+            applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER', 'SAAS_SUBSCRIPTION', 'AGENCY'],
+            riskWeight: 6,
+        },
+        {
+            id: 'legal-commercial-contracts',
+            label: 'Commercial Contract Review',
+            description: 'Supplier, distribution and platform agreements aligned with local commercial law.',
+            triggerTags: ['b2b', 'contracts'],
+            applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER', 'SAAS_SUBSCRIPTION', 'AGENCY'],
+            riskWeight: 4,
         }
     ]
 };

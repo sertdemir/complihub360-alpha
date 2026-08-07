@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { saveWizardSession, fetchSessions } from '../api/sessions';
-import { runSearch, type AnonProvider } from '../api/search';
+import { runSearch, type AnonProvider, type SearchLaw } from '../api/search';
 import { useApiData } from '../lib/useApiData';
 import { ProviderMatchCard } from '../components/ui/ProviderMatchCard';
 import { generateRiskMapPdf } from '../lib/riskMapPdf';
@@ -180,7 +180,7 @@ export function ResultsRiskMap() {
   // ?session=<id> re-queries /search with that session's stored profile.
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session');
-  const { data: anonProviders } = useApiData<AnonProvider[]>(async () => {
+  const { data: searchData } = useApiData<{ providers: AnonProvider[]; laws: SearchLaw[] }>(async () => {
     let query: Parameters<typeof runSearch>[0] = profile ?? {};
     if (sessionId) {
       try {
@@ -188,8 +188,43 @@ export function ResultsRiskMap() {
         if (s) query = { country: s.country ?? 'DE', categories: s.categories as SearchProfile['categories'] };
       } catch { /* fall back to the local profile */ }
     }
-    return (await runSearch(query)).providers;
-  }, PARTNERS_ANON);
+    const res = await runSearch(query);
+    return { providers: res.providers, laws: res.laws ?? [] };
+  }, { providers: PARTNERS_ANON, laws: [] });
+  const anonProviders = searchData.providers;
+
+  // Obligations enrichment: live engine laws (severity/statute/penalty/cadence)
+  // replace the design fixture as soon as the payload carries severity. Live
+  // rows render verbatim (engine ground truth is English) — the indexed
+  // results:obligations.* translations only apply to the fixture.
+  const liveLaws = searchData.laws.filter((l) => l.severity);
+  const isLive = liveLaws.length > 0;
+  const rows: Obligation[] = isLive
+    ? liveLaws.map((l) => ({
+        severity: l.severity as Severity,
+        title: l.title,
+        detail: [l.penalty ? `Penalty: ${l.penalty}` : null, l.source].filter(Boolean).join(' · '),
+        market: l.markets && l.markets.length ? l.markets.join(' · ') : 'EU-wide',
+        due: l.due ?? '—',
+        dueSub: l.due_days != null ? `${l.due_days} days` : l.due === 'Ongoing' ? 'Live' : '',
+        state: { kind: l.state === 'confirmed' ? 'confirmed' : 'likely' },
+      }))
+    : OBLIGATIONS;
+
+  // Stat strip mirrors the table: count, exposure (Σ max penalties), median
+  // days-to-deadline, matched partners. Fixture values until the API answers.
+  const stats = (() => {
+    if (!isLive) return STATS;
+    const exposure = liveLaws.reduce((s, l) => s + (l.penalty_max_eur ?? 0), 0);
+    const days = liveLaws.map((l) => l.due_days).filter((d): d is number => d != null).sort((a, b) => a - b);
+    const median = days.length ? days[Math.floor(days.length / 2)] : null;
+    return [
+      { value: String(rows.length), label: 'obligations identified' },
+      { value: exposure ? `€${Math.round(exposure / 1000)}k` : '—', label: 'total exposure' },
+      { value: median != null ? `${median} days` : 'ongoing', label: 'median deadline' },
+      { value: String(anonProviders.length), label: 'Verified Partners ready' },
+    ];
+  })();
 
   // A6 (User Flows §9): guest-allowed PDF snapshot — PII-free, with sources.
   // Translated at the render point (results namespace); canonical EN fallback.
@@ -197,14 +232,14 @@ export function ResultsRiskMap() {
     generateRiskMapPdf({
       profile,
       t,
-      stats: STATS.map((s, i) => ({ value: s.value, label: t(`stats.${i}.label`, { defaultValue: s.label }) })),
-      obligations: OBLIGATIONS.map((o, i) => ({
+      stats: stats.map((s, i) => ({ value: s.value, label: t(`stats.${i}.label`, { defaultValue: s.label }) })),
+      obligations: rows.map((o, i) => ({
         severity: o.severity,
-        title: t(`obligations.${i}.title`, { defaultValue: o.title }),
-        detail: t(`obligations.${i}.detail`, { defaultValue: o.detail }),
-        market: t(`obligations.${i}.market`, { defaultValue: o.market }),
-        due: t(`obligations.${i}.due`, { defaultValue: o.due }),
-        dueSub: t(`obligations.${i}.dueSub`, { defaultValue: o.dueSub }),
+        title: isLive ? o.title : t(`obligations.${i}.title`, { defaultValue: o.title }),
+        detail: isLive ? o.detail : t(`obligations.${i}.detail`, { defaultValue: o.detail }),
+        market: isLive ? o.market : t(`obligations.${i}.market`, { defaultValue: o.market }),
+        due: isLive ? o.due : t(`obligations.${i}.due`, { defaultValue: o.due }),
+        dueSub: isLive ? o.dueSub : t(`obligations.${i}.dueSub`, { defaultValue: o.dueSub }),
         stateLabel:
           o.state.kind === 'confirmed' ? t('state.confirmed', { defaultValue: 'Confirmed' })
           : o.state.kind === 'likely' ? t('state.likely', { defaultValue: 'Likely' })
@@ -269,7 +304,7 @@ export function ResultsRiskMap() {
 
         {/* Stat strip */}
         <div className="mx-auto mt-10 flex max-w-4xl flex-wrap items-center justify-between gap-y-4 rounded-2xl border border-stroke-subtle bg-surface px-8 py-6 shadow-[0_18px_44px_-32px_rgba(2,22,17,0.3)]">
-          {STATS.map((s, i) => (
+          {stats.map((s, i) => (
             <div key={s.label} className="flex items-center">
               {i > 0 && <span className="mr-8 hidden h-8 w-px bg-stroke-subtle sm:block" />}
               <span className="text-[1.5rem] font-bold text-fg">{s.value}</span>
@@ -287,7 +322,7 @@ export function ResultsRiskMap() {
             <span>{t('table.due')}</span>
             <span className="text-right">{t('table.state')}</span>
           </div>
-          {OBLIGATIONS.map((o, i) => (
+          {rows.map((o, i) => (
             <div
               key={o.title}
               className="grid grid-cols-[100px_1fr_120px_110px_160px] items-center gap-4 border-b border-stroke-subtle px-6 py-5 last:border-b-0 transition-colors hover:bg-surface-secondary/50"
@@ -298,13 +333,13 @@ export function ResultsRiskMap() {
                 </RiskBadge>
               </span>
               <span className="min-w-0">
-                <span className="block text-[15px] font-bold text-fg">{t(`obligations.${i}.title`, { defaultValue: o.title })}</span>
-                <span className="mt-0.5 block text-[12px] leading-relaxed text-fg-brand">{t(`obligations.${i}.detail`, { defaultValue: o.detail })}</span>
+                <span className="block text-[15px] font-bold text-fg">{isLive ? o.title : t(`obligations.${i}.title`, { defaultValue: o.title })}</span>
+                <span className="mt-0.5 block text-[12px] leading-relaxed text-fg-brand">{isLive ? o.detail : t(`obligations.${i}.detail`, { defaultValue: o.detail })}</span>
               </span>
-              <span className="text-[14px] text-fg-secondary">{t(`obligations.${i}.market`, { defaultValue: o.market })}</span>
+              <span className="text-[14px] text-fg-secondary">{isLive ? o.market : t(`obligations.${i}.market`, { defaultValue: o.market })}</span>
               <span>
-                <span className="block text-[14px] font-semibold text-fg">{t(`obligations.${i}.due`, { defaultValue: o.due })}</span>
-                <span className="block text-[12px] text-fg-tertiary">{t(`obligations.${i}.dueSub`, { defaultValue: o.dueSub })}</span>
+                <span className="block text-[14px] font-semibold text-fg">{isLive ? o.due : t(`obligations.${i}.due`, { defaultValue: o.due })}</span>
+                <span className="block text-[12px] text-fg-tertiary">{isLive ? o.dueSub : t(`obligations.${i}.dueSub`, { defaultValue: o.dueSub })}</span>
               </span>
               <span className="flex justify-end">
                 <StatePill state={o.state} onAnswer={() => setSaveOpen(true)} />

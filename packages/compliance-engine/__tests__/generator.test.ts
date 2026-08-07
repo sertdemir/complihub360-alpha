@@ -64,3 +64,44 @@ describe('Compliance Engine Generator', () => {
         expect(aggregated.strictnessScore).toBe(9);
     });
 });
+
+describe('Obligations enrichment (final-8 coverage)', () => {
+    it('6) IT/ES/NL/TR profiles resolve instead of throwing', () => {
+        for (const c of ['IT', 'ES', 'NL', 'TR'] as const) {
+            expect(() => generateRelevantSubdomains({ countries: [c] })).not.toThrow();
+        }
+    });
+
+    it('7) focusDomains are always included and their laws flagged focus:true', () => {
+        const results = generateRelevantSubdomains({
+            countries: ['DE'],
+            businessModel: BusinessModel.SAAS_SUBSCRIPTION,
+            focusDomains: ['LOGISTICS' as any, 'LEGAL' as any],
+        });
+        const ids = results.map(r => r.id);
+        // LOGISTICS templates are physical-goods only, but an explicit focus
+        // domain bypasses the business-model filter.
+        expect(ids).toContain('log-eori');
+        expect(ids).toContain('legal-consumer-terms');
+        expect(results.find(r => r.id === 'log-eori')?.focus).toBe(true);
+        // Focus laws sort before non-focus laws.
+        const firstNonFocus = results.findIndex(r => !r.focus);
+        expect(results.slice(0, firstNonFocus).every(r => r.focus)).toBe(true);
+    });
+
+    it('8) laws carry severity, source, penalty and cadence; country override wins', () => {
+        const results = generateRelevantSubdomains({
+            countries: ['DE'],
+            industry: IndustryType.GENERIC_ECOMMERCE,
+            businessModel: BusinessModel.DTC,
+        });
+        const vat = results.find(r => r.id === 'tax-vat-registration');
+        expect(vat?.severity).toBe('high');
+        expect(vat?.source).toContain('UStG');
+        expect(vat?.penalty).toBeTruthy();
+        expect(vat?.due).toBe('Quarterly');
+        // EU-scoped obligations report an empty markets list (= EU-wide).
+        const privacy = results.find(r => r.id === 'data-privacy');
+        expect(privacy?.markets).toEqual([]);
+    });
+});

@@ -1,11 +1,33 @@
-import { ComplianceDomain, DomainTemplateLibrary, ComplianceSubdomainTemplate } from './domain-schema.js';
+import { ComplianceDomain, DomainTemplateLibrary, ComplianceSubdomainTemplate, ObligationSeverity, severityFromRiskWeight } from './domain-schema.js';
 import { CountryCode, CountryRiskProfile, getCountryRiskProfile } from './country-profile.js';
 import { calculateBusinessModifier, IndustryType, BusinessModel } from './business-modifier.js';
+import { resolveEnrichment } from './obligation-enrichment.js';
 
 export interface GeneratorContext {
     countries: CountryCode[];
     industry?: IndustryType;
     businessModel?: BusinessModel;
+    /** Domains the user explicitly selected (wizard step 3). Always included
+     *  on top of the score-ranked selection; laws from them are 'confirmed'. */
+    focusDomains?: ComplianceDomain[];
+}
+
+export interface EnrichedSubdomain {
+    id: string;
+    label: string;
+    description: string;
+    domain: ComplianceDomain;
+    severity: ObligationSeverity;
+    riskWeight: number;
+    /** Requested countries the obligation was evaluated for; empty = EU-wide. */
+    markets: CountryCode[];
+    /** true when the user explicitly picked this domain in the wizard. */
+    focus: boolean;
+    source?: string;
+    penalty?: string;
+    penaltyMaxEur?: number;
+    due?: string;
+    dueDays?: number;
 }
 
 export function aggregateCountryRiskProfiles(countries: CountryCode[]): CountryRiskProfile {
@@ -21,7 +43,9 @@ export function aggregateCountryRiskProfiles(countries: CountryCode[]): CountryR
         [ComplianceDomain.MARKETING]: 0,
         [ComplianceDomain.DATA]: 0,
         [ComplianceDomain.CORPORATE]: 0,
-        [ComplianceDomain.ONGOING_MONITORING]: 0
+        [ComplianceDomain.ONGOING_MONITORING]: 0,
+        [ComplianceDomain.LOGISTICS]: 0,
+        [ComplianceDomain.LEGAL]: 0
     };
 
     let maxStrictness = 0;
@@ -43,7 +67,7 @@ export function aggregateCountryRiskProfiles(countries: CountryCode[]): CountryR
     };
 }
 
-export function generateRelevantSubdomains(context: GeneratorContext): { id: string; label: string; description: string }[] {
+export function generateRelevantSubdomains(context: GeneratorContext): EnrichedSubdomain[] {
     // 1) Load/Aggregate country profiles
     const aggregatedProfile = aggregateCountryRiskProfiles(context.countries);
 
@@ -65,31 +89,57 @@ export function generateRelevantSubdomains(context: GeneratorContext): { id: str
         return a.domain.localeCompare(b.domain);
     });
 
-    // 5) Take top 4 domains
-    const topDomains = domainScores.slice(0, 4).map(ds => ds.domain);
+    // 5) Domain selection: every explicitly requested focus domain, topped up
+    //    with the best-scored remaining domains to at least 4 in score order.
+    const focus = new Set(context.focusDomains ?? []);
+    const selected: ComplianceDomain[] = domainScores
+        .filter(ds => focus.has(ds.domain))
+        .map(ds => ds.domain);
+    for (const ds of domainScores) {
+        if (selected.length >= 4) break;
+        if (!focus.has(ds.domain)) selected.push(ds.domain);
+    }
 
-    // 6) Select subdomains based on domain + businessModel + threshold
-    // A minimum strictness threshold could apply before including subdomains with high risk.
-    // For simplicity and determinism, we extract all templates from the top domains that 
-    // match the business model (if defined), falling back to trigger tags.
-    const results: { id: string; label: string; description: string }[] = [];
+    // 6) Select subdomains based on domain + businessModel, enriched with the
+    //    editorial legal metadata (severity, statute, penalty, deadline).
+    const results: EnrichedSubdomain[] = [];
 
-    for (const domain of topDomains) {
+    for (const domain of selected) {
         const templates = DomainTemplateLibrary[domain];
         if (!templates) continue;
 
         for (const template of templates) {
-            // Filter by business model if one is specified
-            if (context.businessModel && !template.applicableBusinessModels.includes(context.businessModel)) {
+            // Filter by business model if one is specified — but never filter
+            // away a domain the user explicitly asked for.
+            if (!focus.has(domain) && context.businessModel && !template.applicableBusinessModels.includes(context.businessModel)) {
                 continue;
             }
+            const enrichment = resolveEnrichment(template.id, context.countries);
             results.push({
                 id: template.id,
                 label: template.label,
-                description: template.description
+                description: template.description,
+                domain,
+                severity: severityFromRiskWeight(template.riskWeight),
+                riskWeight: template.riskWeight,
+                markets: enrichment?.scope === 'eu' ? [] : context.countries,
+                focus: focus.has(domain),
+                source: enrichment?.source,
+                penalty: enrichment?.penalty,
+                penaltyMaxEur: enrichment?.penaltyMaxEur,
+                due: enrichment?.due,
+                dueDays: enrichment?.dueDays,
             });
         }
     }
+
+    // Focus-domain obligations first, then by risk weight — the table reads
+    // top-down as "what you asked about, worst first".
+    results.sort((a, b) => {
+        if (a.focus !== b.focus) return a.focus ? -1 : 1;
+        if (b.riskWeight !== a.riskWeight) return b.riskWeight - a.riskWeight;
+        return a.id.localeCompare(b.id);
+    });
 
     return results;
 }
