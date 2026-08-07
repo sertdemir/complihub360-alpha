@@ -1913,9 +1913,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     || requestData.structured_answers?.categories
                     || requestData.domains || [];
 
-                const providers = (await supabaseApi.select('providers', {
-                    partner_status: 'active'
-                })) as any[];
+                // Downgraded providers (review watchdog, decision 2026-08-06)
+                // stay listed but with heavily reduced visibility — "weniger
+                // sichtbar", not invisible. Inactive (unvetted) never appear.
+                const providers = ((await supabaseApi.select('providers', {})) as any[])
+                    .filter((p: any) => p.partner_status === 'active' || p.partner_status === 'downgraded');
 
                 const eligible = country
                     ? providers.filter((p: any) => (p.countries_supported || []).includes(country))
@@ -1939,6 +1941,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     const priority = p.partner_status === 'active' ? 1 : 0;
                     let total = 0.6 * relevance + 0.3 * quality + 0.1 * priority;
                     if (p.availability === 'ooo') total *= 0.5; // out-of-office → rank frozen/low
+                    if (p.partner_status === 'downgraded') total *= 0.4; // review-watchdog penalty
                     return { relevance, total };
                 };
                 const tierOf = (pct: number) => pct >= 90 ? 'high' : pct >= 75 ? 'strong' : 'moderate';

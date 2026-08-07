@@ -476,3 +476,131 @@ export async function sendEmailChangeMail(p: {
         });
     }
 }
+
+// ─── Review-watchdog mails (decision 2026-08-06) ─────────────────────────────
+// After a completed meeting both sides are asked to review within 2 days.
+// Provider reviews are MANDATORY (ranking depends on them): no reaction →
+// warning → downgrade + reduced visibility. User reviews are incentivized
+// (better service / personalisation / faster reaction to problems).
+
+export type ReviewMailKind = 'request_user' | 'request_provider' | 'warning_provider' | 'downgraded_provider';
+
+const REVIEW_STRINGS: Record<MailLocale, Record<ReviewMailKind, { subject: string; body: string }>> = {
+    en: {
+        request_user: {
+            subject: 'How was your appointment? 2 minutes for your review',
+            body: 'Your intro call has taken place. Rate your specialist within the next 2 days — your feedback personalises your matching, helps us react faster to problems and improves your service. Reviews are verified and appear anonymised.\n\n→ Dashboard → Appointments → "Rate provider"',
+        },
+        request_provider: {
+            subject: 'Action required: review your lead (within 2 days)',
+            body: 'Your booked appointment has taken place. As a CompliHub360 partner your lead review is REQUIRED within 2 days — your ranking and visibility depend on an active review loop. Missing reviews lead to a warning and subsequently to a downgrade with reduced visibility.\n\n→ Partner dashboard → Appointments → open dossier → "Rate this lead"',
+        },
+        warning_provider: {
+            subject: 'Warning: review overdue — downgrade imminent',
+            body: 'Your lead review is overdue (deadline: 2 days after the appointment). This is a formal warning: if the review is still missing 2 days from now, your partner status will be downgraded and your visibility to users reduced.\n\n→ Partner dashboard → Appointments → open dossier → "Rate this lead"',
+        },
+        downgraded_provider: {
+            subject: 'Your partner status has been downgraded',
+            body: 'Despite our warning the required lead review was not submitted. Your partner status has been downgraded — your visibility in user matchings is reduced. Submit the outstanding review and contact partners@complihub360.com to restore your status.',
+        },
+    },
+    de: {
+        request_user: {
+            subject: 'Wie war dein Termin? 2 Minuten für deine Bewertung',
+            body: 'Dein Erstgespräch hat stattgefunden. Bewerte deinen Spezialisten innerhalb der nächsten 2 Tage — dein Feedback personalisiert dein Matching, hilft uns, schneller auf Missstände zu reagieren, und verbessert deinen Service. Bewertungen sind verifiziert und erscheinen anonymisiert.\n\n→ Dashboard → Termine → „Provider bewerten"',
+        },
+        request_provider: {
+            subject: 'Aktion erforderlich: Lead bewerten (innerhalb von 2 Tagen)',
+            body: 'Dein gebuchter Termin hat stattgefunden. Als CompliHub360-Partner ist deine Lead-Bewertung innerhalb von 2 Tagen VERPFLICHTEND — dein Ranking und deine Sichtbarkeit hängen an einer aktiven Review-Schleife. Fehlende Bewertungen führen zu einer Verwarnung und anschließend zur Herabstufung mit reduzierter Sichtbarkeit.\n\n→ Partner-Dashboard → Termine → Dossier öffnen → „Lead bewerten"',
+        },
+        warning_provider: {
+            subject: 'Verwarnung: Bewertung überfällig — Herabstufung droht',
+            body: 'Deine Lead-Bewertung ist überfällig (Frist: 2 Tage nach dem Termin). Dies ist eine formale Verwarnung: Fehlt die Bewertung in 2 weiteren Tagen weiterhin, wird dein Partner-Status herabgestuft und deine Sichtbarkeit für User reduziert.\n\n→ Partner-Dashboard → Termine → Dossier öffnen → „Lead bewerten"',
+        },
+        downgraded_provider: {
+            subject: 'Dein Partner-Status wurde herabgestuft',
+            body: 'Trotz Verwarnung wurde die verpflichtende Lead-Bewertung nicht abgegeben. Dein Partner-Status wurde herabgestuft — deine Sichtbarkeit in User-Matchings ist reduziert. Reiche die ausstehende Bewertung nach und melde dich unter partners@complihub360.com, um deinen Status wiederherzustellen.',
+        },
+    },
+    es: {
+        request_user: {
+            subject: '¿Qué tal tu cita? 2 minutos para tu valoración',
+            body: 'Tu llamada inicial ha tenido lugar. Valora a tu especialista en los próximos 2 días — tu feedback personaliza tu matching, nos ayuda a reaccionar más rápido ante problemas y mejora tu servicio. Las valoraciones son verificadas y aparecen anonimizadas.\n\n→ Dashboard → Citas → «Valorar proveedor»',
+        },
+        request_provider: {
+            subject: 'Acción requerida: valora tu lead (en 2 días)',
+            body: 'Tu cita reservada ha tenido lugar. Como partner de CompliHub360, tu valoración del lead es OBLIGATORIA en un plazo de 2 días — tu ranking y visibilidad dependen de un ciclo de valoraciones activo. Las valoraciones ausentes conllevan una advertencia y posteriormente una degradación con visibilidad reducida.\n\n→ Panel de partner → Citas → abrir dossier → «Valorar este lead»',
+        },
+        warning_provider: {
+            subject: 'Advertencia: valoración vencida — degradación inminente',
+            body: 'Tu valoración del lead está vencida (plazo: 2 días tras la cita). Esta es una advertencia formal: si la valoración sigue faltando dentro de 2 días, tu estado de partner será degradado y tu visibilidad ante los usuarios reducida.\n\n→ Panel de partner → Citas → abrir dossier → «Valorar este lead»',
+        },
+        downgraded_provider: {
+            subject: 'Tu estado de partner ha sido degradado',
+            body: 'A pesar de la advertencia, la valoración obligatoria del lead no fue enviada. Tu estado de partner ha sido degradado — tu visibilidad en los matchings se ha reducido. Envía la valoración pendiente y contacta con partners@complihub360.com para restaurar tu estado.',
+        },
+    },
+    tr: {
+        request_user: {
+            subject: 'Randevun nasıldı? Değerlendirmen için 2 dakika',
+            body: 'İlk görüşmen gerçekleşti. Uzmanını önümüzdeki 2 gün içinde değerlendir — geri bildirimin eşleştirmeni kişiselleştirir, sorunlara daha hızlı tepki vermemize yardımcı olur ve hizmetini iyileştirir. Değerlendirmeler doğrulanır ve anonim görünür.\n\n→ Panel → Randevular → «Sağlayıcıyı değerlendir»',
+        },
+        request_provider: {
+            subject: 'İşlem gerekli: lead değerlendirmesi (2 gün içinde)',
+            body: 'Rezerve edilen randevun gerçekleşti. CompliHub360 partneri olarak lead değerlendirmen 2 gün içinde ZORUNLUDUR — sıralaman ve görünürlüğün aktif bir değerlendirme döngüsüne bağlıdır. Eksik değerlendirmeler uyarıya ve ardından görünürlüğü azaltılmış bir düşürmeye yol açar.\n\n→ Partner paneli → Randevular → dosyayı aç → «Bu lead\'i değerlendir»',
+        },
+        warning_provider: {
+            subject: 'Uyarı: değerlendirme gecikti — düşürme yaklaşıyor',
+            body: 'Lead değerlendirmen gecikti (süre: randevudan 2 gün sonra). Bu resmi bir uyarıdır: değerlendirme 2 gün içinde hâlâ eksikse partner statün düşürülecek ve kullanıcılara görünürlüğün azaltılacaktır.\n\n→ Partner paneli → Randevular → dosyayı aç → «Bu lead\'i değerlendir»',
+        },
+        downgraded_provider: {
+            subject: 'Partner statün düşürüldü',
+            body: 'Uyarıya rağmen zorunlu lead değerlendirmesi gönderilmedi. Partner statün düşürüldü — eşleştirmelerdeki görünürlüğün azaltıldı. Bekleyen değerlendirmeyi gönder ve statünü geri almak için partners@complihub360.com ile iletişime geç.',
+        },
+    },
+};
+
+export async function sendReviewMail(p: {
+    kind: ReviewMailKind;
+    to: string | null;
+    bookingId: string;
+    providerKey: string;
+    locale?: string;
+    correlationId?: string;
+}): Promise<void> {
+    const t = REVIEW_STRINGS[resolveLocale(p.locale)][p.kind];
+    const apiKey = process.env.RESEND_API_KEY;
+    try {
+        if (!p.to) {
+            await supabaseApi.insert('event_log', {
+                type: 'email_skipped_no_address',
+                payload: { bookingId: p.bookingId, providerKey: p.providerKey, kind: p.kind },
+            });
+            return;
+        }
+        if (!apiKey) {
+            await supabaseApi.insert('event_log', {
+                type: 'email_outbox',
+                payload: { bookingId: p.bookingId, to: p.to, subject: t.subject, text: t.body, mode: 'log-only', kind: p.kind },
+            });
+            return;
+        }
+        const res = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ from: MAIL_FROM, to: [p.to], subject: t.subject, text: t.body }),
+        });
+        const body = await res.json().catch(() => ({}));
+        await supabaseApi.insert('event_log', {
+            type: res.ok ? 'email_sent' : 'email_failed',
+            payload: { bookingId: p.bookingId, to: p.to, subject: t.subject, providerId: (body as { id?: string }).id, status: res.status, kind: p.kind },
+        });
+    } catch (err) {
+        structuredLog('error', 'Review mail failed', {
+            correlationId: p.correlationId ?? 'watchers', route: 'mailer', severity: 'error', errorCode: 'ERR_MAIL',
+        });
+        try {
+            await supabaseApi.insert('event_log', { type: 'email_failed', payload: { bookingId: p.bookingId, to: p.to, error: String(err), kind: p.kind } });
+        } catch { /* double fault */ }
+    }
+}

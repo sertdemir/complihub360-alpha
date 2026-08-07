@@ -1,7 +1,7 @@
 import * as crypto from "node:crypto";
 import { structuredLog } from "@complihub360/types";
 import { supabaseApi } from "./supabase.js";
-import { sendMagicLinkMail } from "./mailer.js";
+import { sendMagicLinkMail, sendReviewMail } from "./mailer.js";
 
 // ─── SLA Watchers (Beta) ──────────────────────────────────────────────────────
 // An in-process scheduler that makes the SLA/Trust loop autonomous on Staging,
@@ -42,6 +42,8 @@ export const watcherConfig = {
     get tickMs() { return num(process.env.WATCHERS_TICK_MS, 5 * 60 * 1000); },
     get reminderLeadMs() { return num(process.env.SLA_REMINDER_LEAD_HOURS, 4) * 60 * 60 * 1000; },
     get downgradeThreshold() { return num(process.env.SLA_BREACH_DOWNGRADE_THRESHOLD, 3); },
+    // Review watchdog (decision 2026-08-06): both sides review within 2 days.
+    get reviewDeadlineMs() { return num(process.env.REVIEW_DEADLINE_HOURS, 48) * 60 * 60 * 1000; },
 };
 
 type Engagement = {
@@ -65,6 +67,9 @@ export interface TickSummary {
     downgrades: number;
     expiries: number;
     errors: number;
+    reviewRequests: number;
+    reviewWarnings: number;
+    reviewDowngrades: number;
 }
 
 // ─── Shared reminder core ─────────────────────────────────────────────────────
@@ -155,7 +160,7 @@ async function mark(base: string, shadow: boolean, payload: Record<string, unkno
 export async function runWatcherTick(): Promise<TickSummary> {
     const shadow = watcherConfig.shadow;
     const now = Date.now();
-    const summary: TickSummary = { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0 };
+    const summary: TickSummary = { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0, reviewRequests: 0, reviewWarnings: 0, reviewDowngrades: 0 };
 
     let engagements: Engagement[];
     try {
@@ -265,11 +270,142 @@ export async function runWatcherTick(): Promise<TickSummary> {
         } catch { summary.errors++; }
     }
 
+    // Review watchdog (decision 2026-08-06) — mandatory provider reviews with
+    // warning → downgrade escalation; incentivized user reviews.
+    try {
+        const rv = await runReviewTick(shadow);
+        summary.reviewRequests = rv.requests;
+        summary.reviewWarnings = rv.warnings;
+        summary.reviewDowngrades = rv.downgrades;
+        summary.errors += rv.errors;
+    } catch { summary.errors++; }
+
     structuredLog("info", "Watcher tick complete", {
         correlationId: "watchers", route: "watchers/tick", severity: "info", errorCode: "NONE",
         ...summary,
     } as Record<string, unknown>);
     return summary;
+}
+
+// ─── Review watchdog (decision 2026-08-06) ────────────────────────────────────
+// After a booking is marked completed:
+//   T+0   both sides get a review request (event = the dashboard-feed row; mail
+//         via Resend) — the marker doubles as the feed event in live mode.
+//   T+2d  provider review still missing → formal WARNING (mandatory reviews —
+//         the ranking depends on them).
+//   T+4d  still missing → partner_status='downgraded' → reduced visibility in
+//         /search scoring. Natural selection.
+// User reviews are requested but never escalated (incentive framing only).
+// Shadow mode writes `*_shadow` markers and sends no mails.
+
+type BookingRow = {
+    id: string;
+    provider_key: string;
+    user_id: string | null;
+    status: string;
+};
+
+interface ReviewTickCounts { requests: number; warnings: number; downgrades: number; errors: number }
+
+// event_log's time column is `timestamp` (not created_at). A missing value
+// must NOT fall back to epoch 0 — that would make the 2-day deadline appear
+// long past and fire the warning immediately; fall back to NOW instead.
+type MarkerRow = { type: string; payload?: Record<string, unknown> | null; timestamp?: string };
+
+async function loadReviewMarkers(base: string, shadow: boolean): Promise<Map<string, string>> {
+    const rows = (await supabaseApi.select("event_log", { type: markerType(base, shadow) }, { limit: 5000 })) as MarkerRow[];
+    const map = new Map<string, string>();
+    for (const r of rows) {
+        const id = r.payload?.bookingId;
+        const stage = (r.payload?.stage as string | undefined) ?? "_";
+        if (typeof id === "string") map.set(`${id}:${stage}`, r.timestamp ?? new Date().toISOString());
+    }
+    return map;
+}
+
+export async function runReviewTick(shadow: boolean): Promise<ReviewTickCounts> {
+    const counts: ReviewTickCounts = { requests: 0, warnings: 0, downgrades: 0, errors: 0 };
+    const deadlineMs = watcherConfig.reviewDeadlineMs;
+    const now = Date.now();
+
+    let bookings: BookingRow[] = [];
+    try {
+        bookings = (await supabaseApi.select("scheduling", { status: "completed" }, { limit: 500 })) as BookingRow[];
+    } catch {
+        counts.errors++;
+        return counts;
+    }
+    if (!bookings.length) return counts;
+
+    let reqMarks: Map<string, string>, warnMarks: Map<string, string>, downMarks: Map<string, string>;
+    let providerReviews: Set<string>, userEmails: Map<string, string>, providerRows: Map<string, { email: string | null; status: string }>;
+    try {
+        const [rm, wm, dm, reviews, users, providers] = await Promise.all([
+            loadReviewMarkers("review_request", shadow),
+            loadReviewMarkers("review_overdue_warning", shadow),
+            loadReviewMarkers("provider_downgraded_reviews", shadow),
+            supabaseApi.select("reviews", { from_role: "provider" }, { limit: 5000 }) as Promise<Array<{ booking_id: string | null }>>,
+            supabaseApi.select("users", {}, { limit: 5000 }) as Promise<Array<{ id: string; email: string | null }>>,
+            supabaseApi.select("providers", {}, { limit: 1000 }) as Promise<Array<{ provider_key: string; contact_email?: string | null; partner_status: string }>>,
+        ]);
+        reqMarks = rm; warnMarks = wm; downMarks = dm;
+        providerReviews = new Set(reviews.map(r => r.booking_id).filter((x): x is string => typeof x === "string"));
+        userEmails = new Map(users.map(u => [u.id, u.email ?? ""]));
+        providerRows = new Map(providers.map(p => [p.provider_key, { email: p.contact_email ?? null, status: p.partner_status }]));
+    } catch {
+        counts.errors++;
+        return counts;
+    }
+
+    for (const b of bookings) {
+        const prov = providerRows.get(b.provider_key);
+        try {
+            // T+0 — review requests, one marker per side (marker = feed event in live).
+            let requested = false;
+            if (!reqMarks.has(`${b.id}:user`)) {
+                await mark("review_request", shadow, { bookingId: b.id, stage: "user", providerKey: b.provider_key, role: "user" });
+                if (!shadow) {
+                    await sendReviewMail({ kind: "request_user", to: (b.user_id && userEmails.get(b.user_id)) || null, bookingId: b.id, providerKey: b.provider_key });
+                }
+                requested = true;
+            }
+            if (!reqMarks.has(`${b.id}:provider`)) {
+                await mark("review_request", shadow, { bookingId: b.id, stage: "provider", providerKey: b.provider_key, role: "provider" });
+                if (!shadow) {
+                    await sendReviewMail({ kind: "request_provider", to: prov?.email ?? null, bookingId: b.id, providerKey: b.provider_key });
+                }
+                requested = true;
+            }
+            if (requested) { counts.requests++; continue; }
+
+            // Provider escalation only — user reviews are incentivized, never enforced.
+            if (providerReviews.has(b.id)) continue;
+
+            // T+2d — formal warning.
+            const reqAt = reqMarks.get(`${b.id}:provider`);
+            if (reqAt && now - Date.parse(reqAt) > deadlineMs && !warnMarks.has(`${b.id}:_`)) {
+                await mark("review_overdue_warning", shadow, { bookingId: b.id, providerKey: b.provider_key });
+                if (!shadow) {
+                    await sendReviewMail({ kind: "warning_provider", to: prov?.email ?? null, bookingId: b.id, providerKey: b.provider_key });
+                }
+                counts.warnings++;
+                continue;
+            }
+
+            // T+4d — downgrade (once per provider; only from 'active').
+            const warnAt = warnMarks.get(`${b.id}:_`);
+            if (warnAt && now - Date.parse(warnAt) > deadlineMs
+                && !downMarks.has(`${b.id}:_`) && prov?.status === "active") {
+                if (!shadow) {
+                    await supabaseApi.update("providers", { provider_key: b.provider_key }, { partner_status: "downgraded", updated_at: new Date().toISOString() });
+                    await sendReviewMail({ kind: "downgraded_provider", to: prov?.email ?? null, bookingId: b.id, providerKey: b.provider_key });
+                }
+                await mark("provider_downgraded_reviews", shadow, { bookingId: b.id, providerKey: b.provider_key });
+                counts.downgrades++;
+            }
+        } catch { counts.errors++; }
+    }
+    return counts;
 }
 
 // ─── Scheduler ────────────────────────────────────────────────────────────────
