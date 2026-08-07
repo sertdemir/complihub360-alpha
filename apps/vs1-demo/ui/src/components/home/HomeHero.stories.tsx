@@ -1,13 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { MemoryRouter } from 'react-router-dom';
 import { HomeHero } from './HomeHero';
+import '../../i18n/config';
 
 // S1 — User/Entrepreneur hero (Figma 1445:99). Light section; the right-column
 // wizard preview can render its compliance (Domains) wizard in light or DARK.
+// The embedded AnimatedWizard navigates on completion (useNavigate), so the
+// stories need a Router context.
 
 const meta = {
   title: 'Screens/Home Hero',
   component: HomeHero,
   parameters: { layout: 'fullscreen' },
+  decorators: [(Story) => <MemoryRouter><Story /></MemoryRouter>],
 } satisfies Meta<typeof HomeHero>;
 export default meta;
 type Story = StoryObj<typeof HomeHero>;

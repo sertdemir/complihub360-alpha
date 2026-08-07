@@ -1,30 +1,10 @@
 import { RedactionRule } from './types';
 
+// Rule order IS precedence: rules run top-down over the already-partially-
+// redacted text, so the most SPECIFIC patterns (API keys, tokenised URLs,
+// IBAN, cards) must run before the greedy generic ones (phone, passport) —
+// otherwise the phone rule shreds the digit runs inside keys and IBANs.
 export const PATTERNS: RedactionRule[] = [
-    {
-        id: 'rule_email_1',
-        category: 'EMAIL',
-        pattern: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
-        placeholder: '[REDACTED:EMAIL]'
-    },
-    {
-        id: 'rule_phone_1',
-        category: 'PHONE',
-        pattern: /(\+\d{1,3}[\s-]?)?\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{4}/g,
-        placeholder: '[REDACTED:PHONE]'
-    },
-    {
-        id: 'rule_cc_1',
-        category: 'CREDIT_CARD',
-        pattern: /\b(?:\d[ -]*?){13,16}\b/g, // Simplified CC pattern
-        placeholder: '[REDACTED:CREDIT_CARD]'
-    },
-    {
-        id: 'rule_iban_1',
-        category: 'IBAN',
-        pattern: /[A-Z]{2}\d{2}[A-Z0-9]{11,30}/gi,
-        placeholder: '[REDACTED:IBAN]'
-    },
     {
         id: 'rule_api_key_1',
         category: 'API_KEY',
@@ -36,6 +16,32 @@ export const PATTERNS: RedactionRule[] = [
         category: 'URL_WITH_TOKEN',
         pattern: /https?:\/\/[^\s]+[\?&](token|auth|key|sig)=[a-zA-Z0-9\-\._]+/g,
         placeholder: '[REDACTED:URL_WITH_TOKEN]'
+    },
+    {
+        id: 'rule_iban_1',
+        category: 'IBAN',
+        pattern: /[A-Z]{2}\d{2}[A-Z0-9]{11,30}/gi,
+        placeholder: '[REDACTED:IBAN]'
+    },
+    {
+        id: 'rule_cc_1',
+        category: 'CREDIT_CARD',
+        pattern: /\b(?:\d[ -]*?){13,16}\b/g, // Simplified CC pattern
+        placeholder: '[REDACTED:CREDIT_CARD]'
+    },
+    {
+        id: 'rule_email_1',
+        category: 'EMAIL',
+        pattern: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
+        placeholder: '[REDACTED:EMAIL]'
+    },
+    {
+        id: 'rule_phone_1',
+        category: 'PHONE',
+        // Lookarounds pin the match to token boundaries: digit runs embedded
+        // in alphanumeric identifiers (keys, IBANs) are never phone numbers.
+        pattern: /(?<![A-Za-z0-9])(\+\d{1,3}[\s-]?)?\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{4}(?!\d)/g,
+        placeholder: '[REDACTED:PHONE]'
     },
     {
         id: 'rule_invoice_1',
