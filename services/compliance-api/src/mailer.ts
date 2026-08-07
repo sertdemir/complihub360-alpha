@@ -560,6 +560,102 @@ const REVIEW_STRINGS: Record<MailLocale, Record<ReviewMailKind, { subject: strin
     },
 };
 
+// ─── Reschedule notification (user moved a confirmed booking) ────────────────
+// Text-only transactional mail to the provider: same lead, new slot. The user
+// acted in the dashboard; the provider's calendar must not silently drift.
+
+const RESCHEDULE_STRINGS: Record<MailLocale, { subject: string; intro: string; fromLabel: string; toLabel: string; note: string }> = {
+    en: {
+        subject: 'Appointment moved: your CompliHub360 booking has a new time',
+        intro: 'The client has moved the booked intro call to a new slot. The booking and the shared dossier stay unchanged.',
+        fromLabel: 'Previous time',
+        toLabel: 'New time',
+        note: 'No action needed — the appointment is confirmed for the new time. You can see all bookings in your partner dashboard under Appointments.',
+    },
+    de: {
+        subject: 'Termin verschoben: Ihre CompliHub360-Buchung hat eine neue Zeit',
+        intro: 'Der Mandant hat das gebuchte Erstgespräch auf einen neuen Slot verschoben. Buchung und geteiltes Dossier bleiben unverändert.',
+        fromLabel: 'Bisherige Zeit',
+        toLabel: 'Neue Zeit',
+        note: 'Keine Aktion nötig — der Termin ist für die neue Zeit bestätigt. Alle Buchungen finden Sie im Partner-Dashboard unter Termine.',
+    },
+    es: {
+        subject: 'Cita movida: su reserva de CompliHub360 tiene una nueva hora',
+        intro: 'El cliente ha movido la llamada inicial reservada a un nuevo horario. La reserva y el dossier compartido permanecen sin cambios.',
+        fromLabel: 'Hora anterior',
+        toLabel: 'Nueva hora',
+        note: 'No se requiere ninguna acción — la cita está confirmada para la nueva hora. Puede ver todas las reservas en su panel de partner, en Citas.',
+    },
+    tr: {
+        subject: 'Randevu taşındı: CompliHub360 rezervasyonunuzun yeni bir saati var',
+        intro: 'Müşteri, rezerve edilen ilk görüşmeyi yeni bir zamana taşıdı. Rezervasyon ve paylaşılan dosya değişmeden kalır.',
+        fromLabel: 'Önceki saat',
+        toLabel: 'Yeni saat',
+        note: 'İşlem gerekmez — randevu yeni saat için onaylandı. Tüm rezervasyonları partner panelindeki Randevular bölümünde görebilirsiniz.',
+    },
+};
+
+export async function sendRescheduleMail(p: {
+    to: string | null;
+    bookingId: string;
+    providerKey: string;
+    fromIso: string;
+    toIso: string;
+    locale?: string;
+    correlationId?: string;
+}): Promise<void> {
+    const loc = resolveLocale(p.locale);
+    const t = RESCHEDULE_STRINGS[loc];
+    // Slots are stored as UTC instants; render them in the product's home
+    // timezone with an explicit zone label so nothing is ambiguous.
+    const fmt = new Intl.DateTimeFormat(loc, {
+        weekday: 'short', day: 'numeric', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin', timeZoneName: 'short',
+    });
+    const text = [
+        t.intro,
+        ``,
+        `${t.fromLabel}: ${fmt.format(new Date(p.fromIso))}`,
+        `${t.toLabel}:   ${fmt.format(new Date(p.toIso))}`,
+        ``,
+        t.note,
+    ].join('\n');
+    const apiKey = process.env.RESEND_API_KEY;
+    try {
+        if (!p.to) {
+            await supabaseApi.insert('event_log', {
+                type: 'email_skipped_no_address',
+                payload: { bookingId: p.bookingId, providerKey: p.providerKey, kind: 'reschedule_provider' },
+            });
+            return;
+        }
+        if (!apiKey) {
+            await supabaseApi.insert('event_log', {
+                type: 'email_outbox',
+                payload: { bookingId: p.bookingId, to: p.to, subject: t.subject, text, mode: 'log-only', kind: 'reschedule_provider' },
+            });
+            return;
+        }
+        const res = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ from: MAIL_FROM, to: [p.to], subject: t.subject, text }),
+        });
+        const body = await res.json().catch(() => ({}));
+        await supabaseApi.insert('event_log', {
+            type: res.ok ? 'email_sent' : 'email_failed',
+            payload: { bookingId: p.bookingId, to: p.to, subject: t.subject, providerId: (body as { id?: string }).id, status: res.status, kind: 'reschedule_provider' },
+        });
+    } catch (err) {
+        structuredLog('error', 'Reschedule mail failed', {
+            correlationId: p.correlationId ?? 'scheduling', route: 'mailer', severity: 'error', errorCode: 'ERR_MAIL',
+        });
+        try {
+            await supabaseApi.insert('event_log', { type: 'email_failed', payload: { bookingId: p.bookingId, to: p.to, error: String(err), kind: 'reschedule_provider' } });
+        } catch { /* double fault */ }
+    }
+}
+
 export async function sendReviewMail(p: {
     kind: ReviewMailKind;
     to: string | null;

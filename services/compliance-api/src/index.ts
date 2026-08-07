@@ -7,7 +7,7 @@ import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeC
 import { generateRelevantSubdomains, isKnownCountry, ComplianceDomain, type CountryCode, type IndustryType, type BusinessModel, type EnrichedSubdomain } from "@complihub/compliance-engine";
 
 import { supabaseApi } from "./supabase.js";
-import { sendMagicLinkMail, sendEmailChangeMail } from "./mailer.js";
+import { sendMagicLinkMail, sendEmailChangeMail, sendRescheduleMail } from "./mailer.js";
 import { handleAssistantChat, handleAssistantCheckout, handleAssistantVerify } from "./assistant.js";
 import { handleAuthAdopt } from "./adoption.js";
 import { handleBillingRun, syncOpenInvoices } from "./billing.js";
@@ -749,6 +749,21 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     const end = new Date(start.getTime() + 30 * 60 * 1000);
                     await supabaseApi.update('scheduling', { id: bookingId }, { slot_start: start.toISOString(), slot_end: end.toISOString(), updated_at: new Date().toISOString() });
                     await supabaseApi.insert('event_log', { type: 'booking_rescheduled', payload: { bookingId, providerKey: b.provider_key, userId: b.user_id, from: b.slot_start, to: start.toISOString() } });
+                    // Notify the provider (fire-and-forget, in their language):
+                    // the user moved the slot, the provider's calendar must not
+                    // silently drift. Delivery problems are events, not errors.
+                    (async () => {
+                        const provs = (await supabaseApi.select('providers', { provider_key: b.provider_key }, { limit: 1 })) as any[];
+                        await sendRescheduleMail({
+                            to: provs[0]?.contact_email ?? null,
+                            bookingId,
+                            providerKey: b.provider_key,
+                            fromIso: b.slot_start,
+                            toIso: start.toISOString(),
+                            locale: provs[0]?.languages?.[0],
+                            correlationId,
+                        });
+                    })().catch(() => { /* logged inside the mailer */ });
                     res.writeHead(200, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ ok: true, id: bookingId, status: b.status, slot_start: start.toISOString(), slot_end: end.toISOString(), correlationId }));
                     return;
