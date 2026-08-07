@@ -1,8 +1,10 @@
 {
     "compilerOptions": {
+        "composite": true,
         "target": "ES2022",
         "module": "CommonJS",
         "declaration": true,
+        "rootDir": "./src",
         "outDir": "./dist",
         "strict": true,
         "esModuleInterop": true,
@@ -11,5 +13,8 @@
     },
     "include": [
         "src/**/*"
+    ],
+    "exclude": [
+        "src/**/*.test.ts"
     ]
 }
