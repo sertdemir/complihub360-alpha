@@ -1,0 +1,322 @@
+{
+  "hero": {
+    "eyebrow": "Für Verified Partner · Beta",
+    "title": {
+      "pre": "Die Compliance-Arbeit, die Sie",
+      "gold": "wirklich",
+      "post": " wollen."
+    },
+    "sub": "Vorqualifiziert durch von Nutzern ausgefüllte Risk Maps. Sie zahlen nur, wenn Sie die Anfrage annehmen. Keine Vorabgebühr. Die Founding-Kohorte schließt bei 100 Partnern.",
+    "ctaPrimary": "Für die Beta-Kohorte bewerben",
+    "ctaSecondary": "So funktioniert das Matching",
+    "chip": {
+      "noFee": "Keine Vorabgebühr",
+      "payOnAccept": "Zahlung nur bei angenommenen Anfragen",
+      "badge": "Founding-Partner-Badge"
+    },
+    "chipMobile": {
+      "noFee": "Keine Vorabgebühr · kein Abo",
+      "payOnAccept": "Zahlung nur bei angenommenen Mandaten",
+      "badge": "Founding-Partner-Badge während der Beta"
+    },
+    "specialistsLabel": "Founding-Spezialistenprofile",
+    "specialist": {
+      "vat": {
+        "title": "Spezialist für USt & Steuern",
+        "desc": "Grenzüberschreitende Meldungen, OSS / IOSS, Marketplace-Facilitator-Nexus, Fernabsatz-Schwellenwerte."
+      },
+      "epr": {
+        "title": "Berater für EPR & Verpackung",
+        "desc": "Herstellerregister, Ökomodulation, Post-Brexit-Aufteilungen, Rücknahmesysteme."
+      },
+      "gdpr": {
+        "title": "Anwalt für DSGVO & Datenschutz",
+        "desc": "DSFA, Verarbeitungsverzeichnis, Auftragsverarbeitungsverträge, Breach Response, Transfer Impact Assessments."
+      }
+    },
+    "inboxTitle": "Partner Inbox",
+    "inboxActive": "AKTIV · 3",
+    "inboxArchive": "ARCHIV",
+    "sampleLabel": "Eine eingehende Anfrage · Beispiel",
+    "sampleNote": "Nur im Dashboard · Annahme per Klick · $100 erst bei Annahme"
+  },
+  "matchmaking": {
+    "eyebrow": "Matchmaking",
+    "title": {
+      "pre": "Leads kommen",
+      "gold": "vorstrukturiert",
+      "post": ". Sie sehen, was passt."
+    },
+    "tagline": "Weniger Zeit fürs Erklären. Mehr Zeit fürs Abschließen.",
+    "lead": "Jede Anfrage in Ihrem Posteingang kommt strukturiert an — Länderumfang, Geschäftsmodell, Umsatzband, priorisierte Pflichten und Gesetzesverweise. Wir filtern nach Ihrer Abdeckung und Kategorie, ranken Partner-Tier-Anbieter zuerst und leiten nur weiter, was zu Ihrer Praxis passt.",
+    "coldLabel": "Ohne CompliHub · typische Kaltakquise-Anfragen",
+    "structuredLabel": "Mit CompliHub · jede Anfrage kommt strukturiert an",
+    "fromLabel": "Von: {{email}}",
+    "cold": {
+      "0": {
+        "subject": "Kurze Frage zur DSGVO",
+        "body": "„Hallo, machen Sie DSGVO-Audits? Wir brauchen dringend jemanden. Wann können Sie in einem Call alles mit uns durchgehen?“"
+      },
+      "1": {
+        "subject": "USt-Hilfe benötigt",
+        "body": "„Wir expandieren in einige EU-Länder. Können Sie uns sagen, was wir brauchen? Und was berechnen Sie?“"
+      },
+      "2": {
+        "subject": "(kein Betreff)",
+        "body": "„hallo frage zu verpackungs-compliance können sie helfen danke“"
+      }
+    },
+    "note": "Founding Partner bestimmen ihren Abdeckungsumfang selbst. Wir schieben Ihnen nie eine Anfrage außerhalb Ihrer erklärten Expertise zu."
+  },
+  "dashboard": {
+    "eyebrow": "One-Stop-Dashboard",
+    "title": {
+      "pre": "Jedes aktive Mandat, an",
+      "gold": "einem",
+      "post": " Ort."
+    },
+    "lead": "Posteingang, aktive Mandate, Antworthistorie, Abrechnung, Profileinstellungen — alles in einem Workspace. Einmal auf Annehmen klicken. Wir übergeben den Lead mit vollständigem, strukturiertem Kontext. Ab dann ist es Ihre Kundenbeziehung.",
+    "panels": {
+      "inbox": {
+        "caption": "Posteingang · neue Anfragen",
+        "title": "Posteingang · 3 neu",
+        "filter": "Filter ▾"
+      },
+      "active": {
+        "caption": "Aktives Mandat · nach Annahme"
+      },
+      "coverage": {
+        "caption": "Profil · Abdeckungseinstellungen"
+      }
+    },
+    "features": {
+      "0": {
+        "title": "Voller Kontext bei Annahme",
+        "desc": "Bei Annahme erhalten Sie die Risk Map des Nutzers, Gesetzesverweise und den Zeitplan strukturiert — sofort einsatzbereit."
+      },
+      "1": {
+        "title": "SLA-Erinnerungen integriert",
+        "desc": "24 h Bestätigung, 48 h Antwort. Wir melden uns, bevor Sie eine Frist reißen. Wiederholte Verstöße → Downgrade-Warnung."
+      },
+      "2": {
+        "title": "Abdeckung bleibt in Ihrer Hand",
+        "desc": "Kategorien + Jurisdiktionen jederzeit anpassen. Auto-Pause, wenn Ihre aktive Warteschlange voll ist. Keine Überraschungsanfragen."
+      }
+    },
+    "note": "Bei Annahme übergeben wir den Lead — voller Kontext, strukturiert. Ab dann ist es Ihre Kundenbeziehung. Wir treten zur Seite."
+  },
+  "performance": {
+    "eyebrow": "Performance Tracker",
+    "title": {
+      "pre": "Top-Tier bleiben. Wir sagen Ihnen",
+      "gold": "wie",
+      "post": " — bevor Sie abrutschen."
+    },
+    "tagline": "Sichtbarkeit durch Leistung verdienen, nicht durch Werbebudget.",
+    "lead": "Wir messen nur, was in Ihrer Hand liegt: wie schnell Sie antworten, wie oft Sie annehmen, wie zuverlässig Sie das SLA einhalten. Das Ergebnis bleibt zwischen Ihnen und dem Mandanten. Ihr Tier-Ranking, Ihre Verstöße und Ihre prognostizierte Einstufung — für Sie in Echtzeit sichtbar, mit 7-Tage-Frühwarnung, falls Sie auf ein Downgrade zusteuern.",
+    "features": {
+      "0": {
+        "title": "SLA-Timer in Echtzeit",
+        "desc": "Sehen Sie Ihre 24-h-Bestätigungs- und 48-h-Antwort-Countdowns live. Derselbe Timer, den auch der Nutzer auf seiner Seite sieht."
+      },
+      "1": {
+        "title": "Ein Tier-Badge, das mitreist",
+        "desc": "Der Founding-Partner-Status erscheint in Ihrem Profil und bei jeder Anfrage, die ein Nutzer sieht. Echter Social Proof, kein bloßes Schmuckstück."
+      },
+      "2": {
+        "title": "7-Tage-Frühwarnung",
+        "desc": "Steuern Sie auf ein Downgrade zu, melden wir uns eine Woche vorher mit konkreten Maßnahmen. Keine stillen Herabstufungen."
+      }
+    },
+    "note": "Founding Partner erhalten das Badge. Top-Performer halten ihr Tier. Alle sehen dieselben Zahlen — es gibt kein verstecktes Ranking."
+  },
+  "channels": {
+    "eyebrow": "Zwei Kanäle · wählen Sie, was passt",
+    "title": {
+      "pre": "Zwei Wege zu Leads. Beide",
+      "gold": "transparent",
+      "post": "."
+    },
+    "lead": "Die Provider-Monetarisierung ist gestuft. Der Affiliate-Kanal steht jedem Anbieter offen — Zahlung pro Klick, Listung wie vorgefunden. Der Engagement-Kanal ist exklusiv für das Partner-Tier — Sie zahlen nur, wenn Sie eine strukturierte Anfrage annehmen. Wählen Sie einen, nutzen Sie beide oder steigen Sie später um.",
+    "pricingLabel": "Preis",
+    "affiliate": {
+      "tag": "Offen für alle Anbieter",
+      "title": "Affiliate-Link",
+      "desc": "Reine Sichtbarkeit. Leiten Sie Traffic aus Ihrem Listing in den CompliHub-Ergebnissen auf Ihre eigene Website.",
+      "listingMeta": "München · Spezialist für USt & OSS",
+      "listingBadge": "Gesponsert",
+      "listingVisit": "Besuchen →",
+      "priceUnit": "pro Klick auf „Website besuchen“",
+      "points": {
+        "0": "Keine Bewerbung oder Freigabe erforderlich",
+        "1": "Zahlung nur für Klick-Durchleitungen",
+        "2": "Sofort nach der Registrierung verfügbar"
+      },
+      "cta": "Affiliate-Link einrichten",
+      "footnote": "Jederzeit im Dashboard pausieren oder deaktivieren · keine Mindestlaufzeit"
+    },
+    "engagement": {
+      "tag": "Partner-Tier · Registrierung schaltet frei",
+      "title": "Engagement Requests",
+      "desc": "Vorqualifizierte, strukturierte Leads in Ihrem Posteingang. Risikofrei, bis Sie annehmen.",
+      "priceUnit": "pro angenommener Anfrage · nicht pro Anfrageeingang",
+      "points": {
+        "0": "Vorqualifiziert durch von Nutzern ausgefüllte Risk Maps",
+        "1": "Zahlung nur bei Annahme (nicht bei Eingang)",
+        "2": "Founding-Partner-Badge + Tier-Ranking inklusive"
+      },
+      "lockNote": "Bewerben Sie sich für die Beta-Kohorte, um diesen Kanal freizuschalten",
+      "cta": "Für die Beta-Kohorte bewerben",
+      "footnote": "Frei ablehnen · abgerechnet wird nur bei Annahme · Eingänge jederzeit pausieren"
+    },
+    "note": "Beide Kanäle führen zum selben Ergebnis: Ein Nutzer erreicht Sie. Der Unterschied liegt darin, wer die Hürde setzt — und wer weiß, was ihn erwartet."
+  },
+  "faq": {
+    "eyebrow": "Bevor Sie sich bewerben",
+    "title": {
+      "pre": "Die Fragen, die Sie stellen würden.",
+      "gold": "Beantwortet",
+      "post": "."
+    },
+    "items": {
+      "0": {
+        "q": "Was kostet die Teilnahme?",
+        "a": "Zwei Kanäle, beide transparent. Der Affiliate-Link kostet 2 € pro Klick — offen für alle Anbieter, ohne Bewerbung. Engagement Requests kosten 92 € (≈ 100 $) pro angenommener Anfrage, nur im Partner-Tier. Kein Abo, keine Monatsgebühr, kein Mindestbudget. Sie zahlen nur bei einer Aktion — Klicks oder Annahmen. Jederzeit kündbar oder pausierbar."
+      },
+      "1": {
+        "q": "Wie werden Leads vorqualifiziert?",
+        "a": "Jede Anfrage stammt von einem Nutzer, der ein strukturiertes Compliance-Assessment abgeschlossen hat — Länderumfang, Geschäftsmodell, Umsatzband und priorisierte Pflichten mit Gesetzesverweisen. Wir gleichen mit Ihrer erklärten Abdeckung und Kategorie ab und ranken Partner-Tier-Anbieter zuerst."
+      },
+      "2": {
+        "q": "Was passiert, nachdem ich eine Anfrage angenommen habe?",
+        "a": "Bei Annahme übertragen wir Ihnen das vollständige Anfragepaket — Nutzerprofil, priorisierte Pflichten, Gesetzesverweise, direkte Kontaktdaten. Das war's. Das Ergebnis des Mandats verfolgen wir nicht. Ab dann ist es Ihre Kundenbeziehung in Ihren bevorzugten Tools. Das Mandat sehen Sie zur eigenen Referenz in Ihrem Aktiv-Tab. Die Annahmegebühr rechnen wir innerhalb von 24 h ab."
+      },
+      "3": {
+        "q": "Kann ich eine Anfrage ohne Nachteil ablehnen?",
+        "a": "Ja. Lehnen Sie jede Anfrage ohne Gebühr und ohne Tier-Auswirkung ab — abgerechnet wird nur bei Annahme. Lehnen Sie Anfragen außerhalb Ihres erklärten Umfangs ab, wissen wir beim nächsten Mal, anders zu routen."
+      },
+      "4": {
+        "q": "Wie qualifiziere ich mich für das Partner-Tier?",
+        "a": "Das Partner-Tier basiert derzeit auf Einladung + Beta-Kohorte. Konstante Annahmequote, schnelle SLA-Reaktion und verifizierte Qualifikationen bringen Sie nach oben. Der Founding-Partner-Status wird der ersten Kohorte verliehen und trägt ein Badge, das bei jeder Anfrage sichtbar ist, die ein Nutzer sieht."
+      },
+      "5": {
+        "q": "Was passiert, wenn ich das SLA verfehle?",
+        "a": "Bestätigung in 24 h, Antwort in 48 h. Verpassen Sie eine Frist, markieren wir das in Ihrem Dashboard mit einem Hinweis. Wiederholte Verstöße lösen eine Tier-2-Prüfung aus — aber erst nach einer 7-Tage-Frühwarnung mit konkreten Maßnahmen. Keine stillen Herabstufungen."
+      },
+      "6": {
+        "q": "Kann ich den Zugang mit meinem Team teilen?",
+        "a": "Aktuell ist der Workspace auf ein Login ausgelegt. Team-Plätze mit rollenbasierten Berechtigungen stehen auf der Beta-Roadmap, damit Kolleginnen und Kollegen unter einem Partnerkonto triagieren und antworten können."
+      },
+      "7": {
+        "q": "Wann werde ich abgerechnet?",
+        "a": "Affiliate-Klicks werden monatlich nachträglich abgerechnet. Engagement-Annahmen werden innerhalb von 24 h nach Annahme abgerechnet. Keine Vorabkosten, kein Abo — Sie zahlen ausschließlich für einen Klick oder eine Annahme."
+      }
+    },
+    "contactPre": "Nichts gefunden? Schreiben Sie an",
+    "contactPost": "— wir antworten innerhalb von 1 Werktag."
+  },
+  "register": {
+    "eyebrow": "Bewerben · Beta-Kohorte schließt bei 100 Partnern",
+    "title": {
+      "pre": "Bewerben Sie sich als der",
+      "gold": "Partner",
+      "post": ", der Sie sind."
+    },
+    "lead": "Wählen Sie ein Praxisprofil. Fügen Sie Ihre E-Mail hinzu. Founding Partner onboarden wir persönlich — ein 15-minütiger Call zur Abstimmung von Abdeckung und SLA. Keine Vorab-Verpflichtung, bis Sie Ihre erste Anfrage annehmen.",
+    "profiles": {
+      "solo": {
+        "title": "Solo-Spezialist",
+        "desc": "Eigenständige Praxis · Tiefe in einem Fachgebiet"
+      },
+      "boutique": {
+        "title": "Boutique-Kanzlei",
+        "desc": "3–10 Spezialisten · mehrere Fachgebiete"
+      },
+      "network": {
+        "title": "Mittelstand / Netzwerk",
+        "desc": "10+ Spezialisten · mehrere Länder"
+      }
+    },
+    "form": {
+      "emailLabel": "Geschäftliche E-Mail",
+      "emailPlaceholder": "sie@ihrekanzlei.de",
+      "emailHint": "Wir senden Ihnen einen Magic-Link zur Identitätsprüfung.",
+      "areasLabel": "Fachgebiete · Mehrfachauswahl",
+      "areas": {
+        "vatTax": "USt & Steuern",
+        "eprPackaging": "EPR & Verpackung",
+        "gdprPrivacy": "DSGVO & Datenschutz",
+        "marketing": "Marketing-Compliance",
+        "corporate": "Gesellschaftsrecht & Meldungen"
+      },
+      "countriesLabel": "Abgedeckte Länder · Mehrfachauswahl",
+      "addChip": "+ Hinzufügen"
+    },
+    "cta": "Für die Beta-Kohorte bewerben",
+    "footnote": "Keine Kreditkarte · 15-min-Onboarding-Call · Antwort innerhalb von 1 Werktag",
+    "spots": "23 von 100 · Founding-Plätze vergeben · Prüfung erfolgt fortlaufend"
+  },
+  "footer": {
+    "newsletter": {
+      "eyebrow": "Partner Brief",
+      "title": {
+        "pre": "Öffnet sich neue Nachfrage, erfahren Sie es als",
+        "gold": "Erste",
+        "post": "."
+      },
+      "lead": "Ein Partner-Brief pro Monat. Neue Jurisdiktionen in der Beta, bevorstehende Nachfragespitzen in unseren Märkten, regulatorische Änderungen mit Wirkung auf Ihren Posteingang. Keine Werbeinhalte.",
+      "emailPlaceholder": "sie@ihrunternehmen.de",
+      "subscribe": "Abonnieren",
+      "privacyNote": "Wir verwenden Ihre E-Mail nur für den Brief. Abmeldung mit einem Klick. Siehe unsere Datenschutzerklärung.",
+      "applyLink": "Oder für die Beta-Kohorte bewerben →"
+    },
+    "brandTagline": "Die Orchestrierungsschicht zwischen Compliance-Komplexität und verifizierter Spezialistenkapazität.",
+    "brandDisclaimer": "Keine Kanzlei. Wir orchestrieren verifizierte Spezialisten.",
+    "nav": {
+      "platform": {
+        "title": "Plattform",
+        "howItWorks": "So funktioniert es",
+        "startAssessment": "Assessment starten",
+        "exampleResult": "Beispielergebnis",
+        "forProviders": "Für Anbieter"
+      },
+      "solutions": {
+        "title": "Lösungen",
+        "vatTax": "USt & Steuern",
+        "productPackaging": "Produkt & Verpackung",
+        "dataPrivacy": "Datenschutz",
+        "marketingAdvertising": "Marketing & Werbung",
+        "corporateStructure": "Unternehmensstruktur",
+        "fullSupport": "Rundum-Betreuung"
+      },
+      "resources": {
+        "title": "Ressourcen",
+        "complianceNews": "Compliance-News",
+        "knowledgeLibrary": "Wissensbibliothek",
+        "countryGuides": "Länder-Guides",
+        "tutorials": "Tutorials",
+        "glossary": "Compliance-Glossar"
+      },
+      "company": {
+        "title": "Unternehmen",
+        "about": "Über uns",
+        "trustSecurity": "Vertrauen & Sicherheit",
+        "contact": "Kontakt",
+        "careers": "Karriere"
+      }
+    },
+    "betaBadge": "Beta",
+    "marketsPre": "Märkte, die wir heute abdecken:",
+    "marketsList": "Deutschland · Vereinigtes Königreich · Niederlande · Frankreich · Italien · Spanien",
+    "marketsPost": ". Weitere Länder folgen im Laufe von 2026.",
+    "legalDisclaimer": "CompliHub360 ist eine Orchestrierungsplattform — keine Kanzlei. Rechts-, Steuer- und Regulierungsberatung erbringen Verified Partner in eigener Berufshaftung. Wir erbringen keine Rechtsberatung im Sinne der §§ RDG / StBerG.",
+    "copyright": "© 2026 CompliHub360.",
+    "legal": {
+      "privacy": "Datenschutzerklärung",
+      "terms": "AGB",
+      "impressum": "Impressum",
+      "cookies": "Cookie-Einstellungen",
+      "subProcessors": "Subunternehmer (Sub-Processors)"
+    }
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "topbar": {
+    "guestBadge": "Gast-Karte · läuft in 30 Min. ab",
+    "exportPdf": "PDF exportieren",
+    "saveMap": "Diese Karte speichern"
+  },
+  "header": {
+    "eyebrow": "Ihre Risk Map",
+    "title": "Das gilt für Sie.",
+    "subtitleProfile": "Basierend auf Ihrer Einschätzung. {{total}} Bereiche im Fokus.",
+    "subtitleDefault": "Basierend auf Deutschland · Vereinigtes Königreich · Niederlande. D2C-E-Commerce, €2M—€5M Umsatz. VAT · EPR · Datenschutz im Fokus."
+  },
+  "stats": {
+    "0": {
+      "label": "identifizierte Pflichten"
+    },
+    "1": {
+      "label": "Gesamtrisiko"
+    },
+    "2": {
+      "label": "mediane Frist"
+    },
+    "3": {
+      "label": "Verified Partner bereit"
+    }
+  },
+  "table": {
+    "severity": "Schweregrad",
+    "obligation": "Pflicht",
+    "market": "Markt",
+    "due": "Fällig",
+    "state": "Status"
+  },
+  "severity": {
+    "critical": "Kritisch",
+    "high": "Hoch",
+    "medium": "Mittel",
+    "low": "Niedrig"
+  },
+  "state": {
+    "confirmed": "Bestätigt",
+    "likely": "Wahrscheinlich",
+    "answer": "{{total}} Fragen beantworten"
+  },
+  "obligations": {
+    "0": {
+      "title": "OSS-Quartalsmeldung",
+      "detail": "Zuletzt eingereicht: Q1 2025 · Strafe: €5.000 + 1 %/Monat · UStG §18i (OSS)",
+      "market": "DE · NL",
+      "due": "30. Apr",
+      "dueSub": "6 Tage"
+    },
+    "1": {
+      "title": "USt-Registrierung — UK",
+      "detail": "Post-Brexit-Schwellenprüfung erforderlich · Strafe: bis zu £20.000 · UK VATA 1994 §3",
+      "market": "UK",
+      "due": "15. Mai",
+      "dueSub": "21 Tage"
+    },
+    "2": {
+      "title": "EPR-Verpackungsregistrierung (LUCID)",
+      "detail": "Herstellerstatus zu bestätigen · Strafe: bis zu €50.000 · VerpackG Art. 9 Abs. 1",
+      "market": "DE",
+      "due": "02. Mai",
+      "dueSub": "8 Tage"
+    },
+    "3": {
+      "title": "EPR-Registrierungserneuerung (PackUK)",
+      "detail": "Zuletzt eingereicht: Apr 2024 · Strafe: 4 % des UK-Umsatzes · UK Packaging Regs. 2023 §7",
+      "market": "UK",
+      "due": "15. Mai",
+      "dueSub": "21 Tage"
+    },
+    "4": {
+      "title": "Cookie-Banner + Einwilligungsnachweise",
+      "detail": "B2C-EU-Nutzer → erforderlich · DSGVO Art. 6/7 · TTDSG §25",
+      "market": "EU-weit",
+      "due": "Laufend",
+      "dueSub": "Aktiv"
+    },
+    "5": {
+      "title": "DSFA für Tracking-Pixel",
+      "detail": "Abhängig vom Tracking-Stack · DSGVO Art. 35",
+      "market": "EU-weit",
+      "due": "—",
+      "dueSub": "Abhängig von den Tools"
+    },
+    "6": {
+      "title": "Reverse-Charge-Verfahren",
+      "detail": "Gilt nur bei grenzüberschreitendem B2B-Anteil >0 · UStG §13b",
+      "market": "DE · NL",
+      "due": "—",
+      "dueSub": "Abhängig vom B2B-Mix"
+    },
+    "7": {
+      "title": "Aktualisierung wirtschaftlich Berechtigter",
+      "detail": "Zuletzt gemeldet: Mär 2025 · Strafe: €1.000–5.000 · GwG §20 Abs. 1",
+      "market": "DE",
+      "due": "30. Jun",
+      "dueSub": "laufend"
+    }
+  },
+  "partners": {
+    "eyebrow": "3 Verified Partner gefunden",
+    "title": "Wir haben gefunden, wer das für Sie umsetzen kann.",
+    "unlocked": "Matches freigeschaltet",
+    "unlockCta": "Matches mit kostenlosem Konto freischalten",
+    "match": "{{pct}} Übereinstimmung",
+    "requestQuote": "Angebot anfordern",
+    "0": {
+      "sub": "Italienische USt-Registrierung + Fiskalvertretung · DE·IT zweisprachig"
+    },
+    "1": {
+      "sub": "OSS/IOSS-Einrichtung · 12 Jahre grenzüberschreitende Steuern · 8 EU-Standorte"
+    },
+    "2": {
+      "sub": "Iberische USt (ES/PT) · monatliche Meldungen · Marktplatz-Optimierung"
+    }
+  },
+  "cta": {
+    "title": "Karte speichern. Partner freischalten.",
+    "body": "Kostenloses Konto. Keine Kreditkarte. Founding-Member-Zugang bis zum Beta-Launch.",
+    "button": "Kostenloses Konto erstellen"
+  },
+  "quote": {
+    "domainTaxVat": "Steuern & USt."
+  },
+  "pdf": {
+    "title": "Ihre Compliance-Risikokarte.",
+    "generated": "Erstellt am {{date}} · Staging-Vorschau",
+    "profile": {
+      "anonymousScope": "Anonyme Einschätzung · Beispielumfang",
+      "anonymous": "Anonyme Einschätzung",
+      "markets": "Märkte",
+      "domains": "Bereiche",
+      "operations": "Geschäftstätigkeit"
+    },
+    "questionsOpen": "{{total}} Fragen offen",
+    "sources": "Quellen",
+    "disclaimer": "CompliHub360 ist eine Orchestrierungsplattform und keine Rechtsanwaltskanzlei. Rechts-, Steuer- und Regulierungsberatung erbringen Verified Partners in eigener beruflicher Haftung."
+  },
+  "detail": {
+    "back": "Zurück zu den Providern",
+    "activeSince": "aktiv seit",
+    "mandates": "Mandate",
+    "anonNote": "Identität & Qualifikation von CompliHub360 verifiziert. Name und Kontakt werden nach dem gebuchten Termin sichtbar.",
+    "specsTitle": "Über diesen Spezialisten",
+    "coverage": "Abdeckung",
+    "languages": "Sprachen",
+    "pricingTitle": "Preisübersicht",
+    "pricingSub": "verbindliches Angebot nach dem kostenlosen Erstgespräch.",
+    "billing": "Abrechnung",
+    "pricingOnRequest": "Preise auf Anfrage.",
+    "bookTitle": "Termin buchen",
+    "bookSub": "Kostenloses Erstgespräch · 30 Min · unverbindlich",
+    "bookCta": "Termin buchen",
+    "revealNote": "Identität wird nach der Buchung sichtbar."
+  },
+  "schedule": {
+    "back": "Zurück zum Profil",
+    "title": "Termin buchen",
+    "sub": "Kostenloses Erstgespräch, 30 Minuten, unverbindlich — wähle einen Slot.",
+    "summaryTitle": "Deine Buchung",
+    "pickSlot": "Wähle links einen Slot.",
+    "revealNote": "Nach der Buchung werden Name & Kontaktdaten des Providers sichtbar — inkl. Kalendereinladung.",
+    "messagePh": "Kurz zu deinem Anliegen (optional)…",
+    "confirmCta": "Verbindlich buchen",
+    "freeNote": "Kostenlos & unverbindlich · jederzeit stornierbar",
+    "doneEyebrow": "GEBUCHT",
+    "doneTitle": "Dein Termin ist bestätigt.",
+    "revealLabel": "Dein Spezialist",
+    "toAppointments": "Zu deinen Terminen"
+  }
+}

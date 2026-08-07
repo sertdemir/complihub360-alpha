@@ -17,10 +17,18 @@ export default defineConfig({
     },
   },
   cacheDir: './.vite',
+  optimizeDeps: {
+    // Pre-bundle everything the Storybook browser tests touch: deps that Vite
+    // only discovers mid-run trigger a re-optimize + reload, which the running
+    // chromium tests see as "Failed to fetch dynamically imported module"
+    // (flaky CI failures on cold caches).
+    include: ['jspdf', 'react-dom/client', 'zustand', 'react-router-dom', 'react-i18next', 'i18next', 'lucide-react'],
+  },
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        // compliance-api (services/compliance-api) binds PORT 3005 by default.
+        target: process.env.VITE_API_PROXY_TARGET || 'http://localhost:3005',
         changeOrigin: true,
         secure: false
       }

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Typography } from '../ui/Typography';
+import { ThemeToggle } from '../ui/ThemeToggle';
 
 const HIDDEN_PATHS = ['/login', '/register', '/verify-email'];
 
@@ -85,6 +86,12 @@ export function GlobalNav() {
       items: [],
     },
     {
+      id: 'providers',
+      label: t('nav.forProviders', 'For Providers'),
+      path: '/providers',
+      items: [],
+    },
+    {
       id: 'resources',
       label: t('nav.resources', 'Resources'),
       items: [
@@ -153,6 +160,7 @@ export function GlobalNav() {
 
         {/* Actions */}
         <div className="flex items-center gap-1 shrink-0 h-10">
+          <ThemeToggle size={36} />
           <LanguageSwitcher />
 
           {isLoggedIn ? (

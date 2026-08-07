@@ -1,0 +1,66 @@
+<!-- CompliHub360 · Supabase auth mail (Magic Link / Confirm signup)
+     Brand: dark slate shell, serif headline with ONE gold word, gold CTA.
+     Table-based + inline styles (email-client-safe), no external images. -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0b1620;padding:40px 16px;">
+  <tr>
+    <td align="center">
+      <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;">
+
+        <!-- Brand -->
+        <tr>
+          <td style="padding:0 8px 24px 8px;"><img src="https://kqylqwogxbiwpnomkzsn.supabase.co/storage/v1/object/public/assets/logo-lockup-email.png" width="207" height="54" alt="CompliHub360 — Compliance. Simplified." style="display:block;border:0;"/></td>
+        </tr>
+
+        <!-- Card -->
+        <tr>
+          <td style="background-color:#1f2937;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:36px 32px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="font-family:Georgia,'Times New Roman',serif;font-size:28px;line-height:1.2;font-weight:bold;color:#ffffff;">
+                  Your <span style="color:#d4af37;">sign-in</span> link.
+                </td>
+              </tr>
+              <tr>
+                <td style="padding-top:14px;font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#aeb8c4;">
+                  Click the button below to securely access your CompliHub360 workspace.
+                  No password needed &mdash; this link is your key.
+                </td>
+              </tr>
+              <tr>
+                <td style="padding-top:28px;">
+                  <a href="{{ .ConfirmationURL }}"
+                     style="display:block;background-color:#d4af37;border-radius:12px;padding:14px 24px;text-align:center;font-family:Helvetica,Arial,sans-serif;font-size:15px;font-weight:bold;color:#101411;text-decoration:none;">
+                    Sign in to CompliHub360 &rarr;
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding-top:22px;border-top:1px solid rgba(255,255,255,0.08);margin-top:22px;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:22px;">
+                    <tr>
+                      <td style="font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#77828f;">
+                        &#128274;&nbsp; This link works <strong style="color:#aeb8c4;">once</strong> and expires after a short time.<br/>
+                        &#127760;&nbsp; Open it in the <strong style="color:#aeb8c4;">same browser</strong> you requested it from.<br/>
+                        &#128737;&nbsp; Didn&rsquo;t request this? You can safely ignore this e-mail.
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="padding:24px 8px 0 8px;font-family:Helvetica,Arial,sans-serif;font-size:11px;line-height:1.7;color:#5b6673;">
+            CompliHub360 &mdash; the orchestration layer between compliance complexity and operational reality.<br/>
+            You received this e-mail because a sign-in was requested for your address on
+            <a href="{{ .SiteURL }}" style="color:#8b96a5;">complihub360.com</a>.
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>

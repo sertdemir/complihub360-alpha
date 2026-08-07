@@ -1,0 +1,30 @@
+{
+  "draftBanner": "DRAFT — This page describes the actual data processing of the system but is not legal advice. Finalize with legal counsel or a compliance generator and fill the marked placeholders before launch.",
+  "privacy": {
+    "title": "Privacy Policy",
+    "updated": "Last updated: July 2026 · Draft",
+    "headings": {
+      "controller": "1. Controller",
+      "data": "2. Data we process",
+      "purposes": "3. Purposes and legal bases",
+      "ai": "4. AI processing",
+      "recipients": "5. Recipients and processors",
+      "retention": "6. Retention",
+      "rights": "7. Your rights",
+      "contact": "8. Contact"
+    }
+  },
+  "imprint": {
+    "title": "Imprint",
+    "updated": "Information pursuant to § 5 DDG (German law) · Draft",
+    "headings": {
+      "provider": "Provider",
+      "representedBy": "Represented by",
+      "contact": "Contact",
+      "register": "Register entry",
+      "responsible": "Responsible pursuant to § 18 (2) MStV",
+      "dispute": "EU dispute resolution",
+      "notice": "Notice"
+    }
+  }
+}

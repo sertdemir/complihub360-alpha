@@ -1,0 +1,174 @@
+{
+  "topbar": {
+    "guestBadge": "Guest map · expires in 30 min",
+    "exportPdf": "Export PDF",
+    "saveMap": "Save this map"
+  },
+  "header": {
+    "eyebrow": "Your risk map",
+    "title": "Here's what applies to you.",
+    "subtitleProfile": "Based on your assessment. {{total}} domains in scope.",
+    "subtitleDefault": "Based on Germany · United Kingdom · Netherlands. D2C e-commerce, €2M—€5M revenue. VAT · EPR · Privacy in scope."
+  },
+  "stats": {
+    "0": {
+      "label": "obligations identified"
+    },
+    "1": {
+      "label": "total exposure"
+    },
+    "2": {
+      "label": "median deadline"
+    },
+    "3": {
+      "label": "Verified Partners ready"
+    }
+  },
+  "table": {
+    "severity": "Severity",
+    "obligation": "Obligation",
+    "market": "Market",
+    "due": "Due",
+    "state": "State"
+  },
+  "severity": {
+    "critical": "Critical",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
+  },
+  "state": {
+    "confirmed": "Confirmed",
+    "likely": "Likely",
+    "answer": "Answer {{total}} questions"
+  },
+  "obligations": {
+    "0": {
+      "title": "OSS quarterly return",
+      "detail": "Last filed: Q1 2025 · Penalty: €5,000 + 1%/month · UStG §18i (OSS)",
+      "market": "DE · NL",
+      "due": "Apr 30",
+      "dueSub": "6 days"
+    },
+    "1": {
+      "title": "VAT registration — UK",
+      "detail": "Post-Brexit threshold check needed · Penalty: up to £20,000 · UK VATA 1994 §3",
+      "market": "UK",
+      "due": "May 15",
+      "dueSub": "21 days"
+    },
+    "2": {
+      "title": "EPR packaging registration (LUCID)",
+      "detail": "Producer status to confirm · Penalty: up to €50,000 · VerpackG Art. 9 Abs. 1",
+      "market": "DE",
+      "due": "May 02",
+      "dueSub": "8 days"
+    },
+    "3": {
+      "title": "EPR registration renewal (PackUK)",
+      "detail": "Last filed: Apr 2024 · Penalty: 4% of UK revenue · UK Packaging Regs. 2023 §7",
+      "market": "UK",
+      "due": "May 15",
+      "dueSub": "21 days"
+    },
+    "4": {
+      "title": "Cookie banner + consent records",
+      "detail": "B2C EU users → required · GDPR Art. 6/7 · TTDSG §25",
+      "market": "EU-wide",
+      "due": "Ongoing",
+      "dueSub": "Live"
+    },
+    "5": {
+      "title": "DPIA for tracking pixels",
+      "detail": "Depends on tracking stack · GDPR Art. 35",
+      "market": "EU-wide",
+      "due": "—",
+      "dueSub": "Depends on tools"
+    },
+    "6": {
+      "title": "Reverse-charge mechanism",
+      "detail": "Applies only if cross-border B2B share >0 · UStG §13b",
+      "market": "DE · NL",
+      "due": "—",
+      "dueSub": "Depends on B2B mix"
+    },
+    "7": {
+      "title": "Beneficial-owner update",
+      "detail": "Last filed: Mar 2025 · Penalty: €1,000–5,000 · GwG §20 Abs. 1",
+      "market": "DE",
+      "due": "Jun 30",
+      "dueSub": "ongoing"
+    }
+  },
+  "partners": {
+    "eyebrow": "3 Verified Partners matched",
+    "title": "We've found who can act on this.",
+    "unlocked": "Matches unlocked",
+    "unlockCta": "Unlock matches with a free account",
+    "match": "{{pct}} match",
+    "requestQuote": "Request quote",
+    "0": {
+      "sub": "Italian VAT registration + fiscal representation · DE·IT bilingual"
+    },
+    "1": {
+      "sub": "OSS/IOSS setup · 12 years cross-border tax · 8 EU offices"
+    },
+    "2": {
+      "sub": "Iberian VAT (ES/PT) · monthly filing · marketplace optimization"
+    }
+  },
+  "cta": {
+    "title": "Save this map. Unlock the partners.",
+    "body": "Free account. No credit card. Founding-member access through Beta launch.",
+    "button": "Create free account"
+  },
+  "quote": {
+    "domainTaxVat": "Tax & VAT"
+  },
+  "pdf": {
+    "title": "Your compliance risk map.",
+    "generated": "Generated {{date}} · staging preview",
+    "profile": {
+      "anonymousScope": "Anonymous assessment · example scope",
+      "anonymous": "Anonymous assessment",
+      "markets": "Markets",
+      "domains": "Domains",
+      "operations": "Operations"
+    },
+    "questionsOpen": "{{total}} questions open",
+    "sources": "Sources",
+    "disclaimer": "CompliHub360 is an orchestration platform, not a law firm. Legal, tax and regulatory advice is delivered by Verified Partners under their own professional liability."
+  },
+  "detail": {
+    "back": "Back to providers",
+    "activeSince": "active since",
+    "mandates": "mandates",
+    "anonNote": "Identity & qualifications verified by CompliHub360. Name and contact become visible after your booked appointment.",
+    "specsTitle": "About this specialist",
+    "coverage": "Coverage",
+    "languages": "Languages",
+    "pricingTitle": "Pricing overview",
+    "pricingSub": "binding offer after the free intro call.",
+    "billing": "Billing",
+    "pricingOnRequest": "Pricing on request.",
+    "bookTitle": "Book an appointment",
+    "bookSub": "Free intro call · 30 min · non-binding",
+    "bookCta": "Book appointment",
+    "revealNote": "Identity becomes visible after booking."
+  },
+  "schedule": {
+    "back": "Back to profile",
+    "title": "Book an appointment",
+    "sub": "Free intro call, 30 minutes, non-binding — pick a slot.",
+    "summaryTitle": "Your booking",
+    "pickSlot": "Pick a slot on the left.",
+    "revealNote": "After booking, the provider’s name & contact become visible — including a calendar invite.",
+    "messagePh": "Briefly describe your case (optional)…",
+    "confirmCta": "Book bindingly",
+    "freeNote": "Free & non-binding · cancel any time",
+    "doneEyebrow": "BOOKED",
+    "doneTitle": "Your appointment is confirmed.",
+    "revealLabel": "Your specialist",
+    "toAppointments": "Go to your appointments"
+  }
+}

@@ -1,10 +1,25 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#ffffff" />
     <title>CompliHub360</title>
+
+    <!-- Theme: apply light/dark before paint to avoid a flash (FOUC). -->
+    <script>
+        (function () {
+            try {
+                var k = 'ch360-theme';
+                var s = localStorage.getItem(k);
+                var dark = s ? s === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+                var r = document.documentElement;
+                if (dark) r.classList.add('dark');
+                r.style.colorScheme = dark ? 'dark' : 'light';
+            } catch (e) { }
+        })();
+    </script>
 
     <!-- Inter font -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -27,8 +42,6 @@
             justify-content: center;
         }
         html, body {
-            background-color: #0b1117;
-            color: #f1f5f9;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }

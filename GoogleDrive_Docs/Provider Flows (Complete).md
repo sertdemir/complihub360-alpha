@@ -122,11 +122,12 @@ User clicks Primary CTA.
 
 System creates:
 
-* EngagementRequest record
+* EngagementRequest record  
+* **Dossier** (see Addendum 2026-07-10): situational context \+ redacted message; requester identity kept locked
 
 System sends:
 
-* email to provider inbox  
+* email to provider inbox (anonymized dossier summary — never identity)  
 * provider magic link
 
 Events:
@@ -146,17 +147,20 @@ Provider can confirm and respond in 1–2 clicks.
 
 Contains:
 
-* request summary  
+* anonymized dossier summary (country · category · structured answers · redacted message)  
 * secure magic link  
 * SLA expectation
 
+Never contains requester identity (e-mail is an untrusted channel).
+
 ## **4.2 Magic Link Landing (Provider)**
 
-Provider sees:
+Provider sees (ANONYMIZED DOSSIER — Addendum 2026-07-10):
 
-* requester message  
+* requester message **redacted** (names, e-mails, phones, company identifiers masked via redaction pipeline)  
 * country \+ category context  
-* structured answers (if wizard used)
+* structured answers (if wizard used)  
+* requester identity marked as **locked until confirm**
 
 Actions:
 
@@ -173,7 +177,12 @@ Events:
 ### **Action A — Confirm Receipt**
 
 * sets status \= provider\_confirmed  
-* logs timestamp
+* logs timestamp  
+* **unlocks the dossier**: response reveals the unredacted message \+ requester identity
+
+Events (additional):
+
+* dossier\_unlocked
 
 Events:
 

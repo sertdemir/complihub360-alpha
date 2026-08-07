@@ -43,5 +43,11 @@ jobs:
       - name: Run Build
         run: npm run build
 
+      - name: Install Playwright Chromium
+        # The UI workspace runs its Storybook suite in a real chromium via
+        # @vitest/browser-playwright — the runner image has no browsers.
+        run: npx playwright install chromium --with-deps
+        working-directory: apps/vs1-demo/ui
+
       - name: Run Tests
         run: npm run test --workspaces --if-present

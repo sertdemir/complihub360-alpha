@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Serif:wght@400;500;600;700&display=swap');
+/* Inter = UI/body/headings · IBM Plex Serif = Display (>=32pt) — per Compass Typography */
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..700;1,14..32,400..700&family=IBM+Plex+Serif:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,17 +7,185 @@
 
 @layer base {
   :root {
+    color-scheme: light;
+    /* ============================================================
+       COMPASS — PRIMITIVES (raw values; only semantic tokens alias these)
+       Source: Compass Color foundation page (a4BeKbsBGoHkcudhKXUJTl · 18:4)
+       ============================================================ */
+
+    /* Petrol — brand anchor + risk-severity scale (risk is never red) */
+    --petrol-50: #ebf1f0;
+    --petrol-100: #d1dfdd;
+    --petrol-200: #a8c2be;
+    --petrol-300: #7aa29c;
+    --petrol-400: #427b72;
+    --petrol-500: #004d40; /* ★ brand anchor */
+    --petrol-600: #002e26; /* hover/active */
+    --petrol-700: #00231d;
+    --petrol-800: #001612;
+    --petrol-900: #000b09;
+    --petrol-950: #000403;
+
+    /* Gold — brand accent (scarcity: eyebrows, borders, active steps; never a fill) */
+    --gold-50: #fdf8e6;
+    --gold-100: #fbebba;
+    --gold-200: #f8d882;
+    --gold-300: #f4c44a;
+    --gold-400: #e6a514;
+    --gold-500: #d4af37; /* ★ accent */
+    --gold-600: #bca033;
+    --gold-700: #96802a;
+    --gold-800: #6a5b1e;
+    --gold-900: #3d3411;
+    --gold-950: #1a1607;
+
+    /* Neutral — warm-leaning */
+    --neutral-50: #fafafa;
+    --neutral-100: #f4f4f5;
+    --neutral-200: #e5e7eb;
+    --neutral-300: #d1d5da;
+    --neutral-400: #9ca3af;
+    --neutral-500: #6b7280;
+    --neutral-600: #5f5b5b;
+    --neutral-700: #374151;
+    --neutral-800: #1f2937;
+    --neutral-900: #0f172a;
+    --neutral-950: #030712;
+
+    /* Status — TODO: replace with exact Compass scales (Color page) when building Alert.
+       Interim values; status is not used on the Providers marketing landing. */
+    --success-500: #3c8c7a;
+    --warning-500: #c59e38;
+    --error-500: #b55353;
+    --info-500: #2f6feb;
+
+    /* ============================================================
+       COMPASS — SEMANTIC (Light). Names mirror Figma screen tokens 1:1.
+       Values screen-verified (CompliHub-360 · 1784:1156 / 1789:830).
+       ============================================================ */
+
+    /* Background */
+    --color-bg-primary: #ffffff;            /* marketing surface (screen-verified) */
+    --color-bg-secondary: #fafafa;          /* (screen-verified) */
+    --color-bg-tertiary: var(--neutral-100);
+    --color-bg-inverse: var(--petrol-900);
+    --color-bg-brand: var(--petrol-500);
+    --color-bg-brand-light: var(--petrol-50);
+    --color-bg-accent: var(--gold-500);
+    --color-bg-accent-light: var(--gold-50);
+
+    /* Text */
+    --color-text-primary: var(--neutral-900);   /* #0f172a */
+    --color-text-secondary: var(--neutral-600);  /* #5f5b5b */
+    --color-text-tertiary: var(--neutral-500);   /* #6b7280 */
+    --color-text-disabled: var(--neutral-400);
+    --color-text-inverse: #ffffff;
+    --color-text-brand: var(--petrol-500);
+    --color-text-accent: var(--gold-500);
+    --color-text-on-brand: #ffffff;
+    --color-text-on-accent: var(--petrol-900);   /* dark petrol on gold — never white */
+
+    /* Border */
+    --color-border-default: var(--neutral-200);  /* #e5e7eb */
+    --color-border-subtle: var(--neutral-100);   /* #f4f4f5 */
+    --color-border-strong: var(--neutral-300);
+    --color-border-strong-a11y: var(--neutral-500); /* AA, UI-bearing/selected */
+    --color-border-input: var(--neutral-400);    /* AA, mandatory for inputs */
+    --color-border-brand: var(--petrol-500);
+    --color-border-accent: var(--gold-500);
+    --color-border-focus: var(--petrol-500);     /* mandatory, >=2px */
+
+    /* Icon */
+    --color-icon-default: var(--neutral-600);
+    --color-icon-brand: var(--petrol-500);
+    --color-icon-accent: var(--gold-500);
+    --color-icon-inverse: #ffffff;
+    --color-icon-disabled: var(--neutral-400);
+
+    /* Interactive */
+    --color-interactive-primary: var(--petrol-500);
+    --color-interactive-primary-hover: var(--petrol-600);
+    --color-interactive-primary-active: var(--petrol-700);
+    --color-interactive-primary-disabled: var(--neutral-300);
+
+    /* Risk — petrol scale (NEVER red). Exact values from Compass "⚠️ Risk Badge"
+       page (726:2). Escalation via lightness on a single petrol hue:
+       low (lightest) → critical (deepest). */
+    --color-risk-low: #a8c2be;
+    --color-risk-medium: #427b72;
+    --color-risk-high: #002e26;
+    --color-risk-critical: #001612;
+    --color-risk-low-bg: #d1dfdd;
+    --color-risk-medium-bg: #a8c2be;
+    --color-risk-high-bg: #d1dfdd;
+    --color-risk-critical-bg: #ebf1f0;
+    --color-risk-text-on-low: var(--petrol-700);
+    --color-risk-text-on-medium: var(--petrol-800);
+    --color-risk-text-on-high: var(--petrol-800);
+    --color-risk-text-on-critical: var(--petrol-900);
+
+    /* ============================================================
+       COMPASS — RADIUS (9 stops · default 2xl=12px)
+       ============================================================ */
+    --radius-none: 0px;
+    --radius-xs: 2px;
+    --radius-sm: 4px;   /* buttons, inputs */
+    --radius-md: 6px;   /* selects, dropdowns (screen radius/md) */
+    --radius-lg: 8px;
+    --radius-xl: 10px;
+    --radius-2xl: 12px; /* ★ default card */
+    --radius-3xl: 16px; /* hero, wizard-modal */
+    --radius-full: 9999px;
+
+    /* ============================================================
+       COMPASS — DRAWER (side-sheet sizing · mirrors C360 Drawer Surface)
+       Height is adaptive: hugs content, clamped to [min-h, max-h];
+       beyond max the body scrolls while header + footer stay pinned.
+       ============================================================ */
+    --drawer-min-h: 400px;
+    --drawer-max-h: 1000px;
+    --drawer-w-sm: 440px;  /* Size=SM */
+    --drawer-w-md: 520px;  /* Size=MD */
+    --drawer-w-lg: 540px;  /* Size=L  */
+    /* Glass surface — floating drawer overlays (translucent + backdrop-blur). */
+    --drawer-glass-bg: rgba(255, 255, 255, 0.50);
+    --drawer-glass-blur: 48px;  /* strong frost: more see-through yet text stays legible */
+    --drawer-scrim-blur: 6px;   /* soft blur on the page behind while a drawer is open */
+
+    /* ============================================================
+       COMPASS — ELEVATION (7 effect styles; xl matches screen shadow/xl)
+       ============================================================ */
+    --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+    --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08);
+    --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.10);
+    --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -5px rgba(15, 23, 42, 0.06);
+    --shadow-2xl: 0 25px 50px -12px rgba(15, 23, 42, 0.18);
+    --shadow-inner: inset 0 2px 4px 0 rgba(15, 23, 42, 0.08);
+
+    /* ============================================================
+       COMPASS — CONTAINERS (5 max-widths) — see Grid foundation page
+       ============================================================ */
+    --container-sm: 600px;   /* reading / login / modal */
+    --container-md: 768px;   /* article / body / wizard */
+    --container-lg: 1024px;  /* app + sidebar */
+    --container-xl: 1200px;  /* ★ standard marketing / hero */
+    --container-2xl: 1440px; /* ★ Compass max */
+
+    /* fluid type (legacy) */
     --fluid-h1: clamp(1.75rem, 2.5vw, 2.25rem);
     --fluid-body: clamp(0.9375rem, 1.2vw, 1rem);
 
-    /* shadcn CSS Variables — mapped to CompliHub360 brand tokens */
+    /* ============================================================
+       shadcn CSS variables (back-compat — existing components depend on these)
+       ============================================================ */
     --background: 0 0% 100%;
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    --primary: 168 100% 15%;       /* #004D40 Deep Forest Green */
+    --primary: 168 100% 15%;       /* #004D40 Petrol */
     --primary-foreground: 0 0% 100%;
     --secondary: 240 5% 96%;
     --secondary-foreground: 222 47% 11%;
@@ -28,7 +197,7 @@
     --destructive-foreground: 0 0% 100%;
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 168 100% 15%;          /* matches primary */
+    --ring: 168 100% 15%;
     --radius: 0.5rem;
     --chart-1: 168 100% 15%;
     --chart-2: 43 64% 52%;
@@ -45,16 +214,78 @@
     --sidebar-ring: 168 100% 15%;
   }
 
+  /* ============================================================
+     COMPASS — DARK MODE (scaffold). On dark petrol surfaces borders replace
+     shadows. Values are interim and will be finalized when dark mode ships.
+     ============================================================ */
+  .dark {
+    /* App dark = SLATE (mirrors Compass dark tokens, file a4BeKbsBGoHkcudhKXUJTl:
+       bg/primary→neutral/800 #1f2937, bg/secondary→neutral/900 #0f172a, brand teal #14a89a).
+       Replaces the earlier petrol-green dark per the 2026-06-25 dark=slate decision. */
+    --color-bg-primary: #1f2937;        /* default component / card surface — slate */
+    --color-bg-secondary: #0f172a;      /* subtle fills, table headers, deeper cards */
+    --color-bg-tertiary: #2a3340;       /* hover / nested elevation (one step up) */
+    --color-bg-inverse: #ffffff;
+    --drawer-glass-bg: rgba(31, 41, 55, 0.50);  /* slate #1f2937 @ 50% — floating glass drawer */
+    --color-bg-brand: #14a89a;
+    --color-bg-brand-light: rgba(20, 168, 154, 0.16);
+    --color-text-primary: #f5f6f8;
+    --color-text-secondary: #9aa7ad;
+    --color-text-tertiary: #6b7a80;
+    --color-text-inverse: #0f172a;
+    --color-text-brand: #2cc0ad;
+    --color-border-default: #374151;
+    --color-border-subtle: #2a3340;
+    --color-border-focus: #14a89a;
+    --color-icon-default: #9aa7ad;
+    /* Risk scale on dark: escalate by brightness (brighter petrol = more urgent),
+       translucent tints for the soft surface. Keeps the petrol identity. */
+    --color-risk-low: #5e7c74;
+    --color-risk-medium: #258d78;
+    --color-risk-high: #3db49a;
+    --color-risk-critical: #5fd3b8;
+    --color-risk-low-bg: rgba(120, 162, 156, 0.14);
+    --color-risk-medium-bg: rgba(37, 141, 120, 0.20);
+    --color-risk-high-bg: rgba(61, 180, 154, 0.20);
+    --color-risk-critical-bg: rgba(95, 211, 184, 0.24);
+    --color-risk-text-on-low: #cfe0db;
+    --color-risk-text-on-medium: #06201a;
+    --color-risk-text-on-high: #052019;
+    --color-risk-text-on-critical: #04140f;
+
+    /* shadcn back-compat vars (HSL) — dark SLATE so bg-background /
+       bg-card / border-border / text-foreground flip with the .dark class. */
+    color-scheme: dark;
+    --background: 215 28% 17%;        /* #1f2937 */
+    --foreground: 210 17% 96%;
+    --card: 222 47% 11%;              /* #0f172a */
+    --card-foreground: 210 17% 96%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 17% 96%;
+    --secondary: 217 22% 21%;         /* #2a3340 */
+    --secondary-foreground: 210 17% 96%;
+    --muted: 217 22% 21%;
+    --muted-foreground: 199 10% 64%;  /* #9aa7ad */
+    --accent: 182 49% 15%;            /* #143a3b teal-dark */
+    --accent-foreground: 210 17% 96%;
+    --border: 217 19% 27%;            /* #374151 */
+    --input: 217 19% 27%;
+    --ring: 174 79% 37%;              /* #14a89a teal */
+  }
+
   body {
-    @apply bg-background text-neutral-900 font-sans antialiased;
+    @apply bg-background font-sans antialiased;
+    color: var(--color-text-primary);
     font-size: var(--fluid-body);
     line-height: 1.6;
     max-width: 100vw;
     overflow-x: hidden;
   }
-  
+
+  /* Headings: Inter for h1–h6 by default; Display sizes (>=32pt) opt into serif via .font-serif */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-serif text-neutral-900;
+    @apply font-sans;
+    color: var(--color-text-primary);
     line-height: 1.2;
   }
 
@@ -62,8 +293,17 @@
     font-size: var(--fluid-h1);
   }
 
-  /* Optimized Line Length for readability */
+  /* Optimized line length for readability */
   p {
     max-width: 75ch;
   }
+}
+
+/* Anchor targets clear the fixed 80px marketing header; smooth section jumps. */
+html {
+  scroll-behavior: smooth;
+}
+section[id],
+footer[id] {
+  scroll-margin-top: 96px;
 }

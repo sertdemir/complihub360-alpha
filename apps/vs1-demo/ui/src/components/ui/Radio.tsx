@@ -1,39 +1,41 @@
 import React, { forwardRef } from 'react';
+import { cn } from '../../lib/utils';
 
-export interface RadioProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
+// ─── Radio ────────────────────────────────────────────────────────────────────
+// Mirrors the Compass "Radio Button" (602:137). Circle, selected = petrol border
+// (bg/brand) + petrol inner dot, error/disabled. Native input (peer pattern).
+// Light + dark.
+
+export type RadioSize = 'sm' | 'md' | 'lg';
+const BOX: Record<RadioSize, number> = { sm: 16, md: 20, lg: 24 };
+const TXT: Record<RadioSize, string> = { sm: 'text-[13px]', md: 'text-[14px]', lg: 'text-[15px]' };
+
+export interface RadioProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
+  label?: React.ReactNode;
   error?: boolean;
+  size?: RadioSize;
 }
 
 export const Radio = forwardRef<HTMLInputElement, RadioProps>(
-  ({ className = '', label, error, disabled, ...props }, ref) => {
-    
+  ({ className, label, error, size = 'md', disabled, ...props }, ref) => {
+    const s = BOX[size];
     return (
-      <label className={`inline-flex items-center gap-2 ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} ${className}`}>
-        <div className="relative flex items-center justify-center">
-          <input
-            type="radio"
-            ref={ref}
-            disabled={disabled}
-            className="peer sr-only"
-            {...props}
-          />
-          <div className={`
-            w-5 h-5 rounded-full flex items-center justify-center transition-colors border-medium 
-            peer-focus-visible:ring-2 peer-focus-visible:ring-primary-500 peer-focus-visible:ring-offset-2
-            ${error ? 'border-error-500' : 'border-neutral-300 peer-checked:border-primary-500'}
-            bg-white
-          `}>
-             <div className="w-2.5 h-2.5 rounded-full bg-primary-500 opacity-0 peer-checked:opacity-100 transition-opacity" />
-          </div>
-        </div>
-        {label && (
-          <span className="text-body text-neutral-900 select-none">
-            {label}
-          </span>
-        )}
+      <label className={cn('inline-flex items-center gap-2', disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer', className)}>
+        <input type="radio" ref={ref} disabled={disabled} aria-invalid={error || undefined} className="peer sr-only" {...props} />
+        <span
+          style={{ width: s, height: s }}
+          className={cn(
+            'relative grid shrink-0 place-items-center rounded-full border bg-surface transition-colors',
+            '[&>.dot]:scale-0 peer-checked:[&>.dot]:scale-100',
+            'peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-primary-500',
+            error ? 'border-error-500' : 'border-stroke peer-checked:border-brand',
+          )}
+        >
+          <span className="dot rounded-full bg-brand transition-transform" style={{ width: Math.round(s * 0.5), height: Math.round(s * 0.5) }} />
+        </span>
+        {label && <span className={cn('select-none text-fg', TXT[size])}>{label}</span>}
       </label>
     );
-  }
+  },
 );
 Radio.displayName = 'Radio';

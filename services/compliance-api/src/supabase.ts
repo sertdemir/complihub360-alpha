@@ -44,11 +44,14 @@ export const supabaseApi = {
         return res.json();
     },
 
-    async select(table: string, match: any) {
+    async select(table: string, match: any, opts: { order?: string; limit?: number } = {}) {
         const queryParams = new URLSearchParams();
         for (const [key, value] of Object.entries(match)) {
             queryParams.append(key, `eq.${value}`);
         }
+        // Optional PostgREST ordering/limits, e.g. order: 'created_at.desc'.
+        if (opts.order) queryParams.append('order', opts.order);
+        if (opts.limit) queryParams.append('limit', String(opts.limit));
         const res = await fetch(`${restUrl}/${table}?${queryParams.toString()}`, {
             method: 'GET',
             headers: {
@@ -57,6 +60,17 @@ export const supabaseApi = {
             }
         });
         if (!res.ok) throw new Error(`Supabase select failed: ${await res.text()}`);
+        return res.json();
+    },
+
+    // Insert-or-update on a unique column (PostgREST merge-duplicates upsert).
+    async upsert(table: string, onConflict: string, data: any) {
+        const res = await fetch(`${restUrl}/${table}?on_conflict=${onConflict}`, {
+            method: 'POST',
+            headers: { ...defaultHeaders, 'Prefer': 'resolution=merge-duplicates,return=representation' },
+            body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error(`Supabase upsert failed: ${await res.text()}`);
         return res.json();
     },
 

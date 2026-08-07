@@ -634,7 +634,9 @@
     "anchorTax": "Tax & VAT",
     "anchorEpr": "EPR & Packaging",
     "anchorPrivacy": "Data & Privacy",
+    "anchorMarketing": "Marketing & SEO",
     "anchorCorporate": "Corporate Structure",
+    "anchorFullsupport": "Full Support",
     "riskLabel": "Risk",
     "whoAffected": "Who is affected",
     "keyObligations": "Key Obligations",
@@ -642,19 +644,197 @@
     "activeMarkets": "Active Markets",
     "startAssessment": "Start {{title}} Assessment",
     "riskAtGlance": "Risk at a Glance",
+    "country": {
+      "label": "Your primary market",
+      "hint": "Filters active markets and personalises risk priorities."
+    },
+    "kpi": {
+      "jurisdictions": "Jurisdictions Covered",
+      "domains": "Compliance Domains",
+      "time": "Guided Assessment",
+      "specialists": "Verified Specialists Network"
+    },
+    "jtbd": {
+      "overline": "Choose your outcome",
+      "title": "What progress are you trying to make?",
+      "body": "CompliHub360 routes you to the right tool based on the job you need done — not the feature you think you need.",
+      "expand": {
+        "title": "Expand Safely",
+        "body": "Identify obligations before entering a new market.",
+        "cta": "Start guided assessment"
+      },
+      "validate": {
+        "title": "Validate Risk",
+        "body": "Check if a campaign, product, or claim is compliant.",
+        "cta": "Run risk check"
+      },
+      "specialist": {
+        "title": "Find Specialist",
+        "body": "Get matched to a verified expert for your case.",
+        "cta": "Browse areas"
+      },
+      "research": {
+        "title": "Research First",
+        "body": "Read structured guides before contacting anyone.",
+        "cta": "Open library"
+      },
+      "maintain": {
+        "title": "Maintain Compliance",
+        "body": "Track obligations, alerts, and renewals over time.",
+        "cta": "Open dashboard"
+      }
+    },
+    "regulations": {
+      "label": "Key Regulations"
+    },
+    "fines": {
+      "label": "What's at Stake",
+      "authoritiesLabel": "Enforced by:"
+    },
+    "specialists": {
+      "label": "Verified Specialists",
+      "count": "{{count}} verified specialists"
+    },
+    "teaser": {
+      "label": "Quick start"
+    },
+    "risk": {
+      "subtitle": "Sorted by typical priority across markets.",
+      "priorityBadge": "Priority for {{country}}",
+      "hint": {
+        "DE": "In Germany, BfDI enforcement and VerpackG together raise the priority of Privacy and EPR.",
+        "FR": "France: CNIL has been the most active EU enforcer of GDPR — Privacy ranks first.",
+        "IT": "Italy: Garante on Privacy plus a complex VAT regime mean Tax & Privacy demand parallel attention.",
+        "ES": "Spain: AEAT (tax) and AEPD (privacy) both publish enforcement bulletins quarterly.",
+        "UK": "UK: ICO (privacy) and HMRC (VAT) — UK GDPR remains aligned but diverges on adequacy.",
+        "US": "US: FTC marketing guidelines, state-level privacy (CCPA/CPRA), and sales-tax nexus shift priorities.",
+        "CH": "Switzerland: revFADP requires EU representatives — Privacy applies even from outside."
+      }
+    },
+    "matrix": {
+      "title": "Side-by-side: every area at a glance",
+      "body": "Quick-scan comparison for researchers and decision-makers. Sort by risk to triage first.",
+      "area": "Compliance Area",
+      "disclaimer": "Indicative ranges based on public regulatory references. Final exposure depends on your specific case — assess via the wizard for accurate guidance.",
+      "col": {
+        "risk": "Risk",
+        "time": "Time to Act",
+        "fine": "Typical Exposure",
+        "markets": "Active Markets",
+        "effort": "Effort"
+      },
+      "tax": {
+        "risk": "High",
+        "time": "Within 30 days of threshold",
+        "fine": "50–300% of evaded tax + interest",
+        "markets": "EU OSS · UK · US Nexus",
+        "effort": "Medium"
+      },
+      "epr": {
+        "risk": "High",
+        "time": "Before market entry",
+        "fine": "up to 2% annual revenue",
+        "markets": "DE · FR · IT · ES · UK",
+        "effort": "Medium"
+      },
+      "privacy": {
+        "risk": "Critical",
+        "time": "Immediate",
+        "fine": "up to €20M / 4% global revenue",
+        "markets": "EU · UK · CH · US",
+        "effort": "High"
+      },
+      "marketing": {
+        "risk": "Medium",
+        "time": "Pre-campaign launch",
+        "fine": "€5k–€500k + product withdrawal",
+        "markets": "EU · UK",
+        "effort": "Low–Medium"
+      },
+      "corporate": {
+        "risk": "Medium",
+        "time": "Strategic (3–12 months)",
+        "fine": "Tax exposure + entity risk",
+        "markets": "EU · UK · US · CH",
+        "effort": "High"
+      },
+      "fullsupport": {
+        "risk": "Bundled",
+        "time": "On request",
+        "fine": "Coverage across all areas",
+        "markets": "All supported markets",
+        "effort": "Managed"
+      }
+    },
+    "howItWorks": {
+      "overline": "Orchestration, not directory",
+      "title": "From uncertainty to structured action — in four steps",
+      "body": "CompliHub360 controls the engagement funnel and enforces response accountability. You stay in control end-to-end.",
+      "stepLabel": "Step {{num}}",
+      "define": {
+        "title": "Define",
+        "body": "Pick your country and compliance area. We anchor the regulatory context first."
+      },
+      "assess": {
+        "title": "Assess",
+        "body": "4–5 sharp questions translate your situation into a structured search profile."
+      },
+      "match": {
+        "title": "Match",
+        "body": "Verified specialists are ranked by relevance, response speed, and quality score."
+      },
+      "engage": {
+        "title": "Engage",
+        "body": "Send one structured request. Track confirmations and SLAs from your dashboard."
+      }
+    },
+    "resourceTeaser": {
+      "overline": "Prefer to research first?",
+      "title": "Read before you reach out",
+      "body": "Structured knowledge for the careful researcher. Every guide is grounded in official, validated regulatory sources.",
+      "openCta": "Open",
+      "library": {
+        "title": "Compliance Library",
+        "body": "Curated regulations, official sources, and structured guides for every area."
+      },
+      "countries": {
+        "title": "Country Guides",
+        "body": "Jurisdiction-specific overviews — DE, FR, IT, ES, UK, CH, US."
+      },
+      "tutorials": {
+        "title": "Tutorials & Walkthroughs",
+        "body": "Step-by-step playbooks for common compliance scenarios."
+      }
+    },
     "tax": {
       "title": "Tax & VAT",
       "risk": "High",
       "headline": "Cross-Border VAT, Delivery Thresholds & Digital Taxation",
       "description": "Managing cross-border VAT obligations, delivery thresholds, and digital taxation rules across international jurisdictions — including OSS and MTD frameworks.",
       "affected": "Cross-border e-commerce operators selling physical or digital products via marketplaces (Amazon) or independent shops (Shopify).",
+      "personaFit": "Best for: Cross-border e-commerce",
       "ob1": "Monitoring international delivery thresholds",
       "ob2": "Determining when local VAT registration becomes mandatory",
       "ob3": "Navigating varying tax rules for physical vs. digital goods",
       "ob4": "OSS registration & reporting",
       "cov1": "Dedicated Tax & VAT Wizard — captures sales model, legal seat, revenue, and target markets",
       "cov2": "Calculates precise vat_likelihood per jurisdiction",
-      "cov3": "Orchestrates matching to specialized VAT consultants by case complexity"
+      "cov3": "Orchestrates matching to specialized VAT consultants by case complexity",
+      "regulations": {
+        "r1": "EU VAT Directive 2006/112/EC",
+        "r2": "OSS / IOSS schemes",
+        "r3": "UK MTD for VAT"
+      },
+      "fines": {
+        "headline": "Typically 50–300% of evaded tax plus interest; cross-border audits common.",
+        "authorities": "BZSt · HMRC · IRS · AEAT · Agenzia Entrate"
+      },
+      "teaser": {
+        "question": "How many EU markets do you sell to?",
+        "o1": "1 market",
+        "o2": "2–4 markets",
+        "o3": "5+ markets"
+      }
     },
     "epr": {
       "title": "EPR & Packaging",
@@ -662,13 +842,29 @@
       "headline": "Extended Producer Responsibility, VerpackG & Recycling Targets",
       "description": "Highly fragmented local environmental regulations, packaging laws (VerpackG), and recycling targets (PRN) that differ drastically by country.",
       "affected": "E-commerce merchants, manufacturers, resellers, and dropshippers selling physical goods with packaging across borders.",
+      "personaFit": "Best for: Manufacturers & resellers",
       "ob1": "Understanding country-specific packaging & environmental laws",
       "ob2": "Determining registration by product category (electronics, apparel, cosmetics)",
       "ob3": "Adhering to local recycling targets to avoid fines",
       "ob4": "Dropshipper responsibility assessment",
       "cov1": "Product & Packaging Wizard — assesses commercial role, target markets, product categories",
       "cov2": "Calculates epr_required_likelihood per jurisdiction",
-      "cov3": "Intelligent edge-case handling: \"Assume Yes\" safety logic for uncertain dropshippers"
+      "cov3": "Intelligent edge-case handling: \"Assume Yes\" safety logic for uncertain dropshippers",
+      "regulations": {
+        "r1": "PPWR (EU) 2024/1781",
+        "r2": "VerpackG (DE)",
+        "r3": "WEEE 2012/19/EU"
+      },
+      "fines": {
+        "headline": "Up to 2% of annual revenue plus market-entry blocks for unregistered producers.",
+        "authorities": "ZSVR · ADEME · CONAI · Environment Agency"
+      },
+      "teaser": {
+        "question": "Do you ship physical goods cross-border?",
+        "o1": "Yes, regularly",
+        "o2": "Sometimes",
+        "o3": "Not yet — planning to"
+      }
     },
     "privacy": {
       "title": "Data & Privacy",
@@ -676,13 +872,59 @@
       "headline": "GDPR, UK GDPR, Cookie Compliance & Data Transfers",
       "description": "Compliance with EU DSGVO (GDPR), UK GDPR, cookie consent management, and the strict regulations governing international data transfers.",
       "affected": "Software founders, SaaS expansion managers, and businesses collecting personal data or using tracking tools while expanding globally.",
+      "personaFit": "Best for: SaaS & data-driven brands",
       "ob1": "Implementing valid consent management",
       "ob2": "Legally securing international data transfers (EU ↔ US)",
       "ob3": "Managing tracking tool compliance (GA4, Meta, TikTok)",
       "ob4": "Cookie banner & privacy policy requirements",
       "cov1": "Data & Privacy Wizard — analyzes target customers, processing locations, tracking stack",
       "cov2": "Calculates privacy_risk_level based on actual tool exposure",
-      "cov3": "Platform itself uses a local PII Redaction Pipeline — zero raw data in AI layer"
+      "cov3": "Platform itself uses a local PII Redaction Pipeline — zero raw data in AI layer",
+      "regulations": {
+        "r1": "GDPR (EU 2016/679)",
+        "r2": "ePrivacy Directive 2002/58/EC",
+        "r3": "UK GDPR · revFADP (CH) · CCPA/CPRA (US)"
+      },
+      "fines": {
+        "headline": "Up to €20M or 4% of global annual revenue (Art. 83 GDPR), whichever is higher.",
+        "authorities": "BfDI · CNIL · ICO · Garante · AEPD · EDÖB"
+      },
+      "teaser": {
+        "question": "Do you process personal data of EU residents?",
+        "o1": "Yes",
+        "o2": "Not sure",
+        "o3": "No"
+      }
+    },
+    "marketing": {
+      "title": "Marketing & SEO",
+      "risk": "Medium",
+      "headline": "Advertising Claims, Health & Sustainability, Consumer Protection",
+      "description": "Cross-border advertising compliance: medical & health claims, comparative ads, sustainability statements, influencer rules, and digital service obligations under DSA.",
+      "affected": "Agencies, e-commerce brands, supplement & health vendors, financial-services marketers, and any business running paid ads or organic SEO across borders.",
+      "personaFit": "Best for: Agencies & DTC brands",
+      "ob1": "Avoiding misleading or unsubstantiated claims",
+      "ob2": "Health, finance & sustainability claim approvals",
+      "ob3": "Influencer marketing & sponsored-content disclosure",
+      "ob4": "DSA / DMA notice-and-action obligations",
+      "cov1": "Marketing & SEO Wizard — captures industry sensitivity, claim types, channels",
+      "cov2": "Calculates marketing_risk_level + flags high-risk claim patterns",
+      "cov3": "Routes to specialists in advertising law and consumer protection",
+      "regulations": {
+        "r1": "UCPD 2005/29/EC (Unfair Commercial Practices)",
+        "r2": "DSA (EU) 2022/2065",
+        "r3": "Green Claims Directive proposal · ASA UK · UWG (DE)"
+      },
+      "fines": {
+        "headline": "€5k–€500k per violation, plus product or campaign withdrawal orders.",
+        "authorities": "Wettbewerbszentrale · DGCCRF · ASA · AGCM · FTC"
+      },
+      "teaser": {
+        "question": "Do you make health or financial claims in ads?",
+        "o1": "Yes",
+        "o2": "Comparative claims only",
+        "o3": "No"
+      }
     },
     "corporate": {
       "title": "Corporate Structure",
@@ -690,18 +932,65 @@
       "headline": "International Company Setup, Legal Form & Local Substance",
       "description": "Navigating international company setup, choosing the correct legal form, establishing local substance, and handling corporate registrations in new jurisdictions.",
       "affected": "Individuals or companies planning to register legal entities, expand teams, or establish corporate presence in foreign markets.",
+      "personaFit": "Best for: International expansion teams",
       "ob1": "Selecting appropriate corporate structure per target country",
       "ob2": "Fulfilling local registration & documentation requirements",
       "ob3": "Establishing local substance and governance",
       "ob4": "Team complexity assessment",
       "cov1": "Corporate & Structure Wizard — evaluates current status, desired markets, team complexity",
       "cov2": "Determines entity_need_level per jurisdiction",
-      "cov3": "Intelligent routing to educational guide paths for uncertain founders"
+      "cov3": "Intelligent routing to educational guide paths for uncertain founders",
+      "regulations": {
+        "r1": "GwG (DE) · AML 6th Directive (EU) 2018/1673",
+        "r2": "HGB · Companies Act 2006 (UK)",
+        "r3": "Beneficial-ownership transparency (EU 2015/849)"
+      },
+      "fines": {
+        "headline": "Personal liability + retroactive tax exposure if substance/structure missing.",
+        "authorities": "Local commercial registries · Tax authorities · AML supervisors"
+      },
+      "teaser": {
+        "question": "Are you planning to register an entity abroad?",
+        "o1": "Yes, this year",
+        "o2": "Exploring options",
+        "o3": "No"
+      }
+    },
+    "fullsupport": {
+      "title": "Full Support",
+      "risk": "Bundled",
+      "headline": "Cross-Domain Compliance — One Coordinated Engagement",
+      "description": "When obligations span multiple categories (Tax + Privacy + EPR + Marketing), Full Support orchestrates all of them under one structured engagement with a senior partner.",
+      "affected": "Operators running multi-category exposure: regulated industries, cross-border SaaS, marketplaces, multi-product brands, or scaleups expanding into 3+ markets.",
+      "personaFit": "Best for: Cross-domain compliance",
+      "ob1": "Coordinating multiple regulatory streams in parallel",
+      "ob2": "Maintaining audit trails across categories",
+      "ob3": "Aligning compliance roadmap with growth plans",
+      "ob4": "SLA-backed response and escalation",
+      "cov1": "Full Support Wizard — captures business size, markets, priority goal, current maturity",
+      "cov2": "Routes to senior partners with cross-domain capacity and SLA commitments",
+      "cov3": "Single-point-of-contact engagement, not multiple isolated requests",
+      "regulations": {
+        "r1": "Coverage across all listed area regulations",
+        "r2": "Ongoing regulatory monitoring",
+        "r3": "Coordinated response framework"
+      },
+      "fines": {
+        "headline": "Aggregated exposure across all areas — Full Support reduces blind spots and missed obligations.",
+        "authorities": "All authorities relevant to your operation"
+      },
+      "teaser": {
+        "question": "How many compliance areas affect you?",
+        "o1": "2",
+        "o2": "3",
+        "o3": "4 or more"
+      }
     },
     "cta": {
       "title": "Not sure which area applies?",
       "body": "Our Wizard asks the right questions and routes you to the correct assessment automatically.",
-      "btn": "Start General Assessment"
+      "btn": "Start General Assessment",
+      "fullSupportBtn": "Or talk to Full Support"
     },
     "footer": {
       "copyright": "© {{year}} CompliHub360. Built in Berlin."
@@ -975,5 +1264,17 @@
     "featIntentDesc": "Transforms unstructured client input into a structured risk profile. The AI is restricted to analyzing compliance context and cannot make binding legal decisions on its own.",
     "featGateTitle": "Triple AI Gate Validator",
     "featGateDesc": "Every AI action must pass three checks: Data Sanitization, Explicit Consent, and Domain Restriction. If any check fails, the workflow gracefully falls back to a deterministic, non-AI process."
+  },
+  "header": {
+    "nav": {
+      "howItWorks": "How it works",
+      "whatWeKnow": "What we know",
+      "voices": "Voices",
+      "pricing": "Pricing",
+      "howMatchingWorks": "How matching works",
+      "dashboard": "Dashboard",
+      "performance": "Performance",
+      "faq": "FAQ"
+    }
   }
 }

@@ -364,7 +364,7 @@ Fields:
 
 * Message (required)  
 * Email (required only if not registered)  
-* Consent checkbox (privacy)
+* Consent checkbox (privacy) — copy per Addendum 2026-07-10: "Your situational context is shared anonymized; your identity is revealed only after the provider confirms." 
 
 CTA:
 
