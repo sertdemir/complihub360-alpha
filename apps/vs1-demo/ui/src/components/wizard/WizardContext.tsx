@@ -1,12 +1,16 @@
 import { createContext, useContext, useReducer, ReactNode } from "react";
 
+// Canonical final 8 domains (lib/domains.ts, decision 2026-08-04) — Full
+// Support removed; Product Compliance, Logistics & Customs, Legal Advisory added.
 export type WizardCategory =
     | "tax-vat"
-    | "epr"
+    | "product-packaging"
     | "data-privacy"
     | "marketing-seo"
-    | "corporate"
-    | "full-support"
+    | "corporate-structure"
+    | "product-compliance"
+    | "logistics-customs"
+    | "legal-advisory"
     | "";
 
 export type BusinessType =

@@ -1909,9 +1909,26 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 //    Output is ANONYMOUS: no name/website/contact — only attributes,
                 //    billing_model and a match score. Identity is revealed post-booking.
                 const country = requestData.country as string | undefined;
-                const wantedCats: string[] = requestData.structured_answers?.domains
+                const rawCats: string[] = requestData.structured_answers?.domains
                     || requestData.structured_answers?.categories
                     || requestData.domains || [];
+                // The wizard sends the canonical final-8 domain slugs; provider
+                // rows carry legacy DB category keys. Expand slugs → DB keys so
+                // the overlap scoring matches both vocabularies.
+                const DOMAIN_TO_DB: Record<string, string[]> = {
+                    'tax-vat': ['vat', 'vat_oss', 'tax'],
+                    'product-packaging': ['epr', 'packaging'],
+                    'data-privacy': ['privacy', 'gdpr', 'dat', 'data-privacy'],
+                    'marketing-seo': ['marketing', 'seo'],
+                    'corporate-structure': ['corporate', 'cst'],
+                    'product-compliance': ['product_compliance', 'psf', 'ce'],
+                    'logistics-customs': ['logistics', 'customs'],
+                    'legal-advisory': ['legal', 'oth'],
+                };
+                // One group per requested domain — a group counts as matched if
+                // the provider carries ANY of its keys (keeps the overlap
+                // denominator = number of requested domains, not synonym count).
+                const wantedGroups: string[][] = rawCats.map((c) => [c, ...(DOMAIN_TO_DB[c] ?? [])]);
 
                 // Downgraded providers (review watchdog, decision 2026-08-06)
                 // stay listed but with heavily reduced visibility — "weniger
@@ -1926,8 +1943,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const scoreOf = (p: any) => {
                     const countryMatch = country && (p.countries_supported || []).includes(country) ? 1 : 0;
                     const cats: string[] = p.categories || [];
-                    const catOverlap = wantedCats.length
-                        ? wantedCats.filter((c) => cats.includes(c)).length / wantedCats.length
+                    const catOverlap = wantedGroups.length
+                        ? wantedGroups.filter((g) => g.some((c) => cats.includes(c))).length / wantedGroups.length
                         : (cats.length ? 0.5 : 0);
                     const relevance = 0.6 * countryMatch + 0.4 * catOverlap;
 

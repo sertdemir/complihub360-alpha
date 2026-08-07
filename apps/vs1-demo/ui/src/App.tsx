@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, usePa
 import { useTranslation } from "react-i18next";
 import { supportedLngs } from "./i18n/config";
 import { SiteHeader } from "./components/layout/SiteHeader";
-import { WizardProvider } from "./components/wizard/WizardContext";
 import { LandingPage } from "./pages/LandingPage";
 import { HomePage } from "./pages/HomePage";
 import { ServicesPage } from "./pages/ServicesPage";
@@ -43,15 +42,7 @@ import { ExportsPage } from "./pages/user/ExportsPage";
 import { ComingSoonPage } from "./pages/user/ComingSoonPage";
 import { LibraryPage } from "./pages/user/LibraryPage";
 // Wizard Shell Steps
-import { WizardPreGateFlow } from "./pages/wizard/WizardPreGateFlow";
-import { GenericWizardFlow } from "./pages/wizard/GenericWizardFlow";
 // Individualized Category Wizards
-import { TaxVatWizard } from "./pages/wizard/flows/TaxVatWizard";
-import { DataPrivacyWizard } from "./pages/wizard/flows/DataPrivacyWizard";
-import { EprWizard } from "./pages/wizard/flows/EprWizard";
-import { MarketingSeoWizard } from "./pages/wizard/flows/MarketingSeoWizard";
-import { CorporateWizard } from "./pages/wizard/flows/CorporateWizard";
-import { FullSupportWizard } from "./pages/wizard/flows/FullSupportWizard";
 // Auth
 import { LoginPage } from "./pages/auth/LoginPage";
 import { ProviderIntakePage } from "./pages/onboarding/ProviderIntakePage";

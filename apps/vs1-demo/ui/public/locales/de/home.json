@@ -44,15 +44,29 @@
       "showMap": "Beispiel-Risk-Map ansehen",
       "closeMap": "Risk Map schließen"
     },
-    "trust": ["Anonym", "Keine Kreditkarte", "Ergebnisse in Ihrem Browser"],
+    "trust": [
+      "Anonym",
+      "Keine Kreditkarte",
+      "Ergebnisse in Ihrem Browser"
+    ],
     "visualCaption": "Sechs Minuten · 4 Fragen · Kein Konto erforderlich",
     "preview": {
       "context": "Cross-Border-Launch — DE → UK + NL",
-      "steps": ["Märkte", "Bereiche", "Volumen", "Übersicht"],
+      "steps": [
+        "Märkte",
+        "Bereiche",
+        "Volumen",
+        "Übersicht"
+      ],
       "stepLabel": "Schritt 2 von 4",
       "title": "Welche Compliance-Bereiche sind relevant?",
       "subtitle": "Wählen Sie alles Zutreffende aus. Wir kartieren nur die Vorschriften, die für Ihren Rahmen relevant sind.",
-      "domains": ["USt & Steuern", "EPR & Verpackung", "DSGVO & Datenschutz", "Marketing-Compliance"],
+      "domains": [
+        "USt & Steuern",
+        "EPR & Verpackung",
+        "DSGVO & Datenschutz",
+        "Marketing-Compliance"
+      ],
       "selectedCount": "2 ausgewählt · 2 offen",
       "back": "Zurück",
       "continue": "Weiter"
@@ -84,27 +98,98 @@
       }
     },
     "cards": {
-      "germany": { "title": "Deutschland", "desc": "Primäres USt-Regime · LUCID-Register" },
-      "unitedKingdom": { "title": "Vereinigtes Königreich", "desc": "Verpackung + USt nach dem Brexit" },
-      "netherlands": { "title": "Niederlande", "desc": "USt + WEEE-Register" },
-      "france": { "title": "Frankreich", "desc": "EPR + AGEC-Compliance" },
-      "italy": { "title": "Italien", "desc": "USt + REACH" },
-      "spain": { "title": "Spanien", "desc": "USt + Ökodesign" },
-      "unitedStates": { "title": "Vereinigte Staaten", "desc": "Sales-Tax-Nexus · Marketplace Facilitator" },
-      "turkiye": { "title": "Türkei", "desc": "USt (KDV) · e-fatura / e-arşiv" },
-      "others": { "title": "Weitere", "desc": "Länderliste öffnen →" },
-      "d2cEcommerce": { "title": "D2C-E-Commerce", "desc": "Online-Direktvertrieb an Endkunden" },
-      "b2bWholesale": { "title": "B2B / Großhandel", "desc": "Verkauf an Unternehmen oder Distributoren" },
-      "marketplace": { "title": "Marktplatz", "desc": "Sie verbinden Käufer + Verkäufer" },
-      "saasDigital": { "title": "SaaS / digital", "desc": "Software, kein physischer Versand" },
-      "hybrid": { "title": "Hybrid", "desc": "Mischung aus B2B- und B2C-Kanälen" },
-      "other": { "title": "Sonstiges", "desc": "Beschreiben Sie es in einem Satz" },
-      "vatTax": { "title": "USt & Steuern", "desc": "Grenzüberschreitende USt, OSS/IOSS, Schwellenwerte" },
-      "eprPackaging": { "title": "EPR & Verpackung", "desc": "Herstellerverantwortung, Register" },
-      "gdprPrivacy": { "title": "DSGVO & Datenschutz", "desc": "DSFA, VVT, Auftragsverarbeitungsverträge" },
-      "marketing": { "title": "Marketing", "desc": "Einwilligung, Cookies, Dark-Pattern-Audits" },
-      "corporate": { "title": "Unternehmen", "desc": "Jahresabschlüsse, wirtschaftlich Berechtigte" },
-      "fullCoverage": { "title": "Komplettabdeckung", "desc": "Bereichsübergreifendes Partner-Routing" }
+      "germany": {
+        "title": "Deutschland",
+        "desc": "Primäres USt-Regime · LUCID-Register"
+      },
+      "unitedKingdom": {
+        "title": "Vereinigtes Königreich",
+        "desc": "Verpackung + USt nach dem Brexit"
+      },
+      "netherlands": {
+        "title": "Niederlande",
+        "desc": "USt + WEEE-Register"
+      },
+      "france": {
+        "title": "Frankreich",
+        "desc": "EPR + AGEC-Compliance"
+      },
+      "italy": {
+        "title": "Italien",
+        "desc": "USt + REACH"
+      },
+      "spain": {
+        "title": "Spanien",
+        "desc": "USt + Ökodesign"
+      },
+      "unitedStates": {
+        "title": "Vereinigte Staaten",
+        "desc": "Sales-Tax-Nexus · Marketplace Facilitator"
+      },
+      "turkiye": {
+        "title": "Türkei",
+        "desc": "USt (KDV) · e-fatura / e-arşiv"
+      },
+      "others": {
+        "title": "Weitere",
+        "desc": "Länderliste öffnen →"
+      },
+      "d2cEcommerce": {
+        "title": "D2C-E-Commerce",
+        "desc": "Online-Direktvertrieb an Endkunden"
+      },
+      "b2bWholesale": {
+        "title": "B2B / Großhandel",
+        "desc": "Verkauf an Unternehmen oder Distributoren"
+      },
+      "marketplace": {
+        "title": "Marktplatz",
+        "desc": "Sie verbinden Käufer + Verkäufer"
+      },
+      "saasDigital": {
+        "title": "SaaS / digital",
+        "desc": "Software, kein physischer Versand"
+      },
+      "hybrid": {
+        "title": "Hybrid",
+        "desc": "Mischung aus B2B- und B2C-Kanälen"
+      },
+      "other": {
+        "title": "Sonstiges",
+        "desc": "Beschreiben Sie es in einem Satz"
+      },
+      "vatTax": {
+        "title": "USt & Steuern",
+        "desc": "Grenzüberschreitende USt, OSS/IOSS, Schwellenwerte"
+      },
+      "eprPackaging": {
+        "title": "Produkt & Verpackung",
+        "desc": "EPR, Herstellerverantwortung, Register"
+      },
+      "gdprPrivacy": {
+        "title": "Daten & Datenschutz",
+        "desc": "DSGVO, AVV, EU-Vertreter"
+      },
+      "marketing": {
+        "title": "Marketing & SEO",
+        "desc": "Einwilligung, Cookies, Werberecht"
+      },
+      "corporate": {
+        "title": "Unternehmen & Struktur",
+        "desc": "Gesellschaften, Betriebsstätte, Meldungen"
+      },
+      "productCompliance": {
+        "title": "Produkt-Compliance",
+        "desc": "CE-Kennzeichnung, Produktsicherheit, GPSR"
+      },
+      "logisticsCustoms": {
+        "title": "Logistik & Zoll",
+        "desc": "EORI, HS-Codes, Intrastat, Zoll"
+      },
+      "legalAdvisory": {
+        "title": "Rechtsberatung",
+        "desc": "Verträge, AGB, Verbraucherrecht"
+      }
     },
     "footer": {
       "next": "Weiter",
@@ -139,18 +224,54 @@
     "add_other": "{{count}} Märkte hinzufügen",
     "done": "Fertig",
     "markets": {
-      "switzerland": { "name": "Schweiz", "desc": "MwSt · kein EU-Mitglied · Registrierungsschwelle" },
-      "austria": { "name": "Österreich", "desc": "EU-USt · OSS · EPR" },
-      "belgium": { "name": "Belgien", "desc": "EU-USt · EPR (regional)" },
-      "sweden": { "name": "Schweden", "desc": "EU-USt · FTI-Register · EPR" },
-      "denmark": { "name": "Dänemark", "desc": "EU-USt · DRS · EPR" },
-      "poland": { "name": "Polen", "desc": "EU-USt · JPK_VAT · EPR ROP" },
-      "czechia": { "name": "Tschechien", "desc": "EU-USt · EPR · EET" },
-      "romania": { "name": "Rumänien", "desc": "EU-USt · SAF-T · e-Factura" },
-      "norway": { "name": "Norwegen", "desc": "Nicht-EU · VOEC-Verfahren" },
-      "ireland": { "name": "Irland", "desc": "EU-USt · Niedrigsteuer-SaaS" },
-      "finland": { "name": "Finnland", "desc": "EU-USt · OSS · EPR" },
-      "portugal": { "name": "Portugal", "desc": "EU-USt · SAF-T-Dateiformat" }
+      "switzerland": {
+        "name": "Schweiz",
+        "desc": "MwSt · kein EU-Mitglied · Registrierungsschwelle"
+      },
+      "austria": {
+        "name": "Österreich",
+        "desc": "EU-USt · OSS · EPR"
+      },
+      "belgium": {
+        "name": "Belgien",
+        "desc": "EU-USt · EPR (regional)"
+      },
+      "sweden": {
+        "name": "Schweden",
+        "desc": "EU-USt · FTI-Register · EPR"
+      },
+      "denmark": {
+        "name": "Dänemark",
+        "desc": "EU-USt · DRS · EPR"
+      },
+      "poland": {
+        "name": "Polen",
+        "desc": "EU-USt · JPK_VAT · EPR ROP"
+      },
+      "czechia": {
+        "name": "Tschechien",
+        "desc": "EU-USt · EPR · EET"
+      },
+      "romania": {
+        "name": "Rumänien",
+        "desc": "EU-USt · SAF-T · e-Factura"
+      },
+      "norway": {
+        "name": "Norwegen",
+        "desc": "Nicht-EU · VOEC-Verfahren"
+      },
+      "ireland": {
+        "name": "Irland",
+        "desc": "EU-USt · Niedrigsteuer-SaaS"
+      },
+      "finland": {
+        "name": "Finnland",
+        "desc": "EU-USt · OSS · EPR"
+      },
+      "portugal": {
+        "name": "Portugal",
+        "desc": "EU-USt · SAF-T-Dateiformat"
+      }
     }
   },
   "countryInfo": {
@@ -309,7 +430,11 @@
       "eyebrow": "Kostenloses Konto",
       "title": "Fortschritt speichern",
       "desc": "Behalten Sie Ihre Risk Map, lassen Sie sich mit Verified Partnern matchen und erhalten Sie Hinweise, wenn sich Regeln ändern — kostenlos, ohne Kreditkarte. Wir senden Ihnen einen Magic-Link per E-Mail, es gibt also kein Passwort zu merken.",
-      "benefits": ["Ihr gespeichertes Risk-Map-Dossier", "Verified-Partner-Matching", "Hinweise, wenn sich Vorschriften ändern"],
+      "benefits": [
+        "Ihr gespeichertes Risk-Map-Dossier",
+        "Verified-Partner-Matching",
+        "Hinweise, wenn sich Vorschriften ändern"
+      ],
       "confirm": "Ihr Fortschritt ist gesichert.",
       "cta": "Kostenloses Konto erstellen"
     },
@@ -317,7 +442,11 @@
       "eyebrow": "Kostenloses Konto",
       "title": "Echtzeit-Hinweise, kostenlos",
       "desc": "Erhalten Sie Echtzeit-Hinweise, sobald sich eine Vorschrift in Ihren Märkten ändert — plus Ihre gespeicherte Risk Map und Verified-Partner-Matching. Kostenlos, ohne Kreditkarte. Wir senden Ihnen einen Magic-Link per E-Mail, ein Passwort ist nicht nötig.",
-      "benefits": ["Regulatorische Hinweise in Echtzeit", "Ihr gespeichertes Risk-Map-Dossier", "Verified-Partner-Matching"],
+      "benefits": [
+        "Regulatorische Hinweise in Echtzeit",
+        "Ihr gespeichertes Risk-Map-Dossier",
+        "Verified-Partner-Matching"
+      ],
       "confirm": "Klicken Sie auf den Link, um die Einrichtung Ihres kostenlosen Kontos abzuschließen.",
       "cta": "Kostenloses Konto erstellen"
     },
@@ -337,19 +466,73 @@
     "eyebrow": "Ihre Risk Map",
     "title": "Das gilt für Sie.",
     "stats": [
-      { "value": "8", "label": "Pflichten" },
-      { "value": "€25k", "label": "Gesamtrisiko" },
-      { "value": "14 Tage", "label": "mittlere Frist" },
-      { "value": "3", "label": "Partner bereit" }
+      {
+        "value": "8",
+        "label": "Pflichten"
+      },
+      {
+        "value": "€25k",
+        "label": "Gesamtrisiko"
+      },
+      {
+        "value": "14 Tage",
+        "label": "mittlere Frist"
+      },
+      {
+        "value": "3",
+        "label": "Partner bereit"
+      }
     ],
     "rows": [
-      { "title": "OSS-Quartalsmeldung", "detail": "Zuletzt eingereicht: Q1 2025 · Strafe: €5,000 + 1 %/Monat · UStG §18i", "market": "DE · NL", "due": "30. Apr", "dueSub": "6 Tage" },
-      { "title": "USt-Registrierung — UK", "detail": "Schwellenprüfung nach dem Brexit · bis zu €20,000 · VATA §3", "market": "UK", "due": "15. Mai", "dueSub": "21 Tage" },
-      { "title": "EPR-Verpackungsregistrierung (LUCID)", "detail": "Herstellerstatus zu bestätigen · bis zu €50,000 · VerpackG", "market": "DE", "due": "02. Mai", "dueSub": "8 Tage" },
-      { "title": "EPR-Registrierungsverlängerung (PackUK)", "detail": "Zuletzt eingereicht: Apr 2024 · 4 % des UK-Umsatzes · Packaging Regs", "market": "UK", "due": "15. Mai", "dueSub": "21 Tage" },
-      { "title": "Cookie-Banner + Einwilligungsnachweise", "detail": "B2C-Nutzer in der EU: erforderlich · GDPR Art. 6/7 · TTDSG §25", "market": "EU-weit", "due": "Laufend", "dueSub": "Aktiv" },
-      { "title": "DSFA für Tracking-Pixel", "detail": "Abhängig vom Tracking-Setup · GDPR Art. 35", "market": "EU-weit", "due": "—", "dueSub": "Abhängig von den Tools" },
-      { "title": "Reverse-Charge-Verfahren", "detail": "Grenzüberschreitender B2B-Anteil >0 · UStG §13b", "market": "DE · NL", "due": "—", "dueSub": "Abhängig vom Mix" }
+      {
+        "title": "OSS-Quartalsmeldung",
+        "detail": "Zuletzt eingereicht: Q1 2025 · Strafe: €5,000 + 1 %/Monat · UStG §18i",
+        "market": "DE · NL",
+        "due": "30. Apr",
+        "dueSub": "6 Tage"
+      },
+      {
+        "title": "USt-Registrierung — UK",
+        "detail": "Schwellenprüfung nach dem Brexit · bis zu €20,000 · VATA §3",
+        "market": "UK",
+        "due": "15. Mai",
+        "dueSub": "21 Tage"
+      },
+      {
+        "title": "EPR-Verpackungsregistrierung (LUCID)",
+        "detail": "Herstellerstatus zu bestätigen · bis zu €50,000 · VerpackG",
+        "market": "DE",
+        "due": "02. Mai",
+        "dueSub": "8 Tage"
+      },
+      {
+        "title": "EPR-Registrierungsverlängerung (PackUK)",
+        "detail": "Zuletzt eingereicht: Apr 2024 · 4 % des UK-Umsatzes · Packaging Regs",
+        "market": "UK",
+        "due": "15. Mai",
+        "dueSub": "21 Tage"
+      },
+      {
+        "title": "Cookie-Banner + Einwilligungsnachweise",
+        "detail": "B2C-Nutzer in der EU: erforderlich · GDPR Art. 6/7 · TTDSG §25",
+        "market": "EU-weit",
+        "due": "Laufend",
+        "dueSub": "Aktiv"
+      },
+      {
+        "title": "DSFA für Tracking-Pixel",
+        "detail": "Abhängig vom Tracking-Setup · GDPR Art. 35",
+        "market": "EU-weit",
+        "due": "—",
+        "dueSub": "Abhängig von den Tools"
+      },
+      {
+        "title": "Reverse-Charge-Verfahren",
+        "detail": "Grenzüberschreitender B2B-Anteil >0 · UStG §13b",
+        "market": "DE · NL",
+        "due": "—",
+        "dueSub": "Abhängig vom Mix"
+      }
     ]
   },
   "riskMap": {
@@ -361,20 +544,80 @@
     },
     "subtitle": "Basierend auf Deutschland · Vereinigtes Königreich · Niederlande. D2C-E-Commerce, €2M—€5M Umsatz. USt · EPR · Datenschutz im Fokus.",
     "stats": [
-      { "value": "8", "label": "Identifizierte Pflichten" },
-      { "value": "€25k", "label": "Gesamtrisiko" },
-      { "value": "14 Tage", "label": "Mittlere Frist" },
-      { "value": "3", "label": "Verified Partner bereit" }
+      {
+        "value": "8",
+        "label": "Identifizierte Pflichten"
+      },
+      {
+        "value": "€25k",
+        "label": "Gesamtrisiko"
+      },
+      {
+        "value": "14 Tage",
+        "label": "Mittlere Frist"
+      },
+      {
+        "value": "3",
+        "label": "Verified Partner bereit"
+      }
     ],
     "rows": [
-      { "title": "OSS-Quartalsmeldung", "detail": "Zuletzt eingereicht: Q1 2025 · Strafe: €5,000 + 1 %/Monat · UStG §18i (OSS)", "market": "DE · NL", "due": "30. Apr", "dueSub": "6 Tage" },
-      { "title": "USt-Registrierung — UK", "detail": "Schwellenprüfung nach dem Brexit erforderlich · Strafe: bis zu €20,000 · UK VATA 1994 §3", "market": "UK", "due": "15. Mai", "dueSub": "21 Tage" },
-      { "title": "EPR-Verpackungsregistrierung (LUCID)", "detail": "Herstellerstatus zu bestätigen · Strafe: bis zu €50,000 · VerpackG Art. 9 Abs. 1", "market": "DE", "due": "02. Mai", "dueSub": "8 Tage" },
-      { "title": "EPR-Registrierungsverlängerung (PackUK)", "detail": "Zuletzt eingereicht: Apr 2024 · Strafe: 4 % des UK-Umsatzes · UK Packaging Regs. 2023 §7", "market": "UK", "due": "15. Mai", "dueSub": "21 Tage" },
-      { "title": "Cookie-Banner + Einwilligungsnachweise", "detail": "B2C-Nutzer in der EU → erforderlich · GDPR Art. 6/7 · TTDSG §25", "market": "EU-weit", "due": "Laufend", "dueSub": "Aktiv" },
-      { "title": "DSFA für Tracking-Pixel", "detail": "Abhängig vom Tracking-Setup · GDPR Art. 35", "market": "EU-weit", "due": "—", "dueSub": "Abhängig von den Tools" },
-      { "title": "Reverse-Charge-Verfahren", "detail": "Gilt nur bei grenzüberschreitendem B2B-Anteil >0 · UStG §13b", "market": "DE · NL", "due": "—", "dueSub": "Abhängig vom B2B-Mix" },
-      { "title": "Aktualisierung wirtschaftlich Berechtigter", "detail": "Zuletzt gemeldet: Mär 2025 · Strafe: €1,000–5,000 · GwG §20 Abs. 1", "market": "DE", "due": "30. Jun", "dueSub": "laufend" }
+      {
+        "title": "OSS-Quartalsmeldung",
+        "detail": "Zuletzt eingereicht: Q1 2025 · Strafe: €5,000 + 1 %/Monat · UStG §18i (OSS)",
+        "market": "DE · NL",
+        "due": "30. Apr",
+        "dueSub": "6 Tage"
+      },
+      {
+        "title": "USt-Registrierung — UK",
+        "detail": "Schwellenprüfung nach dem Brexit erforderlich · Strafe: bis zu €20,000 · UK VATA 1994 §3",
+        "market": "UK",
+        "due": "15. Mai",
+        "dueSub": "21 Tage"
+      },
+      {
+        "title": "EPR-Verpackungsregistrierung (LUCID)",
+        "detail": "Herstellerstatus zu bestätigen · Strafe: bis zu €50,000 · VerpackG Art. 9 Abs. 1",
+        "market": "DE",
+        "due": "02. Mai",
+        "dueSub": "8 Tage"
+      },
+      {
+        "title": "EPR-Registrierungsverlängerung (PackUK)",
+        "detail": "Zuletzt eingereicht: Apr 2024 · Strafe: 4 % des UK-Umsatzes · UK Packaging Regs. 2023 §7",
+        "market": "UK",
+        "due": "15. Mai",
+        "dueSub": "21 Tage"
+      },
+      {
+        "title": "Cookie-Banner + Einwilligungsnachweise",
+        "detail": "B2C-Nutzer in der EU → erforderlich · GDPR Art. 6/7 · TTDSG §25",
+        "market": "EU-weit",
+        "due": "Laufend",
+        "dueSub": "Aktiv"
+      },
+      {
+        "title": "DSFA für Tracking-Pixel",
+        "detail": "Abhängig vom Tracking-Setup · GDPR Art. 35",
+        "market": "EU-weit",
+        "due": "—",
+        "dueSub": "Abhängig von den Tools"
+      },
+      {
+        "title": "Reverse-Charge-Verfahren",
+        "detail": "Gilt nur bei grenzüberschreitendem B2B-Anteil >0 · UStG §13b",
+        "market": "DE · NL",
+        "due": "—",
+        "dueSub": "Abhängig vom B2B-Mix"
+      },
+      {
+        "title": "Aktualisierung wirtschaftlich Berechtigter",
+        "detail": "Zuletzt gemeldet: Mär 2025 · Strafe: €1,000–5,000 · GwG §20 Abs. 1",
+        "market": "DE",
+        "due": "30. Jun",
+        "dueSub": "laufend"
+      }
     ],
     "partnersEyebrow": "3 Verified Partner gematcht",
     "partnersTitle": "Wir haben gefunden, wer das umsetzen kann.",
@@ -398,7 +641,10 @@
       {
         "place": "München, DE",
         "specialty": "Spezialist für USt & OSS",
-        "tags": ["UStG §18i (OSS)", "DE · NL · FR"],
+        "tags": [
+          "UStG §18i (OSS)",
+          "DE · NL · FR"
+        ],
         "covers": "deckt Ihre 2 kritischen Prioritäten ab",
         "response": "Antwort in 24h",
         "engagements": "142 bisherige Mandate"
@@ -406,7 +652,10 @@
       {
         "place": "London, UK",
         "specialty": "UK-Verpackungs-Compliance",
-        "tags": ["UK Packaging Regs.", "PackUK · EPR-Verlängerung"],
+        "tags": [
+          "UK Packaging Regs.",
+          "PackUK · EPR-Verlängerung"
+        ],
         "covers": "deckt Ihre 1 hohe Priorität ab",
         "response": "Antwort in 21h",
         "engagements": "86 bisherige Mandate"
@@ -414,7 +663,10 @@
       {
         "place": "Paris, FR",
         "specialty": "Beratung für grenzüberschreitende EPR",
-        "tags": ["VerpackG", "LUCID · grenzüberschreitend"],
+        "tags": [
+          "VerpackG",
+          "LUCID · grenzüberschreitend"
+        ],
         "covers": "deckt Ihre 1 mittlere Priorität ab",
         "response": "Antwort in 36h",
         "engagements": "211 bisherige Mandate"
@@ -425,10 +677,22 @@
       "sub": "Vom Assessment zum passenden Spezialisten"
     },
     "steps": [
-      { "title": "Assessment starten", "desc": "4–5 Fragen. Unter 2 Minuten. Kein Konto nötig." },
-      { "title": "Risk Map ansehen", "desc": "Anonyme Vorschau, strukturiert, mit Quellenangaben." },
-      { "title": "Registrieren, um Matches zu sehen", "desc": "Das Anbieter-Matching ist registrierten Konten vorbehalten." },
-      { "title": "Strukturierte Übergaben erhalten", "desc": "Der Anbieter antwortet per Magic-Link in 24–48h. Kein Discovery-Call." }
+      {
+        "title": "Assessment starten",
+        "desc": "4–5 Fragen. Unter 2 Minuten. Kein Konto nötig."
+      },
+      {
+        "title": "Risk Map ansehen",
+        "desc": "Anonyme Vorschau, strukturiert, mit Quellenangaben."
+      },
+      {
+        "title": "Registrieren, um Matches zu sehen",
+        "desc": "Das Anbieter-Matching ist registrierten Konten vorbehalten."
+      },
+      {
+        "title": "Strukturierte Übergaben erhalten",
+        "desc": "Der Anbieter antwortet per Magic-Link in 24–48h. Kein Discovery-Call."
+      }
     ]
   },
   "twoReflexes": {
@@ -450,14 +714,32 @@
     "row1Lead": "Jedes öffentliche Dashboard sagt Ihnen, was die Regeln besagen. Keines sagt Ihnen, was für Ihren Betrieb auf dem Spiel steht — in Prioritätsreihenfolge, mit der Quelle direkt dabei.",
     "row2Lead": "Verzeichnisse listen alle. Sie prüfen niemanden. Wir prüfen auf Abdeckung, Reaktionszeit und Ergebnisse — und binden jedes Mandat an gemeinsame Verantwortung.",
     "row1": [
-      { "title": "Nach Risiko priorisiert, nicht erschöpfend", "desc": "Von Kritisch bis Niedrig. Vier bis zwölf Punkte zu jedem Zeitpunkt. Keine 200-Seiten-Checklisten." },
-      { "title": "Direkt von den Regulierungsbehörden bezogen", "desc": "Jeder Eintrag verlinkt auf die offizielle Bekanntmachung, Registerseite oder Rechtsprechung, aus der er stammt." },
-      { "title": "Gegen Veralten aktualisiert", "desc": "Regeln ändern sich. Die Karte wird aktualisiert, wenn eine Frist verschoben wird, eine Behörde präzisiert oder ein Register öffnet." },
-      { "title": "Klare Sprache als Standard", "desc": "Wenn eine Klausel einen Absatz zur Erklärung braucht, sehen Sie den Absatz — nicht die Klausel." }
+      {
+        "title": "Nach Risiko priorisiert, nicht erschöpfend",
+        "desc": "Von Kritisch bis Niedrig. Vier bis zwölf Punkte zu jedem Zeitpunkt. Keine 200-Seiten-Checklisten."
+      },
+      {
+        "title": "Direkt von den Regulierungsbehörden bezogen",
+        "desc": "Jeder Eintrag verlinkt auf die offizielle Bekanntmachung, Registerseite oder Rechtsprechung, aus der er stammt."
+      },
+      {
+        "title": "Gegen Veralten aktualisiert",
+        "desc": "Regeln ändern sich. Die Karte wird aktualisiert, wenn eine Frist verschoben wird, eine Behörde präzisiert oder ein Register öffnet."
+      },
+      {
+        "title": "Klare Sprache als Standard",
+        "desc": "Wenn eine Klausel einen Absatz zur Erklärung braucht, sehen Sie den Absatz — nicht die Klausel."
+      }
     ],
     "row2": [
-      { "title": "Von uns verifiziert, nicht selbst eingetragen", "desc": "Jeder Verified Partner wird auf Abdeckung, Reaktionszeit und belegte Ergebnisse geprüft — kein Verzeichnis." },
-      { "title": "Gemeinsame Verantwortung eingebaut", "desc": "Jedes Mandat ist vertraglich geregelt. Partner übernehmen Verantwortung für die Sache, nicht nur für den Rat." }
+      {
+        "title": "Von uns verifiziert, nicht selbst eingetragen",
+        "desc": "Jeder Verified Partner wird auf Abdeckung, Reaktionszeit und belegte Ergebnisse geprüft — kein Verzeichnis."
+      },
+      {
+        "title": "Gemeinsame Verantwortung eingebaut",
+        "desc": "Jedes Mandat ist vertraglich geregelt. Partner übernehmen Verantwortung für die Sache, nicht nur für den Rat."
+      }
     ]
   },
   "domains": {
@@ -625,10 +907,22 @@
     },
     "panel3": {
       "timeline": [
-        { "date": "24. Apr", "label": "Anfrage gesendet" },
-        { "date": "25. Apr", "label": "Partner hat angenommen · 21h" },
-        { "date": "28. Apr", "label": "Angebot erhalten" },
-        { "date": "02. Mai", "label": "Umfang vereinbart" }
+        {
+          "date": "24. Apr",
+          "label": "Anfrage gesendet"
+        },
+        {
+          "date": "25. Apr",
+          "label": "Partner hat angenommen · 21h"
+        },
+        {
+          "date": "28. Apr",
+          "label": "Angebot erhalten"
+        },
+        {
+          "date": "02. Mai",
+          "label": "Umfang vereinbart"
+        }
       ],
       "export": "Export"
     }
@@ -677,14 +971,32 @@
       "beta": "Startet mit der Beta"
     },
     "stats": [
-      { "label": "Risk Map", "value": "8 Prioritäten" },
-      { "label": "Aktive Mandate", "value": "2" },
-      { "label": "Gematchte Verified Partner", "value": "3" },
-      { "label": "Verlaufseinträge", "value": "47" }
+      {
+        "label": "Risk Map",
+        "value": "8 Prioritäten"
+      },
+      {
+        "label": "Aktive Mandate",
+        "value": "2"
+      },
+      {
+        "label": "Gematchte Verified Partner",
+        "value": "3"
+      },
+      {
+        "label": "Verlaufseinträge",
+        "value": "47"
+      }
     ],
     "news": [
-      { "tag": "DE · VAT", "text": "OSS-Schwellenwert für Q3 aktualisiert" },
-      { "tag": "UK · EPR", "text": "PackUK öffnet Register für 2026" }
+      {
+        "tag": "DE · VAT",
+        "text": "OSS-Schwellenwert für Q3 aktualisiert"
+      },
+      {
+        "tag": "UK · EPR",
+        "text": "PackUK öffnet Register für 2026"
+      }
     ],
     "workspace": {
       "title": "Ihre Karte. Ihre Partner. Ihr Verlauf. Dauerhaft.",
@@ -737,7 +1049,12 @@
     ]
   },
   "entryDoor": {
-    "journey": ["6 Min.", "Risk Map", "Registrieren", "Workspace"],
+    "journey": [
+      "6 Min.",
+      "Risk Map",
+      "Registrieren",
+      "Workspace"
+    ],
     "eyebrow": "Hier beginnen",
     "title": {
       "pre": "Ein Assessment. Ein Ergebnis. Der Weg wird ",

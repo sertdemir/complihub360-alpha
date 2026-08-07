@@ -34,9 +34,19 @@ const SESSIONS: Row[] = [
 ];
 
 const DOMAIN_LABEL: Record<string, string> = {
+  // legacy DB category keys
   vat: 'Tax & VAT', tax: 'Tax & VAT',
   privacy: 'Data & Privacy', gdpr: 'Data & Privacy', data: 'Data & Privacy',
   epr: 'Product & Packaging', packaging: 'Product & Packaging',
+  // canonical final-8 slugs (wizard v2)
+  'tax-vat': 'Tax & VAT',
+  'product-packaging': 'Product & Packaging',
+  'data-privacy': 'Data & Privacy',
+  'marketing-seo': 'Marketing & SEO',
+  'corporate-structure': 'Corporate & Structure',
+  'product-compliance': 'Product Compliance',
+  'logistics-customs': 'Logistics & Customs',
+  'legal-advisory': 'Legal Advisory',
 };
 
 // Canonical English domain label → userws translation key (display only).

@@ -19,6 +19,8 @@ import {
   Cloud,
   Layers,
   MoreHorizontal,
+  Truck,
+  Scale,
   type LucideIcon,
 } from 'lucide-react';
 import { X } from 'lucide-react';
@@ -80,15 +82,18 @@ const STEPS: StepDef[] = [
   {
     rail: 2,
     key: 'domains',
+    // Final 8 domains (decision 2026-08-04) — Full Coverage removed.
     cards: [
       { id: 'VAT & Tax', key: 'vatTax', icon: BarChart3 },
-      { id: 'EPR & Packaging', key: 'eprPackaging', icon: Globe },
-      { id: 'GDPR & Privacy', key: 'gdprPrivacy', icon: Shield },
-      { id: 'Marketing', key: 'marketing', icon: MessageSquare },
-      { id: 'Corporate', key: 'corporate', icon: Building2 },
-      { id: 'Full Coverage', key: 'fullCoverage', icon: ShieldCheck },
+      { id: 'Product & Packaging', key: 'eprPackaging', icon: Globe },
+      { id: 'Data & Privacy', key: 'gdprPrivacy', icon: Shield },
+      { id: 'Marketing & SEO', key: 'marketing', icon: MessageSquare },
+      { id: 'Corporate & Structure', key: 'corporate', icon: Building2 },
+      { id: 'Product Compliance', key: 'productCompliance', icon: ShieldCheck },
+      { id: 'Logistics & Customs', key: 'logisticsCustoms', icon: Truck },
+      { id: 'Legal Advisory', key: 'legalAdvisory', icon: Scale },
     ],
-    picks: ['VAT & Tax', 'EPR & Packaging', 'GDPR & Privacy'],
+    picks: ['VAT & Tax', 'Product & Packaging', 'Data & Privacy'],
     footerKey: 'skipRoute',
   },
 ];
@@ -103,8 +108,10 @@ const MARKET_CODE: Record<string, string> = {
   Italy: 'IT', Spain: 'ES', 'United States': 'US', 'Türkiye': 'TR',
 };
 const CATEGORY_CODE: Record<string, WizardCategory> = {
-  'VAT & Tax': 'tax-vat', 'EPR & Packaging': 'epr', 'GDPR & Privacy': 'data-privacy',
-  Marketing: 'marketing-seo', Corporate: 'corporate', 'Full Coverage': 'full-support',
+  'VAT & Tax': 'tax-vat', 'Product & Packaging': 'product-packaging', 'Data & Privacy': 'data-privacy',
+  'Marketing & SEO': 'marketing-seo', 'Corporate & Structure': 'corporate-structure',
+  'Product Compliance': 'product-compliance', 'Logistics & Customs': 'logistics-customs',
+  'Legal Advisory': 'legal-advisory',
 };
 const BUSINESS_CODE: Record<string, BusinessType> = {
   'D2C e-commerce': 'ecommerce', 'B2B / wholesale': 'other', Marketplace: 'marketplace',
