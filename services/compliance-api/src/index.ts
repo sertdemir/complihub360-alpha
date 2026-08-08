@@ -1943,12 +1943,16 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     || requestData.domains || [];
                 const focusDomains = [...new Set(requestedSlugs.map((s) => SLUG_TO_ENGINE[s]).filter(Boolean))];
                 try {
-                    engineResults = generateRelevantSubdomains({
-                        countries: engineCountries.length ? engineCountries : ['DE'],
-                        industry: requestData.structured_answers?.industry as IndustryType,
-                        businessModel: requestData.structured_answers?.businessModel as BusinessModel,
-                        focusDomains,
-                    });
+                    // No known market at all → no laws rather than a silent DE
+                    // fallback (foreign users must not see German statutes).
+                    if (engineCountries.length) {
+                        engineResults = generateRelevantSubdomains({
+                            countries: engineCountries,
+                            industry: requestData.structured_answers?.industry as IndustryType,
+                            businessModel: requestData.structured_answers?.businessModel as BusinessModel,
+                            focusDomains,
+                        });
+                    }
                 } catch (engineErr) {
                     console.warn('compliance-engine country profile missing:', String(engineErr));
                 }
