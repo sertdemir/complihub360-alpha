@@ -1,5 +1,14 @@
 # Stack-Audit: 13-Layer-Abgleich (2026-08-07)
 
+> **Status-Update 2026-08-08:** Alle P0- und P1-Gaps sind umgesetzt.
+> P0: Keep-Alive + Backup-Cron + getestetes Restore-Runbook (`63c64a88`),
+> PR #2 nach main mit aktiven CI-Gates (`3439b6f9`). P1: FE-API-Key aus dem
+> Bundle entfernt + Public-Route-Allowlist (`5834a21f`), Error-Alerting-
+> Watchdog (`be840f9f`), API-Auto-Deploy in CI (`a93f72a6`), API-Test-
+> Grundstock 20 Tests (`e322d622`). Offen bleiben nur die bewusst
+> vertagten Punkte (P2 + CDN/Load-Balancing) und der Paid-Tier-Wechsel
+> bei Beta-Start.
+
 Abgleich des CompliHub360-Stacks gegen die 13-Layer-Full-Stack-Checkliste
 (gemerkt 2026-08-04). Methode: Code-/Config-Inspektion (Repo, CI-Workflows,
 VPS per SSH, Supabase) — read-only, keine Änderungen. Bewertungsskala:
