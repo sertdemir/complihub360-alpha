@@ -3,10 +3,10 @@
 #                 scripts/deploy-staging.sh)
 #   deploy-api  — esbuild-bundles compliance-api and restarts its container
 #                 (replaces the manual scp + compose-restart routine)
-# Requires two repo secrets:
-#   VPS_SSH_KEY      — private key of the dedicated CI deploy keypair
-#   STAGING_API_KEY  — x-api-key baked into the frontend bundle
-# Until both exist, runs fail at the SSH step — that is expected, not a bug.
+# Requires one repo secret:
+#   VPS_SSH_KEY — private key of the dedicated CI deploy keypair
+# (The former STAGING_API_KEY bundle bake was removed with audit P1 #4 —
+# the frontend authenticates via user JWT + public guest routes only.)
 name: Deploy Staging
 
 on:
@@ -46,7 +46,9 @@ jobs:
 
       - name: Build frontend
         env:
-          VITE_DEV_API_KEY: ${{ secrets.STAGING_API_KEY }}
+          # No shared x-api-key in the bundle (audit P1 #4): guests use the
+          # public routes, everything else authenticates with the user's JWT.
+          # Demo one-click logins therefore see fixture data on staging.
           # Public by design (browser-safe anon key); demo flag keeps the
           # one-click stakeholder logins alongside real auth on staging.
           VITE_SUPABASE_URL: https://kqylqwogxbiwpnomkzsn.supabase.co

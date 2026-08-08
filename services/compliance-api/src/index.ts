@@ -104,6 +104,23 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     // wins over user_metadata, mirroring the frontend's roleFromUser()).
     let authIsAdmin = false;
 
+    // Public routes (audit P1 #4): guest-usable by DESIGN — the funnel runs
+    // pre-registration (spec v2 §3: wizard → risk map before the gate), and
+    // the provider routes carry their own single-use token / intake secret as
+    // the credential. Everything else requires a user JWT or the server key;
+    // the frontend bundle no longer ships a shared x-api-key. A JWT that IS
+    // sent on a public route is still verified and attaches identity.
+    const PUBLIC_ROUTES: Array<[string, RegExp]> = [
+        ['POST', /^\/api\/v1\/search$/],                   // guest risk map
+        ['POST', /^\/api\/v1\/session$/],                  // guest wizard-session save (guest_key)
+        ['GET', /^\/api\/v1\/sessions(\?|$)/],             // guest session list (guest_key = bearer)
+        ['POST', /^\/api\/v1\/provider\/intake$/],         // intake token checked in-handler
+        ['GET', /^\/api\/v1\/provider\/magic\//],          // single-use token IS the credential
+        ['POST', /^\/api\/v1\/provider\/confirm$/],
+        ['POST', /^\/api\/v1\/provider\/confirm-email$/],
+    ];
+    const isPublicRoute = PUBLIC_ROUTES.some(([m, rx]) => req.method === m && rx.test(req.url || ''));
+
     // 2.c Native Supabase JWT Authentication (Skip for /health and /ready)
     if (req.url !== '/health' && req.url !== '/ready') {
         let isAuthenticated = false;
@@ -161,7 +178,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             authViaApiKey = true;
         }
 
-        if (!isAuthenticated) {
+        if (!isAuthenticated && !isPublicRoute) {
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(401, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({

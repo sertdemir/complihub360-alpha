@@ -118,10 +118,46 @@ describe('auth gate', () => {
         expect(r.body.ok).toBe(true);
     });
 
-    it('401s API routes without credentials', async () => {
-        const r = await api('/api/v1/search', { method: 'POST', body: '{}', auth: 'none' });
+    it('401s protected routes without credentials', async () => {
+        const r = await api('/api/v1/bookings', { auth: 'none' });
         expect(r.status).toBe(401);
         expect(r.body.errorCode).toBe('UNAUTHORIZED');
+    });
+
+    // Audit P1 #4: the frontend ships NO shared api key — the guest funnel
+    // runs on explicitly public routes, everything else stays gated.
+    it('serves the guest funnel without any credentials (public routes)', async () => {
+        seedProvider();
+        const search = await api('/api/v1/search', {
+            method: 'POST', auth: 'none',
+            body: JSON.stringify({ country: 'DE', structured_answers: { domains: ['tax-vat'] } }),
+        });
+        expect(search.status).toBe(200);
+        expect(search.body.providers).toHaveLength(1);
+
+        const save = await api('/api/v1/session', {
+            method: 'POST', auth: 'none',
+            body: JSON.stringify({ guest_key: 'guest-abc', country: 'DE', categories: ['tax-vat'] }),
+        });
+        expect([200, 201]).toContain(save.status);
+    });
+
+    it('keeps admin + booking routes closed for guests', async () => {
+        const tick = await api('/api/v1/admin/watchers/tick', { method: 'POST', body: '{}', auth: 'none' });
+        expect(tick.status).toBe(401);
+        const book = await api('/api/v1/scheduling', { method: 'POST', body: '{}', auth: 'none' });
+        expect(book.status).toBe(401);
+        const patch = await api(`/api/v1/scheduling/${randomUUID()}`, { method: 'PATCH', body: '{}', auth: 'none' });
+        expect(patch.status).toBe(401);
+    });
+
+    it('still verifies and attaches a JWT sent on a public route', async () => {
+        seedProvider();
+        const r = await api('/api/v1/search', {
+            method: 'POST', auth: 'jwt',
+            body: JSON.stringify({ country: 'DE', structured_answers: { domains: ['tax-vat'] } }),
+        });
+        expect(r.status).toBe(200);
     });
 });
 
