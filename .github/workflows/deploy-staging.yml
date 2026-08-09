@@ -1,8 +1,13 @@
-# Staging auto-deploy (v1.1) — two parallel jobs against the Hostinger VPS:
-#   deploy      — builds the vs1-demo UI and rsyncs it (same target as
-#                 scripts/deploy-staging.sh)
+# Staging auto-deploy (v1.2) — two SEQUENTIAL jobs against the Hostinger VPS:
 #   deploy-api  — esbuild-bundles compliance-api and restarts its container
-#                 (replaces the manual scp + compose-restart routine)
+#   deploy      — builds the vs1-demo UI and rsyncs it, AFTER the API is up
+#
+# Order matters: the UI may consume payload fields the API only just gained,
+# so the API must never lag behind the UI. Running API-first means a partial
+# failure can only leave the harmless combination (new API, old UI) — the
+# reverse briefly happened on 2026-08-09 and silently degraded the risk map.
+# Every SSH/rsync/scp hop is retried 3× because a single transient network
+# blip between the runner and Hostinger must not tear a deploy in half.
 # Requires one repo secret:
 #   VPS_SSH_KEY — private key of the dedicated CI deploy keypair
 # (The former STAGING_API_KEY bundle bake was removed with audit P1 #4 —
@@ -22,6 +27,8 @@ on:
 
 jobs:
   deploy:
+    # UI last: guarantees the API is never older than the frontend consuming it.
+    needs: deploy-api
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -73,9 +80,12 @@ jobs:
           # keyscan is best-effort; accept-new covers the first connection.
           ssh-keyscan -T 10 -H 76.13.159.221 >> ~/.ssh/known_hosts || true
           SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15"
-          rsync -az --delete -e "ssh $SSH_OPTS" \
+          # 3 attempts with backoff — transient runner↔Hostinger timeouts are
+          # the single most common deploy failure and are not worth a red run.
+          retry() { for a in 1 2 3; do "$@" && return 0; echo "::warning::attempt $a failed, retrying in $((a*10))s"; sleep $((a*10)); done; echo "::error::still failing after 3 attempts"; return 1; }
+          retry rsync -az --delete -e "ssh $SSH_OPTS" \
             apps/vs1-demo/ui/dist/ root@76.13.159.221:/docker/complihub/site/
-          ssh $SSH_OPTS root@76.13.159.221 'chmod -R a+rX /docker/complihub/site'
+          retry ssh $SSH_OPTS root@76.13.159.221 'chmod -R a+rX /docker/complihub/site'
 
       - name: Verify
         run: |
@@ -119,15 +129,27 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -T 10 -H 76.13.159.221 >> ~/.ssh/known_hosts || true
           SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15"
-          scp $SSH_OPTS /tmp/index.cjs /tmp/api-build-info.json root@76.13.159.221:/docker/complihub-api/app/
-          ssh $SSH_OPTS root@76.13.159.221 'cd /docker/complihub-api && docker compose restart api'
+          retry() { for a in 1 2 3; do "$@" && return 0; echo "::warning::attempt $a failed, retrying in $((a*10))s"; sleep $((a*10)); done; echo "::error::still failing after 3 attempts"; return 1; }
+          retry scp $SSH_OPTS /tmp/index.cjs /tmp/api-build-info.json root@76.13.159.221:/docker/complihub-api/app/
+          retry ssh $SSH_OPTS root@76.13.159.221 'cd /docker/complihub-api && docker compose restart api'
 
       - name: Verify health
         env:
           VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
         run: |
           SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15"
-          sleep 5
-          ssh $SSH_OPTS root@76.13.159.221 \
-            'docker exec complihub-api-api-1 wget -qO- http://localhost:3005/health' | grep -q '"ok":true'
-          echo "✓ API container healthy on the new bundle"
+          # Poll instead of a single shot after a fixed sleep: a container that
+          # is still booting must not read as "broken", and — since the UI job
+          # now waits on this one — a flaky check would block the whole deploy.
+          # Still fails hard after ~45s, so a genuinely dead API stays red.
+          for a in $(seq 1 15); do
+            if ssh $SSH_OPTS root@76.13.159.221 \
+                 'docker exec complihub-api-api-1 wget -qO- --timeout=5 http://localhost:3005/health' 2>/dev/null | grep -q '"ok":true'; then
+              echo "✓ API container healthy on the new bundle (after ${a} attempt(s))"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "::error::API did not report healthy within ~45s after the restart"
+          ssh $SSH_OPTS root@76.13.159.221 'docker logs --tail 30 complihub-api-api-1' || true
+          exit 1
