@@ -33,6 +33,10 @@ export interface SearchLaw {
   severity?: 'critical' | 'high' | 'medium' | 'low';
   markets?: string[];            // [] = EU-wide
   source?: string | null;
+  /** CELEX id of the underlying EU act, verified against EUR-Lex. */
+  celex?: string | null;
+  /** Deep link to the authoritative text — makes the source citable. */
+  source_url?: string | null;
   penalty?: string | null;
   penalty_max_eur?: number | null;
   due?: string | null;

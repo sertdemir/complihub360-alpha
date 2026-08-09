@@ -28,6 +28,16 @@ export interface EnrichedSubdomain {
     penaltyMaxEur?: number;
     due?: string;
     dueDays?: number;
+    /** CELEX id of the underlying EU act (verified against EUR-Lex). */
+    celex?: string;
+    /** Deep link to the authoritative, always-current text on EUR-Lex. */
+    sourceUrl?: string;
+}
+
+/** EUR-Lex permalink for a CELEX id. The language segment only switches the
+ *  interface/translation shown — the act itself is the same document. */
+export function eurLexUrl(celex: string, lang = 'EN'): string {
+    return `https://eur-lex.europa.eu/legal-content/${lang.toUpperCase()}/TXT/?uri=CELEX:${celex}`;
 }
 
 export function aggregateCountryRiskProfiles(countries: CountryCode[]): CountryRiskProfile {
@@ -129,6 +139,8 @@ export function generateRelevantSubdomains(context: GeneratorContext): EnrichedS
                 penaltyMaxEur: enrichment?.penaltyMaxEur,
                 due: enrichment?.due,
                 dueDays: enrichment?.dueDays,
+                celex: template.celex,
+                sourceUrl: template.celex ? eurLexUrl(template.celex) : undefined,
             });
         }
     }
