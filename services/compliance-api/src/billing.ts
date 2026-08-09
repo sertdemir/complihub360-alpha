@@ -208,6 +208,18 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
                     id: string; number?: string; status?: string; total?: number;
                     hosted_invoice_url?: string; invoice_pdf?: string; due_date?: number;
                 };
+                // With collection_method=send_invoice, Stripe e-mails the invoice
+                // (pay link + PDF) to the customer ONLY via this explicit send
+                // call — finalize alone never sends. Test mode: no-op mail-wise.
+                // Best-effort: a send failure must not lose the issued invoice.
+                try {
+                    await stripeForm(stripeKey!, 'POST', `invoices/${invoiceId}/send`);
+                } catch (sendErr) {
+                    await supabaseApi.insert('event_log', {
+                        type: 'invoice_send_failed',
+                        payload: { providerKey, invoiceId, error: String(sendErr) },
+                    }).catch(() => { /* non-blocking */ });
+                }
                 await supabaseApi.insert('invoices', {
                     provider_key: providerKey,
                     invoice_number: finalized.number || invoiceId,
