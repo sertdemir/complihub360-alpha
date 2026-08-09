@@ -32,6 +32,11 @@ type Obligation = {
   due: string;
   dueSub: string;
   state: State;
+  /** Verified EU legal basis (EUR-Lex permalink) — rendered as a link so the
+   *  claim is checkable instead of just asserted. Absent for purely national
+   *  obligations and for the design fixture. */
+  sourceLabel?: string;
+  sourceUrl?: string;
 };
 
 export const OBLIGATIONS: Obligation[] = [
@@ -203,7 +208,9 @@ export function ResultsRiskMap() {
     ? liveLaws.map((l) => ({
         severity: l.severity as Severity,
         title: l.title,
-        detail: [l.penalty ? `Penalty: ${l.penalty}` : null, l.source].filter(Boolean).join(' · '),
+        detail: [l.penalty ? `Penalty: ${l.penalty}` : null, l.source_url ? null : l.source].filter(Boolean).join(' · '),
+        sourceLabel: l.source_url ? (l.source ?? l.celex ?? undefined) : undefined,
+        sourceUrl: l.source_url ?? undefined,
         market: l.markets && l.markets.length ? l.markets.join(' · ') : 'EU-wide',
         due: l.due ?? '—',
         dueSub: l.due_days != null ? `${l.due_days} days` : l.due === 'Ongoing' ? 'Live' : '',
@@ -334,7 +341,24 @@ export function ResultsRiskMap() {
               </span>
               <span className="min-w-0">
                 <span className="block text-[15px] font-bold text-fg">{isLive ? o.title : t(`obligations.${i}.title`, { defaultValue: o.title })}</span>
-                <span className="mt-0.5 block text-[12px] leading-relaxed text-fg-brand">{isLive ? o.detail : t(`obligations.${i}.detail`, { defaultValue: o.detail })}</span>
+                <span className="mt-0.5 block text-[12px] leading-relaxed text-fg-brand">
+                  {isLive ? o.detail : t(`obligations.${i}.detail`, { defaultValue: o.detail })}
+                  {o.sourceUrl && (
+                    <>
+                      {o.detail ? ' · ' : ''}
+                      <a
+                        href={o.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="underline decoration-dotted underline-offset-2 hover:decoration-solid"
+                        title={t('sourceLinkTitle', { defaultValue: 'Open the official text on EUR-Lex' })}
+                      >
+                        {o.sourceLabel} ↗
+                      </a>
+                    </>
+                  )}
+                </span>
               </span>
               <span className="text-[14px] text-fg-secondary">{isLive ? o.market : t(`obligations.${i}.market`, { defaultValue: o.market })}</span>
               <span>

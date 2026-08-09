@@ -11,6 +11,7 @@ import { sendMagicLinkMail, sendEmailChangeMail, sendRescheduleMail } from "./ma
 import { handleAssistantChat, handleAssistantCheckout, handleAssistantVerify } from "./assistant.js";
 import { handleAuthAdopt } from "./adoption.js";
 import { handleBillingRun, handleBillingPreview, syncOpenInvoices } from "./billing.js";
+import { checkVatId } from "./vies.js";
 import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
 import { buildCockpit } from "./cockpit.js";
 import { redactText } from "@complihub360/redaction";
@@ -980,10 +981,20 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     return;
                 }
                 const providerKey = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+                // B2B evidence for the reverse-charge invoicing (VAT brief #4):
+                // validate the VAT ID against VIES and persist the verdict WITH
+                // its timestamp. Fail-soft — a VIES outage must not block intake,
+                // the admin sees the status during vetting either way.
+                const vatRaw = typeof d.vat_id === 'string' ? d.vat_id : '';
+                const vat = vatRaw ? await checkVatId(vatRaw) : null;
                 await supabaseApi.insert('providers', {
                     provider_key: providerKey,
                     name,
                     website_url: d.website_url ?? null,
+                    vat_id: vat?.vatId ?? null,
+                    vat_id_status: vat?.status ?? null,
+                    vat_id_checked_at: vat?.checkedAt ?? null,
+                    billing_country: typeof d.billing_country === 'string' ? d.billing_country.toUpperCase().slice(0, 2) : (vat?.countryCode ?? null),
                     partner_status: 'inactive', // vetting gate: admin flips to 'active' after review
                     countries_supported: Array.isArray(d.countries_supported) ? d.countries_supported : [],
                     languages: Array.isArray(d.languages) ? d.languages : [],
@@ -994,9 +1005,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     region: d.region ?? null,
                     active_since: Number.isInteger(d.active_since) ? d.active_since : null,
                 });
-                await supabaseApi.insert('event_log', { type: 'provider_intake_submitted', payload: { providerKey, certifications: Array.isArray(d.certifications) ? d.certifications.length : 0 } });
+                await supabaseApi.insert('event_log', { type: 'provider_intake_submitted', payload: { providerKey, certifications: Array.isArray(d.certifications) ? d.certifications.length : 0, vatIdStatus: vat?.status ?? null } });
                 res.writeHead(201, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ ok: true, provider_key: providerKey, status: 'in_review', correlationId }));
+                res.end(JSON.stringify({ ok: true, provider_key: providerKey, status: 'in_review', vat_id_status: vat?.status ?? null, correlationId }));
             } catch (err) {
                 structuredLog('error', 'Provider intake failed', { correlationId, errorCode: 'ERR_INTAKE', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -2129,6 +2140,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         severity: r.severity,
                         markets: r.markets,          // [] = EU-wide
                         source: r.source ?? null,
+                        // Verified EU legal basis — lets the risk map link the
+                        // authoritative, always-current text instead of a plain
+                        // paragraph string (EUR-Lex, work package B).
+                        celex: r.celex ?? null,
+                        source_url: r.sourceUrl ?? null,
                         penalty: r.penalty ?? null,
                         penalty_max_eur: r.penaltyMaxEur ?? null,
                         due: r.due ?? null,
