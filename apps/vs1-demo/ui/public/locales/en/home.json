@@ -73,8 +73,8 @@
     },
     "dual": {
       "placeholder": "Describe your situation in your own words…",
-      "answer": "Find answers",
-      "guided": "Start guided analysis",
+      "answer": "Ask a Compliance Question",
+      "guided": "Assess My Needs",
       "trust": "Free · anonymous · under 3 minutes"
     }
   },

@@ -172,14 +172,14 @@
     "toAppointments": "Randevularına git"
   },
   "search": {
-    "navGuided": "Rehberli analiz",
+    "navGuided": "İhtiyaçlarımı değerlendir",
     "placeholder": "Durumunu kendi kelimelerinle anlat…",
-    "submit": "Yanıt bul",
+    "submit": "Bir uyum sorusu sorun",
     "answerEyebrow": "Yanıt",
     "answerTitleFor": "„{{query}}\" hakkında",
     "answerTitleDefault": "Uyum yükümlülüklerin hakkında her şeyi sor",
-    "answerBody1": "[Örnek yanıt] Sorunuza göre aşağıdaki yükümlülükler muhtemelen geçerlidir. Bu, kaynaklı genel bir bilgidir — bireysel hukuki danışmanlık değildir.",
-    "answerBody2": "Pazarlarına ve iş modeline göre kişiselleştirilmiş bir risk haritası için aşağıdan rehberli analize devam et.",
+    "answerBody1": "Sizinkine benzer bir durumda muhtemelen geçerli olanlar, her maddenin kaynağıyla birlikte. Genel bilgidir — bireysel hukuki danışmanlık değildir.",
+    "answerBody2": "İşletmeniz için tam olarak neyin geçerli olduğunu — pazarlarınız, iş modeliniz — görmek için aşağıdan değerlendirmeye devam edin.",
     "sources": "Kaynaklar",
     "obligationsTitle": "İlgili yükümlülükler",
     "sev": {
@@ -207,8 +207,9 @@
       "g3": "Online mağazalar için GDPR temelleri"
     },
     "guideRead": "Oku",
-    "bridgeTitle": "Tüm resmi görmek ister misin?",
-    "bridgeBody": "Pazarlarına ve iş modeline göre kişiselleştirilmiş risk haritanı al — üstelik bunu üstlenebilecek doğrulanmış uzmanlarla birlikte.",
-    "bridgeCta": "Rehberli analizi başlat"
+    "bridgeTitle": "İşletmeniz için neyin geçerli olduğunu görmek ister misiniz?",
+    "bridgeBody": "Risk haritanız pazarlarınıza ve iş modelinize göre eşleştirilir ve gerçek ihtiyacınıza uyan Verified Partner'ları gösterir.",
+    "bridgeCta": "İhtiyaçlarımı değerlendir",
+    "previewBadge": "Önizleme · yanıt motoru henüz bağlı değil"
   }
 }

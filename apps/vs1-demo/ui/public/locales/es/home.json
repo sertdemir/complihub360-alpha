@@ -72,9 +72,9 @@
       "continue": "Continuar"
     },
     "dual": {
-      "placeholder": "Describe tu situación con tus propias palabras…",
-      "answer": "Encontrar respuestas",
-      "guided": "Iniciar análisis guiado",
+      "placeholder": "Describa su situación con sus propias palabras…",
+      "answer": "Hacer una pregunta de compliance",
+      "guided": "Evaluar mis necesidades",
       "trust": "Gratis · anónimo · en menos de 3 minutos"
     }
   },

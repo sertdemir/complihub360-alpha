@@ -172,14 +172,14 @@
     "toAppointments": "Ir a tus citas"
   },
   "search": {
-    "navGuided": "Análisis guiado",
+    "navGuided": "Evaluar mis necesidades",
     "placeholder": "Describe tu situación con tus propias palabras…",
-    "submit": "Encontrar respuestas",
+    "submit": "Hacer una pregunta de compliance",
     "answerEyebrow": "Respuesta",
     "answerTitleFor": "Sobre «{{query}}»",
     "answerTitleDefault": "Pregunta lo que quieras sobre tus obligaciones de compliance",
-    "answerBody1": "[Respuesta de ejemplo] Según tu pregunta, las siguientes obligaciones son probablemente relevantes. Es información general con fuentes, no asesoramiento legal individual.",
-    "answerBody2": "Para un mapa de riesgo personalizado según tus mercados y modelo de negocio, continúa abajo con el análisis guiado.",
+    "answerBody1": "Esto es lo que probablemente se aplica a una situación como la suya, con la fuente detrás de cada punto. Información general, no asesoramiento legal individual.",
+    "answerBody2": "Para ver qué se aplica concretamente a su empresa — sus mercados, su modelo de negocio — continúe abajo con la evaluación.",
     "sources": "Fuentes",
     "obligationsTitle": "Obligaciones relevantes",
     "sev": {
@@ -207,8 +207,9 @@
       "g3": "Fundamentos del RGPD para tiendas online"
     },
     "guideRead": "Leer",
-    "bridgeTitle": "¿Quieres el panorama completo?",
-    "bridgeBody": "Obtén tu mapa de riesgo personalizado según tus mercados y modelo de negocio, más los especialistas verificados que pueden ejecutarlo.",
-    "bridgeCta": "Iniciar análisis guiado"
+    "bridgeTitle": "¿Quiere ver qué se aplica a su empresa?",
+    "bridgeBody": "Su risk map se ajusta a sus mercados y a su modelo de negocio, y muestra los Verified Partners que encajan con lo que realmente necesita.",
+    "bridgeCta": "Evaluar mis necesidades",
+    "previewBadge": "Vista previa · el motor de respuestas aún no está conectado"
   }
 }

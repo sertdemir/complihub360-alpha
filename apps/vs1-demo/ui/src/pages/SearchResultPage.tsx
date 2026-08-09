@@ -14,8 +14,9 @@ import { SectionEyebrow } from '../components/providers/SectionHeading';
 // fills the final wording) via the 'results' namespace search.* keys.
 
 // Placeholder answer scaffold — the real answer will come from the RAG endpoint
-// once the assistant is wired here. Kept as fixtures so the page is demoable and
-// the marketing report can slot final copy without layout churn.
+// once the assistant is wired here. Kept as fixtures so the page is demoable.
+// The surrounding copy is now the report's final wording (Brand Map §10/§11);
+// only these fixtures and the preview badge remain to be replaced.
 const SOURCE_FIXTURE = ['UStG §18i (OSS)', 'EU VAT Directive 2006/112/EC', 'VerpackG §9'];
 const OBLIGATION_FIXTURE = [
   { key: 'o1', severity: 'high' as const },
@@ -74,7 +75,16 @@ export function SearchResultPage() {
 
         {/* Answer */}
         <section className="mt-10">
-          <SectionEyebrow tone="brand">{t('search.answerEyebrow')}</SectionEyebrow>
+          <div className="flex flex-wrap items-center gap-3">
+            <SectionEyebrow tone="brand">{t('search.answerEyebrow')}</SectionEyebrow>
+            {/* The answer prose is final report copy, but the RAG endpoint is not
+                wired up yet — so the page has to say so. This used to be a
+                "[Placeholder answer]" prefix inside the prose itself; as a badge
+                the admission stays visible without living in shippable copy. */}
+            <span className="rounded-full border border-stroke-subtle px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">
+              {t('search.previewBadge')}
+            </span>
+          </div>
           <h1 className="mt-3 font-serif text-[1.9rem] font-bold leading-tight text-fg">
             {initialQuery ? t('search.answerTitleFor', { query: initialQuery }) : t('search.answerTitleDefault')}
           </h1>

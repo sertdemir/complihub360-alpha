@@ -72,9 +72,9 @@
       "continue": "Weiter"
     },
     "dual": {
-      "placeholder": "Beschreibe dein Anliegen in eigenen Worten…",
-      "answer": "Antworten finden",
-      "guided": "Geführte Analyse starten",
+      "placeholder": "Beschreiben Sie Ihr Anliegen in eigenen Worten…",
+      "answer": "Eine Compliance-Frage stellen",
+      "guided": "Meinen Bedarf ermitteln",
       "trust": "Kostenlos · anonym · in unter 3 Minuten"
     }
   },
