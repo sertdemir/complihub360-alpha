@@ -6,6 +6,7 @@ import { ArrowRight, Mail, EyeOff, AlertTriangle } from "lucide-react";
 import { Logo } from "../../components/ui/Logo";
 import { useAuthStore } from "../../store/useAuthStore";
 import { supabase, isSupabaseConfigured, isDemoLoginEnabled } from "../../lib/supabase";
+import { PROVIDER_MARKETING_ENABLED } from '../../lib/featureFlags';
 
 // ─── Auth · Figma 1839:2 / 1842:2288 / 1853:2 / 1855:2 / 1856:2 / 1857:3 ─────
 // One dark split-screen shell, several views driven by a small state machine:
@@ -567,12 +568,17 @@ export function LoginPage() {
                                     </button>
                                     <GoogleButton onClick={() => handleOAuth("partner")} />
                                     {isDemoLoginEnabled && <DemoLoginRow role="partner" onEnter={finishLogin} />}
-                                    <p className="mt-6 text-center text-[14px] text-white/60">
-                                        {t("login.partner.notPartnerYet")}{" "}
-                                        <button type="button" onClick={() => navigate(`/${lang}/providers`)} className="font-semibold text-accent-400 hover:text-accent-300">
-                                            {t("login.partner.applyBeta")}
-                                        </button>
-                                    </p>
+                                    {/* "Become a partner" points at the provider marketing
+                                        landing — hidden while that page is off (providers
+                                        are recruited offline/B2B via the intake link). */}
+                                    {PROVIDER_MARKETING_ENABLED && (
+                                        <p className="mt-6 text-center text-[14px] text-white/60">
+                                            {t("login.partner.notPartnerYet")}{" "}
+                                            <button type="button" onClick={() => navigate(`/${lang}/providers`)} className="font-semibold text-accent-400 hover:text-accent-300">
+                                                {t("login.partner.applyBeta")}
+                                            </button>
+                                        </p>
+                                    )}
                                     <p className="mt-8 text-center text-[12px] leading-relaxed text-white/35">{t("login.partner.legal")}</p>
                                 </form>
                             )}
