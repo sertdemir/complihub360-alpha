@@ -170,5 +170,45 @@
     "doneTitle": "Randevun onaylandı.",
     "revealLabel": "Uzmanın",
     "toAppointments": "Randevularına git"
+  },
+  "search": {
+    "navGuided": "Rehberli analiz",
+    "placeholder": "Durumunu kendi kelimelerinle anlat…",
+    "submit": "Yanıt bul",
+    "answerEyebrow": "Yanıt",
+    "answerTitleFor": "„{{query}}\" hakkında",
+    "answerTitleDefault": "Uyum yükümlülüklerin hakkında her şeyi sor",
+    "answerBody1": "[Örnek yanıt] Sorunuza göre aşağıdaki yükümlülükler muhtemelen geçerlidir. Bu, kaynaklı genel bir bilgidir — bireysel hukuki danışmanlık değildir.",
+    "answerBody2": "Pazarlarına ve iş modeline göre kişiselleştirilmiş bir risk haritası için aşağıdan rehberli analize devam et.",
+    "sources": "Kaynaklar",
+    "obligationsTitle": "İlgili yükümlülükler",
+    "sev": {
+      "high": "Yüksek",
+      "medium": "Orta"
+    },
+    "obligations": {
+      "o1": {
+        "title": "KDV / OSS kaydı",
+        "detail": "AB eşiğinin üzerindeki sınır ötesi mesafeli satışlar OSS kaydını ve üç aylık beyanları tetikler."
+      },
+      "o2": {
+        "title": "EPR / ambalaj kaydı",
+        "detail": "Ambalajlı ürünleri piyasaya sürmek, ilk sevkiyattan önce üretici kaydını gerektirir."
+      },
+      "o3": {
+        "title": "Çerez onayı ve gizlilik bildirimi",
+        "detail": "Tüketiciye yönelik izleme, önceden onay ve KVKK/GDPR uyumlu bir gizlilik bildirimi gerektirir."
+      }
+    },
+    "guidesTitle": "İlgili rehberler",
+    "guides": {
+      "g1": "AB OSS düzeni açıklandı",
+      "g2": "Ülkeye göre ambalaj (EPR) kaydı",
+      "g3": "Online mağazalar için GDPR temelleri"
+    },
+    "guideRead": "Oku",
+    "bridgeTitle": "Tüm resmi görmek ister misin?",
+    "bridgeBody": "Pazarlarına ve iş modeline göre kişiselleştirilmiş risk haritanı al — üstelik bunu üstlenebilecek doğrulanmış uzmanlarla birlikte.",
+    "bridgeCta": "Rehberli analizi başlat"
   }
 }

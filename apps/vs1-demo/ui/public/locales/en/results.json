@@ -170,5 +170,45 @@
     "doneTitle": "Your appointment is confirmed.",
     "revealLabel": "Your specialist",
     "toAppointments": "Go to your appointments"
+  },
+  "search": {
+    "navGuided": "Guided analysis",
+    "placeholder": "Describe your situation in your own words…",
+    "submit": "Find answers",
+    "answerEyebrow": "Answer",
+    "answerTitleFor": "On “{{query}}”",
+    "answerTitleDefault": "Ask anything about your compliance obligations",
+    "answerBody1": "[Placeholder answer] Based on your question, the following obligations are likely relevant. This is general information with sources — not individual legal advice.",
+    "answerBody2": "For a personalised risk map matched to your markets and business model, continue with the guided analysis below.",
+    "sources": "Sources",
+    "obligationsTitle": "Relevant obligations",
+    "sev": {
+      "high": "High",
+      "medium": "Medium"
+    },
+    "obligations": {
+      "o1": {
+        "title": "VAT / OSS registration",
+        "detail": "Cross-border distance sales above the EU threshold trigger OSS registration and quarterly returns."
+      },
+      "o2": {
+        "title": "EPR / packaging registration",
+        "detail": "Placing packaged goods on the market requires producer registration before the first shipment."
+      },
+      "o3": {
+        "title": "Cookie consent & privacy notice",
+        "detail": "Consumer-facing tracking requires prior consent and a GDPR-compliant privacy notice."
+      }
+    },
+    "guidesTitle": "Related guides",
+    "guides": {
+      "g1": "The EU OSS scheme explained",
+      "g2": "Packaging (EPR) registration by country",
+      "g3": "GDPR basics for online shops"
+    },
+    "guideRead": "Read",
+    "bridgeTitle": "Want the full picture?",
+    "bridgeBody": "Get your personalised risk map matched to your markets and business model — plus the verified specialists who can handle it.",
+    "bridgeCta": "Start guided analysis"
   }
 }

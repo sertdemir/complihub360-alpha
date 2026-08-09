@@ -12,6 +12,7 @@ import { SolutionsPage } from "./pages/SolutionsPage";
 import { ComplianceAreasPage } from "./pages/ComplianceAreasPage";
 import { ProvidersPage } from "./pages/ProvidersPage";
 import { ResultsRiskMap } from "./pages/ResultsRiskMap";
+import { SearchResultPage } from "./pages/SearchResultPage";
 import { ResourcesPage } from "./pages/ResourcesPage";
 import AdvisoryPage from "./pages/AdvisoryPage";
 import { AiGovernancePage } from "./pages/AiGovernancePage";
@@ -133,6 +134,8 @@ function AppContent() {
                     <Route path="advisory" element={<AdvisoryPage />} />
                     <Route path="ai-governance" element={<AiGovernancePage />} />
                     <Route path="results" element={<ResultsRiskMap />} />
+                    {/* Station 1A: prose-search answers page (no risk map, no gating). */}
+                    <Route path="search" element={<SearchResultPage />} />
                     <Route path="wizard/*" element={<WizardRoutes />} />
                     {/* Legal (launch requirement: Art. 13 GDPR + Impressumspflicht) */}
                     <Route path="privacy" element={<PrivacyPage />} />

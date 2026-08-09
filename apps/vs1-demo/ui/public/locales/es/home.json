@@ -70,6 +70,12 @@
       "selectedCount": "2 seleccionadas · 2 pendientes",
       "back": "Atrás",
       "continue": "Continuar"
+    },
+    "dual": {
+      "placeholder": "Describe tu situación con tus propias palabras…",
+      "answer": "Encontrar respuestas",
+      "guided": "Iniciar análisis guiado",
+      "trust": "Gratis · anónimo · en menos de 3 minutos"
     }
   },
   "heroWizard": {

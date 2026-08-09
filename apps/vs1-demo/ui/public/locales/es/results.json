@@ -170,5 +170,45 @@
     "doneTitle": "Tu cita está confirmada.",
     "revealLabel": "Tu especialista",
     "toAppointments": "Ir a tus citas"
+  },
+  "search": {
+    "navGuided": "Análisis guiado",
+    "placeholder": "Describe tu situación con tus propias palabras…",
+    "submit": "Encontrar respuestas",
+    "answerEyebrow": "Respuesta",
+    "answerTitleFor": "Sobre «{{query}}»",
+    "answerTitleDefault": "Pregunta lo que quieras sobre tus obligaciones de compliance",
+    "answerBody1": "[Respuesta de ejemplo] Según tu pregunta, las siguientes obligaciones son probablemente relevantes. Es información general con fuentes, no asesoramiento legal individual.",
+    "answerBody2": "Para un mapa de riesgo personalizado según tus mercados y modelo de negocio, continúa abajo con el análisis guiado.",
+    "sources": "Fuentes",
+    "obligationsTitle": "Obligaciones relevantes",
+    "sev": {
+      "high": "Alta",
+      "medium": "Media"
+    },
+    "obligations": {
+      "o1": {
+        "title": "Registro de IVA / OSS",
+        "detail": "Las ventas a distancia transfronterizas por encima del umbral de la UE exigen el registro OSS y declaraciones trimestrales."
+      },
+      "o2": {
+        "title": "Registro EPR / envases",
+        "detail": "Poner en el mercado productos envasados requiere el registro del productor antes del primer envío."
+      },
+      "o3": {
+        "title": "Consentimiento de cookies y aviso de privacidad",
+        "detail": "El seguimiento al consumidor requiere consentimiento previo y un aviso de privacidad conforme al RGPD."
+      }
+    },
+    "guidesTitle": "Guías relacionadas",
+    "guides": {
+      "g1": "El régimen OSS de la UE explicado",
+      "g2": "Registro de envases (EPR) por país",
+      "g3": "Fundamentos del RGPD para tiendas online"
+    },
+    "guideRead": "Leer",
+    "bridgeTitle": "¿Quieres el panorama completo?",
+    "bridgeBody": "Obtén tu mapa de riesgo personalizado según tus mercados y modelo de negocio, más los especialistas verificados que pueden ejecutarlo.",
+    "bridgeCta": "Iniciar análisis guiado"
   }
 }

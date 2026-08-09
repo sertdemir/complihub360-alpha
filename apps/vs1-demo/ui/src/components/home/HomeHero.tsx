@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Check, ArrowRight, Eye, EyeOff, Globe, BarChart3, Lock, MessageSquare } from 'lucide-react';
+import { Check, ArrowRight, Eye, EyeOff, Globe, BarChart3, Lock, MessageSquare, Search } from 'lucide-react';
 import { Container } from '../ui/Container';
 import { Button } from '../ui/Button';
 import { GoldWord, SectionEyebrow } from '../providers/SectionHeading';
@@ -175,7 +175,56 @@ function HeroVisual({ showRiskMap, className }: { showRiskMap: boolean; classNam
   );
 }
 
-export function HomeHero({ wizard = 'desktop' }: { wizard?: WizardForm } = {}) {
+// Dual-entry block (Figma landing 3237:1430 · journey Station 0): a prose
+// search field + two equal-weight paths — (A) "Antworten finden" → the
+// answers-only Search-Result page, (B) "Geführte Analyse starten" → the wizard.
+// Copy lives in the 'home' namespace under hero.dual.* (placeholders until the
+// marketing report lands).
+function DualEntrySearch({ layout }: { layout: 'desktop' | 'mobile' }) {
+  const { t } = useTranslation('home');
+  const navigate = useNavigate();
+  const { locale = 'en' } = useParams();
+  const [query, setQuery] = useState('');
+  const findAnswers = () => {
+    const q = query.trim();
+    navigate(`/${locale}/search${q ? `?q=${encodeURIComponent(q)}` : ''}`);
+  };
+  const startGuided = () => navigate(`/${locale}/wizard`);
+  return (
+    <div className={layout === 'desktop' ? 'mt-8' : 'mt-6'}>
+      <form
+        onSubmit={(e) => { e.preventDefault(); findAnswers(); }}
+        className="flex items-center gap-2 rounded-2xl border border-stroke bg-surface p-2 shadow-[0_18px_44px_-32px_rgba(2,22,17,0.35)] focus-within:border-fg-brand"
+      >
+        <Search size={18} className="ml-2 shrink-0 text-fg-tertiary" />
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={t('hero.dual.placeholder')}
+          aria-label={t('hero.dual.placeholder')}
+          className="min-w-0 flex-1 bg-transparent px-1 py-2 text-body text-fg placeholder:text-fg-tertiary focus:outline-none"
+        />
+        <Button type="submit" size={layout === 'desktop' ? 'md' : 'sm'} className="shrink-0">
+          {t('hero.dual.answer')}
+        </Button>
+      </form>
+      <div className={`mt-4 flex items-center gap-4 ${layout === 'mobile' ? 'flex-col items-stretch' : ''}`}>
+        <button
+          type="button"
+          onClick={startGuided}
+          className="inline-flex items-center justify-center gap-2 text-body font-semibold text-fg-brand hover:underline"
+        >
+          {t('hero.dual.guided')} <ArrowRight size={16} />
+        </button>
+        <span className={`text-caption text-fg-tertiary ${layout === 'mobile' ? '' : 'ml-auto'}`}>
+          {t('hero.dual.trust')}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+export function HomeHero({ wizard = 'desktop', entry = 'wizard' }: { wizard?: WizardForm; entry?: 'wizard' | 'search' } = {}) {
   const { t } = useTranslation('home');
   // Click toggles the hero visual between the animated wizard and the risk map.
   const [showRiskMap, setShowRiskMap] = useState(false);
@@ -207,20 +256,26 @@ export function HomeHero({ wizard = 'desktop' }: { wizard?: WizardForm } = {}) {
             <p className="mt-5 max-w-[560px] text-body-lg leading-relaxed text-fg-secondary">
               {t('hero.subtitleDesktop')}
             </p>
-            <div className="mt-8 flex items-center gap-7">
-              <Button size="lg" onClick={startAssessment}>{t('hero.cta.start')}</Button>
-              <button {...toggleProps} className="inline-flex items-center gap-2 text-body font-semibold text-fg-brand">
-                {showRiskMap ? t('hero.cta.closeMap') : t('hero.cta.showMap')}
-                {showRiskMap ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-            <div className="mt-7 flex flex-wrap items-center gap-x-7 gap-y-2">
-              {TRUST_INDICES.map((i) => (
-                <span key={i} className="inline-flex items-center gap-2 text-body-sm text-fg-secondary">
-                  <Check size={14} className="text-fg-brand" strokeWidth={2.5} /> {t(`hero.trust.${i}`)}
-                </span>
-              ))}
-            </div>
+            {entry === 'search' ? (
+              <DualEntrySearch layout="desktop" />
+            ) : (
+              <>
+                <div className="mt-8 flex items-center gap-7">
+                  <Button size="lg" onClick={startAssessment}>{t('hero.cta.start')}</Button>
+                  <button {...toggleProps} className="inline-flex items-center gap-2 text-body font-semibold text-fg-brand">
+                    {showRiskMap ? t('hero.cta.closeMap') : t('hero.cta.showMap')}
+                    {showRiskMap ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+                <div className="mt-7 flex flex-wrap items-center gap-x-7 gap-y-2">
+                  {TRUST_INDICES.map((i) => (
+                    <span key={i} className="inline-flex items-center gap-2 text-body-sm text-fg-secondary">
+                      <Check size={14} className="text-fg-brand" strokeWidth={2.5} /> {t(`hero.trust.${i}`)}
+                    </span>
+                  ))}
+                </div>
+              </>
+            )}
           </motion.div>
 
           <motion.div
@@ -260,20 +315,26 @@ export function HomeHero({ wizard = 'desktop' }: { wizard?: WizardForm } = {}) {
           <p className="mt-4 text-body leading-relaxed text-fg-secondary">
             {t('hero.subtitleMobile')}
           </p>
-          <div className="mt-6 flex flex-col gap-3">
-            <Button size="lg" fullWidth onClick={startAssessment}>{t('hero.cta.start')}</Button>
-            <button {...toggleProps} className="inline-flex items-center justify-center gap-2 text-body font-semibold text-fg-brand">
-              {showRiskMap ? t('hero.cta.closeMap') : t('hero.cta.showMap')}
-              {showRiskMap ? <EyeOff size={16} /> : <Eye size={16} />}
-            </button>
-          </div>
-          <div className="mt-6 flex flex-col gap-2">
-            {TRUST_INDICES.map((i) => (
-              <span key={i} className="inline-flex items-center gap-2 text-body-sm text-fg-secondary">
-                <Check size={14} className="text-fg-brand" strokeWidth={2.5} /> {t(`hero.trust.${i}`)}
-              </span>
-            ))}
-          </div>
+          {entry === 'search' ? (
+            <DualEntrySearch layout="mobile" />
+          ) : (
+            <>
+              <div className="mt-6 flex flex-col gap-3">
+                <Button size="lg" fullWidth onClick={startAssessment}>{t('hero.cta.start')}</Button>
+                <button {...toggleProps} className="inline-flex items-center justify-center gap-2 text-body font-semibold text-fg-brand">
+                  {showRiskMap ? t('hero.cta.closeMap') : t('hero.cta.showMap')}
+                  {showRiskMap ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              <div className="mt-6 flex flex-col gap-2">
+                {TRUST_INDICES.map((i) => (
+                  <span key={i} className="inline-flex items-center gap-2 text-body-sm text-fg-secondary">
+                    <Check size={14} className="text-fg-brand" strokeWidth={2.5} /> {t(`hero.trust.${i}`)}
+                  </span>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </Container>
     </section>

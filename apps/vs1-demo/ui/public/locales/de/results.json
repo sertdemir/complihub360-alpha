@@ -170,5 +170,45 @@
     "doneTitle": "Dein Termin ist bestätigt.",
     "revealLabel": "Dein Spezialist",
     "toAppointments": "Zu deinen Terminen"
+  },
+  "search": {
+    "navGuided": "Geführte Analyse",
+    "placeholder": "Beschreibe dein Anliegen in eigenen Worten…",
+    "submit": "Antworten finden",
+    "answerEyebrow": "Antwort",
+    "answerTitleFor": "Zu „{{query}}“",
+    "answerTitleDefault": "Frag alles zu deinen Compliance-Pflichten",
+    "answerBody1": "[Platzhalter-Antwort] Basierend auf deiner Frage sind die folgenden Pflichten wahrscheinlich relevant. Dies ist eine allgemeine Information mit Quellen — keine individuelle Rechtsberatung.",
+    "answerBody2": "Für eine personalisierte Risk Map, passend zu deinen Märkten und deinem Geschäftsmodell, geht es unten mit der geführten Analyse weiter.",
+    "sources": "Quellen",
+    "obligationsTitle": "Relevante Pflichten",
+    "sev": {
+      "high": "Hoch",
+      "medium": "Mittel"
+    },
+    "obligations": {
+      "o1": {
+        "title": "USt-/OSS-Registrierung",
+        "detail": "Grenzüberschreitende Fernverkäufe über der EU-Schwelle lösen die OSS-Registrierung und Quartalsmeldungen aus."
+      },
+      "o2": {
+        "title": "EPR-/Verpackungsregistrierung",
+        "detail": "Das Inverkehrbringen verpackter Ware erfordert die Herstellerregistrierung vor der ersten Lieferung."
+      },
+      "o3": {
+        "title": "Cookie-Einwilligung & Datenschutzhinweis",
+        "detail": "Tracking gegenüber Verbrauchern erfordert vorherige Einwilligung und einen DSGVO-konformen Datenschutzhinweis."
+      }
+    },
+    "guidesTitle": "Passende Guides",
+    "guides": {
+      "g1": "Das EU-OSS-Verfahren erklärt",
+      "g2": "Verpackungs-(EPR-)Registrierung nach Land",
+      "g3": "DSGVO-Grundlagen für Online-Shops"
+    },
+    "guideRead": "Lesen",
+    "bridgeTitle": "Willst du das ganze Bild?",
+    "bridgeBody": "Erhalte deine personalisierte Risk Map, passend zu deinen Märkten und deinem Geschäftsmodell — plus die geprüften Spezialisten, die sie umsetzen.",
+    "bridgeCta": "Geführte Analyse starten"
   }
 }

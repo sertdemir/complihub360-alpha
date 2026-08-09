@@ -24,7 +24,7 @@ import {
 export function HomePage() {
   return (
     <main className="bg-white">
-      <HomeHero wizard="animated" />
+      <HomeHero wizard="animated" entry="search" />
       <RiskMapSection />
       <MatchmakingDifference />
       <TwoReflexes />
