@@ -12,6 +12,7 @@ export interface UserBooking {
   providerKey: string;
   providerName: string;   // clear name — identity revealed post-booking
   providerRegion: string | null;
+  providerWebsite: string | null;  // affiliate 1b — post-booking reveal only
   slotStart: string;      // ISO
   slotEnd: string | null;
   status: BookingStatus;
@@ -23,10 +24,19 @@ interface ApiBookingRow {
   provider_key: string;
   provider_name: string;
   provider_region: string | null;
+  provider_website: string | null;
   slot_start: string;
   slot_end: string | null;
   status: BookingStatus;
   message: string | null;
+}
+
+// Affiliate 1b: the counted outclick URL to a provider's website. The server
+// verifies the caller has booked this provider, logs the click and 302-
+// redirects — so this is a plain <a href>, not an apiFetch.
+export function providerWebsiteHref(providerKey: string): string {
+  const base = (import.meta.env.VITE_API_URL as string | undefined) || '';
+  return `${base}/api/v1/provider/${providerKey}/website`;
 }
 
 export async function fetchUserBookings(): Promise<UserBooking[]> {
@@ -36,6 +46,7 @@ export async function fetchUserBookings(): Promise<UserBooking[]> {
     providerKey: b.provider_key,
     providerName: b.provider_name,
     providerRegion: b.provider_region,
+    providerWebsite: b.provider_website,
     slotStart: b.slot_start,
     slotEnd: b.slot_end,
     status: b.status,

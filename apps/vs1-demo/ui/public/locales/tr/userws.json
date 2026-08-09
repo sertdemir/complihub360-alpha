@@ -378,7 +378,7 @@
     "quota": "Günlük ücretsiz limite ulaşıldı — yükseltme planı yakında geliyor.",
     "upgradeTitle": "Assistant Pro",
     "upgradeBody": "Bugünkü 5 ücretsiz sorunuz tükendi. Assistant Pro ile doğrulanmış bilgi tabanından sınırsız yanıt alırsınız — aylık iptal edilebilir.",
-    "upgradeCta": "Yükselt · Ayda 12 $",
+    "upgradeCta": "Yükselt · Ayda 12 €",
     "upgradeSuccess": "Assistant Pro etkin — aramıza hoş geldiniz! Sorularınızı sorabilirsiniz."
   },
   "termine": {
@@ -402,7 +402,8 @@
     "outcomeYes": "Evet",
     "outcomeNo": "Gelmedi",
     "reviewed": "✓ Değerlendirme gönderildi",
-    "noShowNote": "İade yok — sağlayıcı dosyayı rezervasyonda aldı. İstersen seni yeniden eşleştiririz."
+    "noShowNote": "İade yok — sağlayıcı dosyayı rezervasyonda aldı. İstersen seni yeniden eşleştiririz.",
+    "website": "Sağlayıcı web sitesi"
   },
   "review": {
     "eyebrow": "DEĞERLENDİRME",

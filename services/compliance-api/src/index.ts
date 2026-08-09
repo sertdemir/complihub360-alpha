@@ -673,6 +673,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         provider_key: b.provider_key,
                         provider_name: b.identity_revealed ? (p.name ?? b.provider_key) : (p.pseudonym_label ?? 'Verifizierter Spezialist'),
                         provider_region: p.region ?? null,
+                        // Affiliate 1b: the provider's website is a POST-BOOKING
+                        // reveal only — never before, to preserve stage-1/2 anonymity.
+                        // The outclick is routed through /provider/:key/website so
+                        // it can be counted (future affiliate revenue line).
+                        provider_website: b.identity_revealed ? (p.website_url ?? null) : null,
                         slot_start: b.slot_start,
                         slot_end: b.slot_end,
                         status: b.status,
@@ -685,6 +690,40 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 structuredLog('error', 'Bookings fetch failed', { correlationId, errorCode: 'ERR_BOOKINGS', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Bookings fetch failed', correlationId }));
+            }
+        }
+    } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/website$/.test(req.url || '')) {
+        // Affiliate 1b: counted outclick to the provider website. Only a user
+        // who has ALREADY booked this provider may follow it (post-booking
+        // reveal) — this is the tracking hook for the later affiliate revenue
+        // line, not yet monetised. Logs provider_website_outclick, 302-redirects.
+        const providerKey = (req.url || '').split('/')[4];
+        res.setHeader('x-correlation-id', correlationId);
+        if (!authUserId) {
+            res.writeHead(401, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'UNAUTHORIZED', message: 'Login required', correlationId }));
+        } else {
+            try {
+                const booked = (await supabaseApi.select('scheduling', { user_id: authUserId, provider_key: providerKey }, { limit: 1 })) as any[];
+                if (!booked[0] || !booked[0].identity_revealed) {
+                    res.writeHead(403, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'FORBIDDEN', message: 'Website is revealed after booking only', correlationId }));
+                    return;
+                }
+                const provs = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[];
+                const url = provs[0]?.website_url;
+                if (!url) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'No website on file', correlationId }));
+                    return;
+                }
+                await supabaseApi.insert('event_log', { type: 'provider_website_outclick', payload: { providerKey, userId: authUserId, bookingId: booked[0].id } }).catch(() => { /* non-blocking */ });
+                res.writeHead(302, { Location: url });
+                res.end();
+            } catch (err) {
+                structuredLog('error', 'Website outclick failed', { correlationId, errorCode: 'ERR_OUTCLICK', severity: 'error', route: req.url });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Website outclick failed', correlationId }));
             }
         }
     } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/bookings$/.test(req.url || '')) {

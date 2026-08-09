@@ -38,6 +38,10 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
     'tax-corporate': {
         DE: { source: 'KStG §7 / AO §149', penalty: 'late surcharge 0.25%/month of assessed tax', penaltyMaxEur: 10000, due: 'Annual', dueDays: 120 },
         UK: { source: 'CTA 2010 / HMRC CT600', penalty: '£100–£1,000 + tax-geared penalties', penaltyMaxEur: 5000, due: 'Annual', dueDays: 120 },
+        FR: { source: 'CGI Art. 205 (impôt sur les sociétés)', penalty: '10–40% majoration + intérêts de retard', penaltyMaxEur: 12000, due: 'Annual', dueDays: 105 },
+        IT: { source: 'TUIR DPR 917/1986 (IRES)', penalty: '90–180% dell’imposta non versata', penaltyMaxEur: 20000, due: 'Annual', dueDays: 120 },
+        ES: { source: 'Ley 27/2014 (Impuesto sobre Sociedades)', penalty: '50–150% de la cuota + recargos', penaltyMaxEur: 15000, due: 'Annual', dueDays: 115 },
+        NL: { source: 'Wet Vpb 1969 (vennootschapsbelasting)', penalty: 'verzuim-/vergrijpboete tot 100%', penaltyMaxEur: 12000, due: 'Annual', dueDays: 150 },
         US: { source: 'IRC §11 / state franchise tax', penalty: '5%/month of unpaid tax, max 25%', penaltyMaxEur: 15000, due: 'Annual', dueDays: 105 },
         default: { source: 'National corporate income tax act', penalty: 'late surcharges + interest', penaltyMaxEur: 10000, due: 'Annual', dueDays: 120 },
     },
@@ -78,11 +82,17 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
     'corp-registration': {
         DE: { source: 'HGB §29 / GewO §14', penalty: 'coercive fines up to €5,000', penaltyMaxEur: 5000, due: 'One-off', dueDays: 30 },
         UK: { source: 'Companies Act 2006 §9', penalty: 'late-filing penalties up to £1,500', penaltyMaxEur: 1700, due: 'One-off', dueDays: 30 },
+        FR: { source: 'Code de commerce Art. L123 (RCS / Guichet unique)', penalty: 'amendes + radiation d’office', penaltyMaxEur: 4500, due: 'One-off', dueDays: 30 },
+        IT: { source: 'Registro delle Imprese (CCIAA), Art. 2196 c.c.', penalty: 'sanzioni €103–€1.032', penaltyMaxEur: 3000, due: 'One-off', dueDays: 30 },
+        ES: { source: 'Registro Mercantil (RRM)', penalty: 'multas + cierre registral', penaltyMaxEur: 6000, due: 'One-off', dueDays: 30 },
+        NL: { source: 'Handelsregisterwet (KVK-inschrijving)', penalty: 'boete + niet-inschrijving', penaltyMaxEur: 4500, due: 'One-off', dueDays: 8 },
         US: { source: 'State incorporation + foreign qualification', penalty: 'loss of good standing + back fees', penaltyMaxEur: 5000, due: 'One-off', dueDays: 30 },
         default: { source: 'National commercial register act', penalty: 'administrative fines', penaltyMaxEur: 5000, due: 'One-off', dueDays: 30 },
     },
     'monitor-kyb': {
         DE: { source: 'GwG §10 / §20 (Transparenzregister)', penalty: '€1,000–€5,000, serious cases up to €1M', penaltyMaxEur: 150000, due: 'Ongoing' },
+        FR: { source: 'Code monétaire et financier Art. L561 (RBE)', penalty: 'amendes AMF/ACPR + sanctions pénales', penaltyMaxEur: 120000, due: 'Ongoing' },
+        IT: { source: 'D.Lgs. 231/2007 (antiriciclaggio, Registro TE)', penalty: 'sanzioni €2.000–€1M', penaltyMaxEur: 120000, due: 'Ongoing' },
         default: { source: 'EU AMLD5 (2018/843)', penalty: 'national AML fines', penaltyMaxEur: 100000, due: 'Ongoing', scope: 'eu' },
     },
     'log-eori': {
@@ -96,14 +106,21 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
     },
     'log-intrastat': {
         DE: { source: 'Intrastat (EBS Reg. 2019/2152), threshold €500k arrivals', penalty: 'up to €5,000 per missed report', penaltyMaxEur: 5000, due: 'Monthly', dueDays: 20 },
+        IT: { source: 'Intrastat (Agenzia Dogane), modelli INTRA', penalty: 'sanzioni €500–€1.000 per modello', penaltyMaxEur: 5000, due: 'Monthly', dueDays: 25 },
+        ES: { source: 'Intrastat (AEAT), umbral €400k', penalty: 'multas estadísticas hasta €30.000', penaltyMaxEur: 15000, due: 'Monthly', dueDays: 12 },
+        NL: { source: 'Intrastat (CBS aangifte)', penalty: 'bestuurlijke boetes CBS', penaltyMaxEur: 5000, due: 'Monthly', dueDays: 10 },
         default: { source: 'EBS Reg. 2019/2152 (Intrastat)', penalty: 'national statistical fines', penaltyMaxEur: 5000, due: 'Monthly', dueDays: 20, scope: 'eu' },
     },
     'legal-consumer-terms': {
         DE: { source: 'BGB §312g / EGBGB Art. 246a', penalty: 'competitor warnings (Abmahnung) + injunctions', penaltyMaxEur: 15000, due: 'One-off', dueDays: 45 },
         UK: { source: 'Consumer Rights Act 2015', penalty: 'CMA enforcement orders', penaltyMaxEur: 15000, due: 'One-off', dueDays: 45 },
+        FR: { source: 'Code de la consommation Art. L221 (droit de rétractation)', penalty: 'amendes DGCCRF + clauses réputées non écrites', penaltyMaxEur: 15000, due: 'One-off', dueDays: 45 },
+        IT: { source: 'Codice del Consumo D.Lgs. 206/2005', penalty: 'sanzioni AGCM + clausole nulle', penaltyMaxEur: 15000, due: 'One-off', dueDays: 45 },
+        ES: { source: 'RDL 1/2007 (Ley General Consumidores)', penalty: 'sanciones de consumo + cláusulas nulas', penaltyMaxEur: 15000, due: 'One-off', dueDays: 45 },
         default: { source: 'Consumer Rights Directive 2011/83/EU', penalty: 'national enforcement + void clauses', penaltyMaxEur: 15000, due: 'One-off', dueDays: 45, scope: 'eu' },
     },
     'legal-commercial-contracts': {
+        DE: { source: 'BGB/HGB + Rom-I-VO 593/2008', penalty: 'unwirksame Klauseln; Prozessrisiko', penaltyMaxEur: 10000, due: 'One-off', dueDays: 60 },
         default: { source: 'National commercial code + Rome I Reg. 593/2008', penalty: 'unenforceable clauses; dispute exposure', penaltyMaxEur: 10000, due: 'One-off', dueDays: 60 },
     },
 };

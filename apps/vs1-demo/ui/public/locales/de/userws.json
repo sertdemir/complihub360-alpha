@@ -378,7 +378,7 @@
     "quota": "Tageslimit erreicht — der Upgrade-Plan kommt in Kürze.",
     "upgradeTitle": "Assistant Pro",
     "upgradeBody": "Ihre 5 kostenlosen Fragen für heute sind aufgebraucht. Mit Assistant Pro erhalten Sie unbegrenzte Antworten aus der geprüften Wissensbasis — monatlich kündbar.",
-    "upgradeCta": "Upgrade · 12 $ / Monat",
+    "upgradeCta": "Upgrade · 12 € / Monat",
     "upgradeSuccess": "Assistant Pro ist aktiv — willkommen an Bord! Fragen Sie los."
   },
   "termine": {
@@ -402,7 +402,8 @@
     "outcomeYes": "Ja",
     "outcomeNo": "No-Show",
     "reviewed": "✓ Bewertung abgegeben",
-    "noShowNote": "Keine Rückerstattung — der Provider erhielt das Dossier bei Buchung. Auf Wunsch matchen wir dich neu."
+    "noShowNote": "Keine Rückerstattung — der Provider erhielt das Dossier bei Buchung. Auf Wunsch matchen wir dich neu.",
+    "website": "Provider-Website"
   },
   "review": {
     "eyebrow": "BEWERTUNG",

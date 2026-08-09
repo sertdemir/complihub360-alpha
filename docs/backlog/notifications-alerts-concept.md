@@ -2,6 +2,12 @@
 
 > **Status:** Beschlossen 2026-08-04 · Teil von [User-Flow & Matchmaking v2](user-flow-matchmaking-v2-spec.md) (§6/§7/§11).
 > Deckt die Kommunikation **ab der Buchung** (Post-Handoff) inkl. Review-/Ranking-Schleife ab.
+>
+> **LIVE seit 2026-08-09:** `WATCHERS_SHADOW=false` auf Staging — Mails und
+> Status-Änderungen sind scharf. Erster Live-Tick verifiziert (Review-Request-
+> Mail zugestellt, Alt-Engagements bereinigt: 5 Breaches/3 Expiries markiert;
+> ein Junk-Daten-Downgrade von dahlmann-cpa wurde zurückgesetzt, breach_count
+> genullt). Folge-Ticks konvergiert auf 0.
 
 ---
 

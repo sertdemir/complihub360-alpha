@@ -378,7 +378,7 @@
     "quota": "Daily free limit reached — the upgrade plan is coming soon.",
     "upgradeTitle": "Assistant Pro",
     "upgradeBody": "Your 5 free questions for today are used up. Assistant Pro gives you unlimited answers from the verified knowledge base — cancel anytime.",
-    "upgradeCta": "Upgrade · $12 / month",
+    "upgradeCta": "Upgrade · €12 / month",
     "upgradeSuccess": "Assistant Pro is active — welcome aboard! Ask away."
   },
   "termine": {
@@ -402,7 +402,8 @@
     "outcomeYes": "Yes",
     "outcomeNo": "No-show",
     "reviewed": "✓ Review submitted",
-    "noShowNote": "No refund — the provider received the dossier at booking. We re-match you on request."
+    "noShowNote": "No refund — the provider received the dossier at booking. We re-match you on request.",
+    "website": "Provider website"
   },
   "review": {
     "eyebrow": "REVIEW",

@@ -222,7 +222,17 @@ CompliHub360 ist ein **kuratierter Matchmaking-Marktplatz**: Ein User (Firma) kl
 6. **Post-Handoff-Kommunikation:** voller **Alert-/E-Mail-/Review-Prozess** — siehe [notifications-alerts-concept.md](notifications-alerts-concept.md). Watchdog schickt beidseitige Reminder, triggert beidseitige Reviews (→ Ranking), fängt No-Shows/Stornos ab; Admin behält Kontrolle via Cockpit.
 7. **Reveal + Billing-Moment:** **bei Buchung** (`scheduling_confirmed`). Beidseitiger Reveal: User sieht Provider-Identität, Provider bekommt das **Dossier (Risk Map + User-Kontakt)**. Provider zahlt bei Buchung — **auch bei No-Show** (Mehrwert-Prinzip: er erhält immer die Lead-Daten). Kein Storno-Fenster.
 
-**Rest-offen (nicht build-blockierend):** Kalender-Sync-Technik (P4, Phase 2) · Reminder-Offsets · Reschedule-Limit · Verifizierte-Review-Schwelle fürs Listing. Goodwill bei Provider-No-Show ist entschieden (kein Geld: Re-Match ODER CompliHub kontaktiert Provider + User-Review erzwingen).
+**Rest-offen (nicht build-blockierend):** Reminder-Offsets · Reschedule-Limit · Verifizierte-Review-Schwelle fürs Listing. Goodwill bei Provider-No-Show ist entschieden (kein Geld: Re-Match ODER CompliHub kontaktiert Provider + User-Review erzwingen).
+
+**P4 Kalender-Sync — ENTSCHIEDEN 2026-08-09:** Aggregator statt eigener
+OAuth-Anbindungen. Anbieter-Empfehlung: **Nylas** (Calendar API, EU-Region
+Irland mit GDPR-isolierter Datenhaltung; Abrechnung pro verbundenem
+Provider-Account ab ~0,90 $/Monat, Einstieg ~10 $/Monat — passt zur
+Phase-1-Größenordnung; Cronofy als Enterprise-Alternative wäre ab
+99 $/Monat Minimum). Integrationspunkt: `GET /provider/:key/slots` liest
+künftig Free/Busy aus Nylas statt der generierten Business-Hour-Slots;
+`POST /scheduling` legt den Kalendereintrag beidseitig an. Voraussetzung
+(User-Aktion): Nylas-Konto anlegen, EU-Region wählen, API-Key erzeugen.
 
 ---
 

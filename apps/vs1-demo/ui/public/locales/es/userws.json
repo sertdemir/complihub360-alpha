@@ -378,7 +378,7 @@
     "quota": "Límite diario alcanzado — el plan de mejora llegará pronto.",
     "upgradeTitle": "Assistant Pro",
     "upgradeBody": "Sus 5 preguntas gratuitas de hoy se han agotado. Con Assistant Pro obtiene respuestas ilimitadas de la base de conocimiento verificada — cancelable mensualmente.",
-    "upgradeCta": "Mejorar · 12 $ / mes",
+    "upgradeCta": "Mejorar · 12 € / mes",
     "upgradeSuccess": "Assistant Pro está activo — ¡bienvenido! Pregunte lo que quiera."
   },
   "termine": {
@@ -402,7 +402,8 @@
     "outcomeYes": "Sí",
     "outcomeNo": "No asistió",
     "reviewed": "✓ Valoración enviada",
-    "noShowNote": "Sin reembolso — el proveedor recibió el dossier al reservar. Te reasignamos si lo deseas."
+    "noShowNote": "Sin reembolso — el proveedor recibió el dossier al reservar. Te reasignamos si lo deseas.",
+    "website": "Sitio web del proveedor"
   },
   "review": {
     "eyebrow": "VALORACIÓN",
