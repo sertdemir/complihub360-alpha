@@ -471,8 +471,8 @@
         "label": "Pflichten"
       },
       {
-        "value": "€25k",
-        "label": "Gesamtrisiko"
+        "value": "4",
+        "label": "mit Frist in 30 Tagen"
       },
       {
         "value": "14 Tage",
@@ -549,8 +549,8 @@
         "label": "Identifizierte Pflichten"
       },
       {
-        "value": "€25k",
-        "label": "Gesamtrisiko"
+        "value": "4",
+        "label": "Mit Frist in 30 Tagen"
       },
       {
         "value": "14 Tage",

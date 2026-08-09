@@ -471,8 +471,8 @@
         "label": "obligations"
       },
       {
-        "value": "€25k",
-        "label": "total exposure"
+        "value": "4",
+        "label": "with a deadline in 30 days"
       },
       {
         "value": "14 days",
@@ -549,8 +549,8 @@
         "label": "Obligations identified"
       },
       {
-        "value": "€25k",
-        "label": "Total exposure"
+        "value": "4",
+        "label": "With a deadline in 30 days"
       },
       {
         "value": "14 days",
