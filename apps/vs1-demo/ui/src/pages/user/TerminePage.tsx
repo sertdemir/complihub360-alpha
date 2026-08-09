@@ -4,7 +4,7 @@ import { UserShell } from '../../components/user/UserShell';
 import { Button } from '../../components/ui/Button';
 import { Tag } from '../../components/ui/Tag';
 import { useApiData } from '../../lib/useApiData';
-import { fetchUserBookings, cancelBooking, markOutcome, type UserBooking, type BookingStatus } from '../../api/bookings';
+import { fetchUserBookings, cancelBooking, markOutcome, providerWebsiteHref, type UserBooking, type BookingStatus } from '../../api/bookings';
 import { ReviewDrawer, type ReviewTarget } from '../../components/user/ReviewDrawer';
 import { RescheduleDrawer, type RescheduleTarget } from '../../components/user/RescheduleDrawer';
 
@@ -20,16 +20,17 @@ interface Row {
   timeLine: string;   // "10:00–10:30 · Video-Call"
   provider: string;   // clear name — revealed at booking
   providerKey: string;
+  website: string | null;  // affiliate 1b — post-booking reveal only
   meta: string;
   status: BookingStatus;
   needsOutcome?: boolean; // slot passed, outcome not recorded (watchdog §1)
 }
 
 const FIXTURE: Row[] = [
-  { id: 'fx-1', dateLine: 'Mo, 12. Aug 2026', timeLine: '10:00–10:30 · Video-Call', provider: 'Studio Bianchi SRL — Steuerkanzlei, Mailand', providerKey: 'studio-bianchi', meta: 'VAT-Registrierung Italien · Erstgespräch · Dossier geteilt bei Buchung', status: 'confirmed' },
-  { id: 'fx-2', dateLine: 'Do, 15. Aug 2026', timeLine: '14:30–15:00 · Video-Call', provider: 'Hartmann Compliance GmbH — Berlin', providerKey: 'hartmann-compliance', meta: 'EPR / Verpackung DE+IT · Erstgespräch', status: 'confirmed' },
-  { id: 'fx-4', dateLine: 'Fr, 1. Aug 2026', timeLine: '09:00–09:30 · Video-Call', provider: 'Hartmann Compliance GmbH — Berlin', providerKey: 'hartmann-compliance', meta: 'EPR / Verpackung DE+IT · Termin vorbei — Ergebnis offen', status: 'confirmed', needsOutcome: true },
-  { id: 'fx-3', dateLine: 'Di, 29. Jul 2026', timeLine: '11:00–11:30 · Video-Call', provider: 'Studio Bianchi SRL — Steuerkanzlei, Mailand', providerKey: 'studio-bianchi', meta: 'VAT-Registrierung Italien · stattgefunden', status: 'completed' },
+  { id: 'fx-1', dateLine: 'Mo, 12. Aug 2026', timeLine: '10:00–10:30 · Video-Call', provider: 'Studio Bianchi SRL — Steuerkanzlei, Mailand', providerKey: 'studio-bianchi', website: 'https://studiobianchi.example', meta: 'VAT-Registrierung Italien · Erstgespräch · Dossier geteilt bei Buchung', status: 'confirmed' },
+  { id: 'fx-2', dateLine: 'Do, 15. Aug 2026', timeLine: '14:30–15:00 · Video-Call', provider: 'Hartmann Compliance GmbH — Berlin', providerKey: 'hartmann-compliance', website: 'https://hartmann-compliance.example', meta: 'EPR / Verpackung DE+IT · Erstgespräch', status: 'confirmed' },
+  { id: 'fx-4', dateLine: 'Fr, 1. Aug 2026', timeLine: '09:00–09:30 · Video-Call', provider: 'Hartmann Compliance GmbH — Berlin', providerKey: 'hartmann-compliance', website: 'https://hartmann-compliance.example', meta: 'EPR / Verpackung DE+IT · Termin vorbei — Ergebnis offen', status: 'confirmed', needsOutcome: true },
+  { id: 'fx-3', dateLine: 'Di, 29. Jul 2026', timeLine: '11:00–11:30 · Video-Call', provider: 'Studio Bianchi SRL — Steuerkanzlei, Mailand', providerKey: 'studio-bianchi', website: 'https://studiobianchi.example', meta: 'VAT-Registrierung Italien · stattgefunden', status: 'completed' },
 ];
 
 const STATUS_TONE: Record<BookingStatus, 'success' | 'neutral' | 'error' | 'warning'> = {
@@ -48,6 +49,7 @@ function toRows(bookings: UserBooking[], locale: string): Row[] {
       timeLine: `${tf.format(start)}${end ? `–${tf.format(end)}` : ''} · Video-Call`,
       provider: b.providerName + (b.providerRegion ? ` — ${b.providerRegion}` : ''),
       providerKey: b.providerKey,
+      website: b.providerWebsite,
       meta: b.message || '—',
       status: b.status,
       needsOutcome: b.status === 'confirmed' && start.getTime() < Date.now(),
@@ -108,6 +110,19 @@ export function TerminePage() {
       <div className="min-w-0 flex-1">
         <p className="truncate text-[15px] font-semibold text-fg">{r.provider}</p>
         <p className="truncate text-[12px] text-fg-tertiary">{r.meta}</p>
+        {r.website && !r.needsOutcome && (
+          // Affiliate 1b: provider website, revealed only post-booking.
+          // Routed through the counted outclick endpoint. Hidden in the
+          // outcome-open state, where the row's primary action is different.
+          <a
+            href={providerWebsiteHref(r.providerKey)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-0.5 inline-flex items-center gap-1 text-[12px] font-medium text-fg-brand hover:underline"
+          >
+            {t('termine.website')} ↗
+          </a>
+        )}
       </div>
       <div className="flex shrink-0 flex-col items-end gap-2">
         <Tag tone={r.needsOutcome ? 'warning' : STATUS_TONE[r.status]}>

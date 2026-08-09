@@ -18,7 +18,7 @@ export function askAssistant(
   });
 }
 
-// ─── Phase ③: Assistant Pro (12 $/month via Stripe Checkout) ─────────────────
+// ─── Phase ③: Assistant Pro (12 €/month via Stripe Checkout) ─────────────────
 
 export function createAssistantCheckout(returnPath: string, email?: string): Promise<{ ok: boolean; url: string }> {
   return apiFetch<{ ok: boolean; url: string }>('/api/v1/assistant/checkout', {

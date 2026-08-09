@@ -204,7 +204,7 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
     });
 }
 
-// ─── Phase ③: Stripe Checkout for Assistant Pro (12 $/month) ─────────────────
+// ─── Phase ③: Stripe Checkout for Assistant Pro (12 €/month) ─────────────────
 // Inline price_data — no dashboard product setup required. Staging sits behind
 // Basic Auth, so Stripe webhooks can't reach us; entitlement is confirmed via
 // verify-on-return (the success_url carries the checkout session id) and a
@@ -235,7 +235,8 @@ export function handleAssistantCheckout(req: IncomingMessage, res: ServerRespons
             const glue = returnPath.includes('?') ? '&' : '?';
             const session = await stripeForm(stripeKey, 'POST', 'checkout/sessions', {
                 mode: 'subscription',
-                'line_items[0][price_data][currency]': 'usd',
+                // EUR to match the rest of the platform (provider billing is EUR).
+                'line_items[0][price_data][currency]': 'eur',
                 'line_items[0][price_data][unit_amount]': '1200',
                 'line_items[0][price_data][recurring][interval]': 'month',
                 'line_items[0][price_data][product_data][name]': 'CompliHub VAT Assistant Pro',
