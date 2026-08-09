@@ -10,7 +10,7 @@ import { supabaseApi } from "./supabase.js";
 import { sendMagicLinkMail, sendEmailChangeMail, sendRescheduleMail } from "./mailer.js";
 import { handleAssistantChat, handleAssistantCheckout, handleAssistantVerify } from "./assistant.js";
 import { handleAuthAdopt } from "./adoption.js";
-import { handleBillingRun, syncOpenInvoices } from "./billing.js";
+import { handleBillingRun, handleBillingPreview, syncOpenInvoices } from "./billing.js";
 import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
 import { buildCockpit } from "./cockpit.js";
 import { redactText } from "@complihub360/redaction";
@@ -2112,6 +2112,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     } else if (req.method === 'POST' && req.url === '/api/v1/assistant/checkout') {
         // Phase ③: Stripe Checkout for Assistant Pro (12 $/month).
         handleAssistantCheckout(req, res, correlationId, { userId: authUserId, email: authEmail }, ip);
+    } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/billing\/preview$/.test(req.url || '')) {
+        // Current-period charge preview for the provider billing page (pricing
+        // decision 2026-08-09) — behind the normal auth gate, no Stripe needed.
+        await handleBillingPreview(res, correlationId, (req.url || '').split('/')[4]);
     } else if (req.method === 'POST' && req.url === '/api/v1/admin/billing/run') {
         // Monthly platform-fee run (billing.ts) — server-to-server key only.
         handleBillingRun(req, res, correlationId, authViaApiKey);

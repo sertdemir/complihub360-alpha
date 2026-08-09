@@ -3,15 +3,116 @@ import { structuredLog } from "@complihub360/types";
 import { supabaseApi } from "./supabase.js";
 
 // ─── Stripe invoicing (provider platform fees) ───────────────────────────────
-// Monthly run: every engagement that reached confirmed/replied in the period
-// becomes one €92 invoice item (pricing model: €92 per confirm; the €2 per
-// affiliate click joins once A5 ships). Invoices are Stripe-issued
-// (collection_method=send_invoice, 14 days) and mirrored into the invoices
-// table with the hosted pay link + PDF. Staging sits behind Basic Auth, so
-// there is NO webhook — status flows back via syncOpenInvoices() whenever the
-// provider opens their invoice list.
+// Monthly run over the v2 monetisation events (pricing decision 2026-08-09,
+// see docs/pricing/pricing-benchmarks-2026-08.md):
+//   · Lead-Fee 120 € per booking (provider_lead_charged; no refund on
+//     cancel/no-show — decided §11 P7)
+//   · Abo 149 €/month OR 1.490 €/year (2 months free), incl. 1 lead/month
+//     + unlimited detail opens; annual bills in the anniversary month
+//   · Detail-Open 3 € (non-subscribers only, deduped 1×/user/30d at insert
+//     time), capped at 50 €/month
+//   · First 2 leads per provider EVER are free (offline-recruiting sweetener)
+// Invoices are Stripe-issued (collection_method=send_invoice, 14 days) and
+// mirrored into the invoices table with the hosted pay link + PDF. Staging
+// sits behind Basic Auth, so there is NO webhook — status flows back via
+// syncOpenInvoices() whenever the provider opens their invoice list.
 
-const CONFIRM_FEE_CENTS = 9200;
+const int = (v: string | undefined, fallback: number) => {
+    const n = Number(v);
+    return Number.isFinite(n) && n >= 0 ? Math.round(n) : fallback;
+};
+
+export const PRICING = {
+    leadFeeCents: int(process.env.LEAD_FEE_CENTS, 12000),
+    detailOpenCents: int(process.env.DETAIL_OPEN_CENTS, 300),
+    detailOpenCapCents: int(process.env.DETAIL_OPEN_CAP_CENTS, 5000),
+    aboMonthlyCents: int(process.env.ABO_MONTHLY_CENTS, 14900),
+    // Industry-standard annual discount: 12 for the price of 10 (~17 %).
+    aboAnnualCents: int(process.env.ABO_ANNUAL_CENTS, 149000),
+    aboIncludedLeadsPerMonth: 1,
+    freeLeadsPerProvider: int(process.env.FREE_LEADS_PER_PROVIDER, 2),
+};
+
+export type SubscriptionPlan = 'none' | 'monthly' | 'annual';
+
+export interface ProviderChargeInput {
+    providerKey: string;
+    period: string;                     // 'YYYY-MM'
+    subscriptionPlan: SubscriptionPlan;
+    subscriptionSince: string | null;   // ISO timestamp
+    leadsInPeriod: number;
+    leadsBeforePeriod: number;          // lifetime leads before the period (free-allowance basis)
+    detailOpensInPeriod: number;
+}
+
+export interface ChargeLine { label: string; qty: number; unit_cents: number; amount_cents: number }
+
+/** Deterministic charge computation for one provider and period — pure so the
+ *  test suite can pin every pricing rule without Stripe or a database. */
+export function computeProviderCharges(inp: ProviderChargeInput): { lines: ChargeLine[]; total_cents: number } {
+    const lines: ChargeLine[] = [];
+    const sinceMonth = inp.subscriptionSince ? inp.subscriptionSince.slice(0, 7) : null;
+    const subscribed = inp.subscriptionPlan !== 'none' && sinceMonth !== null && sinceMonth <= inp.period;
+
+    // Abo: monthly bills every period; annual bills only in the anniversary month.
+    if (subscribed && inp.subscriptionPlan === 'monthly') {
+        lines.push({ label: `Partner-Abo (monatlich) · ${inp.period}`, qty: 1, unit_cents: PRICING.aboMonthlyCents, amount_cents: PRICING.aboMonthlyCents });
+    } else if (subscribed && inp.subscriptionPlan === 'annual' && sinceMonth!.slice(5, 7) === inp.period.slice(5, 7)) {
+        lines.push({ label: `Partner-Abo (jährlich, 2 Monate geschenkt) · ${inp.period} – 12 Monate`, qty: 1, unit_cents: PRICING.aboAnnualCents, amount_cents: PRICING.aboAnnualCents });
+    }
+
+    // Leads: lifetime free allowance first, then the abo's included lead,
+    // the rest at the flat lead fee.
+    const remainingFree = Math.max(0, PRICING.freeLeadsPerProvider - inp.leadsBeforePeriod);
+    const freeUsed = Math.min(remainingFree, inp.leadsInPeriod);
+    const included = subscribed ? Math.min(PRICING.aboIncludedLeadsPerMonth, inp.leadsInPeriod - freeUsed) : 0;
+    const chargeableLeads = Math.max(0, inp.leadsInPeriod - freeUsed - included);
+    if (chargeableLeads > 0) {
+        const notes = [freeUsed > 0 ? `${freeUsed} Freikontingent` : null, included > 0 ? `${included} im Abo inkludiert` : null].filter(Boolean).join(', ');
+        lines.push({
+            label: `Leads (bestätigte Termine) · ${inp.leadsInPeriod} gesamt${notes ? ` (${notes})` : ''}`,
+            qty: chargeableLeads, unit_cents: PRICING.leadFeeCents, amount_cents: chargeableLeads * PRICING.leadFeeCents,
+        });
+    }
+
+    // Detail opens: unlimited for subscribers, otherwise 3 € each, monthly cap.
+    if (!subscribed && inp.detailOpensInPeriod > 0) {
+        const raw = inp.detailOpensInPeriod * PRICING.detailOpenCents;
+        const amount = Math.min(raw, PRICING.detailOpenCapCents);
+        lines.push({
+            label: `Detail-Opens (qualifizierte Profilansichten) · ${inp.detailOpensInPeriod}×${raw > amount ? ' · Monats-Cap angewendet' : ''}`,
+            qty: inp.detailOpensInPeriod, unit_cents: PRICING.detailOpenCents, amount_cents: amount,
+        });
+    }
+
+    return { lines, total_cents: lines.reduce((s, l) => s + l.amount_cents, 0) };
+}
+
+// ─── Period data collection (event_log is the billing ground truth) ──────────
+
+type BillingEvent = { type: string; timestamp?: string; payload?: { providerKey?: string } };
+
+export async function collectChargeInputs(period: string): Promise<ProviderChargeInput[]> {
+    const providers = (await supabaseApi.select('providers', {}, { limit: 1000 })) as
+        Array<{ provider_key: string; subscription_plan?: string | null; subscription_since?: string | null; partner_status?: string }>;
+    const [leadEvents, openEvents] = await Promise.all([
+        supabaseApi.select('event_log', { type: 'provider_lead_charged' }, { limit: 5000 }) as Promise<BillingEvent[]>,
+        supabaseApi.select('event_log', { type: 'provider_detail_opened' }, { limit: 5000 }) as Promise<BillingEvent[]>,
+    ]);
+    const month = (e: BillingEvent) => (e.timestamp || '').slice(0, 7);
+    return providers.map((p) => {
+        const myLeads = leadEvents.filter((e) => e.payload?.providerKey === p.provider_key);
+        return {
+            providerKey: p.provider_key,
+            period,
+            subscriptionPlan: (p.subscription_plan === 'monthly' || p.subscription_plan === 'annual') ? p.subscription_plan : 'none',
+            subscriptionSince: p.subscription_since ?? null,
+            leadsInPeriod: myLeads.filter((e) => month(e) === period).length,
+            leadsBeforePeriod: myLeads.filter((e) => month(e) < period).length,
+            detailOpensInPeriod: openEvents.filter((e) => e.payload?.providerKey === p.provider_key && month(e) === period).length,
+        };
+    });
+}
 
 const stripeForm = async (stripeKey: string, method: 'POST' | 'GET', path: string, params?: Record<string, string>) => {
     const url = `https://api.stripe.com/v1/${path}${method === 'GET' && params ? `?${new URLSearchParams(params)}` : ''}`;
@@ -40,8 +141,6 @@ async function ensureStripeCustomer(stripeKey: string, providerKey: string): Pro
     return customerId;
 }
 
-type Engagement = { id: string; provider_key: string; country: string; category: string; status: string; updated_at: string };
-
 // POST /api/v1/admin/billing/run — {period?: 'YYYY-MM', dry_run?: boolean}.
 // Server-to-server only (x-api-key); JWT users must not trigger billing.
 export function handleBillingRun(req: IncomingMessage, res: ServerResponse, correlationId: string, isAdminKey: boolean): void {
@@ -55,31 +154,24 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
                 res.end(JSON.stringify({ errorCode: 'FORBIDDEN', message: 'Billing runs are admin-only', correlationId }));
                 return;
             }
-            const stripeKey = process.env.STRIPE_SECRET_KEY;
-            if (!stripeKey) {
-                res.writeHead(503, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ errorCode: 'STRIPE_NOT_CONFIGURED', message: 'Stripe is not connected yet', correlationId }));
-                return;
-            }
             const d = JSON.parse(raw || '{}') as { period?: unknown; dry_run?: unknown };
             const period = typeof d.period === 'string' && /^\d{4}-\d{2}$/.test(d.period)
                 ? d.period : new Date().toISOString().slice(0, 7);
             const dryRun = d.dry_run === true;
-
-            // Billable = engagements whose status settled at confirmed/replied
-            // within the period (updated_at bumps on the status transition).
-            const billable: Engagement[] = [];
-            for (const status of ['confirmed', 'replied']) {
-                const rows = (await supabaseApi.select('engagement_requests', { status }, { limit: 500 })) as Engagement[];
-                billable.push(...rows.filter((r) => (r.updated_at || '').slice(0, 7) === period));
-            }
-            const byProvider = new Map<string, Engagement[]>();
-            for (const e of billable) {
-                byProvider.set(e.provider_key, [...(byProvider.get(e.provider_key) || []), e]);
+            // Dry runs are pure computation — Stripe is only needed to issue.
+            const stripeKey = process.env.STRIPE_SECRET_KEY;
+            if (!stripeKey && !dryRun) {
+                res.writeHead(503, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'STRIPE_NOT_CONFIGURED', message: 'Stripe is not connected yet', correlationId }));
+                return;
             }
 
+            const inputs = await collectChargeInputs(period);
             const results: Array<Record<string, unknown>> = [];
-            for (const [providerKey, engagements] of byProvider) {
+            for (const inp of inputs) {
+                const providerKey = inp.providerKey;
+                const { lines: lineItems, total_cents: totalCents } = computeProviderCharges(inp);
+                if (lineItems.length === 0) continue;   // nothing billable this period
                 // Idempotent: one Stripe invoice per provider and period.
                 const existing = (await supabaseApi.select('invoices', { provider_key: providerKey, period }, { limit: 5 })) as
                     Array<{ stripe_invoice_id?: string | null }>;
@@ -87,20 +179,13 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
                     results.push({ provider: providerKey, skipped: 'already invoiced' });
                     continue;
                 }
-                const lineItems = engagements.map((e) => ({
-                    label: `Confirmed engagement RQ-${e.id.slice(0, 4).toUpperCase()} · ${e.country} / ${e.category}`,
-                    qty: 1,
-                    unit_cents: CONFIRM_FEE_CENTS,
-                    amount_cents: CONFIRM_FEE_CENTS,
-                }));
-                const totalCents = lineItems.reduce((s, li) => s + li.amount_cents, 0);
                 if (dryRun) {
-                    results.push({ provider: providerKey, dry_run: true, items: lineItems.length, total_cents: totalCents });
+                    results.push({ provider: providerKey, dry_run: true, items: lineItems.length, total_cents: totalCents, lines: lineItems });
                     continue;
                 }
 
-                const customerId = await ensureStripeCustomer(stripeKey, providerKey);
-                const invoice = await stripeForm(stripeKey, 'POST', 'invoices', {
+                const customerId = await ensureStripeCustomer(stripeKey!, providerKey);
+                const invoice = await stripeForm(stripeKey!, 'POST', 'invoices', {
                     customer: customerId,
                     collection_method: 'send_invoice',
                     days_until_due: '14',
@@ -111,7 +196,7 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
                 });
                 const invoiceId = String(invoice.id);
                 for (const li of lineItems) {
-                    await stripeForm(stripeKey, 'POST', 'invoiceitems', {
+                    await stripeForm(stripeKey!, 'POST', 'invoiceitems', {
                         customer: customerId,
                         invoice: invoiceId,
                         amount: String(li.amount_cents),
@@ -119,7 +204,7 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
                         description: li.label,
                     });
                 }
-                const finalized = await stripeForm(stripeKey, 'POST', `invoices/${invoiceId}/finalize`) as {
+                const finalized = await stripeForm(stripeKey!, 'POST', `invoices/${invoiceId}/finalize`) as {
                     id: string; number?: string; status?: string; total?: number;
                     hosted_invoice_url?: string; invoice_pdf?: string; due_date?: number;
                 };
@@ -150,6 +235,36 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
             res.end(JSON.stringify({ errorCode: 'BILLING_ERROR', message: 'Billing run failed', correlationId }));
         }
     });
+}
+
+// GET /api/v1/provider/:key/billing/preview — the CURRENT period's charges as
+// the provider dashboard shows them (no Stripe involved, pure computation).
+export async function handleBillingPreview(res: ServerResponse, correlationId: string, providerKey: string): Promise<void> {
+    res.setHeader('x-correlation-id', correlationId);
+    try {
+        const period = new Date().toISOString().slice(0, 7);
+        const inputs = await collectChargeInputs(period);
+        const inp = inputs.find((i) => i.providerKey === providerKey);
+        if (!inp) {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId }));
+            return;
+        }
+        const { lines, total_cents } = computeProviderCharges(inp);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+            ok: true, period, provider_key: providerKey,
+            subscription: { plan: inp.subscriptionPlan, since: inp.subscriptionSince },
+            usage: { leads: inp.leadsInPeriod, detail_opens: inp.detailOpensInPeriod, free_leads_left: Math.max(0, PRICING.freeLeadsPerProvider - inp.leadsBeforePeriod) },
+            lines, total_cents,
+            pricing: { lead_fee_cents: PRICING.leadFeeCents, detail_open_cents: PRICING.detailOpenCents, detail_open_cap_cents: PRICING.detailOpenCapCents, abo_monthly_cents: PRICING.aboMonthlyCents, abo_annual_cents: PRICING.aboAnnualCents, abo_included_leads: PRICING.aboIncludedLeadsPerMonth, free_leads: PRICING.freeLeadsPerProvider },
+            correlationId,
+        }));
+    } catch (err) {
+        structuredLog('error', 'Billing preview failed', { correlationId, errorCode: 'ERR_BILLING_PREVIEW', severity: 'error', route: 'billing/preview' });
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Billing preview failed', correlationId }));
+    }
 }
 
 // Webhook substitute: pull payment status for open Stripe invoices whenever
