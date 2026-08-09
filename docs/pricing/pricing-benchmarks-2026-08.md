@@ -1,6 +1,14 @@
 # CompliHub360 · Pricing-Benchmarks & State of the Art
 
-**Stand: 08.08.2026 · Basis: Markt-Recherche Vergleichsplattformen · Status: Entscheidungsvorlage**
+**Stand: 08.08.2026 · Basis: Markt-Recherche Vergleichsplattformen · Status: ENTSCHIEDEN 2026-08-09**
+
+> **Beschluss 2026-08-09:** Vorschlag übernommen und implementiert (billing.ts,
+> env-überschreibbar): Lead-Fee **120 €** · Abo **149 €/Monat** oder
+> **1.490 €/Jahr** (2 Monate geschenkt, Abrechnung im Jubiläumsmonat) inkl.
+> 1 Lead/Monat + unbegrenzte Detail-Opens · Detail-Open **3 €** (Nicht-Abonnenten,
+> Cap 50 €/Monat) · **erste 2 Leads pro Provider frei** · Affiliate ohne Preis
+> (Post-Booking-Feature, Phase 1b). Abrechnung: monatliche Stripe-Sammelrechnung
+> über die v2-Events; Abo-Verwaltung in Phase 1 durch Admin (Offline-B2B-Vertrieb).
 
 CompliHub360 monetarisiert in Phase 1 vier Punkte entlang des Matchmaking-Funnels
 (Priorisierung vom 06.08.2026): Detail-Open, Lead-Fee, Provider-Abo, Affiliate-Link.

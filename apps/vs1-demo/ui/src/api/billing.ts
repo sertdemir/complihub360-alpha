@@ -37,6 +37,22 @@ export async function fetchInvoices(providerKey: string = DEMO_PROVIDER_KEY): Pr
   return res.invoices;
 }
 
+// ─── Current-period preview (pricing decision 2026-08-09) ────────────────────
+// Live charges of the running month: abo (149 €/M or 1.490 €/J), leads
+// (120 €, first 2 ever free, 1/month included in the abo), detail opens
+// (3 €, 50 € cap, free for subscribers). Pure computation server-side.
+export interface BillingPreview {
+  period: string;
+  subscription: { plan: 'none' | 'monthly' | 'annual'; since: string | null };
+  usage: { leads: number; detail_opens: number; free_leads_left: number };
+  lines: InvoiceLineItem[];
+  total_cents: number;
+}
+
+export async function fetchBillingPreview(providerKey: string = DEMO_PROVIDER_KEY): Promise<BillingPreview> {
+  return apiFetch<BillingPreview & { ok: boolean }>(`/api/v1/provider/${providerKey}/billing/preview`);
+}
+
 // ─── Stripe billing portal (wiring map C3) ───────────────────────────────────
 // Resolves to the portal URL, or 'not-configured' while STRIPE_SECRET_KEY is
 // missing on the API (503) — the page shows an honest note instead of a dead end.

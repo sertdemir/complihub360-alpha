@@ -336,6 +336,30 @@ describe('POST /api/v1/reviews', () => {
     });
 });
 
+describe('GET /api/v1/provider/:key/billing/preview', () => {
+    it('returns the current-period charge preview with usage and pricing', async () => {
+        seedProvider({ subscription_plan: 'none', subscription_since: null });
+        const period = new Date().toISOString().slice(0, 7);
+        (db.event_log ??= []).push(
+            { id: randomUUID(), type: 'provider_lead_charged', timestamp: `${period}-05T10:00:00Z`, payload: { providerKey: 'test-kanzlei' } },
+            { id: randomUUID(), type: 'provider_lead_charged', timestamp: `${period}-06T10:00:00Z`, payload: { providerKey: 'test-kanzlei' } },
+            { id: randomUUID(), type: 'provider_lead_charged', timestamp: `${period}-07T10:00:00Z`, payload: { providerKey: 'test-kanzlei' } },
+            { id: randomUUID(), type: 'provider_detail_opened', timestamp: `${period}-05T09:00:00Z`, payload: { providerKey: 'test-kanzlei' } },
+        );
+        const r = await api('/api/v1/provider/test-kanzlei/billing/preview');
+        expect(r.status).toBe(200);
+        expect(r.body.usage).toEqual({ leads: 3, detail_opens: 1, free_leads_left: 2 });
+        // 3 leads − 2 free = 1×120 € + 1 detail open ×3 €
+        expect(r.body.total_cents).toBe(12000 + 300);
+        expect(r.body.pricing.abo_annual_cents).toBe(149000);
+    });
+
+    it('is not public — guests get 401', async () => {
+        const r = await api('/api/v1/provider/test-kanzlei/billing/preview', { auth: 'none' });
+        expect(r.status).toBe(401);
+    });
+});
+
 describe('POST /api/v1/admin/watchers/tick', () => {
     it('runs a shadow tick against an empty store without erroring', async () => {
         const r = await api('/api/v1/admin/watchers/tick', { method: 'POST', body: '{}', auth: 'key' });
