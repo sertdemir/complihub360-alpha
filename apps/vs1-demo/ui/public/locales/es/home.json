@@ -31,7 +31,7 @@
     "seeIfApplies": "Compruebe si esto le aplica"
   },
   "hero": {
-    "eyebrow": "Para responsables de operaciones",
+    "eyebrow": "Plataforma de compliance intelligence y provider matching",
     "title": {
       "pre": "El trabajo de compliance que ",
       "gold": "no debería",
@@ -40,7 +40,7 @@
     "subtitleDesktop": "CompliHub360 mapea las normas que aplican a sus operaciones en los mercados europeos y le conecta con un especialista verificado cuando algo requiere ejecución. Seis minutos hasta su primera Risk Map. Sin necesidad de cuenta.",
     "subtitleMobile": "CompliHub360 mapea las normas en los mercados europeos y le conecta con un especialista verificado cuando algo requiere ejecución. Seis minutos hasta su primera Risk Map. Sin necesidad de cuenta.",
     "cta": {
-      "start": "Inicie su evaluación",
+      "start": "Evaluar mis necesidades",
       "showMap": "Ver una Risk Map de ejemplo",
       "closeMap": "Cerrar la Risk Map"
     },
@@ -1062,7 +1062,7 @@
       "post": "."
     },
     "subtitle": "Seis minutos. Sin necesidad de cuenta. Contrastamos sus operaciones con la normativa que realmente aplica y le mostramos qué hacer a continuación.",
-    "cta": "Inicie su evaluación"
+    "cta": "Evaluar mis necesidades"
   },
   "newsletter": {
     "eyebrow": "Manténgase al día",

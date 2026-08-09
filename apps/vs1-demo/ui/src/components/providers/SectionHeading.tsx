@@ -79,10 +79,17 @@ export function SectionEyebrow({
   tone?: 'neutral' | 'brand' | 'accent' | 'inverse';
   className?: string;
 }) {
+  // Semantic tokens, not raw palette steps: the palette classes are fixed
+  // values and do not flip with the theme, which left every eyebrow at a
+  // 1.01 contrast ratio on dark surfaces — text-primary-600 (#002E26) sitting
+  // on the dark hero (#1F2937). The fg-* tokens carry a dark override
+  // (brand -> #2CC0AD, tertiary -> #6B7A80) and stay on the same brand colours
+  // in light mode. `inverse` keeps its literal white: it is meant for photo
+  // and colour-block overlays, where the surface is dark in either theme.
   const toneClass = {
-    neutral: 'text-neutral-500',
-    brand: 'text-primary-600',
-    accent: 'text-accent-600',
+    neutral: 'text-fg-tertiary',
+    brand: 'text-fg-brand',
+    accent: 'text-fg-accent',
     inverse: 'text-white/70',
   }[tone];
   return (
