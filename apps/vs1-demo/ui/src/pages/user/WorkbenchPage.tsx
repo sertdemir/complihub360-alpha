@@ -26,7 +26,7 @@ type DomainKey = 'tax-vat' | 'product-packaging' | 'data-privacy' | 'marketing-s
 const DOMAIN_META: Record<DomainKey, { name: string; riskSub: string; steps: { label: string; description?: string }[] }> = {
   'tax-vat': { name: 'Tax & VAT', riskSub: '€145k IT revenue', steps: [] },
   'product-packaging': {
-    name: 'Product & Packaging', riskSub: 'LUCID · EPR',
+    name: 'EPR & Packaging', riskSub: 'LUCID · EPR',
     steps: [
       { label: 'Register with LUCID (Germany)', description: '2 verified partners match · DE-IT cross-border · avg. reply 18h' },
       { label: 'Join a CONAI consortium (Italy)', description: 'Required before next sale to IT · Agenzia delle Entrate online flow' },
@@ -44,7 +44,7 @@ const DOMAIN_META: Record<DomainKey, { name: string; riskSub: string; steps: { l
     ],
   },
   'marketing-seo': {
-    name: 'Marketing & SEO', riskSub: 'UWG · Werberecht',
+    name: 'Marketing Compliance', riskSub: 'UWG · Werberecht',
     steps: [
       { label: 'Review health & comparative claims', description: '2 verified partners match · DE-IT cross-border · avg. reply 18h' },
       { label: 'Add influencer-disclosure policy', description: 'Required before next sale to IT · Agenzia delle Entrate online flow' },

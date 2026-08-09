@@ -63,7 +63,7 @@
       "subtitle": "Seleccione todas las que apliquen. Solo mapearemos la normativa relevante para su alcance.",
       "domains": [
         "IVA e impuestos",
-        "RAP y envases",
+        "EPR y envases",
         "RGPD y privacidad",
         "Compliance de marketing"
       ],
@@ -163,7 +163,7 @@
         "desc": "IVA transfronterizo, OSS/IOSS, umbrales"
       },
       "eprPackaging": {
-        "title": "Producto y embalaje",
+        "title": "EPR y envases",
         "desc": "EPR, responsabilidad del productor, registros"
       },
       "gdprPrivacy": {
@@ -171,7 +171,7 @@
         "desc": "RGPD, encargados, representante UE"
       },
       "marketing": {
-        "title": "Marketing y SEO",
+        "title": "Compliance de marketing",
         "desc": "Consentimiento, cookies, normas publicitarias"
       },
       "corporate": {
@@ -775,7 +775,7 @@
         ]
       },
       {
-        "title": "RAP y envases",
+        "title": "EPR y envases",
         "markets": "DE · UK · NL · FR · AT · BE",
         "desc": "Responsabilidad ampliada del productor, registros de envases, sistemas de devolución, ecomodulación.",
         "intro": "Responsabilidad ampliada del productor para envases, pilas y electrónica. Cada mercado tiene su propio registro, tarifas y calendario de informes. Mapeamos con quién debe registrarse y cuándo.",
@@ -1093,7 +1093,7 @@
         "title": "Soluciones",
         "links": {
           "vatTax": "IVA e impuestos",
-          "productPackaging": "Producto y envases",
+          "productPackaging": "EPR y envases",
           "dataPrivacy": "Privacidad de datos",
           "marketingAdvertising": "Marketing y publicidad",
           "corporateStructure": "Estructura societaria",

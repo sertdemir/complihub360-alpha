@@ -13,7 +13,7 @@ mirroring the two desktop header components — each a COMPONENT_SET with **Stat
 Order top→bottom: **Header Bar → Button Row → Anchor Pills**
 
 1. **Header Bar** — 390×64, HORIZONTAL, `space-between`, pad `12 20`.
-   - Left: **Logo** (360° + CompliHub + "Compliance. Simplified.")
+   - Left: **Logo** (360° + CompliHub + "Always on your side.")
    - Right: **Globe** (language toggle) + **Close (X)** — grouped, gap 8. *(globe added by user)*
    - Bottom border: `color/border/subtle` 1px.
 

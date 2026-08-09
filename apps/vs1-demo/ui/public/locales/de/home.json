@@ -163,7 +163,7 @@
         "desc": "Grenzüberschreitende USt, OSS/IOSS, Schwellenwerte"
       },
       "eprPackaging": {
-        "title": "Produkt & Verpackung",
+        "title": "EPR & Verpackung",
         "desc": "EPR, Herstellerverantwortung, Register"
       },
       "gdprPrivacy": {
@@ -171,7 +171,7 @@
         "desc": "DSGVO, AVV, EU-Vertreter"
       },
       "marketing": {
-        "title": "Marketing & SEO",
+        "title": "Marketing-Compliance",
         "desc": "Einwilligung, Cookies, Werberecht"
       },
       "corporate": {
@@ -1093,7 +1093,7 @@
         "title": "Lösungen",
         "links": {
           "vatTax": "USt & Steuern",
-          "productPackaging": "Produkt & Verpackung",
+          "productPackaging": "EPR & Verpackung",
           "dataPrivacy": "Datenschutz",
           "marketingAdvertising": "Marketing & Werbung",
           "corporateStructure": "Unternehmensstruktur",

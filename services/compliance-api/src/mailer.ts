@@ -346,9 +346,12 @@ function renderHtml(m: MagicLinkMail, t: MailStrings['magic']): string {
     const btn = (label: string, url: string, primary: boolean) => primary
         ? `<a href="${url}" style="display:block;background-color:#d4af37;border-radius:12px;padding:14px 24px;text-align:center;font-family:Helvetica,Arial,sans-serif;font-size:15px;font-weight:bold;color:#101411;text-decoration:none;">${label} &rarr;</a>`
         : `<a href="${url}" style="display:inline-block;border:1px solid rgba(255,255,255,0.25);border-radius:10px;padding:10px 18px;font-family:Helvetica,Arial,sans-serif;font-size:13px;font-weight:bold;color:#e5e7eb;text-decoration:none;">${label}</a>`;
+    // NOTE: logo-lockup-email.png still carries the retired claim "Compliance.
+    // Simplified." baked into the pixels. The alt text already states the new
+    // one; re-export the asset from Compass to close the gap (Brand Map §5).
     return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0b1620;padding:40px 16px;"><tr><td align="center">
 <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;">
-<tr><td style="padding:0 8px 24px 8px;"><img src="https://kqylqwogxbiwpnomkzsn.supabase.co/storage/v1/object/public/assets/logo-lockup-email.png" width="207" height="54" alt="CompliHub360 — Compliance. Simplified." style="display:block;border:0;"/></td></tr>
+<tr><td style="padding:0 8px 24px 8px;"><img src="https://kqylqwogxbiwpnomkzsn.supabase.co/storage/v1/object/public/assets/logo-lockup-email.png" width="207" height="54" alt="CompliHub360 — Always on your side." style="display:block;border:0;"/></td></tr>
 <tr><td style="background-color:#1f2937;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:36px 32px;">
 <div style="font-family:Georgia,serif;font-size:26px;line-height:1.25;font-weight:bold;color:#ffffff;">${esc(t.headlinePre)}<span style="color:#d4af37;">${esc(t.headlineGold)}</span>${esc(t.headlinePost)}</div>
 <div style="padding-top:12px;font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#aeb8c4;">${esc(t.introPre)}<strong style="color:#ffffff;">${esc(t.introStrong)}</strong>${esc(t.introPost)}</div>
