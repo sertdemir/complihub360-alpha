@@ -20,7 +20,7 @@ const DOMAIN_DATA = [
     {
         id: ComplianceDomain.PRODUCT,
         icon: "inventory_2",
-        title: "Product & Packaging (EPR)",
+        title: "EPR & Packaging",
         short: "Produkthaftung & Verpackung",
         desc: "Structured navigation through local packaging laws and Extended Producer Responsibility (EPR). Categorization for manufacturers, resellers, and dropshippers.",
         features: ["EPR Registration", "Local Labeling Laws", "Packaging Act (VerpackG)"],

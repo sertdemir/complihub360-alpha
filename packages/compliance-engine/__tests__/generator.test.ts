@@ -105,3 +105,20 @@ describe('Obligations enrichment (final-8 coverage)', () => {
         expect(privacy?.markets).toEqual([]);
     });
 });
+
+describe('EU legal basis (CELEX → EUR-Lex)', () => {
+    it('9) obligations resting on EU law carry a verified CELEX + permalink', () => {
+        const r = generateRelevantSubdomains({ countries: ['DE'], focusDomains: ['LOGISTICS' as any] });
+        const eori = r.find(x => x.id === 'log-eori');
+        expect(eori?.celex).toBe('32013R0952');           // Union Customs Code
+        expect(eori?.sourceUrl).toBe('https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32013R0952');
+    });
+
+    it('10) purely national obligations carry no CELEX rather than a fabricated one', () => {
+        const r = generateRelevantSubdomains({ countries: ['DE'], focusDomains: ['CORPORATE' as any] });
+        const reg = r.find(x => x.id === 'corp-registration');
+        expect(reg).toBeDefined();
+        expect(reg?.celex).toBeUndefined();
+        expect(reg?.sourceUrl).toBeUndefined();
+    });
+});

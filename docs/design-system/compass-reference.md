@@ -299,6 +299,6 @@ reconciliation — it must become `risk/*` petrol on the Hero redo (Phase D). No
 
 ## 14 · Logo (🪪)
 
-Round **360° mark** (gold/white) + **"CompliHub"** wordmark + tagline **"Compliance. Simplified."**.
+Round **360° mark** (gold/white) + **"CompliHub"** wordmark + tagline **"Always on your side."**.
 Use the real DS logo instance — never a placeholder. Current `GlobalNav` uses a `CircleDot` placeholder
 → replace with the real 360° mark when the header is reworked.

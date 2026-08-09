@@ -26,6 +26,11 @@ export interface ComplianceSubdomainTemplate {
     triggerTags: string[];
     applicableBusinessModels: string[];
     riskWeight: number; // Baseline risk weight (1-10)
+    /** CELEX id of the EU act this obligation rests on — verified against
+     *  EUR-Lex, so the payload can carry a citable, always-current source
+     *  link. Absent where the obligation is purely national (e.g. corporate
+     *  income tax, commercial register). */
+    celex?: string;
 }
 
 // Initial country-agnostic domain template library
@@ -38,6 +43,7 @@ export const DomainTemplateLibrary: Record<ComplianceDomain, ComplianceSubdomain
             triggerTags: ['sales', 'revenue', 'ecommerce'],
             applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER', 'SAAS_SUBSCRIPTION'],
             riskWeight: 8,
+            celex: '32006L0112',
         },
         {
             id: 'tax-corporate',
@@ -56,6 +62,7 @@ export const DomainTemplateLibrary: Record<ComplianceDomain, ComplianceSubdomain
             triggerTags: ['physical_goods', 'packaging', 'electronics'],
             applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER'],
             riskWeight: 7,
+            celex: '32025R0040',
         },
         {
             id: 'prod-safety',
@@ -64,6 +71,7 @@ export const DomainTemplateLibrary: Record<ComplianceDomain, ComplianceSubdomain
             triggerTags: ['consumer_goods', 'health', 'electronics'],
             applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER'],
             riskWeight: 9,
+            celex: '32023R0988',
         }
     ],
     [ComplianceDomain.MARKETING]: [
@@ -74,6 +82,7 @@ export const DomainTemplateLibrary: Record<ComplianceDomain, ComplianceSubdomain
             triggerTags: ['email', 'sms', 'newsletter'],
             applicableBusinessModels: ['DTC', 'SAAS_SUBSCRIPTION', 'AGENCY'],
             riskWeight: 6,
+            celex: '32002L0058',
         },
         {
             id: 'mktg-health-claims',
@@ -82,6 +91,7 @@ export const DomainTemplateLibrary: Record<ComplianceDomain, ComplianceSubdomain
             triggerTags: ['health', 'supplements', 'medical'],
             applicableBusinessModels: ['DTC'],
             riskWeight: 10,
+            celex: '32006R1924',
         }
     ],
     [ComplianceDomain.DATA]: [
@@ -92,6 +102,7 @@ export const DomainTemplateLibrary: Record<ComplianceDomain, ComplianceSubdomain
             triggerTags: ['user_data', 'tracking'],
             applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER', 'SAAS_SUBSCRIPTION', 'AGENCY'],
             riskWeight: 8,
+            celex: '32016R0679',
         },
         {
             id: 'data-hosting',
@@ -100,6 +111,7 @@ export const DomainTemplateLibrary: Record<ComplianceDomain, ComplianceSubdomain
             triggerTags: ['cloud', 'infrastructure', 'sensitive_data'],
             applicableBusinessModels: ['SAAS_SUBSCRIPTION'],
             riskWeight: 7,
+            celex: '32016R0679',
         }
     ],
     [ComplianceDomain.CORPORATE]: [
@@ -120,6 +132,7 @@ export const DomainTemplateLibrary: Record<ComplianceDomain, ComplianceSubdomain
             triggerTags: ['b2b', 'finance', 'high_value'],
             applicableBusinessModels: ['SAAS_SUBSCRIPTION', 'AGENCY', 'MARKETPLACE_SELLER'],
             riskWeight: 8,
+            celex: '32018L0843',
         }
     ],
     [ComplianceDomain.LOGISTICS]: [
@@ -130,6 +143,7 @@ export const DomainTemplateLibrary: Record<ComplianceDomain, ComplianceSubdomain
             triggerTags: ['physical_goods', 'import', 'export'],
             applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER'],
             riskWeight: 7,
+            celex: '32013R0952',
         },
         {
             id: 'log-customs-classification',
@@ -138,6 +152,7 @@ export const DomainTemplateLibrary: Record<ComplianceDomain, ComplianceSubdomain
             triggerTags: ['physical_goods', 'import'],
             applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER'],
             riskWeight: 6,
+            celex: '32013R0952',
         },
         {
             id: 'log-intrastat',
@@ -146,6 +161,7 @@ export const DomainTemplateLibrary: Record<ComplianceDomain, ComplianceSubdomain
             triggerTags: ['physical_goods', 'eu_trade'],
             applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER'],
             riskWeight: 5,
+            celex: '32019R2152',
         }
     ],
     [ComplianceDomain.LEGAL]: [
@@ -156,6 +172,7 @@ export const DomainTemplateLibrary: Record<ComplianceDomain, ComplianceSubdomain
             triggerTags: ['b2c', 'ecommerce'],
             applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER', 'SAAS_SUBSCRIPTION', 'AGENCY'],
             riskWeight: 6,
+            celex: '32011L0083',
         },
         {
             id: 'legal-commercial-contracts',
@@ -164,6 +181,7 @@ export const DomainTemplateLibrary: Record<ComplianceDomain, ComplianceSubdomain
             triggerTags: ['b2b', 'contracts'],
             applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER', 'SAAS_SUBSCRIPTION', 'AGENCY'],
             riskWeight: 4,
+            celex: '32008R0593',
         }
     ]
 };

@@ -25,7 +25,7 @@ const engagements = [
     // C — confirmed, reply deadline 30m ago → breach(reply).
     { id: "cccccccc-0000-0000-0000-000000000003", provider_key: "p_reply", country: "TR", category: "Corporate", status: "confirmed", sla_confirm_deadline: iso(now - 5 * 3600e3), sla_reply_deadline: iso(now - 1800e3), message: "x" },
     // D — healthy, confirm deadline in 20h → no action.
-    { id: "dddddddd-0000-0000-0000-000000000004", provider_key: "p_ok", country: "DE", category: "Marketing & SEO", status: "created", sla_confirm_deadline: iso(now + 20 * 3600e3), sla_reply_deadline: null, message: "x" },
+    { id: "dddddddd-0000-0000-0000-000000000004", provider_key: "p_ok", country: "DE", category: "Marketing Compliance", status: "created", sla_confirm_deadline: iso(now + 20 * 3600e3), sla_reply_deadline: null, message: "x" },
 ];
 
 const inserts: Array<{ table: string; body: any }> = [];

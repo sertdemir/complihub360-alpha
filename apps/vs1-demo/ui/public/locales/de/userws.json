@@ -26,9 +26,9 @@
   },
   "domain": {
     "taxVat": "Steuern & USt",
-    "productPackaging": "Produkt & Verpackung",
+    "productPackaging": "EPR & Verpackung",
     "dataPrivacy": "Daten & Datenschutz",
-    "marketingSeo": "Marketing & SEO",
+    "marketingSeo": "Marketing-Compliance",
     "corporateStructure": "Unternehmen & Struktur",
     "productCompliance": "Produkt-Compliance",
     "logisticsCustoms": "Logistik & Zoll",

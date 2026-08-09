@@ -24,9 +24,9 @@ export interface DomainDef {
 
 export const DOMAINS: DomainDef[] = [
   { slug: 'tax-vat', label: 'Tax & VAT', i18nKey: 'taxVat' },
-  { slug: 'product-packaging', label: 'Product & Packaging', i18nKey: 'productPackaging' },
+  { slug: 'product-packaging', label: 'EPR & Packaging', i18nKey: 'productPackaging' },
   { slug: 'data-privacy', label: 'Data & Privacy', i18nKey: 'dataPrivacy' },
-  { slug: 'marketing-seo', label: 'Marketing & SEO', i18nKey: 'marketingSeo' },
+  { slug: 'marketing-seo', label: 'Marketing Compliance', i18nKey: 'marketingSeo' },
   { slug: 'corporate-structure', label: 'Corporate & Structure', i18nKey: 'corporateStructure' },
   { slug: 'product-compliance', label: 'Product Compliance', i18nKey: 'productCompliance' },
   { slug: 'logistics-customs', label: 'Logistics & Customs', i18nKey: 'logisticsCustoms' },

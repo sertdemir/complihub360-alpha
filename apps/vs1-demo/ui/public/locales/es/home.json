@@ -31,7 +31,7 @@
     "seeIfApplies": "Compruebe si esto le aplica"
   },
   "hero": {
-    "eyebrow": "Para responsables de operaciones",
+    "eyebrow": "Plataforma de compliance intelligence y provider matching",
     "title": {
       "pre": "El trabajo de compliance que ",
       "gold": "no debería",
@@ -40,7 +40,7 @@
     "subtitleDesktop": "CompliHub360 mapea las normas que aplican a sus operaciones en los mercados europeos y le conecta con un especialista verificado cuando algo requiere ejecución. Seis minutos hasta su primera Risk Map. Sin necesidad de cuenta.",
     "subtitleMobile": "CompliHub360 mapea las normas en los mercados europeos y le conecta con un especialista verificado cuando algo requiere ejecución. Seis minutos hasta su primera Risk Map. Sin necesidad de cuenta.",
     "cta": {
-      "start": "Inicie su evaluación",
+      "start": "Evaluar mis necesidades",
       "showMap": "Ver una Risk Map de ejemplo",
       "closeMap": "Cerrar la Risk Map"
     },
@@ -63,7 +63,7 @@
       "subtitle": "Seleccione todas las que apliquen. Solo mapearemos la normativa relevante para su alcance.",
       "domains": [
         "IVA e impuestos",
-        "RAP y envases",
+        "EPR y envases",
         "RGPD y privacidad",
         "Compliance de marketing"
       ],
@@ -169,7 +169,7 @@
         "desc": "IVA transfronterizo, OSS/IOSS, umbrales"
       },
       "eprPackaging": {
-        "title": "Producto y embalaje",
+        "title": "EPR y envases",
         "desc": "EPR, responsabilidad del productor, registros"
       },
       "gdprPrivacy": {
@@ -177,7 +177,7 @@
         "desc": "RGPD, encargados, representante UE"
       },
       "marketing": {
-        "title": "Marketing y SEO",
+        "title": "Compliance de marketing",
         "desc": "Consentimiento, cookies, normas publicitarias"
       },
       "corporate": {
@@ -781,7 +781,7 @@
         ]
       },
       {
-        "title": "RAP y envases",
+        "title": "EPR y envases",
         "markets": "DE · UK · NL · FR · AT · BE",
         "desc": "Responsabilidad ampliada del productor, registros de envases, sistemas de devolución, ecomodulación.",
         "intro": "Responsabilidad ampliada del productor para envases, pilas y electrónica. Cada mercado tiene su propio registro, tarifas y calendario de informes. Mapeamos con quién debe registrarse y cuándo.",
@@ -1068,7 +1068,7 @@
       "post": "."
     },
     "subtitle": "Seis minutos. Sin necesidad de cuenta. Contrastamos sus operaciones con la normativa que realmente aplica y le mostramos qué hacer a continuación.",
-    "cta": "Inicie su evaluación"
+    "cta": "Evaluar mis necesidades"
   },
   "newsletter": {
     "eyebrow": "Manténgase al día",
@@ -1099,7 +1099,7 @@
         "title": "Soluciones",
         "links": {
           "vatTax": "IVA e impuestos",
-          "productPackaging": "Producto y envases",
+          "productPackaging": "EPR y envases",
           "dataPrivacy": "Privacidad de datos",
           "marketingAdvertising": "Marketing y publicidad",
           "corporateStructure": "Estructura societaria",

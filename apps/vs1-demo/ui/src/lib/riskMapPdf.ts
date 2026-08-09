@@ -107,7 +107,7 @@ export function generateRiskMapPdf(opts: {
   const chWidth = doc.getTextWidth('CompliHub');
   doc.setTextColor(GOLD).text('360', M + chWidth + 2, y);
   doc.setFont('helvetica', 'normal').setFontSize(8).setTextColor(MUTED);
-  doc.text('Compliance. Simplified.', M, y + 12);
+  doc.text('Always on your side.', M, y + 12);
   doc.text(L('pdf.generated', 'Generated {{date}} · staging preview', { date: new Date().toISOString().slice(0, 10) }), W - M, y, { align: 'right' });
   y += 40;
 

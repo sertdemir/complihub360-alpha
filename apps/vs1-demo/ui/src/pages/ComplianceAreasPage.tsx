@@ -59,7 +59,7 @@ const ANCHORS: { id: string; defaultLabel: string; key: string }[] = [
   { id: 'tax', defaultLabel: 'Tax & VAT', key: 'compliance.anchorTax' },
   { id: 'epr', defaultLabel: 'EPR & Packaging', key: 'compliance.anchorEpr' },
   { id: 'privacy', defaultLabel: 'Data & Privacy', key: 'compliance.anchorPrivacy' },
-  { id: 'marketing', defaultLabel: 'Marketing & SEO', key: 'compliance.anchorMarketing' },
+  { id: 'marketing', defaultLabel: 'Marketing Compliance', key: 'compliance.anchorMarketing' },
   { id: 'corporate', defaultLabel: 'Corporate Structure', key: 'compliance.anchorCorporate' },
   { id: 'fullsupport', defaultLabel: 'Full Support', key: 'compliance.anchorFullsupport' },
 ];

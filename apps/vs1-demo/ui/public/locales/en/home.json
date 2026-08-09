@@ -31,7 +31,7 @@
     "seeIfApplies": "See if this applies to you"
   },
   "hero": {
-    "eyebrow": "For operations leads",
+    "eyebrow": "Compliance Intelligence & Provider-Matching Platform",
     "title": {
       "pre": "The compliance work you ",
       "gold": "shouldn't",
@@ -40,7 +40,7 @@
     "subtitleDesktop": "CompliHub360 maps the rules that apply to your operations across European markets, then connects you to a verified specialist when something needs hands. Six minutes to your first risk map. No account required.",
     "subtitleMobile": "CompliHub360 maps the rules across European markets, then connects you to a verified specialist when something needs hands. Six minutes to your first risk map. No account required.",
     "cta": {
-      "start": "Start your assessment",
+      "start": "Assess My Needs",
       "showMap": "See an example risk map",
       "closeMap": "Close risk map"
     },
@@ -169,7 +169,7 @@
         "desc": "Cross-border VAT, OSS/IOSS, thresholds"
       },
       "eprPackaging": {
-        "title": "Product & Packaging",
+        "title": "EPR & Packaging",
         "desc": "EPR, producer responsibility, registers"
       },
       "gdprPrivacy": {
@@ -177,7 +177,7 @@
         "desc": "GDPR, DPAs, EU representative"
       },
       "marketing": {
-        "title": "Marketing & SEO",
+        "title": "Marketing Compliance",
         "desc": "Consent, cookies, advertising rules"
       },
       "corporate": {
@@ -1068,7 +1068,7 @@
       "post": "."
     },
     "subtitle": "Six minutes. No account required. We map your operations against the regulations that actually apply, and show you what to do next.",
-    "cta": "Start your assessment"
+    "cta": "Assess My Needs"
   },
   "newsletter": {
     "eyebrow": "Stay current",
@@ -1099,7 +1099,7 @@
         "title": "Solutions",
         "links": {
           "vatTax": "VAT & Tax",
-          "productPackaging": "Product & Packaging",
+          "productPackaging": "EPR & Packaging",
           "dataPrivacy": "Data Privacy",
           "marketingAdvertising": "Marketing & Advertising",
           "corporateStructure": "Corporate Structure",

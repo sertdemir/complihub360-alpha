@@ -31,7 +31,7 @@
     "seeIfApplies": "Prüfen Sie, ob das auf Sie zutrifft"
   },
   "hero": {
-    "eyebrow": "Für Operations-Verantwortliche",
+    "eyebrow": "Plattform für Compliance-Intelligence & Provider-Matching",
     "title": {
       "pre": "Die Compliance-Arbeit, die Sie ",
       "gold": "nicht",
@@ -40,7 +40,7 @@
     "subtitleDesktop": "CompliHub360 kartiert die Regeln, die für Ihre Geschäftstätigkeit in europäischen Märkten gelten, und verbindet Sie mit einem verifizierten Spezialisten, sobald etwas Umsetzung braucht. Sechs Minuten bis zu Ihrer ersten Risk Map. Kein Konto erforderlich.",
     "subtitleMobile": "CompliHub360 kartiert die Regeln in europäischen Märkten und verbindet Sie mit einem verifizierten Spezialisten, sobald etwas Umsetzung braucht. Sechs Minuten bis zu Ihrer ersten Risk Map. Kein Konto erforderlich.",
     "cta": {
-      "start": "Assessment starten",
+      "start": "Meinen Bedarf ermitteln",
       "showMap": "Beispiel-Risk-Map ansehen",
       "closeMap": "Risk Map schließen"
     },
@@ -169,7 +169,7 @@
         "desc": "Grenzüberschreitende USt, OSS/IOSS, Schwellenwerte"
       },
       "eprPackaging": {
-        "title": "Produkt & Verpackung",
+        "title": "EPR & Verpackung",
         "desc": "EPR, Herstellerverantwortung, Register"
       },
       "gdprPrivacy": {
@@ -177,7 +177,7 @@
         "desc": "DSGVO, AVV, EU-Vertreter"
       },
       "marketing": {
-        "title": "Marketing & SEO",
+        "title": "Marketing-Compliance",
         "desc": "Einwilligung, Cookies, Werberecht"
       },
       "corporate": {
@@ -1068,7 +1068,7 @@
       "post": "."
     },
     "subtitle": "Sechs Minuten. Kein Konto erforderlich. Wir gleichen Ihre Tätigkeit mit den Vorschriften ab, die tatsächlich gelten, und zeigen Ihnen, was als Nächstes zu tun ist.",
-    "cta": "Assessment starten"
+    "cta": "Meinen Bedarf ermitteln"
   },
   "newsletter": {
     "eyebrow": "Auf dem Laufenden bleiben",
@@ -1099,7 +1099,7 @@
         "title": "Lösungen",
         "links": {
           "vatTax": "USt & Steuern",
-          "productPackaging": "Produkt & Verpackung",
+          "productPackaging": "EPR & Verpackung",
           "dataPrivacy": "Datenschutz",
           "marketingAdvertising": "Marketing & Werbung",
           "corporateStructure": "Unternehmensstruktur",

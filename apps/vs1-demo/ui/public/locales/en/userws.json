@@ -26,9 +26,9 @@
   },
   "domain": {
     "taxVat": "Tax & VAT",
-    "productPackaging": "Product & Packaging",
+    "productPackaging": "EPR & Packaging",
     "dataPrivacy": "Data & Privacy",
-    "marketingSeo": "Marketing & SEO",
+    "marketingSeo": "Marketing Compliance",
     "corporateStructure": "Corporate & Structure",
     "productCompliance": "Product Compliance",
     "logisticsCustoms": "Logistics & Customs",

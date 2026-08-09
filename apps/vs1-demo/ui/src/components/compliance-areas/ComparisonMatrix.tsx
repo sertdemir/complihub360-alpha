@@ -55,7 +55,7 @@ const ROWS: Row[] = [
   },
   {
     id: 'marketing',
-    titleDefault: 'Marketing & SEO',
+    titleDefault: 'Marketing Compliance',
     riskRank: 2,
     riskLabel: 'Medium',
     riskColor: 'bg-warning-bg text-warning-text border-warning-text/30',
