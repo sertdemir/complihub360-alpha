@@ -158,7 +158,7 @@ Kategorie-Verteilung (Top): `wcag-contrast` 11 · `missing-dark-variant` 11 · `
 - **Compass-Messlatte:** `.claude/skills/compass/references/{token-architecture,accessibility,component-standards,theming,naming-conventions}.md` + `assets/c360-context.md`. Skill via `Skill(compass)` laden.
 - **Dark-Mapping-Doku:** `docs/backlog/app-workspace-dark-tokens.md`.
 - **Theme-Engine:** `src/lib/theme.ts` (localStorage-Key + `<meta theme-color>`, letzterer noch altes Petrol #001c16, #10). App-Workspaces sind **immer dark** (`forceDark`), Marketing-Seiten haben Light/Dark-Toggle.
-- **Verifikation:** Storybook-Dark-Toggle existiert jetzt (Toolbar). Staging: `https://staging.complihub360.com` (Basic Auth `complihub` / `uJLy2d0tJlgyna8c`; Auth-Trick: einmal Creds-URL laden, dann saubere URLs). Deploy FE: `./scripts/deploy-staging.sh`. TSC: `cd apps/vs1-demo/ui && npx tsc -b --noEmit`.
+- **Verifikation:** Storybook-Dark-Toggle existiert jetzt (Toolbar). Staging: `https://staging.complihub360.com` (Basic Auth: Credentials in `.env.staging` → `STAGING_BASIC_AUTH`, nicht im Repo — rotiert 2026-08-09). Deploy FE: `./scripts/deploy-staging.sh`. TSC: `cd apps/vs1-demo/ui && npx tsc -b --noEmit`.
 - **Harte Markenregeln:** Gold `#d4af37` nur Verified/Monetarisierung + ein Gold-Wort; Petrol `#097070/#004d40/#0e6450` = Trust/Primär; Slate `#1f2937` = Dark-Standard; Status = red/amber/green/grey; Ton „authoritative but not alarmist".
 
 ### Startprompt-Vorschlag für die neue Session
