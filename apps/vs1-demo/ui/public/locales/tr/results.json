@@ -31,6 +31,8 @@
     "due": "Son Tarih",
     "state": "Durum"
   },
+  "appliesIn_one": "{{count}} gün içinde geçerli",
+  "appliesIn_other": "{{count}} gün içinde geçerli",
   "severity": {
     "critical": "Kritik",
     "high": "Yüksek",

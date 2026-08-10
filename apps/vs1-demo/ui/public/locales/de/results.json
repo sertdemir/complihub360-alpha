@@ -31,6 +31,8 @@
     "due": "Fällig",
     "state": "Status"
   },
+  "appliesIn_one": "gilt in {{count}} Tag",
+  "appliesIn_other": "gilt in {{count}} Tagen",
   "severity": {
     "critical": "Kritisch",
     "high": "Hoch",

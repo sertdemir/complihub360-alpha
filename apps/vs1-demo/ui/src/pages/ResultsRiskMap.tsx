@@ -39,6 +39,21 @@ type Obligation = {
   sourceUrl?: string;
 };
 
+/** Whole days from today until an ISO date, or null once the date has passed
+ *  (or is absent). Both sides are normalised to local midnight so a duty that
+ *  starts the day after tomorrow reads "2 days" regardless of the clock time.
+ *  Deliberately lives here and not in the engine: the enrichment map is
+ *  deterministic ground truth, and only the render point knows "now". */
+function daysUntil(iso?: string | null): number | null {
+  if (!iso) return null;
+  const target = new Date(`${iso}T00:00:00`);
+  if (Number.isNaN(target.getTime())) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const days = Math.round((target.getTime() - today.getTime()) / 86_400_000);
+  return days > 0 ? days : null;
+}
+
 export const OBLIGATIONS: Obligation[] = [
   {
     severity: 'critical',
@@ -213,8 +228,17 @@ export function ResultsRiskMap() {
         sourceLabel: l.source_url ? (l.source ?? l.celex ?? undefined) : undefined,
         sourceUrl: l.source_url ?? undefined,
         market: l.markets && l.markets.length ? l.markets.join(' · ') : 'EU-wide',
-        due: l.due ?? '—',
-        dueSub: l.due_days != null ? `${l.due_days} days` : l.due === 'Ongoing' ? 'Live' : '',
+        // A duty that has not started yet must not read "Ongoing · Live" — that
+        // would tell the user they are already in breach. Until its start date
+        // the Due cell shows that date plus the countdown; from the day it
+        // applies the row silently reverts to its normal cadence.
+        due: daysUntil(l.applies_from) != null
+          ? new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' })
+              .format(new Date(`${l.applies_from}T00:00:00`))
+          : l.due ?? '—',
+        dueSub: daysUntil(l.applies_from) != null
+          ? t('appliesIn', { count: daysUntil(l.applies_from) as number, defaultValue: `applies in ${daysUntil(l.applies_from)} days` })
+          : l.due_days != null ? `${l.due_days} days` : l.due === 'Ongoing' ? 'Live' : '',
         state: { kind: l.state === 'confirmed' ? 'confirmed' : 'likely' },
       }))
     : OBLIGATIONS;
@@ -230,7 +254,11 @@ export function ResultsRiskMap() {
   const SOON_DAYS = 30;
   const stats = (() => {
     if (!isLive) return STATS;
-    const days = liveLaws.map((l) => l.due_days).filter((d): d is number => d != null).sort((a, b) => a - b);
+    // A not-yet-applicable duty has a real, dated deadline — the day it starts
+    // to apply. Counting it keeps the "near deadlines" stat honest; without it
+    // a rule landing in two days would be invisible in the headline numbers.
+    const days = liveLaws.map((l) => l.due_days ?? daysUntil(l.applies_from))
+      .filter((d): d is number => d != null).sort((a, b) => a - b);
     const median = days.length ? days[Math.floor(days.length / 2)] : null;
     const soon = days.filter((d) => d <= SOON_DAYS).length;
     return [

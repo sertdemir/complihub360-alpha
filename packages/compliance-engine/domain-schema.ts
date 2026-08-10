@@ -65,6 +65,15 @@ export const DomainTemplateLibrary: Record<ComplianceDomain, ComplianceSubdomain
             celex: '32025R0040',
         },
         {
+            id: 'prod-packaging-conformity',
+            label: 'Packaging Conformity (PPWR)',
+            description: 'EU declaration of conformity, technical documentation and substance limits for every packaging format placed on the EU market — shipping cartons, filler and tape included.',
+            triggerTags: ['physical_goods', 'packaging', 'ecommerce', 'shipping'],
+            applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER'],
+            riskWeight: 8,
+            celex: '32025R0040',
+        },
+        {
             id: 'prod-safety',
             label: 'Product Safety & Labeling',
             description: 'Consumer safety standards and mandatory labeling requirements.',

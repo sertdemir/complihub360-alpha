@@ -31,6 +31,8 @@
     "due": "Vence",
     "state": "Estado"
   },
+  "appliesIn_one": "se aplica en {{count}} día",
+  "appliesIn_other": "se aplica en {{count}} días",
   "severity": {
     "critical": "Crítica",
     "high": "Alta",

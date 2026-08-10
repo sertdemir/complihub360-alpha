@@ -41,6 +41,9 @@ export interface SearchLaw {
   penalty_max_eur?: number | null;
   due?: string | null;
   due_days?: number | null;
+  /** ISO date (YYYY-MM-DD) the obligation starts to apply; null = already in
+   *  force. Drives the "applies in N days" countdown on the risk map. */
+  applies_from?: string | null;
   state?: 'confirmed' | 'likely';
 }
 
