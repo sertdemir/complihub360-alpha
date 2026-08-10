@@ -6,13 +6,14 @@ import { LanguageSwitcher } from '../common/LanguageSwitcher';
 import { useAuthStore } from '../../store/useAuthStore';
 import {
   type LucideIcon,
-  CircleDot, ChevronDown, ArrowRight,
+  ChevronDown, ArrowRight,
   Zap, Users, Globe as GlobeIcon, Building2,
   Rocket, Layers, Scale,
   MessageSquare, FileText, ShieldCheck,
   LogOut, LayoutDashboard, User
 } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { Logo } from '../ui/Logo';
 import { Typography } from '../ui/Typography';
 import { ThemeToggle } from '../ui/ThemeToggle';
 
@@ -111,18 +112,18 @@ export function GlobalNav() {
       <div className="pointer-events-auto w-full bg-white/40 backdrop-blur-xl border-b border-white/50 shadow-[0_4px_32px_rgba(0,0,0,0.08)]">
         <div className="flex items-center justify-between gap-2 md:gap-4 py-4 lg:py-6 w-full max-w-[1440px] mx-auto pl-4 pr-8">
 
-        {/* Logo */}
+        {/* Logo — the real lockup from the design system, never a rebuilt mark.
+            This used to be a CircleDot glyph in a green square plus a text
+            wordmark, which carried no brand claim; since SiteHeader routes every
+            non-landing page through GlobalNav, "Always on your side." reached
+            only two routes. href={null} keeps the anchor out: navTo prefixes the
+            active locale, which a plain href would drop. */}
         <button
           onClick={() => navTo('/')}
-          className="flex items-center gap-2 shrink-0 px-2"
+          className="flex shrink-0 items-center px-2"
           aria-label="CompliHub360 Home"
         >
-          <div className="w-5 h-5 bg-primary-500 rounded-sm flex items-center justify-center">
-            <CircleDot size={12} className="text-white" />
-          </div>
-          <span className="font-sans font-bold text-neutral-900 tracking-tight text-sm">
-            CompliHub<span className="text-primary-500">360</span>
-          </span>
+          <Logo lockup="horizontal" tone="on-light" href={null} markClassName="h-7" />
         </button>
 
         {/* Divider */}
