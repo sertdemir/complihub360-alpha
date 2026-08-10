@@ -26,7 +26,7 @@ type Row = {
 // Design fixture (demo data — stays in the original language).
 const SESSIONS: Row[] = [
   { country: 'IT', domain: 'Tax & VAT', needsRefresh: true, updated: '· Updated 2h ago', title: 'VAT registration · Italy', riskLine: '● High risk · threshold reached · 1 markets', risk: 'high' },
-  { country: 'FR', domain: 'Product & Packaging', updated: '· Updated 1d ago', title: 'EPR registration · France', riskLine: '● Medium risk · deadline Q3 2026 · 1 markets', risk: 'medium' },
+  { country: 'FR', domain: 'EPR & Packaging', updated: '· Updated 1d ago', title: 'EPR registration · France', riskLine: '● Medium risk · deadline Q3 2026 · 1 markets', risk: 'medium' },
   { country: 'UK', domain: 'Data & Privacy', needsRefresh: true, updated: '· Updated 3d ago', title: 'GDPR audit & DPA review', riskLine: '● High risk · cookie consent · 1 markets', risk: 'high' },
   { country: 'ES', domain: 'Tax & VAT', updated: '· Updated 7d ago', title: 'VAT thresholds · Spain', riskLine: '● Low risk · monitoring only · 1 markets', risk: 'low' },
   { country: 'DE', domain: 'Data & Privacy', updated: '· Updated 14d ago', title: 'Cookie consent setup', riskLine: '● Medium risk · review pending · 1 markets', risk: 'medium' },
@@ -37,12 +37,12 @@ const DOMAIN_LABEL: Record<string, string> = {
   // legacy DB category keys
   vat: 'Tax & VAT', tax: 'Tax & VAT',
   privacy: 'Data & Privacy', gdpr: 'Data & Privacy', data: 'Data & Privacy',
-  epr: 'Product & Packaging', packaging: 'Product & Packaging',
+  epr: 'EPR & Packaging', packaging: 'EPR & Packaging',
   // canonical final-8 slugs (wizard v2)
   'tax-vat': 'Tax & VAT',
-  'product-packaging': 'Product & Packaging',
+  'product-packaging': 'EPR & Packaging',
   'data-privacy': 'Data & Privacy',
-  'marketing-seo': 'Marketing & SEO',
+  'marketing-seo': 'Marketing Compliance',
   'corporate-structure': 'Corporate & Structure',
   'product-compliance': 'Product Compliance',
   'logistics-customs': 'Logistics & Customs',
@@ -100,7 +100,7 @@ export function SessionsPage() {
 
   const FILTERS = [
     { key: 'all', label: t('sessions.filterAll', { count: rows.length }), match: (_s: Row) => true },
-    ...['Tax & VAT', 'Data & Privacy', 'Product & Packaging']
+    ...['Tax & VAT', 'Data & Privacy', 'EPR & Packaging']
       .filter((d) => rows.some((s) => s.domain === d))
       .map((d) => ({ key: d, label: `${tDomain(d)} · ${rows.filter((s) => s.domain === d).length}`, match: (s: Row) => s.domain === d })),
   ];

@@ -15,7 +15,7 @@ const engagements = [
     { id: "aaaaaaaa-0000-0000-0000-000000000001", provider_key: "p_remind", country: "DE", category: "Tax & VAT", status: "delivered", sla_confirm_deadline: iso(now + 2 * 3600e3), sla_reply_deadline: null, message: "x" },
     { id: "bbbbbbbb-0000-0000-0000-000000000002", provider_key: "p_breach", country: "ES", category: "Data & Privacy", status: "viewed", sla_confirm_deadline: iso(now - 3600e3), sla_reply_deadline: null, message: "x" },
     { id: "cccccccc-0000-0000-0000-000000000003", provider_key: "p_reply", country: "TR", category: "Corporate", status: "confirmed", sla_confirm_deadline: iso(now - 5 * 3600e3), sla_reply_deadline: iso(now - 1800e3), message: "x" },
-    { id: "dddddddd-0000-0000-0000-000000000004", provider_key: "p_ok", country: "DE", category: "Marketing & SEO", status: "created", sla_confirm_deadline: iso(now + 20 * 3600e3), sla_reply_deadline: null, message: "x" },
+    { id: "dddddddd-0000-0000-0000-000000000004", provider_key: "p_ok", country: "DE", category: "Marketing Compliance", status: "created", sla_confirm_deadline: iso(now + 20 * 3600e3), sla_reply_deadline: null, message: "x" },
 ];
 
 const inserts = [];

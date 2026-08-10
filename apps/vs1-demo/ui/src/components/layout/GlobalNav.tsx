@@ -6,13 +6,14 @@ import { LanguageSwitcher } from '../common/LanguageSwitcher';
 import { useAuthStore } from '../../store/useAuthStore';
 import {
   type LucideIcon,
-  CircleDot, ChevronDown, ArrowRight,
+  ChevronDown, ArrowRight,
   Zap, Users, Globe as GlobeIcon, Building2,
   Rocket, Layers, Scale,
   MessageSquare, FileText, ShieldCheck,
   LogOut, LayoutDashboard, User
 } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { Logo } from '../ui/Logo';
 import { Typography } from '../ui/Typography';
 import { ThemeToggle } from '../ui/ThemeToggle';
 
@@ -86,12 +87,6 @@ export function GlobalNav() {
       items: [],
     },
     {
-      id: 'providers',
-      label: t('nav.forProviders', 'For Providers'),
-      path: '/providers',
-      items: [],
-    },
-    {
       id: 'resources',
       label: t('nav.resources', 'Resources'),
       items: [
@@ -108,25 +103,25 @@ export function GlobalNav() {
     <header className="fixed top-0 inset-x-0 z-50 flex flex-col items-center pointer-events-none">
 
       {/* ── Full Width Header ─────────────────────────────────── */}
-      <div className="pointer-events-auto w-full bg-white/40 backdrop-blur-xl border-b border-white/50 shadow-[0_4px_32px_rgba(0,0,0,0.08)]">
+      <div className="pointer-events-auto w-full bg-surface backdrop-blur-xl border-b border-stroke-subtle shadow-[0_4px_32px_rgba(0,0,0,0.08)]">
         <div className="flex items-center justify-between gap-2 md:gap-4 py-4 lg:py-6 w-full max-w-[1440px] mx-auto pl-4 pr-8">
 
-        {/* Logo */}
+        {/* Logo — the real lockup from the design system, never a rebuilt mark.
+            This used to be a CircleDot glyph in a green square plus a text
+            wordmark, which carried no brand claim; since SiteHeader routes every
+            non-landing page through GlobalNav, "Always on your side." reached
+            only two routes. href={null} keeps the anchor out: navTo prefixes the
+            active locale, which a plain href would drop. */}
         <button
           onClick={() => navTo('/')}
-          className="flex items-center gap-2 shrink-0 px-2"
+          className="flex shrink-0 items-center px-2"
           aria-label="CompliHub360 Home"
         >
-          <div className="w-5 h-5 bg-primary-500 rounded-sm flex items-center justify-center">
-            <CircleDot size={12} className="text-white" />
-          </div>
-          <span className="font-sans font-bold text-neutral-900 tracking-tight text-sm">
-            CompliHub<span className="text-primary-500">360</span>
-          </span>
+          <Logo lockup="horizontal" tone="on-light" href={null} markClassName="h-7" />
         </button>
 
         {/* Divider */}
-        <div className="w-px h-5 bg-neutral-200 shrink-0 hidden md:block" />
+        <div className="w-px h-5 bg-stroke shrink-0 hidden md:block" />
 
         {/* Nav */}
         <nav className="flex items-center justify-center flex-1 gap-1 md:gap-4 lg:gap-6 min-w-0 overflow-hidden">
@@ -139,15 +134,15 @@ export function GlobalNav() {
                 }}
                 className={`flex items-center gap-1 px-2 md:px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${
                   activeMenu === menu.id
-                    ? 'text-primary-700 bg-primary-50'
-                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100/80'
+                    ? 'text-fg-brand bg-brand-light'
+                    : 'text-fg-secondary hover:text-fg hover:bg-surface-secondary'
                 }`}
               >
                 {menu.label}
                 {menu.items.length > 0 && (
                   <ChevronDown
                     size={12}
-                    className={`transition-transform duration-200 ${activeMenu === menu.id ? 'rotate-180 text-primary-600' : 'text-neutral-400'}`}
+                    className={`transition-transform duration-200 ${activeMenu === menu.id ? 'rotate-180 text-fg-brand' : 'text-fg-tertiary'}`}
                   />
                 )}
               </button>
@@ -156,7 +151,7 @@ export function GlobalNav() {
         </nav>
 
         {/* Divider */}
-        <div className="w-px h-5 bg-neutral-200 shrink-0 hidden md:block" />
+        <div className="w-px h-5 bg-stroke shrink-0 hidden md:block" />
 
         {/* Actions */}
         <div className="flex items-center gap-1 shrink-0 h-10">
@@ -167,17 +162,17 @@ export function GlobalNav() {
             <div className="relative user-menu-trigger" ref={userMenuRef}>
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-neutral-100/80 transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-surface-secondary transition-colors"
               >
-                <div className="w-7 h-7 rounded-full bg-primary-500 flex items-center justify-center text-white text-xs font-bold">
+                <div className="w-7 h-7 rounded-full bg-brand flex items-center justify-center text-fg-on-brand text-xs font-bold">
                   {(userName || 'U').charAt(0).toUpperCase()}
                 </div>
-                <span className="text-xs font-semibold text-neutral-700 hidden md:block">
+                <span className="text-xs font-semibold text-fg-secondary hidden md:block">
                   {userName || (role === 'partner' ? 'Partner' : 'User')}
                 </span>
                 <ChevronDown
                   size={12}
-                  className={`transition-transform duration-200 text-neutral-400 ${userMenuOpen ? 'rotate-180' : ''}`}
+                  className={`transition-transform duration-200 text-fg-tertiary ${userMenuOpen ? 'rotate-180' : ''}`}
                 />
               </button>
 
@@ -188,11 +183,11 @@ export function GlobalNav() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -4, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute right-0 top-full mt-2 w-52 bg-white border border-neutral-200 rounded-xl shadow-lg ring-1 ring-black/5 overflow-hidden z-50"
+                    className="absolute right-0 top-full mt-2 w-52 bg-surface border border-stroke rounded-xl shadow-lg ring-1 ring-black/5 overflow-hidden z-50"
                   >
-                    <div className="px-4 py-3 border-b border-neutral-100">
-                      <p className="text-sm font-semibold text-neutral-900">{userName || 'User'}</p>
-                      <p className="text-xs text-neutral-500 mt-0.5">{role === 'partner' ? 'Beratungspartner' : 'Unternehmen'}</p>
+                    <div className="px-4 py-3 border-b border-stroke-subtle">
+                      <p className="text-sm font-semibold text-fg">{userName || 'User'}</p>
+                      <p className="text-xs text-fg-tertiary mt-0.5">{role === 'partner' ? 'Beratungspartner' : 'Unternehmen'}</p>
                     </div>
                     <div className="py-1">
                       <button
@@ -201,9 +196,9 @@ export function GlobalNav() {
                           const dashPath = role === 'partner' ? '/partner-dashboard' : '/dashboard';
                           navTo(dashPath);
                         }}
-                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors"
+                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-fg-secondary hover:bg-surface-secondary transition-colors"
                       >
-                        <LayoutDashboard size={16} className="text-neutral-400" />
+                        <LayoutDashboard size={16} className="text-fg-tertiary" />
                         Mein Dashboard
                       </button>
                       <button
@@ -225,7 +220,7 @@ export function GlobalNav() {
           ) : (
             <>
               <button
-                className="text-neutral-600 hover:text-neutral-900 text-xs font-semibold px-2 md:px-3 py-1.5 rounded-lg hover:bg-neutral-100/80 transition-colors whitespace-nowrap"
+                className="text-fg-secondary hover:text-fg text-xs font-semibold px-2 md:px-3 py-1.5 rounded-lg hover:bg-surface-secondary transition-colors whitespace-nowrap"
                 onClick={() => navTo('/login')}
               >
                 {t('nav.login', 'Log in')}
@@ -247,7 +242,7 @@ export function GlobalNav() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.97 }}
             transition={{ duration: 0.18, ease: 'easeOut' } as any}
-            className="pointer-events-auto mt-2 w-full max-w-[1100px] mx-4 rounded-2xl bg-white/40 backdrop-blur-xl border border-white/50 shadow-[0_4px_32px_rgba(0,0,0,0.08)] overflow-hidden"
+            className="pointer-events-auto mt-2 w-full max-w-[1100px] mx-4 rounded-2xl bg-surface backdrop-blur-xl border border-stroke-subtle shadow-[0_4px_32px_rgba(0,0,0,0.08)] overflow-hidden"
           >
             <div className="px-8 py-6">
               <div className="flex flex-nowrap justify-center gap-10">
@@ -255,21 +250,21 @@ export function GlobalNav() {
                   <button
                     key={item.title}
                     onClick={() => navTo(item.path)}
-                    className="text-left group flex items-start gap-3 p-3 -m-3 rounded-xl hover:bg-neutral-100/60 transition-colors"
+                    className="text-left group flex items-start gap-3 p-3 -m-3 rounded-xl hover:bg-surface-secondary transition-colors"
                   >
                     <motion.div
                       className="flex items-start justify-center shrink-0 pt-0.5"
                       whileHover={item.anim}
                       transition={{ type: 'spring', stiffness: 300, damping: 18 } as any}
                     >
-                      <item.icon size={32} className="text-primary-600 group-hover:text-primary-500 transition-colors" strokeWidth={1.5} />
+                      <item.icon size={32} className="text-fg-brand group-hover:opacity-75 transition-colors" strokeWidth={1.5} />
                     </motion.div>
                     <div className="mt-0.5">
-                      <Typography variant="ui-small" weight="bold" className="text-neutral-900 flex items-center gap-1 mb-1 group-hover:text-primary-700 transition-colors">
+                      <Typography variant="ui-small" weight="bold" className="text-fg flex items-center gap-1 mb-1 group-hover:text-fg-brand transition-colors">
                         {item.title}
-                        <ArrowRight size={14} className="opacity-0 -translate-x-2 w-0 group-hover:w-auto overflow-hidden group-hover:opacity-100 group-hover:translate-x-0 transition-all text-primary-500" />
+                        <ArrowRight size={14} className="opacity-0 -translate-x-2 w-0 group-hover:w-auto overflow-hidden group-hover:opacity-100 group-hover:translate-x-0 transition-all text-fg-brand" />
                       </Typography>
-                      <Typography variant="caption" className="text-neutral-500 block normal-case tracking-normal">
+                      <Typography variant="caption" className="text-fg-tertiary block normal-case tracking-normal">
                         {item.desc}
                       </Typography>
                     </div>

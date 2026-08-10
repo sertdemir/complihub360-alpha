@@ -85,15 +85,15 @@ const STEPS: StepDef[] = [
     // Final 8 domains (decision 2026-08-04) — Full Coverage removed.
     cards: [
       { id: 'Tax & VAT', key: 'vatTax', icon: BarChart3 },
-      { id: 'Product & Packaging', key: 'eprPackaging', icon: Globe },
+      { id: 'EPR & Packaging', key: 'eprPackaging', icon: Globe },
       { id: 'Data & Privacy', key: 'gdprPrivacy', icon: Shield },
-      { id: 'Marketing & SEO', key: 'marketing', icon: MessageSquare },
+      { id: 'Marketing Compliance', key: 'marketing', icon: MessageSquare },
       { id: 'Corporate & Structure', key: 'corporate', icon: Building2 },
       { id: 'Product Compliance', key: 'productCompliance', icon: ShieldCheck },
       { id: 'Logistics & Customs', key: 'logisticsCustoms', icon: Truck },
       { id: 'Legal Advisory', key: 'legalAdvisory', icon: Scale },
     ],
-    picks: ['Tax & VAT', 'Product & Packaging', 'Data & Privacy'],
+    picks: ['Tax & VAT', 'EPR & Packaging', 'Data & Privacy'],
     footerKey: 'skipRoute',
   },
 ];
@@ -108,8 +108,8 @@ const MARKET_CODE: Record<string, string> = {
   Italy: 'IT', Spain: 'ES', 'United States': 'US', 'Türkiye': 'TR',
 };
 const CATEGORY_CODE: Record<string, WizardCategory> = {
-  'Tax & VAT': 'tax-vat', 'Product & Packaging': 'product-packaging', 'Data & Privacy': 'data-privacy',
-  'Marketing & SEO': 'marketing-seo', 'Corporate & Structure': 'corporate-structure',
+  'Tax & VAT': 'tax-vat', 'EPR & Packaging': 'product-packaging', 'Data & Privacy': 'data-privacy',
+  'Marketing Compliance': 'marketing-seo', 'Corporate & Structure': 'corporate-structure',
   'Product Compliance': 'product-compliance', 'Logistics & Customs': 'logistics-customs',
   'Legal Advisory': 'legal-advisory',
 };
@@ -256,7 +256,7 @@ export function AnimatedWizard({
   const prefill = initialProfile && interactive ? selectionFromProfile(initialProfile) : null;
   const [stepIndex, setStepIndex] = useState(prefill ? STEPS.length : reduced && !interactive ? 2 : 0);
   const [selected, setSelected] = useState<Set<string>>(
-    () => prefill?.selected ?? new Set(reduced && !interactive ? ['Tax & VAT', 'Product & Packaging', 'Data & Privacy'] : []),
+    () => prefill?.selected ?? new Set(reduced && !interactive ? ['Tax & VAT', 'EPR & Packaging', 'Data & Privacy'] : []),
   );
   const [active, setActive] = useState<string | null>(null);
   const [cursor, setCursor] = useState({ x: 120, y: 60 });

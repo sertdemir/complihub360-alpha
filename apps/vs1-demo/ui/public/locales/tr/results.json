@@ -1,7 +1,7 @@
 {
   "topbar": {
     "guestBadge": "Misafir haritası · 30 dk içinde sona erer",
-    "exportPdf": "PDF olarak dışa aktar",
+    "backHome": "Başa dön",
     "saveMap": "Bu haritayı kaydedin"
   },
   "header": {
@@ -15,7 +15,7 @@
       "label": "tespit edilen yükümlülük"
     },
     "1": {
-      "label": "toplam risk tutarı"
+      "label": "30 gün içinde süresi dolan"
     },
     "2": {
       "label": "medyan son tarih"
@@ -170,5 +170,46 @@
     "doneTitle": "Randevun onaylandı.",
     "revealLabel": "Uzmanın",
     "toAppointments": "Randevularına git"
+  },
+  "search": {
+    "navGuided": "İhtiyaçlarımı değerlendir",
+    "placeholder": "Durumunu kendi kelimelerinle anlat…",
+    "submit": "Bir uyum sorusu sorun",
+    "answerEyebrow": "Yanıt",
+    "answerTitleFor": "„{{query}}\" hakkında",
+    "answerTitleDefault": "Uyum yükümlülüklerin hakkında her şeyi sor",
+    "answerBody1": "Sizinkine benzer bir durumda muhtemelen geçerli olanlar, her maddenin kaynağıyla birlikte. Genel bilgidir — bireysel hukuki danışmanlık değildir.",
+    "answerBody2": "İşletmeniz için tam olarak neyin geçerli olduğunu — pazarlarınız, iş modeliniz — görmek için aşağıdan değerlendirmeye devam edin.",
+    "sources": "Kaynaklar",
+    "obligationsTitle": "İlgili yükümlülükler",
+    "sev": {
+      "high": "Yüksek",
+      "medium": "Orta"
+    },
+    "obligations": {
+      "o1": {
+        "title": "KDV / OSS kaydı",
+        "detail": "AB eşiğinin üzerindeki sınır ötesi mesafeli satışlar OSS kaydını ve üç aylık beyanları tetikler."
+      },
+      "o2": {
+        "title": "EPR / ambalaj kaydı",
+        "detail": "Ambalajlı ürünleri piyasaya sürmek, ilk sevkiyattan önce üretici kaydını gerektirir."
+      },
+      "o3": {
+        "title": "Çerez onayı ve gizlilik bildirimi",
+        "detail": "Tüketiciye yönelik izleme, önceden onay ve KVKK/GDPR uyumlu bir gizlilik bildirimi gerektirir."
+      }
+    },
+    "guidesTitle": "İlgili rehberler",
+    "guides": {
+      "g1": "AB OSS düzeni açıklandı",
+      "g2": "Ülkeye göre ambalaj (EPR) kaydı",
+      "g3": "Online mağazalar için GDPR temelleri"
+    },
+    "guideRead": "Oku",
+    "bridgeTitle": "İşletmeniz için neyin geçerli olduğunu görmek ister misiniz?",
+    "bridgeBody": "Risk haritanız pazarlarınıza ve iş modelinize göre eşleştirilir ve gerçek ihtiyacınıza uyan Verified Partner'ları gösterir.",
+    "bridgeCta": "İhtiyaçlarımı değerlendir",
+    "previewBadge": "Önizleme · yanıt motoru henüz bağlı değil"
   }
 }

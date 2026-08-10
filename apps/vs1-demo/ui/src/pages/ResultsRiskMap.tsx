@@ -1,13 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { saveWizardSession, fetchSessions } from '../api/sessions';
 import { runSearch, type AnonProvider, type SearchLaw } from '../api/search';
 import { useApiData } from '../lib/useApiData';
 import { ProviderMatchCard } from '../components/ui/ProviderMatchCard';
-import { generateRiskMapPdf } from '../lib/riskMapPdf';
 import { useAuthStore } from '../store/useAuthStore';
-import { Lock, Check, Info, ArrowRight, ShieldCheck, Download } from 'lucide-react';
+import { Lock, Check, Info, ArrowRight, ArrowLeft, ShieldCheck } from 'lucide-react';
 import { Logo } from '../components/ui/Logo';
 import { RiskBadge, type RiskLevel } from '../components/ui/RiskBadge';
 import { FreeAccountDrawer } from '../components/home/MarketsDrawer';
@@ -116,7 +115,8 @@ export const OBLIGATIONS: Obligation[] = [
 
 export const STATS = [
   { value: '8', label: 'obligations identified' },
-  { value: '€25k', label: 'total exposure' },
+  // 4 of the fixture rows carry a deadline inside 30 days (6 · 21 · 8 · 21).
+  { value: '4', label: 'with a deadline in 30 days' },
   { value: '14 days', label: 'median deadline' },
   { value: '3', label: 'Verified Partners ready' },
 ];
@@ -218,42 +218,27 @@ export function ResultsRiskMap() {
       }))
     : OBLIGATIONS;
 
-  // Stat strip mirrors the table: count, exposure (Σ max penalties), median
+  // Stat strip mirrors the table: count, near-term deadlines, median
   // days-to-deadline, matched partners. Fixture values until the API answers.
+  //
+  // Brand & Marketing Map V1 §5/§11 rules out "fear-first penalty language".
+  // The strip used to lead with "€530k total exposure" — the biggest number on
+  // screen was a threat. Penalties are still shown per obligation (they are
+  // facts, and useful for prioritising), but the headline stat now conveys
+  // URGENCY instead of DREAD: how many deadlines are actually near.
+  const SOON_DAYS = 30;
   const stats = (() => {
     if (!isLive) return STATS;
-    const exposure = liveLaws.reduce((s, l) => s + (l.penalty_max_eur ?? 0), 0);
     const days = liveLaws.map((l) => l.due_days).filter((d): d is number => d != null).sort((a, b) => a - b);
     const median = days.length ? days[Math.floor(days.length / 2)] : null;
+    const soon = days.filter((d) => d <= SOON_DAYS).length;
     return [
       { value: String(rows.length), label: 'obligations identified' },
-      { value: exposure ? `€${Math.round(exposure / 1000)}k` : '—', label: 'total exposure' },
+      { value: String(soon), label: `with a deadline in ${SOON_DAYS} days` },
       { value: median != null ? `${median} days` : 'ongoing', label: 'median deadline' },
       { value: String(anonProviders.length), label: 'Verified Partners ready' },
     ];
   })();
-
-  // A6 (User Flows §9): guest-allowed PDF snapshot — PII-free, with sources.
-  // Translated at the render point (results namespace); canonical EN fallback.
-  const exportPdf = () => {
-    generateRiskMapPdf({
-      profile,
-      t,
-      stats: stats.map((s, i) => ({ value: s.value, label: t(`stats.${i}.label`, { defaultValue: s.label }) })),
-      obligations: rows.map((o, i) => ({
-        severity: o.severity,
-        title: isLive ? o.title : t(`obligations.${i}.title`, { defaultValue: o.title }),
-        detail: isLive ? o.detail : t(`obligations.${i}.detail`, { defaultValue: o.detail }),
-        market: isLive ? o.market : t(`obligations.${i}.market`, { defaultValue: o.market }),
-        due: isLive ? o.due : t(`obligations.${i}.due`, { defaultValue: o.due }),
-        dueSub: isLive ? o.dueSub : t(`obligations.${i}.dueSub`, { defaultValue: o.dueSub }),
-        stateLabel:
-          o.state.kind === 'confirmed' ? t('state.confirmed', { defaultValue: 'Confirmed' })
-          : o.state.kind === 'likely' ? t('state.likely', { defaultValue: 'Likely' })
-          : t('pdf.questionsOpen', { defaultValue: '{{total}} questions open', total: o.state.count }),
-      })),
-    });
-  };
 
   // Wave A1: arriving from the wizard persists the session (the editable
   // dossier). Guest-anchored via guest_key; fire-and-forget — the page renders
@@ -272,18 +257,23 @@ export function ResultsRiskMap() {
       {/* Topbar */}
       <header className="sticky top-0 z-30 border-b border-stroke-subtle bg-surface/90 backdrop-blur-xl">
         <div className="mx-auto flex h-[72px] w-full max-w-[1440px] items-center justify-between px-4 md:px-8 lg:px-16">
-          <Logo lockup="horizontal" tone="on-light" href="/" markClassName="h-9" />
+          <div className="flex min-w-0 items-center gap-4">
+            <Logo lockup="horizontal" tone="on-light" href="/" markClassName="h-9" />
+            {/* The guest map deliberately drops the site nav to stay focused, which
+                left no visible way out — the logo was the only exit and nobody
+                reads a logo as "back". This is that exit, spelled out. */}
+            <span aria-hidden className="hidden h-5 w-px bg-stroke sm:block" />
+            <Link
+              to={`/${locale}`}
+              className="hidden items-center gap-1.5 text-[13px] font-semibold text-fg-secondary transition-colors hover:text-fg-brand sm:inline-flex"
+            >
+              <ArrowLeft size={14} /> {t('topbar.backHome')}
+            </Link>
+          </div>
           <div className="flex items-center gap-4">
             <span className="hidden items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary sm:inline-flex">
               <Lock size={13} /> {t('topbar.guestBadge')}
             </span>
-            <button
-              type="button"
-              onClick={exportPdf}
-              className="inline-flex items-center gap-2 rounded-xl border border-stroke px-4 py-2.5 text-[14px] font-semibold text-fg transition-colors hover:border-fg-brand"
-            >
-              <Download size={15} /> {t('topbar.exportPdf')}
-            </button>
             <button
               type="button"
               onClick={() => setSaveOpen(true)}
@@ -341,11 +331,12 @@ export function ResultsRiskMap() {
               </span>
               <span className="min-w-0">
                 <span className="block text-[15px] font-bold text-fg">{isLive ? o.title : t(`obligations.${i}.title`, { defaultValue: o.title })}</span>
+                {/* Source leads, penalty follows in a muted tone (Brand Map
+                    §11: penalties are facts worth showing, but must not be the
+                    first thing the eye lands on). */}
                 <span className="mt-0.5 block text-[12px] leading-relaxed text-fg-brand">
-                  {isLive ? o.detail : t(`obligations.${i}.detail`, { defaultValue: o.detail })}
                   {o.sourceUrl && (
                     <>
-                      {o.detail ? ' · ' : ''}
                       <a
                         href={o.sourceUrl}
                         target="_blank"
@@ -356,8 +347,12 @@ export function ResultsRiskMap() {
                       >
                         {o.sourceLabel} ↗
                       </a>
+                      {o.detail ? ' · ' : ''}
                     </>
                   )}
+                  <span className={o.sourceUrl ? 'text-fg-tertiary' : undefined}>
+                    {isLive ? o.detail : t(`obligations.${i}.detail`, { defaultValue: o.detail })}
+                  </span>
                 </span>
               </span>
               <span className="text-[14px] text-fg-secondary">{isLive ? o.market : t(`obligations.${i}.market`, { defaultValue: o.market })}</span>

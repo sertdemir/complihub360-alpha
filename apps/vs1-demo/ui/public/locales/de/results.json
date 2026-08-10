@@ -1,7 +1,7 @@
 {
   "topbar": {
     "guestBadge": "Gast-Karte · läuft in 30 Min. ab",
-    "exportPdf": "PDF exportieren",
+    "backHome": "Zurück zum Start",
     "saveMap": "Diese Karte speichern"
   },
   "header": {
@@ -15,7 +15,7 @@
       "label": "identifizierte Pflichten"
     },
     "1": {
-      "label": "Gesamtrisiko"
+      "label": "mit Frist in 30 Tagen"
     },
     "2": {
       "label": "mediane Frist"
@@ -170,5 +170,46 @@
     "doneTitle": "Dein Termin ist bestätigt.",
     "revealLabel": "Dein Spezialist",
     "toAppointments": "Zu deinen Terminen"
+  },
+  "search": {
+    "navGuided": "Meinen Bedarf ermitteln",
+    "placeholder": "Beschreibe dein Anliegen in eigenen Worten…",
+    "submit": "Eine Compliance-Frage stellen",
+    "answerEyebrow": "Antwort",
+    "answerTitleFor": "Zu „{{query}}“",
+    "answerTitleDefault": "Frag alles zu deinen Compliance-Pflichten",
+    "answerBody1": "Das hier gilt für eine Situation wie Ihre voraussichtlich, mit der Quelle hinter jedem Punkt. Allgemeine Information — keine individuelle Rechtsberatung.",
+    "answerBody2": "Um zu sehen, was konkret für Ihr Unternehmen gilt — Ihre Märkte, Ihr Geschäftsmodell — geht es unten mit dem Assessment weiter.",
+    "sources": "Quellen",
+    "obligationsTitle": "Relevante Pflichten",
+    "sev": {
+      "high": "Hoch",
+      "medium": "Mittel"
+    },
+    "obligations": {
+      "o1": {
+        "title": "USt-/OSS-Registrierung",
+        "detail": "Grenzüberschreitende Fernverkäufe über der EU-Schwelle lösen die OSS-Registrierung und Quartalsmeldungen aus."
+      },
+      "o2": {
+        "title": "EPR-/Verpackungsregistrierung",
+        "detail": "Das Inverkehrbringen verpackter Ware erfordert die Herstellerregistrierung vor der ersten Lieferung."
+      },
+      "o3": {
+        "title": "Cookie-Einwilligung & Datenschutzhinweis",
+        "detail": "Tracking gegenüber Verbrauchern erfordert vorherige Einwilligung und einen DSGVO-konformen Datenschutzhinweis."
+      }
+    },
+    "guidesTitle": "Passende Guides",
+    "guides": {
+      "g1": "Das EU-OSS-Verfahren erklärt",
+      "g2": "Verpackungs-(EPR-)Registrierung nach Land",
+      "g3": "DSGVO-Grundlagen für Online-Shops"
+    },
+    "guideRead": "Lesen",
+    "bridgeTitle": "Möchten Sie sehen, was für Ihr Unternehmen gilt?",
+    "bridgeBody": "Ihre Risk Map ist auf Ihre Märkte und Ihr Geschäftsmodell abgestimmt und zeigt die Verified Partner, die zu Ihrem tatsächlichen Bedarf passen.",
+    "bridgeCta": "Meinen Bedarf ermitteln",
+    "previewBadge": "Vorschau · Antwort-Engine noch nicht angebunden"
   }
 }

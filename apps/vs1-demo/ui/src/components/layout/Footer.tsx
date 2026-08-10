@@ -33,7 +33,6 @@ const DEFAULT_COLUMNS: FooterColumn[] = [
       { label: 'How it works', href: '#how-it-works' },
       { label: 'Compliance areas', href: '/compliance' },
       { label: 'Pricing', href: '#pricing' },
-      { label: 'For Providers', href: '/providers' },
     ],
   },
   {

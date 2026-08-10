@@ -1,7 +1,7 @@
 {
   "topbar": {
     "guestBadge": "Mapa de invitado · caduca en 30 min",
-    "exportPdf": "Exportar PDF",
+    "backHome": "Volver al inicio",
     "saveMap": "Guardar este mapa"
   },
   "header": {
@@ -15,7 +15,7 @@
       "label": "obligaciones identificadas"
     },
     "1": {
-      "label": "exposición total"
+      "label": "con plazo en 30 días"
     },
     "2": {
       "label": "plazo mediano"
@@ -170,5 +170,46 @@
     "doneTitle": "Tu cita está confirmada.",
     "revealLabel": "Tu especialista",
     "toAppointments": "Ir a tus citas"
+  },
+  "search": {
+    "navGuided": "Evaluar mis necesidades",
+    "placeholder": "Describe tu situación con tus propias palabras…",
+    "submit": "Hacer una pregunta de compliance",
+    "answerEyebrow": "Respuesta",
+    "answerTitleFor": "Sobre «{{query}}»",
+    "answerTitleDefault": "Pregunta lo que quieras sobre tus obligaciones de compliance",
+    "answerBody1": "Esto es lo que probablemente se aplica a una situación como la suya, con la fuente detrás de cada punto. Información general, no asesoramiento legal individual.",
+    "answerBody2": "Para ver qué se aplica concretamente a su empresa — sus mercados, su modelo de negocio — continúe abajo con la evaluación.",
+    "sources": "Fuentes",
+    "obligationsTitle": "Obligaciones relevantes",
+    "sev": {
+      "high": "Alta",
+      "medium": "Media"
+    },
+    "obligations": {
+      "o1": {
+        "title": "Registro de IVA / OSS",
+        "detail": "Las ventas a distancia transfronterizas por encima del umbral de la UE exigen el registro OSS y declaraciones trimestrales."
+      },
+      "o2": {
+        "title": "Registro EPR / envases",
+        "detail": "Poner en el mercado productos envasados requiere el registro del productor antes del primer envío."
+      },
+      "o3": {
+        "title": "Consentimiento de cookies y aviso de privacidad",
+        "detail": "El seguimiento al consumidor requiere consentimiento previo y un aviso de privacidad conforme al RGPD."
+      }
+    },
+    "guidesTitle": "Guías relacionadas",
+    "guides": {
+      "g1": "El régimen OSS de la UE explicado",
+      "g2": "Registro de envases (EPR) por país",
+      "g3": "Fundamentos del RGPD para tiendas online"
+    },
+    "guideRead": "Leer",
+    "bridgeTitle": "¿Quiere ver qué se aplica a su empresa?",
+    "bridgeBody": "Su risk map se ajusta a sus mercados y a su modelo de negocio, y muestra los Verified Partners que encajan con lo que realmente necesita.",
+    "bridgeCta": "Evaluar mis necesidades",
+    "previewBadge": "Vista previa · el motor de respuestas aún no está conectado"
   }
 }

@@ -26,9 +26,9 @@
   },
   "domain": {
     "taxVat": "Vergi ve KDV",
-    "productPackaging": "Ürün ve Ambalaj",
+    "productPackaging": "EPR ve Ambalaj",
     "dataPrivacy": "Veri ve Gizlilik",
-    "marketingSeo": "Pazarlama ve SEO",
+    "marketingSeo": "Pazarlama Uyumu",
     "corporateStructure": "Şirket ve Yapı",
     "productCompliance": "Ürün Uygunluğu",
     "logisticsCustoms": "Lojistik ve Gümrük",
