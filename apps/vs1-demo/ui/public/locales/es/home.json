@@ -70,6 +70,12 @@
       "selectedCount": "2 seleccionadas · 2 pendientes",
       "back": "Atrás",
       "continue": "Continuar"
+    },
+    "dual": {
+      "placeholder": "Describa su situación con sus propias palabras…",
+      "answer": "Hacer una pregunta de compliance",
+      "guided": "Evaluar mis necesidades",
+      "trust": "Gratis · anónimo · en menos de 3 minutos"
     }
   },
   "heroWizard": {

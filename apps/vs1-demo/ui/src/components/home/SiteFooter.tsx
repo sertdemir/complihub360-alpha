@@ -18,7 +18,6 @@ const COLUMNS: Column[] = [
       { key: 'howItWorks', href: '#how-it-works' },
       { key: 'startAssessment', href: '#entry-door' },
       { key: 'exampleResult', href: '#' },
-      { key: 'forProviders', href: '/providers' },
     ],
   },
   {

@@ -70,6 +70,12 @@
       "selectedCount": "2 selected · 2 left",
       "back": "Back",
       "continue": "Continue"
+    },
+    "dual": {
+      "placeholder": "Describe your situation in your own words…",
+      "answer": "Ask a Compliance Question",
+      "guided": "Assess My Needs",
+      "trust": "Free · anonymous · under 3 minutes"
     }
   },
   "heroWizard": {

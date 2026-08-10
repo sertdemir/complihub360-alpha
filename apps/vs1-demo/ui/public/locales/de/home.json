@@ -70,6 +70,12 @@
       "selectedCount": "2 ausgewählt · 2 offen",
       "back": "Zurück",
       "continue": "Weiter"
+    },
+    "dual": {
+      "placeholder": "Beschreiben Sie Ihr Anliegen in eigenen Worten…",
+      "answer": "Eine Compliance-Frage stellen",
+      "guided": "Meinen Bedarf ermitteln",
+      "trust": "Kostenlos · anonym · in unter 3 Minuten"
     }
   },
   "heroWizard": {

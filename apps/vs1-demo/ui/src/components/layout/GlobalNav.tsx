@@ -87,12 +87,6 @@ export function GlobalNav() {
       items: [],
     },
     {
-      id: 'providers',
-      label: t('nav.forProviders', 'For Providers'),
-      path: '/providers',
-      items: [],
-    },
-    {
       id: 'resources',
       label: t('nav.resources', 'Resources'),
       items: [

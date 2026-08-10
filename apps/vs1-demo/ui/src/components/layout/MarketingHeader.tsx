@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Globe, Menu, X } from 'lucide-react';
 import { Logo } from '../ui/Logo';
 import { ThemeToggle } from '../ui/ThemeToggle';
+import { PROVIDER_MARKETING_ENABLED } from '../../lib/featureFlags';
 
 // ─── MarketingHeader ──────────────────────────────────────────────────────────
 // Anchor-nav header for the CompliHub360 landing pages. Two audiences
@@ -89,6 +90,9 @@ function AudienceSwitch({
   const underline = (
     <span className={`absolute -bottom-px left-0 right-0 h-0.5 rounded-full ${inverse ? 'bg-white' : 'bg-brand'}`} />
   );
+  // With the provider marketing landing switched off there is only one
+  // audience left — the switch would be a dead toggle, so it disappears.
+  if (!PROVIDER_MARKETING_ENABLED) return null;
   return (
     <div className={`flex items-center gap-6 ${className}`}>
       <a href={providerHref} className={tab(audience === 'provider')}>
