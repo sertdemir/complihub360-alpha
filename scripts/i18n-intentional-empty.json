@@ -1,0 +1,5 @@
+{
+  "_comment": "Keys that are deliberately empty in a target locale, because that language reorders the sentence and the segment carries no words. Format: '<lang>/<namespace>:<key.path>'. Anything listed here is skipped by i18n-translate.mjs instead of being treated as a gap.",
+  "tr/common:hero.scenarios.shortcut.seg3": "Turkish fronts the goal phrase — seg1+seg2 already carry the full headline.",
+  "tr/home:problemRecognition.title.pre": "Turkish starts the sentence with the gold-highlighted word, so the lead-in segment is empty."
+}
