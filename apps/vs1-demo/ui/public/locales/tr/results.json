@@ -31,6 +31,12 @@
     "due": "Son Tarih",
     "state": "Durum"
   },
+  "appliesIn_one": "{{count}} gün içinde geçerli",
+  "appliesIn_other": "{{count}} gün içinde geçerli",
+  "groups": {
+    "now": "Şimdi",
+    "radar": "Radarda"
+  },
   "severity": {
     "critical": "Kritik",
     "high": "Yüksek",

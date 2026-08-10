@@ -114,6 +114,82 @@ describe('EU legal basis (CELEX → EUR-Lex)', () => {
         expect(eori?.sourceUrl).toBe('https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32013R0952');
     });
 
+    it('11) PPWR packaging conformity surfaces for physical-goods sellers, EU-wide', () => {
+        const results = generateRelevantSubdomains({
+            countries: ['DE'],
+            industry: IndustryType.GENERIC_ECOMMERCE,
+            businessModel: BusinessModel.DTC,
+        });
+        const ppwr = results.find(r => r.id === 'prod-packaging-conformity');
+        expect(ppwr?.severity).toBe('high');
+        expect(ppwr?.celex).toBe('32025R0040');
+        // A Regulation applies market-independently → no per-country markets.
+        expect(ppwr?.markets).toEqual([]);
+        // The start date is a structured field, not prose in the source string.
+        expect(ppwr?.appliesFrom).toBe('2026-08-12');
+        expect(ppwr?.source).not.toContain('2026');
+        // The national registration layer stays a separate, DE-specific row.
+        expect(results.find(r => r.id === 'prod-epr')?.source).toContain('VerpackG');
+    });
+
+    it('13) obligations already in force carry no appliesFrom', () => {
+        const results = generateRelevantSubdomains({
+            countries: ['DE'],
+            industry: IndustryType.GENERIC_ECOMMERCE,
+            businessModel: BusinessModel.DTC,
+        });
+        // Only staged/not-yet-applicable duties set the field — everything else
+        // must stay undefined so the UI never renders a bogus countdown.
+        expect(results.find(r => r.id === 'tax-vat-registration')?.appliesFrom).toBeUndefined();
+        expect(results.find(r => r.id === 'prod-epr')?.appliesFrom).toBeUndefined();
+        // Every obligation that does set it is a staged PPWR duty.
+        expect(results.filter(r => r.appliesFrom).every(r => r.celex === '32025R0040')).toBe(true);
+    });
+
+    it('14) the PPWR 2030 tranche lands as separate, individually dated rows', () => {
+        const results = generateRelevantSubdomains({
+            countries: ['DE'],
+            industry: IndustryType.GENERIC_ECOMMERCE,
+            businessModel: BusinessModel.DTC,
+        });
+        const staged = results.filter(r => r.appliesFrom === '2030-01-01').map(r => r.id).sort();
+        expect(staged).toEqual([
+            'prod-packaging-empty-space',
+            'prod-packaging-format-bans',
+            'prod-packaging-recyclability',
+            'prod-packaging-recycled-content',
+            'prod-packaging-reuse-targets',
+        ]);
+        // Each carries its own legal basis rather than a shared blanket string,
+        // so the map can cite the exact article that drives the duty.
+        const articles = staged.map(id => results.find(r => r.id === id)!.source);
+        expect(new Set(articles).size).toBe(staged.length);
+        // The 2030 tranche must not outrank the duty that applies in days.
+        const conformity = results.find(r => r.id === 'prod-packaging-conformity')!;
+        for (const id of staged) {
+            expect(results.find(r => r.id === id)!.riskWeight).toBeLessThan(conformity.riskWeight);
+        }
+    });
+
+    it('15) the empty-space cap is 50%, not the 40% that circulates widely', () => {
+        const r = generateRelevantSubdomains({ countries: ['DE'], focusDomains: ['PRODUCT' as any] });
+        const gap = r.find(x => x.id === 'prod-packaging-empty-space');
+        expect(gap?.source).toContain('50%');
+        expect(gap?.source).not.toContain('40%');
+        // Art. 24 slips if the implementing act is late — the caveat is carried,
+        // not silently dropped, so the date never reads as a hard promise.
+        expect(gap?.source).toContain('implementing act');
+    });
+
+    it('12) SaaS sellers do not get a packaging obligation', () => {
+        const results = generateRelevantSubdomains({
+            countries: ['DE'],
+            industry: IndustryType.SAAS,
+            businessModel: BusinessModel.SAAS_SUBSCRIPTION,
+        });
+        expect(results.map(r => r.id)).not.toContain('prod-packaging-conformity');
+    });
+
     it('10) purely national obligations carry no CELEX rather than a fabricated one', () => {
         const r = generateRelevantSubdomains({ countries: ['DE'], focusDomains: ['CORPORATE' as any] });
         const reg = r.find(x => x.id === 'corp-registration');

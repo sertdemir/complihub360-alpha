@@ -2149,6 +2149,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         penalty_max_eur: r.penaltyMaxEur ?? null,
                         due: r.due ?? null,
                         due_days: r.dueDays ?? null,
+                        // ISO date an obligation starts to apply. Null for the
+                        // vast majority (already in force); set where an act is
+                        // adopted but not yet applicable, so the map can show a
+                        // countdown instead of claiming the duty is live.
+                        applies_from: r.appliesFrom ?? null,
                         state: r.focus ? 'confirmed' : 'likely',
                     })),
                     tutorials: knowledgeMatches.map((m: any) => ({ id: m.id, content: m.content })),

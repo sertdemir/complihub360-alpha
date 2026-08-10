@@ -17,6 +17,15 @@ export interface ObligationEnrichment {
     due: string;
     /** Typical days until the next deadline; drives the median-deadline stat. */
     dueDays?: number;
+    /** ISO date (YYYY-MM-DD) from which the obligation actually bites. Set only
+     *  where an act is already in force but not yet applicable, or where a
+     *  staged duty starts later than its parent act (PPWR recycled-content and
+     *  empty-space quotas in 2030). Omitted = applicable today, which is the
+     *  case for every obligation unless stated otherwise. Kept as a plain date
+     *  rather than a countdown so this map stays deterministic — the days-until
+     *  arithmetic belongs at the render point, which is the only place that
+     *  legitimately knows 'now'. */
+    appliesFrom?: string;
     /** 'eu' = applies market-independently across the EU (shown as EU-wide). */
     scope?: 'eu';
 }
@@ -53,6 +62,31 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
         IT: { source: 'D.Lgs. 152/2006 (CONAI)', penalty: 'up to €60,000', penaltyMaxEur: 60000, due: 'Annual', dueDays: 60 },
         NL: { source: 'Besluit beheer verpakkingen (Afvalfonds)', penalty: 'recovery + administrative fines', penaltyMaxEur: 25000, due: 'Annual', dueDays: 60 },
         default: { source: 'EU PPWR 2025/40', penalty: 'national EPR fines + sales ban', penaltyMaxEur: 50000, due: 'Annual', dueDays: 60 },
+    },
+    // PPWR is a Regulation: it binds whoever places packaging on the EU market,
+    // identically in every member state, so there are no country overrides here.
+    // The national layer (registration, licensing fees) sits in 'prod-epr'.
+    'prod-packaging-conformity': {
+        default: { source: 'EU PPWR 2025/40 Art. 37–39 (Annex VII/VIII)', penalty: 'national penalties under Art. 68 + withdrawal from the market', penaltyMaxEur: 100000, due: 'Ongoing', appliesFrom: '2026-08-12', scope: 'eu' },
+    },
+    // The 2030 tranche. Same reasoning as above: a Regulation, so no country
+    // overrides. Art. 24 additionally slips to "3 years after the implementing
+    // act" if the Commission is late, so the date is a floor, not a promise —
+    // said plainly in the source string rather than pretended away.
+    'prod-packaging-recycled-content': {
+        default: { source: 'EU PPWR 2025/40 Art. 7 (post-consumer recyclate only)', penalty: 'national penalties under Art. 68 + withdrawal from the market', penaltyMaxEur: 100000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu' },
+    },
+    'prod-packaging-recyclability': {
+        default: { source: 'EU PPWR 2025/40 Art. 6 + Annex II (grade A–C; A/B from 2038)', penalty: 'national penalties under Art. 68 + withdrawal from the market', penaltyMaxEur: 100000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu' },
+    },
+    'prod-packaging-empty-space': {
+        default: { source: 'EU PPWR 2025/40 Art. 24 (50% cap, or 3 years after the implementing act)', penalty: 'national penalties under Art. 68 + withdrawal from the market', penaltyMaxEur: 75000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu' },
+    },
+    'prod-packaging-format-bans': {
+        default: { source: 'EU PPWR 2025/40 Art. 25 + Annex V', penalty: 'format may no longer be placed on the market', penaltyMaxEur: 75000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu' },
+    },
+    'prod-packaging-reuse-targets': {
+        default: { source: 'EU PPWR 2025/40 Art. 29 (40% transport / 10% grouped; cardboard exempt)', penalty: 'national penalties under Art. 68', penaltyMaxEur: 50000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu' },
     },
     'prod-safety': {
         UK: { source: 'UK GPSR 2005', penalty: 'up to £20,000 + 12 months imprisonment', penaltyMaxEur: 23000, due: 'Ongoing' },

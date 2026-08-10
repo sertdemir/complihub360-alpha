@@ -31,6 +31,12 @@
     "due": "Due",
     "state": "State"
   },
+  "appliesIn_one": "applies in {{count}} day",
+  "appliesIn_other": "applies in {{count}} days",
+  "groups": {
+    "now": "Now",
+    "radar": "On the radar"
+  },
   "severity": {
     "critical": "Critical",
     "high": "High",

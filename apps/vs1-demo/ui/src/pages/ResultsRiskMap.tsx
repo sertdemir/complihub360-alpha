@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Fragment } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { saveWizardSession, fetchSessions } from '../api/sessions';
@@ -36,6 +36,35 @@ type Obligation = {
    *  obligations and for the design fixture. */
   sourceLabel?: string;
   sourceUrl?: string;
+  /** Adopted law whose start date is past the deadline horizon — shown under
+   *  "On the radar" instead of competing with what needs doing this quarter. */
+  radar?: boolean;
+};
+
+/** Whole days from today until an ISO date, or null once the date has passed
+ *  (or is absent). Both sides are normalised to local midnight so a duty that
+ *  starts the day after tomorrow reads "2 days" regardless of the clock time.
+ *  Deliberately lives here and not in the engine: the enrichment map is
+ *  deterministic ground truth, and only the render point knows "now". */
+function daysUntil(iso?: string | null): number | null {
+  if (!iso) return null;
+  const target = new Date(`${iso}T00:00:00`);
+  if (Number.isNaN(target.getTime())) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const days = Math.round((target.getTime() - today.getTime()) / 86_400_000);
+  return days > 0 ? days : null;
+}
+
+/** Beyond a year out, a start date stops being a deadline and becomes a
+ *  roadmap item. The PPWR 2030 tranche is ~1,200 days away: counted as a
+ *  deadline it would drag the median stat to "1240 days" and render countdowns
+ *  nobody can act on. Past the horizon the row still shows its date — only the
+ *  countdown and the deadline stats drop out. */
+const DEADLINE_HORIZON_DAYS = 365;
+const withinHorizon = (iso?: string | null): number | null => {
+  const d = daysUntil(iso);
+  return d != null && d <= DEADLINE_HORIZON_DAYS ? d : null;
 };
 
 export const OBLIGATIONS: Obligation[] = [
@@ -212,11 +241,40 @@ export function ResultsRiskMap() {
         sourceLabel: l.source_url ? (l.source ?? l.celex ?? undefined) : undefined,
         sourceUrl: l.source_url ?? undefined,
         market: l.markets && l.markets.length ? l.markets.join(' · ') : 'EU-wide',
-        due: l.due ?? '—',
-        dueSub: l.due_days != null ? `${l.due_days} days` : l.due === 'Ongoing' ? 'Live' : '',
+        // A duty that has not started yet must not read "Ongoing · Live" — that
+        // would tell the user they are already in breach. Until its start date
+        // the Due cell shows that date plus the countdown; from the day it
+        // applies the row silently reverts to its normal cadence.
+        due: daysUntil(l.applies_from) != null
+          ? new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' })
+              .format(new Date(`${l.applies_from}T00:00:00`))
+          : l.due ?? '—',
+        dueSub: withinHorizon(l.applies_from) != null
+          ? t('appliesIn', { count: withinHorizon(l.applies_from) as number, defaultValue: `applies in ${withinHorizon(l.applies_from)} days` })
+          : daysUntil(l.applies_from) != null ? ''   // far future: the date says enough
+          : l.due_days != null ? `${l.due_days} days` : l.due === 'Ongoing' ? 'Live' : '',
         state: { kind: l.state === 'confirmed' ? 'confirmed' : 'likely' },
+        // Same horizon as the stats: a duty landing in days is "now" even
+        // though it has not started; one landing in 2030 is not.
+        radar: daysUntil(l.applies_from) != null && withinHorizon(l.applies_from) == null,
       }))
     : OBLIGATIONS;
+
+  // Two groups, not two tables: "Now" is what the user is accountable for
+  // today, "On the radar" is adopted law that only bites later. Keeping the
+  // original index alongside each row matters — the design fixture translates
+  // its cells positionally via results:obligations.<i>, so partitioning must
+  // not renumber them. filter() is stable, so order inside each group holds.
+  const indexed = rows.map((o, i) => ({ o, i }));
+  const nowRows = indexed.filter((x) => !x.o.radar);
+  const radarRows = indexed.filter((x) => x.o.radar);
+  // Headers appear only when there is something to separate; with no staged
+  // obligations the table renders exactly as it did before.
+  const grouped = radarRows.length
+    ? [{ key: 'now', label: t('groups.now', { defaultValue: 'Now' }), items: nowRows },
+       { key: 'radar', label: t('groups.radar', { defaultValue: 'On the radar' }), items: radarRows }]
+        .filter((g) => g.items.length)
+    : [{ key: 'now', label: '', items: indexed }];
 
   // Stat strip mirrors the table: count, near-term deadlines, median
   // days-to-deadline, matched partners. Fixture values until the API answers.
@@ -229,7 +287,13 @@ export function ResultsRiskMap() {
   const SOON_DAYS = 30;
   const stats = (() => {
     if (!isLive) return STATS;
-    const days = liveLaws.map((l) => l.due_days).filter((d): d is number => d != null).sort((a, b) => a - b);
+    // A not-yet-applicable duty has a real, dated deadline — the day it starts
+    // to apply. Counting it keeps the "near deadlines" stat honest; without it
+    // a rule landing in two days would be invisible in the headline numbers.
+    // Only inside the horizon, though: the 2030 tranche is a roadmap, and
+    // averaging it in would report a median deadline three years out.
+    const days = liveLaws.map((l) => l.due_days ?? withinHorizon(l.applies_from))
+      .filter((d): d is number => d != null).sort((a, b) => a - b);
     const median = days.length ? days[Math.floor(days.length / 2)] : null;
     const soon = days.filter((d) => d <= SOON_DAYS).length;
     return [
@@ -319,7 +383,15 @@ export function ResultsRiskMap() {
             <span>{t('table.due')}</span>
             <span className="text-right">{t('table.state')}</span>
           </div>
-          {rows.map((o, i) => (
+          {grouped.map((g) => (
+            <Fragment key={g.key}>
+              {g.label && (
+                <div className="flex items-baseline gap-2 border-b border-stroke-subtle bg-surface-secondary/40 px-6 py-2.5">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-fg-secondary">{g.label}</span>
+                  <span className="text-[11px] text-fg-tertiary">{g.items.length}</span>
+                </div>
+              )}
+              {g.items.map(({ o, i }) => (
             <div
               key={o.title}
               className="grid grid-cols-[100px_1fr_120px_110px_160px] items-center gap-4 border-b border-stroke-subtle px-6 py-5 last:border-b-0 transition-colors hover:bg-surface-secondary/50"
@@ -364,6 +436,8 @@ export function ResultsRiskMap() {
                 <StatePill state={o.state} onAnswer={() => setSaveOpen(true)} />
               </span>
             </div>
+              ))}
+            </Fragment>
           ))}
         </div>
 
