@@ -111,9 +111,11 @@ const ROWS: Row[] = [
   },
 ];
 
+// Storybook-only screen showcase. Kept in step with the live risk map so the
+// design reference does not drift back into fear-first framing (Brand Map §11).
 const STATS: { value: string; label: string }[] = [
   { value: '8', label: 'obligations identified' },
-  { value: '€25k', label: 'total exposure' },
+  { value: '4', label: 'with a deadline in 30 days' },
   { value: '14 days', label: 'median deadline' },
   { value: '3', label: 'Verified Partners ready' },
 ];
