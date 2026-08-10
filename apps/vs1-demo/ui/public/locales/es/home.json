@@ -72,6 +72,34 @@
       "continue": "Continuar"
     }
   },
+  "problemRecognition": {
+    "eyebrow": "Por qué esto cuesta",
+    "title": {
+      "pre": "Obtener una respuesta ",
+      "gold": "clara",
+      "post": " es la parte difícil."
+    },
+    "lead": "La mayoría de las personas con las que hablamos ya lo han intentado. El problema rara vez es el esfuerzo: es que las respuestas no coinciden y no hay forma de saber cuál corresponde a su situación.",
+    "items": [
+      {
+        "title": "Dos asesores, dos respuestas.",
+        "desc": "Haga la misma pregunta dos veces y obtendrá dos respuestas defendibles. Sin la fuente detrás de cada una, no se puede saber cuál se aplica a usted."
+      },
+      {
+        "title": "Le venden más de lo que necesita.",
+        "desc": "El incentivo es cotizar el alcance más amplio. A nadie le pagan por decirle que una tarea es pequeña, o que ya está resuelta."
+      },
+      {
+        "title": "Semanas que se van en definir el alcance.",
+        "desc": "Antes de que empiece el trabajo real ya ha explicado su negocio cinco veces y comparado presupuestos que miden cosas distintas."
+      },
+      {
+        "title": "Sin base de comparación.",
+        "desc": "Cada propuesta está estructurada de otra manera. Compararlas significa adivinar qué omitió cada una."
+      }
+    ],
+    "note": "Nada de esto significa que tenga un problema. Significa que aún no tiene una imagen clara, y eso sí tiene solución."
+  },
   "heroWizard": {
     "mobileAlt": "Asistente de compliance de CompliHub — paso «Áreas» (móvil)"
   },

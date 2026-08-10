@@ -72,6 +72,34 @@
       "continue": "Devam"
     }
   },
+  "problemRecognition": {
+    "eyebrow": "Bu neden zor",
+    "title": {
+      "pre": "",
+      "gold": "Net",
+      "post": " bir yanıt almak, işin zor kısmı."
+    },
+    "lead": "Konuştuğumuz çoğu kişi bunu zaten denemiş. Sorun nadiren çabadır — yanıtlar birbirini tutmaz ve hangisinin sizin durumunuza uyduğunu anlamanın bir yolu yoktur.",
+    "items": [
+      {
+        "title": "İki danışman, iki yanıt.",
+        "desc": "Aynı soruyu iki kez sorun, iki savunulabilir yanıt alırsınız. Arkasındaki kaynak olmadan hangisinin sizin için geçerli olduğunu söyleyemezsiniz."
+      },
+      {
+        "title": "İhtiyacınızdan fazlası satılır.",
+        "desc": "Teşvik, en geniş kapsamı teklif etmektir. Kimseye bir işin küçük olduğunu ya da zaten halledildiğini söylemesi için para ödenmez."
+      },
+      {
+        "title": "Kapsam belirlemede kaybolan haftalar.",
+        "desc": "Asıl iş başlamadan önce işinizi beş kez anlatmış ve farklı şeyleri ölçen teklifleri karşılaştırmış olursunuz."
+      },
+      {
+        "title": "Karşılaştırma zemini yok.",
+        "desc": "Her teklif farklı kurgulanmıştır. Karşılaştırmak, hangisinde neyin atlandığını tahmin etmek demektir."
+      }
+    ],
+    "note": "Bunların hiçbiri bir sorununuz olduğu anlamına gelmez. Henüz net bir resminiz olmadığı anlamına gelir — ve bu çözülebilir."
+  },
   "heroWizard": {
     "mobileAlt": "CompliHub uyum sihirbazı — «Alanlar» adımı (mobil)"
   },

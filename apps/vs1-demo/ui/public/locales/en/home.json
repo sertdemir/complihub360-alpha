@@ -72,6 +72,34 @@
       "continue": "Continue"
     }
   },
+  "problemRecognition": {
+    "eyebrow": "Why this is hard",
+    "title": {
+      "pre": "Getting a ",
+      "gold": "straight",
+      "post": " answer is the hard part."
+    },
+    "lead": "Most people we talk to have already tried. The problem is rarely effort — it is that the answers do not line up, and there is no way to tell which one fits your situation.",
+    "items": [
+      {
+        "title": "Two advisors, two answers.",
+        "desc": "Ask the same question twice and you get two defensible answers. Without the source behind each one, you cannot tell which applies to you."
+      },
+      {
+        "title": "Sold more than you need.",
+        "desc": "The incentive is to quote the widest scope. Nobody is paid to tell you a task is small, or that you have already handled it."
+      },
+      {
+        "title": "Weeks that disappear into scoping.",
+        "desc": "Before the actual work starts you have explained your business five times and compared quotes that measure different things."
+      },
+      {
+        "title": "No basis for comparison.",
+        "desc": "Every proposal is structured differently. Comparing them means guessing at what each one left out."
+      }
+    ],
+    "note": "None of this means you have a problem. It means you do not have a clear picture yet — and that is a solvable one."
+  },
   "heroWizard": {
     "mobileAlt": "CompliHub compliance wizard — Domains step (mobile)"
   },
