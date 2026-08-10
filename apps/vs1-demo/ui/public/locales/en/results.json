@@ -1,7 +1,7 @@
 {
   "topbar": {
     "guestBadge": "Guest map · expires in 30 min",
-    "exportPdf": "Export PDF",
+    "backHome": "Back to start",
     "saveMap": "Save this map"
   },
   "header": {

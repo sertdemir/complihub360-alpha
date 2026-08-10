@@ -1,7 +1,7 @@
 {
   "topbar": {
     "guestBadge": "Misafir haritası · 30 dk içinde sona erer",
-    "exportPdf": "PDF olarak dışa aktar",
+    "backHome": "Başa dön",
     "saveMap": "Bu haritayı kaydedin"
   },
   "header": {

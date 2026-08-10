@@ -1,13 +1,12 @@
 import { useState, useEffect, useRef, Fragment } from 'react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { saveWizardSession, fetchSessions } from '../api/sessions';
 import { runSearch, type AnonProvider, type SearchLaw } from '../api/search';
 import { useApiData } from '../lib/useApiData';
 import { ProviderMatchCard } from '../components/ui/ProviderMatchCard';
-import { generateRiskMapPdf } from '../lib/riskMapPdf';
 import { useAuthStore } from '../store/useAuthStore';
-import { Lock, Check, Info, ArrowRight, ShieldCheck, Download } from 'lucide-react';
+import { Lock, Check, Info, ArrowRight, ArrowLeft, ShieldCheck } from 'lucide-react';
 import { Logo } from '../components/ui/Logo';
 import { RiskBadge, type RiskLevel } from '../components/ui/RiskBadge';
 import { FreeAccountDrawer } from '../components/home/MarketsDrawer';
@@ -305,32 +304,6 @@ export function ResultsRiskMap() {
     ];
   })();
 
-  // A6 (User Flows §9): guest-allowed PDF snapshot — PII-free, with sources.
-  // Translated at the render point (results namespace); canonical EN fallback.
-  const exportPdf = () => {
-    generateRiskMapPdf({
-      profile,
-      t,
-      stats: stats.map((s, i) => ({ value: s.value, label: t(`stats.${i}.label`, { defaultValue: s.label }) })),
-      // Flattened in the same order as the screen, carrying the group label so
-      // the export splits where the table splits — a PDF that reorders the
-      // rows silently would not be the same document the user just read.
-      obligations: grouped.flatMap((g) => g.items.map(({ o, i }) => ({
-        groupLabel: g.label || undefined,
-        severity: o.severity,
-        title: isLive ? o.title : t(`obligations.${i}.title`, { defaultValue: o.title }),
-        detail: isLive ? o.detail : t(`obligations.${i}.detail`, { defaultValue: o.detail }),
-        market: isLive ? o.market : t(`obligations.${i}.market`, { defaultValue: o.market }),
-        due: isLive ? o.due : t(`obligations.${i}.due`, { defaultValue: o.due }),
-        dueSub: isLive ? o.dueSub : t(`obligations.${i}.dueSub`, { defaultValue: o.dueSub }),
-        stateLabel:
-          o.state.kind === 'confirmed' ? t('state.confirmed', { defaultValue: 'Confirmed' })
-          : o.state.kind === 'likely' ? t('state.likely', { defaultValue: 'Likely' })
-          : t('pdf.questionsOpen', { defaultValue: '{{total}} questions open', total: o.state.count }),
-      }))),
-    });
-  };
-
   // Wave A1: arriving from the wizard persists the session (the editable
   // dossier). Guest-anchored via guest_key; fire-and-forget — the page renders
   // regardless, and a failed save just means no resume anchor.
@@ -348,18 +321,23 @@ export function ResultsRiskMap() {
       {/* Topbar */}
       <header className="sticky top-0 z-30 border-b border-stroke-subtle bg-surface/90 backdrop-blur-xl">
         <div className="mx-auto flex h-[72px] w-full max-w-[1440px] items-center justify-between px-4 md:px-8 lg:px-16">
-          <Logo lockup="horizontal" tone="on-light" href="/" markClassName="h-9" />
+          <div className="flex min-w-0 items-center gap-4">
+            <Logo lockup="horizontal" tone="on-light" href="/" markClassName="h-9" />
+            {/* The guest map deliberately drops the site nav to stay focused, which
+                left no visible way out — the logo was the only exit and nobody
+                reads a logo as "back". This is that exit, spelled out. */}
+            <span aria-hidden className="hidden h-5 w-px bg-stroke sm:block" />
+            <Link
+              to={`/${locale}`}
+              className="hidden items-center gap-1.5 text-[13px] font-semibold text-fg-secondary transition-colors hover:text-fg-brand sm:inline-flex"
+            >
+              <ArrowLeft size={14} /> {t('topbar.backHome')}
+            </Link>
+          </div>
           <div className="flex items-center gap-4">
             <span className="hidden items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary sm:inline-flex">
               <Lock size={13} /> {t('topbar.guestBadge')}
             </span>
-            <button
-              type="button"
-              onClick={exportPdf}
-              className="inline-flex items-center gap-2 rounded-xl border border-stroke px-4 py-2.5 text-[14px] font-semibold text-fg transition-colors hover:border-fg-brand"
-            >
-              <Download size={15} /> {t('topbar.exportPdf')}
-            </button>
             <button
               type="button"
               onClick={() => setSaveOpen(true)}
