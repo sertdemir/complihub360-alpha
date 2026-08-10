@@ -1,7 +1,7 @@
 {
   "topbar": {
     "guestBadge": "Mapa de invitado · caduca en 30 min",
-    "exportPdf": "Exportar PDF",
+    "backHome": "Volver al inicio",
     "saveMap": "Guardar este mapa"
   },
   "header": {
