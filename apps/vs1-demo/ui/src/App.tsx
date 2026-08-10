@@ -12,7 +12,9 @@ import { SolutionsPage } from "./pages/SolutionsPage";
 import { ComplianceAreasPage } from "./pages/ComplianceAreasPage";
 import { HowItWorksPage } from "./pages/HowItWorksPage";
 import { ProvidersPage } from "./pages/ProvidersPage";
+import { PROVIDER_MARKETING_ENABLED } from "./lib/featureFlags";
 import { ResultsRiskMap } from "./pages/ResultsRiskMap";
+import { SearchResultPage } from "./pages/SearchResultPage";
 import { ResourcesPage } from "./pages/ResourcesPage";
 import AdvisoryPage from "./pages/AdvisoryPage";
 import { AiGovernancePage } from "./pages/AiGovernancePage";
@@ -130,11 +132,16 @@ function AppContent() {
                     <Route path="solutions" element={<SolutionsPage />} />
                     <Route path="compliance" element={<ComplianceAreasPage />} />
                     <Route path="how-it-works" element={<HowItWorksPage />} />
-                    <Route path="providers" element={<ProvidersPage />} />
+                    {/* Provider marketing landing — off by design (featureFlags.ts):
+                        providers are recruited offline/B2B. Kept in the repo; the
+                        route redirects home while the flag is false. */}
+                    <Route path="providers" element={PROVIDER_MARKETING_ENABLED ? <ProvidersPage /> : <LocaleRedirect to="" />} />
                     <Route path="resources" element={<ResourcesPage />} />
                     <Route path="advisory" element={<AdvisoryPage />} />
                     <Route path="ai-governance" element={<AiGovernancePage />} />
                     <Route path="results" element={<ResultsRiskMap />} />
+                    {/* Station 1A: prose-search answers page (no risk map, no gating). */}
+                    <Route path="search" element={<SearchResultPage />} />
                     <Route path="wizard/*" element={<WizardRoutes />} />
                     {/* Legal (launch requirement: Art. 13 GDPR + Impressumspflicht) */}
                     <Route path="privacy" element={<PrivacyPage />} />

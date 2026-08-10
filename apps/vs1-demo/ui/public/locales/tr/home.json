@@ -70,6 +70,12 @@
       "selectedCount": "2 seçildi · 2 kaldı",
       "back": "Geri",
       "continue": "Devam"
+    },
+    "dual": {
+      "placeholder": "Durumunuzu kendi kelimelerinizle anlatın…",
+      "answer": "Bir uyum sorusu sorun",
+      "guided": "İhtiyaçlarımı değerlendir",
+      "trust": "Ücretsiz · anonim · 3 dakikadan kısa"
     }
   },
   "problemRecognition": {
