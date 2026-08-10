@@ -28,6 +28,8 @@ export interface EnrichedSubdomain {
     penaltyMaxEur?: number;
     due?: string;
     dueDays?: number;
+    /** ISO date the obligation starts to apply; absent = applicable today. */
+    appliesFrom?: string;
     /** CELEX id of the underlying EU act (verified against EUR-Lex). */
     celex?: string;
     /** Deep link to the authoritative, always-current text on EUR-Lex. */
@@ -139,6 +141,7 @@ export function generateRelevantSubdomains(context: GeneratorContext): EnrichedS
                 penaltyMaxEur: enrichment?.penaltyMaxEur,
                 due: enrichment?.due,
                 dueDays: enrichment?.dueDays,
+                appliesFrom: enrichment?.appliesFrom,
                 celex: template.celex,
                 sourceUrl: template.celex ? eurLexUrl(template.celex) : undefined,
             });

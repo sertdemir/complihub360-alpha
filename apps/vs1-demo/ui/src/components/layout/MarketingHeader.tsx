@@ -21,8 +21,6 @@ export interface MarketingHeaderProps {
   audience?: Audience;
   /** Section anchors (in-page). Defaults to the audience preset. */
   anchors?: Anchor[];
-  ctaLabel?: string;
-  ctaHref?: string;
   /** Cross-link to the other audience's landing. Defaults to the audience preset. */
   crossLink?: CrossLink;
   /** Audience-switch targets (locale-aware). The toggle sits next to the logo. */
@@ -38,7 +36,7 @@ export interface MarketingHeaderProps {
 // Anchor ids point at REAL section ids on the respective landing page
 // (user LP: pricing lives in the HowItActs cost section #engagement, voices in
 // the Brand-Code section; provider LP: pricing = the two-channels section).
-const PRESETS: Record<Audience, { anchors: Anchor[]; cta: string; cross: CrossLink }> = {
+const PRESETS: Record<Audience, { anchors: Anchor[]; cross: CrossLink }> = {
   entrepreneur: {
     anchors: [
       { id: 'how-it-works', label: 'How it works', labelKey: 'header.nav.howItWorks' },
@@ -46,7 +44,6 @@ const PRESETS: Record<Audience, { anchors: Anchor[]; cta: string; cross: CrossLi
       { id: 'brand-code', label: 'Voices', labelKey: 'header.nav.voices' },
       { id: 'engagement', label: 'Pricing', labelKey: 'header.nav.pricing' },
     ],
-    cta: 'Start your assessment',
     cross: { label: 'For Providers', href: '/providers' },
   },
   provider: {
@@ -57,7 +54,6 @@ const PRESETS: Record<Audience, { anchors: Anchor[]; cta: string; cross: CrossLi
       { id: 'channels', label: 'Pricing', labelKey: 'header.nav.pricing' },
       { id: 'faq', label: 'FAQ', labelKey: 'header.nav.faq' },
     ],
-    cta: 'Apply for beta',
     cross: { label: 'For Entrepreneurs', href: '/' },
   },
 };
@@ -211,8 +207,6 @@ function useScrollSpy(ids: string[]): string | null {
 export function MarketingHeader({
   audience = 'entrepreneur',
   anchors,
-  ctaLabel,
-  ctaHref = '#register',
   crossLink,
   userHref = '/',
   providerHref = '/providers',
@@ -277,7 +271,7 @@ export function MarketingHeader({
               inverse ? 'border-white/40 text-fg-inverse' : 'border-stroke-brand text-fg-brand'
             }`}
           >
-            Log in
+            {t('header.login')}
           </a>
         </div>
       </div>
@@ -317,7 +311,7 @@ export function MarketingHeader({
               {/* Button row */}
               <div className="flex items-center gap-4 px-4 pb-1 pt-4">
                 <a href={loginHref} className="inline-flex h-[40px] flex-1 items-center justify-center rounded-md border-thin border-stroke-brand px-4 text-body-sm font-semibold text-fg-brand">
-                  Log in
+                  {t('header.login')}
                 </a>
               </div>
               {/* Pill anchor row (horizontal scroll) */}

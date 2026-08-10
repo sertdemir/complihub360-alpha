@@ -10,7 +10,7 @@ const DESCRIPTION = `
 - **Anchors, not pages.** Menu items are in-page section links with **scroll-spy** — the anchor for
   the section currently in view is highlighted (petrol active state).
 - **Responsive.** Desktop = glassmorphism bar (solid + shadow on scroll). Mobile = collapsed bar
-  (logo · globe · hamburger) that **expands** into a panel: action buttons (Login + CTA) above a
+  (logo · globe · hamburger) that **expands** into a panel: the login action above a
   **horizontally-scrollable pill row** of anchors (active pill = scroll-spy; edge-clip instead of
   visible controls).
 - **Themes.** \`light\` for light pages, \`inverse\` over dark hero sections.
@@ -29,7 +29,6 @@ const meta = {
   argTypes: {
     audience: { control: 'radio', options: ['entrepreneur', 'provider'], description: 'Which landing the header serves.' },
     theme: { control: 'radio', options: ['light', 'inverse'], description: 'Light page vs. dark hero (inverse).' },
-    ctaLabel: { control: 'text' },
   },
 } satisfies Meta<typeof MarketingHeader>;
 
