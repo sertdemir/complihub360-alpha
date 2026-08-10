@@ -33,6 +33,10 @@
   },
   "appliesIn_one": "gilt in {{count}} Tag",
   "appliesIn_other": "gilt in {{count}} Tagen",
+  "groups": {
+    "now": "Jetzt",
+    "radar": "Auf dem Radar"
+  },
   "severity": {
     "critical": "Kritisch",
     "high": "Hoch",

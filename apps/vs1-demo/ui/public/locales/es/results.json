@@ -33,6 +33,10 @@
   },
   "appliesIn_one": "se aplica en {{count}} día",
   "appliesIn_other": "se aplica en {{count}} días",
+  "groups": {
+    "now": "Ahora",
+    "radar": "En el radar"
+  },
   "severity": {
     "critical": "Crítica",
     "high": "Alta",

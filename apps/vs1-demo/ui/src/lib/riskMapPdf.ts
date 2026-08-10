@@ -8,6 +8,9 @@ import type { SearchProfile } from '../components/wizard/WizardContext';
 // legal references in each obligation and listed with their official origin.
 
 export interface PdfObligation {
+  /** Section this row belongs to ("Now" / "On the radar"). A heading is drawn
+   *  whenever it changes; absent on every row = no headings, as before. */
+  groupLabel?: string;
   severity: 'critical' | 'high' | 'medium' | 'low';
   title: string;
   detail: string;
@@ -153,7 +156,15 @@ export function generateRiskMapPdf(opts: {
   const SEVERITY_EN: Record<PdfObligation['severity'], string> = {
     critical: 'Critical', high: 'High', medium: 'Medium', low: 'Low',
   };
+  let openGroup: string | undefined;
   for (const raw of opts.obligations) {
+    if (raw.groupLabel && raw.groupLabel !== openGroup) {
+      openGroup = raw.groupLabel;
+      ensureRoom(26);
+      doc.setFont('helvetica', 'bold').setFontSize(7.5).setTextColor(MUTED);
+      doc.text(pdfSafe(openGroup).toUpperCase(), M, y);
+      y += 14;
+    }
     const o = {
       ...raw,
       title: pdfSafe(raw.title),

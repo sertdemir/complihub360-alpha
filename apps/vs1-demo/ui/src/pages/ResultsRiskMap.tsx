@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Fragment } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { saveWizardSession, fetchSessions } from '../api/sessions';
@@ -37,6 +37,9 @@ type Obligation = {
    *  obligations and for the design fixture. */
   sourceLabel?: string;
   sourceUrl?: string;
+  /** Adopted law whose start date is past the deadline horizon — shown under
+   *  "On the radar" instead of competing with what needs doing this quarter. */
+  radar?: boolean;
 };
 
 /** Whole days from today until an ISO date, or null once the date has passed
@@ -252,8 +255,27 @@ export function ResultsRiskMap() {
           : daysUntil(l.applies_from) != null ? ''   // far future: the date says enough
           : l.due_days != null ? `${l.due_days} days` : l.due === 'Ongoing' ? 'Live' : '',
         state: { kind: l.state === 'confirmed' ? 'confirmed' : 'likely' },
+        // Same horizon as the stats: a duty landing in days is "now" even
+        // though it has not started; one landing in 2030 is not.
+        radar: daysUntil(l.applies_from) != null && withinHorizon(l.applies_from) == null,
       }))
     : OBLIGATIONS;
+
+  // Two groups, not two tables: "Now" is what the user is accountable for
+  // today, "On the radar" is adopted law that only bites later. Keeping the
+  // original index alongside each row matters — the design fixture translates
+  // its cells positionally via results:obligations.<i>, so partitioning must
+  // not renumber them. filter() is stable, so order inside each group holds.
+  const indexed = rows.map((o, i) => ({ o, i }));
+  const nowRows = indexed.filter((x) => !x.o.radar);
+  const radarRows = indexed.filter((x) => x.o.radar);
+  // Headers appear only when there is something to separate; with no staged
+  // obligations the table renders exactly as it did before.
+  const grouped = radarRows.length
+    ? [{ key: 'now', label: t('groups.now', { defaultValue: 'Now' }), items: nowRows },
+       { key: 'radar', label: t('groups.radar', { defaultValue: 'On the radar' }), items: radarRows }]
+        .filter((g) => g.items.length)
+    : [{ key: 'now', label: '', items: indexed }];
 
   // Stat strip mirrors the table: count, near-term deadlines, median
   // days-to-deadline, matched partners. Fixture values until the API answers.
@@ -290,7 +312,11 @@ export function ResultsRiskMap() {
       profile,
       t,
       stats: stats.map((s, i) => ({ value: s.value, label: t(`stats.${i}.label`, { defaultValue: s.label }) })),
-      obligations: rows.map((o, i) => ({
+      // Flattened in the same order as the screen, carrying the group label so
+      // the export splits where the table splits — a PDF that reorders the
+      // rows silently would not be the same document the user just read.
+      obligations: grouped.flatMap((g) => g.items.map(({ o, i }) => ({
+        groupLabel: g.label || undefined,
         severity: o.severity,
         title: isLive ? o.title : t(`obligations.${i}.title`, { defaultValue: o.title }),
         detail: isLive ? o.detail : t(`obligations.${i}.detail`, { defaultValue: o.detail }),
@@ -301,7 +327,7 @@ export function ResultsRiskMap() {
           o.state.kind === 'confirmed' ? t('state.confirmed', { defaultValue: 'Confirmed' })
           : o.state.kind === 'likely' ? t('state.likely', { defaultValue: 'Likely' })
           : t('pdf.questionsOpen', { defaultValue: '{{total}} questions open', total: o.state.count }),
-      })),
+      }))),
     });
   };
 
@@ -379,7 +405,15 @@ export function ResultsRiskMap() {
             <span>{t('table.due')}</span>
             <span className="text-right">{t('table.state')}</span>
           </div>
-          {rows.map((o, i) => (
+          {grouped.map((g) => (
+            <Fragment key={g.key}>
+              {g.label && (
+                <div className="flex items-baseline gap-2 border-b border-stroke-subtle bg-surface-secondary/40 px-6 py-2.5">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-fg-secondary">{g.label}</span>
+                  <span className="text-[11px] text-fg-tertiary">{g.items.length}</span>
+                </div>
+              )}
+              {g.items.map(({ o, i }) => (
             <div
               key={o.title}
               className="grid grid-cols-[100px_1fr_120px_110px_160px] items-center gap-4 border-b border-stroke-subtle px-6 py-5 last:border-b-0 transition-colors hover:bg-surface-secondary/50"
@@ -424,6 +458,8 @@ export function ResultsRiskMap() {
                 <StatePill state={o.state} onAnswer={() => setSaveOpen(true)} />
               </span>
             </div>
+              ))}
+            </Fragment>
           ))}
         </div>
 

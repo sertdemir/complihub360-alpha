@@ -40,6 +40,18 @@ export default defineConfig({
     setupFiles: './src/test/setup.ts',
     pool: 'forks',
     projects: [{
+      // Plain unit tests. Without an explicit entry here the storybook project
+      // below is the only project vitest knows about, and every *.test.tsx
+      // under src/ is skipped in silence — "No test files found" rather than a
+      // failure, which is the kind of green that means nothing.
+      extends: true,
+      test: {
+        name: 'unit',
+        environment: 'happy-dom',
+        include: ['src/**/*.test.{ts,tsx}'],
+        setupFiles: ['./src/test/setup.ts'],
+      },
+    }, {
       extends: true,
       plugins: [
       // The plugin will run tests for the stories defined in your Storybook config
