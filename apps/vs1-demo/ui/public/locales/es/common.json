@@ -1276,5 +1276,59 @@
       "performance": "Rendimiento",
       "faq": "FAQ"
     }
+  },
+  "howItWorks": {
+    "meta": {
+      "title": "Cómo funciona · CompliHub360"
+    },
+    "eyebrow": "Cómo funciona",
+    "title": {
+      "pre": "De una pregunta a alguien que puede ",
+      "gold": "actuar",
+      "post": "."
+    },
+    "lead": "Cinco pasos. Puede detenerse después de cualquiera de ellos: la mayoría lo hace, y es un resultado perfectamente válido.",
+    "stages": [
+      {
+        "kicker": "Entender",
+        "title": "Pregunte con sus propias palabras.",
+        "body": "Describa su situación como se la explicaría a un colega. Recibirá una respuesta con la fuente detrás de cada punto: la norma misma, no el resumen de un resumen. Sin cuenta, sin llamada comercial, sin obligación de continuar."
+      },
+      {
+        "kicker": "Evaluar",
+        "title": "Vea qué se aplica realmente a su caso.",
+        "body": "Cuatro preguntas sobre sus mercados, su modelo de negocio y su volumen producen un risk map: las obligaciones que se aplican a su operación, cada una con su base legal y su plazo. Provienen de nuestro propio motor de compliance y enlazan con la base de datos jurídica de la UE; no las genera un chatbot."
+      },
+      {
+        "kicker": "Decidir",
+        "title": "Decida qué necesita ayuda externa.",
+        "body": "El mapa separa lo que puede resolver internamente de lo que realmente requiere un especialista, y en qué orden. Si resulta que ya lo tiene todo cubierto, se lo decimos: en ese caso no tenemos nada que venderle."
+      },
+      {
+        "kicker": "Emparejar",
+        "title": "La idoneidad antes que el nombre.",
+        "body": "Primero ve a los especialistas sin su identidad: cobertura, credenciales verificadas, tiempo de respuesta, encaje con sus mercados. Juzgar la idoneidad antes que el membrete es deliberado: un nombre conocido no es prueba de un buen encaje. El orden nunca está en venta."
+      },
+      {
+        "kicker": "Actuar",
+        "title": "Reserve y entregue el caso.",
+        "body": "Elija una hora en el calendario del especialista. Su identidad se revela al reservar, junto con un dossier de todo lo que ya nos ha contado, de modo que no explique su negocio por sexta vez. Después puede valorar cómo fue, y las obligaciones siguen en su mapa con sus plazos."
+      }
+    ],
+    "cost": {
+      "kicker": "Lo que esto le cuesta",
+      "title": "Nada.",
+      "body": "La plataforma, el risk map y el matching son gratuitos para usted. Nos pagan los especialistas cuando una reserva llega a producirse. Por eso mismo el orden no está en venta: una posición pagada dejaría el match sin valor para ambas partes."
+    },
+    "privacy": {
+      "kicker": "Qué ocurre con sus datos",
+      "title": "Se quedan en la UE, y siguen siendo suyos.",
+      "body": "Todo funciona sobre infraestructura de la UE. Permanece anónimo hasta que decide crear una cuenta: la evaluación no necesita nombre, ni empresa, ni correo electrónico. Un especialista ve sus datos solo cuando usted reserva."
+    },
+    "cta": {
+      "title": "Empiece por donde tenga sentido.",
+      "lead": "Seis minutos, cuatro preguntas, sin cuenta."
+    },
+    "seeAll": "Ver cómo funciona cada paso"
   }
 }

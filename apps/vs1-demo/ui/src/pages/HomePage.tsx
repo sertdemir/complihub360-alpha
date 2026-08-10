@@ -6,7 +6,7 @@
 //
 //   1 Hero                → HomeHero              understand, two equal entries
 //   2 Problem Recognition → ProblemRecognition    NEW — the reader recognises themselves
-//   3 How It Works        → still missing         see note below
+//   3 How It Works        → HowItWorksSteps       the five stages, condensed
 //   4 Risk Map            → RiskMapSection        the result, as the marketing hero
 //   5 Provider Matching   → MatchmakingDifference a consequence of clarity
 //   6 Compliance areas    → DomainsKnows          breadth as evidence, not the story
@@ -19,19 +19,21 @@
 // "engagement" and covers cost, response SLA and the engagement trail, which is
 // where the header's "Pricing" anchor points. It belongs late, near the FAQ.
 //
-// The report's position 3 (Understand → Assess → Decide → Match → Act) has no
-// section yet. It arrives with the /how-it-works page and slots in between
-// ProblemRecognition and RiskMapSection.
+// HowItWorksSteps shares its copy with the /how-it-works page (common.json →
+// howItWorks.*) instead of restating it, so the homepage summary and the full
+// page cannot drift apart.
 //
 // Anchor order matters: the header's scroll-spy nav lists how-it-works,
-// what-we-know, brand-code, engagement — which under this order appear at
-// positions 4, 5, 7 and 8, so the nav highlights in document order.
+// what-we-know, brand-code, engagement. Under this order they appear at
+// positions 5, 6, 8 and 9, so the nav still highlights in document order —
+// the-five-steps carries no nav anchor and does not disturb it.
 //
 // Built screens-led on the Compass DS, section by section.
 
 import {
   HomeHero,
   ProblemRecognition,
+  HowItWorksSteps,
   RiskMapSection,
   MatchmakingDifference,
   DomainsKnows,
@@ -50,6 +52,7 @@ export function HomePage() {
     <main className="bg-white">
       <HomeHero wizard="animated" />
       <ProblemRecognition />
+      <HowItWorksSteps />
       <RiskMapSection />
       <MatchmakingDifference />
       <DomainsKnows />

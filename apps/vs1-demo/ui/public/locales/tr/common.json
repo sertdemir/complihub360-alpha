@@ -1276,5 +1276,59 @@
       "performance": "Performans",
       "faq": "SSS"
     }
+  },
+  "howItWorks": {
+    "meta": {
+      "title": "Nasıl çalışır · CompliHub360"
+    },
+    "eyebrow": "Nasıl çalışır",
+    "title": {
+      "pre": "Bir sorudan, ",
+      "gold": "harekete",
+      "post": " geçebilecek birine."
+    },
+    "lead": "Beş adım. Her birinin ardından durabilirsiniz — çoğu kişi öyle yapıyor ve bu gayet iyi bir sonuç.",
+    "stages": [
+      {
+        "kicker": "Anlayın",
+        "title": "Kendi kelimelerinizle sorun.",
+        "body": "Durumunuzu bir meslektaşınıza anlatır gibi anlatın. Her maddenin arkasındaki kaynakla birlikte bir yanıt alırsınız — özetin özeti değil, mevzuatın kendisi. Hesap yok, satış görüşmesi yok, devam etme zorunluluğu yok."
+      },
+      {
+        "kicker": "Değerlendirin",
+        "title": "Size gerçekte neyin geçerli olduğunu görün.",
+        "body": "Pazarlarınız, iş modeliniz ve hacminize dair dört soru bir risk haritası oluşturur: işletmeniz için geçerli yükümlülükler, her biri yasal dayanağı ve süresiyle. Bunlar kendi uyum motorumuzdan gelir ve AB hukuk veritabanına bağlanır — bir sohbet botu tarafından üretilmezler."
+      },
+      {
+        "kicker": "Karar verin",
+        "title": "Neye dışarıdan destek gerektiğine karar verin.",
+        "body": "Harita, kendi içinizde halledebileceklerinizi gerçekten uzman gerektirenlerden ve hangi sırayla yapılacağından ayırır. Her şeyin zaten karşılandığı ortaya çıkarsa bunu size söyleriz — o durumda size satacağımız bir şey yoktur."
+      },
+      {
+        "kicker": "Eşleştirin",
+        "title": "İsimden önce uygunluk.",
+        "body": "Eşleşen uzmanları önce kimlikleri olmadan görürsünüz: kapsam, doğrulanmış yetkinlikler, yanıt süresi, pazarlarınıza uygunluk. Uygunluğu antetli kâğıttan önce değerlendirmek bilinçli bir tercihtir — tanıdık bir isim, doğru uygunluğun kanıtı değildir. Sıralama hiçbir zaman satılık değildir."
+      },
+      {
+        "kicker": "Harekete geçin",
+        "title": "Randevu alın, sonra devredin.",
+        "body": "Uzmanın takviminden bir saat seçin. Kimlik, randevu anında, bize daha önce anlattığınız her şeyi içeren bir dosyayla birlikte açılır — işinizi altıncı kez anlatmazsınız. Sonrasında süreci değerlendirebilirsiniz ve yükümlülükler süreleriyle birlikte haritanızda kalır."
+      }
+    ],
+    "cost": {
+      "kicker": "Bunun size maliyeti",
+      "title": "Hiç.",
+      "body": "Platform, risk haritası ve eşleştirme sizin için ücretsizdir. Bize, gerçekten bir randevu gerçekleştiğinde uzmanlar öder. Sıralamanın satılık olmamasının nedeni de budur: ücretli bir konum, eşleşmeyi her iki taraf için de değersiz kılardı."
+    },
+    "privacy": {
+      "kicker": "Verilerinize ne olur",
+      "title": "AB’de kalır ve sizin kalır.",
+      "body": "Her şey AB altyapısında çalışır. Hesap açmaya karar verene kadar anonim kalırsınız — değerlendirme ad, şirket ya da e-posta adresi gerektirmez. Bir uzman bilgilerinizi yalnızca siz randevu aldığınızda görür."
+    },
+    "cta": {
+      "title": "Nereden mantıklıysa oradan başlayın.",
+      "lead": "Altı dakika, dört soru, hesap gerekmez."
+    },
+    "seeAll": "Her adımın nasıl işlediğini görün"
   }
 }

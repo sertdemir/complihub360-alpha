@@ -1276,5 +1276,59 @@
       "performance": "Performance",
       "faq": "FAQ"
     }
+  },
+  "howItWorks": {
+    "meta": {
+      "title": "So funktioniert es · CompliHub360"
+    },
+    "eyebrow": "So funktioniert es",
+    "title": {
+      "pre": "Von einer Frage zu jemandem, der ",
+      "gold": "handeln",
+      "post": " kann."
+    },
+    "lead": "Fünf Schritte. Sie können nach jedem davon aufhören — die meisten tun das, und das ist ein völlig gutes Ergebnis.",
+    "stages": [
+      {
+        "kicker": "Verstehen",
+        "title": "Fragen Sie in eigenen Worten.",
+        "body": "Beschreiben Sie Ihre Lage so, wie Sie es einer Kollegin erklären würden. Sie bekommen eine Antwort mit der Quelle hinter jedem Punkt — dem Gesetzestext selbst, nicht der Zusammenfassung einer Zusammenfassung. Kein Konto, kein Verkaufsgespräch, keine Verpflichtung weiterzumachen."
+      },
+      {
+        "kicker": "Einschätzen",
+        "title": "Sehen Sie, was tatsächlich für Sie gilt.",
+        "body": "Vier Fragen zu Ihren Märkten, Ihrem Geschäftsmodell und Ihrem Volumen ergeben eine Risk Map: die Pflichten, die für Ihren Betrieb gelten, jede mit Rechtsgrundlage und Frist. Sie stammen aus unserer eigenen Compliance-Engine und verweisen auf die EU-Rechtsdatenbank — sie werden nicht von einem Chatbot erzeugt."
+      },
+      {
+        "kicker": "Entscheiden",
+        "title": "Entscheiden Sie, wofür Sie Hilfe brauchen.",
+        "body": "Die Karte trennt, was Sie intern erledigen können, von dem, was wirklich eine Fachperson braucht — und in welcher Reihenfolge. Stellt sich heraus, dass Sie bereits alles abgedeckt haben, sagen wir Ihnen das. Dann gibt es für uns nichts zu verkaufen."
+      },
+      {
+        "kicker": "Matchen",
+        "title": "Eignung vor Namen.",
+        "body": "Sie sehen die passenden Fachleute zuerst ohne Identität: Abdeckung, geprüfte Qualifikationen, Reaktionszeit, Passung zu Ihren Märkten. Die Eignung vor dem Briefkopf zu beurteilen, ist Absicht — ein bekannter Name ist kein Beleg für die richtige Passung. Die Reihung ist nicht käuflich."
+      },
+      {
+        "kicker": "Handeln",
+        "title": "Buchen, dann übergeben.",
+        "body": "Wählen Sie einen Termin im Kalender der Fachperson. Die Identität wird bei der Buchung sichtbar, zusammen mit einem Dossier all dessen, was Sie uns bereits gesagt haben — Sie erklären Ihr Geschäft also kein sechstes Mal. Danach können Sie die Zusammenarbeit bewerten, und die Pflichten bleiben mit ihren Fristen auf Ihrer Karte."
+      }
+    ],
+    "cost": {
+      "kicker": "Was Sie das kostet",
+      "title": "Nichts.",
+      "body": "Die Plattform, die Risk Map und das Matching sind für Sie kostenlos. Bezahlt werden wir von den Fachleuten, wenn tatsächlich eine Buchung zustande kommt. Genau deshalb ist die Reihung nicht käuflich: ein bezahlter Platz würde das Match für beide Seiten wertlos machen."
+    },
+    "privacy": {
+      "kicker": "Was mit Ihren Daten passiert",
+      "title": "Sie bleiben in der EU — und bei Ihnen.",
+      "body": "Alles läuft auf EU-Infrastruktur. Sie bleiben anonym, bis Sie sich entscheiden, ein Konto anzulegen — die Einschätzung braucht weder Namen noch Firma noch E-Mail-Adresse. Eine Fachperson sieht Ihre Angaben erst, wenn Sie buchen."
+    },
+    "cta": {
+      "title": "Fangen Sie dort an, wo es für Sie Sinn ergibt.",
+      "lead": "Sechs Minuten, vier Fragen, kein Konto nötig."
+    },
+    "seeAll": "Ansehen, wie jeder Schritt funktioniert"
   }
 }

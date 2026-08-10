@@ -10,6 +10,7 @@ import { CountriesPage } from "./pages/CountriesPage";
 import { PlatformPage } from "./pages/PlatformPage";
 import { SolutionsPage } from "./pages/SolutionsPage";
 import { ComplianceAreasPage } from "./pages/ComplianceAreasPage";
+import { HowItWorksPage } from "./pages/HowItWorksPage";
 import { ProvidersPage } from "./pages/ProvidersPage";
 import { ResultsRiskMap } from "./pages/ResultsRiskMap";
 import { ResourcesPage } from "./pages/ResourcesPage";
@@ -128,6 +129,7 @@ function AppContent() {
                     <Route path="platform" element={<PlatformPage />} />
                     <Route path="solutions" element={<SolutionsPage />} />
                     <Route path="compliance" element={<ComplianceAreasPage />} />
+                    <Route path="how-it-works" element={<HowItWorksPage />} />
                     <Route path="providers" element={<ProvidersPage />} />
                     <Route path="resources" element={<ResourcesPage />} />
                     <Route path="advisory" element={<AdvisoryPage />} />
