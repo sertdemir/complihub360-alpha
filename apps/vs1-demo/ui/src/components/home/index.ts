@@ -1,4 +1,5 @@
 export { HomeHero } from './HomeHero';
+export { ProblemRecognition } from './ProblemRecognition';
 export { RiskMapSection } from './RiskMapSection';
 export { MatchmakingDifference } from './MatchmakingDifference';
 export { TwoReflexes } from './TwoReflexes';

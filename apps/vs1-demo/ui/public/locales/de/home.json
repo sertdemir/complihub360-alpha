@@ -78,6 +78,34 @@
       "trust": "Kostenlos · anonym · in unter 3 Minuten"
     }
   },
+  "problemRecognition": {
+    "eyebrow": "Warum das schwer ist",
+    "title": {
+      "pre": "Eine ",
+      "gold": "klare",
+      "post": " Antwort zu bekommen, ist der schwierige Teil."
+    },
+    "lead": "Die meisten, mit denen wir sprechen, haben es bereits versucht. Das Problem ist selten der Aufwand — es ist, dass die Antworten nicht zusammenpassen und sich nicht erkennen lässt, welche zu Ihrer Lage gehört.",
+    "items": [
+      {
+        "title": "Zwei Berater, zwei Antworten.",
+        "desc": "Stellen Sie dieselbe Frage zweimal, bekommen Sie zwei vertretbare Antworten. Ohne die Quelle dahinter lässt sich nicht sagen, welche für Sie gilt."
+      },
+      {
+        "title": "Mehr verkauft als nötig.",
+        "desc": "Der Anreiz liegt darin, den größten Umfang anzubieten. Niemand wird dafür bezahlt, Ihnen zu sagen, dass eine Aufgabe klein ist — oder längst erledigt."
+      },
+      {
+        "title": "Wochen, die im Scoping verschwinden.",
+        "desc": "Bevor die eigentliche Arbeit beginnt, haben Sie Ihr Geschäft fünfmal erklärt und Angebote verglichen, die Verschiedenes messen."
+      },
+      {
+        "title": "Keine Vergleichsbasis.",
+        "desc": "Jedes Angebot ist anders aufgebaut. Sie zu vergleichen heißt zu raten, was jeweils weggelassen wurde."
+      }
+    ],
+    "note": "Nichts davon heißt, dass Sie ein Problem haben. Es heißt, dass Sie noch kein klares Bild haben — und das lässt sich lösen."
+  },
   "heroWizard": {
     "mobileAlt": "CompliHub Compliance-Assistent — Schritt „Bereiche“ (mobil)"
   },
