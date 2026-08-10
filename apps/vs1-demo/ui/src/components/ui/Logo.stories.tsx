@@ -5,7 +5,7 @@ const DESCRIPTION = `
 **Logo** — the CompliHub360 brand lockup, ported 1:1 from the Compass component
 *Logo* (Figma node \`712:266\`). The mark is the exact exported vector geometry
 (orbit ring + node-dot, "360" numerals + degree); the wordmark is **"CompliHub"**
-Inter Bold 16 and the tagline **"Compliance. Simplified."** Inter Regular 10.
+Inter Bold 16 and the tagline **"Always on your side."** Inter Regular 10.
 
 - **\`lockup\`** — \`horizontal\` (mark + wordmark inline · default), \`stacked\`
   (mark over centred wordmark), or \`mark\` (symbol only).

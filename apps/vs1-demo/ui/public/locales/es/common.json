@@ -90,7 +90,7 @@
       "catTaxVat": "Impuestos e IVA",
       "catEpr": "EPR Embalaje",
       "catPrivacy": "Privacidad de Datos",
-      "catMarketing": "Marketing y SEO",
+      "catMarketing": "Compliance de marketing",
       "catCorporate": "Configuración Corporativa",
       "cta": "Califica ahora"
     }
@@ -112,7 +112,7 @@
       "ops": {
         "title": "Para Operaciones y Expansión",
         "tags": [
-          "EPR y Embalaje",
+          "EPR y envases",
           "ESG en Cadena de Suministro",
           "Estándares de Marketing"
         ],
@@ -632,9 +632,9 @@
     "heroTitle": "Encuentra tu desafío regulatorio. Empieza aquí.",
     "heroBody": "Cada área de cumplimiento es una puerta de entrada a tu evaluación específica. Identifica tu tema, entiende los riesgos y emparéjate con un especialista verificado — todo en menos de 5 minutos.",
     "anchorTax": "Impuestos e IVA",
-    "anchorEpr": "EPR y Embalaje",
+    "anchorEpr": "EPR y envases",
     "anchorPrivacy": "Datos y Privacidad",
-    "anchorMarketing": "Marketing y SEO",
+    "anchorMarketing": "Compliance de marketing",
     "anchorCorporate": "Estructura Corporativa",
     "anchorFullsupport": "Full Support",
     "riskLabel": "Riesgo",
@@ -837,7 +837,7 @@
       }
     },
     "epr": {
-      "title": "EPR y Embalaje",
+      "title": "EPR y envases",
       "risk": "Alto",
       "headline": "Responsabilidad Extendida del Productor, VerpackG y objetivos de reciclaje",
       "description": "Regulaciones ambientales locales altamente fragmentadas, leyes de embalaje (VerpackG) y objetivos de reciclaje (PRN) que difieren drásticamente por país.",
@@ -847,7 +847,7 @@
       "ob2": "Determinar el registro por categoría de producto (electrónica, ropa, cosméticos)",
       "ob3": "Cumplir los objetivos de reciclaje locales para evitar multas",
       "ob4": "Evaluación de responsabilidad del dropshipper",
-      "cov1": "Asistente de Producto y Embalaje — evalúa rol comercial, mercados objetivo, categorías de producto",
+      "cov1": "Asistente de EPR y envases — evalúa rol comercial, mercados objetivo, categorías de producto",
       "cov2": "Calcula la epr_required_likelihood por jurisdicción",
       "cov3": "Manejo inteligente de casos extremos: lógica de seguridad «Asumir Sí» para dropshippers inciertos",
       "regulations": {
@@ -897,7 +897,7 @@
       }
     },
     "marketing": {
-      "title": "Marketing y SEO",
+      "title": "Compliance de marketing",
       "risk": "Medio",
       "headline": "Afirmaciones publicitarias, salud y sostenibilidad, protección del consumidor",
       "description": "Cumplimiento publicitario transfronterizo: afirmaciones médicas y de salud, publicidad comparativa, declaraciones de sostenibilidad, normas para influencers y obligaciones de servicios digitales bajo la DSA.",
@@ -907,7 +907,7 @@
       "ob2": "Aprobación de afirmaciones de salud, finanzas y sostenibilidad",
       "ob3": "Divulgación de marketing de influencers y contenido patrocinado",
       "ob4": "Obligaciones de notificación y acción bajo DSA / DMA",
-      "cov1": "Asistente de Marketing y SEO — captura la sensibilidad del sector, los tipos de afirmaciones y los canales",
+      "cov1": "Asistente de Compliance de marketing — captura la sensibilidad del sector, los tipos de afirmaciones y los canales",
       "cov2": "Calcula marketing_risk_level y señala patrones de afirmaciones de alto riesgo",
       "cov3": "Le dirige a especialistas en derecho publicitario y protección del consumidor",
       "regulations": {

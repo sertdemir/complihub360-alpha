@@ -90,7 +90,7 @@
       "catTaxVat": "Tax & VAT",
       "catEpr": "EPR Packaging",
       "catPrivacy": "Data Privacy",
-      "catMarketing": "Marketing & SEO",
+      "catMarketing": "Marketing Compliance",
       "catCorporate": "Corporate Setup",
       "cta": "Qualify now"
     }
@@ -634,7 +634,7 @@
     "anchorTax": "Tax & VAT",
     "anchorEpr": "EPR & Packaging",
     "anchorPrivacy": "Data & Privacy",
-    "anchorMarketing": "Marketing & SEO",
+    "anchorMarketing": "Marketing Compliance",
     "anchorCorporate": "Corporate Structure",
     "anchorFullsupport": "Full Support",
     "riskLabel": "Risk",
@@ -847,7 +847,7 @@
       "ob2": "Determining registration by product category (electronics, apparel, cosmetics)",
       "ob3": "Adhering to local recycling targets to avoid fines",
       "ob4": "Dropshipper responsibility assessment",
-      "cov1": "Product & Packaging Wizard — assesses commercial role, target markets, product categories",
+      "cov1": "EPR & Packaging Wizard — assesses commercial role, target markets, product categories",
       "cov2": "Calculates epr_required_likelihood per jurisdiction",
       "cov3": "Intelligent edge-case handling: \"Assume Yes\" safety logic for uncertain dropshippers",
       "regulations": {
@@ -897,7 +897,7 @@
       }
     },
     "marketing": {
-      "title": "Marketing & SEO",
+      "title": "Marketing Compliance",
       "risk": "Medium",
       "headline": "Advertising Claims, Health & Sustainability, Consumer Protection",
       "description": "Cross-border advertising compliance: medical & health claims, comparative ads, sustainability statements, influencer rules, and digital service obligations under DSA.",
@@ -907,7 +907,7 @@
       "ob2": "Health, finance & sustainability claim approvals",
       "ob3": "Influencer marketing & sponsored-content disclosure",
       "ob4": "DSA / DMA notice-and-action obligations",
-      "cov1": "Marketing & SEO Wizard — captures industry sensitivity, claim types, channels",
+      "cov1": "Marketing Compliance Wizard — captures industry sensitivity, claim types, channels",
       "cov2": "Calculates marketing_risk_level + flags high-risk claim patterns",
       "cov3": "Routes to specialists in advertising law and consumer protection",
       "regulations": {

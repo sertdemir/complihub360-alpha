@@ -29,7 +29,7 @@ const FIXTURE: Cockpit = {
       { id: 'rq-8f2a', provider_key: 'mueller-cpa', country: 'DE', category: 'Tax & VAT', status: 'delivered', deadline: new Date(Date.now() - 3e6).toISOString(), hoursLeft: -1 },
       { id: 'rq-1b77', provider_key: 'dahlmann-cpa', country: 'AT', category: 'Data & Privacy', status: 'viewed', deadline: new Date(Date.now() - 6e5).toISOString(), hoursLeft: 0 },
       { id: 'rq-44c0', provider_key: 'lex-partners', country: 'ES', category: 'Corporate', status: 'confirmed', deadline: new Date(Date.now() + 72e5).toISOString(), hoursLeft: 2 },
-      { id: 'rq-9d13', provider_key: 'mueller-cpa', country: 'DE', category: 'Marketing & SEO', status: 'delivered', deadline: new Date(Date.now() + 18e6).toISOString(), hoursLeft: 5 },
+      { id: 'rq-9d13', provider_key: 'mueller-cpa', country: 'DE', category: 'Marketing Compliance', status: 'delivered', deadline: new Date(Date.now() + 18e6).toISOString(), hoursLeft: 5 },
     ],
   },
   events: [

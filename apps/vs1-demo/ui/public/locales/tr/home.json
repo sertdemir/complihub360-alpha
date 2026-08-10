@@ -163,7 +163,7 @@
         "desc": "Sınır ötesi KDV, OSS/IOSS, eşikler"
       },
       "eprPackaging": {
-        "title": "Ürün ve Ambalaj",
+        "title": "EPR ve Ambalaj",
         "desc": "EPR, üretici sorumluluğu, kayıtlar"
       },
       "gdprPrivacy": {
@@ -171,7 +171,7 @@
         "desc": "KVKK/GDPR, veri işleme, AB temsilcisi"
       },
       "marketing": {
-        "title": "Pazarlama ve SEO",
+        "title": "Pazarlama Uyumu",
         "desc": "Onay, çerezler, reklam kuralları"
       },
       "corporate": {
@@ -1093,7 +1093,7 @@
         "title": "Çözümler",
         "links": {
           "vatTax": "KDV ve Vergi",
-          "productPackaging": "Ürün ve Ambalaj",
+          "productPackaging": "EPR ve Ambalaj",
           "dataPrivacy": "Veri Gizliliği",
           "marketingAdvertising": "Pazarlama ve Reklam",
           "corporateStructure": "Kurumsal Yapı",

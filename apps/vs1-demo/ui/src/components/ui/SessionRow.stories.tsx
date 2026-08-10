@@ -30,7 +30,7 @@ export const ListDark: Story = {
       <SessionRow country="IT" domain="Tax & VAT" status="Needs refresh" updated="· Updated 2h ago"
         title="VAT registration · Italy" riskLine="● High risk · threshold reached · 1 markets" risk="high"
         onMenu={() => {}} action={<Button variant="accent" size="sm">Open</Button>} />
-      <SessionRow country="FR" domain="Product & Packaging" updated="· Updated 1d ago"
+      <SessionRow country="FR" domain="EPR & Packaging" updated="· Updated 1d ago"
         title="EPR registration · France" riskLine="● Medium risk · deadline Q3 2026 · 1 markets" risk="medium"
         onMenu={() => {}} action={<Button variant="accent" size="sm">Open</Button>} />
       <SessionRow country="ES" domain="Tax & VAT" updated="· Updated 7d ago"

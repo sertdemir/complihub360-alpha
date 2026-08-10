@@ -90,7 +90,7 @@
       "catTaxVat": "Vergi ve KDV",
       "catEpr": "EPR Ambalaj",
       "catPrivacy": "Veri Gizliliği",
-      "catMarketing": "Pazarlama ve SEO",
+      "catMarketing": "Pazarlama Uyumu",
       "catCorporate": "Kurumsal Kurulum",
       "cta": "Şimdi nitele"
     }
@@ -634,7 +634,7 @@
     "anchorTax": "Vergi ve KDV",
     "anchorEpr": "EPR ve Ambalaj",
     "anchorPrivacy": "Veri ve Gizlilik",
-    "anchorMarketing": "Pazarlama ve SEO",
+    "anchorMarketing": "Pazarlama Uyumu",
     "anchorCorporate": "Kurumsal Yapı",
     "anchorFullsupport": "Full Support",
     "riskLabel": "Risk",
@@ -847,7 +847,7 @@
       "ob2": "Ürün kategorisine göre kaydı belirleme (elektronik, giyim, kozmetik)",
       "ob3": "Para cezasından kaçınmak için yerel geri dönüşüm hedeflerine uyma",
       "ob4": "Dropshipper sorumluluk değerlendirmesi",
-      "cov1": "Ürün ve Ambalaj Asistanı — ticari rolü, hedef pazarları, ürün kategorilerini değerlendirir",
+      "cov1": "EPR ve Ambalaj Asistanı — ticari rolü, hedef pazarları, ürün kategorilerini değerlendirir",
       "cov2": "Yargı bölgesi başına epr_required_likelihood hesaplar",
       "cov3": "Akıllı uç durum yönetimi: Belirsiz dropshipper'lar için «Evet Varsay» güvenlik mantığı",
       "regulations": {
@@ -897,7 +897,7 @@
       }
     },
     "marketing": {
-      "title": "Pazarlama ve SEO",
+      "title": "Pazarlama Uyumu",
       "risk": "Orta",
       "headline": "Reklam İddiaları, Sağlık ve Sürdürülebilirlik, Tüketicinin Korunması",
       "description": "Sınır ötesi reklam uyumluluğu: tıbbi ve sağlık iddiaları, karşılaştırmalı reklamlar, sürdürülebilirlik beyanları, influencer kuralları ve DSA kapsamındaki dijital hizmet yükümlülükleri.",
@@ -907,7 +907,7 @@
       "ob2": "Sağlık, finans ve sürdürülebilirlik iddiaları için onaylar",
       "ob3": "Influencer pazarlaması ve sponsorlu içerik bildirimi",
       "ob4": "DSA / DMA bildirim ve eylem yükümlülükleri",
-      "cov1": "Pazarlama ve SEO Asistanı — sektör hassasiyetini, iddia türlerini ve kanalları kaydeder",
+      "cov1": "Pazarlama Uyumu Asistanı — sektör hassasiyetini, iddia türlerini ve kanalları kaydeder",
       "cov2": "marketing_risk_level değerini hesaplar ve yüksek riskli iddia kalıplarını işaretler",
       "cov3": "Sizi reklam hukuku ve tüketicinin korunması alanındaki uzmanlara yönlendirir",
       "regulations": {

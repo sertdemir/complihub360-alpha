@@ -163,7 +163,7 @@
         "desc": "Cross-border VAT, OSS/IOSS, thresholds"
       },
       "eprPackaging": {
-        "title": "Product & Packaging",
+        "title": "EPR & Packaging",
         "desc": "EPR, producer responsibility, registers"
       },
       "gdprPrivacy": {
@@ -171,7 +171,7 @@
         "desc": "GDPR, DPAs, EU representative"
       },
       "marketing": {
-        "title": "Marketing & SEO",
+        "title": "Marketing Compliance",
         "desc": "Consent, cookies, advertising rules"
       },
       "corporate": {
@@ -1093,7 +1093,7 @@
         "title": "Solutions",
         "links": {
           "vatTax": "VAT & Tax",
-          "productPackaging": "Product & Packaging",
+          "productPackaging": "EPR & Packaging",
           "dataPrivacy": "Data Privacy",
           "marketingAdvertising": "Marketing & Advertising",
           "corporateStructure": "Corporate Structure",

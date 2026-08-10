@@ -90,7 +90,7 @@
       "catTaxVat": "Steuern & USt",
       "catEpr": "EPR Verpackung",
       "catPrivacy": "Datenschutz",
-      "catMarketing": "Marketing & SEO",
+      "catMarketing": "Marketing-Compliance",
       "catCorporate": "Unternehmensgründung",
       "cta": "Jetzt qualifizieren"
     }
@@ -634,7 +634,7 @@
     "anchorTax": "Steuer & USt",
     "anchorEpr": "EPR & Verpackung",
     "anchorPrivacy": "Daten & Datenschutz",
-    "anchorMarketing": "Marketing & SEO",
+    "anchorMarketing": "Marketing-Compliance",
     "anchorCorporate": "Unternehmensstruktur",
     "anchorFullsupport": "Full Support",
     "riskLabel": "Risiko",
@@ -897,7 +897,7 @@
       }
     },
     "marketing": {
-      "title": "Marketing & SEO",
+      "title": "Marketing-Compliance",
       "risk": "Mittel",
       "headline": "Werbeaussagen, Health & Sustainability, Verbraucherschutz",
       "description": "Grenzüberschreitende Werbe-Compliance: medizinische & gesundheitliche Aussagen, Vergleichswerbung, Nachhaltigkeitsaussagen, Influencer-Regeln und DSA-Pflichten.",
@@ -907,7 +907,7 @@
       "ob2": "Genehmigungen für Health-, Finanz- & Nachhaltigkeitsaussagen",
       "ob3": "Influencer-Marketing & Sponsored-Content-Kennzeichnung",
       "ob4": "DSA / DMA Notice-and-Action-Pflichten",
-      "cov1": "Marketing & SEO-Assistent – erfasst Branchensensibilität, Aussagentypen, Kanäle",
+      "cov1": "Marketing-Compliance-Assistent – erfasst Branchensensibilität, Aussagentypen, Kanäle",
       "cov2": "Berechnet marketing_risk_level + markiert Hochrisiko-Aussagenmuster",
       "cov3": "Routet zu Spezialisten in Werberecht und Verbraucherschutz",
       "regulations": {

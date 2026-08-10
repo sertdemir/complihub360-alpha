@@ -14,7 +14,7 @@ const fixtures = {
         { id: "e1", provider_key: "p1", country: "DE", category: "Tax & VAT", status: "replied", created_at: iso(now - 5 * 864e5), updated_at: iso(now - 4 * 864e5), sla_confirm_deadline: iso(now - 4 * 864e5), sla_reply_deadline: iso(now - 3 * 864e5) },
         { id: "e2", provider_key: "p1", country: "ES", category: "Data & Privacy", status: "confirmed", created_at: iso(now - 2 * 3600e3), updated_at: iso(now - 3600e3), sla_confirm_deadline: iso(now - 3600e3), sla_reply_deadline: iso(now + 5 * 3600e3) },
         { id: "e3", provider_key: "p2", country: "TR", category: "Corporate", status: "delivered", created_at: iso(now - 30 * 3600e3), updated_at: iso(now - 30 * 3600e3), sla_confirm_deadline: iso(now - 2 * 3600e3), sla_reply_deadline: null },
-        { id: "e4", provider_key: "p3", country: "DE", category: "Marketing & SEO", status: "declined", created_at: iso(now - 3 * 864e5), updated_at: iso(now - 3 * 864e5), sla_confirm_deadline: null, sla_reply_deadline: null },
+        { id: "e4", provider_key: "p3", country: "DE", category: "Marketing Compliance", status: "declined", created_at: iso(now - 3 * 864e5), updated_at: iso(now - 3 * 864e5), sla_confirm_deadline: null, sla_reply_deadline: null },
         { id: "e5", provider_key: "p1", country: "DE", category: "Tax & VAT", status: "withdrawn", created_at: iso(now - 1 * 864e5), updated_at: iso(now - 1 * 864e5), sla_confirm_deadline: null, sla_reply_deadline: null },
     ],
     event_log: [

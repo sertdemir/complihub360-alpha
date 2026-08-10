@@ -188,7 +188,7 @@ const SERVICE_ITEMS: ServiceItem[] = [
   },
   {
     icon: Package,
-    title: 'Product & Packaging',
+    title: 'EPR & Packaging',
     description:
       'Extended Producer Responsibility (EPR) registration, PRN schemes, recycling targets, product labelling, and UKCA marking obligations.',
     tags: ['EPR', 'PRN', 'UKCA', 'Env. Act 2021'],
