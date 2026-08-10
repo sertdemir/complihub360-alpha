@@ -69,6 +69,25 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
     'prod-packaging-conformity': {
         default: { source: 'EU PPWR 2025/40 Art. 37–39 (Annex VII/VIII)', penalty: 'national penalties under Art. 68 + withdrawal from the market', penaltyMaxEur: 100000, due: 'Ongoing', appliesFrom: '2026-08-12', scope: 'eu' },
     },
+    // The 2030 tranche. Same reasoning as above: a Regulation, so no country
+    // overrides. Art. 24 additionally slips to "3 years after the implementing
+    // act" if the Commission is late, so the date is a floor, not a promise —
+    // said plainly in the source string rather than pretended away.
+    'prod-packaging-recycled-content': {
+        default: { source: 'EU PPWR 2025/40 Art. 7 (post-consumer recyclate only)', penalty: 'national penalties under Art. 68 + withdrawal from the market', penaltyMaxEur: 100000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu' },
+    },
+    'prod-packaging-recyclability': {
+        default: { source: 'EU PPWR 2025/40 Art. 6 + Annex II (grade A–C; A/B from 2038)', penalty: 'national penalties under Art. 68 + withdrawal from the market', penaltyMaxEur: 100000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu' },
+    },
+    'prod-packaging-empty-space': {
+        default: { source: 'EU PPWR 2025/40 Art. 24 (50% cap, or 3 years after the implementing act)', penalty: 'national penalties under Art. 68 + withdrawal from the market', penaltyMaxEur: 75000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu' },
+    },
+    'prod-packaging-format-bans': {
+        default: { source: 'EU PPWR 2025/40 Art. 25 + Annex V', penalty: 'format may no longer be placed on the market', penaltyMaxEur: 75000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu' },
+    },
+    'prod-packaging-reuse-targets': {
+        default: { source: 'EU PPWR 2025/40 Art. 29 (40% transport / 10% grouped; cardboard exempt)', penalty: 'national penalties under Art. 68', penaltyMaxEur: 50000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu' },
+    },
     'prod-safety': {
         UK: { source: 'UK GPSR 2005', penalty: 'up to £20,000 + 12 months imprisonment', penaltyMaxEur: 23000, due: 'Ongoing' },
         US: { source: 'CPSA / CPSC recall rules', penalty: 'up to $120,000 per violation', penaltyMaxEur: 110000, due: 'Ongoing' },

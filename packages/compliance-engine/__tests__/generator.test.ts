@@ -141,7 +141,44 @@ describe('EU legal basis (CELEX → EUR-Lex)', () => {
         // Only staged/not-yet-applicable duties set the field — everything else
         // must stay undefined so the UI never renders a bogus countdown.
         expect(results.find(r => r.id === 'tax-vat-registration')?.appliesFrom).toBeUndefined();
-        expect(results.filter(r => r.appliesFrom).map(r => r.id)).toEqual(['prod-packaging-conformity']);
+        expect(results.find(r => r.id === 'prod-epr')?.appliesFrom).toBeUndefined();
+        // Every obligation that does set it is a staged PPWR duty.
+        expect(results.filter(r => r.appliesFrom).every(r => r.celex === '32025R0040')).toBe(true);
+    });
+
+    it('14) the PPWR 2030 tranche lands as separate, individually dated rows', () => {
+        const results = generateRelevantSubdomains({
+            countries: ['DE'],
+            industry: IndustryType.GENERIC_ECOMMERCE,
+            businessModel: BusinessModel.DTC,
+        });
+        const staged = results.filter(r => r.appliesFrom === '2030-01-01').map(r => r.id).sort();
+        expect(staged).toEqual([
+            'prod-packaging-empty-space',
+            'prod-packaging-format-bans',
+            'prod-packaging-recyclability',
+            'prod-packaging-recycled-content',
+            'prod-packaging-reuse-targets',
+        ]);
+        // Each carries its own legal basis rather than a shared blanket string,
+        // so the map can cite the exact article that drives the duty.
+        const articles = staged.map(id => results.find(r => r.id === id)!.source);
+        expect(new Set(articles).size).toBe(staged.length);
+        // The 2030 tranche must not outrank the duty that applies in days.
+        const conformity = results.find(r => r.id === 'prod-packaging-conformity')!;
+        for (const id of staged) {
+            expect(results.find(r => r.id === id)!.riskWeight).toBeLessThan(conformity.riskWeight);
+        }
+    });
+
+    it('15) the empty-space cap is 50%, not the 40% that circulates widely', () => {
+        const r = generateRelevantSubdomains({ countries: ['DE'], focusDomains: ['PRODUCT' as any] });
+        const gap = r.find(x => x.id === 'prod-packaging-empty-space');
+        expect(gap?.source).toContain('50%');
+        expect(gap?.source).not.toContain('40%');
+        // Art. 24 slips if the implementing act is late — the caveat is carried,
+        // not silently dropped, so the date never reads as a hard promise.
+        expect(gap?.source).toContain('implementing act');
     });
 
     it('12) SaaS sellers do not get a packaging obligation', () => {

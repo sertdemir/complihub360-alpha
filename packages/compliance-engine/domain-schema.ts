@@ -73,6 +73,56 @@ export const DomainTemplateLibrary: Record<ComplianceDomain, ComplianceSubdomain
             riskWeight: 8,
             celex: '32025R0040',
         },
+        // PPWR duties that are law today but only bite from 2030. Kept as
+        // separate obligations rather than bullet points on the conformity row:
+        // each has its own evidence, its own owner and its own lead time —
+        // recyclate supply is a procurement problem, the empty-space cap is a
+        // carton-range problem, and Annex V is a product-range problem.
+        {
+            id: 'prod-packaging-recycled-content',
+            label: 'Recycled Content in Plastic Packaging (PPWR)',
+            description: 'Minimum post-consumer recyclate per plastic packaging type: 30% for contact-sensitive PET and single-use beverage bottles, 10% for other contact-sensitive plastics, 35% for all other plastic packaging. Post-industrial recyclate does not count.',
+            triggerTags: ['physical_goods', 'packaging', 'plastic'],
+            applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER'],
+            riskWeight: 7,
+            celex: '32025R0040',
+        },
+        {
+            id: 'prod-packaging-recyclability',
+            label: 'Design for Recycling (PPWR)',
+            description: 'Packaging must reach recyclability grade A–C against the Annex II criteria; below grade C it may no longer be placed on the market. The threshold tightens to grade A or B in 2038.',
+            triggerTags: ['physical_goods', 'packaging'],
+            applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER'],
+            riskWeight: 7,
+            celex: '32025R0040',
+        },
+        {
+            id: 'prod-packaging-empty-space',
+            label: 'Empty Space Ratio (PPWR)',
+            description: 'Grouped, transport and e-commerce packaging may not exceed a 50% empty space ratio. Filler counts as empty volume — air cushions, paper, chips and foam all count against the cap, so oversized cartons cannot be padded into compliance.',
+            triggerTags: ['physical_goods', 'packaging', 'ecommerce', 'shipping'],
+            applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER'],
+            riskWeight: 6,
+            celex: '32025R0040',
+        },
+        {
+            id: 'prod-packaging-format-bans',
+            label: 'Banned Single-Use Formats (PPWR)',
+            description: 'Annex V bans specific single-use formats outright: very lightweight plastic carrier bags, plastic grouped packaging, plastic packaging for fresh produce under 1.5 kg, HORECA single portions and hotel toiletries. Member states may grant hygiene exemptions.',
+            triggerTags: ['physical_goods', 'packaging', 'plastic', 'food'],
+            applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER'],
+            riskWeight: 6,
+            celex: '32025R0040',
+        },
+        {
+            id: 'prod-packaging-reuse-targets',
+            label: 'Reusable Transport Packaging (PPWR)',
+            description: '40% of transport packaging (pallets, crates, pallet wrap, straps) must run inside a reuse system, 10% for grouped packaging. Cardboard boxes are exempt, which leaves ordinary parcel shipping outside the target — this bites on pallets and B2B transport, not on the mailer.',
+            triggerTags: ['physical_goods', 'packaging', 'shipping', 'b2b'],
+            applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER'],
+            riskWeight: 5,
+            celex: '32025R0040',
+        },
         {
             id: 'prod-safety',
             label: 'Product Safety & Labeling',

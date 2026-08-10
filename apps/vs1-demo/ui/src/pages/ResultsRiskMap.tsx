@@ -54,6 +54,17 @@ function daysUntil(iso?: string | null): number | null {
   return days > 0 ? days : null;
 }
 
+/** Beyond a year out, a start date stops being a deadline and becomes a
+ *  roadmap item. The PPWR 2030 tranche is ~1,200 days away: counted as a
+ *  deadline it would drag the median stat to "1240 days" and render countdowns
+ *  nobody can act on. Past the horizon the row still shows its date — only the
+ *  countdown and the deadline stats drop out. */
+const DEADLINE_HORIZON_DAYS = 365;
+const withinHorizon = (iso?: string | null): number | null => {
+  const d = daysUntil(iso);
+  return d != null && d <= DEADLINE_HORIZON_DAYS ? d : null;
+};
+
 export const OBLIGATIONS: Obligation[] = [
   {
     severity: 'critical',
@@ -236,8 +247,9 @@ export function ResultsRiskMap() {
           ? new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' })
               .format(new Date(`${l.applies_from}T00:00:00`))
           : l.due ?? '—',
-        dueSub: daysUntil(l.applies_from) != null
-          ? t('appliesIn', { count: daysUntil(l.applies_from) as number, defaultValue: `applies in ${daysUntil(l.applies_from)} days` })
+        dueSub: withinHorizon(l.applies_from) != null
+          ? t('appliesIn', { count: withinHorizon(l.applies_from) as number, defaultValue: `applies in ${withinHorizon(l.applies_from)} days` })
+          : daysUntil(l.applies_from) != null ? ''   // far future: the date says enough
           : l.due_days != null ? `${l.due_days} days` : l.due === 'Ongoing' ? 'Live' : '',
         state: { kind: l.state === 'confirmed' ? 'confirmed' : 'likely' },
       }))
@@ -257,7 +269,9 @@ export function ResultsRiskMap() {
     // A not-yet-applicable duty has a real, dated deadline — the day it starts
     // to apply. Counting it keeps the "near deadlines" stat honest; without it
     // a rule landing in two days would be invisible in the headline numbers.
-    const days = liveLaws.map((l) => l.due_days ?? daysUntil(l.applies_from))
+    // Only inside the horizon, though: the 2030 tranche is a roadmap, and
+    // averaging it in would report a median deadline three years out.
+    const days = liveLaws.map((l) => l.due_days ?? withinHorizon(l.applies_from))
       .filter((d): d is number => d != null).sort((a, b) => a - b);
     const median = days.length ? days[Math.floor(days.length / 2)] : null;
     const soon = days.filter((d) => d <= SOON_DAYS).length;
