@@ -116,7 +116,8 @@ export const OBLIGATIONS: Obligation[] = [
 
 export const STATS = [
   { value: '8', label: 'obligations identified' },
-  { value: '€25k', label: 'total exposure' },
+  // 4 of the fixture rows carry a deadline inside 30 days (6 · 21 · 8 · 21).
+  { value: '4', label: 'with a deadline in 30 days' },
   { value: '14 days', label: 'median deadline' },
   { value: '3', label: 'Verified Partners ready' },
 ];
@@ -218,16 +219,23 @@ export function ResultsRiskMap() {
       }))
     : OBLIGATIONS;
 
-  // Stat strip mirrors the table: count, exposure (Σ max penalties), median
+  // Stat strip mirrors the table: count, near-term deadlines, median
   // days-to-deadline, matched partners. Fixture values until the API answers.
+  //
+  // Brand & Marketing Map V1 §5/§11 rules out "fear-first penalty language".
+  // The strip used to lead with "€530k total exposure" — the biggest number on
+  // screen was a threat. Penalties are still shown per obligation (they are
+  // facts, and useful for prioritising), but the headline stat now conveys
+  // URGENCY instead of DREAD: how many deadlines are actually near.
+  const SOON_DAYS = 30;
   const stats = (() => {
     if (!isLive) return STATS;
-    const exposure = liveLaws.reduce((s, l) => s + (l.penalty_max_eur ?? 0), 0);
     const days = liveLaws.map((l) => l.due_days).filter((d): d is number => d != null).sort((a, b) => a - b);
     const median = days.length ? days[Math.floor(days.length / 2)] : null;
+    const soon = days.filter((d) => d <= SOON_DAYS).length;
     return [
       { value: String(rows.length), label: 'obligations identified' },
-      { value: exposure ? `€${Math.round(exposure / 1000)}k` : '—', label: 'total exposure' },
+      { value: String(soon), label: `with a deadline in ${SOON_DAYS} days` },
       { value: median != null ? `${median} days` : 'ongoing', label: 'median deadline' },
       { value: String(anonProviders.length), label: 'Verified Partners ready' },
     ];
@@ -341,11 +349,12 @@ export function ResultsRiskMap() {
               </span>
               <span className="min-w-0">
                 <span className="block text-[15px] font-bold text-fg">{isLive ? o.title : t(`obligations.${i}.title`, { defaultValue: o.title })}</span>
+                {/* Source leads, penalty follows in a muted tone (Brand Map
+                    §11: penalties are facts worth showing, but must not be the
+                    first thing the eye lands on). */}
                 <span className="mt-0.5 block text-[12px] leading-relaxed text-fg-brand">
-                  {isLive ? o.detail : t(`obligations.${i}.detail`, { defaultValue: o.detail })}
                   {o.sourceUrl && (
                     <>
-                      {o.detail ? ' · ' : ''}
                       <a
                         href={o.sourceUrl}
                         target="_blank"
@@ -356,8 +365,12 @@ export function ResultsRiskMap() {
                       >
                         {o.sourceLabel} ↗
                       </a>
+                      {o.detail ? ' · ' : ''}
                     </>
                   )}
+                  <span className={o.sourceUrl ? 'text-fg-tertiary' : undefined}>
+                    {isLive ? o.detail : t(`obligations.${i}.detail`, { defaultValue: o.detail })}
+                  </span>
                 </span>
               </span>
               <span className="text-[14px] text-fg-secondary">{isLive ? o.market : t(`obligations.${i}.market`, { defaultValue: o.market })}</span>
