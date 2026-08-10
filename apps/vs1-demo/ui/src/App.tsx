@@ -10,6 +10,7 @@ import { CountriesPage } from "./pages/CountriesPage";
 import { PlatformPage } from "./pages/PlatformPage";
 import { SolutionsPage } from "./pages/SolutionsPage";
 import { ComplianceAreasPage } from "./pages/ComplianceAreasPage";
+import { HowItWorksPage } from "./pages/HowItWorksPage";
 import { ProvidersPage } from "./pages/ProvidersPage";
 import { PROVIDER_MARKETING_ENABLED } from "./lib/featureFlags";
 import { ResultsRiskMap } from "./pages/ResultsRiskMap";
@@ -130,6 +131,7 @@ function AppContent() {
                     <Route path="platform" element={<PlatformPage />} />
                     <Route path="solutions" element={<SolutionsPage />} />
                     <Route path="compliance" element={<ComplianceAreasPage />} />
+                    <Route path="how-it-works" element={<HowItWorksPage />} />
                     {/* Provider marketing landing — off by design (featureFlags.ts):
                         providers are recruited offline/B2B. Kept in the repo; the
                         route redirects home while the flag is false. */}

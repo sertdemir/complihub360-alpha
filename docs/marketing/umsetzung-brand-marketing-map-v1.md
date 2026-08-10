@@ -230,9 +230,9 @@ Plus die bereits abgestimmten Blöcke: Kosten („für dich kostenlos", Modell e
 |---|---|---|
 | 1 | ✅ Entscheidungen A (Claim) + B (Domain-Namen) | erledigt 10.08.2026 |
 | 2 | ✅ Copy-Layer Landing + Search-Page, 4 Sprachen | erledigt 10.08.2026 |
-| 3 | Problem-Recognition-Sektion + Homepage-Reihenfolge | Stufe 2 |
+| 3 | ✅ Problem-Recognition-Sektion + Homepage-Reihenfolge | erledigt 10.08.2026 |
 | 4 | ✅ Risk-Map-Reframing (Stats + Zeilen) | erledigt 10.08.2026 |
-| 5 | `/how-it-works` nach 5-Stufen-Gerüst | Stufe 2 |
+| 5 | ✅ `/how-it-works` nach 5-Stufen-Gerüst | erledigt 10.08.2026 |
 | 6 | Compliance-Bereiche + Länder-Seiten (Wissensbasis) | Entscheidung B |
 | 7 | Claim in Figma/Compass + E-Mail-Asset nachziehen | Entscheidung A |
 
