@@ -31,7 +31,7 @@
     "seeIfApplies": "Bunun size uygulanıp uygulanmadığını görün"
   },
   "hero": {
-    "eyebrow": "Operasyon sorumluları için",
+    "eyebrow": "Compliance Intelligence ve Provider Matching platformu",
     "title": {
       "pre": "Tek başınıza yürütmemeniz ",
       "gold": "gereken",
@@ -40,7 +40,7 @@
     "subtitleDesktop": "CompliHub360, Avrupa pazarlarındaki operasyonlarınız için geçerli kuralları haritalar ve bir işin uygulanması gerektiğinde sizi doğrulanmış bir uzmanla buluşturur. İlk Risk Map'inize altı dakika. Hesap gerekmez.",
     "subtitleMobile": "CompliHub360, Avrupa pazarlarındaki kuralları haritalar ve bir işin uygulanması gerektiğinde sizi doğrulanmış bir uzmanla buluşturur. İlk Risk Map'inize altı dakika. Hesap gerekmez.",
     "cta": {
-      "start": "Değerlendirmenizi başlatın",
+      "start": "İhtiyaçlarımı değerlendir",
       "showMap": "Örnek bir Risk Map görün",
       "closeMap": "Risk Map'i kapat"
     },
@@ -1062,7 +1062,7 @@
       "post": " hâle gelir."
     },
     "subtitle": "Altı dakika. Hesap gerekmez. Operasyonlarınızı fiilen geçerli olan mevzuatla eşleştirir ve bir sonraki adımınızı gösteririz.",
-    "cta": "Değerlendirmenizi başlatın"
+    "cta": "İhtiyaçlarımı değerlendir"
   },
   "newsletter": {
     "eyebrow": "Güncel kalın",

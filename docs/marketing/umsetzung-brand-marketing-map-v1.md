@@ -114,6 +114,41 @@ in **4 Sprachen** (en/de/es/tr).
 | Final-CTA | „Start your assessment" | **„Assess My Needs"** primär, „Ask a Compliance Question" sekundär | `EntryDoor.tsx` |
 | Search-Page-Copy | Platzhalter-Antworttexte | Report-Sprache §11 | `results.json` → `search.*` |
 
+**Umgesetzt 10.08.2026** in zwei Branches, weil `hero.dual.*` und `search.*` nur
+auf dem Dual-Entry-Hero existieren:
+
+- `feat/copy-layer-landing` (auf main) — Hero-Eyebrow, `hero.cta.start`, `entryDoor.cta`
+- `feat/copy-layer-search` (auf `feat/landing-search-v2` + Landing-Branch gemerged) —
+  `hero.dual.*`, gesamte `search.*`
+
+CTA-Sprache über beide Einstiege identisch: **„Assess My Needs"** (de „Meinen Bedarf
+ermitteln", es „Evaluar mis necesidades", tr „İhtiyaçlarımı değerlendir") und
+**„Ask a Compliance Question"**. Englisch übernimmt die Ich-Form des Reports wörtlich;
+die anderen drei behalten ihr eigenes Button-Register, statt die Ich-Form in Sprachen
+zu zwingen, die den Leser siezen.
+
+**Drei Befunde beim Umsetzen:**
+
+1. Die Kategorie-Aussage landete in einem **unsichtbaren** Element. `SectionEyebrow`
+   mappte seine Töne auf rohe Palettenstufen, die nicht mit dem Theme kippen —
+   `tone="brand"` ergab #002E26 auf dem dunklen Hero, Kontrast **1.01**. Auf
+   semantische `fg-*`-Tokens umgestellt: Hero-Eyebrow **1.01 → 6.47** (dark), 9.83
+   (light), kein Eyebrow der Seite unter 4.5:1 im Light Mode.
+2. Die Platzhalter-Copy **duzte** in de/es/tr, während der Rest jeder Locale siezt
+   (159:1 · 69:3 · 93:2). Angeglichen.
+3. Der Antworttext trug ein wörtliches `[Placeholder answer]`. Ersatzlos streichen
+   hätte ein Gerüst wie eine echte Antwort wirken lassen — der Hinweis sitzt jetzt in
+   einem eigenen Badge (`search.previewBadge`) neben dem „Answer"-Eyebrow.
+
+**§11-Prüfung der Bestands-Copy:** sauber. Die einzigen „legal advice"-Treffer sind
+das FAQ, das genau das verneint — gewollte Richtung, kein Verstoß.
+
+**Nicht angefasst, gemeldet:** „Log in" im `MarketingHeader` ist hartkodiert und
+bleibt auf /de /es /tr englisch · `GlobalNav` baut ein Platzhalter-Logo aus Primitiven
+statt der echten `Logo`-Komponente, weshalb der neue Claim nur auf den zwei
+Landing-Routen erscheint · das Eyebrow der `brand-code`-Sektion steht mit Kontrast
+1.37 gold auf Teal (vorbestehend; Sektion steht in Stufe 3 ohnehin zur Disposition).
+
 **Sprachregeln (§11) als Prüfliste für jeden Text:**
 verwenden — *understand, clarity, your needs, informed decision, right fit,
 matched to your needs, what applies to your business*;
@@ -194,7 +229,7 @@ Plus die bereits abgestimmten Blöcke: Kosten („für dich kostenlos", Modell e
 | Stufe | Paket | Blockiert durch |
 |---|---|---|
 | 1 | ✅ Entscheidungen A (Claim) + B (Domain-Namen) | erledigt 10.08.2026 |
-| 2 | Copy-Layer Landing + Search-Page, 4 Sprachen | Stufe 1 |
+| 2 | ✅ Copy-Layer Landing + Search-Page, 4 Sprachen | erledigt 10.08.2026 |
 | 3 | Problem-Recognition-Sektion + Homepage-Reihenfolge | Stufe 2 |
 | 4 | ✅ Risk-Map-Reframing (Stats + Zeilen) | erledigt 10.08.2026 |
 | 5 | `/how-it-works` nach 5-Stufen-Gerüst | Stufe 2 |
