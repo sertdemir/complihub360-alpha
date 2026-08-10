@@ -1,0 +1,74 @@
+# CompliHub360 · Plausible CE hinter dem Hostinger-Traefik (VPS 76.13.159.221)
+#
+# Kanonische Kopie. Deploy-Ziel auf der VPS:
+#   /docker/plausible/compose.override.yml
+# daneben liegt ein Klon von github.com/plausible/community-edition (liefert
+# compose.yml + clickhouse/) sowie die .env (siehe .env.example hier daneben).
+#
+#   scp infra/plausible/compose.override.yml \
+#       root@76.13.159.221:/docker/plausible/compose.override.yml
+#
+# Warum keine `ports:`
+#   Traefik läuft auf dieser Box im HOST-Netz und findet Container über den
+#   Docker-Socket (--providers.docker, exposedbydefault=false). Er erreicht den
+#   Container direkt über dessen Bridge-IP — exakt wie /docker/complihub und
+#   /docker/complihub-next. Ein Port-Mapping wäre nicht nur unnötig, es würde
+#   Plausible zusätzlich offen ans Internet hängen.
+#
+# TLS
+#   Terminiert Traefik (certresolver "letsencrypt"). Plausibles eigenes
+#   Let's-Encrypt bleibt deshalb AUS — konkret: HTTPS_PORT wird in der .env
+#   bewusst NICHT gesetzt, nur HTTP_PORT=8000.
+#
+# Abhängigkeit
+#   Die Middlewares complihub-auth / complihub-noindex sind an den
+#   Staging-Container (/docker/complihub) gelabelt. Liegt der still, verlieren
+#   diese Router ihre Middleware und Traefik nimmt sie aus dem Routing. Gleiche
+#   Kopplung wie bei complihub-next — bewusst, um kein Passwort zu duplizieren.
+
+services:
+  plausible:
+    labels:
+      - traefik.enable=true
+
+      # ── 1 · Öffentlicher Ingest: Tracking-Script + Event-Endpoint ────────
+      # Muss an der Basic-Auth VORBEI. Sonst bekommt jeder Besucher der
+      # Marketing-Site ein 401 auf /js/script.js und es wird nie ein einziger
+      # Pageview erfasst.
+      # Der Host(...)-Teil ist NICHT optional: ohne ihn würde dieser Router
+      # /js/ und /api/event für *jede* Site auf der VPS an sich reißen.
+      - traefik.http.routers.plausible-ingest.rule=Host(`${PLAUSIBLE_HOST}`) && (PathPrefix(`/js/`) || Path(`/api/event`) || Path(`/api/health`))
+      - traefik.http.routers.plausible-ingest.priority=100
+      - traefik.http.routers.plausible-ingest.entrypoints=websecure
+      - traefik.http.routers.plausible-ingest.tls.certresolver=letsencrypt
+      - traefik.http.routers.plausible-ingest.middlewares=complihub-noindex
+      - traefik.http.routers.plausible-ingest.service=plausible
+
+      # ── 2 · Alles andere: Dashboard, Login, Settings ─────────────────────
+      # Hinter derselben Basic-Auth-Wall wie Staging (Doppel-Login: erst
+      # Basic Auth, dann Plausibles eigener Login — Absicht, defense in depth).
+      # Soll das weg, hier `complihub-auth,` streichen; Plausible ist durch
+      # DISABLE_REGISTRATION=invite_only weiterhin geschlossen.
+      # Öffentliche Shared-Dashboards (/share/…) laufen ebenfalls über diesen
+      # Router und sind damit auth-pflichtig — falls die wirklich öffentlich
+      # sein sollen, `PathPrefix(`/share/`)` oben in den Ingest-Router ziehen.
+      - traefik.http.routers.plausible.rule=Host(`${PLAUSIBLE_HOST}`)
+      - traefik.http.routers.plausible.priority=1
+      - traefik.http.routers.plausible.entrypoints=websecure
+      - traefik.http.routers.plausible.tls.certresolver=letsencrypt
+      - traefik.http.routers.plausible.middlewares=complihub-auth,complihub-noindex
+      - traefik.http.routers.plausible.service=plausible
+
+      # Muss zu HTTP_PORT in der .env passen.
+      - traefik.http.services.plausible.loadbalancer.server.port=8000
+
+  # Postgres und ClickHouse bleiben explizit unsichtbar für Traefik. Bei
+  # exposedbydefault=false ohnehin der Default — hier nur festgeschrieben,
+  # damit ein späteres globales enable sie nicht versehentlich mitnimmt.
+  plausible_db:
+    labels:
+      - traefik.enable=false
+
+  plausible_events_db:
+    labels:
+      - traefik.enable=false
