@@ -22,6 +22,10 @@ node_modules/
 # .env should never be committed to git
 .env
 .env.*
+# …except the templates. `.env.*` swallowed these silently, so every
+# .env.example in the repo was untracked without anyone noticing. Exact-name
+# negation only — nothing with a real secret matches it.
+!.env.example
 
 # Supabase local state
 supabase/.temp

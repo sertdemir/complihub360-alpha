@@ -34,6 +34,10 @@ jobs:
         # we fallback to a standard npm install to ensure resilient CI builds.
         run: npm ci || npm install
 
+      - name: Check i18n key parity
+        # Reads the locale files only — no DeepL call, so no API key needed.
+        run: npm run i18n:check
+
       - name: Build Core Dependencies
         run: npm run build:root
 

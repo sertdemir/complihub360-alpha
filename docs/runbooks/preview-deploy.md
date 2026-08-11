@@ -23,8 +23,38 @@ Typ: A   ·   Name: next.staging   ·   Wert: 76.13.159.221   ·   TTL: Standard
 ```
 
 (Beim DNS-Anbieter der Domain complihub360.com, dort wo auch `staging`
-eingetragen ist.) Nach dem Anlegen holt Traefik das Zertifikat automatisch
-innerhalb weniger Minuten — kein weiterer Eingriff nötig.
+eingetragen ist.)
+
+**Wenn der Preview-Container schon lief, bevor der DNS-Record existierte, holt
+Traefik das Zertifikat _nicht_ von selbst nach.** Genau das ist am 10.08.2026
+passiert: der letzte ACME-Versuch (09.08., 12:37 UTC) scheiterte mit `NXDOMAIN`,
+und danach probierte Traefik es nicht erneut — weder beim Redeploy noch bei
+`docker compose up -d --force-recreate` des Preview-Containers. In den
+Traefik-Logs stand über Stunden gar nichts, und `acme.json` enthielt nur
+`staging.complihub360.com`.
+
+Behoben durch einen Neustart des Reverse Proxy:
+
+```bash
+ssh root@76.13.159.221 'docker restart traefik-traefik-1'
+```
+
+Das Zertifikat war danach in **15 Sekunden** ausgestellt. Der Neustart
+unterbricht kurz **alle** Sites auf der VPS (Staging, API, Kuma, Hermes) —
+Traefik war hier ~9 Wochen ohne Neustart gelaufen und kam sauber zurück, alle
+übrigen Container blieben unberührt. Prüfen mit:
+
+```bash
+echo | openssl s_client -connect 76.13.159.221:443 -servername next.staging.complihub360.com 2>/dev/null | openssl x509 -noout -subject -issuer
+```
+
+Erwartet: `subject= /CN=next.staging.complihub360.com`, Issuer Let's Encrypt.
+
+Alternativ ohne Eingriff: Traefiks nächtlicher Renew-Lauf (~22:31 UTC) nimmt den
+Host ebenfalls mit. Der Neustart ist nur der schnelle Weg.
+
+**Reihenfolge für neue Hosts:** erst den DNS-Record anlegen, propagieren lassen
+(`dig +short <host>`), dann deployen. Dann greift die Automatik wie gedacht.
 
 ## Bedienung
 
