@@ -1,7 +1,7 @@
 # Umsetzung · Brand & Marketing Map V1
 
-**Stand: 10.08.2026 · Quelle: `CompliHub360_Brand_Marketing_Map_V1.docx` (Marketing-Handoff)
-· Status: Entscheidungen A + B getroffen und umgesetzt · Stufen 2/3/5/6 offen**
+**Stand: 11.08.2026 · Quelle: `CompliHub360_Brand_Marketing_Map_V1.docx` (Marketing-Handoff)
+· Status: Stufen 1–6 umgesetzt und live · Stufe 7 zur Hälfte (Figma ✅, Publish + E-Mail-Asset offen)**
 
 Übersetzt den Marketing-Report in konkrete Code-Änderungen. Jede Zeile nennt die
 betroffene Datei bzw. den Screen. Die beiden Entscheidungen, die alles Weitere
@@ -233,8 +233,8 @@ Plus die bereits abgestimmten Blöcke: Kosten („für dich kostenlos", Modell e
 | 3 | ✅ Problem-Recognition-Sektion + Homepage-Reihenfolge | erledigt 10.08.2026 |
 | 4 | ✅ Risk-Map-Reframing (Stats + Zeilen) | erledigt 10.08.2026 |
 | 5 | ✅ `/how-it-works` nach 5-Stufen-Gerüst | erledigt 10.08.2026 |
-| 6 | Compliance-Bereiche + Länder-Seiten (Wissensbasis) | Entscheidung B |
-| 7 | Claim in Figma/Compass + E-Mail-Asset nachziehen | Entscheidung A |
+| 6 | ✅ Compliance-Bereiche + Länder-Seiten (Wissensbasis) | erledigt 11.08.2026 |
+| 7 | ⏳ Claim in Figma/Compass + E-Mail-Asset nachziehen | Figma-Komponente erledigt 11.08.2026 · Library-Publish + PNG offen |
 
 **Nicht Teil dieses Plans** (Report §16 explizit als „future work"): Mission, Vision,
 Core Values, Brand Personality, vollständige Social-Media-Strategie, Content-Kalender.
