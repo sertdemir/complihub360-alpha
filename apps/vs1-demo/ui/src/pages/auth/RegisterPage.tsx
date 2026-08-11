@@ -70,7 +70,6 @@ const COMPLIANCE_AREA_DEFS = [
     { value: "epr", tKey: "epr", icon: "inventory_2" },
     { value: "marketing-seo", tKey: "marketingSeo", icon: "campaign" },
     { value: "corporate", tKey: "corporate", icon: "domain" },
-    { value: "full-support", tKey: "fullSupport", icon: "support_agent" },
 ] as const;
 
 const SPECIALIZATION_DEFS = [

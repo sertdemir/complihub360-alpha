@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import {
   Home, FolderClosed, Mail, Bell, BookOpen, Bookmark, Download, TriangleAlert, Calendar, Search, Settings,
-  Receipt, Package, ShieldCheck, Megaphone, Building2, LifeBuoy,
+  Receipt, Package, ShieldCheck, Megaphone, Building2,
 } from 'lucide-react';
 import { AppShell, Sidebar, SidebarGroup, NavItem, DomainBar, DomainTab, MobileTopbar } from './AppShell';
 import { Logo, LogoMark } from './Logo';
@@ -31,7 +31,6 @@ const DOMAINS = [
   { id: 'gdpr', label: 'Data & Privacy', icon: <ShieldCheck size={18} />, dot: true },
   { id: 'mkt', label: 'Marketing Compliance', icon: <Megaphone size={18} /> },
   { id: 'corp', label: 'Corporate & Structure', icon: <Building2 size={18} /> },
-  { id: 'full', label: 'Full Support', icon: <LifeBuoy size={18} /> },
 ];
 
 function Dashboard({ dark }: { dark?: boolean }) {

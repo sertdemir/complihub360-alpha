@@ -312,7 +312,6 @@
     "anchorPrivacy": "Datos y Privacidad",
     "anchorMarketing": "Compliance de marketing",
     "anchorCorporate": "Estructura Corporativa",
-    "anchorFullsupport": "Full Support",
     "riskLabel": "Riesgo",
     "whoAffected": "A quién afecta",
     "keyObligations": "Obligaciones Clave",
@@ -433,13 +432,6 @@
         "fine": "Exposición fiscal + riesgo de la entidad",
         "markets": "EU · UK · US · CH",
         "effort": "Alto"
-      },
-      "fullsupport": {
-        "risk": "Combinado",
-        "time": "Bajo petición",
-        "fine": "Cobertura en todas las áreas",
-        "markets": "Todos los mercados soportados",
-        "effort": "Gestionado"
       }
     },
     "howItWorks": {
@@ -632,41 +624,10 @@
         "o3": "No"
       }
     },
-    "fullsupport": {
-      "title": "Full Support",
-      "risk": "Combinado",
-      "headline": "Cumplimiento multidominio — un único encargo coordinado",
-      "description": "Cuando las obligaciones abarcan varias categorías (Impuestos + Privacidad + EPR + Marketing), Full Support las orquesta todas en un único encargo estructurado con un socio sénior.",
-      "affected": "Operadores con exposición multicategoría: sectores regulados, SaaS transfronterizo, marketplaces, marcas multiproducto o scaleups que se expanden a 3+ mercados.",
-      "personaFit": "Ideal para: cumplimiento multidominio",
-      "ob1": "Coordinar varios frentes regulatorios en paralelo",
-      "ob2": "Mantener registros de auditoría en todas las categorías",
-      "ob3": "Alinear la hoja de ruta de cumplimiento con los planes de crecimiento",
-      "ob4": "Respuesta y escalado respaldados por SLA",
-      "cov1": "Asistente de Full Support — captura el tamaño del negocio, los mercados, el objetivo prioritario y la madurez actual",
-      "cov2": "Le dirige a socios sénior con capacidad multidominio y compromisos de SLA",
-      "cov3": "Encargo con un único punto de contacto, no múltiples solicitudes aisladas",
-      "regulations": {
-        "r1": "Cobertura de todas las normativas de las áreas listadas",
-        "r2": "Supervisión regulatoria continua",
-        "r3": "Marco de respuesta coordinado"
-      },
-      "fines": {
-        "headline": "Exposición agregada en todas las áreas — Full Support reduce los puntos ciegos y las obligaciones omitidas.",
-        "authorities": "Todas las autoridades relevantes para su operación"
-      },
-      "teaser": {
-        "question": "¿Cuántas áreas de cumplimiento le afectan?",
-        "o1": "2",
-        "o2": "3",
-        "o3": "4 o más"
-      }
-    },
     "cta": {
       "title": "¿No estás seguro de qué área aplica?",
       "body": "Nuestro Asistente hace las preguntas correctas y te dirige automáticamente a la evaluación correcta.",
-      "btn": "Iniciar evaluación general",
-      "fullSupportBtn": "O hable con Full Support"
+      "btn": "Iniciar evaluación general"
     },
     "footer": {
       "copyright": "© {{year}} CompliHub360. Construido en Berlín."

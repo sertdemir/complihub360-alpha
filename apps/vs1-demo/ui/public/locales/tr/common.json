@@ -312,7 +312,6 @@
     "anchorPrivacy": "Veri ve Gizlilik",
     "anchorMarketing": "Pazarlama Uyumu",
     "anchorCorporate": "Kurumsal Yapı",
-    "anchorFullsupport": "Full Support",
     "riskLabel": "Risk",
     "whoAffected": "Kimler etkilenir",
     "keyObligations": "Temel Yükümlülükler",
@@ -433,13 +432,6 @@
         "fine": "Vergi riski + tüzel kişilik riski",
         "markets": "EU · UK · US · CH",
         "effort": "Yüksek"
-      },
-      "fullsupport": {
-        "risk": "Paket",
-        "time": "Talep üzerine",
-        "fine": "Tüm alanları kapsayan koruma",
-        "markets": "Desteklenen tüm pazarlar",
-        "effort": "Yönetilen"
       }
     },
     "howItWorks": {
@@ -632,41 +624,10 @@
         "o3": "Hayır"
       }
     },
-    "fullsupport": {
-      "title": "Full Support",
-      "risk": "Paket",
-      "headline": "Alanlar Arası Uyumluluk — Tek Koordineli Süreç",
-      "description": "Yükümlülükler birden fazla kategoriye yayıldığında (Vergi + Gizlilik + EPR + Pazarlama), Full Support hepsini kıdemli bir partner eşliğinde tek bir yapılandırılmış süreçte yönetir.",
-      "affected": "Çok kategorili riske sahip işletmeler: düzenlemeye tabi sektörler, sınır ötesi SaaS, pazar yerleri, çok ürünlü markalar veya 3+ pazara açılan scale-up şirketler.",
-      "personaFit": "En uygun: Alanlar arası uyumluluk",
-      "ob1": "Birden fazla düzenleyici süreci paralel olarak koordine etmek",
-      "ob2": "Kategoriler genelinde denetim kayıtlarını sürdürmek",
-      "ob3": "Uyumluluk yol haritasını büyüme planlarıyla hizalamak",
-      "ob4": "SLA güvenceli yanıt ve eskalasyon",
-      "cov1": "Full Support Asistanı — işletme büyüklüğünü, pazarları, öncelikli hedefi ve mevcut olgunluğu kaydeder",
-      "cov2": "Sizi alanlar arası kapasiteye ve SLA taahhütlerine sahip kıdemli partnerlere yönlendirir",
-      "cov3": "Tek temas noktalı süreç; birden fazla bağımsız talep değil",
-      "regulations": {
-        "r1": "Listelenen tüm alan düzenlemelerini kapsar",
-        "r2": "Sürekli mevzuat takibi",
-        "r3": "Koordineli yanıt çerçevesi"
-      },
-      "fines": {
-        "headline": "Tüm alanlarda toplam risk — Full Support kör noktaları ve gözden kaçan yükümlülükleri azaltır.",
-        "authorities": "Faaliyetinizle ilgili tüm otoriteler"
-      },
-      "teaser": {
-        "question": "Kaç uyumluluk alanı sizi etkiliyor?",
-        "o1": "2",
-        "o2": "3",
-        "o3": "4 veya daha fazla"
-      }
-    },
     "cta": {
       "title": "Hangi alanın geçerli olduğundan emin değil misiniz?",
       "body": "Asistanımız doğru soruları sorar ve sizi otomatik olarak doğru değerlendirmeye yönlendirir.",
-      "btn": "Genel Değerlendirme Başlatın",
-      "fullSupportBtn": "Veya Full Support ile görüşün"
+      "btn": "Genel Değerlendirme Başlatın"
     },
     "footer": {
       "copyright": "© {{year}} CompliHub360. Berlin'de yapıldı."

@@ -1,6 +1,6 @@
 import type { ElementType } from 'react';
 
-export type AreaKey = 'tax' | 'epr' | 'privacy' | 'marketing' | 'corporate' | 'fullsupport';
+export type AreaKey = 'tax' | 'epr' | 'privacy' | 'marketing' | 'corporate';
 
 export type CountryCode = 'EU' | 'DE' | 'FR' | 'IT' | 'ES' | 'UK' | 'US' | 'CH' | 'ALL';
 

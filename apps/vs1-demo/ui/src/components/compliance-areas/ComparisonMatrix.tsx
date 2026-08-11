@@ -75,17 +75,6 @@ const ROWS: Row[] = [
     marketsDefault: 'EU · UK · US · CH',
     effortDefault: 'High',
   },
-  {
-    id: 'fullsupport',
-    titleDefault: 'Full Support',
-    riskRank: 5,
-    riskLabel: 'Bundled',
-    riskColor: 'bg-accent-100 text-accent-700 border-accent-200',
-    timeDefault: 'On request',
-    fineDefault: 'Coverage across all areas',
-    marketsDefault: 'All supported markets',
-    effortDefault: 'Managed',
-  },
 ];
 
 export function ComparisonMatrix() {

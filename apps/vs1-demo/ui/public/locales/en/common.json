@@ -312,7 +312,6 @@
     "anchorPrivacy": "Data & Privacy",
     "anchorMarketing": "Marketing Compliance",
     "anchorCorporate": "Corporate Structure",
-    "anchorFullsupport": "Full Support",
     "riskLabel": "Risk",
     "whoAffected": "Who is affected",
     "keyObligations": "Key Obligations",
@@ -433,13 +432,6 @@
         "fine": "Tax exposure + entity risk",
         "markets": "EU · UK · US · CH",
         "effort": "High"
-      },
-      "fullsupport": {
-        "risk": "Bundled",
-        "time": "On request",
-        "fine": "Coverage across all areas",
-        "markets": "All supported markets",
-        "effort": "Managed"
       }
     },
     "howItWorks": {
@@ -632,41 +624,10 @@
         "o3": "No"
       }
     },
-    "fullsupport": {
-      "title": "Full Support",
-      "risk": "Bundled",
-      "headline": "Cross-Domain Compliance — One Coordinated Engagement",
-      "description": "When obligations span multiple categories (Tax + Privacy + EPR + Marketing), Full Support orchestrates all of them under one structured engagement with a senior partner.",
-      "affected": "Operators running multi-category exposure: regulated industries, cross-border SaaS, marketplaces, multi-product brands, or scaleups expanding into 3+ markets.",
-      "personaFit": "Best for: Cross-domain compliance",
-      "ob1": "Coordinating multiple regulatory streams in parallel",
-      "ob2": "Maintaining audit trails across categories",
-      "ob3": "Aligning compliance roadmap with growth plans",
-      "ob4": "SLA-backed response and escalation",
-      "cov1": "Full Support Wizard — captures business size, markets, priority goal, current maturity",
-      "cov2": "Routes to senior partners with cross-domain capacity and SLA commitments",
-      "cov3": "Single-point-of-contact engagement, not multiple isolated requests",
-      "regulations": {
-        "r1": "Coverage across all listed area regulations",
-        "r2": "Ongoing regulatory monitoring",
-        "r3": "Coordinated response framework"
-      },
-      "fines": {
-        "headline": "Aggregated exposure across all areas — Full Support reduces blind spots and missed obligations.",
-        "authorities": "All authorities relevant to your operation"
-      },
-      "teaser": {
-        "question": "How many compliance areas affect you?",
-        "o1": "2",
-        "o2": "3",
-        "o3": "4 or more"
-      }
-    },
     "cta": {
       "title": "Not sure which area applies?",
       "body": "Our Wizard asks the right questions and routes you to the correct assessment automatically.",
-      "btn": "Start General Assessment",
-      "fullSupportBtn": "Or talk to Full Support"
+      "btn": "Start General Assessment"
     },
     "footer": {
       "copyright": "© {{year}} CompliHub360. Built in Berlin."
