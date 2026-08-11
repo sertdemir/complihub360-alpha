@@ -1331,5 +1331,82 @@
       "lead": "Altı dakika, dört soru, hesap gerekmez."
     },
     "seeAll": "Her adımın nasıl işlediğini görün"
+  },
+  "markets": {
+    "meta": {
+      "index": "Pazarlar · CompliHub360",
+      "country": "{{country}} · CompliHub360"
+    },
+    "index": {
+      "eyebrow": "Pazarlar",
+      "title": {
+        "pre": "Neyin geçerli olduğu, ",
+        "gold": "pazar",
+        "post": " pazar."
+      },
+      "lead": "Yükümlülük tuttuğumuz her pazar, her birinin arkasındaki mevzuatla birlikte. Hukukun bir özeti değil — motorumuzun karşılaştırdığı kayıtlar.",
+      "obligations_one": "{{count}} yükümlülük",
+      "obligations_other": "{{count}} yükümlülük",
+      "enforcement": "Uygulama {{value}}/10"
+    },
+    "country": {
+      "eyebrow": "Pazar",
+      "title": "{{country}} pazarında faaliyet.",
+      "lead": "Uygulama yoğunluğu 10 üzerinden {{enforcement}}, katılık 10 üzerinden {{strictness}} — motorumuzun bu pazarı değerlendirirken uyguladığı ağırlık.",
+      "weightsTitle": "Ağırlığın bulunduğu yer",
+      "weightsLead": "Bu pazarın her alanı diğerlerine kıyasla ne kadar ağır ele aldığı.",
+      "obligationsTitle": "Kaynağını tuttuğumuz yükümlülükler",
+      "obligationsLead": "Her kayıt, dayandığı mevzuatı adıyla belirtir. Yükümlülük AB hukukuna dayanıyorsa resmî metin bir tık uzakta.",
+      "sourceLabel": "Kaynak",
+      "dueLabel": "Sıklık",
+      "leadTime": "{{days}} gün süre",
+      "coverageNote": "Motorun bugün {{country}} için tuttuğu budur — takip ettiğimiz yükümlülüklerin {{count}} tanesinin bu pazara özgü bir kaynağı var. Diğerleri AB genelinde geçerlidir; değerlendirme onları kendi faaliyetinize göre gösterir.",
+      "backToMarkets": "Tüm pazarlar",
+      "notFound": "Bu kod için henüz bir pazar profilimiz yok."
+    },
+    "cta": {
+      "title": "Bunlardan hangilerinin size uyduğunu görün.",
+      "lead": "Değerlendirme bu listeyi faaliyetinize göre daraltır — pazarlarınız, modeliniz."
+    },
+    "countries": {
+      "DE": "Almanya",
+      "ES": "İspanya",
+      "FR": "Fransa",
+      "IT": "İtalya",
+      "NL": "Hollanda",
+      "TR": "Türkiye",
+      "UK": "Birleşik Krallık",
+      "US": "ABD"
+    },
+    "cadence": {
+      "Annual": "Yıllık",
+      "Monthly": "Aylık",
+      "One-off": "Tek seferlik",
+      "Ongoing": "Sürekli",
+      "Quarterly": "Üç aylık"
+    },
+    "obligations": {
+      "corp-registration": "Ticaret sicili",
+      "data-hosting": "Veri yerelleştirme",
+      "data-privacy": "Gizlilik politikası",
+      "legal-commercial-contracts": "Ticari sözleşme incelemesi",
+      "legal-consumer-terms": "Tüketici koşulları ve cayma hakkı",
+      "log-customs-classification": "Gümrük sınıflandırması (HS kodları)",
+      "log-eori": "EORI kaydı",
+      "log-intrastat": "Intrastat beyanları",
+      "mktg-consent": "Pazarlama izni (opt-in)",
+      "mktg-health-claims": "Sağlık beyanları",
+      "monitor-kyb": "Know Your Business (KYB)",
+      "prod-epr": "Genişletilmiş üretici sorumluluğu (EPR)",
+      "prod-packaging-conformity": "Ambalaj uygunluğu (PPWR)",
+      "prod-packaging-empty-space": "Boş alan oranı (PPWR)",
+      "prod-packaging-format-bans": "Yasaklı tek kullanımlık formatlar (PPWR)",
+      "prod-packaging-recyclability": "Geri dönüşüme uygun tasarım (PPWR)",
+      "prod-packaging-recycled-content": "Plastik ambalajda geri dönüştürülmüş içerik (PPWR)",
+      "prod-packaging-reuse-targets": "Yeniden kullanılabilir taşıma ambalajı (PPWR)",
+      "prod-safety": "Ürün güvenliği ve etiketleme",
+      "tax-corporate": "Kurumlar vergisi",
+      "tax-vat-registration": "KDV kaydı ve beyanı"
+    }
   }
 }
