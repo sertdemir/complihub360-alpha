@@ -2,10 +2,14 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Globe, Layers, Timer, ShieldCheck } from 'lucide-react';
 import { Typography } from '../ui/Typography';
+import { DOMAINS } from '../../lib/domains';
 
+// The domain count is read from the canonical list, never typed out: it said
+// "6" while the product had eight, because a literal cannot notice that a
+// domain was added.
 const ITEMS = [
   { icon: Globe, key: 'jurisdictions', value: '27', labelDefault: 'Jurisdictions Covered' },
-  { icon: Layers, key: 'domains', value: '6', labelDefault: 'Compliance Domains' },
+  { icon: Layers, key: 'domains', value: String(DOMAINS.length), labelDefault: 'Compliance Domains' },
   { icon: Timer, key: 'time', value: '< 5 min', labelDefault: 'Guided Assessment' },
   { icon: ShieldCheck, key: 'specialists', value: '✓', labelDefault: 'Verified Specialists Network' },
 ];

@@ -3,11 +3,13 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   BarChart3,
-  Globe,
+  Package,
   Lock,
   MessageSquare,
   Building2,
   ShieldCheck,
+  Truck,
+  Scale,
   Check,
   X,
   ArrowRight,
@@ -23,7 +25,21 @@ import { SectionEyebrow, GoldWord } from '../providers/SectionHeading';
 // (Figma 1650:5764) with cover/when-this-matters detail.
 // All copy lives in the 'home' namespace under domains.items.<index>.*.
 
-const DOMAIN_ICONS = [BarChart3, Globe, Lock, MessageSquare, Building2, ShieldCheck] as const;
+// One icon per canonical domain, in the order of lib/domains.ts — this array
+// drives the grid, so its length IS the number of cards rendered. It had six
+// entries while the app had eight domains, and the sixth was the long-removed
+// "Full Compliance Coverage"; the section therefore under-sold the coverage it
+// was supposed to demonstrate. Adding a domain means adding an icon here.
+const DOMAIN_ICONS = [
+  BarChart3,     // Tax & VAT
+  Package,       // EPR & Packaging
+  Lock,          // Data & Privacy
+  MessageSquare, // Marketing Compliance
+  Building2,     // Corporate & Structure
+  ShieldCheck,   // Product Compliance
+  Truck,         // Logistics & Customs
+  Scale,         // Legal Advisory
+] as const;
 const COVER_COUNT = 6;
 const MATTERS_COUNT = 3;
 

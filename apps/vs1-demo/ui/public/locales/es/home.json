@@ -779,20 +779,20 @@
   "domains": {
     "eyebrow": "Lo que sabemos",
     "title": {
-      "pre": "Seis áreas. ",
+      "pre": "Todos los ámbitos. ",
       "gold": "Un",
       "post": " mapa coherente."
     },
-    "subtitle": "El mapa que nadie dibuja — dibujado. Seis áreas, de extremo a extremo, con los mercados en los que aplican y las obligaciones que conllevan.",
+    "subtitle": "El mapa que nadie dibuja — dibujado. Todos los ámbitos que cubrimos, de principio a fin, con los mercados en los que se aplican y las obligaciones que conllevan.",
     "cardCta": "Haga clic para ver más",
     "drawerEyebrow": "Área",
     "drawerAria": "Detalle de {{domain}}",
     "activeIn": "Activo en:",
     "items": [
       {
-        "title": "IVA e impuestos",
+        "title": "Impuestos e IVA",
         "markets": "DE · UK · NL · FR · IT · ES",
-        "desc": "IVA transfronterizo, OSS/IOSS, entregas intracomunitarias, umbrales de venta a distancia.",
+        "desc": "Saber qué régimen de IVA se aplica en cada mercado al que vende y cuándo toca registrarse.",
         "intro": "IVA transfronterizo, OSS/IOSS, entregas intracomunitarias, umbrales de venta a distancia. Seis mercados significan seis regímenes de IVA, seis umbrales de registro, seis calendarios de presentación. Seguimos cada uno.",
         "cover": [
           "Declaraciones trimestrales OSS / IOSS",
@@ -811,7 +811,7 @@
       {
         "title": "EPR y envases",
         "markets": "DE · UK · NL · FR · AT · BE",
-        "desc": "Responsabilidad ampliada del productor, registros de envases, sistemas de devolución, ecomodulación.",
+        "desc": "Saber si cuenta como productor en un mercado y qué debe registrar antes del primer envío.",
         "intro": "Responsabilidad ampliada del productor para envases, pilas y electrónica. Cada mercado tiene su propio registro, tarifas y calendario de informes. Mapeamos con quién debe registrarse y cuándo.",
         "cover": [
           "LUCID / registros nacionales de envases",
@@ -828,9 +828,9 @@
         ]
       },
       {
-        "title": "RGPD y privacidad",
+        "title": "Datos y privacidad",
         "markets": "TODA LA UE · UK POST-BREXIT",
-        "desc": "Evaluaciones de impacto, RAT, contratos de encargo, derechos de los interesados.",
+        "desc": "Saber qué puede recoger, con qué base y qué tiene que poder demostrar.",
         "intro": "Protección de datos en la UE y en el Reino Unido tras el Brexit. Del registro de actividades a las transferencias internacionales, mostramos las obligaciones que siguen a sus datos — no solo a su sede.",
         "cover": [
           "EIPD para tratamientos de alto riesgo",
@@ -849,7 +849,7 @@
       {
         "title": "Compliance de marketing",
         "markets": "TODA LA UE · EPRIVACY",
-        "desc": "Banners de cookies, registros de consentimiento, e-mail marketing, auditorías de dark patterns.",
+        "desc": "Saber qué puede afirmar, cómo puede dirigirse a las personas y cómo debe ser el consentimiento.",
         "intro": "Reglas de consentimiento y marketing leal bajo ePrivacy y el derecho del consumidor. Los cookie walls, los opt-ins y el escrutinio de dark patterns varían por mercado — seguimos lo que cada regulador realmente hace cumplir.",
         "cover": [
           "Validez del banner de consentimiento de cookies",
@@ -866,9 +866,9 @@
         ]
       },
       {
-        "title": "Societario y presentaciones",
+        "title": "Sociedad y estructura",
         "markets": "DE · AT · CH",
-        "desc": "Cuentas anuales, registro de transparencia, declaraciones de titulares reales, contratos intragrupo.",
+        "desc": "Saber dónde su estructura genera obligaciones: establecimiento permanente, presentaciones, titulares reales.",
         "intro": "Obligaciones a nivel de entidad en la región DACH. Las cuentas anuales, la transparencia de titulares reales y los contratos intragrupo tienen sus propios plazos y sanciones.",
         "cover": [
           "Cuentas anuales",
@@ -885,22 +885,60 @@
         ]
       },
       {
-        "title": "Cobertura completa de compliance",
-        "markets": "TODAS LAS ÁREAS · TODOS LOS MERCADOS",
-        "desc": "Cuando un caso cruza áreas, lo derivamos a partners que lo cierran todo — no solo su parte.",
-        "intro": "Algunos casos no caben en una sola casilla. Cuando una obligación abarca a la vez IVA, RAP, privacidad y presentaciones, coordinamos un equipo de partners que lo cierra todo — con un único responsable.",
+        "title": "Conformidad de producto",
+        "markets": "TODA LA UE · UK",
+        "desc": "Saber si su producto puede comercializarse y qué pruebas debe conservar.",
+        "intro": "Si un producto puede comercializarse siquiera y qué prueba lo respalda. Separado del envase: aquí se trata del producto en sí — seguridad, conformidad, documentación y quién responde por él dentro de la UE.",
         "cover": [
-          "Derivación de casos entre áreas",
-          "Un único punto de responsabilidad",
-          "Equipos de partners coordinados",
-          "Gestión secuenciada de obligaciones",
-          "Seguimiento compartido de plazos",
-          "Una sola relación contractual"
+          "Reglamento de seguridad general de los productos (UE) 2023/988",
+          "Marcado CE y declaración de conformidad",
+          "Documentación técnica y su conservación",
+          "Persona responsable establecida en la UE",
+          "Notificación de incidentes y retiradas",
+          "Marcado UKCA para Gran Bretaña"
         ],
         "matters": [
-          "Un solo cambio activa obligaciones en varias áreas",
-          "Entra en un nuevo mercado de principio a fin",
-          "Necesita un equipo, no cinco proveedores"
+          "Comercializa por primera vez un producto físico en la UE",
+          "Añade una categoría de producto con sus propias reglas de conformidad",
+          "Vende a la UE sin estar establecido allí"
+        ]
+      },
+      {
+        "title": "Logística y aduanas",
+        "markets": "DE · UK · NL · FR · UE",
+        "desc": "Saber qué necesita su mercancía para cruzar una frontera y quién responde cuando lo hace.",
+        "intro": "Qué necesita la mercancía para cruzar una frontera y quién responde una vez que lo hace. Identidad aduanera, declaraciones, estadística y las condiciones de entrega que deciden quién paga y quién responde.",
+        "cover": [
+          "Registro EORI",
+          "Declaraciones de importación y exportación",
+          "Declaración Intrastat al superar el umbral",
+          "Incoterms y dónde recae la responsabilidad",
+          "IVA de importación y su aplazamiento",
+          "Movimientos GB ↔ UE tras el Brexit"
+        ],
+        "matters": [
+          "Envía por primera vez a través de una frontera aduanera",
+          "Su volumen supera un umbral Intrastat",
+          "Cambia los Incoterms o su socio logístico"
+        ]
+      },
+      {
+        "title": "Asesoría legal",
+        "markets": "TODA LA UE",
+        "desc": "Saber cuándo una cuestión necesita de verdad a un abogado, y llegar a uno que ya conoce su caso.",
+        "intro": "Las cuestiones que necesitan una respuesta cualificada y no una lista de comprobación: contratos, condiciones, derechos del consumidor, litigios. CompliHub no es un despacho — los Verified Partners asesoran bajo su propia responsabilidad profesional, y nos ocupamos de que quien le atienda ya conozca su caso.",
+        "cover": [
+          "Condiciones y deberes de información al consumidor",
+          "Contratos con proveedores y plataformas",
+          "Desistimiento, devoluciones y garantía",
+          "Responsabilidad y sus límites",
+          "Litigios que cruzan fronteras",
+          "Qué jurisdicción se aplica realmente"
+        ],
+        "matters": [
+          "Firma un tipo de contrato que no ha usado antes",
+          "Un litigio afecta a un cliente de otro país",
+          "Recibe una reclamación formal o una consulta de una autoridad"
         ]
       }
     ]

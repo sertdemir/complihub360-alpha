@@ -779,20 +779,20 @@
   "domains": {
     "eyebrow": "What we know",
     "title": {
-      "pre": "Six domains. ",
+      "pre": "Every domain. ",
       "gold": "One",
       "post": " coherent map."
     },
-    "subtitle": "The map nobody draws — drawn. Six domains, end-to-end, with the markets they apply in and the obligations that come with them.",
+    "subtitle": "The map nobody draws — drawn. Every domain we cover, end to end, with the markets it applies in and the obligations that come with it.",
     "cardCta": "Click to see more",
     "drawerEyebrow": "Domain",
     "drawerAria": "{{domain}} detail",
     "activeIn": "Active in:",
     "items": [
       {
-        "title": "VAT & Tax",
+        "title": "Tax & VAT",
         "markets": "DE · UK · NL · FR · IT · ES",
-        "desc": "Cross-border VAT, OSS/IOSS, intra-community supply, distance-selling thresholds.",
+        "desc": "Know which VAT regime applies in each market you sell into, and when a registration becomes due.",
         "intro": "Cross-border VAT, OSS/IOSS, intra-community supply, distance-selling thresholds. Six markets means six VAT regimes, six registration thresholds, six filing cadences. We track each.",
         "cover": [
           "OSS / IOSS quarterly returns",
@@ -811,7 +811,7 @@
       {
         "title": "EPR & Packaging",
         "markets": "DE · UK · NL · FR · AT · BE",
-        "desc": "Extended Producer Responsibility, packaging registers, take-back schemes, ecomodulation.",
+        "desc": "Know whether you count as a producer in a market — and what you must register before the first shipment.",
         "intro": "Extended Producer Responsibility across packaging, batteries, and electronics. Each market runs its own register, fee schedule, and reporting cadence. We map who you register with and when.",
         "cover": [
           "LUCID / national packaging registers",
@@ -828,9 +828,9 @@
         ]
       },
       {
-        "title": "GDPR & Privacy",
+        "title": "Data & Privacy",
         "markets": "EU-WIDE · POST-BREXIT UK",
-        "desc": "Data Protection Impact Assessments, RoPA, processor agreements, subject-access rights.",
+        "desc": "Know what you may collect, on what basis, and what you have to be able to show.",
         "intro": "Data protection across the EU and post-Brexit UK. From records of processing to international transfers, we surface the obligations that follow your data — not just your headquarters.",
         "cover": [
           "DPIAs for high-risk processing",
@@ -849,7 +849,7 @@
       {
         "title": "Marketing Compliance",
         "markets": "EU-WIDE · EPRIVACY",
-        "desc": "Cookie banners, consent records, e-mail marketing, dark-pattern audits.",
+        "desc": "Know what you may claim, how you may reach people, and what consent has to look like.",
         "intro": "Consent and fair-marketing rules under ePrivacy and consumer law. Cookie walls, opt-ins, and dark-pattern scrutiny vary by market — we track what each regulator actually enforces.",
         "cover": [
           "Cookie-consent banner validity",
@@ -866,9 +866,9 @@
         ]
       },
       {
-        "title": "Corporate & Filings",
+        "title": "Corporate & Structure",
         "markets": "DE · AT · CH",
-        "desc": "Annual statements, transparency register, beneficial-owner filings, intra-group contracts.",
+        "desc": "Know where your setup creates obligations — permanent establishment, filings, beneficial owners.",
         "intro": "Entity-level obligations in the DACH region. Annual statements, beneficial-owner transparency, and intra-group contracts each carry their own deadlines and penalties.",
         "cover": [
           "Annual financial statements",
@@ -885,22 +885,60 @@
         ]
       },
       {
-        "title": "Full Compliance Coverage",
-        "markets": "ALL DOMAINS · ALL MARKETS",
-        "desc": "When a case crosses domains, we route to partners who close all of it — not just their slice.",
-        "intro": "Some cases don't fit one box. When an obligation spans VAT, EPR, privacy, and filings at once, we coordinate a partner team that closes all of it — with one point of accountability.",
+        "title": "Product Compliance",
+        "markets": "EU-WIDE · UK",
+        "desc": "Know whether your product may go on the market, and what evidence you have to hold.",
+        "intro": "Whether a product may be placed on the market at all, and what proof stands behind it. Separate from packaging: this is the product itself — safety, conformity, documentation, and who inside the EU answers for it.",
         "cover": [
-          "Cross-domain case routing",
-          "Single point of accountability",
-          "Coordinated partner teams",
-          "Sequenced obligation handling",
-          "Shared deadline tracking",
-          "One contractual relationship"
+          "General Product Safety Regulation (EU) 2023/988",
+          "CE marking and declaration of conformity",
+          "Technical documentation and its retention",
+          "Responsible person established in the EU",
+          "Incident reporting and recalls",
+          "UKCA marking for Great Britain"
         ],
         "matters": [
-          "A single change triggers obligations in several domains",
-          "You enter a new market end-to-end",
-          "You need one team, not five vendors"
+          "You place a physical product on the EU market for the first time",
+          "You add a product category with its own conformity rules",
+          "You sell into the EU without being established there"
+        ]
+      },
+      {
+        "title": "Logistics & Customs",
+        "markets": "DE · UK · NL · FR · EU",
+        "desc": "Know what your goods need to cross a border, and who carries the liability when they do.",
+        "intro": "What goods need in order to cross a border, and who carries the liability once they do. Customs identity, declarations, statistics and the terms of delivery that decide who pays and who answers.",
+        "cover": [
+          "EORI registration",
+          "Import and export declarations",
+          "Intrastat reporting once the threshold is crossed",
+          "Incoterms and where liability sits",
+          "Import VAT and deferment",
+          "GB ↔ EU movements after Brexit"
+        ],
+        "matters": [
+          "You ship across a customs border for the first time",
+          "Your trade volume crosses an Intrastat threshold",
+          "You change Incoterms or your fulfilment partner"
+        ]
+      },
+      {
+        "title": "Legal Advisory",
+        "markets": "EU-WIDE",
+        "desc": "Know when a question genuinely needs a lawyer — and reach one who already has your case.",
+        "intro": "The questions that need a qualified answer rather than a checklist: contracts, terms, consumer rights, disputes. CompliHub is not a law firm — Verified Partners advise under their own professional liability, and we make sure the one you reach already has your case.",
+        "cover": [
+          "Terms and consumer information duties",
+          "Supplier and platform contracts",
+          "Withdrawal, returns and warranty",
+          "Liability and its limits",
+          "Handling a dispute across borders",
+          "Which jurisdiction actually applies"
+        ],
+        "matters": [
+          "You enter a contract type you have not used before",
+          "A dispute involves a customer in another country",
+          "You receive a formal complaint or an enquiry from an authority"
         ]
       }
     ]

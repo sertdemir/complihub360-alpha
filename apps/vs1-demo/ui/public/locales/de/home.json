@@ -779,20 +779,20 @@
   "domains": {
     "eyebrow": "Was wir wissen",
     "title": {
-      "pre": "Sechs Bereiche. ",
+      "pre": "Jeder Bereich. ",
       "gold": "Eine",
-      "post": " kohärente Karte."
+      "post": " zusammenhängende Karte."
     },
-    "subtitle": "Die Karte, die niemand zeichnet — gezeichnet. Sechs Bereiche, durchgängig, mit den Märkten, in denen sie gelten, und den Pflichten, die daraus folgen.",
+    "subtitle": "Die Karte, die niemand zeichnet — gezeichnet. Jeder Bereich, den wir abdecken, durchgehend, mit den Märkten, in denen er gilt, und den Pflichten, die daraus folgen.",
     "cardCta": "Für Details klicken",
     "drawerEyebrow": "Bereich",
     "drawerAria": "Details zu {{domain}}",
     "activeIn": "Aktiv in:",
     "items": [
       {
-        "title": "USt & Steuern",
+        "title": "Steuern & USt",
         "markets": "DE · UK · NL · FR · IT · ES",
-        "desc": "Grenzüberschreitende USt, OSS/IOSS, innergemeinschaftliche Lieferungen, Versandhandelsschwellen.",
+        "desc": "Wissen, welches Umsatzsteuerregime in jedem Markt gilt, in den Sie verkaufen, und wann eine Registrierung fällig wird.",
         "intro": "Grenzüberschreitende USt, OSS/IOSS, innergemeinschaftliche Lieferungen, Versandhandelsschwellen. Sechs Märkte bedeuten sechs USt-Regime, sechs Registrierungsschwellen, sechs Meldezyklen. Wir verfolgen jeden davon.",
         "cover": [
           "OSS-/IOSS-Quartalsmeldungen",
@@ -811,7 +811,7 @@
       {
         "title": "EPR & Verpackung",
         "markets": "DE · UK · NL · FR · AT · BE",
-        "desc": "Erweiterte Herstellerverantwortung, Verpackungsregister, Rücknahmesysteme, Ökomodulation.",
+        "desc": "Wissen, ob Sie in einem Markt als Hersteller gelten — und was Sie vor der ersten Sendung registrieren müssen.",
         "intro": "Erweiterte Herstellerverantwortung für Verpackungen, Batterien und Elektronik. Jeder Markt führt sein eigenes Register mit eigenen Gebühren und Meldezyklen. Wir kartieren, wo und wann Sie sich registrieren.",
         "cover": [
           "LUCID / nationale Verpackungsregister",
@@ -828,9 +828,9 @@
         ]
       },
       {
-        "title": "DSGVO & Datenschutz",
+        "title": "Daten & Datenschutz",
         "markets": "EU-WEIT · UK NACH DEM BREXIT",
-        "desc": "Datenschutz-Folgenabschätzungen, VVT, Auftragsverarbeitungsverträge, Betroffenenrechte.",
+        "desc": "Wissen, was Sie erheben dürfen, auf welcher Grundlage, und was Sie belegen können müssen.",
         "intro": "Datenschutz in der EU und im UK nach dem Brexit. Vom Verarbeitungsverzeichnis bis zu internationalen Übermittlungen zeigen wir die Pflichten auf, die Ihren Daten folgen — nicht nur Ihrem Hauptsitz.",
         "cover": [
           "DSFA für risikoreiche Verarbeitung",
@@ -849,7 +849,7 @@
       {
         "title": "Marketing-Compliance",
         "markets": "EU-WEIT · EPRIVACY",
-        "desc": "Cookie-Banner, Einwilligungsnachweise, E-Mail-Marketing, Dark-Pattern-Audits.",
+        "desc": "Wissen, was Sie versprechen dürfen, wie Sie Menschen erreichen dürfen und wie Einwilligung aussehen muss.",
         "intro": "Einwilligungs- und Lauterkeitsregeln unter ePrivacy und Verbraucherrecht. Cookie-Walls, Opt-ins und Dark-Pattern-Prüfungen variieren je Markt — wir verfolgen, was jede Behörde tatsächlich durchsetzt.",
         "cover": [
           "Gültigkeit von Cookie-Einwilligungsbannern",
@@ -866,9 +866,9 @@
         ]
       },
       {
-        "title": "Unternehmen & Meldungen",
+        "title": "Unternehmen & Struktur",
         "markets": "DE · AT · CH",
-        "desc": "Jahresabschlüsse, Transparenzregister, Meldungen wirtschaftlich Berechtigter, konzerninterne Verträge.",
+        "desc": "Wissen, wo Ihre Aufstellung Pflichten auslöst — Betriebsstätte, Meldungen, wirtschaftlich Berechtigte.",
         "intro": "Pflichten auf Unternehmensebene in der DACH-Region. Jahresabschlüsse, Transparenz über wirtschaftlich Berechtigte und konzerninterne Verträge haben jeweils eigene Fristen und Sanktionen.",
         "cover": [
           "Jahresabschlüsse",
@@ -885,22 +885,60 @@
         ]
       },
       {
-        "title": "Vollständige Compliance-Abdeckung",
-        "markets": "ALLE BEREICHE · ALLE MÄRKTE",
-        "desc": "Wenn ein Fall Bereiche überschreitet, leiten wir zu Partnern, die alles davon abschließen — nicht nur ihren Ausschnitt.",
-        "intro": "Manche Fälle passen in keine Schublade. Wenn eine Pflicht USt, EPR, Datenschutz und Meldungen zugleich berührt, koordinieren wir ein Partnerteam, das alles davon abschließt — mit einem zentralen Verantwortlichen.",
+        "title": "Produkt-Compliance",
+        "markets": "EU-WEIT · UK",
+        "desc": "Wissen, ob Ihr Produkt in Verkehr gebracht werden darf und welche Nachweise Sie vorhalten müssen.",
+        "intro": "Ob ein Produkt überhaupt in Verkehr gebracht werden darf und welcher Nachweis dahintersteht. Getrennt von der Verpackung: hier geht es um das Produkt selbst — Sicherheit, Konformität, Dokumentation, und wer innerhalb der EU dafür einsteht.",
         "cover": [
-          "Bereichsübergreifendes Fall-Routing",
-          "Ein zentraler Verantwortlicher",
-          "Koordinierte Partnerteams",
-          "Sequenzierte Bearbeitung der Pflichten",
-          "Gemeinsames Fristen-Tracking",
-          "Eine Vertragsbeziehung"
+          "Produktsicherheitsverordnung (EU) 2023/988",
+          "CE-Kennzeichnung und Konformitätserklärung",
+          "Technische Dokumentation und ihre Aufbewahrung",
+          "In der EU niedergelassene verantwortliche Person",
+          "Meldung von Vorfällen und Rückrufe",
+          "UKCA-Kennzeichnung für Großbritannien"
         ],
         "matters": [
-          "Eine einzige Änderung löst Pflichten in mehreren Bereichen aus",
-          "Sie erschließen einen neuen Markt komplett",
-          "Sie brauchen ein Team, nicht fünf Dienstleister"
+          "Sie bringen erstmals ein physisches Produkt auf den EU-Markt",
+          "Sie nehmen eine Produktkategorie mit eigenen Konformitätsregeln auf",
+          "Sie verkaufen in die EU, ohne dort niedergelassen zu sein"
+        ]
+      },
+      {
+        "title": "Logistik & Zoll",
+        "markets": "DE · UK · NL · FR · EU",
+        "desc": "Wissen, was Ihre Ware für den Grenzübertritt braucht und wer dabei haftet.",
+        "intro": "Was Ware für den Grenzübertritt braucht und wer haftet, sobald sie ihn macht. Zollidentität, Anmeldungen, Statistik und die Lieferbedingungen, die entscheiden, wer zahlt und wer einsteht.",
+        "cover": [
+          "EORI-Registrierung",
+          "Ein- und Ausfuhranmeldungen",
+          "Intrastat-Meldung ab Überschreiten der Schwelle",
+          "Incoterms und wo die Haftung liegt",
+          "Einfuhrumsatzsteuer und Aufschub",
+          "GB ↔ EU-Warenverkehr nach dem Brexit"
+        ],
+        "matters": [
+          "Sie versenden erstmals über eine Zollgrenze",
+          "Ihr Handelsvolumen überschreitet eine Intrastat-Schwelle",
+          "Sie ändern Incoterms oder Ihren Fulfilment-Partner"
+        ]
+      },
+      {
+        "title": "Rechtsberatung",
+        "markets": "EU-WEIT",
+        "desc": "Wissen, wann eine Frage wirklich eine Anwältin braucht — und jemanden erreichen, der Ihren Fall schon kennt.",
+        "intro": "Die Fragen, die eine qualifizierte Antwort brauchen statt einer Checkliste: Verträge, AGB, Verbraucherrechte, Streitfälle. CompliHub ist keine Kanzlei — Verified Partner beraten unter eigener Berufshaftung, und wir sorgen dafür, dass die Person, die Sie erreichen, Ihren Fall bereits kennt.",
+        "cover": [
+          "AGB und verbraucherrechtliche Informationspflichten",
+          "Lieferanten- und Plattformverträge",
+          "Widerruf, Rückgabe und Gewährleistung",
+          "Haftung und ihre Grenzen",
+          "Streitfälle über Grenzen hinweg",
+          "Welches Recht tatsächlich gilt"
+        ],
+        "matters": [
+          "Sie schließen erstmals einen Vertragstyp ab, den Sie nicht kennen",
+          "Ein Streitfall betrifft eine Kundin in einem anderen Land",
+          "Sie erhalten eine förmliche Beschwerde oder eine behördliche Anfrage"
         ]
       }
     ]
