@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, usePa
 import { useTranslation } from "react-i18next";
 import { supportedLngs } from "./i18n/config";
 import { SiteHeader } from "./components/layout/SiteHeader";
-import { LandingPage } from "./pages/LandingPage";
 import { HomePage } from "./pages/HomePage";
 import { ServicesPage } from "./pages/ServicesPage";
 import { CountriesPage } from "./pages/CountriesPage";
@@ -123,9 +122,8 @@ function AppContent() {
             <Routes location={location}>
                 <Route path="/:locale" element={<LocaleLayout />}>
                     {/* Public pages */}
-                    {/* Index = new User/Entrepreneur landing (HomePage). Old marketing landing kept at /home-old. */}
+                    {/* Index = User/Entrepreneur landing (HomePage). */}
                     <Route index element={<HomePage />} />
-                    <Route path="home-old" element={<LandingPage />} />
                     <Route path="services" element={<ServicesPage />} />
                     <Route path="countries" element={<CountriesPage />} />
                     <Route path="platform" element={<PlatformPage />} />
