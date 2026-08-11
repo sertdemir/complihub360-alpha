@@ -24,7 +24,6 @@ const NAV_COLUMNS: { key: string; links: { key: string; beta?: boolean }[] }[] =
       { key: 'dataPrivacy' },
       { key: 'marketingAdvertising' },
       { key: 'corporateStructure' },
-      { key: 'fullSupport' },
     ],
   },
   {

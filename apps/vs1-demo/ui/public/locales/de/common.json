@@ -312,7 +312,6 @@
     "anchorPrivacy": "Daten & Datenschutz",
     "anchorMarketing": "Marketing-Compliance",
     "anchorCorporate": "Unternehmensstruktur",
-    "anchorFullsupport": "Full Support",
     "riskLabel": "Risiko",
     "whoAffected": "Wer ist betroffen",
     "keyObligations": "Wesentliche Pflichten",
@@ -433,13 +432,6 @@
         "fine": "Steuer-Exposition + Entitäts-Risiko",
         "markets": "EU · UK · US · CH",
         "effort": "Hoch"
-      },
-      "fullsupport": {
-        "risk": "Gebündelt",
-        "time": "Nach Anfrage",
-        "fine": "Abdeckung über alle Bereiche",
-        "markets": "Alle unterstützten Märkte",
-        "effort": "Verwaltet"
       }
     },
     "howItWorks": {
@@ -632,41 +624,10 @@
         "o3": "Nein"
       }
     },
-    "fullsupport": {
-      "title": "Full Support",
-      "risk": "Gebündelt",
-      "headline": "Bereichsübergreifende Compliance – ein koordinierter Engagement-Prozess",
-      "description": "Wenn Pflichten mehrere Bereiche umfassen (Steuer + Datenschutz + EPR + Marketing), orchestriert Full Support alles unter einem strukturierten Engagement mit einem Senior-Partner.",
-      "affected": "Operatoren mit Multi-Domain-Exposition: regulierte Branchen, Cross-Border-SaaS, Marktplätze, Multi-Produkt-Marken oder Scaleups in 3+ Märkten.",
-      "personaFit": "Ideal für: Bereichsübergreifende Compliance",
-      "ob1": "Koordination mehrerer regulatorischer Streams parallel",
-      "ob2": "Lückenlose Audit-Trails über Bereiche hinweg",
-      "ob3": "Compliance-Roadmap mit Wachstumsplänen abgleichen",
-      "ob4": "SLA-gestützte Reaktion und Eskalation",
-      "cov1": "Full Support-Assistent – erfasst Unternehmensgröße, Märkte, Priorität, aktuelle Reife",
-      "cov2": "Routet zu Senior-Partnern mit bereichsübergreifender Kapazität und SLA-Zusagen",
-      "cov3": "Single-Point-of-Contact-Engagement statt mehreren isolierten Anfragen",
-      "regulations": {
-        "r1": "Abdeckung über alle gelisteten Bereichsverordnungen",
-        "r2": "Laufendes regulatorisches Monitoring",
-        "r3": "Koordiniertes Response-Framework"
-      },
-      "fines": {
-        "headline": "Aggregierte Exposition über alle Bereiche – Full Support reduziert blinde Flecken und übersehene Pflichten.",
-        "authorities": "Alle für Ihren Betrieb relevanten Behörden"
-      },
-      "teaser": {
-        "question": "Wie viele Compliance-Bereiche betreffen Sie?",
-        "o1": "2",
-        "o2": "3",
-        "o3": "4 oder mehr"
-      }
-    },
     "cta": {
       "title": "Nicht sicher, welcher Bereich zutrifft?",
       "body": "Unser Assistent stellt die richtigen Fragen und leitet Sie automatisch zum richtigen Assessment weiter.",
-      "btn": "Allgemeines Assessment starten",
-      "fullSupportBtn": "Oder mit Full Support sprechen"
+      "btn": "Allgemeines Assessment starten"
     },
     "footer": {
       "copyright": "© {{year}} CompliHub360. Gebaut in Berlin."

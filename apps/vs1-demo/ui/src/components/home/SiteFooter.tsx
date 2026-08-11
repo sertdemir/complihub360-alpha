@@ -28,7 +28,6 @@ const COLUMNS: Column[] = [
       { key: 'dataPrivacy', href: '#' },
       { key: 'marketingAdvertising', href: '#' },
       { key: 'corporateStructure', href: '#' },
-      { key: 'fullSupport', href: '#' },
     ],
   },
   {

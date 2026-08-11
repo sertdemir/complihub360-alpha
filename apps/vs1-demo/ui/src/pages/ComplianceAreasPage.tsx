@@ -8,7 +8,6 @@ import {
   ShieldCheck,
   Megaphone,
   Building2,
-  Layers,
   ArrowRight,
 } from 'lucide-react';
 import { Typography } from '../components/ui/Typography';
@@ -61,7 +60,6 @@ const ANCHORS: { id: string; defaultLabel: string; key: string }[] = [
   { id: 'privacy', defaultLabel: 'Data & Privacy', key: 'compliance.anchorPrivacy' },
   { id: 'marketing', defaultLabel: 'Marketing Compliance', key: 'compliance.anchorMarketing' },
   { id: 'corporate', defaultLabel: 'Corporate Structure', key: 'compliance.anchorCorporate' },
-  { id: 'fullsupport', defaultLabel: 'Full Support', key: 'compliance.anchorFullsupport' },
 ];
 
 function AnchorBar() {
@@ -222,27 +220,6 @@ export function ComplianceAreasPage() {
       riskBarBadge: 'bg-primary-50 text-primary-700',
       personaFitKey: 'Best for: International expansion teams',
     },
-    {
-      id: 'fullsupport',
-      icon: Layers,
-      risk: 'Bundled',
-      riskColor: 'bg-accent-100 text-accent-700 border-accent-200',
-      cardBorder: 'border-accent-200',
-      iconBg: 'bg-accent-100/60',
-      iconColor: 'text-accent-700',
-      wizardPath: '/wizard/full-support',
-      markets: [
-        { code: 'EU', label: '🇪🇺 EU' },
-        { code: 'UK', label: '🇬🇧 UK' },
-        { code: 'US', label: '🇺🇸 US' },
-        { code: 'CH', label: '🇨🇭 CH' },
-      ],
-      specialistsCount: 4,
-      riskBarPct: 60,
-      riskBarColor: 'bg-accent-500',
-      riskBarBadge: 'bg-accent-100 text-accent-700',
-      personaFitKey: 'Best for: Cross-domain compliance',
-    },
   ];
 
   useEffect(() => {
@@ -366,13 +343,6 @@ export function ComplianceAreasPage() {
             >
               {t('compliance.cta.btn', 'Start General Assessment')}
               <ArrowRight size={18} />
-            </button>
-            <button
-              onClick={() => navigate(`${localePrefix}/wizard/full-support`)}
-              className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl border-2 border-white/40 text-white font-bold text-base hover:bg-white/10 transition-colors"
-            >
-              {t('compliance.cta.fullSupportBtn', 'Or talk to Full Support')}
-              <ArrowRight size={16} />
             </button>
           </div>
         </div>
