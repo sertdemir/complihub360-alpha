@@ -62,9 +62,9 @@
       "title": "Welche Compliance-Bereiche sind relevant?",
       "subtitle": "Wählen Sie alles Zutreffende aus. Wir kartieren nur die Vorschriften, die für Ihren Rahmen relevant sind.",
       "domains": [
-        "USt & Steuern",
+        "Steuern & USt",
         "EPR & Verpackung",
-        "DSGVO & Datenschutz",
+        "Daten & Datenschutz",
         "Marketing-Compliance"
       ],
       "selectedCount": "2 ausgewählt · 2 offen",
@@ -1164,7 +1164,7 @@
       "solutions": {
         "title": "Lösungen",
         "links": {
-          "vatTax": "USt & Steuern",
+          "vatTax": "Steuern & USt",
           "productPackaging": "EPR & Verpackung",
           "dataPrivacy": "Datenschutz",
           "marketingAdvertising": "Marketing & Werbung",

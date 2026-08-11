@@ -62,9 +62,9 @@
       "title": "Hangi uyum alanları kapsamda?",
       "subtitle": "Uygun olanların tümünü seçin. Yalnızca kapsamınızla ilgili mevzuatı haritalarız.",
       "domains": [
-        "KDV ve Vergi",
+        "Vergi ve KDV",
         "EPR ve Ambalaj",
-        "GDPR ve Gizlilik",
+        "Veri ve Gizlilik",
         "Pazarlama Uyumu"
       ],
       "selectedCount": "2 seçildi · 2 kaldı",
@@ -1164,7 +1164,7 @@
       "solutions": {
         "title": "Çözümler",
         "links": {
-          "vatTax": "KDV ve Vergi",
+          "vatTax": "Vergi ve KDV",
           "productPackaging": "EPR ve Ambalaj",
           "dataPrivacy": "Veri Gizliliği",
           "marketingAdvertising": "Pazarlama ve Reklam",
