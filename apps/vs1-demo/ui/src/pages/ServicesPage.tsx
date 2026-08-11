@@ -11,7 +11,7 @@ const DOMAIN_DATA = [
     {
         id: ComplianceDomain.TAX,
         icon: "payments",
-        title: "VAT & Tax",
+        title: "Tax & VAT",
         short: "Umsatzsteuer & Steuern",
         desc: "Monitoring delivery thresholds and identifying registration obligations for cross-border commerce. Physical vs. digital goods regulations and revenue band checks.",
         features: ["Threshold Monitoring", "Digital Goods Nexus", "Revenue Band Analysis"],

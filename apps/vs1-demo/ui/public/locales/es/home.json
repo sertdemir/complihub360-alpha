@@ -62,9 +62,9 @@
       "title": "¿Qué áreas de compliance entran en el alcance?",
       "subtitle": "Seleccione todas las que apliquen. Solo mapearemos la normativa relevante para su alcance.",
       "domains": [
-        "IVA e impuestos",
+        "Impuestos e IVA",
         "EPR y envases",
-        "RGPD y privacidad",
+        "Datos y privacidad",
         "Compliance de marketing"
       ],
       "selectedCount": "2 seleccionadas · 2 pendientes",
@@ -1164,7 +1164,7 @@
       "solutions": {
         "title": "Soluciones",
         "links": {
-          "vatTax": "IVA e impuestos",
+          "vatTax": "Impuestos e IVA",
           "productPackaging": "EPR y envases",
           "dataPrivacy": "Privacidad de datos",
           "marketingAdvertising": "Marketing y publicidad",

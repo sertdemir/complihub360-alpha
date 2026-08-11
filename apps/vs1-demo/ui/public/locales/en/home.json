@@ -62,9 +62,9 @@
       "title": "Which compliance domains are in scope?",
       "subtitle": "Select all that apply. We'll map only the regulations relevant to your scope.",
       "domains": [
-        "VAT & Tax",
+        "Tax & VAT",
         "EPR & Packaging",
-        "GDPR & Privacy",
+        "Data & Privacy",
         "Marketing Compliance"
       ],
       "selectedCount": "2 selected · 2 left",
@@ -1164,7 +1164,7 @@
       "solutions": {
         "title": "Solutions",
         "links": {
-          "vatTax": "VAT & Tax",
+          "vatTax": "Tax & VAT",
           "productPackaging": "EPR & Packaging",
           "dataPrivacy": "Data Privacy",
           "marketingAdvertising": "Marketing & Advertising",

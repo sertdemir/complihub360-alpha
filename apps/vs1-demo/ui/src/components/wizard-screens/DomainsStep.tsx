@@ -50,7 +50,7 @@ export function DomainsStep({ className }: { className?: string }) {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
         <WizardOptionCard
           icon={<BarChart3 size={22} />}
-          title="VAT & Tax"
+          title="Tax & VAT"
           desc="Cross-border VAT, OSS/IOSS, thresholds"
           selected
         />
@@ -62,7 +62,7 @@ export function DomainsStep({ className }: { className?: string }) {
         />
         <WizardOptionCard
           icon={<Shield size={22} />}
-          title="GDPR & Privacy"
+          title="Data & Privacy"
           desc="DPIA, RoPA, processor agreements"
           selected
         />
@@ -73,7 +73,7 @@ export function DomainsStep({ className }: { className?: string }) {
         />
         <WizardOptionCard
           icon={<Building2 size={22} />}
-          title="Corporate & Filings"
+          title="Corporate & Structure"
           desc="Annual statements, beneficial owners"
         />
         <WizardOptionCard
