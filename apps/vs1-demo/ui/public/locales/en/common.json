@@ -1331,5 +1331,82 @@
       "lead": "Six minutes, four questions, no account required."
     },
     "seeAll": "See how each step works"
+  },
+  "markets": {
+    "meta": {
+      "index": "Markets · CompliHub360",
+      "country": "{{country}} · CompliHub360"
+    },
+    "index": {
+      "eyebrow": "Markets",
+      "title": {
+        "pre": "What applies, ",
+        "gold": "market",
+        "post": " by market."
+      },
+      "lead": "Every market we hold obligations for, with the statute behind each one. Not a summary of the law — the entries our engine matches against.",
+      "obligations_one": "{{count}} obligation",
+      "obligations_other": "{{count}} obligations",
+      "enforcement": "Enforcement {{value}}/10"
+    },
+    "country": {
+      "eyebrow": "Market",
+      "title": "Operating in {{country}}.",
+      "lead": "Enforcement intensity {{enforcement}} of 10, strictness {{strictness}} of 10 — the weighting our engine applies when it assesses this market.",
+      "weightsTitle": "Where the weight sits",
+      "weightsLead": "How heavily this market treats each domain, relative to the others.",
+      "obligationsTitle": "Obligations we hold a source for",
+      "obligationsLead": "Each entry names the statute it comes from. Where the duty rests on EU law, the official text is one click away.",
+      "sourceLabel": "Source",
+      "dueLabel": "Cadence",
+      "leadTime": "{{days}} days lead time",
+      "coverageNote": "This is what the engine holds for {{country}} today — {{count}} of the duties we track carry a source specific to this market. Others apply under EU-wide rules, and the assessment surfaces those against your own operation.",
+      "backToMarkets": "All markets",
+      "notFound": "We do not hold a market profile for this code yet."
+    },
+    "cta": {
+      "title": "See which of these apply to you.",
+      "lead": "The assessment narrows this list down to your operation — your markets, your model."
+    },
+    "countries": {
+      "DE": "Germany",
+      "ES": "Spain",
+      "FR": "France",
+      "IT": "Italy",
+      "NL": "Netherlands",
+      "TR": "Türkiye",
+      "UK": "United Kingdom",
+      "US": "United States"
+    },
+    "cadence": {
+      "Annual": "Annual",
+      "Monthly": "Monthly",
+      "One-off": "One-off",
+      "Ongoing": "Ongoing",
+      "Quarterly": "Quarterly"
+    },
+    "obligations": {
+      "corp-registration": "Commercial Register",
+      "data-hosting": "Data Localization",
+      "data-privacy": "Data Privacy Policy",
+      "legal-commercial-contracts": "Commercial Contract Review",
+      "legal-consumer-terms": "Consumer Terms & Cancellation Rights",
+      "log-customs-classification": "Customs Classification (HS Codes)",
+      "log-eori": "EORI Registration",
+      "log-intrastat": "Intrastat Declarations",
+      "mktg-consent": "Marketing Consent (Opt-in)",
+      "mktg-health-claims": "Health & Medical Claims",
+      "monitor-kyb": "Know Your Business (KYB)",
+      "prod-epr": "Extended Producer Responsibility (EPR)",
+      "prod-packaging-conformity": "Packaging Conformity (PPWR)",
+      "prod-packaging-empty-space": "Empty Space Ratio (PPWR)",
+      "prod-packaging-format-bans": "Banned Single-Use Formats (PPWR)",
+      "prod-packaging-recyclability": "Design for Recycling (PPWR)",
+      "prod-packaging-recycled-content": "Recycled Content in Plastic Packaging (PPWR)",
+      "prod-packaging-reuse-targets": "Reusable Transport Packaging (PPWR)",
+      "prod-safety": "Product Safety & Labeling",
+      "tax-corporate": "Corporate Income Tax",
+      "tax-vat-registration": "VAT Registration & Filing"
+    }
   }
 }

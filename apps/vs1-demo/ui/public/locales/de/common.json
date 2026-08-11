@@ -1331,5 +1331,82 @@
       "lead": "Sechs Minuten, vier Fragen, kein Konto nötig."
     },
     "seeAll": "Ansehen, wie jeder Schritt funktioniert"
+  },
+  "markets": {
+    "meta": {
+      "index": "Märkte · CompliHub360",
+      "country": "{{country}} · CompliHub360"
+    },
+    "index": {
+      "eyebrow": "Märkte",
+      "title": {
+        "pre": "Was gilt, ",
+        "gold": "Markt",
+        "post": " für Markt."
+      },
+      "lead": "Jeder Markt, für den wir Pflichten führen, mit der Rechtsgrundlage hinter jeder einzelnen. Keine Zusammenfassung des Rechts — die Einträge, gegen die unsere Engine prüft.",
+      "obligations_one": "{{count}} Pflicht",
+      "obligations_other": "{{count}} Pflichten",
+      "enforcement": "Vollzug {{value}}/10"
+    },
+    "country": {
+      "eyebrow": "Markt",
+      "title": "Tätig in {{country}}.",
+      "lead": "Vollzugsintensität {{enforcement}} von 10, Strenge {{strictness}} von 10 — die Gewichtung, mit der unsere Engine diesen Markt bewertet.",
+      "weightsTitle": "Wo das Gewicht liegt",
+      "weightsLead": "Wie stark dieser Markt die einzelnen Bereiche gewichtet, im Verhältnis zueinander.",
+      "obligationsTitle": "Pflichten, für die wir eine Quelle führen",
+      "obligationsLead": "Jeder Eintrag nennt die Norm, aus der er stammt. Beruht die Pflicht auf EU-Recht, ist der amtliche Text einen Klick entfernt.",
+      "sourceLabel": "Quelle",
+      "dueLabel": "Turnus",
+      "leadTime": "{{days}} Tage Vorlauf",
+      "coverageNote": "Das ist, was die Engine heute für {{country}} führt — {{count}} der von uns verfolgten Pflichten haben eine Quelle speziell für diesen Markt. Andere gelten EU-weit; die Einschätzung zeigt sie an Ihrer eigenen Tätigkeit.",
+      "backToMarkets": "Alle Märkte",
+      "notFound": "Für dieses Kürzel führen wir noch kein Marktprofil."
+    },
+    "cta": {
+      "title": "Sehen, welche davon für Sie gelten.",
+      "lead": "Die Einschätzung engt diese Liste auf Ihre Tätigkeit ein — Ihre Märkte, Ihr Modell."
+    },
+    "countries": {
+      "DE": "Deutschland",
+      "ES": "Spanien",
+      "FR": "Frankreich",
+      "IT": "Italien",
+      "NL": "Niederlande",
+      "TR": "Türkei",
+      "UK": "Großbritannien",
+      "US": "USA"
+    },
+    "cadence": {
+      "Annual": "Jährlich",
+      "Monthly": "Monatlich",
+      "One-off": "Einmalig",
+      "Ongoing": "Laufend",
+      "Quarterly": "Vierteljährlich"
+    },
+    "obligations": {
+      "corp-registration": "Handelsregister",
+      "data-hosting": "Datenlokalisierung",
+      "data-privacy": "Datenschutzerklärung",
+      "legal-commercial-contracts": "Prüfung von Handelsverträgen",
+      "legal-consumer-terms": "Verbraucher-AGB & Widerrufsrecht",
+      "log-customs-classification": "Zolltarifierung (HS-Codes)",
+      "log-eori": "EORI-Registrierung",
+      "log-intrastat": "Intrastat-Meldungen",
+      "mktg-consent": "Marketing-Einwilligung (Opt-in)",
+      "mktg-health-claims": "Gesundheitsbezogene Angaben",
+      "monitor-kyb": "Know Your Business (KYB)",
+      "prod-epr": "Erweiterte Herstellerverantwortung (EPR)",
+      "prod-packaging-conformity": "Verpackungskonformität (PPWR)",
+      "prod-packaging-empty-space": "Leerraumquote (PPWR)",
+      "prod-packaging-format-bans": "Verbotene Einwegformate (PPWR)",
+      "prod-packaging-recyclability": "Recyclingfähiges Design (PPWR)",
+      "prod-packaging-recycled-content": "Rezyklatanteil in Kunststoffverpackungen (PPWR)",
+      "prod-packaging-reuse-targets": "Wiederverwendbare Transportverpackung (PPWR)",
+      "prod-safety": "Produktsicherheit & Kennzeichnung",
+      "tax-corporate": "Körperschaftsteuer",
+      "tax-vat-registration": "USt-Registrierung & -Meldung"
+    }
   }
 }
