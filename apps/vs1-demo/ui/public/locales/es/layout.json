@@ -1,0 +1,50 @@
+{
+  "nav": {
+    "services": "Servicios",
+    "countries": "Países",
+    "advisory": "Advisory"
+  },
+  "auth": {
+    "login": "Iniciar sesión",
+    "signup": "Regístrate gratis"
+  },
+  "footer": {
+    "tagline": "Su brújula inteligente de compliance. Navegue la complejidad regulatoria global con precisión impulsada por IA y una arquitectura que prioriza la privacidad.",
+    "columns": {
+      "platform": "Plataforma",
+      "company": "Empresa",
+      "legal": "Legal",
+      "support": "Soporte"
+    },
+    "links": {
+      "services": "Servicios",
+      "countries": "Países",
+      "advisory": "Advisory",
+      "wizard": "Asistente de compliance",
+      "about": "Sobre CompliHub360",
+      "howItWorks": "Cómo funciona",
+      "pricing": "Precios",
+      "blog": "Blog",
+      "privacy": "Política de privacidad",
+      "terms": "Condiciones del servicio",
+      "cookies": "Política de cookies",
+      "gdpr": "Cumplimiento del RGPD",
+      "help": "Centro de ayuda",
+      "contact": "Contacto",
+      "status": "Estado del servicio",
+      "api": "API para desarrolladores"
+    },
+    "newsletter": {
+      "eyebrow": "Compliance Digest",
+      "title": "Adelántese a los cambios regulatorios.",
+      "body": "Resumen semanal de las novedades críticas de compliance en la UE, el Reino Unido y los mercados globales.",
+      "placeholder": "su@email.com",
+      "cta": "Suscribirse",
+      "success": "Su suscripción está confirmada — ¡gracias!"
+    },
+    "bottom": {
+      "copyright": "© {{year}} CompliHub360. Todos los derechos reservados.",
+      "privacyNote": "Arquitectura que prioriza la privacidad · Ningún dato personal almacenado sin consentimiento"
+    }
+  }
+}

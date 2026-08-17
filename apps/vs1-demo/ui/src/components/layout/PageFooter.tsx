@@ -1,35 +1,57 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
-const FOOTER_LINKS = {
-    Platform: [
-        { label: "Services", path: "/services" },
-        { label: "Countries", path: "/countries" },
-        { label: "Advisory", path: "/advisory" },
-        { label: "Compliance Wizard", path: "/wizard" },
-    ],
-    Company: [
-        { label: "About CompliHub360", path: "#" },
-        { label: "How it works", path: "#" },
-        { label: "Pricing", path: "#" },
-        { label: "Blog", path: "#" },
-    ],
-    Legal: [
-        { label: "Privacy Policy", path: "#" },
-        { label: "Terms of Service", path: "#" },
-        { label: "Cookie Policy", path: "#" },
-        { label: "GDPR Compliance", path: "#" },
-    ],
-    Support: [
-        { label: "Help Center", path: "#" },
-        { label: "Contact Us", path: "#" },
-        { label: "Status", path: "#" },
-        { label: "Developer API", path: "#" },
-    ],
-};
+// Copy lives in the shared 'layout' namespace (PageHeader + PageFooter). The
+// table carries only what is not language-dependent: the column key, the link
+// key and the route segment. `segment: null` marks a link with no page behind
+// it yet — those stay inert "#" anchors, as before.
+type FooterLink = { key: string; segment: string | null };
+
+const FOOTER_COLUMNS: { key: string; links: FooterLink[] }[] = [
+    {
+        key: "platform",
+        links: [
+            { key: "services", segment: "services" },
+            { key: "countries", segment: "countries" },
+            { key: "advisory", segment: "advisory" },
+            { key: "wizard", segment: "wizard" },
+        ],
+    },
+    {
+        key: "company",
+        links: [
+            { key: "about", segment: null },
+            { key: "howItWorks", segment: null },
+            { key: "pricing", segment: null },
+            { key: "blog", segment: null },
+        ],
+    },
+    {
+        key: "legal",
+        links: [
+            { key: "privacy", segment: null },
+            { key: "terms", segment: null },
+            { key: "cookies", segment: null },
+            { key: "gdpr", segment: null },
+        ],
+    },
+    {
+        key: "support",
+        links: [
+            { key: "help", segment: null },
+            { key: "contact", segment: null },
+            { key: "status", segment: null },
+            { key: "api", segment: null },
+        ],
+    },
+];
 
 export function PageFooter() {
     const navigate = useNavigate();
+    const { t } = useTranslation("layout");
+    // Routes live under /:locale — see the note in PageHeader.
+    const { locale = "en" } = useParams();
     const [email, setEmail] = useState("");
     const [subscribed, setSubscribed] = useState(false);
 
@@ -52,7 +74,7 @@ export function PageFooter() {
                     <div className="lg:col-span-2">
                         <div
                             className="flex items-center gap-2.5 cursor-pointer mb-4"
-                            onClick={() => navigate("/")}
+                            onClick={() => navigate(`/${locale}`)}
                         >
                             <span className="material-symbols-outlined text-[20px] text-[#137fec]">verified_user</span>
                             <span className="text-slate-100 text-base font-bold tracking-tight">
@@ -60,7 +82,7 @@ export function PageFooter() {
                             </span>
                         </div>
                         <p className="text-slate-400 text-sm leading-relaxed max-w-xs">
-                            Your intelligent compliance compass. Navigate global regulatory complexity with AI-driven precision and privacy-first architecture.
+                            {t("footer.tagline")}
                         </p>
                         <div className="flex gap-3 mt-6">
                             {["language", "corporate_fare", "rss_feed"].map(icon => (
@@ -76,28 +98,31 @@ export function PageFooter() {
                     </div>
 
                     {/* Link Columns */}
-                    {Object.entries(FOOTER_LINKS).map(([category, links]) => (
-                        <div key={category}>
+                    {FOOTER_COLUMNS.map(column => (
+                        <div key={column.key}>
                             <h4 className="text-slate-100 text-sm font-semibold mb-4 tracking-wide uppercase">
-                                {category}
+                                {t(`footer.columns.${column.key}`)}
                             </h4>
                             <ul className="space-y-2.5">
-                                {links.map(link => (
-                                    <li key={link.label}>
-                                        <a
-                                            href={link.path}
-                                            onClick={e => {
-                                                if (link.path.startsWith("/")) {
-                                                    e.preventDefault();
-                                                    navigate(link.path);
-                                                }
-                                            }}
-                                            className="text-slate-400 hover:text-slate-100 text-sm transition-colors"
-                                        >
-                                            {link.label}
-                                        </a>
-                                    </li>
-                                ))}
+                                {column.links.map(link => {
+                                    const path = link.segment ? `/${locale}/${link.segment}` : "#";
+                                    return (
+                                        <li key={link.key}>
+                                            <a
+                                                href={path}
+                                                onClick={e => {
+                                                    if (link.segment) {
+                                                        e.preventDefault();
+                                                        navigate(path);
+                                                    }
+                                                }}
+                                                className="text-slate-400 hover:text-slate-100 text-sm transition-colors"
+                                            >
+                                                {t(`footer.links.${link.key}`)}
+                                            </a>
+                                        </li>
+                                    );
+                                })}
                             </ul>
                         </div>
                     ))}
@@ -108,25 +133,25 @@ export function PageFooter() {
                     <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                             <span className="material-symbols-outlined text-[18px] text-[#137fec]">mail</span>
-                            <span className="text-[#137fec] text-xs font-semibold uppercase tracking-wider">Compliance Digest</span>
+                            <span className="text-[#137fec] text-xs font-semibold uppercase tracking-wider">{t("footer.newsletter.eyebrow")}</span>
                         </div>
                         <h3 className="text-slate-100 text-lg font-bold mb-1">
-                            Stay ahead of regulatory change.
+                            {t("footer.newsletter.title")}
                         </h3>
                         <p className="text-slate-400 text-sm">
-                            Weekly digest of critical compliance updates across EU, UK, and global markets.
+                            {t("footer.newsletter.body")}
                         </p>
                     </div>
                     {subscribed ? (
                         <div className="flex items-center gap-2 text-emerald-400 font-medium shrink-0">
                             <span className="material-symbols-outlined text-[20px]">check_circle</span>
-                            You're subscribed — thank you!
+                            {t("footer.newsletter.success")}
                         </div>
                     ) : (
                         <form onSubmit={handleSubscribe} className="flex gap-3 w-full md:w-auto shrink-0">
                             <input
                                 type="email"
-                                placeholder="your@email.com"
+                                placeholder={t("footer.newsletter.placeholder")}
                                 value={email}
                                 onChange={e => setEmail(e.target.value)}
                                 required
@@ -136,7 +161,7 @@ export function PageFooter() {
                                 type="submit"
                                 className="h-10 px-5 bg-[#137fec] hover:bg-[#137fec]/80 text-white text-sm font-semibold rounded-lg transition-colors shrink-0"
                             >
-                                Subscribe
+                                {t("footer.newsletter.cta")}
                             </button>
                         </form>
                     )}
@@ -145,11 +170,11 @@ export function PageFooter() {
                 {/* Bottom Bar */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-slate-800">
                     <p className="text-slate-500 text-sm">
-                        © {new Date().getFullYear()} CompliHub360. All rights reserved.
+                        {t("footer.bottom.copyright", { year: new Date().getFullYear() })}
                     </p>
                     <div className="flex items-center gap-1 text-slate-500 text-xs">
                         <span className="material-symbols-outlined text-[14px] text-[#137fec]">verified_user</span>
-                        Privacy-first architecture · No PII stored without consent
+                        {t("footer.bottom.privacyNote")}
                     </div>
                 </div>
             </div>

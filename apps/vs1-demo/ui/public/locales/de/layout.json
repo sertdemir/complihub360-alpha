@@ -1,0 +1,50 @@
+{
+  "nav": {
+    "services": "Leistungen",
+    "countries": "Länder",
+    "advisory": "Advisory"
+  },
+  "auth": {
+    "login": "Login",
+    "signup": "Kostenlos starten"
+  },
+  "footer": {
+    "tagline": "Ihr intelligenter Compliance-Kompass. Navigieren Sie globale regulatorische Komplexität mit KI-gestützter Präzision und einer Architektur, die Datenschutz an erste Stelle setzt.",
+    "columns": {
+      "platform": "Plattform",
+      "company": "Unternehmen",
+      "legal": "Rechtliches",
+      "support": "Support"
+    },
+    "links": {
+      "services": "Leistungen",
+      "countries": "Länder",
+      "advisory": "Advisory",
+      "wizard": "Compliance-Assistent",
+      "about": "Über CompliHub360",
+      "howItWorks": "So funktioniert es",
+      "pricing": "Preise",
+      "blog": "Blog",
+      "privacy": "Datenschutzerklärung",
+      "terms": "AGB",
+      "cookies": "Cookie-Richtlinie",
+      "gdpr": "DSGVO-Compliance",
+      "help": "Hilfe-Center",
+      "contact": "Kontakt",
+      "status": "Status",
+      "api": "Entwickler-API"
+    },
+    "newsletter": {
+      "eyebrow": "Compliance-Digest",
+      "title": "Bleiben Sie regulatorischen Änderungen voraus.",
+      "body": "Wöchentlicher Überblick über kritische Compliance-Neuerungen in der EU, im Vereinigten Königreich und weltweit.",
+      "placeholder": "ihre@email.de",
+      "cta": "Abonnieren",
+      "success": "Sie sind angemeldet — vielen Dank!"
+    },
+    "bottom": {
+      "copyright": "© {{year}} CompliHub360. Alle Rechte vorbehalten.",
+      "privacyNote": "Datenschutz-zuerst-Architektur · Keine personenbezogenen Daten ohne Einwilligung"
+    }
+  }
+}
