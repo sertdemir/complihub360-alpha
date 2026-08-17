@@ -2,7 +2,6 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { GoldWord } from '../providers/SectionHeading';
 import { RiskBadge } from '../ui/RiskBadge';
 import { Avatar } from '../ui/Avatar';
 import { PartnerStatusBadge } from '../ui/ProviderBadges';
@@ -94,8 +93,11 @@ function VerifiedPartnerDemo() {
 
 export function BrandCodePreview() {
   const { t } = useTranslation('home');
+  // bg-brand-surface, not bg-brand: in dark mode bg-brand flips to a bright teal
+  // for accent fills, and nothing readable sits on it — white drops to 2.96:1
+  // and the gold eyebrow to 1.37:1. This panel keeps the deep petrol instead.
   return (
-    <section id="brand-code" className="relative overflow-hidden bg-brand py-20 lg:py-28">
+    <section id="brand-code" className="relative overflow-hidden bg-brand-surface py-20 lg:py-28">
       {/* Soft petrol-light glow (Figma "Petrol inner light") */}
       <div
         className="pointer-events-none absolute left-1/2 top-0 h-[700px] w-[1100px] -translate-x-1/2 rounded-full opacity-60 blur-3xl"
@@ -111,12 +113,16 @@ export function BrandCodePreview() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
         >
-          <span className="inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-accent-400">
+          <span className="inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-fg-on-brand-accent">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-current" />
             {t('brandCode.eyebrow')}
           </span>
           <h2 className="mt-4 font-serif text-[2rem] font-semibold leading-tight tracking-tight text-white sm:text-[2.75rem]">
-            <GoldWord>{t('brandCode.title.gold')}</GoldWord>{t('brandCode.title.post')}
+            {/* Not <GoldWord>: that token steps down to gold-700 on light
+                surfaces, which reads at 2.54:1 on this petrol panel. The panel
+                is dark in both themes, so the gold stays put. */}
+            <span className="whitespace-nowrap text-fg-on-brand-accent">{t('brandCode.title.gold')}</span>
+            {t('brandCode.title.post')}
           </h2>
           <p className="mt-5 text-body leading-relaxed text-white/75">
             {t('brandCode.subtitle')}

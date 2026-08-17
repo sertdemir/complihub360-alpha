@@ -71,6 +71,13 @@
     --color-bg-inverse: var(--petrol-900);
     --color-bg-brand: var(--petrol-500);
     --color-bg-brand-light: var(--petrol-50);
+    /* Large brand panels that carry copy, as opposed to the small accent fills
+       (dots, bars, rings, active states) that --color-bg-brand serves. The two
+       have opposite requirements on a dark page: an accent must stay bright to
+       be seen against slate, a text panel must stay dark enough to be read on.
+       One token cannot do both, which is why this one exists — and why it is
+       deliberately the same value in both themes. */
+    --color-bg-brand-surface: var(--petrol-500);
     --color-bg-accent: var(--gold-500);
     --color-bg-accent-light: var(--gold-50);
 
@@ -88,6 +95,14 @@
        white, 3.69:1 on bg-secondary, 3.21:1 on the warm canvas. AA-LARGE ONLY —
        never use this at body size, use --color-text-brand there. */
     --color-text-accent-emphasis: var(--gold-700);
+    /* Gold emphasis on the always-dark brand panel. Fixed in both themes on
+       purpose: --color-text-accent-emphasis steps down to gold-700 for light
+       surfaces, which on this deep petrol drops to 2.54:1.
+       gold-300 rather than gold-500 because the panel carries a radial petrol
+       glow that lifts its core to #04604e — gold-500 measures 4.68:1 on the
+       base but only 3.58:1 under the glow, which fails the 12 pt eyebrow.
+       gold-300 holds 6.01:1 / 4.61:1, so it clears in both spots. */
+    --color-text-on-brand-accent: var(--gold-300);
     --color-text-on-brand: #ffffff;
     --color-text-on-accent: var(--petrol-900);   /* dark petrol on gold — never white */
 
@@ -235,6 +250,11 @@
     --drawer-glass-bg: rgba(31, 41, 55, 0.50);  /* slate #1f2937 @ 50% — floating glass drawer */
     --color-bg-brand: #14a89a;
     --color-bg-brand-light: rgba(20, 168, 154, 0.16);
+    /* Restated, not flipped: on #14a89a white is 2.96:1 and every gold in the
+       scale is below 1.9:1 — nothing readable sits on it. The panel therefore
+       keeps the deep petrol in dark mode, where white stays at 9.83:1 and the
+       gold eyebrow at 4.57:1. */
+    --color-bg-brand-surface: var(--petrol-500);
     --color-text-primary: #f5f6f8;
     --color-text-secondary: #9aa7ad;
     --color-text-tertiary: #6b7a80;
