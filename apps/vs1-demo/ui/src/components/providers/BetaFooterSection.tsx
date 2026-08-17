@@ -5,26 +5,28 @@ import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { Logo } from '../ui/Logo';
 import { SectionEyebrow, GoldWord, Reveal, Stagger, StaggerItem } from './SectionHeading';
+import { DOMAINS } from '../../lib/domains';
 
 // ─── S9 — Newsletter + Footer (Provider) · Figma 1784:1713 ────────────────────
 // Light "Partner Brief" newsletter band + the full light footer (nav columns,
 // markets, legal disclaimer, bottom bar). Not a law firm — orchestration only.
 // Copy lives in the 'providersLp' namespace (footer.*).
 
-const NAV_COLUMNS: { key: string; links: { key: string; beta?: boolean }[] }[] = [
+type NavLink = { key: string; beta?: boolean; fallback?: string };
+
+// Solutions = the canonical eight domains, membership and order straight from
+// lib/domains so the column cannot drift out of sync again. Labels stay in the
+// 'providersLp' namespace; the canonical English name is the fallback.
+const SOLUTION_LINKS: NavLink[] = DOMAINS.map((d) => ({ key: d.i18nKey, fallback: d.label }));
+
+const NAV_COLUMNS: { key: string; links: NavLink[] }[] = [
   {
     key: 'platform',
     links: [{ key: 'howItWorks' }, { key: 'startAssessment' }, { key: 'exampleResult' }, { key: 'forProviders' }],
   },
   {
     key: 'solutions',
-    links: [
-      { key: 'vatTax' },
-      { key: 'productPackaging' },
-      { key: 'dataPrivacy' },
-      { key: 'marketingAdvertising' },
-      { key: 'corporateStructure' },
-    ],
+    links: SOLUTION_LINKS,
   },
   {
     key: 'resources',
@@ -46,6 +48,9 @@ const LEGAL_KEYS = ['privacy', 'terms', 'impressum', 'cookies', 'subProcessors']
 
 export function BetaFooterSection() {
   const { t } = useTranslation('providersLp');
+  // Links carrying a canonical fallback (the domain columns) resolve to the
+  // English domain name if their translation is ever missing, not the raw key.
+  const linkLabel = (key: string, fallback?: string) => (fallback ? t(key, fallback) : t(key));
 
   return (
     <footer id="footer">
@@ -95,7 +100,7 @@ export function BetaFooterSection() {
                   {col.links.map((l) => (
                     <li key={l.key}>
                       <a href="#" className="inline-flex items-center gap-2 text-[14px] text-neutral-700 hover:text-primary-600">
-                        {t(`footer.nav.${col.key}.${l.key}`)}
+                        {linkLabel(`footer.nav.${col.key}.${l.key}`, l.fallback)}
                         {l.beta && (
                           <span className="rounded bg-accent-50 px-1.5 py-0.5 text-[9px] font-bold uppercase text-accent-700">
                             {t('footer.betaBadge')}
