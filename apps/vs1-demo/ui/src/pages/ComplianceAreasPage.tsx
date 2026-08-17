@@ -381,7 +381,7 @@ export function ComplianceAreasPage() {
       <footer className="bg-neutral-900 py-10 text-center">
         <Typography
           variant="caption"
-          className="text-neutral-500 block normal-case tracking-normal"
+          className="text-neutral-400 block normal-case tracking-normal"
         >
           {t('compliance.footer.copyright', '© {{year}} CompliHub360. Built in Berlin.', {
             year: new Date().getFullYear(),

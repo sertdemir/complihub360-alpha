@@ -230,7 +230,7 @@ function PageFooter() {
   const { t } = useTranslation('common');
   return (
     <footer className="bg-neutral-900 py-10 text-center border-t border-neutral-800">
-      <Typography variant="caption" className="text-neutral-500 block normal-case tracking-normal">
+      <Typography variant="caption" className="text-neutral-400 block normal-case tracking-normal">
         {t('platform.footer.copyright', '© {{year}} CompliHub360. Trust Center.', { year: new Date().getFullYear() })}
       </Typography>
     </footer>

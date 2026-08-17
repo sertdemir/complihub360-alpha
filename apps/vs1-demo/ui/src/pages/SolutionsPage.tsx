@@ -176,7 +176,7 @@ function OpsDashboardPreview() {
               <Typography variant="ui-small" weight="bold" className="text-white block">
                 {panel.title}
               </Typography>
-              <Typography variant="caption" className="text-neutral-500 block normal-case tracking-normal">
+              <Typography variant="caption" className="text-neutral-400 block normal-case tracking-normal">
                 {panel.desc}
               </Typography>
             </div>
@@ -237,7 +237,7 @@ function PrivacyGateDiagram() {
             <Typography variant="ui-small" weight="bold" className="text-white block mb-1">
               {s.label}
             </Typography>
-            <Typography variant="caption" className="text-neutral-500 block normal-case tracking-normal">
+            <Typography variant="caption" className="text-neutral-400 block normal-case tracking-normal">
               {s.desc}
             </Typography>
             {i < stages.length - 1 && (
@@ -254,9 +254,9 @@ function PrivacyGateDiagram() {
         transition={{ duration: 0.5, delay: 0.5 }}
         className="mt-6 bg-neutral-800 border border-neutral-700 rounded-xl p-4 font-mono text-xs"
       >
-        <div className="text-neutral-500 mb-2">{t('solutions.counsel.codeCommentBefore', '// Before redaction')}</div>
+        <div className="text-neutral-400 mb-2">{t('solutions.counsel.codeCommentBefore', '// Before redaction')}</div>
         <div className="text-neutral-300">Contract signed by <span className="bg-error-500/30 text-error-300 px-1 rounded">John Mueller</span> at <span className="bg-error-500/30 text-error-300 px-1 rounded">john@acme.de</span></div>
-        <div className="text-neutral-500 mt-3 mb-2">{t('solutions.counsel.codeCommentAfter', '// After redaction')}</div>
+        <div className="text-neutral-400 mt-3 mb-2">{t('solutions.counsel.codeCommentAfter', '// After redaction')}</div>
         <div className="text-neutral-300">Contract signed by <span className="bg-success-bg text-success-400 px-1 rounded">[NAME]</span> at <span className="bg-success-bg text-success-400 px-1 rounded">[EMAIL]</span></div>
       </motion.div>
     </div>
@@ -594,7 +594,7 @@ function SolutionsFooter() {
 
   return (
     <footer className="bg-neutral-900 py-10 text-center">
-      <Typography variant="caption" className="text-neutral-500 block normal-case tracking-normal">
+      <Typography variant="caption" className="text-neutral-400 block normal-case tracking-normal">
         {t('solutions.footer.copyright', '© {{year}} CompliHub360. Built in Berlin.', { year: new Date().getFullYear() })}
       </Typography>
     </footer>

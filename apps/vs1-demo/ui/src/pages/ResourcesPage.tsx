@@ -179,7 +179,7 @@ function StoryCard({ story, index }: { story: typeof STORIES[0]; index: number }
 
       {/* Body */}
       <div className="p-6">
-        <Typography variant="caption" className="text-neutral-400 font-semibold uppercase tracking-wider mb-2 block">
+        <Typography variant="caption" className="text-neutral-500 font-semibold uppercase tracking-wider mb-2 block">
           {t('resources.stories.challengeLabel', 'Challenge')}
         </Typography>
         <Typography variant="body" className="text-neutral-600 mb-5 leading-relaxed">
@@ -230,7 +230,7 @@ function GuideCard({ guide, index }: { guide: typeof GUIDES[0]; index: number })
       <div className="flex items-start justify-between gap-4 mb-4">
         <div className="flex items-center gap-2">
           <span className={`text-xs font-bold px-2.5 py-1 rounded-md ${guide.categoryColor}`}>{guide.category}</span>
-          <span className="text-xs bg-neutral-50 border border-neutral-200 px-2 py-0.5 rounded text-neutral-400 font-medium">{guide.type}</span>
+          <span className="text-xs bg-neutral-50 border border-neutral-200 px-2 py-0.5 rounded text-neutral-500 font-medium">{guide.type}</span>
         </div>
         <ArrowUpRight size={16} className="text-neutral-300 group-hover:text-primary-500 transition-colors shrink-0" />
       </div>
@@ -242,7 +242,7 @@ function GuideCard({ guide, index }: { guide: typeof GUIDES[0]; index: number })
         {guide.desc}
       </Typography>
 
-      <div className="flex items-center gap-4 text-xs text-neutral-400">
+      <div className="flex items-center gap-4 text-xs text-neutral-500">
         <span className="flex items-center gap-1"><Clock size={12} />{guide.readTime}</span>
         <span className="flex items-center gap-1"><Calendar size={12} />{guide.date}</span>
       </div>
@@ -374,7 +374,7 @@ export function ResourcesPage() {
       </section>
 
       <footer className="bg-neutral-900 py-10 text-center">
-        <Typography variant="caption" className="text-neutral-500 block normal-case tracking-normal">
+        <Typography variant="caption" className="text-neutral-400 block normal-case tracking-normal">
           {t('resources.footer.copyright', '© {{year}} CompliHub360. Built in Berlin.', { year: new Date().getFullYear() })}
         </Typography>
       </footer>

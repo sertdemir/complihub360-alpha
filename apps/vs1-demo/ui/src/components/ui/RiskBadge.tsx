@@ -116,7 +116,7 @@ export function RiskDot({ level = 'medium', size = 10, className, ...rest }: Ris
       className={cn(
         'inline-block shrink-0 rounded-full',
         LEVEL_DOT[level],
-        level === 'critical' && 'shadow-[0_0_0_3px_var(--color-risk-low-bg)]',
+        level === 'critical' && 'shadow-[0_0_0_3px_rgb(var(--color-risk-low-bg))]',
         className,
       )}
       style={{ height: size, width: size }}

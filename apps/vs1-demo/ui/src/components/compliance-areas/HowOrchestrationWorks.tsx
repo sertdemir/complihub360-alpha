@@ -34,7 +34,7 @@ export function HowOrchestrationWorks() {
   const { t } = useTranslation('common');
 
   return (
-    <div className="bg-surface-muted/40 border border-primary-100 rounded-2xl p-7 desktop-s:p-10 mt-8">
+    <div className="bg-surface-tertiary/40 border border-primary-100 rounded-2xl p-7 desktop-s:p-10 mt-8">
       <div className="max-w-2xl mb-8">
         <Typography
           variant="caption"

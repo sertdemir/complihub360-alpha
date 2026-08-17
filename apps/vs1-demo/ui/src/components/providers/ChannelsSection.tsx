@@ -61,7 +61,7 @@ export function ChannelsSection() {
 
             {/* Pricing */}
             <div className="mt-4 rounded-lg bg-neutral-50 p-4">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-neutral-400">{t('channels.pricingLabel')}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">{t('channels.pricingLabel')}</p>
               <p className="mt-1">
                 <span className="text-[34px] font-bold text-neutral-900">$2</span>
                 <span className="ml-2 text-[14px] text-neutral-500">{t('channels.affiliate.priceUnit')}</span>
@@ -74,7 +74,7 @@ export function ChannelsSection() {
 
             <div className="mt-auto pt-7">
               <Button fullWidth>{t('channels.affiliate.cta')} <ArrowRight size={16} className="ml-1.5" /></Button>
-              <p className="mt-3 text-center text-[12px] text-neutral-400">{t('channels.affiliate.footnote')}</p>
+              <p className="mt-3 text-center text-[12px] text-neutral-500">{t('channels.affiliate.footnote')}</p>
             </div>
           </StaggerItem>
 
@@ -91,7 +91,7 @@ export function ChannelsSection() {
 
             {/* Pricing */}
             <div className="mt-4 rounded-lg bg-neutral-50 p-4">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-neutral-400">{t('channels.pricingLabel')}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">{t('channels.pricingLabel')}</p>
               <p className="mt-1">
                 <span className="text-[34px] font-bold text-neutral-900">$100</span>
                 <span className="ml-2 text-[14px] text-neutral-500">{t('channels.engagement.priceUnit')}</span>
@@ -109,7 +109,7 @@ export function ChannelsSection() {
               <Button fullWidth>
                 {t('channels.engagement.cta')} <ArrowRight size={16} className="ml-1.5" />
               </Button>
-              <p className="mt-3 text-center text-[12px] text-neutral-400">{t('channels.engagement.footnote')}</p>
+              <p className="mt-3 text-center text-[12px] text-neutral-500">{t('channels.engagement.footnote')}</p>
             </div>
           </StaggerItem>
         </Stagger>

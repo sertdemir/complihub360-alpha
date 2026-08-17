@@ -30,7 +30,7 @@ export function CountrySelector({ value, onChange }: CountrySelectorProps) {
     <div ref={containerRef} className="relative inline-flex flex-col items-stretch">
       <Typography
         variant="caption"
-        className="text-neutral-400 font-semibold uppercase tracking-wider mb-2"
+        className="text-neutral-500 font-semibold uppercase tracking-wider mb-2"
       >
         {t('compliance.country.label', 'Your primary market')}
       </Typography>
