@@ -2,6 +2,16 @@ import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { SearchLaw } from '../api/search';
+// Imported statically on purpose. Pulling the page in with await import()
+// inside the test body charged the whole cold module graph (page + jspdf +
+// lucide + router) to the first test's 5s budget, which CI — running this
+// project alongside the chromium storybook suite on a 2-core runner — blew
+// through. Worse than the timeout was the fallout: vitest aborts the test,
+// RTL's afterEach cleanup runs on a still-empty body, and the pending import
+// then resolves and mounts a tree nobody owns, so the *next* test found two
+// "On the radar" headers. vi.mock is hoisted above imports, so the mocks
+// below still apply; the transform cost now lands in the untimed collect phase.
+import { ResultsRiskMap } from './ResultsRiskMap';
 
 // ─── Risk map · "Now" / "On the radar" grouping ──────────────────────────────
 // The PPWR 2030 tranche put five obligations on the map that are law today but
@@ -41,8 +51,7 @@ const inDays = (n: number) => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 };
 
-const renderPage = async () => {
-  const { ResultsRiskMap } = await import('./ResultsRiskMap');
+const renderPage = () => {
   render(<MemoryRouter><ResultsRiskMap /></MemoryRouter>);
 };
 
@@ -61,7 +70,7 @@ describe('ResultsRiskMap grouping', () => {
         law({ id: 'ppwr-now', title: 'Packaging Conformity', applies_from: inDays(2) }),
       ],
     });
-    await renderPage();
+    renderPage();
 
     expect(await screen.findByText('Packaging Conformity')).toBeInTheDocument();
     expect(screen.getByText('Now')).toBeInTheDocument();
@@ -89,7 +98,7 @@ describe('ResultsRiskMap grouping', () => {
         law({ id: 'c', title: 'Far duty two', applies_from: inDays(1300) }),
       ],
     });
-    await renderPage();
+    renderPage();
     await screen.findByText('Near duty');
 
     // Group counts render next to the labels.
@@ -109,7 +118,7 @@ describe('ResultsRiskMap grouping', () => {
       providers: [],
       laws: [law({ id: 'vat', title: 'VAT return', due_days: 30 })],
     });
-    await renderPage();
+    renderPage();
     await screen.findByText('VAT return');
 
     // Single group → the table looks exactly as it did before the split.
