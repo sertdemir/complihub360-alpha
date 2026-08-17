@@ -88,6 +88,7 @@ export default {
                     inverse: 'var(--color-text-inverse)',
                     brand: 'var(--color-text-brand)',
                     accent: 'var(--color-text-accent)',
+                    'accent-emphasis': 'var(--color-text-accent-emphasis)',
                     'on-brand': 'var(--color-text-on-brand)',
                     'on-accent': 'var(--color-text-on-accent)',
                 },
