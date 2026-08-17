@@ -69,6 +69,8 @@ export default {
                 brand: {
                     DEFAULT: 'var(--color-bg-brand)',
                     light: 'var(--color-bg-brand-light)',
+                    /* Full-bleed brand panels that carry copy — see index.css. */
+                    surface: 'var(--color-bg-brand-surface)',
                 },
                 'brand-accent': {
                     DEFAULT: 'var(--color-bg-accent)',
@@ -90,6 +92,7 @@ export default {
                     accent: 'var(--color-text-accent)',
                     'accent-emphasis': 'var(--color-text-accent-emphasis)',
                     'on-brand': 'var(--color-text-on-brand)',
+                    'on-brand-accent': 'var(--color-text-on-brand-accent)',
                     'on-accent': 'var(--color-text-on-accent)',
                 },
                 stroke: {
