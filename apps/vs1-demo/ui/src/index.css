@@ -82,6 +82,12 @@
     --color-text-inverse: #ffffff;
     --color-text-brand: var(--petrol-500);
     --color-text-accent: var(--gold-500);
+    /* Typographic gold emphasis (the one highlighted word in a serif headline).
+       gold-500 is 2.10:1 on white and gold-600 2.56:1 — both fail even the 3:1
+       AA-large threshold, so light surfaces step down to gold-700: 3.88:1 on
+       white, 3.69:1 on bg-secondary, 3.21:1 on the warm canvas. AA-LARGE ONLY —
+       never use this at body size, use --color-text-brand there. */
+    --color-text-accent-emphasis: var(--gold-700);
     --color-text-on-brand: #ffffff;
     --color-text-on-accent: var(--petrol-900);   /* dark petrol on gold — never white */
 
@@ -234,6 +240,9 @@
     --color-text-tertiary: #6b7a80;
     --color-text-inverse: #0f172a;
     --color-text-brand: #2cc0ad;
+    /* On slate the step-down is unnecessary and wrong: gold-500 is 6.98:1 on
+       #1f2937 and 8.49:1 on #0f172a, so dark surfaces keep the full gold. */
+    --color-text-accent-emphasis: var(--gold-500);
     --color-border-default: #374151;
     --color-border-subtle: #2a3340;
     --color-border-focus: #14a89a;
