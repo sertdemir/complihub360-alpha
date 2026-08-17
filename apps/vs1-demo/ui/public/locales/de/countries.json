@@ -1,0 +1,87 @@
+{
+  "hero": {
+    "badge": "Globales Compliance-Netzwerk",
+    "titlePre": "Ihre Expansion,",
+    "titleAccent": "lokal abgesichert.",
+    "lead": "Rechtliche Anforderungen sind streng an einzelne Jurisdiktionen gebunden. Wir übersetzen länderspezifische Komplexität in strukturierte Klarheit und ermöglichen so sicheres internationales Wachstum.",
+    "cta": "Länder-Risikoanalyse starten"
+  },
+  "regions": {
+    "title": "Abgedeckte Märkte & Regionen",
+    "lead": "Jede Suche und jede Analyse ist fest in den konkreten Gesetzen des Zielmarkts verankert — damit es keine rechtlichen Blindflüge gibt.",
+    "legend": {
+      "live": "Live",
+      "rollout": "Aktiver Rollout"
+    },
+    "focusAreas": "Schwerpunkte",
+    "tiers": {
+      "full": "Vollständige Abdeckung",
+      "expanding": "Im Aufbau",
+      "core": "Grundabdeckung"
+    },
+    "complexity": {
+      "high": "Hohe Komplexität",
+      "medium": "Mittlere Komplexität"
+    },
+    "items": {
+      "eu": {
+        "name": "Europäische Union (EU)",
+        "description": "Spezialisierte Expertise für den stark regulierten Binnenmarkt — von DSGVO-Standards bis zu lokalen EPR-Vorschriften.",
+        "focus": ["DSGVO-Compliance", "EPR-Verpackungsrecht", "EU-weite USt", "Digital Services Act"]
+      },
+      "uk": {
+        "name": "Vereinigtes Königreich (UK)",
+        "description": "Gezielte Navigation durch die Post-Brexit-Compliance-Landschaft und die britischen Datenschutzregeln.",
+        "focus": ["UK-DSGVO", "HMRC-USt-Compliance", "Produktsicherheit (UKCA)", "Arbeitsrecht"]
+      },
+      "us": {
+        "name": "USA & Kanada",
+        "description": "Skalieren Sie Ihr Geschäft nach Nordamerika — mit gebündelter Unterstützung für Anforderungen auf Bundes- und Bundesstaatsebene.",
+        "focus": ["Nexus & Sales Tax", "CCPA/CPRA-Datenschutz", "FDA/Kennzeichnung", "Außenhandels-Compliance"]
+      },
+      "au": {
+        "name": "Australien (APAC)",
+        "description": "Einstieg in die APAC-Region mit Grundabdeckung für australisches Verbraucher- und Steuerrecht.",
+        "focus": ["GST-Compliance", "Privacy Act 1988", "Produkthaftung", "Import/Export"]
+      }
+    }
+  },
+  "features": {
+    "countryGate": {
+      "title": "Länder-Gate",
+      "description": "Unser adaptiver Assistent wirkt als Filter: Jede weitere Anforderung ist damit exakt auf Ihre Ziel-Jurisdiktion zugeschnitten."
+    },
+    "jurisdictionMatching": {
+      "title": "Jurisdiktions-Matching",
+      "description": "Wir vermitteln ausschließlich Fachleute, die zur Beratung im Recht Ihres gewählten Ziellandes zugelassen und geprüft sind."
+    },
+    "dataSecurity": {
+      "title": "Lokalisierte Datensicherheit",
+      "description": "Die Länder-Policy-Matrix sorgt dafür, dass Regeln zu Datenstandort und Aufbewahrung nach regionalem Recht angewendet werden — inklusive strikter DSGVO-Anonymisierung."
+    }
+  },
+  "risk": {
+    "titlePre": "Grenzüberschreitende Risiken",
+    "titlePost": "im Blick behalten",
+    "lead": "Grenzüberschreitende Geschäfte bringen rechtliche Anforderungen mit sich, die generische Lösungen häufig übersehen. Wir strukturieren diese Risiken zu konkreten Schritten.",
+    "items": {
+      "thresholds": {
+        "title": "Lieferschwellen",
+        "desc": "Automatische Erkennung verpflichtender lokaler USt-Registrierungen anhand länderspezifischer Umsatzschwellen."
+      },
+      "epr": {
+        "title": "Lokale EPR-Vorgaben",
+        "desc": "Umgang mit den unterschiedlichen Umwelt- und Verpackungsgesetzen der einzelnen Länder (z. B. Frankreich vs. Deutschland)."
+      },
+      "dataTransfer": {
+        "title": "Grenzüberschreitender Datentransfer",
+        "desc": "Rechtliche Einordnung von Datenflüssen aus der EU in die USA beim Einsatz globaler SaaS-Infrastrukturen."
+      }
+    },
+    "panel": {
+      "title": "Expansions-Risikoanalyse starten",
+      "desc": "Erstellen Sie in wenigen Minuten Ihr jurisdiktionsspezifisches Risikoprofil.",
+      "cta": "Risikobericht erzeugen"
+    }
+  }
+}
