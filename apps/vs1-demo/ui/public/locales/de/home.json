@@ -1164,11 +1164,14 @@
       "solutions": {
         "title": "Lösungen",
         "links": {
-          "vatTax": "Steuern & USt",
+          "taxVat": "Steuern & USt",
           "productPackaging": "EPR & Verpackung",
-          "dataPrivacy": "Datenschutz",
-          "marketingAdvertising": "Marketing & Werbung",
-          "corporateStructure": "Unternehmensstruktur"
+          "dataPrivacy": "Daten & Datenschutz",
+          "marketingSeo": "Marketing-Compliance",
+          "corporateStructure": "Unternehmen & Struktur",
+          "productCompliance": "Produkt-Compliance",
+          "logisticsCustoms": "Logistik & Zoll",
+          "legalAdvisory": "Rechtsberatung"
         }
       },
       "resources": {

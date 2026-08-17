@@ -1164,11 +1164,14 @@
       "solutions": {
         "title": "Çözümler",
         "links": {
-          "vatTax": "Vergi ve KDV",
+          "taxVat": "Vergi ve KDV",
           "productPackaging": "EPR ve Ambalaj",
-          "dataPrivacy": "Veri Gizliliği",
-          "marketingAdvertising": "Pazarlama ve Reklam",
-          "corporateStructure": "Kurumsal Yapı"
+          "dataPrivacy": "Veri ve Gizlilik",
+          "marketingSeo": "Pazarlama Uyumu",
+          "corporateStructure": "Şirket ve Yapı",
+          "productCompliance": "Ürün Uygunluğu",
+          "logisticsCustoms": "Lojistik ve Gümrük",
+          "legalAdvisory": "Hukuki Danışmanlık"
         }
       },
       "resources": {

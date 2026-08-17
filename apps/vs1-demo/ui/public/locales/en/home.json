@@ -1164,11 +1164,14 @@
       "solutions": {
         "title": "Solutions",
         "links": {
-          "vatTax": "Tax & VAT",
+          "taxVat": "Tax & VAT",
           "productPackaging": "EPR & Packaging",
-          "dataPrivacy": "Data Privacy",
-          "marketingAdvertising": "Marketing & Advertising",
-          "corporateStructure": "Corporate Structure"
+          "dataPrivacy": "Data & Privacy",
+          "marketingSeo": "Marketing Compliance",
+          "corporateStructure": "Corporate & Structure",
+          "productCompliance": "Product Compliance",
+          "logisticsCustoms": "Logistics & Customs",
+          "legalAdvisory": "Legal Advisory"
         }
       },
       "resources": {

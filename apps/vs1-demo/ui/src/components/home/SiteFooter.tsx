@@ -2,14 +2,25 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Logo } from '../ui/Logo';
 import { supportedLngs } from '../../i18n/config';
+import { DOMAINS } from '../../lib/domains';
 
 // ─── S10 — Site footer · Figma 1212:11 ──────────────────────────────────────
 // Light four-column footer closing the landing page: brand + positioning, the
 // link columns (with BETA tags), the markets-covered line, the not-a-law-firm
 // disclaimer, and the legal bottom bar. Copy lives in footer.* ('home' ns).
 
-type Link = { key: string; href: string; beta?: boolean };
+type Link = { key: string; href: string; beta?: boolean; fallback?: string };
 type Column = { key: string; links: Link[] };
+
+// Solutions = the canonical eight domains, membership and order straight from
+// lib/domains so the column cannot drift out of sync again. Labels stay in the
+// 'home' namespace (loading 'userws' here would pull 360 dashboard keys into
+// every marketing page); the canonical English name is the fallback.
+const SOLUTION_LINKS: Link[] = DOMAINS.map((d) => ({
+  key: d.i18nKey,
+  href: '#',
+  fallback: d.label,
+}));
 
 const COLUMNS: Column[] = [
   {
@@ -22,13 +33,7 @@ const COLUMNS: Column[] = [
   },
   {
     key: 'solutions',
-    links: [
-      { key: 'vatTax', href: '#' },
-      { key: 'productPackaging', href: '#' },
-      { key: 'dataPrivacy', href: '#' },
-      { key: 'marketingAdvertising', href: '#' },
-      { key: 'corporateStructure', href: '#' },
-    ],
+    links: SOLUTION_LINKS,
   },
   {
     key: 'resources',
@@ -61,6 +66,9 @@ const LEGAL: Link[] = [
 
 export function SiteFooter() {
   const { t, i18n } = useTranslation('home');
+  // Links carrying a canonical fallback (the domain columns) resolve to the
+  // English domain name if their translation is ever missing, not the raw key.
+  const linkLabel = (key: string, fallback?: string) => (fallback ? t(key, fallback) : t(key));
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -119,7 +127,7 @@ export function SiteFooter() {
                         href={l.href}
                         className="inline-flex items-center gap-2 text-[14px] text-fg-secondary transition-colors hover:text-fg"
                       >
-                        {t(`footer.columns.${col.key}.links.${l.key}`)}
+                        {linkLabel(`footer.columns.${col.key}.links.${l.key}`, l.fallback)}
                         {l.beta && (
                           <span className="rounded-full bg-accent-50 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.06em] text-accent-700 ring-1 ring-inset ring-accent-200">
                             {t('footer.beta')}
