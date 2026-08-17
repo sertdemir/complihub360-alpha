@@ -12,7 +12,7 @@ export function CountriesPage() {
             id: "eu",
             name: "European Union (EU)",
             flag: "🇪🇺",
-            description: "Full support for the highly regulated single market. Specialized expertise in GDPR standards and local EPR laws.",
+            description: "Specialized expertise for the highly regulated single market, from GDPR standards to local EPR laws.",
             focus: ["GDPR Compliance", "EPR Packaging Laws", "EU-wide VAT", "Digital Services Act"],
             status: "Full Coverage",
             riskLevel: "High Complexity"
