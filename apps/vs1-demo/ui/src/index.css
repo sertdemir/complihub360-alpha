@@ -255,6 +255,11 @@
        keeps the deep petrol in dark mode, where white stays at 9.83:1 and the
        gold eyebrow at 4.57:1. */
     --color-bg-brand-surface: var(--petrol-500);
+    /* bg-brand flips to the light teal #14a89a in dark, and every button uses
+       THAT token (bg-brand-surface is only the BrandCodePreview panel, which
+       hardcodes text-white). White inherited from :root sat at 2.96:1 on those
+       buttons; dark petrol reads 6.75:1. */
+    --color-text-on-brand: 0 11 9;      /* petrol-900 #000b09 */
     --color-text-primary: 245 246 248;
     --color-text-secondary: 154 167 173;
     /* Was #6b7a80 = 3.30:1 on #1f2937 — below AA for the 11-13 px labels this
