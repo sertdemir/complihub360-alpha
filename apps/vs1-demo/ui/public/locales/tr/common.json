@@ -661,48 +661,6 @@
       "copyright": "© {{year}} CompliHub360. Berlin'de yapıldı."
     }
   },
-  "advisory": {
-    "heroBadge": "GELİŞMİŞ BİLİŞSEL KATMAN",
-    "heroTitle": "Akıllı uyumluluk pusulasınız: Bilişsel",
-    "heroTitleHighlight": "Danışmanlık Katmanı",
-    "heroBody": "Yapılandırılmamış mevzuat belirsizliğini net, eyleme geçirilebilir anlayışa dönüştürme. İşletmeniz ile karmaşık hukuki dünya arasındaki boşluğu kapatıyoruz.",
-    "heroCta1": "Ücretsiz Uyumluluk Kontrolü",
-    "heroCta2": "Metodolojiye Bakın",
-    "featuresTitle": "Akıllı navigasyonumuz nasıl çalışır",
-    "featuresBody": "Geleneksel bir dizinin çok ötesine geçen Danışmanlık Katmanımız, küresel uyumluluk için bilişsel bir işletim sistemi olarak çalışır.",
-    "feature1Title": "Uyarlanabilir Uyumluluk Asistanı",
-    "feature1Desc": "Niyet Yapılandırma: Statik filtreler yerine asistanımız, spesifik iş bağlamınızı 4-5 dinamik adımda yakalar ve belirsizliği yapılandırılmış bir arama profiline dönüştürür.",
-    "feature1Tag1": "Niyet Tabanlı",
-    "feature1Tag2": "Dinamik Akış",
-    "feature2Title": "Gizlilik Öncelikli Düzeltme Hattı",
-    "feature2Desc": "Veri güvenliği mimariye yerleştirilmiştir. Tüm PII, herhangi bir YZ analizinden önce otomatik olarak ve yerel olarak anonimleştirilir; hiçbir gizli veri kontrolünüzden çıkmaz.",
-    "feature2Tag1": "Yerel Anonimleştirme",
-    "feature2Tag2": "PII Güvenli",
-    "feature3Title": "Temelli Zeka",
-    "feature3Desc": "Yapay zekamız, resmi, doğrulanmış hukuki kaynaklarda kesinlikle temellendiriliyor. Her öneri ve özet, dayandığı mevzuat belgelerine doğrudan bağlantılar içerir.",
-    "feature3Tag1": "Halüsinasyonsuz",
-    "feature3Tag2": "Kaynağa Bağlı",
-    "feature4Title": "Risk Tabanlı Karar Motoru",
-    "feature4Desc": "Profil girdilerinize dayalı sürekli risk hesaplaması. Bağlamınızı veritabanımızla bağlantılandırarak küratörlüğü yapılmış kontrol listeleri ve doğrulanmış sağlayıcı eşleşmeleri oluşturur.",
-    "feature4Tag1": "Gerçek Zamanlı Değerlendirme",
-    "feature4Tag2": "Küratörlüklü Eşleştirme",
-    "transparencyTitle": "Yapay zekamızın şeffaflığı ve sınırları",
-    "transparencyQuote": "«Yapay zekamız avukatınızın yerini almaz. Mükemmel önceden yapılandırılmış dijital dosyalar sağlayarak avukatınızı 10 kat daha verimli kılar.»",
-    "check1": "Yapılandırılmış oryantasyon ve dosya orkestrasyonuna odaklanma.",
-    "check2": "Resmi, doğrulanmış kaynaklardan temelli geri getirme.",
-    "cross1": "Bağlayıcı hukuki tavsiye yok — bu lisanslı hukuk firmalarına aittir.",
-    "matrixTitle": "Ülke Politika Matrisi",
-    "matrixBody": "Her veri süreci, yerel veri ikameti ve gizlilik standartlarına uygun katı bireysel bir politika matrisine tabidir.",
-    "pipelineRaw": "HAM VERİ",
-    "pipelineLabel": "DÜZELTME HATTI",
-    "pipelineDoc": "Kullanıcı Belgesi",
-    "pipelineAnon": "Anonimleştirilmiş Dosya",
-    "pipelineReady": "YZ HAZIR",
-    "pipelineNote": "Yapay zekanız hiçbir zaman düz metin PII görmez. Yalnızca yerel çıkarım.",
-    "ctaTitle": "Netlik için hazır mısınız?",
-    "ctaBody": "Statik dizinlerde aramayı bırakın. Bilişsel akıllı işletim sistemimizle uyumluluk yolculuğunuzda yol almaya başlayın.",
-    "ctaBtn": "Aramayı Şimdi Başlatın"
-  },
   "wizard": {
     "reviewPanel": {
       "primaryCountry": "Ana Ülke",
@@ -1034,6 +992,66 @@
       "prod-safety": "Ürün güvenliği ve etiketleme",
       "tax-corporate": "Kurumlar vergisi",
       "tax-vat-registration": "KDV kaydı ve beyanı"
+    },
+    "regions": {
+      "title": "Kapsanan Pazarlar ve Bölgeler",
+      "lead": "Her arama ve analiz, hedef ülkenin somut mevzuatına dayanır — hukuki körlemesine adımları önlemek için.",
+      "legend": {
+        "live": "Yayında",
+        "rollout": "Aktif Yaygınlaştırma"
+      },
+      "focusAreas": "Odak Alanları",
+      "tiers": {
+        "full": "Tam Kapsam",
+        "expanding": "Genişliyor",
+        "core": "Temel Kapsam"
+      },
+      "complexity": {
+        "high": "Yüksek Karmaşıklık",
+        "medium": "Orta Karmaşıklık"
+      },
+      "items": {
+        "eu": {
+          "name": "Avrupa Birliği (AB)",
+          "description": "Yoğun düzenlemeye tabi tek pazar için uzmanlaşmış bilgi birikimi — GDPR standartlarından yerel EPR mevzuatına kadar.",
+          "focus": [
+            "GDPR Uyumu",
+            "EPR Ambalaj Mevzuatı",
+            "AB Geneli KDV",
+            "Dijital Hizmetler Yasası"
+          ]
+        },
+        "uk": {
+          "name": "Birleşik Krallık (UK)",
+          "description": "Brexit sonrası uyumluluk ortamında ve Birleşik Krallık'a özgü veri koruma kurallarında hedefli yönlendirme.",
+          "focus": [
+            "UK GDPR",
+            "HMRC KDV Uyumu",
+            "Ürün Güvenliği (UKCA)",
+            "İş Hukuku"
+          ]
+        },
+        "us": {
+          "name": "ABD ve Kanada",
+          "description": "Federal ve eyalet düzeyindeki gerekliliklere yönelik derli toplu destekle işinizi Kuzey Amerika'ya ölçekleyin.",
+          "focus": [
+            "Nexus ve Satış Vergisi",
+            "CCPA/CPRA Gizliliği",
+            "FDA/Etiketleme",
+            "Dış Ticaret Uyumu"
+          ]
+        },
+        "au": {
+          "name": "Avustralya (APAC)",
+          "description": "Avustralya tüketici hukuku ve vergi mevzuatı için temel kapsamla APAC bölgesine açılan kapı.",
+          "focus": [
+            "GST Uyumu",
+            "Privacy Act 1988",
+            "Ürün Sorumluluğu",
+            "İthalat/İhracat"
+          ]
+        }
+      }
     }
   }
 }

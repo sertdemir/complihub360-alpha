@@ -661,48 +661,6 @@
       "copyright": "© {{year}} CompliHub360. Construido en Berlín."
     }
   },
-  "advisory": {
-    "heroBadge": "CAPA COGNITIVA AVANZADA",
-    "heroTitle": "Tu brújula inteligente de cumplimiento: La capa cognitiva",
-    "heroTitleHighlight": "Advisory Layer",
-    "heroBody": "Traduciendo la incertidumbre regulatoria no estructurada en comprensión clara y accionable. Cerramos la brecha entre tu negocio y el complejo mundo legal.",
-    "heroCta1": "Verificación de cumplimiento gratuita",
-    "heroCta2": "Explorar metodología",
-    "featuresTitle": "Cómo funciona nuestra navegación inteligente",
-    "featuresBody": "Yendo mucho más allá de un directorio tradicional, nuestra capa Advisory opera como un OS cognitivo para el cumplimiento global.",
-    "feature1Title": "Asistente de Cumplimiento Adaptativo",
-    "feature1Desc": "Estructuración de intención: En lugar de filtros estáticos, nuestro asistente captura tu contexto empresarial específico en 4-5 pasos dinámicos, traduciendo la incertidumbre en un perfil de búsqueda estructurado.",
-    "feature1Tag1": "Basado en intención",
-    "feature1Tag2": "Flujo dinámico",
-    "feature2Title": "Pipeline de redacción con privacidad primero",
-    "feature2Desc": "La seguridad de datos está integrada en la arquitectura. Toda la PII se anonimiza automática y localmente antes de cualquier análisis de IA, asegurando que ningún dato confidencial salga de tu control.",
-    "feature2Tag1": "Anonimización local",
-    "feature2Tag2": "Seguro para PII",
-    "feature3Title": "Inteligencia fundamentada",
-    "feature3Desc": "Nuestra IA está estrictamente fundamentada en fuentes legales oficiales y validadas. Cada recomendación y resumen incluye enlaces directos a la documentación regulatoria en la que se basa.",
-    "feature3Tag1": "Sin alucinaciones",
-    "feature3Tag2": "Vinculado a fuentes",
-    "feature4Title": "Motor de decisión basado en riesgos",
-    "feature4Desc": "Cálculo continuo de riesgos basado en los inputs de tu perfil. Conecta tu contexto con nuestra base de datos para generar listas de verificación curadas y emparejamientos de proveedores verificados.",
-    "feature4Tag1": "Evaluación en tiempo real",
-    "feature4Tag2": "Emparejamiento curado",
-    "transparencyTitle": "Transparencia y límites de nuestra IA",
-    "transparencyQuote": "«Nuestra IA no reemplaza a tu abogado. Hace a tu abogado 10 veces más eficiente al proporcionar dossiers digitales perfectamente preestructurados.»",
-    "check1": "Enfoque en orientación estructurada y orquestación de dossiers.",
-    "check2": "Recuperación fundamentada de fuentes oficiales y validadas.",
-    "cross1": "Sin asesoramiento legal vinculante — eso corresponde a los despachos de abogados con licencia.",
-    "matrixTitle": "Matriz de Políticas por País",
-    "matrixBody": "Cada proceso de datos sigue una estricta matriz de políticas individual adaptada a los estándares locales de residencia de datos y privacidad.",
-    "pipelineRaw": "DATOS EN BRUTO",
-    "pipelineLabel": "PIPELINE DE REDACCIÓN",
-    "pipelineDoc": "Documento del Usuario",
-    "pipelineAnon": "Dossier Anonimizado",
-    "pipelineReady": "LISTO PARA IA",
-    "pipelineNote": "Tu IA nunca ve PII en texto plano. Solo extracción local.",
-    "ctaTitle": "¿Listo para la claridad?",
-    "ctaBody": "Deja de buscar en directorios estáticos. Empieza a navegar tu camino de cumplimiento con nuestro sistema operativo cognitivo inteligente.",
-    "ctaBtn": "Iniciar búsqueda ahora"
-  },
   "wizard": {
     "reviewPanel": {
       "primaryCountry": "País Principal",
@@ -1034,6 +992,66 @@
       "prod-safety": "Seguridad y etiquetado del producto",
       "tax-corporate": "Impuesto de sociedades",
       "tax-vat-registration": "Registro y presentación del IVA"
+    },
+    "regions": {
+      "title": "Mercados y regiones cubiertos",
+      "lead": "Cada búsqueda y cada análisis se apoyan en las leyes concretas del país de destino, para evitar vuelos a ciegas en materia legal.",
+      "legend": {
+        "live": "En vivo",
+        "rollout": "Despliegue activo"
+      },
+      "focusAreas": "Áreas prioritarias",
+      "tiers": {
+        "full": "Cobertura completa",
+        "expanding": "En expansión",
+        "core": "Cobertura básica"
+      },
+      "complexity": {
+        "high": "Complejidad alta",
+        "medium": "Complejidad media"
+      },
+      "items": {
+        "eu": {
+          "name": "Unión Europea (UE)",
+          "description": "Experiencia especializada para el mercado único altamente regulado, desde los estándares del RGPD hasta las normas locales de EPR.",
+          "focus": [
+            "Cumplimiento del RGPD",
+            "Normativa EPR de envases",
+            "IVA en toda la UE",
+            "Ley de Servicios Digitales"
+          ]
+        },
+        "uk": {
+          "name": "Reino Unido (UK)",
+          "description": "Navegación específica por el panorama de cumplimiento posterior al Brexit y las normas británicas de protección de datos.",
+          "focus": [
+            "RGPD del Reino Unido",
+            "Cumplimiento de IVA (HMRC)",
+            "Seguridad del producto (UKCA)",
+            "Derecho laboral"
+          ]
+        },
+        "us": {
+          "name": "EE. UU. y Canadá",
+          "description": "Escale su negocio hacia Norteamérica con apoyo unificado para los requisitos federales y estatales.",
+          "focus": [
+            "Nexus e impuesto sobre ventas",
+            "Privacidad CCPA/CPRA",
+            "FDA/Etiquetado",
+            "Cumplimiento comercial"
+          ]
+        },
+        "au": {
+          "name": "Australia (APAC)",
+          "description": "Puerta de entrada a la región APAC con cobertura básica del derecho de consumo y la fiscalidad australianos.",
+          "focus": [
+            "Cumplimiento del GST",
+            "Privacy Act 1988",
+            "Responsabilidad de producto",
+            "Importación/Exportación"
+          ]
+        }
+      }
     }
   }
 }

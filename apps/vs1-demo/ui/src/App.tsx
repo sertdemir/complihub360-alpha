@@ -4,8 +4,6 @@ import { useTranslation } from "react-i18next";
 import { supportedLngs } from "./i18n/config";
 import { SiteHeader } from "./components/layout/SiteHeader";
 import { HomePage } from "./pages/HomePage";
-import { ServicesPage } from "./pages/ServicesPage";
-import { CountriesPage } from "./pages/CountriesPage";
 import { PlatformPage } from "./pages/PlatformPage";
 import { SolutionsPage } from "./pages/SolutionsPage";
 import { ComplianceAreasPage } from "./pages/ComplianceAreasPage";
@@ -16,7 +14,6 @@ import { PROVIDER_MARKETING_ENABLED } from "./lib/featureFlags";
 import { ResultsRiskMap } from "./pages/ResultsRiskMap";
 import { SearchResultPage } from "./pages/SearchResultPage";
 import { ResourcesPage } from "./pages/ResourcesPage";
-import AdvisoryPage from "./pages/AdvisoryPage";
 import { AiGovernancePage } from "./pages/AiGovernancePage";
 import { PrivacyPage, ImprintPage } from "./pages/legal/LegalPages";
 import { AdminOverviewPage } from "./pages/admin/AdminOverviewPage";
@@ -125,8 +122,7 @@ function AppContent() {
                     {/* Public pages */}
                     {/* Index = User/Entrepreneur landing (HomePage). */}
                     <Route index element={<HomePage />} />
-                    <Route path="services" element={<ServicesPage />} />
-                    <Route path="countries" element={<CountriesPage />} />
+                    <Route path="countries" element={<LocaleRedirect to="markets" />} />  {/* /countries wurde 2026-08-18 in /markets zusammengeführt; Redirect erhält die Bestands-URL */}
                     <Route path="platform" element={<PlatformPage />} />
                     <Route path="solutions" element={<SolutionsPage />} />
                     <Route path="compliance" element={<ComplianceAreasPage />} />
@@ -138,7 +134,6 @@ function AppContent() {
                         route redirects home while the flag is false. */}
                     <Route path="providers" element={PROVIDER_MARKETING_ENABLED ? <ProvidersPage /> : <LocaleRedirect to="" />} />
                     <Route path="resources" element={<ResourcesPage />} />
-                    <Route path="advisory" element={<AdvisoryPage />} />
                     <Route path="ai-governance" element={<AiGovernancePage />} />
                     <Route path="results" element={<ResultsRiskMap />} />
                     {/* Station 1A: prose-search answers page (no risk map, no gating). */}

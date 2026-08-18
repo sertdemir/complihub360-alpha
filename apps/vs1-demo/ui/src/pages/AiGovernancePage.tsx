@@ -14,6 +14,7 @@ import {
   Users
 } from 'lucide-react';
 import { Typography } from '../components/ui/Typography';
+import { SiteFooter } from '../components/home';
 
 function Section({ id, children, className = '' }: { id: string; children: React.ReactNode; className?: string }) {
   const ref = useRef<HTMLElement>(null);
@@ -226,17 +227,6 @@ function FeaturesOverview() {
 
 // ─── Footer ───────────────────────────────────────────────────────────────────
 
-function PageFooter() {
-  const { t } = useTranslation('common');
-  return (
-    <footer className="bg-neutral-900 py-10 text-center border-t border-neutral-800">
-      <Typography variant="caption" className="text-neutral-500 block normal-case tracking-normal">
-        {t('platform.footer.copyright', '© {{year}} CompliHub360. Trust Center.', { year: new Date().getFullYear() })}
-      </Typography>
-    </footer>
-  );
-}
-
 // ─── MAIN PAGE ────────────────────────────────────────────────────────────────
 
 export function AiGovernancePage() {
@@ -251,7 +241,7 @@ export function AiGovernancePage() {
       <GovernanceHero />
       <DimensionsSection />
       <FeaturesOverview />
-      <PageFooter />
+      <SiteFooter />
     </div>
   );
 }

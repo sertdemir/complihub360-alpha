@@ -661,48 +661,6 @@
       "copyright": "© {{year}} CompliHub360. Built in Berlin."
     }
   },
-  "advisory": {
-    "heroBadge": "ADVANCED COGNITIVE LAYER",
-    "heroTitle": "Your intelligent compliance compass: The cognitive",
-    "heroTitleHighlight": "Advisory Layer",
-    "heroBody": "Translating unstructured regulatory uncertainty into clear, actionable understanding. We bridge the gap between your business and the complex legal world.",
-    "heroCta1": "Free Compliance Check",
-    "heroCta2": "Explore Methodology",
-    "featuresTitle": "How our intelligent navigation works",
-    "featuresBody": "Going far beyond a traditional directory, our Advisory Layer operates as a cognitive OS for global compliance.",
-    "feature1Title": "Adaptive Compliance-Wizard",
-    "feature1Desc": "Intent Structuring: Instead of static filters, our wizard captures your specific business context in 4-5 dynamic steps, translating uncertainty into a structured search profile.",
-    "feature1Tag1": "Intent-Based",
-    "feature1Tag2": "Dynamic Flow",
-    "feature2Title": "Privacy-First Redaction Pipeline",
-    "feature2Desc": "Data security is built into the architecture. All PII is automatically and locally anonymized before any AI analysis, ensuring no confidential data ever leaves your control.",
-    "feature2Tag1": "Local Anonymization",
-    "feature2Tag2": "PII-Safe",
-    "feature3Title": "Grounded Intelligence",
-    "feature3Desc": "Our AI is strictly grounded in official, validated legal sources. Every recommendation and summary includes direct links to the regulatory documentation it's based on.",
-    "feature3Tag1": "Hallucination-Free",
-    "feature3Tag2": "Source-Linked",
-    "feature4Title": "Risk-Based Decision Engine",
-    "feature4Desc": "Continuous risk calculation based on your profile inputs. Connects your context with our database to generate curated checklists and verified provider matches.",
-    "feature4Tag1": "Real-time Assessment",
-    "feature4Tag2": "Curated Matching",
-    "transparencyTitle": "Transparency and limits of our AI",
-    "transparencyQuote": "\"Our AI does not replace your lawyer. It makes your lawyer 10x more efficient by providing perfectly pre-structured digital dossiers.\"",
-    "check1": "Focus on structured orientation & dossier orchestration.",
-    "check2": "Grounded retrieval from official, validated sources.",
-    "cross1": "No binding legal advice—that belongs to licensed law firms.",
-    "matrixTitle": "Country Policy Matrix",
-    "matrixBody": "Every data process follows a strict individual policy matrix matched to local data residency and privacy standards.",
-    "pipelineRaw": "RAW DATA",
-    "pipelineLabel": "REDACTION PIPELINE",
-    "pipelineDoc": "User Document",
-    "pipelineAnon": "Anonymized Dossier",
-    "pipelineReady": "AI READY",
-    "pipelineNote": "Your AI never sees plaintext PII. Local extraction only.",
-    "ctaTitle": "Ready for clarity?",
-    "ctaBody": "Stop searching through static directories. Start navigating your compliance journey with our cognitive intelligent operating system.",
-    "ctaBtn": "Start Search Now"
-  },
   "wizard": {
     "reviewPanel": {
       "primaryCountry": "Primary Country",
@@ -1034,6 +992,66 @@
       "prod-safety": "Product Safety & Labeling",
       "tax-corporate": "Corporate Income Tax",
       "tax-vat-registration": "VAT Registration & Filing"
+    },
+    "regions": {
+      "title": "Covered Markets & Regions",
+      "lead": "Every search and analysis is deeply rooted in the specific laws of the target country to avoid legal blind flights.",
+      "legend": {
+        "live": "Live",
+        "rollout": "Active Rollout"
+      },
+      "focusAreas": "Focus Areas",
+      "tiers": {
+        "full": "Full Coverage",
+        "expanding": "Expanding",
+        "core": "Core Support"
+      },
+      "complexity": {
+        "high": "High Complexity",
+        "medium": "Medium Complexity"
+      },
+      "items": {
+        "eu": {
+          "name": "European Union (EU)",
+          "description": "Specialized expertise for the highly regulated single market, from GDPR standards to local EPR laws.",
+          "focus": [
+            "GDPR Compliance",
+            "EPR Packaging Laws",
+            "EU-wide VAT",
+            "Digital Services Act"
+          ]
+        },
+        "uk": {
+          "name": "United Kingdom (UK)",
+          "description": "Dedicated navigation through post-Brexit compliance landscapes and UK-specific data protection rules.",
+          "focus": [
+            "UK GDPR",
+            "HMRC VAT Compliance",
+            "Product Safety (UKCA)",
+            "Employment Law"
+          ]
+        },
+        "us": {
+          "name": "USA & Canada",
+          "description": "Scale your business into North America with streamlined support for federal and state-level requirements.",
+          "focus": [
+            "Nexus & Sales Tax",
+            "CCPA/CPRA Privacy",
+            "FDA/Labeling",
+            "Trade Compliance"
+          ]
+        },
+        "au": {
+          "name": "Australia (APAC)",
+          "description": "Gateway to the APAC region with core support for Australian consumer law and tax regulations.",
+          "focus": [
+            "GST Compliance",
+            "Privacy Act 1988",
+            "Product Liability",
+            "Import/Export"
+          ]
+        }
+      }
     }
   }
 }
