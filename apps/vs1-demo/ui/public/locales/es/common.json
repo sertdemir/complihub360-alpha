@@ -1085,7 +1085,7 @@
         },
         {
           "title": "Su Risk Map",
-          "desc": "Las obligaciones que se aplican a su actividad, cada una con su base jurídica y su plazo. Una cuenta gratuita abre el mapa completo."
+          "desc": "Las obligaciones que se aplican a su actividad, cada una con su base jurídica y su plazo de cumplimiento. Una cuenta gratuita abre el mapa completo."
         },
         {
           "title": "La comparación",
@@ -1101,7 +1101,7 @@
     "ranking": {
       "kicker": "Lo que no se puede comprar",
       "title": "El orden.",
-      "body": "Los puestos no están nunca en venta. Un puesto pagado dejaría el match sin valor para ambas partes: usted conocería a quien más hubiera pagado, y el especialista conocería a alguien cuyo caso no podría atender. La idoneidad es el único criterio."
+      "body": "La posición en la lista nunca está a la venta. Un puesto pagado dejaría el match sin valor para ambas partes: usted conocería a quien más hubiera pagado, y el especialista conocería a alguien cuyo caso no podría atender. La idoneidad es el único criterio."
     },
     "specialist": {
       "kicker": "Lo que cuesta el especialista",
