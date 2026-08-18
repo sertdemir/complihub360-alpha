@@ -45,7 +45,7 @@ export function StructuredRequestCard({ request, frame = 'plain', showAccept, on
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2">
           {request.isNew && (
-            <span className="rounded bg-accent-500 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-900">New</span>
+            <span className="rounded bg-accent-500 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-fg-on-accent">New</span>
           )}
           <span className="text-[13px] font-semibold text-fg-brand">{request.matchPct}% match</span>
         </div>

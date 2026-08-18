@@ -131,7 +131,7 @@ export function BeyondAssessment() {
                 <Pill tone="beta">{t('beyond.pills.beta')}</Pill>
               </div>
               <div className="mt-6 flex items-center gap-3 rounded-2xl border border-stroke-subtle bg-surface p-3">
-                <span className="grid h-10 w-16 shrink-0 place-items-center rounded-lg bg-brand text-white">
+                <span className="grid h-10 w-16 shrink-0 place-items-center rounded-lg bg-brand text-fg-on-brand">
                   <Play size={16} fill="currentColor" />
                 </span>
                 <div className="min-w-0">

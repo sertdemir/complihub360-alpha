@@ -92,7 +92,7 @@ function MarketsContent({ value, onChange, onClose }: {
         <span
           className={
             'mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded-[5px] border transition-colors ' +
-            (on ? 'border-brand bg-brand text-white' : 'border-stroke bg-surface')
+            (on ? 'border-brand bg-brand text-fg-on-brand' : 'border-stroke bg-surface')
           }
         >
           {on && <Check size={12} strokeWidth={3} />}

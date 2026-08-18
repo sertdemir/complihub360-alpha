@@ -462,7 +462,7 @@ function HeroZone() {
 
           <button
             onClick={handleQualify}
-            className="w-full h-12 bg-accent-500 hover:bg-accent-600 text-neutral-900 font-bold text-body rounded-md transition-colors flex items-center justify-center gap-2 shadow-sm"
+            className="w-full h-12 bg-accent-500 hover:bg-accent-600 text-fg-on-accent font-bold text-body rounded-md transition-colors flex items-center justify-center gap-2 shadow-sm"
           >
             <ArrowRight size={18} />
             {t('landing.heroZone.ctaButton', 'Qualify in max. 5 Steps')}
@@ -681,7 +681,7 @@ function ServicesZone() {
             </div>
             <button
               onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/wizard?category=full-support`)}
-              className="h-11 bg-accent-500 hover:bg-accent-600 text-neutral-900 font-bold text-ui-small rounded-md transition-colors flex items-center justify-center gap-2"
+              className="h-11 bg-accent-500 hover:bg-accent-600 text-fg-on-accent font-bold text-ui-small rounded-md transition-colors flex items-center justify-center gap-2"
             >
               {t('landing.servicesZone.ctaButton', 'Explore Full Support')}
               <ArrowRight size={16} />
@@ -986,7 +986,7 @@ function ValueProgressionZone() {
               {highlighted ? (
                 <button
                   onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/register`)}
-                  className="w-full h-11 bg-accent-500 hover:bg-accent-600 text-neutral-900 font-bold text-ui-small rounded-md transition-colors"
+                  className="w-full h-11 bg-accent-500 hover:bg-accent-600 text-fg-on-accent font-bold text-ui-small rounded-md transition-colors"
                 >
                   {t(`landing.valueTiers.${index}.cta`, cta)}
                 </button>
@@ -1084,7 +1084,7 @@ function LandingFooter() {
                 />
                 <button
                   type="submit"
-                  className="h-10 px-4 bg-accent-500 hover:bg-accent-600 text-neutral-900 font-semibold text-ui-small rounded-md transition-colors shrink-0 flex items-center gap-1.5"
+                  className="h-10 px-4 bg-accent-500 hover:bg-accent-600 text-fg-on-accent font-semibold text-ui-small rounded-md transition-colors shrink-0 flex items-center gap-1.5"
                 >
                   <Mail size={14} />
                   {t('landing.footer.subscribeButton', 'Subscribe')}

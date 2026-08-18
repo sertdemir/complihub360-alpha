@@ -67,7 +67,7 @@ function WizardPreview({ className = '' }: { className?: string }) {
                 s.state === 'done'
                   ? 'bg-brand text-fg-on-brand'
                   : s.state === 'active'
-                  ? 'bg-accent-500 text-primary-900'
+                  ? 'bg-accent-500 text-fg-on-accent'
                   : 'border border-stroke text-fg-tertiary'
               }`}
             >

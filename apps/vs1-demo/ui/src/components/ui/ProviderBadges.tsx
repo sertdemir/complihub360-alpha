@@ -29,7 +29,7 @@ const PARTNER: Record<PartnerStatus, { cls: string; icon: React.ReactNode; label
 // Solid variant — filled pill (verified = solid gold, white type), as on the
 // marketing match cards.
 const PARTNER_SOLID: Record<PartnerStatus, string> = {
-  verified: 'bg-accent-500 text-white',
+  verified: 'bg-accent-500 text-fg-on-accent',
   pending: 'bg-neutral-500 text-white',
   suspended: 'bg-error-600 text-white',
 };

@@ -89,7 +89,7 @@ export function ProviderSchedulePage() {
             <button
               type="button"
               onClick={() => navigate(`/${locale}/dashboard/termine`)}
-              className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-5 py-3 text-[14px] font-semibold text-white"
+              className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-5 py-3 text-[14px] font-semibold text-fg-on-brand"
             >
               {t('schedule.toAppointments')} <ArrowRight size={15} />
             </button>
@@ -152,7 +152,7 @@ export function ProviderSchedulePage() {
               type="button"
               disabled={!selected || state === 'sending'}
               onClick={book}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand px-4 py-3 text-[14px] font-semibold text-white disabled:opacity-50"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand px-4 py-3 text-[14px] font-semibold text-fg-on-brand disabled:opacity-50"
             >
               {t('schedule.confirmCta')}
             </button>

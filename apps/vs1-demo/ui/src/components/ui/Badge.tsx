@@ -33,7 +33,7 @@ const TONE: Record<BadgeTone, { solid: string; soft: string; outline: string; do
     dot: 'bg-primary-500 dark:bg-primary-300',
   },
   accent: {
-    solid: 'bg-accent-500 text-[#0f172a]',
+    solid: 'bg-accent-500 text-fg-on-accent',
     soft: 'bg-accent-50 text-accent-700 dark:bg-accent-500/20 dark:text-accent-200',
     outline: 'border border-accent-500 text-accent-700 dark:border-accent-400 dark:text-accent-200',
     dot: 'bg-accent-500',

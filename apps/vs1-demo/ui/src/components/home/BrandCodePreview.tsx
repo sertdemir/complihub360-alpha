@@ -67,7 +67,7 @@ function WizardPathDemo() {
     <div>
       <div className="flex items-center gap-1.5">
         <span className="h-1.5 w-7 rounded-full bg-brand" />
-        <span className="rounded-full bg-accent-500 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.06em] text-primary-900">
+        <span className="rounded-full bg-accent-500 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.06em] text-fg-on-accent">
           {t('brandCode.demo.step')}
         </span>
         <span className="h-1.5 w-7 rounded-full bg-neutral-200" />
@@ -115,10 +115,10 @@ export function BrandCodePreview() {
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-current" />
             {t('brandCode.eyebrow')}
           </span>
-          <h2 className="mt-4 font-serif text-[2rem] font-semibold leading-tight tracking-tight text-white sm:text-[2.75rem]">
+          <h2 className="mt-4 font-serif text-[2rem] font-semibold leading-tight tracking-tight text-fg-on-brand sm:text-[2.75rem]">
             <GoldWord>{t('brandCode.title.gold')}</GoldWord>{t('brandCode.title.post')}
           </h2>
-          <p className="mt-5 text-body leading-relaxed text-white/75">
+          <p className="mt-5 text-body leading-relaxed text-fg-on-brand/75">
             {t('brandCode.subtitle')}
           </p>
         </motion.div>

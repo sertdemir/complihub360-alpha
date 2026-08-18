@@ -162,7 +162,7 @@ export function MatchmakingDifference() {
                     (s.tone === 'brand'
                       ? 'bg-brand text-fg-on-brand'
                       : s.tone === 'gold'
-                      ? 'bg-accent-500 text-white'
+                      ? 'bg-accent-500 text-fg-on-accent'
                       : 'bg-neutral-200/80 text-fg-secondary')
                   }
                 >
