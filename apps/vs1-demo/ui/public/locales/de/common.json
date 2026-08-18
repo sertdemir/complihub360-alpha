@@ -662,6 +662,7 @@
     }
   },
   "advisory": {
+    "heroImageAlt": "Kognitive Advisory-Schicht",
     "heroBadge": "FORTGESCHRITTENE KOGNITIVE SCHICHT",
     "heroTitle": "Ihr intelligenter Compliance-Kompass: Die kognitive",
     "heroTitleHighlight": "Advisory-Schicht",

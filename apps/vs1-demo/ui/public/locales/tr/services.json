@@ -1,0 +1,92 @@
+{
+  "hero": {
+    "imageAlt": "Uyum orkestrasyonu",
+    "badge": "Uyum Orkestrasyon Katmanı",
+    "titlePre": "Mevzuat belirsizliğinden",
+    "titleAccent": "yapılandırılmış kararlara.",
+    "lead": "CompliHub360, belirsiz yasal gereklilikleri uygulanabilir ve uzman desteğiyle sağlamlaştırılmış büyüme stratejilerine dönüştürür.",
+    "ctaPrimary": "Risk analizini başlat",
+    "ctaSecondary": "Nasıl çalışır"
+  },
+  "domains": {
+    "title": "Temel Uyum Alanları",
+    "lead": "Uluslararası büyümeye göre uyarlanmış, uzmanlaşmış mevzuat alanlarında kesin ve yapılandırılmış bir yol haritası.",
+    "risk": "Risk: {{score}}/10",
+    "items": {
+      "tax": {
+        "title": "Vergi ve KDV",
+        "short": "Eşikler ve kayıtlar",
+        "desc": "Sınır ötesi ticarette teslimat eşiklerinin izlenmesi ve kayıt yükümlülüklerinin belirlenmesi. Fiziksel ve dijital ürün düzenlemeleri ile ciro bandı kontrolleri.",
+        "features": ["Eşik İzleme", "Dijital Ürün Nexus", "Ciro Bandı Analizi"]
+      },
+      "product": {
+        "title": "EPR ve Ambalaj",
+        "short": "Üretici sorumluluğu",
+        "desc": "Yerel ambalaj mevzuatı ve Genişletilmiş Üretici Sorumluluğu (EPR) içinde yapılandırılmış bir yol haritası. Üreticiler, satıcılar ve dropshipper'lar için sınıflandırma.",
+        "features": ["EPR Kaydı", "Yerel Etiketleme Kuralları", "Ambalaj Yasası (VerpackG)"]
+      },
+      "data": {
+        "title": "Veri ve Gizlilik",
+        "short": "GDPR ve izleme",
+        "desc": "GDPR, çerez uyumu, izleme araçları ve uluslararası veri aktarımlarına ilişkin risk analizi. GA4, Meta ve rıza sistemlerinin değerlendirilmesi.",
+        "features": ["GDPR Risk Denetimi", "Kişisel Veri Redaksiyon Kontrolü", "Çerez Uyumu"]
+      },
+      "marketing": {
+        "title": "Pazarlama Uyumu",
+        "short": "İddialar ve reklam",
+        "desc": "Reklam iddialarının (ör. sağlık beyanları) doğrulanması ve yasal ihtarların önlenmesi. Pazarlama kanallarına ve sektör hassasiyetine göre risk değerlendirmesi.",
+        "features": ["İddia Doğrulama", "Reklam Kanalı Sorumluluğu", "Sektöre Özel Kontroller"]
+      },
+      "corporate": {
+        "title": "Şirket ve Yapı",
+        "short": "Şirket türü ve kayıtlar",
+        "desc": "Doğru şirket türünün seçilmesinde ve yeni hedef pazarlardaki kayıt işlemlerinde destek. Uluslararası büyüme için yapısal uyum.",
+        "features": ["Şirket Türü Araştırması", "Sınır Ötesi Kayıt", "Ortaklık Sözleşmeleri"]
+      }
+    }
+  },
+  "pillars": {
+    "overline": "Platform Altyapısı",
+    "titleLine1": "Mutlak kesinlik için",
+    "titleLine2": "üç katmanlı bir orkestrasyon.",
+    "learnMore": "Daha fazla bilgi",
+    "items": {
+      "risk": {
+        "title": "Akıllı Risk Analizi",
+        "desc": "Uyarlanabilir sihirbazı tamamlayın ve doğrulanmış kaynaklara dayalı olarak yasal yükümlülüklerinizin yapılandırılmış bir özetini alın."
+      },
+      "matching": {
+        "title": "Orkestre Edilmiş Uzman Eşleştirme",
+        "desc": "Yapılandırılmış Engagement talepleri üzerinden ön elemeden geçmiş uzmanlar. Garantili SLA onayı ve yanıt süreleri."
+      },
+      "monitoring": {
+        "title": "İzleme ve Panel",
+        "desc": "Profilleri kaydedin, talep durumlarını takip edin ve ekip paylaşımı ile iç denetimler için PDF raporlar dışa aktarın."
+      }
+    }
+  },
+  "flow": {
+    "step1Label": "1. Girdi",
+    "step1Value": "İş Bağlamı",
+    "step2Label": "2. Orkestrasyon Katmanı",
+    "step2Value": "AI Gate + Risk Matrisi",
+    "step3Label": "3. Sonuç",
+    "step3Value": "Uzman Eşleştirme"
+  },
+  "trust": {
+    "items": {
+      "privacy": {
+        "title": "Gizliliği Önceleyen Yapay Zeka",
+        "text": "Yapay zeka bilgiyi yapılandırır, ancak yerel redaksiyon kişisel verileri işlemeden önce temizler."
+      },
+      "sla": {
+        "title": "SLA İzleme",
+        "text": "Partner yanıt sürelerinin ve kalitesinin sürekli izlenmesi."
+      },
+      "sources": {
+        "title": "Halüsinasyon Yok",
+        "text": "Her öneri, doğrulanmış hukuki kaynaklara doğrudan bağlantılarla temellendirilir."
+      }
+    }
+  }
+}

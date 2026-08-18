@@ -662,6 +662,7 @@
     }
   },
   "advisory": {
+    "heroImageAlt": "Cognitive Advisory Layer",
     "heroBadge": "ADVANCED COGNITIVE LAYER",
     "heroTitle": "Your intelligent compliance compass: The cognitive",
     "heroTitleHighlight": "Advisory Layer",

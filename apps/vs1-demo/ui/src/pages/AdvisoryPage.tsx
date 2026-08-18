@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '../components/layout/PageHeader';
 import { PageFooter } from '../components/layout/PageFooter';
@@ -7,21 +7,8 @@ import { PageFooter } from '../components/layout/PageFooter';
 const AdvisoryPage: React.FC = () => {
     const { t } = useTranslation('common');
     const navigate = useNavigate();
-    const [scrolled, setScrolled] = useState(false);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            setScrolled(window.scrollY > 20);
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-
-    const navLinks = [
-        { name: 'Services', path: '/services' },
-        { name: 'Countries', path: '/countries' },
-        { name: 'Advisory', path: '/advisory', active: true },
-    ];
+    // Routes live under /:locale — see the note in PageHeader.
+    const { locale = 'en' } = useParams();
 
     const advisoryFeatures = [
         {
@@ -80,7 +67,7 @@ const AdvisoryPage: React.FC = () => {
                     <div className="absolute inset-0 z-0">
                         <img
                             src="/assets/cognitive_advisory_hero.png"
-                            alt="Cognitive Advisory Layer"
+                            alt={t('advisory.heroImageAlt', 'Cognitive Advisory Layer')}
                             className="w-full h-full object-cover opacity-40 mix-blend-luminosity"
                         />
                         <div className="absolute inset-0 bg-gradient-to-b from-[#050A15] via-transparent to-[#050A15]"></div>
@@ -215,7 +202,7 @@ const AdvisoryPage: React.FC = () => {
                             {t('advisory.ctaBody', 'Stop searching through static directories. Start navigating your compliance journey with our cognitive intelligent operating system.')}
                         </p>
                         <button
-                            onClick={() => navigate('/')}
+                            onClick={() => navigate(`/${locale}`)}
                             className="bg-white text-black hover:bg-slate-200 px-10 py-4 rounded-xl font-bold text-lg transition-all active:scale-95 shadow-2xl shadow-white/10"
                         >
                             {t('advisory.ctaBtn', 'Start Search Now')}

@@ -662,6 +662,7 @@
     }
   },
   "advisory": {
+    "heroImageAlt": "Capa Advisory cognitiva",
     "heroBadge": "CAPA COGNITIVA AVANZADA",
     "heroTitle": "Tu brújula inteligente de cumplimiento: La capa cognitiva",
     "heroTitleHighlight": "Advisory Layer",
