@@ -32,9 +32,13 @@ export type LogoLockup = 'horizontal' | 'stacked' | 'mark';
 // The tagline carries NO gold. At 10px it is body text and needs 4.5:1, where
 // gold-500 reaches 2.10:1 on white and 4.33:1 on the darker grounds — and it
 // renders on several different grounds, so no single gold value would serve.
+// 'on-petrol' sits on FIXED dark grounds (#0b1620 auth, #14363a onboarding), so its
+// colours are fixed too. word used to be text-fg-inverse, which is white in light but
+// #0f172a in dark — dark ink on a dark ground, 1.02:1. A theme-flipping token only
+// works here if the surface flips with it, and these surfaces do not.
 const TONE: Record<LogoTone, { ring: string; num: string; word: string; tag: string }> = {
   'on-light': { ring: 'fill-[#D4AF37] dark:fill-[#004D40]', num: 'fill-[#004D40] dark:fill-[#D4AF37]', word: 'text-fg-brand', tag: 'text-fg-secondary' },
-  'on-petrol': { ring: 'fill-[#D4AF37]', num: 'fill-[#FFFFFF]', word: 'text-fg-inverse', tag: 'text-white/80' },
+  'on-petrol': { ring: 'fill-[#D4AF37]', num: 'fill-[#FFFFFF]', word: 'text-white', tag: 'text-white/80' },
   'mono-white': { ring: 'fill-white', num: 'fill-white', word: 'text-white', tag: 'text-white' },
   'mono-black': { ring: 'fill-[#0F172A]', num: 'fill-[#0F172A]', word: 'text-[#0F172A]', tag: 'text-[#0F172A]' },
 };
