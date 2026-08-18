@@ -29,9 +29,12 @@ export type LogoLockup = 'horizontal' | 'stacked' | 'mark';
 // swaps (ring → Petrol, 360 → Gold). The wordmark keeps --color-text-brand in
 // both themes: the old dark override #097070 sat at 2.49:1 on the dark surface,
 // while the token's own dark value #2cc0ad reads 6.47:1.
+// The tagline carries NO gold. At 10px it is body text and needs 4.5:1, where
+// gold-500 reaches 2.10:1 on white and 4.33:1 on the darker grounds — and it
+// renders on several different grounds, so no single gold value would serve.
 const TONE: Record<LogoTone, { ring: string; num: string; word: string; tag: string }> = {
-  'on-light': { ring: 'fill-[#D4AF37] dark:fill-[#004D40]', num: 'fill-[#004D40] dark:fill-[#D4AF37]', word: 'text-fg-brand', tag: 'text-fg-accent' },
-  'on-petrol': { ring: 'fill-[#D4AF37]', num: 'fill-[#FFFFFF]', word: 'text-fg-inverse', tag: 'text-fg-accent' },
+  'on-light': { ring: 'fill-[#D4AF37] dark:fill-[#004D40]', num: 'fill-[#004D40] dark:fill-[#D4AF37]', word: 'text-fg-brand', tag: 'text-fg-secondary' },
+  'on-petrol': { ring: 'fill-[#D4AF37]', num: 'fill-[#FFFFFF]', word: 'text-fg-inverse', tag: 'text-white/80' },
   'mono-white': { ring: 'fill-white', num: 'fill-white', word: 'text-white', tag: 'text-white' },
   'mono-black': { ring: 'fill-[#0F172A]', num: 'fill-[#0F172A]', word: 'text-[#0F172A]', tag: 'text-[#0F172A]' },
 };
