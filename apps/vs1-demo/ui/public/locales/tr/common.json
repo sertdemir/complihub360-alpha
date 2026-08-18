@@ -629,8 +629,8 @@
       "body": "Asistanımız doğru soruları sorar ve sizi otomatik olarak doğru değerlendirmeye yönlendirir.",
       "btn": "Genel Değerlendirme Başlatın"
     },
-    "footer": {
-      "copyright": "© {{year}} CompliHub360. Berlin'de yapıldı."
+    "meta": {
+      "title": "Uyum Alanları · CompliHub360"
     }
   },
   "resources": {

@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { supportedLngs } from '../../i18n/config';
 import { LanguageSwitcher } from '../common/LanguageSwitcher';
 import { useAuthStore } from '../../store/useAuthStore';
 import {
@@ -17,13 +18,23 @@ import { Logo } from '../ui/Logo';
 import { Typography } from '../ui/Typography';
 import { ThemeToggle } from '../ui/ThemeToggle';
 
+const menuItemClass = (active: boolean) =>
+  `flex items-center gap-1 px-2 md:px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${
+    active ? 'text-fg-brand bg-brand-light' : 'text-fg-secondary hover:text-fg hover:bg-surface-secondary'
+  }`;
+
 const HIDDEN_PATHS = ['/login', '/register', '/verify-email'];
 
 export function GlobalNav() {
   const { t, i18n } = useTranslation('common');
-  const currentLang = i18n.resolvedLanguage || 'en';
   const navigate = useNavigate();
   const location = useLocation();
+  // From the URL, not from i18n: on /de/compliance the resolved language can
+  // still read 'en' while t() already returns German, which produced German
+  // labels pointing at /en/… — one click and the visitor was in the wrong
+  // language. The path segment is what actually says which locale you are on.
+  const pathLang = location.pathname.split('/').filter(Boolean)[0];
+  const currentLang = supportedLngs.includes(pathLang) ? pathLang : i18n.resolvedLanguage || 'en';
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -102,25 +113,33 @@ export function GlobalNav() {
         <nav className="flex items-center justify-center flex-1 gap-1 md:gap-4 lg:gap-6 min-w-0 overflow-hidden">
           {HEADER_MENU.map((menu) => (
             <div key={menu.id} className="flex items-center">
-              <button
-                onClick={() => {
-                  if (menu.path) navTo(menu.path);
-                  else setActiveMenu(activeMenu === menu.id ? null : menu.id);
-                }}
-                className={`flex items-center gap-1 px-2 md:px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${
-                  activeMenu === menu.id
-                    ? 'text-fg-brand bg-brand-light'
-                    : 'text-fg-secondary hover:text-fg hover:bg-surface-secondary'
-                }`}
-              >
-                {menu.label}
-                {menu.items.length > 0 && (
-                  <ChevronDown
-                    size={12}
-                    className={`transition-transform duration-200 ${activeMenu === menu.id ? 'rotate-180 text-fg-brand' : 'text-fg-tertiary'}`}
-                  />
-                )}
-              </button>
+              {/* A destination is an <a>, not a button. As a button it had no href:
+                  no new tab, no copy-link, not announced as a link — and invisible
+                  to crawlers, which would have quietly undone the whole point of
+                  making these pages reachable. Only a menu that opens children
+                  stays a button, because that is what it does. */}
+              {menu.path ? (
+                <Link
+                  to={`/${currentLang}${menu.path}`}
+                  onClick={() => setActiveMenu(null)}
+                  className={menuItemClass(activeMenu === menu.id)}
+                >
+                  {menu.label}
+                </Link>
+              ) : (
+                <button
+                  onClick={() => setActiveMenu(activeMenu === menu.id ? null : menu.id)}
+                  className={menuItemClass(activeMenu === menu.id)}
+                >
+                  {menu.label}
+                  {menu.items.length > 0 && (
+                    <ChevronDown
+                      size={12}
+                      className={`transition-transform duration-200 ${activeMenu === menu.id ? 'rotate-180 text-fg-brand' : 'text-fg-tertiary'}`}
+                    />
+                  )}
+                </button>
+              )}
             </div>
           ))}
         </nav>

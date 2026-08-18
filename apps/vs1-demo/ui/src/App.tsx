@@ -85,7 +85,8 @@ function WizardRoutes() {
 // back to the old light-mode fixtures.
 function LocaleRedirect({ to }: { to: string }) {
     const { locale } = useParams();
-    return <Navigate to={`/${locale || 'en'}/${to}`} replace />;
+    const base = `/${locale || 'en'}`;
+    return <Navigate to={to ? `${base}/${to}` : base} replace />;
 }
 
 function RootRedirect() {
@@ -198,6 +199,11 @@ function AppContent() {
                     <Route path="verify-email" element={<EmailVerificationPage />} />
                     <Route path="auth/callback" element={<AuthCallbackPage />} />
                     <Route path="reset-password" element={<ResetPasswordPage />} />
+                    {/* Anything unknown below a locale stays in that locale. Without
+                        this it falls to the top-level "*", which redirects to the
+                        i18n default — a German visitor on a retired URL landed on
+                        the English home. */}
+                    <Route path="*" element={<LocaleRedirect to="" />} />
                 </Route>
                 <Route path="/" element={<RootRedirect />} />
                 <Route path="*" element={<RootRedirect />} />

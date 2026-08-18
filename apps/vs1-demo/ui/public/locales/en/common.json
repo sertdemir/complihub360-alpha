@@ -629,8 +629,8 @@
       "body": "Our Wizard asks the right questions and routes you to the correct assessment automatically.",
       "btn": "Start General Assessment"
     },
-    "footer": {
-      "copyright": "© {{year}} CompliHub360. Built in Berlin."
+    "meta": {
+      "title": "Compliance areas · CompliHub360"
     }
   },
   "resources": {

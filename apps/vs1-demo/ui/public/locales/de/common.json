@@ -629,8 +629,8 @@
       "body": "Unser Assistent stellt die richtigen Fragen und leitet Sie automatisch zum richtigen Assessment weiter.",
       "btn": "Allgemeines Assessment starten"
     },
-    "footer": {
-      "copyright": "© {{year}} CompliHub360. Gebaut in Berlin."
+    "meta": {
+      "title": "Compliance-Bereiche · CompliHub360"
     }
   },
   "resources": {
