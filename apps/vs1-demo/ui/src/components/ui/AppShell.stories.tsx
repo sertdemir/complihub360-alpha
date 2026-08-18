@@ -27,9 +27,9 @@ type Story = StoryObj;
 
 const DOMAINS = [
   { id: 'tax', label: 'Tax & VAT', icon: <Receipt size={18} />, dot: true },
-  { id: 'epr', label: 'Product & Packaging', icon: <Package size={18} />, dot: true },
+  { id: 'epr', label: 'EPR & Packaging', icon: <Package size={18} />, dot: true },
   { id: 'gdpr', label: 'Data & Privacy', icon: <ShieldCheck size={18} />, dot: true },
-  { id: 'mkt', label: 'Marketing & SEO', icon: <Megaphone size={18} /> },
+  { id: 'mkt', label: 'Marketing Compliance', icon: <Megaphone size={18} /> },
   { id: 'corp', label: 'Corporate & Structure', icon: <Building2 size={18} /> },
   { id: 'full', label: 'Full Support', icon: <LifeBuoy size={18} /> },
 ];

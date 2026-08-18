@@ -31,7 +31,7 @@
     "seeIfApplies": "Compruebe si esto le aplica"
   },
   "hero": {
-    "eyebrow": "Para responsables de operaciones",
+    "eyebrow": "Plataforma de compliance intelligence y provider matching",
     "title": {
       "pre": "El trabajo de compliance que ",
       "gold": "no debería",
@@ -40,7 +40,7 @@
     "subtitleDesktop": "CompliHub360 mapea las normas que aplican a sus operaciones en los mercados europeos y le conecta con un especialista verificado cuando algo requiere ejecución. Seis minutos hasta su primera Risk Map. Sin necesidad de cuenta.",
     "subtitleMobile": "CompliHub360 mapea las normas en los mercados europeos y le conecta con un especialista verificado cuando algo requiere ejecución. Seis minutos hasta su primera Risk Map. Sin necesidad de cuenta.",
     "cta": {
-      "start": "Inicie su evaluación",
+      "start": "Evaluar mis necesidades",
       "showMap": "Ver una Risk Map de ejemplo",
       "closeMap": "Cerrar la Risk Map"
     },
@@ -63,14 +63,48 @@
       "subtitle": "Seleccione todas las que apliquen. Solo mapearemos la normativa relevante para su alcance.",
       "domains": [
         "IVA e impuestos",
-        "RAP y envases",
+        "EPR y envases",
         "RGPD y privacidad",
         "Compliance de marketing"
       ],
       "selectedCount": "2 seleccionadas · 2 pendientes",
       "back": "Atrás",
       "continue": "Continuar"
+    },
+    "dual": {
+      "placeholder": "Describa su situación con sus propias palabras…",
+      "answer": "Hacer una pregunta de compliance",
+      "guided": "Evaluar mis necesidades",
+      "trust": "Gratis · anónimo · en menos de 3 minutos"
     }
+  },
+  "problemRecognition": {
+    "eyebrow": "Por qué esto cuesta",
+    "title": {
+      "pre": "Obtener una respuesta ",
+      "gold": "clara",
+      "post": " es la parte difícil."
+    },
+    "lead": "La mayoría de las personas con las que hablamos ya lo han intentado. El problema rara vez es el esfuerzo: es que las respuestas no coinciden y no hay forma de saber cuál corresponde a su situación.",
+    "items": [
+      {
+        "title": "Dos asesores, dos respuestas.",
+        "desc": "Haga la misma pregunta dos veces y obtendrá dos respuestas defendibles. Sin la fuente detrás de cada una, no se puede saber cuál se aplica a usted."
+      },
+      {
+        "title": "Le venden más de lo que necesita.",
+        "desc": "El incentivo es cotizar el alcance más amplio. A nadie le pagan por decirle que una tarea es pequeña, o que ya está resuelta."
+      },
+      {
+        "title": "Semanas que se van en definir el alcance.",
+        "desc": "Antes de que empiece el trabajo real ya ha explicado su negocio cinco veces y comparado presupuestos que miden cosas distintas."
+      },
+      {
+        "title": "Sin base de comparación.",
+        "desc": "Cada propuesta está estructurada de otra manera. Compararlas significa adivinar qué omitió cada una."
+      }
+    ],
+    "note": "Nada de esto significa que tenga un problema. Significa que aún no tiene una imagen clara, y eso sí tiene solución."
   },
   "heroWizard": {
     "mobileAlt": "Asistente de compliance de CompliHub — paso «Áreas» (móvil)"
@@ -163,7 +197,7 @@
         "desc": "IVA transfronterizo, OSS/IOSS, umbrales"
       },
       "eprPackaging": {
-        "title": "Producto y embalaje",
+        "title": "EPR y envases",
         "desc": "EPR, responsabilidad del productor, registros"
       },
       "gdprPrivacy": {
@@ -171,7 +205,7 @@
         "desc": "RGPD, encargados, representante UE"
       },
       "marketing": {
-        "title": "Marketing y SEO",
+        "title": "Compliance de marketing",
         "desc": "Consentimiento, cookies, normas publicitarias"
       },
       "corporate": {
@@ -471,8 +505,8 @@
         "label": "obligaciones"
       },
       {
-        "value": "€25k",
-        "label": "exposición total"
+        "value": "4",
+        "label": "con plazo en 30 días"
       },
       {
         "value": "14 días",
@@ -549,8 +583,8 @@
         "label": "Obligaciones identificadas"
       },
       {
-        "value": "€25k",
-        "label": "Exposición total"
+        "value": "4",
+        "label": "Con plazo en 30 días"
       },
       {
         "value": "14 días",
@@ -775,7 +809,7 @@
         ]
       },
       {
-        "title": "RAP y envases",
+        "title": "EPR y envases",
         "markets": "DE · UK · NL · FR · AT · BE",
         "desc": "Responsabilidad ampliada del productor, registros de envases, sistemas de devolución, ecomodulación.",
         "intro": "Responsabilidad ampliada del productor para envases, pilas y electrónica. Cada mercado tiene su propio registro, tarifas y calendario de informes. Mapeamos con quién debe registrarse y cuándo.",
@@ -1062,7 +1096,7 @@
       "post": "."
     },
     "subtitle": "Seis minutos. Sin necesidad de cuenta. Contrastamos sus operaciones con la normativa que realmente aplica y le mostramos qué hacer a continuación.",
-    "cta": "Inicie su evaluación"
+    "cta": "Evaluar mis necesidades"
   },
   "newsletter": {
     "eyebrow": "Manténgase al día",
@@ -1093,7 +1127,7 @@
         "title": "Soluciones",
         "links": {
           "vatTax": "IVA e impuestos",
-          "productPackaging": "Producto y envases",
+          "productPackaging": "EPR y envases",
           "dataPrivacy": "Privacidad de datos",
           "marketingAdvertising": "Marketing y publicidad",
           "corporateStructure": "Estructura societaria",

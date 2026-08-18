@@ -145,7 +145,7 @@ Analogie fürs Marketing: „Wie ein Experten-Netzwerk — erst die Qualität, d
 
 ## 7. Domänen, die wir abdecken (Nutzen kommunizieren, nicht Fachbegriffe)
 
-Tax & VAT · Product & Packaging · Data & Privacy · Marketing & SEO · Corporate & Structure · Product Compliance · Logistics & Customs · Legal Advisory.
+Tax & VAT · EPR & Packaging · Data & Privacy · Marketing Compliance · Corporate & Structure · Product Compliance · Logistics & Customs · Legal Advisory.
 → In Copy immer als **Nutzen** übersetzen („verkauf grenzüberschreitend, ohne Steuer-Fallen"), nicht als Kürzel.
 
 ---

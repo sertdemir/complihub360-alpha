@@ -90,7 +90,7 @@
       "catTaxVat": "Impuestos e IVA",
       "catEpr": "EPR Embalaje",
       "catPrivacy": "Privacidad de Datos",
-      "catMarketing": "Marketing y SEO",
+      "catMarketing": "Compliance de marketing",
       "catCorporate": "Configuración Corporativa",
       "cta": "Califica ahora"
     }
@@ -112,7 +112,7 @@
       "ops": {
         "title": "Para Operaciones y Expansión",
         "tags": [
-          "EPR y Embalaje",
+          "EPR y envases",
           "ESG en Cadena de Suministro",
           "Estándares de Marketing"
         ],
@@ -632,9 +632,9 @@
     "heroTitle": "Encuentra tu desafío regulatorio. Empieza aquí.",
     "heroBody": "Cada área de cumplimiento es una puerta de entrada a tu evaluación específica. Identifica tu tema, entiende los riesgos y emparéjate con un especialista verificado — todo en menos de 5 minutos.",
     "anchorTax": "Impuestos e IVA",
-    "anchorEpr": "EPR y Embalaje",
+    "anchorEpr": "EPR y envases",
     "anchorPrivacy": "Datos y Privacidad",
-    "anchorMarketing": "Marketing y SEO",
+    "anchorMarketing": "Compliance de marketing",
     "anchorCorporate": "Estructura Corporativa",
     "anchorFullsupport": "Full Support",
     "riskLabel": "Riesgo",
@@ -837,7 +837,7 @@
       }
     },
     "epr": {
-      "title": "EPR y Embalaje",
+      "title": "EPR y envases",
       "risk": "Alto",
       "headline": "Responsabilidad Extendida del Productor, VerpackG y objetivos de reciclaje",
       "description": "Regulaciones ambientales locales altamente fragmentadas, leyes de embalaje (VerpackG) y objetivos de reciclaje (PRN) que difieren drásticamente por país.",
@@ -847,7 +847,7 @@
       "ob2": "Determinar el registro por categoría de producto (electrónica, ropa, cosméticos)",
       "ob3": "Cumplir los objetivos de reciclaje locales para evitar multas",
       "ob4": "Evaluación de responsabilidad del dropshipper",
-      "cov1": "Asistente de Producto y Embalaje — evalúa rol comercial, mercados objetivo, categorías de producto",
+      "cov1": "Asistente de EPR y envases — evalúa rol comercial, mercados objetivo, categorías de producto",
       "cov2": "Calcula la epr_required_likelihood por jurisdicción",
       "cov3": "Manejo inteligente de casos extremos: lógica de seguridad «Asumir Sí» para dropshippers inciertos",
       "regulations": {
@@ -897,7 +897,7 @@
       }
     },
     "marketing": {
-      "title": "Marketing y SEO",
+      "title": "Compliance de marketing",
       "risk": "Medio",
       "headline": "Afirmaciones publicitarias, salud y sostenibilidad, protección del consumidor",
       "description": "Cumplimiento publicitario transfronterizo: afirmaciones médicas y de salud, publicidad comparativa, declaraciones de sostenibilidad, normas para influencers y obligaciones de servicios digitales bajo la DSA.",
@@ -907,7 +907,7 @@
       "ob2": "Aprobación de afirmaciones de salud, finanzas y sostenibilidad",
       "ob3": "Divulgación de marketing de influencers y contenido patrocinado",
       "ob4": "Obligaciones de notificación y acción bajo DSA / DMA",
-      "cov1": "Asistente de Marketing y SEO — captura la sensibilidad del sector, los tipos de afirmaciones y los canales",
+      "cov1": "Asistente de Compliance de marketing — captura la sensibilidad del sector, los tipos de afirmaciones y los canales",
       "cov2": "Calcula marketing_risk_level y señala patrones de afirmaciones de alto riesgo",
       "cov3": "Le dirige a especialistas en derecho publicitario y protección del consumidor",
       "regulations": {
@@ -1277,5 +1277,59 @@
       "faq": "FAQ"
     },
     "login": "Iniciar sesión"
+  },
+  "howItWorks": {
+    "meta": {
+      "title": "Cómo funciona · CompliHub360"
+    },
+    "eyebrow": "Cómo funciona",
+    "title": {
+      "pre": "De una pregunta a alguien que puede ",
+      "gold": "actuar",
+      "post": "."
+    },
+    "lead": "Cinco pasos. Puede detenerse después de cualquiera de ellos: la mayoría lo hace, y es un resultado perfectamente válido.",
+    "stages": [
+      {
+        "kicker": "Entender",
+        "title": "Pregunte con sus propias palabras.",
+        "body": "Describa su situación como se la explicaría a un colega. Recibirá una respuesta con la fuente detrás de cada punto: la norma misma, no el resumen de un resumen. Sin cuenta, sin llamada comercial, sin obligación de continuar."
+      },
+      {
+        "kicker": "Evaluar",
+        "title": "Vea qué se aplica realmente a su caso.",
+        "body": "Cuatro preguntas sobre sus mercados, su modelo de negocio y su volumen producen un risk map: las obligaciones que se aplican a su operación, cada una con su base legal y su plazo. Provienen de nuestro propio motor de compliance y enlazan con la base de datos jurídica de la UE; no las genera un chatbot."
+      },
+      {
+        "kicker": "Decidir",
+        "title": "Decida qué necesita ayuda externa.",
+        "body": "El mapa separa lo que puede resolver internamente de lo que realmente requiere un especialista, y en qué orden. Si resulta que ya lo tiene todo cubierto, se lo decimos: en ese caso no tenemos nada que venderle."
+      },
+      {
+        "kicker": "Emparejar",
+        "title": "La idoneidad antes que el nombre.",
+        "body": "Primero ve a los especialistas sin su identidad: cobertura, credenciales verificadas, tiempo de respuesta, encaje con sus mercados. Juzgar la idoneidad antes que el membrete es deliberado: un nombre conocido no es prueba de un buen encaje. El orden nunca está en venta."
+      },
+      {
+        "kicker": "Actuar",
+        "title": "Reserve y entregue el caso.",
+        "body": "Elija una hora en el calendario del especialista. Su identidad se revela al reservar, junto con un dossier de todo lo que ya nos ha contado, de modo que no explique su negocio por sexta vez. Después puede valorar cómo fue, y las obligaciones siguen en su mapa con sus plazos."
+      }
+    ],
+    "cost": {
+      "kicker": "Lo que esto le cuesta",
+      "title": "Nada.",
+      "body": "La plataforma, el risk map y el matching son gratuitos para usted. Nos pagan los especialistas cuando una reserva llega a producirse. Por eso mismo el orden no está en venta: una posición pagada dejaría el match sin valor para ambas partes."
+    },
+    "privacy": {
+      "kicker": "Qué ocurre con sus datos",
+      "title": "Se quedan en la UE, y siguen siendo suyos.",
+      "body": "Todo funciona sobre infraestructura de la UE. Permanece anónimo hasta que decide crear una cuenta: la evaluación no necesita nombre, ni empresa, ni correo electrónico. Un especialista ve sus datos solo cuando usted reserva."
+    },
+    "cta": {
+      "title": "Empiece por donde tenga sentido.",
+      "lead": "Seis minutos, cuatro preguntas, sin cuenta."
+    },
+    "seeAll": "Ver cómo funciona cada paso"
   }
 }

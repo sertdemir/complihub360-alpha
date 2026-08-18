@@ -31,7 +31,7 @@
     "seeIfApplies": "See if this applies to you"
   },
   "hero": {
-    "eyebrow": "For operations leads",
+    "eyebrow": "Compliance Intelligence & Provider-Matching Platform",
     "title": {
       "pre": "The compliance work you ",
       "gold": "shouldn't",
@@ -40,7 +40,7 @@
     "subtitleDesktop": "CompliHub360 maps the rules that apply to your operations across European markets, then connects you to a verified specialist when something needs hands. Six minutes to your first risk map. No account required.",
     "subtitleMobile": "CompliHub360 maps the rules across European markets, then connects you to a verified specialist when something needs hands. Six minutes to your first risk map. No account required.",
     "cta": {
-      "start": "Start your assessment",
+      "start": "Assess My Needs",
       "showMap": "See an example risk map",
       "closeMap": "Close risk map"
     },
@@ -70,7 +70,41 @@
       "selectedCount": "2 selected · 2 left",
       "back": "Back",
       "continue": "Continue"
+    },
+    "dual": {
+      "placeholder": "Describe your situation in your own words…",
+      "answer": "Ask a Compliance Question",
+      "guided": "Assess My Needs",
+      "trust": "Free · anonymous · under 3 minutes"
     }
+  },
+  "problemRecognition": {
+    "eyebrow": "Why this is hard",
+    "title": {
+      "pre": "Getting a ",
+      "gold": "straight",
+      "post": " answer is the hard part."
+    },
+    "lead": "Most people we talk to have already tried. The problem is rarely effort — it is that the answers do not line up, and there is no way to tell which one fits your situation.",
+    "items": [
+      {
+        "title": "Two advisors, two answers.",
+        "desc": "Ask the same question twice and you get two defensible answers. Without the source behind each one, you cannot tell which applies to you."
+      },
+      {
+        "title": "Sold more than you need.",
+        "desc": "The incentive is to quote the widest scope. Nobody is paid to tell you a task is small, or that you have already handled it."
+      },
+      {
+        "title": "Weeks that disappear into scoping.",
+        "desc": "Before the actual work starts you have explained your business five times and compared quotes that measure different things."
+      },
+      {
+        "title": "No basis for comparison.",
+        "desc": "Every proposal is structured differently. Comparing them means guessing at what each one left out."
+      }
+    ],
+    "note": "None of this means you have a problem. It means you do not have a clear picture yet — and that is a solvable one."
   },
   "heroWizard": {
     "mobileAlt": "CompliHub compliance wizard — Domains step (mobile)"
@@ -163,7 +197,7 @@
         "desc": "Cross-border VAT, OSS/IOSS, thresholds"
       },
       "eprPackaging": {
-        "title": "Product & Packaging",
+        "title": "EPR & Packaging",
         "desc": "EPR, producer responsibility, registers"
       },
       "gdprPrivacy": {
@@ -171,7 +205,7 @@
         "desc": "GDPR, DPAs, EU representative"
       },
       "marketing": {
-        "title": "Marketing & SEO",
+        "title": "Marketing Compliance",
         "desc": "Consent, cookies, advertising rules"
       },
       "corporate": {
@@ -471,8 +505,8 @@
         "label": "obligations"
       },
       {
-        "value": "€25k",
-        "label": "total exposure"
+        "value": "4",
+        "label": "with a deadline in 30 days"
       },
       {
         "value": "14 days",
@@ -549,8 +583,8 @@
         "label": "Obligations identified"
       },
       {
-        "value": "€25k",
-        "label": "Total exposure"
+        "value": "4",
+        "label": "With a deadline in 30 days"
       },
       {
         "value": "14 days",
@@ -1062,7 +1096,7 @@
       "post": "."
     },
     "subtitle": "Six minutes. No account required. We map your operations against the regulations that actually apply, and show you what to do next.",
-    "cta": "Start your assessment"
+    "cta": "Assess My Needs"
   },
   "newsletter": {
     "eyebrow": "Stay current",
@@ -1093,7 +1127,7 @@
         "title": "Solutions",
         "links": {
           "vatTax": "VAT & Tax",
-          "productPackaging": "Product & Packaging",
+          "productPackaging": "EPR & Packaging",
           "dataPrivacy": "Data Privacy",
           "marketingAdvertising": "Marketing & Advertising",
           "corporateStructure": "Corporate Structure",
