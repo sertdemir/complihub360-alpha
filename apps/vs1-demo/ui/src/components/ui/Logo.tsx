@@ -26,9 +26,11 @@ export type LogoLockup = 'horizontal' | 'stacked' | 'mark';
 
 // Mark fills are Tailwind `fill-*` classes (not raw attributes) so the mark can
 // flip in dark mode. 'on-light' is the only tone that adapts: in dark the mark
-// swaps (ring → Petrol, 360 → Gold) and the wordmark turns Brandgrün #097070.
+// swaps (ring → Petrol, 360 → Gold). The wordmark keeps --color-text-brand in
+// both themes: the old dark override #097070 sat at 2.49:1 on the dark surface,
+// while the token's own dark value #2cc0ad reads 6.47:1.
 const TONE: Record<LogoTone, { ring: string; num: string; word: string; tag: string }> = {
-  'on-light': { ring: 'fill-[#D4AF37] dark:fill-[#004D40]', num: 'fill-[#004D40] dark:fill-[#D4AF37]', word: 'text-fg-brand dark:text-[#097070]', tag: 'text-fg-accent' },
+  'on-light': { ring: 'fill-[#D4AF37] dark:fill-[#004D40]', num: 'fill-[#004D40] dark:fill-[#D4AF37]', word: 'text-fg-brand', tag: 'text-fg-accent' },
   'on-petrol': { ring: 'fill-[#D4AF37]', num: 'fill-[#FFFFFF]', word: 'text-fg-inverse', tag: 'text-fg-accent' },
   'mono-white': { ring: 'fill-white', num: 'fill-white', word: 'text-white', tag: 'text-white' },
   'mono-black': { ring: 'fill-[#0F172A]', num: 'fill-[#0F172A]', word: 'text-[#0F172A]', tag: 'text-[#0F172A]' },
