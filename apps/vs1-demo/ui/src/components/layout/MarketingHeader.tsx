@@ -1,31 +1,34 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Globe, Menu, X } from 'lucide-react';
 import { Logo } from '../ui/Logo';
 import { ThemeToggle } from '../ui/ThemeToggle';
-import { PROVIDER_MARKETING_ENABLED } from '../../lib/featureFlags';
 
 // ─── MarketingHeader ──────────────────────────────────────────────────────────
-// Anchor-nav header for the CompliHub360 landing pages. Two audiences
-// (entrepreneur · provider), responsive: desktop bar + mobile expanding pill panel.
-// Menu items are in-page section anchors with scroll-spy; a cross-link bridges the
-// two audiences (For Providers ↔ For Entrepreneurs). Compass: Header Marketing
-// Desktop / Header Marketing (Provider) Mobile.
+// The marketing navigation, responsive: desktop bar + mobile expanding pill panel.
+// Compass: Header Marketing Desktop / Mobile.
+//
+// Multipager since 2026-08-18. The entries used to be in-page anchors with
+// scroll-spy, which only worked on the landing page and made three finished pages
+// unreachable — /markets had no entry point anywhere in the app, and "How it works"
+// pointed at the short strip on the landing page rather than the full page of the
+// same name. They are real routes now, and the active state comes from the URL
+// instead of the scroll position.
 
-export type Audience = 'entrepreneur' | 'provider';
-export interface Anchor { id: string; label: string; labelKey?: string }
-export interface CrossLink { label: string; href: string }
+export interface NavLink {
+  /** Path below the locale, e.g. 'markets' — the locale prefix comes from userHref. */
+  to: string;
+  label: string;
+  labelKey?: string;
+}
 
 export interface MarketingHeaderProps {
-  audience?: Audience;
-  /** Section anchors (in-page). Defaults to the audience preset. */
-  anchors?: Anchor[];
-  /** Cross-link to the other audience's landing. Defaults to the audience preset. */
-  crossLink?: CrossLink;
-  /** Audience-switch targets (locale-aware). The toggle sits next to the logo. */
+  /** Navigation entries. Defaults to NAV_LINKS. */
+  links?: NavLink[];
+  /** Locale-aware home link on the logo. */
   userHref?: string;
-  providerHref?: string;
   loginHref?: string;
   /** Theme over a dark hero (white logo + nav). */
   theme?: 'light' | 'inverse';
@@ -33,79 +36,19 @@ export interface MarketingHeaderProps {
   embedded?: boolean;
 }
 
-// Anchor ids point at REAL section ids on the respective landing page
-// (user LP: pricing lives in the HowItActs cost section #engagement, voices in
-// the Brand-Code section; provider LP: pricing = the two-channels section).
-const PRESETS: Record<Audience, { anchors: Anchor[]; cross: CrossLink }> = {
-  entrepreneur: {
-    anchors: [
-      { id: 'how-it-works', label: 'How it works', labelKey: 'header.nav.howItWorks' },
-      { id: 'what-we-know', label: 'What we know', labelKey: 'header.nav.whatWeKnow' },
-      { id: 'brand-code', label: 'Voices', labelKey: 'header.nav.voices' },
-      { id: 'engagement', label: 'Pricing', labelKey: 'header.nav.pricing' },
-    ],
-    cross: { label: 'For Providers', href: '/providers' },
-  },
-  provider: {
-    anchors: [
-      { id: 'matchmaking', label: 'How matching works', labelKey: 'header.nav.howMatchingWorks' },
-      { id: 'dashboard', label: 'Dashboard', labelKey: 'header.nav.dashboard' },
-      { id: 'performance', label: 'Performance', labelKey: 'header.nav.performance' },
-      { id: 'channels', label: 'Pricing', labelKey: 'header.nav.pricing' },
-      { id: 'faq', label: 'FAQ', labelKey: 'header.nav.faq' },
-    ],
-    cross: { label: 'For Entrepreneurs', href: '/' },
-  },
-};
+// The five destinations that carry the story: how the model works, what we cover,
+// where it applies, what it costs, and the library. /platform and /solutions stay
+// out of the header on purpose — §11 P5 keeps them as SEO surfaces, reachable from
+// the footer, and a seven-entry bar does not survive German labels.
+const NAV_LINKS: NavLink[] = [
+  { to: 'how-it-works', label: 'How it works', labelKey: 'header.nav.howItWorks' },
+  { to: 'compliance', label: 'Compliance areas', labelKey: 'header.nav.complianceAreas' },
+  { to: 'markets', label: 'Markets', labelKey: 'header.nav.markets' },
+  { to: 'pricing', label: 'Pricing', labelKey: 'header.nav.pricing' },
+  { to: 'resources', label: 'Resources', labelKey: 'header.nav.resources' },
+];
 
-// Audience labels — change here to relabel both header + mobile panel.
-const AUDIENCE_LABELS = { provider: 'For Providers', entrepreneur: 'For Businesses' } as const;
 
-// Audience switch — minimalist underlined tabs next to the logo. Each tab links
-// to that audience's landing (locale-aware); the active one (matching the current
-// page) carries the underline, so switching swaps the whole header.
-function AudienceSwitch({
-  audience,
-  userHref,
-  providerHref,
-  inverse,
-  className = '',
-}: {
-  audience: Audience;
-  userHref: string;
-  providerHref: string;
-  inverse: boolean;
-  className?: string;
-}) {
-  const tab = (on: boolean) =>
-    `relative pb-1 text-body-sm font-semibold transition-colors ${
-      on
-        ? inverse
-          ? 'text-white'
-          : 'text-fg'
-        : inverse
-          ? 'text-white/65 hover:text-white'
-          : 'text-fg-tertiary hover:text-fg'
-    }`;
-  const underline = (
-    <span className={`absolute -bottom-px left-0 right-0 h-0.5 rounded-full ${inverse ? 'bg-white' : 'bg-brand'}`} />
-  );
-  // With the provider marketing landing switched off there is only one
-  // audience left — the switch would be a dead toggle, so it disappears.
-  if (!PROVIDER_MARKETING_ENABLED) return null;
-  return (
-    <div className={`flex items-center gap-6 ${className}`}>
-      <a href={providerHref} className={tab(audience === 'provider')}>
-        {AUDIENCE_LABELS.provider}
-        {audience === 'provider' && underline}
-      </a>
-      <a href={userHref} className={tab(audience === 'entrepreneur')}>
-        {AUDIENCE_LABELS.entrepreneur}
-        {audience === 'entrepreneur' && underline}
-      </a>
-    </div>
-  );
-}
 
 // Language menu — same four locales and URL-segment logic as
 // components/common/LanguageSwitcher (GlobalNav). Navigation happens via plain
@@ -181,47 +124,27 @@ function LanguageMenu({ buttonClass }: { buttonClass: string }) {
   );
 }
 
-// Track which section is in view (scroll-spy).
-function useScrollSpy(ids: string[]): string | null {
-  const [active, setActive] = useState<string | null>(ids[0] ?? null);
-  useEffect(() => {
-    if (!ids.length) return;
-    const obs = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-        if (visible[0]) setActive(visible[0].target.id);
-      },
-      { rootMargin: '-45% 0px -50% 0px', threshold: [0, 0.25, 0.5, 1] },
-    );
-    ids.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) obs.observe(el);
-    });
-    return () => obs.disconnect();
-  }, [ids.join(',')]);
-  return active;
-}
-
 export function MarketingHeader({
-  audience = 'entrepreneur',
-  anchors,
-  crossLink,
+  links,
   userHref = '/',
-  providerHref = '/providers',
   loginHref = '/login',
   theme = 'light',
   embedded = false,
 }: MarketingHeaderProps) {
   const { t } = useTranslation('common');
-  const preset = PRESETS[audience];
-  const items = anchors ?? preset.anchors;
+  const items = links ?? NAV_LINKS;
+  const { pathname } = useLocation();
+  // Active when the current path IS the entry or sits below it, so /markets/de
+  // keeps "Markets" lit.
+  const hrefFor = (to: string) => `${userHref.replace(/\/$/, '')}/${to}`;
+  const isActive = (to: string) => {
+    const href = hrefFor(to);
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
   const inverse = theme === 'inverse';
 
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const active = useScrollSpy(items.map((a) => a.id));
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -241,17 +164,16 @@ export function MarketingHeader({
       {/* ── Desktop ── */}
       <div className="mx-auto hidden h-20 max-w-container-2xl items-center gap-4 px-4 lg:flex">
         <div className="flex flex-1 basis-0 items-center gap-5">
-          <Logo tone={inverse ? 'on-petrol' : 'on-light'} />
-          <AudienceSwitch audience={audience} userHref={userHref} providerHref={providerHref} inverse={inverse} />
+          <Logo tone={inverse ? 'on-petrol' : 'on-light'} href={userHref} />
         </div>
         {/* Anchor group sits truly centered between the two flex-1 side zones. */}
         <nav className="flex items-center justify-center gap-3">
             {items.map((it) => (
-              <a
-                key={it.id}
-                href={`#${it.id}`}
+              <Link
+                key={it.to}
+                to={hrefFor(it.to)}
                 className={`whitespace-nowrap rounded-md px-2.5 py-2 text-body-sm font-medium transition-colors ${
-                  active === it.id
+                  isActive(it.to)
                     ? 'bg-brand-light text-fg-brand'
                     : inverse
                       ? 'text-white/85 hover:text-fg-inverse'
@@ -259,7 +181,7 @@ export function MarketingHeader({
                 }`}
               >
                 {it.labelKey ? t(it.labelKey, { defaultValue: it.label }) : it.label}
-              </a>
+              </Link>
             ))}
         </nav>
         <div className="flex flex-1 basis-0 items-center justify-end gap-5">
@@ -304,29 +226,25 @@ export function MarketingHeader({
               transition={{ duration: 0.25, ease: 'easeOut' }}
               className="overflow-hidden bg-surface"
             >
-              {/* Audience switch */}
-              <div className="flex justify-center px-4 pt-4">
-                <AudienceSwitch audience={audience} userHref={userHref} providerHref={providerHref} inverse={false} />
-              </div>
               {/* Button row */}
               <div className="flex items-center gap-4 px-4 pb-1 pt-4">
                 <a href={loginHref} className="inline-flex h-[40px] flex-1 items-center justify-center rounded-md border-thin border-stroke-brand px-4 text-body-sm font-semibold text-fg-brand">
                   {t('header.login')}
                 </a>
               </div>
-              {/* Pill anchor row (horizontal scroll) */}
+              {/* Pill row (horizontal scroll) */}
               <div className="flex gap-3 overflow-x-auto px-4 pb-5 pt-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {items.map((a) => (
-                  <a
-                    key={a.id}
-                    href={`#${a.id}`}
+                  <Link
+                    key={a.to}
+                    to={hrefFor(a.to)}
                     onClick={() => setOpen(false)}
                     className={`shrink-0 whitespace-nowrap rounded-pill px-3.5 py-2 text-body-sm font-semibold transition-colors ${
-                      active === a.id ? 'bg-brand text-fg-on-brand' : 'bg-surface-secondary text-fg'
+                      isActive(a.to) ? 'bg-brand text-fg-on-brand' : 'bg-surface-secondary text-fg'
                     }`}
                   >
                     {a.labelKey ? t(a.labelKey, { defaultValue: a.label }) : a.label}
-                  </a>
+                  </Link>
                 ))}
               </div>
             </motion.div>

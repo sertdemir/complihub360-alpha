@@ -23,6 +23,7 @@ import {
   useCountrySelection,
 } from '../components/compliance-areas';
 import type { AreaConfig } from '../components/compliance-areas/types';
+import { SiteFooter } from '../components/home';
 
 // ─── Section wrapper with scroll animation ───────────────────────────────────
 
@@ -110,8 +111,16 @@ export function ComplianceAreasPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { locale } = useParams();
+
   const localePrefix = locale ? `/${locale}` : '';
   const [selectedCountry, setSelectedCountry] = useCountrySelection();
+
+  // Without this the tab keeps the previous page's title — visible because this
+  // page sits in the main navigation.
+  useEffect(() => {
+    document.title = t('compliance.meta.title', 'Compliance areas · CompliHub360');
+  }, [t]);
+
 
   // TODO: replace with verified counts from provider DB
   const COMPLIANCE_AREAS: AreaConfig[] = [
@@ -348,16 +357,7 @@ export function ComplianceAreasPage() {
         </div>
       </section>
 
-      <footer className="bg-neutral-900 py-10 text-center">
-        <Typography
-          variant="caption"
-          className="text-neutral-400 block normal-case tracking-normal"
-        >
-          {t('compliance.footer.copyright', '© {{year}} CompliHub360. Built in Berlin.', {
-            year: new Date().getFullYear(),
-          })}
-        </Typography>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

@@ -629,80 +629,50 @@
       "body": "Nuestro Asistente hace las preguntas correctas y te dirige automáticamente a la evaluación correcta.",
       "btn": "Iniciar evaluación general"
     },
-    "footer": {
-      "copyright": "© {{year}} CompliHub360. Construido en Berlín."
+    "meta": {
+      "title": "Áreas de Cumplimiento · CompliHub360"
     }
   },
   "resources": {
-    "tabStories": "Historias de Clientes",
-    "tabGuides": "Guías y Reportes",
-    "stories": {
-      "overline": "Historias de Clientes",
-      "title": "Resultados reales de cumplimiento, no afirmaciones de marketing",
-      "body": "Mira cómo empresas como la tuya usaron CompliHub360 para navegar el cumplimiento transfronterizo complejo — de la incertidumbre a la resolución.",
-      "challengeLabel": "Desafío",
-      "outcomeLabel": "Resultado"
+    "meta": {
+      "title": "Recursos · CompliHub360"
     },
-    "guides": {
-      "overline": "Guías y Reportes",
-      "title": "Conocimiento que construye confianza en el cumplimiento",
-      "body": "Análisis profundos del mercado, desglose regulatorio y listas de verificación prácticas — curadas por nuestro motor de inteligencia de cumplimiento y revisadas por especialistas.",
-      "kbTitle": "Base de Conocimiento Viva",
-      "kbBody": "Cada actualización de la plataforma, nueva regla de cumplimiento o integración de socios desencadena una actualización de contenido dedicada. Nuestras guías son perennes — mantenidas automáticamente y verificadas contra las últimas fuentes regulatorias.",
-      "kbCta": "Recibir notificaciones"
+    "eyebrow": "Recursos",
+    "title": {
+      "pre": "Lo que ya podemos ",
+      "gold": "enseñarle",
+      "post": "."
+    },
+    "lead": "No es un blog. Son las partes de la plataforma que puede leer sin hablar con nadie — las mismas entradas que comprueba nuestro motor, con la norma detrás de cada una.",
+    "entries": {
+      "markets": {
+        "title": "Mercados",
+        "meta": "{{markets}} mercados · cada obligación con su base jurídica",
+        "desc": "Por país: para qué obligaciones tenemos una fuente, la norma nacional que hay detrás, la periodicidad y un enlace al texto de la UE cuando existe.",
+        "cta": "Ver los mercados"
+      },
+      "compliance": {
+        "title": "Áreas de Cumplimiento",
+        "meta": "{{domains}} áreas",
+        "desc": "Qué abarca cada área, en qué mercados se aplica y a partir de cuándo importa para una empresa como la suya.",
+        "cta": "Ver las áreas"
+      },
+      "howItWorks": {
+        "title": "Cómo funciona",
+        "meta": "{{stages}} etapas, de principio a fin",
+        "desc": "De una pregunta en sus propias palabras a una cita reservada — incluido lo que le cuesta y qué ocurre con sus datos.",
+        "cta": "Leer las cinco etapas"
+      }
+    },
+    "gap": {
+      "kicker": "Lo que aún no está aquí",
+      "title": "Guías, tutoriales y un glosario.",
+      "body": "Preferimos remitirle a entradas verificadas antes que publicar artículos que no hemos escrito. Nada en esta página es el anticipo de algo que no existe — cuando tengamos guías que merezcan la lectura, aparecerán aquí."
     },
     "cta": {
-      "title": "¿Listo para ser conforme?",
-      "body": "Únete a las empresas que transformaron la incertidumbre de cumplimiento en planes de acción estructurados.",
-      "btnAssessment": "Iniciar evaluación gratuita",
-      "btnPlatform": "Explorar plataforma"
-    },
-    "footer": {
-      "copyright": "© {{year}} CompliHub360. Construido en Berlín."
+      "title": "O empiece por su propia situación.",
+      "lead": "Seis minutos, cuatro preguntas, sin necesidad de cuenta."
     }
-  },
-  "advisory": {
-    "heroImageAlt": "Capa Advisory cognitiva",
-    "heroBadge": "CAPA COGNITIVA AVANZADA",
-    "heroTitle": "Tu brújula inteligente de cumplimiento: La capa cognitiva",
-    "heroTitleHighlight": "Advisory Layer",
-    "heroBody": "Traduciendo la incertidumbre regulatoria no estructurada en comprensión clara y accionable. Cerramos la brecha entre tu negocio y el complejo mundo legal.",
-    "heroCta1": "Verificación de cumplimiento gratuita",
-    "heroCta2": "Explorar metodología",
-    "featuresTitle": "Cómo funciona nuestra navegación inteligente",
-    "featuresBody": "Yendo mucho más allá de un directorio tradicional, nuestra capa Advisory opera como un OS cognitivo para el cumplimiento global.",
-    "feature1Title": "Asistente de Cumplimiento Adaptativo",
-    "feature1Desc": "Estructuración de intención: En lugar de filtros estáticos, nuestro asistente captura tu contexto empresarial específico en 4-5 pasos dinámicos, traduciendo la incertidumbre en un perfil de búsqueda estructurado.",
-    "feature1Tag1": "Basado en intención",
-    "feature1Tag2": "Flujo dinámico",
-    "feature2Title": "Pipeline de redacción con privacidad primero",
-    "feature2Desc": "La seguridad de datos está integrada en la arquitectura. Toda la PII se anonimiza automática y localmente antes de cualquier análisis de IA, asegurando que ningún dato confidencial salga de tu control.",
-    "feature2Tag1": "Anonimización local",
-    "feature2Tag2": "Seguro para PII",
-    "feature3Title": "Inteligencia fundamentada",
-    "feature3Desc": "Nuestra IA está estrictamente fundamentada en fuentes legales oficiales y validadas. Cada recomendación y resumen incluye enlaces directos a la documentación regulatoria en la que se basa.",
-    "feature3Tag1": "Sin alucinaciones",
-    "feature3Tag2": "Vinculado a fuentes",
-    "feature4Title": "Motor de decisión basado en riesgos",
-    "feature4Desc": "Cálculo continuo de riesgos basado en los inputs de tu perfil. Conecta tu contexto con nuestra base de datos para generar listas de verificación curadas y emparejamientos de proveedores verificados.",
-    "feature4Tag1": "Evaluación en tiempo real",
-    "feature4Tag2": "Emparejamiento curado",
-    "transparencyTitle": "Transparencia y límites de nuestra IA",
-    "transparencyQuote": "«Nuestra IA no reemplaza a tu abogado. Hace a tu abogado 10 veces más eficiente al proporcionar dossiers digitales perfectamente preestructurados.»",
-    "check1": "Enfoque en orientación estructurada y orquestación de dossiers.",
-    "check2": "Recuperación fundamentada de fuentes oficiales y validadas.",
-    "cross1": "Sin asesoramiento legal vinculante — eso corresponde a los despachos de abogados con licencia.",
-    "matrixTitle": "Matriz de Políticas por País",
-    "matrixBody": "Cada proceso de datos sigue una estricta matriz de políticas individual adaptada a los estándares locales de residencia de datos y privacidad.",
-    "pipelineRaw": "DATOS EN BRUTO",
-    "pipelineLabel": "PIPELINE DE REDACCIÓN",
-    "pipelineDoc": "Documento del Usuario",
-    "pipelineAnon": "Dossier Anonimizado",
-    "pipelineReady": "LISTO PARA IA",
-    "pipelineNote": "Tu IA nunca ve PII en texto plano. Solo extracción local.",
-    "ctaTitle": "¿Listo para la claridad?",
-    "ctaBody": "Deja de buscar en directorios estáticos. Empieza a navegar tu camino de cumplimiento con nuestro sistema operativo cognitivo inteligente.",
-    "ctaBtn": "Iniciar búsqueda ahora"
   },
   "wizard": {
     "reviewPanel": {
@@ -896,13 +866,10 @@
   "header": {
     "nav": {
       "howItWorks": "Cómo funciona",
-      "whatWeKnow": "Qué cubrimos",
-      "voices": "Opiniones",
       "pricing": "Precios",
-      "howMatchingWorks": "Cómo funciona el matching",
-      "dashboard": "Dashboard",
-      "performance": "Rendimiento",
-      "faq": "FAQ"
+      "complianceAreas": "Áreas de Cumplimiento",
+      "markets": "Mercados",
+      "resources": "Recursos"
     },
     "login": "Iniciar sesión"
   },
@@ -1035,6 +1002,115 @@
       "prod-safety": "Seguridad y etiquetado del producto",
       "tax-corporate": "Impuesto de sociedades",
       "tax-vat-registration": "Registro y presentación del IVA"
+    },
+    "regions": {
+      "title": "Mercados y regiones cubiertos",
+      "lead": "Cada búsqueda y cada análisis se apoyan en las leyes concretas del país de destino, para evitar vuelos a ciegas en materia legal.",
+      "legend": {
+        "live": "En vivo",
+        "rollout": "Despliegue activo"
+      },
+      "focusAreas": "Áreas prioritarias",
+      "tiers": {
+        "full": "Cobertura completa",
+        "expanding": "En expansión",
+        "core": "Cobertura básica"
+      },
+      "complexity": {
+        "high": "Complejidad alta",
+        "medium": "Complejidad media"
+      },
+      "items": {
+        "eu": {
+          "name": "Unión Europea (UE)",
+          "description": "Experiencia especializada para el mercado único altamente regulado, desde los estándares del RGPD hasta las normas locales de EPR.",
+          "focus": [
+            "Cumplimiento del RGPD",
+            "Normativa EPR de envases",
+            "IVA en toda la UE",
+            "Ley de Servicios Digitales"
+          ]
+        },
+        "uk": {
+          "name": "Reino Unido (UK)",
+          "description": "Navegación específica por el panorama de cumplimiento posterior al Brexit y las normas británicas de protección de datos.",
+          "focus": [
+            "RGPD del Reino Unido",
+            "Cumplimiento de IVA (HMRC)",
+            "Seguridad del producto (UKCA)",
+            "Derecho laboral"
+          ]
+        },
+        "us": {
+          "name": "EE. UU. y Canadá",
+          "description": "Escale su negocio hacia Norteamérica con apoyo unificado para los requisitos federales y estatales.",
+          "focus": [
+            "Nexus e impuesto sobre ventas",
+            "Privacidad CCPA/CPRA",
+            "FDA/Etiquetado",
+            "Cumplimiento comercial"
+          ]
+        },
+        "au": {
+          "name": "Australia (APAC)",
+          "description": "Puerta de entrada a la región APAC con cobertura básica del derecho de consumo y la fiscalidad australianos.",
+          "focus": [
+            "Cumplimiento del GST",
+            "Privacy Act 1988",
+            "Responsabilidad de producto",
+            "Importación/Exportación"
+          ]
+        }
+      }
+    }
+  },
+  "pricing": {
+    "meta": {
+      "title": "Precios · CompliHub360"
+    },
+    "eyebrow": "Precios",
+    "title": {
+      "pre": "A usted no le cuesta ",
+      "gold": "nada",
+      "post": "."
+    },
+    "lead": "La evaluación, la Risk Map y el matching son gratuitos. Nos pagan los especialistas, y solo cuando la reserva llega a producirse.",
+    "free": {
+      "kicker": "Qué es gratuito",
+      "title": "Todo hasta la reserva.",
+      "items": [
+        {
+          "title": "La evaluación",
+          "desc": "Cuatro preguntas sobre sus mercados, su modelo de negocio y su volumen. Sin cuenta, sin llamada comercial, sin obligación de continuar."
+        },
+        {
+          "title": "Su Risk Map",
+          "desc": "Las obligaciones que se aplican a su actividad, cada una con su base jurídica y su plazo. Una cuenta gratuita abre el mapa completo."
+        },
+        {
+          "title": "La comparación",
+          "desc": "Cobertura, cualificaciones verificadas, tiempo de respuesta y encaje con sus mercados — en paralelo, antes de que se revele ninguna identidad."
+        }
+      ]
+    },
+    "who": {
+      "kicker": "Quién paga",
+      "title": "Los especialistas, al reservar.",
+      "body": "Se cobra a un especialista cuando de un match sale una cita confirmada — no por figurar en la lista, no por clic, no por una visita al perfil. A usted no se le cobra en ningún momento."
+    },
+    "ranking": {
+      "kicker": "Lo que no se puede comprar",
+      "title": "El orden.",
+      "body": "Los puestos no están en venta. Un puesto pagado dejaría el match sin valor para ambas partes: usted conocería a quien más hubiera pagado, y el especialista conocería a alguien cuyo caso no puede atender. La idoneidad es el único criterio."
+    },
+    "specialist": {
+      "kicker": "Lo que cuesta el especialista",
+      "title": "Sus honorarios — presupuestados antes de que se comprometa.",
+      "body": "El asesoramiento en sí no es gratuito, y no vamos a pretender lo contrario. Cada Verified Partner publica una estimación fija antes de que acepte el encargo, de modo que nunca tendrá que aguantar una llamada exploratoria solo para conocer el precio."
+    },
+    "cta": {
+      "title": "Empiece donde tenga sentido para usted.",
+      "lead": "Seis minutos, cuatro preguntas, sin necesidad de cuenta."
     }
   }
 }

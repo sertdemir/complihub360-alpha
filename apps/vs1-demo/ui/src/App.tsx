@@ -4,19 +4,15 @@ import { useTranslation } from "react-i18next";
 import { supportedLngs } from "./i18n/config";
 import { SiteHeader } from "./components/layout/SiteHeader";
 import { HomePage } from "./pages/HomePage";
-import { ServicesPage } from "./pages/ServicesPage";
-import { CountriesPage } from "./pages/CountriesPage";
 import { PlatformPage } from "./pages/PlatformPage";
 import { SolutionsPage } from "./pages/SolutionsPage";
 import { ComplianceAreasPage } from "./pages/ComplianceAreasPage";
 import { HowItWorksPage } from "./pages/HowItWorksPage";
+import { PricingPage } from "./pages/PricingPage";
 import { MarketsIndexPage, MarketPage } from "./pages/MarketsPage";
-import { ProvidersPage } from "./pages/ProvidersPage";
-import { PROVIDER_MARKETING_ENABLED } from "./lib/featureFlags";
 import { ResultsRiskMap } from "./pages/ResultsRiskMap";
 import { SearchResultPage } from "./pages/SearchResultPage";
 import { ResourcesPage } from "./pages/ResourcesPage";
-import AdvisoryPage from "./pages/AdvisoryPage";
 import { AiGovernancePage } from "./pages/AiGovernancePage";
 import { PrivacyPage, ImprintPage, TermsPage, CookiePage } from "./pages/legal/LegalPages";
 import { AdminOverviewPage } from "./pages/admin/AdminOverviewPage";
@@ -89,7 +85,8 @@ function WizardRoutes() {
 // back to the old light-mode fixtures.
 function LocaleRedirect({ to }: { to: string }) {
     const { locale } = useParams();
-    return <Navigate to={`/${locale || 'en'}/${to}`} replace />;
+    const base = `/${locale || 'en'}`;
+    return <Navigate to={to ? `${base}/${to}` : base} replace />;
 }
 
 function RootRedirect() {
@@ -125,20 +122,15 @@ function AppContent() {
                     {/* Public pages */}
                     {/* Index = User/Entrepreneur landing (HomePage). */}
                     <Route index element={<HomePage />} />
-                    <Route path="services" element={<ServicesPage />} />
-                    <Route path="countries" element={<CountriesPage />} />
+                    <Route path="countries" element={<LocaleRedirect to="markets" />} />  {/* /countries wurde 2026-08-18 in /markets zusammengeführt; Redirect erhält die Bestands-URL */}
                     <Route path="platform" element={<PlatformPage />} />
                     <Route path="solutions" element={<SolutionsPage />} />
                     <Route path="compliance" element={<ComplianceAreasPage />} />
                     <Route path="how-it-works" element={<HowItWorksPage />} />
+                    <Route path="pricing" element={<PricingPage />} />
                     <Route path="markets" element={<MarketsIndexPage />} />
                     <Route path="markets/:code" element={<MarketPage />} />
-                    {/* Provider marketing landing — off by design (featureFlags.ts):
-                        providers are recruited offline/B2B. Kept in the repo; the
-                        route redirects home while the flag is false. */}
-                    <Route path="providers" element={PROVIDER_MARKETING_ENABLED ? <ProvidersPage /> : <LocaleRedirect to="" />} />
                     <Route path="resources" element={<ResourcesPage />} />
-                    <Route path="advisory" element={<AdvisoryPage />} />
                     <Route path="ai-governance" element={<AiGovernancePage />} />
                     <Route path="results" element={<ResultsRiskMap />} />
                     {/* Station 1A: prose-search answers page (no risk map, no gating). */}
@@ -209,6 +201,11 @@ function AppContent() {
                     <Route path="verify-email" element={<EmailVerificationPage />} />
                     <Route path="auth/callback" element={<AuthCallbackPage />} />
                     <Route path="reset-password" element={<ResetPasswordPage />} />
+                    {/* Anything unknown below a locale stays in that locale. Without
+                        this it falls to the top-level "*", which redirects to the
+                        i18n default — a German visitor on a retired URL landed on
+                        the English home. */}
+                    <Route path="*" element={<LocaleRedirect to="" />} />
                 </Route>
                 <Route path="/" element={<RootRedirect />} />
                 <Route path="*" element={<RootRedirect />} />
