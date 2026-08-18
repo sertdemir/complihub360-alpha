@@ -35,7 +35,7 @@ function JourneyStepper() {
             />
             {i < JOURNEY.length - 1 && <span className="h-px flex-1 bg-primary-950/25" />}
           </div>
-          <span className={'mt-2.5 text-[12px] ' + (s.done ? 'font-bold text-fg' : 'text-primary-950/60')}>
+          <span className={'mt-2.5 text-[12px] ' + (s.done ? 'font-bold text-neutral-900' : 'text-primary-950/60')}>
             {t(`entryDoor.journey.${s.index}`)}
           </span>
         </div>
@@ -80,12 +80,15 @@ export function EntryDoor() {
                 transition={{ duration: 0.5, ease: 'easeOut' }}
                 className="absolute inset-0 z-10 flex items-center justify-center bg-white/30 px-6 backdrop-blur-md"
               >
+                {/* Der Glas-Backdrop bleibt in beiden Themes hell (bg-white/30 über einem hellen Bild),
+                    deshalb ist der Text hier bewusst hartcodiert dunkel und KEIN Theme-Token — mit
+                    text-fg fiel er im Dark-Mode auf 1,4:1. */}
                 <div className="flex max-w-xl flex-col items-center text-center">
-                  <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-fg-brand">{t('entryDoor.eyebrow')}</span>
-                  <h2 className="mt-4 font-serif text-[2rem] font-bold leading-[1.1] tracking-tight text-fg sm:text-[2.75rem] lg:text-[3rem]">
+                  <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-primary-500">{t('entryDoor.eyebrow')}</span>
+                  <h2 className="mt-4 font-serif text-[2rem] font-bold leading-[1.1] tracking-tight text-neutral-900 sm:text-[2.75rem] lg:text-[3rem]">
                     {t('entryDoor.title.pre')}<span className="text-accent-600">{t('entryDoor.title.highlight')}</span>{t('entryDoor.title.post')}
                   </h2>
-                  <p className="mt-5 max-w-md text-[15px] leading-relaxed text-fg-secondary sm:text-[17px]">
+                  <p className="mt-5 max-w-md text-[15px] leading-relaxed text-neutral-700 sm:text-[17px]">
                     {t('entryDoor.subtitle')}
                   </p>
 

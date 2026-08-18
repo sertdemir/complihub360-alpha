@@ -163,7 +163,7 @@ export function MatchmakingDifference() {
                       ? 'bg-brand text-fg-on-brand'
                       : s.tone === 'gold'
                       ? 'bg-accent-500 text-fg-on-accent'
-                      : 'bg-neutral-200/80 text-fg-secondary')
+                      : 'bg-surface-tertiary/80 text-fg-secondary')
                   }
                 >
                   {s.n}
