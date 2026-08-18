@@ -248,7 +248,12 @@
     --color-bg-brand-light: 29 61 71;   /* #1d3d47 */
     --color-text-primary: 245 246 248;  /* #f5f6f8 */
     --color-text-secondary: 154 167 173;/* #9aa7ad */
-    --color-text-tertiary: 107 122 128; /* #6b7a80 */
+    /* #8e9ca1 — was #6b7a80, which sat at 2.87-4.01:1 on the dark surfaces and
+       failed AA everywhere it was used. This value clears 4.5:1 on all three
+       (bg-primary 5.19, bg-secondary 6.31, bg-tertiary 4.51). It necessarily
+       moves close to text-secondary (5.94 on bg-primary) — the dark ramp has
+       little room between "legible" and "quiet". */
+    --color-text-tertiary: 142 156 161;
     --color-text-inverse: 15 23 42;     /* #0f172a */
     --color-text-brand: 44 192 173;     /* #2cc0ad */
     --color-border-default: 55 65 81;   /* #374151 */
