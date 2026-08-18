@@ -26,5 +26,37 @@
       "dispute": "EU-Streitschlichtung",
       "notice": "Hinweis"
     }
+  },
+  "terms": {
+    "title": "Allgemeine Geschäftsbedingungen",
+    "updated": "Entwurf — noch nicht in Kraft",
+    "headings": {
+      "scope": "1. Geltungsbereich",
+      "service": "2. Leistungen von CompliHub360",
+      "noAdvice": "3. Keine Rechts- oder Steuerberatung",
+      "partners": "4. Verified Partner",
+      "account": "5. Konto und Zugangsvoraussetzungen",
+      "fees": "6. Entgelte und Zahlung",
+      "sla": "7. Reaktionszeiten",
+      "obligations": "8. Ihre Pflichten",
+      "liability": "9. Haftung",
+      "term": "10. Laufzeit und Kündigung",
+      "changes": "11. Änderungen dieser Bedingungen",
+      "law": "12. Anwendbares Recht und Gerichtsstand"
+    }
+  },
+  "cookies": {
+    "title": "Cookie- und Speicher-Richtlinie",
+    "updated": "Entspricht dem aktuellen Stand der Anwendung",
+    "headings": {
+      "summary": "Kurz gefasst",
+      "noCookies": "Wir setzen keine Cookies",
+      "storage": "Was auf Ihrem Gerät gespeichert wird",
+      "purposes": "Wozu wir das speichern",
+      "consent": "Rechtsgrundlage und Einwilligung",
+      "manage": "So löschen Sie diese Daten",
+      "thirdParty": "Inhalte Dritter",
+      "contact": "Fragen"
+    }
   }
 }

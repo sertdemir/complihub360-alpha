@@ -26,5 +26,37 @@
       "dispute": "EU dispute resolution",
       "notice": "Notice"
     }
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "updated": "Draft — not yet in force",
+    "headings": {
+      "scope": "1. Scope",
+      "service": "2. What CompliHub360 provides",
+      "noAdvice": "3. No legal or tax advice",
+      "partners": "4. Verified Partners",
+      "account": "5. Account and eligibility",
+      "fees": "6. Fees and payment",
+      "sla": "7. Response times",
+      "obligations": "8. Your obligations",
+      "liability": "9. Liability",
+      "term": "10. Term and termination",
+      "changes": "11. Changes to these terms",
+      "law": "12. Governing law and venue"
+    }
+  },
+  "cookies": {
+    "title": "Cookie & Storage Policy",
+    "updated": "Reflects the current build",
+    "headings": {
+      "summary": "In short",
+      "noCookies": "We set no cookies",
+      "storage": "What we store on your device",
+      "purposes": "Why we store it",
+      "consent": "Legal basis and consent",
+      "manage": "How to delete this data",
+      "thirdParty": "Third-party content",
+      "contact": "Questions"
+    }
   }
 }
