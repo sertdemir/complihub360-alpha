@@ -4,28 +4,23 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Globe, Menu, X } from 'lucide-react';
 import { Logo } from '../ui/Logo';
 import { ThemeToggle } from '../ui/ThemeToggle';
-import { PROVIDER_MARKETING_ENABLED } from '../../lib/featureFlags';
 
 // ─── MarketingHeader ──────────────────────────────────────────────────────────
-// Anchor-nav header for the CompliHub360 landing pages. Two audiences
-// (entrepreneur · provider), responsive: desktop bar + mobile expanding pill panel.
-// Menu items are in-page section anchors with scroll-spy; a cross-link bridges the
-// two audiences (For Providers ↔ For Entrepreneurs). Compass: Header Marketing
-// Desktop / Header Marketing (Provider) Mobile.
+// Anchor-nav header for the CompliHub360 landing page, responsive: desktop bar +
+// mobile expanding pill panel. Menu items are in-page section anchors with
+// scroll-spy. Compass: Header Marketing Desktop / Mobile.
+//
+// The second audience (provider) and the switch between the two were removed with
+// the provider marketing landing on 2026-08-18 — with one audience left, a toggle
+// and a cross-link had nothing to point at.
 
-export type Audience = 'entrepreneur' | 'provider';
 export interface Anchor { id: string; label: string; labelKey?: string }
-export interface CrossLink { label: string; href: string }
 
 export interface MarketingHeaderProps {
-  audience?: Audience;
-  /** Section anchors (in-page). Defaults to the audience preset. */
+  /** Section anchors (in-page). Defaults to ANCHORS. */
   anchors?: Anchor[];
-  /** Cross-link to the other audience's landing. Defaults to the audience preset. */
-  crossLink?: CrossLink;
-  /** Audience-switch targets (locale-aware). The toggle sits next to the logo. */
+  /** Locale-aware home link on the logo. */
   userHref?: string;
-  providerHref?: string;
   loginHref?: string;
   /** Theme over a dark hero (white logo + nav). */
   theme?: 'light' | 'inverse';
@@ -33,79 +28,16 @@ export interface MarketingHeaderProps {
   embedded?: boolean;
 }
 
-// Anchor ids point at REAL section ids on the respective landing page
-// (user LP: pricing lives in the HowItActs cost section #engagement, voices in
-// the Brand-Code section; provider LP: pricing = the two-channels section).
-const PRESETS: Record<Audience, { anchors: Anchor[]; cross: CrossLink }> = {
-  entrepreneur: {
-    anchors: [
-      { id: 'how-it-works', label: 'How it works', labelKey: 'header.nav.howItWorks' },
-      { id: 'what-we-know', label: 'What we know', labelKey: 'header.nav.whatWeKnow' },
-      { id: 'brand-code', label: 'Voices', labelKey: 'header.nav.voices' },
-      { id: 'engagement', label: 'Pricing', labelKey: 'header.nav.pricing' },
-    ],
-    cross: { label: 'For Providers', href: '/providers' },
-  },
-  provider: {
-    anchors: [
-      { id: 'matchmaking', label: 'How matching works', labelKey: 'header.nav.howMatchingWorks' },
-      { id: 'dashboard', label: 'Dashboard', labelKey: 'header.nav.dashboard' },
-      { id: 'performance', label: 'Performance', labelKey: 'header.nav.performance' },
-      { id: 'channels', label: 'Pricing', labelKey: 'header.nav.pricing' },
-      { id: 'faq', label: 'FAQ', labelKey: 'header.nav.faq' },
-    ],
-    cross: { label: 'For Entrepreneurs', href: '/' },
-  },
-};
+// Anchor ids point at REAL section ids on the landing page — pricing lives in the
+// HowItActs cost section (#engagement), voices in the Brand-Code section.
+const ANCHORS: Anchor[] = [
+  { id: 'how-it-works', label: 'How it works', labelKey: 'header.nav.howItWorks' },
+  { id: 'what-we-know', label: 'What we know', labelKey: 'header.nav.whatWeKnow' },
+  { id: 'brand-code', label: 'Voices', labelKey: 'header.nav.voices' },
+  { id: 'engagement', label: 'Pricing', labelKey: 'header.nav.pricing' },
+];
 
-// Audience labels — change here to relabel both header + mobile panel.
-const AUDIENCE_LABELS = { provider: 'For Providers', entrepreneur: 'For Businesses' } as const;
 
-// Audience switch — minimalist underlined tabs next to the logo. Each tab links
-// to that audience's landing (locale-aware); the active one (matching the current
-// page) carries the underline, so switching swaps the whole header.
-function AudienceSwitch({
-  audience,
-  userHref,
-  providerHref,
-  inverse,
-  className = '',
-}: {
-  audience: Audience;
-  userHref: string;
-  providerHref: string;
-  inverse: boolean;
-  className?: string;
-}) {
-  const tab = (on: boolean) =>
-    `relative pb-1 text-body-sm font-semibold transition-colors ${
-      on
-        ? inverse
-          ? 'text-white'
-          : 'text-fg'
-        : inverse
-          ? 'text-white/65 hover:text-white'
-          : 'text-fg-tertiary hover:text-fg'
-    }`;
-  const underline = (
-    <span className={`absolute -bottom-px left-0 right-0 h-0.5 rounded-full ${inverse ? 'bg-white' : 'bg-brand'}`} />
-  );
-  // With the provider marketing landing switched off there is only one
-  // audience left — the switch would be a dead toggle, so it disappears.
-  if (!PROVIDER_MARKETING_ENABLED) return null;
-  return (
-    <div className={`flex items-center gap-6 ${className}`}>
-      <a href={providerHref} className={tab(audience === 'provider')}>
-        {AUDIENCE_LABELS.provider}
-        {audience === 'provider' && underline}
-      </a>
-      <a href={userHref} className={tab(audience === 'entrepreneur')}>
-        {AUDIENCE_LABELS.entrepreneur}
-        {audience === 'entrepreneur' && underline}
-      </a>
-    </div>
-  );
-}
 
 // Language menu — same four locales and URL-segment logic as
 // components/common/LanguageSwitcher (GlobalNav). Navigation happens via plain
@@ -205,18 +137,14 @@ function useScrollSpy(ids: string[]): string | null {
 }
 
 export function MarketingHeader({
-  audience = 'entrepreneur',
   anchors,
-  crossLink,
   userHref = '/',
-  providerHref = '/providers',
   loginHref = '/login',
   theme = 'light',
   embedded = false,
 }: MarketingHeaderProps) {
   const { t } = useTranslation('common');
-  const preset = PRESETS[audience];
-  const items = anchors ?? preset.anchors;
+  const items = anchors ?? ANCHORS;
   const inverse = theme === 'inverse';
 
   const [scrolled, setScrolled] = useState(false);
@@ -241,8 +169,7 @@ export function MarketingHeader({
       {/* ── Desktop ── */}
       <div className="mx-auto hidden h-20 max-w-container-2xl items-center gap-4 px-4 lg:flex">
         <div className="flex flex-1 basis-0 items-center gap-5">
-          <Logo tone={inverse ? 'on-petrol' : 'on-light'} />
-          <AudienceSwitch audience={audience} userHref={userHref} providerHref={providerHref} inverse={inverse} />
+          <Logo tone={inverse ? 'on-petrol' : 'on-light'} href={userHref} />
         </div>
         {/* Anchor group sits truly centered between the two flex-1 side zones. */}
         <nav className="flex items-center justify-center gap-3">
@@ -304,10 +231,6 @@ export function MarketingHeader({
               transition={{ duration: 0.25, ease: 'easeOut' }}
               className="overflow-hidden bg-surface"
             >
-              {/* Audience switch */}
-              <div className="flex justify-center px-4 pt-4">
-                <AudienceSwitch audience={audience} userHref={userHref} providerHref={providerHref} inverse={false} />
-              </div>
               {/* Button row */}
               <div className="flex items-center gap-4 px-4 pb-1 pt-4">
                 <a href={loginHref} className="inline-flex h-[40px] flex-1 items-center justify-center rounded-md border-thin border-stroke-brand px-4 text-body-sm font-semibold text-fg-brand">
