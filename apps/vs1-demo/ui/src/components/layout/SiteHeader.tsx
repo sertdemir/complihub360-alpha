@@ -4,13 +4,13 @@ import { MarketingHeader } from './MarketingHeader';
 import { supportedLngs } from '../../i18n/config';
 
 // ─── SiteHeader ───────────────────────────────────────────────────────────────
-// Route-aware header dispatcher. The marketing one-pagers get the in-page
-// anchor-nav MarketingHeader (audience-specific); every other route keeps the
-// multi-page GlobalNav. Rendered once at the app root in place of GlobalNav so
-// the two never stack into a double header.
-//   /:locale            → entrepreneur landing  → MarketingHeader (entrepreneur)
-//   /:locale/providers  → provider landing      → MarketingHeader (provider)
-//   else                → GlobalNav
+// Route-aware header dispatcher. The landing page gets the in-page anchor-nav
+// MarketingHeader; every other route keeps the multi-page GlobalNav. Rendered
+// once at the app root in place of GlobalNav so the two never stack into a
+// double header.
+//   /:locale  → landing page → MarketingHeader
+//   else      → GlobalNav
+// The provider landing branch went with that page on 2026-08-18.
 export function SiteHeader() {
   const { pathname } = useLocation();
   const seg = pathname.split('/').filter(Boolean);
@@ -18,14 +18,10 @@ export function SiteHeader() {
 
   const locale = localeOk ? seg[0] : 'en';
   const userHref = `/${locale}`;
-  const providerHref = `/${locale}/providers`;
   const loginHref = `/${locale}/login`;
 
   if (localeOk && seg.length === 1) {
-    return <MarketingHeader audience="entrepreneur" userHref={userHref} providerHref={providerHref} loginHref={loginHref} />;
-  }
-  if (localeOk && seg.length === 2 && seg[1] === 'providers') {
-    return <MarketingHeader audience="provider" userHref={userHref} providerHref={providerHref} loginHref={loginHref} />;
+    return <MarketingHeader userHref={userHref} loginHref={loginHref} />;
   }
   // The risk-map result and the partner-onboarding wizard carry their own
   // dedicated topbars — no global header.

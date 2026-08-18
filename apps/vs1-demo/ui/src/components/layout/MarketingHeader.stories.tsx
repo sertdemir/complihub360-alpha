@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { MemoryRouter } from 'react-router-dom';
 import { MarketingHeader, type MarketingHeaderProps } from './MarketingHeader';
 
 const DESCRIPTION = `
 **MarketingHeader** — the anchor-navigation header for the CompliHub360 landing pages.
 
-- **Two audiences.** \`entrepreneur\` (the initial landing) and \`provider\`. Each shows its own
-  in-page **section anchors** plus a **cross-link** to the other audience's landing
-  (For Providers ↔ For Entrepreneurs).
+- **One audience.** The provider landing and the switch between the two were removed on
+  2026-08-18 — with a single audience left, a toggle and a cross-link had nothing to point at.
 - **Anchors, not pages.** Menu items are in-page section links with **scroll-spy** — the anchor for
   the section currently in view is highlighted (petrol active state).
 - **Responsive.** Desktop = glassmorphism bar (solid + shadow on scroll). Mobile = collapsed bar
@@ -15,7 +15,7 @@ const DESCRIPTION = `
   visible controls).
 - **Themes.** \`light\` for light pages, \`inverse\` over dark hero sections.
 - Built entirely on Compass tokens. Mirrors the Figma components *Header Marketing Desktop /
-  Header Marketing (Provider) Mobile*.
+  Header Marketing Mobile*.
 `;
 
 const meta = {
@@ -26,8 +26,10 @@ const meta = {
     docs: { description: { component: DESCRIPTION } },
   },
   tags: ['autodocs'],
+  // The entries are real routes since 2026-08-18, so the header calls
+  // useLocation() to light the active one — which needs a Router in scope.
+  decorators: [(Story) => <MemoryRouter initialEntries={['/en/markets']}><Story /></MemoryRouter>],
   argTypes: {
-    audience: { control: 'radio', options: ['entrepreneur', 'provider'], description: 'Which landing the header serves.' },
     theme: { control: 'radio', options: ['light', 'inverse'], description: 'Light page vs. dark hero (inverse).' },
   },
 } satisfies Meta<typeof MarketingHeader>;
@@ -35,27 +37,18 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const ANCHORS: Record<string, { id: string; label: string }[]> = {
-  entrepreneur: [
-    { id: 'how-it-works', label: 'How it works' },
-    { id: 'what-we-know', label: 'What we know' },
-    { id: 'voices', label: 'Voices' },
-    { id: 'pricing', label: 'Pricing' },
-  ],
-  provider: [
-    { id: 'matchmaking', label: 'How matching works' },
-    { id: 'dashboard', label: 'Dashboard' },
-    { id: 'performance', label: 'Performance' },
-    { id: 'pricing', label: 'Pricing' },
-    { id: 'faq', label: 'FAQ' },
-  ],
-};
+const ANCHORS: { id: string; label: string }[] = [
+  { id: 'how-it-works', label: 'How it works' },
+  { id: 'what-we-know', label: 'What we know' },
+  { id: 'voices', label: 'Voices' },
+  { id: 'pricing', label: 'Pricing' },
+];
 
 // Mock page with scroll-spy targets. The header is rendered `embedded` (in normal
 // flow) inside a horizontally-scrollable strip so the full-width desktop bar is
 // always visible in the docs column, regardless of how narrow it is.
 function Demo(args: MarketingHeaderProps) {
-  const sections = ANCHORS[args.audience ?? 'entrepreneur'];
+  const sections = ANCHORS;
   return (
     <div className="min-h-screen bg-surface">
       <div className="overflow-x-auto">
@@ -76,18 +69,13 @@ function Demo(args: MarketingHeaderProps) {
   );
 }
 
-export const Entrepreneur: Story = {
-  args: { audience: 'entrepreneur', theme: 'light' },
-  render: (args) => <Demo {...args} />,
-};
-
-export const Provider: Story = {
-  args: { audience: 'provider', theme: 'light' },
+export const Default: Story = {
+  args: { theme: 'light' },
   render: (args) => <Demo {...args} />,
 };
 
 export const InverseOverDarkHero: Story = {
-  args: { audience: 'entrepreneur', theme: 'inverse' },
+  args: { theme: 'inverse' },
   render: (args) => (
     <div className="min-h-screen bg-brand">
       <div className="overflow-x-auto">

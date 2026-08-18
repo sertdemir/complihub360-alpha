@@ -33,6 +33,14 @@ function useDomainLabel() {
   };
 }
 
+// Region cards merged in from /countries. The tier is a key, not a label — it
+// also drives which wording appears, and comparing translated text would break
+// in every non-English locale.
+const REGION_KEYS = ['eu', 'uk', 'us', 'au'] as const;
+const REGION_TIER: Record<(typeof REGION_KEYS)[number], 'full' | 'expanding' | 'core'> = {
+  eu: 'full', uk: 'full', us: 'expanding', au: 'core',
+};
+
 export function MarketsIndexPage() {
   const { t } = useTranslation('common');
   const { locale } = useParams();
@@ -86,6 +94,51 @@ export function MarketsIndexPage() {
               </StaggerItem>
             ))}
           </Stagger>
+        </Container>
+      </section>
+
+      {/* Regions — merged in from the retired /countries page (2026-08-18). That
+          page carried a coverage overview with no legal sources; the per-country
+          duties below are the substance, so the overview became a section here
+          rather than a second, thinner page competing for the same intent. */}
+      <section className="border-t border-stroke-subtle bg-surface-secondary py-16 lg:py-20">
+        <Container size="xl">
+          <Reveal className="mx-auto max-w-[1040px]">
+            <h2 className="font-serif text-[1.75rem] font-semibold text-fg">
+              {t('markets.regions.title')}
+            </h2>
+            <p className="mt-2 max-w-2xl text-body text-fg-secondary">{t('markets.regions.lead')}</p>
+
+            <Stagger className="mt-8 grid gap-4 sm:grid-cols-2">
+              {REGION_KEYS.map((key) => (
+                <StaggerItem key={key}>
+                  <div className="flex h-full flex-col rounded-2xl border border-stroke-subtle bg-surface p-6">
+                    <div className="flex items-baseline justify-between gap-3">
+                      <p className="font-serif text-[1.125rem] font-bold leading-snug text-fg">
+                        {t(`markets.regions.items.${key}.name`)}
+                      </p>
+                      <span className="shrink-0 text-[11px] font-semibold uppercase tracking-[0.12em] text-fg-tertiary">
+                        {t(`markets.regions.tiers.${REGION_TIER[key]}`)}
+                      </span>
+                    </div>
+                    <p className="mt-3 text-body-sm leading-relaxed text-fg-secondary">
+                      {t(`markets.regions.items.${key}.description`)}
+                    </p>
+                    <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.12em] text-fg-tertiary">
+                      {t('markets.regions.focusAreas')}
+                    </p>
+                    <ul className="mt-2 flex flex-wrap gap-1.5">
+                      {(t(`markets.regions.items.${key}.focus`, { returnObjects: true }) as string[]).map((f) => (
+                        <li key={f} className="rounded-full border border-stroke-subtle px-2.5 py-1 text-[12px] text-fg-secondary">
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </StaggerItem>
+              ))}
+            </Stagger>
+          </Reveal>
         </Container>
       </section>
 

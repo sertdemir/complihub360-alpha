@@ -629,80 +629,50 @@
       "body": "Asistanımız doğru soruları sorar ve sizi otomatik olarak doğru değerlendirmeye yönlendirir.",
       "btn": "Genel Değerlendirme Başlatın"
     },
-    "footer": {
-      "copyright": "© {{year}} CompliHub360. Berlin'de yapıldı."
+    "meta": {
+      "title": "Uyum Alanları · CompliHub360"
     }
   },
   "resources": {
-    "tabStories": "Müşteri Hikayeleri",
-    "tabGuides": "Rehberler ve Raporlar",
-    "stories": {
-      "overline": "Müşteri Hikayeleri",
-      "title": "Gerçek uyumluluk sonuçları, pazarlama iddiaları değil",
-      "body": "Sizin gibi işletmelerin karmaşık sınır ötesi uyumluluğu nasıl yönetmek için CompliHub360'ı kullandığını görün — belirsizlikten çözüme.",
-      "challengeLabel": "Zorluk",
-      "outcomeLabel": "Sonuç"
+    "meta": {
+      "title": "Kaynaklar · CompliHub360"
     },
-    "guides": {
-      "overline": "Rehberler ve Raporlar",
-      "title": "Uyumluluk güveni inşa eden bilgi",
-      "body": "Derinlemesine pazar analizleri, mevzuat açıklamaları ve pratik kontrol listeleri — uyumluluk zeka motorumuz tarafından küratörlüğü yapılmış ve uzmanlar tarafından gözden geçirilmiştir.",
-      "kbTitle": "Canlı Bilgi Tabanı",
-      "kbBody": "Her platform güncellemesi, yeni uyumluluk kuralı veya partner entegrasyonu özel bir içerik güncellemesini tetikler. Rehberlerimiz sürekli geçerlidir — otomatik olarak bakımı yapılır ve en son mevzuat kaynaklarına karşı doğrulanır.",
-      "kbCta": "Bildirim Alın"
+    "eyebrow": "Kaynaklar",
+    "title": {
+      "pre": "Size şimdiden ",
+      "gold": "gösterebildiklerimiz",
+      "post": "."
+    },
+    "lead": "Bu bir blog değil. Bunlar, kimseyle konuşmadan okuyabileceğiniz platform bölümleri — motorumuzun karşılaştırdığı aynı kayıtlar, her birinin arkasındaki yasa metniyle birlikte.",
+    "entries": {
+      "markets": {
+        "title": "Pazarlar",
+        "meta": "{{markets}} pazar · her yükümlülük yasal dayanağıyla",
+        "desc": "Ülke bazında: hangi yükümlülükler için kaynağımız var, arkasındaki ulusal düzenleme, bildirim sıklığı — ve varsa AB metnine bağlantı.",
+        "cta": "Pazarlara git"
+      },
+      "compliance": {
+        "title": "Uyum Alanları",
+        "meta": "{{domains}} alan",
+        "desc": "Her alanın neyi kapsadığı, hangi pazarlarda geçerli olduğu ve sizinki gibi bir işletme için ne zaman önem kazandığı.",
+        "cta": "Alanlara git"
+      },
+      "howItWorks": {
+        "title": "Nasıl çalışır",
+        "meta": "{{stages}} aşama, baştan sona",
+        "desc": "Kendi kelimelerinizle sorduğunuz bir sorudan alınmış randevuya — size maliyeti ve verilerinize ne olduğu dahil.",
+        "cta": "Beş aşamayı okuyun"
+      }
+    },
+    "gap": {
+      "kicker": "Burada henüz olmayanlar",
+      "title": "Rehberler, eğitimler ve bir sözlük.",
+      "body": "Yazmadığımız yazıları yayımlamaktansa sizi doğrulanmış kayıtlara yönlendirmeyi tercih ederiz. Bu sayfadaki hiçbir şey, var olmayan bir şeyin ön gösterimi değildir — okunmaya değer rehberlerimiz olduğunda burada yer alacaklar."
     },
     "cta": {
-      "title": "Uyumlu olmaya hazır mısınız?",
-      "body": "Uyumluluk belirsizliğini yapılandırılmış eylem planlarına dönüştüren işletmelere katılın.",
-      "btnAssessment": "Ücretsiz Değerlendirme Başlatın",
-      "btnPlatform": "Platformu Keşfedin"
-    },
-    "footer": {
-      "copyright": "© {{year}} CompliHub360. Berlin'de yapıldı."
+      "title": "Ya da kendi durumunuzla başlayın.",
+      "lead": "Altı dakika, dört soru, hesap gerekmiyor."
     }
-  },
-  "advisory": {
-    "heroImageAlt": "Bilişsel Danışmanlık Katmanı",
-    "heroBadge": "GELİŞMİŞ BİLİŞSEL KATMAN",
-    "heroTitle": "Akıllı uyumluluk pusulasınız: Bilişsel",
-    "heroTitleHighlight": "Danışmanlık Katmanı",
-    "heroBody": "Yapılandırılmamış mevzuat belirsizliğini net, eyleme geçirilebilir anlayışa dönüştürme. İşletmeniz ile karmaşık hukuki dünya arasındaki boşluğu kapatıyoruz.",
-    "heroCta1": "Ücretsiz Uyumluluk Kontrolü",
-    "heroCta2": "Metodolojiye Bakın",
-    "featuresTitle": "Akıllı navigasyonumuz nasıl çalışır",
-    "featuresBody": "Geleneksel bir dizinin çok ötesine geçen Danışmanlık Katmanımız, küresel uyumluluk için bilişsel bir işletim sistemi olarak çalışır.",
-    "feature1Title": "Uyarlanabilir Uyumluluk Asistanı",
-    "feature1Desc": "Niyet Yapılandırma: Statik filtreler yerine asistanımız, spesifik iş bağlamınızı 4-5 dinamik adımda yakalar ve belirsizliği yapılandırılmış bir arama profiline dönüştürür.",
-    "feature1Tag1": "Niyet Tabanlı",
-    "feature1Tag2": "Dinamik Akış",
-    "feature2Title": "Gizlilik Öncelikli Düzeltme Hattı",
-    "feature2Desc": "Veri güvenliği mimariye yerleştirilmiştir. Tüm PII, herhangi bir YZ analizinden önce otomatik olarak ve yerel olarak anonimleştirilir; hiçbir gizli veri kontrolünüzden çıkmaz.",
-    "feature2Tag1": "Yerel Anonimleştirme",
-    "feature2Tag2": "PII Güvenli",
-    "feature3Title": "Temelli Zeka",
-    "feature3Desc": "Yapay zekamız, resmi, doğrulanmış hukuki kaynaklarda kesinlikle temellendiriliyor. Her öneri ve özet, dayandığı mevzuat belgelerine doğrudan bağlantılar içerir.",
-    "feature3Tag1": "Halüsinasyonsuz",
-    "feature3Tag2": "Kaynağa Bağlı",
-    "feature4Title": "Risk Tabanlı Karar Motoru",
-    "feature4Desc": "Profil girdilerinize dayalı sürekli risk hesaplaması. Bağlamınızı veritabanımızla bağlantılandırarak küratörlüğü yapılmış kontrol listeleri ve doğrulanmış sağlayıcı eşleşmeleri oluşturur.",
-    "feature4Tag1": "Gerçek Zamanlı Değerlendirme",
-    "feature4Tag2": "Küratörlüklü Eşleştirme",
-    "transparencyTitle": "Yapay zekamızın şeffaflığı ve sınırları",
-    "transparencyQuote": "«Yapay zekamız avukatınızın yerini almaz. Mükemmel önceden yapılandırılmış dijital dosyalar sağlayarak avukatınızı 10 kat daha verimli kılar.»",
-    "check1": "Yapılandırılmış oryantasyon ve dosya orkestrasyonuna odaklanma.",
-    "check2": "Resmi, doğrulanmış kaynaklardan temelli geri getirme.",
-    "cross1": "Bağlayıcı hukuki tavsiye yok — bu lisanslı hukuk firmalarına aittir.",
-    "matrixTitle": "Ülke Politika Matrisi",
-    "matrixBody": "Her veri süreci, yerel veri ikameti ve gizlilik standartlarına uygun katı bireysel bir politika matrisine tabidir.",
-    "pipelineRaw": "HAM VERİ",
-    "pipelineLabel": "DÜZELTME HATTI",
-    "pipelineDoc": "Kullanıcı Belgesi",
-    "pipelineAnon": "Anonimleştirilmiş Dosya",
-    "pipelineReady": "YZ HAZIR",
-    "pipelineNote": "Yapay zekanız hiçbir zaman düz metin PII görmez. Yalnızca yerel çıkarım.",
-    "ctaTitle": "Netlik için hazır mısınız?",
-    "ctaBody": "Statik dizinlerde aramayı bırakın. Bilişsel akıllı işletim sistemimizle uyumluluk yolculuğunuzda yol almaya başlayın.",
-    "ctaBtn": "Aramayı Şimdi Başlatın"
   },
   "wizard": {
     "reviewPanel": {
@@ -896,13 +866,10 @@
   "header": {
     "nav": {
       "howItWorks": "Nasıl çalışır",
-      "whatWeKnow": "Neleri kapsıyoruz",
-      "voices": "Görüşler",
       "pricing": "Fiyatlandırma",
-      "howMatchingWorks": "Eşleştirme nasıl çalışır",
-      "dashboard": "Dashboard",
-      "performance": "Performans",
-      "faq": "SSS"
+      "complianceAreas": "Uyum Alanları",
+      "markets": "Pazarlar",
+      "resources": "Kaynaklar"
     },
     "login": "Giriş yap"
   },
@@ -1035,6 +1002,115 @@
       "prod-safety": "Ürün güvenliği ve etiketleme",
       "tax-corporate": "Kurumlar vergisi",
       "tax-vat-registration": "KDV kaydı ve beyanı"
+    },
+    "regions": {
+      "title": "Kapsanan Pazarlar ve Bölgeler",
+      "lead": "Her arama ve analiz, hedef ülkenin somut mevzuatına dayanır — hukuki körlemesine adımları önlemek için.",
+      "legend": {
+        "live": "Yayında",
+        "rollout": "Aktif Yaygınlaştırma"
+      },
+      "focusAreas": "Odak Alanları",
+      "tiers": {
+        "full": "Tam Kapsam",
+        "expanding": "Genişliyor",
+        "core": "Temel Kapsam"
+      },
+      "complexity": {
+        "high": "Yüksek Karmaşıklık",
+        "medium": "Orta Karmaşıklık"
+      },
+      "items": {
+        "eu": {
+          "name": "Avrupa Birliği (AB)",
+          "description": "Yoğun düzenlemeye tabi tek pazar için uzmanlaşmış bilgi birikimi — GDPR standartlarından yerel EPR mevzuatına kadar.",
+          "focus": [
+            "GDPR Uyumu",
+            "EPR Ambalaj Mevzuatı",
+            "AB Geneli KDV",
+            "Dijital Hizmetler Yasası"
+          ]
+        },
+        "uk": {
+          "name": "Birleşik Krallık (UK)",
+          "description": "Brexit sonrası uyumluluk ortamında ve Birleşik Krallık'a özgü veri koruma kurallarında hedefli yönlendirme.",
+          "focus": [
+            "UK GDPR",
+            "HMRC KDV Uyumu",
+            "Ürün Güvenliği (UKCA)",
+            "İş Hukuku"
+          ]
+        },
+        "us": {
+          "name": "ABD ve Kanada",
+          "description": "Federal ve eyalet düzeyindeki gerekliliklere yönelik derli toplu destekle işinizi Kuzey Amerika'ya ölçekleyin.",
+          "focus": [
+            "Nexus ve Satış Vergisi",
+            "CCPA/CPRA Gizliliği",
+            "FDA/Etiketleme",
+            "Dış Ticaret Uyumu"
+          ]
+        },
+        "au": {
+          "name": "Avustralya (APAC)",
+          "description": "Avustralya tüketici hukuku ve vergi mevzuatı için temel kapsamla APAC bölgesine açılan kapı.",
+          "focus": [
+            "GST Uyumu",
+            "Privacy Act 1988",
+            "Ürün Sorumluluğu",
+            "İthalat/İhracat"
+          ]
+        }
+      }
+    }
+  },
+  "pricing": {
+    "meta": {
+      "title": "Fiyatlar · CompliHub360"
+    },
+    "eyebrow": "Fiyatlar",
+    "title": {
+      "pre": "Sizin için ",
+      "gold": "ücretsiz",
+      "post": "."
+    },
+    "lead": "Değerlendirme, Risk Map ve eşleştirme ücretsizdir. Bize ödeme uzmanlar tarafından yapılır — ve yalnızca gerçekten bir randevu oluştuğunda.",
+    "free": {
+      "kicker": "Ücretsiz olanlar",
+      "title": "Randevuya kadar her şey.",
+      "items": [
+        {
+          "title": "Değerlendirme",
+          "desc": "Pazarlarınız, iş modeliniz ve hacminiz hakkında dört soru. Hesap yok, satış görüşmesi yok, devam etme zorunluluğu yok."
+        },
+        {
+          "title": "Risk Map'iniz",
+          "desc": "İşletmeniz için geçerli olan yükümlülükler; her biri yasal dayanağı ve süresiyle birlikte. Ücretsiz bir hesap haritanın tamamını açar."
+        },
+        {
+          "title": "Karşılaştırma",
+          "desc": "Kapsam, doğrulanmış nitelikler, yanıt süresi ve pazarlarınıza uygunluk — kimlik açıklanmadan önce, yan yana."
+        }
+      ]
+    },
+    "who": {
+      "kicker": "Kim öder",
+      "title": "Uzmanlar, randevuda.",
+      "body": "Bir eşleşmeden onaylanmış bir randevu çıktığında uzmandan ücret alınır — listede yer aldığı için değil, tıklama başına değil, profil görüntülemesi için değil. Sizden hiçbir aşamada ücret alınmaz."
+    },
+    "ranking": {
+      "kicker": "Parayla alınamayan",
+      "title": "Sıralama.",
+      "body": "Sıralamadaki yerler satılık değildir. Ücretli bir yer, eşleşmeyi her iki taraf için de değersiz kılardı: siz en çok ödeyenle tanışırdınız, uzman ise vakasını karşılayamayacağı biriyle. Tek ölçüt uygunluktur."
+    },
+    "specialist": {
+      "kicker": "Uzmanın ücreti",
+      "title": "Kendi ücreti — siz karar vermeden önce belirtilir.",
+      "body": "Danışmanlığın kendisi ücretsiz değil ve bunu başka türlü göstermeyeceğiz. Her Verified Partner, işi kabul etmenizden önce sabit bir tahmin yayımlar; böylece yalnızca fiyatı öğrenmek için bir ön görüşmeye katlanmak zorunda kalmazsınız."
+    },
+    "cta": {
+      "title": "Sizin için anlamlı olan yerden başlayın.",
+      "lead": "Altı dakika, dört soru, hesap gerekmiyor."
     }
   }
 }

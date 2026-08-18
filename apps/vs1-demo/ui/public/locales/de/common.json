@@ -629,80 +629,50 @@
       "body": "Unser Assistent stellt die richtigen Fragen und leitet Sie automatisch zum richtigen Assessment weiter.",
       "btn": "Allgemeines Assessment starten"
     },
-    "footer": {
-      "copyright": "© {{year}} CompliHub360. Gebaut in Berlin."
+    "meta": {
+      "title": "Compliance-Bereiche · CompliHub360"
     }
   },
   "resources": {
-    "tabStories": "Erfolgsgeschichten",
-    "tabGuides": "Guides & Whitepaper",
-    "stories": {
-      "overline": "Erfolgsgeschichten",
-      "title": "Echte Compliance-Ergebnisse, keine Marketingversprechen",
-      "body": "Sehen Sie, wie Unternehmen wie Ihres CompliHub360 genutzt haben, um komplexe grenzüberschreitende Compliance zu navigieren – von der Unsicherheit zur Lösung.",
-      "challengeLabel": "Herausforderung",
-      "outcomeLabel": "Ergebnis"
+    "meta": {
+      "title": "Ressourcen · CompliHub360"
     },
-    "guides": {
-      "overline": "Guides & Whitepaper",
-      "title": "Wissen, das Compliance-Sicherheit aufbaut",
-      "body": "Tiefgehende Marktanalysen, regulatorische Aufschlüsselungen und praktische Checklisten – kuratiert von unserer Compliance-Intelligenz-Engine und von Spezialisten geprüft.",
-      "kbTitle": "Lebendige Wissensdatenbank",
-      "kbBody": "Jedes Plattform-Update, jede neue Compliance-Regel oder Partner-Integration löst ein dediziertes Inhalts-Update aus. Unsere Guides sind zeitlos – automatisch gepflegt und gegen die neuesten regulatorischen Quellen verifiziert.",
-      "kbCta": "Benachrichtigt werden"
+    "eyebrow": "Ressourcen",
+    "title": {
+      "pre": "Was wir Ihnen schon ",
+      "gold": "zeigen",
+      "post": " können."
+    },
+    "lead": "Kein Blog. Das sind die Teile der Plattform, die Sie lesen können, ohne mit jemandem zu sprechen — dieselben Einträge, gegen die unsere Engine prüft, mit dem Gesetzestext hinter jedem einzelnen.",
+    "entries": {
+      "markets": {
+        "title": "Märkte",
+        "meta": "{{markets}} Märkte · jede Pflicht mit Rechtsgrundlage",
+        "desc": "Pro Land: für welche Pflichten wir eine Quelle führen, die nationale Rechtsgrundlage dahinter, der Turnus — und ein Verweis auf den EU-Text, wo es einen gibt.",
+        "cta": "Zu den Märkten"
+      },
+      "compliance": {
+        "title": "Compliance-Bereiche",
+        "meta": "{{domains}} Bereiche",
+        "desc": "Was jeder Bereich abdeckt, in welchen Märkten er greift, und ab wann er für einen Betrieb wie Ihren relevant wird.",
+        "cta": "Zu den Bereichen"
+      },
+      "howItWorks": {
+        "title": "So funktioniert es",
+        "meta": "{{stages}} Stufen, von Anfang bis Ende",
+        "desc": "Von einer Frage in eigenen Worten bis zum gebuchten Termin — samt dem, was Sie das kostet und was mit Ihren Daten passiert.",
+        "cta": "Die fünf Stufen lesen"
+      }
+    },
+    "gap": {
+      "kicker": "Was hier noch nicht steht",
+      "title": "Guides, Tutorials und ein Glossar.",
+      "body": "Wir verweisen lieber auf geprüfte Einträge, als Artikel zu veröffentlichen, die wir nicht geschrieben haben. Nichts auf dieser Seite ist die Vorschau auf etwas, das es nicht gibt — wenn wir Guides haben, die das Lesen lohnen, stehen sie hier."
     },
     "cta": {
-      "title": "Bereit, compliant zu werden?",
-      "body": "Schließen Sie sich Unternehmen an, die Compliance-Unsicherheit in strukturierte Aktionspläne verwandelt haben.",
-      "btnAssessment": "Kostenloses Assessment starten",
-      "btnPlatform": "Plattform erkunden"
-    },
-    "footer": {
-      "copyright": "© {{year}} CompliHub360. Gebaut in Berlin."
+      "title": "Oder fangen Sie mit Ihrer eigenen Lage an.",
+      "lead": "Sechs Minuten, vier Fragen, kein Konto nötig."
     }
-  },
-  "advisory": {
-    "heroImageAlt": "Kognitive Advisory-Schicht",
-    "heroBadge": "FORTGESCHRITTENE KOGNITIVE SCHICHT",
-    "heroTitle": "Ihr intelligenter Compliance-Kompass: Die kognitive",
-    "heroTitleHighlight": "Advisory-Schicht",
-    "heroBody": "Übersetzt unstrukturierte regulatorische Unsicherheit in klares, handlungsorientiertes Verständnis. Wir überbrücken die Lücke zwischen Ihrem Unternehmen und der komplexen Rechtswelt.",
-    "heroCta1": "Kostenloser Compliance-Check",
-    "heroCta2": "Methodik erkunden",
-    "featuresTitle": "Wie unsere intelligente Navigation funktioniert",
-    "featuresBody": "Weit über ein traditionelles Verzeichnis hinaus fungiert unsere Advisory-Schicht als kognitives Betriebssystem für globale Compliance.",
-    "feature1Title": "Adaptiver Compliance-Assistent",
-    "feature1Desc": "Intent-Strukturierung: Anstatt statischer Filter erfasst unser Assistent Ihren spezifischen Geschäftskontext in 4-5 dynamischen Schritten und übersetzt Unsicherheit in ein strukturiertes Suchprofil.",
-    "feature1Tag1": "Absichtsbasiert",
-    "feature1Tag2": "Dynamischer Ablauf",
-    "feature2Title": "Datenschutz-zuerst-Schwärzungs-Pipeline",
-    "feature2Desc": "Datensicherheit ist in die Architektur integriert. Alle PII werden vor jeder KI-Analyse automatisch und lokal anonymisiert, sodass keine vertraulichen Daten Ihre Kontrolle verlassen.",
-    "feature2Tag1": "Lokale Anonymisierung",
-    "feature2Tag2": "PII-Sicher",
-    "feature3Title": "Fundierte Intelligenz",
-    "feature3Desc": "Unsere KI ist streng in offiziellen, validierten Rechtsquellen verankert. Jede Empfehlung und Zusammenfassung enthält direkte Links zu den zugrunde liegenden Regulierungsdokumenten.",
-    "feature3Tag1": "Halluzinationsfrei",
-    "feature3Tag2": "Quellenverknüpft",
-    "feature4Title": "Risikobasierte Entscheidungs-Engine",
-    "feature4Desc": "Kontinuierliche Risikoberechnung basierend auf Ihren Profileingaben. Verbindet Ihren Kontext mit unserer Datenbank, um kuratierte Checklisten und verifizierte Anbieter-Matches zu generieren.",
-    "feature4Tag1": "Echtzeit-Assessment",
-    "feature4Tag2": "Kuratiertes Matching",
-    "transparencyTitle": "Transparenz und Grenzen unserer KI",
-    "transparencyQuote": "„Unsere KI ersetzt nicht Ihren Anwalt. Sie macht Ihren Anwalt 10x effizienter, indem sie perfekt vorstrukturierte digitale Dossiers bereitstellt.“",
-    "check1": "Fokus auf strukturierte Orientierung & Dossier-Orchestrierung.",
-    "check2": "Fundierter Abruf aus offiziellen, validierten Quellen.",
-    "cross1": "Keine verbindliche Rechtsberatung – das obliegt zugelassenen Anwaltskanzleien.",
-    "matrixTitle": "Länder-Richtlinienmatrix",
-    "matrixBody": "Jeder Datenprozess folgt einer strikten individuellen Richtlinienmatrix, die auf lokale Datenresidenz- und Datenschutzstandards abgestimmt ist.",
-    "pipelineRaw": "ROHDATEN",
-    "pipelineLabel": "SCHWÄRZUNGS-PIPELINE",
-    "pipelineDoc": "Nutzerdokument",
-    "pipelineAnon": "Anonymisiertes Dossier",
-    "pipelineReady": "KI-BEREIT",
-    "pipelineNote": "Ihre KI sieht niemals PII im Klartext. Nur lokale Extraktion.",
-    "ctaTitle": "Bereit für Klarheit?",
-    "ctaBody": "Hören Sie auf, statische Verzeichnisse zu durchsuchen. Navigieren Sie Ihre Compliance-Reise mit unserem kognitiven intelligenten Betriebssystem.",
-    "ctaBtn": "Suche jetzt starten"
   },
   "wizard": {
     "reviewPanel": {
@@ -896,13 +866,10 @@
   "header": {
     "nav": {
       "howItWorks": "So funktioniert es",
-      "whatWeKnow": "Was wir abdecken",
-      "voices": "Stimmen",
       "pricing": "Preise",
-      "howMatchingWorks": "So funktioniert das Matching",
-      "dashboard": "Dashboard",
-      "performance": "Performance",
-      "faq": "FAQ"
+      "complianceAreas": "Compliance-Bereiche",
+      "markets": "Märkte",
+      "resources": "Ressourcen"
     },
     "login": "Anmelden"
   },
@@ -1035,6 +1002,115 @@
       "prod-safety": "Produktsicherheit & Kennzeichnung",
       "tax-corporate": "Körperschaftsteuer",
       "tax-vat-registration": "USt-Registrierung & -Meldung"
+    },
+    "regions": {
+      "title": "Abgedeckte Märkte & Regionen",
+      "lead": "Jede Suche und jede Analyse ist fest in den konkreten Gesetzen des Zielmarkts verankert — damit es keine rechtlichen Blindflüge gibt.",
+      "legend": {
+        "live": "Live",
+        "rollout": "Aktiver Rollout"
+      },
+      "focusAreas": "Schwerpunkte",
+      "tiers": {
+        "full": "Vollständige Abdeckung",
+        "expanding": "Im Aufbau",
+        "core": "Grundabdeckung"
+      },
+      "complexity": {
+        "high": "Hohe Komplexität",
+        "medium": "Mittlere Komplexität"
+      },
+      "items": {
+        "eu": {
+          "name": "Europäische Union (EU)",
+          "description": "Spezialisierte Expertise für den stark regulierten Binnenmarkt — von DSGVO-Standards bis zu lokalen EPR-Vorschriften.",
+          "focus": [
+            "DSGVO-Compliance",
+            "EPR-Verpackungsrecht",
+            "EU-weite USt",
+            "Digital Services Act"
+          ]
+        },
+        "uk": {
+          "name": "Vereinigtes Königreich (UK)",
+          "description": "Gezielte Navigation durch die Post-Brexit-Compliance-Landschaft und die britischen Datenschutzregeln.",
+          "focus": [
+            "UK-DSGVO",
+            "HMRC-USt-Compliance",
+            "Produktsicherheit (UKCA)",
+            "Arbeitsrecht"
+          ]
+        },
+        "us": {
+          "name": "USA & Kanada",
+          "description": "Skalieren Sie Ihr Geschäft nach Nordamerika — mit gebündelter Unterstützung für Anforderungen auf Bundes- und Bundesstaatsebene.",
+          "focus": [
+            "Nexus & Sales Tax",
+            "CCPA/CPRA-Datenschutz",
+            "FDA/Kennzeichnung",
+            "Außenhandels-Compliance"
+          ]
+        },
+        "au": {
+          "name": "Australien (APAC)",
+          "description": "Einstieg in die APAC-Region mit Grundabdeckung für australisches Verbraucher- und Steuerrecht.",
+          "focus": [
+            "GST-Compliance",
+            "Privacy Act 1988",
+            "Produkthaftung",
+            "Import/Export"
+          ]
+        }
+      }
+    }
+  },
+  "pricing": {
+    "meta": {
+      "title": "Preise · CompliHub360"
+    },
+    "eyebrow": "Preise",
+    "title": {
+      "pre": "Für Sie kostet es ",
+      "gold": "nichts",
+      "post": "."
+    },
+    "lead": "Die Einschätzung, die Risk Map und das Matching sind kostenlos. Bezahlt werden wir von den Fachleuten, und nur dann, wenn tatsächlich eine Buchung zustande kommt.",
+    "free": {
+      "kicker": "Was kostenlos ist",
+      "title": "Alles bis zur Buchung.",
+      "items": [
+        {
+          "title": "Die Einschätzung",
+          "desc": "Vier Fragen zu Ihren Märkten, Ihrem Geschäftsmodell und Ihrem Volumen. Kein Konto, kein Verkaufsgespräch, keine Verpflichtung weiterzumachen."
+        },
+        {
+          "title": "Ihre Risk Map",
+          "desc": "Die Pflichten, die für Ihren Betrieb gelten, jede mit Rechtsgrundlage und Frist. Ein kostenloses Konto öffnet die vollständige Karte."
+        },
+        {
+          "title": "Der Vergleich",
+          "desc": "Abdeckung, geprüfte Qualifikationen, Reaktionszeit und Passung zu Ihren Märkten — nebeneinander, bevor eine Identität sichtbar wird."
+        }
+      ]
+    },
+    "who": {
+      "kicker": "Wer bezahlt",
+      "title": "Die Fachleute, bei der Buchung.",
+      "body": "Einer Fachperson wird berechnet, wenn aus einem Match ein bestätigter Termin wird — nicht für den Eintrag, nicht pro Klick, nicht für einen Profilaufruf. Ihnen wird zu keinem Zeitpunkt etwas berechnet."
+    },
+    "ranking": {
+      "kicker": "Was sich nicht kaufen lässt",
+      "title": "Die Reihung.",
+      "body": "Plätze sind nicht verkäuflich. Ein bezahlter Platz würde das Match für beide Seiten wertlos machen: Sie träfen den, der am meisten gezahlt hat, und die Fachperson träfe jemanden, dessen Fall sie nicht bedienen kann. Die Eignung ist das einzige Kriterium."
+    },
+    "specialist": {
+      "kicker": "Was die Fachperson kostet",
+      "title": "Ihr Honorar — beziffert, bevor Sie sich binden.",
+      "body": "Die Beratung selbst ist nicht kostenlos, und wir tun nicht so. Jeder Verified Partner veröffentlicht eine feste Schätzung, bevor Sie das Mandat annehmen — Sie sitzen also kein Erstgespräch ab, nur um den Preis zu erfahren."
+    },
+    "cta": {
+      "title": "Fangen Sie dort an, wo es für Sie Sinn ergibt.",
+      "lead": "Sechs Minuten, vier Fragen, kein Konto nötig."
     }
   }
 }

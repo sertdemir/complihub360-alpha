@@ -1,15 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { supportedLngs } from '../../i18n/config';
 import { LanguageSwitcher } from '../common/LanguageSwitcher';
 import { useAuthStore } from '../../store/useAuthStore';
 import {
+  // The mega-menu item type stays: every entry is a flat link today, but the
+  // dropdown machinery is guarded by `items.length > 0` and works the moment a
+  // menu gets children again. The ten section icons went with those children.
   type LucideIcon,
   ChevronDown, ArrowRight,
-  Zap, Users, Globe as GlobeIcon, Building2,
-  Rocket, Layers, Scale,
-  MessageSquare, FileText, ShieldCheck,
   LogOut, LayoutDashboard, User
 } from 'lucide-react';
 import { Button } from '../ui/Button';
@@ -17,13 +18,23 @@ import { Logo } from '../ui/Logo';
 import { Typography } from '../ui/Typography';
 import { ThemeToggle } from '../ui/ThemeToggle';
 
+const menuItemClass = (active: boolean) =>
+  `flex items-center gap-1 px-2 md:px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${
+    active ? 'text-fg-brand bg-brand-light' : 'text-fg-secondary hover:text-fg hover:bg-surface-secondary'
+  }`;
+
 const HIDDEN_PATHS = ['/login', '/register', '/verify-email'];
 
 export function GlobalNav() {
   const { t, i18n } = useTranslation('common');
-  const currentLang = i18n.resolvedLanguage || 'en';
   const navigate = useNavigate();
   const location = useLocation();
+  // From the URL, not from i18n: on /de/compliance the resolved language can
+  // still read 'en' while t() already returns German, which produced German
+  // labels pointing at /en/… — one click and the visitor was in the wrong
+  // language. The path segment is what actually says which locale you are on.
+  const pathLang = location.pathname.split('/').filter(Boolean)[0];
+  const currentLang = supportedLngs.includes(pathLang) ? pathLang : i18n.resolvedLanguage || 'en';
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -61,40 +72,15 @@ export function GlobalNav() {
     path?: string;
     items: { icon: LucideIcon; anim: any; title: string; desc: string; path: string }[];
   }[] = [
-    {
-      id: 'platform',
-      label: t('nav.platform', 'Platform'),
-      items: [
-        { icon: Zap,       anim: { scale: 1.2, rotate: 15 },        title: t('nav.items.aiEngine.title'),     desc: t('nav.items.aiEngine.desc'), path: '/platform#engine' },
-        { icon: Users,     anim: { scale: 1.15, y: -3 },            title: t('nav.items.partnerMatching.title'),  desc: t('nav.items.partnerMatching.desc'),     path: '/platform#matching' },
-        { icon: GlobeIcon, anim: { scale: 1.1, rotate: 20 },        title: t('nav.items.globalCoverage.title'),   desc: t('nav.items.globalCoverage.desc'),             path: '/platform#coverage' },
-        { icon: Building2, anim: { scale: 1.15, y: -2 },            title: t('nav.items.forPartners.title'), desc: t('nav.items.forPartners.desc'),     path: '/platform#partners' },
-      ],
-    },
-    {
-      id: 'solutions',
-      label: t('nav.solutions', 'Solutions'),
-      items: [
-        { icon: Rocket, anim: { scale: 1.2, y: -6, rotate: -8 },   title: t('nav.items.founders.title'),   desc: t('nav.items.founders.desc'),  path: '/solutions#founders' },
-        { icon: Layers, anim: { scale: 1.15, y: -3 },               title: t('nav.items.operations.title'),  desc: t('nav.items.operations.desc'),     path: '/solutions#operations' },
-        { icon: Scale,  anim: { scale: 1.1, rotate: -12 },          title: t('nav.items.counsel.title'),  desc: t('nav.items.counsel.desc'),      path: '/solutions#counsel' },
-      ],
-    },
-    {
-      id: 'areas',
-      label: t('nav.complianceAreas', 'Compliance Areas'),
-      path: '/compliance',
-      items: [],
-    },
-    {
-      id: 'resources',
-      label: t('nav.resources', 'Resources'),
-      items: [
-        { icon: MessageSquare, anim: { scale: 1.15, y: -2, x: 2 }, title: t('nav.items.stories.title'),     desc: t('nav.items.stories.desc'), path: '/resources#stories' },
-        { icon: FileText,      anim: { scale: 1.15, y: -3 },        title: t('nav.items.guides.title'), desc: t('nav.items.guides.desc'),   path: '/resources#guides' },
-        { icon: ShieldCheck,   anim: { scale: 1.1, rotate: 10 },    title: t('nav.aiGovernance', 'AI Governance'), desc: t('nav.aiGovDesc', 'Our framework for transparent and compliant AI.'), path: '/ai-governance' },
-      ],
-    },
+    // Same five destinations as the MarketingHeader — the two headers must not
+    // present different navigations. Platform and Solutions dropped out of the
+    // header on 2026-08-18: §11 P5 keeps them as SEO surfaces, reachable from the
+    // footer, and seven entries do not survive German labels.
+    { id: 'how-it-works', label: t('header.nav.howItWorks', 'How it works'), path: '/how-it-works', items: [] },
+    { id: 'areas', label: t('header.nav.complianceAreas', 'Compliance Areas'), path: '/compliance', items: [] },
+    { id: 'markets', label: t('header.nav.markets', 'Markets'), path: '/markets', items: [] },
+    { id: 'pricing', label: t('header.nav.pricing', 'Pricing'), path: '/pricing', items: [] },
+    { id: 'resources', label: t('header.nav.resources', 'Resources'), path: '/resources', items: [] },
   ];
 
   if (isHidden) return null;
@@ -127,25 +113,33 @@ export function GlobalNav() {
         <nav className="flex items-center justify-center flex-1 gap-1 md:gap-4 lg:gap-6 min-w-0 overflow-hidden">
           {HEADER_MENU.map((menu) => (
             <div key={menu.id} className="flex items-center">
-              <button
-                onClick={() => {
-                  if (menu.path) navTo(menu.path);
-                  else setActiveMenu(activeMenu === menu.id ? null : menu.id);
-                }}
-                className={`flex items-center gap-1 px-2 md:px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${
-                  activeMenu === menu.id
-                    ? 'text-fg-brand bg-brand-light'
-                    : 'text-fg-secondary hover:text-fg hover:bg-surface-secondary'
-                }`}
-              >
-                {menu.label}
-                {menu.items.length > 0 && (
-                  <ChevronDown
-                    size={12}
-                    className={`transition-transform duration-200 ${activeMenu === menu.id ? 'rotate-180 text-fg-brand' : 'text-fg-tertiary'}`}
-                  />
-                )}
-              </button>
+              {/* A destination is an <a>, not a button. As a button it had no href:
+                  no new tab, no copy-link, not announced as a link — and invisible
+                  to crawlers, which would have quietly undone the whole point of
+                  making these pages reachable. Only a menu that opens children
+                  stays a button, because that is what it does. */}
+              {menu.path ? (
+                <Link
+                  to={`/${currentLang}${menu.path}`}
+                  onClick={() => setActiveMenu(null)}
+                  className={menuItemClass(activeMenu === menu.id)}
+                >
+                  {menu.label}
+                </Link>
+              ) : (
+                <button
+                  onClick={() => setActiveMenu(activeMenu === menu.id ? null : menu.id)}
+                  className={menuItemClass(activeMenu === menu.id)}
+                >
+                  {menu.label}
+                  {menu.items.length > 0 && (
+                    <ChevronDown
+                      size={12}
+                      className={`transition-transform duration-200 ${activeMenu === menu.id ? 'rotate-180 text-fg-brand' : 'text-fg-tertiary'}`}
+                    />
+                  )}
+                </button>
+              )}
             </div>
           ))}
         </nav>

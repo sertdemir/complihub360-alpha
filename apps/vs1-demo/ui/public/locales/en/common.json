@@ -629,80 +629,50 @@
       "body": "Our Wizard asks the right questions and routes you to the correct assessment automatically.",
       "btn": "Start General Assessment"
     },
-    "footer": {
-      "copyright": "© {{year}} CompliHub360. Built in Berlin."
+    "meta": {
+      "title": "Compliance areas · CompliHub360"
     }
   },
   "resources": {
-    "tabStories": "Customer Stories",
-    "tabGuides": "Guides & Whitepapers",
-    "stories": {
-      "overline": "Customer Stories",
-      "title": "Real Compliance Outcomes, Not Marketing Claims",
-      "body": "See how businesses like yours used CompliHub360 to navigate complex cross-border compliance — from uncertainty to resolution.",
-      "challengeLabel": "Challenge",
-      "outcomeLabel": "Outcome"
+    "meta": {
+      "title": "Resources · CompliHub360"
     },
-    "guides": {
-      "overline": "Guides & Whitepapers",
-      "title": "Knowledge That Builds Compliance Confidence",
-      "body": "In-depth market deep-dives, regulatory breakdowns, and practical checklists — curated by our compliance intelligence engine and reviewed by specialists.",
-      "kbTitle": "Living Knowledge Base",
-      "kbBody": "Every platform update, new compliance rule, or partner integration triggers a dedicated content update. Our guides are evergreen — automatically maintained and verified against the latest regulatory sources.",
-      "kbCta": "Get Notified"
+    "eyebrow": "Resources",
+    "title": {
+      "pre": "What we can already ",
+      "gold": "show",
+      "post": " you."
+    },
+    "lead": "Not a blog. These are the parts of the platform you can read without talking to anyone — the same entries our engine checks against, with the statute behind each one.",
+    "entries": {
+      "markets": {
+        "title": "Markets",
+        "meta": "{{markets}} markets · every duty with its legal basis",
+        "desc": "Per country: which duties we hold a source for, the national statute behind each, the filing cadence, and a link to the EU text where one exists.",
+        "cta": "Open the markets"
+      },
+      "compliance": {
+        "title": "Compliance areas",
+        "meta": "{{domains}} areas",
+        "desc": "What each area covers, which markets it applies in, and when it starts to matter for a business like yours.",
+        "cta": "Open the areas"
+      },
+      "howItWorks": {
+        "title": "How it works",
+        "meta": "{{stages}} stages, end to end",
+        "desc": "From a question in your own words to a booked appointment — including what it costs you and what happens to your data.",
+        "cta": "Read the five stages"
+      }
+    },
+    "gap": {
+      "kicker": "What is not here yet",
+      "title": "Guides, tutorials and a glossary.",
+      "body": "We would rather point you at verified entries than publish articles we have not written. Nothing on this page is a preview of something that does not exist — when we have guides worth reading, they will appear here."
     },
     "cta": {
-      "title": "Ready to become compliant?",
-      "body": "Join businesses that turned compliance uncertainty into structured action plans.",
-      "btnAssessment": "Start Free Assessment",
-      "btnPlatform": "Explore Platform"
-    },
-    "footer": {
-      "copyright": "© {{year}} CompliHub360. Built in Berlin."
+      "title": "Or start with your own situation.",
+      "lead": "Six minutes, four questions, no account needed."
     }
-  },
-  "advisory": {
-    "heroImageAlt": "Cognitive Advisory Layer",
-    "heroBadge": "ADVANCED COGNITIVE LAYER",
-    "heroTitle": "Your intelligent compliance compass: The cognitive",
-    "heroTitleHighlight": "Advisory Layer",
-    "heroBody": "Translating unstructured regulatory uncertainty into clear, actionable understanding. We bridge the gap between your business and the complex legal world.",
-    "heroCta1": "Free Compliance Check",
-    "heroCta2": "Explore Methodology",
-    "featuresTitle": "How our intelligent navigation works",
-    "featuresBody": "Going far beyond a traditional directory, our Advisory Layer operates as a cognitive OS for global compliance.",
-    "feature1Title": "Adaptive Compliance-Wizard",
-    "feature1Desc": "Intent Structuring: Instead of static filters, our wizard captures your specific business context in 4-5 dynamic steps, translating uncertainty into a structured search profile.",
-    "feature1Tag1": "Intent-Based",
-    "feature1Tag2": "Dynamic Flow",
-    "feature2Title": "Privacy-First Redaction Pipeline",
-    "feature2Desc": "Data security is built into the architecture. All PII is automatically and locally anonymized before any AI analysis, ensuring no confidential data ever leaves your control.",
-    "feature2Tag1": "Local Anonymization",
-    "feature2Tag2": "PII-Safe",
-    "feature3Title": "Grounded Intelligence",
-    "feature3Desc": "Our AI is strictly grounded in official, validated legal sources. Every recommendation and summary includes direct links to the regulatory documentation it's based on.",
-    "feature3Tag1": "Hallucination-Free",
-    "feature3Tag2": "Source-Linked",
-    "feature4Title": "Risk-Based Decision Engine",
-    "feature4Desc": "Continuous risk calculation based on your profile inputs. Connects your context with our database to generate curated checklists and verified provider matches.",
-    "feature4Tag1": "Real-time Assessment",
-    "feature4Tag2": "Curated Matching",
-    "transparencyTitle": "Transparency and limits of our AI",
-    "transparencyQuote": "\"Our AI does not replace your lawyer. It makes your lawyer 10x more efficient by providing perfectly pre-structured digital dossiers.\"",
-    "check1": "Focus on structured orientation & dossier orchestration.",
-    "check2": "Grounded retrieval from official, validated sources.",
-    "cross1": "No binding legal advice—that belongs to licensed law firms.",
-    "matrixTitle": "Country Policy Matrix",
-    "matrixBody": "Every data process follows a strict individual policy matrix matched to local data residency and privacy standards.",
-    "pipelineRaw": "RAW DATA",
-    "pipelineLabel": "REDACTION PIPELINE",
-    "pipelineDoc": "User Document",
-    "pipelineAnon": "Anonymized Dossier",
-    "pipelineReady": "AI READY",
-    "pipelineNote": "Your AI never sees plaintext PII. Local extraction only.",
-    "ctaTitle": "Ready for clarity?",
-    "ctaBody": "Stop searching through static directories. Start navigating your compliance journey with our cognitive intelligent operating system.",
-    "ctaBtn": "Start Search Now"
   },
   "wizard": {
     "reviewPanel": {
@@ -896,13 +866,10 @@
   "header": {
     "nav": {
       "howItWorks": "How it works",
-      "whatWeKnow": "What we know",
-      "voices": "Voices",
       "pricing": "Pricing",
-      "howMatchingWorks": "How matching works",
-      "dashboard": "Dashboard",
-      "performance": "Performance",
-      "faq": "FAQ"
+      "complianceAreas": "Compliance Areas",
+      "markets": "Markets",
+      "resources": "Resources"
     },
     "login": "Log in"
   },
@@ -1035,6 +1002,115 @@
       "prod-safety": "Product Safety & Labeling",
       "tax-corporate": "Corporate Income Tax",
       "tax-vat-registration": "VAT Registration & Filing"
+    },
+    "regions": {
+      "title": "Covered Markets & Regions",
+      "lead": "Every search and analysis is deeply rooted in the specific laws of the target country to avoid legal blind flights.",
+      "legend": {
+        "live": "Live",
+        "rollout": "Active Rollout"
+      },
+      "focusAreas": "Focus Areas",
+      "tiers": {
+        "full": "Full Coverage",
+        "expanding": "Expanding",
+        "core": "Core Support"
+      },
+      "complexity": {
+        "high": "High Complexity",
+        "medium": "Medium Complexity"
+      },
+      "items": {
+        "eu": {
+          "name": "European Union (EU)",
+          "description": "Specialized expertise for the highly regulated single market, from GDPR standards to local EPR laws.",
+          "focus": [
+            "GDPR Compliance",
+            "EPR Packaging Laws",
+            "EU-wide VAT",
+            "Digital Services Act"
+          ]
+        },
+        "uk": {
+          "name": "United Kingdom (UK)",
+          "description": "Dedicated navigation through post-Brexit compliance landscapes and UK-specific data protection rules.",
+          "focus": [
+            "UK GDPR",
+            "HMRC VAT Compliance",
+            "Product Safety (UKCA)",
+            "Employment Law"
+          ]
+        },
+        "us": {
+          "name": "USA & Canada",
+          "description": "Scale your business into North America with streamlined support for federal and state-level requirements.",
+          "focus": [
+            "Nexus & Sales Tax",
+            "CCPA/CPRA Privacy",
+            "FDA/Labeling",
+            "Trade Compliance"
+          ]
+        },
+        "au": {
+          "name": "Australia (APAC)",
+          "description": "Gateway to the APAC region with core support for Australian consumer law and tax regulations.",
+          "focus": [
+            "GST Compliance",
+            "Privacy Act 1988",
+            "Product Liability",
+            "Import/Export"
+          ]
+        }
+      }
+    }
+  },
+  "pricing": {
+    "meta": {
+      "title": "Pricing · CompliHub360"
+    },
+    "eyebrow": "Pricing",
+    "title": {
+      "pre": "It costs you ",
+      "gold": "nothing",
+      "post": "."
+    },
+    "lead": "The assessment, the risk map and the matching are free. We are paid by the specialists, and only when a booking actually happens.",
+    "free": {
+      "kicker": "What is free",
+      "title": "Everything up to the booking.",
+      "items": [
+        {
+          "title": "The assessment",
+          "desc": "Four questions about your markets, your business model and your volume. No account, no sales call, no obligation to continue."
+        },
+        {
+          "title": "Your risk map",
+          "desc": "The duties that apply to your operation, each with its legal basis and its deadline. A free account opens the full map."
+        },
+        {
+          "title": "The comparison",
+          "desc": "Coverage, verified qualifications, response time and fit to your markets — side by side, before any identity is revealed."
+        }
+      ]
+    },
+    "who": {
+      "kicker": "Who pays",
+      "title": "The specialists, on booking.",
+      "body": "A specialist is charged when a confirmed appointment comes out of a match — not for being listed, not per click, not for a profile view. At no point is anything charged to you."
+    },
+    "ranking": {
+      "kicker": "What money cannot buy",
+      "title": "The ranking.",
+      "body": "Placement is never for sale. A paid position would make the match worthless for both sides: you would meet whoever paid the most, and the specialist would meet someone whose case they cannot serve. Suitability is the only input."
+    },
+    "specialist": {
+      "kicker": "What the specialist costs",
+      "title": "Their fee — quoted before you commit.",
+      "body": "The advice itself is not free, and we will not pretend otherwise. Every Verified Partner publishes a fixed estimate before you accept the engagement, so you never sit through a discovery call just to learn the price."
+    },
+    "cta": {
+      "title": "Start where it makes sense for you.",
+      "lead": "Six minutes, four questions, no account needed."
     }
   }
 }
