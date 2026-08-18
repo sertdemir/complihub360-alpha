@@ -26,5 +26,37 @@
       "dispute": "Resolución de litigios de la UE",
       "notice": "Aviso"
     }
+  },
+  "terms": {
+    "title": "Condiciones del Servicio",
+    "updated": "Borrador — aún no en vigor",
+    "headings": {
+      "scope": "1. Ámbito de aplicación",
+      "service": "2. Servicios de CompliHub360",
+      "noAdvice": "3. Sin asesoramiento jurídico ni fiscal",
+      "partners": "4. Verified Partners",
+      "account": "5. Cuenta y requisitos de acceso",
+      "fees": "6. Tarifas y pago",
+      "sla": "7. Tiempos de respuesta",
+      "obligations": "8. Sus obligaciones",
+      "liability": "9. Responsabilidad",
+      "term": "10. Duración y resolución",
+      "changes": "11. Modificaciones de estas condiciones",
+      "law": "12. Ley aplicable y jurisdicción"
+    }
+  },
+  "cookies": {
+    "title": "Política de Cookies y Almacenamiento",
+    "updated": "Refleja la versión actual de la aplicación",
+    "headings": {
+      "summary": "En resumen",
+      "noCookies": "No utilizamos cookies",
+      "storage": "Qué almacenamos en su dispositivo",
+      "purposes": "Para qué lo almacenamos",
+      "consent": "Base jurídica y consentimiento",
+      "manage": "Cómo eliminar estos datos",
+      "thirdParty": "Contenidos de terceros",
+      "contact": "Consultas"
+    }
   }
 }

@@ -63,9 +63,9 @@ const COLUMNS: Column[] = [
 
 const LEGAL: Link[] = [
   { key: 'privacy', href: '/privacy' },
-  { key: 'terms', href: '#' },
+  { key: 'terms', href: '/terms' },
   { key: 'imprint', href: '/imprint' },
-  { key: 'cookies', href: '#' },
+  { key: 'cookies', href: '/cookies' },
   { key: 'subProcessors', href: '#' },
 ];
 

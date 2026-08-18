@@ -14,7 +14,7 @@ import { ResultsRiskMap } from "./pages/ResultsRiskMap";
 import { SearchResultPage } from "./pages/SearchResultPage";
 import { ResourcesPage } from "./pages/ResourcesPage";
 import { AiGovernancePage } from "./pages/AiGovernancePage";
-import { PrivacyPage, ImprintPage } from "./pages/legal/LegalPages";
+import { PrivacyPage, ImprintPage, TermsPage, CookiePage } from "./pages/legal/LegalPages";
 import { AdminOverviewPage } from "./pages/admin/AdminOverviewPage";
 import { CockpitPage } from "./pages/admin/CockpitPage";
 import { AdminEventsPage } from "./pages/admin/AdminEventsPage";
@@ -139,6 +139,8 @@ function AppContent() {
                     {/* Legal (launch requirement: Art. 13 GDPR + Impressumspflicht) */}
                     <Route path="privacy" element={<PrivacyPage />} />
                     <Route path="imprint" element={<ImprintPage />} />
+                    <Route path="terms" element={<TermsPage />} />
+                    <Route path="cookies" element={<CookiePage />} />
                     {/* Magic-link target from provider e-mails — public by design,
                         the single-use token IS the credential. */}
                     <Route path="provider/action" element={<ProviderMagicActionPage />} />

@@ -281,3 +281,337 @@ export function ImprintPage() {
     </LegalShell>
   );
 }
+
+// ─── Terms of Service ─────────────────────────────────────────────────────────
+// SCAFFOLD. Sections 2, 3, 4 and 7 describe the system as it actually behaves
+// (orchestration not advice, Verified Partners carry their own professional
+// liability, SLA windows) and can stand. Everything that is contract substance —
+// entity, fees, liability caps, term, governing law — is a [PLACEHOLDER] and MUST
+// be drafted by legal counsel. The entity is US-incorporated while customers are
+// EU B2B, so venue and consumer-law carve-outs are not a formality.
+
+export function TermsPage() {
+  const { locale } = useParams();
+  const { t } = useTranslation('legal');
+  const de = locale === 'de';
+
+  if (de) {
+    return (
+      <LegalShell title={t('terms.title')} updated={t('terms.updated')}>
+        <DraftBanner />
+        <Section heading={t('terms.headings.scope')}>
+          <p>
+            Diese Bedingungen gelten zwischen {PLACEHOLDER('Firmenname + Rechtsform')} (&bdquo;CompliHub360&ldquo;) und
+            Unternehmen, die die Plattform nutzen. Das Angebot richtet sich ausschließlich an Unternehmer im Sinne des
+            § 14 BGB, nicht an Verbraucher. {PLACEHOLDER('Abgrenzung zu abweichenden AGB der Kundenseite')}
+          </p>
+        </Section>
+        <Section heading={t('terms.headings.service')}>
+          <p>
+            CompliHub360 strukturiert Ihren Geschäftskontext über einen adaptiven Assistenten, berechnet daraus ein
+            Risikoprofil auf Basis hinterlegter Quellen und vermittelt Ihnen passende Verified Partner. Gegenstand der
+            Leistung ist die Orchestrierung: Strukturierung, Risikodarstellung, Vermittlung und Nachverfolgung der
+            Anfrage. Die fachliche Beratung selbst ist nicht Gegenstand dieses Vertrags.
+          </p>
+        </Section>
+        <Section heading={t('terms.headings.noAdvice')}>
+          <p>
+            CompliHub360 ist keine Kanzlei und keine Steuerberatungsgesellschaft. Wir erbringen keine Rechtsberatung im
+            Sinne des RDG und keine Steuerberatung im Sinne des StBerG. Risikodarstellungen und Checklisten sind
+            Orientierung, keine verbindliche Auskunft und kein Ersatz für eine Prüfung des Einzelfalls.
+          </p>
+        </Section>
+        <Section heading={t('terms.headings.partners')}>
+          <p>
+            Verified Partner erbringen ihre Leistungen im eigenen Namen, auf eigene Rechnung und in eigener beruflicher
+            Verantwortung. Der Beratungsvertrag kommt unmittelbar zwischen Ihnen und dem Partner zustande; CompliHub360
+            ist daran nicht beteiligt und haftet nicht für dessen Leistung.{' '}
+            {PLACEHOLDER('Prüf- und Aufnahmekriterien für Partner, Folgen bei Ausschluss')}
+          </p>
+        </Section>
+        <Section heading={t('terms.headings.account')}>
+          <p>{PLACEHOLDER('Registrierung, Zugangsdaten, Sperrung, Mindestalter/Vertretungsbefugnis')}</p>
+        </Section>
+        <Section heading={t('terms.headings.fees')}>
+          <p>
+            {PLACEHOLDER('Preismodell, Abrechnungszeitraum, Fälligkeit, Verzug, Steuern/Reverse-Charge, Erstattungen')}
+          </p>
+        </Section>
+        <Section heading={t('terms.headings.sla')}>
+          <p>
+            Für vermittelte Anfragen überwacht die Plattform Bestätigungs- und Antwortfristen der Partner und meldet
+            Überschreitungen. Die Fristen selbst sowie die Rechtsfolgen einer Überschreitung sind noch festzulegen:{' '}
+            {PLACEHOLDER('Fristen, Rechtsfolgen bei Überschreitung')}
+          </p>
+        </Section>
+        <Section heading={t('terms.headings.obligations')}>
+          <p>{PLACEHOLDER('Richtigkeit der Angaben, zulässige Nutzung, Rechte an hochgeladenen Inhalten')}</p>
+        </Section>
+        <Section heading={t('terms.headings.liability')}>
+          <p>{PLACEHOLDER('Haftungsmaßstab, Haftungshöchstgrenze, Ausschlüsse, zwingende Haftung')}</p>
+        </Section>
+        <Section heading={t('terms.headings.term')}>
+          <p>{PLACEHOLDER('Laufzeit, Verlängerung, ordentliche und außerordentliche Kündigung, Datenexport nach Ende')}</p>
+        </Section>
+        <Section heading={t('terms.headings.changes')}>
+          <p>{PLACEHOLDER('Änderungsvorbehalt, Ankündigungsfrist, Widerspruchsrecht')}</p>
+        </Section>
+        <Section heading={t('terms.headings.law')}>
+          <p>
+            {PLACEHOLDER('Anwendbares Recht und Gerichtsstand — beachten: Gesellschaft in den USA registriert, Kunden in der EU')}
+          </p>
+        </Section>
+      </LegalShell>
+    );
+  }
+
+  return (
+    <LegalShell title={t('terms.title')} updated={t('terms.updated')}>
+      <DraftBanner />
+      <Section heading={t('terms.headings.scope')}>
+        <p>
+          These terms govern the relationship between {PLACEHOLDER('company name + legal form')} (&ldquo;CompliHub360&rdquo;)
+          and businesses using the platform. The service is offered to businesses only, not to consumers.{' '}
+          {PLACEHOLDER('treatment of conflicting customer terms')}
+        </p>
+      </Section>
+      <Section heading={t('terms.headings.service')}>
+        <p>
+          CompliHub360 structures your business context through an adaptive wizard, derives a risk profile from validated
+          sources, and matches you with suitable Verified Partners. What we owe is the orchestration: structuring, risk
+          presentation, matching, and tracking of the request. The professional advice itself is not part of this contract.
+        </p>
+      </Section>
+      <Section heading={t('terms.headings.noAdvice')}>
+        <p>
+          CompliHub360 is not a law firm and not a tax advisory firm. Risk presentations and checklists are orientation, not
+          binding advice, and no substitute for an assessment of your specific case.
+        </p>
+      </Section>
+      <Section heading={t('terms.headings.partners')}>
+        <p>
+          Verified Partners act in their own name, for their own account, and under their own professional liability. The
+          advisory contract is concluded directly between you and the partner; CompliHub360 is not a party to it and is not
+          liable for the partner&apos;s performance. {PLACEHOLDER('vetting criteria, consequences of removal')}
+        </p>
+      </Section>
+      <Section heading={t('terms.headings.account')}>
+        <p>{PLACEHOLDER('registration, credentials, suspension, authority to bind the company')}</p>
+      </Section>
+      <Section heading={t('terms.headings.fees')}>
+        <p>{PLACEHOLDER('pricing model, billing period, due dates, late payment, taxes/reverse charge, refunds')}</p>
+      </Section>
+      <Section heading={t('terms.headings.sla')}>
+        <p>
+          For matched requests, the platform monitors partner confirmation and response windows and flags breaches. The
+          windows themselves and the consequences of a breach are still to be set:{' '}
+          {PLACEHOLDER('response windows, consequences of breach')}
+        </p>
+      </Section>
+      <Section heading={t('terms.headings.obligations')}>
+        <p>{PLACEHOLDER('accuracy of input, acceptable use, rights in uploaded content')}</p>
+      </Section>
+      <Section heading={t('terms.headings.liability')}>
+        <p>{PLACEHOLDER('standard of liability, cap, exclusions, mandatory liability')}</p>
+      </Section>
+      <Section heading={t('terms.headings.term')}>
+        <p>{PLACEHOLDER('term, renewal, termination for convenience and for cause, data export on exit')}</p>
+      </Section>
+      <Section heading={t('terms.headings.changes')}>
+        <p>{PLACEHOLDER('right to amend, notice period, right to object')}</p>
+      </Section>
+      <Section heading={t('terms.headings.law')}>
+        <p>
+          {PLACEHOLDER('governing law and venue — note: company incorporated in the US, customers in the EU')}
+        </p>
+      </Section>
+    </LegalShell>
+  );
+}
+
+// ─── Cookie & Storage Policy ──────────────────────────────────────────────────
+// Unlike the other three, this page is substantive rather than a scaffold: it
+// describes verifiable behaviour. The app sets no cookies at all (no
+// document.cookie anywhere); it only writes localStorage/sessionStorage. The
+// key list below was taken from the code and must be kept in step with it —
+// grep for localStorage./sessionStorage. before editing. The one genuinely
+// legal call, whether each entry is "strictly necessary" under §25 TDDDG /
+// ePrivacy or needs consent, is left to counsel.
+
+const STORAGE_KEYS: { name: string; scope: 'local' | 'session'; en: string; de: string }[] = [
+  { name: 'ch360_last_profile', scope: 'local',
+    en: 'Your most recent wizard answers, so the risk map can be restored when you come back.',
+    de: 'Ihre zuletzt im Assistenten gemachten Angaben, damit die Risk Map beim Wiederkommen erhalten bleibt.' },
+  { name: 'ch360_guest_key', scope: 'local',
+    en: 'A random identifier that lets sessions be saved before you register. Not linked to a name or e-mail.',
+    de: 'Eine Zufallskennung, mit der Sitzungen schon vor der Registrierung gespeichert werden. Ohne Bezug zu Name oder E-Mail.' },
+  { name: 'ch360_last_session_id', scope: 'local',
+    en: 'Points to the session you last saved, so it can be reopened.',
+    de: 'Verweist auf die zuletzt gespeicherte Sitzung, damit sie wieder geöffnet werden kann.' },
+  { name: 'ch360_adopted_for', scope: 'local',
+    en: 'Records that a guest session has already been transferred to your account, to avoid doing it twice.',
+    de: 'Hält fest, dass eine Gast-Sitzung bereits Ihrem Konto zugeordnet wurde, damit das nicht doppelt geschieht.' },
+  { name: 'ch360-theme', scope: 'local',
+    en: 'Your light/dark mode choice.',
+    de: 'Ihre Auswahl zwischen hellem und dunklem Erscheinungsbild.' },
+  { name: 'i18nextLng', scope: 'local',
+    en: 'Your language choice, so it survives a page reload.',
+    de: 'Ihre Sprachwahl, damit sie einen Seitenwechsel übersteht.' },
+  { name: 'ch360_assistant', scope: 'local',
+    en: 'Switch for the VAT assistant, set only if you open a link carrying that parameter.',
+    de: 'Schalter für den USt-Assistenten, wird nur gesetzt, wenn Sie einen Link mit diesem Parameter öffnen.' },
+  { name: 'complihub360.compliance.country', scope: 'session',
+    en: 'The country you selected on the compliance areas page. Cleared when you close the tab.',
+    de: 'Das auf der Seite „Compliance-Bereiche" gewählte Land. Wird beim Schließen des Tabs verworfen.' },
+  { name: 'demo_is_logged_in, demo_user_role, demo_user_name', scope: 'local',
+    en: 'Demo login state. Only written in demo mode, never in the production build.',
+    de: 'Zustand des Demo-Logins. Wird nur im Demo-Modus geschrieben, nie im Produktivstand.' },
+];
+
+function StorageTable({ de }: { de: boolean }) {
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse text-left text-[13px]">
+        <thead>
+          <tr className="border-b border-stroke-subtle text-fg-tertiary">
+            <th className="py-2 pr-4 font-medium">{de ? 'Schlüssel' : 'Key'}</th>
+            <th className="py-2 pr-4 font-medium">{de ? 'Ablage' : 'Storage'}</th>
+            <th className="py-2 font-medium">{de ? 'Zweck' : 'Purpose'}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {STORAGE_KEYS.map((k) => (
+            <tr key={k.name} className="border-b border-stroke-subtle/60 align-top">
+              <td className="py-2.5 pr-4 font-mono text-[12px] text-fg">{k.name}</td>
+              <td className="py-2.5 pr-4 whitespace-nowrap text-fg-tertiary">
+                {k.scope === 'local' ? 'localStorage' : 'sessionStorage'}
+              </td>
+              <td className="py-2.5 text-fg-secondary">{de ? k.de : k.en}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export function CookiePage() {
+  const { locale } = useParams();
+  const { t } = useTranslation('legal');
+  const de = locale === 'de';
+
+  if (de) {
+    return (
+      <LegalShell title={t('cookies.title')} updated={t('cookies.updated')}>
+        <DraftBanner />
+        <Section heading={t('cookies.headings.summary')}>
+          <p>
+            Diese Website setzt <strong className="text-fg">keine Cookies</strong> — weder eigene noch solche Dritter, weder
+            zur Analyse noch zur Werbung. Es gibt daher auch kein Cookie-Banner. Gespeichert wird ausschließlich im lokalen
+            Speicher Ihres Browsers, und zwar nur, was die Anwendung zum Funktionieren braucht.
+          </p>
+        </Section>
+        <Section heading={t('cookies.headings.noCookies')}>
+          <p>
+            Wir binden kein Tracking, keine Werbenetzwerke und keine Analyse-Dienste ein, die Cookies setzen würden. Ihr
+            Verhalten auf der Seite wird nicht über Sitzungen oder Websites hinweg verfolgt.
+          </p>
+        </Section>
+        <Section heading={t('cookies.headings.storage')}>
+          <p>
+            Die folgenden Einträge legt die Anwendung in Ihrem Browser ab. Sie verbleiben auf Ihrem Gerät und werden nicht
+            als solche an uns übertragen:
+          </p>
+          <StorageTable de />
+        </Section>
+        <Section heading={t('cookies.headings.purposes')}>
+          <p>
+            Alle Einträge dienen dem Betrieb: Sie erhalten Ihre Eingaben über einen Seitenwechsel hinweg, merken sich Ihre
+            Sprach- und Darstellungswahl und ermöglichen es, eine Sitzung schon vor der Registrierung zu speichern. Kein
+            Eintrag dient der Reichweitenmessung, der Profilbildung oder der Werbung.
+          </p>
+        </Section>
+        <Section heading={t('cookies.headings.consent')}>
+          <p>
+            Die Speicherung auf Ihrem Endgerät richtet sich nach § 25 TDDDG. Welche der oben genannten Einträge als
+            unbedingt erforderlich einzustufen sind und für welche gegebenenfalls eine Einwilligung einzuholen ist, ist
+            rechtlich zu bewerten: {PLACEHOLDER('Einstufung je Eintrag durch Rechtsberatung')}
+          </p>
+        </Section>
+        <Section heading={t('cookies.headings.manage')}>
+          <p>
+            Sie können diese Daten jederzeit selbst entfernen, indem Sie in Ihrem Browser die Website-Daten für diese Domain
+            löschen (in den meisten Browsern unter Einstellungen &rsaquo; Datenschutz &rsaquo; Website-Daten). Danach
+            starten Sie ohne gespeicherte Angaben, gespeicherte Sitzungen sind über Ihr Konto weiterhin erreichbar. Der
+            Eintrag mit sessionStorage verschwindet ohnehin, sobald Sie den Tab schließen.
+          </p>
+        </Section>
+        <Section heading={t('cookies.headings.thirdParty')}>
+          <p>
+            Eingebundene Inhalte Dritter können eigene Speichermechanismen mitbringen. Derzeit betrifft das:{' '}
+            {PLACEHOLDER('eingebundene Drittinhalte prüfen und auflisten, z. B. Schriftarten, Karten, Videos')}
+          </p>
+        </Section>
+        <Section heading={t('cookies.headings.contact')}>
+          <p>Fragen zu dieser Seite beantworten wir unter {PLACEHOLDER('datenschutz@… E-Mail-Adresse')}.</p>
+        </Section>
+      </LegalShell>
+    );
+  }
+
+  return (
+    <LegalShell title={t('cookies.title')} updated={t('cookies.updated')}>
+      <DraftBanner />
+      <Section heading={t('cookies.headings.summary')}>
+        <p>
+          This site sets <strong className="text-fg">no cookies</strong> — none of our own, none from third parties, none for
+          analytics or advertising. That is also why you see no cookie banner. The only thing we write is your browser&apos;s
+          local storage, and only what the application needs in order to work.
+        </p>
+      </Section>
+      <Section heading={t('cookies.headings.noCookies')}>
+        <p>
+          We embed no tracking, no ad networks, and no analytics services that would set cookies. Your behaviour is not
+          followed across sessions or across sites.
+        </p>
+      </Section>
+      <Section heading={t('cookies.headings.storage')}>
+        <p>
+          The application stores the following entries in your browser. They stay on your device and are not transmitted to
+          us as such:
+        </p>
+        <StorageTable de={false} />
+      </Section>
+      <Section heading={t('cookies.headings.purposes')}>
+        <p>
+          Every entry serves operation: keeping your input across a page change, remembering your language and appearance
+          choice, and letting a session be saved before you register. None of them is used for audience measurement,
+          profiling, or advertising.
+        </p>
+      </Section>
+      <Section heading={t('cookies.headings.consent')}>
+        <p>
+          Storing information on your device is governed by §&nbsp;25 TDDDG (implementing the ePrivacy Directive). Which of
+          the entries above count as strictly necessary, and which may require consent, is a legal assessment:{' '}
+          {PLACEHOLDER('per-entry classification by legal counsel')}
+        </p>
+      </Section>
+      <Section heading={t('cookies.headings.manage')}>
+        <p>
+          You can remove this data yourself at any time by clearing the site data for this domain in your browser (in most
+          browsers under Settings &rsaquo; Privacy &rsaquo; Site data). You will then start with nothing stored; sessions you
+          saved remain reachable through your account. The sessionStorage entry disappears as soon as you close the tab.
+        </p>
+      </Section>
+      <Section heading={t('cookies.headings.thirdParty')}>
+        <p>
+          Embedded third-party content can bring its own storage. Currently this concerns:{' '}
+          {PLACEHOLDER('review and list embedded third-party content, e.g. fonts, maps, video')}
+        </p>
+      </Section>
+      <Section heading={t('cookies.headings.contact')}>
+        <p>Questions about this page: {PLACEHOLDER('privacy@… e-mail address')}.</p>
+      </Section>
+    </LegalShell>
+  );
+}
