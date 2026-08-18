@@ -1049,5 +1049,54 @@
         }
       }
     }
+  },
+  "pricing": {
+    "meta": {
+      "title": "Pricing · CompliHub360"
+    },
+    "eyebrow": "Pricing",
+    "title": {
+      "pre": "It costs you ",
+      "gold": "nothing",
+      "post": "."
+    },
+    "lead": "The assessment, the risk map and the matching are free. We are paid by the specialists, and only when a booking actually happens.",
+    "free": {
+      "kicker": "What is free",
+      "title": "Everything up to the booking.",
+      "items": [
+        {
+          "title": "The assessment",
+          "desc": "Four questions about your markets, your business model and your volume. No account, no sales call, no obligation to continue."
+        },
+        {
+          "title": "Your risk map",
+          "desc": "The duties that apply to your operation, each with its legal basis and its deadline. A free account opens the full map."
+        },
+        {
+          "title": "The comparison",
+          "desc": "Coverage, verified qualifications, response time and fit to your markets — side by side, before any identity is revealed."
+        }
+      ]
+    },
+    "who": {
+      "kicker": "Who pays",
+      "title": "The specialists, on booking.",
+      "body": "A specialist is charged when a confirmed appointment comes out of a match — not for being listed, not per click, not for a profile view. At no point is anything charged to you."
+    },
+    "ranking": {
+      "kicker": "What money cannot buy",
+      "title": "The ranking.",
+      "body": "Placement is never for sale. A paid position would make the match worthless for both sides: you would meet whoever paid the most, and the specialist would meet someone whose case they cannot serve. Suitability is the only input."
+    },
+    "specialist": {
+      "kicker": "What the specialist costs",
+      "title": "Their fee — quoted before you commit.",
+      "body": "The advice itself is not free, and we will not pretend otherwise. Every Verified Partner publishes a fixed estimate before you accept the engagement, so you never sit through a discovery call just to learn the price."
+    },
+    "cta": {
+      "title": "Start where it makes sense for you.",
+      "lead": "Six minutes, four questions, no account needed."
+    }
   }
 }

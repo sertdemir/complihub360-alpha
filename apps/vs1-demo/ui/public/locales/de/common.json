@@ -1049,5 +1049,54 @@
         }
       }
     }
+  },
+  "pricing": {
+    "meta": {
+      "title": "Preise · CompliHub360"
+    },
+    "eyebrow": "Preise",
+    "title": {
+      "pre": "Für Sie kostet es ",
+      "gold": "nichts",
+      "post": "."
+    },
+    "lead": "Die Einschätzung, die Risk Map und das Matching sind kostenlos. Bezahlt werden wir von den Fachleuten, und nur dann, wenn tatsächlich eine Buchung zustande kommt.",
+    "free": {
+      "kicker": "Was kostenlos ist",
+      "title": "Alles bis zur Buchung.",
+      "items": [
+        {
+          "title": "Die Einschätzung",
+          "desc": "Vier Fragen zu Ihren Märkten, Ihrem Geschäftsmodell und Ihrem Volumen. Kein Konto, kein Verkaufsgespräch, keine Verpflichtung weiterzumachen."
+        },
+        {
+          "title": "Ihre Risk Map",
+          "desc": "Die Pflichten, die für Ihren Betrieb gelten, jede mit Rechtsgrundlage und Frist. Ein kostenloses Konto öffnet die vollständige Karte."
+        },
+        {
+          "title": "Der Vergleich",
+          "desc": "Abdeckung, geprüfte Qualifikationen, Reaktionszeit und Passung zu Ihren Märkten — nebeneinander, bevor eine Identität sichtbar wird."
+        }
+      ]
+    },
+    "who": {
+      "kicker": "Wer bezahlt",
+      "title": "Die Fachleute, bei der Buchung.",
+      "body": "Einer Fachperson wird berechnet, wenn aus einem Match ein bestätigter Termin wird — nicht für den Eintrag, nicht pro Klick, nicht für einen Profilaufruf. Ihnen wird zu keinem Zeitpunkt etwas berechnet."
+    },
+    "ranking": {
+      "kicker": "Was sich nicht kaufen lässt",
+      "title": "Die Reihung.",
+      "body": "Plätze sind nicht verkäuflich. Ein bezahlter Platz würde das Match für beide Seiten wertlos machen: Sie träfen den, der am meisten gezahlt hat, und die Fachperson träfe jemanden, dessen Fall sie nicht bedienen kann. Die Eignung ist das einzige Kriterium."
+    },
+    "specialist": {
+      "kicker": "Was die Fachperson kostet",
+      "title": "Ihr Honorar — beziffert, bevor Sie sich binden.",
+      "body": "Die Beratung selbst ist nicht kostenlos, und wir tun nicht so. Jeder Verified Partner veröffentlicht eine feste Schätzung, bevor Sie das Mandat annehmen — Sie sitzen also kein Erstgespräch ab, nur um den Preis zu erfahren."
+    },
+    "cta": {
+      "title": "Fangen Sie dort an, wo es für Sie Sinn ergibt.",
+      "lead": "Sechs Minuten, vier Fragen, kein Konto nötig."
+    }
   }
 }

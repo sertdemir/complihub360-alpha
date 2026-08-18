@@ -1049,5 +1049,54 @@
         }
       }
     }
+  },
+  "pricing": {
+    "meta": {
+      "title": "Fiyatlar · CompliHub360"
+    },
+    "eyebrow": "Fiyatlar",
+    "title": {
+      "pre": "Sizin için ",
+      "gold": "ücretsiz",
+      "post": "."
+    },
+    "lead": "Değerlendirme, Risk Map ve eşleştirme ücretsizdir. Bize ödeme uzmanlar tarafından yapılır — ve yalnızca gerçekten bir randevu oluştuğunda.",
+    "free": {
+      "kicker": "Ücretsiz olanlar",
+      "title": "Randevuya kadar her şey.",
+      "items": [
+        {
+          "title": "Değerlendirme",
+          "desc": "Pazarlarınız, iş modeliniz ve hacminiz hakkında dört soru. Hesap yok, satış görüşmesi yok, devam etme zorunluluğu yok."
+        },
+        {
+          "title": "Risk Map'iniz",
+          "desc": "İşletmeniz için geçerli olan yükümlülükler; her biri yasal dayanağı ve süresiyle birlikte. Ücretsiz bir hesap haritanın tamamını açar."
+        },
+        {
+          "title": "Karşılaştırma",
+          "desc": "Kapsam, doğrulanmış nitelikler, yanıt süresi ve pazarlarınıza uygunluk — kimlik açıklanmadan önce, yan yana."
+        }
+      ]
+    },
+    "who": {
+      "kicker": "Kim öder",
+      "title": "Uzmanlar, randevuda.",
+      "body": "Bir eşleşmeden onaylanmış bir randevu çıktığında uzmandan ücret alınır — listede yer aldığı için değil, tıklama başına değil, profil görüntülemesi için değil. Sizden hiçbir aşamada ücret alınmaz."
+    },
+    "ranking": {
+      "kicker": "Parayla alınamayan",
+      "title": "Sıralama.",
+      "body": "Sıralamadaki yerler satılık değildir. Ücretli bir yer, eşleşmeyi her iki taraf için de değersiz kılardı: siz en çok ödeyenle tanışırdınız, uzman ise vakasını karşılayamayacağı biriyle. Tek ölçüt uygunluktur."
+    },
+    "specialist": {
+      "kicker": "Uzmanın ücreti",
+      "title": "Kendi ücreti — siz karar vermeden önce belirtilir.",
+      "body": "Danışmanlığın kendisi ücretsiz değil ve bunu başka türlü göstermeyeceğiz. Her Verified Partner, işi kabul etmenizden önce sabit bir tahmin yayımlar; böylece yalnızca fiyatı öğrenmek için bir ön görüşmeye katlanmak zorunda kalmazsınız."
+    },
+    "cta": {
+      "title": "Sizin için anlamlı olan yerden başlayın.",
+      "lead": "Altı dakika, dört soru, hesap gerekmiyor."
+    }
   }
 }

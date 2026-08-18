@@ -1049,5 +1049,54 @@
         }
       }
     }
+  },
+  "pricing": {
+    "meta": {
+      "title": "Precios · CompliHub360"
+    },
+    "eyebrow": "Precios",
+    "title": {
+      "pre": "A usted no le cuesta ",
+      "gold": "nada",
+      "post": "."
+    },
+    "lead": "La evaluación, la Risk Map y el matching son gratuitos. Nos pagan los especialistas, y solo cuando la reserva llega a producirse.",
+    "free": {
+      "kicker": "Qué es gratuito",
+      "title": "Todo hasta la reserva.",
+      "items": [
+        {
+          "title": "La evaluación",
+          "desc": "Cuatro preguntas sobre sus mercados, su modelo de negocio y su volumen. Sin cuenta, sin llamada comercial, sin obligación de continuar."
+        },
+        {
+          "title": "Su Risk Map",
+          "desc": "Las obligaciones que se aplican a su actividad, cada una con su base jurídica y su plazo. Una cuenta gratuita abre el mapa completo."
+        },
+        {
+          "title": "La comparación",
+          "desc": "Cobertura, cualificaciones verificadas, tiempo de respuesta y encaje con sus mercados — en paralelo, antes de que se revele ninguna identidad."
+        }
+      ]
+    },
+    "who": {
+      "kicker": "Quién paga",
+      "title": "Los especialistas, al reservar.",
+      "body": "Se cobra a un especialista cuando de un match sale una cita confirmada — no por figurar en la lista, no por clic, no por una visita al perfil. A usted no se le cobra en ningún momento."
+    },
+    "ranking": {
+      "kicker": "Lo que no se puede comprar",
+      "title": "El orden.",
+      "body": "Los puestos no están en venta. Un puesto pagado dejaría el match sin valor para ambas partes: usted conocería a quien más hubiera pagado, y el especialista conocería a alguien cuyo caso no puede atender. La idoneidad es el único criterio."
+    },
+    "specialist": {
+      "kicker": "Lo que cuesta el especialista",
+      "title": "Sus honorarios — presupuestados antes de que se comprometa.",
+      "body": "El asesoramiento en sí no es gratuito, y no vamos a pretender lo contrario. Cada Verified Partner publica una estimación fija antes de que acepte el encargo, de modo que nunca tendrá que aguantar una llamada exploratoria solo para conocer el precio."
+    },
+    "cta": {
+      "title": "Empiece donde tenga sentido para usted.",
+      "lead": "Seis minutos, cuatro preguntas, sin necesidad de cuenta."
+    }
   }
 }
