@@ -11,7 +11,7 @@ import { cn } from '../../lib/utils';
 export type PartnerStatus = 'verified' | 'pending' | 'suspended';
 const PARTNER: Record<PartnerStatus, { cls: string; icon: React.ReactNode; label: string }> = {
   verified: {
-    cls: 'bg-accent-50 text-accent-700 ring-1 ring-inset ring-accent-200 dark:bg-accent-500/15 dark:text-accent-300 dark:ring-accent-500/30',
+    cls: 'bg-accent-50 text-accent-800 ring-1 ring-inset ring-accent-200 dark:bg-accent-500/15 dark:text-accent-300 dark:ring-accent-500/30',
     icon: <BadgeCheck size={13} strokeWidth={2.5} />,
     label: 'Verified partner',
   },

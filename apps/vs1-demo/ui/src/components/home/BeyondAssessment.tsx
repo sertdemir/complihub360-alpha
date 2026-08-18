@@ -21,7 +21,7 @@ function Pill({ children, tone }: { children: React.ReactNode; tone: 'live' | 'b
       {children}
     </span>
   ) : (
-    <span className="inline-flex items-center rounded-full bg-accent-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-accent-700 ring-1 ring-inset ring-accent-200">
+    <span className="inline-flex items-center rounded-full bg-accent-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-accent-800 ring-1 ring-inset ring-accent-200">
       {children}
     </span>
   );

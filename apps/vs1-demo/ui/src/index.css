@@ -97,6 +97,12 @@
     --color-text-inverse: 255 255 255;
     --color-text-brand: var(--petrol-500);
     --color-text-accent: var(--gold-500);
+    /* Typografische Gold-Hervorhebung (das eine gehighlightete Wort einer Serif-
+       Headline). gold-500 liegt auf Weiß bei 2,10:1 und gold-600 bei 2,56:1 —
+       beide reißen selbst die 3:1 für große Schrift. Helle Flächen gehen deshalb
+       auf gold-700: 3,88:1 auf Weiß. NUR AA-LARGE (>=24px oder >=18.66px fett) —
+       niemals in Fließtextgröße, dort --color-text-brand verwenden. */
+    --color-text-accent-emphasis: var(--gold-700);
     --color-text-on-brand: 255 255 255;
     --color-text-on-accent: var(--petrol-900);   /* dark petrol on gold — never white */
 
@@ -256,6 +262,9 @@
     --color-text-tertiary: 142 156 161;
     --color-text-inverse: 15 23 42;     /* #0f172a */
     --color-text-brand: 44 192 173;     /* #2cc0ad */
+    /* Auf der dunklen Fläche kehrt sich das um: gold-500 erreicht dort 6,98:1
+       und trägt sogar Fließtextgröße. */
+    --color-text-accent-emphasis: var(--gold-500);
     /* bg-brand is the light teal #14a89a in dark mode, so the white inherited
        from :root sat at 2.96:1 on every brand button. Dark petrol reads 6.75:1
        and matches the "never white on brand-light surfaces" doctrine. */

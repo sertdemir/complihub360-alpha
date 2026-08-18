@@ -84,7 +84,7 @@ export function RiskMapSection() {
           {STAT_INDICES.map((i) => (
             <Stat
               key={i}
-              value={<span className="text-accent-600">{t(`riskMap.stats.${i}.value`)}</span>}
+              value={<span className="text-fg-accent-emphasis">{t(`riskMap.stats.${i}.value`)}</span>}
               label={t(`riskMap.stats.${i}.label`)}
               size="md"
             />

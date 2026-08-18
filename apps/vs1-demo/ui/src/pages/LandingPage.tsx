@@ -171,7 +171,7 @@ const USP_ITEMS: UspItem[] = [
       'Verified local expert network',
     ],
     cardCls: 'bg-surface border-neutral-200',
-    iconCls: 'bg-accent-50 text-accent-700',
+    iconCls: 'bg-accent-50 text-accent-800',
     bulletCls: 'bg-accent-500',
   },
 ];
@@ -210,8 +210,8 @@ const SERVICE_ITEMS: ServiceItem[] = [
     description:
       'ASA advertising standards, health claims, influencer rules, cookie consent, tracking laws, and GDPR-compliant marketing practices.',
     tags: ['ASA', 'ICO', 'Cookie Law', 'GDPR'],
-    tagCls: 'bg-accent-50 text-accent-700',
-    iconBgCls: 'bg-accent-50 text-accent-700',
+    tagCls: 'bg-accent-50 text-accent-800',
+    iconBgCls: 'bg-accent-50 text-accent-800',
   },
   {
     icon: Database,
@@ -310,7 +310,7 @@ const VALUE_TIERS: Tier[] = [
   },
   {
     badgeLabel: 'Partner',
-    badgeCls: 'bg-accent-50 text-accent-700 border border-accent-200',
+    badgeCls: 'bg-accent-50 text-accent-800 border border-accent-200',
     title: 'Provider Dashboard',
     description:
       'For verified tax advisors, lawyers, and compliance consultants. Receive pre-qualified, structured leads.',
@@ -335,7 +335,7 @@ const TESTIMONIALS: Testimonial[] = [
       'I saved 3 weeks of legal research in under 30 minutes. CompliHub360 immediately flagged our EPR packaging obligation that our accountant had completely missed. The structured dossier was ready to hand over to our solicitor the same day.',
     result: 'Time Savings',
     resultIcon: Clock,
-    resultCls: 'bg-accent-50 border border-accent-200 text-accent-700',
+    resultCls: 'bg-accent-50 border border-accent-200 text-accent-800',
     tag: 'E-Commerce · EPR + VAT',
   },
   {
@@ -376,7 +376,7 @@ function HeroZone() {
 
         {/* Left — Headline */}
         <div>
-          <div className="inline-flex items-center gap-2 bg-accent-50 border border-accent-200 text-accent-700 text-caption font-semibold px-3 py-1 rounded-md mb-6">
+          <div className="inline-flex items-center gap-2 bg-accent-50 border border-accent-200 text-accent-800 text-caption font-semibold px-3 py-1 rounded-md mb-6">
             <Sparkles size={14} />
             {t('landing.heroZone.badge', 'AI-Powered Advisory System')}
           </div>

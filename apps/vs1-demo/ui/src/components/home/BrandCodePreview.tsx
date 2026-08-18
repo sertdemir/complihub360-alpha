@@ -111,12 +111,12 @@ export function BrandCodePreview() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
         >
-          <span className="inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-accent-400">
+          <span className="inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-accent-300 dark:text-accent-950">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-current" />
             {t('brandCode.eyebrow')}
           </span>
           <h2 className="mt-4 font-serif text-[2rem] font-semibold leading-tight tracking-tight text-fg-on-brand sm:text-[2.75rem]">
-            <GoldWord>{t('brandCode.title.gold')}</GoldWord>{t('brandCode.title.post')}
+            <span className="whitespace-nowrap text-accent-300 dark:text-accent-950">{t('brandCode.title.gold')}</span>{t('brandCode.title.post')}
           </h2>
           <p className="mt-5 text-body leading-relaxed text-fg-on-brand/75">
             {t('brandCode.subtitle')}

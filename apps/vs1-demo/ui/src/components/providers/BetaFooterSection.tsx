@@ -98,7 +98,7 @@ export function BetaFooterSection() {
                       <a href="#" className="inline-flex items-center gap-2 text-[14px] text-neutral-700 hover:text-primary-600">
                         {t(`footer.nav.${col.key}.${l.key}`)}
                         {l.beta && (
-                          <span className="rounded bg-accent-50 px-1.5 py-0.5 text-[9px] font-bold uppercase text-accent-700">
+                          <span className="rounded bg-accent-50 px-1.5 py-0.5 text-[9px] font-bold uppercase text-accent-800">
                             {t('footer.betaBadge')}
                           </span>
                         )}
