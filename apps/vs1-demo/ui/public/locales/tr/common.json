@@ -853,9 +853,10 @@
   "header": {
     "nav": {
       "howItWorks": "Nasıl çalışır",
-      "whatWeKnow": "Neleri kapsıyoruz",
-      "voices": "Görüşler",
-      "pricing": "Fiyatlandırma"
+      "pricing": "Fiyatlandırma",
+      "complianceAreas": "Uyum Alanları",
+      "markets": "Pazarlar",
+      "resources": "Kaynaklar"
     },
     "login": "Giriş yap"
   },

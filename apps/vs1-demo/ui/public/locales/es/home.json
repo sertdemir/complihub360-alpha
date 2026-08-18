@@ -1158,12 +1158,14 @@
           "howItWorks": "Cómo funciona",
           "startAssessment": "Iniciar evaluación",
           "exampleResult": "Resultado de ejemplo",
-          "forProviders": "Para proveedores"
+          "pricing": "Precios",
+          "platformOverview": "La plataforma"
         }
       },
       "solutions": {
         "title": "Soluciones",
         "links": {
+          "solutionsOverview": "Por rol",
           "taxVat": "Impuestos e IVA",
           "productPackaging": "EPR y envases",
           "dataPrivacy": "Datos y privacidad",
@@ -1181,7 +1183,8 @@
           "knowledgeLibrary": "Biblioteca de conocimiento",
           "countryGuides": "Guías por país",
           "tutorials": "Tutoriales",
-          "glossary": "Glosario de compliance"
+          "glossary": "Glosario de compliance",
+          "aiGovernance": "Gobernanza de IA"
         }
       },
       "company": {

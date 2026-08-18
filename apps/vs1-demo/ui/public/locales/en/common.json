@@ -853,9 +853,10 @@
   "header": {
     "nav": {
       "howItWorks": "How it works",
-      "whatWeKnow": "What we know",
-      "voices": "Voices",
-      "pricing": "Pricing"
+      "pricing": "Pricing",
+      "complianceAreas": "Compliance Areas",
+      "markets": "Markets",
+      "resources": "Resources"
     },
     "login": "Log in"
   },

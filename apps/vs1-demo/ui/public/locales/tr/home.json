@@ -1158,12 +1158,14 @@
           "howItWorks": "Nasıl çalışır",
           "startAssessment": "Değerlendirmeyi başlat",
           "exampleResult": "Örnek sonuç",
-          "forProviders": "Sağlayıcılar için"
+          "pricing": "Fiyatlar",
+          "platformOverview": "Platform"
         }
       },
       "solutions": {
         "title": "Çözümler",
         "links": {
+          "solutionsOverview": "Role göre",
           "taxVat": "Vergi ve KDV",
           "productPackaging": "EPR ve Ambalaj",
           "dataPrivacy": "Veri ve Gizlilik",
@@ -1181,7 +1183,8 @@
           "knowledgeLibrary": "Bilgi Kitaplığı",
           "countryGuides": "Ülke Rehberleri",
           "tutorials": "Eğitimler",
-          "glossary": "Uyum Sözlüğü"
+          "glossary": "Uyum Sözlüğü",
+          "aiGovernance": "Yapay zekâ yönetişimi"
         }
       },
       "company": {

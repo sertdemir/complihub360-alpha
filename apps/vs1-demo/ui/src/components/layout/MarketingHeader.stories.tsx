@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { MemoryRouter } from 'react-router-dom';
 import { MarketingHeader, type MarketingHeaderProps } from './MarketingHeader';
 
 const DESCRIPTION = `
@@ -25,6 +26,9 @@ const meta = {
     docs: { description: { component: DESCRIPTION } },
   },
   tags: ['autodocs'],
+  // The entries are real routes since 2026-08-18, so the header calls
+  // useLocation() to light the active one — which needs a Router in scope.
+  decorators: [(Story) => <MemoryRouter initialEntries={['/en/markets']}><Story /></MemoryRouter>],
   argTypes: {
     theme: { control: 'radio', options: ['light', 'inverse'], description: 'Light page vs. dark hero (inverse).' },
   },

@@ -5,11 +5,11 @@ import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../common/LanguageSwitcher';
 import { useAuthStore } from '../../store/useAuthStore';
 import {
+  // The mega-menu item type stays: every entry is a flat link today, but the
+  // dropdown machinery is guarded by `items.length > 0` and works the moment a
+  // menu gets children again. The ten section icons went with those children.
   type LucideIcon,
   ChevronDown, ArrowRight,
-  Zap, Users, Globe as GlobeIcon, Building2,
-  Rocket, Layers, Scale,
-  MessageSquare, FileText, ShieldCheck,
   LogOut, LayoutDashboard, User
 } from 'lucide-react';
 import { Button } from '../ui/Button';
@@ -61,40 +61,15 @@ export function GlobalNav() {
     path?: string;
     items: { icon: LucideIcon; anim: any; title: string; desc: string; path: string }[];
   }[] = [
-    {
-      id: 'platform',
-      label: t('nav.platform', 'Platform'),
-      items: [
-        { icon: Zap,       anim: { scale: 1.2, rotate: 15 },        title: t('nav.items.aiEngine.title'),     desc: t('nav.items.aiEngine.desc'), path: '/platform#engine' },
-        { icon: Users,     anim: { scale: 1.15, y: -3 },            title: t('nav.items.partnerMatching.title'),  desc: t('nav.items.partnerMatching.desc'),     path: '/platform#matching' },
-        { icon: GlobeIcon, anim: { scale: 1.1, rotate: 20 },        title: t('nav.items.globalCoverage.title'),   desc: t('nav.items.globalCoverage.desc'),             path: '/platform#coverage' },
-        { icon: Building2, anim: { scale: 1.15, y: -2 },            title: t('nav.items.forPartners.title'), desc: t('nav.items.forPartners.desc'),     path: '/platform#partners' },
-      ],
-    },
-    {
-      id: 'solutions',
-      label: t('nav.solutions', 'Solutions'),
-      items: [
-        { icon: Rocket, anim: { scale: 1.2, y: -6, rotate: -8 },   title: t('nav.items.founders.title'),   desc: t('nav.items.founders.desc'),  path: '/solutions#founders' },
-        { icon: Layers, anim: { scale: 1.15, y: -3 },               title: t('nav.items.operations.title'),  desc: t('nav.items.operations.desc'),     path: '/solutions#operations' },
-        { icon: Scale,  anim: { scale: 1.1, rotate: -12 },          title: t('nav.items.counsel.title'),  desc: t('nav.items.counsel.desc'),      path: '/solutions#counsel' },
-      ],
-    },
-    {
-      id: 'areas',
-      label: t('nav.complianceAreas', 'Compliance Areas'),
-      path: '/compliance',
-      items: [],
-    },
-    {
-      id: 'resources',
-      label: t('nav.resources', 'Resources'),
-      items: [
-        { icon: MessageSquare, anim: { scale: 1.15, y: -2, x: 2 }, title: t('nav.items.stories.title'),     desc: t('nav.items.stories.desc'), path: '/resources#stories' },
-        { icon: FileText,      anim: { scale: 1.15, y: -3 },        title: t('nav.items.guides.title'), desc: t('nav.items.guides.desc'),   path: '/resources#guides' },
-        { icon: ShieldCheck,   anim: { scale: 1.1, rotate: 10 },    title: t('nav.aiGovernance', 'AI Governance'), desc: t('nav.aiGovDesc', 'Our framework for transparent and compliant AI.'), path: '/ai-governance' },
-      ],
-    },
+    // Same five destinations as the MarketingHeader — the two headers must not
+    // present different navigations. Platform and Solutions dropped out of the
+    // header on 2026-08-18: §11 P5 keeps them as SEO surfaces, reachable from the
+    // footer, and seven entries do not survive German labels.
+    { id: 'how-it-works', label: t('header.nav.howItWorks', 'How it works'), path: '/how-it-works', items: [] },
+    { id: 'areas', label: t('header.nav.complianceAreas', 'Compliance Areas'), path: '/compliance', items: [] },
+    { id: 'markets', label: t('header.nav.markets', 'Markets'), path: '/markets', items: [] },
+    { id: 'pricing', label: t('header.nav.pricing', 'Pricing'), path: '/pricing', items: [] },
+    { id: 'resources', label: t('header.nav.resources', 'Resources'), path: '/resources', items: [] },
   ];
 
   if (isHidden) return null;

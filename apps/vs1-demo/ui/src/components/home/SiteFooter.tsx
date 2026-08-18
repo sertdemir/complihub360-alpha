@@ -16,18 +16,22 @@ type Column = { key: string; links: Link[] };
 // lib/domains so the column cannot drift out of sync again. Labels stay in the
 // 'home' namespace (loading 'userws' here would pull 360 dashboard keys into
 // every marketing page); the canonical English name is the fallback.
-const SOLUTION_LINKS: Link[] = DOMAINS.map((d) => ({
-  key: d.i18nKey,
-  href: '#',
-  fallback: d.label,
-}));
+const SOLUTION_LINKS: Link[] = [
+  // The overview page first, then the eight domains. All eight point at
+  // /compliance: that page IS the domain detail, and eight dead '#' links were
+  // worse than eight honest ones to the same place.
+  { key: 'solutionsOverview', href: '/solutions' },
+  ...DOMAINS.map((d) => ({ key: d.i18nKey, href: '/compliance', fallback: d.label })),
+];
 
 const COLUMNS: Column[] = [
   {
     key: 'platform',
     links: [
-      { key: 'howItWorks', href: '#how-it-works' },
-      { key: 'startAssessment', href: '#entry-door' },
+      { key: 'howItWorks', href: '/how-it-works' },
+      { key: 'pricing', href: '/pricing' },
+      { key: 'platformOverview', href: '/platform' },
+      { key: 'startAssessment', href: '/wizard' },
       { key: 'exampleResult', href: '#' },
     ],
   },
@@ -40,7 +44,8 @@ const COLUMNS: Column[] = [
     links: [
       { key: 'complianceNews', href: '#', beta: true },
       { key: 'knowledgeLibrary', href: '#', beta: true },
-      { key: 'countryGuides', href: '#' },
+      { key: 'countryGuides', href: '/markets' },
+      { key: 'aiGovernance', href: '/ai-governance' },
       { key: 'tutorials', href: '#' },
       { key: 'glossary', href: '#' },
     ],
@@ -124,7 +129,7 @@ export function SiteFooter() {
                   {col.links.map((l) => (
                     <li key={l.key}>
                       <a
-                        href={l.href}
+                        href={localize(l.href)}
                         className="inline-flex items-center gap-2 text-[14px] text-fg-secondary transition-colors hover:text-fg"
                       >
                         {linkLabel(`footer.columns.${col.key}.links.${l.key}`, l.fallback)}

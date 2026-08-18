@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Globe, Menu, X } from 'lucide-react';
@@ -6,19 +7,26 @@ import { Logo } from '../ui/Logo';
 import { ThemeToggle } from '../ui/ThemeToggle';
 
 // ─── MarketingHeader ──────────────────────────────────────────────────────────
-// Anchor-nav header for the CompliHub360 landing page, responsive: desktop bar +
-// mobile expanding pill panel. Menu items are in-page section anchors with
-// scroll-spy. Compass: Header Marketing Desktop / Mobile.
+// The marketing navigation, responsive: desktop bar + mobile expanding pill panel.
+// Compass: Header Marketing Desktop / Mobile.
 //
-// The second audience (provider) and the switch between the two were removed with
-// the provider marketing landing on 2026-08-18 — with one audience left, a toggle
-// and a cross-link had nothing to point at.
+// Multipager since 2026-08-18. The entries used to be in-page anchors with
+// scroll-spy, which only worked on the landing page and made three finished pages
+// unreachable — /markets had no entry point anywhere in the app, and "How it works"
+// pointed at the short strip on the landing page rather than the full page of the
+// same name. They are real routes now, and the active state comes from the URL
+// instead of the scroll position.
 
-export interface Anchor { id: string; label: string; labelKey?: string }
+export interface NavLink {
+  /** Path below the locale, e.g. 'markets' — the locale prefix comes from userHref. */
+  to: string;
+  label: string;
+  labelKey?: string;
+}
 
 export interface MarketingHeaderProps {
-  /** Section anchors (in-page). Defaults to ANCHORS. */
-  anchors?: Anchor[];
+  /** Navigation entries. Defaults to NAV_LINKS. */
+  links?: NavLink[];
   /** Locale-aware home link on the logo. */
   userHref?: string;
   loginHref?: string;
@@ -28,13 +36,16 @@ export interface MarketingHeaderProps {
   embedded?: boolean;
 }
 
-// Anchor ids point at REAL section ids on the landing page — pricing lives in the
-// HowItActs cost section (#engagement), voices in the Brand-Code section.
-const ANCHORS: Anchor[] = [
-  { id: 'how-it-works', label: 'How it works', labelKey: 'header.nav.howItWorks' },
-  { id: 'what-we-know', label: 'What we know', labelKey: 'header.nav.whatWeKnow' },
-  { id: 'brand-code', label: 'Voices', labelKey: 'header.nav.voices' },
-  { id: 'engagement', label: 'Pricing', labelKey: 'header.nav.pricing' },
+// The five destinations that carry the story: how the model works, what we cover,
+// where it applies, what it costs, and the library. /platform and /solutions stay
+// out of the header on purpose — §11 P5 keeps them as SEO surfaces, reachable from
+// the footer, and a seven-entry bar does not survive German labels.
+const NAV_LINKS: NavLink[] = [
+  { to: 'how-it-works', label: 'How it works', labelKey: 'header.nav.howItWorks' },
+  { to: 'compliance', label: 'Compliance areas', labelKey: 'header.nav.complianceAreas' },
+  { to: 'markets', label: 'Markets', labelKey: 'header.nav.markets' },
+  { to: 'pricing', label: 'Pricing', labelKey: 'header.nav.pricing' },
+  { to: 'resources', label: 'Resources', labelKey: 'header.nav.resources' },
 ];
 
 
@@ -113,43 +124,27 @@ function LanguageMenu({ buttonClass }: { buttonClass: string }) {
   );
 }
 
-// Track which section is in view (scroll-spy).
-function useScrollSpy(ids: string[]): string | null {
-  const [active, setActive] = useState<string | null>(ids[0] ?? null);
-  useEffect(() => {
-    if (!ids.length) return;
-    const obs = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-        if (visible[0]) setActive(visible[0].target.id);
-      },
-      { rootMargin: '-45% 0px -50% 0px', threshold: [0, 0.25, 0.5, 1] },
-    );
-    ids.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) obs.observe(el);
-    });
-    return () => obs.disconnect();
-  }, [ids.join(',')]);
-  return active;
-}
-
 export function MarketingHeader({
-  anchors,
+  links,
   userHref = '/',
   loginHref = '/login',
   theme = 'light',
   embedded = false,
 }: MarketingHeaderProps) {
   const { t } = useTranslation('common');
-  const items = anchors ?? ANCHORS;
+  const items = links ?? NAV_LINKS;
+  const { pathname } = useLocation();
+  // Active when the current path IS the entry or sits below it, so /markets/de
+  // keeps "Markets" lit.
+  const hrefFor = (to: string) => `${userHref.replace(/\/$/, '')}/${to}`;
+  const isActive = (to: string) => {
+    const href = hrefFor(to);
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
   const inverse = theme === 'inverse';
 
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const active = useScrollSpy(items.map((a) => a.id));
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -174,11 +169,11 @@ export function MarketingHeader({
         {/* Anchor group sits truly centered between the two flex-1 side zones. */}
         <nav className="flex items-center justify-center gap-3">
             {items.map((it) => (
-              <a
-                key={it.id}
-                href={`#${it.id}`}
+              <Link
+                key={it.to}
+                to={hrefFor(it.to)}
                 className={`whitespace-nowrap rounded-md px-2.5 py-2 text-body-sm font-medium transition-colors ${
-                  active === it.id
+                  isActive(it.to)
                     ? 'bg-brand-light text-fg-brand'
                     : inverse
                       ? 'text-white/85 hover:text-fg-inverse'
@@ -186,7 +181,7 @@ export function MarketingHeader({
                 }`}
               >
                 {it.labelKey ? t(it.labelKey, { defaultValue: it.label }) : it.label}
-              </a>
+              </Link>
             ))}
         </nav>
         <div className="flex flex-1 basis-0 items-center justify-end gap-5">
@@ -237,19 +232,19 @@ export function MarketingHeader({
                   {t('header.login')}
                 </a>
               </div>
-              {/* Pill anchor row (horizontal scroll) */}
+              {/* Pill row (horizontal scroll) */}
               <div className="flex gap-3 overflow-x-auto px-4 pb-5 pt-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {items.map((a) => (
-                  <a
-                    key={a.id}
-                    href={`#${a.id}`}
+                  <Link
+                    key={a.to}
+                    to={hrefFor(a.to)}
                     onClick={() => setOpen(false)}
                     className={`shrink-0 whitespace-nowrap rounded-pill px-3.5 py-2 text-body-sm font-semibold transition-colors ${
-                      active === a.id ? 'bg-brand text-fg-on-brand' : 'bg-surface-secondary text-fg'
+                      isActive(a.to) ? 'bg-brand text-fg-on-brand' : 'bg-surface-secondary text-fg'
                     }`}
                   >
                     {a.labelKey ? t(a.labelKey, { defaultValue: a.label }) : a.label}
-                  </a>
+                  </Link>
                 ))}
               </div>
             </motion.div>
