@@ -12,7 +12,7 @@ function LeadRow({ lead, highlighted }: { lead: InboxLead; highlighted?: boolean
       <div className="flex items-start justify-between gap-2">
         <span className="flex items-center gap-1.5 text-[13px] font-semibold text-fg">
           {highlighted && lead.dimmed === false && (
-            <span className="rounded bg-accent-500 px-1.5 py-0.5 text-[9px] font-bold uppercase text-primary-900">New</span>
+            <span className="rounded bg-accent-500 px-1.5 py-0.5 text-[9px] font-bold uppercase text-fg-on-accent">New</span>
           )}
           {lead.title}
         </span>

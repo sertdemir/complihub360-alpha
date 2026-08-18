@@ -134,7 +134,7 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
                   <div>
                     <Typography
                       variant="caption"
-                      className="text-neutral-400 font-semibold uppercase tracking-wider mb-2 block"
+                      className="text-neutral-500 font-semibold uppercase tracking-wider mb-2 block"
                     >
                       {t('compliance.whoAffected', 'Who is affected')}
                     </Typography>
@@ -146,7 +146,7 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
                   <div>
                     <Typography
                       variant="caption"
-                      className="text-neutral-400 font-semibold uppercase tracking-wider mb-2 block"
+                      className="text-neutral-500 font-semibold uppercase tracking-wider mb-2 block"
                     >
                       {t('compliance.keyObligations', 'Key Obligations')}
                     </Typography>
@@ -166,7 +166,7 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
                     <div>
                       <Typography
                         variant="caption"
-                        className="text-neutral-400 font-semibold uppercase tracking-wider mb-2 block flex items-center gap-1.5"
+                        className="text-neutral-500 font-semibold uppercase tracking-wider mb-2 block flex items-center gap-1.5"
                       >
                         <ScrollText size={12} className="text-neutral-400" />
                         {t('compliance.regulations.label', 'Key Regulations')}
@@ -218,7 +218,7 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
                   <div>
                     <Typography
                       variant="caption"
-                      className="text-neutral-400 font-semibold uppercase tracking-wider mb-2 block"
+                      className="text-neutral-500 font-semibold uppercase tracking-wider mb-2 block"
                     >
                       {t('compliance.whatWeCover', 'What CompliHub360 Covers')}
                     </Typography>
@@ -237,7 +237,7 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
                   <div>
                     <Typography
                       variant="caption"
-                      className="text-neutral-400 font-semibold uppercase tracking-wider mb-2 block flex items-center gap-1.5"
+                      className="text-neutral-500 font-semibold uppercase tracking-wider mb-2 block flex items-center gap-1.5"
                     >
                       <Users size={12} className="text-neutral-400" />
                       {t('compliance.specialists.label', 'Verified Specialists')}
@@ -270,7 +270,7 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
                   <div>
                     <Typography
                       variant="caption"
-                      className="text-neutral-400 font-semibold uppercase tracking-wider mb-2 block"
+                      className="text-neutral-500 font-semibold uppercase tracking-wider mb-2 block"
                     >
                       {t('compliance.activeMarkets', 'Active Markets')}
                     </Typography>
@@ -297,7 +297,7 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
                   </div>
 
                   {teaserQuestion && teaserOptions.length > 0 && (
-                    <div className="bg-surface-muted/30 border border-primary-100 rounded-xl p-4">
+                    <div className="bg-surface-tertiary/30 border border-primary-100 rounded-xl p-4">
                       <Typography
                         variant="caption"
                         className="text-primary-700 font-semibold uppercase tracking-wider mb-2 block"

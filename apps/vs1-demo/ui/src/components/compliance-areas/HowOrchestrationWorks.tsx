@@ -34,7 +34,7 @@ export function HowOrchestrationWorks() {
   const { t } = useTranslation('common');
 
   return (
-    <div className="bg-surface-muted/40 border border-primary-100 rounded-2xl p-7 desktop-s:p-10 mt-8">
+    <div className="bg-surface-tertiary/40 border border-primary-100 rounded-2xl p-7 desktop-s:p-10 mt-8">
       <div className="max-w-2xl mb-8">
         <Typography
           variant="caption"
@@ -42,10 +42,10 @@ export function HowOrchestrationWorks() {
         >
           {t('compliance.howItWorks.overline', 'Orchestration, not directory')}
         </Typography>
-        <Typography variant="h2" weight="bold" className="text-neutral-900">
+        <Typography variant="h2" weight="bold" className="text-fg">
           {t('compliance.howItWorks.title', 'From uncertainty to structured action — in four steps')}
         </Typography>
-        <Typography variant="body" className="text-neutral-600 mt-2 leading-relaxed">
+        <Typography variant="body" className="text-fg-secondary mt-2 leading-relaxed">
           {t(
             'compliance.howItWorks.body',
             'CompliHub360 controls the engagement funnel and enforces response accountability. You stay in control end-to-end.',

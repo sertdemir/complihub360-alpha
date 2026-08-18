@@ -53,7 +53,9 @@ function ReflexCard({
   return (
     <div className="overflow-hidden rounded-3xl border border-stroke-subtle shadow-[0_40px_90px_-40px_rgba(2,22,17,0.35)]">
       <div style={{ backgroundColor: cream }}>
-        <h3 className="px-7 pt-7 font-serif text-[2rem] font-bold leading-[1.2] text-fg">{title}</h3>
+        {/* Fläche ist ein bildabgestimmter Inline-Cremeton und bleibt hell — Text daher
+            hartcodiert dunkel, nicht text-fg (das ergab 1,01:1 im Dark-Mode). */}
+        <h3 className="px-7 pt-7 font-serif text-[2rem] font-bold leading-[1.2] text-neutral-900">{title}</h3>
         <img src={image} alt="" width={imageW} height={imageH} className="mt-5 block w-full" />
       </div>
       <div

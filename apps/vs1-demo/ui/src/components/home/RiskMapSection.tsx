@@ -84,7 +84,7 @@ export function RiskMapSection() {
           {STAT_INDICES.map((i) => (
             <Stat
               key={i}
-              value={<span className="text-accent-600">{t(`riskMap.stats.${i}.value`)}</span>}
+              value={<span className="text-fg-accent-emphasis">{t(`riskMap.stats.${i}.value`)}</span>}
               label={t(`riskMap.stats.${i}.label`)}
               size="md"
             />
@@ -113,7 +113,7 @@ export function RiskMapSection() {
               </span>
               <div className="min-w-0">
                 <p className="text-[14px] font-semibold text-fg">{t(`riskMap.rows.${i}.title`)}</p>
-                <p className="mt-0.5 text-[12px] leading-snug text-primary-600">{t(`riskMap.rows.${i}.detail`)}</p>
+                <p className="mt-0.5 text-[12px] leading-snug text-fg-brand">{t(`riskMap.rows.${i}.detail`)}</p>
               </div>
               <span className="mt-2 block text-[12px] text-fg-secondary sm:mt-0">{t(`riskMap.rows.${i}.market`)}</span>
               <span className="mt-1 block sm:mt-0">

@@ -39,7 +39,12 @@ const TONE: Record<LogoTone, { ring: string; num: string; word: string; tag: str
   // and 4.68:1 on petrol. Flipping the whole tone to gold-800 would have fixed
   // white and broken both of those (2.19:1 and 1.46:1).
   'on-light': { ring: 'fill-[#D4AF37] dark:fill-[#004D40]', num: 'fill-[#004D40] dark:fill-[#D4AF37]', word: 'text-fg-brand', tag: 'text-[#6A5B1E] dark:text-[#D4AF37]' },
-  'on-petrol': { ring: 'fill-[#D4AF37]', num: 'fill-[#FFFFFF]', word: 'text-fg-inverse', tag: 'text-fg-accent' },
+  // 'on-petrol' sits on FIXED dark grounds (#0b1620 auth, #14363a onboarding), so
+  // its colours are fixed too. The tagline keeps the accent — gold-500 reads 8.69:1
+  // and 6.17:1 there. The wordmark cannot: text-fg-inverse is white in light but
+  // #0f172a in dark, i.e. dark ink on a dark ground at 1.02:1. A theme-flipping
+  // token only works where the surface flips with it, and these surfaces do not.
+  'on-petrol': { ring: 'fill-[#D4AF37]', num: 'fill-[#FFFFFF]', word: 'text-white', tag: 'text-fg-accent' },
   'mono-white': { ring: 'fill-white', num: 'fill-white', word: 'text-white', tag: 'text-white' },
   'mono-black': { ring: 'fill-[#0F172A]', num: 'fill-[#0F172A]', word: 'text-[#0F172A]', tag: 'text-[#0F172A]' },
 };

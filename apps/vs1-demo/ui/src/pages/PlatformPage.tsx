@@ -246,7 +246,7 @@ function CoverageGrid() {
               </Typography>
             </div>
             <span className={`text-xs font-bold px-2.5 py-1 rounded-md ${
-              m.status === t('platform.coverage.marketStatusLive', 'Live') ? 'bg-success-bg text-success-500' : 'bg-neutral-100 text-neutral-500'
+              m.status === t('platform.coverage.marketStatusLive', 'Live') ? 'bg-success-bg text-success-text' : 'bg-neutral-100 text-neutral-600'
             }`}>
               {m.status}
             </span>
@@ -504,7 +504,7 @@ function MatchingSection() {
 
           {/* Right: Funnel Diagram */}
           <div>
-            <Typography variant="ui-small" weight="bold" className="text-neutral-400 uppercase tracking-widest mb-6 block text-center">
+            <Typography variant="ui-small" weight="bold" className="text-neutral-500 uppercase tracking-widest mb-6 block text-center">
               {t('platform.matching.funnelTitle', 'The Risk-to-Execution Funnel')}
             </Typography>
             <FunnelDiagram />
@@ -626,7 +626,7 @@ function PartnersSection() {
 
           {/* Right: Magic Link Flow */}
           <div>
-            <Typography variant="ui-small" weight="bold" className="text-neutral-400 uppercase tracking-widest mb-6 block text-center">
+            <Typography variant="ui-small" weight="bold" className="text-neutral-500 uppercase tracking-widest mb-6 block text-center">
               {t('platform.partners.flowTitle', 'The Magic Link Workflow')}
             </Typography>
             <MagicLinkFlow />
@@ -686,7 +686,7 @@ function PlatformFooter() {
 
   return (
     <footer className="bg-neutral-900 py-10 text-center">
-      <Typography variant="caption" className="text-neutral-500 block normal-case tracking-normal">
+      <Typography variant="caption" className="text-neutral-400 block normal-case tracking-normal">
         {t('platform.footer.copyright', '© {{year}} CompliHub360. Built in Berlin.', { year: new Date().getFullYear() })}
       </Typography>
     </footer>

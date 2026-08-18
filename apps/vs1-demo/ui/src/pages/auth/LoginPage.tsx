@@ -389,7 +389,7 @@ export function LoginPage() {
                                     <button
                                         type="button"
                                         onClick={() => { window.location.href = "mailto:"; }}
-                                        className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-accent-500 px-5 py-3.5 text-[15px] font-semibold text-primary-950 transition-transform duration-200 hover:-translate-y-0.5"
+                                        className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-accent-500 px-5 py-3.5 text-[15px] font-semibold text-fg-on-accent transition-transform duration-200 hover:-translate-y-0.5"
                                     >
                                         {t("login.openMailApp")} <ArrowRight size={16} />
                                     </button>
@@ -507,7 +507,7 @@ export function LoginPage() {
                                     />
                                     <button
                                         type="submit"
-                                        className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-accent-500 px-5 py-3.5 text-[15px] font-semibold text-primary-950 transition-transform duration-200 hover:-translate-y-0.5"
+                                        className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-accent-500 px-5 py-3.5 text-[15px] font-semibold text-fg-on-accent transition-transform duration-200 hover:-translate-y-0.5"
                                     >
                                         {t("login.user.send")} <ArrowRight size={16} />
                                     </button>
