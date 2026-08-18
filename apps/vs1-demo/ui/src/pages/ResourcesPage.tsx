@@ -106,7 +106,7 @@ const GUIDES = [
     title: 'Setting Up a GmbH for Non-German Founders',
     desc: 'Step-by-step guide on establishing a German limited company, including notary requirements, trade office registration, and tax ID setup.',
     category: 'Corporate Structure',
-    categoryColor: 'bg-success-bg text-success-500',
+    categoryColor: 'bg-success-bg text-success-text',
     readTime: '15 min read',
     date: 'January 2026',
     type: 'Whitepaper',

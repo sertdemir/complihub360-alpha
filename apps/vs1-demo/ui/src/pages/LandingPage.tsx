@@ -263,7 +263,7 @@ const AI_STEPS: AiStep[] = [
     title: 'Dossier Generation & Matching',
     body: 'The engine cross-references your anonymised profile with live country-specific risk matrices and produces a structured dossier matched to vetted local experts.',
     stepLabelCls: 'text-success-700',
-    iconBgCls: 'bg-success-bg text-success-500',
+    iconBgCls: 'bg-success-bg text-success-text',
     cardCls: 'bg-success-bg border-success-500/30',
     dotActiveCls: 'bg-success-500 border-success-300 ring-success-200',
     panelCls: 'bg-success-bg border-success-500/30',

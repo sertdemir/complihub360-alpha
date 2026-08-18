@@ -246,7 +246,7 @@ function CoverageGrid() {
               </Typography>
             </div>
             <span className={`text-xs font-bold px-2.5 py-1 rounded-md ${
-              m.status === t('platform.coverage.marketStatusLive', 'Live') ? 'bg-success-bg text-success-500' : 'bg-neutral-100 text-neutral-600'
+              m.status === t('platform.coverage.marketStatusLive', 'Live') ? 'bg-success-bg text-success-text' : 'bg-neutral-100 text-neutral-600'
             }`}>
               {m.status}
             </span>

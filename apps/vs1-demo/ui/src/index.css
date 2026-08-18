@@ -256,6 +256,10 @@
     --color-text-tertiary: 142 156 161;
     --color-text-inverse: 15 23 42;     /* #0f172a */
     --color-text-brand: 44 192 173;     /* #2cc0ad */
+    /* bg-brand is the light teal #14a89a in dark mode, so the white inherited
+       from :root sat at 2.96:1 on every brand button. Dark petrol reads 6.75:1
+       and matches the "never white on brand-light surfaces" doctrine. */
+    --color-text-on-brand: 0 11 9;      /* petrol-900 #000b09 */
     --color-border-default: 55 65 81;   /* #374151 */
     --color-border-subtle: 42 51 64;    /* #2a3340 */
     --color-border-focus: 20 168 154;   /* #14a89a */
@@ -271,10 +275,14 @@
     --color-risk-medium-bg: 32 61 68;   /* was rgba(37,141,120,0.20) */
     --color-risk-high-bg: 37 69 75;     /* was rgba(61,180,154,0.20) */
     --color-risk-critical-bg: 46 82 86; /* was rgba(95,211,184,0.24) */
-    --color-risk-text-on-low: 207 224 219;  /* #cfe0db */
-    --color-risk-text-on-medium: 6 32 26;   /* #06201a */
-    --color-risk-text-on-high: 5 32 25;     /* #052019 */
-    --color-risk-text-on-critical: 4 20 15; /* #04140f */
+    /* Text ON the soft risk surfaces. These were dark values carried over from
+       light mode, which is unreadable on the dark *-bg tints above (2.56-4.68:1).
+       Now light, tuned to >=4.6:1 on their own -bg while keeping the petrol
+       identity and the brightness escalation. */
+    --color-risk-text-on-low: 141 169 161;  /* #8da9a1 */
+    --color-risk-text-on-medium: 48 183 156;/* #30b79c */
+    --color-risk-text-on-high: 69 192 165;  /* #45c0a5 */
+    --color-risk-text-on-critical: 95 211 184; /* #5fd3b8 */
 
     /* shadcn back-compat vars (HSL) — dark SLATE so bg-background /
        bg-card / border-border / text-foreground flip with the .dark class. */

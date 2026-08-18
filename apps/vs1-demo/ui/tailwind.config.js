@@ -116,6 +116,11 @@ export default {
                     'medium-bg': 'rgb(var(--color-risk-medium-bg) / <alpha-value>)',
                     'high-bg': 'rgb(var(--color-risk-high-bg) / <alpha-value>)',
                     'critical-bg': 'rgb(var(--color-risk-critical-bg) / <alpha-value>)',
+                    /* Foreground for the soft variant — text ON the *-bg tint. */
+                    'on-low': 'rgb(var(--color-risk-text-on-low) / <alpha-value>)',
+                    'on-medium': 'rgb(var(--color-risk-text-on-medium) / <alpha-value>)',
+                    'on-high': 'rgb(var(--color-risk-text-on-high) / <alpha-value>)',
+                    'on-critical': 'rgb(var(--color-risk-text-on-critical) / <alpha-value>)',
                 },
 
                 /* ── Status (interim — refine vs Compass Color page) ──
