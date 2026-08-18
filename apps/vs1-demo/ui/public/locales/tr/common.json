@@ -1275,7 +1275,8 @@
       "dashboard": "Dashboard",
       "performance": "Performans",
       "faq": "SSS"
-    }
+    },
+    "login": "Giriş yap"
   },
   "howItWorks": {
     "meta": {

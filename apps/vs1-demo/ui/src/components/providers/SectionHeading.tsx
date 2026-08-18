@@ -107,7 +107,8 @@ export function SectionEyebrow({
  * per the C360 "gold word-highlight" pattern.
  */
 export function GoldWord({ children }: { children: React.ReactNode }) {
-  return <span className="whitespace-nowrap text-accent-600">{children}</span>;
+  // Gold-Hervorhebung nur in Headline-Größe — der Token ist auf AA-large ausgelegt.
+  return <span className="whitespace-nowrap text-fg-accent-emphasis">{children}</span>;
 }
 
 export function SectionHeading({

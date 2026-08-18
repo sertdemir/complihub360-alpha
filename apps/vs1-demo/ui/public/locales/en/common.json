@@ -1275,7 +1275,8 @@
       "dashboard": "Dashboard",
       "performance": "Performance",
       "faq": "FAQ"
-    }
+    },
+    "login": "Log in"
   },
   "howItWorks": {
     "meta": {

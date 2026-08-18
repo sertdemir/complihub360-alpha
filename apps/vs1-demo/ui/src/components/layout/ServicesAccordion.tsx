@@ -177,7 +177,7 @@ export function ServicesAccordion() {
                    <div className="absolute inset-0 bg-primary-800/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                    
                    <div className="relative z-10 flex flex-col items-center gap-5">
-                      <div className="w-16 h-16 bg-accent-500 text-primary-900 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-transform duration-300 group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(212,175,55,0.6)]">
+                      <div className="w-16 h-16 bg-accent-500 text-fg-on-accent rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-transform duration-300 group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(212,175,55,0.6)]">
                         <ArrowRight size={28} />
                       </div>
                       <Typography variant="body" weight="bold" className="text-white">

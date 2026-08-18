@@ -23,12 +23,15 @@ const SOLID_BG: Record<RiskLevel, string> = {
   high: 'bg-risk-high',
   critical: 'bg-risk-critical',
 };
-// Solid text: dark on the light Low fill, white on the darker Medium/High/Critical fills.
+// Solid text: dark on the light Low fill, white on the darker Medium/High/Critical
+// fills. In DARK mode the whole scale inverts — every fill is a bright petrol —
+// so white drops to 1.83:1 on Critical and 2.56:1 on High; those flip to ink,
+// which reads 9.77:1 and 6.97:1 respectively.
 const SOLID_TEXT: Record<RiskLevel, string> = {
   low: 'text-[#0f172a]',
-  medium: 'text-white',
-  high: 'text-white',
-  critical: 'text-white',
+  medium: 'text-white dark:text-[#0f172a]',
+  high: 'text-white dark:text-[#0f172a]',
+  critical: 'text-white dark:text-[#0f172a]',
 };
 const SOFT_BG: Record<RiskLevel, string> = {
   low: 'bg-risk-low-bg',
@@ -36,13 +39,22 @@ const SOFT_BG: Record<RiskLevel, string> = {
   high: 'bg-risk-high-bg',
   critical: 'bg-risk-critical-bg',
 };
-// Soft / Outline / Dot text + border + dot all use the level colour itself —
-// intentionally subtle at Low, strong at Critical (the lightness escalation).
+// Outline + Dot text use the level colour itself — intentionally subtle at Low,
+// strong at Critical (the lightness escalation).
 const LEVEL_TEXT: Record<RiskLevel, string> = {
   low: 'text-risk-low',
   medium: 'text-risk-medium',
   high: 'text-risk-high',
   critical: 'text-risk-critical',
+};
+// Soft text is NOT the level colour: the accent on its own tint is unreadable
+// (Low 1.38:1, Medium 2.58:1 in light mode). --color-risk-text-on-* exists for
+// exactly this pairing and clears 9.9-17.5:1 in light, >=4.6:1 in dark.
+const SOFT_TEXT: Record<RiskLevel, string> = {
+  low: 'text-risk-on-low',
+  medium: 'text-risk-on-medium',
+  high: 'text-risk-on-high',
+  critical: 'text-risk-on-critical',
 };
 const LEVEL_BORDER: Record<RiskLevel, string> = {
   low: 'border-risk-low',
@@ -92,7 +104,7 @@ export function RiskBadge({
     styleVariant === 'solid'
       ? cn(s.box, SOLID_BG[level], SOLID_TEXT[level])
       : styleVariant === 'soft'
-        ? cn(s.box, SOFT_BG[level], LEVEL_TEXT[level])
+        ? cn(s.box, SOFT_BG[level], SOFT_TEXT[level])
         : cn(s.box, 'border bg-transparent', LEVEL_BORDER[level], LEVEL_TEXT[level]); // outline
 
   return <span className={cn(base, treatment, className)}>{children}</span>;
@@ -116,7 +128,7 @@ export function RiskDot({ level = 'medium', size = 10, className, ...rest }: Ris
       className={cn(
         'inline-block shrink-0 rounded-full',
         LEVEL_DOT[level],
-        level === 'critical' && 'shadow-[0_0_0_3px_var(--color-risk-low-bg)]',
+        level === 'critical' && 'shadow-[0_0_0_3px_rgb(var(--color-risk-low-bg))]',
         className,
       )}
       style={{ height: size, width: size }}

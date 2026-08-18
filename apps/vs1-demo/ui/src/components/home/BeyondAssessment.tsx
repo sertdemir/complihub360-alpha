@@ -21,7 +21,7 @@ function Pill({ children, tone }: { children: React.ReactNode; tone: 'live' | 'b
       {children}
     </span>
   ) : (
-    <span className="inline-flex items-center rounded-full bg-accent-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-accent-700 ring-1 ring-inset ring-accent-200">
+    <span className="inline-flex items-center rounded-full bg-accent-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-accent-800 ring-1 ring-inset ring-accent-200">
       {children}
     </span>
   );
@@ -131,7 +131,7 @@ export function BeyondAssessment() {
                 <Pill tone="beta">{t('beyond.pills.beta')}</Pill>
               </div>
               <div className="mt-6 flex items-center gap-3 rounded-2xl border border-stroke-subtle bg-surface p-3">
-                <span className="grid h-10 w-16 shrink-0 place-items-center rounded-lg bg-brand text-white">
+                <span className="grid h-10 w-16 shrink-0 place-items-center rounded-lg bg-brand text-fg-on-brand">
                   <Play size={16} fill="currentColor" />
                 </span>
                 <div className="min-w-0">

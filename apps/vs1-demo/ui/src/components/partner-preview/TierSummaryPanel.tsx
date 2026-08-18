@@ -20,7 +20,7 @@ export function TierSummaryPanel({ tier, onViewBreach, className }: TierSummaryP
       {/* Tier banner */}
       <div className="flex flex-col gap-3 rounded-xl border border-accent-200 bg-accent-50 p-4 dark:border-accent-500/30 dark:bg-accent-500/10 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-accent-500 text-primary-900">
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-accent-500 text-fg-on-accent">
             <Check size={22} strokeWidth={3} />
           </span>
           <div>

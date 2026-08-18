@@ -76,13 +76,13 @@ export function RegisterSection() {
 
           {/* Intake form */}
           <div className="rounded-2xl bg-white p-6 shadow-sm sm:p-8">
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-neutral-400">{t('register.form.emailLabel')}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">{t('register.form.emailLabel')}</p>
             <div className="mt-2">
               <Input type="email" placeholder={t('register.form.emailPlaceholder')} />
             </div>
-            <p className="mt-2 text-[12px] text-neutral-400">{t('register.form.emailHint')}</p>
+            <p className="mt-2 text-[12px] text-neutral-500">{t('register.form.emailHint')}</p>
 
-            <p className="mt-6 text-[10px] font-semibold uppercase tracking-wide text-neutral-400">{t('register.form.areasLabel')}</p>
+            <p className="mt-6 text-[10px] font-semibold uppercase tracking-wide text-neutral-500">{t('register.form.areasLabel')}</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {AREA_KEYS.map((a) => {
                 const on = areas.includes(a);
@@ -101,7 +101,7 @@ export function RegisterSection() {
               })}
             </div>
 
-            <p className="mt-6 text-[10px] font-semibold uppercase tracking-wide text-neutral-400">{t('register.form.countriesLabel')}</p>
+            <p className="mt-6 text-[10px] font-semibold uppercase tracking-wide text-neutral-500">{t('register.form.countriesLabel')}</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {COUNTRIES.map((c) => {
                 const on = countries.includes(c);
@@ -118,7 +118,7 @@ export function RegisterSection() {
                   </button>
                 );
               })}
-              <span className="rounded-full border border-dashed border-neutral-300 px-3 py-1.5 text-[13px] font-medium text-neutral-400">{t('register.form.addChip')}</span>
+              <span className="rounded-full border border-dashed border-neutral-300 px-3 py-1.5 text-[13px] font-medium text-neutral-500">{t('register.form.addChip')}</span>
             </div>
           </div>
         </motion.div>

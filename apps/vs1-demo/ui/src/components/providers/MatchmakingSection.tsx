@@ -58,7 +58,7 @@ export function MatchmakingSection() {
               {COLD_EMAILS.map((m) => (
                 <div key={m.key}>
                   <p className="text-[15px] font-semibold text-neutral-800">{t(`matchmaking.cold.${m.key}.subject`)}</p>
-                  <p className="text-[12px] text-neutral-400">{t('matchmaking.fromLabel', { email: m.from })}</p>
+                  <p className="text-[12px] text-neutral-500">{t('matchmaking.fromLabel', { email: m.from })}</p>
                   <p className="mt-1 text-[14px] leading-relaxed text-neutral-500">{t(`matchmaking.cold.${m.key}.body`)}</p>
                 </div>
               ))}

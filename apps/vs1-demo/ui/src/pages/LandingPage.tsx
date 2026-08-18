@@ -171,7 +171,7 @@ const USP_ITEMS: UspItem[] = [
       'Verified local expert network',
     ],
     cardCls: 'bg-surface border-neutral-200',
-    iconCls: 'bg-accent-50 text-accent-700',
+    iconCls: 'bg-accent-50 text-accent-800',
     bulletCls: 'bg-accent-500',
   },
 ];
@@ -210,8 +210,8 @@ const SERVICE_ITEMS: ServiceItem[] = [
     description:
       'ASA advertising standards, health claims, influencer rules, cookie consent, tracking laws, and GDPR-compliant marketing practices.',
     tags: ['ASA', 'ICO', 'Cookie Law', 'GDPR'],
-    tagCls: 'bg-accent-50 text-accent-700',
-    iconBgCls: 'bg-accent-50 text-accent-700',
+    tagCls: 'bg-accent-50 text-accent-800',
+    iconBgCls: 'bg-accent-50 text-accent-800',
   },
   {
     icon: Database,
@@ -263,7 +263,7 @@ const AI_STEPS: AiStep[] = [
     title: 'Dossier Generation & Matching',
     body: 'The engine cross-references your anonymised profile with live country-specific risk matrices and produces a structured dossier matched to vetted local experts.',
     stepLabelCls: 'text-success-700',
-    iconBgCls: 'bg-success-bg text-success-500',
+    iconBgCls: 'bg-success-bg text-success-text',
     cardCls: 'bg-success-bg border-success-500/30',
     dotActiveCls: 'bg-success-500 border-success-300 ring-success-200',
     panelCls: 'bg-success-bg border-success-500/30',
@@ -310,7 +310,7 @@ const VALUE_TIERS: Tier[] = [
   },
   {
     badgeLabel: 'Partner',
-    badgeCls: 'bg-accent-50 text-accent-700 border border-accent-200',
+    badgeCls: 'bg-accent-50 text-accent-800 border border-accent-200',
     title: 'Provider Dashboard',
     description:
       'For verified tax advisors, lawyers, and compliance consultants. Receive pre-qualified, structured leads.',
@@ -335,7 +335,7 @@ const TESTIMONIALS: Testimonial[] = [
       'I saved 3 weeks of legal research in under 30 minutes. CompliHub360 immediately flagged our EPR packaging obligation that our accountant had completely missed. The structured dossier was ready to hand over to our solicitor the same day.',
     result: 'Time Savings',
     resultIcon: Clock,
-    resultCls: 'bg-accent-50 border border-accent-200 text-accent-700',
+    resultCls: 'bg-accent-50 border border-accent-200 text-accent-800',
     tag: 'E-Commerce · EPR + VAT',
   },
   {
@@ -376,7 +376,7 @@ function HeroZone() {
 
         {/* Left — Headline */}
         <div>
-          <div className="inline-flex items-center gap-2 bg-accent-50 border border-accent-200 text-accent-700 text-caption font-semibold px-3 py-1 rounded-md mb-6">
+          <div className="inline-flex items-center gap-2 bg-accent-50 border border-accent-200 text-accent-800 text-caption font-semibold px-3 py-1 rounded-md mb-6">
             <Sparkles size={14} />
             {t('landing.heroZone.badge', 'AI-Powered Advisory System')}
           </div>
@@ -462,7 +462,7 @@ function HeroZone() {
 
           <button
             onClick={handleQualify}
-            className="w-full h-12 bg-accent-500 hover:bg-accent-600 text-neutral-900 font-bold text-body rounded-md transition-colors flex items-center justify-center gap-2 shadow-sm"
+            className="w-full h-12 bg-accent-500 hover:bg-accent-600 text-fg-on-accent font-bold text-body rounded-md transition-colors flex items-center justify-center gap-2 shadow-sm"
           >
             <ArrowRight size={18} />
             {t('landing.heroZone.ctaButton', 'Qualify in max. 5 Steps')}
@@ -681,7 +681,7 @@ function ServicesZone() {
             </div>
             <button
               onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/wizard?category=full-support`)}
-              className="h-11 bg-accent-500 hover:bg-accent-600 text-neutral-900 font-bold text-ui-small rounded-md transition-colors flex items-center justify-center gap-2"
+              className="h-11 bg-accent-500 hover:bg-accent-600 text-fg-on-accent font-bold text-ui-small rounded-md transition-colors flex items-center justify-center gap-2"
             >
               {t('landing.servicesZone.ctaButton', 'Explore Full Support')}
               <ArrowRight size={16} />
@@ -986,7 +986,7 @@ function ValueProgressionZone() {
               {highlighted ? (
                 <button
                   onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/register`)}
-                  className="w-full h-11 bg-accent-500 hover:bg-accent-600 text-neutral-900 font-bold text-ui-small rounded-md transition-colors"
+                  className="w-full h-11 bg-accent-500 hover:bg-accent-600 text-fg-on-accent font-bold text-ui-small rounded-md transition-colors"
                 >
                   {t(`landing.valueTiers.${index}.cta`, cta)}
                 </button>
@@ -1084,7 +1084,7 @@ function LandingFooter() {
                 />
                 <button
                   type="submit"
-                  className="h-10 px-4 bg-accent-500 hover:bg-accent-600 text-neutral-900 font-semibold text-ui-small rounded-md transition-colors shrink-0 flex items-center gap-1.5"
+                  className="h-10 px-4 bg-accent-500 hover:bg-accent-600 text-fg-on-accent font-semibold text-ui-small rounded-md transition-colors shrink-0 flex items-center gap-1.5"
                 >
                   <Mail size={14} />
                   {t('landing.footer.subscribeButton', 'Subscribe')}

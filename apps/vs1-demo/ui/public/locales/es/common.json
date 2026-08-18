@@ -1275,7 +1275,8 @@
       "dashboard": "Dashboard",
       "performance": "Rendimiento",
       "faq": "FAQ"
-    }
+    },
+    "login": "Iniciar sesión"
   },
   "howItWorks": {
     "meta": {
