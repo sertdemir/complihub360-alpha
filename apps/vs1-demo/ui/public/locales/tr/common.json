@@ -643,19 +643,19 @@
       "gold": "gösterebildiklerimiz",
       "post": "."
     },
-    "lead": "Bu bir blog değil. Bunlar, kimseyle konuşmadan okuyabileceğiniz platform bölümleri — motorumuzun karşılaştırdığı aynı kayıtlar, her birinin arkasındaki yasa metniyle birlikte.",
+    "lead": "Bu bir blog değil. Bunlar, platformun, kimseyle konuşmadan okuyabileceğiniz bölümleri — motorumuzun da temel aldığı kayıtların aynısı, her birinin arkasındaki yasa metniyle birlikte.",
     "entries": {
       "markets": {
         "title": "Pazarlar",
         "meta": "{{markets}} pazar · her yükümlülük yasal dayanağıyla",
         "desc": "Ülke bazında: hangi yükümlülükler için kaynağımız var, arkasındaki ulusal düzenleme, bildirim sıklığı — ve varsa AB metnine bağlantı.",
-        "cta": "Pazarlara git"
+        "cta": "Pazarları açın"
       },
       "compliance": {
-        "title": "Uyum Alanları",
+        "title": "Uyum alanları",
         "meta": "{{domains}} alan",
         "desc": "Her alanın neyi kapsadığı, hangi pazarlarda geçerli olduğu ve sizinki gibi bir işletme için ne zaman önem kazandığı.",
-        "cta": "Alanlara git"
+        "cta": "Alanları açın"
       },
       "howItWorks": {
         "title": "Nasıl çalışır",
@@ -1085,7 +1085,7 @@
         },
         {
           "title": "Risk Map'iniz",
-          "desc": "İşletmeniz için geçerli olan yükümlülükler; her biri yasal dayanağı ve süresiyle birlikte. Ücretsiz bir hesap haritanın tamamını açar."
+          "desc": "İşletmeniz için geçerli olan yükümlülükler; her biri yasal dayanağı ve son tarihiyle birlikte. Haritanın tamamı ücretsiz bir hesapla açılır."
         },
         {
           "title": "Karşılaştırma",
@@ -1095,18 +1095,18 @@
     },
     "who": {
       "kicker": "Kim öder",
-      "title": "Uzmanlar, randevuda.",
+      "title": "Uzmanlar, randevu alındığında.",
       "body": "Bir eşleşmeden onaylanmış bir randevu çıktığında uzmandan ücret alınır — listede yer aldığı için değil, tıklama başına değil, profil görüntülemesi için değil. Sizden hiçbir aşamada ücret alınmaz."
     },
     "ranking": {
       "kicker": "Parayla alınamayan",
       "title": "Sıralama.",
-      "body": "Sıralamadaki yerler satılık değildir. Ücretli bir yer, eşleşmeyi her iki taraf için de değersiz kılardı: siz en çok ödeyenle tanışırdınız, uzman ise vakasını karşılayamayacağı biriyle. Tek ölçüt uygunluktur."
+      "body": "Sıralamadaki yerler hiçbir zaman satılık değildir. Ücretli bir yer, eşleşmeyi her iki taraf için de değersiz kılardı: siz en çok ödeyenle tanışırdınız, uzman ise vakasıyla ilgilenemeyeceği biriyle tanışırdı. Tek ölçüt uygunluktur."
     },
     "specialist": {
       "kicker": "Uzmanın ücreti",
       "title": "Kendi ücreti — siz karar vermeden önce belirtilir.",
-      "body": "Danışmanlığın kendisi ücretsiz değil ve bunu başka türlü göstermeyeceğiz. Her Verified Partner, işi kabul etmenizden önce sabit bir tahmin yayımlar; böylece yalnızca fiyatı öğrenmek için bir ön görüşmeye katlanmak zorunda kalmazsınız."
+      "body": "Danışmanlığın kendisi ücretsiz değildir; bunun aksini de iddia etmeyeceğiz. Her Verified Partner, işi kabul etmenizden önce sabit bir fiyat tahmini yayımlar; böylece yalnızca fiyatı öğrenmek için bir ön görüşmeye katlanmak zorunda kalmazsınız."
     },
     "cta": {
       "title": "Sizin için anlamlı olan yerden başlayın.",
