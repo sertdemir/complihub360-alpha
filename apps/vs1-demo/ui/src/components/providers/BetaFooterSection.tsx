@@ -70,7 +70,7 @@ export function BetaFooterSection() {
               </div>
               <Button>{t('footer.newsletter.subscribe')}</Button>
             </div>
-            <p className="text-[12px] text-neutral-400">{t('footer.newsletter.privacyNote')}</p>
+            <p className="text-[12px] text-neutral-500">{t('footer.newsletter.privacyNote')}</p>
             <a href="#register" className="mt-2 text-[14px] font-semibold text-primary-600 hover:text-primary-700">
               {t('footer.newsletter.applyLink')}
             </a>
@@ -87,22 +87,22 @@ export function BetaFooterSection() {
               <Logo lockup="horizontal" tone="on-light" />
               <p className="mt-4 max-w-xs text-[14px] leading-relaxed text-neutral-600">{t('footer.brandTagline')}</p>
               <p className="mt-4 text-[13px] font-medium text-neutral-700">
-                <span className="text-neutral-900">EN</span> · <span className="text-neutral-400">DE</span>
+                <span className="text-neutral-900">EN</span> · <span className="text-neutral-500">DE</span>
               </p>
-              <p className="mt-4 text-[12px] text-neutral-400">{t('footer.brandDisclaimer')}</p>
+              <p className="mt-4 text-[12px] text-neutral-500">{t('footer.brandDisclaimer')}</p>
             </StaggerItem>
 
             {/* Nav columns */}
             {NAV_COLUMNS.map((col) => (
               <StaggerItem key={col.key}>
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">{t(`footer.nav.${col.key}.title`)}</p>
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500">{t(`footer.nav.${col.key}.title`)}</p>
                 <ul className="mt-4 flex flex-col gap-3">
                   {col.links.map((l) => (
                     <li key={l.key}>
                       <a href="#" className="inline-flex items-center gap-2 text-[14px] text-neutral-700 hover:text-primary-600">
                         {linkLabel(`footer.nav.${col.key}.${l.key}`, l.fallback)}
                         {l.beta && (
-                          <span className="rounded bg-accent-50 px-1.5 py-0.5 text-[9px] font-bold uppercase text-accent-700">
+                          <span className="rounded bg-accent-50 px-1.5 py-0.5 text-[9px] font-bold uppercase text-accent-800">
                             {t('footer.betaBadge')}
                           </span>
                         )}
@@ -121,7 +121,7 @@ export function BetaFooterSection() {
               <span className="font-semibold text-neutral-900">{t('footer.marketsList')}</span>
               {t('footer.marketsPost')}
             </p>
-            <p className="mx-auto mt-4 max-w-3xl text-[12px] leading-relaxed text-neutral-400">{t('footer.legalDisclaimer')}</p>
+            <p className="mx-auto mt-4 max-w-3xl text-[12px] leading-relaxed text-neutral-500">{t('footer.legalDisclaimer')}</p>
           </div>
         </Container>
       </div>

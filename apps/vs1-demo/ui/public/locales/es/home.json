@@ -1171,7 +1171,10 @@
           "corporateStructure": "Sociedad y estructura",
           "productCompliance": "Conformidad de producto",
           "logisticsCustoms": "Logística y aduanas",
-          "legalAdvisory": "Asesoría legal"
+          "legalAdvisory": "Asesoría legal",
+          "vatTax": "IVA e impuestos",
+          "marketingAdvertising": "Marketing y publicidad",
+          "fullSupport": "Soporte integral"
         }
       },
       "resources": {

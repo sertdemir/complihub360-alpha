@@ -5,7 +5,7 @@ import { cn } from '../../lib/utils';
 // Mark = exact exported vector geometry (viewBox 0 0 40 39): an orbit ring + a
 // node-dot, and the "360" numerals + degree. Colours are driven by `tone`,
 // mirroring the four Compass colour variants exactly:
-//   On Light   ring #D4AF37 · 360 #004D40 · CompliHub #004D40 · tagline #6A5B1E
+//   On Light   ring #D4AF37 · 360 #004D40 · CompliHub #004D40 · tagline #D4AF37
 //   On Petrol  ring #D4AF37 · 360 #FFFFFF · CompliHub #FFFFFF · tagline #D4AF37
 //   Mono White everything #FFFFFF
 //   Mono Black everything #0F172A
@@ -26,20 +26,19 @@ export type LogoLockup = 'horizontal' | 'stacked' | 'mark';
 
 // Mark fills are Tailwind `fill-*` classes (not raw attributes) so the mark can
 // flip in dark mode. 'on-light' is the only tone that adapts: in dark the mark
-// swaps (ring → Petrol, 360 → Gold) and the wordmark follows --color-text-brand.
-//
-// The wordmark deliberately carries no `dark:` override. It used to force
-// #097070, which is 2.49:1 on the #1f2937 slate — worse than the token it was
-// overriding: text-fg-brand already resolves to #2cc0ad in dark (6.47:1) and to
-// petrol-500 in light (9.83:1 on white). The override made a correct token wrong.
+// swaps (ring → Petrol, 360 → Gold). The wordmark keeps --color-text-brand in
+// both themes: the old dark override #097070 sat at 2.49:1 on the dark surface,
+// while the token's own dark value #2cc0ad reads 6.47:1.
+// The tagline carries NO gold. At 10px it is body text and needs 4.5:1, where
+// gold-500 reaches 2.10:1 on white and 4.33:1 on the darker grounds — and it
+// renders on several different grounds, so no single gold value would serve.
+// 'on-petrol' sits on FIXED dark grounds (#0b1620 auth, #14363a onboarding), so its
+// colours are fixed too. word used to be text-fg-inverse, which is white in light but
+// #0f172a in dark — dark ink on a dark ground, 1.02:1. A theme-flipping token only
+// works here if the surface flips with it, and these surfaces do not.
 const TONE: Record<LogoTone, { ring: string; num: string; word: string; tag: string }> = {
-  // The tagline is 10 px regular, so it answers to the 4.5:1 body threshold, not
-  // 3:1. gold-500 is 2.10:1 on white — hence gold-800 (6.71:1) on light surfaces.
-  // It stays gold-500 wherever the ground is dark: 6.98:1 on the #1f2937 slate
-  // and 4.68:1 on petrol. Flipping the whole tone to gold-800 would have fixed
-  // white and broken both of those (2.19:1 and 1.46:1).
-  'on-light': { ring: 'fill-[#D4AF37] dark:fill-[#004D40]', num: 'fill-[#004D40] dark:fill-[#D4AF37]', word: 'text-fg-brand', tag: 'text-[#6A5B1E] dark:text-[#D4AF37]' },
-  'on-petrol': { ring: 'fill-[#D4AF37]', num: 'fill-[#FFFFFF]', word: 'text-fg-inverse', tag: 'text-fg-accent' },
+  'on-light': { ring: 'fill-[#D4AF37] dark:fill-[#004D40]', num: 'fill-[#004D40] dark:fill-[#D4AF37]', word: 'text-fg-brand', tag: 'text-fg-secondary' },
+  'on-petrol': { ring: 'fill-[#D4AF37]', num: 'fill-[#FFFFFF]', word: 'text-white', tag: 'text-white/80' },
   'mono-white': { ring: 'fill-white', num: 'fill-white', word: 'text-white', tag: 'text-white' },
   'mono-black': { ring: 'fill-[#0F172A]', num: 'fill-[#0F172A]', word: 'text-[#0F172A]', tag: 'text-[#0F172A]' },
 };

@@ -105,17 +105,9 @@ export function SectionEyebrow({
 /**
  * Highlights exactly one word in a serif headline with the Accent-Gold treatment,
  * per the C360 "gold word-highlight" pattern.
- *
- * The tone is a semantic token, not a palette class: the pattern was designed on
- * the dark App-Workspace surfaces, where full gold-500 is 6.98:1, but the same
- * gold on the light marketing surfaces is 2.10:1 — a WCAG failure even at
- * display size. fg-accent-emphasis carries the step-down (gold-700 on light,
- * gold-500 on dark) so one class stays correct in both themes.
- *
- * Headline-only by contract: at 3.88:1 on white this clears AA-large (3:1) but
- * not AA body (4.5:1). For gold-toned body copy use text-fg-brand.
  */
 export function GoldWord({ children }: { children: React.ReactNode }) {
+  // Gold-Hervorhebung nur in Headline-Größe — der Token ist auf AA-large ausgelegt.
   return <span className="whitespace-nowrap text-fg-accent-emphasis">{children}</span>;
 }
 

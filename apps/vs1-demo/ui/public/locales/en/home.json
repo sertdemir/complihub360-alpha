@@ -1171,7 +1171,10 @@
           "corporateStructure": "Corporate & Structure",
           "productCompliance": "Product Compliance",
           "logisticsCustoms": "Logistics & Customs",
-          "legalAdvisory": "Legal Advisory"
+          "legalAdvisory": "Legal Advisory",
+          "vatTax": "VAT & Tax",
+          "marketingAdvertising": "Marketing & Advertising",
+          "fullSupport": "Full Support"
         }
       },
       "resources": {

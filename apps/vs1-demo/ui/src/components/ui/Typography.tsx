@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '../../lib/utils';
 
 type TypographyVariant = 'display' | 'h1' | 'h2' | 'h3' | 'body' | 'ui-small' | 'caption';
 type TypographyWeight = 'regular' | 'medium' | 'semibold' | 'bold';
@@ -57,7 +58,12 @@ export const Typography: React.FC<TypographyProps> = ({
   if (variant === 'body') defaultColor = 'text-neutral-900';
   else if (variant === 'caption' || variant === 'ui-small') defaultColor = 'text-neutral-600';
 
-  const combinedClasses = `${variantMapping[variant]} ${weightMapping[weight]} ${defaultColor} ${className}`.trim();
+  // cn() (tailwind-merge) resolves conflicts by LAST-WINS, so `className`
+  // reliably overrides the variant/weight/colour defaults. Plain string
+  // concatenation left both classes on the element and handed the decision to
+  // Tailwind's stylesheet order — which is why `className="text-error-700"`
+  // used to lose against the built-in `text-neutral-600`.
+  const combinedClasses = cn(variantMapping[variant], weightMapping[weight], defaultColor, className);
 
   return (
     <Component className={combinedClasses} {...props}>

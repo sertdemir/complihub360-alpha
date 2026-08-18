@@ -178,7 +178,7 @@ export function ComparisonMatrix() {
       </div>
 
       <div className="px-7 py-3 bg-neutral-50/60 border-t border-neutral-100">
-        <Typography variant="caption" className="text-neutral-400 normal-case tracking-normal">
+        <Typography variant="caption" className="text-neutral-500 normal-case tracking-normal">
           {t(
             'compliance.matrix.disclaimer',
             'Indicative ranges based on public regulatory references. Final exposure depends on your specific case — assess via the wizard for accurate guidance.',

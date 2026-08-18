@@ -289,7 +289,10 @@
         "corporateStructure": "Şirket ve Yapı",
         "productCompliance": "Ürün Uygunluğu",
         "logisticsCustoms": "Lojistik ve Gümrük",
-        "legalAdvisory": "Hukuki Danışmanlık"
+        "legalAdvisory": "Hukuki Danışmanlık",
+        "vatTax": "KDV ve Vergi",
+        "marketingAdvertising": "Pazarlama ve Reklam",
+        "fullSupport": "Tam Destek"
       },
       "resources": {
         "title": "Kaynaklar",

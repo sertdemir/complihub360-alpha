@@ -75,7 +75,7 @@ export function TableMobileCard({
               onClick={(e) => e.stopPropagation()}
               onChange={(e) => onSelect?.(e.target.checked)}
               aria-label="Select row"
-              className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-[var(--color-bg-brand)]"
+              className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-[rgb(var(--color-bg-brand))]"
             />
           )}
           {title && (

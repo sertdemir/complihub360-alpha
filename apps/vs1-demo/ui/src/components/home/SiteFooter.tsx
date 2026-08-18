@@ -129,7 +129,7 @@ export function SiteFooter() {
                       >
                         {linkLabel(`footer.columns.${col.key}.links.${l.key}`, l.fallback)}
                         {l.beta && (
-                          <span className="rounded-full bg-accent-50 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.06em] text-accent-700 ring-1 ring-inset ring-accent-200">
+                          <span className="rounded-full bg-accent-50 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.06em] text-accent-800 ring-1 ring-inset ring-accent-200">
                             {t('footer.beta')}
                           </span>
                         )}

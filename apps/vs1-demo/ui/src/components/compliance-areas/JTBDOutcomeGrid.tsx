@@ -95,7 +95,7 @@ export function JTBDOutcomeGrid({ onScrollToFirstArea }: OutcomeProps) {
               onClick={o.onClick}
               className="group text-left bg-white border border-neutral-200 hover:border-primary-400 rounded-2xl p-5 transition-all hover:shadow-lg hover:-translate-y-0.5 flex flex-col h-full"
             >
-              <div className="w-10 h-10 rounded-lg bg-surface-muted flex items-center justify-center mb-4">
+              <div className="w-10 h-10 rounded-lg bg-surface-tertiary flex items-center justify-center mb-4">
                 <Icon size={20} className="text-primary-700" />
               </div>
               <Typography variant="ui-small" weight="bold" className="text-neutral-900 mb-1.5 leading-snug">

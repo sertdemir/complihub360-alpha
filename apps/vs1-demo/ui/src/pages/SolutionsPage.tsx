@@ -82,7 +82,7 @@ function ExpandSafelyPath() {
     { icon: Globe, label: t('solutions.founders.node1Label', 'Country Gate'), desc: t('solutions.founders.node1Desc', 'Select target market'), color: 'bg-primary-500/20 border-primary-500/40 text-primary-300' },
     { icon: Brain, label: t('solutions.founders.node2Label', 'Adaptive Wizard'), desc: t('solutions.founders.node2Desc', 'Business model & context'), color: 'bg-accent-500/20 border-accent-500/40 text-accent-400' },
     { icon: Target, label: t('solutions.founders.node3Label', 'Risk Engine'), desc: t('solutions.founders.node3Desc', 'Calculate risk level'), color: 'bg-warning-bg border-warning-text/40 text-warning-text' },
-    { icon: Users, label: t('solutions.founders.node4Label', 'Partner Match'), desc: t('solutions.founders.node4Desc', '1-Click engagement'), color: 'bg-success-bg border-success-500/40 text-success-500' },
+    { icon: Users, label: t('solutions.founders.node4Label', 'Partner Match'), desc: t('solutions.founders.node4Desc', '1-Click engagement'), color: 'bg-success-bg border-success-500/40 text-success-text' },
   ];
 
   return (
@@ -147,7 +147,7 @@ function OpsDashboardPreview() {
       items: [
         { text: t('solutions.operations.statusDraft', 'Draft'), color: 'bg-neutral-200 text-neutral-600' },
         { text: t('solutions.operations.statusSubmitted', 'Submitted'), color: 'bg-warning-bg text-warning-text' },
-        { text: t('solutions.operations.statusConfirmed', 'Confirmed'), color: 'bg-success-bg text-success-500' },
+        { text: t('solutions.operations.statusConfirmed', 'Confirmed'), color: 'bg-success-bg text-success-text' },
       ] as { text: string; color: string }[],
     },
     {
@@ -176,7 +176,7 @@ function OpsDashboardPreview() {
               <Typography variant="ui-small" weight="bold" className="text-white block">
                 {panel.title}
               </Typography>
-              <Typography variant="caption" className="text-neutral-500 block normal-case tracking-normal">
+              <Typography variant="caption" className="text-neutral-400 block normal-case tracking-normal">
                 {panel.desc}
               </Typography>
             </div>
@@ -214,7 +214,7 @@ function PrivacyGateDiagram() {
     { icon: FileText, label: t('solutions.counsel.stage1Label', 'Document Upload'), desc: t('solutions.counsel.stage1Desc', 'Restricted Vault'), colorIcon: 'text-neutral-400', colorBg: 'bg-neutral-700 border-neutral-600' },
     { icon: EyeOff, label: t('solutions.counsel.stage2Label', 'PII Redaction'), desc: t('solutions.counsel.stage2Desc', 'Local masking engine'), colorIcon: 'text-error-400', colorBg: 'bg-error-500/15 border-error-500/30' },
     { icon: ShieldCheck, label: t('solutions.counsel.stage3Label', 'AI Eligibility Gate'), desc: t('solutions.counsel.stage3Desc', 'Policy & consent check'), colorIcon: 'text-warning-text', colorBg: 'bg-warning-bg border-warning-text/30' },
-    { icon: CheckCircle, label: t('solutions.counsel.stage4Label', 'Grounded Output'), desc: t('solutions.counsel.stage4Desc', 'Source-backed summary'), colorIcon: 'text-success-400', colorBg: 'bg-success-bg border-success-500/30' },
+    { icon: CheckCircle, label: t('solutions.counsel.stage4Label', 'Grounded Output'), desc: t('solutions.counsel.stage4Desc', 'Source-backed summary'), colorIcon: 'text-success-text', colorBg: 'bg-success-bg border-success-500/30' },
   ];
 
   return (
@@ -237,7 +237,7 @@ function PrivacyGateDiagram() {
             <Typography variant="ui-small" weight="bold" className="text-white block mb-1">
               {s.label}
             </Typography>
-            <Typography variant="caption" className="text-neutral-500 block normal-case tracking-normal">
+            <Typography variant="caption" className="text-neutral-400 block normal-case tracking-normal">
               {s.desc}
             </Typography>
             {i < stages.length - 1 && (
@@ -254,10 +254,10 @@ function PrivacyGateDiagram() {
         transition={{ duration: 0.5, delay: 0.5 }}
         className="mt-6 bg-neutral-800 border border-neutral-700 rounded-xl p-4 font-mono text-xs"
       >
-        <div className="text-neutral-500 mb-2">{t('solutions.counsel.codeCommentBefore', '// Before redaction')}</div>
+        <div className="text-neutral-400 mb-2">{t('solutions.counsel.codeCommentBefore', '// Before redaction')}</div>
         <div className="text-neutral-300">Contract signed by <span className="bg-error-500/30 text-error-300 px-1 rounded">John Mueller</span> at <span className="bg-error-500/30 text-error-300 px-1 rounded">john@acme.de</span></div>
-        <div className="text-neutral-500 mt-3 mb-2">{t('solutions.counsel.codeCommentAfter', '// After redaction')}</div>
-        <div className="text-neutral-300">Contract signed by <span className="bg-success-bg text-success-400 px-1 rounded">[NAME]</span> at <span className="bg-success-bg text-success-400 px-1 rounded">[EMAIL]</span></div>
+        <div className="text-neutral-400 mt-3 mb-2">{t('solutions.counsel.codeCommentAfter', '// After redaction')}</div>
+        <div className="text-neutral-300">Contract signed by <span className="bg-success-bg text-success-text px-1 rounded">[NAME]</span> at <span className="bg-success-bg text-success-text px-1 rounded">[EMAIL]</span></div>
       </motion.div>
     </div>
   );
@@ -360,7 +360,7 @@ function FoundersSection() {
                 icon: CheckCircle,
                 title: t('solutions.founders.pain3Title', 'We Fix This'),
                 desc: t('solutions.founders.pain3Desc', 'Our AI Wizard captures your context in 4–5 steps, maps jurisdiction-bound risks, and connects you to SLA-enforced specialists within 24–48h.'),
-                color: 'bg-success-bg border-success-200 text-success-500',
+                color: 'bg-success-bg border-success-200 text-success-text',
               },
             ].map(({ icon: Icon, title, desc, color }) => (
               <motion.div
@@ -594,7 +594,7 @@ function SolutionsFooter() {
 
   return (
     <footer className="bg-neutral-900 py-10 text-center">
-      <Typography variant="caption" className="text-neutral-500 block normal-case tracking-normal">
+      <Typography variant="caption" className="text-neutral-400 block normal-case tracking-normal">
         {t('solutions.footer.copyright', '© {{year}} CompliHub360. Built in Berlin.', { year: new Date().getFullYear() })}
       </Typography>
     </footer>

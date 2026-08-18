@@ -30,7 +30,7 @@ export function CountrySelector({ value, onChange }: CountrySelectorProps) {
     <div ref={containerRef} className="relative inline-flex flex-col items-stretch">
       <Typography
         variant="caption"
-        className="text-neutral-400 font-semibold uppercase tracking-wider mb-2"
+        className="text-fg-tertiary font-semibold uppercase tracking-wider mb-2"
       >
         {t('compliance.country.label', 'Your primary market')}
       </Typography>
@@ -85,7 +85,7 @@ export function CountrySelector({ value, onChange }: CountrySelectorProps) {
         </ul>
       )}
 
-      <Typography variant="caption" className="text-neutral-500 mt-2 leading-snug">
+      <Typography variant="caption" className="text-fg-tertiary mt-2 leading-snug">
         {t('compliance.country.hint', 'Filters active markets and personalises risk priorities.')}
       </Typography>
     </div>

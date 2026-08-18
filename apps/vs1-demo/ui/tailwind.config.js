@@ -22,8 +22,8 @@ export default {
                     800: '#001612',
                     900: '#000B09',
                     950: '#000403',
-                    DEFAULT: 'hsl(var(--primary))',
-                    foreground: 'hsl(var(--primary-foreground))',
+                    DEFAULT: 'hsl(var(--primary) / <alpha-value>)',
+                    foreground: 'hsl(var(--primary-foreground) / <alpha-value>)',
                 },
                 accent: {
                     50: '#FDF8E6',
@@ -37,8 +37,8 @@ export default {
                     800: '#6A5B1E',
                     900: '#3D3411',
                     950: '#1A1607',
-                    DEFAULT: 'hsl(var(--accent))',
-                    foreground: 'hsl(var(--accent-foreground))',
+                    DEFAULT: 'hsl(var(--accent) / <alpha-value>)',
+                    foreground: 'hsl(var(--accent-foreground) / <alpha-value>)',
                 },
                 neutral: {
                     50: '#FAFAFA',
@@ -65,92 +65,126 @@ export default {
                     800: '#6A5B1E', 900: '#3D3411', 950: '#1A1607',
                 },
 
-                /* ── Compass semantic (CSS-variable backed, theme-aware) ── */
+                /* ── Compass semantic (CSS-variable backed, theme-aware) ──
+                   The --color-* variables in src/index.css hold RAW CHANNEL
+                   TRIPLETS ("31 41 55"), so they must be referenced as
+                   rgb(var(--token) / <alpha-value>). That placeholder is what
+                   lets opacity modifiers work — bg-surface/85 etc. Referencing
+                   a finished colour instead makes Tailwind drop the utility and
+                   the element renders fully transparent. */
                 brand: {
-                    DEFAULT: 'var(--color-bg-brand)',
-                    light: 'var(--color-bg-brand-light)',
-                    /* Full-bleed brand panels that carry copy — see index.css. */
-                    surface: 'var(--color-bg-brand-surface)',
+                    DEFAULT: 'rgb(var(--color-bg-brand) / <alpha-value>)',
+                    light: 'rgb(var(--color-bg-brand-light) / <alpha-value>)',
                 },
                 'brand-accent': {
-                    DEFAULT: 'var(--color-bg-accent)',
-                    light: 'var(--color-bg-accent-light)',
+                    DEFAULT: 'rgb(var(--color-bg-accent) / <alpha-value>)',
+                    light: 'rgb(var(--color-bg-accent-light) / <alpha-value>)',
                 },
                 surface: {
-                    DEFAULT: 'var(--color-bg-primary)',
-                    secondary: 'var(--color-bg-secondary)',
-                    tertiary: 'var(--color-bg-tertiary)',
-                    inverse: 'var(--color-bg-inverse)',
+                    DEFAULT: 'rgb(var(--color-bg-primary) / <alpha-value>)',
+                    secondary: 'rgb(var(--color-bg-secondary) / <alpha-value>)',
+                    tertiary: 'rgb(var(--color-bg-tertiary) / <alpha-value>)',
+                    inverse: 'rgb(var(--color-bg-inverse) / <alpha-value>)',
                 },
                 fg: {
-                    DEFAULT: 'var(--color-text-primary)',
-                    secondary: 'var(--color-text-secondary)',
-                    tertiary: 'var(--color-text-tertiary)',
-                    disabled: 'var(--color-text-disabled)',
-                    inverse: 'var(--color-text-inverse)',
-                    brand: 'var(--color-text-brand)',
-                    accent: 'var(--color-text-accent)',
-                    'accent-emphasis': 'var(--color-text-accent-emphasis)',
-                    'on-brand': 'var(--color-text-on-brand)',
-                    'on-brand-accent': 'var(--color-text-on-brand-accent)',
-                    'on-accent': 'var(--color-text-on-accent)',
+                    DEFAULT: 'rgb(var(--color-text-primary) / <alpha-value>)',
+                    secondary: 'rgb(var(--color-text-secondary) / <alpha-value>)',
+                    tertiary: 'rgb(var(--color-text-tertiary) / <alpha-value>)',
+                    disabled: 'rgb(var(--color-text-disabled) / <alpha-value>)',
+                    inverse: 'rgb(var(--color-text-inverse) / <alpha-value>)',
+                    brand: 'rgb(var(--color-text-brand) / <alpha-value>)',
+                    accent: 'rgb(var(--color-text-accent) / <alpha-value>)',
+                    'accent-emphasis': 'rgb(var(--color-text-accent-emphasis) / <alpha-value>)',
+                    'on-brand': 'rgb(var(--color-text-on-brand) / <alpha-value>)',
+                    'on-accent': 'rgb(var(--color-text-on-accent) / <alpha-value>)',
                 },
                 stroke: {
-                    DEFAULT: 'var(--color-border-default)',
-                    subtle: 'var(--color-border-subtle)',
-                    strong: 'var(--color-border-strong)',
-                    'strong-a11y': 'var(--color-border-strong-a11y)',
-                    input: 'var(--color-border-input)',
-                    brand: 'var(--color-border-brand)',
-                    accent: 'var(--color-border-accent)',
-                    focus: 'var(--color-border-focus)',
+                    DEFAULT: 'rgb(var(--color-border-default) / <alpha-value>)',
+                    subtle: 'rgb(var(--color-border-subtle) / <alpha-value>)',
+                    strong: 'rgb(var(--color-border-strong) / <alpha-value>)',
+                    'strong-a11y': 'rgb(var(--color-border-strong-a11y) / <alpha-value>)',
+                    input: 'rgb(var(--color-border-input) / <alpha-value>)',
+                    brand: 'rgb(var(--color-border-brand) / <alpha-value>)',
+                    accent: 'rgb(var(--color-border-accent) / <alpha-value>)',
+                    focus: 'rgb(var(--color-border-focus) / <alpha-value>)',
                 },
                 risk: {
-                    low: 'var(--color-risk-low)',
-                    medium: 'var(--color-risk-medium)',
-                    high: 'var(--color-risk-high)',
-                    critical: 'var(--color-risk-critical)',
-                    'low-bg': 'var(--color-risk-low-bg)',
-                    'medium-bg': 'var(--color-risk-medium-bg)',
-                    'high-bg': 'var(--color-risk-high-bg)',
-                    'critical-bg': 'var(--color-risk-critical-bg)',
+                    low: 'rgb(var(--color-risk-low) / <alpha-value>)',
+                    medium: 'rgb(var(--color-risk-medium) / <alpha-value>)',
+                    high: 'rgb(var(--color-risk-high) / <alpha-value>)',
+                    critical: 'rgb(var(--color-risk-critical) / <alpha-value>)',
+                    'low-bg': 'rgb(var(--color-risk-low-bg) / <alpha-value>)',
+                    'medium-bg': 'rgb(var(--color-risk-medium-bg) / <alpha-value>)',
+                    'high-bg': 'rgb(var(--color-risk-high-bg) / <alpha-value>)',
+                    'critical-bg': 'rgb(var(--color-risk-critical-bg) / <alpha-value>)',
+                    /* Foreground for the soft variant — text ON the *-bg tint. */
+                    'on-low': 'rgb(var(--color-risk-text-on-low) / <alpha-value>)',
+                    'on-medium': 'rgb(var(--color-risk-text-on-medium) / <alpha-value>)',
+                    'on-high': 'rgb(var(--color-risk-text-on-high) / <alpha-value>)',
+                    'on-critical': 'rgb(var(--color-risk-text-on-critical) / <alpha-value>)',
                 },
 
-                /* ── Status (interim — refine vs Compass Color page) ── */
-                success: { bg: '#D1FAE5', 500: '#3C8C7A', 700: '#2C6B5C' },
-                warning: { bg: '#FEF3C7', 500: '#C59E38', 700: '#8E7321' },
-                error: { bg: '#FBE9E9', 500: '#B55353', 700: '#8A3B3B' },
-                info: { bg: '#E5EDFD', 500: '#2F6FEB', 700: '#1E4FB0' },
+                /* ── Status (interim — refine vs Compass Color page) ──
+                   Full 50–950 ramps. `bg`, `500` and `700` are the original
+                   screen-verified anchors and are unchanged; every other stop is
+                   interpolated between them (monotonic light → dark). `text` is
+                   the on-`bg` foreground for badges — it equals `700` wherever
+                   that already clears AA 4.5:1 on `bg`; warning is darkened a
+                   step because #8E7321 on #FEF3C7 only reaches 4.08:1.
+                   NOTE: these are fixed hex, not theme-aware. Status colours do
+                   not yet flip in dark mode — see the .dark block in index.css. */
+                success: {
+                    bg: '#D1FAE5', text: '#2C6B5C',
+                    50: '#F3F9F8', 100: '#D4EAE5', 200: '#A7D6CB', 300: '#76C1B0', 400: '#4DAF99',
+                    500: '#3C8C7A', 600: '#347C6B', 700: '#2C6B5C', 800: '#205146', 900: '#153830', 950: '#0A1C18',
+                },
+                warning: {
+                    bg: '#FEF3C7', text: '#876B1F',
+                    50: '#FAF8F2', 100: '#F0E9D6', 200: '#E3D4AE', 300: '#D7BF81', 400: '#CDAE5B',
+                    500: '#C59E38', 600: '#AA8B2C', 700: '#8E7321', 800: '#695218', 900: '#463710', 950: '#201907',
+                },
+                error: {
+                    bg: '#FBE9E9', text: '#8A3B3B',
+                    50: '#F9F3F3', 100: '#EDDADA', 200: '#DDB8B8', 300: '#CD9292', 400: '#C07171',
+                    500: '#B55353', 600: '#A14545', 700: '#8A3B3B', 800: '#662929', 900: '#431919', 950: '#1C0A0A',
+                },
+                info: {
+                    bg: '#E5EDFD', text: '#1E4FB0',
+                    50: '#F0F4FD', 100: '#D2DFF9', 200: '#A8C2F5', 300: '#7AA2F0', 400: '#5387ED',
+                    500: '#2F6FEB', 600: '#1C5BD8', 700: '#1E4FB0', 800: '#103686', 900: '#062159', 950: '#010D26',
+                },
 
-                /* ── shadcn CSS variable colors (back-compat) ── */
-                background: 'hsl(var(--background))',
-                foreground: 'hsl(var(--foreground))',
-                card: { DEFAULT: 'hsl(var(--card))', foreground: 'hsl(var(--card-foreground))' },
-                popover: { DEFAULT: 'hsl(var(--popover))', foreground: 'hsl(var(--popover-foreground))' },
-                secondary: { DEFAULT: 'hsl(var(--secondary))', foreground: 'hsl(var(--secondary-foreground))' },
-                muted: { DEFAULT: 'hsl(var(--muted))', foreground: 'hsl(var(--muted-foreground))' },
-                destructive: { DEFAULT: 'hsl(var(--destructive))', foreground: 'hsl(var(--destructive-foreground))' },
-                border: 'hsl(var(--border))',
-                input: 'hsl(var(--input))',
-                ring: 'hsl(var(--ring))',
+                /* ── shadcn CSS variable colors (back-compat) ──
+                   These vars hold bare HSL channels ("220 13% 91%"), so the
+                   <alpha-value> placeholder applies here too (border-border/50). */
+                background: 'hsl(var(--background) / <alpha-value>)',
+                foreground: 'hsl(var(--foreground) / <alpha-value>)',
+                card: { DEFAULT: 'hsl(var(--card) / <alpha-value>)', foreground: 'hsl(var(--card-foreground) / <alpha-value>)' },
+                popover: { DEFAULT: 'hsl(var(--popover) / <alpha-value>)', foreground: 'hsl(var(--popover-foreground) / <alpha-value>)' },
+                secondary: { DEFAULT: 'hsl(var(--secondary) / <alpha-value>)', foreground: 'hsl(var(--secondary-foreground) / <alpha-value>)' },
+                muted: { DEFAULT: 'hsl(var(--muted) / <alpha-value>)', foreground: 'hsl(var(--muted-foreground) / <alpha-value>)' },
+                destructive: { DEFAULT: 'hsl(var(--destructive) / <alpha-value>)', foreground: 'hsl(var(--destructive-foreground) / <alpha-value>)' },
+                border: 'hsl(var(--border) / <alpha-value>)',
+                input: 'hsl(var(--input) / <alpha-value>)',
+                ring: 'hsl(var(--ring) / <alpha-value>)',
                 'warm-grey': '#EFE8E8',
                 'soft-blue': '#C3DDDC',
                 chart: {
-                    1: 'hsl(var(--chart-1))',
-                    2: 'hsl(var(--chart-2))',
-                    3: 'hsl(var(--chart-3))',
-                    4: 'hsl(var(--chart-4))',
-                    5: 'hsl(var(--chart-5))',
+                    1: 'hsl(var(--chart-1) / <alpha-value>)',
+                    2: 'hsl(var(--chart-2) / <alpha-value>)',
+                    3: 'hsl(var(--chart-3) / <alpha-value>)',
+                    4: 'hsl(var(--chart-4) / <alpha-value>)',
+                    5: 'hsl(var(--chart-5) / <alpha-value>)',
                 },
                 sidebar: {
-                    DEFAULT: 'hsl(var(--sidebar-background))',
-                    foreground: 'hsl(var(--sidebar-foreground))',
-                    primary: 'hsl(var(--sidebar-primary))',
-                    'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-                    accent: 'hsl(var(--sidebar-accent))',
-                    'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-                    border: 'hsl(var(--sidebar-border))',
-                    ring: 'hsl(var(--sidebar-ring))',
+                    DEFAULT: 'hsl(var(--sidebar-background) / <alpha-value>)',
+                    foreground: 'hsl(var(--sidebar-foreground) / <alpha-value>)',
+                    primary: 'hsl(var(--sidebar-primary) / <alpha-value>)',
+                    'primary-foreground': 'hsl(var(--sidebar-primary-foreground) / <alpha-value>)',
+                    accent: 'hsl(var(--sidebar-accent) / <alpha-value>)',
+                    'accent-foreground': 'hsl(var(--sidebar-accent-foreground) / <alpha-value>)',
+                    border: 'hsl(var(--sidebar-border) / <alpha-value>)',
+                    ring: 'hsl(var(--sidebar-ring) / <alpha-value>)',
                 },
             },
             screens: {
@@ -249,7 +283,7 @@ export default {
                 'inner': 'var(--shadow-inner)',
             },
             ringColor: {
-                focus: 'var(--color-border-focus)',
+                focus: 'rgb(var(--color-border-focus) / <alpha-value>)',
             },
         },
     },
