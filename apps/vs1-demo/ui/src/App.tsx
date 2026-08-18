@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, usePa
 import { useTranslation } from "react-i18next";
 import { supportedLngs } from "./i18n/config";
 import { SiteHeader } from "./components/layout/SiteHeader";
-import { LandingPage } from "./pages/LandingPage";
 import { HomePage } from "./pages/HomePage";
 import { ServicesPage } from "./pages/ServicesPage";
 import { CountriesPage } from "./pages/CountriesPage";
@@ -11,6 +10,7 @@ import { PlatformPage } from "./pages/PlatformPage";
 import { SolutionsPage } from "./pages/SolutionsPage";
 import { ComplianceAreasPage } from "./pages/ComplianceAreasPage";
 import { HowItWorksPage } from "./pages/HowItWorksPage";
+import { MarketsIndexPage, MarketPage } from "./pages/MarketsPage";
 import { ProvidersPage } from "./pages/ProvidersPage";
 import { PROVIDER_MARKETING_ENABLED } from "./lib/featureFlags";
 import { ResultsRiskMap } from "./pages/ResultsRiskMap";
@@ -18,7 +18,7 @@ import { SearchResultPage } from "./pages/SearchResultPage";
 import { ResourcesPage } from "./pages/ResourcesPage";
 import AdvisoryPage from "./pages/AdvisoryPage";
 import { AiGovernancePage } from "./pages/AiGovernancePage";
-import { PrivacyPage, ImprintPage } from "./pages/legal/LegalPages";
+import { PrivacyPage, ImprintPage, TermsPage, CookiePage } from "./pages/legal/LegalPages";
 import { AdminOverviewPage } from "./pages/admin/AdminOverviewPage";
 import { CockpitPage } from "./pages/admin/CockpitPage";
 import { AdminEventsPage } from "./pages/admin/AdminEventsPage";
@@ -123,15 +123,16 @@ function AppContent() {
             <Routes location={location}>
                 <Route path="/:locale" element={<LocaleLayout />}>
                     {/* Public pages */}
-                    {/* Index = new User/Entrepreneur landing (HomePage). Old marketing landing kept at /home-old. */}
+                    {/* Index = User/Entrepreneur landing (HomePage). */}
                     <Route index element={<HomePage />} />
-                    <Route path="home-old" element={<LandingPage />} />
                     <Route path="services" element={<ServicesPage />} />
                     <Route path="countries" element={<CountriesPage />} />
                     <Route path="platform" element={<PlatformPage />} />
                     <Route path="solutions" element={<SolutionsPage />} />
                     <Route path="compliance" element={<ComplianceAreasPage />} />
                     <Route path="how-it-works" element={<HowItWorksPage />} />
+                    <Route path="markets" element={<MarketsIndexPage />} />
+                    <Route path="markets/:code" element={<MarketPage />} />
                     {/* Provider marketing landing — off by design (featureFlags.ts):
                         providers are recruited offline/B2B. Kept in the repo; the
                         route redirects home while the flag is false. */}
@@ -146,6 +147,8 @@ function AppContent() {
                     {/* Legal (launch requirement: Art. 13 GDPR + Impressumspflicht) */}
                     <Route path="privacy" element={<PrivacyPage />} />
                     <Route path="imprint" element={<ImprintPage />} />
+                    <Route path="terms" element={<TermsPage />} />
+                    <Route path="cookies" element={<CookiePage />} />
                     {/* Magic-link target from provider e-mails — public by design,
                         the single-use token IS the credential. */}
                     <Route path="provider/action" element={<ProviderMagicActionPage />} />

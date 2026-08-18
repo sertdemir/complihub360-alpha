@@ -20,7 +20,13 @@ export const PATTERNS: RedactionRule[] = [
     {
         id: 'rule_iban_1',
         category: 'IBAN',
-        pattern: /[A-Z]{2}\d{2}[A-Z0-9]{11,30}/gi,
+        // ISO 13616: 2-letter country code + 2 check digits + 11-30 char BBAN.
+        // Two branches: the compact electronic form (NL91ABNA0417164300), which
+        // stays case-insensitive, and the print form in groups of four
+        // (NL91 ABNA 0417 1643 00). The spaced branch is uppercase-only on
+        // purpose — case-insensitive it would swallow ordinary four-letter
+        // words following anything that looks like a country code.
+        pattern: /\b[A-Za-z]{2}\d{2}(?:[A-Za-z0-9]{11,30}|(?:\s[A-Z0-9]{4}){2,7}(?:\s[A-Z0-9]{1,4})?)\b/g,
         placeholder: '[REDACTED:IBAN]'
     },
     {
@@ -36,6 +42,17 @@ export const PATTERNS: RedactionRule[] = [
         placeholder: '[REDACTED:EMAIL]'
     },
     {
+        id: 'rule_phone_intl_1',
+        category: 'PHONE',
+        // E.164-style numbers with a country prefix and freely grouped digits
+        // (+31 6 1234 5678, +49-30-1234567). Runs before the local rule so the
+        // whole number is consumed instead of a 3-3-4 slice out of its middle.
+        // The lookahead demands at least seven more digits after the country
+        // code: without it "+12 34" in ordinary prose was read as a number.
+        pattern: /\+\d{1,3}(?=(?:[\s-]?\d){7,})(?:[\s-]?\d{1,4}){2,6}(?!\d)/g,
+        placeholder: '[REDACTED:PHONE]'
+    },
+    {
         id: 'rule_phone_1',
         category: 'PHONE',
         // Lookarounds pin the match to token boundaries: digit runs embedded
@@ -46,7 +63,9 @@ export const PATTERNS: RedactionRule[] = [
     {
         id: 'rule_invoice_1',
         category: 'INVOICE_NUMBER',
-        pattern: /\b(INV|RECHNUNG)[-\s]?\d{4,10}\b/gi,
+        // Trailing segments are part of the number: INV-2026-042 must not be
+        // left as [REDACTED:INVOICE_NUMBER]-042.
+        pattern: /\b(INV|RECHNUNG)[-\s]?\d{4,10}(?:-\d{1,10})*\b/gi,
         placeholder: '[REDACTED:INVOICE_NUMBER]'
     },
     {
@@ -64,7 +83,17 @@ export const STRICT_PATTERNS: RedactionRule[] = [
     {
         id: 'rule_name_strict',
         category: 'NAME',
-        pattern: /\b(Mr\.|Mrs\.|Ms\.|Dr\.)\s+[A-Z][a-z]+\s+[A-Z][a-z]+\b/g,
+        pattern: /\b(Mr\.|Mrs\.|Ms\.|Dr\.|Prof\.|Herr|Frau)\s+[A-Z][a-z]+\s+[A-Z][a-z]+\b/g,
+        placeholder: '[REDACTED:NAME]'
+    },
+    {
+        id: 'rule_name_context_strict',
+        category: 'NAME',
+        // Names introduced by a salutation or a labelled field. Free-standing
+        // names remain undetected — that needs NER, not a regex (see the test
+        // that documents this limitation). Nl/de/fr nobiliary particles are
+        // allowed between the parts.
+        pattern: /(?<=\b(?:Contact|Dear|Attn\.?|Attention|Name|Kontakt|Ansprechpartner(?:in)?)[:,]?\s+)[A-Z][a-z]+(?:\s+(?:van|von|de|der|den|ter|te|da|di|la|le))*(?:\s+[A-Z][a-z]+){1,2}/g,
         placeholder: '[REDACTED:NAME]'
     }
 ];

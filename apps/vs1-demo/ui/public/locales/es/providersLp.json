@@ -282,12 +282,14 @@
       },
       "solutions": {
         "title": "Soluciones",
-        "vatTax": "IVA y fiscalidad",
+        "taxVat": "Impuestos e IVA",
         "productPackaging": "EPR y envases",
-        "dataPrivacy": "Privacidad de datos",
-        "marketingAdvertising": "Marketing y publicidad",
-        "corporateStructure": "Estructura societaria",
-        "fullSupport": "Soporte integral"
+        "dataPrivacy": "Datos y privacidad",
+        "marketingSeo": "Compliance de marketing",
+        "corporateStructure": "Sociedad y estructura",
+        "productCompliance": "Conformidad de producto",
+        "logisticsCustoms": "Logística y aduanas",
+        "legalAdvisory": "Asesoría legal"
       },
       "resources": {
         "title": "Recursos",

@@ -62,9 +62,9 @@
       "title": "Hangi uyum alanları kapsamda?",
       "subtitle": "Uygun olanların tümünü seçin. Yalnızca kapsamınızla ilgili mevzuatı haritalarız.",
       "domains": [
-        "KDV ve Vergi",
+        "Vergi ve KDV",
         "EPR ve Ambalaj",
-        "GDPR ve Gizlilik",
+        "Veri ve Gizlilik",
         "Pazarlama Uyumu"
       ],
       "selectedCount": "2 seçildi · 2 kaldı",
@@ -779,20 +779,20 @@
   "domains": {
     "eyebrow": "Neleri biliyoruz",
     "title": {
-      "pre": "Altı alan. ",
+      "pre": "Her alan. ",
       "gold": "Tek",
       "post": " tutarlı harita."
     },
-    "subtitle": "Kimsenin çizmediği harita — çizildi. Altı alan, uçtan uca, geçerli oldukları pazarlar ve beraberinde gelen yükümlülüklerle.",
+    "subtitle": "Kimsenin çizmediği harita — çizilmiş hâli. Kapsadığımız her alan, baştan sona, geçerli olduğu pazarlar ve beraberinde gelen yükümlülüklerle.",
     "cardCta": "Ayrıntı için tıklayın",
     "drawerEyebrow": "Alan",
     "drawerAria": "{{domain}} ayrıntısı",
     "activeIn": "Geçerli olduğu pazarlar:",
     "items": [
       {
-        "title": "KDV ve Vergi",
+        "title": "Vergi ve KDV",
         "markets": "DE · UK · NL · FR · IT · ES",
-        "desc": "Sınır ötesi KDV, OSS/IOSS, topluluk içi teslimat, uzaktan satış eşikleri.",
+        "desc": "Sattığınız her pazarda hangi KDV rejiminin geçerli olduğunu ve kaydın ne zaman gerektiğini bilin.",
         "intro": "Sınır ötesi KDV, OSS/IOSS, topluluk içi teslimat, uzaktan satış eşikleri. Altı pazar; altı KDV rejimi, altı kayıt eşiği, altı beyan takvimi demektir. Her birini izleriz.",
         "cover": [
           "OSS / IOSS üç aylık beyanları",
@@ -811,7 +811,7 @@
       {
         "title": "EPR ve Ambalaj",
         "markets": "DE · UK · NL · FR · AT · BE",
-        "desc": "Genişletilmiş üretici sorumluluğu, ambalaj sicilleri, geri alma programları, ekomodülasyon.",
+        "desc": "Bir pazarda üretici sayılıp sayılmadığınızı ve ilk sevkiyattan önce neyi kaydettirmeniz gerektiğini bilin.",
         "intro": "Ambalaj, pil ve elektronikte genişletilmiş üretici sorumluluğu. Her pazar kendi sicilini, ücret tarifesini ve raporlama takvimini işletir. Nereye ve ne zaman kaydolacağınızı haritalarız.",
         "cover": [
           "LUCID / ulusal ambalaj sicilleri",
@@ -828,9 +828,9 @@
         ]
       },
       {
-        "title": "GDPR ve Gizlilik",
+        "title": "Veri ve Gizlilik",
         "markets": "AB GENELİ · BREXIT SONRASI UK",
-        "desc": "Veri koruma etki değerlendirmeleri, RoPA, veri işleme sözleşmeleri, ilgili kişi hakları.",
+        "desc": "Neyi, hangi hukuki dayanakla toplayabileceğinizi ve neyi belgeleyebilmeniz gerektiğini bilin.",
         "intro": "AB'de ve Brexit sonrası Birleşik Krallık'ta veri koruma. İşleme kayıtlarından uluslararası aktarımlara kadar, yalnızca merkezinizi değil, verinizi izleyen yükümlülükleri ortaya koyarız.",
         "cover": [
           "Yüksek riskli işleme için DPIA'lar",
@@ -849,7 +849,7 @@
       {
         "title": "Pazarlama Uyumu",
         "markets": "AB GENELİ · EPRIVACY",
-        "desc": "Çerez bantları, onay kayıtları, e-posta pazarlaması, dark pattern denetimleri.",
+        "desc": "Ne iddia edebileceğinizi, insanlara nasıl ulaşabileceğinizi ve rızanın nasıl görünmesi gerektiğini bilin.",
         "intro": "ePrivacy ve tüketici hukuku kapsamında onay ve dürüst pazarlama kuralları. Çerez duvarları, opt-in'ler ve dark pattern incelemeleri pazara göre değişir — her düzenleyicinin fiilen neyi uyguladığını izleriz.",
         "cover": [
           "Çerez onay bandının geçerliliği",
@@ -866,9 +866,9 @@
         ]
       },
       {
-        "title": "Kurumsal ve Bildirimler",
+        "title": "Şirket ve Yapı",
         "markets": "DE · AT · CH",
-        "desc": "Yıllık beyanlar, şeffaflık sicili, gerçek faydalanıcı bildirimleri, grup içi sözleşmeler.",
+        "desc": "Yapınızın nerede yükümlülük doğurduğunu bilin — işyeri, beyanlar, gerçek faydalanıcılar.",
         "intro": "DACH bölgesinde şirket düzeyindeki yükümlülükler. Yıllık beyanlar, gerçek faydalanıcı şeffaflığı ve grup içi sözleşmelerin her birinin kendi vadeleri ve yaptırımları vardır.",
         "cover": [
           "Yıllık finansal tablolar",
@@ -885,22 +885,60 @@
         ]
       },
       {
-        "title": "Tam Uyum Kapsamı",
-        "markets": "TÜM ALANLAR · TÜM PAZARLAR",
-        "desc": "Bir dosya alanları aştığında, yalnızca kendi dilimini değil tamamını kapatan partner'lara yönlendiririz.",
-        "intro": "Bazı dosyalar tek kutuya sığmaz. Bir yükümlülük aynı anda KDV, EPR, gizlilik ve bildirimleri kapsıyorsa, tamamını kapatan bir partner ekibini tek sorumluluk noktasıyla koordine ederiz.",
+        "title": "Ürün Uygunluğu",
+        "markets": "AB GENELİ · UK",
+        "desc": "Ürününüzün piyasaya arz edilip edilemeyeceğini ve hangi kanıtları saklamanız gerektiğini bilin.",
+        "intro": "Bir ürünün piyasaya arz edilip edilemeyeceği ve bunun arkasında hangi kanıtın durduğu. Ambalajdan ayrı: burada ürünün kendisi söz konusu — güvenlik, uygunluk, dokümantasyon ve AB içinde bunun sorumluluğunu kimin üstlendiği.",
         "cover": [
-          "Alanlar arası dosya yönlendirmesi",
-          "Tek sorumluluk noktası",
-          "Koordineli partner ekipleri",
-          "Sıralı yükümlülük yönetimi",
-          "Ortak vade takibi",
-          "Tek sözleşme ilişkisi"
+          "Genel Ürün Güvenliği Tüzüğü (AB) 2023/988",
+          "CE işareti ve uygunluk beyanı",
+          "Teknik dosya ve saklama süresi",
+          "AB’de yerleşik sorumlu kişi",
+          "Olay bildirimi ve geri çağırmalar",
+          "Büyük Britanya için UKCA işareti"
         ],
         "matters": [
-          "Tek bir değişiklik birden çok alanda yükümlülük doğuruyor",
-          "Yeni bir pazara uçtan uca giriyorsunuz",
-          "Beş tedarikçiye değil, tek ekibe ihtiyacınız var"
+          "AB pazarına ilk kez fiziksel bir ürün sunuyorsunuz",
+          "Kendi uygunluk kuralları olan bir ürün kategorisi ekliyorsunuz",
+          "AB’de yerleşik olmadan AB’ye satış yapıyorsunuz"
+        ]
+      },
+      {
+        "title": "Lojistik ve Gümrük",
+        "markets": "DE · UK · NL · FR · AB",
+        "desc": "Malınızın sınırı geçmek için neye ihtiyaç duyduğunu ve bunun sorumluluğunu kimin taşıdığını bilin.",
+        "intro": "Malın sınırı geçmek için neye ihtiyaç duyduğu ve geçtikten sonra sorumluluğu kimin taşıdığı. Gümrük kimliği, beyannameler, istatistik ve kimin ödeyeceğini, kimin sorumlu olacağını belirleyen teslim şartları.",
+        "cover": [
+          "EORI kaydı",
+          "İthalat ve ihracat beyannameleri",
+          "Eşik aşıldığında Intrastat bildirimi",
+          "Incoterms ve sorumluluğun nerede olduğu",
+          "İthalat KDV’si ve erteleme",
+          "Brexit sonrası GB ↔ AB hareketleri"
+        ],
+        "matters": [
+          "İlk kez bir gümrük sınırının ötesine sevkiyat yapıyorsunuz",
+          "Ticaret hacminiz bir Intrastat eşiğini aşıyor",
+          "Incoterms’i ya da lojistik ortağınızı değiştiriyorsunuz"
+        ]
+      },
+      {
+        "title": "Hukuki Danışmanlık",
+        "markets": "AB GENELİ",
+        "desc": "Bir sorunun gerçekten avukat gerektirip gerektirmediğini bilin — ve dosyanızı zaten bilen birine ulaşın.",
+        "intro": "Kontrol listesi değil, nitelikli yanıt gerektiren sorular: sözleşmeler, koşullar, tüketici hakları, uyuşmazlıklar. CompliHub bir hukuk bürosu değildir — Verified Partner’lar kendi mesleki sorumlulukları altında danışmanlık verir ve biz ulaştığınız kişinin dosyanızı zaten bilmesini sağlarız.",
+        "cover": [
+          "Koşullar ve tüketiciyi bilgilendirme yükümlülükleri",
+          "Tedarikçi ve platform sözleşmeleri",
+          "Cayma, iade ve garanti",
+          "Sorumluluk ve sınırları",
+          "Sınır ötesi uyuşmazlıkların yürütülmesi",
+          "Hangi hukukun gerçekten uygulandığı"
+        ],
+        "matters": [
+          "Daha önce kullanmadığınız bir sözleşme türünü imzalıyorsunuz",
+          "Bir uyuşmazlık başka ülkedeki bir müşteriyi ilgilendiriyor",
+          "Resmi bir şikâyet ya da bir kurumdan sorgu alıyorsunuz"
         ]
       }
     ]
@@ -1126,12 +1164,14 @@
       "solutions": {
         "title": "Çözümler",
         "links": {
-          "vatTax": "KDV ve Vergi",
+          "taxVat": "Vergi ve KDV",
           "productPackaging": "EPR ve Ambalaj",
-          "dataPrivacy": "Veri Gizliliği",
-          "marketingAdvertising": "Pazarlama ve Reklam",
-          "corporateStructure": "Kurumsal Yapı",
-          "fullSupport": "Tam Destek"
+          "dataPrivacy": "Veri ve Gizlilik",
+          "marketingSeo": "Pazarlama Uyumu",
+          "corporateStructure": "Şirket ve Yapı",
+          "productCompliance": "Ürün Uygunluğu",
+          "logisticsCustoms": "Lojistik ve Gümrük",
+          "legalAdvisory": "Hukuki Danışmanlık"
         }
       },
       "resources": {
@@ -1165,7 +1205,7 @@
       "privacy": "Gizlilik Politikası",
       "terms": "Koşullar (AGB)",
       "imprint": "Künye (Impressum)",
-      "cookies": "Çerez Ayarları",
+      "cookies": "Çerez Politikası",
       "subProcessors": "Alt İşleyenler"
     }
   }

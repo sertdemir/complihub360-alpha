@@ -282,12 +282,14 @@
       },
       "solutions": {
         "title": "Çözümler",
-        "vatTax": "KDV ve Vergi",
+        "taxVat": "Vergi ve KDV",
         "productPackaging": "EPR ve Ambalaj",
-        "dataPrivacy": "Veri Gizliliği",
-        "marketingAdvertising": "Pazarlama ve Reklam",
-        "corporateStructure": "Şirket Yapısı",
-        "fullSupport": "Tam Destek"
+        "dataPrivacy": "Veri ve Gizlilik",
+        "marketingSeo": "Pazarlama Uyumu",
+        "corporateStructure": "Şirket ve Yapı",
+        "productCompliance": "Ürün Uygunluğu",
+        "logisticsCustoms": "Lojistik ve Gümrük",
+        "legalAdvisory": "Hukuki Danışmanlık"
       },
       "resources": {
         "title": "Kaynaklar",

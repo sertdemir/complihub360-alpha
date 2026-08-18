@@ -1,0 +1,50 @@
+{
+  "nav": {
+    "services": "Services",
+    "countries": "Countries",
+    "advisory": "Advisory"
+  },
+  "auth": {
+    "login": "Log in",
+    "signup": "Sign up for free"
+  },
+  "footer": {
+    "tagline": "Your intelligent compliance compass. Navigate global regulatory complexity with AI-driven precision and privacy-first architecture.",
+    "columns": {
+      "platform": "Platform",
+      "company": "Company",
+      "legal": "Legal",
+      "support": "Support"
+    },
+    "links": {
+      "services": "Services",
+      "countries": "Countries",
+      "advisory": "Advisory",
+      "wizard": "Compliance Wizard",
+      "about": "About CompliHub360",
+      "howItWorks": "How it works",
+      "pricing": "Pricing",
+      "blog": "Blog",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "cookies": "Cookie Policy",
+      "imprint": "Impressum",
+      "help": "Help Center",
+      "contact": "Contact Us",
+      "status": "Status",
+      "api": "Developer API"
+    },
+    "newsletter": {
+      "eyebrow": "Compliance Digest",
+      "title": "Stay ahead of regulatory change.",
+      "body": "Weekly digest of critical compliance updates across EU, UK, and global markets.",
+      "placeholder": "your@email.com",
+      "cta": "Subscribe",
+      "success": "You're subscribed — thank you!"
+    },
+    "bottom": {
+      "copyright": "© {{year}} CompliHub360. All rights reserved.",
+      "privacyNote": "Privacy-first architecture · No PII stored without consent"
+    }
+  }
+}

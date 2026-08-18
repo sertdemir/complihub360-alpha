@@ -282,12 +282,14 @@
       },
       "solutions": {
         "title": "Solutions",
-        "vatTax": "VAT & Tax",
+        "taxVat": "Tax & VAT",
         "productPackaging": "EPR & Packaging",
-        "dataPrivacy": "Data Privacy",
-        "marketingAdvertising": "Marketing & Advertising",
-        "corporateStructure": "Corporate Structure",
-        "fullSupport": "Full Support"
+        "dataPrivacy": "Data & Privacy",
+        "marketingSeo": "Marketing Compliance",
+        "corporateStructure": "Corporate & Structure",
+        "productCompliance": "Product Compliance",
+        "logisticsCustoms": "Logistics & Customs",
+        "legalAdvisory": "Legal Advisory"
       },
       "resources": {
         "title": "Resources",

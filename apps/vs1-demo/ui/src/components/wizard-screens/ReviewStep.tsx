@@ -24,7 +24,7 @@ const footerLeft = (
 const summaryRows = [
   { caption: 'MARKETS', value: 'Germany · United Kingdom · Netherlands' },
   { caption: 'OPERATIONS', value: 'D2C e-commerce · €2M — €5M' },
-  { caption: 'COMPLIANCE DOMAINS', value: 'VAT & Tax · EPR & Packaging · GDPR & Privacy' },
+  { caption: 'COMPLIANCE DOMAINS', value: 'Tax & VAT · EPR & Packaging · Data & Privacy' },
 ];
 
 export function ReviewStep() {

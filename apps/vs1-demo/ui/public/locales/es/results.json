@@ -1,7 +1,7 @@
 {
   "topbar": {
     "guestBadge": "Mapa de invitado · caduca en 30 min",
-    "exportPdf": "Exportar PDF",
+    "backHome": "Volver al inicio",
     "saveMap": "Guardar este mapa"
   },
   "header": {
@@ -30,6 +30,12 @@
     "market": "Mercado",
     "due": "Vence",
     "state": "Estado"
+  },
+  "appliesIn_one": "se aplica en {{count}} día",
+  "appliesIn_other": "se aplica en {{count}} días",
+  "groups": {
+    "now": "Ahora",
+    "radar": "En el radar"
   },
   "severity": {
     "critical": "Crítica",

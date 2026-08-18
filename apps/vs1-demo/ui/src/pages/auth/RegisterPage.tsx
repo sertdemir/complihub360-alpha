@@ -5,6 +5,7 @@ import { Trans, useTranslation } from "react-i18next";
 import { Typography } from "../../components/ui/Typography";
 import { Button } from "../../components/ui/Button";
 import { useAuthStore } from "../../store/useAuthStore";
+import { DOMAINS, type DomainSlug } from "../../lib/domains";
 
 /* ─── Types ──────────────────────────────────────────────────────────────────── */
 
@@ -64,23 +65,28 @@ const COUNTRY_DEFS = [
     { value: "pl", flag: "🇵🇱" }, { value: "se", flag: "🇸🇪" }, { value: "us", flag: "🇺🇸" }, { value: "eu", flag: "🇪🇺" },
 ] as const;
 
-const COMPLIANCE_AREA_DEFS = [
-    { value: "tax-vat", tKey: "taxVat", icon: "account_balance" },
-    { value: "data-privacy", tKey: "dataPrivacy", icon: "shield" },
-    { value: "epr", tKey: "epr", icon: "inventory_2" },
-    { value: "marketing-seo", tKey: "marketingSeo", icon: "campaign" },
-    { value: "corporate", tKey: "corporate", icon: "domain" },
-    { value: "full-support", tKey: "fullSupport", icon: "support_agent" },
-] as const;
+/* Both domain pickers are derived from the canonical DOMAINS list rather than
+   hand-kept copies, which had drifted twice: "full-support" outlived its
+   removal, and "trade" never had a DOMAIN_TO_DB entry at all — either one
+   produces a selection the matcher can never score. The copies had also gone
+   stale in the other direction, still offering five domains after the list grew
+   to eight. Slugs are what the backend keys on, so they must stay the
+   DomainSlug values; labels come from auth:register.domains.* */
 
-const SPECIALIZATION_DEFS = [
-    { value: "tax-vat", tKey: "taxVat" },
-    { value: "data-privacy", tKey: "dataPrivacy" },
-    { value: "epr", tKey: "epr" },
-    { value: "marketing", tKey: "marketing" },
-    { value: "corporate", tKey: "corporate" },
-    { value: "trade", tKey: "trade" },
-] as const;
+const AREA_ICONS: Record<DomainSlug, string> = {
+    "tax-vat": "account_balance",
+    "product-packaging": "inventory_2",
+    "data-privacy": "shield",
+    "marketing-seo": "campaign",
+    "corporate-structure": "domain",
+    "product-compliance": "verified",
+    "logistics-customs": "local_shipping",
+    "legal-advisory": "gavel",
+};
+
+const COMPLIANCE_AREA_DEFS = DOMAINS.map(d => ({ value: d.slug, tKey: d.i18nKey, icon: AREA_ICONS[d.slug] }));
+
+const SPECIALIZATION_DEFS = DOMAINS.map(d => ({ value: d.slug, tKey: d.i18nKey }));
 
 const INTENT_DEFS = [
     { value: "self-check", tKey: "selfCheck" },
@@ -311,7 +317,7 @@ function UserStep2({ data, onChange }: { data: UserFormData; onChange: (d: Parti
 
 function UserStep3({ data, onChange }: { data: UserFormData; onChange: (d: Partial<UserFormData>) => void }) {
     const { t } = useTranslation("auth");
-    const complianceAreas = COMPLIANCE_AREA_DEFS.map(a => ({ value: a.value, label: t(`register.complianceAreas.${a.tKey}`), icon: a.icon }));
+    const complianceAreas = COMPLIANCE_AREA_DEFS.map(a => ({ value: a.value, label: t(`register.domains.${a.tKey}`), icon: a.icon }));
     const intents = INTENT_DEFS.map(o => ({ value: o.value, label: t(`register.intents.${o.tKey}.label`), desc: t(`register.intents.${o.tKey}.desc`) }));
     const urgencyOptions = URGENCY_DEFS.map(o => ({ value: o.value, label: t(`register.urgencyOptions.${o.tKey}`), icon: o.icon }));
     return (
@@ -406,7 +412,7 @@ function PartnerStep1({ data, onChange }: { data: PartnerFormData; onChange: (d:
 function PartnerStep2({ data, onChange }: { data: PartnerFormData; onChange: (d: Partial<PartnerFormData>) => void }) {
     const { t } = useTranslation("auth");
     const countryOptions = useCountryOptions();
-    const specializations = SPECIALIZATION_DEFS.map(s => ({ value: s.value, label: t(`register.specializations.${s.tKey}`) }));
+    const specializations = SPECIALIZATION_DEFS.map(s => ({ value: s.value, label: t(`register.domains.${s.tKey}`) }));
     return (
         <div className="flex flex-col gap-5">
             <InputField id="preg-firm" label={t("register.firmLabel")} required value={data.firmName} onChange={v => onChange({ firmName: v })} placeholder={t("register.firmPlaceholder")} />

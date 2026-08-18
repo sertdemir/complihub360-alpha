@@ -1,7 +1,7 @@
 {
   "topbar": {
     "guestBadge": "Guest map · expires in 30 min",
-    "exportPdf": "Export PDF",
+    "backHome": "Back to start",
     "saveMap": "Save this map"
   },
   "header": {
@@ -30,6 +30,12 @@
     "market": "Market",
     "due": "Due",
     "state": "State"
+  },
+  "appliesIn_one": "applies in {{count}} day",
+  "appliesIn_other": "applies in {{count}} days",
+  "groups": {
+    "now": "Now",
+    "radar": "On the radar"
   },
   "severity": {
     "critical": "Critical",

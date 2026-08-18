@@ -65,16 +65,12 @@ export default {
                     800: '#6A5B1E', 900: '#3D3411', 950: '#1A1607',
                 },
 
-                /* ── Compass semantic (CSS-variable backed, theme-aware) ──
-                   The --color-* variables in src/index.css hold RAW CHANNEL
-                   TRIPLETS ("31 41 55"), so they must be referenced as
-                   rgb(var(--token) / <alpha-value>). That placeholder is what
-                   lets opacity modifiers work — bg-surface/85 etc. Referencing
-                   a finished colour instead makes Tailwind drop the utility and
-                   the element renders fully transparent. */
+                /* ── Compass semantic (CSS-variable backed, theme-aware) ── */
                 brand: {
                     DEFAULT: 'rgb(var(--color-bg-brand) / <alpha-value>)',
                     light: 'rgb(var(--color-bg-brand-light) / <alpha-value>)',
+                    /* Full-bleed brand panels that carry copy — see index.css. */
+                    surface: 'rgb(var(--color-bg-brand-surface) / <alpha-value>)',
                 },
                 'brand-accent': {
                     DEFAULT: 'rgb(var(--color-bg-accent) / <alpha-value>)',
@@ -96,6 +92,7 @@ export default {
                     accent: 'rgb(var(--color-text-accent) / <alpha-value>)',
                     'accent-emphasis': 'rgb(var(--color-text-accent-emphasis) / <alpha-value>)',
                     'on-brand': 'rgb(var(--color-text-on-brand) / <alpha-value>)',
+                    'on-brand-accent': 'rgb(var(--color-text-on-brand-accent) / <alpha-value>)',
                     'on-accent': 'rgb(var(--color-text-on-accent) / <alpha-value>)',
                 },
                 stroke: {
@@ -124,15 +121,7 @@ export default {
                     'on-critical': 'rgb(var(--color-risk-text-on-critical) / <alpha-value>)',
                 },
 
-                /* ── Status (interim — refine vs Compass Color page) ──
-                   Full 50–950 ramps. `bg`, `500` and `700` are the original
-                   screen-verified anchors and are unchanged; every other stop is
-                   interpolated between them (monotonic light → dark). `text` is
-                   the on-`bg` foreground for badges — it equals `700` wherever
-                   that already clears AA 4.5:1 on `bg`; warning is darkened a
-                   step because #8E7321 on #FEF3C7 only reaches 4.08:1.
-                   NOTE: these are fixed hex, not theme-aware. Status colours do
-                   not yet flip in dark mode — see the .dark block in index.css. */
+                /* ── Status (interim — refine vs Compass Color page) ── */
                 success: {
                     bg: '#D1FAE5', text: '#2C6B5C',
                     50: '#F3F9F8', 100: '#D4EAE5', 200: '#A7D6CB', 300: '#76C1B0', 400: '#4DAF99',
@@ -154,9 +143,7 @@ export default {
                     500: '#2F6FEB', 600: '#1C5BD8', 700: '#1E4FB0', 800: '#103686', 900: '#062159', 950: '#010D26',
                 },
 
-                /* ── shadcn CSS variable colors (back-compat) ──
-                   These vars hold bare HSL channels ("220 13% 91%"), so the
-                   <alpha-value> placeholder applies here too (border-border/50). */
+                /* ── shadcn CSS variable colors (back-compat) ── */
                 background: 'hsl(var(--background) / <alpha-value>)',
                 foreground: 'hsl(var(--foreground) / <alpha-value>)',
                 card: { DEFAULT: 'hsl(var(--card) / <alpha-value>)', foreground: 'hsl(var(--card-foreground) / <alpha-value>)' },
