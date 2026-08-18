@@ -634,31 +634,44 @@
     }
   },
   "resources": {
-    "tabStories": "Customer Stories",
-    "tabGuides": "Guides & Whitepapers",
-    "stories": {
-      "overline": "Customer Stories",
-      "title": "Real Compliance Outcomes, Not Marketing Claims",
-      "body": "See how businesses like yours used CompliHub360 to navigate complex cross-border compliance — from uncertainty to resolution.",
-      "challengeLabel": "Challenge",
-      "outcomeLabel": "Outcome"
+    "meta": {
+      "title": "Resources · CompliHub360"
     },
-    "guides": {
-      "overline": "Guides & Whitepapers",
-      "title": "Knowledge That Builds Compliance Confidence",
-      "body": "In-depth market deep-dives, regulatory breakdowns, and practical checklists — curated by our compliance intelligence engine and reviewed by specialists.",
-      "kbTitle": "Living Knowledge Base",
-      "kbBody": "Every platform update, new compliance rule, or partner integration triggers a dedicated content update. Our guides are evergreen — automatically maintained and verified against the latest regulatory sources.",
-      "kbCta": "Get Notified"
+    "eyebrow": "Resources",
+    "title": {
+      "pre": "What we can already ",
+      "gold": "show",
+      "post": " you."
+    },
+    "lead": "Not a blog. These are the parts of the platform you can read without talking to anyone — the same entries our engine checks against, with the statute behind each one.",
+    "entries": {
+      "markets": {
+        "title": "Markets",
+        "meta": "{{markets}} markets · every duty with its legal basis",
+        "desc": "Per country: which duties we hold a source for, the national statute behind each, the filing cadence, and a link to the EU text where one exists.",
+        "cta": "Open the markets"
+      },
+      "compliance": {
+        "title": "Compliance areas",
+        "meta": "{{domains}} areas",
+        "desc": "What each area covers, which markets it applies in, and when it starts to matter for a business like yours.",
+        "cta": "Open the areas"
+      },
+      "howItWorks": {
+        "title": "How it works",
+        "meta": "{{stages}} stages, end to end",
+        "desc": "From a question in your own words to a booked appointment — including what it costs you and what happens to your data.",
+        "cta": "Read the five stages"
+      }
+    },
+    "gap": {
+      "kicker": "What is not here yet",
+      "title": "Guides, tutorials and a glossary.",
+      "body": "We would rather point you at verified entries than publish articles we have not written. Nothing on this page is a preview of something that does not exist — when we have guides worth reading, they will appear here."
     },
     "cta": {
-      "title": "Ready to become compliant?",
-      "body": "Join businesses that turned compliance uncertainty into structured action plans.",
-      "btnAssessment": "Start Free Assessment",
-      "btnPlatform": "Explore Platform"
-    },
-    "footer": {
-      "copyright": "© {{year}} CompliHub360. Built in Berlin."
+      "title": "Or start with your own situation.",
+      "lead": "Six minutes, four questions, no account needed."
     }
   },
   "wizard": {

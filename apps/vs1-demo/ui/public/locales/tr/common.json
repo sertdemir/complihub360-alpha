@@ -634,31 +634,44 @@
     }
   },
   "resources": {
-    "tabStories": "Müşteri Hikayeleri",
-    "tabGuides": "Rehberler ve Raporlar",
-    "stories": {
-      "overline": "Müşteri Hikayeleri",
-      "title": "Gerçek uyumluluk sonuçları, pazarlama iddiaları değil",
-      "body": "Sizin gibi işletmelerin karmaşık sınır ötesi uyumluluğu nasıl yönetmek için CompliHub360'ı kullandığını görün — belirsizlikten çözüme.",
-      "challengeLabel": "Zorluk",
-      "outcomeLabel": "Sonuç"
+    "meta": {
+      "title": "Kaynaklar · CompliHub360"
     },
-    "guides": {
-      "overline": "Rehberler ve Raporlar",
-      "title": "Uyumluluk güveni inşa eden bilgi",
-      "body": "Derinlemesine pazar analizleri, mevzuat açıklamaları ve pratik kontrol listeleri — uyumluluk zeka motorumuz tarafından küratörlüğü yapılmış ve uzmanlar tarafından gözden geçirilmiştir.",
-      "kbTitle": "Canlı Bilgi Tabanı",
-      "kbBody": "Her platform güncellemesi, yeni uyumluluk kuralı veya partner entegrasyonu özel bir içerik güncellemesini tetikler. Rehberlerimiz sürekli geçerlidir — otomatik olarak bakımı yapılır ve en son mevzuat kaynaklarına karşı doğrulanır.",
-      "kbCta": "Bildirim Alın"
+    "eyebrow": "Kaynaklar",
+    "title": {
+      "pre": "Size şimdiden ",
+      "gold": "gösterebildiklerimiz",
+      "post": "."
+    },
+    "lead": "Bu bir blog değil. Bunlar, kimseyle konuşmadan okuyabileceğiniz platform bölümleri — motorumuzun karşılaştırdığı aynı kayıtlar, her birinin arkasındaki yasa metniyle birlikte.",
+    "entries": {
+      "markets": {
+        "title": "Pazarlar",
+        "meta": "{{markets}} pazar · her yükümlülük yasal dayanağıyla",
+        "desc": "Ülke bazında: hangi yükümlülükler için kaynağımız var, arkasındaki ulusal düzenleme, bildirim sıklığı — ve varsa AB metnine bağlantı.",
+        "cta": "Pazarlara git"
+      },
+      "compliance": {
+        "title": "Uyum Alanları",
+        "meta": "{{domains}} alan",
+        "desc": "Her alanın neyi kapsadığı, hangi pazarlarda geçerli olduğu ve sizinki gibi bir işletme için ne zaman önem kazandığı.",
+        "cta": "Alanlara git"
+      },
+      "howItWorks": {
+        "title": "Nasıl çalışır",
+        "meta": "{{stages}} aşama, baştan sona",
+        "desc": "Kendi kelimelerinizle sorduğunuz bir sorudan alınmış randevuya — size maliyeti ve verilerinize ne olduğu dahil.",
+        "cta": "Beş aşamayı okuyun"
+      }
+    },
+    "gap": {
+      "kicker": "Burada henüz olmayanlar",
+      "title": "Rehberler, eğitimler ve bir sözlük.",
+      "body": "Yazmadığımız yazıları yayımlamaktansa sizi doğrulanmış kayıtlara yönlendirmeyi tercih ederiz. Bu sayfadaki hiçbir şey, var olmayan bir şeyin ön gösterimi değildir — okunmaya değer rehberlerimiz olduğunda burada yer alacaklar."
     },
     "cta": {
-      "title": "Uyumlu olmaya hazır mısınız?",
-      "body": "Uyumluluk belirsizliğini yapılandırılmış eylem planlarına dönüştüren işletmelere katılın.",
-      "btnAssessment": "Ücretsiz Değerlendirme Başlatın",
-      "btnPlatform": "Platformu Keşfedin"
-    },
-    "footer": {
-      "copyright": "© {{year}} CompliHub360. Berlin'de yapıldı."
+      "title": "Ya da kendi durumunuzla başlayın.",
+      "lead": "Altı dakika, dört soru, hesap gerekmiyor."
     }
   },
   "wizard": {

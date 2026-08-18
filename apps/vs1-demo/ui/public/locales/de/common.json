@@ -634,31 +634,44 @@
     }
   },
   "resources": {
-    "tabStories": "Erfolgsgeschichten",
-    "tabGuides": "Guides & Whitepaper",
-    "stories": {
-      "overline": "Erfolgsgeschichten",
-      "title": "Echte Compliance-Ergebnisse, keine Marketingversprechen",
-      "body": "Sehen Sie, wie Unternehmen wie Ihres CompliHub360 genutzt haben, um komplexe grenzüberschreitende Compliance zu navigieren – von der Unsicherheit zur Lösung.",
-      "challengeLabel": "Herausforderung",
-      "outcomeLabel": "Ergebnis"
+    "meta": {
+      "title": "Ressourcen · CompliHub360"
     },
-    "guides": {
-      "overline": "Guides & Whitepaper",
-      "title": "Wissen, das Compliance-Sicherheit aufbaut",
-      "body": "Tiefgehende Marktanalysen, regulatorische Aufschlüsselungen und praktische Checklisten – kuratiert von unserer Compliance-Intelligenz-Engine und von Spezialisten geprüft.",
-      "kbTitle": "Lebendige Wissensdatenbank",
-      "kbBody": "Jedes Plattform-Update, jede neue Compliance-Regel oder Partner-Integration löst ein dediziertes Inhalts-Update aus. Unsere Guides sind zeitlos – automatisch gepflegt und gegen die neuesten regulatorischen Quellen verifiziert.",
-      "kbCta": "Benachrichtigt werden"
+    "eyebrow": "Ressourcen",
+    "title": {
+      "pre": "Was wir Ihnen schon ",
+      "gold": "zeigen",
+      "post": " können."
+    },
+    "lead": "Kein Blog. Das sind die Teile der Plattform, die Sie lesen können, ohne mit jemandem zu sprechen — dieselben Einträge, gegen die unsere Engine prüft, mit dem Gesetzestext hinter jedem einzelnen.",
+    "entries": {
+      "markets": {
+        "title": "Märkte",
+        "meta": "{{markets}} Märkte · jede Pflicht mit Rechtsgrundlage",
+        "desc": "Pro Land: für welche Pflichten wir eine Quelle führen, die nationale Rechtsgrundlage dahinter, der Turnus — und ein Verweis auf den EU-Text, wo es einen gibt.",
+        "cta": "Zu den Märkten"
+      },
+      "compliance": {
+        "title": "Compliance-Bereiche",
+        "meta": "{{domains}} Bereiche",
+        "desc": "Was jeder Bereich abdeckt, in welchen Märkten er greift, und ab wann er für einen Betrieb wie Ihren relevant wird.",
+        "cta": "Zu den Bereichen"
+      },
+      "howItWorks": {
+        "title": "So funktioniert es",
+        "meta": "{{stages}} Stufen, von Anfang bis Ende",
+        "desc": "Von einer Frage in eigenen Worten bis zum gebuchten Termin — samt dem, was Sie das kostet und was mit Ihren Daten passiert.",
+        "cta": "Die fünf Stufen lesen"
+      }
+    },
+    "gap": {
+      "kicker": "Was hier noch nicht steht",
+      "title": "Guides, Tutorials und ein Glossar.",
+      "body": "Wir verweisen lieber auf geprüfte Einträge, als Artikel zu veröffentlichen, die wir nicht geschrieben haben. Nichts auf dieser Seite ist die Vorschau auf etwas, das es nicht gibt — wenn wir Guides haben, die das Lesen lohnen, stehen sie hier."
     },
     "cta": {
-      "title": "Bereit, compliant zu werden?",
-      "body": "Schließen Sie sich Unternehmen an, die Compliance-Unsicherheit in strukturierte Aktionspläne verwandelt haben.",
-      "btnAssessment": "Kostenloses Assessment starten",
-      "btnPlatform": "Plattform erkunden"
-    },
-    "footer": {
-      "copyright": "© {{year}} CompliHub360. Gebaut in Berlin."
+      "title": "Oder fangen Sie mit Ihrer eigenen Lage an.",
+      "lead": "Sechs Minuten, vier Fragen, kein Konto nötig."
     }
   },
   "wizard": {

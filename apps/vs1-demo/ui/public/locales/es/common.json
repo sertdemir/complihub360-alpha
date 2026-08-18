@@ -634,31 +634,44 @@
     }
   },
   "resources": {
-    "tabStories": "Historias de Clientes",
-    "tabGuides": "Guías y Reportes",
-    "stories": {
-      "overline": "Historias de Clientes",
-      "title": "Resultados reales de cumplimiento, no afirmaciones de marketing",
-      "body": "Mira cómo empresas como la tuya usaron CompliHub360 para navegar el cumplimiento transfronterizo complejo — de la incertidumbre a la resolución.",
-      "challengeLabel": "Desafío",
-      "outcomeLabel": "Resultado"
+    "meta": {
+      "title": "Recursos · CompliHub360"
     },
-    "guides": {
-      "overline": "Guías y Reportes",
-      "title": "Conocimiento que construye confianza en el cumplimiento",
-      "body": "Análisis profundos del mercado, desglose regulatorio y listas de verificación prácticas — curadas por nuestro motor de inteligencia de cumplimiento y revisadas por especialistas.",
-      "kbTitle": "Base de Conocimiento Viva",
-      "kbBody": "Cada actualización de la plataforma, nueva regla de cumplimiento o integración de socios desencadena una actualización de contenido dedicada. Nuestras guías son perennes — mantenidas automáticamente y verificadas contra las últimas fuentes regulatorias.",
-      "kbCta": "Recibir notificaciones"
+    "eyebrow": "Recursos",
+    "title": {
+      "pre": "Lo que ya podemos ",
+      "gold": "enseñarle",
+      "post": "."
+    },
+    "lead": "No es un blog. Son las partes de la plataforma que puede leer sin hablar con nadie — las mismas entradas que comprueba nuestro motor, con la norma detrás de cada una.",
+    "entries": {
+      "markets": {
+        "title": "Mercados",
+        "meta": "{{markets}} mercados · cada obligación con su base jurídica",
+        "desc": "Por país: para qué obligaciones tenemos una fuente, la norma nacional que hay detrás, la periodicidad y un enlace al texto de la UE cuando existe.",
+        "cta": "Ver los mercados"
+      },
+      "compliance": {
+        "title": "Áreas de Cumplimiento",
+        "meta": "{{domains}} áreas",
+        "desc": "Qué abarca cada área, en qué mercados se aplica y a partir de cuándo importa para una empresa como la suya.",
+        "cta": "Ver las áreas"
+      },
+      "howItWorks": {
+        "title": "Cómo funciona",
+        "meta": "{{stages}} etapas, de principio a fin",
+        "desc": "De una pregunta en sus propias palabras a una cita reservada — incluido lo que le cuesta y qué ocurre con sus datos.",
+        "cta": "Leer las cinco etapas"
+      }
+    },
+    "gap": {
+      "kicker": "Lo que aún no está aquí",
+      "title": "Guías, tutoriales y un glosario.",
+      "body": "Preferimos remitirle a entradas verificadas antes que publicar artículos que no hemos escrito. Nada en esta página es el anticipo de algo que no existe — cuando tengamos guías que merezcan la lectura, aparecerán aquí."
     },
     "cta": {
-      "title": "¿Listo para ser conforme?",
-      "body": "Únete a las empresas que transformaron la incertidumbre de cumplimiento en planes de acción estructurados.",
-      "btnAssessment": "Iniciar evaluación gratuita",
-      "btnPlatform": "Explorar plataforma"
-    },
-    "footer": {
-      "copyright": "© {{year}} CompliHub360. Construido en Berlín."
+      "title": "O empiece por su propia situación.",
+      "lead": "Seis minutos, cuatro preguntas, sin necesidad de cuenta."
     }
   },
   "wizard": {
