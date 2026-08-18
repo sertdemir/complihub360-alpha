@@ -29,13 +29,10 @@ const FOOTER_COLUMNS: { key: string; links: FooterLink[] }[] = [
     },
     {
         key: "legal",
-        // Only Privacy and Imprint have a page behind them (App.tsx: /:locale/
-        // privacy, /:locale/imprint) — same split the landing SiteFooter makes.
-        // Terms and Cookies stay inert until those pages exist.
         links: [
             { key: "privacy", segment: "privacy" },
-            { key: "terms", segment: null },
-            { key: "cookies", segment: null },
+            { key: "terms", segment: "terms" },
+            { key: "cookies", segment: "cookies" },
             { key: "imprint", segment: "imprint" },
         ],
     },

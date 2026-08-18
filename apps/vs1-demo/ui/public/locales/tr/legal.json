@@ -26,5 +26,37 @@
       "dispute": "AB uyuşmazlık çözümü",
       "notice": "Not"
     }
+  },
+  "terms": {
+    "title": "Hizmet Koşulları",
+    "updated": "Taslak — henüz yürürlükte değil",
+    "headings": {
+      "scope": "1. Kapsam",
+      "service": "2. CompliHub360 hizmetleri",
+      "noAdvice": "3. Hukuki veya vergisel danışmanlık verilmez",
+      "partners": "4. Verified Partner’lar",
+      "account": "5. Hesap ve erişim koşulları",
+      "fees": "6. Ücretler ve ödeme",
+      "sla": "7. Yanıt süreleri",
+      "obligations": "8. Yükümlülükleriniz",
+      "liability": "9. Sorumluluk",
+      "term": "10. Süre ve fesih",
+      "changes": "11. Bu koşullarda yapılacak değişiklikler",
+      "law": "12. Uygulanacak hukuk ve yetkili mahkeme"
+    }
+  },
+  "cookies": {
+    "title": "Çerez ve Depolama Politikası",
+    "updated": "Uygulamanın güncel sürümünü yansıtır",
+    "headings": {
+      "summary": "Kısaca",
+      "noCookies": "Çerez kullanmıyoruz",
+      "storage": "Cihazınızda neler saklanıyor",
+      "purposes": "Neden saklıyoruz",
+      "consent": "Hukuki dayanak ve rıza",
+      "manage": "Bu verileri nasıl silersiniz",
+      "thirdParty": "Üçüncü taraf içerikler",
+      "contact": "Sorularınız"
+    }
   }
 }
