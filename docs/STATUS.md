@@ -1,12 +1,17 @@
-# Infrastructure Status (Infra-Ready Template)
+# Infrastructure Status
 
-## Template Core Blueprint (Mode B)
-The repository is stabilized as a reusable starter template designed to spawn bounded applications inside (or outside) of strict monorepos. 
+## Scope
+The repository builds one product: the CompliHub360 UI in `apps/vs1-demo/ui`, which is what
+`scripts/deploy-staging.sh` ships, on top of the shared packages under `packages/*`.
+
+It used to describe itself as a reusable starter template ("Mode B"), with a scaffolder that
+spawned bounded app slices. That was removed on 2026-08-20: `npm run create:app` had been used
+exactly once, in February, to create `apps/demo-app`, which was never deployed and last touched
+in March — while both still cost every CI run a build, a typecheck and four tests. If the
+multi-app ambition returns, the scaffolder is in the history at `template/`.
 
 ### What is implemented today:
 1. **Core Scoped Packages (`packages/*`)**: Contains `agent-core`, `policy-engine`, `@complihub360/types`, `task-orchestrator`, and `agent-registry` as infrastructure building blocks.
-2. **Template Directory (`template/`)**: Houses the skeletal `example-app` vertical slice blueprint utilized by the scaffolder system. 
-3. **Fully Independent Bootstrapper**: `npm run create:app` orchestrates a new bounded slice entirely devoid of the `complihub360` moniker, generating distinct root packages securely encapsulated under `__APP_ID__`.
 
 ### Verification Steps
 To verify everything is green with zero warnings/faults:
