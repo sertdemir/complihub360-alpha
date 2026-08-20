@@ -152,7 +152,7 @@ export const STATS = [
   { value: '3', label: 'Verified Partners ready' },
 ];
 
-const MATCHES = ['94%', '88%', '81%'];
+const MATCHES = ['100%', '87%', '73%'];
 
 // Real partners behind the unlock (seeded provider_keys on staging).
 // `match` holds the raw percentage; the "match" wording is translated at render.
@@ -160,10 +160,56 @@ const MATCHES = ['94%', '88%', '81%'];
 // Phase-3 wiring: design fixture in the ANONYMOUS wire shape — replaced by the
 // live, scored /search providers when the backend answers.
 const PARTNERS_ANON: AnonProvider[] = [
-  { provider_key: 'studio-bianchi', pseudonym_label: 'Verifizierte Steuerkanzlei · Norditalien', region: 'Norditalien', active_since: 2015, specializations: ['VAT & OSS', 'E-Commerce', 'EU-weit'], languages: ['IT', 'DE', 'EN'], rating: 4.9, completed_count: 210, avg_response_hours: 3, billing_model: 'project', is_verified: true, match: 94, match_tier: 'high' },
-  { provider_key: 'schmidt-partner', pseudonym_label: 'Verifizierte Steuerberatung · Norddeutschland', region: 'Norddeutschland', active_since: 2013, specializations: ['OSS/IOSS', 'Cross-border Tax'], languages: ['DE', 'EN'], rating: 4.7, completed_count: 96, avg_response_hours: 5, billing_model: 'abo', is_verified: true, match: 88, match_tier: 'strong' },
-  { provider_key: 'madrid-tax', pseudonym_label: 'Verifizierter Tax-Spezialist · Spanien', region: 'Spanien', active_since: 2020, specializations: ['Iberian VAT', 'Marketplace'], languages: ['ES', 'EN'], rating: 4.5, completed_count: 41, avg_response_hours: 8, billing_model: 'hourly', is_verified: true, match: 81, match_tier: 'moderate' },
+  // Die Werte sind die, die die Engine tatsaechlich erzeugen KANN. Ihr Score ist
+  // 60 * Marktabdeckung + 40 * (getroffene / angefragte Bereiche); da /search
+  // vorab nach Land filtert, ist die Marktabdeckung bei gelisteten Anbietern
+  // immer 1. Bei drei angefragten Bereichen sind also nur 60/73/87/100 moeglich
+  // — die frueheren 94/88/81 waren erfunden und mit keiner Eingabe herstellbar.
+  { provider_key: 'studio-bianchi', pseudonym_label: 'Verifizierte Steuerkanzlei · Norditalien', region: 'Norditalien', active_since: 2015, specializations: ['VAT & OSS', 'E-Commerce', 'EU-weit'], languages: ['IT', 'DE', 'EN'], rating: 4.9, completed_count: 210, avg_response_hours: 3, billing_model: 'project', is_verified: true, match: 100, match_tier: 'high',
+    match_basis: { country: 'DE', country_covered: true, domains_requested: ['tax-vat', 'product-packaging', 'data-privacy'], domains_matched: ['tax-vat', 'product-packaging', 'data-privacy'] } },
+  { provider_key: 'schmidt-partner', pseudonym_label: 'Verifizierte Steuerberatung · Norddeutschland', region: 'Norddeutschland', active_since: 2013, specializations: ['OSS/IOSS', 'Cross-border Tax'], languages: ['DE', 'EN'], rating: 4.7, completed_count: 96, avg_response_hours: 5, billing_model: 'abo', is_verified: true, match: 87, match_tier: 'strong',
+    match_basis: { country: 'DE', country_covered: true, domains_requested: ['tax-vat', 'product-packaging', 'data-privacy'], domains_matched: ['tax-vat', 'product-packaging'] } },
+  { provider_key: 'madrid-tax', pseudonym_label: 'Verifizierter Tax-Spezialist · Spanien', region: 'Spanien', active_since: 2020, specializations: ['Iberian VAT', 'Marketplace'], languages: ['ES', 'EN'], rating: 4.5, completed_count: 41, avg_response_hours: 8, billing_model: 'hourly', is_verified: true, match: 73, match_tier: 'moderate',
+    match_basis: { country: 'DE', country_covered: true, domains_requested: ['tax-vat', 'product-packaging', 'data-privacy'], domains_matched: ['tax-vat'] } },
 ];
+
+// ─── Warum 87 % 87 % sind ─────────────────────────────────────────────────────
+// Das DNA-Addendum V2 (P1) verlangt sichtbare ✓/Lücken-Kriterien hinter der
+// Match-Zahl. Die Zahl ist im Backend exakt zerlegbar:
+//     match = 60 * Marktabdeckung + 40 * (getroffene / angefragte Bereiche)
+// Deshalb wird hier NICHTS geschätzt — es wird nur ausgeschrieben, was der
+// Score ohnehin ist. Fehlt match_basis (ältere Payloads), erscheint gar nichts:
+// eine erfundene Begründung wäre schlechter als eine nackte Zahl.
+function MatchBasis({ basis }: { basis: NonNullable<AnonProvider['match_basis']> }) {
+  const { t } = useTranslation('results');
+  const matched = new Set(basis.domains_matched);
+  const KEY: Record<string, string> = {
+    'tax-vat': 'taxVat', 'product-packaging': 'productPackaging', 'data-privacy': 'dataPrivacy',
+    'marketing-seo': 'marketingSeo', 'corporate-structure': 'corporateStructure',
+    'product-compliance': 'productCompliance', 'logistics-customs': 'logisticsCustoms',
+    'legal-advisory': 'legalAdvisory',
+  };
+  const label = (slug: string) => t(`domains.${KEY[slug] ?? slug}`, { defaultValue: slug });
+  const Row = ({ hit, children }: { hit: boolean; children: React.ReactNode }) => (
+    <li className="flex items-baseline gap-2">
+      <span aria-hidden className={hit ? 'text-fg-brand' : 'text-fg-tertiary'}>{hit ? '\u2713' : '\u2013'}</span>
+      <span className={hit ? 'text-fg-secondary' : 'text-fg-tertiary'}>{children}</span>
+    </li>
+  );
+
+  return (
+    <ul className="flex flex-col gap-1.5 text-[13px]">
+      <Row hit={basis.country_covered}>
+        {basis.country_covered
+          ? t('matchBasis.market', { country: basis.country ?? '' })
+          : t('matchBasis.marketMissing')}
+      </Row>
+      {basis.domains_requested.map((slug) => (
+        <Row key={slug} hit={matched.has(slug)}>{label(slug)}</Row>
+      ))}
+    </ul>
+  );
+}
 
 const BILLING_LABEL: Record<AnonProvider['billing_model'], string> = {
   abo: 'Abomodell', hourly: 'Stundenbasis', project: 'Projektbasiert', mixed: 'Gemischt',
@@ -490,6 +536,7 @@ export function ResultsRiskMap() {
                     matchTier={p.match_tier}
                     isVerified={p.is_verified}
                     tags={p.specializations.slice(0, 3)}
+                    matchBasis={p.match_basis ? <MatchBasis basis={p.match_basis} /> : undefined}
                     countries={p.languages.join(' · ')}
                     rating={p.rating != null ? `${p.rating} · ${p.completed_count ?? 0} Mandate` : undefined}
                     responseTime={p.avg_response_hours != null ? `Ø ${p.avg_response_hours} Std. Antwortzeit` : undefined}

@@ -20,6 +20,14 @@ export interface AnonProvider {
   is_verified: boolean;
   match: number;            // relevance-normalised percentage
   match_tier: 'high' | 'strong' | 'moderate';
+  /** The percentage decomposed. Optional: older payloads predate it, and the UI
+   *  must fall back to showing the bare number rather than inventing a reason. */
+  match_basis?: {
+    country: string | null;
+    country_covered: boolean;
+    domains_requested: string[];   // the caller's own domain slugs
+    domains_matched: string[];     // subset this provider actually covers
+  };
 }
 
 // Enriched obligation from the engine's editorial map. Older payloads carry

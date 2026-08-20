@@ -221,5 +221,21 @@
   },
   "days_one": "{{count}} Tag",
   "days_other": "{{count}} Tage",
-  "ongoing": "laufend"
+  "ongoing": "laufend",
+  "domains": {
+    "taxVat": "Steuern & USt",
+    "productPackaging": "EPR & Verpackung",
+    "dataPrivacy": "Daten & Datenschutz",
+    "marketingSeo": "Marketing-Compliance",
+    "corporateStructure": "Unternehmen & Struktur",
+    "productCompliance": "Produkt-Compliance",
+    "logisticsCustoms": "Logistik & Zoll",
+    "legalAdvisory": "Rechtsberatung"
+  },
+  "matchBasis": {
+    "market": "Deckt Ihren Markt ab ({{country}})",
+    "marketMissing": "Deckt Ihren Markt nicht ab",
+    "areas": "{{matched}} von {{total}} Ihrer Bereiche",
+    "how": "Der Prozentwert ist die Marktabdeckung plus der Anteil dessen, was Sie angefragt haben und diese Fachperson tatsächlich abdeckt."
+  }
 }

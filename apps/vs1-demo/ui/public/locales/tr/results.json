@@ -221,5 +221,21 @@
   },
   "days_one": "{{count}} gün",
   "days_other": "{{count}} gün",
-  "ongoing": "devam ediyor"
+  "ongoing": "devam ediyor",
+  "domains": {
+    "taxVat": "Vergi ve KDV",
+    "productPackaging": "EPR ve Ambalaj",
+    "dataPrivacy": "Veri ve Gizlilik",
+    "marketingSeo": "Pazarlama Uyumu",
+    "corporateStructure": "Şirket ve Yapı",
+    "productCompliance": "Ürün Uygunluğu",
+    "logisticsCustoms": "Lojistik ve Gümrük",
+    "legalAdvisory": "Hukuki Danışmanlık"
+  },
+  "matchBasis": {
+    "market": "Pazarınızı kapsıyor ({{country}})",
+    "marketMissing": "Pazarınızı kapsamıyor",
+    "areas": "{{total}} alanınızdan {{matched}} tanesi",
+    "how": "Yüzde, pazar kapsamı ile talep ettiklerinizin bu uzman tarafından gerçekten karşılanan kısmının toplamıdır."
+  }
 }

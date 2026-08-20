@@ -221,5 +221,21 @@
   },
   "days_one": "{{count}} día",
   "days_other": "{{count}} días",
-  "ongoing": "continuo"
+  "ongoing": "continuo",
+  "domains": {
+    "taxVat": "Impuestos e IVA",
+    "productPackaging": "EPR y envases",
+    "dataPrivacy": "Datos y privacidad",
+    "marketingSeo": "Compliance de marketing",
+    "corporateStructure": "Sociedad y estructura",
+    "productCompliance": "Conformidad de producto",
+    "logisticsCustoms": "Logística y aduanas",
+    "legalAdvisory": "Asesoría legal"
+  },
+  "matchBasis": {
+    "market": "Cubre su mercado ({{country}})",
+    "marketMissing": "No cubre su mercado",
+    "areas": "{{matched}} de {{total}} de sus áreas",
+    "how": "El porcentaje es la cobertura de mercado más la parte de lo que usted solicitó que este especialista cubre realmente."
+  }
 }
