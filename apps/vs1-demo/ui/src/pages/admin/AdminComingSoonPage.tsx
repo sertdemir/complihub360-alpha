@@ -26,7 +26,7 @@ export function AdminComingSoonPage() {
         <div>
           <h1 className="font-serif text-[32px] font-semibold text-fg">
             {pre}
-            <span className="text-fg-accent">{c.gold}</span>
+            <span className="text-fg-accent-emphasis">{c.gold}</span>
             {post}
           </h1>
           <p className="mt-1 text-[13px] text-fg-secondary">{c.sub}</p>
