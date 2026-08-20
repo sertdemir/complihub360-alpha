@@ -104,6 +104,11 @@
        white, 3.69:1 on bg-secondary, 3.21:1 on the warm canvas. AA-LARGE ONLY —
        never use this at body size, use --color-text-brand there. */
     --color-text-accent-emphasis: var(--gold-700);
+    /* Gold at CAPTION size. --color-text-accent-emphasis is AA-LARGE only; a 10px
+       gold eyebrow on a light card needs the full 4.5:1 and gold-700 reaches
+       only 3.71. gold-800 measures 6.43 on bg-secondary. Use this wherever gold
+       has to carry small text; use -emphasis for the headline word. */
+    --color-text-accent-strong: var(--gold-800);
     /* Gold emphasis on the always-dark brand panel. Fixed in both themes on
        purpose: --color-text-accent-emphasis steps down to gold-700 for light
        surfaces, which on this deep petrol drops to 2.54:1.
@@ -304,6 +309,9 @@
     /* On slate the step-down is unnecessary and wrong: gold-500 is 6.98:1 on
        #1f2937 and 8.49:1 on #0f172a, so dark surfaces keep the full gold. */
     --color-text-accent-emphasis: var(--gold-500);
+    /* Dark inverts the problem: gold-800 drops to 2.66 on the dark card while
+       gold-500 holds 8.49, so the strong stop and the emphasis stop coincide. */
+    --color-text-accent-strong: var(--gold-500);
     --color-border-default: 55 65 81;
     --color-border-subtle: 42 51 64;
     --color-border-focus: 20 168 154;

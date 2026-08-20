@@ -93,6 +93,7 @@ export default {
                     brand: 'rgb(var(--color-text-brand) / <alpha-value>)',
                     accent: 'rgb(var(--color-text-accent) / <alpha-value>)',
                     'accent-emphasis': 'rgb(var(--color-text-accent-emphasis) / <alpha-value>)',
+                    'accent-strong': 'rgb(var(--color-text-accent-strong) / <alpha-value>)',
                     'on-brand': 'rgb(var(--color-text-on-brand) / <alpha-value>)',
                     'on-brand-accent': 'rgb(var(--color-text-on-brand-accent) / <alpha-value>)',
                     'on-accent': 'rgb(var(--color-text-on-accent) / <alpha-value>)',

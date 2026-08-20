@@ -122,7 +122,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
       <Sidebar
         logo={
           <NavLink to={`${base}/dashboard`} className="flex items-center gap-2">
-            <LogoMark tone="on-petrol" className="h-[22px] w-auto" />
+            <LogoMark tone="on-light" className="h-[22px] w-auto" />
             <span className="text-[15px] font-semibold text-fg">CompliHub</span>
           </NavLink>
         }

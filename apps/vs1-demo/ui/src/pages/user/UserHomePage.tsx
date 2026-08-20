@@ -120,7 +120,10 @@ export function UserHomePage() {
             <Play size={16} fill="currentColor" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-accent">{t('home.resumeEyebrow')}</p>
+            {/* accent-STRONG, not accent: at 10px this needs the full 4.5:1, and
+                gold-500 measures 2.01 on a light card. The strong stop keeps the
+                gold in both themes — 6.43 light, 8.49 dark. */}
+            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-accent-strong">{t('home.resumeEyebrow')}</p>
             <p className="mt-0.5 text-[16px] font-semibold text-fg">VAT registration · Italy</p>
             <p className="mt-0.5 text-[12px] text-fg-tertiary">{t('home.resumeMeta')}</p>
           </div>
