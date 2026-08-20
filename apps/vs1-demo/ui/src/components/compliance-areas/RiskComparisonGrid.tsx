@@ -53,14 +53,14 @@ export function RiskComparisonGrid({ areas, selectedCountry }: Props) {
   return (
     <div
       ref={ref}
-      className="bg-white border border-neutral-200 rounded-2xl p-7 desktop-s:p-8 mt-8"
+      className="bg-surface border border-stroke rounded-2xl p-7 desktop-s:p-8 mt-8"
     >
       <div className="flex items-start justify-between flex-wrap gap-3 mb-6">
         <div>
-          <Typography variant="h3" weight="bold" className="text-neutral-900">
+          <Typography variant="h3" weight="bold" className="text-fg">
             {t('compliance.riskAtGlance', 'Risk at a Glance')}
           </Typography>
-          <Typography variant="caption" className="text-neutral-500 normal-case tracking-normal mt-1 block">
+          <Typography variant="caption" className="text-fg-tertiary normal-case tracking-normal mt-1 block">
             {t('compliance.risk.subtitle', 'Sorted by typical priority across markets.')}
           </Typography>
         </div>
@@ -71,10 +71,10 @@ export function RiskComparisonGrid({ areas, selectedCountry }: Props) {
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           key={selectedCountry}
-          className="flex items-start gap-2 bg-primary-50/50 border border-primary-100 rounded-xl px-4 py-3 mb-5"
+          className="flex items-start gap-2 bg-brand-light/50 border border-stroke-subtle rounded-xl px-4 py-3 mb-5"
         >
-          <Info size={16} className="text-primary-600 shrink-0 mt-0.5" />
-          <Typography variant="ui-small" className="text-primary-900 leading-snug">
+          <Info size={16} className="text-fg-brand shrink-0 mt-0.5" />
+          <Typography variant="ui-small" className="text-fg-brand leading-snug">
             {t(`compliance.risk.hint.${selectedCountry}`, hint.messageDefault)}
           </Typography>
         </motion.div>
@@ -96,11 +96,11 @@ export function RiskComparisonGrid({ areas, selectedCountry }: Props) {
                 <Typography
                   variant="ui-small"
                   weight="bold"
-                  className={`${isHighlight ? 'text-primary-700' : 'text-neutral-700'}`}
+                  className={`${isHighlight ? 'text-fg-brand' : 'text-fg-secondary'}`}
                 >
                   {title}
                   {isHighlight && (
-                    <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-primary-600">
+                    <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-fg-brand">
                       {t('compliance.risk.priorityBadge', 'Priority for {{country}}', { country: selectedCountry })}
                     </span>
                   )}
@@ -109,7 +109,7 @@ export function RiskComparisonGrid({ areas, selectedCountry }: Props) {
                   {level}
                 </span>
               </div>
-              <div className="w-full h-2.5 bg-neutral-100 rounded-full overflow-hidden">
+              <div className="w-full h-2.5 bg-surface-tertiary rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={isInView ? { width: `${r.riskBarPct}%` } : {}}
