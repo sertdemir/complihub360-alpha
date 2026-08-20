@@ -35,10 +35,10 @@ const RANK_FACTORS = [
 ];
 
 // avg_confirm_time / confirm_rate are canonical metric ids — kept as-is.
-const TRUST = [
-  { labelKey: 'performance.trustProfileCompleteness', label: undefined, value: '100%', pct: 100, color: 'accent' as const },
-  { labelKey: 'performance.trustProjectCompletion', label: undefined, value: '96%', pct: 96, color: 'accent' as const },
-  { labelKey: 'performance.trustClientSatisfaction', label: undefined, value: '4.7/5', pct: 94, color: 'accent' as const },
+const QUALITY = [
+  { labelKey: 'performance.qualityProfileCompleteness', label: undefined, value: '100%', pct: 100, color: 'accent' as const },
+  { labelKey: 'performance.qualityProjectCompletion', label: undefined, value: '96%', pct: 96, color: 'accent' as const },
+  { labelKey: 'performance.qualityClientSatisfaction', label: undefined, value: '4.7/5', pct: 94, color: 'accent' as const },
   { labelKey: undefined, label: 'avg_confirm_time', value: '4h 12m', pct: 82, color: 'brand' as const },
   { labelKey: undefined, label: 'confirm_rate', value: '87%', pct: 84, color: 'brand' as const },
 ];
@@ -98,11 +98,11 @@ export function PerformancePage() {
 
         <div>
           <h2 className="text-[15px] font-semibold text-fg">
-            {t('performance.trustTitle')} · <span className="text-fg-accent">94 / 100</span>
+            {t('performance.qualityTitle')} · <span className="text-fg-accent">94 / 100</span>
           </h2>
-          <p className="mt-0.5 text-[12px] text-fg-secondary">{t('performance.trustSub')}</p>
+          <p className="mt-0.5 text-[12px] text-fg-secondary">{t('performance.qualitySub')}</p>
           <div className="mt-4 space-y-4">
-            {TRUST.map((tr) => {
+            {QUALITY.map((tr) => {
               const label = tr.labelKey ? t(tr.labelKey) : tr.label!;
               return (
                 <div key={label}>

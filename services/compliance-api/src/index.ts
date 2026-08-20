@@ -2079,8 +2079,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const scoreOf = (p: any) => {
                     const countryMatch = country && (p.countries_supported || []).includes(country) ? 1 : 0;
                     const cats: string[] = p.categories || [];
+                    // Which of the REQUESTED domains this provider actually covers.
+                    // Kept as indices into rawCats so the wire carries the caller's
+                    // own domain slugs back, not our internal synonyms.
+                    const coveredIdx = wantedGroups
+                        .map((g, i) => (g.some((c) => cats.includes(c)) ? i : -1))
+                        .filter((i) => i >= 0);
                     const catOverlap = wantedGroups.length
-                        ? wantedGroups.filter((g) => g.some((c) => cats.includes(c))).length / wantedGroups.length
+                        ? coveredIdx.length / wantedGroups.length
                         : (cats.length ? 0.5 : 0);
                     const relevance = 0.6 * countryMatch + 0.4 * catOverlap;
 
@@ -2095,13 +2101,13 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     let total = 0.6 * relevance + 0.3 * quality + 0.1 * priority;
                     if (p.availability === 'ooo') total *= 0.5; // out-of-office → rank frozen/low
                     if (p.partner_status === 'downgraded') total *= 0.4; // review-watchdog penalty
-                    return { relevance, total };
+                    return { relevance, total, countryMatch, coveredIdx };
                 };
                 const tierOf = (pct: number) => pct >= 90 ? 'high' : pct >= 75 ? 'strong' : 'moderate';
 
                 const anonProviders = eligible
                     .map((p: any) => {
-                        const { relevance, total } = scoreOf(p);
+                        const { relevance, total, countryMatch, coveredIdx } = scoreOf(p);
                         const match = Math.round(relevance * 100);
                         return {
                             provider_key: p.provider_key, // opaque handle for the (monetised) detail-open
@@ -2118,6 +2124,18 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                             is_verified: p.partner_status === 'active',
                             match,                       // percentage, relevance-normalised
                             match_tier: tierOf(match),
+                            // The percentage decomposed, so the UI can show WHY it is
+                            // what it is instead of asserting a bare number:
+                            //   match = 60 * country_covered + 40 * (matched / requested)
+                            // Nothing here is new information — specializations and
+                            // region are already on the wire; this only names which of
+                            // the caller's own requested domains were hit.
+                            match_basis: {
+                                country: country ?? null,
+                                country_covered: countryMatch === 1,
+                                domains_requested: rawCats,
+                                domains_matched: coveredIdx.map((i: number) => rawCats[i]),
+                            },
                             _rank: total,
                         };
                     })

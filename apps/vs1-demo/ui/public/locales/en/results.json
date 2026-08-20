@@ -218,5 +218,24 @@
     "bridgeBody": "Your risk map is matched to your markets and your business model, and shows the Verified Partners who fit what you actually need.",
     "bridgeCta": "Assess My Needs",
     "previewBadge": "Preview · answer engine not connected yet"
+  },
+  "days_one": "{{count}} day",
+  "days_other": "{{count}} days",
+  "ongoing": "ongoing",
+  "domains": {
+    "taxVat": "Tax & VAT",
+    "productPackaging": "EPR & Packaging",
+    "dataPrivacy": "Data & Privacy",
+    "marketingSeo": "Marketing Compliance",
+    "corporateStructure": "Corporate & Structure",
+    "productCompliance": "Product Compliance",
+    "logisticsCustoms": "Logistics & Customs",
+    "legalAdvisory": "Legal Advisory"
+  },
+  "matchBasis": {
+    "market": "Covers your market ({{country}})",
+    "marketMissing": "Does not cover your market",
+    "areas": "{{matched}} of {{total}} of your areas",
+    "how": "The percentage is market coverage plus how much of what you asked for this specialist actually does."
   }
 }
