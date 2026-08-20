@@ -218,5 +218,8 @@
     "bridgeBody": "Risk haritanız pazarlarınıza ve iş modelinize göre eşleştirilir ve gerçek ihtiyacınıza uyan Verified Partner'ları gösterir.",
     "bridgeCta": "İhtiyaçlarımı değerlendir",
     "previewBadge": "Önizleme · yanıt motoru henüz bağlı değil"
-  }
+  },
+  "days_one": "{{count}} gün",
+  "days_other": "{{count}} gün",
+  "ongoing": "devam ediyor"
 }

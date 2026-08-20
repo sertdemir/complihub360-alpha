@@ -218,5 +218,8 @@
     "bridgeBody": "Ihre Risk Map ist auf Ihre Märkte und Ihr Geschäftsmodell abgestimmt und zeigt die Verified Partner, die zu Ihrem tatsächlichen Bedarf passen.",
     "bridgeCta": "Meinen Bedarf ermitteln",
     "previewBadge": "Vorschau · Antwort-Engine noch nicht angebunden"
-  }
+  },
+  "days_one": "{{count}} Tag",
+  "days_other": "{{count}} Tage",
+  "ongoing": "laufend"
 }

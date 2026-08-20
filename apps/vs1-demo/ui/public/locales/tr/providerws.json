@@ -220,7 +220,7 @@
     "sla12hSub": "önerilen",
     "sla24hTitle": "24 saat içinde onay",
     "sla24hSub": "standart",
-    "slaNote": "Daha hızlı hedefler sıralamanızı yükseltir — ancak kaçırmak güven puanınıza zarar verir. Güvenilir şekilde tutturabileceğinizi seçin."
+    "slaNote": "Daha hızlı hedefler sıralamanızı yükseltir — ancak kaçırmak kalite puanınıza zarar verir. Güvenilir şekilde tutturabileceğinizi seçin."
   },
   "notifications": {
     "title": "Bildirimler",
@@ -248,7 +248,7 @@
     "descRq0234": "DE pazar yeri lansmanı için EPR kurulumu · 4,2 M € ciro · %91 eşleşme puanı · SLA şu andan itibaren 24 sa",
     "descRq0233": "DE+AT için KDV incelemesi · 1,8 M € ciro · OSS genişlemesi · %84 eşleşme puanı",
     "descRq0232": "1. hatırlatma (T+24 sa) gönderildi · yeniden yönlendirmeye 14 sa 12 dk kaldı · SaaS şirketi için DPIA atölyesi",
-    "descEngagementClosed": "Müşteri görevi tamamlandı olarak işaretledi · 5 yıldızlı değerlendirme · 3.600 € faturalandı · trust_score +2",
+    "descEngagementClosed": "Müşteri görevi tamamlandı olarak işaretledi · 5 yıldızlı değerlendirme · 3.600 € faturalandı · quality_score +2",
     "actionOpenRq": "{{id}} aç →"
   },
   "performance": {
@@ -278,11 +278,11 @@
     "movePlus3": "+3 sıra",
     "movePlus1": "+1 sıra",
     "moveNoChange": "değişiklik yok",
-    "trustTitle": "Güven puanı dökümü",
-    "trustSub": "5 sinyalin bileşimi · en hızlı yükselmek için en düşüğü iyileştirin",
-    "trustProfileCompleteness": "Profil eksiksizliği",
-    "trustProjectCompletion": "Proje tamamlama (iptalsiz)",
-    "trustClientSatisfaction": "Müşteri memnuniyeti"
+    "qualityTitle": "Kalite puanı dökümü",
+    "qualitySub": "5 sinyalin bileşimi · en hızlı yükselmek için en düşüğü iyileştirin",
+    "qualityProfileCompleteness": "Profil eksiksizliği",
+    "qualityProjectCompletion": "Proje tamamlama (iptalsiz)",
+    "qualityClientSatisfaction": "Müşteri memnuniyeti"
   },
   "magicAction": {
     "partnerBadge": "Partner",

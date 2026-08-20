@@ -146,7 +146,9 @@ export const STATS = [
   { value: '8', label: 'obligations identified' },
   // 4 of the fixture rows carry a deadline inside 30 days (6 · 21 · 8 · 21).
   { value: '4', label: 'with a deadline in 30 days' },
-  { value: '14 days', label: 'median deadline' },
+  // Tageszahl statt fertigem String: die Einheit gehoert in die Sprachdatei,
+  // sonst steht "14 days" im deutschen UI (DNA-Addendum V2, P1).
+  { value: '14', days: 14, label: 'median deadline' },
   { value: '3', label: 'Verified Partners ready' },
 ];
 
@@ -258,7 +260,7 @@ export function ResultsRiskMap() {
         dueSub: withinHorizon(l.applies_from) != null
           ? t('appliesIn', { count: withinHorizon(l.applies_from) as number, defaultValue: `applies in ${withinHorizon(l.applies_from)} days` })
           : daysUntil(l.applies_from) != null ? ''   // far future: the date says enough
-          : l.due_days != null ? `${l.due_days} days` : l.due === 'Ongoing' ? 'Live' : '',
+          : l.due_days != null ? t('days', { count: l.due_days }) : l.due === 'Ongoing' ? 'Live' : '',
         state: { kind: l.state === 'confirmed' ? 'confirmed' : 'likely' },
         // Same horizon as the stats: a duty landing in days is "now" even
         // though it has not started; one landing in 2030 is not.
@@ -305,7 +307,7 @@ export function ResultsRiskMap() {
     return [
       { value: String(rows.length), label: 'obligations identified' },
       { value: String(soon), label: `with a deadline in ${SOON_DAYS} days` },
-      { value: median != null ? `${median} days` : 'ongoing', label: 'median deadline' },
+      { value: median != null ? String(median) : '', days: median ?? undefined, label: 'median deadline' },
       { value: String(anonProviders.length), label: 'Verified Partners ready' },
     ];
   })();
@@ -374,7 +376,9 @@ export function ResultsRiskMap() {
           {stats.map((s, i) => (
             <div key={s.label} className="flex items-center">
               {i > 0 && <span className="mr-8 hidden h-8 w-px bg-stroke-subtle sm:block" />}
-              <span className="text-[1.5rem] font-bold text-fg">{s.value}</span>
+              <span className="text-[1.5rem] font-bold text-fg">
+                {s.days != null ? t('days', { count: s.days }) : s.value || t('ongoing')}
+              </span>
               <span className="ml-2 text-[14px] text-fg-secondary">{t(`stats.${i}.label`, { defaultValue: s.label })}</span>
             </div>
           ))}

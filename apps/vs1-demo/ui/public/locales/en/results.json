@@ -218,5 +218,8 @@
     "bridgeBody": "Your risk map is matched to your markets and your business model, and shows the Verified Partners who fit what you actually need.",
     "bridgeCta": "Assess My Needs",
     "previewBadge": "Preview · answer engine not connected yet"
-  }
+  },
+  "days_one": "{{count}} day",
+  "days_other": "{{count}} days",
+  "ongoing": "ongoing"
 }

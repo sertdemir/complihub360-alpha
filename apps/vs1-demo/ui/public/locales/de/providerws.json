@@ -220,7 +220,7 @@
     "sla12hSub": "empfohlen",
     "sla24hTitle": "Bestätigung innerhalb von 24 h",
     "sla24hSub": "Standard",
-    "slaNote": "Schnellere Ziele heben Ihr Ranking — verpasste Ziele schaden aber Ihrem Trust-Score. Wählen Sie, was Sie zuverlässig einhalten können."
+    "slaNote": "Schnellere Ziele heben Ihr Ranking — verpasste Ziele schaden aber Ihrem Qualitäts-Score. Wählen Sie, was Sie zuverlässig einhalten können."
   },
   "notifications": {
     "title": "Benachrichtigungen",
@@ -248,7 +248,7 @@
     "descRq0234": "EPR-Setup für DE-Marktplatz-Launch · 4,2 M € Umsatz · 91 % Match-Score · SLA 24 h ab jetzt",
     "descRq0233": "USt-Prüfung für DE+AT · 1,8 M € Umsatz · OSS-Expansion · 84 % Match-Score",
     "descRq0232": "Erinnerung #1 (T+24 h) gesendet · 14 h 12 m bis zur Umleitung · DPIA-Workshop für SaaS-Unternehmen",
-    "descEngagementClosed": "Mandant hat das Mandat als abgeschlossen markiert · 5-Sterne-Bewertung · 3.600 € abgerechnet · trust_score +2",
+    "descEngagementClosed": "Mandant hat das Mandat als abgeschlossen markiert · 5-Sterne-Bewertung · 3.600 € abgerechnet · quality_score +2",
     "actionOpenRq": "{{id}} öffnen →"
   },
   "performance": {
@@ -278,11 +278,11 @@
     "movePlus3": "+3 Positionen",
     "movePlus1": "+1 Position",
     "moveNoChange": "unverändert",
-    "trustTitle": "Trust-Score-Aufschlüsselung",
-    "trustSub": "Zusammensetzung aus 5 Signalen · verbessern Sie das schwächste, um am schnellsten zu steigen",
-    "trustProfileCompleteness": "Profil-Vollständigkeit",
-    "trustProjectCompletion": "Projektabschluss (ohne Abbrüche)",
-    "trustClientSatisfaction": "Mandantenzufriedenheit"
+    "qualityTitle": "Qualitäts-Score-Aufschlüsselung",
+    "qualitySub": "Zusammensetzung aus 5 Signalen · verbessern Sie das schwächste, um am schnellsten zu steigen",
+    "qualityProfileCompleteness": "Profil-Vollständigkeit",
+    "qualityProjectCompletion": "Projektabschluss (ohne Abbrüche)",
+    "qualityClientSatisfaction": "Mandantenzufriedenheit"
   },
   "magicAction": {
     "partnerBadge": "Partner",

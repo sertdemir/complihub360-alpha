@@ -220,7 +220,7 @@
     "sla12hSub": "recomendado",
     "sla24hTitle": "Confirmar en 24 h",
     "sla24hSub": "estándar",
-    "slaNote": "Los objetivos más rápidos elevan su posición — pero incumplirlos daña su trust score. Elija lo que pueda cumplir de forma fiable."
+    "slaNote": "Los objetivos más rápidos elevan su posición — pero incumplirlos daña su puntuación de calidad. Elija lo que pueda cumplir de forma fiable."
   },
   "notifications": {
     "title": "Notificaciones",
@@ -248,7 +248,7 @@
     "descRq0234": "Configuración de EPR para lanzamiento en marketplace DE · 4,2 M € de facturación · 91 % de match score · SLA 24 h desde ahora",
     "descRq0233": "Revisión de IVA para DE+AT · 1,8 M € de facturación · expansión OSS · 84 % de match score",
     "descRq0232": "Recordatorio n.º 1 (T+24 h) enviado · quedan 14 h 12 m antes de la redirección · taller de DPIA para empresa SaaS",
-    "descEngagementClosed": "El cliente marcó el encargo como completado · valoración de 5 estrellas · 3.600 € facturados · trust_score +2",
+    "descEngagementClosed": "El cliente marcó el encargo como completado · valoración de 5 estrellas · 3.600 € facturados · quality_score +2",
     "actionOpenRq": "Abrir {{id}} →"
   },
   "performance": {
@@ -278,11 +278,11 @@
     "movePlus3": "+3 posiciones",
     "movePlus1": "+1 posición",
     "moveNoChange": "sin cambios",
-    "trustTitle": "Desglose del trust score",
-    "trustSub": "Compuesto por 5 señales · mejore la más baja para subir más rápido",
-    "trustProfileCompleteness": "Perfil completo",
-    "trustProjectCompletion": "Finalización de proyectos (sin cancelaciones)",
-    "trustClientSatisfaction": "Satisfacción del cliente"
+    "qualityTitle": "Desglose de la puntuación de calidad",
+    "qualitySub": "Compuesto por 5 señales · mejore la más baja para subir más rápido",
+    "qualityProfileCompleteness": "Perfil completo",
+    "qualityProjectCompletion": "Finalización de proyectos (sin cancelaciones)",
+    "qualityClientSatisfaction": "Satisfacción del cliente"
   },
   "magicAction": {
     "partnerBadge": "Partner",
