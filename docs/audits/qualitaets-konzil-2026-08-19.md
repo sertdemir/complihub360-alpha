@@ -178,3 +178,34 @@ Nachgezogen wurden am 20.08. alle Stellen, die noch das Gegenteil behaupteten:
 Hinweis im Kopf) und die Startseite selbst — `brandCode` versprach dem Besucher
 wörtlich „Kein Rot. Nie." über einem roten Badge. Die Karte heißt jetzt
 „Priorität statt Panik" und sagt, was das Produkt tatsächlich tut.
+
+---
+
+## Nachtrag 20.08.2026 — Wurzel 3, Typo-Hälfte (PR #70)
+
+Der Bericht nennt in Wurzel 3 als Gegendruck eine **ESLint-Regel**. Umgesetzt
+wurde stattdessen ein **Contract-Test** (`src/lib/designSystem.guard.test.ts`):
+die CI dieses Repos fährt kein Lint, eine Regel wäre nie gelaufen. Der Test
+scheitert mit Datei, Zeile und Ersatzvorschlag.
+
+Zwei Abweichungen von der Empfehlung, beide bewusst:
+
+**Erst die Lücke, dann die Regel.** Der Bericht deutete die 275 freien Größen als
+Disziplinproblem. Die Ursache war struktureller: die Skala hatte keine neutrale
+kleine Stufe. `caption` (12px) und `eyebrow` (11px) tragen `letter-spacing` und
+engere `line-height` — wer 12px ohne Sperrung brauchte, *musste* die Skala
+verlassen. Erst fünf neutrale Stufen ergänzt (`body-md`/`2xs`/`3xs`/`4xs`/`5xs`
+= 15/12/11/10/9px), dann 254 Vorkommen migriert. Eine Regel vor dem Lückenschluss
+hätte Verstöße erzeugt, für die es keine legale Alternative gibt.
+
+**Keine Prüfung roher Farbklassen.** Der Bericht fordert sie mit. Die dunklen
+Bänder arbeiten absichtlich mit festen Paletten, die *nicht* mitkippen dürfen —
+ein Verbot dort hätte genau den Schaden angerichtet, der in diesem Durchgang
+schon einmal entstand: die blanke Token-Zuordnung drückte den PlatformPage-Funnel
+und die CTA-Buttons auf dunklen Bändern auf 1.20:1. Wo der Hintergrund bewusst
+nicht kippt, darf es der Text auch nicht.
+
+Offen bleibt die **Komponenten-Hälfte** von Wurzel 3, unverändert: Button 14/74,
+Card 3/55, Badge 0/14, Input 0/5, Container 12/46. Das ist ein Markup-Umbau mit
+visuellem Regressionsrisiko und braucht einen eigenen Durchgang mit eigener
+Absicherung.
