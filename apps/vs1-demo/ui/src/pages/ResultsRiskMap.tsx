@@ -198,7 +198,7 @@ function MatchBasis({ basis }: { basis: NonNullable<AnonProvider['match_basis']>
   );
 
   return (
-    <ul className="flex flex-col gap-1.5 text-[13px]">
+    <ul className="flex flex-col gap-1.5 text-body-xs">
       <Row hit={basis.country_covered}>
         {basis.country_covered
           ? t('matchBasis.market', { country: basis.country ?? '' })
@@ -219,14 +219,14 @@ function StatePill({ state, onAnswer }: { state: State; onAnswer: () => void }) 
   const { t } = useTranslation('results');
   if (state.kind === 'confirmed') {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-light px-3 py-1 text-[13px] font-semibold text-fg-brand">
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-light px-3 py-1 text-body-xs font-semibold text-fg-brand">
         <Check size={13} strokeWidth={3} /> {t('state.confirmed')}
       </span>
     );
   }
   if (state.kind === 'likely') {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-stroke px-3 py-1 text-[13px] font-medium text-fg-secondary">
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-stroke px-3 py-1 text-body-xs font-medium text-fg-secondary">
         <Info size={13} /> {t('state.likely')}
       </span>
     );
@@ -235,7 +235,7 @@ function StatePill({ state, onAnswer }: { state: State; onAnswer: () => void }) 
     <button
       type="button"
       onClick={onAnswer}
-      className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-3.5 py-2 text-[13px] font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5"
+      className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-3.5 py-2 text-body-xs font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5"
     >
       {t('state.answer', { total: state.count })} <ArrowRight size={14} />
     </button>
@@ -383,19 +383,19 @@ export function ResultsRiskMap() {
             <span aria-hidden className="hidden h-5 w-px bg-stroke sm:block" />
             <Link
               to={`/${locale}`}
-              className="hidden items-center gap-1.5 text-[13px] font-semibold text-fg-secondary transition-colors hover:text-fg-brand sm:inline-flex"
+              className="hidden items-center gap-1.5 text-body-xs font-semibold text-fg-secondary transition-colors hover:text-fg-brand sm:inline-flex"
             >
               <ArrowLeft size={14} /> {t('topbar.backHome')}
             </Link>
           </div>
           <div className="flex items-center gap-4">
-            <span className="hidden items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary sm:inline-flex">
+            <span className="hidden items-center gap-2 text-body-2xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary sm:inline-flex">
               <Lock size={13} /> {t('topbar.guestBadge')}
             </span>
             <button
               type="button"
               onClick={() => setSaveOpen(true)}
-              className="inline-flex items-center gap-2 rounded-xl bg-accent-500 px-5 py-2.5 text-[14px] font-semibold text-primary-950 transition-transform duration-200 hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 rounded-xl bg-accent-500 px-5 py-2.5 text-body-sm font-semibold text-primary-950 transition-transform duration-200 hover:-translate-y-0.5"
             >
               {t('topbar.saveMap')} <ArrowRight size={15} />
             </button>
@@ -406,11 +406,11 @@ export function ResultsRiskMap() {
       <main className="mx-auto w-full max-w-[1440px] px-4 pb-20 md:px-8 lg:px-16">
         {/* Header */}
         <div className="mx-auto mt-14 max-w-3xl text-center">
-          <span className="text-[12px] font-semibold uppercase tracking-[0.16em] text-fg-brand">{t('header.eyebrow')}</span>
+          <span className="text-body-2xs font-semibold uppercase tracking-[0.16em] text-fg-brand">{t('header.eyebrow')}</span>
           <h1 className="mt-3 font-serif text-[2.75rem] font-bold leading-[1.05] tracking-tight text-fg sm:text-[3.25rem]">
             {t('header.title')}
           </h1>
-          <p className="mt-4 text-[15px] leading-relaxed text-fg-secondary">
+          <p className="mt-4 text-body-md leading-relaxed text-fg-secondary">
             {profile?.country
               ? t('header.subtitleProfile', { total: profile.categories?.length ?? 0 })
               : t('header.subtitleDefault')}
@@ -425,14 +425,14 @@ export function ResultsRiskMap() {
               <span className="text-[1.5rem] font-bold text-fg">
                 {s.days != null ? t('days', { count: s.days }) : s.value || t('ongoing')}
               </span>
-              <span className="ml-2 text-[14px] text-fg-secondary">{t(`stats.${i}.label`, { defaultValue: s.label })}</span>
+              <span className="ml-2 text-body-sm text-fg-secondary">{t(`stats.${i}.label`, { defaultValue: s.label })}</span>
             </div>
           ))}
         </div>
 
         {/* Obligations table */}
         <div className="mt-12 overflow-hidden rounded-2xl border border-stroke-subtle">
-          <div className="grid grid-cols-[100px_1fr_120px_110px_160px] gap-4 border-b border-stroke-subtle bg-surface-secondary px-6 py-3.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">
+          <div className="grid grid-cols-[100px_1fr_120px_110px_160px] gap-4 border-b border-stroke-subtle bg-surface-secondary px-6 py-3.5 text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary">
             <span>{t('table.severity')}</span>
             <span>{t('table.obligation')}</span>
             <span>{t('table.market')}</span>
@@ -443,8 +443,8 @@ export function ResultsRiskMap() {
             <Fragment key={g.key}>
               {g.label && (
                 <div className="flex items-baseline gap-2 border-b border-stroke-subtle bg-surface-secondary/40 px-6 py-2.5">
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-fg-secondary">{g.label}</span>
-                  <span className="text-[11px] text-fg-tertiary">{g.items.length}</span>
+                  <span className="text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-secondary">{g.label}</span>
+                  <span className="text-body-3xs text-fg-tertiary">{g.items.length}</span>
                 </div>
               )}
               {g.items.map(({ o, i }) => (
@@ -458,11 +458,11 @@ export function ResultsRiskMap() {
                 </RiskBadge>
               </span>
               <span className="min-w-0">
-                <span className="block text-[15px] font-bold text-fg">{isLive ? o.title : t(`obligations.${i}.title`, { defaultValue: o.title })}</span>
+                <span className="block text-body-md font-bold text-fg">{isLive ? o.title : t(`obligations.${i}.title`, { defaultValue: o.title })}</span>
                 {/* Source leads, penalty follows in a muted tone (Brand Map
                     §11: penalties are facts worth showing, but must not be the
                     first thing the eye lands on). */}
-                <span className="mt-0.5 block text-[12px] leading-relaxed text-fg-brand">
+                <span className="mt-0.5 block text-body-2xs leading-relaxed text-fg-brand">
                   {o.sourceUrl && (
                     <>
                       <a
@@ -483,10 +483,10 @@ export function ResultsRiskMap() {
                   </span>
                 </span>
               </span>
-              <span className="text-[14px] text-fg-secondary">{isLive ? o.market : t(`obligations.${i}.market`, { defaultValue: o.market })}</span>
+              <span className="text-body-sm text-fg-secondary">{isLive ? o.market : t(`obligations.${i}.market`, { defaultValue: o.market })}</span>
               <span>
-                <span className="block text-[14px] font-semibold text-fg">{isLive ? o.due : t(`obligations.${i}.due`, { defaultValue: o.due })}</span>
-                <span className="block text-[12px] text-fg-tertiary">{isLive ? o.dueSub : t(`obligations.${i}.dueSub`, { defaultValue: o.dueSub })}</span>
+                <span className="block text-body-sm font-semibold text-fg">{isLive ? o.due : t(`obligations.${i}.due`, { defaultValue: o.due })}</span>
+                <span className="block text-body-2xs text-fg-tertiary">{isLive ? o.dueSub : t(`obligations.${i}.dueSub`, { defaultValue: o.dueSub })}</span>
               </span>
               <span className="flex justify-end">
                 <StatePill state={o.state} onAnswer={() => setSaveOpen(true)} />
@@ -501,7 +501,7 @@ export function ResultsRiskMap() {
         <div className="mt-16">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-fg-brand">
+              <span className="text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-brand">
                 {t('partners.eyebrow')}
               </span>
               <h2 className="mt-2 font-serif text-[1.75rem] font-bold leading-tight text-fg">
@@ -509,14 +509,14 @@ export function ResultsRiskMap() {
               </h2>
             </div>
             {isLoggedIn ? (
-              <span className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-fg-brand">
+              <span className="inline-flex items-center gap-1.5 text-body-sm font-semibold text-fg-brand">
                 <Check size={14} strokeWidth={3} /> {t('partners.unlocked')}
               </span>
             ) : (
               <button
                 type="button"
                 onClick={() => setSaveOpen(true)}
-                className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-fg-brand transition-colors hover:text-brand"
+                className="inline-flex items-center gap-1.5 text-body-sm font-semibold text-fg-brand transition-colors hover:text-brand"
               >
                 <Lock size={14} /> {t('partners.unlockCta')} <ArrowRight size={14} />
               </button>
@@ -554,7 +554,7 @@ export function ResultsRiskMap() {
                       <div className="mx-auto h-2.5 w-3/4 rounded-full bg-neutral-200" />
                       <div className="mx-auto h-2.5 w-1/2 rounded-full bg-neutral-200" />
                     </div>
-                    <span className="text-[15px] font-bold text-fg-brand">{t('partners.match', { pct: m })}</span>
+                    <span className="text-body-md font-bold text-fg-brand">{t('partners.match', { pct: m })}</span>
                   </div>
                 ))}
           </div>
@@ -568,13 +568,13 @@ export function ResultsRiskMap() {
           <h2 className="mt-4 font-serif text-[2rem] font-bold leading-tight tracking-tight text-fg">
             {t('cta.title')}
           </h2>
-          <p className="mx-auto mt-3 max-w-md text-[15px] leading-relaxed text-fg-secondary">
+          <p className="mx-auto mt-3 max-w-md text-body-md leading-relaxed text-fg-secondary">
             {t('cta.body')}
           </p>
           <button
             type="button"
             onClick={() => setSaveOpen(true)}
-            className="mt-8 inline-flex items-center gap-2 rounded-xl bg-accent-500 px-7 py-3.5 text-[15px] font-semibold text-primary-950 shadow-[0_18px_34px_-14px_rgba(212,175,55,0.6)] transition-transform duration-200 hover:-translate-y-0.5"
+            className="mt-8 inline-flex items-center gap-2 rounded-xl bg-accent-500 px-7 py-3.5 text-body-md font-semibold text-primary-950 shadow-[0_18px_34px_-14px_rgba(212,175,55,0.6)] transition-transform duration-200 hover:-translate-y-0.5"
           >
             {t('cta.button')} <ArrowRight size={17} />
           </button>

@@ -46,10 +46,10 @@ const MATTERS_COUNT = 3;
 function CheckList({ title, items }: { title: string; items: string[] }) {
   return (
     <div>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-fg-tertiary">{title}</p>
+      <p className="text-body-3xs font-semibold uppercase tracking-[0.12em] text-fg-tertiary">{title}</p>
       <ul className="mt-4 space-y-3">
         {items.map((it) => (
-          <li key={it} className="flex gap-3 text-[15px] text-fg">
+          <li key={it} className="flex gap-3 text-body-md text-fg">
             <Check size={16} strokeWidth={2.5} className="mt-0.5 shrink-0 text-fg-brand" />
             {it}
           </li>
@@ -96,13 +96,13 @@ function DomainDrawer({ index, onClose }: { index: number; onClose: () => void }
       >
         <div className="flex-1 overflow-y-auto px-8 pt-8">
           <div className="flex items-start justify-between">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-fg-tertiary">{t('domains.drawerEyebrow')}</p>
+            <p className="text-body-3xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">{t('domains.drawerEyebrow')}</p>
             <button onClick={onClose} aria-label={t('drawer.close')} className="text-fg-tertiary transition-colors hover:text-fg">
               <X size={22} />
             </button>
           </div>
           <h3 className="mt-3 font-serif text-[2.25rem] font-bold leading-none text-fg">{t(`${base}.title`)}</h3>
-          <p className="mt-3 text-[14px] font-semibold text-fg-brand">
+          <p className="mt-3 text-body-sm font-semibold text-fg-brand">
             {t('domains.activeIn')} <span className="text-fg-secondary">{t(`${base}.markets`)}</span>
           </p>
           <p className="mt-6 text-body leading-relaxed text-fg-secondary">{t(`${base}.intro`)}</p>
@@ -115,7 +115,7 @@ function DomainDrawer({ index, onClose }: { index: number; onClose: () => void }
         </div>
 
         <div className="border-t border-stroke-subtle bg-surface-secondary px-8 py-5">
-          <p className="text-[13px] text-fg-tertiary">{t('drawer.continues')}</p>
+          <p className="text-body-xs text-fg-tertiary">{t('drawer.continues')}</p>
           <Button fullWidth className="mt-3">
             {t('drawer.seeIfApplies')} <ArrowRight size={16} className="ml-1.5" />
           </Button>
@@ -167,9 +167,9 @@ export function DomainsKnows() {
             >
               <Icon size={26} strokeWidth={1.75} className="text-fg-brand" />
               <p className="mt-4 text-[18px] font-bold text-fg">{t(`domains.items.${i}.title`)}</p>
-              <p className="mt-2 text-[14px] leading-relaxed text-fg-secondary">{t(`domains.items.${i}.desc`)}</p>
-              <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">{t(`domains.items.${i}.markets`)}</p>
-              <span className="mt-4 inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-fg-brand">
+              <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">{t(`domains.items.${i}.desc`)}</p>
+              <p className="mt-4 text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary">{t(`domains.items.${i}.markets`)}</p>
+              <span className="mt-4 inline-flex items-center gap-1 text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-brand">
                 {t('domains.cardCta')} <ChevronRight size={13} className="transition-transform group-hover:translate-x-0.5" />
               </span>
             </motion.button>

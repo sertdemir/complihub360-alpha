@@ -97,7 +97,7 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
               {risk} {t('compliance.riskLabel', 'Risk')}
             </span>
             {personaFit && (
-              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-brand-light text-fg-brand border border-stroke-subtle">
+              <span className="text-body-3xs font-semibold px-2 py-0.5 rounded-md bg-brand-light text-fg-brand border border-stroke-subtle">
                 {personaFit}
               </span>
             )}

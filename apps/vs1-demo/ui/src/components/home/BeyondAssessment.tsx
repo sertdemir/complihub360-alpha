@@ -16,12 +16,12 @@ const NEWS_COUNT = 2;
 
 function Pill({ children, tone }: { children: React.ReactNode; tone: 'live' | 'beta' }) {
   return tone === 'live' ? (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-light px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-brand">
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-light px-3 py-1 text-body-3xs font-semibold uppercase tracking-[0.08em] text-fg-brand">
       <span className="h-1.5 w-1.5 rounded-full bg-brand" />
       {children}
     </span>
   ) : (
-    <span className="inline-flex items-center rounded-full bg-accent-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-accent-800 ring-1 ring-inset ring-accent-200">
+    <span className="inline-flex items-center rounded-full bg-accent-50 px-3 py-1 text-body-3xs font-semibold uppercase tracking-[0.08em] text-accent-800 ring-1 ring-inset ring-accent-200">
       {children}
     </span>
   );
@@ -44,7 +44,7 @@ export function BeyondAssessment() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
         >
-          <span className="inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-fg-brand">
+          <span className="inline-flex items-center gap-2 text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-brand">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-current opacity-70" />
             {t('beyond.eyebrow')}
           </span>
@@ -79,8 +79,8 @@ export function BeyondAssessment() {
               <ul className="space-y-4">
                 {Array.from({ length: STATS_COUNT }, (_, i) => (
                   <li key={i} className="flex items-center justify-between">
-                    <span className="text-[14px] text-fg-secondary">{t(`beyond.stats.${i}.label`)}</span>
-                    <span className="text-[14px] font-bold text-fg">{t(`beyond.stats.${i}.value`)}</span>
+                    <span className="text-body-sm text-fg-secondary">{t(`beyond.stats.${i}.label`)}</span>
+                    <span className="text-body-sm font-bold text-fg">{t(`beyond.stats.${i}.value`)}</span>
                   </li>
                 ))}
               </ul>
@@ -89,7 +89,7 @@ export function BeyondAssessment() {
             <h3 className="mt-8 font-serif text-[26px] font-bold leading-[1.2] text-fg">
               {t('beyond.workspace.title')}
             </h3>
-            <p className="mt-4 max-w-[44ch] text-[15px] leading-relaxed text-fg-secondary">
+            <p className="mt-4 max-w-[44ch] text-body-md leading-relaxed text-fg-secondary">
               {t('beyond.workspace.desc')}
             </p>
           </motion.div>
@@ -106,7 +106,7 @@ export function BeyondAssessment() {
               <div className="mt-6 rounded-2xl border border-stroke-subtle bg-surface p-4">
                 <ul className="space-y-3">
                   {Array.from({ length: NEWS_COUNT }, (_, i) => (
-                    <li key={i} className="flex items-baseline gap-2.5 text-[13px]">
+                    <li key={i} className="flex items-baseline gap-2.5 text-body-xs">
                       <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
                       <span className="shrink-0 font-semibold text-fg-brand">{t(`beyond.news.${i}.tag`)}</span>
                       <span className="text-fg-secondary">{t(`beyond.news.${i}.text`)}</span>
@@ -115,7 +115,7 @@ export function BeyondAssessment() {
                 </ul>
               </div>
               <h3 className="mt-6 font-serif text-[22px] font-bold leading-tight text-fg">{t('beyond.newsCard.title')}</h3>
-              <p className="mt-3 text-[14px] leading-relaxed text-fg-secondary">
+              <p className="mt-3 text-body-sm leading-relaxed text-fg-secondary">
                 {t('beyond.newsCard.desc')}
               </p>
             </motion.div>
@@ -135,19 +135,19 @@ export function BeyondAssessment() {
                   <Play size={16} fill="currentColor" />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{t('beyond.learn.meta')}</p>
-                  <p className="mt-0.5 truncate text-[14px] font-bold text-fg">{t('beyond.learn.video')}</p>
+                  <p className="text-body-3xs font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{t('beyond.learn.meta')}</p>
+                  <p className="mt-0.5 truncate text-body-sm font-bold text-fg">{t('beyond.learn.video')}</p>
                 </div>
               </div>
               <h3 className="mt-6 font-serif text-[22px] font-bold leading-tight text-fg">{t('beyond.learn.title')}</h3>
-              <p className="mt-3 text-[14px] leading-relaxed text-fg-secondary">
+              <p className="mt-3 text-body-sm leading-relaxed text-fg-secondary">
                 {t('beyond.learn.desc')}
               </p>
             </motion.div>
           </div>
         </motion.div>
 
-        <p className="mt-8 text-[13px] leading-relaxed text-fg-tertiary">
+        <p className="mt-8 text-body-xs leading-relaxed text-fg-tertiary">
           {t('beyond.footnote')}
         </p>
       </div>

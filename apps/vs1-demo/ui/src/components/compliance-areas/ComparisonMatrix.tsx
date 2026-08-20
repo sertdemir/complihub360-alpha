@@ -154,7 +154,7 @@ export function ComparisonMatrix() {
                 </td>
                 <td className="px-5 py-4">
                   <span
-                    className={`inline-flex text-[11px] font-bold px-2 py-0.5 rounded-md border ${row.riskColor}`}
+                    className={`inline-flex text-body-3xs font-bold px-2 py-0.5 rounded-md border ${row.riskColor}`}
                   >
                     {t(`compliance.matrix.${row.id}.risk`, row.riskLabel)}
                   </span>

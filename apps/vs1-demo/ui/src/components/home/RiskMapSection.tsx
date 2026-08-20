@@ -41,20 +41,20 @@ function StateCell({ kind }: { kind: StateKind }) {
   const label = t(`risk.state.${kind}`);
   if (kind === 'action') {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-md bg-brand px-3 py-1.5 text-[12px] font-semibold text-fg-on-brand">
+      <span className="inline-flex items-center gap-1.5 rounded-md bg-brand px-3 py-1.5 text-body-2xs font-semibold text-fg-on-brand">
         {label} <ArrowRight size={13} />
       </span>
     );
   }
   if (kind === 'confirmed') {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-secondary px-3 py-1.5 text-[12px] font-medium text-fg-secondary">
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-secondary px-3 py-1.5 text-body-2xs font-medium text-fg-secondary">
         <Check size={13} className="text-fg-brand" /> {label}
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-stroke px-3 py-1.5 text-[12px] font-medium text-fg-secondary">
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-stroke px-3 py-1.5 text-body-2xs font-medium text-fg-secondary">
       <Info size={13} /> {label}
     </span>
   );
@@ -99,7 +99,7 @@ export function RiskMapSection() {
           transition={{ duration: 0.5, ease: 'easeOut' }}
           className="mt-8 overflow-hidden rounded-xl border border-stroke bg-surface shadow-[0_50px_110px_-28px_rgba(2,22,17,0.36)]"
         >
-          <div className={`hidden px-5 py-3 text-[10px] font-semibold uppercase tracking-wide text-fg-tertiary sm:px-6 ${COLS} sm:bg-surface-secondary`}>
+          <div className={`hidden px-5 py-3 text-body-4xs font-semibold uppercase tracking-wide text-fg-tertiary sm:px-6 ${COLS} sm:bg-surface-secondary`}>
             <span>{t('risk.table.severity')}</span>
             <span>{t('risk.table.obligation')}</span>
             <span>{t('risk.table.market')}</span>
@@ -112,13 +112,13 @@ export function RiskMapSection() {
                 <RiskBadge level={r.level} size="sm">{t(`risk.severity.${r.level}`)}</RiskBadge>
               </span>
               <div className="min-w-0">
-                <p className="text-[14px] font-semibold text-fg">{t(`riskMap.rows.${i}.title`)}</p>
-                <p className="mt-0.5 text-[12px] leading-snug text-fg-brand">{t(`riskMap.rows.${i}.detail`)}</p>
+                <p className="text-body-sm font-semibold text-fg">{t(`riskMap.rows.${i}.title`)}</p>
+                <p className="mt-0.5 text-body-2xs leading-snug text-fg-brand">{t(`riskMap.rows.${i}.detail`)}</p>
               </div>
-              <span className="mt-2 block text-[12px] text-fg-secondary sm:mt-0">{t(`riskMap.rows.${i}.market`)}</span>
+              <span className="mt-2 block text-body-2xs text-fg-secondary sm:mt-0">{t(`riskMap.rows.${i}.market`)}</span>
               <span className="mt-1 block sm:mt-0">
-                <span className="text-[13px] font-semibold text-fg">{t(`riskMap.rows.${i}.due`)}</span>{' '}
-                <span className="text-[11px] text-fg-tertiary sm:block">{t(`riskMap.rows.${i}.dueSub`)}</span>
+                <span className="text-body-xs font-semibold text-fg">{t(`riskMap.rows.${i}.due`)}</span>{' '}
+                <span className="text-body-3xs text-fg-tertiary sm:block">{t(`riskMap.rows.${i}.dueSub`)}</span>
               </span>
               <span className="mt-3 block sm:mt-0">
                 <StateCell kind={r.state} />
@@ -132,7 +132,7 @@ export function RiskMapSection() {
           <p className="text-eyebrow font-semibold uppercase tracking-[0.14em] text-fg-brand">{t('riskMap.partnersEyebrow')}</p>
           <div className="mt-1 flex flex-wrap items-end justify-between gap-3">
             <h3 className="font-serif text-[24px] font-bold tracking-tight text-fg">{t('riskMap.partnersTitle')}</h3>
-            <a className="inline-flex cursor-pointer items-center gap-1.5 text-[13px] font-semibold text-fg-brand">
+            <a className="inline-flex cursor-pointer items-center gap-1.5 text-body-xs font-semibold text-fg-brand">
               <Lock size={13} /> {t('riskMap.unlock')}
             </a>
           </div>
@@ -145,7 +145,7 @@ export function RiskMapSection() {
                 <Lock size={18} className="mx-auto text-fg-tertiary" />
                 <div className="mx-auto mt-4 h-2.5 w-3/5 rounded bg-neutral-300/70" />
                 <div className="mx-auto mt-2 h-2.5 w-2/5 rounded bg-neutral-300/70" />
-                <p className="mt-4 text-[14px] font-semibold text-fg-brand">{t('risk.match', { pct })}</p>
+                <p className="mt-4 text-body-sm font-semibold text-fg-brand">{t('risk.match', { pct })}</p>
               </div>
             ))}
           </div>
@@ -155,7 +155,7 @@ export function RiskMapSection() {
       {/* Save CTA band — full width */}
       <div className="mt-16 bg-surface-secondary px-6 py-14 text-center lg:py-16">
         <h3 className="font-serif text-[26px] font-bold tracking-tight text-fg">{t('riskMap.save.title')}</h3>
-        <p className="mx-auto mt-2 text-[14px] text-fg-secondary">
+        <p className="mx-auto mt-2 text-body-sm text-fg-secondary">
           {t('riskMap.save.subtitle')}
         </p>
         <Button className="mt-7">

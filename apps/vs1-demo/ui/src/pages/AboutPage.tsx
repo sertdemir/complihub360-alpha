@@ -57,7 +57,7 @@ export function AboutPage() {
       <section className="py-16 lg:py-24">
         <Container size="xl">
           <Reveal className="mx-auto max-w-[760px]">
-            <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
+            <span className="text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
               {t('about.why.kicker')}
             </span>
             <p className="mt-3 font-serif text-[1.75rem] font-bold leading-snug text-fg lg:text-[2rem]">
@@ -74,7 +74,7 @@ export function AboutPage() {
             {PILLARS.map((key) => (
               <StaggerItem key={key}>
                 <div className="flex h-full flex-col rounded-2xl border border-stroke-subtle bg-surface p-6">
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-fg-brand">
+                  <p className="text-body-2xs font-semibold uppercase tracking-[0.12em] text-fg-brand">
                     {t(`about.${key}.title`)}
                   </p>
                   <p className="mt-3 text-body-sm leading-relaxed text-fg-secondary">
@@ -90,7 +90,7 @@ export function AboutPage() {
       <section className="py-16 lg:py-20">
         <Container size="xl">
           <Reveal className="mx-auto max-w-[760px]">
-            <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
+            <span className="text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
               {t('about.behave.kicker')}
             </span>
             <ul className="mt-5 flex flex-col gap-3">

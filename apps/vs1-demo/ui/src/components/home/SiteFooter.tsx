@@ -111,10 +111,10 @@ export function SiteFooter() {
         <div className="grid gap-10 py-16 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <Logo lockup="horizontal" tone="on-light" href="/" markClassName="h-9" />
-            <p className="mt-5 max-w-xs text-[14px] leading-relaxed text-fg-secondary">
+            <p className="mt-5 max-w-xs text-body-sm leading-relaxed text-fg-secondary">
               {t('footer.tagline')}
             </p>
-            <div className="mt-6 flex items-center gap-2 text-[13px] font-semibold">
+            <div className="mt-6 flex items-center gap-2 text-body-xs font-semibold">
               {supportedLngs.map((lng, i) => (
                 <span key={lng} className="flex items-center gap-2">
                   {i > 0 && <span className="text-fg-tertiary">·</span>}
@@ -140,13 +140,13 @@ export function SiteFooter() {
                 </span>
               ))}
             </div>
-            <p className="mt-6 text-[12px] text-fg-tertiary">{t('footer.notLawFirm')}</p>
+            <p className="mt-6 text-body-2xs text-fg-tertiary">{t('footer.notLawFirm')}</p>
           </div>
 
           <nav className="grid grid-cols-2 gap-8 sm:grid-cols-4 lg:col-span-8">
             {COLUMNS.map((col) => (
               <div key={col.key}>
-                <h3 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">
+                <h3 className="text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary">
                   {t(`footer.columns.${col.key}.title`)}
                 </h3>
                 <ul className="mt-4 space-y-3">
@@ -157,13 +157,13 @@ export function SiteFooter() {
                           <>
                             {linkLabel(`footer.columns.${col.key}.links.${l.key}`, l.fallback)}
                             {l.beta && (
-                              <span className="rounded-full bg-accent-50 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.06em] text-accent-800 ring-1 ring-inset ring-accent-200">
+                              <span className="rounded-full bg-accent-50 px-1.5 py-0.5 text-body-5xs font-semibold uppercase tracking-[0.06em] text-accent-800 ring-1 ring-inset ring-accent-200">
                                 {t('footer.beta')}
                               </span>
                             )}
                           </>
                         );
-                        const shared = 'inline-flex items-center gap-2 text-[14px]';
+                        const shared = 'inline-flex items-center gap-2 text-body-sm';
                         return l.href ? (
                           <a href={localize(l.href)} className={`${shared} text-fg-secondary transition-colors hover:text-fg`}>
                             {inner}
@@ -182,28 +182,28 @@ export function SiteFooter() {
 
         {/* Markets + legal disclaimer */}
         <div className="border-t border-stroke-subtle py-10 text-center">
-          <p className="mx-auto max-w-2xl text-[14px] text-fg-secondary">
+          <p className="mx-auto max-w-2xl text-body-sm text-fg-secondary">
             {t('footer.markets.pre')}
             <span className="font-semibold text-fg">{t('footer.markets.list')}</span>
             {t('footer.markets.post')}
           </p>
-          <p className="mx-auto mt-5 max-w-3xl text-[12px] leading-relaxed text-fg-tertiary">
+          <p className="mx-auto mt-5 max-w-3xl text-body-2xs leading-relaxed text-fg-tertiary">
             {t('footer.disclaimer')}
           </p>
         </div>
 
         {/* Bottom bar */}
         <div className="flex flex-col gap-4 border-t border-stroke-subtle py-6 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-[13px] text-fg-tertiary">{t('footer.copyright')}</p>
+          <p className="text-body-xs text-fg-tertiary">{t('footer.copyright')}</p>
           <ul className="flex flex-wrap gap-x-6 gap-y-2">
             {LEGAL.map((l) => (
               <li key={l.key}>
                 {l.href ? (
-                  <a href={localize(l.href)} className="text-[13px] text-fg-tertiary transition-colors hover:text-fg">
+                  <a href={localize(l.href)} className="text-body-xs text-fg-tertiary transition-colors hover:text-fg">
                     {t(`footer.legal.${l.key}`)}
                   </a>
                 ) : (
-                  <span className="text-[13px] text-fg-tertiary">{t(`footer.legal.${l.key}`)}</span>
+                  <span className="text-body-xs text-fg-tertiary">{t(`footer.legal.${l.key}`)}</span>
                 )}
               </li>
             ))}

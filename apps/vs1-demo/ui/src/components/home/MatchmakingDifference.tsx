@@ -55,21 +55,21 @@ function MatchCard({ m, className = '' }: { m: (typeof MATCHES)[number]; classNa
         <div className="flex items-center gap-3">
           <Avatar size="md" initials={m.initials} tone="soft" />
           <div>
-            <p className="text-[15px] font-semibold leading-tight text-fg">{m.name}</p>
-            <p className="text-[12px] text-fg-secondary">{t(`${base}.place`)}</p>
+            <p className="text-body-md font-semibold leading-tight text-fg">{m.name}</p>
+            <p className="text-body-2xs text-fg-secondary">{t(`${base}.place`)}</p>
           </div>
         </div>
         <PartnerStatusBadge status="verified" styleVariant="solid" label={t('badge.verified')} />
       </div>
-      <p className="mt-3 border-b border-stroke-subtle pb-2.5 text-[13px] text-fg-secondary">{t(`${base}.specialty`)}</p>
+      <p className="mt-3 border-b border-stroke-subtle pb-2.5 text-body-xs text-fg-secondary">{t(`${base}.specialty`)}</p>
       <div className="mt-2.5 flex flex-wrap gap-1.5">
         {[0, 1].map((i) => (
           <Tag key={i} tone="neutral">{t(`${base}.tags.${i}`)}</Tag>
         ))}
       </div>
-      <p className="mt-3 text-[16px] font-bold text-fg-brand">{t('risk.match', { pct: m.pct })}</p>
-      <p className="text-[12px] text-fg-secondary">{t(`${base}.covers`)}</p>
-      <p className="mt-3 flex items-center gap-1.5 border-t border-stroke-subtle pt-2.5 text-[11px] text-fg-tertiary">
+      <p className="mt-3 text-body font-bold text-fg-brand">{t('risk.match', { pct: m.pct })}</p>
+      <p className="text-body-2xs text-fg-secondary">{t(`${base}.covers`)}</p>
+      <p className="mt-3 flex items-center gap-1.5 border-t border-stroke-subtle pt-2.5 text-body-3xs text-fg-tertiary">
         {t(`${base}.response`)} · {m.rating} <Star size={10} className="-ml-0.5 fill-accent-500 text-accent-500" /> · {t(`${base}.engagements`)}
       </p>
     </div>
@@ -142,7 +142,7 @@ export function MatchmakingDifference() {
 
         {/* How it works timeline */}
         <div className="mt-20 lg:mt-24">
-          <p className="mx-auto text-center text-[13px] font-semibold uppercase tracking-[0.14em] text-fg-secondary">
+          <p className="mx-auto text-center text-body-xs font-semibold uppercase tracking-[0.14em] text-fg-secondary">
             {t('matchmaking.howItWorks.label')} <span className="mx-1 text-fg-tertiary">·</span> {t('matchmaking.howItWorks.sub')}
           </p>
           <div ref={stepsRef} className="relative mx-auto mt-10 grid max-w-5xl grid-cols-2 gap-x-5 gap-y-10 lg:grid-cols-4 lg:gap-6">
@@ -158,7 +158,7 @@ export function MatchmakingDifference() {
               >
                 <span
                   className={
-                    'grid h-[40px] w-[40px] place-items-center rounded-full text-[15px] font-semibold ' +
+                    'grid h-[40px] w-[40px] place-items-center rounded-full text-body-md font-semibold ' +
                     (s.tone === 'brand'
                       ? 'bg-brand text-fg-on-brand'
                       : s.tone === 'gold'
@@ -168,8 +168,8 @@ export function MatchmakingDifference() {
                 >
                   {s.n}
                 </span>
-                <p className="mt-4 text-[15px] font-bold text-fg">{t(`matchmaking.steps.${i}.title`)}</p>
-                <p className="mt-2 max-w-[240px] text-[13px] leading-relaxed text-fg-secondary">{t(`matchmaking.steps.${i}.desc`)}</p>
+                <p className="mt-4 text-body-md font-bold text-fg">{t(`matchmaking.steps.${i}.title`)}</p>
+                <p className="mt-2 max-w-[240px] text-body-xs leading-relaxed text-fg-secondary">{t(`matchmaking.steps.${i}.desc`)}</p>
               </motion.div>
             ))}
           </div>

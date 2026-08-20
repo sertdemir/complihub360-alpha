@@ -48,7 +48,7 @@ export function ProviderDetailPage() {
     <div className="min-h-screen bg-surface text-fg">
       <header className="flex items-center justify-between border-b border-stroke-subtle bg-surface-secondary px-8 py-4">
         <Logo className="h-[30px] w-auto" />
-        <button type="button" onClick={() => navigate(-1)} className="text-[13px] font-medium text-fg-brand hover:underline">
+        <button type="button" onClick={() => navigate(-1)} className="text-body-xs font-medium text-fg-brand hover:underline">
           ← {t('detail.back')}
         </button>
       </header>
@@ -58,64 +58,64 @@ export function ProviderDetailPage() {
           <div className="flex items-start justify-between gap-6">
             <div>
               <h1 className="font-serif text-[28px] font-bold leading-tight text-fg">{p.pseudonym_label}</h1>
-              <p className="mt-1 text-[13px] font-medium text-fg-tertiary">
+              <p className="mt-1 text-body-xs font-medium text-fg-tertiary">
                 {[p.region, p.active_since ? `${t('detail.activeSince')} ${p.active_since}` : null, p.completed_count ? `${p.completed_count} ${t('detail.mandates')}` : null].filter(Boolean).join(' · ')}
               </p>
             </div>
             <div className="flex shrink-0 flex-col items-end gap-2">
               {p.is_verified && (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-[#d4af37]/40 bg-[#d4af37]/10 px-3 py-1 text-[12px] font-medium text-[#96802a]">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-[#d4af37]/40 bg-[#d4af37]/10 px-3 py-1 text-body-2xs font-medium text-[#96802a]">
                   <ShieldCheck size={13} /> Verified Partner
                 </span>
               )}
-              {p.rating != null && <span className="text-[13px] font-semibold text-fg">★ {p.rating} · {p.completed_count ?? 0} {t('detail.mandates')}</span>}
+              {p.rating != null && <span className="text-body-xs font-semibold text-fg">★ {p.rating} · {p.completed_count ?? 0} {t('detail.mandates')}</span>}
             </div>
           </div>
-          <p className="mt-4 text-[13px] text-fg-secondary">{t('detail.anonNote')}</p>
+          <p className="mt-4 text-body-xs text-fg-secondary">{t('detail.anonNote')}</p>
         </section>
 
         <div className="grid gap-6 lg:grid-cols-[1fr,360px]">
           <div className="space-y-6">
             {/* Specializations */}
             <section className="rounded-2xl border border-stroke-subtle bg-surface-secondary p-7">
-              <h2 className="text-[16px] font-semibold text-fg">{t('detail.specsTitle')}</h2>
+              <h2 className="text-body font-semibold text-fg">{t('detail.specsTitle')}</h2>
               <div className="mt-4 flex flex-wrap gap-2">
                 {p.specializations.map((s) => (
-                  <span key={s} className="rounded-full border border-stroke-subtle px-3 py-1.5 text-[13px] text-fg-secondary">{s}</span>
+                  <span key={s} className="rounded-full border border-stroke-subtle px-3 py-1.5 text-body-xs text-fg-secondary">{s}</span>
                 ))}
               </div>
-              <p className="mt-4 text-[13px] text-fg-tertiary">
+              <p className="mt-4 text-body-xs text-fg-tertiary">
                 {t('detail.coverage')}: {p.countries_supported.join(' · ')} · {t('detail.languages')}: {p.languages.join(' · ')}
                 {p.avg_response_hours != null ? ` · Ø ${p.avg_response_hours} Std.` : ''}
               </p>
             </section>
             {/* Pricing table — the stage-2 reveal */}
             <section className="rounded-2xl border border-stroke-subtle bg-surface-secondary p-7">
-              <h2 className="text-[16px] font-semibold text-fg">{t('detail.pricingTitle')}</h2>
-              <p className="mt-1 text-[12px] text-fg-tertiary">{t('detail.billing')}: {BILLING_LABEL[p.billing_model]} · {t('detail.pricingSub')}</p>
+              <h2 className="text-body font-semibold text-fg">{t('detail.pricingTitle')}</h2>
+              <p className="mt-1 text-body-2xs text-fg-tertiary">{t('detail.billing')}: {BILLING_LABEL[p.billing_model]} · {t('detail.pricingSub')}</p>
               <div className="mt-4 divide-y divide-stroke-subtle">
                 {(p.pricing_table ?? []).map((row) => (
                   <div key={row.service} className="flex items-center justify-between gap-4 py-3.5">
-                    <span className="text-[14px] text-fg">{row.service}</span>
-                    <span className="text-[14px] font-semibold text-fg-brand">{row.price}</span>
+                    <span className="text-body-sm text-fg">{row.service}</span>
+                    <span className="text-body-sm font-semibold text-fg-brand">{row.price}</span>
                   </div>
                 ))}
-                {!p.pricing_table?.length && <p className="py-3 text-[13px] text-fg-tertiary">{t('detail.pricingOnRequest')}</p>}
+                {!p.pricing_table?.length && <p className="py-3 text-body-xs text-fg-tertiary">{t('detail.pricingOnRequest')}</p>}
               </div>
             </section>
           </div>
           {/* Booking box — all settings happen on the scheduling page */}
           <aside className="h-fit rounded-2xl border border-brand bg-surface-secondary p-7 shadow-lg shadow-brand/10">
-            <h2 className="text-[16px] font-semibold text-fg">{t('detail.bookTitle')}</h2>
-            <p className="mt-1 text-[12px] text-fg-tertiary">{t('detail.bookSub')}</p>
+            <h2 className="text-body font-semibold text-fg">{t('detail.bookTitle')}</h2>
+            <p className="mt-1 text-body-2xs text-fg-tertiary">{t('detail.bookSub')}</p>
             <button
               type="button"
               onClick={() => navigate(`/${locale}/provider/${key}/schedule`)}
-              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand px-4 py-3 text-[14px] font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5"
+              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand px-4 py-3 text-body-sm font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5"
             >
               {t('detail.bookCta')} <ArrowRight size={15} />
             </button>
-            <p className="mt-3 text-center text-[11px] text-fg-tertiary">{t('detail.revealNote')}</p>
+            <p className="mt-3 text-center text-body-3xs text-fg-tertiary">{t('detail.revealNote')}</p>
           </aside>
         </div>
       </main>

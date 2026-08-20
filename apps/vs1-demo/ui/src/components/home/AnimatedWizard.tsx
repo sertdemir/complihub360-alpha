@@ -167,13 +167,13 @@ function SummaryRow({ label, value, onEdit }: { label: string; value: string[]; 
   return (
     <div className="flex items-start justify-between gap-4 border-b border-stroke-subtle py-5 last:border-0">
       <div className="min-w-0 text-left">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">{label}</p>
-        <p className="mt-1.5 text-[15px] font-medium text-fg">{value.length ? value.join(' · ') : '—'}</p>
+        <p className="text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary">{label}</p>
+        <p className="mt-1.5 text-body-md font-medium text-fg">{value.length ? value.join(' · ') : '—'}</p>
       </div>
       <button
         type="button"
         onClick={onEdit}
-        className="shrink-0 text-[13px] font-semibold text-fg-brand transition-colors hover:text-brand"
+        className="shrink-0 text-body-xs font-semibold text-fg-brand transition-colors hover:text-brand"
       >
         {t('wizard.review.edit')}
       </button>
@@ -205,7 +205,7 @@ function StepRail({ current, spacious = false }: { current: number; spacious?: b
               />
               <span
                 className={
-                  (spacious ? 'text-[13px] ' : 'text-[10px] ') +
+                  (spacious ? 'text-body-xs ' : 'text-body-4xs ') +
                   'font-semibold ' +
                   (state === 'upcoming' ? 'text-fg-tertiary' : 'text-fg')
                 }
@@ -400,7 +400,7 @@ export function AnimatedWizard({
             onClick={interactive ? () => setSaveOpen(true) : undefined}
             className={
               'flex items-center gap-0.5 font-semibold uppercase tracking-wide text-fg-brand ' +
-              (sp ? 'text-[12px]' : 'text-[10px]') +
+              (sp ? 'text-body-2xs' : 'text-body-4xs') +
               (interactive ? ' transition-colors hover:text-brand' : '')
             }
           >
@@ -424,7 +424,7 @@ export function AnimatedWizard({
             <p
               className={
                 'leading-relaxed text-fg-secondary ' +
-                (sp ? 'mx-auto mt-3 max-w-xl text-[16px]' : 'mt-2 max-w-md text-[12px]')
+                (sp ? 'mx-auto mt-3 max-w-xl text-body' : 'mt-2 max-w-md text-body-2xs')
               }
             >
               {isReview ? t('wizard.review.subtitle') : t(`wizard.steps.${step.key}.subtitle`)}
@@ -439,7 +439,7 @@ export function AnimatedWizard({
                 <SummaryRow label={t('wizard.review.operations')} value={reviewOps} onEdit={() => editStep(1)} />
                 <SummaryRow label={t('wizard.review.domains')} value={reviewDomains} onEdit={() => editStep(2)} />
               </div>
-              <p className="mt-8 text-center text-[14px] text-fg-tertiary">
+              <p className="mt-8 text-center text-body-sm text-fg-tertiary">
                 {t('wizard.review.trust')}
               </p>
             </>
@@ -489,7 +489,7 @@ export function AnimatedWizard({
                           {extraMarkets.map((id) => (
                             <span
                               key={id}
-                              className="inline-flex items-center gap-1 rounded-full bg-brand-light px-2 py-0.5 text-[12px] font-medium text-fg-brand"
+                              className="inline-flex items-center gap-1 rounded-full bg-brand-light px-2 py-0.5 text-body-2xs font-medium text-fg-brand"
                             >
                               {marketLabel(id)}
                               <button
@@ -532,10 +532,10 @@ export function AnimatedWizard({
                       )}
                     </span>
                   </div>
-                  <p className={'font-semibold leading-tight text-fg ' + (sp ? 'mt-3 text-[16px]' : 'mt-2.5 text-[13px]')}>
+                  <p className={'font-semibold leading-tight text-fg ' + (sp ? 'mt-3 text-body' : 'mt-2.5 text-body-xs')}>
                     {cardTitle(c)}
                   </p>
-                  <p className={'leading-snug text-fg-secondary ' + (sp ? 'mt-1 text-[14px]' : 'mt-1 text-[11px]')}>
+                  <p className={'leading-snug text-fg-secondary ' + (sp ? 'mt-1 text-body-sm' : 'mt-1 text-body-3xs')}>
                     {t(`wizard.cards.${c.key}.desc`)}
                   </p>
                 </div>
@@ -546,7 +546,7 @@ export function AnimatedWizard({
 
           {/* Compact: route hint sits in the body; spacious moves it into the footer. */}
           {!sp && (
-            <p className="mx-auto mt-auto pt-4 text-center text-[11px] text-fg-tertiary">
+            <p className="mx-auto mt-auto pt-4 text-center text-body-3xs text-fg-tertiary">
               {t('wizard.skipHint')}
             </p>
           )}
@@ -561,7 +561,7 @@ export function AnimatedWizard({
         }
       >
         {sp && !isReview && (
-          <p className="pointer-events-none absolute left-1/2 hidden -translate-x-1/2 px-4 text-center text-[13px] text-fg-tertiary lg:block">
+          <p className="pointer-events-none absolute left-1/2 hidden -translate-x-1/2 px-4 text-center text-body-xs text-fg-tertiary lg:block">
             {t('wizard.skipHint')}
           </p>
         )}
@@ -573,7 +573,7 @@ export function AnimatedWizard({
               disabled={stepIndex === 0}
               className={
                 'inline-flex items-center gap-1.5 font-medium text-fg-tertiary transition-colors hover:text-fg disabled:pointer-events-none disabled:opacity-40 ' +
-                (sp ? 'text-[14px]' : 'text-[13px]')
+                (sp ? 'text-body-sm' : 'text-body-xs')
               }
             >
               <ArrowLeft size={sp ? 16 : 15} /> {t('wizard.back')}
@@ -583,7 +583,7 @@ export function AnimatedWizard({
               onClick={goNext}
               className={
                 'inline-flex items-center gap-1.5 rounded-lg font-semibold transition-transform duration-200 hover:-translate-y-0.5 ' +
-                (sp ? 'px-6 py-3 text-[15px]' : 'px-5 py-2.5 text-[13px]') +
+                (sp ? 'px-6 py-3 text-body-md' : 'px-5 py-2.5 text-body-xs') +
                 ' bg-brand text-fg-on-brand'
               }
             >
@@ -592,12 +592,12 @@ export function AnimatedWizard({
           </>
         ) : (
           <>
-            <span className="flex items-center gap-1.5 text-[13px] font-medium text-fg-tertiary">
+            <span className="flex items-center gap-1.5 text-body-xs font-medium text-fg-tertiary">
               <ArrowLeft size={15} /> {t('wizard.back')}
             </span>
             <span
               ref={setTarget(FOOTER)}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2 text-[13px] font-semibold text-fg-on-brand"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2 text-body-xs font-semibold text-fg-on-brand"
             >
               {t(`wizard.footer.${step.footerKey}`)} <ArrowRight size={14} />
             </span>

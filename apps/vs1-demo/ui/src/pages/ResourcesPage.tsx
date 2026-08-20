@@ -80,7 +80,7 @@ export function ResourcesPage() {
                   <p className="font-serif text-[1.25rem] font-bold leading-snug text-fg">
                     {t(`resources.entries.${key}.title`)}
                   </p>
-                  <p className="mt-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-fg-tertiary">
+                  <p className="mt-2 text-body-2xs font-semibold uppercase tracking-[0.12em] text-fg-tertiary">
                     {t(`resources.entries.${key}.meta`, counts)}
                   </p>
                   <p className="mt-3 flex-1 text-body-sm leading-relaxed text-fg-secondary">
@@ -102,7 +102,7 @@ export function ResourcesPage() {
       <section className="bg-surface-secondary py-16 lg:py-20">
         <Container size="xl">
           <Reveal className="mx-auto max-w-[760px]">
-            <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
+            <span className="text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
               {t('resources.gap.kicker')}
             </span>
             <p className="mt-2 font-serif text-[1.75rem] font-bold leading-snug text-fg">

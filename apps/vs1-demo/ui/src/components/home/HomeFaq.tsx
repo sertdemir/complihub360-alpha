@@ -38,7 +38,7 @@ function FaqRow({ index, open, onToggle }: { index: number; open: boolean; onTog
             transition={{ duration: 0.25, ease: 'easeOut' }}
             className="overflow-hidden"
           >
-            <p className="max-w-[680px] pb-6 text-[15px] leading-relaxed text-fg-secondary">{t(`faq.items.${index}.a`)}</p>
+            <p className="max-w-[680px] pb-6 text-body-md leading-relaxed text-fg-secondary">{t(`faq.items.${index}.a`)}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -61,7 +61,7 @@ export function HomeFaq() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
         >
-          <span className="inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-fg-brand">
+          <span className="inline-flex items-center gap-2 text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-brand">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-current opacity-70" />
             {t('faq.label')}
           </span>

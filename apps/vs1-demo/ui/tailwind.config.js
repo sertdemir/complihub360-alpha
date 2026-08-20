@@ -223,6 +223,19 @@ export default {
                 'body': ['1rem', { lineHeight: '1.6' }],
                 'body-sm': ['0.875rem', { lineHeight: '1.6' }],
                 'body-xs': ['0.8125rem', { lineHeight: '1.6' }],
+                /* Neutrale UI-Groessen, ergaenzt 20.08. Die semantischen Kleinstufen
+                   caption (12px) und eyebrow (11px) tragen Laufweite und eine engere
+                   Zeilenhoehe — genau deshalb griffen 275 Stellen auf der Marketing-
+                   Flaeche stattdessen zu text-[Npx]. Diese Stufen bilden ab, was das
+                   Produkt tatsaechlich benutzt: dieselben Groessen bei Zeilenhoehe 1.6
+                   und ohne Tracking, im laufenden Build gemessen. Damit ist die Skala
+                   unterhalb 17px vollstaendig — Voraussetzung dafuer, den freien Wert
+                   dort per Lint-Regel zu verbieten. */
+                'body-md': ['0.9375rem', { lineHeight: '1.6' }],    /* 15px */
+                'body-2xs': ['0.75rem', { lineHeight: '1.6' }],     /* 12px */
+                'body-3xs': ['0.6875rem', { lineHeight: '1.6' }],   /* 11px */
+                'body-4xs': ['0.625rem', { lineHeight: '1.6' }],    /* 10px */
+                'body-5xs': ['0.5625rem', { lineHeight: '1.6' }],   /*  9px */
                 'label': ['0.875rem', { lineHeight: '1.4' }],
                 'ui-small': ['0.875rem', { lineHeight: '1.4' }],
                 'caption': ['0.75rem', { lineHeight: '1.45', letterSpacing: '0.01em' }],
