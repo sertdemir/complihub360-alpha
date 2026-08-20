@@ -30,7 +30,10 @@ function JourneyStepper() {
             <span
               className={
                 'h-[11px] w-[11px] shrink-0 rounded-full ' +
-                (s.done ? 'bg-brand' : 'border-2 border-primary-950/35 bg-transparent')
+                // primary-500, not bg-brand: the backdrop below is fixed-light in both
+                // themes, so a flipping token turns this dot into bright teal on a pale
+                // gold ground (1.78:1). Every sibling here is already a fixed primitive.
+                (s.done ? 'bg-primary-500' : 'border-2 border-primary-950/35 bg-transparent')
               }
             />
             {i < JOURNEY.length - 1 && <span className="h-px flex-1 bg-primary-950/25" />}
@@ -83,11 +86,21 @@ export function EntryDoor() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
-                className="absolute inset-0 z-10 flex items-center justify-center bg-white/30 px-6 backdrop-blur-md"
+                className="absolute inset-0 z-10 flex items-center justify-center bg-white/30 px-6 backdrop-blur-md dark:bg-white/80"
               >
-                {/* Der Glas-Backdrop bleibt in beiden Themes hell (bg-white/30 über einem hellen Bild),
-                    deshalb ist der Text hier bewusst hartcodiert dunkel und KEIN Theme-Token — mit
-                    text-fg fiel er im Dark-Mode auf 1,4:1. */}
+                {/* Der Text hier ist bewusst hartcodiert dunkel und KEIN Theme-Token — mit
+                    text-fg fiel er im Dark-Mode auf 1,4:1. Das setzt voraus, dass der
+                    Glas-Backdrop in BEIDEN Themes hell ist, und genau das stimmte nicht:
+                    unter dem Schleier liegt nicht die Sektion, sondern die Wizard-Karte
+                    (ein GESCHWISTER, kein Vorfahr) mit bg-surface — die kippt. bg-white/30
+                    darüber ergab im Dark #626973, ein Mittelgrau, auf dem der 12-px-Text
+                    3,22:1 und der CTA 1,77:1 maßen.
+                    Wer das nachmisst: ein Scanner, der den DOM nach OBEN läuft, landet bei
+                    der Sektion und misst den falschen Grund. Der echte Malstapel steht in
+                    #57; hier wird er aus dem Geschwister gerechnet.
+                    dark:bg-white/80 macht die Voraussetzung wahr — Grund #D2D4D7, CTA 7,0:1,
+                    Fließtext 7,3:1, 12-px-Text 12,6:1. Im Light ändert sich nichts: weiß
+                    über weiß bleibt weiß. */}
                 <div className="flex max-w-xl flex-col items-center text-center">
                   <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-primary-500">{t('entryDoor.eyebrow')}</span>
                   <h2 className="mt-4 font-serif text-[2rem] font-bold leading-[1.1] tracking-tight text-neutral-900 sm:text-[2.75rem] lg:text-[3rem]">
@@ -104,7 +117,7 @@ export function EntryDoor() {
                   <button
                     type="button"
                     onClick={() => setStarted(true)}
-                    className="mt-9 inline-flex items-center gap-2 rounded-xl bg-brand px-7 py-3.5 text-[15px] font-semibold text-fg-on-brand shadow-[0_18px_34px_-14px_rgba(0,77,64,0.65)] transition-transform duration-200 hover:-translate-y-0.5"
+                    className="mt-9 inline-flex items-center gap-2 rounded-xl bg-primary-500 px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_18px_34px_-14px_rgba(0,77,64,0.65)] transition-transform duration-200 hover:-translate-y-0.5"
                   >
                     {t('entryDoor.cta')} <ArrowRight size={17} />
                   </button>
