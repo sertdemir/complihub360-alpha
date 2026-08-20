@@ -83,7 +83,7 @@ export function PerformancePage() {
             </div>
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{t('performance.whatMovesRank')}</p>
-              <div className="mt-2 divide-y divide-white/5">
+              <div className="mt-2 divide-y divide-elevate/5">
                 {RANK_FACTORS.map((r) => (
                   <div key={r.factorKey} className="flex items-center gap-3 py-2">
                     <span className="w-56 shrink-0 text-[13px] text-fg">{t(r.factorKey)}</span>

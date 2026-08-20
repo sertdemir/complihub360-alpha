@@ -35,7 +35,7 @@ export function SearchDrawer({ open, onClose }: { open: boolean; onClose: () => 
   return (
     <Drawer forceDark open={open} onClose={onClose} side="right" size="md" eyebrow={t('searchDrawer.eyebrow')} title={t('searchDrawer.title')}>
       <div className="space-y-4">
-        <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 focus-within:border-fg-brand">
+        <div className="flex items-center gap-2 rounded-lg border border-elevate/10 bg-elevate/5 px-3 py-2.5 focus-within:border-fg-brand">
           <Search size={15} className="shrink-0 text-fg-tertiary" />
           <input
             autoFocus
@@ -58,7 +58,7 @@ export function SearchDrawer({ open, onClose }: { open: boolean; onClose: () => 
               key={r.id}
               type="button"
               onClick={() => { onClose(); navigate(`/${locale}/partner-dashboard/requests?thread=${r.id}`); }}
-              className="flex w-full items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-3.5 py-3 text-left transition-colors hover:border-fg-brand/50"
+              className="flex w-full items-center justify-between gap-3 rounded-lg border border-elevate/10 bg-elevate/[0.03] px-3.5 py-3 text-left transition-colors hover:border-fg-brand/50"
             >
               <span>
                 <span className="block text-[13px] font-semibold text-fg">{r.idLine}</span>
@@ -93,7 +93,7 @@ export function RankingImpactDrawer({ open, onClose }: { open: boolean; onClose:
               <span className="text-[13px] font-medium text-fg">{t(f.labelKey)}</span>
               <span className="text-[12px] font-bold text-fg-accent">{f.weight}%</span>
             </div>
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-elevate/10">
               <div className="h-full rounded-full bg-[#d4af37]" style={{ width: `${f.weight}%` }} />
             </div>
             <p className="mt-1 text-[11px] text-fg-tertiary">{t(f.noteKey)}</p>
@@ -123,7 +123,7 @@ export function HelpDrawer({ open, onClose }: { open: boolean; onClose: () => vo
       }>
       <div className="space-y-2">
         {TOPICS.map((x) => (
-          <div key={x.titleKey} className="rounded-lg border border-white/10 bg-white/[0.03] px-3.5 py-3">
+          <div key={x.titleKey} className="rounded-lg border border-elevate/10 bg-elevate/[0.03] px-3.5 py-3">
             <p className="text-[13px] font-semibold text-fg">{t(x.titleKey)}</p>
             <p className="mt-0.5 text-[11px] leading-relaxed text-fg-tertiary">{t(x.descKey)}</p>
           </div>

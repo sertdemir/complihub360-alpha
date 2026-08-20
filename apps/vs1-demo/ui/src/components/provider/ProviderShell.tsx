@@ -147,7 +147,7 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
       </Sidebar>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-15 min-h-[60px] shrink-0 items-center justify-end gap-3 border-b border-white/10 px-6">
+        <header className="flex h-15 min-h-[60px] shrink-0 items-center justify-end gap-3 border-b border-elevate/10 px-6">
           <button type="button" aria-label={t('shell.searchAria')} onClick={() => setSearchOpen(true)} className="mr-1 text-fg-tertiary transition-colors hover:text-fg">
             <Search size={18} />
           </button>

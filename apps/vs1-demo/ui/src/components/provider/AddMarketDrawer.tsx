@@ -94,7 +94,7 @@ export function AddMarketDrawer({ open, onClose, onAdded }: AddMarketDrawerProps
               onClick={() => setSelected(c.code === selected ? null : c.code)}
               className={cn(
                 'flex w-full items-center justify-between gap-3 rounded-lg border px-3.5 py-3 text-left transition-colors',
-                selected === c.code ? 'border-fg-brand bg-fg-brand/10' : 'border-white/10 bg-white/[0.03] hover:border-white/25',
+                selected === c.code ? 'border-fg-brand bg-fg-brand/10' : 'border-elevate/10 bg-elevate/[0.03] hover:border-elevate/25',
               )}
             >
               <span className="flex min-w-0 items-center gap-3">
