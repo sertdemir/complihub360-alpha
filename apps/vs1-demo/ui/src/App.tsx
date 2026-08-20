@@ -119,6 +119,18 @@ function LocaleLayout() {
     return <Outlet />;
 }
 
+function SkipToContent() {
+    const { t } = useTranslation('common');
+    return (
+        <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-brand focus:px-4 focus:py-2 focus:text-[15px] focus:font-semibold focus:text-fg-on-brand focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-stroke-focus"
+        >
+            {t('a11y.skipToContent', { defaultValue: 'Skip to content' })}
+        </a>
+    );
+}
+
 function AppContent() {
     const location = useLocation();
 
@@ -128,7 +140,16 @@ function AppContent() {
 
     return (
         <>
+            {/* Bypass Blocks (WCAG 2.4.1). Bis 20.08. gab es auf KEINER Seite einen
+                Weg an den ~10 Kopfzeilen-Links vorbei, und fuenf Seiten hatten
+                nicht einmal ein <main>, an dem eine Landmark-Navigation greifen
+                koennte. Das Ziel ist deshalb ein eigener Anker direkt vor den
+                Routen — der funktioniert unabhaengig davon, was die Seite selbst
+                fuer eine Struktur mitbringt. tabIndex={-1} macht ihn
+                fokussierbar, ohne ihn in die Tab-Reihenfolge zu haengen. */}
+            <SkipToContent />
             <SiteHeader />
+            <div id="main-content" tabIndex={-1} className="outline-none">
             <Routes location={location}>
                 <Route path="/:locale" element={<LocaleLayout />}>
                     {/* Public pages */}
@@ -223,6 +244,7 @@ function AppContent() {
                 <Route path="/" element={<RootRedirect />} />
                 <Route path="*" element={<RootRedirect />} />
             </Routes>
+            </div>
 
         </>
     );

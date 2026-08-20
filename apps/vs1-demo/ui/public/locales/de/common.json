@@ -1171,5 +1171,8 @@
       "title": "Sehen Sie, was für Ihr Unternehmen gilt.",
       "lead": "Die Ermittlung ist kostenlos, braucht kein Konto und dauert wenige Minuten."
     }
+  },
+  "a11y": {
+    "skipToContent": "Zum Inhalt springen"
   }
 }

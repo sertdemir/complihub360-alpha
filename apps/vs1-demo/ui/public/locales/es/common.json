@@ -1171,5 +1171,8 @@
       "title": "Vea qué se aplica a su empresa.",
       "lead": "El análisis es gratuito, no requiere cuenta y se completa en unos minutos."
     }
+  },
+  "a11y": {
+    "skipToContent": "Saltar al contenido"
   }
 }

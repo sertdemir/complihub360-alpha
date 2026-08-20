@@ -1171,5 +1171,8 @@
       "title": "İşletmeniz için neyin geçerli olduğunu görün.",
       "lead": "Değerlendirme ücretsizdir, hesap gerektirmez ve birkaç dakika sürer."
     }
+  },
+  "a11y": {
+    "skipToContent": "İçeriğe geç"
   }
 }

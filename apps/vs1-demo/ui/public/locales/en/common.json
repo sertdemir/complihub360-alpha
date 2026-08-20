@@ -1171,5 +1171,8 @@
       "title": "See what applies to your business.",
       "lead": "The assessment is free, needs no account and takes a few minutes."
     }
+  },
+  "a11y": {
+    "skipToContent": "Skip to content"
   }
 }

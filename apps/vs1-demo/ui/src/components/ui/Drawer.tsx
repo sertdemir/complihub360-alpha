@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 
 // ─── Drawer (Side Sheet) ──────────────────────────────────────────────────────
 // Mirrors the Compass "Drawer Surface" (948:449). An overlay panel sliding in from
@@ -41,6 +42,11 @@ export interface DrawerProps {
 }
 
 export function Drawer({ open, onClose, side = 'right', size = 'md', title, eyebrow, headerExtra, footer, children, className, forceDark = false }: DrawerProps) {
+  // Escape und Scroll-Lock gab es hier schon; der FOKUS fehlte. Ohne ihn blieb
+  // er beim Ausloeser stehen, der erste Tab landete HINTER dem Panel, und beim
+  // Schliessen kam er nicht zurueck. Zehn Komponenten haengen an diesem Drawer.
+  const panelRef = useFocusTrap<HTMLDivElement>(open);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
@@ -76,6 +82,8 @@ export function Drawer({ open, onClose, side = 'right', size = 'md', title, eyeb
             )}
           >
             <motion.div
+              ref={panelRef}
+              tabIndex={-1}
               role="dialog"
               aria-modal="true"
               className={cn(
