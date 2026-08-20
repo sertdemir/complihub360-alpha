@@ -47,7 +47,7 @@ export function SavedProvidersPage() {
           {PROVIDERS.map((p) => (
             <EntityCard
               key={p.initials}
-              avatar={<span className="grid h-10 w-10 place-items-center rounded-full bg-[#004d40]/40 text-[12px] font-bold text-[#2cc0ad]">{p.initials}</span>}
+              avatar={<span className="grid h-10 w-10 place-items-center rounded-full bg-[#004d40]/40 text-[12px] font-bold text-fg-brand">{p.initials}</span>}
               name={p.name}
               badge={<Tag tone="brand">✓ PARTNER</Tag>}
               meta={p.sub}

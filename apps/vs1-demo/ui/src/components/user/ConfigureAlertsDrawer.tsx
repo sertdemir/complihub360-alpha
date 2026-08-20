@@ -83,7 +83,7 @@ export function ConfigureAlertsDrawer({ open, onClose }: { open: boolean; onClos
               key={tg.key}
               type="button"
               onClick={() => setPrefs((p) => ({ ...p, [tg.key]: !on }))}
-              className="flex w-full items-start justify-between gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3 text-left transition-colors hover:border-white/25"
+              className="flex w-full items-start justify-between gap-3 rounded-lg border border-elevate/10 bg-elevate/[0.03] px-4 py-3 text-left transition-colors hover:border-elevate/25"
             >
               <span className="min-w-0">
                 <span className="block text-[13px] font-semibold text-fg">{t(`configureAlerts.toggles.${tg.i18nKey}.label`)}</span>
@@ -91,7 +91,7 @@ export function ConfigureAlertsDrawer({ open, onClose }: { open: boolean; onClos
               </span>
               <span className={
                 'mt-0.5 flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors ' +
-                (on ? 'justify-end bg-fg-brand' : 'justify-start bg-white/15')
+                (on ? 'justify-end bg-fg-brand' : 'justify-start bg-elevate/15')
               }>
                 <span className="h-4 w-4 rounded-full bg-white" />
               </span>

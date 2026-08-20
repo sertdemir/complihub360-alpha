@@ -76,6 +76,8 @@ export default {
                     DEFAULT: 'rgb(var(--color-bg-accent) / <alpha-value>)',
                     light: 'rgb(var(--color-bg-accent-light) / <alpha-value>)',
                 },
+                /* Translucent depth overlay — see index.css. Flips direction per theme. */
+                elevate: 'rgb(var(--color-elevate) / <alpha-value>)',
                 surface: {
                     DEFAULT: 'rgb(var(--color-bg-primary) / <alpha-value>)',
                     secondary: 'rgb(var(--color-bg-secondary) / <alpha-value>)',

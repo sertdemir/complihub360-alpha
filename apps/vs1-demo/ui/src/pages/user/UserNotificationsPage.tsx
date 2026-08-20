@@ -119,7 +119,7 @@ export function UserNotificationsPage() {
                 unread={n.unread}
                 interactive={!!n.engagementId || !!n.bookingId}
                 onClick={n.engagementId || n.bookingId ? () => openItem(n) : undefined}
-                avatar={<span className="grid h-9 w-9 place-items-center rounded-full bg-white/[0.06] text-[13px] text-fg-tertiary">🔔</span>}
+                avatar={<span className="grid h-9 w-9 place-items-center rounded-full bg-elevate/[0.06] text-[13px] text-fg-tertiary">🔔</span>}
               />
             ))}
           </section>

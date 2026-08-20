@@ -49,7 +49,7 @@ export function UserSearchDrawer({ open, onClose }: { open: boolean; onClose: ()
   return (
     <Drawer forceDark open={open} onClose={onClose} side="right" size="md" eyebrow={t('userSearch.eyebrow')} title={t('userSearch.title')}>
       <div className="space-y-4">
-        <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 focus-within:border-fg-brand">
+        <div className="flex items-center gap-2 rounded-lg border border-elevate/10 bg-elevate/5 px-3 py-2.5 focus-within:border-fg-brand">
           <Search size={15} className="shrink-0 text-fg-tertiary" />
           <input
             autoFocus
@@ -73,7 +73,7 @@ export function UserSearchDrawer({ open, onClose }: { open: boolean; onClose: ()
                 key={r.uuid}
                 type="button"
                 onClick={() => { onClose(); navigate(`/${locale}/dashboard/requests?thread=${r.uuid}`); }}
-                className="flex w-full items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-3.5 py-3 text-left transition-colors hover:border-fg-brand/50"
+                className="flex w-full items-center justify-between gap-3 rounded-lg border border-elevate/10 bg-elevate/[0.03] px-3.5 py-3 text-left transition-colors hover:border-fg-brand/50"
               >
                 <span className="min-w-0">
                   <span className="block truncate text-[13px] font-semibold text-fg">{r.company}</span>
@@ -93,7 +93,7 @@ export function UserSearchDrawer({ open, onClose }: { open: boolean; onClose: ()
                 key={s.id}
                 type="button"
                 onClick={() => { onClose(); navigate(`/${locale}/dashboard/sessions`); }}
-                className="flex w-full items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-3.5 py-3 text-left transition-colors hover:border-fg-brand/50"
+                className="flex w-full items-center justify-between gap-3 rounded-lg border border-elevate/10 bg-elevate/[0.03] px-3.5 py-3 text-left transition-colors hover:border-fg-brand/50"
               >
                 <span className="min-w-0">
                   <span className="block truncate text-[13px] font-semibold text-fg">

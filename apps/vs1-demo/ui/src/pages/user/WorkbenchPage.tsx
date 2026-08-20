@@ -136,7 +136,7 @@ export function WorkbenchPage() {
       <div className="mx-auto max-w-[1140px] space-y-6">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-full bg-[#d4af37]/15 text-[16px] text-[#d4af37]">€</span>
+            <span className="grid h-10 w-10 place-items-center rounded-full bg-brand-accent/15 text-[16px] text-fg-accent">€</span>
             <div>
               <h1 className="font-serif text-[28px] font-bold leading-tight text-fg">
                 <Trans t={t} i18nKey="workbench.title" values={{ domain: domainDisplay }} components={{ accent: <span className="text-fg-accent" /> }} />
@@ -201,7 +201,7 @@ export function WorkbenchPage() {
               {PROVIDERS.map((p) => (
                 <EntityCard
                   key={p.key}
-                  avatar={<span className="grid h-9 w-9 place-items-center rounded-full bg-[#004d40]/40 text-[11px] font-bold text-[#2cc0ad]">{p.initials}</span>}
+                  avatar={<span className="grid h-9 w-9 place-items-center rounded-full bg-[#004d40]/40 text-[11px] font-bold text-fg-brand">{p.initials}</span>}
                   name={p.name}
                   badge={<Tag tone="brand">✓ PARTNER</Tag>}
                   meta={<span className="block text-[11px] leading-relaxed">{p.sub}</span>}

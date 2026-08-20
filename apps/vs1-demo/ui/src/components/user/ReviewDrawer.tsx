@@ -65,7 +65,7 @@ export function ReviewDrawer({ target, onClose, onSubmitted }: {
           <div className="flex items-center gap-1.5">
             {[1, 2, 3, 4, 5].map((n) => (
               <button key={n} type="button" aria-label={`${n}`} onClick={() => setRating(n)}
-                className={`text-[26px] leading-none transition-colors ${n <= rating ? 'text-[#d4af37]' : 'text-white/20 hover:text-white/40'}`}>
+                className={`text-[26px] leading-none transition-colors ${n <= rating ? 'text-fg-accent' : 'text-white/20 hover:text-white/40'}`}>
                 ★
               </button>
             ))}

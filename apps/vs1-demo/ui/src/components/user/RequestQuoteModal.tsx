@@ -75,10 +75,10 @@ export function RequestQuoteModal({ provider, country, category, domainLabel, re
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 8 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="w-full max-w-[540px] rounded-xl border border-white/10 bg-[#1f2937] shadow-2xl shadow-black/50"
+        className="w-full max-w-[540px] rounded-xl border border-elevate/10 bg-surface shadow-2xl shadow-black/50"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-start justify-between border-b border-white/10 px-6 py-5">
+        <div className="flex items-start justify-between border-b border-elevate/10 px-6 py-5">
           <div>
             <h2 className="font-serif text-[20px] font-semibold text-fg">
               <Trans t={t} i18nKey="requestQuote.title" components={{ accent: <span className="text-fg-accent" /> }} />
@@ -116,7 +116,7 @@ export function RequestQuoteModal({ provider, country, category, domainLabel, re
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder={t('requestQuote.messagePlaceholder')}
-                  className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-[13px] text-fg placeholder:text-fg-tertiary focus:border-fg-brand focus:outline-none"
+                  className="w-full resize-none rounded-lg border border-elevate/10 bg-elevate/5 px-3 py-2.5 text-[13px] text-fg placeholder:text-fg-tertiary focus:border-fg-brand focus:outline-none"
                 />
               </div>
               <p className="text-[11px] leading-relaxed text-fg-tertiary">
@@ -128,7 +128,7 @@ export function RequestQuoteModal({ provider, country, category, domainLabel, re
                 </p>
               )}
             </div>
-            <div className="flex items-center justify-end gap-2 border-t border-white/10 px-6 py-4">
+            <div className="flex items-center justify-end gap-2 border-t border-elevate/10 px-6 py-4">
               <Button variant="ghost" size="sm" onClick={onClose}>{t('shared.cancel')}</Button>
               <Button variant="accent" size="sm" onClick={submit} disabled={phase === 'sending' || message.trim().length < 10}>
                 {phase === 'sending' ? t('requestQuote.sending') : t('requestQuote.sendRequest')}

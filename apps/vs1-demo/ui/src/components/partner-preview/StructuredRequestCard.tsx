@@ -10,8 +10,8 @@ import type { PartnerRequest, RequestPriority } from './types';
 const PILL: Record<RequestPriority, string> = {
   critical: 'bg-primary-100 text-primary-800 dark:bg-primary-500/30 dark:text-primary-100',
   high: 'bg-primary-50 text-primary-600 dark:bg-primary-500/20 dark:text-primary-200',
-  medium: 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300',
-  low: 'bg-neutral-50 text-neutral-500 dark:bg-white/5 dark:text-neutral-400',
+  medium: 'bg-neutral-100 text-neutral-600 dark:bg-elevate/10 dark:text-neutral-300',
+  low: 'bg-neutral-50 text-neutral-500 dark:bg-elevate/5 dark:text-neutral-400',
 };
 
 function summarize(obligations: PartnerRequest['obligations']) {
