@@ -34,9 +34,13 @@ const ENTRIES = [
   { key: 'howItWorks', path: 'how-it-works' },
 ] as const;
 
+// Severity here never joined the traffic light. It carried #c0392b, a red in no
+// scale (2.52:1 in dark), and gold for medium — which now says the wrong thing
+// twice over: gold is brand-only, and medium is yellow. These are the RiskBadge
+// soft pairings, so they read 6.92/5.56 (high) and 7.45/6.96 (medium).
 const SEV_TINT: Record<'high' | 'medium', string> = {
-  high: 'bg-[#c0392b]/12 text-[#c0392b]',
-  medium: 'bg-accent-500/15 text-accent-600',
+  high: 'bg-risk-high-bg text-risk-on-high',
+  medium: 'bg-risk-medium-bg text-risk-on-medium',
 };
 
 export function SearchResultPage() {
