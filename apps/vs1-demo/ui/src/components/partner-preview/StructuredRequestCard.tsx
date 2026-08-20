@@ -5,7 +5,7 @@ import type { PartnerRequest, RequestPriority } from './types';
 
 // Shared partner block — a structured, pre-scoped engagement request card.
 // Used on the provider LP (Hero · S1 Matchmaking · S4 Channels) and (later) in
-// the real partner dashboard. Compass-styled, light + dark. Risk = petrol pills.
+// the real partner dashboard. Compass-styled, light + dark. Risk = RiskBadge pills.
 
 const PILL: Record<RequestPriority, string> = {
   critical: 'bg-primary-100 text-primary-800 dark:bg-primary-500/30 dark:text-primary-100',

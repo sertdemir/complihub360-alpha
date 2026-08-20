@@ -7,7 +7,7 @@ compliance obligations, grouped & ordered by **petrol-severity**
 (critical → high → medium → low). A summary header shows counts per severity;
 each tile carries a **RiskBadge**, the obligation, domain · jurisdiction meta,
 and an optional deadline. Set \`groupByRisk={false}\` for a single flat grid.
-Risk is shown in petrol — never red. Light + dark.
+Risk is shown as a traffic light — green → yellow → orange → red. Light + dark.
 `;
 
 const meta = {

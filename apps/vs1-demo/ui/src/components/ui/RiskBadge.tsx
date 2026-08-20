@@ -2,9 +2,12 @@ import { cn } from '../../lib/utils';
 
 // ─── RiskBadge ────────────────────────────────────────────────────────────────
 // Compass "⚠️ Risk Badge" (Figma node 726:2). The brand-critical component.
-// DOCTRINE: risk is shown in PETROL, never red. Escalation happens through
-// lightness on a single petrol hue — low (lightest) → critical (deepest) — so
-// the system reads as calm and controllable even at critical severity.
+// Risk is a TRAFFIC LIGHT — green · yellow · orange · red — carried entirely by
+// --color-risk-* so both themes flip on their own. (This replaced the earlier
+// petrol-only doctrine; the tokens hold the reasoning and the measurements.)
+// Colour never carries the meaning alone: every variant except RiskDot renders
+// a label, and RiskDot takes an aria-label. Under deuteranopia the four accents
+// separate by only ΔE 7.1 in light mode — the word is what the reader relies on.
 // 48 variants = 4 Risk × 4 Style × 3 Size, plus the standalone RiskDot (4).
 
 export type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
@@ -23,24 +26,20 @@ const SOLID_BG: Record<RiskLevel, string> = {
   high: 'bg-risk-high',
   critical: 'bg-risk-critical',
 };
-// Solid text: dark on the light Low fill, white on the darker Medium/High/Critical
-// fills. In DARK mode the whole scale inverts — every fill is a bright petrol —
-// so white drops to 1.83:1 on Critical and 2.56:1 on High; those flip to ink,
-// which reads 9.77:1 and 6.97:1 respectively.
-const SOLID_TEXT: Record<RiskLevel, string> = {
-  low: 'text-[#0f172a]',
-  medium: 'text-white dark:text-[#0f172a]',
-  high: 'text-white dark:text-[#0f172a]',
-  critical: 'text-white dark:text-[#0f172a]',
-};
+// Solid text is uniform now, because the accents were chosen to make it so: in
+// light mode every fill clears 4.5:1 against WHITE (4.92-10.02), in dark mode
+// every fill clears it against INK (6.45-11.66). The accent's own AA requirement
+// as outline text and its requirement as a solid fill are the same ratio, so one
+// pair of text colours covers all four levels.
+const SOLID_TEXT = 'text-white dark:text-[#0f172a]';
 const SOFT_BG: Record<RiskLevel, string> = {
   low: 'bg-risk-low-bg',
   medium: 'bg-risk-medium-bg',
   high: 'bg-risk-high-bg',
   critical: 'bg-risk-critical-bg',
 };
-// Outline + Dot text use the level colour itself — intentionally subtle at Low,
-// strong at Critical (the lightness escalation).
+// Outline + Dot text use the level colour itself. Each accent clears 4.5:1 on
+// the page in both themes (worst 4.72, medium on --color-bg-secondary).
 const LEVEL_TEXT: Record<RiskLevel, string> = {
   low: 'text-risk-low',
   medium: 'text-risk-medium',
@@ -48,8 +47,8 @@ const LEVEL_TEXT: Record<RiskLevel, string> = {
   critical: 'text-risk-critical',
 };
 // Soft text is NOT the level colour: the accent on its own tint is unreadable
-// (Low 1.38:1, Medium 2.58:1 in light mode). --color-risk-text-on-* exists for
-// exactly this pairing and clears 9.9-17.5:1 in light, >=4.6:1 in dark.
+// (a green-700 on a green-200 tint measures 1.5:1). --color-risk-text-on-*
+// exists for exactly this pairing and clears >=6.92:1 in light, >=5.28:1 in dark.
 const SOFT_TEXT: Record<RiskLevel, string> = {
   low: 'text-risk-on-low',
   medium: 'text-risk-on-medium',
@@ -102,7 +101,7 @@ export function RiskBadge({
 
   const treatment =
     styleVariant === 'solid'
-      ? cn(s.box, SOLID_BG[level], SOLID_TEXT[level])
+      ? cn(s.box, SOLID_BG[level], SOLID_TEXT)
       : styleVariant === 'soft'
         ? cn(s.box, SOFT_BG[level], SOFT_TEXT[level])
         : cn(s.box, 'border bg-transparent', LEVEL_BORDER[level], LEVEL_TEXT[level]); // outline
@@ -111,8 +110,11 @@ export function RiskBadge({
 }
 
 // ─── RiskDot ──────────────────────────────────────────────────────────────────
-// The minimal indicator — a single petrol dot for very dense tables / status
-// strips. Critical keeps a petrol outer halo for extra attention (never red).
+// The minimal indicator — a single dot for very dense tables / status strips.
+// Critical keeps an outer halo for extra attention. The halo is drawn in
+// Critical's OWN tint: it used to reach for --color-risk-low-bg, which under the
+// traffic light would have ringed a red dot in green.
+// This is the one variant with no label, so it requires an aria-label.
 export interface RiskDotProps {
   level?: RiskLevel;
   /** Dot diameter in px (default 10). */
@@ -128,7 +130,7 @@ export function RiskDot({ level = 'medium', size = 10, className, ...rest }: Ris
       className={cn(
         'inline-block shrink-0 rounded-full',
         LEVEL_DOT[level],
-        level === 'critical' && 'shadow-[0_0_0_3px_rgb(var(--color-risk-low-bg))]',
+        level === 'critical' && 'shadow-[0_0_0_3px_rgb(var(--color-risk-critical-bg))]',
         className,
       )}
       style={{ height: size, width: size }}
