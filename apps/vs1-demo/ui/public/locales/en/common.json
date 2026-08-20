@@ -861,7 +861,21 @@
     "featIntentTitle": "Intent Analysis Engine",
     "featIntentDesc": "Transforms unstructured client input into a structured risk profile. The AI is restricted to analyzing compliance context and cannot make binding legal decisions on its own.",
     "featGateTitle": "Triple AI Gate Validator",
-    "featGateDesc": "Every AI action must pass three checks: Data Sanitization, Explicit Consent, and Domain Restriction. If any check fails, the workflow gracefully falls back to a deterministic, non-AI process."
+    "featGateDesc": "Every AI action must pass three checks: Data Sanitization, Explicit Consent, and Domain Restriction. If any check fails, the workflow gracefully falls back to a deterministic, non-AI process.",
+    "behaviour": {
+      "kicker": "How our AI behaves",
+      "title": "Professional first. Human always.",
+      "lead": "Governance describes the rules we hold ourselves to. This is what they mean once you actually use the product.",
+      "items": [
+        "It says that it is AI. It never presents itself as a lawyer, accountant or customs specialist.",
+        "It explains in plain language — and names the technical term, so you learn it.",
+        "When the legal position is clear, it says so and explains why.",
+        "When it is uncertain, it says that too instead of guessing, and points you to qualified confirmation.",
+        "It never uses fear or urgency to move you towards a booking, and never invents an obligation.",
+        "It hands over to a person the moment professional judgement matters."
+      ],
+      "principle": "Technology should be the shortest path to the right human — not a barrier between them."
+    }
   },
   "header": {
     "nav": {

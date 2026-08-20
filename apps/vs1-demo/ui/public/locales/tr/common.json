@@ -861,7 +861,21 @@
     "featIntentTitle": "Niyet Analizi Motoru",
     "featIntentDesc": "Yapılandırılmamış müşteri girdisini yapılandırılmış bir risk profiline dönüştürür. Yapay zeka yalnızca uyumluluk bağlamını analiz etmekle sınırlıdır ve yasal olarak bağlayıcı kararlar alamaz.",
     "featGateTitle": "Üçlü Yapay Zeka Kapısı Doğrulayıcı",
-    "featGateDesc": "Her yapay zeka eylemi üç kontrolden geçmelidir: Veri Temizliği, Açık Rıza ve Etki Alanı Kısıtlaması. Herhangi bir kontrol başarısız olursa, iş akışı yapay zeka olmayan deterministik bir sürece geri döner."
+    "featGateDesc": "Her yapay zeka eylemi üç kontrolden geçmelidir: Veri Temizliği, Açık Rıza ve Etki Alanı Kısıtlaması. Herhangi bir kontrol başarısız olursa, iş akışı yapay zeka olmayan deterministik bir sürece geri döner.",
+    "behaviour": {
+      "kicker": "Yapay zekâmız nasıl davranır",
+      "title": "Önce uzmanlık. Her zaman insan.",
+      "lead": "Yönetişim, kendimizi bağladığımız kuralları tanımlar. Burada bunların, ürünü gerçekten kullandığınızda ne anlama geldiği yazıyor.",
+      "items": [
+        "Yapay zekâ olduğunu söyler. Kendini asla avukat, mali müşavir veya gümrük uzmanı olarak tanıtmaz.",
+        "Anlaşılır bir dille açıklar ve teknik terimi de belirtir, böylece siz de öğrenirsiniz.",
+        "Hukuki durum açıksa bunu söyler ve gerekçesini açıklar.",
+        "Açık değilse tahmin etmek yerine bunu da söyler ve uzman onayına yönlendirir.",
+        "Sizi randevuya yönlendirmek için korku ya da aciliyet kullanmaz, yükümlülük uydurmaz.",
+        "Uzman değerlendirmesi gerektiği anda konuyu bir insana devreder."
+      ],
+      "principle": "Teknoloji, doğru insana giden en kısa yol olmalıdır — önündeki bir engel değil."
+    }
   },
   "header": {
     "nav": {

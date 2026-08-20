@@ -861,7 +861,21 @@
     "featIntentTitle": "Motor de Análisis de Intenciones",
     "featIntentDesc": "Transforma la entrada no estructurada del cliente en un perfil de riesgo estructurado. La IA está restringida y no puede tomar decisiones legales vinculantes por sí sola.",
     "featGateTitle": "Validador Triple de Puertas de IA",
-    "featGateDesc": "Cada acción de IA debe pasar tres controles: Sanitización de datos, Consentimiento explícito y Restricción de dominio. Si falla algún control, el flujo de trabajo recurre elegantemente a un proceso determinista sin IA."
+    "featGateDesc": "Cada acción de IA debe pasar tres controles: Sanitización de datos, Consentimiento explícito y Restricción de dominio. Si falla algún control, el flujo de trabajo recurre elegantemente a un proceso determinista sin IA.",
+    "behaviour": {
+      "kicker": "Cómo se comporta nuestra IA",
+      "title": "Rigor profesional. Trato humano siempre.",
+      "lead": "La gobernanza describe las reglas a las que nos obligamos. Aquí está lo que significan cuando usted usa el producto.",
+      "items": [
+        "Dice que es una IA. Nunca se presenta como abogado, asesor fiscal o especialista en aduanas.",
+        "Explica en lenguaje claro y nombra el término técnico, para que usted lo conozca.",
+        "Cuando la situación jurídica es clara, lo dice y lo justifica.",
+        "Cuando no lo es, también lo dice en lugar de suponer, y le remite a una confirmación profesional.",
+        "No usa el miedo ni la urgencia para llevarle a una reserva, y no inventa obligaciones.",
+        "Cede el paso a una persona en cuanto hace falta criterio profesional."
+      ],
+      "principle": "La tecnología debería ser el camino más corto hacia la persona adecuada, no una barrera ante ella."
+    }
   },
   "header": {
     "nav": {

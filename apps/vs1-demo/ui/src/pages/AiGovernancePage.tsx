@@ -56,6 +56,49 @@ function GovernanceHero() {
   );
 }
 
+// ─── How our AI behaves ───────────────────────────────────────────────────────
+// Added 2026-08-20 per the Developer DNA & Website Audit Addendum V2 (P0 #4).
+// The addendum's verdict on this page: "Excellent foundation, but it is
+// governance-focused rather than experience-focused." The six dimensions below
+// describe the framework; this section describes what the framework means to
+// someone actually using the product. It therefore sits BEFORE the dimensions.
+
+function BehaviourSection() {
+  const { t } = useTranslation('common');
+  const raw = t('aiGov.behaviour.items', { returnObjects: true });
+  const items: string[] = Array.isArray(raw) ? (raw as string[]) : [];
+
+  return (
+    <Section id="behaviour" className="py-20 bg-surface-secondary">
+      <div className="max-w-3xl mx-auto px-6">
+        <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
+          {t('aiGov.behaviour.kicker', 'How our AI behaves')}
+        </span>
+        <Typography variant="h2" weight="bold" className="text-fg mt-3 mb-4">
+          {t('aiGov.behaviour.title', 'Professional first. Human always.')}
+        </Typography>
+        <Typography variant="body" className="text-fg-secondary leading-relaxed">
+          {t('aiGov.behaviour.lead')}
+        </Typography>
+
+        <ul className="mt-8 flex flex-col gap-3">
+          {items.map((line) => (
+            <li key={line} className="flex items-baseline gap-3">
+              <span aria-hidden className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
+              <span className="text-body leading-relaxed text-fg">{line}</span>
+            </li>
+          ))}
+        </ul>
+
+        {/* The addendum names this line explicitly as required copy. */}
+        <p className="mt-10 border-t border-stroke-subtle pt-6 font-serif text-[1.25rem] leading-snug text-fg-secondary">
+          {t('aiGov.behaviour.principle')}
+        </p>
+      </div>
+    </Section>
+  );
+}
+
 // ─── Dimensions Section ───────────────────────────────────────────────────────
 
 function DimensionsSection() {
@@ -239,6 +282,7 @@ export function AiGovernancePage() {
   return (
     <div className="min-h-screen bg-background pt-16">
       <GovernanceHero />
+      <BehaviourSection />
       <DimensionsSection />
       <FeaturesOverview />
       <SiteFooter />

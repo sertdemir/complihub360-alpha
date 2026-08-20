@@ -861,7 +861,21 @@
     "featIntentTitle": "Intent Analysis Engine",
     "featIntentDesc": "Wandelt unstrukturierte Kundeneingaben in ein strukturiertes Risikoprofil um. Die KI ist auf die Analyse des Compliance-Kontexts beschränkt und kann keine rechtsverbindlichen Entscheidungen treffen.",
     "featGateTitle": "Dreifacher KI-Gate-Validator",
-    "featGateDesc": "Jede KI-Aktion muss drei Prüfungen bestehen: Datenbereinigung, ausdrückliche Zustimmung und Domänenbeschränkung. Schlägt eine Prüfung fehl, greift der Workflow auf einen deterministischen Nicht-KI-Prozess zurück."
+    "featGateDesc": "Jede KI-Aktion muss drei Prüfungen bestehen: Datenbereinigung, ausdrückliche Zustimmung und Domänenbeschränkung. Schlägt eine Prüfung fehl, greift der Workflow auf einen deterministischen Nicht-KI-Prozess zurück.",
+    "behaviour": {
+      "kicker": "Wie unsere KI sich verhält",
+      "title": "Fachlich zuerst. Menschlich immer.",
+      "lead": "Governance beschreibt die Regeln, an die wir uns binden. Hier steht, was sie bedeuten, sobald Sie das Produkt tatsächlich benutzen.",
+      "items": [
+        "Sie sagt, dass sie eine KI ist. Sie gibt sich nie als Rechtsanwältin, Steuerberater oder Zollfachkraft aus.",
+        "Sie erklärt in klarer Sprache — und nennt den Fachbegriff dazu, damit Sie ihn kennen.",
+        "Ist die Rechtslage eindeutig, sagt sie das und begründet es.",
+        "Ist sie es nicht, sagt sie auch das, statt zu raten, und verweist auf fachliche Bestätigung.",
+        "Sie nutzt weder Angst noch Dringlichkeit, um Sie zu einer Buchung zu bewegen, und erfindet keine Pflicht.",
+        "Sie übergibt an einen Menschen, sobald fachliches Urteil gefragt ist."
+      ],
+      "principle": "Technik sollte der kürzeste Weg zum richtigen Menschen sein — keine Hürde davor."
+    }
   },
   "header": {
     "nav": {
