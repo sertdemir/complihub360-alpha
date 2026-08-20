@@ -50,8 +50,13 @@ export function EntryDoor() {
   const { locale = 'en' } = useParams();
   const [started, setStarted] = useState(false);
 
+  // Petrol statt Gold. Gold bedeutet in Compass ausschliesslich Verified Partner
+  // und Monetarisierung — hier trug es den KOSTENLOSEN Einstieg, auf dem groessten
+  // Einzelfarbfeld der Seite (1440x1071 px, 6,7 % der Landingpage). bg-brand-surface
+  // ist der Vertrauensanker und bleibt in beiden Themes tiefes Petrol, der weisse
+  // Glas-Backdrop darauf also stabil.
   return (
-    <section id="entry-door" className="overflow-hidden bg-accent-500 py-20 lg:py-24">
+    <section id="entry-door" className="overflow-hidden bg-brand-surface py-20 lg:py-24">
       {/* Hero-content width (matches Container size="2xl") */}
       <div className="mx-auto w-full max-w-[1440px] px-4 md:px-6 lg:px-6">
         <motion.div

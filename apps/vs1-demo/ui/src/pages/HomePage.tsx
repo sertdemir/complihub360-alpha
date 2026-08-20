@@ -5,13 +5,21 @@
 // the order the sections happened to be built in:
 //
 //   1 Hero                → HomeHero              understand, two equal entries
-//   2 Problem Recognition → ProblemRecognition    NEW — the reader recognises themselves
-//   3 How It Works        → HowItWorksSteps       the five stages, condensed
-//   4 Risk Map            → RiskMapSection        the result, as the marketing hero
-//   5 Provider Matching   → MatchmakingDifference a consequence of clarity
-//   6 Compliance areas    → DomainsKnows          breadth as evidence, not the story
-//   7 Trust by showing    → TwoReflexes · BrandCodePreview
-//   8 Final CTA           → EntryDoor
+//   2 Problem Recognition → ProblemRecognition    the reader recognises themselves
+//   3 The instrument      → EntryDoor             the REAL wizard, full size
+//   4 How It Works        → HowItWorksSteps       the five stages, condensed
+//   5 Risk Map            → RiskMapSection        the result, as the marketing hero
+//   6 Provider Matching   → MatchmakingDifference a consequence of clarity
+//   7 Compliance areas    → DomainsKnows          breadth as evidence, not the story
+//   8 Trust by showing    → TwoReflexes · BrandCodePreview
+//
+// EntryDoor moved from last to third on 2026-08-20. It is not a closing banner:
+// it embeds AnimatedWizard with `interactive`, i.e. the only usable assessment
+// on the page — the hero's copy runs `interactive = false` and is a self-playing
+// demo, scaled to 760x588. Measured before the move, the real instrument began
+// at 37.151 px of 44.300 (83,9 %, screen 47 of 56 at an 800 px viewport), while
+// its CTA repeated the hero's "Meinen Bedarf ermitteln" from y=0. It now opens
+// at ~4.750 px, once the problem section has earned the need.
 //
 // What actually moved: Problem Recognition is new at position 2, DomainsKnows
 // now precedes the two trust sections, and HowItActs moved after them. Despite
@@ -23,10 +31,9 @@
 // howItWorks.*) instead of restating it, so the homepage summary and the full
 // page cannot drift apart.
 //
-// Anchor order matters: the header's scroll-spy nav lists how-it-works,
-// what-we-know, brand-code, engagement. Under this order they appear at
-// positions 5, 6, 8 and 9, so the nav still highlights in document order —
-// the-five-steps carries no nav anchor and does not disturb it.
+// (The former note about anchor order is gone with the scroll-spy: the header
+// became a multipager nav on 2026-08-18 and no longer tracks section anchors,
+// so section order is a narrative decision only.)
 //
 // Built screens-led on the Compass DS, section by section.
 
@@ -52,6 +59,7 @@ export function HomePage() {
     <main className="bg-white">
       <HomeHero wizard="animated" entry="search" />
       <ProblemRecognition />
+      <EntryDoor />
       <HowItWorksSteps />
       <RiskMapSection />
       <MatchmakingDifference />
@@ -61,7 +69,6 @@ export function HomePage() {
       <HowItActs />
       <BeyondAssessment />
       <HomeFaq />
-      <EntryDoor />
       <NewsletterBand />
       <SiteFooter />
     </main>
