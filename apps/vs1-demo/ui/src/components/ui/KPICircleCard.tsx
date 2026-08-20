@@ -49,12 +49,18 @@ export interface KPICircleCardProps {
 
 // Accent = ring arc + value text + trend pill text. Static scales (mode-aware
 // pair), except Brand which rides the petrol token.
+// The light half used the raw 500 stops, which are tuned to sit ON a surface,
+// not to be read as 12-13px text against one. Every non-brand tone missed on a
+// white card - emerald 2.54, amber 2.15, red 3.76, sky 2.77 - and the dark-only
+// workspace had hidden all four. They now take the DS status ramps, the same
+// stops Tag uses, and read 6.24-7.58. Dark is untouched: measured on the
+// workbench card the 400s clear at 5.31-8.79.
 const ACCENT: Record<KPIColor, string> = {
   brand: 'text-fg-brand',
-  success: 'text-emerald-500 dark:text-emerald-400',
-  warning: 'text-amber-500 dark:text-amber-400',
-  error: 'text-red-500 dark:text-red-400',
-  info: 'text-sky-500 dark:text-sky-400',
+  success: 'text-success-700 dark:text-emerald-400',
+  warning: 'text-warning-800 dark:text-amber-400',
+  error: 'text-error-700 dark:text-red-400',
+  info: 'text-info-700 dark:text-sky-400',
 };
 
 const TREND_ICON: Record<KPITrendDirection, LucideIcon> = {
