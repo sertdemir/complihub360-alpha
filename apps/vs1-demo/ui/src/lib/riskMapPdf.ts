@@ -1,4 +1,3 @@
-import { jsPDF } from 'jspdf';
 import type { SearchProfile } from '../components/wizard/WizardContext';
 
 // ─── Risk-map PDF export (User Flows §9 · wiring map A6) ─────────────────────
@@ -85,13 +84,18 @@ function profileLine(profile: SearchProfile | null | undefined, t: PdfTranslate)
   return bits.length ? bits.join('   ·   ') : t('pdf.profile.anonymous', { defaultValue: 'Anonymous assessment' });
 }
 
-export function generateRiskMapPdf(opts: {
+// jspdf wiegt 341 kB roh / 112 kB gzip und wurde bis 20.08. in den
+// Marketing-Entry gezogen, weil dieses Modul es auf Modulebene importierte:
+// /de/imprint lud den PDF-Export mit. Jetzt kommt er erst beim Klick.
+// Der Typ-Import oben bleibt — er verschwindet beim Kompilieren.
+export async function generateRiskMapPdf(opts: {
   obligations: PdfObligation[];
   stats: { value: string; label: string }[];
   profile?: SearchProfile | null;
   /** i18next `t` scoped to the `results` namespace. Omitted → canonical EN. */
   t?: PdfTranslate;
-}): void {
+}): Promise<void> {
+  const { jsPDF } = await import('jspdf');
   const t = opts.t ?? fallbackT;
   // Every translated / dynamic string goes through the WinAnsi sanitizer.
   const L = (key: string, defaultValue: string, vars?: Record<string, unknown>) =>

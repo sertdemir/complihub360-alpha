@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { lazy, useEffect } from "react";
 import { trackScrollDepth } from "./lib/analytics";
 import { useSeo } from "./hooks/useSeo";
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, useParams, Navigate, Outlet } from "react-router-dom";
@@ -18,40 +18,47 @@ import { ResourcesPage } from "./pages/ResourcesPage";
 import { AboutPage } from './pages/AboutPage';
 import { AiGovernancePage } from "./pages/AiGovernancePage";
 import { PrivacyPage, ImprintPage, TermsPage, CookiePage } from "./pages/legal/LegalPages";
-import { AdminOverviewPage } from "./pages/admin/AdminOverviewPage";
-import { CockpitPage } from "./pages/admin/CockpitPage";
-import { AdminEventsPage } from "./pages/admin/AdminEventsPage";
-import { AdminComingSoonPage } from "./pages/admin/AdminComingSoonPage";
-import { ProviderMagicActionPage } from "./pages/provider/ProviderMagicActionPage";
-import { ConfirmEmailPage } from "./pages/provider/ConfirmEmailPage";
-import { RequestsPage } from "./pages/provider/RequestsPage";
-import { LeadsPage } from "./pages/provider/LeadsPage";
-import { PerformancePage } from "./pages/provider/PerformancePage";
-import { CoveragePage } from "./pages/provider/CoveragePage";
-import { BillingPage } from "./pages/provider/BillingPage";
-import { SettingsPage } from "./pages/provider/SettingsPage";
-import { NotificationsPage } from "./pages/provider/NotificationsPage";
-import { UserHomePage } from "./pages/user/UserHomePage";
-import { SessionsPage } from "./pages/user/SessionsPage";
-import { UserRequestsPage } from "./pages/user/UserRequestsPage";
-import { TerminePage } from "./pages/user/TerminePage";
+
+// Rollen-Bereiche werden nachgeladen, nicht mitgeliefert. Bis 20.08. steckte
+// der komplette Admin-, Provider-, User-, Auth- und Onboarding-Code im selben
+// Chunk wie die Marketing-Seiten: wer /de/imprint aufrief, lud die
+// Partner-Abrechnung und das Admin-Cockpit mit. recharts haengt ueber
+// MetricCard nur an zwei Admin-Seiten und verschwindet damit ebenfalls aus
+// dem Einstiegs-Chunk. Die Suspense-Grenze steht in main.tsx.
+const AdminOverviewPage = lazy(() => import("./pages/admin/AdminOverviewPage").then((m) => ({ default: m.AdminOverviewPage })));
+const CockpitPage = lazy(() => import("./pages/admin/CockpitPage").then((m) => ({ default: m.CockpitPage })));
+const AdminEventsPage = lazy(() => import("./pages/admin/AdminEventsPage").then((m) => ({ default: m.AdminEventsPage })));
+const AdminComingSoonPage = lazy(() => import("./pages/admin/AdminComingSoonPage").then((m) => ({ default: m.AdminComingSoonPage })));
+const ProviderMagicActionPage = lazy(() => import("./pages/provider/ProviderMagicActionPage").then((m) => ({ default: m.ProviderMagicActionPage })));
+const ConfirmEmailPage = lazy(() => import("./pages/provider/ConfirmEmailPage").then((m) => ({ default: m.ConfirmEmailPage })));
+const RequestsPage = lazy(() => import("./pages/provider/RequestsPage").then((m) => ({ default: m.RequestsPage })));
+const LeadsPage = lazy(() => import("./pages/provider/LeadsPage").then((m) => ({ default: m.LeadsPage })));
+const PerformancePage = lazy(() => import("./pages/provider/PerformancePage").then((m) => ({ default: m.PerformancePage })));
+const CoveragePage = lazy(() => import("./pages/provider/CoveragePage").then((m) => ({ default: m.CoveragePage })));
+const BillingPage = lazy(() => import("./pages/provider/BillingPage").then((m) => ({ default: m.BillingPage })));
+const SettingsPage = lazy(() => import("./pages/provider/SettingsPage").then((m) => ({ default: m.SettingsPage })));
+const NotificationsPage = lazy(() => import("./pages/provider/NotificationsPage").then((m) => ({ default: m.NotificationsPage })));
+const UserHomePage = lazy(() => import("./pages/user/UserHomePage").then((m) => ({ default: m.UserHomePage })));
+const SessionsPage = lazy(() => import("./pages/user/SessionsPage").then((m) => ({ default: m.SessionsPage })));
+const UserRequestsPage = lazy(() => import("./pages/user/UserRequestsPage").then((m) => ({ default: m.UserRequestsPage })));
+const TerminePage = lazy(() => import("./pages/user/TerminePage").then((m) => ({ default: m.TerminePage })));
 import { ProviderDetailPage } from "./pages/ProviderDetailPage";
 import { ProviderSchedulePage } from "./pages/ProviderSchedulePage";
-import { WorkbenchPage } from "./pages/user/WorkbenchPage";
-import { UserNotificationsPage } from "./pages/user/UserNotificationsPage";
-import { SavedProvidersPage } from "./pages/user/SavedProvidersPage";
-import { ExportsPage } from "./pages/user/ExportsPage";
-import { ComingSoonPage } from "./pages/user/ComingSoonPage";
-import { LibraryPage } from "./pages/user/LibraryPage";
+const WorkbenchPage = lazy(() => import("./pages/user/WorkbenchPage").then((m) => ({ default: m.WorkbenchPage })));
+const UserNotificationsPage = lazy(() => import("./pages/user/UserNotificationsPage").then((m) => ({ default: m.UserNotificationsPage })));
+const SavedProvidersPage = lazy(() => import("./pages/user/SavedProvidersPage").then((m) => ({ default: m.SavedProvidersPage })));
+const ExportsPage = lazy(() => import("./pages/user/ExportsPage").then((m) => ({ default: m.ExportsPage })));
+const ComingSoonPage = lazy(() => import("./pages/user/ComingSoonPage").then((m) => ({ default: m.ComingSoonPage })));
+const LibraryPage = lazy(() => import("./pages/user/LibraryPage").then((m) => ({ default: m.LibraryPage })));
 // Wizard Shell Steps
 // Individualized Category Wizards
 // Auth
-import { LoginPage } from "./pages/auth/LoginPage";
-import { ProviderIntakePage } from "./pages/onboarding/ProviderIntakePage";
-import { RegisterPage } from "./pages/auth/RegisterPage";
-import { EmailVerificationPage } from "./pages/auth/EmailVerificationPage";
-import { AuthCallbackPage } from "./pages/auth/AuthCallbackPage";
-import { ResetPasswordPage } from "./pages/auth/ResetPasswordPage";
+const LoginPage = lazy(() => import("./pages/auth/LoginPage").then((m) => ({ default: m.LoginPage })));
+const ProviderIntakePage = lazy(() => import("./pages/onboarding/ProviderIntakePage").then((m) => ({ default: m.ProviderIntakePage })));
+const RegisterPage = lazy(() => import("./pages/auth/RegisterPage").then((m) => ({ default: m.RegisterPage })));
+const EmailVerificationPage = lazy(() => import("./pages/auth/EmailVerificationPage").then((m) => ({ default: m.EmailVerificationPage })));
+const AuthCallbackPage = lazy(() => import("./pages/auth/AuthCallbackPage").then((m) => ({ default: m.AuthCallbackPage })));
+const ResetPasswordPage = lazy(() => import("./pages/auth/ResetPasswordPage").then((m) => ({ default: m.ResetPasswordPage })));
 import { AuthGuard } from "./components/auth/AuthGuard";
 import { AnimatedWizard } from "./components/home/AnimatedWizard";
 

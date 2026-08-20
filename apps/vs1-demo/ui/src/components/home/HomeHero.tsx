@@ -39,7 +39,13 @@ function HeroBackground() {
       <div className="absolute inset-0 bg-surface" />
       <div className="absolute inset-0 hidden lg:block">
         {/* World map capped at 1440px, centered — beyond that only the side margins grow. */}
-        <img src="/img/hero-worldmap.png" alt="" className="absolute inset-0 mx-auto h-full w-full max-w-[1440px] object-cover opacity-[0.42]" />
+        {/* Dekoration (aria-hidden ueber alt=""), aber LCP-Element der Seite.
+            KEIN loading="lazy" — es steht ueber der Falz, lazy wuerde LCP
+            verschlechtern statt verbessern. decoding="async" haelt nur das
+            Dekodieren aus dem kritischen Pfad. Die 368 kB PNG bleiben offen:
+            das Bild traegt Transparenz, JPEG scheidet aus, und auf dieser
+            Maschine ist kein WebP-Encoder installiert. */}
+        <img src="/img/hero-worldmap.png" alt="" decoding="async" className="absolute inset-0 mx-auto h-full w-full max-w-[1440px] object-cover opacity-[0.42]" />
         <div className="absolute inset-0 bg-gradient-to-b from-white/0 to-primary-500/[0.05]" />
         <div className="absolute right-[6%] top-[14%] h-[500px] w-[800px] rounded-full bg-primary-500/10 blur-[130px]" />
       </div>

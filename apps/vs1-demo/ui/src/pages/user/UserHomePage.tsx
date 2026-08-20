@@ -78,10 +78,11 @@ export function UserHomePage() {
   const tAction = (label: string) => (ACTION_KEY[label] ? t(`actions.${ACTION_KEY[label]}`) : label);
   // A6: same PII-free PDF snapshot as on /results, from the resume panel.
   // Translated at the render point (results namespace); canonical EN fallback.
-  const exportPdf = () => {
+  // async, seit jspdf erst beim Klick geladen wird (lib/riskMapPdf.ts).
+  const exportPdf = async () => {
     let profile = null;
     try { profile = JSON.parse(localStorage.getItem('ch360_last_profile') || 'null'); } catch { /* fixture */ }
-    generateRiskMapPdf({
+    await generateRiskMapPdf({
       profile,
       t: tResults,
       stats: STATS.map((s, i) => ({ value: s.value, label: tResults(`stats.${i}.label`, { defaultValue: s.label }) })),

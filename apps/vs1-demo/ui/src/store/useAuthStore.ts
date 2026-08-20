@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { Session, User } from '@supabase/supabase-js';
-import { supabase, isSupabaseConfigured, isDemoLoginEnabled } from '../lib/supabase';
+import { getSupabase, isSupabaseConfigured, isDemoLoginEnabled } from '../lib/supabase';
 import { adoptGuestSessions } from '../api/adoption';
 
 export type UserRole = 'user' | 'partner' | 'admin';
@@ -76,8 +76,9 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: async () => {
-    if (supabase) {
-      await supabase.auth.signOut();
+    const sb = await getSupabase();
+    if (sb) {
+      await sb.auth.signOut();
     }
     localStorage.removeItem('demo_is_logged_in');
     localStorage.removeItem('demo_user_role');
@@ -87,6 +88,11 @@ export const useAuthStore = create<AuthState>((set) => ({
 }));
 
 // ─── One-time initialisation ──────────────────────────────────────────────────
+// Asynchron, seit das Supabase-SDK nachgeladen wird. Der Store startet mit
+// loading: true, und AuthGuard wartet darauf, bevor er ueber eine geschuetzte
+// Route entscheidet — ein spaet eintreffender Client sperrt also niemanden aus.
+void (async () => {
+const supabase = isSupabaseConfigured ? await getSupabase() : null;
 if (isSupabaseConfigured && supabase) {
   // Real auth: hydrate from the persisted session, then track changes. An
   // absent Supabase session must NOT clobber an active demo login (staging
@@ -99,13 +105,13 @@ if (isSupabaseConfigured && supabase) {
       userName: localStorage.getItem('demo_user_name'),
       loading: false,
     });
-  supabase.auth.getSession().then(({ data }) => {
+  supabase.auth.getSession().then(({ data }: { data: { session: Session | null } }) => {
     if (!data.session && demoActive()) { hydrateDemo(); return; }
     useAuthStore.getState().setSession(data.session);
     // Signup adoption (Wave A3): claim guest sessions once per account.
     if (data.session?.user) void adoptGuestSessions(data.session.user.id);
   });
-  supabase.auth.onAuthStateChange((_event, session) => {
+  supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
     if (!session && demoActive()) { hydrateDemo(); return; }
     useAuthStore.getState().setSession(session);
     if (session?.user) void adoptGuestSessions(session.user.id);
@@ -120,3 +126,4 @@ if (isSupabaseConfigured && supabase) {
     loading: false,
   });
 }
+})();
