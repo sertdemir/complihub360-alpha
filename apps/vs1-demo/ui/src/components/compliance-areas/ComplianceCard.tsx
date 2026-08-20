@@ -285,7 +285,7 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
                             key={m.code}
                             className={`text-sm border px-3 py-1 rounded-lg transition-colors ${
                               highlight
-                                ? 'bg-primary-500 text-white border-primary-500 font-bold shadow-sm'
+                                ? 'bg-brand text-fg-on-brand border-brand font-bold shadow-sm'
                                 : 'bg-surface-secondary border-stroke text-fg-secondary'
                             }`}
                           >
@@ -317,7 +317,7 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
                             key={opt}
                             type="button"
                             onClick={() => wizardLink(`teaser_${i}`)}
-                            className="text-xs font-semibold bg-surface hover:bg-primary-500 hover:text-white border border-stroke-subtle hover:border-primary-500 text-fg-brand px-3 py-1.5 rounded-md transition-colors"
+                            className="text-xs font-semibold bg-surface hover:bg-brand hover:text-fg-on-brand border border-stroke-subtle hover:border-brand text-fg-brand px-3 py-1.5 rounded-md transition-colors"
                           >
                             {opt}
                           </button>
@@ -328,7 +328,7 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
 
                   <button
                     onClick={() => wizardLink()}
-                    className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-primary-500 text-white font-bold text-sm shadow-md hover:bg-primary-600 transition-colors"
+                    className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-brand text-fg-on-brand font-bold text-sm shadow-md hover:brightness-95 transition-[filter,background-color]"
                   >
                     {t('compliance.startAssessment', 'Start {{title}} Assessment', { title })}
                     <ArrowRight size={16} />
