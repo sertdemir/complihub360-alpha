@@ -25,7 +25,7 @@
     }
   },
   "table": {
-    "severity": "Gravedad",
+    "severity": "Prioridad",
     "obligation": "Obligación",
     "market": "Mercado",
     "due": "Vence",
@@ -38,7 +38,7 @@
     "radar": "En el radar"
   },
   "severity": {
-    "critical": "Crítica",
+    "critical": "Inmediata",
     "high": "Alta",
     "medium": "Media",
     "low": "Baja"
@@ -160,7 +160,8 @@
     "bookTitle": "Reservar una cita",
     "bookSub": "Llamada inicial gratuita · 30 min · sin compromiso",
     "bookCta": "Reservar cita",
-    "revealNote": "La identidad se muestra tras la reserva."
+    "revealNote": "La identidad se muestra tras la reserva.",
+    "penalty": "Sanción: {{value}}"
   },
   "schedule": {
     "back": "Volver al perfil",

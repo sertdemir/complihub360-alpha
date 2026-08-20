@@ -25,7 +25,7 @@
     }
   },
   "table": {
-    "severity": "Schweregrad",
+    "severity": "Priorität",
     "obligation": "Pflicht",
     "market": "Markt",
     "due": "Fällig",
@@ -38,7 +38,7 @@
     "radar": "Auf dem Radar"
   },
   "severity": {
-    "critical": "Kritisch",
+    "critical": "Sofort",
     "high": "Hoch",
     "medium": "Mittel",
     "low": "Niedrig"
@@ -160,7 +160,8 @@
     "bookTitle": "Termin buchen",
     "bookSub": "Kostenloses Erstgespräch · 30 Min · unverbindlich",
     "bookCta": "Termin buchen",
-    "revealNote": "Identität wird nach der Buchung sichtbar."
+    "revealNote": "Identität wird nach der Buchung sichtbar.",
+    "penalty": "Bußgeld: {{value}}"
   },
   "schedule": {
     "back": "Zurück zum Profil",

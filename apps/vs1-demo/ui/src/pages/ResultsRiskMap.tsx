@@ -237,7 +237,13 @@ export function ResultsRiskMap() {
     ? liveLaws.map((l) => ({
         severity: l.severity as Severity,
         title: l.title,
-        detail: [l.penalty ? `Penalty: ${l.penalty}` : null, l.source_url ? null : l.source].filter(Boolean).join(' · '),
+        // Rechtsgrundlage zuerst, Bußgeld danach. Das DNA-Addendum V2 verlangt,
+        // dass Strafhöhen nicht der primäre Untertitel jeder Pflicht sind —
+        // zugänglich bleiben sie, führend sind sie nicht mehr. Der Präfix war
+        // ausserdem hartkodiertes Englisch ('Penalty:') im deutschen UI.
+        detail: [l.source_url ? null : l.source, l.penalty ? t('detail.penalty', { value: l.penalty }) : null]
+          .filter(Boolean)
+          .join(' · '),
         sourceLabel: l.source_url ? (l.source ?? l.celex ?? undefined) : undefined,
         sourceUrl: l.source_url ?? undefined,
         market: l.markets && l.markets.length ? l.markets.join(' · ') : 'EU-wide',

@@ -25,7 +25,7 @@
     }
   },
   "table": {
-    "severity": "Önem",
+    "severity": "Öncelik",
     "obligation": "Yükümlülük",
     "market": "Pazar",
     "due": "Son Tarih",
@@ -38,7 +38,7 @@
     "radar": "Radarda"
   },
   "severity": {
-    "critical": "Kritik",
+    "critical": "Acil",
     "high": "Yüksek",
     "medium": "Orta",
     "low": "Düşük"
@@ -160,7 +160,8 @@
     "bookTitle": "Randevu al",
     "bookSub": "Ücretsiz ilk görüşme · 30 dk · bağlayıcı değil",
     "bookCta": "Randevu al",
-    "revealNote": "Kimlik rezervasyondan sonra görünür."
+    "revealNote": "Kimlik rezervasyondan sonra görünür.",
+    "penalty": "Ceza: {{value}}"
   },
   "schedule": {
     "back": "Profile dön",

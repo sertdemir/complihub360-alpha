@@ -25,7 +25,7 @@
     }
   },
   "table": {
-    "severity": "Severity",
+    "severity": "Priority",
     "obligation": "Obligation",
     "market": "Market",
     "due": "Due",
@@ -38,7 +38,7 @@
     "radar": "On the radar"
   },
   "severity": {
-    "critical": "Critical",
+    "critical": "Immediate",
     "high": "High",
     "medium": "Medium",
     "low": "Low"
@@ -160,7 +160,8 @@
     "bookTitle": "Book an appointment",
     "bookSub": "Free intro call · 30 min · non-binding",
     "bookCta": "Book appointment",
-    "revealNote": "Identity becomes visible after booking."
+    "revealNote": "Identity becomes visible after booking.",
+    "penalty": "Penalty: {{value}}"
   },
   "schedule": {
     "back": "Back to profile",
