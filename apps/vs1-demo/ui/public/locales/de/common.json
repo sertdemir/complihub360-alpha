@@ -1012,5 +1012,67 @@
   },
   "a11y": {
     "skipToContent": "Zum Inhalt springen"
+  },
+  "seo": {
+    "home": {
+      "title": "CompliHub360 · Compliance verstehen und umsetzen",
+      "description": "Die Regeln für Ihre Märkte auf einer Risk Map, mit Quelle hinter jeder Pflicht — und der Weg zu geprüften Spezialisten. Kostenlos, ohne Konto."
+    },
+    "howItWorks": {
+      "title": "So funktioniert es · CompliHub360",
+      "description": "Von einer Frage zur Risk Map und zur passenden Fachperson. Fünf Schritte, kein Verkaufsgespräch, keine Verpflichtung."
+    },
+    "compliance": {
+      "title": "Compliance-Bereiche · CompliHub360",
+      "description": "Acht Bereiche von Steuern und USt über EPR bis Datenschutz: was jeweils gilt, wie dringend es ist und wer bei der Umsetzung hilft."
+    },
+    "markets": {
+      "title": "Märkte · CompliHub360",
+      "description": "Acht Märkte mit ihren regulatorischen Schwerpunkten — Deutschland, Vereinigtes Königreich, Niederlande, Frankreich, Italien, Spanien, USA und Türkei."
+    },
+    "pricing": {
+      "title": "Preise · CompliHub360",
+      "description": "Einschätzung, Risk Map und Matching kosten Sie nichts. Bezahlt wird von den Fachleuten, und erst wenn ein Termin zustande kommt."
+    },
+    "resources": {
+      "title": "Ressourcen · CompliHub360",
+      "description": "Wo Sie weiterlesen können: Märkte und die dort geltenden Regeln, die acht Compliance-Bereiche und der Weg von der Frage zur Fachperson."
+    },
+    "about": {
+      "title": "Über uns · CompliHub360",
+      "description": "Warum es CompliHub360 gibt, wofür wir stehen und wie wir arbeiten — Wissen vor Verkauf, fragen bevor wir annehmen."
+    },
+    "platform": {
+      "title": "Die Plattform · CompliHub360",
+      "description": "Wie aus Ihrem Geschäftskontext eine strukturierte Risk Map wird: Datenschutz-Gate, Analyse mit Quellenbindung und das Matching dahinter."
+    },
+    "solutions": {
+      "title": "Nach Rolle · CompliHub360",
+      "description": "Was CompliHub360 für Gründer, Operations-Teams und In-House-Counsel leistet — von der ersten Frage bis zur umgesetzten Pflicht."
+    },
+    "aiGovernance": {
+      "title": "KI-Governance · CompliHub360",
+      "description": "In welchem Rahmen unsere KI arbeitet und wie sie sich verhält: sechs Dimensionen der Governance und klare Zusagen im Umgang mit Ihnen."
+    },
+    "privacy": {
+      "title": "Datenschutzerklärung · CompliHub360",
+      "description": "Wie CompliHub360 personenbezogene Daten verarbeitet, auf welcher Rechtsgrundlage und welche Rechte Sie dabei haben."
+    },
+    "terms": {
+      "title": "AGB · CompliHub360",
+      "description": "Die Allgemeinen Geschäftsbedingungen für die Nutzung von CompliHub360."
+    },
+    "imprint": {
+      "title": "Impressum · CompliHub360",
+      "description": "Anbieterkennzeichnung und Kontaktangaben zu CompliHub360."
+    },
+    "cookies": {
+      "title": "Cookie-Richtlinie · CompliHub360",
+      "description": "Welche Cookies CompliHub360 setzt, wozu sie dienen und wie Sie Ihre Auswahl jederzeit ändern."
+    },
+    "marketCountry": {
+      "title": "{{country}} · Märkte · CompliHub360",
+      "description": "Welche Compliance-Pflichten in {{country}} gelten, wie stark die Bereiche dort gewichtet sind und mit welcher Rechtsquelle."
+    }
   }
 }

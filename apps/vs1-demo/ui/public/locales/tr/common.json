@@ -1012,5 +1012,67 @@
   },
   "a11y": {
     "skipToContent": "İçeriğe geç"
+  },
+  "seo": {
+    "home": {
+      "title": "CompliHub360 · Uyumu anlayın ve uygulayın",
+      "description": "Pazarlarınızın kuralları tek bir risk haritasında, her yükümlülüğün arkasında kaynağıyla — ve doğrulanmış uzmanlara giden yol. Ücretsiz, hesapsız."
+    },
+    "howItWorks": {
+      "title": "Nasıl çalışır · CompliHub360",
+      "description": "Bir sorudan risk haritasına ve doğru uzmana. Beş adım, satış görüşmesi yok, yükümlülük yok."
+    },
+    "compliance": {
+      "title": "Uyum alanları · CompliHub360",
+      "description": "Vergi ve KDV'den EPR'ye ve veri gizliliğine sekiz alan: neyin geçerli olduğu, ne kadar acil olduğu ve kimin yardımcı olduğu."
+    },
+    "markets": {
+      "title": "Pazarlar · CompliHub360",
+      "description": "Sekiz pazar ve düzenleyici ağırlıkları: Almanya, Birleşik Krallık, Hollanda, Fransa, İtalya, İspanya, ABD ve Türkiye."
+    },
+    "pricing": {
+      "title": "Fiyatlar · CompliHub360",
+      "description": "Değerlendirme, risk haritası ve eşleştirme size hiçbir şeye mal olmaz. Uzmanlar öder, o da yalnızca randevu kesinleştiğinde."
+    },
+    "resources": {
+      "title": "Kaynaklar · CompliHub360",
+      "description": "Nereden devam edebilirsiniz: pazarlar ve orada geçerli kurallar, sekiz uyum alanı ve sorudan uzmana giden yol."
+    },
+    "about": {
+      "title": "Hakkımızda · CompliHub360",
+      "description": "CompliHub360 neden var, neyi savunur ve nasıl çalışır — satıştan önce bilgi, varsaymadan önce sormak."
+    },
+    "platform": {
+      "title": "Platform · CompliHub360",
+      "description": "İş bağlamınız nasıl yapılandırılmış bir risk haritasına dönüşür: gizlilik kapısı, kaynağa bağlı analiz ve arkasındaki eşleştirme."
+    },
+    "solutions": {
+      "title": "Role göre · CompliHub360",
+      "description": "CompliHub360'ın kurucular, operasyon ekipleri ve şirket içi hukuk için yaptıkları — ilk sorudan çözülmüş yükümlülüğe."
+    },
+    "aiGovernance": {
+      "title": "Yapay zekâ yönetişimi · CompliHub360",
+      "description": "Yapay zekâmızın çalıştığı çerçeve ve nasıl davrandığı: altı yönetişim boyutu ve size karşı net taahhütler."
+    },
+    "privacy": {
+      "title": "Gizlilik politikası · CompliHub360",
+      "description": "CompliHub360 kişisel verileri nasıl işler, hangi hukuki dayanakla ve hangi haklara sahipsiniz."
+    },
+    "terms": {
+      "title": "Koşullar · CompliHub360",
+      "description": "CompliHub360 kullanımına ilişkin genel koşullar."
+    },
+    "imprint": {
+      "title": "Künye · CompliHub360",
+      "description": "CompliHub360 için sağlayıcı bilgileri ve iletişim."
+    },
+    "cookies": {
+      "title": "Çerez politikası · CompliHub360",
+      "description": "CompliHub360'ın hangi çerezleri kullandığı, ne işe yaradıkları ve seçiminizi nasıl değiştirebileceğiniz."
+    },
+    "marketCountry": {
+      "title": "{{country}} · Pazarlar · CompliHub360",
+      "description": "{{country}} ülkesinde hangi uyum yükümlülüklerinin geçerli olduğu, alanların nasıl ağırlıklandırıldığı ve hukuki kaynağı."
+    }
   }
 }

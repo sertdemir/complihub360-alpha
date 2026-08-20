@@ -61,7 +61,7 @@ function StatCard({ value, label, delay }: { value: string; label: string; delay
       transition={{ duration: 0.4, delay }}
       className="bg-surface border border-stroke rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow"
     >
-      <Typography variant="display" weight="bold" className="text-fg-brand block mb-1">
+      <Typography variant="display" as="span" weight="bold" className="text-fg-brand block mb-1">
         {value}
       </Typography>
       <Typography variant="caption" className="text-fg-tertiary block normal-case tracking-normal">
@@ -410,7 +410,7 @@ function OperationsSection() {
           <Typography variant="caption" className="text-fg-brand mb-3 block font-semibold">
             {t('solutions.operations.overline', 'For Operations Teams')}
           </Typography>
-          <Typography variant="display" weight="bold" className="text-fg mb-5 leading-tight">
+          <Typography variant="display" as="h2" weight="bold" className="text-fg mb-5 leading-tight">
             {t('solutions.operations.title', 'Centralize, Track & Master Compliance Ops')}
           </Typography>
           <Typography variant="body" className="text-fg-secondary text-lg leading-relaxed">
@@ -490,7 +490,7 @@ function CounselSection() {
             <Typography variant="caption" className="text-fg-brand mb-3 block font-semibold">
               {t('solutions.counsel.overline', 'For In-House Counsel')}
             </Typography>
-            <Typography variant="display" weight="bold" className="text-fg mb-5 leading-tight">
+            <Typography variant="display" as="h2" weight="bold" className="text-fg mb-5 leading-tight">
               {t('solutions.counsel.title', 'Defensible Intelligence. Secure Orchestration.')}
             </Typography>
             <Typography variant="body" className="text-fg-secondary text-lg leading-relaxed mb-8">
@@ -561,7 +561,7 @@ function SolutionsCTA() {
   return (
     <section className="py-16 desktop-s:py-24 bg-primary-900">
       <div className="max-w-3xl mx-auto px-6 text-center">
-        <Typography variant="display" weight="bold" className="text-white mb-5">
+        <Typography variant="display" as="h2" weight="bold" className="text-white mb-5">
           {t('solutions.cta.title', 'Which role fits you?')}
         </Typography>
         <Typography variant="body" className="text-primary-300 mb-10 text-lg">

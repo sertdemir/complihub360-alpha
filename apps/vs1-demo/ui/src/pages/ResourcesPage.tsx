@@ -40,9 +40,6 @@ export function ResourcesPage() {
   const { locale } = useParams();
   const lng = locale ?? 'en';
 
-  useEffect(() => {
-    document.title = t('resources.meta.title');
-  }, [t]);
 
   // Derived, not written down: the stage count comes from the copy that renders
   // the stages, so the three numbers cannot drift apart from what they describe.

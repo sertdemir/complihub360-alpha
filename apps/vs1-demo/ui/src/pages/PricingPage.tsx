@@ -49,9 +49,6 @@ export function PricingPage() {
   const navigate = useNavigate();
   const { locale } = useParams();
 
-  useEffect(() => {
-    document.title = t('pricing.meta.title');
-  }, [t]);
 
   return (
     <main className="bg-surface">

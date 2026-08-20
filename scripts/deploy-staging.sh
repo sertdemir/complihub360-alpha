@@ -24,6 +24,7 @@ cd "$UI" && VITE_DEV_API_KEY="$STAGING_API_KEY" \
   VITE_SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
   VITE_PLAUSIBLE_DOMAIN="${PLAUSIBLE_DOMAIN:-}" \
   VITE_PLAUSIBLE_HOST="${PLAUSIBLE_HOST:-}" \
+  VITE_SITE_ORIGIN="${SITE_ORIGIN:-}" \
   VITE_DEMO_LOGIN=1 \
   npm run build --silent
 printf 'User-agent: *\nDisallow: /\n' > "$UI/dist/robots.txt"

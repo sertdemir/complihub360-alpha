@@ -65,6 +65,9 @@ jobs:
           # injiziert index.html kein Analytics-Skript. Setzen aktiviert es.
           VITE_PLAUSIBLE_DOMAIN: ${{ vars.PLAUSIBLE_DOMAIN }}
           VITE_PLAUSIBLE_HOST: ${{ vars.PLAUSIBLE_HOST }}
+          # Leer => das SEO-Plugin ueberspringt Sitemap, robots.txt und die
+          # Routen-HTMLs. Ohne Origin waere jedes Canonical geraten.
+          VITE_SITE_ORIGIN: ${{ vars.SITE_ORIGIN }}
         run: |
           npm run build --workspace apps/vs1-demo/ui
           printf 'User-agent: *\nDisallow: /\n' > apps/vs1-demo/ui/dist/robots.txt

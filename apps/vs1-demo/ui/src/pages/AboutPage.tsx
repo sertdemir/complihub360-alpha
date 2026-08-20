@@ -32,9 +32,6 @@ export function AboutPage() {
   const { locale } = useParams();
   const lng = locale ?? 'en';
 
-  useEffect(() => {
-    document.title = t('about.meta.title');
-  }, [t]);
 
   const principles = t('about.behave.items', { returnObjects: true });
   const behaviours: string[] = Array.isArray(principles) ? (principles as string[]) : [];

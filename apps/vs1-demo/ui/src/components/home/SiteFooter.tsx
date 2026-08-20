@@ -89,13 +89,20 @@ export function SiteFooter() {
 
   // Same path-rewrite mechanism as the global LanguageSwitcher: swap (or add)
   // the /:locale prefix and navigate — LocaleLayout then calls changeLanguage.
-  const switchLanguage = (lng: string) => {
-    const pathParts = location.pathname.split('/');
-    const targetPath = (pathParts.length > 1 && supportedLngs.includes(pathParts[1]))
-      ? '/' + lng + pathParts.slice(2).join('/') + location.search + location.hash
-      : '/' + lng + location.pathname + location.search + location.hash;
-    navigate(targetPath);
+  // Zielpfad als reine Funktion: href UND onClick lesen dieselbe Quelle, sonst
+  // zeigt der Link woanders hin als der Klick.
+  const languagePath = (lng: string) => {
+    // Der fehlende Schraegstrich hier war ein stiller Fehler: aus /de/pricing
+    // wurde '/'+'en'+'pricing' = /enpricing. Ohne Locale-Praefix fiel das in den
+    // Catch-all, und der Sprachwechsel warf den Nutzer von JEDER Unterseite auf
+    // die Startseite. Sichtbar wurde es erst, als der Umschalter ein echter
+    // Link mit href wurde.
+    const parts = location.pathname.split('/').filter(Boolean);
+    const rest = supportedLngs.includes(parts[0]) ? parts.slice(1) : parts;
+    const tail = rest.join('/');
+    return `/${lng}${tail ? `/${tail}` : ''}${location.search}${location.hash}`;
   };
+  const switchLanguage = (lng: string) => navigate(languagePath(lng));
 
   return (
     <footer className="border-t border-stroke-subtle bg-surface">
@@ -111,13 +118,25 @@ export function SiteFooter() {
               {supportedLngs.map((lng, i) => (
                 <span key={lng} className="flex items-center gap-2">
                   {i > 0 && <span className="text-fg-tertiary">·</span>}
-                  <button
-                    type="button"
-                    onClick={() => switchLanguage(lng)}
+                  {/* Ein <a>, kein <button>. Als Button war der Umschalter der
+                      EINZIGE Weg nach /es und /tr — und ein Crawler folgt keinem
+                      onClick, also existierten beide Sprachen fuer ihn nicht.
+                      Der Klick bleibt SPA-Navigation (preventDefault); Mittel-
+                      klick, Aufklappen im neuen Tab und Crawler bekommen das
+                      href. hrefLang nennt die Zielsprache explizit. */}
+                  <a
+                    href={languagePath(lng)}
+                    hrefLang={lng}
+                    aria-current={lng === locale ? 'true' : undefined}
+                    onClick={(e) => {
+                      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+                      e.preventDefault();
+                      switchLanguage(lng);
+                    }}
                     className={lng === locale ? 'text-fg' : 'text-fg-tertiary transition-colors hover:text-fg'}
                   >
                     {lng.toUpperCase()}
-                  </button>
+                  </a>
                 </span>
               ))}
             </div>

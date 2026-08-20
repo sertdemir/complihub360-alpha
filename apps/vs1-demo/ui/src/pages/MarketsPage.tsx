@@ -46,9 +46,6 @@ export function MarketsIndexPage() {
   const { locale } = useParams();
   const markets = listMarkets();
 
-  useEffect(() => {
-    document.title = t('markets.meta.index');
-  }, [t]);
 
   return (
     <main className="bg-surface">
@@ -158,9 +155,6 @@ export function MarketPage() {
   const profile = known ? getMarketProfile(upper as Parameters<typeof getMarketProfile>[0]) : null;
   const country = known ? t(`markets.countries.${upper}`) : upper;
 
-  useEffect(() => {
-    document.title = known ? t('markets.meta.country', { country }) : t('markets.meta.index');
-  }, [t, known, country]);
 
   if (!profile) {
     return (
