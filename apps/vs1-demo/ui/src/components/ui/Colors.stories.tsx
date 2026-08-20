@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 // Foundations/Colors — Compass color system (Color foundation page · 74 tokens · 6 namespaces).
-// Petrol = brand anchor + risk scale (never red). Gold = scarcity accent.
+// Petrol = brand anchor. Gold = scarcity accent. Risk has its own traffic light.
 
 const meta = {
   title: 'Foundations/Colors',
@@ -52,7 +52,7 @@ function Token({ label, className, hex }: { label: string; className: string; he
 export const Primitives: Story = {
   render: () => (
     <div className="bg-surface p-8">
-      <Scale name="Petrol · brand anchor + risk scale" colors={PETROL} star={5} />
+      <Scale name="Petrol · brand anchor" colors={PETROL} star={5} />
       <Scale name="Gold · accent (scarcity)" colors={GOLD} star={5} />
       <Scale name="Neutral · warm" colors={NEUTRAL} star={9} />
     </div>
@@ -99,7 +99,7 @@ export const Semantic: Story = {
         </div>
       </div>
       <div>
-        <p className="mb-3 font-sans text-sm font-semibold text-fg">Risk — petrol scale, never red</p>
+        <p className="mb-3 font-sans text-sm font-semibold text-fg">Risk — traffic light (green → yellow → orange → red)</p>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <Token label="risk/low" className="bg-risk-low" />
           <Token label="risk/medium" className="bg-risk-medium" />

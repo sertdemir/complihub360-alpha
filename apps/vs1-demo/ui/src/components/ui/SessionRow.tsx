@@ -4,16 +4,18 @@ import { cn } from '../../lib/utils';
 // ─── SessionRow ───────────────────────────────────────────────────────────────
 // Mirrors the Compass "Session Row" (1450:693): user session list row — country
 // badge · domain pill (+ optional NEEDS-REFRESH pill) + updated · title · risk
-// line · ⋯ menu · action slot. Risk drives the risk-line color (high=red,
-// medium=amber, low=muted). Teal-wash surface in dark, white card in light.
+// line · ⋯ menu · action slot. Risk drives the risk-line color off the shared
+// risk tokens (high=orange, medium=yellow, low=green), so it follows the theme;
+// it used to be a hardcoded red/amber pair. Teal-wash surface in dark, white
+// card in light.
 // Used on Sessions list, Domains hub and the Workbenches.
 
 export type SessionRisk = 'high' | 'medium' | 'low';
 
 const RISK_TEXT: Record<SessionRisk, string> = {
-  high: 'text-[#e0556b]',
-  medium: 'text-[#e6a514]',
-  low: 'text-fg-tertiary',
+  high: 'text-risk-high',
+  medium: 'text-risk-medium',
+  low: 'text-risk-low',
 };
 
 export interface SessionRowProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {

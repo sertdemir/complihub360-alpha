@@ -27,20 +27,24 @@ export type PdfTranslate = (key: string, options: { defaultValue: string; [key: 
 const fallbackT: PdfTranslate = (_key, { defaultValue, ...vars }) =>
   Object.entries(vars).reduce((s, [k, v]) => s.split(`{{${k}}}`).join(String(v)), defaultValue);
 
-// Brand palette — risk lives in petrol tones, never red (Brand Code 02).
+// Brand palette. Petrol is the brand; risk is a separate traffic light.
 const INK = '#0F172B';
 const MUTED = '#6B7280';
 const PETROL_DEEP = '#004D40';
 const PETROL_MID = '#0F524D';
-const PETROL_SOFT = '#427B72';
 const GOLD = '#C7A14D';
 const LINE = '#E4E4E7';
 
+// Severity chips, mirroring --color-risk-* in its LIGHT values: paper is a
+// fixed white surface, so the dark-mode tones never apply here. Each fill is
+// the same value the app paints, and each clears 4.5:1 against the white chip
+// label (4.92-10.02). The old low chip was a pale petrol under white text at
+// roughly 1.9:1 — legible on screen at a glance, gone once printed.
 const SEVERITY_FILL: Record<PdfObligation['severity'], string> = {
-  critical: PETROL_DEEP,
-  high: PETROL_MID,
-  medium: PETROL_SOFT,
-  low: '#9CB8AF',
+  critical: '#7F1D1D',
+  high: '#8F3110',
+  medium: '#A16207',
+  low: '#15803D',
 };
 
 // Curated official sources, matched against the legal refs in the details.
@@ -178,7 +182,7 @@ export function generateRiskMapPdf(opts: {
     const rowH = Math.max(30, 14 + detailLines.length * 9);
     ensureRoom(rowH + 8);
 
-    // severity chip (petrol scale)
+    // severity chip (traffic light — fill carries the level, label is white)
     doc.setFillColor(SEVERITY_FILL[o.severity]);
     doc.roundedRect(cols.sev, y - 8, 58, 14, 7, 7, 'F');
     doc.setFont('helvetica', 'bold').setFontSize(7).setTextColor('#FFFFFF');

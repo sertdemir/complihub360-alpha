@@ -12,7 +12,7 @@ Covers every non-risk badge family:
 - **Removable chip** — pass \`onDismiss\` to render a trailing ✕ (active, removable filter).
 - **FilterChip** — the interactive, toggleable pill (a real button with a pressed state).
 
-The petrol **risk scale** ("Niemals rot.") is intentionally a separate, brand-critical
+The **risk scale** (its own traffic-light tokens) is intentionally a separate, brand-critical
 component — use \`RiskBadge\`, not a red \`error\` badge, for risk.
 `;
 
