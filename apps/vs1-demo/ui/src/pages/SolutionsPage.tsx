@@ -71,9 +71,9 @@ function StatCard({ value, label, delay }: { value: string; label: string; delay
   );
 }
 
-// ─── Diagram: Founders "Expand Safely" Path ───────────────────────────────────
+// ─── Diagram: Founders context-to-specialist path ───────────────────────────────────
 
-function ExpandSafelyPath() {
+function ContextToSpecialistPath() {
   const { t } = useTranslation('common');
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-60px' });
@@ -88,7 +88,7 @@ function ExpandSafelyPath() {
   return (
     <div ref={ref} className="bg-primary-900 rounded-2xl p-8 overflow-hidden">
       <Typography variant="ui-small" weight="bold" className="text-primary-300 uppercase tracking-widest mb-6 block text-center">
-        {t('solutions.founders.diagramTitle', 'The "Expand Safely" Path')}
+        {t('solutions.founders.diagramTitle', 'From context to the right specialist')}
       </Typography>
       <div className="flex flex-col tablet:flex-row items-stretch gap-4 tablet:gap-0 relative">
         {nodes.map((node, i) => (
@@ -326,7 +326,7 @@ function FoundersSection() {
               {t('solutions.founders.overline', 'For Founders & CEOs')}
             </Typography>
             <Typography variant="display" weight="bold" className="text-fg mb-5 leading-tight">
-              {t('solutions.founders.title', 'From Regulatory Uncertainty to Confident Expansion')}
+              {t('solutions.founders.title', 'From Regulatory Uncertainty to the Right Decision')}
             </Typography>
             <Typography variant="body" className="text-fg-secondary text-lg leading-relaxed mb-8">
               {t('solutions.founders.body', 'Founders need speed and clarity — not academic legal explanations. CompliHub360 translates regulatory chaos into safe, actionable business decisions so you can scale across borders without surprises.')}
@@ -336,7 +336,7 @@ function FoundersSection() {
               onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/wizard`)}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary-500 text-white font-bold text-sm shadow-md hover:bg-primary-600 transition-colors"
             >
-              {t('solutions.founders.cta', 'Start Your Expansion Check')}
+              {t('solutions.founders.cta', 'Start Your Compliance Check')}
               <ArrowRight size={18} />
             </button>
           </div>
@@ -383,8 +383,8 @@ function FoundersSection() {
           </div>
         </div>
 
-        {/* "Expand Safely" flow diagram */}
-        <ExpandSafelyPath />
+        {/* context-to-specialist flow diagram */}
+        <ContextToSpecialistPath />
 
         {/* Outcome metrics */}
         <div className="grid grid-cols-2 tablet:grid-cols-4 gap-4 mt-10">

@@ -13,6 +13,7 @@ import { MarketsIndexPage, MarketPage } from "./pages/MarketsPage";
 import { ResultsRiskMap } from "./pages/ResultsRiskMap";
 import { SearchResultPage } from "./pages/SearchResultPage";
 import { ResourcesPage } from "./pages/ResourcesPage";
+import { AboutPage } from './pages/AboutPage';
 import { AiGovernancePage } from "./pages/AiGovernancePage";
 import { PrivacyPage, ImprintPage, TermsPage, CookiePage } from "./pages/legal/LegalPages";
 import { AdminOverviewPage } from "./pages/admin/AdminOverviewPage";
@@ -137,6 +138,7 @@ function AppContent() {
                     <Route path="markets" element={<MarketsIndexPage />} />
                     <Route path="markets/:code" element={<MarketPage />} />
                     <Route path="resources" element={<ResourcesPage />} />
+                    <Route path="about" element={<AboutPage />} />
                     <Route path="ai-governance" element={<AiGovernancePage />} />
                     <Route path="results" element={<ResultsRiskMap />} />
                     {/* Station 1A: prose-search answers page (no risk map, no gating). */}

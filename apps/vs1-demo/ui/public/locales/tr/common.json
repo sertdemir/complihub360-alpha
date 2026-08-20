@@ -115,16 +115,16 @@
     "anchorCounsel": "Kurum İçi Hukuk Danışmanları",
     "founders": {
       "overline": "Kurucular ve CEO'lar için",
-      "title": "Mevzuat belirsizliğinden güvenli genişlemeye",
-      "body": "Kurucuların akademik hukuki açıklamalara değil, hıza ve netliğe ihtiyacı vardır. CompliHub360, mevzuat kaosunu sınır ötesi ölçeklendirmenizi sağlayan güvenli, eyleme geçirilebilir iş kararlarına dönüştürür.",
-      "cta": "Genişleme Kontrolünüzü Başlatın",
+      "title": "Mevzuat belirsizliğinden doğru karara",
+      "body": "Kurucuların akademik hukuki açıklamalara değil, hıza ve netliğe ihtiyacı vardır. CompliHub360, mevzuat karmaşıklığını uygulayabileceğiniz kararlara dönüştürür: işletmeniz için neyin geçerli olduğu, bunun neden önemli olduğu ve kimin yardımcı olabileceği. Sınır ötesi büyüme bu kararlardan biridir, tek karar değil.",
+      "cta": "Uyum Kontrolünü Başlatın",
       "pain1Title": "Sınır ötesi kör nokta",
       "pain1Desc": "Uluslararası genişliyor musunuz? KDV eşikleri, EPR ambalaj yasaları ve GDPR ülkeye göre farklılık gösterir. Kaçırılan bir kayıt para cezası anlamına gelebilir.",
       "pain2Title": "Güvenilmez uzman tuzağı",
       "pain2Desc": "Uyumluluk sağlayıcılarına soğuk e-posta göndermek ve haftalarca belirsiz yanıtlar beklemek bir strateji değildir. Bu bir sorumluluktur.",
       "pain3Title": "Biz bunu çözüyoruz",
       "pain3Desc": "Yapay zeka Asistanımız bağlamınızı 4-5 adımda yakalar, yargı bölgesine özgü riskleri haritalandırır ve sizi 24-48 saat içinde SLA güvenceli uzmanlarla buluşturur.",
-      "diagramTitle": "«Güvenli Genişle» Yolu",
+      "diagramTitle": "Bağlamdan doğru uzmana",
       "node1Label": "Ülke Kapısı",
       "node1Desc": "Hedef pazar seçin",
       "node2Label": "Uyarlanabilir Asistan",
@@ -861,7 +861,21 @@
     "featIntentTitle": "Niyet Analizi Motoru",
     "featIntentDesc": "Yapılandırılmamış müşteri girdisini yapılandırılmış bir risk profiline dönüştürür. Yapay zeka yalnızca uyumluluk bağlamını analiz etmekle sınırlıdır ve yasal olarak bağlayıcı kararlar alamaz.",
     "featGateTitle": "Üçlü Yapay Zeka Kapısı Doğrulayıcı",
-    "featGateDesc": "Her yapay zeka eylemi üç kontrolden geçmelidir: Veri Temizliği, Açık Rıza ve Etki Alanı Kısıtlaması. Herhangi bir kontrol başarısız olursa, iş akışı yapay zeka olmayan deterministik bir sürece geri döner."
+    "featGateDesc": "Her yapay zeka eylemi üç kontrolden geçmelidir: Veri Temizliği, Açık Rıza ve Etki Alanı Kısıtlaması. Herhangi bir kontrol başarısız olursa, iş akışı yapay zeka olmayan deterministik bir sürece geri döner.",
+    "behaviour": {
+      "kicker": "Yapay zekâmız nasıl davranır",
+      "title": "Önce uzmanlık. Her zaman insan.",
+      "lead": "Yönetişim, kendimizi bağladığımız kuralları tanımlar. Burada bunların, ürünü gerçekten kullandığınızda ne anlama geldiği yazıyor.",
+      "items": [
+        "Yapay zekâ olduğunu söyler. Kendini asla avukat, mali müşavir veya gümrük uzmanı olarak tanıtmaz.",
+        "Anlaşılır bir dille açıklar ve teknik terimi de belirtir, böylece siz de öğrenirsiniz.",
+        "Hukuki durum açıksa bunu söyler ve gerekçesini açıklar.",
+        "Açık değilse tahmin etmek yerine bunu da söyler ve uzman onayına yönlendirir.",
+        "Sizi randevuya yönlendirmek için korku ya da aciliyet kullanmaz, yükümlülük uydurmaz.",
+        "Uzman değerlendirmesi gerektiği anda konuyu bir insana devreder."
+      ],
+      "principle": "Teknoloji, doğru insana giden en kısa yol olmalıdır — önündeki bir engel değil."
+    }
   },
   "header": {
     "nav": {
@@ -1111,6 +1125,51 @@
     "cta": {
       "title": "Sizin için anlamlı olan yerden başlayın.",
       "lead": "Altı dakika, dört soru, hesap gerekmiyor."
+    }
+  },
+  "about": {
+    "meta": {
+      "title": "Hakkımızda · CompliHub360"
+    },
+    "eyebrow": "Hakkımızda",
+    "title": {
+      "pre": "Her zaman ",
+      "gold": "yanınızda",
+      "post": "."
+    },
+    "lead": "Uyum kararları, işletmeniz için gerçekte neyin geçerli olduğunu anladığınızda ve size yardımcı olan platformun ihtiyacınız olmayan bir şeyi satmak için hiçbir nedeni olmadığında kolaylaşır.",
+    "why": {
+      "kicker": "Neden varız",
+      "statement": "Önemli kararlar veren işletmeler, gerçekten yanlarında olan birini hak eder.",
+      "body": "CompliHub360, yıllarca aynı sorunu görmenin ardından kuruldu: işletmelerin birçok hizmet sağlayıcıya erişimi vardı, ancak bir satış görüşmesine girmeden önce ihtiyaçlarını anlayabilecekleri tarafsız bir yer yoktu. Netliği, bilgiyi ve seçme özgürlüğünü öne almak için varız."
+    },
+    "purpose": {
+      "title": "Amacımız",
+      "body": "İşletmeleri, ihtiyaçlarını her zaman ön planda tutarak bilinçli kararları güvenle almaya güçlendirmek."
+    },
+    "mission": {
+      "title": "Misyonumuz",
+      "body": "Dünyanın her yerindeki işletmelerin uyum ihtiyaçlarını güvenilir bilgi, anlaşılır teknoloji ve doğru uzmanlara erişim yoluyla anlamasını ve yönetmesini sağlamak; bunu tüm iş yolculukları boyunca sürdürmek."
+    },
+    "vision": {
+      "title": "Vizyonumuz",
+      "body": "Uyum konusunda dünya genelinde işletmelerin ilk başvurduğu yer olmak; bilginin daha iyi kararlar sağladığı, rekabeti kalitenin belirlediği ve kalıcı ilişkilerin kurulduğu daha şeffaf bir sektöre katkıda bulunmak."
+    },
+    "behave": {
+      "kicker": "Nasıl çalışıyoruz",
+      "items": [
+        "Satıştan önce bilgi.",
+        "Varsaymadan önce sormak.",
+        "Önce uzmanlık. Her zaman insan.",
+        "İhtiyaç yaratmayız. İhtiyacı tespit ederiz.",
+        "Aynı saygı. Uygun derinlik.",
+        "Güven, deneyimle kazanılır."
+      ]
+    },
+    "close": "Karmaşıklık bize ait. Sadelik size ait.",
+    "cta": {
+      "title": "İşletmeniz için neyin geçerli olduğunu görün.",
+      "lead": "Değerlendirme ücretsizdir, hesap gerektirmez ve birkaç dakika sürer."
     }
   }
 }

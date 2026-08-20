@@ -115,16 +115,16 @@
     "anchorCounsel": "Asesores Jurídicos Internos",
     "founders": {
       "overline": "Para Fundadores y CEOs",
-      "title": "De la incertidumbre regulatoria a la expansión segura",
-      "body": "Los fundadores necesitan velocidad y claridad, no explicaciones legales académicas. CompliHub360 traduce el caos regulatorio en decisiones empresariales seguras y accionables para que puedas escalar globalmente sin sorpresas.",
-      "cta": "Iniciar verificación de expansión",
+      "title": "De la incertidumbre regulatoria a la decisión correcta",
+      "body": "Los fundadores necesitan velocidad y claridad, no explicaciones legales académicas. CompliHub360 convierte la complejidad regulatoria en decisiones que usted puede tomar: qué se aplica a su empresa, por qué importa y quién puede ayudar. La expansión internacional es una de esas decisiones, no la única.",
+      "cta": "Iniciar verificación de cumplimiento",
       "pain1Title": "El punto ciego transfronterizo",
       "pain1Desc": "¿Expandiéndote internacionalmente? Los umbrales de IVA, las leyes de embalaje EPR y el GDPR difieren por país. Un registro omitido puede significar multas.",
       "pain2Title": "La trampa del experto poco fiable",
       "pain2Desc": "Enviar correos fríos a proveedores de cumplimiento y esperar semanas para respuestas vagas no es una estrategia. Es una responsabilidad.",
       "pain3Title": "Nosotros lo solucionamos",
       "pain3Desc": "Nuestro Asistente de IA captura tu contexto en 4–5 pasos, mapea los riesgos por jurisdicción y te conecta con especialistas con SLA garantizado en 24–48h.",
-      "diagramTitle": "El camino de «Expansión Segura»",
+      "diagramTitle": "Del contexto al especialista adecuado",
       "node1Label": "Puerta de País",
       "node1Desc": "Seleccionar mercado objetivo",
       "node2Label": "Asistente Adaptativo",
@@ -861,7 +861,21 @@
     "featIntentTitle": "Motor de Análisis de Intenciones",
     "featIntentDesc": "Transforma la entrada no estructurada del cliente en un perfil de riesgo estructurado. La IA está restringida y no puede tomar decisiones legales vinculantes por sí sola.",
     "featGateTitle": "Validador Triple de Puertas de IA",
-    "featGateDesc": "Cada acción de IA debe pasar tres controles: Sanitización de datos, Consentimiento explícito y Restricción de dominio. Si falla algún control, el flujo de trabajo recurre elegantemente a un proceso determinista sin IA."
+    "featGateDesc": "Cada acción de IA debe pasar tres controles: Sanitización de datos, Consentimiento explícito y Restricción de dominio. Si falla algún control, el flujo de trabajo recurre elegantemente a un proceso determinista sin IA.",
+    "behaviour": {
+      "kicker": "Cómo se comporta nuestra IA",
+      "title": "Rigor profesional. Trato humano siempre.",
+      "lead": "La gobernanza describe las reglas a las que nos obligamos. Aquí está lo que significan cuando usted usa el producto.",
+      "items": [
+        "Dice que es una IA. Nunca se presenta como abogado, asesor fiscal o especialista en aduanas.",
+        "Explica en lenguaje claro y nombra el término técnico, para que usted lo conozca.",
+        "Cuando la situación jurídica es clara, lo dice y lo justifica.",
+        "Cuando no lo es, también lo dice en lugar de suponer, y le remite a una confirmación profesional.",
+        "No usa el miedo ni la urgencia para llevarle a una reserva, y no inventa obligaciones.",
+        "Cede el paso a una persona en cuanto hace falta criterio profesional."
+      ],
+      "principle": "La tecnología debería ser el camino más corto hacia la persona adecuada, no una barrera ante ella."
+    }
   },
   "header": {
     "nav": {
@@ -1111,6 +1125,51 @@
     "cta": {
       "title": "Empiece donde tenga sentido para usted.",
       "lead": "Seis minutos, cuatro preguntas, sin necesidad de cuenta."
+    }
+  },
+  "about": {
+    "meta": {
+      "title": "Quiénes somos · CompliHub360"
+    },
+    "eyebrow": "Quiénes somos",
+    "title": {
+      "pre": "Siempre de su ",
+      "gold": "lado",
+      "post": "."
+    },
+    "lead": "Las decisiones de cumplimiento son más fáciles cuando usted entiende qué se aplica realmente a su empresa, y cuando la plataforma que le ayuda no tiene motivos para venderle algo que no necesita.",
+    "why": {
+      "kicker": "Por qué existimos",
+      "statement": "Quien toma decisiones importantes merece a alguien que esté verdaderamente de su lado.",
+      "body": "CompliHub360 nació de un problema que se repetía año tras año: las empresas tenían acceso a muchos proveedores, pero a ningún lugar neutral donde entender sus necesidades antes de entrar en una conversación de venta. Existimos para poner por delante la claridad, el conocimiento y la libertad de elección."
+    },
+    "purpose": {
+      "title": "Propósito",
+      "body": "Capacitar a las empresas para tomar decisiones informadas con confianza, situando siempre sus necesidades en primer lugar."
+    },
+    "mission": {
+      "title": "Misión",
+      "body": "Permitir que las empresas de todo el mundo entiendan y gestionen sus obligaciones de cumplimiento mediante conocimiento fiable, tecnología comprensible y acceso a los profesionales adecuados, acompañándolas durante todo su recorrido empresarial."
+    },
+    "vision": {
+      "title": "Visión",
+      "body": "Convertirnos en el primer lugar al que acuden las empresas de todo el mundo en materia de cumplimiento, y contribuir a un sector más transparente en el que el conocimiento permita mejores decisiones, la calidad determine la competencia y se construyan relaciones duraderas."
+    },
+    "behave": {
+      "kicker": "Cómo trabajamos",
+      "items": [
+        "Conocimiento antes que venta.",
+        "Preguntar antes de suponer.",
+        "Rigor profesional. Trato humano siempre.",
+        "No creamos necesidades. Las identificamos.",
+        "El mismo respeto. La profundidad adecuada.",
+        "La confianza se demuestra con la experiencia."
+      ]
+    },
+    "close": "La complejidad es nuestra. La sencillez es suya.",
+    "cta": {
+      "title": "Vea qué se aplica a su empresa.",
+      "lead": "El análisis es gratuito, no requiere cuenta y se completa en unos minutos."
     }
   }
 }

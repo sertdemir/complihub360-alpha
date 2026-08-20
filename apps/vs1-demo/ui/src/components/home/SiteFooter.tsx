@@ -53,7 +53,7 @@ const COLUMNS: Column[] = [
   {
     key: 'company',
     links: [
-      { key: 'about', href: '#' },
+      { key: 'about', href: '/about' },
       { key: 'trustSecurity', href: '#' },
       { key: 'contact', href: '#' },
       { key: 'careers', href: '#' },
