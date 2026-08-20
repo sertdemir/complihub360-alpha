@@ -7,7 +7,7 @@
       "low": "Niedrig",
       "medium": "Mittel",
       "high": "Hoch",
-      "critical": "Kritisch"
+      "critical": "Sofort"
     },
     "state": {
       "confirmed": "Bestätigt",
@@ -1005,13 +1005,13 @@
       "gold": "Drei",
       "post": " leise Grundsätze."
     },
-    "subtitle": "Compliance-Produkte schreien meist. Wir müssen das nicht. Risiko braucht kein Rot. Entscheidungen brauchen keinen 20-Schritte-Funnel. Partner brauchen keinen Marktplatz. Fahren Sie über die Karten, um zu sehen, was wir stattdessen getan haben.",
+    "subtitle": "Compliance-Produkte schreien meist. Wir müssen das nicht. Risiko braucht keine Drohung. Entscheidungen brauchen keinen 20-Schritte-Funnel. Partner brauchen keinen Marktplatz. Fahren Sie über die Karten, um zu sehen, was wir stattdessen getan haben.",
     "hoverCue": "Zum Ansehen hovern",
     "cards": [
       {
-        "label": "Code 02 — Risiko in Petrol",
-        "title": "Kein Rot. Nie.",
-        "desc": "Risikostufen von niedrig bis kritisch, ausgedrückt in Petroltönen — nie in Rot. Das Produkt versucht nie, Sie mit Angst zum Handeln zu bewegen."
+        "label": "Code 02 — Priorität statt Panik",
+        "title": "Dringlichkeit, nicht Drohung.",
+        "desc": "Die Stufen sagen, was zuerst dran ist — nicht, was Ihnen droht. Bußgelder stehen im Detail einer Pflicht, nie in ihrer Überschrift."
       },
       {
         "label": "Code 04 — Der Pfad des Assistenten",

@@ -456,6 +456,13 @@ export function AnimatedWizard({
                   ref={setTarget(c.id)}
                   onClick={interactive ? () => (c.id === 'Others' ? setDrawerOpen(true) : toggle(c.id)) : undefined}
                   role={interactive ? 'button' : undefined}
+                  // Tastatur und Fokusring waren korrekt, der ZUSTAND war unhoerbar: man
+                  // konnte auswaehlen, aber nicht erfahren, was ausgewaehlt ist (WCAG 4.1.2).
+                  // "Others" ist kein Schalter, sondern oeffnet den Markt-Drawer — dort
+                  // deshalb haspopup/expanded statt pressed.
+                  aria-pressed={interactive && c.id !== 'Others' ? on : undefined}
+                  aria-haspopup={interactive && c.id === 'Others' ? 'dialog' : undefined}
+                  aria-expanded={interactive && c.id === 'Others' ? drawerOpen : undefined}
                   tabIndex={interactive ? 0 : undefined}
                   onKeyDown={
                     interactive

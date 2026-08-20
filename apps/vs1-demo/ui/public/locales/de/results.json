@@ -180,13 +180,13 @@
   },
   "search": {
     "navGuided": "Meinen Bedarf ermitteln",
-    "placeholder": "Beschreibe dein Anliegen in eigenen Worten…",
+    "placeholder": "Beschreiben Sie Ihr Anliegen in eigenen Worten…",
     "submit": "Eine Compliance-Frage stellen",
-    "answerEyebrow": "Antwort",
+    "answerEyebrow": "KI-Antwort",
     "answerTitleFor": "Zu „{{query}}“",
-    "answerTitleDefault": "Frag alles zu deinen Compliance-Pflichten",
-    "answerBody1": "Das hier gilt für eine Situation wie Ihre voraussichtlich, mit der Quelle hinter jedem Punkt. Allgemeine Information — keine individuelle Rechtsberatung.",
-    "answerBody2": "Um zu sehen, was konkret für Ihr Unternehmen gilt — Ihre Märkte, Ihr Geschäftsmodell — geht es unten mit dem Assessment weiter.",
+    "answerTitleDefault": "Fragen Sie alles zu Ihren Compliance-Pflichten",
+    "answerBody1": "Das gilt für eine Situation wie Ihre voraussichtlich, mit der Quelle hinter jedem Punkt. Diese Antwort stammt von unserer KI: allgemeine Information, keine individuelle Rechtsberatung.",
+    "answerBody2": "Für Ihr Unternehmen kann anderes gelten — Schwellenwerte, Register und Fristen hängen an Ihren Märkten, Ihrem Geschäftsmodell und Ihrem Volumen. Welche davon Sie betreffen, ermittelt das Assessment unten.",
     "sources": "Quellen",
     "obligationsTitle": "Relevante Pflichten",
     "sev": {
@@ -207,17 +207,17 @@
         "detail": "Tracking gegenüber Verbrauchern erfordert vorherige Einwilligung und einen DSGVO-konformen Datenschutzhinweis."
       }
     },
-    "guidesTitle": "Passende Guides",
-    "guides": {
-      "g1": "Das EU-OSS-Verfahren erklärt",
-      "g2": "Verpackungs-(EPR-)Registrierung nach Land",
-      "g3": "DSGVO-Grundlagen für Online-Shops"
-    },
-    "guideRead": "Lesen",
+    "guidesTitle": "Wo Sie weiterlesen können",
+    "guideRead": "Ansehen",
     "bridgeTitle": "Möchten Sie sehen, was für Ihr Unternehmen gilt?",
     "bridgeBody": "Ihre Risk Map ist auf Ihre Märkte und Ihr Geschäftsmodell abgestimmt und zeigt die Verified Partner, die zu Ihrem tatsächlichen Bedarf passen.",
     "bridgeCta": "Meinen Bedarf ermitteln",
-    "previewBadge": "Vorschau · Antwort-Engine noch nicht angebunden"
+    "previewBadge": "Vorschau · Antwort-Engine noch nicht angebunden",
+    "entries": {
+      "markets": "Märkte und was dort gilt",
+      "compliance": "Die acht Compliance-Bereiche",
+      "howItWorks": "So funktioniert der Weg zum Spezialisten"
+    }
   },
   "days_one": "{{count}} Tag",
   "days_other": "{{count}} Tage",

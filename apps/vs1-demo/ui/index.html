@@ -21,6 +21,30 @@
         })();
     </script>
 
+    <!-- Analytics: self-hosted Plausible CE (infra/plausible), cookieless and
+         without personal data — the only kind acceptable in front of a
+         compliance product. Loads ONLY when both vars are configured; Vite
+         leaves the %VITE_…% literal in place when they are not, which the
+         charAt check catches, so dev and test stay silent.
+         The queue stub must exist before the script so custom events fired
+         during startup are not lost. -->
+    <script>
+        window.plausible = window.plausible || function () {
+            (window.plausible.q = window.plausible.q || []).push(arguments);
+        };
+        (function () {
+            var domain = '%VITE_PLAUSIBLE_DOMAIN%';
+            var host = '%VITE_PLAUSIBLE_HOST%';
+            if (!domain || domain.charAt(0) === '%') return;
+            if (!host || host.charAt(0) === '%') return;
+            var el = document.createElement('script');
+            el.defer = true;
+            el.setAttribute('data-domain', domain);
+            el.src = host.replace(/\/+$/, '') + '/js/script.js';
+            document.head.appendChild(el);
+        })();
+    </script>
+
     <!-- Inter font -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
