@@ -15,7 +15,7 @@ import type { SearchProfile } from '../components/wizard/WizardContext';
 // ─── Results · Risk Map · Figma 1667:215 ────────────────────────────────────
 // The generated risk map shown after the wizard. A guest "map" — obligations
 // table (severity · obligation · market · due · state), a locked Verified-Partner
-// match strip, and a save-to-unlock CTA. Risk shown in petrol tints (never red).
+// match strip, and a save-to-unlock CTA. Risk shown in the traffic-light tints.
 
 type Severity = 'critical' | 'high' | 'medium' | 'low';
 type State =

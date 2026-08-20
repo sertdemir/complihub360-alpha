@@ -40,8 +40,10 @@ const SESSIONS = [
   { eyebrow: 'TAX & VAT · ES', title: 'VAT thresholds · Spain', meta: '● Low risk · monitoring only · Updated 7d ago', risk: 'low' },
 ];
 
+// Traffic light straight off the risk tokens — these were hardcoded to a red and
+// an amber that existed in no scale, so they never followed the theme.
 const RISK_META: Record<string, string> = {
-  high: 'text-[#e0556b]', medium: 'text-[#e6a514]', low: 'text-fg-tertiary',
+  high: 'text-risk-high', medium: 'text-risk-medium', low: 'text-risk-low',
 };
 
 // Fixture UI labels → userws keys (display only; fixture data stays original).

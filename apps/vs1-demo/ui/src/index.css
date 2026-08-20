@@ -13,7 +13,7 @@
        Source: Compass Color foundation page (a4BeKbsBGoHkcudhKXUJTl · 18:4)
        ============================================================ */
 
-    /* Petrol — brand anchor + risk-severity scale (risk is never red) */
+    /* Petrol — brand anchor. (Risk moved off this scale to a traffic light.) */
     --petrol-50: 235 241 240;
     --petrol-100: 209 223 221;
     --petrol-200: 168 194 190;
@@ -138,21 +138,29 @@
     --color-interactive-primary-active: var(--petrol-700);
     --color-interactive-primary-disabled: var(--neutral-300);
 
-    /* Risk — petrol scale (NEVER red). Exact values from Compass "⚠️ Risk Badge"
-       page (726:2). Escalation via lightness on a single petrol hue:
-       low (lightest) → critical (deepest). */
-    --color-risk-low: 168 194 190;
-    --color-risk-medium: 66 123 114;
-    --color-risk-high: 0 46 38;
-    --color-risk-critical: 0 22 18;
-    --color-risk-low-bg: 209 223 221;
-    --color-risk-medium-bg: 168 194 190;
-    --color-risk-high-bg: 209 223 221;
-    --color-risk-critical-bg: 235 241 240;
-    --color-risk-text-on-low: var(--petrol-700);
-    --color-risk-text-on-medium: var(--petrol-800);
-    --color-risk-text-on-high: var(--petrol-800);
-    --color-risk-text-on-critical: var(--petrol-900);
+    /* Risk — traffic light: green → yellow → orange → red. Replaces the former
+       petrol-only scale; the dashboard spec had called for red/amber all along.
+       No tone survives a theme change, so light and dark carry separate values —
+       see the .dark block. The accent doubles as outline text, so it clears 4.5:1
+       on the page (worst 4.72 on --color-bg-secondary); as a solid fill it takes
+       WHITE text, which is the same ratio.
+       Medium and High are the pair red/green deficiency collapses: at yellow-700
+       vs orange-700 they were ΔE2000 0.4 apart under deuteranopia — identical.
+       High and Critical are therefore pushed down to L* 34.1 / 28.1, which lifts
+       the worst CVD pair to ΔE 7.1 (deuteranopia) / 7.6 (protanopia). The badge
+       label still carries the meaning; colour alone never does. */
+    --color-risk-low: 21 128 61;                /* #15803D  5.02:1 on white */
+    --color-risk-medium: 161 98 7;              /* #A16207  4.92:1 */
+    --color-risk-high: 143 49 16;               /* #8F3110  8.03:1 */
+    --color-risk-critical: 127 29 29;           /* #7F1D1D 10.02:1 */
+    --color-risk-low-bg: 187 247 208;           /* #BBF7D0 */
+    --color-risk-medium-bg: 254 240 138;        /* #FEF08A */
+    --color-risk-high-bg: 254 215 170;          /* #FED7AA */
+    --color-risk-critical-bg: 254 202 202;      /* #FECACA */
+    --color-risk-text-on-low: 20 83 45;         /* #14532D  7.52:1 on its -bg */
+    --color-risk-text-on-medium: 113 63 18;     /* #713F12  7.45:1 */
+    --color-risk-text-on-high: 124 45 18;       /* #7C2D12  6.92:1 */
+    --color-risk-text-on-critical: 127 29 29;   /* #7F1D1D  6.93:1 */
 
     /* ============================================================
        COMPASS — RADIUS (9 stops · default 2xl=12px)
@@ -300,24 +308,29 @@
     --color-border-subtle: 42 51 64;
     --color-border-focus: 20 168 154;
     --color-icon-default: 154 167 173;
-    /* Risk scale on dark: escalate by brightness (brighter petrol = more urgent),
-       translucent tints for the soft surface. Keeps the petrol identity. */
-    --color-risk-low: 94 124 116;
-    --color-risk-medium: 37 141 120;
-    --color-risk-high: 61 180 154;
-    --color-risk-critical: 95 211 184;
-    --color-risk-low-bg: 43 58 69;
-    --color-risk-medium-bg: 32 61 68;
-    --color-risk-high-bg: 37 69 75;
-    --color-risk-critical-bg: 46 82 86;
-    /* Text ON the soft risk surfaces. These were dark inks carried over from light
-       mode; once the translucent *-bg tints above are flattened they sit on a dark
-       ground and drop to 1.47-2.21:1. Now light, tuned to >=4.6:1 on their own -bg
-       while keeping the petrol identity and the brightness escalation. */
-    --color-risk-text-on-low: 141 169 161;     /* #8da9a1 */
-    --color-risk-text-on-medium: 48 183 156;   /* #30b79c */
-    --color-risk-text-on-high: 69 192 165;     /* #45c0a5 */
-    --color-risk-text-on-critical: 95 211 184; /* #5fd3b8 */
+    /* Risk on dark — same traffic light, different tones. The light values sit at
+       L* 28-47 and would land at 1.2-2.5:1 on slate, so the scale moves up to the
+       400/500 range. Ratios below are on --color-bg-primary (#1f2937); on the
+       deeper #0f172a they are ~1.2x higher. As a solid fill each takes INK text.
+       Low is #6EE7A5 rather than a pure green: it lifts the worst CVD pair from
+       ΔE 7.2 to 9.4, and still sits ΔE 15.5 clear of the dark brand teal #2cc0ad.
+       Medium is the known compromise — ΔE 8.9 from brand gold #d4af37, which is
+       close. It survives because gold reads muted/metallic (L* 74, C* 40) against
+       a highlighter yellow (L* 84, C* 89), but do not put a gold word-highlight
+       and a Medium badge in the same headline. */
+    --color-risk-low: 110 231 165;              /* #6EE7A5  9.53:1 on slate */
+    --color-risk-medium: 250 204 21;            /* #FACC15  9.59:1 */
+    --color-risk-high: 251 146 60;              /* #FB923C  6.49:1 */
+    --color-risk-critical: 248 113 113;         /* #F87171  5.31:1 */
+    --color-risk-low-bg: 20 83 45;              /* #14532D */
+    --color-risk-medium-bg: 113 63 18;          /* #713F12 */
+    --color-risk-high-bg: 124 45 18;            /* #7C2D12 */
+    --color-risk-critical-bg: 127 29 29;        /* #7F1D1D */
+    /* Text ON the soft risk surfaces — light tints of the same hue. */
+    --color-risk-text-on-low: 134 239 172;      /* #86EFAC  6.49:1 on its -bg */
+    --color-risk-text-on-medium: 253 230 138;   /* #FDE68A  6.96:1 */
+    --color-risk-text-on-high: 253 186 116;     /* #FDBA74  5.56:1 */
+    --color-risk-text-on-critical: 252 165 165; /* #FCA5A5  5.28:1 */
 
     /* shadcn back-compat vars (HSL) — dark SLATE so bg-background /
        bg-card / border-border / text-foreground flip with the .dark class. */

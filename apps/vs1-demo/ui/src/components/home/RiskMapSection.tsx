@@ -11,7 +11,7 @@ import { SectionEyebrow, GoldWord } from '../providers/SectionHeading';
 // ─── S2 — Risk Map example (User LP) · Figma 2470:1774 ───────────────────────
 // "Here's what applies to you." — an anonymized full risk-map result inline on
 // the landing: stat strip · obligation table · locked partner matches · save CTA.
-// Light section; severities use the petrol RiskBadge scale (never red).
+// Light section; severities use the RiskBadge traffic light.
 // Copy lives in the 'home' namespace (riskMap.*, risk.*).
 
 // Compass "Stat" (1100:2): eyebrow label over a large tabular value.
