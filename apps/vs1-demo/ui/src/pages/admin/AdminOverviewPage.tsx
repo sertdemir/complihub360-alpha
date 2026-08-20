@@ -121,7 +121,7 @@ export function AdminOverviewPage() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="font-serif text-[32px] font-semibold text-fg">
-              <span className="text-fg-accent">Control</span> Center
+              <span className="text-fg-accent-emphasis">Control</span> Center
             </h1>
             <p className="mt-1 text-[13px] text-fg-secondary">
               {t('subtitle')}
