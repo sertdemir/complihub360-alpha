@@ -68,13 +68,13 @@ function PipelineStep({ step, title, desc, icon: Icon, color, delay }: {
         <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-md ${color}`}>
           <Icon size={22} />
         </div>
-        {step < 5 && <div className="w-0.5 h-10 bg-neutral-200 mt-2" />}
+        {step < 5 && <div className="w-0.5 h-10 bg-surface-tertiary mt-2" />}
       </div>
       <div className="pt-1.5">
-        <Typography variant="ui-small" weight="bold" className="text-neutral-900 mb-1 block">
+        <Typography variant="ui-small" weight="bold" className="text-fg mb-1 block">
           {title}
         </Typography>
-        <Typography variant="caption" className="text-neutral-500 block normal-case tracking-normal leading-relaxed">
+        <Typography variant="caption" className="text-fg-tertiary block normal-case tracking-normal leading-relaxed">
           {desc}
         </Typography>
       </div>
@@ -94,12 +94,12 @@ function StatCard({ value, label, delay }: { value: string; label: string; delay
       initial={{ opacity: 0, scale: 0.9 }}
       animate={isInView ? { opacity: 1, scale: 1 } : {}}
       transition={{ duration: 0.4, delay }}
-      className="bg-white border border-neutral-200 rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow"
+      className="bg-surface border border-stroke rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow"
     >
-      <Typography variant="display" weight="bold" className="text-primary-600 block mb-1">
+      <Typography variant="display" weight="bold" className="text-fg-brand block mb-1">
         {value}
       </Typography>
-      <Typography variant="caption" className="text-neutral-500 block normal-case tracking-normal">
+      <Typography variant="caption" className="text-fg-tertiary block normal-case tracking-normal">
         {label}
       </Typography>
     </motion.div>
@@ -157,7 +157,7 @@ function DataFlowDiagram() {
               <Typography variant="ui-small" weight="bold" className="text-white text-center block mb-0.5">
                 {node.label}
               </Typography>
-              <Typography variant="caption" className="text-primary-400 text-center block normal-case tracking-normal">
+              <Typography variant="caption" className="text-primary-300 text-center block normal-case tracking-normal">
                 {node.sub}
               </Typography>
             </div>
@@ -202,7 +202,7 @@ function FunnelDiagram() {
           className={`rounded-xl border px-6 py-4 flex items-center justify-between ${s.color}`}
         >
           <div className="flex items-center gap-3">
-            <span className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-sm font-bold">
+            <span className="w-7 h-7 rounded-full bg-surface/20 flex items-center justify-center text-sm font-bold">
               {i + 1}
             </span>
             <span className="font-bold text-sm">{s.label}</span>
@@ -222,10 +222,10 @@ function CoverageGrid() {
   const isInView = useInView(ref, { once: true, margin: '-60px' });
 
   const markets = [
-    { flag: '🇬🇧', country: 'United Kingdom', status: t('platform.coverage.marketStatusLive', 'Live'), domains: ['VAT & MTD', 'EPR Packaging', 'UK GDPR', 'Corporate'], color: 'border-primary-300 bg-primary-50' },
-    { flag: '🇩🇪', country: 'Germany', status: t('platform.coverage.marketStatusLive', 'Live'), domains: ['USt-VA', 'VerpackG', 'DSGVO', 'GmbH Setup'], color: 'border-primary-300 bg-primary-50' },
-    { flag: '🇪🇺', country: 'European Union', status: t('platform.coverage.marketStatusLive', 'Live'), domains: ['EU VAT OSS', 'WEEE', 'GDPR', 'CSRD/ESG'], color: 'border-primary-300 bg-primary-50' },
-    { flag: '🇺🇸', country: 'United States', status: 'Q3 2026', domains: ['Sales Tax', 'EPA Compliance', 'CCPA', 'LLC/Corp'], color: 'border-neutral-200 bg-neutral-50 opacity-70' },
+    { flag: '🇬🇧', country: 'United Kingdom', status: t('platform.coverage.marketStatusLive', 'Live'), domains: ['VAT & MTD', 'EPR Packaging', 'UK GDPR', 'Corporate'], color: 'border-primary-300 bg-brand-light' },
+    { flag: '🇩🇪', country: 'Germany', status: t('platform.coverage.marketStatusLive', 'Live'), domains: ['USt-VA', 'VerpackG', 'DSGVO', 'GmbH Setup'], color: 'border-primary-300 bg-brand-light' },
+    { flag: '🇪🇺', country: 'European Union', status: t('platform.coverage.marketStatusLive', 'Live'), domains: ['EU VAT OSS', 'WEEE', 'GDPR', 'CSRD/ESG'], color: 'border-primary-300 bg-brand-light' },
+    { flag: '🇺🇸', country: 'United States', status: 'Q3 2026', domains: ['Sales Tax', 'EPA Compliance', 'CCPA', 'LLC/Corp'], color: 'border-stroke bg-surface-secondary opacity-70' },
   ];
 
   return (
@@ -241,19 +241,19 @@ function CoverageGrid() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <span className="text-3xl">{m.flag}</span>
-              <Typography variant="h3" weight="bold" className="text-neutral-900">
+              <Typography variant="h3" weight="bold" className="text-fg">
                 {m.country}
               </Typography>
             </div>
             <span className={`text-xs font-bold px-2.5 py-1 rounded-md ${
-              m.status === t('platform.coverage.marketStatusLive', 'Live') ? 'bg-success-bg text-success-text' : 'bg-neutral-100 text-neutral-600'
+              m.status === t('platform.coverage.marketStatusLive', 'Live') ? 'bg-success-bg text-success-text' : 'bg-surface-tertiary text-fg-secondary'
             }`}>
               {m.status}
             </span>
           </div>
           <div className="flex flex-wrap gap-2">
             {m.domains.map(d => (
-              <span key={d} className="text-xs font-medium bg-white border border-neutral-200 px-2.5 py-1 rounded-md text-neutral-600">
+              <span key={d} className="text-xs font-medium bg-surface border border-stroke px-2.5 py-1 rounded-md text-fg-secondary">
                 {d}
               </span>
             ))}
@@ -299,7 +299,7 @@ function MagicLinkFlow() {
               {s.desc}
             </Typography>
             {i < steps.length - 1 && (
-              <ArrowRight size={16} className="hidden tablet:block absolute -right-3 top-6 text-neutral-600" />
+              <ArrowRight size={16} className="hidden tablet:block absolute -right-3 top-6 text-fg-secondary" />
             )}
           </motion.div>
         ))}
@@ -338,7 +338,7 @@ function AnchorBar() {
   }, []);
 
   return (
-    <div className="sticky top-16 z-40 bg-white/80 backdrop-blur-md border-b border-neutral-100">
+    <div className="sticky top-16 z-40 bg-surface/80 backdrop-blur-md border-b border-stroke-subtle">
       <div className="max-w-7xl mx-auto px-6">
         <nav className="flex items-center justify-center gap-1 overflow-x-auto scrollbar-hide py-2">
           {anchors.map(a => (
@@ -347,8 +347,8 @@ function AnchorBar() {
               onClick={() => document.getElementById(a.id)?.scrollIntoView({ behavior: 'smooth' })}
               className={`px-4 py-2 rounded-md text-ui-small font-semibold whitespace-nowrap transition-colors ${
                 active === a.id
-                  ? 'text-primary-700 bg-primary-50'
-                  : 'text-neutral-500 hover:text-neutral-800 hover:bg-neutral-50'
+                  ? 'text-fg-brand bg-brand-light'
+                  : 'text-fg-tertiary hover:text-fg hover:bg-surface-secondary'
               }`}
             >
               {a.label}
@@ -370,13 +370,13 @@ function EngineSection() {
       <div className="max-w-7xl mx-auto px-6">
         {/* Hero */}
         <div className="max-w-3xl mb-14">
-          <Typography variant="caption" className="text-primary-500 mb-3 block font-semibold">
+          <Typography variant="caption" className="text-fg-brand mb-3 block font-semibold">
             {t('platform.engine.overline', 'The AI Engine')}
           </Typography>
-          <Typography variant="display" weight="bold" className="text-neutral-900 mb-5 leading-tight">
+          <Typography variant="display" weight="bold" className="text-fg mb-5 leading-tight">
             {t('platform.engine.title', 'From Regulatory Uncertainty to Structured Action')}
           </Typography>
-          <Typography variant="body" className="text-neutral-600 text-lg leading-relaxed max-w-2xl">
+          <Typography variant="body" className="text-fg-secondary text-lg leading-relaxed max-w-2xl">
             {t('platform.engine.body', 'Compliance data is fragmented and unstructured. Our AI acts as a cognitive Advisory Layer — extracting your business intent and mapping it to concrete legal realities. No hallucinations. Every output grounded in verified sources.')}
           </Typography>
         </div>
@@ -391,15 +391,15 @@ function EngineSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4 }}
-            className="bg-white border border-neutral-200 rounded-2xl p-7"
+            className="bg-surface border border-stroke rounded-2xl p-7"
           >
-            <div className="w-11 h-11 rounded-xl bg-primary-50 border border-primary-100 flex items-center justify-center mb-5">
-              <Brain size={22} className="text-primary-600" />
+            <div className="w-11 h-11 rounded-xl bg-brand-light border border-stroke-subtle flex items-center justify-center mb-5">
+              <Brain size={22} className="text-fg-brand" />
             </div>
-            <Typography variant="h3" weight="bold" className="text-neutral-900 mb-3">
+            <Typography variant="h3" weight="bold" className="text-fg mb-3">
               {t('platform.engine.card1Title', 'Adaptive Intent Mapping')}
             </Typography>
-            <Typography variant="body" className="text-neutral-600 leading-relaxed">
+            <Typography variant="body" className="text-fg-secondary leading-relaxed">
               {t('platform.engine.card1Body', 'You don\'t need to know which laws to search for. Our Wizard captures your context in 4–5 steps and generates a structured Search Profile automatically.')}
             </Typography>
           </motion.div>
@@ -409,15 +409,15 @@ function EngineSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            className="bg-white border border-neutral-200 rounded-2xl p-7"
+            className="bg-surface border border-stroke rounded-2xl p-7"
           >
             <div className="w-11 h-11 rounded-xl bg-error-50 border border-error-100 flex items-center justify-center mb-5">
               <EyeOff size={22} className="text-error-500" />
             </div>
-            <Typography variant="h3" weight="bold" className="text-neutral-900 mb-3">
+            <Typography variant="h3" weight="bold" className="text-fg mb-3">
               {t('platform.engine.card2Title', 'Privacy Redaction Pipeline')}
             </Typography>
-            <Typography variant="body" className="text-neutral-600 leading-relaxed">
+            <Typography variant="body" className="text-fg-secondary leading-relaxed">
               {t('platform.engine.card2Body', 'Before any document touches our AI, it passes through a local Redaction Pipeline — automatically masking PII like names, emails, and phone numbers.')}
             </Typography>
           </motion.div>
@@ -427,22 +427,22 @@ function EngineSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: 0.2 }}
-            className="bg-white border border-neutral-200 rounded-2xl p-7"
+            className="bg-surface border border-stroke rounded-2xl p-7"
           >
             <div className="w-11 h-11 rounded-xl bg-success-50 border border-success-100 flex items-center justify-center mb-5">
               <ShieldCheck size={22} className="text-success-500" />
             </div>
-            <Typography variant="h3" weight="bold" className="text-neutral-900 mb-3">
+            <Typography variant="h3" weight="bold" className="text-fg mb-3">
               {t('platform.engine.card3Title', 'Triple AI Gate')}
             </Typography>
-            <Typography variant="body" className="text-neutral-600 leading-relaxed">
+            <Typography variant="body" className="text-fg-secondary leading-relaxed">
               {t('platform.engine.card3Body', 'The AI only activates if three strict conditions are met: document is sanitized, user has given explicit consent, and it\'s not classified as restricted.')}
             </Typography>
           </motion.div>
         </div>
 
         {/* Trust bar */}
-        <div className="flex flex-wrap justify-center gap-8 mt-12 pt-8 border-t border-neutral-100">
+        <div className="flex flex-wrap justify-center gap-8 mt-12 pt-8 border-t border-stroke-subtle">
           <StatCard value="0" label={t('platform.engine.stat1Label', 'PII stored in AI layer')} delay={0} />
           <StatCard value="100%" label={t('platform.engine.stat2Label', 'Source-grounded outputs')} delay={0.1} />
           <StatCard value="<2 min" label={t('platform.engine.stat3Label', 'Full risk profile')} delay={0.2} />
@@ -458,18 +458,18 @@ function MatchingSection() {
   const { t } = useTranslation('common');
 
   return (
-    <Section id="matching" className="py-16 desktop-s:py-24 bg-neutral-50">
+    <Section id="matching" className="py-16 desktop-s:py-24 bg-surface-secondary">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid desktop-s:grid-cols-2 gap-16 items-center">
           {/* Left */}
           <div>
-            <Typography variant="caption" className="text-primary-500 mb-3 block font-semibold">
+            <Typography variant="caption" className="text-fg-brand mb-3 block font-semibold">
               {t('platform.matching.overline', 'Partner Matching')}
             </Typography>
-            <Typography variant="display" weight="bold" className="text-neutral-900 mb-5 leading-tight">
+            <Typography variant="display" weight="bold" className="text-fg mb-5 leading-tight">
               {t('platform.matching.title', 'Verified Specialists. Orchestrated Accountability.')}
             </Typography>
-            <Typography variant="body" className="text-neutral-600 text-lg leading-relaxed mb-8">
+            <Typography variant="body" className="text-fg-secondary text-lg leading-relaxed mb-8">
               {t('platform.matching.body', "We're not a directory. We're an orchestrator. We don't just give you a list of names — we control the engagement to ensure accountability, from first contact to successful resolution.")}
             </Typography>
 
@@ -504,7 +504,7 @@ function MatchingSection() {
 
           {/* Right: Funnel Diagram */}
           <div>
-            <Typography variant="ui-small" weight="bold" className="text-neutral-500 uppercase tracking-widest mb-6 block text-center">
+            <Typography variant="ui-small" weight="bold" className="text-fg-tertiary uppercase tracking-widest mb-6 block text-center">
               {t('platform.matching.funnelTitle', 'The Risk-to-Execution Funnel')}
             </Typography>
             <FunnelDiagram />
@@ -524,13 +524,13 @@ function CoverageSection() {
     <Section id="coverage" className="py-16 desktop-s:py-24 bg-background">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <Typography variant="caption" className="text-primary-500 mb-3 block font-semibold">
+          <Typography variant="caption" className="text-fg-brand mb-3 block font-semibold">
             {t('platform.coverage.overline', 'Global Coverage')}
           </Typography>
-          <Typography variant="display" weight="bold" className="text-neutral-900 mb-5 leading-tight">
+          <Typography variant="display" weight="bold" className="text-fg mb-5 leading-tight">
             {t('platform.coverage.title', 'Localized Security for Global Expansion')}
           </Typography>
-          <Typography variant="body" className="text-neutral-600 text-lg leading-relaxed">
+          <Typography variant="body" className="text-fg-secondary text-lg leading-relaxed">
             {t('platform.coverage.body', 'Your business crosses borders — your compliance should too. Every question, risk, and matched expert is tailored to the laws of your target market.')}
           </Typography>
         </div>
@@ -561,7 +561,7 @@ function CoverageSection() {
                 <Typography variant="ui-small" weight="bold" className="text-accent-400 block mb-1">
                   {r.val}
                 </Typography>
-                <Typography variant="caption" className="text-primary-400 block normal-case tracking-normal">
+                <Typography variant="caption" className="text-primary-300 block normal-case tracking-normal">
                   {r.label}
                 </Typography>
               </div>
@@ -576,22 +576,22 @@ function CoverageSection() {
 // ─── SECTION 4: FOR PARTNER FIRMS ─────────────────────────────────────────────
 
 function PartnersSection() {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const navigate = useNavigate();
 
   return (
-    <Section id="partners" className="py-16 desktop-s:py-24 bg-neutral-50">
+    <Section id="partners" className="py-16 desktop-s:py-24 bg-surface-secondary">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid desktop-s:grid-cols-2 gap-16 items-start">
           {/* Left */}
           <div>
-            <Typography variant="caption" className="text-accent-600 mb-3 block font-semibold">
+            <Typography variant="caption" className="text-fg-brand mb-3 block font-semibold">
               {t('platform.partners.overline', 'For Partner Firms')}
             </Typography>
-            <Typography variant="display" weight="bold" className="text-neutral-900 mb-5 leading-tight">
+            <Typography variant="display" weight="bold" className="text-fg mb-5 leading-tight">
               {t('platform.partners.title', 'Pre-Qualified Clients. Zero Friction.')}
             </Typography>
-            <Typography variant="body" className="text-neutral-600 text-lg leading-relaxed mb-8">
+            <Typography variant="body" className="text-fg-secondary text-lg leading-relaxed mb-8">
               {t('platform.partners.body', 'Stop wasting billable hours on unqualified leads and unstructured cold emails. CompliHub360 sends you highly qualified, structured business clients ready to act.')}
             </Typography>
 
@@ -604,13 +604,13 @@ function PartnersSection() {
               ].map(({ icon: Icon, title, desc }) => (
                 <div key={title} className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-lg bg-accent-50 border border-accent-200 flex items-center justify-center shrink-0">
-                    <Icon size={20} className="text-accent-600" />
+                    <Icon size={20} className="text-fg-brand" />
                   </div>
                   <div>
-                    <Typography variant="ui-small" weight="bold" className="text-neutral-900 mb-1 block">
+                    <Typography variant="ui-small" weight="bold" className="text-fg mb-1 block">
                       {title}
                     </Typography>
-                    <Typography variant="caption" className="text-neutral-500 block normal-case tracking-normal leading-relaxed">
+                    <Typography variant="caption" className="text-fg-tertiary block normal-case tracking-normal leading-relaxed">
                       {desc}
                     </Typography>
                   </div>
@@ -618,7 +618,7 @@ function PartnersSection() {
               ))}
             </div>
 
-            <Button variant="primary" onClick={() => navigate('/register?intent=partner')} className="shadow-md">
+            <Button variant="primary" onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/register?intent=partner`)} className="shadow-md">
               {t('platform.partners.cta', 'Apply as Partner Firm')}
               <ArrowRight size={18} className="ml-2" />
             </Button>
@@ -626,7 +626,7 @@ function PartnersSection() {
 
           {/* Right: Magic Link Flow */}
           <div>
-            <Typography variant="ui-small" weight="bold" className="text-neutral-500 uppercase tracking-widest mb-6 block text-center">
+            <Typography variant="ui-small" weight="bold" className="text-fg-tertiary uppercase tracking-widest mb-6 block text-center">
               {t('platform.partners.flowTitle', 'The Magic Link Workflow')}
             </Typography>
             <MagicLinkFlow />
@@ -647,7 +647,7 @@ function PartnersSection() {
 // ─── Final CTA ────────────────────────────────────────────────────────────────
 
 function PlatformCTA() {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const navigate = useNavigate();
 
   return (
@@ -661,13 +661,13 @@ function PlatformCTA() {
         </Typography>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button
-            onClick={() => navigate('/register')}
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-white text-primary-900 font-bold text-base shadow-lg hover:bg-neutral-100 transition-colors"
+            onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/register`)}
+            className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-white text-primary-900 font-bold text-base shadow-lg hover:bg-surface-tertiary transition-colors"
           >
             {t('platform.cta.btnAssessment', 'Start Free Assessment')}
           </button>
           <button
-            onClick={() => navigate('/register?intent=expert')}
+            onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/register?intent=expert`)}
             className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border-2 border-primary-400 text-white font-bold text-base hover:bg-primary-800 transition-colors"
           >
             {t('platform.cta.btnExpert', 'Skip to Expert Match')}

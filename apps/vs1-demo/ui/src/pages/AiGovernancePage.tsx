@@ -39,16 +39,16 @@ function Section({ id, children, className = '' }: { id: string; children: React
 function GovernanceHero() {
   const { t } = useTranslation('common');
   return (
-    <Section id="hero" className="py-20 desktop-s:py-32 bg-background border-b border-neutral-100">
+    <Section id="hero" className="py-20 desktop-s:py-32 bg-background border-b border-stroke-subtle">
       <div className="max-w-4xl mx-auto px-6 text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 border border-primary-100 mb-6">
-          <ShieldCheck size={16} className="text-primary-600" />
-          <span className="text-sm font-bold text-primary-700">{t('aiGov.trustCenter', 'CompliHub360 Trust Center')}</span>
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-light border border-stroke-subtle mb-6">
+          <ShieldCheck size={16} className="text-fg-brand" />
+          <span className="text-sm font-bold text-fg-brand">{t('aiGov.trustCenter', 'CompliHub360 Trust Center')}</span>
         </div>
-        <Typography variant="display" weight="bold" className="text-neutral-900 mb-6 leading-tight">
+        <Typography variant="display" weight="bold" className="text-fg mb-6 leading-tight">
           {t('aiGov.heroTitle', 'AI Governance Framework')}
         </Typography>
-        <Typography variant="body" className="text-neutral-600 text-xl leading-relaxed max-w-2xl mx-auto">
+        <Typography variant="body" className="text-fg-secondary text-xl leading-relaxed max-w-2xl mx-auto">
           {t('aiGov.heroDesc', 'We believe in responsible innovation. Our platform integrates AI strictly within the bounds of global regulations, ethics, and transparency. Discover how we implement the 6 dimensions of AI Governance.')}
         </Typography>
       </div>
@@ -66,53 +66,53 @@ function DimensionsSection() {
       icon: Scale,
       title: t('aiGov.dimEthicsTitle', 'Ethical Guidelines'),
       desc: t('aiGov.dimEthicsDesc', 'Our AI features respect human autonomy and are designed to augment professionals, not replace them. We prevent systemic bias through continuous monitoring.'),
-      color: 'bg-indigo-50 border-indigo-200 text-indigo-600'
+      color: 'bg-brand-light border-stroke-subtle text-fg-brand'
     },
     {
       id: 'transparency',
       icon: Eye,
       title: t('aiGov.dimTranspTitle', 'Transparency & Explainability'),
       desc: t('aiGov.dimTranspDesc', 'Users deserve to know when they are interacting with AI. Every AI-generated output on CompliHub360 is clearly marked, and its data sources are traceable.'),
-      color: 'bg-blue-50 border-blue-200 text-blue-600'
+      color: 'bg-brand-light border-stroke-subtle text-fg-brand'
     },
     {
       id: 'organizational',
       icon: Users,
       title: t('aiGov.dimOrgTitle', 'Organizational Accountability'),
       desc: t('aiGov.dimOrgDesc', 'Clear governance pipelines dictate who can deploy, access, and audit AI features. We maintain comprehensive audit logs for all AI interactions.'),
-      color: 'bg-emerald-50 border-emerald-200 text-emerald-600'
+      color: 'bg-brand-light border-stroke-subtle text-fg-brand'
     },
     {
       id: 'technical',
       icon: Server,
       title: t('aiGov.dimTechTitle', 'Technical Robustness'),
       desc: t('aiGov.dimTechDesc', 'Our infrastructure ensures zero downtime and resilient fallbacks. Dedicated Privacy Gates sanitize all inputs before they reach any LLM.'),
-      color: 'bg-amber-50 border-amber-200 text-amber-600'
+      color: 'bg-brand-light border-stroke-subtle text-fg-brand'
     },
     {
       id: 'regulatory',
       icon: Globe,
       title: t('aiGov.dimRegTitle', 'Regulatory Compliance'),
       desc: t('aiGov.dimRegDesc', 'Built for the EU AI Act and ISO 42001. We map global standards directly into our Code, prioritizing strict EU and UK privacy rules.'),
-      color: 'bg-rose-50 border-rose-200 text-rose-600'
+      color: 'bg-brand-light border-stroke-subtle text-fg-brand'
     },
     {
       id: 'risk',
       icon: ShieldCheck, // Reusing ShieldCheck or a suitable risk icon
       title: t('aiGov.dimRiskTitle', 'Risk Management'),
       desc: t('aiGov.dimRiskDesc', 'Continuous risk assessment of AI models. We classify features by risk tiers (e.g., EU AI Act High-Risk vs. Minimal-Risk) and apply proportional security controls.'),
-      color: 'bg-slate-50 border-slate-200 text-slate-600'
+      color: 'bg-brand-light border-stroke-subtle text-fg-brand'
     }
   ];
 
   return (
-    <Section id="dimensions" className="py-20 bg-white">
+    <Section id="dimensions" className="py-20 bg-surface">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <Typography variant="h2" weight="bold" className="text-neutral-900 mb-4">
+          <Typography variant="h2" weight="bold" className="text-fg mb-4">
             {t('aiGov.dimTitle', 'The 6 Dimensions of AI Governance')}
           </Typography>
-          <Typography variant="body" className="text-neutral-500 text-lg">
+          <Typography variant="body" className="text-fg-tertiary text-lg">
             {t('aiGov.dimDesc', 'A comprehensive approach to building trustworthy AI systems for enterprise compliance.')}
           </Typography>
         </div>
@@ -125,15 +125,15 @@ function DimensionsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1, duration: 0.5 }}
-              className="rounded-2xl border border-neutral-200 p-8 hover:shadow-lg transition-shadow bg-neutral-50"
+              className="rounded-2xl border border-stroke p-8 hover:shadow-lg transition-shadow bg-surface-secondary"
             >
               <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 border ${dim.color}`}>
                 <dim.icon size={28} />
               </div>
-              <Typography variant="h3" weight="bold" className="text-neutral-900 mb-3">
+              <Typography variant="h3" weight="bold" className="text-fg mb-3">
                 {dim.title}
               </Typography>
-              <Typography variant="body" className="text-neutral-600 leading-relaxed">
+              <Typography variant="body" className="text-fg-secondary leading-relaxed">
                 {dim.desc}
               </Typography>
             </motion.div>
