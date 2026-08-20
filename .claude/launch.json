@@ -4,98 +4,37 @@
     {
       "name": "vs1-demo-ui",
       "runtimeExecutable": "npm",
-      "runtimeArgs": [
-        "--prefix",
-        "apps/vs1-demo/ui",
-        "run",
-        "dev",
-        "--",
-        "--port",
-        "5173",
-        "--host",
-        "127.0.0.1"
-      ],
+      "runtimeArgs": ["--prefix", "apps/vs1-demo/ui", "run", "dev", "--", "--port", "5173", "--host", "127.0.0.1"],
       "port": 5173
-    },
-    {
-      "name": "vs1-demo-ui-wt",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": [
-        "--prefix",
-        "apps/vs1-demo/ui",
-        "run",
-        "dev",
-        "--",
-        "--port",
-        "5183",
-        "--host",
-        "127.0.0.1"
-      ],
-      "port": 5183
     },
     {
       "name": "vs1-demo-storybook",
       "runtimeExecutable": "npm",
-      "runtimeArgs": [
-        "--prefix",
-        "apps/vs1-demo/ui",
-        "run",
-        "storybook"
-      ],
+      "runtimeArgs": ["--prefix", "apps/vs1-demo/ui", "run", "storybook"],
       "port": 6006
     },
     {
       "name": "demo-app-ui",
       "runtimeExecutable": "npm",
-      "runtimeArgs": [
-        "--prefix",
-        "apps/demo-app/ui",
-        "run",
-        "dev",
-        "--",
-        "--port",
-        "4173",
-        "--host",
-        "127.0.0.1"
-      ],
+      "runtimeArgs": ["--prefix", "apps/demo-app/ui", "run", "dev", "--", "--port", "4173", "--host", "127.0.0.1"],
       "port": 4173
     },
     {
       "name": "design-system",
       "runtimeExecutable": "npm",
-      "runtimeArgs": [
-        "--prefix",
-        "ui/design-system",
-        "run",
-        "dev",
-        "--",
-        "--port",
-        "5174",
-        "--host",
-        "127.0.0.1"
-      ],
+      "runtimeArgs": ["--prefix", "ui/design-system", "run", "dev", "--", "--port", "5174", "--host", "127.0.0.1"],
       "port": 5174
     },
     {
       "name": "compliance-api",
       "runtimeExecutable": "npm",
-      "runtimeArgs": [
-        "--prefix",
-        "services/compliance-api",
-        "run",
-        "dev"
-      ],
+      "runtimeArgs": ["--prefix", "services/compliance-api", "run", "dev"],
       "port": 3005
     },
     {
       "name": "dev-board",
       "runtimeExecutable": "npm",
-      "runtimeArgs": [
-        "--prefix",
-        "packages/dev-board",
-        "run",
-        "dev"
-      ],
+      "runtimeArgs": ["--prefix", "packages/dev-board", "run", "dev"],
       "port": 3334
     }
   ],
