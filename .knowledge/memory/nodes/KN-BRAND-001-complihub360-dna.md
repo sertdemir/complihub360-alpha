@@ -33,7 +33,7 @@ Die strategische **Source of Truth** dafür, wie CompliHub360 denkt, sich verhä
 
 **Verbindlich für:** Founders, Employees, Product, UX, AI Engineering, Marketing, Customer Experience, Provider Partnerships, Agenturen, künftige Führung.
 
-**Verbindlich für Agenten:** Jeder Agent, der Produkt-, UX-, UI-, Copy-, Ranking- oder AI-Verhalten entwirft oder bewertet, muss diesen Knoten vor der Entscheidung lesen und gegen den Decision Filter (§6) prüfen.
+**Verbindlich für Agenten:** Jeder Agent, der Produkt-, UX-, UI-, Copy-, Ranking- oder AI-Verhalten entwirft oder bewertet, muss diesen Knoten vor der Entscheidung lesen und gegen den Decision Filter (§6) prüfen. Verbindlich geregelt in [`.agents/rules/dna-decision-filter.md`](../../../.agents/rules/dna-decision-filter.md) (Auslöserkatalog, Nachweisformat, Eskalationspflicht), begründet in [ADR-0002](../../../docs/decisions/ADR-0002-dna-as-binding-agent-rule.md).
 
 ## DNA at a Glance
 
@@ -186,6 +186,8 @@ Dieser Knoten steht **über** den folgenden Dokumenten: bei Widerspruch gewinnt 
 | `GoogleDrive_Docs/Detailed Personas & User Stories.md` | Respekt- und Tonalitätsvorgaben aus §2–§4 |
 | `GoogleDrive_Docs/Search & Ranking Logic.md` | Fairness- und Erklärbarkeitsvorgabe aus §3 |
 | `GoogleDrive_Docs/Monetization Model (Deep Dive).md` | gegen Decision Filter §6 zu prüfen |
+| [`.agents/rules/dna-decision-filter.md`](../../../.agents/rules/dna-decision-filter.md) | macht diesen Knoten für Agenten verbindlich — Auslöser, Nachweis, Eskalation |
+| [`docs/decisions/ADR-0002`](../../../docs/decisions/ADR-0002-dna-as-binding-agent-rule.md) | begründet Form und Grenzen dieser Verbindlichkeit |
 | `ai-governance.md` · `.agents/rules/` | AI-Verhaltensstandard §5 ist bindende Ergänzung |
 | `.claude/skills/compass/` · `.claude/skills/uxui-architect/` | Experience-Prinzipien §3 und Voice §4 |
 | `docs/decisions/ADR-0001-agent-governance.md` | Agenten-Governance operationalisiert §5 |
@@ -195,3 +197,4 @@ Dieser Knoten steht **über** den folgenden Dokumenten: bei Widerspruch gewinnt 
 | Version | Datum | Änderung |
 |---|---|---|
 | V1 | 2026-08-20 | Erstablage aus `CompliHub360_DNA_V1.docx` in Vault und Memory. |
+| V1 | 2026-08-20 | Für Agenten verbindlich gemacht (ADR-0002, Rule `dna-decision-filter`). Inhalt unverändert. |
