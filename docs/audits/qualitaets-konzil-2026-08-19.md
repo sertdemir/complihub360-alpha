@@ -150,3 +150,24 @@ ESLint-Regel gegen rohe `text-[Npx]` und rohe Paletten-Klassen in `pages/` und
 5. **Die vier Alt-Seiten auf Token ziehen** — größter Posten, aber bekannte Musterarbeit.
 6. Vor dem Livegang: Prerender/SSR, Canonical + hreflang, crawlbarer Sprachumschalter, Titel pro Seite, H1-Gliederung, robots + sitemap für Produktion.
 7. Danach: Bundle-Schnitte, Bilder, Schriften.
+
+---
+
+## Nachtrag 20.08.2026 — die Risiko-Doktrin hat sich geändert
+
+Abschnitt 4 dieses Reports führt „Risiko in Rot" als harten Doktrinbruch, und
+PR #53 hat `/compliance` deshalb auf die Petrol-Skala gezogen. **Am 20.08. hat
+PR #55 diese Skala durch eine Ampel ersetzt** (grün/gelb/orange/rot), mit
+CVD-Analyse, dE2000-Messungen und gespiegeltem Figma. Begründung dort: „The
+dashboard spec had meanwhile settled on red/amber."
+
+Damit steht der Befund in Abschnitt 4 **nicht mehr gegen den Code, sondern
+gegen eine bewusste Gegenentscheidung.** Die `--color-risk-*`-Tokens sind
+weiterhin die einzige Risikoquelle — die Tokenisierung aus #53 trägt also —,
+aber sie lösen jetzt zu Ampelfarben auf.
+
+Offen und vom Auftraggeber zu entscheiden: das DNA-Addendum V2 verlangt unter
+P0 #3 ausdrücklich „prioritize without panic" und nennt rot-kritische Labels
+als angstgetrieben. Die Sprache ist inzwischen entdramatisiert (Sofort/Hoch/
+Mittel/Niedrig statt Kritisch), die Farbe wieder alarmierend. Beides
+gleichzeitig ist eine Haltung, aber vermutlich nicht die beabsichtigte.
