@@ -46,6 +46,10 @@ Widerspricht ein Spec, ein Ticket oder bestehender Code der DNA, **gewinnt die D
 
 Regelwerk: [`.agents/rules/dna-decision-filter.md`](.agents/rules/dna-decision-filter.md) · Begründung: [ADR-0002](docs/decisions/ADR-0002-dna-as-binding-agent-rule.md)
 
+## Wenn du Subagenten einsetzt
+
+Subagenten erben diese Datei **nicht** zuverlässig — in der Remote-Umgebung erhalten sie empirisch gar keinen Projektkontext (geprüft 2026-08-20 mit `general-purpose`). Delegierst du eine Aufgabe aus dem Auslöserkatalog oben, gib die harten Grenzen und den Pfad zu `KN-BRAND-001` **explizit im Prompt mit**. Sonst arbeitet der Subagent ohne DNA.
+
 ---
 
 # Privacy — ebenfalls nicht verhandelbar
