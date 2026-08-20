@@ -260,7 +260,7 @@ function FooterBar({
             </span>
             <button
                 onClick={onNext}
-                className="inline-flex items-center gap-2 rounded-xl bg-[#0e6450] px-6 py-3 text-[14px] font-semibold text-white shadow-[0_14px_30px_-14px_rgba(14,100,80,0.9)] transition-transform duration-200 hover:-translate-y-0.5"
+                className="inline-flex items-center gap-2 rounded-xl bg-brand-fixed px-6 py-3 text-[14px] font-semibold text-fg-on-brand-fixed shadow-[0_14px_30px_-14px_rgba(14,100,80,0.9)] transition-transform duration-200 hover:-translate-y-0.5"
             >
                 {nextLabel} <ArrowRight size={16} />
             </button>
@@ -955,7 +955,7 @@ function ToolingRow({
                     className={
                         connected
                             ? "inline-flex items-center gap-1.5 text-[13px] font-semibold text-white/70 hover:text-white"
-                            : "inline-flex items-center gap-1.5 rounded-xl bg-[#0e6450] px-4 py-2.5 text-[13px] font-semibold text-white transition-transform hover:-translate-y-0.5"
+                            : "inline-flex items-center gap-1.5 rounded-xl bg-brand-fixed px-4 py-2.5 text-[13px] font-semibold text-fg-on-brand-fixed transition-transform hover:-translate-y-0.5"
                     }
                 >
                     {action} <ArrowRight size={14} />

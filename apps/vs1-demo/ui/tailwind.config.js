@@ -71,6 +71,8 @@ export default {
                     light: 'rgb(var(--color-bg-brand-light) / <alpha-value>)',
                     /* Full-bleed brand panels that carry copy — see index.css. */
                     surface: 'rgb(var(--color-bg-brand-surface) / <alpha-value>)',
+                    /* Fixed teal for dark grounds that never flip — see index.css. */
+                    fixed: 'rgb(var(--color-bg-brand-fixed) / <alpha-value>)',
                 },
                 'brand-accent': {
                     DEFAULT: 'rgb(var(--color-bg-accent) / <alpha-value>)',
@@ -95,6 +97,7 @@ export default {
                     'accent-emphasis': 'rgb(var(--color-text-accent-emphasis) / <alpha-value>)',
                     'accent-strong': 'rgb(var(--color-text-accent-strong) / <alpha-value>)',
                     'on-brand': 'rgb(var(--color-text-on-brand) / <alpha-value>)',
+                    'on-brand-fixed': 'rgb(var(--color-text-on-brand-fixed) / <alpha-value>)',
                     'on-brand-accent': 'rgb(var(--color-text-on-brand-accent) / <alpha-value>)',
                     'on-accent': 'rgb(var(--color-text-on-accent) / <alpha-value>)',
                 },

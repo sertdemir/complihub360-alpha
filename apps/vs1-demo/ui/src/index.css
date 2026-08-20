@@ -78,6 +78,17 @@
        One token cannot do both, which is why this one exists — and why it is
        deliberately the same value in both themes. */
     --color-bg-brand-surface: var(--petrol-500);
+    /* Brand CTA fill for grounds that DO NOT flip. LoginPage, ResetPasswordPage
+       and ProviderOnboardingPage paint a dark page with a bare hex and carry no
+       .dark class, so --color-bg-brand resolves to its LIGHT value there: petrol
+       #004d40 on #0b1620, a button that all but disappears. Same value in both
+       themes on purpose — like --color-bg-brand-surface above.
+       It replaces a rogue #0e6450 that sat in no scale and measured 2.57:1
+       against the auth ground, under the 3:1 WCAG 1.4.11 wants for a control's
+       boundary; this reads 6.17. Takes -on-brand-fixed as its label: white on
+       this teal is 2.96:1, the ink 6.38. */
+    --color-bg-brand-fixed: 20 168 154;          /* #14a89a */
+    --color-text-on-brand-fixed: 4 20 15;        /* #04140f */
     --color-bg-accent: var(--gold-500);
     --color-bg-accent-light: var(--gold-50);
 
@@ -287,6 +298,9 @@
        keeps the deep petrol in dark mode, where white stays at 9.83:1 and the
        gold eyebrow at 4.57:1. */
     --color-bg-brand-surface: var(--petrol-500);
+    /* Restated, not flipped — see the light block. */
+    --color-bg-brand-fixed: 20 168 154;          /* #14a89a */
+    --color-text-on-brand-fixed: 4 20 15;        /* #04140f */
     /* White, i.e. exactly what bg-white/5 and border-white/10 resolved to before
        — dark mode is unchanged by the elevation migration. */
     --color-elevate: 255 255 255;
