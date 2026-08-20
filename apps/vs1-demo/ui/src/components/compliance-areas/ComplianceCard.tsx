@@ -77,7 +77,7 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.45, delay: index * 0.08 }}
-      className={`bg-white border-2 rounded-2xl overflow-hidden transition-shadow ${area.cardBorder} ${expanded ? 'shadow-lg' : 'shadow-sm hover:shadow-md'}`}
+      className={`bg-surface border-2 rounded-2xl overflow-hidden transition-shadow ${area.cardBorder} ${expanded ? 'shadow-lg' : 'shadow-sm hover:shadow-md'}`}
     >
       {/* Header — always visible */}
       <button
@@ -90,25 +90,25 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <Typography variant="h3" weight="bold" className="text-neutral-900">
+            <Typography variant="h3" weight="bold" className="text-fg">
               {title}
             </Typography>
             <span className={`text-xs font-bold px-2.5 py-1 rounded-md border ${area.riskColor}`}>
               {risk} {t('compliance.riskLabel', 'Risk')}
             </span>
             {personaFit && (
-              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-primary-50 text-primary-700 border border-primary-100">
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-brand-light text-fg-brand border border-stroke-subtle">
                 {personaFit}
               </span>
             )}
           </div>
-          <Typography variant="body" className="text-neutral-600 leading-relaxed">
+          <Typography variant="body" className="text-fg-secondary leading-relaxed">
             {headline || description}
           </Typography>
         </div>
         <ChevronDown
           size={20}
-          className={`text-neutral-400 shrink-0 mt-2 transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`}
+          className={`text-fg-tertiary shrink-0 mt-2 transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`}
         />
       </button>
 
@@ -121,9 +121,9 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
             transition={{ duration: 0.25, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <div className="px-6 desktop-s:px-7 pb-7 pt-0 border-t border-neutral-100">
+            <div className="px-6 desktop-s:px-7 pb-7 pt-0 border-t border-stroke-subtle">
               {description && headline && (
-                <Typography variant="body" className="text-neutral-600 mt-6 leading-relaxed">
+                <Typography variant="body" className="text-fg-secondary mt-6 leading-relaxed">
                   {description}
                 </Typography>
               )}
@@ -134,11 +134,11 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
                   <div>
                     <Typography
                       variant="caption"
-                      className="text-neutral-500 font-semibold uppercase tracking-wider mb-2 block"
+                      className="text-fg-tertiary font-semibold uppercase tracking-wider mb-2 block"
                     >
                       {t('compliance.whoAffected', 'Who is affected')}
                     </Typography>
-                    <Typography variant="body" className="text-neutral-600 leading-relaxed text-sm">
+                    <Typography variant="body" className="text-fg-secondary leading-relaxed text-sm">
                       {affected}
                     </Typography>
                   </div>
@@ -146,7 +146,7 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
                   <div>
                     <Typography
                       variant="caption"
-                      className="text-neutral-500 font-semibold uppercase tracking-wider mb-2 block"
+                      className="text-fg-tertiary font-semibold uppercase tracking-wider mb-2 block"
                     >
                       {t('compliance.keyObligations', 'Key Obligations')}
                     </Typography>
@@ -154,7 +154,7 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
                       {obligations.map(o => (
                         <li key={o} className="flex items-start gap-2">
                           <AlertTriangle size={14} className="text-warning-text shrink-0 mt-0.5" />
-                          <Typography variant="ui-small" className="text-neutral-700">
+                          <Typography variant="ui-small" className="text-fg-secondary">
                             {o}
                           </Typography>
                         </li>
@@ -166,16 +166,16 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
                     <div>
                       <Typography
                         variant="caption"
-                        className="text-neutral-500 font-semibold uppercase tracking-wider mb-2 block flex items-center gap-1.5"
+                        className="text-fg-tertiary font-semibold uppercase tracking-wider mb-2 block flex items-center gap-1.5"
                       >
-                        <ScrollText size={12} className="text-neutral-400" />
+                        <ScrollText size={12} className="text-fg-tertiary" />
                         {t('compliance.regulations.label', 'Key Regulations')}
                       </Typography>
                       <div className="flex flex-wrap gap-2">
                         {regulations.map(r => (
                           <span
                             key={r}
-                            className="text-xs font-mono bg-neutral-50 border border-neutral-200 px-2.5 py-1 rounded-md text-neutral-700"
+                            className="text-xs font-mono bg-surface-secondary border border-stroke px-2.5 py-1 rounded-md text-fg-secondary"
                           >
                             {r}
                           </span>
@@ -185,25 +185,25 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
                   )}
 
                   {finesHeadline && (
-                    <div className="bg-error-50/40 border border-error-100 rounded-xl p-4">
+                    <div className="bg-risk-critical-bg/40 border border-risk-critical/20 rounded-xl p-4">
                       <Typography
                         variant="caption"
-                        className="text-error-700 font-semibold uppercase tracking-wider mb-1.5 block flex items-center gap-1.5"
+                        className="text-risk-on-critical font-semibold uppercase tracking-wider mb-1.5 block flex items-center gap-1.5"
                       >
-                        <Gavel size={12} className="text-error-600" />
+                        <Gavel size={12} className="text-risk-on-critical" />
                         {t('compliance.fines.label', "What's at Stake")}
                       </Typography>
                       <Typography
                         variant="ui-small"
                         weight="bold"
-                        className="text-neutral-900 leading-snug"
+                        className="text-fg leading-snug"
                       >
                         {finesHeadline}
                       </Typography>
                       {finesAuthorities && (
                         <Typography
                           variant="caption"
-                          className="text-neutral-600 mt-1 block normal-case tracking-normal"
+                          className="text-fg-secondary mt-1 block normal-case tracking-normal"
                         >
                           {t('compliance.fines.authoritiesLabel', 'Enforced by:')}{' '}
                           <span className="font-semibold">{finesAuthorities}</span>
@@ -218,15 +218,15 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
                   <div>
                     <Typography
                       variant="caption"
-                      className="text-neutral-500 font-semibold uppercase tracking-wider mb-2 block"
+                      className="text-fg-tertiary font-semibold uppercase tracking-wider mb-2 block"
                     >
                       {t('compliance.whatWeCover', 'What CompliHub360 Covers')}
                     </Typography>
                     <ul className="space-y-2">
                       {coverage.map(c => (
                         <li key={c} className="flex items-start gap-2">
-                          <CheckCircle size={14} className="text-success-500 shrink-0 mt-0.5" />
-                          <Typography variant="ui-small" className="text-neutral-700">
+                          <CheckCircle size={14} className="text-success-600 dark:text-success-300 shrink-0 mt-0.5" />
+                          <Typography variant="ui-small" className="text-fg-secondary">
                             {c}
                           </Typography>
                         </li>
@@ -237,9 +237,9 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
                   <div>
                     <Typography
                       variant="caption"
-                      className="text-neutral-500 font-semibold uppercase tracking-wider mb-2 block flex items-center gap-1.5"
+                      className="text-fg-tertiary font-semibold uppercase tracking-wider mb-2 block flex items-center gap-1.5"
                     >
-                      <Users size={12} className="text-neutral-400" />
+                      <Users size={12} className="text-fg-tertiary" />
                       {t('compliance.specialists.label', 'Verified Specialists')}
                     </Typography>
                     <div className="flex items-center gap-3">
@@ -258,7 +258,7 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
                           </div>
                         ))}
                       </div>
-                      <span className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-md bg-accent-100/40 text-accent-700 border border-accent-200">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-md bg-accent-100 text-accent-800 border border-accent-200">
                         <Sparkles size={11} className="text-accent-600" />
                         {t('compliance.specialists.count', '{{count}} verified specialists', {
                           count: area.specialistsCount,
@@ -270,7 +270,7 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
                   <div>
                     <Typography
                       variant="caption"
-                      className="text-neutral-500 font-semibold uppercase tracking-wider mb-2 block"
+                      className="text-fg-tertiary font-semibold uppercase tracking-wider mb-2 block"
                     >
                       {t('compliance.activeMarkets', 'Active Markets')}
                     </Typography>
@@ -286,7 +286,7 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
                             className={`text-sm border px-3 py-1 rounded-lg transition-colors ${
                               highlight
                                 ? 'bg-primary-500 text-white border-primary-500 font-bold shadow-sm'
-                                : 'bg-neutral-50 border-neutral-200 text-neutral-700'
+                                : 'bg-surface-secondary border-stroke text-fg-secondary'
                             }`}
                           >
                             {m.label}
@@ -297,17 +297,17 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
                   </div>
 
                   {teaserQuestion && teaserOptions.length > 0 && (
-                    <div className="bg-surface-tertiary/30 border border-primary-100 rounded-xl p-4">
+                    <div className="bg-surface-tertiary/30 border border-stroke-subtle rounded-xl p-4">
                       <Typography
                         variant="caption"
-                        className="text-primary-700 font-semibold uppercase tracking-wider mb-2 block"
+                        className="text-fg-brand font-semibold uppercase tracking-wider mb-2 block"
                       >
                         {t('compliance.teaser.label', 'Quick start')}
                       </Typography>
                       <Typography
                         variant="ui-small"
                         weight="bold"
-                        className="text-neutral-900 mb-3"
+                        className="text-fg mb-3"
                       >
                         {teaserQuestion}
                       </Typography>
@@ -317,7 +317,7 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
                             key={opt}
                             type="button"
                             onClick={() => wizardLink(`teaser_${i}`)}
-                            className="text-xs font-semibold bg-white hover:bg-primary-500 hover:text-white border border-primary-200 hover:border-primary-500 text-primary-700 px-3 py-1.5 rounded-md transition-colors"
+                            className="text-xs font-semibold bg-surface hover:bg-primary-500 hover:text-white border border-stroke-subtle hover:border-primary-500 text-fg-brand px-3 py-1.5 rounded-md transition-colors"
                           >
                             {opt}
                           </button>

@@ -34,11 +34,11 @@ export function HowOrchestrationWorks() {
   const { t } = useTranslation('common');
 
   return (
-    <div className="bg-surface-tertiary/40 border border-primary-100 rounded-2xl p-7 desktop-s:p-10 mt-8">
+    <div className="bg-surface-tertiary/40 border border-stroke-subtle rounded-2xl p-7 desktop-s:p-10 mt-8">
       <div className="max-w-2xl mb-8">
         <Typography
           variant="caption"
-          className="text-primary-700 font-semibold uppercase tracking-wider mb-2 block"
+          className="text-fg-brand font-semibold uppercase tracking-wider mb-2 block"
         >
           {t('compliance.howItWorks.overline', 'Orchestration, not directory')}
         </Typography>
@@ -64,20 +64,20 @@ export function HowOrchestrationWorks() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.1 }}
-              className="relative bg-white rounded-2xl p-5 desktop-s:p-6 border border-primary-100 shadow-sm flex flex-col"
+              className="relative bg-surface rounded-2xl p-5 desktop-s:p-6 border border-stroke-subtle shadow-sm flex flex-col"
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-11 h-11 rounded-xl bg-primary-500 flex items-center justify-center shrink-0">
                   <Icon size={20} className="text-white" />
                 </div>
-                <span className="text-xs font-bold uppercase tracking-wider text-primary-600 tabular-nums">
+                <span className="text-xs font-bold uppercase tracking-wider text-fg-brand tabular-nums">
                   {t('compliance.howItWorks.stepLabel', 'Step {{num}}', { num: i + 1 })}
                 </span>
               </div>
-              <Typography variant="h3" weight="bold" className="text-neutral-900 mb-2">
+              <Typography variant="h3" weight="bold" className="text-fg mb-2">
                 {t(`compliance.howItWorks.${step.id}.title`, step.titleDefault)}
               </Typography>
-              <Typography variant="body" className="text-neutral-600 leading-relaxed text-sm flex-1">
+              <Typography variant="body" className="text-fg-secondary leading-relaxed text-sm flex-1">
                 {t(`compliance.howItWorks.${step.id}.body`, step.bodyDefault)}
               </Typography>
 

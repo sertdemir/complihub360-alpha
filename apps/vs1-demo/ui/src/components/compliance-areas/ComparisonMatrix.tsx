@@ -25,7 +25,7 @@ const ROWS: Row[] = [
     titleDefault: 'Data & Privacy',
     riskRank: 4,
     riskLabel: 'Critical',
-    riskColor: 'bg-error-100 text-error-700 border-error-200',
+    riskColor: 'bg-risk-critical-bg text-risk-on-critical border-risk-critical/30',
     timeDefault: 'Immediate',
     fineDefault: 'up to €20M / 4% global revenue',
     marketsDefault: 'EU · UK · CH · US',
@@ -36,7 +36,7 @@ const ROWS: Row[] = [
     titleDefault: 'Tax & VAT',
     riskRank: 3,
     riskLabel: 'High',
-    riskColor: 'bg-error-50 text-error-600 border-error-200',
+    riskColor: 'bg-risk-high-bg text-risk-on-high border-risk-high/30',
     timeDefault: 'Within 30 days of threshold',
     fineDefault: '50–300% of evaded tax + interest',
     marketsDefault: 'EU OSS · UK · US Nexus',
@@ -47,7 +47,7 @@ const ROWS: Row[] = [
     titleDefault: 'EPR & Packaging',
     riskRank: 3,
     riskLabel: 'High',
-    riskColor: 'bg-warning-bg text-warning-text border-warning-text/30',
+    riskColor: 'bg-risk-high-bg text-risk-on-high border-risk-high/30',
     timeDefault: 'Before market entry',
     fineDefault: 'up to 2% annual revenue',
     marketsDefault: 'DE · FR · IT · ES · UK',
@@ -58,7 +58,7 @@ const ROWS: Row[] = [
     titleDefault: 'Marketing Compliance',
     riskRank: 2,
     riskLabel: 'Medium',
-    riskColor: 'bg-warning-bg text-warning-text border-warning-text/30',
+    riskColor: 'bg-risk-medium-bg text-risk-on-medium border-risk-medium/30',
     timeDefault: 'Pre-campaign launch',
     fineDefault: '€5k–€500k + product withdrawal',
     marketsDefault: 'EU · UK',
@@ -69,7 +69,7 @@ const ROWS: Row[] = [
     titleDefault: 'Corporate Structure',
     riskRank: 2,
     riskLabel: 'Medium',
-    riskColor: 'bg-primary-50 text-primary-700 border-primary-200',
+    riskColor: 'bg-risk-medium-bg text-risk-on-medium border-risk-medium/30',
     timeDefault: 'Strategic (3–12 months)',
     fineDefault: 'Tax exposure + entity risk',
     marketsDefault: 'EU · UK · US · CH',
@@ -96,12 +96,12 @@ export function ComparisonMatrix() {
   ];
 
   return (
-    <div className="bg-white border border-neutral-200 rounded-2xl overflow-hidden mt-8">
-      <div className="px-7 py-5 border-b border-neutral-100">
-        <Typography variant="h3" weight="bold" className="text-neutral-900">
+    <div className="bg-surface border border-stroke rounded-2xl overflow-hidden mt-8">
+      <div className="px-7 py-5 border-b border-stroke-subtle">
+        <Typography variant="h3" weight="bold" className="text-fg">
           {t('compliance.matrix.title', 'Side-by-side: every area at a glance')}
         </Typography>
-        <Typography variant="caption" className="text-neutral-500 normal-case tracking-normal mt-1 block">
+        <Typography variant="caption" className="text-fg-tertiary normal-case tracking-normal mt-1 block">
           {t(
             'compliance.matrix.body',
             'Quick-scan comparison for researchers and decision-makers. Sort by risk to triage first.',
@@ -112,20 +112,20 @@ export function ComparisonMatrix() {
       <div className="overflow-x-auto">
         <table className="w-full text-left tabular-nums">
           <thead>
-            <tr className="bg-neutral-50 border-b border-neutral-100">
-              <th className="px-7 py-3 text-xs font-bold uppercase tracking-wider text-neutral-500">
+            <tr className="bg-surface-secondary border-b border-stroke-subtle">
+              <th className="px-7 py-3 text-xs font-bold uppercase tracking-wider text-fg-tertiary">
                 {t('compliance.matrix.area', 'Compliance Area')}
               </th>
               {headers.map(h => (
                 <th
                   key={h.key}
-                  className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-neutral-500"
+                  className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-fg-tertiary"
                 >
                   {h.sortable ? (
                     <button
                       type="button"
                       onClick={() => setSortBy(h.key)}
-                      className="inline-flex items-center gap-1 hover:text-primary-600"
+                      className="inline-flex items-center gap-1 hover:text-fg-brand"
                     >
                       {t(`compliance.matrix.col.${h.key}`, h.defaultLabel)}
                       <ArrowUpDown size={11} />
@@ -145,10 +145,10 @@ export function ComparisonMatrix() {
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.3, delay: i * 0.05 }}
-                className="border-b border-neutral-100 last:border-0 hover:bg-primary-50/30"
+                className="border-b border-stroke-subtle last:border-0 hover:bg-brand-light/30"
               >
                 <td className="px-7 py-4">
-                  <span className="font-bold text-neutral-900 text-sm">
+                  <span className="font-bold text-fg text-sm">
                     {t(`compliance.${row.id}.title`, row.titleDefault)}
                   </span>
                 </td>
@@ -159,16 +159,16 @@ export function ComparisonMatrix() {
                     {t(`compliance.matrix.${row.id}.risk`, row.riskLabel)}
                   </span>
                 </td>
-                <td className="px-5 py-4 text-sm text-neutral-700">
+                <td className="px-5 py-4 text-sm text-fg-secondary">
                   {t(`compliance.matrix.${row.id}.time`, row.timeDefault)}
                 </td>
-                <td className="px-5 py-4 text-sm text-neutral-700">
+                <td className="px-5 py-4 text-sm text-fg-secondary">
                   {t(`compliance.matrix.${row.id}.fine`, row.fineDefault)}
                 </td>
-                <td className="px-5 py-4 text-sm text-neutral-700">
+                <td className="px-5 py-4 text-sm text-fg-secondary">
                   {t(`compliance.matrix.${row.id}.markets`, row.marketsDefault)}
                 </td>
-                <td className="px-5 py-4 text-sm text-neutral-700">
+                <td className="px-5 py-4 text-sm text-fg-secondary">
                   {t(`compliance.matrix.${row.id}.effort`, row.effortDefault)}
                 </td>
               </motion.tr>
@@ -177,8 +177,8 @@ export function ComparisonMatrix() {
         </table>
       </div>
 
-      <div className="px-7 py-3 bg-neutral-50/60 border-t border-neutral-100">
-        <Typography variant="caption" className="text-neutral-500 normal-case tracking-normal">
+      <div className="px-7 py-3 bg-surface-secondary/60 border-t border-stroke-subtle">
+        <Typography variant="caption" className="text-fg-tertiary normal-case tracking-normal">
           {t(
             'compliance.matrix.disclaimer',
             'Indicative ranges based on public regulatory references. Final exposure depends on your specific case — assess via the wizard for accurate guidance.',

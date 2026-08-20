@@ -20,7 +20,7 @@ Drei gemeldete Befunde haben der Nachmessung nicht standgehalten:
 | Gemeldet | Tatsächlich |
 |---|---|
 | „`robots.txt` mit `Disallow: /` fehlkonfiguriert" | **Absichtlich.** `scripts/deploy-staging.sh:23` schreibt sie bei jedem Deploy, nginx setzt zusätzlich `X-Robots-Tag: noindex`. Korrekte Staging-Hygiene. Echter Punkt: für **Produktion** existiert keine robots/sitemap-Strategie — und der Prod-Deploy darf die Staging-Sperre nicht erben. |
-| „10 tote `href=\"#\"` im Footer" | **Falsch.** Der Footer hat **0**. Repo-weit 13, keiner davon dort. |
+| „10 tote `href=\"#\"` im Footer" | **Der Prüfer hatte recht — meine Gegenprobe war falsch.** Ich suchte nur nach dem JSX-Literal `href=\"#\"` und übersah die datengetriebenen `href: '#'` in der `COLUMNS`-Struktur von `SiteFooter.tsx`. Live nachgezählt: **exakt 10** (Beispielergebnis, Compliance-News, Wissensbibliothek, Tutorials, Glossar, Über uns, Vertrauen & Sicherheit, Kontakt, Karriere, Unterauftragsverarbeiter). Korrigiert am 20.08.2026. |
 | Pfad `components/layout/SiteFooter.tsx` | Existiert nicht; die Datei liegt unter `components/home/`. |
 
 Der Barrierefreiheits-Prüfer hat vier eigene Fehlmessungen selbst verworfen
