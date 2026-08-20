@@ -249,7 +249,17 @@
     --color-bg-inverse: 255 255 255;
     --drawer-glass-bg: rgba(31, 41, 55, 0.50);  /* slate #1f2937 @ 50% — floating glass drawer */
     --color-bg-brand: 20 168 154;
+    /* Was unmapped and stayed petrol-500 — 1.49:1 against the slate surface,
+       which is no border at all. Follows --color-bg-brand to the lighter
+       dark-mode teal: 4.96:1, clearing the 3:1 that non-text contrast needs. */
+    --color-border-brand: 20 168 154;
     --color-bg-brand-light: 29 61 71;
+    /* Was unmapped and therefore stayed gold-50 (253 248 230) on the dark slate:
+       --color-text-primary on it measured 1.02:1, i.e. invisible. Flattened like
+       its brand sibling above — gold-500 at 16% over neutral-800 — so the fill
+       still reads as gold while text on it holds 10.03:1. Triplet, not rgba(),
+       otherwise every /NN modifier on this token stops resolving. */
+    --color-bg-accent-light: 60 62 55;
     /* Restated, not flipped: on #14a89a white is 2.96:1 and every gold in the
        scale is below 1.9:1 — nothing readable sits on it. The panel therefore
        keeps the deep petrol in dark mode, where white stays at 9.83:1 and the
