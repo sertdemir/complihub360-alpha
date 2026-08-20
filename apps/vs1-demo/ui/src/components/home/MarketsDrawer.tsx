@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { useTranslation } from 'react-i18next';
-import { supabase, isSupabaseConfigured } from '../../lib/supabase';
+import { getSupabase, isSupabaseConfigured } from '../../lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Search, Check, ArrowRight } from 'lucide-react';
 
@@ -332,9 +332,10 @@ export function SaveProgressContent({ onClose, copyKey = 'saveProgress' }: { onC
             // Real magic-link signup (Wave A2): the link returns to /results,
             // where the saved profile (localStorage) rebuilds the page and the
             // fresh session unlocks the partner matches.
-            if (isSupabaseConfigured && supabase) {
+            const sb = isSupabaseConfigured ? await getSupabase() : null;
+            if (sb) {
               const lang = document.documentElement.lang || 'en';
-              await supabase.auth.signInWithOtp({
+              await sb.auth.signInWithOtp({
                 email,
                 options: { emailRedirectTo: `${window.location.origin}/${lang}/results` },
               }).catch(() => { /* rate-limit etc. — sent state still shows guidance */ });

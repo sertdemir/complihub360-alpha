@@ -5,7 +5,7 @@ import { Trans, useTranslation } from "react-i18next";
 import { ArrowRight, Mail, EyeOff, AlertTriangle } from "lucide-react";
 import { Logo } from "../../components/ui/Logo";
 import { useAuthStore } from "../../store/useAuthStore";
-import { supabase, isSupabaseConfigured, isDemoLoginEnabled } from "../../lib/supabase";
+import { getSupabase, isSupabaseConfigured, isDemoLoginEnabled } from "../../lib/supabase";
 
 // ─── Auth · Figma 1839:2 / 1842:2288 / 1853:2 / 1855:2 / 1856:2 / 1857:3 ─────
 // One dark split-screen shell, several views driven by a small state machine:
@@ -201,8 +201,9 @@ export function LoginPage() {
     const handleMagicLink = async () => {
         setAuthError(null);
         if (!/.+@.+\..+/.test(email)) { setAuthError(t("login.validation.invalidEmail")); return; }
-        if (!isSupabaseConfigured || !supabase) { setView("magic-sent"); return; } // dev fallback
-        const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: callbackUrl } });
+        const sb = isSupabaseConfigured ? await getSupabase() : null;
+        if (!sb) { setView("magic-sent"); return; } // dev fallback
+        const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: callbackUrl } });
         if (error) { setAuthError(error.message); return; }
         setView("magic-sent");
     };
@@ -210,8 +211,9 @@ export function LoginPage() {
     // Partner · email + password
     const handlePasswordSignIn = async () => {
         setAuthError(null);
-        if (!isSupabaseConfigured || !supabase) { finishLogin("partner"); return; } // dev fallback
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const sb = isSupabaseConfigured ? await getSupabase() : null;
+        if (!sb) { finishLogin("partner"); return; } // dev fallback
+        const { error } = await sb.auth.signInWithPassword({ email, password });
         if (error) { setAuthError(error.message); return; }
         navigate(params.get("redirect") || `/${lang}/partner-dashboard`);
     };
@@ -221,8 +223,9 @@ export function LoginPage() {
     const handleForgot = async () => {
         setAuthError(null);
         if (!/.+@.+\..+/.test(email)) { setAuthError(t("login.validation.invalidEmail")); return; }
-        if (isSupabaseConfigured && supabase) {
-            await supabase.auth.resetPasswordForEmail(email, { redirectTo: resetUrl });
+        const sb = isSupabaseConfigured ? await getSupabase() : null;
+        if (sb) {
+            await sb.auth.resetPasswordForEmail(email, { redirectTo: resetUrl });
         }
         setView("reset-sent");
     };
@@ -230,8 +233,9 @@ export function LoginPage() {
     // OAuth · Google
     const handleOAuth = async (role: "user" | "partner") => {
         setAuthError(null);
-        if (!isSupabaseConfigured || !supabase) { finishLogin(role); return; } // dev fallback
-        const { error } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: callbackUrl } });
+        const sb = isSupabaseConfigured ? await getSupabase() : null;
+        if (!sb) { finishLogin(role); return; } // dev fallback
+        const { error } = await sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: callbackUrl } });
         if (error) setAuthError(error.message);
     };
 

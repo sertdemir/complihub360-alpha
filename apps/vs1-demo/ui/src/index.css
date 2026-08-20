@@ -419,3 +419,17 @@ section[id],
 footer[id] {
   scroll-margin-top: 96px;
 }
+
+/* CSS-Animationen und -Transitions, die framer-motion nicht kennt. Der
+   MotionConfig-Schalter in main.tsx deckt die motion-Komponenten ab; dieser
+   Block faengt den Rest (Tailwind-Transitions, @keyframes, Smooth-Scroll). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

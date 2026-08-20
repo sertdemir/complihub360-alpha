@@ -1,4 +1,4 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 // Public, browser-safe Supabase values. The ANON key is designed to be public;
 // the SERVICE_ROLE key must NEVER appear in any VITE_ variable.
@@ -24,16 +24,36 @@ export const isDemoLoginEnabled = !isSupabaseConfigured || import.meta.env.VITE_
  *  - DEV builds without config fall back to a clearly-labelled local demo login
  *    so the preview keeps working until VITE_SUPABASE_* are supplied.
  */
-export const supabase: SupabaseClient | null = isSupabaseConfigured
-  ? createClient(url as string, anonKey as string, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true, // consume magic-link / OAuth tokens from the URL
-        flowType: 'pkce',
-      },
-    })
-  : null;
+// @supabase/supabase-js wiegt ~206 kB roh / 60 kB gzip (auth-js, realtime,
+// storage, postgrest). Bis 20.08. lag es im Einstiegs-Chunk, weil dieses Modul
+// den Client auf Modulebene erzeugte — ein anonymer Besucher auf /de/imprint lud
+// den Realtime- und Storage-Client mit. Jetzt kommt er beim ersten Bedarf.
+//
+// Der Import wird gemerkt, nicht wiederholt: mehrere Aufrufer teilen sich
+// EINEN Client, sonst liefen mehrere onAuthStateChange-Abonnements nebeneinander.
+let clientPromise: Promise<SupabaseClient | null> | null = null;
+
+/**
+ * Der Supabase-Client, oder null wenn die Umgebung ihn nicht konfiguriert.
+ * Asynchron, weil das SDK nachgeladen wird — Aufrufer, die vorher `supabase`
+ * synchron lasen, muessen awaiten.
+ */
+export function getSupabase(): Promise<SupabaseClient | null> {
+  if (!isSupabaseConfigured) return Promise.resolve(null);
+  if (!clientPromise) {
+    clientPromise = import('@supabase/supabase-js').then(({ createClient }) =>
+      createClient(url as string, anonKey as string, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true, // consume magic-link / OAuth tokens from the URL
+          flowType: 'pkce',
+        },
+      }),
+    );
+  }
+  return clientPromise;
+}
 
 if (!isSupabaseConfigured && import.meta.env.DEV) {
   // eslint-disable-next-line no-console
@@ -44,7 +64,8 @@ if (!isSupabaseConfigured && import.meta.env.DEV) {
 
 /** Returns the current access token (JWT) for authenticated API calls, or null. */
 export async function getAccessToken(): Promise<string | null> {
-  if (!supabase) return null;
-  const { data } = await supabase.auth.getSession();
+  const client = await getSupabase();
+  if (!client) return null;
+  const { data } = await client.auth.getSession();
   return data.session?.access_token ?? null;
 }

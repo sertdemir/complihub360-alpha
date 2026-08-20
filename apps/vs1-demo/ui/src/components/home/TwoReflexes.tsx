@@ -56,7 +56,18 @@ function ReflexCard({
         {/* Fläche ist ein bildabgestimmter Inline-Cremeton und bleibt hell — Text daher
             hartcodiert dunkel, nicht text-fg (das ergab 1,01:1 im Dark-Mode). */}
         <h3 className="px-7 pt-7 font-serif text-[2rem] font-bold leading-[1.2] text-neutral-900">{title}</h3>
-        <img src={image} alt="" width={imageW} height={imageH} className="mt-5 block w-full" />
+        {/* Beide Karten liegen bei rund 24.700 px Scrolltiefe — Bildschirm 31 von 56.
+            Sie sofort zu laden kostete 216 kB, bevor irgendjemand sie sehen kann.
+            width/height standen schon da, es gibt also keinen Layoutsprung. */}
+        <img
+          src={image}
+          alt=""
+          width={imageW}
+          height={imageH}
+          loading="lazy"
+          decoding="async"
+          className="mt-5 block w-full"
+        />
       </div>
       <div
         className="flex min-h-[120px] items-center justify-center text-center text-[16px] font-semibold uppercase tracking-[0.08em] text-white"

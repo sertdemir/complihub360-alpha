@@ -2,6 +2,7 @@ import http from 'http';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import zlib from 'zlib';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,7 +21,15 @@ const MIME_TYPES = {
     '.ico': 'image/x-icon',
     '.woff': 'font/woff',
     '.woff2': 'font/woff2',
+    '.xml': 'application/xml',
+    '.txt': 'text/plain',
+    '.webp': 'image/webp',
+    '.avif': 'image/avif',
 };
+
+// Nur Textformate profitieren; woff2/png/webp sind bereits komprimiert und
+// wuerden durch gzip groesser statt kleiner.
+const COMPRESSIBLE = new Set(['.html', '.js', '.css', '.json', '.svg', '.xml', '.txt']);
 
 const server = http.createServer((req, res) => {
     console.log(`[REQ] ${req.method} ${req.url}`);
@@ -36,8 +45,18 @@ const server = http.createServer((req, res) => {
         return;
     }
 
+    // Verzeichnis -> dessen index.html. Seit dem SEO-Build (vite-plugin-seo)
+    // liegt fuer jede Route ein eigenes dist/<locale>/<pfad>/index.html; ohne
+    // diesen Schritt fand existsSync das VERZEICHNIS, und readFile darauf warf
+    // EISDIR -> HTTP 500 auf jeder oeffentlichen URL.
+    let stat = fs.existsSync(filePath) ? fs.statSync(filePath) : null;
+    if (stat?.isDirectory()) {
+        const candidate = path.join(filePath, 'index.html');
+        if (fs.existsSync(candidate)) { filePath = candidate; stat = fs.statSync(filePath); }
+        else stat = null;
+    }
     // SPA fallback
-    if (!fs.existsSync(filePath)) {
+    if (!stat) {
         filePath = path.join(DIST_DIR, 'index.html');
     }
 
@@ -53,10 +72,33 @@ const server = http.createServer((req, res) => {
                 res.writeHead(500);
                 res.end('Sorry, check with the site admin for error: ' + error.code + ' ..\n');
             }
-        } else {
-            res.writeHead(200, { 'Content-Type': contentType });
-            res.end(content, 'utf-8');
+            return;
         }
+
+        // Content-hashed bundles unter /assets/ aendern sich nie unter ihrem
+        // Namen. index.html und /locales/ muessen dagegen revalidiert werden,
+        // sonst zeigt eine gecachte index.html nach einem Deploy auf geloeschte
+        // Asset-Hashes — dieselbe Begruendung wie in infra/staging/nginx.conf.
+        const cacheControl = urlPath.startsWith('/assets/')
+            ? 'public, max-age=2592000, immutable'
+            : 'no-cache, must-revalidate';
+
+        const headers = { 'Content-Type': contentType, 'Cache-Control': cacheControl };
+        const accepts = String(req.headers['accept-encoding'] || '');
+
+        // Bis 20.08. lieferte dieser Pfad alles unkomprimiert aus, waehrend der
+        // nginx-Pfad daneben gzip nutzte — zwei Auslieferungswege sehr
+        // unterschiedlicher Guete fuer dieselben Dateien.
+        if (COMPRESSIBLE.has(extname) && /\bgzip\b/.test(accepts)) {
+            zlib.gzip(content, (gzErr, zipped) => {
+                if (gzErr) { res.writeHead(200, headers); res.end(content); return; }
+                res.writeHead(200, { ...headers, 'Content-Encoding': 'gzip', Vary: 'Accept-Encoding' });
+                res.end(zipped);
+            });
+            return;
+        }
+        res.writeHead(200, headers);
+        res.end(content);
     });
 });
 
