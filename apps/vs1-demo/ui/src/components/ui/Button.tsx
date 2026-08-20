@@ -72,9 +72,16 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const variantClasses: Record<ButtonVariant, string> = {
-      // Canonical button green = flat Teal #14a89a in BOTH modes, dark ink for AA
-      // contrast — every CTA matches the wizard-footer teal, light and dark.
-      primary: 'bg-[#14a89a] text-[#04140f] hover:brightness-95 active:brightness-90 focus:ring-[#14a89a]',
+      // The primary CTA follows the brand token, so it is petrol #004d40 in light
+      // and teal #14a89a in dark. It used to be that teal pinned in BOTH modes,
+      // which put a colour on light pages that exists in no light token — and at
+      // 2.96:1 against a white page it missed the 3:1 WCAG 1.4.11 asks of a
+      // control's surface. On the token it reads 9.83 light / 4.96 dark, and the
+      // label follows too: white on petrol (9.83), ink on teal (6.75).
+      // Grounds that do NOT flip (the auth and onboarding pages paint a dark hex
+      // without a .dark class) must use bg-brand-fixed instead — this token would
+      // resolve to petrol there and vanish.
+      primary: 'bg-brand text-fg-on-brand hover:brightness-95 active:brightness-90 focus:ring-stroke-focus',
       secondary:
         'bg-neutral-100 text-neutral-900 hover:bg-neutral-200 active:bg-neutral-300 focus:ring-neutral-500 dark:bg-white/10 dark:text-white dark:hover:bg-white/[0.16] dark:active:bg-white/20',
       outline:

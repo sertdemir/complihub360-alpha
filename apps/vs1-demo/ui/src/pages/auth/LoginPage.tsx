@@ -423,7 +423,7 @@ export function LoginPage() {
                                     />
                                     <button
                                         type="submit"
-                                        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-[#0e6450] px-5 py-3.5 text-[15px] font-semibold text-white transition-transform duration-200 hover:-translate-y-0.5"
+                                        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-fixed px-5 py-3.5 text-[15px] font-semibold text-fg-on-brand-fixed transition-transform duration-200 hover:-translate-y-0.5"
                                     >
                                         {t("login.forgot.send")} <ArrowRight size={16} />
                                     </button>
@@ -448,7 +448,7 @@ export function LoginPage() {
                                     <button
                                         type="button"
                                         onClick={() => { window.location.href = "mailto:"; }}
-                                        className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-[#0e6450] px-5 py-3.5 text-[15px] font-semibold text-white transition-transform duration-200 hover:-translate-y-0.5"
+                                        className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-fixed px-5 py-3.5 text-[15px] font-semibold text-fg-on-brand-fixed transition-transform duration-200 hover:-translate-y-0.5"
                                     >
                                         {t("login.openMailApp")} <ArrowRight size={16} />
                                     </button>
@@ -465,7 +465,7 @@ export function LoginPage() {
                                                 key={k}
                                                 type="button"
                                                 onClick={() => setErrKind(k)}
-                                                className={"flex-1 rounded-full px-3.5 py-1.5 transition-colors lg:flex-none " + (errKind === k ? "bg-[#0e6450] text-white" : "text-white/55 hover:text-white")}
+                                                className={"flex-1 rounded-full px-3.5 py-1.5 transition-colors lg:flex-none " + (errKind === k ? "bg-brand-fixed text-fg-on-brand-fixed" : "text-white/55 hover:text-white")}
                                             >
                                                 {t(`login.errors.kindLabels.${errKey(k)}`)}
                                             </button>
@@ -482,7 +482,7 @@ export function LoginPage() {
                                     <button
                                         type="button"
                                         onClick={() => setView("form")}
-                                        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-[#0e6450] px-5 py-3.5 text-[15px] font-semibold text-white transition-transform duration-200 hover:-translate-y-0.5"
+                                        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-fixed px-5 py-3.5 text-[15px] font-semibold text-fg-on-brand-fixed transition-transform duration-200 hover:-translate-y-0.5"
                                     >
                                         {t("login.errors.sendNewLink")} <ArrowRight size={16} />
                                     </button>
@@ -562,7 +562,7 @@ export function LoginPage() {
                                     </div>
                                     <button
                                         type="submit"
-                                        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-[#0e6450] px-5 py-3.5 text-[15px] font-semibold text-white transition-transform duration-200 hover:-translate-y-0.5"
+                                        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-fixed px-5 py-3.5 text-[15px] font-semibold text-fg-on-brand-fixed transition-transform duration-200 hover:-translate-y-0.5"
                                     >
                                         {t("login.partner.signIn")} <ArrowRight size={16} />
                                     </button>

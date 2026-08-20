@@ -23,7 +23,13 @@ export const DomainCard = React.forwardRef<HTMLDivElement, DomainCardProps>(
     <div
       ref={ref}
       className={cn(
-        'flex flex-col gap-1.5 rounded-[10px] border border-stroke-brand bg-brand-light px-4 py-3.5',
+        // The card sits on --color-bg-primary, not on the brand tint it used to
+        // carry. On that tint the risk line failed AA in BOTH themes — light
+        // low 4.39 / medium 4.31, dark critical 4.19 — because the tint is a
+        // mid surface and the accents are tuned to the primary one. The brand
+        // identity survives in the border and the eyebrow, which is where it
+        // was doing the work anyway.
+        'flex flex-col gap-1.5 rounded-[10px] border border-stroke-brand bg-surface px-4 py-3.5',
         interactive && 'cursor-pointer transition-colors hover:border-fg-brand',
         className,
       )}
