@@ -15,9 +15,15 @@ echo "→ Building frontend…"
 # VITE_DEMO_LOGIN=1 keeps the one-click stakeholder logins alongside real auth.
 # shellcheck disable=SC1091
 source "$REPO_ROOT/.env.staging"
+# Analytics: beide leer => index.html injiziert nichts, es fliegt kein Byte.
+# Erst wenn in .env.staging gesetzt, misst Staging auf die dort genannte Site.
+# Bewusst eine EIGENE data-domain nehmen, sonst mischen sich Staging-Klicks
+# unter die echten Zahlen.
 cd "$UI" && VITE_DEV_API_KEY="$STAGING_API_KEY" \
   VITE_SUPABASE_URL="$SUPABASE_URL" \
   VITE_SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
+  VITE_PLAUSIBLE_DOMAIN="${PLAUSIBLE_DOMAIN:-}" \
+  VITE_PLAUSIBLE_HOST="${PLAUSIBLE_HOST:-}" \
   VITE_DEMO_LOGIN=1 \
   npm run build --silent
 printf 'User-agent: *\nDisallow: /\n' > "$UI/dist/robots.txt"

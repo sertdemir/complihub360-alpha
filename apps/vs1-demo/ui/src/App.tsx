@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { trackScrollDepth } from "./lib/analytics";
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, useParams, Navigate, Outlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supportedLngs } from "./i18n/config";
@@ -120,6 +121,10 @@ function LocaleLayout() {
 
 function AppContent() {
     const location = useLocation();
+
+    // Scroll depth per page view. Re-armed on every navigation so the milestones
+    // are per page, not per session; a no-op unless Plausible is configured.
+    useEffect(() => trackScrollDepth(location.pathname), [location.pathname]);
 
     return (
         <>
