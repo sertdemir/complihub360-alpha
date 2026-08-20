@@ -129,7 +129,7 @@ function StepProgress({ current, total, label }: { current: number; total: numbe
     return (
         <div className="flex flex-col gap-2 mb-6">
             <div className="flex justify-between items-center">
-                <Typography variant="body" weight="semibold" className="uppercase tracking-widest text-neutral-400 text-[10px]">
+                <Typography variant="body" weight="semibold" className="uppercase tracking-widest text-neutral-500 text-[10px]">
                     {t("register.stepProgress", { current, total, label })}
                 </Typography>
                 <Typography variant="body" weight="bold" className="text-primary-600 text-[10px]">
@@ -300,7 +300,7 @@ function UserStep1({ data, onChange }: { data: UserFormData; onChange: (d: Parti
             </button>
             <div className="flex items-center gap-3">
                 <div className="flex-1 h-px bg-neutral-200" />
-                <span className="text-xs text-neutral-400 font-medium">{t("register.orEmail")}</span>
+                <span className="text-xs text-neutral-500 font-medium">{t("register.orEmail")}</span>
                 <div className="flex-1 h-px bg-neutral-200" />
             </div>
             <InputField id="reg-name" label={t("register.nameLabel")} required value={data.name} onChange={v => onChange({ name: v })} placeholder={t("register.namePlaceholder")} />
@@ -415,7 +415,7 @@ function PartnerStep1({ data, onChange }: { data: PartnerFormData; onChange: (d:
             </button>
             <div className="flex items-center gap-3">
                 <div className="flex-1 h-px bg-neutral-200" />
-                <span className="text-xs text-neutral-400 font-medium">{t("register.orEmail")}</span>
+                <span className="text-xs text-neutral-500 font-medium">{t("register.orEmail")}</span>
                 <div className="flex-1 h-px bg-neutral-200" />
             </div>
             <InputField id="preg-name" label={t("register.nameLabel")} required value={data.name} onChange={v => onChange({ name: v })} placeholder={t("register.namePlaceholder")} />
@@ -513,7 +513,7 @@ function BenefitsPanel({ role }: { role: Role }) {
 
             {/* Benefits */}
             <div className="flex-1 flex flex-col justify-center">
-                <Typography variant="body" weight="semibold" className="uppercase tracking-widest text-primary-400 text-[10px] mb-4">
+                <Typography variant="body" weight="semibold" className="uppercase tracking-widest text-primary-300 text-[10px] mb-4">
                     {role === "user" ? t("register.benefits.userEyebrow") : t("register.benefits.partnerEyebrow")}
                 </Typography>
                 <Typography variant="h2" weight="bold" className="text-white mb-8 leading-tight">
@@ -554,7 +554,7 @@ function BenefitsPanel({ role }: { role: Role }) {
 
             {/* Trust signal */}
             <div className="mt-12 pt-6 border-t border-white/10">
-                <span className="text-xs text-primary-400/60">
+                <span className="text-xs text-primary-300/80">
                     {t("register.benefits.trust")}
                 </span>
             </div>
@@ -684,7 +684,7 @@ export function RegisterPage() {
                                     className={`flex-1 py-2.5 rounded-lg text-sm font-semibold text-center transition-all ${
                                         role === r
                                             ? "bg-white text-neutral-900 shadow-sm"
-                                            : "text-neutral-500 hover:text-neutral-700"
+                                            : "text-neutral-600 hover:text-neutral-700"
                                     }`}
                                 >
                                     {r === "user" ? t("register.roleUser") : t("register.rolePartner")}

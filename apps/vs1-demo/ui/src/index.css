@@ -249,17 +249,27 @@
     --color-bg-inverse: 255 255 255;
     --drawer-glass-bg: rgba(31, 41, 55, 0.50);  /* slate #1f2937 @ 50% — floating glass drawer */
     --color-bg-brand: 20 168 154;
-    /* Dark counterpart to :root's white. White on #14a89a measures 2.96:1 —
-       below AA — while this deep petrol ink holds 6.38:1. It is exactly what
-       Button.tsx had been hardcoding as text-[#04140f] to work around the
-       missing token; with this in place the component can use the pair. */
-    --color-text-on-brand: 4 20 15;
+    /* Was unmapped and stayed petrol-500 — 1.49:1 against the slate surface,
+       which is no border at all. Follows --color-bg-brand to the lighter
+       dark-mode teal: 4.96:1, clearing the 3:1 that non-text contrast needs. */
+    --color-border-brand: 20 168 154;
     --color-bg-brand-light: 29 61 71;
+    /* Was unmapped and therefore stayed gold-50 (253 248 230) on the dark slate:
+       --color-text-primary on it measured 1.02:1, i.e. invisible. Flattened like
+       its brand sibling above — gold-500 at 16% over neutral-800 — so the fill
+       still reads as gold while text on it holds 10.03:1. Triplet, not rgba(),
+       otherwise every /NN modifier on this token stops resolving. */
+    --color-bg-accent-light: 60 62 55;
     /* Restated, not flipped: on #14a89a white is 2.96:1 and every gold in the
        scale is below 1.9:1 — nothing readable sits on it. The panel therefore
        keeps the deep petrol in dark mode, where white stays at 9.83:1 and the
        gold eyebrow at 4.57:1. */
     --color-bg-brand-surface: var(--petrol-500);
+    /* bg-brand flips to the light teal #14a89a in dark, and every button uses
+       THAT token (bg-brand-surface is only the BrandCodePreview panel, which
+       hardcodes text-white). White inherited from :root sat at 2.96:1 on those
+       buttons; dark petrol reads 6.75:1. */
+    --color-text-on-brand: 0 11 9;      /* petrol-900 #000b09 */
     --color-text-primary: 245 246 248;
     --color-text-secondary: 154 167 173;
     /* Was #6b7a80 = 3.30:1 on #1f2937 — below AA for the 11-13 px labels this
