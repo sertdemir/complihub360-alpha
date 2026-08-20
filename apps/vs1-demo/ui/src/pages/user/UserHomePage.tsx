@@ -106,7 +106,7 @@ export function UserHomePage() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="font-serif text-[32px] font-bold leading-tight text-fg">
-              <Trans t={t} i18nKey="home.title" values={{ name: firstName }} components={{ accent: <span className="text-fg-accent" /> }} />
+              <Trans t={t} i18nKey="home.title" values={{ name: firstName }} components={{ accent: <span className="text-fg-accent-emphasis" /> }} />
             </h1>
             <p className="mt-1 text-body-sm text-fg-secondary">
               {t('home.sub')}

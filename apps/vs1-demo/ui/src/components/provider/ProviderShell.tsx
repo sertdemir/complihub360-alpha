@@ -102,12 +102,12 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="dark flex h-screen bg-surface text-fg">
+    <div className="flex h-screen bg-surface text-fg">
       <Sidebar
         logo={
           <NavLink to={base} className="flex items-center gap-2">
             <LogoMark tone="on-petrol" className="h-[22px] w-auto" />
-            <span className="text-[15px] font-semibold text-white">CompliHub</span>
+            <span className="text-[15px] font-semibold text-fg">CompliHub</span>
             <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-fg-accent">{t('shell.partnerBadge')}</span>
           </NavLink>
         }

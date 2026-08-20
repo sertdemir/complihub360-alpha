@@ -27,7 +27,7 @@ export function SidebarGroup({ label, badge, children }: { label?: string; badge
       {label && (
         <div className="mb-1 flex items-center justify-between px-2">
           <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{label}</span>
-          {badge && <span className="text-[10px] font-semibold uppercase tracking-wide text-fg-tertiary/70">{badge}</span>}
+          {badge && <span className="text-[10px] font-semibold uppercase tracking-wide text-fg-tertiary">{badge}</span>}
         </div>
       )}
       <div className="space-y-0.5">{children}</div>
