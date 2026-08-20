@@ -64,7 +64,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         }
         footer={
           <div className="flex items-center gap-2.5 px-1">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-[#d4af37] text-[11px] font-bold text-[#101411]">AD</span>
+            <span className="grid h-8 w-8 place-items-center rounded-full bg-brand-accent text-[11px] font-bold text-fg-on-accent">AD</span>
             <div className="leading-tight">
               <p className="text-[12px] font-semibold text-fg">Admin</p>
               <p className="text-[10px] text-fg-tertiary">CompliHub360 Ops</p>

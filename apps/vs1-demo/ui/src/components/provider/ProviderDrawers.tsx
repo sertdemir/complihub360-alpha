@@ -94,7 +94,7 @@ export function RankingImpactDrawer({ open, onClose }: { open: boolean; onClose:
               <span className="text-[12px] font-bold text-fg-accent">{f.weight}%</span>
             </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-elevate/10">
-              <div className="h-full rounded-full bg-[#d4af37]" style={{ width: `${f.weight}%` }} />
+              <div className="h-full rounded-full bg-brand-accent" style={{ width: `${f.weight}%` }} />
             </div>
             <p className="mt-1 text-[11px] text-fg-tertiary">{t(f.noteKey)}</p>
           </div>

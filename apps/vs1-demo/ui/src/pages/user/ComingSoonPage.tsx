@@ -36,7 +36,7 @@ export function ComingSoonPage({ page }: { page: keyof typeof PAGES }) {
 
         <div className="flex justify-center pt-4">
           <Card styleVariant="filled" className="w-full max-w-md p-8 text-center">
-            <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-[#14a89a]/15 text-fg-brand">◔</span>
+            <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-brand/15 text-fg-brand">◔</span>
             <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-brand">{t('comingSoon.eyebrow')}</p>
             <h2 className="mt-1 text-[18px] font-semibold text-fg">{t(`${k}.panelTitle`)}</h2>
             <p className="mt-1.5 text-[12px] leading-relaxed text-fg-secondary">{t(`${k}.panelSub`)}</p>

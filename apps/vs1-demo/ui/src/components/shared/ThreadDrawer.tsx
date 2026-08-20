@@ -69,8 +69,8 @@ function relTime(iso: string, t: TFunction): string {
 function ProposalCard({ p }: { p: Proposal }) {
   const { t } = useTranslation('userws');
   return (
-    <div className="mt-2 rounded-lg border border-[#d4af37]/35 bg-[#d4af37]/[0.07] px-3 py-2.5">
-      <p className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#d4af37]">
+    <div className="mt-2 rounded-lg border border-brand-accent/35 bg-brand-accent/[0.07] px-3 py-2.5">
+      <p className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-accent">
         <FileText size={11} /> {t('thread.proposal')}
       </p>
       <div className="space-y-1 text-[12px] leading-relaxed">
@@ -88,7 +88,7 @@ function ProposalCard({ p }: { p: Proposal }) {
             <p className="text-fg-tertiary">{t('thread.deliverables')}</p>
             <ul className="mt-0.5 space-y-0.5">
               {p.deliverables.map((d) => (
-                <li key={d} className="flex gap-1.5 text-fg-secondary"><span className="text-[#d4af37]">·</span>{d}</li>
+                <li key={d} className="flex gap-1.5 text-fg-secondary"><span className="text-fg-accent">·</span>{d}</li>
               ))}
             </ul>
           </div>
@@ -163,9 +163,9 @@ export function ThreadDrawer({ open, engagementId, viewer, onClose }: ThreadDraw
       footer={
         <div className="w-full space-y-2">
           {viewer === 'provider' && proposalOpen && (
-            <div className="rounded-lg border border-[#d4af37]/30 bg-[#d4af37]/[0.05] p-3">
+            <div className="rounded-lg border border-brand-accent/30 bg-brand-accent/[0.05] p-3">
               <div className="mb-2 flex items-center justify-between">
-                <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#d4af37]">
+                <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-accent">
                   <FileText size={11} /> {t('thread.attachProposal')}
                 </p>
                 <button type="button" aria-label={t('thread.removeProposal')} onClick={() => setProposalOpen(false)} className="text-fg-tertiary hover:text-fg">
@@ -174,16 +174,16 @@ export function ThreadDrawer({ open, engagementId, viewer, onClose }: ThreadDraw
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <input value={price} onChange={(ev) => setPrice(ev.target.value)} placeholder={t('thread.pricePlaceholder')}
-                  className="rounded-md border border-elevate/10 bg-elevate/5 px-2.5 py-1.5 text-[12px] text-fg outline-none placeholder:text-fg-tertiary focus:border-[#d4af37]/60" />
+                  className="rounded-md border border-elevate/10 bg-elevate/5 px-2.5 py-1.5 text-[12px] text-fg outline-none placeholder:text-fg-tertiary focus:border-brand-accent/60" />
                 <input value={timeline} onChange={(ev) => setTimeline(ev.target.value)} placeholder={t('thread.timelinePlaceholder')}
-                  className="rounded-md border border-elevate/10 bg-elevate/5 px-2.5 py-1.5 text-[12px] text-fg outline-none placeholder:text-fg-tertiary focus:border-[#d4af37]/60" />
+                  className="rounded-md border border-elevate/10 bg-elevate/5 px-2.5 py-1.5 text-[12px] text-fg outline-none placeholder:text-fg-tertiary focus:border-brand-accent/60" />
               </div>
               <div className="mt-2 flex flex-wrap items-center gap-1.5">
                 {MODELS.map((m) => (
                   <button key={m} type="button" onClick={() => setModel(model === m ? '' : m)}
                     className={
                       'rounded-full border px-2.5 py-1 text-[11px] transition-colors ' +
-                      (model === m ? 'border-[#d4af37]/60 bg-[#d4af37]/15 text-fg' : 'border-elevate/10 text-fg-tertiary hover:text-fg')
+                      (model === m ? 'border-brand-accent/60 bg-brand-accent/15 text-fg' : 'border-elevate/10 text-fg-tertiary hover:text-fg')
                     }>
                     {MODEL_KEY[m] ? t(`thread.${MODEL_KEY[m]}`) : m}
                   </button>
@@ -191,7 +191,7 @@ export function ThreadDrawer({ open, engagementId, viewer, onClose }: ThreadDraw
               </div>
               <textarea rows={2} value={deliverables} onChange={(ev) => setDeliverables(ev.target.value)}
                 placeholder={t('thread.deliverablesPlaceholder')}
-                className="mt-2 w-full resize-none rounded-md border border-elevate/10 bg-elevate/5 px-2.5 py-1.5 text-[12px] text-fg outline-none placeholder:text-fg-tertiary focus:border-[#d4af37]/60" />
+                className="mt-2 w-full resize-none rounded-md border border-elevate/10 bg-elevate/5 px-2.5 py-1.5 text-[12px] text-fg outline-none placeholder:text-fg-tertiary focus:border-brand-accent/60" />
             </div>
           )}
           <div className="flex w-full items-end gap-2">

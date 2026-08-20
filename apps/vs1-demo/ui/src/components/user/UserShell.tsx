@@ -118,7 +118,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
   };
 
   return (
-    <div className="dark flex h-screen bg-[#1F2937] text-fg">
+    <div className="dark flex h-screen bg-surface text-fg">
       <Sidebar
         logo={
           <NavLink to={`${base}/dashboard`} className="flex items-center gap-2">
@@ -129,7 +129,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
         footer={
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-2.5">
-              <span className="grid h-8 w-8 place-items-center rounded-full bg-[#d4af37] text-[11px] font-bold text-[#101411]">{initials}</span>
+              <span className="grid h-8 w-8 place-items-center rounded-full bg-brand-accent text-[11px] font-bold text-fg-on-accent">{initials}</span>
               <div className="leading-tight">
                 <p className="text-[12px] font-semibold text-fg">{displayName}</p>
                 <p className="text-[10px] text-fg-tertiary">{displaySub}</p>

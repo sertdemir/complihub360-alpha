@@ -102,7 +102,7 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="dark flex h-screen bg-[#1F2937] text-fg">
+    <div className="dark flex h-screen bg-surface text-fg">
       <Sidebar
         logo={
           <NavLink to={base} className="flex items-center gap-2">
@@ -114,7 +114,7 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
         footer={
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-2.5">
-              <span className="grid h-8 w-8 place-items-center rounded-full bg-[#d4af37] text-[11px] font-bold text-[#101411]">GD</span>
+              <span className="grid h-8 w-8 place-items-center rounded-full bg-brand-accent text-[11px] font-bold text-fg-on-accent">GD</span>
               <div className="leading-tight">
                 <p className="text-[12px] font-semibold text-fg">G. Dahlmann</p>
                 <p className="text-[10px] text-fg-tertiary">Dahlmann CPA</p>

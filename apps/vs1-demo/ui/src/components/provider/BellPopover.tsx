@@ -75,7 +75,7 @@ export function BellPopover({ unread, onAllRead }: BellPopoverProps) {
         <>
           {/* click-outside catcher */}
           <div className="fixed inset-0 z-[90]" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-[calc(100%+10px)] z-[95] w-[380px] overflow-hidden rounded-xl border border-elevate/10 bg-[#1f2937] shadow-[0_18px_50px_-12px_rgba(0,0,0,0.65)]">
+          <div className="absolute right-0 top-[calc(100%+10px)] z-[95] w-[380px] overflow-hidden rounded-xl border border-elevate/10 bg-surface shadow-[0_18px_50px_-12px_rgba(0,0,0,0.65)]">
             <div className="flex items-center justify-between border-b border-elevate/10 px-4 py-3">
               <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">{t('bell.header')}</p>
               <button
