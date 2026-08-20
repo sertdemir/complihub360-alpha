@@ -311,13 +311,24 @@
     --color-text-on-brand: 0 11 9;      /* petrol-900 #000b09 */
     --color-text-primary: 245 246 248;
     --color-text-secondary: 154 167 173;
-    /* Was #6b7a80 = 3.30:1 on #1f2937 — below AA for the 11-13 px labels this
-       token is made for (footer column headings, separators, disclaimers).
-       #86959c gives 4.75:1 on #1f2937 and 5.77:1 on #0f172a. Chosen over the
-       lighter #8b9aa1 (5.06:1) to keep the step down from --color-text-secondary
-       (#9aa7ad) legible: 1.25 apart rather than 1.18, so the two ranks still
-       read as two ranks. */
-    --color-text-tertiary: 134 149 156;
+    /* Tuned to the LIGHTEST dark ground this token actually lands on, not to
+       --color-bg-primary. Walking eight workspace routes turns up seven distinct
+       composited grounds for it, and two of them sit lighter than the #1f2937 the
+       previous value was fitted to. The predecessor #86959c cleared 4.75 there but
+       only 4.44 on SessionRow's teal wash (#1b3039), which is where its 11px
+       "· Updated 2h ago" lives — below AA on the surface it was most used on.
+       #8c9aa1 clears every ground carrying real text: 4.74 (#1b3039), 5.07
+       (#1f2937), 5.51-5.52 (cards), 6.17-6.21 (bg-secondary, sidebar).
+       The cost is the step down from --color-text-secondary (#9aa7ad), which
+       narrows from 1.25 to 1.17. That is the reason the earlier value stopped
+       where it did, and it is a real loss - but a rank that is legible and slightly
+       closer beats a rank that is distinct and unreadable.
+       Deliberately NOT chased: bg-elevate/[0.06] chips composite to #2c3643, where
+       this reads 4.23. Only a colour emoji sits there today. Reaching it needs
+       #919fa5, which collapses the step to 1.10 - at that point secondary and
+       tertiary stop reading as two ranks. If small text ever needs that chip, the
+       chip should darken, not the token. */
+    --color-text-tertiary: 140 154 161;   /* #8c9aa1 */
     --color-text-inverse: 15 23 42;
     --color-text-brand: 44 192 173;
     /* On slate the step-down is unnecessary and wrong: gold-500 is 6.98:1 on
