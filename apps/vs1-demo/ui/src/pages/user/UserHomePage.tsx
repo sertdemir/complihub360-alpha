@@ -113,8 +113,8 @@ export function UserHomePage() {
           <Button className="mt-1 shrink-0" onClick={() => navigate(`/${locale}/wizard`)}>{t('shared.startNewSearch')}</Button>
         </div>
 
-        <Card styleVariant="filled" className="flex items-center gap-4 border border-[#d4af37]/25 p-5">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#d4af37]/15 text-[#d4af37]">
+        <Card styleVariant="filled" className="flex items-center gap-4 border border-brand-accent/25 p-5">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-accent/15 text-fg-accent">
             <Play size={16} fill="currentColor" />
           </span>
           <div className="min-w-0 flex-1">

@@ -75,7 +75,7 @@ export function RequestQuoteModal({ provider, country, category, domainLabel, re
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 8 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="w-full max-w-[540px] rounded-xl border border-elevate/10 bg-[#1f2937] shadow-2xl shadow-black/50"
+        className="w-full max-w-[540px] rounded-xl border border-elevate/10 bg-surface shadow-2xl shadow-black/50"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between border-b border-elevate/10 px-6 py-5">

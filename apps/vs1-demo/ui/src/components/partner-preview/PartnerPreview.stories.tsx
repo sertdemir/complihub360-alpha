@@ -52,5 +52,5 @@ const Demo = () => (
 export const Light: Story = { render: () => <div className="bg-neutral-50 p-6">{Demo()}</div> };
 export const Dark: Story = {
   parameters: { layout: 'fullscreen' },
-  render: () => <div className="dark min-h-screen bg-[#1F2937] p-8">{Demo()}</div>,
+  render: () => <div className="dark min-h-screen bg-surface p-8">{Demo()}</div>,
 };

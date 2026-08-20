@@ -131,7 +131,7 @@ export function LeadsPage() {
                     <div className="flex items-center gap-1">
                       {[1, 2, 3, 4, 5].map((n) => (
                         <button key={n} type="button" aria-label={`${n}`} onClick={() => setLeadRating(n)}
-                          className={`text-[20px] leading-none ${n <= leadRating ? 'text-[#d4af37]' : 'text-white/20 hover:text-white/40'}`}>★</button>
+                          className={`text-[20px] leading-none ${n <= leadRating ? 'text-fg-accent' : 'text-white/20 hover:text-white/40'}`}>★</button>
                       ))}
                     </div>
                     <Button size="sm" variant="secondary" disabled={leadRating < 1} onClick={() => rateLead(dossierFor)}>OK</Button>

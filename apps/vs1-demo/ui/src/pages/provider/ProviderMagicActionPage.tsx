@@ -59,7 +59,7 @@ export function ProviderMagicActionPage() {
   const [pre, post] = copy.title.split(copy.gold);
 
   return (
-    <div className="dark flex min-h-screen items-center justify-center bg-[#1F2937] px-4 text-fg">
+    <div className="dark flex min-h-screen items-center justify-center bg-surface px-4 text-fg">
       <div className="w-full max-w-[480px] rounded-xl border border-elevate/10 bg-elevate/[0.03] p-8 shadow-2xl shadow-black/40">
         <div className="mb-6 flex items-center gap-2">
           <LogoMark tone="on-petrol" className="h-[22px] w-auto" />

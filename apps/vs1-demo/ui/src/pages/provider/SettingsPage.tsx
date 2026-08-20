@@ -66,7 +66,7 @@ export function SettingsPage() {
             </div>
 
             <Card styleVariant="filled" className="flex items-center gap-4 p-4">
-              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#d4af37] text-[13px] font-bold text-[#101411]">DC</span>
+              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-brand-accent text-[13px] font-bold text-fg-on-accent">DC</span>
               <div className="min-w-0 flex-1">
                 <p className="text-[13px] font-medium text-fg">{t('settings.avatarTitle')}</p>
                 <p className="mt-0.5 text-[11px] text-fg-tertiary">{t('settings.avatarSpec')}</p>
