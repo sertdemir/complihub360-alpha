@@ -1112,5 +1112,50 @@
       "title": "Empiece donde tenga sentido para usted.",
       "lead": "Seis minutos, cuatro preguntas, sin necesidad de cuenta."
     }
+  },
+  "about": {
+    "meta": {
+      "title": "Quiénes somos · CompliHub360"
+    },
+    "eyebrow": "Quiénes somos",
+    "title": {
+      "pre": "Siempre de su ",
+      "gold": "lado",
+      "post": "."
+    },
+    "lead": "Las decisiones de cumplimiento son más fáciles cuando usted entiende qué se aplica realmente a su empresa, y cuando la plataforma que le ayuda no tiene motivos para venderle algo que no necesita.",
+    "why": {
+      "kicker": "Por qué existimos",
+      "statement": "Quien toma decisiones importantes merece a alguien que esté verdaderamente de su lado.",
+      "body": "CompliHub360 nació de un problema que se repetía año tras año: las empresas tenían acceso a muchos proveedores, pero a ningún lugar neutral donde entender sus necesidades antes de entrar en una conversación de venta. Existimos para poner por delante la claridad, el conocimiento y la libertad de elección."
+    },
+    "purpose": {
+      "title": "Propósito",
+      "body": "Capacitar a las empresas para tomar decisiones informadas con confianza, situando siempre sus necesidades en primer lugar."
+    },
+    "mission": {
+      "title": "Misión",
+      "body": "Permitir que las empresas de todo el mundo entiendan y gestionen sus obligaciones de cumplimiento mediante conocimiento fiable, tecnología comprensible y acceso a los profesionales adecuados, acompañándolas durante todo su recorrido empresarial."
+    },
+    "vision": {
+      "title": "Visión",
+      "body": "Convertirnos en el primer lugar al que acuden las empresas de todo el mundo en materia de cumplimiento, y contribuir a un sector más transparente en el que el conocimiento permita mejores decisiones, la calidad determine la competencia y se construyan relaciones duraderas."
+    },
+    "behave": {
+      "kicker": "Cómo trabajamos",
+      "items": [
+        "Conocimiento antes que venta.",
+        "Preguntar antes de suponer.",
+        "Rigor profesional. Trato humano siempre.",
+        "No creamos necesidades. Las identificamos.",
+        "El mismo respeto. La profundidad adecuada.",
+        "La confianza se demuestra con la experiencia."
+      ]
+    },
+    "close": "La complejidad es nuestra. La sencillez es suya.",
+    "cta": {
+      "title": "Vea qué se aplica a su empresa.",
+      "lead": "El análisis es gratuito, no requiere cuenta y se completa en unos minutos."
+    }
   }
 }

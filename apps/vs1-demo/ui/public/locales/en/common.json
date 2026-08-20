@@ -1112,5 +1112,50 @@
       "title": "Start where it makes sense for you.",
       "lead": "Six minutes, four questions, no account needed."
     }
+  },
+  "about": {
+    "meta": {
+      "title": "About us · CompliHub360"
+    },
+    "eyebrow": "About us",
+    "title": {
+      "pre": "Always on your ",
+      "gold": "side",
+      "post": "."
+    },
+    "lead": "Compliance decisions are easier when you understand what actually applies to your business — and when the platform helping you has no reason to sell you something you do not need.",
+    "why": {
+      "kicker": "Why we exist",
+      "statement": "Businesses making important decisions deserve someone genuinely on their side.",
+      "body": "CompliHub360 was created after years of seeing the same problem: businesses had access to many providers, but no neutral place to understand their needs before entering a sales conversation. We exist to put clarity, knowledge and choice first."
+    },
+    "purpose": {
+      "title": "Purpose",
+      "body": "To empower businesses to make informed decisions with confidence, always putting their needs first."
+    },
+    "mission": {
+      "title": "Mission",
+      "body": "To empower businesses everywhere to understand and manage their compliance needs through reliable knowledge, intuitive technology and access to the right professionals — supporting them throughout their entire business journey."
+    },
+    "vision": {
+      "title": "Vision",
+      "body": "To become the place businesses around the world turn to first for compliance — creating a more transparent industry where knowledge empowers better decisions, quality drives competition, and businesses and professionals build meaningful, long-term relationships."
+    },
+    "behave": {
+      "kicker": "How we behave",
+      "items": [
+        "Knowledge before sales.",
+        "Ask before assuming.",
+        "Professional first. Human always.",
+        "We do not create needs. We identify them.",
+        "Same respect. Personalised depth.",
+        "Experience is how trust is delivered."
+      ]
+    },
+    "close": "The complexity belongs to us. The simplicity belongs to you.",
+    "cta": {
+      "title": "See what applies to your business.",
+      "lead": "The assessment is free, needs no account and takes a few minutes."
+    }
   }
 }

@@ -1112,5 +1112,50 @@
       "title": "Fangen Sie dort an, wo es für Sie Sinn ergibt.",
       "lead": "Sechs Minuten, vier Fragen, kein Konto nötig."
     }
+  },
+  "about": {
+    "meta": {
+      "title": "Über uns · CompliHub360"
+    },
+    "eyebrow": "Über uns",
+    "title": {
+      "pre": "Immer an Ihrer ",
+      "gold": "Seite",
+      "post": "."
+    },
+    "lead": "Compliance-Entscheidungen fallen leichter, wenn Sie verstehen, was für Ihr Unternehmen tatsächlich gilt — und wenn die Plattform, die Ihnen dabei hilft, keinen Grund hat, Ihnen etwas zu verkaufen, das Sie nicht brauchen.",
+    "why": {
+      "kicker": "Warum es uns gibt",
+      "statement": "Wer wichtige Entscheidungen trifft, verdient jemanden, der wirklich auf seiner Seite steht.",
+      "body": "CompliHub360 ist aus einer Beobachtung entstanden, die sich über Jahre wiederholte: Unternehmen hatten Zugang zu vielen Anbietern, aber keinen neutralen Ort, an dem sie ihren Bedarf verstehen konnten, bevor das Verkaufsgespräch begann. Wir stellen Klarheit, Wissen und Wahlfreiheit an den Anfang."
+    },
+    "purpose": {
+      "title": "Zweck",
+      "body": "Unternehmen zu befähigen, informierte Entscheidungen mit Zuversicht zu treffen — und dabei ihren Bedarf an die erste Stelle zu setzen."
+    },
+    "mission": {
+      "title": "Auftrag",
+      "body": "Unternehmen überall in die Lage zu versetzen, ihre Compliance-Anforderungen zu verstehen und zu steuern: durch verlässliches Wissen, verständliche Technik und Zugang zu den richtigen Fachleuten — über ihren gesamten unternehmerischen Weg hinweg."
+    },
+    "vision": {
+      "title": "Vision",
+      "body": "Der Ort zu werden, an den sich Unternehmen weltweit bei Compliance zuerst wenden. Für eine transparentere Branche, in der Wissen bessere Entscheidungen ermöglicht, Qualität den Wettbewerb bestimmt und aus Zusammenarbeit langfristige Beziehungen werden."
+    },
+    "behave": {
+      "kicker": "Wie wir arbeiten",
+      "items": [
+        "Wissen vor Verkauf.",
+        "Fragen, bevor wir annehmen.",
+        "Fachlich zuerst. Menschlich immer.",
+        "Wir erzeugen keinen Bedarf. Wir erkennen ihn.",
+        "Gleicher Respekt. Passende Tiefe.",
+        "Vertrauen entsteht durch Erfahrung."
+      ]
+    },
+    "close": "Die Komplexität gehört uns. Die Einfachheit gehört Ihnen.",
+    "cta": {
+      "title": "Sehen Sie, was für Ihr Unternehmen gilt.",
+      "lead": "Die Ermittlung ist kostenlos, braucht kein Konto und dauert wenige Minuten."
+    }
   }
 }

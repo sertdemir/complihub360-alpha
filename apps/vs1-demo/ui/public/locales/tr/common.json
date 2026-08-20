@@ -1112,5 +1112,50 @@
       "title": "Sizin için anlamlı olan yerden başlayın.",
       "lead": "Altı dakika, dört soru, hesap gerekmiyor."
     }
+  },
+  "about": {
+    "meta": {
+      "title": "Hakkımızda · CompliHub360"
+    },
+    "eyebrow": "Hakkımızda",
+    "title": {
+      "pre": "Her zaman ",
+      "gold": "yanınızda",
+      "post": "."
+    },
+    "lead": "Uyum kararları, işletmeniz için gerçekte neyin geçerli olduğunu anladığınızda ve size yardımcı olan platformun ihtiyacınız olmayan bir şeyi satmak için hiçbir nedeni olmadığında kolaylaşır.",
+    "why": {
+      "kicker": "Neden varız",
+      "statement": "Önemli kararlar veren işletmeler, gerçekten yanlarında olan birini hak eder.",
+      "body": "CompliHub360, yıllarca aynı sorunu görmenin ardından kuruldu: işletmelerin birçok hizmet sağlayıcıya erişimi vardı, ancak bir satış görüşmesine girmeden önce ihtiyaçlarını anlayabilecekleri tarafsız bir yer yoktu. Netliği, bilgiyi ve seçme özgürlüğünü öne almak için varız."
+    },
+    "purpose": {
+      "title": "Amacımız",
+      "body": "İşletmeleri, ihtiyaçlarını her zaman ön planda tutarak bilinçli kararları güvenle almaya güçlendirmek."
+    },
+    "mission": {
+      "title": "Misyonumuz",
+      "body": "Dünyanın her yerindeki işletmelerin uyum ihtiyaçlarını güvenilir bilgi, anlaşılır teknoloji ve doğru uzmanlara erişim yoluyla anlamasını ve yönetmesini sağlamak; bunu tüm iş yolculukları boyunca sürdürmek."
+    },
+    "vision": {
+      "title": "Vizyonumuz",
+      "body": "Uyum konusunda dünya genelinde işletmelerin ilk başvurduğu yer olmak; bilginin daha iyi kararlar sağladığı, rekabeti kalitenin belirlediği ve kalıcı ilişkilerin kurulduğu daha şeffaf bir sektöre katkıda bulunmak."
+    },
+    "behave": {
+      "kicker": "Nasıl çalışıyoruz",
+      "items": [
+        "Satıştan önce bilgi.",
+        "Varsaymadan önce sormak.",
+        "Önce uzmanlık. Her zaman insan.",
+        "İhtiyaç yaratmayız. İhtiyacı tespit ederiz.",
+        "Aynı saygı. Uygun derinlik.",
+        "Güven, deneyimle kazanılır."
+      ]
+    },
+    "close": "Karmaşıklık bize ait. Sadelik size ait.",
+    "cta": {
+      "title": "İşletmeniz için neyin geçerli olduğunu görün.",
+      "lead": "Değerlendirme ücretsizdir, hesap gerektirmez ve birkaç dakika sürer."
+    }
   }
 }
