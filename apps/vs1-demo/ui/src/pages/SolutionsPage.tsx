@@ -254,8 +254,11 @@ function PrivacyGateDiagram() {
         transition={{ duration: 0.5, delay: 0.5 }}
         className="mt-6 bg-neutral-800 border border-neutral-700 rounded-xl p-4 font-mono text-xs"
       >
+        {/* This block is a fixed dark code view in BOTH themes (bg-neutral-800), so one
+            value serves both. The highlight ground composites to #4c363f, where
+            error-300 reads 4.26 at 12px — just under. error-200 gives 6.10. */}
         <div className="text-neutral-400 mb-2">{t('solutions.counsel.codeCommentBefore', '// Before redaction')}</div>
-        <div className="text-neutral-300">Contract signed by <span className="bg-error-500/30 text-error-300 px-1 rounded">John Mueller</span> at <span className="bg-error-500/30 text-error-300 px-1 rounded">john@acme.de</span></div>
+        <div className="text-neutral-300">Contract signed by <span className="bg-error-500/30 text-error-200 px-1 rounded">John Mueller</span> at <span className="bg-error-500/30 text-error-200 px-1 rounded">john@acme.de</span></div>
         <div className="text-neutral-400 mt-3 mb-2">{t('solutions.counsel.codeCommentAfter', '// After redaction')}</div>
         <div className="text-neutral-300">Contract signed by <span className="bg-success-bg text-success-text px-1 rounded">[NAME]</span> at <span className="bg-success-bg text-success-text px-1 rounded">[EMAIL]</span></div>
       </motion.div>
