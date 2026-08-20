@@ -182,11 +182,11 @@
     "navGuided": "Assess My Needs",
     "placeholder": "Describe your situation in your own words…",
     "submit": "Ask a Compliance Question",
-    "answerEyebrow": "Answer",
+    "answerEyebrow": "AI answer",
     "answerTitleFor": "On “{{query}}”",
     "answerTitleDefault": "Ask anything about your compliance obligations",
-    "answerBody1": "Here is what is likely to apply to a situation like yours, with the source behind each point. General information — not individual legal advice.",
-    "answerBody2": "To see what applies to your business specifically — your markets, your business model — continue with the assessment below.",
+    "answerBody1": "This is what likely applies to a situation like yours, with the source behind each point. The answer comes from our AI: general information, not individual legal advice.",
+    "answerBody2": "Your business may differ — thresholds, registers and deadlines depend on your markets, your business model and your volume. Which of them apply to you is what the assessment below works out.",
     "sources": "Sources",
     "obligationsTitle": "Relevant obligations",
     "sev": {
@@ -207,17 +207,17 @@
         "detail": "Consumer-facing tracking requires prior consent and a GDPR-compliant privacy notice."
       }
     },
-    "guidesTitle": "Related guides",
-    "guides": {
-      "g1": "The EU OSS scheme explained",
-      "g2": "Packaging (EPR) registration by country",
-      "g3": "GDPR basics for online shops"
-    },
-    "guideRead": "Read",
+    "guidesTitle": "Where to read on",
+    "guideRead": "Open",
     "bridgeTitle": "Want to see what applies to your business?",
     "bridgeBody": "Your risk map is matched to your markets and your business model, and shows the Verified Partners who fit what you actually need.",
     "bridgeCta": "Assess My Needs",
-    "previewBadge": "Preview · answer engine not connected yet"
+    "previewBadge": "Preview · answer engine not connected yet",
+    "entries": {
+      "markets": "Markets and what applies there",
+      "compliance": "The eight compliance areas",
+      "howItWorks": "How you reach a specialist"
+    }
   },
   "days_one": "{{count}} day",
   "days_other": "{{count}} days",
