@@ -116,7 +116,7 @@ export function UserHomePage() {
         </div>
 
         <Card styleVariant="filled" className="flex items-center gap-4 border border-brand-accent/25 p-5">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-accent/15 text-fg-accent">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-accent/15 text-fg-accent-strong">
             <Play size={16} fill="currentColor" />
           </span>
           <div className="min-w-0 flex-1">
