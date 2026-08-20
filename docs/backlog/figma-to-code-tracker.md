@@ -17,7 +17,7 @@ Each component derives from its Compass page; mirrored as a Storybook page + DS 
 | Button | 308:3 🔘 Button | components/ui/Button.tsx | Components/Button | done (sizes fixed to 32/40/48 px; gold-accent + hover) |
 | Logo | 242:199 🪪 Logo (set 712:266) | components/ui/Logo.tsx | Foundations/Logo | done · verified ✓ (lockup × tone, exact vector + Inter 16/10) |
 | MarketingHeader | 704:2 🎩 Header | components/layout/MarketingHeader.tsx | Components/MarketingHeader | done · verified ✓ (wired via SiteHeader on landing routes) |
-| RiskBadge / RiskDot | 726:2 ⚠️ Risk Badge | components/ui/RiskBadge.tsx | Components/RiskBadge | done · verified ✓ (4 risk × 4 style × 3 size; exact petrol tokens, never red) |
+| RiskBadge / RiskDot | 726:2 ⚠️ Risk Badge | components/ui/RiskBadge.tsx | Components/RiskBadge | done · verified ✓ (4 risk × 4 style × 3 size; traffic-light tokens, both themes) |
 | Badge / Chip / Tag | 516:2 🏷 Badge | — | — | todo (408 variants: Badge · Dot · Filter Chip · Tag) |
 | Accordion · Alert · Avatar · Card · Forms · Tooltip · Tabbar · Divider · Modal · Drawer · Table · Empty State · Breadcrumb · Bento · Progress · Icon | (Compass COMPONENTS pages) | — | — | todo |
 

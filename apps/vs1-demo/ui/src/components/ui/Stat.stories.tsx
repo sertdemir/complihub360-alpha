@@ -9,7 +9,7 @@ optional \`trend\` chip (▲ success · ▼ error · – neutral) with a caption
 strips). \`size\` = sm · md · lg.
 
 This is a **neutral metric**, not a risk signal — risk stays on the RiskBadge
-\`RiskBadge\` scale ("Niemals rot.").
+\`RiskBadge\` traffic light.
 `;
 
 const meta = {
