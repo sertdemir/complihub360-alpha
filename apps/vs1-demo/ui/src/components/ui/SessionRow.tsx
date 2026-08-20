@@ -56,8 +56,11 @@ export function SessionRow({
           <span className="rounded-full border border-[#258d78]/35 bg-[#004d40]/10 px-2 py-[3px] text-[9px] font-semibold uppercase tracking-[0.06em] text-fg-brand dark:border-[#14a89a]/35 dark:bg-[#097070]/30">
             {domain}
           </span>
+          {/* Status pill on the error ramp, not the rogue #e36363 that sat in no
+              scale: at 9px it owes 4.5:1 and gave 3.01 light / 3.63 dark — it failed
+              in BOTH themes, which the dark-only workspace had hidden. Now 6.66 / 4.99. */}
           {status && (
-            <span className="rounded-full border border-[#e36363]/35 bg-[#e36363]/10 px-2 py-[3px] text-[9px] font-semibold uppercase tracking-[0.06em] text-[#e36363] dark:bg-[#e36363]/15">
+            <span className="rounded-full border border-error-500/35 bg-error-500/10 px-2 py-[3px] text-[9px] font-semibold uppercase tracking-[0.06em] text-error-700 dark:bg-error-500/15 dark:text-error-300">
               {status}
             </span>
           )}

@@ -26,7 +26,7 @@ export function ExportsPage() {
       <div className="mx-auto max-w-[1140px] space-y-5">
         <div>
           <h1 className="font-serif text-[32px] font-bold leading-tight text-fg">
-            <span className="text-fg-accent">{t('exports.title')}</span>
+            <span className="text-fg-accent-emphasis">{t('exports.title')}</span>
           </h1>
           <p className="mt-1 text-body-sm text-fg-secondary">{t('exports.sub')}</p>
         </div>

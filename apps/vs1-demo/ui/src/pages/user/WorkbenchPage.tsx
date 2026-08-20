@@ -136,10 +136,10 @@ export function WorkbenchPage() {
       <div className="mx-auto max-w-[1140px] space-y-6">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-full bg-brand-accent/15 text-[16px] text-fg-accent">€</span>
+            <span className="grid h-10 w-10 place-items-center rounded-full bg-brand-accent/15 text-[16px] text-fg-accent-strong">€</span>
             <div>
               <h1 className="font-serif text-[28px] font-bold leading-tight text-fg">
-                <Trans t={t} i18nKey="workbench.title" values={{ domain: domainDisplay }} components={{ accent: <span className="text-fg-accent" /> }} />
+                <Trans t={t} i18nKey="workbench.title" values={{ domain: domainDisplay }} components={{ accent: <span className="text-fg-accent-emphasis" /> }} />
               </h1>
               <p className="mt-0.5 text-[12px] text-fg-secondary">
                 {t('workbench.sub')}
