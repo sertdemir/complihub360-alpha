@@ -81,7 +81,7 @@ export function RequestQuoteModal({ provider, country, category, domainLabel, re
         <div className="flex items-start justify-between border-b border-elevate/10 px-6 py-5">
           <div>
             <h2 className="font-serif text-[20px] font-semibold text-fg">
-              <Trans t={t} i18nKey="requestQuote.title" components={{ accent: <span className="text-fg-accent" /> }} />
+              <Trans t={t} i18nKey="requestQuote.title" components={{ accent: <span className="text-fg-accent-emphasis" /> }} />
             </h2>
             <p className="mt-0.5 text-[12px] text-fg-tertiary">
               {provider.name}{provider.meta ? ` · ${provider.meta}` : ''} — {domainDisplay} · {country} {category}
