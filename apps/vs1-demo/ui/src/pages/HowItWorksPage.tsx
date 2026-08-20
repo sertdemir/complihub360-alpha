@@ -74,9 +74,6 @@ export function HowItWorksPage() {
   const navigate = useNavigate();
   const { locale } = useParams();
 
-  useEffect(() => {
-    document.title = t('howItWorks.meta.title');
-  }, [t]);
 
   // Single CTA on purpose: the report's secondary entry ("Ask a Compliance
   // Question") belongs to the search page, which is not on this branch yet.

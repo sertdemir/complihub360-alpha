@@ -1012,5 +1012,67 @@
   },
   "a11y": {
     "skipToContent": "Skip to content"
+  },
+  "seo": {
+    "home": {
+      "title": "CompliHub360 · Understand and act on compliance",
+      "description": "The rules for your markets on one risk map, with the source behind every obligation — and the way to vetted specialists. Free, no account."
+    },
+    "howItWorks": {
+      "title": "How it works · CompliHub360",
+      "description": "From a question to a risk map to the right professional. Five steps, no sales call, no obligation."
+    },
+    "compliance": {
+      "title": "Compliance areas · CompliHub360",
+      "description": "Eight areas from tax and VAT through EPR to data privacy: what applies, how urgent it is and who helps you act on it."
+    },
+    "markets": {
+      "title": "Markets · CompliHub360",
+      "description": "Eight markets and what they weigh most — Germany, United Kingdom, Netherlands, France, Italy, Spain, United States and Türkiye."
+    },
+    "pricing": {
+      "title": "Pricing · CompliHub360",
+      "description": "The assessment, the risk map and the matching cost you nothing. Specialists pay, and only once an appointment is confirmed."
+    },
+    "resources": {
+      "title": "Resources · CompliHub360",
+      "description": "Where to read on: markets and the rules that apply there, the eight compliance areas, and the path from a question to a professional."
+    },
+    "about": {
+      "title": "About us · CompliHub360",
+      "description": "Why CompliHub360 exists, what it stands for and how it behaves — knowledge before sales, ask before assuming."
+    },
+    "platform": {
+      "title": "The platform · CompliHub360",
+      "description": "How your business context becomes a structured risk map: the privacy gate, source-bound analysis and the matching behind it."
+    },
+    "solutions": {
+      "title": "By role · CompliHub360",
+      "description": "What CompliHub360 does for founders, operations teams and in-house counsel — from the first question to the obligation handled."
+    },
+    "aiGovernance": {
+      "title": "AI governance · CompliHub360",
+      "description": "The frame our AI works in and how it behaves: six governance dimensions and plain commitments about how it treats you."
+    },
+    "privacy": {
+      "title": "Privacy policy · CompliHub360",
+      "description": "How CompliHub360 processes personal data, on what legal basis, and the rights you have."
+    },
+    "terms": {
+      "title": "Terms · CompliHub360",
+      "description": "The terms and conditions for using CompliHub360."
+    },
+    "imprint": {
+      "title": "Imprint · CompliHub360",
+      "description": "Provider identification and contact details for CompliHub360."
+    },
+    "cookies": {
+      "title": "Cookie policy · CompliHub360",
+      "description": "Which cookies CompliHub360 sets, what they are for, and how to change your choice at any time."
+    },
+    "marketCountry": {
+      "title": "{{country}} · Markets · CompliHub360",
+      "description": "Which compliance obligations apply in {{country}}, how the areas are weighted there, and the legal source for each."
+    }
   }
 }

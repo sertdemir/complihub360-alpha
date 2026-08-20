@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { trackScrollDepth } from "./lib/analytics";
+import { useSeo } from "./hooks/useSeo";
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, useParams, Navigate, Outlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supportedLngs } from "./i18n/config";
@@ -133,6 +134,10 @@ function SkipToContent() {
 
 function AppContent() {
     const location = useLocation();
+
+    // Titel, Description, Canonical, hreflang und Open Graph — zentral statt je
+    // Seite, damit eine neue Route ihren Kopf aus lib/publicRoutes.ts bekommt.
+    useSeo();
 
     // Scroll depth per page view. Re-armed on every navigation so the milestones
     // are per page, not per session; a no-op unless Plausible is configured.

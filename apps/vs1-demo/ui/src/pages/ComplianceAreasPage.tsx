@@ -117,9 +117,6 @@ export function ComplianceAreasPage() {
 
   // Without this the tab keeps the previous page's title — visible because this
   // page sits in the main navigation.
-  useEffect(() => {
-    document.title = t('compliance.meta.title', 'Compliance areas · CompliHub360');
-  }, [t]);
 
 
   // TODO: replace with verified counts from provider DB
@@ -336,7 +333,7 @@ export function ComplianceAreasPage() {
       {/* ── Final CTA ─────────────────────────────────────────────────── */}
       <section className="py-16 desktop-s:py-24 bg-primary-700">
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <Typography variant="display" weight="bold" className="text-white mb-5">
+          <Typography variant="display" as="h2" weight="bold" className="text-white mb-5">
             {t('compliance.cta.title', 'Not sure which area applies?')}
           </Typography>
           <Typography variant="body" className="text-primary-100 mb-10 text-lg">

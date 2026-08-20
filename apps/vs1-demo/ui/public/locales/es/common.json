@@ -1012,5 +1012,67 @@
   },
   "a11y": {
     "skipToContent": "Saltar al contenido"
+  },
+  "seo": {
+    "home": {
+      "title": "CompliHub360 · Entender y cumplir",
+      "description": "Las normas de sus mercados en un mapa de riesgo, con la fuente detrás de cada obligación, y el camino hacia especialistas verificados. Gratis, sin cuenta."
+    },
+    "howItWorks": {
+      "title": "Cómo funciona · CompliHub360",
+      "description": "De una pregunta al mapa de riesgo y al profesional adecuado. Cinco pasos, sin llamada comercial y sin compromiso."
+    },
+    "compliance": {
+      "title": "Áreas de compliance · CompliHub360",
+      "description": "Ocho áreas, del IVA y los impuestos al EPR y la protección de datos: qué se aplica, con qué urgencia y quién ayuda a resolverlo."
+    },
+    "markets": {
+      "title": "Mercados · CompliHub360",
+      "description": "Ocho mercados y sus prioridades regulatorias: Alemania, Reino Unido, Países Bajos, Francia, Italia, España, Estados Unidos y Turquía."
+    },
+    "pricing": {
+      "title": "Precios · CompliHub360",
+      "description": "El análisis, el mapa de riesgo y el matching no le cuestan nada. Pagan los profesionales, y solo cuando se confirma una cita."
+    },
+    "resources": {
+      "title": "Recursos · CompliHub360",
+      "description": "Dónde seguir leyendo: los mercados y sus normas, las ocho áreas de compliance y el camino de la pregunta al profesional."
+    },
+    "about": {
+      "title": "Quiénes somos · CompliHub360",
+      "description": "Por qué existe CompliHub360, qué defiende y cómo trabaja: conocimiento antes que venta, preguntar antes de suponer."
+    },
+    "platform": {
+      "title": "La plataforma · CompliHub360",
+      "description": "Cómo su contexto de negocio se convierte en un mapa de riesgo estructurado: la puerta de privacidad, el análisis con fuentes y el matching."
+    },
+    "solutions": {
+      "title": "Por rol · CompliHub360",
+      "description": "Qué aporta CompliHub360 a fundadores, equipos de operaciones y asesoría interna, desde la primera pregunta hasta la obligación resuelta."
+    },
+    "aiGovernance": {
+      "title": "Gobernanza de IA · CompliHub360",
+      "description": "El marco en el que trabaja nuestra IA y cómo se comporta: seis dimensiones de gobernanza y compromisos claros en el trato."
+    },
+    "privacy": {
+      "title": "Política de privacidad · CompliHub360",
+      "description": "Cómo trata CompliHub360 los datos personales, sobre qué base jurídica y qué derechos le asisten."
+    },
+    "terms": {
+      "title": "Condiciones · CompliHub360",
+      "description": "Las condiciones generales de uso de CompliHub360."
+    },
+    "imprint": {
+      "title": "Aviso legal · CompliHub360",
+      "description": "Identificación del prestador y datos de contacto de CompliHub360."
+    },
+    "cookies": {
+      "title": "Política de cookies · CompliHub360",
+      "description": "Qué cookies utiliza CompliHub360, para qué sirven y cómo cambiar su elección en cualquier momento."
+    },
+    "marketCountry": {
+      "title": "{{country}} · Mercados · CompliHub360",
+      "description": "Qué obligaciones de compliance se aplican en {{country}}, cómo se ponderan las áreas y con qué fuente jurídica."
+    }
   }
 }
