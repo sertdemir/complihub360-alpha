@@ -166,8 +166,15 @@ gegen eine bewusste Gegenentscheidung.** Die `--color-risk-*`-Tokens sind
 weiterhin die einzige Risikoquelle — die Tokenisierung aus #53 trägt also —,
 aber sie lösen jetzt zu Ampelfarben auf.
 
-Offen und vom Auftraggeber zu entscheiden: das DNA-Addendum V2 verlangt unter
-P0 #3 ausdrücklich „prioritize without panic" und nennt rot-kritische Labels
-als angstgetrieben. Die Sprache ist inzwischen entdramatisiert (Sofort/Hoch/
-Mittel/Niedrig statt Kritisch), die Farbe wieder alarmierend. Beides
-gleichzeitig ist eine Haltung, aber vermutlich nicht die beabsichtigte.
+**Entschieden am 20.08.2026: die Ampel gilt überall.** Damit ist der Befund
+„Risiko in Rot" in Abschnitt 4 **erledigt, nicht offen** — er beschreibt eine
+Regel, die es nicht mehr gibt. Das DNA-Addendum V2 verlangt unter P0 #3
+„prioritize without panic"; dem ist über die **Sprache** entsprochen, nicht über
+die Farbe: die Stufen heißen seit #54 Sofort/Hoch/Mittel/Niedrig statt Kritisch,
+und Bußgelder führen seit #56 keine Pflichtzeile mehr an.
+
+Nachgezogen wurden am 20.08. alle Stellen, die noch das Gegenteil behaupteten:
+`docs/design-system/compass-reference.md` (sechs Regelsätze plus datierter
+Hinweis im Kopf) und die Startseite selbst — `brandCode` versprach dem Besucher
+wörtlich „Kein Rot. Nie." über einem roten Badge. Die Karte heißt jetzt
+„Priorität statt Panik" und sagt, was das Produkt tatsächlich tut.

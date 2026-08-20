@@ -7,7 +7,7 @@
       "low": "Düşük",
       "medium": "Orta",
       "high": "Yüksek",
-      "critical": "Kritik"
+      "critical": "Acil"
     },
     "state": {
       "confirmed": "Onaylandı",
@@ -1005,13 +1005,13 @@
       "gold": "Üç",
       "post": " sessiz ilke."
     },
-    "subtitle": "Uyum ürünleri genellikle bağırır. Bizim buna ihtiyacımız yok. Risk kırmızıya ihtiyaç duymaz. Kararlar 20 adımlı bir huniye ihtiyaç duymaz. Partner'lar bir pazar yerine ihtiyaç duymaz. Bunun yerine ne yaptığımızı görmek için kartların üzerine gelin.",
+    "subtitle": "Uyum ürünleri genellikle bağırır. Bizim buna ihtiyacımız yok. Risk tehdide ihtiyaç duymaz. Kararlar 20 adımlı bir huniye ihtiyaç duymaz. Partner'lar bir pazar yerine ihtiyaç duymaz. Bunun yerine ne yaptığımızı görmek için kartların üzerine gelin.",
     "hoverCue": "Görmek için üzerine gelin",
     "cards": [
       {
-        "label": "Kod 02 — Petrol tonunda risk",
-        "title": "Kırmızı yok. Asla.",
-        "desc": "Düşükten kritiğe risk seviyeleri, petrol tonlarıyla ifade edilir — asla kırmızıyla değil. Ürün sizi hiçbir zaman korkutarak harekete geçirmeye çalışmaz."
+        "label": "Kod 02 — Panik değil, öncelik",
+        "title": "Tehdit değil, aciliyet.",
+        "desc": "Seviyeler size ne olacağını değil, önce neyin geldiğini söyler. Cezalar yükümlülüğün ayrıntısında yer alır, başlığında değil."
       },
       {
         "label": "Kod 04 — Sihirbazın yolu",

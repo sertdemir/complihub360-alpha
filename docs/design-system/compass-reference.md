@@ -1,5 +1,14 @@
 # Compass Design System — Code Reference
 
+> **Geändert am 20.08.2026 — Risiko ist eine Ampel, nicht Petrol.**
+> Bis dahin galt „Risk in Petrol, never red" als eine der definierenden Marken-Regeln.
+> PR #55 hat die Skala auf grün · gelb · orange · rot umgestellt (CVD-Analyse, ΔE2000
+> gegen Deuteranopie/Protanopie, Figma gespiegelt), die Dashboard-Spec hatte rot/amber
+> von Anfang an verlangt. Am 20.08. vom Auftraggeber bestätigt: die Ampel gilt überall.
+> Historische Audits, die „Risiko in Rot" als Doktrinbruch führen, beziehen sich auf den
+> Stand davor — insbesondere docs/audits/qualitaets-konzil-2026-08-19.md, Abschnitt 4.
+
+
 > Mirror of the **Compass** Figma DS (`a4BeKbsBGoHkcudhKXUJTl`) for code implementation in
 > `apps/vs1-demo/ui`. Source of truth = the Figma foundation pages (read 2026-06, DS last updated
 > 2026-05-02). This doc is the working reference for the token + component build.
@@ -39,7 +48,7 @@ Token split: Color **74** · Typography **37** · Spacing **22** (14 numeric + 8
 
 ### Primitive scales (11 stops each)
 
-**Petrol** (also carries the Risk-severity scale — *risk is never red*):
+**Petrol** (the trust anchor; it no longer carries the Risk scale — see the traffic-light note below):
 `50 #EBF1F0 · 100 #D1DFDD · 200 #A8C2BE · 300 #7AA29C · 400 #427B72 · 500 #004D40 ★ · 600 #002E26 (hover/active) · 700 #00231D · 800 #001612 · 900 #000B09 · 950 #000403`
 
 **Gold** (scarcity — eyebrows, borders, active steps; never a fill):
@@ -62,7 +71,7 @@ variants per status (`bg-light·text·border` / `bg-medium·text` / `bg-strong·
 
 ### Color doctrines
 
-- **🚨 Risk in Petrol — NEVER red/yellow/green.** Risk severity is encoded on the petrol scale
+- **🚦 Risk is a TRAFFIC LIGHT — green · yellow · orange · red** (decision 2026-08-20, PR #55). Colour never carries the meaning alone: every badge variant except RiskDot renders a label, because under deuteranopia the four accents separate by only ΔE 7.1.
   (lighter = less, darker = more). *"Risk ist eine Skala. Status ist ein Ereignis."* → `risk/*` and
   status (`success/warning/error/info`) are different token families. `risk/critical` is still petrol.
 - **`color/border/focus`** (Petrol, 9.83:1) is **mandatory** on every interactive element, min 2px
@@ -197,7 +206,7 @@ Each Compass component manual (per Getting Started §07) documents: ① Anatomie
 
 1. **Tokens, never hex** — if a value isn't a token, either create the token or rethink the idea.
 2. **Text styles, never custom fonts** — pick a style; the 24 cover all cases.
-3. **Risk in petrol scale, never red** — most defining visual brand code.
+3. **Risk on the traffic-light scale** — green → yellow → orange → red, carried entirely by `--color-risk-*` so both themes flip on their own.
 4. **Plex Serif only ≥32pt** — below it, Inter. Hard boundary.
 5. Naming: `category/value` · `category/subcategory/value` · `namespace/role-on-context`
    (e.g. `color/text/on-petrol`) · `role/size` (t-shirt).
@@ -246,7 +255,7 @@ playful · legalistic · alarmist ("high penalties!") · enthusiastic (no `!`, n
 
 **Brand reflex:** informational ("I'll surely find that on CompliHub360") + agentic ("and they help
 me implement it"). **5 cascading decisions:** Hero=merchant · reflex=info+agentic · Petrol #004D40 anchor
-· Gold=second tone not paywall · Risk in petrol never red.
+· Gold=second tone not paywall · Risk = traffic light (green/yellow/orange/red).
 
 ## 12 · Brand moments & visual codes (✨)
 
@@ -258,7 +267,7 @@ EngagementTimeline) ⑤ **First wizard step** — the entry door (full-bleed Pet
 question, sidebar of steps, single Gold CTA).
 
 **4 visual codes** (identify CompliHub without a logo): ① **Petrol Layer Pattern** — surfaces filled in
-dark petrol with light card-islands (#FFF/#F4F4F5) ② **Risk in Petrol severity scale** — never RYG; red
+dark petrol with light card-islands (#FFF/#F4F4F5) ② **Risk severity as a traffic light** — green/yellow/orange/red, both themes carrying separate values
 reserved for *true errors only* ③ **Plex Serif for Display** (≥32pt, hard boundary) ④ **Gold-on-Petrol
 pill stepper** (wizard-exclusive).
 
@@ -286,7 +295,7 @@ variables directly** — verified resolved values: `bg/brand #004D40` · `bg/acc
 `text/primary #0F172A` · `text/secondary #5F5B5B` · `text/tertiary #6B7280` · `bg/primary #FFFFFF` ·
 `bg/secondary #FAFAFA` · `border/subtle #F4F4F5` · `border/default #E5E7EB` · `radius/md 6` ·
 `shadow/xl`. **Conclusion: guidelines ARE applied.** Risk/critical badges use the petrol/neutral palette
-— **no red token** — consistent with "Risk in Petrol, never red."
+— the risk scale owns the only reds in the system; no other surface uses red.
 
 **Operative token values for code (screen-aligned, override stale handoff-board snapshot):**
 - `color/bg/primary` (marketing surface) = **#FFFFFF** · `color/bg/secondary` = **#FAFAFA**
