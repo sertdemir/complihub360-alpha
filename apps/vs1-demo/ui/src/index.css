@@ -249,6 +249,11 @@
     --color-bg-inverse: 255 255 255;
     --drawer-glass-bg: rgba(31, 41, 55, 0.50);  /* slate #1f2937 @ 50% — floating glass drawer */
     --color-bg-brand: 20 168 154;
+    /* Dark counterpart to :root's white. White on #14a89a measures 2.96:1 —
+       below AA — while this deep petrol ink holds 6.38:1. It is exactly what
+       Button.tsx had been hardcoding as text-[#04140f] to work around the
+       missing token; with this in place the component can use the pair. */
+    --color-text-on-brand: 4 20 15;
     --color-bg-brand-light: 29 61 71;
     /* Restated, not flipped: on #14a89a white is 2.96:1 and every gold in the
        scale is below 1.9:1 — nothing readable sits on it. The panel therefore

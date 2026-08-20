@@ -99,9 +99,15 @@ function LocaleLayout() {
     const { i18n } = useTranslation();
 
     useEffect(() => {
-        if (locale && supportedLngs.includes(locale) && i18n.resolvedLanguage !== locale) {
+        if (!locale || !supportedLngs.includes(locale)) return;
+        if (i18n.resolvedLanguage !== locale) {
             i18n.changeLanguage(locale);
         }
+        // index.html ships lang="en". Without this every locale claimed to be
+        // English: screen readers spoke German legal copy with English phonetics
+        // (WCAG 3.1.1), and MarketsDrawer reads this attribute to build the
+        // magic-link return URL — so every signup returned to /en/results.
+        document.documentElement.lang = locale;
     }, [locale, i18n]);
 
     if (!locale || !supportedLngs.includes(locale)) {

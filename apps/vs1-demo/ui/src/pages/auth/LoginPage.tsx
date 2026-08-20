@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trans, useTranslation } from "react-i18next";
 import { ArrowRight, Mail, EyeOff, AlertTriangle } from "lucide-react";
@@ -60,6 +60,7 @@ function GoogleButton({ onClick }: { onClick: () => void }) {
 
 function SystemFooter({ className = "" }: { className?: string }) {
     const { t } = useTranslation("auth");
+    const { locale = "en" } = useParams();
     return (
         <div className={"flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px] text-white/50 " + className}>
             <span className="flex items-center gap-2">
@@ -68,9 +69,9 @@ function SystemFooter({ className = "" }: { className?: string }) {
             <span className="text-white/20">·</span>
             <span><span className="font-semibold text-white">EN</span> / DE</span>
             <span className="text-white/20">·</span>
-            <a href="#" className="hover:text-white/80">{t("login.footer.privacy")}</a>
-            <a href="#" className="hover:text-white/80">{t("login.footer.terms")}</a>
-            <a href="#" className="hover:text-white/80">{t("login.footer.imprint")}</a>
+            <a href={`/${locale}/privacy`} className="hover:text-white/80">{t("login.footer.privacy")}</a>
+            <a href={`/${locale}/terms`} className="hover:text-white/80">{t("login.footer.terms")}</a>
+            <a href={`/${locale}/imprint`} className="hover:text-white/80">{t("login.footer.imprint")}</a>
         </div>
     );
 }

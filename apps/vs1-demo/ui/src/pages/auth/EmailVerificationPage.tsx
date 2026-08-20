@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, useLocation, Link, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Trans, useTranslation } from "react-i18next";
 import { Typography } from "../../components/ui/Typography";
@@ -9,6 +9,9 @@ export function EmailVerificationPage() {
     const navigate = useNavigate();
     const location = useLocation();
     const { t } = useTranslation("auth");
+    // Every route lives under /:locale — a bare "/login" falls through to the
+    // locale catch-all and dumps the user on the homepage instead.
+    const { locale = "en" } = useParams();
     const email = (location.state as { email?: string })?.email || "ihre@email.de";
 
     const [cooldown, setCooldown] = useState(0);
@@ -35,7 +38,7 @@ export function EmailVerificationPage() {
                         <span className="material-symbols-outlined text-primary-600 text-2xl">verified_user</span>
                         <Typography variant="h3" className="tracking-tight">CompliHub360</Typography>
                     </button>
-                    <Link to="/login" className="text-sm font-medium text-neutral-500 hover:text-neutral-900 transition-colors flex items-center gap-1">
+                    <Link to={`/${locale}/login`} className="text-sm font-medium text-neutral-500 hover:text-neutral-900 transition-colors flex items-center gap-1">
                         {t("verify.signIn")} <span className="material-symbols-outlined text-base">arrow_forward</span>
                     </Link>
                 </div>
@@ -118,7 +121,7 @@ export function EmailVerificationPage() {
 
                         {/* Change email */}
                         <Link
-                            to="/register"
+                            to={`/${locale}/register`}
                             className="inline-flex items-center gap-1 text-xs text-neutral-400 hover:text-neutral-600 transition-colors"
                         >
                             <span className="material-symbols-outlined text-sm">edit</span>
