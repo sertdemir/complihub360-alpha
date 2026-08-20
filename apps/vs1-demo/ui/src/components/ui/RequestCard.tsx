@@ -10,10 +10,16 @@ import { cn } from '../../lib/utils';
 
 export type RequestStatus = 'awaiting-confirm' | 'awaiting-reply' | 'active';
 
+// The pill label is 11px, so it owes the full 4.5:1 against its own tint - not
+// the 3:1 a large heading would. Both accents used to be hardcoded one stop too
+// light for that: gold-700 measured 3.62 on the 10% gold wash and #1d7a67 4.39
+// on the 10% petrol one. Both now read tokens that already carry the correct
+// stop per theme, so DARK is unchanged (gold-500 5.72, #2cc0ad 6.37) and light
+// lifts to 6.27 / 8.28.
 const PILL: Record<RequestStatus, string> = {
-  'awaiting-confirm': 'bg-[#d4af37]/10 border-[#d4af37]/35 text-[#96802a] dark:bg-[#d4af37]/15 dark:border-[#d4af37]/40 dark:text-[#d4af37]',
+  'awaiting-confirm': 'bg-[#d4af37]/10 border-[#d4af37]/35 text-fg-accent-strong dark:bg-[#d4af37]/15 dark:border-[#d4af37]/40',
   'awaiting-reply': 'bg-surface-secondary border-stroke text-fg-secondary',
-  active: 'bg-[#004d40]/10 border-[#258d78]/35 text-[#1d7a67] dark:bg-[#004d40]/25 dark:border-[#258d78]/40 dark:text-[#2cc0ad]',
+  active: 'bg-[#004d40]/10 border-[#258d78]/35 text-fg-brand dark:bg-[#004d40]/25 dark:border-[#258d78]/40',
 };
 
 const STATUS_LABEL: Record<RequestStatus, string> = {

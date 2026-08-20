@@ -92,7 +92,7 @@ export function LeadsPage() {
       <div className="mx-auto max-w-[1140px] space-y-5">
         <div>
           <h1 className="font-serif text-[32px] font-bold leading-tight text-fg">
-            <Trans t={t} i18nKey="termine.title" components={{ accent: <span className="text-fg-accent" /> }} />
+            <Trans t={t} i18nKey="termine.title" components={{ accent: <span className="text-fg-accent-emphasis" /> }} />
           </h1>
           <p className="mt-1 text-body-sm text-fg-secondary">{t('termine.sub')}</p>
         </div>
