@@ -74,19 +74,19 @@ export function InvoiceDetailDrawer({ invoice, onClose }: { invoice: Invoice | n
               { k: t('invoiceDetail.due'), v: day(invoice.due_at) },
               { k: t('invoiceDetail.paid'), v: invoice.status === 'paid' ? day(invoice.paid_at) : '—' },
             ].map((m) => (
-              <div key={m.k} className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2.5">
+              <div key={m.k} className="rounded-lg border border-elevate/10 bg-elevate/[0.03] px-3 py-2.5">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">{m.k}</p>
                 <p className="mt-0.5 text-[13px] font-medium text-fg">{m.v}</p>
               </div>
             ))}
           </div>
 
-          <div className="rounded-lg border border-white/10 bg-white/[0.03]">
-            <p className="border-b border-white/10 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">
+          <div className="rounded-lg border border-elevate/10 bg-elevate/[0.03]">
+            <p className="border-b border-elevate/10 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">
               {t('invoiceDetail.lineItems')}
             </p>
             {invoice.line_items.map((li) => (
-              <div key={li.label} className="flex items-baseline justify-between gap-3 border-b border-white/5 px-4 py-3 last:border-b-0">
+              <div key={li.label} className="flex items-baseline justify-between gap-3 border-b border-elevate/5 px-4 py-3 last:border-b-0">
                 <div className="min-w-0">
                   <p className="text-[13px] font-medium text-fg">{li.label}</p>
                   <p className="mt-0.5 text-[11px] text-fg-tertiary">{li.qty} × {euro(li.unit_cents)}</p>
@@ -94,7 +94,7 @@ export function InvoiceDetailDrawer({ invoice, onClose }: { invoice: Invoice | n
                 <p className="shrink-0 text-[13px] font-semibold text-fg">{euro(li.amount_cents)}</p>
               </div>
             ))}
-            <div className="flex items-baseline justify-between border-t border-white/10 px-4 py-3">
+            <div className="flex items-baseline justify-between border-t border-elevate/10 px-4 py-3">
               <p className="text-[12px] font-semibold uppercase tracking-[0.06em] text-fg-secondary">{t('invoiceDetail.total')}</p>
               <p className="text-[16px] font-bold text-fg">{euro(invoice.amount_cents)}</p>
             </div>

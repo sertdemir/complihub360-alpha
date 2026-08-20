@@ -129,7 +129,7 @@ export function BillingPage() {
           </Banner>
         )}
         {portalNote && (
-          <p className="rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-[12px] text-fg-secondary">{portalNote}</p>
+          <p className="rounded-lg border border-elevate/10 bg-elevate/[0.04] px-4 py-3 text-[12px] text-fg-secondary">{portalNote}</p>
         )}
 
         <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
@@ -188,7 +188,7 @@ export function BillingPage() {
               {invoices.map((inv) => {
                 const m = STATUS_META[inv.status];
                 return (
-                  <TR key={inv.id} className="cursor-pointer transition-colors hover:bg-white/[0.04]" onClick={() => setDetail(inv)}>
+                  <TR key={inv.id} className="cursor-pointer transition-colors hover:bg-elevate/[0.04]" onClick={() => setDetail(inv)}>
                     <TD bold>{inv.invoice_number}</TD>
                     <TD>{inv.period}</TD>
                     <TD numeric>{euro(inv.amount_cents)}</TD>

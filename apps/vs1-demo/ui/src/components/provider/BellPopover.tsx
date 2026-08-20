@@ -75,8 +75,8 @@ export function BellPopover({ unread, onAllRead }: BellPopoverProps) {
         <>
           {/* click-outside catcher */}
           <div className="fixed inset-0 z-[90]" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-[calc(100%+10px)] z-[95] w-[380px] overflow-hidden rounded-xl border border-white/10 bg-[#1f2937] shadow-[0_18px_50px_-12px_rgba(0,0,0,0.65)]">
-            <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+          <div className="absolute right-0 top-[calc(100%+10px)] z-[95] w-[380px] overflow-hidden rounded-xl border border-elevate/10 bg-[#1f2937] shadow-[0_18px_50px_-12px_rgba(0,0,0,0.65)]">
+            <div className="flex items-center justify-between border-b border-elevate/10 px-4 py-3">
               <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">{t('bell.header')}</p>
               <button
                 type="button"
@@ -99,11 +99,11 @@ export function BellPopover({ unread, onAllRead }: BellPopoverProps) {
                   type="button"
                   onClick={() => openItem(i)}
                   className={cn(
-                    'flex w-full items-start gap-2.5 border-b border-white/5 px-4 py-3 text-left transition-colors hover:bg-white/[0.04]',
-                    i.unread && 'bg-white/[0.03]',
+                    'flex w-full items-start gap-2.5 border-b border-elevate/5 px-4 py-3 text-left transition-colors hover:bg-elevate/[0.04]',
+                    i.unread && 'bg-elevate/[0.03]',
                   )}
                 >
-                  <span className={cn('mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full', i.unread ? 'bg-fg-brand' : 'bg-white/15')} />
+                  <span className={cn('mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full', i.unread ? 'bg-fg-brand' : 'bg-elevate/15')} />
                   <span className="min-w-0">
                     <span className="block truncate text-[12px] font-semibold text-fg">{i.title}</span>
                     {i.desc && <span className="mt-0.5 block truncate text-[11px] text-fg-tertiary">{i.desc}</span>}
@@ -113,7 +113,7 @@ export function BellPopover({ unread, onAllRead }: BellPopoverProps) {
               ))}
             </div>
 
-            <div className="border-t border-white/10 px-3 py-2.5">
+            <div className="border-t border-elevate/10 px-3 py-2.5">
               <Button
                 variant="ghost"
                 size="sm"

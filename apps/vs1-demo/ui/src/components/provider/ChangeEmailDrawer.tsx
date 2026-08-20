@@ -77,7 +77,7 @@ export function ChangeEmailDrawer({ open, currentEmail, onClose }: ChangeEmailDr
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3">
+          <div className="rounded-lg border border-elevate/10 bg-elevate/[0.03] px-4 py-3">
             <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">{t('changeEmail.currentAddress')}</p>
             <p className="mt-0.5 text-[13px] font-medium text-fg">{currentEmail}</p>
           </div>
@@ -89,7 +89,7 @@ export function ChangeEmailDrawer({ open, currentEmail, onClose }: ChangeEmailDr
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="new-address@yourfirm.com"
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-[13px] text-fg outline-none placeholder:text-fg-tertiary focus:border-fg-brand"
+              className="w-full rounded-lg border border-elevate/10 bg-elevate/5 px-3 py-2.5 text-[13px] text-fg outline-none placeholder:text-fg-tertiary focus:border-fg-brand"
             />
           </div>
           <p className="text-[11px] leading-relaxed text-fg-tertiary">

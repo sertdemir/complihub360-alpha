@@ -66,7 +66,7 @@ export function ConfirmDrawer({ spec, onClose }: { spec: ConfirmSpec | null; onC
               <input
                 value={typed}
                 onChange={(e) => setTyped(e.target.value)}
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[13px] text-fg outline-none placeholder:text-fg-tertiary focus:border-error-500"
+                className="w-full rounded-lg border border-elevate/10 bg-elevate/5 px-3 py-2 text-[13px] text-fg outline-none placeholder:text-fg-tertiary focus:border-error-500"
                 placeholder={spec.keyword}
               />
             </div>

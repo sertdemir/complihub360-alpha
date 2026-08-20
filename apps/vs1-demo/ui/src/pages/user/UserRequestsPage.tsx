@@ -122,7 +122,7 @@ export function UserRequestsPage() {
                       type="button"
                       aria-label={t('requests.requestActionsAria')}
                       onClick={() => setActionsFor({ uuid: r.uuid!, idLine: r.id, company: r.company, statusLabel: String(r.statusLabel), rawStatus: r.rawStatus })}
-                      className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-white/10 text-fg-tertiary transition-colors hover:border-white/25 hover:text-fg"
+                      className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-elevate/10 text-fg-tertiary transition-colors hover:border-elevate/25 hover:text-fg"
                     >
                       <MoreHorizontal size={15} />
                     </button>

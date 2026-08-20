@@ -81,6 +81,15 @@
     --color-bg-accent: var(--gold-500);
     --color-bg-accent-light: var(--gold-50);
 
+    /* ── ELEVATION ────────────────────────────────────────────────────────
+       Depth in the app workspace is built from translucent overlays, not from
+       distinct surface colours: bg-elevate/5 for a raised panel, border-elevate/10
+       for a hairline. The DIRECTION flips between themes — dark mode lifts a
+       surface by adding white, light mode by adding ink. One token, because the
+       alpha does the work; hardcoding white here is what makes a dark-only
+       component invisible the moment the theme flips. */
+    --color-elevate: 15 23 42;          /* ink #0f172a — light mode darkens */
+
     /* Text */
     --color-text-primary: var(--neutral-900);   /* #0f172a */
     --color-text-secondary: var(--neutral-600);  /* #5f5b5b */
@@ -265,6 +274,9 @@
        keeps the deep petrol in dark mode, where white stays at 9.83:1 and the
        gold eyebrow at 4.57:1. */
     --color-bg-brand-surface: var(--petrol-500);
+    /* White, i.e. exactly what bg-white/5 and border-white/10 resolved to before
+       — dark mode is unchanged by the elevation migration. */
+    --color-elevate: 255 255 255;
     /* bg-brand flips to the light teal #14a89a in dark, and every button uses
        THAT token (bg-brand-surface is only the BrandCodePreview panel, which
        hardcodes text-white). White inherited from :root sat at 2.96:1 on those

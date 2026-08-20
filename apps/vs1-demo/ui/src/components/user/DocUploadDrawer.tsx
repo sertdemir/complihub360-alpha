@@ -106,7 +106,7 @@ export function DocUploadDrawer({ open, onClose, domainLabel }: DocUploadDrawerP
             <Tag tone={result.sanitized_ready ? 'success' : 'error'}>{result.sanitized_ready ? t('docUpload.tagSanitized') : t('docUpload.tagSanitizationFailed')}</Tag>
             <Tag tone={result.ai_allowed ? 'success' : 'neutral'}>{result.ai_allowed ? t('docUpload.tagAiAllowed') : t('docUpload.tagAiBlocked')}</Tag>
           </div>
-          <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4">
+          <div className="rounded-lg border border-elevate/10 bg-elevate/[0.03] p-4">
             <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">{t('docUpload.redactionReport')}</p>
             {counts.length ? (
               <ul className="mt-2 space-y-1">
@@ -131,7 +131,7 @@ export function DocUploadDrawer({ open, onClose, domainLabel }: DocUploadDrawerP
       ) : (
         <div className="space-y-4">
           <div
-            className="cursor-pointer rounded-lg border border-dashed border-white/20 bg-white/[0.02] px-4 py-6 text-center transition-colors hover:border-fg-brand/60"
+            className="cursor-pointer rounded-lg border border-dashed border-elevate/20 bg-elevate/[0.02] px-4 py-6 text-center transition-colors hover:border-fg-brand/60"
             onClick={() => fileRef.current?.click()}
           >
             <p className="text-[13px] font-medium text-fg">{filename || t('docUpload.chooseFile')}</p>
@@ -144,7 +144,7 @@ export function DocUploadDrawer({ open, onClose, domainLabel }: DocUploadDrawerP
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder={t('docUpload.pastePlaceholder')}
-            className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-[13px] text-fg placeholder:text-fg-tertiary focus:border-fg-brand focus:outline-none"
+            className="w-full resize-none rounded-lg border border-elevate/10 bg-elevate/5 px-3 py-2.5 text-[13px] text-fg placeholder:text-fg-tertiary focus:border-fg-brand focus:outline-none"
           />
           <label className="flex cursor-pointer items-start gap-2.5">
             <Checkbox checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5" />

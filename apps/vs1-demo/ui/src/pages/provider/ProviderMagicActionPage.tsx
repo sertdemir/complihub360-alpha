@@ -60,7 +60,7 @@ export function ProviderMagicActionPage() {
 
   return (
     <div className="dark flex min-h-screen items-center justify-center bg-[#1F2937] px-4 text-fg">
-      <div className="w-full max-w-[480px] rounded-xl border border-white/10 bg-white/[0.03] p-8 shadow-2xl shadow-black/40">
+      <div className="w-full max-w-[480px] rounded-xl border border-elevate/10 bg-elevate/[0.03] p-8 shadow-2xl shadow-black/40">
         <div className="mb-6 flex items-center gap-2">
           <LogoMark tone="on-petrol" className="h-[22px] w-auto" />
           <span className="text-[15px] font-semibold text-white">CompliHub</span>
@@ -89,7 +89,7 @@ export function ProviderMagicActionPage() {
               <Tag tone="neutral">{t('magicAction.singleUseTag')}</Tag>
             </div>
             {dossier && (
-              <div className="mt-4 rounded-lg border border-white/10 bg-white/[0.03] p-4">
+              <div className="mt-4 rounded-lg border border-elevate/10 bg-elevate/[0.03] p-4">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">{t('magicAction.anonymizedDossier')}</p>
                 {answers.length > 0 && (
                   <dl className="mt-2 space-y-1">
@@ -115,7 +115,7 @@ export function ProviderMagicActionPage() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder={t('magicAction.replyPlaceholder')}
-                className="mt-4 w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-[13px] text-fg placeholder:text-fg-tertiary focus:border-fg-brand focus:outline-none"
+                className="mt-4 w-full resize-none rounded-lg border border-elevate/10 bg-elevate/5 px-3 py-2.5 text-[13px] text-fg placeholder:text-fg-tertiary focus:border-fg-brand focus:outline-none"
               />
             )}
             <p className="mt-4 text-[12px] leading-relaxed text-fg-tertiary">

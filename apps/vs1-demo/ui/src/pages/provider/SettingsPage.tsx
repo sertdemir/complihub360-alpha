@@ -119,7 +119,7 @@ export function SettingsPage() {
                   {t('settings.pausedBannerBody')}
                 </Banner>
               )}
-              <Card styleVariant="filled" className="divide-y divide-white/5 p-0">
+              <Card styleVariant="filled" className="divide-y divide-elevate/5 p-0">
                 <div className="flex items-center gap-3 px-4 py-3.5">
                   <div className="min-w-0 flex-1">
                     <p className="text-[13px] font-semibold text-fg">{t('settings.pauseTitle')}</p>

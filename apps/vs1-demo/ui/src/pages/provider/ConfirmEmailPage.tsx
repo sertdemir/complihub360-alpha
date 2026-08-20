@@ -38,7 +38,7 @@ export function ConfirmEmailPage() {
 
   return (
     <div className="dark flex min-h-screen items-center justify-center bg-[#0b1620] px-4">
-      <div className="w-full max-w-[440px] rounded-2xl border border-white/10 bg-[#1f2937] p-8 text-center shadow-[0_18px_50px_-12px_rgba(0,0,0,0.65)]">
+      <div className="w-full max-w-[440px] rounded-2xl border border-elevate/10 bg-[#1f2937] p-8 text-center shadow-[0_18px_50px_-12px_rgba(0,0,0,0.65)]">
         <div className="mb-6 flex justify-center"><Logo lockup="horizontal" tone="on-petrol" markClassName="h-9" /></div>
         {state === 'working' && <p className="text-[14px] text-fg-secondary">{t('confirmEmail.working')}</p>}
         {state === 'done' && (
@@ -62,7 +62,7 @@ export function ConfirmEmailPage() {
             <p className="mt-2 text-[13px] leading-relaxed text-fg-secondary">
               {t('confirmEmail.failedBody')}
             </p>
-            <Link to={`/${locale}/partner-dashboard/settings`} className="mt-6 inline-block rounded-xl border border-white/20 px-6 py-3 text-[14px] font-semibold text-fg">
+            <Link to={`/${locale}/partner-dashboard/settings`} className="mt-6 inline-block rounded-xl border border-elevate/20 px-6 py-3 text-[14px] font-semibold text-fg">
               {t('confirmEmail.openSettings')}
             </Link>
           </>
