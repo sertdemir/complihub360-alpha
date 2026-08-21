@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Typography } from '../components/ui/Typography';
 import { SiteFooter } from '../components/home';
+import { Container } from '../components/ui/Container';
 
 function Section({ id, children, className = '' }: { id: string; children: React.ReactNode; className?: string }) {
   const ref = useRef<HTMLElement>(null);
@@ -150,7 +151,7 @@ function DimensionsSection() {
 
   return (
     <Section id="dimensions" className="py-20 bg-surface">
-      <div className="max-w-7xl mx-auto px-6">
+      <Container gutter="flat">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <Typography variant="h2" weight="bold" className="text-fg mb-4">
             {t('aiGov.dimTitle', 'The 6 Dimensions of AI Governance')}
@@ -182,7 +183,7 @@ function DimensionsSection() {
             </motion.div>
           ))}
         </div>
-      </div>
+      </Container>
     </Section>
   );
 }
@@ -193,7 +194,7 @@ function FeaturesOverview() {
   const { t } = useTranslation('common');
   return (
     <Section id="features" className="py-20 bg-primary-900">
-      <div className="max-w-7xl mx-auto px-6">
+      <Container gutter="flat">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <Typography variant="h2" weight="bold" className="text-white mb-4">
             {t('aiGov.featTitle', 'Active AI Features on CompliHub360')}
@@ -263,7 +264,7 @@ function FeaturesOverview() {
             </div>
           </motion.div>
         </div>
-      </div>
+      </Container>
     </Section>
   );
 }

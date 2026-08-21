@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { Typography } from '../components/ui/Typography';
 import { Button } from '../components/ui/Button';
+import { Container } from '../components/ui/Container';
 
 
 // ─── Animated Section wrapper ─────────────────────────────────────────────────
@@ -295,7 +296,7 @@ function AnchorBar() {
 
   return (
     <div className="sticky top-16 z-40 bg-surface/80 backdrop-blur-md border-b border-stroke-subtle">
-      <div className="max-w-7xl mx-auto px-6">
+      <Container gutter="flat">
         <nav className="flex items-center justify-center gap-1 overflow-x-auto scrollbar-hide py-2">
           {anchors.map(a => (
             <button
@@ -309,7 +310,7 @@ function AnchorBar() {
             </button>
           ))}
         </nav>
-      </div>
+      </Container>
     </div>
   );
 }
@@ -322,7 +323,7 @@ function FoundersSection() {
 
   return (
     <Section id="founders" className="py-16 desktop-s:py-24 bg-background">
-      <div className="max-w-7xl mx-auto px-6">
+      <Container gutter="flat">
         {/* Hero */}
         <div className="grid desktop-s:grid-cols-2 gap-14 items-center mb-14">
           <div>
@@ -399,7 +400,7 @@ function FoundersSection() {
           <StatCard value="48h" label={t('solutions.founders.stat3Label', 'Max reply window')} delay={0.2} />
           <StatCard value="0" label={t('solutions.founders.stat4Label', 'Regulatory surprises')} delay={0.3} />
         </div>
-      </div>
+      </Container>
     </Section>
   );
 }
@@ -411,7 +412,7 @@ function OperationsSection() {
 
   return (
     <Section id="operations" className="py-16 desktop-s:py-24 bg-surface-secondary">
-      <div className="max-w-7xl mx-auto px-6">
+      <Container gutter="flat">
         <div className="max-w-3xl mb-14">
           <Typography variant="caption" className="text-fg-brand mb-3 block font-semibold">
             {t('solutions.operations.overline', 'For Operations Teams')}
@@ -476,7 +477,7 @@ function OperationsSection() {
           <StatCard value="1-Click" label={t('solutions.operations.stat2Label', 'PDF report export')} delay={0.1} />
           <StatCard value="∞" label={t('solutions.operations.stat3Label', 'Saved compliance sessions')} delay={0.2} />
         </div>
-      </div>
+      </Container>
     </Section>
   );
 }
@@ -489,7 +490,7 @@ function CounselSection() {
 
   return (
     <Section id="counsel" className="py-16 desktop-s:py-24 bg-background">
-      <div className="max-w-7xl mx-auto px-6">
+      <Container gutter="flat">
         <div className="grid desktop-s:grid-cols-2 gap-16 items-start">
           {/* Left */}
           <div>
@@ -555,7 +556,7 @@ function CounselSection() {
             </div>
           </div>
         </div>
-      </div>
+      </Container>
     </Section>
   );
 }

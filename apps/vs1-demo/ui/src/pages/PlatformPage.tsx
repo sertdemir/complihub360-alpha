@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Typography } from '../components/ui/Typography';
+import { Container } from '../components/ui/Container';
 
 
 // ─── Animated Section wrapper ─────────────────────────────────────────────────
@@ -339,7 +340,7 @@ function AnchorBar() {
 
   return (
     <div className="sticky top-16 z-40 bg-surface/80 backdrop-blur-md border-b border-stroke-subtle">
-      <div className="max-w-7xl mx-auto px-6">
+      <Container gutter="flat">
         <nav className="flex items-center justify-center gap-1 overflow-x-auto scrollbar-hide py-2">
           {anchors.map(a => (
             <button
@@ -355,7 +356,7 @@ function AnchorBar() {
             </button>
           ))}
         </nav>
-      </div>
+      </Container>
     </div>
   );
 }
@@ -367,7 +368,7 @@ function EngineSection() {
 
   return (
     <Section id="engine" className="py-16 desktop-s:py-24 bg-background">
-      <div className="max-w-7xl mx-auto px-6">
+      <Container gutter="flat">
         {/* Hero */}
         <div className="max-w-3xl mb-14">
           <Typography variant="caption" className="text-fg-brand mb-3 block font-semibold">
@@ -447,7 +448,7 @@ function EngineSection() {
           <StatCard value="100%" label={t('platform.engine.stat2Label', 'Source-grounded outputs')} delay={0.1} />
           <StatCard value="<2 min" label={t('platform.engine.stat3Label', 'Full risk profile')} delay={0.2} />
         </div>
-      </div>
+      </Container>
     </Section>
   );
 }
@@ -459,7 +460,7 @@ function MatchingSection() {
 
   return (
     <Section id="matching" className="py-16 desktop-s:py-24 bg-surface-secondary">
-      <div className="max-w-7xl mx-auto px-6">
+      <Container gutter="flat">
         <div className="grid desktop-s:grid-cols-2 gap-16 items-center">
           {/* Left */}
           <div>
@@ -510,7 +511,7 @@ function MatchingSection() {
             <FunnelDiagram />
           </div>
         </div>
-      </div>
+      </Container>
     </Section>
   );
 }
@@ -522,7 +523,7 @@ function CoverageSection() {
 
   return (
     <Section id="coverage" className="py-16 desktop-s:py-24 bg-background">
-      <div className="max-w-7xl mx-auto px-6">
+      <Container gutter="flat">
         <div className="text-center max-w-3xl mx-auto mb-14">
           <Typography variant="caption" className="text-fg-brand mb-3 block font-semibold">
             {t('platform.coverage.overline', 'Global Coverage')}
@@ -568,7 +569,7 @@ function CoverageSection() {
             ))}
           </div>
         </motion.div>
-      </div>
+      </Container>
     </Section>
   );
 }
@@ -581,7 +582,7 @@ function PartnersSection() {
 
   return (
     <Section id="partners" className="py-16 desktop-s:py-24 bg-surface-secondary">
-      <div className="max-w-7xl mx-auto px-6">
+      <Container gutter="flat">
         <div className="grid desktop-s:grid-cols-2 gap-16 items-start">
           {/* Left */}
           <div>
@@ -639,7 +640,7 @@ function PartnersSection() {
             </div>
           </div>
         </div>
-      </div>
+      </Container>
     </Section>
   );
 }

@@ -189,3 +189,40 @@ describe('Design-System-Waechter · Komponente statt Nachbau', () => {
     expect(uses).toBeGreaterThanOrEqual(30);
   });
 });
+
+// ─── Seitenbreite: die korrigierte Drift darf nicht zurueckkommen ─────────────
+// Die Compass-Grid-Doktrin kennt fuenf Containerbreiten — 600/768/1024/1200/1440.
+// 1280 (Tailwinds max-w-7xl) ist keine davon, wurde aber in 18 Seitenschalen
+// benutzt, alle in denselben vier Alt-Seiten. Container.tsx nennt 1200 im
+// eigenen Kommentar "standard marketing / hero", die 1280 waren also echte Drift.
+//
+// Am 21.08. auf <Container gutter="flat"> gezogen: Breite auf 1200 (Doktrin),
+// Rand bei flachen 24px (NICHT die Doktrin-Ränder 16/40/80). Das ist bewusst
+// asymmetrisch. Die Breite war Drift der Seiten; die Ränder werden von ALLEN 27
+// gepolsterten Schalen einstimmig abgelehnt — das ist Evidenz ueber die Regel,
+// nicht ueber die Aufrufstellen. Entscheidung des Nutzers, nicht meine.
+//
+// Der Test verbietet nur diese eine Breite. Die uebrigen 79 rohen Schalen (in
+// 17 weiteren Breiten) bleiben erlaubt und offen — sie sind groesstenteils
+// Lesebreiten, kein Seitenrahmen, und brauchen einen eigenen Durchgang.
+
+describe('Design-System-Waechter · Seitenbreite', () => {
+  it('setzt keine Seitenschale mehr auf 1280px', () => {
+    const found: string[] = [];
+    for (const file of FILES) {
+      const src = readFileSync(file, 'utf8');
+      for (const m of src.matchAll(/className=\{?[`"']([^`"']*)/g)) {
+        const cls = m[1];
+        if (!cls.includes('mx-auto')) continue;
+        if (!/\bmax-w-(?:7xl|\[1280px\])\b/.test(cls)) continue;
+        found.push(`${relative(SRC, file)}:${src.slice(0, m.index).split('\n').length}`);
+      }
+    }
+    expect(
+      found,
+      '1280px ist keine Compass-Containerbreite. Die Doktrin kennt 600/768/1024/' +
+        '1200/1440.\n  <Container gutter="flat">  → 1200px mit dem flachen 24px-Rand\n' +
+        'Gefunden:\n  ' + found.join('\n  '),
+    ).toEqual([]);
+  });
+});
