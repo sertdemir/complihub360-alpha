@@ -1,18 +1,24 @@
 import type { ObligationSeverity } from '@complihub/compliance-engine';
 
 // ─── Severity → Compass risk tokens ──────────────────────────────────────────
-// One map, every consumer. The severity itself is never authored: it comes from
-// severityFromRiskWeight() in the engine, so a duty's colour and its weight can
-// not drift apart.
+// What this file does NOT do any more: the badge itself. That belongs to
+// ui/RiskBadge, the brand-critical traffic-light component — four levels, four
+// styles, three sizes, its own contrast measurements and a deuteranopia note
+// explaining why every variant carries a word and not just a colour. This file
+// briefly shipped its own copy of that pairing, which was a duplicate of a
+// better-reasoned component.
 //
-// The full four-step scale is used. The page previously only ever reached for
-// three (medium/high/critical) because its hand-kept percentages never fell
-// below 40 — the low tokens existed in Compass and went unused.
+// What remains are the surfaces RiskBadge has no opinion about: the card accent
+// border, the icon tile behind an area's glyph, and the bar fill in the risk
+// grid. Those are page furniture tinted by severity, not labels.
+//
+// The severity itself is never authored: it comes from severityFromRiskWeight()
+// in the engine, so a duty's colour and its weight cannot drift apart. The
+// engine's ObligationSeverity and RiskBadge's RiskLevel are the same four
+// strings, so they map without a translation table.
 
 interface SeverityStyle {
-  /** Badge: background + text, no border. */
-  badge: string;
-  /** Bar fill. */
+  /** Bar fill in the risk grid. */
   bar: string;
   /** Card accent border. */
   border: string;
@@ -23,28 +29,24 @@ interface SeverityStyle {
 
 export const SEVERITY_STYLE: Record<ObligationSeverity, SeverityStyle> = {
   critical: {
-    badge: 'bg-risk-critical-bg text-risk-on-critical',
     bar: 'bg-risk-critical',
     border: 'border-risk-critical/30',
     iconBg: 'bg-risk-critical-bg',
     iconColor: 'text-risk-on-critical',
   },
   high: {
-    badge: 'bg-risk-high-bg text-risk-on-high',
     bar: 'bg-risk-high',
     border: 'border-risk-high/30',
     iconBg: 'bg-risk-high-bg',
     iconColor: 'text-risk-on-high',
   },
   medium: {
-    badge: 'bg-risk-medium-bg text-risk-on-medium',
     bar: 'bg-risk-medium',
     border: 'border-risk-medium/30',
     iconBg: 'bg-risk-medium-bg',
     iconColor: 'text-risk-on-medium',
   },
   low: {
-    badge: 'bg-risk-low-bg text-risk-on-low',
     bar: 'bg-risk-low',
     border: 'border-risk-low/30',
     iconBg: 'bg-risk-low-bg',

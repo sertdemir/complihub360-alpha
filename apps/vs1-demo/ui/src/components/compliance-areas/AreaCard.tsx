@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, ScrollText, Users } from 'lucide-react';
 import { severityFromRiskWeight } from '@complihub/compliance-engine';
 import { Typography } from '../ui/Typography';
+import { RiskBadge } from '../ui/RiskBadge';
 import { DOMAIN_BY_SLUG } from '../../lib/domains';
 import { getAreaObligations, getAreaProfile } from '../../lib/areaProfiles';
 import { SEVERITY_STYLE, SEVERITY_FALLBACK, severityKey } from './severity';
@@ -67,12 +68,12 @@ export function AreaCard({ area, index, selectedCountry }: Props) {
             <Typography variant="h3" weight="bold" className="text-fg leading-snug">
               {title}
             </Typography>
-            <span className={`mt-1.5 inline-block rounded-md px-2 py-0.5 text-xs font-bold ${style.badge}`}>
+            <RiskBadge level={severity} size="sm" className="mt-1.5">
               {t('compliance.riskBadge', {
                 defaultValue: '{{level}} Risk',
                 level: t(severityKey(severity), SEVERITY_FALLBACK[severity]),
               })}
-            </span>
+            </RiskBadge>
           </div>
         </div>
 

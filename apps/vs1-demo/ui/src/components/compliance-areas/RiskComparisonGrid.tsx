@@ -5,6 +5,7 @@ import { motion, useInView } from 'framer-motion';
 import { Info } from 'lucide-react';
 import { severityFromRiskWeight } from '@complihub/compliance-engine';
 import { Typography } from '../ui/Typography';
+import { RiskBadge } from '../ui/RiskBadge';
 import { DOMAIN_BY_SLUG } from '../../lib/domains';
 import { rankAreasForMarket } from '../../lib/areaProfiles';
 import { SEVERITY_STYLE, SEVERITY_FALLBACK, severityKey } from './severity';
@@ -87,9 +88,9 @@ export function RiskComparisonGrid({ selectedCountry }: Props) {
                   <span className="text-body-3xs tabular-nums text-fg-tertiary">
                     {r.weight.toFixed(1)}/10
                   </span>
-                  <span className={`text-xs font-bold px-2.5 py-0.5 rounded-md ${style.badge}`}>
+                  <RiskBadge level={severity} size="sm">
                     {t(severityKey(severity), SEVERITY_FALLBACK[severity])}
-                  </span>
+                  </RiskBadge>
                 </div>
               </div>
               <div className="w-full h-2.5 bg-surface-tertiary rounded-full overflow-hidden">

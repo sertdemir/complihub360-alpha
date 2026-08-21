@@ -5,10 +5,11 @@ import { motion } from 'framer-motion';
 import { ArrowUpDown } from 'lucide-react';
 import { severityFromRiskWeight } from '@complihub/compliance-engine';
 import { Typography } from '../ui/Typography';
+import { RiskBadge } from '../ui/RiskBadge';
 import { DOMAIN_BY_SLUG, type DomainSlug } from '../../lib/domains';
 import { getAreaObligations, getAreaProfile } from '../../lib/areaProfiles';
 import { AREAS } from './areas';
-import { SEVERITY_STYLE, SEVERITY_FALLBACK, severityKey } from './severity';
+import { SEVERITY_FALLBACK, severityKey } from './severity';
 import type { CountryCode } from './types';
 
 type Column = 'risk' | 'time' | 'fine' | 'markets';
@@ -143,7 +144,6 @@ export function ComparisonMatrix({ selectedCountry }: Props) {
           </thead>
           <tbody>
             {sorted.map((row, i) => {
-              const style = SEVERITY_STYLE[row.severity];
               return (
                 <motion.tr
                   key={row.slug}
@@ -162,9 +162,9 @@ export function ComparisonMatrix({ selectedCountry }: Props) {
                     </Link>
                   </td>
                   <td className="px-5 py-4">
-                    <span className={`inline-flex rounded-md px-2 py-0.5 text-body-3xs font-bold ${style.badge}`}>
+                    <RiskBadge level={row.severity} size="sm">
                       {t(severityKey(row.severity), SEVERITY_FALLBACK[row.severity])}
-                    </span>
+                    </RiskBadge>
                   </td>
                   <td className="px-5 py-4 text-sm text-fg-secondary">
                     {row.leadDays == null

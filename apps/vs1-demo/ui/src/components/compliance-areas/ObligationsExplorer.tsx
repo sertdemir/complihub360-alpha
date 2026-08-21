@@ -4,9 +4,10 @@ import { BusinessModel } from '@complihub/compliance-engine';
 import { ExternalLink, ScrollText, CalendarClock, Info } from 'lucide-react';
 import { Typography } from '../ui/Typography';
 import { FilterChip } from '../ui/Badge';
+import { RiskBadge } from '../ui/RiskBadge';
 import { getAreaObligations } from '../../lib/areaProfiles';
 import type { DomainSlug } from '../../lib/domains';
-import { SEVERITY_STYLE, SEVERITY_FALLBACK, severityKey } from './severity';
+import { SEVERITY_FALLBACK, severityKey } from './severity';
 import type { CountryCode } from './types';
 
 interface Props {
@@ -89,7 +90,6 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
       ) : (
         <ul className="mt-6 space-y-3">
           {shown.map(o => {
-            const style = SEVERITY_STYLE[o.severity];
             return (
               <li key={o.id} className="rounded-xl border border-stroke-subtle bg-surface p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
@@ -101,9 +101,9 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                       {o.description}
                     </Typography>
                   </div>
-                  <span className={`shrink-0 rounded-md px-2.5 py-1 text-xs font-bold ${style.badge}`}>
+                  <RiskBadge level={o.severity} size="sm" className="shrink-0">
                     {t(severityKey(o.severity), SEVERITY_FALLBACK[o.severity])}
-                  </span>
+                  </RiskBadge>
                 </div>
 
                 <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5">

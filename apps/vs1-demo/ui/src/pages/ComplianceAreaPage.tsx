@@ -7,6 +7,7 @@ import { severityFromRiskWeight } from '@complihub/compliance-engine';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 import { Typography } from '../components/ui/Typography';
+import { RiskBadge } from '../components/ui/RiskBadge';
 import { SiteFooter } from '../components/home';
 import { SectionEyebrow } from '../components/providers/SectionHeading';
 import { DOMAIN_BY_SLUG } from '../lib/domains';
@@ -151,12 +152,12 @@ export function ComplianceAreaPage() {
                   <SectionEyebrow tone="brand">
                     {t('compliance.heroOverline', 'Compliance Areas')}
                   </SectionEyebrow>
-                  <span className={`ml-0 mt-1 inline-block rounded-md px-2.5 py-1 text-xs font-bold ${style.badge}`}>
+                  <RiskBadge level={severity} size="md" className="mt-1">
                     {t('compliance.riskBadge', {
-                defaultValue: '{{level}} Risk',
-                level: t(severityKey(severity), SEVERITY_FALLBACK[severity]),
-              })}
-                  </span>
+                      defaultValue: '{{level}} Risk',
+                      level: t(severityKey(severity), SEVERITY_FALLBACK[severity]),
+                    })}
+                  </RiskBadge>
                 </div>
               </div>
 
