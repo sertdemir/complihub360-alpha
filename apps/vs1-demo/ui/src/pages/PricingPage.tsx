@@ -78,7 +78,7 @@ export function PricingPage() {
           <Stagger className="mx-auto mt-8 grid max-w-[980px] gap-4 md:grid-cols-3">
             {Array.from({ length: FREE_COUNT }, (_, i) => (
               <StaggerItem key={i}>
-                <div className="flex h-full flex-col rounded-2xl border border-stroke-subtle bg-surface p-6">
+                <div className="flex h-full flex-col rounded-xl border border-stroke-subtle bg-surface p-6">
                   <p className="font-serif text-[1.125rem] font-bold leading-snug text-fg">
                     {t(`pricing.free.items.${i}.title`)}
                   </p>

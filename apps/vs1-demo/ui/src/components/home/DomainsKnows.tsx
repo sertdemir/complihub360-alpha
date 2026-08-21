@@ -163,7 +163,7 @@ export function DomainsKnows() {
               onClick={() => setOpen(i)}
               variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0 } }}
               transition={{ duration: 0.5, ease: 'easeOut' }}
-              className="group rounded-2xl border border-transparent p-6 text-left transition-colors duration-200 hover:border-accent-400 hover:bg-surface"
+              className="group rounded-xl border border-transparent p-6 text-left transition-colors duration-200 hover:border-accent-400 hover:bg-surface"
             >
               <Icon size={26} strokeWidth={1.75} className="text-fg-brand" />
               <p className="mt-4 text-[18px] font-bold text-fg">{t(`domains.items.${i}.title`)}</p>

@@ -19,7 +19,7 @@ export function NewsletterBand() {
   return (
     <section id="newsletter" className="bg-surface-secondary py-14 lg:py-16">
       <div className="mx-auto w-full max-w-[1080px] px-4 md:px-6 lg:px-10">
-        <div className="flex flex-col gap-6 rounded-2xl border border-stroke-subtle bg-surface px-7 py-6 shadow-[0_18px_44px_-30px_rgba(2,22,17,0.3)] lg:flex-row lg:items-center lg:justify-between lg:gap-10 lg:px-9">
+        <div className="flex flex-col gap-6 rounded-xl border border-stroke-subtle bg-surface px-7 py-6 shadow-[0_18px_44px_-30px_rgba(2,22,17,0.3)] lg:flex-row lg:items-center lg:justify-between lg:gap-10 lg:px-9">
           {/* Left — copy */}
           <div className="max-w-lg">
             <span className="inline-flex items-center gap-2 text-body-3xs font-semibold uppercase tracking-[0.14em] text-fg-brand">

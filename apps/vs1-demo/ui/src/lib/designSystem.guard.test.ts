@@ -226,3 +226,48 @@ describe('Design-System-Waechter · Seitenbreite', () => {
     ).toEqual([]);
   });
 });
+
+// ─── Kartenradius: die Doktrin sagt 10px ─────────────────────────────────────
+// Compass bindet den Kartenradius an radius/xl = 10px — Card Base, KPI Card,
+// Audit Card, KPI Circle Card und Metric Card alle. 12px gibt es dort nur fuer
+// zwei Sondertypen (Provider Match Card, Request Card). Auf der Marketing-
+// Flaeche standen aber 52 von 84 umrandeten Karten auf rounded-2xl (12px) —
+// dieselbe Art Drift wie die 1280px-Seitenbreite, und am 22.08. auf
+// Entscheidung des Nutzers korrigiert: 59 Karten auf rounded-xl gezogen.
+//
+// Im laufenden Build gegengeprueft: 12px von 22 auf 0 Elemente, 10px von 25 auf
+// 50, Gesamtzahl unveraendert bei 56 — es ging nichts verloren.
+//
+// Zwei Ausnahmen sind bewusst NICHT konvertiert und stehen deshalb hier:
+// TwoReflexes ist eine Schauflaeche mit eigenem 90px-Schatten, RiskMapPreview
+// ein Geraeterahmen mit fester Groesse. Beide sind keine Karten.
+
+const RADIUS_EXCEPTIONS = new Set([
+  'components/home/TwoReflexes.tsx',    // Schauflaeche, rounded-3xl + eigener Schatten
+  'components/home/RiskMapPreview.tsx', // Geraeterahmen 760x588, rounded-[20px]
+]);
+
+describe('Design-System-Waechter · Kartenradius', () => {
+  it('baut keine Karte mehr auf 12px oder 16px', () => {
+    const found: string[] = [];
+    for (const file of FILES) {
+      const rel = relative(SRC, file);
+      if (RADIUS_EXCEPTIONS.has(rel)) continue;
+      const src = readFileSync(file, 'utf8');
+      for (const m of src.matchAll(/className=\{?[`"']([^`"']*)/g)) {
+        const cls = m[1];
+        const base = cls.split(/\s+/).filter((c) => !c.includes(':'));
+        if (!base.some((c) => /^rounded-(?:2xl|3xl)$/.test(c))) continue;
+        // Nur umrandete/gefuellte Flaechen sind Karten — ein Bild mit Radius nicht.
+        const isCard = base.some((c) => c === 'border' || /^bg-surface/.test(c));
+        if (!isCard) continue;
+        found.push(`${rel}:${src.slice(0, m.index).split('\n').length}`);
+      }
+    }
+    expect(
+      found,
+      'Karte mit 12px/16px Radius. Compass bindet Karten an radius/xl = 10px ' +
+        '→ rounded-xl.\nGefunden:\n  ' + found.join('\n  '),
+    ).toEqual([]);
+  });
+});

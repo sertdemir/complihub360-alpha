@@ -54,7 +54,7 @@ function Stage({ index }: { index: number }) {
 function InfoBlock({ base, icon }: { base: 'cost' | 'privacy'; icon: React.ReactNode }) {
   const { t } = useTranslation('common');
   return (
-    <div className="rounded-2xl border border-stroke-subtle bg-surface p-8">
+    <div className="rounded-xl border border-stroke-subtle bg-surface p-8">
       <span className="inline-flex items-center gap-2 text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
         {icon}
         {t(`howItWorks.${base}.kicker`)}

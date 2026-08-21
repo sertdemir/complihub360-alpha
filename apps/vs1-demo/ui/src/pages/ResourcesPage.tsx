@@ -75,7 +75,7 @@ export function ResourcesPage() {
               <StaggerItem key={key}>
                 <Link
                   to={`/${lng}/${ENTRY_PATHS[key]}`}
-                  className="group flex h-full flex-col rounded-2xl border border-stroke-subtle bg-surface p-6 transition-colors hover:border-stroke-brand"
+                  className="group flex h-full flex-col rounded-xl border border-stroke-subtle bg-surface p-6 transition-colors hover:border-stroke-brand"
                 >
                   <p className="font-serif text-[1.25rem] font-bold leading-snug text-fg">
                     {t(`resources.entries.${key}.title`)}

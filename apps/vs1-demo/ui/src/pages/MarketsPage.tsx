@@ -8,6 +8,7 @@ import { SiteFooter } from '../components/home';
 import { SectionEyebrow, GoldWord, Reveal, Stagger, StaggerItem } from '../components/providers/SectionHeading';
 import { DOMAIN_I18N_KEY, DOMAIN_BY_SLUG } from '../lib/domains';
 import { getMarketProfile, isMarketCode, listMarkets } from '../lib/marketProfiles';
+import { Badge } from '../components/ui/Badge';
 
 // ─── /markets and /markets/:code · Brand Map Stufe 6b ────────────────────────
 // The country knowledge base. Every fact on these pages is derived in
@@ -70,7 +71,7 @@ export function MarketsIndexPage() {
               <StaggerItem key={m.code}>
                 <Link
                   to={`/${locale ?? 'en'}/markets/${m.code.toLowerCase()}`}
-                  className="group flex h-full flex-col rounded-2xl border border-stroke-subtle bg-surface p-6 transition-colors hover:border-stroke-brand"
+                  className="group flex h-full flex-col rounded-xl border border-stroke-subtle bg-surface p-6 transition-colors hover:border-stroke-brand"
                 >
                   <span className="text-body-3xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
                     {m.code}
@@ -109,7 +110,7 @@ export function MarketsIndexPage() {
             <Stagger className="mt-8 grid gap-4 sm:grid-cols-2">
               {REGION_KEYS.map((key) => (
                 <StaggerItem key={key}>
-                  <div className="flex h-full flex-col rounded-2xl border border-stroke-subtle bg-surface p-6">
+                  <div className="flex h-full flex-col rounded-xl border border-stroke-subtle bg-surface p-6">
                     <div className="flex items-baseline justify-between gap-3">
                       <p className="font-serif text-[1.125rem] font-bold leading-snug text-fg">
                         {t(`markets.regions.items.${key}.name`)}
@@ -126,8 +127,11 @@ export function MarketsIndexPage() {
                     </p>
                     <ul className="mt-2 flex flex-wrap gap-1.5">
                       {(t(`markets.regions.items.${key}.focus`, { returnObjects: true }) as string[]).map((f) => (
-                        <li key={f} className="rounded-full border border-stroke-subtle px-2.5 py-1 text-body-2xs text-fg-secondary">
-                          {f}
+                        <li key={f}>
+                          {/* Badge renders a span — it has to sit INSIDE the li, not replace it. */}
+                          <Badge shape="pill" tone="neutral" appearance="outline" size="md">
+                            {f}
+                          </Badge>
                         </li>
                       ))}
                     </ul>

@@ -7,6 +7,7 @@ import { Button } from '../ui/Button';
 import { RiskBadge, type RiskLevel } from '../ui/RiskBadge';
 import { Stat } from '../ui/Stat';
 import { SectionEyebrow, GoldWord } from '../providers/SectionHeading';
+import { Badge } from '../ui/Badge';
 
 // ─── S2 — Risk Map example (User LP) · Figma 2470:1774 ───────────────────────
 // "Here's what applies to you." — an anonymized full risk-map result inline on
@@ -48,15 +49,15 @@ function StateCell({ kind }: { kind: StateKind }) {
   }
   if (kind === 'confirmed') {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-secondary px-3 py-1.5 text-body-2xs font-medium text-fg-secondary">
+      <Badge shape="pill" tone="neutral" appearance="soft" size="md" className="font-medium">
         <Check size={13} className="text-fg-brand" /> {label}
-      </span>
+      </Badge>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-stroke px-3 py-1.5 text-body-2xs font-medium text-fg-secondary">
+    <Badge shape="pill" tone="neutral" appearance="outline" size="md" className="font-medium">
       <Info size={13} /> {label}
-    </span>
+    </Badge>
   );
 }
 

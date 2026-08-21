@@ -18,7 +18,7 @@ export function KPIStrip() {
   const { t } = useTranslation('common');
 
   return (
-    <div className="grid grid-cols-2 desktop-s:grid-cols-4 gap-px bg-primary-100 rounded-2xl overflow-hidden border border-stroke-subtle shadow-sm">
+    <div className="grid grid-cols-2 desktop-s:grid-cols-4 gap-px bg-primary-100 rounded-xl overflow-hidden border border-stroke-subtle shadow-sm">
       {ITEMS.map((item, i) => {
         const Icon = item.icon;
         return (

@@ -78,7 +78,7 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.45, delay: index * 0.08 }}
-      className={`bg-surface border-2 rounded-2xl overflow-hidden transition-shadow ${area.cardBorder} ${expanded ? 'shadow-lg' : 'shadow-sm hover:shadow-md'}`}
+      className={`bg-surface border-2 rounded-xl overflow-hidden transition-shadow ${area.cardBorder} ${expanded ? 'shadow-lg' : 'shadow-sm hover:shadow-md'}`}
     >
       {/* Header — always visible */}
       <button

@@ -27,6 +27,7 @@ import { X } from 'lucide-react';
 import { Logo } from '../ui/Logo';
 import { WizardDrawerLayer, COUNTRY_INFO } from './MarketsDrawer';
 import type { SearchProfile, WizardCategory, BusinessType } from '../wizard/WizardContext';
+import { Badge } from '../ui/Badge';
 
 // ─── AnimatedWizard — auto-playing hero key-visual ───────────────────────────
 // A fake cursor moves across the wizard, clicks option cards (they select), then
@@ -434,7 +435,7 @@ export function AnimatedWizard({
           {/* Review summary card (Step 4 · Figma 1660:162) */}
           {isReview && (
             <>
-              <div className="mx-auto mt-9 max-w-[640px] rounded-2xl border-2 border-accent-400 bg-surface px-6">
+              <div className="mx-auto mt-9 max-w-[640px] rounded-xl border-2 border-accent-400 bg-surface px-6">
                 <SummaryRow label={t('wizard.review.markets')} value={reviewMarkets} onEdit={() => editStep(0)} />
                 <SummaryRow label={t('wizard.review.operations')} value={reviewOps} onEdit={() => editStep(1)} />
                 <SummaryRow label={t('wizard.review.domains')} value={reviewDomains} onEdit={() => editStep(2)} />
@@ -487,9 +488,9 @@ export function AnimatedWizard({
                       {c.id === 'Others' && extraMarkets.length > 0 ? (
                         <div className="flex flex-wrap gap-1.5">
                           {extraMarkets.map((id) => (
-                            <span
+                            <Badge shape="pill" tone="brand" appearance="soft" size="md"
                               key={id}
-                              className="inline-flex items-center gap-1 rounded-full bg-brand-light px-2 py-0.5 text-body-2xs font-medium text-fg-brand"
+                              className="font-medium"
                             >
                               {marketLabel(id)}
                               <button
@@ -503,7 +504,7 @@ export function AnimatedWizard({
                               >
                                 <X size={12} />
                               </button>
-                            </span>
+                            </Badge>
                           ))}
                         </div>
                       ) : c.icon ? (

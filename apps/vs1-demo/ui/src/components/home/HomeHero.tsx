@@ -56,7 +56,7 @@ function HeroBackground() {
 function WizardPreview({ className = '' }: { className?: string }) {
   const { t } = useTranslation('home');
   return (
-    <div className={`w-full max-w-[480px] overflow-hidden rounded-2xl border border-stroke-subtle bg-surface shadow-xl ${className}`}>
+    <div className={`w-full max-w-[480px] overflow-hidden rounded-xl border border-stroke-subtle bg-surface shadow-xl ${className}`}>
       {/* Top bar */}
       <div className="flex items-center justify-between border-b border-stroke-subtle px-5 py-3.5">
         <span className="flex items-center gap-2 text-h6 font-semibold text-fg">
@@ -200,7 +200,7 @@ function DualEntrySearch({ layout }: { layout: 'desktop' | 'mobile' }) {
     <div className={layout === 'desktop' ? 'mt-8' : 'mt-6'}>
       <form
         onSubmit={(e) => { e.preventDefault(); findAnswers(); }}
-        className="flex items-center gap-2 rounded-2xl border border-stroke bg-surface p-2 shadow-[0_18px_44px_-32px_rgba(2,22,17,0.35)] focus-within:border-fg-brand"
+        className="flex items-center gap-2 rounded-xl border border-stroke bg-surface p-2 shadow-[0_18px_44px_-32px_rgba(2,22,17,0.35)] focus-within:border-fg-brand"
       >
         <Search size={18} className="ml-2 shrink-0 text-fg-tertiary" />
         <input

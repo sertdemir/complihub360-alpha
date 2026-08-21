@@ -73,7 +73,7 @@ export function ProviderSchedulePage() {
           <Logo className="h-[30px] w-auto" />
         </header>
         <main className="mx-auto max-w-[640px] px-6 py-16">
-          <div className="rounded-2xl border border-brand bg-surface-secondary p-8 text-center">
+          <div className="rounded-xl border border-brand bg-surface-secondary p-8 text-center">
             <p className="text-body-2xs font-semibold uppercase tracking-[0.08em] text-fg-brand">{t('schedule.doneEyebrow')}</p>
             <h1 className="mt-2 font-serif text-[26px] font-bold text-fg">{t('schedule.doneTitle')}</h1>
             <p className="mt-2 text-body-sm text-fg-secondary">
@@ -116,7 +116,7 @@ export function ProviderSchedulePage() {
           <p className="mt-1 text-body-sm text-fg-secondary">{t('schedule.sub')}</p>
         </div>
         <div className="grid gap-6 lg:grid-cols-[1fr,380px]">
-          <section className="rounded-2xl border border-stroke-subtle bg-surface-secondary p-7">
+          <section className="rounded-xl border border-stroke-subtle bg-surface-secondary p-7">
             {byDay.map(([day, isos]) => (
               <div key={day} className="mb-5">
                 <p className="mb-2 text-body-xs font-semibold text-fg">{day}</p>
@@ -135,7 +135,7 @@ export function ProviderSchedulePage() {
               </div>
             ))}
           </section>
-          <aside className="h-fit space-y-4 rounded-2xl border border-stroke-subtle bg-surface-secondary p-7">
+          <aside className="h-fit space-y-4 rounded-xl border border-stroke-subtle bg-surface-secondary p-7">
             <h2 className="text-body-md font-semibold text-fg">{t('schedule.summaryTitle')}</h2>
             <p className="text-body-xs text-fg-secondary">
               {selected ? `${df.format(new Date(selected))} · ${tf.format(new Date(selected))} · 30 Min` : t('schedule.pickSlot')}
