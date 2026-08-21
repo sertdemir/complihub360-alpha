@@ -72,7 +72,7 @@ export function MarketsIndexPage() {
                   to={`/${locale ?? 'en'}/markets/${m.code.toLowerCase()}`}
                   className="group flex h-full flex-col rounded-2xl border border-stroke-subtle bg-surface p-6 transition-colors hover:border-stroke-brand"
                 >
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
+                  <span className="text-body-3xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
                     {m.code}
                   </span>
                   <p className="mt-2 font-serif text-[1.375rem] font-bold leading-snug text-fg">
@@ -81,7 +81,7 @@ export function MarketsIndexPage() {
                   <p className="mt-3 text-body-sm text-fg-secondary">
                     {t('markets.index.obligations', { count: m.obligationCount })}
                   </p>
-                  <p className="mt-1 text-[12px] text-fg-tertiary">
+                  <p className="mt-1 text-body-2xs text-fg-tertiary">
                     {t('markets.index.enforcement', { value: m.enforcementIntensity })}
                   </p>
                   <span className="mt-4 inline-flex items-center gap-1 text-body-sm font-semibold text-fg-brand">
@@ -114,19 +114,19 @@ export function MarketsIndexPage() {
                       <p className="font-serif text-[1.125rem] font-bold leading-snug text-fg">
                         {t(`markets.regions.items.${key}.name`)}
                       </p>
-                      <span className="shrink-0 text-[11px] font-semibold uppercase tracking-[0.12em] text-fg-tertiary">
+                      <span className="shrink-0 text-body-3xs font-semibold uppercase tracking-[0.12em] text-fg-tertiary">
                         {t(`markets.regions.tiers.${REGION_TIER[key]}`)}
                       </span>
                     </div>
                     <p className="mt-3 text-body-sm leading-relaxed text-fg-secondary">
                       {t(`markets.regions.items.${key}.description`)}
                     </p>
-                    <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.12em] text-fg-tertiary">
+                    <p className="mt-4 text-body-3xs font-semibold uppercase tracking-[0.12em] text-fg-tertiary">
                       {t('markets.regions.focusAreas')}
                     </p>
                     <ul className="mt-2 flex flex-wrap gap-1.5">
                       {(t(`markets.regions.items.${key}.focus`, { returnObjects: true }) as string[]).map((f) => (
-                        <li key={f} className="rounded-full border border-stroke-subtle px-2.5 py-1 text-[12px] text-fg-secondary">
+                        <li key={f} className="rounded-full border border-stroke-subtle px-2.5 py-1 text-body-2xs text-fg-secondary">
                           {f}
                         </li>
                       ))}
@@ -186,7 +186,7 @@ export function MarketPage() {
           <Reveal className="mx-auto flex max-w-[760px] flex-col items-center gap-4 text-center">
             <Link
               to={`/${locale ?? 'en'}/markets`}
-              className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-fg-secondary transition-colors hover:text-fg-brand"
+              className="inline-flex items-center gap-1.5 text-body-xs font-semibold text-fg-secondary transition-colors hover:text-fg-brand"
             >
               <ArrowLeft size={14} /> {t('markets.country.backToMarkets')}
             </Link>
@@ -221,7 +221,7 @@ export function MarketPage() {
                       style={{ width: `${Math.round((w.weight / maxWeight) * 100)}%` }}
                     />
                   </span>
-                  <span className="tabular-nums text-[13px] text-fg-tertiary">{w.weight}/10</span>
+                  <span className="tabular-nums text-body-xs text-fg-tertiary">{w.weight}/10</span>
                 </li>
               ))}
             </ul>
@@ -238,7 +238,7 @@ export function MarketPage() {
             <div className="mt-8 space-y-8">
               {profile.byDomain.map((group) => (
                 <div key={group.domainSlug}>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
+                  <p className="text-body-3xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
                     {domainLabel(group.domainSlug)}
                   </p>
                   <ul className="mt-3 space-y-3">
@@ -247,10 +247,10 @@ export function MarketPage() {
                         {/* The engine's label is the English fallback; the statute
                             in `source` below stays in its original form either
                             way — a law's name is a proper noun. */}
-                        <p className="text-[15px] font-bold text-fg">
+                        <p className="text-body-md font-bold text-fg">
                           {t(`markets.obligations.${o.subdomainId}`, { defaultValue: o.label })}
                         </p>
-                        <p className="mt-1.5 text-[13px] leading-relaxed text-fg-secondary">
+                        <p className="mt-1.5 text-body-xs leading-relaxed text-fg-secondary">
                           <span className="text-fg-tertiary">{t('markets.country.sourceLabel')}: </span>
                           {o.source}
                           {o.eurLexUrl && (
@@ -267,7 +267,7 @@ export function MarketPage() {
                             </>
                           )}
                         </p>
-                        <p className="mt-1 text-[12px] text-fg-tertiary">
+                        <p className="mt-1 text-body-2xs text-fg-tertiary">
                           {t('markets.country.dueLabel')}: {t(`markets.cadence.${o.due}`, { defaultValue: o.due })}
                           {o.dueDays != null && <> · {t('markets.country.leadTime', { days: o.dueDays })}</>}
                         </p>

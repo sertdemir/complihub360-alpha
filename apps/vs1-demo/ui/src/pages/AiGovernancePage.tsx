@@ -71,7 +71,7 @@ function BehaviourSection() {
   return (
     <Section id="behaviour" className="py-20 bg-surface-secondary">
       <div className="max-w-3xl mx-auto px-6">
-        <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
+        <span className="text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
           {t('aiGov.behaviour.kicker', 'How our AI behaves')}
         </span>
         <Typography variant="h2" weight="bold" className="text-fg mt-3 mb-4">

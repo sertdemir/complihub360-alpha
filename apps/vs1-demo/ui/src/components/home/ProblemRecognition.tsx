@@ -42,7 +42,7 @@ export function ProblemRecognition() {
             >
               {/* The quiet index keeps the four readable as a set without
                   implying a sequence — these happen all at once, not in order. */}
-              <span className="text-[12px] font-semibold tabular-nums text-fg-tertiary">
+              <span className="text-body-2xs font-semibold tabular-nums text-fg-tertiary">
                 {String(i + 1).padStart(2, '0')}
               </span>
               <p className="mt-3 font-serif text-[1.25rem] font-bold leading-snug text-fg">

@@ -24,8 +24,8 @@ function Checklist({ baseKey, count }: { baseKey: string; count: number }) {
             <Check size={13} strokeWidth={3} />
           </span>
           <div>
-            <p className="text-[15px] font-bold text-fg">{t(`${baseKey}.${i}.title`)}</p>
-            <p className="mt-1 text-[13px] leading-relaxed text-fg-secondary">{t(`${baseKey}.${i}.desc`)}</p>
+            <p className="text-body-md font-bold text-fg">{t(`${baseKey}.${i}.title`)}</p>
+            <p className="mt-1 text-body-xs leading-relaxed text-fg-secondary">{t(`${baseKey}.${i}.desc`)}</p>
           </div>
         </li>
       ))}
@@ -70,7 +70,7 @@ function ReflexCard({
         />
       </div>
       <div
-        className="flex min-h-[120px] items-center justify-center text-center text-[16px] font-semibold uppercase tracking-[0.08em] text-white"
+        className="flex min-h-[120px] items-center justify-center text-center text-body font-semibold uppercase tracking-[0.08em] text-white"
         style={{ backgroundColor: '#426767' }}
       >
         {label}

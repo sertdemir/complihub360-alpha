@@ -62,14 +62,14 @@ function WizardPreview({ className = '' }: { className?: string }) {
         <span className="flex items-center gap-2 text-h6 font-semibold text-fg">
           <span className="h-4 w-4 rounded bg-accent-500" /> CompliHub
         </span>
-        <span className="text-[12px] text-fg-tertiary">{t('hero.preview.context')}</span>
+        <span className="text-body-2xs text-fg-tertiary">{t('hero.preview.context')}</span>
       </div>
       {/* Stepper */}
       <div className="flex items-center gap-1.5 px-5 py-4">
         {STEPS.map((s, i) => (
           <div key={s.index} className="flex flex-1 items-center gap-1.5">
             <span
-              className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-semibold ${
+              className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-body-3xs font-semibold ${
                 s.state === 'done'
                   ? 'bg-brand text-fg-on-brand'
                   : s.state === 'active'
@@ -79,7 +79,7 @@ function WizardPreview({ className = '' }: { className?: string }) {
             >
               {s.state === 'done' ? <Check size={13} strokeWidth={3} /> : i + 1}
             </span>
-            <span className={`text-[12px] font-medium ${s.state === 'upcoming' ? 'text-fg-tertiary' : 'text-fg'}`}>
+            <span className={`text-body-2xs font-medium ${s.state === 'upcoming' ? 'text-fg-tertiary' : 'text-fg'}`}>
               {t(`hero.preview.steps.${s.index}`)}
             </span>
             {i < STEPS.length - 1 && <span className="h-px flex-1 bg-stroke-subtle" />}
@@ -88,14 +88,14 @@ function WizardPreview({ className = '' }: { className?: string }) {
       </div>
       {/* Body */}
       <div className="px-5 pb-5">
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-fg-tertiary">{t('hero.preview.stepLabel')}</p>
+        <p className="text-body-4xs font-semibold uppercase tracking-wide text-fg-tertiary">{t('hero.preview.stepLabel')}</p>
         <p className="mt-1 font-serif text-[19px] font-bold leading-snug text-fg">{t('hero.preview.title')}</p>
         <p className="mt-1.5 text-body-sm text-fg-secondary">{t('hero.preview.subtitle')}</p>
         <div className="mt-4 grid grid-cols-2 gap-2.5">
           {DOMAINS.map((dm) => (
             <span
               key={dm.index}
-              className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-[13px] font-medium ${
+              className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-body-xs font-medium ${
                 dm.on ? 'border-transparent bg-brand text-fg-on-brand' : 'border-stroke text-fg-secondary'
               }`}
             >
@@ -107,10 +107,10 @@ function WizardPreview({ className = '' }: { className?: string }) {
       </div>
       {/* Footer */}
       <div className="flex items-center justify-between border-t border-stroke-subtle px-5 py-3.5">
-        <span className="text-[12px] text-fg-tertiary">{t('hero.preview.selectedCount')}</span>
+        <span className="text-body-2xs text-fg-tertiary">{t('hero.preview.selectedCount')}</span>
         <span className="flex items-center gap-3">
-          <span className="text-[13px] font-medium text-fg-secondary">{t('hero.preview.back')}</span>
-          <span className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-3.5 py-1.5 text-[13px] font-semibold text-fg-on-brand">
+          <span className="text-body-xs font-medium text-fg-secondary">{t('hero.preview.back')}</span>
+          <span className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-3.5 py-1.5 text-body-xs font-semibold text-fg-on-brand">
             {t('hero.preview.continue')} <ArrowRight size={14} />
           </span>
         </span>

@@ -107,8 +107,8 @@ function MarketsContent({ value, onChange, onClose }: {
           {on && <Check size={12} strokeWidth={3} />}
         </span>
         <span className="min-w-0">
-          <span className="block text-[14px] font-semibold text-fg">{m.name}</span>
-          <span className="block text-[12px] text-fg-secondary">{m.desc}</span>
+          <span className="block text-body-sm font-semibold text-fg">{m.name}</span>
+          <span className="block text-body-2xs text-fg-secondary">{m.desc}</span>
         </span>
       </button>
     );
@@ -117,7 +117,7 @@ function MarketsContent({ value, onChange, onClose }: {
   return (
     <>
       <div className="flex items-center justify-between border-b border-stroke-subtle px-8 py-5">
-        <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-fg-tertiary">{t('marketsDrawer.header')}</span>
+        <span className="text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">{t('marketsDrawer.header')}</span>
         <button onClick={onClose} aria-label={t('drawer.close')} className="text-fg-tertiary transition-colors hover:text-fg">
           <X size={22} />
         </button>
@@ -125,10 +125,10 @@ function MarketsContent({ value, onChange, onClose }: {
 
       <div className="flex-1 overflow-y-auto px-8 pt-6">
         <h3 className="font-serif text-[32px] font-bold leading-none text-fg">{t('marketsDrawer.title')}</h3>
-        <p className="mt-3 text-[14px] font-semibold text-fg-brand">
+        <p className="mt-3 text-body-sm font-semibold text-fg-brand">
           {t('marketsDrawer.count', { selected: local.length, total: TOTAL })}
         </p>
-        <p className="mt-4 text-[14px] leading-relaxed text-fg-secondary">
+        <p className="mt-4 text-body-sm leading-relaxed text-fg-secondary">
           {t('marketsDrawer.desc')}
         </p>
 
@@ -138,7 +138,7 @@ function MarketsContent({ value, onChange, onClose }: {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t('marketsDrawer.searchPlaceholder')}
-            className="w-full bg-transparent text-[14px] text-fg outline-none placeholder:text-fg-tertiary"
+            className="w-full bg-transparent text-body-sm text-fg outline-none placeholder:text-fg-tertiary"
           />
         </div>
 
@@ -146,32 +146,32 @@ function MarketsContent({ value, onChange, onClose }: {
 
         {eu.length > 0 && (
           <>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-fg-tertiary">{t('marketsDrawer.european')}</p>
+            <p className="text-body-3xs font-semibold uppercase tracking-[0.12em] text-fg-tertiary">{t('marketsDrawer.european')}</p>
             <div className="mt-2">{eu.map(Row)}</div>
           </>
         )}
         {ex.length > 0 && (
           <>
             <hr className="my-6 border-stroke-subtle" />
-            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-fg-tertiary">{t('marketsDrawer.expanding')}</p>
+            <p className="text-body-3xs font-semibold uppercase tracking-[0.12em] text-fg-tertiary">{t('marketsDrawer.expanding')}</p>
             <div className="mt-2">{ex.map(Row)}</div>
           </>
         )}
         {eu.length === 0 && ex.length === 0 && (
-          <p className="py-8 text-center text-[14px] text-fg-tertiary">{t('marketsDrawer.noMatch', { query })}</p>
+          <p className="py-8 text-center text-body-sm text-fg-tertiary">{t('marketsDrawer.noMatch', { query })}</p>
         )}
         <div className="h-6" />
       </div>
 
       <div className="border-t border-stroke-subtle px-8 py-5">
-        <p className="text-[13px] text-fg-tertiary">{t('marketsDrawer.footNote')}</p>
+        <p className="text-body-xs text-fg-tertiary">{t('marketsDrawer.footNote')}</p>
         <button
           type="button"
           onClick={() => {
             onChange(local);
             onClose();
           }}
-          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-brand px-5 py-3 text-[15px] font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5"
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-brand px-5 py-3 text-body-md font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5"
         >
           {local.length > 0 ? t('marketsDrawer.add', { count: local.length }) : t('marketsDrawer.done')}
           <ArrowRight size={17} />
@@ -198,10 +198,10 @@ export const COUNTRY_INFO: Record<string, string> = {
 function InfoList({ title, items }: { title: string; items: string[] }) {
   return (
     <div>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-fg-tertiary">{title}</p>
+      <p className="text-body-3xs font-semibold uppercase tracking-[0.12em] text-fg-tertiary">{title}</p>
       <ul className="mt-4 space-y-3">
         {items.map((it) => (
-          <li key={it} className="flex gap-3 text-[14px] text-fg">
+          <li key={it} className="flex gap-3 text-body-sm text-fg">
             <Check size={16} strokeWidth={2.5} className="mt-0.5 shrink-0 text-fg-brand" />
             {it}
           </li>
@@ -225,7 +225,7 @@ function CountryInfoContent({ id, onSelect, onClose }: {
   return (
     <>
       <div className="flex items-center justify-between px-8 pt-6">
-        <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-fg-tertiary">{t('countryInfo.header')}</span>
+        <span className="text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">{t('countryInfo.header')}</span>
         <button onClick={onClose} aria-label={t('drawer.close')} className="text-fg-tertiary transition-colors hover:text-fg">
           <X size={22} />
         </button>
@@ -233,10 +233,10 @@ function CountryInfoContent({ id, onSelect, onClose }: {
 
       <div className="flex-1 overflow-y-auto px-8 pt-2">
         <h3 className="font-serif text-[2.25rem] font-bold leading-none text-fg">{t(`${base}.name`)}</h3>
-        <p className="mt-3 text-[14px] font-semibold text-fg-brand">
+        <p className="mt-3 text-body-sm font-semibold text-fg-brand">
           {t('countryInfo.activeRegime', { regime: t(`${base}.regime`) })}
         </p>
-        <p className="mt-5 text-[15px] leading-relaxed text-fg-secondary">{t(`${base}.intro`)}</p>
+        <p className="mt-5 text-body-md leading-relaxed text-fg-secondary">{t(`${base}.intro`)}</p>
 
         <hr className="my-7 border-stroke-subtle" />
         <InfoList title={t('drawer.whatWeCover')} items={cover} />
@@ -246,14 +246,14 @@ function CountryInfoContent({ id, onSelect, onClose }: {
       </div>
 
       <div className="border-t border-stroke-subtle bg-surface-secondary px-8 py-5">
-        <p className="text-[13px] text-fg-tertiary">{t('drawer.continues')}</p>
+        <p className="text-body-xs text-fg-tertiary">{t('drawer.continues')}</p>
         <button
           type="button"
           onClick={() => {
             onSelect(id);
             onClose();
           }}
-          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-brand px-5 py-3 text-[15px] font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5"
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-brand px-5 py-3 text-body-md font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5"
         >
           {t('drawer.seeIfApplies')} <ArrowRight size={17} />
         </button>
@@ -276,7 +276,7 @@ export function SaveProgressContent({ onClose, copyKey = 'saveProgress' }: { onC
   return (
     <>
       <div className="flex items-center justify-between border-b border-stroke-subtle px-8 py-5">
-        <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-fg-tertiary">{t(`${base}.eyebrow`)}</span>
+        <span className="text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">{t(`${base}.eyebrow`)}</span>
         <button onClick={onClose} aria-label={t('drawer.close')} className="text-fg-tertiary transition-colors hover:text-fg">
           <X size={22} />
         </button>
@@ -284,11 +284,11 @@ export function SaveProgressContent({ onClose, copyKey = 'saveProgress' }: { onC
 
       <div className="flex-1 overflow-y-auto px-8 pt-6">
         <h3 className="font-serif text-[32px] font-bold leading-tight text-fg">{t(`${base}.title`)}</h3>
-        <p className="mt-4 text-[15px] leading-relaxed text-fg-secondary">{t(`${base}.desc`)}</p>
+        <p className="mt-4 text-body-md leading-relaxed text-fg-secondary">{t(`${base}.desc`)}</p>
 
         <ul className="mt-6 space-y-3">
           {[0, 1, 2].map((i) => (
-            <li key={i} className="flex gap-3 text-[14px] text-fg">
+            <li key={i} className="flex gap-3 text-body-sm text-fg">
               <Check size={16} strokeWidth={2.5} className="mt-0.5 shrink-0 text-fg-brand" />
               {t(`${base}.benefits.${i}`)}
             </li>
@@ -297,7 +297,7 @@ export function SaveProgressContent({ onClose, copyKey = 'saveProgress' }: { onC
 
         {!sent ? (
           <div className="mt-7">
-            <label htmlFor="save-email" className="text-[11px] font-semibold uppercase tracking-[0.12em] text-fg-tertiary">
+            <label htmlFor="save-email" className="text-body-3xs font-semibold uppercase tracking-[0.12em] text-fg-tertiary">
               {t('account.workEmail')}
             </label>
             <input
@@ -306,11 +306,11 @@ export function SaveProgressContent({ onClose, copyKey = 'saveProgress' }: { onC
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder={t('account.emailPlaceholder')}
-              className="mt-2 w-full rounded-xl border border-stroke px-4 py-3 text-[15px] text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-brand"
+              className="mt-2 w-full rounded-xl border border-stroke px-4 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-brand"
             />
           </div>
         ) : (
-          <div className="mt-7 rounded-xl border border-stroke-subtle bg-surface-secondary p-5 text-[14px] text-fg">
+          <div className="mt-7 rounded-xl border border-stroke-subtle bg-surface-secondary p-5 text-body-sm text-fg">
             <p className="font-semibold text-fg-brand">{t('account.checkInbox')}</p>
             <p className="mt-1 text-fg-secondary">
               {t('account.sentTo.pre')}
@@ -323,7 +323,7 @@ export function SaveProgressContent({ onClose, copyKey = 'saveProgress' }: { onC
       </div>
 
       <div className="border-t border-stroke-subtle px-8 py-5">
-        <p className="text-[13px] text-fg-tertiary">{t('account.footNote')}</p>
+        <p className="text-body-xs text-fg-tertiary">{t('account.footNote')}</p>
         <button
           type="button"
           disabled={!sent && !valid}
@@ -342,7 +342,7 @@ export function SaveProgressContent({ onClose, copyKey = 'saveProgress' }: { onC
             }
             setSent(true);
           }}
-          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-brand px-5 py-3 text-[15px] font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-40"
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-brand px-5 py-3 text-body-md font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-40"
         >
           {sent ? t('account.done') : t(`${base}.cta`)} <ArrowRight size={17} />
         </button>

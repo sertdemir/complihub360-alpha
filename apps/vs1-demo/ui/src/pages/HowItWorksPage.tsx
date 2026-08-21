@@ -30,14 +30,14 @@ function Stage({ index }: { index: number }) {
       {/* Rail: numbered node with the connector running to the next stage. The
           connector stops at the last node so the sequence reads as finished. */}
       <div className="flex flex-col items-center">
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-stroke-brand bg-brand-light text-[15px] font-bold tabular-nums text-fg-brand">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-stroke-brand bg-brand-light text-body-md font-bold tabular-nums text-fg-brand">
           {index + 1}
         </span>
         {!last && <span aria-hidden className="mt-2 hidden w-px flex-1 bg-stroke-subtle sm:block" />}
       </div>
 
       <div className="min-w-0">
-        <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
+        <span className="text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
           {t(`howItWorks.stages.${index}.kicker`)}
         </span>
         <h3 className="mt-1.5 font-serif text-[1.5rem] font-bold leading-snug text-fg">
@@ -55,7 +55,7 @@ function InfoBlock({ base, icon }: { base: 'cost' | 'privacy'; icon: React.React
   const { t } = useTranslation('common');
   return (
     <div className="rounded-2xl border border-stroke-subtle bg-surface p-8">
-      <span className="inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
+      <span className="inline-flex items-center gap-2 text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
         {icon}
         {t(`howItWorks.${base}.kicker`)}
       </span>

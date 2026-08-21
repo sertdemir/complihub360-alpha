@@ -22,7 +22,7 @@ function CodeCard({ label, demo, title, desc }: { label: string; demo: ReactNode
       transition={{ duration: 0.5, ease: 'easeOut' }}
       className="group flex h-[300px] flex-col rounded-2xl bg-surface p-7 shadow-[0_10px_15px_-3px_rgba(15,23,42,0.1),0_4px_6px_-2px_rgba(15,23,42,0.06)]"
     >
-      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-fg-tertiary">{label}</p>
+      <p className="text-body-3xs font-semibold uppercase tracking-[0.12em] text-fg-tertiary">{label}</p>
 
       <div className="flex flex-1 flex-col justify-center">
         {/* Live preview — collapsed until hover */}
@@ -34,11 +34,11 @@ function CodeCard({ label, demo, title, desc }: { label: string; demo: ReactNode
 
         {/* Explanation — collapsed until hover */}
         <div className="grid grid-rows-[0fr] opacity-0 transition-all duration-[450ms] ease-out group-hover:mt-3 group-hover:grid-rows-[1fr] group-hover:opacity-100">
-          <p className="overflow-hidden text-[14px] leading-relaxed text-fg-secondary">{desc}</p>
+          <p className="overflow-hidden text-body-sm leading-relaxed text-fg-secondary">{desc}</p>
         </div>
       </div>
 
-      <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-fg-brand transition-opacity duration-300 group-hover:opacity-0">
+      <span className="flex items-center gap-1.5 text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-brand transition-opacity duration-300 group-hover:opacity-0">
         {t('brandCode.hoverCue')}
         <ArrowRight size={13} />
       </span>
@@ -66,13 +66,13 @@ function WizardPathDemo() {
     <div>
       <div className="flex items-center gap-1.5">
         <span className="h-1.5 w-7 rounded-full bg-brand" />
-        <span className="rounded-full bg-accent-500 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.06em] text-primary-900">
+        <span className="rounded-full bg-accent-500 px-2.5 py-1 text-body-4xs font-semibold uppercase tracking-[0.06em] text-primary-900">
           {t('brandCode.demo.step')}
         </span>
         <span className="h-1.5 w-7 rounded-full bg-neutral-200" />
         <span className="h-1.5 w-7 rounded-full bg-neutral-200" />
       </div>
-      <p className="mt-3 text-[13px] font-medium text-fg">{t('brandCode.demo.question')}</p>
+      <p className="mt-3 text-body-xs font-medium text-fg">{t('brandCode.demo.question')}</p>
     </div>
   );
 }
@@ -83,8 +83,8 @@ function VerifiedPartnerDemo() {
     <div className="flex items-center gap-3">
       <Avatar size="md" initials="MP" tone="soft" />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-[14px] font-bold text-fg">Müller &amp; Partner KG</p>
-        <p className="truncate text-[12px] text-fg-secondary">{t('brandCode.demo.partnerSpecialty')}</p>
+        <p className="truncate text-body-sm font-bold text-fg">Müller &amp; Partner KG</p>
+        <p className="truncate text-body-2xs text-fg-secondary">{t('brandCode.demo.partnerSpecialty')}</p>
       </div>
       <PartnerStatusBadge status="verified" styleVariant="solid" label={t('badge.verified')} />
     </div>
@@ -113,7 +113,7 @@ export function BrandCodePreview() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
         >
-          <span className="inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-fg-on-brand-accent">
+          <span className="inline-flex items-center gap-2 text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-on-brand-accent">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-current" />
             {t('brandCode.eyebrow')}
           </span>

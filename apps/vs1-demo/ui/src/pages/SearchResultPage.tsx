@@ -63,7 +63,7 @@ export function SearchResultPage() {
       <header className="sticky top-0 z-30 border-b border-stroke-subtle bg-surface/90 backdrop-blur-xl">
         <div className="mx-auto flex h-[68px] w-full max-w-[1100px] items-center justify-between px-4 md:px-8">
           <Logo lockup="horizontal" tone="on-light" href={`/${locale}`} markClassName="h-9" />
-          <button type="button" onClick={startGuided} className="text-[13px] font-semibold text-fg-brand hover:underline">
+          <button type="button" onClick={startGuided} className="text-body-xs font-semibold text-fg-brand hover:underline">
             {t('search.navGuided')} →
           </button>
         </div>
@@ -94,7 +94,7 @@ export function SearchResultPage() {
                 wired up yet — so the page has to say so. This used to be a
                 "[Placeholder answer]" prefix inside the prose itself; as a badge
                 the admission stays visible without living in shippable copy. */}
-            <span className="rounded-full border border-stroke-subtle px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">
+            <span className="rounded-full border border-stroke-subtle px-2.5 py-0.5 text-body-3xs font-semibold uppercase tracking-[0.08em] text-fg-tertiary">
               {t('search.previewBadge')}
             </span>
           </div>
@@ -105,9 +105,9 @@ export function SearchResultPage() {
           <p className="mt-3 text-body leading-relaxed text-fg-secondary">{t('search.answerBody2')}</p>
           {/* Sources */}
           <div className="mt-5 flex flex-wrap items-center gap-2">
-            <span className="text-[12px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{t('search.sources')}:</span>
+            <span className="text-body-2xs font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{t('search.sources')}:</span>
             {SOURCE_FIXTURE.map((s) => (
-              <span key={s} className="inline-flex items-center gap-1.5 rounded-full border border-stroke-subtle px-3 py-1 text-[12px] text-fg-secondary">
+              <span key={s} className="inline-flex items-center gap-1.5 rounded-full border border-stroke-subtle px-3 py-1 text-body-2xs text-fg-secondary">
                 <FileText size={12} /> {s}
               </span>
             ))}
@@ -116,16 +116,16 @@ export function SearchResultPage() {
 
         {/* Relevant obligations */}
         <section className="mt-12">
-          <h2 className="text-[15px] font-semibold text-fg">{t('search.obligationsTitle')}</h2>
+          <h2 className="text-body-md font-semibold text-fg">{t('search.obligationsTitle')}</h2>
           <div className="mt-4 space-y-2.5">
             {OBLIGATION_FIXTURE.map((o) => (
               <div key={o.key} className="flex items-start gap-4 rounded-xl border border-stroke bg-surface-secondary/40 px-5 py-4">
-                <span className={`mt-0.5 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold ${SEV_TINT[o.severity]}`}>
+                <span className={`mt-0.5 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-body-3xs font-semibold ${SEV_TINT[o.severity]}`}>
                   <ShieldCheck size={12} /> {t(`search.sev.${o.severity}`)}
                 </span>
                 <div className="min-w-0">
-                  <p className="text-[15px] font-semibold text-fg">{t(`search.obligations.${o.key}.title`)}</p>
-                  <p className="mt-0.5 text-[13px] leading-relaxed text-fg-secondary">{t(`search.obligations.${o.key}.detail`)}</p>
+                  <p className="text-body-md font-semibold text-fg">{t(`search.obligations.${o.key}.title`)}</p>
+                  <p className="mt-0.5 text-body-xs leading-relaxed text-fg-secondary">{t(`search.obligations.${o.key}.detail`)}</p>
                 </div>
               </div>
             ))}
@@ -134,13 +134,13 @@ export function SearchResultPage() {
 
         {/* Follow-up guides */}
         <section className="mt-12">
-          <h2 className="text-[15px] font-semibold text-fg">{t('search.guidesTitle')}</h2>
+          <h2 className="text-body-md font-semibold text-fg">{t('search.guidesTitle')}</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             {ENTRIES.map((g) => (
               <a key={g.key} href={`/${locale}/${g.path}`} className="group rounded-xl border border-stroke bg-surface p-4 transition-colors hover:border-fg-brand">
                 <BookOpen size={18} className="text-fg-brand" />
-                <p className="mt-2 text-[14px] font-semibold leading-snug text-fg">{t(`search.entries.${g.key}`)}</p>
-                <span className="mt-2 inline-flex items-center gap-1 text-[12px] font-medium text-fg-brand">
+                <p className="mt-2 text-body-sm font-semibold leading-snug text-fg">{t(`search.entries.${g.key}`)}</p>
+                <span className="mt-2 inline-flex items-center gap-1 text-body-2xs font-medium text-fg-brand">
                   {t('search.guideRead')} <ArrowRight size={13} />
                 </span>
               </a>

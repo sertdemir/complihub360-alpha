@@ -31,20 +31,20 @@ function StateCell({ kind }: { kind: StateKind }) {
   const label = t(`risk.state.${kind}`);
   if (kind === 'action') {
     return (
-      <span className="inline-flex items-center gap-1 rounded-md bg-brand px-2 py-1 text-[10px] font-semibold text-fg-on-brand">
+      <span className="inline-flex items-center gap-1 rounded-md bg-brand px-2 py-1 text-body-4xs font-semibold text-fg-on-brand">
         {label} <ArrowRight size={11} />
       </span>
     );
   }
   if (kind === 'confirmed') {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-surface-secondary px-2 py-1 text-[10px] font-medium text-fg-secondary">
+      <span className="inline-flex items-center gap-1 rounded-full bg-surface-secondary px-2 py-1 text-body-4xs font-medium text-fg-secondary">
         <Check size={11} className="text-fg-brand" /> {label}
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 rounded-full border border-stroke px-2 py-1 text-[10px] font-medium text-fg-secondary">
+    <span className="inline-flex items-center gap-1 rounded-full border border-stroke px-2 py-1 text-body-4xs font-medium text-fg-secondary">
       <Info size={11} /> {label}
     </span>
   );
@@ -57,18 +57,18 @@ export function RiskMapPreview() {
       {/* Topbar */}
       <div className="flex items-center justify-between border-b border-stroke-subtle px-7 py-3">
         <Logo lockup="horizontal" tone="on-light" href={null} markClassName="h-7" />
-        <span className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-fg-tertiary">
+        <span className="flex items-center gap-1.5 text-body-4xs font-semibold uppercase tracking-wide text-fg-tertiary">
           <Lock size={12} /> {t('riskMapPreview.guestNote')}
         </span>
       </div>
 
       {/* Header + stats */}
       <div className="px-7 pt-5">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-fg-brand">{t('riskMapPreview.eyebrow')}</p>
+        <p className="text-body-4xs font-semibold uppercase tracking-[0.12em] text-fg-brand">{t('riskMapPreview.eyebrow')}</p>
         <h3 className="mt-1 font-serif text-[22px] font-bold leading-tight text-fg">{t('riskMapPreview.title')}</h3>
         <div className="mt-3 flex flex-wrap items-center gap-x-8 gap-y-1 rounded-xl bg-surface-secondary px-5 py-2.5">
           {STAT_INDICES.map((i) => (
-            <span key={i} className="text-[13px]">
+            <span key={i} className="text-body-xs">
               <b className="font-bold text-fg">{t(`riskMapPreview.stats.${i}.value`)}</b>{' '}
               <span className="text-fg-secondary">{t(`riskMapPreview.stats.${i}.label`)}</span>
             </span>
@@ -79,7 +79,7 @@ export function RiskMapPreview() {
       {/* Obligation table (clipped to the window) */}
       <div className="mt-3 flex-1 overflow-hidden px-7 pb-2">
         <div className="overflow-hidden rounded-xl border border-stroke">
-          <div className={`${COLS} bg-surface-secondary px-4 py-2 text-[9px] font-semibold uppercase tracking-wide text-fg-tertiary`}>
+          <div className={`${COLS} bg-surface-secondary px-4 py-2 text-body-5xs font-semibold uppercase tracking-wide text-fg-tertiary`}>
             <span>{t('risk.table.severity')}</span>
             <span>{t('risk.table.obligation')}</span>
             <span>{t('risk.table.market')}</span>
@@ -92,13 +92,13 @@ export function RiskMapPreview() {
                 <RiskBadge level={r.level} size="sm">{t(`risk.severity.${r.level}`)}</RiskBadge>
               </span>
               <div className="min-w-0">
-                <p className="truncate text-[12px] font-semibold text-fg">{t(`riskMapPreview.rows.${i}.title`)}</p>
-                <p className="truncate text-[10px] text-fg-tertiary">{t(`riskMapPreview.rows.${i}.detail`)}</p>
+                <p className="truncate text-body-2xs font-semibold text-fg">{t(`riskMapPreview.rows.${i}.title`)}</p>
+                <p className="truncate text-body-4xs text-fg-tertiary">{t(`riskMapPreview.rows.${i}.detail`)}</p>
               </div>
-              <span className="text-[11px] text-fg-secondary">{t(`riskMapPreview.rows.${i}.market`)}</span>
+              <span className="text-body-3xs text-fg-secondary">{t(`riskMapPreview.rows.${i}.market`)}</span>
               <span>
-                <p className="text-[11px] font-semibold text-fg">{t(`riskMapPreview.rows.${i}.due`)}</p>
-                <p className="text-[9px] text-fg-tertiary">{t(`riskMapPreview.rows.${i}.dueSub`)}</p>
+                <p className="text-body-3xs font-semibold text-fg">{t(`riskMapPreview.rows.${i}.due`)}</p>
+                <p className="text-body-5xs text-fg-tertiary">{t(`riskMapPreview.rows.${i}.dueSub`)}</p>
               </span>
               <StateCell kind={r.state} />
             </div>

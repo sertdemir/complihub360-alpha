@@ -31,7 +31,7 @@ function Statement({ base }: { base: 'who' | 'ranking' | 'specialist' }) {
   const { t } = useTranslation('common');
   return (
     <Reveal className="border-t border-stroke-subtle py-10 first:border-t-0 first:pt-0 last:pb-0">
-      <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
+      <span className="text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
         {t(`pricing.${base}.kicker`)}
       </span>
       <p className="mt-2 font-serif text-[1.75rem] font-bold leading-snug text-fg">
@@ -70,7 +70,7 @@ export function PricingPage() {
       <section className="py-16 lg:py-20">
         <Container size="xl">
           <Reveal className="mx-auto max-w-[980px]">
-            <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
+            <span className="text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
               {t('pricing.free.kicker')}
             </span>
             <h2 className="mt-2 font-serif text-[1.75rem] font-semibold text-fg">{t('pricing.free.title')}</h2>

@@ -38,13 +38,13 @@ export function HowItWorksSteps() {
               key={i}
               className="rounded-2xl border border-stroke-subtle bg-surface-secondary p-6"
             >
-              <span className="grid h-9 w-9 place-items-center rounded-full bg-brand-light text-[14px] font-bold tabular-nums text-fg-brand">
+              <span className="grid h-9 w-9 place-items-center rounded-full bg-brand-light text-body-sm font-bold tabular-nums text-fg-brand">
                 {i + 1}
               </span>
-              <p className="mt-4 text-[12px] font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
+              <p className="mt-4 text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
                 {t(`howItWorks.stages.${i}.kicker`)}
               </p>
-              <p className="mt-1.5 text-[15px] font-bold leading-snug text-fg">
+              <p className="mt-1.5 text-body-md font-bold leading-snug text-fg">
                 {t(`howItWorks.stages.${i}.title`)}
               </p>
             </StaggerItem>

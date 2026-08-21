@@ -100,7 +100,7 @@ export function RiskComparisonGrid({ areas, selectedCountry }: Props) {
                 >
                   {title}
                   {isHighlight && (
-                    <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-fg-brand">
+                    <span className="ml-2 text-body-4xs font-bold uppercase tracking-wider text-fg-brand">
                       {t('compliance.risk.priorityBadge', 'Priority for {{country}}', { country: selectedCountry })}
                     </span>
                   )}

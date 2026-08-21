@@ -38,7 +38,7 @@ function JourneyStepper() {
             />
             {i < JOURNEY.length - 1 && <span className="h-px flex-1 bg-primary-950/25" />}
           </div>
-          <span className={'mt-2.5 text-[12px] ' + (s.done ? 'font-bold text-neutral-900' : 'text-primary-950/60')}>
+          <span className={'mt-2.5 text-body-2xs ' + (s.done ? 'font-bold text-neutral-900' : 'text-primary-950/60')}>
             {t(`entryDoor.journey.${s.index}`)}
           </span>
         </div>
@@ -102,11 +102,11 @@ export function EntryDoor() {
                     Fließtext 7,3:1, 12-px-Text 12,6:1. Im Light ändert sich nichts: weiß
                     über weiß bleibt weiß. */}
                 <div className="flex max-w-xl flex-col items-center text-center">
-                  <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-primary-500">{t('entryDoor.eyebrow')}</span>
+                  <span className="text-body-2xs font-semibold uppercase tracking-[0.18em] text-primary-500">{t('entryDoor.eyebrow')}</span>
                   <h2 className="mt-4 font-serif text-[2rem] font-bold leading-[1.1] tracking-tight text-neutral-900 sm:text-[2.75rem] lg:text-[3rem]">
                     {t('entryDoor.title.pre')}<span className="text-accent-900">{t('entryDoor.title.highlight')}</span>{t('entryDoor.title.post')}
                   </h2>
-                  <p className="mt-5 max-w-md text-[15px] leading-relaxed text-neutral-700 sm:text-[17px]">
+                  <p className="mt-5 max-w-md text-body-md leading-relaxed text-neutral-700 sm:text-[17px]">
                     {t('entryDoor.subtitle')}
                   </p>
 
@@ -117,7 +117,7 @@ export function EntryDoor() {
                   <button
                     type="button"
                     onClick={() => setStarted(true)}
-                    className="mt-9 inline-flex items-center gap-2 rounded-xl bg-primary-500 px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_18px_34px_-14px_rgba(0,77,64,0.65)] transition-transform duration-200 hover:-translate-y-0.5"
+                    className="mt-9 inline-flex items-center gap-2 rounded-xl bg-primary-500 px-7 py-3.5 text-body-md font-semibold text-white shadow-[0_18px_34px_-14px_rgba(0,77,64,0.65)] transition-transform duration-200 hover:-translate-y-0.5"
                   >
                     {t('entryDoor.cta')} <ArrowRight size={17} />
                   </button>

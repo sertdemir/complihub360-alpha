@@ -21,7 +21,7 @@ function Card({ n, panel, title, desc }: { n: string; panel: React.ReactNode; ti
       <p className="font-serif text-[2.5rem] font-bold leading-none text-fg-brand md:text-[3rem]">{n}</p>
       <div>
         <p className="font-serif text-[20px] font-bold text-fg md:text-[24px]">{title}</p>
-        <p className="mt-3 text-[14px] leading-relaxed text-fg-secondary md:text-[15px]">{desc}</p>
+        <p className="mt-3 text-body-sm leading-relaxed text-fg-secondary md:text-body-md">{desc}</p>
       </div>
       <div className="rounded-xl bg-surface-secondary p-5">{panel}</div>
     </motion.div>
@@ -29,7 +29,7 @@ function Card({ n, panel, title, desc }: { n: string; panel: React.ReactNode; ti
 }
 
 function Label({ children }: { children: React.ReactNode }) {
-  return <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-tertiary">{children}</p>;
+  return <p className="text-body-4xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary">{children}</p>;
 }
 
 // Timeline copy lives in howItActs.panel3.timeline.<index>.* ('home' ns).
@@ -67,15 +67,15 @@ export function HowItActs() {
               <div className="divide-y divide-stroke">
                 <div className="pb-3">
                   <Label>{t('howItActs.panel1.estCost')}</Label>
-                  <p className="mt-1 text-[15px] font-semibold text-fg">{t('howItActs.panel1.estValue')}</p>
+                  <p className="mt-1 text-body-md font-semibold text-fg">{t('howItActs.panel1.estValue')}</p>
                 </div>
                 <div className="py-3">
                   <Label>{t('howItActs.panel1.scope')}</Label>
-                  <p className="mt-1 text-[14px] font-medium text-fg">{t('howItActs.panel1.scopeValue')}</p>
+                  <p className="mt-1 text-body-sm font-medium text-fg">{t('howItActs.panel1.scopeValue')}</p>
                 </div>
                 <div className="pt-3">
                   <Label>{t('howItActs.panel1.approval')}</Label>
-                  <p className="mt-1 text-[14px] font-medium text-fg">{t('howItActs.panel1.approvalValue')}</p>
+                  <p className="mt-1 text-body-sm font-medium text-fg">{t('howItActs.panel1.approvalValue')}</p>
                 </div>
               </div>
             }
@@ -88,7 +88,7 @@ export function HowItActs() {
               <div>
                 <Label>{t('howItActs.panel2.label')}</Label>
                 <p className="mt-2 text-[2rem] font-bold leading-none text-fg-brand">&le; 48h</p>
-                <p className="mt-3 text-[13px] leading-relaxed text-fg-secondary">
+                <p className="mt-3 text-body-xs leading-relaxed text-fg-secondary">
                   {t('howItActs.panel2.note')}
                 </p>
               </div>
@@ -102,14 +102,14 @@ export function HowItActs() {
               <div>
                 <ul className="space-y-2.5">
                   {Array.from({ length: TIMELINE_COUNT }, (_, i) => (
-                    <li key={i} className="flex items-center gap-3 text-[13px]">
+                    <li key={i} className="flex items-center gap-3 text-body-xs">
                       <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
                       <span className="w-12 shrink-0 font-semibold text-fg">{t(`howItActs.panel3.timeline.${i}.date`)}</span>
                       <span className="text-fg-secondary">{t(`howItActs.panel3.timeline.${i}.label`)}</span>
                     </li>
                   ))}
                 </ul>
-                <p className="mt-4 flex items-center gap-1.5 border-t border-stroke pt-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-brand">
+                <p className="mt-4 flex items-center gap-1.5 border-t border-stroke pt-3 text-body-3xs font-semibold uppercase tracking-[0.08em] text-fg-brand">
                   {t('howItActs.panel3.export')} <Download size={12} /> <span className="text-fg-tertiary">PDF · CSV · API</span>
                 </p>
               </div>
