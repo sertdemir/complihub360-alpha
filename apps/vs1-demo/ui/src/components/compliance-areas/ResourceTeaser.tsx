@@ -67,7 +67,7 @@ export function ResourceTeaser() {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.08 }}
               onClick={card.onClick}
-              className="group text-left bg-surface border border-stroke hover:border-primary-400 rounded-2xl p-6 transition-all hover:shadow-lg hover:-translate-y-0.5 flex flex-col"
+              className="group text-left bg-surface border border-stroke hover:border-primary-400 rounded-xl p-6 transition-all hover:shadow-lg hover:-translate-y-0.5 flex flex-col"
             >
               <div className="w-12 h-12 rounded-xl bg-brand-light flex items-center justify-center mb-4">
                 <Icon size={22} className="text-fg-brand" />

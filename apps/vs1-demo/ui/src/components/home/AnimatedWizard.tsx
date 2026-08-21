@@ -435,7 +435,7 @@ export function AnimatedWizard({
           {/* Review summary card (Step 4 · Figma 1660:162) */}
           {isReview && (
             <>
-              <div className="mx-auto mt-9 max-w-[640px] rounded-2xl border-2 border-accent-400 bg-surface px-6">
+              <div className="mx-auto mt-9 max-w-[640px] rounded-xl border-2 border-accent-400 bg-surface px-6">
                 <SummaryRow label={t('wizard.review.markets')} value={reviewMarkets} onEdit={() => editStep(0)} />
                 <SummaryRow label={t('wizard.review.operations')} value={reviewOps} onEdit={() => editStep(1)} />
                 <SummaryRow label={t('wizard.review.domains')} value={reviewDomains} onEdit={() => editStep(2)} />

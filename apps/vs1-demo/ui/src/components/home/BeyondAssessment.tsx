@@ -69,14 +69,14 @@ export function BeyondAssessment() {
           <motion.div
             variants={item}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="flex flex-col rounded-3xl border border-stroke-subtle bg-surface-secondary p-8 lg:p-10"
+            className="flex flex-col rounded-xl border border-stroke-subtle bg-surface-secondary p-8 lg:p-10"
           >
             <div className="flex items-start justify-between">
               <Num>01</Num>
               <Pill tone="live">{t('beyond.pills.live')}</Pill>
             </div>
 
-            <div className="mt-7 rounded-2xl border border-stroke-subtle bg-surface p-6">
+            <div className="mt-7 rounded-xl border border-stroke-subtle bg-surface p-6">
               <ul className="space-y-4">
                 {Array.from({ length: STATS_COUNT }, (_, i) => (
                   <li key={i} className="flex items-center justify-between">
@@ -101,10 +101,10 @@ export function BeyondAssessment() {
             <motion.div
               variants={item}
               transition={{ duration: 0.5, ease: 'easeOut' }}
-              className="rounded-3xl border border-stroke-subtle bg-surface-secondary p-7"
+              className="rounded-xl border border-stroke-subtle bg-surface-secondary p-7"
             >
               <Num>02</Num>
-              <div className="mt-6 rounded-2xl border border-stroke-subtle bg-surface p-4">
+              <div className="mt-6 rounded-xl border border-stroke-subtle bg-surface p-4">
                 <ul className="space-y-3">
                   {Array.from({ length: NEWS_COUNT }, (_, i) => (
                     <li key={i} className="flex items-baseline gap-2.5 text-body-xs">
@@ -125,13 +125,13 @@ export function BeyondAssessment() {
             <motion.div
               variants={item}
               transition={{ duration: 0.5, ease: 'easeOut' }}
-              className="rounded-3xl border border-accent-300 bg-surface-secondary p-7"
+              className="rounded-xl border border-accent-300 bg-surface-secondary p-7"
             >
               <div className="flex items-start justify-between">
                 <Num>03</Num>
                 <Pill tone="beta">{t('beyond.pills.beta')}</Pill>
               </div>
-              <div className="mt-6 flex items-center gap-3 rounded-2xl border border-stroke-subtle bg-surface p-3">
+              <div className="mt-6 flex items-center gap-3 rounded-xl border border-stroke-subtle bg-surface p-3">
                 <span className="grid h-10 w-16 shrink-0 place-items-center rounded-lg bg-brand text-fg-on-brand">
                   <Play size={16} fill="currentColor" />
                 </span>

@@ -50,7 +50,7 @@ function MatchCard({ m, className = '' }: { m: (typeof MATCHES)[number]; classNa
   const { t } = useTranslation('home');
   const base = `matchmaking.matches.${m.index}`;
   return (
-    <div className={`w-full rounded-2xl border border-stroke-subtle bg-surface px-5 py-4 shadow-[0_30px_70px_-30px_rgba(2,22,17,0.3)] ${className}`}>
+    <div className={`w-full rounded-xl border border-stroke-subtle bg-surface px-5 py-4 shadow-[0_30px_70px_-30px_rgba(2,22,17,0.3)] ${className}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <Avatar size="md" initials={m.initials} tone="soft" />

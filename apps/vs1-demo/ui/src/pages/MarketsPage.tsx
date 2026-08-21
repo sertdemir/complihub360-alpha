@@ -71,7 +71,7 @@ export function MarketsIndexPage() {
               <StaggerItem key={m.code}>
                 <Link
                   to={`/${locale ?? 'en'}/markets/${m.code.toLowerCase()}`}
-                  className="group flex h-full flex-col rounded-2xl border border-stroke-subtle bg-surface p-6 transition-colors hover:border-stroke-brand"
+                  className="group flex h-full flex-col rounded-xl border border-stroke-subtle bg-surface p-6 transition-colors hover:border-stroke-brand"
                 >
                   <span className="text-body-3xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
                     {m.code}
@@ -110,7 +110,7 @@ export function MarketsIndexPage() {
             <Stagger className="mt-8 grid gap-4 sm:grid-cols-2">
               {REGION_KEYS.map((key) => (
                 <StaggerItem key={key}>
-                  <div className="flex h-full flex-col rounded-2xl border border-stroke-subtle bg-surface p-6">
+                  <div className="flex h-full flex-col rounded-xl border border-stroke-subtle bg-surface p-6">
                     <div className="flex items-baseline justify-between gap-3">
                       <p className="font-serif text-[1.125rem] font-bold leading-snug text-fg">
                         {t(`markets.regions.items.${key}.name`)}

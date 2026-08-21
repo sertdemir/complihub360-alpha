@@ -56,7 +56,7 @@ export function ProviderDetailPage() {
       </header>
       <main className="mx-auto max-w-[1160px] space-y-6 px-6 py-10">
         {/* Identity hero — anonymous */}
-        <section className="rounded-2xl border border-stroke-subtle bg-surface-secondary p-8">
+        <section className="rounded-xl border border-stroke-subtle bg-surface-secondary p-8">
           <div className="flex items-start justify-between gap-6">
             <div>
               <h1 className="font-serif text-[28px] font-bold leading-tight text-fg">{p.pseudonym_label}</h1>
@@ -79,7 +79,7 @@ export function ProviderDetailPage() {
         <div className="grid gap-6 lg:grid-cols-[1fr,360px]">
           <div className="space-y-6">
             {/* Specializations */}
-            <section className="rounded-2xl border border-stroke-subtle bg-surface-secondary p-7">
+            <section className="rounded-xl border border-stroke-subtle bg-surface-secondary p-7">
               <h2 className="text-body font-semibold text-fg">{t('detail.specsTitle')}</h2>
               <div className="mt-4 flex flex-wrap gap-2">
                 {p.specializations.map((s) => (
@@ -92,7 +92,7 @@ export function ProviderDetailPage() {
               </p>
             </section>
             {/* Pricing table — the stage-2 reveal */}
-            <section className="rounded-2xl border border-stroke-subtle bg-surface-secondary p-7">
+            <section className="rounded-xl border border-stroke-subtle bg-surface-secondary p-7">
               <h2 className="text-body font-semibold text-fg">{t('detail.pricingTitle')}</h2>
               <p className="mt-1 text-body-2xs text-fg-tertiary">{t('detail.billing')}: {BILLING_LABEL[p.billing_model]} · {t('detail.pricingSub')}</p>
               <div className="mt-4 divide-y divide-stroke-subtle">
@@ -107,7 +107,7 @@ export function ProviderDetailPage() {
             </section>
           </div>
           {/* Booking box — all settings happen on the scheduling page */}
-          <aside className="h-fit rounded-2xl border border-brand bg-surface-secondary p-7 shadow-lg shadow-brand/10">
+          <aside className="h-fit rounded-xl border border-brand bg-surface-secondary p-7 shadow-lg shadow-brand/10">
             <h2 className="text-body font-semibold text-fg">{t('detail.bookTitle')}</h2>
             <p className="mt-1 text-body-2xs text-fg-tertiary">{t('detail.bookSub')}</p>
             <Button

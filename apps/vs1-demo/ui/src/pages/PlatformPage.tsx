@@ -95,7 +95,7 @@ function StatCard({ value, label, delay }: { value: string; label: string; delay
       initial={{ opacity: 0, scale: 0.9 }}
       animate={isInView ? { opacity: 1, scale: 1 } : {}}
       transition={{ duration: 0.4, delay }}
-      className="bg-surface border border-stroke rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow"
+      className="bg-surface border border-stroke rounded-xl p-6 text-center shadow-sm hover:shadow-md transition-shadow"
     >
       <Typography variant="display" as="span" weight="bold" className="text-fg-brand block mb-1">
         {value}
@@ -144,7 +144,7 @@ function DataFlowDiagram() {
             )}
 
             <div className="relative z-10 flex flex-col items-center">
-              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-3 shadow-lg border ${
+              <div className={`w-16 h-16 rounded-xl flex items-center justify-center mb-3 shadow-lg border ${
                 i === 1 ? 'bg-error-500/20 border-error-500/40' :
                 i === 2 ? 'bg-accent-500/20 border-accent-500/40' :
                 'bg-primary-500/20 border-primary-500/40'
@@ -237,7 +237,7 @@ function CoverageGrid() {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.4, delay: i * 0.1 }}
-          className={`rounded-2xl border p-6 ${m.color}`}
+          className={`rounded-xl border p-6 ${m.color}`}
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -392,7 +392,7 @@ function EngineSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4 }}
-            className="bg-surface border border-stroke rounded-2xl p-7"
+            className="bg-surface border border-stroke rounded-xl p-7"
           >
             <div className="w-11 h-11 rounded-xl bg-brand-light border border-stroke-subtle flex items-center justify-center mb-5">
               <Brain size={22} className="text-fg-brand" />
@@ -410,7 +410,7 @@ function EngineSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            className="bg-surface border border-stroke rounded-2xl p-7"
+            className="bg-surface border border-stroke rounded-xl p-7"
           >
             <div className="w-11 h-11 rounded-xl bg-error-50 border border-error-100 flex items-center justify-center mb-5">
               <EyeOff size={22} className="text-error-500" />
@@ -428,7 +428,7 @@ function EngineSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: 0.2 }}
-            className="bg-surface border border-stroke rounded-2xl p-7"
+            className="bg-surface border border-stroke rounded-xl p-7"
           >
             <div className="w-11 h-11 rounded-xl bg-success-50 border border-success-100 flex items-center justify-center mb-5">
               <ShieldCheck size={22} className="text-success-500" />

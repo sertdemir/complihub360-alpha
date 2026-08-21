@@ -12,7 +12,7 @@ export function HeroWizardDesktop({ className = '' }: { className?: string }) {
   const scale = 0.4667; // → ~560 × ~355
   return (
     <div
-      className={`dark overflow-hidden rounded-2xl border border-stroke shadow-2xl ${className}`}
+      className={`dark overflow-hidden rounded-xl border border-stroke shadow-2xl ${className}`}
       style={{ width: W * scale, height: H * scale, maxWidth: '100%' }}
     >
       <div style={{ width: W, height: H, transformOrigin: 'top left', transform: `scale(${scale})` }}>

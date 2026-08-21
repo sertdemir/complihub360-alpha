@@ -53,7 +53,7 @@ export function RiskComparisonGrid({ areas, selectedCountry }: Props) {
   return (
     <div
       ref={ref}
-      className="bg-surface border border-stroke rounded-2xl p-7 desktop-s:p-8 mt-8"
+      className="bg-surface border border-stroke rounded-xl p-7 desktop-s:p-8 mt-8"
     >
       <div className="flex items-start justify-between flex-wrap gap-3 mb-6">
         <div>

@@ -74,7 +74,7 @@ export function SearchResultPage() {
         {/* Query bar */}
         <form
           onSubmit={(e) => { e.preventDefault(); runQuery(); }}
-          className="flex items-center gap-2 rounded-2xl border border-stroke bg-surface p-2 shadow-[0_18px_44px_-32px_rgba(2,22,17,0.35)] focus-within:border-fg-brand"
+          className="flex items-center gap-2 rounded-xl border border-stroke bg-surface p-2 shadow-[0_18px_44px_-32px_rgba(2,22,17,0.35)] focus-within:border-fg-brand"
         >
           <Search size={18} className="ml-2 shrink-0 text-fg-tertiary" />
           <input
@@ -150,7 +150,7 @@ export function SearchResultPage() {
         </section>
 
         {/* Bridge CTA → wizard */}
-        <section className="mt-14 rounded-2xl border border-brand/40 bg-brand-light/40 px-7 py-8 text-center">
+        <section className="mt-14 rounded-xl border border-brand/40 bg-brand-light/40 px-7 py-8 text-center">
           <h2 className="font-serif text-[1.5rem] font-bold text-fg">{t('search.bridgeTitle')}</h2>
           <p className="mx-auto mt-2 max-w-xl text-body text-fg-secondary">{t('search.bridgeBody')}</p>
           <Button size="lg" className="mt-6" onClick={startGuided}>

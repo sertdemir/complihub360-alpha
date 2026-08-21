@@ -425,7 +425,7 @@ export function ResultsRiskMap() {
         </div>
 
         {/* Stat strip */}
-        <div className="mx-auto mt-10 flex max-w-4xl flex-wrap items-center justify-between gap-y-4 rounded-2xl border border-stroke-subtle bg-surface px-8 py-6 shadow-[0_18px_44px_-32px_rgba(2,22,17,0.3)]">
+        <div className="mx-auto mt-10 flex max-w-4xl flex-wrap items-center justify-between gap-y-4 rounded-xl border border-stroke-subtle bg-surface px-8 py-6 shadow-[0_18px_44px_-32px_rgba(2,22,17,0.3)]">
           {stats.map((s, i) => (
             <div key={s.label} className="flex items-center">
               {i > 0 && <span className="mr-8 hidden h-8 w-px bg-stroke-subtle sm:block" />}
@@ -438,7 +438,7 @@ export function ResultsRiskMap() {
         </div>
 
         {/* Obligations table */}
-        <div className="mt-12 overflow-hidden rounded-2xl border border-stroke-subtle">
+        <div className="mt-12 overflow-hidden rounded-xl border border-stroke-subtle">
           <div className="grid grid-cols-[100px_1fr_120px_110px_160px] gap-4 border-b border-stroke-subtle bg-surface-secondary px-6 py-3.5 text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary">
             <span>{t('table.severity')}</span>
             <span>{t('table.obligation')}</span>
@@ -554,7 +554,7 @@ export function ResultsRiskMap() {
               : MATCHES.map((m) => (
                   <div
                     key={m}
-                    className="flex flex-col items-center gap-4 rounded-2xl border border-stroke-subtle bg-surface-secondary px-6 py-8"
+                    className="flex flex-col items-center gap-4 rounded-xl border border-stroke-subtle bg-surface-secondary px-6 py-8"
                   >
                     <Lock size={22} className="text-fg-tertiary" />
                     <div className="w-full space-y-2">
