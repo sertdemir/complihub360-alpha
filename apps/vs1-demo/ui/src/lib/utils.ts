@@ -16,6 +16,9 @@ const FONT_SIZES = [
   'display-2xl', 'display-xl', 'display-lg', 'display-md', 'display-sm',
   'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
   'body-lg', 'body', 'body-sm', 'body-xs',
+  // The neutral small steps added with the type-scale migration. Missing here,
+  // tailwind-merge classifies them as text COLOURS and silently drops the size.
+  'body-md', 'body-2xs', 'body-3xs', 'body-4xs', 'body-5xs',
   'label', 'ui-small', 'caption', 'eyebrow',
 ]
 

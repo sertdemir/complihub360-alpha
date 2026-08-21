@@ -14,6 +14,19 @@ import React, { forwardRef } from 'react';
 
 export type ContainerSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
 
+// Side margins. `fluid` is the Compass grid doctrine (mobile 16 → tablet 40 →
+// desktop 80). `flat` is the constant 24px the marketing pages actually use —
+// unanimously, in all 27 of their padded shells. Keeping both is deliberate:
+// the width drift (1280 vs the doctrine's 1200) was a real deviation and has
+// been corrected, but a margin rule that every single call site rejects is
+// evidence about the rule, not about the call sites.
+export type ContainerGutter = 'fluid' | 'flat';
+
+const gutterMap: Record<ContainerGutter, string> = {
+  fluid: 'px-4 md:px-10 lg:px-20',
+  flat: 'px-6',
+};
+
 const sizeMap: Record<ContainerSize, string> = {
   sm: 'max-w-container-sm',
   md: 'max-w-container-md',
@@ -30,11 +43,13 @@ export interface ContainerProps extends React.HTMLAttributes<HTMLElement> {
   as?: React.ElementType;
   /** Drop the fluid side padding (caller manages horizontal space). */
   bleed?: boolean;
+  /** Side margins: Compass grid (`fluid`) or the marketing constant 24px (`flat`). */
+  gutter?: ContainerGutter;
 }
 
 export const Container = forwardRef<HTMLElement, ContainerProps>(
-  ({ size = 'xl', as: Comp = 'div', bleed = false, className = '', children, ...props }, ref) => {
-    const padding = bleed ? '' : 'px-4 md:px-10 lg:px-20';
+  ({ size = 'xl', as: Comp = 'div', bleed = false, gutter = 'fluid', className = '', children, ...props }, ref) => {
+    const padding = bleed ? '' : gutterMap[gutter];
     return (
       <Comp
         ref={ref as never}

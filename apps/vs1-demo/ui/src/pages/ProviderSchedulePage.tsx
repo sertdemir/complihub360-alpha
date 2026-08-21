@@ -5,6 +5,7 @@ import { ArrowRight, Eye } from 'lucide-react';
 import { Logo } from '../components/ui/Logo';
 import { useApiData } from '../lib/useApiData';
 import { fetchSlots, createBooking, type BookingConfirmation } from '../api/bookings';
+import { Button } from '../components/ui/Button';
 
 // ─── Native Scheduling (stage 3) — Phase-3 wiring ────────────────────────────
 // Mirrors the Figma "Scheduling — Buchung" screens: slot picker (from
@@ -86,13 +87,15 @@ export function ProviderSchedulePage() {
                 <p className="text-body-xs text-fg-secondary">{confirmation.provider_identity.contact_email}</p>
               )}
             </div>
-            <button
+            <Button
+              size="lg"
+              shape="soft"
               type="button"
               onClick={() => navigate(`/${locale}/dashboard/termine`)}
-              className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-5 py-3 text-body-sm font-semibold text-fg-on-brand"
+              className="mt-6"
             >
               {t('schedule.toAppointments')} <ArrowRight size={15} />
-            </button>
+            </Button>
           </div>
         </main>
       </div>
@@ -148,14 +151,17 @@ export function ProviderSchedulePage() {
               placeholder={t('schedule.messagePh')}
               className="w-full rounded-lg border border-stroke-subtle bg-transparent px-3.5 py-2.5 text-body-xs text-fg placeholder:text-fg-tertiary focus:outline-none focus:ring-1 focus:ring-brand"
             />
-            <button
+            <Button
+              size="lg"
+              shape="soft"
+              fullWidth
               type="button"
               disabled={!selected || state === 'sending'}
               onClick={book}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand px-4 py-3 text-body-sm font-semibold text-fg-on-brand disabled:opacity-50"
+              className="disabled:opacity-50"
             >
               {t('schedule.confirmCta')}
-            </button>
+            </Button>
             <p className="text-center text-body-3xs text-fg-tertiary">{t('schedule.freeNote')}</p>
           </aside>
         </div>

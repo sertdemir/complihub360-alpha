@@ -24,6 +24,8 @@ import {
 } from '../components/compliance-areas';
 import type { AreaConfig } from '../components/compliance-areas/types';
 import { SiteFooter } from '../components/home';
+import { Button } from '../components/ui/Button';
+import { Container } from '../components/ui/Container';
 
 // ─── Section wrapper with scroll animation ───────────────────────────────────
 
@@ -83,7 +85,7 @@ function AnchorBar() {
 
   return (
     <div className="sticky top-16 z-40 bg-surface/85 backdrop-blur-md border-b border-stroke-subtle">
-      <div className="max-w-7xl mx-auto px-6">
+      <Container gutter="flat">
         <nav className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-2">
           {ANCHORS.map(a => (
             <button
@@ -99,7 +101,7 @@ function AnchorBar() {
             </button>
           ))}
         </nav>
-      </div>
+      </Container>
     </div>
   );
 }
@@ -247,7 +249,7 @@ export function ComplianceAreasPage() {
 
       {/* ── HERO + KPI + Country ─────────────────────────────────────── */}
       <Section className="py-14 desktop-s:py-20">
-        <div className="max-w-7xl mx-auto px-6">
+        <Container gutter="flat">
           <div className="grid desktop-s:grid-cols-12 gap-10 items-end mb-12">
             <div className="desktop-s:col-span-8">
               <Typography
@@ -280,19 +282,19 @@ export function ComplianceAreasPage() {
           </div>
 
           <KPIStrip />
-        </div>
+        </Container>
       </Section>
 
       {/* ── JTBD Outcomes ─────────────────────────────────────────────── */}
       <Section className="pb-12">
-        <div className="max-w-7xl mx-auto px-6">
+        <Container gutter="flat">
           <JTBDOutcomeGrid onScrollToFirstArea={scrollToFirstArea} />
-        </div>
+        </Container>
       </Section>
 
       {/* ── Compliance Cards (6) ──────────────────────────────────────── */}
       <Section className="pb-12">
-        <div className="max-w-7xl mx-auto px-6">
+        <Container gutter="flat">
           <div className="space-y-4">
             {COMPLIANCE_AREAS.map((area, i) => (
               <div key={area.id} id={area.id} className="scroll-mt-28">
@@ -305,29 +307,29 @@ export function ComplianceAreasPage() {
               </div>
             ))}
           </div>
-        </div>
+        </Container>
       </Section>
 
       {/* ── Risk-at-a-Glance + Comparison Matrix ──────────────────────── */}
       <Section className="pb-12">
-        <div className="max-w-7xl mx-auto px-6">
+        <Container gutter="flat">
           <RiskComparisonGrid areas={COMPLIANCE_AREAS} selectedCountry={selectedCountry} />
           <ComparisonMatrix />
-        </div>
+        </Container>
       </Section>
 
       {/* ── How Orchestration Works ───────────────────────────────────── */}
       <Section className="pb-12">
-        <div className="max-w-7xl mx-auto px-6">
+        <Container gutter="flat">
           <HowOrchestrationWorks />
-        </div>
+        </Container>
       </Section>
 
       {/* ── Resource Teaser ───────────────────────────────────────────── */}
       <Section className="pb-16">
-        <div className="max-w-7xl mx-auto px-6">
+        <Container gutter="flat">
           <ResourceTeaser />
-        </div>
+        </Container>
       </Section>
 
       {/* ── Final CTA ─────────────────────────────────────────────────── */}
@@ -343,13 +345,16 @@ export function ComplianceAreasPage() {
             )}
           </Typography>
           <div className="flex flex-col tablet:flex-row items-center justify-center gap-3">
-            <button
+            <Button
+              variant="inverse"
+              size="xl"
+              shape="soft"
               onClick={() => navigate(`${localePrefix}/wizard`)}
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-white text-primary-900 font-bold text-base shadow-lg hover:bg-surface-tertiary transition-colors"
+              className="hover:bg-surface-tertiary transition-colors font-bold"
             >
               {t('compliance.cta.btn', 'Start General Assessment')}
               <ArrowRight size={18} />
-            </button>
+            </Button>
           </div>
         </div>
       </section>
