@@ -20,6 +20,14 @@ binds:
   - provider-relations
   - customer-experience
 supersedes: []
+addenda:
+  - id: developer-dna-website-audit-addendum-v2
+    title: "Developer DNA & Website Audit Addendum — V2"
+    path: "../../../docs/brand/developer-dna-website-audit-addendum-v2.txt"
+    source: "../../../docs/brand/CompliHub360_Developer_DNA_Website_Audit_Addendum_V2.docx"
+    document_date: "2026-08-19"
+    relation: implementation-addendum
+    note: "Setzt die DNA in Screens um; ändert sie nicht. V2 bestätigt ausdrücklich: DNA V1 bleibt master brand source of truth."
 tags: [dna, brand, voice, experience, ai-governance, decision-filter, north-star]
 ---
 
@@ -175,6 +183,38 @@ CompliHub360 ist nicht gebaut, um die lauteste Plattform in Compliance zu sein, 
 
 ---
 
+## Addendum V2 — die Umsetzung in Screens
+
+Seit dem 19.08.2026 liegt im Repository das **[Developer DNA & Website Audit Addendum V2](../../../docs/brand/developer-dna-website-audit-addendum-v2.txt)** (Original: [`.docx`](../../../docs/brand/CompliHub360_Developer_DNA_Website_Audit_Addendum_V2.docx)). Es prüft 38 öffentliche, User-, Partner- und Admin-Routen des Main-Builds gegen diese DNA und benennt pro Screen, was sie bereits trägt und was ihr widerspricht.
+
+**Es ersetzt diesen Knoten nicht.** V2 sagt das selbst im ersten Abschnitt: es löst den *Developer DNA Addendum V1* ab — ein anderes Dokument — während „CompliHub360 DNA V1 remains the master brand source of truth". Dieser Knoten behält damit `authority: source-of-truth`.
+
+Das Verhältnis ist Prinzip zu Anwendung:
+
+| | dieser Knoten (DNA V1) | Addendum V2 |
+|---|---|---|
+| Frage | Wie verhalten wir uns? | Wo im Produkt ist das schon so, wo nicht? |
+| Gegenstand | Prinzipien, Voice, Decision Filter | Screens, Routen, konkrete Copy-Anweisungen |
+| Änderungsanlass | Positionierung ändert sich | Produkt ändert sich |
+
+**Purpose, Mission und Vision sind in V2 wortgleich zu §2 dieses Knotens** — V2 formuliert sie nicht neu, sondern legt fest, wo sie auf der Website sichtbar werden (primär `/about`, ausdrücklich *nicht* alle vier im Homepage-Hero). Es gibt an dieser Stelle also keine Divergenz zu pflegen.
+
+Was V2 zusätzlich liefert und dieser Knoten nicht enthält: eine **KEEP / CHANGE / ADD / AVOID**-Liste und einen **Final Developer Acceptance Test** — beides operationalisiert §6 für die Website, ohne den Filter zu ersetzen.
+
+### Tonalität der Risk Map — wie „prioritize without panic" erfüllt wird
+
+V2 hält fest, dass die Risk Map strukturell stark ist, ihre Tonalität aber teilweise gegen *„prioritize without panic"* (P0 #3) verstieß: Strafbeträge als Zeilen-Untertitel und dominante „Kritisch"-Labels ließen sie angstgeführt wirken. Die geforderte Richtung ist, Severity als **Priorität** zu rahmen und rechtliche Folgen im Detail zugänglich zu halten, statt sie zum primären Aufmerksamkeitsmittel zu machen.
+
+Das ist umgesetzt — **über die Sprache, nicht über die Farbe**:
+
+- Die Stufen heißen seit #54 **Sofort / Hoch / Mittel / Niedrig** statt „Kritisch".
+- Bußgelder führen seit #56 keine Pflichtzeile mehr an.
+- #55 hat die Petrol-Skala durch eine **Ampel** (grün/gelb/orange/rot) ersetzt, mit CVD-Analyse und dE2000-Messungen.
+
+Der Ampel-Schritt ist eine bewusste Gegenentscheidung zur früheren „Risiko nie in Rot"-Regel und **gilt seit dem 20.08.2026 überall**. Der Nachtrag in [`docs/audits/qualitaets-konzil-2026-08-19.md`](../../../docs/audits/qualitaets-konzil-2026-08-19.md) hält ausdrücklich fest, dass der alte Befund „Risiko in Rot" damit *erledigt, nicht offen* ist — er beschreibt eine Regel, die es nicht mehr gibt.
+
+> Wer an der Risk-Map-Darstellung arbeitet, prüft gegen die **aktuelle** Doktrin: Priorität statt Panik, getragen von Wortwahl und Reihenfolge; die Ampel ist gesetzt. Ältere Dokumente, die „kein Rot" verlangen, sind überholt — Widersprüche dort korrigieren statt ihnen zu folgen.
+
 ## Beziehungen zu anderen Artefakten
 
 Dieser Knoten steht **über** den folgenden Dokumenten: bei Widerspruch gewinnt die DNA, und das abweichende Dokument ist zu korrigieren.
@@ -186,6 +226,7 @@ Dieser Knoten steht **über** den folgenden Dokumenten: bei Widerspruch gewinnt 
 | `GoogleDrive_Docs/Detailed Personas & User Stories.md` | Respekt- und Tonalitätsvorgaben aus §2–§4 |
 | `GoogleDrive_Docs/Search & Ranking Logic.md` | Fairness- und Erklärbarkeitsvorgabe aus §3 |
 | `GoogleDrive_Docs/Monetization Model (Deep Dive).md` | gegen Decision Filter §6 zu prüfen |
+| [`docs/brand/…Addendum_V2`](../../../docs/brand/developer-dna-website-audit-addendum-v2.txt) | Screen-für-Screen-Umsetzung dieser DNA; lässt sie ausdrücklich als source of truth bestehen (siehe Abschnitt oben) |
 | [`.agents/rules/dna-decision-filter.md`](../../../.agents/rules/dna-decision-filter.md) | macht diesen Knoten für Agenten verbindlich — Auslöser, Nachweis, Eskalation |
 | [`docs/decisions/ADR-0002`](../../../docs/decisions/ADR-0002-dna-as-binding-agent-rule.md) | begründet Form und Grenzen dieser Verbindlichkeit |
 | `ai-governance.md` · `.agents/rules/` | AI-Verhaltensstandard §5 ist bindende Ergänzung |
