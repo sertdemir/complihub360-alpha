@@ -18,7 +18,7 @@ export function KPIStrip() {
   const { t } = useTranslation('common');
 
   return (
-    <div className="grid grid-cols-2 desktop-s:grid-cols-4 gap-px bg-primary-100 rounded-2xl overflow-hidden border border-primary-100 shadow-sm">
+    <div className="grid grid-cols-2 desktop-s:grid-cols-4 gap-px bg-primary-100 rounded-2xl overflow-hidden border border-stroke-subtle shadow-sm">
       {ITEMS.map((item, i) => {
         const Icon = item.icon;
         return (
@@ -28,20 +28,20 @@ export function KPIStrip() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: i * 0.08 }}
-            className="bg-white px-5 py-5 flex items-start gap-3"
+            className="bg-surface px-5 py-5 flex items-start gap-3"
           >
-            <div className="w-10 h-10 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
-              <Icon size={18} className="text-primary-600" />
+            <div className="w-10 h-10 rounded-lg bg-brand-light flex items-center justify-center shrink-0">
+              <Icon size={18} className="text-fg-brand" />
             </div>
             <div className="min-w-0">
               <Typography
                 variant="h3"
                 weight="bold"
-                className="text-neutral-900 leading-tight tabular-nums"
+                className="text-fg leading-tight tabular-nums"
               >
                 {item.value}
               </Typography>
-              <Typography variant="caption" className="text-neutral-500 leading-snug block mt-0.5 normal-case tracking-normal">
+              <Typography variant="caption" className="text-fg-tertiary leading-snug block mt-0.5 normal-case tracking-normal">
                 {t(`compliance.kpi.${item.key}`, item.labelDefault)}
               </Typography>
             </div>

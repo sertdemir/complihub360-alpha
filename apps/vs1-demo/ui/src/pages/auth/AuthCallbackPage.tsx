@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { Session } from "@supabase/supabase-js";
 import { Loader2 } from "lucide-react";
-import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { getSupabase, isSupabaseConfigured } from "../../lib/supabase";
 
 // Landing target for magic-link and OAuth redirects. The Supabase client is
 // configured with detectSessionInUrl, so it consumes the token from the URL and
@@ -15,12 +15,12 @@ export function AuthCallbackPage() {
     const lang = i18n.resolvedLanguage || "en";
 
     useEffect(() => {
-        if (!isSupabaseConfigured || !supabase) {
-            navigate(`/${lang}/login`, { replace: true });
-            return;
-        }
+        // Das SDK wird nachgeladen; der Effekt raeumt deshalb ueber Flags auf,
+        // nicht ueber ein sofort verfuegbares Abo-Objekt.
         let done = false;
-        const client = supabase;
+        let cancelled = false;
+        let unsubscribe: (() => void) | null = null;
+        let timer: ReturnType<typeof setTimeout> | null = null;
         const go = (session: Session | null) => {
             if (done || !session) return;
             done = true;
@@ -30,14 +30,28 @@ export function AuthCallbackPage() {
             const target = claimed === "partner" ? "partner-dashboard" : "dashboard";
             navigate(`/${lang}/${target}`, { replace: true });
         };
-        client.auth.getSession().then(({ data }) => go(data.session));
-        const { data: sub } = client.auth.onAuthStateChange((_e, session) => go(session));
-        const timer = setTimeout(() => {
+        void (async () => {
+            const client = isSupabaseConfigured ? await getSupabase() : null;
+            if (!client) {
+                navigate(`/${lang}/login`, { replace: true });
+                return;
+            }
+            if (cancelled) return;   // Effekt schon aufgeraeumt, waehrend das SDK lud
+            const { data } = await client.auth.getSession();
+            go(data.session);
+            const { data: sub } = client.auth.onAuthStateChange((_e, session: Session | null) => go(session));
+            unsubscribe = () => sub.subscription.unsubscribe();
+            if (cancelled) unsubscribe();   // Rennen zwischen Abo und Cleanup
+        })();
+
+        timer = setTimeout(() => {
             if (!done) navigate(`/${lang}/login?error=expired`, { replace: true });
         }, 6000);
+
         return () => {
-            sub.subscription.unsubscribe();
-            clearTimeout(timer);
+            cancelled = true;
+            unsubscribe?.();
+            if (timer) clearTimeout(timer);
         };
     }, [lang, navigate]);
 

@@ -7,7 +7,7 @@
       "low": "Low",
       "medium": "Medium",
       "high": "High",
-      "critical": "Critical"
+      "critical": "Immediate"
     },
     "state": {
       "confirmed": "Confirmed",
@@ -1005,13 +1005,13 @@
       "gold": "Three",
       "post": " quiet defaults."
     },
-    "subtitle": "Compliance products usually shout. We shouldn't have to. Risk doesn't need red. Decisions don't need a 20-step funnel. Partners don't need a marketplace. Hover each card to see what we did instead.",
+    "subtitle": "Compliance products usually shout. We shouldn't have to. Risk doesn't need a threat. Decisions don't need a 20-step funnel. Partners don't need a marketplace. Hover each card to see what we did instead.",
     "hoverCue": "Hover to see",
     "cards": [
       {
-        "label": "Code 02 — Risk in petrol",
-        "title": "No red. Ever.",
-        "desc": "Risk levels from low to critical, expressed in petrol tones — never red. The product never tries to scare you into action."
+        "label": "Code 02 — Priority, not panic",
+        "title": "Urgency, not threat.",
+        "desc": "The levels say what comes first — not what will happen to you. Penalties sit in an obligation's detail, never in its headline."
       },
       {
         "label": "Code 04 — The wizard's path",

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { useTranslation } from 'react-i18next';
-import { supabase, isSupabaseConfigured } from '../../lib/supabase';
+import { getSupabase, isSupabaseConfigured } from '../../lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Search, Check, ArrowRight } from 'lucide-react';
 
@@ -17,6 +18,11 @@ function WizardDrawer({ open, onClose, label, children }: {
   label: string;
   children: React.ReactNode;
 }) {
+  // Dieser Drawer oeffnet INNERHALB des Wizard-Containers statt als
+  // Viewport-Portal — der Fokus konnte deshalb besonders leicht in die Seite
+  // dahinter entwischen. aria-modal fehlte hier zusaetzlich.
+  const panelRef = useFocusTrap<HTMLElement>(open);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
@@ -37,6 +43,9 @@ function WizardDrawer({ open, onClose, label, children }: {
             onClick={onClose}
           />
           <motion.aside
+            ref={panelRef}
+            aria-modal="true"
+            tabIndex={-1}
             role="dialog"
             aria-label={label}
             className="absolute right-0 top-0 z-40 flex h-full w-full max-w-[520px] flex-col bg-surface shadow-2xl"
@@ -323,9 +332,10 @@ export function SaveProgressContent({ onClose, copyKey = 'saveProgress' }: { onC
             // Real magic-link signup (Wave A2): the link returns to /results,
             // where the saved profile (localStorage) rebuilds the page and the
             // fresh session unlocks the partner matches.
-            if (isSupabaseConfigured && supabase) {
+            const sb = isSupabaseConfigured ? await getSupabase() : null;
+            if (sb) {
               const lang = document.documentElement.lang || 'en';
-              await supabase.auth.signInWithOtp({
+              await sb.auth.signInWithOtp({
                 email,
                 options: { emailRedirectTo: `${window.location.origin}/${lang}/results` },
               }).catch(() => { /* rate-limit etc. — sent state still shows guidance */ });

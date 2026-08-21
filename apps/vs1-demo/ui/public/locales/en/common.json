@@ -115,16 +115,16 @@
     "anchorCounsel": "In-House Counsel",
     "founders": {
       "overline": "For Founders & CEOs",
-      "title": "From Regulatory Uncertainty to Confident Expansion",
-      "body": "Founders need speed and clarity — not academic legal explanations. CompliHub360 translates regulatory chaos into safe, actionable business decisions so you can scale across borders without surprises.",
-      "cta": "Start Your Expansion Check",
+      "title": "From Regulatory Uncertainty to the Right Decision",
+      "body": "Founders need speed and clarity — not academic legal explanations. CompliHub360 turns regulatory complexity into decisions you can act on: what applies to your business, why it matters, and who can help. Expanding across borders is one of those decisions, not the only one.",
+      "cta": "Start Your Compliance Check",
       "pain1Title": "The Cross-Border Blind Spot",
       "pain1Desc": "Expanding internationally? VAT thresholds, EPR packaging laws, and GDPR differ by country. One missed registration can mean fines.",
       "pain2Title": "The Unreliable Expert Trap",
       "pain2Desc": "Cold-emailing compliance providers and waiting weeks for vague replies is not a strategy. It's a liability.",
       "pain3Title": "We Fix This",
       "pain3Desc": "Our AI Wizard captures your context in 4–5 steps, maps jurisdiction-bound risks, and connects you to SLA-enforced specialists within 24–48h.",
-      "diagramTitle": "The \"Expand Safely\" Path",
+      "diagramTitle": "From context to the right specialist",
       "node1Label": "Country Gate",
       "node1Desc": "Select target market",
       "node2Label": "Adaptive Wizard",
@@ -674,168 +674,6 @@
       "lead": "Six minutes, four questions, no account needed."
     }
   },
-  "wizard": {
-    "reviewPanel": {
-      "primaryCountry": "Primary Country",
-      "additionalMarkets": "Additional Markets",
-      "category": "Compliance Category",
-      "businessType": "Business Type",
-      "marketScope": "Market Scope",
-      "riskSignals": "Risk Signals",
-      "revenue": "Annual Revenue",
-      "intent": "Intent",
-      "generateCTA": "Generate My Compliance Results",
-      "register": "Register",
-      "registerDesc": "to save and edit these answers later in your dashboard."
-    },
-    "businessTypes": {
-      "ecommerce": {
-        "label": "E-Commerce Brand",
-        "desc": "Sell own products via your website or marketplace."
-      },
-      "marketplace": {
-        "label": "Marketplace Seller",
-        "desc": "Sell via Amazon, Shopify, eBay, Etsy, etc."
-      },
-      "saas": {
-        "label": "SaaS / Software",
-        "desc": "Digital products, subscriptions, or software services."
-      },
-      "agency": {
-        "label": "Agency / Consultant",
-        "desc": "Services, consulting, or creative work for clients."
-      },
-      "other": {
-        "label": "Other",
-        "desc": "Tell us a bit more about your business."
-      }
-    },
-    "marketScopes": {
-      "local": {
-        "label": "Local Only",
-        "desc": "I only operate within my primary country."
-      },
-      "eu": {
-        "label": "EU / Europe",
-        "desc": "I sell to or operate across multiple EU countries."
-      },
-      "global": {
-        "label": "Global",
-        "desc": "I operate in markets outside Europe."
-      }
-    },
-    "revenueBands": {
-      "lt10k": "< €10k",
-      "mid1": "€10k–100k",
-      "mid2": "€100k–1M",
-      "gt1m": "> €1M",
-      "perYear": "per year"
-    },
-    "intents": {
-      "selfCheck": {
-        "label": "Quick self-check",
-        "desc": "Get immediate feedback on basic requirements."
-      },
-      "expert": {
-        "label": "Expert advice",
-        "desc": "Speak with a specialist for complex cases."
-      },
-      "fullService": {
-        "label": "Full service",
-        "desc": "End-to-end management by our team."
-      }
-    },
-    "urgencies": {
-      "today": "Today",
-      "week": "This week",
-      "month": "This month",
-      "researching": "Just researching"
-    },
-    "riskSignals": {
-      "taxVat": {
-        "marketplace": "Marketplace seller",
-        "crossBorder": "Cross-border shipping",
-        "warehouse": "Warehouse abroad",
-        "digitalGoods": "Digital goods / services",
-        "highVolume": "High transaction volume",
-        "vatRegistered": "Already VAT registered"
-      },
-      "epr": {
-        "physicalGoods": "Sells physical goods",
-        "ownPackaging": "Uses custom packaging",
-        "dropshipper": "Dropshipper / unbranded",
-        "electronics": "Electronics category",
-        "importer": "Imports from outside EU",
-        "recyclingFee": "Not paying recycling fee"
-      },
-      "privacy": {
-        "ga4": "Google Analytics (GA4)",
-        "metaPixel": "Meta Pixel",
-        "tiktokPixel": "TikTok Pixel",
-        "emailMarketing": "Email marketing",
-        "crmTool": "CRM / contact data",
-        "noConsent": "No consent management"
-      },
-      "marketing": {
-        "healthClaims": "Health / supplement claims",
-        "guaranteed": "\"Guaranteed\" or \"#1\" claims",
-        "googleAds": "Google Ads",
-        "metaAds": "Meta / Facebook Ads",
-        "influencer": "Influencer marketing",
-        "cookiePopup": "No cookie consent"
-      },
-      "corporate": {
-        "individual": "No legal entity yet",
-        "foreign": "Registering abroad",
-        "multiEntity": "Multiple entities",
-        "remoteTeam": "Remote / international team",
-        "investorReady": "Preparing for investment"
-      },
-      "full": {
-        "multiCountry": "Operating in 3+ countries",
-        "allCategories": "Multiple compliance areas",
-        "fastNeeded": "Urgent / fast turnaround",
-        "noTeam": "No in-house compliance",
-        "auditNeeded": "Need compliance audit"
-      }
-    },
-    "steps": {
-      "context": {
-        "label": "Business Context",
-        "title": "How would you describe your business?",
-        "subtitle": "This helps us tailor the right compliance questions for your situation.",
-        "freeTextLabel": "Tell us more about your business",
-        "freeTextDesc": "Optional — helps us suggest the most relevant providers.",
-        "freeTextPlaceholder": "e.g. I run a drop-shipping business across EU markets..."
-      },
-      "markets": {
-        "label": "Market Scope",
-        "title": "Where do you sell or operate?",
-        "subtitle": "Compliance requirements differ significantly based on your operating scope.",
-        "showMarkets": "Select specific additional markets (Optional)",
-        "hideMarkets": "Hide specific markets"
-      },
-      "risk": {
-        "label": "Risk Signals",
-        "subtitle": "Select all that apply — this helps us calculate your risk level and find the best providers.",
-        "signalsDetected": "risk signals",
-        "signalsWeight": "detected — we'll weight provider results accordingly."
-      },
-      "complexity": {
-        "label": "Complexity & Intent",
-        "title": "Last step — tell us your scale & goal.",
-        "subtitle": "This helps rank providers by relevance and match the right service tier.",
-        "revenueLabel": "ANNUAL REVENUE",
-        "intentLabel": "WHAT DO YOU NEED RIGHT NOW?",
-        "urgencyLabel": "HOW URGENT IS THIS?"
-      }
-    },
-    "review": "Review",
-    "reviewAnswers": "Review your answers",
-    "reviewDesc": "Confirm everything looks right before we generate your results.",
-    "reviewAnswersButton": "Review Answers",
-    "backToPrevious": "Back to previous step"
-  },
   "aiGov": {
     "trustCenter": "CompliHub360 Trust Center",
     "heroTitle": "AI Governance Framework",
@@ -861,7 +699,21 @@
     "featIntentTitle": "Intent Analysis Engine",
     "featIntentDesc": "Transforms unstructured client input into a structured risk profile. The AI is restricted to analyzing compliance context and cannot make binding legal decisions on its own.",
     "featGateTitle": "Triple AI Gate Validator",
-    "featGateDesc": "Every AI action must pass three checks: Data Sanitization, Explicit Consent, and Domain Restriction. If any check fails, the workflow gracefully falls back to a deterministic, non-AI process."
+    "featGateDesc": "Every AI action must pass three checks: Data Sanitization, Explicit Consent, and Domain Restriction. If any check fails, the workflow gracefully falls back to a deterministic, non-AI process.",
+    "behaviour": {
+      "kicker": "How our AI behaves",
+      "title": "Professional first. Human always.",
+      "lead": "Governance describes the rules we hold ourselves to. This is what they mean once you actually use the product.",
+      "items": [
+        "It says that it is AI. It never presents itself as a lawyer, accountant or customs specialist.",
+        "It explains in plain language — and names the technical term, so you learn it.",
+        "When the legal position is clear, it says so and explains why.",
+        "When it is uncertain, it says that too instead of guessing, and points you to qualified confirmation.",
+        "It never uses fear or urgency to move you towards a booking, and never invents an obligation.",
+        "It hands over to a person the moment professional judgement matters."
+      ],
+      "principle": "Technology should be the shortest path to the right human — not a barrier between them."
+    }
   },
   "header": {
     "nav": {
@@ -1111,6 +963,116 @@
     "cta": {
       "title": "Start where it makes sense for you.",
       "lead": "Six minutes, four questions, no account needed."
+    }
+  },
+  "about": {
+    "meta": {
+      "title": "About us · CompliHub360"
+    },
+    "eyebrow": "About us",
+    "title": {
+      "pre": "Always on your ",
+      "gold": "side",
+      "post": "."
+    },
+    "lead": "Compliance decisions are easier when you understand what actually applies to your business — and when the platform helping you has no reason to sell you something you do not need.",
+    "why": {
+      "kicker": "Why we exist",
+      "statement": "Businesses making important decisions deserve someone genuinely on their side.",
+      "body": "CompliHub360 was created after years of seeing the same problem: businesses had access to many providers, but no neutral place to understand their needs before entering a sales conversation. We exist to put clarity, knowledge and choice first."
+    },
+    "purpose": {
+      "title": "Purpose",
+      "body": "To empower businesses to make informed decisions with confidence, always putting their needs first."
+    },
+    "mission": {
+      "title": "Mission",
+      "body": "To empower businesses everywhere to understand and manage their compliance needs through reliable knowledge, intuitive technology and access to the right professionals — supporting them throughout their entire business journey."
+    },
+    "vision": {
+      "title": "Vision",
+      "body": "To become the place businesses around the world turn to first for compliance — creating a more transparent industry where knowledge empowers better decisions, quality drives competition, and businesses and professionals build meaningful, long-term relationships."
+    },
+    "behave": {
+      "kicker": "How we behave",
+      "items": [
+        "Knowledge before sales.",
+        "Ask before assuming.",
+        "Professional first. Human always.",
+        "We do not create needs. We identify them.",
+        "Same respect. Personalised depth.",
+        "Experience is how trust is delivered."
+      ]
+    },
+    "close": "The complexity belongs to us. The simplicity belongs to you.",
+    "cta": {
+      "title": "See what applies to your business.",
+      "lead": "The assessment is free, needs no account and takes a few minutes."
+    }
+  },
+  "a11y": {
+    "skipToContent": "Skip to content"
+  },
+  "seo": {
+    "home": {
+      "title": "CompliHub360 · Understand and act on compliance",
+      "description": "The rules for your markets on one risk map, with the source behind every obligation — and the way to vetted specialists. Free, no account."
+    },
+    "howItWorks": {
+      "title": "How it works · CompliHub360",
+      "description": "From a question to a risk map to the right professional. Five steps, no sales call, no obligation."
+    },
+    "compliance": {
+      "title": "Compliance areas · CompliHub360",
+      "description": "Eight areas from tax and VAT through EPR to data privacy: what applies, how urgent it is and who helps you act on it."
+    },
+    "markets": {
+      "title": "Markets · CompliHub360",
+      "description": "Eight markets and what they weigh most — Germany, United Kingdom, Netherlands, France, Italy, Spain, United States and Türkiye."
+    },
+    "pricing": {
+      "title": "Pricing · CompliHub360",
+      "description": "The assessment, the risk map and the matching cost you nothing. Specialists pay, and only once an appointment is confirmed."
+    },
+    "resources": {
+      "title": "Resources · CompliHub360",
+      "description": "Where to read on: markets and the rules that apply there, the eight compliance areas, and the path from a question to a professional."
+    },
+    "about": {
+      "title": "About us · CompliHub360",
+      "description": "Why CompliHub360 exists, what it stands for and how it behaves — knowledge before sales, ask before assuming."
+    },
+    "platform": {
+      "title": "The platform · CompliHub360",
+      "description": "How your business context becomes a structured risk map: the privacy gate, source-bound analysis and the matching behind it."
+    },
+    "solutions": {
+      "title": "By role · CompliHub360",
+      "description": "What CompliHub360 does for founders, operations teams and in-house counsel — from the first question to the obligation handled."
+    },
+    "aiGovernance": {
+      "title": "AI governance · CompliHub360",
+      "description": "The frame our AI works in and how it behaves: six governance dimensions and plain commitments about how it treats you."
+    },
+    "privacy": {
+      "title": "Privacy policy · CompliHub360",
+      "description": "How CompliHub360 processes personal data, on what legal basis, and the rights you have."
+    },
+    "terms": {
+      "title": "Terms · CompliHub360",
+      "description": "The terms and conditions for using CompliHub360."
+    },
+    "imprint": {
+      "title": "Imprint · CompliHub360",
+      "description": "Provider identification and contact details for CompliHub360."
+    },
+    "cookies": {
+      "title": "Cookie policy · CompliHub360",
+      "description": "Which cookies CompliHub360 sets, what they are for, and how to change your choice at any time."
+    },
+    "marketCountry": {
+      "title": "{{country}} · Markets · CompliHub360",
+      "description": "Which compliance obligations apply in {{country}}, how the areas are weighted there, and the legal source for each."
     }
   }
 }

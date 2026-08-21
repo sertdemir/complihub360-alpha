@@ -5,7 +5,7 @@ import { RiskBadge, type RiskLevel } from './RiskBadge';
 // ─── RiskMap ────────────────────────────────────────────────────────────────
 // Wizard step 05 "Risk Map" (Organism). An at-a-glance overview of a company's
 // compliance obligations, grouped & ordered by petrol-severity (critical → low).
-// Reuses RiskBadge for the brand-critical risk scale (petrol, never red).
+// Reuses RiskBadge for the brand-critical risk scale (the traffic light).
 
 export interface RiskMapItem {
   domain: string;

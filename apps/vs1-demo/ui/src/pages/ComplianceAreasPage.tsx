@@ -82,7 +82,7 @@ function AnchorBar() {
   }, []);
 
   return (
-    <div className="sticky top-16 z-40 bg-white/85 backdrop-blur-md border-b border-neutral-100">
+    <div className="sticky top-16 z-40 bg-surface/85 backdrop-blur-md border-b border-stroke-subtle">
       <div className="max-w-7xl mx-auto px-6">
         <nav className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-2">
           {ANCHORS.map(a => (
@@ -91,8 +91,8 @@ function AnchorBar() {
               onClick={() => document.getElementById(a.id)?.scrollIntoView({ behavior: 'smooth' })}
               className={`px-4 py-2 rounded-md text-ui-small font-semibold whitespace-nowrap transition-colors ${
                 active === a.id
-                  ? 'text-primary-700 bg-primary-50'
-                  : 'text-neutral-500 hover:text-neutral-800 hover:bg-neutral-50'
+                  ? 'text-fg-brand bg-brand-light'
+                  : 'text-fg-tertiary hover:text-fg hover:bg-surface-secondary'
               }`}
             >
               {t(a.key, a.defaultLabel)}
@@ -117,9 +117,6 @@ export function ComplianceAreasPage() {
 
   // Without this the tab keeps the previous page's title — visible because this
   // page sits in the main navigation.
-  useEffect(() => {
-    document.title = t('compliance.meta.title', 'Compliance areas · CompliHub360');
-  }, [t]);
 
 
   // TODO: replace with verified counts from provider DB
@@ -128,10 +125,10 @@ export function ComplianceAreasPage() {
       id: 'tax',
       icon: Receipt,
       risk: 'High',
-      riskColor: 'bg-error-50 text-error-600 border-error-200',
-      cardBorder: 'border-error-200',
-      iconBg: 'bg-error-50',
-      iconColor: 'text-error-500',
+      riskColor: 'bg-risk-high-bg text-risk-on-high border-risk-high/30',
+      cardBorder: 'border-risk-high/30',
+      iconBg: 'bg-risk-high-bg',
+      iconColor: 'text-risk-on-high',
       wizardPath: '/wizard/tax-vat',
       markets: [
         { code: 'UK', label: '🇬🇧 UK' },
@@ -141,18 +138,18 @@ export function ComplianceAreasPage() {
       ],
       specialistsCount: 12,
       riskBarPct: 75,
-      riskBarColor: 'bg-warning-text',
-      riskBarBadge: 'bg-warning-bg text-warning-text',
+      riskBarColor: 'bg-risk-high',
+      riskBarBadge: 'bg-risk-high-bg text-risk-on-high',
       personaFitKey: 'Best for: Cross-border e-commerce',
     },
     {
       id: 'epr',
       icon: Recycle,
       risk: 'High',
-      riskColor: 'bg-warning-bg text-warning-text border-warning-text/30',
-      cardBorder: 'border-warning-text/30',
-      iconBg: 'bg-warning-bg',
-      iconColor: 'text-warning-text',
+      riskColor: 'bg-risk-high-bg text-risk-on-high border-risk-high/30',
+      cardBorder: 'border-risk-high/30',
+      iconBg: 'bg-risk-high-bg',
+      iconColor: 'text-risk-on-high',
       wizardPath: '/wizard/epr',
       markets: [
         { code: 'UK', label: '🇬🇧 UK' },
@@ -162,18 +159,18 @@ export function ComplianceAreasPage() {
       ],
       specialistsCount: 8,
       riskBarPct: 70,
-      riskBarColor: 'bg-warning-text',
-      riskBarBadge: 'bg-warning-bg text-warning-text',
+      riskBarColor: 'bg-risk-high',
+      riskBarBadge: 'bg-risk-high-bg text-risk-on-high',
       personaFitKey: 'Best for: Manufacturers & resellers',
     },
     {
       id: 'privacy',
       icon: ShieldCheck,
       risk: 'Critical',
-      riskColor: 'bg-error-100 text-error-700 border-error-300',
-      cardBorder: 'border-error-300',
-      iconBg: 'bg-error-100',
-      iconColor: 'text-error-600',
+      riskColor: 'bg-risk-critical-bg text-risk-on-critical border-risk-critical/30',
+      cardBorder: 'border-risk-critical/30',
+      iconBg: 'bg-risk-critical-bg',
+      iconColor: 'text-risk-on-critical',
       wizardPath: '/wizard/data-privacy',
       markets: [
         { code: 'EU', label: '🇪🇺 EU' },
@@ -183,18 +180,18 @@ export function ComplianceAreasPage() {
       ],
       specialistsCount: 14,
       riskBarPct: 95,
-      riskBarColor: 'bg-error-500',
-      riskBarBadge: 'bg-error-100 text-error-700',
+      riskBarColor: 'bg-risk-critical',
+      riskBarBadge: 'bg-risk-critical-bg text-risk-on-critical',
       personaFitKey: 'Best for: SaaS & data-driven brands',
     },
     {
       id: 'marketing',
       icon: Megaphone,
       risk: 'Medium',
-      riskColor: 'bg-warning-bg text-warning-text border-warning-text/30',
-      cardBorder: 'border-warning-text/30',
-      iconBg: 'bg-warning-bg',
-      iconColor: 'text-warning-text',
+      riskColor: 'bg-risk-medium-bg text-risk-on-medium border-risk-medium/30',
+      cardBorder: 'border-risk-medium/30',
+      iconBg: 'bg-risk-medium-bg',
+      iconColor: 'text-risk-on-medium',
       wizardPath: '/wizard/marketing-seo',
       markets: [
         { code: 'EU', label: '🇪🇺 EU' },
@@ -204,18 +201,18 @@ export function ComplianceAreasPage() {
       ],
       specialistsCount: 5,
       riskBarPct: 55,
-      riskBarColor: 'bg-warning-text/80',
-      riskBarBadge: 'bg-warning-bg text-warning-text',
+      riskBarColor: 'bg-risk-medium',
+      riskBarBadge: 'bg-risk-medium-bg text-risk-on-medium',
       personaFitKey: 'Best for: Agencies & DTC brands',
     },
     {
       id: 'corporate',
       icon: Building2,
       risk: 'Medium',
-      riskColor: 'bg-primary-50 text-primary-600 border-primary-200',
-      cardBorder: 'border-primary-200',
-      iconBg: 'bg-primary-50',
-      iconColor: 'text-primary-600',
+      riskColor: 'bg-risk-medium-bg text-risk-on-medium border-risk-medium/30',
+      cardBorder: 'border-risk-medium/30',
+      iconBg: 'bg-risk-medium-bg',
+      iconColor: 'text-risk-on-medium',
       wizardPath: '/wizard/corporate',
       markets: [
         { code: 'UK', label: '🇬🇧 UK' },
@@ -225,8 +222,8 @@ export function ComplianceAreasPage() {
       ],
       specialistsCount: 6,
       riskBarPct: 40,
-      riskBarColor: 'bg-primary-400',
-      riskBarBadge: 'bg-primary-50 text-primary-700',
+      riskBarColor: 'bg-risk-medium',
+      riskBarBadge: 'bg-risk-medium-bg text-risk-on-medium',
       personaFitKey: 'Best for: International expansion teams',
     },
   ];
@@ -255,20 +252,20 @@ export function ComplianceAreasPage() {
             <div className="desktop-s:col-span-8">
               <Typography
                 variant="caption"
-                className="text-primary-500 mb-3 block font-semibold uppercase tracking-wider"
+                className="text-fg-brand mb-3 block font-semibold uppercase tracking-wider"
               >
                 {t('compliance.heroOverline', 'Compliance Areas')}
               </Typography>
               <Typography
                 variant="display"
                 weight="bold"
-                className="text-neutral-900 mb-5 leading-tight"
+                className="text-fg mb-5 leading-tight"
               >
                 {t('compliance.heroTitle', 'Find Your Regulatory Challenge. Start Here.')}
               </Typography>
               <Typography
                 variant="body"
-                className="text-neutral-600 text-lg leading-relaxed max-w-2xl"
+                className="text-fg-secondary text-lg leading-relaxed max-w-2xl"
               >
                 {t(
                   'compliance.heroBody',
@@ -336,7 +333,7 @@ export function ComplianceAreasPage() {
       {/* ── Final CTA ─────────────────────────────────────────────────── */}
       <section className="py-16 desktop-s:py-24 bg-primary-700">
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <Typography variant="display" weight="bold" className="text-white mb-5">
+          <Typography variant="display" as="h2" weight="bold" className="text-white mb-5">
             {t('compliance.cta.title', 'Not sure which area applies?')}
           </Typography>
           <Typography variant="body" className="text-primary-100 mb-10 text-lg">
@@ -348,7 +345,7 @@ export function ComplianceAreasPage() {
           <div className="flex flex-col tablet:flex-row items-center justify-center gap-3">
             <button
               onClick={() => navigate(`${localePrefix}/wizard`)}
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-white text-primary-900 font-bold text-base shadow-lg hover:bg-neutral-100 transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-white text-primary-900 font-bold text-base shadow-lg hover:bg-surface-tertiary transition-colors"
             >
               {t('compliance.cta.btn', 'Start General Assessment')}
               <ArrowRight size={18} />

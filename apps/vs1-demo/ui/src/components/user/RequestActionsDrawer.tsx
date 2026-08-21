@@ -86,7 +86,7 @@ export function RequestActionsDrawer({ target, onClose, onOpenThread, onWithdraw
     >
       {target && (
         <div className="space-y-4">
-          <div className="rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3">
+          <div className="rounded-lg border border-elevate/10 bg-elevate/[0.03] px-4 py-3">
             <p className="text-[13px] font-semibold text-fg">{target.company}</p>
             <div className="mt-1.5 flex items-center gap-2">
               <Tag tone={actionable ? 'warning' : 'neutral'}>{tStatus(target.statusLabel)}</Tag>
@@ -95,7 +95,7 @@ export function RequestActionsDrawer({ target, onClose, onOpenThread, onWithdraw
           </div>
 
           {/* Remind */}
-          <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4">
+          <div className="rounded-lg border border-elevate/10 bg-elevate/[0.03] p-4">
             <div className="flex items-start gap-3">
               <BellRing size={16} className="mt-0.5 shrink-0 text-fg-accent" />
               <div className="min-w-0 flex-1">
@@ -116,7 +116,7 @@ export function RequestActionsDrawer({ target, onClose, onOpenThread, onWithdraw
           </div>
 
           {/* Thread */}
-          <div className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/[0.03] p-4">
+          <div className="flex items-start gap-3 rounded-lg border border-elevate/10 bg-elevate/[0.03] p-4">
             <MessageSquare size={16} className="mt-0.5 shrink-0 text-fg-brand" />
             <div className="min-w-0 flex-1">
               <p className="text-[13px] font-semibold text-fg">{t('requestActions.threadTitle')}</p>

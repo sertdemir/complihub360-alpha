@@ -23,11 +23,24 @@ const OBLIGATION_FIXTURE = [
   { key: 'o2', severity: 'medium' as const },
   { key: 'o3', severity: 'medium' as const },
 ];
-const GUIDE_FIXTURE = ['g1', 'g2', 'g3'];
+// Bis 20.08. standen hier drei erfundene Guide-Titel ("Das EU-OSS-Verfahren
+// erklärt" …), die auf /resources verlinkten — eine Seite, die genau solche
+// erfundenen Guides beim Neubau am 18.08. entfernt hatte. Wer klickte, landete
+// bei drei völlig anderen Inhalten. Jetzt zeigen die Karten auf das, was es
+// tatsächlich gibt, jeweils an seinem eigenen Ziel.
+const ENTRIES = [
+  { key: 'markets', path: 'markets' },
+  { key: 'compliance', path: 'compliance' },
+  { key: 'howItWorks', path: 'how-it-works' },
+] as const;
 
+// Severity here never joined the traffic light. It carried #c0392b, a red in no
+// scale (2.52:1 in dark), and gold for medium — which now says the wrong thing
+// twice over: gold is brand-only, and medium is yellow. These are the RiskBadge
+// soft pairings, so they read 6.92/5.56 (high) and 7.45/6.96 (medium).
 const SEV_TINT: Record<'high' | 'medium', string> = {
-  high: 'bg-[#c0392b]/12 text-[#c0392b]',
-  medium: 'bg-accent-500/15 text-accent-600',
+  high: 'bg-risk-high-bg text-risk-on-high',
+  medium: 'bg-risk-medium-bg text-risk-on-medium',
 };
 
 export function SearchResultPage() {
@@ -123,10 +136,10 @@ export function SearchResultPage() {
         <section className="mt-12">
           <h2 className="text-[15px] font-semibold text-fg">{t('search.guidesTitle')}</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            {GUIDE_FIXTURE.map((g) => (
-              <a key={g} href={`/${locale}/resources`} className="group rounded-xl border border-stroke bg-surface p-4 transition-colors hover:border-fg-brand">
+            {ENTRIES.map((g) => (
+              <a key={g.key} href={`/${locale}/${g.path}`} className="group rounded-xl border border-stroke bg-surface p-4 transition-colors hover:border-fg-brand">
                 <BookOpen size={18} className="text-fg-brand" />
-                <p className="mt-2 text-[14px] font-semibold leading-snug text-fg">{t(`search.guides.${g}`)}</p>
+                <p className="mt-2 text-[14px] font-semibold leading-snug text-fg">{t(`search.entries.${g.key}`)}</p>
                 <span className="mt-2 inline-flex items-center gap-1 text-[12px] font-medium text-fg-brand">
                   {t('search.guideRead')} <ArrowRight size={13} />
                 </span>

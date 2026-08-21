@@ -102,19 +102,21 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="dark flex h-screen bg-[#1F2937] text-fg">
+    <div className="flex h-screen bg-surface text-fg">
       <Sidebar
         logo={
           <NavLink to={base} className="flex items-center gap-2">
-            <LogoMark tone="on-petrol" className="h-[22px] w-auto" />
-            <span className="text-[15px] font-semibold text-white">CompliHub</span>
-            <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-fg-accent">{t('shell.partnerBadge')}</span>
+            <LogoMark tone="on-light" className="h-[22px] w-auto" />
+            <span className="text-[15px] font-semibold text-fg">CompliHub</span>
+            {/* accent-STRONG: at 9px this needs 4.5:1, and gold-500 measures 2.10 on the
+                light sidebar. See --color-text-accent-strong in index.css. */}
+            <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-fg-accent-strong">{t('shell.partnerBadge')}</span>
           </NavLink>
         }
         footer={
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-2.5">
-              <span className="grid h-8 w-8 place-items-center rounded-full bg-[#d4af37] text-[11px] font-bold text-[#101411]">GD</span>
+              <span className="grid h-8 w-8 place-items-center rounded-full bg-brand-accent text-[11px] font-bold text-fg-on-accent">GD</span>
               <div className="leading-tight">
                 <p className="text-[12px] font-semibold text-fg">G. Dahlmann</p>
                 <p className="text-[10px] text-fg-tertiary">Dahlmann CPA</p>
@@ -147,7 +149,7 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
       </Sidebar>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-15 min-h-[60px] shrink-0 items-center justify-end gap-3 border-b border-white/10 px-6">
+        <header className="flex h-15 min-h-[60px] shrink-0 items-center justify-end gap-3 border-b border-elevate/10 px-6">
           <button type="button" aria-label={t('shell.searchAria')} onClick={() => setSearchOpen(true)} className="mr-1 text-fg-tertiary transition-colors hover:text-fg">
             <Search size={18} />
           </button>

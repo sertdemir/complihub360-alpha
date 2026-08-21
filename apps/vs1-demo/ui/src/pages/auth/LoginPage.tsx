@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trans, useTranslation } from "react-i18next";
 import { ArrowRight, Mail, EyeOff, AlertTriangle } from "lucide-react";
 import { Logo } from "../../components/ui/Logo";
 import { useAuthStore } from "../../store/useAuthStore";
-import { supabase, isSupabaseConfigured, isDemoLoginEnabled } from "../../lib/supabase";
+import { getSupabase, isSupabaseConfigured, isDemoLoginEnabled } from "../../lib/supabase";
 
 // ─── Auth · Figma 1839:2 / 1842:2288 / 1853:2 / 1855:2 / 1856:2 / 1857:3 ─────
 // One dark split-screen shell, several views driven by a small state machine:
@@ -60,6 +60,7 @@ function GoogleButton({ onClick }: { onClick: () => void }) {
 
 function SystemFooter({ className = "" }: { className?: string }) {
     const { t } = useTranslation("auth");
+    const { locale = "en" } = useParams();
     return (
         <div className={"flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px] text-white/50 " + className}>
             <span className="flex items-center gap-2">
@@ -68,9 +69,9 @@ function SystemFooter({ className = "" }: { className?: string }) {
             <span className="text-white/20">·</span>
             <span><span className="font-semibold text-white">EN</span> / DE</span>
             <span className="text-white/20">·</span>
-            <a href="#" className="hover:text-white/80">{t("login.footer.privacy")}</a>
-            <a href="#" className="hover:text-white/80">{t("login.footer.terms")}</a>
-            <a href="#" className="hover:text-white/80">{t("login.footer.imprint")}</a>
+            <a href={`/${locale}/privacy`} className="hover:text-white/80">{t("login.footer.privacy")}</a>
+            <a href={`/${locale}/terms`} className="hover:text-white/80">{t("login.footer.terms")}</a>
+            <a href={`/${locale}/imprint`} className="hover:text-white/80">{t("login.footer.imprint")}</a>
         </div>
     );
 }
@@ -200,8 +201,9 @@ export function LoginPage() {
     const handleMagicLink = async () => {
         setAuthError(null);
         if (!/.+@.+\..+/.test(email)) { setAuthError(t("login.validation.invalidEmail")); return; }
-        if (!isSupabaseConfigured || !supabase) { setView("magic-sent"); return; } // dev fallback
-        const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: callbackUrl } });
+        const sb = isSupabaseConfigured ? await getSupabase() : null;
+        if (!sb) { setView("magic-sent"); return; } // dev fallback
+        const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: callbackUrl } });
         if (error) { setAuthError(error.message); return; }
         setView("magic-sent");
     };
@@ -209,8 +211,9 @@ export function LoginPage() {
     // Partner · email + password
     const handlePasswordSignIn = async () => {
         setAuthError(null);
-        if (!isSupabaseConfigured || !supabase) { finishLogin("partner"); return; } // dev fallback
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const sb = isSupabaseConfigured ? await getSupabase() : null;
+        if (!sb) { finishLogin("partner"); return; } // dev fallback
+        const { error } = await sb.auth.signInWithPassword({ email, password });
         if (error) { setAuthError(error.message); return; }
         navigate(params.get("redirect") || `/${lang}/partner-dashboard`);
     };
@@ -220,8 +223,9 @@ export function LoginPage() {
     const handleForgot = async () => {
         setAuthError(null);
         if (!/.+@.+\..+/.test(email)) { setAuthError(t("login.validation.invalidEmail")); return; }
-        if (isSupabaseConfigured && supabase) {
-            await supabase.auth.resetPasswordForEmail(email, { redirectTo: resetUrl });
+        const sb = isSupabaseConfigured ? await getSupabase() : null;
+        if (sb) {
+            await sb.auth.resetPasswordForEmail(email, { redirectTo: resetUrl });
         }
         setView("reset-sent");
     };
@@ -229,8 +233,9 @@ export function LoginPage() {
     // OAuth · Google
     const handleOAuth = async (role: "user" | "partner") => {
         setAuthError(null);
-        if (!isSupabaseConfigured || !supabase) { finishLogin(role); return; } // dev fallback
-        const { error } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: callbackUrl } });
+        const sb = isSupabaseConfigured ? await getSupabase() : null;
+        if (!sb) { finishLogin(role); return; } // dev fallback
+        const { error } = await sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: callbackUrl } });
         if (error) setAuthError(error.message);
     };
 
@@ -422,7 +427,7 @@ export function LoginPage() {
                                     />
                                     <button
                                         type="submit"
-                                        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-[#0e6450] px-5 py-3.5 text-[15px] font-semibold text-white transition-transform duration-200 hover:-translate-y-0.5"
+                                        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-fixed px-5 py-3.5 text-[15px] font-semibold text-fg-on-brand-fixed transition-transform duration-200 hover:-translate-y-0.5"
                                     >
                                         {t("login.forgot.send")} <ArrowRight size={16} />
                                     </button>
@@ -447,7 +452,7 @@ export function LoginPage() {
                                     <button
                                         type="button"
                                         onClick={() => { window.location.href = "mailto:"; }}
-                                        className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-[#0e6450] px-5 py-3.5 text-[15px] font-semibold text-white transition-transform duration-200 hover:-translate-y-0.5"
+                                        className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-fixed px-5 py-3.5 text-[15px] font-semibold text-fg-on-brand-fixed transition-transform duration-200 hover:-translate-y-0.5"
                                     >
                                         {t("login.openMailApp")} <ArrowRight size={16} />
                                     </button>
@@ -464,7 +469,7 @@ export function LoginPage() {
                                                 key={k}
                                                 type="button"
                                                 onClick={() => setErrKind(k)}
-                                                className={"flex-1 rounded-full px-3.5 py-1.5 transition-colors lg:flex-none " + (errKind === k ? "bg-[#0e6450] text-white" : "text-white/55 hover:text-white")}
+                                                className={"flex-1 rounded-full px-3.5 py-1.5 transition-colors lg:flex-none " + (errKind === k ? "bg-brand-fixed text-fg-on-brand-fixed" : "text-white/55 hover:text-white")}
                                             >
                                                 {t(`login.errors.kindLabels.${errKey(k)}`)}
                                             </button>
@@ -481,7 +486,7 @@ export function LoginPage() {
                                     <button
                                         type="button"
                                         onClick={() => setView("form")}
-                                        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-[#0e6450] px-5 py-3.5 text-[15px] font-semibold text-white transition-transform duration-200 hover:-translate-y-0.5"
+                                        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-fixed px-5 py-3.5 text-[15px] font-semibold text-fg-on-brand-fixed transition-transform duration-200 hover:-translate-y-0.5"
                                     >
                                         {t("login.errors.sendNewLink")} <ArrowRight size={16} />
                                     </button>
@@ -561,7 +566,7 @@ export function LoginPage() {
                                     </div>
                                     <button
                                         type="submit"
-                                        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-[#0e6450] px-5 py-3.5 text-[15px] font-semibold text-white transition-transform duration-200 hover:-translate-y-0.5"
+                                        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-fixed px-5 py-3.5 text-[15px] font-semibold text-fg-on-brand-fixed transition-transform duration-200 hover:-translate-y-0.5"
                                     >
                                         {t("login.partner.signIn")} <ArrowRight size={16} />
                                     </button>

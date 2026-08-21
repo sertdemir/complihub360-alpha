@@ -10,13 +10,11 @@
     "packages/*",
     "services/*",
     "ui/*",
-    "apps/demo-app/*",
     "apps/vs1-demo/*"
   ],
   "scripts": {
     "lint": "eslint . --ext .ts,.tsx",
     "test": "npm run test --if-present --workspaces",
-    "create:app": "node template/scripts/create-app.js",
     "i18n:check": "node scripts/i18n-translate.mjs --check",
     "i18n:translate": "node scripts/i18n-translate.mjs",
     "format": "prettier --write .",

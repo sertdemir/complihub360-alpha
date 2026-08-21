@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ArrowRight, AlertTriangle, CheckCircle2, EyeOff } from "lucide-react";
 import { Logo } from "../../components/ui/Logo";
-import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { getSupabase, isSupabaseConfigured } from "../../lib/supabase";
 
 // Landing target for the password-reset email link. Supabase establishes a
 // short-lived recovery session from the link, so updateUser({ password }) sets
@@ -24,8 +24,9 @@ export function ResetPasswordPage() {
         setError(null);
         if (password.length < 8) { setError(t("reset.errors.tooShort")); return; }
         if (password !== confirm) { setError(t("reset.errors.mismatch")); return; }
-        if (!isSupabaseConfigured || !supabase) { setError(t("reset.errors.notConfigured")); return; }
-        const { error } = await supabase.auth.updateUser({ password });
+        const sb = isSupabaseConfigured ? await getSupabase() : null;
+        if (!sb) { setError(t("reset.errors.notConfigured")); return; }
+        const { error } = await sb.auth.updateUser({ password });
         if (error) { setError(error.message); return; }
         setDone(true);
         setTimeout(() => navigate(`/${lang}/login`, { replace: true }), 1600);
@@ -84,7 +85,7 @@ export function ResetPasswordPage() {
 
                             <button
                                 type="submit"
-                                className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-[#0e6450] px-5 py-3.5 text-[15px] font-semibold text-white transition-transform duration-200 hover:-translate-y-0.5"
+                                className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-fixed px-5 py-3.5 text-[15px] font-semibold text-fg-on-brand-fixed transition-transform duration-200 hover:-translate-y-0.5"
                             >
                                 {t("reset.submit")} <ArrowRight size={16} />
                             </button>

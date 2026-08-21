@@ -39,14 +39,14 @@ export function ResourceTeaser() {
       <div className="mb-6">
         <Typography
           variant="caption"
-          className="text-primary-500 font-semibold uppercase tracking-wider mb-2 block"
+          className="text-fg-brand font-semibold uppercase tracking-wider mb-2 block"
         >
           {t('compliance.resourceTeaser.overline', 'Prefer to research first?')}
         </Typography>
-        <Typography variant="h2" weight="bold" className="text-neutral-900">
+        <Typography variant="h2" weight="bold" className="text-fg">
           {t('compliance.resourceTeaser.title', 'Read before you reach out')}
         </Typography>
-        <Typography variant="body" className="text-neutral-600 mt-2 max-w-2xl">
+        <Typography variant="body" className="text-fg-secondary mt-2 max-w-2xl">
           {t(
             'compliance.resourceTeaser.body',
             'Structured knowledge for the careful researcher. Every guide is grounded in official, validated regulatory sources.',
@@ -67,18 +67,18 @@ export function ResourceTeaser() {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.08 }}
               onClick={card.onClick}
-              className="group text-left bg-white border border-neutral-200 hover:border-primary-400 rounded-2xl p-6 transition-all hover:shadow-lg hover:-translate-y-0.5 flex flex-col"
+              className="group text-left bg-surface border border-stroke hover:border-primary-400 rounded-2xl p-6 transition-all hover:shadow-lg hover:-translate-y-0.5 flex flex-col"
             >
-              <div className="w-12 h-12 rounded-xl bg-primary-50 flex items-center justify-center mb-4">
-                <Icon size={22} className="text-primary-600" />
+              <div className="w-12 h-12 rounded-xl bg-brand-light flex items-center justify-center mb-4">
+                <Icon size={22} className="text-fg-brand" />
               </div>
-              <Typography variant="h3" weight="bold" className="text-neutral-900 mb-2 leading-tight">
+              <Typography variant="h3" weight="bold" className="text-fg mb-2 leading-tight">
                 {title}
               </Typography>
-              <Typography variant="body" className="text-neutral-600 leading-relaxed text-sm flex-1">
+              <Typography variant="body" className="text-fg-secondary leading-relaxed text-sm flex-1">
                 {body}
               </Typography>
-              <span className="inline-flex items-center gap-1.5 mt-5 text-sm font-bold text-primary-600 group-hover:text-primary-700">
+              <span className="inline-flex items-center gap-1.5 mt-5 text-sm font-bold text-fg-brand group-hover:text-fg-brand">
                 {t('compliance.resourceTeaser.openCta', 'Open')}
                 <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
               </span>

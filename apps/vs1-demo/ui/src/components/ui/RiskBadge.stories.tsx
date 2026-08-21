@@ -5,18 +5,26 @@ const DESCRIPTION = `
 **RiskBadge** — the brand-critical risk indicator, ported 1:1 from the Compass
 *⚠️ Risk Badge* page (Figma \`726:2\`).
 
-**Doctrine: risk is shown in _petrol_, never red.** Escalation happens through
-**lightness on a single petrol hue** — \`low\` (lightest) → \`critical\` (deepest) —
-so the system reads as calm and controllable even at critical severity. Red
-triggers stress and blocks decisions; petrol signals control and overview.
+**Risk is a traffic light** — green \`low\` · yellow \`medium\` · orange \`high\` ·
+red \`critical\`. (It used to be a single petrol hue escalating by lightness; the
+scale moved to the conventional colours, and \`--color-risk-*\` carries the values.)
+
+Light and dark hold **separate tones** — no colour clears 4.5:1 on both white and
+slate. The accent is chosen so its AA requirement as outline text and as a solid
+fill are the same ratio, which is why solid text is one pair for all four levels.
+
+**Colour never carries the meaning alone.** Under deuteranopia the four light-mode
+accents separate by only ΔE2000 7.1; \`medium\` and \`high\` were *identical* (ΔE 0.4)
+before \`high\` and \`critical\` were staggered down in lightness. Always ship the
+label — and give \`RiskDot\`, the one variant without one, an \`aria-label\`.
 
 - **\`level\`** — \`low\` · \`medium\` · \`high\` · \`critical\`
 - **\`styleVariant\`** — \`solid\` (full fill, dashboards) · \`soft\` (tinted, the elegant
   default for detail views) · \`outline\` (inline / filter tags) · \`dot\` (dense tables)
 - **\`size\`** — \`sm\` · \`md\` · \`lg\`
 
-\`RiskDot\` is the minimal indicator — a single petrol dot for status strips and
-very dense tables. Critical keeps a subtle petrol halo (never red).
+\`RiskDot\` is the minimal indicator — a single dot for status strips and very
+dense tables. Critical keeps a subtle halo drawn in its own tint.
 `;
 
 const meta = {

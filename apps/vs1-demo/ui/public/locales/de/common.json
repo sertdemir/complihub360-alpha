@@ -115,16 +115,16 @@
     "anchorCounsel": "In-House Counsel",
     "founders": {
       "overline": "Für Gründer & CEOs",
-      "title": "Von regulatorischer Unsicherheit zur sicheren Expansion",
-      "body": "Gründer brauchen Geschwindigkeit und Klarheit – keine akademischen Rechtserklärungen. CompliHub360 übersetzt regulatorisches Chaos in sichere, handlungsorientierte Geschäftsentscheidungen, damit Sie ohne Überraschungen grenzübergreifend skalieren können.",
-      "cta": "Expansions-Check starten",
+      "title": "Von regulatorischer Unsicherheit zur richtigen Entscheidung",
+      "body": "Gründer brauchen Geschwindigkeit und Klarheit – keine akademischen Rechtserklärungen. CompliHub360 übersetzt regulatorische Komplexität in Entscheidungen, die Sie treffen können: was für Ihr Unternehmen gilt, warum es zählt und wer dabei hilft. Die Expansion ins Ausland ist eine dieser Entscheidungen, nicht die einzige.",
+      "cta": "Compliance-Check starten",
       "pain1Title": "Der grenzüberschreitende blinde Fleck",
       "pain1Desc": "International expandieren? Umsatzsteuerschwellen, EPR-Verpackungsgesetze und DSGVO unterscheiden sich je nach Land. Eine versäumte Registrierung kann Bußgelder bedeuten.",
       "pain2Title": "Die unzuverlässige Expertenfalle",
       "pain2Desc": "Compliance-Anbieter kalt anzuschreiben und wochenlang auf vage Antworten zu warten ist keine Strategie. Es ist ein Haftungsrisiko.",
       "pain3Title": "Wir lösen das",
       "pain3Desc": "Unser KI-Assistent erfasst Ihren Kontext in 4–5 Schritten, kartiert jurisdiktionsgebundene Risiken und verbindet Sie mit SLA-gesicherten Spezialisten innerhalb von 24–48 Stunden.",
-      "diagramTitle": "Der „Sicher expandieren“-Pfad",
+      "diagramTitle": "Vom Kontext zur richtigen Fachperson",
       "node1Label": "Länder-Gate",
       "node1Desc": "Zielmarkt auswählen",
       "node2Label": "Adaptiver Assistent",
@@ -674,168 +674,6 @@
       "lead": "Sechs Minuten, vier Fragen, kein Konto nötig."
     }
   },
-  "wizard": {
-    "reviewPanel": {
-      "primaryCountry": "Hauptland",
-      "additionalMarkets": "Weitere Märkte",
-      "category": "Compliance-Kategorie",
-      "businessType": "Geschäftstyp",
-      "marketScope": "Marktabdeckung",
-      "riskSignals": "Risikosignale",
-      "revenue": "Jahresumsatz",
-      "intent": "Absicht",
-      "generateCTA": "Meine Compliance-Ergebnisse generieren",
-      "register": "Registrieren",
-      "registerDesc": "um diese Antworten später in Ihrem Dashboard zu speichern und zu bearbeiten."
-    },
-    "businessTypes": {
-      "ecommerce": {
-        "label": "E-Commerce Marke",
-        "desc": "Eigener Verkauf über Website oder Marktplatz."
-      },
-      "marketplace": {
-        "label": "Marktplatz-Verkäufer",
-        "desc": "Verkauf via Amazon, Shopify, eBay, Etsy, etc."
-      },
-      "saas": {
-        "label": "SaaS / Software",
-        "desc": "Digitale Produkte, Abos oder Software."
-      },
-      "agency": {
-        "label": "Agentur / Berater",
-        "desc": "Dienstleistungen oder Beratung für Kunden."
-      },
-      "other": {
-        "label": "Sonstiges",
-        "desc": "Erzählen Sie uns mehr über Ihr Geschäft."
-      }
-    },
-    "marketScopes": {
-      "local": {
-        "label": "Nur lokal",
-        "desc": "Ich agiere nur in meinem Hauptland."
-      },
-      "eu": {
-        "label": "EU / Europa",
-        "desc": "Ich verkaufe oder agiere in mehreren EU-Ländern."
-      },
-      "global": {
-        "label": "Global",
-        "desc": "Ich agiere auch außerhalb Europas."
-      }
-    },
-    "revenueBands": {
-      "lt10k": "< 10.000 €",
-      "mid1": "10.000–100.000 €",
-      "mid2": "100.000–1 Mio. €",
-      "gt1m": "> 1 Mio. €",
-      "perYear": "pro Jahr"
-    },
-    "intents": {
-      "selfCheck": {
-        "label": "Schneller Selbst-Check",
-        "desc": "Sofortiges Feedback zu Basis-Anforderungen."
-      },
-      "expert": {
-        "label": "Expertenrat",
-        "desc": "Sprechen Sie mit einem Spezialisten für komplexe Fälle."
-      },
-      "fullService": {
-        "label": "Full-Service",
-        "desc": "End-to-End-Management durch unser Team."
-      }
-    },
-    "urgencies": {
-      "today": "Heute",
-      "week": "Diese Woche",
-      "month": "Diesen Monat",
-      "researching": "Recherchiere nur"
-    },
-    "riskSignals": {
-      "taxVat": {
-        "marketplace": "Marktplatz-Verkäufer",
-        "crossBorder": "Grenzüberschreitender Versand",
-        "warehouse": "Lager im Ausland",
-        "digitalGoods": "Digitale Güter / Services",
-        "highVolume": "Hohes Transaktionsvolumen",
-        "vatRegistered": "Bereits USt-registriert"
-      },
-      "epr": {
-        "physicalGoods": "Verkauft physische Güter",
-        "ownPackaging": "Nutzt eigene Verpackung",
-        "dropshipper": "Dropshipper / White-Label",
-        "electronics": "Kategorie Elektronik",
-        "importer": "Importiert von außerhalb EU",
-        "recyclingFee": "Zahlt keine Recyclinggebühr"
-      },
-      "privacy": {
-        "ga4": "Google Analytics (GA4)",
-        "metaPixel": "Meta Pixel",
-        "tiktokPixel": "TikTok Pixel",
-        "emailMarketing": "E-Mail-Marketing",
-        "crmTool": "CRM / Kontaktdaten",
-        "noConsent": "Kein Consent-Management"
-      },
-      "marketing": {
-        "healthClaims": "Gesundheits- / Nahrungsergänzungs-Aussagen",
-        "guaranteed": "\"Garantiert\" oder \"#1\" Aussagen",
-        "googleAds": "Google Ads",
-        "metaAds": "Meta / Facebook Ads",
-        "influencer": "Influencer Marketing",
-        "cookiePopup": "Kein Cookie-Consent"
-      },
-      "corporate": {
-        "individual": "Noch keine juristische Person",
-        "foreign": "Gründung im Ausland",
-        "multiEntity": "Mehrere juristische Personen",
-        "remoteTeam": "Remote / internationales Team",
-        "investorReady": "Vorbereitung auf Investments"
-      },
-      "full": {
-        "multiCountry": "Aktiv in 3+ Ländern",
-        "allCategories": "Mehrere Compliance-Bereiche",
-        "fastNeeded": "Dringend / schnelle Lösung",
-        "noTeam": "Kein In-house Compliance",
-        "auditNeeded": "Compliance-Audit benötigt"
-      }
-    },
-    "steps": {
-      "context": {
-        "label": "Geschäftskontext",
-        "title": "Wie würden Sie Ihr Geschäft beschreiben?",
-        "subtitle": "Dies hilft uns, die richtigen Compliance-Fragen für Ihre Situation anzupassen.",
-        "freeTextLabel": "Erzählen Sie uns mehr über Ihr Geschäft",
-        "freeTextDesc": "Optional — hilft uns, die relevantesten Anbieter vorzuschlagen.",
-        "freeTextPlaceholder": "z.B. Ich betreibe ein Dropshipping-Business in der EU..."
-      },
-      "markets": {
-        "label": "Marktabdeckung",
-        "title": "Wo verkaufen oder agieren Sie?",
-        "subtitle": "Compliance-Anforderungen unterscheiden sich stark je nach Operationsgebiet.",
-        "showMarkets": "Spezifische weitere Märkte auswählen (Optional)",
-        "hideMarkets": "Spezifische Märkte ausblenden"
-      },
-      "risk": {
-        "label": "Risikosignale",
-        "subtitle": "Wählen Sie alle zutreffenden aus — das hilft uns, Ihr Risiko zu berechnen und die besten Anbieter zu finden.",
-        "signalsDetected": "Risikosignale",
-        "signalsWeight": "erkannt — wir werden die Anbieter-Ergebnisse entsprechend gewichten."
-      },
-      "complexity": {
-        "label": "Komplexität & Absicht",
-        "title": "Letzter Schritt — verraten Sie uns Ihre Größe & Ihr Ziel.",
-        "subtitle": "Das hilft dabei, Anbieter nach Relevanz zu ordnen und die passende Service-Stufe zu finden.",
-        "revenueLabel": "JAHRESUMSATZ",
-        "intentLabel": "WAS BRAUCHEN SIE GERADE?",
-        "urgencyLabel": "WIE DRINGEND IST DAS?"
-      }
-    },
-    "review": "Überprüfen",
-    "reviewAnswers": "Antworten überprüfen",
-    "reviewDesc": "Bestätigen Sie, dass alles richtig aussieht, bevor wir Ihre Ergebnisse generieren.",
-    "reviewAnswersButton": "Antworten überprüfen",
-    "backToPrevious": "Zurück zum vorherigen Schritt"
-  },
   "aiGov": {
     "trustCenter": "CompliHub360 Trust Center",
     "heroTitle": "KI Governance Framework",
@@ -861,7 +699,21 @@
     "featIntentTitle": "Intent Analysis Engine",
     "featIntentDesc": "Wandelt unstrukturierte Kundeneingaben in ein strukturiertes Risikoprofil um. Die KI ist auf die Analyse des Compliance-Kontexts beschränkt und kann keine rechtsverbindlichen Entscheidungen treffen.",
     "featGateTitle": "Dreifacher KI-Gate-Validator",
-    "featGateDesc": "Jede KI-Aktion muss drei Prüfungen bestehen: Datenbereinigung, ausdrückliche Zustimmung und Domänenbeschränkung. Schlägt eine Prüfung fehl, greift der Workflow auf einen deterministischen Nicht-KI-Prozess zurück."
+    "featGateDesc": "Jede KI-Aktion muss drei Prüfungen bestehen: Datenbereinigung, ausdrückliche Zustimmung und Domänenbeschränkung. Schlägt eine Prüfung fehl, greift der Workflow auf einen deterministischen Nicht-KI-Prozess zurück.",
+    "behaviour": {
+      "kicker": "Wie unsere KI sich verhält",
+      "title": "Fachlich zuerst. Menschlich immer.",
+      "lead": "Governance beschreibt die Regeln, an die wir uns binden. Hier steht, was sie bedeuten, sobald Sie das Produkt tatsächlich benutzen.",
+      "items": [
+        "Sie sagt, dass sie eine KI ist. Sie gibt sich nie als Rechtsanwältin, Steuerberater oder Zollfachkraft aus.",
+        "Sie erklärt in klarer Sprache — und nennt den Fachbegriff dazu, damit Sie ihn kennen.",
+        "Ist die Rechtslage eindeutig, sagt sie das und begründet es.",
+        "Ist sie es nicht, sagt sie auch das, statt zu raten, und verweist auf fachliche Bestätigung.",
+        "Sie nutzt weder Angst noch Dringlichkeit, um Sie zu einer Buchung zu bewegen, und erfindet keine Pflicht.",
+        "Sie übergibt an einen Menschen, sobald fachliches Urteil gefragt ist."
+      ],
+      "principle": "Technik sollte der kürzeste Weg zum richtigen Menschen sein — keine Hürde davor."
+    }
   },
   "header": {
     "nav": {
@@ -1111,6 +963,116 @@
     "cta": {
       "title": "Fangen Sie dort an, wo es für Sie Sinn ergibt.",
       "lead": "Sechs Minuten, vier Fragen, kein Konto nötig."
+    }
+  },
+  "about": {
+    "meta": {
+      "title": "Über uns · CompliHub360"
+    },
+    "eyebrow": "Über uns",
+    "title": {
+      "pre": "Immer an Ihrer ",
+      "gold": "Seite",
+      "post": "."
+    },
+    "lead": "Compliance-Entscheidungen fallen leichter, wenn Sie verstehen, was für Ihr Unternehmen tatsächlich gilt — und wenn die Plattform, die Ihnen dabei hilft, keinen Grund hat, Ihnen etwas zu verkaufen, das Sie nicht brauchen.",
+    "why": {
+      "kicker": "Warum es uns gibt",
+      "statement": "Wer wichtige Entscheidungen trifft, verdient jemanden, der wirklich auf seiner Seite steht.",
+      "body": "CompliHub360 ist aus einer Beobachtung entstanden, die sich über Jahre wiederholte: Unternehmen hatten Zugang zu vielen Anbietern, aber keinen neutralen Ort, an dem sie ihren Bedarf verstehen konnten, bevor das Verkaufsgespräch begann. Wir stellen Klarheit, Wissen und Wahlfreiheit an den Anfang."
+    },
+    "purpose": {
+      "title": "Zweck",
+      "body": "Unternehmen zu befähigen, informierte Entscheidungen mit Zuversicht zu treffen — und dabei ihren Bedarf an die erste Stelle zu setzen."
+    },
+    "mission": {
+      "title": "Auftrag",
+      "body": "Unternehmen überall in die Lage zu versetzen, ihre Compliance-Anforderungen zu verstehen und zu steuern: durch verlässliches Wissen, verständliche Technik und Zugang zu den richtigen Fachleuten — über ihren gesamten unternehmerischen Weg hinweg."
+    },
+    "vision": {
+      "title": "Vision",
+      "body": "Der Ort zu werden, an den sich Unternehmen weltweit bei Compliance zuerst wenden. Für eine transparentere Branche, in der Wissen bessere Entscheidungen ermöglicht, Qualität den Wettbewerb bestimmt und aus Zusammenarbeit langfristige Beziehungen werden."
+    },
+    "behave": {
+      "kicker": "Wie wir arbeiten",
+      "items": [
+        "Wissen vor Verkauf.",
+        "Fragen, bevor wir annehmen.",
+        "Fachlich zuerst. Menschlich immer.",
+        "Wir erzeugen keinen Bedarf. Wir erkennen ihn.",
+        "Gleicher Respekt. Passende Tiefe.",
+        "Vertrauen entsteht durch Erfahrung."
+      ]
+    },
+    "close": "Die Komplexität gehört uns. Die Einfachheit gehört Ihnen.",
+    "cta": {
+      "title": "Sehen Sie, was für Ihr Unternehmen gilt.",
+      "lead": "Die Ermittlung ist kostenlos, braucht kein Konto und dauert wenige Minuten."
+    }
+  },
+  "a11y": {
+    "skipToContent": "Zum Inhalt springen"
+  },
+  "seo": {
+    "home": {
+      "title": "CompliHub360 · Compliance verstehen und umsetzen",
+      "description": "Die Regeln für Ihre Märkte auf einer Risk Map, mit Quelle hinter jeder Pflicht — und der Weg zu geprüften Spezialisten. Kostenlos, ohne Konto."
+    },
+    "howItWorks": {
+      "title": "So funktioniert es · CompliHub360",
+      "description": "Von einer Frage zur Risk Map und zur passenden Fachperson. Fünf Schritte, kein Verkaufsgespräch, keine Verpflichtung."
+    },
+    "compliance": {
+      "title": "Compliance-Bereiche · CompliHub360",
+      "description": "Acht Bereiche von Steuern und USt über EPR bis Datenschutz: was jeweils gilt, wie dringend es ist und wer bei der Umsetzung hilft."
+    },
+    "markets": {
+      "title": "Märkte · CompliHub360",
+      "description": "Acht Märkte mit ihren regulatorischen Schwerpunkten — Deutschland, Vereinigtes Königreich, Niederlande, Frankreich, Italien, Spanien, USA und Türkei."
+    },
+    "pricing": {
+      "title": "Preise · CompliHub360",
+      "description": "Einschätzung, Risk Map und Matching kosten Sie nichts. Bezahlt wird von den Fachleuten, und erst wenn ein Termin zustande kommt."
+    },
+    "resources": {
+      "title": "Ressourcen · CompliHub360",
+      "description": "Wo Sie weiterlesen können: Märkte und die dort geltenden Regeln, die acht Compliance-Bereiche und der Weg von der Frage zur Fachperson."
+    },
+    "about": {
+      "title": "Über uns · CompliHub360",
+      "description": "Warum es CompliHub360 gibt, wofür wir stehen und wie wir arbeiten — Wissen vor Verkauf, fragen bevor wir annehmen."
+    },
+    "platform": {
+      "title": "Die Plattform · CompliHub360",
+      "description": "Wie aus Ihrem Geschäftskontext eine strukturierte Risk Map wird: Datenschutz-Gate, Analyse mit Quellenbindung und das Matching dahinter."
+    },
+    "solutions": {
+      "title": "Nach Rolle · CompliHub360",
+      "description": "Was CompliHub360 für Gründer, Operations-Teams und In-House-Counsel leistet — von der ersten Frage bis zur umgesetzten Pflicht."
+    },
+    "aiGovernance": {
+      "title": "KI-Governance · CompliHub360",
+      "description": "In welchem Rahmen unsere KI arbeitet und wie sie sich verhält: sechs Dimensionen der Governance und klare Zusagen im Umgang mit Ihnen."
+    },
+    "privacy": {
+      "title": "Datenschutzerklärung · CompliHub360",
+      "description": "Wie CompliHub360 personenbezogene Daten verarbeitet, auf welcher Rechtsgrundlage und welche Rechte Sie dabei haben."
+    },
+    "terms": {
+      "title": "AGB · CompliHub360",
+      "description": "Die Allgemeinen Geschäftsbedingungen für die Nutzung von CompliHub360."
+    },
+    "imprint": {
+      "title": "Impressum · CompliHub360",
+      "description": "Anbieterkennzeichnung und Kontaktangaben zu CompliHub360."
+    },
+    "cookies": {
+      "title": "Cookie-Richtlinie · CompliHub360",
+      "description": "Welche Cookies CompliHub360 setzt, wozu sie dienen und wie Sie Ihre Auswahl jederzeit ändern."
+    },
+    "marketCountry": {
+      "title": "{{country}} · Märkte · CompliHub360",
+      "description": "Welche Compliance-Pflichten in {{country}} gelten, wie stark die Bereiche dort gewichtet sind und mit welcher Rechtsquelle."
     }
   }
 }

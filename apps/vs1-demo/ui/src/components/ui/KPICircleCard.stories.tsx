@@ -11,7 +11,7 @@ Mirrors the Compass set 680:415 (Cards page): **Layout** (Horizontal · Centered
 - \`centered\` — label top, big ring center, trend bottom (hero card).
 
 Reuses \`CircleProgress\` for the ring. Error is the **one** place red is sanctioned;
-all other risk signalling stays on the petrol scale ("Niemals rot.").
+all other risk signalling stays on the RiskBadge traffic light.
 `;
 
 const meta = {

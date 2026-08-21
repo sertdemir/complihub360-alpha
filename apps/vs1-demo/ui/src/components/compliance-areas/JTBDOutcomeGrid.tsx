@@ -63,14 +63,14 @@ export function JTBDOutcomeGrid({ onScrollToFirstArea }: OutcomeProps) {
         <div>
           <Typography
             variant="caption"
-            className="text-primary-500 font-semibold uppercase tracking-wider mb-2 block"
+            className="text-fg-brand font-semibold uppercase tracking-wider mb-2 block"
           >
             {t('compliance.jtbd.overline', 'Choose your outcome')}
           </Typography>
-          <Typography variant="h2" weight="bold" className="text-neutral-900">
+          <Typography variant="h2" weight="bold" className="text-fg">
             {t('compliance.jtbd.title', 'What progress are you trying to make?')}
           </Typography>
-          <Typography variant="body" className="text-neutral-600 mt-2 max-w-2xl">
+          <Typography variant="body" className="text-fg-secondary mt-2 max-w-2xl">
             {t(
               'compliance.jtbd.body',
               'CompliHub360 routes you to the right tool based on the job you need done — not the feature you think you need.',
@@ -93,18 +93,18 @@ export function JTBDOutcomeGrid({ onScrollToFirstArea }: OutcomeProps) {
               viewport={{ once: true }}
               transition={{ duration: 0.35, delay: i * 0.06 }}
               onClick={o.onClick}
-              className="group text-left bg-white border border-neutral-200 hover:border-primary-400 rounded-2xl p-5 transition-all hover:shadow-lg hover:-translate-y-0.5 flex flex-col h-full"
+              className="group text-left bg-surface border border-stroke hover:border-primary-400 rounded-2xl p-5 transition-all hover:shadow-lg hover:-translate-y-0.5 flex flex-col h-full"
             >
               <div className="w-10 h-10 rounded-lg bg-surface-tertiary flex items-center justify-center mb-4">
-                <Icon size={20} className="text-primary-700" />
+                <Icon size={20} className="text-fg-brand" />
               </div>
-              <Typography variant="ui-small" weight="bold" className="text-neutral-900 mb-1.5 leading-snug">
+              <Typography variant="ui-small" weight="bold" className="text-fg mb-1.5 leading-snug">
                 {title}
               </Typography>
-              <Typography variant="caption" className="text-neutral-600 normal-case tracking-normal leading-snug flex-1">
+              <Typography variant="caption" className="text-fg-secondary normal-case tracking-normal leading-snug flex-1">
                 {body}
               </Typography>
-              <span className="inline-flex items-center gap-1 mt-4 text-xs font-bold text-primary-600 group-hover:text-primary-700">
+              <span className="inline-flex items-center gap-1 mt-4 text-xs font-bold text-fg-brand group-hover:text-fg-brand">
                 {cta}
                 <ArrowRight size={12} className="transition-transform group-hover:translate-x-0.5" />
               </span>

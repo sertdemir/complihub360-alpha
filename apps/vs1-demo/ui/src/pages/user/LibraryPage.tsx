@@ -50,7 +50,7 @@ export function LibraryPage() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="font-serif text-[32px] font-bold leading-tight text-fg">
-              <Trans t={t} i18nKey="library.title" components={{ accent: <span className="text-fg-accent" /> }} />
+              <Trans t={t} i18nKey="library.title" components={{ accent: <span className="text-fg-accent-emphasis" /> }} />
             </h1>
             <p className="mt-1 text-body-sm text-fg-secondary">{t('library.sub')}</p>
           </div>
@@ -80,7 +80,7 @@ export function LibraryPage() {
             return (
               <Card key={item.title} styleVariant="filled" interactive className="p-4">
                 <div className="flex items-start gap-3">
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-white/[0.06] text-fg-brand">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-elevate/[0.06] text-fg-brand">
                     <Icon size={15} />
                   </span>
                   <div className="min-w-0">

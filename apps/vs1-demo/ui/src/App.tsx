@@ -1,4 +1,6 @@
-import { useEffect } from "react";
+import { lazy, useEffect } from "react";
+import { trackScrollDepth } from "./lib/analytics";
+import { useSeo } from "./hooks/useSeo";
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, useParams, Navigate, Outlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supportedLngs } from "./i18n/config";
@@ -13,42 +15,50 @@ import { MarketsIndexPage, MarketPage } from "./pages/MarketsPage";
 import { ResultsRiskMap } from "./pages/ResultsRiskMap";
 import { SearchResultPage } from "./pages/SearchResultPage";
 import { ResourcesPage } from "./pages/ResourcesPage";
+import { AboutPage } from './pages/AboutPage';
 import { AiGovernancePage } from "./pages/AiGovernancePage";
 import { PrivacyPage, ImprintPage, TermsPage, CookiePage } from "./pages/legal/LegalPages";
-import { AdminOverviewPage } from "./pages/admin/AdminOverviewPage";
-import { CockpitPage } from "./pages/admin/CockpitPage";
-import { AdminEventsPage } from "./pages/admin/AdminEventsPage";
-import { AdminComingSoonPage } from "./pages/admin/AdminComingSoonPage";
-import { ProviderMagicActionPage } from "./pages/provider/ProviderMagicActionPage";
-import { ConfirmEmailPage } from "./pages/provider/ConfirmEmailPage";
-import { RequestsPage } from "./pages/provider/RequestsPage";
-import { LeadsPage } from "./pages/provider/LeadsPage";
-import { PerformancePage } from "./pages/provider/PerformancePage";
-import { CoveragePage } from "./pages/provider/CoveragePage";
-import { BillingPage } from "./pages/provider/BillingPage";
-import { SettingsPage } from "./pages/provider/SettingsPage";
-import { NotificationsPage } from "./pages/provider/NotificationsPage";
-import { UserHomePage } from "./pages/user/UserHomePage";
-import { SessionsPage } from "./pages/user/SessionsPage";
-import { UserRequestsPage } from "./pages/user/UserRequestsPage";
-import { TerminePage } from "./pages/user/TerminePage";
+
+// Rollen-Bereiche werden nachgeladen, nicht mitgeliefert. Bis 20.08. steckte
+// der komplette Admin-, Provider-, User-, Auth- und Onboarding-Code im selben
+// Chunk wie die Marketing-Seiten: wer /de/imprint aufrief, lud die
+// Partner-Abrechnung und das Admin-Cockpit mit. recharts haengt ueber
+// MetricCard nur an zwei Admin-Seiten und verschwindet damit ebenfalls aus
+// dem Einstiegs-Chunk. Die Suspense-Grenze steht in main.tsx.
+const AdminOverviewPage = lazy(() => import("./pages/admin/AdminOverviewPage").then((m) => ({ default: m.AdminOverviewPage })));
+const CockpitPage = lazy(() => import("./pages/admin/CockpitPage").then((m) => ({ default: m.CockpitPage })));
+const AdminEventsPage = lazy(() => import("./pages/admin/AdminEventsPage").then((m) => ({ default: m.AdminEventsPage })));
+const AdminComingSoonPage = lazy(() => import("./pages/admin/AdminComingSoonPage").then((m) => ({ default: m.AdminComingSoonPage })));
+const ProviderMagicActionPage = lazy(() => import("./pages/provider/ProviderMagicActionPage").then((m) => ({ default: m.ProviderMagicActionPage })));
+const ConfirmEmailPage = lazy(() => import("./pages/provider/ConfirmEmailPage").then((m) => ({ default: m.ConfirmEmailPage })));
+const RequestsPage = lazy(() => import("./pages/provider/RequestsPage").then((m) => ({ default: m.RequestsPage })));
+const LeadsPage = lazy(() => import("./pages/provider/LeadsPage").then((m) => ({ default: m.LeadsPage })));
+const PerformancePage = lazy(() => import("./pages/provider/PerformancePage").then((m) => ({ default: m.PerformancePage })));
+const CoveragePage = lazy(() => import("./pages/provider/CoveragePage").then((m) => ({ default: m.CoveragePage })));
+const BillingPage = lazy(() => import("./pages/provider/BillingPage").then((m) => ({ default: m.BillingPage })));
+const SettingsPage = lazy(() => import("./pages/provider/SettingsPage").then((m) => ({ default: m.SettingsPage })));
+const NotificationsPage = lazy(() => import("./pages/provider/NotificationsPage").then((m) => ({ default: m.NotificationsPage })));
+const UserHomePage = lazy(() => import("./pages/user/UserHomePage").then((m) => ({ default: m.UserHomePage })));
+const SessionsPage = lazy(() => import("./pages/user/SessionsPage").then((m) => ({ default: m.SessionsPage })));
+const UserRequestsPage = lazy(() => import("./pages/user/UserRequestsPage").then((m) => ({ default: m.UserRequestsPage })));
+const TerminePage = lazy(() => import("./pages/user/TerminePage").then((m) => ({ default: m.TerminePage })));
 import { ProviderDetailPage } from "./pages/ProviderDetailPage";
 import { ProviderSchedulePage } from "./pages/ProviderSchedulePage";
-import { WorkbenchPage } from "./pages/user/WorkbenchPage";
-import { UserNotificationsPage } from "./pages/user/UserNotificationsPage";
-import { SavedProvidersPage } from "./pages/user/SavedProvidersPage";
-import { ExportsPage } from "./pages/user/ExportsPage";
-import { ComingSoonPage } from "./pages/user/ComingSoonPage";
-import { LibraryPage } from "./pages/user/LibraryPage";
+const WorkbenchPage = lazy(() => import("./pages/user/WorkbenchPage").then((m) => ({ default: m.WorkbenchPage })));
+const UserNotificationsPage = lazy(() => import("./pages/user/UserNotificationsPage").then((m) => ({ default: m.UserNotificationsPage })));
+const SavedProvidersPage = lazy(() => import("./pages/user/SavedProvidersPage").then((m) => ({ default: m.SavedProvidersPage })));
+const ExportsPage = lazy(() => import("./pages/user/ExportsPage").then((m) => ({ default: m.ExportsPage })));
+const ComingSoonPage = lazy(() => import("./pages/user/ComingSoonPage").then((m) => ({ default: m.ComingSoonPage })));
+const LibraryPage = lazy(() => import("./pages/user/LibraryPage").then((m) => ({ default: m.LibraryPage })));
 // Wizard Shell Steps
 // Individualized Category Wizards
 // Auth
-import { LoginPage } from "./pages/auth/LoginPage";
-import { ProviderIntakePage } from "./pages/onboarding/ProviderIntakePage";
-import { RegisterPage } from "./pages/auth/RegisterPage";
-import { EmailVerificationPage } from "./pages/auth/EmailVerificationPage";
-import { AuthCallbackPage } from "./pages/auth/AuthCallbackPage";
-import { ResetPasswordPage } from "./pages/auth/ResetPasswordPage";
+const LoginPage = lazy(() => import("./pages/auth/LoginPage").then((m) => ({ default: m.LoginPage })));
+const ProviderIntakePage = lazy(() => import("./pages/onboarding/ProviderIntakePage").then((m) => ({ default: m.ProviderIntakePage })));
+const RegisterPage = lazy(() => import("./pages/auth/RegisterPage").then((m) => ({ default: m.RegisterPage })));
+const EmailVerificationPage = lazy(() => import("./pages/auth/EmailVerificationPage").then((m) => ({ default: m.EmailVerificationPage })));
+const AuthCallbackPage = lazy(() => import("./pages/auth/AuthCallbackPage").then((m) => ({ default: m.AuthCallbackPage })));
+const ResetPasswordPage = lazy(() => import("./pages/auth/ResetPasswordPage").then((m) => ({ default: m.ResetPasswordPage })));
 import { AuthGuard } from "./components/auth/AuthGuard";
 import { AnimatedWizard } from "./components/home/AnimatedWizard";
 
@@ -99,9 +109,15 @@ function LocaleLayout() {
     const { i18n } = useTranslation();
 
     useEffect(() => {
-        if (locale && supportedLngs.includes(locale) && i18n.resolvedLanguage !== locale) {
+        if (!locale || !supportedLngs.includes(locale)) return;
+        if (i18n.resolvedLanguage !== locale) {
             i18n.changeLanguage(locale);
         }
+        // index.html ships lang="en". Without this every locale claimed to be
+        // English: screen readers spoke German legal copy with English phonetics
+        // (WCAG 3.1.1), and MarketsDrawer reads this attribute to build the
+        // magic-link return URL — so every signup returned to /en/results.
+        document.documentElement.lang = locale;
     }, [locale, i18n]);
 
     if (!locale || !supportedLngs.includes(locale)) {
@@ -111,12 +127,41 @@ function LocaleLayout() {
     return <Outlet />;
 }
 
+function SkipToContent() {
+    const { t } = useTranslation('common');
+    return (
+        <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-brand focus:px-4 focus:py-2 focus:text-[15px] focus:font-semibold focus:text-fg-on-brand focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-stroke-focus"
+        >
+            {t('a11y.skipToContent', { defaultValue: 'Skip to content' })}
+        </a>
+    );
+}
+
 function AppContent() {
     const location = useLocation();
 
+    // Titel, Description, Canonical, hreflang und Open Graph — zentral statt je
+    // Seite, damit eine neue Route ihren Kopf aus lib/publicRoutes.ts bekommt.
+    useSeo();
+
+    // Scroll depth per page view. Re-armed on every navigation so the milestones
+    // are per page, not per session; a no-op unless Plausible is configured.
+    useEffect(() => trackScrollDepth(location.pathname), [location.pathname]);
+
     return (
         <>
+            {/* Bypass Blocks (WCAG 2.4.1). Bis 20.08. gab es auf KEINER Seite einen
+                Weg an den ~10 Kopfzeilen-Links vorbei, und fuenf Seiten hatten
+                nicht einmal ein <main>, an dem eine Landmark-Navigation greifen
+                koennte. Das Ziel ist deshalb ein eigener Anker direkt vor den
+                Routen — der funktioniert unabhaengig davon, was die Seite selbst
+                fuer eine Struktur mitbringt. tabIndex={-1} macht ihn
+                fokussierbar, ohne ihn in die Tab-Reihenfolge zu haengen. */}
+            <SkipToContent />
             <SiteHeader />
+            <div id="main-content" tabIndex={-1} className="outline-none">
             <Routes location={location}>
                 <Route path="/:locale" element={<LocaleLayout />}>
                     {/* Public pages */}
@@ -131,6 +176,7 @@ function AppContent() {
                     <Route path="markets" element={<MarketsIndexPage />} />
                     <Route path="markets/:code" element={<MarketPage />} />
                     <Route path="resources" element={<ResourcesPage />} />
+                    <Route path="about" element={<AboutPage />} />
                     <Route path="ai-governance" element={<AiGovernancePage />} />
                     <Route path="results" element={<ResultsRiskMap />} />
                     {/* Station 1A: prose-search answers page (no risk map, no gating). */}
@@ -210,6 +256,7 @@ function AppContent() {
                 <Route path="/" element={<RootRedirect />} />
                 <Route path="*" element={<RootRedirect />} />
             </Routes>
+            </div>
 
         </>
     );

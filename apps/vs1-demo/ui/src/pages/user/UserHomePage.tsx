@@ -40,8 +40,10 @@ const SESSIONS = [
   { eyebrow: 'TAX & VAT · ES', title: 'VAT thresholds · Spain', meta: '● Low risk · monitoring only · Updated 7d ago', risk: 'low' },
 ];
 
+// Traffic light straight off the risk tokens — these were hardcoded to a red and
+// an amber that existed in no scale, so they never followed the theme.
 const RISK_META: Record<string, string> = {
-  high: 'text-[#e0556b]', medium: 'text-[#e6a514]', low: 'text-fg-tertiary',
+  high: 'text-risk-high', medium: 'text-risk-medium', low: 'text-risk-low',
 };
 
 // Fixture UI labels → userws keys (display only; fixture data stays original).
@@ -76,10 +78,11 @@ export function UserHomePage() {
   const tAction = (label: string) => (ACTION_KEY[label] ? t(`actions.${ACTION_KEY[label]}`) : label);
   // A6: same PII-free PDF snapshot as on /results, from the resume panel.
   // Translated at the render point (results namespace); canonical EN fallback.
-  const exportPdf = () => {
+  // async, seit jspdf erst beim Klick geladen wird (lib/riskMapPdf.ts).
+  const exportPdf = async () => {
     let profile = null;
     try { profile = JSON.parse(localStorage.getItem('ch360_last_profile') || 'null'); } catch { /* fixture */ }
-    generateRiskMapPdf({
+    await generateRiskMapPdf({
       profile,
       t: tResults,
       stats: STATS.map((s, i) => ({ value: s.value, label: tResults(`stats.${i}.label`, { defaultValue: s.label }) })),
@@ -104,7 +107,7 @@ export function UserHomePage() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="font-serif text-[32px] font-bold leading-tight text-fg">
-              <Trans t={t} i18nKey="home.title" values={{ name: firstName }} components={{ accent: <span className="text-fg-accent" /> }} />
+              <Trans t={t} i18nKey="home.title" values={{ name: firstName }} components={{ accent: <span className="text-fg-accent-emphasis" /> }} />
             </h1>
             <p className="mt-1 text-body-sm text-fg-secondary">
               {t('home.sub')}
@@ -113,12 +116,15 @@ export function UserHomePage() {
           <Button className="mt-1 shrink-0" onClick={() => navigate(`/${locale}/wizard`)}>{t('shared.startNewSearch')}</Button>
         </div>
 
-        <Card styleVariant="filled" className="flex items-center gap-4 border border-[#d4af37]/25 p-5">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#d4af37]/15 text-[#d4af37]">
+        <Card styleVariant="filled" className="flex items-center gap-4 border border-brand-accent/25 p-5">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-accent/15 text-fg-accent-strong">
             <Play size={16} fill="currentColor" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-accent">{t('home.resumeEyebrow')}</p>
+            {/* accent-STRONG, not accent: at 10px this needs the full 4.5:1, and
+                gold-500 measures 2.01 on a light card. The strong stop keeps the
+                gold in both themes — 6.43 light, 8.49 dark. */}
+            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-accent-strong">{t('home.resumeEyebrow')}</p>
             <p className="mt-0.5 text-[16px] font-semibold text-fg">VAT registration · Italy</p>
             <p className="mt-0.5 text-[12px] text-fg-tertiary">{t('home.resumeMeta')}</p>
           </div>

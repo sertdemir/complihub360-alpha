@@ -84,7 +84,7 @@ export function CoveragePage() {
         <section className="space-y-3">
           <SectionHeader title={t('coverage.publicIdentityTitle')} sub={t('coverage.publicIdentitySub')} editLabel={t('coverage.edit')} />
           <Card styleVariant="outlined" className="flex items-center gap-4 p-4">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#d4af37] text-[13px] font-bold text-[#101411]">DC</span>
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-accent text-[13px] font-bold text-fg-on-accent">DC</span>
             <div className="min-w-0">
               <p className="font-serif text-[17px] font-semibold text-fg">Dahlmann CPA Steuerberatungs GmbH</p>
               <p className="mt-0.5 truncate text-[12px] text-fg-secondary">

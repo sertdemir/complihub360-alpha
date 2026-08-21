@@ -49,6 +49,9 @@ export interface ProviderMatchCardProps extends Omit<React.HTMLAttributes<HTMLDi
   isVerified?: boolean;
   /** Specialization tags, max ~3. */
   tags?: string[];
+  /** Why this score is this score — a short ✓/gap list. The card renders it but
+   *  does not compose it: only the caller knows what the user actually asked for. */
+  matchBasis?: React.ReactNode;
   /** Countries / languages line. e.g. "IT · DE · EN". */
   countries?: React.ReactNode;
   /** Rating line. e.g. "4,8 · 128 Mandate". */
@@ -64,7 +67,7 @@ export interface ProviderMatchCardProps extends Omit<React.HTMLAttributes<HTMLDi
 
 export function ProviderMatchCard({
   title, eyebrow, match, matchTier = 'high', isVerified = true,
-  tags, countries, rating, responseTime, billing, action, onDetails,
+  tags, matchBasis, countries, rating, responseTime, billing, action, onDetails,
   className, ...rest
 }: ProviderMatchCardProps) {
   return (
@@ -83,8 +86,12 @@ export function ProviderMatchCard({
           {eyebrow && <p className="text-[13px] text-fg-tertiary">{eyebrow}</p>}
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1.5">
+          {/* Gold-700 (#96802a) misst auf dem 10-%-Goldgrund 3.88:1 und reisst bei
+              11 px die AA-Schwelle. accent-800 haelt dieselbe Goldfamilie und
+              kommt ueber 4.5:1 — gleiche Korrektur wie beim Verified-Badge auf
+              /compliance. Dunkel bleibt gold-500, dort ist der Grund dunkel. */}
           {isVerified && (
-            <span className="flex items-center gap-1 rounded-full border border-[#d4af37]/40 bg-[#d4af37]/10 px-2 py-[3px] text-[11px] font-medium text-[#96802a] dark:text-[#d4af37]">
+            <span className="flex items-center gap-1 rounded-full border border-[#d4af37]/40 bg-[#d4af37]/10 px-2 py-[3px] text-[11px] font-medium text-accent-800 dark:text-[#d4af37]">
               <CheckIcon /> Verified Partner
             </span>
           )}
@@ -103,6 +110,7 @@ export function ProviderMatchCard({
             ))}
           </div>
         )}
+        {matchBasis}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[14px] text-fg-tertiary">
           {countries && <span>{countries}</span>}
           {rating && <span className="flex items-center gap-1 text-fg"><StarIcon />{rating}</span>}

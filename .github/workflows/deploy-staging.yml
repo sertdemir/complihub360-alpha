@@ -61,6 +61,13 @@ jobs:
           VITE_SUPABASE_URL: https://kqylqwogxbiwpnomkzsn.supabase.co
           VITE_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtxeWxxd29neGJpd3Bub21renNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1NDI1MjgsImV4cCI6MjA5OTExODUyOH0.sReK_846Tx-fawVO71Ojy5zJ3uF7Y4xvxGH0Md45Ptk
           VITE_DEMO_LOGIN: '1'
+          # Leer, solange die Repository-Variablen nicht gesetzt sind — dann
+          # injiziert index.html kein Analytics-Skript. Setzen aktiviert es.
+          VITE_PLAUSIBLE_DOMAIN: ${{ vars.PLAUSIBLE_DOMAIN }}
+          VITE_PLAUSIBLE_HOST: ${{ vars.PLAUSIBLE_HOST }}
+          # Leer => das SEO-Plugin ueberspringt Sitemap, robots.txt und die
+          # Routen-HTMLs. Ohne Origin waere jedes Canonical geraten.
+          VITE_SITE_ORIGIN: ${{ vars.SITE_ORIGIN }}
         run: |
           npm run build --workspace apps/vs1-demo/ui
           printf 'User-agent: *\nDisallow: /\n' > apps/vs1-demo/ui/dist/robots.txt

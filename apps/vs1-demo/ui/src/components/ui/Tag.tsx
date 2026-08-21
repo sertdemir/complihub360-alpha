@@ -11,7 +11,11 @@ const TONE: Record<TagTone, string> = {
   neutral: 'bg-neutral-100 text-neutral-700 dark:bg-white/10 dark:text-neutral-200',
   brand: 'bg-primary-50 text-primary-700 dark:bg-primary-500/25 dark:text-primary-200',
   success: 'bg-success-bg text-success-700 dark:bg-emerald-500/15 dark:text-emerald-300',
-  warning: 'bg-warning-bg text-warning-700 dark:bg-amber-500/15 dark:text-amber-300',
+  // warning-700 on the warning tint is 4.08 at this 12px size — the one tone in
+  // this set that misses. Its siblings clear comfortably (success 5.50, error
+  // 6.48, info 6.38) because yellow simply runs lighter at the same ramp stop,
+  // so warning alone steps down to 800: 6.69.
+  warning: 'bg-warning-bg text-warning-800 dark:bg-amber-500/15 dark:text-amber-300',
   error: 'bg-error-bg text-error-700 dark:bg-red-500/15 dark:text-red-300',
   info: 'bg-info-bg text-info-700 dark:bg-sky-500/15 dark:text-sky-300',
 };

@@ -115,16 +115,16 @@
     "anchorCounsel": "Kurum İçi Hukuk Danışmanları",
     "founders": {
       "overline": "Kurucular ve CEO'lar için",
-      "title": "Mevzuat belirsizliğinden güvenli genişlemeye",
-      "body": "Kurucuların akademik hukuki açıklamalara değil, hıza ve netliğe ihtiyacı vardır. CompliHub360, mevzuat kaosunu sınır ötesi ölçeklendirmenizi sağlayan güvenli, eyleme geçirilebilir iş kararlarına dönüştürür.",
-      "cta": "Genişleme Kontrolünüzü Başlatın",
+      "title": "Mevzuat belirsizliğinden doğru karara",
+      "body": "Kurucuların akademik hukuki açıklamalara değil, hıza ve netliğe ihtiyacı vardır. CompliHub360, mevzuat karmaşıklığını uygulayabileceğiniz kararlara dönüştürür: işletmeniz için neyin geçerli olduğu, bunun neden önemli olduğu ve kimin yardımcı olabileceği. Sınır ötesi büyüme bu kararlardan biridir, tek karar değil.",
+      "cta": "Uyum Kontrolünü Başlatın",
       "pain1Title": "Sınır ötesi kör nokta",
       "pain1Desc": "Uluslararası genişliyor musunuz? KDV eşikleri, EPR ambalaj yasaları ve GDPR ülkeye göre farklılık gösterir. Kaçırılan bir kayıt para cezası anlamına gelebilir.",
       "pain2Title": "Güvenilmez uzman tuzağı",
       "pain2Desc": "Uyumluluk sağlayıcılarına soğuk e-posta göndermek ve haftalarca belirsiz yanıtlar beklemek bir strateji değildir. Bu bir sorumluluktur.",
       "pain3Title": "Biz bunu çözüyoruz",
       "pain3Desc": "Yapay zeka Asistanımız bağlamınızı 4-5 adımda yakalar, yargı bölgesine özgü riskleri haritalandırır ve sizi 24-48 saat içinde SLA güvenceli uzmanlarla buluşturur.",
-      "diagramTitle": "«Güvenli Genişle» Yolu",
+      "diagramTitle": "Bağlamdan doğru uzmana",
       "node1Label": "Ülke Kapısı",
       "node1Desc": "Hedef pazar seçin",
       "node2Label": "Uyarlanabilir Asistan",
@@ -674,168 +674,6 @@
       "lead": "Altı dakika, dört soru, hesap gerekmiyor."
     }
   },
-  "wizard": {
-    "reviewPanel": {
-      "primaryCountry": "Ana Ülke",
-      "additionalMarkets": "Ek Pazarlar",
-      "category": "Uyumluluk Kategorisi",
-      "businessType": "İşletme Türü",
-      "marketScope": "Pazar Kapsamı",
-      "riskSignals": "Risk Sinyalleri",
-      "revenue": "Yıllık Gelir",
-      "intent": "Niyet",
-      "generateCTA": "Uyumluluk Sonuçlarımı Oluştur",
-      "register": "Kayıt Ol",
-      "registerDesc": "bu cevapları daha sonra panelinizde kaydetmek ve düzenlemek için."
-    },
-    "businessTypes": {
-      "ecommerce": {
-        "label": "E-Ticaret Markası",
-        "desc": "Web siteniz veya pazar yeri üzerinden kendi ürünlerinizi satın."
-      },
-      "marketplace": {
-        "label": "Pazar Yeri Satıcısı",
-        "desc": "Amazon, Shopify, eBay, Etsy vb. üzerinden satın."
-      },
-      "saas": {
-        "label": "SaaS / Yazılım",
-        "desc": "Dijital ürünler, abonelikler veya yazılım hizmetleri."
-      },
-      "agency": {
-        "label": "Ajans / Danışman",
-        "desc": "Müşteriler için hizmet, danışmanlık veya yaratıcı çalışmalar."
-      },
-      "other": {
-        "label": "Diğer",
-        "desc": "Bize işletmeniz hakkında biraz daha bilgi verin."
-      }
-    },
-    "marketScopes": {
-      "local": {
-        "label": "Sadece Yerel",
-        "desc": "Sadece ana ülkemde faaliyet gösteriyorum."
-      },
-      "eu": {
-        "label": "AB / Avrupa",
-        "desc": "Birden fazla AB ülkesinde satıyor veya faaliyet gösteriyorum."
-      },
-      "global": {
-        "label": "Küresel",
-        "desc": "Avrupa dışındaki pazarlarda faaliyet gösteriyorum."
-      }
-    },
-    "revenueBands": {
-      "lt10k": "< 10.000 €",
-      "mid1": "10.000–100.000 €",
-      "mid2": "100.000–1 Milyon €",
-      "gt1m": "> 1 Milyon €",
-      "perYear": "yıllık"
-    },
-    "intents": {
-      "selfCheck": {
-        "label": "Hızlı Otokontrol",
-        "desc": "Temel gereksinimler hakkında anında geri bildirim alın."
-      },
-      "expert": {
-        "label": "Uzman tavsiyesi",
-        "desc": "Karmaşık durumlar için bir uzmanla konuşun."
-      },
-      "fullService": {
-        "label": "Tam hizmet",
-        "desc": "Ekibimiz tarafından uçtan uca yönetim."
-      }
-    },
-    "urgencies": {
-      "today": "Bugün",
-      "week": "Bu hafta",
-      "month": "Bu ay",
-      "researching": "Sadece araştırıyorum"
-    },
-    "riskSignals": {
-      "taxVat": {
-        "marketplace": "Pazar yeri satıcısı",
-        "crossBorder": "Sınır ötesi nakliye",
-        "warehouse": "Yurtdışında depo",
-        "digitalGoods": "Dijital ürünler / hizmetler",
-        "highVolume": "Yüksek işlem hacmi",
-        "vatRegistered": "Zaten KDV kayıtlı"
-      },
-      "epr": {
-        "physicalGoods": "Fiziksel ürün satıyor",
-        "ownPackaging": "Özel ambalaj kullanıyor",
-        "dropshipper": "Dropshipper / markasız",
-        "electronics": "Elektronik kategorisi",
-        "importer": "AB dışından ithalat",
-        "recyclingFee": "Geri dönüşüm ücreti ödemiyor"
-      },
-      "privacy": {
-        "ga4": "Google Analytics (GA4)",
-        "metaPixel": "Meta Pixel",
-        "tiktokPixel": "TikTok Pixel",
-        "emailMarketing": "E-posta pazarlama",
-        "crmTool": "CRM / iletişim verileri",
-        "noConsent": "Onay yönetimi yok"
-      },
-      "marketing": {
-        "healthClaims": "Sağlık / takviye iddiaları",
-        "guaranteed": "\"Garantili\" veya \"#1\" iddiaları",
-        "googleAds": "Google Ads",
-        "metaAds": "Meta / Facebook Ads",
-        "influencer": "Influencer pazarlama",
-        "cookiePopup": "Çerez onayı yok"
-      },
-      "corporate": {
-        "individual": "Henüz yasal bir kişilik yok",
-        "foreign": "Yurtdışında kayıt olma",
-        "multiEntity": "Birden fazla kuruluş",
-        "remoteTeam": "Uzaktan / uluslararası ekip",
-        "investorReady": "Yatırıma hazırlanıyor"
-      },
-      "full": {
-        "multiCountry": "3+ ülkede faaliyette",
-        "allCategories": "Birden fazla uyumluluk alanı",
-        "fastNeeded": "Acil / hızlı dönüş",
-        "noTeam": "Kurum içi uyumluluk yok",
-        "auditNeeded": "Uyumluluk denetimine ihtiyaç var"
-      }
-    },
-    "steps": {
-      "context": {
-        "label": "İş Bağlamı",
-        "title": "İşletmenizi nasıl tanımlarsınız?",
-        "subtitle": "Bu, durumunuz için doğru uyumluluk sorularını uyarlamamıza yardımcı olur.",
-        "freeTextLabel": "Bize işletmeniz hakkında daha fazla bilgi verin",
-        "freeTextDesc": "İsteğe bağlı — en alakalı sağlayıcıları önermemize yardımcı olur.",
-        "freeTextPlaceholder": "ör. AB pazarlarında bir dropshipping işi yürütüyorum..."
-      },
-      "markets": {
-        "label": "Pazar Kapsamı",
-        "title": "Nerede satıyor veya faaliyet gösteriyorsunuz?",
-        "subtitle": "Uyumluluk gereksinimleri faaliyet kapsamınıza bağlı olarak önemli ölçüde değişir.",
-        "showMarkets": "Belirli ek pazarları seçin (İsteğe bağlı)",
-        "hideMarkets": "Belirli pazarları gizle"
-      },
-      "risk": {
-        "label": "Risk Sinyalleri",
-        "subtitle": "Size uyan tüm seçenekleri işaretleyin — bu, risk seviyenizi hesaplamamıza ve en iyi sağlayıcıları bulmamıza yardımcı olur.",
-        "signalsDetected": "risk sinyali",
-        "signalsWeight": "tespit edildi — sağlayıcı sonuçlarını buna göre ağırlıklandıracağız."
-      },
-      "complexity": {
-        "label": "Karmaşıklık ve Niyet",
-        "title": "Son adım — bize ölçeğinizi ve hedefinizi söyleyin.",
-        "subtitle": "Bu, sağlayıcıları uygunluk durumuna göre sıralamamıza ve doğru hizmet kademesiyle eşleştirmemize yardımcı olur.",
-        "revenueLabel": "YILLIK GELİR",
-        "intentLabel": "ŞU ANDA NEYE İHTİYACINIZ VAR?",
-        "urgencyLabel": "BU NE KADAR ACİL?"
-      }
-    },
-    "review": "İncele",
-    "reviewAnswers": "Cevaplarınızı inceleyin",
-    "reviewDesc": "Sonuçlarınızı oluşturmadan önce her şeyin doğru göründüğünü onaylayın.",
-    "reviewAnswersButton": "Cevapları İncele",
-    "backToPrevious": "Önceki adıma dön"
-  },
   "aiGov": {
     "trustCenter": "CompliHub360 Trust Center",
     "heroTitle": "Yapay Zeka Yönetişimi Çerçevesi",
@@ -861,7 +699,21 @@
     "featIntentTitle": "Niyet Analizi Motoru",
     "featIntentDesc": "Yapılandırılmamış müşteri girdisini yapılandırılmış bir risk profiline dönüştürür. Yapay zeka yalnızca uyumluluk bağlamını analiz etmekle sınırlıdır ve yasal olarak bağlayıcı kararlar alamaz.",
     "featGateTitle": "Üçlü Yapay Zeka Kapısı Doğrulayıcı",
-    "featGateDesc": "Her yapay zeka eylemi üç kontrolden geçmelidir: Veri Temizliği, Açık Rıza ve Etki Alanı Kısıtlaması. Herhangi bir kontrol başarısız olursa, iş akışı yapay zeka olmayan deterministik bir sürece geri döner."
+    "featGateDesc": "Her yapay zeka eylemi üç kontrolden geçmelidir: Veri Temizliği, Açık Rıza ve Etki Alanı Kısıtlaması. Herhangi bir kontrol başarısız olursa, iş akışı yapay zeka olmayan deterministik bir sürece geri döner.",
+    "behaviour": {
+      "kicker": "Yapay zekâmız nasıl davranır",
+      "title": "Önce uzmanlık. Her zaman insan.",
+      "lead": "Yönetişim, kendimizi bağladığımız kuralları tanımlar. Burada bunların, ürünü gerçekten kullandığınızda ne anlama geldiği yazıyor.",
+      "items": [
+        "Yapay zekâ olduğunu söyler. Kendini asla avukat, mali müşavir veya gümrük uzmanı olarak tanıtmaz.",
+        "Anlaşılır bir dille açıklar ve teknik terimi de belirtir, böylece siz de öğrenirsiniz.",
+        "Hukuki durum açıksa bunu söyler ve gerekçesini açıklar.",
+        "Açık değilse tahmin etmek yerine bunu da söyler ve uzman onayına yönlendirir.",
+        "Sizi randevuya yönlendirmek için korku ya da aciliyet kullanmaz, yükümlülük uydurmaz.",
+        "Uzman değerlendirmesi gerektiği anda konuyu bir insana devreder."
+      ],
+      "principle": "Teknoloji, doğru insana giden en kısa yol olmalıdır — önündeki bir engel değil."
+    }
   },
   "header": {
     "nav": {
@@ -1111,6 +963,116 @@
     "cta": {
       "title": "Sizin için anlamlı olan yerden başlayın.",
       "lead": "Altı dakika, dört soru, hesap gerekmiyor."
+    }
+  },
+  "about": {
+    "meta": {
+      "title": "Hakkımızda · CompliHub360"
+    },
+    "eyebrow": "Hakkımızda",
+    "title": {
+      "pre": "Her zaman ",
+      "gold": "yanınızda",
+      "post": "."
+    },
+    "lead": "Uyum kararları, işletmeniz için gerçekte neyin geçerli olduğunu anladığınızda ve size yardımcı olan platformun ihtiyacınız olmayan bir şeyi satmak için hiçbir nedeni olmadığında kolaylaşır.",
+    "why": {
+      "kicker": "Neden varız",
+      "statement": "Önemli kararlar veren işletmeler, gerçekten yanlarında olan birini hak eder.",
+      "body": "CompliHub360, yıllarca aynı sorunu görmenin ardından kuruldu: işletmelerin birçok hizmet sağlayıcıya erişimi vardı, ancak bir satış görüşmesine girmeden önce ihtiyaçlarını anlayabilecekleri tarafsız bir yer yoktu. Netliği, bilgiyi ve seçme özgürlüğünü öne almak için varız."
+    },
+    "purpose": {
+      "title": "Amacımız",
+      "body": "İşletmeleri, ihtiyaçlarını her zaman ön planda tutarak bilinçli kararları güvenle almaya güçlendirmek."
+    },
+    "mission": {
+      "title": "Misyonumuz",
+      "body": "Dünyanın her yerindeki işletmelerin uyum ihtiyaçlarını güvenilir bilgi, anlaşılır teknoloji ve doğru uzmanlara erişim yoluyla anlamasını ve yönetmesini sağlamak; bunu tüm iş yolculukları boyunca sürdürmek."
+    },
+    "vision": {
+      "title": "Vizyonumuz",
+      "body": "Uyum konusunda dünya genelinde işletmelerin ilk başvurduğu yer olmak; bilginin daha iyi kararlar sağladığı, rekabeti kalitenin belirlediği ve kalıcı ilişkilerin kurulduğu daha şeffaf bir sektöre katkıda bulunmak."
+    },
+    "behave": {
+      "kicker": "Nasıl çalışıyoruz",
+      "items": [
+        "Satıştan önce bilgi.",
+        "Varsaymadan önce sormak.",
+        "Önce uzmanlık. Her zaman insan.",
+        "İhtiyaç yaratmayız. İhtiyacı tespit ederiz.",
+        "Aynı saygı. Uygun derinlik.",
+        "Güven, deneyimle kazanılır."
+      ]
+    },
+    "close": "Karmaşıklık bize ait. Sadelik size ait.",
+    "cta": {
+      "title": "İşletmeniz için neyin geçerli olduğunu görün.",
+      "lead": "Değerlendirme ücretsizdir, hesap gerektirmez ve birkaç dakika sürer."
+    }
+  },
+  "a11y": {
+    "skipToContent": "İçeriğe geç"
+  },
+  "seo": {
+    "home": {
+      "title": "CompliHub360 · Uyumu anlayın ve uygulayın",
+      "description": "Pazarlarınızın kuralları tek bir risk haritasında, her yükümlülüğün arkasında kaynağıyla — ve doğrulanmış uzmanlara giden yol. Ücretsiz, hesapsız."
+    },
+    "howItWorks": {
+      "title": "Nasıl çalışır · CompliHub360",
+      "description": "Bir sorudan risk haritasına ve doğru uzmana. Beş adım, satış görüşmesi yok, yükümlülük yok."
+    },
+    "compliance": {
+      "title": "Uyum alanları · CompliHub360",
+      "description": "Vergi ve KDV'den EPR'ye ve veri gizliliğine sekiz alan: neyin geçerli olduğu, ne kadar acil olduğu ve kimin yardımcı olduğu."
+    },
+    "markets": {
+      "title": "Pazarlar · CompliHub360",
+      "description": "Sekiz pazar ve düzenleyici ağırlıkları: Almanya, Birleşik Krallık, Hollanda, Fransa, İtalya, İspanya, ABD ve Türkiye."
+    },
+    "pricing": {
+      "title": "Fiyatlar · CompliHub360",
+      "description": "Değerlendirme, risk haritası ve eşleştirme size hiçbir şeye mal olmaz. Uzmanlar öder, o da yalnızca randevu kesinleştiğinde."
+    },
+    "resources": {
+      "title": "Kaynaklar · CompliHub360",
+      "description": "Nereden devam edebilirsiniz: pazarlar ve orada geçerli kurallar, sekiz uyum alanı ve sorudan uzmana giden yol."
+    },
+    "about": {
+      "title": "Hakkımızda · CompliHub360",
+      "description": "CompliHub360 neden var, neyi savunur ve nasıl çalışır — satıştan önce bilgi, varsaymadan önce sormak."
+    },
+    "platform": {
+      "title": "Platform · CompliHub360",
+      "description": "İş bağlamınız nasıl yapılandırılmış bir risk haritasına dönüşür: gizlilik kapısı, kaynağa bağlı analiz ve arkasındaki eşleştirme."
+    },
+    "solutions": {
+      "title": "Role göre · CompliHub360",
+      "description": "CompliHub360'ın kurucular, operasyon ekipleri ve şirket içi hukuk için yaptıkları — ilk sorudan çözülmüş yükümlülüğe."
+    },
+    "aiGovernance": {
+      "title": "Yapay zekâ yönetişimi · CompliHub360",
+      "description": "Yapay zekâmızın çalıştığı çerçeve ve nasıl davrandığı: altı yönetişim boyutu ve size karşı net taahhütler."
+    },
+    "privacy": {
+      "title": "Gizlilik politikası · CompliHub360",
+      "description": "CompliHub360 kişisel verileri nasıl işler, hangi hukuki dayanakla ve hangi haklara sahipsiniz."
+    },
+    "terms": {
+      "title": "Koşullar · CompliHub360",
+      "description": "CompliHub360 kullanımına ilişkin genel koşullar."
+    },
+    "imprint": {
+      "title": "Künye · CompliHub360",
+      "description": "CompliHub360 için sağlayıcı bilgileri ve iletişim."
+    },
+    "cookies": {
+      "title": "Çerez politikası · CompliHub360",
+      "description": "CompliHub360'ın hangi çerezleri kullandığı, ne işe yaradıkları ve seçiminizi nasıl değiştirebileceğiniz."
+    },
+    "marketCountry": {
+      "title": "{{country}} · Pazarlar · CompliHub360",
+      "description": "{{country}} ülkesinde hangi uyum yükümlülüklerinin geçerli olduğu, alanların nasıl ağırlıklandırıldığı ve hukuki kaynağı."
     }
   }
 }

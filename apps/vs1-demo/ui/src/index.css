@@ -13,7 +13,7 @@
        Source: Compass Color foundation page (a4BeKbsBGoHkcudhKXUJTl · 18:4)
        ============================================================ */
 
-    /* Petrol — brand anchor + risk-severity scale (risk is never red) */
+    /* Petrol — brand anchor. (Risk moved off this scale to a traffic light.) */
     --petrol-50: 235 241 240;
     --petrol-100: 209 223 221;
     --petrol-200: 168 194 190;
@@ -78,8 +78,28 @@
        One token cannot do both, which is why this one exists — and why it is
        deliberately the same value in both themes. */
     --color-bg-brand-surface: var(--petrol-500);
+    /* Brand CTA fill for grounds that DO NOT flip. LoginPage, ResetPasswordPage
+       and ProviderOnboardingPage paint a dark page with a bare hex and carry no
+       .dark class, so --color-bg-brand resolves to its LIGHT value there: petrol
+       #004d40 on #0b1620, a button that all but disappears. Same value in both
+       themes on purpose — like --color-bg-brand-surface above.
+       It replaces a rogue #0e6450 that sat in no scale and measured 2.57:1
+       against the auth ground, under the 3:1 WCAG 1.4.11 wants for a control's
+       boundary; this reads 6.17. Takes -on-brand-fixed as its label: white on
+       this teal is 2.96:1, the ink 6.38. */
+    --color-bg-brand-fixed: 20 168 154;          /* #14a89a */
+    --color-text-on-brand-fixed: 4 20 15;        /* #04140f */
     --color-bg-accent: var(--gold-500);
     --color-bg-accent-light: var(--gold-50);
+
+    /* ── ELEVATION ────────────────────────────────────────────────────────
+       Depth in the app workspace is built from translucent overlays, not from
+       distinct surface colours: bg-elevate/5 for a raised panel, border-elevate/10
+       for a hairline. The DIRECTION flips between themes — dark mode lifts a
+       surface by adding white, light mode by adding ink. One token, because the
+       alpha does the work; hardcoding white here is what makes a dark-only
+       component invisible the moment the theme flips. */
+    --color-elevate: 15 23 42;          /* ink #0f172a — light mode darkens */
 
     /* Text */
     --color-text-primary: var(--neutral-900);   /* #0f172a */
@@ -95,6 +115,11 @@
        white, 3.69:1 on bg-secondary, 3.21:1 on the warm canvas. AA-LARGE ONLY —
        never use this at body size, use --color-text-brand there. */
     --color-text-accent-emphasis: var(--gold-700);
+    /* Gold at CAPTION size. --color-text-accent-emphasis is AA-LARGE only; a 10px
+       gold eyebrow on a light card needs the full 4.5:1 and gold-700 reaches
+       only 3.71. gold-800 measures 6.43 on bg-secondary. Use this wherever gold
+       has to carry small text; use -emphasis for the headline word. */
+    --color-text-accent-strong: var(--gold-800);
     /* Gold emphasis on the always-dark brand panel. Fixed in both themes on
        purpose: --color-text-accent-emphasis steps down to gold-700 for light
        surfaces, which on this deep petrol drops to 2.54:1.
@@ -129,21 +154,29 @@
     --color-interactive-primary-active: var(--petrol-700);
     --color-interactive-primary-disabled: var(--neutral-300);
 
-    /* Risk — petrol scale (NEVER red). Exact values from Compass "⚠️ Risk Badge"
-       page (726:2). Escalation via lightness on a single petrol hue:
-       low (lightest) → critical (deepest). */
-    --color-risk-low: 168 194 190;
-    --color-risk-medium: 66 123 114;
-    --color-risk-high: 0 46 38;
-    --color-risk-critical: 0 22 18;
-    --color-risk-low-bg: 209 223 221;
-    --color-risk-medium-bg: 168 194 190;
-    --color-risk-high-bg: 209 223 221;
-    --color-risk-critical-bg: 235 241 240;
-    --color-risk-text-on-low: var(--petrol-700);
-    --color-risk-text-on-medium: var(--petrol-800);
-    --color-risk-text-on-high: var(--petrol-800);
-    --color-risk-text-on-critical: var(--petrol-900);
+    /* Risk — traffic light: green → yellow → orange → red. Replaces the former
+       petrol-only scale; the dashboard spec had called for red/amber all along.
+       No tone survives a theme change, so light and dark carry separate values —
+       see the .dark block. The accent doubles as outline text, so it clears 4.5:1
+       on the page (worst 4.72 on --color-bg-secondary); as a solid fill it takes
+       WHITE text, which is the same ratio.
+       Medium and High are the pair red/green deficiency collapses: at yellow-700
+       vs orange-700 they were ΔE2000 0.4 apart under deuteranopia — identical.
+       High and Critical are therefore pushed down to L* 34.1 / 28.1, which lifts
+       the worst CVD pair to ΔE 7.1 (deuteranopia) / 7.6 (protanopia). The badge
+       label still carries the meaning; colour alone never does. */
+    --color-risk-low: 21 128 61;                /* #15803D  5.02:1 on white */
+    --color-risk-medium: 161 98 7;              /* #A16207  4.92:1 */
+    --color-risk-high: 143 49 16;               /* #8F3110  8.03:1 */
+    --color-risk-critical: 127 29 29;           /* #7F1D1D 10.02:1 */
+    --color-risk-low-bg: 187 247 208;           /* #BBF7D0 */
+    --color-risk-medium-bg: 254 240 138;        /* #FEF08A */
+    --color-risk-high-bg: 254 215 170;          /* #FED7AA */
+    --color-risk-critical-bg: 254 202 202;      /* #FECACA */
+    --color-risk-text-on-low: 20 83 45;         /* #14532D  7.52:1 on its -bg */
+    --color-risk-text-on-medium: 113 63 18;     /* #713F12  7.45:1 */
+    --color-risk-text-on-high: 124 45 18;       /* #7C2D12  6.92:1 */
+    --color-risk-text-on-critical: 127 29 29;   /* #7F1D1D  6.93:1 */
 
     /* ============================================================
        COMPASS — RADIUS (9 stops · default 2xl=12px)
@@ -249,12 +282,28 @@
     --color-bg-inverse: 255 255 255;
     --drawer-glass-bg: rgba(31, 41, 55, 0.50);  /* slate #1f2937 @ 50% — floating glass drawer */
     --color-bg-brand: 20 168 154;
+    /* Was unmapped and stayed petrol-500 — 1.49:1 against the slate surface,
+       which is no border at all. Follows --color-bg-brand to the lighter
+       dark-mode teal: 4.96:1, clearing the 3:1 that non-text contrast needs. */
+    --color-border-brand: 20 168 154;
     --color-bg-brand-light: 29 61 71;
+    /* Was unmapped and therefore stayed gold-50 (253 248 230) on the dark slate:
+       --color-text-primary on it measured 1.02:1, i.e. invisible. Flattened like
+       its brand sibling above — gold-500 at 16% over neutral-800 — so the fill
+       still reads as gold while text on it holds 10.03:1. Triplet, not rgba(),
+       otherwise every /NN modifier on this token stops resolving. */
+    --color-bg-accent-light: 60 62 55;
     /* Restated, not flipped: on #14a89a white is 2.96:1 and every gold in the
        scale is below 1.9:1 — nothing readable sits on it. The panel therefore
        keeps the deep petrol in dark mode, where white stays at 9.83:1 and the
        gold eyebrow at 4.57:1. */
     --color-bg-brand-surface: var(--petrol-500);
+    /* Restated, not flipped — see the light block. */
+    --color-bg-brand-fixed: 20 168 154;          /* #14a89a */
+    --color-text-on-brand-fixed: 4 20 15;        /* #04140f */
+    /* White, i.e. exactly what bg-white/5 and border-white/10 resolved to before
+       — dark mode is unchanged by the elevation migration. */
+    --color-elevate: 255 255 255;
     /* bg-brand flips to the light teal #14a89a in dark, and every button uses
        THAT token (bg-brand-surface is only the BrandCodePreview panel, which
        hardcodes text-white). White inherited from :root sat at 2.96:1 on those
@@ -262,40 +311,59 @@
     --color-text-on-brand: 0 11 9;      /* petrol-900 #000b09 */
     --color-text-primary: 245 246 248;
     --color-text-secondary: 154 167 173;
-    /* Was #6b7a80 = 3.30:1 on #1f2937 — below AA for the 11-13 px labels this
-       token is made for (footer column headings, separators, disclaimers).
-       #86959c gives 4.75:1 on #1f2937 and 5.77:1 on #0f172a. Chosen over the
-       lighter #8b9aa1 (5.06:1) to keep the step down from --color-text-secondary
-       (#9aa7ad) legible: 1.25 apart rather than 1.18, so the two ranks still
-       read as two ranks. */
-    --color-text-tertiary: 134 149 156;
+    /* Tuned to the LIGHTEST dark ground this token actually lands on, not to
+       --color-bg-primary. Walking eight workspace routes turns up seven distinct
+       composited grounds for it, and two of them sit lighter than the #1f2937 the
+       previous value was fitted to. The predecessor #86959c cleared 4.75 there but
+       only 4.44 on SessionRow's teal wash (#1b3039), which is where its 11px
+       "· Updated 2h ago" lives — below AA on the surface it was most used on.
+       #8c9aa1 clears every ground carrying real text: 4.74 (#1b3039), 5.07
+       (#1f2937), 5.51-5.52 (cards), 6.17-6.21 (bg-secondary, sidebar).
+       The cost is the step down from --color-text-secondary (#9aa7ad), which
+       narrows from 1.25 to 1.17. That is the reason the earlier value stopped
+       where it did, and it is a real loss - but a rank that is legible and slightly
+       closer beats a rank that is distinct and unreadable.
+       Deliberately NOT chased: bg-elevate/[0.06] chips composite to #2c3643, where
+       this reads 4.23. Only a colour emoji sits there today. Reaching it needs
+       #919fa5, which collapses the step to 1.10 - at that point secondary and
+       tertiary stop reading as two ranks. If small text ever needs that chip, the
+       chip should darken, not the token. */
+    --color-text-tertiary: 140 154 161;   /* #8c9aa1 */
     --color-text-inverse: 15 23 42;
     --color-text-brand: 44 192 173;
     /* On slate the step-down is unnecessary and wrong: gold-500 is 6.98:1 on
        #1f2937 and 8.49:1 on #0f172a, so dark surfaces keep the full gold. */
     --color-text-accent-emphasis: var(--gold-500);
+    /* Dark inverts the problem: gold-800 drops to 2.66 on the dark card while
+       gold-500 holds 8.49, so the strong stop and the emphasis stop coincide. */
+    --color-text-accent-strong: var(--gold-500);
     --color-border-default: 55 65 81;
     --color-border-subtle: 42 51 64;
     --color-border-focus: 20 168 154;
     --color-icon-default: 154 167 173;
-    /* Risk scale on dark: escalate by brightness (brighter petrol = more urgent),
-       translucent tints for the soft surface. Keeps the petrol identity. */
-    --color-risk-low: 94 124 116;
-    --color-risk-medium: 37 141 120;
-    --color-risk-high: 61 180 154;
-    --color-risk-critical: 95 211 184;
-    --color-risk-low-bg: 43 58 69;
-    --color-risk-medium-bg: 32 61 68;
-    --color-risk-high-bg: 37 69 75;
-    --color-risk-critical-bg: 46 82 86;
-    /* Text ON the soft risk surfaces. These were dark inks carried over from light
-       mode; once the translucent *-bg tints above are flattened they sit on a dark
-       ground and drop to 1.47-2.21:1. Now light, tuned to >=4.6:1 on their own -bg
-       while keeping the petrol identity and the brightness escalation. */
-    --color-risk-text-on-low: 141 169 161;     /* #8da9a1 */
-    --color-risk-text-on-medium: 48 183 156;   /* #30b79c */
-    --color-risk-text-on-high: 69 192 165;     /* #45c0a5 */
-    --color-risk-text-on-critical: 95 211 184; /* #5fd3b8 */
+    /* Risk on dark — same traffic light, different tones. The light values sit at
+       L* 28-47 and would land at 1.2-2.5:1 on slate, so the scale moves up to the
+       400/500 range. Ratios below are on --color-bg-primary (#1f2937); on the
+       deeper #0f172a they are ~1.2x higher. As a solid fill each takes INK text.
+       Low is #6EE7A5 rather than a pure green: it lifts the worst CVD pair from
+       ΔE 7.2 to 9.4, and still sits ΔE 15.5 clear of the dark brand teal #2cc0ad.
+       Medium is the known compromise — ΔE 8.9 from brand gold #d4af37, which is
+       close. It survives because gold reads muted/metallic (L* 74, C* 40) against
+       a highlighter yellow (L* 84, C* 89), but do not put a gold word-highlight
+       and a Medium badge in the same headline. */
+    --color-risk-low: 110 231 165;              /* #6EE7A5  9.53:1 on slate */
+    --color-risk-medium: 250 204 21;            /* #FACC15  9.59:1 */
+    --color-risk-high: 251 146 60;              /* #FB923C  6.49:1 */
+    --color-risk-critical: 248 113 113;         /* #F87171  5.31:1 */
+    --color-risk-low-bg: 20 83 45;              /* #14532D */
+    --color-risk-medium-bg: 113 63 18;          /* #713F12 */
+    --color-risk-high-bg: 124 45 18;            /* #7C2D12 */
+    --color-risk-critical-bg: 127 29 29;        /* #7F1D1D */
+    /* Text ON the soft risk surfaces — light tints of the same hue. */
+    --color-risk-text-on-low: 134 239 172;      /* #86EFAC  6.49:1 on its -bg */
+    --color-risk-text-on-medium: 253 230 138;   /* #FDE68A  6.96:1 */
+    --color-risk-text-on-high: 253 186 116;     /* #FDBA74  5.56:1 */
+    --color-risk-text-on-critical: 252 165 165; /* #FCA5A5  5.28:1 */
 
     /* shadcn back-compat vars (HSL) — dark SLATE so bg-background /
        bg-card / border-border / text-foreground flip with the .dark class. */
@@ -350,4 +418,18 @@ html {
 section[id],
 footer[id] {
   scroll-margin-top: 96px;
+}
+
+/* CSS-Animationen und -Transitions, die framer-motion nicht kennt. Der
+   MotionConfig-Schalter in main.tsx deckt die motion-Komponenten ab; dieser
+   Block faengt den Rest (Tailwind-Transitions, @keyframes, Smooth-Scroll). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

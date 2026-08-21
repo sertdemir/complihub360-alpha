@@ -220,7 +220,7 @@
     "sla12hSub": "recommended",
     "sla24hTitle": "Confirm within 24h",
     "sla24hSub": "standard",
-    "slaNote": "Faster targets lift your rank — but missing them hurts your trust score. Pick what you can reliably hit."
+    "slaNote": "Faster targets lift your rank — but missing them hurts your quality score. Pick what you can reliably hit."
   },
   "notifications": {
     "title": "Notifications",
@@ -248,7 +248,7 @@
     "descRq0234": "EPR setup for DE marketplace launch · €4.2M revenue · 91% match score · SLA 24h from now",
     "descRq0233": "VAT review for DE+AT · €1.8M revenue · OSS expansion · 84% match score",
     "descRq0232": "Reminder #1 (T+24h) sent · 14h 12m remaining before reroute · DPIA workshop for SaaS company",
-    "descEngagementClosed": "Client marked engagement complete · 5-star rating · €3,600 invoiced · trust_score +2",
+    "descEngagementClosed": "Client marked engagement complete · 5-star rating · €3,600 invoiced · quality_score +2",
     "actionOpenRq": "Open {{id}} →"
   },
   "performance": {
@@ -278,11 +278,11 @@
     "movePlus3": "+3 positions",
     "movePlus1": "+1 position",
     "moveNoChange": "no change",
-    "trustTitle": "Trust score breakdown",
-    "trustSub": "Composite of 5 signals · improve lowest to climb fastest",
-    "trustProfileCompleteness": "Profile completeness",
-    "trustProjectCompletion": "Project completion (no cancels)",
-    "trustClientSatisfaction": "Client satisfaction"
+    "qualityTitle": "Quality score breakdown",
+    "qualitySub": "Composite of 5 signals · improve lowest to climb fastest",
+    "qualityProfileCompleteness": "Profile completeness",
+    "qualityProjectCompletion": "Project completion (no cancels)",
+    "qualityClientSatisfaction": "Client satisfaction"
   },
   "magicAction": {
     "partnerBadge": "Partner",

@@ -25,6 +25,16 @@ i18n
     nonExplicitSupportedLngs: true,
     debug: false,
 
+    // Ohne diese beiden faellt i18next auf seinen eingebauten Standard-Namespace
+    // 'translation' zurueck und fordert /locales/<lng>/translation.json an — eine
+    // Datei, die es hier nie gab. Der SPA-Fallback beantwortete das mit
+    // index.html und HTTP 200, i18next parste HTML als JSON: zwei ueberfluessige
+    // Roundtrips PRO Seitenaufruf (angeforderte Sprache + en) plus ein
+    // dauerhafter Konsolenfehler. Die uebrigen Namespaces laedt jede Komponente
+    // weiterhin selbst nach, wenn sie useTranslation('home') o. ae. aufruft.
+    defaultNS: 'common',
+    ns: ['common'],
+
     // Priority: explicit URL locale beats the user's saved choice beats the
     // device/region language. Once the toggle is used, localStorage wins.
     detection: {

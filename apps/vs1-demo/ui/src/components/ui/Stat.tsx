@@ -6,7 +6,7 @@ import { cn } from '../../lib/utils';
 // A single KPI: an eyebrow label, a large tabular value, and an optional trend
 // chip (▲ success / ▼ error / – neutral) with a caption. Layout-only — drop it
 // into a Card for a metric tile, or in a row for a performance strip. NOTE: this
-// is a neutral metric, not a risk signal — risk uses the petrol RiskBadge scale.
+// is a neutral metric, not a risk signal — risk uses the RiskBadge scale.
 
 export type StatSize = 'sm' | 'md' | 'lg';
 export type TrendDirection = 'up' | 'down' | 'neutral';

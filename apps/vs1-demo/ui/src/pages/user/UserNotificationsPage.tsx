@@ -80,7 +80,7 @@ export function UserNotificationsPage() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="font-serif text-[32px] font-bold leading-tight text-fg">
-              <span className="text-fg-accent">{t('notifications.title')}</span>
+              <span className="text-fg-accent-emphasis">{t('notifications.title')}</span>
             </h1>
             <p className="mt-1 text-body-sm text-fg-secondary">{t('notifications.sub')}</p>
           </div>
@@ -119,7 +119,7 @@ export function UserNotificationsPage() {
                 unread={n.unread}
                 interactive={!!n.engagementId || !!n.bookingId}
                 onClick={n.engagementId || n.bookingId ? () => openItem(n) : undefined}
-                avatar={<span className="grid h-9 w-9 place-items-center rounded-full bg-white/[0.06] text-[13px] text-fg-tertiary">🔔</span>}
+                avatar={<span className="grid h-9 w-9 place-items-center rounded-full bg-elevate/[0.06] text-[13px] text-fg-tertiary">🔔</span>}
               />
             ))}
           </section>

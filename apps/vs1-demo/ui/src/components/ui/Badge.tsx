@@ -6,8 +6,8 @@ import { cn } from '../../lib/utils';
 // Compass "Badge" page. Small label, big meaning. Covers the non-risk badge
 // families: status/label badges (tone × appearance × size), an optional leading
 // dot, and the removable filter chip (trailing ✕). The interactive, toggleable
-// filter chip is `FilterChip` below. The petrol risk scale lives in its own
-// brand-critical component — see RiskBadge ("Petrol-Skala. Niemals rot.").
+// filter chip is `FilterChip` below. The risk scale lives in its own
+// brand-critical component — see RiskBadge (traffic light, own tokens).
 
 export type BadgeTone = 'neutral' | 'brand' | 'accent' | 'success' | 'warning' | 'error' | 'info';
 export type BadgeAppearance = 'solid' | 'soft' | 'outline';

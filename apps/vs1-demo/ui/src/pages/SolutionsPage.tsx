@@ -59,21 +59,21 @@ function StatCard({ value, label, delay }: { value: string; label: string; delay
       initial={{ opacity: 0, scale: 0.9 }}
       animate={isInView ? { opacity: 1, scale: 1 } : {}}
       transition={{ duration: 0.4, delay }}
-      className="bg-white border border-neutral-200 rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow"
+      className="bg-surface border border-stroke rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow"
     >
-      <Typography variant="display" weight="bold" className="text-primary-600 block mb-1">
+      <Typography variant="display" as="span" weight="bold" className="text-fg-brand block mb-1">
         {value}
       </Typography>
-      <Typography variant="caption" className="text-neutral-500 block normal-case tracking-normal">
+      <Typography variant="caption" className="text-fg-tertiary block normal-case tracking-normal">
         {label}
       </Typography>
     </motion.div>
   );
 }
 
-// ─── Diagram: Founders "Expand Safely" Path ───────────────────────────────────
+// ─── Diagram: Founders context-to-specialist path ───────────────────────────────────
 
-function ExpandSafelyPath() {
+function ContextToSpecialistPath() {
   const { t } = useTranslation('common');
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-60px' });
@@ -87,8 +87,8 @@ function ExpandSafelyPath() {
 
   return (
     <div ref={ref} className="bg-primary-900 rounded-2xl p-8 overflow-hidden">
-      <Typography variant="ui-small" weight="bold" className="text-primary-400 uppercase tracking-widest mb-6 block text-center">
-        {t('solutions.founders.diagramTitle', 'The "Expand Safely" Path')}
+      <Typography variant="ui-small" weight="bold" className="text-primary-300 uppercase tracking-widest mb-6 block text-center">
+        {t('solutions.founders.diagramTitle', 'From context to the right specialist')}
       </Typography>
       <div className="flex flex-col tablet:flex-row items-stretch gap-4 tablet:gap-0 relative">
         {nodes.map((node, i) => (
@@ -115,7 +115,7 @@ function ExpandSafelyPath() {
               <Typography variant="ui-small" weight="bold" className="text-white text-center block mb-0.5">
                 {node.label}
               </Typography>
-              <Typography variant="caption" className="text-primary-400 text-center block normal-case tracking-normal">
+              <Typography variant="caption" className="text-primary-300 text-center block normal-case tracking-normal">
                 {node.desc}
               </Typography>
             </div>
@@ -145,7 +145,7 @@ function OpsDashboardPreview() {
       title: t('solutions.operations.panel2Title', 'Active Requests'),
       desc: t('solutions.operations.panel2Desc', 'Provider engagement status'),
       items: [
-        { text: t('solutions.operations.statusDraft', 'Draft'), color: 'bg-neutral-200 text-neutral-600' },
+        { text: t('solutions.operations.statusDraft', 'Draft'), color: 'bg-surface-tertiary text-fg-secondary' },
         { text: t('solutions.operations.statusSubmitted', 'Submitted'), color: 'bg-warning-bg text-warning-text' },
         { text: t('solutions.operations.statusConfirmed', 'Confirmed'), color: 'bg-success-bg text-success-text' },
       ] as { text: string; color: string }[],
@@ -170,7 +170,7 @@ function OpsDashboardPreview() {
         >
           <div className="flex items-center gap-3 mb-4">
             <div className="w-9 h-9 rounded-lg bg-primary-500/15 flex items-center justify-center">
-              <panel.icon size={18} className="text-primary-400" />
+              <panel.icon size={18} className="text-primary-300" />
             </div>
             <div>
               <Typography variant="ui-small" weight="bold" className="text-white block">
@@ -241,7 +241,7 @@ function PrivacyGateDiagram() {
               {s.desc}
             </Typography>
             {i < stages.length - 1 && (
-              <ArrowRight size={16} className="hidden tablet:block absolute -right-2.5 top-6 text-neutral-600" />
+              <ArrowRight size={16} className="hidden tablet:block absolute -right-2.5 top-6 text-fg-secondary" />
             )}
           </motion.div>
         ))}
@@ -254,8 +254,11 @@ function PrivacyGateDiagram() {
         transition={{ duration: 0.5, delay: 0.5 }}
         className="mt-6 bg-neutral-800 border border-neutral-700 rounded-xl p-4 font-mono text-xs"
       >
+        {/* This block is a fixed dark code view in BOTH themes (bg-neutral-800), so one
+            value serves both. The highlight ground composites to #4c363f, where
+            error-300 reads 4.26 at 12px — just under. error-200 gives 6.10. */}
         <div className="text-neutral-400 mb-2">{t('solutions.counsel.codeCommentBefore', '// Before redaction')}</div>
-        <div className="text-neutral-300">Contract signed by <span className="bg-error-500/30 text-error-300 px-1 rounded">John Mueller</span> at <span className="bg-error-500/30 text-error-300 px-1 rounded">john@acme.de</span></div>
+        <div className="text-neutral-300">Contract signed by <span className="bg-error-500/30 text-error-200 px-1 rounded">John Mueller</span> at <span className="bg-error-500/30 text-error-200 px-1 rounded">john@acme.de</span></div>
         <div className="text-neutral-400 mt-3 mb-2">{t('solutions.counsel.codeCommentAfter', '// After redaction')}</div>
         <div className="text-neutral-300">Contract signed by <span className="bg-success-bg text-success-text px-1 rounded">[NAME]</span> at <span className="bg-success-bg text-success-text px-1 rounded">[EMAIL]</span></div>
       </motion.div>
@@ -290,7 +293,7 @@ function AnchorBar() {
   }, []);
 
   return (
-    <div className="sticky top-16 z-40 bg-white/80 backdrop-blur-md border-b border-neutral-100">
+    <div className="sticky top-16 z-40 bg-surface/80 backdrop-blur-md border-b border-stroke-subtle">
       <div className="max-w-7xl mx-auto px-6">
         <nav className="flex items-center justify-center gap-1 overflow-x-auto scrollbar-hide py-2">
           {anchors.map(a => (
@@ -298,7 +301,7 @@ function AnchorBar() {
               key={a.id}
               onClick={() => document.getElementById(a.id)?.scrollIntoView({ behavior: 'smooth' })}
               className={`px-4 py-2 rounded-md text-ui-small font-semibold whitespace-nowrap transition-colors ${
-                active === a.id ? 'text-primary-700 bg-primary-50' : 'text-neutral-500 hover:text-neutral-800 hover:bg-neutral-50'
+                active === a.id ? 'text-fg-brand bg-brand-light' : 'text-fg-tertiary hover:text-fg hover:bg-surface-secondary'
               }`}
             >
               {a.label}
@@ -313,7 +316,7 @@ function AnchorBar() {
 // ─── SECTION 1: FOUNDERS & CEOs ───────────────────────────────────────────────
 
 function FoundersSection() {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const navigate = useNavigate();
 
   return (
@@ -322,21 +325,21 @@ function FoundersSection() {
         {/* Hero */}
         <div className="grid desktop-s:grid-cols-2 gap-14 items-center mb-14">
           <div>
-            <Typography variant="caption" className="text-primary-500 mb-3 block font-semibold">
+            <Typography variant="caption" className="text-fg-brand mb-3 block font-semibold">
               {t('solutions.founders.overline', 'For Founders & CEOs')}
             </Typography>
-            <Typography variant="display" weight="bold" className="text-neutral-900 mb-5 leading-tight">
-              {t('solutions.founders.title', 'From Regulatory Uncertainty to Confident Expansion')}
+            <Typography variant="display" weight="bold" className="text-fg mb-5 leading-tight">
+              {t('solutions.founders.title', 'From Regulatory Uncertainty to the Right Decision')}
             </Typography>
-            <Typography variant="body" className="text-neutral-600 text-lg leading-relaxed mb-8">
+            <Typography variant="body" className="text-fg-secondary text-lg leading-relaxed mb-8">
               {t('solutions.founders.body', 'Founders need speed and clarity — not academic legal explanations. CompliHub360 translates regulatory chaos into safe, actionable business decisions so you can scale across borders without surprises.')}
             </Typography>
 
             <button
-              onClick={() => navigate('/wizard')}
+              onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/wizard`)}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary-500 text-white font-bold text-sm shadow-md hover:bg-primary-600 transition-colors"
             >
-              {t('solutions.founders.cta', 'Start Your Expansion Check')}
+              {t('solutions.founders.cta', 'Start Your Compliance Check')}
               <ArrowRight size={18} />
             </button>
           </div>
@@ -371,7 +374,7 @@ function FoundersSection() {
                 transition={{ duration: 0.4 }}
                 className={`rounded-2xl border p-6 flex items-start gap-4 ${color}`}
               >
-                <div className="w-10 h-10 rounded-lg bg-white/80 flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-lg bg-surface/80 flex items-center justify-center shrink-0">
                   <Icon size={20} />
                 </div>
                 <div>
@@ -383,8 +386,8 @@ function FoundersSection() {
           </div>
         </div>
 
-        {/* "Expand Safely" flow diagram */}
-        <ExpandSafelyPath />
+        {/* context-to-specialist flow diagram */}
+        <ContextToSpecialistPath />
 
         {/* Outcome metrics */}
         <div className="grid grid-cols-2 tablet:grid-cols-4 gap-4 mt-10">
@@ -404,16 +407,16 @@ function OperationsSection() {
   const { t } = useTranslation('common');
 
   return (
-    <Section id="operations" className="py-16 desktop-s:py-24 bg-neutral-50">
+    <Section id="operations" className="py-16 desktop-s:py-24 bg-surface-secondary">
       <div className="max-w-7xl mx-auto px-6">
         <div className="max-w-3xl mb-14">
-          <Typography variant="caption" className="text-primary-500 mb-3 block font-semibold">
+          <Typography variant="caption" className="text-fg-brand mb-3 block font-semibold">
             {t('solutions.operations.overline', 'For Operations Teams')}
           </Typography>
-          <Typography variant="display" weight="bold" className="text-neutral-900 mb-5 leading-tight">
+          <Typography variant="display" as="h2" weight="bold" className="text-fg mb-5 leading-tight">
             {t('solutions.operations.title', 'Centralize, Track & Master Compliance Ops')}
           </Typography>
-          <Typography variant="body" className="text-neutral-600 text-lg leading-relaxed">
+          <Typography variant="body" className="text-fg-secondary text-lg leading-relaxed">
             {t('solutions.operations.body', 'Operations managers and agency operators need structured knowledge and a unified system — not scattered government sites and chaotic email threads. CompliHub360 gives you a single control center for cross-border compliance.')}
           </Typography>
         </div>
@@ -446,16 +449,16 @@ function OperationsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4 }}
-              className="bg-white border border-neutral-200 rounded-2xl p-7"
+              className="bg-surface border border-stroke rounded-2xl p-7"
             >
-              <div className="w-11 h-11 rounded-xl bg-primary-50 border border-primary-100 flex items-center justify-center mb-5">
-                <Icon size={22} className="text-primary-600" />
+              <div className="w-11 h-11 rounded-xl bg-brand-light border border-stroke-subtle flex items-center justify-center mb-5">
+                <Icon size={22} className="text-fg-brand" />
               </div>
-              <Typography variant="h3" weight="bold" className="text-neutral-900 mb-2">{title}</Typography>
-              <Typography variant="caption" className="text-error-500 block normal-case tracking-normal mb-3 font-medium">
+              <Typography variant="h3" weight="bold" className="text-fg mb-2">{title}</Typography>
+              <Typography variant="caption" className="text-error-600 dark:text-error-300 block normal-case tracking-normal mb-3 font-medium">
                 ✗ {problem}
               </Typography>
-              <Typography variant="caption" className="text-success-500 block normal-case tracking-normal font-medium">
+              <Typography variant="caption" className="text-success-600 dark:text-success-300 block normal-case tracking-normal font-medium">
                 ✓ {solution}
               </Typography>
             </motion.div>
@@ -478,7 +481,7 @@ function OperationsSection() {
 // ─── SECTION 3: IN-HOUSE COUNSEL ──────────────────────────────────────────────
 
 function CounselSection() {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const navigate = useNavigate();
 
   return (
@@ -487,13 +490,13 @@ function CounselSection() {
         <div className="grid desktop-s:grid-cols-2 gap-16 items-start">
           {/* Left */}
           <div>
-            <Typography variant="caption" className="text-primary-500 mb-3 block font-semibold">
+            <Typography variant="caption" className="text-fg-brand mb-3 block font-semibold">
               {t('solutions.counsel.overline', 'For In-House Counsel')}
             </Typography>
-            <Typography variant="display" weight="bold" className="text-neutral-900 mb-5 leading-tight">
+            <Typography variant="display" as="h2" weight="bold" className="text-fg mb-5 leading-tight">
               {t('solutions.counsel.title', 'Defensible Intelligence. Secure Orchestration.')}
             </Typography>
-            <Typography variant="body" className="text-neutral-600 text-lg leading-relaxed mb-8">
+            <Typography variant="body" className="text-fg-secondary text-lg leading-relaxed mb-8">
               {t('solutions.counsel.body', 'Legal professionals demand strict data privacy and zero AI hallucinations. CompliHub360 is a secure, EU-AI-Act ready infrastructure layer that accelerates legal research and safely structures external mandates.')}
             </Typography>
 
@@ -517,19 +520,19 @@ function CounselSection() {
                 },
               ].map(({ icon: Icon, title, desc }) => (
                 <div key={title} className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-primary-50 border border-primary-100 flex items-center justify-center shrink-0">
-                    <Icon size={20} className="text-primary-600" />
+                  <div className="w-10 h-10 rounded-lg bg-brand-light border border-stroke-subtle flex items-center justify-center shrink-0">
+                    <Icon size={20} className="text-fg-brand" />
                   </div>
                   <div>
-                    <Typography variant="ui-small" weight="bold" className="text-neutral-900 mb-1 block">{title}</Typography>
-                    <Typography variant="caption" className="text-neutral-500 block normal-case tracking-normal leading-relaxed">{desc}</Typography>
+                    <Typography variant="ui-small" weight="bold" className="text-fg mb-1 block">{title}</Typography>
+                    <Typography variant="caption" className="text-fg-tertiary block normal-case tracking-normal leading-relaxed">{desc}</Typography>
                   </div>
                 </div>
               ))}
             </div>
 
             <button
-              onClick={() => navigate('/register')}
+              onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/register`)}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary-500 text-white font-bold text-sm shadow-md hover:bg-primary-600 transition-colors"
             >
               {t('solutions.counsel.cta', 'Try Secure Research')}
@@ -555,13 +558,13 @@ function CounselSection() {
 // ─── CTA ──────────────────────────────────────────────────────────────────────
 
 function SolutionsCTA() {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const navigate = useNavigate();
 
   return (
     <section className="py-16 desktop-s:py-24 bg-primary-900">
       <div className="max-w-3xl mx-auto px-6 text-center">
-        <Typography variant="display" weight="bold" className="text-white mb-5">
+        <Typography variant="display" as="h2" weight="bold" className="text-white mb-5">
           {t('solutions.cta.title', 'Which role fits you?')}
         </Typography>
         <Typography variant="body" className="text-primary-300 mb-10 text-lg">
@@ -569,13 +572,13 @@ function SolutionsCTA() {
         </Typography>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button
-            onClick={() => navigate('/wizard')}
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-white text-primary-900 font-bold text-base shadow-lg hover:bg-neutral-100 transition-colors"
+            onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/wizard`)}
+            className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-white text-primary-900 font-bold text-base shadow-lg hover:bg-surface-tertiary transition-colors"
           >
             {t('solutions.cta.btnAssessment', 'Start Free Assessment')}
           </button>
           <button
-            onClick={() => navigate('/platform')}
+            onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/platform`)}
             className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border-2 border-primary-400 text-white font-bold text-base hover:bg-primary-800 transition-colors"
           >
             {t('solutions.cta.btnPlatform', 'Explore Platform')}

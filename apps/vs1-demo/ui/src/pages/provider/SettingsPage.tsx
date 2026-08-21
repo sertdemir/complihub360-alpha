@@ -66,7 +66,7 @@ export function SettingsPage() {
             </div>
 
             <Card styleVariant="filled" className="flex items-center gap-4 p-4">
-              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#d4af37] text-[13px] font-bold text-[#101411]">DC</span>
+              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-brand-accent text-[13px] font-bold text-fg-on-accent">DC</span>
               <div className="min-w-0 flex-1">
                 <p className="text-[13px] font-medium text-fg">{t('settings.avatarTitle')}</p>
                 <p className="mt-0.5 text-[11px] text-fg-tertiary">{t('settings.avatarSpec')}</p>
@@ -119,7 +119,7 @@ export function SettingsPage() {
                   {t('settings.pausedBannerBody')}
                 </Banner>
               )}
-              <Card styleVariant="filled" className="divide-y divide-white/5 p-0">
+              <Card styleVariant="filled" className="divide-y divide-elevate/5 p-0">
                 <div className="flex items-center gap-3 px-4 py-3.5">
                   <div className="min-w-0 flex-1">
                     <p className="text-[13px] font-semibold text-fg">{t('settings.pauseTitle')}</p>

@@ -56,7 +56,7 @@ export function SessionActionsDrawer({ target, onClose, onChanged }: SessionActi
     <Drawer forceDark open={!!target} onClose={onClose} side="right" size="md" eyebrow={t('sessionActions.eyebrow')} title={t('sessionActions.title')}>
       {target && (
         <div className="space-y-4">
-          <div className="rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3">
+          <div className="rounded-lg border border-elevate/10 bg-elevate/[0.03] px-4 py-3">
             <p className="text-[13px] font-semibold text-fg">{target.title}</p>
             <div className="mt-1.5 flex items-center gap-2">
               <Tag tone="brand">{DOMAIN_KEY[target.domain] ? t(`domain.${DOMAIN_KEY[target.domain]}`) : target.domain}</Tag>
@@ -65,7 +65,7 @@ export function SessionActionsDrawer({ target, onClose, onChanged }: SessionActi
           </div>
 
           {/* Rename */}
-          <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4">
+          <div className="rounded-lg border border-elevate/10 bg-elevate/[0.03] p-4">
             <div className="flex items-center gap-2.5">
               <PencilLine size={15} className="shrink-0 text-fg-accent" />
               <p className="text-[13px] font-semibold text-fg">{t('sessionActions.renameTitle')}</p>
@@ -74,7 +74,7 @@ export function SessionActionsDrawer({ target, onClose, onChanged }: SessionActi
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[13px] text-fg outline-none placeholder:text-fg-tertiary focus:border-fg-brand"
+                className="w-full rounded-lg border border-elevate/10 bg-elevate/5 px-3 py-2 text-[13px] text-fg outline-none placeholder:text-fg-tertiary focus:border-fg-brand"
                 placeholder={t('sessionActions.namePlaceholder')}
               />
               <Button
@@ -89,7 +89,7 @@ export function SessionActionsDrawer({ target, onClose, onChanged }: SessionActi
           </div>
 
           {/* Duplicate */}
-          <div className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/[0.03] p-4">
+          <div className="flex items-start gap-3 rounded-lg border border-elevate/10 bg-elevate/[0.03] p-4">
             <Copy size={15} className="mt-0.5 shrink-0 text-fg-brand" />
             <div className="min-w-0 flex-1">
               <p className="text-[13px] font-semibold text-fg">{t('sessionActions.duplicateTitle')}</p>
@@ -102,7 +102,7 @@ export function SessionActionsDrawer({ target, onClose, onChanged }: SessionActi
           </div>
 
           {/* Archive */}
-          <div className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/[0.03] p-4">
+          <div className="flex items-start gap-3 rounded-lg border border-elevate/10 bg-elevate/[0.03] p-4">
             <Archive size={15} className="mt-0.5 shrink-0 text-fg-tertiary" />
             <div className="min-w-0 flex-1">
               <p className="text-[13px] font-semibold text-fg">{t('sessionActions.archiveTitle')}</p>

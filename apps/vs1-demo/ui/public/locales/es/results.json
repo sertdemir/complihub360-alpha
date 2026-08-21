@@ -25,7 +25,7 @@
     }
   },
   "table": {
-    "severity": "Gravedad",
+    "severity": "Prioridad",
     "obligation": "Obligación",
     "market": "Mercado",
     "due": "Vence",
@@ -38,7 +38,7 @@
     "radar": "En el radar"
   },
   "severity": {
-    "critical": "Crítica",
+    "critical": "Inmediata",
     "high": "Alta",
     "medium": "Media",
     "low": "Baja"
@@ -160,7 +160,8 @@
     "bookTitle": "Reservar una cita",
     "bookSub": "Llamada inicial gratuita · 30 min · sin compromiso",
     "bookCta": "Reservar cita",
-    "revealNote": "La identidad se muestra tras la reserva."
+    "revealNote": "La identidad se muestra tras la reserva.",
+    "penalty": "Sanción: {{value}}"
   },
   "schedule": {
     "back": "Volver al perfil",
@@ -179,13 +180,13 @@
   },
   "search": {
     "navGuided": "Evaluar mis necesidades",
-    "placeholder": "Describe tu situación con tus propias palabras…",
+    "placeholder": "Describa su situación con sus propias palabras…",
     "submit": "Hacer una pregunta de compliance",
-    "answerEyebrow": "Respuesta",
+    "answerEyebrow": "Respuesta de IA",
     "answerTitleFor": "Sobre «{{query}}»",
-    "answerTitleDefault": "Pregunta lo que quieras sobre tus obligaciones de compliance",
-    "answerBody1": "Esto es lo que probablemente se aplica a una situación como la suya, con la fuente detrás de cada punto. Información general, no asesoramiento legal individual.",
-    "answerBody2": "Para ver qué se aplica concretamente a su empresa — sus mercados, su modelo de negocio — continúe abajo con la evaluación.",
+    "answerTitleDefault": "Pregunte lo que quiera sobre sus obligaciones de compliance",
+    "answerBody1": "Esto es lo que probablemente se aplica a una situación como la suya, con la fuente detrás de cada punto. La respuesta procede de nuestra IA: información general, no asesoramiento jurídico individual.",
+    "answerBody2": "Su empresa puede diferir: los umbrales, registros y plazos dependen de sus mercados, su modelo de negocio y su volumen. Cuáles le afectan es lo que determina el análisis de abajo.",
     "sources": "Fuentes",
     "obligationsTitle": "Obligaciones relevantes",
     "sev": {
@@ -206,16 +207,35 @@
         "detail": "El seguimiento al consumidor requiere consentimiento previo y un aviso de privacidad conforme al RGPD."
       }
     },
-    "guidesTitle": "Guías relacionadas",
-    "guides": {
-      "g1": "El régimen OSS de la UE explicado",
-      "g2": "Registro de envases (EPR) por país",
-      "g3": "Fundamentos del RGPD para tiendas online"
-    },
-    "guideRead": "Leer",
+    "guidesTitle": "Dónde seguir leyendo",
+    "guideRead": "Abrir",
     "bridgeTitle": "¿Quiere ver qué se aplica a su empresa?",
     "bridgeBody": "Su risk map se ajusta a sus mercados y a su modelo de negocio, y muestra los Verified Partners que encajan con lo que realmente necesita.",
     "bridgeCta": "Evaluar mis necesidades",
-    "previewBadge": "Vista previa · el motor de respuestas aún no está conectado"
+    "previewBadge": "Vista previa · el motor de respuestas aún no está conectado",
+    "entries": {
+      "markets": "Mercados y qué se aplica en ellos",
+      "compliance": "Las ocho áreas de compliance",
+      "howItWorks": "Cómo llega hasta un especialista"
+    }
+  },
+  "days_one": "{{count}} día",
+  "days_other": "{{count}} días",
+  "ongoing": "continuo",
+  "domains": {
+    "taxVat": "Impuestos e IVA",
+    "productPackaging": "EPR y envases",
+    "dataPrivacy": "Datos y privacidad",
+    "marketingSeo": "Compliance de marketing",
+    "corporateStructure": "Sociedad y estructura",
+    "productCompliance": "Conformidad de producto",
+    "logisticsCustoms": "Logística y aduanas",
+    "legalAdvisory": "Asesoría legal"
+  },
+  "matchBasis": {
+    "market": "Cubre su mercado ({{country}})",
+    "marketMissing": "No cubre su mercado",
+    "areas": "{{matched}} de {{total}} de sus áreas",
+    "how": "El porcentaje es la cobertura de mercado más la parte de lo que usted solicitó que este especialista cubre realmente."
   }
 }

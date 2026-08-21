@@ -92,7 +92,7 @@ export function LeadsPage() {
       <div className="mx-auto max-w-[1140px] space-y-5">
         <div>
           <h1 className="font-serif text-[32px] font-bold leading-tight text-fg">
-            <Trans t={t} i18nKey="termine.title" components={{ accent: <span className="text-fg-accent" /> }} />
+            <Trans t={t} i18nKey="termine.title" components={{ accent: <span className="text-fg-accent-emphasis" /> }} />
           </h1>
           <p className="mt-1 text-body-sm text-fg-secondary">{t('termine.sub')}</p>
         </div>
@@ -131,7 +131,7 @@ export function LeadsPage() {
                     <div className="flex items-center gap-1">
                       {[1, 2, 3, 4, 5].map((n) => (
                         <button key={n} type="button" aria-label={`${n}`} onClick={() => setLeadRating(n)}
-                          className={`text-[20px] leading-none ${n <= leadRating ? 'text-[#d4af37]' : 'text-white/20 hover:text-white/40'}`}>★</button>
+                          className={`text-[20px] leading-none ${n <= leadRating ? 'text-fg-accent' : 'text-white/20 hover:text-white/40'}`}>★</button>
                       ))}
                     </div>
                     <Button size="sm" variant="secondary" disabled={leadRating < 1} onClick={() => rateLead(dossierFor)}>OK</Button>

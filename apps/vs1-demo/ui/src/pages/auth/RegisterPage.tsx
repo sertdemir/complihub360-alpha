@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link, useLocation } from "react-router-dom";
+import { useNavigate, Link, useLocation, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trans, useTranslation } from "react-i18next";
 import { Typography } from "../../components/ui/Typography";
@@ -232,6 +232,9 @@ function MultiSelectChips({ label, options, selected, onChange }: {
 
 function ConsentCheckbox({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
     const { t } = useTranslation("auth");
+    // Consenting to documents that cannot be opened is not consent. Both open in
+    // a new tab on purpose — navigating away mid-registration drops the form state.
+    const { locale = "en" } = useParams();
     return (
         <label className="flex items-start gap-3 cursor-pointer group select-none">
             <button
@@ -250,8 +253,22 @@ function ConsentCheckbox({ checked, onChange }: { checked: boolean; onChange: (v
                     t={t}
                     i18nKey="register.consent"
                     components={{
-                        terms: <a href="#" className="text-primary-500 hover:underline" />,
-                        privacy: <a href="#" className="text-primary-500 hover:underline" />,
+                        terms: (
+                            <a
+                                href={`/${locale}/terms`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary-500 hover:underline"
+                            />
+                        ),
+                        privacy: (
+                            <a
+                                href={`/${locale}/privacy`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary-500 hover:underline"
+                            />
+                        ),
                     }}
                 />
             </span>
@@ -650,7 +667,7 @@ export function RegisterPage() {
                             <span className="material-symbols-outlined text-primary-600 text-2xl">verified_user</span>
                             <Typography variant="h3" className="tracking-tight">CompliHub360</Typography>
                         </button>
-                        <Link to="/login" className="text-sm font-medium text-neutral-500 hover:text-neutral-900 transition-colors">
+                        <Link to={`/${lang}/login`} className="text-sm font-medium text-neutral-500 hover:text-neutral-900 transition-colors">
                             {t("register.login")}
                         </Link>
                     </div>
@@ -745,7 +762,7 @@ export function RegisterPage() {
                         {/* Login Link */}
                         <p className="text-center text-sm text-neutral-500 mt-6">
                             {t("register.alreadyRegistered")}{" "}
-                            <Link to="/login" className="text-primary-500 hover:text-primary-600 hover:underline font-semibold transition-colors">
+                            <Link to={`/${lang}/login`} className="text-primary-500 hover:text-primary-600 hover:underline font-semibold transition-colors">
                                 {t("register.login")}
                             </Link>
                         </p>

@@ -40,16 +40,16 @@ export function CountrySelector({ value, onChange }: CountrySelectorProps) {
         onClick={() => setOpen(o => !o)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="inline-flex items-center gap-2.5 bg-white border-2 border-primary-200 hover:border-primary-400 transition-colors rounded-xl px-4 py-3 shadow-sm hover:shadow-md min-w-[220px]"
+        className="inline-flex items-center gap-2.5 bg-surface border-2 border-stroke-subtle hover:border-primary-400 transition-colors rounded-xl px-4 py-3 shadow-sm hover:shadow-md min-w-[220px]"
       >
-        <Globe2 size={18} className="text-primary-500 shrink-0" />
+        <Globe2 size={18} className="text-fg-brand shrink-0" />
         <span className="text-2xl leading-none" aria-hidden>{current.flag}</span>
-        <span className="text-ui-small font-bold text-neutral-900 flex-1 text-left">
+        <span className="text-ui-small font-bold text-fg flex-1 text-left">
           {current.label}
         </span>
         <ChevronDown
           size={16}
-          className={`text-neutral-400 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`text-fg-tertiary shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
         />
       </button>
 
@@ -57,7 +57,7 @@ export function CountrySelector({ value, onChange }: CountrySelectorProps) {
         <ul
           role="listbox"
           aria-label={t('compliance.country.label', 'Your primary market')}
-          className="absolute top-full mt-2 left-0 right-0 z-50 bg-white border border-neutral-200 rounded-xl shadow-xl py-1 max-h-80 overflow-y-auto"
+          className="absolute top-full mt-2 left-0 right-0 z-50 bg-surface border border-stroke rounded-xl shadow-xl py-1 max-h-80 overflow-y-auto"
         >
           {COUNTRY_OPTIONS.map(opt => {
             const selected = opt.code === value;
@@ -71,13 +71,13 @@ export function CountrySelector({ value, onChange }: CountrySelectorProps) {
                     onChange(opt.code);
                     setOpen(false);
                   }}
-                  className={`w-full flex items-center gap-3 px-3 py-2 text-left text-ui-small hover:bg-primary-50 transition-colors ${selected ? 'bg-primary-50/60' : ''}`}
+                  className={`w-full flex items-center gap-3 px-3 py-2 text-left text-ui-small hover:bg-brand-light transition-colors ${selected ? 'bg-brand-light/60' : ''}`}
                 >
                   <span className="text-xl leading-none" aria-hidden>{opt.flag}</span>
-                  <span className={`flex-1 ${selected ? 'font-bold text-primary-700' : 'text-neutral-700'}`}>
+                  <span className={`flex-1 ${selected ? 'font-bold text-fg-brand' : 'text-fg-secondary'}`}>
                     {opt.label}
                   </span>
-                  {selected && <Check size={14} className="text-primary-600" />}
+                  {selected && <Check size={14} className="text-fg-brand" />}
                 </button>
               </li>
             );

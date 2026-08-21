@@ -4,16 +4,18 @@ import { cn } from '../../lib/utils';
 // ─── SessionRow ───────────────────────────────────────────────────────────────
 // Mirrors the Compass "Session Row" (1450:693): user session list row — country
 // badge · domain pill (+ optional NEEDS-REFRESH pill) + updated · title · risk
-// line · ⋯ menu · action slot. Risk drives the risk-line color (high=red,
-// medium=amber, low=muted). Teal-wash surface in dark, white card in light.
+// line · ⋯ menu · action slot. Risk drives the risk-line color off the shared
+// risk tokens (high=orange, medium=yellow, low=green), so it follows the theme;
+// it used to be a hardcoded red/amber pair. Teal-wash surface in dark, white
+// card in light.
 // Used on Sessions list, Domains hub and the Workbenches.
 
 export type SessionRisk = 'high' | 'medium' | 'low';
 
 const RISK_TEXT: Record<SessionRisk, string> = {
-  high: 'text-[#e0556b]',
-  medium: 'text-[#e6a514]',
-  low: 'text-fg-tertiary',
+  high: 'text-risk-high',
+  medium: 'text-risk-medium',
+  low: 'text-risk-low',
 };
 
 export interface SessionRowProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
@@ -54,8 +56,11 @@ export function SessionRow({
           <span className="rounded-full border border-[#258d78]/35 bg-[#004d40]/10 px-2 py-[3px] text-[9px] font-semibold uppercase tracking-[0.06em] text-fg-brand dark:border-[#14a89a]/35 dark:bg-[#097070]/30">
             {domain}
           </span>
+          {/* Status pill on the error ramp, not the rogue #e36363 that sat in no
+              scale: at 9px it owes 4.5:1 and gave 3.01 light / 3.63 dark — it failed
+              in BOTH themes, which the dark-only workspace had hidden. Now 6.66 / 4.99. */}
           {status && (
-            <span className="rounded-full border border-[#e36363]/35 bg-[#e36363]/10 px-2 py-[3px] text-[9px] font-semibold uppercase tracking-[0.06em] text-[#e36363] dark:bg-[#e36363]/15">
+            <span className="rounded-full border border-error-500/35 bg-error-500/10 px-2 py-[3px] text-[9px] font-semibold uppercase tracking-[0.06em] text-error-700 dark:bg-error-500/15 dark:text-error-300">
               {status}
             </span>
           )}

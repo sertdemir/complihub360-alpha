@@ -7,7 +7,7 @@ import { RiskBadge, type RiskLevel } from '../ui/RiskBadge';
 
 // ─── RiskMapResult — wizard RESULT screen (Risk Map) ──────────────────────────
 // Mode-aware (light + .dark) result page. No step rail, no footer. Stat strip ·
-// risk table (petrol RiskBadge severities, never red) · locked partner cards ·
+// risk table (RiskBadge traffic-light severities) · locked partner cards ·
 // bottom conversion band. Token-driven surfaces; gold = accent-500 + primary-900.
 
 // ─── State pills used in the table's STATE column ─────────────────────────────

@@ -8,8 +8,8 @@ optional \`trend\` chip (▲ success · ▼ error · – neutral) with a caption
 \`hint\`. Layout-only, so it composes into Cards (metric tiles) or rows (performance
 strips). \`size\` = sm · md · lg.
 
-This is a **neutral metric**, not a risk signal — risk stays on the petrol
-\`RiskBadge\` scale ("Niemals rot.").
+This is a **neutral metric**, not a risk signal — risk stays on the RiskBadge
+\`RiskBadge\` traffic light.
 `;
 
 const meta = {

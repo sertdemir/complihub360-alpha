@@ -7,7 +7,7 @@
       "low": "Bajo",
       "medium": "Medio",
       "high": "Alto",
-      "critical": "Crítico"
+      "critical": "Inmediata"
     },
     "state": {
       "confirmed": "Confirmado",
@@ -1005,13 +1005,13 @@
       "gold": "Tres",
       "post": " principios discretos."
     },
-    "subtitle": "Los productos de compliance suelen gritar. Nosotros no tenemos por qué. El riesgo no necesita rojo. Las decisiones no necesitan un embudo de 20 pasos. Los partners no necesitan un marketplace. Pase el cursor por cada tarjeta para ver qué hicimos en su lugar.",
+    "subtitle": "Los productos de compliance suelen gritar. Nosotros no tenemos por qué. El riesgo no necesita amenaza. Las decisiones no necesitan un embudo de 20 pasos. Los partners no necesitan un marketplace. Pase el cursor por cada tarjeta para ver qué hicimos en su lugar.",
     "hoverCue": "Pase el cursor para ver",
     "cards": [
       {
-        "label": "Código 02 — Riesgo en petróleo",
-        "title": "Nada de rojo. Nunca.",
-        "desc": "Niveles de riesgo de bajo a crítico, expresados en tonos petróleo — nunca en rojo. El producto nunca intenta asustarle para que actúe."
+        "label": "Código 02 — Prioridad, no pánico",
+        "title": "Urgencia, no amenaza.",
+        "desc": "Los niveles indican qué va primero, no lo que le puede pasar. Las sanciones están en el detalle de cada obligación, nunca en su titular."
       },
       {
         "label": "Código 04 — El camino del asistente",

@@ -49,7 +49,7 @@ export function AdminEventsPage() {
       <div className="mx-auto flex max-w-[1160px] flex-col gap-6">
         <div>
           <h1 className="font-serif text-[32px] font-semibold text-fg">
-            Events & <span className="text-fg-accent">Audit</span>
+            Events & <span className="text-fg-accent-emphasis">Audit</span>
           </h1>
           <p className="mt-1 text-[13px] text-fg-secondary">
             Every critical action — immutable, filterable, exportable.

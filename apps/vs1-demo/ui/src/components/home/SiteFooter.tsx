@@ -9,7 +9,12 @@ import { DOMAINS } from '../../lib/domains';
 // link columns (with BETA tags), the markets-covered line, the not-a-law-firm
 // disclaimer, and the legal bottom bar. Copy lives in footer.* ('home' ns).
 
-type Link = { key: string; href: string; beta?: boolean; fallback?: string };
+// href ist OPTIONAL: ein Eintrag ohne Ziel wird als Text gerendert, nicht als
+// Link. Bis 20.08. trugen zehn Eintraege href="#" — sichtbar, klickbar,
+// wirkungslos. Sie zu loeschen haette den Fahrplan mitgeloescht, den sie
+// ankuendigen; ein toter Link bleibt trotzdem ein Defekt. Also: sichtbar
+// bleiben, aber nicht so tun, als fuehre er irgendwohin.
+type Link = { key: string; href?: string; beta?: boolean; fallback?: string };
 type Column = { key: string; links: Link[] };
 
 // Solutions = the canonical eight domains, membership and order straight from
@@ -32,7 +37,7 @@ const COLUMNS: Column[] = [
       { key: 'pricing', href: '/pricing' },
       { key: 'platformOverview', href: '/platform' },
       { key: 'startAssessment', href: '/wizard' },
-      { key: 'exampleResult', href: '#' },
+      { key: 'exampleResult', href: '/results' },
     ],
   },
   {
@@ -42,21 +47,21 @@ const COLUMNS: Column[] = [
   {
     key: 'resources',
     links: [
-      { key: 'complianceNews', href: '#', beta: true },
-      { key: 'knowledgeLibrary', href: '#', beta: true },
+      { key: 'complianceNews', beta: true },
+      { key: 'knowledgeLibrary', beta: true },
       { key: 'countryGuides', href: '/markets' },
       { key: 'aiGovernance', href: '/ai-governance' },
-      { key: 'tutorials', href: '#' },
-      { key: 'glossary', href: '#' },
+      { key: 'tutorials' },
+      { key: 'glossary' },
     ],
   },
   {
     key: 'company',
     links: [
-      { key: 'about', href: '#' },
-      { key: 'trustSecurity', href: '#' },
-      { key: 'contact', href: '#' },
-      { key: 'careers', href: '#' },
+      { key: 'about', href: '/about' },
+      { key: 'trustSecurity', href: '/ai-governance' },  // traegt selbst den Titel "Trust Center"
+      { key: 'contact' },
+      { key: 'careers' },
     ],
   },
 ];
@@ -66,7 +71,7 @@ const LEGAL: Link[] = [
   { key: 'terms', href: '/terms' },
   { key: 'imprint', href: '/imprint' },
   { key: 'cookies', href: '/cookies' },
-  { key: 'subProcessors', href: '#' },
+  { key: 'subProcessors' },
 ];
 
 export function SiteFooter() {
@@ -84,13 +89,20 @@ export function SiteFooter() {
 
   // Same path-rewrite mechanism as the global LanguageSwitcher: swap (or add)
   // the /:locale prefix and navigate — LocaleLayout then calls changeLanguage.
-  const switchLanguage = (lng: string) => {
-    const pathParts = location.pathname.split('/');
-    const targetPath = (pathParts.length > 1 && supportedLngs.includes(pathParts[1]))
-      ? '/' + lng + pathParts.slice(2).join('/') + location.search + location.hash
-      : '/' + lng + location.pathname + location.search + location.hash;
-    navigate(targetPath);
+  // Zielpfad als reine Funktion: href UND onClick lesen dieselbe Quelle, sonst
+  // zeigt der Link woanders hin als der Klick.
+  const languagePath = (lng: string) => {
+    // Der fehlende Schraegstrich hier war ein stiller Fehler: aus /de/pricing
+    // wurde '/'+'en'+'pricing' = /enpricing. Ohne Locale-Praefix fiel das in den
+    // Catch-all, und der Sprachwechsel warf den Nutzer von JEDER Unterseite auf
+    // die Startseite. Sichtbar wurde es erst, als der Umschalter ein echter
+    // Link mit href wurde.
+    const parts = location.pathname.split('/').filter(Boolean);
+    const rest = supportedLngs.includes(parts[0]) ? parts.slice(1) : parts;
+    const tail = rest.join('/');
+    return `/${lng}${tail ? `/${tail}` : ''}${location.search}${location.hash}`;
   };
+  const switchLanguage = (lng: string) => navigate(languagePath(lng));
 
   return (
     <footer className="border-t border-stroke-subtle bg-surface">
@@ -106,13 +118,25 @@ export function SiteFooter() {
               {supportedLngs.map((lng, i) => (
                 <span key={lng} className="flex items-center gap-2">
                   {i > 0 && <span className="text-fg-tertiary">·</span>}
-                  <button
-                    type="button"
-                    onClick={() => switchLanguage(lng)}
+                  {/* Ein <a>, kein <button>. Als Button war der Umschalter der
+                      EINZIGE Weg nach /es und /tr — und ein Crawler folgt keinem
+                      onClick, also existierten beide Sprachen fuer ihn nicht.
+                      Der Klick bleibt SPA-Navigation (preventDefault); Mittel-
+                      klick, Aufklappen im neuen Tab und Crawler bekommen das
+                      href. hrefLang nennt die Zielsprache explizit. */}
+                  <a
+                    href={languagePath(lng)}
+                    hrefLang={lng}
+                    aria-current={lng === locale ? 'true' : undefined}
+                    onClick={(e) => {
+                      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+                      e.preventDefault();
+                      switchLanguage(lng);
+                    }}
                     className={lng === locale ? 'text-fg' : 'text-fg-tertiary transition-colors hover:text-fg'}
                   >
                     {lng.toUpperCase()}
-                  </button>
+                  </a>
                 </span>
               ))}
             </div>
@@ -128,17 +152,26 @@ export function SiteFooter() {
                 <ul className="mt-4 space-y-3">
                   {col.links.map((l) => (
                     <li key={l.key}>
-                      <a
-                        href={localize(l.href)}
-                        className="inline-flex items-center gap-2 text-[14px] text-fg-secondary transition-colors hover:text-fg"
-                      >
-                        {linkLabel(`footer.columns.${col.key}.links.${l.key}`, l.fallback)}
-                        {l.beta && (
-                          <span className="rounded-full bg-accent-50 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.06em] text-accent-800 ring-1 ring-inset ring-accent-200">
-                            {t('footer.beta')}
-                          </span>
-                        )}
-                      </a>
+                      {(() => {
+                        const inner = (
+                          <>
+                            {linkLabel(`footer.columns.${col.key}.links.${l.key}`, l.fallback)}
+                            {l.beta && (
+                              <span className="rounded-full bg-accent-50 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.06em] text-accent-800 ring-1 ring-inset ring-accent-200">
+                                {t('footer.beta')}
+                              </span>
+                            )}
+                          </>
+                        );
+                        const shared = 'inline-flex items-center gap-2 text-[14px]';
+                        return l.href ? (
+                          <a href={localize(l.href)} className={`${shared} text-fg-secondary transition-colors hover:text-fg`}>
+                            {inner}
+                          </a>
+                        ) : (
+                          <span className={`${shared} text-fg-tertiary`}>{inner}</span>
+                        );
+                      })()}
                     </li>
                   ))}
                 </ul>
@@ -165,9 +198,13 @@ export function SiteFooter() {
           <ul className="flex flex-wrap gap-x-6 gap-y-2">
             {LEGAL.map((l) => (
               <li key={l.key}>
-                <a href={localize(l.href)} className="text-[13px] text-fg-tertiary transition-colors hover:text-fg">
-                  {t(`footer.legal.${l.key}`)}
-                </a>
+                {l.href ? (
+                  <a href={localize(l.href)} className="text-[13px] text-fg-tertiary transition-colors hover:text-fg">
+                    {t(`footer.legal.${l.key}`)}
+                  </a>
+                ) : (
+                  <span className="text-[13px] text-fg-tertiary">{t(`footer.legal.${l.key}`)}</span>
+                )}
               </li>
             ))}
           </ul>

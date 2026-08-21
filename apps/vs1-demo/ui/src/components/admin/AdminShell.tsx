@@ -57,14 +57,16 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       <Sidebar
         logo={
           <NavLink to={base} className="flex items-center gap-2">
-            <LogoMark tone="on-petrol" className="h-[22px] w-auto" />
+            <LogoMark tone="on-light" className="h-[22px] w-auto" />
             <span className="text-[15px] font-semibold text-fg">CompliHub</span>
-            <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-fg-accent">Admin</span>
+            {/* accent-STRONG: 9px owes the full 4.5:1 and gold-500 is 2.10 on the light
+                shell. Same call as the PARTNER badge in ProviderShell. */}
+            <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-fg-accent-strong">Admin</span>
           </NavLink>
         }
         footer={
           <div className="flex items-center gap-2.5 px-1">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-[#d4af37] text-[11px] font-bold text-[#101411]">AD</span>
+            <span className="grid h-8 w-8 place-items-center rounded-full bg-brand-accent text-[11px] font-bold text-fg-on-accent">AD</span>
             <div className="leading-tight">
               <p className="text-[12px] font-semibold text-fg">Admin</p>
               <p className="text-[10px] text-fg-tertiary">CompliHub360 Ops</p>
@@ -106,8 +108,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             ))}
           </div>
           <ThemeToggle size={34} />
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/10 px-3 py-1 text-[12px] font-medium text-emerald-400 ring-1 ring-inset ring-emerald-400/30">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+          {/* emerald-400 is a fill stop, not a text stop: on its own 10% tint it
+              reads 1.80 in light. The DS success ramp carries the readable one
+              (5.84), and the dot takes success-500 for the 3:1 a graphic owes
+              (3.76). Dark keeps emerald-400 throughout - it measures 6.26 there. */}
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/10 px-3 py-1 text-[12px] font-medium text-success-700 ring-1 ring-inset ring-emerald-400/30 dark:text-emerald-400">
+            <span className="h-1.5 w-1.5 rounded-full bg-success-500 dark:bg-emerald-400" />
             All systems up
           </span>
         </header>
