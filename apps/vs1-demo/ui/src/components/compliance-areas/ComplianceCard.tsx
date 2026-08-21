@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Typography } from '../ui/Typography';
 import type { AreaConfig, CountryCode } from './types';
+import { Button } from '../ui/Button';
 
 interface Props {
   area: AreaConfig;
@@ -326,13 +327,15 @@ export function ComplianceCard({ area, index, defaultOpen = false, selectedCount
                     </div>
                   )}
 
-                  <button
+                  <Button
+                    size="lg"
+                    shape="soft"
                     onClick={() => wizardLink()}
-                    className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-brand text-fg-on-brand font-bold text-sm shadow-md hover:brightness-95 transition-[filter,background-color]"
+                    className="shadow-md hover:brightness-95 transition-[filter,background-color]"
                   >
                     {t('compliance.startAssessment', 'Start {{title}} Assessment', { title })}
                     <ArrowRight size={16} />
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>

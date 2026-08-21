@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AnimatedWizard } from './AnimatedWizard';
+import { Button } from '../ui/Button';
 
 // ─── S9 — The Entry Door · Figma 1227:151 / wizard 1649:2 ───────────────────
 // The gold closing panel. The real assessment wizard lives here at its natural,
@@ -114,13 +115,16 @@ export function EntryDoor() {
                     <JourneyStepper />
                   </div>
 
-                  <button
+                  <Button
+                    size="lg"
+                    shape="soft"
+                    wrap
                     type="button"
                     onClick={() => setStarted(true)}
-                    className="mt-9 inline-flex items-center gap-2 rounded-xl bg-primary-500 px-7 py-3.5 text-body-md font-semibold text-white shadow-[0_18px_34px_-14px_rgba(0,77,64,0.65)] transition-transform duration-200 hover:-translate-y-0.5"
+                    className="mt-9 text-white shadow-[0_18px_34px_-14px_rgba(0,77,64,0.65)] transition-transform duration-200 hover:-translate-y-0.5"
                   >
                     {t('entryDoor.cta')} <ArrowRight size={17} />
-                  </button>
+                  </Button>
                 </div>
               </motion.div>
             )}

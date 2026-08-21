@@ -11,6 +11,7 @@ import { Logo } from '../components/ui/Logo';
 import { RiskBadge, type RiskLevel } from '../components/ui/RiskBadge';
 import { FreeAccountDrawer } from '../components/home/MarketsDrawer';
 import type { SearchProfile } from '../components/wizard/WizardContext';
+import { Button } from '../components/ui/Button';
 
 // ─── Results · Risk Map · Figma 1667:215 ────────────────────────────────────
 // The generated risk map shown after the wizard. A guest "map" — obligations
@@ -232,13 +233,15 @@ function StatePill({ state, onAnswer }: { state: State; onAnswer: () => void }) 
     );
   }
   return (
-    <button
+    <Button
+      size="sm"
+      shape="soft"
       type="button"
       onClick={onAnswer}
-      className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-3.5 py-2 text-body-xs font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5"
+      className="transition-transform duration-200 hover:-translate-y-0.5"
     >
       {t('state.answer', { total: state.count })} <ArrowRight size={14} />
-    </button>
+    </Button>
   );
 }
 
@@ -392,13 +395,16 @@ export function ResultsRiskMap() {
             <span className="hidden items-center gap-2 text-body-2xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary sm:inline-flex">
               <Lock size={13} /> {t('topbar.guestBadge')}
             </span>
-            <button
+            <Button
+              variant="accent"
+              size="md"
+              shape="soft"
               type="button"
               onClick={() => setSaveOpen(true)}
-              className="inline-flex items-center gap-2 rounded-xl bg-accent-500 px-5 py-2.5 text-body-sm font-semibold text-primary-950 transition-transform duration-200 hover:-translate-y-0.5"
+              className="text-primary-950 transition-transform duration-200 hover:-translate-y-0.5"
             >
               {t('topbar.saveMap')} <ArrowRight size={15} />
-            </button>
+            </Button>
           </div>
         </div>
       </header>
@@ -571,13 +577,16 @@ export function ResultsRiskMap() {
           <p className="mx-auto mt-3 max-w-md text-body-md leading-relaxed text-fg-secondary">
             {t('cta.body')}
           </p>
-          <button
+          <Button
+            variant="accent"
+            size="xl"
+            shape="soft"
             type="button"
             onClick={() => setSaveOpen(true)}
-            className="mt-8 inline-flex items-center gap-2 rounded-xl bg-accent-500 px-7 py-3.5 text-body-md font-semibold text-primary-950 shadow-[0_18px_34px_-14px_rgba(212,175,55,0.6)] transition-transform duration-200 hover:-translate-y-0.5"
+            className="mt-8 text-primary-950 shadow-[0_18px_34px_-14px_rgba(212,175,55,0.6)] transition-transform duration-200 hover:-translate-y-0.5"
           >
             {t('cta.button')} <ArrowRight size={17} />
-          </button>
+          </Button>
         </div>
       </section>
 

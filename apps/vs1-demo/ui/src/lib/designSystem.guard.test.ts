@@ -103,3 +103,89 @@ describe('Design-System-Waechter · Marketing-Flaeche', () => {
     expect(gross.every((n) => n >= 17)).toBe(true);
   });
 });
+
+// ─── Zweite Wurzel-3-Haelfte: die Komponente statt des Nachbaus ───────────────
+// Von 58 rohen <button> auf der Marketing-Flaeche waren nur ~20 CTAs — der Rest
+// sind Akkordeon-Koepfe, Combobox-Trigger, Schliessen-Kreuze und Ankerpillen,
+// die zu Recht KEINE <Button> sind. Die Kennzahl "Adoption 18 %" war deshalb
+// irrefuehrend: gemessen an dem, was ueberhaupt ein Button sein soll, lag sie
+// bei knapp der Haelfte.
+//
+// Der Nachbau hatte einen sachlichen Grund. Die Komponente konnte die
+// Marketing-Form nicht erzeugen: sie sprach nur rounded-md (6 px) bei FESTEN
+// Pixelhoehen und mit whitespace-nowrap, waehrend die Seiten rounded-xl (10 px),
+// 46-57 px hohe Knoepfe und umbrechende Labels brauchen — "Meinen Bedarf
+// ermitteln" laeuft auf Deutsch ueber zwei Zeilen. Erst shape="soft",
+// size="xl" (min-height statt height), wrap und die beiden inverse-Varianten
+// fuer die dunklen Baender machten die Umstellung ueberhaupt moeglich.
+//
+// Dieser Test haelt nur die eng definierte Klasse: ein rohes <button>, das wie
+// ein CTA AUSSIEHT (gefuellte Marken-/Akzent-/Weissflaeche plus Radius). Er
+// verbietet NICHT rohe <button> an sich — das waere falsch und wuerde auf 42
+// korrekten Stellen feuern.
+
+/** Klassen im Ruhezustand — hover:/focus:/dark:-Praefixe zaehlen nicht als Fuellung. */
+function baseClassNames(tag: string): string {
+  const raw = [...tag.matchAll(/className=\{?[`"']([^`"']*)/g)].map((m) => m[1]).join(' ');
+  return raw
+    .split(/\s+/)
+    .filter((c) => c && !c.includes(':'))
+    .join(' ');
+}
+
+/** Ein <button …> vom Namen bis zu seinem schliessenden > — Ausdruecke inklusive. */
+function buttonTags(src: string): { index: number; tag: string }[] {
+  const out: { index: number; tag: string }[] = [];
+  for (const m of src.matchAll(/<button\b/g)) {
+    let i = m.index! + m[0].length;
+    let depth = 0;
+    let quote: string | null = null;
+    while (i < src.length) {
+      const ch = src[i];
+      if (quote) {
+        if (ch === quote && src[i - 1] !== '\\') quote = null;
+      } else if (ch === '"' || ch === "'" || ch === '`') quote = ch;
+      else if (ch === '{') depth++;
+      else if (ch === '}') depth--;
+      else if (ch === '>' && depth === 0) break;
+      i++;
+    }
+    out.push({ index: m.index!, tag: src.slice(m.index!, i + 1) });
+  }
+  return out;
+}
+
+describe('Design-System-Waechter · Komponente statt Nachbau', () => {
+  it('baut keinen CTA aus einem rohen <button> nach', () => {
+    const found: string[] = [];
+    for (const file of FILES) {
+      const src = readFileSync(file, 'utf8');
+      for (const { index, tag } of buttonTags(src)) {
+        const cls = baseClassNames(tag);
+        const filled = /\bbg-(?:brand|primary-\d00|accent-\d00|white)\b/.test(cls);
+        if (filled && /\brounded-/.test(cls)) {
+          const line = src.slice(0, index).split('\n').length;
+          found.push(`${relative(SRC, file)}:${line}`);
+        }
+      }
+    }
+    expect(
+      found,
+      'Gefuellter CTA als rohes <button> gebaut. Die Komponente kann das jetzt:\n' +
+        '  <Button shape="soft" size="lg|xl">        Marken-CTA (10px Radius)\n' +
+        '  <Button variant="inverse" …>              weisse Flaeche auf dunklem Band\n' +
+        '  <Button variant="inverseOutline" …>       Outline auf dunklem Band\n' +
+        '  wrap                                      Label darf umbrechen\n' +
+        'Gefunden:\n  ' + found.join('\n  '),
+    ).toEqual([]);
+  });
+
+  it('nutzt die Komponente inzwischen mehr als doppelt so oft wie vorher', () => {
+    const uses = FILES.reduce(
+      (n, f) => n + (readFileSync(f, 'utf8').match(/<Button\b/g) ?? []).length,
+      0,
+    );
+    // Vor der Umstellung: 14. Die Zahl darf wachsen, aber nicht zurueckfallen.
+    expect(uses).toBeGreaterThanOrEqual(30);
+  });
+});

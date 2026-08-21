@@ -25,6 +25,7 @@ import {
   Briefcase,
 } from 'lucide-react';
 import { Typography } from '../components/ui/Typography';
+import { Button } from '../components/ui/Button';
 
 
 // ─── Animated Section wrapper ─────────────────────────────────────────────────
@@ -335,13 +336,15 @@ function FoundersSection() {
               {t('solutions.founders.body', 'Founders need speed and clarity — not academic legal explanations. CompliHub360 translates regulatory chaos into safe, actionable business decisions so you can scale across borders without surprises.')}
             </Typography>
 
-            <button
+            <Button
+              size="lg"
+              shape="soft"
               onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/wizard`)}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary-500 text-white font-bold text-sm shadow-md hover:bg-primary-600 transition-colors"
+              className="shadow-md hover: transition-colors font-bold"
             >
               {t('solutions.founders.cta', 'Start Your Compliance Check')}
               <ArrowRight size={18} />
-            </button>
+            </Button>
           </div>
 
           {/* Pain points */}
@@ -531,13 +534,15 @@ function CounselSection() {
               ))}
             </div>
 
-            <button
+            <Button
+              size="lg"
+              shape="soft"
               onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/register`)}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary-500 text-white font-bold text-sm shadow-md hover:bg-primary-600 transition-colors"
+              className="shadow-md hover: transition-colors font-bold"
             >
               {t('solutions.counsel.cta', 'Try Secure Research')}
               <ArrowRight size={18} />
-            </button>
+            </Button>
           </div>
 
           {/* Right: Privacy Gate Diagram */}
@@ -571,19 +576,25 @@ function SolutionsCTA() {
           {t('solutions.cta.body', 'No matter your function — our platform adapts to your compliance reality.')}
         </Typography>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <button
+          <Button
+            variant="inverse"
+            size="xl"
+            shape="soft"
             onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/wizard`)}
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-white text-primary-900 font-bold text-base shadow-lg hover:bg-surface-tertiary transition-colors"
+            className="hover:bg-surface-tertiary transition-colors font-bold"
           >
             {t('solutions.cta.btnAssessment', 'Start Free Assessment')}
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="inverseOutline"
+            size="xl"
+            shape="soft"
             onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/platform`)}
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border-2 border-primary-400 text-white font-bold text-base hover:bg-primary-800 transition-colors"
+            className="hover: transition-colors font-bold"
           >
             {t('solutions.cta.btnPlatform', 'Explore Platform')}
             <ArrowRight size={18} />
-          </button>
+          </Button>
         </div>
       </div>
     </section>

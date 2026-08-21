@@ -660,19 +660,25 @@ function PlatformCTA() {
           {t('platform.cta.body', 'Start your free assessment and get a structured risk profile in under 2 minutes.')}
         </Typography>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <button
+          <Button
+            variant="inverse"
+            size="xl"
+            shape="soft"
             onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/register`)}
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-white text-primary-900 font-bold text-base shadow-lg hover:bg-surface-tertiary transition-colors"
+            className="hover:bg-surface-tertiary transition-colors font-bold"
           >
             {t('platform.cta.btnAssessment', 'Start Free Assessment')}
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="inverseOutline"
+            size="xl"
+            shape="soft"
             onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/register?intent=expert`)}
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border-2 border-primary-400 text-white font-bold text-base hover:bg-primary-800 transition-colors"
+            className="hover: transition-colors font-bold"
           >
             {t('platform.cta.btnExpert', 'Skip to Expert Match')}
             <ArrowRight size={18} />
-          </button>
+          </Button>
         </div>
       </div>
     </section>

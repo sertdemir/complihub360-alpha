@@ -24,6 +24,7 @@ import {
 } from '../components/compliance-areas';
 import type { AreaConfig } from '../components/compliance-areas/types';
 import { SiteFooter } from '../components/home';
+import { Button } from '../components/ui/Button';
 
 // ─── Section wrapper with scroll animation ───────────────────────────────────
 
@@ -343,13 +344,16 @@ export function ComplianceAreasPage() {
             )}
           </Typography>
           <div className="flex flex-col tablet:flex-row items-center justify-center gap-3">
-            <button
+            <Button
+              variant="inverse"
+              size="xl"
+              shape="soft"
               onClick={() => navigate(`${localePrefix}/wizard`)}
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-white text-primary-900 font-bold text-base shadow-lg hover:bg-surface-tertiary transition-colors"
+              className="hover:bg-surface-tertiary transition-colors font-bold"
             >
               {t('compliance.cta.btn', 'Start General Assessment')}
               <ArrowRight size={18} />
-            </button>
+            </Button>
           </div>
         </div>
       </section>

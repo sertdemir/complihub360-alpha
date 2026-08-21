@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, Check } from 'lucide-react';
 import { FreeAccountDrawer } from './MarketsDrawer';
+import { Button } from '../ui/Button';
 
 // ─── S10 — Newsletter band · Figma 1212:11 (compact variant) ────────────────
 // A slim band: copy on the left, email + Subscribe on the right. Below it, the
@@ -54,12 +55,14 @@ export function NewsletterBand() {
                 aria-label={t('newsletter.emailAria')}
                 className="min-w-0 flex-1 rounded-xl border border-stroke px-4 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-brand"
               />
-              <button
+              <Button
+                size="lg"
+                shape="soft"
                 type="submit"
-                className="shrink-0 rounded-xl bg-brand px-5 py-3 text-body-md font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5"
+                className="shrink-0 transition-transform duration-200 hover:-translate-y-0.5"
               >
                 {t('newsletter.subscribe')}
-              </button>
+              </Button>
             </form>
           )}
         </div>
