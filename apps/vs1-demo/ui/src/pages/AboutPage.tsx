@@ -73,7 +73,7 @@ export function AboutPage() {
           <Stagger className="mx-auto grid max-w-[1040px] gap-4 md:grid-cols-3">
             {PILLARS.map((key) => (
               <StaggerItem key={key}>
-                <div className="flex h-full flex-col rounded-2xl border border-stroke-subtle bg-surface p-6">
+                <div className="flex h-full flex-col rounded-xl border border-stroke-subtle bg-surface p-6">
                   <p className="text-body-2xs font-semibold uppercase tracking-[0.12em] text-fg-brand">
                     {t(`about.${key}.title`)}
                   </p>

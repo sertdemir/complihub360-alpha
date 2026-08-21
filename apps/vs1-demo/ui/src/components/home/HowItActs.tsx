@@ -16,7 +16,7 @@ function Card({ n, panel, title, desc }: { n: string; panel: React.ReactNode; ti
     <motion.div
       variants={item}
       transition={{ duration: 0.5, ease: 'easeOut' }}
-      className="grid gap-6 rounded-2xl bg-surface p-7 shadow-[0_30px_70px_-34px_rgba(2,22,17,0.3)] md:grid-cols-[auto_1fr_minmax(300px,400px)] md:items-center md:gap-10 md:p-9"
+      className="grid gap-6 rounded-xl bg-surface p-7 shadow-[0_30px_70px_-34px_rgba(2,22,17,0.3)] md:grid-cols-[auto_1fr_minmax(300px,400px)] md:items-center md:gap-10 md:p-9"
     >
       <p className="font-serif text-[2.5rem] font-bold leading-none text-fg-brand md:text-[3rem]">{n}</p>
       <div>

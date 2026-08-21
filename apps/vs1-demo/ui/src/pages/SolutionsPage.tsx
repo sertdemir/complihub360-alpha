@@ -61,7 +61,7 @@ function StatCard({ value, label, delay }: { value: string; label: string; delay
       initial={{ opacity: 0, scale: 0.9 }}
       animate={isInView ? { opacity: 1, scale: 1 } : {}}
       transition={{ duration: 0.4, delay }}
-      className="bg-surface border border-stroke rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow"
+      className="bg-surface border border-stroke rounded-xl p-6 text-center shadow-sm hover:shadow-md transition-shadow"
     >
       <Typography variant="display" as="span" weight="bold" className="text-fg-brand block mb-1">
         {value}
@@ -111,7 +111,7 @@ function ContextToSpecialistPath() {
               />
             )}
             <div className="relative z-10 flex flex-col items-center">
-              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-3 shadow-lg border ${node.color}`}>
+              <div className={`w-16 h-16 rounded-xl flex items-center justify-center mb-3 shadow-lg border ${node.color}`}>
                 <node.icon size={26} />
               </div>
               <Typography variant="ui-small" weight="bold" className="text-white text-center block mb-0.5">
@@ -168,7 +168,7 @@ function OpsDashboardPreview() {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.4, delay: i * 0.1 }}
-          className="bg-neutral-900 rounded-2xl p-6 border border-neutral-800"
+          className="bg-neutral-900 rounded-xl p-6 border border-neutral-800"
         >
           <div className="flex items-center gap-3 mb-4">
             <div className="w-9 h-9 rounded-lg bg-primary-500/15 flex items-center justify-center">
@@ -376,7 +376,7 @@ function FoundersSection() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4 }}
-                className={`rounded-2xl border p-6 flex items-start gap-4 ${color}`}
+                className={`rounded-xl border p-6 flex items-start gap-4 ${color}`}
               >
                 <div className="w-10 h-10 rounded-lg bg-surface/80 flex items-center justify-center shrink-0">
                   <Icon size={20} />
@@ -453,7 +453,7 @@ function OperationsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4 }}
-              className="bg-surface border border-stroke rounded-2xl p-7"
+              className="bg-surface border border-stroke rounded-xl p-7"
             >
               <div className="w-11 h-11 rounded-xl bg-brand-light border border-stroke-subtle flex items-center justify-center mb-5">
                 <Icon size={22} className="text-fg-brand" />

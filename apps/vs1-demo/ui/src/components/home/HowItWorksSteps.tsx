@@ -36,7 +36,7 @@ export function HowItWorksSteps() {
           {Array.from({ length: STAGE_COUNT }, (_, i) => (
             <StaggerItem
               key={i}
-              className="rounded-2xl border border-stroke-subtle bg-surface-secondary p-6"
+              className="rounded-xl border border-stroke-subtle bg-surface-secondary p-6"
             >
               <span className="grid h-9 w-9 place-items-center rounded-full bg-brand-light text-body-sm font-bold tabular-nums text-fg-brand">
                 {i + 1}

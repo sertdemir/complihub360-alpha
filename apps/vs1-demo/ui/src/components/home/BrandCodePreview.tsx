@@ -20,7 +20,7 @@ function CodeCard({ label, demo, title, desc }: { label: string; demo: ReactNode
     <motion.article
       variants={item}
       transition={{ duration: 0.5, ease: 'easeOut' }}
-      className="group flex h-[300px] flex-col rounded-2xl bg-surface p-7 shadow-[0_10px_15px_-3px_rgba(15,23,42,0.1),0_4px_6px_-2px_rgba(15,23,42,0.06)]"
+      className="group flex h-[300px] flex-col rounded-xl bg-surface p-7 shadow-[0_10px_15px_-3px_rgba(15,23,42,0.1),0_4px_6px_-2px_rgba(15,23,42,0.06)]"
     >
       <p className="text-body-3xs font-semibold uppercase tracking-[0.12em] text-fg-tertiary">{label}</p>
 

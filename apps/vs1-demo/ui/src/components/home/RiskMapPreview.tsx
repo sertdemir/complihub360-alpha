@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Lock, Check, Info, ArrowRight } from 'lucide-react';
 import { Logo } from '../ui/Logo';
 import { RiskBadge, type RiskLevel } from '../ui/RiskBadge';
+import { Badge } from '../ui/Badge';
 
 // Risk-map result preview (Figma 1694:1789) at the SAME 760×588 footprint as the
 // AnimatedWizard, so the hero can cross-fade wizard → result without any reflow.
@@ -38,15 +39,15 @@ function StateCell({ kind }: { kind: StateKind }) {
   }
   if (kind === 'confirmed') {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-surface-secondary px-2 py-1 text-body-4xs font-medium text-fg-secondary">
+      <Badge shape="pill" tone="neutral" appearance="soft" size="xs" className="font-medium">
         <Check size={11} className="text-fg-brand" /> {label}
-      </span>
+      </Badge>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 rounded-full border border-stroke px-2 py-1 text-body-4xs font-medium text-fg-secondary">
+    <Badge shape="pill" tone="neutral" appearance="outline" size="xs" className="font-medium">
       <Info size={11} /> {label}
-    </span>
+    </Badge>
   );
 }
 

@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Logo } from '../ui/Logo';
 import { supportedLngs } from '../../i18n/config';
 import { DOMAINS } from '../../lib/domains';
+import { Badge } from '../ui/Badge';
 
 // ─── S10 — Site footer · Figma 1212:11 ──────────────────────────────────────
 // Light four-column footer closing the landing page: brand + positioning, the
@@ -158,9 +159,9 @@ export function SiteFooter() {
                           <>
                             {linkLabel(`footer.columns.${col.key}.links.${l.key}`, l.fallback)}
                             {l.beta && (
-                              <span className="rounded-full bg-accent-50 px-1.5 py-0.5 text-body-5xs font-semibold uppercase tracking-[0.06em] text-accent-800 ring-1 ring-inset ring-accent-200">
+                              <Badge shape="pill" tone="accent" appearance="soft" size="xs" className="uppercase tracking-[0.06em] ring-1 ring-inset ring-accent-200">
                                 {t('footer.beta')}
-                              </span>
+                              </Badge>
                             )}
                           </>
                         );

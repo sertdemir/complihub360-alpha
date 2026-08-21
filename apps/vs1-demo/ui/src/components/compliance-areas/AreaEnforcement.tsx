@@ -51,7 +51,7 @@ export function AreaEnforcement({ slug, selectedCountry }: Props) {
       </Typography>
 
       {ceiling > 0 && (
-        <div className="mt-6 rounded-2xl border border-risk-critical/20 bg-risk-critical-bg/40 p-6">
+        <div className="mt-6 rounded-xl border border-risk-critical/20 bg-risk-critical-bg/40 p-6">
           <div className="flex items-center gap-2">
             <Gavel size={14} className="text-risk-on-critical" />
             <Typography

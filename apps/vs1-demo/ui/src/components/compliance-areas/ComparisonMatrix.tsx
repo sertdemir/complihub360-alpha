@@ -101,7 +101,7 @@ export function ComparisonMatrix({ selectedCountry }: Props) {
     t(`compliance.${slug}.title`, DOMAIN_BY_SLUG[slug]?.label ?? slug);
 
   return (
-    <div className="bg-surface border border-stroke rounded-2xl overflow-hidden mt-8">
+    <div className="bg-surface border border-stroke rounded-xl overflow-hidden mt-8">
       <div className="px-7 py-5 border-b border-stroke-subtle">
         <Typography variant="h3" weight="bold" className="text-fg">
           {t('compliance.matrix.title', 'Side-by-side: every area at a glance')}

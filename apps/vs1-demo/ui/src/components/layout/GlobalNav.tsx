@@ -236,7 +236,7 @@ export function GlobalNav() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.97 }}
             transition={{ duration: 0.18, ease: 'easeOut' } as any}
-            className="pointer-events-auto mt-2 w-full max-w-[1100px] mx-4 rounded-2xl bg-surface backdrop-blur-xl border border-stroke-subtle shadow-[0_4px_32px_rgba(0,0,0,0.08)] overflow-hidden"
+            className="pointer-events-auto mt-2 w-full max-w-[1100px] mx-4 rounded-xl bg-surface backdrop-blur-xl border border-stroke-subtle shadow-[0_4px_32px_rgba(0,0,0,0.08)] overflow-hidden"
           >
             <div className="px-8 py-6">
               <div className="flex flex-nowrap justify-center gap-10">

@@ -12,6 +12,7 @@ import { RiskBadge, type RiskLevel } from '../components/ui/RiskBadge';
 import { FreeAccountDrawer } from '../components/home/MarketsDrawer';
 import type { SearchProfile } from '../components/wizard/WizardContext';
 import { Button } from '../components/ui/Button';
+import { Badge } from '../components/ui/Badge';
 
 // ─── Results · Risk Map · Figma 1667:215 ────────────────────────────────────
 // The generated risk map shown after the wizard. A guest "map" — obligations
@@ -220,16 +221,16 @@ function StatePill({ state, onAnswer }: { state: State; onAnswer: () => void }) 
   const { t } = useTranslation('results');
   if (state.kind === 'confirmed') {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-light px-3 py-1 text-body-xs font-semibold text-fg-brand">
+      <Badge shape="pill" tone="brand" appearance="soft" size="lg" >
         <Check size={13} strokeWidth={3} /> {t('state.confirmed')}
-      </span>
+      </Badge>
     );
   }
   if (state.kind === 'likely') {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-stroke px-3 py-1 text-body-xs font-medium text-fg-secondary">
+      <Badge shape="pill" tone="neutral" appearance="outline" size="lg" className="font-medium">
         <Info size={13} /> {t('state.likely')}
-      </span>
+      </Badge>
     );
   }
   return (
@@ -424,7 +425,7 @@ export function ResultsRiskMap() {
         </div>
 
         {/* Stat strip */}
-        <div className="mx-auto mt-10 flex max-w-4xl flex-wrap items-center justify-between gap-y-4 rounded-2xl border border-stroke-subtle bg-surface px-8 py-6 shadow-[0_18px_44px_-32px_rgba(2,22,17,0.3)]">
+        <div className="mx-auto mt-10 flex max-w-4xl flex-wrap items-center justify-between gap-y-4 rounded-xl border border-stroke-subtle bg-surface px-8 py-6 shadow-[0_18px_44px_-32px_rgba(2,22,17,0.3)]">
           {stats.map((s, i) => (
             <div key={s.label} className="flex items-center">
               {i > 0 && <span className="mr-8 hidden h-8 w-px bg-stroke-subtle sm:block" />}
@@ -437,7 +438,7 @@ export function ResultsRiskMap() {
         </div>
 
         {/* Obligations table */}
-        <div className="mt-12 overflow-hidden rounded-2xl border border-stroke-subtle">
+        <div className="mt-12 overflow-hidden rounded-xl border border-stroke-subtle">
           <div className="grid grid-cols-[100px_1fr_120px_110px_160px] gap-4 border-b border-stroke-subtle bg-surface-secondary px-6 py-3.5 text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary">
             <span>{t('table.severity')}</span>
             <span>{t('table.obligation')}</span>
@@ -553,7 +554,7 @@ export function ResultsRiskMap() {
               : MATCHES.map((m) => (
                   <div
                     key={m}
-                    className="flex flex-col items-center gap-4 rounded-2xl border border-stroke-subtle bg-surface-secondary px-6 py-8"
+                    className="flex flex-col items-center gap-4 rounded-xl border border-stroke-subtle bg-surface-secondary px-6 py-8"
                   >
                     <Lock size={22} className="text-fg-tertiary" />
                     <div className="w-full space-y-2">

@@ -93,7 +93,7 @@ export function JTBDOutcomeGrid({ onScrollToFirstArea }: OutcomeProps) {
               viewport={{ once: true }}
               transition={{ duration: 0.35, delay: i * 0.06 }}
               onClick={o.onClick}
-              className="group text-left bg-surface border border-stroke hover:border-primary-400 rounded-2xl p-5 transition-all hover:shadow-lg hover:-translate-y-0.5 flex flex-col h-full"
+              className="group text-left bg-surface border border-stroke hover:border-primary-400 rounded-xl p-5 transition-all hover:shadow-lg hover:-translate-y-0.5 flex flex-col h-full"
             >
               <div className="w-10 h-10 rounded-lg bg-surface-tertiary flex items-center justify-center mb-4">
                 <Icon size={20} className="text-fg-brand" />

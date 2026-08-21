@@ -57,7 +57,7 @@ export function AreaCard({ area, index, selectedCountry }: Props) {
     >
       <Link
         to={`${localePrefix}/compliance/${area.slug}`}
-        className={`group flex h-full flex-col rounded-2xl border-2 bg-surface p-6 shadow-sm transition-shadow hover:shadow-md focus-visible:shadow-md ${style.border}`}
+        className={`group flex h-full flex-col rounded-xl border-2 bg-surface p-6 shadow-sm transition-shadow hover:shadow-md focus-visible:shadow-md ${style.border}`}
       >
         <div className="flex items-start gap-4">
           <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${style.iconBg}`}>

@@ -37,7 +37,7 @@ export function RiskComparisonGrid({ selectedCountry }: Props) {
       : t(`markets.countries.${selectedCountry}`, { defaultValue: selectedCountry });
 
   return (
-    <div ref={ref} className="bg-surface border border-stroke rounded-2xl p-7 desktop-s:p-8 mt-8">
+    <div ref={ref} className="bg-surface border border-stroke rounded-xl p-7 desktop-s:p-8 mt-8">
       <div className="mb-6">
         <Typography variant="h3" weight="bold" className="text-fg">
           {t('compliance.riskAtGlance', 'Risk at a Glance')}

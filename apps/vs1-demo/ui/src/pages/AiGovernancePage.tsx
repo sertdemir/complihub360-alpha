@@ -169,7 +169,7 @@ function DimensionsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1, duration: 0.5 }}
-              className="rounded-2xl border border-stroke p-8 hover:shadow-lg transition-shadow bg-surface-secondary"
+              className="rounded-xl border border-stroke p-8 hover:shadow-lg transition-shadow bg-surface-secondary"
             >
               <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 border ${dim.color}`}>
                 <dim.icon size={28} />
@@ -209,7 +209,7 @@ function FeaturesOverview() {
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="flex flex-col md:flex-row gap-6 items-start bg-primary-800 border border-primary-700 p-8 rounded-2xl"
+            className="flex flex-col md:flex-row gap-6 items-start bg-primary-800 border border-primary-700 p-8 rounded-xl"
           >
             <div className="w-12 h-12 shrink-0 rounded-xl bg-primary-700 flex items-center justify-center">
               <EyeOff size={24} className="text-primary-300" />
@@ -229,7 +229,7 @@ function FeaturesOverview() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="flex flex-col md:flex-row gap-6 items-start bg-primary-800 border border-primary-700 p-8 rounded-2xl"
+            className="flex flex-col md:flex-row gap-6 items-start bg-primary-800 border border-primary-700 p-8 rounded-xl"
           >
             <div className="w-12 h-12 shrink-0 rounded-xl bg-primary-700 flex items-center justify-center">
               <Brain size={24} className="text-primary-300" />
@@ -249,7 +249,7 @@ function FeaturesOverview() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="flex flex-col md:flex-row gap-6 items-start bg-primary-800 border border-primary-700 p-8 rounded-2xl"
+            className="flex flex-col md:flex-row gap-6 items-start bg-primary-800 border border-primary-700 p-8 rounded-xl"
           >
             <div className="w-12 h-12 shrink-0 rounded-xl bg-primary-700 flex items-center justify-center">
               <Lock size={24} className="text-primary-300" />

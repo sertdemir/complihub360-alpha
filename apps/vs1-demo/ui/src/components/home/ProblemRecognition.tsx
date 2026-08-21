@@ -38,7 +38,7 @@ export function ProblemRecognition() {
           {Array.from({ length: CARD_COUNT }, (_, i) => (
             <StaggerItem
               key={i}
-              className="rounded-2xl border border-stroke-subtle bg-surface p-7 text-left"
+              className="rounded-xl border border-stroke-subtle bg-surface p-7 text-left"
             >
               {/* The quiet index keeps the four readable as a set without
                   implying a sequence — these happen all at once, not in order. */}

@@ -292,7 +292,7 @@ export function ComplianceAreaPage() {
       {/* ── 8 · Specialists ───────────────────────────────────────────────── */}
       <Section className="py-14 desktop-s:py-16">
         <Container size="xl">
-          <div className="max-w-[820px] rounded-2xl border border-stroke-subtle bg-surface p-7">
+          <div className="max-w-[820px] rounded-xl border border-stroke-subtle bg-surface p-7">
             <Typography
               variant="caption"
               className="mb-2 flex items-center gap-1.5 font-semibold uppercase tracking-wider text-fg-tertiary"

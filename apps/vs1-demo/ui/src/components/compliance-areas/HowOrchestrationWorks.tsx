@@ -34,7 +34,7 @@ export function HowOrchestrationWorks() {
   const { t } = useTranslation('common');
 
   return (
-    <div className="bg-surface-tertiary/40 border border-stroke-subtle rounded-2xl p-7 desktop-s:p-10 mt-8">
+    <div className="bg-surface-tertiary/40 border border-stroke-subtle rounded-xl p-7 desktop-s:p-10 mt-8">
       <div className="max-w-2xl mb-8">
         <Typography
           variant="caption"
@@ -64,7 +64,7 @@ export function HowOrchestrationWorks() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.1 }}
-              className="relative bg-surface rounded-2xl p-5 desktop-s:p-6 border border-stroke-subtle shadow-sm flex flex-col"
+              className="relative bg-surface rounded-xl p-5 desktop-s:p-6 border border-stroke-subtle shadow-sm flex flex-col"
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-11 h-11 rounded-xl bg-primary-500 flex items-center justify-center shrink-0">
