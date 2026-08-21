@@ -8,6 +8,7 @@ import { SiteFooter } from '../components/home';
 import { SectionEyebrow, GoldWord, Reveal, Stagger, StaggerItem } from '../components/providers/SectionHeading';
 import { DOMAIN_I18N_KEY, DOMAIN_BY_SLUG } from '../lib/domains';
 import { getMarketProfile, isMarketCode, listMarkets } from '../lib/marketProfiles';
+import { Badge } from '../components/ui/Badge';
 
 // ─── /markets and /markets/:code · Brand Map Stufe 6b ────────────────────────
 // The country knowledge base. Every fact on these pages is derived in
@@ -126,8 +127,11 @@ export function MarketsIndexPage() {
                     </p>
                     <ul className="mt-2 flex flex-wrap gap-1.5">
                       {(t(`markets.regions.items.${key}.focus`, { returnObjects: true }) as string[]).map((f) => (
-                        <li key={f} className="rounded-full border border-stroke-subtle px-2.5 py-1 text-body-2xs text-fg-secondary">
-                          {f}
+                        <li key={f}>
+                          {/* Badge renders a span — it has to sit INSIDE the li, not replace it. */}
+                          <Badge shape="pill" tone="neutral" appearance="outline" size="md">
+                            {f}
+                          </Badge>
                         </li>
                       ))}
                     </ul>

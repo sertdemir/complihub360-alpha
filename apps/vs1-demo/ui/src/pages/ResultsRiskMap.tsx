@@ -12,6 +12,7 @@ import { RiskBadge, type RiskLevel } from '../components/ui/RiskBadge';
 import { FreeAccountDrawer } from '../components/home/MarketsDrawer';
 import type { SearchProfile } from '../components/wizard/WizardContext';
 import { Button } from '../components/ui/Button';
+import { Badge } from '../components/ui/Badge';
 
 // ─── Results · Risk Map · Figma 1667:215 ────────────────────────────────────
 // The generated risk map shown after the wizard. A guest "map" — obligations
@@ -220,16 +221,16 @@ function StatePill({ state, onAnswer }: { state: State; onAnswer: () => void }) 
   const { t } = useTranslation('results');
   if (state.kind === 'confirmed') {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-light px-3 py-1 text-body-xs font-semibold text-fg-brand">
+      <Badge shape="pill" tone="brand" appearance="soft" size="lg" >
         <Check size={13} strokeWidth={3} /> {t('state.confirmed')}
-      </span>
+      </Badge>
     );
   }
   if (state.kind === 'likely') {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-stroke px-3 py-1 text-body-xs font-medium text-fg-secondary">
+      <Badge shape="pill" tone="neutral" appearance="outline" size="lg" className="font-medium">
         <Info size={13} /> {t('state.likely')}
-      </span>
+      </Badge>
     );
   }
   return (

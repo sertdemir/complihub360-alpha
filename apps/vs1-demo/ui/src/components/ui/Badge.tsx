@@ -11,9 +11,20 @@ import { cn } from '../../lib/utils';
 
 export type BadgeTone = 'neutral' | 'brand' | 'accent' | 'success' | 'warning' | 'error' | 'info';
 export type BadgeAppearance = 'solid' | 'soft' | 'outline';
-export type BadgeSize = 'sm' | 'md' | 'lg';
+export type BadgeSize = 'xs' | 'sm' | 'md' | 'lg';
+
+// Corner language. The Compass badge family is emphatically rectangular:
+// Badge 4px, Tag 4px, Risk Badge 4px, Chip 6px — five components, none round.
+// `pill` exists because the marketing surface built 16 fully round labels by
+// hand, and because the mobile anchor nav is a deliberate pill (see
+// docs/design-system/mobile-header-pill-nav.md). Naming the deviation here
+// beats leaving it scattered across 16 hand-built spans. Default stays `rect`,
+// which is the doctrine.
+export type BadgeShape = 'rect' | 'pill';
 
 const SIZE: Record<BadgeSize, { box: string; text: string; radius: string; dot: string; gap: string; close: number }> = {
+  // 10px matches Compass "Risk Badge SM" — the smallest label the system uses.
+  xs: { box: 'px-[5px] py-[2px]', text: 'text-[10px]', radius: 'rounded-[4px]', dot: 'h-[5px] w-[5px]', gap: 'gap-[3px]', close: 10 },
   sm: { box: 'px-[6px] py-[3px]', text: 'text-[11px]', radius: 'rounded-[4px]', dot: 'h-[6px] w-[6px]', gap: 'gap-[4px]', close: 11 },
   md: { box: 'px-[8px] py-[4px]', text: 'text-[12px]', radius: 'rounded-[6px]', dot: 'h-[7px] w-[7px]', gap: 'gap-[5px]', close: 12 },
   lg: { box: 'px-[10px] py-[6px]', text: 'text-[14px]', radius: 'rounded-[6px]', dot: 'h-[8px] w-[8px]', gap: 'gap-[6px]', close: 14 },
@@ -22,18 +33,27 @@ const SIZE: Record<BadgeSize, { box: string; text: string; radius: string; dot: 
 const TONE: Record<BadgeTone, { solid: string; soft: string; outline: string; dot: string }> = {
   neutral: {
     solid: 'bg-neutral-800 text-white dark:bg-neutral-200 dark:text-neutral-900',
-    soft: 'bg-neutral-100 text-neutral-700 dark:bg-white/10 dark:text-neutral-200',
-    outline: 'border border-neutral-300 text-neutral-700 dark:border-white/25 dark:text-neutral-200',
-    dot: 'bg-neutral-500 dark:bg-neutral-300',
+    // Semantic layer, not palette steps. Badge had 2 usages in the whole
+    // project and 0 on the marketing surface — because reaching for it meant
+    // importing neutral-100/300 into pages built on surface/fg tokens. These
+    // pairings are the ones the 16 hand-built pills already ship, so they are
+    // proven in both modes rather than newly invented.
+    soft: 'bg-surface-secondary text-fg-secondary',
+    outline: 'border border-stroke text-fg-secondary',
+    dot: 'bg-fg-tertiary',
   },
   brand: {
     solid: 'bg-primary-500 text-white',
-    soft: 'bg-primary-50 text-primary-700 dark:bg-primary-500/25 dark:text-primary-200',
-    outline: 'border border-primary-500 text-primary-700 dark:border-primary-400 dark:text-primary-200',
-    dot: 'bg-primary-500 dark:bg-primary-300',
+    soft: 'bg-brand-light text-fg-brand',
+    outline: 'border border-stroke-brand text-fg-brand',
+    dot: 'bg-brand',
   },
   accent: {
     solid: 'bg-accent-500 text-fg-on-accent',
+    // Gold stays entirely on the fixed palette, background AND label. The
+    // semantic text-fg-accent-strong flips with the theme while bg-accent-50
+    // does not — pairing them measured 1.98:1 in dark mode. Where a ground
+    // deliberately does not flip, the text on it must not either.
     soft: 'bg-accent-50 text-accent-800 dark:bg-accent-500/20 dark:text-accent-200',
     outline: 'border border-accent-500 text-accent-700 dark:border-accent-400 dark:text-accent-200',
     dot: 'bg-accent-500',
@@ -70,6 +90,8 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   size?: BadgeSize;
   /** Show a leading status dot in the tone colour. */
   dot?: boolean;
+  /** Corner language: `rect` (Compass doctrine) or `pill` (fully round). */
+  shape?: BadgeShape;
   /** Render a trailing ✕ that calls this when clicked (removable filter chip). */
   onDismiss?: () => void;
   /** Accessible label for the ✕ button (default "Remove"). */
@@ -80,6 +102,7 @@ export function Badge({
   tone = 'neutral',
   appearance = 'soft',
   size = 'md',
+  shape = 'rect',
   dot = false,
   onDismiss,
   dismissLabel = 'Remove',
@@ -95,7 +118,7 @@ export function Badge({
         'inline-flex items-center justify-center whitespace-nowrap font-sans font-semibold leading-none tracking-[0.02em]',
         s.box,
         s.text,
-        s.radius,
+        shape === 'pill' ? 'rounded-full' : s.radius,
         s.gap,
         t[appearance],
         className,
@@ -129,6 +152,7 @@ export interface FilterChipProps extends Omit<React.ButtonHTMLAttributes<HTMLBut
 }
 
 const CHIP_SIZE: Record<BadgeSize, string> = {
+  xs: 'px-[8px] py-[3px]', // text size comes from the badge scale
   sm: 'px-[10px] py-[4px] text-[12px]',
   md: 'px-[12px] py-[5px] text-[13px]',
   lg: 'px-[14px] py-[7px] text-[14px]',

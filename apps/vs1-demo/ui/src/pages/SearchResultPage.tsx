@@ -5,6 +5,7 @@ import { Search, ArrowRight, ShieldCheck, FileText, BookOpen } from 'lucide-reac
 import { Logo } from '../components/ui/Logo';
 import { Button } from '../components/ui/Button';
 import { SectionEyebrow } from '../components/providers/SectionHeading';
+import { Badge } from '../components/ui/Badge';
 
 // ─── Search-Result page · Figma 3257:1490 (L) / 3262:1518 (D) ────────────────
 // Journey Station 1A "der schnelle Weg": a prose query gets a direct, sourced
@@ -94,9 +95,9 @@ export function SearchResultPage() {
                 wired up yet — so the page has to say so. This used to be a
                 "[Placeholder answer]" prefix inside the prose itself; as a badge
                 the admission stays visible without living in shippable copy. */}
-            <span className="rounded-full border border-stroke-subtle px-2.5 py-0.5 text-body-3xs font-semibold uppercase tracking-[0.08em] text-fg-tertiary">
+            <Badge shape="pill" tone="neutral" appearance="outline" size="sm" className="uppercase tracking-[0.08em]">
               {t('search.previewBadge')}
-            </span>
+            </Badge>
           </div>
           <h1 className="mt-3 font-serif text-[1.9rem] font-bold leading-tight text-fg">
             {initialQuery ? t('search.answerTitleFor', { query: initialQuery }) : t('search.answerTitleDefault')}
@@ -107,9 +108,9 @@ export function SearchResultPage() {
           <div className="mt-5 flex flex-wrap items-center gap-2">
             <span className="text-body-2xs font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{t('search.sources')}:</span>
             {SOURCE_FIXTURE.map((s) => (
-              <span key={s} className="inline-flex items-center gap-1.5 rounded-full border border-stroke-subtle px-3 py-1 text-body-2xs text-fg-secondary">
+              <Badge shape="pill" tone="neutral" appearance="outline" size="md" key={s} >
                 <FileText size={12} /> {s}
-              </span>
+              </Badge>
             ))}
           </div>
         </section>

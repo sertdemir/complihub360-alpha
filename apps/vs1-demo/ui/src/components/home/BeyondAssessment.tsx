@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Play } from 'lucide-react';
 import { GoldWord } from '../providers/SectionHeading';
+import { Badge } from '../ui/Badge';
 
 // ─── S7 — Beyond the Assessment · Figma 1229:157 ────────────────────────────
 // "From one-time check to home base." A bento grid: a hero card (your persistent
@@ -16,14 +17,14 @@ const NEWS_COUNT = 2;
 
 function Pill({ children, tone }: { children: React.ReactNode; tone: 'live' | 'beta' }) {
   return tone === 'live' ? (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-light px-3 py-1 text-body-3xs font-semibold uppercase tracking-[0.08em] text-fg-brand">
+    <Badge shape="pill" tone="brand" appearance="soft" size="sm" className="uppercase tracking-[0.08em]">
       <span className="h-1.5 w-1.5 rounded-full bg-brand" />
       {children}
-    </span>
+    </Badge>
   ) : (
-    <span className="inline-flex items-center rounded-full bg-accent-50 px-3 py-1 text-body-3xs font-semibold uppercase tracking-[0.08em] text-accent-800 ring-1 ring-inset ring-accent-200">
+    <Badge shape="pill" tone="accent" appearance="soft" size="sm" className="uppercase tracking-[0.08em] ring-1 ring-inset ring-accent-200">
       {children}
-    </span>
+    </Badge>
   );
 }
 

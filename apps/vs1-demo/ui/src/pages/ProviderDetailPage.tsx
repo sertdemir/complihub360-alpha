@@ -5,6 +5,7 @@ import { Logo } from '../components/ui/Logo';
 import { useApiData } from '../lib/useApiData';
 import { fetchProviderDetail, type ProviderDetail } from '../api/bookings';
 import { Button } from '../components/ui/Button';
+import { Badge } from '../components/ui/Badge';
 
 // ─── Provider Detail (stage 2, monetised) — Phase-3 wiring ───────────────────
 // Mirrors the Figma "Provider Detail — Anonym" screens: still-anonymous depth
@@ -82,7 +83,7 @@ export function ProviderDetailPage() {
               <h2 className="text-body font-semibold text-fg">{t('detail.specsTitle')}</h2>
               <div className="mt-4 flex flex-wrap gap-2">
                 {p.specializations.map((s) => (
-                  <span key={s} className="rounded-full border border-stroke-subtle px-3 py-1.5 text-body-xs text-fg-secondary">{s}</span>
+                  <Badge shape="pill" tone="neutral" appearance="outline" size="lg" key={s} >{s}</Badge>
                 ))}
               </div>
               <p className="mt-4 text-body-xs text-fg-tertiary">
