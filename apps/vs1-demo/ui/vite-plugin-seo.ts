@@ -32,6 +32,9 @@ function loadCopy(root: string, lng: string) {
   return {
     seo: (json.seo ?? {}) as Record<string, SeoEntry>,
     countries: (json.markets?.countries ?? {}) as Record<string, string>,
+    // compliance.<slug>.title — the eight area pages name themselves the way
+    // the market pages name their country.
+    areas: (json.compliance ?? {}) as Record<string, { title?: string }>,
   };
 }
 
@@ -65,7 +68,7 @@ export function seoPlugin(): Plugin {
       let written = 0;
 
       for (const locale of SEO_LOCALES) {
-        const { seo, countries } = copy[locale];
+        const { seo, countries, areas } = copy[locale];
         for (const route of PUBLIC_ROUTES) {
           const entry = seo[route.seoKey];
           if (!entry) {
@@ -74,8 +77,18 @@ export function seoPlugin(): Plugin {
           }
           const code = route.seoKey === 'marketCountry' ? route.path.split('/')[1]?.toUpperCase() : '';
           const country = code ? (countries[code] ?? code) : '';
-          const title = entry.title.replace(/\{\{country\}\}/g, country);
-          const description = entry.description.replace(/\{\{country\}\}/g, country);
+
+          // The runtime head (hooks/useSeo) interpolates {{area}} as well. If
+          // only one of the two did, a crawler that runs no JavaScript would
+          // read a raw placeholder while everyone else saw the area's name —
+          // the exact drift these two halves share a manifest to avoid.
+          const slug = route.seoKey === 'complianceArea' ? route.path.split('/')[1] : '';
+          const area = slug ? (areas[slug]?.title ?? slug) : '';
+
+          const fill = (s: string) =>
+            s.replace(/\{\{country\}\}/g, country).replace(/\{\{area\}\}/g, area);
+          const title = fill(entry.title);
+          const description = fill(entry.description);
           const canonical = absoluteUrl(origin, locale, route.path);
 
           const alternates = [

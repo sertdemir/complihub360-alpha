@@ -25,8 +25,13 @@ describe('public route manifest', () => {
   it('every route is actually routed in App.tsx', () => {
     const missing = PUBLIC_ROUTES.filter((r) => {
       if (r.path === '') return !appSource.includes('<Route index');
-      // markets/de … are served by the markets/:code route
-      const routePath = r.path.startsWith('markets/') ? 'markets/:code' : r.path;
+      // markets/de … and compliance/tax-vat … are served by one dynamic route
+      // each, so the manifest entry and the <Route path> cannot match verbatim.
+      const routePath = r.path.startsWith('markets/')
+        ? 'markets/:code'
+        : r.path.startsWith('compliance/')
+          ? 'compliance/:area'
+          : r.path;
       return !appSource.includes(`path="${routePath}"`);
     }).map((r) => r.path);
     expect(missing, `listed but not routed: ${missing.join(', ')}`).toEqual([]);

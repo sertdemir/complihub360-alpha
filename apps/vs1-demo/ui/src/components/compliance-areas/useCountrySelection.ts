@@ -1,23 +1,22 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import type { CountryCode } from './types';
+import { isCountryCode, type CountryCode } from './types';
 
 const STORAGE_KEY = 'complihub360.compliance.country';
-const VALID_CODES: CountryCode[] = ['EU', 'DE', 'FR', 'IT', 'ES', 'UK', 'US', 'CH', 'ALL'];
 
-function isValid(code: string | null | undefined): code is CountryCode {
-  return !!code && (VALID_CODES as string[]).includes(code);
-}
-
+// The selection survives three things on purpose: a reload (sessionStorage), a
+// shared link (?country=), and a move from the hub to an area page and back —
+// the area pages read statutes, penalties and cadences per market, so losing
+// the choice mid-journey would reset the one input the reader gave us.
 export function useCountrySelection(): [CountryCode, (next: CountryCode) => void] {
   const [params, setParams] = useSearchParams();
 
   const initial: CountryCode = (() => {
     const fromUrl = params.get('country');
-    if (isValid(fromUrl)) return fromUrl;
+    if (isCountryCode(fromUrl)) return fromUrl;
     if (typeof window !== 'undefined') {
       const fromStorage = window.sessionStorage.getItem(STORAGE_KEY);
-      if (isValid(fromStorage)) return fromStorage;
+      if (isCountryCode(fromStorage)) return fromStorage;
     }
     return 'EU';
   })();

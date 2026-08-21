@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { PUBLIC_ROUTES, SEO_LOCALES, DEFAULT_LOCALE, absoluteUrl } from '../lib/publicRoutes';
+import { DOMAIN_BY_SLUG } from '../lib/domains';
 
 // ─── useSeo ───────────────────────────────────────────────────────────────────
 // Head management for the public pages, in ONE place rather than per page.
@@ -56,8 +57,19 @@ export function useSeo() {
 
     const code = route.seoKey === 'marketCountry' ? path.split('/')[1]?.toUpperCase() : null;
     const country = code ? t(`markets.countries.${code}`, { defaultValue: code }) : '';
-    const title = t(`seo.${route.seoKey}.title`, { country });
-    const description = t(`seo.${route.seoKey}.description`, { country });
+
+    // The eight area pages share one seoKey and differ by the area's own name,
+    // exactly as the market pages differ by country. Both interpolate rather
+    // than carrying eight near-identical copies of the same sentence.
+    const areaSlug = route.seoKey === 'complianceArea' ? path.split('/')[1] : null;
+    const area = areaSlug
+      ? t(`compliance.${areaSlug}.title`, {
+          defaultValue: DOMAIN_BY_SLUG[areaSlug]?.label ?? areaSlug,
+        })
+      : '';
+
+    const title = t(`seo.${route.seoKey}.title`, { country, area });
+    const description = t(`seo.${route.seoKey}.description`, { country, area });
 
     document.title = title;
     setMeta('name', 'description', description);
