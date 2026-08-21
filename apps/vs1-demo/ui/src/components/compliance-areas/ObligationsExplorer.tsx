@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { BusinessModel } from '@complihub/compliance-engine';
 import { ExternalLink, ScrollText, CalendarClock, Info } from 'lucide-react';
 import { Typography } from '../ui/Typography';
+import { FilterChip } from '../ui/Badge';
 import { getAreaObligations } from '../../lib/areaProfiles';
 import type { DomainSlug } from '../../lib/domains';
 import { SEVERITY_STYLE, SEVERITY_FALLBACK, severityKey } from './severity';
@@ -62,32 +63,17 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
         <span className="text-body-3xs font-semibold uppercase tracking-wider text-fg-tertiary">
           {t('compliance.area.modelFilter', 'I run a')}
         </span>
-        <button
-          type="button"
-          onClick={() => setModel(null)}
-          aria-pressed={model === null}
-          className={`rounded-md border px-3 py-1.5 text-xs font-semibold transition-colors ${
-            model === null
-              ? 'border-brand bg-brand text-fg-on-brand'
-              : 'border-stroke-subtle bg-surface text-fg-secondary hover:border-brand hover:text-fg-brand'
-          }`}
-        >
+        <FilterChip selected={model === null} onClick={() => setModel(null)}>
           {t('compliance.area.modelAll', 'Any business')}
-        </button>
+        </FilterChip>
         {MODELS.map(m => (
-          <button
+          <FilterChip
             key={m.value}
-            type="button"
+            selected={model === m.value}
             onClick={() => setModel(model === m.value ? null : m.value)}
-            aria-pressed={model === m.value}
-            className={`rounded-md border px-3 py-1.5 text-xs font-semibold transition-colors ${
-              model === m.value
-                ? 'border-brand bg-brand text-fg-on-brand'
-                : 'border-stroke-subtle bg-surface text-fg-secondary hover:border-brand hover:text-fg-brand'
-            }`}
           >
             {t(`compliance.businessModel.${m.value}`, m.fallback)}
-          </button>
+          </FilterChip>
         ))}
       </div>
 

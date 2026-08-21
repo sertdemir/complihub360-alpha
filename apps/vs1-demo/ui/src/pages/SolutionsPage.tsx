@@ -25,6 +25,8 @@ import {
   Briefcase,
 } from 'lucide-react';
 import { Typography } from '../components/ui/Typography';
+import { Button } from '../components/ui/Button';
+import { Container } from '../components/ui/Container';
 
 
 // ─── Animated Section wrapper ─────────────────────────────────────────────────
@@ -294,7 +296,7 @@ function AnchorBar() {
 
   return (
     <div className="sticky top-16 z-40 bg-surface/80 backdrop-blur-md border-b border-stroke-subtle">
-      <div className="max-w-7xl mx-auto px-6">
+      <Container gutter="flat">
         <nav className="flex items-center justify-center gap-1 overflow-x-auto scrollbar-hide py-2">
           {anchors.map(a => (
             <button
@@ -308,7 +310,7 @@ function AnchorBar() {
             </button>
           ))}
         </nav>
-      </div>
+      </Container>
     </div>
   );
 }
@@ -321,7 +323,7 @@ function FoundersSection() {
 
   return (
     <Section id="founders" className="py-16 desktop-s:py-24 bg-background">
-      <div className="max-w-7xl mx-auto px-6">
+      <Container gutter="flat">
         {/* Hero */}
         <div className="grid desktop-s:grid-cols-2 gap-14 items-center mb-14">
           <div>
@@ -335,13 +337,15 @@ function FoundersSection() {
               {t('solutions.founders.body', 'Founders need speed and clarity — not academic legal explanations. CompliHub360 translates regulatory chaos into safe, actionable business decisions so you can scale across borders without surprises.')}
             </Typography>
 
-            <button
+            <Button
+              size="lg"
+              shape="soft"
               onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/wizard`)}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary-500 text-white font-bold text-sm shadow-md hover:bg-primary-600 transition-colors"
+              className="shadow-md hover: transition-colors font-bold"
             >
               {t('solutions.founders.cta', 'Start Your Compliance Check')}
               <ArrowRight size={18} />
-            </button>
+            </Button>
           </div>
 
           {/* Pain points */}
@@ -396,7 +400,7 @@ function FoundersSection() {
           <StatCard value="48h" label={t('solutions.founders.stat3Label', 'Max reply window')} delay={0.2} />
           <StatCard value="0" label={t('solutions.founders.stat4Label', 'Regulatory surprises')} delay={0.3} />
         </div>
-      </div>
+      </Container>
     </Section>
   );
 }
@@ -408,7 +412,7 @@ function OperationsSection() {
 
   return (
     <Section id="operations" className="py-16 desktop-s:py-24 bg-surface-secondary">
-      <div className="max-w-7xl mx-auto px-6">
+      <Container gutter="flat">
         <div className="max-w-3xl mb-14">
           <Typography variant="caption" className="text-fg-brand mb-3 block font-semibold">
             {t('solutions.operations.overline', 'For Operations Teams')}
@@ -473,7 +477,7 @@ function OperationsSection() {
           <StatCard value="1-Click" label={t('solutions.operations.stat2Label', 'PDF report export')} delay={0.1} />
           <StatCard value="∞" label={t('solutions.operations.stat3Label', 'Saved compliance sessions')} delay={0.2} />
         </div>
-      </div>
+      </Container>
     </Section>
   );
 }
@@ -486,7 +490,7 @@ function CounselSection() {
 
   return (
     <Section id="counsel" className="py-16 desktop-s:py-24 bg-background">
-      <div className="max-w-7xl mx-auto px-6">
+      <Container gutter="flat">
         <div className="grid desktop-s:grid-cols-2 gap-16 items-start">
           {/* Left */}
           <div>
@@ -531,13 +535,15 @@ function CounselSection() {
               ))}
             </div>
 
-            <button
+            <Button
+              size="lg"
+              shape="soft"
               onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/register`)}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary-500 text-white font-bold text-sm shadow-md hover:bg-primary-600 transition-colors"
+              className="shadow-md hover: transition-colors font-bold"
             >
               {t('solutions.counsel.cta', 'Try Secure Research')}
               <ArrowRight size={18} />
-            </button>
+            </Button>
           </div>
 
           {/* Right: Privacy Gate Diagram */}
@@ -550,7 +556,7 @@ function CounselSection() {
             </div>
           </div>
         </div>
-      </div>
+      </Container>
     </Section>
   );
 }
@@ -571,19 +577,25 @@ function SolutionsCTA() {
           {t('solutions.cta.body', 'No matter your function — our platform adapts to your compliance reality.')}
         </Typography>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <button
+          <Button
+            variant="inverse"
+            size="xl"
+            shape="soft"
             onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/wizard`)}
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-white text-primary-900 font-bold text-base shadow-lg hover:bg-surface-tertiary transition-colors"
+            className="hover:bg-surface-tertiary transition-colors font-bold"
           >
             {t('solutions.cta.btnAssessment', 'Start Free Assessment')}
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="inverseOutline"
+            size="xl"
+            shape="soft"
             onClick={() => navigate(`/${i18n.resolvedLanguage || 'en'}/platform`)}
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border-2 border-primary-400 text-white font-bold text-base hover:bg-primary-800 transition-colors"
+            className="hover: transition-colors font-bold"
           >
             {t('solutions.cta.btnPlatform', 'Explore Platform')}
             <ArrowRight size={18} />
-          </button>
+          </Button>
         </div>
       </div>
     </section>

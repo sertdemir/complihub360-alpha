@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ChevronDown, Check, LayoutGrid } from 'lucide-react';
+import { Container } from '../ui/Container';
 import { DOMAIN_BY_SLUG, type DomainSlug } from '../../lib/domains';
 import { AREAS } from './areas';
 import { CountrySelector } from './CountrySelector';
@@ -72,7 +73,7 @@ export function AreaSwitcher({ current, selectedCountry, onCountryChange }: Prop
       style={{ top: headerH }}
       className="sticky z-40 border-b border-stroke-subtle bg-surface/85 backdrop-blur-md"
     >
-      <div className="mx-auto flex max-w-7xl items-center gap-3 px-6 py-2.5">
+      <Container gutter="flat" className="flex items-center gap-3 py-2.5">
         <Link
           to={`${localePrefix}/compliance`}
           className="inline-flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1.5 text-body-xs font-semibold text-fg-secondary transition-colors hover:text-fg-brand"
@@ -132,7 +133,7 @@ export function AreaSwitcher({ current, selectedCountry, onCountryChange }: Prop
         <div className="hidden shrink-0 tablet:block">
           <CountrySelector value={selectedCountry} onChange={onCountryChange} size="sm" />
         </div>
-      </div>
+      </Container>
     </div>
   );
 }

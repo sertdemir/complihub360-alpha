@@ -80,10 +80,18 @@ jobs:
           mkdir -p ~/.ssh
           echo "$VPS_SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          # Diagnose without leaking: key fingerprint proves the secret is a
-          # valid private key; nc proves port 22 is reachable from GitHub.
+          # Diagnose without leaking: the key fingerprint proves the secret is
+          # a valid private key. That check stays fatal — a broken secret cannot
+          # be retried away. The reachability probe below is only advisory.
           ssh-keygen -lf ~/.ssh/deploy_key || { echo "::error::VPS_SSH_KEY secret is not a valid private key"; exit 1; }
-          nc -zv -w 10 76.13.159.221 22 || { echo "::error::Port 22 on the VPS is not reachable from GitHub runners (firewall?)"; exit 1; }
+          # Diagnosehilfe, KEIN Gate. Am 21.08. hat genau diese Zeile einen
+          # Deploy rot gemacht, den die rsync-Retries darunter ueberlebt
+          # haetten: ein einzelner 10s-Versuch ohne Wiederholung, waehrend die
+          # eigentliche Uebertragung dreimal mit Backoff probiert. Auf dem VPS
+          # war nichts gesperrt (kein fail2ban, ufw inaktiv, iptables leer) und
+          # Port 22 war von ausserhalb GitHubs erreichbar.
+          nc -zv -w 10 76.13.159.221 22 \
+            || echo "::warning::Port 22 im Vorabtest nicht erreichbar — rsync versucht es unten trotzdem dreimal"
           # keyscan is best-effort; accept-new covers the first connection.
           ssh-keyscan -T 10 -H 76.13.159.221 >> ~/.ssh/known_hosts || true
           SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15"

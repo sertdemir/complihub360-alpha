@@ -4,6 +4,7 @@ import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { Logo } from '../components/ui/Logo';
 import { useApiData } from '../lib/useApiData';
 import { fetchProviderDetail, type ProviderDetail } from '../api/bookings';
+import { Button } from '../components/ui/Button';
 
 // ─── Provider Detail (stage 2, monetised) — Phase-3 wiring ───────────────────
 // Mirrors the Figma "Provider Detail — Anonym" screens: still-anonymous depth
@@ -108,13 +109,16 @@ export function ProviderDetailPage() {
           <aside className="h-fit rounded-2xl border border-brand bg-surface-secondary p-7 shadow-lg shadow-brand/10">
             <h2 className="text-body font-semibold text-fg">{t('detail.bookTitle')}</h2>
             <p className="mt-1 text-body-2xs text-fg-tertiary">{t('detail.bookSub')}</p>
-            <button
+            <Button
+              size="lg"
+              shape="soft"
+              fullWidth
               type="button"
               onClick={() => navigate(`/${locale}/provider/${key}/schedule`)}
-              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand px-4 py-3 text-body-sm font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5"
+              className="mt-5 transition-transform duration-200 hover:-translate-y-0.5"
             >
               {t('detail.bookCta')} <ArrowRight size={15} />
-            </button>
+            </Button>
             <p className="mt-3 text-center text-body-3xs text-fg-tertiary">{t('detail.revealNote')}</p>
           </aside>
         </div>

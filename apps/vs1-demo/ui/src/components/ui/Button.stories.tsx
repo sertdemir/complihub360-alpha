@@ -149,3 +149,49 @@ export const DarkVariants: Story = {
     </div>
   ),
 };
+
+// ─── The marketing CTA language ───────────────────────────────────────────────
+// The marketing pages hand-built 20 CTAs because this component could not make
+// their shape: it only spoke rounded-md (6px) at fixed heights, on one line.
+// These three stories are the shapes that closed the gap.
+
+export const MarketingShape: Story = {
+  name: 'Shape — app 6px vs marketing 10px',
+  args: { children: 'Jetzt starten' },
+  render: () => (
+    <div className="flex items-center gap-4">
+      <Button shape="md">App surface (6px)</Button>
+      <Button shape="soft">Marketing CTA (10px)</Button>
+    </div>
+  ),
+};
+
+export const HeroSize: Story = {
+  name: 'Size — including the 56px hero step',
+  args: { children: 'Jetzt starten' },
+  render: () => (
+    <div className="flex items-end gap-4">
+      <Button size="sm" shape="soft">sm 32</Button>
+      <Button size="md" shape="soft">md 40</Button>
+      <Button size="lg" shape="soft">lg 48</Button>
+      <Button size="xl" shape="soft">xl 56</Button>
+    </div>
+  ),
+};
+
+export const WrappingLabel: Story = {
+  name: 'Wrap — a translated label that will not fit on one line',
+  args: { children: 'Meinen Bedarf ermitteln' },
+  render: () => (
+    <div className="flex items-start gap-4">
+      <div className="w-[190px]">
+        <Button size="lg" shape="soft" fullWidth>Meinen Bedarf ermitteln</Button>
+        <p className="mt-2 text-body-2xs text-fg-tertiary">without wrap — one line, overflows</p>
+      </div>
+      <div className="w-[190px]">
+        <Button size="lg" shape="soft" fullWidth wrap>Meinen Bedarf ermitteln</Button>
+        <p className="mt-2 text-body-2xs text-fg-tertiary">with wrap — box grows</p>
+      </div>
+    </div>
+  ),
+};

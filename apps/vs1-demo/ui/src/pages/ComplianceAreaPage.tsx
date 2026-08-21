@@ -350,7 +350,7 @@ export function ComplianceAreaPage() {
                   'The assessment narrows this area to your business, your markets and your product — in under five minutes.',
               })}
             </Typography>
-            <Button size="lg" variant="primary" className="mt-2 bg-white text-primary-900" onClick={startAssessment}>
+            <Button variant="inverse" size="xl" shape="soft" className="mt-2" onClick={startAssessment}>
               {t('compliance.startAssessment', 'Start {{title}} Assessment', { title })}
               <ArrowRight size={17} className="ml-1.5" />
             </Button>

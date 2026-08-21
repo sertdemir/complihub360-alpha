@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { getSupabase, isSupabaseConfigured } from '../../lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Search, Check, ArrowRight } from 'lucide-react';
+import { Button } from '../ui/Button';
 
 // ─── Wizard drawers · Figma 1698:293 (Other Markets) + 1740:428 (Country) ────
 // Both open INSIDE the wizard container (absolute, not a viewport portal): a
@@ -165,17 +166,20 @@ function MarketsContent({ value, onChange, onClose }: {
 
       <div className="border-t border-stroke-subtle px-8 py-5">
         <p className="text-body-xs text-fg-tertiary">{t('marketsDrawer.footNote')}</p>
-        <button
+        <Button
+          size="lg"
+          shape="soft"
+          fullWidth
           type="button"
           onClick={() => {
             onChange(local);
             onClose();
           }}
-          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-brand px-5 py-3 text-body-md font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5"
+          className="mt-3 flex transition-transform duration-200 hover:-translate-y-0.5"
         >
           {local.length > 0 ? t('marketsDrawer.add', { count: local.length }) : t('marketsDrawer.done')}
           <ArrowRight size={17} />
-        </button>
+        </Button>
       </div>
     </>
   );
@@ -247,16 +251,19 @@ function CountryInfoContent({ id, onSelect, onClose }: {
 
       <div className="border-t border-stroke-subtle bg-surface-secondary px-8 py-5">
         <p className="text-body-xs text-fg-tertiary">{t('drawer.continues')}</p>
-        <button
+        <Button
+          size="lg"
+          shape="soft"
+          fullWidth
           type="button"
           onClick={() => {
             onSelect(id);
             onClose();
           }}
-          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-brand px-5 py-3 text-body-md font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5"
+          className="mt-3 flex transition-transform duration-200 hover:-translate-y-0.5"
         >
           {t('drawer.seeIfApplies')} <ArrowRight size={17} />
-        </button>
+        </Button>
       </div>
     </>
   );
@@ -324,7 +331,10 @@ export function SaveProgressContent({ onClose, copyKey = 'saveProgress' }: { onC
 
       <div className="border-t border-stroke-subtle px-8 py-5">
         <p className="text-body-xs text-fg-tertiary">{t('account.footNote')}</p>
-        <button
+        <Button
+          size="lg"
+          shape="soft"
+          fullWidth
           type="button"
           disabled={!sent && !valid}
           onClick={async () => {
@@ -342,10 +352,10 @@ export function SaveProgressContent({ onClose, copyKey = 'saveProgress' }: { onC
             }
             setSent(true);
           }}
-          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-brand px-5 py-3 text-body-md font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-40"
+          className="mt-3 flex transition-transform duration-200 hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-40"
         >
           {sent ? t('account.done') : t(`${base}.cta`)} <ArrowRight size={17} />
-        </button>
+        </Button>
       </div>
     </>
   );
