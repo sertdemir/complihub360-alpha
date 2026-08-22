@@ -11,7 +11,13 @@
 //
 // `seoKey` addresses common.json → seo.<key>.{title,description}.
 
+import { DOMAINS } from './domains';
+
 export const MARKET_CODES_SEO = ['de', 'uk', 'nl', 'fr', 'it', 'es', 'us', 'tr'] as const;
+
+// The canonical eight, imported rather than restated — a hand-copied list here
+// would drift the moment a domain is added, and the drift would be silent.
+export const COMPLIANCE_AREA_SLUGS = DOMAINS.map((d) => d.slug);
 
 export interface PublicRoute {
   /** Path under /:locale, '' for the index. */
@@ -36,6 +42,11 @@ export const PUBLIC_ROUTES: PublicRoute[] = [
   { path: 'terms', seoKey: 'terms', priority: 0.3 },
   { path: 'imprint', seoKey: 'imprint', priority: 0.3 },
   { path: 'cookies', seoKey: 'cookies', priority: 0.3 },
+  ...COMPLIANCE_AREA_SLUGS.map((slug) => ({
+    path: `compliance/${slug}`,
+    seoKey: 'complianceArea',
+    priority: 0.7,
+  })),
   ...MARKET_CODES_SEO.map((code) => ({
     path: `markets/${code}`,
     seoKey: 'marketCountry',

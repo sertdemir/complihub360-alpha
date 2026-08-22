@@ -9,6 +9,7 @@ import { HomePage } from "./pages/HomePage";
 import { PlatformPage } from "./pages/PlatformPage";
 import { SolutionsPage } from "./pages/SolutionsPage";
 import { ComplianceAreasPage } from "./pages/ComplianceAreasPage";
+import { ComplianceAreaPage } from "./pages/ComplianceAreaPage";
 import { HowItWorksPage } from "./pages/HowItWorksPage";
 import { PricingPage } from "./pages/PricingPage";
 import { MarketsIndexPage, MarketPage } from "./pages/MarketsPage";
@@ -171,6 +172,7 @@ function AppContent() {
                     <Route path="platform" element={<PlatformPage />} />
                     <Route path="solutions" element={<SolutionsPage />} />
                     <Route path="compliance" element={<ComplianceAreasPage />} />
+                    <Route path="compliance/:area" element={<ComplianceAreaPage />} />
                     <Route path="how-it-works" element={<HowItWorksPage />} />
                     <Route path="pricing" element={<PricingPage />} />
                     <Route path="markets" element={<MarketsIndexPage />} />

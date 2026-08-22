@@ -1,92 +1,87 @@
-import { useEffect, useRef, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Globe2, ChevronDown, Check } from 'lucide-react';
 import { Typography } from '../ui/Typography';
-import { COUNTRY_OPTIONS } from './types';
+import { SelectMenu, type SelectMenuOption } from '../ui/SelectMenu';
+import { COUNTRY_OPTIONS, isCountryCode } from './types';
 import type { CountryCode } from './types';
 
 interface CountrySelectorProps {
   value: CountryCode;
   onChange: (next: CountryCode) => void;
+  /** Compact variant for the sticky area switcher. */
+  size?: 'md' | 'sm';
 }
 
-export function CountrySelector({ value, onChange }: CountrySelectorProps) {
+// ─── Market picker ───────────────────────────────────────────────────────────
+// This is a value picker, so it is a SelectMenu — the Compass listbox, which
+// already carries the whole keyboard contract (arrows with wrap, Home/End,
+// Enter, Escape, Tab, aria-activedescendant) and an icon slot the flag drops
+// straight into.
+//
+// It briefly reimplemented all of that by hand here. The rewrite was prompted
+// by a real defect — the original announced role="listbox" and aria-haspopup
+// while offering no keyboard navigation at all — but implementing the contract
+// locally was the wrong fix for it: SelectMenu had shipped that contract long
+// before, and a second copy is a second thing to keep correct.
+//
+// What stays local is layout, not behaviour: the caption above and the hint
+// below belong to this control's placement on the page, not to the widget.
+export function CountrySelector({ value, onChange, size = 'md' }: CountrySelectorProps) {
   const { t } = useTranslation('common');
-  const [open, setOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const compact = size === 'sm';
 
-  const current = COUNTRY_OPTIONS.find(c => c.code === value) ?? COUNTRY_OPTIONS[0];
+  const options: SelectMenuOption[] = useMemo(
+    () =>
+      COUNTRY_OPTIONS.map((o) => ({
+        value: o.code,
+        label: t(o.labelKey, o.fallback),
+        // The flag is decoration on top of the label it accompanies — announcing
+        // it would have a screen reader read the country twice.
+        icon: (
+          <span className="text-lg leading-none" aria-hidden>
+            {o.flag}
+          </span>
+        ),
+      })),
+    [t],
+  );
 
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: MouseEvent) => {
-      if (!containerRef.current?.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [open]);
+  const select = (
+    <SelectMenu
+      options={options}
+      value={value}
+      onChange={(next) => {
+        if (isCountryCode(next)) onChange(next);
+      }}
+      inputSize={compact ? 'sm' : 'md'}
+      id={compact ? 'country-select-compact' : 'country-select'}
+    />
+  );
+
+  if (compact) {
+    return (
+      <div className="w-[190px]">
+        <span className="sr-only" id="country-select-compact-label">
+          {t('compliance.country.label', 'Your primary market')}
+        </span>
+        {select}
+      </div>
+    );
+  }
 
   return (
-    <div ref={containerRef} className="relative inline-flex flex-col items-stretch">
-      <Typography
-        variant="caption"
-        className="text-fg-tertiary font-semibold uppercase tracking-wider mb-2"
+    <div className="flex w-[240px] flex-col items-stretch">
+      <label
+        htmlFor="country-select"
+        className="mb-2 font-sans text-caption font-semibold uppercase tracking-wider text-fg-tertiary"
       >
         {t('compliance.country.label', 'Your primary market')}
-      </Typography>
+      </label>
 
-      <button
-        type="button"
-        onClick={() => setOpen(o => !o)}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        className="inline-flex items-center gap-2.5 bg-surface border-2 border-stroke-subtle hover:border-primary-400 transition-colors rounded-xl px-4 py-3 shadow-sm hover:shadow-md min-w-[220px]"
-      >
-        <Globe2 size={18} className="text-fg-brand shrink-0" />
-        <span className="text-2xl leading-none" aria-hidden>{current.flag}</span>
-        <span className="text-ui-small font-bold text-fg flex-1 text-left">
-          {current.label}
-        </span>
-        <ChevronDown
-          size={16}
-          className={`text-fg-tertiary shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
-        />
-      </button>
+      {select}
 
-      {open && (
-        <ul
-          role="listbox"
-          aria-label={t('compliance.country.label', 'Your primary market')}
-          className="absolute top-full mt-2 left-0 right-0 z-50 bg-surface border border-stroke rounded-xl shadow-xl py-1 max-h-80 overflow-y-auto"
-        >
-          {COUNTRY_OPTIONS.map(opt => {
-            const selected = opt.code === value;
-            return (
-              <li key={opt.code}>
-                <button
-                  type="button"
-                  role="option"
-                  aria-selected={selected}
-                  onClick={() => {
-                    onChange(opt.code);
-                    setOpen(false);
-                  }}
-                  className={`w-full flex items-center gap-3 px-3 py-2 text-left text-ui-small hover:bg-brand-light transition-colors ${selected ? 'bg-brand-light/60' : ''}`}
-                >
-                  <span className="text-xl leading-none" aria-hidden>{opt.flag}</span>
-                  <span className={`flex-1 ${selected ? 'font-bold text-fg-brand' : 'text-fg-secondary'}`}>
-                    {opt.label}
-                  </span>
-                  {selected && <Check size={14} className="text-fg-brand" />}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-
-      <Typography variant="caption" className="text-fg-tertiary mt-2 leading-snug">
-        {t('compliance.country.hint', 'Filters active markets and personalises risk priorities.')}
+      <Typography variant="caption" className="mt-2 leading-snug text-fg-tertiary">
+        {t('compliance.country.hint', 'Switches statutes, penalties and deadlines to that market.')}
       </Typography>
     </div>
   );

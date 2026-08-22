@@ -1,18 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, useInView } from 'framer-motion';
-import {
-  Receipt,
-  Recycle,
-  ShieldCheck,
-  Megaphone,
-  Building2,
-  ArrowRight,
-} from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Typography } from '../components/ui/Typography';
 import {
-  ComplianceCard,
+  AreaCard,
+  AREAS,
   ComparisonMatrix,
   CountrySelector,
   HowOrchestrationWorks,
@@ -22,12 +16,25 @@ import {
   RiskComparisonGrid,
   useCountrySelection,
 } from '../components/compliance-areas';
-import type { AreaConfig } from '../components/compliance-areas/types';
 import { SiteFooter } from '../components/home';
 import { Button } from '../components/ui/Button';
 import { Container } from '../components/ui/Container';
 
-// ─── Section wrapper with scroll animation ───────────────────────────────────
+// ─── /compliance · the hub ───────────────────────────────────────────────────
+// Until 2026-08-21 this page was the whole story: five areas, each one an
+// accordion holding its full detail. Two things were wrong with that. The
+// detail could not be linked, shared or indexed — and the product has carried
+// eight canonical domains since 2026-08-04, so three of them appeared nowhere
+// on the marketing surface at all.
+//
+// Both are fixed by making this a hub. It shows all eight, ranked for the
+// selected market by the engine rather than by a hand-kept percentage, and each
+// card is a doorway to /compliance/<slug> where the detail now lives. No
+// content sits in two places: what left the accordions did not get copied.
+//
+// The sticky anchor bar left with them. It listed five short ids, it scrolled
+// sideways out of reach under German labels, and every target it named is now
+// its own page. Area pages carry a lateral switcher instead.
 
 function Section({
   id,
@@ -55,59 +62,6 @@ function Section({
   );
 }
 
-// ─── Anchor Bar ───────────────────────────────────────────────────────────────
-
-const ANCHORS: { id: string; defaultLabel: string; key: string }[] = [
-  { id: 'tax', defaultLabel: 'Tax & VAT', key: 'compliance.anchorTax' },
-  { id: 'epr', defaultLabel: 'EPR & Packaging', key: 'compliance.anchorEpr' },
-  { id: 'privacy', defaultLabel: 'Data & Privacy', key: 'compliance.anchorPrivacy' },
-  { id: 'marketing', defaultLabel: 'Marketing Compliance', key: 'compliance.anchorMarketing' },
-  { id: 'corporate', defaultLabel: 'Corporate Structure', key: 'compliance.anchorCorporate' },
-];
-
-function AnchorBar() {
-  const { t } = useTranslation('common');
-  const [active, setActive] = useState('tax');
-
-  useEffect(() => {
-    const handleScroll = () => {
-      for (const a of [...ANCHORS].reverse()) {
-        const el = document.getElementById(a.id);
-        if (el && el.getBoundingClientRect().top < 140) {
-          setActive(a.id);
-          break;
-        }
-      }
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  return (
-    <div className="sticky top-16 z-40 bg-surface/85 backdrop-blur-md border-b border-stroke-subtle">
-      <Container gutter="flat">
-        <nav className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-2">
-          {ANCHORS.map(a => (
-            <button
-              key={a.id}
-              onClick={() => document.getElementById(a.id)?.scrollIntoView({ behavior: 'smooth' })}
-              className={`px-4 py-2 rounded-md text-ui-small font-semibold whitespace-nowrap transition-colors ${
-                active === a.id
-                  ? 'text-fg-brand bg-brand-light'
-                  : 'text-fg-tertiary hover:text-fg hover:bg-surface-secondary'
-              }`}
-            >
-              {t(a.key, a.defaultLabel)}
-            </button>
-          ))}
-        </nav>
-      </Container>
-    </div>
-  );
-}
-
-// ─── MAIN PAGE ────────────────────────────────────────────────────────────────
-
 export function ComplianceAreasPage() {
   const { t } = useTranslation('common');
   const navigate = useNavigate();
@@ -116,119 +70,6 @@ export function ComplianceAreasPage() {
 
   const localePrefix = locale ? `/${locale}` : '';
   const [selectedCountry, setSelectedCountry] = useCountrySelection();
-
-  // Without this the tab keeps the previous page's title — visible because this
-  // page sits in the main navigation.
-
-
-  // TODO: replace with verified counts from provider DB
-  const COMPLIANCE_AREAS: AreaConfig[] = [
-    {
-      id: 'tax',
-      icon: Receipt,
-      risk: 'High',
-      riskColor: 'bg-risk-high-bg text-risk-on-high border-risk-high/30',
-      cardBorder: 'border-risk-high/30',
-      iconBg: 'bg-risk-high-bg',
-      iconColor: 'text-risk-on-high',
-      wizardPath: '/wizard/tax-vat',
-      markets: [
-        { code: 'UK', label: '🇬🇧 UK' },
-        { code: 'DE', label: '🇩🇪 DE' },
-        { code: 'EU', label: '🇪🇺 EU' },
-        { code: 'US', label: '🇺🇸 US' },
-      ],
-      specialistsCount: 12,
-      riskBarPct: 75,
-      riskBarColor: 'bg-risk-high',
-      riskBarBadge: 'bg-risk-high-bg text-risk-on-high',
-      personaFitKey: 'Best for: Cross-border e-commerce',
-    },
-    {
-      id: 'epr',
-      icon: Recycle,
-      risk: 'High',
-      riskColor: 'bg-risk-high-bg text-risk-on-high border-risk-high/30',
-      cardBorder: 'border-risk-high/30',
-      iconBg: 'bg-risk-high-bg',
-      iconColor: 'text-risk-on-high',
-      wizardPath: '/wizard/epr',
-      markets: [
-        { code: 'UK', label: '🇬🇧 UK' },
-        { code: 'DE', label: '🇩🇪 DE' },
-        { code: 'FR', label: '🇫🇷 FR' },
-        { code: 'EU', label: '🇪🇺 EU' },
-      ],
-      specialistsCount: 8,
-      riskBarPct: 70,
-      riskBarColor: 'bg-risk-high',
-      riskBarBadge: 'bg-risk-high-bg text-risk-on-high',
-      personaFitKey: 'Best for: Manufacturers & resellers',
-    },
-    {
-      id: 'privacy',
-      icon: ShieldCheck,
-      risk: 'Critical',
-      riskColor: 'bg-risk-critical-bg text-risk-on-critical border-risk-critical/30',
-      cardBorder: 'border-risk-critical/30',
-      iconBg: 'bg-risk-critical-bg',
-      iconColor: 'text-risk-on-critical',
-      wizardPath: '/wizard/data-privacy',
-      markets: [
-        { code: 'EU', label: '🇪🇺 EU' },
-        { code: 'UK', label: '🇬🇧 UK' },
-        { code: 'US', label: '🇺🇸 US' },
-        { code: 'CH', label: '🇨🇭 CH' },
-      ],
-      specialistsCount: 14,
-      riskBarPct: 95,
-      riskBarColor: 'bg-risk-critical',
-      riskBarBadge: 'bg-risk-critical-bg text-risk-on-critical',
-      personaFitKey: 'Best for: SaaS & data-driven brands',
-    },
-    {
-      id: 'marketing',
-      icon: Megaphone,
-      risk: 'Medium',
-      riskColor: 'bg-risk-medium-bg text-risk-on-medium border-risk-medium/30',
-      cardBorder: 'border-risk-medium/30',
-      iconBg: 'bg-risk-medium-bg',
-      iconColor: 'text-risk-on-medium',
-      wizardPath: '/wizard/marketing-seo',
-      markets: [
-        { code: 'EU', label: '🇪🇺 EU' },
-        { code: 'DE', label: '🇩🇪 DE' },
-        { code: 'UK', label: '🇬🇧 UK' },
-        { code: 'US', label: '🇺🇸 US' },
-      ],
-      specialistsCount: 5,
-      riskBarPct: 55,
-      riskBarColor: 'bg-risk-medium',
-      riskBarBadge: 'bg-risk-medium-bg text-risk-on-medium',
-      personaFitKey: 'Best for: Agencies & DTC brands',
-    },
-    {
-      id: 'corporate',
-      icon: Building2,
-      risk: 'Medium',
-      riskColor: 'bg-risk-medium-bg text-risk-on-medium border-risk-medium/30',
-      cardBorder: 'border-risk-medium/30',
-      iconBg: 'bg-risk-medium-bg',
-      iconColor: 'text-risk-on-medium',
-      wizardPath: '/wizard/corporate',
-      markets: [
-        { code: 'UK', label: '🇬🇧 UK' },
-        { code: 'DE', label: '🇩🇪 DE' },
-        { code: 'EU', label: '🇪🇺 EU' },
-        { code: 'US', label: '🇺🇸 US' },
-      ],
-      specialistsCount: 6,
-      riskBarPct: 40,
-      riskBarColor: 'bg-risk-medium',
-      riskBarBadge: 'bg-risk-medium-bg text-risk-on-medium',
-      personaFitKey: 'Best for: International expansion teams',
-    },
-  ];
 
   useEffect(() => {
     if (location.hash) {
@@ -239,14 +80,15 @@ export function ComplianceAreasPage() {
     }
   }, [location]);
 
-  const scrollToFirstArea = () => {
-    document.getElementById('tax')?.scrollIntoView({ behavior: 'smooth' });
+  // The JTBD grid's "Find Specialist" card used to call this to scroll to the
+  // first accordion, which meant a link from /compliance to /compliance. It
+  // points at the area grid now — a destination, not a self-reference.
+  const scrollToAreas = () => {
+    document.getElementById('areas')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
     <div className="min-h-screen bg-background">
-      <AnchorBar />
-
       {/* ── HERO + KPI + Country ─────────────────────────────────────── */}
       <Section className="py-14 desktop-s:py-20">
         <Container gutter="flat">
@@ -258,17 +100,10 @@ export function ComplianceAreasPage() {
               >
                 {t('compliance.heroOverline', 'Compliance Areas')}
               </Typography>
-              <Typography
-                variant="display"
-                weight="bold"
-                className="text-fg mb-5 leading-tight"
-              >
+              <Typography variant="display" weight="bold" className="text-fg mb-5 leading-tight">
                 {t('compliance.heroTitle', 'Find Your Regulatory Challenge. Start Here.')}
               </Typography>
-              <Typography
-                variant="body"
-                className="text-fg-secondary text-lg leading-relaxed max-w-2xl"
-              >
+              <Typography variant="body" className="text-fg-secondary text-lg leading-relaxed max-w-2xl">
                 {t(
                   'compliance.heroBody',
                   'Each compliance area is a gateway to your specific assessment. Identify your topic, understand the risks, and get matched with a verified specialist — all in under 5 minutes.',
@@ -288,23 +123,25 @@ export function ComplianceAreasPage() {
       {/* ── JTBD Outcomes ─────────────────────────────────────────────── */}
       <Section className="pb-12">
         <Container gutter="flat">
-          <JTBDOutcomeGrid onScrollToFirstArea={scrollToFirstArea} />
+          <JTBDOutcomeGrid onScrollToFirstArea={scrollToAreas} />
         </Container>
       </Section>
 
-      {/* ── Compliance Cards (6) ──────────────────────────────────────── */}
-      <Section className="pb-12">
+      {/* ── The eight areas ───────────────────────────────────────────── */}
+      <Section id="areas" className="pb-12">
         <Container gutter="flat">
-          <div className="space-y-4">
-            {COMPLIANCE_AREAS.map((area, i) => (
-              <div key={area.id} id={area.id} className="scroll-mt-28">
-                <ComplianceCard
-                  area={area}
-                  index={i}
-                  defaultOpen={i === 0}
-                  selectedCountry={selectedCountry}
-                />
-              </div>
+          <Typography variant="h2" as="h2" weight="bold" className="text-fg mb-2">
+            {t('compliance.areasTitle', 'The eight compliance areas')}
+          </Typography>
+          <Typography variant="body" className="text-fg-secondary mb-8 max-w-2xl">
+            {t('compliance.areasLead', {
+              defaultValue:
+                'Each opens a page with the duties it carries, the statute behind each one, and what it costs to get wrong.',
+            })}
+          </Typography>
+          <div className="grid gap-5 tablet:grid-cols-2 desktop-s:grid-cols-4">
+            {AREAS.map((area, i) => (
+              <AreaCard key={area.slug} area={area} index={i} selectedCountry={selectedCountry} />
             ))}
           </div>
         </Container>
@@ -313,8 +150,8 @@ export function ComplianceAreasPage() {
       {/* ── Risk-at-a-Glance + Comparison Matrix ──────────────────────── */}
       <Section className="pb-12">
         <Container gutter="flat">
-          <RiskComparisonGrid areas={COMPLIANCE_AREAS} selectedCountry={selectedCountry} />
-          <ComparisonMatrix />
+          <RiskComparisonGrid selectedCountry={selectedCountry} />
+          <ComparisonMatrix selectedCountry={selectedCountry} />
         </Container>
       </Section>
 

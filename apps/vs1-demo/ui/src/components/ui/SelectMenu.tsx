@@ -53,6 +53,14 @@ export function SelectMenu({
   id,
   className,
 }: SelectMenuProps) {
+  // Two SelectMenus without an explicit id both fell back to 'sm', so their
+  // option ids collided and aria-activedescendant could point into the wrong
+  // list. useId gives each instance its own namespace.
+  const autoId = React.useId();
+  const uid = id ?? autoId;
+  const listId = `${uid}-listbox`;
+  const optionId = (i: number) => `${uid}-opt-${i}`;
+
   const [uncontrolled, setUncontrolled] = React.useState<string | undefined>(defaultValue);
   const value = controlledValue !== undefined ? controlledValue : uncontrolled;
   const [open, setOpen] = React.useState(Boolean(defaultOpen));
@@ -125,8 +133,11 @@ export function SelectMenu({
         type="button"
         id={id}
         disabled={disabled}
+        role="combobox"
         aria-haspopup="listbox"
         aria-expanded={open}
+        aria-controls={open ? listId : undefined}
+        aria-activedescendant={open && active >= 0 ? optionId(active) : undefined}
         aria-invalid={error || undefined}
         onClick={() => !disabled && setOpen((o) => !o)}
         onKeyDown={onKeyDown}
@@ -154,8 +165,8 @@ export function SelectMenu({
       {open && (
         <ul
           ref={listRef}
+          id={listId}
           role="listbox"
-          aria-activedescendant={active >= 0 ? `${id ?? 'sm'}-opt-${active}` : undefined}
           tabIndex={-1}
           className={cn(
             'absolute z-50 mt-1.5 max-h-64 w-full overflow-auto rounded-xl border border-stroke bg-surface p-1.5 shadow-lg',
@@ -168,7 +179,7 @@ export function SelectMenu({
             return (
               <li
                 key={opt.value}
-                id={`${id ?? 'sm'}-opt-${i}`}
+                id={optionId(i)}
                 role="option"
                 aria-selected={isSelected}
                 aria-disabled={opt.disabled || undefined}

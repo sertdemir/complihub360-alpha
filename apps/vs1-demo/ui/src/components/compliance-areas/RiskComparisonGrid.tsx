@@ -1,120 +1,104 @@
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link, useParams } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
 import { Info } from 'lucide-react';
+import { severityFromRiskWeight } from '@complihub/compliance-engine';
 import { Typography } from '../ui/Typography';
-import type { AreaConfig, CountryCode } from './types';
+import { RiskBadge } from '../ui/RiskBadge';
+import { DOMAIN_BY_SLUG } from '../../lib/domains';
+import { rankAreasForMarket } from '../../lib/areaProfiles';
+import { SEVERITY_STYLE, SEVERITY_FALLBACK, severityKey } from './severity';
+import type { CountryCode } from './types';
 
 interface Props {
-  areas: AreaConfig[];
   selectedCountry: CountryCode;
 }
 
-const COUNTRY_HINTS: Partial<Record<CountryCode, { highlightId: string; messageDefault: string }>> = {
-  DE: {
-    highlightId: 'privacy',
-    messageDefault: 'In Germany, BfDI enforcement and VerpackG together raise the priority of Privacy and EPR.',
-  },
-  FR: {
-    highlightId: 'privacy',
-    messageDefault: 'France: CNIL has been the most active EU enforcer of GDPR in recent years — Privacy ranks first.',
-  },
-  IT: {
-    highlightId: 'tax',
-    messageDefault: 'Italy: Garante on Privacy plus complex VAT regime mean Tax & Privacy demand parallel attention.',
-  },
-  ES: {
-    highlightId: 'tax',
-    messageDefault: 'Spain: AEAT (tax) and AEPD (privacy) both publish enforcement bulletins quarterly.',
-  },
-  UK: {
-    highlightId: 'privacy',
-    messageDefault: 'UK: ICO (privacy) and HMRC (VAT) — UK GDPR remains aligned but diverges on adequacy decisions.',
-  },
-  US: {
-    highlightId: 'marketing',
-    messageDefault: 'US: FTC marketing guidelines, state-level privacy (CCPA/CPRA), and sales-tax nexus shift priorities.',
-  },
-  CH: {
-    highlightId: 'privacy',
-    messageDefault: 'Switzerland: revFADP requires EU representatives — Privacy obligations apply even from outside.',
-  },
-};
-
-export function RiskComparisonGrid({ areas, selectedCountry }: Props) {
+// ─── Risk at a glance · ranked by the engine, not by hand ────────────────────
+// This grid used to sort by a riskBarPct authored in the page and highlight one
+// area from a hand-written COUNTRY_HINTS map. The two disagreed in plain sight:
+// with Spain selected, Tax carried the "Priority for ES" badge while Privacy
+// sat above it, because 95 > 75 regardless of the market.
+//
+// Both are gone. Order and bar length now come from CountryRiskMatrix via
+// rankAreasForMarket, so the top row IS the priority for the selected market
+// and no separate badge is needed to assert it.
+export function RiskComparisonGrid({ selectedCountry }: Props) {
   const { t } = useTranslation('common');
+  const { locale } = useParams();
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-60px' });
 
-  const hint = COUNTRY_HINTS[selectedCountry];
-
-  const sorted = [...areas].sort((a, b) => b.riskBarPct - a.riskBarPct);
+  const localePrefix = locale ? `/${locale}` : '';
+  const ranked = rankAreasForMarket(selectedCountry);
+  const marketLabel =
+    selectedCountry === 'EU'
+      ? t('compliance.country.euOption', 'EU-wide')
+      : t(`markets.countries.${selectedCountry}`, { defaultValue: selectedCountry });
 
   return (
-    <div
-      ref={ref}
-      className="bg-surface border border-stroke rounded-xl p-7 desktop-s:p-8 mt-8"
-    >
-      <div className="flex items-start justify-between flex-wrap gap-3 mb-6">
-        <div>
-          <Typography variant="h3" weight="bold" className="text-fg">
-            {t('compliance.riskAtGlance', 'Risk at a Glance')}
-          </Typography>
-          <Typography variant="caption" className="text-fg-tertiary normal-case tracking-normal mt-1 block">
-            {t('compliance.risk.subtitle', 'Sorted by typical priority across markets.')}
-          </Typography>
-        </div>
+    <div ref={ref} className="bg-surface border border-stroke rounded-xl p-7 desktop-s:p-8 mt-8">
+      <div className="mb-6">
+        <Typography variant="h3" weight="bold" className="text-fg">
+          {t('compliance.riskAtGlance', 'Risk at a Glance')}
+        </Typography>
+        <Typography variant="caption" className="text-fg-tertiary normal-case tracking-normal mt-1 block">
+          {t('compliance.risk.subtitle', 'Weighted for {{market}} by the compliance engine.', {
+            market: marketLabel,
+          })}
+        </Typography>
       </div>
 
-      {hint && (
-        <motion.div
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          key={selectedCountry}
-          className="flex items-start gap-2 bg-brand-light/50 border border-stroke-subtle rounded-xl px-4 py-3 mb-5"
-        >
-          <Info size={16} className="text-fg-brand shrink-0 mt-0.5" />
-          <Typography variant="ui-small" className="text-fg-brand leading-snug">
-            {t(`compliance.risk.hint.${selectedCountry}`, hint.messageDefault)}
-          </Typography>
-        </motion.div>
-      )}
+      <div className="flex items-start gap-2 bg-brand-light/50 border border-stroke-subtle rounded-xl px-4 py-3 mb-5">
+        <Info size={16} className="text-fg-brand shrink-0 mt-0.5" />
+        <Typography variant="ui-small" className="text-fg-brand leading-snug">
+          {selectedCountry === 'EU'
+            ? t(
+                'compliance.risk.hintEu',
+                'Averaged across the eight markets the engine profiles. Pick a market to see its own weighting.',
+              )
+            : t('compliance.risk.hintMarket', '{{market}} weights these areas as shown — strongest first.', {
+                market: marketLabel,
+              })}
+        </Typography>
+      </div>
 
       <div className="space-y-5">
-        {sorted.map((r, i) => {
-          const title = t(`compliance.${r.id}.title`, r.id);
-          const level = t(`compliance.${r.id}.risk`, r.risk);
-          const isHighlight = hint?.highlightId === r.id;
+        {ranked.map((r, i) => {
+          const def = DOMAIN_BY_SLUG[r.slug];
+          const title = t(`compliance.${r.slug}.title`, def?.label ?? r.slug);
+          const severity = severityFromRiskWeight(r.weight);
+          const style = SEVERITY_STYLE[severity];
           return (
             <motion.div
-              key={r.id}
+              key={r.slug}
               initial={{ opacity: 0, x: -20 }}
               animate={isInView ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.4, delay: i * 0.08 }}
+              transition={{ duration: 0.4, delay: i * 0.06 }}
             >
               <div className="flex items-center justify-between mb-2 gap-2">
-                <Typography
-                  variant="ui-small"
-                  weight="bold"
-                  className={`${isHighlight ? 'text-fg-brand' : 'text-fg-secondary'}`}
+                <Link
+                  to={`${localePrefix}/compliance/${r.slug}`}
+                  className="text-ui-small font-bold text-fg-secondary hover:text-fg-brand transition-colors"
                 >
                   {title}
-                  {isHighlight && (
-                    <span className="ml-2 text-body-4xs font-bold uppercase tracking-wider text-fg-brand">
-                      {t('compliance.risk.priorityBadge', 'Priority for {{country}}', { country: selectedCountry })}
-                    </span>
-                  )}
-                </Typography>
-                <span className={`text-xs font-bold px-2.5 py-0.5 rounded-md ${r.riskBarBadge}`}>
-                  {level}
-                </span>
+                </Link>
+                <div className="flex items-center gap-2">
+                  <span className="text-body-3xs tabular-nums text-fg-tertiary">
+                    {r.weight.toFixed(1)}/10
+                  </span>
+                  <RiskBadge level={severity} size="sm">
+                    {t(severityKey(severity), SEVERITY_FALLBACK[severity])}
+                  </RiskBadge>
+                </div>
               </div>
               <div className="w-full h-2.5 bg-surface-tertiary rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
-                  animate={isInView ? { width: `${r.riskBarPct}%` } : {}}
-                  transition={{ duration: 0.7, delay: i * 0.08 + 0.2, ease: 'easeOut' }}
-                  className={`h-full rounded-full ${r.riskBarColor}`}
+                  animate={isInView ? { width: `${(r.weight / 10) * 100}%` } : {}}
+                  transition={{ duration: 0.7, delay: i * 0.06 + 0.2, ease: 'easeOut' }}
+                  className={`h-full rounded-full ${style.bar}`}
                 />
               </div>
             </motion.div>

@@ -1,99 +1,105 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowUpDown } from 'lucide-react';
+import { severityFromRiskWeight } from '@complihub/compliance-engine';
 import { Typography } from '../ui/Typography';
-import type { AreaKey } from './types';
+import { RiskBadge } from '../ui/RiskBadge';
+import { DOMAIN_BY_SLUG, type DomainSlug } from '../../lib/domains';
+import { getAreaObligations, getAreaProfile } from '../../lib/areaProfiles';
+import { AREAS } from './areas';
+import { SEVERITY_FALLBACK, severityKey } from './severity';
+import type { CountryCode } from './types';
 
-type Column = 'risk' | 'time' | 'fine' | 'markets' | 'effort';
+type Column = 'risk' | 'time' | 'fine' | 'markets';
 
-interface Row {
-  id: AreaKey;
-  titleDefault: string;
-  riskRank: number;
-  riskLabel: string;
-  riskColor: string;
-  timeDefault: string;
-  fineDefault: string;
-  marketsDefault: string;
-  effortDefault: string;
+interface Props {
+  selectedCountry: CountryCode;
 }
 
-const ROWS: Row[] = [
-  {
-    id: 'privacy',
-    titleDefault: 'Data & Privacy',
-    riskRank: 4,
-    riskLabel: 'Critical',
-    riskColor: 'bg-risk-critical-bg text-risk-on-critical border-risk-critical/30',
-    timeDefault: 'Immediate',
-    fineDefault: 'up to €20M / 4% global revenue',
-    marketsDefault: 'EU · UK · CH · US',
-    effortDefault: 'High',
-  },
-  {
-    id: 'tax',
-    titleDefault: 'Tax & VAT',
-    riskRank: 3,
-    riskLabel: 'High',
-    riskColor: 'bg-risk-high-bg text-risk-on-high border-risk-high/30',
-    timeDefault: 'Within 30 days of threshold',
-    fineDefault: '50–300% of evaded tax + interest',
-    marketsDefault: 'EU OSS · UK · US Nexus',
-    effortDefault: 'Medium',
-  },
-  {
-    id: 'epr',
-    titleDefault: 'EPR & Packaging',
-    riskRank: 3,
-    riskLabel: 'High',
-    riskColor: 'bg-risk-high-bg text-risk-on-high border-risk-high/30',
-    timeDefault: 'Before market entry',
-    fineDefault: 'up to 2% annual revenue',
-    marketsDefault: 'DE · FR · IT · ES · UK',
-    effortDefault: 'Medium',
-  },
-  {
-    id: 'marketing',
-    titleDefault: 'Marketing Compliance',
-    riskRank: 2,
-    riskLabel: 'Medium',
-    riskColor: 'bg-risk-medium-bg text-risk-on-medium border-risk-medium/30',
-    timeDefault: 'Pre-campaign launch',
-    fineDefault: '€5k–€500k + product withdrawal',
-    marketsDefault: 'EU · UK',
-    effortDefault: 'Low–Medium',
-  },
-  {
-    id: 'corporate',
-    titleDefault: 'Corporate Structure',
-    riskRank: 2,
-    riskLabel: 'Medium',
-    riskColor: 'bg-risk-medium-bg text-risk-on-medium border-risk-medium/30',
-    timeDefault: 'Strategic (3–12 months)',
-    fineDefault: 'Tax exposure + entity risk',
-    marketsDefault: 'EU · UK · US · CH',
-    effortDefault: 'High',
-  },
-];
-
-export function ComparisonMatrix() {
+// ─── Side-by-side · derived, and all eight ───────────────────────────────────
+// This table used to hold five hand-written rows: a risk label, a penalty
+// range, a market list and a lead time, each authored separately from the
+// engine. Two problems, one visible and one not.
+//
+// The visible one: it disagreed with the risk grid directly above it. Privacy
+// read "Critical" here while the engine weighted it 7.6 — high, not critical.
+//
+// The hidden one: the row ids were the old short ids, so every cell fell back
+// to its English default the moment the copy keys moved to the canonical slugs.
+// A German reader would have seen an English table and nothing would have
+// failed. Deriving the rows removes both failure modes at once, and the table
+// covers eight areas instead of five.
+export function ComparisonMatrix({ selectedCountry }: Props) {
   const { t } = useTranslation('common');
+  const { locale } = useParams();
   const [sortBy, setSortBy] = useState<Column>('risk');
 
-  const sorted = useMemo(() => {
-    const copy = [...ROWS];
-    if (sortBy === 'risk') copy.sort((a, b) => b.riskRank - a.riskRank);
-    return copy;
-  }, [sortBy]);
+  const localePrefix = locale ? `/${locale}` : '';
 
-  const headers: { key: Column; defaultLabel: string; sortable?: boolean }[] = [
-    { key: 'risk', defaultLabel: 'Risk', sortable: true },
+  const rows = useMemo(
+    () =>
+      AREAS.map(({ slug }) => {
+        const profile = getAreaProfile(slug);
+        const obligations = getAreaObligations(slug, selectedCountry);
+
+        const weight =
+          selectedCountry === 'EU'
+            ? profile.marketWeights.reduce((s, m) => s + m.weight, 0) / profile.marketWeights.length
+            : (profile.marketWeights.find(m => m.code === selectedCountry)?.weight ??
+               profile.baselineWeight);
+
+        // Shortest lead time in the area — the first thing that comes due.
+        const leadDays = obligations.reduce<number | null>(
+          (min, o) => (o.dueDays == null ? min : min == null ? o.dueDays : Math.min(min, o.dueDays)),
+          null,
+        );
+
+        return {
+          slug,
+          weight,
+          severity: severityFromRiskWeight(weight),
+          leadDays,
+          exposure: obligations.reduce((sum, o) => sum + (o.penaltyMaxEur ?? 0), 0),
+          markets: profile.marketWeights.filter(m => m.obligationCount > 0).length,
+          obligations: obligations.length,
+        };
+      }),
+    [selectedCountry],
+  );
+
+  const sorted = useMemo(() => {
+    const copy = [...rows];
+    switch (sortBy) {
+      case 'time':
+        return copy.sort((a, b) => (a.leadDays ?? 9999) - (b.leadDays ?? 9999));
+      case 'fine':
+        return copy.sort((a, b) => b.exposure - a.exposure);
+      case 'markets':
+        return copy.sort((a, b) => b.markets - a.markets);
+      default:
+        return copy.sort((a, b) => b.weight - a.weight);
+    }
+  }, [rows, sortBy]);
+
+  const headers: { key: Column; defaultLabel: string }[] = [
+    { key: 'risk', defaultLabel: 'Risk' },
     { key: 'time', defaultLabel: 'Time to Act' },
     { key: 'fine', defaultLabel: 'Typical Exposure' },
     { key: 'markets', defaultLabel: 'Active Markets' },
-    { key: 'effort', defaultLabel: 'Effort' },
   ];
+
+  const money = (v: number) =>
+    new Intl.NumberFormat(undefined, {
+      style: 'currency',
+      currency: 'EUR',
+      maximumFractionDigits: 0,
+      notation: 'compact',
+    }).format(v);
+
+  const title = (slug: DomainSlug) =>
+    t(`compliance.${slug}.title`, DOMAIN_BY_SLUG[slug]?.label ?? slug);
 
   return (
     <div className="bg-surface border border-stroke rounded-xl overflow-hidden mt-8">
@@ -119,60 +125,65 @@ export function ComparisonMatrix() {
               {headers.map(h => (
                 <th
                   key={h.key}
+                  aria-sort={sortBy === h.key ? 'descending' : 'none'}
                   className="px-5 py-3 text-xs font-bold uppercase tracking-wider text-fg-tertiary"
                 >
-                  {h.sortable ? (
-                    <button
-                      type="button"
-                      onClick={() => setSortBy(h.key)}
-                      className="inline-flex items-center gap-1 hover:text-fg-brand"
-                    >
-                      {t(`compliance.matrix.col.${h.key}`, h.defaultLabel)}
-                      <ArrowUpDown size={11} />
-                    </button>
-                  ) : (
-                    t(`compliance.matrix.col.${h.key}`, h.defaultLabel)
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => setSortBy(h.key)}
+                    className={`inline-flex items-center gap-1 hover:text-fg-brand ${
+                      sortBy === h.key ? 'text-fg-brand' : ''
+                    }`}
+                  >
+                    {t(`compliance.matrix.col.${h.key}`, h.defaultLabel)}
+                    <ArrowUpDown size={11} />
+                  </button>
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {sorted.map((row, i) => (
-              <motion.tr
-                key={row.id}
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.3, delay: i * 0.05 }}
-                className="border-b border-stroke-subtle last:border-0 hover:bg-brand-light/30"
-              >
-                <td className="px-7 py-4">
-                  <span className="font-bold text-fg text-sm">
-                    {t(`compliance.${row.id}.title`, row.titleDefault)}
-                  </span>
-                </td>
-                <td className="px-5 py-4">
-                  <span
-                    className={`inline-flex text-body-3xs font-bold px-2 py-0.5 rounded-md border ${row.riskColor}`}
-                  >
-                    {t(`compliance.matrix.${row.id}.risk`, row.riskLabel)}
-                  </span>
-                </td>
-                <td className="px-5 py-4 text-sm text-fg-secondary">
-                  {t(`compliance.matrix.${row.id}.time`, row.timeDefault)}
-                </td>
-                <td className="px-5 py-4 text-sm text-fg-secondary">
-                  {t(`compliance.matrix.${row.id}.fine`, row.fineDefault)}
-                </td>
-                <td className="px-5 py-4 text-sm text-fg-secondary">
-                  {t(`compliance.matrix.${row.id}.markets`, row.marketsDefault)}
-                </td>
-                <td className="px-5 py-4 text-sm text-fg-secondary">
-                  {t(`compliance.matrix.${row.id}.effort`, row.effortDefault)}
-                </td>
-              </motion.tr>
-            ))}
+            {sorted.map((row, i) => {
+              return (
+                <motion.tr
+                  key={row.slug}
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.3, delay: i * 0.05 }}
+                  className="border-b border-stroke-subtle last:border-0 hover:bg-brand-light/30"
+                >
+                  <td className="px-7 py-4">
+                    <Link
+                      to={`${localePrefix}/compliance/${row.slug}`}
+                      className="text-sm font-bold text-fg hover:text-fg-brand"
+                    >
+                      {title(row.slug)}
+                    </Link>
+                  </td>
+                  <td className="px-5 py-4">
+                    <RiskBadge level={row.severity} size="sm">
+                      {t(severityKey(row.severity), SEVERITY_FALLBACK[row.severity])}
+                    </RiskBadge>
+                  </td>
+                  <td className="px-5 py-4 text-sm text-fg-secondary">
+                    {row.leadDays == null
+                      ? '—'
+                      : t('markets.country.leadTime', { days: row.leadDays })}
+                  </td>
+                  <td className="px-5 py-4 text-sm text-fg-secondary">
+                    {row.exposure > 0 ? t('compliance.matrix.upTo', { defaultValue: 'up to {{sum}}', sum: money(row.exposure) }) : '—'}
+                  </td>
+                  <td className="px-5 py-4 text-sm text-fg-secondary">
+                    {t('compliance.matrix.marketsCount', {
+                      defaultValue: '{{count}} of {{total}}',
+                      count: row.markets,
+                      total: getAreaProfile(row.slug).marketWeights.length,
+                    })}
+                  </td>
+                </motion.tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

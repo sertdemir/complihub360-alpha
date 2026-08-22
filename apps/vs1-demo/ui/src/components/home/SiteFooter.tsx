@@ -23,11 +23,12 @@ type Column = { key: string; links: Link[] };
 // 'home' namespace (loading 'userws' here would pull 360 dashboard keys into
 // every marketing page); the canonical English name is the fallback.
 const SOLUTION_LINKS: Link[] = [
-  // The overview page first, then the eight domains. All eight point at
-  // /compliance: that page IS the domain detail, and eight dead '#' links were
-  // worse than eight honest ones to the same place.
+  // The overview page first, then the eight domains. Until 2026-08-21 all eight
+  // pointed at /compliance, because that page held every area's detail inside
+  // an accordion and there was nothing more specific to link to. Each domain
+  // has its own page now, so the column finally goes where it says it goes.
   { key: 'solutionsOverview', href: '/solutions' },
-  ...DOMAINS.map((d) => ({ key: d.i18nKey, href: '/compliance', fallback: d.label })),
+  ...DOMAINS.map((d) => ({ key: d.i18nKey, href: `/compliance/${d.slug}`, fallback: d.label })),
 ];
 
 const COLUMNS: Column[] = [
