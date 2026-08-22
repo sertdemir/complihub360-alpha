@@ -575,7 +575,41 @@
       "relatedLead": "Comparten desencadenantes con el área que está leyendo — el mismo hecho de su negocio también las activa.",
       "ctaTitle": "¿Listo para ver qué le aplica?",
       "ctaBody": "La evaluación acota esta área a su negocio, sus mercados y su producto — en menos de cinco minutos.",
-      "regulatorsLabel": "Organismos reguladores en los mercados que cubrimos:"
+      "regulatorsLabel": "Organismos reguladores en los mercados que cubrimos:",
+      "metrics": {
+        "obligations": "Obligaciones en este ámbito",
+        "obligationsNote": "{{count}} con una fuente específica para este mercado",
+        "exposure": "Límite de sanción indicado",
+        "exposureNote": "Suma de los máximos indicados, no una previsión",
+        "days": "{{count}} días",
+        "lead": "Plazo más corto",
+        "leadNote": "La obligación que primero pilla a los equipos",
+        "later": "Aún no aplicable",
+        "laterNote": "Aprobada, pero aplicable a partir de una fecha posterior",
+        "obligationsNoteEu": "Todas las fuentes a nivel de la UE"
+      },
+      "risk": {
+        "title": "Perfil de riesgo",
+        "weight": "Peso del riesgo",
+        "weightNote": "Cuánto pondera este mercado este ámbito",
+        "enforcement": "Intensidad de la aplicación",
+        "enforcementNote": "Una propiedad del mercado, no de este ámbito",
+        "strictness": "Densidad regulatoria",
+        "strictnessNote": "Una propiedad del mercado, no de este ámbito"
+      },
+      "timeline": {
+        "liveNow": "Se aplica hoy"
+      },
+      "fact": {
+        "source": "Base jurídica",
+        "nationalSource": "Fuente nacional",
+        "penalty": "Rango de sanción",
+        "cadence": "Periodicidad",
+        "scope": "Se aplica en"
+      },
+      "relatedOpen": "Abrir este ámbito",
+      "readSource": "Leer la fuente en EUR-Lex",
+      "coverageNoteEu": "El motor recoge {{count}} obligaciones para este ámbito, todas con una fuente a nivel de la UE. Elige un mercado para ver dónde se añade una fuente nacional."
     },
     "riskBadge": "Riesgo: {{level}}"
   },

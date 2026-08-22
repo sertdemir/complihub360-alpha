@@ -575,7 +575,41 @@
       "relatedLead": "Diese teilen Auslöser mit dem Bereich, den Sie gerade lesen — derselbe Umstand in Ihrem Unternehmen zieht sie mit.",
       "ctaTitle": "Bereit zu sehen, was für Sie gilt?",
       "ctaBody": "Das Assessment grenzt diesen Bereich auf Ihr Unternehmen, Ihre Märkte und Ihr Produkt ein — in unter fünf Minuten.",
-      "regulatorsLabel": "Behörden in den von uns abgedeckten Märkten:"
+      "regulatorsLabel": "Behörden in den von uns abgedeckten Märkten:",
+      "metrics": {
+        "obligations": "Pflichten in diesem Bereich",
+        "obligationsNote": "{{count}} davon mit einer Quelle speziell für diesen Markt",
+        "exposure": "Genannter Bußgeldrahmen",
+        "exposureNote": "Summe der genannten Höchstsätze, keine Prognose",
+        "days": "{{count}} Tage",
+        "lead": "Kürzeste Vorlaufzeit",
+        "leadNote": "Die Pflicht, die Teams zuerst einholt",
+        "later": "Noch nicht anwendbar",
+        "laterNote": "Beschlossen, gilt aber erst ab einem späteren Datum",
+        "obligationsNoteEu": "Alle Quellen auf EU-Ebene"
+      },
+      "risk": {
+        "title": "Risikoprofil",
+        "weight": "Risikogewicht",
+        "weightNote": "Wie stark dieser Markt diesen Bereich gewichtet",
+        "enforcement": "Durchsetzungsintensität",
+        "enforcementNote": "Eine Eigenschaft des Marktes, nicht dieses Bereichs",
+        "strictness": "Regelungsdichte",
+        "strictnessNote": "Eine Eigenschaft des Marktes, nicht dieses Bereichs"
+      },
+      "timeline": {
+        "liveNow": "Gilt heute"
+      },
+      "fact": {
+        "source": "Rechtsgrundlage",
+        "nationalSource": "Nationale Quelle",
+        "penalty": "Bußgeldrahmen",
+        "cadence": "Turnus",
+        "scope": "Gilt in"
+      },
+      "relatedOpen": "Bereich öffnen",
+      "readSource": "Quelle auf EUR-Lex lesen",
+      "coverageNoteEu": "Die Engine trägt {{count}} Pflichten für diesen Bereich, alle mit einer Quelle auf EU-Ebene. Wähle einen Markt, um zu sehen, wo eine nationale Quelle dazukommt."
     },
     "riskBadge": "Risiko: {{level}}"
   },
