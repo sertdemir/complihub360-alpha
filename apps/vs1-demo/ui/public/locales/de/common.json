@@ -595,7 +595,9 @@
         "enforcement": "Durchsetzungsintensität",
         "enforcementNote": "Eine Eigenschaft des Marktes, nicht dieses Bereichs",
         "strictness": "Regelungsdichte",
-        "strictnessNote": "Eine Eigenschaft des Marktes, nicht dieses Bereichs"
+        "strictnessNote": "Eine Eigenschaft des Marktes, nicht dieses Bereichs",
+        "outOfTen": "von 10 · Domänengewicht",
+        "marketsCompared": "{{count}} Märkte im Vergleich"
       },
       "timeline": {
         "liveNow": "Gilt heute"
@@ -609,7 +611,15 @@
       },
       "relatedOpen": "Bereich öffnen",
       "readSource": "Quelle auf EUR-Lex lesen",
-      "coverageNoteEu": "Die Engine trägt {{count}} Pflichten für diesen Bereich, alle mit einer Quelle auf EU-Ebene. Wähle einen Markt, um zu sehen, wo eine nationale Quelle dazukommt."
+      "coverageNoteEu": "Die Engine trägt {{count}} Pflichten für diesen Bereich, alle mit einer Quelle auf EU-Ebene. Wähle einen Markt, um zu sehen, wo eine nationale Quelle dazukommt.",
+      "startShort": "Assessment jetzt starten",
+      "sourcePromise": "Jede Pflicht führt auf eine benannte Rechtsgrundlage zurück — keine Einschätzung ohne Quelle.",
+      "facts": {
+        "duties": "{{count}} Pflichten",
+        "allEu": "alle auf EU-Ebene",
+        "national": "{{count}} mit nationaler Rechtsgrundlage",
+        "later": "{{count}} greifen erst später"
+      }
     },
     "riskBadge": "Risiko: {{level}}"
   },

@@ -595,7 +595,9 @@
         "enforcement": "Intensidad de la aplicación",
         "enforcementNote": "Una propiedad del mercado, no de este ámbito",
         "strictness": "Densidad regulatoria",
-        "strictnessNote": "Una propiedad del mercado, no de este ámbito"
+        "strictnessNote": "Una propiedad del mercado, no de este ámbito",
+        "outOfTen": "de 10 · peso del ámbito",
+        "marketsCompared": "{{count}} mercados comparados"
       },
       "timeline": {
         "liveNow": "Se aplica hoy"
@@ -609,7 +611,15 @@
       },
       "relatedOpen": "Abrir este ámbito",
       "readSource": "Leer la fuente en EUR-Lex",
-      "coverageNoteEu": "El motor recoge {{count}} obligaciones para este ámbito, todas con una fuente a nivel de la UE. Elige un mercado para ver dónde se añade una fuente nacional."
+      "coverageNoteEu": "El motor recoge {{count}} obligaciones para este ámbito, todas con una fuente a nivel de la UE. Elige un mercado para ver dónde se añade una fuente nacional.",
+      "startShort": "Iniciar la evaluación",
+      "sourcePromise": "Cada obligación remite a una base jurídica citada — ninguna valoración sin fuente.",
+      "facts": {
+        "duties": "{{count}} obligaciones",
+        "allEu": "todas con fuente a nivel de la UE",
+        "national": "{{count}} con base jurídica nacional",
+        "later": "{{count}} se aplican a partir de una fecha posterior"
+      }
     },
     "riskBadge": "Riesgo: {{level}}"
   },
