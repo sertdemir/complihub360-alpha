@@ -1,7 +1,10 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { severityFromRiskWeight } from '@complihub/compliance-engine';
+import { RiskBadge } from '../ui/RiskBadge';
 import { getMarketProfile, MARKET_CODES } from '../../lib/marketProfiles';
 import { useInViewOnce } from '../../lib/useInViewOnce';
+import { SEVERITY_FALLBACK, SEVERITY_STYLE, severityKey } from './severity';
 import type { AreaProfile } from '../../lib/areaProfiles';
 import type { CountryCode } from './types';
 
@@ -12,87 +15,161 @@ interface Props {
 
 // ─── The hero's risk panel ───────────────────────────────────────────────────
 // The hero used to assert risk with a badge — one word, no way to check it.
-// This shows the three numbers the badge is computed from, so a reader can see
-// what "high" is standing on: how heavily this market weights the area, how
-// hard it enforces, and how densely it regulates.
+// This card shows the number the badge is computed from, the two market
+// properties that feed it, and where this market sits against the other seven.
+// Three claims a reader can audit instead of one they have to take.
 //
-// Weight is per area and per market. Enforcement and density are properties of
-// the MARKET, not of this area — they are the same three digits on every area
-// page for a given country, and the labels say so rather than implying the area
-// earned them.
+// The split matters and the labels carry it: the big figure is the DOMAIN
+// weight, this area in this market. Enforcement and density are properties of
+// the MARKET — identical on all eight area pages for a given country — so they
+// sit below the rule as context, never as something this area earned.
 //
-// EU averages all eight profiled markets, which is what the country selector's
-// EU option means everywhere else on the page.
+// Nothing here is authored. Weights come from CountryRiskMatrix via the area
+// profile, the severity from severityFromRiskWeight, so colour and number
+// cannot drift apart.
 export function AreaRiskCard({ profile, selectedCountry }: Props) {
   const { t, i18n } = useTranslation('common');
-  // toFixed writes a decimal POINT in every locale. German reads 7,1.
-  const score = new Intl.NumberFormat(i18n.language, { maximumFractionDigits: 1 });
-  const [ref, inView] = useInViewOnce<HTMLDivElement>();
+  // toFixed writes a decimal POINT in every locale. German reads 8,0.
+  const score = new Intl.NumberFormat(i18n.language, {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+  const whole = new Intl.NumberFormat(i18n.language, { maximumFractionDigits: 0 });
+  const [ref, inView] = useInViewOnce<HTMLDivElement>('-80px');
 
-  const stats = useMemo(() => {
+  const { weight, severity, market, markets, marketLabel } = useMemo(() => {
     const avg = (ns: number[]) => ns.reduce((s, n) => s + n, 0) / ns.length;
-    const markets = MARKET_CODES.map((c) => getMarketProfile(c));
+    const profiles = MARKET_CODES.map((c) => getMarketProfile(c));
+    const own = selectedCountry === 'EU' ? null : profiles.find((m) => m.code === selectedCountry);
 
-    const weight =
+    const w =
       selectedCountry === 'EU'
         ? avg(profile.marketWeights.map((m) => m.weight))
         : (profile.marketWeights.find((m) => m.code === selectedCountry)?.weight ??
            profile.baselineWeight);
 
-    const own = selectedCountry === 'EU' ? null : markets.find((m) => m.code === selectedCountry);
-
-    return [
-      {
-        key: 'weight',
-        value: weight,
-        label: t('compliance.area.risk.weight', 'Risk weight'),
-        note: t('compliance.area.risk.weightNote', 'How heavily this market weights this area'),
+    return {
+      weight: w,
+      severity: severityFromRiskWeight(w),
+      market: {
+        enforcement: own ? own.enforcementIntensity : avg(profiles.map((m) => m.enforcementIntensity)),
+        density: own ? own.strictnessScore : avg(profiles.map((m) => m.strictnessScore)),
       },
-      {
-        key: 'enforcement',
-        value: own ? own.enforcementIntensity : avg(markets.map((m) => m.enforcementIntensity)),
-        label: t('compliance.area.risk.enforcement', 'Enforcement intensity'),
-        note: t('compliance.area.risk.enforcementNote', 'A property of the market, not of this area'),
-      },
-      {
-        key: 'strictness',
-        value: own ? own.strictnessScore : avg(markets.map((m) => m.strictnessScore)),
-        label: t('compliance.area.risk.strictness', 'Regulatory density'),
-        note: t('compliance.area.risk.strictnessNote', 'A property of the market, not of this area'),
-      },
-    ];
+      markets: profile.marketWeights,
+      marketLabel:
+        selectedCountry === 'EU'
+          ? t('compliance.country.euOption', 'EU-wide')
+          : t(`markets.countries.${selectedCountry}`, { defaultValue: selectedCountry }),
+    };
   }, [profile, selectedCountry, t]);
 
+  const rows = [
+    {
+      key: 'enforcement',
+      label: t('compliance.area.risk.enforcement', 'Enforcement intensity'),
+      value: market.enforcement,
+    },
+    {
+      key: 'density',
+      label: t('compliance.area.risk.strictness', 'Regulatory density'),
+      value: market.density,
+    },
+  ];
+
+  const tallest = Math.max(...markets.map((m) => m.weight), 1);
+
   return (
+    // rounded-xl, not the canvas's 16px: the card-radius doctrine from #73 owns
+    // this, and designSystem.guard.test.ts fails the build on 12px or 16px.
     <div
       ref={ref}
-      className="rounded-xl border border-stroke-subtle bg-surface p-6 shadow-sm desktop-s:p-7"
+      className="overflow-hidden rounded-xl border border-stroke-subtle bg-surface shadow-sm"
     >
-      <p className="text-body-3xs font-bold uppercase tracking-[0.14em] text-fg-tertiary">
-        {t('compliance.area.risk.title', 'Risk profile')}
-      </p>
-      <div className="mt-5 space-y-5">
-        {stats.map((s, i) => (
-          <div key={s.key}>
-            <div className="flex items-baseline justify-between gap-3">
-              <span className="text-body-sm font-semibold text-fg">{s.label}</span>
-              <span className="text-body-sm font-bold text-fg tabular-nums">
-                {score.format(s.value)}
-                <span className="text-fg-tertiary">/10</span>
-              </span>
+      <div className="flex items-center justify-between border-b border-stroke-subtle px-5 py-4">
+        <span className="text-body-3xs font-bold uppercase tracking-[0.14em] text-fg-tertiary">
+          {t('compliance.area.risk.title', 'Risk profile')}
+        </span>
+        <span className="text-body-2xs font-semibold text-fg">{marketLabel}</span>
+      </div>
+
+      <div className="px-5 pb-5 pt-6">
+        <div className="flex items-end gap-3.5">
+          <span
+            className={`font-serif text-[3.5rem] font-semibold leading-[0.9] tracking-tight tabular-nums ${SEVERITY_STYLE[severity].iconColor}`}
+          >
+            {score.format(weight)}
+          </span>
+          <span className="pb-2">
+            <RiskBadge level={severity} size="sm">
+              {t('compliance.riskBadge', {
+                defaultValue: '{{level}} Risk',
+                level: t(severityKey(severity), SEVERITY_FALLBACK[severity]),
+              })}
+            </RiskBadge>
+            <span className="mt-1.5 block text-body-3xs text-fg-tertiary">
+              {t('compliance.area.risk.outOfTen', 'out of 10 · domain weight')}
+            </span>
+          </span>
+        </div>
+
+        <div className="mt-6 flex flex-col gap-3.5">
+          {rows.map((r, i) => (
+            <div key={r.key}>
+              <div className="flex justify-between text-body-3xs font-semibold text-fg-secondary">
+                <span>{r.label}</span>
+                <span className="tabular-nums">{whole.format(r.value)} / 10</span>
+              </div>
+              <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-surface-tertiary">
+                <div
+                  className={`h-full rounded-full transition-[width] duration-700 ease-out ${SEVERITY_STYLE[severity].bar}`}
+                  style={{
+                    width: inView ? `${(r.value / 10) * 100}%` : 0,
+                    transitionDelay: `${i * 80}ms`,
+                  }}
+                />
+              </div>
             </div>
-            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-tertiary">
-              <div
-                className="h-full rounded-full bg-brand transition-[width] duration-700 ease-out"
-                style={{
-                  width: inView ? `${(s.value / 10) * 100}%` : 0,
-                  transitionDelay: `${i * 80}ms`,
-                }}
-              />
-            </div>
-            <p className="mt-1.5 text-body-3xs leading-relaxed text-fg-tertiary">{s.note}</p>
-          </div>
-        ))}
+          ))}
+        </div>
+      </div>
+
+      {/* Where this market sits against the rest. The point of the row is the
+          comparison, so the bars are scaled to the heaviest market rather than
+          to 10 — against a fixed ceiling eight similar markets read as one
+          flat block. */}
+      <div className="border-t border-stroke-subtle bg-surface-secondary px-5 pb-4 pt-4">
+        <span className="text-body-3xs font-bold uppercase tracking-[0.1em] text-fg-tertiary">
+          {t('compliance.area.risk.marketsCompared', {
+            defaultValue: '{{count}} markets compared',
+            count: markets.length,
+          })}
+        </span>
+        <ol className="mt-3.5 flex h-14 items-end gap-2">
+          {markets.map((m) => {
+            const current = m.code === selectedCountry;
+            const sev = severityFromRiskWeight(m.weight);
+            return (
+              <li
+                key={m.code}
+                className="flex flex-1 flex-col items-center gap-1.5"
+                title={`${t(`markets.countries.${m.code}`, { defaultValue: m.code })} · ${score.format(m.weight)}/10`}
+              >
+                <span
+                  aria-hidden
+                  className={`w-full rounded-t transition-[height] duration-700 ease-out ${SEVERITY_STYLE[sev].bar} ${current ? '' : 'opacity-60'}`}
+                  style={{ height: inView ? `${Math.round((m.weight / tallest) * 40) + 8}px` : 0 }}
+                />
+                <span
+                  className={`text-[10px] tabular-nums ${
+                    current ? 'font-bold text-fg' : 'font-semibold text-fg-tertiary'
+                  }`}
+                >
+                  {m.code}
+                </span>
+              </li>
+            );
+          })}
+        </ol>
       </div>
     </div>
   );
