@@ -1,10 +1,27 @@
-# NavMenu — Compass component spec (proposal · not yet built)
+# NavMenu — Compass component spec
 
-**Status:** specification, awaiting decision. Nothing is built in Figma or code yet.
+**Status:** built in code (`components/ui/NavMenu.tsx`), stories and contract test in place.
+Not yet mirrored into Figma — that is the remaining step.
 **Compass page:** 🧩 Navigation
-**Trigger:** the eight compliance areas need a header entry point (`Navigation Architecture.md` calls for a
-Solutions dropdown with domain children). PR #72 shipped the area pages without it, deliberately — see
-"Why not a one-off" below.
+**Trigger:** the eight compliance areas needed a header entry point (`Navigation Architecture.md` calls for
+a Solutions dropdown with domain children). PR #72 shipped the area pages without it, deliberately.
+
+## What was built, and where it differs from this spec
+
+Three changes came out of building it:
+
+- **A `panel` property was needed.** The spec assumed one floating panel. The areas menu is a full-width
+  sheet under the header (the Mercury pattern), and four languages in a full-bleed sheet would be absurd —
+  so `panel: 'sheet' | 'popover'` carries both, and all three call sites fit.
+- **`Item` gained `description`.** The spec had label, icon and meta. A one-line description under each
+  label is what makes the sheet worth opening; it renders `compliance.<slug>.headline`, the same line the
+  area's own page opens with, so the menu cannot promise something the destination does not say.
+- **Closing on focus-out.** Not in the spec and it should have been: tabbing past the last link left the
+  panel open behind the focused element. Covered by the contract test now.
+
+`GlobalNav` carried a mega-panel with icon, title and description already — but every `HEADER_MENU` entry
+had `items: []`, so it never rendered. That dead markup is gone; its panel items were buttons rather than
+links, the same defect this component exists to fix.
 
 ---
 
@@ -56,9 +73,9 @@ Consequence: **both existing `role="menu"` usages are wrong** and get corrected 
 
 | Call site | Today | Should become | Why |
 |---|---|---|---|
-| Header "Compliance areas" | does not exist | **NavMenu** (new) | eight destinations, real links |
-| `MarketingHeader` → `LanguageMenu` | hand-rolled `role="menu"` | **NavMenu** | same shape, same defect, four destinations |
-| `AreaSwitcher` (area pages) | hand-rolled `role="menu"` | **NavMenu** | same shape, eight destinations |
+| Header "Compliance areas" | ~~does not exist~~ | **NavMenu** sheet — done | eight destinations, real links |
+| `MarketingHeader` → `LanguageMenu` | hand-rolled `role="menu"` | **NavMenu** popover — open | same shape, same defect, four destinations |
+| `AreaSwitcher` (area pages) | hand-rolled `role="menu"` | **NavMenu** popover — open | same shape, eight destinations |
 | `CountrySelector` (compliance areas) | ~~hand-rolled `role="listbox"`~~ | **`SelectMenu`** — done, PR #72 | it picks a value; it was a duplicate of an existing component |
 
 ### The `CountrySelector` finding — resolved in #72
@@ -103,6 +120,7 @@ Compass/NavMenu/Footer          optional closing row ("All areas →")
 | `align` | variant | `start` \| `end` | `start` | which trigger edge the panel aligns to; `end` for right-side header items like the language globe |
 | `columns` | variant | `1` \| `2` | `1` | `2` for the eight areas; `1` for four languages |
 | `size` | variant | `sm` \| `md` | `md` | `sm` = the compact area-page switcher |
+| `panel` | variant | `sheet` \| `popover` | `popover` | `sheet` spans the header; `popover` floats beside the trigger |
 
 Three properties on the root, orthogonal, well inside the six-property soft limit.
 
@@ -286,14 +304,14 @@ Storybook mapping
 
 A component, not a draft, when all of these hold:
 
-- [ ] Figma component set on 🧩 Navigation with the three root variants, all states, light + dark
-- [ ] Every colour, radius, spacing and shadow bound to a variable — no raw values
-- [ ] Focus state visible and distinct from hover, meeting 3:1
-- [ ] `NavMenu.tsx` in `components/ui/`, composing sub-components, no react-router dependency
-- [ ] `NavMenu.stories.tsx` covering: 1-column, 2-column, icon-only trigger, current-item, dark
+- [ ] Figma component set on 🧩 Navigation with the root variants, all states, light + dark
+- [x] Every colour, radius, spacing and shadow bound to a variable — no raw values
+- [x] Focus state visible and distinct from hover, meeting 3:1
+- [x] `NavMenu.tsx` in `components/ui/`, composing sub-components, no react-router dependency
+- [x] `NavMenu.stories.tsx` covering: 1-column, 2-column, icon-only trigger, current-item, dark
 - [ ] `NavMenu.figma.tsx` Code Connect mapping
-- [ ] A keyboard contract test in the spirit of `Button.contract.test.tsx` — arrows wrap, Escape returns
-      focus, Tab does not trap
+- [x] A keyboard contract test in the spirit of `Button.contract.test.tsx` — arrows wrap, Escape returns
+      focus, Tab does not trap (9 assertions, `NavMenu.contract.test.tsx`)
 - [ ] Figma description filled from section 9
-- [ ] The three call sites migrated, and the two `role="menu"` usages gone
+- [ ] The remaining two call sites migrated (`LanguageMenu`, `AreaSwitcher`), and both `role="menu"` usages gone
 - [ ] `CountrySelector` moved onto `SelectMenu` (independent of the rest, can land first)

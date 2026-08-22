@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Globe, Menu, X } from 'lucide-react';
 import { Logo } from '../ui/Logo';
 import { ThemeToggle } from '../ui/ThemeToggle';
+import { AreasMenuPanel } from './AreasMenuPanel';
 
 // ─── MarketingHeader ──────────────────────────────────────────────────────────
 // The marketing navigation, responsive: desktop bar + mobile expanding pill panel.
@@ -22,6 +23,8 @@ export interface NavLink {
   to: string;
   label: string;
   labelKey?: string;
+  /** Render as a NavMenu sheet listing the eight compliance areas. */
+  areasMenu?: boolean;
 }
 
 export interface MarketingHeaderProps {
@@ -42,7 +45,7 @@ export interface MarketingHeaderProps {
 // the footer, and a seven-entry bar does not survive German labels.
 const NAV_LINKS: NavLink[] = [
   { to: 'how-it-works', label: 'How it works', labelKey: 'header.nav.howItWorks' },
-  { to: 'compliance', label: 'Compliance areas', labelKey: 'header.nav.complianceAreas' },
+  { to: 'compliance', label: 'Compliance areas', labelKey: 'header.nav.complianceAreas', areasMenu: true },
   { to: 'markets', label: 'Markets', labelKey: 'header.nav.markets' },
   { to: 'pricing', label: 'Pricing', labelKey: 'header.nav.pricing' },
   { to: 'resources', label: 'Resources', labelKey: 'header.nav.resources' },
@@ -124,6 +127,7 @@ function LanguageMenu({ buttonClass }: { buttonClass: string }) {
   );
 }
 
+
 export function MarketingHeader({
   links,
   userHref = '/',
@@ -168,21 +172,35 @@ export function MarketingHeader({
         </div>
         {/* Anchor group sits truly centered between the two flex-1 side zones. */}
         <nav className="flex items-center justify-center gap-3">
-            {items.map((it) => (
-              <Link
-                key={it.to}
-                to={hrefFor(it.to)}
-                className={`whitespace-nowrap rounded-md px-2.5 py-2 text-body-sm font-medium transition-colors ${
-                  isActive(it.to)
-                    ? 'bg-brand-light text-fg-brand'
-                    : inverse
-                      ? 'text-white/85 hover:text-fg-inverse'
-                      : 'text-fg-secondary hover:text-fg'
-                }`}
-              >
-                {it.labelKey ? t(it.labelKey, { defaultValue: it.label }) : it.label}
-              </Link>
-            ))}
+            {items.map((it) => {
+              const itemLabel = it.labelKey ? t(it.labelKey, { defaultValue: it.label }) : it.label;
+              if (it.areasMenu) {
+                return (
+                  <AreasMenuPanel
+                    key={it.to}
+                    label={itemLabel}
+                    lang={userHref.replace(/^\/|\/$/g, '') || 'en'}
+                    isActive={isActive('compliance')}
+                    triggerClassName={inverse ? 'text-white/85 hover:text-fg-inverse' : undefined}
+                  />
+                );
+              }
+              return (
+                <Link
+                  key={it.to}
+                  to={hrefFor(it.to)}
+                  className={`whitespace-nowrap rounded-md px-2.5 py-2 text-body-sm font-medium transition-colors ${
+                    isActive(it.to)
+                      ? 'bg-brand-light text-fg-brand'
+                      : inverse
+                        ? 'text-white/85 hover:text-fg-inverse'
+                        : 'text-fg-secondary hover:text-fg'
+                  }`}
+                >
+                  {itemLabel}
+                </Link>
+              );
+            })}
         </nav>
         <div className="flex flex-1 basis-0 items-center justify-end gap-5">
           <ThemeToggle inverse={inverse} size={36} />

@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { supportedLngs } from '../../i18n/config';
 import { LanguageSwitcher } from '../common/LanguageSwitcher';
+import { NavMenu } from '../ui/NavMenu';
+import { AreasMenuPanel } from './AreasMenuPanel';
 import { useAuthStore } from '../../store/useAuthStore';
 import {
   // The mega-menu item type stays: every entry is a flat link today, but the
@@ -71,13 +73,15 @@ export function GlobalNav() {
     label: string;
     path?: string;
     items: { icon: LucideIcon; anim: any; title: string; desc: string; path: string }[];
+    /** Opens the eight compliance areas as a full-width sheet. */
+    sheet?: boolean;
   }[] = [
     // Same five destinations as the MarketingHeader — the two headers must not
     // present different navigations. Platform and Solutions dropped out of the
     // header on 2026-08-18: §11 P5 keeps them as SEO surfaces, reachable from the
     // footer, and seven entries do not survive German labels.
     { id: 'how-it-works', label: t('header.nav.howItWorks', 'How it works'), path: '/how-it-works', items: [] },
-    { id: 'areas', label: t('header.nav.complianceAreas', 'Compliance Areas'), path: '/compliance', items: [] },
+    { id: 'areas', label: t('header.nav.complianceAreas', 'Compliance Areas'), path: '/compliance', items: [], sheet: true },
     { id: 'markets', label: t('header.nav.markets', 'Markets'), path: '/markets', items: [] },
     { id: 'pricing', label: t('header.nav.pricing', 'Pricing'), path: '/pricing', items: [] },
     { id: 'resources', label: t('header.nav.resources', 'Resources'), path: '/resources', items: [] },
@@ -111,14 +115,20 @@ export function GlobalNav() {
 
         {/* Nav */}
         <nav className="flex items-center justify-center flex-1 gap-1 md:gap-4 lg:gap-6 min-w-0 overflow-hidden">
+          {/* A destination is an <a>, not a button. As a button it had no href:
+              no new tab, no copy-link, not announced as a link — and invisible
+              to crawlers, which would have quietly undone the whole point of
+              making these pages reachable. Only a menu that opens children
+              stays a button, because that is what it does. */}
           {HEADER_MENU.map((menu) => (
             <div key={menu.id} className="flex items-center">
-              {/* A destination is an <a>, not a button. As a button it had no href:
-                  no new tab, no copy-link, not announced as a link — and invisible
-                  to crawlers, which would have quietly undone the whole point of
-                  making these pages reachable. Only a menu that opens children
-                  stays a button, because that is what it does. */}
-              {menu.path ? (
+              {menu.sheet ? (
+                <AreasMenuPanel
+                  label={menu.label}
+                  lang={currentLang}
+                  isActive={location.pathname.startsWith(`/${currentLang}/compliance`)}
+                />
+              ) : menu.path ? (
                 <Link
                   to={`/${currentLang}${menu.path}`}
                   onClick={() => setActiveMenu(null)}
