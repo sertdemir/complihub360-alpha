@@ -1,8 +1,9 @@
 # NavMenu — Compass component spec
 
-**Status:** built in code (`components/ui/NavMenu.tsx`), stories and contract test in place.
-Not yet mirrored into Figma — that is the remaining step.
-**Compass page:** 🧩 Navigation
+**Status:** done. Built in code (`components/ui/NavMenu.tsx`), mirrored into Figma, all three call sites migrated.
+**Compass page:** `⌄ Nav Menu` — three component sets, 20 variants, plus a documentation canvas.
+The spec said 🧩 Navigation; the file's actual convention is one emoji-prefixed page per component
+(🔘 Button, 🍞 Breadcrumb, ⚠️ Risk Badge), so it follows that instead.
 **Trigger:** the eight compliance areas needed a header entry point (`Navigation Architecture.md` calls for
 a Solutions dropdown with domain children). PR #72 shipped the area pages without it, deliberately.
 
@@ -21,7 +22,22 @@ Three changes came out of building it:
 
 `GlobalNav` carried a mega-panel with icon, title and description already — but every `HEADER_MENU` entry
 had `items: []`, so it never rendered. That dead markup is gone; its panel items were buttons rather than
-links, the same defect this component exists to fix.
+links, the same defect this component exists to fix. (It outlived the PR that claimed to remove it by one
+round: only the removal of the *type* landed. Its one live consequence was that the header links never lit
+up, because `activeMenu` could not be set and the active check was permanently false. They light up from
+the URL now.)
+
+## What the Figma mirror could not do
+
+Two honest gaps, both recorded rather than papered over:
+
+- **The leading icon is not an `INSTANCE_SWAP` property.** `addComponentProperty(…, 'INSTANCE_SWAP', key)`
+  rejects the key of a *variant* inside the Icon component set, which is the only form the Compass icons
+  come in. The icon stays a plain nested instance, which Figma lets you swap directly — one click instead
+  of a dropdown, and no variant explosion. The component description says so.
+- **No separate dark-mode boards.** Every fill, stroke and radius is bound to a Color variable, and that
+  collection carries Light and Dark modes, so the component follows the page mode. Drawing a second set of
+  boards would duplicate what the variables already do, and duplicated boards drift.
 
 ---
 
@@ -304,14 +320,20 @@ Storybook mapping
 
 A component, not a draft, when all of these hold:
 
-- [ ] Figma component set on 🧩 Navigation with the root variants, all states, light + dark
+- [x] Figma component sets on `⌄ Nav Menu`: Item (4 State × 2 Layout), Trigger (4 State × 2 Mode),
+      Panel (2 Panel × 2 Columns) — 20 variants, every value bound to a Color variable so both modes follow
 - [x] Every colour, radius, spacing and shadow bound to a variable — no raw values
 - [x] Focus state visible and distinct from hover, meeting 3:1
 - [x] `NavMenu.tsx` in `components/ui/`, composing sub-components, no react-router dependency
 - [x] `NavMenu.stories.tsx` covering: 1-column, 2-column, icon-only trigger, current-item, dark
-- [ ] `NavMenu.figma.tsx` Code Connect mapping
+- [x] `NavMenu.figma.tsx` Code Connect mapping — three `figma.connect` calls, one per set. Figma-only axes
+      (`Trigger State=Open`, `Item Layout`) stay unmapped rather than pointing at props that do not exist
 - [x] A keyboard contract test in the spirit of `Button.contract.test.tsx` — arrows wrap, Escape returns
       focus, Tab does not trap (9 assertions, `NavMenu.contract.test.tsx`)
-- [ ] Figma description filled from section 9
-- [ ] The remaining two call sites migrated (`LanguageMenu`, `AreaSwitcher`), and both `role="menu"` usages gone
-- [ ] `CountrySelector` moved onto `SelectMenu` (independent of the rest, can land first)
+- [x] Figma descriptions filled on all three sets, extended from section 9 with what building them taught
+- [x] The remaining call sites migrated and every `role="menu"` usage gone. It was three, not two: `GlobalNav`
+      used `common/LanguageSwitcher`, a fourth copy that rendered `<button>`s (so the locales were not links
+      at all) in raw `neutral-*`/`white` classes that never followed the theme into dark mode. The two
+      language copies are now one `layout/LanguageMenu` shared by both headers — the same argument
+      `AreasMenuPanel` makes. Held by `NavMenu.guard.test.ts`
+- [x] `CountrySelector` moved onto `SelectMenu` (landed in #72)
