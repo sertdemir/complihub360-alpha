@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ChevronDown, Check, LayoutGrid } from 'lucide-react';
+import { Link, useLocation, useParams } from 'react-router-dom';
+import { LayoutGrid } from 'lucide-react';
 import { Container } from '../ui/Container';
+import { NavMenu } from '../ui/NavMenu';
 import { DOMAIN_BY_SLUG, type DomainSlug } from '../../lib/domains';
 import { AREAS } from './areas';
 import { CountrySelector } from './CountrySelector';
@@ -20,11 +21,18 @@ interface Props {
 // exist. What a detail page actually needs is not a table of contents for
 // itself but a way sideways — this shows where you are and opens the other
 // seven, and carries the market selector so the choice survives the move.
+//
+// The dropdown is NavMenu since 2026-08-22. What it used to be: role="menu"
+// over <button role="menuitem"> that called navigate() — so the seven other
+// areas were not links. No arrow keys, no Home/End, and open-in-new-tab,
+// cmd-click and the screen-reader link list all missed them, on the one control
+// whose entire job is pointing at eight indexable pages. Escape and
+// click-outside were there and are now the component's, along with everything
+// else that was not.
 export function AreaSwitcher({ current, selectedCountry, onCountryChange }: Props) {
   const { t } = useTranslation('common');
   const { locale } = useParams();
-  const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
+  const { pathname } = useLocation();
   // The site header is fixed and its height is responsive (h-16 below lg, h-20
   // above, plus its border) — 113px at desktop width, 64 on mobile. A sticky
   // bar with a hard `top-16` therefore slid under it on every viewport that is
@@ -32,8 +40,6 @@ export function AreaSwitcher({ current, selectedCountry, onCountryChange }: Prop
   // caught. Measuring beats guessing, and it self-corrects on resize instead of
   // pinning a magic number that drifts the next time the header changes.
   const [headerH, setHeaderH] = useState(64);
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
 
   const localePrefix = locale ? `/${locale}` : '';
   const title = (slug: DomainSlug) =>
@@ -49,25 +55,6 @@ export function AreaSwitcher({ current, selectedCountry, onCountryChange }: Prop
     return () => ro.disconnect();
   }, []);
 
-  useEffect(() => {
-    if (!open) return;
-    const onClick = (e: MouseEvent) => {
-      if (!wrapRef.current?.contains(e.target as Node)) setOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setOpen(false);
-        triggerRef.current?.focus();
-      }
-    };
-    document.addEventListener('mousedown', onClick);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onClick);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [open]);
-
   return (
     <div
       style={{ top: headerH }}
@@ -82,53 +69,25 @@ export function AreaSwitcher({ current, selectedCountry, onCountryChange }: Prop
           <span className="hidden tablet:inline">{t('compliance.area.allAreas', 'All areas')}</span>
         </Link>
 
-        <div ref={wrapRef} className="relative min-w-0 flex-1">
-          <button
-            ref={triggerRef}
-            type="button"
-            onClick={() => setOpen(o => !o)}
-            aria-haspopup="menu"
-            aria-expanded={open}
-            className="inline-flex max-w-full items-center gap-2 rounded-md px-3 py-1.5 text-ui-small font-bold text-fg transition-colors hover:bg-surface-secondary"
-          >
-            <span className="truncate">{title(current)}</span>
-            <ChevronDown
-              size={15}
-              className={`shrink-0 text-fg-tertiary transition-transform ${open ? 'rotate-180' : ''}`}
-            />
-          </button>
-
-          {open && (
-            <ul
-              role="menu"
-              className="absolute left-0 top-full z-50 mt-2 w-[260px] overflow-hidden rounded-xl border border-stroke bg-surface py-1 shadow-xl"
-            >
-              {AREAS.map(a => {
-                const active = a.slug === current;
-                const Icon = a.icon;
-                return (
-                  <li key={a.slug} role="none">
-                    <button
-                      type="button"
-                      role="menuitem"
-                      onClick={() => {
-                        setOpen(false);
-                        navigate(`${localePrefix}/compliance/${a.slug}`);
-                      }}
-                      className={`flex w-full items-center gap-2.5 px-3 py-2 text-left text-ui-small transition-colors hover:bg-brand-light ${
-                        active ? 'bg-brand-light/60 font-bold text-fg-brand' : 'text-fg-secondary'
-                      }`}
-                    >
-                      <Icon size={15} className="shrink-0 text-fg-tertiary" />
-                      <span className="flex-1 truncate">{title(a.slug)}</span>
-                      {active && <Check size={13} className="shrink-0 text-fg-brand" />}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </div>
+        <NavMenu panel="popover" closeKey={pathname} className="min-w-0 flex-1">
+          <NavMenu.Trigger label={title(current)} className="max-w-full text-ui-small font-bold text-fg" />
+          <NavMenu.Panel>
+            {AREAS.map((a) => {
+              const Icon = a.icon;
+              return (
+                <NavMenu.Item
+                  key={a.slug}
+                  as={Link}
+                  href={`${localePrefix}/compliance/${a.slug}`}
+                  icon={<Icon size={15} />}
+                  isCurrent={a.slug === current}
+                >
+                  {title(a.slug)}
+                </NavMenu.Item>
+              );
+            })}
+          </NavMenu.Panel>
+        </NavMenu>
 
         <div className="hidden shrink-0 tablet:block">
           <CountrySelector value={selectedCountry} onChange={onCountryChange} size="sm" />

@@ -672,7 +672,8 @@
       "allAreas": "Tüm uyum alanları",
       "areasAsideBody": "Her alan taşıdığı yükümlülükleri, arkasındaki mevzuatı ve hata yapmanın bedelini listeler."
     },
-    "login": "Giriş yap"
+    "login": "Giriş yap",
+    "language": "Dil"
   },
   "howItWorks": {
     "meta": {

@@ -40,6 +40,8 @@ export interface NavMenuContextValue {
   itemsRef: React.MutableRefObject<HTMLAnchorElement[]>;
   /** Focus the item at index, wrapping at both ends. */
   focusItem: (index: number) => void;
+  /** Open the panel and focus the item at index once it has mounted. */
+  openWithFocus: (index: number) => void;
   close: (returnFocus?: boolean) => void;
 }
 
@@ -83,12 +85,33 @@ export function NavMenu({
     if (returnFocus) triggerRef.current?.focus();
   }, []);
 
+  // Which item to focus once the panel exists. NOT a requestAnimationFrame:
+  // rAF fires before React flushes the Items' registration effects in a real
+  // browser, so itemsRef was still empty and focus stayed on the trigger —
+  // ArrowDown opened the panel and went nowhere. jsdom hid it, because its rAF
+  // polyfill lands after the effect flush and the contract test passed.
+  // A child's effect always runs before its parent's, so by the time this one
+  // fires every Item has registered.
+  const pendingFocus = React.useRef<number | null>(null);
+
   const focusItem = React.useCallback((index: number) => {
     const items = itemsRef.current.filter(Boolean);
     if (items.length === 0) return;
     const wrapped = ((index % items.length) + items.length) % items.length;
     items[wrapped]?.focus();
   }, []);
+
+  const openWithFocus = React.useCallback((index: number) => {
+    pendingFocus.current = index;
+    setOpen(true);
+  }, []);
+
+  React.useEffect(() => {
+    if (!open || pendingFocus.current === null) return;
+    const index = pendingFocus.current;
+    pendingFocus.current = null;
+    focusItem(index);
+  }, [open, focusItem]);
 
   // A route change must close the panel. The old AreaSwitcher closed on
   // navigation only because it unmounted, which is luck rather than design.
@@ -135,7 +158,7 @@ export function NavMenu({
   };
 
   const value: NavMenuContextValue = {
-    open, setOpen, panel, align, columns, panelId, triggerRef, itemsRef, focusItem, close,
+    open, setOpen, panel, align, columns, panelId, triggerRef, itemsRef, focusItem, openWithFocus, close,
   };
 
   return (
@@ -164,13 +187,9 @@ export interface NavMenuTriggerProps
 export function NavMenuTrigger({
   label, icon, iconOnly = false, isActive = false, className, ...rest
 }: NavMenuTriggerProps) {
-  const { open, setOpen, panelId, triggerRef, focusItem, close } = useNavMenu('NavMenu.Trigger');
+  const { open, setOpen, panelId, triggerRef, openWithFocus, close } = useNavMenu('NavMenu.Trigger');
 
-  const openAndFocus = (index: number) => {
-    setOpen(true);
-    // The panel mounts on this render; focus lands after it exists.
-    requestAnimationFrame(() => focusItem(index));
-  };
+  const openAndFocus = (index: number) => openWithFocus(index);
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
     switch (e.key) {
@@ -217,7 +236,13 @@ export function NavMenuTrigger({
       {...rest}
     >
       {icon}
-      {!iconOnly && label}
+      {/* The label truncates rather than pushing the chevron out of the button.
+          The area-page switcher puts eight German area titles in a trigger that
+          shares a row with two other controls; "Produktkonformität & Verpackung"
+          overflowed it on a tablet. An overflow-hidden flex child resolves its
+          min-width to 0, so this shrinks without any extra class at the call
+          site. */}
+      {!iconOnly && <span className="truncate">{label}</span>}
       {!iconOnly && (
         <ChevronDown
           size={14}
