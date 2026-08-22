@@ -62,3 +62,8 @@ __pycache__/
 
 # Accidental early-session scaffold (5 files, superseded by the real repo layout)
 apps/complihub360-alpha/
+
+# Playwright navigation smoke (apps/vs1-demo/ui/e2e) — report and traces are
+# per-run artifacts, the spec is the asset.
+playwright-report/
+test-results/

@@ -61,3 +61,13 @@ jobs:
 
       - name: Run Tests
         run: npm run test --workspaces --if-present
+
+      - name: Navigation smoke (production build, real chromium)
+        # Nach "Run Build", weil der Preview-Server dist/ ausliefert — und das
+        # ist der Punkt: zweimal hat ein gruener jsdom-Test behauptet, der
+        # Tastaturvertrag von NavMenu halte, waehrend er auf der gebauten Seite
+        # nicht hielt. Chromium ist oben schon installiert, der Lauf kostet
+        # rund 10 Sekunden. Was er nachweislich faengt und was nicht, steht in
+        # playwright.config.ts.
+        run: npm run test:e2e
+        working-directory: apps/vs1-demo/ui
