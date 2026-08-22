@@ -33,10 +33,17 @@ API_APP_DIR="/docker/complihub-api/app"
 API_COMPOSE_DIR="/docker/complihub-api"
 API_CONTAINER="complihub-api-api-1"
 
-# Leer => neueste Version von der GitHub-API. Nach dem ersten Lauf die unten
-# ausgegebene Kombination hier eintragen, dann wird die Pruefsumme erzwungen.
-RUNNER_VERSION="${RUNNER_VERSION:-}"
-RUNNER_SHA256="${RUNNER_SHA256:-}"
+# Festgenagelt auf die Version, mit der der Runner am 22.08.2026 eingerichtet
+# wurde; die Pruefsumme wird dann erzwungen statt nur TLS zu github.com zu
+# vertrauen. Das bindet nur die INSTALLATION — der Runner aktualisiert sich
+# danach selbst, die Zahl hier veraltet also gefahrlos.
+#
+# Zum Anheben: beide Variablen leeren (`RUNNER_VERSION= RUNNER_SHA256= bash …`),
+# das Skript holt dann die neueste Version und gibt die neue Kombination aus.
+# Schlaegt eine Installation mit "Pruefsumme weicht ab" fehl, ist genau das die
+# Frage, die zu beantworten ist: neue Version oder veraendertes Artefakt?
+RUNNER_VERSION="${RUNNER_VERSION-2.336.0}"
+RUNNER_SHA256="${RUNNER_SHA256-04cf0be1aff4c3ec3554466c39124ca250e3effd8873bb7e8d68535aa9505d5d}"
 
 log() { printf '\n\033[1m→ %s\033[0m\n' "$*"; }
 die() { printf '\033[31m✗ %s\033[0m\n' "$*" >&2; exit 1; }

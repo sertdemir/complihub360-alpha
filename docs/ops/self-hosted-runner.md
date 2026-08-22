@@ -95,6 +95,16 @@ einen zweiten Runner zu hinterlassen. Es legt an:
 | sudoers-Eintrag auf genau diese drei (mit `visudo -c` vorgeprüft) | `/etc/sudoers.d/github-runner` |
 | systemd-Dienst mit `Restart=always`, `After=docker.service` | `actions.runner.*.service` |
 
+Das Runner-Paket ist auf **2.336.0** festgenagelt und wird gegen die SHA-256
+`04cf0be…9505d5d` geprüft — sonst wäre TLS zu github.com der einzige
+Vertrauensanker. Das bindet nur die Installation; der Runner aktualisiert sich
+danach selbst. Zum Anheben beide Variablen leeren, dann holt das Skript die
+neueste Version und gibt die neue Kombination zum Eintragen aus:
+
+```bash
+RUNNER_VERSION= RUNNER_SHA256= RUNNER_TOKEN=A… bash install-github-runner.sh
+```
+
 Warum Wrapper statt `sudo docker …`: Mitgliedschaft in der `docker`-Gruppe ist
 root-äquivalent (`docker run -v /:/host` genügt), und ein sudo-Recht auf das
 `docker`-Binary ebenso. Feste Skripte ohne Argumente lassen dem Aufrufer keinen
