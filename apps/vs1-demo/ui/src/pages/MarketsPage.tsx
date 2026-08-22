@@ -9,6 +9,7 @@ import { SectionEyebrow, GoldWord, Reveal, Stagger, StaggerItem } from '../compo
 import { DOMAIN_I18N_KEY, DOMAIN_BY_SLUG } from '../lib/domains';
 import { getMarketProfile, isMarketCode, listMarkets } from '../lib/marketProfiles';
 import { Badge } from '../components/ui/Badge';
+import { useInViewOnce } from '../lib/useInViewOnce';
 
 // ─── /markets and /markets/:code · Brand Map Stufe 6b ────────────────────────
 // The country knowledge base. Every fact on these pages is derived in
@@ -153,6 +154,7 @@ export function MarketPage() {
   const { locale, code } = useParams();
   const navigate = useNavigate();
   const domainLabel = useDomainLabel();
+  const [weightBarsRef, weightBarsInView] = useInViewOnce<HTMLUListElement>();
 
   const upper = (code ?? '').toUpperCase();
   const known = isMarketCode(upper);
@@ -215,14 +217,17 @@ export function MarketPage() {
           <Reveal className="mx-auto max-w-[820px]">
             <h2 className="font-serif text-[1.75rem] font-semibold text-fg">{t('markets.country.weightsTitle')}</h2>
             <p className="mt-2 text-body text-fg-secondary">{t('markets.country.weightsLead')}</p>
-            <ul className="mt-8 space-y-3">
-              {profile.weights.map((w) => (
+            <ul ref={weightBarsRef} className="mt-8 space-y-3">
+              {profile.weights.map((w, i) => (
                 <li key={w.domainSlug} className="grid grid-cols-[minmax(0,200px)_1fr_auto] items-center gap-4">
                   <span className="truncate text-body-sm font-semibold text-fg">{domainLabel(w.domainSlug)}</span>
                   <span className="h-2 overflow-hidden rounded-full bg-surface-secondary">
                     <span
-                      className="block h-full rounded-full bg-brand"
-                      style={{ width: `${Math.round((w.weight / maxWeight) * 100)}%` }}
+                      className="block h-full rounded-full bg-brand transition-[width] duration-700 ease-out"
+                      style={{
+                        width: weightBarsInView ? `${Math.round((w.weight / maxWeight) * 100)}%` : 0,
+                        transitionDelay: `${i * 60}ms`,
+                      }}
                     />
                   </span>
                   <span className="tabular-nums text-body-xs text-fg-tertiary">{w.weight}/10</span>

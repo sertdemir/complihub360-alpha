@@ -575,7 +575,41 @@
       "relatedLead": "These share triggers with the area you are reading — the same fact about your business pulls them in too.",
       "ctaTitle": "Ready to see what applies to you?",
       "ctaBody": "The assessment narrows this area to your business, your markets and your product — in under five minutes.",
-      "regulatorsLabel": "Regulators across the markets we cover:"
+      "regulatorsLabel": "Regulators across the markets we cover:",
+      "metrics": {
+        "obligations": "Duties in this area",
+        "obligationsNote": "{{count}} with a source specific to this market",
+        "exposure": "Named penalty ceiling",
+        "exposureNote": "Sum of the stated maxima, not a forecast",
+        "days": "{{count}} days",
+        "lead": "Shortest lead time",
+        "leadNote": "The duty that catches teams out first",
+        "later": "Not live yet",
+        "laterNote": "Decided, but applicable from a later date",
+        "obligationsNoteEu": "All sources at EU level"
+      },
+      "risk": {
+        "title": "Risk profile",
+        "weight": "Risk weight",
+        "weightNote": "How heavily this market weights this area",
+        "enforcement": "Enforcement intensity",
+        "enforcementNote": "A property of the market, not of this area",
+        "strictness": "Regulatory density",
+        "strictnessNote": "A property of the market, not of this area"
+      },
+      "timeline": {
+        "liveNow": "Applies today"
+      },
+      "fact": {
+        "source": "Legal basis",
+        "nationalSource": "National source",
+        "penalty": "Penalty range",
+        "cadence": "Cadence",
+        "scope": "Applies in"
+      },
+      "relatedOpen": "Open this area",
+      "readSource": "Read the source on EUR-Lex",
+      "coverageNoteEu": "The engine carries {{count}} duties for this area, all of them on an EU-level source. Pick a market to see where a national source adds to them."
     },
     "riskBadge": "{{level}} Risk"
   },

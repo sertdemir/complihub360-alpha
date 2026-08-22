@@ -2,9 +2,11 @@ import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Typography } from '../ui/Typography';
+import { RiskBadge } from '../ui/RiskBadge';
 import { DOMAIN_BY_SLUG } from '../../lib/domains';
 import { getAreaProfile } from '../../lib/areaProfiles';
 import { AREAS } from './areas';
+import { SEVERITY_FALLBACK, severityKey } from './severity';
 import type { DomainSlug } from '../../lib/domains';
 
 interface Props {
@@ -50,24 +52,39 @@ export function RelatedAreas({ slug }: Props) {
         })}
       </Typography>
 
-      <div className="mt-6 grid gap-4 tablet:grid-cols-3">
+      <div className="mt-8 grid gap-5 tablet:grid-cols-3">
         {related.map(s => {
           const meta = AREAS.find(a => a.slug === s)!;
           const Icon = meta.icon;
+          const severity = getAreaProfile(s).severity;
           return (
             <Link
               key={s}
               to={`${localePrefix}/compliance/${s}`}
-              className="group flex items-center gap-3 rounded-xl border border-stroke-subtle bg-surface p-4 transition-colors hover:border-brand"
+              className="group flex flex-col rounded-xl border border-stroke-subtle bg-surface p-6 transition-colors hover:border-brand"
             >
-              <Icon size={18} className="shrink-0 text-fg-brand" />
-              <span className="flex-1 text-body-sm font-semibold text-fg">
+              <div className="flex items-start justify-between gap-3">
+                {/* No tile behind the glyph: at this size the drawing carries
+                    itself, and a filled chip would compete with the risk badge
+                    sitting opposite it. */}
+                <Icon size={56} strokeWidth={1.5} className="shrink-0 text-fg-brand" aria-hidden />
+                <RiskBadge level={severity} size="sm" className="shrink-0">
+                  {t(severityKey(severity), SEVERITY_FALLBACK[severity])}
+                </RiskBadge>
+              </div>
+              <span className="mt-5 text-body font-bold text-fg">
                 {t(`compliance.${s}.title`, DOMAIN_BY_SLUG[s]?.label ?? s)}
               </span>
-              <ArrowRight
-                size={14}
-                className="shrink-0 text-fg-tertiary transition-transform group-hover:translate-x-0.5"
-              />
+              <span className="mt-1.5 flex-1 text-body-2xs leading-relaxed text-fg-secondary">
+                {t(`compliance.${s}.headline`, t(`compliance.${s}.description`, ''))}
+              </span>
+              <span className="mt-4 inline-flex items-center gap-1.5 text-body-2xs font-semibold text-fg-brand">
+                {t('compliance.area.relatedOpen', 'Open this area')}
+                <ArrowRight
+                  size={13}
+                  className="transition-transform group-hover:translate-x-0.5"
+                />
+              </span>
             </Link>
           );
         })}

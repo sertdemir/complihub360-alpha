@@ -1,6 +1,8 @@
 export { AreaCard } from './AreaCard';
 export { AreaEnforcement } from './AreaEnforcement';
 export { AreaMarketHeatmap } from './AreaMarketHeatmap';
+export { AreaMetrics } from './AreaMetrics';
+export { AreaRiskCard } from './AreaRiskCard';
 export { AreaSwitcher } from './AreaSwitcher';
 export { AreaTimeline } from './AreaTimeline';
 export { ComparisonMatrix } from './ComparisonMatrix';

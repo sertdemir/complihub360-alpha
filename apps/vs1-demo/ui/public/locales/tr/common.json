@@ -575,7 +575,41 @@
       "relatedLead": "Okuduğunuz alanla aynı tetikleyicileri paylaşıyorlar — işinize dair aynı olgu bunları da devreye sokuyor.",
       "ctaTitle": "Size neyin uygulandığını görmeye hazır mısınız?",
       "ctaBody": "Değerlendirme bu alanı işinize, pazarlarınıza ve ürününüze indirger — beş dakikadan kısa sürede.",
-      "regulatorsLabel": "Kapsadığımız pazarlardaki düzenleyici kurumlar:"
+      "regulatorsLabel": "Kapsadığımız pazarlardaki düzenleyici kurumlar:",
+      "metrics": {
+        "obligations": "Bu alandaki yükümlülükler",
+        "obligationsNote": "{{count}} tanesi bu pazara özgü bir kaynakla",
+        "exposure": "Belirtilen ceza üst sınırı",
+        "exposureNote": "Belirtilen üst sınırların toplamı, bir tahmin değil",
+        "days": "{{count}} gün",
+        "lead": "En kısa hazırlık süresi",
+        "leadNote": "Ekipleri ilk yakalayan yükümlülük",
+        "later": "Henüz yürürlükte değil",
+        "laterNote": "Kabul edildi, ancak ileri bir tarihten itibaren geçerli",
+        "obligationsNoteEu": "Tüm kaynaklar AB düzeyinde"
+      },
+      "risk": {
+        "title": "Risk profili",
+        "weight": "Risk ağırlığı",
+        "weightNote": "Bu pazarın bu alana verdiği ağırlık",
+        "enforcement": "Uygulama yoğunluğu",
+        "enforcementNote": "Pazarın bir özelliği, bu alanın değil",
+        "strictness": "Düzenleme yoğunluğu",
+        "strictnessNote": "Pazarın bir özelliği, bu alanın değil"
+      },
+      "timeline": {
+        "liveNow": "Bugün geçerli"
+      },
+      "fact": {
+        "source": "Yasal dayanak",
+        "nationalSource": "Ulusal kaynak",
+        "penalty": "Ceza aralığı",
+        "cadence": "Sıklık",
+        "scope": "Geçerlilik alanı"
+      },
+      "relatedOpen": "Bu alanı aç",
+      "readSource": "Kaynağı EUR-Lex'te oku",
+      "coverageNoteEu": "Motor bu alan için {{count}} yükümlülük taşıyor, hepsi AB düzeyinde bir kaynağa dayanıyor. Ulusal bir kaynağın nerede eklendiğini görmek için bir pazar seç."
     },
     "riskBadge": "Risk: {{level}}"
   },

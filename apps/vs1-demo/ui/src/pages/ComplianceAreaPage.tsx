@@ -14,10 +14,11 @@ import { DOMAIN_BY_SLUG } from '../lib/domains';
 import { getAreaProfile, isAreaSlug } from '../lib/areaProfiles';
 import {
   AreaEnforcement,
+  AreaMetrics,
+  AreaRiskCard,
   AreaMarketHeatmap,
   AreaSwitcher,
   AreaTimeline,
-  CountrySelector,
   HowOrchestrationWorks,
   ObligationsExplorer,
   RelatedAreas,
@@ -133,10 +134,13 @@ export function ComplianceAreaPage() {
       />
 
       {/* ── 1 · Hero ──────────────────────────────────────────────────────── */}
+      {/* The badge no longer carries the risk claim on its own: the panel on the
+          right shows the three numbers it is computed from, so "high" is
+          checkable rather than asserted. */}
       <section className="border-b border-stroke-subtle bg-surface-secondary py-14 desktop-s:py-20">
         <Container size="xl">
-          <div className="grid gap-10 desktop-s:grid-cols-12 desktop-s:items-end">
-            <div className="desktop-s:col-span-8">
+          <div className="grid gap-10 desktop-s:grid-cols-12 desktop-s:gap-14">
+            <div className="desktop-s:col-span-7">
               <Link
                 to={`${localePrefix}/compliance`}
                 className="inline-flex items-center gap-1.5 text-body-xs font-semibold text-fg-secondary transition-colors hover:text-fg-brand"
@@ -144,28 +148,24 @@ export function ComplianceAreaPage() {
                 <ArrowLeft size={14} /> {t('compliance.area.allAreas', 'All areas')}
               </Link>
 
-              <div className="mt-4 flex items-center gap-4">
-                <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-xl ${style.iconBg}`}>
-                  <Icon size={26} className={style.iconColor} />
-                </div>
-                <div>
-                  <SectionEyebrow tone="brand">
-                    {t('compliance.heroOverline', 'Compliance Areas')}
-                  </SectionEyebrow>
-                  <RiskBadge level={severity} size="md" className="mt-1">
-                    {t('compliance.riskBadge', {
-                      defaultValue: '{{level}} Risk',
-                      level: t(severityKey(severity), SEVERITY_FALLBACK[severity]),
-                    })}
-                  </RiskBadge>
-                </div>
+              <div className="mt-5 flex items-center gap-3">
+                <Icon size={32} strokeWidth={1.5} className={`shrink-0 ${style.iconColor}`} aria-hidden />
+                <SectionEyebrow tone="brand">
+                  {t('compliance.heroOverline', 'Compliance Areas')}
+                </SectionEyebrow>
+                <RiskBadge level={severity} size="sm">
+                  {t('compliance.riskBadge', {
+                    defaultValue: '{{level}} Risk',
+                    level: t(severityKey(severity), SEVERITY_FALLBACK[severity]),
+                  })}
+                </RiskBadge>
               </div>
 
-              <h1 className="mt-5 font-serif text-[2.25rem] font-semibold leading-tight tracking-tight text-fg lg:text-[3rem]">
+              <h1 className="mt-5 font-serif text-[2.5rem] font-semibold leading-[1.08] tracking-tight text-fg lg:text-[3.25rem]">
                 {title}
               </h1>
               {(headline || description) && (
-                <Typography variant="body" className="mt-4 max-w-2xl text-lg leading-relaxed text-fg-secondary">
+                <Typography variant="body" className="mt-5 max-w-xl text-lg leading-relaxed text-fg-secondary">
                   {headline || description}
                 </Typography>
               )}
@@ -185,16 +185,26 @@ export function ComplianceAreaPage() {
               </div>
             </div>
 
-            <div className="desktop-s:col-span-4 desktop-s:justify-self-end">
-              <CountrySelector value={selectedCountry} onChange={setSelectedCountry} />
+            {/* No second country selector here: the sticky AreaSwitcher above
+                already carries one, and two controls for one piece of state
+                read as two pieces of state. */}
+            <div className="desktop-s:col-span-5">
+              <AreaRiskCard profile={profile} selectedCountry={selectedCountry} />
             </div>
           </div>
         </Container>
       </section>
 
+      {/* ── 2 · The metric band ───────────────────────────────────────────── */}
+      <section className="border-b border-stroke-subtle bg-surface-secondary pb-14 desktop-s:pb-16">
+        <Container size="xl">
+          <AreaMetrics slug={area} selectedCountry={selectedCountry} />
+        </Container>
+      </section>
+
       {/* ── 2 · Who this affects ──────────────────────────────────────────── */}
       {(affected || description) && (
-        <Section className="py-14 desktop-s:py-16">
+        <Section className="py-16 desktop-s:py-20">
           <Container size="xl">
             <div className="max-w-[820px]">
               <Typography variant="h2" as="h2" weight="bold" className="text-fg">
@@ -228,43 +238,39 @@ export function ComplianceAreaPage() {
       )}
 
       {/* ── 3 · Obligations explorer ──────────────────────────────────────── */}
-      <Section className="bg-surface-secondary py-14 desktop-s:py-16">
+      {/* Full width, not the old 900px column: the explorer is a master/detail
+          pair now, and a narrow column would put the pane under the list. */}
+      <Section className="bg-surface-secondary py-16 desktop-s:py-20">
         <Container size="xl">
-          <div className="max-w-[900px]">
-            <ObligationsExplorer slug={area} selectedCountry={selectedCountry} />
-          </div>
+          <ObligationsExplorer slug={area} selectedCountry={selectedCountry} />
         </Container>
       </Section>
 
-      {/* ── 4 · Enforcement ───────────────────────────────────────────────── */}
-      <Section className="py-14 desktop-s:py-16">
+      {/* ── 4 · Enforcement · the page's one dark moment ──────────────────── */}
+      <section className="bg-primary-700 py-16 desktop-s:py-20">
         <Container size="xl">
-          <div className="max-w-[820px]">
-            <AreaEnforcement slug={area} selectedCountry={selectedCountry} />
-          </div>
+          <AreaEnforcement slug={area} selectedCountry={selectedCountry} />
         </Container>
-      </Section>
+      </section>
 
       {/* ── 5 · Deadlines ─────────────────────────────────────────────────── */}
-      <Section className="bg-surface-secondary py-14 desktop-s:py-16">
+      <Section className="py-16 desktop-s:py-20">
         <Container size="xl">
-          <div className="max-w-[820px]">
-            <AreaTimeline slug={area} selectedCountry={selectedCountry} />
-          </div>
+          <AreaTimeline slug={area} selectedCountry={selectedCountry} />
         </Container>
       </Section>
 
       {/* ── 6 · Market heatmap ────────────────────────────────────────────── */}
-      <Section className="py-14 desktop-s:py-16">
+      <Section className="bg-surface-secondary py-16 desktop-s:py-20">
         <Container size="xl">
-          <div className="max-w-[820px]">
+          <div className="max-w-[900px]">
             <AreaMarketHeatmap slug={area} selectedCountry={selectedCountry} />
           </div>
         </Container>
       </Section>
 
       {/* ── 7 · How CompliHub360 handles it ───────────────────────────────── */}
-      <Section className="bg-surface-secondary py-14 desktop-s:py-16">
+      <Section className="py-16 desktop-s:py-20">
         <Container size="xl">
           {coverage.length > 0 && (
             <div className="mb-12 max-w-[820px]">
@@ -291,7 +297,7 @@ export function ComplianceAreaPage() {
       </Section>
 
       {/* ── 8 · Specialists ───────────────────────────────────────────────── */}
-      <Section className="py-14 desktop-s:py-16">
+      <Section className="bg-surface-secondary py-16 desktop-s:py-20">
         <Container size="xl">
           <div className="max-w-[820px] rounded-xl border border-stroke-subtle bg-surface p-7">
             <Typography
@@ -330,11 +336,9 @@ export function ComplianceAreaPage() {
       </Section>
 
       {/* ── 9 · Related areas ─────────────────────────────────────────────── */}
-      <Section className="bg-surface-secondary py-14 desktop-s:py-16">
+      <Section className="py-16 desktop-s:py-20">
         <Container size="xl">
-          <div className="max-w-[900px]">
-            <RelatedAreas slug={area} />
-          </div>
+          <RelatedAreas slug={area} />
         </Container>
       </Section>
 
