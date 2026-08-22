@@ -95,9 +95,13 @@ jobs:
           # keyscan is best-effort; accept-new covers the first connection.
           ssh-keyscan -T 10 -H 76.13.159.221 >> ~/.ssh/known_hosts || true
           SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15"
-          # 3 attempts with backoff — transient runner↔Hostinger timeouts are
+          # 5 attempts with backoff — transient runner↔Hostinger timeouts are
           # the single most common deploy failure and are not worth a red run.
-          retry() { for a in 1 2 3; do "$@" && return 0; echo "::warning::attempt $a failed, retrying in $((a*10))s"; sleep $((a*10)); done; echo "::error::still failing after 3 attempts"; return 1; }
+          # The old window was 3 attempts / ~105s, and the outage on 21.08.
+          # outlasted it: the run failed 12:44–12:46 and the identical re-run
+          # went through minutes later in 18s. 20/40/60/80s of backoff plus
+          # 5×ConnectTimeout=15 spans ~5min, which covers those clusters.
+          retry() { for a in 1 2 3 4 5; do "$@" && return 0; echo "::warning::attempt $a failed, retrying in $((a*20))s"; sleep $((a*20)); done; echo "::error::still failing after 5 attempts over ~5min"; return 1; }
           retry rsync -az --delete -e "ssh $SSH_OPTS" \
             apps/vs1-demo/ui/dist/ root@76.13.159.221:/docker/complihub/site/
           retry ssh $SSH_OPTS root@76.13.159.221 'chmod -R a+rX /docker/complihub/site'
@@ -144,7 +148,7 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -T 10 -H 76.13.159.221 >> ~/.ssh/known_hosts || true
           SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15"
-          retry() { for a in 1 2 3; do "$@" && return 0; echo "::warning::attempt $a failed, retrying in $((a*10))s"; sleep $((a*10)); done; echo "::error::still failing after 3 attempts"; return 1; }
+          retry() { for a in 1 2 3 4 5; do "$@" && return 0; echo "::warning::attempt $a failed, retrying in $((a*20))s"; sleep $((a*20)); done; echo "::error::still failing after 5 attempts over ~5min"; return 1; }
           retry scp $SSH_OPTS /tmp/index.cjs /tmp/api-build-info.json root@76.13.159.221:/docker/complihub-api/app/
           retry ssh $SSH_OPTS root@76.13.159.221 'cd /docker/complihub-api && docker compose restart api'
 
