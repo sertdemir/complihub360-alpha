@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, CheckCircle, Users, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, CheckCircle, Users, Sparkles } from 'lucide-react';
 import { severityFromRiskWeight } from '@complihub/compliance-engine';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
@@ -11,7 +11,7 @@ import { RiskBadge } from '../components/ui/RiskBadge';
 import { SiteFooter } from '../components/home';
 import { SectionEyebrow } from '../components/providers/SectionHeading';
 import { DOMAIN_BY_SLUG } from '../lib/domains';
-import { getAreaProfile, isAreaSlug } from '../lib/areaProfiles';
+import { getAreaObligations, getAreaProfile, isAreaSlug } from '../lib/areaProfiles';
 import { useInViewOnce } from '../lib/useInViewOnce';
 import {
   AreaEnforcement,
@@ -123,6 +123,31 @@ export function ComplianceAreaPage() {
     .map(k => t(`compliance.${area}.${k}`, ''))
     .filter(Boolean);
 
+  // Dieselbe Liste, die der Explorer weiter unten rendert — die Zeile im Hero
+  // kann also nicht von dem abweichen, was die Seite danach zeigt.
+  const heroObligations = getAreaObligations(area, selectedCountry);
+  const heroLater = heroObligations.filter(
+    o => o.appliesFrom && new Date(o.appliesFrom) > new Date(),
+  ).length;
+  const heroNational = heroObligations.filter(o => o.marketSpecific).length;
+  const heroFacts = [
+    heroObligations.length > 0
+      ? t('compliance.area.facts.duties', { defaultValue: '{{count}} duties', count: heroObligations.length })
+      : '',
+    selectedCountry === 'EU'
+      ? t('compliance.area.facts.allEu', 'all on an EU-level source')
+      : t('compliance.area.facts.national', {
+          defaultValue: '{{count}} on a national legal basis',
+          count: heroNational,
+        }),
+    heroLater > 0
+      ? t('compliance.area.facts.later', {
+          defaultValue: '{{count}} apply only from a later date',
+          count: heroLater,
+        })
+      : '',
+  ].filter(Boolean);
+
   const startAssessment = () => {
     const search = new URLSearchParams();
     if (selectedCountry !== 'EU') search.set('country', selectedCountry);
@@ -142,31 +167,25 @@ export function ComplianceAreaPage() {
       {/* The badge no longer carries the risk claim on its own: the panel on the
           right shows the three numbers it is computed from, so "high" is
           checkable rather than asserted. */}
-      <section className="border-b border-stroke-subtle bg-surface-secondary py-14 desktop-s:py-20">
+      {/* The site header is FIXED and the area switcher is sticky underneath it,
+          so the switcher's flow slot sits far above where it is painted. With
+          the old py-14 the first 33px of this section — the back link, and later
+          the risk card's header row — were drawn behind the pinned bar. The top
+          padding now clears both: 113px of header plus the bar's own height.
+          Measured, not guessed: card top 137 against a bar ending at 170. */}
+      <section className="border-b border-stroke-subtle bg-surface-secondary pb-14 pt-24 desktop-s:pb-20 desktop-s:pt-32">
         <Container size="xl">
           <div className="grid gap-10 desktop-s:grid-cols-12 desktop-s:gap-14">
             <div className="desktop-s:col-span-7">
-              <Link
-                to={`${localePrefix}/compliance`}
-                className="inline-flex items-center gap-1.5 text-body-xs font-semibold text-fg-secondary transition-colors hover:text-fg-brand"
-              >
-                <ArrowLeft size={14} /> {t('compliance.area.allAreas', 'All areas')}
-              </Link>
-
-              <div className="mt-5 flex items-center gap-3">
-                <Icon size={32} strokeWidth={1.5} className={`shrink-0 ${style.iconColor}`} aria-hidden />
+              {/* No back link here: the sticky switcher above carries one, and
+                  the canvas hero opens on the eyebrow. */}
+              <div>
                 <SectionEyebrow tone="brand">
                   {t('compliance.heroOverline', 'Compliance Areas')}
                 </SectionEyebrow>
-                <RiskBadge level={severity} size="sm">
-                  {t('compliance.riskBadge', {
-                    defaultValue: '{{level}} Risk',
-                    level: t(severityKey(severity), SEVERITY_FALLBACK[severity]),
-                  })}
-                </RiskBadge>
               </div>
 
-              <h1 className="mt-5 font-serif text-[2.5rem] font-semibold leading-[1.08] tracking-tight text-fg lg:text-[3.25rem]">
+              <h1 className="mt-4 font-serif text-[2.5rem] font-semibold leading-[1.08] tracking-tight text-fg lg:text-[3.5rem]">
                 {title}
               </h1>
               {(headline || description) && (
@@ -175,9 +194,21 @@ export function ComplianceAreaPage() {
                 </Typography>
               )}
 
+              {/* The canvas states the area's size in the lead sentence. It is
+                  a LIST of derived facts rather than the mockup's prose: the
+                  clauses are conditional (a market with no national source, an
+                  area with nothing deferred) and stitching conditional prose
+                  together in four languages is where grammar breaks. Same
+                  facts, same place, sentences that cannot come out wrong. */}
+              {heroFacts.length > 0 && (
+                <p className="mt-4 text-body-sm text-fg-tertiary tabular-nums">
+                  {heroFacts.join(' · ')}
+                </p>
+              )}
+
               <div className="mt-8 flex flex-col gap-3 tablet:flex-row">
                 <Button size="lg" variant="primary" onClick={startAssessment}>
-                  {t('compliance.startAssessment', 'Start {{title}} Assessment', { title })}
+                  {t('compliance.area.startShort', 'Start the assessment')}
                   <ArrowRight size={17} className="ml-1.5" />
                 </Button>
                 <Button
@@ -188,6 +219,14 @@ export function ComplianceAreaPage() {
                   {t('compliance.area.findSpecialist', 'Find a specialist')}
                 </Button>
               </div>
+
+              <p className="mt-7 flex items-start gap-2.5 text-body-sm text-fg-tertiary">
+                <Check size={15} className="mt-0.5 shrink-0 text-fg-brand" aria-hidden />
+                {t(
+                  'compliance.area.sourcePromise',
+                  'Every duty traces back to a named legal basis — no assessment without a source.',
+                )}
+              </p>
             </div>
 
             {/* No second country selector here: the sticky AreaSwitcher above

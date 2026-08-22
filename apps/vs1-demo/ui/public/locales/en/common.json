@@ -595,7 +595,9 @@
         "enforcement": "Enforcement intensity",
         "enforcementNote": "A property of the market, not of this area",
         "strictness": "Regulatory density",
-        "strictnessNote": "A property of the market, not of this area"
+        "strictnessNote": "A property of the market, not of this area",
+        "outOfTen": "out of 10 · domain weight",
+        "marketsCompared": "{{count}} markets compared"
       },
       "timeline": {
         "liveNow": "Applies today"
@@ -609,7 +611,15 @@
       },
       "relatedOpen": "Open this area",
       "readSource": "Read the source on EUR-Lex",
-      "coverageNoteEu": "The engine carries {{count}} duties for this area, all of them on an EU-level source. Pick a market to see where a national source adds to them."
+      "coverageNoteEu": "The engine carries {{count}} duties for this area, all of them on an EU-level source. Pick a market to see where a national source adds to them.",
+      "startShort": "Start the assessment",
+      "sourcePromise": "Every duty traces back to a named legal basis — no assessment without a source.",
+      "facts": {
+        "duties": "{{count}} duties",
+        "allEu": "all on an EU-level source",
+        "national": "{{count}} on a national legal basis",
+        "later": "{{count}} apply only from a later date"
+      }
     },
     "riskBadge": "{{level}} Risk"
   },
