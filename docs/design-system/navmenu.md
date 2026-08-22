@@ -316,6 +316,37 @@ Storybook mapping
 
 ---
 
+## 9b. Was jsdom nicht sehen kann
+
+Zweimal hintereinander war der Contract-Test grün, während der Tastaturvertrag auf der gebauten Seite
+nicht hielt:
+
+| | Defekt | Warum der Test ihn nicht sah |
+|---|---|---|
+| #74 | Tab hinter dem letzten Link ließ das Panel offen dahinter stehen | Der Test prüfte den Fokus, nicht den Panel-Zustand danach |
+| #76 | ArrowDown öffnete und ließ den Fokus auf dem Knopf | `requestAnimationFrame` feuert im Browser **vor** Reacts Effekt-Flush; jsdoms Polyfill danach |
+
+Beide fand ein echter Browser auf dem Produktions-Build. Daraus ist
+`e2e/navigation.smoke.spec.ts` entstanden (16 Tests, ~10 s, läuft in `ci.yml` nach dem Build).
+
+**Was er nachweislich fängt — jeweils geprüft, indem der Fix zurückgenommen und neu gebaut wurde:**
+
+- **#74: ja.** Zwei Tests werden rot, auf beiden Headern. Kein Rennen, sondern ein fehlender Handler.
+- **#76: nein.** Bleibt grün. Das Rennen entschied sich nur, während die Seite noch an externen
+  Subressourcen hing; unter ruhigen Bedingungen gewinnt Reacts Effekt-Flush zuverlässig, auch bei
+  20-facher CPU-Drosselung. Reproduzierbar machen hieße, den CI-Lauf an die Erreichbarkeit von
+  fonts.googleapis.com zu hängen.
+
+Dieselbe Prüfung an der Chromium-Story `KeyboardOpen`: **fängt #76 auch nicht.** Der Kommentar dort
+sagt das, statt Deckung zu behaupten, die nicht da ist.
+
+Was der Smoke verlässlich hält, ist die strukturelle Hälfte: echte Anker mit richtigen hrefs,
+`aria-expanded`/`aria-controls`, `aria-current` auf dem aktuellen Ziel, kein `role="menu"`, Escape mit
+Fokus-Rückgabe, Tab ohne Falle, kein horizontaler Überlauf. Genau das, was eine Sichtprüfung nicht
+sieht — und was ein jsdom-Test teils falsch misst.
+
+---
+
 ## 10. Definition of done
 
 A component, not a draft, when all of these hold:
@@ -330,6 +361,9 @@ A component, not a draft, when all of these hold:
       (`Trigger State=Open`, `Item Layout`) stay unmapped rather than pointing at props that do not exist
 - [x] A keyboard contract test in the spirit of `Button.contract.test.tsx` — arrows wrap, Escape returns
       focus, Tab does not trap (9 assertions, `NavMenu.contract.test.tsx`)
+- [x] Und weil dieser Test zweimal grün war, während es auf der Seite nicht hielt: ein
+      Navigations-Smoke gegen den Produktions-Build in echtem Chromium (`e2e/navigation.smoke.spec.ts`,
+      16 Tests, in `ci.yml`). Siehe §9b für das, was er fängt — und das, was er nicht fängt
 - [x] Figma descriptions filled on all three sets, extended from section 9 with what building them taught
 - [x] The remaining call sites migrated and every `role="menu"` usage gone. It was three, not two: `GlobalNav`
       used `common/LanguageSwitcher`, a fourth copy that rendered `<button>`s (so the locales were not links
