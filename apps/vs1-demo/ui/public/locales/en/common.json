@@ -672,7 +672,8 @@
       "allAreas": "All compliance areas",
       "areasAsideBody": "Every area lists the duties it carries, the statute behind each one, and what it costs to get wrong."
     },
-    "login": "Log in"
+    "login": "Log in",
+    "language": "Language"
   },
   "howItWorks": {
     "meta": {

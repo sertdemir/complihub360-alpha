@@ -3,21 +3,12 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { supportedLngs } from '../../i18n/config';
-import { LanguageSwitcher } from '../common/LanguageSwitcher';
-import { NavMenu } from '../ui/NavMenu';
+import { LanguageMenu } from './LanguageMenu';
 import { AreasMenuPanel } from './AreasMenuPanel';
 import { useAuthStore } from '../../store/useAuthStore';
-import {
-  // The mega-menu item type stays: every entry is a flat link today, but the
-  // dropdown machinery is guarded by `items.length > 0` and works the moment a
-  // menu gets children again. The ten section icons went with those children.
-  type LucideIcon,
-  ChevronDown, ArrowRight,
-  LogOut, LayoutDashboard, User
-} from 'lucide-react';
+import { ChevronDown, LogOut, LayoutDashboard } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Logo } from '../ui/Logo';
-import { Typography } from '../ui/Typography';
 import { ThemeToggle } from '../ui/ThemeToggle';
 
 const menuItemClass = (active: boolean) =>
@@ -37,7 +28,6 @@ export function GlobalNav() {
   // language. The path segment is what actually says which locale you are on.
   const pathLang = location.pathname.split('/').filter(Boolean)[0];
   const currentLang = supportedLngs.includes(pathLang) ? pathLang : i18n.resolvedLanguage || 'en';
-  const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const { isLoggedIn, role, userName, logout } = useAuthStore();
@@ -46,9 +36,8 @@ export function GlobalNav() {
   const isHidden = HIDDEN_PATHS.includes(pathWithoutLang) || pathWithoutLang.startsWith('/wizard');
 
   useEffect(() => {
-    const handleScroll = () => { setActiveMenu(null); setUserMenuOpen(false); };
+    const handleScroll = () => setUserMenuOpen(false);
     const handleClick = (e: MouseEvent) => {
-      if (!(e.target as Element).closest('header')) setActiveMenu(null);
       if (userMenuRef.current && !(e.target as Element).closest('.user-menu-trigger')) setUserMenuOpen(false);
     };
     window.addEventListener('scroll', handleScroll);
@@ -60,7 +49,6 @@ export function GlobalNav() {
   }, []);
 
   const navTo = (path: string) => {
-    setActiveMenu(null);
     if (path.startsWith('/')) {
       navigate(`/${currentLang}${path}`);
     } else {
@@ -68,11 +56,13 @@ export function GlobalNav() {
     }
   };
 
+  // Every entry is a destination. The one exception is the areas entry, which
+  // opens the NavMenu sheet instead — a control that reveals children, which is
+  // the only thing that legitimately stays a button.
   const HEADER_MENU: {
     id: string;
     label: string;
-    path?: string;
-    items: { icon: LucideIcon; anim: any; title: string; desc: string; path: string }[];
+    path: string;
     /** Opens the eight compliance areas as a full-width sheet. */
     sheet?: boolean;
   }[] = [
@@ -80,11 +70,11 @@ export function GlobalNav() {
     // present different navigations. Platform and Solutions dropped out of the
     // header on 2026-08-18: §11 P5 keeps them as SEO surfaces, reachable from the
     // footer, and seven entries do not survive German labels.
-    { id: 'how-it-works', label: t('header.nav.howItWorks', 'How it works'), path: '/how-it-works', items: [] },
-    { id: 'areas', label: t('header.nav.complianceAreas', 'Compliance Areas'), path: '/compliance', items: [], sheet: true },
-    { id: 'markets', label: t('header.nav.markets', 'Markets'), path: '/markets', items: [] },
-    { id: 'pricing', label: t('header.nav.pricing', 'Pricing'), path: '/pricing', items: [] },
-    { id: 'resources', label: t('header.nav.resources', 'Resources'), path: '/resources', items: [] },
+    { id: 'how-it-works', label: t('header.nav.howItWorks', 'How it works'), path: '/how-it-works' },
+    { id: 'areas', label: t('header.nav.complianceAreas', 'Compliance Areas'), path: '/compliance', sheet: true },
+    { id: 'markets', label: t('header.nav.markets', 'Markets'), path: '/markets' },
+    { id: 'pricing', label: t('header.nav.pricing', 'Pricing'), path: '/pricing' },
+    { id: 'resources', label: t('header.nav.resources', 'Resources'), path: '/resources' },
   ];
 
   if (isHidden) return null;
@@ -128,27 +118,13 @@ export function GlobalNav() {
                   lang={currentLang}
                   isActive={location.pathname.startsWith(`/${currentLang}/compliance`)}
                 />
-              ) : menu.path ? (
+              ) : (
                 <Link
                   to={`/${currentLang}${menu.path}`}
-                  onClick={() => setActiveMenu(null)}
-                  className={menuItemClass(activeMenu === menu.id)}
+                  className={menuItemClass(location.pathname.startsWith(`/${currentLang}${menu.path}`))}
                 >
                   {menu.label}
                 </Link>
-              ) : (
-                <button
-                  onClick={() => setActiveMenu(activeMenu === menu.id ? null : menu.id)}
-                  className={menuItemClass(activeMenu === menu.id)}
-                >
-                  {menu.label}
-                  {menu.items.length > 0 && (
-                    <ChevronDown
-                      size={12}
-                      className={`transition-transform duration-200 ${activeMenu === menu.id ? 'rotate-180 text-fg-brand' : 'text-fg-tertiary'}`}
-                    />
-                  )}
-                </button>
               )}
             </div>
           ))}
@@ -160,7 +136,7 @@ export function GlobalNav() {
         {/* Actions */}
         <div className="flex items-center gap-1 shrink-0 h-10">
           <ThemeToggle size={36} />
-          <LanguageSwitcher />
+          <LanguageMenu triggerClassName="h-9 w-9" />
 
           {isLoggedIn ? (
             <div className="relative user-menu-trigger" ref={userMenuRef}>
@@ -238,47 +214,6 @@ export function GlobalNav() {
         </div>
       </div>
 
-      {/* ── Floating Dropdown ───────────────────────────────────── */}
-      <AnimatePresence>
-        {activeMenu && (
-          <motion.div
-            initial={{ opacity: 0, y: -8, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.97 }}
-            transition={{ duration: 0.18, ease: 'easeOut' } as any}
-            className="pointer-events-auto mt-2 w-full max-w-[1100px] mx-4 rounded-xl bg-surface backdrop-blur-xl border border-stroke-subtle shadow-[0_4px_32px_rgba(0,0,0,0.08)] overflow-hidden"
-          >
-            <div className="px-8 py-6">
-              <div className="flex flex-nowrap justify-center gap-10">
-                {HEADER_MENU.find(m => m.id === activeMenu)?.items.map((item) => (
-                  <button
-                    key={item.title}
-                    onClick={() => navTo(item.path)}
-                    className="text-left group flex items-start gap-3 p-3 -m-3 rounded-xl hover:bg-surface-secondary transition-colors"
-                  >
-                    <motion.div
-                      className="flex items-start justify-center shrink-0 pt-0.5"
-                      whileHover={item.anim}
-                      transition={{ type: 'spring', stiffness: 300, damping: 18 } as any}
-                    >
-                      <item.icon size={32} className="text-fg-brand group-hover:opacity-75 transition-colors" strokeWidth={1.5} />
-                    </motion.div>
-                    <div className="mt-0.5">
-                      <Typography variant="ui-small" weight="bold" className="text-fg flex items-center gap-1 mb-1 group-hover:text-fg-brand transition-colors">
-                        {item.title}
-                        <ArrowRight size={14} className="opacity-0 -translate-x-2 w-0 group-hover:w-auto overflow-hidden group-hover:opacity-100 group-hover:translate-x-0 transition-all text-fg-brand" />
-                      </Typography>
-                      <Typography variant="caption" className="text-fg-tertiary block normal-case tracking-normal">
-                        {item.desc}
-                      </Typography>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </header>
   );
 }

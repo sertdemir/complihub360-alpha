@@ -672,7 +672,8 @@
       "allAreas": "Alle Compliance-Bereiche",
       "areasAsideBody": "Jeder Bereich nennt die Pflichten, die er trägt, die Rechtsgrundlage dahinter und das, was ein Fehler kostet."
     },
-    "login": "Anmelden"
+    "login": "Anmelden",
+    "language": "Sprache"
   },
   "howItWorks": {
     "meta": {

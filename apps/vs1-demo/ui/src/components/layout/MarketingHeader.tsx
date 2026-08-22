@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Globe, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Logo } from '../ui/Logo';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { AreasMenuPanel } from './AreasMenuPanel';
+import { LanguageMenu } from './LanguageMenu';
 
 // ─── MarketingHeader ──────────────────────────────────────────────────────────
 // The marketing navigation, responsive: desktop bar + mobile expanding pill panel.
@@ -50,83 +51,6 @@ const NAV_LINKS: NavLink[] = [
   { to: 'pricing', label: 'Pricing', labelKey: 'header.nav.pricing' },
   { to: 'resources', label: 'Resources', labelKey: 'header.nav.resources' },
 ];
-
-
-
-// Language menu — same four locales and URL-segment logic as
-// components/common/LanguageSwitcher (GlobalNav). Navigation happens via plain
-// hrefs (like every other link in this header), so the component stays
-// router-free (Storybook-safe); the /:locale route in App.tsx picks up the new
-// segment and calls i18n.changeLanguage.
-const LANGUAGES = [
-  { code: 'en', label: 'English' },
-  { code: 'de', label: 'Deutsch' },
-  { code: 'es', label: 'Español' },
-  { code: 'tr', label: 'Türkçe' },
-] as const;
-
-function LanguageMenu({ buttonClass }: { buttonClass: string }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener('mousedown', onDown);
-    return () => document.removeEventListener('mousedown', onDown);
-  }, [open]);
-
-  const { pathname, search, hash } = window.location;
-  const parts = pathname.split('/');
-  const hasLocale = parts.length > 1 && LANGUAGES.some((l) => l.code === parts[1]);
-  const current = hasLocale ? parts[1] : 'en';
-  const hrefFor = (lng: string) =>
-    (hasLocale ? ['', lng, ...parts.slice(2)].join('/') : `/${lng}${pathname}`) + search + hash;
-
-  return (
-    <div className="relative" ref={ref}>
-      <button
-        aria-label="Language"
-        aria-expanded={open}
-        aria-haspopup="menu"
-        onClick={() => setOpen((v) => !v)}
-        className={buttonClass}
-      >
-        <Globe size={20} />
-      </button>
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 8 }}
-            transition={{ duration: 0.15 }}
-            role="menu"
-            className="absolute right-0 top-full z-[100] mt-2 w-36 overflow-hidden rounded-md border-thin border-stroke-subtle bg-surface py-1 shadow-lg"
-          >
-            {LANGUAGES.map((lng) => (
-              <a
-                key={lng.code}
-                role="menuitem"
-                href={hrefFor(lng.code)}
-                onClick={() => setOpen(false)}
-                className={`flex items-center justify-between px-4 py-2 text-body-sm font-medium transition-colors hover:bg-surface-secondary ${
-                  current === lng.code ? 'text-fg-brand' : 'text-fg-secondary'
-                }`}
-              >
-                {lng.label}
-                {current === lng.code && <Check size={14} />}
-              </a>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
 
 export function MarketingHeader({
   links,
@@ -204,7 +128,7 @@ export function MarketingHeader({
         </nav>
         <div className="flex flex-1 basis-0 items-center justify-end gap-5">
           <ThemeToggle inverse={inverse} size={36} />
-          <LanguageMenu buttonClass={`grid h-9 w-9 place-items-center rounded-md ${inverse ? 'text-fg-inverse' : 'text-fg-secondary'}`} />
+          <LanguageMenu triggerClassName={`h-9 w-9 ${inverse ? 'text-fg-inverse hover:text-fg-inverse' : ''}`} />
           <a
             href={loginHref}
             className={`inline-flex h-[40px] items-center whitespace-nowrap rounded-md border-thin px-4 text-body-sm font-semibold ${
@@ -223,7 +147,7 @@ export function MarketingHeader({
           <Logo lockup="mark" tone={inverse ? 'on-petrol' : 'on-light'} />
           <div className="flex items-center gap-2">
             <ThemeToggle inverse={inverse} size={40} />
-            <LanguageMenu buttonClass={`grid h-[40px] w-[40px] place-items-center rounded-md ${inverse ? 'text-fg-inverse' : 'text-fg-secondary'}`} />
+            <LanguageMenu triggerClassName={`h-10 w-10 ${inverse ? 'text-fg-inverse hover:text-fg-inverse' : ''}`} />
             <button
               aria-label={open ? 'Close menu' : 'Open menu'}
               aria-expanded={open}

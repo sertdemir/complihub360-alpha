@@ -217,7 +217,13 @@ export function NavMenuTrigger({
       {...rest}
     >
       {icon}
-      {!iconOnly && label}
+      {/* The label truncates rather than pushing the chevron out of the button.
+          The area-page switcher puts eight German area titles in a trigger that
+          shares a row with two other controls; "Produktkonformität & Verpackung"
+          overflowed it on a tablet. An overflow-hidden flex child resolves its
+          min-width to 0, so this shrinks without any extra class at the call
+          site. */}
+      {!iconOnly && <span className="truncate">{label}</span>}
       {!iconOnly && (
         <ChevronDown
           size={14}
