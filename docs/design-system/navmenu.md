@@ -23,7 +23,9 @@ Two of the three announce a keyboard interface they do not honour. A screen read
 is told it is in a menu and then finds no menu navigation at all — worse than an unlabelled `<div>`, because
 the promise is explicit.
 
-`SelectMenu` is the one that is complete. That matters for section 3.
+`SelectMenu` is the one that is complete on these five columns — which is what made it the right target for
+the `CountrySelector` migration. It was not flawless: moving that call site onto it surfaced three ARIA
+defects the table above does not have a column for, all now fixed and held by a contract test. See section 3.
 
 ---
 
@@ -57,18 +59,27 @@ Consequence: **both existing `role="menu"` usages are wrong** and get corrected 
 | Header "Compliance areas" | does not exist | **NavMenu** (new) | eight destinations, real links |
 | `MarketingHeader` → `LanguageMenu` | hand-rolled `role="menu"` | **NavMenu** | same shape, same defect, four destinations |
 | `AreaSwitcher` (area pages) | hand-rolled `role="menu"` | **NavMenu** | same shape, eight destinations |
-| `CountrySelector` (compliance areas) | hand-rolled `role="listbox"` | **`SelectMenu`** — no new component | it picks a value; it is a duplicate of an existing component |
+| `CountrySelector` (compliance areas) | ~~hand-rolled `role="listbox"`~~ | **`SelectMenu`** — done, PR #72 | it picks a value; it was a duplicate of an existing component |
 
-### The `CountrySelector` finding
+### The `CountrySelector` finding — resolved in #72
 
-This one is a correction to my own work in PR #72. I implemented the full listbox keyboard contract
-(arrows, Home/End, Escape, focus return, `aria-activedescendant`) by hand — and `SelectMenu` already had
-all of it, with `icon`, `description`, a selected check, and three sizes. The flag renders as the `icon`
-slot; the caption and hint above and below the control are the caller's layout, not part of the widget.
+This was a correction to my own work: the full listbox keyboard contract implemented by hand, when
+`SelectMenu` already had all of it plus an `icon` slot the flag drops into. Migrated.
 
-That is the duplication Compass' quality gate exists to catch, and it should be undone regardless of whether
-NavMenu is built. It is listed here rather than silently fixed because it changes a PR that is currently
-green and reviewable.
+Worth recording, because the migration exposed three defects in `SelectMenu` itself that affect every
+consumer, not just this one:
+
+1. `aria-activedescendant` sat on the `<ul>`, which is `tabIndex={-1}` and never focused — so arrowing
+   through the list announced nothing. It belongs on the trigger, which holds focus.
+2. The trigger was a bare `<button>`. `aria-activedescendant` is defined for combobox/textbox/group/
+   application, so with the attribute in its right place the trigger took `role="combobox"`.
+3. Two instances without an explicit `id` both fell back to the literal `'sm'`, colliding option ids.
+   `useId` namespaces them now. The area pages render exactly that case — the hero picker and the compact
+   one in the switcher.
+
+`SelectMenu.contract.test.tsx` holds all three. **This matters for NavMenu:** the plan below says to lift
+the keyboard implementation from `SelectMenu.onKeyDown`. Lift the corrected one — the version before #72
+would carry defect 1 straight into the new component.
 
 ---
 
