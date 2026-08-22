@@ -100,7 +100,10 @@ export function AreaRiskCard({ profile, selectedCountry }: Props) {
             {score.format(weight)}
           </span>
           <span className="pb-2">
-            <RiskBadge level={severity} size="sm">
+            {/* Pill, as the canvas draws every risk chip. Local override
+                rather than a change to RiskBadge: that component is used in
+                twenty places and its radius is not this section's to set. */}
+            <RiskBadge level={severity} size="sm" className="rounded-full">
               {t('compliance.riskBadge', {
                 defaultValue: '{{level}} Risk',
                 level: t(severityKey(severity), SEVERITY_FALLBACK[severity]),
@@ -144,7 +147,7 @@ export function AreaRiskCard({ profile, selectedCountry }: Props) {
             count: markets.length,
           })}
         </span>
-        <ol className="mt-3.5 flex h-14 items-end gap-2">
+        <ol className="mt-[1.05rem] flex h-14 items-end gap-2">
           {markets.map((m) => {
             const current = m.code === selectedCountry;
             const sev = severityFromRiskWeight(m.weight);

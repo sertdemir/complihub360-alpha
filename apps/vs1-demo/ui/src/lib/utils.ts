@@ -22,10 +22,25 @@ const FONT_SIZES = [
   'label', 'ui-small', 'caption', 'eyebrow',
 ]
 
+/**
+ * Compass border-width aliases from tailwind.config.js (theme.extend.borderWidth).
+ *
+ * Same trap as the font sizes above, one group over: tailwind-merge knows
+ * border-2 and border-[2px], not border-medium. Anything else after `border-`
+ * falls into its catch-all and is classified as a border COLOUR — so
+ * `cn('border-medium border-neutral-300')` read both as colours and silently
+ * dropped the WIDTH. Every Button variant="outline" in the app therefore
+ * rendered with no border at all: a white control on a near-white ground.
+ *
+ * Keep this list in sync with theme.extend.borderWidth in tailwind.config.js.
+ */
+const BORDER_WIDTHS = ['none', 'sm', 'md', 'lg', 'thin', 'medium', 'thick']
+
 const twMerge = extendTailwindMerge({
   extend: {
     classGroups: {
       'font-size': [{ text: FONT_SIZES }],
+      'border-w': [{ border: BORDER_WIDTHS }],
     },
   },
 })

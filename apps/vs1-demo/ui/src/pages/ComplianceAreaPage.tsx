@@ -173,14 +173,14 @@ export function ComplianceAreaPage() {
           the risk card's header row — were drawn behind the pinned bar. The top
           padding now clears both: 113px of header plus the bar's own height.
           Measured, not guessed: card top 137 against a bar ending at 170. */}
-      <section className="border-b border-stroke-subtle bg-surface-secondary pb-14 pt-24 desktop-s:pb-20 desktop-s:pt-32">
+      <section className="border-b border-stroke-subtle bg-surface-secondary pb-14 pt-[7.2rem] desktop-s:pb-20 desktop-s:pt-[9.6rem]">
         <Container size="xl">
           <div className="grid gap-10 desktop-s:grid-cols-12 desktop-s:gap-14">
             <div className="desktop-s:col-span-7">
               {/* No back link here: the sticky switcher above carries one, and
                   the canvas hero opens on the eyebrow. */}
               <div>
-                <SectionEyebrow tone="brand">
+                <SectionEyebrow tone="brand" dot={false}>
                   {t('compliance.heroOverline', 'Compliance Areas')}
                 </SectionEyebrow>
               </div>
@@ -211,9 +211,12 @@ export function ComplianceAreaPage() {
                   {t('compliance.area.startShort', 'Start the assessment')}
                   <ArrowRight size={17} className="ml-1.5" />
                 </Button>
+                {/* Outline on a white ground, not the filled secondary: next to
+                    the petrol CTA a grey fill reads as a second primary. */}
                 <Button
                   size="lg"
-                  variant="secondary"
+                  variant="outline"
+                  className="bg-surface"
                   onClick={() => navigate(`${localePrefix}/search?domain=${area}`)}
                 >
                   {t('compliance.area.findSpecialist', 'Find a specialist')}
