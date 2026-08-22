@@ -160,7 +160,7 @@ export function AreaRiskCard({ profile, selectedCountry }: Props) {
                   style={{ height: inView ? `${Math.round((m.weight / tallest) * 40) + 8}px` : 0 }}
                 />
                 <span
-                  className={`text-[10px] tabular-nums ${
+                  className={`text-body-4xs tabular-nums ${
                     current ? 'font-bold text-fg' : 'font-semibold text-fg-tertiary'
                   }`}
                 >
