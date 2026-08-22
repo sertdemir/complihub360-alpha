@@ -75,10 +75,17 @@ export function StaggerItem({ children, className = '' }: { children: ReactNode;
 export function SectionEyebrow({
   children,
   tone = 'neutral',
+  /**
+   * The leading dot. On by default — it is the marketing surface's eyebrow
+   * signature and every other section carries it. The area hero opts out
+   * because the canvas opens on the word alone.
+   */
+  dot = true,
   className = '',
 }: {
   children: React.ReactNode;
   tone?: 'neutral' | 'brand' | 'accent' | 'inverse';
+  dot?: boolean;
   className?: string;
 }) {
   // Semantic tokens, not raw palette steps: the palette classes are fixed
@@ -98,7 +105,7 @@ export function SectionEyebrow({
     <span
       className={`inline-flex items-center gap-2 text-caption font-sans font-semibold uppercase tracking-[0.14em] ${toneClass} ${className}`}
     >
-      <span className="inline-block w-1.5 h-1.5 rounded-full bg-current opacity-60" />
+      {dot && <span className="inline-block w-1.5 h-1.5 rounded-full bg-current opacity-60" />}
       {children}
     </span>
   );
