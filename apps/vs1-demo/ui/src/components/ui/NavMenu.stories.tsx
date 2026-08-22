@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Receipt, Recycle, ShieldCheck, Megaphone, Building2, Globe } from 'lucide-react';
 import { NavMenu } from './NavMenu';
 import { RiskBadge } from './RiskBadge';
@@ -86,6 +87,42 @@ export const SheetWithRisk: Story = {
       </NavMenu.Panel>
     </NavMenu>
   ),
+};
+
+/**
+ * Opening from the keyboard, in chromium.
+ *
+ * Asserts what the contract test asserts, one layer out: that ArrowDown and
+ * ArrowUp actually move focus onto an anchor rather than merely opening the
+ * panel.
+ *
+ * Be honest about what this does NOT prove. The bug it was written for — the
+ * trigger scheduling focus with requestAnimationFrame, which fires before
+ * React flushes the items' registration effects, so the list was empty and
+ * focus stayed on the button — does NOT reproduce here. Reverting the fix and
+ * re-running leaves this story green. It only failed on the built app in a
+ * real page load. So this is a second pair of eyes on the behaviour, not the
+ * net that caught it; the net was driving the preview build by hand.
+ */
+export const KeyboardOpen: Story = {
+  render: AreasSheet.render,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: /compliance areas/i });
+
+    trigger.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    await expect(document.activeElement?.tagName).toBe('A');
+    await expect(document.activeElement).toHaveTextContent(/tax & vat/i);
+
+    // And from the other end.
+    await userEvent.keyboard('{Escape}');
+    await expect(trigger).toHaveFocus();
+    await userEvent.keyboard('{ArrowUp}');
+    await expect(document.activeElement?.tagName).toBe('A');
+    await expect(document.activeElement).toHaveTextContent(/all compliance areas/i);
+  },
 };
 
 /** The compact variant — a language switcher, aligned to the trigger's right edge. */
