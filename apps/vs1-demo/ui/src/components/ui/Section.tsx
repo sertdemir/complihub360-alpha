@@ -1,5 +1,6 @@
-import React, { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { useInViewOnce } from '../../lib/useInViewOnce';
 import { Container, type ContainerSize } from './Container';
 
 // ─── Compass Section ──────────────────────────────────────────────────────────
@@ -53,8 +54,10 @@ export function Section({
   children,
   ...props
 }: SectionProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: '-80px' });
+  // useInViewOnce, not framer-motion's useInView: this wrapper hides its
+  // children until the observer speaks, so it needs a hook that cannot stay
+  // silent. See the comment on useInViewOnce.
+  const [ref, inView] = useInViewOnce<HTMLDivElement>('-80px');
 
   const inner = bleed ? (
     children

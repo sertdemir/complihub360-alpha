@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { motion, useInView } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, CheckCircle, Users, Sparkles } from 'lucide-react';
 import { severityFromRiskWeight } from '@complihub/compliance-engine';
 import { Container } from '../components/ui/Container';
@@ -12,6 +12,7 @@ import { SiteFooter } from '../components/home';
 import { SectionEyebrow } from '../components/providers/SectionHeading';
 import { DOMAIN_BY_SLUG } from '../lib/domains';
 import { getAreaProfile, isAreaSlug } from '../lib/areaProfiles';
+import { useInViewOnce } from '../lib/useInViewOnce';
 import {
   AreaEnforcement,
   AreaMetrics,
@@ -42,9 +43,13 @@ import {
 // is the only reason eight of them could ship at once — as MarketsPage puts it,
 // surfacing what we have already verified needs no new source.
 
+// The reveal renders its children at opacity 0 until it is told otherwise, so
+// it uses useInViewOnce rather than framer-motion's useInView: that hook is
+// guaranteed to reach `true` on every path, including the one where the
+// observer never calls back. A reveal that can stick at 0 does not degrade to
+// "no animation" — it degrades to "the section is not on the page".
 function Section({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  const ref = useRef<HTMLElement>(null);
-  const inView = useInView(ref, { once: true, margin: '-80px' });
+  const [ref, inView] = useInViewOnce<HTMLElement>('-80px');
   return (
     <motion.section
       ref={ref}

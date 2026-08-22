@@ -1,5 +1,6 @@
-import { motion, useInView } from 'framer-motion';
-import { useRef, type ReactNode } from 'react';
+import { motion } from 'framer-motion';
+import { useInViewOnce } from '../../lib/useInViewOnce';
+import { type ReactNode } from 'react';
 import { Typography } from '../ui/Typography';
 
 // ─── Shared section scaffolding for the Providers landing page ───────────────
@@ -21,8 +22,9 @@ export function Reveal({
   delay?: number;
   y?: number;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: '-80px' });
+  // See the comment on useInViewOnce: a wrapper that renders its children at
+  // opacity 0 must use a hook that always reaches true.
+  const [ref, inView] = useInViewOnce<HTMLDivElement>('-80px');
   return (
     <motion.div
       ref={ref}
@@ -136,8 +138,9 @@ export function SectionHeading({
   inverse?: boolean;
   className?: string;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: '-80px' });
+  // See the comment on useInViewOnce: a wrapper that renders its children at
+  // opacity 0 must use a hook that always reaches true.
+  const [ref, inView] = useInViewOnce<HTMLDivElement>('-80px');
   const alignClass = align === 'center' ? 'items-center text-center mx-auto' : 'items-start text-left';
 
   return (
