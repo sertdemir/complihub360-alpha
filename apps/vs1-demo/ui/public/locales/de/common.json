@@ -667,7 +667,10 @@
       "pricing": "Preise",
       "complianceAreas": "Compliance-Bereiche",
       "markets": "Märkte",
-      "resources": "Ressourcen"
+      "resources": "Ressourcen",
+      "areasPanelTitle": "Compliance-Bereich wählen",
+      "allAreas": "Alle Compliance-Bereiche",
+      "areasAsideBody": "Jeder Bereich nennt die Pflichten, die er trägt, die Rechtsgrundlage dahinter und das, was ein Fehler kostet."
     },
     "login": "Anmelden"
   },

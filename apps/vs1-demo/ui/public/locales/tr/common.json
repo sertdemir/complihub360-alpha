@@ -667,7 +667,10 @@
       "pricing": "Fiyatlandırma",
       "complianceAreas": "Uyum Alanları",
       "markets": "Pazarlar",
-      "resources": "Kaynaklar"
+      "resources": "Kaynaklar",
+      "areasPanelTitle": "Bir uyum alanı seçin",
+      "allAreas": "Tüm uyum alanları",
+      "areasAsideBody": "Her alan taşıdığı yükümlülükleri, arkasındaki mevzuatı ve hata yapmanın bedelini listeler."
     },
     "login": "Giriş yap"
   },

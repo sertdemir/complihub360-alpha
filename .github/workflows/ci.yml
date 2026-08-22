@@ -29,6 +29,12 @@ jobs:
           node-version: '22.12.0'
           cache: 'npm'
 
+      - name: Check self-hosted runner rules
+        # Vor npm ci: der Waechter braucht keine Abhaengigkeiten, und die Regel,
+        # die er haelt, ist die teuerste im Repo. Ein self-hosted Runner laeuft
+        # auf dem Staging-VPS, und dieses Repository ist oeffentlich.
+        run: node scripts/check-workflow-runners.mjs
+
       - name: Install dependencies
         # npm ci can sometimes be unreliable with complex local workspace linking
         # we fallback to a standard npm install to ensure resilient CI builds.

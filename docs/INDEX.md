@@ -13,7 +13,7 @@
 | `api/api_schemas_ultra_plus_plus.md` | Extended API Schemas | Active |
 | `ui/StatusBadge.md` | Component Documentation | New |
 | `architecture/` | Architecture Diagrams/Notes | Empty |
-| `ops/` | Operational/Deployment Docs | Empty |
+| `ops/self-hosted-runner.md` | Staging-Deploy über einen Runner auf dem VPS (Einrichtung, Betrieb, Sicherheitsschranken) | Active |
 | `ranking/` | Ranking Algorithm Docs | Empty |
 
 ## 2. Proposed Restructuring
