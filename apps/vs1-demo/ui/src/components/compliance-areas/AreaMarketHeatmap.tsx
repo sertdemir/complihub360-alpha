@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import { severityFromRiskWeight } from '@complihub/compliance-engine';
 import { Typography } from '../ui/Typography';
 import { getAreaProfile } from '../../lib/areaProfiles';
+import { useInViewOnce } from '../../lib/useInViewOnce';
 import type { DomainSlug } from '../../lib/domains';
 import { SEVERITY_STYLE } from './severity';
 import type { CountryCode } from './types';
@@ -22,6 +23,7 @@ export function AreaMarketHeatmap({ slug, selectedCountry }: Props) {
   const { locale } = useParams();
   const localePrefix = locale ? `/${locale}` : '';
   const { marketWeights } = getAreaProfile(slug);
+  const [barsRef, barsInView] = useInViewOnce<HTMLUListElement>();
 
   return (
     <div>
@@ -35,8 +37,8 @@ export function AreaMarketHeatmap({ slug, selectedCountry }: Props) {
         })}
       </Typography>
 
-      <ul className="mt-8 space-y-3">
-        {marketWeights.map(m => {
+      <ul ref={barsRef} className="mt-8 space-y-3">
+        {marketWeights.map((m, i) => {
           const style = SEVERITY_STYLE[severityFromRiskWeight(m.weight)];
           const selected = m.code === selectedCountry;
           return (
@@ -54,8 +56,11 @@ export function AreaMarketHeatmap({ slug, selectedCountry }: Props) {
                 </span>
                 <span className="h-2 overflow-hidden rounded-full bg-surface-secondary">
                   <span
-                    className={`block h-full rounded-full ${style.bar}`}
-                    style={{ width: `${(m.weight / 10) * 100}%` }}
+                    className={`block h-full rounded-full transition-[width] duration-700 ease-out ${style.bar}`}
+                    style={{
+                      width: barsInView ? `${(m.weight / 10) * 100}%` : 0,
+                      transitionDelay: `${i * 60}ms`,
+                    }}
                   />
                 </span>
                 <span className="flex items-center gap-3 text-body-xs tabular-nums text-fg-tertiary">

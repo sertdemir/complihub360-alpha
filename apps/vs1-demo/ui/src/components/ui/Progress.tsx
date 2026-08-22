@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
+import { useInViewOnce } from '../../lib/useInViewOnce';
 
 // ─── Progress primitives ──────────────────────────────────────────────────────
 // From the Compass "Progress" page (536:2): ProgressBar · Spinner · CircleProgress.
@@ -33,14 +34,25 @@ export interface ProgressBarProps {
   color?: ProgressColor;
   /** Animated sliding bar for unknown-duration work. Ignores `value`. */
   indeterminate?: boolean;
+  /**
+   * Grow the fill from 0 to `value` the first time the bar scrolls into view.
+   * On by default. Turn it off where the bar is already the subject of the
+   * reader's attention and the delay would read as lag.
+   */
+  revealOnView?: boolean;
   className?: string;
 }
-export function ProgressBar({ value = 0, size = 'md', color = 'brand', indeterminate = false, className }: ProgressBarProps) {
+export function ProgressBar({ value = 0, size = 'md', color = 'brand', indeterminate = false, revealOnView = true, className }: ProgressBarProps) {
   const h = { sm: 'h-1', md: 'h-2', lg: 'h-3' }[size];
   const v = Math.min(100, Math.max(0, value));
   const fill = PROGRESS_FILL[color];
+  const [ref, inView] = useInViewOnce<HTMLDivElement>();
+  // aria-valuenow below stays on `v`: the number a screen reader announces is
+  // the value, never the frame the animation happens to be on.
+  const shown = !revealOnView || inView ? v : 0;
   return (
     <div
+      ref={ref}
       role="progressbar"
       aria-valuenow={indeterminate ? undefined : Math.round(v)}
       aria-valuemin={0}
@@ -56,7 +68,10 @@ export function ProgressBar({ value = 0, size = 'md', color = 'brand', indetermi
           />
         </>
       ) : (
-        <div className={cn('h-full rounded-full transition-all', fill)} style={{ width: `${v}%` }} />
+        <div
+          className={cn('h-full rounded-full transition-[width] duration-700 ease-out', fill)}
+          style={{ width: `${shown}%` }}
+        />
       )}
     </div>
   );

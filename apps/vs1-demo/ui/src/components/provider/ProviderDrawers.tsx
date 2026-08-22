@@ -6,6 +6,7 @@ import { Drawer } from '../ui/Drawer';
 import { Tag } from '../ui/Tag';
 import { Button } from '../ui/Button';
 import { fetchProviderRequests, type ProviderRequest } from '../../api/requests';
+import { useInViewOnce } from '../../lib/useInViewOnce';
 
 // ─── Provider workspace drawers (wiring map B4 · B6 · B10) ───────────────────
 // Search (2651:2): live filter over the real request inbox, result click
@@ -83,18 +84,22 @@ const FACTORS = [
 
 export function RankingImpactDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useTranslation('providerws');
+  const [factorBarsRef, factorBarsInView] = useInViewOnce<HTMLDivElement>();
   return (
     <Drawer forceDark open={open} onClose={onClose} side="right" size="md" eyebrow={t('rankingImpact.eyebrow')} title={t('rankingImpact.title')}
       footer={<p className="text-[11px] text-fg-tertiary">{t('rankingImpact.footer')}</p>}>
-      <div className="space-y-4">
-        {FACTORS.map((f) => (
+      <div ref={factorBarsRef} className="space-y-4">
+        {FACTORS.map((f, i) => (
           <div key={f.labelKey}>
             <div className="mb-1.5 flex items-baseline justify-between">
               <span className="text-[13px] font-medium text-fg">{t(f.labelKey)}</span>
               <span className="text-[12px] font-bold text-fg-accent">{f.weight}%</span>
             </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-elevate/10">
-              <div className="h-full rounded-full bg-brand-accent" style={{ width: `${f.weight}%` }} />
+              <div
+                className="h-full rounded-full bg-brand-accent transition-[width] duration-700 ease-out"
+                style={{ width: factorBarsInView ? `${f.weight}%` : 0, transitionDelay: `${i * 60}ms` }}
+              />
             </div>
             <p className="mt-1 text-[11px] text-fg-tertiary">{t(f.noteKey)}</p>
           </div>
