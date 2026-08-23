@@ -3,6 +3,7 @@ export { AreaEnforcement } from './AreaEnforcement';
 export { AreaMarketHeatmap } from './AreaMarketHeatmap';
 export { AreaMetrics } from './AreaMetrics';
 export { AreaRiskCard } from './AreaRiskCard';
+export { AreaSectionHeading, useAreaEyebrows } from './AreaSectionHeading';
 export { AreaSwitcher } from './AreaSwitcher';
 export { AreaTimeline } from './AreaTimeline';
 export { ComparisonMatrix } from './ComparisonMatrix';

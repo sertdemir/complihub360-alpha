@@ -6,6 +6,7 @@ import { useInViewOnce } from '../../lib/useInViewOnce';
 import { getAreaObligations } from '../../lib/areaProfiles';
 import type { DomainSlug } from '../../lib/domains';
 import type { CountryCode } from './types';
+import { AreaSectionHeading, useAreaEyebrows } from './AreaSectionHeading';
 
 interface Props {
   slug: DomainSlug;
@@ -26,6 +27,7 @@ interface Props {
 // stakes are stated.
 export function AreaEnforcement({ slug, selectedCountry }: Props) {
   const { t, i18n } = useTranslation('common');
+  const eyebrows = useAreaEyebrows();
   const obligations = useMemo(() => getAreaObligations(slug, selectedCountry), [slug, selectedCountry]);
 
   const withPenalty = obligations.filter((o) => o.penalty);
@@ -59,10 +61,20 @@ export function AreaEnforcement({ slug, selectedCountry }: Props) {
   return (
     <div ref={ref} className="grid gap-10 desktop-s:grid-cols-12 desktop-s:gap-14">
       <div className="desktop-s:col-span-5">
-        <p className="inline-flex items-center gap-2 text-body-3xs font-bold uppercase tracking-[0.14em] text-primary-300">
-          <Gavel size={13} />
-          {t('compliance.area.enforcementTitle', "What's at stake")}
-        </p>
+        {/* The canvas gives this band an eyebrow AND a headline; the live
+            band had only the eyebrow-shaped line, so the one dark section on
+            the page was also the one with no headline. The gavel stays on the
+            eyebrow — it is the band's mark. */}
+        <AreaSectionHeading
+          tone="inverse"
+          eyebrow={
+            <>
+              <Gavel size={13} />
+              {eyebrows.enforcement}
+            </>
+          }
+          title={t('compliance.area.enforcementTitle', "What's at stake")}
+        />
 
         {ceiling > 0 && (
           <>

@@ -624,6 +624,15 @@
         "allEu": "alle auf EU-Ebene",
         "national": "{{count}} mit nationaler Rechtsgrundlage",
         "later": "{{count}} greifen erst später"
+      },
+      "eyebrow": {
+        "affected": "Betroffenheit",
+        "obligations": "Pflichten",
+        "enforcement": "Durchsetzung",
+        "timeline": "Zeitachse",
+        "markets": "Märkte",
+        "process": "Ablauf",
+        "next": "Weiter"
       }
     },
     "riskBadge": "Risiko: {{level}}"

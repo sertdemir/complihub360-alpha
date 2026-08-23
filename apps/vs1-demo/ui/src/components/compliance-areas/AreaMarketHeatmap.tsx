@@ -8,6 +8,7 @@ import { useInViewOnce } from '../../lib/useInViewOnce';
 import type { DomainSlug } from '../../lib/domains';
 import { SEVERITY_STYLE } from './severity';
 import type { CountryCode } from './types';
+import { AreaSectionHeading, useAreaEyebrows } from './AreaSectionHeading';
 
 interface Props {
   slug: DomainSlug;
@@ -20,6 +21,7 @@ interface Props {
 // reader can actually traverse.
 export function AreaMarketHeatmap({ slug, selectedCountry }: Props) {
   const { t } = useTranslation('common');
+  const eyebrows = useAreaEyebrows();
   const { locale } = useParams();
   const localePrefix = locale ? `/${locale}` : '';
   const { marketWeights } = getAreaProfile(slug);
@@ -27,15 +29,18 @@ export function AreaMarketHeatmap({ slug, selectedCountry }: Props) {
 
   return (
     <div>
-      <Typography variant="h2" as="h2" weight="bold" className="text-fg">
-        {t('compliance.area.marketsTitle', 'Where this weighs heaviest')}
-      </Typography>
-      <Typography variant="body" className="mt-2 max-w-2xl text-fg-secondary">
-        {t('compliance.area.marketsLead', {
-          defaultValue:
-            'How each market the engine profiles weights this area, and how many duties it holds a local source for.',
-        })}
-      </Typography>
+      <AreaSectionHeading
+        eyebrow={eyebrows.markets}
+        title={t('compliance.area.marketsTitle', 'Where this weighs heaviest')}
+        lead={
+          <span className="block max-w-2xl">
+            {t('compliance.area.marketsLead', {
+              defaultValue:
+                'How each market the engine profiles weights this area, and how many duties it holds a local source for.',
+            })}
+          </span>
+        }
+      />
 
       <ul ref={barsRef} className="mt-8 space-y-3">
         {marketWeights.map((m, i) => {

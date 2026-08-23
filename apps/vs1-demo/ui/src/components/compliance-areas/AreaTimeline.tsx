@@ -5,6 +5,7 @@ import { getAreaObligations } from '../../lib/areaProfiles';
 import { useInViewOnce } from '../../lib/useInViewOnce';
 import type { DomainSlug } from '../../lib/domains';
 import type { CountryCode } from './types';
+import { AreaSectionHeading, useAreaEyebrows } from './AreaSectionHeading';
 
 interface Props {
   slug: DomainSlug;
@@ -27,6 +28,7 @@ interface Props {
 // ObligationEnrichment.appliesFrom.
 export function AreaTimeline({ slug, selectedCountry }: Props) {
   const { t, i18n } = useTranslation('common');
+  const eyebrows = useAreaEyebrows();
   const [ref, inView] = useInViewOnce<HTMLDivElement>();
   const obligations = useMemo(() => getAreaObligations(slug, selectedCountry), [slug, selectedCountry]);
 
@@ -71,15 +73,18 @@ export function AreaTimeline({ slug, selectedCountry }: Props) {
 
   return (
     <div ref={ref}>
-      <Typography variant="h2" as="h2" weight="bold" className="text-fg">
-        {t('compliance.area.timelineTitle', 'What falls due, and when')}
-      </Typography>
-      <Typography variant="body" className="mt-2 max-w-2xl text-fg-secondary">
-        {t('compliance.area.timelineLead', {
-          defaultValue:
-            'Filing cadence and typical lead time per duty. Shortest lead time first — those are the ones that catch teams out.',
-        })}
-      </Typography>
+      <AreaSectionHeading
+        eyebrow={eyebrows.timeline}
+        title={t('compliance.area.timelineTitle', 'What falls due, and when')}
+        lead={
+          <span className="block max-w-2xl">
+            {t('compliance.area.timelineLead', {
+              defaultValue:
+                'Filing cadence and typical lead time per duty. Shortest lead time first — those are the ones that catch teams out.',
+            })}
+          </span>
+        }
+      />
 
       {/* Below tablet the axis scrolls sideways rather than wrapping, because a
           wrapped axis stops being one. From tablet up the steps share the

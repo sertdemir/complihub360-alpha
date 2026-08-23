@@ -624,6 +624,15 @@
         "allEu": "todas con fuente a nivel de la UE",
         "national": "{{count}} con base jurídica nacional",
         "later": "{{count}} se aplican a partir de una fecha posterior"
+      },
+      "eyebrow": {
+        "affected": "Aplicabilidad",
+        "obligations": "Obligaciones",
+        "enforcement": "Aplicación",
+        "timeline": "Cronología",
+        "markets": "Mercados",
+        "process": "Cómo funciona",
+        "next": "Continuar"
       }
     },
     "riskBadge": "Riesgo: {{level}}"

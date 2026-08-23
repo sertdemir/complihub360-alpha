@@ -17,6 +17,7 @@ import {
   AreaEnforcement,
   AreaMetrics,
   AreaRiskCard,
+  AreaSectionHeading,
   AreaMarketHeatmap,
   AreaSwitcher,
   AreaTimeline,
@@ -26,6 +27,7 @@ import {
   SEVERITY_FALLBACK,
   SEVERITY_STYLE,
   severityKey,
+  useAreaEyebrows,
   useCountrySelection,
   AREA_BY_SLUG,
   LEGACY_AREA_IDS,
@@ -65,6 +67,7 @@ function Section({ children, className = '' }: { children: React.ReactNode; clas
 
 export function ComplianceAreaPage() {
   const { t } = useTranslation('common');
+  const eyebrows = useAreaEyebrows();
   const { locale, area } = useParams();
   const navigate = useNavigate();
   const [selectedCountry, setSelectedCountry] = useCountrySelection();
@@ -249,36 +252,54 @@ export function ComplianceAreaPage() {
           it does not need a border of its own. */}
       <AreaMetrics slug={area} selectedCountry={selectedCountry} />
 
-      {/* ── 2 · Who this affects ──────────────────────────────────────────── */}
+      {/* ── 3 · Who this affects ──────────────────────────────────────────── */}
+      {/* Two columns, as the canvas draws it: the heading holds a narrow left
+          rail and the prose runs beside it, not under it. The single 820px
+          column this replaced put a 30px serif headline directly above its own
+          body text, so the two read as one block and the section had no way to
+          be skimmed. The rail is fixed at 300px and the prose capped at 720 —
+          both from the canvas — so the measure stays readable however wide the
+          page gets. Below desktop-s the rail simply becomes the first row. */}
       {(affected || description) && (
         <Section className="py-16 desktop-s:py-20">
           <Container size="xl">
-            <div className="max-w-[820px]">
-              <Typography variant="h2" as="h2" weight="bold" className="text-fg">
-                {t('compliance.whoAffected', 'Who is affected')}
-              </Typography>
-              {affected && (
-                <Typography variant="body" className="mt-3 leading-relaxed text-fg-secondary">
-                  {affected}
-                </Typography>
-              )}
-              {description && headline && (
-                <Typography variant="body" className="mt-3 leading-relaxed text-fg-secondary">
-                  {description}
-                </Typography>
-              )}
-              {profile.businessModels.length > 0 && (
-                <div className="mt-6 flex flex-wrap gap-2">
-                  {profile.businessModels.map(m => (
-                    <span
-                      key={m}
-                      className="rounded-lg border border-stroke bg-surface-secondary px-3 py-1 text-body-xs font-semibold text-fg-secondary"
-                    >
-                      {t(`compliance.businessModel.${m}`, m)}
-                    </span>
-                  ))}
-                </div>
-              )}
+            <div className="flex flex-col gap-8 desktop-s:flex-row desktop-s:gap-24">
+              <AreaSectionHeading
+                className="desktop-s:w-[300px] desktop-s:shrink-0"
+                eyebrow={eyebrows.affected}
+                title={t('compliance.whoAffected', 'Who is affected')}
+              />
+              <div className="max-w-[720px] desktop-s:grow">
+                {/* The lead is a size up and in full foreground; the paragraph
+                    under it is body size and secondary. The canvas separates
+                    them that way and it is what makes the first sentence read
+                    as the answer to the heading rather than as more prose. */}
+                {affected && (
+                  <Typography variant="body" className="text-body-lg leading-relaxed text-fg">
+                    {affected}
+                  </Typography>
+                )}
+                {description && headline && (
+                  <Typography
+                    variant="body"
+                    className={`leading-relaxed text-fg-secondary ${affected ? 'mt-4' : ''}`}
+                  >
+                    {description}
+                  </Typography>
+                )}
+                {profile.businessModels.length > 0 && (
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    {profile.businessModels.map(m => (
+                      <span
+                        key={m}
+                        className="rounded-lg border border-stroke bg-surface-secondary px-3.5 py-[0.4375rem] text-body-xs font-semibold text-fg-secondary"
+                      >
+                        {t(`compliance.businessModel.${m}`, m)}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </Container>
         </Section>
@@ -321,9 +342,10 @@ export function ComplianceAreaPage() {
         <Container size="xl">
           {coverage.length > 0 && (
             <div className="mb-12 max-w-[820px]">
-              <Typography variant="h2" as="h2" weight="bold" className="text-fg">
-                {t('compliance.area.coversTitle', 'What CompliHub360 covers')}
-              </Typography>
+              <AreaSectionHeading
+                eyebrow={eyebrows.process}
+                title={t('compliance.area.coversTitle', 'What CompliHub360 covers')}
+              />
               <ul className="mt-5 space-y-3">
                 {coverage.map(c => (
                   <li key={c} className="flex items-start gap-2.5">

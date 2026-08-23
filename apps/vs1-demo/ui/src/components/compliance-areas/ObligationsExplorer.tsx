@@ -9,6 +9,7 @@ import { getAreaObligations, type AreaObligation } from '../../lib/areaProfiles'
 import type { DomainSlug } from '../../lib/domains';
 import { SEVERITY_FALLBACK, SEVERITY_STYLE, severityKey } from './severity';
 import type { CountryCode } from './types';
+import { AreaSectionHeading, useAreaEyebrows } from './AreaSectionHeading';
 
 interface Props {
   slug: DomainSlug;
@@ -49,6 +50,7 @@ const MODELS: { value: BusinessModel; fallback: string }[] = [
 // the whole reason a reader can trust the rest of the row.
 export function ObligationsExplorer({ slug, selectedCountry }: Props) {
   const { t, i18n } = useTranslation('common');
+  const eyebrows = useAreaEyebrows();
   const dateFmt = new Intl.DateTimeFormat(i18n.language, { dateStyle: 'long' });
   const [model, setModel] = useState<BusinessModel | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -71,15 +73,18 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
 
   return (
     <div>
-      <Typography variant="h2" as="h2" weight="bold" className="text-fg">
-        {t('compliance.area.obligationsTitle', 'What this area actually requires')}
-      </Typography>
-      <Typography variant="body" className="mt-2 max-w-2xl text-fg-secondary">
-        {t('compliance.area.obligationsLead', {
-          defaultValue:
-            'Every duty below traces to a named statute. Switch market to see the source that applies there.',
-        })}
-      </Typography>
+      <AreaSectionHeading
+        eyebrow={eyebrows.obligations}
+        title={t('compliance.area.obligationsTitle', 'What this area actually requires')}
+        lead={
+          <span className="block max-w-2xl">
+            {t('compliance.area.obligationsLead', {
+              defaultValue:
+                'Every duty below traces to a named statute. Switch market to see the source that applies there.',
+            })}
+          </span>
+        }
+      />
 
       {/* Business-model filter */}
       <div className="mt-6 flex flex-wrap items-center gap-2">

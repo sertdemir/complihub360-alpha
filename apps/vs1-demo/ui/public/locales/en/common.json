@@ -624,6 +624,15 @@
         "allEu": "all on an EU-level source",
         "national": "{{count}} on a national legal basis",
         "later": "{{count}} apply only from a later date"
+      },
+      "eyebrow": {
+        "affected": "Applicability",
+        "obligations": "Duties",
+        "enforcement": "Enforcement",
+        "timeline": "Timeline",
+        "markets": "Markets",
+        "process": "How it runs",
+        "next": "Next"
       }
     },
     "riskBadge": "{{level}} Risk"

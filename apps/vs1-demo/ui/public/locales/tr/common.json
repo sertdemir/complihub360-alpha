@@ -624,6 +624,15 @@
         "allEu": "tümü AB düzeyinde kaynakla",
         "national": "{{count}} ulusal yasal dayanakla",
         "later": "{{count}} ileri bir tarihten itibaren geçerli"
+      },
+      "eyebrow": {
+        "affected": "Kapsam",
+        "obligations": "Yükümlülükler",
+        "enforcement": "Yaptırım",
+        "timeline": "Zaman çizelgesi",
+        "markets": "Pazarlar",
+        "process": "Süreç",
+        "next": "Devamı"
       }
     },
     "riskBadge": "Risk: {{level}}"
