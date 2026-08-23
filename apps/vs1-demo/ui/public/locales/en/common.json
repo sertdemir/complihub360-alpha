@@ -554,10 +554,8 @@
       "euWideSource": "EU-wide source",
       "appliesFrom": "Applies from {{date}}",
       "coverageNote": "The engine carries {{count}} duties for this area, {{specific}} of them with a source specific to {{market}}. Coverage is uneven by market and grows as sources are verified.",
-      "enforcementTitle": "What's at stake",
-      "enforcementLead": "Penalty exposure as the sources for {{market}} state it.",
-      "ceilingLabel": "Combined upper bound",
-      "ceilingNote": "The sum of the maximum penalties named across {{count}} duties. A ceiling if everything went wrong at once, not a forecast.",
+      "enforcementTitle": "Who checks, and what it costs",
+      "enforcementLead": "The figures come from the sources the engine holds for {{market}} — {{count}} duties with a stated penalty range. Upper bounds as written, not an expected cost.",
       "timelineTitle": "What falls due, and when",
       "timelineLead": "Filing cadence and typical lead time per duty. Shortest lead time first — those are the ones that catch teams out.",
       "futureNote": "{{count}} of these do not bite yet. They are listed because the lead time for preparing them starts well before the date does.",
@@ -572,7 +570,6 @@
       "relatedLead": "These share triggers with the area you are reading — the same fact about your business pulls them in too.",
       "ctaTitle": "Ready to see what applies to you?",
       "ctaBody": "The assessment narrows this area to your business, your markets and your product — in under five minutes.",
-      "regulatorsLabel": "Regulators across the markets we cover:",
       "metrics": {
         "obligations": "Duties in this area",
         "obligationsNote": "{{count}} with a source specific to this market",
@@ -640,7 +637,13 @@
       "sourceInJournal": "Source in the Official Journal:",
       "appliesTodayShort": "applies today",
       "appliesToModels": "Applies to:",
-      "noneForMarket": "The engine carries no duty for this area in {{market}} yet. That is a genuine gap in coverage, not a clean bill of health."
+      "noneForMarket": "The engine carries no duty for this area in {{market}} yet. That is a genuine gap in coverage, not a clean bill of health.",
+      "heaviestPenalty": "Highest single penalty",
+      "enforcementTop": "the highest of all {{total}} markets",
+      "enforcementRank": "rank {{rank}} of {{total}} markets",
+      "enforcementAvg": "average across {{total}} markets",
+      "authorities": "Competent authorities",
+      "enforcementLeadEu": "The figures come from the sources the engine holds at EU level — {{count}} duties with a stated penalty range. Upper bounds as written, not an expected cost."
     },
     "riskBadge": "{{level}} Risk"
   },

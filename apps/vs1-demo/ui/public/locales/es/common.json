@@ -554,10 +554,8 @@
       "euWideSource": "Fuente a nivel UE",
       "appliesFrom": "Aplica desde {{date}}",
       "coverageNote": "El motor registra {{count}} obligaciones para esta área, {{specific}} de ellas con una fuente específica de {{market}}. La cobertura es desigual por mercado y crece a medida que se verifican fuentes.",
-      "enforcementTitle": "Qué está en juego",
-      "enforcementLead": "Exposición sancionadora según la formulan las fuentes de {{market}}.",
-      "ceilingLabel": "Límite superior combinado",
-      "ceilingNote": "La suma de las sanciones máximas indicadas en {{count}} obligaciones. Un techo si todo fallara a la vez, no una previsión.",
+      "enforcementTitle": "Quién controla y cuánto cuesta",
+      "enforcementLead": "Las cifras proceden de las fuentes que el motor mantiene para {{market}}: {{count}} obligaciones con un rango de sanción declarado. Son límites máximos tal como están escritos, no un coste esperado.",
       "timelineTitle": "Qué vence y cuándo",
       "timelineLead": "Periodicidad de presentación y plazo típico por obligación. Primero el plazo más corto — son los que pillan desprevenidos.",
       "futureNote": "{{count}} de estas aún no son exigibles. Aparecen porque el tiempo de preparación empieza mucho antes que la fecha.",
@@ -572,7 +570,6 @@
       "relatedLead": "Comparten desencadenantes con el área que está leyendo — el mismo hecho de su negocio también las activa.",
       "ctaTitle": "¿Listo para ver qué le aplica?",
       "ctaBody": "La evaluación acota esta área a su negocio, sus mercados y su producto — en menos de cinco minutos.",
-      "regulatorsLabel": "Organismos reguladores en los mercados que cubrimos:",
       "metrics": {
         "obligations": "Obligaciones en este ámbito",
         "obligationsNote": "{{count}} con una fuente específica para este mercado",
@@ -640,7 +637,13 @@
       "sourceInJournal": "Fuente en el Diario Oficial:",
       "appliesTodayShort": "vigente hoy",
       "appliesToModels": "Se aplica a:",
-      "noneForMarket": "El motor todavía no incluye ninguna obligación de esta área en {{market}}. Es una laguna real de cobertura, no un visto bueno."
+      "noneForMarket": "El motor todavía no incluye ninguna obligación de esta área en {{market}}. Es una laguna real de cobertura, no un visto bueno.",
+      "heaviestPenalty": "Sanción individual más alta",
+      "enforcementTop": "el valor más alto de los {{total}} mercados",
+      "enforcementRank": "puesto {{rank}} de {{total}} mercados",
+      "enforcementAvg": "media de los {{total}} mercados",
+      "authorities": "Autoridades competentes",
+      "enforcementLeadEu": "Las cifras proceden de las fuentes que el motor mantiene a nivel de la UE: {{count}} obligaciones con un rango de sanción declarado. Son límites máximos tal como están escritos, no un coste esperado."
     },
     "riskBadge": "Riesgo: {{level}}"
   },

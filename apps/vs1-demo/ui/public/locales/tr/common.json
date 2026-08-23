@@ -554,10 +554,8 @@
       "euWideSource": "AB genelinde kaynak",
       "appliesFrom": "{{date}} tarihinden itibaren geçerli",
       "coverageNote": "Motor bu alan için {{count}} yükümlülük taşıyor; bunların {{specific}} tanesinde {{market}} pazarına özgü kaynak var. Kapsam pazara göre değişir ve kaynaklar doğrulandıkça büyür.",
-      "enforcementTitle": "Neyin riski var",
-      "enforcementLead": "{{market}} kaynaklarının belirttiği şekilde ceza riski.",
-      "ceilingLabel": "Birleşik üst sınır",
-      "ceilingNote": "{{count}} yükümlülükte belirtilen azami cezaların toplamı. Her şey aynı anda ters giderse ulaşılacak tavan; bir tahmin değil.",
+      "enforcementTitle": "Kim denetler ve maliyeti nedir",
+      "enforcementLead": "Rakamlar motorun {{market}} için tuttuğu kaynaklardan geliyor — ceza aralığı belirtilmiş {{count}} yükümlülük. Yazıldığı haliyle üst sınırlar, beklenen maliyet değil.",
       "timelineTitle": "Ne zaman neyin vadesi geliyor",
       "timelineLead": "Yükümlülük başına bildirim sıklığı ve tipik hazırlık süresi. En kısa süre önce — ekipleri hazırlıksız yakalayanlar bunlar.",
       "futureNote": "Bunlardan {{count}} tanesi henüz yürürlükte değil. Hazırlık süresi tarihten çok önce başladığı için listelendiler.",
@@ -572,7 +570,6 @@
       "relatedLead": "Okuduğunuz alanla aynı tetikleyicileri paylaşıyorlar — işinize dair aynı olgu bunları da devreye sokuyor.",
       "ctaTitle": "Size neyin uygulandığını görmeye hazır mısınız?",
       "ctaBody": "Değerlendirme bu alanı işinize, pazarlarınıza ve ürününüze indirger — beş dakikadan kısa sürede.",
-      "regulatorsLabel": "Kapsadığımız pazarlardaki düzenleyici kurumlar:",
       "metrics": {
         "obligations": "Bu alandaki yükümlülükler",
         "obligationsNote": "{{count}} tanesi bu pazara özgü bir kaynakla",
@@ -640,7 +637,13 @@
       "sourceInJournal": "Resmî Gazete kaynağı:",
       "appliesTodayShort": "bugün geçerli",
       "appliesToModels": "Şunlar için geçerli:",
-      "noneForMarket": "Motor bu alan için {{market}} kapsamında henüz bir yükümlülük taşımıyor. Bu gerçek bir kapsam boşluğudur, temiz kâğıt değil."
+      "noneForMarket": "Motor bu alan için {{market}} kapsamında henüz bir yükümlülük taşımıyor. Bu gerçek bir kapsam boşluğudur, temiz kâğıt değil.",
+      "heaviestPenalty": "En yüksek tekil ceza",
+      "enforcementTop": "{{total}} pazarın en yüksek değeri",
+      "enforcementRank": "{{total}} pazar içinde {{rank}}. sıra",
+      "enforcementAvg": "{{total}} pazarın ortalaması",
+      "authorities": "Yetkili makamlar",
+      "enforcementLeadEu": "Rakamlar motorun AB düzeyinde tuttuğu kaynaklardan geliyor — ceza aralığı belirtilmiş {{count}} yükümlülük. Yazıldığı haliyle üst sınırlar, beklenen maliyet değil."
     },
     "riskBadge": "Risk: {{level}}"
   },

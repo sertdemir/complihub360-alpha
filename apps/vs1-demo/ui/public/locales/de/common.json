@@ -554,10 +554,8 @@
       "euWideSource": "EU-weite Quelle",
       "appliesFrom": "Gilt ab {{date}}",
       "coverageNote": "Die Engine trägt {{count}} Pflichten für diesen Bereich, davon {{specific}} mit einer Quelle speziell für {{market}}. Die Deckung ist je Markt ungleich und wächst, sobald Quellen geprüft sind.",
-      "enforcementTitle": "Was auf dem Spiel steht",
-      "enforcementLead": "Bußgeldrisiko, wie es die Quellen für {{market}} benennen.",
-      "ceilingLabel": "Kombinierte Obergrenze",
-      "ceilingNote": "Die Summe der Höchstbeträge aus {{count}} Pflichten. Eine Obergrenze, falls alles gleichzeitig schiefginge — keine Prognose.",
+      "enforcementTitle": "Wer prüft, und was es kostet",
+      "enforcementLead": "Die Zahlen stammen aus den Quellen, die die Engine für {{market}} führt — {{count}} Pflichten mit benanntem Bußgeldrahmen. Obergrenzen, wie sie dort stehen, keine Erwartungswerte.",
       "timelineTitle": "Was wann fällig wird",
       "timelineLead": "Meldeturnus und typische Vorlaufzeit je Pflicht. Kürzeste Vorlaufzeit zuerst — das sind die, die Teams überraschen.",
       "futureNote": "{{count}} davon greifen noch nicht. Sie stehen hier, weil die Vorbereitungszeit deutlich vor dem Stichtag beginnt.",
@@ -572,7 +570,6 @@
       "relatedLead": "Diese teilen Auslöser mit dem Bereich, den Sie gerade lesen — derselbe Umstand in Ihrem Unternehmen zieht sie mit.",
       "ctaTitle": "Bereit zu sehen, was für Sie gilt?",
       "ctaBody": "Das Assessment grenzt diesen Bereich auf Ihr Unternehmen, Ihre Märkte und Ihr Produkt ein — in unter fünf Minuten.",
-      "regulatorsLabel": "Behörden in den von uns abgedeckten Märkten:",
       "metrics": {
         "obligations": "Pflichten in diesem Bereich",
         "obligationsNote": "{{count}} davon mit einer Quelle speziell für diesen Markt",
@@ -640,7 +637,13 @@
       "sourceInJournal": "Quelle im Amtsblatt:",
       "appliesTodayShort": "gilt heute",
       "appliesToModels": "Gilt für:",
-      "noneForMarket": "Die Engine trägt für diesen Bereich in {{market}} noch keine Pflicht. Das ist eine echte Deckungslücke, kein Freibrief."
+      "noneForMarket": "Die Engine trägt für diesen Bereich in {{market}} noch keine Pflicht. Das ist eine echte Deckungslücke, kein Freibrief.",
+      "heaviestPenalty": "Höchstes Einzelbußgeld",
+      "enforcementTop": "höchster Wert aller {{total}} Märkte",
+      "enforcementRank": "Rang {{rank}} von {{total}} Märkten",
+      "enforcementAvg": "Durchschnitt über {{total}} Märkte",
+      "authorities": "Zuständige Behörden",
+      "enforcementLeadEu": "Die Zahlen stammen aus den Quellen, die die Engine auf EU-Ebene führt — {{count}} Pflichten mit benanntem Bußgeldrahmen. Obergrenzen, wie sie dort stehen, keine Erwartungswerte."
     },
     "riskBadge": "Risiko: {{level}}"
   },
