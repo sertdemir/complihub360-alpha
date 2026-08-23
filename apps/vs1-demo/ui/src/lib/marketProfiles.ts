@@ -4,6 +4,7 @@ import {
   DomainTemplateLibrary,
   ObligationEnrichmentMap,
   type CountryCode,
+  type ObligationEnrichment,
 } from '@complihub/compliance-engine';
 import { DOMAINS, type DomainSlug } from './domains';
 
@@ -86,6 +87,21 @@ export interface MarketObligation {
   eurLexUrl?: string;
 }
 
+/**
+ * A compliance area this market has NO national source for, and what that
+ * actually means. `scope: 'eu'` entries are deliberately absent: an EU
+ * Regulation applies directly and identically here, so there is nothing
+ * missing — calling it a gap is the misreading this type exists to prevent.
+ */
+export interface MarketCoverageGap {
+  domainSlug: DomainSlug;
+  subdomainId: string;
+  label: string;
+  /** The EU-level entry that stands in, or null where there is no source at all. */
+  source: string | null;
+  kind: 'national-pending' | 'placeholder';
+}
+
 export interface MarketWeight {
   domainSlug: DomainSlug;
   weight: number;
@@ -101,6 +117,11 @@ export interface MarketProfile {
   obligations: MarketObligation[];
   /** Obligations grouped by domain, in canonical domain order. */
   byDomain: { domainSlug: DomainSlug; items: MarketObligation[] }[];
+  /**
+   * Duties with no national source here that genuinely have one to hold.
+   * EU Regulations are excluded by construction — see MarketCoverageGap.
+   */
+  gaps: MarketCoverageGap[];
 }
 
 export function isMarketCode(code: string): code is CountryCode {
@@ -149,7 +170,32 @@ export function getMarketProfile(code: CountryCode): MarketProfile {
     items: obligations.filter((o) => o.domainSlug === d.slug),
   })).filter((g) => g.items.length > 0);
 
-  return { code, enforcementIntensity: risk.enforcementIntensity, strictnessScore: risk.strictnessScore, weights, obligations, byDomain };
+  // The coverage gaps. A duty counts only when the engine holds no entry for
+  // this market AND the fallback says a national text exists to hold — which
+  // is the whole distinction: 16 of the 21 defaults are EU Regulations that
+  // apply directly, and reporting those as gaps was reporting the law itself
+  // as a hole in our data.
+  const gaps: MarketCoverageGap[] = [];
+  for (const [subdomainId, byCountry] of Object.entries(ObligationEnrichmentMap)) {
+    const map = byCountry as Record<string, ObligationEnrichment | undefined>;
+    if (map[code]) continue;
+    const fallback = map.default;
+    const scope = fallback?.scope ?? 'eu';
+    if (scope === 'eu') continue;
+    const domain = SUBDOMAIN_DOMAIN[subdomainId];
+    if (!domain) continue;
+    const meta = SUBDOMAIN_META[subdomainId];
+    gaps.push({
+      domainSlug: slugForSubdomain(subdomainId, domain),
+      subdomainId,
+      label: meta?.label ?? subdomainId,
+      // A placeholder is not a source, so it is not handed on as one.
+      source: scope === 'placeholder' ? null : (fallback?.source ?? null),
+      kind: scope,
+    });
+  }
+
+  return { code, enforcementIntensity: risk.enforcementIntensity, strictnessScore: risk.strictnessScore, weights, obligations, byDomain, gaps };
 }
 
 /** Every market with its obligation count — for the index page. */

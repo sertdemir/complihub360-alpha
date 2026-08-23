@@ -551,7 +551,7 @@
       "obligationsLead": "Jede Pflicht unten führt auf eine benannte Rechtsgrundlage zurück. Markt wechseln zeigt die Quelle, die dort gilt.",
       "euWideSource": "EU-weite Quelle",
       "appliesFrom": "Gilt ab {{date}}",
-      "coverageNote": "Die Engine trägt {{count}} Pflichten für diesen Bereich, davon {{specific}} mit einer Quelle speziell für {{market}}. Die Deckung ist je Markt ungleich und wächst, sobald Quellen geprüft sind.",
+      "coverageNote": "{{specific}} von {{count}} Pflichten haben eine Quelle speziell für {{market}}. Die übrigen sind EU-Verordnungen — sie gelten hier unmittelbar, es gibt also keine nationale Fassung zu führen.",
       "enforcementTitle": "Wer prüft, und was es kostet",
       "enforcementLead": "Die Zahlen stammen aus den Quellen, die die Engine für {{market}} führt — {{count}} Pflichten mit benanntem Bußgeldrahmen. Obergrenzen, wie sie dort stehen, keine Erwartungswerte.",
       "timelineTitle": "Was wann greift",
@@ -606,7 +606,11 @@
         "nationalSource": "Nationale Quelle",
         "penalty": "Bußgeldrahmen",
         "cadence": "Turnus",
-        "scope": "Gilt in"
+        "scope": "Gilt in",
+        "noNamedSource": "Noch keine benannte Quelle",
+        "placeholderNote": "Die Engine führt hier keine Norm für {{market}} — eine Lücke in unserer Abdeckung, nicht im Recht.",
+        "pendingNote": "EU-Quelle. {{market}} hat darüber hinaus eine eigene Fassung, die wir noch nicht führen.",
+        "euDirect": "EU-Verordnung — gilt unmittelbar, das ist hier die geltende Norm"
       },
       "relatedOpen": "Bereich öffnen",
       "readSource": "Quelle auf EUR-Lex lesen",
@@ -649,7 +653,8 @@
       "localSourcesNote": "In {{count}} der {{total}} Märkte führt die Engine mindestens eine lokale Quelle für diesen Bereich. Sonst gilt das EU-Instrument — und wird auch so ausgewiesen.",
       "askTitle": "Eine konkrete Frage zu {{area}}?",
       "askLead": "Stellen Sie sie in eigenen Worten und bekommen Sie eine Antwort mit benannten Quellen. Das Assessment weiter unten ist der längere Weg — es bildet den ganzen Bereich auf Ihr Unternehmen ab, statt eine Frage zu beantworten.",
-      "askQuestion": "Frage stellen"
+      "askQuestion": "Frage stellen",
+      "coverageNoteGaps": "{{specific}} von {{count}} Pflichten haben eine Quelle speziell für {{market}}. Von den übrigen haben {{gaps}} eine nationale Fassung, die wir noch nicht führen — der Rest sind EU-Verordnungen, die hier unmittelbar gelten."
     },
     "riskBadge": "Risiko: {{level}}"
   },

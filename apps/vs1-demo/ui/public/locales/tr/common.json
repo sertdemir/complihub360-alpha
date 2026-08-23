@@ -551,7 +551,7 @@
       "obligationsLead": "Aşağıdaki her yükümlülük adı geçen bir mevzuata dayanır. Orada geçerli kaynağı görmek için pazarı değiştirin.",
       "euWideSource": "AB genelinde kaynak",
       "appliesFrom": "{{date}} tarihinden itibaren geçerli",
-      "coverageNote": "Motor bu alan için {{count}} yükümlülük taşıyor; bunların {{specific}} tanesinde {{market}} pazarına özgü kaynak var. Kapsam pazara göre değişir ve kaynaklar doğrulandıkça büyür.",
+      "coverageNote": "{{count}} yükümlülüğün {{specific}} tanesinin {{market}} için özel bir kaynağı var. Geri kalanı AB Tüzüğü — burada doğrudan uygulanır, dolayısıyla taşınacak ulusal bir metin yok.",
       "enforcementTitle": "Kim denetler ve maliyeti nedir",
       "enforcementLead": "Rakamlar motorun {{market}} için tuttuğu kaynaklardan geliyor — ceza aralığı belirtilmiş {{count}} yükümlülük. Yazıldığı haliyle üst sınırlar, beklenen maliyet değil.",
       "timelineTitle": "Ne zaman neyin geçerli olduğu",
@@ -606,7 +606,11 @@
         "nationalSource": "Ulusal kaynak",
         "penalty": "Ceza aralığı",
         "cadence": "Sıklık",
-        "scope": "Geçerlilik alanı"
+        "scope": "Geçerlilik alanı",
+        "noNamedSource": "Henüz adlandırılmış kaynak yok",
+        "placeholderNote": "Motor burada {{market}} için bir mevzuat taşımıyor — bu, hukuktaki değil kapsamımızdaki bir boşluk.",
+        "pendingNote": "AB kaynağı. {{market}} bunun üzerine kendi metnini de koyuyor; onu henüz taşımıyoruz.",
+        "euDirect": "AB Tüzüğü — doğrudan uygulanır, burada geçerli olan norm budur"
       },
       "relatedOpen": "Bu alanı aç",
       "readSource": "Kaynağı EUR-Lex'te oku",
@@ -649,7 +653,8 @@
       "localSourcesNote": "Motor, {{total}} pazarın {{count}} tanesinde bu alan için en az bir yerel kaynak tutuyor. Diğerlerinde AB düzeyindeki araç geçerlidir ve öyle gösterilir.",
       "askTitle": "{{area}} hakkında somut bir sorunuz mu var?",
       "askLead": "Kendi cümlelerinizle sorun, kaynakları adıyla belirtilmiş bir yanıt alın. Aşağıdaki değerlendirme daha uzun yol — tek bir soruyu yanıtlamak yerine tüm alanı şirketinize göre haritalar.",
-      "askQuestion": "Soru sor"
+      "askQuestion": "Soru sor",
+      "coverageNoteGaps": "{{count}} yükümlülüğün {{specific}} tanesinin {{market}} için özel bir kaynağı var. Geri kalanların {{gaps}} tanesinin henüz taşımadığımız ulusal bir metni var; diğerleri burada doğrudan uygulanan AB Tüzükleri."
     },
     "riskBadge": "Risk: {{level}}"
   },

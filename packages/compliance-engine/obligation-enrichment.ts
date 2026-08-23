@@ -26,8 +26,28 @@ export interface ObligationEnrichment {
      *  arithmetic belongs at the render point, which is the only place that
      *  legitimately knows 'now'. */
     appliesFrom?: string;
-    /** 'eu' = applies market-independently across the EU (shown as EU-wide). */
-    scope?: 'eu';
+    /** How this entry stands to NATIONAL law. Only meaningful on a 'default'
+     *  entry — a country override is by definition national.
+     *
+     *  'eu'               An EU Regulation. Directly applicable and identical
+     *                     in every member state, so there is no national text
+     *                     to hold: this IS the applicable law. NOT a coverage
+     *                     gap, and must never be rendered as one.
+     *  'national-pending' A national instrument genuinely exists — a Directive
+     *                     transposed, or a Regulation that mandates a national
+     *                     register — and the engine does not carry it yet.
+     *                     This IS a coverage gap, and the honest one.
+     *  'placeholder'      Not a source. A string shaped like a citation
+     *                     ("National commercial register act") standing where
+     *                     one belongs. It must NEVER be printed as a legal
+     *                     basis: the page's whole claim is that every duty
+     *                     traces to a named statute, and this traces to
+     *                     nothing.
+     *
+     *  Absent on a country override; absent on a default is read as 'eu' for
+     *  back-compatibility, so a new entry that is really a gap has to say so.
+     */
+    scope?: 'eu' | 'national-pending' | 'placeholder';
 }
 
 type EnrichmentMap = Record<string, Partial<Record<CountryCode | 'default', ObligationEnrichment>>>;
@@ -42,7 +62,7 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
         NL: { source: 'Wet OB 1968 Art. 14', penalty: 'up to €5,514 per late return', penaltyMaxEur: 5514, due: 'Quarterly', dueDays: 30 },
         TR: { source: 'KDV Kanunu No. 3065', penalty: 'tax-loss fine: 1× the unpaid KDV', penaltyMaxEur: 15000, due: 'Monthly', dueDays: 26 },
         US: { source: 'State economic-nexus rules (post-Wayfair)', penalty: 'per-state assessments + interest', penaltyMaxEur: 20000, due: 'Monthly', dueDays: 20 },
-        default: { source: 'EU VAT Directive 2006/112/EC', penalty: 'national surcharges + interest', penaltyMaxEur: 20000, due: 'Quarterly', dueDays: 30 },
+        default: { source: 'EU VAT Directive 2006/112/EC', penalty: 'national surcharges + interest', penaltyMaxEur: 20000, due: 'Quarterly', dueDays: 30, scope: 'national-pending' },
     },
     'tax-corporate': {
         DE: { source: 'KStG §7 / AO §149', penalty: 'late surcharge 0.25%/month of assessed tax', penaltyMaxEur: 10000, due: 'Annual', dueDays: 120 },
@@ -52,7 +72,7 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
         ES: { source: 'Ley 27/2014 (Impuesto sobre Sociedades)', penalty: '50–150% de la cuota + recargos', penaltyMaxEur: 15000, due: 'Annual', dueDays: 115 },
         NL: { source: 'Wet Vpb 1969 (vennootschapsbelasting)', penalty: 'verzuim-/vergrijpboete tot 100%', penaltyMaxEur: 12000, due: 'Annual', dueDays: 150 },
         US: { source: 'IRC §11 / state franchise tax', penalty: '5%/month of unpaid tax, max 25%', penaltyMaxEur: 15000, due: 'Annual', dueDays: 105 },
-        default: { source: 'National corporate income tax act', penalty: 'late surcharges + interest', penaltyMaxEur: 10000, due: 'Annual', dueDays: 120 },
+        default: { source: 'National corporate income tax act', penalty: 'late surcharges + interest', penaltyMaxEur: 10000, due: 'Annual', dueDays: 120, scope: 'placeholder' },
     },
     'prod-epr': {
         DE: { source: 'VerpackG §9 (LUCID)', penalty: 'up to €200,000 + distribution ban', penaltyMaxEur: 200000, due: 'Annual', dueDays: 60 },
@@ -61,7 +81,7 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
         ES: { source: 'RD 1055/2022 (Envases)', penalty: 'up to €100,000', penaltyMaxEur: 100000, due: 'Annual', dueDays: 60 },
         IT: { source: 'D.Lgs. 152/2006 (CONAI)', penalty: 'up to €60,000', penaltyMaxEur: 60000, due: 'Annual', dueDays: 60 },
         NL: { source: 'Besluit beheer verpakkingen (Afvalfonds)', penalty: 'recovery + administrative fines', penaltyMaxEur: 25000, due: 'Annual', dueDays: 60 },
-        default: { source: 'EU PPWR 2025/40', penalty: 'national EPR fines + sales ban', penaltyMaxEur: 50000, due: 'Annual', dueDays: 60 },
+        default: { source: 'EU PPWR 2025/40', penalty: 'national EPR fines + sales ban', penaltyMaxEur: 50000, due: 'Annual', dueDays: 60, scope: 'national-pending' },
     },
     // PPWR is a Regulation: it binds whoever places packaging on the EU market,
     // identically in every member state, so there are no country overrides here.
@@ -97,7 +117,7 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
         DE: { source: 'UWG §7 / GDPR Art. 7', penalty: 'up to €300,000 per campaign (UWG)', penaltyMaxEur: 300000, due: 'Ongoing' },
         TR: { source: 'ETK No. 6563 / KVKK', penalty: 'up to ₺1,000,000', penaltyMaxEur: 30000, due: 'Ongoing' },
         US: { source: 'CAN-SPAM / TCPA', penalty: 'up to $51,744 per email; $1,500 per call/text', penaltyMaxEur: 48000, due: 'Ongoing' },
-        default: { source: 'GDPR Art. 7 + ePrivacy Directive 2002/58', penalty: 'up to €20M or 4% of turnover', penaltyMaxEur: 100000, due: 'Ongoing', scope: 'eu' },
+        default: { source: 'GDPR Art. 7 + ePrivacy Directive 2002/58', penalty: 'up to €20M or 4% of turnover', penaltyMaxEur: 100000, due: 'Ongoing', scope: 'national-pending' },
     },
     'mktg-health-claims': {
         default: { source: 'EU Reg. 1924/2006 (Health Claims)', penalty: 'national fines + mandatory withdrawal', penaltyMaxEur: 50000, due: 'Ongoing', scope: 'eu' },
@@ -121,13 +141,13 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
         ES: { source: 'Registro Mercantil (RRM)', penalty: 'multas + cierre registral', penaltyMaxEur: 6000, due: 'One-off', dueDays: 30 },
         NL: { source: 'Handelsregisterwet (KVK-inschrijving)', penalty: 'boete + niet-inschrijving', penaltyMaxEur: 4500, due: 'One-off', dueDays: 8 },
         US: { source: 'State incorporation + foreign qualification', penalty: 'loss of good standing + back fees', penaltyMaxEur: 5000, due: 'One-off', dueDays: 30 },
-        default: { source: 'National commercial register act', penalty: 'administrative fines', penaltyMaxEur: 5000, due: 'One-off', dueDays: 30 },
+        default: { source: 'National commercial register act', penalty: 'administrative fines', penaltyMaxEur: 5000, due: 'One-off', dueDays: 30, scope: 'placeholder' },
     },
     'monitor-kyb': {
         DE: { source: 'GwG §10 / §20 (Transparenzregister)', penalty: '€1,000–€5,000, serious cases up to €1M', penaltyMaxEur: 150000, due: 'Ongoing' },
         FR: { source: 'Code monétaire et financier Art. L561 (RBE)', penalty: 'amendes AMF/ACPR + sanctions pénales', penaltyMaxEur: 120000, due: 'Ongoing' },
         IT: { source: 'D.Lgs. 231/2007 (antiriciclaggio, Registro TE)', penalty: 'sanzioni €2.000–€1M', penaltyMaxEur: 120000, due: 'Ongoing' },
-        default: { source: 'EU AMLD5 (2018/843)', penalty: 'national AML fines', penaltyMaxEur: 100000, due: 'Ongoing', scope: 'eu' },
+        default: { source: 'EU AMLD5 (2018/843)', penalty: 'national AML fines', penaltyMaxEur: 100000, due: 'Ongoing', scope: 'national-pending' },
     },
     'log-eori': {
         UK: { source: 'UK EORI (HMRC, post-Brexit)', penalty: 'goods held at border; storage costs', penaltyMaxEur: 10000, due: 'One-off', dueDays: 14 },
@@ -151,11 +171,11 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
         FR: { source: 'Code de la consommation Art. L221 (droit de rétractation)', penalty: 'amendes DGCCRF + clauses réputées non écrites', penaltyMaxEur: 15000, due: 'One-off', dueDays: 45 },
         IT: { source: 'Codice del Consumo D.Lgs. 206/2005', penalty: 'sanzioni AGCM + clausole nulle', penaltyMaxEur: 15000, due: 'One-off', dueDays: 45 },
         ES: { source: 'RDL 1/2007 (Ley General Consumidores)', penalty: 'sanciones de consumo + cláusulas nulas', penaltyMaxEur: 15000, due: 'One-off', dueDays: 45 },
-        default: { source: 'Consumer Rights Directive 2011/83/EU', penalty: 'national enforcement + void clauses', penaltyMaxEur: 15000, due: 'One-off', dueDays: 45, scope: 'eu' },
+        default: { source: 'Consumer Rights Directive 2011/83/EU', penalty: 'national enforcement + void clauses', penaltyMaxEur: 15000, due: 'One-off', dueDays: 45, scope: 'national-pending' },
     },
     'legal-commercial-contracts': {
         DE: { source: 'BGB/HGB + Rom-I-VO 593/2008', penalty: 'unwirksame Klauseln; Prozessrisiko', penaltyMaxEur: 10000, due: 'One-off', dueDays: 60 },
-        default: { source: 'National commercial code + Rome I Reg. 593/2008', penalty: 'unenforceable clauses; dispute exposure', penaltyMaxEur: 10000, due: 'One-off', dueDays: 60 },
+        default: { source: 'Rome I Reg. 593/2008', penalty: 'unenforceable clauses; dispute exposure', penaltyMaxEur: 10000, due: 'One-off', dueDays: 60, scope: 'national-pending' },
     },
 };
 

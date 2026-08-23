@@ -551,7 +551,7 @@
       "obligationsLead": "Every duty below traces to a named statute. Switch market to see the source that applies there.",
       "euWideSource": "EU-wide source",
       "appliesFrom": "Applies from {{date}}",
-      "coverageNote": "The engine carries {{count}} duties for this area, {{specific}} of them with a source specific to {{market}}. Coverage is uneven by market and grows as sources are verified.",
+      "coverageNote": "{{specific}} of {{count}} duties have a source specific to {{market}}. The rest are EU Regulations — they apply here directly, so there is no national text to hold.",
       "enforcementTitle": "Who checks, and what it costs",
       "enforcementLead": "The figures come from the sources the engine holds for {{market}} — {{count}} duties with a stated penalty range. Upper bounds as written, not an expected cost.",
       "timelineTitle": "What applies when",
@@ -606,7 +606,11 @@
         "nationalSource": "National source",
         "penalty": "Penalty range",
         "cadence": "Cadence",
-        "scope": "Applies in"
+        "scope": "Applies in",
+        "noNamedSource": "No named source yet",
+        "placeholderNote": "The engine carries no statute for {{market}} here — a gap in our coverage, not in the law.",
+        "pendingNote": "EU-level source. {{market}} has its own text on top of it, which we do not carry yet.",
+        "euDirect": "EU Regulation — applies directly, this is the law here"
       },
       "relatedOpen": "Open this area",
       "readSource": "Read the source on EUR-Lex",
@@ -649,7 +653,8 @@
       "localSourcesNote": "The engine holds at least one local source for this area in {{count}} of the {{total}} markets. Elsewhere the EU-level instrument is what applies, and it is shown as such.",
       "askTitle": "A specific question about {{area}}?",
       "askLead": "Ask it in your own words and get an answer with its sources named. The assessment below is the longer way round — it maps the whole area to your business instead of answering one question.",
-      "askQuestion": "Ask a question"
+      "askQuestion": "Ask a question",
+      "coverageNoteGaps": "{{specific}} of {{count}} duties have a source specific to {{market}}. Of the rest, {{gaps}} have a national text we do not carry yet — the others are EU Regulations, which apply here directly."
     },
     "riskBadge": "{{level}} Risk"
   },

@@ -89,6 +89,11 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
   }, [all]);
 
   const byValidity = validity === 'now' ? liveNow : validity === 'later' ? later : all;
+
+  // A REAL gap: no national entry, and the fallback says a national text
+  // exists to hold. An EU Regulation standing in is not a gap — it is the law
+  // here — and counting it as one was the misreading this whole change fixes.
+  const gapCount = all.filter((o) => !o.marketSpecific && o.scope !== 'eu').length;
   const shown = byValidity;
 
   // Changing area, market or filter can strip the duty that was open. Falling
@@ -195,8 +200,17 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                           statute alone was ambiguous between duties that share
                           one — and it was being truncated mid-reference, which
                           is the one part of a row that must never be guessed at. */}
+                      {/* A placeholder must not appear here either — the list
+                          row is the first place a reader meets the source, and
+                          it is the same false citation one line earlier. */}
                       <span className="mt-1 block text-body-2xs leading-snug text-fg-tertiary">
-                        {o.source}
+                        {o.scope === 'placeholder' ? (
+                          <span className="italic">
+                            {t('compliance.area.fact.noNamedSource', 'No named source yet')}
+                          </span>
+                        ) : (
+                          o.source
+                        )}
                         {' · '}
                         {o.appliesFrom && new Date(o.appliesFrom) > new Date()
                           ? t('compliance.area.fromShort', 'from {{date}}', {
@@ -275,13 +289,41 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
             </div>
 
             <dl className="mt-7 grid gap-px overflow-hidden rounded-xl border border-stroke-subtle bg-stroke-subtle tablet:grid-cols-2">
+              {/* Three states, not two. A placeholder is a string SHAPED like
+                  a citation — "National corporate income tax act" — standing
+                  where a source belongs. Printed here it sits in the same
+                  cell, in the same weight, as "UStG §18i (OSS)", and the
+                  page's entire claim is that every duty traces to a named
+                  statute. So it is not printed: the cell says there is none.
+                  'national-pending' means a national text exists and we hold
+                  the EU one; 'eu' means the EU instrument IS the law here and
+                  nothing is missing. */}
               <Fact
                 label={t('compliance.area.fact.source', 'Legal basis')}
-                value={selected.source}
+                value={
+                  selected.scope === 'placeholder'
+                    ? t('compliance.area.fact.noNamedSource', 'No named source yet')
+                    : selected.source
+                }
+                muted={selected.scope === 'placeholder'}
                 note={
                   selected.marketSpecific
                     ? t('compliance.area.fact.nationalSource', 'National source')
-                    : t('compliance.area.euWideSource', 'EU-wide source')
+                    : selected.scope === 'placeholder'
+                      ? t('compliance.area.fact.placeholderNote', {
+                          defaultValue:
+                            'The engine carries no statute for {{market}} here — a gap in our coverage, not in the law.',
+                          market: marketLabel,
+                        })
+                      : selected.scope === 'national-pending'
+                        ? t('compliance.area.fact.pendingNote', {
+                            defaultValue:
+                              'EU-level source. {{market}} has its own text on top of it, which we do not carry yet.',
+                            market: marketLabel,
+                          })
+                        : t('compliance.area.fact.euDirect', {
+                            defaultValue: 'EU Regulation — applies directly, this is the law here',
+                          })
                 }
               />
               <Fact
@@ -300,7 +342,12 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
               />
               <Fact
                 label={t('compliance.area.fact.scope', 'Applies in')}
-                value={selected.marketSpecific ? marketLabel : t('compliance.country.euOption', 'EU-wide')}
+                // Where the duty applies, not where its source comes from.
+                // Those were conflated: a duty with no source at all was
+                // reporting "EU-wide", which claimed a scope for something we
+                // hold nothing on. The source's origin is the Rechtsgrundlage
+                // cell's business now.
+                value={selectedCountry === 'EU' ? t('compliance.country.euOption', 'EU-wide') : marketLabel}
                 note={
                   selected.appliesFrom
                     ? t('compliance.area.appliesFrom', 'Applies from {{date}}', {
@@ -349,13 +396,22 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                   'The engine carries {{count}} duties for this area, all of them on an EU-level source. Pick a market to see where a national source adds to them.',
                 count: all.length,
               })
-            : t('compliance.area.coverageNote', {
-                defaultValue:
-                  'The engine carries {{count}} duties for this area, {{specific}} of them with a source specific to {{market}}. Coverage is uneven by market and grows as sources are verified.',
-                count: all.length,
-                specific: all.filter((o) => o.marketSpecific).length,
-                market: marketLabel,
-              })}
+            : gapCount > 0
+              ? t('compliance.area.coverageNoteGaps', {
+                  defaultValue:
+                    '{{specific}} of {{count}} duties have a source specific to {{market}}. Of the rest, {{gaps}} have a national text we do not carry yet — the others are EU Regulations, which apply here directly.',
+                  count: all.length,
+                  specific: all.filter((o) => o.marketSpecific).length,
+                  gaps: gapCount,
+                  market: marketLabel,
+                })
+              : t('compliance.area.coverageNote', {
+                  defaultValue:
+                    '{{specific}} of {{count}} duties have a source specific to {{market}}. The rest are EU Regulations — they apply here directly, so there is no national text to hold.',
+                  count: all.length,
+                  specific: all.filter((o) => o.marketSpecific).length,
+                  market: marketLabel,
+                })}
         </Typography>
       </div>
     </div>
@@ -367,18 +423,23 @@ function Fact({
   value,
   note,
   emphasis = false,
+  muted = false,
 }: {
   label: string;
   value: string;
   note?: string;
   emphasis?: boolean;
+  /** The value is a statement that there is none — not a citation. */
+  muted?: boolean;
 }) {
   return (
     <div className="bg-surface px-5 py-4">
       <dt className="text-body-3xs font-bold uppercase tracking-[0.1em] text-fg-tertiary">{label}</dt>
       <dd
-        className={`mt-2 text-body-sm font-semibold tabular-nums ${
-          emphasis ? 'text-risk-on-critical' : 'text-fg'
+        className={`mt-2 text-body-sm tabular-nums ${
+          muted
+            ? 'font-normal italic text-fg-tertiary'
+            : `font-semibold ${emphasis ? 'text-risk-on-critical' : 'text-fg'}`
         }`}
       >
         {value}
