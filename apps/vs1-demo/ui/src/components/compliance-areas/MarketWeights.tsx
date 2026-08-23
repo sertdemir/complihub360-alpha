@@ -74,7 +74,7 @@ export function MarketWeights({ profile }: Props) {
     <div className="flex flex-col gap-10 desktop-s:flex-row desktop-s:items-start desktop-s:gap-24">
       <AreaSectionHeading
         className="desktop-s:w-[340px] desktop-s:shrink-0"
-        eyebrow={eyebrows.markets}
+        eyebrow={eyebrows.weighting}
         title={t('markets.country.weightsTitle', 'What weighs heaviest here')}
         lead={lead}
       />
@@ -92,12 +92,15 @@ export function MarketWeights({ profile }: Props) {
               <li key={w.domainSlug}>
                 <Link
                   to={`${localePrefix}/compliance/${w.domainSlug}`}
-                  className="group flex items-center gap-5 px-6 py-3.5 transition-colors hover:bg-surface-secondary"
+                  className="group flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-surface-secondary"
                 >
-                  <span className="w-[10.5rem] shrink-0 text-body-sm font-semibold leading-snug text-fg">
+                  <span className="w-[11.5rem] shrink-0 text-body-sm font-semibold leading-snug text-fg">
                     {areaName(w.domainSlug)}
                   </span>
-                  <span className="h-2 flex-1 overflow-hidden rounded-full bg-surface-tertiary">
+                  {/* min-w so the track can never be squeezed out of existence: with
+                      flex-1 alone the fixed columns simply took the row and the
+                      bars vanished without a warning. */}
+                  <span className="h-2 min-w-[3rem] flex-1 overflow-hidden rounded-full bg-surface-tertiary">
                     <span
                       className={`block h-full rounded-full transition-[width] duration-700 ease-out ${style.bar}`}
                       style={{
@@ -106,23 +109,27 @@ export function MarketWeights({ profile }: Props) {
                       }}
                     />
                   </span>
-                  <span className="w-10 shrink-0 text-right text-body-sm font-bold tabular-nums text-fg">
+                  <span className="w-[2.75rem] shrink-0 text-right text-body-sm font-bold tabular-nums text-fg">
                     {score.format(w.weight)}
                   </span>
                   {/* Coverage, not severity — see the note on this component. */}
                   <span
-                    className={`w-[5.75rem] shrink-0 text-right text-body-2xs tabular-nums ${
+                    className={`w-[4.75rem] shrink-0 text-right text-body-2xs tabular-nums ${
                       n > 0 ? 'font-semibold text-fg-brand' : 'text-fg-tertiary'
                     }`}
                   >
                     {n > 0
-                      ? t('markets.country.nDuties', '{{count}} duties', { count: n })
+                      ? t('markets.country.nDuties', {
+                          defaultValue_one: '{{count}} duty',
+                          defaultValue_other: '{{count}} duties',
+                          count: n,
+                        })
                       : t('markets.country.euSource', 'EU source')}
                   </span>
                   <ArrowRight
                     size={13}
                     aria-hidden
-                    className="shrink-0 text-fg-tertiary opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+                    className="shrink-0 text-stroke-strong transition-colors group-hover:text-fg-brand"
                   />
                 </Link>
               </li>

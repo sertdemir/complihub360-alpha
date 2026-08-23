@@ -632,7 +632,8 @@
         "process": "Cómo funciona",
         "next": "Continuar",
         "calendar": "Calendario",
-        "coverage": "Cobertura"
+        "coverage": "Cobertura",
+        "weighting": "Ponderación"
       },
       "validityAll": "Todas {{count}}",
       "validityNow": "Vigente hoy · {{count}}",
@@ -857,7 +858,6 @@
       "startAssessment": "Iniciar la evaluación para {{market}}",
       "sourcePromise": "Cada obligación cita aquí su base legal nacional. Donde no tenemos ninguna, rige el instrumento de la UE, y así se indica.",
       "weightsLeadTied": "{{count}} áreas pesan lo mismo aquí ({{weight}} sobre 10). Cada una lleva a su propia página.",
-      "nDuties": "{{count}} obligaciones",
       "euSource": "Fuente UE",
       "calendarTitle": "Qué confluye aquí, y con qué frecuencia",
       "calendarLead": "{{count}} obligaciones de {{areas}} áreas en una vista, por periodicidad y no por área. Nadie planifica un mercado área por área: lo planifica contra un calendario.",
@@ -873,7 +873,9 @@
       "relatedFact": "{{count}} obligaciones en {{areas}} áreas, {{shared}} compartidas con este mercado.",
       "openMarket": "Abrir este mercado",
       "ctaBody": "La evaluación acota este mercado a su empresa, su producto y sus áreas, en menos de cinco minutos.",
-      "allAreas": "Todas las áreas"
+      "allAreas": "Todas las áreas",
+      "nDuties_one": "{{count}} obligación",
+      "nDuties_other": "{{count}} obligaciones"
     },
     "cta": {
       "title": "Vea cuáles se aplican a su caso.",

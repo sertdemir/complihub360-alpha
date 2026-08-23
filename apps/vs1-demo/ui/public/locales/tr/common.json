@@ -632,7 +632,8 @@
         "process": "Süreç",
         "next": "Devamı",
         "calendar": "Takvim",
-        "coverage": "Kapsam"
+        "coverage": "Kapsam",
+        "weighting": "Ağırlık"
       },
       "validityAll": "Tümü {{count}}",
       "validityNow": "Bugün geçerli · {{count}}",
@@ -857,7 +858,6 @@
       "startAssessment": "{{market}} için değerlendirmeyi başlat",
       "sourcePromise": "Buradaki her yükümlülük ulusal hukuki dayanağını adıyla belirtir. Elimizde yoksa AB aracı geçerlidir — ve bu yazılıdır.",
       "weightsLeadTied": "{{count}} alan burada eşit ağırlıkta (10 üzerinden {{weight}}). Her biri kendi sayfasına götürür.",
-      "nDuties": "{{count}} yükümlülük",
       "euSource": "AB kaynağı",
       "calendarTitle": "Burada neler bir araya geliyor, ne sıklıkla",
       "calendarLead": "{{areas}} alandan {{count}} yükümlülük tek bir görünümde — alana göre değil, döngüye göre. Kimse bir pazarı alan alan planlamaz; takvime göre planlar.",
@@ -873,7 +873,9 @@
       "relatedFact": "{{areas}} alanda {{count}} yükümlülük, {{shared}} tanesi bu pazarla ortak.",
       "openMarket": "Pazarı aç",
       "ctaBody": "Değerlendirme bu pazarı şirketinize, ürününüze ve alanlarınıza göre daraltır — beş dakikadan kısa sürede.",
-      "allAreas": "Tüm alanlar"
+      "allAreas": "Tüm alanlar",
+      "nDuties_one": "{{count}} yükümlülük",
+      "nDuties_other": "{{count}} yükümlülük"
     },
     "cta": {
       "title": "Bunlardan hangilerinin size uyduğunu görün.",

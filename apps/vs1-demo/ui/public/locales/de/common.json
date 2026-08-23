@@ -632,7 +632,8 @@
         "process": "Ablauf",
         "next": "Weiter",
         "calendar": "Kalender",
-        "coverage": "Deckung"
+        "coverage": "Deckung",
+        "weighting": "Gewichtung"
       },
       "validityAll": "Alle {{count}}",
       "validityNow": "Jetzt gültig · {{count}}",
@@ -857,7 +858,6 @@
       "startAssessment": "Assessment für {{market}} starten",
       "sourcePromise": "Jede Pflicht hier nennt ihre nationale Rechtsgrundlage. Wo wir keine führen, steht das EU-Instrument — und es steht dran.",
       "weightsLeadTied": "{{count}} Bereiche wiegen hier gleich schwer ({{weight}} von 10). Jeder führt auf seine eigene Seite.",
-      "nDuties": "{{count}} Pflichten",
       "euSource": "EU-Quelle",
       "calendarTitle": "Was hier zusammenkommt, und wie oft",
       "calendarLead": "{{count}} Pflichten aus {{areas}} Bereichen in einer Ansicht — nach Turnus, nicht nach Bereich. Niemand plant einen Markt bereichsweise, sondern gegen einen Kalender.",
@@ -873,7 +873,9 @@
       "relatedFact": "{{count}} Pflichten in {{areas}} Bereichen, {{shared}} davon geteilt mit diesem Markt.",
       "openMarket": "Markt öffnen",
       "ctaBody": "Das Assessment grenzt diesen Markt auf Ihr Unternehmen, Ihr Produkt und Ihre Bereiche ein — in unter fünf Minuten.",
-      "allAreas": "Alle Bereiche"
+      "allAreas": "Alle Bereiche",
+      "nDuties_one": "{{count}} Pflicht",
+      "nDuties_other": "{{count}} Pflichten"
     },
     "cta": {
       "title": "Sehen, welche davon für Sie gelten.",

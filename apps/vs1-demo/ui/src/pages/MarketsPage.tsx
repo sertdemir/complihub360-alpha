@@ -325,33 +325,25 @@ export function MarketPage() {
       </section>
 
       {/* ── 2 · Weights · the spine into the area pages ───────────────────── */}
-      <Section className="bg-surface-secondary py-16 desktop-s:py-20">
-        <Container size="xl">
-          <MarketWeights profile={profile} />
-        </Container>
+      <Section className="bg-surface-secondary py-16 desktop-s:py-20" spacing="none">
+        <MarketWeights profile={profile} />
       </Section>
 
       {/* ── 3 · The calendar · the section only this page can assemble ────── */}
-      <Section className="py-16 desktop-s:py-20">
-        <Container size="xl">
-          <MarketCalendar profile={profile} />
-        </Container>
+      <Section className="py-16 desktop-s:py-20" spacing="none">
+        <MarketCalendar profile={profile} />
       </Section>
 
       {/* ── 4 · Coverage · renders only where there is a real gap ─────────── */}
       {profile.gaps.length > 0 && (
-        <Section className="bg-surface-secondary py-16 desktop-s:py-20">
-          <Container size="xl">
-            <MarketCoverage profile={profile} marketLabel={country} />
-          </Container>
+        <Section className="bg-surface-secondary py-16 desktop-s:py-20" spacing="none">
+          <MarketCoverage profile={profile} marketLabel={country} />
         </Section>
       )}
 
       {/* ── 5 · Other markets ────────────────────────────────────────────── */}
-      <Section className="py-16 desktop-s:py-20">
-        <Container size="xl">
-          <RelatedMarkets profile={profile} />
-        </Container>
+      <Section className="py-16 desktop-s:py-20" spacing="none">
+        <RelatedMarkets profile={profile} />
       </Section>
 
       {/* ── 6 · The close · same band as the area page, deliberately ─────── */}

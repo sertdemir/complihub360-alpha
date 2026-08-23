@@ -65,6 +65,7 @@ export function useAreaEyebrows() {
     markets: t('compliance.area.eyebrow.markets', 'Markets'),
     process: t('compliance.area.eyebrow.process', 'How it runs'),
     calendar: t('compliance.area.eyebrow.calendar', 'Calendar'),
+    weighting: t('compliance.area.eyebrow.weighting', 'Weighting'),
     coverage: t('compliance.area.eyebrow.coverage', 'Coverage'),
     next: t('compliance.area.eyebrow.next', 'Next'),
   };
