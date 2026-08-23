@@ -113,9 +113,12 @@ export function AreaMetrics({ slug, selectedCountry }: Props) {
               count: soonest.dueDays as number,
             }),
             label: t('compliance.area.metrics.untilNext', 'until the next deadline'),
-            // The duty itself, not a description of it: a reader who wants to
-            // check the number needs to know which filing it belongs to.
-            note: `${soonest.label}, ${soonest.source}`,
+            // The statute, not the duty's name plus the statute. The name was
+            // the longest string in the band by a wide margin — 69 characters
+            // for the French EPR entry — and pushed its own note onto three
+            // lines. The source alone still says which filing the number
+            // belongs to, and it is what the canvas puts here.
+            note: soonest.source,
             tone: 'text-fg',
           }
         : null,
@@ -148,7 +151,7 @@ export function AreaMetrics({ slug, selectedCountry }: Props) {
     // narrower than the middle ones.
     <dl
       ref={ref}
-      className="-mx-6 flex flex-col border-y border-stroke-subtle bg-surface-secondary tablet:flex-row desktop-s:-mx-10"
+      className="-mx-[1rem] flex flex-col border-y border-stroke-subtle bg-surface-secondary tablet:flex-row"
     >
       {metrics.map((m, i) => (
         <Fragment key={m.key}>
@@ -161,7 +164,16 @@ export function AreaMetrics({ slug, selectedCountry }: Props) {
           <div
             // flex-1 with a zero basis, so any count divides the row evenly —
             // three tiles are three thirds, not three quarters and a gap.
-            className="min-w-0 flex-1 basis-0 px-6 py-8 transition-[opacity,transform] duration-500 ease-out desktop-s:px-10"
+            // 16px a side, not the scale's px-10 — which is 64px in this
+            // config and left 163px of content for a label needing 218, so
+            // every label wrapped at four tiles. The canvas does not wrap
+            // because its band runs the full 1440 and gives each tile ~239px
+            // of content; 16px reaches exactly that inside our narrower
+            // container, with the longest translation (es, 231px) still on one
+            // line. The columns therefore sit closer than the canvas draws
+            // them. That is the half of it worth losing: the hairline does the
+            // separating, and a wrapped label does not.
+            className="min-w-0 flex-1 basis-0 px-[1rem] py-8 transition-[opacity,transform] duration-500 ease-out"
             style={{
               opacity: inView ? 1 : 0,
               transform: inView ? 'none' : 'translateY(12px)',
