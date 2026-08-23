@@ -751,7 +751,11 @@
       "resources": "Ressourcen",
       "areasPanelTitle": "Compliance-Bereich wählen",
       "allAreas": "Alle Compliance-Bereiche",
-      "areasAsideBody": "Jeder Bereich nennt die Pflichten, die er trägt, die Rechtsgrundlage dahinter und das, was ein Fehler kostet."
+      "areasAsideBody": "Jeder Bereich nennt die Pflichten, die er trägt, die Rechtsgrundlage dahinter und das, was ein Fehler kostet.",
+      "marketsPanelTitle": "Markt wählen",
+      "allMarkets": "Alle Märkte",
+      "marketsAsideBody": "Jeder Markt zeigt, was dort wann fällig wird, welche Bereiche am schwersten wiegen und wo wir noch keine lokale Quelle führen.",
+      "marketFact": "{{count}} Pflichten in {{areas}} Bereichen"
     },
     "login": "Anmelden",
     "language": "Sprache"
@@ -868,7 +872,8 @@
       "relatedLead": "Wer verkauft, verkauft selten nur in einen Markt. Diese drei teilen die meisten Pflichten mit diesem — dieselben Meldungen, eine zweite Jurisdiktion.",
       "relatedFact": "{{count}} Pflichten in {{areas}} Bereichen, {{shared}} davon geteilt mit diesem Markt.",
       "openMarket": "Markt öffnen",
-      "ctaBody": "Das Assessment grenzt diesen Markt auf Ihr Unternehmen, Ihr Produkt und Ihre Bereiche ein — in unter fünf Minuten."
+      "ctaBody": "Das Assessment grenzt diesen Markt auf Ihr Unternehmen, Ihr Produkt und Ihre Bereiche ein — in unter fünf Minuten.",
+      "allAreas": "Alle Bereiche"
     },
     "cta": {
       "title": "Sehen, welche davon für Sie gelten.",

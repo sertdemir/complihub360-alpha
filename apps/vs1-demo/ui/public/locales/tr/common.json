@@ -751,7 +751,11 @@
       "resources": "Kaynaklar",
       "areasPanelTitle": "Bir uyum alanı seçin",
       "allAreas": "Tüm uyum alanları",
-      "areasAsideBody": "Her alan taşıdığı yükümlülükleri, arkasındaki mevzuatı ve hata yapmanın bedelini listeler."
+      "areasAsideBody": "Her alan taşıdığı yükümlülükleri, arkasındaki mevzuatı ve hata yapmanın bedelini listeler.",
+      "marketsPanelTitle": "Pazar seçin",
+      "allMarkets": "Tüm pazarlar",
+      "marketsAsideBody": "Her pazar orada neyin ne zaman gerektiğini, hangi alanların en ağır bastığını ve nerede henüz yerel kaynak taşımadığımızı gösterir.",
+      "marketFact": "{{areas}} alanda {{count}} yükümlülük"
     },
     "login": "Giriş yap",
     "language": "Dil"
@@ -868,7 +872,8 @@
       "relatedLead": "Çok azı tek pazara satar. Bu üçü bu pazarla en çok yükümlülüğü paylaşıyor — aynı bildirimler, ikinci bir yargı alanı.",
       "relatedFact": "{{areas}} alanda {{count}} yükümlülük, {{shared}} tanesi bu pazarla ortak.",
       "openMarket": "Pazarı aç",
-      "ctaBody": "Değerlendirme bu pazarı şirketinize, ürününüze ve alanlarınıza göre daraltır — beş dakikadan kısa sürede."
+      "ctaBody": "Değerlendirme bu pazarı şirketinize, ürününüze ve alanlarınıza göre daraltır — beş dakikadan kısa sürede.",
+      "allAreas": "Tüm alanlar"
     },
     "cta": {
       "title": "Bunlardan hangilerinin size uyduğunu görün.",

@@ -751,7 +751,11 @@
       "resources": "Recursos",
       "areasPanelTitle": "Elija un área de cumplimiento",
       "allAreas": "Todas las áreas de cumplimiento",
-      "areasAsideBody": "Cada área enumera las obligaciones que conlleva, la norma que hay detrás y lo que cuesta equivocarse."
+      "areasAsideBody": "Cada área enumera las obligaciones que conlleva, la norma que hay detrás y lo que cuesta equivocarse.",
+      "marketsPanelTitle": "Elegir un mercado",
+      "allMarkets": "Todos los mercados",
+      "marketsAsideBody": "Cada mercado indica qué vence allí y con qué frecuencia, qué áreas pesan más y dónde aún no tenemos fuente local.",
+      "marketFact": "{{count}} obligaciones en {{areas}} áreas"
     },
     "login": "Iniciar sesión",
     "language": "Idioma"
@@ -868,7 +872,8 @@
       "relatedLead": "Pocos venden a un solo mercado. Estos tres comparten más obligaciones con este: las mismas presentaciones, otra jurisdicción.",
       "relatedFact": "{{count}} obligaciones en {{areas}} áreas, {{shared}} compartidas con este mercado.",
       "openMarket": "Abrir este mercado",
-      "ctaBody": "La evaluación acota este mercado a su empresa, su producto y sus áreas, en menos de cinco minutos."
+      "ctaBody": "La evaluación acota este mercado a su empresa, su producto y sus áreas, en menos de cinco minutos.",
+      "allAreas": "Todas las áreas"
     },
     "cta": {
       "title": "Vea cuáles se aplican a su caso.",

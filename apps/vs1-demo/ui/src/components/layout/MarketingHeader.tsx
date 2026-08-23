@@ -6,6 +6,7 @@ import { Menu, X } from 'lucide-react';
 import { Logo } from '../ui/Logo';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { AreasMenuPanel } from './AreasMenuPanel';
+import { MarketsMenuPanel } from './MarketsMenuPanel';
 import { LanguageMenu } from './LanguageMenu';
 
 // ─── MarketingHeader ──────────────────────────────────────────────────────────
@@ -26,6 +27,7 @@ export interface NavLink {
   labelKey?: string;
   /** Render as a NavMenu sheet listing the eight compliance areas. */
   areasMenu?: boolean;
+  marketsMenu?: boolean;
 }
 
 export interface MarketingHeaderProps {
@@ -47,7 +49,7 @@ export interface MarketingHeaderProps {
 const NAV_LINKS: NavLink[] = [
   { to: 'how-it-works', label: 'How it works', labelKey: 'header.nav.howItWorks' },
   { to: 'compliance', label: 'Compliance areas', labelKey: 'header.nav.complianceAreas', areasMenu: true },
-  { to: 'markets', label: 'Markets', labelKey: 'header.nav.markets' },
+  { to: 'markets', label: 'Markets', labelKey: 'header.nav.markets', marketsMenu: true },
   { to: 'pricing', label: 'Pricing', labelKey: 'header.nav.pricing' },
   { to: 'resources', label: 'Resources', labelKey: 'header.nav.resources' },
 ];
@@ -98,6 +100,17 @@ export function MarketingHeader({
         <nav className="flex items-center justify-center gap-3">
             {items.map((it) => {
               const itemLabel = it.labelKey ? t(it.labelKey, { defaultValue: it.label }) : it.label;
+              if (it.marketsMenu) {
+                return (
+                  <MarketsMenuPanel
+                    key={it.to}
+                    label={itemLabel}
+                    lang={userHref.replace(/^\/|\/$/g, '') || 'en'}
+                    isActive={isActive('markets')}
+                    triggerClassName={inverse ? 'text-white/85 hover:text-fg-inverse' : undefined}
+                  />
+                );
+              }
               if (it.areasMenu) {
                 return (
                   <AreasMenuPanel

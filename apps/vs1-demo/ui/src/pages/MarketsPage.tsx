@@ -13,6 +13,7 @@ import {
   MarketCalendar,
   MarketCoverage,
   MarketProfileCard,
+  MarketSwitcher,
   MarketWeights,
   RelatedMarkets,
 } from '../components/compliance-areas';
@@ -243,22 +244,7 @@ export function MarketPage() {
   return (
     <main className="bg-surface">
       {/* ── 1 · Switcher ─────────────────────────────────────────────────── */}
-      <div className="sticky top-[var(--header-h,4rem)] z-30 border-b border-stroke-subtle bg-surface/90 backdrop-blur">
-        <Container size="xl">
-          <div className="flex h-14 items-center gap-5">
-            <Link
-              to={`${localePrefix}/markets`}
-              className="inline-flex items-center gap-1.5 text-body-xs font-semibold text-fg-secondary transition-colors hover:text-fg-brand"
-            >
-              <ArrowLeft size={14} aria-hidden /> {t('markets.country.backToMarkets')}
-            </Link>
-            <span aria-hidden className="h-5 w-px bg-stroke-subtle" />
-            <span className="rounded-lg bg-brand-light/60 px-3 py-1.5 text-body-sm font-bold text-fg-brand">
-              {country}
-            </span>
-          </div>
-        </Container>
-      </div>
+      <MarketSwitcher current={profile.code} />
 
       {/* ── 2 · Hero ─────────────────────────────────────────────────────── */}
       {/* No metric band. The four figures are pills here, because a full-bleed

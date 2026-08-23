@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { supportedLngs } from '../../i18n/config';
 import { LanguageMenu } from './LanguageMenu';
 import { AreasMenuPanel } from './AreasMenuPanel';
+import { MarketsMenuPanel } from './MarketsMenuPanel';
 import { useAuthStore } from '../../store/useAuthStore';
 import { ChevronDown, LogOut, LayoutDashboard } from 'lucide-react';
 import { Button } from '../ui/Button';
@@ -64,15 +65,16 @@ export function GlobalNav() {
     label: string;
     path: string;
     /** Opens the eight compliance areas as a full-width sheet. */
-    sheet?: boolean;
+    /** Which mega-menu this entry opens, if any. */
+    sheet?: 'areas' | 'markets';
   }[] = [
     // Same five destinations as the MarketingHeader — the two headers must not
     // present different navigations. Platform and Solutions dropped out of the
     // header on 2026-08-18: §11 P5 keeps them as SEO surfaces, reachable from the
     // footer, and seven entries do not survive German labels.
     { id: 'how-it-works', label: t('header.nav.howItWorks', 'How it works'), path: '/how-it-works' },
-    { id: 'areas', label: t('header.nav.complianceAreas', 'Compliance Areas'), path: '/compliance', sheet: true },
-    { id: 'markets', label: t('header.nav.markets', 'Markets'), path: '/markets' },
+    { id: 'areas', label: t('header.nav.complianceAreas', 'Compliance Areas'), path: '/compliance', sheet: 'areas' },
+    { id: 'markets', label: t('header.nav.markets', 'Markets'), path: '/markets', sheet: 'markets' },
     { id: 'pricing', label: t('header.nav.pricing', 'Pricing'), path: '/pricing' },
     { id: 'resources', label: t('header.nav.resources', 'Resources'), path: '/resources' },
   ];
@@ -112,11 +114,17 @@ export function GlobalNav() {
               stays a button, because that is what it does. */}
           {HEADER_MENU.map((menu) => (
             <div key={menu.id} className="flex items-center">
-              {menu.sheet ? (
+              {menu.sheet === 'areas' ? (
                 <AreasMenuPanel
                   label={menu.label}
                   lang={currentLang}
                   isActive={location.pathname.startsWith(`/${currentLang}/compliance`)}
+                />
+              ) : menu.sheet === 'markets' ? (
+                <MarketsMenuPanel
+                  label={menu.label}
+                  lang={currentLang}
+                  isActive={location.pathname.startsWith(`/${currentLang}/markets`)}
                 />
               ) : (
                 <Link

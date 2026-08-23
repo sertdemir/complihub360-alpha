@@ -751,7 +751,11 @@
       "resources": "Resources",
       "areasPanelTitle": "Choose a compliance area",
       "allAreas": "All compliance areas",
-      "areasAsideBody": "Every area lists the duties it carries, the statute behind each one, and what it costs to get wrong."
+      "areasAsideBody": "Every area lists the duties it carries, the statute behind each one, and what it costs to get wrong.",
+      "marketsPanelTitle": "Choose a market",
+      "allMarkets": "All markets",
+      "marketsAsideBody": "Every market lists what falls due there and how often, which areas weigh heaviest, and where we hold no local source yet.",
+      "marketFact": "{{count}} duties in {{areas}} areas"
     },
     "login": "Log in",
     "language": "Language"
@@ -868,7 +872,8 @@
       "relatedLead": "Few sell into one market only. These three share the most duties with this one — the same filings, a second jurisdiction.",
       "relatedFact": "{{count}} duties in {{areas}} areas, {{shared}} of them shared with this market.",
       "openMarket": "Open this market",
-      "ctaBody": "The assessment narrows this market to your business, your product and your areas — in under five minutes."
+      "ctaBody": "The assessment narrows this market to your business, your product and your areas — in under five minutes.",
+      "allAreas": "All areas"
     },
     "cta": {
       "title": "See which of these apply to you.",
