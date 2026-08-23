@@ -633,7 +633,15 @@
         "markets": "Mercados",
         "process": "Cómo funciona",
         "next": "Continuar"
-      }
+      },
+      "validityAll": "Todas {{count}}",
+      "validityNow": "Vigente hoy · {{count}}",
+      "validityFromYear": "Desde {{year}} · {{count}}",
+      "validityLater": "Más adelante · {{count}}",
+      "fromShort": "desde {{date}}",
+      "riskWhen": "Riesgo: {{level}} · {{when}}",
+      "sourceInJournal": "Fuente en el Diario Oficial:",
+      "appliesTodayShort": "vigente hoy"
     },
     "riskBadge": "Riesgo: {{level}}"
   },

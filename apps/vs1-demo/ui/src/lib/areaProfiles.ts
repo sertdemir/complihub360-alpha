@@ -71,6 +71,8 @@ export interface AreaSubdomain {
   businessModels: string[];
   triggerTags: string[];
   eurLexUrl?: string;
+  /** The Official Journal reference the eurLexUrl is built from, when there is one. */
+  celex?: string;
 }
 
 export interface AreaObligation extends AreaSubdomain {
@@ -129,6 +131,7 @@ function subdomainsFor(slug: DomainSlug): AreaSubdomain[] {
         businessModels: sub.applicableBusinessModels,
         triggerTags: sub.triggerTags,
         eurLexUrl: eurLex(sub.celex),
+        celex: sub.celex,
       });
     }
   }

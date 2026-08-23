@@ -633,7 +633,15 @@
         "markets": "Pazarlar",
         "process": "Süreç",
         "next": "Devamı"
-      }
+      },
+      "validityAll": "Tümü {{count}}",
+      "validityNow": "Bugün geçerli · {{count}}",
+      "validityFromYear": "{{year}} itibarıyla · {{count}}",
+      "validityLater": "Daha sonra · {{count}}",
+      "fromShort": "{{date}} itibarıyla",
+      "riskWhen": "Risk: {{level}} · {{when}}",
+      "sourceInJournal": "Resmî Gazete kaynağı:",
+      "appliesTodayShort": "bugün geçerli"
     },
     "riskBadge": "Risk: {{level}}"
   },

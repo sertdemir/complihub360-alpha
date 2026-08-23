@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BusinessModel } from '@complihub/compliance-engine';
-import { ExternalLink, Info } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { Typography } from '../ui/Typography';
 import { FilterChip } from '../ui/Badge';
 import { RiskBadge } from '../ui/RiskBadge';
 import { getAreaObligations, type AreaObligation } from '../../lib/areaProfiles';
+import { AREA_BY_SLUG } from './areas';
 import type { DomainSlug } from '../../lib/domains';
 import { SEVERITY_FALLBACK, SEVERITY_STYLE, severityKey } from './severity';
 import type { CountryCode } from './types';
@@ -52,11 +53,42 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
   const { t, i18n } = useTranslation('common');
   const eyebrows = useAreaEyebrows();
   const dateFmt = new Intl.DateTimeFormat(i18n.language, { dateStyle: 'long' });
+  // The list rows and the risk chip need the compact form; the fact grid keeps
+  // the long one.
+  // Explicit parts, not dateStyle 'short': that renders a two-digit year in
+  // several locales, and "ab 01.01.30" for a duty that bites in 2030 is the
+  // one abbreviation this page cannot afford.
+  const shortDate = new Intl.DateTimeFormat(i18n.language, {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+  const AreaIcon = AREA_BY_SLUG[slug]?.icon;
   const [model, setModel] = useState<BusinessModel | null>(null);
+  const [validity, setValidity] = useState<'all' | 'now' | 'later'>('all');
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const all = useMemo(() => getAreaObligations(slug, selectedCountry), [slug, selectedCountry]);
-  const shown = model ? all.filter((o) => o.businessModels.includes(model)) : all;
+
+  // Live today vs deferred. The canvas segments the list this way and it is
+  // the split a reader actually plans around: what binds now is work, what
+  // binds in 2030 is a note in a calendar.
+  const { liveNow, later, laterYear } = useMemo(() => {
+    const today = new Date();
+    const isLater = (o: AreaObligation) => !!o.appliesFrom && new Date(o.appliesFrom) > today;
+    const deferred = all.filter(isLater);
+    const years = new Set(deferred.map((o) => new Date(o.appliesFrom as string).getFullYear()));
+    return {
+      liveNow: all.filter((o) => !isLater(o)),
+      later: deferred,
+      // Only name the year when every deferred duty shares one. Where they do
+      // not, "from 2030" would be false for some of what the filter returns.
+      laterYear: years.size === 1 ? [...years][0] : null,
+    };
+  }, [all]);
+
+  const byValidity = validity === 'now' ? liveNow : validity === 'later' ? later : all;
+  const shown = model ? byValidity.filter((o) => o.businessModels.includes(model)) : byValidity;
 
   // Changing area, market or filter can strip the duty that was open. Falling
   // back to the first row keeps the pane populated instead of blanking it.
@@ -64,7 +96,7 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
     shown.find((o) => o.id === selectedId) ?? shown[0];
   useEffect(() => {
     setSelectedId(null);
-  }, [slug, selectedCountry, model]);
+  }, [slug, selectedCountry, model, validity]);
 
   const marketLabel =
     selectedCountry === 'EU'
@@ -73,21 +105,48 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
 
   return (
     <div>
-      <AreaSectionHeading
-        eyebrow={eyebrows.obligations}
-        title={t('compliance.area.obligationsTitle', 'What this area actually requires')}
-        lead={
-          <span className="block max-w-2xl">
-            {t('compliance.area.obligationsLead', {
-              defaultValue:
-                'Every duty below traces to a named statute. Switch market to see the source that applies there.',
-            })}
-          </span>
-        }
-      />
+      {/* Heading left, validity segments right and baseline-aligned with the
+          lead — the canvas's shape for this row. */}
+      <div className="flex flex-col gap-5 desktop-s:flex-row desktop-s:items-end desktop-s:justify-between desktop-s:gap-10">
+        <AreaSectionHeading
+          className="max-w-[620px]"
+          eyebrow={eyebrows.obligations}
+          title={t('compliance.area.obligationsTitle', 'What this area actually requires')}
+          lead={t('compliance.area.obligationsLead', {
+            defaultValue:
+              'Every duty below traces to a named statute. Switch market to see the source that applies there.',
+          })}
+        />
+        {/* Only worth showing when there is something to separate: with every
+            duty already live the three segments would be one real choice and
+            two dead ones. */}
+        {later.length > 0 && liveNow.length > 0 && (
+          <div className="flex shrink-0 flex-wrap gap-2">
+            <ValiditySegment selected={validity === 'all'} onClick={() => setValidity('all')}>
+              {t('compliance.area.validityAll', 'All {{count}}', { count: all.length })}
+            </ValiditySegment>
+            <ValiditySegment selected={validity === 'now'} onClick={() => setValidity('now')}>
+              {t('compliance.area.validityNow', 'Applies today · {{count}}', {
+                count: liveNow.length,
+              })}
+            </ValiditySegment>
+            <ValiditySegment selected={validity === 'later'} onClick={() => setValidity('later')}>
+              {laterYear
+                ? t('compliance.area.validityFromYear', 'From {{year}} · {{count}}', {
+                    year: laterYear,
+                    count: later.length,
+                  })
+                : t('compliance.area.validityLater', 'Later · {{count}}', { count: later.length })}
+            </ValiditySegment>
+          </div>
+        )}
+      </div>
 
-      {/* Business-model filter */}
-      <div className="mt-6 flex flex-wrap items-center gap-2">
+      {/* The business-model filter has no counterpart in the canvas, which
+          draws one static state. It stays: it reads the engine's own
+          applicableBusinessModels and is the only control that narrows the
+          list to what a given reader is actually on the hook for. */}
+      <div className="mt-7 flex flex-wrap items-center gap-2">
         <span className="text-body-3xs font-semibold uppercase tracking-wider text-fg-tertiary">
           {t('compliance.area.modelFilter', 'I run a')}
         </span>
@@ -115,7 +174,7 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
           </Typography>
         </div>
       ) : (
-        <div className="mt-8 grid overflow-hidden rounded-xl border border-stroke-subtle bg-surface desktop-s:grid-cols-[minmax(0,21rem)_1fr]">
+        <div className="mt-8 grid overflow-hidden rounded-xl border border-stroke-subtle bg-surface shadow-lg shadow-neutral-900/[0.06] desktop-s:grid-cols-[minmax(0,20rem)_1fr] desktop-m:grid-cols-[minmax(0,26rem)_1fr]">
           {/* Master */}
           <ul className="divide-y divide-stroke-subtle border-b border-stroke-subtle desktop-s:border-b-0 desktop-s:border-r">
             {shown.map((o) => {
@@ -127,13 +186,18 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                     type="button"
                     aria-pressed={active}
                     onClick={() => setSelectedId(o.id)}
-                    className={`flex w-full items-start gap-3 px-4 py-3.5 text-left transition-colors ${
-                      active ? 'bg-brand-light/50' : 'hover:bg-surface-secondary'
+                    // The petrol edge on the selected row is the canvas's own
+                    // marker. Without it the only cue was a pale tint, which
+                    // disappears entirely against the hover state.
+                    className={`flex w-full items-center gap-3.5 border-l-[3px] py-4 pl-[1.1875rem] pr-5 text-left transition-colors ${
+                      active
+                        ? 'border-l-brand bg-brand-light/50'
+                        : 'border-l-transparent hover:bg-surface-secondary'
                     }`}
                   >
                     <span
                       aria-hidden
-                      className={`mt-0.5 h-9 w-1 shrink-0 rounded-full ${style.bar}`}
+                      className={`h-[2.125rem] w-1.5 shrink-0 rounded-full ${style.bar}`}
                     />
                     <span className="min-w-0 flex-1">
                       <span
@@ -143,11 +207,21 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                       >
                         {o.label}
                       </span>
-                      <span className="mt-0.5 block truncate text-body-2xs text-fg-tertiary">
+                      {/* Statute AND cadence, as the canvas rows carry. The
+                          statute alone was ambiguous between duties that share
+                          one — and it was being truncated mid-reference, which
+                          is the one part of a row that must never be guessed at. */}
+                      <span className="mt-1 block text-body-2xs leading-snug text-fg-tertiary">
                         {o.source}
+                        {' · '}
+                        {o.appliesFrom && new Date(o.appliesFrom) > new Date()
+                          ? t('compliance.area.fromShort', 'from {{date}}', {
+                              date: shortDate.format(new Date(o.appliesFrom)),
+                            })
+                          : t(`markets.cadence.${o.due}`, { defaultValue: o.due }).toLowerCase()}
                       </span>
                     </span>
-                    <RiskBadge level={o.severity} size="sm" className="shrink-0">
+                    <RiskBadge level={o.severity} size="sm" className="shrink-0 rounded-full">
                       {t(severityKey(o.severity), SEVERITY_FALLBACK[o.severity])}
                     </RiskBadge>
                   </button>
@@ -158,15 +232,42 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
 
           {/* Detail */}
           <div className="p-6 desktop-s:p-8">
-            <RiskBadge level={selected.severity} size="sm">
-              {t(severityKey(selected.severity), SEVERITY_FALLBACK[selected.severity])}
-            </RiskBadge>
-            <h3 className="mt-4 font-serif text-[1.5rem] font-semibold leading-tight text-fg">
-              {selected.label}
-            </h3>
-            <p className="mt-3 max-w-xl text-body-sm leading-relaxed text-fg-secondary">
-              {selected.description}
-            </p>
+            <div className="flex items-start justify-between gap-6">
+              <div className="min-w-0">
+                {/* Risk AND when it bites, in one chip. Severity on its own
+                    said nothing about whether the reader has to act this
+                    quarter or in four years. */}
+                <RiskBadge level={selected.severity} size="sm" className="rounded-full">
+                  {t('compliance.area.riskWhen', '{{level}} · {{when}}', {
+                    level: t(severityKey(selected.severity), SEVERITY_FALLBACK[selected.severity]),
+                    when:
+                      selected.appliesFrom && new Date(selected.appliesFrom) > new Date()
+                        ? t('compliance.area.fromShort', 'from {{date}}', {
+                            date: shortDate.format(new Date(selected.appliesFrom)),
+                          })
+                        : t('compliance.area.appliesTodayShort', 'applies today'),
+                  })}
+                </RiskBadge>
+                <h3 className="mt-3.5 font-serif text-[1.5rem] font-semibold leading-tight text-fg">
+                  {selected.label}
+                </h3>
+                <p className="mt-3 max-w-xl text-body-sm leading-relaxed text-fg-secondary">
+                  {selected.description}
+                </p>
+              </div>
+              {/* The area's own glyph, in the severity's colour — the canvas
+                  puts a drawing here and it is what stops the pane reading as
+                  a form. Hidden below desktop, where it would push the prose
+                  into a column too narrow to read. */}
+              {AreaIcon && (
+                <AreaIcon
+                  size={64}
+                  strokeWidth={1.5}
+                  aria-hidden
+                  className={`hidden shrink-0 desktop-s:block ${SEVERITY_STYLE[selected.severity].iconColor}`}
+                />
+              )}
+            </div>
 
             <dl className="mt-7 grid gap-px overflow-hidden rounded-xl border border-stroke-subtle bg-stroke-subtle tablet:grid-cols-2">
               <Fact
@@ -205,15 +306,26 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
               />
             </dl>
 
+            {/* The Official Journal reference itself, not a button that says
+                a source exists. The CELEX number IS the citation — a reader
+                who wants to check the duty can quote it without following the
+                link. The canvas also prints a last-verified date here; the
+                engine does not carry one, so it is left out rather than made
+                up. */}
             {selected.eurLexUrl && (
               <a
                 href={selected.eurLexUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-5 inline-flex items-center gap-2 rounded-lg bg-surface-secondary px-4 py-3 text-body-2xs text-fg-secondary transition-colors hover:text-fg-brand"
+                className="mt-5 flex items-center gap-3 rounded-lg bg-surface-secondary px-4 py-3.5 text-body-2xs text-fg-tertiary transition-colors hover:text-fg-brand"
               >
-                {t('compliance.area.readSource', 'Read the source on EUR-Lex')}
-                <ExternalLink size={12} />
+                <FileText size={15} className="shrink-0" aria-hidden />
+                <span>
+                  {t('compliance.area.sourceInJournal', 'Source in the Official Journal:')}{' '}
+                  <span className="font-semibold tabular-nums text-fg">
+                    {selected.celex ? `CELEX ${selected.celex}` : selected.source}
+                  </span>
+                </span>
               </a>
             )}
           </div>
@@ -221,9 +333,11 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
       )}
 
       {/* Coverage note — the same honesty MarketPage shows about thin markets. */}
-      <div className="mt-6 flex items-start gap-2 rounded-xl border border-stroke-subtle bg-surface px-4 py-3">
-        <Info size={15} className="mt-0.5 shrink-0 text-fg-tertiary" />
-        <Typography variant="caption" className="normal-case tracking-normal leading-relaxed text-fg-tertiary">
+      {/* Plain text, no box. The canvas sets this as a footnote under the card
+          and that is what it is — boxed and badged with an icon it read as a
+          second piece of content competing with the explorer above it. */}
+      <div className="mt-5 max-w-[760px]">
+        <Typography variant="caption" className="text-body-xs normal-case tracking-normal leading-relaxed text-fg-tertiary">
           {selectedCountry === 'EU'
             ? t('compliance.area.coverageNoteEu', {
                 defaultValue:
@@ -266,5 +380,33 @@ function Fact({
       </dd>
       {note && <p className="mt-1 text-body-3xs text-fg-tertiary">{note}</p>}
     </div>
+  );
+}
+
+// A segmented control, not a FilterChip: these three are one choice with three
+// states, and the chip's pill shape reads as an independent toggle. The canvas
+// draws them square, dark when selected, outlined when not.
+function ValiditySegment({
+  selected,
+  onClick,
+  children,
+}: {
+  selected: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={selected}
+      onClick={onClick}
+      className={`rounded-lg px-3.5 py-2 text-body-xs font-semibold tabular-nums transition-colors ${
+        selected
+          ? 'bg-fg text-surface'
+          : 'border border-stroke bg-surface text-fg-secondary hover:border-stroke-strong hover:text-fg'
+      }`}
+    >
+      {children}
+    </button>
   );
 }

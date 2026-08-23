@@ -633,7 +633,15 @@
         "markets": "Märkte",
         "process": "Ablauf",
         "next": "Weiter"
-      }
+      },
+      "validityAll": "Alle {{count}}",
+      "validityNow": "Jetzt gültig · {{count}}",
+      "validityFromYear": "Ab {{year}} · {{count}}",
+      "validityLater": "Später · {{count}}",
+      "fromShort": "ab {{date}}",
+      "riskWhen": "Risiko: {{level}} · {{when}}",
+      "sourceInJournal": "Quelle im Amtsblatt:",
+      "appliesTodayShort": "gilt heute"
     },
     "riskBadge": "Risiko: {{level}}"
   },
