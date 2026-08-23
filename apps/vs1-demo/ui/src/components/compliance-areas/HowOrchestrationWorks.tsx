@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Crosshair, ClipboardList, Users, MessageSquare, ArrowRight } from 'lucide-react';
+import { Crosshair, ClipboardList, Users, MessageSquare } from 'lucide-react';
 import { Typography } from '../ui/Typography';
 
 const STEPS = [
@@ -82,10 +82,9 @@ export function HowOrchestrationWorks({ cta, tone = 'default' }: Props = {}) {
         </Typography>
       </div>
 
-      <div className="grid grid-cols-1 tablet:grid-cols-2 desktop-s:grid-cols-4 gap-4 desktop-s:gap-2">
+      <div className="grid grid-cols-1 tablet:grid-cols-2 desktop-s:grid-cols-4 gap-4">
         {STEPS.map((step, i) => {
           const Icon = step.icon;
-          const isLast = i === STEPS.length - 1;
           return (
             <motion.div
               key={step.id}
@@ -93,7 +92,7 @@ export function HowOrchestrationWorks({ cta, tone = 'default' }: Props = {}) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.1 }}
-              className={`relative rounded-xl p-5 desktop-s:p-6 border flex flex-col ${
+              className={`rounded-xl p-5 desktop-s:p-6 border flex flex-col ${
                 dark
                   ? 'bg-white/[0.04] border-white/[0.14]'
                   : 'bg-surface border-stroke-subtle shadow-sm'
@@ -124,17 +123,6 @@ export function HowOrchestrationWorks({ cta, tone = 'default' }: Props = {}) {
               >
                 {t(`compliance.howItWorks.${step.id}.body`, step.bodyDefault)}
               </Typography>
-
-              {!isLast && (
-                <div
-                  aria-hidden
-                  className={`hidden desktop-s:flex absolute top-1/2 -right-4 -translate-y-1/2 w-8 h-8 items-center justify-center rounded-full shadow-md z-10 ${
-                    dark ? 'bg-white/20' : 'bg-primary-500'
-                  }`}
-                >
-                  <ArrowRight size={14} className="text-white" />
-                </div>
-              )}
             </motion.div>
           );
         })}
