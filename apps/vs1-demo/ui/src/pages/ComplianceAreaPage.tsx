@@ -243,11 +243,11 @@ export function ComplianceAreaPage() {
       </section>
 
       {/* ── 2 · The metric band ───────────────────────────────────────────── */}
-      {/* The band carries its own rules top and bottom, so the hero above it
-          does not need a border of its own. */}
-      <Container size="xl">
-        <AreaMetrics slug={area} selectedCountry={selectedCountry} />
-      </Container>
+      {/* No Container here: the band is full-bleed and holds its own, so that
+          the grey runs edge to edge while the tiles stay on the page grid.
+          The band also carries its own rules top and bottom, so the hero above
+          it does not need a border of its own. */}
+      <AreaMetrics slug={area} selectedCountry={selectedCountry} />
 
       {/* ── 2 · Who this affects ──────────────────────────────────────────── */}
       {(affected || description) && (

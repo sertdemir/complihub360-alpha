@@ -1,5 +1,6 @@
 import { Fragment, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Container } from '../ui/Container';
 import { getAreaObligations } from '../../lib/areaProfiles';
 import { useInViewOnce } from '../../lib/useInViewOnce';
 import type { DomainSlug } from '../../lib/domains';
@@ -143,69 +144,75 @@ export function AreaMetrics({ slug, selectedCountry }: Props) {
   if (metrics.length === 0) return null;
 
   return (
-    // The negative margin pulls the band out to the container's padding edge,
-    // so every tile can carry the SAME padding and still leave the first one's
-    // text flush with the hero above. Equal padding is what makes the columns
-    // equal: with flex-basis 0 the browser divides the FREE space, and padding
-    // is added on top — one-sided padding on the outer tiles made them 64px
-    // narrower than the middle ones.
-    // The row starts at desktop-m, not tablet. Four tiles need ~263px each for
-    // the longest label to stay on one line, so the band needs 1055px, so the
-    // page needs ~1183. Between 768 and that the row was cramped and every
-    // label wrapped — the same defect that was just fixed at desktop width,
-    // still live one breakpoint down. Below the row the tiles stack and the
-    // hairline turns horizontal.
-    <dl
-      ref={ref}
-      className="-mx-[1rem] flex flex-col border-y border-stroke-subtle bg-surface-secondary desktop-m:flex-row"
-    >
-      {metrics.map((m, i) => (
-        <Fragment key={m.key}>
-          {i > 0 && (
-            <span
-              aria-hidden
-              className="h-px w-full shrink-0 bg-stroke-subtle desktop-m:my-7 desktop-m:h-auto desktop-m:w-px"
-            />
-          )}
-          <div
-            // flex-1 with a zero basis, so any count divides the row evenly —
-            // three tiles are three thirds, not three quarters and a gap.
-            // 16px a side, not the scale's px-10 — which is 64px in this
-            // config and left 163px of content for a label needing 218, so
-            // every label wrapped at four tiles. The canvas does not wrap
-            // because its band runs the full 1440 and gives each tile ~239px
-            // of content; 16px reaches exactly that inside our narrower
-            // container, with the longest translation (es, 231px) still on one
-            // line. The columns therefore sit closer than the canvas draws
-            // them. That is the half of it worth losing: the hairline does the
-            // separating, and a wrapped label does not.
-            //
-            // Centred, where the canvas sets these flush left. The tiles are
-            // equal and the band is centred on the page — measured, both — but
-            // the three strings in a tile are of very different lengths, so
-            // ragged right edges left every column looking as though it had
-            // been pushed left, most of all the last one. Centring makes each
-            // column symmetric about its own axis and the ragged edge falls to
-            // both sides instead of collecting at the end of the band.
-            className="min-w-0 flex-1 basis-0 px-[1rem] py-8 text-center transition-[opacity,transform] duration-500 ease-out"
-            style={{
-              opacity: inView ? 1 : 0,
-              transform: inView ? 'none' : 'translateY(12px)',
-              transitionDelay: `${i * 70}ms`,
-            }}
-          >
-            {/* tabular-nums is not decoration here: these sit in a row and a
-                reader compares them across it. */}
-            <dd
-              className={`font-serif text-[2.5rem] font-semibold leading-none tracking-tight tabular-nums ${m.tone}`}
-            >
-              {m.value}
-            </dd>
-            <dt className="mt-2 text-body-xs font-semibold text-fg">{m.label}</dt>
-            <p className="mt-1 text-body-2xs leading-relaxed text-fg-tertiary">{m.note}</p>
-          </div>
-        </Fragment>
-      ))}
-    </dl>
+    // TWO ELEMENTS, and the split is the whole point of the shape: the grey
+    // and its two rules belong to the full width of the viewport, the tiles
+    // belong to the page grid. So the band is full-bleed and the Container
+    // inside it puts the columns back on the same axis as every other section.
+    <div className="border-y border-stroke-subtle bg-surface-secondary">
+      <Container size="xl">
+        {/* The negative margin pulls the tiles out to the container's padding
+            edge, so every tile can carry the SAME padding and still leave the
+            first one's text flush with the hero above. Equal padding is what
+            makes the columns equal: with flex-basis 0 the browser divides the
+            FREE space and padding is added on top — one-sided padding on the
+            outer tiles made them 64px narrower than the middle ones.
+
+            The row starts at desktop-m, not tablet. Four tiles need ~263px
+            each for the longest label to stay on one line, so the row needs
+            1055px, so the page needs ~1183. Between 768 and that the columns
+            were 127px wide and every label wrapped — the same defect fixed at
+            desktop width, still live one breakpoint down. Below the row the
+            tiles stack and the hairline turns horizontal. */}
+        <dl ref={ref} className="-mx-[1rem] flex flex-col desktop-m:flex-row">
+          {metrics.map((m, i) => (
+            <Fragment key={m.key}>
+              {i > 0 && (
+                <span
+                  aria-hidden
+                  className="h-px w-full shrink-0 bg-stroke-subtle desktop-m:my-7 desktop-m:h-auto desktop-m:w-px"
+                />
+              )}
+              <div
+                // flex-1 with a zero basis, so any count divides the row evenly —
+                // three tiles are three thirds, not three quarters and a gap.
+                // 16px a side, not the scale's px-10 — which is 64px in this
+                // config and left 163px of content for a label needing 218, so
+                // every label wrapped at four tiles. The canvas does not wrap
+                // because its band runs the full 1440 and gives each tile ~239px
+                // of content; 16px reaches exactly that inside our narrower
+                // container, with the longest translation (es, 231px) still on one
+                // line. The columns therefore sit closer than the canvas draws
+                // them. That is the half of it worth losing: the hairline does the
+                // separating, and a wrapped label does not.
+                //
+                // Centred, where the canvas sets these flush left. The tiles are
+                // equal and the band is centred on the page — measured, both — but
+                // the three strings in a tile are of very different lengths, so
+                // ragged right edges left every column looking as though it had
+                // been pushed left, most of all the last one. Centring makes each
+                // column symmetric about its own axis and the ragged edge falls to
+                // both sides instead of collecting at the end of the band.
+                className="min-w-0 flex-1 basis-0 px-[1rem] py-8 text-center transition-[opacity,transform] duration-500 ease-out"
+                style={{
+                  opacity: inView ? 1 : 0,
+                  transform: inView ? 'none' : 'translateY(12px)',
+                  transitionDelay: `${i * 70}ms`,
+                }}
+              >
+                {/* tabular-nums is not decoration here: these sit in a row and a
+                    reader compares them across it. */}
+                <dd
+                  className={`font-serif text-[2.5rem] font-semibold leading-none tracking-tight tabular-nums ${m.tone}`}
+                >
+                  {m.value}
+                </dd>
+                <dt className="mt-2 text-body-xs font-semibold text-fg">{m.label}</dt>
+                <p className="mt-1 text-body-2xs leading-relaxed text-fg-tertiary">{m.note}</p>
+              </div>
+            </Fragment>
+          ))}
+        </dl>
+      </Container>
+    </div>
   );
 }
