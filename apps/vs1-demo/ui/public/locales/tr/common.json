@@ -558,9 +558,8 @@
       "enforcementLead": "Rakamlar motorun {{market}} için tuttuğu kaynaklardan geliyor — ceza aralığı belirtilmiş {{count}} yükümlülük. Yazıldığı haliyle üst sınırlar, beklenen maliyet değil.",
       "timelineTitle": "Ne zaman neyin geçerli olduğu",
       "timelineLead": "{{total}} yükümlülüğün {{deferred}} tanesi yasalaştı ama henüz uygulanabilir değil. “Geçerli” ile “geliyor” arasındaki fark budur.",
-      "marketsTitle": "Bu en çok nerede ağırlık taşıyor",
-      "marketsLead": "Motorun profillediği her pazarın bu alana verdiği ağırlık ve kaç yükümlülük için yerel kaynak tuttuğu.",
-      "localSources": "{{count}} yerel kaynak",
+      "marketsTitle": "Aynı alan, sekiz farklı ağırlık",
+      "marketsLead": "Bu alana en çok ağırlığı {{top}} veriyor — 10 üzerinden {{topWeight}}, {{second}} ise {{secondWeight}}. İkisine birden satış yapan {{top}} pazarına göre planlar.",
       "coversTitle": "CompliHub360 neyi kapsıyor",
       "specialistsTitle": "Rehbere değil, bu alana eşleştirildi",
       "specialistsLead": "Her uzman, beyan ettiği yargı bölgeleri için doğrulanmıştır. Eşleştirme değerlendirmenize göre çalışır; kapsamı vakanıza uyanlarla tanışırsınız.",
@@ -650,7 +649,9 @@
       "enforcementAvg": "{{total}} pazarın ortalaması",
       "authorities": "Yetkili makamlar",
       "enforcementLeadEu": "Rakamlar motorun AB düzeyinde tuttuğu kaynaklardan geliyor — ceza aralığı belirtilmiş {{count}} yükümlülük. Yazıldığı haliyle üst sınırlar, beklenen maliyet değil.",
-      "timelineLeadAllLive": "Bu alandaki her yükümlülük bugün geçerli. Pazara göre değişen şey, her birinin gerektirdiği hazırlık süresi."
+      "timelineLeadAllLive": "Bu alandaki her yükümlülük bugün geçerli. Pazara göre değişen şey, her birinin gerektirdiği hazırlık süresi.",
+      "marketsLeadTied": "{{count}} pazar bu alana eşit ağırlık veriyor (10 üzerinden {{weight}}). Birden fazlasına satış yapmak, en katısına göre planlamak demektir.",
+      "localSourcesNote": "Motor, {{total}} pazarın {{count}} tanesinde bu alan için en az bir yerel kaynak tutuyor. Diğerlerinde AB düzeyindeki araç geçerlidir ve öyle gösterilir."
     },
     "riskBadge": "Risk: {{level}}"
   },

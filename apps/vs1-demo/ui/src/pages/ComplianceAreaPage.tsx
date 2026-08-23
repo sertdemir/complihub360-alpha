@@ -331,9 +331,10 @@ export function ComplianceAreaPage() {
       {/* ── 6 · Market heatmap ────────────────────────────────────────────── */}
       <Section className="bg-surface-secondary py-16 desktop-s:py-20">
         <Container size="xl">
-          <div className="max-w-[900px]">
-            <AreaMarketHeatmap slug={area} selectedCountry={selectedCountry} />
-          </div>
+          {/* Full container width: the section is a heading rail beside a
+              table now, and capping it at 900 squeezed the bars into a column
+              narrower than the labels beside them. */}
+          <AreaMarketHeatmap slug={area} selectedCountry={selectedCountry} />
         </Container>
       </Section>
 

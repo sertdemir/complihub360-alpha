@@ -558,9 +558,8 @@
       "enforcementLead": "Las cifras proceden de las fuentes que el motor mantiene para {{market}}: {{count}} obligaciones con un rango de sanción declarado. Son límites máximos tal como están escritos, no un coste esperado.",
       "timelineTitle": "Qué se aplica y cuándo",
       "timelineLead": "{{deferred}} de las {{total}} obligaciones ya están aprobadas pero aún no son aplicables. Esa es la diferencia entre «se aplica» y «llega».",
-      "marketsTitle": "Dónde pesa más",
-      "marketsLead": "Cómo pondera esta área cada mercado que el motor perfila, y para cuántas obligaciones dispone de fuente local.",
-      "localSources": "{{count}} fuentes locales",
+      "marketsTitle": "La misma área, ocho pesos",
+      "marketsLead": "{{top}} es el mercado que más peso da a esta área: {{topWeight}} sobre 10, frente a {{second}} con {{secondWeight}}. Quien atienda ambos planifica según {{top}}.",
       "coversTitle": "Qué cubre CompliHub360",
       "specialistsTitle": "Emparejado con el área, no con un directorio",
       "specialistsLead": "Cada especialista está verificado para las jurisdicciones que declara. El emparejamiento parte de su evaluación, así que conoce a quienes encajan con su caso.",
@@ -650,7 +649,9 @@
       "enforcementAvg": "media de los {{total}} mercados",
       "authorities": "Autoridades competentes",
       "enforcementLeadEu": "Las cifras proceden de las fuentes que el motor mantiene a nivel de la UE: {{count}} obligaciones con un rango de sanción declarado. Son límites máximos tal como están escritos, no un coste esperado.",
-      "timelineLeadAllLive": "Todas las obligaciones de esta área se aplican hoy. Lo que cambia según el mercado es el plazo de preparación que necesita cada una."
+      "timelineLeadAllLive": "Todas las obligaciones de esta área se aplican hoy. Lo que cambia según el mercado es el plazo de preparación que necesita cada una.",
+      "marketsLeadTied": "{{count}} mercados dan a esta área el mismo peso ({{weight}} sobre 10). Atender varios significa planificar según el más estricto.",
+      "localSourcesNote": "El motor mantiene al menos una fuente local para esta área en {{count}} de los {{total}} mercados. En el resto se aplica el instrumento de la UE, y así se indica."
     },
     "riskBadge": "Riesgo: {{level}}"
   },

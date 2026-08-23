@@ -558,9 +558,8 @@
       "enforcementLead": "Die Zahlen stammen aus den Quellen, die die Engine für {{market}} führt — {{count}} Pflichten mit benanntem Bußgeldrahmen. Obergrenzen, wie sie dort stehen, keine Erwartungswerte.",
       "timelineTitle": "Was wann greift",
       "timelineLead": "{{deferred}} der {{total}} Pflichten sind beschlossen, aber noch nicht anwendbar. Das ist der Unterschied zwischen „gilt“ und „kommt“.",
-      "marketsTitle": "Wo das am schwersten wiegt",
-      "marketsLead": "Wie jeder von der Engine profilierte Markt diesen Bereich gewichtet und für wie viele Pflichten er eine lokale Quelle hält.",
-      "localSources": "{{count}} lokale Quellen",
+      "marketsTitle": "Derselbe Bereich, acht Gewichte",
+      "marketsLead": "{{top}} gewichtet diesen Bereich am schwersten — {{topWeight}} von 10, gegenüber {{second}} mit {{secondWeight}}. Wer beide Märkte bedient, plant nach {{top}}.",
       "coversTitle": "Was CompliHub360 abdeckt",
       "specialistsTitle": "Passend zum Bereich, nicht aus dem Verzeichnis",
       "specialistsLead": "Jeder Spezialist ist für die Jurisdiktionen geprüft, die er angibt. Das Matching läuft über Ihr Assessment — Sie treffen die, deren Abdeckung zu Ihrem Fall passt.",
@@ -650,7 +649,9 @@
       "enforcementAvg": "Durchschnitt über {{total}} Märkte",
       "authorities": "Zuständige Behörden",
       "enforcementLeadEu": "Die Zahlen stammen aus den Quellen, die die Engine auf EU-Ebene führt — {{count}} Pflichten mit benanntem Bußgeldrahmen. Obergrenzen, wie sie dort stehen, keine Erwartungswerte.",
-      "timelineLeadAllLive": "Jede Pflicht in diesem Bereich gilt heute. Was sich je Markt ändert, ist die Vorlaufzeit, die jede einzelne braucht."
+      "timelineLeadAllLive": "Jede Pflicht in diesem Bereich gilt heute. Was sich je Markt ändert, ist die Vorlaufzeit, die jede einzelne braucht.",
+      "marketsLeadTied": "{{count}} Märkte gewichten diesen Bereich gleich schwer ({{weight}} von 10). Wer mehrere bedient, plant nach dem strengsten.",
+      "localSourcesNote": "In {{count}} der {{total}} Märkte führt die Engine mindestens eine lokale Quelle für diesen Bereich. Sonst gilt das EU-Instrument — und wird auch so ausgewiesen."
     },
     "riskBadge": "Risiko: {{level}}"
   },
