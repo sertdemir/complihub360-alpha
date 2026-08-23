@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Crosshair, ClipboardList, Users, MessageSquare, ArrowRight } from 'lucide-react';
@@ -30,11 +31,21 @@ const STEPS = [
   },
 ];
 
-export function HowOrchestrationWorks() {
+interface Props {
+  /**
+   * A closing call to action rendered under the four steps. The areas hub
+   * leaves it off — the steps are context there. An area page passes the
+   * wizard CTA, because that is where the section sits last on the page and a
+   * reader who has followed the steps has nowhere else to go.
+   */
+  cta?: ReactNode;
+}
+
+export function HowOrchestrationWorks({ cta }: Props = {}) {
   const { t } = useTranslation('common');
 
   return (
-    <div className="bg-surface-tertiary/40 border border-stroke-subtle rounded-xl p-7 desktop-s:p-10 mt-8">
+    <div className="bg-surface-tertiary/40 border border-stroke-subtle rounded-xl p-7 desktop-s:p-10">
       <div className="max-w-2xl mb-8">
         <Typography
           variant="caption"
@@ -93,6 +104,8 @@ export function HowOrchestrationWorks() {
           );
         })}
       </div>
+
+      {cta && <div className="mt-10">{cta}</div>}
     </div>
   );
 }

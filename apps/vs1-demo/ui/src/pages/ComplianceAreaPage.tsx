@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Check, CheckCircle, Users, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { severityFromRiskWeight } from '@complihub/compliance-engine';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
@@ -20,8 +20,8 @@ import {
   AreaSectionHeading,
   AreaMarketHeatmap,
   AreaSwitcher,
-  AreaTimeline,
   HowOrchestrationWorks,
+  AreaTimeline,
   ObligationsExplorer,
   RelatedAreas,
   SEVERITY_FALLBACK,
@@ -66,7 +66,7 @@ function Section({ children, className = '' }: { children: React.ReactNode; clas
 }
 
 export function ComplianceAreaPage() {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const eyebrows = useAreaEyebrows();
   const { locale, area } = useParams();
   const navigate = useNavigate();
@@ -338,77 +338,122 @@ export function ComplianceAreaPage() {
         </Container>
       </Section>
 
-      {/* ── 7 · How CompliHub360 handles it ───────────────────────────────── */}
-      <Section className="py-16 desktop-s:py-20">
-        <Container size="xl">
-          {coverage.length > 0 && (
-            <div className="mb-12 max-w-[820px]">
-              <AreaSectionHeading
-                eyebrow={eyebrows.process}
-                title={t('compliance.area.coversTitle', 'What CompliHub360 covers')}
-              />
-              <ul className="mt-5 space-y-3">
-                {coverage.map(c => (
-                  <li key={c} className="flex items-start gap-2.5">
-                    <CheckCircle
-                      size={15}
-                      className="mt-0.5 shrink-0 text-success-600 dark:text-success-300"
-                    />
-                    <Typography variant="body" className="text-fg-secondary">
-                      {c}
-                    </Typography>
+      {/* ── 8 · How CompliHub360 gets there ───────────────────────────────── */}
+      {/* Three numbered cards, which is the canvas's shape and a better fit for
+          this content than the checklist it replaces: each item is a step in
+          how the engine reaches an answer, and a tick implies a feature that
+          is simply present. HowOrchestrationWorks came out with the checklist —
+          the canvas has no four-step funnel here, and that block already sits
+          on the areas hub one level up, where generic product messaging
+          belongs. Repeating it under every area page was the same argument
+          made eight times. */}
+      {coverage.length > 0 && (
+        <Section className="py-16 desktop-s:py-20">
+          <Container size="xl">
+            <AreaSectionHeading
+              className="max-w-[620px]"
+              eyebrow={eyebrows.process}
+              title={t('compliance.area.coversTitle', 'How CompliHub360 gets there')}
+            />
+            <ol className="mt-10 grid gap-6 tablet:grid-cols-3">
+              {coverage.map((c, i) => {
+                // The engine's copy is one sentence per step. Where it carries
+                // its own break — a dash or a colon — the first clause is the
+                // step's name and the rest explains it, which is how the canvas
+                // sets these. Where it does not, the sentence is the name and
+                // the card simply has no second line. Nothing is invented to
+                // fill one.
+                const m = c.match(/^(.{3,60}?)\s*(?:[–—]|:)\s+(.+)$/);
+                // The clause after the dash starts mid-sentence in the source
+                // string ("… assistant – assesses trading role"). Standing on
+                // its own line it is a sentence, so it gets a capital.
+                const [name, body] = m
+                  ? [m[1], m[2].charAt(0).toLocaleUpperCase(i18n.language) + m[2].slice(1)]
+                  : [c, null];
+                return (
+                  <li
+                    key={c}
+                    className="rounded-xl border border-stroke-subtle p-7"
+                  >
+                    <span className="font-serif text-h3 font-semibold tabular-nums text-fg-brand">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <p className="mt-3.5 text-body font-bold leading-snug text-fg">{name}</p>
+                    {body && (
+                      <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">{body}</p>
+                    )}
                   </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          <HowOrchestrationWorks />
-        </Container>
-      </Section>
-
-      {/* ── 8 · Specialists ───────────────────────────────────────────────── */}
-      <Section className="bg-surface-secondary py-16 desktop-s:py-20">
-        <Container size="xl">
-          <div className="max-w-[820px] rounded-xl border border-stroke-subtle bg-surface p-7">
-            <Typography
-              variant="caption"
-              className="mb-2 flex items-center gap-1.5 font-semibold uppercase tracking-wider text-fg-tertiary"
-            >
-              <Users size={12} />
-              {t('compliance.specialists.label', 'Verified Specialists')}
-            </Typography>
-            <Typography variant="h3" weight="bold" className="text-fg">
-              {t('compliance.area.specialistsTitle', 'Matched to this area, not to a directory')}
-            </Typography>
-            <Typography variant="body" className="mt-2 leading-relaxed text-fg-secondary">
-              {t('compliance.area.specialistsLead', {
-                defaultValue:
-                  'Every specialist is verified for the jurisdictions they claim. Matching runs on your assessment, so you are introduced to the ones whose coverage fits your case.',
+                );
               })}
-            </Typography>
-            <div className="mt-5 flex flex-wrap items-center gap-4">
-              <span className="inline-flex items-center gap-1.5 rounded-md border border-accent-200 bg-accent-100 px-2.5 py-1 text-xs font-bold text-accent-800">
-                <Sparkles size={11} className="text-accent-600" />
-                {t('compliance.specialists.count', '{{count}} verified specialists', {
-                  count: meta.specialistsCount,
-                })}
+            </ol>
+          </Container>
+        </Section>
+      )}
+
+      {/* ── 9 · Specialists · the page's only gold ─────────────────────────── */}
+      {/* The gold edge and the badge are the canvas's, and they are spent here
+          and nowhere else on the page — the same argument as the one dark band.
+          A second gold surface would make this one ordinary. */}
+      <Section className="pb-16 desktop-s:pb-20">
+        <Container size="xl">
+          <div className="flex flex-col gap-8 rounded-xl border border-stroke-subtle border-l-[3px] border-l-accent-500 bg-surface-secondary px-10 py-9 desktop-s:flex-row desktop-s:items-center desktop-s:justify-between desktop-s:gap-12">
+            <div className="max-w-[640px]">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-accent-200 bg-accent-100 px-3 py-1 text-body-3xs font-bold uppercase tracking-[0.06em] text-accent-800">
+                <Check size={12} strokeWidth={2.4} aria-hidden />
+                {t('compliance.specialists.label', 'Verified Specialists')}
               </span>
-              <Link
-                to={`${localePrefix}/search?domain=${area}`}
-                className="inline-flex items-center gap-1.5 text-body-sm font-semibold text-fg-brand underline decoration-dotted underline-offset-4 hover:decoration-solid"
-              >
-                {t('compliance.area.browseSpecialists', 'Browse specialists for this area')}
-                <ArrowRight size={14} />
-              </Link>
+              <Typography variant="h3" as="h2" weight="bold" className="mt-3.5 text-fg">
+                {t('compliance.area.specialistsHeadline', {
+                  defaultValue: '{{count}} verified specialists for {{area}}',
+                  count: meta.specialistsCount,
+                  area: title,
+                })}
+              </Typography>
+              <Typography variant="body" className="mt-2.5 leading-relaxed text-fg-secondary">
+                {t('compliance.area.specialistsLead', {
+                  defaultValue:
+                    'Every specialist is verified for the jurisdictions they claim. Matching runs on your assessment, so you are introduced to the ones whose coverage fits your case.',
+                })}
+              </Typography>
             </div>
+            {/* The canvas labels this button "send engagement request". It
+                goes to the filtered specialist list, so it says that instead:
+                naming an action the control does not perform is the one thing
+                a CTA must never do. */}
+            <Link
+              to={`${localePrefix}/search?domain=${area}`}
+              className="inline-flex h-[3rem] shrink-0 items-center gap-2 self-start rounded-lg bg-primary-700 px-6 text-body-md font-semibold text-white transition-colors hover:bg-primary-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stroke-focus desktop-s:self-auto"
+            >
+              {t('compliance.area.browseSpecialists', 'Browse specialists for this area')}
+              <ArrowRight size={17} strokeWidth={2.2} aria-hidden />
+            </Link>
           </div>
         </Container>
       </Section>
 
-      {/* ── 9 · Related areas ─────────────────────────────────────────────── */}
+      {/* ── 10 · Related areas ────────────────────────────────────────────── */}
       <Section className="py-16 desktop-s:py-20">
         <Container size="xl">
           <RelatedAreas slug={area} />
+        </Container>
+      </Section>
+
+      {/* ── 11 · How the orchestration runs ───────────────────────────────── */}
+      {/* Last, and carrying the wizard CTA. The four steps are not about this
+          area — they are how any area gets from "this applies to me" to a
+          specialist who has answered — so they belong after the area is done
+          being explained, not in the middle of it. A reader who has followed
+          them has exactly one next move, and it is the assessment. */}
+      <Section className="bg-surface-secondary py-16 desktop-s:py-20">
+        <Container size="xl">
+          <HowOrchestrationWorks
+            cta={
+              <Button variant="primary" size="lg" onClick={startAssessment}>
+                {t('compliance.startAssessment', 'Start {{title}} Assessment', { title })}
+                <ArrowRight size={16} className="ml-1.5" />
+              </Button>
+            }
+          />
         </Container>
       </Section>
 

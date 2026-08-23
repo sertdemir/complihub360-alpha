@@ -560,8 +560,7 @@
       "timelineLead": "{{deferred}} der {{total}} Pflichten sind beschlossen, aber noch nicht anwendbar. Das ist der Unterschied zwischen „gilt“ und „kommt“.",
       "marketsTitle": "Derselbe Bereich, acht Gewichte",
       "marketsLead": "{{top}} gewichtet diesen Bereich am schwersten — {{topWeight}} von 10, gegenüber {{second}} mit {{secondWeight}}. Wer beide Märkte bedient, plant nach {{top}}.",
-      "coversTitle": "Was CompliHub360 abdeckt",
-      "specialistsTitle": "Passend zum Bereich, nicht aus dem Verzeichnis",
+      "coversTitle": "So kommt CompliHub360 dahin",
       "specialistsLead": "Jeder Spezialist ist für die Jurisdiktionen geprüft, die er angibt. Das Matching läuft über Ihr Assessment — Sie treffen die, deren Abdeckung zu Ihrem Fall passt.",
       "browseSpecialists": "Spezialisten für diesen Bereich ansehen",
       "relatedTitle": "Bereiche, die damit einhergehen",
@@ -651,7 +650,8 @@
       "enforcementLeadEu": "Die Zahlen stammen aus den Quellen, die die Engine auf EU-Ebene führt — {{count}} Pflichten mit benanntem Bußgeldrahmen. Obergrenzen, wie sie dort stehen, keine Erwartungswerte.",
       "timelineLeadAllLive": "Jede Pflicht in diesem Bereich gilt heute. Was sich je Markt ändert, ist die Vorlaufzeit, die jede einzelne braucht.",
       "marketsLeadTied": "{{count}} Märkte gewichten diesen Bereich gleich schwer ({{weight}} von 10). Wer mehrere bedient, plant nach dem strengsten.",
-      "localSourcesNote": "In {{count}} der {{total}} Märkte führt die Engine mindestens eine lokale Quelle für diesen Bereich. Sonst gilt das EU-Instrument — und wird auch so ausgewiesen."
+      "localSourcesNote": "In {{count}} der {{total}} Märkte führt die Engine mindestens eine lokale Quelle für diesen Bereich. Sonst gilt das EU-Instrument — und wird auch so ausgewiesen.",
+      "specialistsHeadline": "{{count}} geprüfte Spezialisten für {{area}}"
     },
     "riskBadge": "Risiko: {{level}}"
   },

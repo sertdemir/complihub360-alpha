@@ -560,8 +560,7 @@
       "timelineLead": "{{deferred}} of the {{total}} duties are settled law but not yet applicable. That is the difference between “applies” and “is coming”.",
       "marketsTitle": "The same area, eight weights",
       "marketsLead": "{{top}} weights this area most heavily — {{topWeight}} out of 10, against {{second}} at {{secondWeight}}. Whoever serves both plans to {{top}}.",
-      "coversTitle": "What CompliHub360 covers",
-      "specialistsTitle": "Matched to this area, not to a directory",
+      "coversTitle": "How CompliHub360 gets there",
       "specialistsLead": "Every specialist is verified for the jurisdictions they claim. Matching runs on your assessment, so you are introduced to the ones whose coverage fits your case.",
       "browseSpecialists": "Browse specialists for this area",
       "relatedTitle": "Areas that travel with this one",
@@ -651,7 +650,8 @@
       "enforcementLeadEu": "The figures come from the sources the engine holds at EU level — {{count}} duties with a stated penalty range. Upper bounds as written, not an expected cost.",
       "timelineLeadAllLive": "Every duty in this area applies today. What changes by market is the lead time each one needs.",
       "marketsLeadTied": "{{count}} markets weight this area equally heavily ({{weight}} out of 10). Serving more than one means planning to the strictest of them.",
-      "localSourcesNote": "The engine holds at least one local source for this area in {{count}} of the {{total}} markets. Elsewhere the EU-level instrument is what applies, and it is shown as such."
+      "localSourcesNote": "The engine holds at least one local source for this area in {{count}} of the {{total}} markets. Elsewhere the EU-level instrument is what applies, and it is shown as such.",
+      "specialistsHeadline": "{{count}} verified specialists for {{area}}"
     },
     "riskBadge": "{{level}} Risk"
   },
