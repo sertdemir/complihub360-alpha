@@ -86,17 +86,32 @@ gesamte Durchsetzungsband: zwei Zahlen sind keine Section.
 
 Daten: `profile.obligations`, gruppiert nach `due`.
 
-### 05 · Deckung — existiert nur hier
-Was die Engine für diesen Markt **nicht** lokal führt. Je fehlendem Bereich
-eine Karte: Name, Gewicht als Pille, warum es EU-Recht ist, das geltende
-Instrument.
+### 05 · Deckung — bedingt, existiert nur hier
 
-Für Deutschland steht hier Daten & Datenschutz — der Bereich mit dem
-**höchsten** Gewicht (10/10), ohne deutsche Quelle, weil die DSGVO eine
-Verordnung ist. Fällt weg, wenn ein Markt alle acht Bereiche abdeckt
-(heute kein Markt).
+Was die Engine für diesen Markt **nicht** lokal führt — und nur, wo das
+tatsächlich eine Lücke ist.
 
-Daten: `profile.weights` minus `profile.byDomain`.
+**Auf der deutschen Seite fehlt diese Section, und das ist richtig.**
+Deutschland hat null echte Lücken. Was der erste Entwurf hier zeigte — Daten &
+Datenschutz, Produkt-Compliance — sind DSGVO und GPSR: Verordnungen, die
+unmittelbar gelten. Es gibt keinen deutschen Text zu führen; das **ist** die
+geltende Norm. Sie als Lücke auszuweisen hieß, das Recht als Loch in unseren
+Daten auszugeben.
+
+Wie sie aussieht, wenn sie greift: eigenes Artboard, Türkei (4 von 4).
+
+Zwei Kartenarten, weil es zwei Fälle sind:
+
+| `kind` | Karte sagt | Quelle |
+|---|---|---|
+| `placeholder` | „Keine Quelle" | keine — es wird auch keine gezeigt |
+| `national-pending` | „EU-Quelle steht ein" | die EU-Norm, benannt |
+
+Daten: `getMarketProfile(code).gaps` — enthält `scope: 'eu'`-Einträge per
+Konstruktion nicht. Section fällt komplett weg bei `gaps.length === 0`.
+
+Gemessen, über alle acht Märkte: DE 0 · UK 1 · FR 1 · IT 1 · ES 1 · NL 1 ·
+US 2 · TR 4.
 
 ### 06 · Weiter — andere Märkte
 = `RelatedAreas`, transponiert. Drei Karten mit Glyph 56px, Risiko-Pille,
@@ -144,6 +159,10 @@ aus `getMarketProfile(code)`.
    bei `celex` auf der Bereichsseite geschehen ist.
 2. `MarketObligation` führt kein `severity`. → `SUBDOMAIN_META[...].riskWeight`
    durch `severityFromRiskWeight` schicken.
+
+`gaps` ist bereits erledigt: `getMarketProfile(code).gaps` liefert die
+Deckungslücken, und `ObligationEnrichment.scope` unterscheidet seit dem
+Scope-Commit Verordnung / nationale Fassung fehlt / Platzhalter.
 
 ## Abweichungen vom Canvas — bewusst
 
