@@ -556,9 +556,8 @@
       "coverageNote": "Die Engine trägt {{count}} Pflichten für diesen Bereich, davon {{specific}} mit einer Quelle speziell für {{market}}. Die Deckung ist je Markt ungleich und wächst, sobald Quellen geprüft sind.",
       "enforcementTitle": "Wer prüft, und was es kostet",
       "enforcementLead": "Die Zahlen stammen aus den Quellen, die die Engine für {{market}} führt — {{count}} Pflichten mit benanntem Bußgeldrahmen. Obergrenzen, wie sie dort stehen, keine Erwartungswerte.",
-      "timelineTitle": "Was wann fällig wird",
-      "timelineLead": "Meldeturnus und typische Vorlaufzeit je Pflicht. Kürzeste Vorlaufzeit zuerst — das sind die, die Teams überraschen.",
-      "futureNote": "{{count}} davon greifen noch nicht. Sie stehen hier, weil die Vorbereitungszeit deutlich vor dem Stichtag beginnt.",
+      "timelineTitle": "Was wann greift",
+      "timelineLead": "{{deferred}} der {{total}} Pflichten sind beschlossen, aber noch nicht anwendbar. Das ist der Unterschied zwischen „gilt“ und „kommt“.",
       "marketsTitle": "Wo das am schwersten wiegt",
       "marketsLead": "Wie jeder von der Engine profilierte Markt diesen Bereich gewichtet und für wie viele Pflichten er eine lokale Quelle hält.",
       "localSources": "{{count}} lokale Quellen",
@@ -599,7 +598,14 @@
         "marketsCompared": "{{count}} Märkte im Vergleich"
       },
       "timeline": {
-        "liveNow": "Gilt heute"
+        "liveNow": "Gilt heute",
+        "today": "Heute",
+        "activeCount": "{{count}} Pflichten aktiv",
+        "togetherCount": "{{count}} Pflichten auf einmal",
+        "liveDetail": "{{names}} gelten laufend — die nächste Meldung ist in {{days}} Tagen fällig.",
+        "liveDetailNoLead": "{{names}} gelten laufend.",
+        "aheadOne": "{{source}} wird anwendbar.",
+        "aheadMany": "{{names}} greifen am selben Tag."
       },
       "fact": {
         "source": "Rechtsgrundlage",
@@ -643,7 +649,8 @@
       "enforcementRank": "Rang {{rank}} von {{total}} Märkten",
       "enforcementAvg": "Durchschnitt über {{total}} Märkte",
       "authorities": "Zuständige Behörden",
-      "enforcementLeadEu": "Die Zahlen stammen aus den Quellen, die die Engine auf EU-Ebene führt — {{count}} Pflichten mit benanntem Bußgeldrahmen. Obergrenzen, wie sie dort stehen, keine Erwartungswerte."
+      "enforcementLeadEu": "Die Zahlen stammen aus den Quellen, die die Engine auf EU-Ebene führt — {{count}} Pflichten mit benanntem Bußgeldrahmen. Obergrenzen, wie sie dort stehen, keine Erwartungswerte.",
+      "timelineLeadAllLive": "Jede Pflicht in diesem Bereich gilt heute. Was sich je Markt ändert, ist die Vorlaufzeit, die jede einzelne braucht."
     },
     "riskBadge": "Risiko: {{level}}"
   },

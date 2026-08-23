@@ -556,9 +556,8 @@
       "coverageNote": "El motor registra {{count}} obligaciones para esta área, {{specific}} de ellas con una fuente específica de {{market}}. La cobertura es desigual por mercado y crece a medida que se verifican fuentes.",
       "enforcementTitle": "Quién controla y cuánto cuesta",
       "enforcementLead": "Las cifras proceden de las fuentes que el motor mantiene para {{market}}: {{count}} obligaciones con un rango de sanción declarado. Son límites máximos tal como están escritos, no un coste esperado.",
-      "timelineTitle": "Qué vence y cuándo",
-      "timelineLead": "Periodicidad de presentación y plazo típico por obligación. Primero el plazo más corto — son los que pillan desprevenidos.",
-      "futureNote": "{{count}} de estas aún no son exigibles. Aparecen porque el tiempo de preparación empieza mucho antes que la fecha.",
+      "timelineTitle": "Qué se aplica y cuándo",
+      "timelineLead": "{{deferred}} de las {{total}} obligaciones ya están aprobadas pero aún no son aplicables. Esa es la diferencia entre «se aplica» y «llega».",
       "marketsTitle": "Dónde pesa más",
       "marketsLead": "Cómo pondera esta área cada mercado que el motor perfila, y para cuántas obligaciones dispone de fuente local.",
       "localSources": "{{count}} fuentes locales",
@@ -599,7 +598,14 @@
         "marketsCompared": "{{count}} mercados comparados"
       },
       "timeline": {
-        "liveNow": "Se aplica hoy"
+        "liveNow": "Se aplica hoy",
+        "today": "Hoy",
+        "activeCount": "{{count}} obligaciones activas",
+        "togetherCount": "{{count}} obligaciones a la vez",
+        "liveDetail": "{{names}} se aplican de forma continua; la próxima presentación vence en {{days}} días.",
+        "liveDetailNoLead": "{{names}} se aplican de forma continua.",
+        "aheadOne": "{{source}} pasa a ser aplicable.",
+        "aheadMany": "{{names}} entran en vigor el mismo día."
       },
       "fact": {
         "source": "Base jurídica",
@@ -643,7 +649,8 @@
       "enforcementRank": "puesto {{rank}} de {{total}} mercados",
       "enforcementAvg": "media de los {{total}} mercados",
       "authorities": "Autoridades competentes",
-      "enforcementLeadEu": "Las cifras proceden de las fuentes que el motor mantiene a nivel de la UE: {{count}} obligaciones con un rango de sanción declarado. Son límites máximos tal como están escritos, no un coste esperado."
+      "enforcementLeadEu": "Las cifras proceden de las fuentes que el motor mantiene a nivel de la UE: {{count}} obligaciones con un rango de sanción declarado. Son límites máximos tal como están escritos, no un coste esperado.",
+      "timelineLeadAllLive": "Todas las obligaciones de esta área se aplican hoy. Lo que cambia según el mercado es el plazo de preparación que necesita cada una."
     },
     "riskBadge": "Riesgo: {{level}}"
   },

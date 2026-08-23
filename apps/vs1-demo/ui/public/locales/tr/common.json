@@ -556,9 +556,8 @@
       "coverageNote": "Motor bu alan için {{count}} yükümlülük taşıyor; bunların {{specific}} tanesinde {{market}} pazarına özgü kaynak var. Kapsam pazara göre değişir ve kaynaklar doğrulandıkça büyür.",
       "enforcementTitle": "Kim denetler ve maliyeti nedir",
       "enforcementLead": "Rakamlar motorun {{market}} için tuttuğu kaynaklardan geliyor — ceza aralığı belirtilmiş {{count}} yükümlülük. Yazıldığı haliyle üst sınırlar, beklenen maliyet değil.",
-      "timelineTitle": "Ne zaman neyin vadesi geliyor",
-      "timelineLead": "Yükümlülük başına bildirim sıklığı ve tipik hazırlık süresi. En kısa süre önce — ekipleri hazırlıksız yakalayanlar bunlar.",
-      "futureNote": "Bunlardan {{count}} tanesi henüz yürürlükte değil. Hazırlık süresi tarihten çok önce başladığı için listelendiler.",
+      "timelineTitle": "Ne zaman neyin geçerli olduğu",
+      "timelineLead": "{{total}} yükümlülüğün {{deferred}} tanesi yasalaştı ama henüz uygulanabilir değil. “Geçerli” ile “geliyor” arasındaki fark budur.",
       "marketsTitle": "Bu en çok nerede ağırlık taşıyor",
       "marketsLead": "Motorun profillediği her pazarın bu alana verdiği ağırlık ve kaç yükümlülük için yerel kaynak tuttuğu.",
       "localSources": "{{count}} yerel kaynak",
@@ -599,7 +598,14 @@
         "marketsCompared": "{{count}} pazar karşılaştırıldı"
       },
       "timeline": {
-        "liveNow": "Bugün geçerli"
+        "liveNow": "Bugün geçerli",
+        "today": "Bugün",
+        "activeCount": "{{count}} yükümlülük aktif",
+        "togetherCount": "Aynı anda {{count}} yükümlülük",
+        "liveDetail": "{{names}} sürekli geçerli — bir sonraki bildirim {{days}} gün içinde.",
+        "liveDetailNoLead": "{{names}} sürekli geçerli.",
+        "aheadOne": "{{source}} uygulanabilir hale geliyor.",
+        "aheadMany": "{{names}} aynı gün yürürlüğe giriyor."
       },
       "fact": {
         "source": "Yasal dayanak",
@@ -643,7 +649,8 @@
       "enforcementRank": "{{total}} pazar içinde {{rank}}. sıra",
       "enforcementAvg": "{{total}} pazarın ortalaması",
       "authorities": "Yetkili makamlar",
-      "enforcementLeadEu": "Rakamlar motorun AB düzeyinde tuttuğu kaynaklardan geliyor — ceza aralığı belirtilmiş {{count}} yükümlülük. Yazıldığı haliyle üst sınırlar, beklenen maliyet değil."
+      "enforcementLeadEu": "Rakamlar motorun AB düzeyinde tuttuğu kaynaklardan geliyor — ceza aralığı belirtilmiş {{count}} yükümlülük. Yazıldığı haliyle üst sınırlar, beklenen maliyet değil.",
+      "timelineLeadAllLive": "Bu alandaki her yükümlülük bugün geçerli. Pazara göre değişen şey, her birinin gerektirdiği hazırlık süresi."
     },
     "riskBadge": "Risk: {{level}}"
   },

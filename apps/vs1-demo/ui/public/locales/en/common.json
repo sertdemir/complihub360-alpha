@@ -556,9 +556,8 @@
       "coverageNote": "The engine carries {{count}} duties for this area, {{specific}} of them with a source specific to {{market}}. Coverage is uneven by market and grows as sources are verified.",
       "enforcementTitle": "Who checks, and what it costs",
       "enforcementLead": "The figures come from the sources the engine holds for {{market}} — {{count}} duties with a stated penalty range. Upper bounds as written, not an expected cost.",
-      "timelineTitle": "What falls due, and when",
-      "timelineLead": "Filing cadence and typical lead time per duty. Shortest lead time first — those are the ones that catch teams out.",
-      "futureNote": "{{count}} of these do not bite yet. They are listed because the lead time for preparing them starts well before the date does.",
+      "timelineTitle": "What applies when",
+      "timelineLead": "{{deferred}} of the {{total}} duties are settled law but not yet applicable. That is the difference between “applies” and “is coming”.",
       "marketsTitle": "Where this weighs heaviest",
       "marketsLead": "How each market the engine profiles weights this area, and how many duties it holds a local source for.",
       "localSources": "{{count}} local sources",
@@ -599,7 +598,14 @@
         "marketsCompared": "{{count}} markets compared"
       },
       "timeline": {
-        "liveNow": "Applies today"
+        "liveNow": "Applies today",
+        "today": "Today",
+        "activeCount": "{{count}} duties active",
+        "togetherCount": "{{count}} duties at once",
+        "liveDetail": "{{names}} apply on an ongoing basis — the next filing is due in {{days}} days.",
+        "liveDetailNoLead": "{{names}} apply on an ongoing basis.",
+        "aheadOne": "{{source}} becomes applicable.",
+        "aheadMany": "{{names}} all land on the same day."
       },
       "fact": {
         "source": "Legal basis",
@@ -643,7 +649,8 @@
       "enforcementRank": "rank {{rank}} of {{total}} markets",
       "enforcementAvg": "average across {{total}} markets",
       "authorities": "Competent authorities",
-      "enforcementLeadEu": "The figures come from the sources the engine holds at EU level — {{count}} duties with a stated penalty range. Upper bounds as written, not an expected cost."
+      "enforcementLeadEu": "The figures come from the sources the engine holds at EU level — {{count}} duties with a stated penalty range. Upper bounds as written, not an expected cost.",
+      "timelineLeadAllLive": "Every duty in this area applies today. What changes by market is the lead time each one needs."
     },
     "riskBadge": "{{level}} Risk"
   },
