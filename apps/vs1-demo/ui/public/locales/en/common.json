@@ -352,8 +352,7 @@
       }
     },
     "specialists": {
-      "label": "Verified Specialists",
-      "count": "{{count}} verified specialists"
+      "label": "Verified Specialists"
     },
     "risk": {
       "subtitle": "Weighted for {{market}} by the compliance engine.",
@@ -548,7 +547,6 @@
     "area": {
       "allAreas": "All areas",
       "notFound": "That compliance area does not exist.",
-      "findSpecialist": "Find a specialist",
       "obligationsTitle": "What this area actually requires",
       "obligationsLead": "Every duty below traces to a named statute. Switch market to see the source that applies there.",
       "euWideSource": "EU-wide source",
@@ -561,8 +559,6 @@
       "marketsTitle": "The same area, eight weights",
       "marketsLead": "{{top}} weights this area most heavily — {{topWeight}} out of 10, against {{second}} at {{secondWeight}}. Whoever serves both plans to {{top}}.",
       "coversTitle": "How CompliHub360 gets there",
-      "specialistsLead": "Every specialist is verified for the jurisdictions they claim. Matching runs on your assessment, so you are introduced to the ones whose coverage fits your case.",
-      "browseSpecialists": "Browse specialists for this area",
       "relatedTitle": "Areas that travel with this one",
       "relatedLead": "These share triggers with the area you are reading — the same fact about your business pulls them in too.",
       "ctaTitle": "Ready to see what applies to you?",
@@ -651,7 +647,9 @@
       "timelineLeadAllLive": "Every duty in this area applies today. What changes by market is the lead time each one needs.",
       "marketsLeadTied": "{{count}} markets weight this area equally heavily ({{weight}} out of 10). Serving more than one means planning to the strictest of them.",
       "localSourcesNote": "The engine holds at least one local source for this area in {{count}} of the {{total}} markets. Elsewhere the EU-level instrument is what applies, and it is shown as such.",
-      "specialistsHeadline": "{{count}} verified specialists for {{area}}"
+      "askTitle": "A specific question about {{area}}?",
+      "askLead": "Ask it in your own words and get an answer with its sources named. The assessment below is the longer way round — it maps the whole area to your business instead of answering one question.",
+      "askQuestion": "Ask a question"
     },
     "riskBadge": "{{level}} Risk"
   },

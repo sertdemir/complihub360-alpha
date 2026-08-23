@@ -352,8 +352,7 @@
       }
     },
     "specialists": {
-      "label": "Especialistas verificados",
-      "count": "{{count}} especialistas verificados"
+      "label": "Especialistas verificados"
     },
     "risk": {
       "subtitle": "Ponderado para {{market}} por el motor de cumplimiento.",
@@ -548,7 +547,6 @@
     "area": {
       "allAreas": "Todas las áreas",
       "notFound": "Esa área de cumplimiento no existe.",
-      "findSpecialist": "Buscar especialista",
       "obligationsTitle": "Qué exige realmente esta área",
       "obligationsLead": "Cada obligación remite a una norma concreta. Cambie de mercado para ver la fuente que se aplica allí.",
       "euWideSource": "Fuente a nivel UE",
@@ -561,8 +559,6 @@
       "marketsTitle": "La misma área, ocho pesos",
       "marketsLead": "{{top}} es el mercado que más peso da a esta área: {{topWeight}} sobre 10, frente a {{second}} con {{secondWeight}}. Quien atienda ambos planifica según {{top}}.",
       "coversTitle": "Cómo llega CompliHub360 hasta ahí",
-      "specialistsLead": "Cada especialista está verificado para las jurisdicciones que declara. El emparejamiento parte de su evaluación, así que conoce a quienes encajan con su caso.",
-      "browseSpecialists": "Ver especialistas de esta área",
       "relatedTitle": "Áreas que van de la mano con esta",
       "relatedLead": "Comparten desencadenantes con el área que está leyendo — el mismo hecho de su negocio también las activa.",
       "ctaTitle": "¿Listo para ver qué le aplica?",
@@ -651,7 +647,9 @@
       "timelineLeadAllLive": "Todas las obligaciones de esta área se aplican hoy. Lo que cambia según el mercado es el plazo de preparación que necesita cada una.",
       "marketsLeadTied": "{{count}} mercados dan a esta área el mismo peso ({{weight}} sobre 10). Atender varios significa planificar según el más estricto.",
       "localSourcesNote": "El motor mantiene al menos una fuente local para esta área en {{count}} de los {{total}} mercados. En el resto se aplica el instrumento de la UE, y así se indica.",
-      "specialistsHeadline": "{{count}} especialistas verificados para {{area}}"
+      "askTitle": "¿Una pregunta concreta sobre {{area}}?",
+      "askLead": "Formúlela con sus propias palabras y obtenga una respuesta con las fuentes citadas. La evaluación de más abajo es el camino largo: traza toda el área sobre su empresa en lugar de responder a una sola pregunta.",
+      "askQuestion": "Hacer una pregunta"
     },
     "riskBadge": "Riesgo: {{level}}"
   },

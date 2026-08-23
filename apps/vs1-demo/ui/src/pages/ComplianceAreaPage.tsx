@@ -215,14 +215,19 @@ export function ComplianceAreaPage() {
                   <ArrowRight size={17} className="ml-1.5" />
                 </Button>
                 {/* Outline on a white ground, not the filled secondary: next to
-                    the petrol CTA a grey fill reads as a second primary. */}
+                    the petrol CTA a grey fill reads as a second primary.
+
+                    It used to say "find a specialist" and carry ?domain= to
+                    /search, which reads only ?q= — so it promised a filtered
+                    list of specialists and delivered a free-text box. It now
+                    says what that box is. */}
                 <Button
                   size="lg"
                   variant="outline"
                   className="bg-surface"
-                  onClick={() => navigate(`${localePrefix}/search?domain=${area}`)}
+                  onClick={() => navigate(`${localePrefix}/search`)}
                 >
-                  {t('compliance.area.findSpecialist', 'Find a specialist')}
+                  {t('compliance.area.askQuestion', 'Ask a question')}
                 </Button>
               </div>
 
@@ -390,41 +395,45 @@ export function ComplianceAreaPage() {
         </Section>
       )}
 
-      {/* ── 9 · Specialists · the page's only gold ─────────────────────────── */}
-      {/* The gold edge and the badge are the canvas's, and they are spent here
-          and nowhere else on the page — the same argument as the one dark band.
-          A second gold surface would make this one ordinary. */}
+      {/* ── 9 · Ask · the page's only gold, and its only input ────────────── */}
+      {/* This was a specialists band, and every claim in it was false. The
+          count came from a literal in areas.ts — 8 for this area, 12 for tax,
+          numbers nobody derived from a registry, because the app has no
+          provider registry. "Verified" verified nothing. And the button
+          carried ?domain= to /search, which reads only ?q=, so it promised a
+          filtered specialist list and delivered a free-text box.
+
+          Specialists belong after sign-up and anonymised, which is later than
+          this page. What is true here and now is the free-text box itself —
+          the one thing an area page offers besides reading, and the fast lane
+          past the wizard. So the band offers that, and the gold stays because
+          it still marks the page's single invitation to act.
+
+          The funnel is intact and nothing in it is claimed early: a question
+          now, the assessment in the closing band, specialists once there is
+          something to introduce. */}
       <Section className="pb-16 desktop-s:pb-20">
         <Container size="xl">
           <div className="flex flex-col gap-8 rounded-xl border border-stroke-subtle border-l-[3px] border-l-accent-500 bg-surface-secondary px-10 py-9 desktop-s:flex-row desktop-s:items-center desktop-s:justify-between desktop-s:gap-12">
             <div className="max-w-[640px]">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-accent-200 bg-accent-100 px-3 py-1 text-body-3xs font-bold uppercase tracking-[0.06em] text-accent-800">
-                <Check size={12} strokeWidth={2.4} aria-hidden />
-                {t('compliance.specialists.label', 'Verified Specialists')}
-              </span>
-              <Typography variant="h3" as="h2" weight="bold" className="mt-3.5 text-fg">
-                {t('compliance.area.specialistsHeadline', {
-                  defaultValue: '{{count}} verified specialists for {{area}}',
-                  count: meta.specialistsCount,
+              <Typography variant="h3" as="h2" weight="bold" className="text-fg">
+                {t('compliance.area.askTitle', {
+                  defaultValue: 'A specific question about {{area}}?',
                   area: title,
                 })}
               </Typography>
               <Typography variant="body" className="mt-2.5 leading-relaxed text-fg-secondary">
-                {t('compliance.area.specialistsLead', {
+                {t('compliance.area.askLead', {
                   defaultValue:
-                    'Every specialist is verified for the jurisdictions they claim. Matching runs on your assessment, so you are introduced to the ones whose coverage fits your case.',
+                    'Ask it in your own words and get an answer with its sources named. The assessment below is the longer way round — it maps the whole area to your business instead of answering one question.',
                 })}
               </Typography>
             </div>
-            {/* The canvas labels this button "send engagement request". It
-                goes to the filtered specialist list, so it says that instead:
-                naming an action the control does not perform is the one thing
-                a CTA must never do. */}
             <Link
-              to={`${localePrefix}/search?domain=${area}`}
+              to={`${localePrefix}/search`}
               className="inline-flex h-[3rem] shrink-0 items-center gap-2 self-start rounded-lg bg-primary-700 px-6 text-body-md font-semibold text-white transition-colors hover:bg-primary-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stroke-focus desktop-s:self-auto"
             >
-              {t('compliance.area.browseSpecialists', 'Browse specialists for this area')}
+              {t('compliance.area.askQuestion', 'Ask a question')}
               <ArrowRight size={17} strokeWidth={2.2} aria-hidden />
             </Link>
           </div>

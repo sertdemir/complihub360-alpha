@@ -57,5 +57,4 @@ export interface AreaConfig {
   id: AreaKey;
   icon: ElementType;
   wizardPath: string;
-  specialistsCount: number;
 }

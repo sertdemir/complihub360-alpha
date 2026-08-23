@@ -29,18 +29,17 @@ export interface AreaMeta {
   /** Wizard entry point. Mirrors the slug except where the wizard predates it. */
   wizardPath: string;
   /** TODO: replace with verified counts from the provider DB. */
-  specialistsCount: number;
 }
 
 const META: Record<DomainSlug, Omit<AreaMeta, 'slug'>> = {
-  'tax-vat': { icon: Receipt, wizardPath: '/wizard/tax-vat', specialistsCount: 12 },
-  'product-packaging': { icon: Recycle, wizardPath: '/wizard/epr', specialistsCount: 8 },
-  'data-privacy': { icon: ShieldCheck, wizardPath: '/wizard/data-privacy', specialistsCount: 14 },
-  'marketing-seo': { icon: Megaphone, wizardPath: '/wizard/marketing-seo', specialistsCount: 5 },
-  'corporate-structure': { icon: Building2, wizardPath: '/wizard/corporate', specialistsCount: 6 },
-  'product-compliance': { icon: BadgeCheck, wizardPath: '/wizard/product-compliance', specialistsCount: 4 },
-  'logistics-customs': { icon: Truck, wizardPath: '/wizard/logistics-customs', specialistsCount: 3 },
-  'legal-advisory': { icon: Scale, wizardPath: '/wizard/legal-advisory', specialistsCount: 7 },
+  'tax-vat': { icon: Receipt, wizardPath: '/wizard/tax-vat' },
+  'product-packaging': { icon: Recycle, wizardPath: '/wizard/epr' },
+  'data-privacy': { icon: ShieldCheck, wizardPath: '/wizard/data-privacy' },
+  'marketing-seo': { icon: Megaphone, wizardPath: '/wizard/marketing-seo' },
+  'corporate-structure': { icon: Building2, wizardPath: '/wizard/corporate' },
+  'product-compliance': { icon: BadgeCheck, wizardPath: '/wizard/product-compliance' },
+  'logistics-customs': { icon: Truck, wizardPath: '/wizard/logistics-customs' },
+  'legal-advisory': { icon: Scale, wizardPath: '/wizard/legal-advisory' },
 };
 
 /** The eight areas in canonical order. */

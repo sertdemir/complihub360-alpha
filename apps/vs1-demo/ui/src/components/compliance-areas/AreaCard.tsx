@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, ScrollText, Users } from 'lucide-react';
+import { ArrowRight, ScrollText } from 'lucide-react';
 import { severityFromRiskWeight } from '@complihub/compliance-engine';
 import { Typography } from '../ui/Typography';
 import { RiskBadge } from '../ui/RiskBadge';
@@ -93,12 +93,6 @@ export function AreaCard({ area, index, selectedCountry }: Props) {
           <span className="inline-flex items-center gap-1.5 text-body-3xs font-semibold text-fg-tertiary">
             <ScrollText size={12} />
             {t('compliance.card.obligations', '{{count}} obligations', { count: obligations.length })}
-          </span>
-          <span className="inline-flex items-center gap-1.5 text-body-3xs font-semibold text-fg-tertiary">
-            <Users size={12} />
-            {t('compliance.specialists.count', '{{count}} verified specialists', {
-              count: area.specialistsCount,
-            })}
           </span>
           {marketSpecific > 0 && selectedCountry !== 'EU' && (
             <span className="text-body-3xs font-semibold text-fg-brand">

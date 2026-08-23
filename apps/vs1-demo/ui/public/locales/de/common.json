@@ -352,8 +352,7 @@
       }
     },
     "specialists": {
-      "label": "Verifizierte Spezialisten",
-      "count": "{{count}} verifizierte Spezialisten"
+      "label": "Verifizierte Spezialisten"
     },
     "risk": {
       "subtitle": "Von der Compliance-Engine für {{market}} gewichtet.",
@@ -548,7 +547,6 @@
     "area": {
       "allAreas": "Alle Bereiche",
       "notFound": "Diesen Compliance-Bereich gibt es nicht.",
-      "findSpecialist": "Spezialisten finden",
       "obligationsTitle": "Was dieser Bereich tatsächlich verlangt",
       "obligationsLead": "Jede Pflicht unten führt auf eine benannte Rechtsgrundlage zurück. Markt wechseln zeigt die Quelle, die dort gilt.",
       "euWideSource": "EU-weite Quelle",
@@ -561,8 +559,6 @@
       "marketsTitle": "Derselbe Bereich, acht Gewichte",
       "marketsLead": "{{top}} gewichtet diesen Bereich am schwersten — {{topWeight}} von 10, gegenüber {{second}} mit {{secondWeight}}. Wer beide Märkte bedient, plant nach {{top}}.",
       "coversTitle": "So kommt CompliHub360 dahin",
-      "specialistsLead": "Jeder Spezialist ist für die Jurisdiktionen geprüft, die er angibt. Das Matching läuft über Ihr Assessment — Sie treffen die, deren Abdeckung zu Ihrem Fall passt.",
-      "browseSpecialists": "Spezialisten für diesen Bereich ansehen",
       "relatedTitle": "Bereiche, die damit einhergehen",
       "relatedLead": "Diese teilen Auslöser mit dem Bereich, den Sie gerade lesen — derselbe Umstand in Ihrem Unternehmen zieht sie mit.",
       "ctaTitle": "Bereit zu sehen, was für Sie gilt?",
@@ -651,7 +647,9 @@
       "timelineLeadAllLive": "Jede Pflicht in diesem Bereich gilt heute. Was sich je Markt ändert, ist die Vorlaufzeit, die jede einzelne braucht.",
       "marketsLeadTied": "{{count}} Märkte gewichten diesen Bereich gleich schwer ({{weight}} von 10). Wer mehrere bedient, plant nach dem strengsten.",
       "localSourcesNote": "In {{count}} der {{total}} Märkte führt die Engine mindestens eine lokale Quelle für diesen Bereich. Sonst gilt das EU-Instrument — und wird auch so ausgewiesen.",
-      "specialistsHeadline": "{{count}} geprüfte Spezialisten für {{area}}"
+      "askTitle": "Eine konkrete Frage zu {{area}}?",
+      "askLead": "Stellen Sie sie in eigenen Worten und bekommen Sie eine Antwort mit benannten Quellen. Das Assessment weiter unten ist der längere Weg — es bildet den ganzen Bereich auf Ihr Unternehmen ab, statt eine Frage zu beantworten.",
+      "askQuestion": "Frage stellen"
     },
     "riskBadge": "Risiko: {{level}}"
   },
