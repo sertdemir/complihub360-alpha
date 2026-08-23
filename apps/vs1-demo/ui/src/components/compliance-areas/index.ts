@@ -5,7 +5,6 @@ export { AreaMetrics } from './AreaMetrics';
 export { AreaRiskCard } from './AreaRiskCard';
 export { AreaSectionHeading, useAreaEyebrows } from './AreaSectionHeading';
 export { AreaSwitcher } from './AreaSwitcher';
-export { MarketSwitcher } from './MarketSwitcher';
 export { MarketProfileCard } from './MarketProfileCard';
 export { MarketWeights } from './MarketWeights';
 export { MarketCalendar } from './MarketCalendar';

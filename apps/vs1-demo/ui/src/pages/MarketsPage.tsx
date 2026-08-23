@@ -13,7 +13,6 @@ import {
   MarketCalendar,
   MarketCoverage,
   MarketProfileCard,
-  MarketSwitcher,
   MarketWeights,
   RelatedMarkets,
 } from '../components/compliance-areas';
@@ -243,14 +242,25 @@ export function MarketPage() {
 
   return (
     <main className="bg-surface">
-      {/* ── 1 · Switcher ─────────────────────────────────────────────────── */}
-      <MarketSwitcher current={profile.code} />
-
-      {/* ── 2 · Hero ─────────────────────────────────────────────────────── */}
+      {/* ── 1 · Hero ─────────────────────────────────────────────────────── */}
       {/* No metric band. The four figures are pills here, because a full-bleed
           band of serif numbers is the AREA page's signature and a second one
-          was the loudest reason both page types read as the same page. */}
-      <section className="bg-surface pb-14 pt-[7.2rem] desktop-s:pb-[4.5rem] desktop-s:pt-[9.6rem]">
+          was the loudest reason both page types read as the same page.
+
+          NO LATERAL SWITCHER either, unlike the area page. The header's own
+          markets menu already opens all eight, so a second one under it was
+          the same control twice — and its area menu pointed OUT of markets
+          entirely, which is the one direction this page should not offer: a
+          market page is where a market is planned, and the way into an area is
+          the weights table further down, in context.
+
+          The padding therefore carries what the bar used to occupy, and the
+          two values are measured rather than derived: they put the eyebrow the
+          same distance below the fixed header as the area page's does — 104px
+          at desktop, 80 at 390 — where the header is 113px and 97px tall. The
+          first guess at this was 5px out at desktop and 4px at mobile, which is
+          exactly why it was measured a second time. */}
+      <section className="bg-surface pb-14 pt-[10.75rem] desktop-s:pb-[4.5rem] desktop-s:pt-[13.1875rem]">
         <Container size="xl">
           <div className="flex flex-col gap-14 desktop-s:flex-row desktop-s:items-start desktop-s:gap-20">
             <div className="min-w-0 max-w-[660px] desktop-s:grow">
@@ -314,21 +324,21 @@ export function MarketPage() {
         </Container>
       </section>
 
-      {/* ── 3 · Weights · the spine into the area pages ───────────────────── */}
+      {/* ── 2 · Weights · the spine into the area pages ───────────────────── */}
       <Section className="bg-surface-secondary py-16 desktop-s:py-20">
         <Container size="xl">
           <MarketWeights profile={profile} />
         </Container>
       </Section>
 
-      {/* ── 4 · The calendar · the section only this page can assemble ────── */}
+      {/* ── 3 · The calendar · the section only this page can assemble ────── */}
       <Section className="py-16 desktop-s:py-20">
         <Container size="xl">
           <MarketCalendar profile={profile} />
         </Container>
       </Section>
 
-      {/* ── 5 · Coverage · renders only where there is a real gap ─────────── */}
+      {/* ── 4 · Coverage · renders only where there is a real gap ─────────── */}
       {profile.gaps.length > 0 && (
         <Section className="bg-surface-secondary py-16 desktop-s:py-20">
           <Container size="xl">
@@ -337,14 +347,14 @@ export function MarketPage() {
         </Section>
       )}
 
-      {/* ── 6 · Other markets ────────────────────────────────────────────── */}
+      {/* ── 5 · Other markets ────────────────────────────────────────────── */}
       <Section className="py-16 desktop-s:py-20">
         <Container size="xl">
           <RelatedMarkets profile={profile} />
         </Container>
       </Section>
 
-      {/* ── 7 · The close · same band as the area page, deliberately ─────── */}
+      {/* ── 6 · The close · same band as the area page, deliberately ─────── */}
       <section className="bg-primary-700 py-16 desktop-s:py-20">
         <Container size="xl">
           <HowOrchestrationWorks tone="inverse" />
