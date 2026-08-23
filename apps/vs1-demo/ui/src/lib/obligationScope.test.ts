@@ -90,3 +90,36 @@ describe('obligation scope', () => {
     }
   });
 });
+
+// ─── The market profile must be renderable for every market ─────────────────
+// Eight market pages ship from one component tree, and the shapes differ: a
+// market with three cadence groups, one with five, one with no gaps at all.
+// Each of those is a branch that only that market exercises, so a change that
+// works on Germany can still blank Turkey.
+describe('market profiles', () => {
+  it('gives every market something to render in every section', () => {
+    for (const code of MARKET_CODES) {
+      const p = getMarketProfile(code);
+      expect(p.obligations.length, `${code} duties`).toBeGreaterThan(0);
+      expect(p.byCadence.length, `${code} cadence groups`).toBeGreaterThan(0);
+      // No empty cadence column may reach the calendar.
+      for (const g of p.byCadence) expect(g.items.length, `${code}/${g.due}`).toBeGreaterThan(0);
+      // The weights row is the spine into the area pages: all eight, always.
+      expect(p.weights.length, `${code} weights`).toBe(8);
+      // Aggregates the hero pills read.
+      expect(p.exposureEur, `${code} exposure`).toBeGreaterThan(0);
+      expect(p.heaviest, `${code} heaviest`).not.toBeNull();
+    }
+  });
+
+  it('orders the calendar by how often it rings, not alphabetically', () => {
+    // The canvas puts the most frequent group first because that is where the
+    // operational burden falls: a monthly filing costs twelve times an annual
+    // one. Alphabetical would open on "Annual" for most markets.
+    const order = ['Monthly', 'Quarterly', 'Annual', 'Ongoing', 'One-off'];
+    for (const code of MARKET_CODES) {
+      const seen = getMarketProfile(code).byCadence.map((g) => order.indexOf(g.due));
+      expect([...seen].sort((a, b) => a - b), `${code}`).toEqual(seen);
+    }
+  });
+});

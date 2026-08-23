@@ -3,8 +3,10 @@ import {
   CountryRiskMatrix,
   DomainTemplateLibrary,
   ObligationEnrichmentMap,
+  severityFromRiskWeight,
   type CountryCode,
   type ObligationEnrichment,
+  type ObligationSeverity,
 } from '@complihub/compliance-engine';
 import { DOMAINS, type DomainSlug } from './domains';
 
@@ -65,10 +67,10 @@ const SUBDOMAIN_DOMAIN: Record<string, ComplianceDomain> = (() => {
 })();
 
 /** Subdomain id → its English label and CELEX id, straight from the library. */
-const SUBDOMAIN_META: Record<string, { label: string; celex?: string }> = (() => {
-  const out: Record<string, { label: string; celex?: string }> = {};
+const SUBDOMAIN_META: Record<string, { label: string; celex?: string; riskWeight: number }> = (() => {
+  const out: Record<string, { label: string; celex?: string; riskWeight: number }> = {};
   for (const subs of Object.values(DomainTemplateLibrary)) {
-    for (const sub of subs) out[sub.id] = { label: sub.label, celex: sub.celex };
+    for (const sub of subs) out[sub.id] = { label: sub.label, celex: sub.celex, riskWeight: sub.riskWeight };
   }
   return out;
 })();
@@ -85,6 +87,12 @@ export interface MarketObligation {
   dueDays?: number;
   /** Official text on EUR-Lex, when the subdomain carries a CELEX id. */
   eurLexUrl?: string;
+  /** Human penalty phrasing as the national entry states it. */
+  penalty: string;
+  /** Upper bound in EUR, where the entry names one. */
+  penaltyMaxEur?: number;
+  /** From the subdomain's riskWeight — the market page tints by it. */
+  severity: ObligationSeverity;
 }
 
 /**
@@ -122,7 +130,23 @@ export interface MarketProfile {
    * EU Regulations are excluded by construction — see MarketCoverageGap.
    */
   gaps: MarketCoverageGap[];
+  /** Obligations grouped by filing cadence, most frequent first. The market
+   *  page's calendar reads this: a market is planned against a calendar, not
+   *  area by area. Empty groups are absent, never rendered as a blank column. */
+  byCadence: { due: string; items: MarketObligation[] }[];
+  /** Sum of the stated upper bounds. A ceiling, never a forecast. */
+  exposureEur: number;
+  /** The single heaviest penalty here, and the duty that carries it. */
+  heaviest: MarketObligation | null;
+  /** The duty whose next filing falls due soonest. */
+  soonest: MarketObligation | null;
 }
+
+// Most frequent first: that is the order the operational burden actually
+// falls in, and the order the canvas draws. Anything the engine adds later
+// that is not in this list sorts after it, alphabetically, rather than
+// vanishing.
+const CADENCE_ORDER = ['Monthly', 'Quarterly', 'Annual', 'Ongoing', 'One-off'];
 
 export function isMarketCode(code: string): code is CountryCode {
   return (MARKET_CODES as string[]).includes(code.toUpperCase());
@@ -146,7 +170,7 @@ export function getMarketProfile(code: CountryCode): MarketProfile {
 
   const obligations: MarketObligation[] = [];
   for (const [subdomainId, byCountry] of Object.entries(ObligationEnrichmentMap)) {
-    const entry = (byCountry as Record<string, { source: string; due: string; dueDays?: number }>)[code];
+    const entry = (byCountry as Record<string, ObligationEnrichment | undefined>)[code];
     if (!entry) continue; // no market-specific source → not claimed for this market
     const domain = SUBDOMAIN_DOMAIN[subdomainId];
     if (!domain) continue;
@@ -158,6 +182,9 @@ export function getMarketProfile(code: CountryCode): MarketProfile {
       source: entry.source,
       due: entry.due,
       dueDays: entry.dueDays,
+      penalty: entry.penalty,
+      penaltyMaxEur: entry.penaltyMaxEur,
+      severity: severityFromRiskWeight(meta?.riskWeight ?? 5),
       eurLexUrl: meta?.celex
         ? `https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:${meta.celex}`
         : undefined,
@@ -195,7 +222,39 @@ export function getMarketProfile(code: CountryCode): MarketProfile {
     });
   }
 
-  return { code, enforcementIntensity: risk.enforcementIntensity, strictnessScore: risk.strictnessScore, weights, obligations, byDomain, gaps };
+  const byCadence = [...new Set(obligations.map((o) => o.due))]
+    .sort((a, b) => {
+      const ia = CADENCE_ORDER.indexOf(a);
+      const ib = CADENCE_ORDER.indexOf(b);
+      if (ia !== ib) return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+      return a.localeCompare(b);
+    })
+    .map((due) => ({ due, items: obligations.filter((o) => o.due === due) }));
+
+  const withCap = obligations.filter((o) => (o.penaltyMaxEur ?? 0) > 0);
+  const withLead = obligations.filter((o) => o.dueDays != null);
+
+  return {
+    code,
+    enforcementIntensity: risk.enforcementIntensity,
+    strictnessScore: risk.strictnessScore,
+    weights,
+    obligations,
+    byDomain,
+    gaps,
+    byCadence,
+    exposureEur: withCap.reduce((sum, o) => sum + (o.penaltyMaxEur as number), 0),
+    heaviest:
+      withCap.length === 0
+        ? null
+        : withCap.reduce((max, o) =>
+            (o.penaltyMaxEur as number) > (max.penaltyMaxEur as number) ? o : max,
+          ),
+    soonest:
+      withLead.length === 0
+        ? null
+        : withLead.reduce((min, o) => ((o.dueDays as number) < (min.dueDays as number) ? o : min)),
+  };
 }
 
 /** Every market with its obligation count — for the index page. */
