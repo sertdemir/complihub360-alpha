@@ -1,11 +1,21 @@
 import { useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ArrowRight, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, ExternalLink } from 'lucide-react';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 import { SiteFooter } from '../components/home';
 import { SectionEyebrow, GoldWord, Reveal, Stagger, StaggerItem } from '../components/providers/SectionHeading';
+import { Typography } from '../components/ui/Typography';
+import { Section } from '../components/ui/Section';
+import {
+  HowOrchestrationWorks,
+  MarketCalendar,
+  MarketCoverage,
+  MarketProfileCard,
+  MarketWeights,
+  RelatedMarkets,
+} from '../components/compliance-areas';
 import { DOMAIN_I18N_KEY, DOMAIN_BY_SLUG } from '../lib/domains';
 import { getMarketProfile, isMarketCode, listMarkets } from '../lib/marketProfiles';
 import { Badge } from '../components/ui/Badge';
@@ -150,17 +160,15 @@ export function MarketsIndexPage() {
 }
 
 export function MarketPage() {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const { locale, code } = useParams();
   const navigate = useNavigate();
-  const domainLabel = useDomainLabel();
-  const [weightBarsRef, weightBarsInView] = useInViewOnce<HTMLUListElement>();
 
   const upper = (code ?? '').toUpperCase();
   const known = isMarketCode(upper);
   const profile = known ? getMarketProfile(upper as Parameters<typeof getMarketProfile>[0]) : null;
   const country = known ? t(`markets.countries.${upper}`) : upper;
-
+  const localePrefix = locale ? `/${locale}` : '';
 
   if (!profile) {
     return (
@@ -183,135 +191,192 @@ export function MarketPage() {
     );
   }
 
-  const maxWeight = Math.max(...profile.weights.map((w) => w.weight));
+  const money = new Intl.NumberFormat(i18n.language, {
+    style: 'currency',
+    currency: 'EUR',
+    notation: profile.exposureEur >= 1_000_000 ? 'compact' : 'standard',
+    maximumFractionDigits: profile.exposureEur >= 1_000_000 ? 1 : 0,
+  });
+
+  // The hero's fact pills. Every one is derived, and every one drops out when
+  // the market has nothing to put in it — the canvas draws four because
+  // Germany fills four, not because four is the shape.
+  const facts = [
+    {
+      key: 'duties',
+      value: String(profile.obligations.length),
+      label: t('markets.country.factDuties', 'duties'),
+      tone: 'text-fg',
+    },
+    {
+      key: 'areas',
+      value: t('markets.country.ofAreasShort', '{{count}} of {{total}}', {
+        count: profile.byDomain.length,
+        total: profile.weights.length,
+      }),
+      label: t('markets.country.factAreas', 'areas'),
+      tone: 'text-fg',
+    },
+    profile.exposureEur > 0
+      ? {
+          key: 'exposure',
+          value: money.format(profile.exposureEur),
+          label: t('markets.country.factExposure', 'exposure'),
+          tone: 'text-risk-on-critical',
+        }
+      : null,
+    profile.soonest?.dueDays != null
+      ? {
+          key: 'lead',
+          value: t('compliance.area.metrics.days', {
+            defaultValue: '{{count}} days',
+            count: profile.soonest.dueDays,
+          }),
+          label: t('markets.country.factLead', 'to the next deadline'),
+          tone: 'text-fg',
+        }
+      : null,
+  ].filter((f): f is { key: string; value: string; label: string; tone: string } => f !== null);
+
+  const startAssessment = () => navigate(`${localePrefix}/wizard`);
 
   return (
     <main className="bg-surface">
-      <section className="border-b border-stroke-subtle bg-surface-secondary pb-16 pt-32 lg:pb-20 lg:pt-40">
-        <Container size="xl">
-          <Reveal className="mx-auto flex max-w-[760px] flex-col items-center gap-4 text-center">
-            <Link
-              to={`/${locale ?? 'en'}/markets`}
-              className="inline-flex items-center gap-1.5 text-body-xs font-semibold text-fg-secondary transition-colors hover:text-fg-brand"
-            >
-              <ArrowLeft size={14} /> {t('markets.country.backToMarkets')}
-            </Link>
-            <SectionEyebrow tone="brand">{t('markets.country.eyebrow')} · {profile.code}</SectionEyebrow>
-            <h1 className="font-serif text-[2.25rem] font-semibold leading-tight tracking-tight text-fg lg:text-[3rem]">
-              {t('markets.country.title', { country })}
-            </h1>
-            <p className="text-body-lg leading-relaxed text-fg-secondary">
-              {t('markets.country.lead', {
-                enforcement: profile.enforcementIntensity,
-                strictness: profile.strictnessScore,
-              })}
-            </p>
-          </Reveal>
-        </Container>
-      </section>
+      {/* ── 1 · Hero ─────────────────────────────────────────────────────── */}
+      {/* No metric band. The four figures are pills here, because a full-bleed
+          band of serif numbers is the AREA page's signature and a second one
+          was the loudest reason both page types read as the same page.
 
-      {/* Weights — a relative picture, so the bars are scaled to this market's
-          own maximum rather than to 10. The number stays visible next to it. */}
-      <section className="py-16 lg:py-20">
+          NO LATERAL SWITCHER either, unlike the area page. The header's own
+          markets menu already opens all eight, so a second one under it was
+          the same control twice — and its area menu pointed OUT of markets
+          entirely, which is the one direction this page should not offer: a
+          market page is where a market is planned, and the way into an area is
+          the weights table further down, in context.
+
+          The padding therefore carries what the bar used to occupy, and the
+          two values are measured rather than derived: they put the eyebrow the
+          same distance below the fixed header as the area page's does — 104px
+          at desktop, 80 at 390 — where the header is 113px and 97px tall. The
+          first guess at this was 5px out at desktop and 4px at mobile, which is
+          exactly why it was measured a second time. */}
+      <section className="bg-surface pb-14 pt-[10.75rem] desktop-s:pb-[4.5rem] desktop-s:pt-[13.1875rem]">
         <Container size="xl">
-          <Reveal className="mx-auto max-w-[820px]">
-            <h2 className="font-serif text-[1.75rem] font-semibold text-fg">{t('markets.country.weightsTitle')}</h2>
-            <p className="mt-2 text-body text-fg-secondary">{t('markets.country.weightsLead')}</p>
-            <ul ref={weightBarsRef} className="mt-8 space-y-3">
-              {profile.weights.map((w, i) => (
-                <li key={w.domainSlug} className="grid grid-cols-[minmax(0,200px)_1fr_auto] items-center gap-4">
-                  <span className="truncate text-body-sm font-semibold text-fg">{domainLabel(w.domainSlug)}</span>
-                  <span className="h-2 overflow-hidden rounded-full bg-surface-secondary">
-                    <span
-                      className="block h-full rounded-full bg-brand transition-[width] duration-700 ease-out"
-                      style={{
-                        width: weightBarsInView ? `${Math.round((w.weight / maxWeight) * 100)}%` : 0,
-                        transitionDelay: `${i * 60}ms`,
-                      }}
-                    />
+          <div className="flex flex-col gap-14 desktop-s:flex-row desktop-s:items-start desktop-s:gap-20">
+            <div className="min-w-0 max-w-[660px] desktop-s:grow">
+              <SectionEyebrow tone="brand" dot={false}>
+                {t('markets.country.eyebrow', 'Market')}
+              </SectionEyebrow>
+              <Typography variant="display" as="h1" weight="bold" className="mt-3.5 text-fg">
+                {country}
+              </Typography>
+              <Typography variant="body" className="mt-4 text-body-lg leading-relaxed text-fg-secondary">
+                {t('markets.country.lead', {
+                  defaultValue:
+                    '{{count}} duties across {{areas}} areas, with a national legal basis. This page shows what comes together here and when — what a single duty requires is set out in its area.',
+                  count: profile.obligations.length,
+                  areas: profile.byDomain.length,
+                })}
+              </Typography>
+
+              <div className="mt-7 flex flex-wrap gap-2.5">
+                {facts.map((f) => (
+                  <span
+                    key={f.key}
+                    className="inline-flex items-baseline gap-1.5 rounded-full border border-stroke-subtle bg-surface-secondary px-3.5 py-2"
+                  >
+                    <span className={`text-body-sm font-bold tabular-nums ${f.tone}`}>{f.value}</span>
+                    <span className="text-body-2xs text-fg-secondary">{f.label}</span>
                   </span>
-                  <span className="tabular-nums text-body-xs text-fg-tertiary">{w.weight}/10</span>
-                </li>
-              ))}
-            </ul>
-          </Reveal>
-        </Container>
-      </section>
+                ))}
+              </div>
 
-      <section className="bg-surface-secondary py-16 lg:py-20">
-        <Container size="xl">
-          <Reveal className="mx-auto max-w-[820px]">
-            <h2 className="font-serif text-[1.75rem] font-semibold text-fg">{t('markets.country.obligationsTitle')}</h2>
-            <p className="mt-2 text-body text-fg-secondary">{t('markets.country.obligationsLead')}</p>
+              <div className="mt-8 flex flex-col gap-3 tablet:flex-row">
+                <Button size="lg" variant="primary" onClick={startAssessment}>
+                  {t('markets.country.startAssessment', 'Start the assessment for {{market}}', {
+                    market: country,
+                  })}
+                  <ArrowRight size={17} className="ml-1.5" />
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="bg-surface"
+                  onClick={() => navigate(`${localePrefix}/search`)}
+                >
+                  {t('compliance.area.askQuestion', 'Ask a question')}
+                </Button>
+              </div>
 
-            <div className="mt-8 space-y-8">
-              {profile.byDomain.map((group) => (
-                <div key={group.domainSlug}>
-                  <p className="text-body-3xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
-                    {domainLabel(group.domainSlug)}
-                  </p>
-                  <ul className="mt-3 space-y-3">
-                    {group.items.map((o) => (
-                      <li key={o.subdomainId} className="rounded-xl border border-stroke-subtle bg-surface p-5">
-                        {/* The engine's label is the English fallback; the statute
-                            in `source` below stays in its original form either
-                            way — a law's name is a proper noun. */}
-                        <p className="text-body-md font-bold text-fg">
-                          {t(`markets.obligations.${o.subdomainId}`, { defaultValue: o.label })}
-                        </p>
-                        <p className="mt-1.5 text-body-xs leading-relaxed text-fg-secondary">
-                          <span className="text-fg-tertiary">{t('markets.country.sourceLabel')}: </span>
-                          {o.source}
-                          {o.eurLexUrl && (
-                            <>
-                              {' '}
-                              <a
-                                href={o.eurLexUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-fg-brand underline decoration-dotted underline-offset-2 hover:decoration-solid"
-                              >
-                                EUR-Lex <ExternalLink size={11} />
-                              </a>
-                            </>
-                          )}
-                        </p>
-                        <p className="mt-1 text-body-2xs text-fg-tertiary">
-                          {t('markets.country.dueLabel')}: {t(`markets.cadence.${o.due}`, { defaultValue: o.due })}
-                          {o.dueDays != null && <> · {t('markets.country.leadTime', { days: o.dueDays })}</>}
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+              <p className="mt-7 flex items-start gap-2.5 text-body-sm text-fg-tertiary">
+                <Check size={15} className="mt-0.5 shrink-0 text-fg-brand" aria-hidden />
+                {t('markets.country.sourcePromise', {
+                  defaultValue:
+                    'Every duty here names its national legal basis. Where we hold none, the EU instrument stands — and it says so.',
+                })}
+              </p>
             </div>
 
-            {/* Honest about the gap rather than implying completeness. */}
-            <p className="mt-8 text-body-sm leading-relaxed text-fg-tertiary">
-              {t('markets.country.coverageNote', { country, count: profile.obligations.length })}
-            </p>
-          </Reveal>
+            <div className="w-full shrink-0 desktop-s:w-[340px]">
+              <MarketProfileCard profile={profile} />
+            </div>
+          </div>
         </Container>
       </section>
 
-      <section className="py-16 lg:py-20">
+      {/* ── 2 · Weights · the spine into the area pages ───────────────────── */}
+      <Section className="bg-surface-secondary py-16 desktop-s:py-20" spacing="none">
+        <MarketWeights profile={profile} />
+      </Section>
+
+      {/* ── 3 · The calendar · the section only this page can assemble ────── */}
+      <Section className="py-16 desktop-s:py-20" spacing="none">
+        <MarketCalendar profile={profile} />
+      </Section>
+
+      {/* ── 4 · Coverage · renders only where there is a real gap ─────────── */}
+      {profile.gaps.length > 0 && (
+        <Section className="bg-surface-secondary py-16 desktop-s:py-20" spacing="none">
+          <MarketCoverage profile={profile} marketLabel={country} />
+        </Section>
+      )}
+
+      {/* ── 5 · Other markets ────────────────────────────────────────────── */}
+      <Section className="py-16 desktop-s:py-20" spacing="none">
+        <RelatedMarkets profile={profile} />
+      </Section>
+
+      {/* ── 6 · The close · same band as the area page, deliberately ─────── */}
+      <section className="bg-primary-700 py-16 desktop-s:py-20">
         <Container size="xl">
-          <Reveal className="mx-auto flex max-w-[640px] flex-col items-center gap-4 text-center">
-            <h2 className="font-serif text-[1.75rem] font-semibold leading-tight text-fg">
-              {t('markets.cta.title')}
-            </h2>
-            <p className="text-body leading-relaxed text-fg-secondary">{t('markets.cta.lead')}</p>
-            <Button
-              size="lg"
-              variant="primary"
-              className="mt-2"
-              onClick={() => navigate(`/${locale ?? 'en'}/wizard`)}
-            >
-              {t('hero.cta.start', { ns: 'home', defaultValue: 'Assess My Needs' })}
-              <ArrowRight size={17} className="ml-1.5" />
-            </Button>
-          </Reveal>
+          <HowOrchestrationWorks tone="inverse" />
+          <div className="mt-[3.5rem] border-t border-white/[0.14] pt-[2.5rem]">
+            <div className="flex flex-col gap-6 desktop-s:flex-row desktop-s:items-center desktop-s:justify-between desktop-s:gap-12">
+              <div className="max-w-[560px]">
+                <Typography variant="h3" as="h2" weight="bold" className="text-white">
+                  {t('compliance.area.ctaTitle', 'Ready to see what applies to you?')}
+                </Typography>
+                <Typography variant="body" className="mt-2 leading-relaxed text-primary-100">
+                  {t('markets.country.ctaBody', {
+                    defaultValue:
+                      'The assessment narrows this market to your business, your product and your areas — in under five minutes.',
+                  })}
+                </Typography>
+              </div>
+              <Button
+                variant="inverse"
+                size="xl"
+                shape="soft"
+                className="shrink-0 self-start desktop-s:self-auto"
+                onClick={startAssessment}
+              >
+                {t('markets.country.startAssessment', 'Start the assessment for {{market}}', {
+                  market: country,
+                })}
+                <ArrowRight size={17} className="ml-1.5" />
+              </Button>
+            </div>
+          </div>
         </Container>
       </section>
 

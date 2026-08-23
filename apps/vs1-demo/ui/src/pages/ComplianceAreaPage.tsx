@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Check, CheckCircle, Users, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { severityFromRiskWeight } from '@complihub/compliance-engine';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
@@ -17,15 +17,17 @@ import {
   AreaEnforcement,
   AreaMetrics,
   AreaRiskCard,
+  AreaSectionHeading,
   AreaMarketHeatmap,
   AreaSwitcher,
-  AreaTimeline,
   HowOrchestrationWorks,
+  AreaTimeline,
   ObligationsExplorer,
   RelatedAreas,
   SEVERITY_FALLBACK,
   SEVERITY_STYLE,
   severityKey,
+  useAreaEyebrows,
   useCountrySelection,
   AREA_BY_SLUG,
   LEGACY_AREA_IDS,
@@ -64,7 +66,8 @@ function Section({ children, className = '' }: { children: React.ReactNode; clas
 }
 
 export function ComplianceAreaPage() {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
+  const eyebrows = useAreaEyebrows();
   const { locale, area } = useParams();
   const navigate = useNavigate();
   const [selectedCountry, setSelectedCountry] = useCountrySelection();
@@ -212,14 +215,19 @@ export function ComplianceAreaPage() {
                   <ArrowRight size={17} className="ml-1.5" />
                 </Button>
                 {/* Outline on a white ground, not the filled secondary: next to
-                    the petrol CTA a grey fill reads as a second primary. */}
+                    the petrol CTA a grey fill reads as a second primary.
+
+                    It used to say "find a specialist" and carry ?domain= to
+                    /search, which reads only ?q= — so it promised a filtered
+                    list of specialists and delivered a free-text box. It now
+                    says what that box is. */}
                 <Button
                   size="lg"
                   variant="outline"
                   className="bg-surface"
-                  onClick={() => navigate(`${localePrefix}/search?domain=${area}`)}
+                  onClick={() => navigate(`${localePrefix}/search`)}
                 >
-                  {t('compliance.area.findSpecialist', 'Find a specialist')}
+                  {t('compliance.area.askQuestion', 'Ask a question')}
                 </Button>
               </div>
 
@@ -243,42 +251,60 @@ export function ComplianceAreaPage() {
       </section>
 
       {/* ── 2 · The metric band ───────────────────────────────────────────── */}
-      {/* The band carries its own rules top and bottom, so the hero above it
-          does not need a border of its own. */}
-      <Container size="xl">
-        <AreaMetrics slug={area} selectedCountry={selectedCountry} />
-      </Container>
+      {/* No Container here: the band is full-bleed and holds its own, so that
+          the grey runs edge to edge while the tiles stay on the page grid.
+          The band also carries its own rules top and bottom, so the hero above
+          it does not need a border of its own. */}
+      <AreaMetrics slug={area} selectedCountry={selectedCountry} />
 
-      {/* ── 2 · Who this affects ──────────────────────────────────────────── */}
+      {/* ── 3 · Who this affects ──────────────────────────────────────────── */}
+      {/* Two columns, as the canvas draws it: the heading holds a narrow left
+          rail and the prose runs beside it, not under it. The single 820px
+          column this replaced put a 30px serif headline directly above its own
+          body text, so the two read as one block and the section had no way to
+          be skimmed. The rail is fixed at 300px and the prose capped at 720 —
+          both from the canvas — so the measure stays readable however wide the
+          page gets. Below desktop-s the rail simply becomes the first row. */}
       {(affected || description) && (
         <Section className="py-16 desktop-s:py-20">
           <Container size="xl">
-            <div className="max-w-[820px]">
-              <Typography variant="h2" as="h2" weight="bold" className="text-fg">
-                {t('compliance.whoAffected', 'Who is affected')}
-              </Typography>
-              {affected && (
-                <Typography variant="body" className="mt-3 leading-relaxed text-fg-secondary">
-                  {affected}
-                </Typography>
-              )}
-              {description && headline && (
-                <Typography variant="body" className="mt-3 leading-relaxed text-fg-secondary">
-                  {description}
-                </Typography>
-              )}
-              {profile.businessModels.length > 0 && (
-                <div className="mt-6 flex flex-wrap gap-2">
-                  {profile.businessModels.map(m => (
-                    <span
-                      key={m}
-                      className="rounded-lg border border-stroke bg-surface-secondary px-3 py-1 text-body-xs font-semibold text-fg-secondary"
-                    >
-                      {t(`compliance.businessModel.${m}`, m)}
-                    </span>
-                  ))}
-                </div>
-              )}
+            <div className="flex flex-col gap-8 desktop-s:flex-row desktop-s:gap-24">
+              <AreaSectionHeading
+                className="desktop-s:w-[300px] desktop-s:shrink-0"
+                eyebrow={eyebrows.affected}
+                title={t('compliance.whoAffected', 'Who is affected')}
+              />
+              <div className="max-w-[720px] desktop-s:grow">
+                {/* The lead is a size up and in full foreground; the paragraph
+                    under it is body size and secondary. The canvas separates
+                    them that way and it is what makes the first sentence read
+                    as the answer to the heading rather than as more prose. */}
+                {affected && (
+                  <Typography variant="body" className="text-body-lg leading-relaxed text-fg">
+                    {affected}
+                  </Typography>
+                )}
+                {description && headline && (
+                  <Typography
+                    variant="body"
+                    className={`leading-relaxed text-fg-secondary ${affected ? 'mt-4' : ''}`}
+                  >
+                    {description}
+                  </Typography>
+                )}
+                {profile.businessModels.length > 0 && (
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    {profile.businessModels.map(m => (
+                      <span
+                        key={m}
+                        className="rounded-lg border border-stroke bg-surface-secondary px-3.5 py-[0.4375rem] text-body-xs font-semibold text-fg-secondary"
+                      >
+                        {t(`compliance.businessModel.${m}`, m)}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </Container>
         </Section>
@@ -310,102 +336,159 @@ export function ComplianceAreaPage() {
       {/* ── 6 · Market heatmap ────────────────────────────────────────────── */}
       <Section className="bg-surface-secondary py-16 desktop-s:py-20">
         <Container size="xl">
-          <div className="max-w-[900px]">
-            <AreaMarketHeatmap slug={area} selectedCountry={selectedCountry} />
-          </div>
+          {/* Full container width: the section is a heading rail beside a
+              table now, and capping it at 900 squeezed the bars into a column
+              narrower than the labels beside them. */}
+          <AreaMarketHeatmap slug={area} selectedCountry={selectedCountry} />
         </Container>
       </Section>
 
-      {/* ── 7 · How CompliHub360 handles it ───────────────────────────────── */}
-      <Section className="py-16 desktop-s:py-20">
-        <Container size="xl">
-          {coverage.length > 0 && (
-            <div className="mb-12 max-w-[820px]">
-              <Typography variant="h2" as="h2" weight="bold" className="text-fg">
-                {t('compliance.area.coversTitle', 'What CompliHub360 covers')}
-              </Typography>
-              <ul className="mt-5 space-y-3">
-                {coverage.map(c => (
-                  <li key={c} className="flex items-start gap-2.5">
-                    <CheckCircle
-                      size={15}
-                      className="mt-0.5 shrink-0 text-success-600 dark:text-success-300"
-                    />
-                    <Typography variant="body" className="text-fg-secondary">
-                      {c}
-                    </Typography>
+      {/* ── 8 · How CompliHub360 gets there ───────────────────────────────── */}
+      {/* Three numbered cards, which is the canvas's shape and a better fit for
+          this content than the checklist it replaces: each item is a step in
+          how the engine reaches an answer, and a tick implies a feature that
+          is simply present. HowOrchestrationWorks came out with the checklist —
+          the canvas has no four-step funnel here, and that block already sits
+          on the areas hub one level up, where generic product messaging
+          belongs. Repeating it under every area page was the same argument
+          made eight times. */}
+      {coverage.length > 0 && (
+        <Section className="py-16 desktop-s:py-20">
+          <Container size="xl">
+            <AreaSectionHeading
+              className="max-w-[620px]"
+              eyebrow={eyebrows.process}
+              title={t('compliance.area.coversTitle', 'How CompliHub360 gets there')}
+            />
+            <ol className="mt-10 grid gap-6 tablet:grid-cols-3">
+              {coverage.map((c, i) => {
+                // The engine's copy is one sentence per step. Where it carries
+                // its own break — a dash or a colon — the first clause is the
+                // step's name and the rest explains it, which is how the canvas
+                // sets these. Where it does not, the sentence is the name and
+                // the card simply has no second line. Nothing is invented to
+                // fill one.
+                const m = c.match(/^(.{3,60}?)\s*(?:[–—]|:)\s+(.+)$/);
+                // The clause after the dash starts mid-sentence in the source
+                // string ("… assistant – assesses trading role"). Standing on
+                // its own line it is a sentence, so it gets a capital.
+                const [name, body] = m
+                  ? [m[1], m[2].charAt(0).toLocaleUpperCase(i18n.language) + m[2].slice(1)]
+                  : [c, null];
+                return (
+                  <li
+                    key={c}
+                    className="rounded-xl border border-stroke-subtle p-7"
+                  >
+                    <span className="font-serif text-h3 font-semibold tabular-nums text-fg-brand">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <p className="mt-3.5 text-body font-bold leading-snug text-fg">{name}</p>
+                    {body && (
+                      <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">{body}</p>
+                    )}
                   </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          <HowOrchestrationWorks />
-        </Container>
-      </Section>
-
-      {/* ── 8 · Specialists ───────────────────────────────────────────────── */}
-      <Section className="bg-surface-secondary py-16 desktop-s:py-20">
-        <Container size="xl">
-          <div className="max-w-[820px] rounded-xl border border-stroke-subtle bg-surface p-7">
-            <Typography
-              variant="caption"
-              className="mb-2 flex items-center gap-1.5 font-semibold uppercase tracking-wider text-fg-tertiary"
-            >
-              <Users size={12} />
-              {t('compliance.specialists.label', 'Verified Specialists')}
-            </Typography>
-            <Typography variant="h3" weight="bold" className="text-fg">
-              {t('compliance.area.specialistsTitle', 'Matched to this area, not to a directory')}
-            </Typography>
-            <Typography variant="body" className="mt-2 leading-relaxed text-fg-secondary">
-              {t('compliance.area.specialistsLead', {
-                defaultValue:
-                  'Every specialist is verified for the jurisdictions they claim. Matching runs on your assessment, so you are introduced to the ones whose coverage fits your case.',
+                );
               })}
-            </Typography>
-            <div className="mt-5 flex flex-wrap items-center gap-4">
-              <span className="inline-flex items-center gap-1.5 rounded-md border border-accent-200 bg-accent-100 px-2.5 py-1 text-xs font-bold text-accent-800">
-                <Sparkles size={11} className="text-accent-600" />
-                {t('compliance.specialists.count', '{{count}} verified specialists', {
-                  count: meta.specialistsCount,
+            </ol>
+          </Container>
+        </Section>
+      )}
+
+      {/* ── 9 · Ask · the page's only gold, and its only input ────────────── */}
+      {/* This was a specialists band, and every claim in it was false. The
+          count came from a literal in areas.ts — 8 for this area, 12 for tax,
+          numbers nobody derived from a registry, because the app has no
+          provider registry. "Verified" verified nothing. And the button
+          carried ?domain= to /search, which reads only ?q=, so it promised a
+          filtered specialist list and delivered a free-text box.
+
+          Specialists belong after sign-up and anonymised, which is later than
+          this page. What is true here and now is the free-text box itself —
+          the one thing an area page offers besides reading, and the fast lane
+          past the wizard. So the band offers that, and the gold stays because
+          it still marks the page's single invitation to act.
+
+          The funnel is intact and nothing in it is claimed early: a question
+          now, the assessment in the closing band, specialists once there is
+          something to introduce. */}
+      <Section className="pb-16 desktop-s:pb-20">
+        <Container size="xl">
+          <div className="flex flex-col gap-8 rounded-xl border border-stroke-subtle border-l-[3px] border-l-accent-500 bg-surface-secondary px-10 py-9 desktop-s:flex-row desktop-s:items-center desktop-s:justify-between desktop-s:gap-12">
+            <div className="max-w-[640px]">
+              <Typography variant="h3" as="h2" weight="bold" className="text-fg">
+                {t('compliance.area.askTitle', {
+                  defaultValue: 'A specific question about {{area}}?',
+                  area: title,
                 })}
-              </span>
-              <Link
-                to={`${localePrefix}/search?domain=${area}`}
-                className="inline-flex items-center gap-1.5 text-body-sm font-semibold text-fg-brand underline decoration-dotted underline-offset-4 hover:decoration-solid"
-              >
-                {t('compliance.area.browseSpecialists', 'Browse specialists for this area')}
-                <ArrowRight size={14} />
-              </Link>
+              </Typography>
+              <Typography variant="body" className="mt-2.5 leading-relaxed text-fg-secondary">
+                {t('compliance.area.askLead', {
+                  defaultValue:
+                    'Ask it in your own words and get an answer with its sources named. The assessment below is the longer way round — it maps the whole area to your business instead of answering one question.',
+                })}
+              </Typography>
             </div>
+            <Link
+              to={`${localePrefix}/search`}
+              className="inline-flex h-[3rem] shrink-0 items-center gap-2 self-start rounded-lg bg-primary-700 px-6 text-body-md font-semibold text-white transition-colors hover:bg-primary-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stroke-focus desktop-s:self-auto"
+            >
+              {t('compliance.area.askQuestion', 'Ask a question')}
+              <ArrowRight size={17} strokeWidth={2.2} aria-hidden />
+            </Link>
           </div>
         </Container>
       </Section>
 
-      {/* ── 9 · Related areas ─────────────────────────────────────────────── */}
+      {/* ── 10 · Related areas ────────────────────────────────────────────── */}
       <Section className="py-16 desktop-s:py-20">
         <Container size="xl">
           <RelatedAreas slug={area} />
         </Container>
       </Section>
 
-      {/* ── CTA ───────────────────────────────────────────────────────────── */}
-      <section className="bg-primary-700 py-16 desktop-s:py-24">
+      {/* ── 11 · The close · orchestration and the assessment, one band ───── */}
+      {/* One petrol band, not two closing sections. The four steps and the
+          assessment CTA were the same move said twice — how you get from "this
+          applies to me" to a specialist who has answered, and the button that
+          starts it — with the steps in a tinted card directly above the band
+          that repeated their conclusion. Merged, the band explains the path
+          and then offers it, and the page keeps exactly one dark close.
+
+          The steps come last because they are not about this area: they are
+          how any area gets there, so they belong after the area is finished
+          being explained. */}
+      <section className="bg-primary-700 py-16 desktop-s:py-20">
         <Container size="xl">
-          <div className="mx-auto flex max-w-[640px] flex-col items-center gap-4 text-center">
-            <Typography variant="display" as="h2" weight="bold" className="text-white">
-              {t('compliance.area.ctaTitle', 'Ready to see what applies to you?')}
-            </Typography>
-            <Typography variant="body" className="text-lg text-primary-100">
-              {t('compliance.area.ctaBody', {
-                defaultValue:
-                  'The assessment narrows this area to your business, your markets and your product — in under five minutes.',
-              })}
-            </Typography>
-            <Button variant="inverse" size="xl" shape="soft" className="mt-2" onClick={startAssessment}>
-              {t('compliance.startAssessment', 'Start {{title}} Assessment', { title })}
-              <ArrowRight size={17} className="ml-1.5" />
-            </Button>
+          <HowOrchestrationWorks tone="inverse" />
+
+          <div className="mt-[3.5rem] border-t border-white/[0.14] pt-[2.5rem]">
+            <div className="flex flex-col gap-6 desktop-s:flex-row desktop-s:items-center desktop-s:justify-between desktop-s:gap-12">
+              <div className="max-w-[560px]">
+                {/* h3, not the display size it used to carry: the band already
+                    has a headline, and two competing ones read as two
+                    sections that failed to separate. */}
+                <Typography variant="h3" as="h2" weight="bold" className="text-white">
+                  {t('compliance.area.ctaTitle', 'Ready to see what applies to you?')}
+                </Typography>
+                <Typography variant="body" className="mt-2 leading-relaxed text-primary-100">
+                  {t('compliance.area.ctaBody', {
+                    defaultValue:
+                      'The assessment narrows this area to your business, your markets and your product — in under five minutes.',
+                  })}
+                </Typography>
+              </div>
+              <Button
+                variant="inverse"
+                size="xl"
+                shape="soft"
+                className="shrink-0 self-start desktop-s:self-auto"
+                onClick={startAssessment}
+              >
+                {t('compliance.startAssessment', 'Start {{title}} Assessment', { title })}
+                <ArrowRight size={17} className="ml-1.5" />
+              </Button>
+            </div>
           </div>
         </Container>
       </section>

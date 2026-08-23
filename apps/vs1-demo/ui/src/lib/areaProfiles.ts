@@ -71,6 +71,8 @@ export interface AreaSubdomain {
   businessModels: string[];
   triggerTags: string[];
   eurLexUrl?: string;
+  /** The Official Journal reference the eurLexUrl is built from, when there is one. */
+  celex?: string;
 }
 
 export interface AreaObligation extends AreaSubdomain {
@@ -86,6 +88,13 @@ export interface AreaObligation extends AreaSubdomain {
   appliesFrom?: string;
   /** false = the engine holds no source for this market, the EU-level one is shown. */
   marketSpecific: boolean;
+  /**
+   * Only set when `marketSpecific` is false — how the EU-level entry that
+   * stood in relates to national law. See ObligationEnrichment.scope: 'eu'
+   * means there IS no national text and this is the applicable law, so the
+   * fallback is not a gap; the other two mean it is.
+   */
+  scope?: 'eu' | 'national-pending' | 'placeholder';
 }
 
 export interface AreaMarketWeight {
@@ -129,6 +138,7 @@ function subdomainsFor(slug: DomainSlug): AreaSubdomain[] {
         businessModels: sub.applicableBusinessModels,
         triggerTags: sub.triggerTags,
         eurLexUrl: eurLex(sub.celex),
+        celex: sub.celex,
       });
     }
   }
@@ -193,6 +203,10 @@ export function getAreaObligations(slug: DomainSlug, code: CountryCode | 'EU'): 
       dueDays: entry.dueDays,
       appliesFrom: entry.appliesFrom,
       marketSpecific: !!national,
+      // A country override is national by definition, so scope only travels
+      // with the fallback. Absent on a default is read as 'eu' — the shape
+      // that existed before the field was widened.
+      scope: national ? undefined : (entry.scope ?? 'eu'),
     });
   }
   return out;

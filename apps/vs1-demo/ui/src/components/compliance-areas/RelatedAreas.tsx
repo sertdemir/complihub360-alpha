@@ -8,6 +8,7 @@ import { getAreaProfile } from '../../lib/areaProfiles';
 import { AREAS } from './areas';
 import { SEVERITY_FALLBACK, severityKey } from './severity';
 import type { DomainSlug } from '../../lib/domains';
+import { AreaSectionHeading, useAreaEyebrows } from './AreaSectionHeading';
 
 interface Props {
   slug: DomainSlug;
@@ -34,6 +35,7 @@ function relatedTo(slug: DomainSlug): DomainSlug[] {
 
 export function RelatedAreas({ slug }: Props) {
   const { t } = useTranslation('common');
+  const eyebrows = useAreaEyebrows();
   const { locale } = useParams();
   const localePrefix = locale ? `/${locale}` : '';
   const related = relatedTo(slug);
@@ -42,15 +44,18 @@ export function RelatedAreas({ slug }: Props) {
 
   return (
     <div>
-      <Typography variant="h2" as="h2" weight="bold" className="text-fg">
-        {t('compliance.area.relatedTitle', 'Areas that travel with this one')}
-      </Typography>
-      <Typography variant="body" className="mt-2 max-w-2xl text-fg-secondary">
-        {t('compliance.area.relatedLead', {
-          defaultValue:
-            'These share triggers with the area you are reading — the same fact about your business pulls them in too.',
-        })}
-      </Typography>
+      <AreaSectionHeading
+        eyebrow={eyebrows.next}
+        title={t('compliance.area.relatedTitle', 'Areas that travel with this one')}
+        lead={
+          <span className="block max-w-2xl">
+            {t('compliance.area.relatedLead', {
+              defaultValue:
+                'These share triggers with the area you are reading — the same fact about your business pulls them in too.',
+            })}
+          </span>
+        }
+      />
 
       <div className="mt-8 grid gap-5 tablet:grid-cols-3">
         {related.map(s => {
