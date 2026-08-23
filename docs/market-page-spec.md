@@ -1,30 +1,126 @@
 # Marktseite — Bauplan
 
 Canvas: https://claude.ai/code/artifact/3b6e8234-b4f4-4781-ae0d-bcd028c81b18
-Arbeitsdateien: `Main.dc.html`, `Hero.dc.html`, `Mobile.dc.html`, `canvas.json`
 Route: `/:locale/markets/:code` (existiert, `MarketsPage.tsx` → `MarketPage`)
 
-Dieses Dokument ist die Referenz zwischen Canvas und Implementierung. Wenn
-Canvas und Code auseinanderlaufen, gewinnt der Canvas — außer bei den unter
-**Abweichungen** genannten Punkten, die bewusst und einmal begründet abweichen.
+## Die Arbeitsteilung
 
-## Die Grundidee
+Alles andere folgt hieraus:
 
-**Die Marktseite ist die Transponierte der Bereichsseite.**
+> **Die Bereichsseite ist der Ort, an dem eine Pflicht erklärt wird.
+> Die Marktseite ist der Ort, an dem ein Markt geplant wird.**
+
+Eine Pflicht *gehört* zu einem Bereich, nicht zu einem Markt — VerpackG §9 ist
+EPR, aus welcher Richtung man auch kommt. Faktenraster, Rechtsgrundlage,
+Bußgeldrahmen und Staffelung stehen deshalb auf der Bereichsseite und **nur**
+dort. Die Marktseite trägt, was keine Bereichsseite je zusammenstellen kann:
+die Zusammenschau über Bereiche hinweg.
+
+### Warum das nötig war
+
+Die erste Fassung spiegelte die Bereichsseite Section für Section. Ergebnis:
+6 von 11 Sections waren dasselbe Möbel, und der einzige sichtbare Unterschied
+war die H1. Der Grund liegt im Datenmodell — es ist **eine Quelle, zweimal
+geschnitten**:
 
 | | Bereichsseite | Marktseite |
 |---|---|---|
-| Frage | Diese Pflicht — über acht Märkte | Dieser Markt — über acht Bereiche |
-| Achse | `AreaProfile.marketWeights` | `MarketProfile.weights` |
-| Detail | Pflichten des Bereichs, je Markt | Pflichten des Marktes, je Bereich |
+| `CountryRiskMatrix` | eine **Spalte** (ein Bereich, 8 Märkte) | eine **Zeile** (ein Markt, 8 Bereiche) |
+| `ObligationEnrichmentMap` | Zeilenschnitt (Pflichten *eines* Bereichs) | Spaltenschnitt (Pflichten *eines* Landes) |
 
-Daraus folgt die Bauregel: **Wo unten „= X" steht, wird die bestehende
-Komponente mit anderen Daten verwendet, nicht neu gebaut.** Nur Section 08
-(Deckung) hat auf der Bereichsseite kein Gegenstück.
+Erschwerend: die Bereichsseite hat bereits einen Länderwähler. Die
+Marktdimension ist dort also schon vorhanden. Eine Marktseite rechtfertigt sich
+nur über das, was ein einzelner Bereich strukturell nicht zeigen kann.
 
-## Datenlage — gemessen, nicht geschätzt
+## Sections — sechs, nicht elf
 
-Alle acht Märkte, Stand der Messung:
+### 01 · Wechsler — 56px, sticky
+= `AreaSwitcher`, Achsen getauscht. Links „Alle Märkte" + Markt-Dropdown,
+rechts Bereichsfilter.
+
+### 02 · Hero
+Links: Eyebrow, H1 = Marktname, Lead, **Pillenzeile** mit den vier Marktzahlen
+(Pflichten · Bereiche n von 8 · Exposition · Tage bis zur nächsten Frist),
+zwei CTAs, Quellenzusage.
+
+**Bewusst kein Kennzahlenband.** Das Band ist die Signatur der Bereichsseite;
+ein zweites davon war der stärkste Grund, warum beide Seiten gleich aussahen.
+Dieselben Zahlen, andere Form.
+
+Rechts die **Marktprofil-Karte**, 340px:
+
+| Element | Datenquelle |
+|---|---|
+| Große Zahl | `enforcementIntensity`, Farbe über `severityFromRiskWeight` |
+| Balken 1 | `strictnessScore` / 10 |
+| Balken 2 | `byDomain.length` / 8 |
+| Fußchart | alle 8 Märkte nach Vollzug, eigener hervorgehoben |
+
+### 03 · Gewichtung — das Rückgrat
+= `AreaMarketHeatmap`, transponiert. 8 Zeilen: Bereich / Balken / Gewicht /
+Pflichtenzahl **oder** „EU-Quelle" / Pfeil.
+
+**Jede Zeile ist ein Link auf die Bereichsseite.** Hier endet die Marktseite
+und die Bereichsseite übernimmt — die Stelle, an der die Arbeitsteilung
+sichtbar wird.
+
+Die rechte Spalte ersetzt das Severity-Wort der Bereichsseite: dort beantwortet
+sie „ist 7 von 10 hier hoch", hier „führen wir dafür überhaupt etwas".
+
+Daten: `profile.weights` + `profile.byDomain`.
+
+### 04 · Kalender — das Herzstück, existiert nur hier
+Alle Pflichten dieses Marktes über **alle** Bereiche, gruppiert nach **Turnus**
+und sortiert danach, wie oft der Kalender klingelt: Monatlich, Vierteljährlich,
+Jährlich, Laufend, Einmalig.
+
+Je Eintrag: Bereichs-Chip, Name, Quelle, Vorlauf. Die häufigste Spalte ist
+petrol hinterlegt — dort liegt die operative Last. Eine Turnus-Gruppe ohne
+Pflichten wird nicht gerendert.
+
+**Keine Detailkarten, kein Faktenraster** — eine Pflicht wird auf ihrer
+Bereichsseite erklärt.
+
+Darunter eine Zeile mit höchstem Einzelbußgeld und Summe. Das ersetzt das
+gesamte Durchsetzungsband: zwei Zahlen sind keine Section.
+
+Daten: `profile.obligations`, gruppiert nach `due`.
+
+### 05 · Deckung — existiert nur hier
+Was die Engine für diesen Markt **nicht** lokal führt. Je fehlendem Bereich
+eine Karte: Name, Gewicht als Pille, warum es EU-Recht ist, das geltende
+Instrument.
+
+Für Deutschland steht hier Daten & Datenschutz — der Bereich mit dem
+**höchsten** Gewicht (10/10), ohne deutsche Quelle, weil die DSGVO eine
+Verordnung ist. Fällt weg, wenn ein Markt alle acht Bereiche abdeckt
+(heute kein Markt).
+
+Daten: `profile.weights` minus `profile.byDomain`.
+
+### 06 · Weiter — andere Märkte
+= `RelatedAreas`, transponiert. Drei Karten mit Glyph 56px, Risiko-Pille,
+Marktname, abgeleitetem Satz, „Markt öffnen". Auswahl: größte
+Pflichten-Überschneidung.
+
+### 07 · Abschluss — dunkel
+= `HowOrchestrationWorks tone="inverse"` + Haarlinie + CTA-Zeile.
+
+Identisch mit der Bereichsseite, und das ist Absicht: der Abschluss ist der
+Funnel, nicht der Seiteninhalt. Zwei Seitentypen dürfen sich einen Ausgang
+teilen — sie dürfen sich nur nicht den Inhalt teilen.
+
+## Was bewusst fehlt
+
+| Weggelassen | Grund |
+|---|---|
+| Kennzahlenband | 3 von 4 Kacheln waren dieselbe Aussage; Zahlen leben als Pillen im Hero |
+| Pflichten-Explorer | das Faktenraster einer Pflicht gehört auf die Bereichsseite |
+| Durchsetzungsband | höchstes Bußgeld und Summe sind zwei Zahlen unter dem Kalender |
+| Zeitachse | im Kalender aufgegangen |
+| Goldband „Frage stellen" | der Hero hat den Button; Gold bleibt Zeichen der Bereichsseite |
+
+## Datenlage — gemessen
 
 | Markt | Pflichten | Exposition | Höchstes Einzelbußgeld | Vollzug | Strenge | Bereiche | Kürzeste Frist |
 |---|---|---|---|---|---|---|---|
@@ -37,134 +133,24 @@ Alle acht Märkte, Stand der Messung:
 | NL | 5 | 52.014 € | 25.000 € · Besluit beheer verpakkingen | 7 | 7 | 4/8 | 8 T |
 | TR | 4 | 435.000 € | 380.000 € · KVKK Art. 10 | 6 | 6 | 4/8 | 14 T |
 
-Quellen: `CountryRiskMatrix` (Vollzug, Strenge, Domänengewichte) und
-`ObligationEnrichmentMap[subdomain][code]` (Quelle, Bußgeld, Turnus, Vorlauf).
-
-**Der Canvas zeichnet Deutschland.** Jede Zahl darin ist aus dieser Tabelle.
-Beim Bau nichts hart verdrahten — alles kommt aus `getMarketProfile(code)`.
+Der Canvas zeichnet Deutschland. Beim Bau nichts hart verdrahten — alles kommt
+aus `getMarketProfile(code)`.
 
 ### Zwei Lücken im Datenmodell, vor dem Bau zu schließen
 
 1. `MarketObligation` lässt `penalty` / `penaltyMaxEur` fallen, obwohl die
-   Enrichment-Map beides pro Land führt. Ohne sie gibt es weder Kennzahl 2
-   noch Section 06. → Felder in `marketProfiles.ts` durchreichen, wie es bei
-   `celex` auf der Bereichsseite schon geschehen ist.
-2. `MarketObligation` führt kein `severity`. Die Risiko-Pillen im Explorer
-   brauchen es. → `SUBDOMAIN_META[...].riskWeight` durch
-   `severityFromRiskWeight` schicken, wie `areaProfiles.ts` es tut.
+   Enrichment-Map beides pro Land führt. Ohne sie gibt es weder die
+   Expositions-Pille noch die Zeile unter dem Kalender. → durchreichen, wie es
+   bei `celex` auf der Bereichsseite geschehen ist.
+2. `MarketObligation` führt kein `severity`. → `SUBDOMAIN_META[...].riskWeight`
+   durch `severityFromRiskWeight` schicken.
 
-## Sections
-
-Reihenfolge und Aufbau, wie im Canvas gezeichnet.
-
-### 01 · Wechsler — 56px, sticky
-= `AreaSwitcher`, Achsen getauscht. Links „Alle Märkte" + Markt-Dropdown,
-rechts Bereichsfilter. Daten: `MARKET_CODES`, `DOMAINS`.
-
-### 02 · Hero
-Links: Eyebrow `tone="brand" dot={false}`, H1 = Marktname, Lead, Faktenzeile
-(mit `·` getrennt), zwei CTAs (Assessment primär, „Frage stellen" outline auf
-weißem Grund), Quellenzusage mit Häkchen.
-
-Rechts die **Marktprofil-Karte**, 340px — Transponierte von `AreaRiskCard`:
-
-| Element | Datenquelle |
-|---|---|
-| Große Zahl | `enforcementIntensity`, Farbe über `severityFromRiskWeight` |
-| Pille | dieselbe Severity |
-| Balken 1 | `strictnessScore` / 10 |
-| Balken 2 | `byDomain.length` / 8 — abgedeckte Bereiche |
-| Fußchart | alle 8 Märkte nach Vollzug, eigener hervorgehoben |
-
-### 03 · Kennzahlenband
-= `AreaMetrics`, unverändert übernehmen — full-bleed Grau, Kacheln im
-Container, Inhalt zentriert, `px-[1rem]`, Zeile ab `desktop-m`.
-
-Vier Kacheln, jede fällt weg wenn leer:
-1. Pflichten mit lokaler Quelle · Note: „von 21, die die Engine führt"
-2. Bußgeld-Exposition (Summe `penaltyMaxEur`) · Note: „Summe der Obergrenzen"
-3. Tage bis zur nächsten Frist (min `dueDays`) · Note: die Quelle
-4. Bereiche mit eigener Quelle (n von 8) · Note: „m laufen über EU-Recht"
-
-### 04 · Gewichtung — Eyebrow „Gewichtung"
-= `AreaMarketHeatmap`, transponiert. Links 340px-Schiene, rechts Karte mit
-8 Zeilen: Name / Balken / Wert mit einer Dezimale / Severity-Wort.
-
-Jede Zeile verlinkt auf die **Bereichsseite**. Pfeil auf `opacity-0`, sichtbar
-bei `hover` **und** `focus-visible`.
-
-Lead wird abgeleitet: schwerster Bereich gegen zweitschwersten, mit eigener
-Formulierung bei Gleichstand — nicht die Sortierreihenfolge entscheiden lassen.
-Daten: `profile.weights` (bereits absteigend sortiert).
-
-### 05 · Pflichten-Explorer — Eyebrow „Pflichten"
-= `ObligationsExplorer` mit **einer** Änderung: die Liste ist nach Bereich
-**gruppiert** (Gruppenkopf `BEREICH · n`), weil das die Achse ist, entlang der
-ein Markt gelesen wird.
-
-Zeile: Titel, darunter `Quelle · Turnus`, Risiko-Pille rechts, petrol Kante
-links wenn gewählt. Detail: Pille „Risiko: X · gilt heute", H3, Beschreibung,
-2×2-Faktenraster, CELEX-Zeile.
-
-**Das Faktenraster weicht in einer Zelle ab:** statt *Geltung* steht dort
-*Bereich* mit dem Gewicht dieses Bereichs in diesem Markt — Geltung ist auf
-einer Marktseite trivial.
-
-Daten: `profile.byDomain` + `ObligationEnrichmentMap[sub][code]`.
-
-### 06 · Durchsetzung — dunkel `#002E26`
-= `AreaEnforcement`, unverändert. Links 380px: Eyebrow (**ohne Icon**), H2,
-Lead. Rechts zwei Statkarten (höchstes Einzelbußgeld + zugehörige Pflicht;
-Vollzugsintensität X/10 + Rang unter 8 Märkten) und eine Behördenkarte mit
-Pillen. Einzige dunkle Fläche neben dem Abschluss.
-
-### 07 · Zeitachse — Eyebrow „Zeitachse"
-= `AreaTimeline`, aber **gruppiert nach Turnus statt nach Datum**.
-
-Begründung, gemessen: für Deutschland trägt keine der 9 Pflichten ein
-`appliesFrom` — alle gelten heute. Eine Datumsachse hätte genau einen Knoten.
-Der Turnus ist das, was einen Markt zeitlich unterscheidet.
-
-Knoten: Monatlich / Vierteljährlich / Jährlich / Laufend & einmalig, je mit
-Anzahl und den Pflichtnamen. Petrol-Schiene bis zum ersten Knoten. Schiene auf
-**Knotenmitte** legen, nicht darüber (auf der Bereichsseite waren es 9px daneben).
-
-Wo ein Markt Pflichten mit `appliesFrom` führt, kommen die Stichtage als
-zusätzliche Knoten dahinter — dieselbe Gruppierungsregel wie dort.
-
-### 08 · Deckung — neu, nur Marktseite
-Was die Engine für diesen Markt **nicht** lokal führt. Je fehlendem Bereich
-eine Karte: Name, Gewicht als Pille, warum es EU-Recht ist, das geltende
-Instrument. Daten: `profile.weights` minus `byDomain`.
-
-Diese Sektion ist der Grund, warum die Seite ehrlich bleibt. Für Deutschland
-steht hier Daten & Datenschutz — der Bereich mit dem **höchsten** Gewicht
-(10/10), für den wir keine deutsche Quelle führen, weil die DSGVO eine
-Verordnung ist. Das gehört gesagt, nicht versteckt.
-
-Fällt weg, wenn ein Markt alle acht Bereiche abdeckt (heute kein Markt).
-
-### 09 · Weiter — andere Märkte
-= `RelatedAreas`, transponiert. Drei Karten: Glyph 56px `strokeWidth={1.5}`,
-Risiko-Pille, Marktname, ein abgeleiteter Satz, „Markt öffnen".
-Auswahl: die drei mit der größten Pflichten-Überschneidung.
-
-### 10 · Frage stellen — einzige Goldfläche
-Goldkante 3px links, H3, Lead, petrol Button auf `/search`.
-**Keine Spezialisten-Behauptung** — die kommen erst nach Anmeldung.
-
-### 11 · Abschluss — dunkel
-Ein Band: `HowOrchestrationWorks tone="inverse"` (vier Schritte, keine
-Verbindungspfeile) + Haarlinie + CTA-Zeile links/rechts. Exakt wie auf der
-Bereichsseite.
-
-## Abweichungen — bewusst, einmal begründet
+## Abweichungen vom Canvas — bewusst
 
 | Canvas | Implementierung | Grund |
 |---|---|---|
 | Radius 14/16px | `rounded-xl` = 10px | Kartendoktrin #73; `designSystem.guard.test.ts` bricht sonst |
 | H2 30px | `text-h2` = 24px | 30px ist keine Stufe der Typo-Skala |
-| Eyebrow mit Ziffer | nur das Wort | Ziffern zählen Artboards, nicht Sections |
 
 ## Fallen dieser Config — jedes Mal messen
 
@@ -181,8 +167,7 @@ Canvas-Wert-Übertrag den berechneten Wert im Browser nachmessen.
 
 Weiter:
 - `cn()` verschluckt Config-Aliase, die tailwind-merge nicht kennt — neue
-  Aliase in `extendTailwindMerge` (`src/lib/utils.ts`) eintragen, sonst
-  verschwindet die Klasse lautlos.
+  Aliase in `extendTailwindMerge` (`src/lib/utils.ts`) eintragen.
 - Alle Reveals über `useInViewOnce` — jeder Pfad endet auf `true`.
 - Zahlen immer `tabular-nums`.
 - Container `size="xl"` = 1200px Kappe, `lg:px-20` = 80px Rand.
