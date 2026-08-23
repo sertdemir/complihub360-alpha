@@ -173,7 +173,7 @@ export function ComplianceAreaPage() {
           the risk card's header row — were drawn behind the pinned bar. The top
           padding now clears both: 113px of header plus the bar's own height.
           Measured, not guessed: card top 137 against a bar ending at 170. */}
-      <section className="border-b border-stroke-subtle bg-surface-secondary pb-14 pt-[7.2rem] desktop-s:pb-20 desktop-s:pt-[9.6rem]">
+      <section className="bg-surface pb-14 pt-[7.2rem] desktop-s:pb-20 desktop-s:pt-[9.6rem]">
         <Container size="xl">
           <div className="grid gap-10 desktop-s:grid-cols-12 desktop-s:gap-14">
             <div className="desktop-s:col-span-7">
@@ -243,11 +243,11 @@ export function ComplianceAreaPage() {
       </section>
 
       {/* ── 2 · The metric band ───────────────────────────────────────────── */}
-      <section className="border-b border-stroke-subtle bg-surface-secondary pb-14 desktop-s:pb-16">
-        <Container size="xl">
-          <AreaMetrics slug={area} selectedCountry={selectedCountry} />
-        </Container>
-      </section>
+      {/* The band carries its own rules top and bottom, so the hero above it
+          does not need a border of its own. */}
+      <Container size="xl">
+        <AreaMetrics slug={area} selectedCountry={selectedCountry} />
+      </Container>
 
       {/* ── 2 · Who this affects ──────────────────────────────────────────── */}
       {(affected || description) && (

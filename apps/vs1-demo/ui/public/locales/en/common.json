@@ -579,14 +579,19 @@
       "metrics": {
         "obligations": "Duties in this area",
         "obligationsNote": "{{count}} with a source specific to this market",
-        "exposure": "Named penalty ceiling",
-        "exposureNote": "Sum of the stated maxima, not a forecast",
+        "exposure": "Maximum penalty exposure",
+        "exposureNote": "Sum of the upper bounds, not the expected value",
         "days": "{{count}} days",
         "lead": "Shortest lead time",
         "leadNote": "The duty that catches teams out first",
         "later": "Not live yet",
         "laterNote": "Decided, but applicable from a later date",
-        "obligationsNoteEu": "All sources at EU level"
+        "obligationsNoteEu": "All sources at EU level",
+        "untilNext": "until the next deadline",
+        "ofTotal": "{{count}} of {{total}}",
+        "laterLabel": "apply only later",
+        "fromDate": "{{count}} from {{date}}",
+        "nationalIn": "{{count}} on a legal basis in {{market}}"
       },
       "risk": {
         "title": "Risk profile",

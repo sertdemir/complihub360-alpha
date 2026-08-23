@@ -579,14 +579,19 @@
       "metrics": {
         "obligations": "Obligaciones en este ámbito",
         "obligationsNote": "{{count}} con una fuente específica para este mercado",
-        "exposure": "Límite de sanción indicado",
-        "exposureNote": "Suma de los máximos indicados, no una previsión",
+        "exposure": "Exposición máxima a sanciones",
+        "exposureNote": "Suma de los límites superiores, no el valor esperado",
         "days": "{{count}} días",
         "lead": "Plazo más corto",
         "leadNote": "La obligación que primero pilla a los equipos",
         "later": "Aún no aplicable",
         "laterNote": "Aprobada, pero aplicable a partir de una fecha posterior",
-        "obligationsNoteEu": "Todas las fuentes a nivel de la UE"
+        "obligationsNoteEu": "Todas las fuentes a nivel de la UE",
+        "untilNext": "hasta el próximo plazo",
+        "ofTotal": "{{count}} de {{total}}",
+        "laterLabel": "se aplican más adelante",
+        "fromDate": "{{count}} desde {{date}}",
+        "nationalIn": "{{count}} con base jurídica en {{market}}"
       },
       "risk": {
         "title": "Perfil de riesgo",
