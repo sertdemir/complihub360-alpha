@@ -579,14 +579,19 @@
       "metrics": {
         "obligations": "Bu alandaki yükümlülükler",
         "obligationsNote": "{{count}} tanesi bu pazara özgü bir kaynakla",
-        "exposure": "Belirtilen ceza üst sınırı",
-        "exposureNote": "Belirtilen üst sınırların toplamı, bir tahmin değil",
+        "exposure": "Azami ceza maruziyeti",
+        "exposureNote": "Üst sınırların toplamı, beklenen değer değil",
         "days": "{{count}} gün",
         "lead": "En kısa hazırlık süresi",
         "leadNote": "Ekipleri ilk yakalayan yükümlülük",
         "later": "Henüz yürürlükte değil",
         "laterNote": "Kabul edildi, ancak ileri bir tarihten itibaren geçerli",
-        "obligationsNoteEu": "Tüm kaynaklar AB düzeyinde"
+        "obligationsNoteEu": "Tüm kaynaklar AB düzeyinde",
+        "untilNext": "bir sonraki son tarihe kadar",
+        "ofTotal": "{{total}} yükümlülükten {{count}}",
+        "laterLabel": "daha sonra geçerli oluyor",
+        "fromDate": "{{date}} tarihinden itibaren {{count}}",
+        "nationalIn": "{{market}} yasal dayanağıyla {{count}}"
       },
       "risk": {
         "title": "Risk profili",

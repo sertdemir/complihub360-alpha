@@ -579,14 +579,19 @@
       "metrics": {
         "obligations": "Pflichten in diesem Bereich",
         "obligationsNote": "{{count}} davon mit einer Quelle speziell für diesen Markt",
-        "exposure": "Genannter Bußgeldrahmen",
-        "exposureNote": "Summe der genannten Höchstsätze, keine Prognose",
+        "exposure": "Maximale Bußgeld-Exposition",
+        "exposureNote": "Summe der Obergrenzen, nicht der Erwartungswert",
         "days": "{{count}} Tage",
         "lead": "Kürzeste Vorlaufzeit",
         "leadNote": "Die Pflicht, die Teams zuerst einholt",
         "later": "Noch nicht anwendbar",
         "laterNote": "Beschlossen, gilt aber erst ab einem späteren Datum",
-        "obligationsNoteEu": "Alle Quellen auf EU-Ebene"
+        "obligationsNoteEu": "Alle Quellen auf EU-Ebene",
+        "untilNext": "bis zur nächsten Frist",
+        "ofTotal": "{{count}} von {{total}}",
+        "laterLabel": "greifen erst später",
+        "fromDate": "{{count}} ab {{date}}",
+        "nationalIn": "{{count}} mit Rechtsgrundlage in {{market}}"
       },
       "risk": {
         "title": "Risikoprofil",
