@@ -149,16 +149,22 @@ export function AreaMetrics({ slug, selectedCountry }: Props) {
     // equal: with flex-basis 0 the browser divides the FREE space, and padding
     // is added on top — one-sided padding on the outer tiles made them 64px
     // narrower than the middle ones.
+    // The row starts at desktop-m, not tablet. Four tiles need ~263px each for
+    // the longest label to stay on one line, so the band needs 1055px, so the
+    // page needs ~1183. Between 768 and that the row was cramped and every
+    // label wrapped — the same defect that was just fixed at desktop width,
+    // still live one breakpoint down. Below the row the tiles stack and the
+    // hairline turns horizontal.
     <dl
       ref={ref}
-      className="-mx-[1rem] flex flex-col border-y border-stroke-subtle bg-surface-secondary tablet:flex-row"
+      className="-mx-[1rem] flex flex-col border-y border-stroke-subtle bg-surface-secondary desktop-m:flex-row"
     >
       {metrics.map((m, i) => (
         <Fragment key={m.key}>
           {i > 0 && (
             <span
               aria-hidden
-              className="hidden w-px shrink-0 bg-stroke-subtle tablet:my-7 tablet:block"
+              className="h-px w-full shrink-0 bg-stroke-subtle desktop-m:my-7 desktop-m:h-auto desktop-m:w-px"
             />
           )}
           <div
@@ -173,7 +179,15 @@ export function AreaMetrics({ slug, selectedCountry }: Props) {
             // line. The columns therefore sit closer than the canvas draws
             // them. That is the half of it worth losing: the hairline does the
             // separating, and a wrapped label does not.
-            className="min-w-0 flex-1 basis-0 px-[1rem] py-8 transition-[opacity,transform] duration-500 ease-out"
+            //
+            // Centred, where the canvas sets these flush left. The tiles are
+            // equal and the band is centred on the page — measured, both — but
+            // the three strings in a tile are of very different lengths, so
+            // ragged right edges left every column looking as though it had
+            // been pushed left, most of all the last one. Centring makes each
+            // column symmetric about its own axis and the ragged edge falls to
+            // both sides instead of collecting at the end of the band.
+            className="min-w-0 flex-1 basis-0 px-[1rem] py-8 text-center transition-[opacity,transform] duration-500 ease-out"
             style={{
               opacity: inView ? 1 : 0,
               transform: inView ? 'none' : 'translateY(12px)',
