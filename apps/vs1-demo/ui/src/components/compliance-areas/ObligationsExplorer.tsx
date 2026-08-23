@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { BusinessModel } from '@complihub/compliance-engine';
 import { FileText } from 'lucide-react';
 import { Typography } from '../ui/Typography';
-import { FilterChip } from '../ui/Badge';
 import { RiskBadge } from '../ui/RiskBadge';
 import { getAreaObligations, type AreaObligation } from '../../lib/areaProfiles';
 import { AREA_BY_SLUG } from './areas';
@@ -17,12 +16,15 @@ interface Props {
   selectedCountry: CountryCode;
 }
 
-const MODELS: { value: BusinessModel; fallback: string }[] = [
-  { value: BusinessModel.DTC, fallback: 'Direct-to-consumer' },
-  { value: BusinessModel.MARKETPLACE_SELLER, fallback: 'Marketplace seller' },
-  { value: BusinessModel.SAAS_SUBSCRIPTION, fallback: 'SaaS / subscription' },
-  { value: BusinessModel.AGENCY, fallback: 'Agency / services' },
-];
+// English fallbacks for the four models the engine names, used to label a
+// duty's scope in the detail pane. There is no longer a filter over them —
+// see the comment on the detail pane for why.
+const MODEL_FALLBACK: Record<string, string> = {
+  [BusinessModel.DTC]: 'Direct-to-consumer',
+  [BusinessModel.MARKETPLACE_SELLER]: 'Marketplace seller',
+  [BusinessModel.SAAS_SUBSCRIPTION]: 'SaaS / subscription',
+  [BusinessModel.AGENCY]: 'Agency / services',
+};
 
 // ─── Obligations explorer ────────────────────────────────────────────────────
 // The substance of an area page, and the part that did not exist anywhere on
@@ -64,7 +66,6 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
     year: 'numeric',
   });
   const AreaIcon = AREA_BY_SLUG[slug]?.icon;
-  const [model, setModel] = useState<BusinessModel | null>(null);
   const [validity, setValidity] = useState<'all' | 'now' | 'later'>('all');
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -88,7 +89,7 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
   }, [all]);
 
   const byValidity = validity === 'now' ? liveNow : validity === 'later' ? later : all;
-  const shown = model ? byValidity.filter((o) => o.businessModels.includes(model)) : byValidity;
+  const shown = byValidity;
 
   // Changing area, market or filter can strip the duty that was open. Falling
   // back to the first row keeps the pane populated instead of blanking it.
@@ -96,7 +97,7 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
     shown.find((o) => o.id === selectedId) ?? shown[0];
   useEffect(() => {
     setSelectedId(null);
-  }, [slug, selectedCountry, model, validity]);
+  }, [slug, selectedCountry, validity]);
 
   const marketLabel =
     selectedCountry === 'EU'
@@ -142,34 +143,17 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
         )}
       </div>
 
-      {/* The business-model filter has no counterpart in the canvas, which
-          draws one static state. It stays: it reads the engine's own
-          applicableBusinessModels and is the only control that narrows the
-          list to what a given reader is actually on the hook for. */}
-      <div className="mt-7 flex flex-wrap items-center gap-2">
-        <span className="text-body-3xs font-semibold uppercase tracking-wider text-fg-tertiary">
-          {t('compliance.area.modelFilter', 'I run a')}
-        </span>
-        <FilterChip selected={model === null} onClick={() => setModel(null)}>
-          {t('compliance.area.modelAll', 'Any business')}
-        </FilterChip>
-        {MODELS.map((m) => (
-          <FilterChip
-            key={m.value}
-            selected={model === m.value}
-            onClick={() => setModel(model === m.value ? null : m.value)}
-          >
-            {t(`compliance.businessModel.${m.value}`, m.fallback)}
-          </FilterChip>
-        ))}
-      </div>
-
       {shown.length === 0 || !selected ? (
         <div className="mt-6 rounded-xl border border-stroke-subtle bg-surface p-6">
           <Typography variant="body" className="text-fg-secondary">
-            {t('compliance.area.noneForModel', {
+            {/* Reachable only when the engine holds nothing for this area in
+                this market — the validity segments cannot empty the list, they
+                render only when both groups have members. The wording used to
+                blame the business-model filter, which no longer exists. */}
+            {t('compliance.area.noneForMarket', {
               defaultValue:
-                'The engine carries no duty in this area for that business model. That is a genuine gap in coverage, not a clean bill of health.',
+                'The engine carries no duty for this area in {{market}} yet. That is a genuine gap in coverage, not a clean bill of health.',
+              market: marketLabel,
             })}
           </Typography>
         </div>
@@ -254,6 +238,27 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                 <p className="mt-3 max-w-xl text-body-sm leading-relaxed text-fg-secondary">
                   {selected.description}
                 </p>
+                {/* Which business models the engine puts this duty on. It used
+                    to be a filter bar over the whole list, which is where the
+                    measurement said it did not belong: across the eight areas
+                    the lists run 1 to 7 duties, four of them are unchanged by
+                    any model, and on the one list long enough to want filtering
+                    two of the four options empty it. Per duty the same data
+                    answers a question a reader actually has — does this one
+                    apply to me — without a control that mostly does nothing.
+                    Omitted when every model is named: "applies to all four" is
+                    what the absence of the line already says. */}
+                {selected.businessModels.length > 0 &&
+                  selected.businessModels.length < Object.keys(MODEL_FALLBACK).length && (
+                    <p className="mt-3.5 text-body-2xs leading-relaxed text-fg-tertiary">
+                      <span className="font-semibold">
+                        {t('compliance.area.appliesToModels', 'Applies to:')}
+                      </span>{' '}
+                      {selected.businessModels
+                        .map((m) => t(`compliance.businessModel.${m}`, MODEL_FALLBACK[m] ?? m))
+                        .join(' · ')}
+                    </p>
+                  )}
               </div>
               {/* The area's own glyph, in the severity's colour — the canvas
                   puts a drawing here and it is what stops the pane reading as

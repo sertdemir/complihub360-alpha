@@ -551,9 +551,6 @@
       "findSpecialist": "Find a specialist",
       "obligationsTitle": "What this area actually requires",
       "obligationsLead": "Every duty below traces to a named statute. Switch market to see the source that applies there.",
-      "modelFilter": "I run a",
-      "modelAll": "Any business",
-      "noneForModel": "The engine carries no duty in this area for that business model. That is a genuine gap in coverage, not a clean bill of health.",
       "euWideSource": "EU-wide source",
       "appliesFrom": "Applies from {{date}}",
       "coverageNote": "The engine carries {{count}} duties for this area, {{specific}} of them with a source specific to {{market}}. Coverage is uneven by market and grows as sources are verified.",
@@ -641,7 +638,9 @@
       "fromShort": "from {{date}}",
       "riskWhen": "Risk: {{level}} · {{when}}",
       "sourceInJournal": "Source in the Official Journal:",
-      "appliesTodayShort": "applies today"
+      "appliesTodayShort": "applies today",
+      "appliesToModels": "Applies to:",
+      "noneForMarket": "The engine carries no duty for this area in {{market}} yet. That is a genuine gap in coverage, not a clean bill of health."
     },
     "riskBadge": "{{level}} Risk"
   },

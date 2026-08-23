@@ -551,9 +551,6 @@
       "findSpecialist": "Uzman bul",
       "obligationsTitle": "Bu alan gerçekte ne gerektiriyor",
       "obligationsLead": "Aşağıdaki her yükümlülük adı geçen bir mevzuata dayanır. Orada geçerli kaynağı görmek için pazarı değiştirin.",
-      "modelFilter": "İşim",
-      "modelAll": "Tüm iş modelleri",
-      "noneForModel": "Motor bu alanda o iş modeli için yükümlülük taşımıyor. Bu gerçek bir kapsam boşluğudur, muafiyet değil.",
       "euWideSource": "AB genelinde kaynak",
       "appliesFrom": "{{date}} tarihinden itibaren geçerli",
       "coverageNote": "Motor bu alan için {{count}} yükümlülük taşıyor; bunların {{specific}} tanesinde {{market}} pazarına özgü kaynak var. Kapsam pazara göre değişir ve kaynaklar doğrulandıkça büyür.",
@@ -641,7 +638,9 @@
       "fromShort": "{{date}} itibarıyla",
       "riskWhen": "Risk: {{level}} · {{when}}",
       "sourceInJournal": "Resmî Gazete kaynağı:",
-      "appliesTodayShort": "bugün geçerli"
+      "appliesTodayShort": "bugün geçerli",
+      "appliesToModels": "Şunlar için geçerli:",
+      "noneForMarket": "Motor bu alan için {{market}} kapsamında henüz bir yükümlülük taşımıyor. Bu gerçek bir kapsam boşluğudur, temiz kâğıt değil."
     },
     "riskBadge": "Risk: {{level}}"
   },

@@ -551,9 +551,6 @@
       "findSpecialist": "Buscar especialista",
       "obligationsTitle": "Qué exige realmente esta área",
       "obligationsLead": "Cada obligación remite a una norma concreta. Cambie de mercado para ver la fuente que se aplica allí.",
-      "modelFilter": "Mi negocio es",
-      "modelAll": "Cualquier negocio",
-      "noneForModel": "El motor no registra ninguna obligación en esta área para ese modelo de negocio. Es una laguna de cobertura real, no una exención.",
       "euWideSource": "Fuente a nivel UE",
       "appliesFrom": "Aplica desde {{date}}",
       "coverageNote": "El motor registra {{count}} obligaciones para esta área, {{specific}} de ellas con una fuente específica de {{market}}. La cobertura es desigual por mercado y crece a medida que se verifican fuentes.",
@@ -641,7 +638,9 @@
       "fromShort": "desde {{date}}",
       "riskWhen": "Riesgo: {{level}} · {{when}}",
       "sourceInJournal": "Fuente en el Diario Oficial:",
-      "appliesTodayShort": "vigente hoy"
+      "appliesTodayShort": "vigente hoy",
+      "appliesToModels": "Se aplica a:",
+      "noneForMarket": "El motor todavía no incluye ninguna obligación de esta área en {{market}}. Es una laguna real de cobertura, no un visto bueno."
     },
     "riskBadge": "Riesgo: {{level}}"
   },

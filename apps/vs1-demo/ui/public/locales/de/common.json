@@ -551,9 +551,6 @@
       "findSpecialist": "Spezialisten finden",
       "obligationsTitle": "Was dieser Bereich tatsächlich verlangt",
       "obligationsLead": "Jede Pflicht unten führt auf eine benannte Rechtsgrundlage zurück. Markt wechseln zeigt die Quelle, die dort gilt.",
-      "modelFilter": "Ich betreibe",
-      "modelAll": "Alle Geschäftsmodelle",
-      "noneForModel": "Für dieses Geschäftsmodell trägt die Engine in diesem Bereich keine Pflicht. Das ist eine echte Deckungslücke, kein Freibrief.",
       "euWideSource": "EU-weite Quelle",
       "appliesFrom": "Gilt ab {{date}}",
       "coverageNote": "Die Engine trägt {{count}} Pflichten für diesen Bereich, davon {{specific}} mit einer Quelle speziell für {{market}}. Die Deckung ist je Markt ungleich und wächst, sobald Quellen geprüft sind.",
@@ -641,7 +638,9 @@
       "fromShort": "ab {{date}}",
       "riskWhen": "Risiko: {{level}} · {{when}}",
       "sourceInJournal": "Quelle im Amtsblatt:",
-      "appliesTodayShort": "gilt heute"
+      "appliesTodayShort": "gilt heute",
+      "appliesToModels": "Gilt für:",
+      "noneForMarket": "Die Engine trägt für diesen Bereich in {{market}} noch keine Pflicht. Das ist eine echte Deckungslücke, kein Freibrief."
     },
     "riskBadge": "Risiko: {{level}}"
   },
