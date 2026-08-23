@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Gavel } from 'lucide-react';
 import { useCountUp } from '../../lib/useCountUp';
 import { useInViewOnce } from '../../lib/useInViewOnce';
 import { getAreaObligations } from '../../lib/areaProfiles';
@@ -106,15 +105,9 @@ export function AreaEnforcement({ slug, selectedCountry }: Props) {
   return (
     <div ref={ref} className="flex flex-col gap-10 desktop-s:flex-row desktop-s:gap-24">
       <div className="desktop-s:w-[380px] desktop-s:shrink-0">
-        {/* The gavel stays on the eyebrow — it is the band's mark. */}
         <AreaSectionHeading
           tone="inverse"
-          eyebrow={
-            <>
-              <Gavel size={13} />
-              {eyebrows.enforcement}
-            </>
-          }
+          eyebrow={eyebrows.enforcement}
           title={t('compliance.area.enforcementTitle', 'Who checks, and what it costs')}
           // Two phrasings, because "the sources the engine holds for EU-wide"
           // is not a sentence in any of the four languages — EU is a scope,
