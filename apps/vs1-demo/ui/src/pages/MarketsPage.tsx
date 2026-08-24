@@ -288,7 +288,7 @@ export function MarketPage() {
         <Container size="xl">
           <div className="flex flex-col gap-14 desktop-s:flex-row desktop-s:items-start desktop-s:gap-20">
             <div className="min-w-0 max-w-[660px] desktop-s:grow">
-              <SectionEyebrow tone="brand" dot={false}>
+              <SectionEyebrow tone="brand">
                 {t('markets.country.eyebrow', 'Market')}
               </SectionEyebrow>
               <Typography variant="display" as="h1" weight="bold" className="mt-3.5 text-fg">

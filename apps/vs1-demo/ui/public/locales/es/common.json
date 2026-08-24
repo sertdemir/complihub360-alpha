@@ -1000,15 +1000,18 @@
       "items": [
         {
           "title": "La evaluación",
-          "desc": "Cuatro preguntas sobre sus mercados, su modelo de negocio y su volumen. Sin cuenta, sin llamada comercial, sin obligación de continuar."
+          "desc": "Cuatro preguntas sobre sus mercados, su modelo de negocio y su volumen. Sin cuenta, sin llamada comercial, sin obligación de continuar.",
+          "price": "0 € · en menos de 5 minutos"
         },
         {
           "title": "Su Risk Map",
-          "desc": "Las obligaciones que se aplican a su actividad, cada una con su base jurídica y su plazo de cumplimiento. Una cuenta gratuita abre el mapa completo."
+          "desc": "Las obligaciones que se aplican a su actividad, cada una con su base jurídica y su plazo de cumplimiento. Una cuenta gratuita abre el mapa completo.",
+          "price": "0 € · con bases legales"
         },
         {
           "title": "La comparación",
-          "desc": "Cobertura, cualificaciones verificadas, tiempo de respuesta y encaje con sus mercados — en paralelo, antes de que se revele ninguna identidad."
+          "desc": "Cobertura, cualificaciones verificadas, tiempo de respuesta y encaje con sus mercados — en paralelo, antes de que se revele ninguna identidad.",
+          "price": "0 € · comparación anónima"
         }
       ]
     },
@@ -1030,6 +1033,49 @@
     "cta": {
       "title": "Empiece donde tenga sentido para usted.",
       "lead": "Seis minutos, cuatro preguntas, sin necesidad de cuenta."
+    },
+    "vignette": {
+      "confirmed": "Cita confirmada",
+      "yourCost": "Su coste",
+      "fee": "Comisión de intermediación",
+      "feePaidBy": "la asume el partner",
+      "match": "{{pct}} % match",
+      "noSlot": "Ningún puesto en venta",
+      "verified": "Verified Partner",
+      "rangeLabel": "Estimación de honorarios",
+      "range": "180–240 €",
+      "perHour": "/ hora",
+      "published": "publicada antes del primer contacto"
+    },
+    "faq": {
+      "eyebrow": "Preguntas frecuentes",
+      "title": "Lo que los visitantes preguntan antes de empezar.",
+      "items": [
+        {
+          "q": "¿La evaluación es realmente gratuita?",
+          "a": "Sí: las cuatro preguntas, el mapa de riesgos y la comparación de especialistas no cuestan nada y no requieren cuenta. Lo que se paga es el asesoramiento en sí, directamente al especialista, según la estimación que publica de antemano."
+        },
+        {
+          "q": "¿Necesito una cuenta?",
+          "a": "Para la evaluación y la comparación, no. Una cuenta gratuita abre el mapa completo: cada obligación con su base legal y su plazo."
+        },
+        {
+          "q": "¿De qué vive entonces CompliHub360?",
+          "a": "De los especialistas: a un especialista se le cobra cuando de un match sale una cita confirmada — no por estar listado, ni por clic, ni por visita al perfil."
+        },
+        {
+          "q": "¿Puede un especialista comprar una mejor posición?",
+          "a": "No. Los puestos no están en venta: una posición pagada haría que el match perdiera su valor para ambas partes. La idoneidad es el único criterio."
+        },
+        {
+          "q": "¿Cuánto cuesta el asesoramiento del especialista?",
+          "a": "Los honorarios los fija el especialista: cada Verified Partner publica una estimación fija antes de que usted acepte el encargo — sin una primera llamada solo para conocer el precio."
+        },
+        {
+          "q": "¿Ve el especialista mis datos antes de la reserva?",
+          "a": "No. Usted compara de forma anónima; solo cuando envía una solicitud, el especialista elegido recibe su perfil de búsqueda estructurado."
+        }
+      ]
     }
   },
   "about": {

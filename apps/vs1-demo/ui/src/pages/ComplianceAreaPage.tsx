@@ -183,7 +183,7 @@ export function ComplianceAreaPage() {
               {/* No back link here: the sticky switcher above carries one, and
                   the canvas hero opens on the eyebrow. */}
               <div>
-                <SectionEyebrow tone="brand" dot={false}>
+                <SectionEyebrow tone="brand">
                   {t('compliance.heroOverline', 'Compliance Areas')}
                 </SectionEyebrow>
               </div>

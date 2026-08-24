@@ -1000,15 +1000,18 @@
       "items": [
         {
           "title": "The assessment",
-          "desc": "Four questions about your markets, your business model and your volume. No account, no sales call, no obligation to continue."
+          "desc": "Four questions about your markets, your business model and your volume. No account, no sales call, no obligation to continue.",
+          "price": "€0 · under 5 minutes"
         },
         {
           "title": "Your risk map",
-          "desc": "The duties that apply to your operation, each with its legal basis and its deadline. A free account opens the full map."
+          "desc": "The duties that apply to your operation, each with its legal basis and its deadline. A free account opens the full map.",
+          "price": "€0 · with legal bases"
         },
         {
           "title": "The comparison",
-          "desc": "Coverage, verified qualifications, response time and fit to your markets — side by side, before any identity is revealed."
+          "desc": "Coverage, verified qualifications, response time and fit to your markets — side by side, before any identity is revealed.",
+          "price": "€0 · compare anonymously"
         }
       ]
     },
@@ -1030,6 +1033,49 @@
     "cta": {
       "title": "Start where it makes sense for you.",
       "lead": "Six minutes, four questions, no account needed."
+    },
+    "vignette": {
+      "confirmed": "Appointment confirmed",
+      "yourCost": "Your cost",
+      "fee": "Placement fee",
+      "feePaidBy": "borne by the partner",
+      "match": "{{pct}}% match",
+      "noSlot": "No slot for sale",
+      "verified": "Verified Partner",
+      "rangeLabel": "Fee estimate",
+      "range": "€180–240",
+      "perHour": "/ hour",
+      "published": "published before first contact"
+    },
+    "faq": {
+      "eyebrow": "Common questions",
+      "title": "What visitors ask before they start.",
+      "items": [
+        {
+          "q": "Is the assessment really free?",
+          "a": "Yes — the four questions, the risk map and the specialist comparison cost nothing and need no account. What costs money is the advice itself, paid directly to the specialist at the estimate they publish up front."
+        },
+        {
+          "q": "Do I need an account?",
+          "a": "Not for the assessment or the comparison. A free account opens the full map — every duty with its legal basis and deadline."
+        },
+        {
+          "q": "What does CompliHub360 live on, then?",
+          "a": "On the specialists: one is charged when a confirmed appointment comes out of a match — not for being listed, not per click, not for a profile view."
+        },
+        {
+          "q": "Can a specialist buy a better position?",
+          "a": "No. Placement is never for sale — a paid position would make the match worthless for both sides. Fit is the only criterion."
+        },
+        {
+          "q": "What does the specialist's advice cost?",
+          "a": "The specialist sets the fee: every Verified Partner publishes a fixed estimate before you accept the engagement — you never sit through a first call just to learn the price."
+        },
+        {
+          "q": "Does the specialist see my details before I book?",
+          "a": "No. You compare anonymously; only when you send a request does the chosen specialist receive your structured search profile."
+        }
+      ]
     }
   },
   "about": {
