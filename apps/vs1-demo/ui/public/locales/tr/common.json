@@ -1000,15 +1000,18 @@
       "items": [
         {
           "title": "Değerlendirme",
-          "desc": "Pazarlarınız, iş modeliniz ve hacminiz hakkında dört soru. Hesap yok, satış görüşmesi yok, devam etme zorunluluğu yok."
+          "desc": "Pazarlarınız, iş modeliniz ve hacminiz hakkında dört soru. Hesap yok, satış görüşmesi yok, devam etme zorunluluğu yok.",
+          "price": "0 € · 5 dakikadan kısa"
         },
         {
           "title": "Risk Map'iniz",
-          "desc": "İşletmeniz için geçerli olan yükümlülükler; her biri yasal dayanağı ve son tarihiyle birlikte. Haritanın tamamı ücretsiz bir hesapla açılır."
+          "desc": "İşletmeniz için geçerli olan yükümlülükler; her biri yasal dayanağı ve son tarihiyle birlikte. Haritanın tamamı ücretsiz bir hesapla açılır.",
+          "price": "0 € · yasal dayanaklarıyla"
         },
         {
           "title": "Karşılaştırma",
-          "desc": "Kapsam, doğrulanmış nitelikler, yanıt süresi ve pazarlarınıza uygunluk — kimlik açıklanmadan önce, yan yana."
+          "desc": "Kapsam, doğrulanmış nitelikler, yanıt süresi ve pazarlarınıza uygunluk — kimlik açıklanmadan önce, yan yana.",
+          "price": "0 € · anonim karşılaştırma"
         }
       ]
     },
@@ -1030,6 +1033,49 @@
     "cta": {
       "title": "Sizin için anlamlı olan yerden başlayın.",
       "lead": "Altı dakika, dört soru, hesap gerekmiyor."
+    },
+    "vignette": {
+      "confirmed": "Randevu onaylandı",
+      "yourCost": "Sizin maliyetiniz",
+      "fee": "Aracılık ücreti",
+      "feePaidBy": "partner karşılar",
+      "match": "%{{pct}} eşleşme",
+      "noSlot": "Satılık sıra yok",
+      "verified": "Verified Partner",
+      "rangeLabel": "Ücret tahmini",
+      "range": "180–240 €",
+      "perHour": "/ saat",
+      "published": "ilk temastan önce yayımlanır"
+    },
+    "faq": {
+      "eyebrow": "Sık sorulan sorular",
+      "title": "Ziyaretçilerin başlamadan önce sordukları.",
+      "items": [
+        {
+          "q": "Değerlendirme gerçekten ücretsiz mi?",
+          "a": "Evet — dört soru, risk haritası ve uzman karşılaştırması hiçbir ücret gerektirmez ve hesap istemez. Ücretli olan danışmanlığın kendisidir; doğrudan uzmana, önceden yayımladığı tahmine göre ödenir."
+        },
+        {
+          "q": "Hesap açmam gerekiyor mu?",
+          "a": "Değerlendirme ve karşılaştırma için gerekmez. Ücretsiz bir hesap haritanın tamamını açar — her yükümlülük, yasal dayanağı ve süresiyle birlikte."
+        },
+        {
+          "q": "CompliHub360 o zaman neyle geçiniyor?",
+          "a": "Uzmanlardan: Bir uzmana yalnızca eşleşmeden onaylanmış bir randevu çıktığında ücret yansıtılır — listelenmek, tıklama veya profil görüntülenmesi için değil."
+        },
+        {
+          "q": "Bir uzman üst sırayı satın alabilir mi?",
+          "a": "Hayır. Sıralar satılık değildir — parayla alınmış bir sıra eşleşmeyi iki taraf için de değersiz kılardı. Uygunluk tek ölçüttür."
+        },
+        {
+          "q": "Uzmanın danışmanlığı ne kadar tutar?",
+          "a": "Ücreti uzman belirler: Her Verified Partner, siz görevi kabul etmeden önce sabit bir tahmin yayımlar — fiyatı öğrenmek için bir ilk görüşmeye katlanmazsınız."
+        },
+        {
+          "q": "Uzman, rezervasyondan önce bilgilerimi görür mü?",
+          "a": "Hayır. Anonim olarak karşılaştırırsınız; yalnızca bir talep gönderdiğinizde seçilen uzman yapılandırılmış arama profilinizi alır."
+        }
+      ]
     }
   },
   "about": {

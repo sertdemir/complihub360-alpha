@@ -1000,15 +1000,18 @@
       "items": [
         {
           "title": "Die Einschätzung",
-          "desc": "Vier Fragen zu Ihren Märkten, Ihrem Geschäftsmodell und Ihrem Volumen. Kein Konto, kein Verkaufsgespräch, keine Verpflichtung weiterzumachen."
+          "desc": "Vier Fragen zu Ihren Märkten, Ihrem Geschäftsmodell und Ihrem Volumen. Kein Konto, kein Verkaufsgespräch, keine Verpflichtung weiterzumachen.",
+          "price": "0 € · unter 5 Minuten"
         },
         {
           "title": "Ihre Risk Map",
-          "desc": "Die Pflichten, die für Ihren Betrieb gelten, jede mit Rechtsgrundlage und Frist. Ein kostenloses Konto öffnet die vollständige Karte."
+          "desc": "Die Pflichten, die für Ihren Betrieb gelten, jede mit Rechtsgrundlage und Frist. Ein kostenloses Konto öffnet die vollständige Karte.",
+          "price": "0 € · mit Rechtsgrundlagen"
         },
         {
           "title": "Der Vergleich",
-          "desc": "Abdeckung, geprüfte Qualifikationen, Reaktionszeit und Passung zu Ihren Märkten — nebeneinander, bevor eine Identität sichtbar wird."
+          "desc": "Abdeckung, geprüfte Qualifikationen, Reaktionszeit und Match zu Ihren Märkten — nebeneinander, bevor eine Identität sichtbar wird.",
+          "price": "0 € · anonym vergleichbar"
         }
       ]
     },
@@ -1030,6 +1033,49 @@
     "cta": {
       "title": "Fangen Sie dort an, wo es für Sie Sinn ergibt.",
       "lead": "Sechs Minuten, vier Fragen, kein Konto nötig."
+    },
+    "vignette": {
+      "confirmed": "Termin bestätigt",
+      "yourCost": "Ihre Kosten",
+      "fee": "Vermittlungsgebühr",
+      "feePaidBy": "trägt der Partner",
+      "match": "{{pct}} % Match",
+      "noSlot": "Kein Platz zu verkaufen",
+      "verified": "Verified Partner",
+      "rangeLabel": "Honorarschätzung",
+      "range": "180–240 €",
+      "perHour": "/ Stunde",
+      "published": "veröffentlicht vor dem Erstkontakt"
+    },
+    "faq": {
+      "eyebrow": "Häufige Fragen",
+      "title": "Was Besucher vor dem Start wissen wollen.",
+      "items": [
+        {
+          "q": "Ist die Einschätzung wirklich kostenlos?",
+          "a": "Ja — die vier Fragen, die Risk Map und der Vergleich der Fachleute kosten nichts und brauchen kein Konto. Bezahlt wird erst die Beratung selbst, direkt bei der Fachperson, zu deren vorab veröffentlichter Schätzung."
+        },
+        {
+          "q": "Brauche ich ein Konto?",
+          "a": "Für die Einschätzung und den Vergleich nicht. Ein kostenloses Konto öffnet die vollständige Karte — jede Pflicht mit Rechtsgrundlage und Frist."
+        },
+        {
+          "q": "Wovon lebt CompliHub360 dann?",
+          "a": "Von den Fachleuten: Einer Fachperson wird berechnet, wenn aus einem Match ein bestätigter Termin wird — nicht für den Eintrag, nicht pro Klick, nicht für einen Profilaufruf."
+        },
+        {
+          "q": "Kann eine Fachperson sich nach oben kaufen?",
+          "a": "Nein. Plätze sind nicht verkäuflich — ein bezahlter Platz würde das Match für beide Seiten wertlos machen. Die Eignung ist das einzige Kriterium."
+        },
+        {
+          "q": "Was kostet die Beratung bei der Fachperson?",
+          "a": "Das Honorar legt die Fachperson fest: Jeder Verified Partner veröffentlicht eine feste Schätzung, bevor Sie das Mandat annehmen — Sie sitzen kein Erstgespräch ab, nur um den Preis zu erfahren."
+        },
+        {
+          "q": "Sieht die Fachperson meine Daten vor der Buchung?",
+          "a": "Nein. Sie vergleichen anonym; erst wenn Sie eine Anfrage senden, erhält die gewählte Fachperson Ihr strukturiertes Suchprofil."
+        }
+      ]
     }
   },
   "about": {

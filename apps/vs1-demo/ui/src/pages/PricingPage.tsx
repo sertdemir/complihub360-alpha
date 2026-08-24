@@ -1,46 +1,266 @@
-import { useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, Check, Lock, Minus, Plus } from 'lucide-react';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
+import { TypeOnView } from '../components/ui/TypeOnView';
 import { SiteFooter } from '../components/home';
+import { HowOrchestrationWorks } from '../components/compliance-areas';
 import { SectionEyebrow, GoldWord, Reveal, Stagger, StaggerItem } from '../components/providers/SectionHeading';
+import { useInViewOnce } from '../lib/useInViewOnce';
 
 // ─── /pricing ────────────────────────────────────────────────────────────────
-// The page the marketing surface never had: the header's "Pricing" entry pointed
-// at the HowItActs section (#engagement), which is about what a partner commits
-// to after a match — not about what anything costs.
+// Redesigned 2026-08-24 against the pricing canvas: the three free items became
+// large numbered cards whose copy TYPES itself in on arrival, the three
+// statements (who pays / ranking / the specialist's fee) became alternating
+// text-and-image teasers, and the page gained the FAQ it never had. It closes
+// on the same orchestration band as the area and market pages.
 //
-// Deliberately a USER-side page only. The provider tariff (lead fee, subscription,
-// detail-open) is decided and implemented in billing.ts, but §11 P5 retired the
-// provider marketing pages and the pricing decision says the subscription is set
-// by an admin — "Provider werden offline/B2B verkauft, kein Self-Checkout". A
-// public provider price list would contradict both, so this page answers only the
-// question a visitor actually has: what does this cost me?
+// Still deliberately a USER-side page only (see the pricing decision: providers
+// are sold offline/B2B, no self-checkout) — the page answers one question: what
+// does this cost me? The answer is "nothing", and the teasers carry the honest
+// part: who pays instead, why the ranking cannot be bought, and that the
+// specialist's own fee is real and published up front.
 //
-// The answer is "nothing", which is a weak page on its own — so it also names who
-// pays instead, why the ranking cannot be bought, and what the specialist's own
-// fee looks like. That last block is the honest part: the advice is not free.
+// The teaser illustrations are decorative vignettes (aria-hidden) — the real
+// content is the text column beside each. Their small labels still come from
+// i18n so no German string is baked into markup.
 //
 // Copy: common.json → pricing.* (en/de/es/tr).
 
 const FREE_COUNT = 3;
+const FAQ_COUNT = 6;
 
-function Statement({ base }: { base: 'who' | 'ranking' | 'specialist' }) {
+// Text column slides in from its own side, the vignette from the other — the
+// pair meets in the middle. Once-only, like every reveal on the marketing
+// surface.
+function SlideIn({
+  children,
+  from,
+  className = '',
+}: {
+  children: React.ReactNode;
+  from: 'left' | 'right';
+  className?: string;
+}) {
+  const [ref, inView] = useInViewOnce<HTMLDivElement>('-80px');
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, x: from === 'left' ? -28 : 28 }}
+      animate={inView ? { opacity: 1, x: 0 } : {}}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+// ─── Teaser vignettes (decorative) ───────────────────────────────────────────
+
+function BookingVignette() {
   const { t } = useTranslation('common');
   return (
-    <Reveal className="border-t border-stroke-subtle py-10 first:border-t-0 first:pt-0 last:pb-0">
-      <span className="text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
-        {t(`pricing.${base}.kicker`)}
-      </span>
-      <p className="mt-2 font-serif text-[1.75rem] font-bold leading-snug text-fg">
-        {t(`pricing.${base}.title`)}
-      </p>
-      <p className="mt-3 max-w-[62ch] text-body leading-relaxed text-fg-secondary">
+    <div
+      aria-hidden="true"
+      className="flex h-[340px] w-full items-center justify-center rounded-xl border border-stroke bg-surface desktop-s:w-[520px]"
+    >
+      <div className="w-[300px] rounded-xl border border-stroke bg-surface p-6 shadow-[0_12px_32px_rgba(15,23,42,0.07)]">
+        <div className="flex items-center gap-3">
+          <div className="h-[38px] w-[38px] rounded-full bg-primary-50" />
+          <div className="flex flex-col gap-1.5">
+            <div className="h-[9px] w-[130px] rounded-[5px] bg-stroke" />
+            <div className="h-2 w-[90px] rounded-[5px] bg-stroke-subtle" />
+          </div>
+        </div>
+        <div className="mt-5 flex flex-col gap-2.5 border-t border-dashed border-stroke pt-4">
+          <div className="flex justify-between text-body-xs text-fg-tertiary">
+            <span>{t('pricing.vignette.confirmed')}</span>
+            <Check size={14} className="text-fg-brand" />
+          </div>
+          <div className="flex justify-between text-body-xs text-fg-tertiary">
+            <span>{t('pricing.vignette.yourCost')}</span>
+            <span className="font-bold text-fg">0 €</span>
+          </div>
+          <div className="flex justify-between text-body-xs text-fg-tertiary">
+            <span>{t('pricing.vignette.fee')}</span>
+            <span className="font-semibold">{t('pricing.vignette.feePaidBy')}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RankingVignette() {
+  const { t } = useTranslation('common');
+  const rows = [
+    { pct: 98, w: 'w-[150px]', lead: true },
+    { pct: 91, w: 'w-[120px]', lead: false },
+    { pct: 87, w: 'w-[135px]', lead: false },
+  ];
+  return (
+    <div
+      aria-hidden="true"
+      className="flex h-[340px] w-full items-center justify-center rounded-xl border border-stroke-subtle bg-surface-secondary desktop-s:w-[520px]"
+    >
+      <div className="flex w-[320px] flex-col gap-3">
+        {rows.map((r, i) => (
+          <div
+            key={r.pct}
+            className={`flex items-center gap-3.5 rounded-xl border bg-surface px-4 py-3.5 ${
+              r.lead ? 'border-primary-100' : 'border-stroke'
+            }`}
+          >
+            <span className={`font-serif text-body font-bold ${r.lead ? 'text-fg-brand' : 'text-fg-tertiary'}`}>
+              {i + 1}
+            </span>
+            <div className={`h-[9px] rounded-[5px] bg-stroke ${r.w}`} />
+            <span
+              className={`ml-auto rounded-full px-2.5 py-1 text-body-3xs font-semibold ${
+                r.lead ? 'bg-primary-50 text-fg-brand' : 'bg-surface-tertiary text-fg-tertiary'
+              }`}
+            >
+              {t('pricing.vignette.match', { pct: r.pct })}
+            </span>
+          </div>
+        ))}
+        <div className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-stroke px-4 py-3 text-body-2xs font-medium text-fg-tertiary">
+          <Lock size={13} />
+          {t('pricing.vignette.noSlot')}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FeeVignette() {
+  const { t } = useTranslation('common');
+  return (
+    <div
+      aria-hidden="true"
+      className="flex h-[340px] w-full items-center justify-center rounded-xl border border-stroke bg-surface desktop-s:w-[520px]"
+    >
+      <div className="w-[320px] overflow-hidden rounded-xl border border-stroke bg-surface shadow-[0_12px_32px_rgba(15,23,42,0.07)]">
+        <div className="flex items-center gap-3 border-b border-stroke-subtle px-6 py-5">
+          <div className="h-[38px] w-[38px] rounded-full bg-primary-50" />
+          <div className="flex flex-col gap-1.5">
+            <div className="h-[9px] w-[120px] rounded-[5px] bg-stroke" />
+            <span className="text-body-3xs font-semibold uppercase tracking-[0.08em] text-accent-700">
+              {t('pricing.vignette.verified')}
+            </span>
+          </div>
+        </div>
+        <div className="flex flex-col gap-1.5 px-6 py-5">
+          <span className="text-body-2xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary">
+            {t('pricing.vignette.rangeLabel')}
+          </span>
+          <span className="font-serif text-h2 font-bold tabular-nums text-fg">
+            {t('pricing.vignette.range')}{' '}
+            <span className="font-sans text-body-xs font-medium text-fg-tertiary">
+              {t('pricing.vignette.perHour')}
+            </span>
+          </span>
+          <span className="text-body-2xs text-fg-tertiary">{t('pricing.vignette.published')}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Teaser row (text + vignette, alternating) ───────────────────────────────
+
+function Teaser({
+  base,
+  vignette,
+  imageLeft = false,
+  tinted = false,
+}: {
+  base: 'who' | 'ranking' | 'specialist';
+  vignette: React.ReactNode;
+  imageLeft?: boolean;
+  tinted?: boolean;
+}) {
+  const { t } = useTranslation('common');
+  const text = (
+    <SlideIn from={imageLeft ? 'right' : 'left'} className="min-w-0 flex-1">
+      <SectionEyebrow tone="brand">{t(`pricing.${base}.kicker`)}</SectionEyebrow>
+      <h2 className="mt-3 font-serif text-h1 font-semibold text-fg">{t(`pricing.${base}.title`)}</h2>
+      <p className="mt-4 max-w-[52ch] text-body leading-relaxed text-fg-secondary">
         {t(`pricing.${base}.body`)}
       </p>
-    </Reveal>
+    </SlideIn>
+  );
+  const image = (
+    <SlideIn from={imageLeft ? 'left' : 'right'} className="w-full shrink-0 desktop-s:w-auto">
+      {vignette}
+    </SlideIn>
+  );
+  return (
+    <section className={tinted ? 'border-y border-stroke-subtle bg-surface-secondary' : 'bg-surface'}>
+      <Container size="xl">
+        <div className="flex flex-col gap-12 py-20 desktop-s:flex-row desktop-s:items-center desktop-s:gap-24 desktop-s:py-[5.5rem]">
+          {imageLeft ? (
+            <>
+              <div className="hidden desktop-s:contents">{image}</div>
+              {text}
+              <div className="desktop-s:hidden">{image}</div>
+            </>
+          ) : (
+            <>
+              {text}
+              {image}
+            </>
+          )}
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+// ─── FAQ (canvas pattern: hairline rows, plus/minus, first open) ─────────────
+
+function FaqItem({ index, open, onToggle }: { index: number; open: boolean; onToggle: () => void }) {
+  const { t } = useTranslation('common');
+  const panelId = `pricing-faq-panel-${index}`;
+  return (
+    <div className="border-b border-stroke">
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={panelId}
+        onClick={onToggle}
+        className="flex w-full items-center justify-between gap-6 px-2 py-6 text-left"
+      >
+        <span className="text-[17px] font-semibold leading-snug text-fg">
+          {t(`pricing.faq.items.${index}.q`)}
+        </span>
+        {open ? (
+          <Minus size={20} strokeWidth={1.75} className="shrink-0 text-fg-brand" aria-hidden />
+        ) : (
+          <Plus size={20} strokeWidth={1.75} className="shrink-0 text-fg-tertiary" aria-hidden />
+        )}
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            id={panelId}
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            className="overflow-hidden"
+          >
+            <p className="max-w-[62ch] px-2 pb-6 text-body-md leading-relaxed text-fg-secondary">
+              {t(`pricing.faq.items.${index}.a`)}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -48,12 +268,12 @@ export function PricingPage() {
   const { t } = useTranslation('common');
   const navigate = useNavigate();
   const { locale } = useParams();
-
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   return (
     <main className="bg-surface">
       {/* The site header is fixed and ~113px tall at lg; each page clears it itself. */}
-      <section className="border-b border-stroke-subtle bg-surface-secondary pb-20 pt-32 lg:pb-28 lg:pt-40">
+      <section className="border-b border-stroke-subtle bg-surface-secondary pb-20 pt-32 lg:pb-24 lg:pt-40">
         <Container size="xl">
           <Reveal className="mx-auto flex max-w-[760px] flex-col items-center gap-4 text-center">
             <SectionEyebrow tone="brand">{t('pricing.eyebrow')}</SectionEyebrow>
@@ -67,24 +287,31 @@ export function PricingPage() {
         </Container>
       </section>
 
-      <section className="py-16 lg:py-20">
+      {/* ── The three free items, as large numbered cards ─────────────────── */}
+      <section className="py-20 desktop-s:py-24">
         <Container size="xl">
-          <Reveal className="mx-auto max-w-[980px]">
-            <span className="text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
-              {t('pricing.free.kicker')}
-            </span>
-            <h2 className="mt-2 font-serif text-[1.75rem] font-semibold text-fg">{t('pricing.free.title')}</h2>
+          <Reveal className="max-w-[760px]">
+            <SectionEyebrow tone="brand">{t('pricing.free.kicker')}</SectionEyebrow>
+            <h2 className="mt-3 font-serif text-h1 font-semibold text-fg">{t('pricing.free.title')}</h2>
           </Reveal>
-          <Stagger className="mx-auto mt-8 grid max-w-[980px] gap-4 md:grid-cols-3">
+          <Stagger className="mt-11 grid gap-6 tablet:grid-cols-3" stagger={0.15}>
             {Array.from({ length: FREE_COUNT }, (_, i) => (
               <StaggerItem key={i}>
-                <div className="flex h-full flex-col rounded-xl border border-stroke-subtle bg-surface p-6">
-                  <p className="font-serif text-[1.125rem] font-bold leading-snug text-fg">
+                <div className="flex h-full min-h-[320px] flex-col rounded-xl border border-stroke-subtle bg-surface p-9">
+                  <span className="font-serif text-display-md font-semibold tabular-nums text-primary-100">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <p className="mt-5 font-serif text-h3 font-bold leading-snug text-fg">
                     {t(`pricing.free.items.${i}.title`)}
                   </p>
-                  <p className="mt-3 text-body-sm leading-relaxed text-fg-secondary">
-                    {t(`pricing.free.items.${i}.desc`)}
-                  </p>
+                  <TypeOnView
+                    text={t(`pricing.free.items.${i}.desc`)}
+                    className="mt-3 text-body-md leading-relaxed text-fg-secondary"
+                    delay={0.2 + i * 0.15}
+                  />
+                  <span className="mt-auto pt-6 text-body-xs font-semibold text-fg-brand">
+                    {t(`pricing.free.items.${i}.price`)}
+                  </span>
                 </div>
               </StaggerItem>
             ))}
@@ -92,28 +319,53 @@ export function PricingPage() {
         </Container>
       </section>
 
-      <section className="bg-surface-secondary py-16 lg:py-20">
+      {/* ── Three teasers, text and image alternating ─────────────────────── */}
+      <Teaser base="who" vignette={<BookingVignette />} tinted />
+      <Teaser base="ranking" vignette={<RankingVignette />} imageLeft />
+      <Teaser base="specialist" vignette={<FeeVignette />} tinted />
+
+      {/* ── FAQ ───────────────────────────────────────────────────────────── */}
+      <section className="py-20 desktop-s:py-24">
         <Container size="xl">
-          <div className="mx-auto max-w-[820px]">
-            <Statement base="who" />
-            <Statement base="ranking" />
-            <Statement base="specialist" />
-          </div>
+          <Reveal className="flex flex-col items-center gap-2.5 text-center">
+            <SectionEyebrow tone="brand">{t('pricing.faq.eyebrow')}</SectionEyebrow>
+            <h2 className="font-serif text-h1 font-semibold text-fg">{t('pricing.faq.title')}</h2>
+          </Reveal>
+          <Reveal delay={0.1} className="mx-auto mt-11 max-w-[820px] border-t border-stroke">
+            {Array.from({ length: FAQ_COUNT }, (_, i) => (
+              <FaqItem
+                key={i}
+                index={i}
+                open={openFaq === i}
+                onToggle={() => setOpenFaq((cur) => (cur === i ? null : i))}
+              />
+            ))}
+          </Reveal>
         </Container>
       </section>
 
-      <section className="py-20 lg:py-24">
+      {/* ── The close · the same orchestration band as area and market ────── */}
+      <section className="bg-primary-700 py-16 desktop-s:py-20">
         <Container size="xl">
-          <Reveal className="mx-auto flex max-w-[640px] flex-col items-center gap-4 text-center">
-            <h2 className="font-serif text-[1.875rem] font-semibold leading-tight text-fg">
-              {t('pricing.cta.title')}
-            </h2>
-            <p className="text-body leading-relaxed text-fg-secondary">{t('pricing.cta.lead')}</p>
-            <Button size="lg" variant="primary" className="mt-2" onClick={() => navigate(`/${locale ?? 'en'}/wizard`)}>
-              {t('hero.cta.start', { ns: 'home', defaultValue: 'Assess My Needs' })}
-              <ArrowRight size={17} className="ml-1.5" />
-            </Button>
-          </Reveal>
+          <HowOrchestrationWorks tone="inverse" />
+          <div className="mt-[3.5rem] border-t border-white/[0.14] pt-[2.5rem]">
+            <div className="flex flex-col gap-6 desktop-s:flex-row desktop-s:items-center desktop-s:justify-between desktop-s:gap-12">
+              <div className="max-w-[560px]">
+                <h2 className="font-serif text-h3 font-bold text-white">{t('pricing.cta.title')}</h2>
+                <p className="mt-2 text-body leading-relaxed text-primary-100">{t('pricing.cta.lead')}</p>
+              </div>
+              <Button
+                variant="inverse"
+                size="xl"
+                shape="soft"
+                className="shrink-0 self-start desktop-s:self-auto"
+                onClick={() => navigate(`/${locale ?? 'en'}/wizard`)}
+              >
+                {t('hero.cta.start', { ns: 'home', defaultValue: 'Assess My Needs' })}
+                <ArrowRight size={17} className="ml-1.5" />
+              </Button>
+            </div>
+          </div>
         </Container>
       </section>
 

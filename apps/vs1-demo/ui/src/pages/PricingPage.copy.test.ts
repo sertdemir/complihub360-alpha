@@ -17,11 +17,13 @@ import { fileURLToPath } from 'node:url';
 const here = dirname(fileURLToPath(import.meta.url));
 const LOCALES = ['en', 'de', 'es', 'tr'] as const;
 const FREE_COUNT = 3; // mirrors the constant in PricingPage.tsx
-// The page interpolates two different variables into key paths; each expands
+const FAQ_COUNT = 6; // mirrors the constant in PricingPage.tsx
+// The page interpolates three different variables into key paths; each expands
 // over its own domain, so the extractor has to tell them apart.
 const EXPANSIONS: Record<string, string[]> = {
-  i: Array.from({ length: FREE_COUNT }, (_, n) => String(n)), // free.items.${i}
-  base: ['who', 'ranking', 'specialist'],                     // ${base}.kicker
+  i: Array.from({ length: FREE_COUNT }, (_, n) => String(n)),     // free.items.${i}
+  index: Array.from({ length: FAQ_COUNT }, (_, n) => String(n)),  // faq.items.${index}
+  base: ['who', 'ranking', 'specialist'],                         // ${base}.kicker
 };
 
 function loadCommon(lng: string) {
