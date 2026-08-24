@@ -830,6 +830,7 @@
       "lead": "Jeder Markt, für den wir Pflichten führen, mit der Rechtsgrundlage hinter jeder einzelnen. Keine Zusammenfassung des Rechts — die Einträge, gegen die unsere Engine prüft.",
       "obligations_one": "{{count}} Pflicht",
       "obligations_other": "{{count}} Pflichten",
+      "areas": "{{count}} von {{total}} Bereichen",
       "enforcement": "Vollzug {{value}}/10"
     },
     "country": {

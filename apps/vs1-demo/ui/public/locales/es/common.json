@@ -830,6 +830,7 @@
       "lead": "Todos los mercados para los que mantenemos obligaciones, con la norma que respalda cada una. No es un resumen del derecho: son las entradas contra las que compara nuestro motor.",
       "obligations_one": "{{count}} obligación",
       "obligations_other": "{{count}} obligaciones",
+      "areas": "{{count}} de {{total}} áreas",
       "enforcement": "Aplicación {{value}}/10"
     },
     "country": {
