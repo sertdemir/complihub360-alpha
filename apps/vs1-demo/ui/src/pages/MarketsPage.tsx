@@ -259,7 +259,10 @@ export function MarketPage() {
       : null,
   ].filter((f): f is { key: string; value: string; label: string; tone: string } => f !== null);
 
-  const startAssessment = () => navigate(`${localePrefix}/wizard`);
+  // The CTA carries the market into the wizard: this page IS the answer to the
+  // wizard's first question, so the flow opens on Operations with this market
+  // pre-selected instead of asking again.
+  const startAssessment = () => navigate(`${localePrefix}/wizard?market=${upper}`);
 
   return (
     <main className="bg-surface">
