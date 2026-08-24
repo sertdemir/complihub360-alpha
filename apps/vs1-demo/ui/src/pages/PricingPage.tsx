@@ -273,16 +273,21 @@ export function PricingPage() {
   return (
     <main className="bg-surface">
       {/* The site header is fixed and ~113px tall at lg; each page clears it itself. */}
-      <section className="border-b border-stroke-subtle bg-surface-secondary pb-20 pt-32 lg:pb-24 lg:pt-40">
+      {/* Sized up on review (2026-08-24): the band grew a step in every
+          dimension — padding, headline, lead — so the page opens like a
+          statement rather than a section. display-xl is the scale's 60px. */}
+      <section className="border-b border-stroke-subtle bg-surface-secondary pb-24 pt-36 lg:pb-32 lg:pt-48">
         <Container size="xl">
-          <Reveal className="mx-auto flex max-w-[760px] flex-col items-center gap-4 text-center">
+          <Reveal className="mx-auto flex max-w-[860px] flex-col items-center gap-5 text-center">
             <SectionEyebrow tone="brand">{t('pricing.eyebrow')}</SectionEyebrow>
-            <h1 className="font-serif text-[2.25rem] font-semibold leading-tight tracking-tight text-fg lg:text-[3rem]">
+            <h1 className="font-serif text-display-md font-semibold tracking-tight text-fg lg:text-display-xl">
               {t('pricing.title.pre')}
               <GoldWord>{t('pricing.title.gold')}</GoldWord>
               {t('pricing.title.post')}
             </h1>
-            <p className="text-body-lg leading-relaxed text-fg-secondary">{t('pricing.lead')}</p>
+            <p className="max-w-[46ch] text-[1.25rem] leading-relaxed text-fg-secondary">
+              {t('pricing.lead')}
+            </p>
           </Reveal>
         </Container>
       </section>
