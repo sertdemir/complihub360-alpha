@@ -78,6 +78,58 @@
       "trust": "Free · anonymous · under 3 minutes"
     }
   },
+  "heroWorld": {
+    "title": {
+      "line1": "Global Compliance.",
+      "line2": "Simplified."
+    },
+    "lead": "Understand your obligations. Find the right specialists. Stay compliant — everywhere you sell.",
+    "ctaRiskMap": "Start the Risk Map",
+    "ask": {
+      "placeholder": "Describe what you need",
+      "send": "Send"
+    },
+    "promises": [
+      {
+        "title": "Know your obligations",
+        "desc": "See clearly what applies to your business."
+      },
+      {
+        "title": "The right specialists",
+        "desc": "We match you with verified partners who fit your case."
+      },
+      {
+        "title": "Get things done",
+        "desc": "Connect, collaborate, complete."
+      },
+      {
+        "title": "Always on your side",
+        "desc": "Human support and AI help — around the clock."
+      }
+    ],
+    "proofs": [
+      {
+        "title": "360° coverage",
+        "desc": "Across countries, topics and regulations."
+      },
+      {
+        "title": "Expert network",
+        "desc": "Verified specialists you can trust."
+      },
+      {
+        "title": "Smart technology",
+        "desc": "AI guidance with human expertise."
+      },
+      {
+        "title": "Human first",
+        "desc": "Real people. Real support."
+      },
+      {
+        "title": "Your data, protected",
+        "desc": "Enterprise-grade security and privacy."
+      }
+    ]
+  },
   "problemRecognition": {
     "eyebrow": "Why this is hard",
     "title": {

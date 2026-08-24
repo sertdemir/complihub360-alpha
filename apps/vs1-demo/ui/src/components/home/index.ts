@@ -1,4 +1,6 @@
 export { HomeHero } from './HomeHero';
+export { HomeHeroWorld } from './HomeHeroWorld';
+export { HeroWorldMap } from './HeroWorldMap';
 export { ProblemRecognition } from './ProblemRecognition';
 export { HowItWorksSteps } from './HowItWorksSteps';
 export { RiskMapSection } from './RiskMapSection';

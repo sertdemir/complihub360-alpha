@@ -4,7 +4,7 @@
 // Section order follows the journey in Brand & Marketing Map V1 §4 rather than
 // the order the sections happened to be built in:
 //
-//   1 Hero                → HomeHero              understand, two equal entries
+//   1 Hero                → HomeHeroWorld         understand, two equal entries
 //   2 Problem Recognition → ProblemRecognition    the reader recognises themselves
 //   3 The instrument      → EntryDoor             the REAL wizard, full size
 //   4 How It Works        → HowItWorksSteps       the five stages, condensed
@@ -38,7 +38,7 @@
 // Built screens-led on the Compass DS, section by section.
 
 import {
-  HomeHero,
+  HomeHeroWorld,
   ProblemRecognition,
   HowItWorksSteps,
   RiskMapSection,
@@ -57,7 +57,10 @@ import {
 export function HomePage() {
   return (
     <main className="bg-white">
-      <HomeHero wizard="animated" entry="search" />
+      {/* World-map hero (canvas 2026-08-24). HomeHero stays available — this
+          swaps the usage only; `<HomeHero wizard="animated" entry="search" />`
+          brings the wizard-led hero back. */}
+      <HomeHeroWorld />
       <ProblemRecognition />
       <EntryDoor />
       <HowItWorksSteps />
