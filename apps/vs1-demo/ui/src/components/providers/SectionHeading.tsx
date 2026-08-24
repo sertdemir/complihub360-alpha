@@ -75,19 +75,15 @@ export function StaggerItem({ children, className = '' }: { children: ReactNode;
 export function SectionEyebrow({
   children,
   tone = 'neutral',
-  /**
-   * The leading dot. On by default — it is the marketing surface's eyebrow
-   * signature and every other section carries it. The area hero opts out
-   * because the canvas opens on the word alone.
-   */
-  dot = true,
   className = '',
 }: {
   children: React.ReactNode;
   tone?: 'neutral' | 'brand' | 'accent' | 'inverse';
-  dot?: boolean;
   className?: string;
 }) {
+  // The leading dot is GONE (user decision 2026-08-24): every eyebrow opens on
+  // the word alone, as the area hero always did. The `dot` prop went with it —
+  // an opt-out nobody can reach cannot drift back in.
   // Semantic tokens, not raw palette steps: the palette classes are fixed
   // values and do not flip with the theme, which left every eyebrow at a
   // 1.01 contrast ratio on dark surfaces — text-primary-600 (#002E26) sitting
@@ -105,7 +101,6 @@ export function SectionEyebrow({
     <span
       className={`inline-flex items-center gap-2 text-caption font-sans font-semibold uppercase tracking-[0.14em] ${toneClass} ${className}`}
     >
-      {dot && <span className="inline-block w-1.5 h-1.5 rounded-full bg-current opacity-60" />}
       {children}
     </span>
   );

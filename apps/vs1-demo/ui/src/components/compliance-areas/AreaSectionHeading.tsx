@@ -31,7 +31,7 @@ interface Props {
 export function AreaSectionHeading({ eyebrow, title, lead, tone = 'default', className = '' }: Props) {
   return (
     <div className={className}>
-      <SectionEyebrow tone={tone === 'inverse' ? 'inverse' : 'neutral'} dot={false}>
+      <SectionEyebrow tone={tone === 'inverse' ? 'inverse' : 'neutral'}>
         {eyebrow}
       </SectionEyebrow>
       <Typography

@@ -62,7 +62,6 @@ export function HomeFaq() {
           transition={{ duration: 0.5, ease: 'easeOut' }}
         >
           <span className="inline-flex items-center gap-2 text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-brand">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-current opacity-70" />
             {t('faq.label')}
           </span>
           <h2 className="font-serif text-[2rem] font-bold leading-tight tracking-tight text-fg sm:text-[2.75rem]">

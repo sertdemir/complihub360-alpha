@@ -23,7 +23,6 @@ export function NewsletterBand() {
           {/* Left — copy */}
           <div className="max-w-lg">
             <span className="inline-flex items-center gap-2 text-body-3xs font-semibold uppercase tracking-[0.14em] text-fg-brand">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-current opacity-70" />
               {t('newsletter.eyebrow')}
             </span>
             <h2 className="mt-2 font-serif text-[1.6rem] font-bold leading-tight tracking-tight text-fg">
