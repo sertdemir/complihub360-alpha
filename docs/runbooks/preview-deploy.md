@@ -12,6 +12,73 @@ einfach die andere URL aufrufen; „Rollback" ist damit kostenlos.
 Beide liegen hinter derselben Basic-Auth-Wall (Credentials: `.env.staging` →
 `STAGING_BASIC_AUTH`) und tragen `X-Robots-Tag: noindex`.
 
+## Zugänge (Basic Auth)
+
+Die Wall ist **eine** Traefik-Middleware (`complihub-auth`), definiert als
+Container-Label in `/docker/complihub/docker-compose.yml` (Zeile mit
+`…basicauth.users=`). Sie gilt für Staging **und** Preview — ein Eintrag, beide
+Kanäle. Auf der VPS liegen nur bcrypt-Hashes, nie Klartext.
+
+Verwaltet wird das mit `./scripts/staging-auth.sh` (SSH auf die VPS, kein
+manuelles Editieren des Labels):
+
+```bash
+./scripts/staging-auth.sh list              # wer hat Zugang?
+./scripts/staging-auth.sh add partner-acme  # anlegen, Passwort wird einmalig ausgegeben
+./scripts/staging-auth.sh remove partner-acme
+```
+
+`add` erzeugt das Passwort **auf der VPS** (`openssl rand -base64 18`), hasht es
+mit `htpasswd -nbB`, trägt es ins Label ein, startet den Container neu und prüft
+den Login per `curl` — erst danach wird das Passwort ausgegeben. Es erscheint
+genau einmal; verloren = neu anlegen (`add` mit demselben Namen ersetzt den
+Eintrag).
+
+**Ein Account pro Partner**, nicht ein geteiltes Passwort für alle: nur so lässt
+sich ein einzelner Zugang wieder entziehen, ohne allen anderen ein neues
+Passwort zu geben. Weitergabe über den Passwort-Manager, nicht als Klartext in
+einer Mail.
+
+`complihub` ist der Haupt-Account — er steckt in `.env.staging` und in den
+Deploy-/Smoke-Scripts. `remove complihub` wird deshalb abgelehnt (nur mit
+`--force`).
+
+### Wenn das Passwort verloren ist
+
+Genau das ist am 23.08.2026 passiert: die Wall stand, die Credentials waren
+weder im Passwort-Manager noch sonst auffindbar, und `.env.staging` ist (zu
+Recht) gitignored — es gibt also keine Kopie im Repo. Der Hash auf der VPS ist
+nicht umkehrbar, das Passwort ist damit weg. Lösung ist nicht Suchen, sondern
+**Neusetzen**:
+
+```bash
+./scripts/staging-auth.sh add complihub     # überschreibt den bestehenden Eintrag
+```
+
+Danach den neuen Wert in `.env.staging` (lokal, untracked) und im
+Passwort-Manager nachziehen.
+
+Zwei Fallen, die diese Runde gekostet haben:
+
+- **`$` muss im compose-File verdoppelt werden** (`$$2y$$05$$…`). Sonst frisst
+  Docker Composes Variablen-Interpolation Teile des bcrypt-Hashes, und der
+  Login schlägt mit korrektem Passwort fehl. Im aufgelösten Label
+  (`docker inspect`) steht wieder ein einfaches `$` — das ist der Beweis, dass
+  es richtig ist.
+- **`docker restart` reicht nicht.** Labels werden bei der Container-*Erzeugung*
+  gelesen. Nach einer Label-Änderung ist `docker compose up -d` nötig, sonst
+  läuft weiter der alte Hash.
+
+Prüfen, was Traefik tatsächlich sieht:
+
+```bash
+docker inspect complihub-web-1 \
+  --format '{{index .Config.Labels "traefik.http.middlewares.complihub-auth.basicauth.users"}}'
+curl -s -o /dev/null -w '%{http_code}\n' -u "complihub:$PW" https://staging.complihub360.com/build-info.json
+```
+
+Erwartet: `200`.
+
 ## Voraussetzung (einmalig, User-Aktion)
 
 **DNS-A-Record anlegen** — solange er fehlt, ist die Preview nur intern

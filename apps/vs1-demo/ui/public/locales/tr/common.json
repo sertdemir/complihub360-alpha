@@ -830,6 +830,7 @@
       "lead": "Yükümlülük tuttuğumuz her pazar, her birinin arkasındaki mevzuatla birlikte. Hukukun bir özeti değil — motorumuzun karşılaştırdığı kayıtlar.",
       "obligations_one": "{{count}} yükümlülük",
       "obligations_other": "{{count}} yükümlülük",
+      "areas": "{{total}} alandan {{count}}",
       "enforcement": "Uygulama {{value}}/10"
     },
     "country": {

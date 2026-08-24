@@ -830,6 +830,7 @@
       "lead": "Every market we hold obligations for, with the statute behind each one. Not a summary of the law — the entries our engine matches against.",
       "obligations_one": "{{count}} obligation",
       "obligations_other": "{{count}} obligations",
+      "areas": "{{count}} of {{total}} areas",
       "enforcement": "Enforcement {{value}}/10"
     },
     "country": {

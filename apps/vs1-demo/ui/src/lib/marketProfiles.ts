@@ -258,9 +258,24 @@ export function getMarketProfile(code: CountryCode): MarketProfile {
 }
 
 /** Every market with its obligation count — for the index page. */
-export function listMarkets(): { code: CountryCode; obligationCount: number; enforcementIntensity: number }[] {
+export function listMarkets(): {
+  code: CountryCode;
+  obligationCount: number;
+  enforcementIntensity: number;
+  /** Areas this market holds its own sources in, out of areasTotal. The hub
+   *  card shows the pair so uneven coverage is stated, never papered over —
+   *  the same rule that keeps the coverage note on the market page honest. */
+  areasCovered: number;
+  areasTotal: number;
+}[] {
   return MARKET_CODES.map((code) => {
     const p = getMarketProfile(code);
-    return { code, obligationCount: p.obligations.length, enforcementIntensity: p.enforcementIntensity };
+    return {
+      code,
+      obligationCount: p.obligations.length,
+      enforcementIntensity: p.enforcementIntensity,
+      areasCovered: p.byDomain.length,
+      areasTotal: p.weights.length,
+    };
   }).sort((a, b) => b.obligationCount - a.obligationCount);
 }

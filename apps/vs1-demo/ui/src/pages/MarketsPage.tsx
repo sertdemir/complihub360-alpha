@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ArrowRight, Check, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, ScrollText } from 'lucide-react';
+import { severityFromRiskWeight } from '@complihub/compliance-engine';
 import { Container } from '../components/ui/Container';
+import { RiskBadge } from '../components/ui/RiskBadge';
 import { Button } from '../components/ui/Button';
 import { SiteFooter } from '../components/home';
 import { SectionEyebrow, GoldWord, Reveal, Stagger, StaggerItem } from '../components/providers/SectionHeading';
@@ -78,30 +80,49 @@ export function MarketsIndexPage() {
       <section className="py-16 lg:py-20">
         <Container size="xl">
           <Stagger className="mx-auto grid max-w-[1040px] gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {markets.map((m) => (
-              <StaggerItem key={m.code}>
-                <Link
-                  to={`/${locale ?? 'en'}/markets/${m.code.toLowerCase()}`}
-                  className="group flex h-full flex-col rounded-xl border border-stroke-subtle bg-surface p-6 transition-colors hover:border-stroke-brand"
-                >
-                  <span className="text-body-3xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
-                    {m.code}
-                  </span>
-                  <p className="mt-2 font-serif text-[1.375rem] font-bold leading-snug text-fg">
-                    {t(`markets.countries.${m.code}`)}
-                  </p>
-                  <p className="mt-3 text-body-sm text-fg-secondary">
-                    {t('markets.index.obligations', { count: m.obligationCount })}
-                  </p>
-                  <p className="mt-1 text-body-2xs text-fg-tertiary">
-                    {t('markets.index.enforcement', { value: m.enforcementIntensity })}
-                  </p>
-                  <span className="mt-4 inline-flex items-center gap-1 text-body-sm font-semibold text-fg-brand">
-                    <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
-                  </span>
-                </Link>
-              </StaggerItem>
-            ))}
+            {markets.map((m) => {
+              // The same instrument as everywhere else: severity derives from
+              // the enforcement score, and the pill carries the real number.
+              const severity = severityFromRiskWeight(m.enforcementIntensity);
+              return (
+                <StaggerItem key={m.code}>
+                  <Link
+                    to={`/${locale ?? 'en'}/markets/${m.code.toLowerCase()}`}
+                    className="group flex h-full flex-col rounded-xl border border-stroke-subtle bg-surface p-6 shadow-sm transition-shadow hover:shadow-md focus-visible:shadow-md"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="text-body-3xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
+                        {m.code}
+                      </span>
+                      <RiskBadge level={severity} size="sm" className="shrink-0 rounded-full tabular-nums">
+                        {t('markets.index.enforcement', { value: m.enforcementIntensity })}
+                      </RiskBadge>
+                    </div>
+                    <p className="mb-5 mt-2 font-serif text-[1.375rem] font-bold leading-snug text-fg">
+                      {t(`markets.countries.${m.code}`)}
+                    </p>
+                    <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-stroke-subtle pt-4">
+                      <span className="inline-flex items-center gap-1.5 text-body-3xs font-semibold text-fg-tertiary">
+                        <ScrollText size={12} />
+                        {t('markets.index.obligations', { count: m.obligationCount })}
+                      </span>
+                      <span className="text-body-3xs font-semibold text-fg-tertiary">
+                        {t('markets.index.areas', {
+                          defaultValue: '{{count}} of {{total}} areas',
+                          count: m.areasCovered,
+                          total: m.areasTotal,
+                        })}
+                      </span>
+                      <ArrowRight
+                        size={14}
+                        className="ml-auto text-fg-brand transition-transform group-hover:translate-x-0.5"
+                        aria-hidden
+                      />
+                    </div>
+                  </Link>
+                </StaggerItem>
+              );
+            })}
           </Stagger>
         </Container>
       </section>
