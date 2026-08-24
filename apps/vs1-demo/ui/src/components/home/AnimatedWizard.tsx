@@ -229,6 +229,7 @@ export function AnimatedWizard({
   spacious = false,
   onComplete,
   initialProfile,
+  initialMarkets,
 }: {
   className?: string;
   /** User-driven: click cards to select, Back/Next to move; no auto-play, no cursor. */
@@ -241,6 +242,11 @@ export function AnimatedWizard({
   onComplete?: (profile: SearchProfile) => void;
   /** C6 "Refine existing": pre-selects the cards and opens on the Review step. */
   initialProfile?: SearchProfile;
+  /** Market codes (DE, UK, …) already known from the entry point — a market
+      page's CTA passes its own market, so the wizard pre-selects it and opens
+      on Operations instead of asking the question the page just answered.
+      Back still reaches the Markets step, so the pick stays editable. */
+  initialMarkets?: string[];
 }) {
   const { t } = useTranslation('home');
   const reduced = useReducedMotion();
@@ -255,9 +261,21 @@ export function AnimatedWizard({
   );
 
   const prefill = initialProfile && interactive ? selectionFromProfile(initialProfile) : null;
-  const [stepIndex, setStepIndex] = useState(prefill ? STEPS.length : reduced && !interactive ? 2 : 0);
+  // Codes are validated here, not at the call site: an unknown ?market= value
+  // degrades to a normal step-0 start instead of an empty pre-selection.
+  const marketPrefill = (() => {
+    if (!interactive || prefill || !initialMarkets?.length) return null;
+    const codeToCard = Object.fromEntries(Object.entries(MARKET_CODE).map(([k, v]) => [v, k]));
+    const cards = initialMarkets.map((m) => codeToCard[m.toUpperCase()]).filter(Boolean);
+    return cards.length ? cards : null;
+  })();
+  const [stepIndex, setStepIndex] = useState(
+    prefill ? STEPS.length : marketPrefill ? 1 : reduced && !interactive ? 2 : 0,
+  );
   const [selected, setSelected] = useState<Set<string>>(
-    () => prefill?.selected ?? new Set(reduced && !interactive ? ['Tax & VAT', 'EPR & Packaging', 'Data & Privacy'] : []),
+    () =>
+      prefill?.selected ??
+      new Set(marketPrefill ?? (reduced && !interactive ? ['Tax & VAT', 'EPR & Packaging', 'Data & Privacy'] : [])),
   );
   const [active, setActive] = useState<string | null>(null);
   const [cursor, setCursor] = useState({ x: 120, y: 60 });

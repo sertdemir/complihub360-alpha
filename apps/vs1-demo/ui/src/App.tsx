@@ -74,17 +74,23 @@ function WizardRoutes() {
     const locale = i18n.resolvedLanguage || 'en';
     // C6 "Refine existing": ?refine=1 pre-fills from the last saved profile and
     // opens on the Review step (edit from there). Fresh run otherwise.
-    const refine = new URLSearchParams(location.search).get('refine') === '1';
+    const params = new URLSearchParams(location.search);
+    const refine = params.get('refine') === '1';
     const initialProfile = (() => {
         if (!refine) return undefined;
         try { return JSON.parse(localStorage.getItem('ch360_last_profile') || 'null') ?? undefined; }
         catch { return undefined; }
     })();
+    // ?market=DE — a market page's CTA already knows its market, so the wizard
+    // must not reopen with the country question that page just answered. The
+    // code is validated inside AnimatedWizard; unknown values start normally.
+    const market = params.get('market');
     return (
         <AnimatedWizard
             spacious
             interactive
             initialProfile={initialProfile}
+            initialMarkets={market ? market.split(',') : undefined}
             onComplete={(profile) => navigate(`/${locale}/results`, { state: { searchProfile: profile } })}
             className="min-h-screen !rounded-none !border-0"
         />
