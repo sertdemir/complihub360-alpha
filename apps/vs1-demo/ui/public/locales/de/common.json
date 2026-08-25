@@ -776,27 +776,32 @@
       {
         "kicker": "Verstehen",
         "title": "Fragen Sie in eigenen Worten.",
-        "body": "Beschreiben Sie Ihre Lage so, wie Sie es einer Kollegin erklären würden. Sie bekommen eine Antwort mit der Quelle hinter jedem Punkt — dem Gesetzestext selbst, nicht der Zusammenfassung einer Zusammenfassung. Kein Konto, kein Verkaufsgespräch, keine Verpflichtung weiterzumachen."
+        "body": "Beschreiben Sie Ihre Lage so, wie Sie es einer Kollegin erklären würden. Sie bekommen eine Antwort mit der Quelle hinter jedem Punkt — dem Gesetzestext selbst, nicht der Zusammenfassung einer Zusammenfassung. Kein Konto, kein Verkaufsgespräch, keine Verpflichtung weiterzumachen.",
+        "short": "Stellen Sie Ihre Frage im Freitextfeld — die Antwort trägt die Quelle hinter jedem Punkt. Ohne Konto."
       },
       {
         "kicker": "Einschätzen",
         "title": "Sehen Sie, was tatsächlich für Sie gilt.",
-        "body": "Vier Fragen zu Ihren Märkten, Ihrem Geschäftsmodell und Ihrem Volumen ergeben eine Risk Map: die Pflichten, die für Ihren Betrieb gelten, jede mit Rechtsgrundlage und Frist. Sie stammen aus unserer eigenen Compliance-Engine und verweisen auf die EU-Rechtsdatenbank — sie werden nicht von einem Chatbot erzeugt."
+        "body": "Vier Fragen zu Ihren Märkten, Ihrem Geschäftsmodell und Ihrem Volumen ergeben eine Risk Map: die Pflichten, die für Ihren Betrieb gelten, jede mit Rechtsgrundlage und Frist. Sie stammen aus unserer eigenen Compliance-Engine und verweisen auf die EU-Rechtsdatenbank — sie werden nicht von einem Chatbot erzeugt.",
+        "short": "Der Wizard fragt vier Dinge ab und erstellt Ihre Risk Map — jede Pflicht mit Rechtsgrundlage und Frist."
       },
       {
         "kicker": "Entscheiden",
         "title": "Entscheiden Sie, wofür Sie Hilfe brauchen.",
-        "body": "Die Karte trennt, was Sie intern erledigen können, von dem, was wirklich eine Fachperson braucht — und in welcher Reihenfolge. Stellt sich heraus, dass Sie bereits alles abgedeckt haben, sagen wir Ihnen das. Dann gibt es für uns nichts zu verkaufen."
+        "body": "Die Karte trennt, was Sie intern erledigen können, von dem, was wirklich eine Fachperson braucht — und in welcher Reihenfolge. Stellt sich heraus, dass Sie bereits alles abgedeckt haben, sagen wir Ihnen das. Dann gibt es für uns nichts zu verkaufen.",
+        "short": "Die Risk Map trennt, was Sie intern erledigen, von dem, was eine Fachperson braucht."
       },
       {
         "kicker": "Matchen",
         "title": "Eignung vor Namen.",
-        "body": "Sie sehen die passenden Fachleute zuerst ohne Identität: Abdeckung, geprüfte Qualifikationen, Reaktionszeit, Passung zu Ihren Märkten. Die Eignung vor dem Briefkopf zu beurteilen, ist Absicht — ein bekannter Name ist kein Beleg für die richtige Passung. Die Reihung ist nicht käuflich."
+        "body": "Sie sehen die passenden Fachleute zuerst ohne Identität: Abdeckung, geprüfte Qualifikationen, Reaktionszeit, Passung zu Ihren Märkten. Die Eignung vor dem Briefkopf zu beurteilen, ist Absicht — ein bekannter Name ist kein Beleg für die richtige Passung. Die Reihung ist nicht käuflich.",
+        "short": "Fachleute zuerst ohne Identität: Abdeckung, geprüfte Qualifikationen, Reaktionszeit."
       },
       {
         "kicker": "Handeln",
         "title": "Buchen, dann übergeben.",
-        "body": "Wählen Sie einen Termin im Kalender der Fachperson. Die Identität wird bei der Buchung sichtbar, zusammen mit einem Dossier all dessen, was Sie uns bereits gesagt haben — Sie erklären Ihr Geschäft also kein sechstes Mal. Danach können Sie die Zusammenarbeit bewerten, und die Pflichten bleiben mit ihren Fristen auf Ihrer Karte."
+        "body": "Wählen Sie einen Termin im Kalender der Fachperson. Die Identität wird bei der Buchung sichtbar, zusammen mit einem Dossier all dessen, was Sie uns bereits gesagt haben — Sie erklären Ihr Geschäft also kein sechstes Mal. Danach können Sie die Zusammenarbeit bewerten, und die Pflichten bleiben mit ihren Fristen auf Ihrer Karte.",
+        "short": "Termin wählen — Ihr Dossier reist mit, Sie erklären Ihr Geschäft kein sechstes Mal."
       }
     ],
     "cost": {

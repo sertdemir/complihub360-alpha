@@ -776,27 +776,32 @@
       {
         "kicker": "Anlayın",
         "title": "Kendi kelimelerinizle sorun.",
-        "body": "Durumunuzu bir meslektaşınıza anlatır gibi anlatın. Her maddenin arkasındaki kaynakla birlikte bir yanıt alırsınız — özetin özeti değil, mevzuatın kendisi. Hesap yok, satış görüşmesi yok, devam etme zorunluluğu yok."
+        "body": "Durumunuzu bir meslektaşınıza anlatır gibi anlatın. Her maddenin arkasındaki kaynakla birlikte bir yanıt alırsınız — özetin özeti değil, mevzuatın kendisi. Hesap yok, satış görüşmesi yok, devam etme zorunluluğu yok.",
+        "short": "Sorunuzu serbest metin alanına yazın — yanıt, her noktanın arkasındaki kaynağı taşır. Hesap gerekmez."
       },
       {
         "kicker": "Değerlendirin",
         "title": "Size gerçekte neyin geçerli olduğunu görün.",
-        "body": "Pazarlarınız, iş modeliniz ve hacminize dair dört soru bir risk haritası oluşturur: işletmeniz için geçerli yükümlülükler, her biri yasal dayanağı ve süresiyle. Bunlar kendi uyum motorumuzdan gelir ve AB hukuk veritabanına bağlanır — bir sohbet botu tarafından üretilmezler."
+        "body": "Pazarlarınız, iş modeliniz ve hacminize dair dört soru bir risk haritası oluşturur: işletmeniz için geçerli yükümlülükler, her biri yasal dayanağı ve süresiyle. Bunlar kendi uyum motorumuzdan gelir ve AB hukuk veritabanına bağlanır — bir sohbet botu tarafından üretilmezler.",
+        "short": "Wizard dört şey sorar ve Risk Map’inizi oluşturur — her yükümlülük yasal dayanağı ve süresiyle."
       },
       {
         "kicker": "Karar verin",
         "title": "Neye dışarıdan destek gerektiğine karar verin.",
-        "body": "Harita, kendi içinizde halledebileceklerinizi gerçekten uzman gerektirenlerden ve hangi sırayla yapılacağından ayırır. Her şeyin zaten karşılandığı ortaya çıkarsa bunu size söyleriz — o durumda size satacağımız bir şey yoktur."
+        "body": "Harita, kendi içinizde halledebileceklerinizi gerçekten uzman gerektirenlerden ve hangi sırayla yapılacağından ayırır. Her şeyin zaten karşılandığı ortaya çıkarsa bunu size söyleriz — o durumda size satacağımız bir şey yoktur.",
+        "short": "Risk Map, kendi başınıza halledebileceklerinizi bir uzman gerektirenlerden ayırır."
       },
       {
         "kicker": "Eşleştirin",
         "title": "İsimden önce uygunluk.",
-        "body": "Eşleşen uzmanları önce kimlikleri olmadan görürsünüz: kapsam, doğrulanmış yetkinlikler, yanıt süresi, pazarlarınıza uygunluk. Uygunluğu antetli kâğıttan önce değerlendirmek bilinçli bir tercihtir — tanıdık bir isim, doğru uygunluğun kanıtı değildir. Sıralama hiçbir zaman satılık değildir."
+        "body": "Eşleşen uzmanları önce kimlikleri olmadan görürsünüz: kapsam, doğrulanmış yetkinlikler, yanıt süresi, pazarlarınıza uygunluk. Uygunluğu antetli kâğıttan önce değerlendirmek bilinçli bir tercihtir — tanıdık bir isim, doğru uygunluğun kanıtı değildir. Sıralama hiçbir zaman satılık değildir.",
+        "short": "Uzmanlar önce kimliksiz: kapsam, doğrulanmış nitelikler, yanıt süresi."
       },
       {
         "kicker": "Harekete geçin",
         "title": "Randevu alın, sonra devredin.",
-        "body": "Uzmanın takviminden bir saat seçin. Kimlik, randevu anında, bize daha önce anlattığınız her şeyi içeren bir dosyayla birlikte açılır — işinizi altıncı kez anlatmazsınız. Sonrasında süreci değerlendirebilirsiniz ve yükümlülükler süreleriyle birlikte haritanızda kalır."
+        "body": "Uzmanın takviminden bir saat seçin. Kimlik, randevu anında, bize daha önce anlattığınız her şeyi içeren bir dosyayla birlikte açılır — işinizi altıncı kez anlatmazsınız. Sonrasında süreci değerlendirebilirsiniz ve yükümlülükler süreleriyle birlikte haritanızda kalır.",
+        "short": "Randevu seçin — dosyanız sizinle gelir, işinizi altıncı kez anlatmazsınız."
       }
     ],
     "cost": {
