@@ -712,7 +712,25 @@
       "title": "Bu haritayı kaydedin. Partner'ların kilidini açın.",
       "subtitle": "Ücretsiz hesap. Kredi kartı gerekmez. Beta lansmanına kadar kurucu üye erişimi.",
       "cta": "Ücretsiz hesap oluşturun"
-    }
+    },
+    "statsCompact": [
+      {
+        "value": "8",
+        "label": "Tespit edilen yükümlülük"
+      },
+      {
+        "value": "4",
+        "label": "30 gün içinde süresi dolan"
+      },
+      {
+        "value": "14",
+        "label": "Gün medyan vade"
+      },
+      {
+        "value": "3",
+        "label": "Verified Partner"
+      }
+    ]
   },
   "matchmaking": {
     "eyebrow": "Fark",

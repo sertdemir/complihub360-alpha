@@ -712,7 +712,25 @@
       "title": "Save this map. Unlock the partners.",
       "subtitle": "Free account. No credit card. Founding-member access through Beta launch.",
       "cta": "Create free account"
-    }
+    },
+    "statsCompact": [
+      {
+        "value": "8",
+        "label": "Obligations identified"
+      },
+      {
+        "value": "4",
+        "label": "Due within 30 days"
+      },
+      {
+        "value": "14",
+        "label": "Days median deadline"
+      },
+      {
+        "value": "3",
+        "label": "Verified Partners"
+      }
+    ]
   },
   "matchmaking": {
     "eyebrow": "The difference",

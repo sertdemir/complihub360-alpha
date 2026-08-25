@@ -712,7 +712,25 @@
       "title": "Guarde este mapa. Desbloquee los partners.",
       "subtitle": "Cuenta gratuita. Sin tarjeta de crédito. Acceso de miembro fundador hasta el lanzamiento de la Beta.",
       "cta": "Crear cuenta gratuita"
-    }
+    },
+    "statsCompact": [
+      {
+        "value": "8",
+        "label": "Obligaciones identificadas"
+      },
+      {
+        "value": "4",
+        "label": "Con plazo en 30 días"
+      },
+      {
+        "value": "14",
+        "label": "Días de plazo mediano"
+      },
+      {
+        "value": "3",
+        "label": "Verified Partners"
+      }
+    ]
   },
   "matchmaking": {
     "eyebrow": "La diferencia",
