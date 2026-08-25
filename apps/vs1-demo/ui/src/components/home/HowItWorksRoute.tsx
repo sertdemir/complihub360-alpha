@@ -1,8 +1,9 @@
 import { useTranslation } from 'react-i18next';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Container } from '../ui/Container';
+import { Button } from '../ui/Button';
 import { SectionEyebrow, GoldWord } from '../providers/SectionHeading';
 import { useInViewOnce } from '../../lib/useInViewOnce';
 import { FitScale } from './HomeHero';
@@ -154,6 +155,7 @@ function MobileStation({ index }: { index: number }) {
 export function HowItWorksRoute() {
   const { t } = useTranslation('common');
   const { locale } = useParams();
+  const navigate = useNavigate();
   const [ref, inView] = useInViewOnce<HTMLDivElement>('-120px');
   const reduced = useReducedMotion();
   const animate = inView || !!reduced;
@@ -209,14 +211,10 @@ export function HowItWorksRoute() {
             ))}
           </div>
 
-          <div className="mt-10 flex justify-center">
-            <Link
-              to={`/${locale ?? 'en'}/how-it-works`}
-              className="inline-flex items-center gap-1.5 text-body-sm font-semibold text-fg-brand underline decoration-dotted underline-offset-4 hover:decoration-solid"
-            >
-              {t('howItWorks.seeAll')}
-              <ArrowRight size={15} />
-            </Link>
+          <div className="mt-12 flex justify-center">
+            <Button size="lg" onClick={() => navigate(`/${locale ?? 'en'}/how-it-works`)}>
+              {t('howItWorks.seeAll')} <ArrowRight size={16} className="ml-1.5" />
+            </Button>
           </div>
         </div>
       </Container>
