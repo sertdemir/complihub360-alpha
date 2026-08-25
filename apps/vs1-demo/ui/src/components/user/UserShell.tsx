@@ -123,7 +123,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
         logo={
           <NavLink to={`${base}/dashboard`} className="flex items-center gap-2">
             <LogoMark tone="on-light" className="h-[22px] w-auto" />
-            <span className="text-[15px] font-semibold text-fg">CompliHub</span>
+            <span className="text-[15px] font-semibold text-fg">CompliHub360</span>
           </NavLink>
         }
         footer={

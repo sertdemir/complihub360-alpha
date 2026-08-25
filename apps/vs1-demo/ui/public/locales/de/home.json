@@ -159,7 +159,7 @@
     "note": "Nichts davon heißt, dass Sie ein Problem haben. Es heißt, dass Sie noch kein klares Bild haben — und das lässt sich lösen."
   },
   "heroWizard": {
-    "mobileAlt": "CompliHub Compliance-Assistent — Schritt „Bereiche“ (mobil)"
+    "mobileAlt": "CompliHub360 Compliance-Assistent — Schritt „Bereiche“ (mobil)"
   },
   "wizard": {
     "rail": {
@@ -806,7 +806,7 @@
       "gold": "Beides",
       "post": " bleibt kaputt, wenn Sie nur eines beheben."
     },
-    "subtitle": "Jeder Markt hat eigene Schwellenwerte, Register und Aufsichten. Jeder Berater kennt einen Ausschnitt. Die Plattformen, die die Regeln kartieren, kennen die Menschen nicht. Die Verzeichnisse der Menschen lesen die Regeln nicht. CompliHub schließt beide Hälften zugleich.",
+    "subtitle": "Jeder Markt hat eigene Schwellenwerte, Register und Aufsichten. Jeder Berater kennt einen Ausschnitt. Die Plattformen, die die Regeln kartieren, kennen die Menschen nicht. Die Verzeichnisse der Menschen lesen die Regeln nicht. CompliHub360 schließt beide Hälften zugleich.",
     "card1": {
       "title": "Die Karte, die niemand zeichnet.",
       "label": "Die Lücke, kartiert"
@@ -996,7 +996,7 @@
         "title": "Rechtsberatung",
         "markets": "EU-WEIT",
         "desc": "Wissen, wann eine Frage wirklich eine Anwältin braucht — und jemanden erreichen, der Ihren Fall schon kennt.",
-        "intro": "Die Fragen, die eine qualifizierte Antwort brauchen statt einer Checkliste: Verträge, AGB, Verbraucherrechte, Streitfälle. CompliHub ist keine Kanzlei — Verified Partner beraten unter eigener Berufshaftung, und wir sorgen dafür, dass die Person, die Sie erreichen, Ihren Fall bereits kennt.",
+        "intro": "Die Fragen, die eine qualifizierte Antwort brauchen statt einer Checkliste: Verträge, AGB, Verbraucherrechte, Streitfälle. CompliHub360 ist keine Kanzlei — Verified Partner beraten unter eigener Berufshaftung, und wir sorgen dafür, dass die Person, die Sie erreichen, Ihren Fall bereits kennt.",
         "cover": [
           "AGB und verbraucherrechtliche Informationspflichten",
           "Lieferanten- und Plattformverträge",
@@ -1108,7 +1108,7 @@
       "gold": "Homebase",
       "post": " für alles rund um Compliance."
     },
-    "subtitle": "Das Assessment ist kostenlos. Was danach kommt — Ihr Workspace, Live-News, Expertenwissen, Ihre Partner — macht CompliHub zu dem Ort, an den Sie zurückkehren.",
+    "subtitle": "Das Assessment ist kostenlos. Was danach kommt — Ihr Workspace, Live-News, Expertenwissen, Ihre Partner — macht CompliHub360 zu dem Ort, an den Sie zurückkehren.",
     "pills": {
       "live": "Heute verfügbar",
       "beta": "Startet mit der Beta"
@@ -1171,7 +1171,7 @@
       },
       {
         "q": "Erhalte ich hier Rechtsberatung?",
-        "a": "Nein. CompliHub kartiert Pflichten und zeigt auf, was wahrscheinlich für Ihren Betrieb gilt — das ist keine Rechtsberatung. Wenn eine Sache eine verbindliche Einschätzung braucht, verbinden wir Sie mit einem Verified Partner, der sie geben kann."
+        "a": "Nein. CompliHub360 kartiert Pflichten und zeigt auf, was wahrscheinlich für Ihren Betrieb gilt — das ist keine Rechtsberatung. Wenn eine Sache eine verbindliche Einschätzung braucht, verbinden wir Sie mit einem Verified Partner, der sie geben kann."
       },
       {
         "q": "Wie werden Verified Partner geprüft?",
@@ -1285,6 +1285,15 @@
       "imprint": "Impressum",
       "cookies": "Cookie-Richtlinie",
       "subProcessors": "Unterauftragsverarbeiter"
+    }
+  },
+  "trustBand": {
+    "eyebrow": "Warum beides zusammengehört",
+    "title": {
+      "line1": "Die Plattformen kennen die Regeln, die Verzeichnisse die Menschen.",
+      "pre": "CompliHub360 schließt ",
+      "gold": "beide Hälften",
+      "post": " zugleich."
     }
   }
 }

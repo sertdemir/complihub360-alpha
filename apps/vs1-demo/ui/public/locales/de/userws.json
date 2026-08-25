@@ -365,7 +365,7 @@
   "assistant": {
     "title": "USt-Assistent",
     "beta": "Beta",
-    "intro": "Fragen Sie mich zu USt-Regeln, Schwellenwerten und Fristen in Ihren Märkten (DE, UK, NL, FR, IT, ES, US, TR, AT). Ich antworte aus der geprüften CompliHub-Wissensbasis.",
+    "intro": "Fragen Sie mich zu USt-Regeln, Schwellenwerten und Fristen in Ihren Märkten (DE, UK, NL, FR, IT, ES, US, TR, AT). Ich antworte aus der geprüften CompliHub360-Wissensbasis.",
     "placeholder": "z. B. Ab wann muss ich mich in Italien registrieren?",
     "send": "Senden",
     "open": "Assistent öffnen",

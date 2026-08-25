@@ -58,7 +58,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         logo={
           <NavLink to={base} className="flex items-center gap-2">
             <LogoMark tone="on-light" className="h-[22px] w-auto" />
-            <span className="text-[15px] font-semibold text-fg">CompliHub</span>
+            <span className="text-[15px] font-semibold text-fg">CompliHub360</span>
             {/* accent-STRONG: 9px owes the full 4.5:1 and gold-500 is 2.10 on the light
                 shell. Same call as the PARTNER badge in ProviderShell. */}
             <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-fg-accent-strong">Admin</span>

@@ -365,7 +365,7 @@
   "assistant": {
     "title": "Asistente de IVA",
     "beta": "Beta",
-    "intro": "Pregúnteme sobre normas de IVA, umbrales y plazos en sus mercados (DE, UK, NL, FR, IT, ES, US, TR, AT). Respondo desde la base de conocimiento verificada de CompliHub.",
+    "intro": "Pregúnteme sobre normas de IVA, umbrales y plazos en sus mercados (DE, UK, NL, FR, IT, ES, US, TR, AT). Respondo desde la base de conocimiento verificada de CompliHub360.",
     "placeholder": "p. ej. ¿Cuándo debo registrarme a efectos de IVA en Italia?",
     "send": "Enviar",
     "open": "Abrir asistente",

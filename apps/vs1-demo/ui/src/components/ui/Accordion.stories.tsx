@@ -32,7 +32,7 @@ type Story = StoryObj<typeof meta>;
 const FAQ = [
   {
     value: 'q1',
-    q: 'How does CompliHub match me with a provider?',
+    q: 'How does CompliHub360 match me with a provider?',
     a: 'After your assessment we score every vetted partner against your jurisdictions, compliance areas and risk profile, then surface the best fit with a transparent match percentage — no cold calls, no guesswork.',
   },
   {

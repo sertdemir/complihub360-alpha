@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Download } from 'lucide-react';
 import { SectionEyebrow, GoldWord } from '../providers/SectionHeading';
 
-// ─── S5 — How CompliHub Acts · Figma 1247:435 ───────────────────────────────
+// ─── S5 — How CompliHub360 Acts · Figma 1247:435 ───────────────────────────────
 // "What happens between the match and the resolution." Three numbered cards —
 // cost, response SLA, and the engagement trail — each with a detail panel, laid
 // out as wide landscape rows (number · text · panel). Cards reveal top-to-bottom

@@ -497,7 +497,7 @@ export function ProviderOnboardingPage() {
                                     <Narrative
                                         eyebrow="Step 5 of 6 · Tooling"
                                         title={<><span className="text-accent-400">Wire up</span> billing + calendar.</>}
-                                        body="Stripe for invoicing, Cal.com for booking. Both self-hosted on our infrastructure — no third-party data leaves CompliHub. Takes about 5 minutes."
+                                        body="Stripe for invoicing, Cal.com for booking. Both self-hosted on our infrastructure — no third-party data leaves CompliHub360. Takes about 5 minutes."
                                     >
                                         <div className="mt-7 rounded-2xl border border-white/10 bg-white/[0.03] p-5">
                                             <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-white/40">How you're billed</p>
@@ -529,7 +529,7 @@ export function ProviderOnboardingPage() {
                                             <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-white/40">What happens after submit</p>
                                             <div className="mt-4 space-y-4">
                                                 {[
-                                                    ["Documents reviewed", "CompliHub Trust Ops verifies license & ID (1-2 business days)"],
+                                                    ["Documents reviewed", "CompliHub360 Trust Ops verifies license & ID (1-2 business days)"],
                                                     ["Workspace activated", "We email you the moment you're live — Verified-Partner badge appears in search"],
                                                     ["First leads route", "You start receiving Engagement Requests within 24h of activation"],
                                                 ].map(([t, d], i) => (
@@ -785,7 +785,7 @@ export function ProviderOnboardingPage() {
                                                 className="w-full resize-none rounded-xl border border-[#0e3e34] bg-[rgba(0,10,8,0.7)] px-4 py-3.5 text-[14px] text-white/80 outline-none transition-colors placeholder:text-white/30 focus:border-[#2a7d6d]"
                                             />
                                         </div>
-                                        <p className={"pt-1 " + FINE}>Documents reviewed by CompliHub Trust Ops · 4-eye check on practice license</p>
+                                        <p className={"pt-1 " + FINE}>Documents reviewed by CompliHub360 Trust Ops · 4-eye check on practice license</p>
                                     </div>
                                 )}
 
@@ -808,7 +808,7 @@ export function ProviderOnboardingPage() {
                                             title="Cal.com"
                                             sub="Self-hosted booking at cal.complihub360.com"
                                             connected={calConnected}
-                                            body="Clients book intro calls directly into your calendar. We host Cal.com ourselves — no third-party tracking, no data leaves CompliHub infrastructure."
+                                            body="Clients book intro calls directly into your calendar. We host Cal.com ourselves — no third-party tracking, no data leaves CompliHub360 infrastructure."
                                             meta="↗ See what data is shared"
                                             action={calConnected ? "Manage" : "Connect Cal.com"}
                                             onAction={() => setCalConnected(true)}
@@ -817,7 +817,7 @@ export function ProviderOnboardingPage() {
                                             <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent-400" />
                                             You can connect later from Settings → Tooling — but Stripe is required before your first invoice cycle. Cal.com can wait until after activation.
                                         </p>
-                                        <p className={"pt-1 " + FINE}>OAuth handshakes signed by CompliHub · Scopes restricted to invoicing & calendar-write only</p>
+                                        <p className={"pt-1 " + FINE}>OAuth handshakes signed by CompliHub360 · Scopes restricted to invoicing & calendar-write only</p>
                                     </div>
                                 )}
 

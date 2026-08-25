@@ -5,7 +5,7 @@ import { KPICircleCard } from "./KPICircleCard";
 // KPICircleCard. Axes: Layout (Horizontal·Centered) × Color (Brand·Success·
 // Warning·Error·Info) × State (Default·Disabled). Layout → layout, Color → color,
 // State → disabled. Label / value / trend are instance content (example hardcodes
-// representative CompliHub content).
+// representative CompliHub360 content).
 figma.connect(
   KPICircleCard,
   "https://www.figma.com/design/a4BeKbsBGoHkcudhKXUJTl?node-id=680-415",
