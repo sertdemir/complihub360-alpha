@@ -1,8 +1,6 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight } from 'lucide-react';
 import { Container } from '../ui/Container';
-import { Button } from '../ui/Button';
 import { RiskBadge, type RiskLevel } from '../ui/RiskBadge';
 import { Stat } from '../ui/Stat';
 import { SectionEyebrow, GoldWord } from '../providers/SectionHeading';
@@ -14,7 +12,9 @@ import { useInViewOnce } from '../../lib/useInViewOnce';
 // RiskMapSection stays in the tree. The Mercury pattern with the wizard
 // showcase's tinted gradient panel: the Risk Map floats as a product frame on
 // the panel and is CROPPED at the panel's bottom edge — there is visibly more
-// below. The partner preview and the save band carry over unchanged.
+// below. The partner preview and the save band moved on: the preview lives in
+// MatchShowcase, the save band was cut (user decision 2026-08-25) — the
+// unlock button under the match band carries the conversion instead.
 //
 // Scroll choreography (user spec 2026-08-25): the tinted panel is already
 // standing when the section scrolls in; once in view, the frame drives up
@@ -117,16 +117,6 @@ export function RiskMapShowcase() {
             "Der Unterschied" section directly below). */}
       </Container>
 
-      {/* Save CTA band — unchanged from RiskMapSection */}
-      <div className="mt-16 bg-surface-secondary px-6 py-14 text-center lg:py-16">
-        <h3 className="font-serif text-[26px] font-bold tracking-tight text-fg">{t('riskMap.save.title')}</h3>
-        <p className="mx-auto mt-2 text-body-sm text-fg-secondary">
-          {t('riskMap.save.subtitle')}
-        </p>
-        <Button className="mt-7">
-          {t('riskMap.save.cta')} <ArrowRight size={16} className="ml-1.5" />
-        </Button>
-      </div>
     </section>
   );
 }

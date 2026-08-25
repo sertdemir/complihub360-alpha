@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
-import { Star, Lock } from 'lucide-react';
+import { Star, Lock, ArrowRight } from 'lucide-react';
 import { Container } from '../ui/Container';
+import { Button } from '../ui/Button';
 import { Tag } from '../ui/Tag';
 import { PartnerStatusBadge } from '../ui/ProviderBadges';
 import { SectionEyebrow, GoldWord, Reveal, Stagger, StaggerItem } from '../providers/SectionHeading';
@@ -125,17 +126,11 @@ export function MatchShowcase() {
           <p className="max-w-[62ch] text-body-lg leading-relaxed text-fg-secondary">{t('matchmaking.subtitle')}</p>
         </Reveal>
 
-        <Reveal delay={0.1} className="mt-12 flex flex-wrap items-baseline justify-between gap-3">
-          <span className="text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-brand">{t('riskMap.partnersEyebrow')}</span>
-          <a className="inline-flex cursor-pointer items-center gap-1.5 text-body-xs font-semibold text-fg-brand">
-            <Lock size={13} /> {t('riskMap.unlock')}
-          </a>
-        </Reveal>
       </Container>
 
       {/* Full-bleed stage: three endlessly drifting ghost rows behind, the
           three matched dossiers sharp in front. */}
-      <div className="relative mt-4 overflow-hidden bg-[linear-gradient(165deg,#EAF3F1_0%,#DDECE8_55%,#E9E4D3_100%)]">
+      <div className="relative mt-12 overflow-hidden bg-[linear-gradient(165deg,#EAF3F1_0%,#DDECE8_55%,#E9E4D3_100%)]">
         <div aria-hidden className="absolute inset-0 flex flex-col justify-center gap-[22px]">
           <GhostRow duration={110} />
           <GhostRow reverse duration={130} />
@@ -151,6 +146,14 @@ export function MatchShowcase() {
           </Stagger>
         </div>
       </div>
+
+      {/* The one conversion of this section, centred under the band (the old
+          save band below the Risk Map was cut in its favour). */}
+      <Reveal delay={0.1} className="mt-12 flex justify-center px-4">
+        <Button size="lg">
+          {t('riskMap.unlock')} <ArrowRight size={16} className="ml-1.5" />
+        </Button>
+      </Reveal>
     </section>
   );
 }
