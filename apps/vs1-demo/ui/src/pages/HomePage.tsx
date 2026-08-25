@@ -40,7 +40,7 @@ import {
   ProblemRecognition,
   HowItWorksRoute,
   RiskMapShowcase,
-  MatchmakingDifference,
+  MatchShowcase,
   DomainsKnows,
   TwoReflexes,
   BrandCodePreview,
@@ -70,7 +70,10 @@ export function HomePage() {
       {/* Showcase edition (canvas 2026-08-25, Mercury pattern): the Risk Map
           drives up onto the tinted panel. RiskMapSection stays available. */}
       <RiskMapShowcase />
-      <MatchmakingDifference />
+      {/* Merged edition (canvas 2026-08-25): the partner preview and the
+          difference pitch become one section — anonymous dossiers on the
+          drifting ghost grid. MatchmakingDifference stays available. */}
+      <MatchShowcase />
       <DomainsKnows />
       <TwoReflexes />
       <BrandCodePreview />

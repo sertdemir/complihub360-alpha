@@ -7,6 +7,7 @@ export { HowItWorksRoute } from './HowItWorksRoute';
 export { RiskMapSection } from './RiskMapSection';
 export { RiskMapShowcase } from './RiskMapShowcase';
 export { MatchmakingDifference } from './MatchmakingDifference';
+export { MatchShowcase } from './MatchShowcase';
 export { TwoReflexes } from './TwoReflexes';
 export { DomainsKnows } from './DomainsKnows';
 export { HowItActs } from './HowItActs';

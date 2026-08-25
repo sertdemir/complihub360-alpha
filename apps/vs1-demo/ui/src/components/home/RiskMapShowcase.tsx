@@ -1,6 +1,6 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Lock, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Container } from '../ui/Container';
 import { Button } from '../ui/Button';
 import { RiskBadge, type RiskLevel } from '../ui/RiskBadge';
@@ -35,8 +35,6 @@ const SHOWCASE_ROWS: { row: number; level: RiskLevel; state: StateKind }[] = [
   { row: 4, level: 'high', state: 'confirmed' },
   { row: 6, level: 'medium', state: 'action' },
 ];
-
-const MATCH_PCTS = [94, 88, 81] as const;
 
 const COLS = 'sm:grid sm:grid-cols-[100px_1fr_92px_92px_168px] sm:items-center sm:gap-3';
 
@@ -115,29 +113,8 @@ export function RiskMapShowcase() {
           </motion.div>
         </div>
 
-        {/* Partners — unchanged from RiskMapSection */}
-        <div className="mt-14">
-          <p className="text-eyebrow font-semibold uppercase tracking-[0.14em] text-fg-brand">{t('riskMap.partnersEyebrow')}</p>
-          <div className="mt-1 flex flex-wrap items-end justify-between gap-3">
-            <h3 className="font-serif text-[24px] font-bold tracking-tight text-fg">{t('riskMap.partnersTitle')}</h3>
-            <a className="inline-flex cursor-pointer items-center gap-1.5 text-body-xs font-semibold text-fg-brand">
-              <Lock size={13} /> {t('riskMap.unlock')}
-            </a>
-          </div>
-          <div className="mt-6 grid gap-4 sm:grid-cols-3">
-            {MATCH_PCTS.map((pct) => (
-              <div
-                key={pct}
-                className="rounded-xl border border-stroke-subtle bg-surface-secondary px-6 py-8 text-center shadow-[0_24px_60px_-28px_rgba(2,22,17,0.25)]"
-              >
-                <Lock size={18} className="mx-auto text-fg-tertiary" />
-                <div className="mx-auto mt-4 h-2.5 w-3/5 rounded bg-neutral-300/70" />
-                <div className="mx-auto mt-2 h-2.5 w-2/5 rounded bg-neutral-300/70" />
-                <p className="mt-4 text-body-sm font-semibold text-fg-brand">{t('risk.match', { pct })}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* The partner preview moved into MatchShowcase (the merged
+            "Der Unterschied" section directly below). */}
       </Container>
 
       {/* Save CTA band — unchanged from RiskMapSection */}

@@ -433,3 +433,12 @@ footer[id] {
     scroll-behavior: auto !important;
   }
 }
+
+/* MatchShowcase: die Ghost-Dossier-Reihen laufen endlos; der Track enthält
+   zwei identische Hälften, -50 % ist also exakt eine Periode. Reduced motion
+   friert das über den globalen Block oben automatisch ein. */
+@keyframes match-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
