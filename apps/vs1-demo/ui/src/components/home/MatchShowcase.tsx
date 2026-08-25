@@ -136,7 +136,7 @@ export function MatchShowcase() {
           <GhostRow reverse duration={130} />
           <GhostRow duration={120} />
         </div>
-        <div className="relative px-4 py-16 md:px-6 lg:py-20">
+        <div className="relative px-4 py-24 md:px-6 lg:py-[120px]">
           <Stagger className="mx-auto grid max-w-[1140px] gap-5 md:grid-cols-3">
             {MATCHES.map((m) => (
               <StaggerItem key={m.index} className="flex">
