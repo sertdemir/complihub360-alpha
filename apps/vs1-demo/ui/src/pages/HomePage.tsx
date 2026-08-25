@@ -44,7 +44,7 @@ import {
   HowItWorksRoute,
   RiskMapShowcase,
   MatchShowcase,
-  DomainsKnows,
+  DomainsAtlas,
   TwoReflexes,
   BrandCodePreview,
   HowItActs,
@@ -80,7 +80,10 @@ export function HomePage() {
       {/* Route edition (canvas 2026-08-25, petrol band): the five stages as
           stations on the golden route. HowItWorksSteps stays available. */}
       <HowItWorksRoute />
-      <DomainsKnows />
+      {/* Atlas edition (canvas 2026-08-25): the drawer content comes onto the
+          page — rail left, the active area's dossier on the Gradient panel,
+          CTA to the area page. DomainsKnows stays available. */}
+      <DomainsAtlas />
       <TwoReflexes />
       <BrandCodePreview />
       <HowItActs />

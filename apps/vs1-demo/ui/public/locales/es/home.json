@@ -1011,7 +1011,8 @@
           "Recibe una reclamación formal o una consulta de una autoridad"
         ]
       }
-    ]
+    ],
+    "learnMore": "Más información"
   },
   "howItActs": {
     "eyebrow": "Dentro de un encargo",

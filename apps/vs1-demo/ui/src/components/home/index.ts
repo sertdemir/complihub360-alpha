@@ -10,6 +10,7 @@ export { MatchmakingDifference } from './MatchmakingDifference';
 export { MatchShowcase } from './MatchShowcase';
 export { TwoReflexes } from './TwoReflexes';
 export { DomainsKnows } from './DomainsKnows';
+export { DomainsAtlas } from './DomainsAtlas';
 export { HowItActs } from './HowItActs';
 export { BrandCodePreview } from './BrandCodePreview';
 export { BeyondAssessment } from './BeyondAssessment';
