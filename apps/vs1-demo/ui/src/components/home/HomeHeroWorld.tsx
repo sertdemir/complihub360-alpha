@@ -5,14 +5,9 @@ import { motion } from 'framer-motion';
 import {
   ArrowRight,
   CheckCircle2,
-  Cpu,
   FileText,
-  Globe,
   Headset,
-  Heart,
-  Lock,
   Search,
-  UserCheck,
   Users,
   type LucideIcon,
 } from 'lucide-react';
@@ -30,15 +25,17 @@ import { HeroWorldMap } from './HeroWorldMap';
 //   1 Hero      → serif display headline ("Globale Compliance." / gold
 //                 "Vereinfacht."), lead, two stacked entries (Risk-Map CTA +
 //                 free-question input), animated world map right
-//   2 Petrol    → four promises on the brand gradient
-//   3 Proof     → five short proofs on a white card
+//   2 Promises  → four promises on the Gradient (dark petrol fill until
+//                 2026-08-25)
+//   3 Proof     → five text-only proofs separated by hairlines
 //
 // Copy lives in the 'home' namespace under heroWorld.*.
 
 const PROMISE_ICONS: LucideIcon[] = [FileText, Users, CheckCircle2, Headset];
-// All five in brand petrol (user decision 2026-08-25) — the former gold
-// accents made the strip look unevenly weighted.
-const PROOF_ICONS: LucideIcon[] = [Globe, UserCheck, Cpu, Heart, Lock];
+// Text-only since 2026-08-25 (user decision) — the icons went through gold,
+// petrol and stacked variants and always fought the promise band above;
+// hairlines between the five proofs carry the rhythm instead.
+const PROOF_COUNT = 5;
 
 function AskForm({ className = '' }: { className?: string }) {
   const { t } = useTranslation('home');
@@ -134,17 +131,15 @@ export function HomeHeroWorld() {
       <Container size="2xl" bleed className="px-4 pb-14 pt-6 md:px-6 lg:px-10">
         <Stagger
           stagger={0.08}
-          className="grid grid-cols-1 gap-x-9 gap-y-6 px-8 py-7 sm:grid-cols-2 lg:grid-cols-5 lg:gap-x-9"
+          className="grid grid-cols-1 gap-y-5 py-7 sm:grid-cols-2 lg:grid-cols-5 lg:gap-y-0"
         >
-          {/* Icons above the text and larger (user spec 2026-08-25) — the
-              strip's proofs carry the weight, not the copy. */}
-          {PROOF_ICONS.map((Icon, i) => (
-            <StaggerItem key={i} className="flex flex-col items-start gap-3.5">
-              <Icon size={52} strokeWidth={1.5} className="text-primary-500" aria-hidden />
-              <div>
-                <p className="text-body-md font-bold text-neutral-900">{t(`heroWorld.proofs.${i}.title`)}</p>
-                <p className="mt-0.5 text-body-2xs text-neutral-500">{t(`heroWorld.proofs.${i}.desc`)}</p>
-              </div>
+          {Array.from({ length: PROOF_COUNT }, (_, i) => (
+            <StaggerItem
+              key={i}
+              className="border-stroke-subtle px-6 lg:border-r lg:px-7 lg:last:border-r-0"
+            >
+              <p className="text-body-md font-bold text-neutral-900">{t(`heroWorld.proofs.${i}.title`)}</p>
+              <p className="mt-0.5 text-body-2xs text-neutral-500">{t(`heroWorld.proofs.${i}.desc`)}</p>
             </StaggerItem>
           ))}
         </Stagger>
