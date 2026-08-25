@@ -157,9 +157,11 @@ export function HowItWorksRoute() {
   const animate = inView || !!reduced;
 
   return (
-    <section id="the-five-steps" className="bg-surface py-16 lg:py-20">
+    // Full-bleed petrol (user decision 2026-08-25): the gradient runs edge to
+    // edge; only the content keeps the container width.
+    <section id="the-five-steps" className="bg-[linear-gradient(160deg,#004D40_0%,#00231D_100%)] py-20 lg:py-24">
       <Container size="2xl" bleed className="px-4 md:px-6 lg:px-10">
-        <div className="rounded-xl bg-[linear-gradient(160deg,#004D40_0%,#00231D_100%)] px-6 py-16 lg:px-14 lg:py-20">
+        <div>
           <div className="mx-auto flex max-w-[760px] flex-col items-center gap-4 text-center">
             <span className="text-body-2xs font-semibold uppercase tracking-[0.14em] text-white/65">{t('howItWorks.eyebrow')}</span>
             <h2 className="font-serif text-[2rem] font-semibold leading-[1.18] tracking-tight text-white lg:text-[2.75rem]">
