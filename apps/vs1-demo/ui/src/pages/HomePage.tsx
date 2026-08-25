@@ -7,11 +7,14 @@
 //   1 Hero                → HomeHeroWorld         understand, two equal entries
 //   2 Problem Recognition → ProblemRecognition    the reader recognises themselves
 //   3 The instrument      → EntryDoorDemo         compact self-playing demo
-//   4 How It Works        → HowItWorksSteps       the five stages, condensed
-//   5 Risk Map            → RiskMapSection        the result, as the marketing hero
-//   6 Provider Matching   → MatchmakingDifference a consequence of clarity
+//   4 Risk Map            → RiskMapShowcase       the instrument's RESULT, immediately
+//   5 Provider Matching   → MatchShowcase         who acts on it (anonymous dossiers)
+//   6 How It Works        → HowItWorksRoute       the frame, once the value is shown
 //   7 Compliance areas    → DomainsKnows          breadth as evidence, not the story
 //   8 Trust by showing    → TwoReflexes · BrandCodePreview
+//
+// Reordered on 2026-08-25 (user decision): instrument → result → people,
+// with the five-stage route explaining the frame only afterwards.
 //
 // EntryDoor moved from last to third on 2026-08-20; on 2026-08-25 the slot
 // switched to EntryDoorDemo (canvas review: the 1440×1071 frosted-glass
@@ -64,9 +67,9 @@ export function HomePage() {
           self-playing wizard beside the pitch. EntryDoor stays available —
           `<EntryDoor />` brings the full frosted-glass instrument back. */}
       <EntryDoorDemo />
-      {/* Route edition (canvas 2026-08-25, petrol band): the five stages as
-          stations on the golden route. HowItWorksSteps stays available. */}
-      <HowItWorksRoute />
+      {/* Reordered 2026-08-25: the wizard showcase flows straight into its
+          RESULT (Risk Map), then into who acts on it (the merged difference
+          section) — the how-it-works route explains the frame afterwards. */}
       {/* Showcase edition (canvas 2026-08-25, Mercury pattern): the Risk Map
           drives up onto the tinted panel. RiskMapSection stays available. */}
       <RiskMapShowcase />
@@ -74,6 +77,9 @@ export function HomePage() {
           difference pitch become one section — anonymous dossiers on the
           drifting ghost grid. MatchmakingDifference stays available. */}
       <MatchShowcase />
+      {/* Route edition (canvas 2026-08-25, petrol band): the five stages as
+          stations on the golden route. HowItWorksSteps stays available. */}
+      <HowItWorksRoute />
       <DomainsKnows />
       <TwoReflexes />
       <BrandCodePreview />
