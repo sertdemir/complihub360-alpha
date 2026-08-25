@@ -18,7 +18,7 @@ import { Badge } from '../ui/Badge';
 // Compass "Stat" (1100:2): eyebrow label over a large tabular value.
 const STAT_INDICES = [0, 1, 2, 3] as const;
 
-type StateKind = 'confirmed' | 'likely' | 'action';
+export type StateKind = 'confirmed' | 'likely' | 'action';
 
 // Display strings come from riskMap.rows.<index>.*; severity + state labels
 // derive from risk.severity.* / risk.state.*.
@@ -37,7 +37,7 @@ const MATCH_PCTS = [94, 88, 81] as const;
 
 const COLS = 'sm:grid sm:grid-cols-[100px_1fr_92px_92px_168px] sm:items-center sm:gap-3';
 
-function StateCell({ kind }: { kind: StateKind }) {
+export function StateCell({ kind }: { kind: StateKind }) {
   const { t } = useTranslation('home');
   const label = t(`risk.state.${kind}`);
   if (kind === 'action') {

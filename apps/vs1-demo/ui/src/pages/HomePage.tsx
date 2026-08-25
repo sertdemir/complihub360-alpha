@@ -39,7 +39,7 @@ import {
   HomeHeroWorld,
   ProblemRecognition,
   HowItWorksRoute,
-  RiskMapSection,
+  RiskMapShowcase,
   MatchmakingDifference,
   DomainsKnows,
   TwoReflexes,
@@ -67,7 +67,9 @@ export function HomePage() {
       {/* Route edition (canvas 2026-08-25, petrol band): the five stages as
           stations on the golden route. HowItWorksSteps stays available. */}
       <HowItWorksRoute />
-      <RiskMapSection />
+      {/* Showcase edition (canvas 2026-08-25, Mercury pattern): the Risk Map
+          drives up onto the tinted panel. RiskMapSection stays available. */}
+      <RiskMapShowcase />
       <MatchmakingDifference />
       <DomainsKnows />
       <TwoReflexes />

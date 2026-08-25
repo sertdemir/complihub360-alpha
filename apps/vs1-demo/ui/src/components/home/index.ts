@@ -5,6 +5,7 @@ export { ProblemRecognition } from './ProblemRecognition';
 export { HowItWorksSteps } from './HowItWorksSteps';
 export { HowItWorksRoute } from './HowItWorksRoute';
 export { RiskMapSection } from './RiskMapSection';
+export { RiskMapShowcase } from './RiskMapShowcase';
 export { MatchmakingDifference } from './MatchmakingDifference';
 export { TwoReflexes } from './TwoReflexes';
 export { DomainsKnows } from './DomainsKnows';
