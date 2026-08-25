@@ -19,8 +19,8 @@ import { Badge } from '../ui/Badge';
 // they depict the product, they do not follow the marketing theme. Window
 // headlines are single-colour by user decision — no gold half-words here.
 //
-// Marketing copy stays in beyond.* ('home' ns), including the Live/Beta pills
-// and the founding-member footnote.
+// Marketing copy stays in beyond.* ('home' ns), including the Live/Beta
+// pills. The founding-member footnote was removed on user decision.
 
 // Choreography (user spec 2026-08-25): the Gradient tile stands first, the
 // dark window rises onto it a beat later, then the window's rows build up one
@@ -260,9 +260,6 @@ export function BeyondAssessment() {
           </div>
         </Stagger>
 
-        <Reveal delay={0.1}>
-          <p className="mt-10 max-w-[72ch] text-body-2xs leading-relaxed text-fg-tertiary">{t('beyond.footnote')}</p>
-        </Reveal>
       </div>
     </section>
   );
