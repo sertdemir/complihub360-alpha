@@ -136,14 +136,11 @@ export function HomeHeroWorld() {
           stagger={0.08}
           className="grid grid-cols-1 gap-x-9 gap-y-6 px-8 py-7 sm:grid-cols-2 lg:grid-cols-5 lg:gap-x-9"
         >
+          {/* Icons above the text and larger (user spec 2026-08-25) — the
+              strip's proofs carry the weight, not the copy. */}
           {PROOF_ICONS.map((Icon, i) => (
-            <StaggerItem key={i} className="flex items-center gap-3.5">
-              <Icon
-                size={40}
-                strokeWidth={1.6}
-                className="shrink-0 text-primary-500"
-                aria-hidden
-              />
+            <StaggerItem key={i} className="flex flex-col items-start gap-3.5">
+              <Icon size={52} strokeWidth={1.5} className="text-primary-500" aria-hidden />
               <div>
                 <p className="text-body-md font-bold text-neutral-900">{t(`heroWorld.proofs.${i}.title`)}</p>
                 <p className="mt-0.5 text-body-2xs text-neutral-500">{t(`heroWorld.proofs.${i}.desc`)}</p>
