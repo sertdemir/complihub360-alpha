@@ -1258,7 +1258,8 @@
     "subscribe": "Abone olun",
     "success": "Listedesiniz — gelen kutunuzu kontrol edin.",
     "privacy": "E-postanızı yalnızca bülten için kullanırız. Tek tıkla abonelikten çıkabilirsiniz. Gizlilik politikamıza bakın.",
-    "accountLink": "Veya gerçek zamanlı bildirimleri ücretsiz hesapla açın"
+    "accountLink": "Veya gerçek zamanlı bildirimleri ücretsiz hesapla açın",
+    "cardTitle": "Aylık briefing"
   },
   "footer": {
     "tagline": "Uyum karmaşıklığı ile operasyonel gerçeklik arasındaki orkestrasyon katmanı.",

@@ -1258,7 +1258,8 @@
     "subscribe": "Abonnieren",
     "success": "Sie stehen auf der Liste — prüfen Sie Ihren Posteingang.",
     "privacy": "Wir nutzen Ihre E-Mail nur für das Briefing. Abmeldung mit einem Klick. Siehe unsere Datenschutzerklärung.",
-    "accountLink": "Oder schalten Sie Echtzeit-Hinweise mit einem kostenlosen Konto frei"
+    "accountLink": "Oder schalten Sie Echtzeit-Hinweise mit einem kostenlosen Konto frei",
+    "cardTitle": "Das monatliche Briefing"
   },
   "footer": {
     "tagline": "Die Orchestrierungsebene zwischen Compliance-Komplexität und betrieblicher Realität.",
