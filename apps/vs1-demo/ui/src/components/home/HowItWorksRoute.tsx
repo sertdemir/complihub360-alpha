@@ -28,12 +28,15 @@ import { FitScale } from './HomeHero';
 const CARD_W = 200;
 // Canvas geometry (1240×400 stage): card left/top per station, arcs between
 // card edge midpoints with the hero's alternating perpendicular bulge.
+// Station spacing +20% (user request 2026-08-25): more air between the
+// cards so the golden connectors read clearly; FitScale absorbs the wider
+// 1448px stage.
 const CARDS = [
   { x: 0, y: 36 },
-  { x: 260, y: 166 },
-  { x: 520, y: 16 },
-  { x: 780, y: 166 },
-  { x: 1040, y: 72 },
+  { x: 312, y: 166 },
+  { x: 624, y: 16 },
+  { x: 936, y: 166 },
+  { x: 1248, y: 72 },
 ];
 
 function arc(i: number): string {
@@ -174,9 +177,9 @@ export function HowItWorksRoute() {
 
           {/* Desktop: the route — a fixed 1240px stage, scaled to fit. */}
           <div ref={ref} className="mt-14 hidden md:block">
-            <FitScale width={1240} height={412}>
-              <div className="relative mt-3 h-[400px] w-[1240px]">
-                <svg viewBox="0 0 1240 400" fill="none" className="absolute inset-0 h-full w-full">
+            <FitScale width={1448} height={412}>
+              <div className="relative mt-3 h-[400px] w-[1448px]">
+                <svg viewBox="0 0 1448 400" fill="none" className="absolute inset-0 h-full w-full">
                   {CARDS.slice(0, -1).map((_, i) => (
                     <motion.path
                       key={i}
