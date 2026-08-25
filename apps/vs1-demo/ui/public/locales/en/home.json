@@ -1258,7 +1258,8 @@
     "subscribe": "Subscribe",
     "success": "You're on the list — check your inbox.",
     "privacy": "We use your email only for the brief. Unsubscribe in one click. See our privacy policy.",
-    "accountLink": "Or unlock real-time alerts with a free account"
+    "accountLink": "Or unlock real-time alerts with a free account",
+    "cardTitle": "The monthly briefing"
   },
   "footer": {
     "tagline": "The orchestration layer between compliance complexity and operational reality.",

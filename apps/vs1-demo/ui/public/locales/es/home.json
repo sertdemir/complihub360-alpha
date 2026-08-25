@@ -1258,7 +1258,8 @@
     "subscribe": "Suscribirse",
     "success": "Está en la lista — revise su bandeja de entrada.",
     "privacy": "Usamos su correo solo para el briefing. Baja con un clic. Consulte nuestra política de privacidad.",
-    "accountLink": "O active avisos en tiempo real con una cuenta gratuita"
+    "accountLink": "O active avisos en tiempo real con una cuenta gratuita",
+    "cardTitle": "El briefing mensual"
   },
   "footer": {
     "tagline": "La capa de orquestación entre la complejidad del compliance y la realidad operativa.",
