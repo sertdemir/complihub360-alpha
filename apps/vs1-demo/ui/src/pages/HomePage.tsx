@@ -11,7 +11,8 @@
 //   5 Provider Matching   → MatchShowcase         who acts on it (anonymous dossiers)
 //   6 How It Works        → HowItWorksRoute       the frame, once the value is shown
 //   7 Compliance areas    → DomainsKnows          breadth as evidence, not the story
-//   8 Trust by showing    → TwoReflexes · BrandCodePreview
+//   8 Trust by naming     → TrustBand (TwoReflexes and BrandCodePreview left
+//                           the homepage on 2026-08-25 — demonstrated, not claimed)
 //
 // Reordered on 2026-08-25 (user decision): instrument → result → people,
 // with the five-stage route explaining the frame only afterwards.
@@ -46,7 +47,6 @@ import {
   MatchShowcase,
   DomainsAtlas,
   TrustBand,
-  BrandCodePreview,
   HowItActs,
   BeyondAssessment,
   HomeFaq,
@@ -88,7 +88,11 @@ export function HomePage() {
           to one claim + six trust proofs — the showcases now SHOW what its
           image cards argued. TwoReflexes stays available. */}
       <TrustBand />
-      <BrandCodePreview />
+      {/* BrandCodePreview left the homepage on 2026-08-25 (user decision):
+          its three principles are now demonstrated instead of claimed — the
+          demo plays one question at a time, the showcases show the priority
+          levels and the verified mark, the trust band names the rest. The
+          component stays in the tree for a future brand/about page. */}
       <HowItActs />
       <BeyondAssessment />
       <HomeFaq />
