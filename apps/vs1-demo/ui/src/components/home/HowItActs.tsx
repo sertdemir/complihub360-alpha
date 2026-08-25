@@ -4,8 +4,8 @@ import { SectionEyebrow, GoldWord, Reveal, Stagger, StaggerItem } from '../provi
 
 // ─── S5 — How CompliHub360 Acts (canvas "Ein Mandat von innen" · C, 2026-08-25) ─
 // "What happens between the match and the resolution." Restyled in place from
-// the grey landscape rows to the reviewed Band variant: heading centred on
-// white, then a FULL-BLEED Gradient band (CLAUDE.md) carrying three column
+// the grey landscape rows to the reviewed Band variant: ONE full-bleed
+// Gradient band (CLAUDE.md) carrying the centred heading and three column
 // cards — gold serif index, title, copy, and the detail exhibit (cost / SLA /
 // trail) anchored at the card's bottom. Same id ("engagement", the header's
 // Pricing anchor), same howItActs.* copy — the stage changed, not the content.
@@ -34,18 +34,20 @@ const TIMELINE_COUNT = 4;
 export function HowItActs() {
   const { t } = useTranslation('home');
   return (
-    <section id="engagement" className="bg-surface pt-20 lg:pt-28">
-      {/* Heading, centred on white */}
-      <Reveal className="mx-auto flex max-w-[820px] flex-col items-center gap-4 px-4 text-center md:px-6">
-        <SectionEyebrow tone="brand">{t('howItActs.eyebrow')}</SectionEyebrow>
-        <h2 className="font-serif text-[2rem] font-semibold leading-tight tracking-tight text-fg sm:text-[2.5rem]">
-          {t('howItActs.title.pre')}<GoldWord>{t('howItActs.title.gold')}</GoldWord>{t('howItActs.title.post')}
-        </h2>
-        <p className="max-w-[62ch] text-body leading-relaxed text-fg-secondary">{t('howItActs.subtitle')}</p>
-      </Reveal>
+    <section id="engagement" className="bg-surface">
+      {/* ONE block (user decision 2026-08-25): the heading lives INSIDE the
+          full-bleed Gradient band, above the three cards — nothing of this
+          section sits outside the tinted container any more. */}
+      <div className="bg-[linear-gradient(165deg,#EAF3F1_0%,#DDECE8_55%,#E9E4D3_100%)] px-4 py-16 md:px-6 lg:px-10 lg:py-20">
+        <Reveal className="mx-auto flex max-w-[820px] flex-col items-center gap-4 text-center">
+          <SectionEyebrow tone="brand">{t('howItActs.eyebrow')}</SectionEyebrow>
+          <h2 className="font-serif text-[2rem] font-semibold leading-tight tracking-tight text-fg sm:text-[2.5rem]">
+            {t('howItActs.title.pre')}<GoldWord>{t('howItActs.title.gold')}</GoldWord>{t('howItActs.title.post')}
+          </h2>
+          <p className="max-w-[62ch] text-body leading-relaxed text-fg-secondary">{t('howItActs.subtitle')}</p>
+        </Reveal>
 
-      {/* Full-bleed Gradient band with the three column cards */}
-      <div className="mt-14 bg-[linear-gradient(165deg,#EAF3F1_0%,#DDECE8_55%,#E9E4D3_100%)] px-4 py-16 md:px-6 lg:px-10 lg:py-[72px]">
+        <div className="mt-12 lg:mt-14">
         <Stagger stagger={0.14} className="mx-auto grid max-w-[1320px] gap-5 md:grid-cols-3">
           <Card
             n="01"
@@ -104,6 +106,7 @@ export function HowItActs() {
             }
           />
         </Stagger>
+        </div>
       </div>
     </section>
   );

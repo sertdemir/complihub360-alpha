@@ -1163,30 +1163,69 @@
       "gold": "merak ettikleriniz",
       "post": "."
     },
-    "items": [
+    "groups": [
       {
-        "q": "Değerlendirme gerçekten ücretsiz mi?",
-        "a": "Evet. Hesap yok, kredi kartı yok. Sonunda yapılandırılmış bir Risk Map alırsınız. Sonrasında kaydolmak — haritayı saklamak, sağlayıcılarla eşleşmek, bildirim almak için — isteğe bağlı bir sonraki adımdır."
+        "label": "Değerlendirme ve Risk Map",
+        "items": [
+          {
+            "q": "Değerlendirme gerçekten ücretsiz mi?",
+            "a": "Evet. Hesap yok, kredi kartı yok. Sonunda yapılandırılmış bir Risk Map alırsınız. Sonrasında kaydolmak — haritayı saklamak, sağlayıcılarla eşleşmek, bildirim almak için — isteğe bağlı bir sonraki adımdır."
+          },
+          {
+            "q": "Risk Map'teki bilgiler nereden geliyor?",
+            "a": "Her kayıt, kaynaklandığı resmî duyuruya, kayıt sayfasına veya içtihada bağlanır — ve bir süre ertelendiğinde, bir kurum netleştirdiğinde veya bir kayıt açıldığında güncellenir."
+          },
+          {
+            "q": "Risk Map'imi dışa aktarabilir miyim?",
+            "a": "Evet. Kayıtlarınız veya denetçiniz için PDF olarak — ve workspace içinde tüm geçmişiniz her zaman PDF, CSV veya API üzerinden dışa aktarılabilir."
+          },
+          {
+            "q": "Birden fazla pazarı ve alanı aynı anda kontrol edebilir miyim?",
+            "a": "Evet. Değerlendirme, faaliyet gösterdiğiniz tüm pazarları ve alanları kapsar ve yükümlülükleri tek bir bütünlüklü haritada birleştirir — hepsi birlikte önceliklendirilir."
+          },
+          {
+            "q": "Pazarım henüz kapsanmıyorsa ne olur?",
+            "a": "Nerede faaliyet gösterdiğinizi bize bildirin. Pazarları sürekli ekliyoruz ve erken kaydolanlar önceliğin belirlenmesine katkıda bulunuyor — pazarınız yayına girdiği anda size haber veririz."
+          }
+        ]
       },
       {
-        "q": "Bana hukuki danışmanlık mı veriyorsunuz?",
-        "a": "Hayır. CompliHub360 yükümlülükleri haritalar ve operasyonunuza muhtemelen neyin uygulanacağını gösterir — bu hukuki danışmanlık değildir. Bir konu bağlayıcı görüş gerektirdiğinde, sizi bunu verebilecek bir Verified Partner ile buluştururuz."
+        "label": "Partnerler ve işler",
+        "items": [
+          {
+            "q": "Bana hukuki danışmanlık mı veriyorsunuz?",
+            "a": "Hayır. CompliHub360 yükümlülükleri haritalar ve operasyonunuza muhtemelen neyin uygulanacağını gösterir — bu hukuki danışmanlık değildir. Bir konu bağlayıcı görüş gerektirdiğinde, sizi bunu verebilecek bir Verified Partner ile buluştururuz."
+          },
+          {
+            "q": "Verified Partner'lar nasıl denetleniyor?",
+            "a": "Her partner; alan kapsamı, yanıt süresi ve belgelenmiş gerçek sonuçlar üzerinden bizim tarafımızdan incelenir — kendi kaydını oluşturan bir dizin değildir. Her iş sözleşmeye bağlıdır ve dosya için ortak sorumluluk içerir."
+          },
+          {
+            "q": "Bir iş ne kadara mal olur?",
+            "a": "Her Verified Partner, siz kabul etmeden önce sabit bir tahmin yayımlar — yalnızca fiyatı öğrenmek için discovery call yok. Aralığı ve kapsamı önceden görür, herhangi bir çalışma başlamadan onaylarsınız."
+          },
+          {
+            "q": "Bir partner ne kadar hızlı yanıt verir?",
+            "a": "İlk yanıta kadar 24–48 saat, sözleşmeyle güvence altında. Gecikme olursa talebinizi otomatik olarak bir sonraki uygun Verified Partner'a yönlendiririz."
+          },
+          {
+            "q": "Tek bir partnere bağlı mıyım?",
+            "a": "Hayır. Her iş ayrı ayrı sözleşmeye bağlanır. İstediğiniz zaman yeni eşleşmeler talep edebilir veya değiştirebilirsiniz — geçmişiniz ve Risk Map'iniz size aittir."
+          }
+        ]
       },
       {
-        "q": "Verified Partner'lar nasıl denetleniyor?",
-        "a": "Her partner; alan kapsamı, yanıt süresi ve belgelenmiş gerçek sonuçlar üzerinden bizim tarafımızdan incelenir — kendi kaydını oluşturan bir dizin değildir. Her iş sözleşmeye bağlıdır ve dosya için ortak sorumluluk içerir."
-      },
-      {
-        "q": "Bir iş ne kadara mal olur?",
-        "a": "Her Verified Partner, siz kabul etmeden önce sabit bir tahmin yayımlar — yalnızca fiyatı öğrenmek için discovery call yok. Aralığı ve kapsamı önceden görür, herhangi bir çalışma başlamadan onaylarsınız."
-      },
-      {
-        "q": "Verilerim nasıl işleniyor?",
-        "a": "Değerlendirme tarayıcınızda çalışır ve hesap gerektirmez. Kaydolursanız dosyanız AB veri koruma kurallarına göre, şifrelenmiş olarak saklanır; talimatınız olmadan asla satılmaz veya paylaşılmaz."
-      },
-      {
-        "q": "Pazarım henüz kapsanmıyorsa ne olur?",
-        "a": "Nerede faaliyet gösterdiğinizi bize bildirin. Pazarları sürekli ekliyoruz ve erken kaydolanlar önceliğin belirlenmesine katkıda bulunuyor — pazarınız yayına girdiği anda size haber veririz."
+        "label": "Hesap ve veriler",
+        "items": [
+          {
+            "q": "Hesaba ihtiyacım var mı?",
+            "a": "Değerlendirme için hayır — tarayıcınızda hesapsız çalışır. Ücretsiz bir hesaba yalnızca Risk Map'inizi saklamak, eşleşmeleri açmak veya bildirim almak istediğinizde ihtiyacınız olur."
+          },
+          {
+            "q": "Verilerim nasıl işleniyor?",
+            "a": "Değerlendirme tarayıcınızda çalışır ve hesap gerektirmez. Kaydolursanız dosyanız AB veri koruma kurallarına göre, şifrelenmiş olarak saklanır; talimatınız olmadan asla satılmaz veya paylaşılmaz."
+          }
+        ]
       }
     ]
   },

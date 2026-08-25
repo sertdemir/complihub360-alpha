@@ -1163,30 +1163,69 @@
       "gold": "probablemente",
       "post": " se está preguntando."
     },
-    "items": [
+    "groups": [
       {
-        "q": "¿La evaluación es realmente gratuita?",
-        "a": "Sí. Sin cuenta y sin tarjeta de crédito. Al final obtiene una Risk Map estructurada. Registrarse después — para conservarla, hacer match con proveedores y recibir avisos — es el siguiente paso opcional."
+        "label": "Evaluación y Risk Map",
+        "items": [
+          {
+            "q": "¿La evaluación es realmente gratuita?",
+            "a": "Sí. Sin cuenta y sin tarjeta de crédito. Al final obtiene una Risk Map estructurada. Registrarse después — para conservarla, hacer match con proveedores y recibir avisos — es el siguiente paso opcional."
+          },
+          {
+            "q": "¿De dónde provienen los datos de la Risk Map?",
+            "a": "Cada entrada enlaza con el anuncio oficial, la página del registro o la jurisprudencia de la que procede — y se actualiza cuando se aplaza un plazo, una autoridad precisa o se abre un registro."
+          },
+          {
+            "q": "¿Puedo exportar mi Risk Map?",
+            "a": "Sí. Como PDF para sus archivos o su auditor — y en su workspace, todo su historial puede exportarse en cualquier momento como PDF, CSV o vía API."
+          },
+          {
+            "q": "¿Puedo comprobar varios mercados y áreas a la vez?",
+            "a": "Sí. La evaluación cubre todos los mercados y áreas en los que opera y reúne las obligaciones en un mapa coherente — priorizado en conjunto."
+          },
+          {
+            "q": "¿Y si mi mercado aún no está cubierto?",
+            "a": "Díganos dónde opera. Añadimos mercados continuamente, y los primeros registros ayudan a fijar la prioridad — le avisaremos en cuanto su mercado esté disponible."
+          }
+        ]
       },
       {
-        "q": "¿Me están dando asesoramiento jurídico?",
-        "a": "No. CompliHub360 mapea obligaciones y muestra lo que probablemente aplica a su operación — no es asesoramiento jurídico. Cuando un asunto requiere una opinión vinculante, le conectamos con un Verified Partner que puede darla."
+        "label": "Partners y encargos",
+        "items": [
+          {
+            "q": "¿Me están dando asesoramiento jurídico?",
+            "a": "No. CompliHub360 mapea obligaciones y muestra lo que probablemente aplica a su operación — no es asesoramiento jurídico. Cuando un asunto requiere una opinión vinculante, le conectamos con un Verified Partner que puede darla."
+          },
+          {
+            "q": "¿Cómo se verifica a los Verified Partners?",
+            "a": "Nosotros evaluamos a cada partner por cobertura de áreas, tiempo de respuesta y resultados reales acreditados — no es un directorio de autoinscripción. Cada encargo es contractual, con responsabilidad compartida por el asunto."
+          },
+          {
+            "q": "¿Cuánto cuesta un encargo?",
+            "a": "Cada Verified Partner publica una estimación fija antes de que usted acepte — sin discovery calls solo para conocer el precio. Ve el rango y el alcance por adelantado y los aprueba antes de que empiece cualquier trabajo."
+          },
+          {
+            "q": "¿Con qué rapidez responde un partner?",
+            "a": "24–48 horas hasta la primera respuesta, acordado por contrato. Si se retrasa, derivamos su solicitud automáticamente al siguiente Verified Partner disponible."
+          },
+          {
+            "q": "¿Estoy vinculado a un partner?",
+            "a": "No. Cada encargo se contrata individualmente. Puede solicitar más matches o cambiar en cualquier momento — su historial y su Risk Map siguen siendo suyos."
+          }
+        ]
       },
       {
-        "q": "¿Cómo se verifica a los Verified Partners?",
-        "a": "Nosotros evaluamos a cada partner por cobertura de áreas, tiempo de respuesta y resultados reales acreditados — no es un directorio de autoinscripción. Cada encargo es contractual, con responsabilidad compartida por el asunto."
-      },
-      {
-        "q": "¿Cuánto cuesta un encargo?",
-        "a": "Cada Verified Partner publica una estimación fija antes de que usted acepte — sin discovery calls solo para conocer el precio. Ve el rango y el alcance por adelantado y los aprueba antes de que empiece cualquier trabajo."
-      },
-      {
-        "q": "¿Cómo se tratan mis datos?",
-        "a": "La evaluación se ejecuta en su navegador y no necesita cuenta. Si se registra, su dossier se almacena conforme a las normas de protección de datos de la UE, cifrado, y nunca se vende ni se comparte sin su instrucción."
-      },
-      {
-        "q": "¿Y si mi mercado aún no está cubierto?",
-        "a": "Díganos dónde opera. Añadimos mercados continuamente, y los primeros registros ayudan a fijar la prioridad — le avisaremos en cuanto su mercado esté disponible."
+        "label": "Cuenta y datos",
+        "items": [
+          {
+            "q": "¿Necesito una cuenta?",
+            "a": "Para la evaluación no — funciona en su navegador sin cuenta. Solo necesita una cuenta gratuita para conservar su Risk Map, desbloquear matches o recibir avisos."
+          },
+          {
+            "q": "¿Cómo se tratan mis datos?",
+            "a": "La evaluación se ejecuta en su navegador y no necesita cuenta. Si se registra, su dossier se almacena conforme a las normas de protección de datos de la UE, cifrado, y nunca se vende ni se comparte sin su instrucción."
+          }
+        ]
       }
     ]
   },
