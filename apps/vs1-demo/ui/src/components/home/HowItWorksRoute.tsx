@@ -1,8 +1,10 @@
 import { useTranslation } from 'react-i18next';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Container } from '../ui/Container';
+import { Button } from '../ui/Button';
+import { SectionEyebrow, GoldWord } from '../providers/SectionHeading';
 import { useInViewOnce } from '../../lib/useInViewOnce';
 import { FitScale } from './HomeHero';
 
@@ -22,8 +24,6 @@ import { FitScale } from './HomeHero';
 // line), then the arc draws onward, and only then the next card — one slot
 // per station. Reduced motion shows the completed picture.
 //
-// Deliberately theme-fixed raw colours (see the guard test's colour note):
-// the band must stay dark petrol in both themes, the cards white on it.
 
 const CARD_W = 200;
 // Canvas geometry (1240×400 stage): card left/top per station, arcs between
@@ -111,7 +111,7 @@ function StationCard({
       initial={reduced ? false : { opacity: 0, y: 20 }}
       animate={animate ? { opacity: 1, y: 0 } : {}}
       transition={{ delay, duration: 0.35, ease: 'easeOut' }}
-      className="rounded-xl border border-neutral-100 bg-white px-[18px] pb-[18px] shadow-[0_20px_44px_-20px_rgba(2,22,17,0.4)]"
+      className="rounded-xl border border-neutral-100 bg-white px-[18px] pb-[18px] shadow-[0_20px_44px_-20px_rgba(2,22,17,0.22)]"
     >
       <div className="-mt-7 flex items-center gap-3">
         <motion.span
@@ -155,24 +155,26 @@ function MobileStation({ index }: { index: number }) {
 export function HowItWorksRoute() {
   const { t } = useTranslation('common');
   const { locale } = useParams();
+  const navigate = useNavigate();
   const [ref, inView] = useInViewOnce<HTMLDivElement>('-120px');
   const reduced = useReducedMotion();
   const animate = inView || !!reduced;
 
   return (
-    // Full-bleed petrol (user decision 2026-08-25): the gradient runs edge to
-    // edge; only the content keeps the container width.
-    <section id="the-five-steps" className="bg-[linear-gradient(160deg,#004D40_0%,#00231D_100%)] py-20 lg:py-24">
+    // Light again (user decision 2026-08-25, after the match band landed just
+    // above): the dark full-bleed read too heavy in the new order. Cards and
+    // route stay, colours flip to the light surface.
+    <section id="the-five-steps" className="bg-surface py-20 lg:py-24">
       <Container size="2xl" bleed className="px-4 md:px-6 lg:px-10">
         <div>
           <div className="mx-auto flex max-w-[760px] flex-col items-center gap-4 text-center">
-            <span className="text-body-2xs font-semibold uppercase tracking-[0.14em] text-white/65">{t('howItWorks.eyebrow')}</span>
-            <h2 className="font-serif text-[2rem] font-semibold leading-[1.18] tracking-tight text-white lg:text-[2.75rem]">
+            <SectionEyebrow tone="brand">{t('howItWorks.eyebrow')}</SectionEyebrow>
+            <h2 className="font-serif text-[2rem] font-semibold leading-[1.18] tracking-tight text-fg lg:text-[2.75rem]">
               {t('howItWorks.title.pre')}
-              <span className="whitespace-nowrap text-accent-500">{t('howItWorks.title.gold')}</span>
+              <GoldWord>{t('howItWorks.title.gold')}</GoldWord>
               {t('howItWorks.title.post')}
             </h2>
-            <p className="text-body-lg leading-relaxed text-white/75">{t('howItWorks.lead')}</p>
+            <p className="text-body-lg leading-relaxed text-fg-secondary">{t('howItWorks.lead')}</p>
           </div>
 
           {/* Desktop: the route — a fixed 1240px stage, scaled to fit. */}
@@ -209,14 +211,10 @@ export function HowItWorksRoute() {
             ))}
           </div>
 
-          <div className="mt-10 flex justify-center">
-            <Link
-              to={`/${locale ?? 'en'}/how-it-works`}
-              className="inline-flex items-center gap-1.5 text-body-sm font-semibold text-accent-500 underline decoration-dotted underline-offset-4 hover:decoration-solid"
-            >
-              {t('howItWorks.seeAll')}
-              <ArrowRight size={15} />
-            </Link>
+          <div className="mt-12 flex justify-center">
+            <Button size="lg" onClick={() => navigate(`/${locale ?? 'en'}/how-it-works`)}>
+              {t('howItWorks.seeAll')} <ArrowRight size={16} className="ml-1.5" />
+            </Button>
           </div>
         </div>
       </Container>

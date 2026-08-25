@@ -707,12 +707,30 @@
     ],
     "partnersEyebrow": "3 Verified Partner gematcht",
     "partnersTitle": "Wir haben gefunden, wer das umsetzen kann.",
-    "unlock": "Matches mit kostenlosem Konto freischalten →",
+    "unlock": "Matches mit kostenlosem Konto freischalten",
     "save": {
       "title": "Diese Map speichern. Partner freischalten.",
       "subtitle": "Kostenloses Konto. Keine Kreditkarte. Founding-Member-Zugang bis zum Beta-Launch.",
       "cta": "Kostenloses Konto erstellen"
-    }
+    },
+    "statsCompact": [
+      {
+        "value": "8",
+        "label": "Identifizierte Pflichten"
+      },
+      {
+        "value": "4",
+        "label": "Mit Frist in 30 Tagen"
+      },
+      {
+        "value": "14",
+        "label": "Tage mittlere Frist"
+      },
+      {
+        "value": "3",
+        "label": "Verified Partner"
+      }
+    ]
   },
   "matchmaking": {
     "eyebrow": "Der Unterschied",
@@ -720,7 +738,7 @@
       "line1": "Andere Tools zeigen Ihnen, was falsch läuft.",
       "pre": "Wir ",
       "gold": "verbinden",
-      "post": " Sie mit denen, die es lösen. Sparen Sie Zeit und Geld."
+      "post": " Sie mit denen, die es lösen."
     },
     "subtitle": "Risk Maps sind überall verfügbar — jedes Compliance-Dashboard bietet eine. Was CompliHub360 unterscheidet, ist das, was danach kommt: verifizierte Anbieter über Länder und Bereiche hinweg, vorgeprüft, mit gemessenen Reaktionszeiten und strukturierten Übergaben. Sie suchen nicht. Wir matchen.",
     "matches": [
@@ -993,7 +1011,8 @@
           "Sie erhalten eine förmliche Beschwerde oder eine behördliche Anfrage"
         ]
       }
-    ]
+    ],
+    "learnMore": "Mehr erfahren"
   },
   "howItActs": {
     "eyebrow": "Ein Mandat von innen",

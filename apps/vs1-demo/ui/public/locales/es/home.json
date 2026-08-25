@@ -707,12 +707,30 @@
     ],
     "partnersEyebrow": "3 Verified Partners con match",
     "partnersTitle": "Hemos encontrado quién puede actuar sobre esto.",
-    "unlock": "Desbloquee los matches con una cuenta gratuita →",
+    "unlock": "Desbloquee los matches con una cuenta gratuita",
     "save": {
       "title": "Guarde este mapa. Desbloquee los partners.",
       "subtitle": "Cuenta gratuita. Sin tarjeta de crédito. Acceso de miembro fundador hasta el lanzamiento de la Beta.",
       "cta": "Crear cuenta gratuita"
-    }
+    },
+    "statsCompact": [
+      {
+        "value": "8",
+        "label": "Obligaciones identificadas"
+      },
+      {
+        "value": "4",
+        "label": "Con plazo en 30 días"
+      },
+      {
+        "value": "14",
+        "label": "Días de plazo mediano"
+      },
+      {
+        "value": "3",
+        "label": "Verified Partners"
+      }
+    ]
   },
   "matchmaking": {
     "eyebrow": "La diferencia",
@@ -720,7 +738,7 @@
       "line1": "Otras herramientas le dicen qué está mal.",
       "pre": "Nosotros le ",
       "gold": "conectamos",
-      "post": " con quien lo resuelve. Ahorre tiempo y dinero."
+      "post": " con quien lo resuelve."
     },
     "subtitle": "Las risk maps son públicas: cualquier dashboard de compliance ofrece una. Lo que distingue a CompliHub360 es lo que viene después: proveedores verificados en varios países y áreas, preseleccionados, con tiempos de respuesta medidos y traspasos estructurados. Usted no busca. Nosotros hacemos el match.",
     "matches": [
@@ -993,7 +1011,8 @@
           "Recibe una reclamación formal o una consulta de una autoridad"
         ]
       }
-    ]
+    ],
+    "learnMore": "Más información"
   },
   "howItActs": {
     "eyebrow": "Dentro de un encargo",

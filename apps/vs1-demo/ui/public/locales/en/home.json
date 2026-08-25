@@ -707,12 +707,30 @@
     ],
     "partnersEyebrow": "3 Verified Partners matched",
     "partnersTitle": "We've found who can act on this.",
-    "unlock": "Unlock matches with a free account →",
+    "unlock": "Unlock matches with a free account",
     "save": {
       "title": "Save this map. Unlock the partners.",
       "subtitle": "Free account. No credit card. Founding-member access through Beta launch.",
       "cta": "Create free account"
-    }
+    },
+    "statsCompact": [
+      {
+        "value": "8",
+        "label": "Obligations identified"
+      },
+      {
+        "value": "4",
+        "label": "Due within 30 days"
+      },
+      {
+        "value": "14",
+        "label": "Days median deadline"
+      },
+      {
+        "value": "3",
+        "label": "Verified Partners"
+      }
+    ]
   },
   "matchmaking": {
     "eyebrow": "The difference",
@@ -720,7 +738,7 @@
       "line1": "Other tools tell you what's wrong.",
       "pre": "We ",
       "gold": "connect",
-      "post": " you with who fixes it. Save time and money."
+      "post": " you with who fixes it."
     },
     "subtitle": "Risk maps are public — every compliance dashboard offers one. What makes CompliHub360 different is what comes after: verified providers across countries and domains, pre-vetted, response-tracked, with structured handovers. You don't search. We match.",
     "matches": [
@@ -993,7 +1011,8 @@
           "You receive a formal complaint or an enquiry from an authority"
         ]
       }
-    ]
+    ],
+    "learnMore": "Learn more"
   },
   "howItActs": {
     "eyebrow": "Inside one engagement",

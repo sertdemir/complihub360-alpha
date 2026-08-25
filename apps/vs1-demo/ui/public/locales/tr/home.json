@@ -707,12 +707,30 @@
     ],
     "partnersEyebrow": "3 Verified Partner eşleşti",
     "partnersTitle": "Bunu kimin çözebileceğini bulduk.",
-    "unlock": "Eşleşmeleri ücretsiz hesapla açın →",
+    "unlock": "Eşleşmeleri ücretsiz hesapla açın",
     "save": {
       "title": "Bu haritayı kaydedin. Partner'ların kilidini açın.",
       "subtitle": "Ücretsiz hesap. Kredi kartı gerekmez. Beta lansmanına kadar kurucu üye erişimi.",
       "cta": "Ücretsiz hesap oluşturun"
-    }
+    },
+    "statsCompact": [
+      {
+        "value": "8",
+        "label": "Tespit edilen yükümlülük"
+      },
+      {
+        "value": "4",
+        "label": "30 gün içinde süresi dolan"
+      },
+      {
+        "value": "14",
+        "label": "Gün medyan vade"
+      },
+      {
+        "value": "3",
+        "label": "Verified Partner"
+      }
+    ]
   },
   "matchmaking": {
     "eyebrow": "Fark",
@@ -720,7 +738,7 @@
       "line1": "Diğer araçlar size neyin yanlış olduğunu söyler.",
       "pre": "Biz sizi çözecek kişiyle ",
       "gold": "buluştururuz",
-      "post": ". Zamandan ve paradan tasarruf edin."
+      "post": "."
     },
     "subtitle": "Risk haritaları herkese açık — her uyum panosu bir tane sunar. CompliHub360'ı farklı kılan sonrasıdır: ülkeler ve alanlar genelinde doğrulanmış, önceden incelenmiş, yanıt süreleri izlenen ve yapılandırılmış devirlerle çalışan sağlayıcılar. Siz aramazsınız. Biz eşleştiririz.",
     "matches": [
@@ -993,7 +1011,8 @@
           "Resmi bir şikâyet ya da bir kurumdan sorgu alıyorsunuz"
         ]
       }
-    ]
+    ],
+    "learnMore": "Daha fazla bilgi"
   },
   "howItActs": {
     "eyebrow": "Bir işin içinden",
