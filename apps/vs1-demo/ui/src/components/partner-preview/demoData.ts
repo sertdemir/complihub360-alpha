@@ -1,7 +1,7 @@
 import type { PartnerData } from './types';
 
 // ─── Demo fixture ─────────────────────────────────────────────────────────────
-// Realistic CompliHub partner data in the presentational view-model shape. Used
+// Realistic CompliHub360 partner data in the presentational view-model shape. Used
 // by the landing-page previews. The real dashboard maps `useDashboardStore` data
 // into this same shape when it adopts these blocks.
 

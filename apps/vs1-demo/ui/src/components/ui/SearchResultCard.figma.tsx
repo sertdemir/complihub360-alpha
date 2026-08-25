@@ -5,7 +5,7 @@ import { SearchResultCard } from "./SearchResultCard";
 // → SearchResultCard. Axes: Type (Audit·Document·Contact·Norm) × State
 // (Default·Hover). Type → type (drives tag label + leading icon); Hover is a CSS
 // :hover state, not a prop. Title / snippet / meta are instance content (the
-// example hardcodes representative CompliHub content).
+// example hardcodes representative CompliHub360 content).
 figma.connect(
   SearchResultCard,
   "https://www.figma.com/design/a4BeKbsBGoHkcudhKXUJTl?node-id=673-188",

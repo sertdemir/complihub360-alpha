@@ -114,8 +114,8 @@ export async function generateRiskMapPdf(opts: {
 
   // ── Header ──────────────────────────────────────────────────────────────
   doc.setFont('times', 'bold').setFontSize(18).setTextColor(INK);
-  doc.text('CompliHub', M, y);
-  const chWidth = doc.getTextWidth('CompliHub');
+  doc.text('CompliHub360', M, y);
+  const chWidth = doc.getTextWidth('CompliHub360');
   doc.setTextColor(GOLD).text('360', M + chWidth + 2, y);
   doc.setFont('helvetica', 'normal').setFontSize(8).setTextColor(MUTED);
   doc.text('Always on your side.', M, y + 12);

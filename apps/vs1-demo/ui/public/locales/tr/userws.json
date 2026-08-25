@@ -365,7 +365,7 @@
   "assistant": {
     "title": "KDV Asistanı",
     "beta": "Beta",
-    "intro": "Pazarlarınızdaki (DE, UK, NL, FR, IT, ES, US, TR, AT) KDV kuralları, eşikler ve son tarihler hakkında bana soru sorabilirsiniz. CompliHub’ın doğrulanmış bilgi tabanından yanıtlıyorum.",
+    "intro": "Pazarlarınızdaki (DE, UK, NL, FR, IT, ES, US, TR, AT) KDV kuralları, eşikler ve son tarihler hakkında bana soru sorabilirsiniz. CompliHub360’ın doğrulanmış bilgi tabanından yanıtlıyorum.",
     "placeholder": "örn. İtalya’da ne zaman KDV kaydı yaptırmam gerekir?",
     "send": "Gönder",
     "open": "Asistanı aç",

@@ -9,6 +9,7 @@ export { RiskMapShowcase } from './RiskMapShowcase';
 export { MatchmakingDifference } from './MatchmakingDifference';
 export { MatchShowcase } from './MatchShowcase';
 export { TwoReflexes } from './TwoReflexes';
+export { TrustBand } from './TrustBand';
 export { DomainsKnows } from './DomainsKnows';
 export { DomainsAtlas } from './DomainsAtlas';
 export { HowItActs } from './HowItActs';

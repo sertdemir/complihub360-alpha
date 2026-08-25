@@ -5,11 +5,11 @@ import { cn } from '../../lib/utils';
 // Mark = exact exported vector geometry (viewBox 0 0 40 39): an orbit ring + a
 // node-dot, and the "360" numerals + degree. Colours are driven by `tone`,
 // mirroring the four Compass colour variants exactly:
-//   On Light   ring #D4AF37 · 360 #004D40 · CompliHub #004D40 · tagline #6A5B1E
-//   On Petrol  ring #D4AF37 · 360 #FFFFFF · CompliHub #FFFFFF · tagline #D4AF37
+//   On Light   ring #D4AF37 · 360 #004D40 · CompliHub360 #004D40 · tagline #6A5B1E
+//   On Petrol  ring #D4AF37 · 360 #FFFFFF · CompliHub360 #FFFFFF · tagline #D4AF37
 //   Mono White everything #FFFFFF
 //   Mono Black everything #0F172A
-// Wordmark = "CompliHub" Inter Bold 16 · Tagline = "Always on your side."
+// Wordmark = "CompliHub360" Inter Bold 16 · Tagline = "Always on your side."
 // Inter Regular 10 — values read straight from the source file.
 // The claim replaced "Compliance. Simplified." on 2026-08-10 (Brand & Marketing
 // Map V1 §5/§16): it names the brand's stance, not the product. Deliberately
@@ -82,7 +82,7 @@ function Wordmark({ tone, align }: { tone: LogoTone; align: 'left' | 'center' })
   return (
     <span className={cn('flex flex-col leading-none', align === 'center' && 'items-center')}>
       <span className={cn('font-sans text-[16px] font-bold leading-none tracking-tight', c.word)}>
-        CompliHub
+        CompliHub360
       </span>
       <span className={cn('mt-[3px] font-sans text-[10px] leading-none', c.tag)}>
         Always on your side.

@@ -4,7 +4,7 @@ import { TableMobileCard } from "./TableMobileCard";
 // Code Connect: Compass "Table Mobile Card" component set (804:504, Table page)
 // → TableMobileCard. Single axis: State (Default·Selected) → selected (bool).
 // Title and the label→value fields are instance content (the example hardcodes
-// representative CompliHub audit-row content).
+// representative CompliHub360 audit-row content).
 figma.connect(
   TableMobileCard,
   "https://www.figma.com/design/a4BeKbsBGoHkcudhKXUJTl?node-id=804-504",

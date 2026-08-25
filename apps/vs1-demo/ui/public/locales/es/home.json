@@ -159,7 +159,7 @@
     "note": "Nada de esto significa que tenga un problema. Significa que aún no tiene una imagen clara, y eso sí tiene solución."
   },
   "heroWizard": {
-    "mobileAlt": "Asistente de compliance de CompliHub — paso «Áreas» (móvil)"
+    "mobileAlt": "Asistente de compliance de CompliHub360 — paso «Áreas» (móvil)"
   },
   "wizard": {
     "rail": {
@@ -806,7 +806,7 @@
       "gold": "Ambos",
       "post": " siguen rotos si solo arregla uno."
     },
-    "subtitle": "Cada mercado tiene sus propios umbrales, registros y supervisores. Cada asesor conoce una parte. Las plataformas que mapean las normas no conocen a las personas. Los directorios de personas no leen las normas. CompliHub está construido para cerrar ambas mitades a la vez.",
+    "subtitle": "Cada mercado tiene sus propios umbrales, registros y supervisores. Cada asesor conoce una parte. Las plataformas que mapean las normas no conocen a las personas. Los directorios de personas no leen las normas. CompliHub360 está construido para cerrar ambas mitades a la vez.",
     "card1": {
       "title": "El mapa que nadie dibuja.",
       "label": "La brecha, mapeada"
@@ -996,7 +996,7 @@
         "title": "Asesoría legal",
         "markets": "TODA LA UE",
         "desc": "Saber cuándo una cuestión necesita de verdad a un abogado, y llegar a uno que ya conoce su caso.",
-        "intro": "Las cuestiones que necesitan una respuesta cualificada y no una lista de comprobación: contratos, condiciones, derechos del consumidor, litigios. CompliHub no es un despacho — los Verified Partners asesoran bajo su propia responsabilidad profesional, y nos ocupamos de que quien le atienda ya conozca su caso.",
+        "intro": "Las cuestiones que necesitan una respuesta cualificada y no una lista de comprobación: contratos, condiciones, derechos del consumidor, litigios. CompliHub360 no es un despacho — los Verified Partners asesoran bajo su propia responsabilidad profesional, y nos ocupamos de que quien le atienda ya conozca su caso.",
         "cover": [
           "Condiciones y deberes de información al consumidor",
           "Contratos con proveedores y plataformas",
@@ -1108,7 +1108,7 @@
       "gold": "base",
       "post": " de todo su compliance."
     },
-    "subtitle": "La evaluación es gratuita. Lo que viene después — su espacio de trabajo, noticias en vivo, contenido experto, sus partners — es lo que convierte a CompliHub en el lugar al que usted vuelve.",
+    "subtitle": "La evaluación es gratuita. Lo que viene después — su espacio de trabajo, noticias en vivo, contenido experto, sus partners — es lo que convierte a CompliHub360 en el lugar al que usted vuelve.",
     "pills": {
       "live": "Disponible hoy",
       "beta": "Llega con la Beta"
@@ -1171,7 +1171,7 @@
       },
       {
         "q": "¿Me están dando asesoramiento jurídico?",
-        "a": "No. CompliHub mapea obligaciones y muestra lo que probablemente aplica a su operación — no es asesoramiento jurídico. Cuando un asunto requiere una opinión vinculante, le conectamos con un Verified Partner que puede darla."
+        "a": "No. CompliHub360 mapea obligaciones y muestra lo que probablemente aplica a su operación — no es asesoramiento jurídico. Cuando un asunto requiere una opinión vinculante, le conectamos con un Verified Partner que puede darla."
       },
       {
         "q": "¿Cómo se verifica a los Verified Partners?",
@@ -1285,6 +1285,15 @@
       "imprint": "Aviso legal (Impressum)",
       "cookies": "Política de cookies",
       "subProcessors": "Subencargados"
+    }
+  },
+  "trustBand": {
+    "eyebrow": "Por qué ambas van juntas",
+    "title": {
+      "line1": "Las plataformas conocen las reglas; los directorios, a las personas.",
+      "pre": "CompliHub360 cierra ",
+      "gold": "ambas mitades",
+      "post": " a la vez."
     }
   }
 }

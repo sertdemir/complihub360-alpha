@@ -18,15 +18,15 @@ const TYPE_ICON: Record<ItemType, typeof Play> = {
 };
 
 const ITEMS: { title: string; source: string; type: ItemType; domain: string }[] = [
-  { title: 'Italian VAT registration: step-by-step', source: 'CompliHub Editorial · 8 min', type: 'VIDEO', domain: 'TAX & VAT' },
-  { title: 'GDPR cookie consent setup checklist', source: 'CompliHub Editorial · 12 steps', type: 'GUIDE', domain: 'PRIVACY' },
+  { title: 'Italian VAT registration: step-by-step', source: 'CompliHub360 Editorial · 8 min', type: 'VIDEO', domain: 'TAX & VAT' },
+  { title: 'GDPR cookie consent setup checklist', source: 'CompliHub360 Editorial · 12 steps', type: 'GUIDE', domain: 'PRIVACY' },
   { title: 'Health claims regulation: what you cannot say', source: 'Lex Marketing · 8 min read', type: 'ARTICLE', domain: 'MARKETING' },
-  { title: 'DPA generator (DE/EN)', source: 'CompliHub Tools · Interactive', type: 'TOOL', domain: 'PRIVACY' },
-  { title: 'OSS vs IOSS: live Q&A with verified tax experts', source: 'CompliHub Live · Mar 14 · 90 min', type: 'WEBINAR', domain: 'TAX & VAT' },
+  { title: 'DPA generator (DE/EN)', source: 'CompliHub360 Tools · Interactive', type: 'TOOL', domain: 'PRIVACY' },
+  { title: 'OSS vs IOSS: live Q&A with verified tax experts', source: 'CompliHub360 Live · Mar 14 · 90 min', type: 'WEBINAR', domain: 'TAX & VAT' },
   { title: 'EPR France: who needs to register?', source: 'Verifizierter Partner · 14 min', type: 'VIDEO', domain: 'PACKAGING' },
-  { title: 'Setting up a German GmbH from abroad', source: 'CompliHub Editorial · 22 steps', type: 'GUIDE', domain: 'CORPORATE' },
-  { title: 'CONAI vs LUCID: comparison for EU sellers', source: 'CompliHub Editorial · 10 min read', type: 'ARTICLE', domain: 'PACKAGING' },
-  { title: 'EU VAT threshold calculator', source: 'CompliHub Tools · Interactive', type: 'TOOL', domain: 'TAX & VAT' },
+  { title: 'Setting up a German GmbH from abroad', source: 'CompliHub360 Editorial · 22 steps', type: 'GUIDE', domain: 'CORPORATE' },
+  { title: 'CONAI vs LUCID: comparison for EU sellers', source: 'CompliHub360 Editorial · 10 min read', type: 'ARTICLE', domain: 'PACKAGING' },
+  { title: 'EU VAT threshold calculator', source: 'CompliHub360 Tools · Interactive', type: 'TOOL', domain: 'TAX & VAT' },
   { title: 'GDPR audit walkthrough — recorded webinar', source: 'Verifizierter Partner · Feb 12 · 60 min', type: 'WEBINAR', domain: 'PRIVACY' },
   { title: 'Reverse charge mechanism explained', source: 'Tax Specialists EU · 11 min', type: 'VIDEO', domain: 'TAX & VAT' },
   { title: 'When does Partita IVA become mandatory?', source: 'Verifizierter Partner · 6 min read', type: 'ARTICLE', domain: 'TAX & VAT' },

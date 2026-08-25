@@ -19,7 +19,7 @@ import { Container } from '../ui/Container';
 import { Button } from '../ui/Button';
 import { SectionEyebrow, GoldWord } from '../providers/SectionHeading';
 
-// ─── S4 — What CompliHub Knows · Figma 1249:439 ──────────────────────────────
+// ─── S4 — What CompliHub360 Knows · Figma 1249:439 ──────────────────────────────
 // "Six domains. One coherent map." A 3×2 grid of domain cards (gold frame on
 // hover) that stagger-reveal on scroll; clicking one opens the domain side-sheet
 // (Figma 1650:5764) with cover/when-this-matters detail.

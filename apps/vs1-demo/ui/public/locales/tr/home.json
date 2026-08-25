@@ -159,7 +159,7 @@
     "note": "Bunların hiçbiri bir sorununuz olduğu anlamına gelmez. Henüz net bir resminiz olmadığı anlamına gelir — ve bu çözülebilir."
   },
   "heroWizard": {
-    "mobileAlt": "CompliHub uyum sihirbazı — «Alanlar» adımı (mobil)"
+    "mobileAlt": "CompliHub360 uyum sihirbazı — «Alanlar» adımı (mobil)"
   },
   "wizard": {
     "rail": {
@@ -806,7 +806,7 @@
       "gold": "İkisi de",
       "post": " yalnızca birini düzeltirseniz bozuk kalır."
     },
-    "subtitle": "Her pazarın kendi eşikleri, sicilleri ve denetçileri var. Her danışman bir dilimi bilir. Kuralları haritalayan platformlar insanları tanımaz. İnsan dizinleri kuralları okumaz. CompliHub her iki yarıyı aynı anda kapatmak için kuruldu.",
+    "subtitle": "Her pazarın kendi eşikleri, sicilleri ve denetçileri var. Her danışman bir dilimi bilir. Kuralları haritalayan platformlar insanları tanımaz. İnsan dizinleri kuralları okumaz. CompliHub360 her iki yarıyı aynı anda kapatmak için kuruldu.",
     "card1": {
       "title": "Kimsenin çizmediği harita.",
       "label": "Boşluk, haritalandı"
@@ -996,7 +996,7 @@
         "title": "Hukuki Danışmanlık",
         "markets": "AB GENELİ",
         "desc": "Bir sorunun gerçekten avukat gerektirip gerektirmediğini bilin — ve dosyanızı zaten bilen birine ulaşın.",
-        "intro": "Kontrol listesi değil, nitelikli yanıt gerektiren sorular: sözleşmeler, koşullar, tüketici hakları, uyuşmazlıklar. CompliHub bir hukuk bürosu değildir — Verified Partner’lar kendi mesleki sorumlulukları altında danışmanlık verir ve biz ulaştığınız kişinin dosyanızı zaten bilmesini sağlarız.",
+        "intro": "Kontrol listesi değil, nitelikli yanıt gerektiren sorular: sözleşmeler, koşullar, tüketici hakları, uyuşmazlıklar. CompliHub360 bir hukuk bürosu değildir — Verified Partner’lar kendi mesleki sorumlulukları altında danışmanlık verir ve biz ulaştığınız kişinin dosyanızı zaten bilmesini sağlarız.",
         "cover": [
           "Koşullar ve tüketiciyi bilgilendirme yükümlülükleri",
           "Tedarikçi ve platform sözleşmeleri",
@@ -1108,7 +1108,7 @@
       "gold": "ana üssüne",
       "post": "."
     },
-    "subtitle": "Değerlendirme ücretsizdir. Sonrasında gelenler — çalışma alanınız, canlı haberler, uzman içeriği, partner'larınız — CompliHub'ı geri döndüğünüz yer yapar.",
+    "subtitle": "Değerlendirme ücretsizdir. Sonrasında gelenler — çalışma alanınız, canlı haberler, uzman içeriği, partner'larınız — CompliHub360'ı geri döndüğünüz yer yapar.",
     "pills": {
       "live": "Bugün kullanılabilir",
       "beta": "Beta ile geliyor"
@@ -1171,7 +1171,7 @@
       },
       {
         "q": "Bana hukuki danışmanlık mı veriyorsunuz?",
-        "a": "Hayır. CompliHub yükümlülükleri haritalar ve operasyonunuza muhtemelen neyin uygulanacağını gösterir — bu hukuki danışmanlık değildir. Bir konu bağlayıcı görüş gerektirdiğinde, sizi bunu verebilecek bir Verified Partner ile buluştururuz."
+        "a": "Hayır. CompliHub360 yükümlülükleri haritalar ve operasyonunuza muhtemelen neyin uygulanacağını gösterir — bu hukuki danışmanlık değildir. Bir konu bağlayıcı görüş gerektirdiğinde, sizi bunu verebilecek bir Verified Partner ile buluştururuz."
       },
       {
         "q": "Verified Partner'lar nasıl denetleniyor?",
@@ -1285,6 +1285,15 @@
       "imprint": "Künye (Impressum)",
       "cookies": "Çerez Politikası",
       "subProcessors": "Alt İşleyenler"
+    }
+  },
+  "trustBand": {
+    "eyebrow": "İkisi neden birlikte",
+    "title": {
+      "line1": "Platformlar kuralları bilir, dizinler insanları.",
+      "pre": "CompliHub360 ",
+      "gold": "iki yarıyı",
+      "post": " aynı anda kapatır."
     }
   }
 }

@@ -45,7 +45,7 @@ import {
   RiskMapShowcase,
   MatchShowcase,
   DomainsAtlas,
-  TwoReflexes,
+  TrustBand,
   BrandCodePreview,
   HowItActs,
   BeyondAssessment,
@@ -84,7 +84,10 @@ export function HomePage() {
           page — rail left, the active area's dossier on the Gradient panel,
           CTA to the area page. DomainsKnows stays available. */}
       <DomainsAtlas />
-      <TwoReflexes />
+      {/* Band edition (canvas 2026-08-25, Variante A): TwoReflexes condensed
+          to one claim + six trust proofs — the showcases now SHOW what its
+          image cards argued. TwoReflexes stays available. */}
+      <TrustBand />
       <BrandCodePreview />
       <HowItActs />
       <BeyondAssessment />

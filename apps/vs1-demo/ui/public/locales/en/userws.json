@@ -365,7 +365,7 @@
   "assistant": {
     "title": "VAT Assistant",
     "beta": "Beta",
-    "intro": "Ask me about VAT rules, thresholds and deadlines in your markets (DE, UK, NL, FR, IT, ES, US, TR, AT). I answer from CompliHub’s verified knowledge base.",
+    "intro": "Ask me about VAT rules, thresholds and deadlines in your markets (DE, UK, NL, FR, IT, ES, US, TR, AT). I answer from CompliHub360’s verified knowledge base.",
     "placeholder": "e.g. When do I have to register for VAT in Italy?",
     "send": "Send",
     "open": "Open assistant",

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-// Foundations/Gradients — the gradient patterns used across CompliHub surfaces:
+// Foundations/Gradients — the gradient patterns used across CompliHub360 surfaces:
 // the petrol brand wash (marketing dark bands), the surface-to-surface fade
 // (section transitions), edge fades (tickers/carousels) and the radial brand
 // glow (hero ambience). Derived from real usage, not ad-hoc.
