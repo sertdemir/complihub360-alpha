@@ -1163,30 +1163,69 @@
       "gold": "probably",
       "post": " wondering."
     },
-    "items": [
+    "groups": [
       {
-        "q": "Is the assessment really free?",
-        "a": "Yes. No account, no credit card. You get a structured risk map at the end. Registering after — to keep it, to match with providers, to receive alerts — is the optional next step."
+        "label": "Assessment & Risk Map",
+        "items": [
+          {
+            "q": "Is the assessment really free?",
+            "a": "Yes. No account, no credit card. You get a structured risk map at the end. Registering after — to keep it, to match with providers, to receive alerts — is the optional next step."
+          },
+          {
+            "q": "Where does the Risk Map's data come from?",
+            "a": "Every entry links to the official announcement, register page or case law it derives from — and is updated whenever a deadline moves, an authority clarifies or a register opens."
+          },
+          {
+            "q": "Can I export my Risk Map?",
+            "a": "Yes. As a PDF for your records or your auditor — and in your workspace, your full trail is exportable at any time as PDF, CSV or via the API."
+          },
+          {
+            "q": "Can I check several markets and areas at once?",
+            "a": "Yes. The assessment covers every market and area you operate in and merges the obligations into one coherent map — prioritised across all of them."
+          },
+          {
+            "q": "What if my market isn't covered yet?",
+            "a": "Tell us where you operate. We add markets continuously, and early registrants help set the priority — we will alert you the moment your market goes live."
+          }
+        ]
       },
       {
-        "q": "Are you giving me legal advice?",
-        "a": "No. CompliHub360 maps obligations and surfaces what is likely to apply to your operation — it is not legal advice. When a matter needs a binding opinion, we connect you to a Verified Partner who can give one."
+        "label": "Partners & engagements",
+        "items": [
+          {
+            "q": "Are you giving me legal advice?",
+            "a": "No. CompliHub360 maps obligations and surfaces what is likely to apply to your operation — it is not legal advice. When a matter needs a binding opinion, we connect you to a Verified Partner who can give one."
+          },
+          {
+            "q": "How are Verified Partners vetted?",
+            "a": "Every partner is reviewed by us on domain coverage, response time, and named real-world outcomes — not a self-listed directory. Each engagement is contractual, with shared accountability for the matter."
+          },
+          {
+            "q": "What does an engagement cost?",
+            "a": "Each Verified Partner publishes a fixed estimate before you accept — no discovery calls just to learn the price. You see the range and scope up front, and approve it before any work begins."
+          },
+          {
+            "q": "How fast does a partner respond?",
+            "a": "24–48 hours to the first response, contractually agreed. If it slips, we automatically route your request to the next available Verified Partner."
+          },
+          {
+            "q": "Am I tied to one partner?",
+            "a": "No. Every engagement is contracted individually. You can request further matches or switch at any time — your trail and your Risk Map remain yours."
+          }
+        ]
       },
       {
-        "q": "How are Verified Partners vetted?",
-        "a": "Every partner is reviewed by us on domain coverage, response time, and named real-world outcomes — not a self-listed directory. Each engagement is contractual, with shared accountability for the matter."
-      },
-      {
-        "q": "What does an engagement cost?",
-        "a": "Each Verified Partner publishes a fixed estimate before you accept — no discovery calls just to learn the price. You see the range and scope up front, and approve it before any work begins."
-      },
-      {
-        "q": "How is my data handled?",
-        "a": "The assessment runs in your browser and needs no account. If you register, your dossier is stored under EU data-protection rules, encrypted, and never sold or shared without your instruction."
-      },
-      {
-        "q": "What if my market isn't covered yet?",
-        "a": "Tell us where you operate. We add markets continuously, and early registrants help set the priority — we will alert you the moment your market goes live."
+        "label": "Account & data",
+        "items": [
+          {
+            "q": "Do I need an account?",
+            "a": "Not for the assessment — it runs in your browser without one. You only need a free account to keep your Risk Map, unlock matches or receive alerts."
+          },
+          {
+            "q": "How is my data handled?",
+            "a": "The assessment runs in your browser and needs no account. If you register, your dossier is stored under EU data-protection rules, encrypted, and never sold or shared without your instruction."
+          }
+        ]
       }
     ]
   },

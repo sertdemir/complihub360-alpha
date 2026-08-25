@@ -1163,30 +1163,69 @@
       "gold": "vermutlich",
       "post": " fragen."
     },
-    "items": [
+    "groups": [
       {
-        "q": "Ist das Assessment wirklich kostenlos?",
-        "a": "Ja. Kein Konto, keine Kreditkarte. Am Ende erhalten Sie eine strukturierte Risk Map. Die anschließende Registrierung — um sie zu behalten, sich mit Anbietern matchen zu lassen und Hinweise zu erhalten — ist der optionale nächste Schritt."
+        "label": "Assessment & Risk Map",
+        "items": [
+          {
+            "q": "Ist das Assessment wirklich kostenlos?",
+            "a": "Ja. Kein Konto, keine Kreditkarte. Am Ende erhalten Sie eine strukturierte Risk Map. Die anschließende Registrierung — um sie zu behalten, sich mit Anbietern matchen zu lassen und Hinweise zu erhalten — ist der optionale nächste Schritt."
+          },
+          {
+            "q": "Woher stammen die Angaben in der Risk Map?",
+            "a": "Jeder Eintrag verlinkt auf die offizielle Bekanntmachung, Registerseite oder Rechtsprechung, aus der er stammt — und wird aktualisiert, wenn eine Frist verschoben wird, eine Behörde präzisiert oder ein Register öffnet."
+          },
+          {
+            "q": "Kann ich meine Risk Map exportieren?",
+            "a": "Ja. Als PDF für Ihre Unterlagen oder Ihren Prüfer — und im Workspace ist Ihr kompletter Verlauf jederzeit als PDF, CSV oder über die API exportierbar."
+          },
+          {
+            "q": "Kann ich mehrere Märkte und Bereiche gleichzeitig prüfen?",
+            "a": "Ja. Das Assessment fragt alle Märkte und Bereiche ab, in denen Sie tätig sind, und führt die Pflichten in einer zusammenhängenden Karte zusammen — priorisiert über alles hinweg."
+          },
+          {
+            "q": "Was, wenn mein Markt noch nicht abgedeckt ist?",
+            "a": "Sagen Sie uns, wo Sie tätig sind. Wir ergänzen laufend Märkte, und frühe Registrierungen setzen die Priorität mit — wir benachrichtigen Sie, sobald Ihr Markt live geht."
+          }
+        ]
       },
       {
-        "q": "Erhalte ich hier Rechtsberatung?",
-        "a": "Nein. CompliHub360 kartiert Pflichten und zeigt auf, was wahrscheinlich für Ihren Betrieb gilt — das ist keine Rechtsberatung. Wenn eine Sache eine verbindliche Einschätzung braucht, verbinden wir Sie mit einem Verified Partner, der sie geben kann."
+        "label": "Partner & Mandate",
+        "items": [
+          {
+            "q": "Erhalte ich hier Rechtsberatung?",
+            "a": "Nein. CompliHub360 kartiert Pflichten und zeigt auf, was wahrscheinlich für Ihren Betrieb gilt — das ist keine Rechtsberatung. Wenn eine Sache eine verbindliche Einschätzung braucht, verbinden wir Sie mit einem Verified Partner, der sie geben kann."
+          },
+          {
+            "q": "Wie werden Verified Partner geprüft?",
+            "a": "Jeder Partner wird von uns auf Bereichsabdeckung, Reaktionszeit und belegte Ergebnisse geprüft — kein Selbsteintrags-Verzeichnis. Jedes Mandat ist vertraglich geregelt, mit gemeinsamer Verantwortung für die Sache."
+          },
+          {
+            "q": "Was kostet ein Mandat?",
+            "a": "Jeder Verified Partner veröffentlicht eine feste Schätzung, bevor Sie annehmen — keine Discovery-Calls, nur um den Preis zu erfahren. Sie sehen Spanne und Umfang vorab und geben sie frei, bevor Arbeit beginnt."
+          },
+          {
+            "q": "Wie schnell antwortet ein Partner?",
+            "a": "24–48 Stunden bis zur ersten Antwort, vertraglich vereinbart. Bei Verzug leiten wir Ihre Anfrage automatisch an den nächsten verfügbaren Verified Partner weiter."
+          },
+          {
+            "q": "Bin ich an einen Partner gebunden?",
+            "a": "Nein. Jedes Mandat ist einzeln vertraglich geregelt. Sie können jederzeit weitere Matches anfragen oder wechseln — Ihr Verlauf und Ihre Risk Map gehören Ihnen."
+          }
+        ]
       },
       {
-        "q": "Wie werden Verified Partner geprüft?",
-        "a": "Jeder Partner wird von uns auf Bereichsabdeckung, Reaktionszeit und belegte Ergebnisse geprüft — kein Selbsteintrags-Verzeichnis. Jedes Mandat ist vertraglich geregelt, mit gemeinsamer Verantwortung für die Sache."
-      },
-      {
-        "q": "Was kostet ein Mandat?",
-        "a": "Jeder Verified Partner veröffentlicht eine feste Schätzung, bevor Sie annehmen — keine Discovery-Calls, nur um den Preis zu erfahren. Sie sehen Spanne und Umfang vorab und geben sie frei, bevor Arbeit beginnt."
-      },
-      {
-        "q": "Wie werden meine Daten behandelt?",
-        "a": "Das Assessment läuft in Ihrem Browser und braucht kein Konto. Wenn Sie sich registrieren, wird Ihr Dossier nach EU-Datenschutzregeln gespeichert, verschlüsselt und nie ohne Ihre Anweisung verkauft oder geteilt."
-      },
-      {
-        "q": "Was, wenn mein Markt noch nicht abgedeckt ist?",
-        "a": "Sagen Sie uns, wo Sie tätig sind. Wir ergänzen laufend Märkte, und frühe Registrierungen setzen die Priorität mit — wir benachrichtigen Sie, sobald Ihr Markt live geht."
+        "label": "Konto & Daten",
+        "items": [
+          {
+            "q": "Brauche ich ein Konto?",
+            "a": "Für das Assessment nicht — es läuft ohne Konto im Browser. Ein kostenloses Konto brauchen Sie erst, wenn Sie Ihre Risk Map behalten, Matches freischalten oder Hinweise erhalten wollen."
+          },
+          {
+            "q": "Wie werden meine Daten behandelt?",
+            "a": "Das Assessment läuft in Ihrem Browser und braucht kein Konto. Wenn Sie sich registrieren, wird Ihr Dossier nach EU-Datenschutzregeln gespeichert, verschlüsselt und nie ohne Ihre Anweisung verkauft oder geteilt."
+          }
+        ]
       }
     ]
   },
