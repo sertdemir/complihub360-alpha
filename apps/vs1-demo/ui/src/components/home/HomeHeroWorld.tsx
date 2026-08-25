@@ -36,13 +36,9 @@ import { HeroWorldMap } from './HeroWorldMap';
 // Copy lives in the 'home' namespace under heroWorld.*.
 
 const PROMISE_ICONS: LucideIcon[] = [FileText, Users, CheckCircle2, Headset];
-const PROOF_ICONS: { Icon: LucideIcon; gold: boolean }[] = [
-  { Icon: Globe, gold: false },
-  { Icon: UserCheck, gold: false },
-  { Icon: Cpu, gold: true },
-  { Icon: Heart, gold: true },
-  { Icon: Lock, gold: false },
-];
+// All five in brand petrol (user decision 2026-08-25) — the former gold
+// accents made the strip look unevenly weighted.
+const PROOF_ICONS: LucideIcon[] = [Globe, UserCheck, Cpu, Heart, Lock];
 
 function AskForm({ className = '' }: { className?: string }) {
   const { t } = useTranslation('home');
@@ -118,16 +114,17 @@ export function HomeHeroWorld() {
         </div>
       </Container>
 
-      {/* ── 2 · Petrol band: four promises ── */}
-      {/* Deliberately theme-fixed raw colours (see the guard test's colour note):
-          this band must stay dark in both themes. */}
+      {/* ── 2 · Gradient band: four promises ── */}
+      {/* On the Gradient (CLAUDE.md) since 2026-08-25 — the dark petrol fill
+          was retired with the light redesign. Icons in the emphasis gold that
+          reads on light surfaces. */}
       <Container size="2xl" bleed className="px-4 md:px-6 lg:px-10">
-        <Stagger className="grid grid-cols-1 rounded-xl bg-[linear-gradient(115deg,#004D40_0%,#00231D_100%)] px-3 py-10 sm:grid-cols-2 lg:grid-cols-4 lg:py-11">
+        <Stagger className="grid grid-cols-1 rounded-xl bg-[linear-gradient(165deg,#EAF3F1_0%,#DDECE8_55%,#E9E4D3_100%)] px-3 py-10 sm:grid-cols-2 lg:grid-cols-4 lg:py-11">
           {PROMISE_ICONS.map((Icon, i) => (
-            <StaggerItem key={i} className="border-white/15 px-6 py-4 sm:py-2 lg:border-r lg:px-7 lg:last:border-r-0">
-              <Icon size={40} strokeWidth={1.7} className="text-accent-500" aria-hidden />
-              <p className="mt-4 font-serif text-h3 font-bold leading-snug text-white">{t(`heroWorld.promises.${i}.title`)}</p>
-              <p className="mt-2 text-body-sm text-[#D1DFDD]">{t(`heroWorld.promises.${i}.desc`)}</p>
+            <StaggerItem key={i} className="border-primary-500/15 px-6 py-4 sm:py-2 lg:border-r lg:px-7 lg:last:border-r-0">
+              <Icon size={40} strokeWidth={1.7} className="text-fg-accent-emphasis" aria-hidden />
+              <p className="mt-4 font-serif text-h3 font-bold leading-snug text-fg">{t(`heroWorld.promises.${i}.title`)}</p>
+              <p className="mt-2 text-body-sm text-fg-secondary">{t(`heroWorld.promises.${i}.desc`)}</p>
             </StaggerItem>
           ))}
         </Stagger>
@@ -137,14 +134,14 @@ export function HomeHeroWorld() {
       <Container size="2xl" bleed className="px-4 pb-14 pt-6 md:px-6 lg:px-10">
         <Stagger
           stagger={0.08}
-          className="grid grid-cols-1 gap-x-9 gap-y-6 rounded-xl border border-stroke-subtle bg-white px-8 py-7 sm:grid-cols-2 lg:grid-cols-5 lg:gap-x-9"
+          className="grid grid-cols-1 gap-x-9 gap-y-6 px-8 py-7 sm:grid-cols-2 lg:grid-cols-5 lg:gap-x-9"
         >
-          {PROOF_ICONS.map(({ Icon, gold }, i) => (
+          {PROOF_ICONS.map((Icon, i) => (
             <StaggerItem key={i} className="flex items-center gap-3.5">
               <Icon
                 size={40}
                 strokeWidth={1.6}
-                className={`shrink-0 ${gold ? 'text-accent-500' : 'text-primary-500'}`}
+                className="shrink-0 text-primary-500"
                 aria-hidden
               />
               <div>
