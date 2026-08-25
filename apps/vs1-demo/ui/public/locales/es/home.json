@@ -78,6 +78,58 @@
       "trust": "Gratis · anónimo · en menos de 3 minutos"
     }
   },
+  "heroWorld": {
+    "title": {
+      "line1": "Compliance global.",
+      "line2": "Simplificado."
+    },
+    "lead": "Entienda sus obligaciones. Encuentre a los especialistas adecuados. Manténgase conforme — allí donde venda.",
+    "ctaRiskMap": "Iniciar el Risk Map",
+    "ask": {
+      "placeholder": "Describa su caso",
+      "send": "Enviar"
+    },
+    "promises": [
+      {
+        "title": "Conozca sus obligaciones",
+        "desc": "Vea con claridad qué aplica a su negocio."
+      },
+      {
+        "title": "Los especialistas adecuados",
+        "desc": "Hacemos match entre usted y partners verificados que encajan con su caso."
+      },
+      {
+        "title": "Pase a la acción",
+        "desc": "Conectar, colaborar, completar."
+      },
+      {
+        "title": "Always on your side",
+        "desc": "Soporte humano y ayuda de IA — a cualquier hora."
+      }
+    ],
+    "proofs": [
+      {
+        "title": "Cobertura 360°",
+        "desc": "Países, temas y regulaciones."
+      },
+      {
+        "title": "Red de expertos",
+        "desc": "Especialistas verificados en los que confiar."
+      },
+      {
+        "title": "Tecnología inteligente",
+        "desc": "Guía de IA con experiencia humana."
+      },
+      {
+        "title": "Human first",
+        "desc": "Personas reales. Soporte real."
+      },
+      {
+        "title": "Sus datos, protegidos",
+        "desc": "Seguridad y privacidad de nivel enterprise."
+      }
+    ]
+  },
   "problemRecognition": {
     "eyebrow": "Por qué esto cuesta",
     "title": {
@@ -1134,7 +1186,11 @@
       "post": "."
     },
     "subtitle": "Seis minutos. Sin necesidad de cuenta. Contrastamos sus operaciones con la normativa que realmente aplica y le mostramos qué hacer a continuación.",
-    "cta": "Evaluar mis necesidades"
+    "cta": "Evaluar mis necesidades",
+    "demo": {
+      "pause": "Pausar la demo",
+      "play": "Reproducir la demo"
+    }
   },
   "newsletter": {
     "eyebrow": "Manténgase al día",

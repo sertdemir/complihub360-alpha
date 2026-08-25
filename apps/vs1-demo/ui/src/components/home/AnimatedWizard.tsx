@@ -227,6 +227,7 @@ export function AnimatedWizard({
   interactive = false,
   showHeader = true,
   spacious = false,
+  paused = false,
   onComplete,
   initialProfile,
   initialMarkets,
@@ -236,6 +237,8 @@ export function AnimatedWizard({
   interactive?: boolean;
   /** Show the wizard topbar (logo + save link). */
   showHeader?: boolean;
+  /** Freezes the auto-play demo loop in place; resuming continues where it stopped. */
+  paused?: boolean;
   /** Full-width, natural-size layout with generous whitespace (Figma 1649:2). */
   spacious?: boolean;
   /** Called when the user advances past the last step (interactive mode). */
@@ -251,6 +254,10 @@ export function AnimatedWizard({
   const { t } = useTranslation('home');
   const reduced = useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
+  // Ref, not effect dep: pausing must freeze the running loop in place, not
+  // restart it from step 0 the way re-running the driver effect would.
+  const pausedRef = useRef(paused);
+  pausedRef.current = paused;
   const targets = useRef(new Map<string, HTMLElement | null>());
   const setTarget = useCallback(
     (id: string) => (el: HTMLElement | null) => {
@@ -334,7 +341,10 @@ export function AnimatedWizard({
   useEffect(() => {
     if (reduced || interactive) return;
     let cancelled = false;
-    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+    const sleep = async (ms: number) => {
+      await new Promise((r) => setTimeout(r, ms));
+      while (pausedRef.current && !cancelled) await new Promise((r) => setTimeout(r, 150));
+    };
     const firePulse = () => setPulse((p) => p + 1);
 
     (async () => {

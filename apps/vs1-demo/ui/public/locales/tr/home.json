@@ -78,6 +78,58 @@
       "trust": "Ücretsiz · anonim · 3 dakikadan kısa"
     }
   },
+  "heroWorld": {
+    "title": {
+      "line1": "Küresel uyum.",
+      "line2": "Basitleştirildi."
+    },
+    "lead": "Yükümlülüklerinizi anlayın. Doğru uzmanları bulun. Sattığınız her yerde uyumlu kalın.",
+    "ctaRiskMap": "Risk Map’i başlat",
+    "ask": {
+      "placeholder": "Talebinizi kısaca anlatın",
+      "send": "Gönder"
+    },
+    "promises": [
+      {
+        "title": "Yükümlülüklerinizi bilin",
+        "desc": "İşletmeniz için nelerin geçerli olduğunu net görün."
+      },
+      {
+        "title": "Doğru uzmanlar",
+        "desc": "Sizi durumunuza uygun, doğrulanmış partnerlerle eşleştiriyoruz."
+      },
+      {
+        "title": "Harekete geçin",
+        "desc": "Bağlanın, birlikte çalışın, tamamlayın."
+      },
+      {
+        "title": "Always on your side",
+        "desc": "İnsan desteği ve yapay zekâ yardımı — günün her saati."
+      }
+    ],
+    "proofs": [
+      {
+        "title": "360° kapsam",
+        "desc": "Ülkeler, konular ve düzenlemeler genelinde."
+      },
+      {
+        "title": "Uzman ağı",
+        "desc": "Güvenebileceğiniz doğrulanmış uzmanlar."
+      },
+      {
+        "title": "Akıllı teknoloji",
+        "desc": "İnsan uzmanlığıyla birleşen yapay zekâ rehberliği."
+      },
+      {
+        "title": "Human first",
+        "desc": "Gerçek insanlar. Gerçek destek."
+      },
+      {
+        "title": "Verileriniz güvende",
+        "desc": "Kurumsal düzeyde güvenlik ve veri koruması."
+      }
+    ]
+  },
   "problemRecognition": {
     "eyebrow": "Bu neden zor",
     "title": {
@@ -1134,7 +1186,11 @@
       "post": " hâle gelir."
     },
     "subtitle": "Altı dakika. Hesap gerekmez. Operasyonlarınızı fiilen geçerli olan mevzuatla eşleştirir ve bir sonraki adımınızı gösteririz.",
-    "cta": "İhtiyaçlarımı değerlendir"
+    "cta": "İhtiyaçlarımı değerlendir",
+    "demo": {
+      "pause": "Demoyu duraklat",
+      "play": "Demoyu oynat"
+    }
   },
   "newsletter": {
     "eyebrow": "Güncel kalın",

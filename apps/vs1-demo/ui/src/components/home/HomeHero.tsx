@@ -123,7 +123,7 @@ function WizardPreview({ className = '' }: { className?: string }) {
 // width — so the wizard fills its column at any viewport (bigger, minimal side
 // gaps) without overflow. Never upscales past `max`. Cursor stays aligned because
 // AnimatedWizard measures targets via layout offsets, not getBoundingClientRect.
-function FitScale({
+export function FitScale({
   width,
   height,
   max = 1,

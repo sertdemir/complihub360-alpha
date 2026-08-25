@@ -1,4 +1,6 @@
 export { HomeHero } from './HomeHero';
+export { HomeHeroWorld } from './HomeHeroWorld';
+export { HeroWorldMap } from './HeroWorldMap';
 export { ProblemRecognition } from './ProblemRecognition';
 export { HowItWorksSteps } from './HowItWorksSteps';
 export { RiskMapSection } from './RiskMapSection';
@@ -10,5 +12,6 @@ export { BrandCodePreview } from './BrandCodePreview';
 export { BeyondAssessment } from './BeyondAssessment';
 export { HomeFaq } from './HomeFaq';
 export { EntryDoor } from './EntryDoor';
+export { EntryDoorDemo } from './EntryDoorDemo';
 export { NewsletterBand } from './NewsletterBand';
 export { SiteFooter } from './SiteFooter';

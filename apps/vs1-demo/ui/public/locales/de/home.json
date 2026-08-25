@@ -78,6 +78,58 @@
       "trust": "Kostenlos · anonym · in unter 3 Minuten"
     }
   },
+  "heroWorld": {
+    "title": {
+      "line1": "Globale Compliance.",
+      "line2": "Vereinfacht."
+    },
+    "lead": "Verstehen Sie Ihre Pflichten. Finden Sie die richtigen Fachleute. Bleiben Sie konform — überall, wo Sie verkaufen.",
+    "ctaRiskMap": "Risk Map starten",
+    "ask": {
+      "placeholder": "Beschreiben Sie Ihr Anliegen",
+      "send": "Senden"
+    },
+    "promises": [
+      {
+        "title": "Pflichten kennen",
+        "desc": "Sehen Sie klar, was für Ihren Betrieb gilt."
+      },
+      {
+        "title": "Die richtigen Fachleute",
+        "desc": "Wir matchen Sie mit verifizierten Partnern, die zu Ihrem Fall passen."
+      },
+      {
+        "title": "Ins Handeln kommen",
+        "desc": "Verbinden, zusammenarbeiten, erledigen."
+      },
+      {
+        "title": "Always on your side",
+        "desc": "Menschlicher Support und KI-Hilfe — rund um die Uhr."
+      }
+    ],
+    "proofs": [
+      {
+        "title": "360°-Abdeckung",
+        "desc": "Über Länder, Themen und Regularien."
+      },
+      {
+        "title": "Experten-Netzwerk",
+        "desc": "Verifizierte Fachleute, denen Sie vertrauen können."
+      },
+      {
+        "title": "Smarte Technologie",
+        "desc": "KI-Führung mit menschlicher Expertise."
+      },
+      {
+        "title": "Human First",
+        "desc": "Echte Menschen. Echter Support."
+      },
+      {
+        "title": "Ihre Daten, geschützt",
+        "desc": "Sicherheit und Datenschutz auf Enterprise-Niveau."
+      }
+    ]
+  },
   "problemRecognition": {
     "eyebrow": "Warum das schwer ist",
     "title": {
@@ -1134,7 +1186,11 @@
       "post": "."
     },
     "subtitle": "Sechs Minuten. Kein Konto erforderlich. Wir gleichen Ihre Tätigkeit mit den Vorschriften ab, die tatsächlich gelten, und zeigen Ihnen, was als Nächstes zu tun ist.",
-    "cta": "Meinen Bedarf ermitteln"
+    "cta": "Meinen Bedarf ermitteln",
+    "demo": {
+      "pause": "Demo pausieren",
+      "play": "Demo abspielen"
+    }
   },
   "newsletter": {
     "eyebrow": "Auf dem Laufenden bleiben",
