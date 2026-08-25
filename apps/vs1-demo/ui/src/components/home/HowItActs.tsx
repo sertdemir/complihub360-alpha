@@ -1,35 +1,31 @@
-import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Download } from 'lucide-react';
-import { SectionEyebrow, GoldWord } from '../providers/SectionHeading';
+import { SectionEyebrow, GoldWord, Reveal, Stagger, StaggerItem } from '../providers/SectionHeading';
 
-// ─── S5 — How CompliHub360 Acts · Figma 1247:435 ───────────────────────────────
-// "What happens between the match and the resolution." Three numbered cards —
-// cost, response SLA, and the engagement trail — each with a detail panel, laid
-// out as wide landscape rows (number · text · panel). Cards reveal top-to-bottom
-// on scroll.
-
-const item = { hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0 } };
-
-function Card({ n, panel, title, desc }: { n: string; panel: React.ReactNode; title: string; desc: string }) {
-  return (
-    <motion.div
-      variants={item}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-      className="grid gap-6 rounded-xl bg-surface p-7 shadow-[0_30px_70px_-34px_rgba(2,22,17,0.3)] md:grid-cols-[auto_1fr_minmax(300px,400px)] md:items-center md:gap-10 md:p-9"
-    >
-      <p className="font-serif text-[2.5rem] font-bold leading-none text-fg-brand md:text-[3rem]">{n}</p>
-      <div>
-        <p className="font-serif text-[20px] font-bold text-fg md:text-[24px]">{title}</p>
-        <p className="mt-3 text-body-sm leading-relaxed text-fg-secondary md:text-body-md">{desc}</p>
-      </div>
-      <div className="rounded-xl bg-surface-secondary p-5">{panel}</div>
-    </motion.div>
-  );
-}
+// ─── S5 — How CompliHub360 Acts (canvas "Ein Mandat von innen" · C, 2026-08-25) ─
+// "What happens between the match and the resolution." Restyled in place from
+// the grey landscape rows to the reviewed Band variant: heading centred on
+// white, then a FULL-BLEED Gradient band (CLAUDE.md) carrying three column
+// cards — gold serif index, title, copy, and the detail exhibit (cost / SLA /
+// trail) anchored at the card's bottom. Same id ("engagement", the header's
+// Pricing anchor), same howItActs.* copy — the stage changed, not the content.
+// Cards stagger in left-to-right on scroll; reduced motion shows them in place.
 
 function Label({ children }: { children: React.ReactNode }) {
   return <p className="text-body-4xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary">{children}</p>;
+}
+
+function Card({ n, panel, title, desc }: { n: string; panel: React.ReactNode; title: string; desc: string }) {
+  return (
+    <StaggerItem className="flex">
+      <div className="flex w-full flex-col rounded-xl bg-surface p-7 shadow-[0_34px_80px_-30px_rgba(2,22,17,0.4)] lg:p-8">
+        <p className="font-serif text-[21px] font-bold leading-none text-fg-accent-emphasis">{n}</p>
+        <p className="mt-3.5 font-serif text-[21px] font-bold leading-snug text-fg">{title}</p>
+        <p className="mb-5 mt-2.5 text-body-sm leading-relaxed text-fg-secondary">{desc}</p>
+        <div className="mt-auto rounded-[10px] bg-surface-secondary p-5">{panel}</div>
+      </div>
+    </StaggerItem>
+  );
 }
 
 // Timeline copy lives in howItActs.panel3.timeline.<index>.* ('home' ns).
@@ -38,27 +34,19 @@ const TIMELINE_COUNT = 4;
 export function HowItActs() {
   const { t } = useTranslation('home');
   return (
-    <section id="engagement" className="bg-surface-secondary py-20 lg:py-28">
-      <div className="mx-auto w-full max-w-[1320px] px-4 md:px-6 lg:px-10">
-        {/* Heading (left-aligned) */}
-        <div className="max-w-2xl">
-          <SectionEyebrow tone="brand">{t('howItActs.eyebrow')}</SectionEyebrow>
-          <h2 className="mt-4 font-serif text-[2rem] font-semibold leading-tight tracking-tight text-fg sm:text-[2.75rem]">
-            {t('howItActs.title.pre')}<GoldWord>{t('howItActs.title.gold')}</GoldWord>{t('howItActs.title.post')}
-          </h2>
-          <p className="mt-5 text-body leading-relaxed text-fg-secondary">
-            {t('howItActs.subtitle')}
-          </p>
-        </div>
+    <section id="engagement" className="bg-surface pt-20 lg:pt-28">
+      {/* Heading, centred on white */}
+      <Reveal className="mx-auto flex max-w-[820px] flex-col items-center gap-4 px-4 text-center md:px-6">
+        <SectionEyebrow tone="brand">{t('howItActs.eyebrow')}</SectionEyebrow>
+        <h2 className="font-serif text-[2rem] font-semibold leading-tight tracking-tight text-fg sm:text-[2.5rem]">
+          {t('howItActs.title.pre')}<GoldWord>{t('howItActs.title.gold')}</GoldWord>{t('howItActs.title.post')}
+        </h2>
+        <p className="max-w-[62ch] text-body leading-relaxed text-fg-secondary">{t('howItActs.subtitle')}</p>
+      </Reveal>
 
-        {/* Cards — landscape rows, top-to-bottom stagger reveal */}
-        <motion.div
-          className="mt-14 flex flex-col gap-6"
-          variants={{ show: { transition: { staggerChildren: 0.14 } } }}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: '-80px' }}
-        >
+      {/* Full-bleed Gradient band with the three column cards */}
+      <div className="mt-14 bg-[linear-gradient(165deg,#EAF3F1_0%,#DDECE8_55%,#E9E4D3_100%)] px-4 py-16 md:px-6 lg:px-10 lg:py-[72px]">
+        <Stagger stagger={0.14} className="mx-auto grid max-w-[1320px] gap-5 md:grid-cols-3">
           <Card
             n="01"
             title={t('howItActs.cards.0.title')}
@@ -115,7 +103,7 @@ export function HowItActs() {
               </div>
             }
           />
-        </motion.div>
+        </Stagger>
       </div>
     </section>
   );
