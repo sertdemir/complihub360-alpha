@@ -144,16 +144,17 @@ export function MatchShowcase() {
               </StaggerItem>
             ))}
           </Stagger>
+
+          {/* The one conversion of this section, inside the band below the
+              dossiers — the band's symmetric padding keeps the space above
+              the cards and below the button equal. */}
+          <Reveal delay={0.1} className="mt-12 flex justify-center lg:mt-16">
+            <Button size="lg">
+              {t('riskMap.unlock')} <ArrowRight size={16} className="ml-1.5" />
+            </Button>
+          </Reveal>
         </div>
       </div>
-
-      {/* The one conversion of this section, centred under the band (the old
-          save band below the Risk Map was cut in its favour). */}
-      <Reveal delay={0.1} className="mt-12 flex justify-center px-4">
-        <Button size="lg">
-          {t('riskMap.unlock')} <ArrowRight size={16} className="ml-1.5" />
-        </Button>
-      </Reveal>
     </section>
   );
 }
