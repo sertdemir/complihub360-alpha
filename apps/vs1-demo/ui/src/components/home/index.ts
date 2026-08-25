@@ -3,6 +3,7 @@ export { HomeHeroWorld } from './HomeHeroWorld';
 export { HeroWorldMap } from './HeroWorldMap';
 export { ProblemRecognition } from './ProblemRecognition';
 export { HowItWorksSteps } from './HowItWorksSteps';
+export { HowItWorksRoute } from './HowItWorksRoute';
 export { RiskMapSection } from './RiskMapSection';
 export { MatchmakingDifference } from './MatchmakingDifference';
 export { TwoReflexes } from './TwoReflexes';

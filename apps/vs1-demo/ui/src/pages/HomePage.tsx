@@ -38,7 +38,7 @@
 import {
   HomeHeroWorld,
   ProblemRecognition,
-  HowItWorksSteps,
+  HowItWorksRoute,
   RiskMapSection,
   MatchmakingDifference,
   DomainsKnows,
@@ -64,7 +64,9 @@ export function HomePage() {
           self-playing wizard beside the pitch. EntryDoor stays available —
           `<EntryDoor />` brings the full frosted-glass instrument back. */}
       <EntryDoorDemo />
-      <HowItWorksSteps />
+      {/* Route edition (canvas 2026-08-25, petrol band): the five stages as
+          stations on the golden route. HowItWorksSteps stays available. */}
+      <HowItWorksRoute />
       <RiskMapSection />
       <MatchmakingDifference />
       <DomainsKnows />

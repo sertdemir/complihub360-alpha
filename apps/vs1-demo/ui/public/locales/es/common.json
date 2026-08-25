@@ -776,27 +776,32 @@
       {
         "kicker": "Entender",
         "title": "Pregunte con sus propias palabras.",
-        "body": "Describa su situación como se la explicaría a un colega. Recibirá una respuesta con la fuente detrás de cada punto: la norma misma, no el resumen de un resumen. Sin cuenta, sin llamada comercial, sin obligación de continuar."
+        "body": "Describa su situación como se la explicaría a un colega. Recibirá una respuesta con la fuente detrás de cada punto: la norma misma, no el resumen de un resumen. Sin cuenta, sin llamada comercial, sin obligación de continuar.",
+        "short": "Formule su pregunta en el campo de texto libre — la respuesta lleva la fuente detrás de cada punto. Sin cuenta."
       },
       {
         "kicker": "Evaluar",
         "title": "Vea qué se aplica realmente a su caso.",
-        "body": "Cuatro preguntas sobre sus mercados, su modelo de negocio y su volumen producen un risk map: las obligaciones que se aplican a su operación, cada una con su base legal y su plazo. Provienen de nuestro propio motor de compliance y enlazan con la base de datos jurídica de la UE; no las genera un chatbot."
+        "body": "Cuatro preguntas sobre sus mercados, su modelo de negocio y su volumen producen un risk map: las obligaciones que se aplican a su operación, cada una con su base legal y su plazo. Provienen de nuestro propio motor de compliance y enlazan con la base de datos jurídica de la UE; no las genera un chatbot.",
+        "short": "El wizard pregunta cuatro cosas y crea su Risk Map — cada obligación con base legal y plazo."
       },
       {
         "kicker": "Decidir",
         "title": "Decida qué necesita ayuda externa.",
-        "body": "El mapa separa lo que puede resolver internamente de lo que realmente requiere un especialista, y en qué orden. Si resulta que ya lo tiene todo cubierto, se lo decimos: en ese caso no tenemos nada que venderle."
+        "body": "El mapa separa lo que puede resolver internamente de lo que realmente requiere un especialista, y en qué orden. Si resulta que ya lo tiene todo cubierto, se lo decimos: en ese caso no tenemos nada que venderle.",
+        "short": "La Risk Map separa lo que puede resolver internamente de lo que necesita un especialista."
       },
       {
         "kicker": "Emparejar",
         "title": "La idoneidad antes que el nombre.",
-        "body": "Primero ve a los especialistas sin su identidad: cobertura, credenciales verificadas, tiempo de respuesta, encaje con sus mercados. Juzgar la idoneidad antes que el membrete es deliberado: un nombre conocido no es prueba de un buen encaje. El orden nunca está en venta."
+        "body": "Primero ve a los especialistas sin su identidad: cobertura, credenciales verificadas, tiempo de respuesta, encaje con sus mercados. Juzgar la idoneidad antes que el membrete es deliberado: un nombre conocido no es prueba de un buen encaje. El orden nunca está en venta.",
+        "short": "Especialistas primero sin identidad: cobertura, cualificaciones verificadas, tiempo de respuesta."
       },
       {
         "kicker": "Actuar",
         "title": "Reserve y entregue el caso.",
-        "body": "Elija una hora en el calendario del especialista. Su identidad se revela al reservar, junto con un dossier de todo lo que ya nos ha contado, de modo que no explique su negocio por sexta vez. Después puede valorar cómo fue, y las obligaciones siguen en su mapa con sus plazos."
+        "body": "Elija una hora en el calendario del especialista. Su identidad se revela al reservar, junto con un dossier de todo lo que ya nos ha contado, de modo que no explique su negocio por sexta vez. Después puede valorar cómo fue, y las obligaciones siguen en su mapa con sus plazos.",
+        "short": "Elija una cita — su dossier viaja con usted, no explicará su negocio una sexta vez."
       }
     ],
     "cost": {
