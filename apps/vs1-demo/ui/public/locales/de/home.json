@@ -1186,7 +1186,11 @@
       "post": "."
     },
     "subtitle": "Sechs Minuten. Kein Konto erforderlich. Wir gleichen Ihre Tätigkeit mit den Vorschriften ab, die tatsächlich gelten, und zeigen Ihnen, was als Nächstes zu tun ist.",
-    "cta": "Meinen Bedarf ermitteln"
+    "cta": "Meinen Bedarf ermitteln",
+    "demo": {
+      "pause": "Demo pausieren",
+      "play": "Demo abspielen"
+    }
   },
   "newsletter": {
     "eyebrow": "Auf dem Laufenden bleiben",

@@ -1186,7 +1186,11 @@
       "post": "."
     },
     "subtitle": "Seis minutos. Sin necesidad de cuenta. Contrastamos sus operaciones con la normativa que realmente aplica y le mostramos qué hacer a continuación.",
-    "cta": "Evaluar mis necesidades"
+    "cta": "Evaluar mis necesidades",
+    "demo": {
+      "pause": "Pausar la demo",
+      "play": "Reproducir la demo"
+    }
   },
   "newsletter": {
     "eyebrow": "Manténgase al día",

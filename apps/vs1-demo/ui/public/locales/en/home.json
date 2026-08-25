@@ -1186,7 +1186,11 @@
       "post": "."
     },
     "subtitle": "Six minutes. No account required. We map your operations against the regulations that actually apply, and show you what to do next.",
-    "cta": "Assess My Needs"
+    "cta": "Assess My Needs",
+    "demo": {
+      "pause": "Pause demo",
+      "play": "Play demo"
+    }
   },
   "newsletter": {
     "eyebrow": "Stay current",

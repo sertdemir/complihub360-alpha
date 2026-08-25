@@ -6,20 +6,18 @@
 //
 //   1 Hero                → HomeHeroWorld         understand, two equal entries
 //   2 Problem Recognition → ProblemRecognition    the reader recognises themselves
-//   3 The instrument      → EntryDoor             the REAL wizard, full size
+//   3 The instrument      → EntryDoorDemo         compact self-playing demo
 //   4 How It Works        → HowItWorksSteps       the five stages, condensed
 //   5 Risk Map            → RiskMapSection        the result, as the marketing hero
 //   6 Provider Matching   → MatchmakingDifference a consequence of clarity
 //   7 Compliance areas    → DomainsKnows          breadth as evidence, not the story
 //   8 Trust by showing    → TwoReflexes · BrandCodePreview
 //
-// EntryDoor moved from last to third on 2026-08-20. It is not a closing banner:
-// it embeds AnimatedWizard with `interactive`, i.e. the only usable assessment
-// on the page — the hero's copy runs `interactive = false` and is a self-playing
-// demo, scaled to 760x588. Measured before the move, the real instrument began
-// at 37.151 px of 44.300 (83,9 %, screen 47 of 56 at an 800 px viewport), while
-// its CTA repeated the hero's "Meinen Bedarf ermitteln" from y=0. It now opens
-// at ~4.750 px, once the problem section has earned the need.
+// EntryDoor moved from last to third on 2026-08-20; on 2026-08-25 the slot
+// switched to EntryDoorDemo (canvas review: the 1440×1071 frosted-glass
+// instrument dominated the page). The homepage now embeds NO interactive
+// wizard — the demo self-plays at ~518 px, and every CTA opens the real
+// wizard full-screen on the /:locale/wizard route.
 //
 // What actually moved: Problem Recognition is new at position 2, DomainsKnows
 // now precedes the two trust sections, and HowItActs moved after them. Despite
@@ -49,7 +47,7 @@ import {
   HowItActs,
   BeyondAssessment,
   HomeFaq,
-  EntryDoor,
+  EntryDoorDemo,
   NewsletterBand,
   SiteFooter,
 } from '../components/home';
@@ -62,7 +60,10 @@ export function HomePage() {
           brings the wizard-led hero back. */}
       <HomeHeroWorld />
       <ProblemRecognition />
-      <EntryDoor />
+      {/* Demo edition (canvas 2026-08-25, Mercury pattern): the compact
+          self-playing wizard beside the pitch. EntryDoor stays available —
+          `<EntryDoor />` brings the full frosted-glass instrument back. */}
+      <EntryDoorDemo />
       <HowItWorksSteps />
       <RiskMapSection />
       <MatchmakingDifference />

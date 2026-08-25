@@ -1186,7 +1186,11 @@
       "post": " hâle gelir."
     },
     "subtitle": "Altı dakika. Hesap gerekmez. Operasyonlarınızı fiilen geçerli olan mevzuatla eşleştirir ve bir sonraki adımınızı gösteririz.",
-    "cta": "İhtiyaçlarımı değerlendir"
+    "cta": "İhtiyaçlarımı değerlendir",
+    "demo": {
+      "pause": "Demoyu duraklat",
+      "play": "Demoyu oynat"
+    }
   },
   "newsletter": {
     "eyebrow": "Güncel kalın",

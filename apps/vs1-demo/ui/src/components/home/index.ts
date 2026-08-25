@@ -12,5 +12,6 @@ export { BrandCodePreview } from './BrandCodePreview';
 export { BeyondAssessment } from './BeyondAssessment';
 export { HomeFaq } from './HomeFaq';
 export { EntryDoor } from './EntryDoor';
+export { EntryDoorDemo } from './EntryDoorDemo';
 export { NewsletterBand } from './NewsletterBand';
 export { SiteFooter } from './SiteFooter';
