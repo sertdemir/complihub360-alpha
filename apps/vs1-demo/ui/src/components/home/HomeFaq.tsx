@@ -12,7 +12,8 @@ import { Tabs, TabList, Tab } from '../ui/Tabs';
 // what the redesigned page itself raises — sources, export, multi-market, the
 // 48h SLA, partner binding, account — so the FAQ speaks the sections'
 // language. Single-open disclosure list per tab (Compass Accordion motion);
-// switching tabs crossfades the list and reopens its first question.
+// switching tabs crossfades the list and reopens its first question. The list
+// is 1120px wide — the same content width as the trust band above it.
 //
 // Copy lives in faq.groups.<g>.{label,items.<i>.{q,a}} ('home' ns).
 
@@ -110,7 +111,7 @@ export function HomeFaq() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.25, ease: 'easeOut' }}
-              className="mx-auto mt-9 max-w-[880px] border-t border-stroke-subtle"
+              className="mx-auto mt-9 max-w-[1120px] border-t border-stroke-subtle"
             >
               {Array.from({ length: GROUP_COUNTS[group] }, (_, i) => (
                 <FaqRow
