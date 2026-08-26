@@ -34,7 +34,7 @@ export function AreaSwitcher({ current, selectedCountry, onCountryChange }: Prop
   const { locale } = useParams();
   const { pathname } = useLocation();
   // The site header is fixed and its height is responsive (h-16 below lg, h-20
-  // above, plus its border) — 113px at desktop width, 64 on mobile. A sticky
+  // above, plus its border) — 81px at desktop width, 65 on mobile. A sticky
   // bar with a hard `top-16` therefore slid under it on every viewport that is
   // not mobile, which is what the hub's old anchor bar did too and nobody
   // caught. Measuring beats guessing, and it self-corrects on resize instead of

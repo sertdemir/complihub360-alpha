@@ -71,7 +71,7 @@ export function HowItWorksPage() {
 
   return (
     <main className="bg-surface">
-      {/* The site header is fixed and ~113px tall at lg (97px below it), and
+      {/* The site header is fixed and 81px tall at lg (65px below it), and
           there is no global spacer — each page clears it itself. pt-32/pt-40
           buys real breathing room instead of the 1px the section padding alone
           was leaving between the header and the eyebrow. */}

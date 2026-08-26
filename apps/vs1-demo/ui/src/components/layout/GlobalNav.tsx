@@ -85,8 +85,13 @@ export function GlobalNav() {
     <header className="fixed top-0 inset-x-0 z-50 flex flex-col items-center pointer-events-none">
 
       {/* ── Full Width Header ─────────────────────────────────── */}
+      {/* h-16 lg:h-20 is the MarketingHeader's bar height — the two headers sit
+          on the same routes' shared layout, so they must be the same height, or
+          every page that clears the fixed bar with padding is wrong on half the
+          site. Fixed height, not padding: the tallest child (h-10 actions) must
+          never grow the bar. */}
       <div className="pointer-events-auto w-full bg-surface backdrop-blur-xl border-b border-stroke-subtle shadow-[0_4px_32px_rgba(0,0,0,0.08)]">
-        <div className="flex items-center justify-between gap-2 md:gap-4 py-4 lg:py-6 w-full max-w-[1440px] mx-auto pl-4 pr-8">
+        <div className="flex h-16 items-center justify-between gap-2 md:gap-4 lg:h-20 w-full max-w-[1440px] mx-auto pl-4 pr-8">
 
         {/* Logo — the real lockup from the design system, never a rebuilt mark.
             This used to be a CircleDot glyph in a green square plus a text
