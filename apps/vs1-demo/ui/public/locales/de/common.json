@@ -305,7 +305,8 @@
   },
   "compliance": {
     "heroOverline": "Compliance-Bereiche",
-    "heroTitle": "Finden Sie Ihre regulatorische Herausforderung. Starten Sie hier.",
+    "heroTitlePre": "Finden Sie Ihre regulatorische Herausforderung.",
+    "heroTitleGold": "Starten Sie hier.",
     "heroBody": "Jeder Compliance-Bereich ist ein Einstieg zu Ihrem spezifischen Assessment. Identifizieren Sie Ihr Thema, verstehen Sie die Risiken und werden Sie mit einem verifizierten Spezialisten gematcht – alles in unter 5 Minuten.",
     "whoAffected": "Wer ist betroffen",
     "startAssessment": "{{title}}-Assessment starten",

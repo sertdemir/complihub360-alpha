@@ -305,7 +305,8 @@
   },
   "compliance": {
     "heroOverline": "Áreas de Cumplimiento",
-    "heroTitle": "Encuentra tu desafío regulatorio. Empieza aquí.",
+    "heroTitlePre": "Encuentra tu desafío regulatorio.",
+    "heroTitleGold": "Empieza aquí.",
     "heroBody": "Cada área de cumplimiento es una puerta de entrada a tu evaluación específica. Identifica tu tema, entiende los riesgos y emparéjate con un especialista verificado — todo en menos de 5 minutos.",
     "whoAffected": "A quién afecta",
     "startAssessment": "Iniciar evaluación de {{title}}",

@@ -305,7 +305,8 @@
   },
   "compliance": {
     "heroOverline": "Uyumluluk Alanları",
-    "heroTitle": "Mevzuat zorluğunuzu bulun. Buradan başlayın.",
+    "heroTitlePre": "Mevzuat zorluğunuzu bulun.",
+    "heroTitleGold": "Buradan başlayın.",
     "heroBody": "Her uyumluluk alanı, spesifik değerlendirmenize açılan bir kapıdır. Konunuzu belirleyin, riskleri anlayın ve doğrulanmış bir uzmanla eşleşin — hepsi 5 dakikadan az sürede.",
     "whoAffected": "Kimler etkilenir",
     "startAssessment": "{{title}} Değerlendirmesini Başlatın",

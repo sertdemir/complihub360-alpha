@@ -19,6 +19,7 @@ import {
 import { SiteFooter } from '../components/home';
 import { Button } from '../components/ui/Button';
 import { Container } from '../components/ui/Container';
+import { SectionEyebrow, GoldWord, Reveal } from '../components/providers/SectionHeading';
 
 // ─── /compliance · the hub ───────────────────────────────────────────────────
 // Until 2026-08-21 this page was the whole story: five areas, each one an
@@ -89,39 +90,48 @@ export function ComplianceAreasPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* ── HERO + KPI + Country ─────────────────────────────────────── */}
-      <Section className="py-14 desktop-s:py-20">
-        <Container gutter="flat">
-          <div className="grid desktop-s:grid-cols-12 gap-10 items-end mb-12">
-            <div className="desktop-s:col-span-8">
-              <Typography
-                variant="caption"
-                className="text-fg-brand mb-3 block font-semibold uppercase tracking-wider"
-              >
-                {t('compliance.heroOverline', 'Compliance Areas')}
-              </Typography>
-              <Typography variant="display" weight="bold" className="text-fg mb-5 leading-tight">
-                {t('compliance.heroTitle', 'Find Your Regulatory Challenge. Start Here.')}
-              </Typography>
-              <Typography variant="body" className="text-fg-secondary text-lg leading-relaxed max-w-2xl">
-                {t(
-                  'compliance.heroBody',
-                  'Each compliance area is a gateway to your specific assessment. Identify your topic, understand the risks, and get matched with a verified specialist — all in under 5 minutes.',
-                )}
-              </Typography>
-            </div>
+      {/* ── HERO on the full-bleed Gradient ──────────────────────────── */}
+      {/* (canvas "Compliance-Hub · Hero" · Variante B "Schwebende KPI-Karte",
+          2026-08-26): the Gradient carries copy left — serif headline with the
+          gold closing line, the homepage hero's language — and the market
+          picker as a white card right. The header is fixed and 81px tall at
+          lg; pt-32/pt-40 clears it, as on /how-it-works. */}
+      <section className="bg-gradient-stage pb-24 pt-32 lg:pb-28 lg:pt-40">
+        <Container gutter="flat" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-[60px]">
+          <Reveal className="min-w-0 max-w-[680px]">
+            <SectionEyebrow tone="brand">{t('compliance.heroOverline', 'Compliance Areas')}</SectionEyebrow>
+            <h1 className="mt-3.5 font-serif text-[2.25rem] font-semibold leading-[1.14] tracking-tight text-fg lg:text-[3rem]">
+              {t('compliance.heroTitlePre', 'Find Your Regulatory Challenge.')}
+              <br />
+              <GoldWord>{t('compliance.heroTitleGold', 'Start Here.')}</GoldWord>
+            </h1>
+            <p className="mt-5 max-w-[56ch] text-body-lg leading-relaxed text-fg-secondary">
+              {t(
+                'compliance.heroBody',
+                'Each compliance area is a gateway to your specific assessment. Identify your topic, understand the risks, and get matched with a verified specialist — all in under 5 minutes.',
+              )}
+            </p>
+          </Reveal>
 
-            <div className="desktop-s:col-span-4 desktop-s:justify-self-end">
-              <CountrySelector value={selectedCountry} onChange={setSelectedCountry} />
-            </div>
-          </div>
-
-          <KPIStrip />
+          <Reveal
+            delay={0.15}
+            className="w-full shrink-0 rounded-xl bg-surface p-6 shadow-[0_32px_70px_-30px_rgba(2,22,17,0.38)] dark:bg-surface-secondary lg:w-[300px]"
+          >
+            <CountrySelector value={selectedCountry} onChange={setSelectedCountry} />
+          </Reveal>
         </Container>
-      </Section>
+      </section>
+
+      {/* Floating KPI card — ONE white card pulled up over the Gradient's
+          bottom edge, clamping hero and content together. */}
+      <Container gutter="flat" className="relative z-10 -mt-14">
+        <Reveal delay={0.1}>
+          <KPIStrip />
+        </Reveal>
+      </Container>
 
       {/* ── JTBD Outcomes ─────────────────────────────────────────────── */}
-      <Section className="pb-12">
+      <Section className="pb-12 pt-14 desktop-s:pt-16">
         <Container gutter="flat">
           <JTBDOutcomeGrid onScrollToFirstArea={scrollToAreas} />
         </Container>
