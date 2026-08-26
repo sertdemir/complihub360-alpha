@@ -772,6 +772,7 @@
       "post": "."
     },
     "lead": "Cinco pasos. Puede detenerse después de cualquiera de ellos: la mayoría lo hace, y es un resultado perfectamente válido.",
+    "heroListTitle": "Los cinco pasos",
     "stages": [
       {
         "kicker": "Entender",
