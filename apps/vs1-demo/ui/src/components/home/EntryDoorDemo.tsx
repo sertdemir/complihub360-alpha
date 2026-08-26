@@ -30,15 +30,15 @@ export function EntryDoorDemo() {
     <section id="entry-door" className="overflow-hidden bg-surface py-20 lg:py-24">
       <div className="mx-auto w-full max-w-[1440px] px-4 md:px-6 lg:px-10">
         <div className="flex flex-col items-center gap-12 lg:flex-row lg:gap-[88px]">
-          {/* Tinted demo panel. Fixed light gradient in both themes — like the
-              marketing bands, it must not flip; the wizard card on it keeps its
-              own surface tokens. */}
+          {/* Tinted demo panel on the stage Gradient — theme-aware since the
+              dark G1 variant (2026-08-26); the wizard card on it keeps its own
+              surface tokens, so both flip together. */}
           <motion.div
             initial={{ opacity: 0, y: 28 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
-            className="relative flex w-full items-center justify-center rounded-xl bg-[linear-gradient(165deg,#EAF3F1_0%,#DDECE8_55%,#E9E4D3_100%)] px-4 py-10 lg:h-[560px] lg:w-[660px] lg:shrink-0"
+            className="relative flex w-full items-center justify-center rounded-xl bg-gradient-stage px-4 py-10 lg:h-[560px] lg:w-[660px] lg:shrink-0"
           >
             <div className="w-[440px] max-w-full">
               <FitScale width={760} height={588}>
@@ -52,7 +52,7 @@ export function EntryDoorDemo() {
                 onClick={() => setPaused((v) => !v)}
                 aria-pressed={paused}
                 aria-label={t(paused ? 'entryDoor.demo.play' : 'entryDoor.demo.pause')}
-                className="absolute bottom-4 left-4 grid h-8 w-8 place-items-center rounded-full border border-neutral-900/50 text-neutral-900 transition-colors hover:bg-white/70"
+                className="absolute bottom-4 left-4 grid h-8 w-8 place-items-center rounded-full border border-neutral-900/50 text-neutral-900 transition-colors hover:bg-white/70 dark:border-white/50 dark:text-white dark:hover:bg-white/10"
               >
                 {paused ? <Play size={12} /> : <Pause size={12} />}
               </button>

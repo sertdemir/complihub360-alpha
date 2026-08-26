@@ -291,6 +291,12 @@ export default {
             ringColor: {
                 focus: 'rgb(var(--color-border-focus) / <alpha-value>)',
             },
+            backgroundImage: {
+                /* "Gradient" (CLAUDE.md) — the Petrol→Gold stage tint under the
+                   marketing panels. Theme-aware: --gradient-stage flips to the
+                   deep G1 variant in .dark (see index.css). */
+                'gradient-stage': 'var(--gradient-stage)',
+            },
         },
     },
     plugins: [tailwindcssAnimate],

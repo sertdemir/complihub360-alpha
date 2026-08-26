@@ -37,14 +37,14 @@ export function ProblemRecognition() {
           </p>
         </Reveal>
 
-        <div className="mx-auto mt-14 max-w-[1140px] rounded-xl bg-[linear-gradient(165deg,#EAF3F1_0%,#DDECE8_55%,#E9E4D3_100%)] p-5 sm:p-12">
+        <div className="mx-auto mt-14 max-w-[1140px] rounded-xl bg-gradient-stage p-5 sm:p-12">
         {/* User spec 2026-08-25: the cards appear one after another, smooth —
             0.18s apart so the sequence is clearly readable, not one wave. */}
         <Stagger stagger={0.18} className="grid gap-5 sm:grid-cols-2">
           {Array.from({ length: CARD_COUNT }, (_, i) => (
             <StaggerItem
               key={i}
-              className="rounded-xl border border-neutral-100 bg-surface p-7 text-left shadow-[0_24px_60px_-28px_rgba(2,22,17,0.25)]"
+              className="rounded-xl border border-stroke-subtle bg-surface p-7 text-left shadow-[0_24px_60px_-28px_rgba(2,22,17,0.25)] dark:bg-surface-secondary"
             >
               {/* Gold serif indices — a set, not a sequence: these happen all
                   at once, not in order. */}
