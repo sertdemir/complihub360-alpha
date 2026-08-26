@@ -301,6 +301,26 @@ function BookDemo({ inView }: { inView: boolean }) {
 
 const DEMOS = [AskDemo, MapDemo, DecideDemo, MatchDemo, BookDemo] as const;
 
+// The numbered node lights up the moment its stage scrolls into view: the
+// ring fills with the brand colour and pops once (user spec 2026-08-26).
+// Reduced motion swaps the colours without the pop.
+function StageNode({ n, active, className = '' }: { n: number; active: boolean; className?: string }) {
+  const reduced = useReducedMotion();
+  return (
+    <motion.span
+      animate={active && !reduced ? { scale: [1, 1.16, 1] } : {}}
+      transition={{ duration: 0.45, ease: 'easeOut', delay: 0.15 }}
+      className={`grid shrink-0 place-items-center rounded-full border font-bold tabular-nums transition-colors duration-300 ${
+        active
+          ? 'border-brand bg-brand text-fg-on-brand'
+          : 'border-stroke-brand bg-surface text-fg-brand dark:bg-surface-secondary'
+      } ${className}`}
+    >
+      {n}
+    </motion.span>
+  );
+}
+
 function StageRow({ index }: { index: number }) {
   const { t } = useTranslation('common');
   const [ref, inView] = useInViewOnce<HTMLDivElement>('-140px');
@@ -312,9 +332,7 @@ function StageRow({ index }: { index: number }) {
     <Reveal className={`flex min-w-0 items-center lg:py-9 ${copyLeft ? 'lg:justify-end' : ''}`}>
       <div className={copyLeft ? 'lg:text-right' : ''}>
         <span className="flex items-center gap-3 lg:block">
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-stroke-brand bg-surface text-body-sm font-bold tabular-nums text-fg-brand dark:bg-surface-secondary lg:hidden">
-            {index + 1}
-          </span>
+          <StageNode n={index + 1} active={inView} className="h-9 w-9 text-body-sm lg:hidden" />
           <span className="text-body-3xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
             {t(`howItWorks.stages.${index}.kicker`)}
           </span>
@@ -348,9 +366,7 @@ function StageRow({ index }: { index: number }) {
       {/* The spine: golden connector with the numbered node — desktop only. */}
       <div className="hidden flex-col items-center self-stretch lg:flex">
         <span aria-hidden className={`w-px flex-1 bg-accent-500/70 ${index === 0 ? 'opacity-0' : ''}`} />
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-stroke-brand bg-surface text-body-md font-bold tabular-nums text-fg-brand dark:bg-surface-secondary">
-          {index + 1}
-        </span>
+        <StageNode n={index + 1} active={inView} className="h-11 w-11 text-body-md" />
         <span aria-hidden className={`w-px flex-1 bg-accent-500/70 ${index === STAGES - 1 ? 'opacity-0' : ''}`} />
       </div>
       {copyLeft ? panel : copy}
