@@ -6,6 +6,7 @@ import { ArrowRight, Lock, Wallet } from 'lucide-react';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 import { SiteFooter } from '../components/home';
+import { StagesShowcase } from '../components/home/StagesShowcase';
 import { SectionEyebrow, GoldWord, Reveal } from '../components/providers/SectionHeading';
 
 // ─── /how-it-works · Brand & Marketing Map V1 §6 ─────────────────────────────
@@ -33,36 +34,6 @@ const cardItem = {
   hidden: { opacity: 0, y: 10 },
   show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' as const } },
 };
-
-function Stage({ index }: { index: number }) {
-  const { t } = useTranslation('common');
-  const last = index === STAGE_COUNT - 1;
-
-  return (
-    <Reveal className="relative grid gap-x-8 gap-y-3 pb-14 last:pb-0 sm:grid-cols-[auto_1fr]">
-      {/* Rail: numbered node with the connector running to the next stage. The
-          connector stops at the last node so the sequence reads as finished. */}
-      <div className="flex flex-col items-center">
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-stroke-brand bg-brand-light text-body-md font-bold tabular-nums text-fg-brand">
-          {index + 1}
-        </span>
-        {!last && <span aria-hidden className="mt-2 hidden w-px flex-1 bg-stroke-subtle sm:block" />}
-      </div>
-
-      <div className="min-w-0">
-        <span className="text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
-          {t(`howItWorks.stages.${index}.kicker`)}
-        </span>
-        <h3 className="mt-1.5 font-serif text-[1.5rem] font-bold leading-snug text-fg">
-          {t(`howItWorks.stages.${index}.title`)}
-        </h3>
-        <p className="mt-2.5 max-w-[62ch] text-body leading-relaxed text-fg-secondary">
-          {t(`howItWorks.stages.${index}.body`)}
-        </p>
-      </div>
-    </Reveal>
-  );
-}
 
 function InfoBlock({ base, icon }: { base: 'cost' | 'privacy'; icon: React.ReactNode }) {
   const { t } = useTranslation('common');
@@ -154,13 +125,11 @@ export function HowItWorksPage() {
         </div>
       </section>
 
+      {/* The five stages as the zigzag showcase route (canvas Variante A) —
+          replaces the plain numbered list. */}
       <section className="py-20 lg:py-24">
-        <Container size="xl">
-          <div className="mx-auto max-w-[820px]">
-            {Array.from({ length: STAGE_COUNT }, (_, i) => (
-              <Stage key={i} index={i} />
-            ))}
-          </div>
+        <Container size="2xl" bleed className="px-4 md:px-6 lg:px-10">
+          <StagesShowcase />
         </Container>
       </section>
 

@@ -805,6 +805,93 @@
         "short": "Elija una cita — su dossier viaja con usted, no explicará su negocio una sexta vez."
       }
     ],
+    "demos": {
+      "ask": {
+        "question": "¿Debo registrarme para la REP en Francia?",
+        "cta": "Preguntar",
+        "answers": [
+          {
+            "text": "Sí — como primer comercializador de envases se aplica la obligación de registro.",
+            "chip": "Art. L541-10 C. env."
+          },
+          {
+            "text": "La declaración se realiza a través de un sistema colectivo autorizado.",
+            "chip": "Registro ADEME"
+          },
+          {
+            "text": "Para volúmenes mínimos existe una tarifa plana simplificada, que…",
+            "chip": ""
+          }
+        ]
+      },
+      "map": {
+        "stats": [
+          {
+            "value": "8",
+            "label": "Obligaciones identificadas"
+          },
+          {
+            "value": "4",
+            "label": "Con plazo en 30 días"
+          }
+        ],
+        "rows": [
+          {
+            "level": "critical",
+            "title": "Declaración trimestral OSS",
+            "meta": "DE · NL · Vence 30 abr"
+          },
+          {
+            "level": "medium",
+            "title": "EIPD para píxeles de seguimiento",
+            "meta": "Toda la UE · Vence —"
+          },
+          {
+            "level": "high",
+            "title": "Banner de cookies + registros",
+            "meta": "Toda la UE · Vence Continuo"
+          }
+        ]
+      },
+      "decide": {
+        "selfTitle": "Hacerlo usted mismo",
+        "proTitle": "Se necesita especialista",
+        "self": [
+          "Actualizar el banner de cookies",
+          "Completar el aviso legal FR"
+        ],
+        "pro": [
+          "Registro OSS + declaraciones",
+          "Representación REP en Francia"
+        ],
+        "notePre": "¿Todo cubierto?",
+        "notePost": "Entonces se lo decimos tal cual — no hay nada que vender."
+      },
+      "match": {
+        "rows": [
+          {
+            "meta": "Responde en 24h · 4.8 ★ · Verificado"
+          },
+          {
+            "meta": "Responde en 21h · 4.9 ★ · Verificado"
+          }
+        ],
+        "note": "La identidad se muestra solo al reservar. El orden nunca está en venta."
+      },
+      "book": {
+        "title": "Elegir cita · Semana 19",
+        "slots": [
+          "Mar 09:00",
+          "Mar 14:30",
+          "Mié 10:00",
+          "Jue 11:30"
+        ],
+        "points": [
+          "Su dossier viaja con usted — no explica su negocio una sexta vez.",
+          "Las obligaciones permanecen en su mapa con sus plazos."
+        ]
+      }
+    },
     "cost": {
       "kicker": "Lo que esto le cuesta",
       "title": "Nada.",

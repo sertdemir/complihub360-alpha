@@ -805,6 +805,93 @@
         "short": "Termin wählen — Ihr Dossier reist mit, Sie erklären Ihr Geschäft kein sechstes Mal."
       }
     ],
+    "demos": {
+      "ask": {
+        "question": "Muss ich mich in Frankreich für EPR registrieren?",
+        "cta": "Fragen",
+        "answers": [
+          {
+            "text": "Ja — als Erstinverkehrbringer von Verpackungen gilt die Registrierungspflicht.",
+            "chip": "Art. L541-10 C. env."
+          },
+          {
+            "text": "Die Meldung läuft über einen zugelassenen Systembetreiber.",
+            "chip": "ADEME-Register"
+          },
+          {
+            "text": "Für Kleinstmengen existiert eine vereinfachte Pauschale, die…",
+            "chip": ""
+          }
+        ]
+      },
+      "map": {
+        "stats": [
+          {
+            "value": "8",
+            "label": "Identifizierte Pflichten"
+          },
+          {
+            "value": "4",
+            "label": "Mit Frist in 30 Tagen"
+          }
+        ],
+        "rows": [
+          {
+            "level": "critical",
+            "title": "OSS-Quartalsmeldung",
+            "meta": "DE · NL · Fällig 30. Apr"
+          },
+          {
+            "level": "medium",
+            "title": "DSFA für Tracking-Pixel",
+            "meta": "EU-weit · Fällig —"
+          },
+          {
+            "level": "high",
+            "title": "Cookie-Banner + Nachweise",
+            "meta": "EU-weit · Fällig Laufend"
+          }
+        ]
+      },
+      "decide": {
+        "selfTitle": "Selbst erledigen",
+        "proTitle": "Fachperson nötig",
+        "self": [
+          "Cookie-Banner aktualisieren",
+          "Impressum FR ergänzen"
+        ],
+        "pro": [
+          "OSS-Registrierung + Meldungen",
+          "EPR-Vertretung Frankreich"
+        ],
+        "notePre": "Alles abgedeckt?",
+        "notePost": "Dann sagen wir Ihnen genau das — es gibt nichts zu verkaufen."
+      },
+      "match": {
+        "rows": [
+          {
+            "meta": "Antwort in 24h · 4.8 ★ · Verifiziert"
+          },
+          {
+            "meta": "Antwort in 21h · 4.9 ★ · Verifiziert"
+          }
+        ],
+        "note": "Identität wird erst bei der Buchung sichtbar. Die Reihung ist nicht käuflich."
+      },
+      "book": {
+        "title": "Termin wählen · KW 19",
+        "slots": [
+          "Di 09:00",
+          "Di 14:30",
+          "Mi 10:00",
+          "Do 11:30"
+        ],
+        "points": [
+          "Ihr Dossier reist mit — Sie erklären Ihr Geschäft kein sechstes Mal.",
+          "Pflichten bleiben mit ihren Fristen auf Ihrer Karte."
+        ]
+      }
+    },
     "cost": {
       "kicker": "Was Sie das kostet",
       "title": "Nichts.",

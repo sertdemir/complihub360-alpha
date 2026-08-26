@@ -805,6 +805,93 @@
         "short": "Randevu seçin — dosyanız sizinle gelir, işinizi altıncı kez anlatmazsınız."
       }
     ],
+    "demos": {
+      "ask": {
+        "question": "Fransa'da EPR kaydı yaptırmam gerekiyor mu?",
+        "cta": "Sor",
+        "answers": [
+          {
+            "text": "Evet — ambalajı piyasaya ilk süren olarak kayıt yükümlülüğü kapsamındasınız.",
+            "chip": "Art. L541-10 C. env."
+          },
+          {
+            "text": "Bildirim, yetkili bir sistem işleticisi üzerinden yapılır.",
+            "chip": "ADEME kaydı"
+          },
+          {
+            "text": "Çok küçük hacimler için basitleştirilmiş bir götürü ücret bulunur ve…",
+            "chip": ""
+          }
+        ]
+      },
+      "map": {
+        "stats": [
+          {
+            "value": "8",
+            "label": "Tespit edilen yükümlülükler"
+          },
+          {
+            "value": "4",
+            "label": "30 gün içinde süresi dolan"
+          }
+        ],
+        "rows": [
+          {
+            "level": "critical",
+            "title": "OSS üç aylık beyanı",
+            "meta": "DE · NL · Son tarih 30 Nis"
+          },
+          {
+            "level": "medium",
+            "title": "İzleme pikselleri için DKED",
+            "meta": "AB genelinde · Son tarih —"
+          },
+          {
+            "level": "high",
+            "title": "Çerez bandı + onay kayıtları",
+            "meta": "AB genelinde · Son tarih Sürekli"
+          }
+        ]
+      },
+      "decide": {
+        "selfTitle": "Kendiniz halledin",
+        "proTitle": "Uzman gerekli",
+        "self": [
+          "Çerez bandını güncelleyin",
+          "FR künyesini tamamlayın"
+        ],
+        "pro": [
+          "OSS kaydı + beyanlar",
+          "Fransa'da EPR temsilciliği"
+        ],
+        "notePre": "Her şey kapsandı mı?",
+        "notePost": "O zaman size tam olarak bunu söyleriz — satacak bir şey yok."
+      },
+      "match": {
+        "rows": [
+          {
+            "meta": "24 saat içinde yanıt · 4.8 ★ · Doğrulanmış"
+          },
+          {
+            "meta": "21 saat içinde yanıt · 4.9 ★ · Doğrulanmış"
+          }
+        ],
+        "note": "Kimlik yalnızca rezervasyonda görünür. Sıralama asla satılık değildir."
+      },
+      "book": {
+        "title": "Randevu seçin · 19. hafta",
+        "slots": [
+          "Sal 09:00",
+          "Sal 14:30",
+          "Çar 10:00",
+          "Per 11:30"
+        ],
+        "points": [
+          "Dosyanız sizinle gelir — işinizi altıncı kez anlatmazsınız.",
+          "Yükümlülükler, süreleriyle birlikte haritanızda kalır."
+        ]
+      }
+    },
     "cost": {
       "kicker": "Bunun size maliyeti",
       "title": "Hiç.",
