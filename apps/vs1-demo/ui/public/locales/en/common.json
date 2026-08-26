@@ -899,8 +899,12 @@
     },
     "privacy": {
       "kicker": "What happens to your data",
-      "title": "It stays in the EU, and it stays yours.",
-      "body": "Everything runs on EU infrastructure. You stay anonymous until you choose to create an account — the assessment needs no name, no company and no e-mail address. A specialist sees your details only once you book."
+      "title": "Your data stays yours.",
+      "body": "You stay anonymous until you decide to create an account — the assessment needs neither name nor company nor e-mail address. A specialist sees your details only once you book, and your dossier is never shared without your instruction."
+    },
+    "closing": {
+      "eyebrow": "No fine print",
+      "title": "Two things you should still know."
     },
     "cta": {
       "title": "Start wherever makes sense.",
