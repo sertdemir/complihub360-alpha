@@ -278,12 +278,11 @@ export function MarketPage() {
           market page is where a market is planned, and the way into an area is
           the weights table further down, in context.
 
-          The padding therefore carries what the bar used to occupy, and the
-          two values are measured rather than derived: they put the eyebrow the
-          same distance below the fixed header as the area page's does — 104px
-          at desktop, 80 at 390 — where the header is 113px and 97px tall. The
-          first guess at this was 5px out at desktop and 4px at mobile, which is
-          exactly why it was measured a second time. */}
+          The padding therefore carries what the bar used to occupy. The two
+          values were measured against the old 113/97px header to put the
+          eyebrow 104px (desktop) / 80px (390) below it; since the site headers
+          were unified on the MarketingHeader's height the fixed bar is 81/65px,
+          so the eyebrow now sits ~32px lower — deliberate slack, not drift. */}
       <section className="bg-surface pb-14 pt-[10.75rem] desktop-s:pb-[4.5rem] desktop-s:pt-[13.1875rem]">
         <Container size="xl">
           <div className="flex flex-col gap-14 desktop-s:flex-row desktop-s:items-start desktop-s:gap-20">

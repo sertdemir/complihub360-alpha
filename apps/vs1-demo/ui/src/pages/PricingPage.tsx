@@ -272,7 +272,7 @@ export function PricingPage() {
 
   return (
     <main className="bg-surface">
-      {/* The site header is fixed and ~113px tall at lg; each page clears it itself. */}
+      {/* The site header is fixed and 81px tall at lg; each page clears it itself. */}
       {/* Sized up on review (2026-08-24): the band grew a step in every
           dimension — padding, headline, lead — so the page opens like a
           statement rather than a section. display-xl is the scale's 60px. */}

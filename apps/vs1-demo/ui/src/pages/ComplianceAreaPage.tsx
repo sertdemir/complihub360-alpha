@@ -174,8 +174,8 @@ export function ComplianceAreaPage() {
           so the switcher's flow slot sits far above where it is painted. With
           the old py-14 the first 33px of this section — the back link, and later
           the risk card's header row — were drawn behind the pinned bar. The top
-          padding now clears both: 113px of header plus the bar's own height.
-          Measured, not guessed: card top 137 against a bar ending at 170. */}
+          padding clears both: the fixed header (81px at lg since the two site
+          headers were unified on one height) plus the bar's own height. */}
       <section className="bg-surface pb-14 pt-[7.2rem] desktop-s:pb-20 desktop-s:pt-[9.6rem]">
         <Container size="xl">
           <div className="grid gap-10 desktop-s:grid-cols-12 desktop-s:gap-14">
