@@ -106,8 +106,8 @@ export function DomainsAtlas() {
                   transition={{ duration: 0.5, ease: 'easeOut' }}
                   className={
                     isActive
-                      ? 'flex items-center gap-4 rounded-xl border-l-[3px] border-accent-500 bg-surface px-5 py-4 text-left shadow-[0_20px_50px_-24px_rgba(2,22,17,0.28)]'
-                      : 'flex items-center gap-4 border-b border-neutral-100 px-5 py-2.5 text-left transition-colors hover:bg-surface-secondary/60'
+                      ? 'flex items-center gap-4 rounded-xl border-l-[3px] border-accent-500 bg-surface px-5 py-4 text-left shadow-[0_20px_50px_-24px_rgba(2,22,17,0.28)] dark:bg-surface-secondary'
+                      : 'flex items-center gap-4 border-b border-stroke-subtle px-5 py-2.5 text-left transition-colors hover:bg-surface-secondary/60'
                   }
                 >
                   <span className="flex w-12 shrink-0 justify-center">
@@ -133,7 +133,7 @@ export function DomainsAtlas() {
           </motion.div>
 
           {/* The Gradient panel with the active area's dossier */}
-          <div className="flex flex-1 items-center rounded-xl bg-[linear-gradient(165deg,#EAF3F1_0%,#DDECE8_55%,#E9E4D3_100%)] p-5 sm:p-8 lg:p-11">
+          <div className="flex flex-1 items-center rounded-xl bg-gradient-stage p-5 sm:p-8 lg:p-11">
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={active}
@@ -141,7 +141,7 @@ export function DomainsAtlas() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={reduced ? undefined : { opacity: 0, y: -10 }}
                 transition={{ duration: 0.35, ease: 'easeOut' }}
-                className="w-full rounded-[14px] bg-surface p-6 shadow-[0_40px_90px_-30px_rgba(2,22,17,0.4)] sm:p-10"
+                className="w-full rounded-[14px] bg-surface p-6 shadow-[0_40px_90px_-30px_rgba(2,22,17,0.4)] dark:bg-surface-secondary sm:p-10"
               >
                 <div className="flex items-start justify-between gap-6">
                   <div>
@@ -157,7 +157,7 @@ export function DomainsAtlas() {
                   })()}
                 </div>
                 <p className="mt-4 text-body-sm leading-relaxed text-fg-secondary">{t(`${base}.intro`)}</p>
-                <p className="mt-4 rounded-[10px] border border-accent-500/35 bg-accent-500/10 px-4 py-3 text-body-xs leading-relaxed text-accent-700">
+                <p className="mt-4 rounded-[10px] border border-accent-500/35 bg-accent-500/10 px-4 py-3 text-body-xs leading-relaxed text-accent-700 dark:text-fg-accent-strong">
                   <span className="font-bold">{t('drawer.whenThisMatters')}:</span> {t(`${base}.matters.0`)}
                 </p>
                 <hr className="my-6 border-stroke-subtle" />

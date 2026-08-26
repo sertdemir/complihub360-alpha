@@ -37,7 +37,7 @@ export function NewsletterBand() {
 
   return (
     <section id="newsletter" className="bg-surface">
-      <div className="bg-[linear-gradient(165deg,#EAF3F1_0%,#DDECE8_55%,#E9E4D3_100%)] px-4 py-16 md:px-6 lg:px-10 lg:py-20">
+      <div className="bg-gradient-stage px-4 py-16 md:px-6 lg:px-10 lg:py-20">
         <div className="mx-auto flex max-w-[1140px] flex-col gap-10 lg:flex-row lg:items-center lg:gap-[72px]">
           {/* Left — copy directly on the Gradient */}
           <Reveal className="min-w-0 flex-1">
@@ -63,7 +63,7 @@ export function NewsletterBand() {
             initial="hidden"
             whileInView="show"
             viewport={{ once: true, margin: '-80px' }}
-            className="w-full shrink-0 rounded-xl bg-surface p-7 shadow-[0_34px_80px_-30px_rgba(2,22,17,0.35)] lg:w-[440px]"
+            className="w-full shrink-0 rounded-xl bg-surface p-7 shadow-[0_34px_80px_-30px_rgba(2,22,17,0.35)] dark:bg-surface-secondary lg:w-[440px]"
           >
             <motion.p variants={cardItem} className="font-serif text-[1.125rem] font-bold text-fg">
               {t('newsletter.cardTitle')}

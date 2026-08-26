@@ -116,9 +116,9 @@ export function HomeHeroWorld() {
           was retired with the light redesign. Icons in the emphasis gold that
           reads on light surfaces. */}
       <Container size="2xl" bleed className="px-4 md:px-6 lg:px-10">
-        <Stagger className="grid grid-cols-1 rounded-xl bg-[linear-gradient(165deg,#EAF3F1_0%,#DDECE8_55%,#E9E4D3_100%)] px-3 py-10 sm:grid-cols-2 lg:grid-cols-4 lg:py-11">
+        <Stagger className="grid grid-cols-1 rounded-xl bg-gradient-stage px-3 py-10 sm:grid-cols-2 lg:grid-cols-4 lg:py-11">
           {PROMISE_ICONS.map((Icon, i) => (
-            <StaggerItem key={i} className="border-primary-500/15 px-6 py-4 sm:py-2 lg:border-r lg:px-7 lg:last:border-r-0">
+            <StaggerItem key={i} className="border-primary-500/15 px-6 py-4 dark:border-white/15 sm:py-2 lg:border-r lg:px-7 lg:last:border-r-0">
               <Icon size={40} strokeWidth={1.7} className="text-fg-accent-emphasis" aria-hidden />
               <p className="mt-4 font-serif text-h3 font-bold leading-snug text-fg">{t(`heroWorld.promises.${i}.title`)}</p>
               <p className="mt-2 text-body-sm text-fg-secondary">{t(`heroWorld.promises.${i}.desc`)}</p>
@@ -138,8 +138,8 @@ export function HomeHeroWorld() {
               key={i}
               className="border-stroke-subtle px-6 lg:border-r lg:px-7 lg:last:border-r-0"
             >
-              <p className="text-body-md font-bold text-neutral-900">{t(`heroWorld.proofs.${i}.title`)}</p>
-              <p className="mt-0.5 text-body-2xs text-neutral-500">{t(`heroWorld.proofs.${i}.desc`)}</p>
+              <p className="text-body-md font-bold text-fg">{t(`heroWorld.proofs.${i}.title`)}</p>
+              <p className="mt-0.5 text-body-2xs text-fg-tertiary">{t(`heroWorld.proofs.${i}.desc`)}</p>
             </StaggerItem>
           ))}
         </Stagger>

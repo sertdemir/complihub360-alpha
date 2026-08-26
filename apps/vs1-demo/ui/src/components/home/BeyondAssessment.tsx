@@ -46,7 +46,7 @@ function Pill({ children, tone }: { children: React.ReactNode; tone: 'live' | 'b
       {children}
     </Badge>
   ) : (
-    <Badge shape="pill" tone="accent" appearance="soft" size="sm" className="uppercase tracking-[0.08em] ring-1 ring-inset ring-accent-200">
+    <Badge shape="pill" tone="accent" appearance="soft" size="sm" className="uppercase tracking-[0.08em] ring-1 ring-inset ring-accent-200 dark:ring-accent-500/45">
       {children}
     </Badge>
   );
@@ -206,7 +206,7 @@ function Tile({
 }) {
   return (
     <StaggerItem
-      className={`flex flex-col items-center rounded-xl bg-[linear-gradient(165deg,#EAF3F1_0%,#DDECE8_55%,#E9E4D3_100%)] ${
+      className={`flex flex-col items-center rounded-xl bg-gradient-stage ${
         big ? 'p-6 lg:p-8' : 'p-6'
       } ${goldFrame ? 'border-[1.5px] border-accent-500/55' : ''}`}
     >

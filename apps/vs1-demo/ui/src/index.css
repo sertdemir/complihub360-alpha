@@ -8,6 +8,10 @@
 @layer base {
   :root {
     color-scheme: light;
+    /* "Gradient" (CLAUDE.md, Festlegung 2026-08-25) — the Petrol→Gold stage
+       tint under the marketing panels. Exposed as bg-gradient-stage; the .dark
+       block swaps in the deep G1 variant (same 165° geometry, same story). */
+    --gradient-stage: linear-gradient(165deg, #EAF3F1 0%, #DDECE8 55%, #E9E4D3 100%);
     /* ============================================================
        COMPASS — PRIMITIVES (raw values; only semantic tokens alias these)
        Source: Compass Color foundation page (a4BeKbsBGoHkcudhKXUJTl · 18:4)
@@ -276,6 +280,11 @@
     /* App dark = SLATE (mirrors Compass dark tokens, file a4BeKbsBGoHkcudhKXUJTl:
        bg/primary→neutral/800 #1f2937, bg/secondary→neutral/900 #0f172a, brand teal #14a89a).
        Replaces the earlier petrol-green dark per the 2026-06-25 dark=slate decision. */
+    /* Dark "Gradient" — G1 "Tiefes Petrol→Gold" (canvas decision 2026-08-26).
+       Same 165° geometry and Petrol→Gold narrative as the light anchor, sunk
+       to sit just above the slate page (#1f2937); cards on it drop to the
+       deeper #0f172a (bg-secondary) with white/10 hairlines. */
+    --gradient-stage: linear-gradient(165deg, #1D322C 0%, #1B2F33 55%, #33301F 100%);
     --color-bg-primary: 31 41 55;        /* default component / card surface — slate */
     --color-bg-secondary: 15 23 42;      /* subtle fills, table headers, deeper cards */
     --color-bg-tertiary: 42 51 64;       /* hover / nested elevation (one step up) */

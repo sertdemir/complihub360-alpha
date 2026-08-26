@@ -58,24 +58,25 @@ const ARC_DUR = 0.28;
 
 // Station icons — the canvas set: speech bubble (free-text question), folded
 // map (Risk Map), fork in the road (decide), person + check (match), pin
-// with the gold orbit (act). 28px grid, petrol strokes, gold accents.
+// with the gold orbit (act). 28px grid, brand strokes via currentColor
+// (petrol in light, teal in dark), gold accents fixed.
 const ICONS = [
-  <g key="chat" stroke="#004D40" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" fill="none" transform="translate(1,1)">
+  <g key="chat" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" fill="none" transform="translate(1,1)">
     <path d="M4 7a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-8l-5 5v-5H7a3 3 0 0 1-3-3z" />
     <path d="M11.2 9.2a2.6 2.6 0 1 1 3.6 2.4c-.9.4-1.4.9-1.4 1.9" />
-    <circle cx="13.4" cy="16.3" r="0.4" fill="#004D40" />
+    <circle cx="13.4" cy="16.3" r="0.4" fill="currentColor" />
   </g>,
-  <g key="map" stroke="#004D40" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" fill="none" transform="translate(2,2)">
+  <g key="map" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" fill="none" transform="translate(2,2)">
     <path d="M10 4 3.5 6.5v14L10 18l7 2.5 6.5-2.5v-14L17 6.5 10 4z" />
     <path d="M10 4v14M17 6.5v14" />
   </g>,
-  <g key="fork" stroke="#004D40" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" fill="none" transform="translate(1,1)">
+  <g key="fork" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" fill="none" transform="translate(1,1)">
     <path d="M14 24v-8" />
     <path d="M14 16c0-4.5-7-3.5-7-9.5" />
     <path d="M14 16c0-4.5 7-3.5 7-9.5" />
     <path d="M4.8 9 7 6.5 9.2 9M18.8 9 21 6.5 23.2 9" />
   </g>,
-  <g key="match" stroke="#004D40" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" fill="none" transform="translate(1,1)">
+  <g key="match" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" fill="none" transform="translate(1,1)">
     <circle cx="10.5" cy="8.5" r="3.6" />
     <path d="M3.5 23c0-4.2 3.2-7 7-7 1.6 0 3 .4 4.2 1.2" />
     <circle cx="19" cy="18.5" r="4.6" stroke="#D4AF37" />
@@ -83,7 +84,7 @@ const ICONS = [
   </g>,
   <g key="pin" transform="translate(3,1)">
     <ellipse cx="11" cy="23.5" rx="8.5" ry="2.8" stroke="#D4AF37" strokeWidth={1.2} fill="none" opacity="0.9" />
-    <path d="M11 1 C16.2 1 20.2 5 20.2 10 C20.2 16.2 11 23.5 11 23.5 C11 23.5 1.8 16.2 1.8 10 C1.8 5 5.8 1 11 1 Z" fill="#004D40" />
+    <path d="M11 1 C16.2 1 20.2 5 20.2 10 C20.2 16.2 11 23.5 11 23.5 C11 23.5 1.8 16.2 1.8 10 C1.8 5 5.8 1 11 1 Z" fill="currentColor" />
     <circle cx="11" cy="9.6" r="3.2" fill="#ffffff" />
   </g>,
 ];
@@ -111,30 +112,30 @@ function StationCard({
       initial={reduced ? false : { opacity: 0, y: 20 }}
       animate={animate ? { opacity: 1, y: 0 } : {}}
       transition={{ delay, duration: 0.35, ease: 'easeOut' }}
-      className="rounded-xl border border-neutral-100 bg-white px-[18px] pb-[18px] shadow-[0_20px_44px_-20px_rgba(2,22,17,0.22)]"
+      className="rounded-xl border border-stroke-subtle bg-surface px-[18px] pb-[18px] shadow-[0_20px_44px_-20px_rgba(2,22,17,0.22)] dark:bg-surface-secondary"
     >
       <div className="-mt-7 flex items-center gap-3">
         <motion.span
           initial={reduced ? false : { opacity: 0, scale: 0 }}
           animate={animate ? { opacity: 1, scale: 1 } : {}}
           transition={{ delay: delay + 0.1, type: 'spring', stiffness: 280, damping: 20 }}
-          className="grid h-14 w-14 shrink-0 place-items-center rounded-full border border-neutral-100 bg-white shadow-[0_10px_24px_-10px_rgba(2,22,17,0.28)]"
+          className="grid h-14 w-14 shrink-0 place-items-center rounded-full border border-stroke-subtle bg-surface shadow-[0_10px_24px_-10px_rgba(2,22,17,0.28)] dark:bg-surface-secondary"
         >
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden>
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden className="text-fg-brand">
             {ICONS[index]}
           </svg>
         </motion.span>
         <motion.span
           {...part(0.22, { x: -8 })}
-          className="whitespace-nowrap rounded-full border border-neutral-100 bg-white px-3 py-[5px] text-body-3xs font-semibold uppercase tracking-[0.12em] text-neutral-600 shadow-[0_6px_16px_-8px_rgba(2,22,17,0.25)]"
+          className="whitespace-nowrap rounded-full border border-stroke-subtle bg-surface px-3 py-[5px] text-body-3xs font-semibold uppercase tracking-[0.12em] text-fg-secondary shadow-[0_6px_16px_-8px_rgba(2,22,17,0.25)] dark:bg-surface-secondary"
         >
           {index + 1} · {t(`howItWorks.stages.${index}.kicker`)}
         </motion.span>
       </div>
-      <motion.p {...part(0.32, { y: 8 })} className="mt-3.5 text-body-md font-bold leading-snug text-neutral-900">
+      <motion.p {...part(0.32, { y: 8 })} className="mt-3.5 text-body-md font-bold leading-snug text-fg">
         {t(`howItWorks.stages.${index}.title`)}
       </motion.p>
-      <motion.p {...part(0.42, { y: 8 })} className="mt-[7px] text-body-xs leading-relaxed text-neutral-600">
+      <motion.p {...part(0.42, { y: 8 })} className="mt-[7px] text-body-xs leading-relaxed text-fg-secondary">
         {t(`howItWorks.stages.${index}.short`)}
       </motion.p>
     </motion.div>
@@ -163,7 +164,8 @@ export function HowItWorksRoute() {
   return (
     // Light again (user decision 2026-08-25, after the match band landed just
     // above): the dark full-bleed read too heavy in the new order. Cards and
-    // route stay, colours flip to the light surface.
+    // route stay on the page surface — tokenised since 2026-08-26 so the
+    // station cards drop to the deep dark surface with the rest of the page.
     <section id="the-five-steps" className="bg-surface py-20 lg:py-24">
       <Container size="2xl" bleed className="px-4 md:px-6 lg:px-10">
         <div>

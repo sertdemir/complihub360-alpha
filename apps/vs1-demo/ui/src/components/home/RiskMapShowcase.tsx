@@ -62,13 +62,13 @@ export function RiskMapShowcase() {
           {/* The Gradient panel; the card drives up from below its edge. */}
           <div
             ref={ref}
-            className="relative flex w-full items-center justify-center overflow-hidden rounded-xl bg-[linear-gradient(165deg,#EAF3F1_0%,#DDECE8_55%,#E9E4D3_100%)] px-4 py-10 lg:h-[640px] lg:w-[720px] lg:shrink-0 lg:px-0 lg:py-0"
+            className="relative flex w-full items-center justify-center overflow-hidden rounded-xl bg-gradient-stage px-4 py-10 lg:h-[640px] lg:w-[720px] lg:shrink-0 lg:px-0 lg:py-0"
           >
             <motion.div
               initial={reduced ? false : { y: 480, opacity: 0 }}
               animate={animate ? { y: 0, opacity: 1 } : {}}
               transition={{ delay: 0.25, duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
-              className="w-full max-w-[620px] overflow-hidden rounded-[14px] bg-surface shadow-[0_40px_90px_-30px_rgba(2,22,17,0.4)]"
+              className="w-full max-w-[620px] overflow-hidden rounded-[14px] bg-surface shadow-[0_40px_90px_-30px_rgba(2,22,17,0.4)] dark:bg-surface-secondary"
             >
               {/* Head: bare gold numbers, single-line labels, 2×2 */}
               <div className="grid grid-cols-1 gap-x-6 gap-y-3 border-b border-stroke-subtle px-5 py-4 sm:grid-cols-2">

@@ -18,11 +18,11 @@ function Label({ children }: { children: React.ReactNode }) {
 function Card({ n, panel, title, desc }: { n: string; panel: React.ReactNode; title: string; desc: string }) {
   return (
     <StaggerItem className="flex">
-      <div className="flex w-full flex-col rounded-xl bg-surface p-7 shadow-[0_34px_80px_-30px_rgba(2,22,17,0.4)] lg:p-8">
+      <div className="flex w-full flex-col rounded-xl bg-surface p-7 shadow-[0_34px_80px_-30px_rgba(2,22,17,0.4)] dark:bg-surface-secondary lg:p-8">
         <p className="font-serif text-[21px] font-bold leading-none text-fg-accent-emphasis">{n}</p>
         <p className="mt-3.5 font-serif text-[21px] font-bold leading-snug text-fg">{title}</p>
         <p className="mb-5 mt-2.5 text-body-sm leading-relaxed text-fg-secondary">{desc}</p>
-        <div className="mt-auto rounded-[10px] bg-surface-secondary p-5">{panel}</div>
+        <div className="mt-auto rounded-[10px] bg-surface-secondary p-5 dark:bg-white/[0.04] dark:ring-1 dark:ring-white/10">{panel}</div>
       </div>
     </StaggerItem>
   );
@@ -38,7 +38,7 @@ export function HowItActs() {
       {/* ONE block (user decision 2026-08-25): the heading lives INSIDE the
           full-bleed Gradient band, above the three cards — nothing of this
           section sits outside the tinted container any more. */}
-      <div className="bg-[linear-gradient(165deg,#EAF3F1_0%,#DDECE8_55%,#E9E4D3_100%)] px-4 py-16 md:px-6 lg:px-10 lg:py-20">
+      <div className="bg-gradient-stage px-4 py-16 md:px-6 lg:px-10 lg:py-20">
         <Reveal className="mx-auto flex max-w-[820px] flex-col items-center gap-4 text-center">
           <SectionEyebrow tone="brand">{t('howItActs.eyebrow')}</SectionEyebrow>
           <h2 className="font-serif text-[2rem] font-semibold leading-tight tracking-tight text-fg sm:text-[2.5rem]">

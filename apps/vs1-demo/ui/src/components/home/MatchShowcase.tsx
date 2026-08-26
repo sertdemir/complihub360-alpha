@@ -32,26 +32,26 @@ function GhostCard() {
   return (
     <div
       aria-hidden
-      className="mr-[22px] flex h-[200px] w-[300px] shrink-0 flex-col gap-3 rounded-xl border border-white/70 bg-white/40 p-[18px]"
+      className="mr-[22px] flex h-[200px] w-[300px] shrink-0 flex-col gap-3 rounded-xl border border-white/70 bg-white/40 p-[18px] dark:border-white/10 dark:bg-white/[0.05]"
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <span className="h-[34px] w-[34px] rounded-full bg-primary-500/[0.08]" />
+          <span className="h-[34px] w-[34px] rounded-full bg-primary-500/[0.08] dark:bg-white/[0.08]" />
           <div className="flex flex-col gap-1.5">
-            <span className="h-[9px] w-[78px] rounded-[5px] bg-primary-500/10" />
-            <span className="h-[9px] w-[52px] rounded-[5px] bg-primary-500/[0.07]" />
+            <span className="h-[9px] w-[78px] rounded-[5px] bg-primary-500/10 dark:bg-white/10" />
+            <span className="h-[9px] w-[52px] rounded-[5px] bg-primary-500/[0.07] dark:bg-white/[0.07]" />
           </div>
         </div>
         <span className="h-5 w-[74px] rounded-full bg-accent-500/[0.22]" />
       </div>
-      <span className="h-[9px] w-[150px] rounded-[5px] bg-primary-500/[0.09]" />
+      <span className="h-[9px] w-[150px] rounded-[5px] bg-primary-500/[0.09] dark:bg-white/[0.09]" />
       <div className="flex gap-2">
-        <span className="h-5 w-[86px] rounded-full bg-primary-500/[0.07]" />
-        <span className="h-5 w-16 rounded-full bg-primary-500/[0.07]" />
+        <span className="h-5 w-[86px] rounded-full bg-primary-500/[0.07] dark:bg-white/[0.07]" />
+        <span className="h-5 w-16 rounded-full bg-primary-500/[0.07] dark:bg-white/[0.07]" />
       </div>
-      <div className="flex flex-col gap-[7px] border-t border-white/70 pt-2.5">
-        <span className="h-[9px] w-[110px] rounded-[5px] bg-primary-500/[0.12]" />
-        <span className="h-[9px] w-[88px] rounded-[5px] bg-primary-500/[0.07]" />
+      <div className="flex flex-col gap-[7px] border-t border-white/70 pt-2.5 dark:border-white/10">
+        <span className="h-[9px] w-[110px] rounded-[5px] bg-primary-500/[0.12] dark:bg-white/[0.12]" />
+        <span className="h-[9px] w-[88px] rounded-[5px] bg-primary-500/[0.07] dark:bg-white/[0.07]" />
       </div>
     </div>
   );
@@ -78,15 +78,15 @@ function AnonMatchCard({ m }: { m: (typeof MATCHES)[number] }) {
   const { t } = useTranslation('home');
   const base = `matchmaking.matches.${m.index}`;
   return (
-    <div className="flex h-full w-full flex-col rounded-xl border border-stroke-subtle bg-surface px-5 py-4 shadow-[0_34px_80px_-30px_rgba(2,22,17,0.4)]">
+    <div className="flex h-full w-full flex-col rounded-xl border border-stroke-subtle bg-surface px-5 py-4 shadow-[0_34px_80px_-30px_rgba(2,22,17,0.4)] dark:bg-surface-secondary">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-surface-secondary">
             <Lock size={15} className="text-fg-tertiary" />
           </span>
           <div className="flex flex-col gap-1.5">
-            <span className="h-2.5 w-24 rounded bg-neutral-300/70" />
-            <span className="h-2.5 w-16 rounded bg-neutral-300/50" />
+            <span className="h-2.5 w-24 rounded bg-neutral-300/70 dark:bg-white/20" />
+            <span className="h-2.5 w-16 rounded bg-neutral-300/50 dark:bg-white/[0.14]" />
           </div>
         </div>
         <PartnerStatusBadge status="verified" styleVariant="solid" label={t('badge.verified')} />
@@ -130,7 +130,7 @@ export function MatchShowcase() {
 
       {/* Full-bleed stage: three endlessly drifting ghost rows behind, the
           three matched dossiers sharp in front. */}
-      <div className="relative mt-12 overflow-hidden bg-[linear-gradient(165deg,#EAF3F1_0%,#DDECE8_55%,#E9E4D3_100%)]">
+      <div className="relative mt-12 overflow-hidden bg-gradient-stage">
         <div aria-hidden className="absolute inset-0 flex flex-col justify-center gap-[22px]">
           <GhostRow duration={110} />
           <GhostRow reverse duration={130} />
