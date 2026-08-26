@@ -899,8 +899,12 @@
     },
     "privacy": {
       "kicker": "Was mit Ihren Daten passiert",
-      "title": "Sie bleiben in der EU — und bei Ihnen.",
-      "body": "Alles läuft auf EU-Infrastruktur. Sie bleiben anonym, bis Sie sich entscheiden, ein Konto anzulegen — die Einschätzung braucht weder Namen noch Firma noch E-Mail-Adresse. Eine Fachperson sieht Ihre Angaben erst, wenn Sie buchen."
+      "title": "Ihre Daten bleiben bei Ihnen.",
+      "body": "Sie bleiben anonym, bis Sie sich entscheiden, ein Konto anzulegen — die Einschätzung braucht weder Namen noch Firma noch E-Mail-Adresse. Eine Fachperson sieht Ihre Angaben erst, wenn Sie buchen, und Ihr Dossier wird nie ohne Ihre Anweisung geteilt."
+    },
+    "closing": {
+      "eyebrow": "Kein Kleingedrucktes",
+      "title": "Zwei Dinge, die Sie noch wissen sollten."
     },
     "cta": {
       "title": "Fangen Sie dort an, wo es für Sie Sinn ergibt.",

@@ -899,8 +899,12 @@
     },
     "privacy": {
       "kicker": "Qué ocurre con sus datos",
-      "title": "Se quedan en la UE, y siguen siendo suyos.",
-      "body": "Todo funciona sobre infraestructura de la UE. Permanece anónimo hasta que decide crear una cuenta: la evaluación no necesita nombre, ni empresa, ni correo electrónico. Un especialista ve sus datos solo cuando usted reserva."
+      "title": "Sus datos siguen siendo suyos.",
+      "body": "Usted permanece anónimo hasta que decida crear una cuenta — la evaluación no necesita nombre, ni empresa, ni dirección de correo. Un especialista ve sus datos solo cuando reserva, y su dossier nunca se comparte sin su instrucción."
+    },
+    "closing": {
+      "eyebrow": "Sin letra pequeña",
+      "title": "Dos cosas que aún debería saber."
     },
     "cta": {
       "title": "Empiece por donde tenga sentido.",

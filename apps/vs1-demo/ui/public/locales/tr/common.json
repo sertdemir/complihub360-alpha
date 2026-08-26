@@ -899,8 +899,12 @@
     },
     "privacy": {
       "kicker": "Verilerinize ne olur",
-      "title": "AB’de kalır ve sizin kalır.",
-      "body": "Her şey AB altyapısında çalışır. Hesap açmaya karar verene kadar anonim kalırsınız — değerlendirme ad, şirket ya da e-posta adresi gerektirmez. Bir uzman bilgilerinizi yalnızca siz randevu aldığınızda görür."
+      "title": "Verileriniz sizde kalır.",
+      "body": "Bir hesap açmaya karar verene kadar anonim kalırsınız — değerlendirme ne isim, ne şirket, ne de e-posta adresi ister. Bir uzman bilgilerinizi ancak rezervasyon yaptığınızda görür ve dosyanız talimatınız olmadan asla paylaşılmaz."
+    },
+    "closing": {
+      "eyebrow": "Küçük yazı yok",
+      "title": "Bilmeniz gereken iki şey daha."
     },
     "cta": {
       "title": "Nereden mantıklıysa oradan başlayın.",
