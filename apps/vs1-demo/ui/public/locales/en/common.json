@@ -322,36 +322,6 @@
       "time": "Guided Assessment",
       "specialists": "Verified Specialists Network"
     },
-    "jtbd": {
-      "overline": "Choose your outcome",
-      "title": "What progress are you trying to make?",
-      "body": "CompliHub360 routes you to the right tool based on the job you need done — not the feature you think you need.",
-      "expand": {
-        "title": "Expand Safely",
-        "body": "Identify obligations before entering a new market.",
-        "cta": "Start guided assessment"
-      },
-      "validate": {
-        "title": "Validate Risk",
-        "body": "Check if a campaign, product, or claim is compliant.",
-        "cta": "Run risk check"
-      },
-      "specialist": {
-        "title": "Find Specialist",
-        "body": "Get matched to a verified expert for your case.",
-        "cta": "Browse areas"
-      },
-      "research": {
-        "title": "Research First",
-        "body": "Read structured guides before contacting anyone.",
-        "cta": "Open library"
-      },
-      "maintain": {
-        "title": "Maintain Compliance",
-        "body": "Track obligations, alerts, and renewals over time.",
-        "cta": "Open dashboard"
-      }
-    },
     "specialists": {
       "label": "Verified Specialists"
     },

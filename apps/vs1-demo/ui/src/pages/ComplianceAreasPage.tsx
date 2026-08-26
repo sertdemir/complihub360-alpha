@@ -10,7 +10,6 @@ import {
   ComparisonMatrix,
   CountrySelector,
   HowOrchestrationWorks,
-  JTBDOutcomeGrid,
   KPIStrip,
   ResourceTeaser,
   RiskComparisonGrid,
@@ -81,13 +80,6 @@ export function ComplianceAreasPage() {
     }
   }, [location]);
 
-  // The JTBD grid's "Find Specialist" card used to call this to scroll to the
-  // first accordion, which meant a link from /compliance to /compliance. It
-  // points at the area grid now — a destination, not a self-reference.
-  const scrollToAreas = () => {
-    document.getElementById('areas')?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   return (
     <div className="min-h-screen bg-background">
       {/* ── HERO on the full-bleed Gradient ──────────────────────────── */}
@@ -130,15 +122,13 @@ export function ComplianceAreasPage() {
         </Reveal>
       </Container>
 
-      {/* ── JTBD Outcomes ─────────────────────────────────────────────── */}
-      <Section className="pb-12 pt-14 desktop-s:pt-16">
-        <Container gutter="flat">
-          <JTBDOutcomeGrid onScrollToFirstArea={scrollToAreas} />
-        </Container>
-      </Section>
-
       {/* ── The eight areas ───────────────────────────────────────────── */}
-      <Section id="areas" className="pb-12">
+      {/* Directly after the KPI card since 2026-08-26: the JTBD outcome grid
+          that used to sit between them was cut without replacement — two of
+          its five cards duplicated the page CTA (wizard), one scrolled to
+          this very grid, one duplicated the resource teaser and one led
+          logged-out visitors to the dashboard login wall. */}
+      <Section id="areas" className="pb-12 pt-14 desktop-s:pt-16">
         <Container gutter="flat">
           <Typography variant="h2" as="h2" weight="bold" className="text-fg mb-2">
             {t('compliance.areasTitle', 'The eight compliance areas')}

@@ -322,36 +322,6 @@
       "time": "Geführtes Assessment",
       "specialists": "Verifiziertes Spezialisten-Netzwerk"
     },
-    "jtbd": {
-      "overline": "Wählen Sie Ihr Ziel",
-      "title": "Welchen Fortschritt möchten Sie erzielen?",
-      "body": "CompliHub360 leitet Sie zum richtigen Werkzeug – basierend auf der Aufgabe, die Sie erledigen müssen, nicht auf einem Feature.",
-      "expand": {
-        "title": "Sicher expandieren",
-        "body": "Pflichten identifizieren, bevor Sie einen neuen Markt betreten.",
-        "cta": "Geführtes Assessment starten"
-      },
-      "validate": {
-        "title": "Risiko validieren",
-        "body": "Prüfen, ob eine Kampagne, ein Produkt oder eine Aussage konform ist.",
-        "cta": "Risiko-Check starten"
-      },
-      "specialist": {
-        "title": "Spezialisten finden",
-        "body": "Vermittlung zu einem verifizierten Experten für Ihren Fall.",
-        "cta": "Bereiche durchsehen"
-      },
-      "research": {
-        "title": "Erst recherchieren",
-        "body": "Strukturierte Leitfäden lesen, bevor Sie jemanden kontaktieren.",
-        "cta": "Bibliothek öffnen"
-      },
-      "maintain": {
-        "title": "Compliance aufrechterhalten",
-        "body": "Pflichten, Warnungen und Verlängerungen über Zeit verfolgen.",
-        "cta": "Dashboard öffnen"
-      }
-    },
     "specialists": {
       "label": "Verifizierte Spezialisten"
     },

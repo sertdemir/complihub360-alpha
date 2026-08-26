@@ -322,36 +322,6 @@
       "time": "Rehberli Değerlendirme",
       "specialists": "Doğrulanmış Uzman Ağı"
     },
-    "jtbd": {
-      "overline": "Hedefinizi seçin",
-      "title": "Hangi ilerlemeyi kaydetmek istiyorsunuz?",
-      "body": "CompliHub360 sizi, ihtiyaç duyduğunuzu düşündüğünüz özelliğe göre değil, tamamlamanız gereken işe göre doğru araca yönlendirir.",
-      "expand": {
-        "title": "Güvenle Büyüyün",
-        "body": "Yeni bir pazara girmeden önce yükümlülüklerinizi belirleyin.",
-        "cta": "Rehberli değerlendirmeyi başlatın"
-      },
-      "validate": {
-        "title": "Riski Doğrulayın",
-        "body": "Bir kampanyanın, ürünün veya iddianın mevzuata uygun olup olmadığını kontrol edin.",
-        "cta": "Risk kontrolü yapın"
-      },
-      "specialist": {
-        "title": "Uzman Bulun",
-        "body": "Vakanız için doğrulanmış bir uzmanla eşleşin.",
-        "cta": "Alanlara göz atın"
-      },
-      "research": {
-        "title": "Önce Araştırın",
-        "body": "Kimseyle iletişime geçmeden önce yapılandırılmış rehberleri okuyun.",
-        "cta": "Kütüphaneyi açın"
-      },
-      "maintain": {
-        "title": "Uyumluluğu Sürdürün",
-        "body": "Yükümlülükleri, uyarıları ve yenilemeleri zaman içinde takip edin.",
-        "cta": "Paneli açın"
-      }
-    },
     "specialists": {
       "label": "Doğrulanmış Uzmanlar"
     },

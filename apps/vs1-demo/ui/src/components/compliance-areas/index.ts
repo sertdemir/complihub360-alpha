@@ -14,7 +14,6 @@ export { AreaTimeline } from './AreaTimeline';
 export { ComparisonMatrix } from './ComparisonMatrix';
 export { CountrySelector } from './CountrySelector';
 export { HowOrchestrationWorks } from './HowOrchestrationWorks';
-export { JTBDOutcomeGrid } from './JTBDOutcomeGrid';
 export { KPIStrip } from './KPIStrip';
 export { ObligationsExplorer } from './ObligationsExplorer';
 export { RelatedAreas } from './RelatedAreas';

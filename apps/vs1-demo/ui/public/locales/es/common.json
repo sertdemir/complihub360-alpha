@@ -322,36 +322,6 @@
       "time": "Evaluación guiada",
       "specialists": "Red de especialistas verificados"
     },
-    "jtbd": {
-      "overline": "Elija su objetivo",
-      "title": "¿Qué progreso desea lograr?",
-      "body": "CompliHub360 le dirige a la herramienta adecuada según la tarea que necesita resolver — no según la función que cree necesitar.",
-      "expand": {
-        "title": "Expandirse con seguridad",
-        "body": "Identifique sus obligaciones antes de entrar en un nuevo mercado.",
-        "cta": "Iniciar evaluación guiada"
-      },
-      "validate": {
-        "title": "Validar el riesgo",
-        "body": "Compruebe si una campaña, un producto o una afirmación cumple la normativa.",
-        "cta": "Ejecutar verificación de riesgo"
-      },
-      "specialist": {
-        "title": "Encontrar especialista",
-        "body": "Reciba la asignación de un experto verificado para su caso.",
-        "cta": "Explorar áreas"
-      },
-      "research": {
-        "title": "Investigar primero",
-        "body": "Lea guías estructuradas antes de contactar con nadie.",
-        "cta": "Abrir biblioteca"
-      },
-      "maintain": {
-        "title": "Mantener el cumplimiento",
-        "body": "Supervise obligaciones, alertas y renovaciones a lo largo del tiempo.",
-        "cta": "Abrir panel"
-      }
-    },
     "specialists": {
       "label": "Especialistas verificados"
     },
