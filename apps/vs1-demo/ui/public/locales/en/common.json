@@ -805,6 +805,93 @@
         "short": "Pick a slot — your dossier travels along, so you never explain your business a sixth time."
       }
     ],
+    "demos": {
+      "ask": {
+        "question": "Do I need to register for EPR in France?",
+        "cta": "Ask",
+        "answers": [
+          {
+            "text": "Yes — as the first distributor of packaging you fall under the registration duty.",
+            "chip": "Art. L541-10 C. env."
+          },
+          {
+            "text": "Reporting runs through an approved compliance scheme.",
+            "chip": "ADEME register"
+          },
+          {
+            "text": "For very small volumes a simplified flat fee exists, which…",
+            "chip": ""
+          }
+        ]
+      },
+      "map": {
+        "stats": [
+          {
+            "value": "8",
+            "label": "Identified obligations"
+          },
+          {
+            "value": "4",
+            "label": "Due within 30 days"
+          }
+        ],
+        "rows": [
+          {
+            "level": "critical",
+            "title": "OSS quarterly return",
+            "meta": "DE · NL · Due 30 Apr"
+          },
+          {
+            "level": "medium",
+            "title": "DPIA for tracking pixels",
+            "meta": "EU-wide · Due —"
+          },
+          {
+            "level": "high",
+            "title": "Cookie banner + consent records",
+            "meta": "EU-wide · Due Ongoing"
+          }
+        ]
+      },
+      "decide": {
+        "selfTitle": "Handle yourself",
+        "proTitle": "Specialist needed",
+        "self": [
+          "Update the cookie banner",
+          "Extend the FR imprint"
+        ],
+        "pro": [
+          "OSS registration + returns",
+          "EPR representation France"
+        ],
+        "notePre": "Everything covered?",
+        "notePost": "Then that is exactly what we tell you — there is nothing to sell."
+      },
+      "match": {
+        "rows": [
+          {
+            "meta": "Replies in 24h · 4.8 ★ · Verified"
+          },
+          {
+            "meta": "Replies in 21h · 4.9 ★ · Verified"
+          }
+        ],
+        "note": "Identity becomes visible only at booking. Ranking is never for sale."
+      },
+      "book": {
+        "title": "Pick a slot · Week 19",
+        "slots": [
+          "Tue 09:00",
+          "Tue 14:30",
+          "Wed 10:00",
+          "Thu 11:30"
+        ],
+        "points": [
+          "Your dossier travels along — you don't explain your business a sixth time.",
+          "Obligations stay on your map with their deadlines."
+        ]
+      }
+    },
     "cost": {
       "kicker": "What this costs you",
       "title": "Nothing.",
