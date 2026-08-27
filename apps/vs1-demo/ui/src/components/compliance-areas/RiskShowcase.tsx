@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
@@ -39,6 +39,34 @@ interface Props {
 // table gets a longer dwell because it is read, not watched.
 const RANKING_DWELL_MS = 3000;
 const TABLE_DWELL_MS = 4600;
+
+// The two views are not the same height, so the card resizes on every
+// crossfade — this wrapper measures its content and eases the height there
+// instead of snapping (user note 2026-08-27). The card shell stays static;
+// only the measured inner content swaps.
+function AnimateHeight({ children }: { children: ReactNode }) {
+  const reduced = useReducedMotion();
+  const innerRef = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState<number | 'auto'>('auto');
+
+  useEffect(() => {
+    const el = innerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setHeight(el.offsetHeight));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  return (
+    <motion.div
+      animate={{ height }}
+      transition={reduced ? { duration: 0 } : { duration: 0.4, ease: 'easeInOut' }}
+      className="overflow-hidden"
+    >
+      <div ref={innerRef}>{children}</div>
+    </motion.div>
+  );
+}
 
 function RankingView({ selectedCountry, run }: Props & { run: boolean }) {
   const { t } = useTranslation('common');
@@ -245,15 +273,18 @@ export function RiskShowcase({ selectedCountry }: Props) {
           </TabList>
         </Tabs>
 
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={tab}
-            initial={reduced ? false : { opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduced ? undefined : { opacity: 0, y: -10 }}
-            transition={{ duration: 0.32, ease: 'easeOut' }}
-            className="rounded-xl bg-surface p-5 shadow-[0_34px_80px_-30px_rgba(2,22,17,0.4)] dark:bg-surface-secondary sm:p-7"
-          >
+        {/* Static card shell — the height eases via AnimateHeight while the
+            keyed content inside crossfades. */}
+        <div className="rounded-xl bg-surface p-5 shadow-[0_34px_80px_-30px_rgba(2,22,17,0.4)] dark:bg-surface-secondary sm:p-7">
+          <AnimateHeight>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={tab}
+                initial={reduced ? false : { opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduced ? undefined : { opacity: 0, y: -10 }}
+                transition={{ duration: 0.32, ease: 'easeOut' }}
+              >
             {/* Title always one line, the engine note directly beneath it —
                 side by side the two made the table view taller than the
                 ranking and the card jumped on every crossfade. */}
@@ -269,13 +300,15 @@ export function RiskShowcase({ selectedCountry }: Props) {
                 })}
               </span>
             </div>
-            {tab === 'ranking' ? (
-              <RankingView selectedCountry={selectedCountry} run={inView} />
-            ) : (
-              <TableView selectedCountry={selectedCountry} />
-            )}
-          </motion.div>
-        </AnimatePresence>
+                {tab === 'ranking' ? (
+                  <RankingView selectedCountry={selectedCountry} run={inView} />
+                ) : (
+                  <TableView selectedCountry={selectedCountry} />
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </AnimateHeight>
+        </div>
       </Reveal>
     </div>
   );
