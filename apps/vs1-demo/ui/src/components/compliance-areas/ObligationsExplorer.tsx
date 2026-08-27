@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { BusinessModel } from '@complihub/compliance-engine';
 import { ChevronRight, FileText } from 'lucide-react';
 import { Typography } from '../ui/Typography';
@@ -134,62 +134,15 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
 
   return (
     <div>
-      {/* Heading left, validity segments right and baseline-aligned with the
-          lead — the canvas's shape for this row. */}
-      <div className="flex flex-col gap-5 desktop-s:flex-row desktop-s:items-end desktop-s:justify-between desktop-s:gap-10">
-        <AreaSectionHeading
-          className="max-w-[620px]"
-          eyebrow={eyebrows.obligations}
-          title={t('compliance.area.obligationsTitle', 'What this area actually requires')}
-          lead={t('compliance.area.obligationsLead', {
-            defaultValue:
-              'Every duty below traces to a named statute. Switch market to see the source that applies there.',
-          })}
-        />
-        {/* Only worth showing when there is something to separate: with every
-            duty already live the three segments would be one real choice and
-            two dead ones. */}
-        {later.length > 0 && liveNow.length > 0 && (
-          <div className="flex shrink-0 flex-wrap gap-2">
-            {/* Touching a filter is taking over, same as clicking a row — the
-                auto-run must not fight a reader who just narrowed the list. */}
-            <ValiditySegment
-              selected={validity === 'all'}
-              onClick={() => {
-                setPicked(true);
-                setValidity('all');
-              }}
-            >
-              {t('compliance.area.validityAll', 'All {{count}}', { count: all.length })}
-            </ValiditySegment>
-            <ValiditySegment
-              selected={validity === 'now'}
-              onClick={() => {
-                setPicked(true);
-                setValidity('now');
-              }}
-            >
-              {t('compliance.area.validityNow', 'Applies today · {{count}}', {
-                count: liveNow.length,
-              })}
-            </ValiditySegment>
-            <ValiditySegment
-              selected={validity === 'later'}
-              onClick={() => {
-                setPicked(true);
-                setValidity('later');
-              }}
-            >
-              {laterYear
-                ? t('compliance.area.validityFromYear', 'From {{year}} · {{count}}', {
-                    year: laterYear,
-                    count: later.length,
-                  })
-                : t('compliance.area.validityLater', 'Later · {{count}}', { count: later.length })}
-            </ValiditySegment>
-          </div>
-        )}
-      </div>
+      <AreaSectionHeading
+        className="max-w-[620px]"
+        eyebrow={eyebrows.obligations}
+        title={t('compliance.area.obligationsTitle', 'What this area actually requires')}
+        lead={t('compliance.area.obligationsLead', {
+          defaultValue:
+            'Every duty below traces to a named statute. Switch market to see the source that applies there.',
+        })}
+      />
 
       {shown.length === 0 || !selected ? (
         <div className="mt-6 rounded-xl border border-stroke-subtle bg-surface p-6">
@@ -206,25 +159,75 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
           </Typography>
         </div>
       ) : (
-        <div ref={ref} className="mt-10 flex flex-col gap-8 desktop-s:flex-row desktop-s:items-stretch desktop-s:gap-10">
-          {/* Rail — the atlas's list anatomy: quiet rows with hairlines, the
-              active duty as an elevated card with the gold edge. */}
-          <motion.ul
-            className="flex flex-col justify-center gap-1.5 desktop-s:w-[360px] desktop-s:shrink-0"
-            variants={{ show: { transition: { staggerChildren: 0.07 } } }}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, margin: '-80px' }}
-          >
-            {shown.map((o) => {
-              const active = o.id === selected.id;
-              const style = SEVERITY_STYLE[o.severity];
-              return (
-                <motion.li
-                  key={o.id}
-                  variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
-                  transition={{ duration: 0.5, ease: 'easeOut' }}
+        <div ref={ref} className="mt-6 flex flex-col gap-8 desktop-s:flex-row desktop-s:items-stretch desktop-s:gap-10">
+          {/* Rail column — the validity segments sit hard under the title and
+              the rows stack beneath them: the chips lead the list they filter
+              (user ask 2026-08-28, moved out of the heading row to save
+              height). */}
+          <div className="flex flex-col desktop-s:w-[360px] desktop-s:shrink-0">
+            {/* Only worth showing when there is something to separate: with
+                every duty already live the three segments would be one real
+                choice and two dead ones. */}
+            {later.length > 0 && liveNow.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {/* Touching a filter is taking over, same as clicking a row —
+                    the auto-run must not fight a reader who just narrowed the
+                    list. */}
+                <ValiditySegment
+                  selected={validity === 'all'}
+                  onClick={() => {
+                    setPicked(true);
+                    setValidity('all');
+                  }}
                 >
+                  {t('compliance.area.validityAll', 'All {{count}}', { count: all.length })}
+                </ValiditySegment>
+                <ValiditySegment
+                  selected={validity === 'now'}
+                  onClick={() => {
+                    setPicked(true);
+                    setValidity('now');
+                  }}
+                >
+                  {t('compliance.area.validityNow', 'Applies today · {{count}}', {
+                    count: liveNow.length,
+                  })}
+                </ValiditySegment>
+                <ValiditySegment
+                  selected={validity === 'later'}
+                  onClick={() => {
+                    setPicked(true);
+                    setValidity('later');
+                  }}
+                >
+                  {laterYear
+                    ? t('compliance.area.validityFromYear', 'From {{year}} · {{count}}', {
+                        year: laterYear,
+                        count: later.length,
+                      })
+                    : t('compliance.area.validityLater', 'Later · {{count}}', {
+                        count: later.length,
+                      })}
+                </ValiditySegment>
+              </div>
+            )}
+            {/* Rail — the atlas's list anatomy: quiet rows with hairlines, the
+                active duty as an elevated card with the gold edge. Each row
+                carries its OWN entrance — not parent variant propagation: a
+                row mounted later by a filter switch would inherit "hidden"
+                from a parent whose animation has already run and never be
+                told to show (the vanishing-list bug, fixed 2026-08-28). */}
+            <ul className="mt-5 flex flex-1 flex-col justify-center gap-1.5">
+              {shown.map((o, i) => {
+                const active = o.id === selected.id;
+                const style = SEVERITY_STYLE[o.severity];
+                return (
+                  <motion.li
+                    key={o.id}
+                    initial={reduced ? false : { opacity: 0, y: 20 }}
+                    animate={inView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.5, ease: 'easeOut', delay: i * 0.06 }}
+                  >
                   <button
                     type="button"
                     aria-pressed={active}
@@ -286,176 +289,206 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                     )}
                   </button>
                 </motion.li>
-              );
-            })}
-          </motion.ul>
+                );
+              })}
+            </ul>
+          </div>
 
-          {/* Detail — the dossier card standing on the Gradient panel,
-              crossfading on every selection like the atlas. */}
+          {/* Detail — the dossier cards standing on the Gradient panel. EVERY
+              duty's card is mounted, stacked in the same grid cell, and the
+              active one fades in over the rest — the RiskShowcase move. The
+              panel therefore always keeps the height of the tallest dossier,
+              whichever duty is open and whichever filter is set: nothing on
+              the page moves when the content grows or shrinks (user ask
+              2026-08-28, replacing the AnimatePresence crossfade that let the
+              page jump on every swap). The stack reads from `all`, not
+              `shown`, so a filter switch cannot change the height either. */}
           <div className="flex min-w-0 flex-1 items-center rounded-xl bg-gradient-stage p-4 sm:p-7">
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={selected.id}
-                initial={reduced ? false : { opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={reduced ? undefined : { opacity: 0, y: -10 }}
-                transition={{ duration: 0.35, ease: 'easeOut' }}
-                className="w-full rounded-[14px] bg-surface p-6 shadow-[0_40px_90px_-30px_rgba(2,22,17,0.4)] dark:bg-surface-secondary sm:p-8"
-              >
-            <div className="flex items-start justify-between gap-6">
-              <div className="min-w-0">
-                {/* Risk AND when it bites, in one chip. Severity on its own
-                    said nothing about whether the reader has to act this
-                    quarter or in four years. */}
-                <RiskBadge level={selected.severity} size="sm" className="rounded-full">
-                  {t('compliance.area.riskWhen', '{{level}} · {{when}}', {
-                    level: t(severityKey(selected.severity), SEVERITY_FALLBACK[selected.severity]),
-                    when:
-                      selected.appliesFrom && new Date(selected.appliesFrom) > new Date()
-                        ? t('compliance.area.fromShort', 'from {{date}}', {
-                            date: shortDate.format(new Date(selected.appliesFrom)),
-                          })
-                        : t('compliance.area.appliesTodayShort', 'applies today'),
-                  })}
-                </RiskBadge>
-                <h3 className="mt-3.5 font-serif text-[1.5rem] font-semibold leading-tight text-fg">
-                  {selected.label}
-                </h3>
-                <p className="mt-3 max-w-xl text-body-sm leading-relaxed text-fg-secondary">
-                  {selected.description}
-                </p>
-                {/* Which business models the engine puts this duty on. It used
-                    to be a filter bar over the whole list, which is where the
-                    measurement said it did not belong: across the eight areas
-                    the lists run 1 to 7 duties, four of them are unchanged by
-                    any model, and on the one list long enough to want filtering
-                    two of the four options empty it. Per duty the same data
-                    answers a question a reader actually has — does this one
-                    apply to me — without a control that mostly does nothing.
-                    Omitted when every model is named: "applies to all four" is
-                    what the absence of the line already says. */}
-                {selected.businessModels.length > 0 &&
-                  selected.businessModels.length < Object.keys(MODEL_FALLBACK).length && (
-                    <p className="mt-3.5 text-body-2xs leading-relaxed text-fg-tertiary">
-                      <span className="font-semibold">
-                        {t('compliance.area.appliesToModels', 'Applies to:')}
-                      </span>{' '}
-                      {selected.businessModels
-                        .map((m) => t(`compliance.businessModel.${m}`, MODEL_FALLBACK[m] ?? m))
-                        .join(' · ')}
-                    </p>
-                  )}
-              </div>
-              {/* The area's own glyph, in the severity's colour — the canvas
-                  puts a drawing here and it is what stops the pane reading as
-                  a form. Hidden below desktop, where it would push the prose
-                  into a column too narrow to read. */}
-              {/* Brand, not the severity colour: the icon is presentation, the
-                  severity statement is the chip's (colour doctrine 2026-08-27). */}
-              {AreaIcon && (
-                <AreaIcon
-                  size={64}
-                  strokeWidth={1.5}
-                  aria-hidden
-                  className="hidden shrink-0 text-fg-brand desktop-s:block"
-                />
-              )}
+            <div className="grid w-full">
+              {all.map((o) => {
+                const active = o.id === selected.id;
+                const deferred = !!o.appliesFrom && new Date(o.appliesFrom) > new Date();
+                return (
+                  <motion.div
+                    key={o.id}
+                    initial={false}
+                    animate={
+                      active
+                        ? { opacity: 1, y: 0, visibility: 'visible' }
+                        : { opacity: 0, y: 10, transitionEnd: { visibility: 'hidden' } }
+                    }
+                    transition={reduced ? { duration: 0 } : { duration: 0.35, ease: 'easeOut' }}
+                    aria-hidden={!active}
+                    className={`col-start-1 row-start-1 min-w-0 self-center ${active ? '' : 'pointer-events-none'}`}
+                  >
+                    <div className="w-full rounded-[14px] bg-surface p-6 shadow-[0_40px_90px_-30px_rgba(2,22,17,0.4)] dark:bg-surface-secondary sm:p-8">
+                      <div className="flex items-start justify-between gap-6">
+                        <div className="min-w-0">
+                          {/* Risk AND when it bites, in one chip. Severity on
+                              its own said nothing about whether the reader has
+                              to act this quarter or in four years. */}
+                          <RiskBadge level={o.severity} size="sm" className="rounded-full">
+                            {t('compliance.area.riskWhen', '{{level}} · {{when}}', {
+                              level: t(severityKey(o.severity), SEVERITY_FALLBACK[o.severity]),
+                              when: deferred
+                                ? t('compliance.area.fromShort', 'from {{date}}', {
+                                    date: shortDate.format(new Date(o.appliesFrom as string)),
+                                  })
+                                : t('compliance.area.appliesTodayShort', 'applies today'),
+                            })}
+                          </RiskBadge>
+                          <h3 className="mt-3.5 font-serif text-[1.5rem] font-semibold leading-tight text-fg">
+                            {o.label}
+                          </h3>
+                          <p className="mt-3 max-w-xl text-body-sm leading-relaxed text-fg-secondary">
+                            {o.description}
+                          </p>
+                          {/* Which business models the engine puts this duty
+                              on. It used to be a filter bar over the whole
+                              list, which is where the measurement said it did
+                              not belong: across the eight areas the lists run
+                              1 to 7 duties, four of them are unchanged by any
+                              model, and on the one list long enough to want
+                              filtering two of the four options empty it. Per
+                              duty the same data answers a question a reader
+                              actually has — does this one apply to me —
+                              without a control that mostly does nothing.
+                              Omitted when every model is named: "applies to
+                              all four" is what the absence of the line already
+                              says. */}
+                          {o.businessModels.length > 0 &&
+                            o.businessModels.length < Object.keys(MODEL_FALLBACK).length && (
+                              <p className="mt-3.5 text-body-2xs leading-relaxed text-fg-tertiary">
+                                <span className="font-semibold">
+                                  {t('compliance.area.appliesToModels', 'Applies to:')}
+                                </span>{' '}
+                                {o.businessModels
+                                  .map((m) => t(`compliance.businessModel.${m}`, MODEL_FALLBACK[m] ?? m))
+                                  .join(' · ')}
+                              </p>
+                            )}
+                        </div>
+                        {/* The area's own glyph — the canvas puts a drawing
+                            here and it is what stops the pane reading as a
+                            form. Hidden below desktop, where it would push the
+                            prose into a column too narrow to read. Brand, not
+                            the severity colour: the icon is presentation, the
+                            severity statement is the chip's (colour doctrine
+                            2026-08-27). */}
+                        {AreaIcon && (
+                          <AreaIcon
+                            size={64}
+                            strokeWidth={1.5}
+                            aria-hidden
+                            className="hidden shrink-0 text-fg-brand desktop-s:block"
+                          />
+                        )}
+                      </div>
+
+                      <dl className="mt-7 grid gap-px overflow-hidden rounded-xl border border-stroke-subtle bg-stroke-subtle tablet:grid-cols-2">
+                        {/* Three states, not two. A placeholder is a string
+                            SHAPED like a citation — "National corporate income
+                            tax act" — standing where a source belongs. Printed
+                            here it sits in the same cell, in the same weight,
+                            as "UStG §18i (OSS)", and the page's entire claim
+                            is that every duty traces to a named statute. So it
+                            is not printed: the cell says there is none.
+                            'national-pending' means a national text exists and
+                            we hold the EU one; 'eu' means the EU instrument IS
+                            the law here and nothing is missing. */}
+                        <Fact
+                          label={t('compliance.area.fact.source', 'Legal basis')}
+                          value={
+                            o.scope === 'placeholder'
+                              ? t('compliance.area.fact.noNamedSource', 'No named source yet')
+                              : o.source
+                          }
+                          muted={o.scope === 'placeholder'}
+                          note={
+                            o.marketSpecific
+                              ? t('compliance.area.fact.nationalSource', 'National source')
+                              : o.scope === 'placeholder'
+                                ? t('compliance.area.fact.placeholderNote', {
+                                    defaultValue:
+                                      'The engine carries no statute for {{market}} here — a gap in our coverage, not in the law.',
+                                    market: marketLabel,
+                                  })
+                                : o.scope === 'national-pending'
+                                  ? t('compliance.area.fact.pendingNote', {
+                                      defaultValue:
+                                        'EU-level source. {{market}} has its own text on top of it, which we do not carry yet.',
+                                      market: marketLabel,
+                                    })
+                                  : t('compliance.area.fact.euDirect', {
+                                      defaultValue:
+                                        'EU Regulation — applies directly, this is the law here',
+                                    })
+                          }
+                        />
+                        <Fact
+                          label={t('compliance.area.fact.penalty', 'Penalty range')}
+                          value={o.penalty}
+                          emphasis
+                        />
+                        <Fact
+                          label={t('compliance.area.fact.cadence', 'Cadence')}
+                          value={t(`markets.cadence.${o.due}`, { defaultValue: o.due })}
+                          note={
+                            o.dueDays != null
+                              ? t('markets.country.leadTime', { days: o.dueDays })
+                              : undefined
+                          }
+                        />
+                        <Fact
+                          label={t('compliance.area.fact.scope', 'Applies in')}
+                          // Where the duty applies, not where its source comes
+                          // from. Those were conflated: a duty with no source
+                          // at all was reporting "EU-wide", which claimed a
+                          // scope for something we hold nothing on. The
+                          // source's origin is the Rechtsgrundlage cell's
+                          // business now.
+                          value={
+                            selectedCountry === 'EU'
+                              ? t('compliance.country.euOption', 'EU-wide')
+                              : marketLabel
+                          }
+                          note={
+                            o.appliesFrom
+                              ? t('compliance.area.appliesFrom', 'Applies from {{date}}', {
+                                  date: dateFmt.format(new Date(o.appliesFrom)),
+                                })
+                              : t('compliance.area.timeline.liveNow', 'Applies today')
+                          }
+                        />
+                      </dl>
+
+                      {/* The Official Journal reference itself, not a button
+                          that says a source exists. The CELEX number IS the
+                          citation — a reader who wants to check the duty can
+                          quote it without following the link. The canvas also
+                          prints a last-verified date here; the engine does not
+                          carry one, so it is left out rather than made up. */}
+                      {o.eurLexUrl && (
+                        <a
+                          href={o.eurLexUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-5 flex items-center gap-3 rounded-lg bg-surface-secondary px-4 py-3.5 text-body-2xs text-fg-tertiary transition-colors hover:text-fg-brand dark:bg-white/[0.04]"
+                        >
+                          <FileText size={15} className="shrink-0" aria-hidden />
+                          <span>
+                            {t('compliance.area.sourceInJournal', 'Source in the Official Journal:')}{' '}
+                            <span className="font-semibold tabular-nums text-fg">
+                              {o.celex ? `CELEX ${o.celex}` : o.source}
+                            </span>
+                          </span>
+                        </a>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
-
-            <dl className="mt-7 grid gap-px overflow-hidden rounded-xl border border-stroke-subtle bg-stroke-subtle tablet:grid-cols-2">
-              {/* Three states, not two. A placeholder is a string SHAPED like
-                  a citation — "National corporate income tax act" — standing
-                  where a source belongs. Printed here it sits in the same
-                  cell, in the same weight, as "UStG §18i (OSS)", and the
-                  page's entire claim is that every duty traces to a named
-                  statute. So it is not printed: the cell says there is none.
-                  'national-pending' means a national text exists and we hold
-                  the EU one; 'eu' means the EU instrument IS the law here and
-                  nothing is missing. */}
-              <Fact
-                label={t('compliance.area.fact.source', 'Legal basis')}
-                value={
-                  selected.scope === 'placeholder'
-                    ? t('compliance.area.fact.noNamedSource', 'No named source yet')
-                    : selected.source
-                }
-                muted={selected.scope === 'placeholder'}
-                note={
-                  selected.marketSpecific
-                    ? t('compliance.area.fact.nationalSource', 'National source')
-                    : selected.scope === 'placeholder'
-                      ? t('compliance.area.fact.placeholderNote', {
-                          defaultValue:
-                            'The engine carries no statute for {{market}} here — a gap in our coverage, not in the law.',
-                          market: marketLabel,
-                        })
-                      : selected.scope === 'national-pending'
-                        ? t('compliance.area.fact.pendingNote', {
-                            defaultValue:
-                              'EU-level source. {{market}} has its own text on top of it, which we do not carry yet.',
-                            market: marketLabel,
-                          })
-                        : t('compliance.area.fact.euDirect', {
-                            defaultValue: 'EU Regulation — applies directly, this is the law here',
-                          })
-                }
-              />
-              <Fact
-                label={t('compliance.area.fact.penalty', 'Penalty range')}
-                value={selected.penalty}
-                emphasis
-              />
-              <Fact
-                label={t('compliance.area.fact.cadence', 'Cadence')}
-                value={t(`markets.cadence.${selected.due}`, { defaultValue: selected.due })}
-                note={
-                  selected.dueDays != null
-                    ? t('markets.country.leadTime', { days: selected.dueDays })
-                    : undefined
-                }
-              />
-              <Fact
-                label={t('compliance.area.fact.scope', 'Applies in')}
-                // Where the duty applies, not where its source comes from.
-                // Those were conflated: a duty with no source at all was
-                // reporting "EU-wide", which claimed a scope for something we
-                // hold nothing on. The source's origin is the Rechtsgrundlage
-                // cell's business now.
-                value={selectedCountry === 'EU' ? t('compliance.country.euOption', 'EU-wide') : marketLabel}
-                note={
-                  selected.appliesFrom
-                    ? t('compliance.area.appliesFrom', 'Applies from {{date}}', {
-                        date: dateFmt.format(new Date(selected.appliesFrom)),
-                      })
-                    : t('compliance.area.timeline.liveNow', 'Applies today')
-                }
-              />
-            </dl>
-
-            {/* The Official Journal reference itself, not a button that says
-                a source exists. The CELEX number IS the citation — a reader
-                who wants to check the duty can quote it without following the
-                link. The canvas also prints a last-verified date here; the
-                engine does not carry one, so it is left out rather than made
-                up. */}
-            {selected.eurLexUrl && (
-              <a
-                href={selected.eurLexUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-5 flex items-center gap-3 rounded-lg bg-surface-secondary px-4 py-3.5 text-body-2xs text-fg-tertiary transition-colors hover:text-fg-brand dark:bg-white/[0.04]"
-              >
-                <FileText size={15} className="shrink-0" aria-hidden />
-                <span>
-                  {t('compliance.area.sourceInJournal', 'Source in the Official Journal:')}{' '}
-                  <span className="font-semibold tabular-nums text-fg">
-                    {selected.celex ? `CELEX ${selected.celex}` : selected.source}
-                  </span>
-                </span>
-              </a>
-            )}
-              </motion.div>
-            </AnimatePresence>
           </div>
         </div>
       )}
