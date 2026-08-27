@@ -211,29 +211,38 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                 </ValiditySegment>
               </div>
             )}
-            {/* Rail — the atlas's list anatomy: quiet rows with hairlines, the
-                active duty as an elevated card with the gold edge. Each row
+            {/* Rail — the atlas's rows VERBATIM, `layout` included: when the
+                active row grows into its card every sibling is pulled along
+                in the same soft move, the homepage's rubber-band feel (user
+                ask 2026-08-28). The rows sit under the chips, top-aligned —
+                centering them against the tall panel read as adrift. Each row
                 carries its OWN entrance — not parent variant propagation: a
                 row mounted later by a filter switch would inherit "hidden"
                 from a parent whose animation has already run and never be
-                told to show (the vanishing-list bug, fixed 2026-08-28). */}
-            <ul className="mt-5 flex flex-1 flex-col justify-center gap-1.5">
+                told to show (the vanishing-list bug, fixed 2026-08-28). The
+                entrance delay is scoped per value so it never drags on the
+                layout spring. */}
+            <div className="mt-6 flex flex-col gap-1.5">
               {shown.map((o, i) => {
                 const active = o.id === selected.id;
                 const style = SEVERITY_STYLE[o.severity];
                 return (
-                  <motion.li
+                  <motion.button
                     key={o.id}
-                    initial={reduced ? false : { opacity: 0, y: 20 }}
-                    animate={inView ? { opacity: 1, y: 0 } : {}}
-                    transition={{ duration: 0.5, ease: 'easeOut', delay: i * 0.06 }}
-                  >
-                  <button
                     type="button"
+                    layout
                     aria-pressed={active}
                     onClick={() => {
                       setPicked(true);
                       setSelectedId(o.id);
+                    }}
+                    initial={reduced ? false : { opacity: 0, y: 20 }}
+                    animate={inView ? { opacity: 1, y: 0 } : {}}
+                    transition={{
+                      duration: 0.5,
+                      ease: 'easeOut',
+                      opacity: { duration: 0.5, ease: 'easeOut', delay: i * 0.06 },
+                      y: { duration: 0.5, ease: 'easeOut', delay: i * 0.06 },
                     }}
                     className={
                       active
@@ -287,11 +296,43 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                         {t(severityKey(o.severity), SEVERITY_FALLBACK[o.severity])}
                       </RiskBadge>
                     )}
-                  </button>
-                </motion.li>
+                  </motion.button>
                 );
               })}
-            </ul>
+            </div>
+
+            {/* Coverage note — the same honesty MarketPage shows about thin
+                markets. Plain text, no box; it closes the rail column right
+                under the rows (user ask 2026-08-28 — it used to sit under the
+                whole section, three screens of dossier away from the list it
+                talks about). */}
+            <Typography
+              variant="caption"
+              className="mt-6 text-body-xs normal-case tracking-normal leading-relaxed text-fg-tertiary"
+            >
+              {selectedCountry === 'EU'
+                ? t('compliance.area.coverageNoteEu', {
+                    defaultValue:
+                      'The engine carries {{count}} duties for this area, all of them on an EU-level source. Pick a market to see where a national source adds to them.',
+                    count: all.length,
+                  })
+                : gapCount > 0
+                  ? t('compliance.area.coverageNoteGaps', {
+                      defaultValue:
+                        '{{specific}} of {{count}} duties have a source specific to {{market}}. Of the rest, {{gaps}} have a national text we do not carry yet — the others are EU Regulations, which apply here directly.',
+                      count: all.length,
+                      specific: all.filter((o) => o.marketSpecific).length,
+                      gaps: gapCount,
+                      market: marketLabel,
+                    })
+                  : t('compliance.area.coverageNote', {
+                      defaultValue:
+                        '{{specific}} of {{count}} duties have a source specific to {{market}}. The rest are EU Regulations — they apply here directly, so there is no national text to hold.',
+                      count: all.length,
+                      specific: all.filter((o) => o.marketSpecific).length,
+                      market: marketLabel,
+                    })}
+            </Typography>
           </div>
 
           {/* Detail — the dossier cards standing on the Gradient panel. EVERY
@@ -493,36 +534,6 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
         </div>
       )}
 
-      {/* Coverage note — the same honesty MarketPage shows about thin markets. */}
-      {/* Plain text, no box. The canvas sets this as a footnote under the card
-          and that is what it is — boxed and badged with an icon it read as a
-          second piece of content competing with the explorer above it. */}
-      <div className="mt-5 max-w-[760px]">
-        <Typography variant="caption" className="text-body-xs normal-case tracking-normal leading-relaxed text-fg-tertiary">
-          {selectedCountry === 'EU'
-            ? t('compliance.area.coverageNoteEu', {
-                defaultValue:
-                  'The engine carries {{count}} duties for this area, all of them on an EU-level source. Pick a market to see where a national source adds to them.',
-                count: all.length,
-              })
-            : gapCount > 0
-              ? t('compliance.area.coverageNoteGaps', {
-                  defaultValue:
-                    '{{specific}} of {{count}} duties have a source specific to {{market}}. Of the rest, {{gaps}} have a national text we do not carry yet — the others are EU Regulations, which apply here directly.',
-                  count: all.length,
-                  specific: all.filter((o) => o.marketSpecific).length,
-                  gaps: gapCount,
-                  market: marketLabel,
-                })
-              : t('compliance.area.coverageNote', {
-                  defaultValue:
-                    '{{specific}} of {{count}} duties have a source specific to {{market}}. The rest are EU Regulations — they apply here directly, so there is no national text to hold.',
-                  count: all.length,
-                  specific: all.filter((o) => o.marketSpecific).length,
-                  market: marketLabel,
-                })}
-        </Typography>
-      </div>
     </div>
   );
 }
