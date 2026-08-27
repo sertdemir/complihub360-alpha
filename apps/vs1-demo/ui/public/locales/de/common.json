@@ -807,6 +807,7 @@
       "enforcementAvg": "Durchschnitt über {{total}} Märkte",
       "authorities": "Zuständige Behörden",
       "enforcementLeadEu": "Die Zahlen stammen aus den Quellen, die die Engine auf EU-Ebene führt — {{count}} Pflichten mit benanntem Bußgeldrahmen. Obergrenzen, wie sie dort stehen, keine Erwartungswerte.",
+      "enforcementScaleSub": "Alle acht Märkte auf einer Skala — der goldene Marker ist der Wert, mit dem die Engine hier rechnet.",
       "timelineLeadAllLive": "Jede Pflicht in diesem Bereich gilt heute. Was sich je Markt ändert, ist die Vorlaufzeit, die jede einzelne braucht.",
       "marketsLeadTied": "{{count}} Märkte gewichten diesen Bereich gleich schwer ({{weight}} von 10). Wer mehrere bedient, plant nach dem strengsten.",
       "localSourcesNote": "In {{count}} der {{total}} Märkte führt die Engine mindestens eine lokale Quelle für diesen Bereich. Sonst gilt das EU-Instrument — und wird auch so ausgewiesen.",

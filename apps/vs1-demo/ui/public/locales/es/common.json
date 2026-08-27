@@ -807,6 +807,7 @@
       "enforcementAvg": "media de los {{total}} mercados",
       "authorities": "Autoridades competentes",
       "enforcementLeadEu": "Las cifras proceden de las fuentes que el motor mantiene a nivel de la UE: {{count}} obligaciones con un rango de sanción declarado. Son límites máximos tal como están escritos, no un coste esperado.",
+      "enforcementScaleSub": "Los ocho mercados en una misma escala — el marcador dorado es el valor con el que calcula el motor aquí.",
       "timelineLeadAllLive": "Todas las obligaciones de esta área se aplican hoy. Lo que cambia según el mercado es el plazo de preparación que necesita cada una.",
       "marketsLeadTied": "{{count}} mercados dan a esta área el mismo peso ({{weight}} sobre 10). Atender varios significa planificar según el más estricto.",
       "localSourcesNote": "El motor mantiene al menos una fuente local para esta área en {{count}} de los {{total}} mercados. En el resto se aplica el instrumento de la UE, y así se indica.",

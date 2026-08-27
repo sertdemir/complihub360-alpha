@@ -268,12 +268,15 @@ export function ComplianceAreaPage() {
         </Container>
       </Section>
 
-      {/* ── 4 · Enforcement · the page's one dark moment ──────────────────── */}
-      <section className="bg-primary-700 py-16 desktop-s:py-20">
+      {/* ── 4 · Enforcement ───────────────────────────────────────────────── */}
+      {/* The dark band retired here (user decision 2026-08-28): the section
+          speaks the Gradient text-image pair now, and the page's one dark
+          moment is the orchestration band further down. */}
+      <Section className="py-16 desktop-s:py-20">
         <Container size="xl">
           <AreaEnforcement slug={area} selectedCountry={selectedCountry} />
         </Container>
-      </section>
+      </Section>
 
       {/* ── 5 · Deadlines ─────────────────────────────────────────────────── */}
       <Section className="py-16 desktop-s:py-20">

@@ -807,6 +807,7 @@
       "enforcementAvg": "{{total}} pazarın ortalaması",
       "authorities": "Yetkili makamlar",
       "enforcementLeadEu": "Rakamlar motorun AB düzeyinde tuttuğu kaynaklardan geliyor — ceza aralığı belirtilmiş {{count}} yükümlülük. Yazıldığı haliyle üst sınırlar, beklenen maliyet değil.",
+      "enforcementScaleSub": "Sekiz pazarın tümü tek ölçekte — altın işaret, motorun burada kullandığı değerdir.",
       "timelineLeadAllLive": "Bu alandaki her yükümlülük bugün geçerli. Pazara göre değişen şey, her birinin gerektirdiği hazırlık süresi.",
       "marketsLeadTied": "{{count}} pazar bu alana eşit ağırlık veriyor (10 üzerinden {{weight}}). Birden fazlasına satış yapmak, en katısına göre planlamak demektir.",
       "localSourcesNote": "Motor, {{total}} pazarın {{count}} tanesinde bu alan için en az bir yerel kaynak tutuyor. Diğerlerinde AB düzeyindeki araç geçerlidir ve öyle gösterilir.",
