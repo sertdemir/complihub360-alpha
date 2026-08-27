@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
-  Check,
   Store,
   Factory,
   Repeat,
@@ -118,25 +117,51 @@ export function AreaAffected({ slug, eyebrow }: Props) {
                 {t('compliance.area.checkTitle', 'Does this apply to you?')}
               </span>
               <div>
-                {checks.map((c, i) => (
-                  <motion.div
-                    key={c}
-                    initial={reduced ? false : { opacity: 0, y: 8 }}
-                    animate={panelInView || reduced ? { opacity: 1, y: 0 } : {}}
-                    transition={{ duration: 0.3, delay: 0.5 + i * 0.35 }}
-                    className={`flex items-center gap-3 py-3 ${i < checks.length - 1 ? 'border-b border-stroke-subtle' : ''}`}
-                  >
-                    <motion.span
-                      initial={reduced ? false : { scale: 0 }}
-                      animate={panelInView || reduced ? { scale: 1 } : {}}
-                      transition={{ duration: 0.28, delay: 0.62 + i * 0.35, ease: 'backOut' }}
-                      className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand"
+                {checks.map((c, i) => {
+                  // Three beats per row (user ask 2026-08-28): the TEXT lands
+                  // first, then the circle pops in, then the check LINE draws
+                  // itself — the row reads as being ticked right now, not as
+                  // arriving pre-ticked.
+                  const base = 0.4 + i * 0.55;
+                  const run = panelInView || reduced;
+                  return (
+                    <motion.div
+                      key={c}
+                      initial={reduced ? false : { opacity: 0, y: 8 }}
+                      animate={run ? { opacity: 1, y: 0 } : {}}
+                      transition={{ duration: 0.3, delay: base }}
+                      className={`flex items-center gap-3.5 py-3 ${i < checks.length - 1 ? 'border-b border-stroke-subtle' : ''}`}
                     >
-                      <Check size={13} strokeWidth={2.6} className="text-fg-on-brand" aria-hidden />
-                    </motion.span>
-                    <span className="text-body-sm font-semibold text-fg">{c}</span>
-                  </motion.div>
-                ))}
+                      <motion.span
+                        initial={reduced ? false : { scale: 0 }}
+                        animate={run ? { scale: 1 } : {}}
+                        transition={{ duration: 0.28, delay: base + 0.28, ease: 'backOut' }}
+                        className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand"
+                      >
+                        <svg
+                          width="17"
+                          height="17"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2.6}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="text-fg-on-brand"
+                          aria-hidden
+                        >
+                          <motion.path
+                            d="M20 6 9 17l-5-5"
+                            initial={reduced ? false : { pathLength: 0 }}
+                            animate={run ? { pathLength: 1 } : {}}
+                            transition={{ duration: 0.32, delay: base + 0.58, ease: 'easeOut' }}
+                          />
+                        </svg>
+                      </motion.span>
+                      <span className="text-body-sm font-semibold text-fg">{c}</span>
+                    </motion.div>
+                  );
+                })}
               </div>
               <p className="border-t border-stroke-subtle pt-3 text-body-2xs leading-relaxed text-fg-tertiary">
                 {t(
