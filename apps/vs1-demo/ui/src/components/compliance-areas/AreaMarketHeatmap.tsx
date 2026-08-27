@@ -81,7 +81,11 @@ export function AreaMarketHeatmap({ slug, selectedCountry }: Props) {
     .join(' ');
 
   return (
-    <div className="flex flex-col gap-10 desktop-s:flex-row desktop-s:items-center desktop-s:gap-14">
+    // row-reverse on desktop (user ask 2026-08-28): the card stands left and
+    // the copy right, trading places with the thread section above so the
+    // page keeps alternating sides. The DOM order stays copy-first so mobile
+    // leads with the heading.
+    <div className="flex flex-col gap-10 desktop-s:flex-row-reverse desktop-s:items-center desktop-s:gap-14">
       <div className="shrink-0 desktop-s:w-[380px]">
         <AreaSectionHeading
           eyebrow={eyebrows.markets}
