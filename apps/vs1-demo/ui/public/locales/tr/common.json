@@ -372,6 +372,11 @@
       "engage": {
         "title": "Harekete Geçin",
         "body": "Tek bir yapılandırılmış talep gönderin. Onayları ve SLA'ları panelinizden takip edin."
+      },
+      "hubCta": {
+        "title": "Sizin için ne geçerli, görmeye hazır mısınız?",
+        "lead": "Değerlendirme, sekiz alanı işletmenize, pazarlarınıza ve ürününüze göre daraltır — beş dakikadan kısa sürede.",
+        "btn": "Bir değerlendirme başlatın"
       }
     },
     "resourceTeaser": {

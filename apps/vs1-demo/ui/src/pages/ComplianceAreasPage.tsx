@@ -161,9 +161,38 @@ export function ComplianceAreasPage() {
       </Section>
 
       {/* ── How Orchestration Works ───────────────────────────────────── */}
-      <Section className="pb-12">
+      {/* The area pages' closing component in the hub's light dress (canvas
+          "Orchestrierung im Hub" · Variante B "Ohne Gradient", 2026-08-27) —
+          with the CTA row the hub never had: generic wizard entry, since no
+          single area is chosen yet. */}
+      <Section className="py-10 desktop-s:py-12">
         <Container gutter="flat">
-          <HowOrchestrationWorks />
+          <HowOrchestrationWorks
+            cta={
+              <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between md:gap-10">
+                <div className="max-w-[560px]">
+                  <h3 className="font-serif text-[1.375rem] font-bold leading-snug text-fg">
+                    {t('compliance.howItWorks.hubCta.title', 'Ready to see what applies to you?')}
+                  </h3>
+                  <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">
+                    {t(
+                      'compliance.howItWorks.hubCta.lead',
+                      'The assessment narrows the eight areas down to your business, your markets and your product — in under five minutes.',
+                    )}
+                  </p>
+                </div>
+                <Button
+                  size="lg"
+                  variant="primary"
+                  className="shrink-0"
+                  onClick={() => navigate(`${localePrefix}/wizard`)}
+                >
+                  {t('compliance.howItWorks.hubCta.btn', 'Start an assessment')}
+                  <ArrowRight size={17} className="ml-1.5" />
+                </Button>
+              </div>
+            }
+          />
         </Container>
       </Section>
 

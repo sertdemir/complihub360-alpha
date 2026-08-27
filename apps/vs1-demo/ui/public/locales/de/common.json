@@ -372,6 +372,11 @@
       "engage": {
         "title": "Anfragen",
         "body": "Senden Sie eine strukturierte Anfrage. Verfolgen Sie Bestätigungen und SLAs vom Dashboard aus."
+      },
+      "hubCta": {
+        "title": "Bereit zu sehen, was für Sie gilt?",
+        "lead": "Das Assessment grenzt die acht Bereiche auf Ihr Unternehmen, Ihre Märkte und Ihr Produkt ein — in unter fünf Minuten.",
+        "btn": "Ein Assessment starten"
       }
     },
     "resourceTeaser": {

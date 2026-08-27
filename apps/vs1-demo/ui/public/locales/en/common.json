@@ -372,6 +372,11 @@
       "engage": {
         "title": "Engage",
         "body": "Send one structured request. Track confirmations and SLAs from your dashboard."
+      },
+      "hubCta": {
+        "title": "Ready to see what applies to you?",
+        "lead": "The assessment narrows the eight areas down to your business, your markets and your product — in under five minutes.",
+        "btn": "Start an assessment"
       }
     },
     "resourceTeaser": {

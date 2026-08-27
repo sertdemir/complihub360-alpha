@@ -372,6 +372,11 @@
       "engage": {
         "title": "Contratar",
         "body": "Envíe una única solicitud estructurada. Siga confirmaciones y SLA desde su panel."
+      },
+      "hubCta": {
+        "title": "¿Listo para ver qué le aplica?",
+        "lead": "El assessment acota las ocho áreas a su empresa, sus mercados y su producto — en menos de cinco minutos.",
+        "btn": "Iniciar un assessment"
       }
     },
     "resourceTeaser": {

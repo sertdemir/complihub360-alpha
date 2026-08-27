@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Crosshair, ClipboardList, Users, MessageSquare } from 'lucide-react';
 import { Typography } from '../ui/Typography';
+import { SectionEyebrow } from '../providers/SectionHeading';
 
 const STEPS = [
   {
@@ -49,40 +50,49 @@ interface Props {
   tone?: 'default' | 'inverse';
 }
 
+// The default tone is the hub's (its only caller since 2026-08-27, canvas
+// "Orchestrierung im Hub" · Variante B "Ohne Gradient"): no shell around the
+// block, eyebrow + serif header, white step cards with hairline border and a
+// soft shadow, pure brand icon + kicker instead of the petrol icon tile, and
+// the optional CTA row behind a hairline. `inverse` stays exactly the petrol
+// band the area, market and pricing pages close with.
 export function HowOrchestrationWorks({ cta, tone = 'default' }: Props = {}) {
   const { t } = useTranslation('common');
   const dark = tone === 'inverse';
 
   return (
-    <div
-      className={
-        dark ? '' : 'bg-surface-tertiary/40 border border-stroke-subtle rounded-xl p-7 desktop-s:p-10'
-      }
-    >
-      <div className="max-w-2xl mb-8">
-        <Typography
-          variant="caption"
-          className={`font-semibold uppercase tracking-wider mb-2 block ${
-            dark ? 'text-white/70' : 'text-fg-brand'
-          }`}
-        >
-          {t('compliance.howItWorks.overline', 'Orchestration, not directory')}
-        </Typography>
-        <Typography variant="h2" weight="bold" className={dark ? 'text-white' : 'text-fg'}>
-          {t('compliance.howItWorks.title', 'From uncertainty to structured action — in four steps')}
-        </Typography>
-        <Typography
-          variant="body"
-          className={`mt-2 leading-relaxed ${dark ? 'text-primary-100' : 'text-fg-secondary'}`}
-        >
+    <div>
+      <div className="mb-8 max-w-2xl">
+        {dark ? (
+          <Typography
+            variant="caption"
+            className="mb-2 block font-semibold uppercase tracking-wider text-white/70"
+          >
+            {t('compliance.howItWorks.overline', 'Orchestration, not directory')}
+          </Typography>
+        ) : (
+          <SectionEyebrow tone="brand">
+            {t('compliance.howItWorks.overline', 'Orchestration, not directory')}
+          </SectionEyebrow>
+        )}
+        {dark ? (
+          <Typography variant="h2" weight="bold" className="text-white">
+            {t('compliance.howItWorks.title', 'From uncertainty to structured action — in four steps')}
+          </Typography>
+        ) : (
+          <h2 className="mt-2.5 font-serif text-[1.75rem] font-bold leading-tight tracking-tight text-fg lg:text-[2rem]">
+            {t('compliance.howItWorks.title', 'From uncertainty to structured action — in four steps')}
+          </h2>
+        )}
+        <p className={`mt-3 leading-relaxed ${dark ? 'text-body text-primary-100' : 'text-body text-fg-secondary'}`}>
           {t(
             'compliance.howItWorks.body',
             'CompliHub360 controls the engagement funnel and enforces response accountability. You stay in control end-to-end.',
           )}
-        </Typography>
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 tablet:grid-cols-2 desktop-s:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 tablet:grid-cols-2 desktop-s:grid-cols-4">
         {STEPS.map((step, i) => {
           const Icon = step.icon;
           return (
@@ -92,43 +102,55 @@ export function HowOrchestrationWorks({ cta, tone = 'default' }: Props = {}) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.1 }}
-              className={`rounded-xl p-5 desktop-s:p-6 border flex flex-col ${
+              className={`flex flex-col rounded-xl border p-5 desktop-s:p-6 ${
                 dark
-                  ? 'bg-white/[0.04] border-white/[0.14]'
-                  : 'bg-surface border-stroke-subtle shadow-sm'
+                  ? 'border-white/[0.14] bg-white/[0.04]'
+                  : 'border-stroke-subtle bg-surface shadow-[0_18px_44px_-30px_rgba(2,22,17,0.25)] dark:bg-surface-secondary'
               }`}
             >
-              <div className="flex items-center gap-3 mb-4">
-                <div
-                  className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
-                    dark ? 'bg-white/10' : 'bg-primary-500'
-                  }`}
-                >
-                  <Icon size={20} className="text-white" />
-                </div>
+              <div className="mb-3.5 flex items-center gap-3">
+                {dark ? (
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10">
+                    <Icon size={20} className="text-white" />
+                  </div>
+                ) : (
+                  <Icon size={38} strokeWidth={1.6} className="shrink-0 text-fg-brand" aria-hidden />
+                )}
                 <span
-                  className={`text-body-2xs font-bold uppercase tracking-wider tabular-nums ${
+                  className={`text-body-3xs font-bold uppercase tracking-[0.1em] tabular-nums ${
                     dark ? 'text-white/70' : 'text-fg-brand'
                   }`}
                 >
                   {t('compliance.howItWorks.stepLabel', 'Step {{num}}', { num: i + 1 })}
                 </span>
               </div>
-              <Typography variant="h3" weight="bold" className={`mb-2 ${dark ? 'text-white' : 'text-fg'}`}>
-                {t(`compliance.howItWorks.${step.id}.title`, step.titleDefault)}
-              </Typography>
-              <Typography
-                variant="body"
-                className={`leading-relaxed text-body-sm flex-1 ${dark ? 'text-primary-200' : 'text-fg-secondary'}`}
+              {dark ? (
+                <Typography variant="h3" weight="bold" className="mb-2 text-white">
+                  {t(`compliance.howItWorks.${step.id}.title`, step.titleDefault)}
+                </Typography>
+              ) : (
+                <span className="font-serif text-[1.1875rem] font-bold leading-snug text-fg">
+                  {t(`compliance.howItWorks.${step.id}.title`, step.titleDefault)}
+                </span>
+              )}
+              <p
+                className={`flex-1 leading-relaxed ${
+                  dark ? 'text-body-sm text-primary-200' : 'mt-2 text-body-xs text-fg-secondary'
+                }`}
               >
                 {t(`compliance.howItWorks.${step.id}.body`, step.bodyDefault)}
-              </Typography>
+              </p>
             </motion.div>
           );
         })}
       </div>
 
-      {cta && <div className="mt-10">{cta}</div>}
+      {cta &&
+        (dark ? (
+          <div className="mt-10">{cta}</div>
+        ) : (
+          <div className="mt-10 border-t border-stroke-subtle pt-8">{cta}</div>
+        ))}
     </div>
   );
 }
