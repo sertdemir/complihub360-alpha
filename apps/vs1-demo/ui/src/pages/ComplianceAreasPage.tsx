@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { motion, useInView } from 'framer-motion';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import {
   AreaCard,
@@ -68,6 +68,34 @@ export function ComplianceAreasPage() {
   const localePrefix = locale ? `/${locale}` : '';
   const [selectedCountry, setSelectedCountry] = useCountrySelection();
 
+  // The whole page answers to the market, so the picker must stay reachable
+  // after the hero card scrolls away (user ask 2026-08-27): once it leaves the
+  // viewport, a slim bar docks under the fixed header carrying the compact
+  // picker — the AreaSwitcher's mechanics, measured, not guessed.
+  const heroPickerRef = useRef<HTMLDivElement>(null);
+  const [docked, setDocked] = useState(false);
+  const [headerH, setHeaderH] = useState(64);
+
+  useEffect(() => {
+    const header = document.querySelector('header');
+    if (!header) return;
+    const measure = () => setHeaderH(header.getBoundingClientRect().height);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(header);
+    return () => ro.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const el = heroPickerRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setDocked(!e.isIntersecting), {
+      rootMargin: '-90px 0px 0px 0px',
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   useEffect(() => {
     if (location.hash) {
       const id = location.hash.replace('#', '');
@@ -79,6 +107,28 @@ export function ComplianceAreasPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Docked market picker — slides in under the fixed header once the
+          hero's picker card has scrolled away. */}
+      <AnimatePresence>
+        {docked && (
+          <motion.div
+            initial={{ y: -14, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -14, opacity: 0 }}
+            transition={{ duration: 0.22, ease: 'easeOut' }}
+            style={{ top: headerH }}
+            className="fixed inset-x-0 z-40 border-b border-stroke-subtle bg-surface/85 backdrop-blur-md"
+          >
+            <Container gutter="flat" className="flex items-center justify-end gap-3 py-2">
+              <span className="hidden text-body-3xs font-semibold uppercase tracking-wider text-fg-tertiary sm:block">
+                {t('compliance.country.label', 'Your primary market')}
+              </span>
+              <CountrySelector value={selectedCountry} onChange={setSelectedCountry} size="sm" />
+            </Container>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ── HERO on the full-bleed Gradient ──────────────────────────── */}
       {/* (canvas "Compliance-Hub · Hero" · Variante B "Schwebende KPI-Karte",
           2026-08-26): the Gradient carries copy left — serif headline with the
@@ -102,12 +152,16 @@ export function ComplianceAreasPage() {
             </p>
           </Reveal>
 
-          <Reveal
-            delay={0.15}
-            className="w-full shrink-0 rounded-xl bg-surface p-6 shadow-[0_32px_70px_-30px_rgba(2,22,17,0.38)] dark:bg-surface-secondary lg:w-[300px]"
-          >
-            <CountrySelector value={selectedCountry} onChange={setSelectedCountry} />
-          </Reveal>
+          {/* The plain wrapper carries the dock-observer ref — Reveal's own
+              motion div does not forward one. */}
+          <div ref={heroPickerRef} className="w-full shrink-0 lg:w-[300px]">
+            <Reveal
+              delay={0.15}
+              className="rounded-xl bg-surface p-6 shadow-[0_32px_70px_-30px_rgba(2,22,17,0.38)] dark:bg-surface-secondary"
+            >
+              <CountrySelector value={selectedCountry} onChange={setSelectedCountry} />
+            </Reveal>
+          </div>
         </Container>
       </section>
 
