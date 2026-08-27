@@ -3,11 +3,10 @@ import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, ScrollText } from 'lucide-react';
 import { severityFromRiskWeight } from '@complihub/compliance-engine';
-import { Typography } from '../ui/Typography';
 import { RiskBadge } from '../ui/RiskBadge';
 import { DOMAIN_BY_SLUG } from '../../lib/domains';
 import { getAreaObligations, getAreaProfile } from '../../lib/areaProfiles';
-import { SEVERITY_STYLE, SEVERITY_FALLBACK, severityKey } from './severity';
+import { SEVERITY_FALLBACK, severityKey } from './severity';
 import type { AreaMeta } from './areas';
 import type { CountryCode } from './types';
 
@@ -22,6 +21,11 @@ interface Props {
 // detail did not belong in a collapsed panel: it could not be linked, shared,
 // or indexed, and eight of them on one page would have buried it further. It
 // lives on /compliance/<slug> now and this card is the way in.
+//
+// Two-column band since 2026-08-27 (canvas "Die acht Bereiche" · Variante B,
+// on white — the hero above already carries the Gradient): pure brand icon
+// instead of the severity-tinted tile, serif title with the risk badge on one
+// line, "Ideal für" as a gold line instead of a grey chip, hairline foot.
 //
 // What stays on the card is what helps a reader pick: how heavily the selected
 // market weighs the area, how many duties the engine actually carries, and one
@@ -42,7 +46,6 @@ export function AreaCard({ area, index, selectedCountry }: Props) {
       ? profile.marketWeights.reduce((s, m) => s + m.weight, 0) / profile.marketWeights.length
       : (profile.marketWeights.find(m => m.code === selectedCountry)?.weight ?? profile.baselineWeight);
   const severity = severityFromRiskWeight(marketWeight);
-  const style = SEVERITY_STYLE[severity];
 
   const title = t(`compliance.${area.slug}.title`, def?.label ?? area.slug);
   const headline = t(`compliance.${area.slug}.headline`, '');
@@ -58,54 +61,47 @@ export function AreaCard({ area, index, selectedCountry }: Props) {
     >
       <Link
         to={`${localePrefix}/compliance/${area.slug}`}
-        className={`group flex h-full flex-col rounded-xl border-2 bg-surface p-6 shadow-sm transition-shadow hover:shadow-md focus-visible:shadow-md ${style.border}`}
+        className="group flex h-full gap-5 rounded-xl border border-stroke-subtle bg-surface p-7 shadow-[0_18px_44px_-30px_rgba(2,22,17,0.25)] transition-all hover:-translate-y-0.5 hover:shadow-[0_26px_60px_-30px_rgba(2,22,17,0.35)] focus-visible:shadow-lg dark:bg-surface-secondary"
       >
-        <div className="flex items-start gap-4">
-          <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${style.iconBg}`}>
-            <Icon size={22} className={style.iconColor} />
-          </div>
-          <div className="min-w-0 flex-1">
-            <Typography variant="h3" weight="bold" className="text-fg leading-snug">
-              {title}
-            </Typography>
-            <RiskBadge level={severity} size="sm" className="mt-1.5">
+        <Icon size={40} strokeWidth={1.5} className="mt-0.5 shrink-0 text-fg-brand" aria-hidden />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div className="flex items-start justify-between gap-3">
+            <span className="min-w-0 font-serif text-[1.25rem] font-bold leading-snug text-fg">{title}</span>
+            <RiskBadge level={severity} size="sm" className="mt-0.5 shrink-0">
               {t('compliance.riskBadge', {
                 defaultValue: '{{level}} Risk',
                 level: t(severityKey(severity), SEVERITY_FALLBACK[severity]),
               })}
             </RiskBadge>
           </div>
-        </div>
 
-        {headline && (
-          <Typography variant="body" className="mt-4 flex-1 text-sm leading-relaxed text-fg-secondary">
-            {headline}
-          </Typography>
-        )}
+          {headline && <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">{headline}</p>}
 
-        {personaFit && (
-          <span className="mt-3 inline-block self-start rounded-md border border-stroke-subtle bg-brand-light px-2 py-0.5 text-body-3xs font-semibold text-fg-brand">
-            {personaFit}
-          </span>
-        )}
-
-        <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-stroke-subtle pt-4">
-          <span className="inline-flex items-center gap-1.5 text-body-3xs font-semibold text-fg-tertiary">
-            <ScrollText size={12} />
-            {t('compliance.card.obligations', '{{count}} obligations', { count: obligations.length })}
-          </span>
-          {marketSpecific > 0 && selectedCountry !== 'EU' && (
-            <span className="text-body-3xs font-semibold text-fg-brand">
-              {t('compliance.card.marketSpecific', '{{count}} specific to {{market}}', {
-                count: marketSpecific,
-                market: selectedCountry,
-              })}
-            </span>
+          {personaFit && (
+            <p className="mt-2 text-body-2xs font-semibold text-fg-accent-emphasis">{personaFit}</p>
           )}
-          <span className="ml-auto inline-flex items-center gap-1 text-body-3xs font-bold text-fg-brand">
-            {t('compliance.card.open', 'Open area')}
-            <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
-          </span>
+
+          {/* mt-auto keeps the feet of both cards in a row on one line. */}
+          <div className="mt-auto pt-5">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-stroke-subtle pt-3.5">
+              <span className="inline-flex items-center gap-1.5 text-body-3xs font-semibold text-fg-tertiary">
+                <ScrollText size={12} />
+                {t('compliance.card.obligations', '{{count}} obligations', { count: obligations.length })}
+              </span>
+              {marketSpecific > 0 && selectedCountry !== 'EU' && (
+                <span className="text-body-3xs font-semibold text-fg-brand">
+                  {t('compliance.card.marketSpecific', '{{count}} specific to {{market}}', {
+                    count: marketSpecific,
+                    market: selectedCountry,
+                  })}
+                </span>
+              )}
+              <span className="ml-auto inline-flex items-center gap-1 text-body-3xs font-bold text-fg-brand">
+                {t('compliance.card.open', 'Open area')}
+                <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
+              </span>
+            </div>
+          </div>
         </div>
       </Link>
     </motion.div>

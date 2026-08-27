@@ -130,16 +130,21 @@ export function ComplianceAreasPage() {
           logged-out visitors to the dashboard login wall. */}
       <Section id="areas" className="pb-12 pt-14 desktop-s:pt-16">
         <Container gutter="flat">
-          <Typography variant="h2" as="h2" weight="bold" className="text-fg mb-2">
+          {/* Two columns since 2026-08-27 (canvas "Die acht Bereiche" ·
+              Variante B, on white): four across squeezed the long German
+              titles against the icon tiles. Twice the card width gives the
+              serif title, badge and headline one calm line each. */}
+          <SectionEyebrow tone="brand">{t('compliance.areasEyebrow', 'Eight areas, one way in')}</SectionEyebrow>
+          <h2 className="mt-2.5 font-serif text-[1.75rem] font-bold leading-tight tracking-tight text-fg lg:text-[2rem]">
             {t('compliance.areasTitle', 'The eight compliance areas')}
-          </Typography>
-          <Typography variant="body" className="text-fg-secondary mb-8 max-w-2xl">
+          </h2>
+          <p className="mt-3.5 max-w-2xl text-body leading-relaxed text-fg-secondary">
             {t('compliance.areasLead', {
               defaultValue:
                 'Each opens a page with the duties it carries, the statute behind each one, and what it costs to get wrong.',
             })}
-          </Typography>
-          <div className="grid gap-5 tablet:grid-cols-2 desktop-s:grid-cols-4">
+          </p>
+          <div className="mt-9 grid gap-4 tablet:grid-cols-2">
             {AREAS.map((area, i) => (
               <AreaCard key={area.slug} area={area} index={i} selectedCountry={selectedCountry} />
             ))}
