@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { RiskBadge } from '../ui/RiskBadge';
 import { DOMAIN_BY_SLUG } from '../../lib/domains';
@@ -44,29 +46,31 @@ export function hasRelatedAreas(slug: DomainSlug): boolean {
 // the strongest bridge stands as ONE big card with the gold edge and a kicker,
 // whatever the count — one related area reads as deliberate, not as a gap —
 // the runners-up follow as quiet rows, and "all eight areas" closes the column
-// as the standing exit. Every entry now SHOWS its reason: the number of
-// shared triggers, which is the same count the sort runs on.
+// as the standing exit. Every entry SHOWS its reason: the number of shared
+// triggers, which is the same count the sort runs on.
+//
+// Cards left, copy right (user ask 2026-08-28), and the runners-up EXPAND on
+// hover and keyboard focus into the same card state the top one opens with —
+// title, badge, headline, foot — with the atlas's layout spring pulling the
+// neighbours along. The gold edge and the kicker stay the top card's alone:
+// they mark the strongest connection, not the hovered one.
 export function RelatedAreas({ slug }: Props) {
   const { t } = useTranslation('common');
   const eyebrows = useAreaEyebrows();
   const { locale } = useParams();
+  const reduced = useReducedMotion();
   const localePrefix = locale ? `/${locale}` : '';
   const related = relatedTo(slug);
+  const [hovered, setHovered] = useState<DomainSlug | null>(null);
 
   if (related.length === 0) return null;
-  const [top, ...rest] = related;
 
   const areaTitle = (s: DomainSlug) => t(`compliance.${s}.title`, DOMAIN_BY_SLUG[s]?.label ?? s);
   const sharedTriggers = (count: number) =>
     t('compliance.area.sharedTriggers', { defaultValue: '{{count}} shared triggers', count });
 
-  const topMeta = AREAS.find(a => a.slug === top.slug)!;
-  const TopIcon = topMeta.icon;
-  const topSeverity = getAreaProfile(top.slug).severity;
-  const topHeadline = t(`compliance.${top.slug}.headline`, t(`compliance.${top.slug}.description`, ''));
-
   return (
-    <div className="flex flex-col gap-10 desktop-s:flex-row desktop-s:gap-24">
+    <div className="flex flex-col gap-10 desktop-s:flex-row-reverse desktop-s:gap-24">
       <AreaSectionHeading
         className="desktop-s:w-[340px] desktop-s:shrink-0"
         eyebrow={eyebrows.next}
@@ -77,79 +81,97 @@ export function RelatedAreas({ slug }: Props) {
         })}
       />
 
-      <div className="min-w-0 flex-1">
-        {/* The strongest bridge: hub-card anatomy with the gold edge. */}
-        <Link
-          to={`${localePrefix}/compliance/${top.slug}`}
-          className="group flex gap-5 rounded-xl border border-stroke-subtle border-l-[3px] border-l-accent-500 bg-surface p-7 shadow-[0_18px_44px_-30px_rgba(2,22,17,0.25)] transition-all hover:-translate-y-0.5 hover:shadow-[0_26px_60px_-30px_rgba(2,22,17,0.35)] dark:bg-surface-secondary"
-        >
-          <TopIcon size={40} strokeWidth={1.5} className="mt-0.5 shrink-0 text-fg-brand" aria-hidden />
-          <div className="flex min-w-0 flex-1 flex-col">
-            <span className="text-body-4xs font-bold uppercase tracking-[0.12em] text-accent-700 dark:text-fg-accent-strong">
-              {t('compliance.area.relatedStrongest', 'Strongest connection')}
-            </span>
-            <div className="mt-1.5 flex items-start justify-between gap-3">
-              <span className="min-w-0 font-serif text-[1.25rem] font-bold leading-snug text-fg">
-                {areaTitle(top.slug)}
-              </span>
-              <RiskBadge level={topSeverity} size="sm" className="mt-0.5 shrink-0">
-                {t(severityKey(topSeverity), SEVERITY_FALLBACK[topSeverity])}
-              </RiskBadge>
-            </div>
-            {topHeadline && (
-              <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">{topHeadline}</p>
-            )}
-            <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-stroke-subtle pt-3.5">
-              <span className="text-body-3xs font-bold text-fg-brand">{sharedTriggers(top.overlap)}</span>
-              <span className="inline-flex items-center gap-1.5 text-body-3xs font-bold text-fg-brand">
-                {t('compliance.area.relatedOpen', 'Open this area')}
-                <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
-              </span>
-            </div>
-          </div>
-        </Link>
-
-        {/* The runners-up as quiet rows — one to two of them, never a grid. */}
-        {rest.length > 0 && (
-          <ul className="mt-2">
-            {rest.map((r, i) => {
-              const meta = AREAS.find(a => a.slug === r.slug)!;
-              const Icon = meta.icon;
-              return (
-                <li key={r.slug} className={i > 0 ? 'border-t border-stroke-subtle' : ''}>
-                  <Link
-                    to={`${localePrefix}/compliance/${r.slug}`}
-                    className="group flex items-center gap-4 px-1 py-4"
-                  >
+      <div className="flex min-w-0 flex-1 flex-col gap-2.5">
+        {related.map((r, i) => {
+          const isTop = i === 0;
+          const expanded = isTop || hovered === r.slug;
+          const meta = AREAS.find(a => a.slug === r.slug)!;
+          const Icon = meta.icon;
+          const severity = getAreaProfile(r.slug).severity;
+          const headline = t(`compliance.${r.slug}.headline`, t(`compliance.${r.slug}.description`, ''));
+          return (
+            <motion.div key={r.slug} layout transition={{ duration: 0.35, ease: 'easeOut' }}>
+              <Link
+                to={`${localePrefix}/compliance/${r.slug}`}
+                onMouseEnter={() => !isTop && setHovered(r.slug)}
+                onMouseLeave={() => setHovered(v => (v === r.slug ? null : v))}
+                onFocus={() => !isTop && setHovered(r.slug)}
+                onBlur={() => setHovered(v => (v === r.slug ? null : v))}
+                className={
+                  expanded
+                    ? `group flex gap-5 rounded-xl border border-stroke-subtle bg-surface p-7 shadow-[0_18px_44px_-30px_rgba(2,22,17,0.25)] dark:bg-surface-secondary ${
+                        isTop
+                          ? 'border-l-[3px] border-l-accent-500 transition-all hover:-translate-y-0.5 hover:shadow-[0_26px_60px_-30px_rgba(2,22,17,0.35)]'
+                          : ''
+                      }`
+                    : 'group flex items-center gap-4 px-1 py-4'
+                }
+              >
+                {expanded ? (
+                  <>
+                    <Icon size={40} strokeWidth={1.5} className="mt-0.5 shrink-0 text-fg-brand" aria-hidden />
+                    <motion.div
+                      initial={reduced || isTop ? false : { opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.25 }}
+                      className="flex min-w-0 flex-1 flex-col"
+                    >
+                      {isTop && (
+                        <span className="mb-1.5 text-body-4xs font-bold uppercase tracking-[0.12em] text-accent-700 dark:text-fg-accent-strong">
+                          {t('compliance.area.relatedStrongest', 'Strongest connection')}
+                        </span>
+                      )}
+                      <div className="flex items-start justify-between gap-3">
+                        <span className="min-w-0 font-serif text-[1.25rem] font-bold leading-snug text-fg">
+                          {areaTitle(r.slug)}
+                        </span>
+                        <RiskBadge level={severity} size="sm" className="mt-0.5 shrink-0">
+                          {t(severityKey(severity), SEVERITY_FALLBACK[severity])}
+                        </RiskBadge>
+                      </div>
+                      {headline && (
+                        <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">{headline}</p>
+                      )}
+                      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-stroke-subtle pt-3.5">
+                        <span className="text-body-3xs font-bold text-fg-brand">
+                          {sharedTriggers(r.overlap)}
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 text-body-3xs font-bold text-fg-brand">
+                          {t('compliance.area.relatedOpen', 'Open this area')}
+                          <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
+                        </span>
+                      </div>
+                    </motion.div>
+                  </>
+                ) : (
+                  <>
                     <Icon size={22} strokeWidth={1.5} className="shrink-0 text-fg-brand" aria-hidden />
-                    <span className="min-w-0 flex-1 text-body-sm font-bold text-fg transition-colors group-hover:text-fg-brand">
+                    <span className="min-w-0 flex-1 text-body-sm font-bold text-fg">
                       {areaTitle(r.slug)}
                     </span>
                     <span className="shrink-0 text-body-3xs font-semibold text-fg-tertiary">
                       {sharedTriggers(r.overlap)}
                     </span>
-                    <ArrowRight
-                      size={13}
-                      aria-hidden
-                      className="shrink-0 text-fg-tertiary transition-transform group-hover:translate-x-0.5"
-                    />
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+                    <ArrowRight size={13} aria-hidden className="shrink-0 text-fg-tertiary" />
+                  </>
+                )}
+              </Link>
+            </motion.div>
+          );
+        })}
 
         {/* The standing exit: whatever the relatedness holds, the hub is one
             step away — and it is what keeps the one-card state from ending in
             a dead end. */}
-        <Link
-          to={`${localePrefix}/compliance`}
-          className="group mt-2 flex items-center justify-between gap-3 border-t border-stroke-subtle px-1 pt-4 text-body-2xs font-bold text-fg-brand"
-        >
-          {t('compliance.area.allAreasLink', 'All eight areas at a glance')}
-          <ArrowRight size={13} aria-hidden className="transition-transform group-hover:translate-x-0.5" />
-        </Link>
+        <motion.div layout transition={{ duration: 0.35, ease: 'easeOut' }}>
+          <Link
+            to={`${localePrefix}/compliance`}
+            className="group flex items-center justify-between gap-3 border-t border-stroke-subtle px-1 pt-4 text-body-2xs font-bold text-fg-brand"
+          >
+            {t('compliance.area.allAreasLink', 'All eight areas at a glance')}
+            <ArrowRight size={13} aria-hidden className="transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </motion.div>
       </div>
     </div>
   );
