@@ -10,7 +10,6 @@ import {
   CountrySelector,
   HowOrchestrationWorks,
   KPIStrip,
-  ResourceTeaser,
   RiskShowcase,
   useCountrySelection,
 } from '../components/compliance-areas';
@@ -196,12 +195,13 @@ export function ComplianceAreasPage() {
         </Container>
       </Section>
 
-      {/* ── Resource Teaser ───────────────────────────────────────────── */}
-      <Section className="pb-16">
-        <Container gutter="flat">
-          <ResourceTeaser />
-        </Container>
-      </Section>
+      {/* ── Resource Teaser · PAUSED, not deleted ─────────────────────── */}
+      {/* TODO(resources-live): the resources page carries no content yet, so
+          the teaser is out of the flow for now (user decision 2026-08-27).
+          Once the resources page is filled: render <ResourceTeaser /> here
+          again AND cross-link the resources page from the other surfaces
+          where it makes sense (the component stays exported for exactly
+          that moment — do not delete it). */}
 
       {/* ── Final CTA ─────────────────────────────────────────────────── */}
       <section className="py-16 desktop-s:py-24 bg-primary-700">
