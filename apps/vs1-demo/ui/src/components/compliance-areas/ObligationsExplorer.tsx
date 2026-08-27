@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { BusinessModel } from '@complihub/compliance-engine';
-import { FileText } from 'lucide-react';
+import { ChevronRight, FileText } from 'lucide-react';
 import { Typography } from '../ui/Typography';
 import { RiskBadge } from '../ui/RiskBadge';
 import { getAreaObligations, type AreaObligation } from '../../lib/areaProfiles';
+import { useInViewOnce } from '../../lib/useInViewOnce';
 import { AREA_BY_SLUG } from './areas';
 import type { DomainSlug } from '../../lib/domains';
 import { SEVERITY_FALLBACK, SEVERITY_STYLE, severityKey } from './severity';
@@ -37,6 +39,13 @@ const MODEL_FALLBACK: Record<string, string> = {
 // questions a duty is actually judged by — what law, what it costs, how often,
 // and where it applies.
 //
+// In the homepage atlas's dress since 2026-08-28 (user decision — same
+// component language, no new invention): the list is the RAIL, the active row
+// an elevated card with the gold edge, and the detail stands as a dossier card
+// on the Gradient panel, crossfading on every selection. Like the atlas it
+// plays itself through — every few seconds the next duty opens — until a click
+// takes over; reduced motion never auto-advances.
+//
 // The list is plain buttons with aria-pressed, NOT a tablist with roving focus.
 // A tablist is the textbook pattern here and it is also the one that quietly
 // breaks: this repo has twice shipped a green jsdom test asserting a keyboard
@@ -66,8 +75,11 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
     year: 'numeric',
   });
   const AreaIcon = AREA_BY_SLUG[slug]?.icon;
+  const reduced = useReducedMotion();
+  const [ref, inView] = useInViewOnce<HTMLDivElement>('-120px');
   const [validity, setValidity] = useState<'all' | 'now' | 'later'>('all');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [picked, setPicked] = useState(false);
 
   const all = useMemo(() => getAreaObligations(slug, selectedCountry), [slug, selectedCountry]);
 
@@ -104,6 +116,17 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
     setSelectedId(null);
   }, [slug, selectedCountry, validity]);
 
+  // Self-run like the homepage atlas: once in view the next duty opens every
+  // few seconds, until the user takes over by clicking a row or a filter.
+  useEffect(() => {
+    if (!inView || reduced || picked || shown.length < 2 || !selected) return;
+    const id = setTimeout(() => {
+      const idx = shown.findIndex((o) => o.id === selected.id);
+      setSelectedId(shown[(idx + 1) % shown.length].id);
+    }, 6000);
+    return () => clearTimeout(id);
+  }, [inView, reduced, picked, shown, selected]);
+
   const marketLabel =
     selectedCountry === 'EU'
       ? t('compliance.country.euOption', 'EU-wide')
@@ -128,15 +151,35 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
             two dead ones. */}
         {later.length > 0 && liveNow.length > 0 && (
           <div className="flex shrink-0 flex-wrap gap-2">
-            <ValiditySegment selected={validity === 'all'} onClick={() => setValidity('all')}>
+            {/* Touching a filter is taking over, same as clicking a row — the
+                auto-run must not fight a reader who just narrowed the list. */}
+            <ValiditySegment
+              selected={validity === 'all'}
+              onClick={() => {
+                setPicked(true);
+                setValidity('all');
+              }}
+            >
               {t('compliance.area.validityAll', 'All {{count}}', { count: all.length })}
             </ValiditySegment>
-            <ValiditySegment selected={validity === 'now'} onClick={() => setValidity('now')}>
+            <ValiditySegment
+              selected={validity === 'now'}
+              onClick={() => {
+                setPicked(true);
+                setValidity('now');
+              }}
+            >
               {t('compliance.area.validityNow', 'Applies today · {{count}}', {
                 count: liveNow.length,
               })}
             </ValiditySegment>
-            <ValiditySegment selected={validity === 'later'} onClick={() => setValidity('later')}>
+            <ValiditySegment
+              selected={validity === 'later'}
+              onClick={() => {
+                setPicked(true);
+                setValidity('later');
+              }}
+            >
               {laterYear
                 ? t('compliance.area.validityFromYear', 'From {{year}} · {{count}}', {
                     year: laterYear,
@@ -163,73 +206,102 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
           </Typography>
         </div>
       ) : (
-        <div className="mt-8 grid overflow-hidden rounded-xl border border-stroke-subtle bg-surface shadow-lg shadow-neutral-900/[0.06] desktop-s:grid-cols-[minmax(0,20rem)_1fr] desktop-m:grid-cols-[minmax(0,26rem)_1fr]">
-          {/* Master */}
-          <ul className="divide-y divide-stroke-subtle border-b border-stroke-subtle desktop-s:border-b-0 desktop-s:border-r">
+        <div ref={ref} className="mt-10 flex flex-col gap-8 desktop-s:flex-row desktop-s:items-stretch desktop-s:gap-10">
+          {/* Rail — the atlas's list anatomy: quiet rows with hairlines, the
+              active duty as an elevated card with the gold edge. */}
+          <motion.ul
+            className="flex flex-col justify-center gap-1.5 desktop-s:w-[360px] desktop-s:shrink-0"
+            variants={{ show: { transition: { staggerChildren: 0.07 } } }}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: '-80px' }}
+          >
             {shown.map((o) => {
               const active = o.id === selected.id;
               const style = SEVERITY_STYLE[o.severity];
               return (
-                <li key={o.id}>
+                <motion.li
+                  key={o.id}
+                  variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
+                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                >
                   <button
                     type="button"
                     aria-pressed={active}
-                    onClick={() => setSelectedId(o.id)}
-                    // The petrol edge on the selected row is the canvas's own
-                    // marker. Without it the only cue was a pale tint, which
-                    // disappears entirely against the hover state.
-                    className={`flex w-full items-center gap-3.5 border-l-[3px] py-4 pl-[1.1875rem] pr-5 text-left transition-colors ${
+                    onClick={() => {
+                      setPicked(true);
+                      setSelectedId(o.id);
+                    }}
+                    className={
                       active
-                        ? 'border-l-brand bg-brand-light/50'
-                        : 'border-l-transparent hover:bg-surface-secondary'
-                    }`}
+                        ? 'flex w-full items-center gap-3.5 rounded-xl border-l-[3px] border-accent-500 bg-surface px-4 py-4 text-left shadow-[0_20px_50px_-24px_rgba(2,22,17,0.28)] dark:bg-surface-secondary'
+                        : 'flex w-full items-center gap-3.5 border-b border-stroke-subtle px-4 py-3 text-left transition-colors hover:bg-surface-secondary/60'
+                    }
                   >
+                    {/* The severity marker is a mini badge, so it keeps the
+                        warning colours — the doctrine's petrol is for measures. */}
                     <span
                       aria-hidden
                       className={`h-[2.125rem] w-1.5 shrink-0 rounded-full ${style.bar}`}
                     />
-                    <span className="min-w-0 flex-1">
-                      <span
-                        className={`block text-body-sm font-bold leading-snug ${
-                          active ? 'text-fg-brand' : 'text-fg'
-                        }`}
+                    {active ? (
+                      <motion.span
+                        initial={reduced ? false : { opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                        className="block min-w-0 flex-1"
                       >
-                        {o.label}
-                      </span>
-                      {/* Statute AND cadence, as the canvas rows carry. The
-                          statute alone was ambiguous between duties that share
-                          one — and it was being truncated mid-reference, which
-                          is the one part of a row that must never be guessed at. */}
-                      {/* A placeholder must not appear here either — the list
-                          row is the first place a reader meets the source, and
-                          it is the same false citation one line earlier. */}
-                      <span className="mt-1 block text-body-2xs leading-snug text-fg-tertiary">
-                        {o.scope === 'placeholder' ? (
-                          <span className="italic">
-                            {t('compliance.area.fact.noNamedSource', 'No named source yet')}
-                          </span>
-                        ) : (
-                          o.source
-                        )}
-                        {' · '}
-                        {o.appliesFrom && new Date(o.appliesFrom) > new Date()
-                          ? t('compliance.area.fromShort', 'from {{date}}', {
-                              date: shortDate.format(new Date(o.appliesFrom)),
-                            })
-                          : t(`markets.cadence.${o.due}`, { defaultValue: o.due }).toLowerCase()}
-                      </span>
-                    </span>
-                    <RiskBadge level={o.severity} size="sm" className="shrink-0 rounded-full">
-                      {t(severityKey(o.severity), SEVERITY_FALLBACK[o.severity])}
-                    </RiskBadge>
+                        <span className="block text-body-sm font-bold leading-snug text-fg">{o.label}</span>
+                        {/* Statute AND cadence; a placeholder must not appear
+                            here — the row is the first place a reader meets
+                            the source. */}
+                        <span className="mt-1 block text-body-2xs leading-snug text-fg-tertiary">
+                          {o.scope === 'placeholder' ? (
+                            <span className="italic">
+                              {t('compliance.area.fact.noNamedSource', 'No named source yet')}
+                            </span>
+                          ) : (
+                            o.source
+                          )}
+                          {' · '}
+                          {o.appliesFrom && new Date(o.appliesFrom) > new Date()
+                            ? t('compliance.area.fromShort', 'from {{date}}', {
+                                date: shortDate.format(new Date(o.appliesFrom)),
+                              })
+                            : t(`markets.cadence.${o.due}`, { defaultValue: o.due }).toLowerCase()}
+                        </span>
+                      </motion.span>
+                    ) : (
+                      <>
+                        <span className="min-w-0 flex-1 text-body-sm font-semibold leading-snug text-fg-secondary">
+                          {o.label}
+                        </span>
+                        <ChevronRight size={15} className="shrink-0 text-fg-tertiary" aria-hidden />
+                      </>
+                    )}
+                    {active && (
+                      <RiskBadge level={o.severity} size="sm" className="shrink-0 rounded-full">
+                        {t(severityKey(o.severity), SEVERITY_FALLBACK[o.severity])}
+                      </RiskBadge>
+                    )}
                   </button>
-                </li>
+                </motion.li>
               );
             })}
-          </ul>
+          </motion.ul>
 
-          {/* Detail */}
-          <div className="p-6 desktop-s:p-8">
+          {/* Detail — the dossier card standing on the Gradient panel,
+              crossfading on every selection like the atlas. */}
+          <div className="flex min-w-0 flex-1 items-center rounded-xl bg-gradient-stage p-4 sm:p-7">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={selected.id}
+                initial={reduced ? false : { opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduced ? undefined : { opacity: 0, y: -10 }}
+                transition={{ duration: 0.35, ease: 'easeOut' }}
+                className="w-full rounded-[14px] bg-surface p-6 shadow-[0_40px_90px_-30px_rgba(2,22,17,0.4)] dark:bg-surface-secondary sm:p-8"
+              >
             <div className="flex items-start justify-between gap-6">
               <div className="min-w-0">
                 {/* Risk AND when it bites, in one chip. Severity on its own
@@ -278,12 +350,14 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                   puts a drawing here and it is what stops the pane reading as
                   a form. Hidden below desktop, where it would push the prose
                   into a column too narrow to read. */}
+              {/* Brand, not the severity colour: the icon is presentation, the
+                  severity statement is the chip's (colour doctrine 2026-08-27). */}
               {AreaIcon && (
                 <AreaIcon
                   size={64}
                   strokeWidth={1.5}
                   aria-hidden
-                  className={`hidden shrink-0 desktop-s:block ${SEVERITY_STYLE[selected.severity].iconColor}`}
+                  className="hidden shrink-0 text-fg-brand desktop-s:block"
                 />
               )}
             </div>
@@ -369,7 +443,7 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                 href={selected.eurLexUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-5 flex items-center gap-3 rounded-lg bg-surface-secondary px-4 py-3.5 text-body-2xs text-fg-tertiary transition-colors hover:text-fg-brand"
+                className="mt-5 flex items-center gap-3 rounded-lg bg-surface-secondary px-4 py-3.5 text-body-2xs text-fg-tertiary transition-colors hover:text-fg-brand dark:bg-white/[0.04]"
               >
                 <FileText size={15} className="shrink-0" aria-hidden />
                 <span>
@@ -380,6 +454,8 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                 </span>
               </a>
             )}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
       )}

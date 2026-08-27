@@ -259,9 +259,10 @@ export function ComplianceAreaPage() {
       </Section>
 
       {/* ── 3 · Obligations explorer ──────────────────────────────────────── */}
-      {/* Full width, not the old 900px column: the explorer is a master/detail
-          pair now, and a narrow column would put the pane under the list. */}
-      <Section className="bg-surface-secondary py-16 desktop-s:py-20">
+      {/* On white since 2026-08-28: the explorer wears the homepage atlas's
+          dress — rail plus dossier card on the Gradient PANEL — so the grey
+          full-bleed band underneath it retired with the rest of the greys. */}
+      <Section className="py-16 desktop-s:py-20">
         <Container size="xl">
           <ObligationsExplorer slug={area} selectedCountry={selectedCountry} />
         </Container>
