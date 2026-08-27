@@ -305,10 +305,19 @@
   },
   "compliance": {
     "heroOverline": "Áreas de Cumplimiento",
-    "heroTitle": "Encuentra tu desafío regulatorio. Empieza aquí.",
+    "heroTitlePre": "Encuentra tu desafío regulatorio.",
+    "heroTitleGold": "Empieza aquí.",
     "heroBody": "Cada área de cumplimiento es una puerta de entrada a tu evaluación específica. Identifica tu tema, entiende los riesgos y emparéjate con un especialista verificado — todo en menos de 5 minutos.",
     "whoAffected": "A quién afecta",
     "startAssessment": "Iniciar evaluación de {{title}}",
+    "riskPanel": {
+      "eyebrow": "Ponderado por el motor",
+      "title": "Dónde arde primero — calculado para su mercado.",
+      "lead": "El motor de cumplimiento pondera cada área a partir de bases legales, rangos de sanciones y plazos. El ranking muestra qué necesita atención primero; la vista comparativa pone riesgo, plazo de actuación y exposición típica lado a lado.",
+      "marketNote": "Ponderado para {{market}} — el selector de mercado de arriba recalcula ranking y rangos.",
+      "tabRanking": "Ranking de riesgo",
+      "tabTable": "Comparativa"
+    },
     "riskAtGlance": "Riesgo de un vistazo",
     "country": {
       "label": "Su mercado principal",
@@ -321,36 +330,6 @@
       "time": "Evaluación guiada",
       "specialists": "Red de especialistas verificados"
     },
-    "jtbd": {
-      "overline": "Elija su objetivo",
-      "title": "¿Qué progreso desea lograr?",
-      "body": "CompliHub360 le dirige a la herramienta adecuada según la tarea que necesita resolver — no según la función que cree necesitar.",
-      "expand": {
-        "title": "Expandirse con seguridad",
-        "body": "Identifique sus obligaciones antes de entrar en un nuevo mercado.",
-        "cta": "Iniciar evaluación guiada"
-      },
-      "validate": {
-        "title": "Validar el riesgo",
-        "body": "Compruebe si una campaña, un producto o una afirmación cumple la normativa.",
-        "cta": "Ejecutar verificación de riesgo"
-      },
-      "specialist": {
-        "title": "Encontrar especialista",
-        "body": "Reciba la asignación de un experto verificado para su caso.",
-        "cta": "Explorar áreas"
-      },
-      "research": {
-        "title": "Investigar primero",
-        "body": "Lea guías estructuradas antes de contactar con nadie.",
-        "cta": "Abrir biblioteca"
-      },
-      "maintain": {
-        "title": "Mantener el cumplimiento",
-        "body": "Supervise obligaciones, alertas y renovaciones a lo largo del tiempo.",
-        "cta": "Abrir panel"
-      }
-    },
     "specialists": {
       "label": "Especialistas verificados"
     },
@@ -360,7 +339,7 @@
       "hintMarket": "{{market}} pondera estas áreas como se muestra — la más fuerte primero."
     },
     "matrix": {
-      "title": "Comparativa: todas las áreas de un vistazo",
+      "title": "Todas las áreas de un vistazo",
       "body": "Comparación rápida para investigadores y responsables de decisión. Ordene por riesgo para priorizar.",
       "area": "Área de cumplimiento",
       "disclaimer": "Rangos indicativos basados en referencias regulatorias públicas. La exposición final depende de su caso específico — evalúelo con el asistente para obtener una orientación precisa.",
@@ -393,6 +372,11 @@
       "engage": {
         "title": "Contratar",
         "body": "Envíe una única solicitud estructurada. Siga confirmaciones y SLA desde su panel."
+      },
+      "hubCta": {
+        "title": "¿Listo para ver qué le aplica?",
+        "lead": "El assessment acota las ocho áreas a su empresa, sus mercados y su producto — en menos de cinco minutos.",
+        "btn": "Iniciar un assessment"
       }
     },
     "resourceTeaser": {
@@ -412,11 +396,6 @@
         "title": "Tutoriales y guías prácticas",
         "body": "Manuales paso a paso para escenarios de cumplimiento habituales."
       }
-    },
-    "cta": {
-      "title": "¿No estás seguro de qué área aplica?",
-      "body": "Nuestro Asistente hace las preguntas correctas y te dirige automáticamente a la evaluación correcta.",
-      "btn": "Iniciar evaluación general"
     },
     "meta": {
       "title": "Áreas de Cumplimiento · CompliHub360"
@@ -525,6 +504,7 @@
         "authorities": "Organismos de protección del consumidor · Tribunales civiles"
       }
     },
+    "areasEyebrow": "Ocho áreas, una puerta de entrada",
     "areasTitle": "Las ocho áreas de cumplimiento",
     "areasLead": "Cada una abre una página con las obligaciones que conlleva, la norma que hay detrás y lo que cuesta equivocarse.",
     "severity": {

@@ -305,10 +305,19 @@
   },
   "compliance": {
     "heroOverline": "Compliance-Bereiche",
-    "heroTitle": "Finden Sie Ihre regulatorische Herausforderung. Starten Sie hier.",
+    "heroTitlePre": "Finden Sie Ihre regulatorische Herausforderung.",
+    "heroTitleGold": "Starten Sie hier.",
     "heroBody": "Jeder Compliance-Bereich ist ein Einstieg zu Ihrem spezifischen Assessment. Identifizieren Sie Ihr Thema, verstehen Sie die Risiken und werden Sie mit einem verifizierten Spezialisten gematcht – alles in unter 5 Minuten.",
     "whoAffected": "Wer ist betroffen",
     "startAssessment": "{{title}}-Assessment starten",
+    "riskPanel": {
+      "eyebrow": "Von der Engine gewichtet",
+      "title": "Wo es zuerst brennt — für Ihren Markt gerechnet.",
+      "lead": "Die Compliance-Engine gewichtet jeden Bereich aus Rechtsgrundlagen, Bußgeldrahmen und Fristen. Das Ranking zeigt, was zuerst Aufmerksamkeit braucht; die Vergleichsansicht stellt Risiko, Handlungsfrist und typische Exposition nebeneinander.",
+      "marketNote": "Gewichtet für {{market}} — der Markt-Selector oben rechnet Rangfolge und Spannen neu.",
+      "tabRanking": "Risiko-Ranking",
+      "tabTable": "Side-by-side"
+    },
     "riskAtGlance": "Risiko auf einen Blick",
     "country": {
       "label": "Ihr Hauptmarkt",
@@ -321,36 +330,6 @@
       "time": "Geführtes Assessment",
       "specialists": "Verifiziertes Spezialisten-Netzwerk"
     },
-    "jtbd": {
-      "overline": "Wählen Sie Ihr Ziel",
-      "title": "Welchen Fortschritt möchten Sie erzielen?",
-      "body": "CompliHub360 leitet Sie zum richtigen Werkzeug – basierend auf der Aufgabe, die Sie erledigen müssen, nicht auf einem Feature.",
-      "expand": {
-        "title": "Sicher expandieren",
-        "body": "Pflichten identifizieren, bevor Sie einen neuen Markt betreten.",
-        "cta": "Geführtes Assessment starten"
-      },
-      "validate": {
-        "title": "Risiko validieren",
-        "body": "Prüfen, ob eine Kampagne, ein Produkt oder eine Aussage konform ist.",
-        "cta": "Risiko-Check starten"
-      },
-      "specialist": {
-        "title": "Spezialisten finden",
-        "body": "Vermittlung zu einem verifizierten Experten für Ihren Fall.",
-        "cta": "Bereiche durchsehen"
-      },
-      "research": {
-        "title": "Erst recherchieren",
-        "body": "Strukturierte Leitfäden lesen, bevor Sie jemanden kontaktieren.",
-        "cta": "Bibliothek öffnen"
-      },
-      "maintain": {
-        "title": "Compliance aufrechterhalten",
-        "body": "Pflichten, Warnungen und Verlängerungen über Zeit verfolgen.",
-        "cta": "Dashboard öffnen"
-      }
-    },
     "specialists": {
       "label": "Verifizierte Spezialisten"
     },
@@ -360,7 +339,7 @@
       "hintMarket": "{{market}} gewichtet diese Bereiche wie gezeigt — stärkster zuerst."
     },
     "matrix": {
-      "title": "Side-by-side: Alle Bereiche auf einen Blick",
+      "title": "Alle Bereiche auf einen Blick",
       "body": "Schnell-Vergleich für Recherchierende und Entscheider. Nach Risiko sortieren, um zuerst zu triagieren.",
       "area": "Compliance-Bereich",
       "disclaimer": "Indikative Spannen basierend auf öffentlichen regulatorischen Quellen. Die tatsächliche Exposition hängt von Ihrem Fall ab – über den Wizard für genaue Empfehlungen prüfen.",
@@ -393,6 +372,11 @@
       "engage": {
         "title": "Anfragen",
         "body": "Senden Sie eine strukturierte Anfrage. Verfolgen Sie Bestätigungen und SLAs vom Dashboard aus."
+      },
+      "hubCta": {
+        "title": "Bereit zu sehen, was für Sie gilt?",
+        "lead": "Das Assessment grenzt die acht Bereiche auf Ihr Unternehmen, Ihre Märkte und Ihr Produkt ein — in unter fünf Minuten.",
+        "btn": "Ein Assessment starten"
       }
     },
     "resourceTeaser": {
@@ -412,11 +396,6 @@
         "title": "Tutorials & Walkthroughs",
         "body": "Schritt-für-Schritt-Playbooks für gängige Compliance-Szenarien."
       }
-    },
-    "cta": {
-      "title": "Nicht sicher, welcher Bereich zutrifft?",
-      "body": "Unser Assistent stellt die richtigen Fragen und leitet Sie automatisch zum richtigen Assessment weiter.",
-      "btn": "Allgemeines Assessment starten"
     },
     "meta": {
       "title": "Compliance-Bereiche · CompliHub360"
@@ -525,6 +504,7 @@
         "authorities": "Verbraucherschutzstellen · Zivilgerichte"
       }
     },
+    "areasEyebrow": "Acht Bereiche, ein Einstieg",
     "areasTitle": "Die acht Compliance-Bereiche",
     "areasLead": "Jeder öffnet eine Seite mit den Pflichten, die er trägt, der Rechtsgrundlage dahinter und dem, was ein Fehler kostet.",
     "severity": {

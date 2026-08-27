@@ -69,8 +69,10 @@ export function CountrySelector({ value, onChange, size = 'md' }: CountrySelecto
     );
   }
 
+  // Full width since the hero redesign (2026-08-26): the md variant sits inside
+  // the hero's white market card, which owns the width.
   return (
-    <div className="flex w-[240px] flex-col items-stretch">
+    <div className="flex w-full flex-col items-stretch">
       <label
         htmlFor="country-select"
         className="mb-2 font-sans text-caption font-semibold uppercase tracking-wider text-fg-tertiary"

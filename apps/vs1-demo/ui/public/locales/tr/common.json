@@ -305,10 +305,19 @@
   },
   "compliance": {
     "heroOverline": "Uyumluluk Alanları",
-    "heroTitle": "Mevzuat zorluğunuzu bulun. Buradan başlayın.",
+    "heroTitlePre": "Mevzuat zorluğunuzu bulun.",
+    "heroTitleGold": "Buradan başlayın.",
     "heroBody": "Her uyumluluk alanı, spesifik değerlendirmenize açılan bir kapıdır. Konunuzu belirleyin, riskleri anlayın ve doğrulanmış bir uzmanla eşleşin — hepsi 5 dakikadan az sürede.",
     "whoAffected": "Kimler etkilenir",
     "startAssessment": "{{title}} Değerlendirmesini Başlatın",
+    "riskPanel": {
+      "eyebrow": "Motor tarafından ağırlıklandırıldı",
+      "title": "Önce nerede yanıyor — pazarınız için hesaplanmış.",
+      "lead": "Uyum motoru her alanı yasal dayanaklar, ceza aralıkları ve sürelerden ağırlıklandırır. Sıralama önce neyin dikkat gerektirdiğini gösterir; karşılaştırma görünümü risk, harekete geçme süresi ve tipik maruziyeti yan yana koyar.",
+      "marketNote": "{{market}} için ağırlıklandırıldı — üstteki pazar seçici sıralamayı ve aralıkları yeniden hesaplar.",
+      "tabRanking": "Risk sıralaması",
+      "tabTable": "Yan yana"
+    },
     "riskAtGlance": "Riske Kısa Bakış",
     "country": {
       "label": "Ana pazarınız",
@@ -321,36 +330,6 @@
       "time": "Rehberli Değerlendirme",
       "specialists": "Doğrulanmış Uzman Ağı"
     },
-    "jtbd": {
-      "overline": "Hedefinizi seçin",
-      "title": "Hangi ilerlemeyi kaydetmek istiyorsunuz?",
-      "body": "CompliHub360 sizi, ihtiyaç duyduğunuzu düşündüğünüz özelliğe göre değil, tamamlamanız gereken işe göre doğru araca yönlendirir.",
-      "expand": {
-        "title": "Güvenle Büyüyün",
-        "body": "Yeni bir pazara girmeden önce yükümlülüklerinizi belirleyin.",
-        "cta": "Rehberli değerlendirmeyi başlatın"
-      },
-      "validate": {
-        "title": "Riski Doğrulayın",
-        "body": "Bir kampanyanın, ürünün veya iddianın mevzuata uygun olup olmadığını kontrol edin.",
-        "cta": "Risk kontrolü yapın"
-      },
-      "specialist": {
-        "title": "Uzman Bulun",
-        "body": "Vakanız için doğrulanmış bir uzmanla eşleşin.",
-        "cta": "Alanlara göz atın"
-      },
-      "research": {
-        "title": "Önce Araştırın",
-        "body": "Kimseyle iletişime geçmeden önce yapılandırılmış rehberleri okuyun.",
-        "cta": "Kütüphaneyi açın"
-      },
-      "maintain": {
-        "title": "Uyumluluğu Sürdürün",
-        "body": "Yükümlülükleri, uyarıları ve yenilemeleri zaman içinde takip edin.",
-        "cta": "Paneli açın"
-      }
-    },
     "specialists": {
       "label": "Doğrulanmış Uzmanlar"
     },
@@ -360,7 +339,7 @@
       "hintMarket": "{{market}} bu alanları gösterildiği gibi ağırlıklandırır — en güçlüsü önce."
     },
     "matrix": {
-      "title": "Yan yana: tüm alanlar bir bakışta",
+      "title": "Tüm alanlar bir bakışta",
       "body": "Araştırmacılar ve karar vericiler için hızlı karşılaştırma. Önceliklendirmek için riske göre sıralayın.",
       "area": "Uyumluluk Alanı",
       "disclaimer": "Kamuya açık düzenleyici kaynaklara dayanan gösterge niteliğinde aralıklar. Nihai risk, özel durumunuza bağlıdır — kesin yönlendirme için değerlendirmeyi asistan üzerinden yapın.",
@@ -393,6 +372,11 @@
       "engage": {
         "title": "Harekete Geçin",
         "body": "Tek bir yapılandırılmış talep gönderin. Onayları ve SLA'ları panelinizden takip edin."
+      },
+      "hubCta": {
+        "title": "Sizin için ne geçerli, görmeye hazır mısınız?",
+        "lead": "Değerlendirme, sekiz alanı işletmenize, pazarlarınıza ve ürününüze göre daraltır — beş dakikadan kısa sürede.",
+        "btn": "Bir değerlendirme başlatın"
       }
     },
     "resourceTeaser": {
@@ -412,11 +396,6 @@
         "title": "Eğitimler ve Uygulamalı Rehberler",
         "body": "Yaygın uyumluluk senaryoları için adım adım kılavuzlar."
       }
-    },
-    "cta": {
-      "title": "Hangi alanın geçerli olduğundan emin değil misiniz?",
-      "body": "Asistanımız doğru soruları sorar ve sizi otomatik olarak doğru değerlendirmeye yönlendirir.",
-      "btn": "Genel Değerlendirme Başlatın"
     },
     "meta": {
       "title": "Uyum Alanları · CompliHub360"
@@ -525,6 +504,7 @@
         "authorities": "Tüketici koruma kurumları · Hukuk mahkemeleri"
       }
     },
+    "areasEyebrow": "Sekiz alan, tek giriş",
     "areasTitle": "Sekiz uyum alanı",
     "areasLead": "Her biri, taşıdığı yükümlülükleri, arkasındaki mevzuatı ve hata yapmanın bedelini gösteren bir sayfa açar.",
     "severity": {

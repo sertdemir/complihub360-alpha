@@ -305,10 +305,19 @@
   },
   "compliance": {
     "heroOverline": "Compliance Areas",
-    "heroTitle": "Find Your Regulatory Challenge. Start Here.",
+    "heroTitlePre": "Find Your Regulatory Challenge.",
+    "heroTitleGold": "Start Here.",
     "heroBody": "Each compliance area is a gateway to your specific assessment. Identify your topic, understand the risks, and get matched with a verified specialist — all in under 5 minutes.",
     "whoAffected": "Who is affected",
     "startAssessment": "Start {{title}} Assessment",
+    "riskPanel": {
+      "eyebrow": "Weighted by the engine",
+      "title": "Where it burns first — computed for your market.",
+      "lead": "The compliance engine weighs every area from statutes, penalty ranges and deadlines. The ranking shows what needs attention first; the comparison view puts risk, time to act and typical exposure side by side.",
+      "marketNote": "Weighted for {{market}} — the market selector above recalculates ranking and ranges.",
+      "tabRanking": "Risk ranking",
+      "tabTable": "Side-by-side"
+    },
     "riskAtGlance": "Risk at a Glance",
     "country": {
       "label": "Your primary market",
@@ -321,36 +330,6 @@
       "time": "Guided Assessment",
       "specialists": "Verified Specialists Network"
     },
-    "jtbd": {
-      "overline": "Choose your outcome",
-      "title": "What progress are you trying to make?",
-      "body": "CompliHub360 routes you to the right tool based on the job you need done — not the feature you think you need.",
-      "expand": {
-        "title": "Expand Safely",
-        "body": "Identify obligations before entering a new market.",
-        "cta": "Start guided assessment"
-      },
-      "validate": {
-        "title": "Validate Risk",
-        "body": "Check if a campaign, product, or claim is compliant.",
-        "cta": "Run risk check"
-      },
-      "specialist": {
-        "title": "Find Specialist",
-        "body": "Get matched to a verified expert for your case.",
-        "cta": "Browse areas"
-      },
-      "research": {
-        "title": "Research First",
-        "body": "Read structured guides before contacting anyone.",
-        "cta": "Open library"
-      },
-      "maintain": {
-        "title": "Maintain Compliance",
-        "body": "Track obligations, alerts, and renewals over time.",
-        "cta": "Open dashboard"
-      }
-    },
     "specialists": {
       "label": "Verified Specialists"
     },
@@ -360,7 +339,7 @@
       "hintMarket": "{{market}} weights these areas as shown — strongest first."
     },
     "matrix": {
-      "title": "Side-by-side: every area at a glance",
+      "title": "Every area at a glance",
       "body": "Quick-scan comparison for researchers and decision-makers. Sort by risk to triage first.",
       "area": "Compliance Area",
       "disclaimer": "Indicative ranges based on public regulatory references. Final exposure depends on your specific case — assess via the wizard for accurate guidance.",
@@ -393,6 +372,11 @@
       "engage": {
         "title": "Engage",
         "body": "Send one structured request. Track confirmations and SLAs from your dashboard."
+      },
+      "hubCta": {
+        "title": "Ready to see what applies to you?",
+        "lead": "The assessment narrows the eight areas down to your business, your markets and your product — in under five minutes.",
+        "btn": "Start an assessment"
       }
     },
     "resourceTeaser": {
@@ -412,11 +396,6 @@
         "title": "Tutorials & Walkthroughs",
         "body": "Step-by-step playbooks for common compliance scenarios."
       }
-    },
-    "cta": {
-      "title": "Not sure which area applies?",
-      "body": "Our Wizard asks the right questions and routes you to the correct assessment automatically.",
-      "btn": "Start General Assessment"
     },
     "meta": {
       "title": "Compliance areas · CompliHub360"
@@ -525,6 +504,7 @@
         "authorities": "Consumer protection bodies · Civil courts"
       }
     },
+    "areasEyebrow": "Eight areas, one way in",
     "areasTitle": "The eight compliance areas",
     "areasLead": "Each opens a page with the duties it carries, the statute behind each one, and what it costs to get wrong.",
     "severity": {

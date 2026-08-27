@@ -451,3 +451,21 @@ footer[id] {
     transform: translateX(-50%);
   }
 }
+
+/* "Gradient" in leiser Bewegung (Nutzer-Entscheidung 2026-08-27): jede
+   bg-gradient-stage-Fläche ist größer aufgezogen als ihr Kasten und wandert
+   sehr langsam darüber — Atmen, kein Effekt; die Farbwelt und die 165°-
+   Geometrie bleiben exakt die festgelegten. Reduced motion friert das über
+   den globalen Block oben automatisch ein. */
+.bg-gradient-stage {
+  background-size: 180% 180%;
+  animation: gradient-drift 26s ease-in-out infinite alternate;
+}
+@keyframes gradient-drift {
+  from {
+    background-position: 0% 0%;
+  }
+  to {
+    background-position: 100% 100%;
+  }
+}
