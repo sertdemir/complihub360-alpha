@@ -10,7 +10,7 @@ import { DOMAIN_BY_SLUG, type DomainSlug } from '../../lib/domains';
 import { getAreaObligations, getAreaProfile, rankAreasForMarket } from '../../lib/areaProfiles';
 import { useInViewOnce } from '../../lib/useInViewOnce';
 import { AREAS } from './areas';
-import { SEVERITY_STYLE, SEVERITY_FALLBACK, severityKey } from './severity';
+import { SEVERITY_FALLBACK, severityKey } from './severity';
 import type { CountryCode } from './types';
 
 interface Props {
@@ -26,14 +26,19 @@ interface Props {
 // like the homepage atlas: after a few seconds it crossfades to the other
 // view; a click on a tab takes over and stops the auto-run. The bars fill one
 // after another once the panel scrolls into view (user ask 2026-08-27).
-// Severity colors stayed on the bars by design — a petrol-only version washed
-// out against the Gradient panel (user decision 2026-08-27).
+// The bars are petrol in two weights (final user decision 2026-08-27, after
+// seeing both live): the severity statement belongs to the badge alone, the
+// bar only carries intensity — high fuller, medium lighter.
 //
 // Everything shown is derived: order and bar length from rankAreasForMarket,
 // table cells from the area profiles — nothing risk-related is authored here.
 // Copy: compliance.riskPanel.* + the card strings the old panels already had.
 
-const CYCLE_MS = 7000;
+// The demo alternates the two views on its own: the ranking hands over a beat
+// AFTER its last bar has finished filling (fills end ~1.75s after mount), the
+// table gets a longer dwell because it is read, not watched.
+const RANKING_DWELL_MS = 3000;
+const TABLE_DWELL_MS = 4600;
 
 function RankingView({ selectedCountry, run }: Props & { run: boolean }) {
   const { t } = useTranslation('common');
@@ -48,7 +53,6 @@ function RankingView({ selectedCountry, run }: Props & { run: boolean }) {
         const def = DOMAIN_BY_SLUG[r.slug];
         const title = t(`compliance.${r.slug}.title`, def?.label ?? r.slug);
         const severity = severityFromRiskWeight(r.weight);
-        const style = SEVERITY_STYLE[severity];
         return (
           <motion.div
             key={r.slug}
@@ -70,14 +74,14 @@ function RankingView({ selectedCountry, run }: Props & { run: boolean }) {
                 </RiskBadge>
               </div>
             </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-surface-tertiary">
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-brand/10">
               {/* The fills run one after another — each bar waits for the one
                   above it, which is the whole animation (user ask). */}
               <motion.div
                 initial={reduced ? false : { width: 0 }}
                 animate={run || reduced ? { width: `${(r.weight / 10) * 100}%` } : { width: 0 }}
                 transition={{ duration: 0.55, delay: 0.2 + i * 0.14, ease: 'easeOut' }}
-                className={`h-full rounded-full ${style.bar}`}
+                className={`h-full rounded-full ${severity === 'medium' || severity === 'low' ? 'bg-brand/45' : 'bg-brand'}`}
               />
             </div>
           </motion.div>
@@ -183,13 +187,18 @@ export function RiskShowcase({ selectedCountry }: Props) {
   const [tab, setTab] = useState('ranking');
   const [picked, setPicked] = useState(false);
 
-  // Self-run like the homepage atlas: once in view, the panel crossfades to
-  // the other view every few seconds until the user takes over.
+  // Self-run: once in view, the views alternate — the ranking hands over a
+  // beat after its fill animation has finished, the table after its reading
+  // dwell. Picking a tab takes over and stops the auto-run; the bars re-fill
+  // every time the ranking comes back, so the demo keeps playing.
   useEffect(() => {
     if (!inView || reduced || picked) return;
-    const id = setInterval(() => setTab(v => (v === 'ranking' ? 'table' : 'ranking')), CYCLE_MS);
-    return () => clearInterval(id);
-  }, [inView, reduced, picked]);
+    const id = setTimeout(
+      () => setTab(v => (v === 'ranking' ? 'table' : 'ranking')),
+      tab === 'ranking' ? RANKING_DWELL_MS : TABLE_DWELL_MS,
+    );
+    return () => clearTimeout(id);
+  }, [inView, reduced, picked, tab]);
 
   const marketLabel =
     selectedCountry === 'EU'
@@ -217,7 +226,10 @@ export function RiskShowcase({ selectedCountry }: Props) {
         </p>
       </Reveal>
 
-      <Reveal delay={0.12} className="min-w-0 flex-1 rounded-xl bg-gradient-stage p-5 sm:p-8 lg:p-10">
+      {/* Top padding sits a step below the other sides: the tab row carries
+          its own height, so an even inset read as more air above the tabs
+          than below the card (user note 2026-08-27). */}
+      <Reveal delay={0.12} className="min-w-0 flex-1 rounded-xl bg-gradient-stage p-5 pt-4 sm:p-8 sm:pt-5 lg:p-10 lg:pt-6">
         <Tabs
           variant="filled"
           size="md"
@@ -227,7 +239,7 @@ export function RiskShowcase({ selectedCountry }: Props) {
             setTab(v);
           }}
         >
-          <TabList className="mb-5">
+          <TabList className="mb-4">
             <Tab value="ranking">{t('compliance.riskPanel.tabRanking', 'Risk ranking')}</Tab>
             <Tab value="table">{t('compliance.riskPanel.tabTable', 'Side-by-side')}</Tab>
           </TabList>
@@ -242,13 +254,16 @@ export function RiskShowcase({ selectedCountry }: Props) {
             transition={{ duration: 0.32, ease: 'easeOut' }}
             className="rounded-xl bg-surface p-5 shadow-[0_34px_80px_-30px_rgba(2,22,17,0.4)] dark:bg-surface-secondary sm:p-7"
           >
-            <div className="mb-5 flex items-baseline justify-between gap-3 border-b border-stroke-subtle pb-3">
-              <span className="font-serif text-[1.125rem] font-bold text-fg">
+            {/* Title always one line, the engine note directly beneath it —
+                side by side the two made the table view taller than the
+                ranking and the card jumped on every crossfade. */}
+            <div className="mb-4 border-b border-stroke-subtle pb-3">
+              <span className="block font-serif text-[1.125rem] font-bold leading-snug text-fg">
                 {tab === 'ranking'
                   ? t('compliance.riskAtGlance', 'Risk at a Glance')
-                  : t('compliance.matrix.title', 'Side-by-side: every area at a glance')}
+                  : t('compliance.matrix.title', 'Every area at a glance')}
               </span>
-              <span className="text-right text-body-3xs font-semibold text-fg-tertiary">
+              <span className="mt-0.5 block text-body-3xs font-semibold text-fg-tertiary">
                 {t('compliance.risk.subtitle', 'Weighted for {{market}} by the compliance engine.', {
                   market: marketLabel,
                 })}

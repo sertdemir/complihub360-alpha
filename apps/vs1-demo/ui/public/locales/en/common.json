@@ -339,7 +339,7 @@
       "hintMarket": "{{market}} weights these areas as shown — strongest first."
     },
     "matrix": {
-      "title": "Side-by-side: every area at a glance",
+      "title": "Every area at a glance",
       "body": "Quick-scan comparison for researchers and decision-makers. Sort by risk to triage first.",
       "area": "Compliance Area",
       "disclaimer": "Indicative ranges based on public regulatory references. Final exposure depends on your specific case — assess via the wizard for accurate guidance.",

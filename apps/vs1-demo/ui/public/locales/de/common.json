@@ -339,7 +339,7 @@
       "hintMarket": "{{market}} gewichtet diese Bereiche wie gezeigt — stärkster zuerst."
     },
     "matrix": {
-      "title": "Side-by-side: Alle Bereiche auf einen Blick",
+      "title": "Alle Bereiche auf einen Blick",
       "body": "Schnell-Vergleich für Recherchierende und Entscheider. Nach Risiko sortieren, um zuerst zu triagieren.",
       "area": "Compliance-Bereich",
       "disclaimer": "Indikative Spannen basierend auf öffentlichen regulatorischen Quellen. Die tatsächliche Exposition hängt von Ihrem Fall ab – über den Wizard für genaue Empfehlungen prüfen.",

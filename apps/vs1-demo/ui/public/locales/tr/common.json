@@ -339,7 +339,7 @@
       "hintMarket": "{{market}} bu alanları gösterildiği gibi ağırlıklandırır — en güçlüsü önce."
     },
     "matrix": {
-      "title": "Yan yana: tüm alanlar bir bakışta",
+      "title": "Tüm alanlar bir bakışta",
       "body": "Araştırmacılar ve karar vericiler için hızlı karşılaştırma. Önceliklendirmek için riske göre sıralayın.",
       "area": "Uyumluluk Alanı",
       "disclaimer": "Kamuya açık düzenleyici kaynaklara dayanan gösterge niteliğinde aralıklar. Nihai risk, özel durumunuza bağlıdır — kesin yönlendirme için değerlendirmeyi asistan üzerinden yapın.",
