@@ -166,17 +166,19 @@ export function ComplianceAreaPage() {
         onCountryChange={setSelectedCountry}
       />
 
-      {/* ── 1 · Hero ──────────────────────────────────────────────────────── */}
+      {/* ── 1 · Hero on the full-bleed Gradient ───────────────────────────── */}
+      {/* (canvas "Bereichsseiten-Hero" · Variante C "Schwebende Kennzahlen-
+          Karte", 2026-08-28): the Gradient carries copy and the risk dossier
+          card; the metric card floats over the bottom edge right after. */}
       {/* The badge no longer carries the risk claim on its own: the panel on the
           right shows the three numbers it is computed from, so "high" is
           checkable rather than asserted. */}
       {/* The site header is FIXED and the area switcher is sticky underneath it,
-          so the switcher's flow slot sits far above where it is painted. With
-          the old py-14 the first 33px of this section — the back link, and later
-          the risk card's header row — were drawn behind the pinned bar. The top
-          padding clears both: the fixed header (81px at lg since the two site
-          headers were unified on one height) plus the bar's own height. */}
-      <section className="bg-surface pb-14 pt-[7.2rem] desktop-s:pb-20 desktop-s:pt-[9.6rem]">
+          so the switcher's flow slot sits far above where it is painted. The
+          top padding clears both: the fixed header (81px at lg) plus the bar's
+          own height. The bottom padding buys the room the floating metric card
+          pulls itself into (-mt-14). */}
+      <section className="bg-gradient-stage pb-24 pt-[7.2rem] desktop-s:pb-28 desktop-s:pt-[9.6rem]">
         <Container size="xl">
           <div className="grid gap-10 desktop-s:grid-cols-12 desktop-s:gap-14">
             <div className="desktop-s:col-span-7">
@@ -209,25 +211,13 @@ export function ComplianceAreaPage() {
                 </p>
               )}
 
-              <div className="mt-8 flex flex-col gap-3 tablet:flex-row">
+              {/* The "Ask a question" outline that stood here moved out on
+                  2026-08-28: the gold band below is the page's one invitation
+                  to ask, and the hero keeps the one move it opens with. */}
+              <div className="mt-8">
                 <Button size="lg" variant="primary" onClick={startAssessment}>
                   {t('compliance.area.startShort', 'Start the assessment')}
                   <ArrowRight size={17} className="ml-1.5" />
-                </Button>
-                {/* Outline on a white ground, not the filled secondary: next to
-                    the petrol CTA a grey fill reads as a second primary.
-
-                    It used to say "find a specialist" and carry ?domain= to
-                    /search, which reads only ?q= — so it promised a filtered
-                    list of specialists and delivered a free-text box. It now
-                    says what that box is. */}
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="bg-surface"
-                  onClick={() => navigate(`${localePrefix}/search`)}
-                >
-                  {t('compliance.area.askQuestion', 'Ask a question')}
                 </Button>
               </div>
 
@@ -250,11 +240,10 @@ export function ComplianceAreaPage() {
         </Container>
       </section>
 
-      {/* ── 2 · The metric band ───────────────────────────────────────────── */}
-      {/* No Container here: the band is full-bleed and holds its own, so that
-          the grey runs edge to edge while the tiles stay on the page grid.
-          The band also carries its own rules top and bottom, so the hero above
-          it does not need a border of its own. */}
+      {/* ── 2 · The metric card, floating over the Gradient's edge ────────── */}
+      {/* The component carries its own Container and -mt offset, and renders
+          nothing at all when the engine has no figures — so the offset never
+          fires on an empty card. */}
       <AreaMetrics slug={area} selectedCountry={selectedCountry} />
 
       {/* ── 3 · Who this affects ──────────────────────────────────────────── */}

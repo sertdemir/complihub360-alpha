@@ -11,27 +11,28 @@ interface Props {
   selectedCountry: CountryCode;
 }
 
-// ─── The metric band · what there is of this area, in four figures ───────────
+// ─── The metric card · what there is of this area, in four figures ───────────
 // The hero says which area you are on. This says how much of it there is, in
 // the terms a reader actually weighs an area by: how many duties, what the
 // named penalties add up to, how soon the nearest one falls due, and how much
 // of it is not live yet.
 //
-// A BAND, NOT A ROW OF CARDS. That is the canvas's shape and it is also what
-// makes the section survive thin data: the tiles flex, so three fill the width
-// as evenly as four and two as evenly as three. The card grid this replaced
-// had four fixed columns, so an area the engine carries less for — and there
-// are several — rendered its shortfall as an empty grey box. A missing figure
-// should be invisible, not drawn.
+// ONE white card floating over the Gradient hero's bottom edge since
+// 2026-08-28 (canvas "Bereichsseiten-Hero" · Variante C) — the hub's KPI-card
+// move, clamping hero and content together. It replaced the full-bleed grey
+// band; the tiles still FLEX rather than sit in a fixed grid, so three fill
+// the card as evenly as four and a missing figure stays invisible instead of
+// rendering an empty column.
 //
 // Every figure is derived from the same obligations list the explorer renders
-// further down, so the band cannot drift from the section it summarises. None
+// further down, so the card cannot drift from the section it summarises. None
 // of it is authored: no figure here exists unless the engine carries it, and
 // each tile drops out entirely rather than showing a zero.
 //
 // The exposure figure is a SUM OF CEILINGS, not a forecast — the same framing
-// AreaEnforcement uses, for the same reason. It is the one number in the band
-// that carries the risk tone, because it is the one that is a threat.
+// AreaEnforcement uses, for the same reason. It is the one number in the card
+// that carries the risk tone (the color doctrine's "red costs"), because it
+// is the one that is a threat.
 export function AreaMetrics({ slug, selectedCountry }: Props) {
   const { t, i18n } = useTranslation('common');
   const [ref, inView] = useInViewOnce<HTMLDListElement>();
@@ -144,55 +145,28 @@ export function AreaMetrics({ slug, selectedCountry }: Props) {
   if (metrics.length === 0) return null;
 
   return (
-    // TWO ELEMENTS, and the split is the whole point of the shape: the grey
-    // and its two rules belong to the full width of the viewport, the tiles
-    // belong to the page grid. So the band is full-bleed and the Container
-    // inside it puts the columns back on the same axis as every other section.
-    <div className="border-y border-stroke-subtle bg-surface-secondary">
-      <Container size="xl">
-        {/* The negative margin pulls the tiles out to the container's padding
-            edge, so every tile can carry the SAME padding and still leave the
-            first one's text flush with the hero above. Equal padding is what
-            makes the columns equal: with flex-basis 0 the browser divides the
-            FREE space and padding is added on top — one-sided padding on the
-            outer tiles made them 64px narrower than the middle ones.
-
-            The row starts at desktop-m, not tablet. Four tiles need ~263px
-            each for the longest label to stay on one line, so the row needs
-            1055px, so the page needs ~1183. Between 768 and that the columns
-            were 127px wide and every label wrapped — the same defect fixed at
-            desktop width, still live one breakpoint down. Below the row the
-            tiles stack and the hairline turns horizontal. */}
-        <dl ref={ref} className="-mx-[1rem] flex flex-col desktop-m:flex-row">
+    // The component positions itself: the negative margin pulls the card up
+    // over the Gradient hero's bottom edge. When every figure drops out the
+    // component returns null ABOVE, so the offset never fires on nothing and
+    // the next section meets the Gradient edge plainly.
+    <Container size="xl" className="relative z-10 -mt-14">
+      <div className="rounded-xl bg-surface p-7 shadow-[0_34px_80px_-32px_rgba(2,22,17,0.35)] dark:bg-surface-secondary lg:px-8">
+        {/* flex-1 with a zero basis, so any count divides the row evenly —
+            three tiles are three thirds, not three quarters and a gap. The row
+            starts at desktop-m: below it the tiles stack and the hairline
+            turns horizontal. Left-aligned like the hub's KPI card — inside a
+            card the ragged edge reads as typesetting, not as drift. */}
+        <dl ref={ref} className="flex flex-col desktop-m:flex-row">
           {metrics.map((m, i) => (
             <Fragment key={m.key}>
               {i > 0 && (
                 <span
                   aria-hidden
-                  className="h-px w-full shrink-0 bg-stroke-subtle desktop-m:my-7 desktop-m:h-auto desktop-m:w-px"
+                  className="my-5 h-px w-full shrink-0 bg-stroke-subtle desktop-m:mx-6 desktop-m:my-0 desktop-m:h-auto desktop-m:w-px"
                 />
               )}
               <div
-                // flex-1 with a zero basis, so any count divides the row evenly —
-                // three tiles are three thirds, not three quarters and a gap.
-                // 16px a side, not the scale's px-10 — which is 64px in this
-                // config and left 163px of content for a label needing 218, so
-                // every label wrapped at four tiles. The canvas does not wrap
-                // because its band runs the full 1440 and gives each tile ~239px
-                // of content; 16px reaches exactly that inside our narrower
-                // container, with the longest translation (es, 231px) still on one
-                // line. The columns therefore sit closer than the canvas draws
-                // them. That is the half of it worth losing: the hairline does the
-                // separating, and a wrapped label does not.
-                //
-                // Centred, where the canvas sets these flush left. The tiles are
-                // equal and the band is centred on the page — measured, both — but
-                // the three strings in a tile are of very different lengths, so
-                // ragged right edges left every column looking as though it had
-                // been pushed left, most of all the last one. Centring makes each
-                // column symmetric about its own axis and the ragged edge falls to
-                // both sides instead of collecting at the end of the band.
-                className="min-w-0 flex-1 basis-0 px-[1rem] py-8 text-center transition-[opacity,transform] duration-500 ease-out"
+                className="min-w-0 flex-1 basis-0 transition-[opacity,transform] duration-500 ease-out"
                 style={{
                   opacity: inView ? 1 : 0,
                   transform: inView ? 'none' : 'translateY(12px)',
@@ -202,17 +176,17 @@ export function AreaMetrics({ slug, selectedCountry }: Props) {
                 {/* tabular-nums is not decoration here: these sit in a row and a
                     reader compares them across it. */}
                 <dd
-                  className={`font-serif text-[2.5rem] font-semibold leading-none tracking-tight tabular-nums ${m.tone}`}
+                  className={`font-serif text-[1.625rem] font-bold leading-none tracking-tight tabular-nums ${m.tone}`}
                 >
                   {m.value}
                 </dd>
-                <dt className="mt-2 text-body-xs font-semibold text-fg">{m.label}</dt>
+                <dt className="mt-2 text-body-xs font-semibold leading-snug text-fg">{m.label}</dt>
                 <p className="mt-1 text-body-2xs leading-relaxed text-fg-tertiary">{m.note}</p>
               </div>
             </Fragment>
           ))}
         </dl>
-      </Container>
-    </div>
+      </div>
+    </Container>
   );
 }

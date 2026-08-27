@@ -4,7 +4,7 @@ import { severityFromRiskWeight } from '@complihub/compliance-engine';
 import { RiskBadge } from '../ui/RiskBadge';
 import { getMarketProfile, MARKET_CODES } from '../../lib/marketProfiles';
 import { useInViewOnce } from '../../lib/useInViewOnce';
-import { SEVERITY_FALLBACK, SEVERITY_STYLE, severityKey } from './severity';
+import { SEVERITY_FALLBACK, severityKey } from './severity';
 import type { AreaProfile } from '../../lib/areaProfiles';
 import type { CountryCode } from './types';
 
@@ -81,9 +81,13 @@ export function AreaRiskCard({ profile, selectedCountry }: Props) {
   return (
     // rounded-xl, not the canvas's 16px: the card-radius doctrine from #73 owns
     // this, and designSystem.guard.test.ts fails the build on 12px or 16px.
+    // The dossier shadow instead of the hairline border since 2026-08-28: the
+    // card stands on the Gradient hero now (canvas "Bereichsseiten-Hero" · C),
+    // and petrol carries the bars — the severity statement is the badge's,
+    // color-doctrine decision 2026-08-27.
     <div
       ref={ref}
-      className="overflow-hidden rounded-xl border border-stroke-subtle bg-surface shadow-sm"
+      className="overflow-hidden rounded-xl bg-surface shadow-[0_34px_80px_-30px_rgba(2,22,17,0.4)] dark:bg-surface-secondary"
     >
       <div className="flex items-center justify-between border-b border-stroke-subtle px-5 py-4">
         <span className="text-body-3xs font-bold uppercase tracking-[0.14em] text-fg-tertiary">
@@ -94,9 +98,7 @@ export function AreaRiskCard({ profile, selectedCountry }: Props) {
 
       <div className="px-5 pb-5 pt-6">
         <div className="flex items-end gap-3.5">
-          <span
-            className={`font-serif text-[3.5rem] font-semibold leading-[0.9] tracking-tight tabular-nums ${SEVERITY_STYLE[severity].iconColor}`}
-          >
+          <span className="font-serif text-[3.5rem] font-semibold leading-[0.9] tracking-tight tabular-nums text-fg">
             {score.format(weight)}
           </span>
           <span className="pb-2">
@@ -122,9 +124,9 @@ export function AreaRiskCard({ profile, selectedCountry }: Props) {
                 <span>{r.label}</span>
                 <span className="tabular-nums">{whole.format(r.value)} / 10</span>
               </div>
-              <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-surface-tertiary">
+              <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-brand/10">
                 <div
-                  className={`h-full rounded-full transition-[width] duration-700 ease-out ${SEVERITY_STYLE[severity].bar}`}
+                  className="h-full rounded-full bg-brand transition-[width] duration-700 ease-out"
                   style={{
                     width: inView ? `${(r.value / 10) * 100}%` : 0,
                     transitionDelay: `${i * 80}ms`,
@@ -140,7 +142,7 @@ export function AreaRiskCard({ profile, selectedCountry }: Props) {
           comparison, so the bars are scaled to the heaviest market rather than
           to 10 — against a fixed ceiling eight similar markets read as one
           flat block. */}
-      <div className="border-t border-stroke-subtle bg-surface-secondary px-5 pb-4 pt-4">
+      <div className="border-t border-stroke-subtle bg-surface-secondary px-5 pb-4 pt-4 dark:bg-white/[0.04]">
         <span className="text-body-3xs font-bold uppercase tracking-[0.1em] text-fg-tertiary">
           {t('compliance.area.risk.marketsCompared', {
             defaultValue: '{{count}} markets compared',
@@ -159,7 +161,9 @@ export function AreaRiskCard({ profile, selectedCountry }: Props) {
               >
                 <span
                   aria-hidden
-                  className={`w-full rounded-t transition-[height] duration-700 ease-out ${SEVERITY_STYLE[sev].bar} ${current ? '' : 'opacity-60'}`}
+                  className={`w-full rounded-t transition-[height] duration-700 ease-out ${
+                    sev === 'medium' || sev === 'low' ? 'bg-brand/45' : 'bg-brand'
+                  } ${current ? '' : 'opacity-60'}`}
                   style={{ height: inView ? `${Math.round((m.weight / tallest) * 40) + 8}px` : 0 }}
                 />
                 <span
