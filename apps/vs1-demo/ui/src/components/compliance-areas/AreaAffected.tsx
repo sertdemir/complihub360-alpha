@@ -118,10 +118,11 @@ export function AreaAffected({ slug, eyebrow }: Props) {
               </span>
               <div>
                 {checks.map((c, i) => {
-                  // Three beats per row (user ask 2026-08-28): the TEXT lands
-                  // first, then the circle pops in, then the check LINE draws
-                  // itself — the row reads as being ticked right now, not as
-                  // arriving pre-ticked.
+                  // Two beats per row: the TEXT lands first, then the bare
+                  // brand check draws itself LEFT TO RIGHT — the path starts
+                  // at the short stroke and finishes on the long one, the way
+                  // a hand ticks a box (user ask 2026-08-28; the filled
+                  // circle background left with the same note).
                   const base = 0.4 + i * 0.55;
                   const run = panelInView || reduced;
                   return (
@@ -132,32 +133,27 @@ export function AreaAffected({ slug, eyebrow }: Props) {
                       transition={{ duration: 0.3, delay: base }}
                       className={`flex items-center gap-3.5 py-3 ${i < checks.length - 1 ? 'border-b border-stroke-subtle' : ''}`}
                     >
-                      <motion.span
-                        initial={reduced ? false : { scale: 0 }}
-                        animate={run ? { scale: 1 } : {}}
-                        transition={{ duration: 0.28, delay: base + 0.28, ease: 'backOut' }}
-                        className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand"
-                      >
+                      <span className="grid h-8 w-8 shrink-0 place-items-center">
                         <svg
-                          width="17"
-                          height="17"
+                          width="28"
+                          height="28"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
-                          strokeWidth={2.6}
+                          strokeWidth={2.4}
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          className="text-fg-on-brand"
+                          className="text-fg-brand"
                           aria-hidden
                         >
                           <motion.path
-                            d="M20 6 9 17l-5-5"
+                            d="M4 12l5 5L20 6"
                             initial={reduced ? false : { pathLength: 0 }}
                             animate={run ? { pathLength: 1 } : {}}
-                            transition={{ duration: 0.32, delay: base + 0.58, ease: 'easeOut' }}
+                            transition={{ duration: 0.35, delay: base + 0.35, ease: 'easeOut' }}
                           />
                         </svg>
-                      </motion.span>
+                      </span>
                       <span className="text-body-sm font-semibold text-fg">{c}</span>
                     </motion.div>
                   );
