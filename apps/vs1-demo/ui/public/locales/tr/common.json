@@ -397,11 +397,6 @@
         "body": "Yaygın uyumluluk senaryoları için adım adım kılavuzlar."
       }
     },
-    "cta": {
-      "title": "Hangi alanın geçerli olduğundan emin değil misiniz?",
-      "body": "Asistanımız doğru soruları sorar ve sizi otomatik olarak doğru değerlendirmeye yönlendirir.",
-      "btn": "Genel Değerlendirme Başlatın"
-    },
     "meta": {
       "title": "Uyum Alanları · CompliHub360"
     },

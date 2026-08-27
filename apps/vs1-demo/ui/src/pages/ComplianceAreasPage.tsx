@@ -3,7 +3,6 @@ import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, useInView } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import { Typography } from '../components/ui/Typography';
 import {
   AreaCard,
   AREAS,
@@ -203,33 +202,10 @@ export function ComplianceAreasPage() {
           where it makes sense (the component stays exported for exactly
           that moment — do not delete it). */}
 
-      {/* ── Final CTA ─────────────────────────────────────────────────── */}
-      <section className="py-16 desktop-s:py-24 bg-primary-700">
-        <div className="max-w-3xl mx-auto px-6 text-center">
-          <Typography variant="display" as="h2" weight="bold" className="text-white mb-5">
-            {t('compliance.cta.title', 'Not sure which area applies?')}
-          </Typography>
-          <Typography variant="body" className="text-primary-100 mb-10 text-lg">
-            {t(
-              'compliance.cta.body',
-              'Our Wizard asks the right questions and routes you to the correct assessment automatically.',
-            )}
-          </Typography>
-          <div className="flex flex-col tablet:flex-row items-center justify-center gap-3">
-            <Button
-              variant="inverse"
-              size="xl"
-              shape="soft"
-              onClick={() => navigate(`${localePrefix}/wizard`)}
-              className="hover:bg-surface-tertiary transition-colors font-bold"
-            >
-              {t('compliance.cta.btn', 'Start General Assessment')}
-              <ArrowRight size={18} />
-            </Button>
-          </div>
-        </div>
-      </section>
-
+      {/* No page-own closing CTA anymore (user decision 2026-08-27): the dark
+          petrol band duplicated the orchestration section's wizard CTA right
+          above it. The site-wide closer — the monthly-briefing NewsletterBand
+          — is anchored inside SiteFooter and ends this page like every other. */}
       <SiteFooter />
     </div>
   );

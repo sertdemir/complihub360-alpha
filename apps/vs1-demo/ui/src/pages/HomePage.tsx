@@ -51,7 +51,6 @@ import {
   BeyondAssessment,
   HomeFaq,
   EntryDoorDemo,
-  NewsletterBand,
   SiteFooter,
 } from '../components/home';
 
@@ -96,7 +95,8 @@ export function HomePage() {
       <HowItActs />
       <BeyondAssessment />
       <HomeFaq />
-      <NewsletterBand />
+      {/* The NewsletterBand closer lives inside SiteFooter since 2026-08-27 —
+          anchored site-wide, so the homepage no longer renders it itself. */}
       <SiteFooter />
     </main>
   );

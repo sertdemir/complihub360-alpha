@@ -4,11 +4,17 @@ import { Logo } from '../ui/Logo';
 import { supportedLngs } from '../../i18n/config';
 import { DOMAINS } from '../../lib/domains';
 import { Badge } from '../ui/Badge';
+import { NewsletterBand } from './NewsletterBand';
 
 // ─── S10 — Site footer · Figma 1212:11 ──────────────────────────────────────
 // Light four-column footer closing the landing page: brand + positioning, the
 // link columns (with BETA tags), the markets-covered line, the not-a-law-firm
 // disclaimer, and the legal bottom bar. Copy lives in footer.* ('home' ns).
+//
+// The NewsletterBand (the monthly-briefing closer from the homepage) is
+// ANCHORED here since 2026-08-27 (user decision): every page that ends in the
+// footer ends with the briefing hand-off first — one closer for the whole
+// site, no per-page CTA sections to keep in sync.
 
 // href ist OPTIONAL: ein Eintrag ohne Ziel wird als Text gerendert, nicht als
 // Link. Bis 20.08. trugen zehn Eintraege href="#" — sichtbar, klickbar,
@@ -107,7 +113,9 @@ export function SiteFooter() {
   const switchLanguage = (lng: string) => navigate(languagePath(lng));
 
   return (
-    <footer className="border-t border-stroke-subtle bg-surface">
+    <>
+      <NewsletterBand />
+      <footer className="border-t border-stroke-subtle bg-surface">
       <div className="mx-auto w-full max-w-[1440px] px-4 md:px-6 lg:px-6">
         {/* Brand + link columns */}
         <div className="grid gap-10 py-16 lg:grid-cols-12">
@@ -212,6 +220,7 @@ export function SiteFooter() {
           </ul>
         </div>
       </div>
-    </footer>
+      </footer>
+    </>
   );
 }

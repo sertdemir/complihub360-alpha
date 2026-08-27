@@ -397,11 +397,6 @@
         "body": "Step-by-step playbooks for common compliance scenarios."
       }
     },
-    "cta": {
-      "title": "Not sure which area applies?",
-      "body": "Our Wizard asks the right questions and routes you to the correct assessment automatically.",
-      "btn": "Start General Assessment"
-    },
     "meta": {
       "title": "Compliance areas · CompliHub360"
     },
