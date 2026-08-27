@@ -310,6 +310,14 @@
     "heroBody": "Cada área de cumplimiento es una puerta de entrada a tu evaluación específica. Identifica tu tema, entiende los riesgos y emparéjate con un especialista verificado — todo en menos de 5 minutos.",
     "whoAffected": "A quién afecta",
     "startAssessment": "Iniciar evaluación de {{title}}",
+    "riskPanel": {
+      "eyebrow": "Ponderado por el motor",
+      "title": "Dónde arde primero — calculado para su mercado.",
+      "lead": "El motor de cumplimiento pondera cada área a partir de bases legales, rangos de sanciones y plazos. El ranking muestra qué necesita atención primero; la vista comparativa pone riesgo, plazo de actuación y exposición típica lado a lado.",
+      "marketNote": "Ponderado para {{market}} — el selector de mercado de arriba recalcula ranking y rangos.",
+      "tabRanking": "Ranking de riesgo",
+      "tabTable": "Comparativa"
+    },
     "riskAtGlance": "Riesgo de un vistazo",
     "country": {
       "label": "Su mercado principal",

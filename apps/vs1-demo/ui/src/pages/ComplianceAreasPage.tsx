@@ -7,12 +7,11 @@ import { Typography } from '../components/ui/Typography';
 import {
   AreaCard,
   AREAS,
-  ComparisonMatrix,
   CountrySelector,
   HowOrchestrationWorks,
   KPIStrip,
   ResourceTeaser,
-  RiskComparisonGrid,
+  RiskShowcase,
   useCountrySelection,
 } from '../components/compliance-areas';
 import { SiteFooter } from '../components/home';
@@ -152,11 +151,12 @@ export function ComplianceAreasPage() {
         </Container>
       </Section>
 
-      {/* ── Risk-at-a-Glance + Comparison Matrix ──────────────────────── */}
-      <Section className="pb-12">
+      {/* ── Risk showcase: ranking + side-by-side in ONE Gradient panel ── */}
+      {/* (canvas "Risiko und Vergleich" · Variante B, 2026-08-27) — replaces
+          the two stacked white panels. */}
+      <Section className="py-10 desktop-s:py-12">
         <Container gutter="flat">
-          <RiskComparisonGrid selectedCountry={selectedCountry} />
-          <ComparisonMatrix selectedCountry={selectedCountry} />
+          <RiskShowcase selectedCountry={selectedCountry} />
         </Container>
       </Section>
 

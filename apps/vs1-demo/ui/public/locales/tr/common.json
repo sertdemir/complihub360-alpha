@@ -310,6 +310,14 @@
     "heroBody": "Her uyumluluk alanı, spesifik değerlendirmenize açılan bir kapıdır. Konunuzu belirleyin, riskleri anlayın ve doğrulanmış bir uzmanla eşleşin — hepsi 5 dakikadan az sürede.",
     "whoAffected": "Kimler etkilenir",
     "startAssessment": "{{title}} Değerlendirmesini Başlatın",
+    "riskPanel": {
+      "eyebrow": "Motor tarafından ağırlıklandırıldı",
+      "title": "Önce nerede yanıyor — pazarınız için hesaplanmış.",
+      "lead": "Uyum motoru her alanı yasal dayanaklar, ceza aralıkları ve sürelerden ağırlıklandırır. Sıralama önce neyin dikkat gerektirdiğini gösterir; karşılaştırma görünümü risk, harekete geçme süresi ve tipik maruziyeti yan yana koyar.",
+      "marketNote": "{{market}} için ağırlıklandırıldı — üstteki pazar seçici sıralamayı ve aralıkları yeniden hesaplar.",
+      "tabRanking": "Risk sıralaması",
+      "tabTable": "Yan yana"
+    },
     "riskAtGlance": "Riske Kısa Bakış",
     "country": {
       "label": "Ana pazarınız",

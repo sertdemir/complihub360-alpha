@@ -310,6 +310,14 @@
     "heroBody": "Each compliance area is a gateway to your specific assessment. Identify your topic, understand the risks, and get matched with a verified specialist — all in under 5 minutes.",
     "whoAffected": "Who is affected",
     "startAssessment": "Start {{title}} Assessment",
+    "riskPanel": {
+      "eyebrow": "Weighted by the engine",
+      "title": "Where it burns first — computed for your market.",
+      "lead": "The compliance engine weighs every area from statutes, penalty ranges and deadlines. The ranking shows what needs attention first; the comparison view puts risk, time to act and typical exposure side by side.",
+      "marketNote": "Weighted for {{market}} — the market selector above recalculates ranking and ranges.",
+      "tabRanking": "Risk ranking",
+      "tabTable": "Side-by-side"
+    },
     "riskAtGlance": "Risk at a Glance",
     "country": {
       "label": "Your primary market",
