@@ -393,51 +393,42 @@ export function ComplianceAreaPage() {
         </Section>
       )}
 
-      {/* ── 11 · The close · orchestration and the assessment, one band ───── */}
-      {/* One petrol band, not two closing sections. The four steps and the
-          assessment CTA were the same move said twice — how you get from "this
-          applies to me" to a specialist who has answered, and the button that
-          starts it — with the steps in a tinted card directly above the band
-          that repeated their conclusion. Merged, the band explains the path
-          and then offers it, and the page keeps exactly one dark close.
+      {/* ── 11 · The close · the hub's closing component, area content ────── */}
+      {/* The same light orchestration block the hub anchors at its foot (user
+          decision 2026-08-28) — the dark closing band retires with it, and
+          with the enforcement section already in the light the page now ends
+          the way the hub does: white step cards, then the assessment row
+          behind a hairline. What changes against the hub is only the content:
+          the CTA narrows THIS area, and the button carries its name.
 
           The steps come last because they are not about this area: they are
           how any area gets there, so they belong after the area is finished
           being explained. */}
-      <section className="bg-primary-700 py-16 desktop-s:py-20">
+      <Section className="py-10 desktop-s:py-12">
         <Container size="xl">
-          <HowOrchestrationWorks tone="inverse" />
-
-          <div className="mt-[3.5rem] border-t border-white/[0.14] pt-[2.5rem]">
-            <div className="flex flex-col gap-6 desktop-s:flex-row desktop-s:items-center desktop-s:justify-between desktop-s:gap-12">
-              <div className="max-w-[560px]">
-                {/* h3, not the display size it used to carry: the band already
-                    has a headline, and two competing ones read as two
-                    sections that failed to separate. */}
-                <Typography variant="h3" as="h2" weight="bold" className="text-white">
-                  {t('compliance.area.ctaTitle', 'Ready to see what applies to you?')}
-                </Typography>
-                <Typography variant="body" className="mt-2 leading-relaxed text-primary-100">
-                  {t('compliance.area.ctaBody', {
-                    defaultValue:
-                      'The assessment narrows this area to your business, your markets and your product — in under five minutes.',
-                  })}
-                </Typography>
+          <HowOrchestrationWorks
+            cta={
+              <div className="flex flex-col gap-6 desktop-s:flex-row desktop-s:items-center desktop-s:justify-between desktop-s:gap-10">
+                <div className="max-w-[560px]">
+                  <h3 className="font-serif text-[1.375rem] font-bold leading-snug text-fg">
+                    {t('compliance.area.ctaTitle', 'Ready to see what applies to you?')}
+                  </h3>
+                  <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">
+                    {t('compliance.area.ctaBody', {
+                      defaultValue:
+                        'The assessment narrows this area to your business, your markets and your product — in under five minutes.',
+                    })}
+                  </p>
+                </div>
+                <Button size="lg" variant="primary" className="shrink-0" onClick={startAssessment}>
+                  {t('compliance.startAssessment', 'Start {{title}} Assessment', { title })}
+                  <ArrowRight size={17} className="ml-1.5" />
+                </Button>
               </div>
-              <Button
-                variant="inverse"
-                size="xl"
-                shape="soft"
-                className="shrink-0 self-start desktop-s:self-auto"
-                onClick={startAssessment}
-              >
-                {t('compliance.startAssessment', 'Start {{title}} Assessment', { title })}
-                <ArrowRight size={17} className="ml-1.5" />
-              </Button>
-            </div>
-          </div>
+            }
+          />
         </Container>
-      </section>
+      </Section>
 
       <SiteFooter />
     </main>
