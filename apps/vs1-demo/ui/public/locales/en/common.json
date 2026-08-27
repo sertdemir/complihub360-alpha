@@ -434,7 +434,8 @@
         "You sell into more than one country — via marketplace or your own shop",
         "Your foreign revenue is approaching a delivery threshold",
         "You sell digital products or services abroad"
-      ]
+      ],
+      "askPlaceholder": "E.g.: When do I need a VAT registration in France?"
     },
     "product-packaging": {
       "title": "EPR & Packaging",
@@ -470,7 +471,8 @@
         "You sell physical goods with their own packaging",
         "You ship cross-border into EU markets",
         "You sell via direct sale or marketplaces"
-      ]
+      ],
+      "askPlaceholder": "E.g.: Do I need to register for EPR in France?"
     },
     "data-privacy": {
       "title": "Data & Privacy",
@@ -506,7 +508,8 @@
         "You process personal data of EU or UK users",
         "You run cookies, analytics or tracking pixels",
         "Your data flows to processors outside the EU"
-      ]
+      ],
+      "askPlaceholder": "E.g.: Do I need a DPA for my US tracking tool?"
     },
     "marketing-seo": {
       "title": "Marketing Compliance",
@@ -542,7 +545,8 @@
         "You advertise products or services outside your home market",
         "Your advertising carries health, sustainability or comparative claims",
         "You work with influencers or run paid ads"
-      ]
+      ],
+      "askPlaceholder": "E.g.: Am I allowed to advertise as “climate neutral”?"
     },
     "corporate-structure": {
       "title": "Corporate Structure",
@@ -578,7 +582,8 @@
         "You are planning a legal entity in a new market",
         "You employ or recruit people abroad",
         "You need local substance for banks, taxes or platforms"
-      ]
+      ],
+      "askPlaceholder": "E.g.: Do I need a separate company for the UK market?"
     },
     "product-compliance": {
       "title": "Product Compliance",
@@ -614,7 +619,8 @@
         "You manufacture, import or rebrand physical products",
         "Your products need CE marking or safety documentation",
         "You place goods on a new market for the first time"
-      ]
+      ],
+      "askPlaceholder": "E.g.: Which CE documents does my product need in the EU?"
     },
     "logistics-customs": {
       "title": "Logistics & Customs",
@@ -646,7 +652,8 @@
         "You ship goods across a customs border (e.g. UK, CH, US)",
         "Your intra-EU trade passes the reporting thresholds",
         "Your goods need commodity codes and customs declarations"
-      ]
+      ],
+      "askPlaceholder": "E.g.: Do I need an EORI number for imports from Türkiye?"
     },
     "legal-advisory": {
       "title": "Legal Advisory",
@@ -678,7 +685,8 @@
         "You sell to consumers outside your home law",
         "Your terms and withdrawal notices come from a single market",
         "You sign contracts with partners in other jurisdictions"
-      ]
+      ],
+      "askPlaceholder": "E.g.: Does my German withdrawal policy also hold in France?"
     },
     "areasEyebrow": "Eight areas, one way in",
     "areasTitle": "The eight compliance areas",
@@ -819,6 +827,8 @@
       "askTitle": "A specific question about {{area}}?",
       "askLead": "Ask it in your own words and get an answer with its sources named. The assessment below is the longer way round — it maps the whole area to your business instead of answering one question.",
       "askQuestion": "Ask a question",
+      "askEyebrow": "Your question",
+      "askPlaceholder": "Ask your question in your own words",
       "coverageNoteGaps": "{{specific}} of {{count}} duties have a source specific to {{market}}. Of the rest, {{gaps}} have a national text we do not carry yet — the others are EU Regulations, which apply here directly.",
       "checkTitle": "Does this apply to you?",
       "checkFoot": "If one applies, this area carries duties for you — the assessment narrows them to your case."

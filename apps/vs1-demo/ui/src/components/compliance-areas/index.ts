@@ -1,4 +1,5 @@
 export { AreaAffected } from './AreaAffected';
+export { AreaAskBand } from './AreaAskBand';
 export { AreaCard } from './AreaCard';
 export { AreaEnforcement } from './AreaEnforcement';
 export { AreaMarketHeatmap } from './AreaMarketHeatmap';

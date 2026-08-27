@@ -434,7 +434,8 @@
         "Birden fazla ülkeye satıyorsunuz — pazar yeri veya kendi mağazanızla",
         "Yurt dışı cironuz bir teslimat eşiğine yaklaşıyor",
         "Yurt dışına dijital ürün veya hizmet satıyorsunuz"
-      ]
+      ],
+      "askPlaceholder": "Örn.: Fransa’da ne zaman KDV kaydı gerekir?"
     },
     "product-packaging": {
       "title": "EPR ve Ambalaj",
@@ -470,7 +471,8 @@
         "Kendi ambalajıyla fiziksel ürün satıyorsunuz",
         "AB pazarlarına sınır ötesi gönderim yapıyorsunuz",
         "Doğrudan satış veya pazar yerleri üzerinden satıyorsunuz"
-      ]
+      ],
+      "askPlaceholder": "Örn.: Fransa’da EPR kaydı yaptırmam gerekir mi?"
     },
     "data-privacy": {
       "title": "Veri ve Gizlilik",
@@ -506,7 +508,8 @@
         "AB veya BK kullanıcılarının kişisel verilerini işliyorsunuz",
         "Çerez, analitik veya izleme pikselleri kullanıyorsunuz",
         "Verileriniz AB dışındaki hizmet sağlayıcılara akıyor"
-      ]
+      ],
+      "askPlaceholder": "Örn.: ABD merkezli izleme aracım için veri işleme sözleşmesi gerekir mi?"
     },
     "marketing-seo": {
       "title": "Pazarlama Uyumu",
@@ -542,7 +545,8 @@
         "Ürün veya hizmetlerinizi kendi pazarınızın dışında tanıtıyorsunuz",
         "Reklamlarınız sağlık, sürdürülebilirlik veya karşılaştırma iddiaları içeriyor",
         "Influencerlarla çalışıyor veya ücretli reklam veriyorsunuz"
-      ]
+      ],
+      "askPlaceholder": "Örn.: “İklim nötr” ifadesiyle reklam verebilir miyim?"
     },
     "corporate-structure": {
       "title": "Kurumsal Yapı",
@@ -578,7 +582,8 @@
         "Yeni bir pazarda tüzel kişilik planlıyorsunuz",
         "Yurt dışında insan çalıştırıyor veya işe alıyorsunuz",
         "Bankalar, vergiler veya platformlar için yerel substansa ihtiyacınız var"
-      ]
+      ],
+      "askPlaceholder": "Örn.: Birleşik Krallık pazarı için ayrı bir şirket gerekir mi?"
     },
     "product-compliance": {
       "title": "Ürün Uygunluğu",
@@ -614,7 +619,8 @@
         "Fiziksel ürün üretiyor, ithal ediyor veya yeniden markalıyorsunuz",
         "Ürünleriniz CE işareti veya güvenlik dokümantasyonu gerektiriyor",
         "Malları ilk kez yeni bir pazara sürüyorsunuz"
-      ]
+      ],
+      "askPlaceholder": "Örn.: Ürünüm için AB’de hangi CE belgeleri gerekir?"
     },
     "logistics-customs": {
       "title": "Lojistik ve Gümrük",
@@ -646,7 +652,8 @@
         "Malları bir gümrük sınırının ötesine gönderiyorsunuz (ör. BK, CH, ABD)",
         "AB içi ticaretiniz bildirim eşiklerini aşıyor",
         "Mallarınız tarife kodları ve gümrük beyannameleri gerektiriyor"
-      ]
+      ],
+      "askPlaceholder": "Örn.: Türkiye’den ithalat için EORI numarası gerekir mi?"
     },
     "legal-advisory": {
       "title": "Hukuki Danışmanlık",
@@ -678,7 +685,8 @@
         "Kendi hukukunuzun dışındaki tüketicilere satıyorsunuz",
         "Koşullarınız ve cayma bildirimleriniz tek bir pazardan geliyor",
         "Başka yargı bölgelerindeki ortaklarla sözleşme imzalıyorsunuz"
-      ]
+      ],
+      "askPlaceholder": "Örn.: Almanya için hazırlanan cayma politikam Fransa’da da geçerli mi?"
     },
     "areasEyebrow": "Sekiz alan, tek giriş",
     "areasTitle": "Sekiz uyum alanı",
@@ -819,6 +827,8 @@
       "askTitle": "{{area}} hakkında somut bir sorunuz mu var?",
       "askLead": "Kendi cümlelerinizle sorun, kaynakları adıyla belirtilmiş bir yanıt alın. Aşağıdaki değerlendirme daha uzun yol — tek bir soruyu yanıtlamak yerine tüm alanı şirketinize göre haritalar.",
       "askQuestion": "Soru sor",
+      "askEyebrow": "Sorunuz",
+      "askPlaceholder": "Sorunuzu kendi sözcüklerinizle sorun",
       "coverageNoteGaps": "{{count}} yükümlülüğün {{specific}} tanesinin {{market}} için özel bir kaynağı var. Geri kalanların {{gaps}} tanesinin henüz taşımadığımız ulusal bir metni var; diğerleri burada doğrudan uygulanan AB Tüzükleri.",
       "checkTitle": "Bu size uyuyor mu?",
       "checkFoot": "Biri geçerliyse bu alan sizin için yükümlülükler taşır — değerlendirme bunları durumunuza daraltır."

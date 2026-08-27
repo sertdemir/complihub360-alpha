@@ -434,7 +434,8 @@
         "Sie verkaufen in mehr als ein Land — über Marktplatz oder eigenen Shop",
         "Ihr Auslandsumsatz nähert sich einer Lieferschwelle",
         "Sie verkaufen digitale Produkte oder Dienstleistungen ins Ausland"
-      ]
+      ],
+      "askPlaceholder": "Z. B.: Ab wann brauche ich eine USt-Registrierung in Frankreich?"
     },
     "product-packaging": {
       "title": "EPR & Verpackung",
@@ -470,7 +471,8 @@
         "Sie verkaufen physische Waren mit eigener Verpackung",
         "Sie versenden grenzüberschreitend in EU-Märkte",
         "Sie verkaufen über Direktvertrieb oder Marktplätze"
-      ]
+      ],
+      "askPlaceholder": "Z. B.: Muss ich mich in Frankreich für EPR registrieren?"
     },
     "data-privacy": {
       "title": "Daten & Datenschutz",
@@ -506,7 +508,8 @@
         "Sie verarbeiten personenbezogene Daten von EU- oder UK-Nutzern",
         "Sie setzen Cookies, Analytics oder Tracking-Pixel ein",
         "Ihre Daten fließen an Dienstleister außerhalb der EU"
-      ]
+      ],
+      "askPlaceholder": "Z. B.: Brauche ich einen AV-Vertrag für mein US-Tracking-Tool?"
     },
     "marketing-seo": {
       "title": "Marketing-Compliance",
@@ -542,7 +545,8 @@
         "Sie bewerben Produkte oder Dienste außerhalb Ihres Heimatmarkts",
         "Ihre Werbung enthält Gesundheits-, Umwelt- oder Vergleichsaussagen",
         "Sie arbeiten mit Influencern oder schalten Paid Ads"
-      ]
+      ],
+      "askPlaceholder": "Z. B.: Darf ich mit „klimaneutral“ werben?"
     },
     "corporate-structure": {
       "title": "Unternehmensstruktur",
@@ -578,7 +582,8 @@
         "Sie planen eine juristische Einheit in einem neuen Markt",
         "Sie beschäftigen oder rekrutieren Menschen im Ausland",
         "Sie brauchen lokale Substanz für Banken, Steuern oder Plattformen"
-      ]
+      ],
+      "askPlaceholder": "Z. B.: Brauche ich eine eigene Gesellschaft für den UK-Markt?"
     },
     "product-compliance": {
       "title": "Produktkonformität",
@@ -614,7 +619,8 @@
         "Sie stellen physische Produkte her, importieren oder rebranden sie",
         "Ihre Produkte brauchen CE-Kennzeichnung oder Sicherheitsdokumentation",
         "Sie bringen Waren erstmals in einen neuen Markt"
-      ]
+      ],
+      "askPlaceholder": "Z. B.: Welche CE-Dokumente braucht mein Produkt in der EU?"
     },
     "logistics-customs": {
       "title": "Logistik & Zoll",
@@ -646,7 +652,8 @@
         "Sie versenden Waren über eine Zollgrenze (z. B. UK, CH, US)",
         "Ihr EU-Binnenhandel überschreitet die Meldeschwellen",
         "Ihre Waren brauchen Warennummern und Zollanmeldungen"
-      ]
+      ],
+      "askPlaceholder": "Z. B.: Brauche ich eine EORI-Nummer für Importe aus der Türkei?"
     },
     "legal-advisory": {
       "title": "Rechtsberatung",
@@ -678,7 +685,8 @@
         "Sie verkaufen an Verbraucher außerhalb Ihres Heimatrechts",
         "Ihre AGB und Widerrufsbelehrungen stammen aus einem einzigen Markt",
         "Sie schließen Verträge mit Partnern in anderen Jurisdiktionen"
-      ]
+      ],
+      "askPlaceholder": "Z. B.: Gilt mein deutsches Widerrufsrecht auch in Frankreich?"
     },
     "areasEyebrow": "Acht Bereiche, ein Einstieg",
     "areasTitle": "Die acht Compliance-Bereiche",
@@ -819,6 +827,8 @@
       "askTitle": "Eine konkrete Frage zu {{area}}?",
       "askLead": "Stellen Sie sie in eigenen Worten und bekommen Sie eine Antwort mit benannten Quellen. Das Assessment weiter unten ist der längere Weg — es bildet den ganzen Bereich auf Ihr Unternehmen ab, statt eine Frage zu beantworten.",
       "askQuestion": "Frage stellen",
+      "askEyebrow": "Ihre Frage",
+      "askPlaceholder": "Stellen Sie Ihre Frage in eigenen Worten",
       "coverageNoteGaps": "{{specific}} von {{count}} Pflichten haben eine Quelle speziell für {{market}}. Von den übrigen haben {{gaps}} eine nationale Fassung, die wir noch nicht führen — der Rest sind EU-Verordnungen, die hier unmittelbar gelten.",
       "checkTitle": "Trifft das auf Sie zu?",
       "checkFoot": "Trifft eines zu, trägt dieser Bereich Pflichten für Sie — das Assessment grenzt sie auf Ihren Fall ein."

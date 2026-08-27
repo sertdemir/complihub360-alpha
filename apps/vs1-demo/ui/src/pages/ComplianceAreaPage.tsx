@@ -15,6 +15,7 @@ import { getAreaObligations, getAreaProfile, isAreaSlug } from '../lib/areaProfi
 import { useInViewOnce } from '../lib/useInViewOnce';
 import {
   AreaAffected,
+  AreaAskBand,
   AreaEnforcement,
   AreaMetrics,
   AreaRiskCard,
@@ -370,31 +371,12 @@ export function ComplianceAreaPage() {
           The funnel is intact and nothing in it is claimed early: a question
           now, the assessment in the closing band, specialists once there is
           something to introduce. */}
+      {/* Canvas "Frage-Band" · Variante D (2026-08-28): the inflating bubble,
+          the left-aligned invitation and a REAL search field — the fast lane
+          finally looks like one. Lives in AreaAskBand. */}
       <Section className="pb-16 desktop-s:pb-20">
         <Container size="xl">
-          <div className="flex flex-col gap-8 rounded-xl border border-stroke-subtle border-l-[3px] border-l-accent-500 bg-surface-secondary px-10 py-9 desktop-s:flex-row desktop-s:items-center desktop-s:justify-between desktop-s:gap-12">
-            <div className="max-w-[640px]">
-              <Typography variant="h3" as="h2" weight="bold" className="text-fg">
-                {t('compliance.area.askTitle', {
-                  defaultValue: 'A specific question about {{area}}?',
-                  area: title,
-                })}
-              </Typography>
-              <Typography variant="body" className="mt-2.5 leading-relaxed text-fg-secondary">
-                {t('compliance.area.askLead', {
-                  defaultValue:
-                    'Ask it in your own words and get an answer with its sources named. The assessment below is the longer way round — it maps the whole area to your business instead of answering one question.',
-                })}
-              </Typography>
-            </div>
-            <Link
-              to={`${localePrefix}/search`}
-              className="inline-flex h-[3rem] shrink-0 items-center gap-2 self-start rounded-lg bg-primary-700 px-6 text-body-md font-semibold text-white transition-colors hover:bg-primary-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stroke-focus desktop-s:self-auto"
-            >
-              {t('compliance.area.askQuestion', 'Ask a question')}
-              <ArrowRight size={17} strokeWidth={2.2} aria-hidden />
-            </Link>
-          </div>
+          <AreaAskBand slug={area} title={title} />
         </Container>
       </Section>
 
