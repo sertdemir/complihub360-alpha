@@ -407,7 +407,7 @@
       "affected": "Cross-border e-commerce operators selling physical or digital products via marketplaces (Amazon) or independent shops (Shopify).",
       "personaFit": "Best for: Cross-border e-commerce",
       "cov1": "Dedicated Tax & VAT Wizard — captures sales model, legal seat, revenue, and target markets",
-      "cov2": "Calculates precise vat_likelihood per jurisdiction",
+      "cov2": "VAT liability per market – calculates how likely your setup needs to register there",
       "cov3": "Orchestrates matching to specialized VAT consultants by case complexity",
       "fines": {
         "authorities": "BZSt · HMRC · IRS · AEAT · Agenzia Entrate"
@@ -443,8 +443,8 @@
       "affected": "E-commerce merchants, manufacturers, resellers, and dropshippers selling physical goods with packaging across borders.",
       "personaFit": "Best for: Manufacturers & resellers",
       "cov1": "EPR & Packaging Wizard — assesses commercial role, target markets, product categories",
-      "cov2": "Calculates epr_required_likelihood per jurisdiction",
-      "cov3": "Intelligent edge-case handling: \"Assume Yes\" safety logic for uncertain dropshippers",
+      "cov2": "Producer responsibility per market – calculates how likely you are EPR-liable",
+      "cov3": "Edge cases with safety-first logic – in doubt a duty is assumed, not defined away",
       "fines": {
         "authorities": "ZSVR · ADEME · CONAI · Environment Agency"
       },
@@ -479,7 +479,7 @@
       "affected": "Software founders, SaaS expansion managers, and businesses collecting personal data or using tracking tools while expanding globally.",
       "personaFit": "Best for: SaaS & data-driven brands",
       "cov1": "Data & Privacy Wizard — analyzes target customers, processing locations, tracking stack",
-      "cov2": "Calculates privacy_risk_level based on actual tool exposure",
+      "cov2": "Risk level from tool exposure – rated on the services you actually use",
       "cov3": "Platform itself uses a local PII Redaction Pipeline — zero raw data in AI layer",
       "fines": {
         "authorities": "BfDI · CNIL · ICO · Garante · AEPD · EDÖB"
@@ -515,7 +515,7 @@
       "affected": "Agencies, e-commerce brands, supplement & health vendors, financial-services marketers, and any business running paid ads or organic SEO across borders.",
       "personaFit": "Best for: Agencies & DTC brands",
       "cov1": "Marketing Compliance Wizard — captures industry sensitivity, claim types, channels",
-      "cov2": "Calculates marketing_risk_level + flags high-risk claim patterns",
+      "cov2": "Marketing risk level – high-risk claim patterns get flagged",
       "cov3": "Routes to specialists in advertising law and consumer protection",
       "fines": {
         "authorities": "Wettbewerbszentrale · DGCCRF · ASA · AGCM · FTC"
@@ -551,7 +551,7 @@
       "affected": "Individuals or companies planning to register legal entities, expand teams, or establish corporate presence in foreign markets.",
       "personaFit": "Best for: International expansion teams",
       "cov1": "Corporate & Structure Wizard — evaluates current status, desired markets, team complexity",
-      "cov2": "Determines entity_need_level per jurisdiction",
+      "cov2": "Entity need per market – determines whether your setup requires its own company",
       "cov3": "Intelligent routing to educational guide paths for uncertain founders",
       "fines": {
         "authorities": "Local commercial registries · Tax authorities · AML supervisors"

@@ -407,7 +407,7 @@
       "affected": "Operadores de comercio electrónico transfronterizo que venden productos físicos o digitales a través de marketplaces (Amazon) o tiendas independientes (Shopify).",
       "personaFit": "Ideal para: e-commerce transfronterizo",
       "cov1": "Asistente dedicado de Impuestos e IVA — captura modelo de ventas, sede legal, ingresos y mercados objetivo",
-      "cov2": "Calcula la vat_likelihood precisa por jurisdicción",
+      "cov2": "Obligación de IVA por mercado – calcula la probabilidad de que su configuración deba registrarse allí",
       "cov3": "Orquesta el emparejamiento con consultores especializados en IVA según la complejidad del caso",
       "fines": {
         "authorities": "BZSt · HMRC · IRS · AEAT · Agenzia Entrate"
@@ -443,8 +443,8 @@
       "affected": "Comerciantes de e-commerce, fabricantes, revendedores y dropshippers que venden bienes físicos con embalaje a través de fronteras.",
       "personaFit": "Ideal para: fabricantes y revendedores",
       "cov1": "Asistente de EPR y envases — evalúa rol comercial, mercados objetivo, categorías de producto",
-      "cov2": "Calcula la epr_required_likelihood por jurisdicción",
-      "cov3": "Manejo inteligente de casos extremos: lógica de seguridad «Asumir Sí» para dropshippers inciertos",
+      "cov2": "Responsabilidad de productor por mercado – calcula la probabilidad de que esté sujeto a RAP",
+      "cov3": "Casos límite con lógica de seguridad – en caso de duda se asume una obligación, no se descarta",
       "fines": {
         "authorities": "ZSVR · ADEME · CONAI · Environment Agency"
       },
@@ -479,7 +479,7 @@
       "affected": "Fundadores de software, gerentes de expansión de SaaS y empresas que recopilan datos personales o utilizan herramientas de seguimiento durante su expansión global.",
       "personaFit": "Ideal para: SaaS y marcas orientadas a datos",
       "cov1": "Asistente de Datos y Privacidad — analiza clientes objetivo, ubicaciones de procesamiento, stack de seguimiento",
-      "cov2": "Calcula el privacy_risk_level basado en la exposición real de herramientas",
+      "cov2": "Nivel de riesgo según sus herramientas – evaluado por los servicios que realmente usa",
       "cov3": "La propia plataforma usa un Pipeline local de redacción de PII — cero datos en bruto en la capa de IA",
       "fines": {
         "authorities": "BfDI · CNIL · ICO · Garante · AEPD · EDÖB"
@@ -515,7 +515,7 @@
       "affected": "Agencias, marcas de e-commerce, vendedores de suplementos y productos de salud, comercializadores de servicios financieros y cualquier negocio con publicidad de pago o SEO orgánico transfronterizo.",
       "personaFit": "Ideal para: agencias y marcas DTC",
       "cov1": "Asistente de Compliance de marketing — captura la sensibilidad del sector, los tipos de afirmaciones y los canales",
-      "cov2": "Calcula marketing_risk_level y señala patrones de afirmaciones de alto riesgo",
+      "cov2": "Nivel de riesgo de marketing – se marcan los patrones de afirmaciones de alto riesgo",
       "cov3": "Le dirige a especialistas en derecho publicitario y protección del consumidor",
       "fines": {
         "authorities": "Wettbewerbszentrale · DGCCRF · ASA · AGCM · FTC"
@@ -551,7 +551,7 @@
       "affected": "Personas o empresas que planean registrar entidades legales, expandir equipos o establecer presencia corporativa en mercados extranjeros.",
       "personaFit": "Ideal para: equipos de expansión internacional",
       "cov1": "Asistente Corporativo y de Estructura — evalúa el estado actual, mercados deseados, complejidad del equipo",
-      "cov2": "Determina el entity_need_level por jurisdicción",
+      "cov2": "Necesidad de entidad por mercado – determina si su configuración requiere una sociedad propia",
       "cov3": "Enrutamiento inteligente a rutas de guías educativas para fundadores indecisos",
       "fines": {
         "authorities": "Registros mercantiles locales · Autoridades fiscales · Supervisores AML"

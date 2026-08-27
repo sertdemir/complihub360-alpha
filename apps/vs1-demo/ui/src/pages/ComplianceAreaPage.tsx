@@ -296,53 +296,59 @@ export function ComplianceAreaPage() {
       </Section>
 
       {/* ── 8 · How CompliHub360 gets there ───────────────────────────────── */}
-      {/* Three numbered cards, which is the canvas's shape and a better fit for
-          this content than the checklist it replaces: each item is a step in
-          how the engine reaches an answer, and a tick implies a feature that
-          is simply present. HowOrchestrationWorks came out with the checklist —
-          the canvas has no four-step funnel here, and that block already sits
-          on the areas hub one level up, where generic product messaging
-          belongs. Repeating it under every area page was the same argument
-          made eight times. */}
+      {/* Editorial rows, no cards (canvas "Ablauf" · Variante B, 2026-08-28):
+          after three sections of panels and cards in a row, this one goes
+          quiet — heading left, three flat numbered rows right with hairlines
+          between them. The content is three sentences about the product; it
+          supports the page, it is not its substance, and a third card stage
+          would have claimed otherwise. */}
       {coverage.length > 0 && (
         <Section className="py-16 desktop-s:py-20">
           <Container size="xl">
-            <AreaSectionHeading
-              className="max-w-[620px]"
-              eyebrow={eyebrows.process}
-              title={t('compliance.area.coversTitle', 'How CompliHub360 gets there')}
-            />
-            <ol className="mt-10 grid gap-6 tablet:grid-cols-3">
-              {coverage.map((c, i) => {
-                // The engine's copy is one sentence per step. Where it carries
-                // its own break — a dash or a colon — the first clause is the
-                // step's name and the rest explains it, which is how the canvas
-                // sets these. Where it does not, the sentence is the name and
-                // the card simply has no second line. Nothing is invented to
-                // fill one.
-                const m = c.match(/^(.{3,60}?)\s*(?:[–—]|:)\s+(.+)$/);
-                // The clause after the dash starts mid-sentence in the source
-                // string ("… assistant – assesses trading role"). Standing on
-                // its own line it is a sentence, so it gets a capital.
-                const [name, body] = m
-                  ? [m[1], m[2].charAt(0).toLocaleUpperCase(i18n.language) + m[2].slice(1)]
-                  : [c, null];
-                return (
-                  <li
-                    key={c}
-                    className="rounded-xl border border-stroke-subtle p-7"
-                  >
-                    <span className="font-serif text-h3 font-semibold tabular-nums text-fg-brand">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <p className="mt-3.5 text-body font-bold leading-snug text-fg">{name}</p>
-                    {body && (
-                      <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">{body}</p>
-                    )}
-                  </li>
-                );
-              })}
-            </ol>
+            <div className="flex flex-col gap-10 desktop-s:flex-row desktop-s:gap-24">
+              <AreaSectionHeading
+                className="desktop-s:w-[340px] desktop-s:shrink-0"
+                eyebrow={eyebrows.process}
+                title={t('compliance.area.coversTitle', 'How CompliHub360 gets there')}
+              />
+              <ol className="min-w-0 flex-1">
+                {coverage.map((c, i) => {
+                  // The engine's copy is one sentence per step. Where it
+                  // carries its own break — a dash or a colon — the first
+                  // clause is the step's name and the rest explains it. Where
+                  // it does not, the sentence is the name and the row simply
+                  // has no second line. Nothing is invented to fill one.
+                  const m = c.match(/^(.{3,60}?)\s*(?:[–—]|:)\s+(.+)$/);
+                  // The clause after the dash starts mid-sentence in the
+                  // source string ("… assistant – assesses trading role").
+                  // Standing on its own line it is a sentence, so it gets a
+                  // capital.
+                  const [name, body] = m
+                    ? [m[1], m[2].charAt(0).toLocaleUpperCase(i18n.language) + m[2].slice(1)]
+                    : [c, null];
+                  return (
+                    <li
+                      key={c}
+                      className={`flex gap-7 py-6 last:pb-0 ${
+                        i > 0 ? 'border-t border-stroke-subtle' : 'pt-0 desktop-s:pt-1'
+                      }`}
+                    >
+                      <span className="w-14 shrink-0 font-serif text-[1.875rem] font-bold leading-none tabular-nums text-fg-brand">
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="text-body font-bold leading-snug text-fg">{name}</p>
+                        {body && (
+                          <p className="mt-1.5 max-w-[560px] text-body-sm leading-relaxed text-fg-secondary">
+                            {body}
+                          </p>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
           </Container>
         </Section>
       )}

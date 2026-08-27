@@ -407,7 +407,7 @@
       "affected": "Grenzüberschreitende E-Commerce-Betreiber, die physische oder digitale Produkte über Marktplätze (Amazon) oder unabhängige Shops (Shopify) verkaufen.",
       "personaFit": "Ideal für: Cross-Border E-Commerce",
       "cov1": "Dedizierter Steuer & USt-Assistent – erfasst Vertriebsmodell, Rechtssitz, Umsatz und Zielmärkte",
-      "cov2": "Berechnet präzise vat_likelihood pro Jurisdiktion",
+      "cov2": "USt-Pflicht je Markt – berechnet, wie wahrscheinlich Ihr Setup dort registrierungspflichtig ist",
       "cov3": "Orchestriert Matching mit spezialisierten Umsatzsteuerberatern nach Fallkomplexität",
       "fines": {
         "authorities": "BZSt · HMRC · IRS · AEAT · Agenzia Entrate"
@@ -443,8 +443,8 @@
       "affected": "E-Commerce-Händler, Hersteller, Wiederverkäufer und Dropshipper, die physische Waren mit Verpackung grenzüberschreitend verkaufen.",
       "personaFit": "Ideal für: Hersteller & Reseller",
       "cov1": "Produkt- & Verpackungsassistent – bewertet Handelsrolle, Zielmärkte, Produktkategorien",
-      "cov2": "Berechnet epr_required_likelihood pro Jurisdiktion",
-      "cov3": "Intelligente Randfall-Behandlung: „Annehme Ja“-Sicherheitslogik für unsichere Dropshipper",
+      "cov2": "Herstellerverantwortung je Markt – berechnet, wie wahrscheinlich Sie EPR-pflichtig sind",
+      "cov3": "Randfälle mit Sicherheitslogik – im Zweifel wird eine Pflicht angenommen, nicht wegdefiniert",
       "fines": {
         "authorities": "ZSVR · ADEME · CONAI · Environment Agency"
       },
@@ -479,7 +479,7 @@
       "affected": "Software-Gründer, SaaS-Expansionsmanager und Unternehmen, die personenbezogene Daten sammeln oder Tracking-Tools bei der globalen Expansion nutzen.",
       "personaFit": "Ideal für: SaaS & datengetriebene Marken",
       "cov1": "Daten- & Datenschutzassistent – analysiert Zielkunden, Verarbeitungsstandorte, Tracking-Stack",
-      "cov2": "Berechnet privacy_risk_level basierend auf tatsächlicher Tool-Exposition",
+      "cov2": "Risikostufe aus der Tool-Exposition – eingestuft nach den Diensten, die Sie tatsächlich einsetzen",
       "cov3": "Plattform selbst verwendet eine lokale PII-Schwärzungs-Pipeline – keine Rohdaten in der KI-Schicht",
       "fines": {
         "authorities": "BfDI · CNIL · ICO · Garante · AEPD · EDÖB"
@@ -515,7 +515,7 @@
       "affected": "Agenturen, E-Commerce-Marken, Nahrungsergänzungs- & Gesundheitsanbieter, Finanzdienstleister-Marketer und alle Unternehmen mit grenzüberschreitendem SEO oder Paid Ads.",
       "personaFit": "Ideal für: Agenturen & DTC-Marken",
       "cov1": "Marketing-Compliance-Assistent – erfasst Branchensensibilität, Aussagentypen, Kanäle",
-      "cov2": "Berechnet marketing_risk_level + markiert Hochrisiko-Aussagenmuster",
+      "cov2": "Risikostufe fürs Marketing – Hochrisiko-Aussagenmuster werden markiert",
       "cov3": "Routet zu Spezialisten in Werberecht und Verbraucherschutz",
       "fines": {
         "authorities": "Wettbewerbszentrale · DGCCRF · ASA · AGCM · FTC"
@@ -551,7 +551,7 @@
       "affected": "Einzelpersonen oder Unternehmen, die juristische Einheiten registrieren, Teams erweitern oder Unternehmenspräsenz in ausländischen Märkten aufbauen möchten.",
       "personaFit": "Ideal für: Internationale Expansionsteams",
       "cov1": "Unternehmens- & Strukturassistent – bewertet aktuellen Status, gewünschte Märkte, Team-Komplexität",
-      "cov2": "Bestimmt entity_need_level pro Jurisdiktion",
+      "cov2": "Strukturbedarf je Markt – bestimmt, ob Ihr Setup eine eigene Gesellschaft braucht",
       "cov3": "Intelligente Weiterleitung zu Bildungsleitfaden-Pfaden für unsichere Gründer",
       "fines": {
         "authorities": "Lokale Handelsregister · Finanzbehörden · Geldwäsche-Aufseher"

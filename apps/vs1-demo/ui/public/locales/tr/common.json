@@ -407,7 +407,7 @@
       "affected": "Pazar yerleri (Amazon) veya bağımsız mağazalar (Shopify) aracılığıyla fiziksel veya dijital ürünler satan sınır ötesi e-ticaret operatörleri.",
       "personaFit": "En uygun: Sınır ötesi e-ticaret",
       "cov1": "Özel Vergi ve KDV Asistanı — satış modelini, hukuki yeri, geliri ve hedef pazarları yakalar",
-      "cov2": "Yargı bölgesi başına hassas vat_likelihood hesaplar",
+      "cov2": "Pazar başına KDV yükümlülüğü – kurulumunuzun orada kayıt gerektirme olasılığını hesaplar",
       "cov3": "Vaka karmaşıklığına göre uzman KDV danışmanlarıyla eşleştirmeyi düzenler",
       "fines": {
         "authorities": "BZSt · HMRC · IRS · AEAT · Agenzia Entrate"
@@ -443,8 +443,8 @@
       "affected": "Sınırlar ötesinde ambalajlı fiziksel ürünler satan e-ticaret satıcıları, üreticiler, yeniden satıcılar ve dropshipper'lar.",
       "personaFit": "En uygun: Üreticiler ve satıcılar",
       "cov1": "EPR ve Ambalaj Asistanı — ticari rolü, hedef pazarları, ürün kategorilerini değerlendirir",
-      "cov2": "Yargı bölgesi başına epr_required_likelihood hesaplar",
-      "cov3": "Akıllı uç durum yönetimi: Belirsiz dropshipper'lar için «Evet Varsay» güvenlik mantığı",
+      "cov2": "Pazar başına üretici sorumluluğu – EPR yükümlüsü olma olasılığınızı hesaplar",
+      "cov3": "Sınır durumlarında güvenlik mantığı – şüphede yükümlülük varsayılır, göz ardı edilmez",
       "fines": {
         "authorities": "ZSVR · ADEME · CONAI · Environment Agency"
       },
@@ -479,7 +479,7 @@
       "affected": "Küresel genişleme sürecinde kişisel veri toplayan veya izleme araçları kullanan yazılım kurucuları, SaaS genişleme yöneticileri ve işletmeler.",
       "personaFit": "En uygun: SaaS ve veri odaklı markalar",
       "cov1": "Veri ve Gizlilik Asistanı — hedef müşterileri, işleme konumlarını, izleme yığınını analiz eder",
-      "cov2": "Gerçek araç maruziyetine dayalı privacy_risk_level hesaplar",
+      "cov2": "Araç kullanımına göre risk seviyesi – gerçekten kullandığınız servislere göre derecelendirilir",
       "cov3": "Platform yerel bir PII Düzeltme Hattı kullanır — YZ katmanında ham veri yok",
       "fines": {
         "authorities": "BfDI · CNIL · ICO · Garante · AEPD · EDÖB"
@@ -515,7 +515,7 @@
       "affected": "Ajanslar, e-ticaret markaları, takviye ve sağlık ürünü satıcıları, finansal hizmet pazarlamacıları ve sınır ötesinde ücretli reklam veya organik SEO yürüten tüm işletmeler.",
       "personaFit": "En uygun: Ajanslar ve DTC markaları",
       "cov1": "Pazarlama Uyumu Asistanı — sektör hassasiyetini, iddia türlerini ve kanalları kaydeder",
-      "cov2": "marketing_risk_level değerini hesaplar ve yüksek riskli iddia kalıplarını işaretler",
+      "cov2": "Pazarlama risk seviyesi – yüksek riskli iddia kalıpları işaretlenir",
       "cov3": "Sizi reklam hukuku ve tüketicinin korunması alanındaki uzmanlara yönlendirir",
       "fines": {
         "authorities": "Wettbewerbszentrale · DGCCRF · ASA · AGCM · FTC"
@@ -551,7 +551,7 @@
       "affected": "Yabancı pazarlarda hukuki kuruluşlar kaydetmeyi, ekipleri genişletmeyi veya kurumsal varlık oluşturmayı planlayan bireyler veya şirketler.",
       "personaFit": "En uygun: Uluslararası büyüme ekipleri",
       "cov1": "Kurumsal ve Yapı Asistanı — mevcut durumu, istenen pazarları, ekip karmaşıklığını değerlendirir",
-      "cov2": "Yargı bölgesi başına entity_need_level belirler",
+      "cov2": "Pazar başına şirket ihtiyacı – kurulumunuzun kendi şirketini gerektirip gerektirmediğini belirler",
       "cov3": "Belirsiz kurucular için eğitim rehberi yollarına akıllı yönlendirme",
       "fines": {
         "authorities": "Yerel ticaret sicilleri · Vergi otoriteleri · AML denetçileri"
