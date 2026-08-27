@@ -411,7 +411,30 @@
       "cov3": "Vaka karmaşıklığına göre uzman KDV danışmanlarıyla eşleştirmeyi düzenler",
       "fines": {
         "authorities": "BZSt · HMRC · IRS · AEAT · Agenzia Entrate"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Pazar yeri satıcıları",
+          "line": "Amazon ve benzeri üzerinden aynı anda birden çok ülkeye satar"
+        },
+        {
+          "name": "Mağaza işletmecileri",
+          "line": "kendi mağazasından (ör. Shopify) sınır ötesine gönderir"
+        },
+        {
+          "name": "Dijital sağlayıcılar",
+          "line": "kendi vergi kurallarını taşıyan dijital ürünler satar"
+        },
+        {
+          "name": "Sınır ötesi tüccarlar",
+          "line": "teslimat eşiklerini aşarak yeni vergi yükümlülüklerine girer"
+        }
+      ],
+      "affectedChecks": [
+        "Birden fazla ülkeye satıyorsunuz — pazar yeri veya kendi mağazanızla",
+        "Yurt dışı cironuz bir teslimat eşiğine yaklaşıyor",
+        "Yurt dışına dijital ürün veya hizmet satıyorsunuz"
+      ]
     },
     "product-packaging": {
       "title": "EPR ve Ambalaj",
@@ -424,7 +447,30 @@
       "cov3": "Akıllı uç durum yönetimi: Belirsiz dropshipper'lar için «Evet Varsay» güvenlik mantığı",
       "fines": {
         "authorities": "ZSVR · ADEME · CONAI · Environment Agency"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "E-ticaret satıcıları",
+          "line": "ambalajlı fiziksel ürünleri sınır ötesine satar"
+        },
+        {
+          "name": "Üreticiler",
+          "line": "ambalajlı ürünleri bir pazara ilk kez sürer"
+        },
+        {
+          "name": "Yeniden satıcılar",
+          "line": "ithalatta üretici yükümlülüklerini devralır"
+        },
+        {
+          "name": "Dropshipperlar",
+          "line": "çoğu zaman farkında olmadan ilk piyasaya süren sayılır"
+        }
+      ],
+      "affectedChecks": [
+        "Kendi ambalajıyla fiziksel ürün satıyorsunuz",
+        "AB pazarlarına sınır ötesi gönderim yapıyorsunuz",
+        "Doğrudan satış veya pazar yerleri üzerinden satıyorsunuz"
+      ]
     },
     "data-privacy": {
       "title": "Veri ve Gizlilik",
@@ -437,7 +483,30 @@
       "cov3": "Platform yerel bir PII Düzeltme Hattı kullanır — YZ katmanında ham veri yok",
       "fines": {
         "authorities": "BfDI · CNIL · ICO · Garante · AEPD · EDÖB"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Yazılım kurucuları",
+          "line": "kişisel veri işleyen ürünler geliştirir"
+        },
+        {
+          "name": "SaaS ekipleri",
+          "line": "bir veri ürünüyle yeni pazarlara açılır"
+        },
+        {
+          "name": "Veri toplayıcılar",
+          "line": "form, hesap veya CRM ile müşteri verisi toplar"
+        },
+        {
+          "name": "Takip kullanıcıları",
+          "line": "sayfalarında çerez ve izleme araçları çalıştırır"
+        }
+      ],
+      "affectedChecks": [
+        "AB veya BK kullanıcılarının kişisel verilerini işliyorsunuz",
+        "Çerez, analitik veya izleme pikselleri kullanıyorsunuz",
+        "Verileriniz AB dışındaki hizmet sağlayıcılara akıyor"
+      ]
     },
     "marketing-seo": {
       "title": "Pazarlama Uyumu",
@@ -450,7 +519,30 @@
       "cov3": "Sizi reklam hukuku ve tüketicinin korunması alanındaki uzmanlara yönlendirir",
       "fines": {
         "authorities": "Wettbewerbszentrale · DGCCRF · ASA · AGCM · FTC"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Ajanslar",
+          "line": "müşterilerinin kampanyalarından sınırlar ötesinde sorumludur"
+        },
+        {
+          "name": "E-ticaret markaları",
+          "line": "birden çok pazarda ürün iddialarıyla reklam verir"
+        },
+        {
+          "name": "Sağlık ve finans sağlayıcıları",
+          "line": "katı reklam kuralları olan sektörlerde çalışır"
+        },
+        {
+          "name": "SEO ve reklam operatörleri",
+          "line": "yurt dışında ücretli reklam verir veya organik sıralanır"
+        }
+      ],
+      "affectedChecks": [
+        "Ürün veya hizmetlerinizi kendi pazarınızın dışında tanıtıyorsunuz",
+        "Reklamlarınız sağlık, sürdürülebilirlik veya karşılaştırma iddiaları içeriyor",
+        "Influencerlarla çalışıyor veya ücretli reklam veriyorsunuz"
+      ]
     },
     "corporate-structure": {
       "title": "Kurumsal Yapı",
@@ -463,7 +555,30 @@
       "cov3": "Belirsiz kurucular için eğitim rehberi yollarına akıllı yönlendirme",
       "fines": {
         "authorities": "Yerel ticaret sicilleri · Vergi otoriteleri · AML denetçileri"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Kurucular",
+          "line": "yurt dışında ilk kez bir tüzel kişilik kaydeder"
+        },
+        {
+          "name": "Genişleme ekipleri",
+          "line": "yeni pazarlarda ekip ve varlık kurar"
+        },
+        {
+          "name": "Yerleşik şirketler",
+          "line": "yeni yargı bölgeleri için hukuki form ve substans seçer"
+        },
+        {
+          "name": "Uzaktan işverenler",
+          "line": "sınırlar ötesinde çalışan istihdam eder"
+        }
+      ],
+      "affectedChecks": [
+        "Yeni bir pazarda tüzel kişilik planlıyorsunuz",
+        "Yurt dışında insan çalıştırıyor veya işe alıyorsunuz",
+        "Bankalar, vergiler veya platformlar için yerel substansa ihtiyacınız var"
+      ]
     },
     "product-compliance": {
       "title": "Ürün Uygunluğu",
@@ -476,7 +591,30 @@
       "cov3": "Uygunluk değerlendirmesi ve CE dokümantasyonu uzmanlarına yönlendirir",
       "fines": {
         "authorities": "Piyasa gözetim otoriteleri · Gümrük · Tüketici koruma kurumları"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Üreticiler",
+          "line": "kendi fiziksel ürünlerini piyasaya sürer"
+        },
+        {
+          "name": "İthalatçılar",
+          "line": "malları dışarıdan hedef pazara getirir"
+        },
+        {
+          "name": "Özel markalı satıcılar",
+          "line": "üçüncü taraf ürünleri kendi adıyla satar"
+        },
+        {
+          "name": "Online satıcılar",
+          "line": "pazarda başka bir aktör yoksa uygunluktan sorumludur"
+        }
+      ],
+      "affectedChecks": [
+        "Fiziksel ürün üretiyor, ithal ediyor veya yeniden markalıyorsunuz",
+        "Ürünleriniz CE işareti veya güvenlik dokümantasyonu gerektiriyor",
+        "Malları ilk kez yeni bir pazara sürüyorsunuz"
+      ]
     },
     "logistics-customs": {
       "title": "Lojistik ve Gümrük",
@@ -489,7 +627,26 @@
       "cov3": "Gümrük müşavirlerine ve dış ticaret uzmanlarına yönlendirir",
       "fines": {
         "authorities": "Gümrük otoriteleri · Ulusal istatistik kurumları"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Gönderiler",
+          "line": "fiziksel malları gümrük sınırlarının ötesine taşır"
+        },
+        {
+          "name": "İthalatçı ve ihracatçılar",
+          "line": "EORI, tarife sınıflandırması ve gümrük beyannameleri gerektirir"
+        },
+        {
+          "name": "AB içi tüccarlar",
+          "line": "Intrastat bildirim eşiklerini aşar"
+        }
+      ],
+      "affectedChecks": [
+        "Malları bir gümrük sınırının ötesine gönderiyorsunuz (ör. BK, CH, ABD)",
+        "AB içi ticaretiniz bildirim eşiklerini aşıyor",
+        "Mallarınız tarife kodları ve gümrük beyannameleri gerektiriyor"
+      ]
     },
     "legal-advisory": {
       "title": "Hukuki Danışmanlık",
@@ -502,7 +659,26 @@
       "cov3": "İlgili yargı bölgesindeki yetkili avukatlara yönlendirir — CompliHub360 hukuki danışmanlık vermez",
       "fines": {
         "authorities": "Tüketici koruma kurumları · Hukuk mahkemeleri"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Tüketiciye satanlar",
+          "line": "yabancı hukuka tabi pazarlarda tüketicilere satar"
+        },
+        {
+          "name": "Sözleşme tarafları",
+          "line": "yurt dışındaki tedarikçi veya ortaklarla sözleşme yapar"
+        },
+        {
+          "name": "Platform satıcıları",
+          "line": "hedef pazarda geçerli olacak koşullara ihtiyaç duyar"
+        }
+      ],
+      "affectedChecks": [
+        "Kendi hukukunuzun dışındaki tüketicilere satıyorsunuz",
+        "Koşullarınız ve cayma bildirimleriniz tek bir pazardan geliyor",
+        "Başka yargı bölgelerindeki ortaklarla sözleşme imzalıyorsunuz"
+      ]
     },
     "areasEyebrow": "Sekiz alan, tek giriş",
     "areasTitle": "Sekiz uyum alanı",
@@ -637,7 +813,9 @@
       "askTitle": "{{area}} hakkında somut bir sorunuz mu var?",
       "askLead": "Kendi cümlelerinizle sorun, kaynakları adıyla belirtilmiş bir yanıt alın. Aşağıdaki değerlendirme daha uzun yol — tek bir soruyu yanıtlamak yerine tüm alanı şirketinize göre haritalar.",
       "askQuestion": "Soru sor",
-      "coverageNoteGaps": "{{count}} yükümlülüğün {{specific}} tanesinin {{market}} için özel bir kaynağı var. Geri kalanların {{gaps}} tanesinin henüz taşımadığımız ulusal bir metni var; diğerleri burada doğrudan uygulanan AB Tüzükleri."
+      "coverageNoteGaps": "{{count}} yükümlülüğün {{specific}} tanesinin {{market}} için özel bir kaynağı var. Geri kalanların {{gaps}} tanesinin henüz taşımadığımız ulusal bir metni var; diğerleri burada doğrudan uygulanan AB Tüzükleri.",
+      "checkTitle": "Bu size uyuyor mu?",
+      "checkFoot": "Biri geçerliyse bu alan sizin için yükümlülükler taşır — değerlendirme bunları durumunuza daraltır."
     },
     "riskBadge": "Risk: {{level}}"
   },

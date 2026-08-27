@@ -411,7 +411,30 @@
       "cov3": "Orchestrates matching to specialized VAT consultants by case complexity",
       "fines": {
         "authorities": "BZSt · HMRC · IRS · AEAT · Agenzia Entrate"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Marketplace sellers",
+          "line": "sell into several countries at once via Amazon & co."
+        },
+        {
+          "name": "Shop operators",
+          "line": "ship cross-border from their own shop (e.g. Shopify)"
+        },
+        {
+          "name": "Digital vendors",
+          "line": "sell digital products that carry their own tax rules"
+        },
+        {
+          "name": "Cross-border merchants",
+          "line": "grow past delivery thresholds into new tax duties"
+        }
+      ],
+      "affectedChecks": [
+        "You sell into more than one country — via marketplace or your own shop",
+        "Your foreign revenue is approaching a delivery threshold",
+        "You sell digital products or services abroad"
+      ]
     },
     "product-packaging": {
       "title": "EPR & Packaging",
@@ -424,7 +447,30 @@
       "cov3": "Intelligent edge-case handling: \"Assume Yes\" safety logic for uncertain dropshippers",
       "fines": {
         "authorities": "ZSVR · ADEME · CONAI · Environment Agency"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "E-commerce merchants",
+          "line": "sell physical goods with packaging across borders"
+        },
+        {
+          "name": "Manufacturers",
+          "line": "place packaged products on a market for the first time"
+        },
+        {
+          "name": "Resellers",
+          "line": "take on the producer duties when importing"
+        },
+        {
+          "name": "Dropshippers",
+          "line": "often count as first placers — without knowing it"
+        }
+      ],
+      "affectedChecks": [
+        "You sell physical goods with their own packaging",
+        "You ship cross-border into EU markets",
+        "You sell via direct sale or marketplaces"
+      ]
     },
     "data-privacy": {
       "title": "Data & Privacy",
@@ -437,7 +483,30 @@
       "cov3": "Platform itself uses a local PII Redaction Pipeline — zero raw data in AI layer",
       "fines": {
         "authorities": "BfDI · CNIL · ICO · Garante · AEPD · EDÖB"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Software founders",
+          "line": "build products that process personal data"
+        },
+        {
+          "name": "SaaS teams",
+          "line": "expand into new markets with a data product"
+        },
+        {
+          "name": "Data collectors",
+          "line": "capture customer data via forms, accounts or CRM"
+        },
+        {
+          "name": "Tracking users",
+          "line": "run cookies and tracking tools on their pages"
+        }
+      ],
+      "affectedChecks": [
+        "You process personal data of EU or UK users",
+        "You run cookies, analytics or tracking pixels",
+        "Your data flows to processors outside the EU"
+      ]
     },
     "marketing-seo": {
       "title": "Marketing Compliance",
@@ -450,7 +519,30 @@
       "cov3": "Routes to specialists in advertising law and consumer protection",
       "fines": {
         "authorities": "Wettbewerbszentrale · DGCCRF · ASA · AGCM · FTC"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Agencies",
+          "line": "answer for their clients’ campaigns across borders"
+        },
+        {
+          "name": "E-commerce brands",
+          "line": "advertise with product claims in several markets"
+        },
+        {
+          "name": "Health & finance vendors",
+          "line": "work in industries with strict advertising rules"
+        },
+        {
+          "name": "SEO & ads operators",
+          "line": "run paid ads or rank organically abroad"
+        }
+      ],
+      "affectedChecks": [
+        "You advertise products or services outside your home market",
+        "Your advertising carries health, sustainability or comparative claims",
+        "You work with influencers or run paid ads"
+      ]
     },
     "corporate-structure": {
       "title": "Corporate Structure",
@@ -463,7 +555,30 @@
       "cov3": "Intelligent routing to educational guide paths for uncertain founders",
       "fines": {
         "authorities": "Local commercial registries · Tax authorities · AML supervisors"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Founders",
+          "line": "register a legal entity abroad for the first time"
+        },
+        {
+          "name": "Expansion teams",
+          "line": "build teams and presence in new markets"
+        },
+        {
+          "name": "Established companies",
+          "line": "choose legal form and substance for new jurisdictions"
+        },
+        {
+          "name": "Remote employers",
+          "line": "employ people across borders"
+        }
+      ],
+      "affectedChecks": [
+        "You are planning a legal entity in a new market",
+        "You employ or recruit people abroad",
+        "You need local substance for banks, taxes or platforms"
+      ]
     },
     "product-compliance": {
       "title": "Product Compliance",
@@ -476,7 +591,30 @@
       "cov3": "Routes to specialists for conformity assessment and CE documentation",
       "fines": {
         "authorities": "Market surveillance authorities · Customs · Consumer protection bodies"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Manufacturers",
+          "line": "place their own physical products on a market"
+        },
+        {
+          "name": "Importers",
+          "line": "bring goods from outside into the destination market"
+        },
+        {
+          "name": "Private-label sellers",
+          "line": "sell third-party products under their own name"
+        },
+        {
+          "name": "Online sellers",
+          "line": "answer for conformity when no other actor stands in the market"
+        }
+      ],
+      "affectedChecks": [
+        "You manufacture, import or rebrand physical products",
+        "Your products need CE marking or safety documentation",
+        "You place goods on a new market for the first time"
+      ]
     },
     "logistics-customs": {
       "title": "Logistics & Customs",
@@ -489,7 +627,26 @@
       "cov3": "Routes to customs brokers and trade compliance specialists",
       "fines": {
         "authorities": "Customs authorities · National statistical offices"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Shippers",
+          "line": "move physical goods across customs borders"
+        },
+        {
+          "name": "Importers & exporters",
+          "line": "need EORI, commodity coding and customs declarations"
+        },
+        {
+          "name": "EU intra-community traders",
+          "line": "pass the Intrastat reporting thresholds"
+        }
+      ],
+      "affectedChecks": [
+        "You ship goods across a customs border (e.g. UK, CH, US)",
+        "Your intra-EU trade passes the reporting thresholds",
+        "Your goods need commodity codes and customs declarations"
+      ]
     },
     "legal-advisory": {
       "title": "Legal Advisory",
@@ -502,7 +659,26 @@
       "cov3": "Routes to qualified lawyers in the relevant jurisdiction — CompliHub360 does not give legal advice",
       "fines": {
         "authorities": "Consumer protection bodies · Civil courts"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Consumer sellers",
+          "line": "sell to consumers in markets under foreign law"
+        },
+        {
+          "name": "Contract partners",
+          "line": "contract with suppliers or partners abroad"
+        },
+        {
+          "name": "Platform sellers",
+          "line": "need terms that hold up in the destination market"
+        }
+      ],
+      "affectedChecks": [
+        "You sell to consumers outside your home law",
+        "Your terms and withdrawal notices come from a single market",
+        "You sign contracts with partners in other jurisdictions"
+      ]
     },
     "areasEyebrow": "Eight areas, one way in",
     "areasTitle": "The eight compliance areas",
@@ -637,7 +813,9 @@
       "askTitle": "A specific question about {{area}}?",
       "askLead": "Ask it in your own words and get an answer with its sources named. The assessment below is the longer way round — it maps the whole area to your business instead of answering one question.",
       "askQuestion": "Ask a question",
-      "coverageNoteGaps": "{{specific}} of {{count}} duties have a source specific to {{market}}. Of the rest, {{gaps}} have a national text we do not carry yet — the others are EU Regulations, which apply here directly."
+      "coverageNoteGaps": "{{specific}} of {{count}} duties have a source specific to {{market}}. Of the rest, {{gaps}} have a national text we do not carry yet — the others are EU Regulations, which apply here directly.",
+      "checkTitle": "Does this apply to you?",
+      "checkFoot": "If one applies, this area carries duties for you — the assessment narrows them to your case."
     },
     "riskBadge": "{{level}} Risk"
   },

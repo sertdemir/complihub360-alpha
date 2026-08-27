@@ -14,6 +14,7 @@ import { DOMAIN_BY_SLUG } from '../lib/domains';
 import { getAreaObligations, getAreaProfile, isAreaSlug } from '../lib/areaProfiles';
 import { useInViewOnce } from '../lib/useInViewOnce';
 import {
+  AreaAffected,
   AreaEnforcement,
   AreaMetrics,
   AreaRiskCard,
@@ -121,7 +122,6 @@ export function ComplianceAreaPage() {
   const title = t(`compliance.${area}.title`, def?.label ?? area);
   const headline = t(`compliance.${area}.headline`, '');
   const description = t(`compliance.${area}.description`, '');
-  const affected = t(`compliance.${area}.affected`, '');
   const coverage = ['cov1', 'cov2', 'cov3']
     .map(k => t(`compliance.${area}.${k}`, ''))
     .filter(Boolean);
@@ -247,57 +247,16 @@ export function ComplianceAreaPage() {
       <AreaMetrics slug={area} selectedCountry={selectedCountry} />
 
       {/* ── 3 · Who this affects ──────────────────────────────────────────── */}
-      {/* Two columns, as the canvas draws it: the heading holds a narrow left
-          rail and the prose runs beside it, not under it. The single 820px
-          column this replaced put a 30px serif headline directly above its own
-          body text, so the two read as one block and the section had no way to
-          be skimmed. The rail is fixed at 300px and the prose capped at 720 —
-          both from the canvas — so the measure stays readable however wide the
-          page gets. Below desktop-s the rail simply becomes the first row. */}
-      {(affected || description) && (
-        <Section className="py-16 desktop-s:py-20">
-          <Container size="xl">
-            <div className="flex flex-col gap-8 desktop-s:flex-row desktop-s:gap-24">
-              <AreaSectionHeading
-                className="desktop-s:w-[300px] desktop-s:shrink-0"
-                eyebrow={eyebrows.affected}
-                title={t('compliance.whoAffected', 'Who is affected')}
-              />
-              <div className="max-w-[720px] desktop-s:grow">
-                {/* The lead is a size up and in full foreground; the paragraph
-                    under it is body size and secondary. The canvas separates
-                    them that way and it is what makes the first sentence read
-                    as the answer to the heading rather than as more prose. */}
-                {affected && (
-                  <Typography variant="body" className="text-body-lg leading-relaxed text-fg">
-                    {affected}
-                  </Typography>
-                )}
-                {description && headline && (
-                  <Typography
-                    variant="body"
-                    className={`leading-relaxed text-fg-secondary ${affected ? 'mt-4' : ''}`}
-                  >
-                    {description}
-                  </Typography>
-                )}
-                {profile.businessModels.length > 0 && (
-                  <div className="mt-6 flex flex-wrap gap-2">
-                    {profile.businessModels.map(m => (
-                      <span
-                        key={m}
-                        className="rounded-lg border border-stroke bg-surface-secondary px-3.5 py-[0.4375rem] text-body-xs font-semibold text-fg-secondary"
-                      >
-                        {t(`compliance.businessModel.${m}`, m)}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </Container>
-        </Section>
-      )}
+      {/* Narrative pair since 2026-08-28 (canvas "Wer ist betroffen" · D):
+          WHO — the affected sentence as role cards — and ARE YOU — the
+          self-check card on the Gradient panel. The business-model chips left
+          with the prose layout: a chip without a verb makes no claim, and
+          their information lives on as a check statement. */}
+      <Section className="py-16 desktop-s:py-20">
+        <Container size="xl">
+          <AreaAffected slug={area} eyebrow={eyebrows.affected} />
+        </Container>
+      </Section>
 
       {/* ── 3 · Obligations explorer ──────────────────────────────────────── */}
       {/* Full width, not the old 900px column: the explorer is a master/detail

@@ -1,3 +1,4 @@
+export { AreaAffected } from './AreaAffected';
 export { AreaCard } from './AreaCard';
 export { AreaEnforcement } from './AreaEnforcement';
 export { AreaMarketHeatmap } from './AreaMarketHeatmap';

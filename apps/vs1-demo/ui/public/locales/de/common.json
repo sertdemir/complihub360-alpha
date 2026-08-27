@@ -411,7 +411,30 @@
       "cov3": "Orchestriert Matching mit spezialisierten Umsatzsteuerberatern nach Fallkomplexität",
       "fines": {
         "authorities": "BZSt · HMRC · IRS · AEAT · Agenzia Entrate"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Marktplatz-Verkäufer",
+          "line": "verkaufen über Amazon & Co. in mehrere Länder zugleich"
+        },
+        {
+          "name": "Shop-Betreiber",
+          "line": "versenden aus dem eigenen Shop (z. B. Shopify) grenzüberschreitend"
+        },
+        {
+          "name": "Digital-Anbieter",
+          "line": "verkaufen digitale Produkte, für die eigene Steuerregeln gelten"
+        },
+        {
+          "name": "Grenzüberschreitende Händler",
+          "line": "wachsen über Lieferschwellen in neue Steuerpflichten hinein"
+        }
+      ],
+      "affectedChecks": [
+        "Sie verkaufen in mehr als ein Land — über Marktplatz oder eigenen Shop",
+        "Ihr Auslandsumsatz nähert sich einer Lieferschwelle",
+        "Sie verkaufen digitale Produkte oder Dienstleistungen ins Ausland"
+      ]
     },
     "product-packaging": {
       "title": "EPR & Verpackung",
@@ -424,7 +447,30 @@
       "cov3": "Intelligente Randfall-Behandlung: „Annehme Ja“-Sicherheitslogik für unsichere Dropshipper",
       "fines": {
         "authorities": "ZSVR · ADEME · CONAI · Environment Agency"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "E-Commerce-Händler",
+          "line": "verkaufen physische Waren mit Verpackung grenzüberschreitend"
+        },
+        {
+          "name": "Hersteller",
+          "line": "bringen verpackte Produkte erstmals in einen Markt"
+        },
+        {
+          "name": "Wiederverkäufer",
+          "line": "übernehmen beim Import die Herstellerpflichten"
+        },
+        {
+          "name": "Dropshipper",
+          "line": "gelten oft als Erstinverkehrbringer — ohne es zu wissen"
+        }
+      ],
+      "affectedChecks": [
+        "Sie verkaufen physische Waren mit eigener Verpackung",
+        "Sie versenden grenzüberschreitend in EU-Märkte",
+        "Sie verkaufen über Direktvertrieb oder Marktplätze"
+      ]
     },
     "data-privacy": {
       "title": "Daten & Datenschutz",
@@ -437,7 +483,30 @@
       "cov3": "Plattform selbst verwendet eine lokale PII-Schwärzungs-Pipeline – keine Rohdaten in der KI-Schicht",
       "fines": {
         "authorities": "BfDI · CNIL · ICO · Garante · AEPD · EDÖB"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Software-Gründer",
+          "line": "bauen Produkte, die personenbezogene Daten verarbeiten"
+        },
+        {
+          "name": "SaaS-Teams",
+          "line": "expandieren mit einem Datenprodukt in neue Märkte"
+        },
+        {
+          "name": "Daten-Sammler",
+          "line": "erfassen Kundendaten über Formulare, Konten oder CRM"
+        },
+        {
+          "name": "Tracking-Nutzer",
+          "line": "setzen Cookies und Tracking-Tools auf ihren Seiten ein"
+        }
+      ],
+      "affectedChecks": [
+        "Sie verarbeiten personenbezogene Daten von EU- oder UK-Nutzern",
+        "Sie setzen Cookies, Analytics oder Tracking-Pixel ein",
+        "Ihre Daten fließen an Dienstleister außerhalb der EU"
+      ]
     },
     "marketing-seo": {
       "title": "Marketing-Compliance",
@@ -450,7 +519,30 @@
       "cov3": "Routet zu Spezialisten in Werberecht und Verbraucherschutz",
       "fines": {
         "authorities": "Wettbewerbszentrale · DGCCRF · ASA · AGCM · FTC"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Agenturen",
+          "line": "verantworten Kampagnen ihrer Kunden über Grenzen hinweg"
+        },
+        {
+          "name": "E-Commerce-Marken",
+          "line": "werben mit Produktaussagen in mehreren Märkten"
+        },
+        {
+          "name": "Health- & Finanz-Anbieter",
+          "line": "arbeiten in Branchen mit strengen Werberegeln"
+        },
+        {
+          "name": "SEO- & Ads-Betreiber",
+          "line": "schalten Paid Ads oder ranken organisch im Ausland"
+        }
+      ],
+      "affectedChecks": [
+        "Sie bewerben Produkte oder Dienste außerhalb Ihres Heimatmarkts",
+        "Ihre Werbung enthält Gesundheits-, Umwelt- oder Vergleichsaussagen",
+        "Sie arbeiten mit Influencern oder schalten Paid Ads"
+      ]
     },
     "corporate-structure": {
       "title": "Unternehmensstruktur",
@@ -463,7 +555,30 @@
       "cov3": "Intelligente Weiterleitung zu Bildungsleitfaden-Pfaden für unsichere Gründer",
       "fines": {
         "authorities": "Lokale Handelsregister · Finanzbehörden · Geldwäsche-Aufseher"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Gründer",
+          "line": "registrieren erstmals eine juristische Einheit im Ausland"
+        },
+        {
+          "name": "Expansionsteams",
+          "line": "bauen Teams und Präsenz in neuen Märkten auf"
+        },
+        {
+          "name": "Etablierte Unternehmen",
+          "line": "wählen Rechtsform und Substanz für neue Jurisdiktionen"
+        },
+        {
+          "name": "Remote-Arbeitgeber",
+          "line": "beschäftigen Mitarbeitende über Grenzen hinweg"
+        }
+      ],
+      "affectedChecks": [
+        "Sie planen eine juristische Einheit in einem neuen Markt",
+        "Sie beschäftigen oder rekrutieren Menschen im Ausland",
+        "Sie brauchen lokale Substanz für Banken, Steuern oder Plattformen"
+      ]
     },
     "product-compliance": {
       "title": "Produktkonformität",
@@ -476,7 +591,30 @@
       "cov3": "Weiterleitung an Spezialisten für Konformitätsbewertung und CE-Dokumentation",
       "fines": {
         "authorities": "Marktüberwachungsbehörden · Zoll · Verbraucherschutzstellen"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Hersteller",
+          "line": "bringen eigene physische Produkte in Verkehr"
+        },
+        {
+          "name": "Importeure",
+          "line": "holen Waren von außerhalb in den Zielmarkt"
+        },
+        {
+          "name": "Eigenmarken-Händler",
+          "line": "verkaufen fremde Produkte unter eigenem Namen"
+        },
+        {
+          "name": "Online-Händler",
+          "line": "verantworten Konformität, wenn kein anderer Akteur im Markt steht"
+        }
+      ],
+      "affectedChecks": [
+        "Sie stellen physische Produkte her, importieren oder rebranden sie",
+        "Ihre Produkte brauchen CE-Kennzeichnung oder Sicherheitsdokumentation",
+        "Sie bringen Waren erstmals in einen neuen Markt"
+      ]
     },
     "logistics-customs": {
       "title": "Logistik & Zoll",
@@ -489,7 +627,26 @@
       "cov3": "Weiterleitung an Zollagenten und Spezialisten für Außenhandelsrecht",
       "fines": {
         "authorities": "Zollbehörden · Statistische Ämter"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Versender",
+          "line": "bewegen physische Waren über Zollgrenzen"
+        },
+        {
+          "name": "Importeure & Exporteure",
+          "line": "brauchen EORI, Tarifierung und Zollanmeldungen"
+        },
+        {
+          "name": "EU-Binnenhändler",
+          "line": "überschreiten Intrastat-Meldeschwellen im Binnenhandel"
+        }
+      ],
+      "affectedChecks": [
+        "Sie versenden Waren über eine Zollgrenze (z. B. UK, CH, US)",
+        "Ihr EU-Binnenhandel überschreitet die Meldeschwellen",
+        "Ihre Waren brauchen Warennummern und Zollanmeldungen"
+      ]
     },
     "legal-advisory": {
       "title": "Rechtsberatung",
@@ -502,7 +659,26 @@
       "cov3": "Weiterleitung an zugelassene Anwälte in der jeweiligen Jurisdiktion – CompliHub360 leistet keine Rechtsberatung",
       "fines": {
         "authorities": "Verbraucherschutzstellen · Zivilgerichte"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Verbraucher-Verkäufer",
+          "line": "verkaufen an Verbraucher in Märkten mit fremdem Recht"
+        },
+        {
+          "name": "Vertragspartner",
+          "line": "kontrahieren mit Lieferanten oder Partnern im Ausland"
+        },
+        {
+          "name": "Plattform-Verkäufer",
+          "line": "brauchen AGB, die im Zielmarkt standhalten"
+        }
+      ],
+      "affectedChecks": [
+        "Sie verkaufen an Verbraucher außerhalb Ihres Heimatrechts",
+        "Ihre AGB und Widerrufsbelehrungen stammen aus einem einzigen Markt",
+        "Sie schließen Verträge mit Partnern in anderen Jurisdiktionen"
+      ]
     },
     "areasEyebrow": "Acht Bereiche, ein Einstieg",
     "areasTitle": "Die acht Compliance-Bereiche",
@@ -637,7 +813,9 @@
       "askTitle": "Eine konkrete Frage zu {{area}}?",
       "askLead": "Stellen Sie sie in eigenen Worten und bekommen Sie eine Antwort mit benannten Quellen. Das Assessment weiter unten ist der längere Weg — es bildet den ganzen Bereich auf Ihr Unternehmen ab, statt eine Frage zu beantworten.",
       "askQuestion": "Frage stellen",
-      "coverageNoteGaps": "{{specific}} von {{count}} Pflichten haben eine Quelle speziell für {{market}}. Von den übrigen haben {{gaps}} eine nationale Fassung, die wir noch nicht führen — der Rest sind EU-Verordnungen, die hier unmittelbar gelten."
+      "coverageNoteGaps": "{{specific}} von {{count}} Pflichten haben eine Quelle speziell für {{market}}. Von den übrigen haben {{gaps}} eine nationale Fassung, die wir noch nicht führen — der Rest sind EU-Verordnungen, die hier unmittelbar gelten.",
+      "checkTitle": "Trifft das auf Sie zu?",
+      "checkFoot": "Trifft eines zu, trägt dieser Bereich Pflichten für Sie — das Assessment grenzt sie auf Ihren Fall ein."
     },
     "riskBadge": "Risiko: {{level}}"
   },
