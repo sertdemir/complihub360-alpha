@@ -781,6 +781,10 @@
         "euDirect": "EU Regulation — applies directly, this is the law here"
       },
       "relatedOpen": "Open this area",
+      "relatedStrongest": "Strongest connection",
+      "sharedTriggers_one": "{{count}} shared trigger",
+      "sharedTriggers_other": "{{count}} shared triggers",
+      "allAreasLink": "All eight areas at a glance",
       "readSource": "Read the source on EUR-Lex",
       "coverageNoteEu": "The engine carries {{count}} duties for this area, all of them on an EU-level source. Pick a market to see where a national source adds to them.",
       "startShort": "Start the assessment",

@@ -26,6 +26,7 @@ import {
   AreaTimeline,
   ObligationsExplorer,
   RelatedAreas,
+  hasRelatedAreas,
   SEVERITY_FALLBACK,
   SEVERITY_STYLE,
   severityKey,
@@ -381,11 +382,16 @@ export function ComplianceAreaPage() {
       </Section>
 
       {/* ── 10 · Related areas ────────────────────────────────────────────── */}
-      <Section className="py-16 desktop-s:py-20">
-        <Container size="xl">
-          <RelatedAreas slug={area} />
-        </Container>
-      </Section>
+      {/* Skipped entirely where the engine derives no relatedness (data
+          privacy shares no trigger with anyone) — an empty Section would
+          still paint its padding. */}
+      {hasRelatedAreas(area) && (
+        <Section className="py-16 desktop-s:py-20">
+          <Container size="xl">
+            <RelatedAreas slug={area} />
+          </Container>
+        </Section>
+      )}
 
       {/* ── 11 · The close · orchestration and the assessment, one band ───── */}
       {/* One petrol band, not two closing sections. The four steps and the

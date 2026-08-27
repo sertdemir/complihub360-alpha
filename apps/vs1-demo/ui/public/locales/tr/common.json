@@ -781,6 +781,10 @@
         "euDirect": "AB Tüzüğü — doğrudan uygulanır, burada geçerli olan norm budur"
       },
       "relatedOpen": "Bu alanı aç",
+      "relatedStrongest": "En güçlü bağlantı",
+      "sharedTriggers_one": "{{count}} ortak tetikleyici",
+      "sharedTriggers_other": "{{count}} ortak tetikleyici",
+      "allAreasLink": "Sekiz alanın tümüne genel bakış",
       "readSource": "Kaynağı EUR-Lex'te oku",
       "coverageNoteEu": "Motor bu alan için {{count}} yükümlülük taşıyor, hepsi AB düzeyinde bir kaynağa dayanıyor. Ulusal bir kaynağın nerede eklendiğini görmek için bir pazar seç.",
       "startShort": "Değerlendirmeyi başlat",

@@ -781,6 +781,10 @@
         "euDirect": "Reglamento de la UE: se aplica directamente, esta es la norma vigente aquí"
       },
       "relatedOpen": "Abrir este ámbito",
+      "relatedStrongest": "Conexión más fuerte",
+      "sharedTriggers_one": "{{count}} disparador compartido",
+      "sharedTriggers_other": "{{count}} disparadores compartidos",
+      "allAreasLink": "Las ocho áreas de un vistazo",
       "readSource": "Leer la fuente en EUR-Lex",
       "coverageNoteEu": "El motor recoge {{count}} obligaciones para este ámbito, todas con una fuente a nivel de la UE. Elige un mercado para ver dónde se añade una fuente nacional.",
       "startShort": "Iniciar la evaluación",

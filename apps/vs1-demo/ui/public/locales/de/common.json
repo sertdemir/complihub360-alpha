@@ -781,6 +781,10 @@
         "euDirect": "EU-Verordnung — gilt unmittelbar, das ist hier die geltende Norm"
       },
       "relatedOpen": "Bereich öffnen",
+      "relatedStrongest": "Stärkste Verbindung",
+      "sharedTriggers_one": "{{count}} gemeinsamer Auslöser",
+      "sharedTriggers_other": "{{count}} gemeinsame Auslöser",
+      "allAreasLink": "Alle acht Bereiche im Überblick",
       "readSource": "Quelle auf EUR-Lex lesen",
       "coverageNoteEu": "Die Engine trägt {{count}} Pflichten für diesen Bereich, alle mit einer Quelle auf EU-Ebene. Wähle einen Markt, um zu sehen, wo eine nationale Quelle dazukommt.",
       "startShort": "Assessment jetzt starten",
