@@ -41,19 +41,18 @@ export function hasRelatedAreas(slug: DomainSlug): boolean {
 }
 
 // ─── Related areas (canvas "Verwandte Bereiche" · Variante C, 2026-08-28) ────
-// The derived relatedness runs 0–3 across the eight areas, and a three-column
-// card grid with one lonely card was the one-node-timeline mistake again. So
-// the strongest bridge stands as ONE big card with the gold edge and a kicker,
-// whatever the count — one related area reads as deliberate, not as a gap —
-// the runners-up follow as quiet rows, and "all eight areas" closes the column
-// as the standing exit. Every entry SHOWS its reason: the number of shared
-// triggers, which is the same count the sort runs on.
-//
-// Cards left, copy right (user ask 2026-08-28), and the runners-up EXPAND on
-// hover and keyboard focus into the same card state the top one opens with —
-// title, badge, headline, foot — with the atlas's layout spring pulling the
-// neighbours along. The gold edge and the kicker stay the top card's alone:
-// they mark the strongest connection, not the hovered one.
+// Cards left, copy right. An ACCORDION with exactly one entry open: the
+// strongest bridge opens the section, and hovering (or focusing) another
+// entry folds the open one shut while the touched one unfolds — automatic,
+// both at once. Every entry is always a card with a constant header (icon,
+// serif title, badge, shared-trigger count, arrow); only the detail folds.
+// The details are built to identical heights — the kicker line is reserved
+// on every card and the headline block holds two lines — so the closing and
+// the opening delta cancel out and THE COLUMN'S TOTAL HEIGHT NEVER MOVES
+// (user requirement 2026-08-28, replacing the FLIP morph that stuttered and
+// grew the section downwards). Leaving the widget folds everything back to
+// the strongest bridge. The gold edge stays the top card's alone: it marks
+// the strongest connection, not the hovered one.
 export function RelatedAreas({ slug }: Props) {
   const { t } = useTranslation('common');
   const eyebrows = useAreaEyebrows();
@@ -64,8 +63,8 @@ export function RelatedAreas({ slug }: Props) {
   const [hovered, setHovered] = useState<DomainSlug | null>(null);
 
   if (related.length === 0) return null;
+  const active = hovered ?? related[0].slug;
 
-  const areaTitle = (s: DomainSlug) => t(`compliance.${s}.title`, DOMAIN_BY_SLUG[s]?.label ?? s);
   const sharedTriggers = (count: number) =>
     t('compliance.area.sharedTriggers', { defaultValue: '{{count}} shared triggers', count });
 
@@ -81,97 +80,87 @@ export function RelatedAreas({ slug }: Props) {
         })}
       />
 
-      <div className="flex min-w-0 flex-1 flex-col gap-2.5">
+      <div
+        className="flex min-w-0 flex-1 flex-col gap-2.5"
+        onMouseLeave={() => setHovered(null)}
+      >
         {related.map((r, i) => {
           const isTop = i === 0;
-          const expanded = isTop || hovered === r.slug;
+          const expanded = r.slug === active;
           const meta = AREAS.find(a => a.slug === r.slug)!;
           const Icon = meta.icon;
           const severity = getAreaProfile(r.slug).severity;
           const headline = t(`compliance.${r.slug}.headline`, t(`compliance.${r.slug}.description`, ''));
           return (
-            <motion.div key={r.slug} layout transition={{ duration: 0.35, ease: 'easeOut' }}>
-              <Link
-                to={`${localePrefix}/compliance/${r.slug}`}
-                onMouseEnter={() => !isTop && setHovered(r.slug)}
-                onMouseLeave={() => setHovered(v => (v === r.slug ? null : v))}
-                onFocus={() => !isTop && setHovered(r.slug)}
-                onBlur={() => setHovered(v => (v === r.slug ? null : v))}
-                className={
-                  expanded
-                    ? `group flex gap-5 rounded-xl border border-stroke-subtle bg-surface p-7 shadow-[0_18px_44px_-30px_rgba(2,22,17,0.25)] dark:bg-surface-secondary ${
-                        isTop
-                          ? 'border-l-[3px] border-l-accent-500 transition-all hover:-translate-y-0.5 hover:shadow-[0_26px_60px_-30px_rgba(2,22,17,0.35)]'
-                          : ''
-                      }`
-                    : 'group flex items-center gap-4 px-1 py-4'
-                }
+            <Link
+              key={r.slug}
+              to={`${localePrefix}/compliance/${r.slug}`}
+              onMouseEnter={() => setHovered(r.slug)}
+              onFocus={() => setHovered(r.slug)}
+              onBlur={() => setHovered(v => (v === r.slug ? null : v))}
+              className={`group block rounded-xl border border-stroke-subtle bg-surface px-6 py-4 shadow-[0_18px_44px_-30px_rgba(2,22,17,0.22)] dark:bg-surface-secondary ${
+                isTop ? 'border-l-[3px] border-l-accent-500 pl-[calc(1.5rem-2px)]' : ''
+              }`}
+            >
+              {/* The header never changes between states — what folds is only
+                  the detail below it, so nothing pops. */}
+              <div className="flex items-center gap-4">
+                <Icon size={26} strokeWidth={1.5} className="shrink-0 text-fg-brand" aria-hidden />
+                <span className="min-w-0 flex-1 font-serif text-[1.125rem] font-bold leading-snug text-fg">
+                  {t(`compliance.${r.slug}.title`, DOMAIN_BY_SLUG[r.slug]?.label ?? r.slug)}
+                </span>
+                <RiskBadge level={severity} size="sm" className="shrink-0">
+                  {t(severityKey(severity), SEVERITY_FALLBACK[severity])}
+                </RiskBadge>
+                <span className="hidden shrink-0 text-body-3xs font-semibold text-fg-tertiary sm:block">
+                  {sharedTriggers(r.overlap)}
+                </span>
+                <ArrowRight
+                  size={13}
+                  aria-hidden
+                  className="shrink-0 text-fg-tertiary transition-transform group-hover:translate-x-0.5"
+                />
+              </div>
+
+              {/* Open and close run simultaneously with the same magnitude —
+                  the details share one fixed anatomy (reserved kicker line,
+                  two-line headline block), so the column's total height stays
+                  put in every frame. */}
+              <motion.div
+                initial={false}
+                animate={expanded ? { height: 'auto', opacity: 1 } : { height: 0, opacity: 0 }}
+                transition={reduced ? { duration: 0 } : { duration: 0.35, ease: 'easeOut' }}
+                aria-hidden={!expanded}
+                className="overflow-hidden"
               >
-                {expanded ? (
-                  <>
-                    <Icon size={40} strokeWidth={1.5} className="mt-0.5 shrink-0 text-fg-brand" aria-hidden />
-                    <motion.div
-                      initial={reduced || isTop ? false : { opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.25 }}
-                      className="flex min-w-0 flex-1 flex-col"
-                    >
-                      {isTop && (
-                        <span className="mb-1.5 text-body-4xs font-bold uppercase tracking-[0.12em] text-accent-700 dark:text-fg-accent-strong">
-                          {t('compliance.area.relatedStrongest', 'Strongest connection')}
-                        </span>
-                      )}
-                      <div className="flex items-start justify-between gap-3">
-                        <span className="min-w-0 font-serif text-[1.25rem] font-bold leading-snug text-fg">
-                          {areaTitle(r.slug)}
-                        </span>
-                        <RiskBadge level={severity} size="sm" className="mt-0.5 shrink-0">
-                          {t(severityKey(severity), SEVERITY_FALLBACK[severity])}
-                        </RiskBadge>
-                      </div>
-                      {headline && (
-                        <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">{headline}</p>
-                      )}
-                      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-stroke-subtle pt-3.5">
-                        <span className="text-body-3xs font-bold text-fg-brand">
-                          {sharedTriggers(r.overlap)}
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 text-body-3xs font-bold text-fg-brand">
-                          {t('compliance.area.relatedOpen', 'Open this area')}
-                          <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
-                        </span>
-                      </div>
-                    </motion.div>
-                  </>
-                ) : (
-                  <>
-                    <Icon size={22} strokeWidth={1.5} className="shrink-0 text-fg-brand" aria-hidden />
-                    <span className="min-w-0 flex-1 text-body-sm font-bold text-fg">
-                      {areaTitle(r.slug)}
-                    </span>
-                    <span className="shrink-0 text-body-3xs font-semibold text-fg-tertiary">
-                      {sharedTriggers(r.overlap)}
-                    </span>
-                    <ArrowRight size={13} aria-hidden className="shrink-0 text-fg-tertiary" />
-                  </>
-                )}
-              </Link>
-            </motion.div>
+                <div className="pl-[2.625rem] pt-3">
+                  <span
+                    aria-hidden={!isTop}
+                    className={`block text-body-4xs font-bold uppercase tracking-[0.12em] ${
+                      isTop ? 'text-accent-700 dark:text-fg-accent-strong' : 'invisible'
+                    }`}
+                  >
+                    {t('compliance.area.relatedStrongest', 'Strongest connection')}
+                  </span>
+                  <p className="mt-1 min-h-[3rem] max-w-[560px] text-body-sm leading-relaxed text-fg-secondary">
+                    {headline}
+                  </p>
+                </div>
+              </motion.div>
+            </Link>
           );
         })}
 
         {/* The standing exit: whatever the relatedness holds, the hub is one
             step away — and it is what keeps the one-card state from ending in
             a dead end. */}
-        <motion.div layout transition={{ duration: 0.35, ease: 'easeOut' }}>
-          <Link
-            to={`${localePrefix}/compliance`}
-            className="group flex items-center justify-between gap-3 border-t border-stroke-subtle px-1 pt-4 text-body-2xs font-bold text-fg-brand"
-          >
-            {t('compliance.area.allAreasLink', 'All eight areas at a glance')}
-            <ArrowRight size={13} aria-hidden className="transition-transform group-hover:translate-x-0.5" />
-          </Link>
-        </motion.div>
+        <Link
+          to={`${localePrefix}/compliance`}
+          className="group mt-1.5 flex items-center justify-between gap-3 border-t border-stroke-subtle px-1 pt-4 text-body-2xs font-bold text-fg-brand"
+        >
+          {t('compliance.area.allAreasLink', 'All eight areas at a glance')}
+          <ArrowRight size={13} aria-hidden className="transition-transform group-hover:translate-x-0.5" />
+        </Link>
       </div>
     </div>
   );
