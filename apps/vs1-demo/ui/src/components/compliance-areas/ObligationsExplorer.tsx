@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, useReducedMotion } from 'framer-motion';
 import { BusinessModel } from '@complihub/compliance-engine';
@@ -115,6 +115,25 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
   useEffect(() => {
     setSelectedId(null);
   }, [slug, selectedCountry, validity]);
+
+  // The panel follows the OPEN card's height. The dossiers stand absolutely
+  // stacked (for the robust crossfade), so the panel cannot size itself from
+  // flow — instead the active card is measured and the wrapper's height eases
+  // towards it with a CSS transition. Measured in a layout effect so the very
+  // first height is painted, never animated; the ResizeObserver keeps it true
+  // through viewport and font changes.
+  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [panelH, setPanelH] = useState<number | null>(null);
+  const activeId = selected?.id ?? null;
+  useLayoutEffect(() => {
+    const el = activeId ? cardRefs.current[activeId] : null;
+    if (!el) return;
+    setPanelH(el.offsetHeight);
+    if (typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(() => setPanelH(el.offsetHeight));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [activeId]);
 
   // Self-run like the homepage atlas: once in view the next duty opens every
   // few seconds, until the user takes over by clicking a row or a filter.
@@ -335,23 +354,29 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
             </Typography>
           </div>
 
-          {/* Detail — the dossier cards standing on the Gradient panel. EVERY
-              duty's card is mounted, stacked in the same grid cell, and the
-              active one fades in over the rest — the RiskShowcase move. The
-              panel therefore always keeps the height of the tallest dossier,
-              whichever duty is open and whichever filter is set: nothing on
-              the page moves when the content grows or shrinks (user ask
-              2026-08-28, replacing the AnimatePresence crossfade that let the
-              page jump on every swap). The stack reads from `all`, not
-              `shown`, so a filter switch cannot change the height either. */}
-          <div className="flex min-w-0 flex-1 items-center rounded-xl bg-gradient-stage p-4 sm:p-7">
-            <div className="grid w-full">
+          {/* Detail — the dossier cards standing on the Gradient panel, the
+              card anchored to the panel's TOP and growing downwards with its
+              content (user ask 2026-08-28). Every duty's card stays mounted
+              for the robust crossfade, but absolutely stacked, so none of
+              them dictates the panel's height: the wrapper eases towards the
+              measured height of the OPEN card, and the Gradient breathes with
+              it. Its resting floor comes free from the row's items-stretch —
+              the panel never ends above the rail column's last line, the
+              coverage note, and only a taller dossier pushes past it. */}
+          <div className="flex min-w-0 flex-1 items-start rounded-xl bg-gradient-stage p-4 sm:p-7">
+            <div
+              className="relative w-full min-w-0 transition-[height] duration-500 ease-out motion-reduce:transition-none"
+              style={{ height: panelH ?? undefined }}
+            >
               {all.map((o) => {
                 const active = o.id === selected.id;
                 const deferred = !!o.appliesFrom && new Date(o.appliesFrom) > new Date();
                 return (
                   <motion.div
                     key={o.id}
+                    ref={(el) => {
+                      cardRefs.current[o.id] = el;
+                    }}
                     initial={false}
                     animate={
                       active
@@ -360,7 +385,7 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                     }
                     transition={reduced ? { duration: 0 } : { duration: 0.35, ease: 'easeOut' }}
                     aria-hidden={!active}
-                    className={`col-start-1 row-start-1 min-w-0 self-center ${active ? '' : 'pointer-events-none'}`}
+                    className={`absolute inset-x-0 top-0 min-w-0 ${active ? '' : 'pointer-events-none'}`}
                   >
                     <div className="w-full rounded-[14px] bg-surface p-6 shadow-[0_40px_90px_-30px_rgba(2,22,17,0.4)] dark:bg-surface-secondary sm:p-8">
                       <div className="flex items-start justify-between gap-6">
