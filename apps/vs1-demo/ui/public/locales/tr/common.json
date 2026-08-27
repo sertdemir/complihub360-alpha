@@ -815,6 +815,7 @@
       "timelineLeadAllLive": "Buradaki her yükümlülük zaten geçerli — hat, her birinin hangi ritimle döndüğünü ve ne kadar hazırlık süresi gerektirdiğini gösterir. Üstteki pazar seçimi hazırlık sürelerini yeniden hesaplar.",
       "marketsLeadTied": "{{count}} pazar bu alana eşit ağırlık veriyor (10 üzerinden {{weight}}). Birden fazlasına satış yapmak, en katısına göre planlamak demektir.",
       "localSourcesNote": "Motor, {{total}} pazarın {{count}} tanesinde bu alan için en az bir yerel kaynak tutuyor. Diğerlerinde AB düzeyindeki araç geçerlidir ve öyle gösterilir.",
+      "marketsRowsNote": "Her satır pazar sayfasına gider.",
       "askTitle": "{{area}} hakkında somut bir sorunuz mu var?",
       "askLead": "Kendi cümlelerinizle sorun, kaynakları adıyla belirtilmiş bir yanıt alın. Aşağıdaki değerlendirme daha uzun yol — tek bir soruyu yanıtlamak yerine tüm alanı şirketinize göre haritalar.",
       "askQuestion": "Soru sor",

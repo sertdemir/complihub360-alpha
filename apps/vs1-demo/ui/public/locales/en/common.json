@@ -815,6 +815,7 @@
       "timelineLeadAllLive": "Every duty here already applies — the thread shows the cadence each one returns on and the lead time it needs. The market switch above recalculates the lead times.",
       "marketsLeadTied": "{{count}} markets weight this area equally heavily ({{weight}} out of 10). Serving more than one means planning to the strictest of them.",
       "localSourcesNote": "The engine holds at least one local source for this area in {{count}} of the {{total}} markets. Elsewhere the EU-level instrument is what applies, and it is shown as such.",
+      "marketsRowsNote": "Every row leads to the market page.",
       "askTitle": "A specific question about {{area}}?",
       "askLead": "Ask it in your own words and get an answer with its sources named. The assessment below is the longer way round — it maps the whole area to your business instead of answering one question.",
       "askQuestion": "Ask a question",

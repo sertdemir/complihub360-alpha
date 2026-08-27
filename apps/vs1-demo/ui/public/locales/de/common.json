@@ -815,6 +815,7 @@
       "timelineLeadAllLive": "Jede Pflicht gilt bereits — der Strang zeigt, in welchem Takt sie zurückkommen und wie viel Vorlauf jede braucht. Der Marktwechsel oben rechnet die Vorläufe um.",
       "marketsLeadTied": "{{count}} Märkte gewichten diesen Bereich gleich schwer ({{weight}} von 10). Wer mehrere bedient, plant nach dem strengsten.",
       "localSourcesNote": "In {{count}} der {{total}} Märkte führt die Engine mindestens eine lokale Quelle für diesen Bereich. Sonst gilt das EU-Instrument — und wird auch so ausgewiesen.",
+      "marketsRowsNote": "Jede Zeile führt zur Marktseite.",
       "askTitle": "Eine konkrete Frage zu {{area}}?",
       "askLead": "Stellen Sie sie in eigenen Worten und bekommen Sie eine Antwort mit benannten Quellen. Das Assessment weiter unten ist der längere Weg — es bildet den ganzen Bereich auf Ihr Unternehmen ab, statt eine Frage zu beantworten.",
       "askQuestion": "Frage stellen",
