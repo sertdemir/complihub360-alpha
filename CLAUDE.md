@@ -14,3 +14,8 @@
   Fläche, die eine FAQ bekommt, nutzt sie; keine Parallel-Implementierungen
   bauen. Thematische Tabs (wie auf der Startseite) sind Sache des Aufrufers,
   nicht der Liste.
+- **Redesign-Workflow** (Festlegung 2026-08-28): Bei einer Seiten-Überarbeitung
+  oder einer neuen Seite ZUERST die ganze Seite durchgehen und für ALLE
+  Sektionen je drei Varianten in EINEM Canvas abbilden — nicht Sektion für
+  Sektion nachliefern. Der Nutzer geht dann alles in einem Durchgang durch und
+  nennt seine Wahl je Sektion; erst danach wird ausgerollt.

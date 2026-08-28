@@ -1270,16 +1270,15 @@
         "title": "Platform",
         "links": {
           "howItWorks": "Nasıl çalışır",
+          "forWhom": "Kimler için",
           "startAssessment": "Değerlendirmeyi başlat",
-          "exampleResult": "Örnek sonuç",
-          "pricing": "Fiyatlar",
-          "platformOverview": "Platform"
+          "pricing": "Fiyatlar"
         }
       },
-      "solutions": {
-        "title": "Çözümler",
+      "areas": {
+        "title": "Uyum alanları",
         "links": {
-          "solutionsOverview": "Role göre",
+          "areasOverview": "Tüm alanlar",
           "taxVat": "Vergi ve KDV",
           "productPackaging": "EPR ve Ambalaj",
           "dataPrivacy": "Veri ve Gizlilik",
@@ -1290,24 +1289,28 @@
           "legalAdvisory": "Hukuki Danışmanlık"
         }
       },
-      "resources": {
-        "title": "Kaynaklar",
+      "markets": {
+        "title": "Pazarlar",
         "links": {
-          "complianceNews": "Uyum Haberleri",
-          "knowledgeLibrary": "Bilgi Kitaplığı",
-          "countryGuides": "Ülke Rehberleri",
-          "tutorials": "Eğitimler",
-          "glossary": "Uyum Sözlüğü",
-          "aiGovernance": "Yapay zekâ yönetişimi"
+          "marketsOverview": "Tüm pazarlar",
+          "market_DE": "Almanya",
+          "market_FR": "Fransa",
+          "market_US": "ABD",
+          "market_UK": "Birleşik Krallık",
+          "market_IT": "İtalya",
+          "market_ES": "İspanya",
+          "market_NL": "Hollanda",
+          "market_TR": "Türkiye"
         }
       },
       "company": {
         "title": "Şirket",
         "links": {
           "about": "Hakkımızda",
+          "partner": "Partnerler",
           "trustSecurity": "Güven ve Güvenlik",
           "contact": "İletişim",
-          "careers": "Kariyer"
+          "support": "Destek"
         }
       }
     },

@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Logo } from '../ui/Logo';
 import { supportedLngs } from '../../i18n/config';
 import { DOMAINS } from '../../lib/domains';
+import { MARKET_CODES } from '../../lib/marketProfiles';
 import { Badge } from '../ui/Badge';
 import { NewsletterBand } from './NewsletterBand';
 
@@ -24,17 +25,29 @@ import { NewsletterBand } from './NewsletterBand';
 type Link = { key: string; href?: string; beta?: boolean; fallback?: string };
 type Column = { key: string; links: Link[] };
 
-// Solutions = the canonical eight domains, membership and order straight from
-// lib/domains so the column cannot drift out of sync again. Labels stay in the
-// 'home' namespace (loading 'userws' here would pull 360 dashboard keys into
-// every marketing page); the canonical English name is the fallback.
-const SOLUTION_LINKS: Link[] = [
-  // The overview page first, then the eight domains. Until 2026-08-21 all eight
-  // pointed at /compliance, because that page held every area's detail inside
-  // an accordion and there was nothing more specific to link to. Each domain
-  // has its own page now, so the column finally goes where it says it goes.
-  { key: 'solutionsOverview', href: '/solutions' },
+// The eight areas, membership and order straight from lib/domains so the
+// column cannot drift out of sync again. Labels stay in the 'home' namespace
+// (loading 'userws' here would pull 360 dashboard keys into every marketing
+// page); the canonical English name is the fallback.
+const AREA_LINKS: Link[] = [
+  // The hub first, then the eight areas. Until 2026-08-21 all eight pointed at
+  // /compliance, because that page held every area's detail inside an
+  // accordion and there was nothing more specific to link to. Each area has
+  // its own page now, so the column finally goes where it says it goes.
+  { key: 'areasOverview', href: '/compliance' },
   ...DOMAINS.map((d) => ({ key: d.i18nKey, href: `/compliance/${d.slug}`, fallback: d.label })),
+];
+
+// The eight markets, membership and order from the engine — same reasoning as
+// the areas column above, and the reason this column can exist at all: every
+// market has had its own page since 2026-08-28.
+const MARKET_LINKS: Link[] = [
+  { key: 'marketsOverview', href: '/markets' },
+  ...MARKET_CODES.map((code) => ({
+    key: `market_${code}`,
+    href: `/markets/${code.toLowerCase()}`,
+    fallback: code,
+  })),
 ];
 
 const COLUMNS: Column[] = [
@@ -42,34 +55,53 @@ const COLUMNS: Column[] = [
     key: 'platform',
     links: [
       { key: 'howItWorks', href: '/how-it-works' },
+      // "Für wen" sits right under "So funktioniert es" (user decision
+      // 2026-08-28): the by-role page answers the question the how-it-works
+      // page raises next.
+      { key: 'forWhom', href: '/solutions' },
       { key: 'pricing', href: '/pricing' },
-      { key: 'platformOverview', href: '/platform' },
+      // 'platformOverview' left this column 2026-08-28: the page it points at
+      // is the partner pitch (structured dossiers, magic-link workflow, the
+      // SLA the ranking rewards), so it belongs with the company, not with
+      // what a visitor gets. It is the 'partner' entry below now.
+      // 'exampleResult' left 2026-08-28 (user decision): /results renders the
+      // result of an assessment the visitor has taken — from the footer it
+      // opens an empty report, not an example. The wizard entry above is the
+      // honest way there, and the flow itself routes to /results on finish.
       { key: 'startAssessment', href: '/wizard' },
-      { key: 'exampleResult', href: '/results' },
     ],
   },
   {
-    key: 'solutions',
-    links: SOLUTION_LINKS,
+    key: 'areas',
+    links: AREA_LINKS,
   },
   {
-    key: 'resources',
-    links: [
-      { key: 'complianceNews', beta: true },
-      { key: 'knowledgeLibrary', beta: true },
-      { key: 'countryGuides', href: '/markets' },
-      { key: 'aiGovernance', href: '/ai-governance' },
-      { key: 'tutorials' },
-      { key: 'glossary' },
-    ],
+    key: 'markets',
+    links: MARKET_LINKS,
   },
+  // The RESOURCES column is hidden until it has something to point at (user
+  // decision 2026-08-28): country guides only led back to /markets, tutorials
+  // and the glossary do not exist, news and the knowledge library are BETA
+  // placeholders, and the overview page itself is still empty. Listing six
+  // entries where five are dead is worse than not listing them.
+  // TODO(resources-live): restore this column — resourcesOverview,
+  // complianceNews (beta), knowledgeLibrary (beta), tutorials, glossary — once
+  // the resources surface carries content. Same trigger as the paused
+  // ResourceTeaser on the compliance hub.
   {
     key: 'company',
     links: [
       { key: 'about', href: '/about' },
+      // TODO(partner-redesign): /platform is the partner-facing page and still
+      // speaks the pre-redesign language — it is queued for its own pass after
+      // the current stages (user decision 2026-08-28).
+      { key: 'partner', href: '/platform' },
       { key: 'trustSecurity', href: '/ai-governance' },  // traegt selbst den Titel "Trust Center"
+      // TODO(contact-live): route contact AND support to the /contact page
+      // once it exists — it ships with placeholders first (user decision
+      // 2026-08-28), real channels and addresses still to be provided.
       { key: 'contact' },
-      { key: 'careers' },
+      { key: 'support' },
     ],
   },
 ];

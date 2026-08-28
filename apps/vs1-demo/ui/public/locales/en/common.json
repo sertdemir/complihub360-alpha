@@ -136,7 +136,8 @@
       "stat1Label": "Steps to risk profile",
       "stat2Label": "Max confirmation time",
       "stat3Label": "Max reply window",
-      "stat4Label": "Regulatory surprises"
+      "stat4Label": "Regulatory surprises",
+      "railSub": "Speed and clarity instead of legal opinions"
     },
     "operations": {
       "overline": "For Operations Teams",
@@ -165,7 +166,8 @@
       "item3": "Source Index",
       "stat1Label": "Engagement lifecycle visibility",
       "stat2Label": "PDF report export",
-      "stat3Label": "Saved compliance sessions"
+      "stat3Label": "Saved compliance sessions",
+      "railSub": "One control centre instead of email threads"
     },
     "counsel": {
       "overline": "For In-House Counsel",
@@ -190,7 +192,8 @@
       "codeCommentBefore": "// Before redaction",
       "codeCommentAfter": "// After redaction",
       "stat1Label": "PII masked before AI",
-      "stat2Label": "Source-linked outputs"
+      "stat2Label": "Source-linked outputs",
+      "railSub": "Sourced statements, masked data"
     },
     "cta": {
       "title": "Which role fits you?",
@@ -198,8 +201,27 @@
       "btnAssessment": "Start Free Assessment",
       "btnPlatform": "Explore Platform"
     },
-    "footer": {
-      "copyright": "© {{year}} CompliHub360. Built in Berlin."
+    "hero": {
+      "eyebrow": "Who it is for",
+      "titlePre": "Three roles, ",
+      "titleGold": "one",
+      "titlePost": " way to a decision.",
+      "lead": "Founder, operations lead or in-house counsel — the questions differ, the engine behind them does not. Pick who you are and the page shows what CompliHub360 takes off your desk.",
+      "roleKicker": "Role {{num}}"
+    },
+    "roles": {
+      "eyebrow": "Roles",
+      "title": "What CompliHub360 takes off your desk"
+    },
+    "path": {
+      "eyebrow": "The path",
+      "title": "From context to the right specialist",
+      "lead": "Four steps, whatever the role: the target market sets the frame, the assistant captures the business, the engine calculates, the match leads to the person."
+    },
+    "stats": {
+      "eyebrow": "Numbers",
+      "title": "What holds in every role",
+      "note": "No forecasts — promised windows and measured shares."
     }
   },
   "platform": {
@@ -925,9 +947,10 @@
     "nav": {
       "howItWorks": "How it works",
       "pricing": "Pricing",
+      "trust": "Trust & Security",
       "complianceAreas": "Compliance Areas",
       "markets": "Markets",
-      "resources": "Resources",
+      "solutions": "Who it is for",
       "areasPanelTitle": "Choose a compliance area",
       "allAreas": "All compliance areas",
       "areasAsideBody": "Every area lists the duties it carries, the statute behind each one, and what it costs to get wrong.",

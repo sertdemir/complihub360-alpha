@@ -136,7 +136,8 @@
       "stat1Label": "Pasos para el perfil de riesgo",
       "stat2Label": "Tiempo máximo de confirmación",
       "stat3Label": "Ventana máxima de respuesta",
-      "stat4Label": "Sorpresas regulatorias"
+      "stat4Label": "Sorpresas regulatorias",
+      "railSub": "Velocidad y claridad en lugar de dictámenes"
     },
     "operations": {
       "overline": "Para Equipos de Operaciones",
@@ -165,7 +166,8 @@
       "item3": "Índice de Fuentes",
       "stat1Label": "Visibilidad del ciclo de vida del engagement",
       "stat2Label": "Exportación de informes PDF",
-      "stat3Label": "Sesiones de cumplimiento guardadas"
+      "stat3Label": "Sesiones de cumplimiento guardadas",
+      "railSub": "Un centro de control en lugar de hilos de correo"
     },
     "counsel": {
       "overline": "Para Asesores Jurídicos Internos",
@@ -190,7 +192,8 @@
       "codeCommentBefore": "// Antes de la redacción",
       "codeCommentAfter": "// Después de la redacción",
       "stat1Label": "PII enmascarada antes de la IA",
-      "stat2Label": "Resultados vinculados a fuentes"
+      "stat2Label": "Resultados vinculados a fuentes",
+      "railSub": "Afirmaciones con fuente, datos enmascarados"
     },
     "cta": {
       "title": "¿Qué rol te describe mejor?",
@@ -198,8 +201,27 @@
       "btnAssessment": "Iniciar evaluación gratuita",
       "btnPlatform": "Explorar plataforma"
     },
-    "footer": {
-      "copyright": "© {{year}} CompliHub360. Construido en Berlín."
+    "hero": {
+      "eyebrow": "Para quién",
+      "titlePre": "Tres funciones, ",
+      "titleGold": "un",
+      "titlePost": " camino a la decisión.",
+      "lead": "Fundadora, responsable de operaciones o asesor interno: las preguntas cambian, el motor detrás no. Elija quién es y la página muestra qué le quita de encima CompliHub360.",
+      "roleKicker": "Función {{num}}"
+    },
+    "roles": {
+      "eyebrow": "Funciones",
+      "title": "Qué le quita de encima CompliHub360"
+    },
+    "path": {
+      "eyebrow": "El camino",
+      "title": "Del contexto al especialista adecuado",
+      "lead": "Cuatro pasos, sea cual sea la función: el mercado objetivo marca el encuadre, el asistente capta el negocio, el motor calcula, el match lleva a la persona."
+    },
+    "stats": {
+      "eyebrow": "Cifras",
+      "title": "Lo que vale en cualquier función",
+      "note": "Sin previsiones: ventanas comprometidas y proporciones medidas."
     }
   },
   "platform": {
@@ -925,9 +947,10 @@
     "nav": {
       "howItWorks": "Cómo funciona",
       "pricing": "Precios",
+      "trust": "Confianza y seguridad",
       "complianceAreas": "Áreas de Cumplimiento",
       "markets": "Mercados",
-      "resources": "Recursos",
+      "solutions": "Para quién",
       "areasPanelTitle": "Elija un área de cumplimiento",
       "allAreas": "Todas las áreas de cumplimiento",
       "areasAsideBody": "Cada área enumera las obligaciones que conlleva, la norma que hay detrás y lo que cuesta equivocarse.",

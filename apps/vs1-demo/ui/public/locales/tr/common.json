@@ -136,7 +136,8 @@
       "stat1Label": "Risk profili için adımlar",
       "stat2Label": "Maks. onay süresi",
       "stat3Label": "Maks. yanıt penceresi",
-      "stat4Label": "Mevzuat sürprizleri"
+      "stat4Label": "Mevzuat sürprizleri",
+      "railSub": "Mütalaa yerine hız ve netlik"
     },
     "operations": {
       "overline": "Operasyon Ekipleri için",
@@ -165,7 +166,8 @@
       "item3": "Kaynak Dizini",
       "stat1Label": "Engagement yaşam döngüsü görünürlüğü",
       "stat2Label": "PDF raporu dışa aktarma",
-      "stat3Label": "Kaydedilmiş uyumluluk oturumları"
+      "stat3Label": "Kaydedilmiş uyumluluk oturumları",
+      "railSub": "E-posta zincirleri yerine tek kontrol merkezi"
     },
     "counsel": {
       "overline": "Kurum İçi Hukuk Danışmanları için",
@@ -190,7 +192,8 @@
       "codeCommentBefore": "// Düzeltmeden önce",
       "codeCommentAfter": "// Düzeltmeden sonra",
       "stat1Label": "Yapay zekadan önce maskelenen PII",
-      "stat2Label": "Kaynağa bağlı çıktılar"
+      "stat2Label": "Kaynağa bağlı çıktılar",
+      "railSub": "Kaynaklı ifadeler, maskelenmiş veriler"
     },
     "cta": {
       "title": "Hangi rol size uyuyor?",
@@ -198,8 +201,27 @@
       "btnAssessment": "Ücretsiz Değerlendirme Başlatın",
       "btnPlatform": "Platformu Keşfedin"
     },
-    "footer": {
-      "copyright": "© {{year}} CompliHub360. Berlin'de yapıldı."
+    "hero": {
+      "eyebrow": "Kimin için",
+      "titlePre": "Üç rol, ",
+      "titleGold": "tek",
+      "titlePost": " karar yolu.",
+      "lead": "Kurucu, operasyon lideri ya da şirket içi hukukçu — sorular değişir, arkasındaki motor değişmez. Kim olduğunuzu seçin; sayfa, CompliHub360’ın sizden neyi devraldığını gösterir.",
+      "roleKicker": "Rol {{num}}"
+    },
+    "roles": {
+      "eyebrow": "Roller",
+      "title": "CompliHub360 sizden neyi devralır"
+    },
+    "path": {
+      "eyebrow": "Yol",
+      "title": "Bağlamdan doğru uzmana",
+      "lead": "Rol ne olursa olsun dört adım: hedef pazar çerçeveyi kurar, asistan işi kavrar, motor hesaplar, eşleşme kişiye götürür."
+    },
+    "stats": {
+      "eyebrow": "Sayılar",
+      "title": "Her rolde geçerli olan",
+      "note": "Tahmin yok — taahhüt edilen süreler ve ölçülmüş oranlar."
     }
   },
   "platform": {
@@ -925,9 +947,10 @@
     "nav": {
       "howItWorks": "Nasıl çalışır",
       "pricing": "Fiyatlandırma",
+      "trust": "Güven ve Güvenlik",
       "complianceAreas": "Uyum Alanları",
       "markets": "Pazarlar",
-      "resources": "Kaynaklar",
+      "solutions": "Kimler için",
       "areasPanelTitle": "Bir uyum alanı seçin",
       "allAreas": "Tüm uyum alanları",
       "areasAsideBody": "Her alan taşıdığı yükümlülükleri, arkasındaki mevzuatı ve hata yapmanın bedelini listeler.",

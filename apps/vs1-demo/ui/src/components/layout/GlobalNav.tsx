@@ -7,13 +7,14 @@ import { LanguageMenu } from './LanguageMenu';
 import { AreasMenuPanel } from './AreasMenuPanel';
 import { MarketsMenuPanel } from './MarketsMenuPanel';
 import { useAuthStore } from '../../store/useAuthStore';
-import { ChevronDown, LogOut, LayoutDashboard } from 'lucide-react';
+import { ChevronDown, LogOut, LayoutDashboard, Menu, X } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Logo } from '../ui/Logo';
 import { ThemeToggle } from '../ui/ThemeToggle';
+import { HEADER_NAV_LINKS } from './navLinks';
 
 const menuItemClass = (active: boolean) =>
-  `flex items-center gap-1 px-2 md:px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${
+  `flex items-center gap-1 px-2 desktop-l:px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${
     active ? 'text-fg-brand bg-brand-light' : 'text-fg-secondary hover:text-fg hover:bg-surface-secondary'
   }`;
 
@@ -30,6 +31,7 @@ export function GlobalNav() {
   const pathLang = location.pathname.split('/').filter(Boolean)[0];
   const currentLang = supportedLngs.includes(pathLang) ? pathLang : i18n.resolvedLanguage || 'en';
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const { isLoggedIn, role, userName, logout } = useAuthStore();
 
@@ -57,27 +59,17 @@ export function GlobalNav() {
     }
   };
 
-  // Every entry is a destination. The one exception is the areas entry, which
-  // opens the NavMenu sheet instead — a control that reveals children, which is
-  // the only thing that legitimately stays a button.
-  const HEADER_MENU: {
-    id: string;
-    label: string;
-    path: string;
-    /** Opens the eight compliance areas as a full-width sheet. */
-    /** Which mega-menu this entry opens, if any. */
-    sheet?: 'areas' | 'markets';
-  }[] = [
-    // Same five destinations as the MarketingHeader — the two headers must not
-    // present different navigations. Platform and Solutions dropped out of the
-    // header on 2026-08-18: §11 P5 keeps them as SEO surfaces, reachable from the
-    // footer, and seven entries do not survive German labels.
-    { id: 'how-it-works', label: t('header.nav.howItWorks', 'How it works'), path: '/how-it-works' },
-    { id: 'areas', label: t('header.nav.complianceAreas', 'Compliance Areas'), path: '/compliance', sheet: 'areas' },
-    { id: 'markets', label: t('header.nav.markets', 'Markets'), path: '/markets', sheet: 'markets' },
-    { id: 'pricing', label: t('header.nav.pricing', 'Pricing'), path: '/pricing' },
-    { id: 'resources', label: t('header.nav.resources', 'Resources'), path: '/resources' },
-  ];
+  // Every entry is a destination. The exceptions are the two mega-menu
+  // entries, which open a sheet instead — a control that reveals children,
+  // which is the only thing that legitimately stays a button. The entries
+  // themselves come from the shared source both headers read (navLinks.ts) —
+  // the two headers cannot present different navigations anymore.
+  const HEADER_MENU = HEADER_NAV_LINKS.map((l) => ({
+    id: l.to,
+    label: t(l.labelKey, l.labelDefault),
+    path: `/${l.to}`,
+    sheet: l.sheet,
+  }));
 
   if (isHidden) return null;
 
@@ -91,7 +83,11 @@ export function GlobalNav() {
           site. Fixed height, not padding: the tallest child (h-10 actions) must
           never grow the bar. */}
       <div className="pointer-events-auto w-full bg-surface backdrop-blur-xl border-b border-stroke-subtle shadow-[0_4px_32px_rgba(0,0,0,0.08)]">
-        <div className="flex h-16 items-center justify-between gap-2 md:gap-4 lg:h-20 w-full max-w-[1440px] mx-auto pl-4 pr-8">
+        {/* ── Desktop bar — from xl only: six entries with German labels do
+            not survive 1024px, they clipped behind overflow-hidden. Below
+            desktop-m (1280) the burger panel takes over — note xl is 1440 in
+            this Tailwind scale. ── */}
+        <div className="hidden desktop-m:flex h-20 items-center justify-between gap-3 w-full max-w-[1440px] mx-auto pl-4 pr-8">
 
         {/* Logo — the real lockup from the design system, never a rebuilt mark.
             This used to be a CircleDot glyph in a green square plus a text
@@ -104,14 +100,21 @@ export function GlobalNav() {
           className="flex shrink-0 items-center px-2"
           aria-label="CompliHub360 Home"
         >
-          <Logo lockup="horizontal" tone="on-light" href={null} markClassName="h-7" />
+          {/* Mark only between desktop-m and desktop-l: the full lockup plus
+              six German entries need the last ~130px the wordmark occupies. */}
+          <span className="desktop-l:hidden">
+            <Logo lockup="mark" tone="on-light" href={null} markClassName="h-7" />
+          </span>
+          <span className="hidden desktop-l:block">
+            <Logo lockup="horizontal" tone="on-light" href={null} markClassName="h-7" />
+          </span>
         </button>
 
         {/* Divider */}
         <div className="w-px h-5 bg-stroke shrink-0 hidden md:block" />
 
         {/* Nav */}
-        <nav className="flex items-center justify-center flex-1 gap-1 md:gap-4 lg:gap-6 min-w-0 overflow-hidden">
+        <nav className="flex items-center justify-center flex-1 gap-1 desktop-l:gap-3 min-w-0 overflow-hidden">
           {/* A destination is an <a>, not a button. As a button it had no href:
               no new tab, no copy-link, not announced as a link — and invisible
               to crawlers, which would have quietly undone the whole point of
@@ -224,6 +227,121 @@ export function GlobalNav() {
             </>
           )}
         </div>
+        </div>
+
+        {/* ── Mobile / Tablet (burger + expanding panel) ── */}
+        {/* GlobalNav had NO mobile navigation until 2026-08-28 (user finding):
+            the desktop row simply clipped its entries behind overflow-hidden.
+            This is the MarketingHeader's mobile anatomy — compact bar with the
+            mark, theme, language and a burger; the panel carries the account
+            actions and the nav entries as a scrollable pill row. The two mega
+            menus are plain links here: their overview pages list the same
+            children a sheet would. */}
+        <div className="desktop-m:hidden">
+          <div className="flex h-16 items-center justify-between px-5">
+            <button onClick={() => navTo('/')} className="flex items-center" aria-label="CompliHub360 Home">
+              <Logo lockup="mark" tone="on-light" href={null} />
+            </button>
+            <div className="flex items-center gap-2">
+              <ThemeToggle size={40} />
+              <LanguageMenu triggerClassName="h-10 w-10" />
+              <button
+                aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={mobileOpen}
+                onClick={() => setMobileOpen((v) => !v)}
+                className="grid h-[40px] w-[40px] place-items-center rounded-md text-fg"
+              >
+                {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+              </button>
+            </div>
+          </div>
+
+          <AnimatePresence initial={false}>
+            {mobileOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
+                className="overflow-hidden bg-surface"
+              >
+                {/* Account row — the same actions the desktop bar's right zone
+                    carries, full-width so a thumb can hit them. */}
+                <div className="flex items-center gap-3 px-4 pb-1 pt-4">
+                  {isLoggedIn ? (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="md"
+                        className="flex-1"
+                        onClick={() => {
+                          setMobileOpen(false);
+                          navTo(role === 'partner' ? '/partner-dashboard' : '/dashboard');
+                        }}
+                      >
+                        <LayoutDashboard size={16} className="mr-2" aria-hidden />
+                        Mein Dashboard
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="md"
+                        aria-label="Abmelden"
+                        onClick={() => {
+                          setMobileOpen(false);
+                          logout();
+                          navTo('/');
+                        }}
+                      >
+                        <LogOut size={16} aria-hidden />
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="md"
+                        className="flex-1"
+                        onClick={() => {
+                          setMobileOpen(false);
+                          navTo('/login');
+                        }}
+                      >
+                        {t('nav.login', 'Log in')}
+                      </Button>
+                      <Button
+                        variant="primary"
+                        size="md"
+                        className="flex-1"
+                        onClick={() => {
+                          setMobileOpen(false);
+                          navTo('/register');
+                        }}
+                      >
+                        {t('nav.signup', 'Sign up for free')}
+                      </Button>
+                    </>
+                  )}
+                </div>
+                {/* Pill row (horizontal scroll) — the MarketingHeader's move. */}
+                <div className="flex gap-3 overflow-x-auto px-4 pb-5 pt-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  {HEADER_MENU.map((menu) => (
+                    <Link
+                      key={menu.id}
+                      to={`/${currentLang}${menu.path}`}
+                      onClick={() => setMobileOpen(false)}
+                      className={`shrink-0 whitespace-nowrap rounded-pill px-3.5 py-2 text-body-sm font-semibold transition-colors ${
+                        location.pathname.startsWith(`/${currentLang}${menu.path}`)
+                          ? 'bg-brand text-fg-on-brand'
+                          : 'bg-surface-secondary text-fg'
+                      }`}
+                    >
+                      {menu.label}
+                    </Link>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 

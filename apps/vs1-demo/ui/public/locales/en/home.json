@@ -1270,16 +1270,15 @@
         "title": "Platform",
         "links": {
           "howItWorks": "How it works",
+          "forWhom": "Who it is for",
           "startAssessment": "Start Assessment",
-          "exampleResult": "Example Result",
-          "pricing": "Pricing",
-          "platformOverview": "Platform overview"
+          "pricing": "Pricing"
         }
       },
-      "solutions": {
-        "title": "Solutions",
+      "areas": {
+        "title": "Compliance areas",
         "links": {
-          "solutionsOverview": "By role",
+          "areasOverview": "All areas",
           "taxVat": "Tax & VAT",
           "productPackaging": "EPR & Packaging",
           "dataPrivacy": "Data & Privacy",
@@ -1290,24 +1289,28 @@
           "legalAdvisory": "Legal Advisory"
         }
       },
-      "resources": {
-        "title": "Resources",
+      "markets": {
+        "title": "Markets",
         "links": {
-          "complianceNews": "Compliance News",
-          "knowledgeLibrary": "Knowledge Library",
-          "countryGuides": "Country Guides",
-          "tutorials": "Tutorials",
-          "glossary": "Compliance Glossary",
-          "aiGovernance": "AI governance"
+          "marketsOverview": "All markets",
+          "market_DE": "Germany",
+          "market_FR": "France",
+          "market_US": "United States",
+          "market_UK": "United Kingdom",
+          "market_IT": "Italy",
+          "market_ES": "Spain",
+          "market_NL": "Netherlands",
+          "market_TR": "Türkiye"
         }
       },
       "company": {
         "title": "Company",
         "links": {
           "about": "About",
+          "partner": "Partners",
           "trustSecurity": "Trust & Security",
           "contact": "Contact",
-          "careers": "Careers"
+          "support": "Support"
         }
       }
     },
