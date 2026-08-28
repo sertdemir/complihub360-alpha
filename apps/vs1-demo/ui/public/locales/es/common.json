@@ -1106,7 +1106,19 @@
       "obligations_one": "{{count}} obligación",
       "obligations_other": "{{count}} obligaciones",
       "areas": "{{count}} de {{total}} áreas",
-      "enforcement": "Aplicación {{value}}/10"
+      "enforcement": "Aplicación {{value}}/10",
+      "kpi": {
+        "markets": "Mercados",
+        "marketsNote": "el núcleo de la UE más Reino Unido, EE. UU. y Turquía",
+        "duties": "Obligaciones con base legal",
+        "dutiesNote": "cada una comparada contra el motor",
+        "enforcement": "Aplicación media",
+        "enforcementNote": "{{market}} lidera con {{value}} de 10",
+        "ofTen": "/ 10"
+      },
+      "cardSub_one": "{{count}} obligación con base legal nacional, fuentes propias en {{areas}} de {{total}} áreas.",
+      "cardSub_other": "{{count}} obligaciones con base legal nacional, fuentes propias en {{areas}} de {{total}} áreas.",
+      "openMarket": "Abrir el mercado"
     },
     "country": {
       "eyebrow": "Mercado",
@@ -1119,7 +1131,6 @@
       "sourceLabel": "Fuente",
       "dueLabel": "Periodicidad",
       "leadTime": "{{days}} días de antelación",
-      "coverageNote": "Las demás obligaciones que mantenemos para {{market}} se apoyan en {{count}} fuentes nacionales, más los Reglamentos de la UE de aplicación directa: esos no necesitan texto nacional y no cuentan como ausentes.",
       "backToMarkets": "Todos los mercados",
       "notFound": "Todavía no tenemos un perfil de mercado para este código.",
       "profileTitle": "Perfil del mercado",
@@ -1127,31 +1138,34 @@
       "ownSources": "Fuentes propias",
       "ofAreas": "{{count}} / {{total}} áreas",
       "ofAreasShort": "{{count}} de {{total}}",
-      "factDuties": "obligaciones",
-      "factAreas": "áreas",
-      "factExposure": "exposición",
-      "factLead": "hasta el próximo plazo",
       "startAssessment": "Iniciar la evaluación para {{market}}",
       "sourcePromise": "Cada obligación cita aquí su base legal nacional. Donde no tenemos ninguna, rige el instrumento de la UE, y así se indica.",
       "weightsLeadTied": "{{count}} áreas pesan lo mismo aquí ({{weight}} sobre 10). Cada una lleva a su propia página.",
-      "euSource": "Fuente UE",
       "calendarTitle": "Qué confluye aquí, y con qué frecuencia",
       "calendarLead": "{{count}} obligaciones de {{areas}} áreas en una vista, por periodicidad y no por área. Nadie planifica un mercado área por área: lo planifica contra un calendario.",
       "leadDays": "{{count}} días de antelación",
       "exposureNote": "Sanción individual más alta en este mercado: {{max}} sobre {{duty}}. Los límites declarados suman {{total}}: un techo si todo saliera mal a la vez, no una previsión.",
-      "coverageTitle": "Dónde aún no tenemos fuente local",
-      "coverageLead": "{{count}} obligaciones tienen un texto nacional que no incluimos. Es una laguna de nuestra cobertura, no de la ley, y conviene saber cuál de las dos.",
-      "gapNone": "Sin fuente",
-      "gapEu": "Rige la fuente UE",
-      "gapShowing": "Mostramos",
-      "relatedTitle": "Mercados que van con este",
-      "relatedLead": "Pocos venden a un solo mercado. Estos tres comparten más obligaciones con este: las mismas presentaciones, otra jurisdicción.",
-      "relatedFact": "{{count}} obligaciones en {{areas}} áreas, {{shared}} compartidas con este mercado.",
-      "openMarket": "Abrir este mercado",
       "ctaBody": "La evaluación acota este mercado a su empresa, su producto y sus áreas, en menos de cinco minutos.",
       "allAreas": "Todas las áreas",
-      "nDuties_one": "{{count}} obligación",
-      "nDuties_other": "{{count}} obligaciones"
+      "facts": {
+        "duties": "Obligaciones en este mercado",
+        "dutiesNote": "cada una con fuente nacional",
+        "areas": "áreas con fuente propia",
+        "areasNote": "el resto se rige por el derecho de la UE",
+        "exposure": "Exposición máxima",
+        "exposureNote": "suma de los topes indicados, no una previsión",
+        "lead": "hasta el próximo plazo"
+      },
+      "weightsFoot": "Fuentes propias en {{covered}} de {{total}} áreas — el resto se aplica directamente a través del derecho de la UE.",
+      "cadenceGroup": "{{cadence}} · {{count}}",
+      "cadenceHot": "Mayor carga de frecuencia",
+      "relatedAreasTitle": "Las áreas que sostienen este mercado",
+      "relatedAreasLead": "Aquí viven las obligaciones nacionales de este mercado — primero las áreas con más fuentes propias. Lo que exige cada obligación está en la página de su área.",
+      "relatedAreasFact_one": "{{count}} obligación en este mercado",
+      "relatedAreasFact_other": "{{count}} obligaciones en este mercado",
+      "weightsFootCovered": "Fuentes propias en {{covered}} de {{total}} áreas — los reglamentos de la UE se aplican directamente y no cuentan como carencia.",
+      "weightsFootPending": "Para {{list}} existe un texto nacional que aún no incorporamos — en su lugar figura el instrumento de la UE indicado.",
+      "weightsFootNone": "Para {{list}} aún no tenemos una fuente con nombre."
     },
     "cta": {
       "title": "Vea cuáles se aplican a su caso.",
@@ -1198,26 +1212,18 @@
       "tax-vat-registration": "Registro y presentación del IVA"
     },
     "regions": {
-      "title": "Mercados y regiones cubiertos",
+      "eyebrow": "Regiones",
+      "title": "Dónde estamos — y hacia dónde vamos",
       "lead": "Cada búsqueda y cada análisis se apoyan en las leyes concretas del país de destino, para evitar vuelos a ciegas en materia legal.",
-      "legend": {
-        "live": "En vivo",
-        "rollout": "Despliegue activo"
-      },
-      "focusAreas": "Áreas prioritarias",
+      "note": "La UE y el Reino Unido están totalmente cubiertos; Norteamérica está en construcción y APAC arranca con cobertura básica. Más países se sumarán a lo largo de 2026.",
       "tiers": {
         "full": "Cobertura completa",
         "expanding": "En expansión",
         "core": "Cobertura básica"
       },
-      "complexity": {
-        "high": "Complejidad alta",
-        "medium": "Complejidad media"
-      },
       "items": {
         "eu": {
-          "name": "Unión Europea (UE)",
-          "description": "Experiencia especializada para el mercado único altamente regulado, desde los estándares del RGPD hasta las normas locales de EPR.",
+          "name": "Unión Europea",
           "focus": [
             "Cumplimiento del RGPD",
             "Normativa EPR de envases",
@@ -1226,8 +1232,7 @@
           ]
         },
         "uk": {
-          "name": "Reino Unido (UK)",
-          "description": "Navegación específica por el panorama de cumplimiento posterior al Brexit y las normas británicas de protección de datos.",
+          "name": "Reino Unido",
           "focus": [
             "RGPD del Reino Unido",
             "Cumplimiento de IVA (HMRC)",
@@ -1237,7 +1242,6 @@
         },
         "us": {
           "name": "EE. UU. y Canadá",
-          "description": "Escale su negocio hacia Norteamérica con apoyo unificado para los requisitos federales y estatales.",
           "focus": [
             "Nexus e impuesto sobre ventas",
             "Privacidad CCPA/CPRA",
@@ -1247,7 +1251,6 @@
         },
         "au": {
           "name": "Australia (APAC)",
-          "description": "Puerta de entrada a la región APAC con cobertura básica del derecho de consumo y la fiscalidad australianos.",
           "focus": [
             "Cumplimiento del GST",
             "Privacy Act 1988",

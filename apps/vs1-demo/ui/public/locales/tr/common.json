@@ -1106,7 +1106,19 @@
       "obligations_one": "{{count}} yükümlülük",
       "obligations_other": "{{count}} yükümlülük",
       "areas": "{{total}} alandan {{count}}",
-      "enforcement": "Uygulama {{value}}/10"
+      "enforcement": "Uygulama {{value}}/10",
+      "kpi": {
+        "markets": "Pazarlar",
+        "marketsNote": "AB çekirdeği artı Birleşik Krallık, ABD ve Türkiye",
+        "duties": "Yasal dayanağı olan yükümlülükler",
+        "dutiesNote": "her biri motora karşı doğrulandı",
+        "enforcement": "Ortalama uygulama",
+        "enforcementNote": "{{market}}, 10 üzerinden {{value}} ile önde",
+        "ofTen": "/ 10"
+      },
+      "cardSub_one": "Ulusal yasal dayanağı olan {{count}} yükümlülük; {{total}} alandan {{areas}} tanesinde kendi kaynaklarımız var.",
+      "cardSub_other": "Ulusal yasal dayanağı olan {{count}} yükümlülük; {{total}} alandan {{areas}} tanesinde kendi kaynaklarımız var.",
+      "openMarket": "Pazarı aç"
     },
     "country": {
       "eyebrow": "Pazar",
@@ -1119,7 +1131,6 @@
       "sourceLabel": "Kaynak",
       "dueLabel": "Sıklık",
       "leadTime": "{{days}} gün süre",
-      "coverageNote": "{{market}} için taşıdığımız diğer yükümlülükler {{count}} ulusal kaynağa ve burada doğrudan uygulanan AB Tüzüklerine dayanır; onların ulusal metne ihtiyacı yoktur, bu yüzden eksik sayılmazlar.",
       "backToMarkets": "Tüm pazarlar",
       "notFound": "Bu kod için henüz bir pazar profilimiz yok.",
       "profileTitle": "Pazar profili",
@@ -1127,31 +1138,34 @@
       "ownSources": "Kendi kaynaklarımız",
       "ofAreas": "{{count}} / {{total}} alan",
       "ofAreasShort": "{{total}} alanın {{count}} tanesi",
-      "factDuties": "yükümlülük",
-      "factAreas": "alan",
-      "factExposure": "maruziyet",
-      "factLead": "sonraki süreye",
       "startAssessment": "{{market}} için değerlendirmeyi başlat",
       "sourcePromise": "Buradaki her yükümlülük ulusal hukuki dayanağını adıyla belirtir. Elimizde yoksa AB aracı geçerlidir — ve bu yazılıdır.",
       "weightsLeadTied": "{{count}} alan burada eşit ağırlıkta (10 üzerinden {{weight}}). Her biri kendi sayfasına götürür.",
-      "euSource": "AB kaynağı",
       "calendarTitle": "Burada neler bir araya geliyor, ne sıklıkla",
       "calendarLead": "{{areas}} alandan {{count}} yükümlülük tek bir görünümde — alana göre değil, döngüye göre. Kimse bir pazarı alan alan planlamaz; takvime göre planlar.",
       "leadDays": "{{count}} gün hazırlık süresi",
       "exposureNote": "Bu pazardaki en yüksek tekil ceza: {{duty}} için {{max}}. Belirtilen üst sınırların toplamı {{total}} — her şey aynı anda ters gitseydi diye bir tavan, tahmin değil.",
-      "coverageTitle": "Henüz yerel kaynak taşımadığımız yerler",
-      "coverageLead": "{{count}} yükümlülüğün taşımadığımız bir ulusal metni var. Bu, hukuktaki değil kapsamımızdaki bir boşluk — hangisi olduğunu bilmek önemli.",
-      "gapNone": "Kaynak yok",
-      "gapEu": "AB kaynağı geçerli",
-      "gapShowing": "Gösterdiğimiz",
-      "relatedTitle": "Bununla birlikte gelen pazarlar",
-      "relatedLead": "Çok azı tek pazara satar. Bu üçü bu pazarla en çok yükümlülüğü paylaşıyor — aynı bildirimler, ikinci bir yargı alanı.",
-      "relatedFact": "{{areas}} alanda {{count}} yükümlülük, {{shared}} tanesi bu pazarla ortak.",
-      "openMarket": "Pazarı aç",
       "ctaBody": "Değerlendirme bu pazarı şirketinize, ürününüze ve alanlarınıza göre daraltır — beş dakikadan kısa sürede.",
       "allAreas": "Tüm alanlar",
-      "nDuties_one": "{{count}} yükümlülük",
-      "nDuties_other": "{{count}} yükümlülük"
+      "facts": {
+        "duties": "Bu pazardaki yükümlülükler",
+        "dutiesNote": "her biri ulusal kaynaklı",
+        "areas": "kendi kaynaklı alan",
+        "areasNote": "geri kalanı AB hukuku üzerinden yürür",
+        "exposure": "Azami risk tutarı",
+        "exposureNote": "belirtilen üst sınırların toplamı, tahmin değil",
+        "lead": "sonraki son tarihe kadar"
+      },
+      "weightsFoot": "{{total}} alandan {{covered}} tanesinde kendi kaynaklarımız var — geri kalanı doğrudan AB hukuku üzerinden geçerli.",
+      "cadenceGroup": "{{cadence}} · {{count}}",
+      "cadenceHot": "En yüksek takt yükü",
+      "relatedAreasTitle": "Bu pazarı taşıyan alanlar",
+      "relatedAreasLead": "Bu pazarın ulusal yükümlülükleri burada yaşar — önce en çok kendi kaynağı olan alanlar. Tek bir yükümlülüğün ne istediği kendi alan sayfasında yazar.",
+      "relatedAreasFact_one": "Bu pazarda {{count}} yükümlülük",
+      "relatedAreasFact_other": "Bu pazarda {{count}} yükümlülük",
+      "weightsFootCovered": "{{total}} alandan {{covered}} tanesinde kendi kaynaklarımız var — AB tüzükleri doğrudan geçerlidir ve eksik sayılmaz.",
+      "weightsFootPending": "{{list}} için henüz taşımadığımız bir ulusal metin mevcut — yerinde belirtilen AB aracı duruyor.",
+      "weightsFootNone": "{{list}} için henüz adlandırılmış bir kaynağımız yok."
     },
     "cta": {
       "title": "Bunlardan hangilerinin size uyduğunu görün.",
@@ -1198,26 +1212,18 @@
       "tax-vat-registration": "KDV kaydı ve beyanı"
     },
     "regions": {
-      "title": "Kapsanan Pazarlar ve Bölgeler",
+      "eyebrow": "Bölgeler",
+      "title": "Neredeyiz — ve yol nereye gidiyor",
       "lead": "Her arama ve analiz, hedef ülkenin somut mevzuatına dayanır — hukuki körlemesine adımları önlemek için.",
-      "legend": {
-        "live": "Yayında",
-        "rollout": "Aktif Yaygınlaştırma"
-      },
-      "focusAreas": "Odak Alanları",
+      "note": "AB ve Birleşik Krallık tam kapsamda; Kuzey Amerika yapım aşamasında, APAC temel kapsamla başlıyor. 2026 boyunca yeni ülkeler eklenecek.",
       "tiers": {
         "full": "Tam Kapsam",
         "expanding": "Genişliyor",
         "core": "Temel Kapsam"
       },
-      "complexity": {
-        "high": "Yüksek Karmaşıklık",
-        "medium": "Orta Karmaşıklık"
-      },
       "items": {
         "eu": {
-          "name": "Avrupa Birliği (AB)",
-          "description": "Yoğun düzenlemeye tabi tek pazar için uzmanlaşmış bilgi birikimi — GDPR standartlarından yerel EPR mevzuatına kadar.",
+          "name": "Avrupa Birliği",
           "focus": [
             "GDPR Uyumu",
             "EPR Ambalaj Mevzuatı",
@@ -1226,8 +1232,7 @@
           ]
         },
         "uk": {
-          "name": "Birleşik Krallık (UK)",
-          "description": "Brexit sonrası uyumluluk ortamında ve Birleşik Krallık'a özgü veri koruma kurallarında hedefli yönlendirme.",
+          "name": "Birleşik Krallık",
           "focus": [
             "UK GDPR",
             "HMRC KDV Uyumu",
@@ -1237,7 +1242,6 @@
         },
         "us": {
           "name": "ABD ve Kanada",
-          "description": "Federal ve eyalet düzeyindeki gerekliliklere yönelik derli toplu destekle işinizi Kuzey Amerika'ya ölçekleyin.",
           "focus": [
             "Nexus ve Satış Vergisi",
             "CCPA/CPRA Gizliliği",
@@ -1247,7 +1251,6 @@
         },
         "au": {
           "name": "Avustralya (APAC)",
-          "description": "Avustralya tüketici hukuku ve vergi mevzuatı için temel kapsamla APAC bölgesine açılan kapı.",
           "focus": [
             "GST Uyumu",
             "Privacy Act 1988",

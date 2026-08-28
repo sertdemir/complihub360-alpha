@@ -1106,7 +1106,19 @@
       "obligations_one": "{{count}} Pflicht",
       "obligations_other": "{{count}} Pflichten",
       "areas": "{{count}} von {{total}} Bereichen",
-      "enforcement": "Vollzug {{value}}/10"
+      "enforcement": "Vollzug {{value}}/10",
+      "kpi": {
+        "markets": "Märkte",
+        "marketsNote": "EU-Kern plus UK, USA und Türkei",
+        "duties": "Pflichten mit Rechtsgrundlage",
+        "dutiesNote": "jede gegen die Engine geprüft",
+        "enforcement": "Vollzug im Schnitt",
+        "enforcementNote": "{{market}} führt mit {{value}} von 10",
+        "ofTen": "/ 10"
+      },
+      "cardSub_one": "{{count}} Pflicht mit nationaler Rechtsgrundlage, eigene Quellen in {{areas}} von {{total}} Bereichen.",
+      "cardSub_other": "{{count}} Pflichten mit nationaler Rechtsgrundlage, eigene Quellen in {{areas}} von {{total}} Bereichen.",
+      "openMarket": "Markt öffnen"
     },
     "country": {
       "eyebrow": "Markt",
@@ -1119,7 +1131,6 @@
       "sourceLabel": "Quelle",
       "dueLabel": "Turnus",
       "leadTime": "{{days}} Tage Vorlauf",
-      "coverageNote": "Die übrigen Pflichten, die wir für {{market}} führen, laufen über {{count}} nationale Quellen sowie die EU-Verordnungen, die hier unmittelbar gelten — die brauchen keinen nationalen Text und zählen deshalb nicht als fehlend.",
       "backToMarkets": "Alle Märkte",
       "notFound": "Für dieses Kürzel führen wir noch kein Marktprofil.",
       "profileTitle": "Marktprofil",
@@ -1127,31 +1138,34 @@
       "ownSources": "Eigene Quellen",
       "ofAreas": "{{count}} / {{total}} Bereiche",
       "ofAreasShort": "{{count}} von {{total}}",
-      "factDuties": "Pflichten",
-      "factAreas": "Bereiche",
-      "factExposure": "Exposition",
-      "factLead": "bis zur nächsten Frist",
       "startAssessment": "Assessment für {{market}} starten",
       "sourcePromise": "Jede Pflicht hier nennt ihre nationale Rechtsgrundlage. Wo wir keine führen, steht das EU-Instrument — und es steht dran.",
       "weightsLeadTied": "{{count}} Bereiche wiegen hier gleich schwer ({{weight}} von 10). Jeder führt auf seine eigene Seite.",
-      "euSource": "EU-Quelle",
       "calendarTitle": "Was hier zusammenkommt, und wie oft",
       "calendarLead": "{{count}} Pflichten aus {{areas}} Bereichen in einer Ansicht — nach Turnus, nicht nach Bereich. Niemand plant einen Markt bereichsweise, sondern gegen einen Kalender.",
       "leadDays": "{{count}} Tage Vorlauf",
       "exposureNote": "Höchstes Einzelbußgeld in diesem Markt: {{max}} auf {{duty}}. Die benannten Obergrenzen summieren sich auf {{total}} — ein Deckel, falls alles gleichzeitig schiefginge, keine Prognose.",
-      "coverageTitle": "Wo wir noch keine lokale Quelle führen",
-      "coverageLead": "{{count}} Pflichten haben eine nationale Fassung, die wir nicht führen. Das ist eine Lücke in unserer Abdeckung, nicht im Recht — und es lohnt zu wissen, welche von beiden.",
-      "gapNone": "Keine Quelle",
-      "gapEu": "EU-Quelle steht ein",
-      "gapShowing": "Wir zeigen",
-      "relatedTitle": "Märkte, die damit einhergehen",
-      "relatedLead": "Wer verkauft, verkauft selten nur in einen Markt. Diese drei teilen die meisten Pflichten mit diesem — dieselben Meldungen, eine zweite Jurisdiktion.",
-      "relatedFact": "{{count}} Pflichten in {{areas}} Bereichen, {{shared}} davon geteilt mit diesem Markt.",
-      "openMarket": "Markt öffnen",
       "ctaBody": "Das Assessment grenzt diesen Markt auf Ihr Unternehmen, Ihr Produkt und Ihre Bereiche ein — in unter fünf Minuten.",
       "allAreas": "Alle Bereiche",
-      "nDuties_one": "{{count}} Pflicht",
-      "nDuties_other": "{{count}} Pflichten"
+      "facts": {
+        "duties": "Pflichten in diesem Markt",
+        "dutiesNote": "jede mit nationaler Quelle",
+        "areas": "Bereichen mit eigener Quelle",
+        "areasNote": "der Rest läuft über EU-Recht",
+        "exposure": "Maximale Exposition",
+        "exposureNote": "Summe der Obergrenzen, keine Prognose",
+        "lead": "bis zur nächsten Frist"
+      },
+      "weightsFoot": "Eigene Quellen in {{covered}} von {{total}} Bereichen — der Rest gilt über EU-Recht unmittelbar.",
+      "cadenceGroup": "{{cadence}} · {{count}}",
+      "cadenceHot": "Höchste Taktlast",
+      "relatedAreasTitle": "Bereiche, die diesen Markt tragen",
+      "relatedAreasLead": "Hier liegen die nationalen Pflichten dieses Markts — die Bereiche mit den meisten eigenen Quellen zuerst. Was eine einzelne Pflicht verlangt, steht auf ihrer Bereichsseite.",
+      "relatedAreasFact_one": "{{count}} Pflicht in diesem Markt",
+      "relatedAreasFact_other": "{{count}} Pflichten in diesem Markt",
+      "weightsFootCovered": "Eigene Quellen in {{covered}} von {{total}} Bereichen — EU-Verordnungen gelten unmittelbar und zählen nicht als Lücke.",
+      "weightsFootPending": "Bei {{list}} existiert ein nationaler Text, den wir noch nicht führen — dort steht das benannte EU-Instrument.",
+      "weightsFootNone": "Für {{list}} führen wir noch keine benannte Quelle."
     },
     "cta": {
       "title": "Sehen, welche davon für Sie gelten.",
@@ -1198,26 +1212,18 @@
       "tax-vat-registration": "USt-Registrierung & -Meldung"
     },
     "regions": {
-      "title": "Abgedeckte Märkte & Regionen",
+      "eyebrow": "Regionen",
+      "title": "Wo wir stehen — und wo es hingeht",
       "lead": "Jede Suche und jede Analyse ist fest in den konkreten Gesetzen des Zielmarkts verankert — damit es keine rechtlichen Blindflüge gibt.",
-      "legend": {
-        "live": "Live",
-        "rollout": "Aktiver Rollout"
-      },
-      "focusAreas": "Schwerpunkte",
+      "note": "EU und UK sind voll abgedeckt; Nordamerika ist im Aufbau, APAC startet mit Grundabdeckung. Weitere Länder folgen im Lauf des Jahres 2026.",
       "tiers": {
         "full": "Vollständige Abdeckung",
         "expanding": "Im Aufbau",
         "core": "Grundabdeckung"
       },
-      "complexity": {
-        "high": "Hohe Komplexität",
-        "medium": "Mittlere Komplexität"
-      },
       "items": {
         "eu": {
-          "name": "Europäische Union (EU)",
-          "description": "Spezialisierte Expertise für den stark regulierten Binnenmarkt — von DSGVO-Standards bis zu lokalen EPR-Vorschriften.",
+          "name": "Europäische Union",
           "focus": [
             "DSGVO-Compliance",
             "EPR-Verpackungsrecht",
@@ -1226,8 +1232,7 @@
           ]
         },
         "uk": {
-          "name": "Vereinigtes Königreich (UK)",
-          "description": "Gezielte Navigation durch die Post-Brexit-Compliance-Landschaft und die britischen Datenschutzregeln.",
+          "name": "Vereinigtes Königreich",
           "focus": [
             "UK-DSGVO",
             "HMRC-USt-Compliance",
@@ -1237,7 +1242,6 @@
         },
         "us": {
           "name": "USA & Kanada",
-          "description": "Skalieren Sie Ihr Geschäft nach Nordamerika — mit gebündelter Unterstützung für Anforderungen auf Bundes- und Bundesstaatsebene.",
           "focus": [
             "Nexus & Sales Tax",
             "CCPA/CPRA-Datenschutz",
@@ -1247,7 +1251,6 @@
         },
         "au": {
           "name": "Australien (APAC)",
-          "description": "Einstieg in die APAC-Region mit Grundabdeckung für australisches Verbraucher- und Steuerrecht.",
           "focus": [
             "GST-Compliance",
             "Privacy Act 1988",

@@ -1106,7 +1106,19 @@
       "obligations_one": "{{count}} obligation",
       "obligations_other": "{{count}} obligations",
       "areas": "{{count}} of {{total}} areas",
-      "enforcement": "Enforcement {{value}}/10"
+      "enforcement": "Enforcement {{value}}/10",
+      "kpi": {
+        "markets": "Markets",
+        "marketsNote": "the EU core plus the UK, USA and Türkiye",
+        "duties": "Duties with a legal basis",
+        "dutiesNote": "each checked against the engine",
+        "enforcement": "Enforcement on average",
+        "enforcementNote": "{{market}} leads with {{value}} of 10",
+        "ofTen": "/ 10"
+      },
+      "cardSub_one": "{{count}} duty with a national legal basis, own sources in {{areas}} of {{total}} areas.",
+      "cardSub_other": "{{count}} duties with a national legal basis, own sources in {{areas}} of {{total}} areas.",
+      "openMarket": "Open the market"
     },
     "country": {
       "eyebrow": "Market",
@@ -1119,7 +1131,6 @@
       "sourceLabel": "Source",
       "dueLabel": "Cadence",
       "leadTime": "{{days}} days lead time",
-      "coverageNote": "The other duties we carry for {{market}} run on {{count}} national sources, plus the EU Regulations that apply here directly — those need no national text, so they are not counted as missing.",
       "backToMarkets": "All markets",
       "notFound": "We do not hold a market profile for this code yet.",
       "profileTitle": "Market profile",
@@ -1127,31 +1138,34 @@
       "ownSources": "Own sources",
       "ofAreas": "{{count}} / {{total}} areas",
       "ofAreasShort": "{{count}} of {{total}}",
-      "factDuties": "duties",
-      "factAreas": "areas",
-      "factExposure": "exposure",
-      "factLead": "to the next deadline",
       "startAssessment": "Start the assessment for {{market}}",
       "sourcePromise": "Every duty here names its national legal basis. Where we hold none, the EU instrument stands — and it says so.",
       "weightsLeadTied": "{{count}} areas weigh equally heavily here ({{weight}} out of 10). Each one leads to its own page.",
-      "euSource": "EU source",
       "calendarTitle": "What comes together here, and how often",
       "calendarLead": "{{count}} duties from {{areas}} areas in one view — by cadence, not by area. Nobody plans a market area by area; they plan it against a calendar.",
       "leadDays": "{{count}} days lead time",
       "exposureNote": "Highest single penalty in this market: {{max}} on {{duty}}. The stated upper bounds add up to {{total}} — a ceiling if everything went wrong at once, not a forecast.",
-      "coverageTitle": "Where we hold no local source yet",
-      "coverageLead": "{{count}} duties have a national text we do not carry. That is a gap in our coverage, not in the law — and it is worth knowing which way round.",
-      "gapNone": "No source",
-      "gapEu": "EU source stands in",
-      "gapShowing": "We show",
-      "relatedTitle": "Markets that travel with this one",
-      "relatedLead": "Few sell into one market only. These three share the most duties with this one — the same filings, a second jurisdiction.",
-      "relatedFact": "{{count}} duties in {{areas}} areas, {{shared}} of them shared with this market.",
-      "openMarket": "Open this market",
       "ctaBody": "The assessment narrows this market to your business, your product and your areas — in under five minutes.",
       "allAreas": "All areas",
-      "nDuties_one": "{{count}} duty",
-      "nDuties_other": "{{count}} duties"
+      "facts": {
+        "duties": "Duties in this market",
+        "dutiesNote": "each with a national source",
+        "areas": "areas with their own source",
+        "areasNote": "the rest runs on EU law",
+        "exposure": "Maximum exposure",
+        "exposureNote": "sum of the stated caps, not a forecast",
+        "lead": "to the next deadline"
+      },
+      "weightsFoot": "Own sources in {{covered}} of {{total}} areas — the rest applies directly through EU law.",
+      "cadenceGroup": "{{cadence}} · {{count}}",
+      "cadenceHot": "Highest cadence load",
+      "relatedAreasTitle": "The areas that carry this market",
+      "relatedAreasLead": "This is where this market's national duties live — the areas with the most own sources first. What a single duty requires is set out on its area page.",
+      "relatedAreasFact_one": "{{count}} duty in this market",
+      "relatedAreasFact_other": "{{count}} duties in this market",
+      "weightsFootCovered": "Own sources in {{covered}} of {{total}} areas — EU Regulations apply directly and do not count as missing.",
+      "weightsFootPending": "For {{list}} a national text exists that we do not carry yet — the named EU instrument stands in.",
+      "weightsFootNone": "For {{list}} we hold no named source yet."
     },
     "cta": {
       "title": "See which of these apply to you.",
@@ -1198,26 +1212,18 @@
       "tax-vat-registration": "VAT Registration & Filing"
     },
     "regions": {
-      "title": "Covered Markets & Regions",
+      "eyebrow": "Regions",
+      "title": "Where we stand — and where it goes next",
       "lead": "Every search and analysis is deeply rooted in the specific laws of the target country to avoid legal blind flights.",
-      "legend": {
-        "live": "Live",
-        "rollout": "Active Rollout"
-      },
-      "focusAreas": "Focus Areas",
+      "note": "The EU and the UK are fully covered; North America is expanding and APAC starts with core coverage. More countries follow over the course of 2026.",
       "tiers": {
         "full": "Full Coverage",
         "expanding": "Expanding",
         "core": "Core Support"
       },
-      "complexity": {
-        "high": "High Complexity",
-        "medium": "Medium Complexity"
-      },
       "items": {
         "eu": {
-          "name": "European Union (EU)",
-          "description": "Specialized expertise for the highly regulated single market, from GDPR standards to local EPR laws.",
+          "name": "European Union",
           "focus": [
             "GDPR Compliance",
             "EPR Packaging Laws",
@@ -1226,8 +1232,7 @@
           ]
         },
         "uk": {
-          "name": "United Kingdom (UK)",
-          "description": "Dedicated navigation through post-Brexit compliance landscapes and UK-specific data protection rules.",
+          "name": "United Kingdom",
           "focus": [
             "UK GDPR",
             "HMRC VAT Compliance",
@@ -1237,7 +1242,6 @@
         },
         "us": {
           "name": "USA & Canada",
-          "description": "Scale your business into North America with streamlined support for federal and state-level requirements.",
           "focus": [
             "Nexus & Sales Tax",
             "CCPA/CPRA Privacy",
@@ -1247,7 +1251,6 @@
         },
         "au": {
           "name": "Australia (APAC)",
-          "description": "Gateway to the APAC region with core support for Australian consumer law and tax regulations.",
           "focus": [
             "GST Compliance",
             "Privacy Act 1988",

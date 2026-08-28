@@ -276,7 +276,10 @@ export function PricingPage() {
       {/* Sized up on review (2026-08-24): the band grew a step in every
           dimension — padding, headline, lead — so the page opens like a
           statement rather than a section. display-xl is the scale's 60px. */}
-      <section className="border-b border-stroke-subtle bg-surface-secondary pb-24 pt-36 lg:pb-32 lg:pt-48">
+      {/* min-h lifts the band onto the shared 613px desktop hero height
+          (user ask 2026-08-28, hub = reference); justify-center spreads the
+          slack evenly. */}
+      <section className="flex flex-col justify-center border-b border-stroke-subtle bg-surface-secondary pb-24 pt-36 lg:min-h-[38.3125rem] lg:pb-32 lg:pt-48">
         <Container size="xl">
           <Reveal className="mx-auto flex max-w-[860px] flex-col items-center gap-5 text-center">
             <SectionEyebrow tone="brand">{t('pricing.eyebrow')}</SectionEyebrow>

@@ -180,7 +180,10 @@ export function ComplianceAreaPage() {
           top padding clears both: the fixed header (81px at lg) plus the bar's
           own height. The bottom padding buys the room the floating metric card
           pulls itself into (-mt-14). */}
-      <section className="bg-gradient-stage pb-24 pt-[7.2rem] desktop-s:pb-28 desktop-s:pt-[9.6rem]">
+      {/* The bottom padding shrank from pb-28 when the shared 613px desktop
+          hero height arrived (user ask 2026-08-28, hub = reference) — this
+          hero ran 36px over it; the min-h floor holds the line downwards. */}
+      <section className="flex flex-col justify-center bg-gradient-stage pb-24 pt-[7.2rem] desktop-s:min-h-[38.3125rem] desktop-s:pb-[4.75rem] desktop-s:pt-[9.6rem]">
         <Container size="xl">
           <div className="grid gap-10 desktop-s:grid-cols-12 desktop-s:gap-14">
             <div className="desktop-s:col-span-7">

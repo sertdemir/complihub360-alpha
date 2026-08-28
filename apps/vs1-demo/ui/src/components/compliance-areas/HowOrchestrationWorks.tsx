@@ -42,7 +42,7 @@ interface Props {
   cta?: ReactNode;
   /**
    * `inverse` drops the card shell and repaints for the petrol band, which is
-   * where an area page closes. The block cannot simply be dropped onto that
+   * where the pricing page closes. The block cannot simply be dropped onto that
    * ground as it is: its own tinted card inside a dark section reads as a
    * light panel someone forgot to restyle, and fg-secondary on petrol is
    * unreadable rather than merely quiet.
@@ -55,7 +55,8 @@ interface Props {
 // block, eyebrow + serif header, white step cards with hairline border and a
 // soft shadow, pure brand icon + kicker instead of the petrol icon tile, and
 // the optional CTA row behind a hairline. `inverse` stays exactly the petrol
-// band the area, market and pricing pages close with.
+// band the pricing page closes with — its last caller since the area and
+// market pages moved to the light close (2026-08-28).
 export function HowOrchestrationWorks({ cta, tone = 'default' }: Props = {}) {
   const { t } = useTranslation('common');
   const dark = tone === 'inverse';
