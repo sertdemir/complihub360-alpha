@@ -22,9 +22,12 @@ export interface HeaderNavLink {
 
 export const HEADER_NAV_LINKS: HeaderNavLink[] = [
   { to: 'how-it-works', labelKey: 'header.nav.howItWorks', labelDefault: 'How it works' },
+  // "Für wen" sits directly beside "So funktioniert es" (user ask
+  // 2026-08-28), mirroring the footer's Plattform column: the how and the
+  // who belong together, before the what (areas) and the where (markets).
+  { to: 'solutions', labelKey: 'header.nav.solutions', labelDefault: 'Who it is for' },
   { to: 'compliance', labelKey: 'header.nav.complianceAreas', labelDefault: 'Compliance areas', sheet: 'areas' },
   { to: 'markets', labelKey: 'header.nav.markets', labelDefault: 'Markets', sheet: 'markets' },
-  { to: 'solutions', labelKey: 'header.nav.solutions', labelDefault: 'Solutions' },
   { to: 'pricing', labelKey: 'header.nav.pricing', labelDefault: 'Pricing' },
   { to: 'ai-governance', labelKey: 'header.nav.trust', labelDefault: 'Trust & Security' },
 ];
