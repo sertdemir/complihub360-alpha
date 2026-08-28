@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Gauge, Globe, ScrollText } from 'lucide-react';
 import { useReducedMotion } from 'framer-motion';
 import { severityFromRiskWeight } from '@complihub/compliance-engine';
 import { Container } from '../components/ui/Container';
@@ -90,6 +90,7 @@ function MarketsKpiCard({ markets }: { markets: ReturnType<typeof listMarkets> }
   const cells = [
     {
       key: 'markets',
+      icon: Globe,
       value: <CountUp to={markets.length} run={inView} format={int} />,
       suffix: null as ReactNode,
       label: t('markets.index.kpi.markets', 'Markets'),
@@ -97,6 +98,7 @@ function MarketsKpiCard({ markets }: { markets: ReturnType<typeof listMarkets> }
     },
     {
       key: 'duties',
+      icon: ScrollText,
       value: <CountUp to={dutiesTotal} run={inView} format={int} />,
       suffix: null as ReactNode,
       label: t('markets.index.kpi.duties', 'Duties with a legal basis'),
@@ -104,6 +106,7 @@ function MarketsKpiCard({ markets }: { markets: ReturnType<typeof listMarkets> }
     },
     {
       key: 'enforcement',
+      icon: Gauge,
       value: <CountUp to={avgEnforcement} run={inView} format={(v) => one.format(v)} />,
       suffix: (
         <span className="ml-1 text-body-sm font-semibold text-fg-tertiary">
@@ -124,16 +127,24 @@ function MarketsKpiCard({ markets }: { markets: ReturnType<typeof listMarkets> }
       className="rounded-xl bg-surface p-7 shadow-[0_34px_80px_-32px_rgba(2,22,17,0.35)] dark:bg-surface-secondary lg:px-8"
     >
       <div className="grid grid-cols-1 gap-y-7 sm:grid-cols-3 sm:divide-x sm:divide-stroke-subtle">
-        {cells.map((c) => (
-          <div key={c.key} className="min-w-0 sm:px-8 sm:first:pl-0 sm:last:pr-0">
-            <p className="font-serif text-[1.625rem] font-bold leading-none tabular-nums text-fg">
-              {c.value}
-              {c.suffix}
-            </p>
-            <p className="mt-2 text-body-sm font-bold text-fg">{c.label}</p>
-            <p className="mt-1 text-body-xs leading-snug text-fg-tertiary">{c.note}</p>
-          </div>
-        ))}
+        {/* The pure gold icon left of the block — the KPIStrip's language
+            (user ask 2026-08-28), so the two cards read as one instrument. */}
+        {cells.map((c) => {
+          const Icon = c.icon;
+          return (
+            <div key={c.key} className="flex min-w-0 items-start gap-4 sm:px-8 sm:first:pl-0 sm:last:pr-0">
+              <Icon size={34} strokeWidth={1.7} className="mt-0.5 shrink-0 text-fg-accent-emphasis" aria-hidden />
+              <span className="min-w-0">
+                <p className="font-serif text-[1.625rem] font-bold leading-none tabular-nums text-fg">
+                  {c.value}
+                  {c.suffix}
+                </p>
+                <p className="mt-2 text-body-sm font-bold text-fg">{c.label}</p>
+                <p className="mt-1 text-body-xs leading-snug text-fg-tertiary">{c.note}</p>
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
