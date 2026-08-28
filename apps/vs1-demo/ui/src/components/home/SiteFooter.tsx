@@ -60,7 +60,10 @@ const COLUMNS: Column[] = [
       // page raises next.
       { key: 'forWhom', href: '/solutions' },
       { key: 'pricing', href: '/pricing' },
-      { key: 'platformOverview', href: '/platform' },
+      // 'platformOverview' left this column 2026-08-28: the page it points at
+      // is the partner pitch (structured dossiers, magic-link workflow, the
+      // SLA the ranking rewards), so it belongs with the company, not with
+      // what a visitor gets. It is the 'partner' entry below now.
       { key: 'startAssessment', href: '/wizard' },
       { key: 'exampleResult', href: '/results' },
     ],
@@ -86,6 +89,10 @@ const COLUMNS: Column[] = [
     key: 'company',
     links: [
       { key: 'about', href: '/about' },
+      // TODO(partner-redesign): /platform is the partner-facing page and still
+      // speaks the pre-redesign language — it is queued for its own pass after
+      // the current stages (user decision 2026-08-28).
+      { key: 'partner', href: '/platform' },
       { key: 'trustSecurity', href: '/ai-governance' },  // traegt selbst den Titel "Trust Center"
       // TODO(contact-live): route contact AND support to the /contact page
       // once it exists — it ships with placeholders first (user decision

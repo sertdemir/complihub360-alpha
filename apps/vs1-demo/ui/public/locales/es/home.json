@@ -1273,8 +1273,7 @@
           "forWhom": "Para quién",
           "startAssessment": "Iniciar evaluación",
           "exampleResult": "Resultado de ejemplo",
-          "pricing": "Precios",
-          "platformOverview": "La plataforma"
+          "pricing": "Precios"
         }
       },
       "areas": {
@@ -1309,6 +1308,7 @@
         "title": "Empresa",
         "links": {
           "about": "Sobre nosotros",
+          "partner": "Partners",
           "trustSecurity": "Confianza y seguridad",
           "contact": "Contacto",
           "support": "Soporte"

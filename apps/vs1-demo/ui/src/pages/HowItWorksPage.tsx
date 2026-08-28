@@ -42,7 +42,7 @@ const cardItem = {
 function InfoCard({ base, icon }: { base: 'cost' | 'privacy'; icon: React.ReactNode }) {
   const { t } = useTranslation('common');
   return (
-    <StaggerItem className="rounded-xl bg-surface p-7 shadow-[0_24px_60px_-28px_rgba(2,22,17,0.3)] dark:bg-surface-secondary">
+    <StaggerItem className="rounded-xl border border-stroke-subtle bg-surface p-7 shadow-[0_18px_44px_-30px_rgba(2,22,17,0.25)] dark:bg-surface-secondary">
       <span className="flex items-center gap-3.5">
         {icon}
         <span className="text-body-3xs font-bold uppercase tracking-[0.1em] text-fg-brand">
@@ -142,10 +142,12 @@ export function HowItWorksPage() {
         </Container>
       </section>
 
-      {/* Closing band on the Gradient — replaces the grey info section AND the
-          bare CTA section: header, the two info cards (cascade), hairline,
-          then the page CTA row. */}
-      <section className="bg-gradient-stage px-4 py-16 md:px-6 lg:px-10 lg:py-20">
+      {/* Closing band — replaces the grey info section AND the bare CTA
+          section: header, the two info cards (cascade), hairline, then the
+          page CTA row. On white since 2026-08-28 (user ask): the Gradient
+          already carries this page's hero and the stages showcase directly
+          above, and a third tinted band in a row read as one long wash. */}
+      <section className="bg-surface px-4 py-16 md:px-6 lg:px-10 lg:py-20">
         <div className="mx-auto max-w-[1180px]">
           <Reveal className="max-w-[720px]">
             <SectionEyebrow tone="brand">{t('howItWorks.closing.eyebrow')}</SectionEyebrow>
@@ -159,7 +161,7 @@ export function HowItWorksPage() {
           </Stagger>
           <Reveal
             delay={0.2}
-            className="mt-10 flex flex-col gap-6 border-t border-primary-500/20 pt-8 dark:border-white/15 md:flex-row md:items-center md:justify-between md:gap-10"
+            className="mt-10 flex flex-col gap-6 border-t border-stroke-subtle pt-8 md:flex-row md:items-center md:justify-between md:gap-10"
           >
             <div>
               <h3 className="font-serif text-[1.375rem] font-bold leading-snug text-fg">

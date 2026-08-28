@@ -1273,8 +1273,7 @@
           "forWhom": "Kimler için",
           "startAssessment": "Değerlendirmeyi başlat",
           "exampleResult": "Örnek sonuç",
-          "pricing": "Fiyatlar",
-          "platformOverview": "Platform"
+          "pricing": "Fiyatlar"
         }
       },
       "areas": {
@@ -1309,6 +1308,7 @@
         "title": "Şirket",
         "links": {
           "about": "Hakkımızda",
+          "partner": "Partnerler",
           "trustSecurity": "Güven ve Güvenlik",
           "contact": "İletişim",
           "support": "Destek"
