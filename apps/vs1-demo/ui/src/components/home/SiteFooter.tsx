@@ -64,8 +64,11 @@ const COLUMNS: Column[] = [
       // is the partner pitch (structured dossiers, magic-link workflow, the
       // SLA the ranking rewards), so it belongs with the company, not with
       // what a visitor gets. It is the 'partner' entry below now.
+      // 'exampleResult' left 2026-08-28 (user decision): /results renders the
+      // result of an assessment the visitor has taken — from the footer it
+      // opens an empty report, not an example. The wizard entry above is the
+      // honest way there, and the flow itself routes to /results on finish.
       { key: 'startAssessment', href: '/wizard' },
-      { key: 'exampleResult', href: '/results' },
     ],
   },
   {
