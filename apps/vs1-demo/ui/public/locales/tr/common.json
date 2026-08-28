@@ -225,104 +225,117 @@
     }
   },
   "platform": {
-    "anchorEngine": "YZ Motoru",
-    "anchorMatching": "Partner Eşleştirme",
-    "anchorCoverage": "Küresel Kapsam",
-    "anchorPartners": "Partnerler için",
-    "engine": {
-      "overline": "YZ Motoru",
-      "title": "Mevzuat belirsizliğinden yapılandırılmış eyleme",
-      "body": "Uyumluluk verileri parçalı ve yapılandırılmamıştır. Yapay zekamız bilişsel bir Danışmanlık Katmanı olarak görev yapar — iş niyetinizi çıkarır ve somut hukuki gerçekliklere haritalandırır. Halüsinasyon yok. Her çıktı doğrulanmış kaynaklarda temellendirilmiştir.",
-      "node1Label": "İş Bağlamı",
-      "node1Sub": "Asistan Girdisi",
-      "node2Label": "PII Düzeltme",
-      "node2Sub": "Gizlilik Kapısı",
-      "node3Label": "YZ Analizi",
-      "node3Sub": "Temelli RAG",
-      "node4Label": "Risk Dosyası",
-      "node4Sub": "Yapılandırılmış Çıktı",
-      "card1Title": "Uyarlanabilir Niyet Haritalama",
-      "card1Body": "Hangi yasaları aramanız gerektiğini bilmenize gerek yok. Asistanımız bağlamınızı 4-5 adımda yakalar ve otomatik olarak yapılandırılmış bir Arama Profili oluşturur.",
-      "card2Title": "Gizlilik Düzeltme Hattı",
-      "card2Body": "Herhangi bir belge yapay zekamıza ulaşmadan önce yerel bir Düzeltme Hattı'ndan geçer — isimler, e-postalar ve telefon numaraları gibi PII'yi otomatik olarak maskeler.",
-      "card3Title": "Üçlü YZ Kapısı",
-      "card3Body": "Yapay zeka yalnızca üç katı koşul karşılanırsa etkinleşir: belge temizlenmiş, kullanıcı açık rıza vermiş ve kısıtlanmış olarak sınıflandırılmamış.",
-      "stat1Label": "YZ katmanında depolanan PII",
-      "stat2Label": "Kaynağa dayalı çıktılar",
-      "stat3Label": "Tam risk profili"
+    "hero": {
+      "eyebrow": "Hukuk büroları ve danışmanlıklar için",
+      "titlePre": "Size ",
+      "titleGold": "sınıflandırılmış",
+      "titlePost": " gelen dosyalar.",
+      "lead": "Soğuk temas yok, yeniden kurgulama yok. Size ulaşan şey; pazarı, bağlamı ve risk profili olan anonimleştirilmiş bir dosya — ve üstlenip üstlenmeyeceğiniz sorusu.",
+      "facts": {
+        "confirm": {
+          "value": "24s",
+          "label": "Onaya kadar",
+          "note": "umduğumuz değil, taahhüt ettiğiniz süre"
+        },
+        "answer": {
+          "value": "48s",
+          "label": "Yanıta kadar",
+          "note": "esasa ilişkin ilk değerlendirme"
+        },
+        "fee": {
+          "value": "0 €",
+          "label": "Platform aboneliği",
+          "note": "listelenmek için taban ücret yok"
+        }
+      }
     },
-    "matching": {
-      "overline": "Partner Eşleştirme",
-      "title": "Doğrulanmış uzmanlar. Düzenlenmiş hesap verebilirlik.",
-      "body": "Bir dizin değiliz. Bir orkestratörüz. Size sadece isim listesi vermiyoruz — ilk temastan başarılı çözüme kadar hesap verebilirliği sağlamak için engagementı kontrol ediyoruz.",
-      "funnelTitle": "Riskten Uygulamaya Hunisi",
-      "step1Title": "Yargı bölgesine bağlı eşleştirme",
-      "step1Desc": "Sizi yalnızca hedef ülkeniz ve uyumluluk kategoriniz için doğrulanmış uzmanlarla bağlar.",
-      "step2Title": "Yapılandırılmış engagement talebi",
-      "step2Desc": "Anonimleştirilmiş uyumluluk dosyanız doğrudan partnere gönderilir — soğuk e-posta yok, boş sorgular yok.",
-      "step3Title": "SLA güvenceli yanıt",
-      "step3Desc": "Partnerler 24 saat içinde alındıyı onaylamak ve 48 saat içinde yanıt vermek zorundadır. Otomatik Watchdog'umuz bunu uygular.",
-      "step4Title": "Otomatik indirgeme sistemi",
-      "step4Desc": "Tekrarlanan SLA ihlalleri otomatik indirgemeleri tetikler. Yalnızca duyarlı, üst düzey profesyonellerle etkileşime girersiniz.",
-      "step5Title": "Öncelik ödülleri",
-      "step5Desc": "Yüksek performanslı partnerler, Sıralama Motorumuz aracılığıyla öncelikli yerleşim ve premium rozetler kazanır.",
-      "funnel1Label": "Değerlendirme",
-      "funnel1Detail": "Yapılandırılmış niyet yakalama",
-      "funnel2Label": "Dosya",
-      "funnel2Detail": "Anonimleştirilmiş risk profili",
-      "funnel3Label": "Eşleştirme",
-      "funnel3Detail": "Yargı bölgesine bağlı sıralama",
-      "funnel4Label": "Randevu",
-      "funnel4Detail": "SLA güvenceli yanıt",
-      "funnel5Label": "Uygulama",
-      "funnel5Detail": "Yerel uzman teslimatı"
+    "arrives": {
+      "eyebrow": "Size ne ulaşıyor",
+      "title": "Bir dosya, iletişim formu değil",
+      "lead": "Bir aday müşteri ile bir vekâlet arasındaki fark, aradaki emektir. O emek burada zaten harcanmıştır."
     },
-    "coverage": {
-      "overline": "Küresel Kapsam",
-      "title": "Küresel genişleme için yerelleştirilmiş güvenlik",
-      "body": "İşletmeniz sınırları aşıyor — uyumluluğunuz da öyle olmalı. Her soru, risk ve eşleştirilen uzman, hedef pazarınızın yasalarına göre uyarlanmıştır.",
-      "matrixTitle": "Dinamik Ülke Politika Matrisi",
-      "matrixBody": "Veri gizlilik yasaları sınırlar arasında farklılık gösterir. Platformumuz, yargı bölgesi başına veri ikameti, saklama ve YZ uygunluk kurallarını uyarlar — Avrupa pazarları için varsayılan olarak katı GDPR standartlarını kullanır.",
-      "matrix1Val": "Coğrafi sınırlı",
-      "matrix1Label": "Veri İkameti",
-      "matrix2Val": "Ülkeye özgü",
-      "matrix2Label": "Saklama Politikası",
-      "matrix3Val": "Dinamik kapılar",
-      "matrix3Label": "YZ Uygunluğu",
-      "marketStatusLive": "Canlı"
+    "benefit": {
+      "dossier": {
+        "title": "Yapılandırılmış dosyalar",
+        "desc": "İş bağlamı, hedef pazarlar ve kaynağıyla birlikte somut yükümlülükler — dosyayı yeniden kurmak yerine doğrudan değerlendirirsiniz."
+      },
+      "magicLink": {
+        "title": "Sihirli bağlantı akışı",
+        "desc": "Güvenli, süreli tek tıklama. Bakılacak portal yok, hatırlanacak parola yok."
+      },
+      "merit": {
+        "title": "Bütçe değil, performans",
+        "desc": "Hızlı ve güvenilir yanıt veren sıralamada yükselir. Konum satın alınamaz."
+      }
     },
-    "partners": {
-      "overline": "Partner Firmalar için",
-      "title": "Ön nitelikli müşteriler. Sıfır sürtünme.",
-      "body": "Niteliksiz leads ve yapılandırılmamış soğuk e-postalarda faturalandırılabilir saatler harcamayı bırakın. CompliHub360, harekete geçmeye hazır yüksek nitelikli, yapılandırılmış iş müşterilerini size gönderir.",
-      "benefit1Title": "Yapılandırılmış dosyalar",
-      "benefit1Desc": "İş bağlamı, hedef pazarlar ve spesifik mevzuat riskleri alın — görevleri anında değerlendirin.",
-      "benefit2Title": "Sihirli Bağlantı İş Akışı",
-      "benefit2Desc": "Güvenli, zaman sınırlı tek tıkla erişim. Yönetilecek portal yok, hatırlanacak şifre yok.",
-      "benefit3Title": "Performansa dayalı büyüme",
-      "benefit3Desc": "Şeffaf sabit engagement ücreti. İyi SLA performansı öncelikli yerleşim ve premium rozetler kazandırır.",
-      "cta": "Partner Firma Olarak Başvurun",
-      "flowTitle": "Sihirli Bağlantı İş Akışı",
-      "flow1Label": "Yapılandırılmış Dosya",
-      "flow1Desc": "Ön nitelikli lead gelir",
-      "flow2Label": "Sihirli Bağlantı E-postası",
-      "flow2Desc": "Güvenli, zaman sınırlı erişim",
-      "flow3Label": "Tek Tıkla İnceleme",
-      "flow3Desc": "Portal yok. Şifre yok.",
-      "flow4Label": "Onayla ve Yanıtla",
-      "flow4Desc": "SLA sayacı durur",
-      "stat1Label": "Maks. onay süresi",
-      "stat2Label": "Maks. yanıt penceresi",
-      "stat3Label": "Platform aboneliği"
+    "flow": {
+      "eyebrow": "Yol",
+      "title": "Dosyadan yanıta, dört adımda",
+      "lead": "Portal yok, parola yok, kurulum yok. Erişim, son kullanma tarihi olan bir bağlantıdır.",
+      "step": "Adım {{num}}"
     },
-    "cta": {
-      "title": "Uyumluluğu basitleştirmeye hazır mısınız?",
-      "body": "Ücretsiz değerlendirmenizi başlatın ve 2 dakikadan kısa sürede yapılandırılmış bir risk profili alın.",
-      "btnAssessment": "Ücretsiz Değerlendirme Başlatın",
-      "btnExpert": "Direkt Uzman Eşleşmesine Gidin"
+    "step": {
+      "dossier": {
+        "title": "Yapılandırılmış dosya",
+        "desc": "Ön elemeden geçmiş bir dosya gelir — anonimleştirilmiş, pazarı ve risk profiliyle."
+      },
+      "mail": {
+        "title": "Sihirli bağlantı e-postası",
+        "desc": "Güvenli ve süreli erişim, doğrudan gelen kutunuza."
+      },
+      "view": {
+        "title": "Görmek için tek tık",
+        "desc": "Portal yok, parola yok, kurulum yok."
+      },
+      "reply": {
+        "title": "Onaylayın ve yanıtlayın",
+        "desc": "Onayınızla SLA sayacı durur."
+      }
     },
-    "footer": {
-      "copyright": "© {{year}} CompliHub360. Berlin'de yapıldı."
+    "rules": {
+      "eyebrow": "Taahhütler",
+      "title": "Ne istiyoruz — ve karşılığı ne",
+      "lead": "İki süre ve iki sonuç; herkes için aynı kural.",
+      "creed": "Konum performanstır, bütçe değil. Burada öne geçmek satın alınamaz."
+    },
+    "rule": {
+      "confirm": {
+        "title": "24 saat içinde onay",
+        "desc": "Dosyanın ulaştığı onaylanır, böylece müvekkil bilgilendirilmiş olur."
+      },
+      "answer": {
+        "title": "48 saat içinde yanıt",
+        "desc": "Esasa ilişkin ilk değerlendirme, geçiştirme değil."
+      },
+      "priority": {
+        "title": "Öncelikli konum",
+        "desc": "Taahhütleri tutan, sıralama motoru tarafından öne alınır."
+      },
+      "demotion": {
+        "title": "Otomatik geri düşme",
+        "desc": "Tekrarlanan ihlaller sıralamayı düşürür — pazarlık yok, herkese aynı kural."
+      }
+    },
+    "intake": {
+      "eyebrow": "Katılım",
+      "title": "Üç adımda ağın içinde",
+      "ctaTitle": "Hazır mısınız?",
+      "ctaBody": "Başvuru, iletişim sayfasındaki „Sağlayıcı olarak listelenmek“ yolundan ilerler — üç iş günü içinde dönüş yapılır.",
+      "ctaButton": "Partner olarak başvur"
+    },
+    "intakeStep": {
+      "apply": {
+        "title": "Başvuru",
+        "desc": "Uzmanlık alanlarınızı, pazarlarınızı ve ruhsat durumunuzu bildirirsiniz."
+      },
+      "vetting": {
+        "title": "İnceleme",
+        "desc": "Size herhangi bir dosya gitmeden önce ruhsat ve referansları denetleriz."
+      },
+      "activation": {
+        "title": "Etkinleştirme",
+        "desc": "Kişisel erişim bağlantınızı alır, pazar ve alanlarınız için eşleştirmeye girersiniz."
+      }
     }
   },
   "compliance": {

@@ -225,104 +225,117 @@
     }
   },
   "platform": {
-    "anchorEngine": "AI Engine",
-    "anchorMatching": "Partner Matching",
-    "anchorCoverage": "Global Coverage",
-    "anchorPartners": "For Partners",
-    "engine": {
-      "overline": "The AI Engine",
-      "title": "From Regulatory Uncertainty to Structured Action",
-      "body": "Compliance data is fragmented and unstructured. Our AI acts as a cognitive Advisory Layer — extracting your business intent and mapping it to concrete legal realities. No hallucinations. Every output grounded in verified sources.",
-      "node1Label": "Business Context",
-      "node1Sub": "Wizard Input",
-      "node2Label": "PII Redaction",
-      "node2Sub": "Privacy Gate",
-      "node3Label": "AI Analysis",
-      "node3Sub": "Grounded RAG",
-      "node4Label": "Risk Dossier",
-      "node4Sub": "Structured Output",
-      "card1Title": "Adaptive Intent Mapping",
-      "card1Body": "You don't need to know which laws to search for. Our Wizard captures your context in 4–5 steps and generates a structured Search Profile automatically.",
-      "card2Title": "Privacy Redaction Pipeline",
-      "card2Body": "Before any document touches our AI, it passes through a local Redaction Pipeline — automatically masking PII like names, emails, and phone numbers.",
-      "card3Title": "Triple AI Gate",
-      "card3Body": "The AI only activates if three strict conditions are met: document is sanitized, user has given explicit consent, and it's not classified as restricted.",
-      "stat1Label": "PII stored in AI layer",
-      "stat2Label": "Source-grounded outputs",
-      "stat3Label": "Full risk profile"
+    "hero": {
+      "eyebrow": "For law firms and consultancies",
+      "titlePre": "Mandates that arrive ",
+      "titleGold": "already sorted",
+      "titlePost": ".",
+      "lead": "No cold contact, no reconstruction. What reaches you is an anonymised dossier with the market, the context and the risk profile — and the question of whether you take it on.",
+      "facts": {
+        "confirm": {
+          "value": "24h",
+          "label": "To confirmation",
+          "note": "what you commit to, not what we hope for"
+        },
+        "answer": {
+          "value": "48h",
+          "label": "To a reply",
+          "note": "a first substantive assessment"
+        },
+        "fee": {
+          "value": "€0",
+          "label": "Platform subscription",
+          "note": "no base fee for being listed"
+        }
+      }
     },
-    "matching": {
-      "overline": "Partner Matching",
-      "title": "Verified Specialists. Orchestrated Accountability.",
-      "body": "We're not a directory. We're an orchestrator. We don't just give you a list of names — we control the engagement to ensure accountability, from first contact to successful resolution.",
-      "funnelTitle": "The Risk-to-Execution Funnel",
-      "step1Title": "Jurisdiction-Bound Matching",
-      "step1Desc": "Connects you only with specialists verified for your target country and compliance category.",
-      "step2Title": "Structured Engagement Request",
-      "step2Desc": "Your anonymized compliance dossier is sent directly to the partner — no cold emails, no blank inquiries.",
-      "step3Title": "SLA-Enforced Response",
-      "step3Desc": "Partners must confirm receipt within 24h and reply within 48h. Our automated Watchdog enforces this.",
-      "step4Title": "Automated Downgrade System",
-      "step4Desc": "Repeated SLA breaches trigger an automatic downgrade. You only engage with responsive, top-tier professionals.",
-      "step5Title": "Priority Rewards",
-      "step5Desc": "High-performing partners earn priority placement and premium badges through our Ranking Engine.",
-      "funnel1Label": "Assessment",
-      "funnel1Detail": "Structured intent capture",
-      "funnel2Label": "Dossier",
-      "funnel2Detail": "Anonymized risk profile",
-      "funnel3Label": "Matching",
-      "funnel3Detail": "Jurisdiction-bound ranking",
-      "funnel4Label": "Appointment",
-      "funnel4Detail": "SLA-enforced response",
-      "funnel5Label": "Execution",
-      "funnel5Detail": "Local expert delivery"
+    "arrives": {
+      "eyebrow": "What reaches you",
+      "title": "A case, not a contact form",
+      "lead": "The difference between a lead and a mandate is the work in between. Here it is already done."
     },
-    "coverage": {
-      "overline": "Global Coverage",
-      "title": "Localized Security for Global Expansion",
-      "body": "Your business crosses borders — your compliance should too. Every question, risk, and matched expert is tailored to the laws of your target market.",
-      "matrixTitle": "Dynamic Country Policy Matrix",
-      "matrixBody": "Data privacy laws differ across borders. Our platform adapts data residency, retention, and AI eligibility rules per jurisdiction — defaulting to strict GDPR standards for European markets.",
-      "matrix1Val": "Geo-fenced",
-      "matrix1Label": "Data Residency",
-      "matrix2Val": "Country-specific",
-      "matrix2Label": "Retention Policy",
-      "matrix3Val": "Dynamic gates",
-      "matrix3Label": "AI Eligibility",
-      "marketStatusLive": "Live"
+    "benefit": {
+      "dossier": {
+        "title": "Structured dossiers",
+        "desc": "Business context, target markets and the specific duties with their source — you assess a mandate instead of reconstructing it first."
+      },
+      "magicLink": {
+        "title": "Magic link workflow",
+        "desc": "One secure, time-bound click. No portal to maintain, no password to remember."
+      },
+      "merit": {
+        "title": "Merit counts, not budget",
+        "desc": "Answer quickly and reliably and you rise in the ranking. Placement is not for sale."
+      }
     },
-    "partners": {
-      "overline": "For Partner Firms",
-      "title": "Pre-Qualified Clients. Zero Friction.",
-      "body": "Stop wasting billable hours on unqualified leads and unstructured cold emails. CompliHub360 sends you highly qualified, structured business clients ready to act.",
-      "benefit1Title": "Structured Dossiers",
-      "benefit1Desc": "Receive business context, target markets, and specific regulatory risks — evaluate mandates instantly.",
-      "benefit2Title": "Magic Link Workflow",
-      "benefit2Desc": "Secure, time-bound one-click access. No portal to maintain, no password to remember.",
-      "benefit3Title": "Performance-Based Growth",
-      "benefit3Desc": "Transparent flat engagement fee. Great SLA performance earns priority placement and premium badges.",
-      "cta": "Apply as Partner Firm",
-      "flowTitle": "The Magic Link Workflow",
-      "flow1Label": "Structured Dossier",
-      "flow1Desc": "Pre-qualified lead arrives",
-      "flow2Label": "Magic Link Email",
-      "flow2Desc": "Secure, time-bound access",
-      "flow3Label": "One-Click Review",
-      "flow3Desc": "No portal. No password.",
-      "flow4Label": "Confirm & Reply",
-      "flow4Desc": "SLA timer stops",
-      "stat1Label": "Max confirmation time",
-      "stat2Label": "Max reply window",
-      "stat3Label": "Platform subscription"
+    "flow": {
+      "eyebrow": "The route",
+      "title": "From dossier to reply, in four steps",
+      "lead": "No portal, no password, no setup. Access is a link with an expiry date.",
+      "step": "Step {{num}}"
     },
-    "cta": {
-      "title": "Ready to simplify compliance?",
-      "body": "Start your free assessment and get a structured risk profile in under 2 minutes.",
-      "btnAssessment": "Start Free Assessment",
-      "btnExpert": "Skip to Expert Match"
+    "step": {
+      "dossier": {
+        "title": "Structured dossier",
+        "desc": "A pre-qualified case arrives — anonymised, with its market and risk profile."
+      },
+      "mail": {
+        "title": "Magic link e-mail",
+        "desc": "Secure, time-bound access, straight to your inbox."
+      },
+      "view": {
+        "title": "One click to view",
+        "desc": "No portal, no password, no setup."
+      },
+      "reply": {
+        "title": "Confirm and reply",
+        "desc": "Your confirmation stops the SLA timer."
+      }
     },
-    "footer": {
-      "copyright": "© {{year}} CompliHub360. Built in Berlin."
+    "rules": {
+      "eyebrow": "The commitments",
+      "title": "What we ask — and what it earns",
+      "lead": "Two deadlines and two consequences, the same rule for everyone.",
+      "creed": "Placement is merit, not budget. There is no buying your way to the front here."
+    },
+    "rule": {
+      "confirm": {
+        "title": "Confirm within 24 hours",
+        "desc": "Receipt is confirmed so the client knows their case has landed."
+      },
+      "answer": {
+        "title": "Reply within 48 hours",
+        "desc": "A first substantive assessment, not a placeholder."
+      },
+      "priority": {
+        "title": "Priority placement",
+        "desc": "Keep the commitments and the ranking engine sorts you towards the front."
+      },
+      "demotion": {
+        "title": "Automatic demotion",
+        "desc": "Repeated breaches demote — no negotiation, the same rule for everyone."
+      }
+    },
+    "intake": {
+      "eyebrow": "Joining",
+      "title": "Into the network in three steps",
+      "ctaTitle": "Ready?",
+      "ctaBody": "Applications go through the “Getting listed as a provider” route on the contact page — with a response within three business days.",
+      "ctaButton": "Apply as a partner"
+    },
+    "intakeStep": {
+      "apply": {
+        "title": "Application",
+        "desc": "You describe your practice areas, markets and admission to practise."
+      },
+      "vetting": {
+        "title": "Vetting",
+        "desc": "We check admission and references before any case reaches you."
+      },
+      "activation": {
+        "title": "Activation",
+        "desc": "You receive your personal access link and enter the matching for your markets and areas."
+      }
     }
   },
   "compliance": {
