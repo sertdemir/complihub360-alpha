@@ -1526,5 +1526,144 @@
       "title": "{{area}} — Obligaciones y sanciones | CompliHub360",
       "description": "Cada obligación de {{area}} con su norma, exposición sancionadora y plazos por mercado. Emparejado con especialistas verificados."
     }
+  },
+  "contact": {
+    "hero": {
+      "eyebrow": "Contacto y soporte",
+      "titlePre": "Díganos ",
+      "titleGold": "de qué se trata",
+      "titlePost": ".",
+      "lead": "Un único buzón para todo sería cómodo para nosotros y lento para usted. Elija su asunto: llegará a las personas que pueden responderlo.",
+      "facts": {
+        "ways": {
+          "value": "4 vías",
+          "note": "ordenadas por asunto"
+        },
+        "day": {
+          "value": "1 día hábil",
+          "note": "para soporte y ventas"
+        },
+        "human": {
+          "value": "Sin bot",
+          "note": "responde una persona"
+        }
+      }
+    },
+    "lanes": {
+      "eyebrow": "Cuatro vías",
+      "title": "Qué vía para qué asunto",
+      "lead": "Cada vía termina en personas que pueden responder exactamente eso. La dirección y el plazo están a la vista, para que no tenga que adivinar.",
+      "postal": "Dirección postal y teléfono:"
+    },
+    "lane": {
+      "support": {
+        "short": "Evaluación",
+        "title": "Ayuda con la evaluación",
+        "desc": "Una pregunta se atasca, un resultado parece erróneo, la cuenta no avanza.",
+        "sla": "Respuesta al siguiente día hábil",
+        "mailbox": "support@…"
+      },
+      "sales": {
+        "short": "Precios",
+        "title": "Precios y planes",
+        "desc": "Qué plan encaja, cuánto cuesta un equipo, cómo funciona la facturación.",
+        "sla": "Respuesta al siguiente día hábil",
+        "mailbox": "sales@…"
+      },
+      "partner": {
+        "short": "Proveedores",
+        "title": "Figurar como proveedor",
+        "desc": "Despacho, asesoría fiscal o consultoría que quiere entrar en la red.",
+        "sla": "Respuesta en 3 días hábiles",
+        "mailbox": "partner@…"
+      },
+      "privacy": {
+        "short": "Privacidad",
+        "title": "Privacidad y seguridad",
+        "desc": "Acceso, supresión, encargo del tratamiento o el aviso de una vulnerabilidad.",
+        "sla": "Plazo del art. 12 RGPD",
+        "mailbox": "privacidad@…"
+      }
+    },
+    "form": {
+      "eyebrow": "Mensaje",
+      "title": "Escríbanos",
+      "lead": "Un formulario para las cuatro vías. Su elección decide dónde llega el mensaje: no hay que buscar ninguna dirección.",
+      "lane": "Su asunto",
+      "name": "Nombre",
+      "namePlaceholder": "Su nombre",
+      "email": "Correo electrónico",
+      "emailPlaceholder": "nombre@empresa.es",
+      "message": "¿De qué se trata?",
+      "messagePlaceholder": "Cuanto más concreto, más rápida la respuesta.",
+      "messageHelper": "Mercado, producto y qué esperaba en su lugar: eso ahorra una consulta de vuelta.",
+      "privacy": "Usamos sus datos solo para responderle. Sin boletín salvo que lo pida.",
+      "submit": "Enviar mensaje",
+      "draftNote": "Vista previa: la vía de envío y los buzones de esta página aún no están conectados. Hasta entonces, nada sale de aquí.",
+      "notWired": "Aún no enviado: la vía de envío sigue pendiente. Hasta entonces puede escribirnos a"
+    },
+    "faster": {
+      "eyebrow": "Quizá más rápido",
+      "title": "Tres vías sin esperar",
+      "assessment": {
+        "title": "La evaluación suele responderlo antes",
+        "desc": "Cuatro o cinco preguntas y verá qué obligaciones activa su caso, sin esperar respuesta.",
+        "cta": "Iniciar la evaluación"
+      },
+      "faq": {
+        "title": "Las preguntas frecuentes están abajo",
+        "desc": "Quién responde, qué pasa con sus datos, cómo se verifican los proveedores.",
+        "cta": "Ir a las preguntas"
+      },
+      "security": {
+        "title": "¿Ha encontrado un fallo de seguridad?",
+        "desc": "El Trust Center indica la vía hacia nuestro equipo de seguridad y las reglas a las que nos obligamos.",
+        "cta": "Trust Center"
+      }
+    },
+    "after": {
+      "eyebrow": "Después de enviar",
+      "ack": {
+        "title": "Confirmación de recepción",
+        "when": "al instante"
+      },
+      "sort": {
+        "title": "Una persona lo clasifica",
+        "when": "mismo día hábil"
+      },
+      "answer": {
+        "title": "Respuesta con fundamento",
+        "when": "siguiente día hábil"
+      },
+      "note": "Si tarda más, recibirá un aviso intermedio: nada de esperas en silencio."
+    },
+    "faq": {
+      "eyebrow": "Preguntas frecuentes",
+      "title": "Antes de escribir",
+      "note": "¿Ninguna encaja? El formulario de arriba es el camino más corto.",
+      "items": {
+        "human": {
+          "q": "¿Responde una persona o un bot?",
+          "a": "Una persona. La confirmación de recepción es automática; nada de lo que viene después lo es. Nuestra IA trabaja en la evaluación, no en el buzón."
+        },
+        "legal": {
+          "q": "¿Recibo asesoramiento jurídico aquí?",
+          "a": "No. No somos un despacho ni una asesoría fiscal. Ordenamos lo que aplica a su caso y le ponemos en contacto con profesionales verificados: solo ellos pueden asesorarle de forma vinculante."
+        },
+        "data": {
+          "q": "¿Qué pasa con mis datos?",
+          "a": "Los tratamos para responder a su consulta y para nada más. Sin boletín salvo que lo pida, sin cesiones con fines publicitarios. Los detalles están en la política de privacidad."
+        },
+        "provider": {
+          "q": "Soy proveedor, ¿es este el sitio?",
+          "a": "Sí, por la vía «Figurar como proveedor». Le responderemos con la documentación que necesitamos para la verificación."
+        }
+      }
+    },
+    "placeholders": {
+      "address": "dirección postal",
+      "phone": "número de teléfono",
+      "hours": "horario de atención"
+    }
   }
 }

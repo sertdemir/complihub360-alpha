@@ -17,6 +17,7 @@ export { HowOrchestrationWorks } from './HowOrchestrationWorks';
 export { KPIStrip } from './KPIStrip';
 export { ObligationsExplorer } from './ObligationsExplorer';
 export { RailDossier } from './RailDossier';
+export { Segment } from './Segment';
 export type { RailItem } from './RailDossier';
 export { RelatedAreas, hasRelatedAreas } from './RelatedAreas';
 export { ResourceTeaser } from './ResourceTeaser';
