@@ -1151,10 +1151,6 @@
       "gapNone": "No source",
       "gapEu": "EU source stands in",
       "gapShowing": "We show",
-      "relatedTitle": "Markets that travel with this one",
-      "relatedLead": "Few sell into one market only. These three share the most duties with this one — the same filings, a second jurisdiction.",
-      "relatedFact": "{{count}} duties in {{areas}} areas, {{shared}} of them shared with this market.",
-      "openMarket": "Open this market",
       "ctaBody": "The assessment narrows this market to your business, your product and your areas — in under five minutes.",
       "allAreas": "All areas",
       "facts": {
@@ -1168,7 +1164,11 @@
       },
       "weightsFoot": "Own sources in {{covered}} of {{total}} areas — the rest applies directly through EU law.",
       "cadenceGroup": "{{cadence}} · {{count}}",
-      "cadenceHot": "Highest cadence load"
+      "cadenceHot": "Highest cadence load",
+      "relatedAreasTitle": "The areas that carry this market",
+      "relatedAreasLead": "This is where this market's national duties live — the areas with the most own sources first. What a single duty requires is set out on its area page.",
+      "relatedAreasFact_one": "{{count}} duty in this market",
+      "relatedAreasFact_other": "{{count}} duties in this market"
     },
     "cta": {
       "title": "See which of these apply to you.",

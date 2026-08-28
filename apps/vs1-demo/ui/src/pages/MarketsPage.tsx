@@ -19,7 +19,7 @@ import {
   MarketCoverage,
   MarketProfileCard,
   MarketWeights,
-  RelatedMarkets,
+  MarketRelatedAreas,
 } from '../components/compliance-areas';
 import { getMarketProfile, isMarketCode, listMarkets } from '../lib/marketProfiles';
 import { useInViewOnce } from '../lib/useInViewOnce';
@@ -561,9 +561,12 @@ export function MarketPage() {
         </Section>
       )}
 
-      {/* ── 5 · Other markets ────────────────────────────────────────────── */}
+      {/* ── 5 · The cross-link back into the areas (user ask 2026-08-28) ──
+          An area page points at markets (its heatmap); the market page points
+          back at areas — with the area pages' own related-accordion, replacing
+          the market-to-market cards that pointed sideways instead. */}
       <Section className="py-16 desktop-s:py-20" spacing="none">
-        <RelatedMarkets profile={profile} />
+        <MarketRelatedAreas profile={profile} />
       </Section>
 
       {/* ── 6 · The close · the hub's light orchestration block (user ask

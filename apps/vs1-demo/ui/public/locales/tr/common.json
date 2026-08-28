@@ -1151,10 +1151,6 @@
       "gapNone": "Kaynak yok",
       "gapEu": "AB kaynağı geçerli",
       "gapShowing": "Gösterdiğimiz",
-      "relatedTitle": "Bununla birlikte gelen pazarlar",
-      "relatedLead": "Çok azı tek pazara satar. Bu üçü bu pazarla en çok yükümlülüğü paylaşıyor — aynı bildirimler, ikinci bir yargı alanı.",
-      "relatedFact": "{{areas}} alanda {{count}} yükümlülük, {{shared}} tanesi bu pazarla ortak.",
-      "openMarket": "Pazarı aç",
       "ctaBody": "Değerlendirme bu pazarı şirketinize, ürününüze ve alanlarınıza göre daraltır — beş dakikadan kısa sürede.",
       "allAreas": "Tüm alanlar",
       "facts": {
@@ -1168,7 +1164,11 @@
       },
       "weightsFoot": "{{total}} alandan {{covered}} tanesinde kendi kaynaklarımız var — geri kalanı doğrudan AB hukuku üzerinden geçerli.",
       "cadenceGroup": "{{cadence}} · {{count}}",
-      "cadenceHot": "En yüksek takt yükü"
+      "cadenceHot": "En yüksek takt yükü",
+      "relatedAreasTitle": "Bu pazarı taşıyan alanlar",
+      "relatedAreasLead": "Bu pazarın ulusal yükümlülükleri burada yaşar — önce en çok kendi kaynağı olan alanlar. Tek bir yükümlülüğün ne istediği kendi alan sayfasında yazar.",
+      "relatedAreasFact_one": "Bu pazarda {{count}} yükümlülük",
+      "relatedAreasFact_other": "Bu pazarda {{count}} yükümlülük"
     },
     "cta": {
       "title": "Bunlardan hangilerinin size uyduğunu görün.",

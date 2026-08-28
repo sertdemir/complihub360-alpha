@@ -1151,10 +1151,6 @@
       "gapNone": "Sin fuente",
       "gapEu": "Rige la fuente UE",
       "gapShowing": "Mostramos",
-      "relatedTitle": "Mercados que van con este",
-      "relatedLead": "Pocos venden a un solo mercado. Estos tres comparten más obligaciones con este: las mismas presentaciones, otra jurisdicción.",
-      "relatedFact": "{{count}} obligaciones en {{areas}} áreas, {{shared}} compartidas con este mercado.",
-      "openMarket": "Abrir este mercado",
       "ctaBody": "La evaluación acota este mercado a su empresa, su producto y sus áreas, en menos de cinco minutos.",
       "allAreas": "Todas las áreas",
       "facts": {
@@ -1168,7 +1164,11 @@
       },
       "weightsFoot": "Fuentes propias en {{covered}} de {{total}} áreas — el resto se aplica directamente a través del derecho de la UE.",
       "cadenceGroup": "{{cadence}} · {{count}}",
-      "cadenceHot": "Mayor carga de frecuencia"
+      "cadenceHot": "Mayor carga de frecuencia",
+      "relatedAreasTitle": "Las áreas que sostienen este mercado",
+      "relatedAreasLead": "Aquí viven las obligaciones nacionales de este mercado — primero las áreas con más fuentes propias. Lo que exige cada obligación está en la página de su área.",
+      "relatedAreasFact_one": "{{count}} obligación en este mercado",
+      "relatedAreasFact_other": "{{count}} obligaciones en este mercado"
     },
     "cta": {
       "title": "Vea cuáles se aplican a su caso.",

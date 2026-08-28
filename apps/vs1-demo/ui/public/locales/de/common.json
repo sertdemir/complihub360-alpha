@@ -1151,10 +1151,6 @@
       "gapNone": "Keine Quelle",
       "gapEu": "EU-Quelle steht ein",
       "gapShowing": "Wir zeigen",
-      "relatedTitle": "Märkte, die damit einhergehen",
-      "relatedLead": "Wer verkauft, verkauft selten nur in einen Markt. Diese drei teilen die meisten Pflichten mit diesem — dieselben Meldungen, eine zweite Jurisdiktion.",
-      "relatedFact": "{{count}} Pflichten in {{areas}} Bereichen, {{shared}} davon geteilt mit diesem Markt.",
-      "openMarket": "Markt öffnen",
       "ctaBody": "Das Assessment grenzt diesen Markt auf Ihr Unternehmen, Ihr Produkt und Ihre Bereiche ein — in unter fünf Minuten.",
       "allAreas": "Alle Bereiche",
       "facts": {
@@ -1168,7 +1164,11 @@
       },
       "weightsFoot": "Eigene Quellen in {{covered}} von {{total}} Bereichen — der Rest gilt über EU-Recht unmittelbar.",
       "cadenceGroup": "{{cadence}} · {{count}}",
-      "cadenceHot": "Höchste Taktlast"
+      "cadenceHot": "Höchste Taktlast",
+      "relatedAreasTitle": "Bereiche, die diesen Markt tragen",
+      "relatedAreasLead": "Hier liegen die nationalen Pflichten dieses Markts — die Bereiche mit den meisten eigenen Quellen zuerst. Was eine einzelne Pflicht verlangt, steht auf ihrer Bereichsseite.",
+      "relatedAreasFact_one": "{{count}} Pflicht in diesem Markt",
+      "relatedAreasFact_other": "{{count}} Pflichten in diesem Markt"
     },
     "cta": {
       "title": "Sehen, welche davon für Sie gelten.",
