@@ -5,18 +5,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Check, Lock, Minus, Plus } from 'lucide-react';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
-import { TypeOnView } from '../components/ui/TypeOnView';
 import { SiteFooter } from '../components/home';
 import { HowOrchestrationWorks } from '../components/compliance-areas';
 import { SectionEyebrow, GoldWord, Reveal, Stagger, StaggerItem } from '../components/providers/SectionHeading';
 import { useInViewOnce } from '../lib/useInViewOnce';
 
 // ─── /pricing ────────────────────────────────────────────────────────────────
-// Redesigned 2026-08-24 against the pricing canvas: the three free items became
-// large numbered cards whose copy TYPES itself in on arrival, the three
-// statements (who pays / ranking / the specialist's fee) became alternating
-// text-and-image teasers, and the page gained the FAQ it never had. It closes
-// on the same orchestration band as the area and market pages.
+// Redesigned 2026-08-24 against the pricing canvas; re-dressed section by
+// section from 2026-08-28 (Gradient hero with the receipt card, the free
+// items as a card trio on a Gradient panel). The three statements (who pays /
+// ranking / the specialist's fee) are alternating text-and-image teasers, and
+// the page carries the FAQ it never had before 08-24.
 //
 // Still deliberately a USER-side page only (see the pricing decision: providers
 // are sold offline/B2B, no self-checkout) — the page answers one question: what
@@ -364,35 +363,41 @@ export function PricingPage() {
         </Container>
       </section>
 
-      {/* ── The three free items, as large numbered cards ─────────────────── */}
+      {/* ── The three free items (canvas "Preise · Was kostenlos ist" ·
+          Variante B "Karten-Trio auf Gradient-Panel", 2026-08-28) ──────────
+          The bordered 320px cards and their typewriter body retire: the
+          three posts stand as white dossier cards in ONE Gradient panel —
+          gold numeral kicker, serif title, and the 0-€ price behind a
+          hairline in the foot — arriving with the staggered entrance every
+          card on the redesigned surface uses. */}
       <section className="py-20 desktop-s:py-24">
         <Container size="xl">
           <Reveal className="max-w-[760px]">
             <SectionEyebrow tone="brand">{t('pricing.free.kicker')}</SectionEyebrow>
             <h2 className="mt-3 font-serif text-h1 font-semibold text-fg">{t('pricing.free.title')}</h2>
           </Reveal>
-          <Stagger className="mt-11 grid gap-6 tablet:grid-cols-3" stagger={0.15}>
-            {Array.from({ length: FREE_COUNT }, (_, i) => (
-              <StaggerItem key={i}>
-                <div className="flex h-full min-h-[320px] flex-col rounded-xl border border-stroke-subtle bg-surface p-9">
-                  <span className="font-serif text-display-md font-semibold tabular-nums text-primary-100">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <p className="mt-5 font-serif text-h3 font-bold leading-snug text-fg">
-                    {t(`pricing.free.items.${i}.title`)}
-                  </p>
-                  <TypeOnView
-                    text={t(`pricing.free.items.${i}.desc`)}
-                    className="mt-3 text-body-md leading-relaxed text-fg-secondary"
-                    delay={0.2 + i * 0.15}
-                  />
-                  <span className="mt-auto pt-6 text-body-xs font-semibold text-fg-brand">
-                    {t(`pricing.free.items.${i}.price`)}
-                  </span>
-                </div>
-              </StaggerItem>
-            ))}
-          </Stagger>
+          <Reveal delay={0.1} className="mt-9 rounded-xl bg-gradient-stage p-5 sm:p-7">
+            <Stagger className="grid gap-5 tablet:grid-cols-3" stagger={0.15}>
+              {Array.from({ length: FREE_COUNT }, (_, i) => (
+                <StaggerItem key={i} className="h-full">
+                  <div className="flex h-full flex-col rounded-xl bg-surface p-7 shadow-[0_34px_80px_-30px_rgba(2,22,17,0.35)] dark:bg-surface-secondary">
+                    <span className="text-body-3xs font-extrabold uppercase tracking-[0.12em] tabular-nums text-accent-700 dark:text-fg-accent-strong">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <p className="mt-2.5 font-serif text-[1.25rem] font-bold leading-snug text-fg">
+                      {t(`pricing.free.items.${i}.title`)}
+                    </p>
+                    <p className="mt-2.5 flex-1 text-body-sm leading-relaxed text-fg-secondary">
+                      {t(`pricing.free.items.${i}.desc`)}
+                    </p>
+                    <span className="mt-5 border-t border-stroke-subtle pt-3.5 text-body-xs font-bold tabular-nums text-fg-brand">
+                      {t(`pricing.free.items.${i}.price`)}
+                    </span>
+                  </div>
+                </StaggerItem>
+              ))}
+            </Stagger>
+          </Reveal>
         </Container>
       </section>
 
