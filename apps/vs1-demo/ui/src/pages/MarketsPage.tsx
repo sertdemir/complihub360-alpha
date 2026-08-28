@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ArrowRight, Check, ScrollText } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { useReducedMotion } from 'framer-motion';
 import { severityFromRiskWeight } from '@complihub/compliance-engine';
 import { Container } from '../components/ui/Container';
 import { RiskBadge } from '../components/ui/RiskBadge';
@@ -11,6 +12,8 @@ import { SectionEyebrow, GoldWord, Reveal, Stagger, StaggerItem } from '../compo
 import { Typography } from '../components/ui/Typography';
 import { Section } from '../components/ui/Section';
 import {
+  AreaSectionHeading,
+  COUNTRY_OPTIONS,
   HowOrchestrationWorks,
   MarketCalendar,
   MarketCoverage,
@@ -18,9 +21,7 @@ import {
   MarketWeights,
   RelatedMarkets,
 } from '../components/compliance-areas';
-import { DOMAIN_I18N_KEY, DOMAIN_BY_SLUG } from '../lib/domains';
 import { getMarketProfile, isMarketCode, listMarkets } from '../lib/marketProfiles';
-import { Badge } from '../components/ui/Badge';
 import { useInViewOnce } from '../lib/useInViewOnce';
 
 // ─── /markets and /markets/:code · Brand Map Stufe 6b ────────────────────────
@@ -38,32 +39,118 @@ import { useInViewOnce } from '../lib/useInViewOnce';
 // The visible consequence is uneven coverage — DE carries nine market-specific
 // duties, TR four. The coverage note says so instead of padding it.
 
-function useDomainLabel() {
-  const { t } = useTranslation('userws');
-  return (slug: string) => {
-    const def = DOMAIN_BY_SLUG[slug];
-    const key = def ? DOMAIN_I18N_KEY[def.label] : undefined;
-    return key ? t(`domain.${key}`, { defaultValue: def!.label }) : slug;
-  };
-}
-
-// Region cards merged in from /countries. The tier is a key, not a label — it
-// also drives which wording appears, and comparing translated text would break
-// in every non-English locale.
+// Region rows merged in from /countries. The tier is a key, not a label — it
+// also drives which color the kicker takes, and comparing translated text
+// would break in every non-English locale.
 const REGION_KEYS = ['eu', 'uk', 'us', 'au'] as const;
 const REGION_TIER: Record<(typeof REGION_KEYS)[number], 'full' | 'expanding' | 'core'> = {
   eu: 'full', uk: 'full', us: 'expanding', au: 'core',
 };
+
+// Flags are presentation, sourced from the market picker's own list — the one
+// sanctioned emoji exception, so the cards and the picker can never disagree.
+const FLAG_BY_CODE = new Map(COUNTRY_OPTIONS.map((o) => [o.code as string, o.flag]));
+
+// A serif value counting up in view — the KPIStrip's move, with the formatter
+// injected because the third cell is a locale-formatted decimal, not an int.
+function CountUp({ to, run, format }: { to: number; run: boolean; format: (v: number) => string }) {
+  const reduced = useReducedMotion();
+  const [v, setV] = useState(reduced ? to : 0);
+  useEffect(() => {
+    if (!run || reduced) return;
+    let raf = 0;
+    const t0 = performance.now();
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - t0) / 700);
+      setV(p * to);
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [run, to, reduced]);
+  return <>{format(run || reduced ? v : 0)}</>;
+}
+
+// ─── The floating KPI card (canvas "Märkte · Hero" · Variante A, 2026-08-28) ─
+// ONE white card pulled up over the Gradient's bottom edge — the hub hero's
+// anatomy. All three figures are aggregates over listMarkets(), never typed
+// out, so a ninth market or a new duty changes them without anyone remembering
+// this card exists.
+function MarketsKpiCard({ markets }: { markets: ReturnType<typeof listMarkets> }) {
+  const { t, i18n } = useTranslation('common');
+  const [ref, inView] = useInViewOnce<HTMLDivElement>('-60px');
+
+  const dutiesTotal = markets.reduce((sum, m) => sum + m.obligationCount, 0);
+  const avgEnforcement = markets.reduce((sum, m) => sum + m.enforcementIntensity, 0) / markets.length;
+  // The market that anchors the scale — named by the data, not by hand.
+  const leader = markets.reduce((max, m) => (m.enforcementIntensity > max.enforcementIntensity ? m : max), markets[0]);
+  const one = new Intl.NumberFormat(i18n.language, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const int = (v: number) => String(Math.round(v));
+
+  const cells = [
+    {
+      key: 'markets',
+      value: <CountUp to={markets.length} run={inView} format={int} />,
+      suffix: null as ReactNode,
+      label: t('markets.index.kpi.markets', 'Markets'),
+      note: t('markets.index.kpi.marketsNote', 'the EU core plus the UK, USA and Türkiye'),
+    },
+    {
+      key: 'duties',
+      value: <CountUp to={dutiesTotal} run={inView} format={int} />,
+      suffix: null as ReactNode,
+      label: t('markets.index.kpi.duties', 'Duties with a legal basis'),
+      note: t('markets.index.kpi.dutiesNote', 'each checked against the engine'),
+    },
+    {
+      key: 'enforcement',
+      value: <CountUp to={avgEnforcement} run={inView} format={(v) => one.format(v)} />,
+      suffix: (
+        <span className="ml-1 text-body-sm font-semibold text-fg-tertiary">
+          {t('markets.index.kpi.ofTen', '/ 10')}
+        </span>
+      ),
+      label: t('markets.index.kpi.enforcement', 'Enforcement on average'),
+      note: t('markets.index.kpi.enforcementNote', '{{market}} leads with {{value}} of 10', {
+        market: t(`markets.countries.${leader.code}`),
+        value: leader.enforcementIntensity,
+      }),
+    },
+  ];
+
+  return (
+    <div
+      ref={ref}
+      className="rounded-xl bg-surface p-7 shadow-[0_34px_80px_-32px_rgba(2,22,17,0.35)] dark:bg-surface-secondary lg:px-8"
+    >
+      <div className="grid grid-cols-1 gap-y-7 sm:grid-cols-3 sm:divide-x sm:divide-stroke-subtle">
+        {cells.map((c) => (
+          <div key={c.key} className="min-w-0 sm:px-8 sm:first:pl-0 sm:last:pr-0">
+            <p className="font-serif text-[1.625rem] font-bold leading-none tabular-nums text-fg">
+              {c.value}
+              {c.suffix}
+            </p>
+            <p className="mt-2 text-body-sm font-bold text-fg">{c.label}</p>
+            <p className="mt-1 text-body-xs leading-snug text-fg-tertiary">{c.note}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export function MarketsIndexPage() {
   const { t } = useTranslation('common');
   const { locale } = useParams();
   const markets = listMarkets();
 
-
   return (
     <main className="bg-surface">
-      <section className="border-b border-stroke-subtle bg-surface-secondary pb-16 pt-32 lg:pb-20 lg:pt-40">
+      {/* ── Hero on the full-bleed Gradient (canvas "Märkte · Hero" ·
+          Variante A, 2026-08-28) — the hub hero's anatomy. Unlike the hub
+          this page has no picker card to balance, so the copy holds the
+          center and the KPI card below clamps hero and grid together. */}
+      <section className="bg-gradient-stage pb-24 pt-32 lg:pb-28 lg:pt-40">
         <Container size="xl">
           <Reveal className="mx-auto flex max-w-[760px] flex-col items-center gap-4 text-center">
             <SectionEyebrow tone="brand">{t('markets.index.eyebrow')}</SectionEyebrow>
@@ -77,9 +164,19 @@ export function MarketsIndexPage() {
         </Container>
       </section>
 
-      <section className="py-16 lg:py-20">
+      <Container size="xl" className="relative z-10 -mt-14">
+        <Reveal delay={0.1} className="mx-auto max-w-[1040px]">
+          <MarketsKpiCard markets={markets} />
+        </Reveal>
+      </Container>
+
+      {/* ── The eight markets (canvas "Märkte · Karten" · Variante A,
+          2026-08-28) — hub cards, two across: flag, serif name, the
+          enforcement pill, one plain sentence, and a foot that repeats the
+          two figures the sentence carries so a scanner needs neither. */}
+      <section className="pb-16 pt-14 lg:pb-20 desktop-s:pt-16">
         <Container size="xl">
-          <Stagger className="mx-auto grid max-w-[1040px] gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Stagger className="mx-auto grid max-w-[1040px] gap-4 desktop-s:grid-cols-2">
             {markets.map((m) => {
               // The same instrument as everywhere else: severity derives from
               // the enforcement score, and the pill carries the real number.
@@ -88,37 +185,49 @@ export function MarketsIndexPage() {
                 <StaggerItem key={m.code}>
                   <Link
                     to={`/${locale ?? 'en'}/markets/${m.code.toLowerCase()}`}
-                    className="group flex h-full flex-col rounded-xl border border-stroke-subtle bg-surface p-6 shadow-sm transition-shadow hover:shadow-md focus-visible:shadow-md"
+                    className="group flex h-full gap-4 rounded-xl border border-stroke-subtle bg-surface p-6 shadow-sm transition-shadow hover:shadow-md focus-visible:shadow-md tablet:p-7"
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <span className="text-body-3xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
-                        {m.code}
+                    <span className="mt-0.5 shrink-0 text-[2.125rem] leading-none" aria-hidden>
+                      {FLAG_BY_CODE.get(m.code)}
+                    </span>
+                    <span className="flex min-w-0 flex-1 flex-col">
+                      <span className="flex items-start justify-between gap-3">
+                        <span className="font-serif text-[1.25rem] font-bold leading-snug text-fg">
+                          {t(`markets.countries.${m.code}`)}
+                        </span>
+                        <RiskBadge level={severity} size="sm" className="shrink-0 rounded-full tabular-nums">
+                          {t('markets.index.enforcement', { value: m.enforcementIntensity })}
+                        </RiskBadge>
                       </span>
-                      <RiskBadge level={severity} size="sm" className="shrink-0 rounded-full tabular-nums">
-                        {t('markets.index.enforcement', { value: m.enforcementIntensity })}
-                      </RiskBadge>
-                    </div>
-                    <p className="mb-5 mt-2 font-serif text-[1.375rem] font-bold leading-snug text-fg">
-                      {t(`markets.countries.${m.code}`)}
-                    </p>
-                    <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-stroke-subtle pt-4">
-                      <span className="inline-flex items-center gap-1.5 text-body-3xs font-semibold text-fg-tertiary">
-                        <ScrollText size={12} />
-                        {t('markets.index.obligations', { count: m.obligationCount })}
-                      </span>
-                      <span className="text-body-3xs font-semibold text-fg-tertiary">
-                        {t('markets.index.areas', {
-                          defaultValue: '{{count}} of {{total}} areas',
-                          count: m.areasCovered,
+                      <span className="mb-4 mt-1.5 text-body-sm leading-relaxed text-fg-secondary">
+                        {t('markets.index.cardSub', {
+                          defaultValue:
+                            '{{count}} duties with a national legal basis, own sources in {{areas}} of {{total}} areas.',
+                          count: m.obligationCount,
+                          areas: m.areasCovered,
                           total: m.areasTotal,
                         })}
                       </span>
-                      <ArrowRight
-                        size={14}
-                        className="ml-auto text-fg-brand transition-transform group-hover:translate-x-0.5"
-                        aria-hidden
-                      />
-                    </div>
+                      <span className="mt-auto flex items-center justify-between gap-3 border-t border-stroke-subtle pt-3">
+                        <span className="text-body-3xs font-semibold text-fg-tertiary">
+                          {t('markets.index.obligations', { count: m.obligationCount })}
+                          {' · '}
+                          {t('markets.index.areas', {
+                            defaultValue: '{{count}} of {{total}} areas',
+                            count: m.areasCovered,
+                            total: m.areasTotal,
+                          })}
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-body-3xs font-bold text-fg-brand">
+                          {t('markets.index.openMarket', 'Open the market')}
+                          <ArrowRight
+                            size={13}
+                            className="transition-transform group-hover:translate-x-0.5"
+                            aria-hidden
+                          />
+                        </span>
+                      </span>
+                    </span>
                   </Link>
                 </StaggerItem>
               );
@@ -127,51 +236,71 @@ export function MarketsIndexPage() {
         </Container>
       </section>
 
-      {/* Regions — merged in from the retired /countries page (2026-08-18). That
-          page carried a coverage overview with no legal sources; the per-country
-          duties below are the substance, so the overview became a section here
-          rather than a second, thinner page competing for the same intent. */}
-      <section className="border-t border-stroke-subtle bg-surface-secondary py-16 lg:py-20">
+      {/* ── Regions (canvas "Märkte · Regionen" · Variante C, 2026-08-28) —
+          merged in from the retired /countries page (2026-08-18) and now a
+          Gradient pair: the four regions as quiet rows in ONE white card on
+          the tinted panel left, the copy right. The descriptions the old
+          cards carried are gone — name, tier and focus statutes say it. */}
+      <section className="py-16 lg:py-20">
         <Container size="xl">
-          <Reveal className="mx-auto max-w-[1040px]">
-            <h2 className="font-serif text-[1.75rem] font-semibold text-fg">
-              {t('markets.regions.title')}
-            </h2>
-            <p className="mt-2 max-w-2xl text-body text-fg-secondary">{t('markets.regions.lead')}</p>
+          <div className="mx-auto flex max-w-[1040px] flex-col gap-10 desktop-s:flex-row-reverse desktop-s:items-center desktop-s:gap-14">
+            {/* DOM order copy-first so mobile leads with the heading; the
+                row-reverse stands the panel left on desktop. */}
+            <Reveal className="shrink-0 desktop-s:w-[360px]">
+              <AreaSectionHeading
+                eyebrow={t('markets.regions.eyebrow', 'Regions')}
+                title={t('markets.regions.title')}
+                lead={t('markets.regions.lead')}
+              />
+              <Typography
+                variant="caption"
+                className="mt-6 block border-t border-stroke-subtle pt-4 text-body-xs normal-case leading-relaxed tracking-normal text-fg-tertiary"
+              >
+                {t('markets.regions.note', {
+                  defaultValue:
+                    'The EU and the UK are fully covered; North America is expanding and APAC starts with core coverage. More countries follow over the course of 2026.',
+                })}
+              </Typography>
+            </Reveal>
 
-            <Stagger className="mt-8 grid gap-4 sm:grid-cols-2">
-              {REGION_KEYS.map((key) => (
-                <StaggerItem key={key}>
-                  <div className="flex h-full flex-col rounded-xl border border-stroke-subtle bg-surface p-6">
-                    <div className="flex items-baseline justify-between gap-3">
-                      <p className="font-serif text-[1.125rem] font-bold leading-snug text-fg">
-                        {t(`markets.regions.items.${key}.name`)}
-                      </p>
-                      <span className="shrink-0 text-body-3xs font-semibold uppercase tracking-[0.12em] text-fg-tertiary">
-                        {t(`markets.regions.tiers.${REGION_TIER[key]}`)}
+            <Reveal delay={0.1} className="min-w-0 flex-1 rounded-xl bg-gradient-stage p-5 sm:p-7">
+              <div className="rounded-xl bg-surface px-6 py-2 shadow-[0_34px_80px_-30px_rgba(2,22,17,0.4)] dark:bg-surface-secondary sm:px-7">
+                <Stagger className="divide-y divide-stroke-subtle">
+                  {REGION_KEYS.map((key) => (
+                    <StaggerItem
+                      key={key}
+                      className="flex flex-col gap-2 py-4 tablet:flex-row tablet:items-baseline tablet:gap-5"
+                    >
+                      <span className="shrink-0 tablet:w-[11.5rem]">
+                        <span className="block font-serif text-body font-bold leading-snug text-fg">
+                          {t(`markets.regions.items.${key}.name`)}
+                        </span>
+                        <span
+                          className={`mt-1 block text-[0.5625rem] font-extrabold uppercase tracking-[0.1em] ${
+                            REGION_TIER[key] === 'full'
+                              ? 'text-fg-brand'
+                              : 'text-accent-700 dark:text-fg-accent-strong'
+                          }`}
+                        >
+                          {t(`markets.regions.tiers.${REGION_TIER[key]}`)}
+                        </span>
                       </span>
-                    </div>
-                    <p className="mt-3 text-body-sm leading-relaxed text-fg-secondary">
-                      {t(`markets.regions.items.${key}.description`)}
-                    </p>
-                    <p className="mt-4 text-body-3xs font-semibold uppercase tracking-[0.12em] text-fg-tertiary">
-                      {t('markets.regions.focusAreas')}
-                    </p>
-                    <ul className="mt-2 flex flex-wrap gap-1.5">
-                      {(t(`markets.regions.items.${key}.focus`, { returnObjects: true }) as string[]).map((f) => (
-                        <li key={f}>
-                          {/* Badge renders a span — it has to sit INSIDE the li, not replace it. */}
-                          <Badge shape="pill" tone="neutral" appearance="outline" size="md">
-                            {f}
-                          </Badge>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </StaggerItem>
-              ))}
-            </Stagger>
-          </Reveal>
+                      <span className="min-w-0 flex-1 text-body-xs leading-relaxed text-fg-tertiary">
+                        {(t(`markets.regions.items.${key}.focus`, { returnObjects: true }) as string[]).map(
+                          (f, j, arr) => (
+                            <span key={f}>
+                              <span className="font-semibold text-fg">{f}</span>
+                              {j < arr.length - 1 && ' · '}
+                            </span>
+                          ),
+                        )}
+                      </span>
+                    </StaggerItem>
+                  ))}
+                </Stagger>
+              </div>
+            </Reveal>
+          </div>
         </Container>
       </section>
 

@@ -1106,7 +1106,19 @@
       "obligations_one": "{{count}} Pflicht",
       "obligations_other": "{{count}} Pflichten",
       "areas": "{{count}} von {{total}} Bereichen",
-      "enforcement": "Vollzug {{value}}/10"
+      "enforcement": "Vollzug {{value}}/10",
+      "kpi": {
+        "markets": "Märkte",
+        "marketsNote": "EU-Kern plus UK, USA und Türkei",
+        "duties": "Pflichten mit Rechtsgrundlage",
+        "dutiesNote": "jede gegen die Engine geprüft",
+        "enforcement": "Vollzug im Schnitt",
+        "enforcementNote": "{{market}} führt mit {{value}} von 10",
+        "ofTen": "/ 10"
+      },
+      "cardSub_one": "{{count}} Pflicht mit nationaler Rechtsgrundlage, eigene Quellen in {{areas}} von {{total}} Bereichen.",
+      "cardSub_other": "{{count}} Pflichten mit nationaler Rechtsgrundlage, eigene Quellen in {{areas}} von {{total}} Bereichen.",
+      "openMarket": "Markt öffnen"
     },
     "country": {
       "eyebrow": "Markt",
@@ -1198,26 +1210,18 @@
       "tax-vat-registration": "USt-Registrierung & -Meldung"
     },
     "regions": {
-      "title": "Abgedeckte Märkte & Regionen",
+      "eyebrow": "Regionen",
+      "title": "Wo wir stehen — und wo es hingeht",
       "lead": "Jede Suche und jede Analyse ist fest in den konkreten Gesetzen des Zielmarkts verankert — damit es keine rechtlichen Blindflüge gibt.",
-      "legend": {
-        "live": "Live",
-        "rollout": "Aktiver Rollout"
-      },
-      "focusAreas": "Schwerpunkte",
+      "note": "EU und UK sind voll abgedeckt; Nordamerika ist im Aufbau, APAC startet mit Grundabdeckung. Weitere Länder folgen im Lauf des Jahres 2026.",
       "tiers": {
         "full": "Vollständige Abdeckung",
         "expanding": "Im Aufbau",
         "core": "Grundabdeckung"
       },
-      "complexity": {
-        "high": "Hohe Komplexität",
-        "medium": "Mittlere Komplexität"
-      },
       "items": {
         "eu": {
-          "name": "Europäische Union (EU)",
-          "description": "Spezialisierte Expertise für den stark regulierten Binnenmarkt — von DSGVO-Standards bis zu lokalen EPR-Vorschriften.",
+          "name": "Europäische Union",
           "focus": [
             "DSGVO-Compliance",
             "EPR-Verpackungsrecht",
@@ -1226,8 +1230,7 @@
           ]
         },
         "uk": {
-          "name": "Vereinigtes Königreich (UK)",
-          "description": "Gezielte Navigation durch die Post-Brexit-Compliance-Landschaft und die britischen Datenschutzregeln.",
+          "name": "Vereinigtes Königreich",
           "focus": [
             "UK-DSGVO",
             "HMRC-USt-Compliance",
@@ -1237,7 +1240,6 @@
         },
         "us": {
           "name": "USA & Kanada",
-          "description": "Skalieren Sie Ihr Geschäft nach Nordamerika — mit gebündelter Unterstützung für Anforderungen auf Bundes- und Bundesstaatsebene.",
           "focus": [
             "Nexus & Sales Tax",
             "CCPA/CPRA-Datenschutz",
@@ -1247,7 +1249,6 @@
         },
         "au": {
           "name": "Australien (APAC)",
-          "description": "Einstieg in die APAC-Region mit Grundabdeckung für australisches Verbraucher- und Steuerrecht.",
           "focus": [
             "GST-Compliance",
             "Privacy Act 1988",

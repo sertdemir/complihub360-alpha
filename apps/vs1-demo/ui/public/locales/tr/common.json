@@ -1106,7 +1106,19 @@
       "obligations_one": "{{count}} yükümlülük",
       "obligations_other": "{{count}} yükümlülük",
       "areas": "{{total}} alandan {{count}}",
-      "enforcement": "Uygulama {{value}}/10"
+      "enforcement": "Uygulama {{value}}/10",
+      "kpi": {
+        "markets": "Pazarlar",
+        "marketsNote": "AB çekirdeği artı Birleşik Krallık, ABD ve Türkiye",
+        "duties": "Yasal dayanağı olan yükümlülükler",
+        "dutiesNote": "her biri motora karşı doğrulandı",
+        "enforcement": "Ortalama uygulama",
+        "enforcementNote": "{{market}}, 10 üzerinden {{value}} ile önde",
+        "ofTen": "/ 10"
+      },
+      "cardSub_one": "Ulusal yasal dayanağı olan {{count}} yükümlülük; {{total}} alandan {{areas}} tanesinde kendi kaynaklarımız var.",
+      "cardSub_other": "Ulusal yasal dayanağı olan {{count}} yükümlülük; {{total}} alandan {{areas}} tanesinde kendi kaynaklarımız var.",
+      "openMarket": "Pazarı aç"
     },
     "country": {
       "eyebrow": "Pazar",
@@ -1198,26 +1210,18 @@
       "tax-vat-registration": "KDV kaydı ve beyanı"
     },
     "regions": {
-      "title": "Kapsanan Pazarlar ve Bölgeler",
+      "eyebrow": "Bölgeler",
+      "title": "Neredeyiz — ve yol nereye gidiyor",
       "lead": "Her arama ve analiz, hedef ülkenin somut mevzuatına dayanır — hukuki körlemesine adımları önlemek için.",
-      "legend": {
-        "live": "Yayında",
-        "rollout": "Aktif Yaygınlaştırma"
-      },
-      "focusAreas": "Odak Alanları",
+      "note": "AB ve Birleşik Krallık tam kapsamda; Kuzey Amerika yapım aşamasında, APAC temel kapsamla başlıyor. 2026 boyunca yeni ülkeler eklenecek.",
       "tiers": {
         "full": "Tam Kapsam",
         "expanding": "Genişliyor",
         "core": "Temel Kapsam"
       },
-      "complexity": {
-        "high": "Yüksek Karmaşıklık",
-        "medium": "Orta Karmaşıklık"
-      },
       "items": {
         "eu": {
-          "name": "Avrupa Birliği (AB)",
-          "description": "Yoğun düzenlemeye tabi tek pazar için uzmanlaşmış bilgi birikimi — GDPR standartlarından yerel EPR mevzuatına kadar.",
+          "name": "Avrupa Birliği",
           "focus": [
             "GDPR Uyumu",
             "EPR Ambalaj Mevzuatı",
@@ -1226,8 +1230,7 @@
           ]
         },
         "uk": {
-          "name": "Birleşik Krallık (UK)",
-          "description": "Brexit sonrası uyumluluk ortamında ve Birleşik Krallık'a özgü veri koruma kurallarında hedefli yönlendirme.",
+          "name": "Birleşik Krallık",
           "focus": [
             "UK GDPR",
             "HMRC KDV Uyumu",
@@ -1237,7 +1240,6 @@
         },
         "us": {
           "name": "ABD ve Kanada",
-          "description": "Federal ve eyalet düzeyindeki gerekliliklere yönelik derli toplu destekle işinizi Kuzey Amerika'ya ölçekleyin.",
           "focus": [
             "Nexus ve Satış Vergisi",
             "CCPA/CPRA Gizliliği",
@@ -1247,7 +1249,6 @@
         },
         "au": {
           "name": "Avustralya (APAC)",
-          "description": "Avustralya tüketici hukuku ve vergi mevzuatı için temel kapsamla APAC bölgesine açılan kapı.",
           "focus": [
             "GST Uyumu",
             "Privacy Act 1988",

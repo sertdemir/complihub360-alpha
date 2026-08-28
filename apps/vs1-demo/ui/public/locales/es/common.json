@@ -1106,7 +1106,19 @@
       "obligations_one": "{{count}} obligación",
       "obligations_other": "{{count}} obligaciones",
       "areas": "{{count}} de {{total}} áreas",
-      "enforcement": "Aplicación {{value}}/10"
+      "enforcement": "Aplicación {{value}}/10",
+      "kpi": {
+        "markets": "Mercados",
+        "marketsNote": "el núcleo de la UE más Reino Unido, EE. UU. y Turquía",
+        "duties": "Obligaciones con base legal",
+        "dutiesNote": "cada una comparada contra el motor",
+        "enforcement": "Aplicación media",
+        "enforcementNote": "{{market}} lidera con {{value}} de 10",
+        "ofTen": "/ 10"
+      },
+      "cardSub_one": "{{count}} obligación con base legal nacional, fuentes propias en {{areas}} de {{total}} áreas.",
+      "cardSub_other": "{{count}} obligaciones con base legal nacional, fuentes propias en {{areas}} de {{total}} áreas.",
+      "openMarket": "Abrir el mercado"
     },
     "country": {
       "eyebrow": "Mercado",
@@ -1198,26 +1210,18 @@
       "tax-vat-registration": "Registro y presentación del IVA"
     },
     "regions": {
-      "title": "Mercados y regiones cubiertos",
+      "eyebrow": "Regiones",
+      "title": "Dónde estamos — y hacia dónde vamos",
       "lead": "Cada búsqueda y cada análisis se apoyan en las leyes concretas del país de destino, para evitar vuelos a ciegas en materia legal.",
-      "legend": {
-        "live": "En vivo",
-        "rollout": "Despliegue activo"
-      },
-      "focusAreas": "Áreas prioritarias",
+      "note": "La UE y el Reino Unido están totalmente cubiertos; Norteamérica está en construcción y APAC arranca con cobertura básica. Más países se sumarán a lo largo de 2026.",
       "tiers": {
         "full": "Cobertura completa",
         "expanding": "En expansión",
         "core": "Cobertura básica"
       },
-      "complexity": {
-        "high": "Complejidad alta",
-        "medium": "Complejidad media"
-      },
       "items": {
         "eu": {
-          "name": "Unión Europea (UE)",
-          "description": "Experiencia especializada para el mercado único altamente regulado, desde los estándares del RGPD hasta las normas locales de EPR.",
+          "name": "Unión Europea",
           "focus": [
             "Cumplimiento del RGPD",
             "Normativa EPR de envases",
@@ -1226,8 +1230,7 @@
           ]
         },
         "uk": {
-          "name": "Reino Unido (UK)",
-          "description": "Navegación específica por el panorama de cumplimiento posterior al Brexit y las normas británicas de protección de datos.",
+          "name": "Reino Unido",
           "focus": [
             "RGPD del Reino Unido",
             "Cumplimiento de IVA (HMRC)",
@@ -1237,7 +1240,6 @@
         },
         "us": {
           "name": "EE. UU. y Canadá",
-          "description": "Escale su negocio hacia Norteamérica con apoyo unificado para los requisitos federales y estatales.",
           "focus": [
             "Nexus e impuesto sobre ventas",
             "Privacidad CCPA/CPRA",
@@ -1247,7 +1249,6 @@
         },
         "au": {
           "name": "Australia (APAC)",
-          "description": "Puerta de entrada a la región APAC con cobertura básica del derecho de consumo y la fiscalidad australianos.",
           "focus": [
             "Cumplimiento del GST",
             "Privacy Act 1988",

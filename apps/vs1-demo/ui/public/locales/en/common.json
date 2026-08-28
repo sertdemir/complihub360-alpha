@@ -1106,7 +1106,19 @@
       "obligations_one": "{{count}} obligation",
       "obligations_other": "{{count}} obligations",
       "areas": "{{count}} of {{total}} areas",
-      "enforcement": "Enforcement {{value}}/10"
+      "enforcement": "Enforcement {{value}}/10",
+      "kpi": {
+        "markets": "Markets",
+        "marketsNote": "the EU core plus the UK, USA and Türkiye",
+        "duties": "Duties with a legal basis",
+        "dutiesNote": "each checked against the engine",
+        "enforcement": "Enforcement on average",
+        "enforcementNote": "{{market}} leads with {{value}} of 10",
+        "ofTen": "/ 10"
+      },
+      "cardSub_one": "{{count}} duty with a national legal basis, own sources in {{areas}} of {{total}} areas.",
+      "cardSub_other": "{{count}} duties with a national legal basis, own sources in {{areas}} of {{total}} areas.",
+      "openMarket": "Open the market"
     },
     "country": {
       "eyebrow": "Market",
@@ -1198,26 +1210,18 @@
       "tax-vat-registration": "VAT Registration & Filing"
     },
     "regions": {
-      "title": "Covered Markets & Regions",
+      "eyebrow": "Regions",
+      "title": "Where we stand — and where it goes next",
       "lead": "Every search and analysis is deeply rooted in the specific laws of the target country to avoid legal blind flights.",
-      "legend": {
-        "live": "Live",
-        "rollout": "Active Rollout"
-      },
-      "focusAreas": "Focus Areas",
+      "note": "The EU and the UK are fully covered; North America is expanding and APAC starts with core coverage. More countries follow over the course of 2026.",
       "tiers": {
         "full": "Full Coverage",
         "expanding": "Expanding",
         "core": "Core Support"
       },
-      "complexity": {
-        "high": "High Complexity",
-        "medium": "Medium Complexity"
-      },
       "items": {
         "eu": {
-          "name": "European Union (EU)",
-          "description": "Specialized expertise for the highly regulated single market, from GDPR standards to local EPR laws.",
+          "name": "European Union",
           "focus": [
             "GDPR Compliance",
             "EPR Packaging Laws",
@@ -1226,8 +1230,7 @@
           ]
         },
         "uk": {
-          "name": "United Kingdom (UK)",
-          "description": "Dedicated navigation through post-Brexit compliance landscapes and UK-specific data protection rules.",
+          "name": "United Kingdom",
           "focus": [
             "UK GDPR",
             "HMRC VAT Compliance",
@@ -1237,7 +1240,6 @@
         },
         "us": {
           "name": "USA & Canada",
-          "description": "Scale your business into North America with streamlined support for federal and state-level requirements.",
           "focus": [
             "Nexus & Sales Tax",
             "CCPA/CPRA Privacy",
@@ -1247,7 +1249,6 @@
         },
         "au": {
           "name": "Australia (APAC)",
-          "description": "Gateway to the APAC region with core support for Australian consumer law and tax regulations.",
           "focus": [
             "GST Compliance",
             "Privacy Act 1988",
