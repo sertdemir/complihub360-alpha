@@ -157,6 +157,10 @@ export function SolutionsPage() {
         <RailDossier
           items={items}
           railWidthClass="desktop-s:w-[340px]"
+          // Three roles, so hovering opens — the related-areas accordion's
+          // behaviour (user ask 2026-08-28): sweep the rail and read, no
+          // click needed. The duty explorer keeps its click, see RailDossier.
+          openOnHover
           renderCard={(item) => {
             const id = item.id as RoleId;
             return (

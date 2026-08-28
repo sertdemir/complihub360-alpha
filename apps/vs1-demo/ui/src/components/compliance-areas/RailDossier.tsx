@@ -32,6 +32,13 @@ interface Props {
   onPick?: (id: string) => void;
   /** Resets selection when it changes (area, market, filter …). */
   resetKey?: string;
+  /**
+   * Hovering a row opens it, and leaving the column falls back to the first —
+   * the related-areas accordion's behaviour (user ask 2026-08-28). Off by
+   * default: with seven duty rows, sweeping the pointer towards the dossier
+   * would flip through every card on the way.
+   */
+  openOnHover?: boolean;
 }
 
 // ─── Rail and dossier ────────────────────────────────────────────────────────
@@ -62,15 +69,19 @@ export function RailDossier({
   railWidthClass = 'desktop-s:w-[360px]',
   onPick,
   resetKey,
+  openOnHover = false,
 }: Props) {
   const reduced = useReducedMotion();
   const [ref, inView] = useInViewOnce<HTMLDivElement>('-120px');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [hovered, setHovered] = useState<string | null>(null);
   const [picked, setPicked] = useState(false);
 
   // Changing the caller's context can strip the item that was open; falling
-  // back to the first keeps the pane populated instead of blanking it.
-  const selected = items.find((i) => i.id === selectedId) ?? items[0];
+  // back to the first keeps the pane populated instead of blanking it. A
+  // hovered row wins over the clicked one for as long as the pointer rests on
+  // it — the accordion's rule, so a reader can sweep the rail and read.
+  const selected = items.find((i) => i.id === (hovered ?? selectedId)) ?? items[0];
   useEffect(() => {
     setSelectedId(null);
   }, [resetKey]);
@@ -89,13 +100,14 @@ export function RailDossier({
   }, [activeId]);
 
   useEffect(() => {
-    if (!inView || reduced || picked || items.length < 2 || !selected || autoAdvanceMs <= 0) return;
+    if (!inView || reduced || picked || hovered || items.length < 2 || !selected || autoAdvanceMs <= 0)
+      return;
     const id = setTimeout(() => {
       const idx = items.findIndex((i) => i.id === selected.id);
       setSelectedId(items[(idx + 1) % items.length].id);
     }, autoAdvanceMs);
     return () => clearTimeout(id);
-  }, [inView, reduced, picked, items, selected, autoAdvanceMs]);
+  }, [inView, reduced, picked, hovered, items, selected, autoAdvanceMs]);
 
   if (items.length === 0 || !selected) return null;
 
@@ -107,7 +119,10 @@ export function RailDossier({
 
   return (
     <div ref={ref} className="mt-6 flex flex-col gap-8 desktop-s:flex-row desktop-s:items-stretch desktop-s:gap-10">
-      <div className={`flex flex-col desktop-s:shrink-0 ${railWidthClass}`}>
+      <div
+        className={`flex flex-col desktop-s:shrink-0 ${railWidthClass}`}
+        onMouseLeave={openOnHover ? () => setHovered(null) : undefined}
+      >
         {railHeader}
         <div className={`flex flex-col gap-1.5 ${railHeader ? 'mt-6' : ''}`}>
           {items.map((item, i) => {
@@ -119,6 +134,9 @@ export function RailDossier({
                 layout
                 aria-pressed={active}
                 onClick={() => take(item.id)}
+                onMouseEnter={openOnHover ? () => setHovered(item.id) : undefined}
+                onFocus={openOnHover ? () => setHovered(item.id) : undefined}
+                onBlur={openOnHover ? () => setHovered((v) => (v === item.id ? null : v)) : undefined}
                 initial={reduced ? false : { opacity: 0, y: 20 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{
