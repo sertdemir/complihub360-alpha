@@ -904,8 +904,6 @@
   },
   "aiGov": {
     "trustCenter": "CompliHub360 Trust Center",
-    "heroTitle": "Yapay Zeka Yönetişimi Çerçevesi",
-    "heroDesc": "Sorumlu inovasyona inanıyoruz. Platformumuz, yapay zekayı küresel düzenlemeler, etik ve şeffaflık sınırları içinde sıkı bir şekilde entegre eder. Yapay Zeka Yönetişiminin 6 boyutunu nasıl uyguladığımızı keşfedin.",
     "dimTitle": "Yapay Zeka Yönetişiminin 6 Boyutu",
     "dimDesc": "Kurumsal uyumluluk için güvenilir yapay zeka sistemleri oluşturmaya yönelik kapsamlı bir yaklaşım.",
     "dimEthicsTitle": "Etik Kurallar",
@@ -941,7 +939,31 @@
         "Uzman değerlendirmesi gerektiği anda konuyu bir insana devreder."
       ],
       "principle": "Teknoloji, doğru insana giden en kısa yol olmalıdır — önündeki bir engel değil."
-    }
+    },
+    "hero": {
+      "titlePre": "Ne olduğunu ",
+      "titleGold": "söyleyen yapay zekâ",
+      "titlePost": ".",
+      "lead": "Yapay zekâyı mevzuata, etiğe ve şeffaflığa sıkı sıkıya bağlarız. Bu sayfa, uyduğumuz kuralları ve ürünü kullandığınızda ne anlama geldiklerini gösterir.",
+      "facts": {
+        "dimensions": {
+          "label": "Yönetişim boyutu",
+          "note": "etikten risk yönetimine"
+        },
+        "gates": {
+          "label": "Her yapay zekâ eyleminden önceki kapı",
+          "note": "temizleme, onay, alan sınırı"
+        },
+        "pii": {
+          "label": "Modeldeki kişisel veri",
+          "note": "dışarı çıkmadan önce yerelde maskelenir"
+        }
+      }
+    },
+    "dimEyebrow": "Yönetişim",
+    "dimCounter": "{{total}} boyuttan {{num}}.",
+    "featEyebrow": "Kullanımda",
+    "ctaBody": "Aynı kurallar, aynı yapay zekâ: değerlendirme beş dakikadan kısa sürede sizin için geçerli olanı daraltır — her ifade kaynağıyla."
   },
   "header": {
     "nav": {

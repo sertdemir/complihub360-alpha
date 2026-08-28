@@ -904,8 +904,6 @@
   },
   "aiGov": {
     "trustCenter": "CompliHub360 Trust Center",
-    "heroTitle": "Marco de Gobernanza de IA",
-    "heroDesc": "Creemos en la innovación responsable. Nuestra plataforma integra la IA estrictamente dentro de los límites de las regulaciones globales, la ética y la transparencia. Descubra cómo implementamos las 6 dimensiones de la Gobernanza de IA.",
     "dimTitle": "Las 6 Dimensiones de la Gobernanza de IA",
     "dimDesc": "Un enfoque integral para construir sistemas de IA confiables para el cumplimiento empresarial.",
     "dimEthicsTitle": "Pautas Éticas",
@@ -941,7 +939,31 @@
         "Cede el paso a una persona en cuanto hace falta criterio profesional."
       ],
       "principle": "La tecnología debería ser el camino más corto hacia la persona adecuada, no una barrera ante ella."
-    }
+    },
+    "hero": {
+      "titlePre": "IA que dice ",
+      "titleGold": "lo que es",
+      "titlePost": ".",
+      "lead": "Vinculamos la IA estrictamente a la normativa, la ética y la transparencia. Esta página expone las reglas que nos imponemos y lo que significan cuando usa el producto.",
+      "facts": {
+        "dimensions": {
+          "label": "Dimensiones de la gobernanza",
+          "note": "de la ética a la gestión de riesgos"
+        },
+        "gates": {
+          "label": "Controles antes de cada acción de IA",
+          "note": "depuración, consentimiento, dominio"
+        },
+        "pii": {
+          "label": "Datos personales en el modelo",
+          "note": "enmascarados localmente antes de salir"
+        }
+      }
+    },
+    "dimEyebrow": "Gobernanza",
+    "dimCounter": "Dimensión {{num}} de {{total}}",
+    "featEyebrow": "En uso",
+    "ctaBody": "Las mismas reglas, la misma IA: la evaluación acota en menos de cinco minutos lo que se le aplica, con la fuente de cada afirmación."
   },
   "header": {
     "nav": {

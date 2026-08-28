@@ -183,7 +183,13 @@ export function RailDossier({
         {railFooter}
       </div>
 
-      <div className="flex min-w-0 flex-1 items-start rounded-xl bg-gradient-stage p-4 sm:p-7">
+      {/* items-CENTER, nicht -start (Nutzer-Hinweis 2026-08-28): die Flaeche
+          wird von der Rail auf Hoehe gezogen (items-stretch oben), also haengt
+          eine kurze Karte sonst oben am Rand statt in ihrer Flaeche zu sitzen.
+          Zentrieren bewegt NUR die Karte — die Groesse des Gradients bleibt,
+          wie sie ist. Ist die Karte hoeher als die Rail, waechst die Flaeche
+          wie bisher mit; dann ist zentriert und gefuellt dasselbe. */}
+      <div className="flex min-w-0 flex-1 items-center rounded-xl bg-gradient-stage p-4 sm:p-7">
         <div
           className="relative w-full min-w-0 transition-[height] duration-500 ease-out motion-reduce:transition-none"
           style={{ height: panelH ?? undefined }}
