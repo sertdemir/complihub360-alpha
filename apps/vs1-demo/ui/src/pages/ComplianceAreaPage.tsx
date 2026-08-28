@@ -256,7 +256,12 @@ export function ComplianceAreaPage() {
           their information lives on as a check statement. */}
       <Section className="py-16 desktop-s:py-20">
         <Container size="xl">
-          <AreaAffected slug={area} eyebrow={eyebrows.affected} />
+          {/* Keyed by area: on a client-side switch the component stays
+              mounted otherwise, and the Stagger's once-fired "show" never
+              reaches role cards mounted later — they stall at opacity 0
+              until a refresh (user report 2026-08-28). A remount lets the
+              whole entrance play per area. */}
+          <AreaAffected key={area} slug={area} eyebrow={eyebrows.affected} />
         </Container>
       </Section>
 
