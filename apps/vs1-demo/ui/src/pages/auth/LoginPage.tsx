@@ -395,8 +395,7 @@ export function LoginPage() {
                     ) : mode === "user" ? (
                         <form onSubmit={(e) => { e.preventDefault(); handleMagicLink(); }}>
                             <h2 className="font-serif text-[1.75rem] font-bold leading-tight text-fg">{t("login.user.title")}</h2>
-                            <p className="mt-2 text-body-md leading-relaxed text-fg-secondary">{t("login.user.subtitle")}</p>
-                            <label htmlFor="login-email" className={"mt-7 " + LABEL}>{t("login.emailLabel")}</label>
+                            <label htmlFor="login-email" className={"mt-7 block " + LABEL}>{t("login.emailLabel")}</label>
                             <input
                                 id="login-email"
                                 type="email"
@@ -421,8 +420,7 @@ export function LoginPage() {
                     ) : (
                         <form onSubmit={(e) => { e.preventDefault(); handlePasswordSignIn(); }}>
                             <h2 className="font-serif text-[1.75rem] font-bold leading-tight text-fg">{t("login.partner.title")}</h2>
-                            <p className="mt-2 text-body-md leading-relaxed text-fg-secondary">{t("login.partner.subtitle")}</p>
-                            <label htmlFor="login-email" className={"mt-7 " + LABEL}>{t("login.emailLabel")}</label>
+                            <label htmlFor="login-email" className={"mt-7 block " + LABEL}>{t("login.emailLabel")}</label>
                             <input
                                 id="login-email"
                                 type="email"
