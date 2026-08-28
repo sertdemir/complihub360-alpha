@@ -1131,7 +1131,6 @@
       "sourceLabel": "Fuente",
       "dueLabel": "Periodicidad",
       "leadTime": "{{days}} días de antelación",
-      "coverageNote": "Las demás obligaciones que mantenemos para {{market}} se apoyan en {{count}} fuentes nacionales, más los Reglamentos de la UE de aplicación directa: esos no necesitan texto nacional y no cuentan como ausentes.",
       "backToMarkets": "Todos los mercados",
       "notFound": "Todavía no tenemos un perfil de mercado para este código.",
       "profileTitle": "Perfil del mercado",
@@ -1146,11 +1145,6 @@
       "calendarLead": "{{count}} obligaciones de {{areas}} áreas en una vista, por periodicidad y no por área. Nadie planifica un mercado área por área: lo planifica contra un calendario.",
       "leadDays": "{{count}} días de antelación",
       "exposureNote": "Sanción individual más alta en este mercado: {{max}} sobre {{duty}}. Los límites declarados suman {{total}}: un techo si todo saliera mal a la vez, no una previsión.",
-      "coverageTitle": "Dónde aún no tenemos fuente local",
-      "coverageLead": "{{count}} obligaciones tienen un texto nacional que no incluimos. Es una laguna de nuestra cobertura, no de la ley, y conviene saber cuál de las dos.",
-      "gapNone": "Sin fuente",
-      "gapEu": "Rige la fuente UE",
-      "gapShowing": "Mostramos",
       "ctaBody": "La evaluación acota este mercado a su empresa, su producto y sus áreas, en menos de cinco minutos.",
       "allAreas": "Todas las áreas",
       "facts": {
@@ -1168,7 +1162,10 @@
       "relatedAreasTitle": "Las áreas que sostienen este mercado",
       "relatedAreasLead": "Aquí viven las obligaciones nacionales de este mercado — primero las áreas con más fuentes propias. Lo que exige cada obligación está en la página de su área.",
       "relatedAreasFact_one": "{{count}} obligación en este mercado",
-      "relatedAreasFact_other": "{{count}} obligaciones en este mercado"
+      "relatedAreasFact_other": "{{count}} obligaciones en este mercado",
+      "weightsFootCovered": "Fuentes propias en {{covered}} de {{total}} áreas — los reglamentos de la UE se aplican directamente y no cuentan como carencia.",
+      "weightsFootPending": "Para {{list}} existe un texto nacional que aún no incorporamos — en su lugar figura el instrumento de la UE indicado.",
+      "weightsFootNone": "Para {{list}} aún no tenemos una fuente con nombre."
     },
     "cta": {
       "title": "Vea cuáles se aplican a su caso.",

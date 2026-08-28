@@ -154,14 +154,48 @@ export function MarketWeights({ profile }: Props) {
             })}
           </ul>
           {/* The sources, once, in the foot — where the retired per-row
-              column used to repeat itself eight times. */}
+              column used to repeat itself eight times. The coverage section
+              folded in here too (user decision 2026-08-28): where this market
+              has REAL gaps the foot names them, keeping the two admissions
+              apart — a national text we do not carry yet (the EU instrument
+              stands in, named) is not the same as holding nothing at all.
+              An EU Regulation applying directly is neither: it is the law
+              here, and it is not counted as missing. */}
           <p className="border-t border-stroke-subtle bg-surface-secondary px-[1.375rem] py-3.5 text-body-2xs leading-relaxed text-fg-tertiary dark:bg-white/[0.04]">
-            {t('markets.country.weightsFoot', {
-              defaultValue:
-                'Own sources in {{covered}} of {{total}} areas — the rest applies directly through EU law.',
-              covered: profile.byDomain.length,
-              total: profile.weights.length,
-            })}
+            {profile.gaps.length === 0
+              ? t('markets.country.weightsFoot', {
+                  defaultValue:
+                    'Own sources in {{covered}} of {{total}} areas — the rest applies directly through EU law.',
+                  covered: profile.byDomain.length,
+                  total: profile.weights.length,
+                })
+              : [
+                  t('markets.country.weightsFootCovered', {
+                    defaultValue:
+                      'Own sources in {{covered}} of {{total}} areas — EU Regulations apply directly and do not count as missing.',
+                    covered: profile.byDomain.length,
+                    total: profile.weights.length,
+                  }),
+                  profile.gaps.some((g) => g.kind === 'national-pending') &&
+                    t('markets.country.weightsFootPending', {
+                      defaultValue:
+                        'For {{list}} a national text exists that we do not carry yet — the named EU instrument stands in.',
+                      list: profile.gaps
+                        .filter((g) => g.kind === 'national-pending')
+                        .map((g) => g.label)
+                        .join(' · '),
+                    }),
+                  profile.gaps.some((g) => g.kind === 'placeholder') &&
+                    t('markets.country.weightsFootNone', {
+                      defaultValue: 'For {{list}} we hold no named source yet.',
+                      list: profile.gaps
+                        .filter((g) => g.kind === 'placeholder')
+                        .map((g) => g.label)
+                        .join(' · '),
+                    }),
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
           </p>
         </div>
       </div>

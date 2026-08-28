@@ -10,7 +10,6 @@ export { AreaSwitcher } from './AreaSwitcher';
 export { MarketProfileCard } from './MarketProfileCard';
 export { MarketWeights } from './MarketWeights';
 export { MarketCalendar } from './MarketCalendar';
-export { MarketCoverage } from './MarketCoverage';
 export { MarketRelatedAreas } from './MarketRelatedAreas';
 export { AreaTimeline } from './AreaTimeline';
 export { CountrySelector } from './CountrySelector';

@@ -1131,7 +1131,6 @@
       "sourceLabel": "Source",
       "dueLabel": "Cadence",
       "leadTime": "{{days}} days lead time",
-      "coverageNote": "The other duties we carry for {{market}} run on {{count}} national sources, plus the EU Regulations that apply here directly — those need no national text, so they are not counted as missing.",
       "backToMarkets": "All markets",
       "notFound": "We do not hold a market profile for this code yet.",
       "profileTitle": "Market profile",
@@ -1146,11 +1145,6 @@
       "calendarLead": "{{count}} duties from {{areas}} areas in one view — by cadence, not by area. Nobody plans a market area by area; they plan it against a calendar.",
       "leadDays": "{{count}} days lead time",
       "exposureNote": "Highest single penalty in this market: {{max}} on {{duty}}. The stated upper bounds add up to {{total}} — a ceiling if everything went wrong at once, not a forecast.",
-      "coverageTitle": "Where we hold no local source yet",
-      "coverageLead": "{{count}} duties have a national text we do not carry. That is a gap in our coverage, not in the law — and it is worth knowing which way round.",
-      "gapNone": "No source",
-      "gapEu": "EU source stands in",
-      "gapShowing": "We show",
       "ctaBody": "The assessment narrows this market to your business, your product and your areas — in under five minutes.",
       "allAreas": "All areas",
       "facts": {
@@ -1168,7 +1162,10 @@
       "relatedAreasTitle": "The areas that carry this market",
       "relatedAreasLead": "This is where this market's national duties live — the areas with the most own sources first. What a single duty requires is set out on its area page.",
       "relatedAreasFact_one": "{{count}} duty in this market",
-      "relatedAreasFact_other": "{{count}} duties in this market"
+      "relatedAreasFact_other": "{{count}} duties in this market",
+      "weightsFootCovered": "Own sources in {{covered}} of {{total}} areas — EU Regulations apply directly and do not count as missing.",
+      "weightsFootPending": "For {{list}} a national text exists that we do not carry yet — the named EU instrument stands in.",
+      "weightsFootNone": "For {{list}} we hold no named source yet."
     },
     "cta": {
       "title": "See which of these apply to you.",

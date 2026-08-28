@@ -1131,7 +1131,6 @@
       "sourceLabel": "Quelle",
       "dueLabel": "Turnus",
       "leadTime": "{{days}} Tage Vorlauf",
-      "coverageNote": "Die übrigen Pflichten, die wir für {{market}} führen, laufen über {{count}} nationale Quellen sowie die EU-Verordnungen, die hier unmittelbar gelten — die brauchen keinen nationalen Text und zählen deshalb nicht als fehlend.",
       "backToMarkets": "Alle Märkte",
       "notFound": "Für dieses Kürzel führen wir noch kein Marktprofil.",
       "profileTitle": "Marktprofil",
@@ -1146,11 +1145,6 @@
       "calendarLead": "{{count}} Pflichten aus {{areas}} Bereichen in einer Ansicht — nach Turnus, nicht nach Bereich. Niemand plant einen Markt bereichsweise, sondern gegen einen Kalender.",
       "leadDays": "{{count}} Tage Vorlauf",
       "exposureNote": "Höchstes Einzelbußgeld in diesem Markt: {{max}} auf {{duty}}. Die benannten Obergrenzen summieren sich auf {{total}} — ein Deckel, falls alles gleichzeitig schiefginge, keine Prognose.",
-      "coverageTitle": "Wo wir noch keine lokale Quelle führen",
-      "coverageLead": "{{count}} Pflichten haben eine nationale Fassung, die wir nicht führen. Das ist eine Lücke in unserer Abdeckung, nicht im Recht — und es lohnt zu wissen, welche von beiden.",
-      "gapNone": "Keine Quelle",
-      "gapEu": "EU-Quelle steht ein",
-      "gapShowing": "Wir zeigen",
       "ctaBody": "Das Assessment grenzt diesen Markt auf Ihr Unternehmen, Ihr Produkt und Ihre Bereiche ein — in unter fünf Minuten.",
       "allAreas": "Alle Bereiche",
       "facts": {
@@ -1168,7 +1162,10 @@
       "relatedAreasTitle": "Bereiche, die diesen Markt tragen",
       "relatedAreasLead": "Hier liegen die nationalen Pflichten dieses Markts — die Bereiche mit den meisten eigenen Quellen zuerst. Was eine einzelne Pflicht verlangt, steht auf ihrer Bereichsseite.",
       "relatedAreasFact_one": "{{count}} Pflicht in diesem Markt",
-      "relatedAreasFact_other": "{{count}} Pflichten in diesem Markt"
+      "relatedAreasFact_other": "{{count}} Pflichten in diesem Markt",
+      "weightsFootCovered": "Eigene Quellen in {{covered}} von {{total}} Bereichen — EU-Verordnungen gelten unmittelbar und zählen nicht als Lücke.",
+      "weightsFootPending": "Bei {{list}} existiert ein nationaler Text, den wir noch nicht führen — dort steht das benannte EU-Instrument.",
+      "weightsFootNone": "Für {{list}} führen wir noch keine benannte Quelle."
     },
     "cta": {
       "title": "Sehen, welche davon für Sie gelten.",

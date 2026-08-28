@@ -1131,7 +1131,6 @@
       "sourceLabel": "Kaynak",
       "dueLabel": "Sıklık",
       "leadTime": "{{days}} gün süre",
-      "coverageNote": "{{market}} için taşıdığımız diğer yükümlülükler {{count}} ulusal kaynağa ve burada doğrudan uygulanan AB Tüzüklerine dayanır; onların ulusal metne ihtiyacı yoktur, bu yüzden eksik sayılmazlar.",
       "backToMarkets": "Tüm pazarlar",
       "notFound": "Bu kod için henüz bir pazar profilimiz yok.",
       "profileTitle": "Pazar profili",
@@ -1146,11 +1145,6 @@
       "calendarLead": "{{areas}} alandan {{count}} yükümlülük tek bir görünümde — alana göre değil, döngüye göre. Kimse bir pazarı alan alan planlamaz; takvime göre planlar.",
       "leadDays": "{{count}} gün hazırlık süresi",
       "exposureNote": "Bu pazardaki en yüksek tekil ceza: {{duty}} için {{max}}. Belirtilen üst sınırların toplamı {{total}} — her şey aynı anda ters gitseydi diye bir tavan, tahmin değil.",
-      "coverageTitle": "Henüz yerel kaynak taşımadığımız yerler",
-      "coverageLead": "{{count}} yükümlülüğün taşımadığımız bir ulusal metni var. Bu, hukuktaki değil kapsamımızdaki bir boşluk — hangisi olduğunu bilmek önemli.",
-      "gapNone": "Kaynak yok",
-      "gapEu": "AB kaynağı geçerli",
-      "gapShowing": "Gösterdiğimiz",
       "ctaBody": "Değerlendirme bu pazarı şirketinize, ürününüze ve alanlarınıza göre daraltır — beş dakikadan kısa sürede.",
       "allAreas": "Tüm alanlar",
       "facts": {
@@ -1168,7 +1162,10 @@
       "relatedAreasTitle": "Bu pazarı taşıyan alanlar",
       "relatedAreasLead": "Bu pazarın ulusal yükümlülükleri burada yaşar — önce en çok kendi kaynağı olan alanlar. Tek bir yükümlülüğün ne istediği kendi alan sayfasında yazar.",
       "relatedAreasFact_one": "Bu pazarda {{count}} yükümlülük",
-      "relatedAreasFact_other": "Bu pazarda {{count}} yükümlülük"
+      "relatedAreasFact_other": "Bu pazarda {{count}} yükümlülük",
+      "weightsFootCovered": "{{total}} alandan {{covered}} tanesinde kendi kaynaklarımız var — AB tüzükleri doğrudan geçerlidir ve eksik sayılmaz.",
+      "weightsFootPending": "{{list}} için henüz taşımadığımız bir ulusal metin mevcut — yerinde belirtilen AB aracı duruyor.",
+      "weightsFootNone": "{{list}} için henüz adlandırılmış bir kaynağımız yok."
     },
     "cta": {
       "title": "Bunlardan hangilerinin size uyduğunu görün.",

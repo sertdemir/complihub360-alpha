@@ -16,7 +16,6 @@ import {
   COUNTRY_OPTIONS,
   HowOrchestrationWorks,
   MarketCalendar,
-  MarketCoverage,
   MarketProfileCard,
   MarketWeights,
   MarketRelatedAreas,
@@ -554,14 +553,12 @@ export function MarketPage() {
         <MarketCalendar profile={profile} />
       </Section>
 
-      {/* ── 4 · Coverage · renders only where there is a real gap ─────────── */}
-      {profile.gaps.length > 0 && (
-        <Section className="bg-surface-secondary py-16 desktop-s:py-20" spacing="none">
-          <MarketCoverage profile={profile} marketLabel={country} />
-        </Section>
-      )}
+      {/* No coverage section anymore (user decision 2026-08-28): what it said
+          — the duties whose national text we do not carry yet — moved into
+          the weights card's foot above, sized to what it is: a caveat on the
+          spine, not a section of its own. */}
 
-      {/* ── 5 · The cross-link back into the areas (user ask 2026-08-28) ──
+      {/* ── 4 · The cross-link back into the areas (user ask 2026-08-28) ──
           An area page points at markets (its heatmap); the market page points
           back at areas — with the area pages' own related-accordion, replacing
           the market-to-market cards that pointed sideways instead. */}
@@ -569,7 +566,7 @@ export function MarketPage() {
         <MarketRelatedAreas profile={profile} />
       </Section>
 
-      {/* ── 6 · The close · the hub's light orchestration block (user ask
+      {/* ── 5 · The close · the hub's light orchestration block (user ask
           2026-08-28) — the dark petrol band retires here as it did on the
           area pages: same section, same spot, right above the site-wide
           NewsletterBand. Only the content stays this page's: the CTA narrows
