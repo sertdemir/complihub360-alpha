@@ -1139,14 +1139,9 @@
       "ownSources": "Fuentes propias",
       "ofAreas": "{{count}} / {{total}} áreas",
       "ofAreasShort": "{{count}} de {{total}}",
-      "factDuties": "obligaciones",
-      "factAreas": "áreas",
-      "factExposure": "exposición",
-      "factLead": "hasta el próximo plazo",
       "startAssessment": "Iniciar la evaluación para {{market}}",
       "sourcePromise": "Cada obligación cita aquí su base legal nacional. Donde no tenemos ninguna, rige el instrumento de la UE, y así se indica.",
       "weightsLeadTied": "{{count}} áreas pesan lo mismo aquí ({{weight}} sobre 10). Cada una lleva a su propia página.",
-      "euSource": "Fuente UE",
       "calendarTitle": "Qué confluye aquí, y con qué frecuencia",
       "calendarLead": "{{count}} obligaciones de {{areas}} áreas en una vista, por periodicidad y no por área. Nadie planifica un mercado área por área: lo planifica contra un calendario.",
       "leadDays": "{{count}} días de antelación",
@@ -1162,8 +1157,18 @@
       "openMarket": "Abrir este mercado",
       "ctaBody": "La evaluación acota este mercado a su empresa, su producto y sus áreas, en menos de cinco minutos.",
       "allAreas": "Todas las áreas",
-      "nDuties_one": "{{count}} obligación",
-      "nDuties_other": "{{count}} obligaciones"
+      "facts": {
+        "duties": "Obligaciones en este mercado",
+        "dutiesNote": "cada una con fuente nacional",
+        "areas": "áreas con fuente propia",
+        "areasNote": "el resto se rige por el derecho de la UE",
+        "exposure": "Exposición máxima",
+        "exposureNote": "suma de los topes indicados, no una previsión",
+        "lead": "hasta el próximo plazo"
+      },
+      "weightsFoot": "Fuentes propias en {{covered}} de {{total}} áreas — el resto se aplica directamente a través del derecho de la UE.",
+      "cadenceGroup": "{{cadence}} · {{count}}",
+      "cadenceHot": "Mayor carga de frecuencia"
     },
     "cta": {
       "title": "Vea cuáles se aplican a su caso.",

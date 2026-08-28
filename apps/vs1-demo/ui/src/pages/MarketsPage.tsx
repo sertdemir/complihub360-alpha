@@ -398,14 +398,17 @@ export function MarketPage() {
     maximumFractionDigits: profile.exposureEur >= 1_000_000 ? 1 : 0,
   });
 
-  // The hero's fact pills. Every one is derived, and every one drops out when
-  // the market has nothing to put in it — the canvas draws four because
-  // Germany fills four, not because four is the shape.
+  // The floating facts card (canvas "Marktseite · Hero" · Variante C,
+  // 2026-08-28) — the fact pills grew into the KPI-card anatomy the index
+  // hero floats. Every cell is derived, and every one drops out when the
+  // market has nothing to put in it — the canvas draws four because Germany
+  // fills four, not because four is the shape.
   const facts = [
     {
       key: 'duties',
       value: String(profile.obligations.length),
-      label: t('markets.country.factDuties', 'duties'),
+      label: t('markets.country.facts.duties', 'Duties in this market'),
+      note: t('markets.country.facts.dutiesNote', 'each with a national source'),
       tone: 'text-fg',
     },
     {
@@ -414,14 +417,16 @@ export function MarketPage() {
         count: profile.byDomain.length,
         total: profile.weights.length,
       }),
-      label: t('markets.country.factAreas', 'areas'),
+      label: t('markets.country.facts.areas', 'areas with their own source'),
+      note: t('markets.country.facts.areasNote', 'the rest runs on EU law'),
       tone: 'text-fg',
     },
     profile.exposureEur > 0
       ? {
           key: 'exposure',
           value: money.format(profile.exposureEur),
-          label: t('markets.country.factExposure', 'exposure'),
+          label: t('markets.country.facts.exposure', 'Maximum exposure'),
+          note: t('markets.country.facts.exposureNote', 'sum of the stated caps, not a forecast'),
           tone: 'text-risk-on-critical',
         }
       : null,
@@ -432,11 +437,16 @@ export function MarketPage() {
             defaultValue: '{{count}} days',
             count: profile.soonest.dueDays,
           }),
-          label: t('markets.country.factLead', 'to the next deadline'),
+          label: t('markets.country.facts.lead', 'to the next deadline'),
+          // The duty's canonical engine label, as everywhere on the surface.
+          note: profile.soonest.label,
           tone: 'text-fg',
         }
       : null,
-  ].filter((f): f is { key: string; value: string; label: string; tone: string } => f !== null);
+  ].filter(
+    (f): f is { key: string; value: string; label: string; note: string; tone: string } =>
+      f !== null,
+  );
 
   // The CTA carries the market into the wizard: this page IS the answer to the
   // wizard's first question, so the flow opens on Operations with this market
@@ -445,27 +455,25 @@ export function MarketPage() {
 
   return (
     <main className="bg-surface">
-      {/* ── 1 · Hero ─────────────────────────────────────────────────────── */}
-      {/* No metric band. The four figures are pills here, because a full-bleed
-          band of serif numbers is the AREA page's signature and a second one
-          was the loudest reason both page types read as the same page.
+      {/* ── 1 · Hero on the full-bleed Gradient (canvas "Marktseite · Hero" ·
+          Variante C "Gradient mit schwebender Faktenkarte", 2026-08-28) ────
+          Copy left, the floating profile card right, and the four figures no
+          longer pills but ONE white facts card pulled over the Gradient's
+          bottom edge — the index hero's anatomy, so the two markets pages
+          read as one family. Height pinned to the shared 613px hero band.
 
-          NO LATERAL SWITCHER either, unlike the area page. The header's own
-          markets menu already opens all eight, so a second one under it was
-          the same control twice — and its area menu pointed OUT of markets
-          entirely, which is the one direction this page should not offer: a
-          market page is where a market is planned, and the way into an area is
-          the weights table further down, in context.
+          Still NO lateral switcher, unlike the area page: the header's own
+          markets menu already opens all eight, and a market page's way into
+          an area is the weights section below, in context.
 
-          The padding therefore carries what the bar used to occupy. The two
-          values were measured against the old 113/97px header to put the
-          eyebrow 104px (desktop) / 80px (390) below it; since the site headers
-          were unified on the MarketingHeader's height the fixed bar is 81/65px,
-          so the eyebrow now sits ~32px lower — deliberate slack, not drift. */}
-      <section className="bg-surface pb-14 pt-[10.75rem] desktop-s:pb-[4.5rem] desktop-s:pt-[13.1875rem]">
+          The desktop paddings are tuned to land THIS content on the 613px
+          band (the profile card makes it the tallest hero content): 140px
+          top — the canvas's own measure — and the rest below, part of which
+          the floating facts card covers. */}
+      <section className="flex flex-col justify-center bg-gradient-stage pb-24 pt-32 lg:min-h-[38.3125rem] lg:pb-[5.625rem] lg:pt-[8.75rem]">
         <Container size="xl">
-          <div className="flex flex-col gap-14 desktop-s:flex-row desktop-s:items-start desktop-s:gap-20">
-            <div className="min-w-0 max-w-[660px] desktop-s:grow">
+          <div className="flex flex-col gap-14 desktop-s:flex-row desktop-s:items-start desktop-s:gap-[4.5rem]">
+            <Reveal className="min-w-0 max-w-[660px] desktop-s:grow">
               <SectionEyebrow tone="brand">
                 {t('markets.country.eyebrow', 'Market')}
               </SectionEyebrow>
@@ -480,18 +488,6 @@ export function MarketPage() {
                   areas: profile.byDomain.length,
                 })}
               </Typography>
-
-              <div className="mt-7 flex flex-wrap gap-2.5">
-                {facts.map((f) => (
-                  <span
-                    key={f.key}
-                    className="inline-flex items-baseline gap-1.5 rounded-full border border-stroke-subtle bg-surface-secondary px-3.5 py-2"
-                  >
-                    <span className={`text-body-sm font-bold tabular-nums ${f.tone}`}>{f.value}</span>
-                    <span className="text-body-2xs text-fg-secondary">{f.label}</span>
-                  </span>
-                ))}
-              </div>
 
               <div className="mt-8 flex flex-col gap-3 tablet:flex-row">
                 <Button size="lg" variant="primary" onClick={startAssessment}>
@@ -510,24 +506,46 @@ export function MarketPage() {
                 </Button>
               </div>
 
-              <p className="mt-7 flex items-start gap-2.5 text-body-sm text-fg-tertiary">
+              <p className="mt-7 flex max-w-[560px] items-start gap-2.5 text-body-sm text-fg-tertiary">
                 <Check size={15} className="mt-0.5 shrink-0 text-fg-brand" aria-hidden />
                 {t('markets.country.sourcePromise', {
                   defaultValue:
                     'Every duty here names its national legal basis. Where we hold none, the EU instrument stands — and it says so.',
                 })}
               </p>
-            </div>
+            </Reveal>
 
-            <div className="w-full shrink-0 desktop-s:w-[340px]">
+            <Reveal delay={0.15} className="w-full shrink-0 desktop-s:w-[340px]">
               <MarketProfileCard profile={profile} />
-            </div>
+            </Reveal>
           </div>
         </Container>
       </section>
 
+      {/* The floating facts card — clamping hero and page together the way
+          the index hero's KPI card does. */}
+      <Container size="xl" className="relative z-10 -mt-14">
+        <Reveal delay={0.1}>
+          <div className="rounded-xl bg-surface p-7 shadow-[0_34px_80px_-32px_rgba(2,22,17,0.35)] dark:bg-surface-secondary lg:px-8">
+            <div className="grid grid-cols-1 gap-y-7 sm:grid-cols-2 sm:gap-x-8 desktop-s:grid-cols-4 desktop-s:gap-x-0 desktop-s:divide-x desktop-s:divide-stroke-subtle">
+              {facts.map((f) => (
+                <div key={f.key} className="min-w-0 desktop-s:px-8 desktop-s:first:pl-0 desktop-s:last:pr-0">
+                  <p className={`font-serif text-[1.625rem] font-bold leading-none tabular-nums ${f.tone}`}>
+                    {f.value}
+                  </p>
+                  <p className="mt-2 text-body-sm font-bold text-fg">{f.label}</p>
+                  <p className="mt-1 text-body-xs leading-snug text-fg-tertiary">{f.note}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+      </Container>
+
       {/* ── 2 · Weights · the spine into the area pages ───────────────────── */}
-      <Section className="bg-surface-secondary py-16 desktop-s:py-20" spacing="none">
+      {/* On white since T2 Variante B: the Gradient panel inside the component
+          carries the tint now, a secondary band behind it doubled the wash. */}
+      <Section className="pb-16 pt-14 desktop-s:pb-20 desktop-s:pt-16" spacing="none">
         <MarketWeights profile={profile} />
       </Section>
 

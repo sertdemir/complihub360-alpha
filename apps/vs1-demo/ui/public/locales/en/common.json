@@ -1139,14 +1139,9 @@
       "ownSources": "Own sources",
       "ofAreas": "{{count}} / {{total}} areas",
       "ofAreasShort": "{{count}} of {{total}}",
-      "factDuties": "duties",
-      "factAreas": "areas",
-      "factExposure": "exposure",
-      "factLead": "to the next deadline",
       "startAssessment": "Start the assessment for {{market}}",
       "sourcePromise": "Every duty here names its national legal basis. Where we hold none, the EU instrument stands — and it says so.",
       "weightsLeadTied": "{{count}} areas weigh equally heavily here ({{weight}} out of 10). Each one leads to its own page.",
-      "euSource": "EU source",
       "calendarTitle": "What comes together here, and how often",
       "calendarLead": "{{count}} duties from {{areas}} areas in one view — by cadence, not by area. Nobody plans a market area by area; they plan it against a calendar.",
       "leadDays": "{{count}} days lead time",
@@ -1162,8 +1157,18 @@
       "openMarket": "Open this market",
       "ctaBody": "The assessment narrows this market to your business, your product and your areas — in under five minutes.",
       "allAreas": "All areas",
-      "nDuties_one": "{{count}} duty",
-      "nDuties_other": "{{count}} duties"
+      "facts": {
+        "duties": "Duties in this market",
+        "dutiesNote": "each with a national source",
+        "areas": "areas with their own source",
+        "areasNote": "the rest runs on EU law",
+        "exposure": "Maximum exposure",
+        "exposureNote": "sum of the stated caps, not a forecast",
+        "lead": "to the next deadline"
+      },
+      "weightsFoot": "Own sources in {{covered}} of {{total}} areas — the rest applies directly through EU law.",
+      "cadenceGroup": "{{cadence}} · {{count}}",
+      "cadenceHot": "Highest cadence load"
     },
     "cta": {
       "title": "See which of these apply to you.",

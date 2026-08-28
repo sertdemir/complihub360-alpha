@@ -1139,14 +1139,9 @@
       "ownSources": "Kendi kaynaklarımız",
       "ofAreas": "{{count}} / {{total}} alan",
       "ofAreasShort": "{{total}} alanın {{count}} tanesi",
-      "factDuties": "yükümlülük",
-      "factAreas": "alan",
-      "factExposure": "maruziyet",
-      "factLead": "sonraki süreye",
       "startAssessment": "{{market}} için değerlendirmeyi başlat",
       "sourcePromise": "Buradaki her yükümlülük ulusal hukuki dayanağını adıyla belirtir. Elimizde yoksa AB aracı geçerlidir — ve bu yazılıdır.",
       "weightsLeadTied": "{{count}} alan burada eşit ağırlıkta (10 üzerinden {{weight}}). Her biri kendi sayfasına götürür.",
-      "euSource": "AB kaynağı",
       "calendarTitle": "Burada neler bir araya geliyor, ne sıklıkla",
       "calendarLead": "{{areas}} alandan {{count}} yükümlülük tek bir görünümde — alana göre değil, döngüye göre. Kimse bir pazarı alan alan planlamaz; takvime göre planlar.",
       "leadDays": "{{count}} gün hazırlık süresi",
@@ -1162,8 +1157,18 @@
       "openMarket": "Pazarı aç",
       "ctaBody": "Değerlendirme bu pazarı şirketinize, ürününüze ve alanlarınıza göre daraltır — beş dakikadan kısa sürede.",
       "allAreas": "Tüm alanlar",
-      "nDuties_one": "{{count}} yükümlülük",
-      "nDuties_other": "{{count}} yükümlülük"
+      "facts": {
+        "duties": "Bu pazardaki yükümlülükler",
+        "dutiesNote": "her biri ulusal kaynaklı",
+        "areas": "kendi kaynaklı alan",
+        "areasNote": "geri kalanı AB hukuku üzerinden yürür",
+        "exposure": "Azami risk tutarı",
+        "exposureNote": "belirtilen üst sınırların toplamı, tahmin değil",
+        "lead": "sonraki son tarihe kadar"
+      },
+      "weightsFoot": "{{total}} alandan {{covered}} tanesinde kendi kaynaklarımız var — geri kalanı doğrudan AB hukuku üzerinden geçerli.",
+      "cadenceGroup": "{{cadence}} · {{count}}",
+      "cadenceHot": "En yüksek takt yükü"
     },
     "cta": {
       "title": "Bunlardan hangilerinin size uyduğunu görün.",

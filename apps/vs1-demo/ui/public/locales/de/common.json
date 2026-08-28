@@ -1139,14 +1139,9 @@
       "ownSources": "Eigene Quellen",
       "ofAreas": "{{count}} / {{total}} Bereiche",
       "ofAreasShort": "{{count}} von {{total}}",
-      "factDuties": "Pflichten",
-      "factAreas": "Bereiche",
-      "factExposure": "Exposition",
-      "factLead": "bis zur nächsten Frist",
       "startAssessment": "Assessment für {{market}} starten",
       "sourcePromise": "Jede Pflicht hier nennt ihre nationale Rechtsgrundlage. Wo wir keine führen, steht das EU-Instrument — und es steht dran.",
       "weightsLeadTied": "{{count}} Bereiche wiegen hier gleich schwer ({{weight}} von 10). Jeder führt auf seine eigene Seite.",
-      "euSource": "EU-Quelle",
       "calendarTitle": "Was hier zusammenkommt, und wie oft",
       "calendarLead": "{{count}} Pflichten aus {{areas}} Bereichen in einer Ansicht — nach Turnus, nicht nach Bereich. Niemand plant einen Markt bereichsweise, sondern gegen einen Kalender.",
       "leadDays": "{{count}} Tage Vorlauf",
@@ -1162,8 +1157,18 @@
       "openMarket": "Markt öffnen",
       "ctaBody": "Das Assessment grenzt diesen Markt auf Ihr Unternehmen, Ihr Produkt und Ihre Bereiche ein — in unter fünf Minuten.",
       "allAreas": "Alle Bereiche",
-      "nDuties_one": "{{count}} Pflicht",
-      "nDuties_other": "{{count}} Pflichten"
+      "facts": {
+        "duties": "Pflichten in diesem Markt",
+        "dutiesNote": "jede mit nationaler Quelle",
+        "areas": "Bereichen mit eigener Quelle",
+        "areasNote": "der Rest läuft über EU-Recht",
+        "exposure": "Maximale Exposition",
+        "exposureNote": "Summe der Obergrenzen, keine Prognose",
+        "lead": "bis zur nächsten Frist"
+      },
+      "weightsFoot": "Eigene Quellen in {{covered}} von {{total}} Bereichen — der Rest gilt über EU-Recht unmittelbar.",
+      "cadenceGroup": "{{cadence}} · {{count}}",
+      "cadenceHot": "Höchste Taktlast"
     },
     "cta": {
       "title": "Sehen, welche davon für Sie gelten.",

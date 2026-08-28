@@ -3,7 +3,7 @@ import { severityFromRiskWeight } from '@complihub/compliance-engine';
 import { RiskBadge } from '../ui/RiskBadge';
 import { getMarketProfile, MARKET_CODES, type MarketProfile } from '../../lib/marketProfiles';
 import { useInViewOnce } from '../../lib/useInViewOnce';
-import { SEVERITY_FALLBACK, SEVERITY_STYLE, severityKey } from './severity';
+import { SEVERITY_FALLBACK, severityKey } from './severity';
 import type { CountryCode } from './types';
 
 interface Props {
@@ -37,13 +37,15 @@ export function MarketProfileCard({ profile }: Props) {
   })).sort((a, b) => b.value - a.value);
   const tallest = Math.max(...all.map((m) => m.value), 1);
 
+  // Petrol measures (doctrine 2026-08-27, applied here with T1 Variante C):
+  // both bars are measurements, so both draw brand — the warning is the
+  // RiskBadge's job, and the badge is the only place severity colours the card.
   const rows = [
     {
       key: 'density',
       label: t('compliance.area.risk.strictness', 'Regulatory density'),
       value: `${profile.strictnessScore} / 10`,
       pct: (profile.strictnessScore / 10) * 100,
-      bar: SEVERITY_STYLE[severity].bar,
     },
     {
       key: 'coverage',
@@ -53,16 +55,17 @@ export function MarketProfileCard({ profile }: Props) {
         total: totalAreas,
       }),
       pct: (covered / Math.max(totalAreas, 1)) * 100,
-      bar: 'bg-brand',
     },
   ];
 
   return (
     // rounded-xl, not the canvas's 16px: the card-radius doctrine from #73 owns
     // this, and designSystem.guard.test.ts fails the build on anything wider.
+    // Floating dress since the hero moved onto the Gradient (T1 Variante C,
+    // 2026-08-28): the deep drop shadow instead of a hairline border.
     <div
       ref={ref}
-      className="overflow-hidden rounded-xl border border-stroke-subtle bg-surface shadow-sm"
+      className="overflow-hidden rounded-xl bg-surface shadow-[0_40px_90px_-30px_rgba(2,22,17,0.4)] dark:bg-surface-secondary"
     >
       <div className="flex items-center justify-between border-b border-stroke-subtle px-5 py-4">
         <span className="text-body-3xs font-bold uppercase tracking-[0.14em] text-fg-tertiary">
@@ -73,9 +76,9 @@ export function MarketProfileCard({ profile }: Props) {
 
       <div className="px-5 pb-5 pt-6">
         <div className="flex items-end gap-3.5">
-          <span
-            className={`font-serif text-[3.5rem] font-semibold leading-[0.9] tracking-tight tabular-nums ${SEVERITY_STYLE[severity].iconColor}`}
-          >
+          {/* The number is dark serif, not the severity colour — the chip
+              beside it carries the warning (canvas T1 · Variante C). */}
+          <span className="font-serif text-[3.5rem] font-semibold leading-[0.9] tracking-tight tabular-nums text-fg">
             {score.format(profile.enforcementIntensity)}
           </span>
           <span className="pb-2">
@@ -98,9 +101,9 @@ export function MarketProfileCard({ profile }: Props) {
                 <span>{r.label}</span>
                 <span className="tabular-nums">{r.value}</span>
               </div>
-              <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-surface-tertiary">
+              <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-brand/10">
                 <div
-                  className={`h-full rounded-full transition-[width] duration-700 ease-out ${r.bar}`}
+                  className="h-full rounded-full bg-brand transition-[width] duration-700 ease-out"
                   style={{ width: inView ? `${r.pct}%` : 0, transitionDelay: `${i * 80}ms` }}
                 />
               </div>
@@ -122,16 +125,18 @@ export function MarketProfileCard({ profile }: Props) {
         <ol className="mt-[1.05rem] flex h-14 items-end gap-2">
           {all.map((m) => {
             const current = m.code === profile.code;
-            const sev = severityFromRiskWeight(m.value);
             return (
               <li
                 key={m.code}
                 className="flex flex-1 flex-col items-center gap-1.5"
                 title={`${t(`markets.countries.${m.code}`, { defaultValue: m.code })} · ${score.format(m.value)}/10`}
               >
+                {/* Petrol measures here too: THIS market full, the other seven
+                    the lighter weight — no severity colours in the comparison
+                    (canvas T1 · Variante C). */}
                 <span
                   aria-hidden
-                  className={`w-full rounded-t transition-[height] duration-700 ease-out ${SEVERITY_STYLE[sev].bar} ${current ? '' : 'opacity-60'}`}
+                  className={`w-full rounded-t transition-[height] duration-700 ease-out ${current ? 'bg-brand' : 'bg-brand/35'}`}
                   style={{ height: inView ? `${Math.round((m.value / tallest) * 40) + 8}px` : 0 }}
                 />
                 <span
