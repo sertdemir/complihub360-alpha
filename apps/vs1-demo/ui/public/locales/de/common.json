@@ -904,8 +904,6 @@
   },
   "aiGov": {
     "trustCenter": "CompliHub360 Trust Center",
-    "heroTitle": "KI Governance Framework",
-    "heroDesc": "Wir glauben an verantwortungsvolle Innovation. Unsere Plattform integriert KI streng im Rahmen globaler Vorschriften, Ethik und Transparenz. Entdecken Sie, wie wir die 6 Dimensionen der KI-Governance umsetzen.",
     "dimTitle": "Die 6 Dimensionen der KI Governance",
     "dimDesc": "Ein umfassender Ansatz zum Aufbau vertrauenswürdiger KI-Systeme für Unternehmens-Compliance.",
     "dimEthicsTitle": "Ethische Richtlinien",
@@ -941,7 +939,31 @@
         "Sie übergibt an einen Menschen, sobald fachliches Urteil gefragt ist."
       ],
       "principle": "Technik sollte der kürzeste Weg zum richtigen Menschen sein — keine Hürde davor."
-    }
+    },
+    "hero": {
+      "titlePre": "KI, die sagt, ",
+      "titleGold": "was sie ist",
+      "titlePost": ".",
+      "lead": "Wir binden KI streng an Vorschriften, Ethik und Transparenz. Diese Seite zeigt die Regeln, an die wir uns halten — und was sie bedeuten, sobald Sie das Produkt benutzen.",
+      "facts": {
+        "dimensions": {
+          "label": "Dimensionen der Governance",
+          "note": "von Ethik bis Risikomanagement"
+        },
+        "gates": {
+          "label": "Gates vor jeder KI-Aktion",
+          "note": "Bereinigung, Zustimmung, Domäne"
+        },
+        "pii": {
+          "label": "PII im Modell",
+          "note": "lokal geschwärzt, bevor etwas hinausgeht"
+        }
+      }
+    },
+    "dimEyebrow": "Governance",
+    "dimCounter": "Dimension {{num}} von {{total}}",
+    "featEyebrow": "Im Einsatz",
+    "ctaBody": "Dieselben Regeln, dieselbe KI: Das Assessment grenzt in unter fünf Minuten ein, was für Sie gilt — jede Aussage mit Quelle."
   },
   "header": {
     "nav": {

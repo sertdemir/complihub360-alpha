@@ -904,8 +904,6 @@
   },
   "aiGov": {
     "trustCenter": "CompliHub360 Trust Center",
-    "heroTitle": "AI Governance Framework",
-    "heroDesc": "We believe in responsible innovation. Our platform integrates AI strictly within the bounds of global regulations, ethics, and transparency. Discover how we implement the 6 dimensions of AI Governance.",
     "dimTitle": "The 6 Dimensions of AI Governance",
     "dimDesc": "A comprehensive approach to building trustworthy AI systems for enterprise compliance.",
     "dimEthicsTitle": "Ethical Guidelines",
@@ -941,7 +939,31 @@
         "It hands over to a person the moment professional judgement matters."
       ],
       "principle": "Technology should be the shortest path to the right human — not a barrier between them."
-    }
+    },
+    "hero": {
+      "titlePre": "AI that says ",
+      "titleGold": "what it is",
+      "titlePost": ".",
+      "lead": "We bind AI strictly to regulation, ethics and transparency. This page sets out the rules we hold ourselves to — and what they mean once you actually use the product.",
+      "facts": {
+        "dimensions": {
+          "label": "Dimensions of governance",
+          "note": "from ethics to risk management"
+        },
+        "gates": {
+          "label": "Gates before every AI action",
+          "note": "sanitisation, consent, domain"
+        },
+        "pii": {
+          "label": "PII in the model",
+          "note": "redacted locally before anything leaves"
+        }
+      }
+    },
+    "dimEyebrow": "Governance",
+    "dimCounter": "Dimension {{num}} of {{total}}",
+    "featEyebrow": "In use",
+    "ctaBody": "The same rules, the same AI: the assessment narrows down what applies to you in under five minutes — every statement with its source."
   },
   "header": {
     "nav": {
