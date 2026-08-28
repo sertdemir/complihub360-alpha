@@ -1354,6 +1354,11 @@
           "a": "No. You compare anonymously; only when you send a request does the chosen specialist receive your structured search profile."
         }
       ]
+    },
+    "receipt": {
+      "title": "Your booking",
+      "specialistFee": "The specialist's fee",
+      "note": "The fee is quantified before you commit — published before first contact, no intro call just to learn the price."
     }
   },
   "about": {

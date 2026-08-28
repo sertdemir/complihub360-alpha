@@ -1354,6 +1354,11 @@
           "a": "Hayır. Anonim olarak karşılaştırırsınız; yalnızca bir talep gönderdiğinizde seçilen uzman yapılandırılmış arama profilinizi alır."
         }
       ]
+    },
+    "receipt": {
+      "title": "Rezervasyonunuz",
+      "specialistFee": "Uzmanın ücreti",
+      "note": "Ücret, siz bağlanmadan önce rakamla bellidir — ilk temastan önce yayımlanır, sırf fiyatı öğrenmek için ön görüşme gerekmez."
     }
   },
   "about": {

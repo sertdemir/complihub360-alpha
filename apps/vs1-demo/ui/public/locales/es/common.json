@@ -1354,6 +1354,11 @@
           "a": "No. Usted compara de forma anónima; solo cuando envía una solicitud, el especialista elegido recibe su perfil de búsqueda estructurado."
         }
       ]
+    },
+    "receipt": {
+      "title": "Su reserva",
+      "specialistFee": "Honorarios del especialista",
+      "note": "Los honorarios están cifrados antes de comprometerse — publicados antes del primer contacto, sin una primera llamada solo para conocer el precio."
     }
   },
   "about": {

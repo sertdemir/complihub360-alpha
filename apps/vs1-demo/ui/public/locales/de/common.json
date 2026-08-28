@@ -1354,6 +1354,11 @@
           "a": "Nein. Sie vergleichen anonym; erst wenn Sie eine Anfrage senden, erhält die gewählte Fachperson Ihr strukturiertes Suchprofil."
         }
       ]
+    },
+    "receipt": {
+      "title": "Ihre Buchung",
+      "specialistFee": "Honorar der Fachperson",
+      "note": "Das Honorar ist beziffert, bevor Sie sich binden — veröffentlicht vor dem Erstkontakt, kein Erstgespräch nur für den Preis."
     }
   },
   "about": {

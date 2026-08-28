@@ -272,26 +272,95 @@ export function PricingPage() {
 
   return (
     <main className="bg-surface">
-      {/* The site header is fixed and 81px tall at lg; each page clears it itself. */}
-      {/* Sized up on review (2026-08-24): the band grew a step in every
-          dimension — padding, headline, lead — so the page opens like a
-          statement rather than a section. display-xl is the scale's 60px. */}
-      {/* min-h lifts the band onto the shared 613px desktop hero height
-          (user ask 2026-08-28, hub = reference); justify-center spreads the
-          slack evenly. */}
-      <section className="flex flex-col justify-center border-b border-stroke-subtle bg-surface-secondary pb-24 pt-36 lg:min-h-[38.3125rem] lg:pb-32 lg:pt-48">
+      {/* ── Hero on the full-bleed Gradient (canvas "Preise · Hero" ·
+          Variante B "Gradient-Split mit Buchungs-Quittung", 2026-08-28) ────
+          The grey statement band retires: copy stands left on the Gradient
+          with the two ways onward, and the whole pricing story floats right
+          as ONE receipt card — your cost 0 €, the platform fee the partner's,
+          the specialist's fee quantified up front. Height pinned to the
+          shared 613px hero band; the fixed header (81px at lg) floats over
+          the tint like on the hub. */}
+      <section className="flex flex-col justify-center bg-gradient-stage pb-24 pt-32 lg:min-h-[38.3125rem] lg:pb-28 lg:pt-40">
         <Container size="xl">
-          <Reveal className="mx-auto flex max-w-[860px] flex-col items-center gap-5 text-center">
-            <SectionEyebrow tone="brand">{t('pricing.eyebrow')}</SectionEyebrow>
-            <h1 className="font-serif text-display-md font-semibold tracking-tight text-fg lg:text-display-xl">
-              {t('pricing.title.pre')}
-              <GoldWord>{t('pricing.title.gold')}</GoldWord>
-              {t('pricing.title.post')}
-            </h1>
-            <p className="max-w-[46ch] text-[1.25rem] leading-relaxed text-fg-secondary">
-              {t('pricing.lead')}
-            </p>
-          </Reveal>
+          <div className="flex flex-col gap-14 desktop-s:flex-row desktop-s:items-center desktop-s:gap-[4.75rem]">
+            <Reveal className="min-w-0 flex-1">
+              <SectionEyebrow tone="brand">{t('pricing.eyebrow')}</SectionEyebrow>
+              <h1 className="mt-3.5 font-serif text-[2.25rem] font-semibold leading-[1.1] tracking-tight text-fg lg:text-[3.25rem]">
+                {t('pricing.title.pre')}
+                <GoldWord>{t('pricing.title.gold')}</GoldWord>
+                {t('pricing.title.post')}
+              </h1>
+              <p className="mt-4 max-w-[540px] text-body-lg leading-relaxed text-fg-secondary">
+                {t('pricing.lead')}
+              </p>
+              <div className="mt-8 flex flex-col gap-3 tablet:flex-row">
+                <Button
+                  size="lg"
+                  variant="primary"
+                  onClick={() => navigate(`/${locale ?? 'en'}/wizard`)}
+                >
+                  {t('hero.cta.start', { ns: 'home', defaultValue: 'Assess My Needs' })}
+                  <ArrowRight size={17} className="ml-1.5" />
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="bg-surface"
+                  onClick={() =>
+                    document.getElementById('pricing-faq')?.scrollIntoView({ behavior: 'smooth' })
+                  }
+                >
+                  {t('pricing.faq.eyebrow')}
+                </Button>
+              </div>
+            </Reveal>
+
+            {/* The receipt — the FeeVignette's honesty condensed into the
+                hero: every row is a claim the page below substantiates. */}
+            <Reveal delay={0.15} className="w-full shrink-0 desktop-s:w-[380px]">
+              <div className="overflow-hidden rounded-xl bg-surface shadow-[0_40px_90px_-30px_rgba(2,22,17,0.4)] dark:bg-surface-secondary">
+                <div className="flex items-center justify-between border-b border-stroke-subtle px-5 py-4">
+                  <span className="text-body-3xs font-bold uppercase tracking-[0.14em] text-fg-tertiary">
+                    {t('pricing.receipt.title', 'Your booking')}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-body-2xs font-semibold text-fg-brand">
+                    <Check size={14} aria-hidden />
+                    {t('pricing.vignette.confirmed')}
+                  </span>
+                </div>
+                <div className="px-5 pb-5 pt-4">
+                  <div className="flex items-baseline justify-between gap-4">
+                    <span className="text-body-sm font-bold text-fg">
+                      {t('pricing.vignette.yourCost')}
+                    </span>
+                    <span className="font-serif text-[2.5rem] font-semibold leading-none tabular-nums text-fg">
+                      0 €
+                    </span>
+                  </div>
+                  <div className="mt-4 flex items-baseline justify-between gap-4 border-t border-stroke-subtle pt-3.5">
+                    <span className="text-body-2xs text-fg-tertiary">{t('pricing.vignette.fee')}</span>
+                    <span className="text-body-2xs font-bold text-fg">
+                      {t('pricing.vignette.feePaidBy')}
+                    </span>
+                  </div>
+                  <div className="mt-3.5 flex items-baseline justify-between gap-4 border-t border-stroke-subtle pt-3.5">
+                    <span className="text-body-2xs text-fg-tertiary">
+                      {t('pricing.receipt.specialistFee', "The specialist's fee")}
+                    </span>
+                    <span className="text-body-2xs font-bold tabular-nums text-accent-700 dark:text-fg-accent-strong">
+                      {t('pricing.vignette.range')} {t('pricing.vignette.perHour')}
+                    </span>
+                  </div>
+                </div>
+                <p className="border-t border-stroke-subtle bg-surface-secondary px-5 py-3.5 text-body-3xs leading-relaxed text-fg-tertiary dark:bg-white/[0.04]">
+                  {t('pricing.receipt.note', {
+                    defaultValue:
+                      'The fee is quantified before you commit — published before first contact, no intro call just to learn the price.',
+                  })}
+                </p>
+              </div>
+            </Reveal>
+          </div>
         </Container>
       </section>
 
@@ -333,7 +402,9 @@ export function PricingPage() {
       <Teaser base="specialist" vignette={<FeeVignette />} tinted />
 
       {/* ── FAQ ───────────────────────────────────────────────────────────── */}
-      <section className="py-20 desktop-s:py-24">
+      {/* The id is the hero's secondary CTA target — scroll-mt clears the
+          fixed header. */}
+      <section id="pricing-faq" className="scroll-mt-28 py-20 desktop-s:py-24">
         <Container size="xl">
           <Reveal className="flex flex-col items-center gap-2.5 text-center">
             <SectionEyebrow tone="brand">{t('pricing.faq.eyebrow')}</SectionEyebrow>
