@@ -19,9 +19,7 @@ import { Tabs, TabList, Tab } from '../ui/Tabs';
 
 const GROUP_COUNTS = [5, 5, 2] as const;
 
-function FaqRow({ group, index, open, onToggle }: { group: number; index: number; open: boolean; onToggle: () => void }) {
-  const { t } = useTranslation('home');
-  const base = `faq.groups.${group}.items.${index}`;
+function FaqRow({ q, a, open, onToggle }: { q: string; a: string; open: boolean; onToggle: () => void }) {
   return (
     <div className="border-b border-stroke-subtle">
       <button
@@ -30,7 +28,7 @@ function FaqRow({ group, index, open, onToggle }: { group: number; index: number
         onClick={onToggle}
         className="flex w-full items-center gap-4 py-6 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus"
       >
-        <span className="flex-1 text-[18px] font-bold text-fg">{t(`${base}.q`)}</span>
+        <span className="flex-1 text-[18px] font-bold text-fg">{q}</span>
         <ChevronDown
           size={22}
           className={`shrink-0 text-fg-secondary transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
@@ -45,7 +43,7 @@ function FaqRow({ group, index, open, onToggle }: { group: number; index: number
             transition={{ duration: 0.25, ease: 'easeOut' }}
             className="overflow-hidden"
           >
-            <p className="max-w-[680px] pb-6 text-body-md leading-relaxed text-fg-secondary">{t(`${base}.a`)}</p>
+            <p className="max-w-[680px] pb-6 text-body-md leading-relaxed text-fg-secondary">{a}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -53,10 +51,30 @@ function FaqRow({ group, index, open, onToggle }: { group: number; index: number
   );
 }
 
+/** The homepage's single-open disclosure list, shared since P4 (2026-08-28)
+    so the pricing page's FAQ is literally the same widget, not a lookalike.
+    The first question opens by default; a remounting caller (HomeFaq keys the
+    wrapper by tab) resets it for free. */
+export function FaqList({ items }: { items: { q: string; a: string }[] }) {
+  const [open, setOpen] = useState(0);
+  return (
+    <>
+      {items.map((item, i) => (
+        <FaqRow
+          key={i}
+          q={item.q}
+          a={item.a}
+          open={open === i}
+          onToggle={() => setOpen(open === i ? -1 : i)}
+        />
+      ))}
+    </>
+  );
+}
+
 export function HomeFaq() {
   const { t } = useTranslation('home');
   const [tab, setTab] = useState('0');
-  const [open, setOpen] = useState(0);
   const group = Number(tab);
 
   return (
@@ -78,7 +96,9 @@ export function HomeFaq() {
           </h2>
         </motion.div>
 
-        {/* Theme tabs + the active tab's disclosure list */}
+        {/* Theme tabs + the active tab's disclosure list. Switching tabs
+            remounts the list (key={group}), so FaqList's own open state
+            falls back to the first question by itself. */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -89,10 +109,7 @@ export function HomeFaq() {
             variant="filled"
             size="md"
             value={tab}
-            onValueChange={(v) => {
-              setTab(v);
-              setOpen(0);
-            }}
+            onValueChange={setTab}
             className="mt-10"
           >
             <TabList className="flex-wrap justify-center gap-2">
@@ -113,15 +130,12 @@ export function HomeFaq() {
               transition={{ duration: 0.25, ease: 'easeOut' }}
               className="mx-auto mt-9 max-w-[1120px] border-t border-stroke-subtle"
             >
-              {Array.from({ length: GROUP_COUNTS[group] }, (_, i) => (
-                <FaqRow
-                  key={i}
-                  group={group}
-                  index={i}
-                  open={open === i}
-                  onToggle={() => setOpen(open === i ? -1 : i)}
-                />
-              ))}
+              <FaqList
+                items={Array.from({ length: GROUP_COUNTS[group] }, (_, i) => ({
+                  q: t(`faq.groups.${group}.items.${i}.q`),
+                  a: t(`faq.groups.${group}.items.${i}.a`),
+                }))}
+              />
             </motion.div>
           </AnimatePresence>
         </motion.div>

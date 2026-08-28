@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { ArrowRight, Check, Lock, Minus, Plus } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { ArrowRight, Check, Lock } from 'lucide-react';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
-import { SiteFooter } from '../components/home';
+import { FaqList, SiteFooter } from '../components/home';
 import { HowOrchestrationWorks } from '../components/compliance-areas';
 import { SectionEyebrow, GoldWord, Reveal, Stagger, StaggerItem } from '../components/providers/SectionHeading';
 import { useInViewOnce } from '../lib/useInViewOnce';
@@ -338,54 +338,10 @@ function Teaser({
   );
 }
 
-// ─── FAQ (canvas pattern: hairline rows, plus/minus, first open) ─────────────
-
-function FaqItem({ index, open, onToggle }: { index: number; open: boolean; onToggle: () => void }) {
-  const { t } = useTranslation('common');
-  const panelId = `pricing-faq-panel-${index}`;
-  return (
-    <div className="border-b border-stroke">
-      <button
-        type="button"
-        aria-expanded={open}
-        aria-controls={panelId}
-        onClick={onToggle}
-        className="flex w-full items-center justify-between gap-6 px-2 py-6 text-left"
-      >
-        <span className="text-[17px] font-semibold leading-snug text-fg">
-          {t(`pricing.faq.items.${index}.q`)}
-        </span>
-        {open ? (
-          <Minus size={20} strokeWidth={1.75} className="shrink-0 text-fg-brand" aria-hidden />
-        ) : (
-          <Plus size={20} strokeWidth={1.75} className="shrink-0 text-fg-tertiary" aria-hidden />
-        )}
-      </button>
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div
-            id={panelId}
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="overflow-hidden"
-          >
-            <p className="max-w-[62ch] px-2 pb-6 text-body-md leading-relaxed text-fg-secondary">
-              {t(`pricing.faq.items.${index}.a`)}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
 export function PricingPage() {
   const { t } = useTranslation('common');
   const navigate = useNavigate();
   const { locale } = useParams();
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   return (
     <main className="bg-surface">
@@ -524,50 +480,63 @@ export function PricingPage() {
       <Teaser base="ranking" vignette={<RankingVignette />} imageLeft />
       <Teaser base="specialist" vignette={<FeeVignette />} />
 
-      {/* ── FAQ ───────────────────────────────────────────────────────────── */}
-      {/* The id is the hero's secondary CTA target — scroll-mt clears the
-          fixed header. */}
+      {/* ── FAQ · the homepage's own widget (user decision 2026-08-28) ────── */}
+      {/* The plus/minus list retired: header and disclosure rows are the
+          HomeFaq anatomy, and the list itself IS the shared FaqList — same
+          chevron, same motion, same widths. No theme tabs here: six pricing
+          questions are one theme. The id is the hero's secondary CTA target;
+          scroll-mt clears the fixed header. */}
       <section id="pricing-faq" className="scroll-mt-28 py-20 desktop-s:py-24">
         <Container size="xl">
-          <Reveal className="flex flex-col items-center gap-2.5 text-center">
-            <SectionEyebrow tone="brand">{t('pricing.faq.eyebrow')}</SectionEyebrow>
-            <h2 className="font-serif text-h1 font-semibold text-fg">{t('pricing.faq.title')}</h2>
+          <Reveal className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
+            <span className="inline-flex items-center gap-2 text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-brand">
+              {t('pricing.faq.eyebrow')}
+            </span>
+            <h2 className="font-serif text-[2rem] font-bold leading-tight tracking-tight text-fg sm:text-[2.75rem]">
+              {t('pricing.faq.title')}
+            </h2>
           </Reveal>
-          <Reveal delay={0.1} className="mx-auto mt-11 max-w-[820px] border-t border-stroke">
-            {Array.from({ length: FAQ_COUNT }, (_, i) => (
-              <FaqItem
-                key={i}
-                index={i}
-                open={openFaq === i}
-                onToggle={() => setOpenFaq((cur) => (cur === i ? null : i))}
-              />
-            ))}
+          <Reveal delay={0.1} className="mx-auto mt-9 max-w-[1120px] border-t border-stroke-subtle">
+            <FaqList
+              items={Array.from({ length: FAQ_COUNT }, (_, i) => ({
+                q: t(`pricing.faq.items.${i}.q`),
+                a: t(`pricing.faq.items.${i}.a`),
+              }))}
+            />
           </Reveal>
         </Container>
       </section>
 
-      {/* ── The close · the same orchestration band as area and market ────── */}
-      <section className="bg-primary-700 py-16 desktop-s:py-20">
+      {/* ── The close · the hub's light orchestration block (user ask
+          2026-08-28) — the LAST dark petrol band on the site retires here:
+          same section, same spot as on the hub, the area and the market
+          pages, right above the site-wide NewsletterBand. Only the CTA copy
+          stays this page's. */}
+      <section className="py-10 desktop-s:py-12">
         <Container size="xl">
-          <HowOrchestrationWorks tone="inverse" />
-          <div className="mt-[3.5rem] border-t border-white/[0.14] pt-[2.5rem]">
-            <div className="flex flex-col gap-6 desktop-s:flex-row desktop-s:items-center desktop-s:justify-between desktop-s:gap-12">
-              <div className="max-w-[560px]">
-                <h2 className="font-serif text-h3 font-bold text-white">{t('pricing.cta.title')}</h2>
-                <p className="mt-2 text-body leading-relaxed text-primary-100">{t('pricing.cta.lead')}</p>
+          <HowOrchestrationWorks
+            cta={
+              <div className="flex flex-col gap-6 desktop-s:flex-row desktop-s:items-center desktop-s:justify-between desktop-s:gap-10">
+                <div className="max-w-[560px]">
+                  <h2 className="font-serif text-[1.375rem] font-bold leading-snug text-fg">
+                    {t('pricing.cta.title')}
+                  </h2>
+                  <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">
+                    {t('pricing.cta.lead')}
+                  </p>
+                </div>
+                <Button
+                  size="lg"
+                  variant="primary"
+                  className="shrink-0"
+                  onClick={() => navigate(`/${locale ?? 'en'}/wizard`)}
+                >
+                  {t('hero.cta.start', { ns: 'home', defaultValue: 'Assess My Needs' })}
+                  <ArrowRight size={17} className="ml-1.5" />
+                </Button>
               </div>
-              <Button
-                variant="inverse"
-                size="xl"
-                shape="soft"
-                className="shrink-0 self-start desktop-s:self-auto"
-                onClick={() => navigate(`/${locale ?? 'en'}/wizard`)}
-              >
-                {t('hero.cta.start', { ns: 'home', defaultValue: 'Assess My Needs' })}
-                <ArrowRight size={17} className="ml-1.5" />
-              </Button>
-            </div>
-          </div>
+            }
+          />
         </Container>
       </section>
 
