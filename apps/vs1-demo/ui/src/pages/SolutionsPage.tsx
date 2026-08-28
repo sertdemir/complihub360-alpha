@@ -191,23 +191,24 @@ export function SolutionsPage() {
                 {/* The figures stand with the claim they back, not in a wall of
                     their own — the page-wide row below carries only what holds
                     for every role. */}
-                <div className="mt-5 flex flex-wrap items-baseline gap-x-7 gap-y-3">
-                  {ROLE_STATS[id].map((s) => (
-                    <span key={s.labelKey} className="inline-flex items-baseline gap-2">
-                      <span className="font-serif text-[1.375rem] font-bold tabular-nums text-fg">
-                        {s.value}
+                <div className="mt-5 flex flex-wrap items-center justify-between gap-x-7 gap-y-4">
+                  <div className="flex flex-wrap items-baseline gap-x-7 gap-y-3">
+                    {ROLE_STATS[id].map((s) => (
+                      <span key={s.labelKey} className="inline-flex items-baseline gap-2">
+                        <span className="font-serif text-[1.375rem] font-bold tabular-nums text-fg">
+                          {s.value}
+                        </span>
+                        <span className="text-body-2xs text-fg-tertiary">{t(s.labelKey)}</span>
                       </span>
-                      <span className="text-body-2xs text-fg-tertiary">{t(s.labelKey)}</span>
-                    </span>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={startAssessment}
-                    className="ml-auto inline-flex items-center gap-1.5 text-body-2xs font-bold text-fg-brand"
-                  >
+                    ))}
+                  </div>
+                  {/* The card's own entry point is a real Button, not a text
+                      link (user ask 2026-08-28) — it carries the same weight
+                      as the page's closing CTA. */}
+                  <Button size="sm" variant="primary" className="shrink-0" onClick={startAssessment}>
                     {t('solutions.cta.btnAssessment')}
-                    <ArrowRight size={13} aria-hidden />
-                  </button>
+                    <ArrowRight size={15} className="ml-1.5" />
+                  </Button>
                 </div>
               </div>
             );
