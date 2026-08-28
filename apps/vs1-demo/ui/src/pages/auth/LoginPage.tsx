@@ -2,20 +2,29 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trans, useTranslation } from "react-i18next";
-import { ArrowRight, Mail, EyeOff, AlertTriangle } from "lucide-react";
+import { ArrowRight, AlertTriangle, Mail } from "lucide-react";
 import { Logo } from "../../components/ui/Logo";
 import { useAuthStore } from "../../store/useAuthStore";
+import { supportedLngs } from "../../i18n/config";
 import { getSupabase, isSupabaseConfigured, isDemoLoginEnabled } from "../../lib/supabase";
 
-// ─── Auth · Figma 1839:2 / 1842:2288 / 1853:2 / 1855:2 / 1856:2 / 1857:3 ─────
-// One dark split-screen shell, several views driven by a small state machine:
+// ─── Auth · die Anmeldeseite ─────────────────────────────────────────────────
+// Im hellen Kleid seit 2026-08-28 (Nutzer-Entscheidung, Canvas "Login-Seite":
+// L1 A, L2 A, L3 C, L4 C, L5 B). Sie war die LETZTE dunkle Flaeche der Site —
+// die Marketing-Baender sind ueber die Redesigns alle hell geworden, und ein
+// petrol-schwarzer Split-Screen hinter dem Login brach diese Sprache genau da,
+// wo ein Besucher zum ersten Mal etwas eingibt.
+//
+// Eine Regel traegt alle fuenf Ansichten: EINGABE steht im Split (Gradient mit
+// dem Narrativ links, weisses Formular rechts), MELDUNG steht zentriert auf
+// Weiss. So weiss man an der Form schon, ob man etwas tun muss.
+//
+// Die Zustandsmaschine ist unveraendert:
 //   form        → user magic-link  ·  partner email+password
-//   magic-sent  → "check your inbox" (user)
+//   magic-sent  → "Postfach pruefen" (user)
 //   forgot      → partner password reset request
-//   reset-sent  → "reset link on the way" (partner)
-//   error       → expired / invalid / rate-limited sign-in link (?error=…)
-// Narrative-LEFT + action-RIGHT. Risk/partner actions in petrol; gold reserved
-// for the user magic-link and the one highlighted word per headline.
+//   reset-sent  → "Reset-Link unterwegs" (partner)
+//   error       → abgelaufener / ungueltiger / limitierter Anmeldelink (?error=)
 
 const GoogleIcon = () => (
     <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -31,26 +40,41 @@ type View = "form" | "magic-sent" | "forgot" | "reset-sent" | "error";
 type ErrKind = "expired" | "invalid" | "rate-limited";
 
 const ERR_KINDS: ErrKind[] = ["expired", "invalid", "rate-limited"];
-// camelCase i18n key segment per error kind (auth:login.errors.<key>.*)
 const errKey = (k: ErrKind) => (k === "rate-limited" ? "rateLimited" : k);
 
-// Gold-highlight + line-break markup used by the <Trans> headline keys.
+// Gold hebt EIN Wort je Headline hervor — dieselbe Rolle wie <GoldWord> auf der
+// Marketing-Flaeche.
 const goldComponents = {
     br: <br />,
-    gold: <span className="text-accent-400" />,
+    gold: <span className="text-accent-700 dark:text-fg-accent-strong" />,
 };
+
+/** Wie in LegalPages.tsx und auf der Kontaktseite: sichtbar offen statt erfunden. */
+function Placeholder({ children }: { children: React.ReactNode }) {
+    return (
+        <span className="rounded bg-warning-bg px-1.5 py-0.5 font-mono text-[0.85em] text-warning-700 ring-1 ring-inset ring-warning-500/30">
+            [{children}]
+        </span>
+    );
+}
+
+const FIELD =
+    "mt-2 w-full rounded-lg border border-stroke bg-surface px-3.5 py-3 text-body-md text-fg outline-none transition-colors placeholder:text-fg-tertiary focus:border-stroke-focus focus:ring-2 focus:ring-inset focus:ring-primary-500/35";
+const LABEL = "block text-body-3xs font-bold uppercase tracking-[0.1em] text-fg-secondary";
+const CTA =
+    "mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-5 py-3.5 text-body-md font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5";
 
 function GoogleButton({ onClick }: { onClick: () => void }) {
     const { t } = useTranslation("auth");
     return (
         <>
-            <div className="my-5 flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/35">
-                <span className="h-px flex-1 bg-white/10" /> {t("login.or")} <span className="h-px flex-1 bg-white/10" />
+            <div className="my-5 flex items-center gap-3 text-body-4xs font-bold uppercase tracking-[0.12em] text-fg-tertiary">
+                <span className="h-px flex-1 bg-stroke-subtle" /> {t("login.or")} <span className="h-px flex-1 bg-stroke-subtle" />
             </div>
             <button
                 type="button"
                 onClick={onClick}
-                className="flex w-full items-center justify-center gap-2.5 rounded-xl border border-white/12 bg-white/[0.03] px-5 py-3 text-[14px] font-semibold text-white transition-colors hover:bg-white/[0.07]"
+                className="flex w-full items-center justify-center gap-2.5 rounded-lg border border-stroke bg-surface px-5 py-3 text-body-sm font-semibold text-fg transition-colors hover:bg-surface-secondary"
             >
                 <GoogleIcon /> {t("login.continueWithGoogle")}
             </button>
@@ -58,33 +82,70 @@ function GoogleButton({ onClick }: { onClick: () => void }) {
     );
 }
 
+// ─── L5 · Fussleiste, Variante B (Nutzerwahl) ────────────────────────────────
+// Dreigeteilt: Betriebsstatus links, Sprachen mittig, Rechtslinks rechts.
+//
+// Die Sprachen waren bis 2026-08-28 der Text "EN / DE" — fest verdrahtet, nicht
+// klickbar, und er verschwieg zwei der vier Sprachen, die die Site spricht. Jetzt
+// kommen sie aus supportedLngs und fuehren als echte Links auf denselben Pfad in
+// der anderen Sprache, wie im SiteFooter.
 function SystemFooter({ className = "" }: { className?: string }) {
-    const { t } = useTranslation("auth");
+    const { t, i18n } = useTranslation("auth");
     const { locale = "en" } = useParams();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const current = i18n.resolvedLanguage || locale;
+
+    const languagePath = (lng: string) => {
+        const parts = location.pathname.split("/").filter(Boolean);
+        const rest = supportedLngs.includes(parts[0]) ? parts.slice(1) : parts;
+        const tail = rest.join("/");
+        return `/${lng}${tail ? `/${tail}` : ""}${location.search}${location.hash}`;
+    };
+
     return (
-        <div className={"flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px] text-white/50 " + className}>
+        <div className={"flex flex-col gap-4 border-t border-stroke-subtle pt-5 text-body-2xs text-fg-tertiary sm:flex-row sm:items-center sm:justify-between " + className}>
             <span className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> {t("login.footer.operational")}
+                <span className="h-1.5 w-1.5 rounded-full bg-success-500" /> {t("login.footer.operational")}
             </span>
-            <span className="text-white/20">·</span>
-            <span><span className="font-semibold text-white">EN</span> / DE</span>
-            <span className="text-white/20">·</span>
-            <a href={`/${locale}/privacy`} className="hover:text-white/80">{t("login.footer.privacy")}</a>
-            <a href={`/${locale}/terms`} className="hover:text-white/80">{t("login.footer.terms")}</a>
-            <a href={`/${locale}/imprint`} className="hover:text-white/80">{t("login.footer.imprint")}</a>
+            <span className="flex items-center gap-2 font-semibold">
+                {supportedLngs.map((lng, i) => (
+                    <span key={lng} className="flex items-center gap-2">
+                        {i > 0 && <span className="text-stroke">·</span>}
+                        <a
+                            href={languagePath(lng)}
+                            hrefLang={lng}
+                            aria-current={lng === current ? "true" : undefined}
+                            onClick={(e) => {
+                                if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+                                e.preventDefault();
+                                navigate(languagePath(lng));
+                            }}
+                            className={lng === current ? "text-fg" : "transition-colors hover:text-fg"}
+                        >
+                            {lng.toUpperCase()}
+                        </a>
+                    </span>
+                ))}
+            </span>
+            <span className="flex flex-wrap items-center gap-x-5 gap-y-1">
+                <a href={`/${locale}/privacy`} className="transition-colors hover:text-fg">{t("login.footer.privacy")}</a>
+                <a href={`/${locale}/terms`} className="transition-colors hover:text-fg">{t("login.footer.terms")}</a>
+                <a href={`/${locale}/imprint`} className="transition-colors hover:text-fg">{t("login.footer.imprint")}</a>
+            </span>
         </div>
     );
 }
 
-// Explicit, labelled stakeholder demo entry — rendered only when the
-// VITE_DEMO_LOGIN flag allows it (staging). Real auth stays untouched.
+// Ausdruecklicher, beschrifteter Demo-Einstieg — nur wenn VITE_DEMO_LOGIN ihn
+// erlaubt (Staging). Die echte Anmeldung bleibt unberuehrt.
 function DemoLoginRow({ role, onEnter }: { role: "user" | "partner"; onEnter: (r: "user" | "partner") => void }) {
     const { t } = useTranslation("auth");
     return (
         <button
             type="button"
             onClick={() => onEnter(role)}
-            className="mt-4 w-full rounded-xl border border-dashed border-white/20 px-5 py-2.5 text-[13px] font-medium text-white/60 transition-colors hover:border-white/40 hover:text-white"
+            className="mt-4 w-full rounded-lg border border-dashed border-stroke px-5 py-2.5 text-body-xs font-medium text-fg-tertiary transition-colors hover:border-stroke-strong hover:text-fg"
         >
             {role === "partner" ? t("login.demo.partner") : t("login.demo.user")}
         </button>
@@ -95,7 +156,7 @@ function BackToSignIn({ onClick }: { onClick: () => void }) {
     const { t } = useTranslation("auth");
     return (
         <p className="mt-6 text-center">
-            <button type="button" onClick={onClick} className="text-[14px] font-semibold text-emerald-400 hover:text-emerald-300">
+            <button type="button" onClick={onClick} className="text-body-sm font-semibold text-brand transition-colors hover:text-brand-700">
                 {t("login.backToSignIn")}
             </button>
         </p>
@@ -131,17 +192,17 @@ function ResendTimer({ label, total = 58, onResend }: { label: string; total?: n
     };
 
     const done = remaining <= 0;
-    // Bar fills green as the cooldown elapses → 100% when resend is available.
+    // Der Balken fuellt sich, waehrend die Sperre ablaeuft → 100 % heisst bereit.
     const pct = Math.round(((total - remaining) / total) * 100);
     const mmss = `${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2, "0")}`;
 
     return (
-        <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
-            <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.1em] text-white/45">
+        <div className="mt-5 rounded-lg border border-stroke-subtle bg-surface-secondary px-4 py-3 text-left">
+            <div className="flex items-center justify-between text-body-4xs font-bold uppercase tracking-[0.1em] text-fg-tertiary">
                 {done ? (
                     <>
-                        <span className="text-emerald-400">{t("login.resend.ready")}</span>
-                        <button type="button" onClick={restart} className="text-emerald-400 hover:text-emerald-300">
+                        <span className="text-brand">{t("login.resend.ready")}</span>
+                        <button type="button" onClick={restart} className="text-brand transition-colors hover:text-brand-700">
                             {t("login.resend.button")}
                         </button>
                     </>
@@ -152,8 +213,8 @@ function ResendTimer({ label, total = 58, onResend }: { label: string; total?: n
                     </>
                 )}
             </div>
-            <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-white/10">
-                <div className="h-full rounded-full bg-emerald-400 transition-[width] duration-1000 ease-linear" style={{ width: `${pct}%` }} />
+            <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-brand/10">
+                <div className="h-full rounded-full bg-brand transition-[width] duration-1000 ease-linear" style={{ width: `${pct}%` }} />
             </div>
         </div>
     );
@@ -171,7 +232,11 @@ export function LoginPage() {
 
     const [mode, setMode] = useState<Mode>("user");
     const [view, setView] = useState<View>(errParam ? "error" : "form");
-    const [errKind, setErrKind] = useState<ErrKind>(errParam && ERR_KINDS.includes(errParam) ? errParam : "expired");
+    // Die Fehlerart kommt aus ?error= und ist danach fest. Bis 2026-08-28 stand
+    // hier eine Umschaltleiste, mit der ein Besucher sich seine Fehlermeldung
+    // aussuchen konnte — ein Schaufenster fuer drei Zustaende, von denen im
+    // Ernstfall genau einer zutrifft.
+    const errKind: ErrKind = errParam && ERR_KINDS.includes(errParam) ? errParam : "expired";
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPw, setShowPw] = useState(false);
@@ -182,8 +247,8 @@ export function LoginPage() {
         navigate(redirect || `/${lang}/${role === "partner" ? "partner-dashboard" : "dashboard"}`);
     };
 
-    // Dev entry for the admin workspace (no public admin login UI by design):
-    // /:locale/login?as=admin — only active with the demo-auth fallback.
+    // Dev-Einstieg in den Admin-Workspace (bewusst ohne oeffentliche Admin-UI):
+    // /:locale/login?as=admin — nur mit aktivem Demo-Auth-Fallback.
     useEffect(() => {
         if (params.get("as") === "admin" && isDemoLoginEnabled) {
             login("admin", "admin");
@@ -192,34 +257,32 @@ export function LoginPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // ── Real Supabase Auth handlers (with a dev fallback when env is unset) ────
+    // ── Echte Supabase-Auth (mit Dev-Fallback, wenn die Umgebung fehlt) ───────
     const [authError, setAuthError] = useState<string | null>(null);
     const callbackUrl = `${window.location.origin}/${lang}/auth/callback`;
     const resetUrl = `${window.location.origin}/${lang}/reset-password`;
 
-    // User · passwordless magic-link
     const handleMagicLink = async () => {
         setAuthError(null);
         if (!/.+@.+\..+/.test(email)) { setAuthError(t("login.validation.invalidEmail")); return; }
         const sb = isSupabaseConfigured ? await getSupabase() : null;
-        if (!sb) { setView("magic-sent"); return; } // dev fallback
+        if (!sb) { setView("magic-sent"); return; }
         const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: callbackUrl } });
         if (error) { setAuthError(error.message); return; }
         setView("magic-sent");
     };
 
-    // Partner · email + password
     const handlePasswordSignIn = async () => {
         setAuthError(null);
         const sb = isSupabaseConfigured ? await getSupabase() : null;
-        if (!sb) { finishLogin("partner"); return; } // dev fallback
+        if (!sb) { finishLogin("partner"); return; }
         const { error } = await sb.auth.signInWithPassword({ email, password });
         if (error) { setAuthError(error.message); return; }
         navigate(params.get("redirect") || `/${lang}/partner-dashboard`);
     };
 
-    // Partner · request password reset (same confirmation regardless, to avoid
-    // leaking which emails have accounts).
+    // Dieselbe Bestaetigung, egal ob es das Konto gibt — sonst verraet die Seite,
+    // welche Adressen registriert sind.
     const handleForgot = async () => {
         setAuthError(null);
         if (!/.+@.+\..+/.test(email)) { setAuthError(t("login.validation.invalidEmail")); return; }
@@ -230,11 +293,10 @@ export function LoginPage() {
         setView("reset-sent");
     };
 
-    // OAuth · Google
     const handleOAuth = async (role: "user" | "partner") => {
         setAuthError(null);
         const sb = isSupabaseConfigured ? await getSupabase() : null;
-        if (!sb) { finishLogin(role); return; } // dev fallback
+        if (!sb) { finishLogin(role); return; }
         const { error } = await sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: callbackUrl } });
         if (error) setAuthError(error.message);
     };
@@ -244,341 +306,315 @@ export function LoginPage() {
         setView("form");
     };
 
-    // ── Left narrative, per view / mode ───────────────────────────────────────
-    type Left = {
-        eyebrow: string;
-        eyebrowTone?: string;
-        title: React.ReactNode;
-        body?: string;
-        note?: string;
-        stat?: { label: string; value: string };
-        meta?: { label: string; value: string }[];
-    };
+    // Eingabe steht im Split, Meldung zentriert — siehe Kopfkommentar.
+    const isMessage = view === "magic-sent" || view === "reset-sent" || view === "error";
 
-    const left: Left =
-        view === "magic-sent"
-            ? {
-                  eyebrow: t("login.left.magicSent.eyebrow"),
-                  title: <Trans t={t} i18nKey="login.left.magicSent.title" components={goldComponents} />,
-                  body: t("login.left.magicSent.body"),
-                  note: t("login.left.magicSent.note"),
-              }
-            : view === "forgot"
-              ? {
-                    eyebrow: t("login.left.forgot.eyebrow"),
-                    title: <Trans t={t} i18nKey="login.left.forgot.title" components={goldComponents} />,
-                    body: t("login.left.forgot.body"),
-                    note: t("login.left.forgot.note"),
-                }
-              : view === "reset-sent"
-                ? {
-                      eyebrow: t("login.left.resetSent.eyebrow"),
-                      title: <Trans t={t} i18nKey="login.left.resetSent.title" components={goldComponents} />,
-                      body: t("login.left.resetSent.body"),
-                      note: t("login.left.resetSent.note"),
-                  }
-                : view === "error"
-                  ? {
-                        eyebrow: t("login.left.error.eyebrow"),
-                        eyebrowTone: "text-accent-400",
-                        title: <Trans t={t} i18nKey="login.left.error.title" components={goldComponents} />,
-                        body: t("login.left.error.body"),
-                        meta: [
-                            { label: t("login.left.error.requestLabel"), value: "req_8f24b1c · 2026-05-17 14:32 UTC" },
-                            { label: t("login.left.error.supportLabel"), value: "support@complihub360.com" },
-                        ],
+    const errorBanner = authError ? (
+        <div className="mb-5 flex items-start gap-2 rounded-lg border border-error-500/30 bg-error-bg px-4 py-2.5 text-body-xs text-error-700">
+            <AlertTriangle size={15} className="mt-0.5 shrink-0" /> {authError}
+        </div>
+    ) : null;
+
+    const modeToggle = (
+        <div className="mb-8 inline-flex gap-1.5">
+            {(["user", "partner"] as Mode[]).map((m) => (
+                <button
+                    key={m}
+                    type="button"
+                    aria-pressed={mode === m}
+                    onClick={() => switchMode(m)}
+                    className={
+                        "rounded-lg px-4 py-2 text-body-xs font-semibold transition-colors " +
+                        (mode === m
+                            ? "bg-fg text-surface"
+                            : "border border-stroke bg-surface text-fg-secondary hover:border-stroke-strong hover:text-fg")
                     }
-                  : mode === "user"
-                    ? {
-                          eyebrow: t("login.left.user.eyebrow"),
-                          title: <Trans t={t} i18nKey="login.left.user.title" components={goldComponents} />,
-                          stat: { label: t("login.left.user.statLabel"), value: t("login.left.user.statValue") },
-                      }
-                    : {
-                          eyebrow: t("login.left.partner.eyebrow"),
-                          title: <Trans t={t} i18nKey="login.left.partner.title" components={goldComponents} />,
-                          stat: { label: t("login.left.partner.statLabel"), value: t("login.left.partner.statValue") },
-                      };
+                >
+                    {m === "user" ? t("login.toggle.business") : t("login.toggle.provider")}
+                </button>
+            ))}
+        </div>
+    );
 
-    return (
-        <div className="flex min-h-screen flex-col bg-[#0b1620] text-white lg:flex-row">
-            {/* ── LEFT · narrative ── */}
-            <div className="relative flex flex-col gap-7 px-6 pb-2 pt-8 lg:w-[57%] lg:justify-between lg:gap-0 lg:px-16 lg:py-12">
-                <Logo lockup="horizontal" tone="on-petrol" href="/" markClassName="h-9" />
+    // ── Das Narrativ der Split-Ansichten ──────────────────────────────────────
+    const narrative =
+        view === "forgot"
+            ? {
+                  eyebrow: t("login.left.forgot.eyebrow"),
+                  title: <Trans t={t} i18nKey="login.left.forgot.title" components={goldComponents} />,
+                  body: t("login.left.forgot.body"),
+                  note: t("login.left.forgot.note"),
+              }
+            : mode === "user"
+              ? {
+                    eyebrow: t("login.left.user.eyebrow"),
+                    title: <Trans t={t} i18nKey="login.left.user.title" components={goldComponents} />,
+                    body: t("login.left.user.lead"),
+                    note: undefined as string | undefined,
+                }
+              : {
+                    eyebrow: t("login.left.partner.eyebrow"),
+                    title: <Trans t={t} i18nKey="login.left.partner.title" components={goldComponents} />,
+                    body: t("login.left.partner.lead"),
+                    note: undefined as string | undefined,
+                };
 
-                <div className="max-w-[640px] lg:py-0">
-                    <span className={"text-[12px] font-semibold uppercase tracking-[0.16em] " + (left.eyebrowTone || "text-emerald-400")}>
-                        {left.eyebrow}
-                    </span>
-                    <h1 className="mt-4 font-serif text-[1.75rem] font-bold leading-[1.12] tracking-tight text-white lg:text-[3.25rem] lg:leading-[1.08]">
-                        {left.title}
-                    </h1>
-                    {left.body ? <p className="mt-5 max-w-md text-[15px] leading-relaxed text-white/65">{left.body}</p> : null}
-                    {left.stat ? (
-                        <div className="mt-7">
-                            <p className="flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-accent-400">
-                                <span className="h-1.5 w-1.5 rounded-full bg-accent-400" /> {left.stat.label}
+    // ── Das Formular der Split-Ansichten ─────────────────────────────────────
+    const formPane = (
+        <div className="mx-auto w-full max-w-[400px]">
+            {errorBanner}
+            {view === "form" && modeToggle}
+
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={view + (view === "form" ? mode : "")}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
+                >
+                    {view === "forgot" ? (
+                        <form onSubmit={(e) => { e.preventDefault(); handleForgot(); }}>
+                            <h2 className="font-serif text-[1.75rem] font-bold leading-tight text-fg">{t("login.forgot.title")}</h2>
+                            <p className="mt-2 text-body-md leading-relaxed text-fg-secondary">{t("login.forgot.subtitle")}</p>
+                            <label htmlFor="login-email" className={"mt-7 " + LABEL}>{t("login.forgot.emailLabel")}</label>
+                            <input
+                                id="login-email"
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="name@kanzlei.de"
+                                className={FIELD}
+                            />
+                            <button type="submit" className={CTA}>
+                                {t("login.forgot.send")} <ArrowRight size={16} />
+                            </button>
+                            <p className="mt-4 text-center text-body-2xs text-fg-tertiary">{t("login.forgot.fineprint")}</p>
+                            <BackToSignIn onClick={() => setView("form")} />
+                        </form>
+                    ) : mode === "user" ? (
+                        <form onSubmit={(e) => { e.preventDefault(); handleMagicLink(); }}>
+                            <h2 className="font-serif text-[1.75rem] font-bold leading-tight text-fg">{t("login.user.title")}</h2>
+                            <p className="mt-2 text-body-md leading-relaxed text-fg-secondary">{t("login.user.subtitle")}</p>
+                            <label htmlFor="login-email" className={"mt-7 " + LABEL}>{t("login.emailLabel")}</label>
+                            <input
+                                id="login-email"
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="sie@ihrunternehmen.de"
+                                className={FIELD}
+                            />
+                            <button type="submit" className={CTA}>
+                                {t("login.user.send")} <ArrowRight size={16} />
+                            </button>
+                            <GoogleButton onClick={() => handleOAuth("user")} />
+                            {isDemoLoginEnabled && <DemoLoginRow role="user" onEnter={finishLogin} />}
+                            <p className="mt-6 text-center text-body-sm text-fg-secondary">
+                                {t("login.user.newHere")}{" "}
+                                <button type="button" onClick={() => navigate(`/${lang}/wizard`)} className="font-semibold text-brand transition-colors hover:text-brand-700">
+                                    {t("login.user.startRiskMap")}
+                                </button>
                             </p>
-                            <p className="mt-1 text-[15px] text-white/80">{left.stat.value}</p>
-                        </div>
-                    ) : null}
-                    {left.note ? (
-                        <p className="mt-8 flex items-start gap-2 text-[14px] text-white/55">
-                            <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent-400" /> {left.note}
+                            <p className="mt-7 text-center text-body-2xs leading-relaxed text-fg-tertiary">{t("login.user.legal")}</p>
+                        </form>
+                    ) : (
+                        <form onSubmit={(e) => { e.preventDefault(); handlePasswordSignIn(); }}>
+                            <h2 className="font-serif text-[1.75rem] font-bold leading-tight text-fg">{t("login.partner.title")}</h2>
+                            <p className="mt-2 text-body-md leading-relaxed text-fg-secondary">{t("login.partner.subtitle")}</p>
+                            <label htmlFor="login-email" className={"mt-7 " + LABEL}>{t("login.emailLabel")}</label>
+                            <input
+                                id="login-email"
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="sie@kanzlei.de"
+                                className={FIELD}
+                            />
+                            <div className="mt-5 flex items-center justify-between">
+                                <label htmlFor="login-password" className={LABEL}>{t("login.partner.passwordLabel")}</label>
+                                <button type="button" onClick={() => setView("forgot")} className="text-body-2xs font-semibold text-brand transition-colors hover:text-brand-700">
+                                    {t("login.partner.forgotLink")}
+                                </button>
+                            </div>
+                            <div className="relative">
+                                <input
+                                    id="login-password"
+                                    type={showPw ? "text" : "password"}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="••••••••••"
+                                    className={FIELD + " pr-16"}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPw((v) => !v)}
+                                    className="absolute right-4 top-1/2 mt-1 -translate-y-1/2 text-body-2xs font-semibold text-fg-tertiary transition-colors hover:text-fg"
+                                >
+                                    {showPw ? t("login.hide") : t("login.show")}
+                                </button>
+                            </div>
+                            <button type="submit" className={CTA}>
+                                {t("login.partner.signIn")} <ArrowRight size={16} />
+                            </button>
+                            <GoogleButton onClick={() => handleOAuth("partner")} />
+                            {isDemoLoginEnabled && <DemoLoginRow role="partner" onEnter={finishLogin} />}
+                            <p className="mt-7 text-center text-body-2xs leading-relaxed text-fg-tertiary">{t("login.partner.legal")}</p>
+                        </form>
+                    )}
+                </motion.div>
+            </AnimatePresence>
+        </div>
+    );
+
+    // ── L3-C / L4-C · Meldungen, zentriert auf Weiss ──────────────────────────
+    if (isMessage) {
+        const sent = view === "magic-sent" || view === "reset-sent";
+        const shown = email || (view === "reset-sent" ? "sie@kanzlei.de" : "sie@ihrunternehmen.de");
+        return (
+            <div className="flex min-h-screen flex-col bg-surface px-6 py-8 lg:px-16 lg:py-10">
+                <Logo lockup="horizontal" tone="on-light" href="/" markClassName="h-9" />
+
+                <div className="flex flex-1 items-center justify-center py-12">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={view}
+                            initial={{ opacity: 0, y: 12 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -8 }}
+                            transition={{ duration: 0.25, ease: "easeOut" }}
+                            className="w-full max-w-[640px] text-center"
+                        >
+                            {sent ? (
+                                <>
+                                    <Mail size={30} strokeWidth={1.6} className="mx-auto text-brand" aria-hidden />
+                                    <p className="mt-5 text-body-3xs font-bold uppercase tracking-[0.14em] text-brand">
+                                        {t(view === "magic-sent" ? "login.left.magicSent.eyebrow" : "login.left.resetSent.eyebrow")}
+                                    </p>
+                                    <h1 className="mt-3 font-serif text-[2.25rem] font-bold leading-tight tracking-tight text-fg">
+                                        <Trans
+                                            t={t}
+                                            i18nKey={view === "magic-sent" ? "login.left.magicSent.title" : "login.left.resetSent.title"}
+                                            components={goldComponents}
+                                        />
+                                    </h1>
+                                    <p className="mx-auto mt-4 max-w-[480px] text-body-lg leading-relaxed text-fg-secondary">
+                                        <Trans
+                                            t={t}
+                                            i18nKey={view === "magic-sent" ? "login.magicSent.body" : "login.resetSent.body"}
+                                            values={{ email: shown }}
+                                            components={{ em: <span className="font-semibold text-fg" /> }}
+                                        />
+                                    </p>
+                                    <div className="mx-auto mt-7 grid max-w-[420px] grid-cols-2 border-y border-accent-500/40 py-5">
+                                        <div>
+                                            <p className="font-serif text-[1.0625rem] font-bold text-fg">
+                                                {t(view === "magic-sent" ? "login.facts.validMagic" : "login.facts.validReset")}
+                                            </p>
+                                            <p className="mt-1 text-body-2xs text-fg-tertiary">{t("login.facts.validLabel")}</p>
+                                        </div>
+                                        <div className="border-l border-stroke-subtle">
+                                            <p className="font-serif text-[1.0625rem] font-bold text-fg">{t("login.facts.onceValue")}</p>
+                                            <p className="mt-1 text-body-2xs text-fg-tertiary">{t("login.facts.onceLabel")}</p>
+                                        </div>
+                                    </div>
+                                    <div className="mx-auto max-w-[340px]">
+                                        <ResendTimer label={t(view === "magic-sent" ? "login.magicSent.resendIn" : "login.resetSent.resendIn")} />
+                                    </div>
+                                    <BackToSignIn onClick={() => { setView("form"); setMode(view === "reset-sent" ? "partner" : "user"); }} />
+                                    <p className="mt-6 text-body-2xs text-fg-tertiary">
+                                        {t(view === "magic-sent" ? "login.magicSent.fineprint" : "login.resetSent.fineprint")}
+                                    </p>
+                                </>
+                            ) : (
+                                <>
+                                    <AlertTriangle size={30} strokeWidth={1.6} className="mx-auto text-warning-700" aria-hidden />
+                                    <p className="mt-5 text-body-3xs font-bold uppercase tracking-[0.14em] text-warning-700">
+                                        {t(`login.errors.kindLabels.${errKey(errKind)}`)}
+                                    </p>
+                                    <h1 className="mt-3 font-serif text-[2.25rem] font-bold leading-tight tracking-tight text-fg">
+                                        {t(`login.errors.${errKey(errKind)}.title`)}
+                                    </h1>
+                                    <p className="mx-auto mt-4 max-w-[480px] text-body-lg leading-relaxed text-fg-secondary">
+                                        {t(`login.errors.${errKey(errKind)}.lead`)}
+                                    </p>
+                                    {/* Abgesetzt statt als zweiter Fliesstext: bei "abgelaufen"
+                                        wiederholt die Erklaerung sonst nur den Lead, waehrend sie
+                                        bei "ungueltig" und "limitiert" echte Zusatzinfo traegt.
+                                        Die Hairline-Box macht sie als Fussnote lesbar. */}
+                                    <p className="mx-auto mt-6 max-w-[440px] rounded-lg border border-stroke-subtle bg-surface-secondary px-4 py-3 text-body-xs leading-relaxed text-fg-tertiary">
+                                        {t(`login.errors.${errKey(errKind)}.why`)}
+                                    </p>
+
+                                    <div className="mx-auto mt-8 max-w-[360px] text-left">
+                                        {errorBanner}
+                                        <form onSubmit={(e) => { e.preventDefault(); handleMagicLink(); }}>
+                                            <label htmlFor="login-email" className={LABEL}>{t("login.emailLabel")}</label>
+                                            <input
+                                                id="login-email"
+                                                type="email"
+                                                value={email}
+                                                onChange={(e) => setEmail(e.target.value)}
+                                                placeholder="sie@ihrunternehmen.de"
+                                                className={FIELD}
+                                            />
+                                            <button type="submit" className={CTA}>
+                                                {t("login.errors.sendNewLink")} <ArrowRight size={16} />
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                    {/* TODO(contact-live): Support-Adresse und die echte Request-ID
+                                        einsetzen. Bis dahin stehen beide als Platzhalter da, statt
+                                        eine erfundene Kennung wie "req_8f24b1c" auszugeben. */}
+                                    <p className="mt-6 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-body-2xs text-fg-tertiary">
+                                        <span>{t("login.left.error.supportLabel")}:</span>
+                                        <Placeholder>support@…</Placeholder>
+                                        <span className="text-stroke">·</span>
+                                        <span>{t("login.left.error.requestLabel")}</span>
+                                        <Placeholder>Request-ID</Placeholder>
+                                    </p>
+                                    <BackToSignIn onClick={() => setView("form")} />
+                                </>
+                            )}
+                        </motion.div>
+                    </AnimatePresence>
+                </div>
+
+                <SystemFooter />
+            </div>
+        );
+    }
+
+    // ── L1-A / L2-A · Eingabe im Split ────────────────────────────────────────
+    return (
+        <div className="flex min-h-screen flex-col bg-surface lg:flex-row">
+            {/* LINKS · Narrativ auf dem Gradient */}
+            <div className="flex flex-col justify-between gap-8 bg-gradient-stage px-6 pb-8 pt-8 lg:w-[57%] lg:gap-0 lg:px-16 lg:py-10">
+                <Logo lockup="horizontal" tone="on-light" href="/" markClassName="h-9" />
+
+                <div className="max-w-[520px] py-6 lg:py-0">
+                    <p className="text-body-3xs font-bold uppercase tracking-[0.14em] text-brand">{narrative.eyebrow}</p>
+                    <h1 className="mt-4 font-serif text-[2rem] font-bold leading-[1.14] tracking-tight text-fg lg:text-[2.625rem]">
+                        {narrative.title}
+                    </h1>
+                    {narrative.body && (
+                        <p className="mt-5 max-w-[420px] text-body-lg leading-relaxed text-fg-secondary">{narrative.body}</p>
+                    )}
+                    {narrative.note && (
+                        <p className="mt-7 flex items-start gap-2.5 text-body-sm leading-relaxed text-fg-tertiary">
+                            <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent-500" /> {narrative.note}
                         </p>
-                    ) : null}
-                    {left.meta ? (
-                        <div className="mt-10 flex flex-wrap gap-x-16 gap-y-4">
-                            {left.meta.map((m) => (
-                                <div key={m.label}>
-                                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-white/35">{m.label}</p>
-                                    <p className="mt-1 text-[14px] text-white/70">{m.value}</p>
-                                </div>
-                            ))}
-                        </div>
-                    ) : null}
+                    )}
                 </div>
 
                 <SystemFooter className="hidden lg:flex" />
             </div>
 
-            {/* ── RIGHT · action ── */}
-            {/* Top-anchored (not vertically centred) so switching the Business/
-                Provider tabs grows the form downward instead of re-centring the
-                whole block — keeps the toggle and upper fields perfectly still. */}
-            <div className="flex flex-1 flex-col px-6 pb-8 pt-2 lg:items-center lg:justify-start lg:border-l lg:border-white/10 lg:bg-[#101c28] lg:px-16 lg:pb-12 lg:pt-[14vh]">
-                <div className="mx-auto w-full max-w-[400px]">
-                    {authError && (
-                        <div className="mb-5 flex items-start gap-2 rounded-xl border border-rose-400/30 bg-rose-500/10 px-4 py-2.5 text-[13px] text-rose-200">
-                            <AlertTriangle size={15} className="mt-0.5 shrink-0" /> {authError}
-                        </div>
-                    )}
-                    {/* Mode toggle (form view only) */}
-                    {view === "form" && (
-                        <div className="mb-8 flex w-full rounded-full bg-white/5 p-1 text-[13px] font-semibold">
-                            {(["user", "partner"] as Mode[]).map((m) => (
-                                <button
-                                    key={m}
-                                    type="button"
-                                    onClick={() => switchMode(m)}
-                                    className={"flex-1 rounded-full px-4 py-2 text-center transition-colors " + (mode === m ? "bg-white/10 text-white" : "text-white/55 hover:text-white")}
-                                >
-                                    {m === "user" ? t("login.toggle.business") : t("login.toggle.provider")}
-                                </button>
-                            ))}
-                        </div>
-                    )}
-
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={view + (view === "form" ? mode : "")}
-                            initial={{ opacity: 0, y: 12 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -8 }}
-                            transition={{ duration: 0.25, ease: "easeOut" }}
-                        >
-                            {view === "magic-sent" ? (
-                                /* ── User · magic-link sent ── */
-                                <>
-                                    <h2 className="flex items-center gap-2.5 font-serif text-[1.75rem] font-bold text-white">
-                                        <Mail size={22} className="text-accent-400" /> {t("login.magicSent.title")}
-                                    </h2>
-                                    <p className="mt-3 text-[15px] leading-relaxed text-white/65">
-                                        <Trans
-                                            t={t}
-                                            i18nKey="login.magicSent.body"
-                                            values={{ email: email || "you@yourcompany.com" }}
-                                            components={{ em: <span className="font-semibold text-accent-400" /> }}
-                                        />
-                                    </p>
-                                    <button
-                                        type="button"
-                                        onClick={() => { window.location.href = "mailto:"; }}
-                                        className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-accent-500 px-5 py-3.5 text-[15px] font-semibold text-fg-on-accent transition-transform duration-200 hover:-translate-y-0.5"
-                                    >
-                                        {t("login.openMailApp")} <ArrowRight size={16} />
-                                    </button>
-                                    <ResendTimer label={t("login.magicSent.resendIn")} />
-                                    <p className="mt-6 text-center text-[14px] text-white/55">
-                                        {t("login.magicSent.wrongEmail")}{" "}
-                                        <button onClick={() => setView("form")} className="font-semibold text-accent-400 hover:text-accent-300">
-                                            {t("login.magicSent.useDifferent")}
-                                        </button>
-                                    </p>
-                                    <p className="mt-8 text-center text-[12px] text-white/35">{t("login.magicSent.fineprint")}</p>
-                                </>
-                            ) : view === "forgot" ? (
-                                /* ── Partner · password reset request ── */
-                                <form
-                                    onSubmit={(e) => {
-                                        e.preventDefault();
-                                        handleForgot();
-                                    }}
-                                >
-                                    <h2 className="font-serif text-[1.9rem] font-bold text-white">{t("login.forgot.title")}</h2>
-                                    <p className="mt-2 text-[15px] text-white/65">{t("login.forgot.subtitle")}</p>
-                                    <label className="mt-7 block text-[11px] font-semibold uppercase tracking-[0.1em] text-white/45">{t("login.forgot.emailLabel")}</label>
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="name@partner-firm.com"
-                                        className="mt-2 w-full rounded-xl border border-white/12 bg-[#0a1019] px-4 py-3.5 text-[15px] text-white outline-none transition-colors placeholder:text-white/35 focus:border-emerald-400/50"
-                                    />
-                                    <button
-                                        type="submit"
-                                        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-fixed px-5 py-3.5 text-[15px] font-semibold text-fg-on-brand-fixed transition-transform duration-200 hover:-translate-y-0.5"
-                                    >
-                                        {t("login.forgot.send")} <ArrowRight size={16} />
-                                    </button>
-                                    <p className="mt-4 text-center text-[12px] text-white/35">{t("login.forgot.fineprint")}</p>
-                                    <BackToSignIn onClick={() => setView("form")} />
-                                    <p className="mt-6 text-center text-[12px] text-white/30">{t("login.forgot.noMagicLink")}</p>
-                                </form>
-                            ) : view === "reset-sent" ? (
-                                /* ── Partner · reset link sent ── */
-                                <>
-                                    <h2 className="flex items-center gap-2.5 font-serif text-[1.75rem] font-bold text-white">
-                                        <Mail size={22} className="text-emerald-400" /> {t("login.resetSent.title")}
-                                    </h2>
-                                    <p className="mt-3 text-[15px] leading-relaxed text-white/65">
-                                        <Trans
-                                            t={t}
-                                            i18nKey="login.resetSent.body"
-                                            values={{ email: email || "you@partner-firm.com" }}
-                                            components={{ em: <span className="font-semibold text-emerald-400" /> }}
-                                        />
-                                    </p>
-                                    <button
-                                        type="button"
-                                        onClick={() => { window.location.href = "mailto:"; }}
-                                        className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-fixed px-5 py-3.5 text-[15px] font-semibold text-fg-on-brand-fixed transition-transform duration-200 hover:-translate-y-0.5"
-                                    >
-                                        {t("login.openMailApp")} <ArrowRight size={16} />
-                                    </button>
-                                    <ResendTimer label={t("login.resetSent.resendIn")} />
-                                    <BackToSignIn onClick={() => setView("form")} />
-                                    <p className="mt-6 text-center text-[12px] text-white/30">{t("login.resetSent.fineprint")}</p>
-                                </>
-                            ) : view === "error" ? (
-                                /* ── Auth error (expired / invalid / rate-limited) ── */
-                                <>
-                                    <div className="mb-8 flex w-full rounded-full bg-white/5 p-1 text-[12px] font-semibold lg:inline-flex lg:w-auto">
-                                        {ERR_KINDS.map((k) => (
-                                            <button
-                                                key={k}
-                                                type="button"
-                                                onClick={() => setErrKind(k)}
-                                                className={"flex-1 rounded-full px-3.5 py-1.5 transition-colors lg:flex-none " + (errKind === k ? "bg-brand-fixed text-fg-on-brand-fixed" : "text-white/55 hover:text-white")}
-                                            >
-                                                {t(`login.errors.kindLabels.${errKey(k)}`)}
-                                            </button>
-                                        ))}
-                                    </div>
-                                    <h2 className="flex items-center gap-2.5 font-serif text-[1.75rem] font-bold text-white">
-                                        <AlertTriangle size={22} className="text-rose-400" /> {t(`login.errors.${errKey(errKind)}.title`)}
-                                    </h2>
-                                    <p className="mt-3 text-[15px] leading-relaxed text-white/65">{t(`login.errors.${errKey(errKind)}.lead`)}</p>
-                                    <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
-                                        <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-white/40">{t("login.errors.whyTitle")}</p>
-                                        <p className="mt-1.5 text-[13px] leading-relaxed text-white/60">{t(`login.errors.${errKey(errKind)}.why`)}</p>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => setView("form")}
-                                        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-fixed px-5 py-3.5 text-[15px] font-semibold text-fg-on-brand-fixed transition-transform duration-200 hover:-translate-y-0.5"
-                                    >
-                                        {t("login.errors.sendNewLink")} <ArrowRight size={16} />
-                                    </button>
-                                    <BackToSignIn onClick={() => setView("form")} />
-                                </>
-                            ) : mode === "user" ? (
-                                /* ── User · magic-link ── */
-                                <form
-                                    onSubmit={(e) => {
-                                        e.preventDefault();
-                                        handleMagicLink();
-                                    }}
-                                >
-                                    <h2 className="font-serif text-[1.9rem] font-bold text-white">{t("login.user.title")}</h2>
-                                    <p className="mt-2 text-[15px] text-white/65">{t("login.user.subtitle")}</p>
-                                    <label className="mt-7 block text-[11px] font-semibold uppercase tracking-[0.1em] text-white/45">{t("login.emailLabel")}</label>
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="you@yourcompany.com"
-                                        className="mt-2 w-full rounded-xl border border-white/12 bg-[#0a1019] px-4 py-3.5 text-[15px] text-white outline-none transition-colors placeholder:text-white/35 focus:border-accent-400/60"
-                                    />
-                                    <button
-                                        type="submit"
-                                        className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-accent-500 px-5 py-3.5 text-[15px] font-semibold text-fg-on-accent transition-transform duration-200 hover:-translate-y-0.5"
-                                    >
-                                        {t("login.user.send")} <ArrowRight size={16} />
-                                    </button>
-                                    <GoogleButton onClick={() => handleOAuth("user")} />
-                                    {isDemoLoginEnabled && <DemoLoginRow role="user" onEnter={finishLogin} />}
-                                    <p className="mt-6 text-center text-[14px] text-white/60">
-                                        {t("login.user.newHere")}{" "}
-                                        <button type="button" onClick={() => navigate(`/${lang}`)} className="font-semibold text-accent-400 hover:text-accent-300">
-                                            {t("login.user.startRiskMap")}
-                                        </button>
-                                    </p>
-                                    <p className="mt-8 text-center text-[12px] leading-relaxed text-white/35">{t("login.user.legal")}</p>
-                                </form>
-                            ) : (
-                                /* ── Partner · password ── */
-                                <form
-                                    onSubmit={(e) => {
-                                        e.preventDefault();
-                                        handlePasswordSignIn();
-                                    }}
-                                >
-                                    <h2 className="font-serif text-[1.9rem] font-bold text-white">{t("login.partner.title")}</h2>
-                                    <p className="mt-2 text-[15px] text-white/65">{t("login.partner.subtitle")}</p>
-                                    <label className="mt-7 block text-[11px] font-semibold uppercase tracking-[0.1em] text-white/45">{t("login.emailLabel")}</label>
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="you@yourfirm.com"
-                                        className="mt-2 w-full rounded-xl border border-white/12 bg-[#0a1019] px-4 py-3.5 text-[15px] text-white outline-none transition-colors placeholder:text-white/35 focus:border-emerald-400/50"
-                                    />
-                                    <div className="mt-5 flex items-center justify-between">
-                                        <label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-white/45">{t("login.partner.passwordLabel")}</label>
-                                        <button type="button" onClick={() => setView("forgot")} className="text-[12px] font-semibold text-accent-400 hover:text-accent-300">{t("login.partner.forgotLink")}</button>
-                                    </div>
-                                    <div className="relative mt-2">
-                                        <input
-                                            type={showPw ? "text" : "password"}
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            placeholder="••••••••••"
-                                            className="w-full rounded-xl border border-white/12 bg-[#0a1019] px-4 py-3.5 pr-16 text-[15px] text-white outline-none transition-colors placeholder:text-white/35 focus:border-emerald-400/50"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPw((v) => !v)}
-                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-white/55 hover:text-white"
-                                        >
-                                            {showPw ? <EyeOff size={16} /> : t("login.show")}
-                                        </button>
-                                    </div>
-                                    <button
-                                        type="submit"
-                                        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-fixed px-5 py-3.5 text-[15px] font-semibold text-fg-on-brand-fixed transition-transform duration-200 hover:-translate-y-0.5"
-                                    >
-                                        {t("login.partner.signIn")} <ArrowRight size={16} />
-                                    </button>
-                                    <GoogleButton onClick={() => handleOAuth("partner")} />
-                                    {isDemoLoginEnabled && <DemoLoginRow role="partner" onEnter={finishLogin} />}
-                                    <p className="mt-8 text-center text-[12px] leading-relaxed text-white/35">{t("login.partner.legal")}</p>
-                                </form>
-                            )}
-                        </motion.div>
-                    </AnimatePresence>
-                </div>
-                <SystemFooter className="mt-12 w-full justify-center text-center lg:hidden" />
+            {/* RECHTS · Formular auf Weiss */}
+            <div className="flex flex-1 flex-col justify-center border-stroke-subtle px-6 pb-10 pt-8 lg:border-l lg:px-16 lg:py-12">
+                {formPane}
+                <SystemFooter className="mt-10 lg:hidden" />
             </div>
         </div>
     );
