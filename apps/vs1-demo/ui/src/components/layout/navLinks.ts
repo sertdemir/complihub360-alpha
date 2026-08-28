@@ -21,11 +21,11 @@ export interface HeaderNavLink {
 }
 
 export const HEADER_NAV_LINKS: HeaderNavLink[] = [
-  { to: 'how-it-works', labelKey: 'header.nav.howItWorks', labelDefault: 'How it works' },
-  // "Für wen" sits directly beside "So funktioniert es" (user ask
-  // 2026-08-28), mirroring the footer's Plattform column: the how and the
-  // who belong together, before the what (areas) and the where (markets).
+  // "Für wen" LEADS the bar (user ask 2026-08-28): a visitor asks who this is
+  // for before asking how it works. The two stay neighbours either way, and
+  // both come before the what (areas) and the where (markets).
   { to: 'solutions', labelKey: 'header.nav.solutions', labelDefault: 'Who it is for' },
+  { to: 'how-it-works', labelKey: 'header.nav.howItWorks', labelDefault: 'How it works' },
   { to: 'compliance', labelKey: 'header.nav.complianceAreas', labelDefault: 'Compliance areas', sheet: 'areas' },
   { to: 'markets', labelKey: 'header.nav.markets', labelDefault: 'Markets', sheet: 'markets' },
   { to: 'pricing', labelKey: 'header.nav.pricing', labelDefault: 'Pricing' },
