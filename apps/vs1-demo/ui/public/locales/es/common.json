@@ -1323,7 +1323,14 @@
       "rangeLabel": "Estimación de honorarios",
       "range": "180–240 €",
       "perHour": "/ hora",
-      "published": "publicada antes del primer contacto"
+      "published": "publicada antes del primer contacto",
+      "billTitle": "La factura del partner",
+      "billListing": "Entrada en el directorio",
+      "billProfile": "Visita al perfil",
+      "billClick": "Clic en el perfil",
+      "billBooked": "Cita confirmada",
+      "billDue": "comisión debida",
+      "billFoot": "A usted no se le cobra nada en ningún momento."
     },
     "faq": {
       "eyebrow": "Preguntas frecuentes",
@@ -1354,6 +1361,11 @@
           "a": "No. Usted compara de forma anónima; solo cuando envía una solicitud, el especialista elegido recibe su perfil de búsqueda estructurado."
         }
       ]
+    },
+    "receipt": {
+      "title": "Su reserva",
+      "specialistFee": "Honorarios del especialista",
+      "note": "Los honorarios están cifrados antes de comprometerse — publicados antes del primer contacto, sin una primera llamada solo para conocer el precio."
     }
   },
   "about": {

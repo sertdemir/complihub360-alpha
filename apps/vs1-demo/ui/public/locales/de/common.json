@@ -973,7 +973,7 @@
       {
         "kicker": "Matchen",
         "title": "Eignung vor Namen.",
-        "body": "Sie sehen die passenden Fachleute zuerst ohne Identität: Abdeckung, geprüfte Qualifikationen, Reaktionszeit, Passung zu Ihren Märkten. Die Eignung vor dem Briefkopf zu beurteilen, ist Absicht — ein bekannter Name ist kein Beleg für die richtige Passung. Die Reihung ist nicht käuflich.",
+        "body": "Sie sehen die passenden Fachleute zuerst ohne Identität: Abdeckung, geprüfte Qualifikationen, Reaktionszeit, Passung zu Ihren Märkten. Die Eignung vor dem Briefkopf zu beurteilen, ist Absicht — ein bekannter Name ist kein Beleg für die richtige Passung. Das Ranking ist nicht käuflich.",
         "short": "Fachleute zuerst ohne Identität: Abdeckung, geprüfte Qualifikationen, Reaktionszeit."
       },
       {
@@ -1054,7 +1054,7 @@
             "meta": "Antwort in 21h · 4.9 ★ · Verifiziert"
           }
         ],
-        "note": "Identität wird erst bei der Buchung sichtbar. Die Reihung ist nicht käuflich."
+        "note": "Identität wird erst bei der Buchung sichtbar. Das Ranking ist nicht käuflich."
       },
       "book": {
         "title": "Termin wählen · KW 19",
@@ -1073,7 +1073,7 @@
     "cost": {
       "kicker": "Was Sie das kostet",
       "title": "Nichts.",
-      "body": "Die Plattform, die Risk Map und das Matching sind für Sie kostenlos. Bezahlt werden wir von den Fachleuten, wenn tatsächlich eine Buchung zustande kommt. Genau deshalb ist die Reihung nicht käuflich: ein bezahlter Platz würde das Match für beide Seiten wertlos machen."
+      "body": "Die Plattform, die Risk Map und das Matching sind für Sie kostenlos. Bezahlt werden wir von den Fachleuten, wenn tatsächlich eine Buchung zustande kommt. Genau deshalb ist das Ranking nicht käuflich: ein bezahlter Platz würde das Match für beide Seiten wertlos machen."
     },
     "privacy": {
       "kicker": "Was mit Ihren Daten passiert",
@@ -1300,7 +1300,7 @@
     },
     "ranking": {
       "kicker": "Was sich nicht kaufen lässt",
-      "title": "Die Reihung.",
+      "title": "Das Ranking.",
       "body": "Plätze sind nicht verkäuflich. Ein bezahlter Platz würde das Match für beide Seiten wertlos machen: Sie träfen den, der am meisten gezahlt hat, und die Fachperson träfe jemanden, dessen Fall sie nicht bedienen kann. Die Eignung ist das einzige Kriterium."
     },
     "specialist": {
@@ -1323,7 +1323,14 @@
       "rangeLabel": "Honorarschätzung",
       "range": "180–240 €",
       "perHour": "/ Stunde",
-      "published": "veröffentlicht vor dem Erstkontakt"
+      "published": "veröffentlicht vor dem Erstkontakt",
+      "billTitle": "Abrechnung des Partners",
+      "billListing": "Eintrag im Verzeichnis",
+      "billProfile": "Profilaufruf",
+      "billClick": "Klick aufs Profil",
+      "billBooked": "Bestätigter Termin",
+      "billDue": "Gebühr fällig",
+      "billFoot": "Ihnen wird zu keinem Zeitpunkt etwas berechnet."
     },
     "faq": {
       "eyebrow": "Häufige Fragen",
@@ -1354,6 +1361,11 @@
           "a": "Nein. Sie vergleichen anonym; erst wenn Sie eine Anfrage senden, erhält die gewählte Fachperson Ihr strukturiertes Suchprofil."
         }
       ]
+    },
+    "receipt": {
+      "title": "Ihre Buchung",
+      "specialistFee": "Honorar der Fachperson",
+      "note": "Das Honorar ist beziffert, bevor Sie sich binden — veröffentlicht vor dem Erstkontakt, kein Erstgespräch nur für den Preis."
     }
   },
   "about": {

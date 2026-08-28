@@ -8,3 +8,9 @@
   (Petrol- zu Gold-Tint). Sie liegt unter den Showcase-Panels der Homepage
   (EntryDoorDemo, RiskMapShowcase) und ist der Konsistenzanker für alle
   weiteren getönten Flächen. Keine Varianten erfinden.
+- **FAQ** (Festlegung 2026-08-28): Es gibt genau EINE FAQ-Komponente auf der
+  Site — die geteilte `FaqList` aus `components/home/HomeFaq.tsx`
+  (Chevron-Disclosure, single-open, erste Frage standardmäßig offen). Jede
+  Fläche, die eine FAQ bekommt, nutzt sie; keine Parallel-Implementierungen
+  bauen. Thematische Tabs (wie auf der Startseite) sind Sache des Aufrufers,
+  nicht der Liste.

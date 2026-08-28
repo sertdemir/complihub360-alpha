@@ -15,7 +15,7 @@ export { DomainsAtlas } from './DomainsAtlas';
 export { HowItActs } from './HowItActs';
 export { BrandCodePreview } from './BrandCodePreview';
 export { BeyondAssessment } from './BeyondAssessment';
-export { HomeFaq } from './HomeFaq';
+export { HomeFaq, FaqList } from './HomeFaq';
 export { EntryDoor } from './EntryDoor';
 export { EntryDoorDemo } from './EntryDoorDemo';
 export { NewsletterBand } from './NewsletterBand';
