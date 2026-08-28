@@ -265,7 +265,7 @@ export function RegisterPage() {
                         </p>
                         <button
                             type="button"
-                            onClick={() => navigate(`/${lang}/contact`)}
+                            onClick={() => navigate(`/${lang}/contact?lane=partner`)}
                             className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-5 py-3.5 text-body-md font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5"
                         >
                             {t("register.partnerGate.cta")} <ArrowRight size={16} />

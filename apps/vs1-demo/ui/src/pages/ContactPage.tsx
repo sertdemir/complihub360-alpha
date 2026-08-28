@@ -1,5 +1,6 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import { ArrowRight, BookOpen, Clock, HandHeart, LifeBuoy, Map, ShieldCheck, Tag } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Container } from '../components/ui/Container';
@@ -67,8 +68,22 @@ export function ContactPage() {
   const locale = i18n.resolvedLanguage || 'en';
   const localize = (href: string) => (href.startsWith('/') ? `/${locale}${href}` : href);
 
-  const [lane, setLane] = useState<LaneId>('support');
+  // Tiefenlink fuer die Zubringer (Registrierungs-Weiche, Partnerseite):
+  // /contact?lane=partner waehlt den Weg vor und scrollt zum Formular — ohne
+  // das landete ein Bewerber oben im Hero und musste den Anbieter-Weg selbst
+  // suchen (Nutzer-Befund 2026-08-29).
+  const [params] = useSearchParams();
+  const laneParam = params.get('lane');
+  const initialLane: LaneId = LANE_IDS.includes(laneParam as LaneId) ? (laneParam as LaneId) : 'support';
+  const [lane, setLane] = useState<LaneId>(initialLane);
   const [sent, setSent] = useState(false);
+
+  useEffect(() => {
+    if (laneParam && LANE_IDS.includes(laneParam as LaneId)) {
+      document.getElementById('contact-form')?.scrollIntoView({ block: 'start' });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -167,7 +182,7 @@ export function ContactPage() {
         {/* ── K3 · Das Formular (Variante B, auf Full-Bleed-Gradient) ──────
             Nutzerwahl 2026-08-28: die schwebende Karte, aber der Gradient
             läuft über die volle Breite statt als Kasten. */}
-        <section className="bg-gradient-stage py-20 lg:py-24">
+        <section id="contact-form" className="scroll-mt-16 bg-gradient-stage py-20 lg:py-24">
           <Container size="xl">
             <Reveal className="mx-auto max-w-[640px] text-center">
               <SectionEyebrow tone="brand">{t('contact.form.eyebrow')}</SectionEyebrow>
