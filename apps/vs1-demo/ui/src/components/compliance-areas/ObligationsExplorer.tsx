@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { motion, useReducedMotion } from 'framer-motion';
 import { BusinessModel } from '@complihub/compliance-engine';
-import { FileText } from 'lucide-react';
+import { ChevronRight, FileText } from 'lucide-react';
 import { Typography } from '../ui/Typography';
 import { RiskBadge } from '../ui/RiskBadge';
 import { getAreaObligations, type AreaObligation } from '../../lib/areaProfiles';
+import { useInViewOnce } from '../../lib/useInViewOnce';
 import { AREA_BY_SLUG } from './areas';
 import type { DomainSlug } from '../../lib/domains';
 import { SEVERITY_FALLBACK, SEVERITY_STYLE, severityKey } from './severity';
@@ -37,6 +39,13 @@ const MODEL_FALLBACK: Record<string, string> = {
 // questions a duty is actually judged by — what law, what it costs, how often,
 // and where it applies.
 //
+// In the homepage atlas's dress since 2026-08-28 (user decision — same
+// component language, no new invention): the list is the RAIL, the active row
+// an elevated card with the gold edge, and the detail stands as a dossier card
+// on the Gradient panel, crossfading on every selection. Like the atlas it
+// plays itself through — every few seconds the next duty opens — until a click
+// takes over; reduced motion never auto-advances.
+//
 // The list is plain buttons with aria-pressed, NOT a tablist with roving focus.
 // A tablist is the textbook pattern here and it is also the one that quietly
 // breaks: this repo has twice shipped a green jsdom test asserting a keyboard
@@ -66,8 +75,11 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
     year: 'numeric',
   });
   const AreaIcon = AREA_BY_SLUG[slug]?.icon;
+  const reduced = useReducedMotion();
+  const [ref, inView] = useInViewOnce<HTMLDivElement>('-120px');
   const [validity, setValidity] = useState<'all' | 'now' | 'later'>('all');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [picked, setPicked] = useState(false);
 
   const all = useMemo(() => getAreaObligations(slug, selectedCountry), [slug, selectedCountry]);
 
@@ -104,6 +116,36 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
     setSelectedId(null);
   }, [slug, selectedCountry, validity]);
 
+  // The panel follows the OPEN card's height. The dossiers stand absolutely
+  // stacked (for the robust crossfade), so the panel cannot size itself from
+  // flow — instead the active card is measured and the wrapper's height eases
+  // towards it with a CSS transition. Measured in a layout effect so the very
+  // first height is painted, never animated; the ResizeObserver keeps it true
+  // through viewport and font changes.
+  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [panelH, setPanelH] = useState<number | null>(null);
+  const activeId = selected?.id ?? null;
+  useLayoutEffect(() => {
+    const el = activeId ? cardRefs.current[activeId] : null;
+    if (!el) return;
+    setPanelH(el.offsetHeight);
+    if (typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(() => setPanelH(el.offsetHeight));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [activeId]);
+
+  // Self-run like the homepage atlas: once in view the next duty opens every
+  // few seconds, until the user takes over by clicking a row or a filter.
+  useEffect(() => {
+    if (!inView || reduced || picked || shown.length < 2 || !selected) return;
+    const id = setTimeout(() => {
+      const idx = shown.findIndex((o) => o.id === selected.id);
+      setSelectedId(shown[(idx + 1) % shown.length].id);
+    }, 6000);
+    return () => clearTimeout(id);
+  }, [inView, reduced, picked, shown, selected]);
+
   const marketLabel =
     selectedCountry === 'EU'
       ? t('compliance.country.euOption', 'EU-wide')
@@ -111,42 +153,15 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
 
   return (
     <div>
-      {/* Heading left, validity segments right and baseline-aligned with the
-          lead — the canvas's shape for this row. */}
-      <div className="flex flex-col gap-5 desktop-s:flex-row desktop-s:items-end desktop-s:justify-between desktop-s:gap-10">
-        <AreaSectionHeading
-          className="max-w-[620px]"
-          eyebrow={eyebrows.obligations}
-          title={t('compliance.area.obligationsTitle', 'What this area actually requires')}
-          lead={t('compliance.area.obligationsLead', {
-            defaultValue:
-              'Every duty below traces to a named statute. Switch market to see the source that applies there.',
-          })}
-        />
-        {/* Only worth showing when there is something to separate: with every
-            duty already live the three segments would be one real choice and
-            two dead ones. */}
-        {later.length > 0 && liveNow.length > 0 && (
-          <div className="flex shrink-0 flex-wrap gap-2">
-            <ValiditySegment selected={validity === 'all'} onClick={() => setValidity('all')}>
-              {t('compliance.area.validityAll', 'All {{count}}', { count: all.length })}
-            </ValiditySegment>
-            <ValiditySegment selected={validity === 'now'} onClick={() => setValidity('now')}>
-              {t('compliance.area.validityNow', 'Applies today · {{count}}', {
-                count: liveNow.length,
-              })}
-            </ValiditySegment>
-            <ValiditySegment selected={validity === 'later'} onClick={() => setValidity('later')}>
-              {laterYear
-                ? t('compliance.area.validityFromYear', 'From {{year}} · {{count}}', {
-                    year: laterYear,
-                    count: later.length,
-                  })
-                : t('compliance.area.validityLater', 'Later · {{count}}', { count: later.length })}
-            </ValiditySegment>
-          </div>
-        )}
-      </div>
+      <AreaSectionHeading
+        className="max-w-[620px]"
+        eyebrow={eyebrows.obligations}
+        title={t('compliance.area.obligationsTitle', 'What this area actually requires')}
+        lead={t('compliance.area.obligationsLead', {
+          defaultValue:
+            'Every duty below traces to a named statute. Switch market to see the source that applies there.',
+        })}
+      />
 
       {shown.length === 0 || !selected ? (
         <div className="mt-6 rounded-xl border border-stroke-subtle bg-surface p-6">
@@ -163,257 +178,387 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
           </Typography>
         </div>
       ) : (
-        <div className="mt-8 grid overflow-hidden rounded-xl border border-stroke-subtle bg-surface shadow-lg shadow-neutral-900/[0.06] desktop-s:grid-cols-[minmax(0,20rem)_1fr] desktop-m:grid-cols-[minmax(0,26rem)_1fr]">
-          {/* Master */}
-          <ul className="divide-y divide-stroke-subtle border-b border-stroke-subtle desktop-s:border-b-0 desktop-s:border-r">
-            {shown.map((o) => {
-              const active = o.id === selected.id;
-              const style = SEVERITY_STYLE[o.severity];
-              return (
-                <li key={o.id}>
-                  <button
+        <div ref={ref} className="mt-6 flex flex-col gap-8 desktop-s:flex-row desktop-s:items-stretch desktop-s:gap-10">
+          {/* Rail column — the validity segments sit hard under the title and
+              the rows stack beneath them: the chips lead the list they filter
+              (user ask 2026-08-28, moved out of the heading row to save
+              height). */}
+          <div className="flex flex-col desktop-s:w-[360px] desktop-s:shrink-0">
+            {/* Only worth showing when there is something to separate: with
+                every duty already live the three segments would be one real
+                choice and two dead ones. */}
+            {later.length > 0 && liveNow.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {/* Touching a filter is taking over, same as clicking a row —
+                    the auto-run must not fight a reader who just narrowed the
+                    list. */}
+                <ValiditySegment
+                  selected={validity === 'all'}
+                  onClick={() => {
+                    setPicked(true);
+                    setValidity('all');
+                  }}
+                >
+                  {t('compliance.area.validityAll', 'All {{count}}', { count: all.length })}
+                </ValiditySegment>
+                <ValiditySegment
+                  selected={validity === 'now'}
+                  onClick={() => {
+                    setPicked(true);
+                    setValidity('now');
+                  }}
+                >
+                  {t('compliance.area.validityNow', 'Applies today · {{count}}', {
+                    count: liveNow.length,
+                  })}
+                </ValiditySegment>
+                <ValiditySegment
+                  selected={validity === 'later'}
+                  onClick={() => {
+                    setPicked(true);
+                    setValidity('later');
+                  }}
+                >
+                  {laterYear
+                    ? t('compliance.area.validityFromYear', 'From {{year}} · {{count}}', {
+                        year: laterYear,
+                        count: later.length,
+                      })
+                    : t('compliance.area.validityLater', 'Later · {{count}}', {
+                        count: later.length,
+                      })}
+                </ValiditySegment>
+              </div>
+            )}
+            {/* Rail — the atlas's rows VERBATIM, `layout` included: when the
+                active row grows into its card every sibling is pulled along
+                in the same soft move, the homepage's rubber-band feel (user
+                ask 2026-08-28). The rows sit under the chips, top-aligned —
+                centering them against the tall panel read as adrift. Each row
+                carries its OWN entrance — not parent variant propagation: a
+                row mounted later by a filter switch would inherit "hidden"
+                from a parent whose animation has already run and never be
+                told to show (the vanishing-list bug, fixed 2026-08-28). The
+                entrance delay is scoped per value so it never drags on the
+                layout spring. */}
+            <div className="mt-6 flex flex-col gap-1.5">
+              {shown.map((o, i) => {
+                const active = o.id === selected.id;
+                const style = SEVERITY_STYLE[o.severity];
+                return (
+                  <motion.button
+                    key={o.id}
                     type="button"
+                    layout
                     aria-pressed={active}
-                    onClick={() => setSelectedId(o.id)}
-                    // The petrol edge on the selected row is the canvas's own
-                    // marker. Without it the only cue was a pale tint, which
-                    // disappears entirely against the hover state.
-                    className={`flex w-full items-center gap-3.5 border-l-[3px] py-4 pl-[1.1875rem] pr-5 text-left transition-colors ${
+                    onClick={() => {
+                      setPicked(true);
+                      setSelectedId(o.id);
+                    }}
+                    initial={reduced ? false : { opacity: 0, y: 20 }}
+                    animate={inView ? { opacity: 1, y: 0 } : {}}
+                    transition={{
+                      duration: 0.5,
+                      ease: 'easeOut',
+                      opacity: { duration: 0.5, ease: 'easeOut', delay: i * 0.06 },
+                      y: { duration: 0.5, ease: 'easeOut', delay: i * 0.06 },
+                    }}
+                    className={
                       active
-                        ? 'border-l-brand bg-brand-light/50'
-                        : 'border-l-transparent hover:bg-surface-secondary'
-                    }`}
+                        ? 'flex w-full items-center gap-3.5 rounded-xl border-l-[3px] border-accent-500 bg-surface px-4 py-4 text-left shadow-[0_20px_50px_-24px_rgba(2,22,17,0.28)] dark:bg-surface-secondary'
+                        : 'flex w-full items-center gap-3.5 border-b border-stroke-subtle px-4 py-3 text-left transition-colors hover:bg-surface-secondary/60'
+                    }
                   >
+                    {/* The severity marker is a mini badge, so it keeps the
+                        warning colours — the doctrine's petrol is for measures. */}
                     <span
                       aria-hidden
                       className={`h-[2.125rem] w-1.5 shrink-0 rounded-full ${style.bar}`}
                     />
-                    <span className="min-w-0 flex-1">
-                      <span
-                        className={`block text-body-sm font-bold leading-snug ${
-                          active ? 'text-fg-brand' : 'text-fg'
-                        }`}
+                    {active ? (
+                      <motion.span
+                        initial={reduced ? false : { opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                        className="block min-w-0 flex-1"
                       >
-                        {o.label}
-                      </span>
-                      {/* Statute AND cadence, as the canvas rows carry. The
-                          statute alone was ambiguous between duties that share
-                          one — and it was being truncated mid-reference, which
-                          is the one part of a row that must never be guessed at. */}
-                      {/* A placeholder must not appear here either — the list
-                          row is the first place a reader meets the source, and
-                          it is the same false citation one line earlier. */}
-                      <span className="mt-1 block text-body-2xs leading-snug text-fg-tertiary">
-                        {o.scope === 'placeholder' ? (
-                          <span className="italic">
-                            {t('compliance.area.fact.noNamedSource', 'No named source yet')}
-                          </span>
-                        ) : (
-                          o.source
-                        )}
-                        {' · '}
-                        {o.appliesFrom && new Date(o.appliesFrom) > new Date()
-                          ? t('compliance.area.fromShort', 'from {{date}}', {
-                              date: shortDate.format(new Date(o.appliesFrom)),
-                            })
-                          : t(`markets.cadence.${o.due}`, { defaultValue: o.due }).toLowerCase()}
-                      </span>
-                    </span>
-                    <RiskBadge level={o.severity} size="sm" className="shrink-0 rounded-full">
-                      {t(severityKey(o.severity), SEVERITY_FALLBACK[o.severity])}
-                    </RiskBadge>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-
-          {/* Detail */}
-          <div className="p-6 desktop-s:p-8">
-            <div className="flex items-start justify-between gap-6">
-              <div className="min-w-0">
-                {/* Risk AND when it bites, in one chip. Severity on its own
-                    said nothing about whether the reader has to act this
-                    quarter or in four years. */}
-                <RiskBadge level={selected.severity} size="sm" className="rounded-full">
-                  {t('compliance.area.riskWhen', '{{level}} · {{when}}', {
-                    level: t(severityKey(selected.severity), SEVERITY_FALLBACK[selected.severity]),
-                    when:
-                      selected.appliesFrom && new Date(selected.appliesFrom) > new Date()
-                        ? t('compliance.area.fromShort', 'from {{date}}', {
-                            date: shortDate.format(new Date(selected.appliesFrom)),
-                          })
-                        : t('compliance.area.appliesTodayShort', 'applies today'),
-                  })}
-                </RiskBadge>
-                <h3 className="mt-3.5 font-serif text-[1.5rem] font-semibold leading-tight text-fg">
-                  {selected.label}
-                </h3>
-                <p className="mt-3 max-w-xl text-body-sm leading-relaxed text-fg-secondary">
-                  {selected.description}
-                </p>
-                {/* Which business models the engine puts this duty on. It used
-                    to be a filter bar over the whole list, which is where the
-                    measurement said it did not belong: across the eight areas
-                    the lists run 1 to 7 duties, four of them are unchanged by
-                    any model, and on the one list long enough to want filtering
-                    two of the four options empty it. Per duty the same data
-                    answers a question a reader actually has — does this one
-                    apply to me — without a control that mostly does nothing.
-                    Omitted when every model is named: "applies to all four" is
-                    what the absence of the line already says. */}
-                {selected.businessModels.length > 0 &&
-                  selected.businessModels.length < Object.keys(MODEL_FALLBACK).length && (
-                    <p className="mt-3.5 text-body-2xs leading-relaxed text-fg-tertiary">
-                      <span className="font-semibold">
-                        {t('compliance.area.appliesToModels', 'Applies to:')}
-                      </span>{' '}
-                      {selected.businessModels
-                        .map((m) => t(`compliance.businessModel.${m}`, MODEL_FALLBACK[m] ?? m))
-                        .join(' · ')}
-                    </p>
-                  )}
-              </div>
-              {/* The area's own glyph, in the severity's colour — the canvas
-                  puts a drawing here and it is what stops the pane reading as
-                  a form. Hidden below desktop, where it would push the prose
-                  into a column too narrow to read. */}
-              {AreaIcon && (
-                <AreaIcon
-                  size={64}
-                  strokeWidth={1.5}
-                  aria-hidden
-                  className={`hidden shrink-0 desktop-s:block ${SEVERITY_STYLE[selected.severity].iconColor}`}
-                />
-              )}
+                        <span className="block text-body-sm font-bold leading-snug text-fg">{o.label}</span>
+                        {/* Statute AND cadence; a placeholder must not appear
+                            here — the row is the first place a reader meets
+                            the source. */}
+                        <span className="mt-1 block text-body-2xs leading-snug text-fg-tertiary">
+                          {o.scope === 'placeholder' ? (
+                            <span className="italic">
+                              {t('compliance.area.fact.noNamedSource', 'No named source yet')}
+                            </span>
+                          ) : (
+                            o.source
+                          )}
+                          {' · '}
+                          {o.appliesFrom && new Date(o.appliesFrom) > new Date()
+                            ? t('compliance.area.fromShort', 'from {{date}}', {
+                                date: shortDate.format(new Date(o.appliesFrom)),
+                              })
+                            : t(`markets.cadence.${o.due}`, { defaultValue: o.due }).toLowerCase()}
+                        </span>
+                      </motion.span>
+                    ) : (
+                      <>
+                        <span className="min-w-0 flex-1 text-body-sm font-semibold leading-snug text-fg-secondary">
+                          {o.label}
+                        </span>
+                        <ChevronRight size={15} className="shrink-0 text-fg-tertiary" aria-hidden />
+                      </>
+                    )}
+                    {active && (
+                      <RiskBadge level={o.severity} size="sm" className="shrink-0 rounded-full">
+                        {t(severityKey(o.severity), SEVERITY_FALLBACK[o.severity])}
+                      </RiskBadge>
+                    )}
+                  </motion.button>
+                );
+              })}
             </div>
 
-            <dl className="mt-7 grid gap-px overflow-hidden rounded-xl border border-stroke-subtle bg-stroke-subtle tablet:grid-cols-2">
-              {/* Three states, not two. A placeholder is a string SHAPED like
-                  a citation — "National corporate income tax act" — standing
-                  where a source belongs. Printed here it sits in the same
-                  cell, in the same weight, as "UStG §18i (OSS)", and the
-                  page's entire claim is that every duty traces to a named
-                  statute. So it is not printed: the cell says there is none.
-                  'national-pending' means a national text exists and we hold
-                  the EU one; 'eu' means the EU instrument IS the law here and
-                  nothing is missing. */}
-              <Fact
-                label={t('compliance.area.fact.source', 'Legal basis')}
-                value={
-                  selected.scope === 'placeholder'
-                    ? t('compliance.area.fact.noNamedSource', 'No named source yet')
-                    : selected.source
-                }
-                muted={selected.scope === 'placeholder'}
-                note={
-                  selected.marketSpecific
-                    ? t('compliance.area.fact.nationalSource', 'National source')
-                    : selected.scope === 'placeholder'
-                      ? t('compliance.area.fact.placeholderNote', {
-                          defaultValue:
-                            'The engine carries no statute for {{market}} here — a gap in our coverage, not in the law.',
-                          market: marketLabel,
-                        })
-                      : selected.scope === 'national-pending'
-                        ? t('compliance.area.fact.pendingNote', {
-                            defaultValue:
-                              'EU-level source. {{market}} has its own text on top of it, which we do not carry yet.',
-                            market: marketLabel,
-                          })
-                        : t('compliance.area.fact.euDirect', {
-                            defaultValue: 'EU Regulation — applies directly, this is the law here',
-                          })
-                }
-              />
-              <Fact
-                label={t('compliance.area.fact.penalty', 'Penalty range')}
-                value={selected.penalty}
-                emphasis
-              />
-              <Fact
-                label={t('compliance.area.fact.cadence', 'Cadence')}
-                value={t(`markets.cadence.${selected.due}`, { defaultValue: selected.due })}
-                note={
-                  selected.dueDays != null
-                    ? t('markets.country.leadTime', { days: selected.dueDays })
-                    : undefined
-                }
-              />
-              <Fact
-                label={t('compliance.area.fact.scope', 'Applies in')}
-                // Where the duty applies, not where its source comes from.
-                // Those were conflated: a duty with no source at all was
-                // reporting "EU-wide", which claimed a scope for something we
-                // hold nothing on. The source's origin is the Rechtsgrundlage
-                // cell's business now.
-                value={selectedCountry === 'EU' ? t('compliance.country.euOption', 'EU-wide') : marketLabel}
-                note={
-                  selected.appliesFrom
-                    ? t('compliance.area.appliesFrom', 'Applies from {{date}}', {
-                        date: dateFmt.format(new Date(selected.appliesFrom)),
-                      })
-                    : t('compliance.area.timeline.liveNow', 'Applies today')
-                }
-              />
-            </dl>
+            {/* Coverage note — the same honesty MarketPage shows about thin
+                markets. Plain text, no box; it closes the rail column right
+                under the rows (user ask 2026-08-28 — it used to sit under the
+                whole section, three screens of dossier away from the list it
+                talks about). */}
+            <Typography
+              variant="caption"
+              className="mt-6 text-body-xs normal-case tracking-normal leading-relaxed text-fg-tertiary"
+            >
+              {selectedCountry === 'EU'
+                ? t('compliance.area.coverageNoteEu', {
+                    defaultValue:
+                      'The engine carries {{count}} duties for this area, all of them on an EU-level source. Pick a market to see where a national source adds to them.',
+                    count: all.length,
+                  })
+                : gapCount > 0
+                  ? t('compliance.area.coverageNoteGaps', {
+                      defaultValue:
+                        '{{specific}} of {{count}} duties have a source specific to {{market}}. Of the rest, {{gaps}} have a national text we do not carry yet — the others are EU Regulations, which apply here directly.',
+                      count: all.length,
+                      specific: all.filter((o) => o.marketSpecific).length,
+                      gaps: gapCount,
+                      market: marketLabel,
+                    })
+                  : t('compliance.area.coverageNote', {
+                      defaultValue:
+                        '{{specific}} of {{count}} duties have a source specific to {{market}}. The rest are EU Regulations — they apply here directly, so there is no national text to hold.',
+                      count: all.length,
+                      specific: all.filter((o) => o.marketSpecific).length,
+                      market: marketLabel,
+                    })}
+            </Typography>
+          </div>
 
-            {/* The Official Journal reference itself, not a button that says
-                a source exists. The CELEX number IS the citation — a reader
-                who wants to check the duty can quote it without following the
-                link. The canvas also prints a last-verified date here; the
-                engine does not carry one, so it is left out rather than made
-                up. */}
-            {selected.eurLexUrl && (
-              <a
-                href={selected.eurLexUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-5 flex items-center gap-3 rounded-lg bg-surface-secondary px-4 py-3.5 text-body-2xs text-fg-tertiary transition-colors hover:text-fg-brand"
-              >
-                <FileText size={15} className="shrink-0" aria-hidden />
-                <span>
-                  {t('compliance.area.sourceInJournal', 'Source in the Official Journal:')}{' '}
-                  <span className="font-semibold tabular-nums text-fg">
-                    {selected.celex ? `CELEX ${selected.celex}` : selected.source}
-                  </span>
-                </span>
-              </a>
-            )}
+          {/* Detail — the dossier cards standing on the Gradient panel, the
+              card anchored to the panel's TOP and growing downwards with its
+              content (user ask 2026-08-28). Every duty's card stays mounted
+              for the robust crossfade, but absolutely stacked, so none of
+              them dictates the panel's height: the wrapper eases towards the
+              measured height of the OPEN card, and the Gradient breathes with
+              it. Its resting floor comes free from the row's items-stretch —
+              the panel never ends above the rail column's last line, the
+              coverage note, and only a taller dossier pushes past it. */}
+          <div className="flex min-w-0 flex-1 items-start rounded-xl bg-gradient-stage p-4 sm:p-7">
+            <div
+              className="relative w-full min-w-0 transition-[height] duration-500 ease-out motion-reduce:transition-none"
+              style={{ height: panelH ?? undefined }}
+            >
+              {all.map((o) => {
+                const active = o.id === selected.id;
+                const deferred = !!o.appliesFrom && new Date(o.appliesFrom) > new Date();
+                return (
+                  <motion.div
+                    key={o.id}
+                    ref={(el) => {
+                      cardRefs.current[o.id] = el;
+                    }}
+                    initial={false}
+                    animate={
+                      active
+                        ? { opacity: 1, y: 0, visibility: 'visible' }
+                        : { opacity: 0, y: 10, transitionEnd: { visibility: 'hidden' } }
+                    }
+                    transition={reduced ? { duration: 0 } : { duration: 0.35, ease: 'easeOut' }}
+                    aria-hidden={!active}
+                    className={`absolute inset-x-0 top-0 min-w-0 ${active ? '' : 'pointer-events-none'}`}
+                  >
+                    <div className="w-full rounded-[14px] bg-surface p-6 shadow-[0_40px_90px_-30px_rgba(2,22,17,0.4)] dark:bg-surface-secondary sm:p-8">
+                      <div className="flex items-start justify-between gap-6">
+                        <div className="min-w-0">
+                          {/* Risk AND when it bites, in one chip. Severity on
+                              its own said nothing about whether the reader has
+                              to act this quarter or in four years. */}
+                          <RiskBadge level={o.severity} size="sm" className="rounded-full">
+                            {t('compliance.area.riskWhen', '{{level}} · {{when}}', {
+                              level: t(severityKey(o.severity), SEVERITY_FALLBACK[o.severity]),
+                              when: deferred
+                                ? t('compliance.area.fromShort', 'from {{date}}', {
+                                    date: shortDate.format(new Date(o.appliesFrom as string)),
+                                  })
+                                : t('compliance.area.appliesTodayShort', 'applies today'),
+                            })}
+                          </RiskBadge>
+                          <h3 className="mt-3.5 font-serif text-[1.5rem] font-semibold leading-tight text-fg">
+                            {o.label}
+                          </h3>
+                          <p className="mt-3 max-w-xl text-body-sm leading-relaxed text-fg-secondary">
+                            {o.description}
+                          </p>
+                          {/* Which business models the engine puts this duty
+                              on. It used to be a filter bar over the whole
+                              list, which is where the measurement said it did
+                              not belong: across the eight areas the lists run
+                              1 to 7 duties, four of them are unchanged by any
+                              model, and on the one list long enough to want
+                              filtering two of the four options empty it. Per
+                              duty the same data answers a question a reader
+                              actually has — does this one apply to me —
+                              without a control that mostly does nothing.
+                              Omitted when every model is named: "applies to
+                              all four" is what the absence of the line already
+                              says. */}
+                          {o.businessModels.length > 0 &&
+                            o.businessModels.length < Object.keys(MODEL_FALLBACK).length && (
+                              <p className="mt-3.5 text-body-2xs leading-relaxed text-fg-tertiary">
+                                <span className="font-semibold">
+                                  {t('compliance.area.appliesToModels', 'Applies to:')}
+                                </span>{' '}
+                                {o.businessModels
+                                  .map((m) => t(`compliance.businessModel.${m}`, MODEL_FALLBACK[m] ?? m))
+                                  .join(' · ')}
+                              </p>
+                            )}
+                        </div>
+                        {/* The area's own glyph — the canvas puts a drawing
+                            here and it is what stops the pane reading as a
+                            form. Hidden below desktop, where it would push the
+                            prose into a column too narrow to read. Brand, not
+                            the severity colour: the icon is presentation, the
+                            severity statement is the chip's (colour doctrine
+                            2026-08-27). */}
+                        {AreaIcon && (
+                          <AreaIcon
+                            size={64}
+                            strokeWidth={1.5}
+                            aria-hidden
+                            className="hidden shrink-0 text-fg-brand desktop-s:block"
+                          />
+                        )}
+                      </div>
+
+                      <dl className="mt-7 grid gap-px overflow-hidden rounded-xl border border-stroke-subtle bg-stroke-subtle tablet:grid-cols-2">
+                        {/* Three states, not two. A placeholder is a string
+                            SHAPED like a citation — "National corporate income
+                            tax act" — standing where a source belongs. Printed
+                            here it sits in the same cell, in the same weight,
+                            as "UStG §18i (OSS)", and the page's entire claim
+                            is that every duty traces to a named statute. So it
+                            is not printed: the cell says there is none.
+                            'national-pending' means a national text exists and
+                            we hold the EU one; 'eu' means the EU instrument IS
+                            the law here and nothing is missing. */}
+                        <Fact
+                          label={t('compliance.area.fact.source', 'Legal basis')}
+                          value={
+                            o.scope === 'placeholder'
+                              ? t('compliance.area.fact.noNamedSource', 'No named source yet')
+                              : o.source
+                          }
+                          muted={o.scope === 'placeholder'}
+                          note={
+                            o.marketSpecific
+                              ? t('compliance.area.fact.nationalSource', 'National source')
+                              : o.scope === 'placeholder'
+                                ? t('compliance.area.fact.placeholderNote', {
+                                    defaultValue:
+                                      'The engine carries no statute for {{market}} here — a gap in our coverage, not in the law.',
+                                    market: marketLabel,
+                                  })
+                                : o.scope === 'national-pending'
+                                  ? t('compliance.area.fact.pendingNote', {
+                                      defaultValue:
+                                        'EU-level source. {{market}} has its own text on top of it, which we do not carry yet.',
+                                      market: marketLabel,
+                                    })
+                                  : t('compliance.area.fact.euDirect', {
+                                      defaultValue:
+                                        'EU Regulation — applies directly, this is the law here',
+                                    })
+                          }
+                        />
+                        <Fact
+                          label={t('compliance.area.fact.penalty', 'Penalty range')}
+                          value={o.penalty}
+                          emphasis
+                        />
+                        <Fact
+                          label={t('compliance.area.fact.cadence', 'Cadence')}
+                          value={t(`markets.cadence.${o.due}`, { defaultValue: o.due })}
+                          note={
+                            o.dueDays != null
+                              ? t('markets.country.leadTime', { days: o.dueDays })
+                              : undefined
+                          }
+                        />
+                        <Fact
+                          label={t('compliance.area.fact.scope', 'Applies in')}
+                          // Where the duty applies, not where its source comes
+                          // from. Those were conflated: a duty with no source
+                          // at all was reporting "EU-wide", which claimed a
+                          // scope for something we hold nothing on. The
+                          // source's origin is the Rechtsgrundlage cell's
+                          // business now.
+                          value={
+                            selectedCountry === 'EU'
+                              ? t('compliance.country.euOption', 'EU-wide')
+                              : marketLabel
+                          }
+                          note={
+                            o.appliesFrom
+                              ? t('compliance.area.appliesFrom', 'Applies from {{date}}', {
+                                  date: dateFmt.format(new Date(o.appliesFrom)),
+                                })
+                              : t('compliance.area.timeline.liveNow', 'Applies today')
+                          }
+                        />
+                      </dl>
+
+                      {/* The Official Journal reference itself, not a button
+                          that says a source exists. The CELEX number IS the
+                          citation — a reader who wants to check the duty can
+                          quote it without following the link. The canvas also
+                          prints a last-verified date here; the engine does not
+                          carry one, so it is left out rather than made up. */}
+                      {o.eurLexUrl && (
+                        <a
+                          href={o.eurLexUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-5 flex items-center gap-3 rounded-lg bg-surface-secondary px-4 py-3.5 text-body-2xs text-fg-tertiary transition-colors hover:text-fg-brand dark:bg-white/[0.04]"
+                        >
+                          <FileText size={15} className="shrink-0" aria-hidden />
+                          <span>
+                            {t('compliance.area.sourceInJournal', 'Source in the Official Journal:')}{' '}
+                            <span className="font-semibold tabular-nums text-fg">
+                              {o.celex ? `CELEX ${o.celex}` : o.source}
+                            </span>
+                          </span>
+                        </a>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}
 
-      {/* Coverage note — the same honesty MarketPage shows about thin markets. */}
-      {/* Plain text, no box. The canvas sets this as a footnote under the card
-          and that is what it is — boxed and badged with an icon it read as a
-          second piece of content competing with the explorer above it. */}
-      <div className="mt-5 max-w-[760px]">
-        <Typography variant="caption" className="text-body-xs normal-case tracking-normal leading-relaxed text-fg-tertiary">
-          {selectedCountry === 'EU'
-            ? t('compliance.area.coverageNoteEu', {
-                defaultValue:
-                  'The engine carries {{count}} duties for this area, all of them on an EU-level source. Pick a market to see where a national source adds to them.',
-                count: all.length,
-              })
-            : gapCount > 0
-              ? t('compliance.area.coverageNoteGaps', {
-                  defaultValue:
-                    '{{specific}} of {{count}} duties have a source specific to {{market}}. Of the rest, {{gaps}} have a national text we do not carry yet — the others are EU Regulations, which apply here directly.',
-                  count: all.length,
-                  specific: all.filter((o) => o.marketSpecific).length,
-                  gaps: gapCount,
-                  market: marketLabel,
-                })
-              : t('compliance.area.coverageNote', {
-                  defaultValue:
-                    '{{specific}} of {{count}} duties have a source specific to {{market}}. The rest are EU Regulations — they apply here directly, so there is no national text to hold.',
-                  count: all.length,
-                  specific: all.filter((o) => o.marketSpecific).length,
-                  market: marketLabel,
-                })}
-        </Typography>
-      </div>
     </div>
   );
 }

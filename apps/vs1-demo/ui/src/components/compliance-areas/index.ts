@@ -1,3 +1,5 @@
+export { AreaAffected } from './AreaAffected';
+export { AreaAskBand } from './AreaAskBand';
 export { AreaCard } from './AreaCard';
 export { AreaEnforcement } from './AreaEnforcement';
 export { AreaMarketHeatmap } from './AreaMarketHeatmap';
@@ -15,7 +17,7 @@ export { CountrySelector } from './CountrySelector';
 export { HowOrchestrationWorks } from './HowOrchestrationWorks';
 export { KPIStrip } from './KPIStrip';
 export { ObligationsExplorer } from './ObligationsExplorer';
-export { RelatedAreas } from './RelatedAreas';
+export { RelatedAreas, hasRelatedAreas } from './RelatedAreas';
 export { ResourceTeaser } from './ResourceTeaser';
 export { RiskShowcase } from './RiskShowcase';
 export { useCountrySelection } from './useCountrySelection';

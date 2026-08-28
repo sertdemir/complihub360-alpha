@@ -14,6 +14,8 @@ import { DOMAIN_BY_SLUG } from '../lib/domains';
 import { getAreaObligations, getAreaProfile, isAreaSlug } from '../lib/areaProfiles';
 import { useInViewOnce } from '../lib/useInViewOnce';
 import {
+  AreaAffected,
+  AreaAskBand,
   AreaEnforcement,
   AreaMetrics,
   AreaRiskCard,
@@ -24,6 +26,7 @@ import {
   AreaTimeline,
   ObligationsExplorer,
   RelatedAreas,
+  hasRelatedAreas,
   SEVERITY_FALLBACK,
   SEVERITY_STYLE,
   severityKey,
@@ -121,7 +124,6 @@ export function ComplianceAreaPage() {
   const title = t(`compliance.${area}.title`, def?.label ?? area);
   const headline = t(`compliance.${area}.headline`, '');
   const description = t(`compliance.${area}.description`, '');
-  const affected = t(`compliance.${area}.affected`, '');
   const coverage = ['cov1', 'cov2', 'cov3']
     .map(k => t(`compliance.${area}.${k}`, ''))
     .filter(Boolean);
@@ -166,17 +168,19 @@ export function ComplianceAreaPage() {
         onCountryChange={setSelectedCountry}
       />
 
-      {/* ── 1 · Hero ──────────────────────────────────────────────────────── */}
+      {/* ── 1 · Hero on the full-bleed Gradient ───────────────────────────── */}
+      {/* (canvas "Bereichsseiten-Hero" · Variante C "Schwebende Kennzahlen-
+          Karte", 2026-08-28): the Gradient carries copy and the risk dossier
+          card; the metric card floats over the bottom edge right after. */}
       {/* The badge no longer carries the risk claim on its own: the panel on the
           right shows the three numbers it is computed from, so "high" is
           checkable rather than asserted. */}
       {/* The site header is FIXED and the area switcher is sticky underneath it,
-          so the switcher's flow slot sits far above where it is painted. With
-          the old py-14 the first 33px of this section — the back link, and later
-          the risk card's header row — were drawn behind the pinned bar. The top
-          padding clears both: the fixed header (81px at lg since the two site
-          headers were unified on one height) plus the bar's own height. */}
-      <section className="bg-surface pb-14 pt-[7.2rem] desktop-s:pb-20 desktop-s:pt-[9.6rem]">
+          so the switcher's flow slot sits far above where it is painted. The
+          top padding clears both: the fixed header (81px at lg) plus the bar's
+          own height. The bottom padding buys the room the floating metric card
+          pulls itself into (-mt-14). */}
+      <section className="bg-gradient-stage pb-24 pt-[7.2rem] desktop-s:pb-28 desktop-s:pt-[9.6rem]">
         <Container size="xl">
           <div className="grid gap-10 desktop-s:grid-cols-12 desktop-s:gap-14">
             <div className="desktop-s:col-span-7">
@@ -209,25 +213,13 @@ export function ComplianceAreaPage() {
                 </p>
               )}
 
-              <div className="mt-8 flex flex-col gap-3 tablet:flex-row">
+              {/* The "Ask a question" outline that stood here moved out on
+                  2026-08-28: the gold band below is the page's one invitation
+                  to ask, and the hero keeps the one move it opens with. */}
+              <div className="mt-8">
                 <Button size="lg" variant="primary" onClick={startAssessment}>
                   {t('compliance.area.startShort', 'Start the assessment')}
                   <ArrowRight size={17} className="ml-1.5" />
-                </Button>
-                {/* Outline on a white ground, not the filled secondary: next to
-                    the petrol CTA a grey fill reads as a second primary.
-
-                    It used to say "find a specialist" and carry ?domain= to
-                    /search, which reads only ?q= — so it promised a filtered
-                    list of specialists and delivered a free-text box. It now
-                    says what that box is. */}
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="bg-surface"
-                  onClick={() => navigate(`${localePrefix}/search`)}
-                >
-                  {t('compliance.area.askQuestion', 'Ask a question')}
                 </Button>
               </div>
 
@@ -250,81 +242,48 @@ export function ComplianceAreaPage() {
         </Container>
       </section>
 
-      {/* ── 2 · The metric band ───────────────────────────────────────────── */}
-      {/* No Container here: the band is full-bleed and holds its own, so that
-          the grey runs edge to edge while the tiles stay on the page grid.
-          The band also carries its own rules top and bottom, so the hero above
-          it does not need a border of its own. */}
+      {/* ── 2 · The metric card, floating over the Gradient's edge ────────── */}
+      {/* The component carries its own Container and -mt offset, and renders
+          nothing at all when the engine has no figures — so the offset never
+          fires on an empty card. */}
       <AreaMetrics slug={area} selectedCountry={selectedCountry} />
 
       {/* ── 3 · Who this affects ──────────────────────────────────────────── */}
-      {/* Two columns, as the canvas draws it: the heading holds a narrow left
-          rail and the prose runs beside it, not under it. The single 820px
-          column this replaced put a 30px serif headline directly above its own
-          body text, so the two read as one block and the section had no way to
-          be skimmed. The rail is fixed at 300px and the prose capped at 720 —
-          both from the canvas — so the measure stays readable however wide the
-          page gets. Below desktop-s the rail simply becomes the first row. */}
-      {(affected || description) && (
-        <Section className="py-16 desktop-s:py-20">
-          <Container size="xl">
-            <div className="flex flex-col gap-8 desktop-s:flex-row desktop-s:gap-24">
-              <AreaSectionHeading
-                className="desktop-s:w-[300px] desktop-s:shrink-0"
-                eyebrow={eyebrows.affected}
-                title={t('compliance.whoAffected', 'Who is affected')}
-              />
-              <div className="max-w-[720px] desktop-s:grow">
-                {/* The lead is a size up and in full foreground; the paragraph
-                    under it is body size and secondary. The canvas separates
-                    them that way and it is what makes the first sentence read
-                    as the answer to the heading rather than as more prose. */}
-                {affected && (
-                  <Typography variant="body" className="text-body-lg leading-relaxed text-fg">
-                    {affected}
-                  </Typography>
-                )}
-                {description && headline && (
-                  <Typography
-                    variant="body"
-                    className={`leading-relaxed text-fg-secondary ${affected ? 'mt-4' : ''}`}
-                  >
-                    {description}
-                  </Typography>
-                )}
-                {profile.businessModels.length > 0 && (
-                  <div className="mt-6 flex flex-wrap gap-2">
-                    {profile.businessModels.map(m => (
-                      <span
-                        key={m}
-                        className="rounded-lg border border-stroke bg-surface-secondary px-3.5 py-[0.4375rem] text-body-xs font-semibold text-fg-secondary"
-                      >
-                        {t(`compliance.businessModel.${m}`, m)}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </Container>
-        </Section>
-      )}
+      {/* Narrative pair since 2026-08-28 (canvas "Wer ist betroffen" · D):
+          WHO — the affected sentence as role cards — and ARE YOU — the
+          self-check card on the Gradient panel. The business-model chips left
+          with the prose layout: a chip without a verb makes no claim, and
+          their information lives on as a check statement. */}
+      <Section className="py-16 desktop-s:py-20">
+        <Container size="xl">
+          {/* Keyed by area: on a client-side switch the component stays
+              mounted otherwise, and the Stagger's once-fired "show" never
+              reaches role cards mounted later — they stall at opacity 0
+              until a refresh (user report 2026-08-28). A remount lets the
+              whole entrance play per area. */}
+          <AreaAffected key={area} slug={area} eyebrow={eyebrows.affected} />
+        </Container>
+      </Section>
 
       {/* ── 3 · Obligations explorer ──────────────────────────────────────── */}
-      {/* Full width, not the old 900px column: the explorer is a master/detail
-          pair now, and a narrow column would put the pane under the list. */}
-      <Section className="bg-surface-secondary py-16 desktop-s:py-20">
+      {/* On white since 2026-08-28: the explorer wears the homepage atlas's
+          dress — rail plus dossier card on the Gradient PANEL — so the grey
+          full-bleed band underneath it retired with the rest of the greys. */}
+      <Section className="py-16 desktop-s:py-20">
         <Container size="xl">
           <ObligationsExplorer slug={area} selectedCountry={selectedCountry} />
         </Container>
       </Section>
 
-      {/* ── 4 · Enforcement · the page's one dark moment ──────────────────── */}
-      <section className="bg-primary-700 py-16 desktop-s:py-20">
+      {/* ── 4 · Enforcement ───────────────────────────────────────────────── */}
+      {/* The dark band retired here (user decision 2026-08-28): the section
+          speaks the Gradient text-image pair now, and the page's one dark
+          moment is the orchestration band further down. */}
+      <Section className="py-16 desktop-s:py-20">
         <Container size="xl">
           <AreaEnforcement slug={area} selectedCountry={selectedCountry} />
         </Container>
-      </section>
+      </Section>
 
       {/* ── 5 · Deadlines ─────────────────────────────────────────────────── */}
       <Section className="py-16 desktop-s:py-20">
@@ -344,53 +303,59 @@ export function ComplianceAreaPage() {
       </Section>
 
       {/* ── 8 · How CompliHub360 gets there ───────────────────────────────── */}
-      {/* Three numbered cards, which is the canvas's shape and a better fit for
-          this content than the checklist it replaces: each item is a step in
-          how the engine reaches an answer, and a tick implies a feature that
-          is simply present. HowOrchestrationWorks came out with the checklist —
-          the canvas has no four-step funnel here, and that block already sits
-          on the areas hub one level up, where generic product messaging
-          belongs. Repeating it under every area page was the same argument
-          made eight times. */}
+      {/* Editorial rows, no cards (canvas "Ablauf" · Variante B, 2026-08-28):
+          after three sections of panels and cards in a row, this one goes
+          quiet — heading left, three flat numbered rows right with hairlines
+          between them. The content is three sentences about the product; it
+          supports the page, it is not its substance, and a third card stage
+          would have claimed otherwise. */}
       {coverage.length > 0 && (
         <Section className="py-16 desktop-s:py-20">
           <Container size="xl">
-            <AreaSectionHeading
-              className="max-w-[620px]"
-              eyebrow={eyebrows.process}
-              title={t('compliance.area.coversTitle', 'How CompliHub360 gets there')}
-            />
-            <ol className="mt-10 grid gap-6 tablet:grid-cols-3">
-              {coverage.map((c, i) => {
-                // The engine's copy is one sentence per step. Where it carries
-                // its own break — a dash or a colon — the first clause is the
-                // step's name and the rest explains it, which is how the canvas
-                // sets these. Where it does not, the sentence is the name and
-                // the card simply has no second line. Nothing is invented to
-                // fill one.
-                const m = c.match(/^(.{3,60}?)\s*(?:[–—]|:)\s+(.+)$/);
-                // The clause after the dash starts mid-sentence in the source
-                // string ("… assistant – assesses trading role"). Standing on
-                // its own line it is a sentence, so it gets a capital.
-                const [name, body] = m
-                  ? [m[1], m[2].charAt(0).toLocaleUpperCase(i18n.language) + m[2].slice(1)]
-                  : [c, null];
-                return (
-                  <li
-                    key={c}
-                    className="rounded-xl border border-stroke-subtle p-7"
-                  >
-                    <span className="font-serif text-h3 font-semibold tabular-nums text-fg-brand">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <p className="mt-3.5 text-body font-bold leading-snug text-fg">{name}</p>
-                    {body && (
-                      <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">{body}</p>
-                    )}
-                  </li>
-                );
-              })}
-            </ol>
+            <div className="flex flex-col gap-10 desktop-s:flex-row desktop-s:gap-24">
+              <AreaSectionHeading
+                className="desktop-s:w-[340px] desktop-s:shrink-0"
+                eyebrow={eyebrows.process}
+                title={t('compliance.area.coversTitle', 'How CompliHub360 gets there')}
+              />
+              <ol className="min-w-0 flex-1">
+                {coverage.map((c, i) => {
+                  // The engine's copy is one sentence per step. Where it
+                  // carries its own break — a dash or a colon — the first
+                  // clause is the step's name and the rest explains it. Where
+                  // it does not, the sentence is the name and the row simply
+                  // has no second line. Nothing is invented to fill one.
+                  const m = c.match(/^(.{3,60}?)\s*(?:[–—]|:)\s+(.+)$/);
+                  // The clause after the dash starts mid-sentence in the
+                  // source string ("… assistant – assesses trading role").
+                  // Standing on its own line it is a sentence, so it gets a
+                  // capital.
+                  const [name, body] = m
+                    ? [m[1], m[2].charAt(0).toLocaleUpperCase(i18n.language) + m[2].slice(1)]
+                    : [c, null];
+                  return (
+                    <li
+                      key={c}
+                      className={`flex gap-7 py-6 last:pb-0 ${
+                        i > 0 ? 'border-t border-stroke-subtle' : 'pt-0 desktop-s:pt-1'
+                      }`}
+                    >
+                      <span className="w-14 shrink-0 font-serif text-[1.875rem] font-bold leading-none tabular-nums text-fg-brand">
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="text-body font-bold leading-snug text-fg">{name}</p>
+                        {body && (
+                          <p className="mt-1.5 max-w-[560px] text-body-sm leading-relaxed text-fg-secondary">
+                            {body}
+                          </p>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
           </Container>
         </Section>
       )}
@@ -412,86 +377,63 @@ export function ComplianceAreaPage() {
           The funnel is intact and nothing in it is claimed early: a question
           now, the assessment in the closing band, specialists once there is
           something to introduce. */}
+      {/* Canvas "Frage-Band" · Variante D (2026-08-28): the inflating bubble,
+          the left-aligned invitation and a REAL search field — the fast lane
+          finally looks like one. Lives in AreaAskBand. */}
       <Section className="pb-16 desktop-s:pb-20">
         <Container size="xl">
-          <div className="flex flex-col gap-8 rounded-xl border border-stroke-subtle border-l-[3px] border-l-accent-500 bg-surface-secondary px-10 py-9 desktop-s:flex-row desktop-s:items-center desktop-s:justify-between desktop-s:gap-12">
-            <div className="max-w-[640px]">
-              <Typography variant="h3" as="h2" weight="bold" className="text-fg">
-                {t('compliance.area.askTitle', {
-                  defaultValue: 'A specific question about {{area}}?',
-                  area: title,
-                })}
-              </Typography>
-              <Typography variant="body" className="mt-2.5 leading-relaxed text-fg-secondary">
-                {t('compliance.area.askLead', {
-                  defaultValue:
-                    'Ask it in your own words and get an answer with its sources named. The assessment below is the longer way round — it maps the whole area to your business instead of answering one question.',
-                })}
-              </Typography>
-            </div>
-            <Link
-              to={`${localePrefix}/search`}
-              className="inline-flex h-[3rem] shrink-0 items-center gap-2 self-start rounded-lg bg-primary-700 px-6 text-body-md font-semibold text-white transition-colors hover:bg-primary-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stroke-focus desktop-s:self-auto"
-            >
-              {t('compliance.area.askQuestion', 'Ask a question')}
-              <ArrowRight size={17} strokeWidth={2.2} aria-hidden />
-            </Link>
-          </div>
+          <AreaAskBand slug={area} title={title} />
         </Container>
       </Section>
 
       {/* ── 10 · Related areas ────────────────────────────────────────────── */}
-      <Section className="py-16 desktop-s:py-20">
-        <Container size="xl">
-          <RelatedAreas slug={area} />
-        </Container>
-      </Section>
+      {/* Skipped entirely where the engine derives no relatedness (data
+          privacy shares no trigger with anyone) — an empty Section would
+          still paint its padding. */}
+      {hasRelatedAreas(area) && (
+        <Section className="py-16 desktop-s:py-20">
+          <Container size="xl">
+            <RelatedAreas slug={area} />
+          </Container>
+        </Section>
+      )}
 
-      {/* ── 11 · The close · orchestration and the assessment, one band ───── */}
-      {/* One petrol band, not two closing sections. The four steps and the
-          assessment CTA were the same move said twice — how you get from "this
-          applies to me" to a specialist who has answered, and the button that
-          starts it — with the steps in a tinted card directly above the band
-          that repeated their conclusion. Merged, the band explains the path
-          and then offers it, and the page keeps exactly one dark close.
+      {/* ── 11 · The close · the hub's closing component, area content ────── */}
+      {/* The same light orchestration block the hub anchors at its foot (user
+          decision 2026-08-28) — the dark closing band retires with it, and
+          with the enforcement section already in the light the page now ends
+          the way the hub does: white step cards, then the assessment row
+          behind a hairline. What changes against the hub is only the content:
+          the CTA narrows THIS area, and the button carries its name.
 
           The steps come last because they are not about this area: they are
           how any area gets there, so they belong after the area is finished
           being explained. */}
-      <section className="bg-primary-700 py-16 desktop-s:py-20">
+      <Section className="py-10 desktop-s:py-12">
         <Container size="xl">
-          <HowOrchestrationWorks tone="inverse" />
-
-          <div className="mt-[3.5rem] border-t border-white/[0.14] pt-[2.5rem]">
-            <div className="flex flex-col gap-6 desktop-s:flex-row desktop-s:items-center desktop-s:justify-between desktop-s:gap-12">
-              <div className="max-w-[560px]">
-                {/* h3, not the display size it used to carry: the band already
-                    has a headline, and two competing ones read as two
-                    sections that failed to separate. */}
-                <Typography variant="h3" as="h2" weight="bold" className="text-white">
-                  {t('compliance.area.ctaTitle', 'Ready to see what applies to you?')}
-                </Typography>
-                <Typography variant="body" className="mt-2 leading-relaxed text-primary-100">
-                  {t('compliance.area.ctaBody', {
-                    defaultValue:
-                      'The assessment narrows this area to your business, your markets and your product — in under five minutes.',
-                  })}
-                </Typography>
+          <HowOrchestrationWorks
+            cta={
+              <div className="flex flex-col gap-6 desktop-s:flex-row desktop-s:items-center desktop-s:justify-between desktop-s:gap-10">
+                <div className="max-w-[560px]">
+                  <h3 className="font-serif text-[1.375rem] font-bold leading-snug text-fg">
+                    {t('compliance.area.ctaTitle', 'Ready to see what applies to you?')}
+                  </h3>
+                  <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">
+                    {t('compliance.area.ctaBody', {
+                      defaultValue:
+                        'The assessment narrows this area to your business, your markets and your product — in under five minutes.',
+                    })}
+                  </p>
+                </div>
+                <Button size="lg" variant="primary" className="shrink-0" onClick={startAssessment}>
+                  {t('compliance.startAssessment', 'Start {{title}} Assessment', { title })}
+                  <ArrowRight size={17} className="ml-1.5" />
+                </Button>
               </div>
-              <Button
-                variant="inverse"
-                size="xl"
-                shape="soft"
-                className="shrink-0 self-start desktop-s:self-auto"
-                onClick={startAssessment}
-              >
-                {t('compliance.startAssessment', 'Start {{title}} Assessment', { title })}
-                <ArrowRight size={17} className="ml-1.5" />
-              </Button>
-            </div>
-          </div>
+            }
+          />
         </Container>
-      </section>
+      </Section>
 
       <SiteFooter />
     </main>

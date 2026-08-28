@@ -407,11 +407,35 @@
       "affected": "Cross-border e-commerce operators selling physical or digital products via marketplaces (Amazon) or independent shops (Shopify).",
       "personaFit": "Best for: Cross-border e-commerce",
       "cov1": "Dedicated Tax & VAT Wizard — captures sales model, legal seat, revenue, and target markets",
-      "cov2": "Calculates precise vat_likelihood per jurisdiction",
+      "cov2": "VAT liability per market – calculates how likely your setup needs to register there",
       "cov3": "Orchestrates matching to specialized VAT consultants by case complexity",
       "fines": {
         "authorities": "BZSt · HMRC · IRS · AEAT · Agenzia Entrate"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Marketplace sellers",
+          "line": "sell into several countries at once via Amazon & co."
+        },
+        {
+          "name": "Shop operators",
+          "line": "ship cross-border from their own shop (e.g. Shopify)"
+        },
+        {
+          "name": "Digital vendors",
+          "line": "sell digital products that carry their own tax rules"
+        },
+        {
+          "name": "Cross-border merchants",
+          "line": "grow past delivery thresholds into new tax duties"
+        }
+      ],
+      "affectedChecks": [
+        "You sell into more than one country — via marketplace or your own shop",
+        "Your foreign revenue is approaching a delivery threshold",
+        "You sell digital products or services abroad"
+      ],
+      "askPlaceholder": "E.g.: When do I need a VAT registration in France?"
     },
     "product-packaging": {
       "title": "EPR & Packaging",
@@ -420,11 +444,35 @@
       "affected": "E-commerce merchants, manufacturers, resellers, and dropshippers selling physical goods with packaging across borders.",
       "personaFit": "Best for: Manufacturers & resellers",
       "cov1": "EPR & Packaging Wizard — assesses commercial role, target markets, product categories",
-      "cov2": "Calculates epr_required_likelihood per jurisdiction",
-      "cov3": "Intelligent edge-case handling: \"Assume Yes\" safety logic for uncertain dropshippers",
+      "cov2": "Producer responsibility per market – calculates how likely you are EPR-liable",
+      "cov3": "Edge cases with safety-first logic – in doubt a duty is assumed, not defined away",
       "fines": {
         "authorities": "ZSVR · ADEME · CONAI · Environment Agency"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "E-commerce merchants",
+          "line": "sell physical goods with packaging across borders"
+        },
+        {
+          "name": "Manufacturers",
+          "line": "place packaged products on a market for the first time"
+        },
+        {
+          "name": "Resellers",
+          "line": "take on the producer duties when importing"
+        },
+        {
+          "name": "Dropshippers",
+          "line": "often count as first placers — without knowing it"
+        }
+      ],
+      "affectedChecks": [
+        "You sell physical goods with their own packaging",
+        "You ship cross-border into EU markets",
+        "You sell via direct sale or marketplaces"
+      ],
+      "askPlaceholder": "E.g.: Do I need to register for EPR in France?"
     },
     "data-privacy": {
       "title": "Data & Privacy",
@@ -433,11 +481,35 @@
       "affected": "Software founders, SaaS expansion managers, and businesses collecting personal data or using tracking tools while expanding globally.",
       "personaFit": "Best for: SaaS & data-driven brands",
       "cov1": "Data & Privacy Wizard — analyzes target customers, processing locations, tracking stack",
-      "cov2": "Calculates privacy_risk_level based on actual tool exposure",
+      "cov2": "Risk level from tool exposure – rated on the services you actually use",
       "cov3": "Platform itself uses a local PII Redaction Pipeline — zero raw data in AI layer",
       "fines": {
         "authorities": "BfDI · CNIL · ICO · Garante · AEPD · EDÖB"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Software founders",
+          "line": "build products that process personal data"
+        },
+        {
+          "name": "SaaS teams",
+          "line": "expand into new markets with a data product"
+        },
+        {
+          "name": "Data collectors",
+          "line": "capture customer data via forms, accounts or CRM"
+        },
+        {
+          "name": "Tracking users",
+          "line": "run cookies and tracking tools on their pages"
+        }
+      ],
+      "affectedChecks": [
+        "You process personal data of EU or UK users",
+        "You run cookies, analytics or tracking pixels",
+        "Your data flows to processors outside the EU"
+      ],
+      "askPlaceholder": "E.g.: Do I need a DPA for my US tracking tool?"
     },
     "marketing-seo": {
       "title": "Marketing Compliance",
@@ -446,11 +518,35 @@
       "affected": "Agencies, e-commerce brands, supplement & health vendors, financial-services marketers, and any business running paid ads or organic SEO across borders.",
       "personaFit": "Best for: Agencies & DTC brands",
       "cov1": "Marketing Compliance Wizard — captures industry sensitivity, claim types, channels",
-      "cov2": "Calculates marketing_risk_level + flags high-risk claim patterns",
+      "cov2": "Marketing risk level – high-risk claim patterns get flagged",
       "cov3": "Routes to specialists in advertising law and consumer protection",
       "fines": {
         "authorities": "Wettbewerbszentrale · DGCCRF · ASA · AGCM · FTC"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Agencies",
+          "line": "answer for their clients’ campaigns across borders"
+        },
+        {
+          "name": "E-commerce brands",
+          "line": "advertise with product claims in several markets"
+        },
+        {
+          "name": "Health & finance vendors",
+          "line": "work in industries with strict advertising rules"
+        },
+        {
+          "name": "SEO & ads operators",
+          "line": "run paid ads or rank organically abroad"
+        }
+      ],
+      "affectedChecks": [
+        "You advertise products or services outside your home market",
+        "Your advertising carries health, sustainability or comparative claims",
+        "You work with influencers or run paid ads"
+      ],
+      "askPlaceholder": "E.g.: Am I allowed to advertise as “climate neutral”?"
     },
     "corporate-structure": {
       "title": "Corporate Structure",
@@ -459,11 +555,35 @@
       "affected": "Individuals or companies planning to register legal entities, expand teams, or establish corporate presence in foreign markets.",
       "personaFit": "Best for: International expansion teams",
       "cov1": "Corporate & Structure Wizard — evaluates current status, desired markets, team complexity",
-      "cov2": "Determines entity_need_level per jurisdiction",
+      "cov2": "Entity need per market – determines whether your setup requires its own company",
       "cov3": "Intelligent routing to educational guide paths for uncertain founders",
       "fines": {
         "authorities": "Local commercial registries · Tax authorities · AML supervisors"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Founders",
+          "line": "register a legal entity abroad for the first time"
+        },
+        {
+          "name": "Expansion teams",
+          "line": "build teams and presence in new markets"
+        },
+        {
+          "name": "Established companies",
+          "line": "choose legal form and substance for new jurisdictions"
+        },
+        {
+          "name": "Remote employers",
+          "line": "employ people across borders"
+        }
+      ],
+      "affectedChecks": [
+        "You are planning a legal entity in a new market",
+        "You employ or recruit people abroad",
+        "You need local substance for banks, taxes or platforms"
+      ],
+      "askPlaceholder": "E.g.: Do I need a separate company for the UK market?"
     },
     "product-compliance": {
       "title": "Product Compliance",
@@ -476,7 +596,31 @@
       "cov3": "Routes to specialists for conformity assessment and CE documentation",
       "fines": {
         "authorities": "Market surveillance authorities · Customs · Consumer protection bodies"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Manufacturers",
+          "line": "place their own physical products on a market"
+        },
+        {
+          "name": "Importers",
+          "line": "bring goods from outside into the destination market"
+        },
+        {
+          "name": "Private-label sellers",
+          "line": "sell third-party products under their own name"
+        },
+        {
+          "name": "Online sellers",
+          "line": "answer for conformity when no other actor stands in the market"
+        }
+      ],
+      "affectedChecks": [
+        "You manufacture, import or rebrand physical products",
+        "Your products need CE marking or safety documentation",
+        "You place goods on a new market for the first time"
+      ],
+      "askPlaceholder": "E.g.: Which CE documents does my product need in the EU?"
     },
     "logistics-customs": {
       "title": "Logistics & Customs",
@@ -489,7 +633,27 @@
       "cov3": "Routes to customs brokers and trade compliance specialists",
       "fines": {
         "authorities": "Customs authorities · National statistical offices"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Shippers",
+          "line": "move physical goods across customs borders"
+        },
+        {
+          "name": "Importers & exporters",
+          "line": "need EORI, commodity coding and customs declarations"
+        },
+        {
+          "name": "EU intra-community traders",
+          "line": "pass the Intrastat reporting thresholds"
+        }
+      ],
+      "affectedChecks": [
+        "You ship goods across a customs border (e.g. UK, CH, US)",
+        "Your intra-EU trade passes the reporting thresholds",
+        "Your goods need commodity codes and customs declarations"
+      ],
+      "askPlaceholder": "E.g.: Do I need an EORI number for imports from Türkiye?"
     },
     "legal-advisory": {
       "title": "Legal Advisory",
@@ -502,7 +666,27 @@
       "cov3": "Routes to qualified lawyers in the relevant jurisdiction — CompliHub360 does not give legal advice",
       "fines": {
         "authorities": "Consumer protection bodies · Civil courts"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Consumer sellers",
+          "line": "sell to consumers in markets under foreign law"
+        },
+        {
+          "name": "Contract partners",
+          "line": "contract with suppliers or partners abroad"
+        },
+        {
+          "name": "Platform sellers",
+          "line": "need terms that hold up in the destination market"
+        }
+      ],
+      "affectedChecks": [
+        "You sell to consumers outside your home law",
+        "Your terms and withdrawal notices come from a single market",
+        "You sign contracts with partners in other jurisdictions"
+      ],
+      "askPlaceholder": "E.g.: Does my German withdrawal policy also hold in France?"
     },
     "areasEyebrow": "Eight areas, one way in",
     "areasTitle": "The eight compliance areas",
@@ -534,8 +718,8 @@
       "coverageNote": "{{specific}} of {{count}} duties have a source specific to {{market}}. The rest are EU Regulations — they apply here directly, so there is no national text to hold.",
       "enforcementTitle": "Who checks, and what it costs",
       "enforcementLead": "The figures come from the sources the engine holds for {{market}} — {{count}} duties with a stated penalty range. Upper bounds as written, not an expected cost.",
-      "timelineTitle": "What applies when",
-      "timelineLead": "{{deferred}} of the {{total}} duties are settled law but not yet applicable. That is the difference between “applies” and “is coming”.",
+      "timelineTitle": "What comes next",
+      "timelineLead": "One thread, in time order: first the filings that day-to-day operation demands, then the day new law lands. {{deferred}} of the {{total}} duties are settled law but not yet applicable.",
       "marketsTitle": "The same area, eight weights",
       "marketsLead": "{{top}} weights this area most heavily — {{topWeight}} out of 10, against {{second}} at {{secondWeight}}. Whoever serves both plans to {{top}}.",
       "coversTitle": "How CompliHub360 gets there",
@@ -573,13 +757,17 @@
       },
       "timeline": {
         "liveNow": "Applies today",
-        "today": "Today",
-        "activeCount": "{{count}} duties active",
-        "togetherCount": "{{count}} duties at once",
-        "liveDetail": "{{names}} apply on an ongoing basis — the next filing is due in {{days}} days.",
-        "liveDetailNoLead": "{{names}} apply on an ongoing basis.",
+        "togetherCount": "{{count}} duties land on one day",
         "aheadOne": "{{source}} becomes applicable.",
-        "aheadMany": "{{names}} all land on the same day."
+        "aheadMany": "{{names}} all land on the same day.",
+        "inDays": "In {{count}} days",
+        "dueBody": "Cadence: {{cadence}} — {{days}} days of lead time.",
+        "ongoingBody": "An ongoing duty with no fixed filing date.",
+        "ongoingMany": "{{count}} duties apply on an ongoing basis",
+        "sinceTag": "in force since {{date}}",
+        "noAheadWhen": "No date ahead",
+        "noAheadTitle": "This area is fully in force",
+        "noAheadBody": "No statute with a later start date is on the way — this area's calendar is its rhythm."
       },
       "fact": {
         "source": "Legal basis",
@@ -593,6 +781,10 @@
         "euDirect": "EU Regulation — applies directly, this is the law here"
       },
       "relatedOpen": "Open this area",
+      "relatedStrongest": "Strongest connection",
+      "sharedTriggers_one": "{{count}} shared trigger",
+      "sharedTriggers_other": "{{count}} shared triggers",
+      "allAreasLink": "All eight areas at a glance",
       "readSource": "Read the source on EUR-Lex",
       "coverageNoteEu": "The engine carries {{count}} duties for this area, all of them on an EU-level source. Pick a market to see where a national source adds to them.",
       "startShort": "Start the assessment",
@@ -631,13 +823,19 @@
       "enforcementAvg": "average across {{total}} markets",
       "authorities": "Competent authorities",
       "enforcementLeadEu": "The figures come from the sources the engine holds at EU level — {{count}} duties with a stated penalty range. Upper bounds as written, not an expected cost.",
-      "timelineLeadAllLive": "Every duty in this area applies today. What changes by market is the lead time each one needs.",
+      "enforcementScaleSub": "All eight markets on one scale — the gold marker is the value the engine uses here.",
+      "timelineLeadAllLive": "Every duty here already applies — the thread shows the cadence each one returns on and the lead time it needs. The market switch above recalculates the lead times.",
       "marketsLeadTied": "{{count}} markets weight this area equally heavily ({{weight}} out of 10). Serving more than one means planning to the strictest of them.",
       "localSourcesNote": "The engine holds at least one local source for this area in {{count}} of the {{total}} markets. Elsewhere the EU-level instrument is what applies, and it is shown as such.",
+      "marketsRowsNote": "Every row leads to the market page.",
       "askTitle": "A specific question about {{area}}?",
       "askLead": "Ask it in your own words and get an answer with its sources named. The assessment below is the longer way round — it maps the whole area to your business instead of answering one question.",
       "askQuestion": "Ask a question",
-      "coverageNoteGaps": "{{specific}} of {{count}} duties have a source specific to {{market}}. Of the rest, {{gaps}} have a national text we do not carry yet — the others are EU Regulations, which apply here directly."
+      "askEyebrow": "Your question",
+      "askPlaceholder": "Ask your question in your own words",
+      "coverageNoteGaps": "{{specific}} of {{count}} duties have a source specific to {{market}}. Of the rest, {{gaps}} have a national text we do not carry yet — the others are EU Regulations, which apply here directly.",
+      "checkTitle": "Does this apply to you?",
+      "checkFoot": "If one applies, this area carries duties for you — the assessment narrows them to your case."
     },
     "riskBadge": "{{level}} Risk"
   },

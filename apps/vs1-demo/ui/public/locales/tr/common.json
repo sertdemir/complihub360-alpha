@@ -407,11 +407,35 @@
       "affected": "Pazar yerleri (Amazon) veya bağımsız mağazalar (Shopify) aracılığıyla fiziksel veya dijital ürünler satan sınır ötesi e-ticaret operatörleri.",
       "personaFit": "En uygun: Sınır ötesi e-ticaret",
       "cov1": "Özel Vergi ve KDV Asistanı — satış modelini, hukuki yeri, geliri ve hedef pazarları yakalar",
-      "cov2": "Yargı bölgesi başına hassas vat_likelihood hesaplar",
+      "cov2": "Pazar başına KDV yükümlülüğü – kurulumunuzun orada kayıt gerektirme olasılığını hesaplar",
       "cov3": "Vaka karmaşıklığına göre uzman KDV danışmanlarıyla eşleştirmeyi düzenler",
       "fines": {
         "authorities": "BZSt · HMRC · IRS · AEAT · Agenzia Entrate"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Pazar yeri satıcıları",
+          "line": "Amazon ve benzeri üzerinden aynı anda birden çok ülkeye satar"
+        },
+        {
+          "name": "Mağaza işletmecileri",
+          "line": "kendi mağazasından (ör. Shopify) sınır ötesine gönderir"
+        },
+        {
+          "name": "Dijital sağlayıcılar",
+          "line": "kendi vergi kurallarını taşıyan dijital ürünler satar"
+        },
+        {
+          "name": "Sınır ötesi tüccarlar",
+          "line": "teslimat eşiklerini aşarak yeni vergi yükümlülüklerine girer"
+        }
+      ],
+      "affectedChecks": [
+        "Birden fazla ülkeye satıyorsunuz — pazar yeri veya kendi mağazanızla",
+        "Yurt dışı cironuz bir teslimat eşiğine yaklaşıyor",
+        "Yurt dışına dijital ürün veya hizmet satıyorsunuz"
+      ],
+      "askPlaceholder": "Örn.: Fransa’da ne zaman KDV kaydı gerekir?"
     },
     "product-packaging": {
       "title": "EPR ve Ambalaj",
@@ -420,11 +444,35 @@
       "affected": "Sınırlar ötesinde ambalajlı fiziksel ürünler satan e-ticaret satıcıları, üreticiler, yeniden satıcılar ve dropshipper'lar.",
       "personaFit": "En uygun: Üreticiler ve satıcılar",
       "cov1": "EPR ve Ambalaj Asistanı — ticari rolü, hedef pazarları, ürün kategorilerini değerlendirir",
-      "cov2": "Yargı bölgesi başına epr_required_likelihood hesaplar",
-      "cov3": "Akıllı uç durum yönetimi: Belirsiz dropshipper'lar için «Evet Varsay» güvenlik mantığı",
+      "cov2": "Pazar başına üretici sorumluluğu – EPR yükümlüsü olma olasılığınızı hesaplar",
+      "cov3": "Sınır durumlarında güvenlik mantığı – şüphede yükümlülük varsayılır, göz ardı edilmez",
       "fines": {
         "authorities": "ZSVR · ADEME · CONAI · Environment Agency"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "E-ticaret satıcıları",
+          "line": "ambalajlı fiziksel ürünleri sınır ötesine satar"
+        },
+        {
+          "name": "Üreticiler",
+          "line": "ambalajlı ürünleri bir pazara ilk kez sürer"
+        },
+        {
+          "name": "Yeniden satıcılar",
+          "line": "ithalatta üretici yükümlülüklerini devralır"
+        },
+        {
+          "name": "Dropshipperlar",
+          "line": "çoğu zaman farkında olmadan ilk piyasaya süren sayılır"
+        }
+      ],
+      "affectedChecks": [
+        "Kendi ambalajıyla fiziksel ürün satıyorsunuz",
+        "AB pazarlarına sınır ötesi gönderim yapıyorsunuz",
+        "Doğrudan satış veya pazar yerleri üzerinden satıyorsunuz"
+      ],
+      "askPlaceholder": "Örn.: Fransa’da EPR kaydı yaptırmam gerekir mi?"
     },
     "data-privacy": {
       "title": "Veri ve Gizlilik",
@@ -433,11 +481,35 @@
       "affected": "Küresel genişleme sürecinde kişisel veri toplayan veya izleme araçları kullanan yazılım kurucuları, SaaS genişleme yöneticileri ve işletmeler.",
       "personaFit": "En uygun: SaaS ve veri odaklı markalar",
       "cov1": "Veri ve Gizlilik Asistanı — hedef müşterileri, işleme konumlarını, izleme yığınını analiz eder",
-      "cov2": "Gerçek araç maruziyetine dayalı privacy_risk_level hesaplar",
+      "cov2": "Araç kullanımına göre risk seviyesi – gerçekten kullandığınız servislere göre derecelendirilir",
       "cov3": "Platform yerel bir PII Düzeltme Hattı kullanır — YZ katmanında ham veri yok",
       "fines": {
         "authorities": "BfDI · CNIL · ICO · Garante · AEPD · EDÖB"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Yazılım kurucuları",
+          "line": "kişisel veri işleyen ürünler geliştirir"
+        },
+        {
+          "name": "SaaS ekipleri",
+          "line": "bir veri ürünüyle yeni pazarlara açılır"
+        },
+        {
+          "name": "Veri toplayıcılar",
+          "line": "form, hesap veya CRM ile müşteri verisi toplar"
+        },
+        {
+          "name": "Takip kullanıcıları",
+          "line": "sayfalarında çerez ve izleme araçları çalıştırır"
+        }
+      ],
+      "affectedChecks": [
+        "AB veya BK kullanıcılarının kişisel verilerini işliyorsunuz",
+        "Çerez, analitik veya izleme pikselleri kullanıyorsunuz",
+        "Verileriniz AB dışındaki hizmet sağlayıcılara akıyor"
+      ],
+      "askPlaceholder": "Örn.: ABD merkezli izleme aracım için veri işleme sözleşmesi gerekir mi?"
     },
     "marketing-seo": {
       "title": "Pazarlama Uyumu",
@@ -446,11 +518,35 @@
       "affected": "Ajanslar, e-ticaret markaları, takviye ve sağlık ürünü satıcıları, finansal hizmet pazarlamacıları ve sınır ötesinde ücretli reklam veya organik SEO yürüten tüm işletmeler.",
       "personaFit": "En uygun: Ajanslar ve DTC markaları",
       "cov1": "Pazarlama Uyumu Asistanı — sektör hassasiyetini, iddia türlerini ve kanalları kaydeder",
-      "cov2": "marketing_risk_level değerini hesaplar ve yüksek riskli iddia kalıplarını işaretler",
+      "cov2": "Pazarlama risk seviyesi – yüksek riskli iddia kalıpları işaretlenir",
       "cov3": "Sizi reklam hukuku ve tüketicinin korunması alanındaki uzmanlara yönlendirir",
       "fines": {
         "authorities": "Wettbewerbszentrale · DGCCRF · ASA · AGCM · FTC"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Ajanslar",
+          "line": "müşterilerinin kampanyalarından sınırlar ötesinde sorumludur"
+        },
+        {
+          "name": "E-ticaret markaları",
+          "line": "birden çok pazarda ürün iddialarıyla reklam verir"
+        },
+        {
+          "name": "Sağlık ve finans sağlayıcıları",
+          "line": "katı reklam kuralları olan sektörlerde çalışır"
+        },
+        {
+          "name": "SEO ve reklam operatörleri",
+          "line": "yurt dışında ücretli reklam verir veya organik sıralanır"
+        }
+      ],
+      "affectedChecks": [
+        "Ürün veya hizmetlerinizi kendi pazarınızın dışında tanıtıyorsunuz",
+        "Reklamlarınız sağlık, sürdürülebilirlik veya karşılaştırma iddiaları içeriyor",
+        "Influencerlarla çalışıyor veya ücretli reklam veriyorsunuz"
+      ],
+      "askPlaceholder": "Örn.: “İklim nötr” ifadesiyle reklam verebilir miyim?"
     },
     "corporate-structure": {
       "title": "Kurumsal Yapı",
@@ -459,11 +555,35 @@
       "affected": "Yabancı pazarlarda hukuki kuruluşlar kaydetmeyi, ekipleri genişletmeyi veya kurumsal varlık oluşturmayı planlayan bireyler veya şirketler.",
       "personaFit": "En uygun: Uluslararası büyüme ekipleri",
       "cov1": "Kurumsal ve Yapı Asistanı — mevcut durumu, istenen pazarları, ekip karmaşıklığını değerlendirir",
-      "cov2": "Yargı bölgesi başına entity_need_level belirler",
+      "cov2": "Pazar başına şirket ihtiyacı – kurulumunuzun kendi şirketini gerektirip gerektirmediğini belirler",
       "cov3": "Belirsiz kurucular için eğitim rehberi yollarına akıllı yönlendirme",
       "fines": {
         "authorities": "Yerel ticaret sicilleri · Vergi otoriteleri · AML denetçileri"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Kurucular",
+          "line": "yurt dışında ilk kez bir tüzel kişilik kaydeder"
+        },
+        {
+          "name": "Genişleme ekipleri",
+          "line": "yeni pazarlarda ekip ve varlık kurar"
+        },
+        {
+          "name": "Yerleşik şirketler",
+          "line": "yeni yargı bölgeleri için hukuki form ve substans seçer"
+        },
+        {
+          "name": "Uzaktan işverenler",
+          "line": "sınırlar ötesinde çalışan istihdam eder"
+        }
+      ],
+      "affectedChecks": [
+        "Yeni bir pazarda tüzel kişilik planlıyorsunuz",
+        "Yurt dışında insan çalıştırıyor veya işe alıyorsunuz",
+        "Bankalar, vergiler veya platformlar için yerel substansa ihtiyacınız var"
+      ],
+      "askPlaceholder": "Örn.: Birleşik Krallık pazarı için ayrı bir şirket gerekir mi?"
     },
     "product-compliance": {
       "title": "Ürün Uygunluğu",
@@ -476,7 +596,31 @@
       "cov3": "Uygunluk değerlendirmesi ve CE dokümantasyonu uzmanlarına yönlendirir",
       "fines": {
         "authorities": "Piyasa gözetim otoriteleri · Gümrük · Tüketici koruma kurumları"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Üreticiler",
+          "line": "kendi fiziksel ürünlerini piyasaya sürer"
+        },
+        {
+          "name": "İthalatçılar",
+          "line": "malları dışarıdan hedef pazara getirir"
+        },
+        {
+          "name": "Özel markalı satıcılar",
+          "line": "üçüncü taraf ürünleri kendi adıyla satar"
+        },
+        {
+          "name": "Online satıcılar",
+          "line": "pazarda başka bir aktör yoksa uygunluktan sorumludur"
+        }
+      ],
+      "affectedChecks": [
+        "Fiziksel ürün üretiyor, ithal ediyor veya yeniden markalıyorsunuz",
+        "Ürünleriniz CE işareti veya güvenlik dokümantasyonu gerektiriyor",
+        "Malları ilk kez yeni bir pazara sürüyorsunuz"
+      ],
+      "askPlaceholder": "Örn.: Ürünüm için AB’de hangi CE belgeleri gerekir?"
     },
     "logistics-customs": {
       "title": "Lojistik ve Gümrük",
@@ -489,7 +633,27 @@
       "cov3": "Gümrük müşavirlerine ve dış ticaret uzmanlarına yönlendirir",
       "fines": {
         "authorities": "Gümrük otoriteleri · Ulusal istatistik kurumları"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Gönderiler",
+          "line": "fiziksel malları gümrük sınırlarının ötesine taşır"
+        },
+        {
+          "name": "İthalatçı ve ihracatçılar",
+          "line": "EORI, tarife sınıflandırması ve gümrük beyannameleri gerektirir"
+        },
+        {
+          "name": "AB içi tüccarlar",
+          "line": "Intrastat bildirim eşiklerini aşar"
+        }
+      ],
+      "affectedChecks": [
+        "Malları bir gümrük sınırının ötesine gönderiyorsunuz (ör. BK, CH, ABD)",
+        "AB içi ticaretiniz bildirim eşiklerini aşıyor",
+        "Mallarınız tarife kodları ve gümrük beyannameleri gerektiriyor"
+      ],
+      "askPlaceholder": "Örn.: Türkiye’den ithalat için EORI numarası gerekir mi?"
     },
     "legal-advisory": {
       "title": "Hukuki Danışmanlık",
@@ -502,7 +666,27 @@
       "cov3": "İlgili yargı bölgesindeki yetkili avukatlara yönlendirir — CompliHub360 hukuki danışmanlık vermez",
       "fines": {
         "authorities": "Tüketici koruma kurumları · Hukuk mahkemeleri"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Tüketiciye satanlar",
+          "line": "yabancı hukuka tabi pazarlarda tüketicilere satar"
+        },
+        {
+          "name": "Sözleşme tarafları",
+          "line": "yurt dışındaki tedarikçi veya ortaklarla sözleşme yapar"
+        },
+        {
+          "name": "Platform satıcıları",
+          "line": "hedef pazarda geçerli olacak koşullara ihtiyaç duyar"
+        }
+      ],
+      "affectedChecks": [
+        "Kendi hukukunuzun dışındaki tüketicilere satıyorsunuz",
+        "Koşullarınız ve cayma bildirimleriniz tek bir pazardan geliyor",
+        "Başka yargı bölgelerindeki ortaklarla sözleşme imzalıyorsunuz"
+      ],
+      "askPlaceholder": "Örn.: Almanya için hazırlanan cayma politikam Fransa’da da geçerli mi?"
     },
     "areasEyebrow": "Sekiz alan, tek giriş",
     "areasTitle": "Sekiz uyum alanı",
@@ -534,8 +718,8 @@
       "coverageNote": "{{count}} yükümlülüğün {{specific}} tanesinin {{market}} için özel bir kaynağı var. Geri kalanı AB Tüzüğü — burada doğrudan uygulanır, dolayısıyla taşınacak ulusal bir metin yok.",
       "enforcementTitle": "Kim denetler ve maliyeti nedir",
       "enforcementLead": "Rakamlar motorun {{market}} için tuttuğu kaynaklardan geliyor — ceza aralığı belirtilmiş {{count}} yükümlülük. Yazıldığı haliyle üst sınırlar, beklenen maliyet değil.",
-      "timelineTitle": "Ne zaman neyin geçerli olduğu",
-      "timelineLead": "{{total}} yükümlülüğün {{deferred}} tanesi yasalaştı ama henüz uygulanabilir değil. “Geçerli” ile “geliyor” arasındaki fark budur.",
+      "timelineTitle": "Sırada ne var",
+      "timelineLead": "Zaman sırasına göre tek bir hat: önce günlük işleyişin gerektirdiği bildirimler, sonra yeni yasanın devreye girdiği gün. {{total}} yükümlülükten {{deferred}} tanesi kesinleşmiş ancak henüz geçerli değil.",
       "marketsTitle": "Aynı alan, sekiz farklı ağırlık",
       "marketsLead": "Bu alana en çok ağırlığı {{top}} veriyor — 10 üzerinden {{topWeight}}, {{second}} ise {{secondWeight}}. İkisine birden satış yapan {{top}} pazarına göre planlar.",
       "coversTitle": "CompliHub360 oraya nasıl varıyor",
@@ -573,13 +757,17 @@
       },
       "timeline": {
         "liveNow": "Bugün geçerli",
-        "today": "Bugün",
-        "activeCount": "{{count}} yükümlülük aktif",
-        "togetherCount": "Aynı anda {{count}} yükümlülük",
-        "liveDetail": "{{names}} sürekli geçerli — bir sonraki bildirim {{days}} gün içinde.",
-        "liveDetailNoLead": "{{names}} sürekli geçerli.",
+        "togetherCount": "{{count}} yükümlülük aynı gün devreye giriyor",
         "aheadOne": "{{source}} uygulanabilir hale geliyor.",
-        "aheadMany": "{{names}} aynı gün yürürlüğe giriyor."
+        "aheadMany": "{{names}} aynı gün yürürlüğe giriyor.",
+        "inDays": "{{count}} gün içinde",
+        "dueBody": "Ritim: {{cadence}} — {{days}} gün hazırlık süresi.",
+        "ongoingBody": "Sabit bildirim tarihi olmayan sürekli bir yükümlülük.",
+        "ongoingMany": "{{count}} yükümlülük sürekli geçerli",
+        "sinceTag": "{{date}} itibarıyla yürürlükte",
+        "noAheadWhen": "İleride tarih yok",
+        "noAheadTitle": "Bu alan tamamen yürürlükte",
+        "noAheadBody": "Daha sonra başlayacak bir yasa yolda değil — bu alanın takvimi kendi ritmidir."
       },
       "fact": {
         "source": "Yasal dayanak",
@@ -593,6 +781,10 @@
         "euDirect": "AB Tüzüğü — doğrudan uygulanır, burada geçerli olan norm budur"
       },
       "relatedOpen": "Bu alanı aç",
+      "relatedStrongest": "En güçlü bağlantı",
+      "sharedTriggers_one": "{{count}} ortak tetikleyici",
+      "sharedTriggers_other": "{{count}} ortak tetikleyici",
+      "allAreasLink": "Sekiz alanın tümüne genel bakış",
       "readSource": "Kaynağı EUR-Lex'te oku",
       "coverageNoteEu": "Motor bu alan için {{count}} yükümlülük taşıyor, hepsi AB düzeyinde bir kaynağa dayanıyor. Ulusal bir kaynağın nerede eklendiğini görmek için bir pazar seç.",
       "startShort": "Değerlendirmeyi başlat",
@@ -631,13 +823,19 @@
       "enforcementAvg": "{{total}} pazarın ortalaması",
       "authorities": "Yetkili makamlar",
       "enforcementLeadEu": "Rakamlar motorun AB düzeyinde tuttuğu kaynaklardan geliyor — ceza aralığı belirtilmiş {{count}} yükümlülük. Yazıldığı haliyle üst sınırlar, beklenen maliyet değil.",
-      "timelineLeadAllLive": "Bu alandaki her yükümlülük bugün geçerli. Pazara göre değişen şey, her birinin gerektirdiği hazırlık süresi.",
+      "enforcementScaleSub": "Sekiz pazarın tümü tek ölçekte — altın işaret, motorun burada kullandığı değerdir.",
+      "timelineLeadAllLive": "Buradaki her yükümlülük zaten geçerli — hat, her birinin hangi ritimle döndüğünü ve ne kadar hazırlık süresi gerektirdiğini gösterir. Üstteki pazar seçimi hazırlık sürelerini yeniden hesaplar.",
       "marketsLeadTied": "{{count}} pazar bu alana eşit ağırlık veriyor (10 üzerinden {{weight}}). Birden fazlasına satış yapmak, en katısına göre planlamak demektir.",
       "localSourcesNote": "Motor, {{total}} pazarın {{count}} tanesinde bu alan için en az bir yerel kaynak tutuyor. Diğerlerinde AB düzeyindeki araç geçerlidir ve öyle gösterilir.",
+      "marketsRowsNote": "Her satır pazar sayfasına gider.",
       "askTitle": "{{area}} hakkında somut bir sorunuz mu var?",
       "askLead": "Kendi cümlelerinizle sorun, kaynakları adıyla belirtilmiş bir yanıt alın. Aşağıdaki değerlendirme daha uzun yol — tek bir soruyu yanıtlamak yerine tüm alanı şirketinize göre haritalar.",
       "askQuestion": "Soru sor",
-      "coverageNoteGaps": "{{count}} yükümlülüğün {{specific}} tanesinin {{market}} için özel bir kaynağı var. Geri kalanların {{gaps}} tanesinin henüz taşımadığımız ulusal bir metni var; diğerleri burada doğrudan uygulanan AB Tüzükleri."
+      "askEyebrow": "Sorunuz",
+      "askPlaceholder": "Sorunuzu kendi sözcüklerinizle sorun",
+      "coverageNoteGaps": "{{count}} yükümlülüğün {{specific}} tanesinin {{market}} için özel bir kaynağı var. Geri kalanların {{gaps}} tanesinin henüz taşımadığımız ulusal bir metni var; diğerleri burada doğrudan uygulanan AB Tüzükleri.",
+      "checkTitle": "Bu size uyuyor mu?",
+      "checkFoot": "Biri geçerliyse bu alan sizin için yükümlülükler taşır — değerlendirme bunları durumunuza daraltır."
     },
     "riskBadge": "Risk: {{level}}"
   },

@@ -407,11 +407,35 @@
       "affected": "Grenzüberschreitende E-Commerce-Betreiber, die physische oder digitale Produkte über Marktplätze (Amazon) oder unabhängige Shops (Shopify) verkaufen.",
       "personaFit": "Ideal für: Cross-Border E-Commerce",
       "cov1": "Dedizierter Steuer & USt-Assistent – erfasst Vertriebsmodell, Rechtssitz, Umsatz und Zielmärkte",
-      "cov2": "Berechnet präzise vat_likelihood pro Jurisdiktion",
+      "cov2": "USt-Pflicht je Markt – berechnet, wie wahrscheinlich Ihr Setup dort registrierungspflichtig ist",
       "cov3": "Orchestriert Matching mit spezialisierten Umsatzsteuerberatern nach Fallkomplexität",
       "fines": {
         "authorities": "BZSt · HMRC · IRS · AEAT · Agenzia Entrate"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Marktplatz-Verkäufer",
+          "line": "verkaufen über Amazon & Co. in mehrere Länder zugleich"
+        },
+        {
+          "name": "Shop-Betreiber",
+          "line": "versenden aus dem eigenen Shop (z. B. Shopify) grenzüberschreitend"
+        },
+        {
+          "name": "Digital-Anbieter",
+          "line": "verkaufen digitale Produkte, für die eigene Steuerregeln gelten"
+        },
+        {
+          "name": "Grenzüberschreitende Händler",
+          "line": "wachsen über Lieferschwellen in neue Steuerpflichten hinein"
+        }
+      ],
+      "affectedChecks": [
+        "Sie verkaufen in mehr als ein Land — über Marktplatz oder eigenen Shop",
+        "Ihr Auslandsumsatz nähert sich einer Lieferschwelle",
+        "Sie verkaufen digitale Produkte oder Dienstleistungen ins Ausland"
+      ],
+      "askPlaceholder": "Z. B.: Ab wann brauche ich eine USt-Registrierung in Frankreich?"
     },
     "product-packaging": {
       "title": "EPR & Verpackung",
@@ -420,11 +444,35 @@
       "affected": "E-Commerce-Händler, Hersteller, Wiederverkäufer und Dropshipper, die physische Waren mit Verpackung grenzüberschreitend verkaufen.",
       "personaFit": "Ideal für: Hersteller & Reseller",
       "cov1": "Produkt- & Verpackungsassistent – bewertet Handelsrolle, Zielmärkte, Produktkategorien",
-      "cov2": "Berechnet epr_required_likelihood pro Jurisdiktion",
-      "cov3": "Intelligente Randfall-Behandlung: „Annehme Ja“-Sicherheitslogik für unsichere Dropshipper",
+      "cov2": "Herstellerverantwortung je Markt – berechnet, wie wahrscheinlich Sie EPR-pflichtig sind",
+      "cov3": "Randfälle mit Sicherheitslogik – im Zweifel wird eine Pflicht angenommen, nicht wegdefiniert",
       "fines": {
         "authorities": "ZSVR · ADEME · CONAI · Environment Agency"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "E-Commerce-Händler",
+          "line": "verkaufen physische Waren mit Verpackung grenzüberschreitend"
+        },
+        {
+          "name": "Hersteller",
+          "line": "bringen verpackte Produkte erstmals in einen Markt"
+        },
+        {
+          "name": "Wiederverkäufer",
+          "line": "übernehmen beim Import die Herstellerpflichten"
+        },
+        {
+          "name": "Dropshipper",
+          "line": "gelten oft als Erstinverkehrbringer — ohne es zu wissen"
+        }
+      ],
+      "affectedChecks": [
+        "Sie verkaufen physische Waren mit eigener Verpackung",
+        "Sie versenden grenzüberschreitend in EU-Märkte",
+        "Sie verkaufen über Direktvertrieb oder Marktplätze"
+      ],
+      "askPlaceholder": "Z. B.: Muss ich mich in Frankreich für EPR registrieren?"
     },
     "data-privacy": {
       "title": "Daten & Datenschutz",
@@ -433,11 +481,35 @@
       "affected": "Software-Gründer, SaaS-Expansionsmanager und Unternehmen, die personenbezogene Daten sammeln oder Tracking-Tools bei der globalen Expansion nutzen.",
       "personaFit": "Ideal für: SaaS & datengetriebene Marken",
       "cov1": "Daten- & Datenschutzassistent – analysiert Zielkunden, Verarbeitungsstandorte, Tracking-Stack",
-      "cov2": "Berechnet privacy_risk_level basierend auf tatsächlicher Tool-Exposition",
+      "cov2": "Risikostufe aus der Tool-Exposition – eingestuft nach den Diensten, die Sie tatsächlich einsetzen",
       "cov3": "Plattform selbst verwendet eine lokale PII-Schwärzungs-Pipeline – keine Rohdaten in der KI-Schicht",
       "fines": {
         "authorities": "BfDI · CNIL · ICO · Garante · AEPD · EDÖB"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Software-Gründer",
+          "line": "bauen Produkte, die personenbezogene Daten verarbeiten"
+        },
+        {
+          "name": "SaaS-Teams",
+          "line": "expandieren mit einem Datenprodukt in neue Märkte"
+        },
+        {
+          "name": "Daten-Sammler",
+          "line": "erfassen Kundendaten über Formulare, Konten oder CRM"
+        },
+        {
+          "name": "Tracking-Nutzer",
+          "line": "setzen Cookies und Tracking-Tools auf ihren Seiten ein"
+        }
+      ],
+      "affectedChecks": [
+        "Sie verarbeiten personenbezogene Daten von EU- oder UK-Nutzern",
+        "Sie setzen Cookies, Analytics oder Tracking-Pixel ein",
+        "Ihre Daten fließen an Dienstleister außerhalb der EU"
+      ],
+      "askPlaceholder": "Z. B.: Brauche ich einen AV-Vertrag für mein US-Tracking-Tool?"
     },
     "marketing-seo": {
       "title": "Marketing-Compliance",
@@ -446,11 +518,35 @@
       "affected": "Agenturen, E-Commerce-Marken, Nahrungsergänzungs- & Gesundheitsanbieter, Finanzdienstleister-Marketer und alle Unternehmen mit grenzüberschreitendem SEO oder Paid Ads.",
       "personaFit": "Ideal für: Agenturen & DTC-Marken",
       "cov1": "Marketing-Compliance-Assistent – erfasst Branchensensibilität, Aussagentypen, Kanäle",
-      "cov2": "Berechnet marketing_risk_level + markiert Hochrisiko-Aussagenmuster",
+      "cov2": "Risikostufe fürs Marketing – Hochrisiko-Aussagenmuster werden markiert",
       "cov3": "Routet zu Spezialisten in Werberecht und Verbraucherschutz",
       "fines": {
         "authorities": "Wettbewerbszentrale · DGCCRF · ASA · AGCM · FTC"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Agenturen",
+          "line": "verantworten Kampagnen ihrer Kunden über Grenzen hinweg"
+        },
+        {
+          "name": "E-Commerce-Marken",
+          "line": "werben mit Produktaussagen in mehreren Märkten"
+        },
+        {
+          "name": "Health- & Finanz-Anbieter",
+          "line": "arbeiten in Branchen mit strengen Werberegeln"
+        },
+        {
+          "name": "SEO- & Ads-Betreiber",
+          "line": "schalten Paid Ads oder ranken organisch im Ausland"
+        }
+      ],
+      "affectedChecks": [
+        "Sie bewerben Produkte oder Dienste außerhalb Ihres Heimatmarkts",
+        "Ihre Werbung enthält Gesundheits-, Umwelt- oder Vergleichsaussagen",
+        "Sie arbeiten mit Influencern oder schalten Paid Ads"
+      ],
+      "askPlaceholder": "Z. B.: Darf ich mit „klimaneutral“ werben?"
     },
     "corporate-structure": {
       "title": "Unternehmensstruktur",
@@ -459,11 +555,35 @@
       "affected": "Einzelpersonen oder Unternehmen, die juristische Einheiten registrieren, Teams erweitern oder Unternehmenspräsenz in ausländischen Märkten aufbauen möchten.",
       "personaFit": "Ideal für: Internationale Expansionsteams",
       "cov1": "Unternehmens- & Strukturassistent – bewertet aktuellen Status, gewünschte Märkte, Team-Komplexität",
-      "cov2": "Bestimmt entity_need_level pro Jurisdiktion",
+      "cov2": "Strukturbedarf je Markt – bestimmt, ob Ihr Setup eine eigene Gesellschaft braucht",
       "cov3": "Intelligente Weiterleitung zu Bildungsleitfaden-Pfaden für unsichere Gründer",
       "fines": {
         "authorities": "Lokale Handelsregister · Finanzbehörden · Geldwäsche-Aufseher"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Gründer",
+          "line": "registrieren erstmals eine juristische Einheit im Ausland"
+        },
+        {
+          "name": "Expansionsteams",
+          "line": "bauen Teams und Präsenz in neuen Märkten auf"
+        },
+        {
+          "name": "Etablierte Unternehmen",
+          "line": "wählen Rechtsform und Substanz für neue Jurisdiktionen"
+        },
+        {
+          "name": "Remote-Arbeitgeber",
+          "line": "beschäftigen Mitarbeitende über Grenzen hinweg"
+        }
+      ],
+      "affectedChecks": [
+        "Sie planen eine juristische Einheit in einem neuen Markt",
+        "Sie beschäftigen oder rekrutieren Menschen im Ausland",
+        "Sie brauchen lokale Substanz für Banken, Steuern oder Plattformen"
+      ],
+      "askPlaceholder": "Z. B.: Brauche ich eine eigene Gesellschaft für den UK-Markt?"
     },
     "product-compliance": {
       "title": "Produktkonformität",
@@ -476,7 +596,31 @@
       "cov3": "Weiterleitung an Spezialisten für Konformitätsbewertung und CE-Dokumentation",
       "fines": {
         "authorities": "Marktüberwachungsbehörden · Zoll · Verbraucherschutzstellen"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Hersteller",
+          "line": "bringen eigene physische Produkte in Verkehr"
+        },
+        {
+          "name": "Importeure",
+          "line": "holen Waren von außerhalb in den Zielmarkt"
+        },
+        {
+          "name": "Eigenmarken-Händler",
+          "line": "verkaufen fremde Produkte unter eigenem Namen"
+        },
+        {
+          "name": "Online-Händler",
+          "line": "verantworten Konformität, wenn kein anderer Akteur im Markt steht"
+        }
+      ],
+      "affectedChecks": [
+        "Sie stellen physische Produkte her, importieren oder rebranden sie",
+        "Ihre Produkte brauchen CE-Kennzeichnung oder Sicherheitsdokumentation",
+        "Sie bringen Waren erstmals in einen neuen Markt"
+      ],
+      "askPlaceholder": "Z. B.: Welche CE-Dokumente braucht mein Produkt in der EU?"
     },
     "logistics-customs": {
       "title": "Logistik & Zoll",
@@ -489,7 +633,27 @@
       "cov3": "Weiterleitung an Zollagenten und Spezialisten für Außenhandelsrecht",
       "fines": {
         "authorities": "Zollbehörden · Statistische Ämter"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Versender",
+          "line": "bewegen physische Waren über Zollgrenzen"
+        },
+        {
+          "name": "Importeure & Exporteure",
+          "line": "brauchen EORI, Tarifierung und Zollanmeldungen"
+        },
+        {
+          "name": "EU-Binnenhändler",
+          "line": "überschreiten Intrastat-Meldeschwellen im Binnenhandel"
+        }
+      ],
+      "affectedChecks": [
+        "Sie versenden Waren über eine Zollgrenze (z. B. UK, CH, US)",
+        "Ihr EU-Binnenhandel überschreitet die Meldeschwellen",
+        "Ihre Waren brauchen Warennummern und Zollanmeldungen"
+      ],
+      "askPlaceholder": "Z. B.: Brauche ich eine EORI-Nummer für Importe aus der Türkei?"
     },
     "legal-advisory": {
       "title": "Rechtsberatung",
@@ -502,7 +666,27 @@
       "cov3": "Weiterleitung an zugelassene Anwälte in der jeweiligen Jurisdiktion – CompliHub360 leistet keine Rechtsberatung",
       "fines": {
         "authorities": "Verbraucherschutzstellen · Zivilgerichte"
-      }
+      },
+      "affectedRoles": [
+        {
+          "name": "Verbraucher-Verkäufer",
+          "line": "verkaufen an Verbraucher in Märkten mit fremdem Recht"
+        },
+        {
+          "name": "Vertragspartner",
+          "line": "kontrahieren mit Lieferanten oder Partnern im Ausland"
+        },
+        {
+          "name": "Plattform-Verkäufer",
+          "line": "brauchen AGB, die im Zielmarkt standhalten"
+        }
+      ],
+      "affectedChecks": [
+        "Sie verkaufen an Verbraucher außerhalb Ihres Heimatrechts",
+        "Ihre AGB und Widerrufsbelehrungen stammen aus einem einzigen Markt",
+        "Sie schließen Verträge mit Partnern in anderen Jurisdiktionen"
+      ],
+      "askPlaceholder": "Z. B.: Gilt mein deutsches Widerrufsrecht auch in Frankreich?"
     },
     "areasEyebrow": "Acht Bereiche, ein Einstieg",
     "areasTitle": "Die acht Compliance-Bereiche",
@@ -534,8 +718,8 @@
       "coverageNote": "{{specific}} von {{count}} Pflichten haben eine Quelle speziell für {{market}}. Die übrigen sind EU-Verordnungen — sie gelten hier unmittelbar, es gibt also keine nationale Fassung zu führen.",
       "enforcementTitle": "Wer prüft, und was es kostet",
       "enforcementLead": "Die Zahlen stammen aus den Quellen, die die Engine für {{market}} führt — {{count}} Pflichten mit benanntem Bußgeldrahmen. Obergrenzen, wie sie dort stehen, keine Erwartungswerte.",
-      "timelineTitle": "Was wann greift",
-      "timelineLead": "{{deferred}} der {{total}} Pflichten sind beschlossen, aber noch nicht anwendbar. Das ist der Unterschied zwischen „gilt“ und „kommt“.",
+      "timelineTitle": "Was als Nächstes ansteht",
+      "timelineLead": "Ein Strang, zeitlich sortiert: erst die Meldungen, die der laufende Betrieb verlangt, dann der Tag, an dem neues Recht dazukommt. {{deferred}} der {{total}} Pflichten sind beschlossen, gelten aber noch nicht.",
       "marketsTitle": "Derselbe Bereich, acht Gewichte",
       "marketsLead": "{{top}} gewichtet diesen Bereich am schwersten — {{topWeight}} von 10, gegenüber {{second}} mit {{secondWeight}}. Wer beide Märkte bedient, plant nach {{top}}.",
       "coversTitle": "So kommt CompliHub360 dahin",
@@ -573,13 +757,17 @@
       },
       "timeline": {
         "liveNow": "Gilt heute",
-        "today": "Heute",
-        "activeCount": "{{count}} Pflichten aktiv",
-        "togetherCount": "{{count}} Pflichten auf einmal",
-        "liveDetail": "{{names}} gelten laufend — die nächste Meldung ist in {{days}} Tagen fällig.",
-        "liveDetailNoLead": "{{names}} gelten laufend.",
+        "togetherCount": "{{count}} Pflichten landen an einem Tag",
         "aheadOne": "{{source}} wird anwendbar.",
-        "aheadMany": "{{names}} greifen am selben Tag."
+        "aheadMany": "{{names}} greifen am selben Tag.",
+        "inDays": "In {{count}} Tagen",
+        "dueBody": "Takt: {{cadence}} — {{days}} Tage Vorlauf.",
+        "ongoingBody": "Laufende Pflicht ohne festen Meldetermin.",
+        "ongoingMany": "{{count}} Pflichten gelten laufend",
+        "sinceTag": "gilt seit {{date}}",
+        "noAheadWhen": "Kein Stichtag voraus",
+        "noAheadTitle": "Dieser Bereich ist voll in Kraft",
+        "noAheadBody": "Es steht kein Gesetz mit späterem Startdatum an — der Kalender dieses Bereichs ist sein Rhythmus."
       },
       "fact": {
         "source": "Rechtsgrundlage",
@@ -593,6 +781,10 @@
         "euDirect": "EU-Verordnung — gilt unmittelbar, das ist hier die geltende Norm"
       },
       "relatedOpen": "Bereich öffnen",
+      "relatedStrongest": "Stärkste Verbindung",
+      "sharedTriggers_one": "{{count}} gemeinsamer Auslöser",
+      "sharedTriggers_other": "{{count}} gemeinsame Auslöser",
+      "allAreasLink": "Alle acht Bereiche im Überblick",
       "readSource": "Quelle auf EUR-Lex lesen",
       "coverageNoteEu": "Die Engine trägt {{count}} Pflichten für diesen Bereich, alle mit einer Quelle auf EU-Ebene. Wähle einen Markt, um zu sehen, wo eine nationale Quelle dazukommt.",
       "startShort": "Assessment jetzt starten",
@@ -631,13 +823,19 @@
       "enforcementAvg": "Durchschnitt über {{total}} Märkte",
       "authorities": "Zuständige Behörden",
       "enforcementLeadEu": "Die Zahlen stammen aus den Quellen, die die Engine auf EU-Ebene führt — {{count}} Pflichten mit benanntem Bußgeldrahmen. Obergrenzen, wie sie dort stehen, keine Erwartungswerte.",
-      "timelineLeadAllLive": "Jede Pflicht in diesem Bereich gilt heute. Was sich je Markt ändert, ist die Vorlaufzeit, die jede einzelne braucht.",
+      "enforcementScaleSub": "Alle acht Märkte auf einer Skala — der goldene Marker ist der Wert, mit dem die Engine hier rechnet.",
+      "timelineLeadAllLive": "Jede Pflicht gilt bereits — der Strang zeigt, in welchem Takt sie zurückkommen und wie viel Vorlauf jede braucht. Der Marktwechsel oben rechnet die Vorläufe um.",
       "marketsLeadTied": "{{count}} Märkte gewichten diesen Bereich gleich schwer ({{weight}} von 10). Wer mehrere bedient, plant nach dem strengsten.",
       "localSourcesNote": "In {{count}} der {{total}} Märkte führt die Engine mindestens eine lokale Quelle für diesen Bereich. Sonst gilt das EU-Instrument — und wird auch so ausgewiesen.",
+      "marketsRowsNote": "Jede Zeile führt zur Marktseite.",
       "askTitle": "Eine konkrete Frage zu {{area}}?",
       "askLead": "Stellen Sie sie in eigenen Worten und bekommen Sie eine Antwort mit benannten Quellen. Das Assessment weiter unten ist der längere Weg — es bildet den ganzen Bereich auf Ihr Unternehmen ab, statt eine Frage zu beantworten.",
       "askQuestion": "Frage stellen",
-      "coverageNoteGaps": "{{specific}} von {{count}} Pflichten haben eine Quelle speziell für {{market}}. Von den übrigen haben {{gaps}} eine nationale Fassung, die wir noch nicht führen — der Rest sind EU-Verordnungen, die hier unmittelbar gelten."
+      "askEyebrow": "Ihre Frage",
+      "askPlaceholder": "Stellen Sie Ihre Frage in eigenen Worten",
+      "coverageNoteGaps": "{{specific}} von {{count}} Pflichten haben eine Quelle speziell für {{market}}. Von den übrigen haben {{gaps}} eine nationale Fassung, die wir noch nicht führen — der Rest sind EU-Verordnungen, die hier unmittelbar gelten.",
+      "checkTitle": "Trifft das auf Sie zu?",
+      "checkFoot": "Trifft eines zu, trägt dieser Bereich Pflichten für Sie — das Assessment grenzt sie auf Ihren Fall ein."
     },
     "riskBadge": "Risiko: {{level}}"
   },
