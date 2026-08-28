@@ -925,9 +925,10 @@
     "nav": {
       "howItWorks": "So funktioniert es",
       "pricing": "Preise",
+      "trust": "Vertrauen & Sicherheit",
       "complianceAreas": "Compliance-Bereiche",
       "markets": "Märkte",
-      "resources": "Ressourcen",
+      "solutions": "Lösungen",
       "areasPanelTitle": "Compliance-Bereich wählen",
       "allAreas": "Alle Compliance-Bereiche",
       "areasAsideBody": "Jeder Bereich nennt die Pflichten, die er trägt, die Rechtsgrundlage dahinter und das, was ein Fehler kostet.",

@@ -925,9 +925,10 @@
     "nav": {
       "howItWorks": "How it works",
       "pricing": "Pricing",
+      "trust": "Trust & Security",
       "complianceAreas": "Compliance Areas",
       "markets": "Markets",
-      "resources": "Resources",
+      "solutions": "Solutions",
       "areasPanelTitle": "Choose a compliance area",
       "allAreas": "All compliance areas",
       "areasAsideBody": "Every area lists the duties it carries, the statute behind each one, and what it costs to get wrong.",

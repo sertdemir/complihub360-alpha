@@ -925,9 +925,10 @@
     "nav": {
       "howItWorks": "Cómo funciona",
       "pricing": "Precios",
+      "trust": "Confianza y seguridad",
       "complianceAreas": "Áreas de Cumplimiento",
       "markets": "Mercados",
-      "resources": "Recursos",
+      "solutions": "Soluciones",
       "areasPanelTitle": "Elija un área de cumplimiento",
       "allAreas": "Todas las áreas de cumplimiento",
       "areasAsideBody": "Cada área enumera las obligaciones que conlleva, la norma que hay detrás y lo que cuesta equivocarse.",

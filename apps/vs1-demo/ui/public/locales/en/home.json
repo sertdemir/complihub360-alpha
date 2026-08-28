@@ -1293,12 +1293,12 @@
       "resources": {
         "title": "Resources",
         "links": {
+          "resourcesOverview": "All resources",
           "complianceNews": "Compliance News",
           "knowledgeLibrary": "Knowledge Library",
           "countryGuides": "Country Guides",
           "tutorials": "Tutorials",
-          "glossary": "Compliance Glossary",
-          "aiGovernance": "AI governance"
+          "glossary": "Compliance Glossary"
         }
       },
       "company": {
@@ -1307,7 +1307,7 @@
           "about": "About",
           "trustSecurity": "Trust & Security",
           "contact": "Contact",
-          "careers": "Careers"
+          "support": "Support"
         }
       }
     },

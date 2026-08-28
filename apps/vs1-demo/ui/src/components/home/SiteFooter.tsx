@@ -55,10 +55,15 @@ const COLUMNS: Column[] = [
   {
     key: 'resources',
     links: [
+      // The resources overview lives HERE now, not in the header (user
+      // decision 2026-08-28): the library is part of the dashboard offering,
+      // so its entry point sits deliberately below the fold.
+      { key: 'resourcesOverview', href: '/resources' },
       { key: 'complianceNews', beta: true },
       { key: 'knowledgeLibrary', beta: true },
       { key: 'countryGuides', href: '/markets' },
-      { key: 'aiGovernance', href: '/ai-governance' },
+      // aiGovernance left 2026-08-28: it pointed at the same page as
+      // trustSecurity below, and one page does not get two names.
       { key: 'tutorials' },
       { key: 'glossary' },
     ],
@@ -68,8 +73,11 @@ const COLUMNS: Column[] = [
     links: [
       { key: 'about', href: '/about' },
       { key: 'trustSecurity', href: '/ai-governance' },  // traegt selbst den Titel "Trust Center"
+      // TODO(contact-live): route contact AND support to the /contact page
+      // once it exists — it ships with placeholders first (user decision
+      // 2026-08-28), real channels and addresses still to be provided.
       { key: 'contact' },
-      { key: 'careers' },
+      { key: 'support' },
     ],
   },
 ];

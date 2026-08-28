@@ -1293,12 +1293,12 @@
       "resources": {
         "title": "Kaynaklar",
         "links": {
+          "resourcesOverview": "Tüm kaynaklar",
           "complianceNews": "Uyum Haberleri",
           "knowledgeLibrary": "Bilgi Kitaplığı",
           "countryGuides": "Ülke Rehberleri",
           "tutorials": "Eğitimler",
-          "glossary": "Uyum Sözlüğü",
-          "aiGovernance": "Yapay zekâ yönetişimi"
+          "glossary": "Uyum Sözlüğü"
         }
       },
       "company": {
@@ -1307,7 +1307,7 @@
           "about": "Hakkımızda",
           "trustSecurity": "Güven ve Güvenlik",
           "contact": "İletişim",
-          "careers": "Kariyer"
+          "support": "Destek"
         }
       }
     },

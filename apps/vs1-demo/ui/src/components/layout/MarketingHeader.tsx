@@ -8,6 +8,7 @@ import { ThemeToggle } from '../ui/ThemeToggle';
 import { AreasMenuPanel } from './AreasMenuPanel';
 import { MarketsMenuPanel } from './MarketsMenuPanel';
 import { LanguageMenu } from './LanguageMenu';
+import { HEADER_NAV_LINKS } from './navLinks';
 
 // ─── MarketingHeader ──────────────────────────────────────────────────────────
 // The marketing navigation, responsive: desktop bar + mobile expanding pill panel.
@@ -42,17 +43,17 @@ export interface MarketingHeaderProps {
   embedded?: boolean;
 }
 
-// The five destinations that carry the story: how the model works, what we cover,
-// where it applies, what it costs, and the library. /platform and /solutions stay
-// out of the header on purpose — §11 P5 keeps them as SEO surfaces, reachable from
-// the footer, and a seven-entry bar does not survive German labels.
-const NAV_LINKS: NavLink[] = [
-  { to: 'how-it-works', label: 'How it works', labelKey: 'header.nav.howItWorks' },
-  { to: 'compliance', label: 'Compliance areas', labelKey: 'header.nav.complianceAreas', areasMenu: true },
-  { to: 'markets', label: 'Markets', labelKey: 'header.nav.markets', marketsMenu: true },
-  { to: 'pricing', label: 'Pricing', labelKey: 'header.nav.pricing' },
-  { to: 'resources', label: 'Resources', labelKey: 'header.nav.resources' },
-];
+// The entries come from the shared source both headers read — see navLinks.ts
+// for what is in the bar and why (user decision 2026-08-28: Solutions and
+// Trust & Security up, Resources down into the footer). /platform stays out —
+// §11 P5 keeps it as an SEO surface, reachable from the footer.
+const NAV_LINKS: NavLink[] = HEADER_NAV_LINKS.map((l) => ({
+  to: l.to,
+  label: l.labelDefault,
+  labelKey: l.labelKey,
+  areasMenu: l.sheet === 'areas',
+  marketsMenu: l.sheet === 'markets',
+}));
 
 export function MarketingHeader({
   links,
@@ -91,13 +92,15 @@ export function MarketingHeader({
 
   return (
     <header className={`${embedded ? 'relative' : 'fixed inset-x-0 top-0'} z-50 border-b ${inverse ? 'border-stroke-brand' : 'border-stroke-subtle'} transition-all ${barTone}`}>
-      {/* ── Desktop ── */}
-      <div className="mx-auto hidden h-20 max-w-container-2xl items-center gap-4 px-4 lg:flex">
+      {/* ── Desktop — from xl only: six entries with German labels do not
+          survive 1024px (user finding on the GlobalNav twin, 2026-08-28); note
+          xl is 1440 in this Tailwind scale, so the cut is desktop-m (1280). ── */}
+      <div className="mx-auto hidden h-20 max-w-container-2xl items-center gap-4 px-4 desktop-m:flex">
         <div className="flex flex-1 basis-0 items-center gap-5">
           <Logo tone={inverse ? 'on-petrol' : 'on-light'} href={userHref} />
         </div>
         {/* Anchor group sits truly centered between the two flex-1 side zones. */}
-        <nav className="flex items-center justify-center gap-3">
+        <nav className="flex items-center justify-center gap-1.5 desktop-l:gap-3">
             {items.map((it) => {
               const itemLabel = it.labelKey ? t(it.labelKey, { defaultValue: it.label }) : it.label;
               if (it.marketsMenu) {
@@ -154,7 +157,7 @@ export function MarketingHeader({
       </div>
 
       {/* ── Mobile / Tablet (pill panel until the desktop bar fits) ── */}
-      <div className="lg:hidden">
+      <div className="desktop-m:hidden">
         <div className="flex h-16 items-center justify-between px-5">
           {/* Mobile: mark only — wordmark + claim dropped to save width. */}
           <Logo lockup="mark" tone={inverse ? 'on-petrol' : 'on-light'} />
