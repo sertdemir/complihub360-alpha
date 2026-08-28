@@ -16,6 +16,8 @@ export { CountrySelector } from './CountrySelector';
 export { HowOrchestrationWorks } from './HowOrchestrationWorks';
 export { KPIStrip } from './KPIStrip';
 export { ObligationsExplorer } from './ObligationsExplorer';
+export { RailDossier } from './RailDossier';
+export type { RailItem } from './RailDossier';
 export { RelatedAreas, hasRelatedAreas } from './RelatedAreas';
 export { ResourceTeaser } from './ResourceTeaser';
 export { RiskShowcase } from './RiskShowcase';

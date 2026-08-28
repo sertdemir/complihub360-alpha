@@ -136,7 +136,8 @@
       "stat1Label": "Schritte zum Risikoprofil",
       "stat2Label": "Max. Bestätigungszeit",
       "stat3Label": "Max. Antwortfenster",
-      "stat4Label": "Regulatorische Überraschungen"
+      "stat4Label": "Regulatorische Überraschungen",
+      "railSub": "Tempo und Klarheit statt Rechtsgutachten"
     },
     "operations": {
       "overline": "Für Operations Teams",
@@ -165,7 +166,8 @@
       "item3": "Quellenindex",
       "stat1Label": "Sichtbarkeit des Engagement-Lebenszyklus",
       "stat2Label": "PDF-Berichtsexport",
-      "stat3Label": "Gespeicherte Compliance-Sitzungen"
+      "stat3Label": "Gespeicherte Compliance-Sitzungen",
+      "railSub": "Ein Kontrollzentrum statt E-Mail-Threads"
     },
     "counsel": {
       "overline": "Für In-House Counsel",
@@ -190,7 +192,8 @@
       "codeCommentBefore": "// Vor der Schwärzung",
       "codeCommentAfter": "// Nach der Schwärzung",
       "stat1Label": "PII vor KI maskiert",
-      "stat2Label": "Quellenverknüpfte Ausgaben"
+      "stat2Label": "Quellenverknüpfte Ausgaben",
+      "railSub": "Belegte Aussagen, maskierte Daten"
     },
     "cta": {
       "title": "Welche Rolle passt zu Ihnen?",
@@ -198,8 +201,27 @@
       "btnAssessment": "Kostenloses Assessment starten",
       "btnPlatform": "Plattform erkunden"
     },
-    "footer": {
-      "copyright": "© {{year}} CompliHub360. Gebaut in Berlin."
+    "hero": {
+      "eyebrow": "Für wen",
+      "titlePre": "Drei Rollen, ",
+      "titleGold": "ein",
+      "titlePost": " Weg zur Entscheidung.",
+      "lead": "Gründerin, Operations-Lead oder Syndikus — die Fragen unterscheiden sich, die Engine dahinter nicht. Wählen Sie, wer Sie sind, und die Seite zeigt, was CompliHub360 Ihnen abnimmt.",
+      "roleKicker": "Rolle {{num}}"
+    },
+    "roles": {
+      "eyebrow": "Rollen",
+      "title": "Was CompliHub360 Ihnen abnimmt"
+    },
+    "path": {
+      "eyebrow": "Der Weg",
+      "title": "Vom Kontext zur richtigen Fachperson",
+      "lead": "Vier Schritte, unabhängig von der Rolle: der Zielmarkt setzt den Rahmen, der Assistent erfasst das Geschäft, die Engine rechnet, das Match führt zur Person."
+    },
+    "stats": {
+      "eyebrow": "Zahlen",
+      "title": "Was in jeder Rolle gilt",
+      "note": "Keine Prognosen — zugesagte Fenster und gemessene Anteile."
     }
   },
   "platform": {

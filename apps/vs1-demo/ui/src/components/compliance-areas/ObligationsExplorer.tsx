@@ -1,12 +1,11 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion, useReducedMotion } from 'framer-motion';
 import { BusinessModel } from '@complihub/compliance-engine';
-import { ChevronRight, FileText } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { Typography } from '../ui/Typography';
 import { RiskBadge } from '../ui/RiskBadge';
 import { getAreaObligations, type AreaObligation } from '../../lib/areaProfiles';
-import { useInViewOnce } from '../../lib/useInViewOnce';
+import { RailDossier } from './RailDossier';
 import { AREA_BY_SLUG } from './areas';
 import type { DomainSlug } from '../../lib/domains';
 import { SEVERITY_FALLBACK, SEVERITY_STYLE, severityKey } from './severity';
@@ -75,10 +74,9 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
     year: 'numeric',
   });
   const AreaIcon = AREA_BY_SLUG[slug]?.icon;
-  const reduced = useReducedMotion();
-  const [ref, inView] = useInViewOnce<HTMLDivElement>('-120px');
   const [validity, setValidity] = useState<'all' | 'now' | 'later'>('all');
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  // Only the filter's "the reader took over" flag stays here — which row is
+  // open, and the panel that breathes with it, belong to RailDossier.
   const [picked, setPicked] = useState(false);
 
   const all = useMemo(() => getAreaObligations(slug, selectedCountry), [slug, selectedCountry]);
@@ -108,44 +106,6 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
   const gapCount = all.filter((o) => !o.marketSpecific && o.scope !== 'eu').length;
   const shown = byValidity;
 
-  // Changing area, market or filter can strip the duty that was open. Falling
-  // back to the first row keeps the pane populated instead of blanking it.
-  const selected: AreaObligation | undefined =
-    shown.find((o) => o.id === selectedId) ?? shown[0];
-  useEffect(() => {
-    setSelectedId(null);
-  }, [slug, selectedCountry, validity]);
-
-  // The panel follows the OPEN card's height. The dossiers stand absolutely
-  // stacked (for the robust crossfade), so the panel cannot size itself from
-  // flow — instead the active card is measured and the wrapper's height eases
-  // towards it with a CSS transition. Measured in a layout effect so the very
-  // first height is painted, never animated; the ResizeObserver keeps it true
-  // through viewport and font changes.
-  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const [panelH, setPanelH] = useState<number | null>(null);
-  const activeId = selected?.id ?? null;
-  useLayoutEffect(() => {
-    const el = activeId ? cardRefs.current[activeId] : null;
-    if (!el) return;
-    setPanelH(el.offsetHeight);
-    if (typeof ResizeObserver === 'undefined') return;
-    const ro = new ResizeObserver(() => setPanelH(el.offsetHeight));
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [activeId]);
-
-  // Self-run like the homepage atlas: once in view the next duty opens every
-  // few seconds, until the user takes over by clicking a row or a filter.
-  useEffect(() => {
-    if (!inView || reduced || picked || shown.length < 2 || !selected) return;
-    const id = setTimeout(() => {
-      const idx = shown.findIndex((o) => o.id === selected.id);
-      setSelectedId(shown[(idx + 1) % shown.length].id);
-    }, 6000);
-    return () => clearTimeout(id);
-  }, [inView, reduced, picked, shown, selected]);
-
   const marketLabel =
     selectedCountry === 'EU'
       ? t('compliance.country.euOption', 'EU-wide')
@@ -163,7 +123,7 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
         })}
       />
 
-      {shown.length === 0 || !selected ? (
+      {shown.length === 0 ? (
         <div className="mt-6 rounded-xl border border-stroke-subtle bg-surface p-6">
           <Typography variant="body" className="text-fg-secondary">
             {/* Reachable only when the engine holds nothing for this area in
@@ -178,15 +138,42 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
           </Typography>
         </div>
       ) : (
-        <div ref={ref} className="mt-6 flex flex-col gap-8 desktop-s:flex-row desktop-s:items-stretch desktop-s:gap-10">
-          {/* Rail column — the validity segments sit hard under the title and
-              the rows stack beneath them: the chips lead the list they filter
-              (user ask 2026-08-28, moved out of the heading row to save
-              height). */}
-          <div className="flex flex-col desktop-s:w-[360px] desktop-s:shrink-0">
-            {/* Only worth showing when there is something to separate: with
-                every duty already live the three segments would be one real
-                choice and two dead ones. */}
+        <RailDossier
+          resetKey={`${slug}|${selectedCountry}|${validity}`}
+          // Touching a filter is taking over, same as clicking a row — the
+          // auto-run must not fight a reader who just narrowed the list.
+          autoAdvanceMs={picked ? 0 : 6000}
+          items={shown.map((o) => ({
+            id: o.id,
+            label: o.label,
+            markerClass: SEVERITY_STYLE[o.severity].bar,
+            // Statute AND cadence; a placeholder must not appear here — the
+            // row is the first place a reader meets the source.
+            sub: (
+              <>
+                {o.scope === 'placeholder' ? (
+                  <span className="italic">
+                    {t('compliance.area.fact.noNamedSource', 'No named source yet')}
+                  </span>
+                ) : (
+                  o.source
+                )}
+                {' · '}
+                {o.appliesFrom && new Date(o.appliesFrom) > new Date()
+                  ? t('compliance.area.fromShort', 'from {{date}}', {
+                      date: shortDate.format(new Date(o.appliesFrom)),
+                    })
+                  : t(`markets.cadence.${o.due}`, { defaultValue: o.due }).toLowerCase()}
+              </>
+            ),
+            badge: (
+              <RiskBadge level={o.severity} size="sm" className="shrink-0 rounded-full">
+                {t(severityKey(o.severity), SEVERITY_FALLBACK[o.severity])}
+              </RiskBadge>
+            ),
+          }))}
+          railHeader={
+            <>
             {later.length > 0 && liveNow.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {/* Touching a filter is taking over, same as clicking a row —
@@ -230,163 +217,49 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                 </ValiditySegment>
               </div>
             )}
-            {/* Rail — the atlas's rows VERBATIM, `layout` included: when the
-                active row grows into its card every sibling is pulled along
-                in the same soft move, the homepage's rubber-band feel (user
-                ask 2026-08-28). The rows sit under the chips, top-aligned —
-                centering them against the tall panel read as adrift. Each row
-                carries its OWN entrance — not parent variant propagation: a
-                row mounted later by a filter switch would inherit "hidden"
-                from a parent whose animation has already run and never be
-                told to show (the vanishing-list bug, fixed 2026-08-28). The
-                entrance delay is scoped per value so it never drags on the
-                layout spring. */}
-            <div className="mt-6 flex flex-col gap-1.5">
-              {shown.map((o, i) => {
-                const active = o.id === selected.id;
-                const style = SEVERITY_STYLE[o.severity];
-                return (
-                  <motion.button
-                    key={o.id}
-                    type="button"
-                    layout
-                    aria-pressed={active}
-                    onClick={() => {
-                      setPicked(true);
-                      setSelectedId(o.id);
-                    }}
-                    initial={reduced ? false : { opacity: 0, y: 20 }}
-                    animate={inView ? { opacity: 1, y: 0 } : {}}
-                    transition={{
-                      duration: 0.5,
-                      ease: 'easeOut',
-                      opacity: { duration: 0.5, ease: 'easeOut', delay: i * 0.06 },
-                      y: { duration: 0.5, ease: 'easeOut', delay: i * 0.06 },
-                    }}
-                    className={
-                      active
-                        ? 'flex w-full items-center gap-3.5 rounded-xl border-l-[3px] border-accent-500 bg-surface px-4 py-4 text-left shadow-[0_20px_50px_-24px_rgba(2,22,17,0.28)] dark:bg-surface-secondary'
-                        : 'flex w-full items-center gap-3.5 border-b border-stroke-subtle px-4 py-3 text-left transition-colors hover:bg-surface-secondary/60'
-                    }
-                  >
-                    {/* The severity marker is a mini badge, so it keeps the
-                        warning colours — the doctrine's petrol is for measures. */}
-                    <span
-                      aria-hidden
-                      className={`h-[2.125rem] w-1.5 shrink-0 rounded-full ${style.bar}`}
-                    />
-                    {active ? (
-                      <motion.span
-                        initial={reduced ? false : { opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.3 }}
-                        className="block min-w-0 flex-1"
-                      >
-                        <span className="block text-body-sm font-bold leading-snug text-fg">{o.label}</span>
-                        {/* Statute AND cadence; a placeholder must not appear
-                            here — the row is the first place a reader meets
-                            the source. */}
-                        <span className="mt-1 block text-body-2xs leading-snug text-fg-tertiary">
-                          {o.scope === 'placeholder' ? (
-                            <span className="italic">
-                              {t('compliance.area.fact.noNamedSource', 'No named source yet')}
-                            </span>
-                          ) : (
-                            o.source
-                          )}
-                          {' · '}
-                          {o.appliesFrom && new Date(o.appliesFrom) > new Date()
-                            ? t('compliance.area.fromShort', 'from {{date}}', {
-                                date: shortDate.format(new Date(o.appliesFrom)),
-                              })
-                            : t(`markets.cadence.${o.due}`, { defaultValue: o.due }).toLowerCase()}
-                        </span>
-                      </motion.span>
-                    ) : (
-                      <>
-                        <span className="min-w-0 flex-1 text-body-sm font-semibold leading-snug text-fg-secondary">
-                          {o.label}
-                        </span>
-                        <ChevronRight size={15} className="shrink-0 text-fg-tertiary" aria-hidden />
-                      </>
-                    )}
-                    {active && (
-                      <RiskBadge level={o.severity} size="sm" className="shrink-0 rounded-full">
-                        {t(severityKey(o.severity), SEVERITY_FALLBACK[o.severity])}
-                      </RiskBadge>
-                    )}
-                  </motion.button>
-                );
-              })}
-            </div>
-
-            {/* Coverage note — the same honesty MarketPage shows about thin
-                markets. Plain text, no box; it closes the rail column right
-                under the rows (user ask 2026-08-28 — it used to sit under the
-                whole section, three screens of dossier away from the list it
-                talks about). */}
-            <Typography
-              variant="caption"
-              className="mt-6 text-body-xs normal-case tracking-normal leading-relaxed text-fg-tertiary"
-            >
-              {selectedCountry === 'EU'
-                ? t('compliance.area.coverageNoteEu', {
+            </>
+          }
+          railFooter={
+            <>
+          {/* Coverage note — the same honesty MarketPage shows about thin
+              markets. Plain text, no box; it closes the rail column right
+              under the rows (user ask 2026-08-28 — it used to sit under the
+              whole section, three screens of dossier away from the list it
+              talks about). */}
+          <Typography
+            variant="caption"
+            className="mt-6 text-body-xs normal-case tracking-normal leading-relaxed text-fg-tertiary"
+          >
+            {selectedCountry === 'EU'
+              ? t('compliance.area.coverageNoteEu', {
+                  defaultValue:
+                    'The engine carries {{count}} duties for this area, all of them on an EU-level source. Pick a market to see where a national source adds to them.',
+                  count: all.length,
+                })
+              : gapCount > 0
+                ? t('compliance.area.coverageNoteGaps', {
                     defaultValue:
-                      'The engine carries {{count}} duties for this area, all of them on an EU-level source. Pick a market to see where a national source adds to them.',
+                      '{{specific}} of {{count}} duties have a source specific to {{market}}. Of the rest, {{gaps}} have a national text we do not carry yet — the others are EU Regulations, which apply here directly.',
                     count: all.length,
+                    specific: all.filter((o) => o.marketSpecific).length,
+                    gaps: gapCount,
+                    market: marketLabel,
                   })
-                : gapCount > 0
-                  ? t('compliance.area.coverageNoteGaps', {
-                      defaultValue:
-                        '{{specific}} of {{count}} duties have a source specific to {{market}}. Of the rest, {{gaps}} have a national text we do not carry yet — the others are EU Regulations, which apply here directly.',
-                      count: all.length,
-                      specific: all.filter((o) => o.marketSpecific).length,
-                      gaps: gapCount,
-                      market: marketLabel,
-                    })
-                  : t('compliance.area.coverageNote', {
-                      defaultValue:
-                        '{{specific}} of {{count}} duties have a source specific to {{market}}. The rest are EU Regulations — they apply here directly, so there is no national text to hold.',
-                      count: all.length,
-                      specific: all.filter((o) => o.marketSpecific).length,
-                      market: marketLabel,
-                    })}
-            </Typography>
-          </div>
-
-          {/* Detail — the dossier cards standing on the Gradient panel, the
-              card anchored to the panel's TOP and growing downwards with its
-              content (user ask 2026-08-28). Every duty's card stays mounted
-              for the robust crossfade, but absolutely stacked, so none of
-              them dictates the panel's height: the wrapper eases towards the
-              measured height of the OPEN card, and the Gradient breathes with
-              it. Its resting floor comes free from the row's items-stretch —
-              the panel never ends above the rail column's last line, the
-              coverage note, and only a taller dossier pushes past it. */}
-          <div className="flex min-w-0 flex-1 items-start rounded-xl bg-gradient-stage p-4 sm:p-7">
-            <div
-              className="relative w-full min-w-0 transition-[height] duration-500 ease-out motion-reduce:transition-none"
-              style={{ height: panelH ?? undefined }}
-            >
-              {all.map((o) => {
-                const active = o.id === selected.id;
-                const deferred = !!o.appliesFrom && new Date(o.appliesFrom) > new Date();
-                return (
-                  <motion.div
-                    key={o.id}
-                    ref={(el) => {
-                      cardRefs.current[o.id] = el;
-                    }}
-                    initial={false}
-                    animate={
-                      active
-                        ? { opacity: 1, y: 0, visibility: 'visible' }
-                        : { opacity: 0, y: 10, transitionEnd: { visibility: 'hidden' } }
-                    }
-                    transition={reduced ? { duration: 0 } : { duration: 0.35, ease: 'easeOut' }}
-                    aria-hidden={!active}
-                    className={`absolute inset-x-0 top-0 min-w-0 ${active ? '' : 'pointer-events-none'}`}
-                  >
+                : t('compliance.area.coverageNote', {
+                    defaultValue:
+                      '{{specific}} of {{count}} duties have a source specific to {{market}}. The rest are EU Regulations — they apply here directly, so there is no national text to hold.',
+                    count: all.length,
+                    specific: all.filter((o) => o.marketSpecific).length,
+                    market: marketLabel,
+                  })}
+          </Typography>
+            </>
+          }
+          renderCard={(item) => {
+            const o = all.find((x) => x.id === item.id);
+            if (!o) return null;
+            const deferred = !!o.appliesFrom && new Date(o.appliesFrom) > new Date();
+            return (
                     <div className="w-full rounded-[14px] bg-surface p-6 shadow-[0_40px_90px_-30px_rgba(2,22,17,0.4)] dark:bg-surface-secondary sm:p-8">
                       <div className="flex items-start justify-between gap-6">
                         <div className="min-w-0">
@@ -551,12 +424,9 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                         </a>
                       )}
                     </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
+            );
+          }}
+        />
       )}
 
     </div>
