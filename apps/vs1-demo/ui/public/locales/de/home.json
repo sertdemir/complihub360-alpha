@@ -1270,16 +1270,17 @@
         "title": "Plattform",
         "links": {
           "howItWorks": "So funktioniert es",
+          "forWhom": "Für wen",
           "startAssessment": "Assessment starten",
           "exampleResult": "Beispielergebnis",
           "pricing": "Preise",
           "platformOverview": "Die Plattform"
         }
       },
-      "solutions": {
-        "title": "Lösungen",
+      "areas": {
+        "title": "Compliance-Bereiche",
         "links": {
-          "solutionsOverview": "Nach Rolle",
+          "areasOverview": "Alle Bereiche",
           "taxVat": "Steuern & USt",
           "productPackaging": "EPR & Verpackung",
           "dataPrivacy": "Daten & Datenschutz",
@@ -1290,15 +1291,18 @@
           "legalAdvisory": "Rechtsberatung"
         }
       },
-      "resources": {
-        "title": "Ressourcen",
+      "markets": {
+        "title": "Märkte",
         "links": {
-          "resourcesOverview": "Alle Ressourcen",
-          "complianceNews": "Compliance-News",
-          "knowledgeLibrary": "Wissensbibliothek",
-          "countryGuides": "Länderleitfäden",
-          "tutorials": "Tutorials",
-          "glossary": "Compliance-Glossar"
+          "marketsOverview": "Alle Märkte",
+          "market_DE": "Deutschland",
+          "market_FR": "Frankreich",
+          "market_US": "USA",
+          "market_UK": "Großbritannien",
+          "market_IT": "Italien",
+          "market_ES": "Spanien",
+          "market_NL": "Niederlande",
+          "market_TR": "Türkei"
         }
       },
       "company": {
