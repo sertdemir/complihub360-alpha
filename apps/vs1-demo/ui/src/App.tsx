@@ -17,6 +17,7 @@ import { ResultsRiskMap } from "./pages/ResultsRiskMap";
 import { SearchResultPage } from "./pages/SearchResultPage";
 import { ResourcesPage } from "./pages/ResourcesPage";
 import { AboutPage } from './pages/AboutPage';
+import { ContactPage } from './pages/ContactPage';
 import { AiGovernancePage } from "./pages/AiGovernancePage";
 import { PrivacyPage, ImprintPage, TermsPage, CookiePage } from "./pages/legal/LegalPages";
 
@@ -186,6 +187,9 @@ function AppContent() {
                     <Route path="resources" element={<ResourcesPage />} />
                     <Route path="about" element={<AboutPage />} />
                     <Route path="ai-governance" element={<AiGovernancePage />} />
+                    {/* Kontakt UND Support: beide Footer-Eintraege zeigen hierher,
+                        die Seite sortiert nach Anliegen statt nach Abteilung. */}
+                    <Route path="contact" element={<ContactPage />} />
                     <Route path="results" element={<ResultsRiskMap />} />
                     {/* Station 1A: prose-search answers page (no risk map, no gating). */}
                     <Route path="search" element={<SearchResultPage />} />

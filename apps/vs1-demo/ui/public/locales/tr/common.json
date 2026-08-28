@@ -1526,5 +1526,144 @@
       "title": "{{area}} — Yükümlülükler ve cezalar | CompliHub360",
       "description": "Her {{area}} yükümlülüğü; dayandığı mevzuat, ceza riski ve pazara göre süreler. Doğrulanmış uzmanlarla eşleştirilir."
     }
+  },
+  "contact": {
+    "hero": {
+      "eyebrow": "İletişim ve destek",
+      "titlePre": "Bize ",
+      "titleGold": "konunun ne olduğunu",
+      "titlePost": " söyleyin.",
+      "lead": "Her şey için tek bir kutu bizim işimize gelir, sizi ise yavaşlatır. Konunuzu seçin — yanıtlayabilecek kişilere ulaşsın.",
+      "facts": {
+        "ways": {
+          "value": "4 yol",
+          "note": "konuya göre ayrılmış"
+        },
+        "day": {
+          "value": "1 iş günü",
+          "note": "destek ve satış için"
+        },
+        "human": {
+          "value": "Bot yok",
+          "note": "yanıtı bir insan yazar"
+        }
+      }
+    },
+    "lanes": {
+      "eyebrow": "Dört yol",
+      "title": "Hangi konu için hangi yol",
+      "lead": "Her yol, tam olarak o konuyu yanıtlayabilecek kişilerde biter. Adres ve süre yanında yazar, tahmin etmeniz gerekmez.",
+      "postal": "Posta adresi ve telefon:"
+    },
+    "lane": {
+      "support": {
+        "short": "Değerlendirme",
+        "title": "Değerlendirmede yardım",
+        "desc": "Bir soru takıldı, bir sonuç yanlış görünüyor, hesap açılmıyor.",
+        "sla": "Ertesi iş günü yanıt",
+        "mailbox": "support@…"
+      },
+      "sales": {
+        "short": "Fiyatlar",
+        "title": "Fiyatlar ve planlar",
+        "desc": "Hangi plan uyar, bir ekip ne tutar, faturalama nasıl işler.",
+        "sla": "Ertesi iş günü yanıt",
+        "mailbox": "sales@…"
+      },
+      "partner": {
+        "short": "Sağlayıcı",
+        "title": "Sağlayıcı olarak listelenmek",
+        "desc": "Ağımıza katılmak isteyen hukuk bürosu, mali müşavir ya da danışmanlık.",
+        "sla": "3 iş günü içinde dönüş",
+        "mailbox": "partner@…"
+      },
+      "privacy": {
+        "short": "Veri koruma",
+        "title": "Veri koruma ve güvenlik",
+        "desc": "Bilgi talebi, silme, veri işleme sözleşmesi ya da bir açığın bildirimi.",
+        "sla": "KVKK/GDPR md. 12 süresi",
+        "mailbox": "kvkk@…"
+      }
+    },
+    "form": {
+      "eyebrow": "Mesaj",
+      "title": "Bize yazın",
+      "lead": "Dört yolun tamamı için tek form. Seçiminiz mesajın nereye düşeceğini belirler — adres aramanıza gerek yok.",
+      "lane": "Konunuz",
+      "name": "Ad",
+      "namePlaceholder": "Adınız",
+      "email": "E-posta",
+      "emailPlaceholder": "ad@firma.com",
+      "message": "Konu nedir?",
+      "messagePlaceholder": "Ne kadar somut olursa yanıt o kadar hızlı gelir.",
+      "messageHelper": "Pazar, ürün ve bunun yerine ne beklediğiniz — bu bir tur soru sormaktan kurtarır.",
+      "privacy": "Yazdıklarınızı yalnızca size yanıt vermek için kullanırız. İstemediğiniz sürece bülten göndermeyiz.",
+      "submit": "Mesajı gönder",
+      "draftNote": "Önizleme: Bu sayfanın gönderim yolu ve posta kutuları henüz bağlanmadı. O zamana kadar buradan hiçbir şey çıkmaz.",
+      "notWired": "Henüz gönderilmedi — gönderim yolu hazır değil. O zamana dek bize şuradan ulaşabilirsiniz:"
+    },
+    "faster": {
+      "eyebrow": "Belki daha hızlı",
+      "title": "Beklemeden üç yol",
+      "assessment": {
+        "title": "Değerlendirme çoğu zaman daha erken yanıtlar",
+        "desc": "Dört beş soru, ve durumunuzun hangi yükümlülükleri doğurduğunu görürsünüz — yanıt beklemeden.",
+        "cta": "Değerlendirmeyi başlat"
+      },
+      "faq": {
+        "title": "Sık sorulanlar aşağıda",
+        "desc": "Kim yanıtlıyor, bilgilerinize ne oluyor, sağlayıcılar nasıl denetleniyor.",
+        "cta": "Sorulara git"
+      },
+      "security": {
+        "title": "Bir güvenlik açığı mı buldunuz?",
+        "desc": "Trust Center güvenlik ekibimize giden yolu ve bağlı olduğumuz kuralları anlatır.",
+        "cta": "Trust Center"
+      }
+    },
+    "after": {
+      "eyebrow": "Gönderdikten sonra",
+      "ack": {
+        "title": "Alındı onayı",
+        "when": "anında"
+      },
+      "sort": {
+        "title": "Bir insan sınıflandırır",
+        "when": "aynı iş günü"
+      },
+      "answer": {
+        "title": "Esasa ilişkin yanıt",
+        "when": "ertesi iş günü"
+      },
+      "note": "Daha uzun sürerse ara bilgi alırsınız — sessiz bekleme yok."
+    },
+    "faq": {
+      "eyebrow": "Sık sorulanlar",
+      "title": "Yazmadan önce",
+      "note": "Uyan bir soru yok mu? Yukarıdaki form en kısa yol.",
+      "items": {
+        "human": {
+          "q": "Burada bir insan mı yanıtlıyor, bot mu?",
+          "a": "Bir insan. Alındı onayı otomatiktir, sonrasındaki hiçbir şey değil. Yapay zekâmız değerlendirmede çalışır, posta kutusunda değil."
+        },
+        "legal": {
+          "q": "Burada hukuki danışmanlık alır mıyım?",
+          "a": "Hayır. Ne hukuk bürosuyuz ne de mali müşavirlik. Durumunuza neyin uyduğunu düzenler ve denetlenmiş uzmanlara yönlendiririz — bağlayıcı danışmanlığı yalnızca onlar verebilir."
+        },
+        "data": {
+          "q": "Bilgilerime ne oluyor?",
+          "a": "Yalnızca talebinizi yanıtlamak için işleriz, bunun ötesinde değil. İstemediğiniz sürece bülten yok, reklam amacıyla aktarım yok. Ayrıntılar aydınlatma metnindedir."
+        },
+        "provider": {
+          "q": "Ben bir sağlayıcıyım — doğru yer burası mı?",
+          "a": "Evet, „Sağlayıcı olarak listelenmek“ yolundan. İnceleme için gereken belgelerle size döneriz."
+        }
+      }
+    },
+    "placeholders": {
+      "address": "posta adresi",
+      "phone": "telefon numarası",
+      "hours": "hizmet saatleri"
+    }
   }
 }

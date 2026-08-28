@@ -97,11 +97,15 @@ const COLUMNS: Column[] = [
       // the current stages (user decision 2026-08-28).
       { key: 'partner', href: '/platform' },
       { key: 'trustSecurity', href: '/ai-governance' },  // traegt selbst den Titel "Trust Center"
-      // TODO(contact-live): route contact AND support to the /contact page
-      // once it exists — it ships with placeholders first (user decision
-      // 2026-08-28), real channels and addresses still to be provided.
-      { key: 'contact' },
-      { key: 'support' },
+      // Beide zeigen auf DIESELBE Seite, und das ist Absicht: /contact sortiert
+      // nach Anliegen, nicht nach Abteilung — "Support" ist dort einer der vier
+      // Wege, nicht ein eigenes Ziel. Bis 2026-08-28 waren beide tote Eintraege
+      // ohne href.
+      // TODO(contact-live): echte Postfaecher, Anschrift, Telefonnummer und
+      // Servicezeiten stehen noch aus; die Seite zeigt sie als Platzhalter und
+      // haelt den Absendeweg offen, statt einen Versand vorzutaeuschen.
+      { key: 'contact', href: '/contact' },
+      { key: 'support', href: '/contact' },
     ],
   },
 ];

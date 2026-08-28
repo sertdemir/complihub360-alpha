@@ -1526,5 +1526,144 @@
       "title": "{{area}} — Obligations & Penalties | CompliHub360",
       "description": "Every {{area}} duty with the statute behind it, penalty exposure and filing deadlines per market. Matched to verified specialists."
     }
+  },
+  "contact": {
+    "hero": {
+      "eyebrow": "Contact and support",
+      "titlePre": "Tell us ",
+      "titleGold": "what it is about",
+      "titlePost": ".",
+      "lead": "One inbox for everything would be convenient for us and slow for you. Pick your topic — it goes to the people who can answer it.",
+      "facts": {
+        "ways": {
+          "value": "4 routes",
+          "note": "sorted by topic"
+        },
+        "day": {
+          "value": "1 business day",
+          "note": "for support and sales"
+        },
+        "human": {
+          "value": "No bot",
+          "note": "a person replies"
+        }
+      }
+    },
+    "lanes": {
+      "eyebrow": "Four routes",
+      "title": "Which route for which topic",
+      "lead": "Every route ends with people who can answer that specific thing. The address and the deadline are right there, so you never have to guess.",
+      "postal": "Postal address and phone:"
+    },
+    "lane": {
+      "support": {
+        "short": "Assessment",
+        "title": "Help with the assessment",
+        "desc": "A question is stuck, a result looks wrong, the account will not budge.",
+        "sla": "Reply the next business day",
+        "mailbox": "support@…"
+      },
+      "sales": {
+        "short": "Pricing",
+        "title": "Pricing and plans",
+        "desc": "Which plan fits, what a team costs, how invoicing works.",
+        "sla": "Reply the next business day",
+        "mailbox": "sales@…"
+      },
+      "partner": {
+        "short": "Providers",
+        "title": "Getting listed as a provider",
+        "desc": "A law firm, tax advisor or consultancy that wants to join the network.",
+        "sla": "Response within 3 business days",
+        "mailbox": "partner@…"
+      },
+      "privacy": {
+        "short": "Privacy",
+        "title": "Privacy and security",
+        "desc": "Access, erasure, data processing agreements, or reporting a vulnerability.",
+        "sla": "Deadline under Art. 12 GDPR",
+        "mailbox": "privacy@…"
+      }
+    },
+    "form": {
+      "eyebrow": "Message",
+      "title": "Write to us",
+      "lead": "One form for all four routes. Your selection decides where the message lands — no address to look up.",
+      "lane": "Your topic",
+      "name": "Name",
+      "namePlaceholder": "Your name",
+      "email": "E-mail",
+      "emailPlaceholder": "name@company.com",
+      "message": "What is it about?",
+      "messagePlaceholder": "The more specific, the faster the answer.",
+      "messageHelper": "Market, product and what you expected instead — that saves a round trip.",
+      "privacy": "We use what you write to answer you, nothing else. No newsletter unless you ask for one.",
+      "submit": "Send message",
+      "draftNote": "Preview: the sending route and the mailboxes on this page are not connected yet. Nothing leaves here until they are.",
+      "notWired": "Not sent yet — the sending route is still pending. Until then you can reach us at"
+    },
+    "faster": {
+      "eyebrow": "Possibly faster",
+      "title": "Three routes without waiting",
+      "assessment": {
+        "title": "The assessment often answers it sooner",
+        "desc": "Four to five questions and you see which duties your case triggers — no waiting for a reply.",
+        "cta": "Start the assessment"
+      },
+      "faq": {
+        "title": "The common questions are below",
+        "desc": "Who answers, what happens to your details, how providers are vetted.",
+        "cta": "Go to the questions"
+      },
+      "security": {
+        "title": "Found a security issue?",
+        "desc": "The Trust Center names the route to our security team and the rules we hold ourselves to.",
+        "cta": "Trust Center"
+      }
+    },
+    "after": {
+      "eyebrow": "After you send",
+      "ack": {
+        "title": "Receipt confirmation",
+        "when": "immediately"
+      },
+      "sort": {
+        "title": "A person sorts it",
+        "when": "same business day"
+      },
+      "answer": {
+        "title": "Substantive reply",
+        "when": "next business day"
+      },
+      "note": "If it takes longer, you get an interim note — no silent waiting."
+    },
+    "faq": {
+      "eyebrow": "Common questions",
+      "title": "Before you write",
+      "note": "Nothing here fits? The form above is the shortest way.",
+      "items": {
+        "human": {
+          "q": "Does a person answer, or a bot?",
+          "a": "A person. The receipt confirmation is automatic, nothing after it is. Our AI works inside the assessment, not in the inbox."
+        },
+        "legal": {
+          "q": "Do I get legal advice here?",
+          "a": "No. We are not a law firm and not a tax practice. We map what applies to your case and connect you to vetted professionals — only they may advise you bindingly."
+        },
+        "data": {
+          "q": "What happens to my details?",
+          "a": "We process them to answer your enquiry and for nothing beyond that. No newsletter unless you ask, no passing them on for advertising. The specifics are in the privacy policy."
+        },
+        "provider": {
+          "q": "I am a provider — is this the right place?",
+          "a": "Yes, via the “Getting listed as a provider” route. We will come back with the documents we need for the review."
+        }
+      }
+    },
+    "placeholders": {
+      "address": "postal address",
+      "phone": "phone number",
+      "hours": "service hours"
+    }
   }
 }

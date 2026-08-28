@@ -1526,5 +1526,144 @@
       "title": "{{area}} — Pflichten & Bußgelder | CompliHub360",
       "description": "Jede {{area}}-Pflicht mit Rechtsgrundlage, Bußgeldrisiko und Fristen je Markt. Vermittlung an geprüfte Spezialisten."
     }
+  },
+  "contact": {
+    "hero": {
+      "eyebrow": "Kontakt und Support",
+      "titlePre": "Sagen Sie uns, ",
+      "titleGold": "worum es geht",
+      "titlePost": ".",
+      "lead": "Ein Weg für alles wäre bequem für uns und langsam für Sie. Wählen Sie Ihr Anliegen — es landet bei den Menschen, die es beantworten können.",
+      "facts": {
+        "ways": {
+          "value": "4 Wege",
+          "note": "nach Anliegen sortiert"
+        },
+        "day": {
+          "value": "1 Werktag",
+          "note": "für Support und Vertrieb"
+        },
+        "human": {
+          "value": "Kein Bot",
+          "note": "es antwortet ein Mensch"
+        }
+      }
+    },
+    "lanes": {
+      "eyebrow": "Vier Wege",
+      "title": "Welcher Weg zu welchem Anliegen",
+      "lead": "Jeder Weg endet bei Menschen, die genau dazu antworten können. Adresse und Frist stehen dabei, damit Sie nicht raten müssen.",
+      "postal": "Postanschrift und Telefon:"
+    },
+    "lane": {
+      "support": {
+        "short": "Assessment",
+        "title": "Hilfe beim Assessment",
+        "desc": "Eine Frage hängt, ein Ergebnis wirkt falsch, das Konto klemmt.",
+        "sla": "Antwort am nächsten Werktag",
+        "mailbox": "support@…"
+      },
+      "sales": {
+        "short": "Preise",
+        "title": "Preise und Pläne",
+        "desc": "Welcher Plan passt, was ein Team kostet, wie Rechnungen laufen.",
+        "sla": "Antwort am nächsten Werktag",
+        "mailbox": "sales@…"
+      },
+      "partner": {
+        "short": "Anbieter",
+        "title": "Als Anbieter gelistet werden",
+        "desc": "Kanzlei, Steuerberatung oder Beratung, die in unser Netzwerk möchte.",
+        "sla": "Rückmeldung in 3 Werktagen",
+        "mailbox": "partner@…"
+      },
+      "privacy": {
+        "short": "Datenschutz",
+        "title": "Datenschutz und Sicherheit",
+        "desc": "Auskunft, Löschung, Auftragsverarbeitung oder die Meldung einer Lücke.",
+        "sla": "Frist nach Art. 12 DSGVO",
+        "mailbox": "datenschutz@…"
+      }
+    },
+    "form": {
+      "eyebrow": "Nachricht",
+      "title": "Schreiben Sie uns",
+      "lead": "Ein Formular für alle vier Wege. Die Auswahl entscheidet, wo Ihre Nachricht landet — Sie müssen keine Adresse suchen.",
+      "lane": "Ihr Anliegen",
+      "name": "Name",
+      "namePlaceholder": "Ihr Name",
+      "email": "E-Mail",
+      "emailPlaceholder": "name@firma.de",
+      "message": "Worum geht es?",
+      "messagePlaceholder": "Je konkreter, desto schneller die Antwort.",
+      "messageHelper": "Markt, Produkt und was Sie erwartet hätten — das spart eine Rückfrage.",
+      "privacy": "Wir nutzen Ihre Angaben nur zur Beantwortung. Kein Newsletter ohne Ihr Zutun.",
+      "submit": "Nachricht senden",
+      "draftNote": "Vorschau: Der Versandweg und die Postfächer dieser Seite sind noch nicht angebunden. Bis dahin geht hier nichts hinaus.",
+      "notWired": "Noch nicht abgeschickt — der Versandweg steht noch aus. Bis dahin erreichen Sie uns unter"
+    },
+    "faster": {
+      "eyebrow": "Vielleicht schneller",
+      "title": "Drei Wege ohne Warten",
+      "assessment": {
+        "title": "Das Assessment beantwortet es oft schneller",
+        "desc": "Vier bis fünf Fragen, und Sie sehen, welche Pflichten Ihr Fall auslöst — ohne auf eine Antwort zu warten.",
+        "cta": "Assessment starten"
+      },
+      "faq": {
+        "title": "Die häufigsten Fragen stehen unten",
+        "desc": "Wer antwortet, was mit Ihren Angaben passiert, wie Anbieter geprüft werden.",
+        "cta": "Zu den Fragen"
+      },
+      "security": {
+        "title": "Eine Sicherheitslücke gefunden?",
+        "desc": "Das Trust Center nennt den Weg zu unserem Sicherheitsteam und die Regeln, an die wir uns binden.",
+        "cta": "Trust Center"
+      }
+    },
+    "after": {
+      "eyebrow": "Nach dem Absenden",
+      "ack": {
+        "title": "Eingangsbestätigung",
+        "when": "sofort"
+      },
+      "sort": {
+        "title": "Ein Mensch sortiert",
+        "when": "selber Werktag"
+      },
+      "answer": {
+        "title": "Fachliche Antwort",
+        "when": "nächster Werktag"
+      },
+      "note": "Dauert es länger, bekommen Sie eine Zwischennachricht — kein stilles Warten."
+    },
+    "faq": {
+      "eyebrow": "Häufige Fragen",
+      "title": "Bevor Sie schreiben",
+      "note": "Keine passende Frage dabei? Das Formular oben ist der kürzeste Weg.",
+      "items": {
+        "human": {
+          "q": "Antwortet hier ein Mensch oder ein Bot?",
+          "a": "Ein Mensch. Die Eingangsbestätigung ist automatisch, alles danach nicht. Unsere KI arbeitet im Assessment, nicht im Postfach."
+        },
+        "legal": {
+          "q": "Bekomme ich hier Rechtsauskunft?",
+          "a": "Nein. Wir sind keine Kanzlei und keine Steuerberatung. Wir ordnen ein, was für Ihren Fall gilt, und vermitteln an geprüfte Fachleute — verbindlich beraten dürfen nur die."
+        },
+        "data": {
+          "q": "Was passiert mit meinen Angaben?",
+          "a": "Wir verarbeiten sie zur Beantwortung Ihrer Anfrage und nicht darüber hinaus. Kein Newsletter ohne Ihr Zutun, keine Weitergabe zu Werbezwecken. Die Einzelheiten stehen in der Datenschutzerklärung."
+        },
+        "provider": {
+          "q": "Ich bin Anbieter — geht das auch hier?",
+          "a": "Ja, über den Weg „Als Anbieter gelistet werden“. Wir melden uns mit den Unterlagen, die wir für die Prüfung brauchen."
+        }
+      }
+    },
+    "placeholders": {
+      "address": "Anschrift",
+      "phone": "Telefonnummer",
+      "hours": "Servicezeiten"
+    }
   }
 }

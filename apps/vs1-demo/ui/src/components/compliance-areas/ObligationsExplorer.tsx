@@ -6,6 +6,7 @@ import { Typography } from '../ui/Typography';
 import { RiskBadge } from '../ui/RiskBadge';
 import { getAreaObligations, type AreaObligation } from '../../lib/areaProfiles';
 import { RailDossier } from './RailDossier';
+import { Segment } from './Segment';
 import { AREA_BY_SLUG } from './areas';
 import type { DomainSlug } from '../../lib/domains';
 import { SEVERITY_FALLBACK, SEVERITY_STYLE, severityKey } from './severity';
@@ -179,7 +180,7 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                 {/* Touching a filter is taking over, same as clicking a row —
                     the auto-run must not fight a reader who just narrowed the
                     list. */}
-                <ValiditySegment
+                <Segment
                   selected={validity === 'all'}
                   onClick={() => {
                     setPicked(true);
@@ -187,8 +188,8 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                   }}
                 >
                   {t('compliance.area.validityAll', 'All {{count}}', { count: all.length })}
-                </ValiditySegment>
-                <ValiditySegment
+                </Segment>
+                <Segment
                   selected={validity === 'now'}
                   onClick={() => {
                     setPicked(true);
@@ -198,8 +199,8 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                   {t('compliance.area.validityNow', 'Applies today · {{count}}', {
                     count: liveNow.length,
                   })}
-                </ValiditySegment>
-                <ValiditySegment
+                </Segment>
+                <Segment
                   selected={validity === 'later'}
                   onClick={() => {
                     setPicked(true);
@@ -214,7 +215,7 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                     : t('compliance.area.validityLater', 'Later · {{count}}', {
                         count: later.length,
                       })}
-                </ValiditySegment>
+                </Segment>
               </div>
             )}
             </>
@@ -464,30 +465,3 @@ function Fact({
   );
 }
 
-// A segmented control, not a FilterChip: these three are one choice with three
-// states, and the chip's pill shape reads as an independent toggle. The canvas
-// draws them square, dark when selected, outlined when not.
-function ValiditySegment({
-  selected,
-  onClick,
-  children,
-}: {
-  selected: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      aria-pressed={selected}
-      onClick={onClick}
-      className={`rounded-lg px-3.5 py-2 text-body-xs font-semibold tabular-nums transition-colors ${
-        selected
-          ? 'bg-fg text-surface'
-          : 'border border-stroke bg-surface text-fg-secondary hover:border-stroke-strong hover:text-fg'
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
