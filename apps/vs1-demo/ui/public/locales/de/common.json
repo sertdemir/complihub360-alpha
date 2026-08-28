@@ -1323,7 +1323,14 @@
       "rangeLabel": "Honorarschätzung",
       "range": "180–240 €",
       "perHour": "/ Stunde",
-      "published": "veröffentlicht vor dem Erstkontakt"
+      "published": "veröffentlicht vor dem Erstkontakt",
+      "billTitle": "Abrechnung des Partners",
+      "billListing": "Eintrag im Verzeichnis",
+      "billProfile": "Profilaufruf",
+      "billClick": "Klick aufs Profil",
+      "billBooked": "Bestätigter Termin",
+      "billDue": "Gebühr fällig",
+      "billFoot": "Ihnen wird zu keinem Zeitpunkt etwas berechnet."
     },
     "faq": {
       "eyebrow": "Häufige Fragen",

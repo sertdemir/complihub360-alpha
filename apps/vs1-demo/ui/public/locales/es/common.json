@@ -1323,7 +1323,14 @@
       "rangeLabel": "Estimación de honorarios",
       "range": "180–240 €",
       "perHour": "/ hora",
-      "published": "publicada antes del primer contacto"
+      "published": "publicada antes del primer contacto",
+      "billTitle": "La factura del partner",
+      "billListing": "Entrada en el directorio",
+      "billProfile": "Visita al perfil",
+      "billClick": "Clic en el perfil",
+      "billBooked": "Cita confirmada",
+      "billDue": "comisión debida",
+      "billFoot": "A usted no se le cobra nada en ningún momento."
     },
     "faq": {
       "eyebrow": "Preguntas frecuentes",

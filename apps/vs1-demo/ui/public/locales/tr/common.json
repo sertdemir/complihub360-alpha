@@ -1323,7 +1323,14 @@
       "rangeLabel": "Ücret tahmini",
       "range": "180–240 €",
       "perHour": "/ saat",
-      "published": "ilk temastan önce yayımlanır"
+      "published": "ilk temastan önce yayımlanır",
+      "billTitle": "Partnerin faturası",
+      "billListing": "Dizin kaydı",
+      "billProfile": "Profil görüntüleme",
+      "billClick": "Profile tıklama",
+      "billBooked": "Onaylanmış randevu",
+      "billDue": "ücret tahakkuk eder",
+      "billFoot": "Sizden hiçbir aşamada ücret alınmaz."
     },
     "faq": {
       "eyebrow": "Sık sorulan sorular",

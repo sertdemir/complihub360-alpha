@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Check, Lock, Minus, Plus } from 'lucide-react';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
@@ -58,150 +58,268 @@ function SlideIn({
   );
 }
 
-// ─── Teaser vignettes (decorative) ───────────────────────────────────────────
+// ─── Teaser vignettes (decorative, but honest) ───────────────────────────────
+// Redrawn with P3 Variante A (2026-08-28): real dossier cards with real text
+// on the Gradient panels instead of grey skeleton mockups on tinted bands.
+// Each card ANIMATES its own argument once in view (user ask): the partner's
+// bill staggers its 0-€ rows towards the one line that costs, the ranking
+// counts its match scores up while the bars grow, and the fee card lifts in.
+// They stay aria-hidden — every claim they draw is stated in the copy beside
+// them.
 
-function BookingVignette() {
+/** A number easing towards its target once `run` is true — the KPI cards' move. */
+function useCountUp(to: number, run: boolean) {
+  const reduced = useReducedMotion();
+  const [v, setV] = useState(reduced ? to : 0);
+  useEffect(() => {
+    if (!run || reduced) return;
+    let raf = 0;
+    const t0 = performance.now();
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - t0) / 800);
+      setV(Math.round(p * to));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [run, to, reduced]);
+  return run || reduced ? v : 0;
+}
+
+function VignetteRow({
+  inView,
+  delay,
+  children,
+  className = '',
+}: {
+  inView: boolean;
+  delay: number;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const reduced = useReducedMotion();
+  return (
+    <motion.div
+      initial={reduced ? false : { opacity: 0, y: 10 }}
+      animate={inView || reduced ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.4, ease: 'easeOut', delay }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function PartnerBillVignette() {
   const { t } = useTranslation('common');
+  const [ref, inView] = useInViewOnce<HTMLDivElement>('-60px');
+  const rows = [
+    { key: 'listing', label: t('pricing.vignette.billListing', 'Directory listing') },
+    { key: 'profile', label: t('pricing.vignette.billProfile', 'Profile view') },
+    { key: 'click', label: t('pricing.vignette.billClick', 'Click on the profile') },
+  ];
   return (
     <div
+      ref={ref}
       aria-hidden="true"
-      className="flex h-[340px] w-full items-center justify-center rounded-xl border border-stroke bg-surface desktop-s:w-[520px]"
+      className="w-[340px] max-w-full overflow-hidden rounded-xl bg-surface shadow-[0_34px_80px_-30px_rgba(2,22,17,0.4)] dark:bg-surface-secondary"
     >
-      <div className="w-[300px] rounded-xl border border-stroke bg-surface p-6 shadow-[0_12px_32px_rgba(15,23,42,0.07)]">
-        <div className="flex items-center gap-3">
-          <div className="h-[38px] w-[38px] rounded-full bg-primary-50" />
-          <div className="flex flex-col gap-1.5">
-            <div className="h-[9px] w-[130px] rounded-[5px] bg-stroke" />
-            <div className="h-2 w-[90px] rounded-[5px] bg-stroke-subtle" />
-          </div>
-        </div>
-        <div className="mt-5 flex flex-col gap-2.5 border-t border-dashed border-stroke pt-4">
-          <div className="flex justify-between text-body-xs text-fg-tertiary">
-            <span>{t('pricing.vignette.confirmed')}</span>
-            <Check size={14} className="text-fg-brand" />
-          </div>
-          <div className="flex justify-between text-body-xs text-fg-tertiary">
-            <span>{t('pricing.vignette.yourCost')}</span>
-            <span className="font-bold text-fg">0 €</span>
-          </div>
-          <div className="flex justify-between text-body-xs text-fg-tertiary">
-            <span>{t('pricing.vignette.fee')}</span>
-            <span className="font-semibold">{t('pricing.vignette.feePaidBy')}</span>
-          </div>
-        </div>
+      <div className="border-b border-stroke-subtle px-5 py-3 text-body-4xs font-extrabold uppercase tracking-[0.12em] text-fg-tertiary">
+        {t('pricing.vignette.billTitle', "The partner's bill")}
       </div>
+      <div className="px-5 py-2">
+        {rows.map((r, i) => (
+          <VignetteRow
+            key={r.key}
+            inView={inView}
+            delay={0.15 + i * 0.18}
+            className={`flex items-baseline justify-between gap-3 py-2 ${i > 0 ? 'border-t border-stroke-subtle' : ''}`}
+          >
+            <span className="text-body-2xs text-fg-tertiary">{r.label}</span>
+            <span className="text-body-2xs font-bold tabular-nums text-fg">0 €</span>
+          </VignetteRow>
+        ))}
+        {/* The payoff lands last: the one line on the bill that costs. */}
+        <VignetteRow
+          inView={inView}
+          delay={0.8}
+          className="flex items-baseline justify-between gap-3 border-t border-stroke-subtle py-2.5"
+        >
+          <span className="text-body-2xs font-bold text-fg">
+            {t('pricing.vignette.billBooked', 'Confirmed appointment')}
+          </span>
+          <span className="inline-flex items-center gap-1.5 text-body-2xs font-bold text-fg-brand">
+            <Check size={13} aria-hidden />
+            {t('pricing.vignette.billDue', 'fee due')}
+          </span>
+        </VignetteRow>
+      </div>
+      <p className="border-t border-stroke-subtle bg-surface-secondary px-5 py-2.5 text-body-3xs leading-relaxed text-fg-tertiary dark:bg-white/[0.04]">
+        {t('pricing.vignette.billFoot', 'You are never charged at any point.')}
+      </p>
     </div>
+  );
+}
+
+function RankingRow({
+  rank,
+  pct,
+  barWidth,
+  lead,
+  inView,
+  delay,
+}: {
+  rank: number;
+  pct: number;
+  barWidth: string;
+  lead: boolean;
+  inView: boolean;
+  delay: number;
+}) {
+  const { t } = useTranslation('common');
+  const value = useCountUp(pct, inView);
+  return (
+    <VignetteRow
+      inView={inView}
+      delay={delay}
+      className={`flex items-center gap-3.5 rounded-xl border bg-surface px-4 py-3 dark:bg-surface-secondary ${
+        lead ? 'border-primary-200' : 'border-stroke-subtle'
+      }`}
+    >
+      <span className={`font-serif text-body font-bold ${lead ? 'text-fg-brand' : 'text-fg-tertiary'}`}>
+        {rank}
+      </span>
+      {/* The name stays a bar on purpose — anonymity before contact is the
+          product's own promise; the bar just measures in petrol now. */}
+      <span className="h-2 overflow-hidden rounded-full bg-brand/10" style={{ width: barWidth }}>
+        <span
+          className="block h-full rounded-full bg-brand/35 transition-[width] duration-700 ease-out"
+          style={{ width: inView ? '100%' : 0, transitionDelay: `${delay * 1000}ms` }}
+        />
+      </span>
+      <span
+        className={`ml-auto rounded-full px-2.5 py-1 text-body-3xs font-semibold tabular-nums ${
+          lead ? 'bg-brand-light/60 text-fg-brand' : 'bg-surface-tertiary text-fg-tertiary'
+        }`}
+      >
+        {t('pricing.vignette.match', { pct: value })}
+      </span>
+    </VignetteRow>
   );
 }
 
 function RankingVignette() {
   const { t } = useTranslation('common');
+  const [ref, inView] = useInViewOnce<HTMLDivElement>('-60px');
   const rows = [
-    { pct: 98, w: 'w-[150px]', lead: true },
-    { pct: 91, w: 'w-[120px]', lead: false },
-    { pct: 87, w: 'w-[135px]', lead: false },
+    { pct: 98, w: '9.375rem', lead: true },
+    { pct: 91, w: '7.375rem', lead: false },
+    { pct: 87, w: '8.25rem', lead: false },
   ];
   return (
-    <div
-      aria-hidden="true"
-      className="flex h-[340px] w-full items-center justify-center rounded-xl border border-stroke-subtle bg-surface-secondary desktop-s:w-[520px]"
-    >
-      <div className="flex w-[320px] flex-col gap-3">
-        {rows.map((r, i) => (
-          <div
-            key={r.pct}
-            className={`flex items-center gap-3.5 rounded-xl border bg-surface px-4 py-3.5 ${
-              r.lead ? 'border-primary-100' : 'border-stroke'
-            }`}
-          >
-            <span className={`font-serif text-body font-bold ${r.lead ? 'text-fg-brand' : 'text-fg-tertiary'}`}>
-              {i + 1}
-            </span>
-            <div className={`h-[9px] rounded-[5px] bg-stroke ${r.w}`} />
-            <span
-              className={`ml-auto rounded-full px-2.5 py-1 text-body-3xs font-semibold ${
-                r.lead ? 'bg-primary-50 text-fg-brand' : 'bg-surface-tertiary text-fg-tertiary'
-              }`}
-            >
-              {t('pricing.vignette.match', { pct: r.pct })}
-            </span>
-          </div>
-        ))}
-        <div className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-stroke px-4 py-3 text-body-2xs font-medium text-fg-tertiary">
-          <Lock size={13} />
-          {t('pricing.vignette.noSlot')}
-        </div>
-      </div>
+    <div ref={ref} aria-hidden="true" className="flex w-[340px] max-w-full flex-col gap-2.5">
+      {rows.map((r, i) => (
+        <RankingRow
+          key={r.pct}
+          rank={i + 1}
+          pct={r.pct}
+          barWidth={r.w}
+          lead={r.lead}
+          inView={inView}
+          delay={0.15 + i * 0.18}
+        />
+      ))}
+      {/* The dashed slot arrives last: the one place money cannot buy. */}
+      <VignetteRow
+        inView={inView}
+        delay={0.75}
+        className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-stroke bg-surface/60 px-4 py-2.5 text-body-2xs font-semibold text-fg-tertiary"
+      >
+        <Lock size={13} aria-hidden />
+        {t('pricing.vignette.noSlot')}
+      </VignetteRow>
     </div>
   );
 }
 
 function FeeVignette() {
   const { t } = useTranslation('common');
+  const [ref, inView] = useInViewOnce<HTMLDivElement>('-60px');
   return (
     <div
+      ref={ref}
       aria-hidden="true"
-      className="flex h-[340px] w-full items-center justify-center rounded-xl border border-stroke bg-surface desktop-s:w-[520px]"
+      className="w-[340px] max-w-full overflow-hidden rounded-xl bg-surface shadow-[0_34px_80px_-30px_rgba(2,22,17,0.4)] dark:bg-surface-secondary"
     >
-      <div className="w-[320px] overflow-hidden rounded-xl border border-stroke bg-surface shadow-[0_12px_32px_rgba(15,23,42,0.07)]">
-        <div className="flex items-center gap-3 border-b border-stroke-subtle px-6 py-5">
-          <div className="h-[38px] w-[38px] rounded-full bg-primary-50" />
-          <div className="flex flex-col gap-1.5">
-            <div className="h-[9px] w-[120px] rounded-[5px] bg-stroke" />
-            <span className="text-body-3xs font-semibold uppercase tracking-[0.08em] text-accent-700">
-              {t('pricing.vignette.verified')}
-            </span>
-          </div>
-        </div>
-        <div className="flex flex-col gap-1.5 px-6 py-5">
-          <span className="text-body-2xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary">
-            {t('pricing.vignette.rangeLabel')}
+      <div className="flex items-center gap-3 border-b border-stroke-subtle px-5 py-4">
+        <div className="h-9 w-9 rounded-full bg-brand-light/70" />
+        <div className="flex flex-col gap-1.5">
+          <div className="h-2 w-[7.5rem] rounded-full bg-brand/15" />
+          <span className="text-body-4xs font-extrabold uppercase tracking-[0.1em] text-accent-700 dark:text-fg-accent-strong">
+            {t('pricing.vignette.verified')}
           </span>
-          <span className="font-serif text-h2 font-bold tabular-nums text-fg">
+        </div>
+      </div>
+      <div className="px-5 py-4">
+        <span className="text-body-4xs font-extrabold uppercase tracking-[0.1em] text-fg-tertiary">
+          {t('pricing.vignette.rangeLabel')}
+        </span>
+        <VignetteRow inView={inView} delay={0.3}>
+          <span className="mt-1.5 block font-serif text-[1.875rem] font-bold leading-tight tabular-nums text-fg">
             {t('pricing.vignette.range')}{' '}
             <span className="font-sans text-body-xs font-medium text-fg-tertiary">
               {t('pricing.vignette.perHour')}
             </span>
           </span>
-          <span className="text-body-2xs text-fg-tertiary">{t('pricing.vignette.published')}</span>
-        </div>
+        </VignetteRow>
+        <VignetteRow inView={inView} delay={0.55}>
+          <span className="mt-1 block text-body-2xs text-fg-tertiary">
+            {t('pricing.vignette.published')}
+          </span>
+        </VignetteRow>
       </div>
     </div>
   );
 }
 
-// ─── Teaser row (text + vignette, alternating) ───────────────────────────────
+// ─── Teaser row (text + Gradient panel, alternating) ─────────────────────────
+// The tinted full-bleed bands retired with P3 Variante A: each statement is a
+// Gradient-panel pair now — copy on one side, the animated dossier card
+// standing on the tinted panel — the same anatomy the area and market
+// sections speak. The pair still slides together from both sides.
 
 function Teaser({
   base,
   vignette,
   imageLeft = false,
-  tinted = false,
 }: {
   base: 'who' | 'ranking' | 'specialist';
   vignette: React.ReactNode;
   imageLeft?: boolean;
-  tinted?: boolean;
 }) {
   const { t } = useTranslation('common');
   const text = (
-    <SlideIn from={imageLeft ? 'right' : 'left'} className="min-w-0 flex-1">
+    <SlideIn from={imageLeft ? 'right' : 'left'} className="min-w-0 shrink-0 desktop-s:w-[400px]">
       <SectionEyebrow tone="brand">{t(`pricing.${base}.kicker`)}</SectionEyebrow>
-      <h2 className="mt-3 font-serif text-h1 font-semibold text-fg">{t(`pricing.${base}.title`)}</h2>
-      <p className="mt-4 max-w-[52ch] text-body leading-relaxed text-fg-secondary">
+      <h2 className="mt-3 font-serif text-[1.625rem] font-bold leading-snug text-fg">
+        {t(`pricing.${base}.title`)}
+      </h2>
+      <p className="mt-3.5 text-body leading-relaxed text-fg-secondary">
         {t(`pricing.${base}.body`)}
       </p>
     </SlideIn>
   );
   const image = (
-    <SlideIn from={imageLeft ? 'left' : 'right'} className="w-full shrink-0 desktop-s:w-auto">
-      {vignette}
+    <SlideIn from={imageLeft ? 'left' : 'right'} className="min-w-0 w-full desktop-s:flex-1">
+      <div className="flex justify-center rounded-xl bg-gradient-stage px-5 py-9 sm:px-7">
+        {vignette}
+      </div>
     </SlideIn>
   );
   return (
-    <section className={tinted ? 'border-y border-stroke-subtle bg-surface-secondary' : 'bg-surface'}>
+    <section className="bg-surface">
       <Container size="xl">
-        <div className="flex flex-col gap-12 py-20 desktop-s:flex-row desktop-s:items-center desktop-s:gap-24 desktop-s:py-[5.5rem]">
+        <div className="flex flex-col gap-10 py-12 desktop-s:flex-row desktop-s:items-center desktop-s:gap-14 desktop-s:py-14">
           {imageLeft ? (
             <>
               <div className="hidden desktop-s:contents">{image}</div>
@@ -401,10 +519,10 @@ export function PricingPage() {
         </Container>
       </section>
 
-      {/* ── Three teasers, text and image alternating ─────────────────────── */}
-      <Teaser base="who" vignette={<BookingVignette />} tinted />
+      {/* ── Three teasers, text and animated card alternating ─────────────── */}
+      <Teaser base="who" vignette={<PartnerBillVignette />} />
       <Teaser base="ranking" vignette={<RankingVignette />} imageLeft />
-      <Teaser base="specialist" vignette={<FeeVignette />} tinted />
+      <Teaser base="specialist" vignette={<FeeVignette />} />
 
       {/* ── FAQ ───────────────────────────────────────────────────────────── */}
       {/* The id is the hero's secondary CTA target — scroll-mt clears the

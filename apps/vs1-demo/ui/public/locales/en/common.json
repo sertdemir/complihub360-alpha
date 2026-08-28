@@ -1323,7 +1323,14 @@
       "rangeLabel": "Fee estimate",
       "range": "€180–240",
       "perHour": "/ hour",
-      "published": "published before first contact"
+      "published": "published before first contact",
+      "billTitle": "The partner's bill",
+      "billListing": "Directory listing",
+      "billProfile": "Profile view",
+      "billClick": "Click on the profile",
+      "billBooked": "Confirmed appointment",
+      "billDue": "fee due",
+      "billFoot": "You are never charged at any point."
     },
     "faq": {
       "eyebrow": "Common questions",
