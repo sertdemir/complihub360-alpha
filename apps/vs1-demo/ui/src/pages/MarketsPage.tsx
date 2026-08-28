@@ -142,7 +142,9 @@ function MarketsKpiCard({ markets }: { markets: ReturnType<typeof listMarkets> }
 export function MarketsIndexPage() {
   const { t } = useTranslation('common');
   const { locale } = useParams();
+  const navigate = useNavigate();
   const markets = listMarkets();
+  const localePrefix = locale ? `/${locale}` : '';
 
   return (
     <main className="bg-surface">
@@ -150,7 +152,10 @@ export function MarketsIndexPage() {
           Variante A, 2026-08-28) — the hub hero's anatomy. Unlike the hub
           this page has no picker card to balance, so the copy holds the
           center and the KPI card below clamps hero and grid together. */}
-      <section className="bg-gradient-stage pb-24 pt-32 lg:pb-28 lg:pt-40">
+      {/* All marketing heroes share one desktop height (user ask 2026-08-28,
+          homepage excepted) — the hub hero's natural 613px is the reference;
+          justify-center spreads the shorter copy into the stretched band. */}
+      <section className="flex flex-col justify-center bg-gradient-stage pb-24 pt-32 lg:min-h-[38.3125rem] lg:pb-28 lg:pt-40">
         <Container size="xl">
           <Reveal className="mx-auto flex max-w-[760px] flex-col items-center gap-4 text-center">
             <SectionEyebrow tone="brand">{t('markets.index.eyebrow')}</SectionEyebrow>
@@ -303,6 +308,40 @@ export function MarketsIndexPage() {
           </div>
         </Container>
       </section>
+
+      {/* ── The close · the hub's light orchestration block (user ask
+          2026-08-28) — same section, same spot as on the hub and the area
+          pages: steps, then the generic assessment row behind a hairline,
+          right above the site-wide NewsletterBand in the footer. No market
+          is chosen yet, so the CTA stays the hub's generic wizard entry. */}
+      <Section className="py-10 desktop-s:py-12" spacing="none">
+        <HowOrchestrationWorks
+          cta={
+            <div className="flex flex-col gap-6 desktop-s:flex-row desktop-s:items-center desktop-s:justify-between desktop-s:gap-10">
+              <div className="max-w-[560px]">
+                <h3 className="font-serif text-[1.375rem] font-bold leading-snug text-fg">
+                  {t('compliance.howItWorks.hubCta.title', 'Ready to see what applies to you?')}
+                </h3>
+                <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">
+                  {t(
+                    'compliance.howItWorks.hubCta.lead',
+                    'The assessment narrows the eight areas down to your business, your markets and your product — in under five minutes.',
+                  )}
+                </p>
+              </div>
+              <Button
+                size="lg"
+                variant="primary"
+                className="shrink-0"
+                onClick={() => navigate(`${localePrefix}/wizard`)}
+              >
+                {t('compliance.howItWorks.hubCta.btn', 'Start an assessment')}
+                <ArrowRight size={17} className="ml-1.5" />
+              </Button>
+            </div>
+          }
+        />
+      </Section>
 
       <SiteFooter />
     </main>
@@ -498,39 +537,36 @@ export function MarketPage() {
         <RelatedMarkets profile={profile} />
       </Section>
 
-      {/* ── 6 · The close · same band as the area page, deliberately ─────── */}
-      <section className="bg-primary-700 py-16 desktop-s:py-20">
-        <Container size="xl">
-          <HowOrchestrationWorks tone="inverse" />
-          <div className="mt-[3.5rem] border-t border-white/[0.14] pt-[2.5rem]">
-            <div className="flex flex-col gap-6 desktop-s:flex-row desktop-s:items-center desktop-s:justify-between desktop-s:gap-12">
+      {/* ── 6 · The close · the hub's light orchestration block (user ask
+          2026-08-28) — the dark petrol band retires here as it did on the
+          area pages: same section, same spot, right above the site-wide
+          NewsletterBand. Only the content stays this page's: the CTA narrows
+          THIS market, and the button carries its name. */}
+      <Section className="py-10 desktop-s:py-12" spacing="none">
+        <HowOrchestrationWorks
+          cta={
+            <div className="flex flex-col gap-6 desktop-s:flex-row desktop-s:items-center desktop-s:justify-between desktop-s:gap-10">
               <div className="max-w-[560px]">
-                <Typography variant="h3" as="h2" weight="bold" className="text-white">
+                <h3 className="font-serif text-[1.375rem] font-bold leading-snug text-fg">
                   {t('compliance.area.ctaTitle', 'Ready to see what applies to you?')}
-                </Typography>
-                <Typography variant="body" className="mt-2 leading-relaxed text-primary-100">
+                </h3>
+                <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">
                   {t('markets.country.ctaBody', {
                     defaultValue:
                       'The assessment narrows this market to your business, your product and your areas — in under five minutes.',
                   })}
-                </Typography>
+                </p>
               </div>
-              <Button
-                variant="inverse"
-                size="xl"
-                shape="soft"
-                className="shrink-0 self-start desktop-s:self-auto"
-                onClick={startAssessment}
-              >
+              <Button size="lg" variant="primary" className="shrink-0" onClick={startAssessment}>
                 {t('markets.country.startAssessment', 'Start the assessment for {{market}}', {
                   market: country,
                 })}
                 <ArrowRight size={17} className="ml-1.5" />
               </Button>
             </div>
-          </div>
-        </Container>
-      </section>
+          }
+        />
+      </Section>
 
       <SiteFooter />
     </main>

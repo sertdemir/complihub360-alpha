@@ -79,7 +79,10 @@ export function HowItWorksPage() {
           Routen-Dossier", 2026-08-26): copy standing left on the tint with the
           primary CTA and the quiet meta line, the five stages as a white
           dossier card on the right — the page as an itinerary. */}
-      <section className="bg-gradient-stage px-4 pb-16 pt-32 md:px-6 lg:px-10 lg:pb-24 lg:pt-40">
+      {/* Bottom padding trimmed to land this hero on the shared 613px desktop
+          height of every marketing hero (user ask 2026-08-28, hub = reference);
+          the min-h floor keeps it there if the copy ever shortens. */}
+      <section className="flex flex-col justify-center bg-gradient-stage px-4 pb-16 pt-32 md:px-6 lg:min-h-[38.3125rem] lg:px-10 lg:pb-[3.25rem] lg:pt-40">
         <div className="mx-auto flex max-w-[1180px] flex-col gap-12 lg:flex-row lg:items-center lg:gap-[76px]">
           <Reveal className="min-w-0 flex-1">
             <SectionEyebrow tone="brand">{t('howItWorks.eyebrow')}</SectionEyebrow>

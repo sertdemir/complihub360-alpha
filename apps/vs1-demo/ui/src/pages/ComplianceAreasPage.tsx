@@ -135,7 +135,10 @@ export function ComplianceAreasPage() {
           gold closing line, the homepage hero's language — and the market
           picker as a white card right. The header is fixed and 81px tall at
           lg; pt-32/pt-40 clears it, as on /how-it-works. */}
-      <section className="bg-gradient-stage pb-24 pt-32 lg:pb-28 lg:pt-40">
+      {/* lg:min-h pins the shared marketing-hero height (user ask 2026-08-28):
+          613px is THIS hero's natural desktop height, so the floor changes
+          nothing here — it makes this the reference the other pages match. */}
+      <section className="flex flex-col justify-center bg-gradient-stage pb-24 pt-32 lg:min-h-[38.3125rem] lg:pb-28 lg:pt-40">
         <Container gutter="flat" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-[60px]">
           <Reveal className="min-w-0 max-w-[680px]">
             <SectionEyebrow tone="brand">{t('compliance.heroOverline', 'Compliance Areas')}</SectionEyebrow>
