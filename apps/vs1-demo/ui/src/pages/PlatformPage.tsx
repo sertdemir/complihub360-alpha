@@ -195,7 +195,10 @@ export function PlatformPage() {
             Flaeche steht erst im Schluss darunter. */}
         <section className="bg-surface pb-20 lg:pb-24">
           <Container size="xl">
-            <Reveal className="mx-auto max-w-[660px] text-center">
+            {/* Linksbuendig wie die Koepfe der Sektionen darueber (Nutzer-
+                Hinweis 2026-08-28) — nur der Leitsatz unter den Karten bleibt
+                zentriert, der steht bewusst mittig zwischen den Gold-Hairlines. */}
+            <Reveal className="max-w-[660px]">
               <SectionEyebrow tone="brand">{t('platform.rules.eyebrow')}</SectionEyebrow>
               <h2 className="mt-2.5 font-serif text-[1.75rem] font-bold leading-tight tracking-tight text-fg lg:text-[2rem]">
                 {t('platform.rules.title')}
