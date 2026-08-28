@@ -1,0 +1,21 @@
+{
+  "name": "complihub",
+  "description": "CompliHub360 interne Plugins. Nur CompliHub360 — Cosmo Consult hat einen eigenen Marketplace.",
+  "owner": {
+    "name": "CompliHub360"
+  },
+  "plugins": [
+    {
+      "name": "complihub-loops",
+      "source": "./plugins/complihub-loops",
+      "displayName": "CompliHub Loops",
+      "description": "Loop Engineering und Gauntlet-Loops fuer CompliHub360. Verankert Compass als Design-System-Autoritaet und erzwingt binaer pruefbare Stop-Bedingungen.",
+      "version": "0.1.0",
+      "category": "workflow",
+      "keywords": ["loop", "gauntlet", "compass", "quality", "complihub360"],
+      "author": {
+        "name": "CompliHub360"
+      }
+    }
+  ]
+}
