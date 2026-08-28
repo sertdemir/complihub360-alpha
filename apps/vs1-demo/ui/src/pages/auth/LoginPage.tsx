@@ -357,8 +357,8 @@ export function LoginPage() {
                             {isDemoLoginEnabled && <DemoLoginRow role="user" onEnter={finishLogin} />}
                             <p className="mt-6 text-center text-body-sm text-fg-secondary">
                                 {t("login.user.newHere")}{" "}
-                                <button type="button" onClick={() => navigate(`/${lang}/wizard`)} className="font-semibold text-brand transition-colors hover:text-brand-700">
-                                    {t("login.user.startRiskMap")}
+                                <button type="button" onClick={() => navigate(`/${lang}/register`)} className="font-semibold text-brand transition-colors hover:text-brand-700">
+                                    {t("login.user.createAccount")}
                                 </button>
                             </p>
                             <p className="mt-7 text-center text-body-2xs leading-relaxed text-fg-tertiary">{t("login.user.legal")}</p>

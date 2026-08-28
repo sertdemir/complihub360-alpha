@@ -37,6 +37,7 @@ export interface MarketingHeaderProps {
   /** Locale-aware home link on the logo. */
   userHref?: string;
   loginHref?: string;
+  signupHref?: string;
   /** Theme over a dark hero (white logo + nav). */
   theme?: 'light' | 'inverse';
   /** Render in normal flow (relative) instead of fixed — for showcases / embeds. */
@@ -59,6 +60,7 @@ export function MarketingHeader({
   links,
   userHref = '/',
   loginHref = '/login',
+  signupHref = '/register',
   theme = 'light',
   embedded = false,
 }: MarketingHeaderProps) {
@@ -153,6 +155,14 @@ export function MarketingHeader({
           >
             {t('header.login')}
           </a>
+          <a
+            href={signupHref}
+            className={`inline-flex h-[40px] items-center whitespace-nowrap rounded-md px-4 text-body-sm font-semibold ${
+              inverse ? 'bg-white text-fg' : 'bg-brand text-fg-on-brand'
+            }`}
+          >
+            {t('nav.signup')}
+          </a>
         </div>
       </div>
 
@@ -188,6 +198,9 @@ export function MarketingHeader({
               <div className="flex items-center gap-4 px-4 pb-1 pt-4">
                 <a href={loginHref} className="inline-flex h-[40px] flex-1 items-center justify-center rounded-md border-thin border-stroke-brand px-4 text-body-sm font-semibold text-fg-brand">
                   {t('header.login')}
+                </a>
+                <a href={signupHref} className="inline-flex h-[40px] flex-1 items-center justify-center rounded-md bg-brand px-4 text-body-sm font-semibold text-fg-on-brand">
+                  {t('nav.signup')}
                 </a>
               </div>
               {/* Pill row (horizontal scroll) */}
