@@ -251,7 +251,7 @@ export function AnimatedWizard({
       Back still reaches the Markets step, so the pick stays editable. */
   initialMarkets?: string[];
 }) {
-  const { t } = useTranslation('home');
+  const { t, i18n } = useTranslation('home');
   const reduced = useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
   // Ref, not effect dep: pausing must freeze the running loop in place, not
@@ -418,7 +418,19 @@ export function AnimatedWizard({
             (sp ? 'relative px-16 py-5' : 'px-7 py-3')
           }
         >
-          <Logo lockup="horizontal" tone="on-light" href={null} markClassName={sp ? 'h-9' : 'h-7'} />
+          {/* Im VOLLBILD-Wizard fuehrt das Logo zurueck auf die Startseite. Der
+              SiteHeader ist unter /wizard ausgeblendet (er bringt seine eigene
+              Topbar mit), und solange das Logo href={null} trug, gab es von hier
+              keinen Weg zurueck ausser dem Browser-Knopf — eine Sackgasse fuer
+              jeden Einstieg, den Hero-CTA eingeschlossen. In den eingebetteten
+              Demos auf der Startseite bleibt es Text: dort waere ein Home-Link
+              der Ausgang aus einer Vorschau, die gar keine Seite ist. */}
+          <Logo
+            lockup="horizontal"
+            tone="on-light"
+            href={sp ? `/${i18n.resolvedLanguage || 'en'}` : null}
+            markClassName={sp ? 'h-9' : 'h-7'}
+          />
           {sp && (
             <div className="pointer-events-none absolute left-1/2 -translate-x-1/2">
               <StepRail current={isReview ? STEPS.length : step.rail} spacious />
