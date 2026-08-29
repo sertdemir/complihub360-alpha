@@ -74,6 +74,21 @@ export const supabaseApi = {
         return res.json();
     },
 
+    // Zeilen loeschen. Gebraucht, wo der Ausgangszustand KEINE Zeile ist —
+    // etwa ein Pflicht-Status, der auf 'open' zurueckgesetzt wird.
+    async remove(table: string, match: any) {
+        const queryParams = new URLSearchParams();
+        for (const [key, value] of Object.entries(match)) {
+            queryParams.append(key, `eq.${value}`);
+        }
+        const res = await fetch(`${restUrl}/${table}?${queryParams.toString()}`, {
+            method: 'DELETE',
+            headers: defaultHeaders
+        });
+        if (!res.ok) throw new Error(`Supabase delete failed: ${await res.text()}`);
+        return res.json();
+    },
+
     async rpc(functionName: string, params: any) {
         const res = await fetch(`${restUrl}/rpc/${functionName}`, {
             method: 'POST',

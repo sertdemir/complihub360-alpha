@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, MotionConfig, type Variants } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ChevronDown } from 'lucide-react';
 import { UserShell } from './UserShell';
 import { Button } from '../ui/Button';
 import { Donut, useEntered, useCountUp, EASE } from '../ui/Stats';
 import { duplicateSession } from '../../api/sessions';
+import { fetchObligationStatus, setObligationStatus, type ObligationStatus } from '../../api/obligations';
 import type { AnonProvider } from '../../api/search';
 
 // ─── Sitzungs-Snapshot · Canvas "Sitzungs-Snapshot", Gesamt · G8 ─────────────
@@ -33,6 +34,10 @@ type Severity = 'critical' | 'high' | 'medium' | 'low';
 type State = { kind: 'confirmed' } | { kind: 'likely' } | { kind: 'answer'; count: number };
 
 export type SnapshotRow = {
+  /** Engine-Template-ID ('tax-vat-registration', …) — der Schluessel, unter
+   *  dem der Bearbeitungs-Stand gespeichert wird. Fehlt sie (Design-Fixture),
+   *  ist die Zeile nicht abhakbar. */
+  obligationId?: string;
   severity: Severity;
   title: string;
   market: string;
@@ -112,9 +117,74 @@ function GeltungCell({ state, entered, index }: { state: State; entered: boolean
   );
 }
 
-function GroupCard({ label, sub, dot, rows, entered, offset, onAnswer }: {
+// ─── Bearbeitung ─────────────────────────────────────────────────────────────
+// Der Chip traegt die Farbe seines Zustands und ist zugleich das Menue
+// (Nutzer-Festlegung 2026-08-29). Theme-feste Rezepte statt Token-Opazitaet:
+// bg-warning-bg & Co. fressen im Dark Mode den Text.
+const TASK_CHIP: Record<ObligationStatus, string> = {
+  done: 'bg-[#E7F3EE] border-[rgba(21,128,61,.35)] text-[#14532D] dark:bg-[#15803D]/20 dark:text-[#8FD3AE]',
+  in_progress: 'bg-[#FEF3C7] border-[rgba(161,98,7,.35)] text-[#713F12] dark:bg-[#A16207]/25 dark:text-[#F0C86A]',
+  open: 'bg-[#FEE2E2] border-[rgba(143,49,16,.30)] text-[#8F3110] dark:bg-[#8F3110]/25 dark:text-[#F1A88C]',
+  not_applicable: 'bg-surface-secondary border-stroke-subtle text-fg-tertiary',
+};
+const TASK_ORDER: ObligationStatus[] = ['open', 'in_progress', 'done', 'not_applicable'];
+
+function TaskChip({ status, busy, onSet }: {
+  status: ObligationStatus; busy: boolean; onSet: (s: ObligationStatus) => void;
+}) {
+  const { t } = useTranslation('results');
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const away = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) setOpen(false); };
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('mousedown', away);
+    document.addEventListener('keydown', esc);
+    return () => { document.removeEventListener('mousedown', away); document.removeEventListener('keydown', esc); };
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        disabled={busy}
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className={'inline-flex items-center whitespace-nowrap rounded-full border px-3 py-1 text-[10.5px] font-bold transition-opacity disabled:opacity-60 ' + TASK_CHIP[status]}
+      >
+        {busy ? '…' : t(`snapshot.task.${status}`)}
+        <ChevronDown size={11} className="ml-1 opacity-70" />
+      </button>
+      {open && (
+        <div role="listbox" className="absolute right-0 z-20 mt-1.5 w-[168px] overflow-hidden rounded-lg border border-stroke-subtle bg-surface py-1 shadow-[0_12px_32px_-12px_rgba(11,21,18,0.28)]">
+          {TASK_ORDER.map((s) => (
+            <button
+              key={s}
+              type="button"
+              role="option"
+              aria-selected={s === status}
+              onClick={() => { setOpen(false); if (s !== status) onSet(s); }}
+              className={'flex w-full items-center gap-2 px-3 py-1.5 text-left text-body-2xs transition-colors hover:bg-surface-secondary '
+                + (s === status ? 'font-bold text-fg' : 'text-fg-secondary')}
+            >
+              {t(`snapshot.task.${s}`)}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function GroupCard({ label, sub, dot, rows, entered, offset, onAnswer, taskOf, onSetTask, busyId }: {
   label: string; sub: string; dot: string; rows: SnapshotRow[];
   entered: boolean; offset: number; onAnswer: () => void;
+  /** null = Abhaken nicht moeglich (keine gespeicherte Sitzung). */
+  taskOf: ((row: SnapshotRow) => ObligationStatus) | null;
+  onSetTask: (row: SnapshotRow, status: ObligationStatus) => void;
+  busyId: string | null;
 }) {
   const { t } = useTranslation('results');
   return (
@@ -154,6 +224,15 @@ function GroupCard({ label, sub, dot, rows, entered, offset, onAnswer }: {
               </p>
             </div>
             <GeltungCell state={r.state} entered={entered} index={offset + i} />
+            {taskOf && r.obligationId && (
+              <div className="hidden shrink-0 justify-center sm:flex">
+                <TaskChip
+                  status={taskOf(r)}
+                  busy={busyId === r.obligationId}
+                  onSet={(next) => onSetTask(r, next)}
+                />
+              </div>
+            )}
             {/* Rechts steht, was zu tun ist: bei offenen Fragen der Weg dorthin,
                 sonst die Frist. Beide auf einer Kante. */}
             <div className="hidden w-[150px] shrink-0 justify-end text-right sm:flex">
@@ -197,6 +276,54 @@ export function SessionSnapshot({
   const nSoon = useCountUp(kpis.soon, entered);
   const nOpen = useCountUp(kpis.open, entered);
   const [copy, setCopy] = useState<'idle' | 'busy' | 'done' | 'error'>('idle');
+  // Bearbeitungs-Stand: nur ABWEICHUNGEN kommen vom Server, alles andere ist
+  // 'open'. Ohne gespeicherte Sitzung gibt es nichts abzuhaken — dann bleibt
+  // die Spalte leer statt eine Attrappe zu zeigen.
+  const [tasks, setTasks] = useState<Record<string, ObligationStatus>>({});
+  const [taskBusy, setTaskBusy] = useState<string | null>(null);
+  const [taskable, setTaskable] = useState(false);
+
+  useEffect(() => {
+    if (!sessionId) { setTaskable(false); return; }
+    let alive = true;
+    fetchObligationStatus(sessionId)
+      .then((map) => {
+        if (!alive) return;
+        const next: Record<string, ObligationStatus> = {};
+        for (const [id, row] of Object.entries(map)) next[id] = row.status;
+        setTasks(next);
+        setTaskable(true);
+      })
+      .catch(() => { if (alive) setTaskable(false); });
+    return () => { alive = false; };
+  }, [sessionId]);
+
+  const taskOf = (row: SnapshotRow): ObligationStatus =>
+    (row.obligationId && tasks[row.obligationId]) || 'open';
+
+  // Optimistisch setzen, bei Fehler zurueckdrehen — ein Haken, der bleibt
+  // obwohl er nicht gespeichert wurde, waere die schlechteste Auskunft.
+  const setTask = async (row: SnapshotRow, next: ObligationStatus) => {
+    if (!sessionId || !row.obligationId) return;
+    const id = row.obligationId;
+    const before = taskOf(row);
+    setTasks((m) => ({ ...m, [id]: next }));
+    setTaskBusy(id);
+    try {
+      await setObligationStatus(sessionId, id, next);
+    } catch {
+      setTasks((m) => ({ ...m, [id]: before }));
+    }
+    setTaskBusy(null);
+  };
+
+  // Fortschritt zaehlt nur, was ueberhaupt zu tun ist: "trifft nicht zu"
+  // gehoert nicht in den Nenner.
+  const withId = rows.filter((r) => r.obligationId);
+  const nNa = withId.filter((r) => taskOf(r) === 'not_applicable').length;
+  const nDone = withId.filter((r) => taskOf(r) === 'done').length;
+  const nProg = withId.filter((r) => taskOf(r) === 'in_progress').length;
+  const nRel = Math.max(1, withId.length - nNa);
 
   const total = Math.max(1, kpis.total);
   const answerRow = rows.find((r) => r.state.kind === 'answer');
@@ -285,11 +412,30 @@ export function SessionSnapshot({
                     entered={entered}
                     offset={groups.slice(0, gi).reduce((n, x) => n + x.items.length, 0)}
                     onAnswer={toAnswers}
+                    taskOf={taskable ? taskOf : null}
+                    onSetTask={setTask}
+                    busyId={taskBusy}
                   />
                 ))}
               </motion.div>
 
-              <motion.aside variants={ITEM} className="flex w-full shrink-0 flex-col xl:w-[330px]">
+              <motion.aside variants={ITEM} className="flex w-full shrink-0 flex-col gap-3.5 xl:w-[330px]">
+                {/* Gesamtfortschritt, buendig mit der Oberkante der ersten
+                    Pflichtkarte (Nutzer-Vorgabe 2026-08-29). */}
+                {taskable && (
+                  <div className={CARD + ' px-5 py-4'}>
+                    <p className="font-serif text-[20px] font-bold leading-none text-fg">
+                      {t('snapshot.progress', { done: nDone, total: nRel })}
+                    </p>
+                    <div className="mt-2.5 flex h-2 overflow-hidden rounded-full bg-stroke-subtle">
+                      <div className="h-2 bg-risk-low" style={{ width: entered ? `${(nDone / nRel) * 100}%` : 0, transition: `width 850ms ${EASE} 150ms` }} />
+                      <div className="h-2 bg-risk-medium" style={{ width: entered ? `${(nProg / nRel) * 100}%` : 0, transition: `width 850ms ${EASE} 320ms` }} />
+                    </div>
+                    <p className="mt-2.5 text-[10.5px] text-fg-tertiary">
+                      {t('snapshot.progressSub', { prog: nProg, open: Math.max(0, nRel - nDone - nProg), na: nNa })}
+                    </p>
+                  </div>
+                )}
                 <div className={CARD + ' flex flex-1 flex-col p-5'}>
                   <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('snapshot.historyTitle')}</p>
                   <div className="mt-3.5">
@@ -359,7 +505,7 @@ export function SessionSnapshot({
                   {/* Der einzige gefuellte Knopf der Seite: der Weg zum
                       einzelnen Anbieter. */}
                   <div className="mt-auto pt-5">
-                    <Button variant="accent" className="w-full" onClick={() => onProviderDetails(p.provider_key)}>
+                    <Button variant="primary" className="w-full" onClick={() => onProviderDetails(p.provider_key)}>
                       {t('snapshot.providerDetails')}
                     </Button>
                   </div>

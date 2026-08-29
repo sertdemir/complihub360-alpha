@@ -291,6 +291,14 @@
       "duty": "Yükümlülük",
       "likelyDuty": "Muhtemelen yükümlülük",
       "toClarify": "Önce netleştirin"
-    }
+    },
+    "task": {
+      "open": "Açık",
+      "in_progress": "Devam ediyor",
+      "done": "Tamamlandı",
+      "not_applicable": "Geçerli değil"
+    },
+    "progress": "{{total}} yükümlülükten {{done}} tamamlandı",
+    "progressSub": "{{prog}} devam ediyor · {{open}} açık · {{na}} geçerli değil"
   }
 }

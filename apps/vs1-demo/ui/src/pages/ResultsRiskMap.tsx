@@ -27,6 +27,9 @@ type State =
   | { kind: 'answer'; count: number };
 
 type Obligation = {
+  /** Engine-Template-ID ('tax-vat-registration', …). Nur auf Live-Zeilen —
+   *  die Design-Fixture hat keine, ist also nicht abhakbar. */
+  id?: string;
   severity: Severity;
   title: string;
   detail: string;
@@ -298,6 +301,7 @@ export function ResultsRiskMap() {
   const isLive = liveLaws.length > 0;
   const rows: Obligation[] = isLive
     ? liveLaws.map((l) => ({
+        id: l.id,
         severity: l.severity as Severity,
         title: l.title,
         // Rechtsgrundlage zuerst, Bußgeld danach. Das DNA-Addendum V2 verlangt,
@@ -390,6 +394,7 @@ export function ResultsRiskMap() {
   // Karte, "Karte speichern", das Schluss-Band) lief bis 2026-08-29 auch fuer
   // eingeloggte Nutzer — es haengt jetzt tatsaechlich am Login.
   const snapshotRows: SnapshotRow[] = indexed.map(({ o, i }) => ({
+    obligationId: o.id,
     severity: o.severity,
     title: isLive ? o.title : t(`obligations.${i}.title`, { defaultValue: o.title }),
     market: isLive ? o.market : t(`obligations.${i}.market`, { defaultValue: o.market }),

@@ -291,6 +291,14 @@
       "duty": "Pflicht",
       "likelyDuty": "Vermutlich Pflicht",
       "toClarify": "Erst zu klären"
-    }
+    },
+    "task": {
+      "open": "Offen",
+      "in_progress": "In Arbeit",
+      "done": "Erledigt",
+      "not_applicable": "Trifft nicht zu"
+    },
+    "progress": "{{done}} von {{total}} erledigt",
+    "progressSub": "{{prog}} in Arbeit · {{open}} offen · {{na}} trifft nicht zu"
   }
 }

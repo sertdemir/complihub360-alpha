@@ -94,14 +94,18 @@ GET    /api/v1/session/{id}/obligations                  -> alle abweichenden Zu
 Nicht gesetzte Zeilen sind `open` — die Tabelle hält nur Abweichungen, sonst
 schreibt jede Sitzungsanzeige acht Zeilen ins Nichts.
 
-### 3.2 Stabile Pflicht-ID — der kritische Punkt
+### 3.2 Stabile Pflicht-ID — geklärt (2026-08-29)
 
-Die Engine liefert `r.id`. Ob diese ID **über Neuberechnungen hinweg stabil**
-bleibt, wenn der Nutzer seine Antworten ändert, ist ungeprüft. Wenn nicht,
-hakt jemand die LUCID-Registrierung ab, ändert eine Antwort — und der Haken
-ist weg. **Das ist zu klären, bevor irgendetwas gebaut wird.** Kandidat für
-einen belastbaren Schlüssel: `subdomain + country`, weil daran auch der
-Enrichment-Eintrag hängt.
+**Die ID ist stabil.** `packages/compliance-engine/generator.ts:131` setzt
+`id: template.id` — ein fester Slug aus `DomainTemplateLibrary`
+(`tax-vat-registration`, `prod-epr`, `priv-gdpr`, …), definiert in
+`domain-schema.ts`. Kein generierter Wert, keine Abhängigkeit von den
+Antworten. Ein Haken überlebt damit jede Neuberechnung.
+
+Der einzige Fall, in dem eine Zeile verwaist: Der Nutzer entfernt einen
+Bereich, die Pflicht taucht nicht mehr auf. Die Statuszeile bleibt dann in
+der Tabelle liegen und wird schlicht nicht mehr gelesen — kommt der Bereich
+zurück, ist der alte Stand wieder da. Das ist das gewünschte Verhalten.
 
 ### 3.3 Fristen — heute keine echten Termine
 
@@ -134,9 +138,18 @@ verbindlicher Termin aussieht.
 
 ---
 
-## 4 · Reihenfolge
+## 4 · Stand
 
-1. 3.2 klären (stabile ID) — blockiert alles Weitere.
-2. 3.1 bauen (Tabelle, zwei Endpunkte), Oberfläche nach Abschnitt 2.
-3. Fortschritt in die Sitzungen-Liste und ins Dashboard erben lassen.
-4. 3.3 Perioden-Stammdaten, Markt für Markt.
+- [x] 3.2 stabile ID geklärt
+- [x] 3.1 gebaut — Migration `20260830000000_session_obligation_status.sql`,
+      `GET`/`PUT` `/api/v1/session/{id}/obligations[/{obligationId}]`,
+      Client `src/api/obligations.ts`, Chips und Fortschrittskarte im
+      Sitzungs-Snapshot. Sechs API-Tests decken Anlegen, Überschreiben,
+      Zurücksetzen, unbekannte Zustände und die fehlende Sitzung ab.
+- [ ] Fortschritt in die Sitzungen-Liste und ins Dashboard erben lassen
+- [ ] 3.3 Perioden-Stammdaten, Markt für Markt
+
+**Vor dem ersten Einsatz:** Die Migration muss auf Staging und Produktion
+eingespielt werden. Ohne die Tabelle antwortet `GET .../obligations` mit 500;
+die Oberfläche fängt das ab und blendet Chips und Fortschritt aus, statt eine
+Attrappe zu zeigen.

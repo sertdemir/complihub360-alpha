@@ -34,10 +34,24 @@ vi.mock('../supabase.js', () => ({
             rows.forEach((r) => Object.assign(r, data));
             return rows;
         },
-        async upsert(table: string, _onConflict: string, data: any) {
+        async upsert(table: string, onConflict: string, data: any) {
+            const keys = onConflict.split(',').map((k) => k.trim()).filter(Boolean);
             const rows = Array.isArray(data) ? data : [data];
-            (db[table] ??= []).push(...rows.map((r) => ({ id: randomUUID(), ...r })));
+            const store = (db[table] ??= []);
+            for (const r of rows) {
+                const hit = keys.length
+                    ? store.find((x) => keys.every((k) => x[k] === r[k]))
+                    : undefined;
+                if (hit) Object.assign(hit, r);
+                else store.push({ id: randomUUID(), ...r });
+            }
             return rows;
+        },
+        async remove(table: string, match: Record<string, any> = {}) {
+            const store = (db[table] ??= []);
+            const gone = store.filter((r) => Object.entries(match).every(([k, v]) => r[k] === v));
+            db[table] = store.filter((r) => !gone.includes(r));
+            return gone;
         },
         async rpc() { return []; },
     },
@@ -365,5 +379,64 @@ describe('POST /api/v1/admin/watchers/tick', () => {
         const r = await api('/api/v1/admin/watchers/tick', { method: 'POST', body: '{}', auth: 'key' });
         expect(r.status).toBe(200);
         expect(r.body.summary ?? r.body).toBeTruthy();
+    });
+});
+
+describe('Pflicht-Status je Sitzung', () => {
+    // Zwei Achsen, die nie verschmelzen duerfen: die GELTUNG kommt aus der
+    // Engine, die BEARBEITUNG vom Nutzer. Diese Endpunkte decken die zweite ab.
+    const seedSession = () => {
+        const row = { id: randomUUID(), user_id: USER_ID, country: 'DE', categories: ['vat'], answers: {}, status: 'active' };
+        (db.sessions ??= []).push(row);
+        return row.id;
+    };
+
+    it('liefert anfangs nichts — was fehlt, ist offen', async () => {
+        const id = seedSession();
+        const r = await api(`/api/v1/session/${id}/obligations`);
+        expect(r.status).toBe(200);
+        expect(r.body.items).toEqual([]);
+    });
+
+    it('setzt einen Zustand und vergibt das Erledigt-Datum serverseitig', async () => {
+        const id = seedSession();
+        const put = await api(`/api/v1/session/${id}/obligations/tax-vat-registration`, {
+            method: 'PUT', body: JSON.stringify({ status: 'done' }),
+        });
+        expect(put.status).toBe(200);
+        expect(put.body.done_at).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+
+        const list = await api(`/api/v1/session/${id}/obligations`);
+        expect(list.body.items).toHaveLength(1);
+        expect(list.body.items[0]).toMatchObject({ obligation_id: 'tax-vat-registration', status: 'done' });
+    });
+
+    it('ueberschreibt denselben Schluessel statt zu doppeln', async () => {
+        const id = seedSession();
+        await api(`/api/v1/session/${id}/obligations/prod-epr`, { method: 'PUT', body: JSON.stringify({ status: 'in_progress' }) });
+        await api(`/api/v1/session/${id}/obligations/prod-epr`, { method: 'PUT', body: JSON.stringify({ status: 'done' }) });
+        const list = await api(`/api/v1/session/${id}/obligations`);
+        expect(list.body.items).toHaveLength(1);
+        expect(list.body.items[0].status).toBe('done');
+    });
+
+    it('"open" loescht die Zeile — der Ausgangszustand braucht keinen Eintrag', async () => {
+        const id = seedSession();
+        await api(`/api/v1/session/${id}/obligations/prod-epr`, { method: 'PUT', body: JSON.stringify({ status: 'done' }) });
+        const back = await api(`/api/v1/session/${id}/obligations/prod-epr`, { method: 'PUT', body: JSON.stringify({ status: 'open' }) });
+        expect(back.status).toBe(200);
+        const list = await api(`/api/v1/session/${id}/obligations`);
+        expect(list.body.items).toEqual([]);
+    });
+
+    it('weist unbekannte Zustaende ab', async () => {
+        const id = seedSession();
+        const r = await api(`/api/v1/session/${id}/obligations/prod-epr`, { method: 'PUT', body: JSON.stringify({ status: 'erledigt-ish' }) });
+        expect(r.status).toBe(400);
+    });
+
+    it('antwortet 404 fuer eine Sitzung, die es nicht gibt', async () => {
+        const r = await api(`/api/v1/session/${randomUUID()}/obligations/prod-epr`, { method: 'PUT', body: JSON.stringify({ status: 'done' }) });
+        expect(r.status).toBe(404);
     });
 });
