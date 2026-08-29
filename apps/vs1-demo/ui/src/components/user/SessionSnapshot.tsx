@@ -217,6 +217,14 @@ export function SessionSnapshot({
                 <h1 className="mt-1.5 font-serif text-[26px] font-bold leading-tight text-fg">{title}</h1>
                 <p className="mt-1 text-body-2xs text-fg-tertiary">{meta}</p>
               </div>
+              {/* Beide als Textlinks — auf dieser Seite gibt es keinen einzelnen
+                  primaeren Knopf mehr. Sie sitzen rechtsbuendig im Kopf, also
+                  direkt ueber der dritten Kennzahl-Kachel; im Spalt zwischen
+                  den Reihen zerschnitten sie das Raster (Nutzer 2026-08-29). */}
+              <div className="flex shrink-0 items-center gap-5 pt-1">
+                <button type="button" onClick={onExportPdf} className={TEXT_LINK}>{t('snapshot.exportPdf')}</button>
+                <button type="button" onClick={onEditAnswers} className={TEXT_LINK}>{t('snapshot.editAnswers')}</button>
+              </div>
             </motion.div>
 
             {/* Kennzahlen */}
@@ -246,10 +254,6 @@ export function SessionSnapshot({
             {/* Pflichten + Verlauf, beide Spalten enden auf einer Kante */}
             <div className="mt-[18px] flex flex-col items-stretch gap-[18px] xl:flex-row">
               <motion.div variants={ITEM} className="flex min-w-0 flex-1 flex-col gap-3.5">
-                <div className="-mt-1 flex justify-end gap-5 pr-1">
-                  <button type="button" onClick={onExportPdf} className={TEXT_LINK}>{t('snapshot.exportPdf')}</button>
-                  <button type="button" onClick={onEditAnswers} className={TEXT_LINK}>{t('snapshot.editAnswers')}</button>
-                </div>
                 {groups.map((g) => (
                   <GroupCard
                     key={g.key}
