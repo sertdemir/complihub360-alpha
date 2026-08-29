@@ -68,10 +68,10 @@ export function ContactPage() {
   const locale = i18n.resolvedLanguage || 'en';
   const localize = (href: string) => (href.startsWith('/') ? `/${locale}${href}` : href);
 
-  // Tiefenlink fuer die Zubringer (Registrierungs-Weiche, Partnerseite):
-  // /contact?lane=partner waehlt den Weg vor und scrollt zum Formular — ohne
-  // das landete ein Bewerber oben im Hero und musste den Anbieter-Weg selbst
-  // suchen (Nutzer-Befund 2026-08-29).
+  // Tiefenlink fuer Zubringer (heute: der "formlose Fragen"-Weg der
+  // Bewerbungsseite /partner-apply): /contact?lane=partner waehlt den Weg vor
+  // und scrollt zum Formular — ohne das landete ein Bewerber oben im Hero und
+  // musste den Anbieter-Weg selbst suchen (Nutzer-Befund 2026-08-29).
   const [params] = useSearchParams();
   const laneParam = params.get('lane');
   const initialLane: LaneId = LANE_IDS.includes(laneParam as LaneId) ? (laneParam as LaneId) : 'support';

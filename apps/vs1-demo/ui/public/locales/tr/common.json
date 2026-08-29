@@ -1540,6 +1540,61 @@
       "description": "Her {{area}} yükümlülüğü; dayandığı mevzuat, ceza riski ve pazara göre süreler. Doğrulanmış uzmanlarla eşleştirilir."
     }
   },
+  "partnerApply": {
+    "eyebrow": "Partner olun",
+    "titlePre": "Ağa giden ",
+    "titleGold": "yolunuz",
+    "titlePost": " — adım adım.",
+    "outlook": {
+      "review": {
+        "title": "Alım ve inceleme",
+        "desc": "Her başvuruyu elle inceliyoruz: yetki belgesi, web sitesi, kapsam. Önce alındı onayı, ardından gerekçeli bir yanıt alırsınız."
+      },
+      "access": {
+        "title": "Kişisel erişim bağlantınız",
+        "desc": "Uygunsa e-postayla bir magic link alırsınız — şifre yok, bağlantı sizi doğrudan partner alanınıza götürür."
+      },
+      "listing": {
+        "title": "Onboarding ve listelenme",
+        "desc": "İlk açılışta profilinizi birkaç adımda tamamlarsınız. Zorunlu alanlar dolduğunda uygun talepler için listelenirsiniz."
+      }
+    },
+    "facts": {
+      "confirm": {
+        "value": "24 sa",
+        "label": "alındı onayı"
+      },
+      "answer": {
+        "value": "3 iş günü",
+        "label": "inceleme yanıtı"
+      },
+      "fee": {
+        "value": "0 €",
+        "label": "başvuru ücretsiz"
+      }
+    },
+    "formTitle": "Başvurunuz",
+    "formLead": "İncelemeyi başlatmak için gereken asgari bilgiler. Gerisini görüşmede netleştiririz.",
+    "draftNote": "Önizleme: Başvuru gönderim yolu henüz bağlı değil. O zamana kadar bu sayfadan hiçbir şey gönderilmez.",
+    "firm": "Büro / şirket",
+    "contact": "İlgili kişi",
+    "email": "E-posta",
+    "emailPh": "siz@buro.com",
+    "website": "Web sitesi (isteğe bağlı)",
+    "credentials": "Yetki belgesi / nitelik",
+    "credentialsPh": "örn. vergi danışmanı (DE), avukat, ISO denetçisi",
+    "areas": "Alanlarınız",
+    "markets": "Pazarlarınız",
+    "message": "Mesaj (isteğe bağlı)",
+    "messagePh": "Önceden bilmemiz gereken bir şey var mı?",
+    "privacy": "Bilgilerinizi yalnızca başvurunuzun incelenmesi için kullanırız.",
+    "submit": "Başvuruyu gönder",
+    "questions": "Önce gayriresmî sormak mı istersiniz?",
+    "questionsLink": "Sağlayıcı iletişimi",
+    "notWiredTitle": "Henüz gönderilmedi",
+    "notWiredBody": "Başvuru gönderim yolu henüz hazır değil. O zamana kadar bize şu adresten ulaşabilirsiniz:",
+    "backToForm": "Forma geri dön"
+  },
   "contact": {
     "hero": {
       "eyebrow": "İletişim ve destek",

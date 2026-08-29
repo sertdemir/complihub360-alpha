@@ -1540,6 +1540,61 @@
       "description": "Every {{area}} duty with the statute behind it, penalty exposure and filing deadlines per market. Matched to verified specialists."
     }
   },
+  "partnerApply": {
+    "eyebrow": "Become a partner",
+    "titlePre": "Your path into the ",
+    "titleGold": "network",
+    "titlePost": " — step by step.",
+    "outlook": {
+      "review": {
+        "title": "Receipt and review",
+        "desc": "We review every application by hand: credentials, website, coverage. You get a confirmation of receipt, then a reasoned reply."
+      },
+      "access": {
+        "title": "Your personal access link",
+        "desc": "If it is a fit, you receive a magic link by email — no password, the link takes you straight to your partner workspace."
+      },
+      "listing": {
+        "title": "Onboarding and listing",
+        "desc": "On first open you complete your profile in a few steps. Once the required fields are in, you are listed for matching requests."
+      }
+    },
+    "facts": {
+      "confirm": {
+        "value": "24 h",
+        "label": "receipt confirmed"
+      },
+      "answer": {
+        "value": "3 workdays",
+        "label": "review feedback"
+      },
+      "fee": {
+        "value": "€0",
+        "label": "applying is free"
+      }
+    },
+    "formTitle": "Your application",
+    "formLead": "The minimum we need to start the review. Everything else we clarify in conversation.",
+    "draftNote": "Preview: the submission path for applications is not wired up yet. Until it is, nothing leaves this page.",
+    "firm": "Firm / company",
+    "contact": "Contact person",
+    "email": "Email",
+    "emailPh": "you@firm.com",
+    "website": "Website (optional)",
+    "credentials": "Licence / qualification",
+    "credentialsPh": "e.g. tax advisor (DE), attorney, ISO auditor",
+    "areas": "Your areas",
+    "markets": "Your markets",
+    "message": "Message (optional)",
+    "messagePh": "Anything we should know up front?",
+    "privacy": "We use your details only to review your application.",
+    "submit": "Send application",
+    "questions": "Prefer to ask informally first?",
+    "questionsLink": "Contact for providers",
+    "notWiredTitle": "Not sent yet",
+    "notWiredBody": "The submission path for applications is still pending. Until then, reach us at",
+    "backToForm": "Back to the form"
+  },
   "contact": {
     "hero": {
       "eyebrow": "Contact and support",

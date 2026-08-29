@@ -1540,6 +1540,61 @@
       "description": "Jede {{area}}-Pflicht mit Rechtsgrundlage, Bußgeldrisiko und Fristen je Markt. Vermittlung an geprüfte Spezialisten."
     }
   },
+  "partnerApply": {
+    "eyebrow": "Partner werden",
+    "titlePre": "Ihr Weg ins ",
+    "titleGold": "Netzwerk",
+    "titlePost": " — Schritt für Schritt.",
+    "outlook": {
+      "review": {
+        "title": "Eingang und Prüfung",
+        "desc": "Wir prüfen jede Bewerbung von Hand: Zulassung, Website, Abdeckung. Sie erhalten eine Eingangsbestätigung, danach eine begründete Rückmeldung."
+      },
+      "access": {
+        "title": "Ihr persönlicher Zugangslink",
+        "desc": "Passt es, bekommen Sie einen Magic-Link per E-Mail — kein Passwort, der Link führt direkt in Ihren Partner-Bereich."
+      },
+      "listing": {
+        "title": "Onboarding und Listung",
+        "desc": "Beim ersten Öffnen vervollständigen Sie Ihr Profil in wenigen Schritten. Sobald die Pflichtangaben stehen, sind Sie für passende Anfragen gelistet."
+      }
+    },
+    "facts": {
+      "confirm": {
+        "value": "24 h",
+        "label": "Eingang bestätigt"
+      },
+      "answer": {
+        "value": "3 Werktage",
+        "label": "Rückmeldung zur Prüfung"
+      },
+      "fee": {
+        "value": "0 €",
+        "label": "Bewerbung kostenlos"
+      }
+    },
+    "formTitle": "Ihre Bewerbung",
+    "formLead": "Das Minimum, mit dem die Prüfung starten kann. Alles Weitere klären wir im Gespräch.",
+    "draftNote": "Vorschau: Der Versandweg für Bewerbungen ist noch nicht angebunden. Bis dahin geht hier nichts hinaus.",
+    "firm": "Kanzlei / Firma",
+    "contact": "Ansprechperson",
+    "email": "E-Mail",
+    "emailPh": "sie@kanzlei.de",
+    "website": "Website (optional)",
+    "credentials": "Zulassung / Qualifikation",
+    "credentialsPh": "z. B. Steuerberater (DE), Rechtsanwältin, ISO-Auditor",
+    "areas": "Ihre Bereiche",
+    "markets": "Ihre Märkte",
+    "message": "Nachricht (optional)",
+    "messagePh": "Was sollten wir vorab wissen?",
+    "privacy": "Wir nutzen Ihre Angaben nur für die Prüfung Ihrer Bewerbung.",
+    "submit": "Bewerbung senden",
+    "questions": "Lieber erst formlos fragen?",
+    "questionsLink": "Zum Kontakt für Anbieter",
+    "notWiredTitle": "Noch nicht abgeschickt",
+    "notWiredBody": "Der Versandweg für Bewerbungen steht noch aus. Bis dahin erreichen Sie uns unter",
+    "backToForm": "Zurück zum Formular"
+  },
   "contact": {
     "hero": {
       "eyebrow": "Kontakt und Support",
