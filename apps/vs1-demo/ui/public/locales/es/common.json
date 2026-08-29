@@ -1540,6 +1540,61 @@
       "description": "Cada obligación de {{area}} con su norma, exposición sancionadora y plazos por mercado. Emparejado con especialistas verificados."
     }
   },
+  "partnerApply": {
+    "eyebrow": "Conviértase en partner",
+    "titlePre": "Su camino a la ",
+    "titleGold": "red",
+    "titlePost": ", paso a paso.",
+    "outlook": {
+      "review": {
+        "title": "Recepción y revisión",
+        "desc": "Revisamos cada solicitud a mano: habilitación, web, cobertura. Recibirá una confirmación de recepción y después una respuesta motivada."
+      },
+      "access": {
+        "title": "Su enlace de acceso personal",
+        "desc": "Si encaja, recibirá un magic link por correo: sin contraseña, el enlace le lleva directo a su área de partner."
+      },
+      "listing": {
+        "title": "Onboarding y listado",
+        "desc": "Al abrirla por primera vez completa su perfil en pocos pasos. Con los campos obligatorios listos, queda listado para solicitudes afines."
+      }
+    },
+    "facts": {
+      "confirm": {
+        "value": "24 h",
+        "label": "recepción confirmada"
+      },
+      "answer": {
+        "value": "3 días hábiles",
+        "label": "respuesta a la revisión"
+      },
+      "fee": {
+        "value": "0 €",
+        "label": "solicitud gratuita"
+      }
+    },
+    "formTitle": "Su solicitud",
+    "formLead": "Lo mínimo para iniciar la revisión. El resto lo aclaramos en conversación.",
+    "draftNote": "Vista previa: el envío de solicitudes aún no está conectado. Hasta entonces, nada sale de esta página.",
+    "firm": "Despacho / empresa",
+    "contact": "Persona de contacto",
+    "email": "Correo electrónico",
+    "emailPh": "usted@despacho.es",
+    "website": "Sitio web (opcional)",
+    "credentials": "Habilitación / cualificación",
+    "credentialsPh": "p. ej. asesor fiscal (DE), abogada, auditor ISO",
+    "areas": "Sus áreas",
+    "markets": "Sus mercados",
+    "message": "Mensaje (opcional)",
+    "messagePh": "¿Algo que debamos saber de antemano?",
+    "privacy": "Usamos sus datos solo para revisar su solicitud.",
+    "submit": "Enviar solicitud",
+    "questions": "¿Prefiere preguntar primero sin compromiso?",
+    "questionsLink": "Contacto para proveedores",
+    "notWiredTitle": "Aún no enviado",
+    "notWiredBody": "El envío de solicitudes está pendiente. Hasta entonces puede escribirnos a",
+    "backToForm": "Volver al formulario"
+  },
   "contact": {
     "hero": {
       "eyebrow": "Contacto y soporte",

@@ -459,5 +459,98 @@
     "doneNote": "¿Preguntas? partners@complihub360.com",
     "errorTitle": "Error al enviar",
     "errorBody": "No se pudo enviar el paquete. Comprueba tu enlace de alta o inténtalo de nuevo — o contacta con partners@complihub360.com."
+  },
+  "onboarding": {
+    "steps": {
+      "contact": "Contacto",
+      "coverage": "Cobertura",
+      "listing": "Publicación"
+    },
+    "stepSubs": {
+      "contact": "Persona de contacto y buzón de respuesta",
+      "coverage": "Países, idiomas, áreas, objetivo SLA",
+      "listing": "Su perfil público"
+    },
+    "welcome": {
+      "eyebrow": "Bienvenido a CompliHub360",
+      "titlePre": "Antes de que lleguen los primeros expedientes: ",
+      "titleGold": "su perfil",
+      "titlePost": ".",
+      "body": "Su solicitud está verificada y su acceso activo. Para que el matching le encuentre y los clientes le vean publicado, necesitamos tres cosas:",
+      "cta": "Completar el perfil",
+      "note": "Lleva unos 5 minutos. Sus datos deciden qué expedientes le llegan."
+    },
+    "contact": {
+      "title": "¿Quién responde — y adónde?",
+      "lead": "Revise sobre todo el buzón: ahí llegan los expedientes.",
+      "name": "Persona de contacto",
+      "namePh": "Su nombre",
+      "inbox": "Buzón de respuesta",
+      "inboxHint": "Aquí llegan los expedientes y los enlaces mágicos: el buzón que su equipo realmente lee.",
+      "firm": "Despacho / empresa",
+      "website": "Sitio web"
+    },
+    "coverage": {
+      "title": "Qué cubre usted",
+      "lead": "El matching solo le muestra expedientes de esta selección.",
+      "countries": "Países",
+      "langs": "Idiomas",
+      "areas": "Áreas de práctica",
+      "sla": "Su objetivo SLA",
+      "slaDefault": "Confirmación en 24h · respuesta en 48h",
+      "slaFast": "Más rápido: 12h / 24h"
+    },
+    "listing": {
+      "title": "Su perfil público",
+      "lead": "Así aparece en el matching. Los campos dorados son opcionales — y cuentan en el ranking.",
+      "displayName": "Nombre público",
+      "shortDesc": "Descripción breve",
+      "shortDescPh": "En qué ayuda a sus clientes, en una o dos frases.",
+      "credentials": "Colegiación / profesión",
+      "credentialsPh": "p. ej. Abogada (DE) · Especialista en derecho TI",
+      "certs": "Certificaciones",
+      "certsPh": "p. ej. ISO 27001 Lead Auditor",
+      "activeSince": "Activo desde",
+      "teamSize": "Tamaño del equipo"
+    },
+    "done": {
+      "titlePre": "Está usted ",
+      "titleEm": "publicado",
+      "titlePost": ".",
+      "lead": "Su perfil está activo. Qué pasa ahora:",
+      "dossier": "Cuando un expediente encaja con su cobertura, llega a su buzón mediante enlace mágico.",
+      "sla": "Su confirmación detiene el contador del SLA — desde ahora rigen sus tiempos de respuesta.",
+      "rank": "Complete los campos dorados cuando quiera — cuentan en el ranking.",
+      "meterLabel": "Perfil {{pct}} % completo",
+      "cta": "Al panel"
+    },
+    "rankBadge": "mejora su ranking",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "activate": "Activar perfil",
+    "languages": {
+      "de": "Alemán",
+      "en": "Inglés",
+      "fr": "Francés",
+      "nl": "Neerlandés",
+      "es": "Español",
+      "tr": "Turco"
+    },
+    "areas": {
+      "taxVat": "Impuestos e IVA",
+      "productPackaging": "EPR y envases",
+      "dataPrivacy": "Datos y privacidad",
+      "marketingSeo": "Marketing",
+      "corporateStructure": "Sociedad y estructura",
+      "productCompliance": "Conformidad de producto",
+      "logisticsCustoms": "Logística y aduanas",
+      "legalAdvisory": "Asesoría jurídica"
+    },
+    "banner": {
+      "text": "Perfil {{pct}} % completo — los perfiles incompletos aparecen más abajo en el ranking.",
+      "cta": "Completar el perfil",
+      "dismiss": "Ocultar en esta sesión",
+      "dismissTitle": "Ocultar — vuelve en su próxima visita hasta completar el perfil"
+    }
   }
 }

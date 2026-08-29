@@ -18,7 +18,7 @@ const menuItemClass = (active: boolean) =>
     active ? 'text-fg-brand bg-brand-light' : 'text-fg-secondary hover:text-fg hover:bg-surface-secondary'
   }`;
 
-const HIDDEN_PATHS = ['/login', '/register', '/verify-email'];
+const HIDDEN_PATHS = ['/login', '/register', '/partner-apply', '/verify-email'];
 
 export function GlobalNav() {
   const { t, i18n } = useTranslation('common');

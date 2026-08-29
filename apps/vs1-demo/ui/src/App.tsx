@@ -58,6 +58,7 @@ const LibraryPage = lazy(() => import("./pages/user/LibraryPage").then((m) => ({
 const LoginPage = lazy(() => import("./pages/auth/LoginPage").then((m) => ({ default: m.LoginPage })));
 const ProviderIntakePage = lazy(() => import("./pages/onboarding/ProviderIntakePage").then((m) => ({ default: m.ProviderIntakePage })));
 const RegisterPage = lazy(() => import("./pages/auth/RegisterPage").then((m) => ({ default: m.RegisterPage })));
+const PartnerApplyPage = lazy(() => import("./pages/PartnerApplyPage").then((m) => ({ default: m.PartnerApplyPage })));
 const EmailVerificationPage = lazy(() => import("./pages/auth/EmailVerificationPage").then((m) => ({ default: m.EmailVerificationPage })));
 const AuthCallbackPage = lazy(() => import("./pages/auth/AuthCallbackPage").then((m) => ({ default: m.AuthCallbackPage })));
 const ResetPasswordPage = lazy(() => import("./pages/auth/ResetPasswordPage").then((m) => ({ default: m.ResetPasswordPage })));
@@ -256,6 +257,10 @@ function AppContent() {
                     <Route path="provider-intake" element={<ProviderIntakePage />} />
                     <Route path="partner-onboarding" element={<ProviderIntakePage />} />
                     <Route path="register" element={<RegisterPage />} />
+                    {/* Oeffentliche Partner-Bewerbung — fuehrt in die manuelle
+                        Pruefung; der token-gesicherte Intake bleibt der Weg fuer
+                        eingeladene Partner. */}
+                    <Route path="partner-apply" element={<PartnerApplyPage />} />
                     <Route path="verify-email" element={<EmailVerificationPage />} />
                     <Route path="auth/callback" element={<AuthCallbackPage />} />
                     <Route path="reset-password" element={<ResetPasswordPage />} />

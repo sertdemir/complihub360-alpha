@@ -8,6 +8,7 @@ import { PartnerStatusBadge, AvailabilityPill } from '../ui/ProviderBadges';
 import { SearchDrawer, HelpDrawer } from './ProviderDrawers';
 import { BellPopover } from './BellPopover';
 import { ConfirmDrawer, type ConfirmSpec } from './ConfirmDrawer';
+import { ProviderOnboardingModal, ProviderProfileBanner } from './ProviderOnboardingModal';
 import { fetchProviderBookings } from '../../api/bookings';
 import { fetchUnreadCount } from '../../api/notifications';
 import { fetchCoverage, setAvailability, AVAILABILITY_EVENT, DEMO_PROVIDER_KEY } from '../../api/provider';
@@ -103,6 +104,10 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen bg-surface text-fg">
+      {/* Erst das Profil, dann der Workspace: solange das Onboarding nicht
+          abgeschlossen ist, liegt das Modal ueber JEDER Workspace-Seite —
+          deshalb hier in der Shell, nicht auf einer Route. */}
+      <ProviderOnboardingModal />
       <Sidebar
         logo={
           <NavLink to={base} className="flex items-center gap-2">
@@ -159,7 +164,12 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
           </button>
           <PartnerStatusBadge status={vetted ? 'verified' : 'pending'} label={vetted ? 'Verified Partner' : 'Pending review'} />
         </header>
-        <main className={cn('flex-1 overflow-y-auto px-8 py-6')}>{children}</main>
+        <main className={cn('flex-1 overflow-y-auto px-8 py-6')}>
+          {/* O5-C: bis das Profil 100 % erreicht, steht der Vollstaendigkeits-
+              Banner ueber JEDER Workspace-Seite — deshalb hier, nicht je Seite. */}
+          <ProviderProfileBanner />
+          {children}
+        </main>
       </div>
       <SearchDrawer open={searchOpen} onClose={() => setSearchOpen(false)} />
       <HelpDrawer open={helpOpen} onClose={() => setHelpOpen(false)} />

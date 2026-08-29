@@ -19,9 +19,10 @@ export function SiteHeader() {
   const locale = localeOk ? seg[0] : 'en';
   const userHref = `/${locale}`;
   const loginHref = `/${locale}/login`;
+  const signupHref = `/${locale}/register`;
 
   if (localeOk && seg.length === 1) {
-    return <MarketingHeader userHref={userHref} loginHref={loginHref} />;
+    return <MarketingHeader userHref={userHref} loginHref={loginHref} signupHref={signupHref} />;
   }
   // The risk-map result and the partner-onboarding wizard carry their own
   // dedicated topbars — no global header.
