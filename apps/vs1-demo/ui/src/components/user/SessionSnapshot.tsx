@@ -342,7 +342,7 @@ export function SessionSnapshot({
                   {matchBasis && <div className="mt-3 border-t border-stroke-subtle pt-3">{matchBasis(p)}</div>}
                   {/* Der einzige gefuellte Knopf der Seite: der Weg zum
                       einzelnen Anbieter. */}
-                  <div className="mt-auto pt-3.5">
+                  <div className="mt-auto pt-5">
                     <Button variant="accent" className="w-full" onClick={() => onProviderDetails(p.provider_key)}>
                       {t('snapshot.providerDetails')}
                     </Button>
