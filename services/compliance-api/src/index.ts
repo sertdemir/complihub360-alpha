@@ -530,6 +530,85 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Session update failed', correlationId }));
             }
         });
+    } else if (req.method === 'GET' && /^\/api\/v1\/session\/[0-9a-f-]{36}\/obligations$/.test(req.url || '')) {
+        // Bearbeitungs-Stand der Pflichten einer Sitzung. Nur ABWEICHUNGEN
+        // liegen in der Tabelle — was nicht drinsteht, ist 'open'.
+        const sessionId = (req.url || '').split('/')[4];
+        try {
+            const rows = (await supabaseApi.select('session_obligation_status', { session_id: sessionId }, { limit: 200 })) as Array<Record<string, unknown>>;
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+                items: rows.map((r) => ({
+                    obligation_id: r.obligation_id,
+                    status: r.status,
+                    done_at: r.done_at ?? null,
+                    note: r.note ?? null,
+                    updated_at: r.updated_at,
+                })),
+            }));
+        } catch (err) {
+            structuredLog('error', 'Obligation status read failed', { correlationId, errorCode: 'ERR_OBLIGATION_READ', severity: 'error', route: req.url });
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Failed to read obligation status', correlationId }));
+        }
+    } else if (req.method === 'PUT' && /^\/api\/v1\/session\/[0-9a-f-]{36}\/obligations\/[a-z0-9-]{1,64}$/.test(req.url || '')) {
+        // Eine Pflicht auf einen Zustand setzen. 'open' loescht die Zeile —
+        // der Ausgangszustand braucht keinen Eintrag.
+        const parts = (req.url || '').split('/');
+        const sessionId = parts[4];
+        const obligationId = parts[6];
+        let obBody = '';
+        req.on('data', (chunk: any) => obBody += chunk.toString());
+        req.on('end', async () => {
+            try {
+                const d = JSON.parse(obBody || '{}');
+                const status = String(d.status || '');
+                if (!['open', 'in_progress', 'done', 'not_applicable'].includes(status)) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'BAD_STATUS', message: 'Unknown status', correlationId }));
+                    return;
+                }
+                const owner = (await supabaseApi.select('sessions', { id: sessionId }, { limit: 1 })) as unknown[];
+                if (!owner.length) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Session not found', correlationId }));
+                    return;
+                }
+
+                if (status === 'open') {
+                    await supabaseApi.remove('session_obligation_status', { session_id: sessionId, obligation_id: obligationId });
+                    res.setHeader('x-correlation-id', correlationId);
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ ok: true, obligation_id: obligationId, status: 'open' }));
+                    return;
+                }
+
+                // Das Datum setzt der Server, nicht der Client: "erledigt am"
+                // ist eine Systemaussage, keine Eingabe. Nur 'done' traegt eins
+                // — der CHECK in der Migration erzwingt das ohnehin.
+                const doneAt = status === 'done'
+                    ? (typeof d.done_at === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d.done_at) ? d.done_at : new Date().toISOString().slice(0, 10))
+                    : null;
+                const row = {
+                    session_id: sessionId,
+                    obligation_id: obligationId,
+                    status,
+                    done_at: doneAt,
+                    note: typeof d.note === 'string' ? d.note.slice(0, 500) || null : null,
+                    updated_at: new Date().toISOString(),
+                };
+                await supabaseApi.upsert('session_obligation_status', 'session_id,obligation_id', row);
+                await supabaseApi.insert('event_log', { type: 'obligation_status_set', payload: { sessionId, obligationId, status } });
+                res.setHeader('x-correlation-id', correlationId);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, obligation_id: obligationId, status, done_at: doneAt }));
+            } catch (err) {
+                structuredLog('error', 'Obligation status write failed', { correlationId, errorCode: 'ERR_OBLIGATION_WRITE', severity: 'error', route: req.url });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Failed to set obligation status', correlationId }));
+            }
+        });
     } else if (req.method === 'POST' && /^\/api\/v1\/session\/[0-9a-f-]{36}\/duplicate$/.test(req.url || '')) {
         // B13: duplicate a session as an editable copy.
         const sessionId = (req.url || '').split('/')[4];

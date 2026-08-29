@@ -237,5 +237,68 @@
     "marketMissing": "Pazarınızı kapsamıyor",
     "areas": "{{total}} alanınızdan {{matched}} tanesi",
     "how": "Yüzde, pazar kapsamı ile talep ettiklerinizin bu uzman tarafından gerçekten karşılanan kısmının toplamıdır."
+  },
+  "snapshot": {
+    "fallbackTitle": "Risk haritanız",
+    "areas_one": "{{count}} alan",
+    "areas_other": "{{count}} alan",
+    "exportPdf": "PDF olarak dışa aktar",
+    "editAnswers": "Yanıtları düzenle",
+    "kpiTotal": "Toplam yükümlülük",
+    "kpiTotalSub": "{{now}} acil · {{high}} yüksek · {{rest}} diğer",
+    "kpiSoon": "30 gün içinde süre",
+    "kpiSoonSub": "en yakın olanlar aşağıda",
+    "kpiOpen": "Açık sorular",
+    "kpiOpenSub_one": "{{count}} yükümlülük yanıtınızı bekliyor",
+    "kpiOpenSub_other": "{{count}} yükümlülük yanıtlarınızı bekliyor",
+    "group": {
+      "now": "Hemen harekete geçin",
+      "month": "Bu ay",
+      "open": "Önce netleştirin",
+      "later": "Daha sonra"
+    },
+    "groupSub": {
+      "now_one": "{{count}} yükümlülük",
+      "now_other": "{{count}} yükümlülük",
+      "month_one": "{{count}} yükümlülük",
+      "month_other": "{{count}} yükümlülük",
+      "open_one": "{{count}} yükümlülük yanıtlarınıza bağlı",
+      "open_other": "{{count}} yükümlülük yanıtlarınıza bağlı",
+      "later_one": "{{count}} yükümlülük",
+      "later_other": "{{count}} yükümlülük"
+    },
+    "historyTitle": "Bu oturumun geçmişi",
+    "historyCurrent": "Güncel durum",
+    "historyStart": "Oturum oluşturuldu",
+    "historyCreated": "İlk verdiğiniz yanıtlar",
+    "copyVariant": "Varyant olarak kopyala",
+    "copyHint": "Bir kopya oluşturur — orijinali kaybetmeden varyantları deneyin.",
+    "copyDone": "Kopya oluşturuldu",
+    "copyOpenList": "Oturumlarda aç",
+    "copyError": "Kopya oluşturulamadı.",
+    "copyUnavailable": "Önce kaydedin, sonra varyant oluşturabilirsiniz.",
+    "verifiedPartner": "Verified Partner",
+    "activeSince": "{{year}} yılından beri aktif",
+    "responseTime": "Ø {{hours}} sa. yanıt süresi",
+    "billing": {
+      "abo": "Abonelik",
+      "hourly": "Saatlik",
+      "project": "Proje bazlı",
+      "mixed": "Karma"
+    },
+    "providerDetails": "Ayrıntıları gör",
+    "geltung": {
+      "duty": "Yükümlülük",
+      "likelyDuty": "Muhtemelen yükümlülük",
+      "toClarify": "Önce netleştirin"
+    },
+    "task": {
+      "open": "Açık",
+      "in_progress": "Devam ediyor",
+      "done": "Tamamlandı",
+      "not_applicable": "Geçerli değil"
+    },
+    "progress": "{{total}} yükümlülükten {{done}} tamamlandı",
+    "progressSub": "{{prog}} devam ediyor · {{open}} açık · {{na}} geçerli değil"
   }
 }

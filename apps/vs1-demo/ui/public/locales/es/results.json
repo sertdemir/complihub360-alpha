@@ -237,5 +237,68 @@
     "marketMissing": "No cubre su mercado",
     "areas": "{{matched}} de {{total}} de sus áreas",
     "how": "El porcentaje es la cobertura de mercado más la parte de lo que usted solicitó que este especialista cubre realmente."
+  },
+  "snapshot": {
+    "fallbackTitle": "Su mapa de riesgos",
+    "areas_one": "{{count}} área",
+    "areas_other": "{{count}} áreas",
+    "exportPdf": "Exportar PDF",
+    "editAnswers": "Editar respuestas",
+    "kpiTotal": "Obligaciones en total",
+    "kpiTotalSub": "{{now}} inmediatas · {{high}} altas · {{rest}} restantes",
+    "kpiSoon": "Plazo en 30 días",
+    "kpiSoonSub": "los más próximos figuran abajo",
+    "kpiOpen": "Preguntas abiertas",
+    "kpiOpenSub_one": "{{count}} obligación espera su respuesta",
+    "kpiOpenSub_other": "{{count}} obligaciones esperan sus respuestas",
+    "group": {
+      "now": "Actuar ahora",
+      "month": "Este mes",
+      "open": "Primero aclarar",
+      "later": "Más adelante"
+    },
+    "groupSub": {
+      "now_one": "{{count}} obligación",
+      "now_other": "{{count}} obligaciones",
+      "month_one": "{{count}} obligación",
+      "month_other": "{{count}} obligaciones",
+      "open_one": "{{count}} obligación depende de sus respuestas",
+      "open_other": "{{count}} obligaciones dependen de sus respuestas",
+      "later_one": "{{count}} obligación",
+      "later_other": "{{count}} obligaciones"
+    },
+    "historyTitle": "Historial de esta sesión",
+    "historyCurrent": "Estado actual",
+    "historyStart": "Sesión creada",
+    "historyCreated": "Sus respuestas iniciales",
+    "copyVariant": "Copiar como variante",
+    "copyHint": "Crea una copia: pruebe variantes sin perder el original.",
+    "copyDone": "Copia creada",
+    "copyOpenList": "Abrir en sesiones",
+    "copyError": "No se pudo crear la copia.",
+    "copyUnavailable": "Guarde primero y podrá crear una variante.",
+    "verifiedPartner": "Verified Partner",
+    "activeSince": "activo desde {{year}}",
+    "responseTime": "Ø {{hours}} h de respuesta",
+    "billing": {
+      "abo": "Suscripción",
+      "hourly": "Por horas",
+      "project": "Por proyecto",
+      "mixed": "Mixto"
+    },
+    "providerDetails": "Ver detalles",
+    "geltung": {
+      "duty": "Obligación",
+      "likelyDuty": "Probablemente obligación",
+      "toClarify": "Primero aclarar"
+    },
+    "task": {
+      "open": "Abierto",
+      "in_progress": "En curso",
+      "done": "Hecho",
+      "not_applicable": "No aplica"
+    },
+    "progress": "{{done}} de {{total}} hecho",
+    "progressSub": "{{prog}} en curso · {{open}} abierto · {{na}} no aplica"
   }
 }

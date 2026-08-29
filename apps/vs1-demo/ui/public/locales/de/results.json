@@ -237,5 +237,68 @@
     "marketMissing": "Deckt Ihren Markt nicht ab",
     "areas": "{{matched}} von {{total}} Ihrer Bereiche",
     "how": "Der Prozentwert ist die Marktabdeckung plus der Anteil dessen, was Sie angefragt haben und diese Fachperson tatsächlich abdeckt."
+  },
+  "snapshot": {
+    "fallbackTitle": "Ihre Risk Map",
+    "areas_one": "{{count}} Bereich",
+    "areas_other": "{{count}} Bereiche",
+    "exportPdf": "PDF exportieren",
+    "editAnswers": "Antworten bearbeiten",
+    "kpiTotal": "Pflichten gesamt",
+    "kpiTotalSub": "{{now}} sofort · {{high}} hoch · {{rest}} übrige",
+    "kpiSoon": "Frist in 30 Tagen",
+    "kpiSoonSub": "die nächsten stehen unten",
+    "kpiOpen": "Offene Fragen",
+    "kpiOpenSub_one": "{{count}} Pflicht wartet auf Ihre Antwort",
+    "kpiOpenSub_other": "{{count}} Pflichten warten auf Ihre Antworten",
+    "group": {
+      "now": "Sofort handeln",
+      "month": "Diesen Monat",
+      "open": "Erst zu klären",
+      "later": "Später"
+    },
+    "groupSub": {
+      "now_one": "{{count}} Pflicht",
+      "now_other": "{{count}} Pflichten",
+      "month_one": "{{count}} Pflicht",
+      "month_other": "{{count}} Pflichten",
+      "open_one": "{{count}} Pflicht hängt an Ihren Antworten",
+      "open_other": "{{count}} Pflichten hängen an Ihren Antworten",
+      "later_one": "{{count}} Pflicht",
+      "later_other": "{{count}} Pflichten"
+    },
+    "historyTitle": "Verlauf dieser Sitzung",
+    "historyCurrent": "Aktueller Stand",
+    "historyStart": "Sitzung angelegt",
+    "historyCreated": "Ausgangsstand Ihrer Antworten",
+    "copyVariant": "Als Variante kopieren",
+    "copyHint": "Legt eine Kopie an — Varianten durchspielen, ohne das Original zu verlieren.",
+    "copyDone": "Kopie angelegt",
+    "copyOpenList": "In den Sitzungen öffnen",
+    "copyError": "Die Kopie konnte nicht angelegt werden.",
+    "copyUnavailable": "Erst speichern, dann lässt sich eine Variante anlegen.",
+    "verifiedPartner": "Verified Partner",
+    "activeSince": "aktiv seit {{year}}",
+    "responseTime": "Ø {{hours}} Std. Antwortzeit",
+    "billing": {
+      "abo": "Abomodell",
+      "hourly": "Stundenbasis",
+      "project": "Projektbasiert",
+      "mixed": "Gemischt"
+    },
+    "providerDetails": "Details ansehen",
+    "geltung": {
+      "duty": "Pflicht",
+      "likelyDuty": "Vermutlich Pflicht",
+      "toClarify": "Erst zu klären"
+    },
+    "task": {
+      "open": "Offen",
+      "in_progress": "In Arbeit",
+      "done": "Erledigt",
+      "not_applicable": "Trifft nicht zu"
+    },
+    "progress": "{{done}} von {{total}} erledigt",
+    "progressSub": "{{prog}} in Arbeit · {{open}} offen · {{na}} trifft nicht zu"
   }
 }
