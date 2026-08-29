@@ -52,7 +52,10 @@
     "navAlerts": "Alerts",
     "navCalendar": "Calendar",
     "signOut": "Sign out",
-    "search": "Search"
+    "search": "Search",
+    "sessionsToggle": "Expand or collapse sessions",
+    "sessionsAll_one": "All {{count}} session",
+    "sessionsAll_other": "All {{count}} sessions"
   },
   "home": {
     "title": "Welcome back, <accent>{{name}}</accent>.",

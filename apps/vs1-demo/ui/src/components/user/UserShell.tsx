@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import {
   LayoutGrid, FolderClosed, Bell, BookOpen, Bookmark, Download, CalendarCheck,
   TriangleAlert, Calendar, Search, LogOut, Landmark, Package, ShieldCheck, Megaphone, Building2,
-  PackageCheck, Truck, Scale,
+  PackageCheck, Truck, Scale, ChevronRight,
 } from 'lucide-react';
 import { DOMAINS as CANONICAL_DOMAINS, type DomainSlug } from '../../lib/domains';
 import { Sidebar, SidebarGroup, NavItem } from '../ui/AppShell';
@@ -13,6 +13,7 @@ import { LogoMark } from '../ui/Logo';
 import { UserSearchDrawer } from './UserSearchDrawer';
 import { AssistantWidget } from './AssistantWidget';
 import { fetchUserBookings } from '../../api/bookings';
+import { fetchSessions, type SessionRowData } from '../../api/sessions';
 import { fetchNotificationsFeed, USER_NOTIFICATIONS_VIEWER } from '../../api/notifications';
 
 // ─── UserShell ────────────────────────────────────────────────────────────────
@@ -104,6 +105,11 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
   // B16: workspace search drawer · C1: live sidebar badges (hidden in fixture mode).
   const [searchOpen, setSearchOpen] = useState(false);
   const [counts, setCounts] = useState<{ requests?: number; unread?: number }>({});
+  // ─── Sitzungen als zweite Nav-Ebene (Canvas N, Variante N3b) ──────────────
+  // Zugeklappt, damit die Nav nicht mit jeder neuen Sitzung waechst — aber die
+  // AKTIVE bleibt sichtbar, sonst weiss niemand, worin er gerade steckt.
+  const [sessions, setSessions] = useState<SessionRowData[]>([]);
+  const [sessionsOpen, setSessionsOpen] = useState(false);
   useEffect(() => {
     fetchUserBookings()
       .then((bs) => setCounts((c) => ({ ...c, requests: bs.filter((b) => b.status === 'confirmed').length })))
@@ -111,7 +117,18 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
     fetchNotificationsFeed(USER_NOTIFICATIONS_VIEWER)
       .then((f) => setCounts((c) => ({ ...c, unread: f.groups.reduce((n, g) => n + g.items.filter((i) => i.unread).length, 0) })))
       .catch(() => {});
+    // Ohne API bleibt die Liste leer und die Ebene erscheint gar nicht —
+    // eine Fixture-Sitzung in der Navigation waere eine Behauptung.
+    fetchSessions().then(setSessions).catch(() => {});
   }, []);
+
+  // Welche Sitzung ist offen? /results?session=<id> ist der einzige Ort, an
+  // dem eine einzelne Sitzung angezeigt wird.
+  const activeSessionId = new URLSearchParams(location.search).get('session');
+  const activeSession = sessions.find((s2) => s2.id === activeSessionId) ?? null;
+  const shownSessions = sessionsOpen ? sessions : (activeSession ? [activeSession] : []);
+  const sessionLabel = (s2: SessionRowData) =>
+    s2.label || [s2.country, (s2.categories ?? [])[0]].filter(Boolean).join(' · ') || t('shell.navSessions');
   const badgeFor = (to: string): string | undefined => {
     const n = to === 'dashboard/termine' ? counts.requests : to === 'dashboard/notifications' ? counts.unread : undefined;
     return n ? String(n) : undefined;
@@ -156,6 +173,54 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
                   ? location.pathname === target || location.pathname === `${target}/`
                   : location.pathname.startsWith(target);
                 const Icon = it.icon;
+                if (it.to === 'dashboard/sessions') {
+                  return (
+                    <React.Fragment key={it.to}>
+                      <div className="flex items-center">
+                        <NavLink to={target} className="min-w-0 flex-1">
+                          <NavItem icon={<Icon size={16} />} label={t(`shell.${it.labelKey}`)} count={it.count ?? badgeFor(it.to)} active={active} />
+                        </NavLink>
+                        {sessions.length > 0 && (
+                          <button
+                            type="button"
+                            aria-expanded={sessionsOpen}
+                            aria-label={t('shell.sessionsToggle', { defaultValue: 'Sitzungen ein- und ausklappen' })}
+                            onClick={() => setSessionsOpen((v) => !v)}
+                            className="shrink-0 rounded-md p-1 text-fg-tertiary transition-colors hover:text-fg"
+                          >
+                            <ChevronRight size={13} className={'transition-transform ' + (sessionsOpen ? 'rotate-90' : '')} />
+                          </button>
+                        )}
+                      </div>
+                      {shownSessions.map((s2) => (
+                        <NavLink key={s2.id} to={`${base}/results?session=${s2.id}`} className="block">
+                          <span
+                            className={'ml-6 flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[12px] transition-colors '
+                              + (s2.id === activeSessionId
+                                ? 'bg-brand-light font-bold text-fg'
+                                : 'text-fg-secondary hover:bg-elevate/5')}
+                          >
+                            {s2.country && (
+                              <span className="shrink-0 text-[9px] font-extrabold uppercase tracking-[0.05em] text-fg-accent-emphasis">
+                                {s2.country}
+                              </span>
+                            )}
+                            <span className="truncate">{sessionLabel(s2)}</span>
+                          </span>
+                        </NavLink>
+                      ))}
+                      {!sessionsOpen && sessions.length > (activeSession ? 1 : 0) && (
+                        <button
+                          type="button"
+                          onClick={() => setSessionsOpen(true)}
+                          className="ml-6 block px-2.5 py-1 text-left text-[11px] font-semibold text-brand underline underline-offset-2"
+                        >
+                          {t('shell.sessionsAll', { count: sessions.length })}
+                        </button>
+                      )}
+                    </React.Fragment>
+                  );
+                }
                 return (
                   <NavLink key={it.to} to={target}>
                     <NavItem icon={<Icon size={16} />} label={t(`shell.${it.labelKey}`)} count={it.count ?? badgeFor(it.to)} active={active} />

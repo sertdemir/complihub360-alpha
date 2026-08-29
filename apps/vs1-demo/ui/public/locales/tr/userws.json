@@ -52,7 +52,10 @@
     "navAlerts": "Uyarılar",
     "navCalendar": "Takvim",
     "signOut": "Oturumu kapat",
-    "search": "Ara"
+    "search": "Ara",
+    "sessionsToggle": "Oturumları aç veya kapat",
+    "sessionsAll_one": "{{count}} oturumun tümü",
+    "sessionsAll_other": "{{count}} oturumun tümü"
   },
   "home": {
     "title": "Tekrar hoş geldiniz, <accent>{{name}}</accent>.",
