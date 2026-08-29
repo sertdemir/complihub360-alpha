@@ -1,4 +1,5 @@
-import { Play, ArrowRight } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
+import { Play, ArrowRight, TriangleAlert, CalendarClock } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { generateRiskMapPdf } from '../../lib/riskMapPdf';
@@ -6,79 +7,175 @@ import { OBLIGATIONS, STATS } from '../ResultsRiskMap';
 import { UserShell } from '../../components/user/UserShell';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Button } from '../../components/ui/Button';
-import { Card } from '../../components/ui/Card';
-import { RequestCard } from '../../components/ui/RequestCard';
-import { DomainCard } from '../../components/ui/DomainCard';
+import { Segment } from '../../components/compliance-areas';
 
-// ─── User Dashboard · Home v2 ─────────────────────────────────────────────────
-// Mirrors "User Dashboard v1 · Home (Desktop)" (2051:45): welcome header with
-// gold name · resume panel · active requests (Request Cards) · saved sessions
-// (Domain Cards with risk-colored meta). Design fixture until the API lands.
+// ─── User Dashboard · Home v3 (Bento) ────────────────────────────────────────
+// Canvas "User-Dashboard", Gesamt · V3 auf dem Gradient (Nutzer-Wahl
+// 2026-08-29, plus drei Optimierungen: prominentes Warnband, "Weitermachen"
+// als Karte in der rechten Spalte, mehr Raum). Ersetzt das langgezogene
+// Karten-Layout durch ein Kachelraster: KPI-Reihe mit Donuts, Hero-Karte
+// "Pflichten je Markt", kompakte Anfragen-Liste, rechte Spalte mit Terminen,
+// naechstem Schritt und der Weitermachen-Karte, Sitzungen als kleine Kacheln.
+//
+// Alle Zahlen sind weiterhin die Design-Fixture bis die API steht — aber in
+// sich konsistent: 12 Pflichten = 2 hoch / 6 mittel / 4 niedrig, je Markt
+// IT 5 · FR 3 · UK 3 · ES 1. Die Mini-Charts zeigen ZUSAMMENSETZUNGEN dieser
+// Fixture, keine erfundenen Trends ("+12 % vs. letzte Woche" gibt es nicht,
+// weil es keine Zeitreihe gibt).
 
 const REQUESTS = [
   {
-    id: '14h ago', status: 'awaiting-confirm' as const, statusLabel: 'Awaiting confirmation',
-    company: 'Verifizierte Steuerkanzlei · Norditalien', meta: 'VAT registration · Italy · 14h ago',
-    action: { label: 'Send reminder', variant: 'secondary' as const },
+    initials: 'VS', tone: 'bg-brand-accent text-fg-on-accent',
+    status: 'wait' as const, statusLabel: 'Awaiting confirmation',
+    company: 'Verifizierte Steuerkanzlei', meta: 'VAT registration · Italien · vor 14 Std.',
+    action: 'Send reminder',
   },
   {
-    id: '2d ago', status: 'active' as const, statusLabel: 'Active',
-    company: 'Verifizierter EPR-Spezialist · Deutschland', meta: 'EPR registration · France',
-    action: { label: 'Open thread', variant: 'secondary' as const },
+    initials: 'EP', tone: 'bg-brand text-fg-on-brand',
+    status: 'active' as const, statusLabel: 'Active',
+    company: 'Verifizierter EPR-Spezialist', meta: 'EPR registration · Frankreich · vor 2 Tagen',
+    action: 'Open thread',
   },
   {
-    id: '4d ago', status: 'active' as const, statusLabel: 'Active',
-    company: 'Verifizierte Datenschutz-Kanzlei · UK', meta: 'GDPR audit · UK · 4d ago',
-    action: { label: 'Open thread', variant: 'secondary' as const },
+    initials: 'DK', tone: 'bg-primary-800 text-white',
+    status: 'active' as const, statusLabel: 'Active',
+    company: 'Verifizierte Datenschutz-Kanzlei', meta: 'GDPR audit · UK · vor 4 Tagen',
+    action: 'Open thread',
   },
 ];
 
 const SESSIONS = [
-  { eyebrow: 'TAX & VAT · IT', title: 'VAT registration · Italy', meta: '● High risk · threshold reached · Updated 2h ago', risk: 'high' },
-  { eyebrow: 'PRODUCT & PACKAGING · FR', title: 'EPR registration · France', meta: '● Medium risk · deadline Q3 2026 · Updated 1d ago', risk: 'medium' },
-  { eyebrow: 'DATA & PRIVACY · UK', title: 'GDPR audit & DPA review', meta: '● High risk · cookie consent · Updated 3d ago', risk: 'high' },
-  { eyebrow: 'TAX & VAT · ES', title: 'VAT thresholds · Spain', meta: '● Low risk · monitoring only · Updated 7d ago', risk: 'low' },
+  { eyebrow: 'TAX & VAT · IT', title: 'VAT registration · Italien', risk: 'high' as const, meta: 'Hohes Risiko · Schwelle erreicht', upd: 'vor 2 Std.', frac: 0.8 },
+  { eyebrow: 'EPR · FR', title: 'EPR registration · Frankreich', risk: 'medium' as const, meta: 'Frist Q3 2026', upd: 'vor 1 Tag', frac: 0.55 },
+  { eyebrow: 'DATEN · UK', title: 'GDPR audit & DPA review', risk: 'high' as const, meta: 'Cookie-Consent', upd: 'vor 3 Tagen', frac: 0.7 },
+  { eyebrow: 'TAX & VAT · ES', title: 'VAT thresholds · Spanien', risk: 'low' as const, meta: 'nur Beobachtung', upd: 'vor 7 Tagen', frac: 0.25 },
 ];
 
-// Traffic light straight off the risk tokens — these were hardcoded to a red and
-// an amber that existed in no scale, so they never followed the theme.
-const RISK_META: Record<string, string> = {
-  high: 'text-risk-high', medium: 'text-risk-medium', low: 'text-risk-low',
-};
+// Pflichten je Markt / je Bereich — beide Sichten summieren auf die 12 des
+// Snapshots, davon 2 mit hohem Risiko (IT und UK je 1).
+const BY_MARKET = [
+  { label: 'IT', total: 5, high: 1 },
+  { label: 'FR', total: 3, high: 0 },
+  { label: 'UK', total: 3, high: 1 },
+  { label: 'ES', total: 1, high: 0 },
+];
+const BY_AREA = [
+  { label: 'Tax & VAT', total: 6, high: 1 },
+  { label: 'EPR', total: 3, high: 0 },
+  { label: 'Daten', total: 3, high: 1 },
+];
 
-// Fixture UI labels → userws keys (display only; fixture data stays original).
-const STATUS_KEY: Record<string, string> = {
-  'Awaiting confirmation': 'awaitingConfirmation', 'Active': 'active',
-  'Provider replied': 'providerReplied', 'Provider confirmed': 'providerConfirmed', 'Withdrawn': 'withdrawn',
-};
-const ACTION_KEY: Record<string, string> = {
-  'Send reminder': 'sendReminder', 'Open thread': 'openThread', 'View thread': 'viewThread', 'View request': 'viewRequest',
-};
+// Termine-Fixture — dieselben zwei, die die Termine-Seite traegt.
+const APPOINTMENTS = [
+  { day: 'Di', date: '02', title: '10:00 · Erstgespräch Steuerkanzlei', sub: 'VAT · Italien' },
+  { day: 'Do', date: '04', title: '14:30 · Dossier-Review EPR', sub: 'EPR · Frankreich' },
+];
 
-function SectionHeader({ title, count, to }: { title: string; count: string; to: string }) {
+const RISK_TEXT = { high: 'text-risk-high', medium: 'text-risk-medium', low: 'text-risk-low' } as const;
+const RISK_BG = { high: 'bg-risk-high', medium: 'bg-risk-medium', low: 'bg-risk-low' } as const;
+
+const STATUS_KEY: Record<string, string> = { 'Awaiting confirmation': 'awaitingConfirmation', 'Active': 'active' };
+const ACTION_KEY: Record<string, string> = { 'Send reminder': 'sendReminder', 'Open thread': 'openThread' };
+
+const CARD = 'rounded-xl border border-stroke-subtle bg-surface shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]';
+
+/** Donut aus Zusammensetzungs-Anteilen; Farben folgen den Tokens via currentColor. */
+function Donut({ segs, size = 46, stroke = 7, center }: {
+  segs: { frac: number; cls: string }[]; size?: number; stroke?: number; center?: string;
+}) {
+  const r = (size - stroke) / 2 - 1;
+  const c = 2 * Math.PI * r;
+  let off = 0;
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke} stroke="currentColor" className="text-stroke-subtle" />
+      {segs.map((s) => {
+        const d = s.frac * c;
+        const el = (
+          <circle
+            key={s.cls + off}
+            cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke}
+            stroke="currentColor" className={s.cls}
+            strokeDasharray={`${d} ${c - d}`} strokeDashoffset={-off}
+            transform={`rotate(-90 ${size / 2} ${size / 2})`}
+          />
+        );
+        off += d;
+        return el;
+      })}
+      {center && (
+        <text x="50%" y="54%" textAnchor="middle" fill="currentColor" className="text-fg" fontSize="12" fontWeight="800">{center}</text>
+      )}
+    </svg>
+  );
+}
+
+/** Zusammensetzungs-Balken (keine Zeitreihe): Hoehen relativ zum Maximum. */
+function SparkBars({ vals, cls = 'text-brand' }: { vals: number[]; cls?: string }) {
+  const w = 64, h = 30, bw = w / vals.length - 4;
+  const max = Math.max(...vals);
+  return (
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden className={cls}>
+      {vals.map((v, i) => {
+        const bh = Math.max(3, (v / max) * h);
+        return <rect key={i} x={i * (bw + 4)} y={h - bh} width={bw} height={bh} rx="2.5" fill="currentColor" />;
+      })}
+    </svg>
+  );
+}
+
+function KpiCard({ title, big, sub, chip, children }: {
+  title: string; big: string; sub: string; chip?: string; children: ReactNode;
+}) {
+  return (
+    <div className={CARD + ' flex-1 p-5'}>
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{title}</p>
+        {chip && <span className="rounded-md bg-warning-bg px-1.5 py-0.5 text-[10px] font-extrabold text-warning-700">{chip}</span>}
+      </div>
+      <div className="mt-2.5 flex items-center justify-between gap-3">
+        <div>
+          <p className="font-serif text-[24px] font-bold leading-none text-fg">{big}</p>
+          <p className="mt-1.5 text-body-2xs text-fg-tertiary">{sub}</p>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function SectionHead({ title, count, to, extra }: { title: string; count?: string; to: string; extra?: ReactNode }) {
   const { t, i18n } = useTranslation('userws');
   const base = `/${i18n.resolvedLanguage || 'en'}`;
   return (
-    <div className="flex items-baseline gap-2">
-      <h2 className="text-[15px] font-semibold text-fg">{title}</h2>
-      <span className="text-[13px] font-semibold text-fg-brand">{count}</span>
-      <Link to={`${base}/${to}`} className="ml-auto text-[12px] text-fg-secondary underline-offset-2 hover:underline">{t('shared.seeAll')}</Link>
+    <div className="mb-3 flex items-baseline gap-2">
+      <h2 className="text-body-md font-bold text-fg">{title}</h2>
+      {count && <span className="text-body-xs font-bold text-fg-brand">{count}</span>}
+      {extra}
+      <Link to={`${base}/${to}`} className="ml-auto text-body-2xs text-fg-secondary underline-offset-2 hover:underline">
+        {t('shared.seeAll')}
+      </Link>
     </div>
   );
 }
 
 export function UserHomePage() {
-  // C6: Resume -> results with the stored profile · Start new -> fresh wizard.
   const navigate = useNavigate();
   const { locale = 'en' } = useParams();
-  const { t } = useTranslation('userws');
+  const { t, i18n } = useTranslation('userws');
   const { t: tResults } = useTranslation('results');
+  const [chartView, setChartView] = useState<'markets' | 'areas'>('markets');
   const hasProfile = !!localStorage.getItem('ch360_last_profile');
-  const tStatus = (label: string) => (STATUS_KEY[label] ? t(`status.${STATUS_KEY[label]}`) : label);
-  const tAction = (label: string) => (ACTION_KEY[label] ? t(`actions.${ACTION_KEY[label]}`) : label);
-  // A6: same PII-free PDF snapshot as on /results, from the resume panel.
-  // Translated at the render point (results namespace); canonical EN fallback.
-  // async, seit jspdf erst beim Klick geladen wird (lib/riskMapPdf.ts).
+  const tStatus = (label: string) => t(`status.${STATUS_KEY[label]}`);
+  const tAction = (label: string) => t(`actions.${ACTION_KEY[label]}`);
+  const firstName = (useAuthStore((st) => st.userName) || 'Alex').split(/[\s._-]+/)[0];
+  const today = new Date().toLocaleDateString(i18n.resolvedLanguage || 'en', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+  });
+  const chartData = chartView === 'markets' ? BY_MARKET : BY_AREA;
+  const chartMax = Math.max(...chartData.map((m) => m.total));
+
+  // A6: derselbe PII-freie PDF-Schnappschuss wie auf /results (jspdf laedt beim Klick).
   const exportPdf = async () => {
     let profile = null;
     try { profile = JSON.parse(localStorage.getItem('ch360_last_profile') || 'null'); } catch { /* fixture */ }
@@ -100,72 +197,199 @@ export function UserHomePage() {
       })),
     });
   };
-  const firstName = (useAuthStore((st) => st.userName) || 'Alex').split(/[\s._-]+/)[0];
+
   return (
     <UserShell>
-      <div className="mx-auto max-w-[1140px] space-y-7">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="font-serif text-[32px] font-bold leading-tight text-fg">
-              <Trans t={t} i18nKey="home.title" values={{ name: firstName }} components={{ accent: <span className="text-fg-accent-emphasis" /> }} />
-            </h1>
-            <p className="mt-1 text-body-sm text-fg-secondary">
-              {t('home.sub')}
-            </p>
+      {/* Der Gradient liegt unter dem ganzen Main-Bereich, die Karten weiss
+          darauf — die Shell selbst bleibt unangetastet (negative Raender
+          heben ihr Main-Padding auf). */}
+      <div className="-mx-8 -my-6 min-h-full bg-gradient-stage px-8 py-7">
+        <div className="mx-auto max-w-[1200px]">
+          {/* Kopf: Begruessung + Datum, rechts der Primaer-CTA */}
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="font-serif text-[22px] font-bold leading-tight text-fg">
+                <Trans t={t} i18nKey="home.title" values={{ name: firstName }} components={{ accent: <span className="text-fg-accent-emphasis" /> }} />
+              </h1>
+              <p className="mt-1 text-body-2xs text-fg-tertiary">{today} · {t('home.lastActivity')}</p>
+            </div>
+            <Button className="mt-0.5 shrink-0" onClick={() => navigate(`/${locale}/wizard`)}>{t('shared.startNewSearch')}</Button>
           </div>
-          <Button className="mt-1 shrink-0" onClick={() => navigate(`/${locale}/wizard`)}>{t('shared.startNewSearch')}</Button>
+
+          {/* Prominentes Warnband (Nutzer-Optimierung: faellt direkt ins Auge) */}
+          <div className="mt-4 flex items-center gap-3.5 rounded-xl border border-warning-500/45 border-l-4 border-l-risk-medium bg-warning-bg px-5 py-3.5">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-risk-medium/15 text-warning-700">
+              <TriangleAlert size={17} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-body-xs font-extrabold text-warning-700">{t('home.alertTitle')}</p>
+              <p className="mt-0.5 text-body-2xs text-warning-700/80">{t('home.alertBody')}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate(`/${locale}/dashboard/sessions`)}
+              className="shrink-0 rounded-lg bg-risk-medium px-3.5 py-2 text-body-2xs font-bold text-white transition-colors hover:bg-risk-on-medium"
+            >
+              {t('home.alertCta')}
+            </button>
+          </div>
+
+          {/* KPI-Reihe */}
+          <div className="mt-[18px] flex flex-col gap-[18px] lg:flex-row">
+            <KpiCard title={t('home.kpiRequests')} big="3" sub={t('home.kpiRequestsSub')} chip={t('home.kpiRequestsChip')}>
+              <Donut segs={[{ frac: 1 / 3, cls: 'text-fg-accent' }, { frac: 2 / 3, cls: 'text-brand' }]} center="3" />
+            </KpiCard>
+            <KpiCard title={t('home.kpiDuties')} big="12" sub={t('home.kpiDutiesSub')}>
+              <Donut segs={[{ frac: 2 / 12, cls: 'text-risk-high' }, { frac: 6 / 12, cls: 'text-risk-medium' }, { frac: 4 / 12, cls: 'text-risk-low' }]} center="12" />
+            </KpiCard>
+            <KpiCard title={t('home.kpiSessions')} big="4" sub={t('home.kpiSessionsSub')}>
+              <SparkBars vals={BY_MARKET.map((m) => m.total)} />
+            </KpiCard>
+            <KpiCard title={t('home.kpiDeadline')} big={t('home.kpiDeadlineValue')} sub={t('home.kpiDeadlineSub')}>
+              <Donut segs={[{ frac: 0.72, cls: 'text-fg-accent' }]} center="72%" />
+            </KpiCard>
+          </div>
+
+          <div className="mt-[18px] flex flex-col gap-[18px] xl:flex-row">
+            {/* Hauptspalte */}
+            <div className="flex min-w-0 flex-[1.9] flex-col gap-[18px]">
+              {/* Hero: Pflichten je Markt / je Bereich */}
+              <div className={CARD + ' p-6'}>
+                <SectionHead
+                  title={t('home.marketsTitle')} count="12" to="results"
+                  extra={
+                    <span className="ml-3 inline-flex gap-1.5">
+                      <Segment selected={chartView === 'markets'} onClick={() => setChartView('markets')}>{t('home.tabMarkets')}</Segment>
+                      <Segment selected={chartView === 'areas'} onClick={() => setChartView('areas')}>{t('home.tabAreas')}</Segment>
+                    </span>
+                  }
+                />
+                <div className="flex items-end justify-center gap-7 pb-1 pt-2">
+                  {chartData.map((m) => (
+                    <div key={m.label} className="flex flex-col items-center gap-2">
+                      <div className="relative h-[120px] w-[34px] overflow-hidden rounded-lg bg-surface-secondary">
+                        <div className="absolute inset-x-0 bottom-0 rounded-t-lg bg-brand" style={{ height: `${(m.total / chartMax) * 120}px` }} />
+                        {m.high > 0 && <div className="absolute inset-x-0 bottom-0 bg-risk-high" style={{ height: `${(m.high / chartMax) * 120}px` }} />}
+                      </div>
+                      <span className="text-[10px] font-extrabold text-fg-secondary">{m.label}</span>
+                      <span className="text-[10px] text-fg-tertiary">{t('home.dutiesCount', { count: m.total })}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-2 text-center text-body-3xs text-fg-tertiary">{t('home.marketsLegend')}</p>
+              </div>
+
+              {/* Aktive Anfragen */}
+              <div className={CARD + ' p-6 pt-5'}>
+                <SectionHead title={t('home.activeRequests')} count={String(REQUESTS.length)} to="dashboard/requests" />
+                <div>
+                  {REQUESTS.map((r, i) => (
+                    <div key={r.company} className={'flex items-center gap-3 py-2.5 ' + (i < REQUESTS.length - 1 ? 'border-b border-stroke-subtle' : '')}>
+                      <span className={`grid h-[26px] w-[26px] shrink-0 place-items-center rounded-full text-[10px] font-extrabold ${r.tone}`}>{r.initials}</span>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-body-xs font-bold text-fg">{r.company}</p>
+                        <p className="text-body-4xs text-fg-tertiary">{r.meta}</p>
+                      </div>
+                      {/* Dieselben theme-festen Pill-Rezepte wie RequestCard —
+                          bg-warning-bg blieb im Dark Mode hell und frass den Text. */}
+                      <span className={
+                        'rounded-full border px-2.5 py-0.5 text-[10px] font-bold ' +
+                        (r.status === 'wait'
+                          ? 'bg-[#d4af37]/10 border-[#d4af37]/35 text-fg-accent-strong dark:bg-[#d4af37]/15 dark:border-[#d4af37]/40'
+                          : 'bg-[#004d40]/10 border-[#258d78]/35 text-fg-brand dark:bg-[#004d40]/25 dark:border-[#258d78]/40')
+                      }>
+                        {tStatus(r.statusLabel)}
+                      </span>
+                      <button type="button" className="text-body-3xs font-semibold text-brand underline underline-offset-2 transition-colors hover:text-brand-700">
+                        {tAction(r.action)}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-2 text-body-3xs text-risk-on-medium">{t('home.slaNote')}</p>
+              </div>
+            </div>
+
+            {/* Rechte Spalte */}
+            <div className="flex min-w-0 flex-1 flex-col gap-[18px]">
+              {/* Termine */}
+              <div className={CARD + ' p-5'}>
+                <SectionHead title={t('home.termine')} count={String(APPOINTMENTS.length)} to="dashboard/termine" />
+                {APPOINTMENTS.map((a) => (
+                  <div key={a.title} className="flex items-center gap-3 border-b border-stroke-subtle py-2.5">
+                    <span className="flex h-[34px] w-[34px] shrink-0 flex-col items-center justify-center rounded-[10px] bg-brand-light leading-none text-fg-brand">
+                      <span className="text-[9px] font-extrabold">{a.day}</span>
+                      <span className="mt-0.5 text-[10.5px] font-extrabold">{a.date}</span>
+                    </span>
+                    <div>
+                      <p className="text-body-2xs font-bold text-fg">{a.title}</p>
+                      <p className="text-body-4xs text-fg-tertiary">{a.sub}</p>
+                    </div>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => navigate(`/${locale}/dashboard/termine`)}
+                  className="mt-2.5 inline-flex items-center gap-1.5 text-body-3xs font-semibold text-brand underline underline-offset-2 transition-colors hover:text-brand-700"
+                >
+                  <CalendarClock size={12} /> {t('home.proposeSlot')}
+                </button>
+              </div>
+
+              {/* Naechster Schritt */}
+              <div className={CARD + ' p-5'}>
+                <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('home.nextStepEyebrow')}</p>
+                <p className="mt-2 text-body-xs font-bold text-fg">{t('home.nextStepTitle')}</p>
+                <p className="mt-1 text-body-3xs leading-relaxed text-fg-tertiary">{t('home.nextStepBody')}</p>
+                <Button size="sm" variant="secondary" className="mt-2.5" onClick={() => navigate(`/${locale}/dashboard/sessions`)}>
+                  {t('home.nextStepCta')}
+                </Button>
+              </div>
+
+              {/* Weitermachen — als Karte (Nutzer-Optimierung), goldgerahmt */}
+              <div className={CARD + ' border-brand-accent/50 bg-brand-accent-light/40 p-5'}>
+                <div className="flex items-center gap-2.5">
+                  <span className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-[10px] bg-brand-accent/15 text-fg-accent-strong">
+                    <Play size={12} fill="currentColor" />
+                  </span>
+                  <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-accent-strong">{t('home.resumeEyebrow')}</p>
+                </div>
+                <p className="mt-2.5 text-body-sm font-bold text-fg">VAT registration · Italy</p>
+                <p className="mt-0.5 text-body-3xs text-fg-tertiary">{t('home.resumeMeta')}</p>
+                <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-surface-secondary">
+                  <div className="h-full w-4/5 rounded-full bg-gradient-to-r from-brand to-brand-accent" />
+                </div>
+                <Button variant="accent" className="mt-3 w-full" onClick={() => navigate(hasProfile ? `/${locale}/results` : `/${locale}/wizard`)}>
+                  {t('home.resume')} <ArrowRight size={14} className="ml-1" />
+                </Button>
+                <div className="mt-2.5 flex justify-center gap-4">
+                  <button type="button" onClick={() => navigate(`/${locale}/results`)} className="text-body-3xs font-semibold text-brand underline underline-offset-2">{t('home.viewResults')}</button>
+                  <button type="button" onClick={exportPdf} className="text-body-3xs font-semibold text-brand underline underline-offset-2">{t('home.exportPdf')}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Gespeicherte Sitzungen als Kacheln */}
+          <div className="mt-[18px]">
+            <SectionHead title={t('home.savedSessions')} count={String(SESSIONS.length)} to="dashboard/sessions" />
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              {SESSIONS.map((s) => (
+                <Link key={s.title} to={`/${locale}/dashboard/sessions`} className={CARD + ' block p-4 transition-transform hover:-translate-y-0.5'}>
+                  <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{s.eyebrow}</p>
+                  <p className="mt-1.5 text-body-xs font-bold text-fg">{s.title}</p>
+                  <div className="mt-2.5 h-[5px] overflow-hidden rounded-full bg-surface-secondary">
+                    <div className={`h-full rounded-full ${RISK_BG[s.risk]}`} style={{ width: `${s.frac * 100}%` }} />
+                  </div>
+                  <p className="mt-2 text-body-4xs">
+                    <span className={`font-bold ${RISK_TEXT[s.risk]}`}>{s.meta}</span>
+                    <span className="text-fg-tertiary"> · {s.upd}</span>
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
-
-        <Card styleVariant="filled" className="flex items-center gap-4 border border-brand-accent/25 p-5">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-accent/15 text-fg-accent-strong">
-            <Play size={16} fill="currentColor" />
-          </span>
-          <div className="min-w-0 flex-1">
-            {/* accent-STRONG, not accent: at 10px this needs the full 4.5:1, and
-                gold-500 measures 2.01 on a light card. The strong stop keeps the
-                gold in both themes — 6.43 light, 8.49 dark. */}
-            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-accent-strong">{t('home.resumeEyebrow')}</p>
-            <p className="mt-0.5 text-[16px] font-semibold text-fg">VAT registration · Italy</p>
-            <p className="mt-0.5 text-[12px] text-fg-tertiary">{t('home.resumeMeta')}</p>
-          </div>
-          <div className="flex shrink-0 items-center gap-4">
-            <button type="button" onClick={() => navigate(`/${locale}/results`)} className="text-[12px] font-medium text-fg underline underline-offset-2">{t('home.viewResults')}</button>
-            <button type="button" onClick={exportPdf} className="text-[12px] font-medium text-fg underline underline-offset-2">{t('home.exportPdf')}</button>
-            <Button size="sm" variant="accent" onClick={() => navigate(hasProfile ? `/${locale}/results` : `/${locale}/wizard`)}>{t('home.resume')} <ArrowRight size={14} className="ml-1" /></Button>
-          </div>
-        </Card>
-
-        <section className="space-y-3">
-          <SectionHeader title={t('home.activeRequests')} count={String(REQUESTS.length)} to="dashboard/requests" />
-          <div className="space-y-2.5">
-            {REQUESTS.map((r) => (
-              <RequestCard
-                key={r.company}
-                idLine={r.id}
-                status={r.status}
-                statusLabel={tStatus(r.statusLabel)}
-                company={r.company}
-                meta={r.meta}
-                action={<Button size="sm" variant={r.action.variant}>{tAction(r.action.label)}</Button>}
-              />
-            ))}
-          </div>
-        </section>
-
-        <section className="space-y-3">
-          <SectionHeader title={t('home.savedSessions')} count={String(SESSIONS.length)} to="dashboard/sessions" />
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            {SESSIONS.map((s) => (
-              <DomainCard
-                key={s.title}
-                eyebrow={s.eyebrow}
-                title={s.title}
-                meta={<span className={RISK_META[s.risk]}>{s.meta}</span>}
-                interactive
-              />
-            ))}
-          </div>
-        </section>
       </div>
     </UserShell>
   );
