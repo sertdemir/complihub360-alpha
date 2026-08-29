@@ -237,5 +237,55 @@
     "marketMissing": "Does not cover your market",
     "areas": "{{matched}} of {{total}} of your areas",
     "how": "The percentage is market coverage plus how much of what you asked for this specialist actually does."
+  },
+  "snapshot": {
+    "fallbackTitle": "Your risk map",
+    "areas_one": "{{count}} area",
+    "areas_other": "{{count}} areas",
+    "exportPdf": "Export PDF",
+    "editAnswers": "Edit answers",
+    "kpiTotal": "Obligations in total",
+    "kpiTotalSub": "{{now}} now · {{high}} high · {{rest}} other",
+    "kpiSoon": "Deadline within 30 days",
+    "kpiSoonSub": "the nearest ones are listed below",
+    "kpiOpen": "Open questions",
+    "kpiOpenSub_one": "{{count}} obligation is waiting on your answer",
+    "kpiOpenSub_other": "{{count}} obligations are waiting on your answers",
+    "group": {
+      "now": "Act now",
+      "month": "This month",
+      "open": "To clarify first",
+      "later": "Later"
+    },
+    "groupSub": {
+      "now_one": "{{count}} obligation",
+      "now_other": "{{count}} obligations",
+      "month_one": "{{count}} obligation",
+      "month_other": "{{count}} obligations",
+      "open_one": "{{count}} obligation depends on your answers",
+      "open_other": "{{count}} obligations depend on your answers",
+      "later_one": "{{count}} obligation",
+      "later_other": "{{count}} obligations"
+    },
+    "historyTitle": "History of this session",
+    "historyCurrent": "Current state",
+    "historyStart": "Session created",
+    "historyCreated": "Your answers as first given",
+    "copyVariant": "Copy as a variant",
+    "copyHint": "Creates a copy — try variants without losing the original.",
+    "copyDone": "Copy created",
+    "copyOpenList": "Open in sessions",
+    "copyError": "The copy could not be created.",
+    "copyUnavailable": "Save first, then you can create a variant.",
+    "verifiedPartner": "Verified Partner",
+    "activeSince": "active since {{year}}",
+    "responseTime": "Ø {{hours}} h response time",
+    "billing": {
+      "abo": "Subscription",
+      "hourly": "Hourly",
+      "project": "Per project",
+      "mixed": "Mixed"
+    },
+    "providerDetails": "View details"
   }
 }

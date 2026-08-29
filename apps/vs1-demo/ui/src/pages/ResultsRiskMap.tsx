@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef, Fragment } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { saveWizardSession, fetchSessions } from '../api/sessions';
+import { saveWizardSession, fetchSessions, type SessionRowData } from '../api/sessions';
 import { runSearch, type AnonProvider, type SearchLaw } from '../api/search';
 import { useApiData } from '../lib/useApiData';
-import { ProviderMatchCard } from '../components/ui/ProviderMatchCard';
 import { useAuthStore } from '../store/useAuthStore';
 import { Lock, Check, Info, ArrowRight, ArrowLeft, ShieldCheck } from 'lucide-react';
 import { Logo } from '../components/ui/Logo';
@@ -13,6 +12,8 @@ import { FreeAccountDrawer } from '../components/home/MarketsDrawer';
 import type { SearchProfile } from '../components/wizard/WizardContext';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
+import { SessionSnapshot, type SnapshotRow } from '../components/user/SessionSnapshot';
+import { generateRiskMapPdf } from '../lib/riskMapPdf';
 
 // ─── Results · Risk Map · Figma 1667:215 ────────────────────────────────────
 // The generated risk map shown after the wizard. A guest "map" — obligations
@@ -41,6 +42,11 @@ type Obligation = {
   /** Adopted law whose start date is past the deadline horizon — shown under
    *  "On the radar" instead of competing with what needs doing this quarter. */
   radar?: boolean;
+  /** Die Norm als Klartext. Der Snapshot zeigt sie eigenstaendig unter dem
+   *  Titel; aus `detail` liesse sie sich nur raten (dort steht sie mal am
+   *  Ende, mal in der Mitte). Statutennamen sind sprachneutral, deshalb
+   *  keine eigene i18n-Zeile. */
+  law?: string;
 };
 
 /** Whole days from today until an ISO date, or null once the date has passed
@@ -73,6 +79,7 @@ export const OBLIGATIONS: Obligation[] = [
   {
     severity: 'critical',
     title: 'OSS quarterly return',
+    law: 'UStG §18i (OSS)',
     detail: 'Last filed: Q1 2025 · Penalty: €5,000 + 1%/month · UStG §18i (OSS)',
     market: 'DE · NL',
     due: 'Apr 30',
@@ -82,6 +89,7 @@ export const OBLIGATIONS: Obligation[] = [
   {
     severity: 'critical',
     title: 'VAT registration — UK',
+    law: 'UK VATA 1994 §3',
     detail: 'Post-Brexit threshold check needed · Penalty: up to £20,000 · UK VATA 1994 §3',
     market: 'UK',
     due: 'May 15',
@@ -91,6 +99,7 @@ export const OBLIGATIONS: Obligation[] = [
   {
     severity: 'critical',
     title: 'EPR packaging registration (LUCID)',
+    law: 'VerpackG Art. 9 Abs. 1',
     detail: 'Producer status to confirm · Penalty: up to €50,000 · VerpackG Art. 9 Abs. 1',
     market: 'DE',
     due: 'May 02',
@@ -100,6 +109,7 @@ export const OBLIGATIONS: Obligation[] = [
   {
     severity: 'high',
     title: 'EPR registration renewal (PackUK)',
+    law: 'UK Packaging Regs. 2023 §7',
     detail: 'Last filed: Apr 2024 · Penalty: 4% of UK revenue · UK Packaging Regs. 2023 §7',
     market: 'UK',
     due: 'May 15',
@@ -109,6 +119,7 @@ export const OBLIGATIONS: Obligation[] = [
   {
     severity: 'high',
     title: 'Cookie banner + consent records',
+    law: 'GDPR Art. 6/7 · TTDSG §25',
     detail: 'B2C EU users → required · GDPR Art. 6/7 · TTDSG §25',
     market: 'EU-wide',
     due: 'Ongoing',
@@ -118,6 +129,7 @@ export const OBLIGATIONS: Obligation[] = [
   {
     severity: 'medium',
     title: 'DPIA for tracking pixels',
+    law: 'GDPR Art. 35',
     detail: 'Depends on tracking stack · GDPR Art. 35',
     market: 'EU-wide',
     due: '—',
@@ -127,6 +139,7 @@ export const OBLIGATIONS: Obligation[] = [
   {
     severity: 'medium',
     title: 'Reverse-charge mechanism',
+    law: 'UStG §13b',
     detail: 'Applies only if cross-border B2B share >0 · UStG §13b',
     market: 'DE · NL',
     due: '—',
@@ -136,6 +149,7 @@ export const OBLIGATIONS: Obligation[] = [
   {
     severity: 'medium',
     title: 'Beneficial-owner update',
+    law: 'GwG §20 Abs. 1',
     detail: 'Last filed: Mar 2025 · Penalty: €1,000–5,000 · GwG §20 Abs. 1',
     market: 'DE',
     due: 'Jun 30',
@@ -213,10 +227,6 @@ function MatchBasis({ basis }: { basis: NonNullable<AnonProvider['match_basis']>
   );
 }
 
-const BILLING_LABEL: Record<AnonProvider['billing_model'], string> = {
-  abo: 'Abomodell', hourly: 'Stundenbasis', project: 'Projektbasiert', mixed: 'Gemischt',
-};
-
 function StatePill({ state, onAnswer }: { state: State; onAnswer: () => void }) {
   const { t } = useTranslation('results');
   if (state.kind === 'confirmed') {
@@ -266,17 +276,18 @@ export function ResultsRiskMap() {
   // ?session=<id> re-queries /search with that session's stored profile.
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session');
-  const { data: searchData } = useApiData<{ providers: AnonProvider[]; laws: SearchLaw[] }>(async () => {
+  const { data: searchData } = useApiData<{ providers: AnonProvider[]; laws: SearchLaw[]; session: SessionRowData | null }>(async () => {
     let query: Parameters<typeof runSearch>[0] = profile ?? {};
+    let session: SessionRowData | null = null;
     if (sessionId) {
       try {
         const s = (await fetchSessions()).find((x) => x.id === sessionId);
-        if (s) query = { country: s.country ?? 'DE', categories: s.categories as SearchProfile['categories'] };
+        if (s) { session = s; query = { country: s.country ?? 'DE', categories: s.categories as SearchProfile['categories'] }; }
       } catch { /* fall back to the local profile */ }
     }
     const res = await runSearch(query);
-    return { providers: res.providers, laws: res.laws ?? [] };
-  }, { providers: PARTNERS_ANON, laws: [] });
+    return { providers: res.providers, laws: res.laws ?? [], session };
+  }, { providers: PARTNERS_ANON, laws: [], session: null });
   const anonProviders = searchData.providers;
 
   // Obligations enrichment: live engine laws (severity/statute/penalty/cadence)
@@ -373,6 +384,75 @@ export function ResultsRiskMap() {
     saveWizardSession(profile).catch(() => { /* offline/demo — non-fatal */ });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // ─── Eingeloggt: der Sitzungs-Snapshot ────────────────────────────────────
+  // Dieselben Daten, andere Flaeche. Das Gast-Chrome darunter (30-Minuten-
+  // Karte, "Karte speichern", das Schluss-Band) lief bis 2026-08-29 auch fuer
+  // eingeloggte Nutzer — es haengt jetzt tatsaechlich am Login.
+  const snapshotRows: SnapshotRow[] = indexed.map(({ o, i }) => ({
+    severity: o.severity,
+    title: isLive ? o.title : t(`obligations.${i}.title`, { defaultValue: o.title }),
+    market: isLive ? o.market : t(`obligations.${i}.market`, { defaultValue: o.market }),
+    due: isLive ? o.due : t(`obligations.${i}.due`, { defaultValue: o.due }),
+    dueSub: isLive ? o.dueSub : t(`obligations.${i}.dueSub`, { defaultValue: o.dueSub }),
+    state: o.state,
+    sourceLabel: o.sourceLabel,
+    sourceUrl: o.sourceUrl,
+    sourceText: o.sourceUrl ? undefined : o.law,
+  }));
+
+  const exportPdf = async () => {
+    await generateRiskMapPdf({
+      profile: profile ?? null,
+      t,
+      stats: stats.map((s2, i) => ({ value: s2.value, label: t(`stats.${i}.label`, { defaultValue: s2.label }) })),
+      obligations: rows.map((o, i) => ({
+        severity: o.severity,
+        title: isLive ? o.title : t(`obligations.${i}.title`, { defaultValue: o.title }),
+        detail: isLive ? o.detail : t(`obligations.${i}.detail`, { defaultValue: o.detail }),
+        market: isLive ? o.market : t(`obligations.${i}.market`, { defaultValue: o.market }),
+        due: isLive ? o.due : t(`obligations.${i}.due`, { defaultValue: o.due }),
+        dueSub: isLive ? o.dueSub : t(`obligations.${i}.dueSub`, { defaultValue: o.dueSub }),
+        stateLabel:
+          o.state.kind === 'confirmed' ? t('state.confirmed', { defaultValue: 'Confirmed' })
+          : o.state.kind === 'likely' ? t('state.likely', { defaultValue: 'Likely' })
+          : t('pdf.questionsOpen', { defaultValue: '{{total}} questions open', total: o.state.count }),
+      })),
+    });
+  };
+
+  if (isLoggedIn) {
+    const notAnswer = (o: Obligation) => o.state.kind !== 'answer';
+    const critical = rows.filter((o) => notAnswer(o) && o.severity === 'critical').length;
+    const high = rows.filter((o) => notAnswer(o) && o.severity === 'high').length;
+    const open = rows.filter((o) => o.state.kind === 'answer').length;
+    const session = searchData.session;
+    // Der Untertitel nennt nur, was wirklich bekannt ist: Markt und Bereiche.
+    // Eine Versionsnummer stuende hier gern — die API fuehrt keine.
+    const markets = session?.country ?? profile?.country ?? '';
+    const areas = session?.categories?.length ?? profile?.categories?.length ?? 0;
+    return (
+      <SessionSnapshot
+        rows={snapshotRows}
+        providers={anonProviders}
+        sessionId={sessionId}
+        title={session?.label || t('snapshot.fallbackTitle')}
+        meta={[markets, areas ? t('snapshot.areas', { count: areas }) : null].filter(Boolean).join(' · ')}
+        kpis={{
+          total: rows.length,
+          soon: Number(stats[1]?.value ?? 0) || 0,
+          open,
+          critical,
+          high,
+          rest: Math.max(0, rows.length - critical - high),
+        }}
+        matchBasis={(p) => (p.match_basis ? <MatchBasis basis={p.match_basis} /> : null)}
+        onExportPdf={exportPdf}
+        onEditAnswers={() => navigate(`/${locale}/wizard`)}
+        onProviderDetails={(key) => navigate(`/${locale}/provider/${key}`)}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-surface">
@@ -515,55 +595,29 @@ export function ResultsRiskMap() {
                 {t('partners.title')}
               </h2>
             </div>
-            {isLoggedIn ? (
-              <span className="inline-flex items-center gap-1.5 text-body-sm font-semibold text-fg-brand">
-                <Check size={14} strokeWidth={3} /> {t('partners.unlocked')}
-              </span>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setSaveOpen(true)}
-                className="inline-flex items-center gap-1.5 text-body-sm font-semibold text-fg-brand transition-colors hover:text-brand"
-              >
-                <Lock size={14} /> {t('partners.unlockCta')} <ArrowRight size={14} />
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => setSaveOpen(true)}
+              className="inline-flex items-center gap-1.5 text-body-sm font-semibold text-fg-brand transition-colors hover:text-brand"
+            >
+              <Lock size={14} /> {t('partners.unlockCta')} <ArrowRight size={14} />
+            </button>
           </div>
 
-          <div className={isLoggedIn ? 'mt-6 space-y-4' : 'mt-6 grid gap-5 sm:grid-cols-3'}>
-            {isLoggedIn
-              ? anonProviders.map((p) => (
-                  // v2 stage-1 anonymous listing: the scored, anonymized cards.
-                  // "Details" opens the (monetised) stage-2 detail page.
-                  <ProviderMatchCard
-                    key={p.provider_key}
-                    title={p.pseudonym_label}
-                    eyebrow={[p.region, p.active_since ? `aktiv seit ${p.active_since}` : null].filter(Boolean).join(' · ') || undefined}
-                    match={t('partners.match', { pct: `${p.match}%` })}
-                    matchTier={p.match_tier}
-                    isVerified={p.is_verified}
-                    tags={p.specializations.slice(0, 3)}
-                    matchBasis={p.match_basis ? <MatchBasis basis={p.match_basis} /> : undefined}
-                    countries={p.languages.join(' · ')}
-                    rating={p.rating != null ? `${p.rating} · ${p.completed_count ?? 0} Mandate` : undefined}
-                    responseTime={p.avg_response_hours != null ? `Ø ${p.avg_response_hours} Std. Antwortzeit` : undefined}
-                    billing={BILLING_LABEL[p.billing_model]}
-                    onDetails={() => navigate(`/${locale}/provider/${p.provider_key}`)}
-                  />
-                ))
-              : MATCHES.map((m) => (
-                  <div
-                    key={m}
-                    className="flex flex-col items-center gap-4 rounded-xl border border-stroke-subtle bg-surface-secondary px-6 py-8"
-                  >
-                    <Lock size={22} className="text-fg-tertiary" />
-                    <div className="w-full space-y-2">
-                      <div className="mx-auto h-2.5 w-3/4 rounded-full bg-neutral-200" />
-                      <div className="mx-auto h-2.5 w-1/2 rounded-full bg-neutral-200" />
-                    </div>
-                    <span className="text-body-md font-bold text-fg-brand">{t('partners.match', { pct: m })}</span>
-                  </div>
-                ))}
+          <div className="mt-6 grid gap-5 sm:grid-cols-3">
+            {MATCHES.map((m) => (
+              <div
+                key={m}
+                className="flex flex-col items-center gap-4 rounded-xl border border-stroke-subtle bg-surface-secondary px-6 py-8"
+              >
+                <Lock size={22} className="text-fg-tertiary" />
+                <div className="w-full space-y-2">
+                  <div className="mx-auto h-2.5 w-3/4 rounded-full bg-neutral-200" />
+                  <div className="mx-auto h-2.5 w-1/2 rounded-full bg-neutral-200" />
+                </div>
+                <span className="text-body-md font-bold text-fg-brand">{t('partners.match', { pct: m })}</span>
+              </div>
+            ))}
           </div>
         </div>
       </main>
