@@ -212,7 +212,7 @@ export function SessionSnapshot({
         <MotionConfig reducedMotion="user">
           <motion.div variants={SECTION} initial="enter" animate="show" className="mx-auto max-w-[1200px]">
             {/* Kopf */}
-            <motion.div variants={ITEM} className="flex flex-wrap items-start justify-between gap-4">
+            <motion.div variants={ITEM} className="flex flex-wrap items-end justify-between gap-4">
               <div className="min-w-0">
                 <p className="text-body-3xs text-fg-tertiary">
                   <Link to={`/${locale}/dashboard/sessions`} className="font-semibold text-brand underline underline-offset-2">
@@ -224,10 +224,11 @@ export function SessionSnapshot({
                 <p className="mt-1 text-body-2xs text-fg-tertiary">{meta}</p>
               </div>
               {/* Beide als Textlinks — auf dieser Seite gibt es keinen einzelnen
-                  primaeren Knopf mehr. Sie sitzen rechtsbuendig im Kopf, also
-                  direkt ueber der dritten Kennzahl-Kachel; im Spalt zwischen
-                  den Reihen zerschnitten sie das Raster (Nutzer 2026-08-29). */}
-              <div className="flex shrink-0 items-center gap-5 pt-1">
+                  primaeren Knopf mehr. Sie sitzen rechtsbuendig im Kopf, auf der
+                  Hoehe der Meta-Zeile unter dem Titel und buendig mit der Kachel
+                  "Offene Fragen" darunter; im Spalt zwischen den Reihen
+                  zerschnitten sie das Raster (Nutzer 2026-08-29). */}
+              <div className="flex shrink-0 items-center gap-5 pb-0.5">
                 <button type="button" onClick={onExportPdf} className={TEXT_LINK}>{t('snapshot.exportPdf')}</button>
                 <button type="button" onClick={onEditAnswers} className={TEXT_LINK}>{t('snapshot.editAnswers')}</button>
               </div>
