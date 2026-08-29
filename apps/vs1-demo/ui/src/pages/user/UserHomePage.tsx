@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Play, ArrowRight, TriangleAlert, CalendarClock } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
@@ -79,9 +79,50 @@ const ACTION_KEY: Record<string, string> = { 'Send reminder': 'sendReminder', 'O
 
 const CARD = 'rounded-xl border border-stroke-subtle bg-surface shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]';
 
-/** Donut aus Zusammensetzungs-Anteilen; Farben folgen den Tokens via currentColor. */
-function Donut({ segs, size = 46, stroke = 7, center }: {
-  segs: { frac: number; cls: string }[]; size?: number; stroke?: number; center?: string;
+// ─── Eintritts-Animation (Nutzer-Wunsch 2026-08-29) ──────────────────────────
+// Bei JEDEM Betreten des Dashboards (die Route mountet die Seite neu) zaehlen
+// die Zahlen hoch, zeichnen sich die Donuts und wachsen die Balken. Reine
+// CSS-Transitions ab einem Mount-Trigger — kein Animations-Framework noetig.
+// prefers-reduced-motion schaltet alles ab (sofort Endzustand).
+
+const reducedMotion = () =>
+  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/** true einen Frame nach dem Mount — der Startpunkt aller Transitions. */
+function useEntered() {
+  const [on, setOn] = useState(reducedMotion);
+  useEffect(() => {
+    if (on) return;
+    const id = requestAnimationFrame(() => requestAnimationFrame(() => setOn(true)));
+    return () => cancelAnimationFrame(id);
+  }, [on]);
+  return on;
+}
+
+/** Zaehlt mit ease-out von 0 auf target; bei reduced motion sofort target. */
+function useCountUp(target: number, on: boolean, duration = 900) {
+  const [value, setValue] = useState(reducedMotion() ? target : 0);
+  const raf = useRef(0);
+  useEffect(() => {
+    if (!on || reducedMotion()) { setValue(target); return; }
+    const start = performance.now();
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - start) / duration);
+      setValue(Math.round(target * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) raf.current = requestAnimationFrame(tick);
+    };
+    raf.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf.current);
+  }, [on, target, duration]);
+  return value;
+}
+
+const EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+
+/** Donut aus Zusammensetzungs-Anteilen; Farben folgen den Tokens via currentColor.
+    Die Segmente zeichnen sich ab `on` gestaffelt (dasharray 0 → Anteil). */
+function Donut({ segs, size = 46, stroke = 7, center, on }: {
+  segs: { frac: number; cls: string }[]; size?: number; stroke?: number; center?: string; on: boolean;
 }) {
   const r = (size - stroke) / 2 - 1;
   const c = 2 * Math.PI * r;
@@ -89,15 +130,19 @@ function Donut({ segs, size = 46, stroke = 7, center }: {
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke} stroke="currentColor" className="text-stroke-subtle" />
-      {segs.map((s) => {
+      {segs.map((s, i) => {
         const d = s.frac * c;
         const el = (
           <circle
             key={s.cls + off}
             cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke}
             stroke="currentColor" className={s.cls}
-            strokeDasharray={`${d} ${c - d}`} strokeDashoffset={-off}
+            strokeDashoffset={-off}
             transform={`rotate(-90 ${size / 2} ${size / 2})`}
+            style={{
+              strokeDasharray: on ? `${d} ${c - d}` : `0 ${c}`,
+              transition: `stroke-dasharray 850ms ${EASE} ${90 + i * 130}ms`,
+            }}
           />
         );
         off += d;
@@ -110,15 +155,25 @@ function Donut({ segs, size = 46, stroke = 7, center }: {
   );
 }
 
-/** Zusammensetzungs-Balken (keine Zeitreihe): Hoehen relativ zum Maximum. */
-function SparkBars({ vals, cls = 'text-brand' }: { vals: number[]; cls?: string }) {
+/** Zusammensetzungs-Balken (keine Zeitreihe): Hoehen relativ zum Maximum,
+    wachsen ab `on` gestaffelt vom Boden. */
+function SparkBars({ vals, cls = 'text-brand', on }: { vals: number[]; cls?: string; on: boolean }) {
   const w = 64, h = 30, bw = w / vals.length - 4;
   const max = Math.max(...vals);
   return (
     <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden className={cls}>
       {vals.map((v, i) => {
         const bh = Math.max(3, (v / max) * h);
-        return <rect key={i} x={i * (bw + 4)} y={h - bh} width={bw} height={bh} rx="2.5" fill="currentColor" />;
+        return (
+          <rect
+            key={i} x={i * (bw + 4)} y={h - bh} width={bw} height={bh} rx="2.5" fill="currentColor"
+            style={{
+              transform: on ? 'scaleY(1)' : 'scaleY(0)',
+              transformOrigin: 'bottom', transformBox: 'fill-box',
+              transition: `transform 700ms ${EASE} ${120 + i * 90}ms`,
+            }}
+          />
+        );
       })}
     </svg>
   );
@@ -165,6 +220,11 @@ export function UserHomePage() {
   const { t, i18n } = useTranslation('userws');
   const { t: tResults } = useTranslation('results');
   const [chartView, setChartView] = useState<'markets' | 'areas'>('markets');
+  const entered = useEntered();
+  const nRequests = useCountUp(3, entered);
+  const nDuties = useCountUp(12, entered);
+  const nSessions = useCountUp(4, entered);
+  const nDeadlinePct = useCountUp(72, entered, 1100);
   const hasProfile = !!localStorage.getItem('ch360_last_profile');
   const tStatus = (label: string) => t(`status.${STATUS_KEY[label]}`);
   const tAction = (label: string) => t(`actions.${ACTION_KEY[label]}`);
@@ -236,17 +296,17 @@ export function UserHomePage() {
 
           {/* KPI-Reihe */}
           <div className="mt-[18px] flex flex-col gap-[18px] lg:flex-row">
-            <KpiCard title={t('home.kpiRequests')} big="3" sub={t('home.kpiRequestsSub')} chip={t('home.kpiRequestsChip')}>
-              <Donut segs={[{ frac: 1 / 3, cls: 'text-fg-accent' }, { frac: 2 / 3, cls: 'text-brand' }]} center="3" />
+            <KpiCard title={t('home.kpiRequests')} big={String(nRequests)} sub={t('home.kpiRequestsSub')} chip={t('home.kpiRequestsChip')}>
+              <Donut on={entered} segs={[{ frac: 1 / 3, cls: 'text-fg-accent' }, { frac: 2 / 3, cls: 'text-brand' }]} center={String(nRequests)} />
             </KpiCard>
-            <KpiCard title={t('home.kpiDuties')} big="12" sub={t('home.kpiDutiesSub')}>
-              <Donut segs={[{ frac: 2 / 12, cls: 'text-risk-high' }, { frac: 6 / 12, cls: 'text-risk-medium' }, { frac: 4 / 12, cls: 'text-risk-low' }]} center="12" />
+            <KpiCard title={t('home.kpiDuties')} big={String(nDuties)} sub={t('home.kpiDutiesSub')}>
+              <Donut on={entered} segs={[{ frac: 2 / 12, cls: 'text-risk-high' }, { frac: 6 / 12, cls: 'text-risk-medium' }, { frac: 4 / 12, cls: 'text-risk-low' }]} center={String(nDuties)} />
             </KpiCard>
-            <KpiCard title={t('home.kpiSessions')} big="4" sub={t('home.kpiSessionsSub')}>
-              <SparkBars vals={BY_MARKET.map((m) => m.total)} />
+            <KpiCard title={t('home.kpiSessions')} big={String(nSessions)} sub={t('home.kpiSessionsSub')}>
+              <SparkBars on={entered} vals={BY_MARKET.map((m) => m.total)} />
             </KpiCard>
             <KpiCard title={t('home.kpiDeadline')} big={t('home.kpiDeadlineValue')} sub={t('home.kpiDeadlineSub')}>
-              <Donut segs={[{ frac: 0.72, cls: 'text-fg-accent' }]} center="72%" />
+              <Donut on={entered} segs={[{ frac: 0.72, cls: 'text-fg-accent' }]} center={`${nDeadlinePct}%`} />
             </KpiCard>
           </div>
 
@@ -265,11 +325,19 @@ export function UserHomePage() {
                   }
                 />
                 <div className="flex items-end justify-center gap-7 pb-1 pt-2">
-                  {chartData.map((m) => (
+                  {chartData.map((m, i) => (
                     <div key={m.label} className="flex flex-col items-center gap-2">
                       <div className="relative h-[120px] w-[34px] overflow-hidden rounded-lg bg-surface-secondary">
-                        <div className="absolute inset-x-0 bottom-0 rounded-t-lg bg-brand" style={{ height: `${(m.total / chartMax) * 120}px` }} />
-                        {m.high > 0 && <div className="absolute inset-x-0 bottom-0 bg-risk-high" style={{ height: `${(m.high / chartMax) * 120}px` }} />}
+                        {/* Hoehen-Transition: animiert den Eintritt UND den
+                            Maerkte/Bereiche-Wechsel gleich mit. */}
+                        <div
+                          className="absolute inset-x-0 bottom-0 rounded-t-lg bg-brand"
+                          style={{ height: entered ? `${(m.total / chartMax) * 120}px` : 0, transition: `height 750ms ${EASE} ${140 + i * 90}ms` }}
+                        />
+                        <div
+                          className="absolute inset-x-0 bottom-0 bg-risk-high"
+                          style={{ height: entered && m.high > 0 ? `${(m.high / chartMax) * 120}px` : 0, transition: `height 750ms ${EASE} ${220 + i * 90}ms` }}
+                        />
                       </div>
                       <span className="text-[10px] font-extrabold text-fg-secondary">{m.label}</span>
                       <span className="text-[10px] text-fg-tertiary">{t('home.dutiesCount', { count: m.total })}</span>
@@ -357,7 +425,10 @@ export function UserHomePage() {
                 <p className="mt-2.5 text-body-sm font-bold text-fg">VAT registration · Italy</p>
                 <p className="mt-0.5 text-body-3xs text-fg-tertiary">{t('home.resumeMeta')}</p>
                 <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-surface-secondary">
-                  <div className="h-full w-4/5 rounded-full bg-gradient-to-r from-brand to-brand-accent" />
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-brand to-brand-accent"
+                    style={{ width: entered ? '80%' : 0, transition: `width 900ms ${EASE} 250ms` }}
+                  />
                 </div>
                 <Button variant="accent" className="mt-3 w-full" onClick={() => navigate(hasProfile ? `/${locale}/results` : `/${locale}/wizard`)}>
                   {t('home.resume')} <ArrowRight size={14} className="ml-1" />
@@ -374,12 +445,15 @@ export function UserHomePage() {
           <div className="mt-[18px]">
             <SectionHead title={t('home.savedSessions')} count={String(SESSIONS.length)} to="dashboard/sessions" />
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              {SESSIONS.map((s) => (
+              {SESSIONS.map((s, i) => (
                 <Link key={s.title} to={`/${locale}/dashboard/sessions`} className={CARD + ' block p-4 transition-transform hover:-translate-y-0.5'}>
                   <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{s.eyebrow}</p>
                   <p className="mt-1.5 text-body-xs font-bold text-fg">{s.title}</p>
                   <div className="mt-2.5 h-[5px] overflow-hidden rounded-full bg-surface-secondary">
-                    <div className={`h-full rounded-full ${RISK_BG[s.risk]}`} style={{ width: `${s.frac * 100}%` }} />
+                    <div
+                      className={`h-full rounded-full ${RISK_BG[s.risk]}`}
+                      style={{ width: entered ? `${s.frac * 100}%` : 0, transition: `width 800ms ${EASE} ${300 + i * 90}ms` }}
+                    />
                   </div>
                   <p className="mt-2 text-body-4xs">
                     <span className={`font-bold ${RISK_TEXT[s.risk]}`}>{s.meta}</span>
