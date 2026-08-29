@@ -188,10 +188,21 @@ Anbieter-Auswahlschritt davor.
 
 ## Festlegungen 2026-08-29 (Nutzer)
 
-- Der Märkte-Bereich wird **erst in Phase 2 gebaut**, jetzt aber schon
-  angeteasert: Nav-Eintrag „Märkte" mit **BETA**-Marke, dazu ein Teaser im
-  Sitzungs-Snapshot. Die Ausarbeitung der Punkte 1 und 2 folgt später im
-  Detail.
+- Der Märkte-Bereich wird **erst in Phase 2 gebaut**. Kurzzeitig war
+  vorgesehen, ihn schon jetzt anzuteasern (Nav-Eintrag mit BETA-Marke,
+  Teaser in der Seitenleiste des Snapshots). Das ist am 2026-08-29
+  **zurückgestellt** worden: beides ist aus den auszurollenden Entwürfen
+  wieder entfernt und wird zum passenden Zeitpunkt eingesetzt.
+  **Verworfen ist nichts** — die Entwürfe liegen im Canvas als eigene,
+  mit „Zurückgestellt · …" gekennzeichnete Artboards:
+  Teaser als Fläche (Band / rechte Spalte / breite Karte), Teaser in der
+  Seitenleiste in vier Abstufungen (D1–D3 gefüllt, D4 Ankündigung) und drei
+  Gesamtansichten. Für den Nav-Eintrag ist die vorhandene Gruppe
+  *Monitoring* in `UserShell.tsx` der richtige Ort — sie trägt die
+  „Bald"-Marke bereits; als Ziel genügt eine `ComingSoonPage` unter
+  `dashboard/markets`, dem Muster von `dashboard/alerts` und
+  `dashboard/calendar` folgend. Die Ausarbeitung der Punkte 1 und 2 folgt
+  später im Detail.
 - Im Verlauf einer Sitzung bleibt **nur „Als Variante kopieren"**.
   „Ansehen" und „Mit heute vergleichen" entfallen, bis §3 steht — lieber
   drei ehrliche Zeilen als zwei tote Links.
