@@ -183,3 +183,19 @@ Anbieter-Auswahlschritt davor.
 3. §1 Datenmodell + Ingest für **eine** Art (Gesetze) und **einen** Markt.
 4. §2 Teaser, sobald §1 Daten führt.
 5. §5, §6 nebenher.
+
+---
+
+## Festlegungen 2026-08-29 (Nutzer)
+
+- Der Märkte-Bereich wird **erst in Phase 2 gebaut**, jetzt aber schon
+  angeteasert: Nav-Eintrag „Märkte" mit **BETA**-Marke, dazu ein Teaser im
+  Sitzungs-Snapshot. Die Ausarbeitung der Punkte 1 und 2 folgt später im
+  Detail.
+- Im Verlauf einer Sitzung bleibt **nur „Als Variante kopieren"**.
+  „Ansehen" und „Mit heute vergleichen" entfallen, bis §3 steht — lieber
+  drei ehrliche Zeilen als zwei tote Links.
+- **Wichtig für den Teaser:** Solange kein Endpunkt Daten liefert, darf die
+  Oberfläche keine erfundenen Meldungen zeigen. Bis §2 steht, entweder hinter
+  einem Flag ausgeblendet oder als reiner Ankündigungszustand ohne Inhalte.
+  Der Canvas-Entwurf arbeitet mit einem Platzhalter-Fixture.
