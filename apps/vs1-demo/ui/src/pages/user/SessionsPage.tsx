@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { LayoutGrid, List, TriangleAlert } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
-import { AnimatePresence, LayoutGroup, MotionConfig, motion } from 'framer-motion';
+import { AnimatePresence, MotionConfig, motion, type Variants } from 'framer-motion';
 import type { TFunction } from 'i18next';
 import { UserShell } from '../../components/user/UserShell';
 import { Button } from '../../components/ui/Button';
@@ -64,6 +64,24 @@ const DOMAIN_LABEL: Record<string, string> = {
 
 const RISK_TEXT = { high: 'text-risk-high', medium: 'text-risk-medium', low: 'text-risk-low' } as const;
 const RISK_BG = { high: 'bg-risk-high', medium: 'bg-risk-medium', low: 'bg-risk-low' } as const;
+
+// Ansichtswechsel: langsam genug zum Mitlesen, mit einer Spur Skalierung —
+// nichts springt, nichts wandert. Framer respektiert prefers-reduced-motion
+// nicht von allein, deshalb faellt die Bewegung dort auf reines Ein-/Ausblenden
+// zurueck (Dauer 0, siehe VIEW_VARIANTS).
+const SOFT = [0.22, 1, 0.36, 1] as const;
+const FADE = { duration: 0.34, ease: SOFT };
+
+const VIEW_VARIANTS: Variants = {
+  enter: { opacity: 0, scale: 0.985 },
+  show: { opacity: 1, scale: 1, transition: { duration: 0.34, ease: SOFT, staggerChildren: 0.03, delayChildren: 0.04 } },
+  leave: { opacity: 0, scale: 0.985, transition: { duration: 0.22, ease: SOFT } },
+};
+const CARD_VARIANTS: Variants = {
+  enter: { opacity: 0, scale: 0.97, y: 6 },
+  show: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.36, ease: SOFT } },
+  leave: { opacity: 0, scale: 0.97, transition: { duration: 0.18, ease: SOFT } },
+};
 
 const CARD = 'rounded-xl border border-stroke-subtle bg-surface shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]';
 const LINK = 'text-body-3xs font-bold text-brand underline underline-offset-2 transition-colors hover:text-brand-700';
@@ -267,57 +285,64 @@ export function SessionsPage() {
             </div>
           </div>
 
-          {/* Ein Raster, zwei Formen: die Karten MORPHEN zwischen Zeile und
-              Kachel (Framer `layout`), statt hart auszutauschen — Nutzer-Wunsch
-              2026-08-29. MotionConfig reducedMotion="user" schaltet das fuer
-              alle ab, die weniger Bewegung wollen. */}
-          <MotionConfig reducedMotion="user" transition={{ type: 'spring', stiffness: 320, damping: 34, mass: 0.9 }}>
-            <LayoutGroup>
-              <div className="mt-4 flex flex-col gap-4 xl:flex-row">
+          {/* Ansichtswechsel: ruhiges Aus- und Einblenden mit leichter
+              Skalierung (Nutzer-Vorgabe 2026-08-29, ersetzt den Layout-Morph).
+              Der Morph musste beim Umschalten jede Karte neu vermessen und
+              ruckelte am Ende sichtbar; ein Crossfade laeuft auf der GPU und
+              bleibt weich. `mode="wait"` laesst die alte Ansicht erst ganz
+              gehen — kein Uebereinanderliegen. Die Karten kommen mit 30 ms
+              Versatz, das nimmt dem Einblenden die Haerte. */}
+          <MotionConfig reducedMotion="user">
+          <div className="mt-4 flex flex-col gap-4 xl:flex-row">
+            <div className="min-w-0 flex-1">
+              <AnimatePresence mode="wait" initial={false}>
                 <motion.div
-                  layout
-                  className={
-                    'min-w-0 flex-1 ' +
-                    (view === 'list' ? 'flex flex-col gap-2.5' : 'grid gap-4 md:grid-cols-2 xl:grid-cols-3')
-                  }
+                  key={view}
+                  variants={VIEW_VARIANTS}
+                  initial="enter"
+                  animate="show"
+                  exit="leave"
+                  className={view === 'list' ? 'flex flex-col gap-2.5' : 'grid gap-4 md:grid-cols-2 xl:grid-cols-3'}
                 >
                   {list.map((r, i) => (
-                    <SessionCard
-                      key={r.id ?? r.title}
-                      row={r}
-                      view={view}
-                      index={i}
-                      entered={entered}
-                      selected={view === 'list' && current === r}
-                      domainLabel={tDomain(r.domain)}
-                      onSelect={() => setSelected(i)}
-                      onOpen={() => openSession(r)}
-                      onPdf={exportPdf}
-                      onCopy={() => r.id && setActionsFor({ id: r.id, title: r.title, domain: r.domain, country: r.cc })}
-                    />
-                  ))}
-                </motion.div>
-
-                {/* Die Rail gehoert zur Listenansicht — sie faehrt mit heraus. */}
-                <AnimatePresence mode="popLayout" initial={false}>
-                  {view === 'list' && current && (
-                    <motion.div
-                      key="rail"
-                      layout
-                      initial={{ opacity: 0, x: 24 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 24 }}
-                      className="w-full shrink-0 xl:w-[320px]"
-                    >
-                      <HistoryRail
-                        row={current}
-                        onDuplicate={() => current.id && setActionsFor({ id: current.id, title: current.title, domain: current.domain, country: current.cc })}
+                    <motion.div key={r.id ?? r.title} variants={CARD_VARIANTS}>
+                      <SessionCard
+                        row={r}
+                        view={view}
+                        index={i}
+                        entered={entered}
+                        selected={view === 'list' && current === r}
+                        domainLabel={tDomain(r.domain)}
+                        onSelect={() => setSelected(i)}
+                        onOpen={() => openSession(r)}
+                        onPdf={exportPdf}
+                        onCopy={() => r.id && setActionsFor({ id: r.id, title: r.title, domain: r.domain, country: r.cc })}
                       />
                     </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </LayoutGroup>
+                  ))}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* Die Rail gehoert zur Listenansicht — sie blendet mit aus. */}
+            <AnimatePresence initial={false}>
+              {view === 'list' && current && (
+                <motion.div
+                  key="rail"
+                  initial={{ opacity: 0, scale: 0.985 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.985 }}
+                  transition={FADE}
+                  className="w-full shrink-0 xl:w-[320px]"
+                >
+                  <HistoryRail
+                    row={current}
+                    onDuplicate={() => current.id && setActionsFor({ id: current.id, title: current.title, domain: current.domain, country: current.cc })}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
           </MotionConfig>
         </div>
       </div>
@@ -327,11 +352,10 @@ export function SessionsPage() {
 }
 
 // ─── SessionCard · eine Karte, zwei Formen ───────────────────────────────────
-// Zeile und Kachel sind DASSELBE Element (gleicher key), nur anders angeordnet.
-// Framers `layout` misst beide Zustaende und faehrt Position und Groesse
-// ineinander — die Zeile entwickelt sich zur Kachel statt ausgetauscht zu
-// werden (Nutzer-Wunsch 2026-08-29). Kinder tragen `layout` ebenfalls, sonst
-// verzerrt der Text waehrend des Uebergangs.
+// Zeile und Kachel unterscheiden sich nur in der Anordnung. Der Wechsel
+// zwischen beiden blendet ueber (siehe VIEW_VARIANTS) — bis 2026-08-29 morphte
+// er ueber Framers `layout`, was am Ende jeder Bewegung sichtbar ruckelte,
+// weil dabei jedes Textstueck neu vermessen wird.
 function SessionCard({ row, view, index, entered, selected, domainLabel, onSelect, onOpen, onPdf, onCopy }: {
   row: Row; view: 'list' | 'tiles'; index: number; entered: boolean; selected: boolean;
   domainLabel: string; onSelect: () => void; onOpen: () => void; onPdf: () => void; onCopy: () => void;
@@ -346,110 +370,69 @@ function SessionCard({ row, view, index, entered, selected, domainLabel, onSelec
     </span>
   );
 
-  return (
-    <motion.div
-      layout
-      onClick={isList ? onSelect : undefined}
-      role={isList ? 'button' : undefined}
-      tabIndex={isList ? 0 : undefined}
-      onKeyDown={isList ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(); } } : undefined}
-      className={
-        CARD + ' relative overflow-hidden ' +
-        (isList
-          ? 'flex cursor-pointer items-center gap-3.5 px-4 py-3 ' + (selected ? 'border-brand/50 ring-1 ring-brand/25' : 'hover:border-stroke')
-          : 'flex flex-col')
-      }
-    >
-      {/* Risiko-Kante: in der Kachel oben quer, in der Zeile als schmale
-          Kante links — dieselbe Flaeche, die mitwandert. */}
-      <motion.span
-        layout
-        className={`absolute ${RISK_BG[row.risk]} ` + (isList ? 'inset-y-0 left-0 w-1' : 'inset-x-0 top-0 h-1')}
-      />
-
-      <motion.div layout className={isList ? 'flex min-w-0 flex-1 items-center gap-3.5' : 'flex-1 p-4'}>
-        <motion.div layout className={isList ? 'flex items-center gap-3.5' : 'flex items-center gap-2'}>
-          <motion.span
-            layout
-            className={
-              'grid shrink-0 place-items-center rounded-[10px] bg-surface-secondary font-extrabold text-fg ' +
-              (isList ? 'h-[34px] w-[34px] text-[11px] ml-1' : 'h-[30px] w-[30px] text-[10.5px]')
-            }
-          >
-            {row.cc}
-          </motion.span>
-          {!isList && <motion.span layout="position" className={TAG}>{domainLabel}</motion.span>}
-        </motion.div>
-
-        <motion.div layout className={isList ? 'min-w-0 flex-1' : 'mt-2.5'}>
-          {isList && (
-            <motion.div layout className="flex flex-wrap items-center gap-1.5">
-              <motion.span layout="position" className={TAG}>{domainLabel}</motion.span>
-              {stale && <motion.span layout="position" className={TAG_STALE}>{t('sessions.needsRefresh')}</motion.span>}
-            </motion.div>
-          )}
-          <motion.p layout="position" className={'text-body-xs font-bold text-fg ' + (isList ? 'mt-1' : '')}>{row.title}</motion.p>
-          <motion.p layout="position" className={isList ? 'mt-0.5' : 'mt-1'}>{meta}</motion.p>
-
-          {/* Nur in der Kachel: Pflichten-Balken und das Auffrischungs-Tag */}
-          <AnimatePresence initial={false}>
-            {!isList && (
-              <motion.div
-                key="tile-extras"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="overflow-hidden"
-              >
-                <div className="mt-3 flex items-center gap-2.5">
-                  <div className="h-[5px] flex-1 overflow-hidden rounded-full bg-surface-secondary">
-                    <div
-                      className={`h-full rounded-full ${RISK_BG[row.risk]}`}
-                      style={{ width: entered ? `${row.frac * 100}%` : 0, transition: `width 800ms ${EASE} ${200 + index * 70}ms` }}
-                    />
-                  </div>
-                  {row.duties > 0 && <span className="text-[10px] text-fg-tertiary">{t('sessions.duties', { count: row.duties })}</span>}
-                </div>
-                {stale && <span className={TAG_STALE + ' mt-3'}>{t('sessions.needsRefresh')}</span>}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-
-        {isList && (
-          <motion.span layout="position" className="w-[86px] shrink-0 text-right text-body-3xs text-fg-tertiary">
-            {relTime(row.daysAgo, t)}
-          </motion.span>
-        )}
-      </motion.div>
-
-      {/* Aktionen: in der Zeile inline (PDF, Öffnen), in der Kachel als
-          eigene Leiste mit dem dritten Weg. */}
-      <motion.div
-        layout
+  if (isList) {
+    return (
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={onSelect}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(); } }}
         className={
-          isList
-            ? 'flex shrink-0 items-center gap-3 pr-1'
-            : 'flex items-center gap-3 border-t border-stroke-subtle px-4 py-2.5'
+          CARD + ' relative flex cursor-pointer items-center gap-3.5 overflow-hidden px-4 py-3 transition-colors ' +
+          (selected ? 'border-brand/50 ring-1 ring-brand/25' : 'hover:border-stroke')
         }
       >
-        {!isList && <motion.button layout="position" type="button" className={LINK} onClick={onOpen}>{t('shared.open')}</motion.button>}
-        <motion.button layout="position" type="button" className={LINK} onClick={(e) => { e.stopPropagation(); onPdf(); }}>{t('sessions.pdf')}</motion.button>
-        {isList && <motion.button layout="position" type="button" className={LINK} onClick={(e) => { e.stopPropagation(); onOpen(); }}>{t('shared.open')}</motion.button>}
-        <AnimatePresence initial={false}>
-          {!isList && (
-            <motion.button
-              key="copy" type="button" className={LINK} onClick={onCopy}
-              initial={{ opacity: 0, width: 0 }} animate={{ opacity: 1, width: 'auto' }} exit={{ opacity: 0, width: 0 }}
-              style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}
-            >
-              {t('sessions.copyVariant')}
-            </motion.button>
-          )}
-        </AnimatePresence>
-        {!isList && <motion.span layout="position" className="ml-auto text-[10px] text-fg-tertiary">{relTime(row.daysAgo, t)}</motion.span>}
-      </motion.div>
-    </motion.div>
+        <span className={`absolute inset-y-0 left-0 w-1 ${RISK_BG[row.risk]}`} />
+        <span className="ml-1 grid h-[34px] w-[34px] shrink-0 place-items-center rounded-[10px] bg-surface-secondary text-[11px] font-extrabold text-fg">
+          {row.cc}
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className={TAG}>{domainLabel}</span>
+            {stale && <span className={TAG_STALE}>{t('sessions.needsRefresh')}</span>}
+          </div>
+          <p className="mt-1 text-body-xs font-bold text-fg">{row.title}</p>
+          <p className="mt-0.5">{meta}</p>
+        </div>
+        <span className="w-[86px] shrink-0 text-right text-body-3xs text-fg-tertiary">{relTime(row.daysAgo, t)}</span>
+        <span className="flex shrink-0 items-center gap-3 pr-1">
+          <button type="button" className={LINK} onClick={(e) => { e.stopPropagation(); onPdf(); }}>{t('sessions.pdf')}</button>
+          <button type="button" className={LINK} onClick={(e) => { e.stopPropagation(); onOpen(); }}>{t('shared.open')}</button>
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div className={CARD + ' flex h-full flex-col overflow-hidden'}>
+      <div className={`h-1 ${RISK_BG[row.risk]}`} />
+      <div className="flex-1 p-4">
+        <div className="flex items-center gap-2">
+          <span className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-lg bg-surface-secondary text-[10.5px] font-extrabold text-fg">
+            {row.cc}
+          </span>
+          <span className={TAG}>{domainLabel}</span>
+        </div>
+        <p className="mt-2.5 text-body-xs font-bold text-fg">{row.title}</p>
+        <p className="mt-1">{meta}</p>
+        <div className="mt-3 flex items-center gap-2.5">
+          <div className="h-[5px] flex-1 overflow-hidden rounded-full bg-surface-secondary">
+            <div
+              className={`h-full rounded-full ${RISK_BG[row.risk]}`}
+              style={{ width: entered ? `${row.frac * 100}%` : 0, transition: `width 800ms ${EASE} ${200 + index * 70}ms` }}
+            />
+          </div>
+          {row.duties > 0 && <span className="text-[10px] text-fg-tertiary">{t('sessions.duties', { count: row.duties })}</span>}
+        </div>
+        {stale && <span className={TAG_STALE + ' mt-3'}>{t('sessions.needsRefresh')}</span>}
+      </div>
+      <div className="flex items-center gap-3 border-t border-stroke-subtle px-4 py-2.5">
+        <button type="button" className={LINK} onClick={onOpen}>{t('shared.open')}</button>
+        <button type="button" className={LINK} onClick={onPdf}>{t('sessions.pdf')}</button>
+        <button type="button" className={LINK} onClick={onCopy}>{t('sessions.copyVariant')}</button>
+        <span className="ml-auto text-[10px] text-fg-tertiary">{relTime(row.daysAgo, t)}</span>
+      </div>
+    </div>
   );
 }
 
