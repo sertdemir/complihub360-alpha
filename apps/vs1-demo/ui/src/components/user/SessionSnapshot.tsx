@@ -141,10 +141,16 @@ function GroupCard({ label, sub, dot, rows, onAnswer }: {
                 )}
               </p>
             </div>
-            <span className="hidden w-[150px] shrink-0 text-right text-[10.5px] text-fg-tertiary sm:block">
+            {/* Dreispaltig (Nutzer 2026-08-29): der Chip mittig in eigener
+                Spalte, die Frist ganz rechts auf einer Kante. Vorher stand
+                "Abhaengig von Tools" direkt neben dem Textlink "2 Fragen
+                beantworten" und machte ihn unleserlich. */}
+            <div className="flex w-[186px] shrink-0 justify-center">
+              <StateCell state={r.state} onAnswer={onAnswer} />
+            </div>
+            <span className="hidden w-[132px] shrink-0 text-right text-[10.5px] text-fg-tertiary sm:block">
               {r.due && r.due !== '—' ? r.due : r.dueSub}
             </span>
-            <StateCell state={r.state} onAnswer={onAnswer} />
           </div>
         ))}
       </div>
