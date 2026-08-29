@@ -25,10 +25,10 @@ import { DOMAINS, type DomainSlug } from "../../lib/domains";
 // - Einen "Beratungspartner"-Tab, der wortlos nach /provider-intake sprang,
 //   wo ohne Token nur der Nur-auf-Einladung-Hinweis steht. Die dazugehoerigen
 //   PartnerStep1-3 und das Partner-Nutzenpanel waren dadurch UNERREICHBAR —
-//   toter Code, hier ersatzlos ausgebaut. Der Tab fuehrt jetzt auf die
-//   R4-Weiche: eine Karte, die den echten Weg erklaert (Bewerbung ueber die
-//   Kontaktseite, Pruefung, persoenlicher Zugangslink) — wie auf /platform
-//   etabliert.
+//   toter Code, hier ersatzlos ausgebaut. Der Tab zeigt jetzt die R4-Weiche
+//   IN der Formularspalte (Nutzer-Entscheidung 2026-08-29, vorher eine
+//   zentrierte Karte): sie erklaert den echten Weg und fuehrt zur Bewerbung
+//   auf /partner-apply.
 //
 // Drei Schritte, unveraendert in der Sache: Konto → Unternehmen → Bedarf.
 // Abschluss: mit konfiguriertem Supabase ein echtes signUp mit
@@ -232,60 +232,6 @@ export function RegisterPage() {
         </div>
     );
 
-    // ── R4-B · Die Partner-Weiche: Karte auf vollflaechigem Gradient ─────────
-    // Anbieter werden geprueft aufgenommen, nicht selbst registriert (v2
-    // §10/D7). Statt den Tab wortlos vor die Invite-only-Wand von
-    // /provider-intake springen zu lassen, sagt die Karte den echten Weg.
-    if (role === "partner") {
-        return (
-            <div className="flex min-h-screen flex-col bg-gradient-stage px-6 py-8 lg:px-16 lg:py-10">
-                <Logo lockup="horizontal" tone="on-light" href="/" markClassName="h-9" />
-                <div className="flex flex-1 items-center justify-center py-10">
-                    <motion.div
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.25, ease: "easeOut" }}
-                        className="w-full max-w-[520px] rounded-xl bg-surface p-9 text-center shadow-[0_34px_80px_-30px_rgba(2,22,17,0.35)] dark:bg-surface-secondary"
-                    >
-                        <div className="mx-auto mb-7 flex flex-wrap justify-center gap-2">
-                            {(["user", "partner"] as const).map((r) => (
-                                <Segment key={r} selected={role === r} onClick={() => setRole(r)}>
-                                    {t(r === "user" ? "register.roleUser" : "register.rolePartner")}
-                                </Segment>
-                            ))}
-                        </div>
-                        <p className="text-body-3xs font-bold uppercase tracking-[0.14em] text-brand">
-                            {t("register.partnerGate.kicker")}
-                        </p>
-                        <h1 className="mt-2.5 font-serif text-[1.5rem] font-bold leading-tight text-fg">
-                            {t("register.partnerGate.title")}
-                        </h1>
-                        <p className="mt-3 text-body-sm leading-relaxed text-fg-secondary">
-                            {t("register.partnerGate.body")}
-                        </p>
-                        <button
-                            type="button"
-                            onClick={() => navigate(`/${lang}/partner-apply`)}
-                            className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-5 py-3.5 text-body-md font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5"
-                        >
-                            {t("register.partnerGate.cta")} <ArrowRight size={16} />
-                        </button>
-                        <p className="mt-4 text-body-xs">
-                            <button
-                                type="button"
-                                onClick={() => navigate(`/${lang}/platform`)}
-                                className="font-semibold text-brand transition-colors hover:text-brand-700"
-                            >
-                                {t("register.partnerGate.learnMore")}
-                            </button>
-                        </p>
-                    </motion.div>
-                </div>
-                <SystemFooter />
-            </div>
-        );
-    }
-
     // ── R1-A/R2-A/R3-A · Die drei Schritte im Split ──────────────────────────
     // Schritt 1 traegt das breite Narrativ mit den drei Zusagen; die Schritte
     // 2 und 3 ruecken die Spalte schmaler, weil ihre Formulare mehr Platz
@@ -333,6 +279,49 @@ export function RegisterPage() {
             <div className="flex flex-1 flex-col justify-center border-stroke-subtle px-6 pb-10 pt-8 lg:border-l lg:px-14 lg:py-12">
                 <div className="mx-auto w-full max-w-[420px]">
                     {step === 0 && roleToggle}
+
+                    {role === "partner" ? (
+                        /* R4 · Die Partner-Weiche IM Split (Nutzer-Entscheidung
+                           2026-08-29, ersetzt die zentrierte R4-B-Karte): beim
+                           Umschalten auf "Kanzlei / Beratung" wechselt nur der
+                           Inhalt der Formularspalte, das Narrativ links bleibt
+                           stehen. Anbieter werden geprueft aufgenommen, nicht
+                           selbst registriert (v2 §10/D7) — der Weg fuehrt zur
+                           Bewerbung (/partner-apply). */
+                        <motion.div
+                            key="partner-gate"
+                            initial={{ opacity: 0, y: 12 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.25, ease: "easeOut" }}
+                        >
+                            <p className="text-body-3xs font-bold uppercase tracking-[0.14em] text-brand">
+                                {t("register.partnerGate.kicker")}
+                            </p>
+                            <h2 className="mt-2.5 font-serif text-[1.5rem] font-bold leading-tight text-fg">
+                                {t("register.partnerGate.title")}
+                            </h2>
+                            <p className="mt-3 text-body-sm leading-relaxed text-fg-secondary">
+                                {t("register.partnerGate.body")}
+                            </p>
+                            <button
+                                type="button"
+                                onClick={() => navigate(`/${lang}/partner-apply`)}
+                                className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-5 py-3.5 text-body-md font-semibold text-fg-on-brand transition-transform duration-200 hover:-translate-y-0.5"
+                            >
+                                {t("register.partnerGate.cta")} <ArrowRight size={16} />
+                            </button>
+                            <p className="mt-4 text-center text-body-xs">
+                                <button
+                                    type="button"
+                                    onClick={() => navigate(`/${lang}/platform`)}
+                                    className="font-semibold text-brand transition-colors hover:text-brand-700"
+                                >
+                                    {t("register.partnerGate.learnMore")}
+                                </button>
+                            </p>
+                        </motion.div>
+                    ) : (
+                    <>
                     <StepDots current={step} />
 
                     {authError && (
@@ -484,6 +473,8 @@ export function RegisterPage() {
                             {t("register.login")}
                         </button>
                     </p>
+                    </>
+                    )}
                 </div>
                 <SystemFooter className="mt-10 lg:hidden" />
             </div>
