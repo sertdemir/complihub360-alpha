@@ -8,6 +8,7 @@ import { UserShell } from '../../components/user/UserShell';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Button } from '../../components/ui/Button';
 import { Segment } from '../../components/compliance-areas';
+import { Donut, SparkBars, KpiCard, useEntered, useCountUp, EASE } from '../../components/ui/Stats';
 
 // ─── User Dashboard · Home v3 (Bento) ────────────────────────────────────────
 // Canvas "User-Dashboard", Gesamt · V3 auf dem Gradient (Nutzer-Wahl
@@ -79,125 +80,8 @@ const ACTION_KEY: Record<string, string> = { 'Send reminder': 'sendReminder', 'O
 
 const CARD = 'rounded-xl border border-stroke-subtle bg-surface shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]';
 
-// ─── Eintritts-Animation (Nutzer-Wunsch 2026-08-29) ──────────────────────────
-// Bei JEDEM Betreten des Dashboards (die Route mountet die Seite neu) zaehlen
-// die Zahlen hoch, zeichnen sich die Donuts und wachsen die Balken. Reine
-// CSS-Transitions ab einem Mount-Trigger — kein Animations-Framework noetig.
-// prefers-reduced-motion schaltet alles ab (sofort Endzustand).
-
-const reducedMotion = () =>
-  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-/** true einen Frame nach dem Mount — der Startpunkt aller Transitions. */
-function useEntered() {
-  const [on, setOn] = useState(reducedMotion);
-  useEffect(() => {
-    if (on) return;
-    const id = requestAnimationFrame(() => requestAnimationFrame(() => setOn(true)));
-    return () => cancelAnimationFrame(id);
-  }, [on]);
-  return on;
-}
-
-/** Zaehlt mit ease-out von 0 auf target; bei reduced motion sofort target. */
-function useCountUp(target: number, on: boolean, duration = 900) {
-  const [value, setValue] = useState(reducedMotion() ? target : 0);
-  const raf = useRef(0);
-  useEffect(() => {
-    if (!on || reducedMotion()) { setValue(target); return; }
-    const start = performance.now();
-    const tick = (now: number) => {
-      const p = Math.min(1, (now - start) / duration);
-      setValue(Math.round(target * (1 - Math.pow(1 - p, 3))));
-      if (p < 1) raf.current = requestAnimationFrame(tick);
-    };
-    raf.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf.current);
-  }, [on, target, duration]);
-  return value;
-}
-
-const EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
-
-/** Donut aus Zusammensetzungs-Anteilen; Farben folgen den Tokens via currentColor.
-    Die Segmente zeichnen sich ab `on` gestaffelt (dasharray 0 → Anteil). */
-function Donut({ segs, size = 46, stroke = 7, center, on }: {
-  segs: { frac: number; cls: string }[]; size?: number; stroke?: number; center?: string; on: boolean;
-}) {
-  const r = (size - stroke) / 2 - 1;
-  const c = 2 * Math.PI * r;
-  let off = 0;
-  return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke} stroke="currentColor" className="text-stroke-subtle" />
-      {segs.map((s, i) => {
-        const d = s.frac * c;
-        const el = (
-          <circle
-            key={s.cls + off}
-            cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke}
-            stroke="currentColor" className={s.cls}
-            strokeDashoffset={-off}
-            transform={`rotate(-90 ${size / 2} ${size / 2})`}
-            style={{
-              strokeDasharray: on ? `${d} ${c - d}` : `0 ${c}`,
-              transition: `stroke-dasharray 850ms ${EASE} ${90 + i * 130}ms`,
-            }}
-          />
-        );
-        off += d;
-        return el;
-      })}
-      {center && (
-        <text x="50%" y="54%" textAnchor="middle" fill="currentColor" className="text-fg" fontSize="12" fontWeight="800">{center}</text>
-      )}
-    </svg>
-  );
-}
-
-/** Zusammensetzungs-Balken (keine Zeitreihe): Hoehen relativ zum Maximum,
-    wachsen ab `on` gestaffelt vom Boden. */
-function SparkBars({ vals, cls = 'text-brand', on }: { vals: number[]; cls?: string; on: boolean }) {
-  const w = 64, h = 30, bw = w / vals.length - 4;
-  const max = Math.max(...vals);
-  return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden className={cls}>
-      {vals.map((v, i) => {
-        const bh = Math.max(3, (v / max) * h);
-        return (
-          <rect
-            key={i} x={i * (bw + 4)} y={h - bh} width={bw} height={bh} rx="2.5" fill="currentColor"
-            style={{
-              transform: on ? 'scaleY(1)' : 'scaleY(0)',
-              transformOrigin: 'bottom', transformBox: 'fill-box',
-              transition: `transform 700ms ${EASE} ${120 + i * 90}ms`,
-            }}
-          />
-        );
-      })}
-    </svg>
-  );
-}
-
-function KpiCard({ title, big, sub, chip, children }: {
-  title: string; big: string; sub: string; chip?: string; children: ReactNode;
-}) {
-  return (
-    <div className={CARD + ' flex-1 p-5'}>
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{title}</p>
-        {chip && <span className="rounded-md bg-warning-bg px-1.5 py-0.5 text-[10px] font-extrabold text-warning-700">{chip}</span>}
-      </div>
-      <div className="mt-2.5 flex items-center justify-between gap-3">
-        <div>
-          <p className="font-serif text-[24px] font-bold leading-none text-fg">{big}</p>
-          <p className="mt-1.5 text-body-2xs text-fg-tertiary">{sub}</p>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}
+// Die Kleinst-Diagramme und die Eintritts-Animation liegen seit dem
+// Sitzungen-Umbau in components/ui/Stats.tsx — hier standen sie zuerst.
 
 function SectionHead({ title, count, to, extra }: { title: string; count?: string; to: string; extra?: ReactNode }) {
   const { t, i18n } = useTranslation('userws');
@@ -278,12 +162,11 @@ export function UserHomePage() {
 
           {/* Prominentes Warnband (Nutzer-Optimierung: faellt direkt ins Auge) */}
           <div className="mt-4 flex items-center gap-3.5 rounded-xl border border-warning-500/45 border-l-4 border-l-risk-medium bg-warning-bg px-5 py-3.5">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-risk-medium/15 text-warning-700">
-              <TriangleAlert size={17} />
-            </span>
+            {/* Icon ohne Flaeche, dafuer in voller Groesse (Nutzer-Vorgabe) */}
+            <TriangleAlert size={26} strokeWidth={1.9} className="shrink-0 text-risk-medium" />
             <div className="min-w-0 flex-1">
               <p className="text-body-xs font-extrabold text-warning-700">{t('home.alertTitle')}</p>
-              <p className="mt-0.5 text-body-2xs text-warning-700/80">{t('home.alertBody')}</p>
+              <p className="mt-0.5 text-body-xs text-warning-700">{t('home.alertBody')}</p>
             </div>
             <button
               type="button"

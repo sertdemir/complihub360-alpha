@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { LayoutGrid, List, TriangleAlert } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
+import { AnimatePresence, LayoutGroup, MotionConfig, motion } from 'framer-motion';
 import type { TFunction } from 'i18next';
 import { UserShell } from '../../components/user/UserShell';
 import { Button } from '../../components/ui/Button';
@@ -219,14 +220,13 @@ export function SessionsPage() {
           {/* S6-A · Alters-Band: spricht ueber das Alter, nicht ueber Regeln */}
           {stale.length > 0 && (
             <div className="mt-[18px] flex items-center gap-3.5 rounded-xl border border-warning-500/45 border-l-4 border-l-risk-medium bg-warning-bg px-5 py-3.5">
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-risk-medium/15 text-warning-700">
-                <TriangleAlert size={17} />
-              </span>
+              {/* Icon ohne Flaeche, dafuer in voller Groesse (Nutzer-Vorgabe) */}
+              <TriangleAlert size={26} strokeWidth={1.9} className="shrink-0 text-risk-medium" />
               <div className="min-w-0 flex-1">
                 <p className="text-body-xs font-extrabold text-warning-700">
                   {t('sessions.staleTitle', { count: stale.length, months: Math.floor(STALE_DAYS / 30) })}
                 </p>
-                <p className="mt-0.5 text-body-2xs text-warning-700/80">
+                <p className="mt-0.5 text-body-xs text-warning-700">
                   {stale.map((s) => `${s.title.split(' · ').pop()} (${relTime(s.daysAgo, t)})`).join(' · ')} — {t('sessions.staleBody')}
                 </p>
               </div>
@@ -267,85 +267,189 @@ export function SessionsPage() {
             </div>
           </div>
 
-          {view === 'list' ? (
-            <div className="mt-4 flex flex-col gap-4 xl:flex-row">
-              {/* Zeilen: nur PDF und Öffnen als Textlinks */}
-              <div className="flex min-w-0 flex-1 flex-col gap-2.5">
-                {list.map((r, i) => (
-                  <div
-                    key={r.id ?? r.title}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => setSelected(i)}
-                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelected(i); } }}
-                    className={CARD + ' flex cursor-pointer items-center gap-3.5 px-4 py-3 transition-shadow ' +
-                      (current === r ? 'border-brand/50 ring-1 ring-brand/25' : 'hover:border-stroke')}
-                  >
-                    <span className="grid h-[34px] w-[34px] shrink-0 place-items-center rounded-[10px] bg-surface-secondary text-[11px] font-extrabold text-fg">{r.cc}</span>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <span className={TAG}>{tDomain(r.domain)}</span>
-                        {r.daysAgo >= STALE_DAYS && <span className={TAG_STALE}>{t('sessions.needsRefresh')}</span>}
-                      </div>
-                      <p className="mt-1 text-body-xs font-bold text-fg">{r.title}</p>
-                      <p className="mt-0.5">{metaLine(r)}</p>
-                    </div>
-                    <span className="w-[86px] shrink-0 text-right text-body-3xs text-fg-tertiary">{relTime(r.daysAgo, t)}</span>
-                    <span className="flex shrink-0 items-center gap-3">
-                      <button type="button" className={LINK} onClick={(e) => { e.stopPropagation(); exportPdf(); }}>{t('sessions.pdf')}</button>
-                      <button type="button" className={LINK} onClick={(e) => { e.stopPropagation(); openSession(r); }}>{t('shared.open')}</button>
-                    </span>
-                  </div>
-                ))}
-              </div>
+          {/* Ein Raster, zwei Formen: die Karten MORPHEN zwischen Zeile und
+              Kachel (Framer `layout`), statt hart auszutauschen — Nutzer-Wunsch
+              2026-08-29. MotionConfig reducedMotion="user" schaltet das fuer
+              alle ab, die weniger Bewegung wollen. */}
+          <MotionConfig reducedMotion="user" transition={{ type: 'spring', stiffness: 320, damping: 34, mass: 0.9 }}>
+            <LayoutGroup>
+              <div className="mt-4 flex flex-col gap-4 xl:flex-row">
+                <motion.div
+                  layout
+                  className={
+                    'min-w-0 flex-1 ' +
+                    (view === 'list' ? 'flex flex-col gap-2.5' : 'grid gap-4 md:grid-cols-2 xl:grid-cols-3')
+                  }
+                >
+                  {list.map((r, i) => (
+                    <SessionCard
+                      key={r.id ?? r.title}
+                      row={r}
+                      view={view}
+                      index={i}
+                      entered={entered}
+                      selected={view === 'list' && current === r}
+                      domainLabel={tDomain(r.domain)}
+                      onSelect={() => setSelected(i)}
+                      onOpen={() => openSession(r)}
+                      onPdf={exportPdf}
+                      onCopy={() => r.id && setActionsFor({ id: r.id, title: r.title, domain: r.domain, country: r.cc })}
+                    />
+                  ))}
+                </motion.div>
 
-              {/* Verlauf-Rail: gehoert sichtbar zu EINER Sitzung */}
-              {current && <HistoryRail row={current} onDuplicate={() => current.id && setActionsFor({ id: current.id, title: current.title, domain: current.domain, country: current.cc })} />}
-            </div>
-          ) : (
-            /* Kacheln: alle drei Aktionen */
-            <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {list.map((r, i) => (
-                <div key={r.id ?? r.title} className={CARD + ' flex flex-col overflow-hidden'}>
-                  <div className={`h-1 ${RISK_BG[r.risk]}`} />
-                  <div className="flex-1 p-4">
-                    <div className="flex items-center gap-2">
-                      <span className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-lg bg-surface-secondary text-[10.5px] font-extrabold text-fg">{r.cc}</span>
-                      <span className={TAG}>{tDomain(r.domain)}</span>
-                    </div>
-                    <p className="mt-2.5 text-body-xs font-bold text-fg">{r.title}</p>
-                    <p className="mt-1">{metaLine(r)}</p>
-                    <div className="mt-3 flex items-center gap-2.5">
-                      <div className="h-[5px] flex-1 overflow-hidden rounded-full bg-surface-secondary">
-                        <div
-                          className={`h-full rounded-full ${RISK_BG[r.risk]}`}
-                          style={{ width: entered ? `${r.frac * 100}%` : 0, transition: `width 800ms ${EASE} ${200 + i * 70}ms` }}
-                        />
-                      </div>
-                      {r.duties > 0 && <span className="text-[10px] text-fg-tertiary">{t('sessions.duties', { count: r.duties })}</span>}
-                    </div>
-                    {r.daysAgo >= STALE_DAYS && <span className={TAG_STALE + ' mt-3'}>{t('sessions.needsRefresh')}</span>}
-                  </div>
-                  <div className="flex items-center gap-3 border-t border-stroke-subtle px-4 py-2.5">
-                    <button type="button" className={LINK} onClick={() => openSession(r)}>{t('shared.open')}</button>
-                    <button type="button" className={LINK} onClick={exportPdf}>{t('sessions.pdf')}</button>
-                    <button
-                      type="button"
-                      className={LINK}
-                      onClick={() => r.id && setActionsFor({ id: r.id, title: r.title, domain: r.domain, country: r.cc })}
+                {/* Die Rail gehoert zur Listenansicht — sie faehrt mit heraus. */}
+                <AnimatePresence mode="popLayout" initial={false}>
+                  {view === 'list' && current && (
+                    <motion.div
+                      key="rail"
+                      layout
+                      initial={{ opacity: 0, x: 24 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 24 }}
+                      className="w-full shrink-0 xl:w-[320px]"
                     >
-                      {t('sessions.copyVariant')}
-                    </button>
-                    <span className="ml-auto text-[10px] text-fg-tertiary">{relTime(r.daysAgo, t)}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+                      <HistoryRail
+                        row={current}
+                        onDuplicate={() => current.id && setActionsFor({ id: current.id, title: current.title, domain: current.domain, country: current.cc })}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </LayoutGroup>
+          </MotionConfig>
         </div>
       </div>
       <SessionActionsDrawer target={actionsFor} onClose={() => setActionsFor(null)} onChanged={reload} />
     </UserShell>
+  );
+}
+
+// ─── SessionCard · eine Karte, zwei Formen ───────────────────────────────────
+// Zeile und Kachel sind DASSELBE Element (gleicher key), nur anders angeordnet.
+// Framers `layout` misst beide Zustaende und faehrt Position und Groesse
+// ineinander — die Zeile entwickelt sich zur Kachel statt ausgetauscht zu
+// werden (Nutzer-Wunsch 2026-08-29). Kinder tragen `layout` ebenfalls, sonst
+// verzerrt der Text waehrend des Uebergangs.
+function SessionCard({ row, view, index, entered, selected, domainLabel, onSelect, onOpen, onPdf, onCopy }: {
+  row: Row; view: 'list' | 'tiles'; index: number; entered: boolean; selected: boolean;
+  domainLabel: string; onSelect: () => void; onOpen: () => void; onPdf: () => void; onCopy: () => void;
+}) {
+  const { t } = useTranslation('userws');
+  const isList = view === 'list';
+  const stale = row.daysAgo >= STALE_DAYS;
+
+  const meta = (
+    <span className={`text-body-4xs font-semibold ${RISK_TEXT[row.risk]}`}>
+      ● {t(`sessions.risk.${row.risk}`)}{row.note ? ` · ${row.note}` : ''} · {t('sessions.markets', { count: row.markets })}
+    </span>
+  );
+
+  return (
+    <motion.div
+      layout
+      onClick={isList ? onSelect : undefined}
+      role={isList ? 'button' : undefined}
+      tabIndex={isList ? 0 : undefined}
+      onKeyDown={isList ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(); } } : undefined}
+      className={
+        CARD + ' relative overflow-hidden ' +
+        (isList
+          ? 'flex cursor-pointer items-center gap-3.5 px-4 py-3 ' + (selected ? 'border-brand/50 ring-1 ring-brand/25' : 'hover:border-stroke')
+          : 'flex flex-col')
+      }
+    >
+      {/* Risiko-Kante: in der Kachel oben quer, in der Zeile als schmale
+          Kante links — dieselbe Flaeche, die mitwandert. */}
+      <motion.span
+        layout
+        className={`absolute ${RISK_BG[row.risk]} ` + (isList ? 'inset-y-0 left-0 w-1' : 'inset-x-0 top-0 h-1')}
+      />
+
+      <motion.div layout className={isList ? 'flex min-w-0 flex-1 items-center gap-3.5' : 'flex-1 p-4'}>
+        <motion.div layout className={isList ? 'flex items-center gap-3.5' : 'flex items-center gap-2'}>
+          <motion.span
+            layout
+            className={
+              'grid shrink-0 place-items-center rounded-[10px] bg-surface-secondary font-extrabold text-fg ' +
+              (isList ? 'h-[34px] w-[34px] text-[11px] ml-1' : 'h-[30px] w-[30px] text-[10.5px]')
+            }
+          >
+            {row.cc}
+          </motion.span>
+          {!isList && <motion.span layout="position" className={TAG}>{domainLabel}</motion.span>}
+        </motion.div>
+
+        <motion.div layout className={isList ? 'min-w-0 flex-1' : 'mt-2.5'}>
+          {isList && (
+            <motion.div layout className="flex flex-wrap items-center gap-1.5">
+              <motion.span layout="position" className={TAG}>{domainLabel}</motion.span>
+              {stale && <motion.span layout="position" className={TAG_STALE}>{t('sessions.needsRefresh')}</motion.span>}
+            </motion.div>
+          )}
+          <motion.p layout="position" className={'text-body-xs font-bold text-fg ' + (isList ? 'mt-1' : '')}>{row.title}</motion.p>
+          <motion.p layout="position" className={isList ? 'mt-0.5' : 'mt-1'}>{meta}</motion.p>
+
+          {/* Nur in der Kachel: Pflichten-Balken und das Auffrischungs-Tag */}
+          <AnimatePresence initial={false}>
+            {!isList && (
+              <motion.div
+                key="tile-extras"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="mt-3 flex items-center gap-2.5">
+                  <div className="h-[5px] flex-1 overflow-hidden rounded-full bg-surface-secondary">
+                    <div
+                      className={`h-full rounded-full ${RISK_BG[row.risk]}`}
+                      style={{ width: entered ? `${row.frac * 100}%` : 0, transition: `width 800ms ${EASE} ${200 + index * 70}ms` }}
+                    />
+                  </div>
+                  {row.duties > 0 && <span className="text-[10px] text-fg-tertiary">{t('sessions.duties', { count: row.duties })}</span>}
+                </div>
+                {stale && <span className={TAG_STALE + ' mt-3'}>{t('sessions.needsRefresh')}</span>}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+
+        {isList && (
+          <motion.span layout="position" className="w-[86px] shrink-0 text-right text-body-3xs text-fg-tertiary">
+            {relTime(row.daysAgo, t)}
+          </motion.span>
+        )}
+      </motion.div>
+
+      {/* Aktionen: in der Zeile inline (PDF, Öffnen), in der Kachel als
+          eigene Leiste mit dem dritten Weg. */}
+      <motion.div
+        layout
+        className={
+          isList
+            ? 'flex shrink-0 items-center gap-3 pr-1'
+            : 'flex items-center gap-3 border-t border-stroke-subtle px-4 py-2.5'
+        }
+      >
+        {!isList && <motion.button layout="position" type="button" className={LINK} onClick={onOpen}>{t('shared.open')}</motion.button>}
+        <motion.button layout="position" type="button" className={LINK} onClick={(e) => { e.stopPropagation(); onPdf(); }}>{t('sessions.pdf')}</motion.button>
+        {isList && <motion.button layout="position" type="button" className={LINK} onClick={(e) => { e.stopPropagation(); onOpen(); }}>{t('shared.open')}</motion.button>}
+        <AnimatePresence initial={false}>
+          {!isList && (
+            <motion.button
+              key="copy" type="button" className={LINK} onClick={onCopy}
+              initial={{ opacity: 0, width: 0 }} animate={{ opacity: 1, width: 'auto' }} exit={{ opacity: 0, width: 0 }}
+              style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}
+            >
+              {t('sessions.copyVariant')}
+            </motion.button>
+          )}
+        </AnimatePresence>
+        {!isList && <motion.span layout="position" className="ml-auto text-[10px] text-fg-tertiary">{relTime(row.daysAgo, t)}</motion.span>}
+      </motion.div>
+    </motion.div>
   );
 }
 
