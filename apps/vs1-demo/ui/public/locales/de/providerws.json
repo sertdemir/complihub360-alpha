@@ -459,5 +459,92 @@
     "doneNote": "Fragen? partners@complihub360.com",
     "errorTitle": "Einreichen fehlgeschlagen",
     "errorBody": "Das Paket konnte nicht übermittelt werden. Prüfe deinen Intake-Link oder versuche es erneut — oder kontaktiere partners@complihub360.com."
+  },
+  "onboarding": {
+    "steps": {
+      "contact": "Kontakt",
+      "coverage": "Abdeckung",
+      "listing": "Listung"
+    },
+    "stepSubs": {
+      "contact": "Ansprechperson und Antwort-Postfach",
+      "coverage": "Länder, Sprachen, Bereiche, SLA-Ziel",
+      "listing": "Ihr öffentliches Profil"
+    },
+    "welcome": {
+      "eyebrow": "Willkommen bei CompliHub360",
+      "titlePre": "Bevor die ersten Dossiers kommen: ",
+      "titleGold": "Ihr Profil",
+      "titlePost": ".",
+      "body": "Ihre Bewerbung ist geprüft, Ihr Zugang aktiv. Damit das Matching Sie findet und Mandanten Sie gelistet sehen, brauchen wir drei Dinge:",
+      "cta": "Profil vervollständigen",
+      "note": "Dauert etwa 5 Minuten. Ihre Angaben steuern, welche Dossiers Sie erreichen."
+    },
+    "contact": {
+      "title": "Wer antwortet — und wohin?",
+      "lead": "Prüfen Sie besonders das Postfach: dahin gehen die Dossiers.",
+      "name": "Ansprechpartner:in",
+      "namePh": "Ihr Name",
+      "inbox": "Antwort-Postfach",
+      "inboxHint": "Hierhin gehen die Dossiers und die Magic-Links — das Postfach, das Ihr Team wirklich liest.",
+      "firm": "Kanzlei / Unternehmen",
+      "website": "Website"
+    },
+    "coverage": {
+      "title": "Was Sie abdecken",
+      "lead": "Das Matching zeigt Ihnen nur Dossiers aus dieser Auswahl.",
+      "countries": "Länder",
+      "langs": "Sprachen",
+      "areas": "Fachgebiete",
+      "sla": "Ihr SLA-Ziel",
+      "slaDefault": "Bestätigung in 24h · Antwort in 48h",
+      "slaFast": "Schneller: 12h / 24h"
+    },
+    "listing": {
+      "title": "Ihr öffentliches Profil",
+      "lead": "So erscheinen Sie im Matching. Goldene Felder sind freiwillig — und zählen in der Reihung.",
+      "displayName": "Öffentlicher Anzeigename",
+      "shortDesc": "Kurzbeschreibung",
+      "shortDescPh": "Womit Sie Mandanten helfen, in ein bis zwei Sätzen.",
+      "credentials": "Zulassung / Berufsstand",
+      "credentialsPh": "z. B. Rechtsanwältin (DE) · Fachanwältin für IT-Recht",
+      "certs": "Zertifikate",
+      "certsPh": "z. B. ISO 27001 Lead Auditor",
+      "activeSince": "Aktiv seit",
+      "teamSize": "Team-Größe"
+    },
+    "done": {
+      "titlePre": "Sie sind ",
+      "titleEm": "gelistet",
+      "titlePost": ".",
+      "lead": "Ihr Profil ist aktiv. Was jetzt passiert:",
+      "dossier": "Passt ein Dossier zu Ihrer Abdeckung, kommt es per Magic-Link in Ihr Antwort-Postfach.",
+      "sla": "Ihre Bestätigung stoppt den SLA-Timer — ab jetzt gelten Ihre Antwortzeiten.",
+      "rank": "Vervollständigen Sie die goldenen Felder, wann immer Sie wollen — sie zählen in der Reihung.",
+      "meterLabel": "Profil {{pct}} % vollständig",
+      "cta": "Zum Dashboard"
+    },
+    "rankBadge": "stärkt Ihr Ranking",
+    "back": "Zurück",
+    "next": "Weiter",
+    "activate": "Profil aktivieren",
+    "languages": {
+      "de": "Deutsch",
+      "en": "Englisch",
+      "fr": "Französisch",
+      "nl": "Niederländisch",
+      "es": "Spanisch",
+      "tr": "Türkisch"
+    },
+    "areas": {
+      "taxVat": "Steuern & USt",
+      "productPackaging": "EPR & Verpackung",
+      "dataPrivacy": "Daten & Datenschutz",
+      "marketingSeo": "Marketing",
+      "corporateStructure": "Unternehmen & Struktur",
+      "productCompliance": "Produkt-Compliance",
+      "logisticsCustoms": "Logistik & Zoll",
+      "legalAdvisory": "Rechtsberatung"
+    }
   }
 }

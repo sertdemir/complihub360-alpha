@@ -8,6 +8,7 @@ import { PartnerStatusBadge, AvailabilityPill } from '../ui/ProviderBadges';
 import { SearchDrawer, HelpDrawer } from './ProviderDrawers';
 import { BellPopover } from './BellPopover';
 import { ConfirmDrawer, type ConfirmSpec } from './ConfirmDrawer';
+import { ProviderOnboardingModal } from './ProviderOnboardingModal';
 import { fetchProviderBookings } from '../../api/bookings';
 import { fetchUnreadCount } from '../../api/notifications';
 import { fetchCoverage, setAvailability, AVAILABILITY_EVENT, DEMO_PROVIDER_KEY } from '../../api/provider';
@@ -103,6 +104,10 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen bg-surface text-fg">
+      {/* Erst das Profil, dann der Workspace: solange das Onboarding nicht
+          abgeschlossen ist, liegt das Modal ueber JEDER Workspace-Seite —
+          deshalb hier in der Shell, nicht auf einer Route. */}
+      <ProviderOnboardingModal />
       <Sidebar
         logo={
           <NavLink to={base} className="flex items-center gap-2">

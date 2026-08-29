@@ -459,5 +459,92 @@
     "doneNote": "Questions? partners@complihub360.com",
     "errorTitle": "Submission failed",
     "errorBody": "The package could not be submitted. Check your intake link or try again — or contact partners@complihub360.com."
+  },
+  "onboarding": {
+    "steps": {
+      "contact": "Contact",
+      "coverage": "Coverage",
+      "listing": "Listing"
+    },
+    "stepSubs": {
+      "contact": "Contact person and reply inbox",
+      "coverage": "Countries, languages, areas, SLA target",
+      "listing": "Your public profile"
+    },
+    "welcome": {
+      "eyebrow": "Welcome to CompliHub360",
+      "titlePre": "Before the first dossiers arrive: ",
+      "titleGold": "your profile",
+      "titlePost": ".",
+      "body": "Your application is vetted, your access is live. For the matching to find you and clients to see you listed, we need three things:",
+      "cta": "Complete your profile",
+      "note": "Takes about 5 minutes. What you enter here decides which dossiers reach you."
+    },
+    "contact": {
+      "title": "Who answers — and where?",
+      "lead": "Check the inbox especially: that is where the dossiers go.",
+      "name": "Contact person",
+      "namePh": "Your name",
+      "inbox": "Reply inbox",
+      "inboxHint": "Dossiers and magic links go here — the inbox your team actually reads.",
+      "firm": "Firm / company",
+      "website": "Website"
+    },
+    "coverage": {
+      "title": "What you cover",
+      "lead": "The matching shows you only dossiers from this selection.",
+      "countries": "Countries",
+      "langs": "Languages",
+      "areas": "Practice areas",
+      "sla": "Your SLA target",
+      "slaDefault": "Confirm in 24h · reply in 48h",
+      "slaFast": "Faster: 12h / 24h"
+    },
+    "listing": {
+      "title": "Your public profile",
+      "lead": "This is how you appear in the matching. Gold fields are optional — and count in the ranking.",
+      "displayName": "Public display name",
+      "shortDesc": "Short description",
+      "shortDescPh": "What you help clients with, in one or two sentences.",
+      "credentials": "Admission / profession",
+      "credentialsPh": "e.g. Attorney (DE) · Certified IT law specialist",
+      "certs": "Certifications",
+      "certsPh": "e.g. ISO 27001 Lead Auditor",
+      "activeSince": "Active since",
+      "teamSize": "Team size"
+    },
+    "done": {
+      "titlePre": "You are ",
+      "titleEm": "listed",
+      "titlePost": ".",
+      "lead": "Your profile is live. What happens now:",
+      "dossier": "When a dossier matches your coverage, it arrives in your reply inbox via magic link.",
+      "sla": "Your confirmation stops the SLA timer — your response times apply from now on.",
+      "rank": "Complete the gold fields whenever you like — they count in the ranking.",
+      "meterLabel": "Profile {{pct}}% complete",
+      "cta": "To the dashboard"
+    },
+    "rankBadge": "boosts your ranking",
+    "back": "Back",
+    "next": "Next",
+    "activate": "Activate profile",
+    "languages": {
+      "de": "German",
+      "en": "English",
+      "fr": "French",
+      "nl": "Dutch",
+      "es": "Spanish",
+      "tr": "Turkish"
+    },
+    "areas": {
+      "taxVat": "Tax & VAT",
+      "productPackaging": "EPR & Packaging",
+      "dataPrivacy": "Data & Privacy",
+      "marketingSeo": "Marketing",
+      "corporateStructure": "Corporate & Structure",
+      "productCompliance": "Product compliance",
+      "logisticsCustoms": "Logistics & Customs",
+      "legalAdvisory": "Legal advisory"
+    }
   }
 }

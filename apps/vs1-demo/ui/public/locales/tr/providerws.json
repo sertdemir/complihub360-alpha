@@ -459,5 +459,92 @@
     "doneNote": "Sorular? partners@complihub360.com",
     "errorTitle": "Gönderim başarısız",
     "errorBody": "Paket gönderilemedi. Kayıt bağlantını kontrol et veya tekrar dene — ya da partners@complihub360.com ile iletişime geç."
+  },
+  "onboarding": {
+    "steps": {
+      "contact": "İletişim",
+      "coverage": "Kapsam",
+      "listing": "Listeleme"
+    },
+    "stepSubs": {
+      "contact": "İlgili kişi ve yanıt kutusu",
+      "coverage": "Ülkeler, diller, alanlar, SLA hedefi",
+      "listing": "Herkese açık profiliniz"
+    },
+    "welcome": {
+      "eyebrow": "CompliHub360'a hoş geldiniz",
+      "titlePre": "İlk dosyalar gelmeden önce: ",
+      "titleGold": "profiliniz",
+      "titlePost": ".",
+      "body": "Başvurunuz incelendi, erişiminiz aktif. Eşleştirmenin sizi bulması ve müvekkillerin sizi listede görmesi için üç şeye ihtiyacımız var:",
+      "cta": "Profili tamamla",
+      "note": "Yaklaşık 5 dakika sürer. Girdileriniz size hangi dosyaların ulaşacağını belirler."
+    },
+    "contact": {
+      "title": "Kim yanıtlıyor — ve nereye?",
+      "lead": "Özellikle posta kutusunu kontrol edin: dosyalar oraya gider.",
+      "name": "İlgili kişi",
+      "namePh": "Adınız",
+      "inbox": "Yanıt kutusu",
+      "inboxHint": "Dosyalar ve sihirli bağlantılar buraya gelir — ekibinizin gerçekten okuduğu kutu.",
+      "firm": "Büro / şirket",
+      "website": "Web sitesi"
+    },
+    "coverage": {
+      "title": "Neyi kapsıyorsunuz",
+      "lead": "Eşleştirme size yalnızca bu seçimden dosyalar gösterir.",
+      "countries": "Ülkeler",
+      "langs": "Diller",
+      "areas": "Uzmanlık alanları",
+      "sla": "SLA hedefiniz",
+      "slaDefault": "24s içinde onay · 48s içinde yanıt",
+      "slaFast": "Daha hızlı: 12s / 24s"
+    },
+    "listing": {
+      "title": "Herkese açık profiliniz",
+      "lead": "Eşleştirmede böyle görünürsünüz. Altın alanlar isteğe bağlıdır — ve sıralamada sayılır.",
+      "displayName": "Görünen ad",
+      "shortDesc": "Kısa açıklama",
+      "shortDescPh": "Müvekkillere nasıl yardım ettiğiniz, bir iki cümleyle.",
+      "credentials": "Ruhsat / meslek",
+      "credentialsPh": "örn. Avukat (DE) · BT hukuku uzmanı",
+      "certs": "Sertifikalar",
+      "certsPh": "örn. ISO 27001 Baş Denetçi",
+      "activeSince": "Şu tarihten beri aktif",
+      "teamSize": "Ekip büyüklüğü"
+    },
+    "done": {
+      "titlePre": "Artık ",
+      "titleEm": "listedesiniz",
+      "titlePost": ".",
+      "lead": "Profiliniz aktif. Şimdi ne olacak:",
+      "dossier": "Kapsamınıza uyan bir dosya, sihirli bağlantıyla yanıt kutunuza gelir.",
+      "sla": "Onayınız SLA sayacını durdurur — artık yanıt süreleriniz geçerli.",
+      "rank": "Altın alanları dilediğiniz zaman tamamlayın — sıralamada sayılırlar.",
+      "meterLabel": "Profil %{{pct}} tamam",
+      "cta": "Panele git"
+    },
+    "rankBadge": "sıralamanızı güçlendirir",
+    "back": "Geri",
+    "next": "İleri",
+    "activate": "Profili etkinleştir",
+    "languages": {
+      "de": "Almanca",
+      "en": "İngilizce",
+      "fr": "Fransızca",
+      "nl": "Felemenkçe",
+      "es": "İspanyolca",
+      "tr": "Türkçe"
+    },
+    "areas": {
+      "taxVat": "Vergi ve KDV",
+      "productPackaging": "EPR ve Ambalaj",
+      "dataPrivacy": "Veri ve Gizlilik",
+      "marketingSeo": "Pazarlama",
+      "corporateStructure": "Şirket ve Yapı",
+      "productCompliance": "Ürün Uyumu",
+      "logisticsCustoms": "Lojistik ve Gümrük",
+      "legalAdvisory": "Hukuki Danışmanlık"
+    }
   }
 }
