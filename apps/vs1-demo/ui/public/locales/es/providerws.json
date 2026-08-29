@@ -545,6 +545,12 @@
       "productCompliance": "Conformidad de producto",
       "logisticsCustoms": "Logística y aduanas",
       "legalAdvisory": "Asesoría jurídica"
+    },
+    "banner": {
+      "text": "Perfil {{pct}} % completo — los perfiles incompletos aparecen más abajo en el ranking.",
+      "cta": "Completar el perfil",
+      "dismiss": "Ocultar en esta sesión",
+      "dismissTitle": "Ocultar — vuelve en su próxima visita hasta completar el perfil"
     }
   }
 }

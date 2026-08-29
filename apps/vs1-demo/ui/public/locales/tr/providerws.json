@@ -545,6 +545,12 @@
       "productCompliance": "Ürün Uyumu",
       "logisticsCustoms": "Lojistik ve Gümrük",
       "legalAdvisory": "Hukuki Danışmanlık"
+    },
+    "banner": {
+      "text": "Profil %{{pct}} tamam — eksik profiller sıralamada daha aşağıda yer alır.",
+      "cta": "Profili tamamla",
+      "dismiss": "Bu oturumda gizle",
+      "dismissTitle": "Gizle — profil tamamlanana dek bir sonraki ziyarette yeniden görünür"
     }
   }
 }

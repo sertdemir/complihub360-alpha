@@ -545,6 +545,12 @@
       "productCompliance": "Produkt-Compliance",
       "logisticsCustoms": "Logistik & Zoll",
       "legalAdvisory": "Rechtsberatung"
+    },
+    "banner": {
+      "text": "Profil {{pct}} % vollständig — unvollständige Profile stehen in der Reihung weiter hinten.",
+      "cta": "Profil vervollständigen",
+      "dismiss": "Für diese Sitzung ausblenden",
+      "dismissTitle": "Ausblenden — erscheint beim nächsten Besuch wieder, bis das Profil vollständig ist"
     }
   }
 }

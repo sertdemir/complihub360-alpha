@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Check, CheckCircle2, TrendingUp } from 'lucide-react';
+import { ArrowRight, Check, CheckCircle2, TrendingUp, X } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Segment } from '../compliance-areas';
 import { DOMAINS } from '../../lib/domains';
@@ -33,6 +33,12 @@ import { MARKET_CODES } from '../../lib/marketProfiles';
 // Intake fuellen die Felder vor.
 
 const STORAGE_KEY = 'ch360_provider_onboarding_v1';
+/** Session-Schluessel des Banner-X: naechster Besuch zeigt ihn wieder. */
+const BANNER_DISMISS_KEY = 'ch360_provider_banner_dismissed';
+/** Banner → Modal ("Profil vervollständigen") und Modal → Banner (nach dem
+    Speichern neu rechnen) — dasselbe CustomEvent-Muster wie AVAILABILITY_EVENT. */
+export const OPEN_PROFILE_EVENT = 'ch360:provider-profile-open';
+export const PROFILE_SAVED_EVENT = 'ch360:provider-profile-saved';
 
 type StepId = 'welcome' | 'contact' | 'coverage' | 'listing' | 'done';
 const FORM_STEPS = ['contact', 'coverage', 'listing'] as const;
@@ -52,12 +58,16 @@ const EMPTY: OnboardingData = {
 
 const LANGUAGE_KEYS = ['de', 'en', 'fr', 'nl', 'es', 'tr'] as const;
 
-export function isProviderOnboarded(): boolean {
+function readStored(): { completed?: boolean; data?: OnboardingData } | null {
     try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null')?.completed === true;
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
     } catch {
-        return false;
+        return null;
     }
+}
+
+export function isProviderOnboarded(): boolean {
+    return readStored()?.completed === true;
 }
 
 /** Anteil gefuellter Felder — speist Meter und Banner; Pflicht + Ranking gleich gewichtet. */
@@ -160,7 +170,19 @@ export function ProviderOnboardingModal() {
     const { t } = useTranslation('providerws');
     const [step, setStep] = useState<StepId>(() => (isProviderOnboarded() ? 'done' : 'welcome'));
     const [dismissed, setDismissed] = useState(() => isProviderOnboarded());
-    const [data, setData] = useState<OnboardingData>(EMPTY);
+    const [data, setData] = useState<OnboardingData>(() => ({ ...EMPTY, ...(readStored()?.data ?? {}) }));
+
+    // "Profil vervollständigen" im Banner oeffnet das Modal direkt im
+    // Listungs-Schritt — mit den gespeicherten Angaben vorbefuellt.
+    useEffect(() => {
+        const onOpen = () => {
+            setData({ ...EMPTY, ...(readStored()?.data ?? {}) });
+            setStep('listing');
+            setDismissed(false);
+        };
+        window.addEventListener(OPEN_PROFILE_EVENT, onOpen);
+        return () => window.removeEventListener(OPEN_PROFILE_EVENT, onOpen);
+    }, []);
     const patch = (d: Partial<OnboardingData>) => setData((prev) => ({ ...prev, ...d }));
 
     if (dismissed) return null;
@@ -179,6 +201,7 @@ export function ProviderOnboardingModal() {
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify({ completed: true, completedAt: Date.now(), data }));
         } catch { /* Speichern ist Komfort, kein Gate */ }
+        window.dispatchEvent(new Event(PROFILE_SAVED_EVENT));
         setStep('done');
     };
 
@@ -342,6 +365,62 @@ export function ProviderOnboardingModal() {
                     )}
                 </motion.div>
             </AnimatePresence>
+        </div>
+    );
+}
+
+// ─── O5-C · der Vollstaendigkeits-Banner im Workspace ────────────────────────
+// Nutzer-Nachwahl 2026-08-29: zusaetzlich zum Erfolgs-Modal bleibt im Main-
+// Bereich ein Banner stehen, bis das Profil 100 % erreicht. Das X blendet ihn
+// nur fuer die SITZUNG aus — beim naechsten Besuch ist er wieder da: die Copy
+// sagt offen, dass ein unvollstaendiges Profil die Reihung kostet, und ein
+// endgueltig wegklickbarer Hinweis waere das leiseste Ranking-Leck der Welt.
+export function ProviderProfileBanner() {
+    const { t } = useTranslation('providerws');
+    const [, setTick] = useState(0);
+    const [sessionDismissed, setSessionDismissed] = useState(() => {
+        try { return sessionStorage.getItem(BANNER_DISMISS_KEY) === '1'; } catch { return false; }
+    });
+
+    // Nach jedem Speichern im Modal neu rechnen, ohne Reload.
+    useEffect(() => {
+        const onSaved = () => setTick((n) => n + 1);
+        window.addEventListener(PROFILE_SAVED_EVENT, onSaved);
+        return () => window.removeEventListener(PROFILE_SAVED_EVENT, onSaved);
+    }, []);
+
+    const stored = readStored();
+    if (!stored?.completed || sessionDismissed) return null;
+    const pct = completeness({ ...EMPTY, ...(stored.data ?? {}) });
+    if (pct >= 100) return null;
+
+    const dismiss = () => {
+        try { sessionStorage.setItem(BANNER_DISMISS_KEY, '1'); } catch { /* Sitzungs-Komfort */ }
+        setSessionDismissed(true);
+    };
+
+    return (
+        <div className="mb-5 flex flex-wrap items-center gap-x-5 gap-y-3 rounded-xl border border-accent-500/35 bg-accent-500/[0.07] py-3 pl-5 pr-3">
+            <span className="h-1.5 w-[130px] shrink-0 overflow-hidden rounded-full bg-elevate/15">
+                <span className="block h-full rounded-full bg-gradient-to-r from-[var(--fg-brand,#34d399)] to-[#D4AF37]" style={{ width: `${pct}%` }} />
+            </span>
+            <span className="min-w-0 flex-1 text-body-xs leading-relaxed text-fg-secondary">
+                {t('onboarding.banner.text', { pct })}
+            </span>
+            <span className="flex shrink-0 items-center gap-1.5">
+                <Button variant="ghost" size="sm" onClick={() => window.dispatchEvent(new Event(OPEN_PROFILE_EVENT))}>
+                    {t('onboarding.banner.cta')}
+                </Button>
+                <button
+                    type="button"
+                    onClick={dismiss}
+                    aria-label={t('onboarding.banner.dismiss')}
+                    title={t('onboarding.banner.dismissTitle')}
+                    className="grid h-8 w-8 place-items-center rounded-md text-fg-tertiary transition-colors hover:bg-elevate/10 hover:text-fg"
+                >
+                    <X size={15} />
+                </button>
+            </span>
         </div>
     );
 }

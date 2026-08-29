@@ -545,6 +545,12 @@
       "productCompliance": "Product compliance",
       "logisticsCustoms": "Logistics & Customs",
       "legalAdvisory": "Legal advisory"
+    },
+    "banner": {
+      "text": "Profile {{pct}}% complete — incomplete profiles rank further down.",
+      "cta": "Complete your profile",
+      "dismiss": "Hide for this session",
+      "dismissTitle": "Hide — returns on your next visit until the profile is complete"
     }
   }
 }
