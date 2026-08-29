@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, MotionConfig, type Variants } from 'framer-motion';
-import { ArrowRight, Check, Info } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { UserShell } from './UserShell';
 import { Button } from '../ui/Button';
-import { Donut, useEntered, useCountUp } from '../ui/Stats';
+import { Donut, useEntered, useCountUp, EASE } from '../ui/Stats';
 import { duplicateSession } from '../../api/sessions';
 import type { AnonProvider } from '../../api/search';
 
@@ -77,34 +77,46 @@ const GROUPS = [
     match: (r: SnapshotRow) => r.state.kind !== 'answer' && (r.severity === 'medium' || r.severity === 'low') },
 ] as const;
 
-function StateCell({ state, onAnswer }: { state: State; onAnswer: () => void }) {
+// ─── Geltung ─────────────────────────────────────────────────────────────────
+// Was der bisherige Chip WIRKLICH sagte: ob die Pflicht zutrifft — nicht, ob
+// sie getan ist (services/compliance-api/src/index.ts:2175 setzt
+// state = focus ? 'confirmed' : 'likely'). Deshalb heisst er jetzt "Pflicht"
+// bzw. "Vermutlich Pflicht", und der Balken darunter zeigt die Abstufung.
+//
+// MOBIL faellt der Balken weg (Nutzer-Festlegung 2026-08-29) — er ist eine
+// Desktop-Verstaerkung; auf schmalen Breiten braucht die Zeile den Platz.
+const GELTUNG = {
+  confirmed: { key: 'duty',       frac: 1,    bar: 'bg-risk-low' },
+  likely:    { key: 'likelyDuty', frac: 0.6,  bar: 'bg-risk-medium' },
+  answer:    { key: 'toClarify',  frac: 0.25, bar: 'bg-fg-tertiary' },
+} as const;
+
+function GeltungCell({ state, entered, index }: { state: State; entered: boolean; index: number }) {
   const { t } = useTranslation('results');
-  if (state.kind === 'confirmed') {
-    return (
-      <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-brand/30 bg-brand-light px-3 py-1 text-[10.5px] font-bold text-fg-brand">
-        <Check size={12} strokeWidth={3} /> {t('state.confirmed')}
-      </span>
-    );
-  }
-  if (state.kind === 'likely') {
-    return (
-      <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-stroke bg-surface px-3 py-1 text-[10.5px] font-bold text-fg-secondary">
-        <Info size={12} /> {t('state.likely')}
-      </span>
-    );
-  }
-  // Der Klaerungs-Weg ist ein Textbutton (Nutzer-Regel): gefuellte Knoepfe
-  // bleiben den wenigen wirklich primaeren Handlungen vorbehalten.
+  const g = GELTUNG[state.kind];
   return (
-    <button type="button" onClick={onAnswer} className={TEXT_LINK + ' inline-flex shrink-0 items-center gap-1 whitespace-nowrap'}>
-      {t('state.answer', { total: state.count })} <ArrowRight size={13} />
-    </button>
+    <div className="w-[124px] shrink-0 sm:w-[136px]">
+      <p className="whitespace-nowrap text-[10.5px] font-semibold text-fg-secondary">
+        {t(`snapshot.geltung.${g.key}`)}
+      </p>
+      <div className="mt-1.5 hidden h-1 overflow-hidden rounded-full bg-stroke-subtle sm:block">
+        <div
+          className={'h-1 rounded-full ' + g.bar}
+          style={{
+            width: entered ? `${g.frac * 100}%` : 0,
+            transition: `width 850ms ${EASE} ${120 + index * 60}ms`,
+          }}
+        />
+      </div>
+    </div>
   );
 }
 
-function GroupCard({ label, sub, dot, rows, onAnswer }: {
-  label: string; sub: string; dot: string; rows: SnapshotRow[]; onAnswer: () => void;
+function GroupCard({ label, sub, dot, rows, entered, offset, onAnswer }: {
+  label: string; sub: string; dot: string; rows: SnapshotRow[];
+  entered: boolean; offset: number; onAnswer: () => void;
 }) {
+  const { t } = useTranslation('results');
   return (
     <div className={CARD + ' overflow-hidden'}>
       <div className="flex items-center gap-2.5 border-b border-stroke-subtle bg-surface-secondary px-5 py-3.5">
@@ -141,16 +153,18 @@ function GroupCard({ label, sub, dot, rows, onAnswer }: {
                 )}
               </p>
             </div>
-            {/* Dreispaltig (Nutzer 2026-08-29): der Chip mittig in eigener
-                Spalte, die Frist ganz rechts auf einer Kante. Vorher stand
-                "Abhaengig von Tools" direkt neben dem Textlink "2 Fragen
-                beantworten" und machte ihn unleserlich. */}
-            <div className="flex w-[186px] shrink-0 justify-center">
-              <StateCell state={r.state} onAnswer={onAnswer} />
+            <GeltungCell state={r.state} entered={entered} index={offset + i} />
+            {/* Rechts steht, was zu tun ist: bei offenen Fragen der Weg dorthin,
+                sonst die Frist. Beide auf einer Kante. */}
+            <div className="hidden w-[150px] shrink-0 justify-end text-right sm:flex">
+              {r.state.kind === 'answer' ? (
+                <button type="button" onClick={onAnswer} className={TEXT_LINK + ' inline-flex items-center gap-1 whitespace-nowrap'}>
+                  {t('state.answer', { total: r.state.count })} <ArrowRight size={13} />
+                </button>
+              ) : (
+                <span className="text-[10.5px] text-fg-tertiary">{r.due && r.due !== '—' ? r.due : r.dueSub}</span>
+              )}
             </div>
-            <span className="hidden w-[132px] shrink-0 text-right text-[10.5px] text-fg-tertiary sm:block">
-              {r.due && r.due !== '—' ? r.due : r.dueSub}
-            </span>
           </div>
         ))}
       </div>
@@ -261,13 +275,15 @@ export function SessionSnapshot({
             {/* Pflichten + Verlauf, beide Spalten enden auf einer Kante */}
             <div className="mt-[18px] flex flex-col items-stretch gap-[18px] xl:flex-row">
               <motion.div variants={ITEM} className="flex min-w-0 flex-1 flex-col gap-3.5">
-                {groups.map((g) => (
+                {groups.map((g, gi) => (
                   <GroupCard
                     key={g.key}
                     label={t(`snapshot.group.${g.key}`)}
                     sub={t(`snapshot.groupSub.${g.key}`, { count: g.items.length })}
                     dot={g.dot}
                     rows={g.items}
+                    entered={entered}
+                    offset={groups.slice(0, gi).reduce((n, x) => n + x.items.length, 0)}
                     onAnswer={toAnswers}
                   />
                 ))}

@@ -286,6 +286,11 @@
       "project": "Projektbasiert",
       "mixed": "Gemischt"
     },
-    "providerDetails": "Details ansehen"
+    "providerDetails": "Details ansehen",
+    "geltung": {
+      "duty": "Pflicht",
+      "likelyDuty": "Vermutlich Pflicht",
+      "toClarify": "Erst zu klären"
+    }
   }
 }

@@ -286,6 +286,11 @@
       "project": "Proje bazlı",
       "mixed": "Karma"
     },
-    "providerDetails": "Ayrıntıları gör"
+    "providerDetails": "Ayrıntıları gör",
+    "geltung": {
+      "duty": "Yükümlülük",
+      "likelyDuty": "Muhtemelen yükümlülük",
+      "toClarify": "Önce netleştirin"
+    }
   }
 }

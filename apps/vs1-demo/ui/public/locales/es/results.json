@@ -286,6 +286,11 @@
       "project": "Por proyecto",
       "mixed": "Mixto"
     },
-    "providerDetails": "Ver detalles"
+    "providerDetails": "Ver detalles",
+    "geltung": {
+      "duty": "Obligación",
+      "likelyDuty": "Probablemente obligación",
+      "toClarify": "Primero aclarar"
+    }
   }
 }
