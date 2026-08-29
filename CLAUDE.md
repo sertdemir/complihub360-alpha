@@ -19,3 +19,9 @@
   Sektionen je drei Varianten in EINEM Canvas abbilden — nicht Sektion für
   Sektion nachliefern. Der Nutzer geht dann alles in einem Durchgang durch und
   nennt seine Wahl je Sektion; erst danach wird ausgerollt.
+
+## Ansprache
+
+- **Du, nicht Sie** (Festlegung 2026-08-29). Der Nutzer und Claude duzen sich.
+  Gilt für Chat-Antworten; Produkt-Copy und Oberflächentexte bleiben davon
+  unberührt — die siezen weiter.
