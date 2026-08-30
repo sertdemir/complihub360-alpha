@@ -12,7 +12,15 @@ function roleFromUser(user: User | null | undefined): UserRole {
   const r =
     (user?.app_metadata?.role as string | undefined) ??
     (user?.user_metadata?.role as string | undefined);
-  return r === 'partner' ? 'partner' : 'user';
+  // 'admin' fiel bis 2026-08-29 durch: der Typ kennt die Rolle und
+  // App.tsx gated das Control Center mit requiredRole="admin", aber diese
+  // Ableitung gab fuer alles ausser 'partner' 'user' zurueck. Eine als
+  // Administrator gefuehrte Person wurde damit vom eigenen Bereich
+  // ausgesperrt. Unbekannte Werte fallen weiterhin auf 'user' — eine Rolle
+  // wird zuerkannt, nicht geraten.
+  if (r === 'partner') return 'partner';
+  if (r === 'admin') return 'admin';
+  return 'user';
 }
 
 function nameFromUser(user: User | null | undefined): string | null {
