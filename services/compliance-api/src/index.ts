@@ -1192,8 +1192,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         });
     } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/invoices$/.test(req.url || '')) {
         // B7: invoice history incl. line items. Stripe-issued via the monthly
-        // billing run; open rows pull their payment status here (no webhook —
-        // the staging basic-auth wall blocks Stripe callbacks).
+        // billing run; open rows pull their payment status here.
+        // Why polling and not a webhook: this was once justified with the
+        // staging basic-auth wall supposedly sitting in front of /api. That is
+        // wrong — the API's Traefik router carries only `complihub-noindex`
+        // (checked 2026-08-30). No webhook endpoint has been built yet, so the
+        // polling stays until one is; the wall was never the reason.
         const providerKey = (req.url || '').split('/')[4];
         try {
             await syncOpenInvoices(providerKey).catch(() => { /* list still renders */ });

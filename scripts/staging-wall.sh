@@ -1,30 +1,38 @@
 #!/usr/bin/env bash
 #
-# Die Basic-Auth-Wand von der API nehmen — die Seite bleibt geschuetzt.
+# Die Basic-Auth-Wand vor Staging an- oder abschalten.
 #
-# WARUM: Die Traefik-Middleware `complihub-auth` liegt auf Staging nicht nur
-# vor der Seite, sondern auch vor `/api`. Das schuetzt dort nichts — die API
-# hat ihren eigenen Riegel (services/compliance-api/src/index.ts:108-185:
-# Supabase-JWT oder Server-Key, mit kurzer Liste oeffentlicher Routen) —,
-# richtet aber zwei Schaeden an:
+# WAS DIE WAND IST: die Traefik-Middleware `complihub-auth`, referenziert in den
+# Router-Labels des Service `web` in /docker/complihub/docker-compose.yml. Sie
+# liegt vor der ausgelieferten Seite — vor NICHTS SONST.
 #
-#   1. Jeder XHR aus dem Arbeitsbereich, der ohne Zugangsdaten an die Wand
-#      laeuft, bekommt `401` MIT `WWW-Authenticate: Basic`. Der Browser
-#      oeffnet daraufhin pro Request einen Login-Dialog — daher die
-#      wiederholten Abfragen beim Seitenwechsel.
-#   2. Stripe-Webhooks kommen nicht durch. Deshalb steht in index.ts:1195
-#      ein Polling-Workaround statt eines Webhooks.
+# BEFUND 2026-08-30, festgehalten, weil vorher das Gegenteil behauptet wurde:
+# die API haengt NICHT hinter dieser Wand. Ihr Router lebt in einem eigenen
+# Stack (/docker/complihub-api) mit der Regel
+#     Host(`staging.complihub360.com`) && PathPrefix(`/api`)
+# und traegt als Middleware ausschliesslich `complihub-noindex`. Traefik waehlt
+# bei konkurrierenden Regeln die spezifischere, also gewinnt dieser Router fuer
+# alles unter /api. Geschuetzt ist die API durch ihren eigenen Riegel in
+# services/compliance-api/src/index.ts (Supabase-JWT oder Server-Key, mit einer
+# kurzen Liste oeffentlicher Routen ab PUBLIC_ROUTES).
 #
-#   ./scripts/staging-api-unwall.sh check          # nur ansehen, aendert nichts
-#   ./scripts/staging-api-unwall.sh apply          # Wand von der API nehmen
-#   ./scripts/staging-api-unwall.sh apply worker   # anderer Service-Name
-#   ./scripts/staging-api-unwall.sh revert         # letzte Sicherung zurueck
+# Ein Vorgaengerskript dieser Datei nahm an, die Wand liege auch vor /api, und
+# begruendete damit sowohl sich selbst als auch den Polling-Workaround bei den
+# Stripe-Rechnungen. Beides war falsch.
+#
+# `complihub-noindex` bleibt in jedem Fall stehen: Suchmaschinen haelt dieser
+# Header fern, nicht die Wand.
+#
+#   ./scripts/staging-wall.sh check          # nur ansehen, aendert nichts
+#   ./scripts/staging-wall.sh off            # Wand abnehmen
+#   ./scripts/staging-wall.sh off web        # anderer Service-Name
+#   ./scripts/staging-wall.sh on             # letzte Sicherung zurueckspielen
 #
 # Ueberschreibbar per Env: STAGING_SSH_HOST, STAGING_SSH_KEY,
 # STAGING_COMPOSE_DIR, STAGING_VERIFY_HOST.
 #
 # Schwester-Skript: scripts/staging-auth.sh verwaltet die Zugaenge derselben
-# Middleware.
+# Middleware, solange sie haengt.
 
 set -euo pipefail
 
@@ -35,15 +43,15 @@ VERIFY_HOST="${STAGING_VERIFY_HOST:-https://staging.complihub360.com}"
 MIDDLEWARE='complihub-auth'
 
 usage() {
-  sed -n '/^# Die Basic-Auth-Wand/,/^# Middleware\./p' "$0" | sed 's/^#\{1,2\} \{0,1\}//'
+  sed -n '/^# Die Basic-Auth-Wand/,/^# Middleware, solange sie haengt\./p' "$0" | sed 's/^#\{1,2\} \{0,1\}//'
   exit "${1:-1}"
 }
 
 cmd="${1:-}"
-service="${2:-api}"
+service="${2:-web}"
 
 case "$cmd" in
-  check|apply|revert) ;;
+  check|off|on) ;;
   -h|--help|help) usage 0 ;;
   *) usage 1 ;;
 esac
@@ -61,8 +69,8 @@ file="$dir/docker-compose.yml"
 [ -f "$file" ] || { echo "compose-Datei nicht gefunden: $file" >&2; exit 1; }
 cd "$dir"
 
-# ── revert ────────────────────────────────────────────────────────────────
-if [ "$mode" = "revert" ]; then
+# ── on: letzte Sicherung zurueck ──────────────────────────────────────────
+if [ "$mode" = "on" ]; then
   newest=$(ls -1t "$file".bak.* 2>/dev/null | head -1 || true)
   [ -n "$newest" ] || { echo "Keine Sicherung gefunden." >&2; exit 1; }
   cp "$newest" "$file"
@@ -77,7 +85,6 @@ fi
 # braucht: ein Label gehoert dem Service, unter dem es steht.
 report() {
   awk -v mw="$mw" '
-    # Service-Kopf: genau zwei Leerzeichen Einrueckung, dann "name:"
     /^  [A-Za-z0-9_.-]+:[[:space:]]*$/ { svc = $1; sub(/:$/, "", svc); next }
     /traefik\.http\.routers\..*\.rule/        { printf "  [%s] REGEL       %s\n", svc, $0 }
     /traefik\.http\.routers\..*\.middlewares/ { printf "  [%s] MIDDLEWARE  %s\n", svc, $0 }
@@ -90,14 +97,14 @@ echo
 
 if [ "$mode" = "check" ]; then
   echo "Nichts geaendert. Wenn oben beim Service \"$service\" eine MIDDLEWARE-Zeile"
-  echo "mit \"$mw\" steht, nimmt \"apply\" genau die heraus."
+  echo "mit \"$mw\" steht, nimmt \"off\" genau die heraus."
   exit 0
 fi
 
-# ── apply ─────────────────────────────────────────────────────────────────
+# ── off ───────────────────────────────────────────────────────────────────
 grep -q "^  ${service}:[[:space:]]*$" "$file" || {
   echo "Service \"$service\" steht nicht in $file — siehe die Liste oben." >&2
-  echo "Aufruf mit abweichendem Namen: staging-api-unwall.sh apply <service>" >&2
+  echo "Aufruf mit abweichendem Namen: staging-wall.sh off <service>" >&2
   exit 1
 }
 
@@ -168,23 +175,22 @@ echo
 # ── Verifizieren ──────────────────────────────────────────────────────────
 sleep 3
 echo "Pruefe von der Box aus:"
-api_hdr=$(curl -sS -o /dev/null -D - --max-time 15 "$verify_host/api/v1/sessions" || true)
 site_hdr=$(curl -sS -o /dev/null -D - --max-time 15 "$verify_host/" || true)
 
-if printf '%s' "$api_hdr" | grep -qi '^www-authenticate:'; then
-  echo "  ✗ API antwortet weiter mit einer Basic-Auth-Aufforderung:"
-  printf '%s\n' "$api_hdr" | grep -i '^HTTP/\|^www-authenticate:' | sed 's/^/      /'
-  echo "    Der Router der API traegt die Middleware offenbar unter einem"
-  echo "    anderen Service. Siehe die Liste oben, dann: apply <service>."
+if printf '%s' "$site_hdr" | grep -qi '^www-authenticate:'; then
+  echo "  ✗ Die Seite verlangt weiterhin eine Anmeldung:"
+  printf '%s\n' "$site_hdr" | grep -i '^HTTP/\|^www-authenticate:' | sed 's/^/      /'
+  echo "    Der Router traegt die Middleware offenbar unter einem anderen"
+  echo "    Service. Siehe die Liste oben, dann: off <service>."
 else
-  echo "  ✓ API ohne Basic-Auth-Aufforderung"
-  printf '%s\n' "$api_hdr" | grep -i '^HTTP/' | sed 's/^/      /'
+  echo "  ✓ Seite ohne Basic-Auth-Aufforderung"
+  printf '%s\n' "$site_hdr" | grep -i '^HTTP/' | sed 's/^/      /'
 fi
 
-if printf '%s' "$site_hdr" | grep -qi '^www-authenticate:'; then
-  echo "  ✓ Seite weiterhin hinter der Wand"
+if printf '%s' "$site_hdr" | grep -qi '^x-robots-tag:.*noindex'; then
+  echo "  ✓ noindex steht weiterhin"
 else
-  echo "  ✗ ACHTUNG: die Seite verlangt keine Anmeldung mehr — sofort zurueck:"
-  echo "      ./scripts/staging-api-unwall.sh revert"
+  echo "  ✗ ACHTUNG: kein noindex mehr — Staging waere indexierbar:"
+  echo "      ./scripts/staging-wall.sh on"
 fi
 REMOTE_EOF
