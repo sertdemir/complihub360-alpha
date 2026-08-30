@@ -10,6 +10,7 @@ import { supabaseApi } from "./supabase.js";
 import { sendMagicLinkMail, sendEmailChangeMail, sendRescheduleMail } from "./mailer.js";
 import { handleAssistantChat, handleAssistantCheckout, handleAssistantVerify } from "./assistant.js";
 import { handleAuthAdopt } from "./adoption.js";
+import { handleDashboard, SLUG_TO_ENGINE } from "./dashboard.js";
 import { handleBillingRun, handleBillingPreview, syncOpenInvoices } from "./billing.js";
 import { checkVatId } from "./vies.js";
 import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
@@ -1192,8 +1193,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         });
     } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/invoices$/.test(req.url || '')) {
         // B7: invoice history incl. line items. Stripe-issued via the monthly
-        // billing run; open rows pull their payment status here (no webhook —
-        // the staging basic-auth wall blocks Stripe callbacks).
+        // billing run; open rows pull their payment status here.
+        // Why polling and not a webhook: this was once justified with the
+        // staging basic-auth wall supposedly sitting in front of /api. That is
+        // wrong — the API's Traefik router carries only `complihub-noindex`
+        // (checked 2026-08-30). No webhook endpoint has been built yet, so the
+        // polling stays until one is; the wall was never the reason.
         const providerKey = (req.url || '').split('/')[4];
         try {
             await syncOpenInvoices(providerKey).catch(() => { /* list still renders */ });
@@ -1457,16 +1462,22 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             }
         });
     } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/sessions')) {
-        // List sessions for a guest key (registered listing lands with real auth).
+        // Zwei Ausweise, nach Rang: ein verifizierter JWT schlaegt den
+        // guest_key. Der guest_key steht im localStorage EINES Browsers —
+        // wer sich am Telefon anmeldet, haette damit eine leere Liste, obwohl
+        // die Sitzungen laengst seinem Konto gehoeren (adoption.ts setzt
+        // user_id und laesst guest_key stehen). Deshalb entscheidet die
+        // Anmeldung, nicht das Geraet.
         try {
             const u = new URL(req.url, 'http://localhost');
             const guestKey = u.searchParams.get('guest_key');
-            if (!guestKey) {
+            if (!authUserId && !guestKey) {
                 res.writeHead(400, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'guest_key required', correlationId }));
                 return;
             }
-            const rows = await supabaseApi.select('sessions', { guest_key: guestKey }, { order: 'created_at.desc', limit: 20 });
+            const filter = authUserId ? { user_id: authUserId } : { guest_key: guestKey as string };
+            const rows = await supabaseApi.select('sessions', filter, { order: 'created_at.desc', limit: 20 });
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, sessions: rows }));
@@ -2074,16 +2085,6 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     .filter((c): c is CountryCode => isKnownCountry(String(c)));
                 // Wizard domain slugs → engine domains (focus = user-selected;
                 // always included and marked 'confirmed' in the payload).
-                const SLUG_TO_ENGINE: Record<string, ComplianceDomain> = {
-                    'tax-vat': ComplianceDomain.TAX,
-                    'product-packaging': ComplianceDomain.PRODUCT,
-                    'product-compliance': ComplianceDomain.PRODUCT,
-                    'data-privacy': ComplianceDomain.DATA,
-                    'marketing-seo': ComplianceDomain.MARKETING,
-                    'corporate-structure': ComplianceDomain.CORPORATE,
-                    'logistics-customs': ComplianceDomain.LOGISTICS,
-                    'legal-advisory': ComplianceDomain.LEGAL,
-                };
                 const requestedSlugs: string[] = requestData.structured_answers?.domains
                     || requestData.structured_answers?.categories
                     || requestData.domains || [];
@@ -2315,6 +2316,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     } else if (req.method === 'POST' && req.url === '/api/v1/assistant/verify') {
         // Phase ③: verify-on-return — confirms the subscription after checkout.
         handleAssistantVerify(req, res, correlationId, { userId: authUserId, email: authEmail });
+    } else if (req.method === 'GET' && req.url === '/api/v1/dashboard') {
+        // Kennzahlen des Arbeitsbereichs aus echten Zeilen (dashboard.ts).
+        await handleDashboard(res, correlationId, authUserId);
     } else if (req.method === 'POST' && req.url === '/api/v1/auth/adopt') {
         // Signup adoption: the signed-in account claims its guest sessions (adoption.ts).
         handleAuthAdopt(req, res, correlationId, { userId: authUserId, email: authEmail });

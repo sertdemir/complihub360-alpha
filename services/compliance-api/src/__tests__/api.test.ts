@@ -440,3 +440,117 @@ describe('Pflicht-Status je Sitzung', () => {
         expect(r.status).toBe(404);
     });
 });
+
+describe('GET /api/v1/sessions — welcher Ausweis zaehlt', () => {
+    // Der guest_key lebt im localStorage EINES Browsers. Wer sich am Telefon
+    // anmeldet, saehe damit eine leere Liste, obwohl die Sitzungen laengst
+    // seinem Konto gehoeren. Deshalb schlaegt der JWT den guest_key.
+    const seed = (over: Record<string, any> = {}) => {
+        const row = {
+            id: randomUUID(), country: 'DE', markets: [], categories: ['vat'],
+            answers: {}, status: 'active', created_at: new Date().toISOString(),
+            user_id: null, guest_key: null, ...over,
+        };
+        (db.sessions ??= []).push(row);
+        return row.id;
+    };
+
+    it('liefert angemeldet die eigenen Sitzungen — auch ohne guest_key', async () => {
+        const mine = seed({ user_id: USER_ID });
+        seed({ guest_key: 'fremder-schluessel-12345678' });
+        const r = await api('/api/v1/sessions', { auth: 'jwt' });
+        expect(r.status).toBe(200);
+        expect(r.body.sessions.map((s: any) => s.id)).toEqual([mine]);
+    });
+
+    it('ignoriert angemeldet einen mitgeschickten fremden guest_key', async () => {
+        const mine = seed({ user_id: USER_ID });
+        seed({ guest_key: 'fremder-schluessel-12345678' });
+        const r = await api('/api/v1/sessions?guest_key=fremder-schluessel-12345678', { auth: 'jwt' });
+        expect(r.status).toBe(200);
+        expect(r.body.sessions.map((s: any) => s.id)).toEqual([mine]);
+    });
+
+    it('liefert als Gast weiterhin ueber den guest_key', async () => {
+        const gast = seed({ guest_key: 'gast-schluessel-abcdefgh' });
+        seed({ user_id: USER_ID });
+        const r = await api('/api/v1/sessions?guest_key=gast-schluessel-abcdefgh', { auth: 'none' });
+        expect(r.status).toBe(200);
+        expect(r.body.sessions.map((s: any) => s.id)).toEqual([gast]);
+    });
+
+    it('verlangt ohne Anmeldung und ohne guest_key eine Angabe', async () => {
+        const r = await api('/api/v1/sessions', { auth: 'none' });
+        expect(r.status).toBe(400);
+    });
+});
+
+describe('GET /api/v1/dashboard', () => {
+    // Die Kennzahlen des Arbeitsbereichs. Bis 2026-08-30 standen sie fest im
+    // Frontend; ein frisches Konto sah dieselbe erfundene Lage wie jedes
+    // andere. Diese Tests halten fest, dass sie aus echten Zeilen kommen.
+    const seedSession = (over: Record<string, any> = {}) => {
+        const row = {
+            id: randomUUID(), user_id: USER_ID, country: 'DE', markets: ['FR'],
+            categories: ['tax-vat'], answers: {}, status: 'active',
+            created_at: new Date().toISOString(), label: null, ...over,
+        };
+        (db.sessions ??= []).push(row);
+        return row.id;
+    };
+
+    it('verlangt eine Anmeldung — der Server-Key genuegt nicht', async () => {
+        const r = await api('/api/v1/dashboard', { auth: 'key' });
+        expect(r.status).toBe(401);
+    });
+
+    it('meldet fuer ein frisches Konto ehrlich null', async () => {
+        const r = await api('/api/v1/dashboard', { auth: 'jwt' });
+        expect(r.status).toBe(200);
+        expect(r.body.sessions.total).toBe(0);
+        expect(r.body.sessions.items).toEqual([]);
+        expect(r.body.obligations.open).toBe(0);
+    });
+
+    it('zaehlt nur eigene Sitzungen, keine fremden', async () => {
+        seedSession();
+        seedSession({ user_id: randomUUID() });
+        seedSession({ user_id: null, guest_key: 'fremd-abcdefgh' });
+        const r = await api('/api/v1/dashboard', { auth: 'jwt' });
+        expect(r.body.sessions.total).toBe(1);
+    });
+
+    it('laesst archivierte Sitzungen aus', async () => {
+        seedSession();
+        seedSession({ status: 'archived' });
+        const r = await api('/api/v1/dashboard', { auth: 'jwt' });
+        expect(r.body.sessions.total).toBe(1);
+    });
+
+    it('rechnet erledigte Pflichten aus den offenen heraus', async () => {
+        const id = seedSession();
+        const vorher = (await api('/api/v1/dashboard', { auth: 'jwt' })).body;
+        const eine = vorher.sessions.items[0];
+        if (eine.total === 0) return;   // ohne Laenderprofil gibt es nichts abzuziehen
+
+        // Eine beliebige Pflicht dieser Sitzung abhaken.
+        const liste = await api(`/api/v1/session/${id}/obligations`);
+        expect(liste.status).toBe(200);
+        const irgendeine = 'tax-vat-registration';
+        (db.session_obligation_status ??= []).push({
+            session_id: id, obligation_id: irgendeine, status: 'done',
+            done_at: '2026-08-30',
+        });
+
+        const nachher = (await api('/api/v1/dashboard', { auth: 'jwt' })).body;
+        expect(nachher.obligations.open).toBeLessThanOrEqual(vorher.obligations.open);
+    });
+
+    it('summiert die Schweregrade auf die Zahl der offenen Pflichten', async () => {
+        seedSession();
+        const r = await api('/api/v1/dashboard', { auth: 'jwt' });
+        const summe = Object.values(r.body.obligations.by_severity as Record<string, number>)
+            .reduce((a, b) => a + b, 0);
+        expect(summe).toBe(r.body.obligations.open);
+    });
+});

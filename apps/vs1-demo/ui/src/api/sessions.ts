@@ -1,4 +1,4 @@
-import { apiFetch } from './client';
+import { apiFetch, ApiError } from './client';
 import type { SearchProfile } from '../components/wizard/WizardContext';
 
 // ─── Sessions API (Wave A1) ───────────────────────────────────────────────────
@@ -34,13 +34,24 @@ export interface SessionRowData {
   updated_at: string;
 }
 
+/** Angemeldet entscheidet der JWT, als Gast der guest_key — die Auswahl trifft
+ *  der Server (index.ts, GET /api/v1/sessions). Hier wird der guest_key nur
+ *  mitgeschickt, wenn es einen gibt: ein frisches Geraet hat keinen, und ohne
+ *  Anmeldung gibt es dort auch nichts zu holen. */
 export async function fetchSessions(): Promise<SessionRowData[]> {
   const guestKey = localStorage.getItem(GUEST_KEY);
-  if (!guestKey) return [];
-  const res = await apiFetch<{ ok: boolean; sessions: SessionRowData[] }>(
-    `/api/v1/sessions?guest_key=${encodeURIComponent(guestKey)}`,
-  );
-  return res.sessions;
+  const path = guestKey
+    ? `/api/v1/sessions?guest_key=${encodeURIComponent(guestKey)}`
+    : '/api/v1/sessions';
+  try {
+    const res = await apiFetch<{ ok: boolean; sessions: SessionRowData[] }>(path);
+    return res.sessions;
+  } catch (err) {
+    // 400 = weder Anmeldung noch guest_key. Das ist kein Fehler, sondern der
+    // Normalfall eines Besuchers, der noch nichts getan hat.
+    if (err instanceof ApiError && err.status === 400) return [];
+    throw err;
+  }
 }
 
 export async function patchSession(id: string, patch: { label?: string; status?: 'active' | 'archived' }): Promise<void> {
