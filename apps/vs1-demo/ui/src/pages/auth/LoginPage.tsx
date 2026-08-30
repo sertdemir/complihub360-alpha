@@ -208,13 +208,25 @@ export function LoginPage() {
     const callbackUrl = `${window.location.origin}/${lang}/auth/callback`;
     const resetUrl = `${window.location.origin}/${lang}/reset-password`;
 
+    // Supabase reicht bei manchen Fehlern eine leere Nachricht durch — dann
+    // stand im Banner woertlich "{}" (Befund 2026-08-30, Magic-Link bei
+    // kaputtem SMTP). Eine unlesbare Fehlermeldung ist schlimmer als eine
+    // allgemeine: sie sieht aus wie ein Anzeigefehler und nicht wie ein
+    // Hinweis. Kurze oder klammerartige Werte fallen deshalb auf einen
+    // uebersetzten Satz zurueck.
+    const readableError = (raw: string | null | undefined): string => {
+        const m = (raw ?? "").trim();
+        if (!m || m === "{}" || m === "[]" || m.length < 3) return t("login.validation.unknownError");
+        return m;
+    };
+
     const handleMagicLink = async () => {
         setAuthError(null);
         if (!/.+@.+\..+/.test(email)) { setAuthError(t("login.validation.invalidEmail")); return; }
         const sb = isSupabaseConfigured ? await getSupabase() : null;
         if (!sb) { setView("magic-sent"); return; }
         const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: callbackUrl } });
-        if (error) { setAuthError(error.message); return; }
+        if (error) { setAuthError(readableError(error.message)); return; }
         setView("magic-sent");
     };
 
@@ -223,7 +235,7 @@ export function LoginPage() {
         const sb = isSupabaseConfigured ? await getSupabase() : null;
         if (!sb) { finishLogin("partner"); return; }
         const { error } = await sb.auth.signInWithPassword({ email, password });
-        if (error) { setAuthError(error.message); return; }
+        if (error) { setAuthError(readableError(error.message)); return; }
         navigate(params.get("redirect") || `/${lang}/partner-dashboard`);
     };
 
@@ -244,7 +256,7 @@ export function LoginPage() {
         const sb = isSupabaseConfigured ? await getSupabase() : null;
         if (!sb) { finishLogin(role); return; }
         const { error } = await sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: callbackUrl } });
-        if (error) setAuthError(error.message);
+        if (error) setAuthError(readableError(error.message));
     };
 
     const switchMode = (m: Mode) => {

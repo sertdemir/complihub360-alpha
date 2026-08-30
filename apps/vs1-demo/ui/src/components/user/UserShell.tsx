@@ -97,7 +97,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
   const locale = i18n.resolvedLanguage || 'en';
   const location = useLocation();
   // Real session identity when present; the design fixture only as fallback.
-  const { userName, user, logout } = useAuthStore();
+  const { userName, user, session, logout } = useAuthStore();
   const displayName = userName || 'Alex Weber';
   const displaySub = user?.email || 'Acme GmbH';
   const initials = displayName.split(/[\s._-]+/).map((p) => p[0]).join('').slice(0, 2).toUpperCase();
@@ -110,17 +110,32 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
   // AKTIVE bleibt sichtbar, sonst weiss niemand, worin er gerade steckt.
   const [sessions, setSessions] = useState<SessionRowData[]>([]);
   const [sessionsOpen, setSessionsOpen] = useState(false);
+  // /api/v1/bookings und /notifications verlangen einen echten Supabase-JWT
+  // (services/compliance-api/src/index.ts:114 — beide stehen NICHT in
+  // PUBLIC_ROUTES). Der Demo-Login auf Staging setzt nur ein localStorage-Flag
+  // und KEINE Session; die Aufrufe koennen dort also nur scheitern. Sie
+  // trotzdem zu feuern kostet nicht nur Requests: auf Staging liegt eine
+  // Traefik-Basic-Auth-Wand davor, deren 401 ein "WWW-Authenticate: Basic"
+  // traegt — und dann oeffnet der Browser pro Request einen Login-Dialog.
+  // Deshalb: nur mit echter Sitzung anfragen. Die Badges blieben ohne sie
+  // ohnehin leer.
+  const hasSession = !!session;
   useEffect(() => {
-    fetchUserBookings()
-      .then((bs) => setCounts((c) => ({ ...c, requests: bs.filter((b) => b.status === 'confirmed').length })))
-      .catch(() => {});
-    fetchNotificationsFeed(USER_NOTIFICATIONS_VIEWER)
-      .then((f) => setCounts((c) => ({ ...c, unread: f.groups.reduce((n, g) => n + g.items.filter((i) => i.unread).length, 0) })))
-      .catch(() => {});
-    // Ohne API bleibt die Liste leer und die Ebene erscheint gar nicht —
-    // eine Fixture-Sitzung in der Navigation waere eine Behauptung.
+    if (hasSession) {
+      fetchUserBookings()
+        .then((bs) => setCounts((c) => ({ ...c, requests: bs.filter((b) => b.status === 'confirmed').length })))
+        .catch(() => {});
+      fetchNotificationsFeed(USER_NOTIFICATIONS_VIEWER)
+        .then((f) => setCounts((c) => ({ ...c, unread: f.groups.reduce((n, g) => n + g.items.filter((i) => i.unread).length, 0) })))
+        .catch(() => {});
+    }
+    // Die Sitzungsliste ist eine OEFFENTLICHE Route (guest_key als Ausweis)
+    // und laeuft deshalb auch ohne Anmeldung — sie feuert ohnehin nur, wenn
+    // ueberhaupt ein guest_key vorliegt. Ohne API bleibt die Liste leer und
+    // die Nav-Ebene erscheint gar nicht; eine Fixture-Sitzung in der
+    // Navigation waere eine Behauptung.
     fetchSessions().then(setSessions).catch(() => {});
-  }, []);
+  }, [hasSession]);
 
   // Welche Sitzung ist offen? /results?session=<id> ist der einzige Ort, an
   // dem eine einzelne Sitzung angezeigt wird.
