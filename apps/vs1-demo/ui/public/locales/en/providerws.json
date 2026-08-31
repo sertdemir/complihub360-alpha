@@ -551,6 +551,8 @@
       "cta": "Complete your profile",
       "dismiss": "Hide for this session",
       "dismissTitle": "Hide — returns on your next visit until the profile is complete"
-    }
+    },
+    "deferLabel": "Close — continue later",
+    "deferTitle": "Closes onboarding for this session. Your entries are kept; the banner above leads back."
   }
 }

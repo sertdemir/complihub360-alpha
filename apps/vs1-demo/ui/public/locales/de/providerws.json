@@ -551,6 +551,8 @@
       "cta": "Profil vervollständigen",
       "dismiss": "Für diese Sitzung ausblenden",
       "dismissTitle": "Ausblenden — erscheint beim nächsten Besuch wieder, bis das Profil vollständig ist"
-    }
+    },
+    "deferLabel": "Schließen — später fortsetzen",
+    "deferTitle": "Schließt das Onboarding für diese Sitzung. Ihre Eingaben bleiben erhalten; der Hinweis oben führt zurück."
   }
 }
