@@ -126,7 +126,13 @@ export function SessionsPage() {
   const reload = useCallback(() => {
     fetchSessions()
       .then((rows) => setLive(rows.filter((r) => r.status === 'active').map(toRow)))
-      .catch(() => { /* Fixture behalten */ });
+      // Eine gescheiterte Anfrage ist ein LEERES Ergebnis, kein Dauerzustand.
+      // Bis 2026-08-31 stand hier "Fixture behalten" — ein Rest aus der Zeit
+      // vor #118. Ohne Fixture liess derselbe catch `live` fuer immer auf
+      // null, und weil der Erstzustand `live !== null` verlangt, lud die
+      // Seite endlos statt die Karte zu zeigen. Anfragen und Termine machen
+      // es seit #118 richtig; diese eine Zeile blieb zurueck.
+      .catch(() => setLive([]));
   }, []);
   useEffect(() => { reload(); }, [reload]);
 
