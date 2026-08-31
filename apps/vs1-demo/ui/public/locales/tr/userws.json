@@ -192,16 +192,15 @@
   },
   "requests": {
     "title": "Sağlayıcı <accent>talepleriniz</accent>.",
-    "sub": "5 etkin · 1 gecikmiş · bu çeyrekte 12 kapatıldı · ort. yanıt 22 sa.",
+    "sub": "Sağlayıcılara gönderdiğiniz talepler — durum, süre ve görüşme akışıyla.",
     "exportCsv": "CSV olarak dışa aktar",
     "findProvider": "Sağlayıcı bul",
-    "filterAll": "Tümü · 5",
-    "filterAwaitingConfirmation": "Onay bekleniyor · 2",
-    "filterConfirmed": "Onaylandı · 1",
-    "filterReplied": "Yanıtlandı · 1",
-    "filterOverdue": "Gecikmiş · 1",
+    "filterAll": "Tümü · {{count}}",
+    "filterAwaitingConfirmation": "Onay bekleyen · {{count}}",
+    "filterConfirmed": "Onaylanan · {{count}}",
+    "filterReplied": "Yanıtlanan · {{count}}",
+    "filterOverdue": "Gecikmiş · {{count}}",
     "requestActionsAria": "Talep işlemleri",
-    "footerStats": "● Çalışma alanınızda ortalama iş ortağı yanıt süresi: 22 sa. · %87'si SLA içinde onaylıyor · son 30 gün",
     "emptyTitle": "Henüz talep yok",
     "emptyBody": "Bir oturumdan bir sağlayıcıya başvurduğunuzda talep burada görünür — durumu, süresi ve yazışmasıyla.",
     "emptyCta": "Uygun sağlayıcıları bul",
@@ -210,7 +209,8 @@
     "emptyStep2Title": "Sorun",
     "emptyStep2Body": "Talebiniz — gerçek adınız olmadan.",
     "emptyStep3Title": "İzleyin",
-    "emptyStep3Body": "Onay ve yanıt, süresiyle birlikte."
+    "emptyStep3Body": "Onay ve yanıt, süresiyle birlikte.",
+    "subCounts": "{{active}} etkin · {{overdue}} gecikmiş"
   },
   "notifications": {
     "title": "Bildirimler",

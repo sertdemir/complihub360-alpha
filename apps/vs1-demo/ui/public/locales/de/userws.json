@@ -192,16 +192,15 @@
   },
   "requests": {
     "title": "Ihre Anbieter-<accent>Anfragen</accent>.",
-    "sub": "5 aktiv · 1 überfällig · 12 in diesem Quartal abgeschlossen · Ø Antwort 22 Std.",
+    "sub": "Ihre Anfragen an Anbieter — mit Status, Frist und Gesprächsverlauf.",
     "exportCsv": "CSV exportieren",
     "findProvider": "Anbieter finden",
-    "filterAll": "Alle · 5",
-    "filterAwaitingConfirmation": "Bestätigung ausstehend · 2",
-    "filterConfirmed": "Bestätigt · 1",
-    "filterReplied": "Beantwortet · 1",
-    "filterOverdue": "Überfällig · 1",
+    "filterAll": "Alle · {{count}}",
+    "filterAwaitingConfirmation": "Bestätigung ausstehend · {{count}}",
+    "filterConfirmed": "Bestätigt · {{count}}",
+    "filterReplied": "Beantwortet · {{count}}",
+    "filterOverdue": "Überfällig · {{count}}",
     "requestActionsAria": "Anfrage-Aktionen",
-    "footerStats": "● Durchschnittliche Partner-Antwortzeit in Ihrem Arbeitsbereich: 22 Std. · 87 % bestätigen innerhalb des SLA · letzte 30 Tage",
     "emptyTitle": "Noch keine Anfragen",
     "emptyBody": "Wenn Sie in einer Sitzung einen Anbieter anfragen, steht der Vorgang hier — mit Status, Frist und dem Gesprächsverlauf.",
     "emptyCta": "Passende Anbieter finden",
@@ -210,7 +209,8 @@
     "emptyStep2Title": "Anfragen",
     "emptyStep2Body": "Ihr Anliegen — ohne Ihren Klarnamen.",
     "emptyStep3Title": "Verfolgen",
-    "emptyStep3Body": "Bestätigung und Antwort, mit Frist."
+    "emptyStep3Body": "Bestätigung und Antwort, mit Frist.",
+    "subCounts": "{{active}} aktiv · {{overdue}} überfällig"
   },
   "notifications": {
     "title": "Benachrichtigungen",

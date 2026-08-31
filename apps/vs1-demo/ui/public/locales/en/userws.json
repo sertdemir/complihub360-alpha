@@ -192,16 +192,15 @@
   },
   "requests": {
     "title": "Your provider <accent>requests</accent>.",
-    "sub": "5 active · 1 overdue · 12 closed this quarter · avg. reply 22h",
+    "sub": "Your requests to providers — with status, deadline and thread.",
     "exportCsv": "Export CSV",
     "findProvider": "Find provider",
-    "filterAll": "All · 5",
-    "filterAwaitingConfirmation": "Awaiting confirmation · 2",
-    "filterConfirmed": "Confirmed · 1",
-    "filterReplied": "Replied · 1",
-    "filterOverdue": "Overdue · 1",
+    "filterAll": "All · {{count}}",
+    "filterAwaitingConfirmation": "Awaiting confirmation · {{count}}",
+    "filterConfirmed": "Confirmed · {{count}}",
+    "filterReplied": "Replied · {{count}}",
+    "filterOverdue": "Overdue · {{count}}",
     "requestActionsAria": "Request actions",
-    "footerStats": "● Average partner response on your workspace: 22h · 87% confirm within SLA · last 30 days",
     "emptyTitle": "No requests yet",
     "emptyBody": "When you contact a provider from a session, the request appears here — with its status, deadline and the conversation.",
     "emptyCta": "Find matching providers",
@@ -210,7 +209,8 @@
     "emptyStep2Title": "Ask",
     "emptyStep2Body": "Your question — without your real name.",
     "emptyStep3Title": "Track",
-    "emptyStep3Body": "Confirmation and reply, with a deadline."
+    "emptyStep3Body": "Confirmation and reply, with a deadline.",
+    "subCounts": "{{active}} active · {{overdue}} overdue"
   },
   "notifications": {
     "title": "Notifications",

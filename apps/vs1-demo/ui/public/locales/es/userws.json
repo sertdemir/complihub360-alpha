@@ -192,16 +192,15 @@
   },
   "requests": {
     "title": "Sus <accent>solicitudes</accent> a proveedores.",
-    "sub": "5 activas · 1 vencida · 12 cerradas este trimestre · respuesta media 22 h",
+    "sub": "Sus solicitudes a proveedores — con estado, plazo e historial.",
     "exportCsv": "Exportar CSV",
     "findProvider": "Buscar proveedor",
-    "filterAll": "Todas · 5",
-    "filterAwaitingConfirmation": "Pendiente de confirmación · 2",
-    "filterConfirmed": "Confirmadas · 1",
-    "filterReplied": "Respondidas · 1",
-    "filterOverdue": "Vencidas · 1",
+    "filterAll": "Todas · {{count}}",
+    "filterAwaitingConfirmation": "Confirmación pendiente · {{count}}",
+    "filterConfirmed": "Confirmadas · {{count}}",
+    "filterReplied": "Respondidas · {{count}}",
+    "filterOverdue": "Vencidas · {{count}}",
     "requestActionsAria": "Acciones de la solicitud",
-    "footerStats": "● Respuesta media de los socios en su espacio de trabajo: 22 h · 87 % confirma dentro del SLA · últimos 30 días",
     "emptyTitle": "Todavía no hay solicitudes",
     "emptyBody": "Cuando contacte con un proveedor desde una sesión, la solicitud aparecerá aquí — con su estado, su plazo y la conversación.",
     "emptyCta": "Buscar proveedores adecuados",
@@ -210,7 +209,8 @@
     "emptyStep2Title": "Solicitar",
     "emptyStep2Body": "Su consulta — sin su nombre real.",
     "emptyStep3Title": "Seguir",
-    "emptyStep3Body": "Confirmación y respuesta, con plazo."
+    "emptyStep3Body": "Confirmación y respuesta, con plazo.",
+    "subCounts": "{{active}} activas · {{overdue}} vencidas"
   },
   "notifications": {
     "title": "Notificaciones",
