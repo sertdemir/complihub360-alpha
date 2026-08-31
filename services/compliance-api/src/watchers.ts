@@ -2,6 +2,7 @@ import * as crypto from "node:crypto";
 import { structuredLog } from "@complihub360/types";
 import { supabaseApi } from "./supabase.js";
 import { sendMagicLinkMail, sendReviewMail } from "./mailer.js";
+import { notify } from "./notifications.js";
 
 // ─── SLA Watchers (Beta) ──────────────────────────────────────────────────────
 // An in-process scheduler that makes the SLA/Trust loop autonomous on Staging,
@@ -48,6 +49,9 @@ export const watcherConfig = {
 
 type Engagement = {
     id: string;
+    // Der Anfragende. Gebraucht, um ihn zu benachrichtigen, wenn seine Anfrage
+    // ablaeuft — das ist der eine Fall im Waechter, der jemanden etwas angeht.
+    user_id?: string | null;
     provider_key: string;
     country: string;
     category: string;
@@ -266,6 +270,15 @@ export async function runWatcherTick(): Promise<TickSummary> {
                 await supabaseApi.update("magic_link_tokens", { id: t.id }, { used_at: ts });
             }
             await supabaseApi.insert("event_log", { type: "engagement_expired", payload: { engagementId: e.id, provider_key: e.provider_key, stage: "expired" } });
+            // Der Anfragende hat auf eine Antwort gewartet, die nicht kam.
+            // `dedupeKey`, weil dieser Durchlauf im Minutentakt laeuft: die
+            // Marker oben schuetzen den Statuswechsel, nicht diese Zeile.
+            await notify({
+                to: e.user_id, type: "engagement_expired",
+                subject: "engagement", subjectId: e.id,
+                payload: { providerKey: e.provider_key },
+                dedupeKey: `engagement_expired:${e.id}`,
+            });
             summary.expiries++;
         } catch { summary.errors++; }
     }

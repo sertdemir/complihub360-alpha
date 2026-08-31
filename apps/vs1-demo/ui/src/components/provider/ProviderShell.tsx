@@ -10,7 +10,7 @@ import { BellPopover } from './BellPopover';
 import { ConfirmDrawer, type ConfirmSpec } from './ConfirmDrawer';
 import { ProviderOnboardingModal, ProviderProfileBanner } from './ProviderOnboardingModal';
 import { fetchProviderBookings } from '../../api/bookings';
-import { fetchUnreadCount } from '../../api/notifications';
+import { fetchEventLogFeed } from '../../api/notifications';
 import { fetchCoverage, setAvailability, AVAILABILITY_EVENT, DEMO_PROVIDER_KEY } from '../../api/provider';
 import { cn } from '../../lib/utils';
 
@@ -60,8 +60,12 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
     fetchProviderBookings(DEMO_PROVIDER_KEY)
       .then((bs) => setCounts((c) => ({ ...c, requests: bs.filter((b) => b.status === 'confirmed').length })))
       .catch(() => {});
-    fetchUnreadCount()
-      .then((n) => setCounts((c) => ({ ...c, unread: n })))
+    // Der Anbieter-Bereich haengt noch am Betriebsprotokoll: eine eigene
+    // Quelle fuer Anbieter gibt es nicht, weil `providers` keine Spalte hat,
+    // die auf ein Konto zeigt. Die Route ist admin-pflichtig, der Zaehler
+    // bleibt fuer Partner also aus — besser als eine erfundene Zahl.
+    fetchEventLogFeed()
+      .then((f) => setCounts((c) => ({ ...c, unread: f.groups.reduce((n, g) => n + g.items.filter((i) => i.unread).length, 0) })))
       .catch(() => {});
   }, []);
   const badgeFor = (to: string): string | undefined => {

@@ -76,8 +76,20 @@ export function UserRequestsPage() {
   );
   const list = effective.filter((r) => filter === 'all' || r.bucket === filter);
 
+  // Kopf und Chips rechnen mit denselben Zeilen wie die Liste — bis
+  // 2026-08-31 standen hier Fixture-Zahlen fest im i18n-Text ("5 aktiv ·
+  // 1 überfällig …"), waehrend die Karte darunter ehrlich "Noch keine
+  // Anfragen" sagte. Ein leeres Konto sah beides gleichzeitig.
+  const je = (b: Fixture['bucket']) => effective.filter((r) => r.bucket === b).length;
+  const aktiv = je('confirm') + je('confirmed') + je('replied');
+  const ueberfaellig = je('overdue');
+
   return (
     <UserShell>
+      {/* Der Gradient-Grund (CLAUDE.md), wie ihn die uebrigen Arbeitsflaechen
+          tragen — vorgezogen am 2026-08-31, das Redesign der Seite steht noch
+          aus. Negative Raender heben das Shell-Padding auf. */}
+      <div className="-mx-8 -my-6 min-h-full bg-gradient-stage px-8 py-7">
       <div className="mx-auto max-w-[1140px] space-y-5">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -85,7 +97,9 @@ export function UserRequestsPage() {
               <Trans t={t} i18nKey="requests.title" components={{ accent: <span className="text-fg-accent-emphasis" /> }} />
             </h1>
             <p className="mt-1 text-body-sm text-fg-secondary">
-              {t('requests.sub')}
+              {effective.length > 0
+                ? t('requests.subCounts', { active: aktiv, overdue: ueberfaellig })
+                : t('requests.sub')}
             </p>
           </div>
           <div className="mt-1 flex shrink-0 items-center gap-4">
@@ -94,16 +108,20 @@ export function UserRequestsPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {FILTERS.map((f) => (
-            <FilterChip key={f.key} size="sm" selected={filter === f.key} onClick={() => setFilter(f.key)}>
-              {t(`requests.${f.labelKey}`)}
-            </FilterChip>
-          ))}
-          <button type="button" className="ml-auto flex items-center gap-1 text-[12px] text-fg-tertiary transition-colors hover:text-fg">
-            {t('shared.sortLastUpdated')} <ChevronDown size={12} />
-          </button>
-        </div>
+        {effective.length > 0 && (
+          <div className="flex items-center gap-2">
+            {FILTERS
+              .filter((f) => f.key === 'all' || je(f.key as Fixture['bucket']) > 0)
+              .map((f) => (
+                <FilterChip key={f.key} size="sm" selected={filter === f.key} onClick={() => setFilter(f.key)}>
+                  {t(`requests.${f.labelKey}`, { count: f.key === 'all' ? effective.length : je(f.key as Fixture['bucket']) })}
+                </FilterChip>
+              ))}
+            <button type="button" className="ml-auto flex items-center gap-1 text-[12px] text-fg-tertiary transition-colors hover:text-fg">
+              {t('shared.sortLastUpdated')} <ChevronDown size={12} />
+            </button>
+          </div>
+        )}
 
         {rows !== null && rows.length === 0 ? (
           <EmptyState
@@ -111,6 +129,11 @@ export function UserRequestsPage() {
             title={t('requests.emptyTitle')}
             body={t('requests.emptyBody')}
             cta={{ label: t('requests.emptyCta'), onClick: () => navigate(`/${locale}/wizard`) }}
+            steps={[
+              { title: t('requests.emptyStep1Title'), body: t('requests.emptyStep1Body') },
+              { title: t('requests.emptyStep2Title'), body: t('requests.emptyStep2Body') },
+              { title: t('requests.emptyStep3Title'), body: t('requests.emptyStep3Body') },
+            ]}
           />
         ) : null}
 
@@ -143,9 +166,7 @@ export function UserRequestsPage() {
           ))}
         </div>
 
-        <p className="text-[11px] text-fg-tertiary">
-          {t('requests.footerStats')}
-        </p>
+      </div>
       </div>
       <ThreadDrawer open={!!threadFor} engagementId={threadFor} viewer="user" onClose={() => { setThreadFor(null); if (deepThread) setSearchParams({}, { replace: true }); }} />
       <RequestActionsDrawer

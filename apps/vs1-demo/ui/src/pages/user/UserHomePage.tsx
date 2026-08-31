@@ -7,6 +7,7 @@ import { useAuthStore } from '../../store/useAuthStore';
 import { Button } from '../../components/ui/Button';
 import { Segment } from '../../components/compliance-areas';
 import { Donut, SparkBars, KpiCard, useEntered, useCountUp, EASE } from '../../components/ui/Stats';
+import { EmptyState } from '../../components/user/EmptyState';
 import { fetchDashboard, EMPTY_DASHBOARD, type DashboardData, type DashboardSession } from '../../api/dashboard';
 import { fetchUserRequests, type UserRequestRow } from '../../api/requests';
 import { fetchUserBookings, type UserBooking } from '../../api/bookings';
@@ -198,19 +199,18 @@ export function UserHomePage() {
         <div className="-mx-8 -my-6 min-h-full bg-gradient-stage px-8 py-7">
           <div className="mx-auto max-w-[1200px]">
             {kopf}
-            <div className={CARD + ' mx-auto mt-10 max-w-[560px] p-8 text-center'}>
-              <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-brand-light text-fg-brand">
-                <Compass size={22} strokeWidth={1.9} />
-              </span>
-              <h2 className="mt-4 font-serif text-[20px] font-bold text-fg">{t('home.emptyTitle')}</h2>
-              <p className="mx-auto mt-2 max-w-[420px] text-body-xs leading-relaxed text-fg-tertiary">
-                {t('home.emptyBody')}
-              </p>
-              <Button className="mt-5" onClick={() => navigate(`/${locale}/wizard`)}>
-                {t('home.emptyCta')} <ArrowRight size={14} className="ml-1" />
-              </Button>
-              <p className="mt-3 text-body-3xs text-fg-tertiary">{t('home.emptyHint')}</p>
-            </div>
+            <EmptyState
+              icon={Compass}
+              title={t('home.emptyTitle')}
+              body={t('home.emptyBody')}
+              hint={t('home.emptyHint')}
+              cta={{ label: t('home.emptyCta'), onClick: () => navigate(`/${locale}/wizard`) }}
+              steps={[
+                { title: t('home.emptyStep1Title'), body: t('home.emptyStep1Body') },
+                { title: t('home.emptyStep2Title'), body: t('home.emptyStep2Body') },
+                { title: t('home.emptyStep3Title'), body: t('home.emptyStep3Body') },
+              ]}
+            />
           </div>
         </div>
       </UserShell>

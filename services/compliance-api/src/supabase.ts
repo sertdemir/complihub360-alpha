@@ -44,6 +44,24 @@ export const supabaseApi = {
         return res.json();
     },
 
+    // Wie update(), aber der Aufrufer schreibt den PostgREST-Ausdruck selbst
+    // ('eq.abc', 'is.null'). Gebraucht, wo 'gleich' nicht reicht — etwa
+    // "alle noch ungelesenen Benachrichtigungen dieses Nutzers". Ohne das
+    // muesste der Aufrufer erst lesen und dann Zeile fuer Zeile schreiben.
+    async updateWhere(table: string, filters: Record<string, string>, data: any) {
+        const queryParams = new URLSearchParams();
+        for (const [key, expr] of Object.entries(filters)) {
+            queryParams.append(key, expr);
+        }
+        const res = await fetch(`${restUrl}/${table}?${queryParams.toString()}`, {
+            method: 'PATCH',
+            headers: defaultHeaders,
+            body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error(`Supabase updateWhere failed: ${await res.text()}`);
+        return res.json();
+    },
+
     async select(table: string, match: any, opts: { order?: string; limit?: number } = {}) {
         const queryParams = new URLSearchParams();
         for (const [key, value] of Object.entries(match)) {

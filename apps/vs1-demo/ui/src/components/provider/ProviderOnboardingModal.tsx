@@ -35,6 +35,9 @@ import { MARKET_CODES } from '../../lib/marketProfiles';
 const STORAGE_KEY = 'ch360_provider_onboarding_v1';
 /** Session-Schluessel des Banner-X: naechster Besuch zeigt ihn wieder. */
 const BANNER_DISMISS_KEY = 'ch360_provider_banner_dismissed';
+/** Session-Schluessel des Modal-X: "spaeter" gilt fuer die Sitzung, nicht fuer
+    immer — beim naechsten Besuch steht das Onboarding wieder da. */
+const MODAL_DEFER_KEY = 'ch360_provider_onboarding_deferred';
 /** Banner → Modal ("Profil vervollständigen") und Modal → Banner (nach dem
     Speichern neu rechnen) — dasselbe CustomEvent-Muster wie AVAILABILITY_EVENT. */
 export const OPEN_PROFILE_EVENT = 'ch360:provider-profile-open';
@@ -169,7 +172,13 @@ function StepDots({ current }: { current: number }) {
 export function ProviderOnboardingModal() {
     const { t } = useTranslation('providerws');
     const [step, setStep] = useState<StepId>(() => (isProviderOnboarded() ? 'done' : 'welcome'));
-    const [dismissed, setDismissed] = useState(() => isProviderOnboarded());
+    // Zu ist zu, wenn: fertig ODER in dieser Sitzung vertagt. Das Vertagen kam
+    // am 2026-08-31 dazu — vorher hatte das Modal keinen Schliessen-Weg, wer
+    // sich erst umsehen wollte, sass fest.
+    const [dismissed, setDismissed] = useState(() => {
+        if (isProviderOnboarded()) return true;
+        try { return sessionStorage.getItem(MODAL_DEFER_KEY) === '1'; } catch { return false; }
+    });
     const [data, setData] = useState<OnboardingData>(() => ({ ...EMPTY, ...(readStored()?.data ?? {}) }));
 
     // "Profil vervollständigen" im Banner oeffnet das Modal direkt im
@@ -177,13 +186,38 @@ export function ProviderOnboardingModal() {
     useEffect(() => {
         const onOpen = () => {
             setData({ ...EMPTY, ...(readStored()?.data ?? {}) });
-            setStep('listing');
+            // Fertiges Profil → direkt zur Listung (der Banner-Fall "staerke
+            // dein Ranking"). Vertagtes Onboarding → wieder beim Kontakt
+            // anfangen, dem ersten Pflicht-Schritt.
+            setStep(isProviderOnboarded() ? 'listing' : 'contact');
+            try { sessionStorage.removeItem(MODAL_DEFER_KEY); } catch { /* Komfort */ }
             setDismissed(false);
         };
         window.addEventListener(OPEN_PROFILE_EVENT, onOpen);
         return () => window.removeEventListener(OPEN_PROFILE_EVENT, onOpen);
     }, []);
     const patch = (d: Partial<OnboardingData>) => setData((prev) => ({ ...prev, ...d }));
+
+    // "Spaeter": Entwurf sichern (die getippten Felder sollen den Aufschub
+    // ueberleben), Sitzungs-Marke setzen, Banner neu rechnen lassen. Ein
+    // abgeschlossenes Profil wird dabei nie zurueck auf completed:false
+    // geschrieben — das X im Done-Schritt schliesst nur.
+    const close = () => {
+        if (!isProviderOnboarded()) {
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ completed: false, data })); } catch { /* Komfort */ }
+        }
+        try { sessionStorage.setItem(MODAL_DEFER_KEY, '1'); } catch { /* Sitzungs-Komfort */ }
+        window.dispatchEvent(new Event(PROFILE_SAVED_EVENT));
+        setDismissed(true);
+    };
+
+    // Escape = derselbe Weg wie das X.
+    useEffect(() => {
+        if (dismissed) return;
+        const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    });
 
     if (dismissed) return null;
 
@@ -252,10 +286,19 @@ export function ProviderOnboardingModal() {
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.22, ease: 'easeOut' }}
                     className={
-                        'my-auto w-full rounded-xl border border-elevate/15 bg-surface p-7 shadow-[0_40px_90px_-30px_rgba(0,0,0,0.8)] sm:p-8 ' +
+                        'relative my-auto w-full rounded-xl border border-elevate/15 bg-surface p-7 shadow-[0_40px_90px_-30px_rgba(0,0,0,0.8)] sm:p-8 ' +
                         (step === 'welcome' || step === 'done' ? 'max-w-[480px]' : 'max-w-[560px]')
                     }
                 >
+                    <button
+                        type="button"
+                        onClick={close}
+                        aria-label={t('onboarding.deferLabel')}
+                        title={t('onboarding.deferTitle')}
+                        className="absolute right-3.5 top-3.5 grid h-8 w-8 place-items-center rounded-md text-fg-tertiary transition-colors hover:bg-elevate/10 hover:text-fg"
+                    >
+                        <X size={16} />
+                    </button>
                     {step === 'welcome' && (
                         <>
                             <p className="text-body-3xs font-extrabold uppercase tracking-[0.14em] text-fg-brand">
@@ -390,9 +433,15 @@ export function ProviderProfileBanner() {
     }, []);
 
     const stored = readStored();
-    if (!stored?.completed || sessionDismissed) return null;
-    const pct = completeness({ ...EMPTY, ...(stored.data ?? {}) });
-    if (pct >= 100) return null;
+    if (sessionDismissed) return null;
+    // Zwei Faelle zeigen den Banner: ein fertiges Profil unter 100 % (wie
+    // gehabt) — und ein VERTAGTES Onboarding. Ohne den zweiten gaebe es nach
+    // dem X keinen Weg zurueck in den Flow, ausser die Sitzung zu beenden.
+    let deferred = false;
+    try { deferred = sessionStorage.getItem(MODAL_DEFER_KEY) === '1'; } catch { /* wie nicht vertagt */ }
+    if (!stored?.completed && !deferred) return null;
+    const pct = completeness({ ...EMPTY, ...(stored?.data ?? {}) });
+    if (stored?.completed && pct >= 100) return null;
 
     const dismiss = () => {
         try { sessionStorage.setItem(BANNER_DISMISS_KEY, '1'); } catch { /* Sitzungs-Komfort */ }

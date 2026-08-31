@@ -17,8 +17,24 @@ export interface ConfirmSpec {
   onConfirm: () => void | Promise<void>;
 }
 
-export function ConfirmDrawer({ spec, onClose }: { spec: ConfirmSpec | null; onClose: () => void }) {
+/** Rahmentexte des Drawers. Vorgabe ist der providerws-Namensraum (der
+ *  urspruengliche Aufrufer); der Nutzer-Arbeitsbereich reicht seine eigenen
+ *  Texte herein, statt providerws-Schluessel zu laden. */
+export interface ConfirmLabels {
+  eyebrow: string;
+  cancel: string;
+  confirm: string;
+  fallbackTitle: string;
+}
+
+export function ConfirmDrawer({ spec, onClose, labels }: { spec: ConfirmSpec | null; onClose: () => void; labels?: ConfirmLabels }) {
   const { t } = useTranslation('providerws');
+  const L: ConfirmLabels = labels ?? {
+    eyebrow: t('confirmDrawer.eyebrow'),
+    cancel: t('confirmDrawer.cancel'),
+    confirm: t('confirmDrawer.confirm'),
+    fallbackTitle: t('confirmDrawer.fallbackTitle'),
+  };
   const [typed, setTyped] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -41,13 +57,13 @@ export function ConfirmDrawer({ spec, onClose }: { spec: ConfirmSpec | null; onC
       onClose={onClose}
       side="right"
       size="sm"
-      eyebrow={t('confirmDrawer.eyebrow')}
-      title={spec?.title ?? t('confirmDrawer.fallbackTitle')}
+      eyebrow={L.eyebrow}
+      title={spec?.title ?? L.fallbackTitle}
       footer={
         <div className="flex w-full items-center justify-end gap-2">
-          <Button variant="ghost" size="sm" onClick={onClose} disabled={busy}>{t('confirmDrawer.cancel')}</Button>
+          <Button variant="ghost" size="sm" onClick={onClose} disabled={busy}>{L.cancel}</Button>
           <Button variant="accent" size="sm" onClick={run} disabled={!armed || busy}>
-            {busy ? '…' : spec?.confirmLabel ?? t('confirmDrawer.confirm')}
+            {busy ? '…' : spec?.confirmLabel ?? L.confirm}
           </Button>
         </div>
       }

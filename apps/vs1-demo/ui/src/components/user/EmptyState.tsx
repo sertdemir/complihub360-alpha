@@ -7,21 +7,30 @@ import { Button } from '../ui/Button';
 // Sitzungen, Anfragen, Termine).
 //
 // WARUM ES SIE GIBT: bis 2026-08-30 fielen diese Seiten bei einem leeren
-// Ergebnis auf Design-Fixtures zurueck — useApiData behielt sie ausdruecklich
-// ("Empty API result → keep the fixture so demos stay meaningful"),
-// SessionsPage tat dasselbe von Hand. Ein neues Konto sah damit vier Seiten
-// voller erfundener Daten. Fuer die Demo-Phase war das gewollt; vor dem User
-// Testing kehrt es sich um: Rueckmeldung zu einer Fiktion ist wertlos, und
-// der Zustand, der einen echten Erstbesucher empfaengt, wurde nie gesehen.
+// Ergebnis auf Design-Fixtures zurueck. Ein neues Konto sah vier Seiten voller
+// erfundener Daten; der Zustand, der einen echten Erstbesucher empfaengt,
+// wurde nie gesehen.
 //
 // WARUM EINE KOMPONENTE UND NICHT VIER: der Erstzustand ist der erste
 // Eindruck des Produkts. Er muss auf allen vier Flaechen dieselbe Sprache
 // sprechen — und wenn die Gestaltung sich aendert, an einer Stelle.
 //
+// GESTALTUNG: Variante B "Erster Weg" (Nutzer-Wahl 2026-08-31, Canvas
+// "Erstzustaende Arbeitsbereich"). Die Karte nennt nicht nur, dass nichts da
+// ist, sondern in drei nummerierten Schritten, was entsteht, wenn man anfaengt.
+// Verworfen wurden A (nur Karte, Satz, Knopf — sagt nicht, was danach kommt)
+// und C (echter Aufbau blass darunter — der Schleier liest sich wie ein
+// Ladefehler).
+//
 // Kein Raster aus Nullen: vier Kacheln mit 0 sehen aus wie ein Defekt und
 // sagen nichts darueber, was als Naechstes zu tun waere.
 
 const CARD = 'rounded-xl border border-stroke-subtle bg-surface shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]';
+
+export interface EmptyStateStep {
+  title: string;
+  body: string;
+}
 
 export interface EmptyStateProps {
   icon: LucideIcon;
@@ -29,27 +38,48 @@ export interface EmptyStateProps {
   body: string;
   /** Der eine naechste Schritt. Ein Erstzustand ohne Ausweg ist eine Sackgasse. */
   cta: { label: string; onClick: () => void };
-  /** Was den Schritt kleiner macht — Dauer, Unverbindlichkeit. Optional. */
+  /** Was den Schritt kleiner macht — Dauer, Unverbindlichkeit. Steht neben dem
+   *  Titel, nicht unter dem Knopf: dort wird es nach der Entscheidung gelesen. */
   hint?: string;
-  /** Kompakt fuer eine Karte in der Seitenspalte, gross fuer eine ganze Seite. */
-  size?: 'page' | 'panel';
+  /** Genau drei — was der Nutzer bekommt, bevor er Zeit investiert. Weniger
+   *  traegt die Spalten nicht, mehr liest niemand auf einer leeren Seite. */
+  steps?: [EmptyStateStep, EmptyStateStep, EmptyStateStep];
 }
 
-export function EmptyState({ icon: Icon, title, body, cta, hint, size = 'page' }: EmptyStateProps) {
-  const gross = size === 'page';
+export function EmptyState({ icon: Icon, title, body, cta, hint, steps }: EmptyStateProps) {
   return (
-    <div className={`${CARD} mx-auto ${gross ? 'mt-10 max-w-[560px] p-8' : 'p-6'} text-center`}>
-      <span className={`mx-auto grid place-items-center rounded-2xl bg-brand-light text-fg-brand ${gross ? 'h-12 w-12' : 'h-10 w-10'}`}>
-        <Icon size={gross ? 22 : 18} strokeWidth={1.9} />
-      </span>
-      <h2 className={`mt-4 font-serif font-bold text-fg ${gross ? 'text-[20px]' : 'text-body-md'}`}>{title}</h2>
-      <p className={`mx-auto mt-2 max-w-[420px] leading-relaxed text-fg-tertiary ${gross ? 'text-body-xs' : 'text-body-2xs'}`}>
-        {body}
-      </p>
-      <Button className="mt-5" size={gross ? undefined : 'sm'} onClick={cta.onClick}>
+    <div className={`${CARD} mx-auto mt-9 max-w-[720px] px-9 py-8`}>
+      <div className="flex items-center gap-3.5">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand-light text-fg-brand">
+          <Icon size={20} strokeWidth={1.9} />
+        </span>
+        <div className="min-w-0">
+          <h2 className="font-serif text-[20px] font-bold leading-tight text-fg">{title}</h2>
+          {hint && <p className="mt-0.5 text-body-2xs text-fg-tertiary">{hint}</p>}
+        </div>
+      </div>
+
+      <p className="mt-[18px] text-body-xs leading-relaxed text-fg-secondary [text-wrap:pretty]">{body}</p>
+
+      {steps && (
+        <div className="mt-[22px] grid gap-5 border-t border-stroke-subtle pt-[22px] sm:grid-cols-3">
+          {steps.map((s, i) => (
+            <div key={s.title} className="flex items-start gap-3">
+              <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full border-[1.5px] border-brand text-[11px] font-extrabold text-fg-brand">
+                {i + 1}
+              </span>
+              <div className="min-w-0">
+                <p className="text-body-xs font-bold text-fg">{s.title}</p>
+                <p className="mt-0.5 text-body-2xs leading-snug text-fg-tertiary">{s.body}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <Button className="mt-6" onClick={cta.onClick}>
         {cta.label} <ArrowRight size={14} className="ml-1" />
       </Button>
-      {hint && <p className="mt-3 text-body-3xs text-fg-tertiary">{hint}</p>}
     </div>
   );
 }

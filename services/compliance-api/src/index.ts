@@ -7,10 +7,11 @@ import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeC
 import { generateRelevantSubdomains, isKnownCountry, ComplianceDomain, type CountryCode, type IndustryType, type BusinessModel, type EnrichedSubdomain } from "@complihub/compliance-engine";
 
 import { supabaseApi } from "./supabase.js";
-import { sendMagicLinkMail, sendEmailChangeMail, sendRescheduleMail } from "./mailer.js";
+import { sendMagicLinkMail, sendEmailChangeMail, sendRescheduleMail, sendCancellationMail } from "./mailer.js";
 import { handleAssistantChat, handleAssistantCheckout, handleAssistantVerify } from "./assistant.js";
 import { handleAuthAdopt } from "./adoption.js";
 import { handleDashboard, SLUG_TO_ENGINE } from "./dashboard.js";
+import { notify, handleNotificationsList, handleNotificationsRead } from "./notifications.js";
 import { handleBillingRun, handleBillingPreview, syncOpenInvoices } from "./billing.js";
 import { checkVatId } from "./vies.js";
 import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
@@ -452,22 +453,50 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Failed to compute metrics', correlationId }));
         }
+    } else if (req.method === 'POST' && req.url === '/api/v1/notifications/read') {
+        // Gelesen-Markieren: eine Zeile (`id`) oder alle offenen (`all`).
+        let readBody = '';
+        req.on('data', (chunk: any) => readBody += chunk.toString());
+        req.on('end', async () => {
+            let parsed: { id?: string; all?: boolean } = {};
+            try { parsed = readBody ? JSON.parse(readBody) : {}; } catch { parsed = {}; }
+            await handleNotificationsRead(res, correlationId, authUserId, parsed);
+        });
     } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/notifications')) {
-        // Aggregated event feed straight from event_log (newest first). The
-        // table's time column is `timestamp` (init migration) — alias it to
-        // created_at in the response for the FE mappers.
-        try {
-            const rows = (await supabaseApi.select('event_log', {}, { order: 'timestamp.desc', limit: 50 })) as
-                Array<{ timestamp?: string; created_at?: string }>;
-            const notifications = rows.map(r => ({ ...r, created_at: r.created_at || r.timestamp }));
-            res.setHeader('x-correlation-id', correlationId);
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ ok: true, notifications }));
-        } catch (err) {
-            structuredLog('error', 'Notifications list failed', { correlationId, errorCode: 'ERR_NOTIFICATIONS', severity: 'error', route: req.url });
-            res.setHeader('x-correlation-id', correlationId);
-            res.writeHead(500, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Failed to load notifications', correlationId }));
+        // Benachrichtigungen des ANGEMELDETEN Kontos aus `notifications`.
+        //
+        // Bis 2026-08-31 stand hier `select('event_log', {})` — ein leerer
+        // Filter auf das Betriebsprotokoll. Jedes angemeldete Konto bekam
+        // damit alle Zeilen aller Nutzer, samt der Mailadressen in den
+        // `email_sent`-Nutzlasten. Eine Einschraenkung war nicht nachtraeglich
+        // moeglich: `actor_id` wird an keiner Schreibstelle gesetzt, das
+        // Protokoll weiss schlicht nicht, wen eine Zeile angeht. Deshalb die
+        // eigene Tabelle (notifications.ts, Migration 20260831000000).
+        //
+        // Das Protokoll selbst bleibt lesbar — unter /api/v1/admin/events,
+        // wo es hingehoert.
+        await handleNotificationsList(res, correlationId, authUserId);
+    } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/admin/events')) {
+        // Das Betriebsprotokoll, neueste zuerst. Frueher /api/v1/notifications;
+        // hier ist es das, was es immer war — eine Betriebssicht, keine
+        // Nutzer-Post. `timestamp` heisst in der Antwort `created_at`, weil die
+        // Frontend-Mapper das erwarten.
+        res.setHeader('x-correlation-id', correlationId);
+        if (!authViaApiKey && !authIsAdmin) {
+            res.writeHead(403, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'FORBIDDEN', message: 'Event log is admin-only', correlationId }));
+        } else {
+            try {
+                const rows = (await supabaseApi.select('event_log', {}, { order: 'timestamp.desc', limit: 50 })) as
+                    Array<{ timestamp?: string; created_at?: string }>;
+                const events = rows.map(r => ({ ...r, created_at: r.created_at || r.timestamp }));
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, events }));
+            } catch (err) {
+                structuredLog('error', 'Event log list failed', { correlationId, errorCode: 'ERR_EVENTS', severity: 'error', route: req.url });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Failed to load events', correlationId }));
+            }
         }
     } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/reads')) {
         // C1: read-state watermark for a viewer key. Unread = newer than this.
@@ -886,6 +915,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     const end = new Date(start.getTime() + 30 * 60 * 1000);
                     await supabaseApi.update('scheduling', { id: bookingId }, { slot_start: start.toISOString(), slot_end: end.toISOString(), updated_at: new Date().toISOString() });
                     await supabaseApi.insert('event_log', { type: 'booking_rescheduled', payload: { bookingId, providerKey: b.provider_key, userId: b.user_id, from: b.slot_start, to: start.toISOString() } });
+                    // `actor` gesetzt: wer selbst verschiebt, bekommt keine
+                    // Nachricht darueber. Uebrig bleibt der Fall, dass jemand
+                    // anderes den Termin bewegt hat.
+                    await notify({
+                        to: b.user_id, actor: authUserId, type: 'booking_rescheduled',
+                        subject: 'booking', subjectId: bookingId,
+                        payload: { providerKey: b.provider_key, from: b.slot_start, to: start.toISOString() },
+                    });
                     // Notify the provider (fire-and-forget, in their language):
                     // the user moved the slot, the provider's calendar must not
                     // silently drift. Delivery problems are events, not errors.
@@ -905,9 +942,45 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     res.end(JSON.stringify({ ok: true, id: bookingId, status: b.status, slot_start: start.toISOString(), slot_end: end.toISOString(), correlationId }));
                     return;
                 }
-                await supabaseApi.update('scheduling', { id: bookingId }, { status, updated_at: new Date().toISOString() });
+                const jetzt = new Date().toISOString();
+                // Wer abgesagt hat, wird mitgeschrieben. Ohne diese Spalte ist
+                // eine Absage des Mandanten von einer des Anbieters nicht zu
+                // unterscheiden — und damit jede Auswertung darueber Raterei
+                // (Migration 20260831000001).
+                await supabaseApi.update('scheduling', { id: bookingId }, {
+                    status, updated_at: jetzt,
+                    ...(status === 'cancelled'
+                        // Diese Route gehoert dem Mandanten (403 oben, wenn die
+                        // Buchung nicht seine ist). Der Server-Key handelt im
+                        // Auftrag des Betriebs, nicht des Anbieters.
+                        ? { cancelled_by: authViaApiKey ? 'system' : 'user', cancelled_at: jetzt }
+                        : {}),
+                });
                 const evType = status === 'cancelled' ? 'user_cancelled' : status === 'no_show' ? 'no_show' : 'outcome_check';
                 await supabaseApi.insert('event_log', { type: evType, payload: { bookingId, providerKey: b.provider_key, userId: b.user_id, status } });
+                if (status === 'cancelled') {
+                    await notify({
+                        to: b.user_id, actor: authUserId, type: 'booking_cancelled',
+                        subject: 'booking', subjectId: bookingId,
+                        payload: { providerKey: b.provider_key, from: b.slot_start },
+                    });
+                    // Der Anbieter erfuhr bis 2026-08-31 GAR NICHTS von einer
+                    // Absage — der Verschieben-Pfad mailte, dieser nicht. Er
+                    // behielt den Termin im Kalender und erschien zum Gespraech.
+                    // Wie beim Verschieben: nebenlaeufig, Zustellprobleme sind
+                    // Ereignisse im Protokoll und keine Fehler der Route.
+                    (async () => {
+                        const provs = (await supabaseApi.select('providers', { provider_key: b.provider_key }, { limit: 1 })) as any[];
+                        await sendCancellationMail({
+                            to: provs[0]?.contact_email ?? null,
+                            bookingId,
+                            providerKey: b.provider_key,
+                            slotIso: b.slot_start,
+                            locale: provs[0]?.languages?.[0],
+                            correlationId,
+                        });
+                    })().catch(() => { /* im Mailer protokolliert */ });
+                }
                 // Outcome "completed" feeds the quality score (spec §6): bump the
                 // provider's completed_count used in the anonymous listing card.
                 if (status === 'completed') {
@@ -1540,6 +1613,18 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     type: 'engagement_message_posted',
                     payload: { engagementId, author: d.author },
                 });
+                // Nur die Gegenrichtung: schreibt der Anbieter, erfaehrt es der
+                // Anfragende. Schreibt der Anfragende, gibt es (noch) niemanden
+                // zu benachrichtigen — Anbieter haengen an keinem Konto.
+                if (d.author === 'provider') {
+                    const msgEng = (await supabaseApi.select('engagement_requests', { id: engagementId }, { limit: 1 })) as
+                        Array<{ user_id?: string | null; provider_key?: string | null }>;
+                    await notify({
+                        to: msgEng[0]?.user_id, type: 'engagement_message',
+                        subject: 'engagement', subjectId: engagementId,
+                        payload: { providerKey: msgEng[0]?.provider_key ?? undefined },
+                    });
+                }
                 if (proposal) {
                     await supabaseApi.insert('event_log', {
                         type: 'proposal_submitted',
@@ -1970,8 +2055,16 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 // unredacted message + requester identity. Disclosure is an
                 // auditable moment (dossier_unlocked).
                 const engRows = (await supabaseApi.select('engagement_requests', { id: engagementId }, { limit: 1 })) as
-                    Array<{ message?: string; structured_answers?: Record<string, unknown> & { requester_email?: string; company?: string } }>;
+                    Array<{ user_id?: string | null; provider_key?: string | null; message?: string; structured_answers?: Record<string, unknown> & { requester_email?: string; company?: string } }>;
                 const eng = engRows[0];
+                // Der Anfragende erfaehrt es in seinem Arbeitsbereich. Kein
+                // Akteur-Vergleich noetig: hier handelt immer der Anbieter,
+                // ueber einen Magic Link ohne angemeldetes Konto.
+                await notify({
+                    to: eng?.user_id, type: 'provider_confirmed',
+                    subject: 'engagement', subjectId: engagementId,
+                    payload: { providerKey: eng?.provider_key ?? undefined },
+                });
                 const unlocked = eng ? {
                     message: eng.message || '',
                     requester_identity: {
@@ -2025,6 +2118,16 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     payload: { engagementId }
                 });
 
+                const replyEng = (await supabaseApi.select('engagement_requests', { id: engagementId }, { limit: 1 })) as
+                    Array<{ user_id?: string | null; provider_key?: string | null }>;
+                // Nur die Tatsache, nicht der Text: der Antworttext steht im
+                // Verlauf, wo er hingehoert, und nicht in einer Nutzlast.
+                await notify({
+                    to: replyEng[0]?.user_id, type: 'provider_replied',
+                    subject: 'engagement', subjectId: engagementId,
+                    payload: { providerKey: replyEng[0]?.provider_key ?? undefined },
+                });
+
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, message: "Provider replied" }));
             } catch (err) {
@@ -2056,6 +2159,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 await supabaseApi.insert('event_log', {
                     type: 'provider_declined',
                     payload: { engagementId }
+                });
+
+                const declEng = (await supabaseApi.select('engagement_requests', { id: engagementId }, { limit: 1 })) as
+                    Array<{ user_id?: string | null; provider_key?: string | null }>;
+                await notify({
+                    to: declEng[0]?.user_id, type: 'provider_declined',
+                    subject: 'engagement', subjectId: engagementId,
+                    payload: { providerKey: declEng[0]?.provider_key ?? undefined },
                 });
 
                 res.writeHead(200, { 'Content-Type': 'application/json' });

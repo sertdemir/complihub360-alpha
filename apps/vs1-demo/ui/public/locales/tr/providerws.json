@@ -551,6 +551,8 @@
       "cta": "Profili tamamla",
       "dismiss": "Bu oturumda gizle",
       "dismissTitle": "Gizle — profil tamamlanana dek bir sonraki ziyarette yeniden görünür"
-    }
+    },
+    "deferLabel": "Kapat — daha sonra devam et",
+    "deferTitle": "Bu oturum için katılım sürecini kapatır. Girdileriniz saklanır; üstteki bildirim geri götürür."
   }
 }

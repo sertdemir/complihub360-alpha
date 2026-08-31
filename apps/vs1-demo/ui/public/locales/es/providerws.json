@@ -551,6 +551,8 @@
       "cta": "Completar el perfil",
       "dismiss": "Ocultar en esta sesión",
       "dismissTitle": "Ocultar — vuelve en su próxima visita hasta completar el perfil"
-    }
+    },
+    "deferLabel": "Cerrar — continuar más tarde",
+    "deferTitle": "Cierra el onboarding durante esta sesión. Sus datos se conservan; el aviso superior le lleva de vuelta."
   }
 }

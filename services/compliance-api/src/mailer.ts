@@ -598,6 +598,93 @@ const RESCHEDULE_STRINGS: Record<MailLocale, { subject: string; intro: string; f
     },
 };
 
+const CANCELLATION_STRINGS: Record<MailLocale, { subject: string; intro: string; whenLabel: string; note: string }> = {
+    en: {
+        subject: 'Appointment cancelled: your CompliHub360 booking will not take place',
+        intro: 'The client has cancelled the booked intro call. The slot is free again — please remove it from your calendar.',
+        whenLabel: 'Cancelled slot',
+        note: 'The lead fee was charged at booking and is not affected. You can see all bookings in your partner dashboard under Appointments.',
+    },
+    de: {
+        subject: 'Termin abgesagt: Ihre CompliHub360-Buchung findet nicht statt',
+        intro: 'Der Mandant hat das gebuchte Erstgespräch abgesagt. Der Slot ist wieder frei — bitte streichen Sie ihn aus Ihrem Kalender.',
+        whenLabel: 'Abgesagter Termin',
+        note: 'Die Lead-Gebühr fiel bei der Buchung an und ist davon nicht berührt. Alle Buchungen finden Sie im Partner-Dashboard unter Termine.',
+    },
+    es: {
+        subject: 'Cita cancelada: su reserva de CompliHub360 no se celebrará',
+        intro: 'El cliente ha cancelado la llamada inicial reservada. El horario vuelve a estar libre — elimínelo de su calendario.',
+        whenLabel: 'Cita cancelada',
+        note: 'La tarifa de lead se cobró en el momento de la reserva y no se ve afectada. Puede ver todas las reservas en su panel de partner, en Citas.',
+    },
+    tr: {
+        subject: 'Randevu iptal edildi: CompliHub360 rezervasyonunuz gerçekleşmeyecek',
+        intro: 'Müşteri, rezerve edilen ilk görüşmeyi iptal etti. Zaman dilimi yeniden boşta — lütfen takviminizden kaldırın.',
+        whenLabel: 'İptal edilen randevu',
+        note: 'Lead ücreti rezervasyon sırasında tahsil edildi ve bundan etkilenmez. Tüm rezervasyonları partner panelindeki Randevular bölümünde görebilirsiniz.',
+    },
+};
+
+/**
+ * Absage an den Anbieter.
+ *
+ * Warum es sie gibt: der Verschieben-Pfad mailte, der Storno-Pfad nicht. Ein
+ * Anbieter behielt den Termin im Kalender und erfuhr nichts — bis er zum
+ * Video-Call erschien. Gleiche Bauweise wie sendRescheduleMail: ohne Adresse
+ * ein `email_skipped_no_address`, ohne Resend-Schluessel ein `email_outbox`,
+ * sonst der Versand samt Quittung im Protokoll.
+ */
+export async function sendCancellationMail(p: {
+    to: string | null;
+    bookingId: string;
+    providerKey: string;
+    slotIso: string;
+    locale?: string;
+    correlationId?: string;
+}): Promise<void> {
+    const loc = resolveLocale(p.locale);
+    const t = CANCELLATION_STRINGS[loc];
+    const fmt = new Intl.DateTimeFormat(loc, {
+        weekday: 'short', day: 'numeric', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin', timeZoneName: 'short',
+    });
+    const text = [t.intro, ``, `${t.whenLabel}: ${fmt.format(new Date(p.slotIso))}`, ``, t.note].join('\n');
+    const apiKey = process.env.RESEND_API_KEY;
+    try {
+        if (!p.to) {
+            await supabaseApi.insert('event_log', {
+                type: 'email_skipped_no_address',
+                payload: { bookingId: p.bookingId, providerKey: p.providerKey, kind: 'cancellation_provider' },
+            });
+            return;
+        }
+        if (!apiKey) {
+            await supabaseApi.insert('event_log', {
+                type: 'email_outbox',
+                payload: { bookingId: p.bookingId, to: p.to, subject: t.subject, text, mode: 'log-only', kind: 'cancellation_provider' },
+            });
+            return;
+        }
+        const res = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ from: MAIL_FROM, to: [p.to], subject: t.subject, text }),
+        });
+        const body = await res.json().catch(() => ({}));
+        await supabaseApi.insert('event_log', {
+            type: res.ok ? 'email_sent' : 'email_failed',
+            payload: { bookingId: p.bookingId, to: p.to, subject: t.subject, providerId: (body as { id?: string }).id, status: res.status, kind: 'cancellation_provider' },
+        });
+    } catch (err) {
+        structuredLog('error', 'Cancellation mail failed', {
+            correlationId: p.correlationId ?? 'scheduling', route: 'mailer', severity: 'error', errorCode: 'ERR_MAIL',
+        });
+        try {
+            await supabaseApi.insert('event_log', { type: 'email_failed', payload: { bookingId: p.bookingId, to: p.to, error: String(err), kind: 'cancellation_provider' } });
+        } catch { /* double fault */ }
+    }
+}
+
 export async function sendRescheduleMail(p: {
     to: string | null;
     bookingId: string;

@@ -11,10 +11,11 @@ import { DOMAINS as CANONICAL_DOMAINS, type DomainSlug } from '../../lib/domains
 import { Sidebar, SidebarGroup, NavItem } from '../ui/AppShell';
 import { LogoMark } from '../ui/Logo';
 import { UserSearchDrawer } from './UserSearchDrawer';
+import { ThemeToggle } from '../ui/ThemeToggle';
 import { AssistantWidget } from './AssistantWidget';
 import { fetchUserBookings } from '../../api/bookings';
 import { fetchSessions, type SessionRowData } from '../../api/sessions';
-import { fetchNotificationsFeed, USER_NOTIFICATIONS_VIEWER } from '../../api/notifications';
+import { fetchMyNotifications } from '../../api/notifications';
 
 // ─── UserShell ────────────────────────────────────────────────────────────────
 // The user App-Workspace frame (always dark slate), mirroring the Figma User
@@ -125,9 +126,12 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
       fetchUserBookings()
         .then((bs) => setCounts((c) => ({ ...c, requests: bs.filter((b) => b.status === 'confirmed').length })))
         .catch(() => {});
-      fetchNotificationsFeed(USER_NOTIFICATIONS_VIEWER)
-        .then((f) => setCounts((c) => ({ ...c, unread: f.groups.reduce((n, g) => n + g.items.filter((i) => i.unread).length, 0) })))
-        .catch(() => {});
+      // Ungelesene haengen jetzt an der Zeile selbst (read_at), nicht mehr an
+      // einem Wasserstand pro Flaeche: der zaehlte alles Neuere als ungelesen,
+      // auch was nie jemanden anging.
+      fetchMyNotifications()
+        .then((f) => setCounts((c) => ({ ...c, unread: f.unread })))
+        .catch(() => setCounts((c) => ({ ...c, unread: 0 })));
     }
     // Die Sitzungsliste ist eine OEFFENTLICHE Route (guest_key als Ausweis)
     // und laeuft deshalb auch ohne Anmeldung — sie feuert ohnehin nur, wenn
@@ -274,11 +278,19 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Slim utility bar: workspace search trigger (the Domain Bar is gone —
-            domains navigate from the sidebar group). */}
-        <div className="flex items-center justify-end border-b border-stroke px-4 py-1.5">
+            domains navigate from the sidebar group) und der Hell/Dunkel-Schalter.
+            Der Schalter existierte bisher nur auf der Marketing-Fläche, im
+            Control Center und in der globalen Navigation — im Arbeitsbereich
+            gab es ihn nicht, obwohl jedes Token hier zweifarbig angelegt ist.
+            Wer im Dunkelmodus arbeiten wollte, musste ihn auf der Startseite
+            umstellen und zurücknavigieren. */}
+        <div className="flex items-center justify-end gap-1 border-b border-stroke px-4 py-1.5">
           <button type="button" aria-label={t('shell.search')} onClick={() => setSearchOpen(true)} className="grid h-9 w-9 place-items-center rounded-lg text-fg-secondary hover:text-fg">
             <Search size={17} />
           </button>
+          {/* 36 px und rounded-lg statt der Vorgaben der Komponente, damit die
+              beiden Knöpfe in der Leiste dieselbe Fläche haben. */}
+          <ThemeToggle size={36} className="rounded-lg" />
         </div>
         <main className="flex-1 overflow-y-auto px-8 py-6">{children}</main>
       </div>
