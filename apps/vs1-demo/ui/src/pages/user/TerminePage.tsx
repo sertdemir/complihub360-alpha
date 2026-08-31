@@ -348,6 +348,11 @@ export function TerminePage() {
 
   return (
     <UserShell>
+      {/* Der Gradient-Grund (CLAUDE.md), wie ihn Dashboard und Sitzungen
+          tragen — bis 2026-08-31 sass diese Seite als einzige Arbeitsfläche
+          auf blankem Weiss. Negative Ränder heben das Shell-Padding auf,
+          damit die Tönung randlos steht. */}
+      <div className="-mx-8 -my-6 min-h-full bg-gradient-stage px-8 py-7">
       <div className="mx-auto max-w-[1140px] space-y-5">
         {/* 1: Kopfzeile A — Titel und Unterzeile bleiben immer stehen … */}
         <div>
@@ -412,6 +417,7 @@ export function TerminePage() {
         </section>
         </>
         )}
+      </div>
       </div>
       <ReviewDrawer target={reviewFor} onClose={() => setReviewFor(null)} onSubmitted={(id) => setReviewed((s) => new Set(s).add(id))} />
       <RescheduleDrawer target={rescheduleFor} onClose={() => setRescheduleFor(null)} onRescheduled={(id, iso) => setMoved((m) => ({ ...m, [id]: iso }))} />

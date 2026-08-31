@@ -118,6 +118,11 @@ export function UserNotificationsPage() {
 
   return (
     <UserShell>
+      {/* Der Gradient-Grund (CLAUDE.md), wie ihn Dashboard und Sitzungen
+          tragen — bis 2026-08-31 sass diese Seite als einzige Arbeitsfläche
+          auf blankem Weiss. Negative Ränder heben das Shell-Padding auf,
+          damit die Tönung randlos steht. */}
+      <div className="-mx-8 -my-6 min-h-full bg-gradient-stage px-8 py-7">
       <div className="mx-auto max-w-[1140px] space-y-5">
         {/* Kopfzeile — Variante B (Nutzer-Wahl 2026-08-31, Canvas
             "Benachrichtigungen · Varianten"): die erklaerende Unterzeile faellt
@@ -242,6 +247,7 @@ export function UserNotificationsPage() {
             })}
           </section>
         ))}
+      </div>
       </div>
     </UserShell>
   );
