@@ -214,7 +214,8 @@
   },
   "notifications": {
     "title": "Benachrichtigungen",
-    "sub": "Was in Ihren Anfragen und Terminen passiert ist · Neueste zuerst",
+    "unread_one": "{{count}} ungelesen",
+    "unread_other": "{{count}} ungelesen",
     "markAllRead": "Alle als gelesen markieren",
     "filterAll": "Alle · {{count}}",
     "filterUnread": "Ungelesen · {{count}}",

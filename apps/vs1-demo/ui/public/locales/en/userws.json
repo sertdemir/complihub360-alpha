@@ -214,7 +214,8 @@
   },
   "notifications": {
     "title": "Notifications",
-    "sub": "What happened in your requests and appointments · Newest first",
+    "unread_one": "{{count}} unread",
+    "unread_other": "{{count}} unread",
     "markAllRead": "Mark all as read",
     "filterAll": "All · {{count}}",
     "filterUnread": "Unread · {{count}}",

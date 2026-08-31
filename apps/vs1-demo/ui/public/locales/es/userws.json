@@ -214,7 +214,8 @@
   },
   "notifications": {
     "title": "Notificaciones",
-    "sub": "Lo que ha ocurrido en sus solicitudes y citas · Más recientes primero",
+    "unread_one": "{{count}} sin leer",
+    "unread_other": "{{count}} sin leer",
     "markAllRead": "Marcar todo como leído",
     "filterAll": "Todas · {{count}}",
     "filterUnread": "Sin leer · {{count}}",

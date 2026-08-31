@@ -6,6 +6,8 @@ import type { LucideIcon } from 'lucide-react';
 import { UserShell } from '../../components/user/UserShell';
 import { EmptyState } from '../../components/user/EmptyState';
 import { FilterChip } from '../../components/ui/Badge';
+import { Button } from '../../components/ui/Button';
+import { Tabs, TabList, Tab } from '../../components/ui/Tabs';
 import { Tag } from '../../components/ui/Tag';
 import { EntityCard } from '../../components/ui/Cards';
 import {
@@ -68,7 +70,10 @@ export function UserNotificationsPage() {
   const { t: tRaw, i18n } = useTranslation('userws');
   const t = tRaw as unknown as Uebersetzer;
   const locale = i18n.resolvedLanguage || 'en';
-  const [filter, setFilter] = useState<'all' | 'unread' | Notification['kind']>('all');
+  // Zwei Achsen statt einer: der Zustand (alle/ungelesen) und die Art. Sie
+  // kombinieren sich — genau das war der Punkt an Variante B.
+  const [zustand, setZustand] = useState<'all' | 'unread'>('all');
+  const [art, setArt] = useState<Notification['kind'] | null>(null);
   // null = laedt noch, LEERES_FACH = es gibt nichts. Ein Ladefehler ist ein
   // leeres Fach, kein Dauerzustand — sonst dreht sich die Seite fuer immer.
   const [feed, setFeed] = useState<NotificationsFeed | null>(null);
@@ -79,8 +84,8 @@ export function UserNotificationsPage() {
 
   const items = feed?.items ?? [];
   const passt = (n: Notification) =>
-    filter === 'all' ? true : filter === 'unread' ? n.unread : n.kind === filter;
-  const sichtbar = useMemo(() => items.filter(passt), [items, filter]);
+    (zustand === 'all' || n.unread) && (art === null || n.kind === art);
+  const sichtbar = useMemo(() => items.filter(passt), [items, zustand, art]);
 
   // Nach Tagen gruppieren, Reihenfolge bleibt die des Servers (neueste zuerst).
   const gruppen = useMemo(() => {
@@ -114,37 +119,75 @@ export function UserNotificationsPage() {
   return (
     <UserShell>
       <div className="mx-auto max-w-[1140px] space-y-5">
+        {/* Kopfzeile — Variante B (Nutzer-Wahl 2026-08-31, Canvas
+            "Benachrichtigungen · Varianten"): die erklaerende Unterzeile faellt
+            weg, an ihre Stelle tritt die Zahl, die man tatsaechlich sucht. Wer
+            zum zehnten Mal hier ist, liest keine Definition der Seite mehr —
+            er zaehlt. Verworfen wurden A (Unterzeile bleibt, kein Zaehler) und
+            C (kompakte Postfach-Leiste ohne Serif-Titel: flacher, aber die
+            Flaeche verliert den Auftritt der uebrigen Arbeitsbereich-Seiten). */}
         <div className="flex items-start justify-between gap-4">
-          <div>
+          <div className="flex flex-wrap items-center gap-3">
             <h1 className="font-serif text-[32px] font-bold leading-tight text-fg">
               <span className="text-fg-accent-emphasis">{t('notifications.title')}</span>
             </h1>
-            <p className="mt-1 text-body-sm text-fg-secondary">{t('notifications.sub')}</p>
+            {/* Nur wenn es etwas zu zaehlen gibt. "0 ungelesen" ist keine
+                Auskunft, sondern eine Kachel mit einer Null darin. */}
+            {ungelesen > 0 && (
+              <Tag tone="brand" className="text-[13px]">{t('notifications.unread', { count: ungelesen })}</Tag>
+            )}
           </div>
           {ungelesen > 0 && (
-            <button
-              type="button"
+            <Button
+              variant="outline"
+              size="sm"
               onClick={alleGelesen}
-              className="mt-2 flex shrink-0 items-center gap-1.5 text-[12px] text-fg-secondary transition-colors hover:text-fg"
+              iconLeft={<CheckCheck size={14} />}
+              className="mt-1 shrink-0"
             >
-              <CheckCheck size={13} /> {t('notifications.markAllRead')}
-            </button>
+              {t('notifications.markAllRead')}
+            </Button>
           )}
         </div>
 
+        {/* Filterleiste — Variante B (Nutzer-Wahl 2026-08-31): ZWEI EBENEN.
+            Links der Zustand als Umschalter, rechts das Thema als Chips.
+            Vorher standen beide als gleichrangige Chips nebeneinander und
+            schlossen sich gegenseitig aus — "ungelesene Termine", die
+            haeufigste Frage an ein Postfach, war damit nicht stellbar. Jetzt
+            ist es eine Auswahl aus zwei Achsen.
+            Der Umschalter ist `Tabs variant="boxed"`, der Segmented Control des
+            Systems. Der Canvas zeigte ihn als Pille mit Rahmen; die gibt es im
+            Design-System nicht, und eine sechste Pillenform neben Badge, Tag,
+            Chip und Risk-Badge zu erfinden waere der schlechtere Tausch. */}
         {items.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2">
-            <FilterChip size="sm" selected={filter === 'all'} onClick={() => setFilter('all')}>
-              {t('notifications.filterAll', { count: items.length })}
-            </FilterChip>
-            <FilterChip size="sm" selected={filter === 'unread'} onClick={() => setFilter('unread')}>
-              {t('notifications.filterUnread', { count: ungelesen })}
-            </FilterChip>
-            {KIND_CHIPS.filter((k) => items.some((n) => n.kind === k)).map((k) => (
-              <FilterChip key={k} size="sm" selected={filter === k} onClick={() => setFilter(k)}>
-                {t(`notifications.chip.${k}`)} · {items.filter((n) => n.kind === k).length}
-              </FilterChip>
-            ))}
+          <div className="flex flex-wrap items-center gap-3">
+            <Tabs
+              value={zustand}
+              onValueChange={(v) => setZustand(v as 'all' | 'unread')}
+              variant="boxed"
+              size="sm"
+            >
+              <TabList>
+                <Tab value="all">{t('notifications.filterAll', { count: items.length })}</Tab>
+                <Tab value="unread">{t('notifications.filterUnread', { count: ungelesen })}</Tab>
+              </TabList>
+            </Tabs>
+            <span aria-hidden="true" className="h-5 w-px bg-stroke" />
+            <div className="flex flex-wrap items-center gap-2">
+              {KIND_CHIPS.filter((k) => items.some((n) => n.kind === k)).map((k) => (
+                <FilterChip
+                  key={k}
+                  size="sm"
+                  selected={art === k}
+                  // Ein zweiter Klick auf dieselbe Art hebt sie wieder auf —
+                  // sonst gaebe es keinen Weg zurueck auf "alle Arten".
+                  onClick={() => setArt(art === k ? null : k)}
+                >
+                  {t(`notifications.chip.${k}`)} · {items.filter((n) => n.kind === k).length}
+                </FilterChip>
+              ))}
+            </div>
           </div>
         )}
 

@@ -214,7 +214,8 @@
   },
   "notifications": {
     "title": "Bildirimler",
-    "sub": "Taleplerinizde ve randevularınızda neler olduğu · En yeniler önce",
+    "unread_one": "{{count}} okunmamış",
+    "unread_other": "{{count}} okunmamış",
     "markAllRead": "Tümünü okundu işaretle",
     "filterAll": "Tümü · {{count}}",
     "filterUnread": "Okunmamış · {{count}}",
