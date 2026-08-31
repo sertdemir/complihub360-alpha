@@ -78,6 +78,10 @@ export function UserRequestsPage() {
 
   return (
     <UserShell>
+      {/* Der Gradient-Grund (CLAUDE.md), wie ihn die uebrigen Arbeitsflaechen
+          tragen — vorgezogen am 2026-08-31, das Redesign der Seite steht noch
+          aus. Negative Raender heben das Shell-Padding auf. */}
+      <div className="-mx-8 -my-6 min-h-full bg-gradient-stage px-8 py-7">
       <div className="mx-auto max-w-[1140px] space-y-5">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -151,6 +155,7 @@ export function UserRequestsPage() {
         <p className="text-[11px] text-fg-tertiary">
           {t('requests.footerStats')}
         </p>
+      </div>
       </div>
       <ThreadDrawer open={!!threadFor} engagementId={threadFor} viewer="user" onClose={() => { setThreadFor(null); if (deepThread) setSearchParams({}, { replace: true }); }} />
       <RequestActionsDrawer
