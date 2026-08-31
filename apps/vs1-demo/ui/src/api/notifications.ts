@@ -1,9 +1,119 @@
 import { apiFetch } from './client';
 import { fetchLastSeen, isUnread } from './reads';
 
-// ─── Notifications API ────────────────────────────────────────────────────────
-// GET /api/v1/notifications → event_log rows, grouped by day for the feed pages.
-// Unread comes from the C1 read-state watermark, not a per-row flag.
+// ─── Benachrichtigungen ───────────────────────────────────────────────────────
+// Zwei verschiedene Dinge, die bis 2026-08-31 dieselbe Route benutzt haben:
+//
+//   fetchMyNotifications()  → GET /api/v1/notifications
+//       Die Post des ANGEMELDETEN Kontos aus `public.notifications`. Jede Zeile
+//       hat einen Empfaenger und einen eigenen Lesezeitpunkt.
+//
+//   fetchEventLogFeed()     → GET /api/v1/admin/events
+//       Das BETRIEBSPROTOKOLL, neueste zuerst. Das ist eine Betriebssicht fuer
+//       das Control Center, keine Nutzer-Post.
+//
+// Vorher lief beides ueber /api/v1/notifications, und das lieferte den
+// event_log mit leerem Filter: jedes angemeldete Konto sah alle Zeilen aller
+// Nutzer — und weil die Beschreibungszeile hier als roher Abzug der Nutzlast
+// gebaut wurde (`Object.entries(payload).map(...)`), standen die Mailadressen
+// aus den `email_sent`-Zeilen im Klartext darin. Beides ist mit der Trennung
+// weg: die Nutzer-Post traegt nur Felder, die der Server ausdruecklich
+// durchlaesst (services/compliance-api/src/notifications.ts → PayloadFelder).
+
+// ─── Nutzer-Post ─────────────────────────────────────────────────────────────
+
+export type NotificationType =
+  | 'provider_confirmed'
+  | 'provider_replied'
+  | 'provider_declined'
+  | 'engagement_message'
+  | 'engagement_expired'
+  | 'booking_rescheduled'
+  | 'booking_cancelled';
+
+/** Die Felder, die der Server durchlaesst. Keine Kontaktdaten, keine Freitexte. */
+export interface NotificationPayload {
+  providerKey?: string;
+  providerName?: string;
+  from?: string;
+  to?: string;
+  label?: string;
+}
+
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  subject: 'engagement' | 'booking' | 'session' | null;
+  subjectId: string | null;
+  payload: NotificationPayload;
+  createdAt: string;
+  unread: boolean;
+  /** Einfaerbung und Filterleiste. Kein Server-Feld, reine Anzeige-Sache. */
+  kind: 'request' | 'termine' | 'sla';
+}
+
+/**
+ * Welcher Anlass welche Spur bekommt. Anfragen sind Petrol, Termine neutral,
+ * ein Ablauf ohne Antwort ist eine Warnung — dort ist etwas NICHT passiert.
+ */
+const KIND: Record<NotificationType, Notification['kind']> = {
+  provider_confirmed: 'request',
+  provider_replied: 'request',
+  provider_declined: 'request',
+  engagement_message: 'request',
+  engagement_expired: 'sla',
+  booking_rescheduled: 'termine',
+  booking_cancelled: 'termine',
+};
+
+interface NotificationRow {
+  id: string;
+  type: string;
+  subject: string | null;
+  subject_id: string | null;
+  payload?: NotificationPayload | null;
+  created_at: string;
+  read_at: string | null;
+}
+
+export interface NotificationsFeed {
+  items: Notification[];
+  unread: number;
+}
+
+export const LEERES_FACH: NotificationsFeed = { items: [], unread: 0 };
+
+export async function fetchMyNotifications(): Promise<NotificationsFeed> {
+  const res = await apiFetch<{ ok: boolean; notifications: NotificationRow[]; unread: number }>(
+    '/api/v1/notifications',
+  );
+  const items = res.notifications
+    // Ein unbekannter Typ waere eine Zeile ohne Text — der Server ist neuer
+    // als dieses Bundle. Lieber weglassen als eine leere Karte zeigen.
+    .filter((r): r is NotificationRow & { type: NotificationType } => r.type in KIND)
+    .map((r) => ({
+      id: r.id,
+      type: r.type,
+      subject: (r.subject as Notification['subject']) ?? null,
+      subjectId: r.subject_id,
+      payload: r.payload ?? {},
+      createdAt: r.created_at,
+      unread: !r.read_at,
+      kind: KIND[r.type],
+    }));
+  return { items, unread: items.filter((i) => i.unread).length };
+}
+
+/** `{ id }` markiert eine Zeile, `{ all: true }` alle noch offenen. */
+export async function markNotificationsRead(arg: { id?: string; all?: boolean }): Promise<number> {
+  const res = await apiFetch<{ ok: boolean; marked: number }>('/api/v1/notifications/read', {
+    method: 'POST',
+    body: JSON.stringify(arg),
+  });
+  return res.marked;
+}
+
+// ─── Betriebsprotokoll (Control Center) ──────────────────────────────────────
 
 interface EventRow {
   id?: string;
@@ -29,7 +139,7 @@ export interface FeedGroup {
   items: FeedItem[];
 }
 
-const KIND: Record<string, FeedItem['kind']> = {
+const EVENT_KIND: Record<string, FeedItem['kind']> = {
   primary_request_submitted: 'request',
   request_routed: 'request',
   sla_reminder_sent: 'sla',
@@ -58,7 +168,8 @@ const KIND: Record<string, FeedItem['kind']> = {
 };
 
 // Human titles for v2 events — without this, the feed would show raw
-// "reminder 24h"-style debug text (dashboard-v2 gap cluster G).
+// "reminder 24h"-style debug text (dashboard-v2 gap cluster G). English by
+// design: the Control Center is an internal surface.
 const TITLE: Record<string, string> = {
   scheduling_started: 'Booking started',
   scheduling_confirmed: 'Appointment booked',
@@ -79,6 +190,20 @@ const TITLE: Record<string, string> = {
   provider_profile_updated: 'Matchmaking profile updated',
 };
 
+// Aus der Nutzlast wird NUR gezeigt, was ein Bezeichner ist. Freitexte und
+// alles, was nach einer Adresse aussieht, bleiben draussen — der Abzug lief
+// frueher ueber alle Felder und trug damit die Mailadressen der
+// `email_sent`-Zeilen ins Bild.
+const EVENT_PAYLOAD_KEYS = ['engagementId', 'bookingId', 'providerKey', 'provider_key', 'status', 'stage', 'sessionId'];
+
+function eventDesc(payload: Record<string, unknown> | undefined): string {
+  if (!payload) return '';
+  return EVENT_PAYLOAD_KEYS
+    .filter((k) => payload[k] !== undefined && payload[k] !== null)
+    .map((k) => `${k}: ${String(payload[k])}`)
+    .join(' · ');
+}
+
 function dayLabel(iso: string): string {
   const d = new Date(iso);
   const today = new Date();
@@ -96,7 +221,7 @@ function timeLabel(iso: string): string {
   return new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 }
 
-export interface NotificationsFeed {
+export interface EventLogFeed {
   groups: FeedGroup[];
   lastSeen: string | null;
 }
@@ -104,25 +229,28 @@ export interface NotificationsFeed {
 export const NOTIFICATIONS_VIEWER = 'provider-notifications';
 export const USER_NOTIFICATIONS_VIEWER = 'user-notifications';
 
-export async function fetchNotificationsFeed(viewer: string = NOTIFICATIONS_VIEWER): Promise<NotificationsFeed> {
-  const [{ notifications }, lastSeen] = await Promise.all([
-    apiFetch<{ ok: boolean; notifications: EventRow[] }>('/api/v1/notifications'),
+/**
+ * Das Betriebsprotokoll. Die Route ist admin-pflichtig (403 fuer alle
+ * anderen) — die Anbieter-Oberflaechen rufen sie noch auf und fallen damit
+ * auf ihre Fixture zurueck, wie der Rest des Anbieter-Arbeitsbereichs. Eine
+ * eigene Quelle fuer Anbieter gibt es noch nicht: Anbieter haengen an keinem
+ * Konto, `providers` hat keine Spalte, die auf `auth.users` zeigt.
+ */
+export async function fetchEventLogFeed(viewer: string = NOTIFICATIONS_VIEWER): Promise<EventLogFeed> {
+  const [{ events }, lastSeen] = await Promise.all([
+    apiFetch<{ ok: boolean; events: EventRow[] }>('/api/v1/admin/events'),
     fetchLastSeen(viewer),
   ]);
-  if (!notifications.length) throw new Error('empty feed'); // keep the design fixture
   const groups = new Map<string, FeedItem[]>();
-  for (const row of notifications) {
+  for (const row of events) {
     const day = dayLabel(row.created_at);
-    const payloadBits = row.payload
-      ? Object.entries(row.payload).map(([k, v]) => `${k}: ${String(v)}`).join(' · ')
-      : '';
     const item: FeedItem = {
       title: TITLE[row.type] ?? row.type.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase()),
       event: row.type,
       time: timeLabel(row.created_at),
-      desc: payloadBits,
+      desc: eventDesc(row.payload),
       unread: isUnread(row.created_at, lastSeen),
-      kind: KIND[row.type] ?? 'system',
+      kind: EVENT_KIND[row.type] ?? 'system',
       action: row.payload?.bookingId
         ? 'Open Termine →'
         : row.payload?.engagementId ? `Open ${String(row.payload.engagementId).slice(0, 8)} →` : undefined,
@@ -132,10 +260,4 @@ export async function fetchNotificationsFeed(viewer: string = NOTIFICATIONS_VIEW
     groups.set(day, [...(groups.get(day) ?? []), item]);
   }
   return { groups: [...groups.entries()].map(([day, items]) => ({ day, items })), lastSeen };
-}
-
-// Lightweight unread counter for the sidebar badge (shell-level).
-export async function fetchUnreadCount(): Promise<number> {
-  const { groups } = await fetchNotificationsFeed();
-  return groups.reduce((n, g) => n + g.items.filter((i) => i.unread).length, 0);
 }

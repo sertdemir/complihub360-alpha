@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Bell } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { fetchNotificationsFeed, NOTIFICATIONS_VIEWER, type FeedItem } from '../../api/notifications';
+import { fetchEventLogFeed, NOTIFICATIONS_VIEWER, type FeedItem } from '../../api/notifications';
 import { markSeen } from '../../api/reads';
 import { cn } from '../../lib/utils';
 
@@ -31,7 +31,7 @@ export function BellPopover({ unread, onAllRead }: BellPopoverProps) {
   useEffect(() => {
     if (!open) return;
     setItems(null);
-    fetchNotificationsFeed()
+    fetchEventLogFeed()
       .then((f) => setItems(f.groups.flatMap((g) => g.items).slice(0, SHOWN)))
       .catch(() => setItems([]));
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);

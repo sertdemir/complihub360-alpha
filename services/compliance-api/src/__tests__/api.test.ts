@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
-import { createHmac, randomUUID } from 'node:crypto';
+import { createHash, createHmac, randomUUID } from 'node:crypto';
 
 // ─── API integration tests (13-layer audit P1 #7) ────────────────────────────
 // The real HTTP server runs in-process on a test port; only supabaseApi is
@@ -31,6 +31,20 @@ vi.mock('../supabase.js', () => ({
         },
         async update(table: string, match: Record<string, any>, data: any) {
             const rows = (db[table] ?? []).filter((r) => Object.entries(match).every(([k, v]) => r[k] === v));
+            rows.forEach((r) => Object.assign(r, data));
+            return rows;
+        },
+        // Spiegelt supabaseApi.updateWhere: der Aufrufer schreibt den
+        // PostgREST-Ausdruck selbst. Hier gebraucht werden 'eq.<wert>' und
+        // 'is.null'; alles andere waere im Test eine stille Falschannahme,
+        // deshalb wirft es.
+        async updateWhere(table: string, filters: Record<string, string>, data: any) {
+            const passt = (r: any) => Object.entries(filters).every(([k, expr]) => {
+                if (expr === 'is.null') return r[k] === null || r[k] === undefined;
+                if (expr.startsWith('eq.')) return String(r[k]) === expr.slice(3);
+                throw new Error(`unsupported filter in test store: ${expr}`);
+            });
+            const rows = (db[table] ?? []).filter(passt);
             rows.forEach((r) => Object.assign(r, data));
             return rows;
         },
@@ -552,5 +566,159 @@ describe('GET /api/v1/dashboard', () => {
         const summe = Object.values(r.body.obligations.by_severity as Record<string, number>)
             .reduce((a, b) => a + b, 0);
         expect(summe).toBe(r.body.obligations.open);
+    });
+});
+
+
+describe('GET /api/v1/notifications', () => {
+    // Bis 2026-08-31 lieferte diese Route `event_log` mit LEEREM Filter: jedes
+    // angemeldete Konto bekam alle Zeilen aller Nutzer, samt der Mailadressen
+    // in den `email_sent`-Nutzlasten. Die Tests hier halten fest, dass die
+    // Antwort jetzt an den Aufrufer gebunden ist.
+    const seedNotification = (over: Record<string, any> = {}) => {
+        const row = {
+            id: randomUUID(), user_id: USER_ID, type: 'provider_replied',
+            subject: 'engagement', subject_id: randomUUID(), payload: {},
+            created_at: new Date().toISOString(), read_at: null, ...over,
+        };
+        (db.notifications ??= []).push(row);
+        return row;
+    };
+
+    it('meldet fuer ein frisches Konto ein leeres Fach', async () => {
+        const r = await api('/api/v1/notifications', { auth: 'jwt' });
+        expect(r.status).toBe(200);
+        expect(r.body.notifications).toEqual([]);
+        expect(r.body.unread).toBe(0);
+    });
+
+    it('zeigt eigene Zeilen und keine fremden', async () => {
+        seedNotification();
+        seedNotification({ user_id: randomUUID() });
+        seedNotification({ user_id: randomUUID() });
+        const r = await api('/api/v1/notifications', { auth: 'jwt' });
+        expect(r.body.notifications).toHaveLength(1);
+        expect(r.body.unread).toBe(1);
+    });
+
+    it('gibt ohne Anmeldung nichts heraus — auch nicht dem Server-Key', async () => {
+        seedNotification();
+        const r = await api('/api/v1/notifications', { auth: 'key' });
+        expect(r.body.notifications ?? []).toEqual([]);
+    });
+
+    it('markiert eine einzelne Zeile als gelesen', async () => {
+        const n = seedNotification();
+        const r = await api('/api/v1/notifications/read', {
+            method: 'POST', auth: 'jwt', body: JSON.stringify({ id: n.id }),
+        });
+        expect(r.status).toBe(200);
+        expect(r.body.marked).toBe(1);
+        expect((await api('/api/v1/notifications', { auth: 'jwt' })).body.unread).toBe(0);
+    });
+
+    it('markiert keine fremde Zeile, auch wenn die id stimmt', async () => {
+        const fremd = seedNotification({ user_id: randomUUID() });
+        const r = await api('/api/v1/notifications/read', {
+            method: 'POST', auth: 'jwt', body: JSON.stringify({ id: fremd.id }),
+        });
+        expect(r.body.marked).toBe(0);
+        expect(db.notifications.find((n: any) => n.id === fremd.id).read_at).toBeNull();
+    });
+
+    it('laesst beim Alles-Markieren bereits gelesene Zeitpunkte stehen', async () => {
+        const alt = seedNotification({ read_at: '2026-08-01T00:00:00.000Z' });
+        seedNotification();
+        const r = await api('/api/v1/notifications/read', {
+            method: 'POST', auth: 'jwt', body: JSON.stringify({ all: true }),
+        });
+        expect(r.body.marked).toBe(1);
+        expect(db.notifications.find((n: any) => n.id === alt.id).read_at).toBe('2026-08-01T00:00:00.000Z');
+    });
+});
+
+describe('Benachrichtigungen entstehen aus Vorgaengen', () => {
+    // Weg A: die Quelle zuerst. Diese Tests halten die Schreibstellen fest —
+    // wer eine Benachrichtigung bekommt, und wer ausdruecklich keine.
+    const seedEngagement = (over: Record<string, any> = {}) => {
+        const row = {
+            id: randomUUID(), user_id: USER_ID, provider_key: 'test-kanzlei',
+            country: 'DE', category: 'tax-vat', structured_answers: {},
+            message: 'Bitte um Angebot', status: 'delivered',
+            created_at: new Date().toISOString(), ...over,
+        };
+        (db.engagement_requests ??= []).push(row);
+        return row;
+    };
+    const seedToken = (engagementId: string, action: string) => {
+        const token = randomUUID();
+        (db.magic_link_tokens ??= []).push({
+            id: randomUUID(), engagement_id: engagementId, action,
+            token_hash: createHash('sha256').update(token).digest('hex'),
+            expires_at: new Date(Date.now() + 3600_000).toISOString(), used_at: null,
+        });
+        return token;
+    };
+
+    it('benachrichtigt den Anfragenden, wenn der Anbieter zusagt', async () => {
+        const eng = seedEngagement();
+        const token = seedToken(eng.id, 'confirm');
+        const r = await api('/api/v1/provider/confirm', {
+            method: 'POST', auth: 'none', body: JSON.stringify({ engagementId: eng.id, token }),
+        });
+        expect(r.status).toBe(200);
+        const meine = (db.notifications ?? []).filter((n: any) => n.user_id === USER_ID);
+        expect(meine).toHaveLength(1);
+        expect(meine[0].type).toBe('provider_confirmed');
+        expect(meine[0].subject_id).toBe(eng.id);
+    });
+
+    it('benachrichtigt niemanden, wenn die Anfrage von einem Gast stammt', async () => {
+        const eng = seedEngagement({ user_id: null });
+        const token = seedToken(eng.id, 'decline');
+        await api('/api/v1/provider/decline', {
+            method: 'POST', auth: 'none', body: JSON.stringify({ engagementId: eng.id, token }),
+        });
+        expect(db.notifications ?? []).toEqual([]);
+    });
+
+    it('traegt keine Mailadresse in die Nutzlast — auch wenn eine danebensteht', async () => {
+        const eng = seedEngagement({
+            structured_answers: { requester_email: 'kunde@example.com', company: 'Muster GmbH' },
+        });
+        const token = seedToken(eng.id, 'confirm');
+        await api('/api/v1/provider/confirm', {
+            method: 'POST', auth: 'none', body: JSON.stringify({ engagementId: eng.id, token }),
+        });
+        const alles = JSON.stringify(db.notifications ?? []);
+        expect(alles).not.toContain('kunde@example.com');
+        expect(alles).not.toContain('Muster GmbH');
+    });
+
+    it('meldet die Antwort des Anbieters, aber nicht die eigene', async () => {
+        const eng = seedEngagement();
+        await api(`/api/v1/engagement/${eng.id}/message`, {
+            method: 'POST', body: JSON.stringify({ author: 'user', body: 'Nachfrage von mir' }),
+        });
+        expect(db.notifications ?? []).toEqual([]);
+        await api(`/api/v1/engagement/${eng.id}/message`, {
+            method: 'POST', body: JSON.stringify({ author: 'provider', body: 'Antwort' }),
+        });
+        expect((db.notifications ?? []).map((n: any) => n.type)).toEqual(['engagement_message']);
+    });
+
+    it('schweigt, wenn der Nutzer seinen eigenen Termin verschiebt', async () => {
+        seedProvider();
+        const bookingId = randomUUID();
+        (db.scheduling ??= []).push({
+            id: bookingId, provider_key: 'test-kanzlei', user_id: USER_ID,
+            slot_start: new Date(Date.now() + 86400_000).toISOString(), status: 'confirmed',
+        });
+        const neu = new Date(Date.now() + 172800_000).toISOString();
+        const r = await api(`/api/v1/scheduling/${bookingId}`, {
+            method: 'PATCH', auth: 'jwt', body: JSON.stringify({ slot_start: neu }),
+        });
+        expect(r.status).toBe(200);
+        expect(db.notifications ?? []).toEqual([]);
     });
 });

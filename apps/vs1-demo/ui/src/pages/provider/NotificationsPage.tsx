@@ -7,7 +7,7 @@ import { FilterChip } from '../../components/ui/Badge';
 import { Tag } from '../../components/ui/Tag';
 import { Card } from '../../components/ui/Card';
 import { useApiData } from '../../lib/useApiData';
-import { fetchNotificationsFeed, NOTIFICATIONS_VIEWER, type FeedItem } from '../../api/notifications';
+import { fetchEventLogFeed, NOTIFICATIONS_VIEWER, type FeedItem } from '../../api/notifications';
 import { markSeen } from '../../api/reads';
 
 // ─── Provider /notifications ──────────────────────────────────────────────────
@@ -74,7 +74,7 @@ export function NotificationsPage() {
   const [allSeen, setAllSeen] = useState(false);
   const [marking, setMarking] = useState(false);
   // Live event feed when the compliance-api answers; the design fixture otherwise.
-  const { data } = useApiData(fetchNotificationsFeed, { groups: buildFeedFixture(t), lastSeen: null });
+  const { data } = useApiData(fetchEventLogFeed, { groups: buildFeedFixture(t), lastSeen: null });
 
   const withReadState = data.groups.map((g) => ({
     ...g,

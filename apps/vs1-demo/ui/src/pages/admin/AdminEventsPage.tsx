@@ -3,7 +3,7 @@ import { AdminShell } from '../../components/admin/AdminShell';
 import { EntityCard } from '../../components/ui/Cards';
 import { FilterChip } from '../../components/ui/Badge';
 import { useApiData } from '../../lib/useApiData';
-import { fetchNotificationsFeed, type FeedGroup } from '../../api/notifications';
+import { fetchEventLogFeed, type FeedGroup } from '../../api/notifications';
 
 // ─── Admin · Events & Audit (Figma 2975:556) ─────────────────────────────────
 // The raw audit stream, newest first, filterable by domain. Reuses the
@@ -39,7 +39,7 @@ const KIND_FILTER: Record<string, (desc: string) => boolean> = {
 };
 
 export function AdminEventsPage() {
-  const { data, source } = useApiData(() => fetchNotificationsFeed().then((f) => f.groups), FIXTURE);
+  const { data, source } = useApiData(() => fetchEventLogFeed().then((f) => f.groups), FIXTURE);
   const groups = data;
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>('All');
   const pred = KIND_FILTER[filter];

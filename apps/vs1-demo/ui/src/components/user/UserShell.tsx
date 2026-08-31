@@ -14,7 +14,7 @@ import { UserSearchDrawer } from './UserSearchDrawer';
 import { AssistantWidget } from './AssistantWidget';
 import { fetchUserBookings } from '../../api/bookings';
 import { fetchSessions, type SessionRowData } from '../../api/sessions';
-import { fetchNotificationsFeed, USER_NOTIFICATIONS_VIEWER } from '../../api/notifications';
+import { fetchMyNotifications } from '../../api/notifications';
 
 // ─── UserShell ────────────────────────────────────────────────────────────────
 // The user App-Workspace frame (always dark slate), mirroring the Figma User
@@ -125,9 +125,12 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
       fetchUserBookings()
         .then((bs) => setCounts((c) => ({ ...c, requests: bs.filter((b) => b.status === 'confirmed').length })))
         .catch(() => {});
-      fetchNotificationsFeed(USER_NOTIFICATIONS_VIEWER)
-        .then((f) => setCounts((c) => ({ ...c, unread: f.groups.reduce((n, g) => n + g.items.filter((i) => i.unread).length, 0) })))
-        .catch(() => {});
+      // Ungelesene haengen jetzt an der Zeile selbst (read_at), nicht mehr an
+      // einem Wasserstand pro Flaeche: der zaehlte alles Neuere als ungelesen,
+      // auch was nie jemanden anging.
+      fetchMyNotifications()
+        .then((f) => setCounts((c) => ({ ...c, unread: f.unread })))
+        .catch(() => setCounts((c) => ({ ...c, unread: 0 })));
     }
     // Die Sitzungsliste ist eine OEFFENTLICHE Route (guest_key als Ausweis)
     // und laeuft deshalb auch ohne Anmeldung — sie feuert ohnehin nur, wenn
