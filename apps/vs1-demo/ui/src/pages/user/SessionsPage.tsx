@@ -208,6 +208,11 @@ export function SessionsPage() {
               body={t('sessions.emptyBody')}
               cta={{ label: t('sessions.emptyCta'), onClick: () => navigate(`/${locale}/wizard`) }}
               hint={t('sessions.emptyHint')}
+              steps={[
+                { title: t('sessions.emptyStep1Title'), body: t('sessions.emptyStep1Body') },
+                { title: t('sessions.emptyStep2Title'), body: t('sessions.emptyStep2Body') },
+                { title: t('sessions.emptyStep3Title'), body: t('sessions.emptyStep3Body') },
+              ]}
             />
           </div>
         </div>

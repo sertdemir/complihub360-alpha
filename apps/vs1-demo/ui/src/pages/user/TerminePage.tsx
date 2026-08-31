@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { CalendarClock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { UserShell } from '../../components/user/UserShell';
 import { Button } from '../../components/ui/Button';
@@ -6,6 +8,7 @@ import { Tag } from '../../components/ui/Tag';
 import { fetchUserBookings, cancelBooking, markOutcome, providerWebsiteHref, type UserBooking, type BookingStatus } from '../../api/bookings';
 import { ReviewDrawer, type ReviewTarget } from '../../components/user/ReviewDrawer';
 import { RescheduleDrawer, type RescheduleTarget } from '../../components/user/RescheduleDrawer';
+import { EmptyState } from '../../components/user/EmptyState';
 
 // ─── User Dashboard · Termine (bookings) ─────────────────────────────────────
 // Mirrors the Figma "User · Termine / Buchungen v2" screen: the booking IS the
@@ -59,6 +62,7 @@ function icsHref(r: Row): string {
 }
 
 export function TerminePage() {
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation('userws');
   const locale = i18n.resolvedLanguage || 'en';
   // Kein Fixture-Rueckfall mehr (Befund 2026-08-30): useApiData behielt bei
@@ -166,10 +170,26 @@ export function TerminePage() {
           </h1>
           <p className="mt-1 text-body-sm text-fg-secondary">{t('termine.sub')}</p>
         </div>
+        {data !== null && rows.length === 0 ? (
+          <EmptyState
+            icon={CalendarClock}
+            title={t('termine.emptyTitle')}
+            body={t('termine.emptyBody')}
+            cta={{ label: t('termine.emptyCta'), onClick: () => navigate(`/${locale}/wizard`) }}
+            steps={[
+              { title: t('termine.emptyStep1Title'), body: t('termine.emptyStep1Body') },
+              { title: t('termine.emptyStep2Title'), body: t('termine.emptyStep2Body') },
+              { title: t('termine.emptyStep3Title'), body: t('termine.emptyStep3Body') },
+            ]}
+          />
+        ) : (
+        <>
         <p className="text-[11px] font-semibold uppercase tracking-[0.05em] text-fg-tertiary">{t('termine.upcoming')}</p>
         <div className="space-y-2.5">{upcoming.length ? upcoming.map(card) : <p className="text-body-sm text-fg-tertiary">{t('termine.emptyUpcoming')}</p>}</div>
         <p className="pt-2 text-[11px] font-semibold uppercase tracking-[0.05em] text-fg-tertiary">{t('termine.past')}</p>
         <div className="space-y-2.5">{past.length ? past.map(card) : <p className="text-body-sm text-fg-tertiary">{t('termine.emptyPast')}</p>}</div>
+        </>
+        )}
       </div>
       <ReviewDrawer target={reviewFor} onClose={() => setReviewFor(null)} onSubmitted={(id) => setReviewed((s) => new Set(s).add(id))} />
       <RescheduleDrawer target={rescheduleFor} onClose={() => setRescheduleFor(null)} onRescheduled={(id, iso) => setMoved((m) => ({ ...m, [id]: iso }))} />

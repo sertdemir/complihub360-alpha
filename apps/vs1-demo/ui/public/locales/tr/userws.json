@@ -121,7 +121,13 @@
       "corporate-structure": "Şirket",
       "logistics-customs": "Lojistik & gümrük",
       "legal-advisory": "Hukuki danışmanlık"
-    }
+    },
+    "emptyStep1Title": "Anlatın",
+    "emptyStep1Body": "Ülke, pazarlar ve ürün yelpazesi hakkında dört soru.",
+    "emptyStep2Title": "Görün",
+    "emptyStep2Body": "Yükümlülükleriniz, aciliyete göre sıralı.",
+    "emptyStep3Title": "Harekete geçin",
+    "emptyStep3Body": "İşaretleyin — ya da bir uzman katın."
   },
   "sessions": {
     "title": "Uyum <accent>oturumlarınız</accent>.",
@@ -176,7 +182,13 @@
     "emptyTitle": "Henüz kayıtlı oturum yok",
     "emptyBody": "Bir oturum, tek bir pazar ve alan için neyin geçerli olduğunu kaydeder — kaynağı, riski ve ilerlemesiyle. Asistanın sonunda oluşur.",
     "emptyCta": "İlk oturumu oluştur",
-    "emptyHint": "Yaklaşık altı dakika. İstediğiniz anda durabilirsiniz."
+    "emptyHint": "Yaklaşık altı dakika. İstediğiniz anda durabilirsiniz.",
+    "emptyStep1Title": "Oluşturun",
+    "emptyStep1Body": "Asistanın bir turu, bir oturum.",
+    "emptyStep2Title": "Karşılaştırın",
+    "emptyStep2Body": "Birden çok pazarı yan yana yürütün.",
+    "emptyStep3Title": "Güncelleyin",
+    "emptyStep3Body": "Daha sonra güncel rakamlarla yeniden hesaplatın."
   },
   "requests": {
     "title": "Sağlayıcı <accent>talepleriniz</accent>.",
@@ -192,7 +204,13 @@
     "footerStats": "● Çalışma alanınızda ortalama iş ortağı yanıt süresi: 22 sa. · %87'si SLA içinde onaylıyor · son 30 gün",
     "emptyTitle": "Henüz talep yok",
     "emptyBody": "Bir oturumdan bir sağlayıcıya başvurduğunuzda talep burada görünür — durumu, süresi ve yazışmasıyla.",
-    "emptyCta": "Uygun sağlayıcıları bul"
+    "emptyCta": "Uygun sağlayıcıları bul",
+    "emptyStep1Title": "Seçin",
+    "emptyStep1Body": "Bir oturumun önerileri arasından.",
+    "emptyStep2Title": "Sorun",
+    "emptyStep2Body": "Talebiniz — gerçek adınız olmadan.",
+    "emptyStep3Title": "İzleyin",
+    "emptyStep3Body": "Onay ve yanıt, süresiyle birlikte."
   },
   "notifications": {
     "title": "Bildirimler",
@@ -505,7 +523,13 @@
     "website": "Sağlayıcı web sitesi",
     "emptyTitle": "Randevu yok",
     "emptyBody": "Randevular bir talepten doğar: bir sağlayıcı onayladığında görüşme burada görünür ve takviminize eklenebilir.",
-    "emptyCta": "Uygun sağlayıcıları bul"
+    "emptyCta": "Uygun sağlayıcıları bul",
+    "emptyStep1Title": "Talep edin",
+    "emptyStep1Body": "Dilediğiniz bir sağlayıcı.",
+    "emptyStep2Title": "Uzlaşın",
+    "emptyStep2Body": "Uyana kadar karşılıklı öneriler.",
+    "emptyStep3Title": "Görüşün",
+    "emptyStep3Body": "Randevu kesinleşti — isimle ve takvim kaydıyla."
   },
   "review": {
     "eyebrow": "DEĞERLENDİRME",

@@ -121,7 +121,13 @@
       "corporate-structure": "Sociedad",
       "logistics-customs": "Logística y aduanas",
       "legal-advisory": "Asesoría jurídica"
-    }
+    },
+    "emptyStep1Title": "Describir",
+    "emptyStep1Body": "Cuatro preguntas sobre país, mercados y gama.",
+    "emptyStep2Title": "Ver",
+    "emptyStep2Body": "Sus obligaciones, ordenadas por urgencia.",
+    "emptyStep3Title": "Actuar",
+    "emptyStep3Body": "Marcarlas — o recurrir a un especialista."
   },
   "sessions": {
     "title": "Sus <accent>sesiones</accent> de cumplimiento.",
@@ -176,7 +182,13 @@
     "emptyTitle": "Todavía no hay sesiones guardadas",
     "emptyBody": "Una sesión recoge lo que se aplica a un mercado y a un área — con su fuente, su riesgo y su estado. Se crea al final del asistente.",
     "emptyCta": "Crear la primera sesión",
-    "emptyHint": "Unos seis minutos. Puede detenerse cuando quiera."
+    "emptyHint": "Unos seis minutos. Puede detenerse cuando quiera.",
+    "emptyStep1Title": "Crear",
+    "emptyStep1Body": "Una ejecución del asistente, una sesión.",
+    "emptyStep2Title": "Comparar",
+    "emptyStep2Body": "Varios mercados en paralelo.",
+    "emptyStep3Title": "Actualizar",
+    "emptyStep3Body": "Recalcular más tarde con cifras actuales."
   },
   "requests": {
     "title": "Sus <accent>solicitudes</accent> a proveedores.",
@@ -192,7 +204,13 @@
     "footerStats": "● Respuesta media de los socios en su espacio de trabajo: 22 h · 87 % confirma dentro del SLA · últimos 30 días",
     "emptyTitle": "Todavía no hay solicitudes",
     "emptyBody": "Cuando contacte con un proveedor desde una sesión, la solicitud aparecerá aquí — con su estado, su plazo y la conversación.",
-    "emptyCta": "Buscar proveedores adecuados"
+    "emptyCta": "Buscar proveedores adecuados",
+    "emptyStep1Title": "Elegir",
+    "emptyStep1Body": "Entre las propuestas de una sesión.",
+    "emptyStep2Title": "Solicitar",
+    "emptyStep2Body": "Su consulta — sin su nombre real.",
+    "emptyStep3Title": "Seguir",
+    "emptyStep3Body": "Confirmación y respuesta, con plazo."
   },
   "notifications": {
     "title": "Notificaciones",
@@ -505,7 +523,13 @@
     "website": "Sitio web del proveedor",
     "emptyTitle": "Sin citas",
     "emptyBody": "Las citas nacen de una solicitud: en cuanto un proveedor confirma, la reunión aparece aquí y puede añadirse a su calendario.",
-    "emptyCta": "Buscar proveedores adecuados"
+    "emptyCta": "Buscar proveedores adecuados",
+    "emptyStep1Title": "Solicitar",
+    "emptyStep1Body": "Un proveedor de su elección.",
+    "emptyStep2Title": "Acordar",
+    "emptyStep2Body": "Propuestas de ida y vuelta hasta encajar.",
+    "emptyStep3Title": "Hablar",
+    "emptyStep3Body": "La cita queda fijada — con nombre y entrada de calendario."
   },
   "review": {
     "eyebrow": "VALORACIÓN",

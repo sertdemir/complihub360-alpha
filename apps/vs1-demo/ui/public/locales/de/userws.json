@@ -121,7 +121,13 @@
       "corporate-structure": "Unternehmen",
       "logistics-customs": "Logistik & Zoll",
       "legal-advisory": "Rechtsberatung"
-    }
+    },
+    "emptyStep1Title": "Beschreiben",
+    "emptyStep1Body": "Vier Fragen zu Land, Märkten und Sortiment.",
+    "emptyStep2Title": "Sehen",
+    "emptyStep2Body": "Ihre Pflichten, nach Dringlichkeit sortiert.",
+    "emptyStep3Title": "Handeln",
+    "emptyStep3Body": "Abhaken — oder Fachleute dazuholen."
   },
   "sessions": {
     "title": "Ihre Compliance-<accent>Sitzungen</accent>.",
@@ -176,7 +182,13 @@
     "emptyTitle": "Noch keine Sitzung gespeichert",
     "emptyBody": "Eine Sitzung hält fest, was für einen Markt und einen Bereich gilt — mit Quelle, Risiko und Bearbeitungsstand. Sie entsteht am Ende des Assistenten.",
     "emptyCta": "Erste Sitzung anlegen",
-    "emptyHint": "Etwa sechs Minuten. Sie können jederzeit aufhören."
+    "emptyHint": "Etwa sechs Minuten. Sie können jederzeit aufhören.",
+    "emptyStep1Title": "Anlegen",
+    "emptyStep1Body": "Ein Durchlauf des Assistenten, eine Sitzung.",
+    "emptyStep2Title": "Vergleichen",
+    "emptyStep2Body": "Mehrere Märkte nebeneinander führen.",
+    "emptyStep3Title": "Nachziehen",
+    "emptyStep3Body": "Später mit aktuellen Zahlen neu rechnen."
   },
   "requests": {
     "title": "Ihre Anbieter-<accent>Anfragen</accent>.",
@@ -192,7 +204,13 @@
     "footerStats": "● Durchschnittliche Partner-Antwortzeit in Ihrem Arbeitsbereich: 22 Std. · 87 % bestätigen innerhalb des SLA · letzte 30 Tage",
     "emptyTitle": "Noch keine Anfragen",
     "emptyBody": "Wenn Sie in einer Sitzung einen Anbieter anfragen, steht der Vorgang hier — mit Status, Frist und dem Gesprächsverlauf.",
-    "emptyCta": "Passende Anbieter finden"
+    "emptyCta": "Passende Anbieter finden",
+    "emptyStep1Title": "Auswählen",
+    "emptyStep1Body": "Aus den Vorschlägen einer Sitzung.",
+    "emptyStep2Title": "Anfragen",
+    "emptyStep2Body": "Ihr Anliegen — ohne Ihren Klarnamen.",
+    "emptyStep3Title": "Verfolgen",
+    "emptyStep3Body": "Bestätigung und Antwort, mit Frist."
   },
   "notifications": {
     "title": "Benachrichtigungen",
@@ -488,7 +506,7 @@
     "reschedule": "Verschieben",
     "cancel": "Stornieren",
     "review": "Provider bewerten",
-    "emptyUpcoming": "Keine anstehenden Termine — buche einen aus deiner Risk Map.",
+    "emptyUpcoming": "Keine anstehenden Termine — buchen Sie einen aus Ihrer Risk Map.",
     "emptyPast": "Noch keine vergangenen Termine.",
     "status": {
       "confirmed": "BESTÄTIGT",
@@ -505,7 +523,13 @@
     "website": "Provider-Website",
     "emptyTitle": "Keine Termine",
     "emptyBody": "Termine entstehen aus einer Anfrage: Sobald ein Anbieter bestätigt, steht der Gesprächstermin hier und lässt sich in Ihren Kalender übernehmen.",
-    "emptyCta": "Passende Anbieter finden"
+    "emptyCta": "Passende Anbieter finden",
+    "emptyStep1Title": "Anfragen",
+    "emptyStep1Body": "Ein Anbieter Ihrer Wahl.",
+    "emptyStep2Title": "Abstimmen",
+    "emptyStep2Body": "Vorschläge hin und her, bis es passt.",
+    "emptyStep3Title": "Sprechen",
+    "emptyStep3Body": "Termin steht — mit Namen und Kalendereintrag."
   },
   "review": {
     "eyebrow": "BEWERTUNG",

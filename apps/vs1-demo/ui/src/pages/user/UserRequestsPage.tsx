@@ -111,6 +111,11 @@ export function UserRequestsPage() {
             title={t('requests.emptyTitle')}
             body={t('requests.emptyBody')}
             cta={{ label: t('requests.emptyCta'), onClick: () => navigate(`/${locale}/wizard`) }}
+            steps={[
+              { title: t('requests.emptyStep1Title'), body: t('requests.emptyStep1Body') },
+              { title: t('requests.emptyStep2Title'), body: t('requests.emptyStep2Body') },
+              { title: t('requests.emptyStep3Title'), body: t('requests.emptyStep3Body') },
+            ]}
           />
         ) : null}
 
