@@ -1,9 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { UserShell } from '../../components/user/UserShell';
 import { Button } from '../../components/ui/Button';
 import { Tag } from '../../components/ui/Tag';
-import { useApiData } from '../../lib/useApiData';
 import { fetchUserBookings, cancelBooking, markOutcome, providerWebsiteHref, type UserBooking, type BookingStatus } from '../../api/bookings';
 import { ReviewDrawer, type ReviewTarget } from '../../components/user/ReviewDrawer';
 import { RescheduleDrawer, type RescheduleTarget } from '../../components/user/RescheduleDrawer';
@@ -12,7 +11,7 @@ import { RescheduleDrawer, type RescheduleTarget } from '../../components/user/R
 // Mirrors the Figma "User · Termine / Buchungen v2" screen: the booking IS the
 // paid lead — provider identity is visible from booking time (v2 §5 stage 3).
 // Replaces the retired engagement-request center as the primary nav item.
-// Fixture-first via useApiData; live rows come from GET /api/v1/bookings.
+// Live rows come from GET /api/v1/bookings.
 
 interface Row {
   id: string;
@@ -26,12 +25,6 @@ interface Row {
   needsOutcome?: boolean; // slot passed, outcome not recorded (watchdog §1)
 }
 
-const FIXTURE: Row[] = [
-  { id: 'fx-1', dateLine: 'Mo, 12. Aug 2026', timeLine: '10:00–10:30 · Video-Call', provider: 'Studio Bianchi SRL — Steuerkanzlei, Mailand', providerKey: 'studio-bianchi', website: 'https://studiobianchi.example', meta: 'VAT-Registrierung Italien · Erstgespräch · Dossier geteilt bei Buchung', status: 'confirmed' },
-  { id: 'fx-2', dateLine: 'Do, 15. Aug 2026', timeLine: '14:30–15:00 · Video-Call', provider: 'Hartmann Compliance GmbH — Berlin', providerKey: 'hartmann-compliance', website: 'https://hartmann-compliance.example', meta: 'EPR / Verpackung DE+IT · Erstgespräch', status: 'confirmed' },
-  { id: 'fx-4', dateLine: 'Fr, 1. Aug 2026', timeLine: '09:00–09:30 · Video-Call', provider: 'Hartmann Compliance GmbH — Berlin', providerKey: 'hartmann-compliance', website: 'https://hartmann-compliance.example', meta: 'EPR / Verpackung DE+IT · Termin vorbei — Ergebnis offen', status: 'confirmed', needsOutcome: true },
-  { id: 'fx-3', dateLine: 'Di, 29. Jul 2026', timeLine: '11:00–11:30 · Video-Call', provider: 'Studio Bianchi SRL — Steuerkanzlei, Mailand', providerKey: 'studio-bianchi', website: 'https://studiobianchi.example', meta: 'VAT-Registrierung Italien · stattgefunden', status: 'completed' },
-];
 
 const STATUS_TONE: Record<BookingStatus, 'success' | 'neutral' | 'error' | 'warning'> = {
   confirmed: 'success', completed: 'neutral', cancelled: 'error', no_show: 'warning',
@@ -68,7 +61,18 @@ function icsHref(r: Row): string {
 export function TerminePage() {
   const { t, i18n } = useTranslation('userws');
   const locale = i18n.resolvedLanguage || 'en';
-  const { data } = useApiData<Row[]>(async () => toRows(await fetchUserBookings(), locale), FIXTURE);
+  // Kein Fixture-Rueckfall mehr (Befund 2026-08-30): useApiData behielt bei
+  // einem leeren Ergebnis die Fixture, und ein neues Konto sah zwei erfundene
+  // Termine im September. Die Abschnitts-Leertexte darunter gab es laengst —
+  // sie kamen nur nie zum Vorschein.
+  const [data, setData] = useState<Row[] | null>(null);
+  useEffect(() => {
+    let alive = true;
+    fetchUserBookings()
+      .then((b) => { if (alive) setData(toRows(b, locale)); })
+      .catch(() => { if (alive) setData([]); });
+    return () => { alive = false; };
+  }, [locale]);
   const [cancelled, setCancelled] = useState<Set<string>>(new Set());
   const [outcomes, setOutcomes] = useState<Record<string, BookingStatus>>({});
   const [reviewFor, setReviewFor] = useState<ReviewTarget | null>(null);
@@ -78,7 +82,7 @@ export function TerminePage() {
   const [moved, setMoved] = useState<Record<string, string>>({});
   const df = new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
   const tf = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' });
-  const rows = data.map((r) => {
+  const rows = (data ?? []).map((r) => {
     if (cancelled.has(r.id)) return { ...r, status: 'cancelled' as BookingStatus, needsOutcome: false };
     if (outcomes[r.id]) return { ...r, status: outcomes[r.id], needsOutcome: false };
     if (moved[r.id]) {

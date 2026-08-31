@@ -172,7 +172,11 @@
     "historyRecalculated": "yeniden hesaplandı",
     "historyAnswersChanged": "yanıtlar değişti",
     "historyCreated": "oturum oluşturuldu",
-    "historyScope": "Geçmiş <b>tek bir</b> oturuma aittir — solda seçtiğiniz satırla değişir."
+    "historyScope": "Geçmiş <b>tek bir</b> oturuma aittir — solda seçtiğiniz satırla değişir.",
+    "emptyTitle": "Henüz kayıtlı oturum yok",
+    "emptyBody": "Bir oturum, tek bir pazar ve alan için neyin geçerli olduğunu kaydeder — kaynağı, riski ve ilerlemesiyle. Asistanın sonunda oluşur.",
+    "emptyCta": "İlk oturumu oluştur",
+    "emptyHint": "Yaklaşık altı dakika. İstediğiniz anda durabilirsiniz."
   },
   "requests": {
     "title": "Sağlayıcı <accent>talepleriniz</accent>.",
@@ -185,7 +189,10 @@
     "filterReplied": "Yanıtlandı · 1",
     "filterOverdue": "Gecikmiş · 1",
     "requestActionsAria": "Talep işlemleri",
-    "footerStats": "● Çalışma alanınızda ortalama iş ortağı yanıt süresi: 22 sa. · %87'si SLA içinde onaylıyor · son 30 gün"
+    "footerStats": "● Çalışma alanınızda ortalama iş ortağı yanıt süresi: 22 sa. · %87'si SLA içinde onaylıyor · son 30 gün",
+    "emptyTitle": "Henüz talep yok",
+    "emptyBody": "Bir oturumdan bir sağlayıcıya başvurduğunuzda talep burada görünür — durumu, süresi ve yazışmasıyla.",
+    "emptyCta": "Uygun sağlayıcıları bul"
   },
   "notifications": {
     "title": "Bildirimler",
@@ -495,7 +502,10 @@
     "outcomeNo": "Gelmedi",
     "reviewed": "✓ Değerlendirme gönderildi",
     "noShowNote": "İade yok — sağlayıcı dosyayı rezervasyonda aldı. İstersen seni yeniden eşleştiririz.",
-    "website": "Sağlayıcı web sitesi"
+    "website": "Sağlayıcı web sitesi",
+    "emptyTitle": "Randevu yok",
+    "emptyBody": "Randevular bir talepten doğar: bir sağlayıcı onayladığında görüşme burada görünür ve takviminize eklenebilir.",
+    "emptyCta": "Uygun sağlayıcıları bul"
   },
   "review": {
     "eyebrow": "DEĞERLENDİRME",

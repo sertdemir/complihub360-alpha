@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { LayoutGrid, List, TriangleAlert } from 'lucide-react';
+import { LayoutGrid, List, TriangleAlert, FolderOpen } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { AnimatePresence, MotionConfig, motion, type Variants } from 'framer-motion';
@@ -9,6 +9,7 @@ import { Button } from '../../components/ui/Button';
 import { Segment } from '../../components/compliance-areas';
 import { Donut, SparkBars, KpiCard, useEntered, useCountUp, EASE } from '../../components/ui/Stats';
 import { SessionActionsDrawer, type SessionActionsTarget } from '../../components/user/SessionActionsDrawer';
+import { EmptyState } from '../../components/user/EmptyState';
 import { fetchSessions, type SessionRowData } from '../../api/sessions';
 import { generateRiskMapPdf } from '../../lib/riskMapPdf';
 import { OBLIGATIONS, STATS } from '../ResultsRiskMap';
@@ -43,14 +44,6 @@ type Row = {
   markets: number; duties: number; frac: number; daysAgo: number;
 };
 
-const SESSIONS: Row[] = [
-  { cc: 'IT', domain: 'Tax & VAT', title: 'VAT registration · Italien', risk: 'high', note: 'Schwelle erreicht', markets: 1, duties: 5, frac: 0.8, daysAgo: 0.08 },
-  { cc: 'FR', domain: 'EPR & Packaging', title: 'EPR registration · Frankreich', risk: 'medium', note: 'Frist Q3 2026', markets: 1, duties: 3, frac: 0.55, daysAgo: 1 },
-  { cc: 'UK', domain: 'Data & Privacy', title: 'GDPR audit & DPA review', risk: 'high', note: 'Cookie-Consent', markets: 1, duties: 3, frac: 0.7, daysAgo: 3 },
-  { cc: 'ES', domain: 'Tax & VAT', title: 'VAT thresholds · Spanien', risk: 'low', note: 'nur Beobachtung', markets: 1, duties: 1, frac: 0.25, daysAgo: 7 },
-  { cc: 'DE', domain: 'Data & Privacy', title: 'Cookie-Consent einrichten', risk: 'medium', note: 'Prüfung offen', markets: 1, duties: 2, frac: 0.5, daysAgo: 104 },
-  { cc: 'DE', domain: 'Tax & VAT', title: 'USt-Fahrplan · EU-weit', risk: 'low', note: 'erfüllt', markets: 4, duties: 2, frac: 0.2, daysAgo: 131 },
-];
 
 const DOMAIN_LABEL: Record<string, string> = {
   vat: 'Tax & VAT', tax: 'Tax & VAT',
@@ -137,7 +130,11 @@ export function SessionsPage() {
   }, []);
   useEffect(() => { reload(); }, [reload]);
 
-  const rows = live && live.length > 0 ? live : SESSIONS;
+  // Kein Fixture-Rueckfall mehr (Befund 2026-08-30): ein leeres Konto sah hier
+  // vier erfundene Sitzungen. `live === null` heisst "laedt noch", ein leeres
+  // Feld heisst "es gibt nichts" — zwei Zustaende, die nicht verschmelzen
+  // duerfen, sonst blitzt der Erstzustand bei jedem Aufruf kurz auf.
+  const rows = live ?? [];
   const stale = rows.filter((r) => r.daysAgo >= STALE_DAYS);
   const byRisk = {
     high: rows.filter((r) => r.risk === 'high').length,
@@ -196,6 +193,27 @@ export function SessionsPage() {
       ● {t(`sessions.risk.${r.risk}`)}{r.note ? ` · ${r.note}` : ''} · {t('sessions.markets', { count: r.markets })}
     </span>
   );
+
+  if (live !== null && rows.length === 0) {
+    return (
+      <UserShell>
+        <div className="-mx-8 -my-6 min-h-full bg-gradient-stage px-8 py-7">
+          <div className="mx-auto max-w-[1240px]">
+            <h1 className="font-serif text-[23px] font-bold leading-tight text-fg">
+              <Trans t={t} i18nKey="sessions.title" components={{ accent: <span className="text-fg-accent-emphasis" /> }} />
+            </h1>
+            <EmptyState
+              icon={FolderOpen}
+              title={t('sessions.emptyTitle')}
+              body={t('sessions.emptyBody')}
+              cta={{ label: t('sessions.emptyCta'), onClick: () => navigate(`/${locale}/wizard`) }}
+              hint={t('sessions.emptyHint')}
+            />
+          </div>
+        </div>
+      </UserShell>
+    );
+  }
 
   return (
     <UserShell>

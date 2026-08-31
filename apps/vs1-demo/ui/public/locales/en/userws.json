@@ -172,7 +172,11 @@
     "historyRecalculated": "recalculated",
     "historyAnswersChanged": "answers changed",
     "historyCreated": "session created",
-    "historyScope": "The history belongs to <b>one</b> session — it follows the row you select on the left."
+    "historyScope": "The history belongs to <b>one</b> session — it follows the row you select on the left.",
+    "emptyTitle": "No session saved yet",
+    "emptyBody": "A session records what applies to one market and one area — with its source, risk and progress. It is created at the end of the assistant.",
+    "emptyCta": "Create your first session",
+    "emptyHint": "About six minutes. You can stop at any point."
   },
   "requests": {
     "title": "Your provider <accent>requests</accent>.",
@@ -185,7 +189,10 @@
     "filterReplied": "Replied · 1",
     "filterOverdue": "Overdue · 1",
     "requestActionsAria": "Request actions",
-    "footerStats": "● Average partner response on your workspace: 22h · 87% confirm within SLA · last 30 days"
+    "footerStats": "● Average partner response on your workspace: 22h · 87% confirm within SLA · last 30 days",
+    "emptyTitle": "No requests yet",
+    "emptyBody": "When you contact a provider from a session, the request appears here — with its status, deadline and the conversation.",
+    "emptyCta": "Find matching providers"
   },
   "notifications": {
     "title": "Notifications",
@@ -495,7 +502,10 @@
     "outcomeNo": "No-show",
     "reviewed": "✓ Review submitted",
     "noShowNote": "No refund — the provider received the dossier at booking. We re-match you on request.",
-    "website": "Provider website"
+    "website": "Provider website",
+    "emptyTitle": "No appointments",
+    "emptyBody": "Appointments come from a request: once a provider confirms, the meeting appears here and can be added to your calendar.",
+    "emptyCta": "Find matching providers"
   },
   "review": {
     "eyebrow": "REVIEW",

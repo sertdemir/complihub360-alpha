@@ -172,7 +172,11 @@
     "historyRecalculated": "recalculada",
     "historyAnswersChanged": "respuestas modificadas",
     "historyCreated": "sesión creada",
-    "historyScope": "El historial pertenece a <b>una</b> sesión — cambia con la fila que seleccione a la izquierda."
+    "historyScope": "El historial pertenece a <b>una</b> sesión — cambia con la fila que seleccione a la izquierda.",
+    "emptyTitle": "Todavía no hay sesiones guardadas",
+    "emptyBody": "Una sesión recoge lo que se aplica a un mercado y a un área — con su fuente, su riesgo y su estado. Se crea al final del asistente.",
+    "emptyCta": "Crear la primera sesión",
+    "emptyHint": "Unos seis minutos. Puede detenerse cuando quiera."
   },
   "requests": {
     "title": "Sus <accent>solicitudes</accent> a proveedores.",
@@ -185,7 +189,10 @@
     "filterReplied": "Respondidas · 1",
     "filterOverdue": "Vencidas · 1",
     "requestActionsAria": "Acciones de la solicitud",
-    "footerStats": "● Respuesta media de los socios en su espacio de trabajo: 22 h · 87 % confirma dentro del SLA · últimos 30 días"
+    "footerStats": "● Respuesta media de los socios en su espacio de trabajo: 22 h · 87 % confirma dentro del SLA · últimos 30 días",
+    "emptyTitle": "Todavía no hay solicitudes",
+    "emptyBody": "Cuando contacte con un proveedor desde una sesión, la solicitud aparecerá aquí — con su estado, su plazo y la conversación.",
+    "emptyCta": "Buscar proveedores adecuados"
   },
   "notifications": {
     "title": "Notificaciones",
@@ -495,7 +502,10 @@
     "outcomeNo": "No asistió",
     "reviewed": "✓ Valoración enviada",
     "noShowNote": "Sin reembolso — el proveedor recibió el dossier al reservar. Te reasignamos si lo deseas.",
-    "website": "Sitio web del proveedor"
+    "website": "Sitio web del proveedor",
+    "emptyTitle": "Sin citas",
+    "emptyBody": "Las citas nacen de una solicitud: en cuanto un proveedor confirma, la reunión aparece aquí y puede añadirse a su calendario.",
+    "emptyCta": "Buscar proveedores adecuados"
   },
   "review": {
     "eyebrow": "VALORACIÓN",

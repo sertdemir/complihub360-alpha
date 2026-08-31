@@ -172,7 +172,11 @@
     "historyRecalculated": "neu berechnet",
     "historyAnswersChanged": "Antworten geändert",
     "historyCreated": "Sitzung angelegt",
-    "historyScope": "Der Verlauf gehört zu <b>einer</b> Sitzung — er wechselt mit der Zeile, die Sie links auswählen."
+    "historyScope": "Der Verlauf gehört zu <b>einer</b> Sitzung — er wechselt mit der Zeile, die Sie links auswählen.",
+    "emptyTitle": "Noch keine Sitzung gespeichert",
+    "emptyBody": "Eine Sitzung hält fest, was für einen Markt und einen Bereich gilt — mit Quelle, Risiko und Bearbeitungsstand. Sie entsteht am Ende des Assistenten.",
+    "emptyCta": "Erste Sitzung anlegen",
+    "emptyHint": "Etwa sechs Minuten. Sie können jederzeit aufhören."
   },
   "requests": {
     "title": "Ihre Anbieter-<accent>Anfragen</accent>.",
@@ -185,7 +189,10 @@
     "filterReplied": "Beantwortet · 1",
     "filterOverdue": "Überfällig · 1",
     "requestActionsAria": "Anfrage-Aktionen",
-    "footerStats": "● Durchschnittliche Partner-Antwortzeit in Ihrem Arbeitsbereich: 22 Std. · 87 % bestätigen innerhalb des SLA · letzte 30 Tage"
+    "footerStats": "● Durchschnittliche Partner-Antwortzeit in Ihrem Arbeitsbereich: 22 Std. · 87 % bestätigen innerhalb des SLA · letzte 30 Tage",
+    "emptyTitle": "Noch keine Anfragen",
+    "emptyBody": "Wenn Sie in einer Sitzung einen Anbieter anfragen, steht der Vorgang hier — mit Status, Frist und dem Gesprächsverlauf.",
+    "emptyCta": "Passende Anbieter finden"
   },
   "notifications": {
     "title": "Benachrichtigungen",
@@ -495,7 +502,10 @@
     "outcomeNo": "No-Show",
     "reviewed": "✓ Bewertung abgegeben",
     "noShowNote": "Keine Rückerstattung — der Provider erhielt das Dossier bei Buchung. Auf Wunsch matchen wir dich neu.",
-    "website": "Provider-Website"
+    "website": "Provider-Website",
+    "emptyTitle": "Keine Termine",
+    "emptyBody": "Termine entstehen aus einer Anfrage: Sobald ein Anbieter bestätigt, steht der Gesprächstermin hier und lässt sich in Ihren Kalender übernehmen.",
+    "emptyCta": "Passende Anbieter finden"
   },
   "review": {
     "eyebrow": "BEWERTUNG",

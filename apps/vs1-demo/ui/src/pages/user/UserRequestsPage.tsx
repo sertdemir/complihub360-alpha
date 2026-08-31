@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { ChevronDown, MoreHorizontal } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { ChevronDown, MoreHorizontal, Inbox } from 'lucide-react';
 import { Trans, useTranslation } from 'react-i18next';
 import { UserShell } from '../../components/user/UserShell';
+import { EmptyState } from '../../components/user/EmptyState';
 import { Button } from '../../components/ui/Button';
 import { FilterChip } from '../../components/ui/Badge';
 import { RequestCard, type RequestStatus } from '../../components/ui/RequestCard';
 import { ThreadDrawer } from '../../components/shared/ThreadDrawer';
 import { RequestActionsDrawer, type RequestActionsTarget } from '../../components/user/RequestActionsDrawer';
-import { useApiData } from '../../lib/useApiData';
 import { fetchUserRequests } from '../../api/requests';
 
 // ─── User Dashboard · Requests / Lead Center ──────────────────────────────────
@@ -24,18 +24,6 @@ type Fixture = {
   rawStatus?: string;
 };
 
-const REQUESTS: Fixture[] = [
-  { id: 'RQ-881 · sent 14h ago', status: 'awaiting-confirm', statusLabel: 'Awaiting confirmation', company: 'Studio Bianchi SRL', partner: true,
-    meta: '↗ VAT registration · Italy · avg. reply 18h', action: { label: 'Send reminder', variant: 'accent' }, bucket: 'confirm' },
-  { id: 'RQ-842 · sent 4d ago', status: 'active', statusLabel: 'Active', company: 'Lex Privacy LLP', partner: true,
-    meta: '↗ GDPR audit · UK', action: { label: 'Open thread', variant: 'secondary' }, bucket: 'active' },
-  { id: 'RQ-864 · sent 2d ago', status: 'awaiting-reply', statusLabel: 'Provider replied', company: 'PackComply GmbH', partner: true,
-    meta: '↗ EPR registration · France · reply 8h ago', action: { label: 'Open thread', variant: 'secondary' }, bucket: 'replied' },
-  { id: 'RQ-818 · sent 6h ago · reply ETA 24h', status: 'active', statusLabel: 'Provider confirmed', company: 'Schmidt & Partner',
-    meta: '↗ VAT roadmap · EU-wide', action: { label: 'View thread', variant: 'secondary' }, bucket: 'confirmed' },
-  { id: 'RQ-819 · sent 3h ago · avg. reply 17h', status: 'awaiting-confirm', statusLabel: 'Awaiting confirmation', company: 'Madrid Tax Consultancy', partner: true,
-    meta: '↗ VAT thresholds · Spain', action: { label: 'View request', variant: 'secondary' }, bucket: 'overdue' },
-];
 
 const FILTERS = [
   { key: 'all', labelKey: 'filterAll' },
@@ -55,8 +43,10 @@ const ACTION_KEY: Record<string, string> = {
 };
 
 export function UserRequestsPage() {
-  const { t } = useTranslation('userws');
+  const { t, i18n } = useTranslation('userws');
   const [filter, setFilter] = useState<string>('all');
+  const navigate = useNavigate();
+  const locale = i18n.resolvedLanguage || 'en';
   const [threadFor, setThreadFor] = useState<string | null>(null);
   const tStatus = (label: string) => (STATUS_KEY[label] ? t(`status.${STATUS_KEY[label]}`) : label);
   const tAction = (label: string) => (ACTION_KEY[label] ? t(`actions.${ACTION_KEY[label]}`) : label);
@@ -64,11 +54,22 @@ export function UserRequestsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const deepThread = searchParams.get('thread');
   if (deepThread && threadFor !== deepThread) setThreadFor(deepThread);
-  const { data: rows } = useApiData<Fixture[]>(fetchUserRequests, REQUESTS);
+  // Kein Fixture-Rueckfall mehr (Befund 2026-08-30): useApiData behielt bei
+  // einem leeren Ergebnis ausdruecklich die Fixture ("so demos stay
+  // meaningful"), und ein neues Konto sah damit drei erfundene Anfragen.
+  // `null` heisst laedt, `[]` heisst es gibt keine.
+  const [rows, setRows] = useState<Fixture[] | null>(null);
+  useEffect(() => {
+    let alive = true;
+    fetchUserRequests()
+      .then((r) => { if (alive) setRows(r); })
+      .catch(() => { if (alive) setRows([]); });
+    return () => { alive = false; };
+  }, []);
   // B14: "⋯" actions drawer + local override after a withdraw (no refetch API).
   const [actionsFor, setActionsFor] = useState<RequestActionsTarget | null>(null);
   const [withdrawnIds, setWithdrawnIds] = useState<Set<string>>(new Set());
-  const effective = rows.map((r) =>
+  const effective = (rows ?? []).map((r) =>
     r.uuid && withdrawnIds.has(r.uuid)
       ? { ...r, status: 'active' as RequestStatus, statusLabel: 'Withdrawn', bucket: 'closed' as const, rawStatus: 'withdrawn' }
       : r,
@@ -103,6 +104,15 @@ export function UserRequestsPage() {
             {t('shared.sortLastUpdated')} <ChevronDown size={12} />
           </button>
         </div>
+
+        {rows !== null && rows.length === 0 ? (
+          <EmptyState
+            icon={Inbox}
+            title={t('requests.emptyTitle')}
+            body={t('requests.emptyBody')}
+            cta={{ label: t('requests.emptyCta'), onClick: () => navigate(`/${locale}/wizard`) }}
+          />
+        ) : null}
 
         <div className="space-y-2.5">
           {list.map((r) => (
