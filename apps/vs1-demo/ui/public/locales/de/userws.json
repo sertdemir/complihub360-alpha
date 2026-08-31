@@ -534,8 +534,8 @@
     "upgradeSuccess": "Assistant Pro ist aktiv — willkommen an Bord! Fragen Sie los."
   },
   "termine": {
-    "title": "Deine <accent>Termine</accent>.",
-    "sub": "Gebuchte Erstgespräche mit deinen Spezialisten — Identität und Kontakt sind seit der Buchung sichtbar.",
+    "title": "Ihre <accent>Termine</accent>.",
+    "sub": "Gebuchte Erstgespräche mit Ihren Spezialisten — Identität und Kontakt sind seit der Buchung sichtbar.",
     "upcoming": "KOMMEND",
     "past": "VERGANGEN",
     "reschedule": "Verschieben",
@@ -545,7 +545,7 @@
     "cancelConfirmBody": "Der Termin am {{date}} wird abgesagt und der Anbieter benachrichtigt. Das lässt sich nicht rückgängig machen; die Vermittlungsgebühr fiel bereits bei der Buchung an.",
     "cancelConfirmCta": "Termin stornieren",
     "cancelConfirmBack": "Behalten",
-    "review": "Provider bewerten",
+    "review": "Anbieter bewerten",
     "emptyUpcoming": "Keine anstehenden Termine — buchen Sie einen aus Ihrer Risk Map.",
     "emptyPast": "Noch keine vergangenen Termine.",
     "status": {
@@ -555,12 +555,12 @@
       "no_show": "NICHT ERSCHIENEN",
       "outcome_open": "ERGEBNIS OFFEN"
     },
-    "outcomeQuestion": "Hat der Termin stattgefunden?",
-    "outcomeYes": "Ja",
-    "outcomeNo": "No-Show",
+    "outcomeQuestion": "Hat dieser Termin stattgefunden?",
+    "outcomeYes": "Ja, hat stattgefunden",
+    "outcomeNo": "Anbieter war nicht da",
     "reviewed": "✓ Bewertung abgegeben",
-    "noShowNote": "Keine Rückerstattung — der Provider erhielt das Dossier bei Buchung. Auf Wunsch matchen wir dich neu.",
-    "website": "Provider-Website",
+    "noShowNote": "Keine Rückerstattung — der Anbieter erhielt das Dossier bei der Buchung. Auf Wunsch vermitteln wir Sie neu.",
+    "website": "Anbieter-Website",
     "emptyTitle": "Keine Termine",
     "emptyBody": "Termine entstehen aus einer Anfrage: Sobald ein Anbieter bestätigt, steht der Gesprächstermin hier und lässt sich in Ihren Kalender übernehmen.",
     "emptyCta": "Passende Anbieter finden",
@@ -569,7 +569,15 @@
     "emptyStep2Title": "Abstimmen",
     "emptyStep2Body": "Vorschläge hin und her, bis es passt.",
     "emptyStep3Title": "Sprechen",
-    "emptyStep3Body": "Termin steht — mit Namen und Kalendereintrag."
+    "emptyStep3Body": "Termin steht — mit Namen und Kalendereintrag.",
+    "needsAnswer": "Braucht Ihre Antwort",
+    "nextLabel": "Als Nächstes",
+    "nextToday": "heute",
+    "nextTomorrow": "morgen",
+    "nextInDays_one": "in {{count}} Tag",
+    "nextInDays_other": "in {{count}} Tagen",
+    "addToCalendar": "In den Kalender",
+    "moreActions": "Weitere Aktionen"
   },
   "review": {
     "eyebrow": "BEWERTUNG",

@@ -534,8 +534,8 @@
     "upgradeSuccess": "Assistant Pro está activo — ¡bienvenido! Pregunte lo que quiera."
   },
   "termine": {
-    "title": "Tus <accent>citas</accent>.",
-    "sub": "Llamadas iniciales reservadas con tus especialistas — identidad y contacto visibles desde la reserva.",
+    "title": "Sus <accent>citas</accent>.",
+    "sub": "Llamadas iniciales reservadas con sus especialistas — identidad y contacto visibles desde la reserva.",
     "upcoming": "PRÓXIMAS",
     "past": "PASADAS",
     "reschedule": "Reprogramar",
@@ -546,7 +546,7 @@
     "cancelConfirmCta": "Cancelar la cita",
     "cancelConfirmBack": "Mantenerla",
     "review": "Valorar al proveedor",
-    "emptyUpcoming": "No hay citas próximas — reserva una desde tu risk map.",
+    "emptyUpcoming": "No hay citas próximas — reserve una desde su risk map.",
     "emptyPast": "Aún no hay citas pasadas.",
     "status": {
       "confirmed": "CONFIRMADA",
@@ -555,11 +555,11 @@
       "no_show": "NO ASISTIÓ",
       "outcome_open": "RESULTADO PENDIENTE"
     },
-    "outcomeQuestion": "¿Tuvo lugar la cita?",
-    "outcomeYes": "Sí",
-    "outcomeNo": "No asistió",
+    "outcomeQuestion": "¿Se celebró esta cita?",
+    "outcomeYes": "Sí, se celebró",
+    "outcomeNo": "El proveedor no asistió",
     "reviewed": "✓ Valoración enviada",
-    "noShowNote": "Sin reembolso — el proveedor recibió el dossier al reservar. Te reasignamos si lo deseas.",
+    "noShowNote": "Sin reembolso — el proveedor recibió el dossier al reservar. Le reasignamos si lo desea.",
     "website": "Sitio web del proveedor",
     "emptyTitle": "Sin citas",
     "emptyBody": "Las citas nacen de una solicitud: en cuanto un proveedor confirma, la reunión aparece aquí y puede añadirse a su calendario.",
@@ -569,7 +569,15 @@
     "emptyStep2Title": "Acordar",
     "emptyStep2Body": "Propuestas de ida y vuelta hasta encajar.",
     "emptyStep3Title": "Hablar",
-    "emptyStep3Body": "La cita queda fijada — con nombre y entrada de calendario."
+    "emptyStep3Body": "La cita queda fijada — con nombre y entrada de calendario.",
+    "needsAnswer": "Requiere su respuesta",
+    "nextLabel": "Próxima cita",
+    "nextToday": "hoy",
+    "nextTomorrow": "mañana",
+    "nextInDays_one": "en {{count}} día",
+    "nextInDays_other": "en {{count}} días",
+    "addToCalendar": "Añadir al calendario",
+    "moreActions": "Más acciones"
   },
   "review": {
     "eyebrow": "VALORACIÓN",

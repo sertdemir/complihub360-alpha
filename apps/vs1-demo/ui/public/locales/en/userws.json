@@ -555,9 +555,9 @@
       "no_show": "NO-SHOW",
       "outcome_open": "OUTCOME OPEN"
     },
-    "outcomeQuestion": "Did the appointment take place?",
-    "outcomeYes": "Yes",
-    "outcomeNo": "No-show",
+    "outcomeQuestion": "Did this appointment take place?",
+    "outcomeYes": "Yes, it took place",
+    "outcomeNo": "Provider did not show",
     "reviewed": "✓ Review submitted",
     "noShowNote": "No refund — the provider received the dossier at booking. We re-match you on request.",
     "website": "Provider website",
@@ -569,7 +569,15 @@
     "emptyStep2Title": "Agree",
     "emptyStep2Body": "Proposals back and forth until it fits.",
     "emptyStep3Title": "Talk",
-    "emptyStep3Body": "The appointment stands — with a name and a calendar entry."
+    "emptyStep3Body": "The appointment stands — with a name and a calendar entry.",
+    "needsAnswer": "Needs your answer",
+    "nextLabel": "Up next",
+    "nextToday": "today",
+    "nextTomorrow": "tomorrow",
+    "nextInDays_one": "in {{count}} day",
+    "nextInDays_other": "in {{count}} days",
+    "addToCalendar": "Add to calendar",
+    "moreActions": "More actions"
   },
   "review": {
     "eyebrow": "REVIEW",

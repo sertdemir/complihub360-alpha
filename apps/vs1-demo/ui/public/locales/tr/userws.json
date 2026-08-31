@@ -534,8 +534,8 @@
     "upgradeSuccess": "Assistant Pro etkin — aramıza hoş geldiniz! Sorularınızı sorabilirsiniz."
   },
   "termine": {
-    "title": "<accent>Randevuların</accent>.",
-    "sub": "Uzmanlarınla planlanmış ilk görüşmeler — kimlik ve iletişim, rezervasyondan itibaren görünür.",
+    "title": "<accent>Randevularınız</accent>.",
+    "sub": "Uzmanlarınızla planlanmış ilk görüşmeler — kimlik ve iletişim, rezervasyondan itibaren görünür.",
     "upcoming": "YAKLAŞAN",
     "past": "GEÇMİŞ",
     "reschedule": "Ertele",
@@ -546,7 +546,7 @@
     "cancelConfirmCta": "Randevuyu iptal et",
     "cancelConfirmBack": "Vazgeç",
     "review": "Sağlayıcıyı değerlendir",
-    "emptyUpcoming": "Yaklaşan randevu yok — risk haritandan bir tane planla.",
+    "emptyUpcoming": "Yaklaşan randevu yok — risk haritanızdan bir tane planlayın.",
     "emptyPast": "Henüz geçmiş randevu yok.",
     "status": {
       "confirmed": "ONAYLANDI",
@@ -555,11 +555,11 @@
       "no_show": "KATILMADI",
       "outcome_open": "SONUÇ BEKLİYOR"
     },
-    "outcomeQuestion": "Randevu gerçekleşti mi?",
-    "outcomeYes": "Evet",
-    "outcomeNo": "Gelmedi",
+    "outcomeQuestion": "Bu randevu gerçekleşti mi?",
+    "outcomeYes": "Evet, gerçekleşti",
+    "outcomeNo": "Sağlayıcı gelmedi",
     "reviewed": "✓ Değerlendirme gönderildi",
-    "noShowNote": "İade yok — sağlayıcı dosyayı rezervasyonda aldı. İstersen seni yeniden eşleştiririz.",
+    "noShowNote": "İade yok — sağlayıcı dosyayı rezervasyonda aldı. İsterseniz sizi yeniden eşleştiririz.",
     "website": "Sağlayıcı web sitesi",
     "emptyTitle": "Randevu yok",
     "emptyBody": "Randevular bir talepten doğar: bir sağlayıcı onayladığında görüşme burada görünür ve takviminize eklenebilir.",
@@ -569,7 +569,15 @@
     "emptyStep2Title": "Uzlaşın",
     "emptyStep2Body": "Uyana kadar karşılıklı öneriler.",
     "emptyStep3Title": "Görüşün",
-    "emptyStep3Body": "Randevu kesinleşti — isimle ve takvim kaydıyla."
+    "emptyStep3Body": "Randevu kesinleşti — isimle ve takvim kaydıyla.",
+    "needsAnswer": "Yanıtınızı bekliyor",
+    "nextLabel": "Sıradaki",
+    "nextToday": "bugün",
+    "nextTomorrow": "yarın",
+    "nextInDays_one": "{{count}} gün içinde",
+    "nextInDays_other": "{{count}} gün içinde",
+    "addToCalendar": "Takvime ekle",
+    "moreActions": "Diğer işlemler"
   },
   "review": {
     "eyebrow": "DEĞERLENDİRME",
