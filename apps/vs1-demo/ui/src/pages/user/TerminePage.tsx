@@ -8,6 +8,7 @@ import { Tag } from '../../components/ui/Tag';
 import { fetchUserBookings, cancelBooking, markOutcome, providerWebsiteHref, type UserBooking, type BookingStatus } from '../../api/bookings';
 import { ReviewDrawer, type ReviewTarget } from '../../components/user/ReviewDrawer';
 import { RescheduleDrawer, type RescheduleTarget } from '../../components/user/RescheduleDrawer';
+import { ConfirmDrawer, type ConfirmSpec } from '../../components/provider/ConfirmDrawer';
 import { EmptyState } from '../../components/user/EmptyState';
 
 // ─── User Dashboard · Termine (bookings) ─────────────────────────────────────
@@ -18,6 +19,10 @@ import { EmptyState } from '../../components/user/EmptyState';
 
 interface Row {
   id: string;
+  // Die rohen Zeitpunkte bleiben an der Zeile. Die .ics-Datei braucht sie —
+  // sie aus den formatierten Anzeigezeilen zurueckzulesen waere Unsinn.
+  slotStartIso: string;
+  slotEndIso: string | null;
   dateLine: string;   // "Mo, 12. Aug 2026"
   timeLine: string;   // "10:00–10:30 · Video-Call"
   provider: string;   // clear name — revealed at booking
@@ -41,6 +46,8 @@ function toRows(bookings: UserBooking[], locale: string): Row[] {
     const end = b.slotEnd ? new Date(b.slotEnd) : null;
     return {
       id: b.id,
+      slotStartIso: b.slotStart,
+      slotEndIso: b.slotEnd,
       dateLine: df.format(start),
       timeLine: `${tf.format(start)}${end ? `–${tf.format(end)}` : ''} · Video-Call`,
       provider: b.providerName + (b.providerRegion ? ` — ${b.providerRegion}` : ''),
@@ -54,10 +61,28 @@ function toRows(bookings: UserBooking[], locale: string): Row[] {
 }
 
 // Client-side .ics so the card action is real without a mail roundtrip.
-function icsHref(r: Row): string {
+//
+// Bis 2026-08-31 fehlten DTSTART, DTEND, UID und DTSTAMP — die eine Aktion,
+// deren ganzer Zweck das Datum ist, trug keins. Kalender wiesen das VEVENT ab
+// oder legten einen Eintrag ohne Zeit an; der Knopf hat nie funktioniert.
+// RFC 5545: Zeitpunkte als UTC-Instants (…Z), Text mit \\ \; \, und
+// Zeilenumbruechen als \n maskiert statt plattgeklopft.
+export const icsUtc = (iso: string) => new Date(iso).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+export const icsEsc = (s: string) => s.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+
+export function icsHref(r: Pick<Row, 'id' | 'slotStartIso' | 'slotEndIso' | 'provider' | 'meta'>): string {
+  const start = icsUtc(r.slotStartIso);
+  // Ohne Ende waere der Eintrag punktfoermig; 30 Minuten sind die Slot-Laenge
+  // der Buchungsstrecke (POST /scheduling setzt slot_end genauso).
+  const end = icsUtc(r.slotEndIso ?? new Date(new Date(r.slotStartIso).getTime() + 30 * 60 * 1000).toISOString());
   const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//CompliHub360//Termine//DE', 'BEGIN:VEVENT',
-    `SUMMARY:CompliHub360 Erstgespräch — ${r.provider.replace(/[,;]/g, ' ')}`,
-    `DESCRIPTION:${r.meta.replace(/[,;]/g, ' ')}`, 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+    `UID:${r.id}@complihub360.com`,
+    `DTSTAMP:${icsUtc(new Date().toISOString())}`,
+    `DTSTART:${start}`,
+    `DTEND:${end}`,
+    `SUMMARY:${icsEsc(`CompliHub360 Erstgespräch — ${r.provider}`)}`,
+    `DESCRIPTION:${icsEsc(r.meta)}`,
+    'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
   return `data:text/calendar;charset=utf-8,${encodeURIComponent(ics)}`;
 }
 
@@ -92,16 +117,28 @@ export function TerminePage() {
     if (moved[r.id]) {
       const start = new Date(moved[r.id]);
       const end = new Date(start.getTime() + 30 * 60 * 1000);
-      return { ...r, dateLine: df.format(start), timeLine: `${tf.format(start)}–${tf.format(end)} · Video-Call`, needsOutcome: false };
+      return { ...r, slotStartIso: start.toISOString(), slotEndIso: end.toISOString(), dateLine: df.format(start), timeLine: `${tf.format(start)}–${tf.format(end)} · Video-Call`, needsOutcome: false };
     }
     return r;
   });
   const upcoming = rows.filter((r) => r.status === 'confirmed' && !r.needsOutcome);
   const past = rows.filter((r) => r.status !== 'confirmed' || r.needsOutcome);
 
-  const onCancel = async (id: string) => {
-    setCancelled((s) => new Set(s).add(id));
-    cancelBooking(id).catch(() => {});
+  // Stornieren fragt nach (Befund 2026-08-31): vorher galt EIN Klick auf
+  // einen Textlink, der aussah wie ».ics« daneben — ohne Rueckfrage, ohne
+  // Rueckweg, und die Lead-Gebuehr ist bezahlt. Der ConfirmDrawer nennt die
+  // Folgen, erst dann laeuft die Absage.
+  const [confirm, setConfirm] = useState<ConfirmSpec | null>(null);
+  const onCancel = (r: Row) => {
+    setConfirm({
+      title: t('termine.cancelConfirmTitle', { provider: r.provider }),
+      consequence: t('termine.cancelConfirmBody', { date: `${r.dateLine}, ${r.timeLine}` }),
+      confirmLabel: t('termine.cancelConfirmCta'),
+      onConfirm: () => {
+        setCancelled((s) => new Set(s).add(r.id));
+        cancelBooking(r.id).catch(() => {});
+      },
+    });
   };
   // Watchdog outcome check (§1/§3): slot passed → "did it take place?".
   const onOutcome = (id: string, status: 'completed' | 'no_show') => {
@@ -146,7 +183,7 @@ export function TerminePage() {
           <p className="text-[12px] text-fg-brand">
             <button type="button" onClick={() => setRescheduleFor({ bookingId: r.id, providerKey: r.providerKey, providerName: r.provider, currentLine: `${r.dateLine} · ${r.timeLine}` })} className="hover:underline">{t('termine.reschedule')}</button>
             {' · '}
-            <button type="button" onClick={() => onCancel(r.id)} className="hover:underline">{t('termine.cancel')}</button>
+            <button type="button" onClick={() => onCancel(r)} className="hover:underline">{t('termine.cancel')}</button>
             {' · '}
             <a href={icsHref(r)} download="complihub-termin.ics" className="hover:underline">.ics</a>
           </p>
@@ -193,6 +230,16 @@ export function TerminePage() {
       </div>
       <ReviewDrawer target={reviewFor} onClose={() => setReviewFor(null)} onSubmitted={(id) => setReviewed((s) => new Set(s).add(id))} />
       <RescheduleDrawer target={rescheduleFor} onClose={() => setRescheduleFor(null)} onRescheduled={(id, iso) => setMoved((m) => ({ ...m, [id]: iso }))} />
+      <ConfirmDrawer
+        spec={confirm}
+        onClose={() => setConfirm(null)}
+        labels={{
+          eyebrow: t('termine.cancelConfirmEyebrow'),
+          cancel: t('termine.cancelConfirmBack'),
+          confirm: t('termine.cancelConfirmCta'),
+          fallbackTitle: t('termine.cancel'),
+        }}
+      />
     </UserShell>
   );
 }

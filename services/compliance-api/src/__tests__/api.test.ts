@@ -349,6 +349,59 @@ describe('PATCH /api/v1/scheduling/:id (reschedule + outcome guards)', () => {
     });
 });
 
+describe('PATCH /api/v1/scheduling/:id — Absage', () => {
+    // Befund 2026-08-31: der Storno-Pfad schrieb nicht, WER abgesagt hat, und
+    // der Anbieter erfuhr nichts (der Verschieben-Pfad mailte, dieser nicht).
+    const seedBooking = () => {
+        const id = randomUUID();
+        (db.scheduling ??= []).push({
+            id, provider_key: 'test-kanzlei', user_id: USER_ID,
+            slot_start: new Date(Date.now() + 86400_000).toISOString(), status: 'confirmed',
+        });
+        return id;
+    };
+
+    it('schreibt cancelled_by und cancelled_at an die Zeile', async () => {
+        seedProvider();
+        const id = seedBooking();
+        const r = await api(`/api/v1/scheduling/${id}`, {
+            method: 'PATCH', auth: 'jwt', body: JSON.stringify({ status: 'cancelled' }),
+        });
+        expect(r.status).toBe(200);
+        const row = db.scheduling.find((b: any) => b.id === id);
+        expect(row.cancelled_by).toBe('user');
+        expect(row.cancelled_at).toBeTruthy();
+    });
+
+    it('benachrichtigt den Anbieter per Mail (Outbox ohne Resend-Key)', async () => {
+        seedProvider();
+        const id = seedBooking();
+        await api(`/api/v1/scheduling/${id}`, {
+            method: 'PATCH', auth: 'jwt', body: JSON.stringify({ status: 'cancelled' }),
+        });
+        // Der Mailversand ist nebenlaeufig — kurz nachfassen statt sofort urteilen.
+        let mail: any;
+        for (let i = 0; i < 20 && !mail; i++) {
+            await new Promise((r) => setTimeout(r, 25));
+            mail = (db.event_log ?? []).find((e: any) =>
+                e.type === 'email_outbox' && e.payload?.kind === 'cancellation_provider');
+        }
+        expect(mail?.payload?.to).toBe('geheim@testkanzlei.example');
+    });
+
+    it('laesst ein Outcome (completed) ohne cancelled_by durch', async () => {
+        seedProvider();
+        const id = seedBooking();
+        db.scheduling.find((b: any) => b.id === id).slot_start = new Date(Date.now() - 3600_000).toISOString();
+        await api(`/api/v1/scheduling/${id}`, {
+            method: 'PATCH', auth: 'jwt', body: JSON.stringify({ status: 'completed' }),
+        });
+        const row = db.scheduling.find((b: any) => b.id === id);
+        expect(row.status).toBe('completed');
+        expect(row.cancelled_by).toBeUndefined();
+    });
+});
+
 describe('POST /api/v1/reviews', () => {
     it('stores the review and recomputes the provider aggregate rating', async () => {
         const p = seedProvider({ rating: 5 });

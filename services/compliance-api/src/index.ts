@@ -7,7 +7,7 @@ import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeC
 import { generateRelevantSubdomains, isKnownCountry, ComplianceDomain, type CountryCode, type IndustryType, type BusinessModel, type EnrichedSubdomain } from "@complihub/compliance-engine";
 
 import { supabaseApi } from "./supabase.js";
-import { sendMagicLinkMail, sendEmailChangeMail, sendRescheduleMail } from "./mailer.js";
+import { sendMagicLinkMail, sendEmailChangeMail, sendRescheduleMail, sendCancellationMail } from "./mailer.js";
 import { handleAssistantChat, handleAssistantCheckout, handleAssistantVerify } from "./assistant.js";
 import { handleAuthAdopt } from "./adoption.js";
 import { handleDashboard, SLUG_TO_ENGINE } from "./dashboard.js";
@@ -942,7 +942,20 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     res.end(JSON.stringify({ ok: true, id: bookingId, status: b.status, slot_start: start.toISOString(), slot_end: end.toISOString(), correlationId }));
                     return;
                 }
-                await supabaseApi.update('scheduling', { id: bookingId }, { status, updated_at: new Date().toISOString() });
+                const jetzt = new Date().toISOString();
+                // Wer abgesagt hat, wird mitgeschrieben. Ohne diese Spalte ist
+                // eine Absage des Mandanten von einer des Anbieters nicht zu
+                // unterscheiden — und damit jede Auswertung darueber Raterei
+                // (Migration 20260831000001).
+                await supabaseApi.update('scheduling', { id: bookingId }, {
+                    status, updated_at: jetzt,
+                    ...(status === 'cancelled'
+                        // Diese Route gehoert dem Mandanten (403 oben, wenn die
+                        // Buchung nicht seine ist). Der Server-Key handelt im
+                        // Auftrag des Betriebs, nicht des Anbieters.
+                        ? { cancelled_by: authViaApiKey ? 'system' : 'user', cancelled_at: jetzt }
+                        : {}),
+                });
                 const evType = status === 'cancelled' ? 'user_cancelled' : status === 'no_show' ? 'no_show' : 'outcome_check';
                 await supabaseApi.insert('event_log', { type: evType, payload: { bookingId, providerKey: b.provider_key, userId: b.user_id, status } });
                 if (status === 'cancelled') {
@@ -951,6 +964,22 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         subject: 'booking', subjectId: bookingId,
                         payload: { providerKey: b.provider_key, from: b.slot_start },
                     });
+                    // Der Anbieter erfuhr bis 2026-08-31 GAR NICHTS von einer
+                    // Absage — der Verschieben-Pfad mailte, dieser nicht. Er
+                    // behielt den Termin im Kalender und erschien zum Gespraech.
+                    // Wie beim Verschieben: nebenlaeufig, Zustellprobleme sind
+                    // Ereignisse im Protokoll und keine Fehler der Route.
+                    (async () => {
+                        const provs = (await supabaseApi.select('providers', { provider_key: b.provider_key }, { limit: 1 })) as any[];
+                        await sendCancellationMail({
+                            to: provs[0]?.contact_email ?? null,
+                            bookingId,
+                            providerKey: b.provider_key,
+                            slotIso: b.slot_start,
+                            locale: provs[0]?.languages?.[0],
+                            correlationId,
+                        });
+                    })().catch(() => { /* im Mailer protokolliert */ });
                 }
                 // Outcome "completed" feeds the quality score (spec §6): bump the
                 // provider's completed_count used in the anonymous listing card.
