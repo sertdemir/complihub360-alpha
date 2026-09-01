@@ -7,6 +7,8 @@
 // packages/compliance-engine/domain-schema.ts, der eine Neuberechnung
 // ueberlebt.
 
+import { apiFetch } from './client';
+
 export type ObligationStatus = 'open' | 'in_progress' | 'done' | 'not_applicable';
 
 export interface ObligationStatusRow {
@@ -19,9 +21,7 @@ export interface ObligationStatusRow {
 
 /** Nur die ABWEICHUNGEN — was nicht zurueckkommt, ist 'open'. */
 export async function fetchObligationStatus(sessionId: string): Promise<Record<string, ObligationStatusRow>> {
-  const res = await fetch(`/api/v1/session/${sessionId}/obligations`);
-  if (!res.ok) throw new Error('obligation status unavailable');
-  const data = (await res.json()) as { items?: ObligationStatusRow[] };
+  const data = await apiFetch<{ items?: ObligationStatusRow[] }>(`/api/v1/session/${sessionId}/obligations`);
   const map: Record<string, ObligationStatusRow> = {};
   for (const item of data.items ?? []) map[item.obligation_id] = item;
   return map;
@@ -36,10 +36,8 @@ export async function setObligationStatus(
   status: ObligationStatus,
   note?: string,
 ): Promise<void> {
-  const res = await fetch(`/api/v1/session/${sessionId}/obligations/${obligationId}`, {
+  await apiFetch(`/api/v1/session/${sessionId}/obligations/${obligationId}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status, ...(note ? { note } : {}) }),
   });
-  if (!res.ok) throw new Error('obligation status write failed');
 }

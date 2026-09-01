@@ -554,9 +554,18 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         });
     } else if (req.method === 'GET' && /^\/api\/v1\/session\/[0-9a-f-]{36}\/obligations$/.test(req.url || '')) {
         // Bearbeitungs-Stand der Pflichten einer Sitzung. Nur ABWEICHUNGEN
-        // liegen in der Tabelle — was nicht drinsteht, ist 'open'.
+        // liegen in der Tabelle — was nicht drinsteht, ist 'open'. Gebunden an
+        // den Eigentümer der Sitzung: fremde Sitzungen sind unsichtbar (404,
+        // nicht 403 — Existenz nicht verraten); der Server-Key behält die
+        // Betriebssicht.
         const sessionId = (req.url || '').split('/')[4];
         try {
+            const own = (await supabaseApi.select('sessions', { id: sessionId }, { limit: 1 })) as Array<Record<string, unknown>>;
+            if (!own.length || !(authViaApiKey || (authUserId && own[0].user_id === authUserId))) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Session not found', correlationId }));
+                return;
+            }
             const rows = (await supabaseApi.select('session_obligation_status', { session_id: sessionId }, { limit: 200 })) as Array<Record<string, unknown>>;
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -591,8 +600,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     res.end(JSON.stringify({ errorCode: 'BAD_STATUS', message: 'Unknown status', correlationId }));
                     return;
                 }
-                const owner = (await supabaseApi.select('sessions', { id: sessionId }, { limit: 1 })) as unknown[];
-                if (!owner.length) {
+                const owner = (await supabaseApi.select('sessions', { id: sessionId }, { limit: 1 })) as Array<Record<string, unknown>>;
+                // Wie beim Lesen: nur der Eigentümer (oder der Server-Key)
+                // darf Stände setzen — fremde Sitzungen bleiben ein 404.
+                if (!owner.length || !(authViaApiKey || (authUserId && owner[0].user_id === authUserId))) {
                     res.writeHead(404, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Session not found', correlationId }));
                     return;
