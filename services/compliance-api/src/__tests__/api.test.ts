@@ -555,6 +555,26 @@ describe('Pflicht-Status je Sitzung', () => {
         const r = await api(`/api/v1/session/${randomUUID()}/obligations/prod-epr`, { method: 'PUT', body: JSON.stringify({ status: 'done' }) });
         expect(r.status).toBe(404);
     });
+
+    // Empfaengerbindung (gleiches Muster wie Anfragen/Benachrichtigungen):
+    // der JWT-Nutzer sieht und setzt nur Staende der EIGENEN Sitzungen.
+    it('liest die eigene Sitzung per JWT', async () => {
+        const id = seedSession();
+        const r = await api(`/api/v1/session/${id}/obligations`, { auth: 'jwt' });
+        expect(r.status).toBe(200);
+        expect(r.body.items).toEqual([]);
+    });
+
+    it('verbirgt fremde Sitzungen als 404 — lesen wie schreiben', async () => {
+        const fremd = { id: randomUUID(), user_id: randomUUID(), country: 'DE', categories: ['vat'], answers: {}, status: 'active' };
+        (db.sessions ??= []).push(fremd);
+        const read = await api(`/api/v1/session/${fremd.id}/obligations`, { auth: 'jwt' });
+        expect(read.status).toBe(404);
+        const write = await api(`/api/v1/session/${fremd.id}/obligations/prod-epr`, {
+            method: 'PUT', auth: 'jwt', body: JSON.stringify({ status: 'done' }),
+        });
+        expect(write.status).toBe(404);
+    });
 });
 
 describe('GET /api/v1/sessions — welcher Ausweis zaehlt', () => {
