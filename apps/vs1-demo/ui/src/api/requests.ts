@@ -98,6 +98,14 @@ export interface UserRequestRow {
   bucket: 'confirm' | 'confirmed' | 'replied' | 'overdue' | 'active' | 'closed';
   /** Raw engagement status — the B14 actions drawer gates remind/withdraw on it. */
   rawStatus?: string;
+  /** Rohwerte fuer die Anzeige (4B): Zeitpunkte lokalisiert das UI selbst,
+   *  Bereich/Markt werden dort uebersetzt statt als Slug gezeigt. */
+  createdAt?: string;
+  category?: string;
+  country?: string;
+  /** Die gerade laufende Frist (confirm 24h / reply 48h) — null, wenn keine läuft. */
+  slaDeadline?: string | null;
+  slaWindowMs?: number;
 }
 
 const USER_VIEW: Record<string, Pick<UserRequestRow, 'status' | 'statusLabel' | 'action' | 'bucket'>> = {
@@ -125,17 +133,27 @@ export async function fetchUserRequests(): Promise<UserRequestRow[]> {
   const { requests } = await apiFetch<{ ok: boolean; requests: EngagementRow[] }>('/api/v1/requests');
   return requests.map((r) => {
     const v = USER_VIEW[r.status] ?? USER_VIEW.created;
+    // Welche Frist laeuft? Vor der Bestaetigung die 24h-Confirm-Frist, nach ihr
+    // die 48h-Reply-Frist. Beantwortet/abgeschlossen laeuft nichts mehr.
+    const slaDeadline = v.bucket === 'confirm' || v.bucket === 'overdue'
+      ? r.sla_confirm_deadline ?? null
+      : v.bucket === 'confirmed' ? r.sla_reply_deadline ?? null : null;
     return {
       uuid: r.id,
-      id: `RQ-${r.id.slice(0, 4).toUpperCase()} · sent ${relTime(r.created_at)}`,
+      id: `RQ-${r.id.slice(0, 4).toUpperCase()}`,
       status: v.status,
       statusLabel: v.statusLabel,
       company: PROVIDER_NAMES[r.provider_key] ?? r.provider_key,
       partner: true,
-      meta: `↗ ${r.category} · ${r.country}`,
+      meta: `${r.category} · ${r.country}`,
       action: v.action,
       bucket: v.bucket,
       rawStatus: r.status,
+      createdAt: r.created_at,
+      category: r.category,
+      country: r.country,
+      slaDeadline,
+      slaWindowMs: v.bucket === 'confirmed' ? 48 * 3_600_000 : 24 * 3_600_000,
     };
   });
 }

@@ -16,7 +16,9 @@
     "active": "Activa",
     "providerReplied": "El proveedor respondió",
     "providerConfirmed": "El proveedor confirmó",
-    "withdrawn": "Retirada"
+    "withdrawn": "Retirada",
+    "declined": "Rechazada",
+    "expired": "Vencida"
   },
   "actions": {
     "sendReminder": "Enviar recordatorio",
@@ -210,7 +212,16 @@
     "emptyStep2Body": "Su consulta — sin su nombre real.",
     "emptyStep3Title": "Seguir",
     "emptyStep3Body": "Confirmación y respuesta, con plazo.",
-    "subCounts": "{{active}} activas · {{overdue}} vencidas"
+    "subCounts": "{{active}} activas · {{overdue}} vencidas",
+    "subWaiting_one": "{{count}} solicitud espera su respuesta.",
+    "subWaiting_other": "{{count}} solicitudes esperan su respuesta.",
+    "secYou": "Espera su respuesta",
+    "secProvider": "Espera al proveedor",
+    "secDone": "Cerradas",
+    "actionRead": "Leer respuesta",
+    "actionOpen": "Abrir historial",
+    "slaLabel": "Plazo",
+    "slaExpired": "vencido"
   },
   "notifications": {
     "title": "Notificaciones",
@@ -577,7 +588,11 @@
     "nextInDays_one": "en {{count}} día",
     "nextInDays_other": "en {{count}} días",
     "addToCalendar": "Añadir al calendario",
-    "moreActions": "Más acciones"
+    "moreActions": "Más acciones",
+    "tabs": {
+      "anfragen": "Solicitudes",
+      "termine": "Citas"
+    }
   },
   "review": {
     "eyebrow": "VALORACIÓN",

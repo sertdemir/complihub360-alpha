@@ -22,7 +22,9 @@ import { join } from 'node:path';
 // Der Test liest die Quelle statt zu rendern: er soll die REGEL sichern, nicht
 // vier Seiten mit ihren Drawern, Charts und i18n-Baeumen aufbauen.
 
-const SEITEN = ['SessionsPage.tsx', 'UserRequestsPage.tsx', 'TerminePage.tsx', 'UserHomePage.tsx'];
+// UserRequestsPage ging 2026-09-01 im Termine-Reiter auf (Canvas 1C); die
+// Anfragen-Ladekette lebt jetzt in der TerminePage, der Tab bekommt Props.
+const SEITEN = ['SessionsPage.tsx', 'TerminePage.tsx', 'UserHomePage.tsx'];
 
 const quelle = (datei: string) => readFileSync(join(__dirname, datei), 'utf8');
 

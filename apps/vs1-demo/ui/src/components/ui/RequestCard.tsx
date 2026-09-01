@@ -52,15 +52,19 @@ export function RequestCard({
   return (
     <div
       className={cn(
-        'flex items-center gap-4 rounded-xl border border-stroke bg-white px-[18px] py-4',
+        'flex items-center gap-7 rounded-xl border border-stroke bg-white px-[18px] py-4',
         'dark:border-transparent dark:bg-[#001c16]/40',
         className,
       )}
       {...rest}
     >
-      <div className="flex w-[150px] shrink-0 flex-col items-start gap-1.5">
+      {/* Einzeilig-Regel (Nutzer-Vorgabe 2026-09-01): die Status-Pille darf in
+          KEINER Sprache umbrechen. Deshalb min-width statt fester Breite —
+          die Spalte waechst mit ihrer laengsten Beschriftung ("Bestätigung
+          ausstehend", "Confirmación pendiente"), statt sie zu falten. */}
+      <div className="flex w-auto min-w-[150px] shrink-0 flex-col items-start gap-1.5">
         <p className="text-[11px] font-bold text-fg-tertiary">{idLine}</p>
-        <span className={cn('flex items-center gap-1.5 rounded-full border px-2 py-[3px] text-[11px] font-medium', PILL[status])}>
+        <span className={cn('flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2 py-[3px] text-[11px] font-medium', PILL[status])}>
           <span className="h-1.5 w-1.5 rounded-full bg-current" />
           {statusLabel ?? STATUS_LABEL[status]}
         </span>

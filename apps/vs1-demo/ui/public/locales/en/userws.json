@@ -16,7 +16,9 @@
     "active": "Active",
     "providerReplied": "Provider replied",
     "providerConfirmed": "Provider confirmed",
-    "withdrawn": "Withdrawn"
+    "withdrawn": "Withdrawn",
+    "declined": "Declined",
+    "expired": "Expired"
   },
   "actions": {
     "sendReminder": "Send reminder",
@@ -210,7 +212,16 @@
     "emptyStep2Body": "Your question — without your real name.",
     "emptyStep3Title": "Track",
     "emptyStep3Body": "Confirmation and reply, with a deadline.",
-    "subCounts": "{{active}} active · {{overdue}} overdue"
+    "subCounts": "{{active}} active · {{overdue}} overdue",
+    "subWaiting_one": "{{count}} request is waiting for you.",
+    "subWaiting_other": "{{count}} requests are waiting for you.",
+    "secYou": "Waiting for you",
+    "secProvider": "Waiting for the provider",
+    "secDone": "Closed",
+    "actionRead": "Read reply",
+    "actionOpen": "Open thread",
+    "slaLabel": "Deadline",
+    "slaExpired": "expired"
   },
   "notifications": {
     "title": "Notifications",
@@ -577,7 +588,11 @@
     "nextInDays_one": "in {{count}} day",
     "nextInDays_other": "in {{count}} days",
     "addToCalendar": "Add to calendar",
-    "moreActions": "More actions"
+    "moreActions": "More actions",
+    "tabs": {
+      "anfragen": "Requests",
+      "termine": "Appointments"
+    }
   },
   "review": {
     "eyebrow": "REVIEW",

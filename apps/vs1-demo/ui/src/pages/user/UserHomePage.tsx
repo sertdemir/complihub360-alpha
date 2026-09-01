@@ -327,7 +327,7 @@ export function UserHomePage() {
 
               {/* Aktive Anfragen */}
               <div className={CARD + ' p-6 pt-5'}>
-                <SectionHead title={t('home.activeRequests')} count={String(offeneAnfragen.length)} to="dashboard/requests" />
+                <SectionHead title={t('home.activeRequests')} count={String(offeneAnfragen.length)} to="dashboard/termine?tab=anfragen" />
                 {offeneAnfragen.length ? (
                   <div>
                     {offeneAnfragen.slice(0, 3).map((r, i, arr) => (
@@ -351,7 +351,7 @@ export function UserHomePage() {
                         </span>
                         <button
                           type="button"
-                          onClick={() => navigate(`/${locale}/dashboard/requests`)}
+                          onClick={() => navigate(`/${locale}/dashboard/termine?tab=anfragen`)}
                           className="shrink-0 text-body-3xs font-semibold text-brand underline underline-offset-2 transition-colors hover:text-brand-700"
                         >
                           {t('shared.seeAll')}
