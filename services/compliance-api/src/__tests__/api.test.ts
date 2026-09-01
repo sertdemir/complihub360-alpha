@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
-import { createHash, createHmac, randomUUID } from 'node:crypto';
+import { createHash, createHmac, randomUUID, generateKeyPairSync, sign as cryptoSign } from 'node:crypto';
+import { createServer as createHttpServer } from 'node:http';
 
 // ─── API integration tests (13-layer audit P1 #7) ────────────────────────────
 // The real HTTP server runs in-process on a test port; only supabaseApi is
@@ -87,6 +88,21 @@ function signJwt(payload: Record<string, any>): string {
 const USER_ID = randomUUID();
 const USER_JWT = signJwt({ sub: USER_ID, email: 'test@complihub.test' });
 
+// ES256: what migrated Supabase projects issue — the public key is served
+// via the project's JWKS endpoint, mocked below on JWKS_PORT.
+const JWKS_PORT = 3612;
+const ES_KID = 'test-es256-kid';
+const esKeys = generateKeyPairSync('ec', { namedCurve: 'P-256' });
+
+function signEs256Jwt(payload: Record<string, any>, kid: string = ES_KID): string {
+    const b64 = (o: any) => Buffer.from(JSON.stringify(o)).toString('base64url');
+    const head = b64({ alg: 'ES256', typ: 'JWT', kid });
+    const body = b64({ role: 'authenticated', exp: Math.floor(Date.now() / 1000) + 3600, ...payload });
+    const sig = cryptoSign('sha256', Buffer.from(`${head}.${body}`), { key: esKeys.privateKey, dsaEncoding: 'ieee-p1363' })
+        .toString('base64url');
+    return `${head}.${body}.${sig}`;
+}
+
 async function api(path: string, init: RequestInit & { auth?: 'key' | 'jwt' | 'none' } = {}) {
     const headers: Record<string, string> = { 'content-type': 'application/json', ...(init.headers as any) };
     if (init.auth === 'key' || init.auth === undefined) headers['x-api-key'] = API_KEY;
@@ -122,6 +138,16 @@ function seedProvider(over: Record<string, any> = {}) {
 }
 
 beforeAll(async () => {
+    // Mock JWKS endpoint — supabaseJwt.ts derives its URL from SUPABASE_URL.
+    const jwk = esKeys.publicKey.export({ format: 'jwk' });
+    await new Promise<void>((resolve) => {
+        createHttpServer((_req, res) => {
+            res.writeHead(200, { 'content-type': 'application/json' });
+            res.end(JSON.stringify({ keys: [{ ...jwk, kid: ES_KID, alg: 'ES256', use: 'sig' }] }));
+        }).listen(JWKS_PORT, resolve);
+    });
+    process.env.SUPABASE_URL = `http://127.0.0.1:${JWKS_PORT}`;
+
     process.env.PORT = String(PORT);
     process.env.API_KEY = API_KEY;
     process.env.SUPABASE_JWT_SECRET = JWT_SECRET;
@@ -186,6 +212,29 @@ describe('auth gate', () => {
             body: JSON.stringify({ country: 'DE', structured_answers: { domains: ['tax-vat'] } }),
         });
         expect(r.status).toBe(200);
+    });
+
+    // Supabase "JWT signing keys" migration: tokens arrive ES256-signed with
+    // a kid resolved against the project JWKS (staging regression 2026-09-01:
+    // the HS256-only gate 401ed every logged-in user).
+    it('accepts an ES256 token signed with the published JWKS key', async () => {
+        const token = signEs256Jwt({ sub: USER_ID, email: 'test@complihub.test' });
+        const res = await fetch(`${BASE}/api/v1/bookings`, { headers: { authorization: `Bearer ${token}` } });
+        expect(res.status).toBe(200);
+    });
+
+    it('rejects an ES256 token with an unknown kid', async () => {
+        const token = signEs256Jwt({ sub: USER_ID }, 'kid-not-in-jwks');
+        const res = await fetch(`${BASE}/api/v1/bookings`, { headers: { authorization: `Bearer ${token}` } });
+        expect(res.status).toBe(401);
+    });
+
+    it('rejects a tampered ES256 token', async () => {
+        const token = signEs256Jwt({ sub: USER_ID });
+        const [head, body, sig] = token.split('.');
+        const forgedBody = Buffer.from(JSON.stringify({ role: 'authenticated', exp: Math.floor(Date.now() / 1000) + 3600, sub: randomUUID() })).toString('base64url');
+        const res = await fetch(`${BASE}/api/v1/bookings`, { headers: { authorization: `Bearer ${head}.${forgedBody}.${sig}` } });
+        expect(res.status).toBe(401);
     });
 });
 

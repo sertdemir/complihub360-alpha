@@ -7,6 +7,7 @@ import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeC
 import { generateRelevantSubdomains, isKnownCountry, ComplianceDomain, type CountryCode, type IndustryType, type BusinessModel, type EnrichedSubdomain } from "@complihub/compliance-engine";
 
 import { supabaseApi } from "./supabase.js";
+import { verifySupabaseJwt } from "./supabaseJwt.js";
 import { sendMagicLinkMail, sendEmailChangeMail, sendRescheduleMail, sendCancellationMail } from "./mailer.js";
 import { handleAssistantChat, handleAssistantCheckout, handleAssistantVerify } from "./assistant.js";
 import { handleAuthAdopt } from "./adoption.js";
@@ -130,46 +131,27 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         const authHeader = req.headers['authorization'];
         const devKey = req.headers['x-api-key'];
 
-        // 1. Verify the Supabase access token (HS256): algorithm + signature + exp/nbf + role.
+        // 1. Verify the Supabase access token (HS256 secret or ES256 signing
+        //    key via JWKS — supabaseJwt.ts): signature there, exp/nbf/role here.
         if (authHeader && authHeader.startsWith('Bearer ')) {
             const token = authHeader.substring(7);
-            const jwtSecret = process.env.SUPABASE_JWT_SECRET;
-            const parts = token.split('.');
-            if (jwtSecret && parts.length === 3) {
-                try {
-                    const [headerB64, payloadB64, signatureB64] = parts;
-                    const header = JSON.parse(Buffer.from(headerB64, 'base64url').toString('utf8'));
-                    // Pin the algorithm — reject alg:none and RS/ES "confusion" tokens.
-                    if (header.alg === 'HS256') {
-                        const expectedSignature = crypto
-                            .createHmac('sha256', jwtSecret)
-                            .update(`${headerB64}.${payloadB64}`)
-                            .digest('base64url'); // JWT uses Base64URL encoding
-                        const sigBuf = Buffer.from(signatureB64);
-                        const expBuf = Buffer.from(expectedSignature);
-                        // Constant-time comparison to avoid signature timing leaks.
-                        if (sigBuf.length === expBuf.length && crypto.timingSafeEqual(sigBuf, expBuf)) {
-                            const payload = JSON.parse(Buffer.from(payloadB64, 'base64url').toString('utf8'));
-                            const nowSec = Math.floor(Date.now() / 1000);
-                            const notExpired = typeof payload.exp !== 'number' || payload.exp > nowSec;
-                            const active = typeof payload.nbf !== 'number' || payload.nbf <= nowSec;
-                            const role = typeof payload.role === 'string' ? payload.role : '';
-                            // Reject the public anon key (role 'anon'): it ships to browsers and is
-                            // NOT a per-user credential. Only real, unexpired user/service tokens pass.
-                            if (notExpired && active && role && role !== 'anon') {
-                                isAuthenticated = true;
-                                if (typeof payload.sub === 'string') authUserId = payload.sub;
-                                if (typeof payload.email === 'string') authEmail = payload.email;
-                                // App-level role lives in app_metadata.role (authoritative),
-                                // user_metadata.role as fallback — same precedence as the FE.
-                                const appRole = (payload.app_metadata && typeof payload.app_metadata.role === 'string' ? payload.app_metadata.role : undefined)
-                                    ?? (payload.user_metadata && typeof payload.user_metadata.role === 'string' ? payload.user_metadata.role : undefined);
-                                if (appRole === 'admin') authIsAdmin = true;
-                            }
-                        }
-                    }
-                } catch (e) {
-                    // Malformed token → fall through to 401
+            const payload = await verifySupabaseJwt(token);
+            if (payload) {
+                const nowSec = Math.floor(Date.now() / 1000);
+                const notExpired = typeof payload.exp !== 'number' || payload.exp > nowSec;
+                const active = typeof payload.nbf !== 'number' || payload.nbf <= nowSec;
+                const role = typeof payload.role === 'string' ? payload.role : '';
+                // Reject the public anon key (role 'anon'): it ships to browsers and is
+                // NOT a per-user credential. Only real, unexpired user/service tokens pass.
+                if (notExpired && active && role && role !== 'anon') {
+                    isAuthenticated = true;
+                    if (typeof payload.sub === 'string') authUserId = payload.sub;
+                    if (typeof payload.email === 'string') authEmail = payload.email;
+                    // App-level role lives in app_metadata.role (authoritative),
+                    // user_metadata.role as fallback — same precedence as the FE.
+                    const appRole = (payload.app_metadata && typeof payload.app_metadata.role === 'string' ? payload.app_metadata.role : undefined)
+                        ?? (payload.user_metadata && typeof payload.user_metadata.role === 'string' ? payload.user_metadata.role : undefined);
+                    if (appRole === 'admin') authIsAdmin = true;
                 }
             }
         }
