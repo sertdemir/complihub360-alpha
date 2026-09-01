@@ -188,8 +188,11 @@ function GroupCard({ label, sub, dot, rows, entered, offset, onAnswer, taskOf, o
 }) {
   const { t } = useTranslation('results');
   return (
-    <div className={CARD + ' overflow-hidden'}>
-      <div className="flex items-center gap-2.5 border-b border-stroke-subtle bg-surface-secondary px-5 py-3.5">
+    // Kein overflow-hidden auf der Karte: das Zustands-Menue des Chips ragt
+    // ueber die Kartenkante hinaus und wuerde sonst abgeschnitten. Die
+    // Kopfzeile rundet ihre Ecken deshalb selbst.
+    <div className={CARD}>
+      <div className="flex items-center gap-2.5 rounded-t-xl border-b border-stroke-subtle bg-surface-secondary px-5 py-3.5">
         <span className={'h-2.5 w-2.5 shrink-0 rounded-full ' + dot} />
         <span className="text-body-sm font-extrabold text-fg">{label}</span>
         {/* Kein Kleingedrucktes: der Zusatz nennt Zahl und naechste Frist und
@@ -224,13 +227,19 @@ function GroupCard({ label, sub, dot, rows, entered, offset, onAnswer, taskOf, o
               </p>
             </div>
             <GeltungCell state={r.state} entered={entered} index={offset + i} />
-            {taskOf && r.obligationId && (
-              <div className="hidden shrink-0 justify-center sm:flex">
-                <TaskChip
-                  status={taskOf(r)}
-                  busy={busyId === r.obligationId}
-                  onSet={(next) => onSetTask(r, next)}
-                />
+            {/* Feste, zentrierte Spalte ZWISCHEN Geltung und Frist — auch
+                ohne Chip gerendert, damit alle Zeilen auf denselben Kanten
+                stehen (Nutzer-Vorgabe 2026-09-01). Breite traegt das
+                laengste Label ("Trifft nicht zu") einzeilig. */}
+            {taskOf && (
+              <div className="hidden w-[132px] shrink-0 justify-center sm:flex">
+                {r.obligationId && (
+                  <TaskChip
+                    status={taskOf(r)}
+                    busy={busyId === r.obligationId}
+                    onSet={(next) => onSetTask(r, next)}
+                  />
+                )}
               </div>
             )}
             {/* Rechts steht, was zu tun ist: bei offenen Fragen der Weg dorthin,
