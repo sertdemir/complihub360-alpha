@@ -227,31 +227,31 @@ function GroupCard({ label, sub, dot, rows, entered, offset, onAnswer, taskOf, o
               </p>
             </div>
             <GeltungCell state={r.state} entered={entered} index={offset + i} />
-            {/* Feste, zentrierte Spalte ZWISCHEN Geltung und Frist — auch
-                ohne Chip gerendert, damit alle Zeilen auf denselben Kanten
-                stehen (Nutzer-Vorgabe 2026-09-01). Breite traegt das
-                laengste Label ("Trifft nicht zu") einzeilig. */}
-            {taskOf && (
-              <div className="hidden w-[132px] shrink-0 justify-center sm:flex">
-                {r.obligationId && (
-                  <TaskChip
-                    status={taskOf(r)}
-                    busy={busyId === r.obligationId}
-                    onSet={(next) => onSetTask(r, next)}
-                  />
+            {/* Freier Raum bleibt in der Mitte — Chip und Frist bilden rechts
+                einen gemeinsamen Aktionsblock (Canvas-Wahl 1C, 2026-09-01):
+                Zustand und Termin stehen beieinander, kurzer Blickweg beim
+                Abhaken. Die Frist haelt eine feste Breite, damit die Chips
+                aller Zeilen an derselben Kante enden. */}
+            <div className="hidden flex-1 sm:block" />
+            <div className="hidden shrink-0 items-center gap-4 sm:flex">
+              {taskOf && r.obligationId && (
+                <TaskChip
+                  status={taskOf(r)}
+                  busy={busyId === r.obligationId}
+                  onSet={(next) => onSetTask(r, next)}
+                />
+              )}
+              {/* Rechts steht, was zu tun ist: bei offenen Fragen der Weg
+                  dorthin, sonst die Frist. Beide auf einer Kante. */}
+              <div className="flex min-w-[86px] shrink-0 justify-end text-right">
+                {r.state.kind === 'answer' ? (
+                  <button type="button" onClick={onAnswer} className={TEXT_LINK + ' inline-flex items-center gap-1 whitespace-nowrap'}>
+                    {t('state.answer', { total: r.state.count })} <ArrowRight size={13} />
+                  </button>
+                ) : (
+                  <span className="text-[10.5px] text-fg-tertiary">{r.due && r.due !== '—' ? r.due : r.dueSub}</span>
                 )}
               </div>
-            )}
-            {/* Rechts steht, was zu tun ist: bei offenen Fragen der Weg dorthin,
-                sonst die Frist. Beide auf einer Kante. */}
-            <div className="hidden w-[150px] shrink-0 justify-end text-right sm:flex">
-              {r.state.kind === 'answer' ? (
-                <button type="button" onClick={onAnswer} className={TEXT_LINK + ' inline-flex items-center gap-1 whitespace-nowrap'}>
-                  {t('state.answer', { total: r.state.count })} <ArrowRight size={13} />
-                </button>
-              ) : (
-                <span className="text-[10.5px] text-fg-tertiary">{r.due && r.due !== '—' ? r.due : r.dueSub}</span>
-              )}
             </div>
           </div>
         ))}
@@ -429,61 +429,48 @@ export function SessionSnapshot({
               </motion.div>
 
               <motion.aside variants={ITEM} className="flex w-full shrink-0 flex-col gap-3.5 xl:w-[330px]">
-                {/* Gesamtfortschritt, buendig mit der Oberkante der ersten
-                    Pflichtkarte (Nutzer-Vorgabe 2026-08-29). */}
-                {taskable && (
+                {/* Canvas-Wahl 2C (2026-09-01): kein Verlaufs-Kasten mehr —
+                    die Fortschrittskarte traegt "Als Variante kopieren" als
+                    Textlink, direkt darunter kommen die Anbieter. Die
+                    kuenftige Versionsliste (Verlaufs-Endpunkt, Backlog)
+                    braucht dann einen neuen Ort. */}
+                {(taskable || sessionId) && (
                   <div className={CARD + ' px-5 py-4'}>
-                    <p className="font-serif text-[20px] font-bold leading-none text-fg">
-                      {t('snapshot.progress', { done: nDone, total: nRel })}
-                    </p>
-                    <div className="mt-2.5 flex h-2 overflow-hidden rounded-full bg-stroke-subtle">
-                      <div className="h-2 bg-risk-low" style={{ width: entered ? `${(nDone / nRel) * 100}%` : 0, transition: `width 850ms ${EASE} 150ms` }} />
-                      <div className="h-2 bg-risk-medium" style={{ width: entered ? `${(nProg / nRel) * 100}%` : 0, transition: `width 850ms ${EASE} 320ms` }} />
-                    </div>
-                    <p className="mt-2.5 text-[10.5px] text-fg-tertiary">
-                      {t('snapshot.progressSub', { prog: nProg, open: Math.max(0, nRel - nDone - nProg), na: nNa })}
-                    </p>
+                    {taskable && (
+                      <>
+                        <p className="font-serif text-[20px] font-bold leading-none text-fg">
+                          {t('snapshot.progress', { done: nDone, total: nRel })}
+                        </p>
+                        <div className="mt-2.5 flex h-2 overflow-hidden rounded-full bg-stroke-subtle">
+                          <div className="h-2 bg-risk-low" style={{ width: entered ? `${(nDone / nRel) * 100}%` : 0, transition: `width 850ms ${EASE} 150ms` }} />
+                          <div className="h-2 bg-risk-medium" style={{ width: entered ? `${(nProg / nRel) * 100}%` : 0, transition: `width 850ms ${EASE} 320ms` }} />
+                        </div>
+                        <p className="mt-2.5 text-[10.5px] text-fg-tertiary">
+                          {t('snapshot.progressSub', { prog: nProg, open: Math.max(0, nRel - nDone - nProg), na: nNa })}
+                        </p>
+                      </>
+                    )}
+                    {sessionId && (
+                      <div className={'text-center ' + (taskable ? 'mt-3 border-t border-stroke-subtle pt-2.5' : '')}>
+                        {copy === 'done' ? (
+                          <button type="button" onClick={() => navigate(`/${locale}/dashboard/sessions`)} className={TEXT_LINK}>
+                            {t('snapshot.copyOpenList')}
+                          </button>
+                        ) : copy === 'error' ? (
+                          <span className="text-[10.5px] text-risk-high">{t('snapshot.copyError')}</span>
+                        ) : (
+                          <button type="button" disabled={copy === 'busy'} onClick={duplicate} className={TEXT_LINK + ' disabled:opacity-60'}>
+                            {copy === 'busy' ? '…' : t('snapshot.copyVariant')}
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
-                <div className={CARD + ' flex flex-1 flex-col p-5'}>
-                  <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('snapshot.historyTitle')}</p>
-                  <div className="mt-3.5">
-                    <HistoryEntry now label={t('snapshot.historyCurrent')} meta={meta} />
-                    <HistoryEntry label={t('snapshot.historyStart')} meta={t('snapshot.historyCreated')} last />
-                  </div>
-                  {/* Der Knopf sitzt am Fuss, damit die Karte auf derselben
-                      Kante endet wie die Pflichtenliste (Nutzer-Vorgabe). */}
-                  <div className="mt-auto border-t border-stroke-subtle pt-4">
-                    <Button
-                      variant="secondary"
-                      className="w-full"
-                      disabled={!sessionId || copy === 'busy' || copy === 'done'}
-                      onClick={duplicate}
-                    >
-                      {copy === 'busy' ? '…' : copy === 'done' ? t('snapshot.copyDone') : t('snapshot.copyVariant')}
-                    </Button>
-                    <p className="mt-1.5 text-center text-[10.5px] leading-relaxed text-fg-tertiary">
-                      {copy === 'done' ? (
-                        <button type="button" onClick={() => navigate(`/${locale}/dashboard/sessions`)} className={TEXT_LINK}>
-                          {t('snapshot.copyOpenList')}
-                        </button>
-                      ) : copy === 'error' ? (
-                        <span className="text-risk-high">{t('snapshot.copyError')}</span>
-                      ) : !sessionId ? (
-                        t('snapshot.copyUnavailable')
-                      ) : (
-                        t('snapshot.copyHint')
-                      )}
-                    </p>
-                  </div>
-                </div>
-              </motion.aside>
-            </div>
-
-            {/* Passende Anbieter — je eine Karte, kein Sammellink, keine
-                Zwischenuebersicht (Nutzer-Entscheidung 2026-08-29). */}
-            <motion.div variants={ITEM} className="mt-[18px] grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {providers.map((p, i) => (
+                {/* Passende Anbieter — je eine Karte, gestapelt in der
+                    Spalte (Canvas-Wahl 2C); kein Sammellink, keine
+                    Zwischenuebersicht (Nutzer-Entscheidung 2026-08-29). */}
+                {providers.map((p, i) => (
                 <div key={p.provider_key} className={CARD + ' flex flex-col p-4'}>
                   <div className="flex items-center gap-2.5">
                     <span
@@ -520,7 +507,8 @@ export function SessionSnapshot({
                   </div>
                 </div>
               ))}
-            </motion.div>
+              </motion.aside>
+            </div>
 
             {answerRow && <span className="sr-only">{t('state.answer', { total: 0 })}</span>}
           </motion.div>
@@ -547,14 +535,3 @@ function Kpi({ title, big, sub, children }: { title: string; big: string; sub: s
   );
 }
 
-function HistoryEntry({ label, meta, now = false, last = false }: { label: string; meta: string; now?: boolean; last?: boolean }) {
-  return (
-    <div className={'flex gap-3 py-2.5 ' + (last ? '' : 'border-b border-stroke-subtle')}>
-      <span className={'mt-1 h-2.5 w-2.5 shrink-0 rounded-full ' + (now ? 'bg-brand' : 'box-border border-2 border-stroke')} />
-      <div className="min-w-0">
-        <p className={'text-body-3xs font-bold ' + (now ? 'text-fg' : 'text-fg-secondary')}>{label}</p>
-        <p className="mt-0.5 text-[10.5px] text-fg-tertiary">{meta}</p>
-      </div>
-    </div>
-  );
-}
