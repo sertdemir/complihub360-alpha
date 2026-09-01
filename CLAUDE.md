@@ -25,3 +25,15 @@
 - **Du, nicht Sie** (Festlegung 2026-08-29). Der Nutzer und Claude duzen sich.
   Gilt für Chat-Antworten; Produkt-Copy und Oberflächentexte bleiben davon
   unberührt — die siezen weiter.
+
+## Vault-Log (Festlegung 2026-09-01)
+
+- Das Projekt-Gedächtnis liegt im Obsidian-Vault-Repo
+  **`sertdemir/complihub360-vault`** (Ordner `Log/`, `Doku/`,
+  `Entscheidungen/`; Konvention im dortigen README).
+- **Nach jedem Merge in dieses Repo** schreibt Claude dort das Log fort
+  (eine Notiz je Sitzung/Strang, `JJJJ-MM-TT — <Thema>.md`) und
+  aktualisiert betroffene Doku-Seiten. Direkt auf `main` des
+  Vault-Repos committen und pushen — kein PR-Umweg.
+- Notizen mit YAML-Frontmatter (`typ`, `datum`, `projekt`, `tags`) und
+  Wikilinks. Keine Secrets, keine personenbezogenen Daten.
