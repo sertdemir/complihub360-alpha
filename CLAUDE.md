@@ -25,3 +25,18 @@
 - **Du, nicht Sie** (Festlegung 2026-08-29). Der Nutzer und Claude duzen sich.
   Gilt für Chat-Antworten; Produkt-Copy und Oberflächentexte bleiben davon
   unberührt — die siezen weiter.
+
+## Vault-Log (Festlegung 2026-09-01)
+
+- Das Projekt-Gedächtnis liegt im Obsidian-Vault-Repo
+  **`sertdemir/complihub360-vault`**, Haupt-Vault im Ordner
+  `Complihub360/` (1:1 vom Mac importiert; Konvention im dortigen README).
+- **Nach jedem Merge in dieses Repo** schreibt Claude dort fort und
+  pusht direkt auf `main` des Vault-Repos — kein PR-Umweg:
+  Sitzungs-Log → `08 Daily/JJJJ-MM-TT Kurztitel.md` · Doku →
+  `05 Technik/` + Wikilink in der Technik-MOC · Entscheidungen → eine
+  Notiz je Entscheidung in `07 Entscheidungen/` (Template
+  `13 Templates/Entscheidung.md`) + Zeile oben im Entscheidungslog ·
+  Merk-Fakten → `11 Claude Memory/` (eine Notiz = ein Fakt).
+- Frontmatter wie in den Vault-Templates, Wikilinks statt Pfade.
+  Keine Secrets, keine personenbezogenen Daten.
