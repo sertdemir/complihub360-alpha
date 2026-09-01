@@ -404,11 +404,21 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             }
         });
     } else if (req.method === 'GET' && req.url?.startsWith('/api/v1/requests')) {
-        // Provider request inbox — the first dashboard read endpoint. Auth is
-        // enforced by the global guard above; rows come straight from
-        // engagement_requests (newest first, capped at 50).
+        // Anfragen des AUFRUFERS (newest first, capped at 50).
+        //
+        // Bis 2026-08-31 stand hier ein leerer Filter: jedes angemeldete Konto
+        // bekam alle Anfragen aller Nutzer — samt requester_email, Firmenname
+        // und Freitext in structured_answers. Derselbe Befund wie beim alten
+        // /notifications-Feed, eine Etage tiefer. Der Server-Schluessel sieht
+        // weiterhin alles (Betriebs-/Admin-Sicht); der Anbieter-Arbeitsbereich
+        // faellt damit auf seine Fixture zurueck, bis Anbieter an einem Konto
+        // haengen — wie bei der Glocke, und ehrlicher als fremde Vorgaenge.
         try {
-            const rows = await supabaseApi.select('engagement_requests', {}, { order: 'created_at.desc', limit: 50 });
+            const rows = await supabaseApi.select(
+                'engagement_requests',
+                authViaApiKey ? {} : { user_id: authUserId as string },
+                { order: 'created_at.desc', limit: 50 },
+            );
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, requests: rows }));
@@ -1902,7 +1912,15 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 
                 const newEngagement = {
                     id: engagementId,
-                    user_id: requestData.user_id || undefined,
+                    // Der Ersteller kommt aus dem GEPRUEFTEN Token, nie aus dem
+                    // Body. Vorher stand hier requestData.user_id — ein
+                    // angemeldetes Konto haette Anfragen im Namen jedes anderen
+                    // anlegen koennen. Und weil das Frontend das Feld nie
+                    // schickte, gehoerte bis 2026-08-31 KEINE einzige
+                    // UI-Anfrage jemandem (user_id NULL) — womit auch jede
+                    // provider_confirmed/replied/declined-Benachrichtigung ins
+                    // Leere lief: notify() hat ohne Empfaenger nichts zu tun.
+                    user_id: authUserId || undefined,
                     // Wave A7: link the wizard session + carry the requester
                     // identity (revealed only via the dossier unlock).
                     session_id: requestData.session_id || undefined,

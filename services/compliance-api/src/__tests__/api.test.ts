@@ -775,3 +775,46 @@ describe('Benachrichtigungen entstehen aus Vorgaengen', () => {
         expect(db.notifications ?? []).toEqual([]);
     });
 });
+
+
+describe('Anfragen gehoeren ihrem Ersteller', () => {
+    // Bis 2026-08-31 nahm POST /engagement die user_id aus dem BODY (und das
+    // Frontend schickte keine — alle UI-Anfragen gehoerten niemandem), und
+    // GET /requests lieferte mit leerem Filter die Anfragen ALLER Nutzer,
+    // samt requester_email und Firmenname. Diese Tests pinnen beides fest.
+    const anlegen = (body: Record<string, unknown> = {}) =>
+        api('/api/v1/engagement', {
+            method: 'POST', auth: 'jwt',
+            body: JSON.stringify({ provider_key: 'test-kanzlei', country: 'DE', category: 'tax-vat', message: 'Bitte um Angebot', ...body }),
+        });
+
+    it('schreibt den Ersteller aus dem Token — ein fremdes user_id im Body zaehlt nicht', async () => {
+        seedProvider();
+        const fremd = randomUUID();
+        const r = await anlegen({ user_id: fremd });
+        expect([200, 201]).toContain(r.status);
+        const row = (db.engagement_requests ?? []).find((e: any) => e.id === r.body.id);
+        expect(row.user_id).toBe(USER_ID);
+        expect(row.user_id).not.toBe(fremd);
+    });
+
+    it('listet nur die eigenen Anfragen, keine fremden', async () => {
+        (db.engagement_requests ??= []).push(
+            { id: randomUUID(), user_id: USER_ID, provider_key: 'test-kanzlei', country: 'DE', category: 'tax-vat', structured_answers: {}, status: 'created', created_at: new Date().toISOString() },
+            { id: randomUUID(), user_id: randomUUID(), provider_key: 'test-kanzlei', country: 'DE', category: 'tax-vat', structured_answers: { requester_email: 'fremd@example.com' }, status: 'created', created_at: new Date().toISOString() },
+        );
+        const r = await api('/api/v1/requests', { auth: 'jwt' });
+        expect(r.status).toBe(200);
+        expect(r.body.requests).toHaveLength(1);
+        expect(JSON.stringify(r.body)).not.toContain('fremd@example.com');
+    });
+
+    it('laesst den Server-Schluessel weiter alles sehen (Betriebssicht)', async () => {
+        (db.engagement_requests ??= []).push(
+            { id: randomUUID(), user_id: USER_ID, provider_key: 'test-kanzlei', country: 'DE', category: 'tax-vat', structured_answers: {}, status: 'created', created_at: new Date().toISOString() },
+            { id: randomUUID(), user_id: randomUUID(), provider_key: 'test-kanzlei', country: 'DE', category: 'tax-vat', structured_answers: {}, status: 'created', created_at: new Date().toISOString() },
+        );
+        const r = await api('/api/v1/requests', { auth: 'key' });
+        expect(r.body.requests).toHaveLength(2);
+    });
+});
