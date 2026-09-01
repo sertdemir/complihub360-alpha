@@ -72,7 +72,7 @@ export function UserSearchDrawer({ open, onClose }: { open: boolean; onClose: ()
               <button
                 key={r.uuid}
                 type="button"
-                onClick={() => { onClose(); navigate(`/${locale}/dashboard/requests?thread=${r.uuid}`); }}
+                onClick={() => { onClose(); navigate(`/${locale}/dashboard/termine?tab=anfragen&thread=${r.uuid}`); }}
                 className="flex w-full items-center justify-between gap-3 rounded-lg border border-elevate/10 bg-elevate/[0.03] px-3.5 py-3 text-left transition-colors hover:border-fg-brand/50"
               >
                 <span className="min-w-0">

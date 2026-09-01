@@ -42,7 +42,6 @@ const SettingsPage = lazy(() => import("./pages/provider/SettingsPage").then((m)
 const NotificationsPage = lazy(() => import("./pages/provider/NotificationsPage").then((m) => ({ default: m.NotificationsPage })));
 const UserHomePage = lazy(() => import("./pages/user/UserHomePage").then((m) => ({ default: m.UserHomePage })));
 const SessionsPage = lazy(() => import("./pages/user/SessionsPage").then((m) => ({ default: m.SessionsPage })));
-const UserRequestsPage = lazy(() => import("./pages/user/UserRequestsPage").then((m) => ({ default: m.UserRequestsPage })));
 const TerminePage = lazy(() => import("./pages/user/TerminePage").then((m) => ({ default: m.TerminePage })));
 import { ProviderDetailPage } from "./pages/ProviderDetailPage";
 import { ProviderSchedulePage } from "./pages/ProviderSchedulePage";
@@ -106,6 +105,15 @@ function LocaleRedirect({ to }: { to: string }) {
     const { locale } = useParams();
     const base = `/${locale || 'en'}`;
     return <Navigate to={to ? `${base}/${to}` : base} replace />;
+}
+
+// Anfragen → Termine-Reiter (Canvas-Wahl 1C, 2026-09-01). Bestehende
+// Parameter (?thread=… aus Glocke und Suche) reisen mit.
+function RequestsRedirect() {
+    const { locale } = useParams();
+    const params = new URLSearchParams(useLocation().search);
+    params.set('tab', 'anfragen');
+    return <Navigate to={`/${locale || 'en'}/dashboard/termine?${params.toString()}`} replace />;
 }
 
 function RootRedirect() {
@@ -208,7 +216,10 @@ function AppContent() {
                     <Route element={<AuthGuard requiredRole="user" />}>
                         <Route path="dashboard" element={<UserHomePage />} />
                         <Route path="dashboard/sessions" element={<SessionsPage />} />
-                        <Route path="dashboard/requests" element={<UserRequestsPage />} />
+                        {/* Anfragen ist seit 2026-09-01 ein Reiter der Termine-Seite
+                            (Canvas-Wahl 1C). Alte Links — Glocke, Lesezeichen — laufen
+                            hier auf und behalten ihre Parameter (?thread=…). */}
+                        <Route path="dashboard/requests" element={<RequestsRedirect />} />
                         <Route path="dashboard/termine" element={<TerminePage />} />
                         {/* Phase-3: stage-2 detail (monetised open) + native scheduling */}
                         <Route path="provider/:key" element={<ProviderDetailPage />} />

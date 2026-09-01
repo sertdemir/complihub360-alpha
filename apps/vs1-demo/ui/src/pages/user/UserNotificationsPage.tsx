@@ -106,7 +106,7 @@ export function UserNotificationsPage() {
       markNotificationsRead({ id: n.id }).catch(() => {});
     }
     if (n.subject === 'booking') { navigate(`/${locale}/dashboard/termine`); return; }
-    if (n.subject === 'engagement' && n.subjectId) navigate(`/${locale}/dashboard/requests?thread=${n.subjectId}`);
+    if (n.subject === 'engagement' && n.subjectId) navigate(`/${locale}/dashboard/termine?tab=anfragen&thread=${n.subjectId}`);
   };
 
   const alleGelesen = () => {
@@ -204,7 +204,7 @@ export function UserNotificationsPage() {
             title={t('notifications.emptyTitle')}
             body={t('notifications.emptyBody')}
             hint={t('notifications.emptyHint')}
-            cta={{ label: t('notifications.emptyCta'), onClick: () => navigate(`/${locale}/dashboard/requests`) }}
+            cta={{ label: t('notifications.emptyCta'), onClick: () => navigate(`/${locale}/dashboard/termine?tab=anfragen`) }}
             steps={[
               { title: t('notifications.emptyStep1Title'), body: t('notifications.emptyStep1Body') },
               { title: t('notifications.emptyStep2Title'), body: t('notifications.emptyStep2Body') },

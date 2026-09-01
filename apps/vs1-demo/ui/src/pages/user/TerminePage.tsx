@@ -10,6 +10,10 @@ import { ReviewDrawer, type ReviewTarget } from '../../components/user/ReviewDra
 import { RescheduleDrawer, type RescheduleTarget } from '../../components/user/RescheduleDrawer';
 import { ConfirmDrawer, type ConfirmSpec } from '../../components/provider/ConfirmDrawer';
 import { EmptyState } from '../../components/user/EmptyState';
+import { Tabs, TabList, Tab } from '../../components/ui/Tabs';
+import { useSearchParams } from 'react-router-dom';
+import { fetchUserRequests, type UserRequestRow } from '../../api/requests';
+import { AnfragenTab } from './AnfragenTab';
 
 // ─── User Dashboard · Termine (bookings) ─────────────────────────────────────
 // Die Buchung IST der bezahlte Lead — Anbieter-Identität ist seit der Buchung
@@ -29,6 +33,12 @@ import { EmptyState } from '../../components/user/EmptyState';
 //   4B Die Ergebnisfrage ist eine eigene Leiste ÜBER der Zeile, mit Knöpfen,
 //      die austragen, was sie bedeuten — statt "Ja / No-Show" rechts in der
 //      gedrängten Ecke.
+//
+// Seit 2026-09-01 (Canvas "Anfragen · Varianten", Wahl 1C) traegt die Seite
+// ZWEI REITER: Anfragen und Termine — eine Beziehung, zwei Lebensphasen (vor
+// und nach der Zusage). Die Seite laedt beide Listen (die Reiter-Zaehler
+// brauchen beide), der Anfragen-Inhalt lebt in AnfragenTab. Alte Links auf
+// /dashboard/requests leitet App.tsx hierher um (?tab=anfragen).
 
 interface Row {
   id: string;
@@ -198,6 +208,26 @@ export function TerminePage() {
       .catch(() => { if (alive) setData([]); });
     return () => { alive = false; };
   }, [locale]);
+  // Anfragen fuer den zweiten Reiter — hier geladen (nicht im Tab), weil die
+  // Reiter-Zaehler beide Listen brauchen, egal welcher offen ist.
+  const [anfragen, setAnfragen] = useState<UserRequestRow[] | null>(null);
+  useEffect(() => {
+    let alive = true;
+    fetchUserRequests()
+      .then((r) => { if (alive) setAnfragen(r); })
+      .catch(() => { if (alive) setAnfragen([]); });
+    return () => { alive = false; };
+  }, []);
+  // ?tab=anfragen (auch von der /dashboard/requests-Umleitung gesetzt);
+  // ein ?thread=-Deep-Link aus Glocke oder Suche erzwingt den Anfragen-Reiter.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const reiter: 'anfragen' | 'termine' =
+    searchParams.get('tab') === 'anfragen' || searchParams.get('thread') ? 'anfragen' : 'termine';
+  const reiterWechsel = (v: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (v === 'anfragen') next.set('tab', 'anfragen'); else { next.delete('tab'); next.delete('thread'); }
+    setSearchParams(next, { replace: true });
+  };
   const [cancelled, setCancelled] = useState<Set<string>>(new Set());
   const [outcomes, setOutcomes] = useState<Record<string, BookingStatus>>({});
   const [reviewFor, setReviewFor] = useState<ReviewTarget | null>(null);
@@ -354,6 +384,20 @@ export function TerminePage() {
           damit die Tönung randlos steht. */}
       <div className="-mx-8 -my-6 min-h-full bg-gradient-stage px-8 py-7">
       <div className="mx-auto max-w-[1140px] space-y-5">
+        {/* 1C (Anfragen-Canvas): zwei Reiter, Anfragen zuerst — die
+            Lebensphasen-Reihenfolge. Der Nav-Punkt heisst weiter "Termine"
+            und landet auf dem Termine-Reiter. */}
+        <Tabs value={reiter} onValueChange={reiterWechsel} variant="underline" size="md">
+          <TabList>
+            <Tab value="anfragen" badge={anfragen ? anfragen.length : undefined}>{t('termine.tabs.anfragen')}</Tab>
+            <Tab value="termine" badge={data ? rows.length : undefined}>{t('termine.tabs.termine')}</Tab>
+          </TabList>
+        </Tabs>
+
+        {reiter === 'anfragen' ? (
+          <AnfragenTab rows={anfragen} />
+        ) : (
+        <>
         {/* 1: Kopfzeile A — Titel und Unterzeile bleiben immer stehen … */}
         <div>
           <h1 className="font-serif text-[32px] font-bold leading-tight text-fg">
@@ -415,6 +459,8 @@ export function TerminePage() {
           {kopf('termine.past', past.length)}
           {past.length ? past.map((r) => card(r)) : <p className="text-body-sm text-fg-tertiary">{t('termine.emptyPast')}</p>}
         </section>
+        </>
+        )}
         </>
         )}
       </div>

@@ -16,7 +16,9 @@
     "active": "Aktiv",
     "providerReplied": "Anbieter hat geantwortet",
     "providerConfirmed": "Anbieter hat bestätigt",
-    "withdrawn": "Zurückgezogen"
+    "withdrawn": "Zurückgezogen",
+    "declined": "Abgelehnt",
+    "expired": "Abgelaufen"
   },
   "actions": {
     "sendReminder": "Erinnerung senden",
@@ -210,7 +212,16 @@
     "emptyStep2Body": "Ihr Anliegen — ohne Ihren Klarnamen.",
     "emptyStep3Title": "Verfolgen",
     "emptyStep3Body": "Bestätigung und Antwort, mit Frist.",
-    "subCounts": "{{active}} aktiv · {{overdue}} überfällig"
+    "subCounts": "{{active}} aktiv · {{overdue}} überfällig",
+    "subWaiting_one": "{{count}} Anfrage wartet auf Sie.",
+    "subWaiting_other": "{{count}} Anfragen warten auf Sie.",
+    "secYou": "Wartet auf Sie",
+    "secProvider": "Wartet auf den Anbieter",
+    "secDone": "Abgeschlossen",
+    "actionRead": "Antwort lesen",
+    "actionOpen": "Verlauf öffnen",
+    "slaLabel": "Frist",
+    "slaExpired": "abgelaufen"
   },
   "notifications": {
     "title": "Benachrichtigungen",
@@ -577,7 +588,11 @@
     "nextInDays_one": "in {{count}} Tag",
     "nextInDays_other": "in {{count}} Tagen",
     "addToCalendar": "In den Kalender",
-    "moreActions": "Weitere Aktionen"
+    "moreActions": "Weitere Aktionen",
+    "tabs": {
+      "anfragen": "Anfragen",
+      "termine": "Termine"
+    }
   },
   "review": {
     "eyebrow": "BEWERTUNG",

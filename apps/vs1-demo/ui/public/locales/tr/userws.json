@@ -16,7 +16,9 @@
     "active": "Etkin",
     "providerReplied": "Sağlayıcı yanıtladı",
     "providerConfirmed": "Sağlayıcı onayladı",
-    "withdrawn": "Geri çekildi"
+    "withdrawn": "Geri çekildi",
+    "declined": "Reddedildi",
+    "expired": "Süresi doldu"
   },
   "actions": {
     "sendReminder": "Hatırlatma gönder",
@@ -210,7 +212,16 @@
     "emptyStep2Body": "Talebiniz — gerçek adınız olmadan.",
     "emptyStep3Title": "İzleyin",
     "emptyStep3Body": "Onay ve yanıt, süresiyle birlikte.",
-    "subCounts": "{{active}} etkin · {{overdue}} gecikmiş"
+    "subCounts": "{{active}} etkin · {{overdue}} gecikmiş",
+    "subWaiting_one": "{{count}} talep yanıtınızı bekliyor.",
+    "subWaiting_other": "{{count}} talep yanıtınızı bekliyor.",
+    "secYou": "Yanıtınızı bekliyor",
+    "secProvider": "Sağlayıcıyı bekliyor",
+    "secDone": "Kapandı",
+    "actionRead": "Yanıtı oku",
+    "actionOpen": "Akışı aç",
+    "slaLabel": "Süre",
+    "slaExpired": "doldu"
   },
   "notifications": {
     "title": "Bildirimler",
@@ -577,7 +588,11 @@
     "nextInDays_one": "{{count}} gün içinde",
     "nextInDays_other": "{{count}} gün içinde",
     "addToCalendar": "Takvime ekle",
-    "moreActions": "Diğer işlemler"
+    "moreActions": "Diğer işlemler",
+    "tabs": {
+      "anfragen": "Talepler",
+      "termine": "Randevular"
+    }
   },
   "review": {
     "eyebrow": "DEĞERLENDİRME",
