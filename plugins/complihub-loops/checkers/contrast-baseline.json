@@ -1,0 +1,36 @@
+{
+  "_comment": "Bekannte Kontrastprobleme der Compass-v1-Palette. Sie sind echt und gehoeren behoben — aber in einem eigenen Palette-Loop, nicht nebenbei in jedem Screen-Loop. contrast.mjs meldet sie bei jedem Lauf mit [bekannt], zaehlt sie aber nicht als Fehler. Wird ein Eintrag behoben, hier loeschen. Neue Eintraege nur mit Begruendung und Datum.",
+  "recorded": "2026-08-28",
+  "known": [
+    {
+      "pair": "text.brand auf surface.muted",
+      "ratio": 3.87,
+      "need": 4.5,
+      "note": "Petrol-500 auf Surface-Muted — betrifft Wizard-Shell und Filter-Sidebar. Fix vermutlich petrol.600 als Textfarbe auf muted."
+    },
+    {
+      "pair": "feedback.success auf surface.background",
+      "ratio": 4.02,
+      "need": 4.5,
+      "note": "Knapp unter AA. Success-500 muesste um etwa eine Stufe abdunkeln."
+    },
+    {
+      "pair": "feedback.warning auf surface.background",
+      "ratio": 2.52,
+      "need": 4.5,
+      "note": "Deutlich unter AA. Amber auf Weiss ist der klassische Fall — Warning-Text braucht einen dunkleren Schritt der Skala, das -500 taugt nur als Flaeche."
+    },
+    {
+      "pair": "border.strong gegen surface.background",
+      "ratio": 1.66,
+      "need": 3.0,
+      "note": "Relevant, wo border.strong die Grenze eines Eingabefelds bildet (WCAG 1.4.11). Als reiner Trenner unkritisch."
+    },
+    {
+      "pair": "brand.partnerBadge auf surface.background",
+      "ratio": 2.01,
+      "need": 3.0,
+      "note": "Gold-500 als Badge-Flaeche auf Weiss. Unkritisch, solange der Badge-Text selbst AA erfuellt und die Information nicht allein ueber die Farbe transportiert wird."
+    }
+  ]
+}

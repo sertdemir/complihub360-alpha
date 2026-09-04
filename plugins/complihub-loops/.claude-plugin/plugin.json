@@ -1,0 +1,6 @@
+{
+  "name": "complihub-loops",
+  "displayName": "CompliHub Loops",
+  "version": "0.1.0",
+  "description": "Loop Engineering und Gauntlet-Loops fuer CompliHub360. Baut Builder/Critic-Runden gegen eine vorab gesetzte Qualitaetslatte, mit Compass als Design-System-Autoritaet und binaer pruefbaren Stop-Bedingungen."
+}

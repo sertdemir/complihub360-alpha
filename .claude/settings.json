@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "complihub": {
+      "source": {
+        "source": "directory",
+        "path": "."
+      }
+    }
+  },
+  "enabledPlugins": {
+    "complihub-loops@complihub": true
+  }
+}
