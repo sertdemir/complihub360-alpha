@@ -221,7 +221,11 @@
     "actionRead": "Yanıtı oku",
     "actionOpen": "Akışı aç",
     "slaLabel": "Süre",
-    "slaExpired": "doldu"
+    "slaExpired": "doldu",
+    "inboxTitle": "Sağlayıcı talepleri",
+    "inboxCounts": "{{you}} sizi bekliyor · {{provider}} sağlayıcıda · {{done}} kapandı",
+    "slaLabelProvider": "Süre · sağlayıcı",
+    "slaMissed": "kaçırıldı"
   },
   "notifications": {
     "title": "Bildirimler",
@@ -459,7 +463,11 @@
     "keep": "Koru",
     "confirmWithdraw": "Evet, geri çek",
     "withdrawError": "Geri çekme başarısız — lütfen birazdan tekrar deneyin.",
-    "notActionable": "Hatırlatma ve geri çekme yalnızca talep sağlayıcının onayını beklerken kullanılabilir."
+    "notActionable": "Hatırlatma ve geri çekme yalnızca talep sağlayıcının onayını beklerken kullanılabilir.",
+    "findOtherTitle": "Başka sağlayıcı bul",
+    "findOtherDesc": "Bu sağlayıcı yanıt vermedi — profilinizle yeni bir arama başlatın.",
+    "findOther": "Sağlayıcı bul",
+    "expiredNote": "Sağlayıcının onay süresi doldu. Talebi kapatabilir veya başka bir sağlayıcı seçebilirsiniz."
   },
   "sessionActions": {
     "eyebrow": "OTURUM",
@@ -574,7 +582,7 @@
     "website": "Sağlayıcı web sitesi",
     "emptyTitle": "Randevu yok",
     "emptyBody": "Randevular bir talepten doğar: bir sağlayıcı onayladığında görüşme burada görünür ve takviminize eklenebilir.",
-    "emptyCta": "Uygun sağlayıcıları bul",
+    "emptyCta": "İlk görüşme talep et",
     "emptyStep1Title": "Talep edin",
     "emptyStep1Body": "Dilediğiniz bir sağlayıcı.",
     "emptyStep2Title": "Uzlaşın",
@@ -592,7 +600,9 @@
     "tabs": {
       "anfragen": "Talepler",
       "termine": "Randevular"
-    }
+    },
+    "tabUpcoming": "Yaklaşan",
+    "tabPast": "Geçmiş"
   },
   "review": {
     "eyebrow": "DEĞERLENDİRME",
@@ -619,5 +629,9 @@
     "cancel": "Vazgeç",
     "done": "Taşındı ✓",
     "note": "Randevu taşındığında rezervasyon ve paylaşılan dosya korunur — yeni bir lead ücreti alınmaz. Sağlayıcı yeni saat hakkında bilgilendirilir."
+  },
+  "wizardDrawer": {
+    "eyebrow": "Yeni arama",
+    "title": "Uygun sağlayıcıları bul"
   }
 }

@@ -107,7 +107,6 @@ export function LeadsPage() {
         onClose={() => setDossierFor(null)}
         eyebrow={t('termine.dossierEyebrow')}
         title={dossierFor?.company ?? ''}
-        forceDark
       >
         {dossierFor && (
           <div className="space-y-4">

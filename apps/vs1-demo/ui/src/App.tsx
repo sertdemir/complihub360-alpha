@@ -63,6 +63,7 @@ const AuthCallbackPage = lazy(() => import("./pages/auth/AuthCallbackPage").then
 const ResetPasswordPage = lazy(() => import("./pages/auth/ResetPasswordPage").then((m) => ({ default: m.ResetPasswordPage })));
 import { AuthGuard } from "./components/auth/AuthGuard";
 import { AnimatedWizard } from "./components/home/AnimatedWizard";
+import { WizardDrawerProvider } from "./components/user/WizardDrawer";
 
 // Full-view assessment (/:locale/wizard, Figma 1705:262 light + · Dark): the
 // hero CTA opens the SAME 4-step wizard as the Entry-Door section, but as a
@@ -213,7 +214,10 @@ function AppContent() {
                     <Route path="provider/action" element={<ProviderMagicActionPage />} />
                     <Route path="provider/confirm-email" element={<ConfirmEmailPage />} />
                     {/* User Dashboard Routes (Auth Guarded) */}
-                    <Route element={<AuthGuard requiredRole="user" />}>
+                    {/* Wizard-Schublade fuer den ganzen Arbeitsbereich (2026-09-05):
+                        die Seiten rendern die Shell selbst, deshalb sitzt der
+                        Kontext hier, eine Ebene ueber ihnen. */}
+                    <Route element={<WizardDrawerProvider><AuthGuard requiredRole="user" /></WizardDrawerProvider>}>
                         <Route path="dashboard" element={<UserHomePage />} />
                         <Route path="dashboard/sessions" element={<SessionsPage />} />
                         {/* Anfragen ist seit 2026-09-01 ein Reiter der Termine-Seite

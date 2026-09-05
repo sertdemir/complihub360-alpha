@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
-import { BellRing, MessageSquare, XCircle } from 'lucide-react';
+import { BellRing, MessageSquare, XCircle, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useWizardDrawer } from './WizardDrawer';
+import { useNavigate } from 'react-router-dom';
 import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
 import { Tag } from '../ui/Tag';
@@ -28,15 +30,24 @@ interface RequestActionsDrawerProps {
 }
 
 const OPEN_STATUSES = ['created', 'delivered', 'viewed'];
+// Matrix-Befund 6 (2026-09-05): eine abgelaufene Anfrage stand unter "Wartet
+// auf Sie", bot aber keine Handlung. Jetzt: schliessen (Zurueckziehen) oder
+// einen anderen Anbieter suchen. Erinnern bleibt an die offene Frist gebunden.
+const WITHDRAWABLE_STATUSES = [...OPEN_STATUSES, 'expired'];
+const FIND_OTHER_STATUSES = ['expired', 'declined'];
 
 // Status labels arrive as English strings (fixture or api) — display mapping only.
 const STATUS_KEY: Record<string, string> = {
   'Awaiting confirmation': 'awaitingConfirmation', 'Active': 'active',
   'Provider replied': 'providerReplied', 'Provider confirmed': 'providerConfirmed', 'Withdrawn': 'withdrawn',
+  'Declined': 'declined', 'Expired': 'expired',
 };
 
 export function RequestActionsDrawer({ target, onClose, onOpenThread, onWithdrawn }: RequestActionsDrawerProps) {
-  const { t } = useTranslation('userws');
+  const { t, i18n } = useTranslation('userws');
+  const navigate = useNavigate();
+  const { openWizard } = useWizardDrawer();
+  const locale = i18n.resolvedLanguage || 'en';
   const [busy, setBusy] = useState<'remind' | 'withdraw' | null>(null);
   const [reminded, setReminded] = useState(false);
   const [confirmWithdraw, setConfirmWithdraw] = useState(false);
@@ -46,7 +57,10 @@ export function RequestActionsDrawer({ target, onClose, onOpenThread, onWithdraw
     setBusy(null); setReminded(false); setConfirmWithdraw(false); setError('');
   }, [target?.uuid]);
 
-  const actionable = !!target?.rawStatus && OPEN_STATUSES.includes(target.rawStatus);
+  const raw = target?.rawStatus ?? '';
+  const actionable = OPEN_STATUSES.includes(raw);
+  const canWithdraw = WITHDRAWABLE_STATUSES.includes(raw);
+  const canFindOther = FIND_OTHER_STATUSES.includes(raw);
   const tStatus = (label: string) => (STATUS_KEY[label] ? t(`status.${STATUS_KEY[label]}`) : label);
 
   const remind = async () => {
@@ -76,7 +90,6 @@ export function RequestActionsDrawer({ target, onClose, onOpenThread, onWithdraw
 
   return (
     <Drawer
-      forceDark
       open={!!target}
       onClose={onClose}
       side="right"
@@ -136,7 +149,7 @@ export function RequestActionsDrawer({ target, onClose, onOpenThread, onWithdraw
                 </p>
               </div>
               {!confirmWithdraw ? (
-                <Button size="sm" variant="ghost" onClick={() => setConfirmWithdraw(true)} disabled={!actionable || busy !== null}>
+                <Button size="sm" variant="ghost" onClick={() => setConfirmWithdraw(true)} disabled={!canWithdraw || busy !== null}>
                   {t('requestActions.withdraw')}
                 </Button>
               ) : (
@@ -150,9 +163,22 @@ export function RequestActionsDrawer({ target, onClose, onOpenThread, onWithdraw
             </div>
           </div>
 
+          {/* Anderen Anbieter finden — nur, wenn dieser nicht reagiert oder
+              abgelehnt hat (Befund 6). */}
+          {canFindOther && (
+            <div className="flex items-start gap-3 rounded-lg border border-elevate/10 bg-elevate/[0.03] p-4">
+              <Search size={16} className="mt-0.5 shrink-0 text-fg-brand" />
+              <div className="min-w-0 flex-1">
+                <p className="text-[13px] font-semibold text-fg">{t('requestActions.findOtherTitle')}</p>
+                <p className="mt-0.5 text-[11px] leading-relaxed text-fg-tertiary">{t('requestActions.findOtherDesc')}</p>
+              </div>
+              <Button size="sm" variant="primary" onClick={() => { onClose(); openWizard(); }}>{t('requestActions.findOther')}</Button>
+            </div>
+          )}
+
           {!actionable && (
             <p className="text-[11px] leading-relaxed text-fg-tertiary">
-              {t('requestActions.notActionable')}
+              {raw === 'expired' ? t('requestActions.expiredNote') : t('requestActions.notActionable')}
             </p>
           )}
           {error && (

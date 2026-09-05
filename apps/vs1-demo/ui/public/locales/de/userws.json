@@ -221,7 +221,11 @@
     "actionRead": "Antwort lesen",
     "actionOpen": "Verlauf öffnen",
     "slaLabel": "Frist",
-    "slaExpired": "abgelaufen"
+    "slaExpired": "abgelaufen",
+    "inboxTitle": "Anbieter-Anfragen",
+    "inboxCounts": "{{you}} warten auf Sie · {{provider}} beim Anbieter · {{done}} abgeschlossen",
+    "slaLabelProvider": "Frist · Anbieter",
+    "slaMissed": "verpasst"
   },
   "notifications": {
     "title": "Benachrichtigungen",
@@ -459,7 +463,11 @@
     "keep": "Behalten",
     "confirmWithdraw": "Ja, zurückziehen",
     "withdrawError": "Zurückziehen fehlgeschlagen — versuchen Sie es gleich erneut.",
-    "notActionable": "Erinnern und Zurückziehen sind nur möglich, solange die Anfrage auf die Bestätigung des Anbieters wartet."
+    "notActionable": "Erinnern und Zurückziehen sind nur möglich, solange die Anfrage auf die Bestätigung des Anbieters wartet.",
+    "findOtherTitle": "Anderen Anbieter finden",
+    "findOtherDesc": "Dieser Anbieter hat nicht reagiert — starten Sie mit Ihrem Profil eine neue Suche.",
+    "findOther": "Anbieter finden",
+    "expiredNote": "Die Bestätigungsfrist des Anbieters ist verstrichen. Sie können die Anfrage schließen oder einen anderen Anbieter wählen."
   },
   "sessionActions": {
     "eyebrow": "SITZUNG",
@@ -574,7 +582,7 @@
     "website": "Anbieter-Website",
     "emptyTitle": "Keine Termine",
     "emptyBody": "Termine entstehen aus einer Anfrage: Sobald ein Anbieter bestätigt, steht der Gesprächstermin hier und lässt sich in Ihren Kalender übernehmen.",
-    "emptyCta": "Passende Anbieter finden",
+    "emptyCta": "Erstgespräch anfragen",
     "emptyStep1Title": "Anfragen",
     "emptyStep1Body": "Ein Anbieter Ihrer Wahl.",
     "emptyStep2Title": "Abstimmen",
@@ -592,7 +600,9 @@
     "tabs": {
       "anfragen": "Anfragen",
       "termine": "Termine"
-    }
+    },
+    "tabUpcoming": "Kommend",
+    "tabPast": "Vergangen"
   },
   "review": {
     "eyebrow": "BEWERTUNG",
@@ -619,5 +629,9 @@
     "cancel": "Abbrechen",
     "done": "Verschoben ✓",
     "note": "Beim Verschieben bleiben Buchung und geteiltes Dossier bestehen — es fällt keine neue Lead-Gebühr an. Der Provider wird über die neue Zeit informiert."
+  },
+  "wizardDrawer": {
+    "eyebrow": "Neue Suche",
+    "title": "Passende Anbieter finden"
   }
 }

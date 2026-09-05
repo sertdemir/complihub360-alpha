@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { LayoutGrid, List, TriangleAlert, FolderOpen } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
+import { useWizardDrawer } from '../../components/user/WizardDrawer';
 import { AnimatePresence, MotionConfig, motion, type Variants } from 'framer-motion';
 import type { TFunction } from 'i18next';
 import { UserShell } from '../../components/user/UserShell';
@@ -113,6 +114,7 @@ export function SessionsPage() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation('userws');
   const { t: tResults } = useTranslation('results');
+  const { openWizard } = useWizardDrawer();
   const locale = i18n.resolvedLanguage || 'en';
   const [live, setLive] = useState<Row[] | null>(null);
   const [filter, setFilter] = useState('all');
@@ -192,7 +194,7 @@ export function SessionsPage() {
   };
   // "Erneut pruefen" laeuft die gespeicherten Antworten neu durch — es gibt
   // keinen Neuberechnungs-Endpunkt, der Assistent IST der ehrliche Weg dahin.
-  const recheck = () => navigate(`/${locale}/wizard`);
+  const recheck = () => openWizard();
 
   const metaLine = (r: Row) => (
     <span className={`text-body-4xs font-semibold ${RISK_TEXT[r.risk]}`}>
@@ -212,7 +214,7 @@ export function SessionsPage() {
               icon={FolderOpen}
               title={t('sessions.emptyTitle')}
               body={t('sessions.emptyBody')}
-              cta={{ label: t('sessions.emptyCta'), onClick: () => navigate(`/${locale}/wizard`) }}
+              cta={{ label: t('sessions.emptyCta'), onClick: () => openWizard() }}
               hint={t('sessions.emptyHint')}
               steps={[
                 { title: t('sessions.emptyStep1Title'), body: t('sessions.emptyStep1Body') },
@@ -241,7 +243,7 @@ export function SessionsPage() {
                 {stale.length > 0 && ` · ${t('sessions.subStale', { count: stale.length })}`}
               </p>
             </div>
-            <Button className="mt-0.5 shrink-0" onClick={() => navigate(`/${locale}/wizard`)}>{t('shared.startNewSearch')}</Button>
+            <Button className="mt-0.5 shrink-0" onClick={() => openWizard()}>{t('shared.startNewSearch')}</Button>
           </div>
 
           <div className="mt-4 flex flex-col gap-4 lg:flex-row">

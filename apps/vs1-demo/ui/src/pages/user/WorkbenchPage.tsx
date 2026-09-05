@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
+import { useWizardDrawer } from '../../components/user/WizardDrawer';
 import { UserShell } from '../../components/user/UserShell';
 import { RequestQuoteModal, type QuoteProvider } from '../../components/user/RequestQuoteModal';
 import { DocUploadDrawer } from '../../components/user/DocUploadDrawer';
@@ -124,6 +125,7 @@ export function WorkbenchPage() {
   const { domain, locale = 'en' } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation('userws');
+  const { openWizard } = useWizardDrawer();
   const key = (domain && domain in DOMAIN_META ? domain : 'tax-vat') as DomainKey;
   const meta = DOMAIN_META[key];
   const steps = meta.steps.length ? meta.steps : STEPS;
@@ -149,7 +151,7 @@ export function WorkbenchPage() {
           <div className="mt-1 flex shrink-0 items-center gap-4">
             <button type="button" onClick={() => navigate(`/${locale}/wizard?refine=1`)} className="text-[12px] font-medium text-fg underline underline-offset-2">{t('workbench.refineExisting')}</button>
             <Button size="sm" variant="secondary" onClick={() => setUploadOpen(true)}>{t('workbench.uploadDocument')}</Button>
-            <Button size="sm" onClick={() => navigate(`/${locale}/wizard`)}>{t('workbench.startNew')}</Button>
+            <Button size="sm" onClick={() => openWizard()}>{t('workbench.startNew')}</Button>
           </div>
         </div>
 

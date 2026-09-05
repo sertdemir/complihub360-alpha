@@ -498,6 +498,37 @@ describe('POST /api/v1/admin/watchers/tick', () => {
     });
 });
 
+describe('Zurueckziehen und Erinnern gehoeren dem Ersteller', () => {
+    const seedEngagement = (over: Record<string, any> = {}) => {
+        const row = { id: randomUUID(), user_id: USER_ID, provider_key: 'test-kanzlei', country: 'DE', category: 'vat', status: 'created', created_at: new Date().toISOString(), ...over };
+        (db.engagement_requests ??= []).push(row);
+        return row;
+    };
+
+    it('zieht eine ABGELAUFENE Anfrage zurueck — sie war vorher eine Sackgasse', async () => {
+        const e = seedEngagement({ status: 'expired' });
+        const r = await api(`/api/v1/engagement/${e.id}/withdraw`, { method: 'POST', auth: 'jwt', body: '{}' });
+        expect(r.status).toBe(200);
+        expect(r.body.status).toBe('withdrawn');
+    });
+
+    it('weist Zurueckziehen nach der Bestaetigung weiter ab (409)', async () => {
+        const e = seedEngagement({ status: 'confirmed' });
+        const r = await api(`/api/v1/engagement/${e.id}/withdraw`, { method: 'POST', auth: 'jwt', body: '{}' });
+        expect(r.status).toBe(409);
+    });
+
+    it('verbirgt fremde Anfragen als 404 — zurueckziehen wie erinnern', async () => {
+        const fremd = seedEngagement({ user_id: randomUUID() });
+        const w = await api(`/api/v1/engagement/${fremd.id}/withdraw`, { method: 'POST', auth: 'jwt', body: '{}' });
+        expect(w.status).toBe(404);
+        const rm = await api(`/api/v1/engagement/${fremd.id}/remind`, { method: 'POST', auth: 'jwt', body: '{}' });
+        expect(rm.status).toBe(404);
+        // Die Zeile ist unveraendert — nichts wurde zurueckgezogen.
+        expect(db.engagement_requests.find((x: any) => x.id === fremd.id).status).toBe('created');
+    });
+});
+
 describe('Pflicht-Status je Sitzung', () => {
     // Zwei Achsen, die nie verschmelzen duerfen: die GELTUNG kommt aus der
     // Engine, die BEARBEITUNG vom Nutzer. Diese Endpunkte decken die zweite ab.

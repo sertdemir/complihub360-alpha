@@ -61,7 +61,6 @@ export function AddMarketDrawer({ open, onClose, onAdded }: AddMarketDrawerProps
 
   return (
     <Drawer
-      forceDark
       open={open}
       onClose={onClose}
       side="right"

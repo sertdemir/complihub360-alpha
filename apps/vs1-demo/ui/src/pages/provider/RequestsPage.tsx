@@ -87,6 +87,7 @@ const STATUS_LABEL_KEY: Record<RequestStatus, string> = {
   'awaiting-confirm': 'requests.statusAwaitingConfirm',
   'awaiting-reply': 'requests.statusAwaitingReply',
   'active': 'requests.statusActive',
+  'closed': 'requests.statusClosed',
 };
 
 // action label → localized button label (defaultValue = raw label).

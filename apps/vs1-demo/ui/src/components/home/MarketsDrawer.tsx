@@ -421,7 +421,7 @@ export function FreeAccountDrawer({ open, onClose }: { open: boolean; onClose: (
       {open && (
         <div className="fixed inset-0 z-[120]">
           <motion.div
-            className="absolute inset-0 bg-black/30 backdrop-blur-md"
+            className="absolute inset-0 bg-black/20 backdrop-blur-[var(--drawer-scrim-blur)]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -431,7 +431,9 @@ export function FreeAccountDrawer({ open, onClose }: { open: boolean; onClose: (
           <motion.aside
             role="dialog"
             aria-label={t('account.drawerLabel')}
-            className="absolute right-0 top-0 flex h-full w-full max-w-[520px] flex-col bg-surface shadow-2xl"
+            // Gleiche Form wie components/ui/Drawer (Canvas-Wahl 4C, 2026-09-05):
+            // schwebendes helles Milchglas statt flacher Vollhoehen-Wand.
+            className="absolute right-4 top-1/2 flex max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[520px] -translate-y-1/2 flex-col overflow-hidden rounded-[var(--radius-3xl)] border border-white/70 bg-[var(--drawer-glass-bg)] shadow-[0_24px_60px_-24px_rgba(11,21,18,0.30),0_2px_6px_rgba(11,21,18,0.06)] backdrop-blur-[var(--drawer-glass-blur)] dark:border-white/10"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}

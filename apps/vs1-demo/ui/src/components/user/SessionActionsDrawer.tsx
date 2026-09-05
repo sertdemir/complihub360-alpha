@@ -53,7 +53,7 @@ export function SessionActionsDrawer({ target, onClose, onChanged }: SessionActi
   };
 
   return (
-    <Drawer forceDark open={!!target} onClose={onClose} side="right" size="md" eyebrow={t('sessionActions.eyebrow')} title={t('sessionActions.title')}>
+    <Drawer open={!!target} onClose={onClose} side="right" size="md" eyebrow={t('sessionActions.eyebrow')} title={t('sessionActions.title')}>
       {target && (
         <div className="space-y-4">
           <div className="rounded-lg border border-elevate/10 bg-elevate/[0.03] px-4 py-3">

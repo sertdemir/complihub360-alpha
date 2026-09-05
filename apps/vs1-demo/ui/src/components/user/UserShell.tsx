@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useTranslation } from 'react-i18next';
 import {
@@ -288,8 +288,21 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
           <button type="button" aria-label={t('shell.search')} onClick={() => setSearchOpen(true)} className="grid h-9 w-9 place-items-center rounded-lg text-fg-secondary hover:text-fg">
             <Search size={17} />
           </button>
+          {/* Glocke (Canvas-Wahl 5B, 2026-09-05): fuehrt direkt zu den
+              Benachrichtigungen; ein goldener Punkt, sobald etwas ungelesen ist —
+              dieselbe Zahl, die die Seitenleiste traegt. */}
+          <Link
+            to={`/${locale}/dashboard/notifications`}
+            aria-label={t('shell.navNotifications')}
+            className="relative grid h-9 w-9 place-items-center rounded-lg text-fg-secondary hover:text-fg"
+          >
+            <Bell size={17} />
+            {(counts.unread ?? 0) > 0 && (
+              <span aria-hidden="true" className="absolute right-[7px] top-[7px] h-2 w-2 rounded-full bg-accent ring-2 ring-surface" />
+            )}
+          </Link>
           {/* 36 px und rounded-lg statt der Vorgaben der Komponente, damit die
-              beiden Knöpfe in der Leiste dieselbe Fläche haben. */}
+              Knöpfe in der Leiste dieselbe Fläche haben. */}
           <ThemeToggle size={36} className="rounded-lg" />
         </div>
         <main className="flex-1 overflow-y-auto px-8 py-6">{children}</main>

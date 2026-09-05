@@ -1650,6 +1650,16 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         // and the autonomous SLA watcher share one code path.
         const engagementId = (req.url || '').split('/')[4];
         res.setHeader('x-correlation-id', correlationId);
+        // Eigentuemer-Bindung (2026-09-05, gleiches Muster wie Anfragen-Liste
+        // und Pflicht-Staende): nur der Ersteller (oder der Server-Key) darf
+        // erinnern — fremde Anfragen bleiben ein 404.
+        const own = (await supabaseApi.select('engagement_requests', { id: engagementId }, { limit: 1 })) as
+            Array<{ id: string; user_id?: string | null }>;
+        if (!own[0] || !(authViaApiKey || (authUserId && own[0].user_id === authUserId))) {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Engagement not found', correlationId }));
+            return;
+        }
         const reminderOutcome = await issueReminder(engagementId, { auto: false });
         if (reminderOutcome === 'not_found') {
             res.writeHead(404, { 'Content-Type': 'application/json' });
@@ -1671,13 +1681,17 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         const engagementId = (req.url || '').split('/')[4];
         try {
             const eng = (await supabaseApi.select('engagement_requests', { id: engagementId }, { limit: 1 })) as
-                Array<{ id: string; status: string }>;
-            if (!eng[0]) {
+                Array<{ id: string; status: string; user_id?: string | null }>;
+            // Eigentuemer-Bindung (2026-09-05): fremde Anfragen sind ein 404.
+            if (!eng[0] || !(authViaApiKey || (authUserId && eng[0].user_id === authUserId))) {
                 res.writeHead(404, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Engagement not found', correlationId }));
                 return;
             }
-            if (!['created', 'delivered', 'viewed'].includes(eng[0].status)) {
+            // 'expired' darf ebenfalls zurueckgezogen werden (Befund 2026-09-05):
+            // sonst blieb eine vom Anbieter verpasste Anfrage fuer immer unter
+            // "Wartet auf Sie", ohne dass der Nutzer sie schliessen konnte.
+            if (!['created', 'delivered', 'viewed', 'expired'].includes(eng[0].status)) {
                 res.writeHead(409, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INVALID_STATE', message: `Cannot withdraw in status '${eng[0].status}'`, correlationId }));
                 return;

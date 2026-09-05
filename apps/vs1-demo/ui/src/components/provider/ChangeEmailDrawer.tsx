@@ -43,7 +43,6 @@ export function ChangeEmailDrawer({ open, currentEmail, onClose }: ChangeEmailDr
 
   return (
     <Drawer
-      forceDark
       open={open}
       onClose={onClose}
       side="right"

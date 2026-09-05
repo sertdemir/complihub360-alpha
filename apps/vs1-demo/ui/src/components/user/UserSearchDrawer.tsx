@@ -47,7 +47,7 @@ export function UserSearchDrawer({ open, onClose }: { open: boolean; onClose: ()
   const tStatus = (label: string) => (STATUS_KEY[label] ? t(`status.${STATUS_KEY[label]}`) : label);
 
   return (
-    <Drawer forceDark open={open} onClose={onClose} side="right" size="md" eyebrow={t('userSearch.eyebrow')} title={t('userSearch.title')}>
+    <Drawer open={open} onClose={onClose} side="right" size="md" eyebrow={t('userSearch.eyebrow')} title={t('userSearch.title')}>
       <div className="space-y-4">
         <div className="flex items-center gap-2 rounded-lg border border-elevate/10 bg-elevate/5 px-3 py-2.5 focus-within:border-fg-brand">
           <Search size={15} className="shrink-0 text-fg-tertiary" />

@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Play, ArrowRight, TriangleAlert, CalendarClock, Compass } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
+import { useWizardDrawer } from '../../components/user/WizardDrawer';
 import { UserShell } from '../../components/user/UserShell';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Button } from '../../components/ui/Button';
@@ -114,6 +115,7 @@ export function UserHomePage() {
   const navigate = useNavigate();
   const { locale = 'en' } = useParams();
   const { t, i18n } = useTranslation('userws');
+  const { openWizard } = useWizardDrawer();
   const [chartView, setChartView] = useState<'markets' | 'areas'>('markets');
   const entered = useEntered();
   const { dash, requests, bookings, loading } = useLage();
@@ -173,7 +175,7 @@ export function UserHomePage() {
         </h1>
         <p className="mt-1 text-body-2xs text-fg-tertiary">{today}</p>
       </div>
-      <Button className="mt-0.5 shrink-0" onClick={() => navigate(`/${locale}/wizard`)}>{t('shared.startNewSearch')}</Button>
+      <Button className="mt-0.5 shrink-0" onClick={() => openWizard()}>{t('shared.startNewSearch')}</Button>
     </div>
   );
 
@@ -204,7 +206,7 @@ export function UserHomePage() {
               title={t('home.emptyTitle')}
               body={t('home.emptyBody')}
               hint={t('home.emptyHint')}
-              cta={{ label: t('home.emptyCta'), onClick: () => navigate(`/${locale}/wizard`) }}
+              cta={{ label: t('home.emptyCta'), onClick: () => openWizard() }}
               steps={[
                 { title: t('home.emptyStep1Title'), body: t('home.emptyStep1Body') },
                 { title: t('home.emptyStep2Title'), body: t('home.emptyStep2Body') },

@@ -74,7 +74,7 @@ export function RescheduleDrawer({ target, onClose, onRescheduled }: {
   };
 
   return (
-    <Drawer open={!!target} onClose={onClose} eyebrow={t('reschedule.eyebrow')} title={target?.providerName ?? ''} forceDark
+    <Drawer open={!!target} onClose={onClose} eyebrow={t('reschedule.eyebrow')} title={target?.providerName ?? ''}
       footer={
         <div className="flex items-center justify-end gap-2.5">
           <Button size="sm" variant="ghost" onClick={onClose}>{t('reschedule.cancel')}</Button>

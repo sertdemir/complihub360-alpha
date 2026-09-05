@@ -147,7 +147,6 @@ export function ThreadDrawer({ open, engagementId, viewer, onClose }: ThreadDraw
 
   return (
     <Drawer
-      forceDark
       open={open}
       onClose={onClose}
       side="right"

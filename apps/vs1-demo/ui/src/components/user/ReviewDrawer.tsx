@@ -49,7 +49,7 @@ export function ReviewDrawer({ target, onClose, onSubmitted }: {
   };
 
   return (
-    <Drawer open={!!target} onClose={close} eyebrow={t('review.eyebrow')} title={target?.providerName ?? ''} forceDark
+    <Drawer open={!!target} onClose={close} eyebrow={t('review.eyebrow')} title={target?.providerName ?? ''}
       footer={
         <div className="flex items-center justify-end gap-2.5">
           <Button size="sm" variant="ghost" onClick={close}>{t('review.cancel')}</Button>

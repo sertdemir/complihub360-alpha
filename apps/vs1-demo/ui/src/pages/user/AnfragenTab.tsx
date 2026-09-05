@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { MoreHorizontal, Inbox } from 'lucide-react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import { useWizardDrawer } from '../../components/user/WizardDrawer';
 import { EmptyState } from '../../components/user/EmptyState';
 import { Button } from '../../components/ui/Button';
 import { RequestCard, type RequestStatus } from '../../components/ui/RequestCard';
@@ -46,6 +47,7 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation('userws');
   const locale = i18n.resolvedLanguage || 'en';
+  const { openWizard } = useWizardDrawer();
   const [threadFor, setThreadFor] = useState<string | null>(null);
   // Deep-Link (Glocke, Suche): ?thread=<uuid> oeffnet den Verlauf direkt.
   const [searchParams, setSearchParams] = useSearchParams();
@@ -54,11 +56,18 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
   const [actionsFor, setActionsFor] = useState<RequestActionsTarget | null>(null);
   const [withdrawnIds, setWithdrawnIds] = useState<Set<string>>(new Set());
 
-  const effective = (rows ?? []).map((r) =>
-    withdrawnIds.has(r.uuid)
-      ? { ...r, status: 'active' as RequestStatus, statusLabel: 'Withdrawn', bucket: 'closed' as const, rawStatus: 'withdrawn', slaDeadline: null }
-      : r,
-  );
+  const effective = (rows ?? []).map((r) => {
+    if (withdrawnIds.has(r.uuid)) {
+      return { ...r, status: 'closed' as RequestStatus, statusLabel: 'Withdrawn', bucket: 'closed' as const, rawStatus: 'withdrawn', slaDeadline: null };
+    }
+    // Matrix-Befund 4 (2026-09-05): reisst der Anbieter nach der Bestaetigung
+    // die Antwortfrist, blieb die Zeile fuer immer "wartet auf den Anbieter".
+    // Jetzt wandert sie zu "wartet auf Sie" — Ihre Entscheidung steht an.
+    if (r.bucket === 'confirmed' && r.slaDeadline && new Date(r.slaDeadline).getTime() <= Date.now()) {
+      return { ...r, bucket: 'overdue' as const };
+    }
+    return r;
+  });
 
   // 3B: drei Abschnitte, sortiert danach, wer am Zug ist.
   const aufSie = effective.filter((r) => r.bucket === 'replied' || r.bucket === 'overdue');
@@ -71,10 +80,13 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
 
   // 4B: die gerade laufende Frist als Restzeit + Balkenanteil.
   const frist = (r: UserRequestRow) => {
-    if (r.bucket === 'overdue') return { label: t('requests.slaExpired'), tone: 'err' as const, pct: 0 };
+    // 2B (2026-09-05): Fristen gehoeren immer dem Anbieter (24 h bestaetigen,
+    // 48 h antworten). "verpasst" statt "abgelaufen" — sonst las es sich, als
+    // haetten SIE etwas versaeumt.
+    if (r.bucket === 'overdue') return { label: t('requests.slaMissed'), tone: 'err' as const, pct: 0 };
     if (!r.slaDeadline) return null;
     const left = new Date(r.slaDeadline).getTime() - Date.now();
-    if (left <= 0) return { label: t('requests.slaExpired'), tone: 'err' as const, pct: 0 };
+    if (left <= 0) return { label: t('requests.slaMissed'), tone: 'err' as const, pct: 0 };
     const h = Math.floor(left / 3_600_000);
     const m = Math.floor((left % 3_600_000) / 60_000);
     return {
@@ -99,13 +111,14 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
     return (
       <RequestCard
         key={r.uuid}
+        className="rounded-none border-0 border-t border-stroke-subtle bg-transparent px-5"
         idLine={`${r.id} · ${relZeit(r.createdAt, locale)}`}
         status={r.status}
         statusLabel={r.statusLabel ? t(`status.${STATUS_KEY[r.statusLabel] ?? ''}`, r.statusLabel) : r.statusLabel}
         company={r.company}
         tag={r.partner ? 'PARTNER' : undefined}
         meta={[bereich(r.category), markt(r.country)].filter(Boolean).join(' · ') || r.meta}
-        slaLabel={t('requests.slaLabel')}
+        slaLabel={t('requests.slaLabelProvider')}
         slaValue={f ? (
           <span className="block">
             <span className={`text-[15px] font-medium ${FRIST_TONE[f.tone]}`}>{f.label}</span>
@@ -133,8 +146,8 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
 
   const abschnitt = (key: string, liste: UserRequestRow[], warn = false) => (
     liste.length > 0 && (
-      <section className="space-y-2.5">
-        <p className={`text-[11px] font-semibold uppercase tracking-[0.05em] ${warn ? 'text-warning-800 dark:text-amber-300' : 'text-fg-tertiary'}`}>
+      <section>
+        <p className={`px-5 pb-1.5 pt-3.5 text-[10.5px] font-bold uppercase tracking-[0.05em] ${warn ? 'text-warning-800 dark:text-amber-300' : 'text-fg-tertiary'}`}>
           {t(key)} · {liste.length}
         </p>
         {liste.map(karte)}
@@ -142,31 +155,24 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
     )
   );
 
-  // 2B: die Unterzeile sagt, was wartet — sonst die Zählung, sonst den Satz.
-  const sub = aufSie.length > 0
-    ? t('requests.subWaiting', { count: aufSie.length })
-    : effective.length > 0
-      ? t('requests.subCounts', { active: aufAnbieter.length + aufSie.length, overdue: effective.filter((r) => r.bucket === 'overdue').length })
-      : t('requests.sub');
+  // 1C (2026-09-05): Anfragen sind der Posteingang UNTER den Terminen — eine
+  // Karte mit Zaehlern im Kopf statt einer eigenen H1. Die Unterzeile zaehlt,
+  // wer am Zug ist; wartet etwas auf Sie, steht sie fett.
+  const counts = { you: aufSie.length, provider: aufAnbieter.length, done: abgeschlossen.length };
+
+  // Leerzustand ohne Posteingangs-Rahmen (Nutzer-Vorgabe 2026-09-05): die
+  // Karte steht dann genau wie die Termine-Leerkarte darueber — gleiche
+  // Breite, gleiche Form, kein breiter Kasten mit Kopfzeile drumherum.
+  const leer = rows !== null && effective.length === 0;
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="font-serif text-[32px] font-bold leading-tight text-fg">
-            <Trans t={t} i18nKey="requests.title" components={{ accent: <span className="text-fg-accent-emphasis" /> }} />
-          </h1>
-          <p className={`mt-1 text-body-sm ${aufSie.length > 0 ? 'font-semibold text-fg' : 'text-fg-secondary'}`}>{sub}</p>
-        </div>
-        <Button size="sm" className="mt-1 shrink-0" onClick={() => navigate(`/${locale}/wizard`)}>{t('requests.findProvider')}</Button>
-      </div>
-
-      {rows !== null && effective.length === 0 ? (
+    <section id="anfragen" className="scroll-mt-6">
+      {leer ? (
         <EmptyState
           icon={Inbox}
           title={t('requests.emptyTitle')}
           body={t('requests.emptyBody')}
-          cta={{ label: t('requests.emptyCta'), onClick: () => navigate(`/${locale}/wizard`) }}
+          cta={{ label: t('requests.emptyCta'), onClick: () => openWizard() }}
           steps={[
             { title: t('requests.emptyStep1Title'), body: t('requests.emptyStep1Body') },
             { title: t('requests.emptyStep2Title'), body: t('requests.emptyStep2Body') },
@@ -174,11 +180,24 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
           ]}
         />
       ) : (
-        <>
+      <div className="overflow-hidden rounded-xl border border-stroke bg-surface">
+        <div className="flex items-start justify-between gap-4 border-b border-stroke-subtle bg-surface-secondary px-5 py-4">
+          <div className="min-w-0">
+            <h2 className="font-serif text-[20px] font-bold leading-tight text-fg">{t('requests.inboxTitle')}</h2>
+            <p className={`mt-0.5 text-[12px] ${aufSie.length > 0 ? 'font-semibold text-fg' : 'text-fg-secondary'}`}>
+              {rows === null ? '…' : t('requests.inboxCounts', counts)}
+            </p>
+          </div>
+          <button type="button" onClick={() => openWizard()} className="shrink-0 text-[12px] font-bold text-fg-brand underline underline-offset-2 hover:text-fg">
+            {t('requests.findProvider')}
+          </button>
+        </div>
+        <div className="pb-1.5">
           {abschnitt('requests.secYou', aufSie, true)}
           {abschnitt('requests.secProvider', aufAnbieter)}
           {abschnitt('requests.secDone', abgeschlossen)}
-        </>
+        </div>
+      </div>
       )}
 
       <ThreadDrawer open={!!threadFor} engagementId={threadFor} viewer="user" onClose={() => { setThreadFor(null); if (deepThread) { searchParams.delete('thread'); setSearchParams(searchParams, { replace: true }); } }} />
@@ -188,7 +207,7 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
         onOpenThread={(uuid) => setThreadFor(uuid)}
         onWithdrawn={(uuid) => setWithdrawnIds((prev) => new Set(prev).add(uuid))}
       />
-    </div>
+    </section>
   );
 }
 
