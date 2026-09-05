@@ -481,7 +481,8 @@
     "archiveTitle": "Arşivle",
     "archiveDesc": "Oturumu listeden gizler · izleme duraklatılır · her zaman geri yüklenebilir.",
     "archived": "Arşivlendi ✓",
-    "actionError": "İşlem başarısız — lütfen birazdan tekrar deneyin."
+    "actionError": "İşlem başarısız — lütfen birazdan tekrar deneyin.",
+    "copyLabel": "{{label}} kopyası"
   },
   "userSearch": {
     "eyebrow": "ÇALIŞMA ALANI",
@@ -633,5 +634,18 @@
   "wizardDrawer": {
     "eyebrow": "Yeni arama",
     "title": "Uygun sağlayıcıları bul"
+  },
+  "answersDrawer": {
+    "title": "Yanıtları düzenle",
+    "hint": "Kapalı adımlar yanıtlarını gösterir; açın, değiştirin, kaydedin.",
+    "unsaved": "Kaydedilmemiş değişiklik: {{count}}",
+    "footerNote": "Kaydetmek bu oturumun risk haritasını yeniden hesaplar.",
+    "discard": "Vazgeç",
+    "save": "Kaydet",
+    "saved": "Kaydedildi; risk haritası yeniden hesaplanıyor.",
+    "error": "Kaydetme başarısız. Lütfen tekrar deneyin.",
+    "changed": "değişti",
+    "none": "Seçim yok",
+    "needSelection": "En az bir pazar ve bir uyumluluk alanı seçin."
   }
 }

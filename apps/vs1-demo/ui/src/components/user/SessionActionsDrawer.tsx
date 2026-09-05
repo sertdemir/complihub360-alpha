@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Archive, Copy, PencilLine } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
 import { Tag } from '../ui/Tag';
@@ -28,7 +29,9 @@ interface SessionActionsDrawerProps {
 const DOMAIN_KEY = DOMAIN_I18N_KEY;
 
 export function SessionActionsDrawer({ target, onClose, onChanged }: SessionActionsDrawerProps) {
-  const { t } = useTranslation('userws');
+  const { t, i18n } = useTranslation('userws');
+  const navigate = useNavigate();
+  const locale = i18n.resolvedLanguage || 'en';
   const [name, setName] = useState('');
   const [busy, setBusy] = useState<'rename' | 'duplicate' | 'archive' | null>(null);
   const [done, setDone] = useState('');
@@ -96,7 +99,12 @@ export function SessionActionsDrawer({ target, onClose, onChanged }: SessionActi
               <p className="mt-0.5 text-[11px] leading-relaxed text-fg-tertiary">{t('sessionActions.duplicateDesc')}</p>
             </div>
             <Button size="sm" variant="secondary" disabled={busy !== null}
-              onClick={() => run('duplicate', () => duplicateSession(target.id), t('sessionActions.duplicated'))}>
+              // Kopie anlegen und sofort auf ihr die Antworten-Schublade oeffnen
+              // (Canvas-Wahl 2B, 2026-09-05) — "muss da nicht der Wizard starten?"
+              onClick={() => run('duplicate', async () => {
+                const copyId = await duplicateSession(target.id, t('sessionActions.copyLabel', { label: target.title }));
+                navigate(`/${locale}/results?session=${copyId}`, { state: { openAnswers: true } });
+              }, t('sessionActions.duplicated'))}>
               {busy === 'duplicate' ? '…' : t('sessionActions.duplicateTitle')}
             </Button>
           </div>

@@ -481,7 +481,8 @@
     "archiveTitle": "Archivieren",
     "archiveDesc": "Blendet die Sitzung aus der Liste aus · Monitoring pausiert · jederzeit wiederherstellbar.",
     "archived": "Archiviert ✓",
-    "actionError": "Aktion fehlgeschlagen — versuchen Sie es gleich erneut."
+    "actionError": "Aktion fehlgeschlagen — versuchen Sie es gleich erneut.",
+    "copyLabel": "Kopie von {{label}}"
   },
   "userSearch": {
     "eyebrow": "ARBEITSBEREICH",
@@ -633,5 +634,18 @@
   "wizardDrawer": {
     "eyebrow": "Neue Suche",
     "title": "Passende Anbieter finden"
+  },
+  "answersDrawer": {
+    "title": "Antworten bearbeiten",
+    "hint": "Zugeklappte Schritte zeigen ihre Antwort — aufklappen, ändern, speichern.",
+    "unsaved": "Ungespeicherte Änderungen: {{count}}",
+    "footerNote": "Speichern rechnet die Risk Map dieser Sitzung neu.",
+    "discard": "Verwerfen",
+    "save": "Speichern",
+    "saved": "Gespeichert — die Risk Map wird neu berechnet.",
+    "error": "Speichern fehlgeschlagen. Bitte erneut versuchen.",
+    "changed": "geändert",
+    "none": "Keine Auswahl",
+    "needSelection": "Mindestens ein Markt und ein Compliance-Bereich müssen ausgewählt sein."
   }
 }

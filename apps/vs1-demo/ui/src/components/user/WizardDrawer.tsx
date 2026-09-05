@@ -41,7 +41,7 @@ export function WizardDrawerProvider({ children }: { children: ReactNode }) {
   return (
     <Ctx.Provider value={api}>
       {children}
-      <Drawer open={open} onClose={() => setOpen(false)} size="xl" eyebrow={t('wizardDrawer.eyebrow')} title={t('wizardDrawer.title')}>
+      <Drawer open={open} onClose={() => setOpen(false)} size="xl" fixedHeight eyebrow={t('wizardDrawer.eyebrow')} title={t('wizardDrawer.title')}>
         {/* `key` setzt den Wizard bei jedem Oeffnen auf Schritt 1 zurueck. */}
         {open && (
           <AnimatedWizard

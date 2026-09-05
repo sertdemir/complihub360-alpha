@@ -481,7 +481,8 @@
     "archiveTitle": "Archivar",
     "archiveDesc": "Oculta la sesión de la lista · la monitorización se pausa · restaurable en cualquier momento.",
     "archived": "Archivada ✓",
-    "actionError": "La acción falló — inténtelo de nuevo en un momento."
+    "actionError": "La acción falló — inténtelo de nuevo en un momento.",
+    "copyLabel": "Copia de {{label}}"
   },
   "userSearch": {
     "eyebrow": "ESPACIO DE TRABAJO",
@@ -633,5 +634,18 @@
   "wizardDrawer": {
     "eyebrow": "Nueva búsqueda",
     "title": "Buscar proveedores adecuados"
+  },
+  "answersDrawer": {
+    "title": "Editar respuestas",
+    "hint": "Los pasos plegados muestran su respuesta: despliegue, cambie, guarde.",
+    "unsaved": "Cambios sin guardar: {{count}}",
+    "footerNote": "Guardar recalcula el mapa de riesgos de esta sesión.",
+    "discard": "Descartar",
+    "save": "Guardar",
+    "saved": "Guardado: el mapa de riesgos se está recalculando.",
+    "error": "No se pudo guardar. Inténtelo de nuevo.",
+    "changed": "cambiado",
+    "none": "Sin selección",
+    "needSelection": "Seleccione al menos un mercado y un área de cumplimiento."
   }
 }

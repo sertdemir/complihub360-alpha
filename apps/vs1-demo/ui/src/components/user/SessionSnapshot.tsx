@@ -280,7 +280,7 @@ function GroupCard({ label, sub, dot, rows, entered, offset, taskOf, statusRowOf
 }
 
 export function SessionSnapshot({
-  rows, providers, sessionId, title, meta, kpis, matchBasis, onExportPdf, onEditAnswers, onProviderDetails,
+  rows, providers, sessionId, title, meta, kpis, matchBasis, onExportPdf, onEditAnswers, onProviderDetails, answersDrawer,
 }: {
   rows: SnapshotRow[];
   providers: AnonProvider[];
@@ -294,6 +294,9 @@ export function SessionSnapshot({
   onExportPdf: () => void;
   onEditAnswers: () => void;
   onProviderDetails: (key: string) => void;
+  /** Die Schublade "Antworten bearbeiten" — der Aufrufer besitzt sie, weil er
+   *  die Sitzungsdaten und das Neuladen kennt; sie haengt hier im Baum. */
+  answersDrawer?: React.ReactNode;
 }) {
   const { t, i18n } = useTranslation('results');
   const { t: tw } = useTranslation('userws');
@@ -358,15 +361,18 @@ export function SessionSnapshot({
 
   const total = Math.max(1, kpis.total);
 
-  // Legt eine Kopie an und bestaetigt an Ort und Stelle. Ohne gespeicherte
-  // Sitzung (Fixture/Gast-Profil) gibt es nichts zu duplizieren — dann bleibt
-  // der Knopf inaktiv statt einen Fehler zu erzeugen.
+  // Legt eine Kopie an und springt sofort auf sie — mit offener Schublade
+  // "Antworten bearbeiten" (Canvas-Wahl 2B, 2026-09-05): Variante anlegen
+  // heisst Antworten aendern. Das Label kommt in der Sprache des Nutzers von
+  // hier, der Server kennt sie nicht. Ohne gespeicherte Sitzung (Fixture/
+  // Gast-Profil) gibt es nichts zu duplizieren — dann fehlt der Link.
   const duplicate = async () => {
     if (!sessionId) return;
     setCopy('busy');
     try {
-      await duplicateSession(sessionId);
+      const copyId = await duplicateSession(sessionId, t('snapshot.copyLabel', { label: title }));
       setCopy('done');
+      navigate(`/${locale}/results?session=${copyId}`, { state: { openAnswers: true } });
     } catch {
       setCopy('error');
     }
@@ -416,15 +422,11 @@ export function SessionSnapshot({
                     (Fixture/Gast-Profil) gibt es nichts zu kopieren, dann
                     fehlt der Link ganz statt tot herumzustehen. */}
                 {sessionId && (
-                  copy === 'done' ? (
-                    <button type="button" onClick={() => navigate(`/${locale}/dashboard/sessions`)} className={TEXT_LINK}>
-                      {t('snapshot.copyOpenList')}
-                    </button>
-                  ) : copy === 'error' ? (
+                  copy === 'error' ? (
                     <span className="text-body-2xs font-bold text-risk-high">{t('snapshot.copyError')}</span>
                   ) : (
-                    <button type="button" disabled={copy === 'busy'} onClick={duplicate} className={TEXT_LINK + ' disabled:opacity-60'}>
-                      {copy === 'busy' ? '…' : t('snapshot.copyVariant')}
+                    <button type="button" disabled={copy !== 'idle'} onClick={duplicate} className={TEXT_LINK + ' disabled:opacity-60'}>
+                      {copy === 'idle' ? t('snapshot.copyVariant') : '…'}
                     </button>
                   )
                 )}
@@ -543,6 +545,7 @@ export function SessionSnapshot({
           </motion.div>
         </MotionConfig>
       </div>
+      {answersDrawer}
     </UserShell>
   );
 }
