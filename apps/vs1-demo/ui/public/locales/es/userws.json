@@ -629,5 +629,9 @@
     "cancel": "Cancelar",
     "done": "Movida ✓",
     "note": "Al reprogramar se mantienen la reserva y el dossier compartido — no se aplica una nueva tarifa de lead. El proveedor recibe la nueva hora."
+  },
+  "wizardDrawer": {
+    "eyebrow": "Nueva búsqueda",
+    "title": "Buscar proveedores adecuados"
   }
 }

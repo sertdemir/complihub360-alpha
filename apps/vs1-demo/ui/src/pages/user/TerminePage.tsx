@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { CalendarClock, CalendarPlus, MoreHorizontal } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
+import { useWizardDrawer } from '../../components/user/WizardDrawer';
 import { UserShell } from '../../components/user/UserShell';
 import { Button } from '../../components/ui/Button';
 import { Tag } from '../../components/ui/Tag';
@@ -196,6 +197,7 @@ function AktionenMenu({ label, items }: {
 export function TerminePage() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation('userws');
+  const { openWizard } = useWizardDrawer();
   const locale = i18n.resolvedLanguage || 'en';
   // Kein Fixture-Rueckfall mehr (Befund 2026-08-30): useApiData behielt bei
   // einem leeren Ergebnis die Fixture, und ein neues Konto sah zwei erfundene
@@ -476,7 +478,7 @@ export function TerminePage() {
             icon={CalendarClock}
             title={t('termine.emptyTitle')}
             body={t('termine.emptyBody')}
-            cta={{ label: t('termine.emptyCta'), onClick: () => navigate(`/${locale}/wizard`) }}
+            cta={{ label: t('termine.emptyCta'), onClick: () => openWizard() }}
             steps={[
               { title: t('termine.emptyStep1Title'), body: t('termine.emptyStep1Body') },
               { title: t('termine.emptyStep2Title'), body: t('termine.emptyStep2Body') },

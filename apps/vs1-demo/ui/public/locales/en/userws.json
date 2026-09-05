@@ -629,5 +629,9 @@
     "cancel": "Cancel",
     "done": "Moved ✓",
     "note": "Moving the appointment keeps your booking and the shared dossier — no new lead fee applies. The provider is notified of the new time."
+  },
+  "wizardDrawer": {
+    "eyebrow": "New search",
+    "title": "Find matching providers"
   }
 }

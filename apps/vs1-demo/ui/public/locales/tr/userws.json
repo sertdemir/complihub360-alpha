@@ -629,5 +629,9 @@
     "cancel": "Vazgeç",
     "done": "Taşındı ✓",
     "note": "Randevu taşındığında rezervasyon ve paylaşılan dosya korunur — yeni bir lead ücreti alınmaz. Sağlayıcı yeni saat hakkında bilgilendirilir."
+  },
+  "wizardDrawer": {
+    "eyebrow": "Yeni arama",
+    "title": "Uygun sağlayıcıları bul"
   }
 }

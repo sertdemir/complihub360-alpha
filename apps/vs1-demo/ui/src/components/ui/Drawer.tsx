@@ -8,18 +8,20 @@ import { useFocusTrap } from '../../hooks/useFocusTrap';
 // ─── Drawer (Side Sheet) ──────────────────────────────────────────────────────
 // Mirrors the Compass "Drawer Surface" (948:449). An overlay panel sliding in from
 // the right (or left): header (eyebrow + title + close), scrollable body, footer.
-// Size sm/md/lg → 440 / 520 / 540 (Compass SM / MD / L).
+// Size sm/md/lg/xl → 440 / 520 / 540 / 720 (Compass SM / MD / L · xl = Wizard).
 // Height is ADAPTIVE — hugs content, clamped to [--drawer-min-h, --drawer-max-h]
 // (400 / 1000); beyond max the body scrolls while header + footer stay pinned.
 // Dimmed backdrop, Escape + backdrop-click close, scroll-lock. Portal on <body> →
 // inherits the app `dark` class. Light + dark — never forced.
 
-export type DrawerSize = 'sm' | 'md' | 'lg';
+export type DrawerSize = 'sm' | 'md' | 'lg' | 'xl';
 export type DrawerSide = 'right' | 'left';
 const WIDTH: Record<DrawerSize, string> = {
   sm: 'max-w-[var(--drawer-w-sm)]',
   md: 'max-w-[var(--drawer-w-md)]',
   lg: 'max-w-[var(--drawer-w-lg)]',
+  // xl (720): der eingebettete Wizard braucht Platz fuer seine Kartenreihen.
+  xl: 'max-w-[var(--drawer-w-xl)]',
 };
 
 export interface DrawerProps {

@@ -629,5 +629,9 @@
     "cancel": "Abbrechen",
     "done": "Verschoben ✓",
     "note": "Beim Verschieben bleiben Buchung und geteiltes Dossier bestehen — es fällt keine neue Lead-Gebühr an. Der Provider wird über die neue Zeit informiert."
+  },
+  "wizardDrawer": {
+    "eyebrow": "Neue Suche",
+    "title": "Passende Anbieter finden"
   }
 }

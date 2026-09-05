@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { BellRing, MessageSquare, XCircle, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useWizardDrawer } from './WizardDrawer';
 import { useNavigate } from 'react-router-dom';
 import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
@@ -45,6 +46,7 @@ const STATUS_KEY: Record<string, string> = {
 export function RequestActionsDrawer({ target, onClose, onOpenThread, onWithdrawn }: RequestActionsDrawerProps) {
   const { t, i18n } = useTranslation('userws');
   const navigate = useNavigate();
+  const { openWizard } = useWizardDrawer();
   const locale = i18n.resolvedLanguage || 'en';
   const [busy, setBusy] = useState<'remind' | 'withdraw' | null>(null);
   const [reminded, setReminded] = useState(false);
@@ -170,7 +172,7 @@ export function RequestActionsDrawer({ target, onClose, onOpenThread, onWithdraw
                 <p className="text-[13px] font-semibold text-fg">{t('requestActions.findOtherTitle')}</p>
                 <p className="mt-0.5 text-[11px] leading-relaxed text-fg-tertiary">{t('requestActions.findOtherDesc')}</p>
               </div>
-              <Button size="sm" variant="primary" onClick={() => { onClose(); navigate(`/${locale}/wizard`); }}>{t('requestActions.findOther')}</Button>
+              <Button size="sm" variant="primary" onClick={() => { onClose(); openWizard(); }}>{t('requestActions.findOther')}</Button>
             </div>
           )}
 

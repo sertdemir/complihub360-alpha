@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { MoreHorizontal, Inbox } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useWizardDrawer } from '../../components/user/WizardDrawer';
 import { EmptyState } from '../../components/user/EmptyState';
 import { Button } from '../../components/ui/Button';
 import { RequestCard, type RequestStatus } from '../../components/ui/RequestCard';
@@ -46,6 +47,7 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation('userws');
   const locale = i18n.resolvedLanguage || 'en';
+  const { openWizard } = useWizardDrawer();
   const [threadFor, setThreadFor] = useState<string | null>(null);
   // Deep-Link (Glocke, Suche): ?thread=<uuid> oeffnet den Verlauf direkt.
   const [searchParams, setSearchParams] = useSearchParams();
@@ -170,7 +172,7 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
           icon={Inbox}
           title={t('requests.emptyTitle')}
           body={t('requests.emptyBody')}
-          cta={{ label: t('requests.emptyCta'), onClick: () => navigate(`/${locale}/wizard`) }}
+          cta={{ label: t('requests.emptyCta'), onClick: () => openWizard() }}
           steps={[
             { title: t('requests.emptyStep1Title'), body: t('requests.emptyStep1Body') },
             { title: t('requests.emptyStep2Title'), body: t('requests.emptyStep2Body') },
@@ -186,7 +188,7 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
               {rows === null ? '…' : t('requests.inboxCounts', counts)}
             </p>
           </div>
-          <button type="button" onClick={() => navigate(`/${locale}/wizard`)} className="shrink-0 text-[12px] font-bold text-fg-brand underline underline-offset-2 hover:text-fg">
+          <button type="button" onClick={() => openWizard()} className="shrink-0 text-[12px] font-bold text-fg-brand underline underline-offset-2 hover:text-fg">
             {t('requests.findProvider')}
           </button>
         </div>
