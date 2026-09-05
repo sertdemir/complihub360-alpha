@@ -435,7 +435,7 @@ export function UserHomePage() {
                               </>
                             )}
                           </div>
-                          <Button size="sm" variant={r.bucket === 'replied' ? 'accent' : 'secondary'} className="shrink-0" onClick={() => oeffneVerlauf(r.uuid)}>
+                          <Button size="sm" variant={r.bucket === 'replied' ? 'primary' : 'secondary'} className="shrink-0" onClick={() => oeffneVerlauf(r.uuid)}>
                             {r.bucket === 'replied' ? t('requests.actionRead') : t('requests.actionOpen')}
                           </Button>
                         </div>
@@ -505,7 +505,7 @@ export function UserHomePage() {
                       }}
                     />
                   </div>
-                  <Button variant="accent" className="mt-3" onClick={() => oeffneSitzung(zuletzt.id)}>
+                  <Button variant="primary" className="mt-3" onClick={() => oeffneSitzung(zuletzt.id)}>
                     {t('home.resume')} <ArrowRight size={14} className="ml-1" />
                   </Button>
                 </div>

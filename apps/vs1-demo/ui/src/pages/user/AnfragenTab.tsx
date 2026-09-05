@@ -99,7 +99,7 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
   const oeffnen = (r: UserRequestRow) => setThreadFor(r.uuid);
   const knopf = (r: UserRequestRow) => {
     const label = r.bucket === 'replied' ? t('requests.actionRead') : t('requests.actionOpen');
-    const variant = r.bucket === 'replied' ? 'accent' as const : 'secondary' as const;
+    const variant = r.bucket === 'replied' ? 'primary' as const : 'secondary' as const;
     return <Button size="sm" variant={variant} onClick={() => oeffnen(r)}>{label}</Button>;
   };
 
