@@ -12,7 +12,7 @@ import { useFocusTrap } from '../../hooks/useFocusTrap';
 // Height is ADAPTIVE — hugs content, clamped to [--drawer-min-h, --drawer-max-h]
 // (400 / 1000); beyond max the body scrolls while header + footer stay pinned.
 // Dimmed backdrop, Escape + backdrop-click close, scroll-lock. Portal on <body> →
-// inherits the app `dark` class. Light + dark.
+// inherits the app `dark` class. Light + dark — never forced.
 
 export type DrawerSize = 'sm' | 'md' | 'lg';
 export type DrawerSide = 'right' | 'left';
@@ -25,10 +25,6 @@ const WIDTH: Record<DrawerSize, string> = {
 export interface DrawerProps {
   open: boolean;
   onClose: () => void;
-  /** Force dark theming — required when the drawer is opened from an
-      always-dark workspace: the portal mounts on document.body, OUTSIDE the
-      shell's `.dark` scope, so it would otherwise pick up light variables. */
-  forceDark?: boolean;
   side?: DrawerSide;
   size?: DrawerSize;
   title?: React.ReactNode;
@@ -41,7 +37,7 @@ export interface DrawerProps {
   className?: string;
 }
 
-export function Drawer({ open, onClose, side = 'right', size = 'md', title, eyebrow, headerExtra, footer, children, className, forceDark = false }: DrawerProps) {
+export function Drawer({ open, onClose, side = 'right', size = 'md', title, eyebrow, headerExtra, footer, children, className }: DrawerProps) {
   // Escape und Scroll-Lock gab es hier schon; der FOKUS fehlte. Ohne ihn blieb
   // er beim Ausloeser stehen, der erste Tab landete HINTER dem Panel, und beim
   // Schliessen kam er nicht zurueck. Zehn Komponenten haengen an diesem Drawer.
@@ -62,12 +58,16 @@ export function Drawer({ open, onClose, side = 'right', size = 'md', title, eyeb
   if (typeof document === 'undefined') return null;
   const offX = side === 'right' ? '100%' : '-100%';
 
+  // Folgt dem Theme der Seite (Canvas-Wahl 4C, 2026-09-05). Das fruehere
+  // `forceDark` stammte aus dem immer-dunklen Arbeitsbereich und legte auf
+  // hellem Grund einen trueben Slate-Kasten ueber die Seite.
+
   return createPortal(
     <AnimatePresence>
       {open && (
-        <div className={cn('fixed inset-0 z-[100]', forceDark && 'dark')}>
+        <div className="fixed inset-0 z-[100]">
           <motion.div
-            className="absolute inset-0 bg-black/30 backdrop-blur-[var(--drawer-scrim-blur)]"
+            className="absolute inset-0 bg-black/20 backdrop-blur-[var(--drawer-scrim-blur)]"
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -87,9 +87,9 @@ export function Drawer({ open, onClose, side = 'right', size = 'md', title, eyeb
               role="dialog"
               aria-modal="true"
               className={cn(
-                // Floating glass overlay: translucent surface + backdrop-blur frosts the
-                // dimmed content behind; rounded (radius/3xl) with a soft ambient shadow.
-                'pointer-events-auto flex w-full flex-col overflow-hidden rounded-[var(--radius-3xl)] border border-white/10 shadow-2xl',
+                // Helles Milchglas (4C): Weiss zu 78 % + Unschaerfe, heller Rand,
+                // weicher Schatten; im Dark Mode Slate-Glas mit dunklem Rand.
+                'pointer-events-auto flex w-full flex-col overflow-hidden rounded-[var(--radius-3xl)] border border-white/70 shadow-[0_24px_60px_-24px_rgba(11,21,18,0.30),0_2px_6px_rgba(11,21,18,0.06)] dark:border-white/10',
                 'bg-[var(--drawer-glass-bg)] backdrop-blur-[var(--drawer-glass-blur)]',
                 'min-h-[var(--drawer-min-h)] max-h-[min(var(--drawer-max-h),calc(100dvh-2rem))]',
                 WIDTH[size],

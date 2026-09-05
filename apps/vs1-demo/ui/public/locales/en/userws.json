@@ -221,7 +221,11 @@
     "actionRead": "Read reply",
     "actionOpen": "Open thread",
     "slaLabel": "Deadline",
-    "slaExpired": "expired"
+    "slaExpired": "expired",
+    "inboxTitle": "Provider requests",
+    "inboxCounts": "{{you}} waiting for you · {{provider}} with the provider · {{done}} closed",
+    "slaLabelProvider": "Deadline · provider",
+    "slaMissed": "missed"
   },
   "notifications": {
     "title": "Notifications",
@@ -459,7 +463,11 @@
     "keep": "Keep",
     "confirmWithdraw": "Yes, withdraw",
     "withdrawError": "Withdraw failed — try again in a moment.",
-    "notActionable": "Remind and withdraw are only available while the request awaits the provider's confirmation."
+    "notActionable": "Remind and withdraw are only available while the request awaits the provider's confirmation.",
+    "findOtherTitle": "Find another provider",
+    "findOtherDesc": "This provider did not respond — start a new search with your profile.",
+    "findOther": "Find provider",
+    "expiredNote": "The provider’s confirmation window has passed. You can close the request or choose another provider."
   },
   "sessionActions": {
     "eyebrow": "SESSION",
@@ -592,7 +600,9 @@
     "tabs": {
       "anfragen": "Requests",
       "termine": "Appointments"
-    }
+    },
+    "tabUpcoming": "Upcoming",
+    "tabPast": "Past"
   },
   "review": {
     "eyebrow": "REVIEW",

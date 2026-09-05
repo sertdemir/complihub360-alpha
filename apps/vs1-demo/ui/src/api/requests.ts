@@ -114,9 +114,11 @@ const USER_VIEW: Record<string, Pick<UserRequestRow, 'status' | 'statusLabel' | 
   viewed:    { status: 'awaiting-confirm', statusLabel: 'Awaiting confirmation', action: { label: 'Send reminder', variant: 'accent' }, bucket: 'confirm' },
   confirmed: { status: 'active', statusLabel: 'Provider confirmed', action: { label: 'View thread', variant: 'secondary' }, bucket: 'confirmed' },
   replied:   { status: 'awaiting-reply', statusLabel: 'Provider replied', action: { label: 'Open thread', variant: 'secondary' }, bucket: 'replied' },
-  declined:  { status: 'active', statusLabel: 'Declined', action: { label: 'View request', variant: 'secondary' }, bucket: 'overdue' },
+  // Matrix-Befund 7 (2026-09-05): eine Ablehnung ist abgeschlossen, nicht
+  // "wartet auf Sie" — und traegt die neutrale Pille, nicht die aktive.
+  declined:  { status: 'closed', statusLabel: 'Declined', action: { label: 'View request', variant: 'secondary' }, bucket: 'closed' },
   expired:   { status: 'awaiting-confirm', statusLabel: 'Expired', action: { label: 'View request', variant: 'secondary' }, bucket: 'overdue' },
-  withdrawn: { status: 'active', statusLabel: 'Withdrawn', action: { label: 'View thread', variant: 'secondary' }, bucket: 'closed' },
+  withdrawn: { status: 'closed', statusLabel: 'Withdrawn', action: { label: 'View thread', variant: 'secondary' }, bucket: 'closed' },
 };
 
 // v2 §5 anonymity: pre-booking the user only ever sees an anonymous

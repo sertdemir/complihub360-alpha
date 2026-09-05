@@ -8,7 +8,7 @@ import { cn } from '../../lib/utils';
 // active = teal. Surface = petrol wash on dark (bg/card-translucent), white card
 // in light. Used on /requests and its OOO / RESPONDED states.
 
-export type RequestStatus = 'awaiting-confirm' | 'awaiting-reply' | 'active';
+export type RequestStatus = 'awaiting-confirm' | 'awaiting-reply' | 'active' | 'closed';
 
 // The pill label is 11px, so it owes the full 4.5:1 against its own tint - not
 // the 3:1 a large heading would. Both accents used to be hardcoded one stop too
@@ -20,12 +20,16 @@ const PILL: Record<RequestStatus, string> = {
   'awaiting-confirm': 'bg-[#d4af37]/10 border-[#d4af37]/35 text-fg-accent-strong dark:bg-[#d4af37]/15 dark:border-[#d4af37]/40',
   'awaiting-reply': 'bg-surface-secondary border-stroke text-fg-secondary',
   active: 'bg-[#004d40]/10 border-[#258d78]/35 text-fg-brand dark:bg-[#004d40]/25 dark:border-[#258d78]/40',
+  // Abgeschlossen (abgelehnt, zurueckgezogen): neutral — kein Teal, das nach
+  // "aktiv" aussieht (Matrix-Befund 7, 2026-09-05).
+  closed: 'bg-surface-secondary border-stroke text-fg-tertiary',
 };
 
 const STATUS_LABEL: Record<RequestStatus, string> = {
   'awaiting-confirm': 'Awaiting confirm',
   'awaiting-reply': 'Awaiting reply',
   active: 'Active',
+  closed: 'Closed',
 };
 
 export interface RequestCardProps extends React.HTMLAttributes<HTMLDivElement> {

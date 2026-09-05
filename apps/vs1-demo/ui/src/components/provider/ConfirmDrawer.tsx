@@ -52,7 +52,6 @@ export function ConfirmDrawer({ spec, onClose, labels }: { spec: ConfirmSpec | n
 
   return (
     <Drawer
-      forceDark
       open={!!spec}
       onClose={onClose}
       side="right"

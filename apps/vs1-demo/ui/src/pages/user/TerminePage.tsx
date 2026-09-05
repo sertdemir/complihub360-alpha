@@ -208,8 +208,8 @@ export function TerminePage() {
       .catch(() => { if (alive) setData([]); });
     return () => { alive = false; };
   }, [locale]);
-  // Anfragen fuer den zweiten Reiter — hier geladen (nicht im Tab), weil die
-  // Reiter-Zaehler beide Listen brauchen, egal welcher offen ist.
+  // Anfragen fuer den Posteingang unter den Terminen — hier geladen, damit
+  // die Seite ihre Ladekette an einem Ort haelt (Waechter-Test).
   const [anfragen, setAnfragen] = useState<UserRequestRow[] | null>(null);
   useEffect(() => {
     let alive = true;
@@ -218,16 +218,17 @@ export function TerminePage() {
       .catch(() => { if (alive) setAnfragen([]); });
     return () => { alive = false; };
   }, []);
-  // ?tab=anfragen (auch von der /dashboard/requests-Umleitung gesetzt);
-  // ein ?thread=-Deep-Link aus Glocke oder Suche erzwingt den Anfragen-Reiter.
-  const [searchParams, setSearchParams] = useSearchParams();
-  const reiter: 'anfragen' | 'termine' =
-    searchParams.get('tab') === 'anfragen' || searchParams.get('thread') ? 'anfragen' : 'termine';
-  const reiterWechsel = (v: string) => {
-    const next = new URLSearchParams(searchParams);
-    if (v === 'anfragen') next.set('tab', 'anfragen'); else { next.delete('tab'); next.delete('thread'); }
-    setSearchParams(next, { replace: true });
-  };
+  // Kein Anfragen-Reiter mehr (Canvas-Wahl 1C, 2026-09-05): ?tab=anfragen
+  // (alte /dashboard/requests-Umleitung) und ein ?thread=-Deep-Link aus Glocke
+  // oder Suche scrollen zum Posteingang, sobald er geladen ist.
+  const [searchParams] = useSearchParams();
+  const zielAnfragen = searchParams.get('tab') === 'anfragen' || !!searchParams.get('thread');
+  // Kommend / Vergangen als Reiter ueber dem Karten-Grid.
+  const [sicht, setSicht] = useState<'upcoming' | 'past'>('upcoming');
+  useEffect(() => {
+    if (!zielAnfragen || anfragen === null) return;
+    document.getElementById('anfragen')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [zielAnfragen, anfragen]);
   const [cancelled, setCancelled] = useState<Set<string>>(new Set());
   const [outcomes, setOutcomes] = useState<Record<string, BookingStatus>>({});
   const [reviewFor, setReviewFor] = useState<ReviewTarget | null>(null);
@@ -370,6 +371,56 @@ export function TerminePage() {
     </div>
   );
 
+  // ── Terminkarte im Grid (Canvas-Wahl 1C, 2026-09-05) ──────────────────────
+  // Datumsmarke und Status oben, Anbieter und Zeit in der Mitte, Aktionen am
+  // Fuss — dieselben Aktionen wie in der Zeile, nur gestapelt.
+  const karte = (r: Row) => (
+    <div key={r.id} className="flex flex-col gap-3 rounded-xl border border-stroke bg-surface p-4">
+      <div className="flex items-start justify-between gap-3">
+        <DatumsMarke iso={r.slotStartIso} locale={locale} soon={next?.id === r.id} />
+        <Tag tone={STATUS_TONE[r.status]}>{t(`termine.status.${r.status}`)}</Tag>
+      </div>
+      <div className="min-w-0">
+        <p className="truncate text-[15px] font-semibold text-fg">{r.provider}</p>
+        <p className="text-[12px] text-fg-tertiary">{r.dateLine} · {r.timeLine}{r.meta !== '—' ? ` · ${r.meta}` : ''}</p>
+        {r.website && (
+          <a
+            href={providerWebsiteHref(r.providerKey)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-0.5 inline-flex items-center gap-1 text-[12px] font-medium text-fg-brand hover:underline"
+          >
+            {t('termine.website')} ↗
+          </a>
+        )}
+      </div>
+      <div className="mt-auto flex flex-wrap items-center gap-2 pt-1">
+        {r.status === 'confirmed' && (
+          <>
+            <Button size="sm" variant="outline" iconLeft={<CalendarPlus size={14} />} onClick={() => ladeIcs(r)}>
+              {t('termine.addToCalendar')}
+            </Button>
+            <AktionenMenu
+              label={t('termine.moreActions')}
+              items={[
+                { label: t('termine.reschedule'), onClick: () => onReschedule(r) },
+                { label: t('termine.cancel'), danger: true, onClick: () => onCancel(r) },
+              ]}
+            />
+          </>
+        )}
+        {r.status === 'completed' && (
+          reviewed.has(r.id)
+            ? <span className="text-[12px] text-fg-brand">{t('termine.reviewed')}</span>
+            : <Button variant="accent" size="sm" onClick={() => setReviewFor({ bookingId: r.id, providerKey: r.providerKey, providerName: r.provider })}>{t('termine.review')}</Button>
+        )}
+        {r.status === 'no_show' && (
+          <span className="text-[12px] text-fg-tertiary">{t('termine.noShowNote')}</span>
+        )}
+      </div>
+    </div>
+  );
+
   const kopf = (key: string, n: number, warn = false) => (
     <p className={`text-[11px] font-semibold uppercase tracking-[0.05em] ${warn ? 'text-warning-800 dark:text-amber-300' : 'text-fg-tertiary'}`}>
       {t(key)} · {n}
@@ -384,32 +435,21 @@ export function TerminePage() {
           damit die Tönung randlos steht. */}
       <div className="-mx-8 -my-6 min-h-full bg-gradient-stage px-8 py-7">
       <div className="mx-auto max-w-[1140px] space-y-5">
-        {/* 1C (Anfragen-Canvas): zwei Reiter, Anfragen zuerst — die
-            Lebensphasen-Reihenfolge. Der Nav-Punkt heisst weiter "Termine"
-            und landet auf dem Termine-Reiter. */}
-        <Tabs value={reiter} onValueChange={reiterWechsel} variant="underline" size="md">
-          <TabList>
-            <Tab value="anfragen" badge={anfragen ? anfragen.length : undefined}>{t('termine.tabs.anfragen')}</Tab>
-            <Tab value="termine" badge={data ? rows.length : undefined}>{t('termine.tabs.termine')}</Tab>
-          </TabList>
-        </Tabs>
-
-        {reiter === 'anfragen' ? (
-          <AnfragenTab rows={anfragen} />
-        ) : (
-        <>
-        {/* 1: Kopfzeile A — Titel und Unterzeile bleiben immer stehen … */}
+        {/* Canvas-Wahl 1C (2026-09-05): Termine oben als Buehne — H1, "Als
+            Naechstes"-Karte, dann Kommend/Vergangen als Reiter ueber einem
+            Karten-Grid. Darunter der Anfragen-Posteingang. Nichts ist mehr
+            hinter einem Reiter versteckt. */}
         <div>
-          <h1 className="font-serif text-[32px] font-bold leading-tight text-fg">
+          <h1 className="font-serif text-[36px] font-bold leading-tight text-fg">
             <Trans t={t} i18nKey="termine.title" components={{ accent: <span className="text-fg-accent-emphasis" /> }} />
           </h1>
           <p className="mt-1 text-body-sm text-fg-secondary">{t('termine.sub')}</p>
         </div>
 
-        {/* … und die "Als Nächstes"-Karte aus C darunter, sobald ein Termin
-            ansteht. Ohne "Alle in den Kalender"-Knopf: ein Einmal-Download,
-            der beim nächsten Verschieben falsch ist, wäre schlimmer als kein
-            Knopf — der kommt erst mit einem abonnierbaren Feed. */}
+        {/* "Als Naechstes"-Karte, sobald ein Termin ansteht. Ohne "Alle in den
+            Kalender"-Knopf: ein Einmal-Download, der beim naechsten Verschieben
+            falsch ist, waere schlimmer als kein Knopf — der kommt erst mit
+            einem abonnierbaren Feed. */}
         {next && (
           <div className="flex flex-col gap-4 rounded-xl border border-stroke-brand/30 bg-brand-light px-6 py-5 sm:flex-row sm:items-center">
             <DatumsMarke iso={next.slotStartIso} locale={locale} soon />
@@ -417,7 +457,7 @@ export function TerminePage() {
               <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-fg-brand/70">
                 {t('termine.nextLabel')} · {nextRelativ}
               </p>
-              <p className="truncate font-serif text-[24px] font-bold leading-tight text-fg-brand">{next.provider}</p>
+              <p className="truncate font-serif text-[26px] font-bold leading-tight text-fg-brand">{next.provider}</p>
               <p className="truncate text-[13px] text-fg-brand">
                 {next.dateLine} · {next.timeLine}{next.meta !== '—' ? ` · ${next.meta}` : ''}
               </p>
@@ -451,18 +491,27 @@ export function TerminePage() {
             {needsAnswer.map(outcomeBlock)}
           </section>
         )}
-        <section className="space-y-2.5">
-          {kopf('termine.upcoming', upcoming.length)}
-          {upcoming.length ? upcoming.map((r) => card(r)) : <p className="text-body-sm text-fg-tertiary">{t('termine.emptyUpcoming')}</p>}
-        </section>
-        <section className="space-y-2.5 pt-2">
-          {kopf('termine.past', past.length)}
-          {past.length ? past.map((r) => card(r)) : <p className="text-body-sm text-fg-tertiary">{t('termine.emptyPast')}</p>}
-        </section>
+        <div>
+          <Tabs value={sicht} onValueChange={(v) => setSicht(v as 'upcoming' | 'past')} variant="underline" size="sm">
+            <TabList>
+              <Tab value="upcoming" badge={upcoming.length}>{t('termine.tabUpcoming')}</Tab>
+              <Tab value="past" badge={past.length}>{t('termine.tabPast')}</Tab>
+            </TabList>
+          </Tabs>
+          {(sicht === 'upcoming' ? upcoming : past).length ? (
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {(sicht === 'upcoming' ? upcoming : past).map(karte)}
+            </div>
+          ) : (
+            <p className="mt-4 text-body-sm text-fg-tertiary">{t(sicht === 'upcoming' ? 'termine.emptyUpcoming' : 'termine.emptyPast')}</p>
+          )}
+        </div>
         </>
         )}
-        </>
-        )}
+
+        <div className="pt-3">
+          <AnfragenTab rows={anfragen} />
+        </div>
       </div>
       </div>
       <ReviewDrawer target={reviewFor} onClose={() => setReviewFor(null)} onSubmitted={(id) => setReviewed((s) => new Set(s).add(id))} />

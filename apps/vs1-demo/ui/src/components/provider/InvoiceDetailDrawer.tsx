@@ -32,7 +32,6 @@ export function InvoiceDetailDrawer({ invoice, onClose }: { invoice: Invoice | n
   const { t } = useTranslation('providerws');
   return (
     <Drawer
-      forceDark
       open={!!invoice}
       onClose={onClose}
       side="right"

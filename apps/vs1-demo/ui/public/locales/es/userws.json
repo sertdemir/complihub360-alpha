@@ -221,7 +221,11 @@
     "actionRead": "Leer respuesta",
     "actionOpen": "Abrir historial",
     "slaLabel": "Plazo",
-    "slaExpired": "vencido"
+    "slaExpired": "vencido",
+    "inboxTitle": "Solicitudes a proveedores",
+    "inboxCounts": "{{you}} esperan su respuesta · {{provider}} con el proveedor · {{done}} cerradas",
+    "slaLabelProvider": "Plazo · proveedor",
+    "slaMissed": "incumplido"
   },
   "notifications": {
     "title": "Notificaciones",
@@ -459,7 +463,11 @@
     "keep": "Mantener",
     "confirmWithdraw": "Sí, retirar",
     "withdrawError": "La retirada falló — inténtelo de nuevo en un momento.",
-    "notActionable": "Recordar y retirar solo están disponibles mientras la solicitud espera la confirmación del proveedor."
+    "notActionable": "Recordar y retirar solo están disponibles mientras la solicitud espera la confirmación del proveedor.",
+    "findOtherTitle": "Buscar otro proveedor",
+    "findOtherDesc": "Este proveedor no respondió: inicie una nueva búsqueda con su perfil.",
+    "findOther": "Buscar proveedor",
+    "expiredNote": "El plazo de confirmación del proveedor ha vencido. Puede cerrar la solicitud o elegir otro proveedor."
   },
   "sessionActions": {
     "eyebrow": "SESIÓN",
@@ -592,7 +600,9 @@
     "tabs": {
       "anfragen": "Solicitudes",
       "termine": "Citas"
-    }
+    },
+    "tabUpcoming": "Próximas",
+    "tabPast": "Pasadas"
   },
   "review": {
     "eyebrow": "VALORACIÓN",

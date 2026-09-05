@@ -61,7 +61,6 @@ export function ConfigureAlertsDrawer({ open, onClose }: { open: boolean; onClos
 
   return (
     <Drawer
-      forceDark
       open={open}
       onClose={onClose}
       side="right"

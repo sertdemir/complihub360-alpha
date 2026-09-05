@@ -206,8 +206,8 @@
     --drawer-w-md: 520px;  /* Size=MD */
     --drawer-w-lg: 540px;  /* Size=L  */
     /* Glass surface — floating drawer overlays (translucent + backdrop-blur). */
-    --drawer-glass-bg: rgba(255, 255, 255, 0.50);
-    --drawer-glass-blur: 48px;  /* strong frost: more see-through yet text stays legible */
+    --drawer-glass-bg: rgba(255, 255, 255, 0.78);  /* helles Milchglas (Canvas-Wahl 4C) */
+    --drawer-glass-blur: 24px;  /* frost behind the panel; text stays crisp on the 78 % white */
     --drawer-scrim-blur: 6px;   /* soft blur on the page behind while a drawer is open */
 
     /* ============================================================

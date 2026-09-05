@@ -34,7 +34,7 @@ export function SearchDrawer({ open, onClose }: { open: boolean; onClose: () => 
   });
 
   return (
-    <Drawer forceDark open={open} onClose={onClose} side="right" size="md" eyebrow={t('searchDrawer.eyebrow')} title={t('searchDrawer.title')}>
+    <Drawer open={open} onClose={onClose} side="right" size="md" eyebrow={t('searchDrawer.eyebrow')} title={t('searchDrawer.title')}>
       <div className="space-y-4">
         <div className="flex items-center gap-2 rounded-lg border border-elevate/10 bg-elevate/5 px-3 py-2.5 focus-within:border-fg-brand">
           <Search size={15} className="shrink-0 text-fg-tertiary" />
@@ -86,7 +86,7 @@ export function RankingImpactDrawer({ open, onClose }: { open: boolean; onClose:
   const { t } = useTranslation('providerws');
   const [factorBarsRef, factorBarsInView] = useInViewOnce<HTMLDivElement>();
   return (
-    <Drawer forceDark open={open} onClose={onClose} side="right" size="md" eyebrow={t('rankingImpact.eyebrow')} title={t('rankingImpact.title')}
+    <Drawer open={open} onClose={onClose} side="right" size="md" eyebrow={t('rankingImpact.eyebrow')} title={t('rankingImpact.title')}
       footer={<p className="text-[11px] text-fg-tertiary">{t('rankingImpact.footer')}</p>}>
       <div ref={factorBarsRef} className="space-y-4">
         {FACTORS.map((f, i) => (
@@ -120,7 +120,7 @@ const TOPICS = [
 export function HelpDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useTranslation('providerws');
   return (
-    <Drawer forceDark open={open} onClose={onClose} side="right" size="md" eyebrow={t('helpDrawer.eyebrow')} title={t('helpDrawer.title')}
+    <Drawer open={open} onClose={onClose} side="right" size="md" eyebrow={t('helpDrawer.eyebrow')} title={t('helpDrawer.title')}
       footer={
         <a href="mailto:support@complihub360.com" className="w-full">
           <Button variant="accent" size="sm" className="w-full">{t('helpDrawer.contactSupport')}</Button>
