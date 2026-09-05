@@ -505,9 +505,11 @@ export function UserHomePage() {
                       }}
                     />
                   </div>
-                  <Button variant="primary" className="mt-3" onClick={() => oeffneSitzung(zuletzt.id)}>
-                    {t('home.resume')} <ArrowRight size={14} className="ml-1" />
-                  </Button>
+                  <div className="mt-3 flex justify-end">
+                    <Button variant="primary" onClick={() => oeffneSitzung(zuletzt.id)}>
+                      {t('home.resume')} <ArrowRight size={14} className="ml-1" />
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>
