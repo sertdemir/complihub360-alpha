@@ -129,7 +129,25 @@
     "emptyStep2Title": "Görün",
     "emptyStep2Body": "Yükümlülükleriniz, aciliyete göre sıralı.",
     "emptyStep3Title": "Harekete geçin",
-    "emptyStep3Body": "İşaretleyin — ya da bir uzman katın."
+    "emptyStep3Body": "İşaretleyin — ya da bir uzman katın.",
+    "todayPrefix": "Bugün:",
+    "todayRequests_one": "{{count}} talep sizi bekliyor",
+    "todayRequests_other": "{{count}} talep sizi bekliyor",
+    "todayOutcomes_one": "{{count}} sonuç sorusu açık",
+    "todayOutcomes_other": "{{count}} sonuç sorusu açık",
+    "todayRisk_one": "{{count}} yüksek riskli yükümlülük",
+    "todayRisk_other": "{{count}} yüksek riskli yükümlülük",
+    "todayCalm": "Bugün sizi bekleyen bir şey yok.",
+    "dutiesHigh_one": "{{count}} yüksek",
+    "dutiesHigh_other": "{{count}} yüksek",
+    "today": "Bugün",
+    "tomorrow": "Yarın",
+    "riskTag": {
+      "critical": "Kritik",
+      "high": "Yüksek risk",
+      "medium": "Orta risk",
+      "low": "Düşük risk"
+    }
   },
   "sessions": {
     "title": "Uyum <accent>oturumlarınız</accent>.",

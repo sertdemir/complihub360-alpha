@@ -111,7 +111,7 @@ export function icsHref(r: Pick<Row, 'id' | 'slotStartIso' | 'slotEndIso' | 'pro
 
 // "In den Kalender" ist ein Button, kein <a download> — so trägt er dieselbe
 // Gestalt wie jede andere Aktion. Der Anker entsteht nur für den Klick.
-function ladeIcs(r: Pick<Row, 'id' | 'slotStartIso' | 'slotEndIso' | 'provider' | 'meta'>) {
+export function ladeIcs(r: Pick<Row, 'id' | 'slotStartIso' | 'slotEndIso' | 'provider' | 'meta'>) {
   const a = document.createElement('a');
   a.href = icsHref(r);
   a.download = 'complihub-termin.ics';

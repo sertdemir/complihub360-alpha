@@ -47,8 +47,12 @@ export function useCountUp(target: number, on: boolean, duration = 900) {
 }
 
 /** Donut aus Anteilen; Farben folgen den Tokens ueber currentColor. */
-export function Donut({ segs, size = 46, stroke = 7, center, on }: {
-  segs: { frac: number; cls: string }[]; size?: number; stroke?: number; center?: string; on: boolean;
+export function Donut({ segs, size = 46, stroke = 7, center, centerSize = 12, centerClass = 'text-fg', on }: {
+  segs: { frac: number; cls: string }[]; size?: number; stroke?: number; center?: string;
+  /** Schriftgroesse der Zahl im Ring — das Dashboard (2A, 2026-09-05) traegt
+   *  seine Kennzahl NUR noch im Kreis, deshalb groesser als die 12 px der
+   *  kleinen Kacheln. */
+  centerSize?: number; centerClass?: string; on: boolean;
 }) {
   const r = (size - stroke) / 2 - 1;
   const c = 2 * Math.PI * r;
@@ -75,7 +79,7 @@ export function Donut({ segs, size = 46, stroke = 7, center, on }: {
         return el;
       })}
       {center && (
-        <text x="50%" y="54%" textAnchor="middle" fill="currentColor" className="text-fg" fontSize="12" fontWeight="800">{center}</text>
+        <text x="50%" y="50%" dominantBaseline="central" textAnchor="middle" fill="currentColor" className={centerClass} fontSize={centerSize} fontWeight="800">{center}</text>
       )}
     </svg>
   );

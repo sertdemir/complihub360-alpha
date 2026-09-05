@@ -129,7 +129,25 @@
     "emptyStep2Title": "Sehen",
     "emptyStep2Body": "Ihre Pflichten, nach Dringlichkeit sortiert.",
     "emptyStep3Title": "Handeln",
-    "emptyStep3Body": "Abhaken — oder Fachleute dazuholen."
+    "emptyStep3Body": "Abhaken — oder Fachleute dazuholen.",
+    "todayPrefix": "Heute:",
+    "todayRequests_one": "{{count}} Anfrage wartet auf Sie",
+    "todayRequests_other": "{{count}} Anfragen warten auf Sie",
+    "todayOutcomes_one": "{{count}} Ergebnisfrage offen",
+    "todayOutcomes_other": "{{count}} Ergebnisfragen offen",
+    "todayRisk_one": "{{count}} Pflicht mit hohem Risiko",
+    "todayRisk_other": "{{count}} Pflichten mit hohem Risiko",
+    "todayCalm": "Heute wartet nichts auf Sie.",
+    "dutiesHigh_one": "{{count}} hoch",
+    "dutiesHigh_other": "{{count}} hoch",
+    "today": "Heute",
+    "tomorrow": "Morgen",
+    "riskTag": {
+      "critical": "Kritisch",
+      "high": "Hohes Risiko",
+      "medium": "Mittleres Risiko",
+      "low": "Niedriges Risiko"
+    }
   },
   "sessions": {
     "title": "Ihre Compliance-<accent>Sitzungen</accent>.",
