@@ -7,7 +7,7 @@ import { UserShell } from '../../components/user/UserShell';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Button } from '../../components/ui/Button';
 import { Segment } from '../../components/compliance-areas';
-import { Donut, useEntered, useCountUp, EASE } from '../../components/ui/Stats';
+import { KpiRing, useEntered, EASE } from '../../components/ui/Stats';
 import { EmptyState } from '../../components/user/EmptyState';
 import { RescheduleDrawer, type RescheduleTarget } from '../../components/user/RescheduleDrawer';
 import { fetchDashboard, EMPTY_DASHBOARD, type DashboardData, type DashboardSession } from '../../api/dashboard';
@@ -128,32 +128,6 @@ function DatumsMarke({ iso, locale }: { iso: string; locale: string }) {
     <div aria-hidden="true" className="grid h-11 w-11 shrink-0 place-content-center rounded-lg border border-stroke-brand/40 bg-brand-light text-center leading-[1.1] text-fg-brand">
       <span className="text-[16px] font-bold">{d.getDate()}</span>
       <span className="text-[8.5px] font-bold uppercase tracking-[0.08em]">{d.toLocaleDateString(locale, { month: 'short' }).replace('.', '')}</span>
-    </div>
-  );
-}
-
-// ─── Kennzahl ohne Karte (2A nach Nutzer-Vorgabe) ────────────────────────────
-// Text links, Kreis rechts, beides auf dem Gradient. Die Zahl steht nur im
-// Kreis; die Unterzeile traegt die Zusammensetzung.
-const KPI_SIZE = 96;
-const KPI_STROKE = 12;
-
-function Kennzahl({ title, sub, chip, value, segs, on }: {
-  title: string; sub: string; chip?: string; value: number; segs: { frac: number; cls: string }[]; on: boolean;
-}) {
-  const n = useCountUp(value, on);
-  return (
-    <div className="flex flex-1 items-center justify-between gap-4 py-1">
-      <div className="min-w-0 text-left">
-        <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{title}</p>
-        <p className="mt-1.5 text-body-2xs leading-snug text-fg-secondary">{sub}</p>
-        {chip && (
-          <span className="mt-2 inline-flex rounded-full bg-accent/15 px-2 py-[2px] text-[10px] font-bold text-fg-accent-strong">{chip}</span>
-        )}
-      </div>
-      <div className="shrink-0 font-serif">
-        <Donut on={on} size={KPI_SIZE} stroke={KPI_STROKE} segs={segs} center={String(n)} centerSize={30} />
-      </div>
     </div>
   );
 }
@@ -325,7 +299,7 @@ export function UserHomePage() {
 
           {/* Kennzahlen ohne Karte, auf dem Gradient (2A nach Vorgabe) */}
           <div className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-2 xl:grid-cols-4">
-            <Kennzahl
+            <KpiRing
               on={entered}
               title={t('home.kpiRequests')}
               value={offeneAnfragen.length}
@@ -336,7 +310,7 @@ export function UserHomePage() {
                    { frac: (offeneAnfragen.length - wartend) / offeneAnfragen.length, cls: 'text-brand' }]
                 : []}
             />
-            <Kennzahl
+            <KpiRing
               on={entered}
               title={t('home.kpiDuties')}
               value={offen}
@@ -347,14 +321,14 @@ export function UserHomePage() {
                    { frac: niedrig / offen, cls: 'text-risk-low' }]
                 : []}
             />
-            <Kennzahl
+            <KpiRing
               on={entered}
               title={t('home.kpiSessions')}
               value={dash.sessions.total}
               sub={t('home.kpiSessionsSub', { count: marktAnteile.length })}
               segs={marktAnteile.map((n, i) => ({ frac: n / marktSumme, cls: MARKT_CLS[i % MARKT_CLS.length] }))}
             />
-            <Kennzahl
+            <KpiRing
               on={entered}
               title={t('home.kpiRisk')}
               value={hoch}

@@ -85,45 +85,34 @@ export function Donut({ segs, size = 46, stroke = 7, center, centerSize = 12, ce
   );
 }
 
-/** Zusammensetzungs-Balken: Hoehen relativ zum Maximum, wachsen vom Boden. */
-export function SparkBars({ vals, cls = 'text-brand', on }: { vals: number[]; cls?: string; on: boolean }) {
-  const w = 64, h = 30, bw = w / vals.length - 4;
-  const max = Math.max(...vals, 1);
-  return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden className={cls}>
-      {vals.map((v, i) => {
-        const bh = Math.max(3, (v / max) * h);
-        return (
-          <rect
-            key={i} x={i * (bw + 4)} y={h - bh} width={bw} height={bh} rx="2.5" fill="currentColor"
-            style={{
-              transform: on ? 'scaleY(1)' : 'scaleY(0)',
-              transformOrigin: 'bottom', transformBox: 'fill-box',
-              transition: `transform 700ms ${EASE} ${120 + i * 90}ms`,
-            }}
-          />
-        );
-      })}
-    </svg>
-  );
-}
+// ─── Kennzahl-Ring ohne Karte ────────────────────────────────────────────────
+// Dashboard-Canvas 2A nach Nutzer-Vorgabe (2026-09-05), seitdem die EINE
+// Kennzahl-Form aller Arbeitsflaechen (Dashboard, Sitzungen, Sitzungsseite):
+// Text links (Titel, Unterzeile, optionaler Chip), Kreis rechts, doppelt so
+// gross wie die alte Kachel, die Zahl steht NUR im Kreis. Keine Karte — die
+// Zeile liegt direkt auf dem Gradient des Arbeitsbereichs.
+export const KPI_RING_SIZE = 96;
+export const KPI_RING_STROKE = 12;
 
-/** Die Kachel, die eine Kennzahl mit ihrem Kleinst-Diagramm zeigt. */
-export function KpiCard({ title, big, sub, chip, className = '', children }: {
-  title: string; big: string; sub: string; chip?: string; className?: string; children: React.ReactNode;
+export function KpiRing({ title, sub, chip, value, segs, on }: {
+  title: string; sub: string; chip?: string;
+  /** Die Zahl im Kreis — zaehlt beim Eintritt hoch. */
+  value: number;
+  segs: { frac: number; cls: string }[];
+  on: boolean;
 }) {
+  const n = useCountUp(value, on);
   return (
-    <div className={'flex-1 rounded-xl border border-stroke-subtle bg-surface p-5 shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)] ' + className}>
-      <div className="flex items-center justify-between gap-2">
+    <div className="flex flex-1 items-center justify-between gap-4 py-1">
+      <div className="min-w-0 text-left">
         <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{title}</p>
-        {chip && <span className="rounded-md bg-warning-bg px-1.5 py-0.5 text-[10px] font-extrabold text-warning-700">{chip}</span>}
+        <p className="mt-1.5 text-body-2xs leading-snug text-fg-secondary">{sub}</p>
+        {chip && (
+          <span className="mt-2 inline-flex rounded-full bg-accent/15 px-2 py-[2px] text-[10px] font-bold text-fg-accent-strong">{chip}</span>
+        )}
       </div>
-      <div className="mt-2.5 flex items-center justify-between gap-3">
-        <div>
-          <p className="font-serif text-[24px] font-bold leading-none text-fg">{big}</p>
-          <p className="mt-1.5 text-body-2xs text-fg-tertiary">{sub}</p>
-        </div>
-        {children}
+      <div className="shrink-0 font-serif">
+        <Donut on={on} size={KPI_RING_SIZE} stroke={KPI_RING_STROKE} segs={segs} center={String(n)} centerSize={30} />
       </div>
     </div>
   );
