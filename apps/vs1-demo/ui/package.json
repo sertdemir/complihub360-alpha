@@ -8,6 +8,7 @@
     ],
     "scripts": {
         "dev": "vite",
+    "dev:mock": "VITE_MOCK_API=1 vite",
         "build": "npm run build:root --prefix ../../.. && npx tsc && vite build",
         "preview": "vite preview",
         "start": "node server.js",
