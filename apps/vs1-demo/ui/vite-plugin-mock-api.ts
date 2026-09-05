@@ -67,7 +67,9 @@ function requests() {
   ];
 }
 
-const SESSIONS = [
+// Veraenderlich: Duplikate, Umbenennen und Archivieren wirken fuer die
+// Laufzeit des Dev-Servers — sonst sieht man eine angelegte Kopie nie.
+const SESSIONS: Array<Record<string, any>> = [
   { id: uuid(1, 1), label: 'EU-Expansion Shop', country: 'DE', markets: ['DE', 'IT', 'ES'], categories: ['tax-vat', 'product-packaging', 'data-privacy'], status: 'active', risk_summary: { level: 'high' }, created_at: iso(-20), updated_at: iso(-2), open: 13, total: 14, severity: 'critical' },
   { id: uuid(2, 1), label: 'UK nach Brexit', country: 'UK', markets: ['UK'], categories: ['tax-vat'], status: 'active', risk_summary: { level: 'high' }, created_at: iso(-9), updated_at: iso(-9), open: 6, total: 8, severity: 'high' },
   { id: uuid(3, 1), label: null, country: 'ES', markets: ['ES'], categories: ['marketing-seo', 'legal-advisory'], status: 'active', risk_summary: { level: 'low' }, created_at: iso(-40), updated_at: iso(-30), open: 7, total: 9, severity: 'low' },
@@ -120,7 +122,20 @@ function engagement(id: string) {
   ] };
 }
 
-function route(method: string, path: string): unknown {
+let laufNr = 100;
+function duplicateSession(id: string) {
+  const src = SESSIONS.find((s) => s.id === id) ?? SESSIONS[0];
+  const copy = { ...src, id: uuid(++laufNr, 1), label: `Kopie von ${src.label || src.country || 'Sitzung'}`, status: 'active', created_at: plus(0), updated_at: plus(0) };
+  SESSIONS.unshift(copy);
+  return { ok: true, id: copy.id };
+}
+function patchSession(id: string, body: Record<string, unknown>) {
+  const s = SESSIONS.find((x) => x.id === id);
+  if (s) { if (typeof body.label === 'string') s.label = body.label; if (body.status === 'active' || body.status === 'archived') s.status = body.status; s.updated_at = plus(0); }
+  return { ok: true, id, session: s ?? null };
+}
+
+function route(method: string, path: string, body: Record<string, unknown> = {}): unknown {
   const seg = path.split('/').filter(Boolean); // ['api','v1',...]
   const p = seg.slice(2);
   if (method === 'GET') {
@@ -136,7 +151,8 @@ function route(method: string, path: string): unknown {
   }
   if (p[0] === 'search') return { ok: true, providers: [], laws: [] };
   if (p[0] === 'session' && p.length === 1) return { ok: true, id: uuid(9, 1) };
-  if (p[0] === 'session' && p[2] === 'duplicate') return { ok: true, id: uuid(8, 1) };
+  if (p[0] === 'session' && p[2] === 'duplicate') return duplicateSession(p[1]);
+  if (p[0] === 'session' && p.length === 2 && method === 'PATCH') return patchSession(p[1], body);
   if (p[0] === 'notifications' && p[1] === 'read') return { ok: true, marked: 3 };
   return { ok: true };
 }
@@ -152,12 +168,18 @@ export function mockApiPlugin(): Plugin {
       server.middlewares.use((req, res, next) => {
         if (!req.url || !req.url.startsWith('/api/v1/')) return next();
         const url = new URL(req.url, 'http://mock.local');
-        const body = route(req.method ?? 'GET', url.pathname);
+        let raw = '';
+        req.on('data', (c: Buffer) => { raw += c.toString(); });
+        req.on('end', () => {
+        let parsed: Record<string, unknown> = {};
+        try { parsed = raw ? JSON.parse(raw) : {}; } catch { /* kein JSON */ }
+        const body = route(req.method ?? 'GET', url.pathname, parsed);
         res.setHeader('content-type', 'application/json');
         res.setHeader('x-mock-api', '1');
         res.statusCode = 200;
         // Kurze Latenz, damit Lade- und Leerzustaende nicht flackern.
         setTimeout(() => res.end(JSON.stringify(body)), 120);
+        });
       });
     },
   };
