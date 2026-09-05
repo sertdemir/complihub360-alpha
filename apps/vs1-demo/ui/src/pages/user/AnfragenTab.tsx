@@ -158,43 +158,45 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
   // wer am Zug ist; wartet etwas auf Sie, steht sie fett.
   const counts = { you: aufSie.length, provider: aufAnbieter.length, done: abgeschlossen.length };
 
+  // Leerzustand ohne Posteingangs-Rahmen (Nutzer-Vorgabe 2026-09-05): die
+  // Karte steht dann genau wie die Termine-Leerkarte darueber — gleiche
+  // Breite, gleiche Form, kein breiter Kasten mit Kopfzeile drumherum.
+  const leer = rows !== null && effective.length === 0;
+
   return (
     <section id="anfragen" className="scroll-mt-6">
+      {leer ? (
+        <EmptyState
+          icon={Inbox}
+          title={t('requests.emptyTitle')}
+          body={t('requests.emptyBody')}
+          cta={{ label: t('requests.emptyCta'), onClick: () => navigate(`/${locale}/wizard`) }}
+          steps={[
+            { title: t('requests.emptyStep1Title'), body: t('requests.emptyStep1Body') },
+            { title: t('requests.emptyStep2Title'), body: t('requests.emptyStep2Body') },
+            { title: t('requests.emptyStep3Title'), body: t('requests.emptyStep3Body') },
+          ]}
+        />
+      ) : (
       <div className="overflow-hidden rounded-xl border border-stroke bg-surface">
         <div className="flex items-start justify-between gap-4 border-b border-stroke-subtle bg-surface-secondary px-5 py-4">
           <div className="min-w-0">
             <h2 className="font-serif text-[20px] font-bold leading-tight text-fg">{t('requests.inboxTitle')}</h2>
             <p className={`mt-0.5 text-[12px] ${aufSie.length > 0 ? 'font-semibold text-fg' : 'text-fg-secondary'}`}>
-              {rows === null ? '…' : effective.length === 0 ? t('requests.sub') : t('requests.inboxCounts', counts)}
+              {rows === null ? '…' : t('requests.inboxCounts', counts)}
             </p>
           </div>
           <button type="button" onClick={() => navigate(`/${locale}/wizard`)} className="shrink-0 text-[12px] font-bold text-fg-brand underline underline-offset-2 hover:text-fg">
             {t('requests.findProvider')}
           </button>
         </div>
-
-        {rows !== null && effective.length === 0 ? (
-          <div className="p-5">
-            <EmptyState
-              icon={Inbox}
-              title={t('requests.emptyTitle')}
-              body={t('requests.emptyBody')}
-              cta={{ label: t('requests.emptyCta'), onClick: () => navigate(`/${locale}/wizard`) }}
-              steps={[
-                { title: t('requests.emptyStep1Title'), body: t('requests.emptyStep1Body') },
-                { title: t('requests.emptyStep2Title'), body: t('requests.emptyStep2Body') },
-                { title: t('requests.emptyStep3Title'), body: t('requests.emptyStep3Body') },
-              ]}
-            />
-          </div>
-        ) : (
-          <div className="pb-1.5">
-            {abschnitt('requests.secYou', aufSie, true)}
-            {abschnitt('requests.secProvider', aufAnbieter)}
-            {abschnitt('requests.secDone', abgeschlossen)}
-          </div>
-        )}
+        <div className="pb-1.5">
+          {abschnitt('requests.secYou', aufSie, true)}
+          {abschnitt('requests.secProvider', aufAnbieter)}
+          {abschnitt('requests.secDone', abgeschlossen)}
+        </div>
       </div>
+      )}
 
       <ThreadDrawer open={!!threadFor} engagementId={threadFor} viewer="user" onClose={() => { setThreadFor(null); if (deepThread) { searchParams.delete('thread'); setSearchParams(searchParams, { replace: true }); } }} />
       <RequestActionsDrawer
