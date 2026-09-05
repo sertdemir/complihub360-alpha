@@ -582,7 +582,7 @@
     "website": "Provider website",
     "emptyTitle": "No appointments",
     "emptyBody": "Appointments come from a request: once a provider confirms, the meeting appears here and can be added to your calendar.",
-    "emptyCta": "Find matching providers",
+    "emptyCta": "Request a first call",
     "emptyStep1Title": "Request",
     "emptyStep1Body": "A provider of your choice.",
     "emptyStep2Title": "Agree",

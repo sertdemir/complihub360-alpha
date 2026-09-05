@@ -50,7 +50,9 @@ export function EmptyState({ icon: Icon, title, body, cta, hint, steps }: EmptyS
   return (
     <div className={`${CARD} mx-auto mt-9 max-w-[720px] px-9 py-8`}>
       <div className="flex items-center gap-3.5">
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand-light text-fg-brand">
+        {/* Ohne Hintergrundflaeche, aber in derselben 44-px-Box, damit Titel
+            und Text an der gleichen Kante bleiben (Nutzer-Vorgabe 2026-09-05). */}
+        <span className="grid h-11 w-11 shrink-0 place-items-center text-fg-brand">
           <Icon size={20} strokeWidth={1.9} />
         </span>
         <div className="min-w-0">
@@ -77,9 +79,13 @@ export function EmptyState({ icon: Icon, title, body, cta, hint, steps }: EmptyS
         </div>
       )}
 
-      <Button className="mt-6" onClick={cta.onClick}>
-        {cta.label} <ArrowRight size={14} className="ml-1" />
-      </Button>
+      {/* Rechtsbuendig — der naechste Schritt steht am Ende der Leserichtung
+          (Nutzer-Vorgabe 2026-09-05). */}
+      <div className="mt-6 flex justify-end">
+        <Button onClick={cta.onClick}>
+          {cta.label} <ArrowRight size={14} className="ml-1" />
+        </Button>
+      </div>
     </div>
   );
 }
