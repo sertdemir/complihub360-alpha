@@ -14,6 +14,7 @@ import { UserSearchDrawer } from './UserSearchDrawer';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { AssistantWidget } from './AssistantWidget';
 import { fetchUserBookings } from '../../api/bookings';
+import { isMockApi } from '../../lib/supabase';
 import { fetchSessions, type SessionRowData } from '../../api/sessions';
 import { fetchMyNotifications } from '../../api/notifications';
 
@@ -120,7 +121,9 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
   // traegt — und dann oeffnet der Browser pro Request einen Login-Dialog.
   // Deshalb: nur mit echter Sitzung anfragen. Die Badges blieben ohne sie
   // ohnehin leer.
-  const hasSession = !!session;
+  // Im Mock-Modus gibt es keine Supabase-Sitzung, aber Daten — die Badges
+  // (Termine, Glocke) sollen dann trotzdem laden.
+  const hasSession = !!session || isMockApi;
   useEffect(() => {
     if (hasSession) {
       fetchUserBookings()
