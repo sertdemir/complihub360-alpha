@@ -313,7 +313,10 @@ export function ResultsRiskMap() {
           .join(' · '),
         sourceLabel: l.source_url ? (l.source ?? l.celex ?? undefined) : undefined,
         sourceUrl: l.source_url ?? undefined,
-        market: l.markets && l.markets.length ? l.markets.join(' · ') : 'EU-wide',
+        market: l.markets && l.markets.length ? l.markets.join(' · ') : t('euWide'),
+        // Die Norm im Klartext, wenn es keine verlinkbare Fundstelle gibt —
+        // sonst stuende unter dem Titel nur der Markt (Befund 2026-09-05).
+        law: l.source_url ? undefined : (l.source ?? undefined),
         // A duty that has not started yet must not read "Ongoing · Live" — that
         // would tell the user they are already in breach. Until its start date
         // the Due cell shows that date plus the countdown; from the day it
@@ -321,7 +324,7 @@ export function ResultsRiskMap() {
         due: daysUntil(l.applies_from) != null
           ? new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' })
               .format(new Date(`${l.applies_from}T00:00:00`))
-          : l.due ?? '—',
+          : l.due === 'Ongoing' ? t('ongoing') : l.due ?? '—',
         dueSub: withinHorizon(l.applies_from) != null
           ? t('appliesIn', { count: withinHorizon(l.applies_from) as number, defaultValue: `applies in ${withinHorizon(l.applies_from)} days` })
           : daysUntil(l.applies_from) != null ? ''   // far future: the date says enough

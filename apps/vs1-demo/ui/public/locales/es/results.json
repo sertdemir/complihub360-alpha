@@ -222,6 +222,7 @@
   "days_one": "{{count}} día",
   "days_other": "{{count}} días",
   "ongoing": "continuo",
+  "euWide": "toda la UE",
   "domains": {
     "taxVat": "Impuestos e IVA",
     "productPackaging": "EPR y envases",

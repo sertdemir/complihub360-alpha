@@ -12,8 +12,10 @@ import type { Plugin } from 'vite';
 // aendern aber nichts — der Datensatz wird bei jedem Aufruf frisch relativ zu
 // "jetzt" berechnet, damit Fristen und Datumsmarken realistisch bleiben.
 //
-// Nicht abgedeckt: POST /search (die Engine laeuft serverseitig) — die
-// Ergebnisseite einer Sitzung zeigt im Mock deshalb keine Pflichten.
+// POST /search antwortet mit einem festen Satz Anbieter und Pflichten im
+// Drahtformat der Engine (SearchLaw / AnonProvider), damit die Sitzungsseite
+// mit Aufgaben-Chips, Fortschritt und Anbieter-Spalte prueferbar ist. Die
+// Engine selbst laeuft serverseitig und wird hier nicht nachgebaut.
 
 const H = 3_600_000;
 const iso = (days: number, hour = 10, minute = 0) => {
@@ -74,6 +76,29 @@ const SESSIONS: Array<Record<string, any>> = [
   { id: uuid(2, 1), label: 'UK nach Brexit', country: 'UK', markets: ['UK'], categories: ['tax-vat'], status: 'active', risk_summary: { level: 'high' }, created_at: iso(-9), updated_at: iso(-9), open: 6, total: 8, severity: 'high' },
   { id: uuid(3, 1), label: null, country: 'ES', markets: ['ES'], categories: ['marketing-seo', 'legal-advisory'], status: 'active', risk_summary: { level: 'low' }, created_at: iso(-40), updated_at: iso(-30), open: 7, total: 9, severity: 'low' },
   { id: uuid(4, 1), label: 'Archiv: Testlauf 2025', country: 'DE', markets: ['DE'], categories: ['tax-vat'], status: 'archived', risk_summary: { level: 'low' }, created_at: iso(-200), updated_at: iso(-190), open: 0, total: 5, severity: null },
+];
+
+// Pflichten der Sitzung "EU-Expansion Shop" — Titel auf Deutsch, weil das
+// hier Pruefdaten sind (die echte Engine liefert englische Titel). Die IDs
+// tax-vat-registration / prod-epr / data-privacy passen zu obligations().
+const LAWS = [
+  { id: 'tax-vat-registration', title: 'OSS-Quartalsmeldung', description: '', domain: 'tax-vat', severity: 'critical', markets: ['DE', 'NL'], source: 'UStG §18i (OSS)', penalty: '5.000 € + 1 %/Monat', due: '30. Apr', due_days: 6, state: 'confirmed' },
+  { id: 'tax-vat-uk', title: 'USt-Registrierung — UK', description: '', domain: 'tax-vat', severity: 'critical', markets: ['UK'], source: 'UK VATA 1994 §3', penalty: 'bis 20.000 £', due: '15. Mai', due_days: 21, state: 'likely' },
+  { id: 'prod-epr', title: 'EPR-Verpackungsregistrierung (LUCID)', description: '', domain: 'product-packaging', severity: 'critical', markets: ['DE'], source: 'VerpackG Art. 9 Abs. 1', penalty: 'bis 50.000 €', due: '02. Mai', due_days: 8, state: 'likely' },
+  { id: 'prod-epr-uk', title: 'EPR-Registrierungserneuerung (PackUK)', description: '', domain: 'product-packaging', severity: 'high', markets: ['UK'], source: 'UK Packaging Regs. 2023 §7', penalty: '4 % des UK-Umsatzes', due: '15. Mai', due_days: 21, state: 'likely' },
+  { id: 'mktg-consent', title: 'Cookie-Banner + Einwilligungsnachweise', description: '', domain: 'data-privacy', severity: 'high', markets: [], source: 'DSGVO Art. 6/7 · TTDSG §25', celex: '32016R0679', source_url: 'https://eur-lex.europa.eu/eli/reg/2016/679/oj', penalty: null, due: 'Ongoing', due_days: null, state: 'confirmed' },
+  { id: 'data-privacy', title: 'DSFA für Tracking-Pixel', description: '', domain: 'data-privacy', severity: 'medium', markets: [], source: 'DSGVO Art. 35', celex: '32016R0679', source_url: 'https://eur-lex.europa.eu/eli/reg/2016/679/oj', penalty: null, due: null, due_days: null, state: 'likely' },
+  { id: 'tax-reverse-charge', title: 'Reverse-Charge-Verfahren', description: '', domain: 'tax-vat', severity: 'medium', markets: ['DE', 'NL'], source: 'UStG §13b', penalty: null, due: null, due_days: null, state: 'likely' },
+  { id: 'corp-registration', title: 'Transparenzregister aktualisieren', description: '', domain: 'legal-advisory', severity: 'medium', markets: ['DE'], source: 'GwG §20 Abs. 1', penalty: '1.000–5.000 €', due: '30. Jun', due_days: 67, state: 'confirmed' },
+];
+
+// Die drei passenden Anbieter, Score-Aufschluesselung wie im Backend:
+// 60 * Marktabdeckung + 40 * (getroffene / angefragte Bereiche).
+const BASIS = (matched: string[]) => ({ country: 'DE', country_covered: true, domains_requested: ['tax-vat', 'product-packaging', 'data-privacy'], domains_matched: matched });
+const PROVIDERS = [
+  { provider_key: 'studio-bianchi', pseudonym_label: 'Verifizierte Steuerkanzlei · Norditalien', region: 'Norditalien', active_since: 2015, specializations: ['VAT & OSS', 'E-Commerce', 'EU-weit'], languages: ['IT', 'DE', 'EN'], rating: 4.9, completed_count: 210, avg_response_hours: 3, billing_model: 'project', is_verified: true, match: 100, match_tier: 'high', match_basis: BASIS(['tax-vat', 'product-packaging', 'data-privacy']) },
+  { provider_key: 'schmidt-partner', pseudonym_label: 'Verifizierte Steuerberatung · Norddeutschland', region: 'Norddeutschland', active_since: 2013, specializations: ['OSS/IOSS', 'Cross-border Tax'], languages: ['DE', 'EN'], rating: 4.7, completed_count: 96, avg_response_hours: 5, billing_model: 'abo', is_verified: true, match: 87, match_tier: 'strong', match_basis: BASIS(['tax-vat', 'product-packaging']) },
+  { provider_key: 'madrid-tax', pseudonym_label: 'Verifizierter Tax-Spezialist · Spanien', region: 'Spanien', active_since: 2020, specializations: ['Iberian VAT', 'Marketplace'], languages: ['ES', 'EN'], rating: 4.5, completed_count: 41, avg_response_hours: 8, billing_model: 'hourly', is_verified: true, match: 73, match_tier: 'moderate', match_basis: BASIS(['tax-vat']) },
 ];
 
 function dashboard() {
@@ -149,7 +174,7 @@ function route(method: string, path: string, body: Record<string, unknown> = {})
     if (p[0] === 'metrics') return { ok: true, sla: { confirm_rate: 0.86, avg_reply_hours: 5.2 } };
     return { ok: true, items: [], providers: [], laws: [], documents: [], exports: [] };
   }
-  if (p[0] === 'search') return { ok: true, providers: [], laws: [] };
+  if (p[0] === 'search') return { ok: true, providers: PROVIDERS, laws: LAWS };
   if (p[0] === 'session' && p.length === 1) return { ok: true, id: uuid(9, 1) };
   if (p[0] === 'session' && p[2] === 'duplicate') return duplicateSession(p[1]);
   if (p[0] === 'session' && p.length === 2 && method === 'PATCH') return patchSession(p[1], body);

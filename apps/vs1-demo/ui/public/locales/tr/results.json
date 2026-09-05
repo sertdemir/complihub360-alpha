@@ -222,6 +222,7 @@
   "days_one": "{{count}} gün",
   "days_other": "{{count}} gün",
   "ongoing": "devam ediyor",
+  "euWide": "AB genelinde",
   "domains": {
     "taxVat": "Vergi ve KDV",
     "productPackaging": "EPR ve Ambalaj",

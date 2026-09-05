@@ -13,12 +13,12 @@ import type { AnonProvider } from '../../api/search';
 // ─── Sitzungs-Snapshot · Canvas "Sitzungs-Snapshot", Gesamt · G8 ─────────────
 // Die Detailansicht EINER Sitzung fuer eingeloggte Nutzer. Aufbau nach der
 // Nutzer-Wahl vom 2026-08-29:
-//   Kopf (Brotkrumen, Titel, Meta) · PDF und Antworten bearbeiten als Textlinks
+//   Kopf (Brotkrumen, Titel, Meta) · PDF exportieren, Als Variante kopieren
+//     und Antworten bearbeiten als Textlinks (Reihenfolge Nutzer 2026-09-05)
 //   Kennzahlen mit grossen Donuts, volle Breite
-//   zweispaltig: Pflichten nach Dringlichkeit gruppiert | Verlauf, der auf die
-//     volle Hoehe waechst — Versionen oben, "Als Variante kopieren" am Fuss,
-//     sodass beide Spalten auf einer Kante enden
-//   die passenden Anbieter darunter, je eine Karte, volle Breite
+//   zweispaltig: Pflichten nach Dringlichkeit gruppiert, je Zeile Geltung und
+//     Bearbeitungs-Chip | rechts Fortschrittskarte und darunter die passenden
+//     Anbieter gestapelt (Canvas G9 + Wahl 2C; der Verlauf ist weg)
 //
 // Was hier bewusst NICHT steht:
 // - Keine Reiterleiste. Rechtsgrundlagen, News und Gesetzesaenderungen wandern
@@ -205,7 +205,10 @@ function GroupCard({ label, sub, dot, rows, entered, offset, onAnswer, taskOf, o
             key={r.title}
             className={'flex items-center gap-4 py-3.5 ' + (i < rows.length - 1 ? 'border-b border-stroke-subtle' : '')}
           >
-            <div className="min-w-0 flex-1">
+            {/* Der Titel bekommt den groesseren Teil des freien Raums —
+                sonst bricht "EPR-Verpackungsregistrierung" dreizeilig um,
+                waehrend rechts Luft bleibt. */}
+            <div className="min-w-0 flex-[2]">
               <p className="text-body-xs font-bold text-fg">{r.title}</p>
               <p className="mt-0.5 text-[10.5px] text-fg-tertiary">
                 {r.market}
@@ -380,6 +383,24 @@ export function SessionSnapshot({
                   zerschnitten sie das Raster (Nutzer 2026-08-29). */}
               <div className="flex shrink-0 items-center gap-5 pb-0.5">
                 <button type="button" onClick={onExportPdf} className={TEXT_LINK}>{t('snapshot.exportPdf')}</button>
+                {/* "Als Variante kopieren" steht seit 2026-09-05 hier zwischen
+                    den beiden anderen Textlinks (Nutzer-Vorgabe) — nicht mehr
+                    in der Fortschrittskarte. Ohne gespeicherte Sitzung
+                    (Fixture/Gast-Profil) gibt es nichts zu kopieren, dann
+                    fehlt der Link ganz statt tot herumzustehen. */}
+                {sessionId && (
+                  copy === 'done' ? (
+                    <button type="button" onClick={() => navigate(`/${locale}/dashboard/sessions`)} className={TEXT_LINK}>
+                      {t('snapshot.copyOpenList')}
+                    </button>
+                  ) : copy === 'error' ? (
+                    <span className="text-body-2xs font-bold text-risk-high">{t('snapshot.copyError')}</span>
+                  ) : (
+                    <button type="button" disabled={copy === 'busy'} onClick={duplicate} className={TEXT_LINK + ' disabled:opacity-60'}>
+                      {copy === 'busy' ? '…' : t('snapshot.copyVariant')}
+                    </button>
+                  )
+                )}
                 <button type="button" onClick={onEditAnswers} className={TEXT_LINK}>{t('snapshot.editAnswers')}</button>
               </div>
             </motion.div>
@@ -429,42 +450,24 @@ export function SessionSnapshot({
               </motion.div>
 
               <motion.aside variants={ITEM} className="flex w-full shrink-0 flex-col gap-3.5 xl:w-[330px]">
-                {/* Canvas-Wahl 2C (2026-09-01): kein Verlaufs-Kasten mehr —
-                    die Fortschrittskarte traegt "Als Variante kopieren" als
-                    Textlink, direkt darunter kommen die Anbieter. Die
-                    kuenftige Versionsliste (Verlaufs-Endpunkt, Backlog)
-                    braucht dann einen neuen Ort. */}
-                {(taskable || sessionId) && (
+                {/* Canvas-Wahl 2C (2026-09-01) + Nutzer-Vorgabe 2026-09-05:
+                    kein Verlaufs-Kasten mehr, die Fortschrittskarte zeigt nur
+                    noch den Stand, "Als Variante kopieren" sitzt im Kopf.
+                    Direkt darunter kommen die Anbieter. Die kuenftige
+                    Versionsliste (Verlaufs-Endpunkt, Backlog) braucht dann
+                    einen neuen Ort. */}
+                {taskable && (
                   <div className={CARD + ' px-5 py-4'}>
-                    {taskable && (
-                      <>
-                        <p className="font-serif text-[20px] font-bold leading-none text-fg">
-                          {t('snapshot.progress', { done: nDone, total: nRel })}
-                        </p>
-                        <div className="mt-2.5 flex h-2 overflow-hidden rounded-full bg-stroke-subtle">
-                          <div className="h-2 bg-risk-low" style={{ width: entered ? `${(nDone / nRel) * 100}%` : 0, transition: `width 850ms ${EASE} 150ms` }} />
-                          <div className="h-2 bg-risk-medium" style={{ width: entered ? `${(nProg / nRel) * 100}%` : 0, transition: `width 850ms ${EASE} 320ms` }} />
-                        </div>
-                        <p className="mt-2.5 text-[10.5px] text-fg-tertiary">
-                          {t('snapshot.progressSub', { prog: nProg, open: Math.max(0, nRel - nDone - nProg), na: nNa })}
-                        </p>
-                      </>
-                    )}
-                    {sessionId && (
-                      <div className={'text-center ' + (taskable ? 'mt-3 border-t border-stroke-subtle pt-2.5' : '')}>
-                        {copy === 'done' ? (
-                          <button type="button" onClick={() => navigate(`/${locale}/dashboard/sessions`)} className={TEXT_LINK}>
-                            {t('snapshot.copyOpenList')}
-                          </button>
-                        ) : copy === 'error' ? (
-                          <span className="text-[10.5px] text-risk-high">{t('snapshot.copyError')}</span>
-                        ) : (
-                          <button type="button" disabled={copy === 'busy'} onClick={duplicate} className={TEXT_LINK + ' disabled:opacity-60'}>
-                            {copy === 'busy' ? '…' : t('snapshot.copyVariant')}
-                          </button>
-                        )}
-                      </div>
-                    )}
+                    <p className="font-serif text-[20px] font-bold leading-none text-fg">
+                      {t('snapshot.progress', { done: nDone, total: nRel })}
+                    </p>
+                    <div className="mt-2.5 flex h-2 overflow-hidden rounded-full bg-stroke-subtle">
+                      <div className="h-2 bg-risk-low" style={{ width: entered ? `${(nDone / nRel) * 100}%` : 0, transition: `width 850ms ${EASE} 150ms` }} />
+                      <div className="h-2 bg-risk-medium" style={{ width: entered ? `${(nProg / nRel) * 100}%` : 0, transition: `width 850ms ${EASE} 320ms` }} />
+                    </div>
+                    <p className="mt-2.5 text-[10.5px] text-fg-tertiary">
+                      {t('snapshot.progressSub', { prog: nProg, open: Math.max(0, nRel - nDone - nProg), na: nNa })}
+                    </p>
                   </div>
                 )}
                 {/* Passende Anbieter — je eine Karte, gestapelt in der

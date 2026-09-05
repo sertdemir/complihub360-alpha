@@ -222,6 +222,7 @@
   "days_one": "{{count}} day",
   "days_other": "{{count}} days",
   "ongoing": "ongoing",
+  "euWide": "EU-wide",
   "domains": {
     "taxVat": "Tax & VAT",
     "productPackaging": "EPR & Packaging",
