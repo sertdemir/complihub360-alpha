@@ -1,5 +1,5 @@
 import { generateCorrelationId } from '@complihub360/types/src/observability';
-import { getAccessToken } from '../lib/supabase';
+import { getAccessToken, isMockApi } from '../lib/supabase';
 
 // ─── API client ───────────────────────────────────────────────────────────────
 // Shared fetch wrapper for the compliance-api (services/compliance-api): base
@@ -15,7 +15,11 @@ export class ApiError extends Error {
 
 export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   const correlationId = generateCorrelationId();
-  const baseUrl = import.meta.env.VITE_API_URL || '';
+  // Im Mock-Modus bleiben alle Aufrufe relativ, damit sie die Vite-Middleware
+  // treffen — eine lokale .env mit VITE_API_URL=https://staging… schickte sie
+  // sonst am Mock vorbei an die echte API (Befund 2026-09-05: "die Task-
+  // Badges sind immer noch nicht da").
+  const baseUrl = isMockApi ? '' : (import.meta.env.VITE_API_URL || '');
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',

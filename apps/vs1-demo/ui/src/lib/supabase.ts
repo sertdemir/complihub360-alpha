@@ -13,7 +13,11 @@ export const isSupabaseConfigured = Boolean(url && anonKey);
  * staging sets VITE_DEMO_LOGIN=1 to keep the one-click stakeholder logins
  * alongside real auth. Never set the flag in production builds.
  */
-export const isDemoLoginEnabled = !isSupabaseConfigured || import.meta.env.VITE_DEMO_LOGIN === '1';
+// Mock-API-Modus (VITE_MOCK_API=1, nur `vite dev`): die Daten kommen aus dem
+// eingebauten Datensatz, ein echter Login waere ein Magic-Link ins Leere —
+// deshalb schaltet der Mock-Schalter den Demo-Login gleich mit frei.
+export const isMockApi = import.meta.env.DEV && import.meta.env.VITE_MOCK_API === '1';
+export const isDemoLoginEnabled = !isSupabaseConfigured || import.meta.env.VITE_DEMO_LOGIN === '1' || isMockApi;
 
 /**
  * The Supabase client, or null when env is not configured.

@@ -24,6 +24,7 @@
     "typecheck:root": "npx tsc -b",
     "clean": "npx tsc -b --clean",
     "dev:ui": "npm run dev --workspace=@vs1-demo/ui",
+    "dev:ui:mock": "npm run dev:mock --workspace=@vs1-demo/ui",
     "dev:service": "npm run dev --workspace=@complihub/compliance-api",
     "dev:board": "npm run dev --workspace=@complihub/dev-board",
     "start:ui": "npm run start --workspace=@vs1-demo/ui",
