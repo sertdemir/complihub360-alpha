@@ -291,6 +291,15 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
           <button type="button" aria-label={t('shell.search')} onClick={() => setSearchOpen(true)} className="grid h-9 w-9 place-items-center rounded-lg text-fg-secondary hover:text-fg">
             <Search size={17} />
           </button>
+          {/* Nur im Dev-Server mit VITE_MOCK_API=1: macht sichtbar, dass die
+              Daten aus dem eingebauten Datensatz kommen — sonst ist ein
+              versehentlich normal gestarteter Server nicht vom Mock zu
+              unterscheiden. */}
+          {isMockApi && (
+            <span className="rounded-full border border-accent/55 px-2 py-[2px] text-[9px] font-extrabold uppercase tracking-[0.06em] text-fg-accent-strong">
+              Mock-Daten
+            </span>
+          )}
           {/* Glocke (Canvas-Wahl 5B, 2026-09-05): fuehrt direkt zu den
               Benachrichtigungen; ein goldener Punkt, sobald etwas ungelesen ist —
               dieselbe Zahl, die die Seitenleiste traegt. */}
