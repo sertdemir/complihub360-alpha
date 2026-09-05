@@ -5,7 +5,7 @@ import { motion, MotionConfig, type Variants } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { UserShell } from './UserShell';
 import { Button } from '../ui/Button';
-import { Donut, useEntered, useCountUp, EASE } from '../ui/Stats';
+import { KpiRing, useEntered, EASE } from '../ui/Stats';
 import { duplicateSession } from '../../api/sessions';
 import { fetchObligationStatus, setObligationStatus, type ObligationStatus, type ObligationStatusRow } from '../../api/obligations';
 import type { AnonProvider } from '../../api/search';
@@ -15,7 +15,7 @@ import type { AnonProvider } from '../../api/search';
 // Nutzer-Wahl vom 2026-08-29:
 //   Kopf (Brotkrumen, Titel, Meta) · PDF exportieren, Als Variante kopieren
 //     und Antworten bearbeiten als Textlinks (Reihenfolge Nutzer 2026-09-05)
-//   Kennzahlen mit grossen Donuts, volle Breite
+//   Kennzahl-Ringe ohne Karte (wie Dashboard), volle Breite
 //   zweispaltig: Pflichten nach Dringlichkeit gruppiert, je Zeile Geltung und
 //     Bearbeitungs-Chip | rechts Fortschrittskarte und darunter die passenden
 //     Anbieter gestapelt (Canvas G9 + Wahl 2C; der Verlauf ist weg)
@@ -65,10 +65,6 @@ const ITEM: Variants = {
 
 const CARD = 'rounded-xl border border-stroke-subtle bg-surface shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]';
 const TEXT_LINK = 'text-body-2xs font-bold text-brand underline underline-offset-[3px] transition-colors hover:text-brand-700';
-
-/** Doppelte Donut-Groesse gegenueber Dashboard und Sitzungen (Nutzer-Vorgabe). */
-const DONUT_SIZE = 92;
-const DONUT_STROKE = 13;
 
 // Die Gruppen folgen der Dringlichkeit, nicht dem Bereich: "Was muss ich
 // zuerst tun" ist die Frage, mit der jemand diese Seite oeffnet.
@@ -280,7 +276,7 @@ function GroupCard({ label, sub, dot, rows, entered, offset, taskOf, statusRowOf
 }
 
 export function SessionSnapshot({
-  rows, providers, sessionId, title, meta, kpis, matchBasis, onExportPdf, onEditAnswers, onProviderDetails,
+  rows, providers, sessionId, title, meta, kpis, matchBasis, onExportPdf, onEditAnswers, onProviderDetails, answersDrawer,
 }: {
   rows: SnapshotRow[];
   providers: AnonProvider[];
@@ -294,15 +290,15 @@ export function SessionSnapshot({
   onExportPdf: () => void;
   onEditAnswers: () => void;
   onProviderDetails: (key: string) => void;
+  /** Die Schublade "Antworten bearbeiten" — der Aufrufer besitzt sie, weil er
+   *  die Sitzungsdaten und das Neuladen kennt; sie haengt hier im Baum. */
+  answersDrawer?: React.ReactNode;
 }) {
   const { t, i18n } = useTranslation('results');
   const { t: tw } = useTranslation('userws');
   const locale = i18n.resolvedLanguage || 'en';
   const navigate = useNavigate();
   const entered = useEntered();
-  const nTotal = useCountUp(kpis.total, entered);
-  const nSoon = useCountUp(kpis.soon, entered);
-  const nOpen = useCountUp(kpis.open, entered);
   const [copy, setCopy] = useState<'idle' | 'busy' | 'done' | 'error'>('idle');
   // Bearbeitungs-Stand: nur ABWEICHUNGEN kommen vom Server, alles andere ist
   // 'open'. Ohne gespeicherte Sitzung gibt es nichts abzuhaken — dann bleibt
@@ -358,15 +354,18 @@ export function SessionSnapshot({
 
   const total = Math.max(1, kpis.total);
 
-  // Legt eine Kopie an und bestaetigt an Ort und Stelle. Ohne gespeicherte
-  // Sitzung (Fixture/Gast-Profil) gibt es nichts zu duplizieren — dann bleibt
-  // der Knopf inaktiv statt einen Fehler zu erzeugen.
+  // Legt eine Kopie an und springt sofort auf sie — mit offener Schublade
+  // "Antworten bearbeiten" (Canvas-Wahl 2B, 2026-09-05): Variante anlegen
+  // heisst Antworten aendern. Das Label kommt in der Sprache des Nutzers von
+  // hier, der Server kennt sie nicht. Ohne gespeicherte Sitzung (Fixture/
+  // Gast-Profil) gibt es nichts zu duplizieren — dann fehlt der Link.
   const duplicate = async () => {
     if (!sessionId) return;
     setCopy('busy');
     try {
-      await duplicateSession(sessionId);
+      const copyId = await duplicateSession(sessionId, t('snapshot.copyLabel', { label: title }));
       setCopy('done');
+      navigate(`/${locale}/results?session=${copyId}`, { state: { openAnswers: true } });
     } catch {
       setCopy('error');
     }
@@ -416,15 +415,11 @@ export function SessionSnapshot({
                     (Fixture/Gast-Profil) gibt es nichts zu kopieren, dann
                     fehlt der Link ganz statt tot herumzustehen. */}
                 {sessionId && (
-                  copy === 'done' ? (
-                    <button type="button" onClick={() => navigate(`/${locale}/dashboard/sessions`)} className={TEXT_LINK}>
-                      {t('snapshot.copyOpenList')}
-                    </button>
-                  ) : copy === 'error' ? (
+                  copy === 'error' ? (
                     <span className="text-body-2xs font-bold text-risk-high">{t('snapshot.copyError')}</span>
                   ) : (
-                    <button type="button" disabled={copy === 'busy'} onClick={duplicate} className={TEXT_LINK + ' disabled:opacity-60'}>
-                      {copy === 'busy' ? '…' : t('snapshot.copyVariant')}
+                    <button type="button" disabled={copy !== 'idle'} onClick={duplicate} className={TEXT_LINK + ' disabled:opacity-60'}>
+                      {copy === 'idle' ? t('snapshot.copyVariant') : '…'}
                     </button>
                   )
                 )}
@@ -432,28 +427,22 @@ export function SessionSnapshot({
               </div>
             </motion.div>
 
-            {/* Kennzahlen */}
-            <motion.div variants={ITEM} className="mt-4 grid gap-4 sm:grid-cols-3">
-              <Kpi
+            {/* Kennzahl-Ringe wie auf dem Dashboard (Nutzer-Vorgabe
+                2026-09-05): ohne Karte, Zahl nur im Kreis. */}
+            <motion.div variants={ITEM} className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-3">
+              <KpiRing
+                on={entered}
                 title={t('snapshot.kpiTotal')}
-                big={String(nTotal)}
+                value={kpis.total}
                 sub={t('snapshot.kpiTotalSub', { now: kpis.critical, high: kpis.high, rest: kpis.rest })}
-              >
-                <Donut
-                  on={entered} size={DONUT_SIZE} stroke={DONUT_STROKE}
-                  segs={[
-                    { frac: kpis.critical / total, cls: 'text-risk-critical' },
-                    { frac: kpis.high / total, cls: 'text-risk-high' },
-                    { frac: kpis.rest / total, cls: 'text-risk-medium' },
-                  ]}
-                />
-              </Kpi>
-              <Kpi title={t('snapshot.kpiSoon')} big={String(nSoon)} sub={t('snapshot.kpiSoonSub')}>
-                <Donut on={entered} size={DONUT_SIZE} stroke={DONUT_STROKE} segs={[{ frac: kpis.soon / total, cls: 'text-fg-accent' }]} />
-              </Kpi>
-              <Kpi title={t('snapshot.kpiOpen')} big={String(nOpen)} sub={t('snapshot.kpiOpenSub', { count: kpis.open })}>
-                <Donut on={entered} size={DONUT_SIZE} stroke={DONUT_STROKE} segs={[{ frac: kpis.open / total, cls: 'text-brand' }]} />
-              </Kpi>
+                segs={[
+                  { frac: kpis.critical / total, cls: 'text-risk-critical' },
+                  { frac: kpis.high / total, cls: 'text-risk-high' },
+                  { frac: kpis.rest / total, cls: 'text-risk-medium' },
+                ]}
+              />
+              <KpiRing on={entered} title={t('snapshot.kpiSoon')} value={kpis.soon} sub={t('snapshot.kpiSoonSub')} segs={[{ frac: kpis.soon / total, cls: 'text-fg-accent' }]} />
+              <KpiRing on={entered} title={t('snapshot.kpiOpen')} value={kpis.open} sub={t('snapshot.kpiOpenSub', { count: kpis.open })} segs={[{ frac: kpis.open / total, cls: 'text-brand' }]} />
             </motion.div>
 
             {/* Pflichten + Verlauf, beide Spalten enden auf einer Kante */}
@@ -543,24 +532,7 @@ export function SessionSnapshot({
           </motion.div>
         </MotionConfig>
       </div>
+      {answersDrawer}
     </UserShell>
   );
 }
-
-/** Kennzahl-Kachel mit grossem Donut — eigener Zuschnitt, weil KpiCard aus
- *  Stats fuer die kleineren Dashboard-Kacheln gebaut ist. */
-function Kpi({ title, big, sub, children }: { title: string; big: string; sub: string; children: React.ReactNode }) {
-  return (
-    <div className={CARD + ' px-5 py-4'}>
-      <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{title}</p>
-      <div className="mt-2 flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <p className="font-serif text-[26px] font-bold leading-none text-fg">{big}</p>
-          <p className="mt-1.5 text-body-2xs text-fg-tertiary">{sub}</p>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}
-

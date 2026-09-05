@@ -8,7 +8,7 @@ import type { TFunction } from 'i18next';
 import { UserShell } from '../../components/user/UserShell';
 import { Button } from '../../components/ui/Button';
 import { Segment } from '../../components/compliance-areas';
-import { Donut, SparkBars, KpiCard, useEntered, useCountUp, EASE } from '../../components/ui/Stats';
+import { KpiRing, useEntered, EASE } from '../../components/ui/Stats';
 import { SessionActionsDrawer, type SessionActionsTarget } from '../../components/user/SessionActionsDrawer';
 import { EmptyState } from '../../components/user/EmptyState';
 import { fetchSessions, type SessionRowData } from '../../api/sessions';
@@ -151,8 +151,6 @@ export function SessionsPage() {
   };
   const marketCount = new Set(rows.map((r) => r.cc)).size;
 
-  const nSessions = useCountUp(rows.length, entered);
-  const nStale = useCountUp(stale.length, entered);
 
   const FILTERS = useMemo(() => [
     { key: 'all', label: t('sessions.filterAll', { count: rows.length }), match: () => true },
@@ -246,24 +244,34 @@ export function SessionsPage() {
             <Button className="mt-0.5 shrink-0" onClick={() => openWizard()}>{t('shared.startNewSearch')}</Button>
           </div>
 
-          <div className="mt-4 flex flex-col gap-4 lg:flex-row">
-            <KpiCard title={t('sessions.kpiSaved')} big={String(nSessions)} sub={t('sessions.kpiSavedSub', { count: marketCount })}>
-              <SparkBars on={entered} vals={[byRisk.high, byRisk.medium, byRisk.low]} />
-            </KpiCard>
-            <KpiCard title={t('sessions.kpiRisk')} big={t('sessions.kpiRiskValue', { count: byRisk.high })} sub={t('sessions.kpiRiskSub', { medium: byRisk.medium, low: byRisk.low })}>
-              <Donut
-                on={entered}
-                center={String(rows.length)}
-                segs={[
-                  { frac: byRisk.high / rows.length, cls: 'text-risk-high' },
-                  { frac: byRisk.medium / rows.length, cls: 'text-risk-medium' },
-                  { frac: byRisk.low / rows.length, cls: 'text-risk-low' },
-                ]}
-              />
-            </KpiCard>
-            <KpiCard title={t('sessions.kpiStale')} big={String(nStale)} sub={stale.length ? t('sessions.kpiStaleSub', { count: Math.round(Math.max(...stale.map((s) => s.daysAgo)) / 30) }) : t('sessions.kpiStaleNone')}>
-              <Donut on={entered} center={String(stale.length)} segs={[{ frac: stale.length / rows.length, cls: 'text-fg-accent' }]} />
-            </KpiCard>
+          {/* Kennzahl-Ringe wie auf dem Dashboard (Nutzer-Vorgabe 2026-09-05):
+              ohne Karte, Zahl nur im Kreis. */}
+          <div className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-3">
+            <KpiRing
+              on={entered}
+              title={t('sessions.kpiSaved')}
+              value={rows.length}
+              sub={t('sessions.kpiSavedSub', { count: marketCount })}
+              segs={rows.length ? [
+                { frac: byRisk.high / rows.length, cls: 'text-risk-high' },
+                { frac: byRisk.medium / rows.length, cls: 'text-risk-medium' },
+                { frac: byRisk.low / rows.length, cls: 'text-risk-low' },
+              ] : []}
+            />
+            <KpiRing
+              on={entered}
+              title={t('sessions.kpiRisk')}
+              value={byRisk.high}
+              sub={`${t('sessions.kpiRiskValue', { count: byRisk.high })} · ${t('sessions.kpiRiskSub', { medium: byRisk.medium, low: byRisk.low })}`}
+              segs={rows.length ? [{ frac: byRisk.high / rows.length, cls: 'text-risk-high' }] : []}
+            />
+            <KpiRing
+              on={entered}
+              title={t('sessions.kpiStale')}
+              value={stale.length}
+              sub={stale.length ? t('sessions.kpiStaleSub', { count: Math.round(Math.max(...stale.map((s) => s.daysAgo)) / 30) }) : t('sessions.kpiStaleNone')}
+              segs={rows.length ? [{ frac: stale.length / rows.length, cls: 'text-fg-accent' }] : []}
+            />
           </div>
 
           {/* S6-A · Alters-Band: spricht ueber das Alter, nicht ueber Regeln */}

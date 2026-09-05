@@ -306,6 +306,7 @@
     "inProgressSince_one": "seit {{count}} Tag in Arbeit",
     "inProgressSince_other": "seit {{count}} Tagen in Arbeit",
     "nextDue_one": "nächste Frist in {{count}} Tag",
-    "nextDue_other": "nächste Frist in {{count}} Tagen"
+    "nextDue_other": "nächste Frist in {{count}} Tagen",
+    "copyLabel": "Kopie von {{label}}"
   }
 }

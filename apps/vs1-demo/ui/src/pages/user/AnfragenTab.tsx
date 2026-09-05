@@ -29,10 +29,10 @@ import type { UserRequestRow } from '../../api/requests';
 //        Zeitangaben (Intl.RelativeTimeFormat) und uebersetzte Bereichs-/
 //        Marktnamen statt roher Slugs ("tax-vat · IT").
 
-const SLUG_TO_I18N: Record<string, string> = Object.fromEntries(DOMAINS.map((d) => [d.slug, d.i18nKey]));
+export const SLUG_TO_I18N: Record<string, string> = Object.fromEntries(DOMAINS.map((d) => [d.slug, d.i18nKey]));
 
 /** "vor 2 Std." / "hace 2 h" — lokalisiert ohne eigene Schluessel. */
-function relZeit(iso: string | undefined, locale: string): string {
+export function relZeit(iso: string | undefined, locale: string): string {
   if (!iso) return '';
   const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto', style: 'short' });
   const diffMs = new Date(iso).getTime() - Date.now();
@@ -99,7 +99,7 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
   const oeffnen = (r: UserRequestRow) => setThreadFor(r.uuid);
   const knopf = (r: UserRequestRow) => {
     const label = r.bucket === 'replied' ? t('requests.actionRead') : t('requests.actionOpen');
-    const variant = r.bucket === 'replied' ? 'accent' as const : 'secondary' as const;
+    const variant = r.bucket === 'replied' ? 'primary' as const : 'secondary' as const;
     return <Button size="sm" variant={variant} onClick={() => oeffnen(r)}>{label}</Button>;
   };
 
@@ -212,7 +212,7 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
 }
 
 // Live/fixture UI labels → userws keys (display only; raw values untouched).
-const STATUS_KEY: Record<string, string> = {
+export const STATUS_KEY: Record<string, string> = {
   'Awaiting confirmation': 'awaitingConfirmation', 'Active': 'active',
   'Provider replied': 'providerReplied', 'Provider confirmed': 'providerConfirmed', 'Withdrawn': 'withdrawn',
   'Declined': 'declined', 'Expired': 'expired',

@@ -1,5 +1,5 @@
-import { useEffect, useState, type ReactNode } from 'react';
-import { Play, ArrowRight, TriangleAlert, CalendarClock, Compass } from 'lucide-react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { Play, ArrowRight, CalendarPlus, Compass } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { useWizardDrawer } from '../../components/user/WizardDrawer';
@@ -7,41 +7,52 @@ import { UserShell } from '../../components/user/UserShell';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Button } from '../../components/ui/Button';
 import { Segment } from '../../components/compliance-areas';
-import { Donut, SparkBars, KpiCard, useEntered, useCountUp, EASE } from '../../components/ui/Stats';
+import { KpiRing, useEntered, EASE } from '../../components/ui/Stats';
 import { EmptyState } from '../../components/user/EmptyState';
+import { RescheduleDrawer, type RescheduleTarget } from '../../components/user/RescheduleDrawer';
 import { fetchDashboard, EMPTY_DASHBOARD, type DashboardData, type DashboardSession } from '../../api/dashboard';
 import { fetchUserRequests, type UserRequestRow } from '../../api/requests';
 import { fetchUserBookings, type UserBooking } from '../../api/bookings';
+import { SLUG_TO_I18N, STATUS_KEY, relZeit } from './AnfragenTab';
+import { ladeIcs } from './TerminePage';
 
-// ─── User Dashboard · Home v3 (Bento) ────────────────────────────────────────
-// Canvas "User-Dashboard", Gesamt · V3 auf dem Gradient (Nutzer-Wahl
-// 2026-08-29). Das Kachelraster ist unveraendert; was sich am 2026-08-30
-// geaendert hat, ist die HERKUNFT der Zahlen.
+// ─── User Dashboard · Home v4 ────────────────────────────────────────────────
+// Canvas "Dashboard · Arbeitsbereich", Nutzer-Wahl 2026-09-05:
+//   1B  Kopf mit LAGE-SATZ statt Datum und Warnband: "Heute: 1 Anfrage wartet
+//       auf Sie · 1 Ergebnisfrage offen · 15 Pflichten mit hohem Risiko".
+//   2A' Vier Kennzahlen OHNE Karte auf dem Gradient: Text links (Titel,
+//       Unterzeile, Chip), Kreis rechts, doppelt so gross, die Zahl steht NUR
+//       im Kreis (Nutzer-Vorgabe).
+//   3B  Offene Pflichten als Balken quer, sortiert, Zahl und Hoch-Anteil rechts.
+//   4B  Anfragen als Posteingangs-Zeilen — dasselbe Vokabular wie die
+//       Termine-Seite: lokalisierte Pille, Bereich · Markt, "Frist · Anbieter",
+//       eine Aktion je Zeile, EIN "Alle anzeigen" im Kopf.
+//   5B  Rechts zwei Karten: Termine mit Datumsmarke und echten Aktionen (In
+//       den Kalender, Verschieben), "Da weitermachen" mit Fortsetzen. Der
+//       "Naechste Schritt" und "Termin vorschlagen" (ohne Funktion) entfallen.
+//   6B  Sitzungen als Kacheln mit Risiko-Tag, Bereichs-/Land-Chips, Balken
+//       und "Oeffnen"-Link direkt auf die Sitzung.
 //
-// Bis dahin standen sie fest im Code — 3 Anfragen, 12 Pflichten, 4 Sitzungen,
-// zwei Termine im September. Jedes Konto sah dieselbe erfundene Lage, auch ein
-// fuenf Minuten altes. Fuer die Design-Phase war das gewollt, fuer echte
-// Nutzer ist es eine Falschaussage: wer darauf Rueckmeldung gibt, gibt sie zu
-// einer Fiktion, und den Zustand, der ihn wirklich empfaengt — ein leeres
-// Dashboard nach der ersten Anmeldung — sieht nie jemand.
-//
-// Jetzt kommt alles aus drei Aufrufen: /api/v1/dashboard (Sitzungen und
-// Pflichten, serverseitig durch die Engine gerechnet), /requests, /bookings.
-// Ist nichts da, steht das da — siehe ErsterBesuch weiter unten.
-//
-// Was bewusst FEHLT: die Kachel "Naechste Frist". Die Kadenzen der Engine sind
-// redaktionelle Rhythmen ("jaehrlich", "quartalsweise"), keine Termine. Ein
-// Datum daraus zu machen hiesse, eine Faelligkeit zu behaupten, die niemand
-// geprueft hat. An ihrer Stelle steht "Hohes Risiko" — eine Zahl, die es gibt.
+// Die Zahlen kommen weiterhin aus drei Aufrufen: /api/v1/dashboard (Sitzungen
+// und Pflichten, serverseitig durch die Engine gerechnet), /requests,
+// /bookings. Ist nichts da, steht das da — siehe ErsterBesuch weiter unten.
+// Was bewusst FEHLT: eine Kachel "Naechste Frist" — die Kadenzen der Engine
+// sind redaktionelle Rhythmen, keine Termine.
 
 const RISK_TEXT = { critical: 'text-risk-critical', high: 'text-risk-high', medium: 'text-risk-medium', low: 'text-risk-low' } as const;
 const RISK_BG = { critical: 'bg-risk-critical', high: 'bg-risk-high', medium: 'bg-risk-medium', low: 'bg-risk-low' } as const;
+// Theme-feste Rezepte wie die Aufgaben-Chips der Sitzungsseite: Token-
+// Opazitaet frisst im Dark Mode den Text.
+const RISK_TAG = {
+  critical: 'bg-[#FEE2E2] border-[rgba(143,49,16,.30)] text-[#8F3110] dark:bg-[#8F3110]/25 dark:text-[#F1A88C]',
+  high: 'bg-[#FEE2E2] border-[rgba(143,49,16,.30)] text-[#8F3110] dark:bg-[#8F3110]/25 dark:text-[#F1A88C]',
+  medium: 'bg-[#FEF3C7] border-[rgba(161,98,7,.35)] text-[#713F12] dark:bg-[#A16207]/25 dark:text-[#F0C86A]',
+  low: 'bg-[#E7F3EE] border-[rgba(21,128,61,.35)] text-[#14532D] dark:bg-[#15803D]/20 dark:text-[#8FD3AE]',
+} as const;
 type Sev = keyof typeof RISK_BG;
 
 const CARD = 'rounded-xl border border-stroke-subtle bg-surface shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]';
-
-// Die Kleinst-Diagramme und die Eintritts-Animation liegen seit dem
-// Sitzungen-Umbau in components/ui/Stats.tsx.
+const TEXT_LINK = 'text-body-2xs font-bold text-brand underline underline-offset-[3px] transition-colors hover:text-brand-700';
 
 function SectionHead({ title, count, to, extra }: { title: string; count?: string; to: string; extra?: ReactNode }) {
   const { t, i18n } = useTranslation('userws');
@@ -95,8 +106,7 @@ function useLage(): Lage {
   return { dash, requests, bookings, loading };
 }
 
-/** Termine, die noch bevorstehen und nicht abgesagt sind — ein Dashboard zeigt,
- *  was ansteht, nicht was war. */
+/** Termine, die noch bevorstehen und nicht abgesagt sind. */
 function kommende(bookings: UserBooking[]): UserBooking[] {
   const jetzt = Date.now();
   return bookings
@@ -111,21 +121,42 @@ function sitzungsTitel(s: DashboardSession, domainLabel: (k: string) => string):
   return [bereiche, s.country].filter(Boolean).join(' · ') || '—';
 }
 
+/** Datums-Blockmarke (5B) — Tag gross, Monat klein, wie auf der Termine-Seite. */
+function DatumsMarke({ iso, locale }: { iso: string; locale: string }) {
+  const d = new Date(iso);
+  return (
+    <div aria-hidden="true" className="grid h-11 w-11 shrink-0 place-content-center rounded-lg border border-stroke-brand/40 bg-brand-light text-center leading-[1.1] text-fg-brand">
+      <span className="text-[16px] font-bold">{d.getDate()}</span>
+      <span className="text-[8.5px] font-bold uppercase tracking-[0.08em]">{d.toLocaleDateString(locale, { month: 'short' }).replace('.', '')}</span>
+    </div>
+  );
+}
+
 export function UserHomePage() {
   const navigate = useNavigate();
   const { locale = 'en' } = useParams();
   const { t, i18n } = useTranslation('userws');
   const { openWizard } = useWizardDrawer();
   const [chartView, setChartView] = useState<'markets' | 'areas'>('markets');
+  const [rescheduleFor, setRescheduleFor] = useState<RescheduleTarget | null>(null);
+  const [moved, setMoved] = useState<Record<string, string>>({});
   const entered = useEntered();
   const { dash, requests, bookings, loading } = useLage();
+  const jetzt = Date.now();
 
-  const offeneAnfragen = requests.filter((r) => r.bucket !== 'closed');
-  // "Wartend" heisst: der Anbieter hat noch nicht bestaetigt. Das Vokabular
-  // steht in RequestCard (RequestStatus), nicht hier.
-  const wartet = (r: UserRequestRow) => r.status === 'awaiting-confirm';
-  const wartend = offeneAnfragen.filter(wartet).length;
-  const termine = kommende(bookings);
+  // Anfragen: "wartet auf Sie" = Antwort liegt vor, Frist verpasst (auch nach
+  // Bestaetigung — Matrix-Befund 4) oder abgelaufen; "wartet" auf der Kachel =
+  // der Anbieter hat noch nicht bestaetigt.
+  const effective = requests.map((r) =>
+    r.bucket === 'confirmed' && r.slaDeadline && new Date(r.slaDeadline).getTime() <= jetzt ? { ...r, bucket: 'overdue' as const } : r,
+  );
+  const offeneAnfragen = effective.filter((r) => r.bucket !== 'closed');
+  const aufSie = offeneAnfragen.filter((r) => r.bucket === 'replied' || r.bucket === 'overdue');
+  const wartend = offeneAnfragen.filter((r) => r.status === 'awaiting-confirm' && r.bucket === 'confirm').length;
+
+  // Termine: kommend (ggf. verschoben) und offene Ergebnisfragen.
+  const termine = kommende(bookings.map((b) => (moved[b.id] ? { ...b, slotStart: moved[b.id] } : b)));
+  const ergebnisfragen = bookings.filter((b) => b.status === 'confirmed' && new Date(b.slotStart).getTime() < jetzt).length;
 
   const sev = dash.obligations.by_severity;
   const hoch = (sev.critical ?? 0) + (sev.high ?? 0);
@@ -133,16 +164,11 @@ export function UserHomePage() {
   const niedrig = sev.low ?? 0;
   const offen = dash.obligations.open;
 
-  const nRequests = useCountUp(offeneAnfragen.length, entered && !loading);
-  const nDuties = useCountUp(offen, entered && !loading);
-  const nSessions = useCountUp(dash.sessions.total, entered && !loading);
-  const nHigh = useCountUp(hoch, entered && !loading);
-
   const firstName = (useAuthStore((st) => st.userName) || '').split(/[\s._-]+/)[0];
-  const today = new Date().toLocaleDateString(i18n.resolvedLanguage || 'en', {
-    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
-  });
   const domainLabel = (key: string) => t(`home.domain.${key}`, { defaultValue: key });
+  const bereich = (slug?: string) => (slug && SLUG_TO_I18N[slug] ? t(`domain.${SLUG_TO_I18N[slug]}`) : slug ?? '');
+  const regionName = useMemo(() => { try { return new Intl.DisplayNames([locale], { type: 'region' }); } catch { return null; } }, [locale]);
+  const markt = (code?: string) => { try { return code ? (regionName?.of(code.toUpperCase()) ?? code) : ''; } catch { return code ?? ''; } };
 
   // Balken: Maerkte oder Bereiche, beides aus denselben offenen Pflichten.
   const quelle = chartView === 'markets'
@@ -153,27 +179,39 @@ export function UserHomePage() {
     .sort((a, b) => b.total - a.total)
     .slice(0, 6);
   const chartMax = Math.max(1, ...chartData.map((m) => m.total));
+  const marktAnteile = Object.values(dash.obligations.by_market);
+  const marktSumme = Math.max(1, marktAnteile.reduce((a, b) => a + b, 0));
+  const MARKT_CLS = ['text-brand', 'text-fg-accent', 'text-risk-low', 'text-brand/60', 'text-fg-accent/60', 'text-risk-low/60'];
 
-  // Die dringendste Sitzung traegt beide Hinweiskarten — Warnband und
-  // "Naechster Schritt". Gibt es keine mit hohem Risiko, bleiben sie weg.
-  const RANG: Record<string, number> = { low: 0, medium: 1, high: 2, critical: 3 };
-  const dringend = [...dash.sessions.items]
-    .filter((s) => s.open > 0)
-    .sort((a, b) => (RANG[b.severity ?? 'low'] - RANG[a.severity ?? 'low']) || (b.open - a.open))[0];
-  const zuletzt = [...dash.sessions.items]
-    .sort((a, b) => b.updated_at.localeCompare(a.updated_at))[0];
-
+  const zuletzt = [...dash.sessions.items].sort((a, b) => b.updated_at.localeCompare(a.updated_at))[0];
   const nichts = !loading && dash.sessions.total === 0 && offeneAnfragen.length === 0 && termine.length === 0;
+
+  // 1B: der Lage-Satz — nur Teile, die es gibt; sonst der ruhige Satz.
+  const lageTeile: ReactNode[] = [];
+  if (aufSie.length) lageTeile.push(<strong key="a" className="text-fg">{t('home.todayRequests', { count: aufSie.length })}</strong>);
+  if (ergebnisfragen) lageTeile.push(<span key="e">{t('home.todayOutcomes', { count: ergebnisfragen })}</span>);
+  if (hoch) lageTeile.push(<strong key="r" className="text-[#8A3B3B] dark:text-[#F1A88C]">{t('home.todayRisk', { count: hoch })}</strong>);
 
   const kopf = (
     <div className="flex items-start justify-between gap-4">
-      <div>
+      <div className="min-w-0">
         <h1 className="font-serif text-[22px] font-bold leading-tight text-fg">
           {firstName
             ? <Trans t={t} i18nKey="home.title" values={{ name: firstName }} components={{ accent: <span className="text-fg-accent-emphasis" /> }} />
             : t('home.titleNoName')}
         </h1>
-        <p className="mt-1 text-body-2xs text-fg-tertiary">{today}</p>
+        {!loading && (
+          <p className="mt-1.5 text-body-sm text-fg-secondary">
+            {lageTeile.length ? (
+              <>
+                {t('home.todayPrefix')}{' '}
+                {lageTeile.map((teil, i) => (
+                  <span key={i}>{i > 0 && <span className="text-fg-tertiary"> · </span>}{teil}</span>
+                ))}
+              </>
+            ) : t('home.todayCalm')}
+          </p>
+        )}
       </div>
       <Button className="mt-0.5 shrink-0" onClick={() => openWizard()}>{t('shared.startNewSearch')}</Button>
     </div>
@@ -193,8 +231,6 @@ export function UserHomePage() {
   }
 
   // ─── Erster Besuch ────────────────────────────────────────────────────────
-  // Kein Raster aus Nullen: vier Kacheln mit 0 sehen aus wie ein Defekt und
-  // sagen nichts darueber, was als Naechstes zu tun waere.
   if (nichts) {
     return (
       <UserShell>
@@ -219,75 +255,92 @@ export function UserHomePage() {
     );
   }
 
+  const oeffneSitzung = (id: string) => navigate(`/${locale}/results?session=${id}`);
+  const oeffneVerlauf = (uuid: string) => navigate(`/${locale}/dashboard/termine?thread=${uuid}`);
+
+  // 4B: die laufende Frist als Restzeit + Balken (Vokabular der Termine-Seite).
+  const frist = (r: UserRequestRow) => {
+    if (r.bucket === 'overdue') return { label: t('requests.slaMissed'), tone: 'err' as const, pct: 0 };
+    if (!r.slaDeadline) return null;
+    const left = new Date(r.slaDeadline).getTime() - jetzt;
+    if (left <= 0) return { label: t('requests.slaMissed'), tone: 'err' as const, pct: 0 };
+    const h = Math.floor(left / 3_600_000);
+    const m = Math.floor((left % 3_600_000) / 60_000);
+    return {
+      label: h > 0 ? `${h}h ${String(m).padStart(2, '0')}m` : `${m}m`,
+      tone: left <= 4 * 3_600_000 ? ('warn' as const) : ('ok' as const),
+      pct: Math.max(3, Math.min(100, Math.round((left / (r.slaWindowMs ?? 24 * 3_600_000)) * 100))),
+    };
+  };
+  const FRIST_TONE = { ok: 'text-fg-brand', warn: 'text-fg-accent-strong', err: 'text-[#8A3B3B]' };
+  const BALKEN_TONE = { ok: 'bg-brand', warn: 'bg-[#d4af37]', err: 'bg-[#B55353]' };
+  const PILL: Record<string, string> = {
+    'awaiting-confirm': 'bg-[#d4af37]/10 border-[#d4af37]/35 text-fg-accent-strong dark:bg-[#d4af37]/15 dark:border-[#d4af37]/40',
+    'awaiting-reply': 'bg-surface-secondary border-stroke text-fg-secondary',
+    active: 'bg-[#004d40]/10 border-[#258d78]/35 text-fg-brand dark:bg-[#004d40]/25 dark:border-[#258d78]/40',
+    closed: 'bg-surface-secondary border-stroke text-fg-tertiary',
+  };
+  const anfragenZeilen = [...aufSie, ...offeneAnfragen.filter((r) => !aufSie.includes(r))].slice(0, 3);
+
+  // 5B: "Heute · 09:00" / "Morgen · 09:00" / "Mo., 8. Sep. · 09:00".
+  const wann = (iso: string) => {
+    const d = new Date(iso);
+    const tage = Math.floor((new Date(iso).setHours(0, 0, 0, 0) - new Date().setHours(0, 0, 0, 0)) / 86_400_000);
+    const tag = tage <= 0 ? t('home.today') : tage === 1 ? t('home.tomorrow')
+      : d.toLocaleDateString(i18n.resolvedLanguage || 'en', { weekday: 'short', day: 'numeric', month: 'short' });
+    return `${tag} · ${d.toLocaleTimeString(i18n.resolvedLanguage || 'en', { hour: '2-digit', minute: '2-digit' })}`;
+  };
+
   return (
     <UserShell>
-      {/* Der Gradient liegt unter dem ganzen Main-Bereich, die Karten weiss
-          darauf — die Shell selbst bleibt unangetastet. */}
       <div className="-mx-8 -my-6 min-h-full bg-gradient-stage px-8 py-7">
         <div className="mx-auto max-w-[1200px]">
           {kopf}
 
-          {/* Warnband nur, wenn es etwas zu warnen gibt. */}
-          {dringend && (dringend.severity === 'high' || dringend.severity === 'critical') && (
-            <div className="mt-4 flex items-center gap-3.5 rounded-xl border border-warning-500/45 border-l-4 border-l-risk-medium bg-warning-bg px-5 py-3.5">
-              <TriangleAlert size={26} strokeWidth={1.9} className="shrink-0 text-risk-medium" />
-              <div className="min-w-0 flex-1">
-                <p className="text-body-xs font-extrabold text-warning-700">
-                  {t('home.alertTitle', { name: sitzungsTitel(dringend, domainLabel) })}
-                </p>
-                <p className="mt-0.5 text-body-xs text-warning-700">
-                  {t('home.alertBody', { count: dringend.open })}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => navigate(`/${locale}/dashboard/sessions`)}
-                className="shrink-0 rounded-lg bg-risk-medium px-3.5 py-2 text-body-2xs font-bold text-white transition-colors hover:bg-risk-on-medium"
-              >
-                {t('home.alertCta')}
-              </button>
-            </div>
-          )}
-
-          {/* KPI-Reihe */}
-          <div className="mt-[18px] flex flex-col gap-[18px] lg:flex-row">
-            <KpiCard
-              title={t('home.kpiRequests')} big={String(nRequests)}
+          {/* Kennzahlen ohne Karte, auf dem Gradient (2A nach Vorgabe) */}
+          <div className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-2 xl:grid-cols-4">
+            <KpiRing
+              on={entered}
+              title={t('home.kpiRequests')}
+              value={offeneAnfragen.length}
               sub={t('home.kpiRequestsSub', { waiting: wartend, active: offeneAnfragen.length - wartend })}
               chip={wartend > 0 ? t('home.kpiRequestsChip', { count: wartend }) : undefined}
-            >
-              <Donut
-                on={entered}
-                segs={offeneAnfragen.length
-                  ? [{ frac: wartend / offeneAnfragen.length, cls: 'text-fg-accent' },
-                     { frac: (offeneAnfragen.length - wartend) / offeneAnfragen.length, cls: 'text-brand' }]
-                  : []}
-                center={String(nRequests)}
-              />
-            </KpiCard>
-            <KpiCard title={t('home.kpiDuties')} big={String(nDuties)} sub={t('home.kpiDutiesSub', { count: dash.sessions.total })}>
-              <Donut
-                on={entered}
-                segs={offen
-                  ? [{ frac: hoch / offen, cls: 'text-risk-high' },
-                     { frac: mittel / offen, cls: 'text-risk-medium' },
-                     { frac: niedrig / offen, cls: 'text-risk-low' }]
-                  : []}
-                center={String(nDuties)}
-              />
-            </KpiCard>
-            <KpiCard title={t('home.kpiSessions')} big={String(nSessions)} sub={t('home.kpiSessionsSub', { count: chartData.length })}>
-              <SparkBars on={entered} vals={chartData.length ? chartData.map((m) => m.total) : [0]} />
-            </KpiCard>
-            <KpiCard title={t('home.kpiRisk')} big={String(nHigh)} sub={t('home.kpiRiskSub', { count: offen })}>
-              <Donut on={entered} segs={offen ? [{ frac: hoch / offen, cls: 'text-risk-high' }] : []} center={String(nHigh)} />
-            </KpiCard>
+              segs={offeneAnfragen.length
+                ? [{ frac: wartend / offeneAnfragen.length, cls: 'text-fg-accent' },
+                   { frac: (offeneAnfragen.length - wartend) / offeneAnfragen.length, cls: 'text-brand' }]
+                : []}
+            />
+            <KpiRing
+              on={entered}
+              title={t('home.kpiDuties')}
+              value={offen}
+              sub={t('home.kpiDutiesSub', { count: dash.sessions.total })}
+              segs={offen
+                ? [{ frac: hoch / offen, cls: 'text-risk-high' },
+                   { frac: mittel / offen, cls: 'text-risk-medium' },
+                   { frac: niedrig / offen, cls: 'text-risk-low' }]
+                : []}
+            />
+            <KpiRing
+              on={entered}
+              title={t('home.kpiSessions')}
+              value={dash.sessions.total}
+              sub={t('home.kpiSessionsSub', { count: marktAnteile.length })}
+              segs={marktAnteile.map((n, i) => ({ frac: n / marktSumme, cls: MARKT_CLS[i % MARKT_CLS.length] }))}
+            />
+            <KpiRing
+              on={entered}
+              title={t('home.kpiRisk')}
+              value={hoch}
+              sub={t('home.kpiRiskSub', { count: offen })}
+              segs={offen ? [{ frac: hoch / offen, cls: 'text-risk-high' }] : []}
+            />
           </div>
 
-          <div className="mt-[18px] flex flex-col gap-[18px] xl:flex-row">
+          <div className="mt-7 flex flex-col gap-[18px] xl:flex-row">
             {/* Hauptspalte */}
             <div className="flex min-w-0 flex-[1.9] flex-col gap-[18px]">
-              {/* Hero: Pflichten je Markt / je Bereich */}
+              {/* 3B: Offene Pflichten als Balken quer */}
               <div className={CARD + ' p-6'}>
                 <SectionHead
                   title={t('home.marketsTitle')} count={String(offen)} to="dashboard/sessions"
@@ -299,67 +352,69 @@ export function UserHomePage() {
                   }
                 />
                 {chartData.length ? (
-                  <>
-                    <div className="flex items-end justify-center gap-7 pb-1 pt-2">
-                      {chartData.map((m, i) => (
-                        <div key={m.key} className="flex flex-col items-center gap-2">
-                          <div className="relative h-[120px] w-[34px] overflow-hidden rounded-lg bg-surface-secondary">
-                            {/* Hoehen-Transition: animiert den Eintritt UND den
-                                Maerkte/Bereiche-Wechsel gleich mit. */}
-                            <div
-                              className="absolute inset-x-0 bottom-0 rounded-t-lg bg-brand"
-                              style={{ height: entered ? `${(m.total / chartMax) * 120}px` : 0, transition: `height 750ms ${EASE} ${140 + i * 90}ms` }}
-                            />
-                            <div
-                              className="absolute inset-x-0 bottom-0 bg-risk-high"
-                              style={{ height: entered && m.high > 0 ? `${(m.high / chartMax) * 120}px` : 0, transition: `height 750ms ${EASE} ${220 + i * 90}ms` }}
-                            />
-                          </div>
-                          <span className="text-[10px] font-extrabold text-fg-secondary">{m.label}</span>
-                          <span className="text-[10px] text-fg-tertiary">{t('home.dutiesCount', { count: m.total })}</span>
+                  <div>
+                    {chartData.map((m, i) => (
+                      <div key={m.key} className="grid grid-cols-[minmax(40px,auto)_1fr_150px] items-center gap-3.5 py-[9px]">
+                        <span className="truncate text-body-xs font-extrabold text-fg">{m.label}</span>
+                        <div className="relative h-3 overflow-hidden rounded-full bg-surface-secondary">
+                          <div
+                            className="absolute inset-y-0 left-0 rounded-full bg-brand"
+                            style={{ width: entered ? `${(m.total / chartMax) * 100}%` : 0, transition: `width 750ms ${EASE} ${140 + i * 90}ms` }}
+                          />
+                          <div
+                            className="absolute inset-y-0 left-0 rounded-full bg-risk-high"
+                            style={{ width: entered && m.high > 0 ? `${(m.high / chartMax) * 100}%` : 0, transition: `width 750ms ${EASE} ${220 + i * 90}ms` }}
+                          />
                         </div>
-                      ))}
-                    </div>
-                    <p className="mt-2 text-center text-body-3xs text-fg-tertiary">{t('home.marketsLegend')}</p>
-                  </>
+                        <span className="text-right text-body-2xs text-fg-secondary">
+                          <b className="text-fg">{t('home.dutiesCount', { count: m.total })}</b>
+                          {m.high > 0 && <> · <span className="text-risk-high">{t('home.dutiesHigh', { count: m.high })}</span></>}
+                        </span>
+                      </div>
+                    ))}
+                    <p className="mt-2 text-body-3xs text-fg-tertiary">{t('home.marketsLegend')}</p>
+                  </div>
                 ) : (
                   <p className="py-10 text-center text-body-xs text-fg-tertiary">{t('home.noDuties')}</p>
                 )}
               </div>
 
-              {/* Aktive Anfragen */}
-              <div className={CARD + ' p-6 pt-5'}>
+              {/* 4B: Anfragen als Posteingangs-Zeilen */}
+              <div className={CARD + ' px-6 py-5'}>
                 <SectionHead title={t('home.activeRequests')} count={String(offeneAnfragen.length)} to="dashboard/termine?tab=anfragen" />
-                {offeneAnfragen.length ? (
+                {anfragenZeilen.length ? (
                   <div>
-                    {offeneAnfragen.slice(0, 3).map((r, i, arr) => (
-                      <div key={r.uuid} className={'flex items-center gap-3 py-2.5 ' + (i < arr.length - 1 ? 'border-b border-stroke-subtle' : '')}>
-                        <span className="grid h-[26px] w-[26px] shrink-0 place-items-center rounded-full bg-brand text-[10px] font-extrabold text-fg-on-brand">
-                          {r.company.slice(0, 2).toUpperCase()}
-                        </span>
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-body-xs font-bold text-fg">{r.company}</p>
-                          <p className="truncate text-body-4xs text-fg-tertiary">{r.meta}</p>
+                    {anfragenZeilen.map((r, i, arr) => {
+                      const f = frist(r);
+                      const pille = r.statusLabel ? t(`status.${STATUS_KEY[r.statusLabel] ?? ''}`, r.statusLabel) : r.statusLabel;
+                      return (
+                        <div key={r.uuid} className={'flex items-center gap-4 py-3 ' + (i < arr.length - 1 ? 'border-b border-stroke-subtle' : '')}>
+                          <div className="min-w-0 flex-1">
+                            <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-body-xs font-bold text-fg">
+                              <span className="truncate">{r.company}</span>
+                              <span className={'inline-flex whitespace-nowrap rounded-full border px-2.5 py-[2px] text-[10px] font-bold ' + (PILL[r.status] ?? PILL.closed)}>{pille}</span>
+                            </p>
+                            <p className="mt-0.5 truncate text-[10.5px] text-fg-tertiary">
+                              {[bereich(r.category), markt(r.country), relZeit(r.createdAt, locale)].filter(Boolean).join(' · ')}
+                            </p>
+                          </div>
+                          <div className="hidden w-[120px] shrink-0 sm:block">
+                            {f && (
+                              <>
+                                <p className="text-[9.5px] font-bold uppercase tracking-[0.06em] text-fg-tertiary">{t('requests.slaLabelProvider')}</p>
+                                <p className={'text-[13px] font-medium ' + FRIST_TONE[f.tone]}>{f.label}</p>
+                                <span className="mt-1 block h-[3px] overflow-hidden rounded-full bg-surface-tertiary">
+                                  <span className={'block h-full rounded-full ' + BALKEN_TONE[f.tone]} style={{ width: `${f.pct}%` }} />
+                                </span>
+                              </>
+                            )}
+                          </div>
+                          <Button size="sm" variant={r.bucket === 'replied' ? 'primary' : 'secondary'} className="shrink-0" onClick={() => oeffneVerlauf(r.uuid)}>
+                            {r.bucket === 'replied' ? t('requests.actionRead') : t('requests.actionOpen')}
+                          </Button>
                         </div>
-                        {/* Dieselben theme-festen Pill-Rezepte wie RequestCard —
-                            bg-warning-bg blieb im Dark Mode hell und frass den Text. */}
-                        <span className={
-                          'shrink-0 rounded-full border px-2.5 py-0.5 text-[10px] font-bold ' +
-                          (wartet(r)
-                            ? 'bg-[#d4af37]/10 border-[#d4af37]/35 text-fg-accent-strong dark:bg-[#d4af37]/15 dark:border-[#d4af37]/40'
-                            : 'bg-[#004d40]/10 border-[#258d78]/35 text-fg-brand dark:bg-[#004d40]/25 dark:border-[#258d78]/40')
-                        }>
-                          {r.statusLabel}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => navigate(`/${locale}/dashboard/termine?tab=anfragen`)}
-                          className="shrink-0 text-body-3xs font-semibold text-brand underline underline-offset-2 transition-colors hover:text-brand-700"
-                        >
-                          {t('shared.seeAll')}
-                        </button>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
                   <p className="py-6 text-center text-body-xs text-fg-tertiary">{t('home.noRequests')}</p>
@@ -367,57 +422,42 @@ export function UserHomePage() {
               </div>
             </div>
 
-            {/* Rechte Spalte */}
+            {/* Rechte Spalte (5B) */}
             <div className="flex min-w-0 flex-1 flex-col gap-[18px]">
-              {/* Termine */}
               <div className={CARD + ' p-5'}>
                 <SectionHead title={t('home.termine')} count={String(termine.length)} to="dashboard/termine" />
-                {termine.slice(0, 3).map((a) => {
-                  const d = new Date(a.slotStart);
+                {termine.slice(0, 2).map((a, i) => {
+                  const provider = a.providerName + (a.providerRegion ? ` — ${a.providerRegion}` : '');
                   return (
-                    <div key={a.id} className="flex items-center gap-3 border-b border-stroke-subtle py-2.5">
-                      <span className="flex h-[34px] w-[34px] shrink-0 flex-col items-center justify-center rounded-[10px] bg-brand-light leading-none text-fg-brand">
-                        <span className="text-[9px] font-extrabold">
-                          {d.toLocaleDateString(i18n.resolvedLanguage || 'en', { weekday: 'short' })}
-                        </span>
-                        <span className="mt-0.5 text-[10.5px] font-extrabold">
-                          {String(d.getDate()).padStart(2, '0')}
-                        </span>
-                      </span>
-                      <div className="min-w-0">
-                        <p className="truncate text-body-2xs font-bold text-fg">
-                          {d.toLocaleTimeString(i18n.resolvedLanguage || 'en', { hour: '2-digit', minute: '2-digit' })} · {a.providerName}
-                        </p>
-                        {a.providerRegion && <p className="truncate text-body-4xs text-fg-tertiary">{a.providerRegion}</p>}
+                    <div key={a.id} className={i > 0 ? 'mt-3 border-t border-stroke-subtle pt-3' : ''}>
+                      <div className="flex items-center gap-3 py-1">
+                        <DatumsMarke iso={a.slotStart} locale={i18n.resolvedLanguage || 'en'} />
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-bold uppercase tracking-[0.06em] text-fg-brand/70">{wann(a.slotStart)}</p>
+                          <p className="mt-0.5 truncate text-body-xs font-bold text-fg">{a.providerName}</p>
+                          <p className="truncate text-[10px] text-fg-tertiary">{[a.providerRegion, 'Video-Call'].filter(Boolean).join(' · ')}</p>
+                        </div>
+                      </div>
+                      <div className="mt-2.5 flex gap-2">
+                        <Button size="sm" variant="outline" iconLeft={<CalendarPlus size={14} />}
+                          onClick={() => ladeIcs({ id: a.id, slotStartIso: a.slotStart, slotEndIso: a.slotEnd, provider, meta: a.message || '—' })}>
+                          {t('termine.addToCalendar')}
+                        </Button>
+                        <Button size="sm" variant="ghost"
+                          onClick={() => setRescheduleFor({
+                            bookingId: a.id, providerKey: a.providerKey, providerName: provider,
+                            currentLine: wann(a.slotStart),
+                          })}>
+                          {t('termine.reschedule')}
+                        </Button>
                       </div>
                     </div>
                   );
                 })}
                 {!termine.length && <p className="py-4 text-center text-body-2xs text-fg-tertiary">{t('home.noTermine')}</p>}
-                <button
-                  type="button"
-                  onClick={() => navigate(`/${locale}/dashboard/termine`)}
-                  className="mt-2.5 inline-flex items-center gap-1.5 text-body-3xs font-semibold text-brand underline underline-offset-2 transition-colors hover:text-brand-700"
-                >
-                  <CalendarClock size={12} /> {t('home.proposeSlot')}
-                </button>
               </div>
 
-              {/* Naechster Schritt — nur wenn es einen gibt. */}
-              {dringend && (
-                <div className={CARD + ' p-5'}>
-                  <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('home.nextStepEyebrow')}</p>
-                  <p className="mt-2 text-body-xs font-bold text-fg">{sitzungsTitel(dringend, domainLabel)}</p>
-                  <p className="mt-1 text-body-3xs leading-relaxed text-fg-tertiary">
-                    {t('home.nextStepBody', { open: dringend.open, total: dringend.total })}
-                  </p>
-                  <Button size="sm" variant="secondary" className="mt-2.5" onClick={() => navigate(`/${locale}/dashboard/sessions`)}>
-                    {t('home.nextStepCta')}
-                  </Button>
-                </div>
-              )}
-
-              {/* Weitermachen — goldgerahmt, an der zuletzt bearbeiteten Sitzung. */}
+              {/* Da weitermachen — goldgerahmt, an der zuletzt bearbeiteten Sitzung. */}
               {zuletzt && (
                 <div className={CARD + ' border-brand-accent/50 bg-brand-accent-light/40 p-5'}>
                   <div className="flex items-center gap-2.5">
@@ -439,39 +479,55 @@ export function UserHomePage() {
                       }}
                     />
                   </div>
-                  <Button variant="accent" className="mt-3 w-full" onClick={() => navigate(`/${locale}/dashboard/sessions`)}>
-                    {t('home.resume')} <ArrowRight size={14} className="ml-1" />
-                  </Button>
+                  <div className="mt-3 flex justify-end">
+                    <Button variant="primary" onClick={() => oeffneSitzung(zuletzt.id)}>
+                      {t('home.resume')} <ArrowRight size={14} className="ml-1" />
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Gespeicherte Sitzungen als Kacheln */}
+          {/* 6B: Gespeicherte Sitzungen als Kacheln mit Risiko-Tag und Chips */}
           {dash.sessions.items.length > 0 && (
             <div className="mt-[18px]">
               <SectionHead title={t('home.savedSessions')} count={String(dash.sessions.total)} to="dashboard/sessions" />
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                {dash.sessions.items.slice(0, 4).map((s, i) => {
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {dash.sessions.items.slice(0, 3).map((s, i) => {
                   const risiko = (s.severity ?? 'low') as Sev;
                   const frac = s.total ? (s.total - s.open) / s.total : 0;
                   return (
-                    <Link key={s.id} to={`/${locale}/dashboard/sessions`} className={CARD + ' block p-4 transition-transform hover:-translate-y-0.5'}>
-                      <p className="truncate text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">
-                        {[s.categories.map(domainLabel).join(', '), s.country].filter(Boolean).join(' · ')}
-                      </p>
-                      <p className="mt-1.5 truncate text-body-xs font-bold text-fg">{sitzungsTitel(s, domainLabel)}</p>
-                      <div className="mt-2.5 h-[5px] overflow-hidden rounded-full bg-surface-secondary">
-                        <div
-                          className={`h-full rounded-full ${RISK_BG[risiko]}`}
-                          style={{ width: entered ? `${frac * 100}%` : 0, transition: `width 800ms ${EASE} ${300 + i * 90}ms` }}
-                        />
+                    <div key={s.id} className={CARD + ' flex flex-col gap-2.5 p-4'}>
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="min-w-0 text-body-xs font-bold text-fg">{sitzungsTitel(s, domainLabel)}</p>
+                        <span className={'inline-flex shrink-0 whitespace-nowrap rounded border px-[7px] py-[2px] text-[9.5px] font-bold uppercase tracking-[0.06em] ' + RISK_TAG[risiko]}>
+                          {t(`home.riskTag.${risiko}`)}
+                        </span>
                       </div>
-                      <p className="mt-2 text-body-4xs">
-                        <span className={`font-bold ${RISK_TEXT[risiko]}`}>{t('home.sessionOpen', { count: s.open })}</span>
-                        <span className="text-fg-tertiary"> · {t('home.sessionOf', { count: s.total })}</span>
-                      </p>
-                    </Link>
+                      <div className="flex flex-wrap gap-1">
+                        {s.categories.map((c) => (
+                          <span key={c} className="rounded-full bg-surface-secondary px-2 py-[2px] text-[9.5px] font-semibold text-fg-secondary">{domainLabel(c)}</span>
+                        ))}
+                        {s.country && <span className="rounded-full border border-stroke px-2 py-[2px] text-[9.5px] font-bold text-fg">{s.country}</span>}
+                      </div>
+                      <div>
+                        <div className="h-[5px] overflow-hidden rounded-full bg-surface-secondary">
+                          <div
+                            className={`h-full rounded-full ${RISK_BG[risiko]}`}
+                            style={{ width: entered ? `${frac * 100}%` : 0, transition: `width 800ms ${EASE} ${300 + i * 90}ms` }}
+                          />
+                        </div>
+                        <p className="mt-1.5 text-[10px] text-fg-tertiary">
+                          <b className={RISK_TEXT[risiko]}>{t('home.sessionOpen', { count: s.open })}</b>
+                          {' · '}{t('home.sessionOf', { count: s.total })}
+                          {' · '}{relZeit(s.updated_at, locale)}
+                        </p>
+                      </div>
+                      <div className="flex justify-end">
+                        <button type="button" onClick={() => oeffneSitzung(s.id)} className={TEXT_LINK}>{t('shared.open')}</button>
+                      </div>
+                    </div>
                   );
                 })}
               </div>
@@ -479,6 +535,7 @@ export function UserHomePage() {
           )}
         </div>
       </div>
+      <RescheduleDrawer target={rescheduleFor} onClose={() => setRescheduleFor(null)} onRescheduled={(id, iso) => setMoved((m) => ({ ...m, [id]: iso }))} />
     </UserShell>
   );
 }

@@ -129,7 +129,25 @@
     "emptyStep2Title": "Görün",
     "emptyStep2Body": "Yükümlülükleriniz, aciliyete göre sıralı.",
     "emptyStep3Title": "Harekete geçin",
-    "emptyStep3Body": "İşaretleyin — ya da bir uzman katın."
+    "emptyStep3Body": "İşaretleyin — ya da bir uzman katın.",
+    "todayPrefix": "Bugün:",
+    "todayRequests_one": "{{count}} talep sizi bekliyor",
+    "todayRequests_other": "{{count}} talep sizi bekliyor",
+    "todayOutcomes_one": "{{count}} sonuç sorusu açık",
+    "todayOutcomes_other": "{{count}} sonuç sorusu açık",
+    "todayRisk_one": "{{count}} yüksek riskli yükümlülük",
+    "todayRisk_other": "{{count}} yüksek riskli yükümlülük",
+    "todayCalm": "Bugün sizi bekleyen bir şey yok.",
+    "dutiesHigh_one": "{{count}} yüksek",
+    "dutiesHigh_other": "{{count}} yüksek",
+    "today": "Bugün",
+    "tomorrow": "Yarın",
+    "riskTag": {
+      "critical": "Kritik",
+      "high": "Yüksek risk",
+      "medium": "Orta risk",
+      "low": "Düşük risk"
+    }
   },
   "sessions": {
     "title": "Uyum <accent>oturumlarınız</accent>.",
@@ -481,7 +499,8 @@
     "archiveTitle": "Arşivle",
     "archiveDesc": "Oturumu listeden gizler · izleme duraklatılır · her zaman geri yüklenebilir.",
     "archived": "Arşivlendi ✓",
-    "actionError": "İşlem başarısız — lütfen birazdan tekrar deneyin."
+    "actionError": "İşlem başarısız — lütfen birazdan tekrar deneyin.",
+    "copyLabel": "{{label}} kopyası"
   },
   "userSearch": {
     "eyebrow": "ÇALIŞMA ALANI",
@@ -633,5 +652,18 @@
   "wizardDrawer": {
     "eyebrow": "Yeni arama",
     "title": "Uygun sağlayıcıları bul"
+  },
+  "answersDrawer": {
+    "title": "Yanıtları düzenle",
+    "hint": "Kapalı adımlar yanıtlarını gösterir; açın, değiştirin, kaydedin.",
+    "unsaved": "Kaydedilmemiş değişiklik: {{count}}",
+    "footerNote": "Kaydetmek bu oturumun risk haritasını yeniden hesaplar.",
+    "discard": "Vazgeç",
+    "save": "Kaydet",
+    "saved": "Kaydedildi; risk haritası yeniden hesaplanıyor.",
+    "error": "Kaydetme başarısız. Lütfen tekrar deneyin.",
+    "changed": "değişti",
+    "none": "Seçim yok",
+    "needSelection": "En az bir pazar ve bir uyumluluk alanı seçin."
   }
 }

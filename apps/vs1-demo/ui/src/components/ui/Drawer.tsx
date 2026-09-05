@@ -37,9 +37,14 @@ export interface DrawerProps {
   footer?: React.ReactNode;
   children?: React.ReactNode;
   className?: string;
+  /** Feste Hoehe (volle Fensterhoehe minus Rand) statt der adaptiven: fuer
+   *  Inhalte, die sich beim Bedienen auf- und zuklappen (Akkordeon, Wizard).
+   *  Nutzer-Vorgabe 2026-09-05: "die Hoehe des Sidesheets darf sich nicht
+   *  aendern". */
+  fixedHeight?: boolean;
 }
 
-export function Drawer({ open, onClose, side = 'right', size = 'md', title, eyebrow, headerExtra, footer, children, className }: DrawerProps) {
+export function Drawer({ open, onClose, side = 'right', size = 'md', title, eyebrow, headerExtra, footer, children, className, fixedHeight = false }: DrawerProps) {
   // Escape und Scroll-Lock gab es hier schon; der FOKUS fehlte. Ohne ihn blieb
   // er beim Ausloeser stehen, der erste Tab landete HINTER dem Panel, und beim
   // Schliessen kam er nicht zurueck. Zehn Komponenten haengen an diesem Drawer.
@@ -93,7 +98,9 @@ export function Drawer({ open, onClose, side = 'right', size = 'md', title, eyeb
                 // weicher Schatten; im Dark Mode Slate-Glas mit dunklem Rand.
                 'pointer-events-auto flex w-full flex-col overflow-hidden rounded-[var(--radius-3xl)] border border-white/70 shadow-[0_24px_60px_-24px_rgba(11,21,18,0.30),0_2px_6px_rgba(11,21,18,0.06)] dark:border-white/10',
                 'bg-[var(--drawer-glass-bg)] backdrop-blur-[var(--drawer-glass-blur)]',
-                'min-h-[var(--drawer-min-h)] max-h-[min(var(--drawer-max-h),calc(100dvh-2rem))]',
+                fixedHeight
+                  ? 'h-[min(var(--drawer-max-h),calc(100dvh-2rem))]'
+                  : 'min-h-[var(--drawer-min-h)] max-h-[min(var(--drawer-max-h),calc(100dvh-2rem))]',
                 WIDTH[size],
                 className,
               )}

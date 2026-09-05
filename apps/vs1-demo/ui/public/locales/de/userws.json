@@ -129,7 +129,25 @@
     "emptyStep2Title": "Sehen",
     "emptyStep2Body": "Ihre Pflichten, nach Dringlichkeit sortiert.",
     "emptyStep3Title": "Handeln",
-    "emptyStep3Body": "Abhaken — oder Fachleute dazuholen."
+    "emptyStep3Body": "Abhaken — oder Fachleute dazuholen.",
+    "todayPrefix": "Heute:",
+    "todayRequests_one": "{{count}} Anfrage wartet auf Sie",
+    "todayRequests_other": "{{count}} Anfragen warten auf Sie",
+    "todayOutcomes_one": "{{count}} Ergebnisfrage offen",
+    "todayOutcomes_other": "{{count}} Ergebnisfragen offen",
+    "todayRisk_one": "{{count}} Pflicht mit hohem Risiko",
+    "todayRisk_other": "{{count}} Pflichten mit hohem Risiko",
+    "todayCalm": "Heute wartet nichts auf Sie.",
+    "dutiesHigh_one": "{{count}} hoch",
+    "dutiesHigh_other": "{{count}} hoch",
+    "today": "Heute",
+    "tomorrow": "Morgen",
+    "riskTag": {
+      "critical": "Kritisch",
+      "high": "Hohes Risiko",
+      "medium": "Mittleres Risiko",
+      "low": "Niedriges Risiko"
+    }
   },
   "sessions": {
     "title": "Ihre Compliance-<accent>Sitzungen</accent>.",
@@ -481,7 +499,8 @@
     "archiveTitle": "Archivieren",
     "archiveDesc": "Blendet die Sitzung aus der Liste aus · Monitoring pausiert · jederzeit wiederherstellbar.",
     "archived": "Archiviert ✓",
-    "actionError": "Aktion fehlgeschlagen — versuchen Sie es gleich erneut."
+    "actionError": "Aktion fehlgeschlagen — versuchen Sie es gleich erneut.",
+    "copyLabel": "Kopie von {{label}}"
   },
   "userSearch": {
     "eyebrow": "ARBEITSBEREICH",
@@ -633,5 +652,18 @@
   "wizardDrawer": {
     "eyebrow": "Neue Suche",
     "title": "Passende Anbieter finden"
+  },
+  "answersDrawer": {
+    "title": "Antworten bearbeiten",
+    "hint": "Zugeklappte Schritte zeigen ihre Antwort — aufklappen, ändern, speichern.",
+    "unsaved": "Ungespeicherte Änderungen: {{count}}",
+    "footerNote": "Speichern rechnet die Risk Map dieser Sitzung neu.",
+    "discard": "Verwerfen",
+    "save": "Speichern",
+    "saved": "Gespeichert — die Risk Map wird neu berechnet.",
+    "error": "Speichern fehlgeschlagen. Bitte erneut versuchen.",
+    "changed": "geändert",
+    "none": "Keine Auswahl",
+    "needSelection": "Mindestens ein Markt und ein Compliance-Bereich müssen ausgewählt sein."
   }
 }

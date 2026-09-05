@@ -129,7 +129,25 @@
     "emptyStep2Title": "See",
     "emptyStep2Body": "Your obligations, sorted by urgency.",
     "emptyStep3Title": "Act",
-    "emptyStep3Body": "Tick them off — or bring in a specialist."
+    "emptyStep3Body": "Tick them off — or bring in a specialist.",
+    "todayPrefix": "Today:",
+    "todayRequests_one": "{{count}} request is waiting for you",
+    "todayRequests_other": "{{count}} requests are waiting for you",
+    "todayOutcomes_one": "{{count}} outcome question open",
+    "todayOutcomes_other": "{{count}} outcome questions open",
+    "todayRisk_one": "{{count}} high-risk obligation",
+    "todayRisk_other": "{{count}} high-risk obligations",
+    "todayCalm": "Nothing is waiting for you today.",
+    "dutiesHigh_one": "{{count}} high",
+    "dutiesHigh_other": "{{count}} high",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "riskTag": {
+      "critical": "Critical",
+      "high": "High risk",
+      "medium": "Medium risk",
+      "low": "Low risk"
+    }
   },
   "sessions": {
     "title": "Your compliance <accent>sessions</accent>.",
@@ -481,7 +499,8 @@
     "archiveTitle": "Archive",
     "archiveDesc": "Hides the session from the list · monitoring pauses · restorable anytime.",
     "archived": "Archived ✓",
-    "actionError": "Action failed — try again in a moment."
+    "actionError": "Action failed — try again in a moment.",
+    "copyLabel": "Copy of {{label}}"
   },
   "userSearch": {
     "eyebrow": "WORKSPACE",
@@ -633,5 +652,18 @@
   "wizardDrawer": {
     "eyebrow": "New search",
     "title": "Find matching providers"
+  },
+  "answersDrawer": {
+    "title": "Edit answers",
+    "hint": "Collapsed steps show their answer — expand, change, save.",
+    "unsaved": "Unsaved changes: {{count}}",
+    "footerNote": "Saving recalculates this session’s risk map.",
+    "discard": "Discard",
+    "save": "Save",
+    "saved": "Saved — the risk map is being recalculated.",
+    "error": "Saving failed. Please try again.",
+    "changed": "changed",
+    "none": "Nothing selected",
+    "needSelection": "Select at least one market and one compliance area."
   }
 }
