@@ -300,6 +300,12 @@
       "not_applicable": "Trifft nicht zu"
     },
     "progress": "{{done}} von {{total}} erledigt",
-    "progressSub": "{{prog}} in Arbeit · {{open}} offen · {{na}} trifft nicht zu"
+    "progressSub": "{{prog}} in Arbeit · {{open}} offen · {{na}} trifft nicht zu",
+    "doneOn": "erledigt am {{date}}",
+    "inProgressToday": "seit heute in Arbeit",
+    "inProgressSince_one": "seit {{count}} Tag in Arbeit",
+    "inProgressSince_other": "seit {{count}} Tagen in Arbeit",
+    "nextDue_one": "nächste Frist in {{count}} Tag",
+    "nextDue_other": "nächste Frist in {{count}} Tagen"
   }
 }

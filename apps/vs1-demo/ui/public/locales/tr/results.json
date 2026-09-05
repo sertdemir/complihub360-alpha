@@ -300,6 +300,12 @@
       "not_applicable": "Geçerli değil"
     },
     "progress": "{{total}} yükümlülükten {{done}} tamamlandı",
-    "progressSub": "{{prog}} devam ediyor · {{open}} açık · {{na}} geçerli değil"
+    "progressSub": "{{prog}} devam ediyor · {{open}} açık · {{na}} geçerli değil",
+    "doneOn": "{{date}} tarihinde tamamlandı",
+    "inProgressToday": "bugünden beri devam ediyor",
+    "inProgressSince_one": "{{count}} gündür devam ediyor",
+    "inProgressSince_other": "{{count}} gündür devam ediyor",
+    "nextDue_one": "sonraki son tarih {{count}} gün içinde",
+    "nextDue_other": "sonraki son tarih {{count}} gün içinde"
   }
 }

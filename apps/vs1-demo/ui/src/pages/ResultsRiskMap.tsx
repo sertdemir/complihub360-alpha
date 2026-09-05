@@ -36,6 +36,8 @@ type Obligation = {
   market: string;
   due: string;
   dueSub: string;
+  /** Tage bis zur Frist (Engine due_days) — nur auf Live-Zeilen. */
+  dueDays?: number;
   state: State;
   /** Verified EU legal basis (EUR-Lex permalink) — rendered as a link so the
    *  claim is checkable instead of just asserted. Absent for purely national
@@ -329,6 +331,7 @@ export function ResultsRiskMap() {
           ? t('appliesIn', { count: withinHorizon(l.applies_from) as number, defaultValue: `applies in ${withinHorizon(l.applies_from)} days` })
           : daysUntil(l.applies_from) != null ? ''   // far future: the date says enough
           : l.due_days != null ? t('days', { count: l.due_days }) : l.due === 'Ongoing' ? 'Live' : '',
+        dueDays: l.due_days ?? undefined,
         state: { kind: l.state === 'confirmed' ? 'confirmed' : 'likely' },
         // Same horizon as the stats: a duty landing in days is "now" even
         // though it has not started; one landing in 2030 is not.
@@ -403,6 +406,7 @@ export function ResultsRiskMap() {
     market: isLive ? o.market : t(`obligations.${i}.market`, { defaultValue: o.market }),
     due: isLive ? o.due : t(`obligations.${i}.due`, { defaultValue: o.due }),
     dueSub: isLive ? o.dueSub : t(`obligations.${i}.dueSub`, { defaultValue: o.dueSub }),
+    dueDays: o.dueDays,
     state: o.state,
     sourceLabel: o.sourceLabel,
     sourceUrl: o.sourceUrl,

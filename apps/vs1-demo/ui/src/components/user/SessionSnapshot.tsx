@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, MotionConfig, type Variants } from 'framer-motion';
-import { ArrowRight, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { UserShell } from './UserShell';
 import { Button } from '../ui/Button';
 import { Donut, useEntered, useCountUp, EASE } from '../ui/Stats';
 import { duplicateSession } from '../../api/sessions';
-import { fetchObligationStatus, setObligationStatus, type ObligationStatus } from '../../api/obligations';
+import { fetchObligationStatus, setObligationStatus, type ObligationStatus, type ObligationStatusRow } from '../../api/obligations';
 import type { AnonProvider } from '../../api/search';
 
 // ─── Sitzungs-Snapshot · Canvas "Sitzungs-Snapshot", Gesamt · G8 ─────────────
@@ -43,6 +43,9 @@ export type SnapshotRow = {
   market: string;
   due: string;
   dueSub: string;
+  /** Tage bis zur Frist, wenn die Engine sie kennt — fuer "naechste Frist in
+   *  N Tagen" in der Gruppenkopfzeile. */
+  dueDays?: number;
   state: State;
   sourceLabel?: string;
   sourceUrl?: string;
@@ -100,7 +103,7 @@ function GeltungCell({ state, entered, index }: { state: State; entered: boolean
   const { t } = useTranslation('results');
   const g = GELTUNG[state.kind];
   return (
-    <div className="w-[124px] shrink-0 sm:w-[136px]">
+    <div className="min-w-0">
       <p className="whitespace-nowrap text-[10.5px] font-semibold text-fg-secondary">
         {t(`snapshot.geltung.${g.key}`)}
       </p>
@@ -178,15 +181,36 @@ function TaskChip({ status, busy, onSet }: {
   );
 }
 
-function GroupCard({ label, sub, dot, rows, entered, offset, onAnswer, taskOf, onSetTask, busyId }: {
+function GroupCard({ label, sub, dot, rows, entered, offset, taskOf, statusRowOf, onSetTask, busyId }: {
   label: string; sub: string; dot: string; rows: SnapshotRow[];
-  entered: boolean; offset: number; onAnswer: () => void;
+  entered: boolean; offset: number;
   /** null = Abhaken nicht moeglich (keine gespeicherte Sitzung). */
   taskOf: ((row: SnapshotRow) => ObligationStatus) | null;
+  /** Die gespeicherte Zeile dahinter — fuer "erledigt am" und "seit N Tagen". */
+  statusRowOf: (row: SnapshotRow) => ObligationStatusRow | undefined;
   onSetTask: (row: SnapshotRow, status: ObligationStatus) => void;
   busyId: string | null;
 }) {
-  const { t } = useTranslation('results');
+  const { t, i18n } = useTranslation('results');
+  const locale = i18n.resolvedLanguage || 'en';
+  // Die Fristspalte sagt, was der Zustand hergibt (Canvas G9): erledigt →
+  // "erledigt am 12. Apr" (Datum vom Server), in Arbeit → "seit 3 Tagen in
+  // Arbeit", sonst die Frist der Pflicht. Ohne Datum faellt sie auf die
+  // Frist zurueck statt etwas zu erfinden.
+  const fristText = (r: SnapshotRow): string => {
+    const st = statusRowOf(r);
+    const fallback = r.due && r.due !== '—' ? r.due : r.dueSub;
+    if (!st) return fallback;
+    if (st.status === 'done' && st.done_at) {
+      const d = new Date(st.done_at.length === 10 ? `${st.done_at}T00:00:00` : st.done_at);
+      if (!Number.isNaN(d.getTime())) return t('snapshot.doneOn', { date: new Intl.DateTimeFormat(locale, { day: '2-digit', month: 'short' }).format(d) });
+    }
+    if (st.status === 'in_progress' && st.updated_at) {
+      const days = Math.max(0, Math.floor((Date.now() - new Date(st.updated_at).getTime()) / 86_400_000));
+      return days === 0 ? t('snapshot.inProgressToday') : t('snapshot.inProgressSince', { count: days });
+    }
+    return fallback;
+  };
   return (
     // Kein overflow-hidden auf der Karte: das Zustands-Menue des Chips ragt
     // ueber die Kartenkante hinaus und wuerde sonst abgeschnitten. Die
@@ -200,15 +224,21 @@ function GroupCard({ label, sub, dot, rows, entered, offset, onAnswer, taskOf, o
         <span className="ml-auto text-body-2xs font-semibold text-fg-secondary">{sub}</span>
       </div>
       <div className="px-5">
+        {/* Festes Spaltenraster statt Flex (Nutzer 2026-09-05): Geltungs-
+            Balken, Chips und Fristen stehen in allen Zeilen auf derselben
+            Kante — mit flex:1 wanderte die Geltungsspalte je nach Titel-
+            laenge. Spalten wie im Canvas G9: Titel (Rest) · Geltung 128 ·
+            Chip 116 mittig · Frist 130 rechtsbuendig. Mobil bleiben nur
+            Titel und Geltung. Offene Fragen ("Erst zu klaeren") haben
+            dieselben Spalten; der Weg zu den Antworten ist der Kopf-Link
+            "Antworten bearbeiten". */}
         {rows.map((r, i) => (
           <div
             key={r.title}
-            className={'flex items-center gap-4 py-3.5 ' + (i < rows.length - 1 ? 'border-b border-stroke-subtle' : '')}
+            className={'grid grid-cols-[minmax(0,1fr)_124px] items-center gap-4 py-3.5 sm:grid-cols-[minmax(0,1fr)_128px_116px_130px] '
+              + (i < rows.length - 1 ? 'border-b border-stroke-subtle' : '')}
           >
-            {/* Der Titel bekommt den groesseren Teil des freien Raums —
-                sonst bricht "EPR-Verpackungsregistrierung" dreizeilig um,
-                waehrend rechts Luft bleibt. */}
-            <div className="min-w-0 flex-[2]">
+            <div className="min-w-0">
               <p className="text-body-xs font-bold text-fg">{r.title}</p>
               <p className="mt-0.5 text-[10.5px] text-fg-tertiary">
                 {r.market}
@@ -230,13 +260,7 @@ function GroupCard({ label, sub, dot, rows, entered, offset, onAnswer, taskOf, o
               </p>
             </div>
             <GeltungCell state={r.state} entered={entered} index={offset + i} />
-            {/* Freier Raum bleibt in der Mitte — Chip und Frist bilden rechts
-                einen gemeinsamen Aktionsblock (Canvas-Wahl 1C, 2026-09-01):
-                Zustand und Termin stehen beieinander, kurzer Blickweg beim
-                Abhaken. Die Frist haelt eine feste Breite, damit die Chips
-                aller Zeilen an derselben Kante enden. */}
-            <div className="hidden flex-1 sm:block" />
-            <div className="hidden shrink-0 items-center gap-4 sm:flex">
+            <div className="hidden justify-center sm:flex">
               {taskOf && r.obligationId && (
                 <TaskChip
                   status={taskOf(r)}
@@ -244,17 +268,9 @@ function GroupCard({ label, sub, dot, rows, entered, offset, onAnswer, taskOf, o
                   onSet={(next) => onSetTask(r, next)}
                 />
               )}
-              {/* Rechts steht, was zu tun ist: bei offenen Fragen der Weg
-                  dorthin, sonst die Frist. Beide auf einer Kante. */}
-              <div className="flex min-w-[86px] shrink-0 justify-end text-right">
-                {r.state.kind === 'answer' ? (
-                  <button type="button" onClick={onAnswer} className={TEXT_LINK + ' inline-flex items-center gap-1 whitespace-nowrap'}>
-                    {t('state.answer', { total: r.state.count })} <ArrowRight size={13} />
-                  </button>
-                ) : (
-                  <span className="text-[10.5px] text-fg-tertiary">{r.due && r.due !== '—' ? r.due : r.dueSub}</span>
-                )}
-              </div>
+            </div>
+            <div className="hidden justify-end text-right sm:flex">
+              <span className="text-[10.5px] text-fg-tertiary">{fristText(r)}</span>
             </div>
           </div>
         ))}
@@ -292,6 +308,7 @@ export function SessionSnapshot({
   // 'open'. Ohne gespeicherte Sitzung gibt es nichts abzuhaken — dann bleibt
   // die Spalte leer statt eine Attrappe zu zeigen.
   const [tasks, setTasks] = useState<Record<string, ObligationStatus>>({});
+  const [statusRows, setStatusRows] = useState<Record<string, ObligationStatusRow>>({});
   const [taskBusy, setTaskBusy] = useState<string | null>(null);
   const [taskable, setTaskable] = useState(false);
 
@@ -304,6 +321,7 @@ export function SessionSnapshot({
         const next: Record<string, ObligationStatus> = {};
         for (const [id, row] of Object.entries(map)) next[id] = row.status;
         setTasks(next);
+        setStatusRows(map);
         setTaskable(true);
       })
       .catch(() => { if (alive) setTaskable(false); });
@@ -312,6 +330,7 @@ export function SessionSnapshot({
 
   const taskOf = (row: SnapshotRow): ObligationStatus =>
     (row.obligationId && tasks[row.obligationId]) || 'open';
+  const statusRowOf = (row: SnapshotRow) => (row.obligationId ? statusRows[row.obligationId] : undefined);
 
   // Optimistisch setzen, bei Fehler zurueckdrehen — ein Haken, der bleibt
   // obwohl er nicht gespeichert wurde, waere die schlechteste Auskunft.
@@ -338,8 +357,6 @@ export function SessionSnapshot({
   const nRel = Math.max(1, withId.length - nNa);
 
   const total = Math.max(1, kpis.total);
-  const answerRow = rows.find((r) => r.state.kind === 'answer');
-  const toAnswers = () => onEditAnswers();
 
   // Legt eine Kopie an und bestaetigt an Ort und Stelle. Ohne gespeicherte
   // Sitzung (Fixture/Gast-Profil) gibt es nichts zu duplizieren — dann bleibt
@@ -358,6 +375,16 @@ export function SessionSnapshot({
   const groups = GROUPS
     .map((g) => ({ ...g, items: rows.filter(g.match) }))
     .filter((g) => g.items.length > 0);
+  // Kopfzeile: "3 Pflichten · naechste Frist in 8 Tagen" — nur, wenn die
+  // Engine Tage kennt, und nur fuer noch nicht erledigte Pflichten.
+  const groupSub = (g: (typeof groups)[number]) => {
+    const base = t(`snapshot.groupSub.${g.key}`, { count: g.items.length });
+    const days = g.items
+      .filter((r) => r.dueDays != null && taskOf(r) !== 'done' && taskOf(r) !== 'not_applicable')
+      .map((r) => r.dueDays as number);
+    if (!days.length) return base;
+    return `${base} · ${t('snapshot.nextDue', { count: Math.min(...days) })}`;
+  };
 
   return (
     <UserShell>
@@ -436,13 +463,13 @@ export function SessionSnapshot({
                   <GroupCard
                     key={g.key}
                     label={t(`snapshot.group.${g.key}`)}
-                    sub={t(`snapshot.groupSub.${g.key}`, { count: g.items.length })}
+                    sub={groupSub(g)}
                     dot={g.dot}
                     rows={g.items}
                     entered={entered}
                     offset={groups.slice(0, gi).reduce((n, x) => n + x.items.length, 0)}
-                    onAnswer={toAnswers}
                     taskOf={taskable ? taskOf : null}
+                    statusRowOf={statusRowOf}
                     onSetTask={setTask}
                     busyId={taskBusy}
                   />
@@ -513,7 +540,6 @@ export function SessionSnapshot({
               </motion.aside>
             </div>
 
-            {answerRow && <span className="sr-only">{t('state.answer', { total: 0 })}</span>}
           </motion.div>
         </MotionConfig>
       </div>
