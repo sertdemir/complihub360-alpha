@@ -28,6 +28,8 @@ export interface SessionRowData {
   markets: string[];
   categories: string[];
   label: string | null;
+  /** Die gespeicherten Wizard-Antworten (SearchProfile, evtl. unvollstaendig). */
+  answers?: Partial<SearchProfile> | null;
   status: 'active' | 'archived';
   risk_summary: { level?: string; note?: string } | null;
   created_at: string;
@@ -58,8 +60,19 @@ export async function patchSession(id: string, patch: { label?: string; status?:
   await apiFetch(`/api/v1/session/${id}`, { method: 'PATCH', body: JSON.stringify(patch) });
 }
 
-export async function duplicateSession(id: string): Promise<string> {
-  const res = await apiFetch<{ ok: boolean; id: string }>(`/api/v1/session/${id}/duplicate`, { method: 'POST', body: '{}' });
+/** Schreibt geaenderte Antworten in DIESE Sitzung (Canvas-Wahl 2B,
+ *  2026-09-05). Der Server uebernimmt country/markets/categories daraus, die
+ *  Ergebnisseite rechnet beim naechsten Laden neu. */
+export async function updateSessionAnswers(id: string, answers: SearchProfile): Promise<void> {
+  await apiFetch(`/api/v1/session/${id}`, { method: 'PATCH', body: JSON.stringify({ answers }) });
+}
+
+/** Legt eine Kopie an. `label` kommt vom Aufrufer in der Sprache des Nutzers
+ *  ("Kopie von …") — der Server kennt die Sprache nicht. */
+export async function duplicateSession(id: string, label?: string): Promise<string> {
+  const res = await apiFetch<{ ok: boolean; id: string }>(`/api/v1/session/${id}/duplicate`, {
+    method: 'POST', body: JSON.stringify(label ? { label } : {}),
+  });
   return res.id;
 }
 

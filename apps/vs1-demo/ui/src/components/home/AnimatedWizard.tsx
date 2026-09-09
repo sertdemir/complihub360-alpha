@@ -36,9 +36,9 @@ import { Badge } from '../ui/Badge';
 
 // Copy lives in the 'home' namespace: wizard.cards.<key>.{title,desc},
 // wizard.steps.<key>.{title,subtitle}, wizard.rail.<key>, wizard.footer.<key>.
-type Card = { id: string; key: string; icon?: LucideIcon };
+export type Card = { id: string; key: string; icon?: LucideIcon };
 
-type StepDef = {
+export type StepDef = {
   rail: number;
   key: 'markets' | 'operations' | 'domains';
   cards: Card[];
@@ -48,7 +48,7 @@ type StepDef = {
 
 const RAIL = ['markets', 'operations', 'domains', 'review'] as const;
 
-const STEPS: StepDef[] = [
+export const STEPS: StepDef[] = [
   {
     rail: 0,
     key: 'markets',
@@ -104,7 +104,7 @@ const FOOTER = '__footer';
 // A1 fix: completing the embedded wizard must hand a SearchProfile to the
 // results page — otherwise the session save (the whole funnel anchor) never
 // fires for the landing-page entry points.
-const MARKET_CODE: Record<string, string> = {
+export const MARKET_CODE: Record<string, string> = {
   Germany: 'DE', 'United Kingdom': 'UK', Netherlands: 'NL', France: 'FR',
   Italy: 'IT', Spain: 'ES', 'United States': 'US', 'Türkiye': 'TR',
 };
@@ -121,7 +121,7 @@ const BUSINESS_CODE: Record<string, BusinessType> = {
 
 // C6 "Refine existing": a stored profile pre-selects the cards. Reverse of the
 // maps above — businessTypeNote carries the original card id when available.
-function selectionFromProfile(p: SearchProfile): { selected: Set<string>; extraMarkets: string[] } {
+export function selectionFromProfile(p: SearchProfile): { selected: Set<string>; extraMarkets: string[] } {
   const sel = new Set<string>();
   const codeToCard = Object.fromEntries(Object.entries(MARKET_CODE).map(([k, v]) => [v, k]));
   const extra: string[] = [];
@@ -139,7 +139,7 @@ function selectionFromProfile(p: SearchProfile): { selected: Set<string>; extraM
   return { selected: sel, extraMarkets: extra };
 }
 
-function buildProfile(selected: Set<string>, extraMarkets: string[]): SearchProfile {
+export function buildProfile(selected: Set<string>, extraMarkets: string[]): SearchProfile {
   const markets = [
     ...STEPS[0].cards.filter((c) => c.id !== 'Others' && selected.has(c.id)).map((c) => MARKET_CODE[c.id] ?? c.id),
     ...extraMarkets,

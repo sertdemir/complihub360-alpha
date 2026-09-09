@@ -527,15 +527,36 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         });
     } else if (req.method === 'PATCH' && /^\/api\/v1\/session\/[0-9a-f-]{36}$/.test(req.url || '')) {
         // B13: rename (label) / archive (status) a saved session.
+        // 2026-09-05 (Canvas-Wahl 2B): auch `answers` — die Antworten der
+        // Sitzung werden ersetzt, country/markets/categories folgen daraus,
+        // die Ergebnisseite rechnet beim naechsten /search neu. Gebunden an
+        // den Eigentuemer (fremde 404 — sechstes Vorkommen des Musters
+        // "Empfaengerbindung fehlt"); der Server-Key behaelt die Betriebssicht.
         const sessionId = (req.url || '').split('/').pop() as string;
         let patchBody = '';
         req.on('data', (chunk: any) => patchBody += chunk.toString());
         req.on('end', async () => {
             try {
+                const own = (await supabaseApi.select('sessions', { id: sessionId }, { limit: 1 })) as Array<{ user_id: string | null }>;
+                if (!own.length || !(authViaApiKey || (authUserId && own[0].user_id === authUserId))) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Session not found', correlationId }));
+                    return;
+                }
                 const d = JSON.parse(patchBody || '{}');
                 const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
                 if (typeof d.label === 'string') patch.label = d.label.slice(0, 120) || null;
                 if (d.status === 'active' || d.status === 'archived') patch.status = d.status;
+                if (d.answers && typeof d.answers === 'object' && !Array.isArray(d.answers)) {
+                    const a = d.answers as Record<string, unknown>;
+                    const strList = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string').slice(0, 40) : null);
+                    patch.answers = a;
+                    const markets = strList(a.markets);
+                    const categories = strList(a.categories);
+                    if (markets) patch.markets = markets;
+                    if (categories) patch.categories = categories;
+                    if (typeof a.country === 'string') patch.country = a.country || (markets?.[0] ?? null);
+                }
                 const updated = (await supabaseApi.update('sessions', { id: sessionId }, patch)) as unknown[];
                 if (!updated.length) {
                     res.writeHead(404, { 'Content-Type': 'application/json' });
@@ -643,16 +664,23 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             }
         });
     } else if (req.method === 'POST' && /^\/api\/v1\/session\/[0-9a-f-]{36}\/duplicate$/.test(req.url || '')) {
-        // B13: duplicate a session as an editable copy.
+        // B13: duplicate a session as an editable copy. Das Label liefert das
+        // Frontend in der Sprache des Nutzers ("Kopie von …"); ohne Label
+        // bleibt der englische Fallback. Eigentuemer-Bindung wie beim PATCH.
         const sessionId = (req.url || '').split('/')[4];
+        let dupBody = '';
+        req.on('data', (chunk: any) => dupBody += chunk.toString());
+        req.on('end', async () => {
         try {
             const rows = (await supabaseApi.select('sessions', { id: sessionId }, { limit: 1 })) as Array<Record<string, unknown>>;
-            if (!rows[0]) {
+            if (!rows[0] || !(authViaApiKey || (authUserId && rows[0].user_id === authUserId))) {
                 res.writeHead(404, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Session not found', correlationId }));
                 return;
             }
             const src = rows[0];
+            let wantedLabel = '';
+            try { const d = JSON.parse(dupBody || '{}'); if (typeof d.label === 'string') wantedLabel = d.label.trim(); } catch { /* leerer Body */ }
             const copy = (await supabaseApi.insert('sessions', {
                 user_id: src.user_id ?? null,
                 guest_key: src.guest_key ?? null,
@@ -661,7 +689,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 categories: src.categories ?? [],
                 answers: src.answers ?? {},
                 risk_summary: src.risk_summary ?? null,
-                label: `Copy of ${String(src.label || src.country || 'session')}`.slice(0, 120),
+                label: (wantedLabel || `Copy of ${String(src.label || src.country || 'session')}`).slice(0, 120),
                 status: 'active',
             })) as Array<{ id: string }>;
             await supabaseApi.insert('event_log', { type: 'session_duplicated', payload: { sourceId: sessionId, copyId: copy?.[0]?.id } });
@@ -673,6 +701,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Session duplicate failed', correlationId }));
         }
+        });
     } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/detail$/.test(req.url || '')) {
         // Matchmaking v2 (spec §8): stage-2 ANONYMOUS provider detail. Opening it
         // is the monetised event `provider_detail_opened`, deduped server-side to

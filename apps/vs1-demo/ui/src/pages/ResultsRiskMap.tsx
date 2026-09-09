@@ -13,6 +13,7 @@ import type { SearchProfile } from '../components/wizard/WizardContext';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { SessionSnapshot, type SnapshotRow } from '../components/user/SessionSnapshot';
+import { AnswersDrawer } from '../components/user/AnswersDrawer';
 import { generateRiskMapPdf } from '../lib/riskMapPdf';
 
 // ─── Results · Risk Map · Figma 1667:215 ────────────────────────────────────
@@ -273,6 +274,11 @@ export function ResultsRiskMap() {
   })();
   const profile = stateProfile ?? storedProfile ?? undefined;
   const [saveOpen, setSaveOpen] = useState(false);
+  // "Antworten bearbeiten" als Schublade (Canvas-Wahl 1B/2B, 2026-09-05).
+  // Nach "Als Variante kopieren" landet man hier auf der Kopie mit
+  // openAnswers im Router-State — die Schublade geht sofort auf.
+  const [answersOpen, setAnswersOpen] = useState<boolean>(!!location.state?.openAnswers);
+  const [reloadKey, setReloadKey] = useState(0);
   const { isLoggedIn } = useAuthStore();
   const navigate = useNavigate();
   const { i18n } = useTranslation();
@@ -292,7 +298,7 @@ export function ResultsRiskMap() {
     }
     const res = await runSearch(query);
     return { providers: res.providers, laws: res.laws ?? [], session };
-  }, { providers: PARTNERS_ANON, laws: [], session: null });
+  }, { providers: PARTNERS_ANON, laws: [], session: null }, [sessionId, reloadKey]);
   const anonProviders = searchData.providers;
 
   // Obligations enrichment: live engine laws (severity/statute/penalty/cadence)
@@ -460,8 +466,25 @@ export function ResultsRiskMap() {
         }}
         matchBasis={(p) => (p.match_basis ? <MatchBasis basis={p.match_basis} /> : null)}
         onExportPdf={exportPdf}
-        onEditAnswers={() => navigate(`/${locale}/wizard`)}
+        // Mit gespeicherter Sitzung oeffnet sich die Schublade; ohne (Fixture,
+        // Gast-Profil) bleibt der Weg zum Erst-Wizard.
+        onEditAnswers={() => (sessionId && session ? setAnswersOpen(true) : navigate(`/${locale}/wizard`))}
         onProviderDetails={(key) => navigate(`/${locale}/provider/${key}`)}
+        answersDrawer={sessionId && session ? (
+          <AnswersDrawer
+            open={answersOpen}
+            onClose={() => setAnswersOpen(false)}
+            sessionId={sessionId}
+            sessionLabel={session.label || t('snapshot.fallbackTitle')}
+            profile={{
+              country: session.country ?? '',
+              markets: session.markets ?? [],
+              categories: (session.categories ?? []) as SearchProfile['categories'],
+              ...(session.answers ?? {}),
+            }}
+            onSaved={() => setReloadKey((k) => k + 1)}
+          />
+        ) : null}
       />
     );
   }

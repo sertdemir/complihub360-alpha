@@ -8,7 +8,9 @@ import { useEffect, useRef, useState } from 'react';
 
 export type DataSource = 'api' | 'fixture';
 
-export function useApiData<T>(fetcher: () => Promise<T>, fixture: T): { data: T; source: DataSource; loading: boolean } {
+/** `deps`: wenn sich einer der Werte aendert, wird neu geladen (z. B. nach
+ *  dem Speichern geaenderter Antworten). Ohne `deps` laedt der Hook einmal. */
+export function useApiData<T>(fetcher: () => Promise<T>, fixture: T, deps: unknown[] = []): { data: T; source: DataSource; loading: boolean } {
   const [data, setData] = useState<T>(fixture);
   const [source, setSource] = useState<DataSource>('fixture');
   const [loading, setLoading] = useState(true);
@@ -17,6 +19,7 @@ export function useApiData<T>(fetcher: () => Promise<T>, fixture: T): { data: T;
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
     fetcherRef
       .current()
       .then((result) => {
@@ -37,7 +40,8 @@ export function useApiData<T>(fetcher: () => Promise<T>, fixture: T): { data: T;
     return () => {
       cancelled = true;
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
 
   return { data, source, loading };
 }

@@ -608,6 +608,83 @@ describe('Pflicht-Status je Sitzung', () => {
     });
 });
 
+describe('PATCH /api/v1/session/:id — Antworten aktualisieren (Canvas-Wahl 2B)', () => {
+    const seed = (over: Record<string, any> = {}) => {
+        const row = { id: randomUUID(), user_id: USER_ID, country: 'DE', markets: ['DE'], categories: ['tax-vat'], answers: { country: 'DE', note: 'alt' }, label: 'Shop', status: 'active', ...over };
+        (db.sessions ??= []).push(row);
+        return row;
+    };
+
+    it('ersetzt die Antworten und zieht country/markets/categories nach', async () => {
+        const row = seed();
+        const answers = { country: 'IT', markets: ['IT', 'ES'], categories: ['tax-vat', 'data-privacy'], note: 'neu' };
+        const r = await api(`/api/v1/session/${row.id}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ answers }) });
+        expect(r.status).toBe(200);
+        const saved = db.sessions.find((x: any) => x.id === row.id);
+        expect(saved.answers).toEqual(answers);
+        expect(saved.country).toBe('IT');
+        expect(saved.markets).toEqual(['IT', 'ES']);
+        expect(saved.categories).toEqual(['tax-vat', 'data-privacy']);
+        expect(saved.label).toBe('Shop');
+    });
+
+    it('nimmt nur Strings in markets/categories', async () => {
+        const row = seed();
+        const r = await api(`/api/v1/session/${row.id}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ answers: { markets: ['DE', 7, null], categories: [{ x: 1 }, 'tax-vat'] } }) });
+        expect(r.status).toBe(200);
+        const saved = db.sessions.find((x: any) => x.id === row.id);
+        expect(saved.markets).toEqual(['DE']);
+        expect(saved.categories).toEqual(['tax-vat']);
+    });
+
+    it('verbirgt fremde Sitzungen als 404 — auch fuer label/status', async () => {
+        const fremd = seed({ user_id: randomUUID() });
+        const r = await api(`/api/v1/session/${fremd.id}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ label: 'geklaut' }) });
+        expect(r.status).toBe(404);
+        expect(db.sessions.find((x: any) => x.id === fremd.id).label).toBe('Shop');
+    });
+
+    it('Server-Key behaelt die Betriebssicht', async () => {
+        const fremd = seed({ user_id: randomUUID() });
+        const r = await api(`/api/v1/session/${fremd.id}`, { method: 'PATCH', auth: 'key', body: JSON.stringify({ status: 'archived' }) });
+        expect(r.status).toBe(200);
+        expect(db.sessions.find((x: any) => x.id === fremd.id).status).toBe('archived');
+    });
+});
+
+describe('POST /api/v1/session/:id/duplicate — Label vom Frontend, Eigentuemer-Bindung', () => {
+    const seed = (over: Record<string, any> = {}) => {
+        const row = { id: randomUUID(), user_id: USER_ID, country: 'DE', markets: ['DE'], categories: ['tax-vat'], answers: { country: 'DE' }, label: 'Shop', status: 'active', ...over };
+        (db.sessions ??= []).push(row);
+        return row;
+    };
+
+    it('uebernimmt das mitgeschickte Label', async () => {
+        const row = seed();
+        const r = await api(`/api/v1/session/${row.id}/duplicate`, { method: 'POST', auth: 'jwt', body: JSON.stringify({ label: 'Kopie von Shop' }) });
+        expect(r.status).toBe(201);
+        const copy = db.sessions.find((x: any) => x.id === r.body.id);
+        expect(copy.label).toBe('Kopie von Shop');
+        expect(copy.answers).toEqual({ country: 'DE' });
+        expect(copy.user_id).toBe(USER_ID);
+    });
+
+    it('faellt ohne Label auf "Copy of …" zurueck', async () => {
+        const row = seed();
+        const r = await api(`/api/v1/session/${row.id}/duplicate`, { method: 'POST', auth: 'jwt', body: '{}' });
+        expect(r.status).toBe(201);
+        expect(db.sessions.find((x: any) => x.id === r.body.id).label).toBe('Copy of Shop');
+    });
+
+    it('verbirgt fremde Sitzungen als 404', async () => {
+        const fremd = seed({ user_id: randomUUID() });
+        const before = db.sessions.length;
+        const r = await api(`/api/v1/session/${fremd.id}/duplicate`, { method: 'POST', auth: 'jwt', body: '{}' });
+        expect(r.status).toBe(404);
+        expect(db.sessions.length).toBe(before);
+    });
+});
+
 describe('GET /api/v1/sessions — welcher Ausweis zaehlt', () => {
     // Der guest_key lebt im localStorage EINES Browsers. Wer sich am Telefon
     // anmeldet, saehe damit eine leere Liste, obwohl die Sitzungen laengst
