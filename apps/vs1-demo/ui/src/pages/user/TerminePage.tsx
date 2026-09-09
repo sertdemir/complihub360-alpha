@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { CalendarClock, CalendarPlus, MoreHorizontal } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { CalendarClock, CalendarPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { useWizardDrawer } from '../../components/user/WizardDrawer';
 import { UserShell } from '../../components/user/UserShell';
 import { Button } from '../../components/ui/Button';
 import { Tag } from '../../components/ui/Tag';
+import { ActionMenu } from '../../components/ui/ActionMenu';
 import { fetchUserBookings, cancelBooking, markOutcome, providerWebsiteHref, type UserBooking, type BookingStatus } from '../../api/bookings';
 import { ReviewDrawer, type ReviewTarget } from '../../components/user/ReviewDrawer';
 import { RescheduleDrawer, type RescheduleTarget } from '../../components/user/RescheduleDrawer';
@@ -137,59 +138,6 @@ function DatumsMarke({ iso, locale, soon }: { iso: string; locale: string; soon?
       <span className={`text-[10px] font-bold uppercase tracking-[0.08em] ${soon ? '' : 'text-fg-tertiary'}`}>
         {d.toLocaleDateString(locale, { month: 'short' }).replace('.', '')}
       </span>
-    </div>
-  );
-}
-
-// ─── ⋯-Menü (3B) ─────────────────────────────────────────────────────────────
-// Seiten-lokal, weil das Design-System (noch) kein Aktionsmenü kennt: NavMenu
-// ist Navigation, SelectMenu ein Formularfeld. Wiederholt sich das Muster auf
-// einer zweiten Fläche, gehört es nach components/ui.
-function AktionenMenu({ label, items }: {
-  label: string;
-  items: { label: string; danger?: boolean; onClick: () => void }[];
-}) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    const onDoc = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
-    document.addEventListener('mousedown', onDoc);
-    document.addEventListener('keydown', onKey);
-    return () => { document.removeEventListener('mousedown', onDoc); document.removeEventListener('keydown', onKey); };
-  }, [open]);
-  return (
-    <div ref={ref} className="relative">
-      <button
-        type="button"
-        aria-label={label}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        onClick={() => setOpen((o) => !o)}
-        className="grid h-8 w-8 place-items-center rounded-md border border-stroke bg-surface text-fg-secondary transition-colors hover:text-fg"
-      >
-        <MoreHorizontal size={15} />
-      </button>
-      {open && (
-        <div role="menu" className="absolute right-0 top-9 z-20 min-w-[180px] rounded-lg border border-stroke bg-surface p-1 shadow-md">
-          {items.map((i) => (
-            <button
-              key={i.label}
-              role="menuitem"
-              type="button"
-              onClick={() => { setOpen(false); i.onClick(); }}
-              className={`block w-full rounded-md px-3 py-2 text-left text-[13px] transition-colors ${
-                i.danger
-                  ? 'text-error-700 hover:bg-error-bg/60 dark:text-red-300 dark:hover:bg-red-500/10'
-                  : 'text-fg hover:bg-surface-secondary'
-              }`}
-            >
-              {i.label}
-            </button>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
@@ -333,7 +281,7 @@ export function TerminePage() {
             <Button size="sm" variant="outline" iconLeft={<CalendarPlus size={14} />} onClick={() => ladeIcs(r)}>
               {t('termine.addToCalendar')}
             </Button>
-            <AktionenMenu
+            <ActionMenu
               label={t('termine.moreActions')}
               items={[
                 { label: t('termine.reschedule'), onClick: () => onReschedule(r) },
@@ -402,7 +350,7 @@ export function TerminePage() {
             <Button size="sm" variant="outline" iconLeft={<CalendarPlus size={14} />} onClick={() => ladeIcs(r)}>
               {t('termine.addToCalendar')}
             </Button>
-            <AktionenMenu
+            <ActionMenu
               label={t('termine.moreActions')}
               items={[
                 { label: t('termine.reschedule'), onClick: () => onReschedule(r) },

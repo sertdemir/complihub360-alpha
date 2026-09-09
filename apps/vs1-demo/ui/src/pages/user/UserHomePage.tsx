@@ -10,6 +10,7 @@ import { Segment } from '../../components/compliance-areas';
 import { KpiRing, useEntered, EASE } from '../../components/ui/Stats';
 import { EmptyState } from '../../components/user/EmptyState';
 import { RescheduleDrawer, type RescheduleTarget } from '../../components/user/RescheduleDrawer';
+import { SessionTile } from '../../components/user/SessionTile';
 import { fetchDashboard, EMPTY_DASHBOARD, type DashboardData, type DashboardSession } from '../../api/dashboard';
 import { fetchUserRequests, type UserRequestRow } from '../../api/requests';
 import { fetchUserBookings, type UserBooking } from '../../api/bookings';
@@ -31,7 +32,8 @@ import { ladeIcs } from './TerminePage';
 //       den Kalender, Verschieben), "Da weitermachen" mit Fortsetzen. Der
 //       "Naechste Schritt" und "Termin vorschlagen" (ohne Funktion) entfallen.
 //   6B  Sitzungen als Kacheln mit Risiko-Tag, Bereichs-/Land-Chips, Balken
-//       und "Oeffnen"-Link direkt auf die Sitzung.
+//       und "Oeffnen"-Link direkt auf die Sitzung — dieselbe Kachel wie auf der
+//       Sitzungen-Seite (SessionTile, Canvas 3B vom 2026-09-09).
 //
 // Die Zahlen kommen weiterhin aus drei Aufrufen: /api/v1/dashboard (Sitzungen
 // und Pflichten, serverseitig durch die Engine gerechnet), /requests,
@@ -41,14 +43,6 @@ import { ladeIcs } from './TerminePage';
 
 const RISK_TEXT = { critical: 'text-risk-critical', high: 'text-risk-high', medium: 'text-risk-medium', low: 'text-risk-low' } as const;
 const RISK_BG = { critical: 'bg-risk-critical', high: 'bg-risk-high', medium: 'bg-risk-medium', low: 'bg-risk-low' } as const;
-// Theme-feste Rezepte wie die Aufgaben-Chips der Sitzungsseite: Token-
-// Opazitaet frisst im Dark Mode den Text.
-const RISK_TAG = {
-  critical: 'bg-[#FEE2E2] border-[rgba(143,49,16,.30)] text-[#8F3110] dark:bg-[#8F3110]/25 dark:text-[#F1A88C]',
-  high: 'bg-[#FEE2E2] border-[rgba(143,49,16,.30)] text-[#8F3110] dark:bg-[#8F3110]/25 dark:text-[#F1A88C]',
-  medium: 'bg-[#FEF3C7] border-[rgba(161,98,7,.35)] text-[#713F12] dark:bg-[#A16207]/25 dark:text-[#F0C86A]',
-  low: 'bg-[#E7F3EE] border-[rgba(21,128,61,.35)] text-[#14532D] dark:bg-[#15803D]/20 dark:text-[#8FD3AE]',
-} as const;
 type Sev = keyof typeof RISK_BG;
 
 const CARD = 'rounded-xl border border-stroke-subtle bg-surface shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]';
@@ -494,42 +488,25 @@ export function UserHomePage() {
             <div className="mt-[18px]">
               <SectionHead title={t('home.savedSessions')} count={String(dash.sessions.total)} to="dashboard/sessions" />
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {dash.sessions.items.slice(0, 3).map((s, i) => {
-                  const risiko = (s.severity ?? 'low') as Sev;
-                  const frac = s.total ? (s.total - s.open) / s.total : 0;
-                  return (
-                    <div key={s.id} className={CARD + ' flex flex-col gap-2.5 p-4'}>
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="min-w-0 text-body-xs font-bold text-fg">{sitzungsTitel(s, domainLabel)}</p>
-                        <span className={'inline-flex shrink-0 whitespace-nowrap rounded border px-[7px] py-[2px] text-[9.5px] font-bold uppercase tracking-[0.06em] ' + RISK_TAG[risiko]}>
-                          {t(`home.riskTag.${risiko}`)}
-                        </span>
-                      </div>
-                      <div className="flex flex-wrap gap-1">
-                        {s.categories.map((c) => (
-                          <span key={c} className="rounded-full bg-surface-secondary px-2 py-[2px] text-[9.5px] font-semibold text-fg-secondary">{domainLabel(c)}</span>
-                        ))}
-                        {s.country && <span className="rounded-full border border-stroke px-2 py-[2px] text-[9.5px] font-bold text-fg">{s.country}</span>}
-                      </div>
-                      <div>
-                        <div className="h-[5px] overflow-hidden rounded-full bg-surface-secondary">
-                          <div
-                            className={`h-full rounded-full ${RISK_BG[risiko]}`}
-                            style={{ width: entered ? `${frac * 100}%` : 0, transition: `width 800ms ${EASE} ${300 + i * 90}ms` }}
-                          />
-                        </div>
-                        <p className="mt-1.5 text-[10px] text-fg-tertiary">
-                          <b className={RISK_TEXT[risiko]}>{t('home.sessionOpen', { count: s.open })}</b>
-                          {' · '}{t('home.sessionOf', { count: s.total })}
-                          {' · '}{relZeit(s.updated_at, locale)}
-                        </p>
-                      </div>
+                {dash.sessions.items.slice(0, 3).map((s, i) => (
+                  <SessionTile
+                    key={s.id}
+                    title={sitzungsTitel(s, domainLabel)}
+                    severity={(s.severity ?? 'low') as Sev}
+                    domains={s.categories.map(domainLabel)}
+                    country={s.country}
+                    open={s.open}
+                    total={s.total}
+                    updatedLabel={relZeit(s.updated_at, locale)}
+                    entered={entered}
+                    index={i}
+                    footer={
                       <div className="flex justify-end">
                         <button type="button" onClick={() => oeffneSitzung(s.id)} className={TEXT_LINK}>{t('shared.open')}</button>
                       </div>
-                    </div>
-                  );
-                })}
+                    }
+                  />
+                ))}
               </div>
             </div>
           )}
