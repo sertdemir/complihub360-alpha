@@ -69,12 +69,16 @@ function DomainView({ slug }: { slug: DomainSlug }) {
   const providersRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    let alive = true;
     setData(null);
     fetchDomainOverview(slug)
-      .then(setData)
+      // Nur die Antwort des aktuellen Bereichs zaehlt — bei schnellem Klicken
+      // durch die Navigation darf eine spaete Antwort den neuen nicht ueberschreiben.
+      .then((d) => { if (alive) setData(d); })
       // 401 (Gast) oder Ausfall: der Leerzustand, kein Dauerladen
       // (Waechter-Test emptyState.guard: null = laedt, EMPTY_ = nichts da).
-      .catch(() => setData(EMPTY_DOMAIN));
+      .catch(() => { if (alive) setData(EMPTY_DOMAIN); });
+    return () => { alive = false; };
   }, [slug]);
 
   const areaLabel = t(`domain.${SLUG_TO_I18N[slug]}`);
@@ -147,7 +151,9 @@ function DomainView({ slug }: { slug: DomainSlug }) {
             </div>
             {/* Kein "Frage stellen" mehr im Kopf (Nutzer 2026-09-13): der Assistent
                 steht als Karte rechts daneben, der Knopf war doppelt. */}
-            {!empty && (
+            {/* Erst wenn die Daten da sind: waehrend des Ladens ist `empty` noch
+                false, der Knopf blitzte beim Bereichswechsel kurz auf. */}
+            {data && !empty && (
               <div className="mt-0.5 flex shrink-0 items-center">
                 <Button onClick={() => openWizard()}>{t('shared.startNewSearch')}</Button>
               </div>
