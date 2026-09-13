@@ -377,8 +377,6 @@
     "dueInDays_other": "{{count}} gün içinde",
     "statusDone": "tamamlandı",
     "statusNotApplicable": "uygulanmıyor",
-    "askEyebrow": "Sorunuz",
-    "askTitle": "{{area}} hakkında somut bir sorunuz mu var?",
     "askScope": "Yanıt kaynağı:",
     "askScopeArea": "Alan · {{area}}",
     "askScopeSessions_one": "{{count}} oturum",
@@ -386,7 +384,6 @@
     "askScopeNoSession": "oturum yok",
     "askPlaceholder": "Sorunuzu kendi sözcüklerinizle yazın",
     "askSuggest": "{{title}} için ne geçerli?",
-    "askYou": "Siz:",
     "askThinking": "Alan bilgisi kontrol ediliyor …",
     "askDisclaimer": "Genel bilgidir, hukuki veya vergi danışmanlığı değildir. Bağlayıcı bir yanıt için:",
     "askPartner": "Doğrulanmış bir ortağa talep gönderin",
@@ -423,7 +420,9 @@
     "emptyArchived_other": "Bu alanı içeren {{count}} arşivlenmiş oturum",
     "emptyArchivedLink": "Arşivlenmiş oturumlara git",
     "sourceArea": "Alan bilgisi · {{area}}",
-    "sourceSession": "Oturumunuz · {{name}}"
+    "sourceSession": "Oturumunuz · {{name}}",
+    "assistantTitle": "Asistan · {{area}}",
+    "assistantIntro": "{{area}} hakkında sorun — yanıt alan bilgisinden ve oturumlarınızdan gelir."
   },
   "configureAlerts": {
     "eyebrow": "İZLEME",

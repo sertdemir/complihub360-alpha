@@ -6,7 +6,7 @@ import { useWizardDrawer } from '../../components/user/WizardDrawer';
 import { Button } from '../../components/ui/Button';
 import { KpiRing, useEntered } from '../../components/ui/Stats';
 import { RequestQuoteModal, type QuoteProvider } from '../../components/user/RequestQuoteModal';
-import { DomainAskBand } from '../../components/user/DomainAskBand';
+import { DomainAssistant } from '../../components/user/DomainAssistant';
 import { DomainKnowledge } from '../../components/user/DomainKnowledge';
 import { DomainProviders } from '../../components/user/DomainProviders';
 import { AREA_BY_SLUG } from '../../components/compliance-areas/areas';
@@ -17,7 +17,7 @@ import { DOMAINS, type DomainSlug } from '../../lib/domains';
 import { SLUG_TO_I18N } from './AnfragenTab';
 
 // ─── User Dashboard · Bereichsseite ──────────────────────────────────────────
-// Canvas "Bereichsseite", Nutzer-Wahl 2026-09-13 (1B · 2C · 3B · 4B · 5D · 6B).
+// Canvas "Bereichsseite", Nutzer-Wahl 2026-09-13 (1B · 2C · 3C · 4B · 5D · 6B).
 // Festlegung 2026-09-09: ein Bereich ist fuer den Dashboard-Nutzer der
 // QUERSCHNITT ueber alle seine Sitzungen, dazu der Wissens-Hub und die Frage,
 // die nur ueber diesen Bereich und seine Sitzungen antwortet.
@@ -30,7 +30,9 @@ import { SLUG_TO_I18N } from './AnfragenTab';
 //       in Risikofarbe (Tooltip: Sitzung, Frist), rechts die Sitzung. Eine
 //       Pflicht, die in zwei Sitzungen liegt, steht zweimal — je Sitzung ein
 //       eigener Stand.
-//   3B  Frage-Band mit Antwort darunter (DomainAskBand).
+//   3C  Assistent als klebende Karte RECHTS neben dem Inhalt (DomainAssistant,
+//       Nutzer-Aenderung 2026-09-13 statt 3B): zweispaltig ab lg, Kopf und
+//       Ringe bleiben ueber beiden Spalten.
 //   4B  Pflichten-Explorer im Arbeitsbereich (DomainKnowledge).
 //   5D  Anbieter als Karten der Ergebnisseite (DomainProviders).
 //   6B  Leerzustand ohne Sitzung: Leerkarte mit vorbelegtem Wizard; Wissen,
@@ -179,111 +181,117 @@ function DomainView({ slug }: { slug: DomainSlug }) {
             </div>
           )}
 
-          {/* 6B · Leerzustand: eine Karte, der Rest der Seite bleibt. */}
-          {empty && (
-            <div className="mt-6 flex items-center gap-7 rounded-xl border border-stroke-subtle bg-surface px-8 py-7 shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]">
-              <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-brand/[0.08] text-fg-brand">
-                <Icon size={26} strokeWidth={1.8} aria-hidden />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="font-serif text-[18px] font-bold leading-tight text-fg">{t('domainPage.emptyTitle', { area: areaLabel })}</p>
-                <p className="mt-1.5 max-w-[640px] text-body-xs leading-relaxed text-fg-secondary">{t('domainPage.emptyBody')}</p>
-                <p className="mt-2 text-body-3xs text-fg-tertiary">
-                  {t('domainPage.emptyHint')}
-                  {(data?.archived ?? 0) > 0 && (
-                    <>
-                      {' · '}{t('domainPage.emptyArchived', { count: data?.archived ?? 0 })}{' · '}
-                      <Link to={`/${locale}/dashboard/sessions`} className="font-bold text-brand underline underline-offset-2 hover:text-brand-700">{t('domainPage.emptyArchivedLink')}</Link>
-                    </>
-                  )}
-                </p>
-              </div>
-              <Button className="shrink-0" onClick={() => openWizard({ categories: [slug] })}>{t('domainPage.emptyCta')}</Button>
-            </div>
-          )}
-
-          {/* 2C · Matrix Pflicht × Markt */}
-          {data && !empty && (
-            <section className="mt-7">
-              <h2 className="mb-3 text-body-md font-bold text-fg">
-                {t('domainPage.matrixTitle')} <span className="text-fg-brand">{open.length}</span>
-              </h2>
-              <div className="overflow-x-auto rounded-xl border border-stroke-subtle bg-surface px-[18px] py-3.5 shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]">
-                <div className="min-w-[640px]">
-                  <div
-                    className="grid items-center gap-2 border-b border-stroke-subtle pb-2"
-                    style={{ gridTemplateColumns: `minmax(0,1fr) repeat(${markets.length}, 56px) 170px` }}
-                  >
-                    <span />
-                    {markets.map((m) => <span key={m} className="text-center text-[10px] font-extrabold text-fg-secondary">{m}</span>)}
-                    <span className="text-[10px] font-extrabold text-fg-secondary">{t('domainPage.matrixSession')}</span>
+          {/* Zweispaltig (3C): links Leerkarte/Matrix, Wissen, Anbieter — rechts
+              der Assistent, der beim Scrollen stehen bleibt. */}
+          <div className="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+            <div className="min-w-0">
+              {/* 6B · Leerzustand: eine Karte, der Rest der Seite bleibt. */}
+              {empty && (
+                <div className="flex items-center gap-7 rounded-xl border border-stroke-subtle bg-surface px-8 py-7 shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]">
+                  <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-brand/[0.08] text-fg-brand">
+                    <Icon size={26} strokeWidth={1.8} aria-hidden />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-serif text-[18px] font-bold leading-tight text-fg">{t('domainPage.emptyTitle', { area: areaLabel })}</p>
+                    <p className="mt-1.5 max-w-[640px] text-body-xs leading-relaxed text-fg-secondary">{t('domainPage.emptyBody')}</p>
+                    <p className="mt-2 text-body-3xs text-fg-tertiary">
+                      {t('domainPage.emptyHint')}
+                      {(data?.archived ?? 0) > 0 && (
+                        <>
+                          {' · '}{t('domainPage.emptyArchived', { count: data?.archived ?? 0 })}{' · '}
+                          <Link to={`/${locale}/dashboard/sessions`} className="font-bold text-brand underline underline-offset-2 hover:text-brand-700">{t('domainPage.emptyArchivedLink')}</Link>
+                        </>
+                      )}
+                    </p>
                   </div>
-                  {open.length === 0 && (
-                    <p className="py-4 text-body-xs text-fg-tertiary">{t('domainPage.matrixNone')}</p>
-                  )}
-                  {open.map(({ o, session }, i) => {
-                    const own = sessionMarkets(session);
-                    const euWide = o.markets.length === 0;
-                    const applies = (m: string) => (euWide ? own.includes(m) : o.markets.map((x) => x.toUpperCase()).includes(m));
-                    const tip = t('domainPage.matrixTooltip', { session: sessionTitle(session), due: dueLabel(o) });
-                    return (
+                  <Button className="shrink-0" onClick={() => openWizard({ categories: [slug] })}>{t('domainPage.emptyCta')}</Button>
+                </div>
+              )}
+
+              {/* 2C · Matrix Pflicht × Markt */}
+              {data && !empty && (
+                <section className="mt-0">
+                  <h2 className="mb-3 text-body-md font-bold text-fg">
+                    {t('domainPage.matrixTitle')} <span className="text-fg-brand">{open.length}</span>
+                  </h2>
+                  <div className="overflow-x-auto rounded-xl border border-stroke-subtle bg-surface px-[18px] py-3.5 shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]">
+                    <div className="min-w-[640px]">
                       <div
-                        key={`${session.id}:${o.id}`}
-                        role="button"
-                        tabIndex={0}
-                        title={tip}
-                        onClick={() => navigate(`/${locale}/results?session=${session.id}`)}
-                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/${locale}/results?session=${session.id}`); } }}
-                        className={'grid cursor-pointer items-center gap-2 py-2.5 transition-colors hover:bg-surface-secondary/60 ' + (i < open.length - 1 ? 'border-b border-stroke-subtle' : '')}
+                        className="grid items-center gap-2 border-b border-stroke-subtle pb-2"
                         style={{ gridTemplateColumns: `minmax(0,1fr) repeat(${markets.length}, 56px) 170px` }}
                       >
-                        <span className="min-w-0 truncate text-body-xs font-bold text-fg">
-                          {o.label}
-                          {euWide && <span className="ml-1.5 text-[10px] font-semibold text-fg-tertiary">{t('domainPage.matrixEuWide')}</span>}
-                          {o.status === 'in_progress' && <span className="ml-1.5 text-[10px] font-semibold text-risk-medium">{t('domainPage.inProgress')}</span>}
-                        </span>
-                        {markets.map((m) => (
-                          <span key={m} className="grid place-items-center">
-                            {applies(m)
-                              ? <span className={`h-3 w-3 rounded-full ${SEVERITY_STYLE[o.severity].bar}`} />
-                              : <span className="h-3 w-3 rounded-full border border-stroke" />}
-                          </span>
-                        ))}
-                        <span className="truncate text-body-3xs text-fg-secondary">{sessionTitle(session)}</span>
+                        <span />
+                        {markets.map((m) => <span key={m} className="text-center text-[10px] font-extrabold text-fg-secondary">{m}</span>)}
+                        <span className="text-[10px] font-extrabold text-fg-secondary">{t('domainPage.matrixSession')}</span>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </section>
-          )}
+                      {open.length === 0 && (
+                        <p className="py-4 text-body-xs text-fg-tertiary">{t('domainPage.matrixNone')}</p>
+                      )}
+                      {open.map(({ o, session }, i) => {
+                        const own = sessionMarkets(session);
+                        const euWide = o.markets.length === 0;
+                        const applies = (m: string) => (euWide ? own.includes(m) : o.markets.map((x) => x.toUpperCase()).includes(m));
+                        const tip = t('domainPage.matrixTooltip', { session: sessionTitle(session), due: dueLabel(o) });
+                        return (
+                          <div
+                            key={`${session.id}:${o.id}`}
+                            role="button"
+                            tabIndex={0}
+                            title={tip}
+                            onClick={() => navigate(`/${locale}/results?session=${session.id}`)}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/${locale}/results?session=${session.id}`); } }}
+                            className={'grid cursor-pointer items-center gap-2 py-2.5 transition-colors hover:bg-surface-secondary/60 ' + (i < open.length - 1 ? 'border-b border-stroke-subtle' : '')}
+                            style={{ gridTemplateColumns: `minmax(0,1fr) repeat(${markets.length}, 56px) 170px` }}
+                          >
+                            <span className="min-w-0 truncate text-body-xs font-bold text-fg">
+                              {o.label}
+                              {euWide && <span className="ml-1.5 text-[10px] font-semibold text-fg-tertiary">{t('domainPage.matrixEuWide')}</span>}
+                              {o.status === 'in_progress' && <span className="ml-1.5 text-[10px] font-semibold text-risk-medium">{t('domainPage.inProgress')}</span>}
+                            </span>
+                            {markets.map((m) => (
+                              <span key={m} className="grid place-items-center">
+                                {applies(m)
+                                  ? <span className={`h-3 w-3 rounded-full ${SEVERITY_STYLE[o.severity].bar}`} />
+                                  : <span className="h-3 w-3 rounded-full border border-stroke" />}
+                              </span>
+                            ))}
+                            <span className="truncate text-body-3xs text-fg-secondary">{sessionTitle(session)}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </section>
+              )}
 
-          {/* 3B · Frage stellen */}
-          {data && (
-            <DomainAskBand
-              slug={slug}
-              areaLabel={areaLabel}
-              sessions={sessions}
-              markets={markets}
-              openDuties={open.map((d) => d.o)}
-              inputRef={askRef}
-              onPartner={scrollProviders}
-            />
-          )}
+              {/* 4B · Wissen zum Bereich */}
+              {data && <DomainKnowledge slug={slug} markets={markets} sessions={sessions} />}
 
-          {/* 4B · Wissen zum Bereich */}
-          {data && <DomainKnowledge slug={slug} markets={markets} sessions={sessions} />}
+              {/* 5D · Anbieter als Karten */}
+              {data && (
+                <DomainProviders
+                  ref={providersRef}
+                  slug={slug}
+                  areaLabel={areaLabel}
+                  country={primaryCountry}
+                  onRequest={(p) => setQuoteFor({ key: p.provider_key, name: p.pseudonym_label, meta: p.region ?? undefined, country: primaryCountry })}
+                />
+              )}
+            </div>
 
-          {/* 5D · Anbieter als Karten */}
-          {data && (
-            <DomainProviders
-              ref={providersRef}
-              slug={slug}
-              areaLabel={areaLabel}
-              country={primaryCountry}
-              onRequest={(p) => setQuoteFor({ key: p.provider_key, name: p.pseudonym_label, meta: p.region ?? undefined, country: primaryCountry })}
-            />
-          )}
+            {/* 3C · Assistent rechts */}
+            {data && (
+              <DomainAssistant
+                slug={slug}
+                areaLabel={areaLabel}
+                sessions={sessions}
+                markets={markets}
+                openDuties={open.map((d) => d.o)}
+                inputRef={askRef}
+                onPartner={scrollProviders}
+              />
+            )}
+          </div>
         </div>
       </div>
       {quoteFor && (

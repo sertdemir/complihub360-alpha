@@ -11,7 +11,8 @@ import type { SearchProfile } from '../wizard/WizardContext';
 // hier nach Bereich statt nach Sitzung gesucht: POST /search mit dem Bereich
 // als einziger Domaene und dem Hauptmarkt des Nutzers. Pseudonym, Match,
 // Spezialisierungen, Bewertung, Antwortzeit, Abrechnungsmodell — Klarnamen
-// erst nach Buchung. Ab vier Anbietern zwei Reihen (Nutzer-Vorgabe).
+// erst nach Buchung. In der linken Spalte des zweispaltigen Layouts (3C)
+// zwei je Reihe — zu dritt bricht das Pseudonym auf "Ver…" ab.
 
 export const DomainProviders = forwardRef<HTMLElement, {
   slug: string;
@@ -48,7 +49,7 @@ export const DomainProviders = forwardRef<HTMLElement, {
       ) : providers.length === 0 ? (
         <p className="text-body-xs text-fg-tertiary">{t('domainPage.providersNone')}</p>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2">
           {providers.map((p) => {
             const basis = p.match_basis;
             return (

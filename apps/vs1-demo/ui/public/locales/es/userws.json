@@ -377,8 +377,6 @@
     "dueInDays_other": "en {{count}} días",
     "statusDone": "hecha",
     "statusNotApplicable": "no aplica",
-    "askEyebrow": "Su pregunta",
-    "askTitle": "¿Una pregunta concreta sobre {{area}}?",
     "askScope": "Responde a partir de:",
     "askScopeArea": "Área · {{area}}",
     "askScopeSessions_one": "{{count}} sesión",
@@ -386,7 +384,6 @@
     "askScopeNoSession": "sin sesión",
     "askPlaceholder": "Formule su pregunta con sus propias palabras",
     "askSuggest": "¿Qué aplica a {{title}}?",
-    "askYou": "Usted:",
     "askThinking": "Consultando el conocimiento del área …",
     "askDisclaimer": "Información general, no asesoramiento legal ni fiscal. Para una respuesta vinculante:",
     "askPartner": "Enviar una solicitud a un socio verificado",
@@ -423,7 +420,9 @@
     "emptyArchived_other": "{{count}} sesiones archivadas con esta área",
     "emptyArchivedLink": "Ver sesiones archivadas",
     "sourceArea": "Conocimiento del área · {{area}}",
-    "sourceSession": "Su sesión · {{name}}"
+    "sourceSession": "Su sesión · {{name}}",
+    "assistantTitle": "Asistente · {{area}}",
+    "assistantIntro": "Pregunte sobre {{area}} — la respuesta sale del conocimiento del área y de sus sesiones."
   },
   "configureAlerts": {
     "eyebrow": "MONITORIZACIÓN",
