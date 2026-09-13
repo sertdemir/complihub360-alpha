@@ -45,7 +45,7 @@ const SessionsPage = lazy(() => import("./pages/user/SessionsPage").then((m) => 
 const TerminePage = lazy(() => import("./pages/user/TerminePage").then((m) => ({ default: m.TerminePage })));
 import { ProviderDetailPage } from "./pages/ProviderDetailPage";
 import { ProviderSchedulePage } from "./pages/ProviderSchedulePage";
-const WorkbenchPage = lazy(() => import("./pages/user/WorkbenchPage").then((m) => ({ default: m.WorkbenchPage })));
+const DomainPage = lazy(() => import("./pages/user/DomainPage").then((m) => ({ default: m.DomainPage })));
 const UserNotificationsPage = lazy(() => import("./pages/user/UserNotificationsPage").then((m) => ({ default: m.UserNotificationsPage })));
 const SavedProvidersPage = lazy(() => import("./pages/user/SavedProvidersPage").then((m) => ({ default: m.SavedProvidersPage })));
 const ExportsPage = lazy(() => import("./pages/user/ExportsPage").then((m) => ({ default: m.ExportsPage })));
@@ -228,7 +228,7 @@ function AppContent() {
                         {/* Phase-3: stage-2 detail (monetised open) + native scheduling */}
                         <Route path="provider/:key" element={<ProviderDetailPage />} />
                         <Route path="provider/:key/schedule" element={<ProviderSchedulePage />} />
-                        <Route path="dashboard/workbench/:domain" element={<WorkbenchPage />} />
+                        <Route path="dashboard/workbench/:domain" element={<DomainPage />} />
                         <Route path="dashboard/notifications" element={<UserNotificationsPage />} />
                         <Route path="dashboard/saved-providers" element={<SavedProvidersPage />} />
                         <Route path="dashboard/exports" element={<ExportsPage />} />

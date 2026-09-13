@@ -24,7 +24,7 @@ import { join } from 'node:path';
 
 // UserRequestsPage ging 2026-09-01 im Termine-Reiter auf (Canvas 1C); die
 // Anfragen-Ladekette lebt jetzt in der TerminePage, der Tab bekommt Props.
-const SEITEN = ['SessionsPage.tsx', 'TerminePage.tsx', 'UserHomePage.tsx'];
+const SEITEN = ['SessionsPage.tsx', 'TerminePage.tsx', 'UserHomePage.tsx', 'DomainPage.tsx'];
 
 const quelle = (datei: string) => readFileSync(join(__dirname, datei), 'utf8');
 

@@ -16,6 +16,7 @@ import { AssistantWidget } from './AssistantWidget';
 import { fetchUserBookings } from '../../api/bookings';
 import { isMockApi } from '../../lib/supabase';
 import { fetchSessions, type SessionRowData } from '../../api/sessions';
+import { fetchDashboard } from '../../api/dashboard';
 import { fetchMyNotifications } from '../../api/notifications';
 
 // ─── UserShell ────────────────────────────────────────────────────────────────
@@ -80,16 +81,19 @@ const DOMAIN_ICON: Record<DomainSlug, React.ComponentType<{ size?: number | stri
   'logistics-customs': Truck,
   'legal-advisory': Scale,
 };
-const DOMAIN_DOT: Partial<Record<DomainSlug, 'high' | 'medium'>> = {
-  'tax-vat': 'high',
-  'product-packaging': 'medium',
-  'data-privacy': 'medium',
+// Die Punkte an den Bereichen kommen aus /dashboard (by_domain_high,
+// by_domain), nicht mehr aus einer festen Liste (bis 2026-09-13 standen
+// Steuern rot, EPR und Datenschutz gelb — fuer jedes Konto). Das Dashboard
+// zaehlt nach ENGINE-Domaene, deshalb die Abbildung; Verpackung und
+// Produkt-Compliance teilen sich PRODUCT und damit den Punkt.
+const SLUG_TO_ENGINE_KEY: Record<DomainSlug, string> = {
+  'tax-vat': 'TAX', 'product-packaging': 'PRODUCT', 'product-compliance': 'PRODUCT', 'data-privacy': 'DATA',
+  'marketing-seo': 'MARKETING', 'corporate-structure': 'CORPORATE', 'logistics-customs': 'LOGISTICS', 'legal-advisory': 'LEGAL',
 };
 const DOMAINS = CANONICAL_DOMAINS.map((d) => ({
   ...d,
   key: d.i18nKey,
   icon: DOMAIN_ICON[d.slug],
-  dot: DOMAIN_DOT[d.slug],
 }));
 
 const DOT: Record<'high' | 'medium', string> = { high: 'bg-red-400', medium: 'bg-amber-400' };
@@ -107,6 +111,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
   // B16: workspace search drawer · C1: live sidebar badges (hidden in fixture mode).
   const [searchOpen, setSearchOpen] = useState(false);
   const [counts, setCounts] = useState<{ requests?: number; unread?: number }>({});
+  const [domainDots, setDomainDots] = useState<Partial<Record<DomainSlug, 'high' | 'medium'>>>({});
   // ─── Sitzungen als zweite Nav-Ebene (Canvas N, Variante N3b) ──────────────
   // Zugeklappt, damit die Nav nicht mit jeder neuen Sitzung waechst — aber die
   // AKTIVE bleibt sichtbar, sonst weiss niemand, worin er gerade steckt.
@@ -135,6 +140,17 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
       fetchMyNotifications()
         .then((f) => setCounts((c) => ({ ...c, unread: f.unread })))
         .catch(() => setCounts((c) => ({ ...c, unread: 0 })));
+      fetchDashboard().then((d) => {
+        const dots: Partial<Record<DomainSlug, 'high' | 'medium'>> = {};
+        for (const dom of CANONICAL_DOMAINS) {
+          const key = SLUG_TO_ENGINE_KEY[dom.slug];
+          const hoch = (d.obligations.by_domain_high[key] ?? d.obligations.by_domain_high[dom.slug] ?? 0);
+          const offen = (d.obligations.by_domain[key] ?? d.obligations.by_domain[dom.slug] ?? 0);
+          if (hoch > 0) dots[dom.slug] = 'high';
+          else if (offen > 0) dots[dom.slug] = 'medium';
+        }
+        setDomainDots(dots);
+      });
     }
     // Die Sitzungsliste ist eine OEFFENTLICHE Route (guest_key als Ausweis)
     // und laeuft deshalb auch ohne Anmeldung — sie feuert ohnehin nur, wenn
@@ -265,7 +281,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
                         label={
                           <span className="inline-flex items-center gap-1.5">
                             {t(`domain.${d.key}`)}
-                            {d.dot && <span className={`h-1.5 w-1.5 rounded-full ${DOT[d.dot]}`} />}
+                            {domainDots[d.slug] && <span className={`h-1.5 w-1.5 rounded-full ${DOT[domainDots[d.slug] as 'high' | 'medium']}`} />}
                           </span>
                         }
                         active={active}

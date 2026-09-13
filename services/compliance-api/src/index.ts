@@ -10,6 +10,7 @@ import { supabaseApi } from "./supabase.js";
 import { verifySupabaseJwt } from "./supabaseJwt.js";
 import { sendMagicLinkMail, sendEmailChangeMail, sendRescheduleMail, sendCancellationMail } from "./mailer.js";
 import { handleAssistantChat, handleAssistantCheckout, handleAssistantVerify } from "./assistant.js";
+import { handleDomain } from "./domain.js";
 import { handleAuthAdopt } from "./adoption.js";
 import { handleDashboard, SLUG_TO_ENGINE } from "./dashboard.js";
 import { notify, handleNotificationsList, handleNotificationsRead } from "./notifications.js";
@@ -2484,6 +2485,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     } else if (req.method === 'GET' && req.url === '/api/v1/dashboard') {
         // Kennzahlen des Arbeitsbereichs aus echten Zeilen (dashboard.ts).
         await handleDashboard(res, correlationId, authUserId);
+    } else if (req.method === 'GET' && /^\/api\/v1\/domain\/[a-z-]+$/.test(req.url || '')) {
+        // Bereichs-Querschnitt: die Pflichten EINES Bereichs ueber alle
+        // Sitzungen des Nutzers (domain.ts, Canvas "Bereichsseite" 2026-09-13).
+        await handleDomain(res, correlationId, authUserId, (req.url || '').split('/').pop() as string);
     } else if (req.method === 'POST' && req.url === '/api/v1/auth/adopt') {
         // Signup adoption: the signed-in account claims its guest sessions (adoption.ts).
         handleAuthAdopt(req, res, correlationId, { userId: authUserId, email: authEmail });

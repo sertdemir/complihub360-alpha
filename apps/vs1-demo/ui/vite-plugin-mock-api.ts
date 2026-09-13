@@ -90,7 +90,47 @@ const LAWS = [
   { id: 'data-privacy', title: 'DSFA für Tracking-Pixel', description: '', domain: 'data-privacy', severity: 'medium', markets: [], source: 'DSGVO Art. 35', celex: '32016R0679', source_url: 'https://eur-lex.europa.eu/eli/reg/2016/679/oj', penalty: null, due: null, due_days: null, state: 'likely' },
   { id: 'tax-reverse-charge', title: 'Reverse-Charge-Verfahren', description: '', domain: 'tax-vat', severity: 'medium', markets: ['DE', 'NL'], source: 'UStG §13b', penalty: null, due: null, due_days: null, state: 'likely' },
   { id: 'corp-registration', title: 'Transparenzregister aktualisieren', description: '', domain: 'legal-advisory', severity: 'medium', markets: ['DE'], source: 'GwG §20 Abs. 1', penalty: '1.000–5.000 €', due: '30. Jun', due_days: 67, state: 'confirmed' },
+  { id: 'mktg-claims', title: 'Werbeaussagen und Preisangaben prüfen', description: '', domain: 'marketing-seo', severity: 'medium', markets: ['ES'], source: 'Ley 3/1991 (LCD) · PAngV', penalty: 'bis 30.000 €', due: 'laufend', due_days: null, state: 'likely' },
+  { id: 'tax-ioss', title: 'IOSS für Importe unter 150 €', description: '', domain: 'tax-vat', severity: 'medium', markets: [], source: 'MwStSystRL Art. 369l', penalty: 'Einfuhr-USt + Säumnis', due: 'laufend', due_days: null, state: 'likely' },
 ];
+
+// Bereichs-Querschnitt (Canvas "Bereichsseite" 2026-09-13): je aktiver Sitzung
+// die Pflichten EINES Bereichs, Stand aus obligations(). Leere Marktliste =
+// EU-weit. Die UK-Sitzung traegt ihre UK-Pflichten, die EU-Sitzung die EU.
+function domainOverview(slug: string) {
+  const RANG: Record<string, number> = { low: 0, medium: 1, high: 2, critical: 3 };
+  const sessions = SESSIONS.filter((s) => s.status === 'active' && (s.categories as string[]).includes(slug)).map((s) => {
+    const markets = [s.country, ...(s.markets as string[])].filter(Boolean) as string[];
+    const stand = new Map(obligations(s.id).items.map((i) => [i.obligation_id, i.status]));
+    const rows = LAWS.filter((l) => l.domain === slug && (l.markets.length === 0 || l.markets.some((m) => markets.includes(m))))
+      .map((l) => ({ id: l.id, label: l.title, severity: l.severity, markets: l.markets.filter((m) => markets.includes(m)), source: l.source, sourceUrl: (l as Record<string, unknown>).source_url ?? null, penalty: l.penalty, due: l.due, dueDays: l.due_days, status: stand.get(l.id) ?? 'open' }))
+      .sort((a, b) => RANG[b.severity] - RANG[a.severity] || (a.dueDays ?? 9999) - (b.dueDays ?? 9999));
+    return { id: s.id, label: s.label, country: s.country, markets: s.markets, categories: s.categories, updated_at: s.updated_at, obligations: rows };
+  });
+  const offen = sessions.flatMap((s) => s.obligations.filter((o) => o.status === 'open' || o.status === 'in_progress'));
+  const faellig = offen.map((o) => o.dueDays).filter((d): d is number => typeof d === 'number');
+  return {
+    ok: true, slug, sessions,
+    archived: SESSIONS.filter((s) => s.status === 'archived' && (s.categories as string[]).includes(slug)).length,
+    markets: [...new Set(sessions.flatMap((s) => [s.country, ...(s.markets as string[])].filter(Boolean)))],
+    open: offen.length, high: offen.filter((o) => o.severity === 'high' || o.severity === 'critical').length,
+    next_due_days: faellig.length ? Math.min(...faellig) : null,
+  };
+}
+
+// Assistent im Mock: eine feste Antwort mit Bezug auf Bereich und Sitzung,
+// damit das Frage-Band prueferbar ist, ohne Gemini und ohne Korpus.
+function assistantChat(body: Record<string, unknown>) {
+  const domain = typeof body.domain === 'string' ? body.domain : null;
+  const frage = String(body.message ?? '');
+  const answer = domain
+    ? `OSS deckt Fernverkäufe an Verbraucher ab, nicht aber Lagerhaltung oder lokale Lieferungen im Zielland. In Ihrer Sitzung EU-Expansion Shop ist Italien als Markt hinterlegt — dafür bleibt die italienische USt-Registrierung offen (Frist: vor dem ersten Verkauf).\n\n- Fiskalvertreter: für EU-Unternehmen nicht Pflicht, aber üblich\n- OSS-Quartalsmeldung: seit 3 Tagen in Arbeit, Frist in 6 Tagen\n\nIhre Frage war: „${frage.slice(0, 80)}“`
+    : `Mock-Antwort ohne Bereichskontext auf: „${frage.slice(0, 80)}“`;
+  return { ok: true, answer, sources: [
+    ...(domain ? [{ label: `CompliHub area knowledge · ${domain}`, kind: 'area', name: domain }, { label: 'Your session · EU-Expansion Shop', kind: 'session', name: 'EU-Expansion Shop' }] : []),
+    { label: 'CompliHub knowledge base · DE facts' },
+  ] };
+}
 
 // Die drei passenden Anbieter, Score-Aufschluesselung wie im Backend:
 // 60 * Marktabdeckung + 40 * (getroffene / angefragte Bereiche).
@@ -178,6 +218,7 @@ function route(method: string, path: string, body: Record<string, unknown> = {})
   const p = seg.slice(2);
   if (method === 'GET') {
     if (p[0] === 'dashboard') return dashboard();
+    if (p[0] === 'domain' && p[1]) return domainOverview(p[1]);
     if (p[0] === 'bookings') return { ok: true, bookings: bookings() };
     if (p[0] === 'requests') return { ok: true, requests: requests() };
     if (p[0] === 'notifications') { const rows = notifications(); return { ok: true, notifications: rows, unread: rows.filter((r) => !r.read_at).length }; }
@@ -188,6 +229,7 @@ function route(method: string, path: string, body: Record<string, unknown> = {})
     return { ok: true, items: [], providers: [], laws: [], documents: [], exports: [] };
   }
   if (p[0] === 'search') return { ok: true, providers: PROVIDERS, laws: LAWS };
+  if (p[0] === 'assistant' && p[1] === 'chat') return assistantChat(body);
   if (p[0] === 'session' && p.length === 1) return { ok: true, id: uuid(9, 1) };
   if (p[0] === 'session' && p[2] === 'duplicate') return duplicateSession(p[1], body);
   if (p[0] === 'session' && p.length === 2 && method === 'PATCH') return patchSession(p[1], body);

@@ -1,6 +1,7 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { structuredLog } from "@complihub360/types";
 import { supabaseApi } from "./supabase.js";
+import { DOMAIN_SLUGS, domainKnowledge, loadDomainSessions } from "./domain.js";
 
 // ─── VAT assistant (chatbot plan phase ②) ─────────────────────────────────────
 // RAG over knowledge_chunks (vector 768, match_knowledge_chunks RPC) plus the
@@ -117,6 +118,30 @@ Rules — follow ALL of them:
 5a. Output PLAIN TEXT only — the chat window renders no Markdown. Never use **, *, # or backticks; bullets are lines starting with "- ".
 6. When the question names a country outside the covered set (DE, UK, NL, FR, IT, ES, US, TR, AT), say coverage for it is coming and suggest a partner request.`;
 
+// Bereichsseite (Canvas 3B, 2026-09-13): die Frage antwortet NUR ueber diesen
+// Bereich und die Sitzungen des Nutzers. Der Kontext besteht dann aus dem
+// Bereichswissen der Engine und den eigenen Pflichten; der USt-Korpus kommt
+// nur beim Bereich Steuern dazu, sonst wuerde er EPR-Fragen mit
+// Umsatzsteuer-Auszuegen fuellen.
+const DOMAIN_LABEL: Record<string, string> = {
+    'tax-vat': 'Tax & VAT', 'product-packaging': 'EPR & Packaging', 'data-privacy': 'Data & Privacy',
+    'marketing-seo': 'Marketing Compliance', 'corporate-structure': 'Corporate & Structure',
+    'product-compliance': 'Product Compliance', 'logistics-customs': 'Logistics & Customs', 'legal-advisory': 'Legal Advisory',
+};
+function domainPrompt(slug: string): string {
+    return `You are the CompliHub360 compliance assistant for the area "${DOMAIN_LABEL[slug] ?? slug}".
+
+Rules — follow ALL of them:
+1. Answer ONLY from the CONTEXT block: the AREA KNOWLEDGE (the duties this area carries, with statute, penalty and cadence per market), the user's OWN OBLIGATIONS from their saved sessions, and — where present — structured facts and knowledge excerpts. If the context does not cover the question, say so plainly and suggest sending a request to a verified partner via CompliHub360 — never guess and never bring in other areas.
+2. Relate the answer to the user's own obligations and sessions when they are relevant: name the session and the duty, and its status or deadline as given.
+3. Write every answer in YOUR OWN words. Never copy sentences from the context verbatim.
+4. You provide general regulatory information, NOT legal or tax advice. Describe what the rules say; do not issue binding personal instructions.
+5. Reply in the language of the user's question (English, German, Spanish or Turkish).
+6. Be compact: at most ~180 words. Short bullet points for lists. State amounts and deadlines precisely.
+6a. Output PLAIN TEXT only — no Markdown; bullets are lines starting with "- ".
+7. Where the AREA KNOWLEDGE marks an entry as EU-level without a national source, say that the national text is not on file.`;
+}
+
 export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, correlationId: string, ip: string, identity: CallerIdentity): void {
     let raw = '';
     req.on('data', (chunk: Buffer) => { raw += chunk.toString(); if (raw.length > 32_000) req.destroy(); });
@@ -144,7 +169,7 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
                 res.end(JSON.stringify({ errorCode: 'ASSISTANT_QUOTA', message: 'Daily assistant limit reached', correlationId }));
                 return;
             }
-            const d = JSON.parse(raw || '{}') as { message?: unknown; country?: unknown; history?: unknown };
+            const d = JSON.parse(raw || '{}') as { message?: unknown; country?: unknown; history?: unknown; domain?: unknown; session_ids?: unknown };
             const message = typeof d.message === 'string' ? d.message.trim() : '';
             if (message.length < 3 || message.length > 2000) {
                 res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -159,19 +184,41 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
                     .map((m) => ({ role: m.role as string, content: m.content as string }))
                 : [];
 
-            // Retrieval: vector search over the corpus + structured facts.
-            const embedding = await embedQuery(apiKey, country ? `[${country}] ${message}` : message);
-            const chunks = (await supabaseApi.rpc('match_knowledge_chunks', {
-                query_embedding: embedding, match_threshold: 0.4, match_count: 6,
-            })) as Array<{ content: string; metadata: { country?: string; section?: string } | null; similarity: number }>;
+            // Bereichs-Kontext (Bereichsseite): nur fuer angemeldete Nutzer, nur
+            // fuer bekannte Slugs. session_ids grenzen weiter ein.
+            const domain = typeof d.domain === 'string' && DOMAIN_SLUGS.has(d.domain) ? d.domain : null;
+            const sessionIds = Array.isArray(d.session_ids) ? d.session_ids.filter((x): x is string => typeof x === 'string').slice(0, 20) : undefined;
+            const scoped = domain ? await loadDomainSessions(identity.userId ?? '', domain, sessionIds).catch(() => ({ active: [], archived: 0 })) : null;
+            const scopedMarkets = scoped
+                ? [...new Set(scoped.active.flatMap((s) => [s.country, ...s.markets].filter((m): m is string => !!m)))]
+                : [];
+            const vatScope = !domain || domain === 'tax-vat';
 
-            const factsFor = country || (chunks[0]?.metadata?.country ?? null);
+            // Retrieval: vector search over the corpus + structured facts —
+            // der Korpus ist Umsatzsteuer, also nur im USt-Bereich.
+            const chunks = vatScope
+                ? (await supabaseApi.rpc('match_knowledge_chunks', {
+                    query_embedding: await embedQuery(apiKey, country ? `[${country}] ${message}` : message), match_threshold: 0.4, match_count: 6,
+                })) as Array<{ content: string; metadata: { country?: string; section?: string } | null; similarity: number }>
+                : [];
+
+            const factsFor = vatScope ? (country || scopedMarkets[0] || (chunks[0]?.metadata?.country ?? null)) : null;
             const facts = factsFor
                 ? (await supabaseApi.select('jurisdiction_facts', { country_code: factsFor }, { limit: 40 })) as
                     Array<{ fact_key: string; value_text: string; notes: string | null }>
                 : [];
 
             const contextParts: string[] = [];
+            if (domain) {
+                const wissen = domainKnowledge(domain, scopedMarkets);
+                if (wissen.length) contextParts.push(`AREA KNOWLEDGE · ${DOMAIN_LABEL[domain]} (engine entries; EU-level where marked):\n${wissen.join('\n')}`);
+                const eigene = (scoped?.active ?? []).flatMap((s) =>
+                    s.obligations.map((o) =>
+                        `- [session "${s.label || s.id.slice(0, 8)}" · markets ${[s.country, ...s.markets].filter(Boolean).join(', ') || '—'}] ${o.label}: severity ${o.severity}; status ${o.status}${o.due ? `; cadence/due ${o.due}` : ''}${typeof o.dueDays === 'number' ? ` (in ${o.dueDays} days)` : ''}; markets ${o.markets.length ? o.markets.join(', ') : 'EU-wide'}${o.source ? `; source ${o.source}` : ''}`));
+                contextParts.push(eigene.length
+                    ? `OWN OBLIGATIONS (from the user's saved sessions, this area only):\n${eigene.join('\n')}`
+                    : 'OWN OBLIGATIONS: the user has no saved session covering this area yet.');
+            }
             if (facts.length) {
                 contextParts.push(`STRUCTURED FACTS · ${factsFor} (verified ground truth — prefer these for numbers):\n` +
                     facts.map((f) => `- ${f.fact_key}: ${f.value_text}${f.notes ? ` (${f.notes})` : ''}`).join('\n'));
@@ -181,15 +228,17 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
             });
             const userTurn = `CONTEXT:\n${contextParts.join('\n\n') || '(no matching context found)'}\n\nQUESTION:\n${message}`;
 
-            const answer = await generate(apiKey, SYSTEM_PROMPT, history, userTurn);
+            const answer = await generate(apiKey, domain ? domainPrompt(domain) : SYSTEM_PROMPT, history, userTurn);
 
             // Log usage without message content (privacy) — volume + coverage only.
             await supabaseApi.insert('event_log', {
                 type: 'assistant_chat',
-                payload: { country: factsFor, chunks: chunks.length, message_chars: message.length },
+                payload: { country: factsFor, domain, chunks: chunks.length, message_chars: message.length },
             }).catch(() => { /* non-blocking */ });
 
             const sources = [
+                ...(domain ? [{ label: `CompliHub area knowledge · ${DOMAIN_LABEL[domain]}`, kind: 'area', name: DOMAIN_LABEL[domain] }] : []),
+                ...(scoped?.active ?? []).slice(0, 3).map((s) => ({ label: `Your session · ${s.label || s.id.slice(0, 8)}`, kind: 'session', name: s.label || s.id.slice(0, 8) })),
                 ...(facts.length ? [{ label: `CompliHub knowledge base · ${factsFor} facts` }] : []),
                 ...[...new Set(chunks.map((c) => `${c.metadata?.country || '?'} · ${c.metadata?.section || 'General'}`))]
                     .slice(0, 4).map((label) => ({ label })),
