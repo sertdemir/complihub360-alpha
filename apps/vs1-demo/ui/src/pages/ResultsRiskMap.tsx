@@ -14,6 +14,7 @@ import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { SessionSnapshot, type SnapshotRow } from '../components/user/SessionSnapshot';
 import { AnswersDrawer } from '../components/user/AnswersDrawer';
+import { MatchBasis } from '../components/user/PartnerCard';
 import { generateRiskMapPdf } from '../lib/riskMapPdf';
 
 // ─── Results · Risk Map · Figma 1667:215 ────────────────────────────────────
@@ -202,37 +203,6 @@ const PARTNERS_ANON: AnonProvider[] = [
 // Deshalb wird hier NICHTS geschätzt — es wird nur ausgeschrieben, was der
 // Score ohnehin ist. Fehlt match_basis (ältere Payloads), erscheint gar nichts:
 // eine erfundene Begründung wäre schlechter als eine nackte Zahl.
-function MatchBasis({ basis }: { basis: NonNullable<AnonProvider['match_basis']> }) {
-  const { t } = useTranslation('results');
-  const matched = new Set(basis.domains_matched);
-  const KEY: Record<string, string> = {
-    'tax-vat': 'taxVat', 'product-packaging': 'productPackaging', 'data-privacy': 'dataPrivacy',
-    'marketing-seo': 'marketingSeo', 'corporate-structure': 'corporateStructure',
-    'product-compliance': 'productCompliance', 'logistics-customs': 'logisticsCustoms',
-    'legal-advisory': 'legalAdvisory',
-  };
-  const label = (slug: string) => t(`domains.${KEY[slug] ?? slug}`, { defaultValue: slug });
-  const Row = ({ hit, children }: { hit: boolean; children: React.ReactNode }) => (
-    <li className="flex items-baseline gap-2">
-      <span aria-hidden className={hit ? 'text-fg-brand' : 'text-fg-tertiary'}>{hit ? '\u2713' : '\u2013'}</span>
-      <span className={hit ? 'text-fg-secondary' : 'text-fg-tertiary'}>{children}</span>
-    </li>
-  );
-
-  return (
-    <ul className="flex flex-col gap-1.5 text-body-xs">
-      <Row hit={basis.country_covered}>
-        {basis.country_covered
-          ? t('matchBasis.market', { country: basis.country ?? '' })
-          : t('matchBasis.marketMissing')}
-      </Row>
-      {basis.domains_requested.map((slug) => (
-        <Row key={slug} hit={matched.has(slug)}>{label(slug)}</Row>
-      ))}
-    </ul>
-  );
-}
-
 function StatePill({ state, onAnswer }: { state: State; onAnswer: () => void }) {
   const { t } = useTranslation('results');
   if (state.kind === 'confirmed') {

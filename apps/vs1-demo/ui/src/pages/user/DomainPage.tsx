@@ -5,7 +5,6 @@ import { UserShell } from '../../components/user/UserShell';
 import { useWizardDrawer } from '../../components/user/WizardDrawer';
 import { Button } from '../../components/ui/Button';
 import { KpiRing, useEntered } from '../../components/ui/Stats';
-import { RequestQuoteModal, type QuoteProvider } from '../../components/user/RequestQuoteModal';
 import { DomainAssistant } from '../../components/user/DomainAssistant';
 import { DomainKnowledge } from '../../components/user/DomainKnowledge';
 import { DomainProviders } from '../../components/user/DomainProviders';
@@ -34,7 +33,8 @@ import { SLUG_TO_I18N } from './AnfragenTab';
 //       Nutzer-Aenderung 2026-09-13 statt 3B): zweispaltig ab lg, Kopf und
 //       Ringe bleiben ueber beiden Spalten.
 //   4B  Pflichten-Explorer im Arbeitsbereich (DomainKnowledge).
-//   5D  Anbieter als Karten der Ergebnisseite (DomainProviders).
+//   5D  Anbieter als Karten — dieselbe PartnerCard wie die Sitzungsseite, nur
+//       „Details ansehen" (DomainProviders).
 //   6B  Leerzustand ohne Sitzung: Leerkarte mit vorbelegtem Wizard; Wissen,
 //       Frage und Anbieter bleiben — sie brauchen keine Sitzung.
 //
@@ -64,7 +64,6 @@ function DomainView({ slug }: { slug: DomainSlug }) {
   const locale = i18n.resolvedLanguage || 'en';
   const entered = useEntered();
   const [data, setData] = useState<DomainOverview | null>(null);
-  const [quoteFor, setQuoteFor] = useState<(QuoteProvider & { country: string }) | null>(null);
   const askRef = useRef<HTMLTextAreaElement>(null);
   const providersRef = useRef<HTMLElement>(null);
 
@@ -269,13 +268,7 @@ function DomainView({ slug }: { slug: DomainSlug }) {
 
               {/* 5D · Anbieter als Karten */}
               {data && (
-                <DomainProviders
-                  ref={providersRef}
-                  slug={slug}
-                  areaLabel={areaLabel}
-                  country={primaryCountry}
-                  onRequest={(p) => setQuoteFor({ key: p.provider_key, name: p.pseudonym_label, meta: p.region ?? undefined, country: primaryCountry })}
-                />
+                <DomainProviders ref={providersRef} slug={slug} areaLabel={areaLabel} country={primaryCountry} />
               )}
             </div>
 
@@ -294,15 +287,6 @@ function DomainView({ slug }: { slug: DomainSlug }) {
           </div>
         </div>
       </div>
-      {quoteFor && (
-        <RequestQuoteModal
-          provider={quoteFor}
-          country={quoteFor.country}
-          category={slug}
-          domainLabel={domainLabel}
-          onClose={() => setQuoteFor(null)}
-        />
-      )}
     </UserShell>
   );
 }
