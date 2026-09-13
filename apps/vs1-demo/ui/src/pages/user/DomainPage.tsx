@@ -198,8 +198,9 @@ function DomainView({ slug }: { slug: DomainSlug }) {
               {/* 6B · Leerzustand: eine Karte, der Rest der Seite bleibt. */}
               {empty && (
                 <div className="flex items-center gap-7 rounded-xl border border-stroke-subtle bg-surface px-8 py-7 shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]">
-                  <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-brand/[0.08] text-fg-brand">
-                    <Icon size={26} strokeWidth={1.8} aria-hidden />
+                  {/* Icon frei, so gross wie der Kasten vorher (56 px). */}
+                  <span className="shrink-0 text-fg-brand">
+                    <Icon size={56} strokeWidth={1.25} aria-hidden />
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="font-serif text-[18px] font-bold leading-tight text-fg">{t('domainPage.emptyTitle', { area: areaLabel })}</p>
