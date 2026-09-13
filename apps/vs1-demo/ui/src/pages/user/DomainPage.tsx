@@ -125,8 +125,10 @@ function DomainView({ slug }: { slug: DomainSlug }) {
           {/* 1B · Kopf */}
           <div className="flex items-start justify-between gap-6">
             <div className="flex min-w-0 items-start gap-3.5">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand/10 text-fg-brand">
-                <Icon size={20} strokeWidth={2} aria-hidden />
+              {/* Icon frei, ohne Kasten — so gross wie der Kasten vorher (40 px);
+                  duennerer Strich, sonst wirkt es bei dieser Groesse klobig. */}
+              <span className="shrink-0 text-fg-brand">
+                <Icon size={40} strokeWidth={1.5} aria-hidden />
               </span>
               <div className="min-w-0">
                 <h1 className="font-serif text-[23px] font-bold leading-tight text-fg">{title}</h1>
