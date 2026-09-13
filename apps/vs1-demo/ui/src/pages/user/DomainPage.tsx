@@ -22,7 +22,8 @@ import { SLUG_TO_I18N } from './AnfragenTab';
 // die nur ueber diesen Bereich und seine Sitzungen antwortet.
 //   1B  Kopf mit Bereichs-Icon, Titel, Lage-Satz aus den Sitzungen ("7 offene
 //       Pflichten in 2 Sitzungen · 5 mit hohem Risiko · DE · IT · ES · naechste
-//       Frist in 6 Tagen"); rechts "Frage stellen" und "Neue Suche starten";
+//       Frist in 6 Tagen"); rechts nur "Neue Suche starten" (der Assistent
+//       steht als Karte daneben, ein "Frage stellen"-Knopf waere doppelt);
 //       drei Kennzahl-Ringe wie Dashboard und Sitzungen.
 //   2C  MATRIX Pflicht × Markt: Zeilen = offene Pflichten des Bereichs aus
 //       allen Sitzungen, Spalten = Maerkte des Nutzers, in der Zelle ein Punkt
@@ -100,7 +101,6 @@ function DomainView({ slug }: { slug: DomainSlug }) {
     o.status === 'in_progress' ? t('domainPage.inProgress')
     : typeof o.dueDays === 'number' ? t('domainPage.dueInDays', { count: o.dueDays })
     : (o.due || t('domainPage.noDue'));
-  const focusAsk = () => { askRef.current?.focus(); askRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); };
   const scrollProviders = () => providersRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   // Titel: das letzte Wort in Gold, wie "Ihre Compliance-Sitzungen."
@@ -145,10 +145,13 @@ function DomainView({ slug }: { slug: DomainSlug }) {
                 )}
               </div>
             </div>
-            <div className="mt-0.5 flex shrink-0 items-center gap-2.5">
-              <Button variant="secondary" onClick={focusAsk}>{t('domainPage.askButton')}</Button>
-              {!empty && <Button onClick={() => openWizard()}>{t('shared.startNewSearch')}</Button>}
-            </div>
+            {/* Kein "Frage stellen" mehr im Kopf (Nutzer 2026-09-13): der Assistent
+                steht als Karte rechts daneben, der Knopf war doppelt. */}
+            {!empty && (
+              <div className="mt-0.5 flex shrink-0 items-center">
+                <Button onClick={() => openWizard()}>{t('shared.startNewSearch')}</Button>
+              </div>
+            )}
           </div>
 
           {/* Kennzahl-Ringe wie Dashboard und Sitzungen: ohne Karte, Zahl nur im Kreis. */}
