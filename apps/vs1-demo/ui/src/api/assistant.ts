@@ -5,16 +5,26 @@ import { apiFetch } from './client';
 // 503 ASSISTANT_NOT_CONFIGURED until the model key is set server-side.
 
 export type AssistantMessage = { role: 'user' | 'assistant'; content: string };
-export type AssistantSource = { label: string };
+/** `kind`/`name` kommen seit der Bereichsseite mit, damit der Client die
+ *  Quelle in seiner Sprache benennen kann; `label` bleibt der Rueckfall. */
+export type AssistantSource = { label: string; kind?: 'area' | 'session' | string; name?: string };
 export type AssistantReply = { ok: boolean; answer: string; sources: AssistantSource[] };
 
 export function askAssistant(
   message: string,
-  opts: { country?: string; history?: AssistantMessage[] } = {},
+  opts: {
+    country?: string;
+    history?: AssistantMessage[];
+    /** Bereichsseite (Canvas 3B, 2026-09-13): antwortet nur ueber diesen
+     *  Bereich und die Sitzungen des Nutzers; `sessionIds` grenzt weiter ein. */
+    domain?: string;
+    sessionIds?: string[];
+  } = {},
 ): Promise<AssistantReply> {
+  const { sessionIds, ...rest } = opts;
   return apiFetch<AssistantReply>('/api/v1/assistant/chat', {
     method: 'POST',
-    body: JSON.stringify({ message, ...opts }),
+    body: JSON.stringify({ message, ...rest, ...(sessionIds ? { session_ids: sessionIds } : {}) }),
   });
 }
 

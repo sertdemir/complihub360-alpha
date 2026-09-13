@@ -800,6 +800,68 @@ describe('GET /api/v1/dashboard', () => {
 });
 
 
+describe('GET /api/v1/domain/:slug — Bereichs-Querschnitt', () => {
+    // Canvas "Bereichsseite" (2026-09-13): ein Bereich ist der Querschnitt
+    // ueber alle Sitzungen des Nutzers. Der Endpunkt liefert je aktiver
+    // Sitzung die Pflichten DIESES Bereichs, nichts aus anderen Bereichen.
+    const seedSession = (over: Record<string, any> = {}) => {
+        const row = {
+            id: randomUUID(), user_id: USER_ID, country: 'DE', markets: ['FR'],
+            categories: ['tax-vat'], answers: {}, status: 'active',
+            created_at: new Date().toISOString(), label: 'Testlauf', ...over,
+        };
+        (db.sessions ??= []).push(row);
+        return row.id;
+    };
+
+    it('verlangt eine Anmeldung — der Server-Key genuegt nicht', async () => {
+        const r = await api('/api/v1/domain/tax-vat', { auth: 'key' });
+        expect(r.status).toBe(401);
+    });
+
+    it('kennt nur die acht Bereiche', async () => {
+        const r = await api('/api/v1/domain/full-support', { auth: 'jwt' });
+        expect(r.status).toBe(404);
+    });
+
+    it('meldet fuer ein frisches Konto ehrlich nichts', async () => {
+        const r = await api('/api/v1/domain/tax-vat', { auth: 'jwt' });
+        expect(r.status).toBe(200);
+        expect(r.body.sessions).toEqual([]);
+        expect(r.body.open).toBe(0);
+        expect(r.body.archived).toBe(0);
+        expect(r.body.next_due_days).toBeNull();
+    });
+
+    it('liefert nur Pflichten dieses Bereichs, nur aus eigenen aktiven Sitzungen', async () => {
+        seedSession({ categories: ['tax-vat', 'data-privacy'] });
+        seedSession({ user_id: randomUUID() });
+        seedSession({ status: 'archived' });
+        const r = await api('/api/v1/domain/tax-vat', { auth: 'jwt' });
+        expect(r.status).toBe(200);
+        expect(r.body.sessions).toHaveLength(1);
+        expect(r.body.archived).toBe(1);
+        const pflichten = r.body.sessions[0].obligations as Array<{ id: string; status: string; markets: string[] }>;
+        // Steuern liefert die Engine fuer DE immer; Datenschutz darf hier nicht auftauchen.
+        expect(pflichten.length).toBeGreaterThan(0);
+        expect(pflichten.every((o) => o.id.startsWith('tax-'))).toBe(true);
+        expect(pflichten.every((o) => o.status === 'open')).toBe(true);
+        expect(r.body.markets).toEqual(expect.arrayContaining(['DE', 'FR']));
+    });
+
+    it('nimmt erledigte Pflichten aus der Zahl der offenen heraus, behaelt sie aber mit Stand', async () => {
+        const id = seedSession();
+        const vorher = (await api('/api/v1/domain/tax-vat', { auth: 'jwt' })).body;
+        (db.session_obligation_status ??= []).push({
+            session_id: id, obligation_id: 'tax-vat-registration', status: 'done', done_at: '2026-09-01',
+        });
+        const nachher = (await api('/api/v1/domain/tax-vat', { auth: 'jwt' })).body;
+        expect(nachher.open).toBe(vorher.open - 1);
+        const eintrag = nachher.sessions[0].obligations.find((o: { id: string }) => o.id === 'tax-vat-registration');
+        expect(eintrag?.status).toBe('done');
+    });
+});
+
 describe('GET /api/v1/notifications', () => {
     // Bis 2026-08-31 lieferte diese Route `event_log` mit LEEREM Filter: jedes
     // angemeldete Konto bekam alle Zeilen aller Nutzer, samt der Mailadressen

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Drawer } from '../ui/Drawer';
 import { AnimatedWizard } from '../home/AnimatedWizard';
+import type { SearchProfile } from '../wizard/WizardContext';
 
 // ─── Wizard als Schublade ────────────────────────────────────────────────────
 // Nutzer-Vorgabe 2026-09-05: Jeder "Anbieter finden"-Weg im Arbeitsbereich
@@ -14,8 +15,14 @@ import { AnimatedWizard } from '../home/AnimatedWizard';
 // Aktions-Schublade) denselben Wizard oeffnet, und die Schublade nur einmal
 // in der Shell haengt.
 
+/** Vorbelegung: die Bereichsseite (Leerzustand 6B, 2026-09-13) oeffnet den
+ *  Wizard mit ihrem Bereich bereits angehakt. */
+export interface WizardPreset {
+  categories?: string[];
+}
+
 interface WizardDrawerApi {
-  openWizard: () => void;
+  openWizard: (preset?: WizardPreset) => void;
 }
 
 const Ctx = createContext<WizardDrawerApi | null>(null);
@@ -32,10 +39,11 @@ export function useWizardDrawer(): WizardDrawerApi {
 
 export function WizardDrawerProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
+  const [preset, setPreset] = useState<WizardPreset | null>(null);
   const navigate = useNavigate();
   const { t, i18n } = useTranslation('userws');
   const locale = i18n.resolvedLanguage || 'en';
-  const openWizard = useCallback(() => setOpen(true), []);
+  const openWizard = useCallback((p?: WizardPreset) => { setPreset(p ?? null); setOpen(true); }, []);
   const api = useMemo(() => ({ openWizard }), [openWizard]);
 
   return (
@@ -49,6 +57,7 @@ export function WizardDrawerProvider({ children }: { children: ReactNode }) {
             spacious
             interactive
             showHeader={false}
+            initialProfile={preset?.categories?.length ? ({ categories: preset.categories } as unknown as SearchProfile) : undefined}
             onComplete={(profile) => {
               setOpen(false);
               navigate(`/${locale}/results`, { state: { searchProfile: profile } });

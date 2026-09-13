@@ -5,6 +5,7 @@ import { motion, MotionConfig, type Variants } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { UserShell } from './UserShell';
 import { Button } from '../ui/Button';
+import { PartnerCard } from './PartnerCard';
 import { KpiRing, useEntered, EASE } from '../ui/Stats';
 import { duplicateSession } from '../../api/sessions';
 import { fetchObligationStatus, setObligationStatus, type ObligationStatus, type ObligationStatusRow } from '../../api/obligations';
@@ -490,42 +491,14 @@ export function SessionSnapshot({
                     Spalte (Canvas-Wahl 2C); kein Sammellink, keine
                     Zwischenuebersicht (Nutzer-Entscheidung 2026-08-29). */}
                 {providers.map((p, i) => (
-                <div key={p.provider_key} className={CARD + ' flex flex-col p-4'}>
-                  <div className="flex items-center gap-2.5">
-                    <span
-                      className={'grid h-10 w-10 shrink-0 place-items-center rounded-[10px] text-body-xs font-extrabold '
-                        + (i === 0 ? 'bg-accent text-primary-950' : 'bg-brand-light text-fg-brand')}
-                    >
-                      {p.match}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      {i === 0 && (
-                        <span className="inline-flex rounded-full border border-accent/55 px-2 py-[2px] text-[9px] font-extrabold uppercase tracking-[0.06em] text-fg-accent-strong">
-                          ✓ {t('snapshot.verifiedPartner')}
-                        </span>
-                      )}
-                      <p className={(i === 0 ? 'mt-1 ' : '') + 'text-body-xs font-bold leading-snug text-fg'}>{p.pseudonym_label}</p>
-                    </div>
-                  </div>
-                  <p className="mt-2.5 text-[10.5px] text-fg-tertiary">
-                    {[p.region, p.active_since ? t('snapshot.activeSince', { year: p.active_since }) : null].filter(Boolean).join(' · ')}
-                  </p>
-                  <p className="mt-0.5 text-[10.5px] text-fg-tertiary">
-                    {[p.avg_response_hours != null ? t('snapshot.responseTime', { hours: p.avg_response_hours }) : null,
-                      t(`snapshot.billing.${p.billing_model}`)].filter(Boolean).join(' · ')}
-                  </p>
-                  {/* Die Zahl allein waere eine Behauptung — hier steht, woraus
-                      sie besteht (DNA-Addendum V2 P1). */}
-                  {matchBasis && <div className="mt-3 border-t border-stroke-subtle pt-3">{matchBasis(p)}</div>}
-                  {/* Der einzige gefuellte Knopf der Seite: der Weg zum
-                      einzelnen Anbieter. */}
-                  <div className="mt-auto pt-5">
-                    <Button variant="primary" className="w-full" onClick={() => onProviderDetails(p.provider_key)}>
-                      {t('snapshot.providerDetails')}
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                  <PartnerCard
+                    key={p.provider_key}
+                    provider={p}
+                    top={i === 0}
+                    basis={matchBasis?.(p)}
+                    onDetails={() => onProviderDetails(p.provider_key)}
+                  />
+                ))}
               </motion.aside>
             </div>
 

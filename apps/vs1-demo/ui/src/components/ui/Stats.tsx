@@ -87,10 +87,14 @@ export function Donut({ segs, size = 46, stroke = 7, center, centerSize = 12, ce
 
 // ─── Kennzahl-Ring ohne Karte ────────────────────────────────────────────────
 // Dashboard-Canvas 2A nach Nutzer-Vorgabe (2026-09-05), seitdem die EINE
-// Kennzahl-Form aller Arbeitsflaechen (Dashboard, Sitzungen, Sitzungsseite):
-// Text links (Titel, Unterzeile, optionaler Chip), Kreis rechts, doppelt so
-// gross wie die alte Kachel, die Zahl steht NUR im Kreis. Keine Karte — die
-// Zeile liegt direkt auf dem Gradient des Arbeitsbereichs.
+// Kennzahl-Form aller Arbeitsflaechen (Dashboard, Sitzungen, Sitzungsseite,
+// Bereichsseite): Text links (Titel, Unterzeile, optionaler Chip), Kreis
+// rechts daneben, doppelt so gross wie die alte Kachel, die Zahl steht NUR
+// im Kreis. Keine Karte — die Zeile liegt direkt auf dem Gradient.
+// Text und Kreis stehen DICHT beieinander (Nutzer-Vorgabe 2026-09-13): bis
+// dahin schob `justify-between` den Kreis ans Spaltenende, und bei drei
+// Spalten auf 1240 px lag der Text 200 px vom Kreis entfernt — nicht mehr
+// als Paar lesbar.
 export const KPI_RING_SIZE = 96;
 export const KPI_RING_STROKE = 12;
 
@@ -103,8 +107,8 @@ export function KpiRing({ title, sub, chip, value, segs, on }: {
 }) {
   const n = useCountUp(value, on);
   return (
-    <div className="flex flex-1 items-center justify-between gap-4 py-1">
-      <div className="min-w-0 text-left">
+    <div className="flex items-center gap-5 py-1">
+      <div className="min-w-0 max-w-[220px] text-left">
         <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{title}</p>
         <p className="mt-1.5 text-body-2xs leading-snug text-fg-secondary">{sub}</p>
         {chip && (
