@@ -161,7 +161,12 @@
     "bookSub": "Llamada inicial gratuita · 30 min · sin compromiso",
     "bookCta": "Reservar cita",
     "revealNote": "La identidad se muestra tras la reserva.",
-    "penalty": "Sanción: {{value}}"
+    "penalty": "Sanción: {{value}}",
+    "loading": "Cargando proveedor …",
+    "notFoundTitle": "Este proveedor ya no está disponible",
+    "notFoundBody": "El proveedor ya no figura en el directorio o no está activo actualmente. Su búsqueda le muestra otros proveedores adecuados.",
+    "errorTitle": "No se pudo cargar el proveedor",
+    "errorBody": "Inténtelo de nuevo en un momento."
   },
   "schedule": {
     "back": "Volver al perfil",

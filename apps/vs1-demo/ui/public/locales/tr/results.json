@@ -161,7 +161,12 @@
     "bookSub": "Ücretsiz ilk görüşme · 30 dk · bağlayıcı değil",
     "bookCta": "Randevu al",
     "revealNote": "Kimlik rezervasyondan sonra görünür.",
-    "penalty": "Ceza: {{value}}"
+    "penalty": "Ceza: {{value}}",
+    "loading": "Sağlayıcı yükleniyor …",
+    "notFoundTitle": "Bu sağlayıcı artık mevcut değil",
+    "notFoundBody": "Sağlayıcı artık dizinde yer almıyor veya şu anda etkin değil. Aramanız size uygun başka sağlayıcılar gösterir.",
+    "errorTitle": "Sağlayıcı yüklenemedi",
+    "errorBody": "Lütfen birazdan tekrar deneyin."
   },
   "schedule": {
     "back": "Profile dön",

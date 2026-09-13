@@ -161,7 +161,12 @@
     "bookSub": "Free intro call · 30 min · non-binding",
     "bookCta": "Book appointment",
     "revealNote": "Identity becomes visible after booking.",
-    "penalty": "Penalty: {{value}}"
+    "penalty": "Penalty: {{value}}",
+    "loading": "Loading provider …",
+    "notFoundTitle": "This provider is no longer available",
+    "notFoundBody": "The provider is no longer listed or is currently not active. Your search shows further matching providers.",
+    "errorTitle": "Provider could not be loaded",
+    "errorBody": "Please try again in a moment."
   },
   "schedule": {
     "back": "Back to profile",

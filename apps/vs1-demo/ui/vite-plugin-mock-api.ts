@@ -141,6 +141,47 @@ const PROVIDERS = [
   { provider_key: 'madrid-tax', pseudonym_label: 'Verifizierter Tax-Spezialist · Spanien', region: 'Spanien', active_since: 2020, specializations: ['Iberian VAT', 'Marketplace'], languages: ['ES', 'EN'], rating: 4.5, completed_count: 41, avg_response_hours: 8, billing_model: 'hourly', is_verified: true, match: 73, match_tier: 'moderate', match_basis: BASIS(['tax-vat']) },
 ];
 
+// Stufe-2-Detail je Anbieter (Spec §4.6): dieselben anonymen Felder wie die
+// Karte plus Abdeckung und volle Preistabelle. Unbekannter Schluessel → 404,
+// damit die Seite ihren Nicht-gefunden-Zustand zeigt statt eines fremden
+// Anbieters (Befund 2026-09-13: „Details ansehen" endete auf weisser Seite).
+const PROVIDER_DETAIL: Record<string, { countries_supported: string[]; pricing_table: Array<{ service: string; price: string }> | null }> = {
+  'studio-bianchi': { countries_supported: ['IT', 'DE', 'AT'], pricing_table: [
+    { service: 'USt-Erstregistrierung Italien (Partita IVA)', price: 'ab 450 € · einmalig' },
+    { service: 'Laufende OSS-Betreuung', price: '180 € / Quartal' },
+    { service: 'Fachberatung (Stundensatz)', price: '140 € / Std.' },
+    { service: 'Komplettpaket E-Commerce-Setup', price: 'auf Anfrage' },
+  ] },
+  'schmidt-partner': { countries_supported: ['DE', 'NL', 'AT', 'FR'], pricing_table: [
+    { service: 'OSS/IOSS-Registrierung', price: 'im Abo enthalten' },
+    { service: 'Compliance-Abo (bis 3 Märkte)', price: '290 € / Monat' },
+    { service: 'Jeder weitere Markt', price: '60 € / Monat' },
+  ] },
+  'madrid-tax': { countries_supported: ['ES', 'PT'], pricing_table: null },
+};
+function providerDetail(key: string) {
+  const p = PROVIDERS.find((x) => x.provider_key === key);
+  const d = PROVIDER_DETAIL[key];
+  if (!p || !d) return { __status: 404, errorCode: 'NOT_FOUND', message: 'Provider not found' };
+  const { match, match_tier, match_basis, ...anon } = p;
+  void match; void match_tier; void match_basis;
+  return { ok: true, detail: { ...anon, ...d, availability: 'available' }, detail_open_charged: false };
+}
+function providerSlots() {
+  const out: string[] = [];
+  const d = new Date(); d.setHours(0, 0, 0, 0);
+  let days = 0;
+  while (days < 5) {
+    d.setDate(d.getDate() + 1);
+    if (d.getDay() === 0 || d.getDay() === 6) continue;
+    days++;
+    for (const [h, m] of [[9, 0], [10, 0], [11, 0], [14, 0], [15, 30]] as const) {
+      const t = new Date(d); t.setHours(h, m, 0, 0); out.push(t.toISOString());
+    }
+  }
+  return { ok: true, slots: out };
+}
+
 function dashboard() {
   const aktive = SESSIONS.filter((s) => s.status === 'active');
   return {
@@ -225,6 +266,8 @@ function route(method: string, path: string, body: Record<string, unknown> = {})
     if (p[0] === 'sessions') return { ok: true, sessions: SESSIONS.map(({ open, total, severity, ...s }) => s) };
     if (p[0] === 'session' && p[2] === 'obligations') return obligations(p[1]);
     if (p[0] === 'engagement' && p.length === 2) return engagement(p[1]);
+    if (p[0] === 'provider' && p[2] === 'detail') return providerDetail(p[1]);
+    if (p[0] === 'provider' && p[2] === 'slots') return providerSlots();
     if (p[0] === 'metrics') return { ok: true, sla: { confirm_rate: 0.86, avg_reply_hours: 5.2 } };
     return { ok: true, items: [], providers: [], laws: [], documents: [], exports: [] };
   }
@@ -256,9 +299,11 @@ export function mockApiPlugin(): Plugin {
         const body = route(req.method ?? 'GET', url.pathname, parsed);
         res.setHeader('content-type', 'application/json');
         res.setHeader('x-mock-api', '1');
-        res.statusCode = 200;
+        // Eine Antwort darf ihren Status mitbringen (404 fuer unbekannte Anbieter).
+        const { __status, ...payload } = (body ?? {}) as { __status?: number } & Record<string, unknown>;
+        res.statusCode = __status ?? 200;
         // Kurze Latenz, damit Lade- und Leerzustaende nicht flackern.
-        setTimeout(() => res.end(JSON.stringify(body)), 120);
+        setTimeout(() => res.end(JSON.stringify(payload)), 120);
         });
       });
     },

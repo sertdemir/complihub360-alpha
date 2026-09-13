@@ -161,7 +161,12 @@
     "bookSub": "Kostenloses Erstgespräch · 30 Min · unverbindlich",
     "bookCta": "Termin buchen",
     "revealNote": "Identität wird nach der Buchung sichtbar.",
-    "penalty": "Bußgeld: {{value}}"
+    "penalty": "Bußgeld: {{value}}",
+    "loading": "Anbieter wird geladen …",
+    "notFoundTitle": "Dieser Anbieter ist nicht mehr verfügbar",
+    "notFoundBody": "Der Anbieter ist nicht mehr im Verzeichnis oder derzeit nicht freigeschaltet. Ihre Suche zeigt Ihnen weitere passende Anbieter.",
+    "errorTitle": "Anbieter konnte nicht geladen werden",
+    "errorBody": "Bitte versuchen Sie es in einem Moment erneut."
   },
   "schedule": {
     "back": "Zurück zum Profil",
