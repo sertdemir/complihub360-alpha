@@ -756,6 +756,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         pricing_table: p.pricing_table ?? null, // stage-2 reveal: full pricing
                         is_verified: true,
                         availability: p.availability || 'available',
+                        // Dossier (Partnerseite 3B): was der Anbieter tut und was er
+                        // vorweisen kann. NULL heisst hier "nichts hinterlegt" — die
+                        // Karte bleibt dann leer, statt etwas zu behaupten.
+                        confirmation_rate: p.confirmation_rate != null ? Number(p.confirmation_rate) : null,
+                        services: p.services ?? null,
+                        credentials: p.credentials ?? null,
+                        excluded_services: p.excluded_services ?? null,
+                        work_mode: p.work_mode ?? null,
                     },
                     detail_open_charged: charged,
                     correlationId,
@@ -795,6 +803,47 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             structuredLog('error', 'Slots fetch failed', { correlationId, errorCode: 'ERR_SLOTS', severity: 'error', route: req.url });
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Slots fetch failed', correlationId }));
+        }
+    } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/reviews$/.test(req.url || '')) {
+        // Bewertungen eines Anbieters fuer die Partnerseite (Canvas 5B).
+        //
+        // Nur Bewertungen, die an einer echten Buchung haengen: `from_role='user'`
+        // UND `verified` UND eine `booking_id`. Eine Bewertung ohne Buchung ist
+        // eine Behauptung — die Seite zeigt sie nicht, auch wenn sie in der
+        // Tabelle steht. Damit ist "verifiziert nach Buchung" unter jedem Zitat
+        // keine Marke, sondern die Bedingung, unter der es hier ueberhaupt steht.
+        //
+        // Ausgegeben wird, was niemanden identifiziert: Note, Text, Kategorien,
+        // Monat. Die Tabelle fuehrt keine user_id, der Mandant bleibt anonym.
+        const providerKey = (req.url || '').split('/')[4];
+        res.setHeader('x-correlation-id', correlationId);
+        if (!authUserId && !authViaApiKey) {
+            res.writeHead(401, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'UNAUTHORIZED', message: 'Login required', correlationId }));
+        } else {
+            try {
+                const rows = (await supabaseApi.select('reviews', { provider_key: providerKey, from_role: 'user' }, { order: 'created_at.desc', limit: 500 })) as any[];
+                const usable = rows.filter((r: any) => r.verified !== false && r.booking_id && r.rating != null);
+                const average = usable.length
+                    ? Math.round((usable.reduce((sum: number, r: any) => sum + Number(r.rating), 0) / usable.length) * 10) / 10
+                    : null;
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    ok: true,
+                    reviews: usable.slice(0, 50).map((r: any) => ({
+                        rating: Number(r.rating),
+                        body: typeof r.body === 'string' && r.body.trim() ? r.body : null,
+                        categories: r.categories || [],
+                        created_at: r.created_at,
+                    })),
+                    summary: { count: usable.length, average },
+                    correlationId,
+                }));
+            } catch (err) {
+                structuredLog('error', 'Provider reviews failed', { correlationId, errorCode: 'ERR_REVIEWS', severity: 'error', route: req.url });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Provider reviews failed', correlationId }));
+            }
         }
     } else if (req.method === 'GET' && req.url === '/api/v1/bookings') {
         // Matchmaking v2: the user's bookings ("Termine"). Identity is revealed
@@ -1190,6 +1239,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     pseudonym_label: d.pseudonym_label ?? null,
                     region: d.region ?? null,
                     active_since: Number.isInteger(d.active_since) ? d.active_since : null,
+                    // Dossier fuer die Partnerseite: bisher zaehlte der Intake die
+                    // Nachweise nur fuer das Event-Log und warf sie dann weg. Jetzt
+                    // werden sie gespeichert — sonst bleibt die Karte "Qualifikation"
+                    // auf der Partnerseite fuer immer leer.
+                    services: Array.isArray(d.services) ? d.services : null,
+                    credentials: Array.isArray(d.certifications) ? d.certifications : null,
+                    excluded_services: Array.isArray(d.excluded_services) ? d.excluded_services : null,
+                    work_mode: typeof d.work_mode === 'string' ? d.work_mode.slice(0, 120) : null,
                 });
                 await supabaseApi.insert('event_log', { type: 'provider_intake_submitted', payload: { providerKey, certifications: Array.isArray(d.certifications) ? d.certifications.length : 0, vatIdStatus: vat?.status ?? null } });
                 res.writeHead(201, { 'Content-Type': 'application/json' });

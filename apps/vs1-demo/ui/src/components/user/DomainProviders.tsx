@@ -1,8 +1,9 @@
 import { forwardRef, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { PartnerCard, MatchBasis } from './PartnerCard';
+import { PartnerDrawer } from './PartnerDrawer';
 import { runSearch, type AnonProvider } from '../../api/search';
+import { fetchUserBookings } from '../../api/bookings';
 import type { SearchProfile } from '../wizard/WizardContext';
 
 // ─── Anbieter fuer den Bereich (Canvas 5D, 2026-09-13) ───────────────────────
@@ -10,7 +11,39 @@ import type { SearchProfile } from '../wizard/WizardContext';
 // Vorgabe 2026-09-13: eine Darstellung, nur „Details ansehen"), hier nach
 // Bereich statt nach Sitzung gesucht: POST /search mit dem Bereich als
 // einziger Domaene und dem Hauptmarkt des Nutzers. Die Match-Basis zeigt
-// dann Markt und diesen einen Bereich. In der linken Spalte zwei je Reihe.
+// dann Markt und diesen einen Bereich.
+//
+// „Details ansehen" oeffnet die PARTNER-SCHUBLADE (Canvas 1C, Nutzer-
+// Entscheidung 2026-09-15), nicht mehr die eigene Partnerseite: der Nutzer
+// bleibt auf der Bereichsseite, die Liste bleibt sichtbar, Vergleichen heisst
+// naechste Karte, naechste Schublade. Die Buchung passiert in derselben
+// Schublade (Schritt zwei), der Bereich bleibt die ganze Zeit stehen. Die
+// volle Seite wird erst wieder verlinkt, wenn es eine Partner-Uebersichts-
+// seite und einen Navigationspunkt „Partner" gibt.
+//
+// Die Karten kennen die Termine des Nutzers (GET /bookings): wo einer liegt,
+// traegt die Karte den KLARNAMEN und den Termin statt des Pseudonyms — beim
+// Laden wie unmittelbar nach einer Buchung in der Schublade (Nutzer
+// 2026-09-15). Drei Karten nebeneinander, ohne Umbruch.
+
+/** Termin je Anbieter — nur bestaetigte und abgeschlossene zaehlen; eine
+ *  abgesagte Buchung nimmt den Klarnamen nicht zurueck, aber sie ist kein
+ *  Termin mehr und soll auf der Karte nicht als einer stehen. */
+export type BookingByKey = Record<string, { name: string; slotStart: string }>;
+
+export async function loadBookingsByKey(): Promise<BookingByKey> {
+  const rows = await fetchUserBookings();
+  const out: BookingByKey = {};
+  for (const b of rows) {
+    if (b.status !== 'confirmed' && b.status !== 'completed') continue;
+    const prev = out[b.providerKey];
+    // Der naechstliegende Termin gewinnt die Karte.
+    if (!prev || new Date(b.slotStart) < new Date(prev.slotStart)) {
+      out[b.providerKey] = { name: b.providerName, slotStart: b.slotStart };
+    }
+  }
+  return out;
+}
 
 export const DomainProviders = forwardRef<HTMLElement, {
   slug: string;
@@ -18,10 +51,10 @@ export const DomainProviders = forwardRef<HTMLElement, {
   /** Hauptmarkt des Nutzers in diesem Bereich; ohne Sitzung DE. */
   country: string;
 }>(function DomainProviders({ slug, areaLabel, country }, ref) {
-  const { t, i18n } = useTranslation('userws');
-  const navigate = useNavigate();
-  const locale = i18n.resolvedLanguage || 'en';
+  const { t } = useTranslation('userws');
   const [providers, setProviders] = useState<AnonProvider[] | null>(null);
+  const [open, setOpen] = useState<AnonProvider | null>(null);
+  const [booked, setBooked] = useState<BookingByKey>({});
 
   useEffect(() => {
     let alive = true;
@@ -31,6 +64,15 @@ export const DomainProviders = forwardRef<HTMLElement, {
       .catch(() => { if (alive) setProviders([]); });
     return () => { alive = false; };
   }, [slug, country]);
+
+  useEffect(() => {
+    let alive = true;
+    loadBookingsByKey()
+      // Ohne Termine bleibt es beim Pseudonym — kein Fehler, nur nichts zu zeigen.
+      .then((b) => { if (alive) setBooked(b); })
+      .catch(() => { if (alive) setBooked({}); });
+    return () => { alive = false; };
+  }, []);
 
   return (
     <section ref={ref} className="mt-8">
@@ -45,18 +87,30 @@ export const DomainProviders = forwardRef<HTMLElement, {
       ) : providers.length === 0 ? (
         <p className="text-body-xs text-fg-tertiary">{t('domainPage.providersNone')}</p>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
+        // Drei nebeneinander, ohne Umbruch (Nutzer 2026-09-15). Unter 768 px
+        // passen drei Karten in kein Raster mehr, in das ein Klarname hinein-
+        // geht — dort steht eine unter der anderen.
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {providers.map((p, i) => (
             <PartnerCard
               key={p.provider_key}
               provider={p}
               top={i === 0}
               basis={p.match_basis ? <MatchBasis basis={p.match_basis} /> : undefined}
-              onDetails={() => navigate(`/${locale}/provider/${p.provider_key}`)}
+              booking={booked[p.provider_key] ?? null}
+              onDetails={() => setOpen(p)}
             />
           ))}
         </div>
       )}
+      <PartnerDrawer
+        open={open !== null}
+        onClose={() => setOpen(null)}
+        provider={open}
+        basisNode={open?.match_basis ? <MatchBasis basis={open.match_basis} /> : undefined}
+        booking={open ? booked[open.provider_key] ?? null : null}
+        onBooked={(key, b) => setBooked((prev) => ({ ...prev, [key]: b }))}
+      />
     </section>
   );
 });

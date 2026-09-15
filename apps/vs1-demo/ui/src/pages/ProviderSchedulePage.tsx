@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, Eye } from 'lucide-react';
 import { Logo } from '../components/ui/Logo';
@@ -30,13 +30,17 @@ function fixtureSlots(): string[] {
 
 export function ProviderSchedulePage() {
   const { key = '' } = useParams();
+  const [params] = useSearchParams();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation('results');
   const locale = i18n.resolvedLanguage || 'en';
   const { data: slots } = useApiData<string[]>(() => fetchSlots(key), fixtureSlots());
-  const [selected, setSelected] = useState<string | null>(null);
+  // `?slot=` kommt von einem Termin-Chip: wer dort einen Termin angetippt hat,
+  // soll ihn hier nicht noch einmal suchen muessen.
+  const [selected, setSelected] = useState<string | null>(params.get('slot'));
   const [message, setMessage] = useState('');
   const [state, setState] = useState<'idle' | 'sending' | 'done'>('idle');
+  const [failed, setFailed] = useState(false);
   const [confirmation, setConfirmation] = useState<BookingConfirmation | null>(null);
 
   const df = useMemo(() => new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short' }), [locale]);
@@ -53,17 +57,19 @@ export function ProviderSchedulePage() {
   const book = async () => {
     if (!selected) return;
     setState('sending');
+    setFailed(false);
     try {
-      const res = await createBooking(key, selected, message.trim() || undefined);
-      setConfirmation(res);
+      setConfirmation(await createBooking(key, selected, message.trim() || undefined));
+      setState('done');
     } catch {
-      // fixture mode: simulate the reveal so the funnel stays demo-able
-      setConfirmation({
-        booking: { id: 'demo', provider_key: key, slot_start: selected, slot_end: selected, status: 'confirmed' },
-        provider_identity: { name: 'Studio Bianchi SRL — Steuerkanzlei, Mailand', website_url: null, contact_email: 'kontakt@studiobianchi.example' },
-      });
+      // Frueher stand hier eine Fixture-Identitaet („Studio Bianchi SRL") fuer
+      // JEDEN Schluessel, damit der Trichter vorfuehrbar bleibt. Das ist eine
+      // Bestaetigung fuer einen Termin, den es nicht gibt, mit dem Namen eines
+      // Anbieters, der nichts davon weiss. Ein Fehler sagt jetzt, dass nicht
+      // gebucht wurde.
+      setFailed(true);
+      setState('idle');
     }
-    setState('done');
   };
 
   if (state === 'done' && confirmation) {
@@ -162,6 +168,9 @@ export function ProviderSchedulePage() {
             >
               {t('schedule.confirmCta')}
             </Button>
+            {failed && (
+              <p className="text-body-3xs leading-relaxed text-[#8A3B3B] dark:text-[#F1A88C]">{t('schedule.failed')}</p>
+            )}
             <p className="text-center text-body-3xs text-fg-tertiary">{t('schedule.freeNote')}</p>
           </aside>
         </div>

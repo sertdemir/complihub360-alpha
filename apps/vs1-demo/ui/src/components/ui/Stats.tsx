@@ -98,17 +98,27 @@ export function Donut({ segs, size = 46, stroke = 7, center, centerSize = 12, ce
 export const KPI_RING_SIZE = 96;
 export const KPI_RING_STROKE = 12;
 
-export function KpiRing({ title, sub, chip, value, segs, on }: {
+export function KpiRing({ title, sub, chip, value, segs, on, format }: {
   title: string; sub: string; chip?: string;
   /** Die Zahl im Kreis — zaehlt beim Eintritt hoch. */
   value: number;
   segs: { frac: number; cls: string }[];
   on: boolean;
+  /** Wie die hochgezaehlte Zahl im Ring erscheint. Ohne das kann der Ring nur
+   *  ganze Zahlen zeigen (useCountUp rundet) — eine Bewertung von 4,7 oder
+   *  eine Quote mit Prozentzeichen braucht deshalb eine eigene Schreibweise.
+   *  Der gezaehlte Wert bleibt die ganze Zahl (47 bzw. 92), nur die Anzeige
+   *  formt sie um. */
+  format?: (n: number) => string;
 }) {
   const n = useCountUp(value, on);
   return (
     <div className="flex items-center gap-5 py-1">
-      <div className="min-w-0 max-w-[220px] text-left">
+      {/* Der Textblock nimmt den Rest der Spalte, damit der Ring am SPALTENENDE
+          sitzt und nicht am Textende (Befund 2026-09-15: bei kurzem Untertitel
+          klebte der Ring am Text, drei Ringe einer Zeile standen auf drei
+          verschiedenen Hoehenlinien). */}
+      <div className="min-w-0 max-w-[220px] flex-1 text-left">
         <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{title}</p>
         <p className="mt-1.5 text-body-2xs leading-snug text-fg-secondary">{sub}</p>
         {chip && (
@@ -116,7 +126,7 @@ export function KpiRing({ title, sub, chip, value, segs, on }: {
         )}
       </div>
       <div className="shrink-0 font-serif">
-        <Donut on={on} size={KPI_RING_SIZE} stroke={KPI_RING_STROKE} segs={segs} center={String(n)} centerSize={30} />
+        <Donut on={on} size={KPI_RING_SIZE} stroke={KPI_RING_STROKE} segs={segs} center={format ? format(n) : String(n)} centerSize={30} />
       </div>
     </div>
   );
