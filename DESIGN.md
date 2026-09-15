@@ -524,7 +524,7 @@ Inner container:
   Height: always consistent (enforce h-10 on actions area)
 
 Logo:
-  Left: <Logo lockup="default" tone="light" /> — Bildmarke + Wortmarke
+  Left: <Logo lockup="horizontal" tone="on-light" /> — Bildmarke + Wortmarke
   Höhe: h-7 … h-9 (die Breite folgt über w-auto)
   Die Wortmarke ist Vektor, kein Text — Schriftgrößen sind hier gegenstandslos.
 

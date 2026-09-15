@@ -41,7 +41,7 @@ function Dashboard({ dark }: { dark?: boolean }) {
       <AppShell
         sidebar={
           <Sidebar
-            logo={<Logo lockup="default" tone={dark ? 'dark' : 'light'} className="h-8" />}
+            logo={<Logo lockup="horizontal" tone={dark ? 'on-petrol' : 'on-light'} className="h-8" />}
             footer={
               <div className="flex items-center gap-3">
                 <Avatar size="sm" initials="AW" />
@@ -113,7 +113,7 @@ export const MobileChromeDark: Story = {
   render: () => (
     <div className="dark mx-auto w-[390px] overflow-hidden rounded-xl bg-[#1F2937]">
       <MobileTopbar
-        logo={<LogoMark tone="dark" className="h-[22px] w-auto" />}
+        logo={<LogoMark tone="on-petrol" className="h-[22px] w-auto" />}
         contextLabel="Partner"
         actions={
           <>

@@ -175,7 +175,7 @@ Legend: ✅ exact · ⚠️ partial (gaps listed) · ❌ missing in code.
 | **Table Mobile Card** | `804:504` | State (Default·Selected) = 2 | — | ❌ missing | Mobile stacked-card strategy (label/value pairs per row) not implemented. Code Table relies on `overflow-x-auto` horizontal scroll on mobile — contradicts the Compass doctrine ("Mobile gibt es nicht als Tabelle"). |
 | **Mobile Sort Bar** | `805:508` | Active (Name·Risk·Owner·Due) = 4 | — | ❌ missing | No mobile sort-bar control. |
 | **Stat** | `1112:2` | Size (SM·MD·LG) × Trend (Up·Down·Neutral) = 9 | `Stat.tsx` | ⚠️ partial | Size SM/MD/LG ✅; Trend up/down/neutral ✅. **Doctrine drift**: trend uses green/red (`success-700` / `error-700`) — fine for a neutral KPI, but note Stat is explicitly NOT risk; acceptable. Eyebrow+value+trend anatomy matches. Minor: value sizes are code-author chosen, not token-locked. |
-| **Logo** | `712:266` | Lockup (bildmarke·wortmarke·default) × light/dark = 6 | `Logo.tsx` | ✅ exact | Alle 3 Lockups × beide Tones. Geometrie aus dem Node exportiert und optimiert (siehe `logo-paths.ts`); Wortmarke und Claim sind Vektor, kein Text. |
+| **Logo** | `2101:1151` | Lockup (Horizontal·Stacked·Symbol·Wortmarke) × Color (On Light·On Petrol·Mono White·Mono Black) = 16 | `Logo.tsx` | ✅ exact | Alle 4 Lockups × alle 4 Tones. Geometrie aus dem Node exportiert und optimiert (siehe `logo-paths.ts`); Wortmarke und Claim sind Vektor, kein Text. Das alte Set `712:266` ist gelöscht. |
 
 ## Summary by verdict
 
@@ -218,7 +218,7 @@ Table                          → 801:648
 Table Mobile Card              → 804:504
 Mobile Sort Bar                → 805:508
 Stat                           → 1112:2
-Logo                           → 712:266
+Logo                           → 2101:1151
 ```
 
 ### Page node-ids (audited)

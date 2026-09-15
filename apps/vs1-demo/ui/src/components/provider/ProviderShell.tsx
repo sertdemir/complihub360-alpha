@@ -115,7 +115,7 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
       <Sidebar
         logo={
           <NavLink to={base} className="flex items-center gap-2">
-            <LogoMark tone="light" className="h-[22px] w-auto" />
+            <LogoMark tone="on-light" className="h-[22px] w-auto" />
             <span className="text-[15px] font-semibold text-fg">CompliHub360</span>
             {/* accent-STRONG: at 9px this needs 4.5:1, and gold-500 measures 2.10 on the
                 light sidebar. See --color-text-accent-strong in index.css. */}

@@ -35,7 +35,7 @@ export function ResetPasswordPage() {
     return (
         <div className="flex min-h-screen flex-col bg-[#0b1620] text-white">
             <div className="px-6 pt-8 lg:px-16 lg:py-12">
-                <Logo lockup="default" tone="dark" href="/" className="h-9" />
+                <Logo lockup="horizontal" tone="on-petrol" href="/" className="h-9" />
             </div>
             <div className="flex flex-1 flex-col items-center justify-center px-6 pb-16">
                 <div className="w-full max-w-[400px]">

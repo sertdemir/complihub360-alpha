@@ -311,17 +311,28 @@ reconciliation — it must become `risk/*` petrol on the Hero redo (Phase D). No
 Globus im Kreisbogen + goldener Schwung, daneben **"CompliHub"** (Ink) **"360"** (Gold) und der
 Claim **"Always on your side"** zwischen zwei Linien.
 
-Das Component-Set führt sechs Varianten über **eine** Property:
+Das Component-Set (Figma `2101:1151`) führt **zwei** Properties, 16 Varianten:
 
-| Lockup | Aufbau | Maße |
+| `Lockup` | Aufbau | Maße |
 | --- | --- | --- |
-| `default` | Bildmarke + Wortmarke | 144.594 × 40.018 |
-| `bildmarke` | nur das Symbol | 40.594 × 40.018 |
-| `wortmarke` | nur der Schriftzug | 101 × 20.701 |
+| `Horizontal` | Bildmarke + Wortmarke nebeneinander | 144.594 × 40.018 |
+| `Stacked` | Bildmarke über Wortmarke | 101 × 68.719 |
+| `Symbol` | nur die Bildmarke | 40.594 × 40.018 |
+| `Wortmarke` | nur der Schriftzug | 101 × 20.701 |
 
-dazu `tone`: `light` für helle Gründe, `dark` für dunkle. Nur die Ink-Seite kippt,
-Gold bleibt konstant — `ink` `#012E27` → `#FFFFFF`, `ring` `#0D3B33` → `#FFFFFF`,
-`gold` `#C5913B`.
+| `Color` | Wofür |
+| --- | --- |
+| `On Light` | helle Gründe — Petrol-Ink, Gold-Akzent |
+| `On Petrol` | dunkle Marken-Gründe — weiße Ink, Gold bleibt |
+| `Mono White` | Fotos, unruhige Gründe — alles Weiß |
+| `Mono Black` | Print, einfarbige Kontexte — alles `#0F172A` |
+
+Bei den beiden Marken-Tones kippt nur die Ink-Seite, Gold bleibt konstant
+(`ink` `#012E27` → `#FFFFFF`, `ring` `#0D3B33` → `#FFFFFF`, `gold` `#C5913B`);
+die Mono-Tones ziehen alles auf eine Farbe, inklusive des Schwungs.
+
+Im Code heißt die Color-Property `tone` — das ist die Hauskonvention des
+Code-DS (Badge, Alert, Stat). Die Werte sind die aus Figma.
 
 Immer die echte DS-Instanz verwenden, nie einen Platzhalter. Der frühere
 `CircleDot`-Platzhalter im `GlobalNav` ist abgelöst.

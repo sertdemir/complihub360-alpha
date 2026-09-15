@@ -32,7 +32,7 @@ const Demo = () => (
   <WizardSurface
     steps={STEPS}
     current={1}
-    logo={<Logo lockup="default" tone="dark" />}
+    logo={<Logo lockup="horizontal" tone="on-petrol" />}
     wizardEyebrow="MATCHING WIZARD"
     wizardTitle="Cross-border compliance setup"
     onClose={() => {}}

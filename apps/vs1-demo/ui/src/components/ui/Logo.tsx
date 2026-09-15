@@ -3,154 +3,189 @@ import {
   MARK_ARC,
   MARK_ARC_LOWER,
   MARK_SWOOSH,
-  GLOBE as GLOBE_D,
+  GLOBE,
   WORDMARK_INK,
   WORDMARK_GOLD,
   CLAIM,
 } from './logo-paths';
 
 // ─── Logo ─────────────────────────────────────────────────────────────────────
-// Compass-Komponente "Logo" (Figma-Node 712:266). Das Component-Set führt sechs
-// Varianten über eine einzige Property: Lockup = bildmarke | wortmarke | default,
-// jeweils light und dark. Diese API bildet das 1:1 ab — Figma ist die Quelle.
+// Compass-Komponente "Logo" (Figma-Node 2101:1151). Das Component-Set führt zwei
+// Properties, diese API bildet sie 1:1 ab — Figma ist die Quelle:
 //
-// Bildmarke: Kreisbogen + unterer Bogen (Ring-Farbe), Globus (Ink-Farbe) und der
-// goldene Schwung darüber. Wortmarke: "CompliHub" in Ink, "360" in Gold, darunter
-// der Claim zwischen zwei Linien.
+//   Lockup : Horizontal · Stacked · Symbol · Wortmarke
+//   Color  : On Light · On Petrol · Mono White · Mono Black
 //
-// Farblogik — nur die Ink-Seite kippt, Gold bleibt in beiden Tones konstant:
-//   ink    #012E27 → #FFFFFF   Globus · "CompliHub"
-//   ring   #0D3B33 → #FFFFFF   die beiden Bögen
-//   gold   #C5913B             "360" · Claim · Linien
+// Der Prop heißt hier `tone`, nicht `color`: `tone` ist die Hauskonvention des
+// Code-Design-Systems (Badge, Alert, Stat verwenden sie ebenso). Die WERTE sind
+// die aus Figma, damit Design und Code dieselbe Sprache sprechen.
 //
-// Der goldene Schwung trägt in Figma einen WebGPU-Shader ("Water caustic",
-// #B07E36 → #C6923B). Ein Shader-Runtime für ein Logo, das auf jeder Seite im
-// Header steht, wäre nicht vertretbar — die Anmutung trägt hier ein linearer
-// Gradient zwischen denselben beiden Goldtönen. Bei den real verwendeten Größen
-// (22–40 px) ist der Unterschied nicht auflösbar.
+// Farblogik — bei den beiden Marken-Tones kippt nur die Ink-Seite, Gold bleibt;
+// die Mono-Tones ziehen alles auf eine Farbe, inklusive des Schwungs:
+//   on-light    ring #0D3B33 · ink #012E27 · gold #C5913B
+//   on-petrol   ring #FFFFFF · ink #FFFFFF · gold #C5913B
+//   mono-white  alles #FFFFFF
+//   mono-black  alles #0F172A
+//
+// Der Schwung trägt in Figma einen WebGPU-Shader ("Water caustic"). Eine
+// Shader-Runtime für ein Logo im Header wäre nicht vertretbar — bei den beiden
+// Marken-Tones trägt ein Gradient zwischen denselben Goldtönen, bei Mono eine
+// Vollfläche. Bei 22–40 px ist der Unterschied nicht auflösbar.
 //
 // Die Geometrie liegt in logo-paths.ts; dort steht auch, wie sie gegenüber dem
 // Figma-Original optimiert wurde.
 
-export type LogoTone = 'light' | 'dark';
-export type LogoLockup = 'default' | 'bildmarke' | 'wortmarke';
+export type LogoTone = 'on-light' | 'on-petrol' | 'mono-white' | 'mono-black';
+export type LogoLockup = 'horizontal' | 'stacked' | 'symbol' | 'wortmarke';
 
-const INK: Record<LogoTone, string> = { light: '#012E27', dark: '#FFFFFF' };
-const RING: Record<LogoTone, string> = { light: '#0D3B33', dark: '#FFFFFF' };
-const GOLD = '#C5913B';
+interface Palette {
+  ring: string;
+  ink: string;
+  gold: string;
+  /** null = Gradient zwischen #C6923B und #B07E36, sonst Vollfläche. */
+  swoosh: string | null;
+}
 
-/** Geometrie der Bildmarke, wie sie in Figma sitzt. */
+const TONE: Record<LogoTone, Palette> = {
+  'on-light': { ring: '#0D3B33', ink: '#012E27', gold: '#C5913B', swoosh: null },
+  'on-petrol': { ring: '#FFFFFF', ink: '#FFFFFF', gold: '#C5913B', swoosh: null },
+  'mono-white': { ring: '#FFFFFF', ink: '#FFFFFF', gold: '#FFFFFF', swoosh: '#FFFFFF' },
+  'mono-black': { ring: '#0F172A', ink: '#0F172A', gold: '#0F172A', swoosh: '#0F172A' },
+};
+
+// Maße aus dem Component-Set.
 const MARK_W = 40.594;
 const MARK_H = 40.018;
-/** Geometrie der Wortmarke. */
 const WORD_W = 101;
 const WORD_H = 20.701;
-/** Abstand zwischen Bildmarke und Wortmarke im default-Lockup. */
-const LOCKUP_GAP = 3;
+/** Abstand Bildmarke → Wortmarke: 3 px nebeneinander, 8 px gestapelt. */
+const GAP_H = 3;
+const GAP_V = 8;
 
-let gradientSeq = 0;
+const BOX: Record<LogoLockup, { w: number; h: number }> = {
+  horizontal: { w: MARK_W + GAP_H + WORD_W, h: MARK_H },
+  stacked: { w: WORD_W, h: MARK_H + GAP_V + WORD_H },
+  symbol: { w: MARK_W, h: MARK_H },
+  wortmarke: { w: WORD_W, h: WORD_H },
+};
 
-function Bildmarke({ tone, idPrefix }: { tone: LogoTone; idPrefix: string }) {
-  const gradId = `${idPrefix}-swoosh`;
+/** Default-Höhe je Lockup, wenn der Aufrufer keine Klasse mitgibt. */
+const DEFAULT_H: Record<LogoLockup, string> = {
+  horizontal: 'h-9',
+  stacked: 'h-16',
+  symbol: 'h-8',
+  wortmarke: 'h-5',
+};
+
+let seq = 0;
+
+function Bildmarke({ tone, gradId }: { tone: LogoTone; gradId: string }) {
+  const c = TONE[tone];
   return (
     <>
-      <defs>
-        <linearGradient id={gradId} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#C6923B" />
-          <stop offset="100%" stopColor="#B07E36" />
-        </linearGradient>
-      </defs>
-      <path d={MARK_ARC} fill={RING[tone]} transform="translate(2.11 0)" />
-      <path d={MARK_ARC_LOWER} fill={RING[tone]} transform="translate(10.101 29.798)" />
-      <path d={GLOBE_D} fill={INK[tone]} transform="translate(19.496 16.996)" />
-      <path d={MARK_SWOOSH} fill={`url(#${gradId})`} transform="translate(0 13.877)" />
+      <path d={MARK_ARC} fill={c.ring} transform="translate(2.11 0)" />
+      <path d={MARK_ARC_LOWER} fill={c.ring} transform="translate(10.101 29.798)" />
+      <path d={GLOBE} fill={c.ink} transform="translate(19.496 16.996)" />
+      <path
+        d={MARK_SWOOSH}
+        fill={c.swoosh ?? `url(#${gradId})`}
+        transform="translate(0 13.877)"
+      />
     </>
   );
 }
 
 function Wortmarke({ tone }: { tone: LogoTone }) {
+  const c = TONE[tone];
   return (
     <>
       {WORDMARK_INK.map((d, i) => (
-        <path key={`i${i}`} d={d} fill={INK[tone]} />
+        <path key={`i${i}`} d={d} fill={c.ink} />
       ))}
       {WORDMARK_GOLD.map((d, i) => (
-        <path key={`g${i}`} d={d} fill={GOLD} />
+        <path key={`g${i}`} d={d} fill={c.gold} />
       ))}
       {/* Claim-Zeile: Linie · "Always on your side" · Linie, 4 px Abstand. */}
-      <g transform={`translate(0 ${13.701})`}>
-        <rect x="0" y="3.5" width="13.5" height="0.7" fill={GOLD} />
-        <path d={CLAIM} fill={GOLD} transform="translate(17.5 0)" />
-        <rect x="87.5" y="3.5" width="13.5" height="0.7" fill={GOLD} />
+      <g transform={`translate(0 ${WORD_H - 7})`}>
+        <rect x="0" y="3.5" width="13.5" height="0.7" fill={c.gold} />
+        <path d={CLAIM} fill={c.gold} transform="translate(17.5 0)" />
+        <rect x="87.5" y="3.5" width="13.5" height="0.7" fill={c.gold} />
       </g>
     </>
   );
 }
 
 export interface LogoProps {
-  /** default = Bildmarke + Wortmarke · bildmarke = Symbol · wortmarke = Schriftzug. */
+  /** Entspricht der Figma-Property "Lockup". */
   lockup?: LogoLockup;
-  /** light = für helle Gründe · dark = für dunkle Gründe. */
+  /** Entspricht der Figma-Property "Color". */
   tone?: LogoTone;
   /** Wrappt in einen Link. null rendert inline ohne Anker. */
   href?: string | null;
   className?: string;
 }
 
-export function LogoMark({ tone = 'light', className }: { tone?: LogoTone; className?: string }) {
-  const id = `chl${++gradientSeq}`;
-  return (
+/** Nur die Bildmarke — Kurzform für `<Logo lockup="symbol" />`. */
+export function LogoMark({ tone = 'on-light', className }: { tone?: LogoTone; className?: string }) {
+  return <Logo lockup="symbol" tone={tone} href={null} className={className} />;
+}
+
+export function Logo({
+  lockup = 'horizontal',
+  tone = 'on-light',
+  href = '/',
+  className,
+}: LogoProps) {
+  const gradId = `ch-swoosh-${++seq}`;
+  const box = BOX[lockup];
+  const needsGradient = TONE[tone].swoosh === null && lockup !== 'wortmarke';
+
+  const svg = (
     <svg
-      viewBox={`0 0 ${MARK_W} ${MARK_H}`}
-      className={cn('block shrink-0', className)}
+      viewBox={`0 0 ${box.w} ${box.h}`}
+      className={cn('block w-auto shrink-0', DEFAULT_H[lockup], className)}
       fill="none"
       aria-hidden="true"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <Bildmarke tone={tone} idPrefix={id} />
+      {needsGradient && (
+        <defs>
+          <linearGradient id={gradId} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#C6923B" />
+            <stop offset="100%" stopColor="#B07E36" />
+          </linearGradient>
+        </defs>
+      )}
+
+      {lockup === 'horizontal' && (
+        <>
+          <Bildmarke tone={tone} gradId={gradId} />
+          <g transform={`translate(${MARK_W + GAP_H} ${(MARK_H - WORD_H) / 2})`}>
+            <Wortmarke tone={tone} />
+          </g>
+        </>
+      )}
+
+      {lockup === 'stacked' && (
+        <>
+          <g transform={`translate(${(WORD_W - MARK_W) / 2} 0)`}>
+            <Bildmarke tone={tone} gradId={gradId} />
+          </g>
+          <g transform={`translate(0 ${MARK_H + GAP_V})`}>
+            <Wortmarke tone={tone} />
+          </g>
+        </>
+      )}
+
+      {lockup === 'symbol' && <Bildmarke tone={tone} gradId={gradId} />}
+      {lockup === 'wortmarke' && <Wortmarke tone={tone} />}
     </svg>
   );
-}
 
-export function Logo({ lockup = 'default', tone = 'light', href = '/', className }: LogoProps) {
-  const id = `chl${++gradientSeq}`;
-  let content;
-
-  if (lockup === 'bildmarke') {
-    content = <LogoMark tone={tone} className={cn('h-8 w-auto', className)} />;
-  } else if (lockup === 'wortmarke') {
-    content = (
-      <svg
-        viewBox={`0 0 ${WORD_W} ${WORD_H}`}
-        className={cn('block h-5 w-auto shrink-0', className)}
-        fill="none"
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <Wortmarke tone={tone} />
-      </svg>
-    );
-  } else {
-    content = (
-      <svg
-        viewBox={`0 0 ${MARK_W + LOCKUP_GAP + WORD_W} ${MARK_H}`}
-        className={cn('block h-9 w-auto shrink-0', className)}
-        fill="none"
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <Bildmarke tone={tone} idPrefix={id} />
-        <g transform={`translate(${MARK_W + LOCKUP_GAP} ${(MARK_H - WORD_H) / 2})`}>
-          <Wortmarke tone={tone} />
-        </g>
-      </svg>
-    );
-  }
-
-  if (href === null) return content;
+  if (href === null) return svg;
   return (
     <a href={href} className="inline-flex shrink-0 items-center" aria-label="CompliHub360 — Home">
-      {content}
+      {svg}
     </a>
   );
 }
