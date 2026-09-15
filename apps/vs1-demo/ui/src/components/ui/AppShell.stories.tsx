@@ -41,7 +41,7 @@ function Dashboard({ dark }: { dark?: boolean }) {
       <AppShell
         sidebar={
           <Sidebar
-            logo={<Logo lockup="horizontal" tone={dark ? 'on-petrol' : 'on-light'} markClassName="h-8" />}
+            logo={<Logo lockup="horizontal" tone={dark ? 'on-petrol' : 'on-light'} className="h-8" />}
             footer={
               <div className="flex items-center gap-3">
                 <Avatar size="sm" initials="AW" />

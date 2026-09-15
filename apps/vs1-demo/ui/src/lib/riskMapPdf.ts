@@ -27,11 +27,11 @@ const fallbackT: PdfTranslate = (_key, { defaultValue, ...vars }) =>
   Object.entries(vars).reduce((s, [k, v]) => s.split(`{{${k}}}`).join(String(v)), defaultValue);
 
 // Brand palette. Petrol is the brand; risk is a separate traffic light.
-const INK = '#0F172B';
+const INK = '#012E27';   // Logo-Ink (Compass 712:266)
 const MUTED = '#6B7280';
 const PETROL_DEEP = '#004D40';
 const PETROL_MID = '#0F524D';
-const GOLD = '#C7A14D';
+const GOLD = '#C5913B';  // Logo-Gold (Compass 712:266)
 const LINE = '#E4E4E7';
 
 // Severity chips, mirroring --color-risk-* in its LIGHT values: paper is a
@@ -113,12 +113,14 @@ export async function generateRiskMapPdf(opts: {
   };
 
   // ── Header ──────────────────────────────────────────────────────────────
-  doc.setFont('times', 'bold').setFontSize(18).setTextColor(INK);
-  doc.text('CompliHub360', M, y);
-  const chWidth = doc.getTextWidth('CompliHub360');
-  doc.setTextColor(GOLD).text('360', M + chWidth + 2, y);
-  doc.setFont('helvetica', 'normal').setFontSize(8).setTextColor(MUTED);
-  doc.text('Always on your side.', M, y + 12);
+  // Wortmarke: "CompliHub" in Ink, "360" in Gold — wie im Logo. Gesetzt als
+  // Grotesk, nicht als Serif; die Compass-Wortmarke ist eine Groteske.
+  doc.setFont('helvetica', 'bold').setFontSize(18).setTextColor(INK);
+  doc.text('CompliHub', M, y);
+  const chWidth = doc.getTextWidth('CompliHub');
+  doc.setTextColor(GOLD).text('360', M + chWidth, y);
+  doc.setFont('helvetica', 'normal').setFontSize(8).setTextColor(GOLD);
+  doc.text('Always on your side', M, y + 12);
   doc.text(L('pdf.generated', 'Generated {{date}} · staging preview', { date: new Date().toISOString().slice(0, 10) }), W - M, y, { align: 'right' });
   y += 40;
 
