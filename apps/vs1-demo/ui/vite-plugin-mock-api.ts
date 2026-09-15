@@ -134,7 +134,17 @@ function assistantChat(body: Record<string, unknown>) {
 
 // Die drei passenden Anbieter, Score-Aufschluesselung wie im Backend:
 // 60 * Marktabdeckung + 40 * (getroffene / angefragte Bereiche).
-const BASIS = (matched: string[]) => ({ country: 'DE', country_covered: true, domains_requested: ['tax-vat', 'product-packaging', 'data-privacy'], domains_matched: matched });
+// Welche Bereiche ein Anbieter wirklich abdeckt. Die Match-Basis wird daraus
+// GEGEN DIE ANFRAGE gerechnet — vorher stand in `domains_requested` eine feste
+// Dreierliste, egal wonach gesucht wurde. Dadurch behauptete die Partnerseite
+// „1 von 3 Bereichen", wo der Nutzer genau einen Bereich offen hatte.
+const COVERS: Record<string, string[]> = {
+  'studio-bianchi': ['tax-vat', 'product-packaging', 'data-privacy'],
+  'schmidt-partner': ['tax-vat', 'product-packaging'],
+  'madrid-tax': ['tax-vat'],
+};
+const DEFAULT_REQUEST = ['tax-vat', 'product-packaging', 'data-privacy'];
+const BASIS = (matched: string[]) => ({ country: 'DE', country_covered: true, domains_requested: DEFAULT_REQUEST, domains_matched: matched });
 const PROVIDERS = [
   { provider_key: 'studio-bianchi', pseudonym_label: 'Verifizierte Steuerkanzlei · Norditalien', region: 'Norditalien', active_since: 2015, specializations: ['VAT & OSS', 'E-Commerce', 'EU-weit'], languages: ['IT', 'DE', 'EN'], rating: 4.9, completed_count: 210, avg_response_hours: 3, billing_model: 'project', is_verified: true, match: 100, match_tier: 'high', match_basis: BASIS(['tax-vat', 'product-packaging', 'data-privacy']) },
   { provider_key: 'schmidt-partner', pseudonym_label: 'Verifizierte Steuerberatung · Norddeutschland', region: 'Norddeutschland', active_since: 2013, specializations: ['OSS/IOSS', 'Cross-border Tax'], languages: ['DE', 'EN'], rating: 4.7, completed_count: 96, avg_response_hours: 5, billing_model: 'abo', is_verified: true, match: 87, match_tier: 'strong', match_basis: BASIS(['tax-vat', 'product-packaging']) },
@@ -145,19 +155,101 @@ const PROVIDERS = [
 // Karte plus Abdeckung und volle Preistabelle. Unbekannter Schluessel → 404,
 // damit die Seite ihren Nicht-gefunden-Zustand zeigt statt eines fremden
 // Anbieters (Befund 2026-09-13: „Details ansehen" endete auf weisser Seite).
-const PROVIDER_DETAIL: Record<string, { countries_supported: string[]; pricing_table: Array<{ service: string; price: string }> | null }> = {
-  'studio-bianchi': { countries_supported: ['IT', 'DE', 'AT'], pricing_table: [
-    { service: 'USt-Erstregistrierung Italien (Partita IVA)', price: 'ab 450 € · einmalig' },
-    { service: 'Laufende OSS-Betreuung', price: '180 € / Quartal' },
-    { service: 'Fachberatung (Stundensatz)', price: '140 € / Std.' },
-    { service: 'Komplettpaket E-Commerce-Setup', price: 'auf Anfrage' },
-  ] },
-  'schmidt-partner': { countries_supported: ['DE', 'NL', 'AT', 'FR'], pricing_table: [
-    { service: 'OSS/IOSS-Registrierung', price: 'im Abo enthalten' },
-    { service: 'Compliance-Abo (bis 3 Märkte)', price: '290 € / Monat' },
-    { service: 'Jeder weitere Markt', price: '60 € / Monat' },
-  ] },
-  'madrid-tax': { countries_supported: ['ES', 'PT'], pricing_table: null },
+// Die Suche antwortet auf DIE ANFRAGE: die Match-Basis nennt die angefragten
+// Bereiche und davon die, die der Anbieter abdeckt. Die Zahl selbst bleibt die
+// der Fixture — sie ist die Demo-Rangfolge, nicht die Rechnung des Servers.
+function search(body: unknown) {
+  // runSearch schickt die Bereiche als `domains` (der Server erwartet das so);
+  // `categories` bleibt als zweite Schreibweise stehen.
+  const req = (body ?? {}) as { domains?: unknown; categories?: unknown; country?: unknown };
+  const asked = Array.isArray(req.domains) && req.domains.length ? req.domains
+    : Array.isArray(req.categories) && req.categories.length ? req.categories
+    : null;
+  const requested = (asked as string[] | null) ?? DEFAULT_REQUEST;
+  const country = typeof req.country === 'string' && req.country ? req.country.toUpperCase() : 'DE';
+  const providers = PROVIDERS.map((p) => {
+    const covers = COVERS[p.provider_key] ?? [];
+    return {
+      ...p,
+      match_basis: {
+        country,
+        country_covered: (PROVIDER_DETAIL[p.provider_key]?.countries_supported ?? []).includes(country),
+        domains_requested: requested,
+        domains_matched: requested.filter((d) => covers.includes(d)),
+      },
+    };
+  });
+  return { ok: true, providers, laws: LAWS };
+}
+
+type MockDetail = {
+  countries_supported: string[];
+  pricing_table: Array<{ service: string; price: string }> | null;
+  confirmation_rate: number | null;
+  work_mode: string | null;
+  services: Array<{ title: string; includes: string[] }> | null;
+  credentials: Array<{ label: string; note: string }> | null;
+  excluded_services: string[] | null;
+};
+
+// Stufe-2-Detail je Anbieter. „madrid-tax" traegt bewusst fast nichts: so
+// sieht man im Mock, wie die Partnerseite mit einem Anbieter umgeht, der sein
+// Dossier noch nicht gefuellt hat — leere Karten mit ehrlichem Satz, keine
+// erfundenen Leistungen.
+const PROVIDER_DETAIL: Record<string, MockDetail> = {
+  'studio-bianchi': {
+    countries_supported: ['IT', 'DE', 'AT'],
+    pricing_table: [
+      { service: 'USt-Erstregistrierung Italien (Partita IVA)', price: 'ab 450 € · einmalig' },
+      { service: 'Laufende OSS-Betreuung', price: '180 € / Quartal' },
+      { service: 'Fachberatung (Stundensatz)', price: '140 € / Std.' },
+      { service: 'Komplettpaket E-Commerce-Setup', price: 'auf Anfrage' },
+    ],
+    confirmation_rate: 0.97,
+    work_mode: 'remote · Portal',
+    services: [
+      { title: 'USt-Registrierung Italien', includes: ['Partita IVA beantragen', 'Vertretung gegenüber Agenzia delle Entrate'] },
+      { title: 'OSS-Betreuung', includes: ['Quartalsmeldungen', 'Fristenüberwachung'] },
+      { title: 'E-Commerce-Setup EU', includes: ['Lieferschwellen', 'Marktplatz-Anbindung'] },
+    ],
+    credentials: [
+      { label: 'Dottore Commercialista (IT)', note: 'seit 2015 · Kammer geprüft' },
+      { label: 'Revisore Legale', note: 'Titel verifiziert' },
+    ],
+    excluded_services: ['Zoll', 'Markenrecht'],
+  },
+  'schmidt-partner': {
+    countries_supported: ['DE', 'NL', 'AT', 'FR'],
+    pricing_table: [
+      { service: 'OSS/IOSS-Registrierung', price: 'im Abo enthalten' },
+      { service: 'Compliance-Abo (bis 3 Märkte)', price: '290 € / Monat' },
+      { service: 'Jeder weitere Markt', price: '60 € / Monat' },
+    ],
+    confirmation_rate: 0.92,
+    work_mode: 'remote · Portal',
+    services: [
+      { title: 'OSS/IOSS-Registrierung', includes: ['Anmeldung beim BZSt', 'Erste Quartalsmeldung', 'Fristenüberwachung'] },
+      { title: 'Laufende USt-Betreuung EU', includes: ['Voranmeldungen DE', 'Reverse Charge', 'Intrastat ab Schwelle'] },
+      { title: 'Cross-border Tax', includes: ['Betriebsstättenprüfung', 'Lieferketten-Strukturierung'] },
+    ],
+    credentials: [
+      { label: 'Steuerberater-Zulassung (DE)', note: 'seit 2013 · Kammer geprüft' },
+      { label: 'Fachberater Internationales Steuerrecht', note: 'Titel verifiziert' },
+      { label: 'Kanzlei mit ISO 27001', note: 'Zertifikat 2025 vorgelegt' },
+      { label: 'DATEV · Amazon SPN gelistet', note: 'Plattform-Nachweise' },
+    ],
+    excluded_services: ['Zoll', 'Datenschutz', 'Markenrecht'],
+  },
+  // Dossier bewusst leer — der Leerfall der Karten.
+  'madrid-tax': {
+    countries_supported: ['ES', 'PT'],
+    pricing_table: null,
+    confirmation_rate: null,
+    work_mode: null,
+    services: null,
+    credentials: null,
+    excluded_services: null,
+  },
 };
 function providerDetail(key: string) {
   const p = PROVIDERS.find((x) => x.provider_key === key);
@@ -166,6 +258,36 @@ function providerDetail(key: string) {
   const { match, match_tier, match_basis, ...anon } = p;
   void match; void match_tier; void match_basis;
   return { ok: true, detail: { ...anon, ...d, availability: 'available' }, detail_open_charged: false };
+}
+
+// Bewertungen: nur, was an einer Buchung haengt (so wie der Server filtert).
+// „madrid-tax" hat keine — die Sektion sagt das dann, statt Sterne zu erfinden.
+const PROVIDER_REVIEWS: Record<string, Array<{ rating: number; body: string | null; categories: string[]; daysAgo: number }>> = {
+  'studio-bianchi': [
+    { rating: 5, body: 'Partita IVA war in drei Wochen da, inklusive der Rückfragen der Agenzia.', categories: ['Fristen', 'Erreichbarkeit'], daysAgo: 40 },
+    { rating: 5, body: 'Auf Deutsch beraten, in Italien vertreten — genau das, was wir brauchten.', categories: ['Fachlich'], daysAgo: 95 },
+    { rating: 4, body: null, categories: ['Preis'], daysAgo: 160 },
+  ],
+  'schmidt-partner': [
+    { rating: 5, body: 'OSS-Umstellung in zwei Wochen sauber durch, Fristen kamen als Erinnerung vor uns an.', categories: ['Fristen', 'Fachlich'], daysAgo: 88 },
+    { rating: 5, body: 'Reverse-Charge-Fragen wurden am selben Tag beantwortet. Preis wie besprochen.', categories: ['Erreichbarkeit', 'Preis'], daysAgo: 150 },
+    { rating: 4, body: 'Gut bei Steuern, für Verpackung mussten wir woanders hin — sagt er aber selbst offen.', categories: ['Fachlich'], daysAgo: 190 },
+  ],
+  'madrid-tax': [],
+};
+function providerReviews(key: string) {
+  const list = PROVIDER_REVIEWS[key];
+  if (!list) return { __status: 404, errorCode: 'NOT_FOUND', message: 'Provider not found' };
+  const reviews = list.map((r) => ({
+    rating: r.rating,
+    body: r.body,
+    categories: r.categories,
+    created_at: plus(-r.daysAgo * 24 * H),
+  }));
+  const average = reviews.length
+    ? Math.round((reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length) * 10) / 10
+    : null;
+  return { ok: true, reviews, summary: { count: reviews.length, average } };
 }
 function providerSlots() {
   const out: string[] = [];
@@ -268,10 +390,11 @@ function route(method: string, path: string, body: Record<string, unknown> = {})
     if (p[0] === 'engagement' && p.length === 2) return engagement(p[1]);
     if (p[0] === 'provider' && p[2] === 'detail') return providerDetail(p[1]);
     if (p[0] === 'provider' && p[2] === 'slots') return providerSlots();
+    if (p[0] === 'provider' && p[2] === 'reviews') return providerReviews(p[1]);
     if (p[0] === 'metrics') return { ok: true, sla: { confirm_rate: 0.86, avg_reply_hours: 5.2 } };
     return { ok: true, items: [], providers: [], laws: [], documents: [], exports: [] };
   }
-  if (p[0] === 'search') return { ok: true, providers: PROVIDERS, laws: LAWS };
+  if (p[0] === 'search') return search(body);
   if (p[0] === 'assistant' && p[1] === 'chat') return assistantChat(body);
   if (p[0] === 'session' && p.length === 1) return { ok: true, id: uuid(9, 1) };
   if (p[0] === 'session' && p[2] === 'duplicate') return duplicateSession(p[1], body);

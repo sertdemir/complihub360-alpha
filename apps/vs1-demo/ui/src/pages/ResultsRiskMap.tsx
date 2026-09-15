@@ -439,7 +439,9 @@ export function ResultsRiskMap() {
         // Mit gespeicherter Sitzung oeffnet sich die Schublade; ohne (Fixture,
         // Gast-Profil) bleibt der Weg zum Erst-Wizard.
         onEditAnswers={() => (sessionId && session ? setAnswersOpen(true) : navigate(`/${locale}/wizard`))}
-        onProviderDetails={(key) => navigate(`/${locale}/provider/${key}`)}
+        // Wie auf der Bereichsseite: der Bezug reist mit, sonst steht die
+        // Partnerseite ohne die Pflichten da, wegen derer man sie oeffnet.
+        onProviderDetails={(key) => navigate(`/${locale}/provider/${key}${sessionId ? `?session=${sessionId}` : ''}`)}
         answersDrawer={sessionId && session ? (
           <AnswersDrawer
             open={answersOpen}

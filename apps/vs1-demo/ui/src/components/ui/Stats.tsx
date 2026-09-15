@@ -98,12 +98,18 @@ export function Donut({ segs, size = 46, stroke = 7, center, centerSize = 12, ce
 export const KPI_RING_SIZE = 96;
 export const KPI_RING_STROKE = 12;
 
-export function KpiRing({ title, sub, chip, value, segs, on }: {
+export function KpiRing({ title, sub, chip, value, segs, on, format }: {
   title: string; sub: string; chip?: string;
   /** Die Zahl im Kreis — zaehlt beim Eintritt hoch. */
   value: number;
   segs: { frac: number; cls: string }[];
   on: boolean;
+  /** Wie die hochgezaehlte Zahl im Ring erscheint. Ohne das kann der Ring nur
+   *  ganze Zahlen zeigen (useCountUp rundet) — eine Bewertung von 4,7 oder
+   *  eine Quote mit Prozentzeichen braucht deshalb eine eigene Schreibweise.
+   *  Der gezaehlte Wert bleibt die ganze Zahl (47 bzw. 92), nur die Anzeige
+   *  formt sie um. */
+  format?: (n: number) => string;
 }) {
   const n = useCountUp(value, on);
   return (
@@ -116,7 +122,7 @@ export function KpiRing({ title, sub, chip, value, segs, on }: {
         )}
       </div>
       <div className="shrink-0 font-serif">
-        <Donut on={on} size={KPI_RING_SIZE} stroke={KPI_RING_STROKE} segs={segs} center={String(n)} centerSize={30} />
+        <Donut on={on} size={KPI_RING_SIZE} stroke={KPI_RING_STROKE} segs={segs} center={format ? format(n) : String(n)} centerSize={30} />
       </div>
     </div>
   );

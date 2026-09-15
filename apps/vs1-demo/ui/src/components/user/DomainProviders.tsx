@@ -52,7 +52,10 @@ export const DomainProviders = forwardRef<HTMLElement, {
               provider={p}
               top={i === 0}
               basis={p.match_basis ? <MatchBasis basis={p.match_basis} /> : undefined}
-              onDetails={() => navigate(`/${locale}/provider/${p.provider_key}`)}
+              // Der Bereich reist mit: die Partnerseite zeigt sonst weder den
+              // Lage-Satz noch die Matrix — sie wuesste nicht, worauf sie den
+              // Anbieter beziehen soll.
+              onDetails={() => navigate(`/${locale}/provider/${p.provider_key}?area=${slug}`)}
             />
           ))}
         </div>
