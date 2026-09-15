@@ -450,7 +450,7 @@ export function ResultsRiskMap() {
             onClose={() => setPartnerOpen(null)}
             provider={partnerOpen}
             basisNode={partnerOpen?.match_basis ? <MatchBasis basis={partnerOpen.match_basis} /> : undefined}
-            onBook={(key) => navigate(`/${locale}/provider/${key}/schedule`)}
+            sessionMessage={session?.label ? t('schedule.messageFromSession', { session: session.label }) : undefined}
           />
         }
         answersDrawer={sessionId && session ? (

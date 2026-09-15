@@ -289,6 +289,33 @@ function providerReviews(key: string) {
     : null;
   return { ok: true, reviews, summary: { count: reviews.length, average } };
 }
+// Klarnamen — Stufe 3. Sie werden NUR nach einer Buchung herausgegeben; bis
+// dahin kennt die Oberflaeche den Anbieter ausschliesslich unter seinem
+// Pseudonym (spec §5).
+const PROVIDER_IDENTITY: Record<string, { name: string; website_url: string | null; contact_email: string | null }> = {
+  'studio-bianchi': { name: 'Studio Bianchi & Partner Commercialisti Associati S.r.l.', website_url: 'https://example.org', contact_email: 'kontakt@studiobianchi.example' },
+  'schmidt-partner': { name: 'Schmidt & Partner Steuerberatungsgesellschaft mbH', website_url: 'https://example.org', contact_email: 'kanzlei@schmidt-partner.example' },
+  'madrid-tax': { name: 'Madrid Tax Advisors', website_url: null, contact_email: 'hola@madridtax.example' },
+};
+
+// POST /scheduling — die Buchung ist der bezahlte Lead UND der Moment, in dem
+// beide Seiten Namen und Kontakt bekommen.
+function createBooking(body: unknown) {
+  const d = (body ?? {}) as { provider_key?: unknown; slot_start?: unknown; message?: unknown };
+  const key = typeof d.provider_key === 'string' ? d.provider_key : '';
+  const slot = typeof d.slot_start === 'string' ? d.slot_start : '';
+  const identity = PROVIDER_IDENTITY[key];
+  if (!key || !slot || !identity) {
+    return { __status: 400, errorCode: 'VALIDATION_ERROR', message: 'provider_key and slot_start required' };
+  }
+  const end = new Date(new Date(slot).getTime() + 30 * 60 * 1000).toISOString();
+  return {
+    ok: true,
+    booking: { id: `m0ck-new-${key}`, provider_key: key, slot_start: slot, slot_end: end, status: 'confirmed' },
+    provider_identity: identity,
+  };
+}
+
 function providerSlots() {
   const out: string[] = [];
   const d = new Date(); d.setHours(0, 0, 0, 0);
@@ -395,6 +422,7 @@ function route(method: string, path: string, body: Record<string, unknown> = {})
     return { ok: true, items: [], providers: [], laws: [], documents: [], exports: [] };
   }
   if (p[0] === 'search') return search(body);
+  if (p[0] === 'scheduling' && p.length === 1 && method === 'POST') return createBooking(body);
   if (p[0] === 'assistant' && p[1] === 'chat') return assistantChat(body);
   if (p[0] === 'session' && p.length === 1) return { ok: true, id: uuid(9, 1) };
   if (p[0] === 'session' && p[2] === 'duplicate') return duplicateSession(p[1], body);

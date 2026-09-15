@@ -1,5 +1,4 @@
 import { forwardRef, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { PartnerCard, MatchBasis } from './PartnerCard';
 import { PartnerDrawer } from './PartnerDrawer';
@@ -16,9 +15,10 @@ import type { SearchProfile } from '../wizard/WizardContext';
 // „Details ansehen" oeffnet die PARTNER-SCHUBLADE (Canvas 1C, Nutzer-
 // Entscheidung 2026-09-15), nicht mehr die eigene Partnerseite: der Nutzer
 // bleibt auf der Bereichsseite, die Liste bleibt sichtbar, Vergleichen heisst
-// naechste Karte, naechste Schublade. Die volle Seite wird erst wieder
-// verlinkt, wenn es eine Partner-Uebersichtsseite und einen Navigationspunkt
-// „Partner" gibt.
+// naechste Karte, naechste Schublade. Die Buchung passiert in derselben
+// Schublade (Schritt zwei), der Bereich bleibt die ganze Zeit stehen. Die
+// volle Seite wird erst wieder verlinkt, wenn es eine Partner-Uebersichts-
+// seite und einen Navigationspunkt „Partner" gibt.
 
 export const DomainProviders = forwardRef<HTMLElement, {
   slug: string;
@@ -26,9 +26,7 @@ export const DomainProviders = forwardRef<HTMLElement, {
   /** Hauptmarkt des Nutzers in diesem Bereich; ohne Sitzung DE. */
   country: string;
 }>(function DomainProviders({ slug, areaLabel, country }, ref) {
-  const { t, i18n } = useTranslation('userws');
-  const navigate = useNavigate();
-  const locale = i18n.resolvedLanguage || 'en';
+  const { t } = useTranslation('userws');
   const [providers, setProviders] = useState<AnonProvider[] | null>(null);
   const [open, setOpen] = useState<AnonProvider | null>(null);
 
@@ -71,7 +69,6 @@ export const DomainProviders = forwardRef<HTMLElement, {
         onClose={() => setOpen(null)}
         provider={open}
         basisNode={open?.match_basis ? <MatchBasis basis={open.match_basis} /> : undefined}
-        onBook={(key) => navigate(`/${locale}/provider/${key}/schedule`)}
       />
     </section>
   );
