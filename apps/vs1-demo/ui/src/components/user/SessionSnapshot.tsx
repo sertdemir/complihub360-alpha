@@ -277,7 +277,7 @@ function GroupCard({ label, sub, dot, rows, entered, offset, taskOf, statusRowOf
 }
 
 export function SessionSnapshot({
-  rows, providers, sessionId, title, meta, kpis, matchBasis, onExportPdf, onEditAnswers, onProviderDetails, answersDrawer,
+  rows, providers, sessionId, title, meta, kpis, matchBasis, onExportPdf, onEditAnswers, onProviderDetails, answersDrawer, partnerDrawer,
 }: {
   rows: SnapshotRow[];
   providers: AnonProvider[];
@@ -291,6 +291,9 @@ export function SessionSnapshot({
   onExportPdf: () => void;
   onEditAnswers: () => void;
   onProviderDetails: (key: string) => void;
+  /** Die Partner-Schublade des Aufrufers (Canvas 1C) — sie haengt am Zustand
+   *  der Seite, nicht an dieser Darstellung. */
+  partnerDrawer?: React.ReactNode;
   /** Die Schublade "Antworten bearbeiten" — der Aufrufer besitzt sie, weil er
    *  die Sitzungsdaten und das Neuladen kennt; sie haengt hier im Baum. */
   answersDrawer?: React.ReactNode;
@@ -506,6 +509,7 @@ export function SessionSnapshot({
         </MotionConfig>
       </div>
       {answersDrawer}
+      {partnerDrawer}
     </UserShell>
   );
 }

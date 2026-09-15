@@ -114,7 +114,11 @@ export function KpiRing({ title, sub, chip, value, segs, on, format }: {
   const n = useCountUp(value, on);
   return (
     <div className="flex items-center gap-5 py-1">
-      <div className="min-w-0 max-w-[220px] text-left">
+      {/* Der Textblock nimmt den Rest der Spalte, damit der Ring am SPALTENENDE
+          sitzt und nicht am Textende (Befund 2026-09-15: bei kurzem Untertitel
+          klebte der Ring am Text, drei Ringe einer Zeile standen auf drei
+          verschiedenen Hoehenlinien). */}
+      <div className="min-w-0 max-w-[220px] flex-1 text-left">
         <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{title}</p>
         <p className="mt-1.5 text-body-2xs leading-snug text-fg-secondary">{sub}</p>
         {chip && (

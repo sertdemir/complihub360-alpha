@@ -43,6 +43,13 @@ import { SLUG_TO_I18N } from './user/AnfragenTab';
 // Stufe 2 bleibt anonym: Name und Kontakt gibt es erst nach der Buchung
 // (spec §5). Das Oeffnen ist das bezahlte Ereignis `provider_detail_opened`
 // (serverseitig 1×/Nutzer/30 Tage entprellt).
+//
+// NICHT VERLINKT (Nutzer-Entscheidung 2026-09-15). Bereichs- und Sitzungsseite
+// oeffnen einen Anbieter seither als Schublade (components/user/PartnerDrawer,
+// Canvas 1C): kein Seitenwechsel, die Liste bleibt sichtbar. Diese Seite bleibt
+// unter ihrer Route erreichbar und wird wieder verlinkt, sobald es eine
+// Partner-UEBERSICHTSSEITE und einen Navigationspunkt „Partner" gibt — erst
+// dann fuehrt aus ihr ein Weg heraus, der nicht der Zurueck-Knopf ist.
 
 type State = { kind: 'loading' } | { kind: 'ready'; p: ProviderDetail } | { kind: 'missing' } | { kind: 'error' };
 

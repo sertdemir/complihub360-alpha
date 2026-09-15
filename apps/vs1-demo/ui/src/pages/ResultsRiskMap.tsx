@@ -15,6 +15,7 @@ import { Badge } from '../components/ui/Badge';
 import { SessionSnapshot, type SnapshotRow } from '../components/user/SessionSnapshot';
 import { AnswersDrawer } from '../components/user/AnswersDrawer';
 import { MatchBasis } from '../components/user/PartnerCard';
+import { PartnerDrawer } from '../components/user/PartnerDrawer';
 import { generateRiskMapPdf } from '../lib/riskMapPdf';
 
 // ─── Results · Risk Map · Figma 1667:215 ────────────────────────────────────
@@ -248,6 +249,9 @@ export function ResultsRiskMap() {
   // Nach "Als Variante kopieren" landet man hier auf der Kopie mit
   // openAnswers im Router-State — die Schublade geht sofort auf.
   const [answersOpen, setAnswersOpen] = useState<boolean>(!!location.state?.openAnswers);
+  // Partner oeffnen als Schublade ueber der Sitzung (Canvas 1C, 2026-09-15) —
+  // wie auf der Bereichsseite. Kein Seitenwechsel, die Ergebnisse bleiben stehen.
+  const [partnerOpen, setPartnerOpen] = useState<AnonProvider | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
   const { isLoggedIn } = useAuthStore();
   const navigate = useNavigate();
@@ -439,9 +443,16 @@ export function ResultsRiskMap() {
         // Mit gespeicherter Sitzung oeffnet sich die Schublade; ohne (Fixture,
         // Gast-Profil) bleibt der Weg zum Erst-Wizard.
         onEditAnswers={() => (sessionId && session ? setAnswersOpen(true) : navigate(`/${locale}/wizard`))}
-        // Wie auf der Bereichsseite: der Bezug reist mit, sonst steht die
-        // Partnerseite ohne die Pflichten da, wegen derer man sie oeffnet.
-        onProviderDetails={(key) => navigate(`/${locale}/provider/${key}${sessionId ? `?session=${sessionId}` : ''}`)}
+        onProviderDetails={(key) => setPartnerOpen(anonProviders.find((p) => p.provider_key === key) ?? null)}
+        partnerDrawer={
+          <PartnerDrawer
+            open={partnerOpen !== null}
+            onClose={() => setPartnerOpen(null)}
+            provider={partnerOpen}
+            basisNode={partnerOpen?.match_basis ? <MatchBasis basis={partnerOpen.match_basis} /> : undefined}
+            onBook={(key) => navigate(`/${locale}/provider/${key}/schedule`)}
+          />
+        }
         answersDrawer={sessionId && session ? (
           <AnswersDrawer
             open={answersOpen}

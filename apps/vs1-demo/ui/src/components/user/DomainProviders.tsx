@@ -2,6 +2,7 @@ import { forwardRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { PartnerCard, MatchBasis } from './PartnerCard';
+import { PartnerDrawer } from './PartnerDrawer';
 import { runSearch, type AnonProvider } from '../../api/search';
 import type { SearchProfile } from '../wizard/WizardContext';
 
@@ -11,6 +12,13 @@ import type { SearchProfile } from '../wizard/WizardContext';
 // Bereich statt nach Sitzung gesucht: POST /search mit dem Bereich als
 // einziger Domaene und dem Hauptmarkt des Nutzers. Die Match-Basis zeigt
 // dann Markt und diesen einen Bereich. In der linken Spalte zwei je Reihe.
+//
+// „Details ansehen" oeffnet die PARTNER-SCHUBLADE (Canvas 1C, Nutzer-
+// Entscheidung 2026-09-15), nicht mehr die eigene Partnerseite: der Nutzer
+// bleibt auf der Bereichsseite, die Liste bleibt sichtbar, Vergleichen heisst
+// naechste Karte, naechste Schublade. Die volle Seite wird erst wieder
+// verlinkt, wenn es eine Partner-Uebersichtsseite und einen Navigationspunkt
+// „Partner" gibt.
 
 export const DomainProviders = forwardRef<HTMLElement, {
   slug: string;
@@ -22,6 +30,7 @@ export const DomainProviders = forwardRef<HTMLElement, {
   const navigate = useNavigate();
   const locale = i18n.resolvedLanguage || 'en';
   const [providers, setProviders] = useState<AnonProvider[] | null>(null);
+  const [open, setOpen] = useState<AnonProvider | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -52,14 +61,18 @@ export const DomainProviders = forwardRef<HTMLElement, {
               provider={p}
               top={i === 0}
               basis={p.match_basis ? <MatchBasis basis={p.match_basis} /> : undefined}
-              // Der Bereich reist mit: die Partnerseite zeigt sonst weder den
-              // Lage-Satz noch die Matrix — sie wuesste nicht, worauf sie den
-              // Anbieter beziehen soll.
-              onDetails={() => navigate(`/${locale}/provider/${p.provider_key}?area=${slug}`)}
+              onDetails={() => setOpen(p)}
             />
           ))}
         </div>
       )}
+      <PartnerDrawer
+        open={open !== null}
+        onClose={() => setOpen(null)}
+        provider={open}
+        basisNode={open?.match_basis ? <MatchBasis basis={open.match_basis} /> : undefined}
+        onBook={(key) => navigate(`/${locale}/provider/${key}/schedule`)}
+      />
     </section>
   );
 });

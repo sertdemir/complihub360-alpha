@@ -217,7 +217,8 @@
     "slotsNone": "No appointments are free right now. You can still enquire with the button above.",
     "slotsAll": "All appointments this week",
     "lageAreaYes": "Covers {{area}}",
-    "lageAreaNo": "Does not cover {{area}}"
+    "lageAreaNo": "Does not cover {{area}}",
+    "drawerBookNote": "Free first call · 30 min · identity visible after booking"
   },
   "schedule": {
     "back": "Back to profile",

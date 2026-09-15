@@ -217,7 +217,8 @@
     "slotsNone": "Ahora mismo no hay citas libres. Aun así puede consultar con el botón de arriba.",
     "slotsAll": "Todas las citas de esta semana",
     "lageAreaYes": "Cubre {{area}}",
-    "lageAreaNo": "No cubre {{area}}"
+    "lageAreaNo": "No cubre {{area}}",
+    "drawerBookNote": "Primera consulta gratuita · 30 min · identidad visible tras la reserva"
   },
   "schedule": {
     "back": "Volver al perfil",

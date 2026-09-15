@@ -217,7 +217,8 @@
     "slotsNone": "Gerade sind keine Termine frei. Über den Knopf oben können Sie trotzdem anfragen.",
     "slotsAll": "Alle Termine dieser Woche",
     "lageAreaYes": "Deckt {{area}} ab",
-    "lageAreaNo": "Deckt {{area}} nicht ab"
+    "lageAreaNo": "Deckt {{area}} nicht ab",
+    "drawerBookNote": "Kostenloses Erstgespräch · 30 Min · Identität nach der Buchung sichtbar"
   },
   "schedule": {
     "back": "Zurück zum Profil",

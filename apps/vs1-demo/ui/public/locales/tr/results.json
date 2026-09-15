@@ -217,7 +217,8 @@
     "slotsNone": "Şu anda boş randevu yok. Yine de yukarıdaki düğmeyle talep edebilirsiniz.",
     "slotsAll": "Bu haftanın tüm randevuları",
     "lageAreaYes": "{{area}} alanını kapsıyor",
-    "lageAreaNo": "{{area}} alanını kapsamıyor"
+    "lageAreaNo": "{{area}} alanını kapsamıyor",
+    "drawerBookNote": "Ücretsiz ilk görüşme · 30 dk · kimlik randevudan sonra görünür"
   },
   "schedule": {
     "back": "Profile dön",
