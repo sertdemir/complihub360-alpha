@@ -16,6 +16,7 @@ import { SessionSnapshot, type SnapshotRow } from '../components/user/SessionSna
 import { AnswersDrawer } from '../components/user/AnswersDrawer';
 import { MatchBasis } from '../components/user/PartnerCard';
 import { PartnerDrawer } from '../components/user/PartnerDrawer';
+import { loadBookingsByKey, type BookingByKey } from '../components/user/DomainProviders';
 import { generateRiskMapPdf } from '../lib/riskMapPdf';
 
 // ─── Results · Risk Map · Figma 1667:215 ────────────────────────────────────
@@ -252,6 +253,17 @@ export function ResultsRiskMap() {
   // Partner oeffnen als Schublade ueber der Sitzung (Canvas 1C, 2026-09-15) —
   // wie auf der Bereichsseite. Kein Seitenwechsel, die Ergebnisse bleiben stehen.
   const [partnerOpen, setPartnerOpen] = useState<AnonProvider | null>(null);
+  // Termine des Nutzers je Anbieter: wo einer liegt, traegt die Karte den
+  // Klarnamen statt des Pseudonyms (Stufe 3).
+  const [booked, setBooked] = useState<BookingByKey>({});
+
+  useEffect(() => {
+    let alive = true;
+    loadBookingsByKey()
+      .then((b) => { if (alive) setBooked(b); })
+      .catch(() => { if (alive) setBooked({}); });
+    return () => { alive = false; };
+  }, []);
   const [reloadKey, setReloadKey] = useState(0);
   const { isLoggedIn } = useAuthStore();
   const navigate = useNavigate();
@@ -439,6 +451,7 @@ export function ResultsRiskMap() {
           rest: Math.max(0, rows.length - critical - high),
         }}
         matchBasis={(p) => (p.match_basis ? <MatchBasis basis={p.match_basis} /> : null)}
+        bookings={booked}
         onExportPdf={exportPdf}
         // Mit gespeicherter Sitzung oeffnet sich die Schublade; ohne (Fixture,
         // Gast-Profil) bleibt der Weg zum Erst-Wizard.
@@ -451,6 +464,8 @@ export function ResultsRiskMap() {
             provider={partnerOpen}
             basisNode={partnerOpen?.match_basis ? <MatchBasis basis={partnerOpen.match_basis} /> : undefined}
             sessionMessage={session?.label ? t('schedule.messageFromSession', { session: session.label }) : undefined}
+            booking={partnerOpen ? booked[partnerOpen.provider_key] ?? null : null}
+            onBooked={(key, b) => setBooked((prev) => ({ ...prev, [key]: b }))}
           />
         }
         answersDrawer={sessionId && session ? (

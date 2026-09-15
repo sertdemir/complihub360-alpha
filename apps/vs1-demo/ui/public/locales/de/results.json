@@ -372,6 +372,9 @@
     "inProgressSince_other": "seit {{count}} Tagen in Arbeit",
     "nextDue_one": "nächste Frist in {{count}} Tag",
     "nextDue_other": "nächste Frist in {{count}} Tagen",
-    "copyLabel": "Kopie von {{label}}"
+    "copyLabel": "Kopie von {{label}}",
+    "bookedOn": "Termin {{when}}",
+    "providerBooked": "Termin ansehen",
+    "booked": "Gebucht"
   }
 }

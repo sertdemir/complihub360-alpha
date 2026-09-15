@@ -372,6 +372,9 @@
     "inProgressSince_other": "in progress for {{count}} days",
     "nextDue_one": "next deadline in {{count}} day",
     "nextDue_other": "next deadline in {{count}} days",
-    "copyLabel": "Copy of {{label}}"
+    "copyLabel": "Copy of {{label}}",
+    "bookedOn": "Appointment {{when}}",
+    "providerBooked": "View appointment",
+    "booked": "Booked"
   }
 }

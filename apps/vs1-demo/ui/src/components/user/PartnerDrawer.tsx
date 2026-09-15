@@ -41,7 +41,7 @@ import type { AnonProvider } from '../../api/search';
 type Detail = { kind: 'loading' } | { kind: 'ready'; d: ProviderDetail } | { kind: 'missing' } | { kind: 'error' };
 type Step = 'profil' | 'termin' | 'fertig';
 
-export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessage }: {
+export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessage, booking, onBooked }: {
   open: boolean;
   onClose: () => void;
   /** Der Anbieter aus der Suche — traegt Match-Zahl und Pseudonym schon; die
@@ -51,6 +51,12 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
   basisNode?: React.ReactNode;
   /** Vorschlag fuer die Nachricht an den Anbieter, z. B. der Sitzungstitel. */
   sessionMessage?: string;
+  /** Ein bereits bestehender Termin bei diesem Anbieter — dann steht sein
+   *  Klarname im Kopf, nicht mehr das Pseudonym. */
+  booking?: { name: string; slotStart: string } | null;
+  /** Die frische Buchung nach oben melden, damit die Liste dahinter sofort
+   *  den Klarnamen und den Termin traegt. */
+  onBooked?: (key: string, b: { name: string; slotStart: string }) => void;
 }) {
   const { t, i18n } = useTranslation('results');
   const navigate = useNavigate();
@@ -119,7 +125,11 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
     setSending(true);
     setFailed(false);
     try {
-      setConfirmation(await createBooking(key, selected, message.trim() || undefined));
+      const res = await createBooking(key, selected, message.trim() || undefined);
+      setConfirmation(res);
+      // Die Liste dahinter erfaehrt es sofort — ohne Neuladen, ohne dass der
+      // Mandant die Schublade schliessen und suchen muss.
+      onBooked?.(key, { name: res.provider_identity.name, slotStart: res.booking.slot_start });
       setStep('fertig');
     } catch {
       // Kein erfundener Anbieter als Rueckfall: der Termin ist nicht gebucht,
@@ -137,7 +147,7 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
     provider.completed_count ? `${provider.completed_count} ${t('detail.mandates')}` : null,
   ].filter(Boolean).join(' · ');
 
-  const title = step === 'profil' ? provider.pseudonym_label
+  const title = step === 'profil' ? (booking?.name ?? provider.pseudonym_label)
     : step === 'termin' ? t('schedule.title')
     : t('schedule.doneTitle');
   const eyebrow = step === 'fertig' ? t('schedule.doneEyebrow') : t('detail.crumbProviders');
@@ -158,7 +168,11 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
             </span>
             <div className="min-w-0">
               <p className="text-body-3xs text-fg-tertiary">{meta}</p>
-              {provider.is_verified && (
+              {booking ? (
+                <span className="mt-1 inline-flex rounded-full bg-brand-light px-2 py-[2px] text-body-4xs font-extrabold uppercase tracking-[0.06em] text-fg-brand">
+                  {t('snapshot.bookedOn', { when: new Date(booking.slotStart).toLocaleString(locale, { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) })}
+                </span>
+              ) : provider.is_verified && (
                 <span className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-accent/55 px-2 py-[2px] text-body-4xs font-extrabold uppercase tracking-[0.06em] text-fg-accent-strong">
                   <ShieldCheck size={12} strokeWidth={2.2} aria-hidden /> {t('snapshot.verifiedPartner')}
                 </span>

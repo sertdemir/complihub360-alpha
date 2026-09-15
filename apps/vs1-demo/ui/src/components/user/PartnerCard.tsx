@@ -13,20 +13,31 @@ import type { AnonProvider } from '../../api/search';
 // den ausgewaehlten Anbieter, der Weg geht ueber die Detailseite.
 //
 // Der erste Anbieter traegt den goldenen Kasten und die Marke (bester Match),
-// alle weiteren den petrolfarbenen. Klarnamen erst nach Buchung.
+// alle weiteren den petrolfarbenen. Klarnamen erst nach Buchung — DANN aber
+// auch hier: eine Karte, hinter der ein Termin steht, nennt den Anbieter beim
+// Namen und den Termin (Nutzer 2026-09-15). Sonst sucht der Mandant in seiner
+// eigenen Liste nach einem Pseudonym, dessen Namen er laengst kennt.
 
 const CARD = 'rounded-xl border border-stroke-subtle bg-surface shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]';
 
-export function PartnerCard({ provider: p, top, basis, onDetails, className = '' }: {
+export function PartnerCard({ provider: p, top, basis, onDetails, booking, className = '' }: {
   provider: AnonProvider;
   /** Bester Match: goldener Kasten + Verified-Marke. */
   top?: boolean;
   /** Woraus die Match-Zahl besteht — meist <MatchBasis basis={p.match_basis} />. */
   basis?: ReactNode;
   onDetails: () => void;
+  /** Gibt es einen Termin bei diesem Anbieter, traegt die Karte seinen
+   *  KLARNAMEN statt des Pseudonyms (Stufe 3, spec §5): wer gebucht hat, soll
+   *  in seiner Liste nicht weiter ein Pseudonym suchen muessen. */
+  booking?: { name: string; slotStart: string } | null;
   className?: string;
 }) {
-  const { t } = useTranslation('results');
+  const { t, i18n } = useTranslation('results');
+  const locale = i18n.resolvedLanguage || 'en';
+  const when = booking
+    ? new Date(booking.slotStart).toLocaleString(locale, { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+    : null;
   return (
     <div className={`${CARD} flex flex-col p-4 ${className}`}>
       <div className="flex items-center gap-2.5">
@@ -37,15 +48,26 @@ export function PartnerCard({ provider: p, top, basis, onDetails, className = ''
           {p.match}
         </span>
         <div className="min-w-0 flex-1">
-          {top && (
-            <span className="inline-flex rounded-full border border-accent/55 px-2 py-[2px] text-[9px] font-extrabold uppercase tracking-[0.06em] text-fg-accent-strong">
+          {booking ? (
+            <span className="inline-flex whitespace-nowrap rounded-full bg-brand-light px-2 py-[2px] text-[9px] font-extrabold uppercase tracking-[0.06em] text-fg-brand">
+              {t('snapshot.booked')}
+            </span>
+          ) : top && (
+            <span className="inline-flex whitespace-nowrap rounded-full border border-accent/55 px-2 py-[2px] text-[9px] font-extrabold uppercase tracking-[0.06em] text-fg-accent-strong">
               ✓ {t('snapshot.verifiedPartner')}
             </span>
           )}
-          <p className={(top ? 'mt-1 ' : '') + 'text-body-xs font-bold leading-snug text-fg'}>{p.pseudonym_label}</p>
+          {/* Klarnamen sind laenger als Pseudonyme und muessen in einer
+              schmalen Spalte umbrechen duerfen, statt aus der Karte zu laufen. */}
+          <p className={(top || booking ? 'mt-1 ' : '') + 'break-words text-body-xs font-bold leading-snug text-fg'}>
+            {booking ? booking.name : p.pseudonym_label}
+          </p>
         </div>
       </div>
-      <p className="mt-2.5 text-[10.5px] text-fg-tertiary">
+      {booking && (
+        <p className="mt-2.5 text-[10.5px] font-bold text-fg-brand">{t('snapshot.bookedOn', { when })}</p>
+      )}
+      <p className={(booking ? 'mt-0.5 ' : 'mt-2.5 ') + 'text-[10.5px] text-fg-tertiary'}>
         {[p.region, p.active_since ? t('snapshot.activeSince', { year: p.active_since }) : null].filter(Boolean).join(' · ')}
       </p>
       <p className="mt-0.5 text-[10.5px] text-fg-tertiary">
@@ -57,8 +79,8 @@ export function PartnerCard({ provider: p, top, basis, onDetails, className = ''
       {basis && <div className="mt-3 border-t border-stroke-subtle pt-3">{basis}</div>}
       {/* Der einzige gefuellte Knopf: der Weg zum einzelnen Anbieter. */}
       <div className="mt-auto pt-5">
-        <Button variant="primary" className="w-full" onClick={onDetails}>
-          {t('snapshot.providerDetails')}
+        <Button variant={booking ? 'secondary' : 'primary'} className="w-full" onClick={onDetails}>
+          {booking ? t('snapshot.providerBooked') : t('snapshot.providerDetails')}
         </Button>
       </div>
     </div>

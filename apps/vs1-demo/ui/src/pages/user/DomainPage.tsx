@@ -278,10 +278,6 @@ function DomainView({ slug }: { slug: DomainSlug }) {
               {/* 4B · Wissen zum Bereich */}
               {data && <DomainKnowledge slug={slug} markets={markets} sessions={sessions} />}
 
-              {/* 5D · Anbieter als Karten */}
-              {data && (
-                <DomainProviders ref={providersRef} slug={slug} areaLabel={areaLabel} country={primaryCountry} />
-              )}
             </div>
 
             {/* 3C · Assistent rechts */}
@@ -297,6 +293,15 @@ function DomainView({ slug }: { slug: DomainSlug }) {
               />
             )}
           </div>
+
+          {/* 5D · Anbieter als Karten — ueber die VOLLE Breite, nicht in der
+              linken Spalte (Nutzer 2026-09-15: drei nebeneinander, kein
+              Umbruch). Neben dem Assistenten blieben je Karte rund 280 px;
+              ein Klarname wie „Studio Bianchi & Partner Commercialisti
+              Associati S.r.l." wurde darin buchstabenweise zerlegt. */}
+          {data && (
+            <DomainProviders ref={providersRef} slug={slug} areaLabel={areaLabel} country={primaryCountry} />
+          )}
         </div>
       </div>
     </UserShell>

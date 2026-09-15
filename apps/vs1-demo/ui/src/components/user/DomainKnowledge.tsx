@@ -22,6 +22,12 @@ import type { DomainSession } from '../../api/domain';
 //
 // Kein Auto-Vorlauf wie auf der Marketing-Seite: im Arbeitsbereich liest
 // man, man schaut nicht zu.
+//
+// Darstellung seit 2026-09-15: EIN BLATT JE PFLICHT. Vorher stand links eine
+// Liste und rechts das Dossier der ausgewaehlten — man sah eine von zwoelf
+// Pflichten und musste fuer jede weitere klicken. Jetzt tragen alle Karten
+// ihre Norm, Kadenz, Bussgeld und Geltung selbst; der Umschalter oben
+// (eigene Maerkte / alle) entscheidet weiterhin, welche ueberhaupt gelten.
 
 const CARD = 'rounded-xl border border-stroke-subtle bg-surface shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]';
 const TAG = 'inline-flex whitespace-nowrap rounded-md bg-brand-light px-2 py-[3px] text-[9.5px] font-extrabold uppercase tracking-[0.07em] text-fg-brand';
@@ -50,7 +56,6 @@ export function DomainKnowledge({ slug, markets, sessions }: {
   const locale = i18n.resolvedLanguage || 'en';
   const mine = markets.map((m) => m.toUpperCase()).filter(isMarketCode);
   const [view, setView] = useState<'mine' | 'all'>(mine.length ? 'mine' : 'all');
-  const [picked, setPicked] = useState<string | null>(null);
 
   const entries = useMemo<Entry[]>(() => {
     const profile = getAreaProfile(slug);
@@ -73,7 +78,6 @@ export function DomainKnowledge({ slug, markets, sessions }: {
     return out.sort((a, b) => (b.own.length ? 1 : 0) - (a.own.length ? 1 : 0) || b.primary.riskWeight - a.primary.riskWeight);
   }, [slug, view, mine.join(','), sessions]);
 
-  const active = entries.find((e) => e.id === picked) ?? entries[0];
   const sessionTitle = (s: DomainSession) => s.label || [s.categories.join(', '), s.country].filter(Boolean).join(' · ');
   const statusLabel = (o: Entry['own'][number]) =>
     o.status === 'in_progress' ? t('domainPage.inProgress')
@@ -98,57 +102,37 @@ export function DomainKnowledge({ slug, markets, sessions }: {
         )}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[400px_minmax(0,1fr)]">
-        {/* Rail */}
-        <div className="flex flex-col gap-0.5">
-          {entries.map((e) => {
-            const on = e.id === active?.id;
-            return (
-              <button
-                key={e.id}
-                type="button"
-                aria-pressed={on}
-                onClick={() => setPicked(e.id)}
-                className={'flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-left transition-colors ' +
-                  (on ? 'border-l-[3px] border-l-[#d4af37] bg-surface shadow-[0_8px_24px_-18px_rgba(11,21,18,0.3)]' : 'hover:bg-surface/60')}
-              >
-                <span className={`h-2 w-2 shrink-0 rounded-full ${SEVERITY_STYLE[e.primary.severity].bar}`} />
-                <span className="min-w-0 flex-1">
-                  <span className={'block text-body-xs ' + (on ? 'font-extrabold text-fg' : 'font-semibold text-fg')}>{e.primary.label}</span>
-                  <span className="block text-[10px] text-fg-tertiary">{e.primary.source}</span>
-                </span>
-                {e.own.length > 0 && <span className={TAG}>{t('domainPage.knowledgeInSession')}</span>}
-              </button>
-            );
-          })}
-        </div>
+      {/* Ein Blatt je Pflicht statt Liste links, Dossier rechts (Nutzer
+          2026-09-15): alles auf einen Blick, nichts hinter einem Klick. Die
+          Marken oben — eigene Maerkte oder alle — bleiben, sie entscheiden,
+          welche Pflichten hier ueberhaupt stehen. */}
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        {entries.map((e) => (
+          <article key={e.id} className={CARD + ' flex flex-col p-5'}>
+            <div className="flex items-start gap-2.5">
+              <span className={`mt-[5px] h-2 w-2 shrink-0 rounded-full ${SEVERITY_STYLE[e.primary.severity].bar}`} />
+              <div className="min-w-0 flex-1">
+                <h3 className="font-serif text-[16px] font-bold leading-tight text-fg">{e.primary.label}</h3>
+                <p className="mt-0.5 text-body-4xs text-fg-tertiary">{e.primary.source}</p>
+              </div>
+              {e.own.length > 0 && <span className={TAG}>{t('domainPage.knowledgeInSession')}</span>}
+            </div>
 
-        {/* Dossier */}
-        {active && (
-          <div className={CARD + ' p-5'}>
-            <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-accent-strong">
-              {t('domainPage.dossier')} · {active.primary.label}
-            </p>
-            <h3 className="mt-2 font-serif text-[18px] font-bold leading-tight text-fg">{active.primary.label}</h3>
-            <p className="mt-2 text-body-xs leading-relaxed text-fg-secondary">{active.primary.description}</p>
+            <p className="mt-2.5 text-body-3xs leading-relaxed text-fg-secondary">{e.primary.description}</p>
 
-            <dl className="mt-3.5 grid gap-x-4 gap-y-2.5 text-body-3xs sm:grid-cols-2">
+            <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-body-3xs">
               <div>
-                <dt className="text-[9.5px] font-extrabold uppercase tracking-[0.06em] text-fg-tertiary">{t('domainPage.dossierNorm')}</dt>
-                <dd className="mt-0.5 font-semibold text-fg">{active.primary.source}</dd>
+                <dt className="text-body-4xs font-extrabold uppercase tracking-[0.06em] text-fg-tertiary">{t('domainPage.dossierCadence')}</dt>
+                <dd className="mt-0.5 font-semibold text-fg">{e.primary.due}</dd>
               </div>
               <div>
-                <dt className="text-[9.5px] font-extrabold uppercase tracking-[0.06em] text-fg-tertiary">{t('domainPage.dossierCadence')}</dt>
-                <dd className="mt-0.5 font-semibold text-fg">{active.primary.due}</dd>
+                <dt className="text-body-4xs font-extrabold uppercase tracking-[0.06em] text-fg-tertiary">{t('domainPage.dossierPenalty')}</dt>
+                <dd className="mt-0.5 font-semibold text-fg">{e.primary.penalty}</dd>
               </div>
-              <div>
-                <dt className="text-[9.5px] font-extrabold uppercase tracking-[0.06em] text-fg-tertiary">{t('domainPage.dossierPenalty')}</dt>
-                <dd className="mt-0.5 font-semibold text-fg">{active.primary.penalty}</dd>
-              </div>
-              <div>
-                <dt className="text-[9.5px] font-extrabold uppercase tracking-[0.06em] text-fg-tertiary">{t('domainPage.dossierScope')}</dt>
+              <div className="col-span-2">
+                <dt className="text-body-4xs font-extrabold uppercase tracking-[0.06em] text-fg-tertiary">{t('domainPage.dossierScope')}</dt>
                 <dd className="mt-0.5 font-semibold text-fg">
-                  {active.perMarket.map((m, i) => (
+                  {e.perMarket.map((m, i) => (
                     <span key={m.code}>
                       {i > 0 && ' · '}
                       {m.code === 'EU' ? tc('compliance.area.euWide', 'EU-wide') : m.code}
@@ -159,9 +143,9 @@ export function DomainKnowledge({ slug, markets, sessions }: {
               </div>
             </dl>
 
-            {active.own.length > 0 && (
-              <div className="mt-3.5 flex flex-col gap-1.5">
-                {active.own.map((o) => (
+            {e.own.length > 0 && (
+              <div className="mt-3 flex flex-col gap-1.5">
+                {e.own.map((o) => (
                   <div key={o.session.id} className="rounded-lg bg-brand-light px-3 py-2 text-body-3xs text-fg">
                     <b>{t('domainPage.dossierOwn', { session: sessionTitle(o.session) })}</b> {statusLabel(o)} ·{' '}
                     <button type="button" onClick={() => navigate(`/${locale}/results?session=${o.session.id}`)} className="font-bold text-brand underline underline-offset-2 hover:text-brand-700">
@@ -172,9 +156,9 @@ export function DomainKnowledge({ slug, markets, sessions }: {
               </div>
             )}
 
-            <div className="mt-3.5 flex flex-wrap gap-3 text-body-3xs font-bold">
-              {active.primary.eurLexUrl && (
-                <a href={active.primary.eurLexUrl} target="_blank" rel="noopener noreferrer" className="text-brand underline underline-offset-2 hover:text-brand-700">
+            <div className="mt-auto flex flex-wrap gap-3 pt-3.5 text-body-3xs font-bold">
+              {e.primary.eurLexUrl && (
+                <a href={e.primary.eurLexUrl} target="_blank" rel="noopener noreferrer" className="text-brand underline underline-offset-2 hover:text-brand-700">
                   {t('domainPage.dossierSource')}
                 </a>
               )}
@@ -182,8 +166,8 @@ export function DomainKnowledge({ slug, markets, sessions }: {
                 {t('domainPage.dossierPublic')}
               </Link>
             </div>
-          </div>
-        )}
+          </article>
+        ))}
       </div>
     </section>
   );

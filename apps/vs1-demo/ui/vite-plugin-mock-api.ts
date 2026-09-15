@@ -32,13 +32,17 @@ function bookings() {
   return [
     b('m0ck-b01', 'studio-bianchi', 'Studio Bianchi & Partner Commercialisti Associati S.r.l.', 'Norditalien', 'https://example.org', iso(0, 16), iso(0, 16, 30), 'confirmed'),
     b('m0ck-b02', 'schmidt-partner', 'Schmidt & Partner Steuerberatungsgesellschaft mbH', 'Norddeutschland', 'https://example.org', iso(1, 9), iso(1, 9, 30), 'confirmed'),
-    b('m0ck-b03', 'madrid-tax', 'Madrid Tax Advisors', 'Spanien', null, iso(4, 11), iso(4, 11, 30), 'confirmed'),
+    // Bewusst NICHT 'madrid-tax': von den drei Anbietern, die die Suche zeigt,
+    // soll einer ohne Termin bleiben. Sonst trugen im Mock alle drei Karten den
+    // Klarnamen und der Normalfall — Pseudonym, „Details ansehen" — war nicht
+    // mehr zu sehen.
+    b('m0ck-b03', 'lucid-reg', 'LUCID Registrierungsdienst Hamburg', 'Hamburg', null, iso(4, 11), iso(4, 11, 30), 'confirmed'),
     b('m0ck-b04', 'dahlmann-cpa', 'Dahlmann CPA', 'USA', null, iso(6, 15), iso(6, 15, 30), 'confirmed'),
     b('m0ck-b05', 'paris-legal', 'Cabinet Durand & Associés — Droit des affaires', 'Île-de-France', null, iso(12, 10), iso(12, 10, 30), 'confirmed'),
     b('m0ck-b06', 'ams-privacy', 'Amsterdam Privacy Partners', 'Niederlande', null, iso(19, 13), iso(19, 13, 30), 'confirmed'),
     b('m0ck-b07', 'lucid-reg', 'LUCID Registrierungsdienst Hamburg', 'Hamburg', null, iso(-1, 14), iso(-1, 14, 30), 'confirmed'),
     b('m0ck-b08', 'oss-experts', 'OSS Experts GmbH', 'Berlin', null, iso(-2, 10), iso(-2, 10, 30), 'confirmed'),
-    b('m0ck-b09', 'madrid-tax', 'Madrid Tax Advisors', 'Spanien', null, iso(-8, 9), iso(-8, 9, 30), 'completed'),
+    b('m0ck-b09', 'oss-experts', 'OSS Experts GmbH', 'Berlin', null, iso(-8, 9), iso(-8, 9, 30), 'completed'),
     b('m0ck-b10', 'dahlmann-cpa', 'Dahlmann CPA', 'USA', null, iso(-17, 16), iso(-17, 16, 30), 'cancelled'),
     b('m0ck-b11', 'ams-privacy', 'Amsterdam Privacy Partners', 'Niederlande', null, iso(-21, 11), iso(-21, 11, 30), 'no_show'),
     b('m0ck-b12', 'schmidt-partner', 'Schmidt & Partner Steuerberatungsgesellschaft mbH', 'Norddeutschland', null, iso(-30, 15), iso(-30, 15, 30), 'completed'),

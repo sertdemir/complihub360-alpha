@@ -372,6 +372,9 @@
     "inProgressSince_other": "{{count}} gündür devam ediyor",
     "nextDue_one": "sonraki son tarih {{count}} gün içinde",
     "nextDue_other": "sonraki son tarih {{count}} gün içinde",
-    "copyLabel": "{{label}} kopyası"
+    "copyLabel": "{{label}} kopyası",
+    "bookedOn": "Randevu {{when}}",
+    "providerBooked": "Randevuyu gör",
+    "booked": "Alındı"
   }
 }

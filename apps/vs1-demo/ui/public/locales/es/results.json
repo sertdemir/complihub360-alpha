@@ -372,6 +372,9 @@
     "inProgressSince_other": "en curso desde hace {{count}} días",
     "nextDue_one": "próximo plazo en {{count}} día",
     "nextDue_other": "próximo plazo en {{count}} días",
-    "copyLabel": "Copia de {{label}}"
+    "copyLabel": "Copia de {{label}}",
+    "bookedOn": "Cita {{when}}",
+    "providerBooked": "Ver la cita",
+    "booked": "Reservado"
   }
 }
