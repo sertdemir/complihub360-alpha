@@ -175,7 +175,7 @@ Legend: ✅ exact · ⚠️ partial (gaps listed) · ❌ missing in code.
 | **Table Mobile Card** | `804:504` | State (Default·Selected) = 2 | — | ❌ missing | Mobile stacked-card strategy (label/value pairs per row) not implemented. Code Table relies on `overflow-x-auto` horizontal scroll on mobile — contradicts the Compass doctrine ("Mobile gibt es nicht als Tabelle"). |
 | **Mobile Sort Bar** | `805:508` | Active (Name·Risk·Owner·Due) = 4 | — | ❌ missing | No mobile sort-bar control. |
 | **Stat** | `1112:2` | Size (SM·MD·LG) × Trend (Up·Down·Neutral) = 9 | `Stat.tsx` | ⚠️ partial | Size SM/MD/LG ✅; Trend up/down/neutral ✅. **Doctrine drift**: trend uses green/red (`success-700` / `error-700`) — fine for a neutral KPI, but note Stat is explicitly NOT risk; acceptable. Eyebrow+value+trend anatomy matches. Minor: value sizes are code-author chosen, not token-locked. |
-| **Logo** | `712:266` | Lockup (Horizontal·Stacked·Symbol-Only) × Color (On Light·On Petrol·Mono White·Mono Black) = 12 | `Logo.tsx` | ✅ exact | All 3 lockups (`horizontal`/`stacked`/`mark`) × all 4 tones (`on-light`/`on-petrol`/`mono-white`/`mono-black`). Exact exported vector geometry; Inter Bold 16 wordmark + Inter Regular 10 gold tagline per spec. |
+| **Logo** | `712:266` | Lockup (bildmarke·wortmarke·default) × light/dark = 6 | `Logo.tsx` | ✅ exact | Alle 3 Lockups × beide Tones. Geometrie aus dem Node exportiert und optimiert (siehe `logo-paths.ts`); Wortmarke und Claim sind Vektor, kein Text. |
 
 ## Summary by verdict
 

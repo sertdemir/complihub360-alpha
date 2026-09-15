@@ -99,7 +99,7 @@ export function MarketingHeader({
           xl is 1440 in this Tailwind scale, so the cut is desktop-m (1280). ── */}
       <div className="mx-auto hidden h-20 max-w-container-2xl items-center gap-4 px-4 desktop-m:flex">
         <div className="flex flex-1 basis-0 items-center gap-5">
-          <Logo tone={inverse ? 'on-petrol' : 'on-light'} href={userHref} />
+          <Logo tone={inverse ? 'dark' : 'light'} href={userHref} />
         </div>
         {/* Anchor group sits truly centered between the two flex-1 side zones. */}
         <nav className="flex items-center justify-center gap-1.5 desktop-l:gap-3">
@@ -170,7 +170,7 @@ export function MarketingHeader({
       <div className="desktop-m:hidden">
         <div className="flex h-16 items-center justify-between px-5">
           {/* Mobile: mark only — wordmark + claim dropped to save width. */}
-          <Logo lockup="mark" tone={inverse ? 'on-petrol' : 'on-light'} />
+          <Logo lockup="bildmarke" tone={inverse ? 'dark' : 'light'} />
           <div className="flex items-center gap-2">
             <ThemeToggle inverse={inverse} size={40} />
             <LanguageMenu triggerClassName={`h-10 w-10 ${inverse ? 'text-fg-inverse hover:text-fg-inverse' : ''}`} />

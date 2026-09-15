@@ -92,7 +92,7 @@ export function GlobalNav() {
         {/* Logo — the real lockup from the design system, never a rebuilt mark.
             This used to be a CircleDot glyph in a green square plus a text
             wordmark, which carried no brand claim; since SiteHeader routes every
-            non-landing page through GlobalNav, "Always on your side." reached
+            non-landing page through GlobalNav, "Always on your side" reached
             only two routes. href={null} keeps the anchor out: navTo prefixes the
             active locale, which a plain href would drop. */}
         <button
@@ -103,10 +103,10 @@ export function GlobalNav() {
           {/* Mark only between desktop-m and desktop-l: the full lockup plus
               six German entries need the last ~130px the wordmark occupies. */}
           <span className="desktop-l:hidden">
-            <Logo lockup="mark" tone="on-light" href={null} markClassName="h-7" />
+            <Logo lockup="bildmarke" tone="light" href={null} className="h-7" />
           </span>
           <span className="hidden desktop-l:block">
-            <Logo lockup="horizontal" tone="on-light" href={null} markClassName="h-7" />
+            <Logo lockup="default" tone="light" href={null} className="h-7" />
           </span>
         </button>
 
@@ -240,7 +240,7 @@ export function GlobalNav() {
         <div className="desktop-m:hidden">
           <div className="flex h-16 items-center justify-between px-5">
             <button onClick={() => navTo('/')} className="flex items-center" aria-label="CompliHub360 Home">
-              <Logo lockup="mark" tone="on-light" href={null} />
+              <Logo lockup="bildmarke" tone="light" href={null} />
             </button>
             <div className="flex items-center gap-2">
               <ThemeToggle size={40} />

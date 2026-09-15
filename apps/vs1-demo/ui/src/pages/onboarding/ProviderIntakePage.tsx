@@ -64,7 +64,7 @@ export function ProviderIntakePage() {
     <div className="dark min-h-screen bg-[#1F2937] px-6 py-10 text-fg">
       <div className="mx-auto max-w-[720px] space-y-6">
         <div className="flex items-center gap-2.5">
-          <LogoMark tone="on-petrol" className="h-[24px] w-auto" />
+          <LogoMark tone="dark" className="h-[24px] w-auto" />
           <span className="text-[15px] font-semibold text-white">CompliHub360</span>
           <span className="text-[11px] font-semibold tracking-[0.12em] text-[#d4af37]">· PARTNER INTAKE</span>
         </div>

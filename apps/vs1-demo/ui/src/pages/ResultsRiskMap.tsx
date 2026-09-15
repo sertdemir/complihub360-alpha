@@ -465,7 +465,7 @@ export function ResultsRiskMap() {
       <header className="sticky top-0 z-30 border-b border-stroke-subtle bg-surface/90 backdrop-blur-xl">
         <div className="mx-auto flex h-[72px] w-full max-w-[1440px] items-center justify-between px-4 md:px-8 lg:px-16">
           <div className="flex min-w-0 items-center gap-4">
-            <Logo lockup="horizontal" tone="on-light" href="/" markClassName="h-9" />
+            <Logo lockup="default" tone="light" href="/" className="h-9" />
             {/* The guest map deliberately drops the site nav to stay focused, which
                 left no visible way out — the logo was the only exit and nobody
                 reads a logo as "back". This is that exit, spelled out. */}

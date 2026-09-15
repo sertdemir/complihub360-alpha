@@ -426,10 +426,10 @@ export function AnimatedWizard({
               Demos auf der Startseite bleibt es Text: dort waere ein Home-Link
               der Ausgang aus einer Vorschau, die gar keine Seite ist. */}
           <Logo
-            lockup="horizontal"
-            tone="on-light"
+            lockup="default"
+            tone="light"
             href={sp ? `/${i18n.resolvedLanguage || 'en'}` : null}
-            markClassName={sp ? 'h-9' : 'h-7'}
+            className={sp ? 'h-9' : 'h-7'}
           />
           {sp && (
             <div className="pointer-events-none absolute left-1/2 -translate-x-1/2">

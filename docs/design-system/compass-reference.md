@@ -308,6 +308,20 @@ reconciliation — it must become `risk/*` petrol on the Hero redo (Phase D). No
 
 ## 14 · Logo (🪪)
 
-Round **360° mark** (gold/white) + **"CompliHub"** wordmark + tagline **"Always on your side."**.
-Use the real DS logo instance — never a placeholder. Current `GlobalNav` uses a `CircleDot` placeholder
-→ replace with the real 360° mark when the header is reworked.
+Globus im Kreisbogen + goldener Schwung, daneben **"CompliHub"** (Ink) **"360"** (Gold) und der
+Claim **"Always on your side"** zwischen zwei Linien.
+
+Das Component-Set führt sechs Varianten über **eine** Property:
+
+| Lockup | Aufbau | Maße |
+| --- | --- | --- |
+| `default` | Bildmarke + Wortmarke | 144.594 × 40.018 |
+| `bildmarke` | nur das Symbol | 40.594 × 40.018 |
+| `wortmarke` | nur der Schriftzug | 101 × 20.701 |
+
+dazu `tone`: `light` für helle Gründe, `dark` für dunkle. Nur die Ink-Seite kippt,
+Gold bleibt konstant — `ink` `#012E27` → `#FFFFFF`, `ring` `#0D3B33` → `#FFFFFF`,
+`gold` `#C5913B`.
+
+Immer die echte DS-Instanz verwenden, nie einen Platzhalter. Der frühere
+`CircleDot`-Platzhalter im `GlobalNav` ist abgelöst.

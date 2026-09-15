@@ -524,8 +524,9 @@ Inner container:
   Height: always consistent (enforce h-10 on actions area)
 
 Logo:
-  Left: CompliHub360 with circular dot icon (primary-500)
-  Font: Inter Bold 14px
+  Left: <Logo lockup="default" tone="light" /> — Bildmarke + Wortmarke
+  Höhe: h-7 … h-9 (die Breite folgt über w-auto)
+  Die Wortmarke ist Vektor, kein Text — Schriftgrößen sind hier gegenstandslos.
 
 Nav links (center):
   Inter Medium 14px · neutral-700
