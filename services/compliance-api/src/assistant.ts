@@ -2,6 +2,7 @@ import { IncomingMessage, ServerResponse } from "http";
 import { structuredLog } from "@complihub360/types";
 import { supabaseApi } from "./supabase.js";
 import { DOMAIN_SLUGS, domainKnowledge, loadDomainSessions } from "./domain.js";
+import { jurisdictionChain, resolveFacts } from './jurisdiction.js';
 
 // ─── VAT assistant (chatbot plan phase ②) ─────────────────────────────────────
 // RAG over knowledge_chunks (vector 768, match_knowledge_chunks RPC) plus the
@@ -202,10 +203,24 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
                 })) as Array<{ content: string; metadata: { country?: string; section?: string } | null; similarity: number }>
                 : [];
 
+            // `factsFor` kann seit 20260917000000 eine Region tragen ('US-CA'),
+            // nicht nur ein Land. Abgefragt wird weiter ueber `country_code` —
+            // die Wurzel der Kette —, damit eine Abfrage alle Ebenen holt;
+            // resolveFacts entscheidet dann, welche Zeile je fact_key gilt.
+            //
+            // Ohne bekannte Region bleiben NUR die Landeszeilen uebrig. Das ist
+            // der Punkt: die Zeilen gehen unten als "verified ground truth —
+            // prefer these for numbers" in den Kontext, und zwei sich
+            // widersprechende Schwellen nebeneinander waeren dort schlimmer als
+            // der allgemeine Wert mit seiner Anmerkung.
             const factsFor = vatScope ? (country || scopedMarkets[0] || (chunks[0]?.metadata?.country ?? null)) : null;
-            const facts = factsFor
-                ? (await supabaseApi.select('jurisdiction_facts', { country_code: factsFor }, { limit: 40 })) as
-                    Array<{ fact_key: string; value_text: string; notes: string | null }>
+            const factsRoot = factsFor ? jurisdictionChain(factsFor)[0] : null;
+            const facts = factsRoot
+                ? resolveFacts(
+                    (await supabaseApi.select('jurisdiction_facts', { country_code: factsRoot }, { limit: 200 })) as
+                        Array<{ fact_key: string; value_text: string; notes: string | null; jurisdiction_code?: string | null }>,
+                    factsFor as string,
+                  )
                 : [];
 
             const contextParts: string[] = [];

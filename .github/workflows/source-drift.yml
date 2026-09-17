@@ -1,0 +1,67 @@
+# ─── Waechter: laufen unsere Werte den amtlichen Quellen hinterher? ──────────
+#
+# Die Steuersaetze in `jurisdiction_facts` stammten aus dem EY Global VAT Guide,
+# Ausgabe 03/2026 — einer Momentaufnahme. Der erste Abgleich gegen die Taxes in
+# Europe Database am 17.09.2026 fand prompt zwei veraltete Werte: Spaniens
+# befristeter Satz von 5 % war ausgelaufen, und Oesterreich hatte seit dem
+# 01.07.2026 einen neuen Satz von 4,9 %. Beides ist korrigiert; die Frage ist,
+# wie wir das naechste Mal davon erfahren, BEVOR ein Mandant danach handelt.
+#
+# Dieser Lauf ist die Antwort. Einmal die Woche gegen TEDB, und rot, sobald ein
+# Mitgliedstaat einen Satz aendert, den wir noch anders fuehren.
+#
+# ER SCHREIBT NICHTS. Das ist Absicht und keine Bequemlichkeit: eine
+# Steuerangabe, die sich ohne menschlichen Blick selbst ueberschreibt, ist
+# genau die Art Automatik, die in einem Compliance-Produkt nichts zu suchen
+# hat. Ein falscher Wert aus einer fehlgedeuteten Antwort stuende sonst binnen
+# Stunden in der Auskunft an einen Mandanten. Der Lauf meldet, ein Mensch
+# entscheidet, die Korrektur geht als Migration durch einen PR — so wie
+# 20260917000001.
+#
+# Nur ABWEICHUNG faerbt rot. "gehoert auf region-Ebene" und "ausserhalb TEDB"
+# sind bekannte Luecken unseres Modells, keine Drift der Quelle; wuerden sie
+# mitzaehlen, waere der Waechter vom ersten Tag an rot und damit wertlos.
+
+name: Source Drift
+
+on:
+  schedule:
+    # Montags 06:00 UTC. Frueh genug, dass eine Aenderung zum Wochenstart
+    # auffaellt, und ausserhalb der Zeiten, in denen TEDB gepflegt wird.
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tedb:
+    name: MwSt-Saetze gegen TEDB
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Kein `npm ci`: das Skript kommt ohne Abhaengigkeiten aus. Das war beim
+      # Bauen eine bewusste Entscheidung und zahlt sich hier aus — der Waechter
+      # kann nicht an einem Installationsfehler scheitern, der mit der Frage
+      # nichts zu tun hat.
+      - name: Abgleich
+        run: node scripts/tedb-vat-rates.mjs --record tedb-response.xml --fail-on-diff
+
+      # Bei Rot ist die Rohantwort das Beweisstueck: ohne sie laesst sich
+      # hinterher nicht mehr klaeren, ob die Quelle sich geaendert hat oder
+      # unsere Auswertung. Auch bei Gruen hochgeladen, damit ein Vergleich
+      # zweier Wochen moeglich ist.
+      - name: Rohantwort sichern
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tedb-response
+          path: tedb-response.xml
+          retention-days: 90
+          if-no-files-found: warn
