@@ -104,7 +104,7 @@ export function BrandCodePreview() {
         style={{ background: 'radial-gradient(ellipse at center, rgba(13,148,114,0.45), transparent 70%)' }}
       />
 
-      <div className="relative mx-auto w-full max-w-[1320px] px-4 md:px-6 lg:px-10">
+      <div className="relative mx-auto w-full max-w-container-xl px-4 md:px-6 lg:px-10">
         {/* Header (left-aligned) */}
         <motion.div
           className="max-w-2xl"
