@@ -129,7 +129,9 @@ describe('EU legal basis (CELEX → EUR-Lex)', () => {
         expect(ppwr?.appliesFrom).toBe('2026-08-12');
         expect(ppwr?.source).not.toContain('2026');
         // The national registration layer stays a separate, DE-specific row.
-        expect(results.find(r => r.id === 'prod-epr')?.source).toContain('VerpackG');
+        // VerpackDG, not VerpackG: the old act is repealed, its successor is the
+        // German implementation of this very Regulation (checked 2026-09-17).
+        expect(results.find(r => r.id === 'prod-epr')?.source).toContain('VerpackDG');
     });
 
     it('13) obligations already in force carry no appliesFrom', () => {
