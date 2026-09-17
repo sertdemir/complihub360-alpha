@@ -41,6 +41,27 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// ─── Proxy ───────────────────────────────────────────────────────────────────
+// Node 22 liest HTTPS_PROXY bei `fetch` NICHT von allein (undici nimmt die
+// Umgebung erst mit NODE_USE_ENV_PROXY=1, bis heute als experimentell
+// markiert). Ohne das geht die Anfrage am Proxy vorbei und laeuft in dessen
+// Sperre — mit einer 403-Meldung, die wie eine fehlende Freischaltung
+// aussieht, obwohl der Host laengst erlaubt ist. Genau darauf bin ich
+// hereingefallen; `curl` kam durch, das Skript nicht.
+//
+// Statt das in die Aufruf-Doku zu schreiben (wo es beim naechsten Mal niemand
+// liest), startet sich das Skript einmal mit gesetzter Variable neu. Die
+// Variable ist zugleich die Abbruchbedingung, eine Schleife kann es also nicht
+// geben. Ohne Proxy in der Umgebung passiert nichts davon.
+if (process.env.HTTPS_PROXY && !process.env.NODE_USE_ENV_PROXY) {
+  const { spawnSync } = await import('node:child_process');
+  const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), ...process.argv.slice(2)], {
+    stdio: 'inherit',
+    env: { ...process.env, NODE_USE_ENV_PROXY: '1', NODE_NO_WARNINGS: '1' },
+  });
+  process.exit(r.status ?? 1);
+}
+
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const MIGRATION = join(ROOT, 'supabase/migrations/20260715000008_jurisdiction_facts.sql');
 const ENDPOINT = 'https://ec.europa.eu/taxation_customs/tedb/ws/';
@@ -120,12 +141,24 @@ function compare(facts, rates) {
   const byState = new Map();
   for (const r of rates) {
     if (r.value === null) continue;
-    const e = byState.get(r.memberState) ?? { standard: null, reduced: new Map(), parking: new Set() };
+    const e = byState.get(r.memberState) ?? { standard: null, reduced: new Map(), parking: new Set(), regional: new Map() };
 
     if (r.rateType === 'DEFAULT') {
       // Der Regelsatz ist der einzige Eintrag OHNE Kategorie — er gilt fuer
       // alles, was nicht eigens ermaessigt ist.
       e.standard = r.value;
+    } else if (r.category === 'REGION') {
+      // BEFUND aus dem Live-Lauf: TEDB markiert territoriale Sondersaetze selbst
+      // mit der Kategorie REGION und sagt im Kommentar, wofuer sie gelten —
+      // Korsika und die Ueberseedepartements bei Frankreich (0,9 · 1,05 · 8,5 ·
+      // 13 %), Jungholz und Mittelberg bei Oesterreich (19 %). Das sind keine
+      // ermaessigten Saetze des LANDES, und sie gehoeren deshalb nicht in die
+      // Menge, die wir gegen `reduced_rates` stellen: sonst meldet jedes Land
+      // mit Sonderzone eine Abweichung, die keine ist.
+      //
+      // Ihr Platz ist die region-Ebene von `jurisdiction_facts` (Migration
+      // 20260917000000) — dieselbe Ebene, die die US-Bundesstaaten brauchen.
+      e.regional.set(r.value, [...(e.regional.get(r.value) ?? []), r.comment ?? '']);
     } else if (r.rateType === 'REDUCED_RATE' || r.rateType === 'SUPER_REDUCED_RATE') {
       // BEFUND aus dem ersten Live-Lauf (2026-09-17, 333 Eintraege fuer sechs
       // Laender): ein ermaessigter Satz haengt in TEDB IMMER an einer Kategorie
@@ -181,6 +214,16 @@ function compare(facts, rates) {
       theirs: theirRed.length ? theirRed.map((v) => `${v}%`).join(', ') : '—',
       verdict: !theirRed.length ? 'keine Antwort' : same ? 'deckungsgleich' : 'ABWEICHUNG',
     });
+
+    if (t.regional.size) {
+      const vals = [...t.regional.keys()].sort((a, b) => a - b);
+      rows.push({
+        market, key: 'regionale Sondersaetze',
+        ours: '— (kennt unser Modell nicht)',
+        theirs: vals.map((v) => `${v}%`).join(', '),
+        verdict: 'gehoert auf region-Ebene',
+      });
+    }
 
     if (t.parking.size) {
       rows.push({
@@ -291,6 +334,7 @@ async function main() {
 
   const diff = rows.filter((r) => r.verdict === 'ABWEICHUNG').length;
   const gap = rows.filter((r) => r.verdict !== 'deckungsgleich' && r.verdict !== 'ABWEICHUNG').length;
+  void gap;
   console.log(`\n${rows.length - diff - gap} deckungsgleich · ${diff} abweichend · ${gap} nicht aus TEDB zu bekommen`);
   if (gap) console.log('Fuer die letzte Gruppe braucht es eine zweite Quelle — fuer UK legislation.gov.uk/HMRC (OGL v3).');
 }
