@@ -71,7 +71,7 @@ const BOX: Record<LogoLockup, { w: number; h: number }> = {
 
 /** Default-Höhe je Lockup, wenn der Aufrufer keine Klasse mitgibt. */
 const DEFAULT_H: Record<LogoLockup, string> = {
-  horizontal: 'h-9',
+  horizontal: 'h-[47px]',
   stacked: 'h-16',
   symbol: 'h-8',
   wortmarke: 'h-5',

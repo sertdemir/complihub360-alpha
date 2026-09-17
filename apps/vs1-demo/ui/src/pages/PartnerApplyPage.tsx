@@ -75,7 +75,7 @@ export function PartnerApplyPage() {
         <div className="flex min-h-screen flex-col bg-surface lg:flex-row">
             {/* LINKS · die Aussicht auf dem Gradient */}
             <div className="flex flex-col justify-between gap-8 bg-gradient-stage px-6 pb-8 pt-8 lg:w-[46%] lg:gap-0 lg:px-14 lg:py-10">
-                <Logo lockup="horizontal" tone="on-light" href="/" className="h-9" />
+                <Logo lockup="horizontal" tone="on-light" href="/" className="h-[47px]" />
 
                 <div className="max-w-[460px] py-6 lg:py-0">
                     <p className="text-body-3xs font-bold uppercase tracking-[0.14em] text-brand">
