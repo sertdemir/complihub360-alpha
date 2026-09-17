@@ -118,8 +118,8 @@ export function HomeHeroWorld() {
           Full-bleed since 2026-09-17 (user decision): the band runs edge to
           edge like the HowItActs one, no rounded box; the four promises keep
           the 2xl content width inside it. The Gradient drifts (index.css) —
-          over this wide a surface with the long-travel variant. */}
-      <div className="bg-gradient-stage bg-gradient-stage--bleed py-10 lg:py-11">
+          same 12s / 300% as every other tinted surface since 2026-09-18. */}
+      <div className="bg-gradient-stage py-10 lg:py-11">
         <Stagger className="mx-auto grid w-full max-w-container-2xl grid-cols-1 px-4 sm:grid-cols-2 md:px-6 lg:grid-cols-4 lg:px-10">
           {PROMISE_ICONS.map((Icon, i) => (
             <StaggerItem key={i} className="border-primary-500/15 px-6 py-4 dark:border-white/15 sm:py-2 lg:border-r lg:px-7 lg:last:border-r-0">
