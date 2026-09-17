@@ -38,7 +38,7 @@ export function NewsletterBand() {
   return (
     <section id="newsletter" className="bg-surface">
       <div className="bg-gradient-stage px-4 py-16 md:px-6 lg:px-10 lg:py-20">
-        <div className="mx-auto flex max-w-[1140px] flex-col gap-10 lg:flex-row lg:items-center lg:gap-[72px]">
+        <div className="mx-auto flex max-w-container-xl flex-col gap-10 lg:flex-row lg:items-center lg:gap-[72px]">
           {/* Left — copy directly on the Gradient */}
           <Reveal className="min-w-0 flex-1">
             <SectionEyebrow tone="brand">{t('newsletter.eyebrow')}</SectionEyebrow>

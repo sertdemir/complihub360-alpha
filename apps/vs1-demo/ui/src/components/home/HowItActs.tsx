@@ -48,7 +48,7 @@ export function HowItActs() {
         </Reveal>
 
         <div className="mt-12 lg:mt-14">
-        <Stagger stagger={0.14} className="mx-auto grid max-w-[1320px] gap-5 md:grid-cols-3">
+        <Stagger stagger={0.14} className="mx-auto grid max-w-container-xl gap-5 md:grid-cols-3">
           <Card
             n="01"
             title={t('howItActs.cards.0.title')}

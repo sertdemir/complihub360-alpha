@@ -79,7 +79,7 @@ export function HomeFaq() {
 
   return (
     <section id="faq" className="bg-surface py-20 lg:py-28">
-      <div className="mx-auto w-full max-w-[1320px] px-4 md:px-6 lg:px-10">
+      <div className="mx-auto w-full max-w-container-xl px-4 md:px-6 lg:px-10">
         {/* Header (centered) */}
         <motion.div
           className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center"
