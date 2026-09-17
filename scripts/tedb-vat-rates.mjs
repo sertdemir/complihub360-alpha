@@ -36,8 +36,10 @@
 //   node scripts/tedb-vat-rates.mjs --json               # maschinenlesbar
 //   node scripts/tedb-vat-rates.mjs --dump AT            # Saetze eines Landes
 //                                                          mit ihren Kategorien
+//   node scripts/tedb-vat-rates.mjs --fail-on-diff       # Exit 1 bei Abweichung
+//                                                          (fuer den CI-Waechter)
 
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -63,7 +65,8 @@ if (process.env.HTTPS_PROXY && !process.env.NODE_USE_ENV_PROXY) {
 }
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const MIGRATION = join(ROOT, 'supabase/migrations/20260715000008_jurisdiction_facts.sql');
+const MIGRATIONS = join(ROOT, 'supabase/migrations');
+const SEED = '20260715000008_jurisdiction_facts.sql';
 const ENDPOINT = 'https://ec.europa.eu/taxation_customs/tedb/ws/';
 const SOAP_ACTION = 'urn:ec.europa.eu:taxud:tedb:services:v1:VatRetrievalService/RetrieveVatRates';
 
@@ -118,12 +121,51 @@ function parseRates(xml) {
 // Skript waere schon beim naechsten Eintrag falsch, ohne dass es auffiele.
 
 function ownFacts() {
-  const sql = readFileSync(MIGRATION, 'utf8');
   const out = {};
-  const re = /^\('([A-Z]{2})','([a-z_]+)','((?:[^']|'')*)',\s*([0-9.]+|null)/gm;
-  for (const m of sql.matchAll(re)) {
+
+  // Der Saatgut-Stand.
+  const seed = readFileSync(join(MIGRATIONS, SEED), 'utf8');
+  for (const m of seed.matchAll(/^\('([A-Z]{2})','([a-z_]+)','((?:[^']|'')*)',\s*([0-9.]+|null)/gm)) {
     const [, country, key, value, numeric] = m;
     (out[country] ??= {})[key] = { text: value.replace(/''/g, "'"), numeric: numeric === 'null' ? null : Number(numeric) };
+  }
+
+  // …und was spaetere Migrationen daran geaendert haben. Ohne diesen Schritt
+  // liest das Skript ewig den Saatgut-Wert und meldet eine Abweichung, die wir
+  // laengst behoben haben — der Waechter wuerde zum Dauerrot und damit
+  // wertlos. Erkannt wird GENAU eine Form:
+  //
+  //   update public.jurisdiction_facts
+  //      set value_text = '…' [, weitere Spalten]
+  //    where jurisdiction_code = 'XX' … and fact_key = '…';
+  //
+  // Alles andere waere geraten. Deshalb zaehlt der Leser mit, wie viele
+  // update-Anweisungen auf die Tabelle es insgesamt gibt, und meldet jede, die
+  // er nicht verstanden hat — lieber eine laute Warnung als ein stiller
+  // Vergleich gegen einen Stand, den es nicht mehr gibt.
+  const later = readdirSync(MIGRATIONS).filter((f) => f.endsWith('.sql') && f > SEED).sort();
+  let seen = 0, understood = 0;
+  for (const file of later) {
+    const sql = readFileSync(join(MIGRATIONS, file), 'utf8');
+    const stripped = sql.replace(/^\s*--.*$/gm, '');
+    seen += (stripped.match(/update\s+public\.jurisdiction_facts/gi) ?? []).length;
+    const re = /update\s+public\.jurisdiction_facts\s+set\s+([\s\S]*?)\s+where\s+([\s\S]*?);/gi;
+    for (const m of stripped.matchAll(re)) {
+      const [, setPart, wherePart] = m;
+      const val  = setPart.match(/value_text\s*=\s*'((?:[^']|'')*)'/i);
+      const code = wherePart.match(/jurisdiction_code\s*=\s*'([A-Z]{2}(?:-[A-Z0-9]+)*)'/i);
+      const key  = wherePart.match(/fact_key\s*=\s*'([a-z_]+)'/i);
+      if (!val || !code || !key) continue;                 // z. B. nur notes geaendert
+      const num = setPart.match(/value_numeric\s*=\s*([0-9.]+|null)/i);
+      (out[code[1]] ??= {})[key[1]] = {
+        text: val[1].replace(/''/g, "'"),
+        numeric: num ? (num[1] === 'null' ? null : Number(num[1])) : (out[code[1]]?.[key[1]]?.numeric ?? null),
+      };
+      understood++;
+    }
+  }
+  if (seen > understood) {
+    console.error(`⚠  ${seen - understood} update-Anweisung(en) auf jurisdiction_facts nicht verstanden — der Vergleich kann gegen einen ueberholten Stand laufen.\n`);
   }
   return out;
 }
@@ -289,7 +331,7 @@ async function fetchRates(isoCodes, date) {
 // ─── Ausgabe ─────────────────────────────────────────────────────────────────
 
 function table(rows) {
-  const head = ['Markt', 'Wert', 'unser Stand (EY)', 'TEDB', 'Befund'];
+  const head = ['Markt', 'Wert', 'unser Stand', 'TEDB', 'Befund'];
   const data = rows.map((r) => [r.market, r.key, r.ours, r.theirs, r.verdict]);
   const w = head.map((h, i) => Math.max(h.length, ...data.map((d) => d[i].length)));
   const line = (cells) => cells.map((c, i) => c.padEnd(w[i])).join('  ').trimEnd();
@@ -334,9 +376,18 @@ async function main() {
 
   const diff = rows.filter((r) => r.verdict === 'ABWEICHUNG').length;
   const gap = rows.filter((r) => r.verdict !== 'deckungsgleich' && r.verdict !== 'ABWEICHUNG').length;
-  void gap;
   console.log(`\n${rows.length - diff - gap} deckungsgleich · ${diff} abweichend · ${gap} nicht aus TEDB zu bekommen`);
   if (gap) console.log('Fuer die letzte Gruppe braucht es eine zweite Quelle — fuer UK legislation.gov.uk/HMRC (OGL v3).');
+
+  // --fail-on-diff macht aus dem Bericht einen Waechter: der woechentliche
+  // CI-Lauf schlaegt an, sobald ein Mitgliedstaat einen Satz aendert. Nur
+  // ABWEICHUNG zaehlt — "gehoert auf region-Ebene" und "ausserhalb TEDB" sind
+  // bekannte Luecken unseres Modells, keine Drift der Quelle. Wuerden sie
+  // mitzaehlen, waere der Waechter vom ersten Tag an rot und damit wertlos.
+  if (argv.includes('--fail-on-diff') && diff > 0) {
+    console.error(`\n✗ ${diff} Abweichung(en) gegen TEDB. Pruefen und entweder unseren Stand nachziehen oder die Abweichung begruenden.`);
+    process.exitCode = 1;
+  }
 }
 
 main().catch((e) => { console.error(`\n✗ ${e.message}`); process.exit(1); });
