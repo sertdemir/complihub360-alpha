@@ -382,7 +382,7 @@
     "askScopeSessions_one": "{{count}} Sitzung",
     "askScopeSessions_other": "{{count}} Sitzungen",
     "askScopeNoSession": "keine Sitzung",
-    "askPlaceholder": "Stellen Sie Ihre Frage in eigenen Worten",
+    "askPlaceholder": "Ihre Frage in eigenen Worten",
     "askSuggest": "Was gilt für {{title}}?",
     "askThinking": "Prüfe das Bereichswissen …",
     "askDisclaimer": "Allgemeine Information, keine Rechts- oder Steuerberatung. Für eine verbindliche Antwort:",

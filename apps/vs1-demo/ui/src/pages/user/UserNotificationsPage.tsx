@@ -238,8 +238,8 @@ export function UserNotificationsPage() {
                   interactive={!!n.subject}
                   onClick={n.subject ? () => oeffnen(n) : undefined}
                   avatar={
-                    <span className="grid h-9 w-9 place-items-center rounded-full bg-elevate/[0.06] text-fg-tertiary">
-                      <Icon size={16} strokeWidth={1.9} />
+                    <span className="text-fg-tertiary">
+                      <Icon size={36} strokeWidth={1.4} />
                     </span>
                   }
                 />

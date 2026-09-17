@@ -455,8 +455,8 @@ export function UserHomePage() {
               {zuletzt && (
                 <div className={CARD + ' border-brand-accent/50 bg-brand-accent-light/40 p-5'}>
                   <div className="flex items-center gap-2.5">
-                    <span className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-[10px] bg-brand-accent/15 text-fg-accent-strong">
-                      <Play size={12} fill="currentColor" />
+                    <span className="shrink-0 text-fg-accent-strong">
+                      <Play size={30} fill="currentColor" strokeWidth={1.5} />
                     </span>
                     <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-accent-strong">{t('home.resumeEyebrow')}</p>
                   </div>

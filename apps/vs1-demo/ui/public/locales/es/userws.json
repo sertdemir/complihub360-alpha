@@ -382,7 +382,7 @@
     "askScopeSessions_one": "{{count}} sesión",
     "askScopeSessions_other": "{{count}} sesiones",
     "askScopeNoSession": "sin sesión",
-    "askPlaceholder": "Formule su pregunta con sus propias palabras",
+    "askPlaceholder": "Su pregunta, en sus palabras",
     "askSuggest": "¿Qué aplica a {{title}}?",
     "askThinking": "Consultando el conocimiento del área …",
     "askDisclaimer": "Información general, no asesoramiento legal ni fiscal. Para una respuesta vinculante:",

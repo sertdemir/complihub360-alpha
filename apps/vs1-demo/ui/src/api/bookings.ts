@@ -96,11 +96,33 @@ export interface ProviderDetail {
   pricing_table: Array<{ service: string; price: string }> | null;
   is_verified: boolean;
   availability: 'available' | 'ooo';
+  /** Anteil bestaetigter Termine, 0..1. Kennzahl auf der Partnerseite. */
+  confirmation_rate?: number | null;
+  /** Dossier (Partnerseite 3B). null = der Anbieter hat nichts hinterlegt —
+   *  die Karte sagt das, statt eine Leistung zu erfinden. */
+  services?: Array<{ title: string; includes?: string[] }> | null;
+  credentials?: Array<{ label: string; note?: string | null }> | null;
+  excluded_services?: string[] | null;
+  work_mode?: string | null;
+}
+
+/** Eine Bewertung, die an einer echten Buchung haengt. Der Server gibt nur
+ *  solche heraus; ohne Buchung waere ein Stern eine Behauptung. */
+export interface ProviderReview {
+  rating: number;
+  body: string | null;
+  categories: string[];
+  created_at: string;
 }
 
 export async function fetchProviderDetail(key: string): Promise<ProviderDetail> {
   const res = await apiFetch<{ ok: boolean; detail: ProviderDetail }>(`/api/v1/provider/${key}/detail`);
   return res.detail;
+}
+
+export async function fetchProviderReviews(key: string): Promise<{ reviews: ProviderReview[]; count: number; average: number | null }> {
+  const res = await apiFetch<{ ok: boolean; reviews: ProviderReview[]; summary: { count: number; average: number | null } }>(`/api/v1/provider/${key}/reviews`);
+  return { reviews: res.reviews || [], count: res.summary?.count ?? 0, average: res.summary?.average ?? null };
 }
 
 export async function fetchSlots(key: string): Promise<string[]> {

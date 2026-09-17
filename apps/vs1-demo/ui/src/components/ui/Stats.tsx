@@ -98,17 +98,29 @@ export function Donut({ segs, size = 46, stroke = 7, center, centerSize = 12, ce
 export const KPI_RING_SIZE = 96;
 export const KPI_RING_STROKE = 12;
 
-export function KpiRing({ title, sub, chip, value, segs, on }: {
+export function KpiRing({ title, sub, chip, value, segs, on, format }: {
   title: string; sub: string; chip?: string;
   /** Die Zahl im Kreis — zaehlt beim Eintritt hoch. */
   value: number;
   segs: { frac: number; cls: string }[];
   on: boolean;
+  /** Wie die hochgezaehlte Zahl im Ring erscheint. Ohne das kann der Ring nur
+   *  ganze Zahlen zeigen (useCountUp rundet) — eine Bewertung von 4,7 oder
+   *  eine Quote mit Prozentzeichen braucht deshalb eine eigene Schreibweise.
+   *  Der gezaehlte Wert bleibt die ganze Zahl (47 bzw. 92), nur die Anzeige
+   *  formt sie um. */
+  format?: (n: number) => string;
 }) {
   const n = useCountUp(value, on);
   return (
-    <div className="flex items-center gap-5 py-1">
-      <div className="min-w-0 max-w-[220px] text-left">
+    <div className="flex items-center gap-4 py-1">
+      {/* Der Textblock waechst auf eine FESTE Breite, damit die Ringe einer
+          Zeile auf derselben Linie stehen (Befund 2026-09-15: vorher sass der
+          Ring am Textende, drei Ringe standen auf drei Hoehenlinien) — aber
+          nur auf 180 px statt 220 (Befund 2026-09-16: die Korrektur war zu
+          weit gegangen, bei kurzem Untertitel klaffte zwischen Text und Ring
+          eine leere Spalte, und das Paar war nicht mehr als Paar zu lesen). */}
+      <div className="min-w-0 max-w-[180px] flex-1 text-left">
         <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{title}</p>
         <p className="mt-1.5 text-body-2xs leading-snug text-fg-secondary">{sub}</p>
         {chip && (
@@ -116,7 +128,7 @@ export function KpiRing({ title, sub, chip, value, segs, on }: {
         )}
       </div>
       <div className="shrink-0 font-serif">
-        <Donut on={on} size={KPI_RING_SIZE} stroke={KPI_RING_STROKE} segs={segs} center={String(n)} centerSize={30} />
+        <Donut on={on} size={KPI_RING_SIZE} stroke={KPI_RING_STROKE} segs={segs} center={format ? format(n) : String(n)} centerSize={30} />
       </div>
     </div>
   );

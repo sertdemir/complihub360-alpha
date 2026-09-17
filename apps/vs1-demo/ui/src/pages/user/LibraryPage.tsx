@@ -80,8 +80,8 @@ export function LibraryPage() {
             return (
               <Card key={item.title} styleVariant="filled" interactive className="p-4">
                 <div className="flex items-start gap-3">
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-elevate/[0.06] text-fg-brand">
-                    <Icon size={15} />
+                  <span className="shrink-0 text-fg-brand">
+                    <Icon size={36} strokeWidth={1.4} />
                   </span>
                   <div className="min-w-0">
                     <p className="text-[13px] font-semibold leading-snug text-fg">{item.title}</p>
