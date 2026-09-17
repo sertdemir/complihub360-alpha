@@ -1,4 +1,4 @@
-import { ComplianceDomain, DomainTemplateLibrary, ComplianceSubdomainTemplate, ObligationSeverity, severityFromRiskWeight } from './domain-schema.js';
+import { ComplianceDomain, DomainTemplateLibrary, ObligationSeverity, severityFromRiskWeight } from './domain-schema.js';
 import { CountryCode, CountryRiskProfile, getCountryRiskProfile } from './country-profile.js';
 import { calculateBusinessModifier, IndustryType, BusinessModel } from './business-modifier.js';
 import { resolveEnrichment } from './obligation-enrichment.js';

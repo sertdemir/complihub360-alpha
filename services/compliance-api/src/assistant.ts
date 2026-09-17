@@ -260,7 +260,7 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
             ];
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, answer, sources, correlationId }));
-        } catch (err) {
+        } catch {
             structuredLog('error', 'Assistant chat failed', { correlationId, errorCode: 'ERR_ASSISTANT', severity: 'error', route: '/api/v1/assistant/chat' });
             res.writeHead(502, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'ASSISTANT_ERROR', message: 'Assistant request failed', correlationId }));
@@ -314,7 +314,7 @@ export function handleAssistantCheckout(req: IncomingMessage, res: ServerRespons
             await supabaseApi.upsert('user_subscriptions', 'user_key', { user_key: userKey, email, status: 'inactive', updated_at: new Date().toISOString() });
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, url: session.url, correlationId }));
-        } catch (err) {
+        } catch {
             structuredLog('error', 'Assistant checkout failed', { correlationId, errorCode: 'ERR_ASSISTANT_CHECKOUT', severity: 'error', route: '/api/v1/assistant/checkout' });
             res.writeHead(502, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'STRIPE_ERROR', message: 'Stripe request failed', correlationId }));
@@ -322,7 +322,7 @@ export function handleAssistantCheckout(req: IncomingMessage, res: ServerRespons
     });
 }
 
-export function handleAssistantVerify(req: IncomingMessage, res: ServerResponse, correlationId: string, identity: CallerIdentity): void {
+export function handleAssistantVerify(req: IncomingMessage, res: ServerResponse, correlationId: string, _identity: CallerIdentity): void {
     let raw = '';
     req.on('data', (chunk: Buffer) => { raw += chunk.toString(); if (raw.length > 8_000) req.destroy(); });
     req.on('end', async () => {
@@ -366,7 +366,7 @@ export function handleAssistantVerify(req: IncomingMessage, res: ServerResponse,
             await supabaseApi.insert('event_log', { type: 'assistant_subscription_verified', payload: { status: sub.status } }).catch(() => { /* non-blocking */ });
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, active, status: sub.status, correlationId }));
-        } catch (err) {
+        } catch {
             structuredLog('error', 'Assistant verify failed', { correlationId, errorCode: 'ERR_ASSISTANT_VERIFY', severity: 'error', route: '/api/v1/assistant/verify' });
             res.writeHead(502, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'STRIPE_ERROR', message: 'Stripe request failed', correlationId }));

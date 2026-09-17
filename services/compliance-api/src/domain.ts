@@ -191,7 +191,7 @@ export async function handleDomain(
             next_due_days: naechste.length ? Math.min(...naechste) : null,
             correlationId,
         }));
-    } catch (err) {
+    } catch {
         structuredLog('error', 'Domain overview failed', {
             correlationId, errorCode: 'ERR_DOMAIN', severity: 'error', route: `/api/v1/domain/${slug}`,
         });

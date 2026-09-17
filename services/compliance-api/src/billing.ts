@@ -241,7 +241,7 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
             }
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, period, providers: results.length, results, correlationId }));
-        } catch (err) {
+        } catch {
             structuredLog('error', 'Billing run failed', { correlationId, errorCode: 'ERR_BILLING_RUN', severity: 'error', route: '/api/v1/admin/billing/run' });
             res.writeHead(502, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'BILLING_ERROR', message: 'Billing run failed', correlationId }));
@@ -272,7 +272,7 @@ export async function handleBillingPreview(res: ServerResponse, correlationId: s
             pricing: { lead_fee_cents: PRICING.leadFeeCents, detail_open_cents: PRICING.detailOpenCents, detail_open_cap_cents: PRICING.detailOpenCapCents, abo_monthly_cents: PRICING.aboMonthlyCents, abo_annual_cents: PRICING.aboAnnualCents, abo_included_leads: PRICING.aboIncludedLeadsPerMonth, free_leads: PRICING.freeLeadsPerProvider },
             correlationId,
         }));
-    } catch (err) {
+    } catch {
         structuredLog('error', 'Billing preview failed', { correlationId, errorCode: 'ERR_BILLING_PREVIEW', severity: 'error', route: 'billing/preview' });
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Billing preview failed', correlationId }));

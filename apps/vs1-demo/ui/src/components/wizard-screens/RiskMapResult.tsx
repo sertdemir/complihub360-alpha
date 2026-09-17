@@ -1,6 +1,5 @@
 import React from 'react';
 import { Lock, ArrowRight, Check, Info } from 'lucide-react';
-import { cn } from '../../lib/utils';
 import { WizardScreen } from './WizardScreen';
 import { Button } from '../ui/Button';
 import { RiskBadge, type RiskLevel } from '../ui/RiskBadge';

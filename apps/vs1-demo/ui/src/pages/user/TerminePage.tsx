@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CalendarClock, CalendarPlus } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { useWizardDrawer } from '../../components/user/WizardDrawer';
 import { UserShell } from '../../components/user/UserShell';
@@ -143,7 +142,6 @@ function DatumsMarke({ iso, locale, soon }: { iso: string; locale: string; soon?
 }
 
 export function TerminePage() {
-  const navigate = useNavigate();
   const { t, i18n } = useTranslation('userws');
   const { openWizard } = useWizardDrawer();
   const locale = i18n.resolvedLanguage || 'en';

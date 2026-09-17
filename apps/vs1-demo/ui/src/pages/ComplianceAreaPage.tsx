@@ -3,11 +3,9 @@ import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
-import { severityFromRiskWeight } from '@complihub/compliance-engine';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 import { Typography } from '../components/ui/Typography';
-import { RiskBadge } from '../components/ui/RiskBadge';
 import { SiteFooter } from '../components/home';
 import { SectionEyebrow } from '../components/providers/SectionHeading';
 import { DOMAIN_BY_SLUG } from '../lib/domains';
@@ -27,9 +25,6 @@ import {
   ObligationsExplorer,
   RelatedAreas,
   hasRelatedAreas,
-  SEVERITY_FALLBACK,
-  SEVERITY_STYLE,
-  severityKey,
   useAreaEyebrows,
   useCountrySelection,
   AREA_BY_SLUG,
@@ -112,14 +107,6 @@ export function ComplianceAreaPage() {
   const meta = AREA_BY_SLUG[area];
   const profile = getAreaProfile(area);
   const def = DOMAIN_BY_SLUG[area];
-  const Icon = meta.icon;
-
-  const marketWeight =
-    selectedCountry === 'EU'
-      ? profile.marketWeights.reduce((s, m) => s + m.weight, 0) / profile.marketWeights.length
-      : (profile.marketWeights.find(m => m.code === selectedCountry)?.weight ?? profile.baselineWeight);
-  const severity = severityFromRiskWeight(marketWeight);
-  const style = SEVERITY_STYLE[severity];
 
   const title = t(`compliance.${area}.title`, def?.label ?? area);
   const headline = t(`compliance.${area}.headline`, '');

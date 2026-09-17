@@ -3,8 +3,8 @@ import * as crypto from "node:crypto";
 import { Orchestrator } from "@complihub/task-orchestrator";
 import { createDefaultRegistry } from "@complihub/agent-registry";
 import { DefaultPolicyEngine } from "@complihub/policy-engine";
-import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeCorrelationId, structuredLog, type AnalyticsEvent, type AlertRecord } from "@complihub360/types";
-import { generateRelevantSubdomains, isKnownCountry, ComplianceDomain, type CountryCode, type IndustryType, type BusinessModel, type EnrichedSubdomain } from "@complihub/compliance-engine";
+import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeCorrelationId, structuredLog, type AnalyticsEvent } from "@complihub360/types";
+import { generateRelevantSubdomains, isKnownCountry, type CountryCode, type IndustryType, type BusinessModel, type EnrichedSubdomain } from "@complihub/compliance-engine";
 
 import { supabaseApi } from "./supabase.js";
 import { verifySupabaseJwt } from "./supabaseJwt.js";
@@ -244,7 +244,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             try {
                 // 2.f Handle JSON Parsing errors explicitly
                 requestData = JSON.parse(body);
-            } catch (err) {
+            } catch {
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(400, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INVALID_JSON', message: 'Invalid JSON payload', correlationId }));
@@ -340,7 +340,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             let eventData: AnalyticsEvent;
             try {
                 eventData = JSON.parse(body);
-            } catch (err) {
+            } catch {
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(400, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INVALID_JSON', message: 'Invalid JSON payload', correlationId }));
@@ -369,7 +369,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(202, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, id: recordedEvent.eventId }));
-            } catch (err) {
+            } catch {
                 const message = process.env.NODE_ENV === 'production' ? 'Internal Server Error' : 'Invalid event payload';
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -405,7 +405,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, requests: rows }));
-        } catch (err) {
+        } catch {
             structuredLog('error', 'Requests list failed', { correlationId, errorCode: 'ERR_REQUESTS_LIST', severity: 'error', route: req.url });
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -440,7 +440,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, metrics }));
-        } catch (err) {
+        } catch {
             structuredLog('error', 'Metrics failed', { correlationId, errorCode: 'ERR_METRICS', severity: 'error', route: req.url });
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -485,7 +485,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const events = rows.map(r => ({ ...r, created_at: r.created_at || r.timestamp }));
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, events }));
-            } catch (err) {
+            } catch {
                 structuredLog('error', 'Event log list failed', { correlationId, errorCode: 'ERR_EVENTS', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Failed to load events', correlationId }));
@@ -500,7 +500,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, viewer, last_seen_at: rows[0]?.last_seen_at ?? null }));
-        } catch (err) {
+        } catch {
             structuredLog('error', 'Read-state fetch failed', { correlationId, errorCode: 'ERR_READS', severity: 'error', route: req.url });
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -520,7 +520,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, viewer, last_seen_at: now }));
-            } catch (err) {
+            } catch {
                 structuredLog('error', 'Read-state update failed', { correlationId, errorCode: 'ERR_READS', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Failed to mark seen', correlationId }));
@@ -568,7 +568,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, id: sessionId, session: updated[0] }));
-            } catch (err) {
+            } catch {
                 structuredLog('error', 'Session patch failed', { correlationId, errorCode: 'ERR_SESSION_PATCH', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Session update failed', correlationId }));
@@ -600,7 +600,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     updated_at: r.updated_at,
                 })),
             }));
-        } catch (err) {
+        } catch {
             structuredLog('error', 'Obligation status read failed', { correlationId, errorCode: 'ERR_OBLIGATION_READ', severity: 'error', route: req.url });
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Failed to read obligation status', correlationId }));
@@ -658,7 +658,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, obligation_id: obligationId, status, done_at: doneAt }));
-            } catch (err) {
+            } catch {
                 structuredLog('error', 'Obligation status write failed', { correlationId, errorCode: 'ERR_OBLIGATION_WRITE', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Failed to set obligation status', correlationId }));
@@ -697,7 +697,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(201, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, id: copy?.[0]?.id }));
-        } catch (err) {
+        } catch {
             structuredLog('error', 'Session duplicate failed', { correlationId, errorCode: 'ERR_SESSION_DUP', severity: 'error', route: req.url });
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Session duplicate failed', correlationId }));
@@ -768,7 +768,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     detail_open_charged: charged,
                     correlationId,
                 }));
-            } catch (err) {
+            } catch {
                 structuredLog('error', 'Provider detail failed', { correlationId, errorCode: 'ERR_DETAIL', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Provider detail failed', correlationId }));
@@ -799,7 +799,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             }
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, providerKey, slots, correlationId }));
-        } catch (err) {
+        } catch {
             structuredLog('error', 'Slots fetch failed', { correlationId, errorCode: 'ERR_SLOTS', severity: 'error', route: req.url });
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Slots fetch failed', correlationId }));
@@ -839,7 +839,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     summary: { count: usable.length, average },
                     correlationId,
                 }));
-            } catch (err) {
+            } catch {
                 structuredLog('error', 'Provider reviews failed', { correlationId, errorCode: 'ERR_REVIEWS', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Provider reviews failed', correlationId }));
@@ -878,7 +878,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 });
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, bookings, correlationId }));
-            } catch (err) {
+            } catch {
                 structuredLog('error', 'Bookings fetch failed', { correlationId, errorCode: 'ERR_BOOKINGS', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Bookings fetch failed', correlationId }));
@@ -912,7 +912,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 await supabaseApi.insert('event_log', { type: 'provider_website_outclick', payload: { providerKey, userId: authUserId, bookingId: booked[0].id } }).catch(() => { /* non-blocking */ });
                 res.writeHead(302, { Location: url });
                 res.end();
-            } catch (err) {
+            } catch {
                 structuredLog('error', 'Website outclick failed', { correlationId, errorCode: 'ERR_OUTCLICK', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Website outclick failed', correlationId }));
@@ -940,7 +940,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             }));
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, providerKey, bookings, correlationId }));
-        } catch (err) {
+        } catch {
             structuredLog('error', 'Provider bookings fetch failed', { correlationId, errorCode: 'ERR_PROVIDER_BOOKINGS', severity: 'error', route: req.url });
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Provider bookings fetch failed', correlationId }));
@@ -1073,7 +1073,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 }
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, id: bookingId, status, correlationId }));
-            } catch (err) {
+            } catch {
                 structuredLog('error', 'Booking patch failed', { correlationId, errorCode: 'ERR_BOOKING_PATCH', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Booking patch failed', correlationId }));
@@ -1130,7 +1130,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         provider_identity: { name: p.name, website_url: p.website_url ?? null, contact_email: p.contact_email ?? null },
                         correlationId,
                     }));
-                } catch (err) {
+                } catch {
                     structuredLog('error', 'Scheduling create failed', { correlationId, errorCode: 'ERR_SCHEDULING', severity: 'error', route: req.url });
                     res.writeHead(500, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Scheduling create failed', correlationId }));
@@ -1183,7 +1183,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     await supabaseApi.insert('event_log', { type: 'review_submitted', payload: { providerKey: d.provider_key, bookingId: d.booking_id ?? null, fromRole, rating } });
                     res.writeHead(201, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ ok: true, correlationId }));
-                } catch (err) {
+                } catch {
                     structuredLog('error', 'Review submit failed', { correlationId, errorCode: 'ERR_REVIEW', severity: 'error', route: req.url });
                     res.writeHead(500, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Review submit failed', correlationId }));
@@ -1251,7 +1251,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 await supabaseApi.insert('event_log', { type: 'provider_intake_submitted', payload: { providerKey, certifications: Array.isArray(d.certifications) ? d.certifications.length : 0, vatIdStatus: vat?.status ?? null } });
                 res.writeHead(201, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, provider_key: providerKey, status: 'in_review', vat_id_status: vat?.status ?? null, correlationId }));
-            } catch (err) {
+            } catch {
                 structuredLog('error', 'Provider intake failed', { correlationId, errorCode: 'ERR_INTAKE', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Provider intake failed', correlationId }));
@@ -1271,7 +1271,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, coverage: rows[0] }));
-        } catch (err) {
+        } catch {
             structuredLog('error', 'Coverage fetch failed', { correlationId, errorCode: 'ERR_COVERAGE', severity: 'error', route: req.url });
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Coverage fetch failed', correlationId }));
@@ -1315,7 +1315,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, providerKey, countries_supported: [...current, country], verification: 'pending-2bd' }));
-            } catch (err) {
+            } catch {
                 structuredLog('error', 'Coverage patch failed', { correlationId, errorCode: 'ERR_COVERAGE_PATCH', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Coverage update failed', correlationId }));
@@ -1348,7 +1348,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 await supabaseApi.insert('event_log', { type: 'provider_profile_updated', payload: { providerKey, fields: Object.keys(patch) } });
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, providerKey, updated: Object.keys(patch), correlationId }));
-            } catch (err) {
+            } catch {
                 structuredLog('error', 'Provider profile update failed', { correlationId, errorCode: 'ERR_PROFILE', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Profile update failed', correlationId }));
@@ -1369,7 +1369,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, invoices }));
-        } catch (err) {
+        } catch {
             structuredLog('error', 'Invoices fetch failed', { correlationId, errorCode: 'ERR_INVOICES', severity: 'error', route: req.url });
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Invoices fetch failed', correlationId }));
@@ -1404,7 +1404,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, providerKey, availability: d.status, ooo_until: d.status === 'ooo' ? (d.until ?? null) : null }));
-            } catch (err) {
+            } catch {
                 structuredLog('error', 'Availability patch failed', { correlationId, errorCode: 'ERR_AVAILABILITY', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Availability update failed', correlationId }));
@@ -1458,7 +1458,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, url: session.url }));
-        } catch (err) {
+        } catch {
             structuredLog('error', 'Billing portal failed', { correlationId, errorCode: 'ERR_BILLING_PORTAL', severity: 'error', route: req.url });
             res.writeHead(502, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'STRIPE_ERROR', message: 'Stripe request failed', correlationId }));
@@ -1516,7 +1516,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, sent: true }));
-            } catch (err) {
+            } catch {
                 structuredLog('error', 'Email change request failed', { correlationId, errorCode: 'ERR_EMAIL_CHANGE', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Email change request failed', correlationId }));
@@ -1550,7 +1550,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, providerKey: t.provider_key, contact_email: t.new_email }));
-            } catch (err) {
+            } catch {
                 structuredLog('error', 'Email change confirm failed', { correlationId, errorCode: 'ERR_EMAIL_CONFIRM', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Email change confirm failed', correlationId }));
@@ -1565,7 +1565,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, owner, prefs: rows[0]?.prefs ?? null }));
-        } catch (err) {
+        } catch {
             structuredLog('error', 'Alert prefs fetch failed', { correlationId, errorCode: 'ERR_ALERT_PREFS', severity: 'error', route: req.url });
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Alert prefs fetch failed', correlationId }));
@@ -1586,7 +1586,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, owner, prefs }));
-            } catch (err) {
+            } catch {
                 structuredLog('error', 'Alert prefs save failed', { correlationId, errorCode: 'ERR_ALERT_PREFS', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Alert prefs save failed', correlationId }));
@@ -1618,7 +1618,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(201, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, id: inserted?.[0]?.id }));
-            } catch (err) {
+            } catch {
                 structuredLog('error', 'Session save failed', { correlationId, errorCode: 'ERR_SESSION', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Session save failed', correlationId }));
@@ -1644,7 +1644,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, sessions: rows }));
-        } catch (err) {
+        } catch {
             structuredLog('error', 'Sessions list failed', { correlationId, errorCode: 'ERR_SESSIONS', severity: 'error', route: req.url });
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Sessions list failed', correlationId }));
@@ -1664,7 +1664,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, engagement: eng[0], messages }));
-        } catch (err) {
+        } catch {
             structuredLog('error', 'Engagement detail failed', { correlationId, errorCode: 'ERR_ENGAGEMENT_DETAIL', severity: 'error', route: req.url });
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Engagement detail failed', correlationId }));
@@ -1724,7 +1724,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(201, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, id: inserted?.[0]?.id, created_at: inserted?.[0]?.created_at }));
-            } catch (err) {
+            } catch {
                 structuredLog('error', 'Thread message failed', { correlationId, errorCode: 'ERR_THREAD_MSG', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Thread message failed', correlationId }));
@@ -1798,7 +1798,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, id: engagementId, status: 'withdrawn' }));
-        } catch (err) {
+        } catch {
             structuredLog('error', 'Withdraw failed', { correlationId, errorCode: 'ERR_WITHDRAW', severity: 'error', route: req.url });
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Withdraw failed', correlationId }));
@@ -1897,7 +1897,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, stats, watchlist, privacy, security, events: feed, series }));
-        } catch (err) {
+        } catch {
             structuredLog('error', 'Admin stats failed', { correlationId, errorCode: 'ERR_ADMIN_STATS', severity: 'error', route: req.url });
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -1946,7 +1946,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(201, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, id: documentId, sanitized_ready: redaction.sanitized_ready, consent_ai: consentAI, ai_allowed: aiAllowed, classification: redaction.classification, report: redaction.report }));
-            } catch (err) {
+            } catch {
                 structuredLog('error', 'Document upload failed', { correlationId, errorCode: 'ERR_DOC_UPLOAD', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Document upload failed', correlationId }));
@@ -1987,7 +1987,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.setHeader('x-correlation-id', correlationId);
                 res.writeHead(202, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, id: documentId, status: 'queued', message: 'Document accepted for AI processing (sanitized content only)' }));
-            } catch (err) {
+            } catch {
                 structuredLog('error', 'Document AI request failed', { correlationId, errorCode: 'ERR_DOC_AI', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Document AI request failed', correlationId }));
@@ -2132,7 +2132,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.end(JSON.stringify(valid
                 ? { ok: true, engagementId: row.engagement_id, action: row.action, expiresAt: row.expires_at, dossier }
                 : { ok: false, errorCode: 'INVALID_TOKEN', message: 'Magic link invalid, expired or already used' }));
-        } catch (err) {
+        } catch {
             res.setHeader('x-correlation-id', correlationId);
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Token verification failed', correlationId }));
@@ -2517,7 +2517,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const cockpit = await buildCockpit();
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, cockpit, correlationId }));
-            } catch (err) {
+            } catch {
                 structuredLog('error', 'Cockpit build failed', { correlationId, errorCode: 'ERR_COCKPIT', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Cockpit build failed', correlationId }));
@@ -2535,7 +2535,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const summary = await runWatcherTick();
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, summary, correlationId }));
-            } catch (err) {
+            } catch {
                 structuredLog('error', 'Watcher tick failed', { correlationId, errorCode: 'ERR_WATCHER_TICK', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Watcher tick failed', correlationId }));

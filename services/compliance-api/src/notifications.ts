@@ -96,7 +96,7 @@ export async function notify(args: NotifyArgs): Promise<void> {
             payload: nutzlast(payload ?? {}),
             ...(dedupeKey ? { dedupe_key: dedupeKey.slice(0, 200) } : {}),
         });
-    } catch (err) {
+    } catch {
         // Ein verletzter dedupe-Index ist der Normalfall, kein Fehler: der
         // Waechter hat dieselbe Lage ein zweites Mal gesehen.
         structuredLog('info', 'Notification not stored', {
@@ -146,7 +146,7 @@ export async function handleNotificationsList(
             unread: rows.filter(r => !r.read_at).length,
             correlationId,
         }));
-    } catch (err) {
+    } catch {
         structuredLog('error', 'Notifications list failed', {
             correlationId, errorCode: 'ERR_NOTIFICATIONS', severity: 'error', route: '/api/v1/notifications',
         });
@@ -185,7 +185,7 @@ export async function handleNotificationsRead(
         const updated = (await supabaseApi.updateWhere('notifications', filter, { read_at: now })) as unknown[];
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ ok: true, marked: updated.length, read_at: now, correlationId }));
-    } catch (err) {
+    } catch {
         structuredLog('error', 'Notification read failed', {
             correlationId, errorCode: 'ERR_NOTIFICATION_READ', severity: 'error', route: '/api/v1/notifications/read',
         });

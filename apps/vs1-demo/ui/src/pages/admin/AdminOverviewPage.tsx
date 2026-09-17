@@ -5,7 +5,6 @@ import { KPICard, EntityCard } from '../../components/ui/Cards';
 import { MetricCard } from '../../components/ui/MetricCard';
 import { Table, THead, TBody, TR, TH, TD } from '../../components/ui/Table';
 import { Tag, type TagProps } from '../../components/ui/Tag';
-import { Banner } from '../../components/ui/Banner';
 import { useApiData } from '../../lib/useApiData';
 import { fetchAdminStats, type AdminStats } from '../../api/admin';
 

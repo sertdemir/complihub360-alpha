@@ -221,7 +221,6 @@ export function ProviderOnboardingModal() {
 
     if (dismissed) return null;
 
-    const stepIndex = FORM_STEPS.indexOf(step as (typeof FORM_STEPS)[number]);
     const canProceed =
         step === 'contact'
             ? Boolean(data.contactName.trim() && /.+@.+\..+/.test(data.replyInbox) && data.firmName.trim())

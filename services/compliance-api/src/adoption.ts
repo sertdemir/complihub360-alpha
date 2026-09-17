@@ -91,7 +91,7 @@ export function handleAuthAdopt(
 
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, adopted, correlationId }));
-        } catch (err) {
+        } catch {
             structuredLog('error', 'Signup adoption failed', { correlationId, errorCode: 'ERR_ADOPTION', severity: 'error', route: '/api/v1/auth/adopt' });
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Adoption failed', correlationId }));

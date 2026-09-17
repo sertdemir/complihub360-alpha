@@ -2,7 +2,7 @@ import * as assert from "node:assert";
 import type { AgentId } from "@complihub/agent-core";
 import { Orchestrator } from "./Orchestrator.js";
 import { composeMiddlewares } from "./middleware.js";
-import type { TaskContext, ExecutionResult, Middleware, ExecutableAgent } from "./types.js";
+import type { Middleware, ExecutableAgent } from "./types.js";
 import { createMockTaskContext } from "@complihub360/types";
 
 // Mock Registry for Test
@@ -32,7 +32,7 @@ class MockRegistry {
 
     get(id: string) { return id ? { id, name: "Test", version: "1" } : undefined; }
     list() { return this.mockAgents; }
-    getByCapability(name: string) { return []; }
+    getByCapability(_name: string) { return []; }
 }
 
 const mockCtx = createMockTaskContext();
@@ -42,8 +42,8 @@ async function runTests() {
 
     // TEST 1: Middleware compose order
     const orderList: number[] = [];
-    const m1: Middleware = async (ctx, next, id) => { orderList.push(1); const res = await next(); orderList.push(1); return res; };
-    const m2: Middleware = async (ctx, next, id) => { orderList.push(2); const res = await next(); orderList.push(2); return res; };
+    const m1: Middleware = async (ctx, next, _id) => { orderList.push(1); const res = await next(); orderList.push(1); return res; };
+    const m2: Middleware = async (ctx, next, _id) => { orderList.push(2); const res = await next(); orderList.push(2); return res; };
 
     const composed = composeMiddlewares([m1, m2]);
     await composed(mockCtx, async () => { orderList.push(3); return { ok: true, durationMs: 0, agentId: "test-agent" as AgentId }; }, "test-agent" as AgentId);
@@ -85,7 +85,7 @@ async function runTests() {
     console.log("✅ Timeout execution cleanly rejected slow execution");
 
     // TEST 4: Lifecycle Hooks execution
-    let hookLogs: string[] = [];
+    const hookLogs: string[] = [];
     const orchHooks = new Orchestrator(new MockRegistry() as any, {
         beforeExecute: () => { hookLogs.push("before"); },
         afterExecute: () => { hookLogs.push("after"); }
@@ -154,7 +154,7 @@ async function runTests() {
     console.log("✅ Intent routing scoring and fallback successfully verified");
 
     // TEST 7: Execution Observability
-    let observedEvents: any[] = [];
+    const observedEvents: any[] = [];
     const orchObs = new Orchestrator(new MockRegistry() as any);
     orchObs.addObserver({
         onExecution: (event) => observedEvents.push(event)
@@ -173,7 +173,7 @@ async function runTests() {
 
     // Test observer triggers on failure
     orchObs.registerExecutable({ id: "fail-agent" as AgentId, execute: async () => ({ ok: false, durationMs: 0, error: { name: "Err", message: "Failed", code: "FAILED" }, agentId: "fail-agent" as AgentId }) });
-    let failCtx = createMockTaskContext({ requestId: "req-fail", correlationId: "fail-id" });
+    const failCtx = createMockTaskContext({ requestId: "req-fail", correlationId: "fail-id" });
     await orchObs.execute("fail-agent" as AgentId, failCtx);
 
     assert.strictEqual(observedEvents.length, 2);
@@ -221,7 +221,7 @@ async function runTests() {
             if (ctx.agentId === "concurrent-agent") return false;
             return true;
         },
-        release: (ctx: any) => { }
+        release: (_ctx: any) => { }
     };
 
     const orchPolicy = new Orchestrator(new MockRegistry() as any, {}, mockPolicyEngine as any);

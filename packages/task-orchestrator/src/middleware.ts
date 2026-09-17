@@ -23,8 +23,7 @@ export function composeMiddlewares(middlewares: Middleware[]): Middleware {
     };
 }
 
-export const loggerMiddleware: Middleware = async (ctx, next, agentId) => {
-    const start = Date.now();
+export const loggerMiddleware: Middleware = async (ctx, next, _agentId) => {
     // Simulate logging explicitly outside standard execution path without true console usage
     const result = await next();
     // Re-verify duration injection if necessary, generally handled by core execute wrapper 

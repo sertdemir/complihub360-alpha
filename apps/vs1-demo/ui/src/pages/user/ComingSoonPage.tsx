@@ -10,9 +10,8 @@ import { Card } from '../../components/ui/Card';
 // accent banner + centered feature panel with gold CTA. Copy lives in the
 // 'userws' namespace under comingSoon.{alerts,calendar}.*.
 
-const PAGES = { alerts: 'alerts', calendar: 'calendar' } as const;
 
-export function ComingSoonPage({ page }: { page: keyof typeof PAGES }) {
+export function ComingSoonPage({ page }: { page: 'alerts' | 'calendar' }) {
   const { t } = useTranslation('userws');
   const k = `comingSoon.${page}`;
   const features = [1, 2, 3, 4].map((n) => t(`${k}.feature${n}`));

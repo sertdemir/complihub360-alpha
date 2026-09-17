@@ -43,7 +43,7 @@ app.get('/api/tickets', async (_req, res) => {
                 const assignee = assigneeMatch ? assigneeMatch[1] : null;
 
                 // Parse Agent Audit Log list items
-                let auditLog = [];
+                const auditLog = [];
                 const auditLogIndex = content.indexOf('## Agent Audit Log');
                 if (auditLogIndex !== -1) {
                     const logSection = content.substring(auditLogIndex);

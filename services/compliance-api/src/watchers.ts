@@ -131,7 +131,7 @@ export async function issueReminder(
         }).catch(() => { /* logged inside the mailer */ });
 
         return "ok";
-    } catch (err) {
+    } catch {
         structuredLog("error", "issueReminder failed", { correlationId: engagementId, errorCode: "ERR_REMIND_CORE", severity: "error", route: "watchers/issueReminder" });
         return "error";
     }
@@ -169,7 +169,7 @@ export async function runWatcherTick(): Promise<TickSummary> {
     let engagements: Engagement[];
     try {
         engagements = (await supabaseApi.select("engagement_requests", {}, { order: "created_at.desc", limit: 500 })) as Engagement[];
-    } catch (err) {
+    } catch {
         structuredLog("error", "Watcher tick: engagement load failed", { correlationId: "watchers", errorCode: "ERR_WATCHER_LOAD", severity: "error", route: "watchers/tick" });
         summary.errors++;
         return summary;

@@ -15,7 +15,7 @@ export interface OptionCardProps extends Omit<React.HTMLAttributes<HTMLDivElemen
 }
 
 export const OptionCard = React.forwardRef<HTMLDivElement, OptionCardProps>(
-  ({ className = '', title, description, icon, selected = false, name, value = '', disabled = false, onSelect, ...props }, ref) => {
+  ({ className = '', title, description, icon, selected = false, name: _name, value = '', disabled = false, onSelect, ...props }, ref) => {
     
     const handleCardClick = () => {
       if (!disabled && onSelect) {

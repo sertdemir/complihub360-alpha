@@ -11,7 +11,7 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const body = await req.json();
+    await req.json();
     // For now, mock the search results
     const mockProviders = [
         { name: "Acme Compliance", initial: "A", type: "Full Service", match: 98, desc: "Global firm specializing in everything compliance.", primary: true },
