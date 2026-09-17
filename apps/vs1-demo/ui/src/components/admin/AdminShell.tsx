@@ -57,7 +57,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       <Sidebar
         logo={
           <NavLink to={base} className="flex items-center gap-2">
-            <Logo lockup="horizontal" tone="on-light" href={null} className="h-[29px] w-auto" />
+            <Logo lockup="horizontal" tone="on-light" href={null} className="h-[47px] w-auto" />
             {/* accent-STRONG: 9px owes the full 4.5:1 and gold-500 is 2.10 on the light
                 shell. Same call as the PARTNER badge in ProviderShell. */}
             <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-fg-accent-strong">Admin</span>
