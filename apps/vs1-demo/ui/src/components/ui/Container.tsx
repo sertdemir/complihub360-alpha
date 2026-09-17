@@ -12,7 +12,7 @@ import React, { forwardRef } from 'react';
 //   2xl  1440px — ★ Compass max
 //   full        — no cap (caller controls)
 
-export type ContainerSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
+export type ContainerSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full';
 
 // Side margins. `fluid` is the Compass grid doctrine (mobile 16 → tablet 40 →
 // desktop 80). `flat` is the constant 24px the marketing pages actually use —
@@ -33,6 +33,7 @@ const sizeMap: Record<ContainerSize, string> = {
   lg: 'max-w-container-lg',
   xl: 'max-w-container-xl',
   '2xl': 'max-w-container-2xl',
+  '3xl': 'max-w-container-3xl',
   full: 'max-w-none',
 };
 

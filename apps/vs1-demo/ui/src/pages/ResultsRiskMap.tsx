@@ -491,9 +491,9 @@ export function ResultsRiskMap() {
     <div className="min-h-screen bg-surface">
       {/* Topbar */}
       <header className="sticky top-0 z-30 border-b border-stroke-subtle bg-surface/90 backdrop-blur-xl">
-        <div className="mx-auto flex h-[72px] w-full max-w-[1440px] items-center justify-between px-4 md:px-8 lg:px-16">
+        <div className="mx-auto flex h-[72px] w-full max-w-container-3xl items-center justify-between px-4 md:px-8 lg:px-16">
           <div className="flex min-w-0 items-center gap-4">
-            <Logo lockup="horizontal" tone="on-light" href="/" className="h-9" />
+            <Logo lockup="horizontal" tone="on-light" href="/" className="h-[47px]" />
             {/* The guest map deliberately drops the site nav to stay focused, which
                 left no visible way out — the logo was the only exit and nobody
                 reads a logo as "back". This is that exit, spelled out. */}
@@ -523,7 +523,7 @@ export function ResultsRiskMap() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-[1440px] px-4 pb-20 md:px-8 lg:px-16">
+      <main className="mx-auto w-full max-w-container-3xl px-4 pb-20 md:px-8 lg:px-16">
         {/* Header */}
         <div className="mx-auto mt-14 max-w-3xl text-center">
           <span className="text-body-2xs font-semibold uppercase tracking-[0.16em] text-fg-brand">{t('header.eyebrow')}</span>

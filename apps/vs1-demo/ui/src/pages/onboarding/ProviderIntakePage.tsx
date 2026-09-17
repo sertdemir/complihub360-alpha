@@ -5,7 +5,7 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { FilterChip } from '../../components/ui/Badge';
 import { Banner } from '../../components/ui/Banner';
-import { LogoMark } from '../../components/ui/Logo';
+import { Logo } from '../../components/ui/Logo';
 import { apiFetch } from '../../api/client';
 import { DOMAINS } from '../../lib/domains';
 import type { BillingModel } from '../../api/provider';
@@ -64,8 +64,7 @@ export function ProviderIntakePage() {
     <div className="dark min-h-screen bg-[#1F2937] px-6 py-10 text-fg">
       <div className="mx-auto max-w-[720px] space-y-6">
         <div className="flex items-center gap-2.5">
-          <LogoMark tone="on-petrol" className="h-[24px] w-auto" />
-          <span className="text-[15px] font-semibold text-white">CompliHub360</span>
+          <Logo lockup="horizontal" tone="on-petrol" href={null} className="h-[31px] w-auto" />
           <span className="text-[11px] font-semibold tracking-[0.12em] text-[#d4af37]">· PARTNER INTAKE</span>
         </div>
         {children}

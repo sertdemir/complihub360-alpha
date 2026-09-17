@@ -3,7 +3,7 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LayoutGrid, Bell, Users, Shield, Lock, Activity, Search, ScrollText, Gauge } from 'lucide-react';
 import { Sidebar, SidebarGroup, NavItem } from '../ui/AppShell';
-import { LogoMark } from '../ui/Logo';
+import { Logo } from '../ui/Logo';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { cn } from '../../lib/utils';
 
@@ -57,8 +57,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       <Sidebar
         logo={
           <NavLink to={base} className="flex items-center gap-2">
-            <LogoMark tone="on-light" className="h-[22px] w-auto" />
-            <span className="text-[15px] font-semibold text-fg">CompliHub360</span>
+            <Logo lockup="horizontal" tone="on-light" href={null} className="h-[29px] w-auto" />
             {/* accent-STRONG: 9px owes the full 4.5:1 and gold-500 is 2.10 on the light
                 shell. Same call as the PARTNER badge in ProviderShell. */}
             <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-fg-accent-strong">Admin</span>

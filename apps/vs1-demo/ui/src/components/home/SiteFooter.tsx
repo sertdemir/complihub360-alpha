@@ -152,11 +152,11 @@ export function SiteFooter() {
     <>
       <NewsletterBand />
       <footer className="border-t border-stroke-subtle bg-surface">
-      <div className="mx-auto w-full max-w-[1440px] px-4 md:px-6 lg:px-6">
+      <div className="mx-auto w-full max-w-container-3xl px-4 md:px-6 lg:px-6">
         {/* Brand + link columns */}
         <div className="grid gap-10 py-16 lg:grid-cols-12">
           <div className="lg:col-span-4">
-            <Logo lockup="horizontal" tone="on-light" href="/" className="h-9" />
+            <Logo lockup="horizontal" tone="on-light" href="/" className="h-[47px]" />
             <p className="mt-5 max-w-xs text-body-sm leading-relaxed text-fg-secondary">
               {t('footer.tagline')}
             </p>

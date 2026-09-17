@@ -76,7 +76,7 @@ export function ProviderSchedulePage() {
     return (
       <div className="min-h-screen bg-surface text-fg">
         <header className="flex items-center justify-between border-b border-stroke-subtle bg-surface-secondary px-8 py-4">
-          <Logo className="h-[30px] w-auto" />
+          <Logo className="h-[39px] w-auto" />
         </header>
         <main className="mx-auto max-w-[640px] px-6 py-16">
           <div className="rounded-xl border border-brand bg-surface-secondary p-8 text-center">
@@ -111,7 +111,7 @@ export function ProviderSchedulePage() {
   return (
     <div className="min-h-screen bg-surface text-fg">
       <header className="flex items-center justify-between border-b border-stroke-subtle bg-surface-secondary px-8 py-4">
-        <Logo className="h-[30px] w-auto" />
+        <Logo className="h-[39px] w-auto" />
         <button type="button" onClick={() => navigate(-1)} className="text-body-xs font-medium text-fg-brand hover:underline">
           ← {t('schedule.back')}
         </button>

@@ -45,7 +45,7 @@ function HeroBackground() {
             Dekodieren aus dem kritischen Pfad. Die 368 kB PNG bleiben offen:
             das Bild traegt Transparenz, JPEG scheidet aus, und auf dieser
             Maschine ist kein WebP-Encoder installiert. */}
-        <img src="/img/hero-worldmap.png" alt="" decoding="async" className="absolute inset-0 mx-auto h-full w-full max-w-[1440px] object-cover opacity-[0.42]" />
+        <img src="/img/hero-worldmap.png" alt="" decoding="async" className="absolute inset-0 mx-auto h-full w-full max-w-container-3xl object-cover opacity-[0.42]" />
         <div className="absolute inset-0 bg-gradient-to-b from-white/0 to-primary-500/[0.05]" />
         <div className="absolute right-[6%] top-[14%] h-[500px] w-[800px] rounded-full bg-primary-500/10 blur-[130px]" />
       </div>

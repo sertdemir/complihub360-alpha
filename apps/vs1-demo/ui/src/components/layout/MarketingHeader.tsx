@@ -97,9 +97,21 @@ export function MarketingHeader({
       {/* ── Desktop — from xl only: six entries with German labels do not
           survive 1024px (user finding on the GlobalNav twin, 2026-08-28); note
           xl is 1440 in this Tailwind scale, so the cut is desktop-m (1280). ── */}
-      <div className="mx-auto hidden h-20 max-w-container-2xl items-center gap-4 px-4 desktop-m:flex">
+      <div className="mx-auto hidden h-20 max-w-container-3xl items-center gap-4 px-4 desktop-m:flex">
         <div className="flex flex-1 basis-0 items-center gap-5">
-          <Logo tone={inverse ? 'on-petrol' : 'on-light'} href={userHref} />
+          {/* Zwischen 1280 und 1440 nur die Bildmarke — dasselbe Muster, das
+              GlobalNav fuer dasselbe Problem schon faehrt. Gemessen am
+              gebauten Stand brauchte die Leiste bei 1280 mit vollem Lockup
+              1339 px bei 1280 verfuegbaren; der Registrieren-Knopf wurde
+              abgeschnitten. Das galt schon vor der Logo-Vergroesserung
+              (1299 px), nur weniger deutlich. Die Wortmarke belegt 123 px —
+              genau die Reserve, die hier fehlt. Ab 1440 passt beides. */}
+          <span className="desktop-l:hidden">
+            <Logo lockup="symbol" tone={inverse ? 'on-petrol' : 'on-light'} href={userHref} className="h-[47px]" />
+          </span>
+          <span className="hidden desktop-l:block">
+            <Logo tone={inverse ? 'on-petrol' : 'on-light'} href={userHref} />
+          </span>
         </div>
         {/* Anchor group sits truly centered between the two flex-1 side zones. */}
         <nav className="flex items-center justify-center gap-1.5 desktop-l:gap-3">

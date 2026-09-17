@@ -1,6 +1,6 @@
 import figma from "@figma/code-connect";
 import { NavItem, DomainTab, MobileTopbar } from "./AppShell";
-import { LogoMark } from "./Logo";
+import { Logo } from "./Logo";
 
 // Code Connect: Compass AppShell atoms.
 // "Nav Item" (974:1223) → NavItem; "Domain Tab" (984:56) → DomainTab.
@@ -35,7 +35,7 @@ figma.connect(
   {
     example: () => (
       <MobileTopbar
-        logo={<LogoMark tone="on-petrol" className="h-[22px] w-auto" />}
+        logo={<Logo lockup="horizontal" tone="on-petrol" href={null} className="h-[29px] w-auto" />}
         contextLabel="Partner"
         actions={<>{/* search icon · verified badge */}</>}
       />

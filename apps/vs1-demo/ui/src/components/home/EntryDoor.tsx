@@ -62,7 +62,7 @@ export function EntryDoor() {
   return (
     <section id="entry-door" className="overflow-hidden bg-brand-surface py-20 lg:py-24">
       {/* Hero-content width (matches Container size="2xl") */}
-      <div className="mx-auto w-full max-w-[1440px] px-4 md:px-6 lg:px-6">
+      <div className="mx-auto w-full max-w-container-3xl px-4 md:px-6 lg:px-6">
         <motion.div
           className="relative overflow-hidden rounded-[20px] shadow-[0_50px_110px_-35px_rgba(11,11,12,0.45)]"
           initial={{ opacity: 0, y: 28 }}
