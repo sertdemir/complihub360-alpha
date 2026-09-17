@@ -224,7 +224,7 @@ export function BeyondAssessment() {
   const { t } = useTranslation('home');
   return (
     <section id="beyond" className="bg-surface py-20 lg:py-28">
-      <div className="mx-auto w-full max-w-[1320px] px-4 md:px-6 lg:px-10">
+      <div className="mx-auto w-full max-w-container-xl px-4 md:px-6 lg:px-10">
         <Reveal className="max-w-3xl">
           <span className="inline-flex items-center gap-2 text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-brand">
             {t('beyond.eyebrow')}
