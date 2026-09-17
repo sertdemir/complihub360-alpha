@@ -455,12 +455,17 @@ footer[id] {
 
 /* "Gradient" in leiser Bewegung (Nutzer-Entscheidung 2026-08-27): jede
    bg-gradient-stage-Fläche ist größer aufgezogen als ihr Kasten und wandert
-   sehr langsam darüber — Atmen, kein Effekt; die Farbwelt und die 165°-
-   Geometrie bleiben exakt die festgelegten. Reduced motion friert das über
-   den globalen Block oben automatisch ein. */
+   darüber — die Farbwelt und die 165°-Geometrie bleiben exakt die
+   festgelegten. Reduced motion friert das über den globalen Block oben
+   automatisch ein.
+   Seit 18.09.2026 tragen ALLE getönten Flächen dieselbe Bewegung: 12 s
+   Periode (vorher 26 s) und 300 % Auszug (vorher 180 %, 300 % nur für
+   randlose Bänder). Die Werte sind am Hero-Band am laufenden Bild
+   eingestellt worden (34 → 28 → 24 → 19 → 12 s) und dann auf Karten,
+   Panels und Bänder gezogen — eine Fläche, eine Bewegung. */
 .bg-gradient-stage {
-  background-size: 180% 180%;
-  animation: gradient-drift 26s ease-in-out infinite alternate;
+  background-size: 300% 300%;
+  animation: gradient-drift 12s ease-in-out infinite alternate;
 }
 @keyframes gradient-drift {
   from {
@@ -469,15 +474,4 @@ footer[id] {
   to {
     background-position: 100% 100%;
   }
-}
-
-/* Full-bleed-Variante (Promise-Band im Hero, 2026-09-17): über eine Fläche,
-   die die ganze Viewport-Breite einnimmt, verpufft der 180-%-Hub — die
-   Wanderung wäre da kaum noch zu sehen. Größerer Auszug, eigene Periode:
-   dieselbe Farbwelt, dieselbe 165°-Geometrie, nur sichtbar in Bewegung.
-   12 s — Nutzer-Festlegung nach 34 → 28 → 24 → 19; die Fläche darf hier
-   deutlich lebendiger sein als unter den gerundeten Panels (26 s). */
-.bg-gradient-stage--bleed {
-  background-size: 300% 300%;
-  animation-duration: 12s;
 }
