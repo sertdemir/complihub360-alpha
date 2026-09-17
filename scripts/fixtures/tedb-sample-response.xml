@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SYNTHETISCHE Antwort — NICHT vom Dienst mitgeschnitten.
+
+  Gebaut aus VatRetrievalServiceType.xsd (dem Vertrag), damit der Parser und
+  der Vergleich ohne Netzzugang pruefbar sind. Die Zahlen sind plausibel
+  gewaehlt, aber sie sind KEINE Datenquelle: aus einem Lauf gegen diese Datei
+  darf ueber keinen Steuersatz irgendeine Aussage abgeleitet werden. Dafuer
+  gibt es den Live-Lauf.
+
+  Abgedeckt sind bewusst auch die drei Stellen, an denen ein Parser bricht:
+  ein Eintrag MIT Kategorie (darf den Regelsatz nicht ueberschreiben), ein
+  Eintrag OHNE value (NOT_APPLICABLE), und ein Kommentarfeld.
+-->
+<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
+  <env:Body>
+    <ns2:retrieveVatRatesRespMsg xmlns:ns2="urn:ec.europa.eu:taxud:tedb:services:v1:IVatRetrievalService"
+                                 xmlns:ns3="urn:ec.europa.eu:taxud:tedb:services:v1:IVatRetrievalService:types">
+      <ns3:additionalInformation>
+        <ns3:countries>
+          <ns3:country><ns3:isoCode>DE</ns3:isoCode><ns3:cnCodeProvided>false</ns3:cnCodeProvided><ns3:cpaCodeProvided>false</ns3:cpaCodeProvided></ns3:country>
+        </ns3:countries>
+      </ns3:additionalInformation>
+
+      <ns3:vatRateResults><ns3:memberState>DE</ns3:memberState><ns3:type>STANDARD</ns3:type><ns3:rate><ns3:type>DEFAULT</ns3:type><ns3:value>19</ns3:value></ns3:rate><ns3:situationOn>2026-09-17</ns3:situationOn></ns3:vatRateResults>
+      <ns3:vatRateResults><ns3:memberState>DE</ns3:memberState><ns3:type>REDUCED</ns3:type><ns3:rate><ns3:type>REDUCED_RATE</ns3:type><ns3:value>7</ns3:value></ns3:rate><ns3:situationOn>2026-09-17</ns3:situationOn></ns3:vatRateResults>
+
+      <ns3:vatRateResults><ns3:memberState>NL</ns3:memberState><ns3:type>STANDARD</ns3:type><ns3:rate><ns3:type>DEFAULT</ns3:type><ns3:value>21</ns3:value></ns3:rate><ns3:situationOn>2026-09-17</ns3:situationOn></ns3:vatRateResults>
+      <ns3:vatRateResults><ns3:memberState>NL</ns3:memberState><ns3:type>REDUCED</ns3:type><ns3:rate><ns3:type>REDUCED_RATE</ns3:type><ns3:value>9</ns3:value></ns3:rate><ns3:situationOn>2026-09-17</ns3:situationOn></ns3:vatRateResults>
+
+      <ns3:vatRateResults><ns3:memberState>FR</ns3:memberState><ns3:type>STANDARD</ns3:type><ns3:rate><ns3:type>DEFAULT</ns3:type><ns3:value>20</ns3:value></ns3:rate><ns3:situationOn>2026-09-17</ns3:situationOn></ns3:vatRateResults>
+      <ns3:vatRateResults><ns3:memberState>FR</ns3:memberState><ns3:type>REDUCED</ns3:type><ns3:rate><ns3:type>SUPER_REDUCED_RATE</ns3:type><ns3:value>2.1</ns3:value></ns3:rate><ns3:situationOn>2026-09-17</ns3:situationOn></ns3:vatRateResults>
+      <ns3:vatRateResults><ns3:memberState>FR</ns3:memberState><ns3:type>REDUCED</ns3:type><ns3:rate><ns3:type>REDUCED_RATE</ns3:type><ns3:value>5.5</ns3:value></ns3:rate><ns3:situationOn>2026-09-17</ns3:situationOn></ns3:vatRateResults>
+      <ns3:vatRateResults><ns3:memberState>FR</ns3:memberState><ns3:type>REDUCED</ns3:type><ns3:rate><ns3:type>REDUCED_RATE</ns3:type><ns3:value>10</ns3:value></ns3:rate><ns3:situationOn>2026-09-17</ns3:situationOn></ns3:vatRateResults>
+
+      <ns3:vatRateResults><ns3:memberState>IT</ns3:memberState><ns3:type>STANDARD</ns3:type><ns3:rate><ns3:type>DEFAULT</ns3:type><ns3:value>22</ns3:value></ns3:rate><ns3:situationOn>2026-09-17</ns3:situationOn></ns3:vatRateResults>
+      <ns3:vatRateResults><ns3:memberState>IT</ns3:memberState><ns3:type>REDUCED</ns3:type><ns3:rate><ns3:type>SUPER_REDUCED_RATE</ns3:type><ns3:value>4</ns3:value></ns3:rate><ns3:situationOn>2026-09-17</ns3:situationOn></ns3:vatRateResults>
+      <ns3:vatRateResults><ns3:memberState>IT</ns3:memberState><ns3:type>REDUCED</ns3:type><ns3:rate><ns3:type>REDUCED_RATE</ns3:type><ns3:value>5</ns3:value></ns3:rate><ns3:situationOn>2026-09-17</ns3:situationOn></ns3:vatRateResults>
+      <ns3:vatRateResults><ns3:memberState>IT</ns3:memberState><ns3:type>REDUCED</ns3:type><ns3:rate><ns3:type>REDUCED_RATE</ns3:type><ns3:value>10</ns3:value></ns3:rate><ns3:situationOn>2026-09-17</ns3:situationOn></ns3:vatRateResults>
+
+      <ns3:vatRateResults><ns3:memberState>ES</ns3:memberState><ns3:type>STANDARD</ns3:type><ns3:rate><ns3:type>DEFAULT</ns3:type><ns3:value>21</ns3:value></ns3:rate><ns3:situationOn>2026-09-17</ns3:situationOn></ns3:vatRateResults>
+      <ns3:vatRateResults><ns3:memberState>ES</ns3:memberState><ns3:type>REDUCED</ns3:type><ns3:rate><ns3:type>SUPER_REDUCED_RATE</ns3:type><ns3:value>4</ns3:value></ns3:rate><ns3:situationOn>2026-09-17</ns3:situationOn></ns3:vatRateResults>
+      <ns3:vatRateResults><ns3:memberState>ES</ns3:memberState><ns3:type>REDUCED</ns3:type><ns3:rate><ns3:type>REDUCED_RATE</ns3:type><ns3:value>10</ns3:value></ns3:rate><ns3:situationOn>2026-09-17</ns3:situationOn></ns3:vatRateResults>
+
+      <ns3:vatRateResults><ns3:memberState>AT</ns3:memberState><ns3:type>STANDARD</ns3:type><ns3:rate><ns3:type>DEFAULT</ns3:type><ns3:value>20</ns3:value></ns3:rate><ns3:situationOn>2026-09-17</ns3:situationOn></ns3:vatRateResults>
+      <ns3:vatRateResults><ns3:memberState>AT</ns3:memberState><ns3:type>REDUCED</ns3:type><ns3:rate><ns3:type>REDUCED_RATE</ns3:type><ns3:value>10</ns3:value></ns3:rate><ns3:situationOn>2026-09-17</ns3:situationOn></ns3:vatRateResults>
+      <ns3:vatRateResults><ns3:memberState>AT</ns3:memberState><ns3:type>REDUCED</ns3:type><ns3:rate><ns3:type>REDUCED_RATE</ns3:type><ns3:value>13</ns3:value></ns3:rate><ns3:situationOn>2026-09-17</ns3:situationOn></ns3:vatRateResults>
+
+      <!-- Warenbezogener Eintrag: darf den Regelsatz NICHT verdraengen. -->
+      <ns3:vatRateResults><ns3:memberState>AT</ns3:memberState><ns3:type>REDUCED</ns3:type><ns3:rate><ns3:type>REDUCED_RATE</ns3:type><ns3:value>19</ns3:value></ns3:rate><ns3:situationOn>2026-09-17</ns3:situationOn><ns3:category><ns3:identifier>JUNGHOLZ_MITTELBERG</ns3:identifier><ns3:description>Jungholz and Mittelberg</ns3:description></ns3:category><ns3:comment>Territorial exception</ns3:comment></ns3:vatRateResults>
+      <!-- Ohne value: darf keine 0 und keinen Absturz erzeugen. -->
+      <ns3:vatRateResults><ns3:memberState>DE</ns3:memberState><ns3:type>REDUCED</ns3:type><ns3:rate><ns3:type>NOT_APPLICABLE</ns3:type></ns3:rate><ns3:situationOn>2026-09-17</ns3:situationOn></ns3:vatRateResults>
+    </ns2:retrieveVatRatesRespMsg>
+  </env:Body>
+</env:Envelope>
