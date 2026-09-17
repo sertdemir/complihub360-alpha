@@ -171,7 +171,7 @@ export async function handleDashboard(
             },
             correlationId,
         }));
-    } catch (err) {
+    } catch {
         structuredLog('error', 'Dashboard aggregate failed', {
             correlationId, errorCode: 'ERR_DASHBOARD', severity: 'error', route: '/api/v1/dashboard',
         });

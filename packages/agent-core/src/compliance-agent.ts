@@ -10,7 +10,7 @@ export const complianceCheckAgent: Agent = {
             description: "Analyzes text for basic compliance rules (length, secrets, public context)."
         }
     ],
-    run: async (input: TaskInput, ctx: AgentContext): Promise<TaskResult<{ findings: ComplianceCheckFinding[] }>> => {
+    run: async (input: TaskInput, _ctx: AgentContext): Promise<TaskResult<{ findings: ComplianceCheckFinding[] }>> => {
         const req = input.payload as unknown as ComplianceCheckRequest;
         const findings: ComplianceCheckFinding[] = [];
 

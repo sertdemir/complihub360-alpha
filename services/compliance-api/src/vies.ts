@@ -65,7 +65,7 @@ export async function checkVatId(raw: string): Promise<VatCheckResult> {
         // VIES returns '---' when the member state withholds the name.
         const name = body.name && body.name !== '---' ? body.name : null;
         return { status: body.isValid ? 'valid' : 'invalid', vatId, countryCode, name, checkedAt };
-    } catch (err) {
+    } catch {
         structuredLog('warn', 'VIES check unavailable', {
             correlationId: 'vies', route: 'vies/check', severity: 'warning', errorCode: 'ERR_VIES',
         });

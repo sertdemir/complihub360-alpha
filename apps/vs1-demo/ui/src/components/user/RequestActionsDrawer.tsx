@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { BellRing, MessageSquare, XCircle, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useWizardDrawer } from './WizardDrawer';
-import { useNavigate } from 'react-router-dom';
 import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
 import { Tag } from '../ui/Tag';
@@ -44,10 +43,8 @@ const STATUS_KEY: Record<string, string> = {
 };
 
 export function RequestActionsDrawer({ target, onClose, onOpenThread, onWithdrawn }: RequestActionsDrawerProps) {
-  const { t, i18n } = useTranslation('userws');
-  const navigate = useNavigate();
+  const { t } = useTranslation('userws');
   const { openWizard } = useWizardDrawer();
-  const locale = i18n.resolvedLanguage || 'en';
   const [busy, setBusy] = useState<'remind' | 'withdraw' | null>(null);
   const [reminded, setReminded] = useState(false);
   const [confirmWithdraw, setConfirmWithdraw] = useState(false);

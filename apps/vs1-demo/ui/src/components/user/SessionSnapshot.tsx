@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { motion, MotionConfig, type Variants } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { UserShell } from './UserShell';
-import { Button } from '../ui/Button';
 import { PartnerCard } from './PartnerCard';
 import { KpiRing, useEntered, EASE } from '../ui/Stats';
 import { duplicateSession } from '../../api/sessions';

@@ -19,10 +19,10 @@ export class SanitizedVault implements ISanitizedVault {
     async saveSanitizedDocument(payload: StoreSanitizedPayload): Promise<{ sanitizedStorageRef: string }> {
         return { sanitizedStorageRef: `sanitized://${payload.documentId}` };
     }
-    async getSanitizedDocument(sanitizedStorageRef: string): Promise<string> {
+    async getSanitizedDocument(_sanitizedStorageRef: string): Promise<string> {
         return "MOCK_SANITIZED_DATA";
     }
-    async deleteSanitizedDocument(sanitizedStorageRef: string): Promise<void> {
+    async deleteSanitizedDocument(_sanitizedStorageRef: string): Promise<void> {
         // Deleted
     }
 }

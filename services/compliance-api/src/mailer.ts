@@ -475,7 +475,7 @@ export async function sendEmailChangeMail(p: {
             type: res.ok ? 'email_sent' : 'email_failed',
             payload: { providerKey: p.providerKey, to: p.newEmail, subject, providerId: (body as { id?: string }).id, status: res.status },
         });
-    } catch (err) {
+    } catch {
         structuredLog('error', 'Email-change mail failed', {
             correlationId: p.correlationId, route: 'mailer', severity: 'error', errorCode: 'ERR_MAIL',
         });

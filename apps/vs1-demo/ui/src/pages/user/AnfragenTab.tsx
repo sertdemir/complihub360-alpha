@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { MoreHorizontal, Inbox } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useWizardDrawer } from '../../components/user/WizardDrawer';
@@ -44,7 +44,6 @@ export function relZeit(iso: string | undefined, locale: string): string {
 }
 
 export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
-  const navigate = useNavigate();
   const { t, i18n } = useTranslation('userws');
   const locale = i18n.resolvedLanguage || 'en';
   const { openWizard } = useWizardDrawer();

@@ -19,7 +19,7 @@ export class AuditLog implements IAuditLog {
     async logEvent(event: AuditEvent): Promise<void> {
         console.log(`[AUDIT] ${event.action} on ${event.documentId}`);
     }
-    async queryEvents(documentId: string): Promise<AuditEvent[]> {
+    async queryEvents(_documentId: string): Promise<AuditEvent[]> {
         return [];
     }
 }

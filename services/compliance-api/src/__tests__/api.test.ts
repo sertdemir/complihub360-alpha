@@ -231,7 +231,7 @@ describe('auth gate', () => {
 
     it('rejects a tampered ES256 token', async () => {
         const token = signEs256Jwt({ sub: USER_ID });
-        const [head, body, sig] = token.split('.');
+        const [head, , sig] = token.split('.');
         const forgedBody = Buffer.from(JSON.stringify({ role: 'authenticated', exp: Math.floor(Date.now() / 1000) + 3600, sub: randomUUID() })).toString('base64url');
         const res = await fetch(`${BASE}/api/v1/bookings`, { headers: { authorization: `Bearer ${head}.${forgedBody}.${sig}` } });
         expect(res.status).toBe(401);

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "./ui/Button";
 import { Input } from "./ui/Input";
@@ -17,12 +16,9 @@ interface EngagementModalProps {
 
 export function EngagementModal({
     providerName = "Acme Compliance",
-    market = "DE, EU",
-    category = "Tax & VAT",
     onClose,
     onSubmit,
 }: EngagementModalProps) {
-    const { t } = useTranslation('common');
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
         email: localStorage.getItem("user_email") || "",

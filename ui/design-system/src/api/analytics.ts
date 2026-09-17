@@ -52,7 +52,7 @@ export async function trackEvent(
         } else {
             console.debug(`[Analytics] Emitted ${eventName}`, event);
         }
-    } catch (e) {
+    } catch {
         // Failing to track must never break the UI
         console.warn(`[Analytics] Network error emitting event ${eventName}`);
     }

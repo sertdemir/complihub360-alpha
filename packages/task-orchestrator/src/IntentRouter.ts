@@ -18,7 +18,7 @@ export class IntentRouter {
 
             if (agent.capabilities) {
                 for (const cap of agent.capabilities) {
-                    let baseCapScore = cap.name === intent ? 2 : 0;
+                    const baseCapScore = cap.name === intent ? 2 : 0;
                     let highestIntentScore = 0;
 
                     if (cap.supportedIntents) {

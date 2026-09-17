@@ -50,7 +50,7 @@ export class DefaultPolicyEngine implements PolicyEngine {
                 if (size > policy.maxPayloadBytes) {
                     return { allowed: false, reason: `Payload size (${size} bytes) exceeds tenant limit (${policy.maxPayloadBytes} bytes).` };
                 }
-            } catch (e) {
+            } catch {
                 // If circular or un-stringifiable, allow but warn (best effort)
                 console.warn(`[PolicyEngine] Unable to measure payload size for context: ${ctx.correlationId}`);
             }

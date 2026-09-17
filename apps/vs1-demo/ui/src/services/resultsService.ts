@@ -247,7 +247,7 @@ const MOCK_PROVIDERS: ProviderInfo[] = [
     }
 ];
 
-function getFilteredProviders(tags: string[], profile?: SearchProfile | null): ProviderInfo[] {
+function getFilteredProviders(tags: string[], _profile?: SearchProfile | null): ProviderInfo[] {
     let sorted = [...MOCK_PROVIDERS];
     
     if (tags.length > 0) {

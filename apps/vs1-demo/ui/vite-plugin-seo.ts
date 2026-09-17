@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import type { Plugin } from 'vite';
 import { PUBLIC_ROUTES, SEO_LOCALES, DEFAULT_LOCALE, absoluteUrl } from './src/lib/publicRoutes';

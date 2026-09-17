@@ -41,9 +41,7 @@ import { ladeIcs } from './TerminePage';
 // Was bewusst FEHLT: eine Kachel "Naechste Frist" — die Kadenzen der Engine
 // sind redaktionelle Rhythmen, keine Termine.
 
-const RISK_TEXT = { critical: 'text-risk-critical', high: 'text-risk-high', medium: 'text-risk-medium', low: 'text-risk-low' } as const;
-const RISK_BG = { critical: 'bg-risk-critical', high: 'bg-risk-high', medium: 'bg-risk-medium', low: 'bg-risk-low' } as const;
-type Sev = keyof typeof RISK_BG;
+type Sev = 'critical' | 'high' | 'medium' | 'low';
 
 const CARD = 'rounded-xl border border-stroke-subtle bg-surface shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]';
 const TEXT_LINK = 'text-body-2xs font-bold text-brand underline underline-offset-[3px] transition-colors hover:text-brand-700';

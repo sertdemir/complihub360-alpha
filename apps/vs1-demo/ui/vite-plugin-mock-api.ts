@@ -416,7 +416,7 @@ function route(method: string, path: string, body: Record<string, unknown> = {})
     if (p[0] === 'bookings') return { ok: true, bookings: bookings() };
     if (p[0] === 'requests') return { ok: true, requests: requests() };
     if (p[0] === 'notifications') { const rows = notifications(); return { ok: true, notifications: rows, unread: rows.filter((r) => !r.read_at).length }; }
-    if (p[0] === 'sessions') return { ok: true, sessions: SESSIONS.map(({ open, total, severity, ...s }) => s) };
+    if (p[0] === 'sessions') return { ok: true, sessions: SESSIONS.map(({ open: _open, total: _total, severity: _severity, ...s }) => s) };
     if (p[0] === 'session' && p[2] === 'obligations') return obligations(p[1]);
     if (p[0] === 'engagement' && p.length === 2) return engagement(p[1]);
     if (p[0] === 'provider' && p[2] === 'detail') return providerDetail(p[1]);

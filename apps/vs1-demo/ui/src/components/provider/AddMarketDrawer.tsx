@@ -34,7 +34,7 @@ export function AddMarketDrawer({ open, onClose, onAdded }: AddMarketDrawerProps
   const [selected, setSelected] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [added, setAdded] = useState<string | null>(null);
-  const [error, setError] = useState('');
+  const [, setError] = useState('');
 
   useEffect(() => {
     if (!open) return;
