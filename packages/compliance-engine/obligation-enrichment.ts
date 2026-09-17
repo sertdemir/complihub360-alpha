@@ -6,6 +6,18 @@ import { CountryCode } from './country-profile.js';
 // 'default' fallback (EU-level instruments or a generic phrasing). This is
 // editorial ground truth for the risk map — deterministic, no live lookups.
 
+/** Die Obergrenze einer Sanktion, so wie das Gesetz sie fuehrt. */
+export type PenaltyCeiling =
+    /** Ein im Gesetz genannter Betrag, in SEINER Waehrung. Nicht umrechnen und
+     *  nicht runden — die Umrechnung gehoert an die Anzeige, mit Kurs und Tag. */
+    | { kind: 'amount'; value: number; currency: 'EUR' | 'GBP' | 'USD' | 'TRY'; basis: string; asOf: string }
+    /** Umsatzabhaengig. `orAmount` fuer den Fall, dass das Gesetz das Hoehere
+     *  von beidem verlangt — so die DSGVO in Art. 83 Abs. 5. */
+    | { kind: 'turnover'; percent: number; orAmount?: { value: number; currency: 'EUR' }; basis: string; asOf: string }
+    /** Der Rechtsakt ueberlaesst die Sanktion den Mitgliedstaaten. Hier GIBT es
+     *  keinen Betrag; eine Zahl waere erfunden, kein ungenauer Wert. */
+    | { kind: 'delegated'; basis: string; note: string };
+
 export interface ObligationEnrichment {
     /** Primary legal source, e.g. 'UStG §18i (OSS)'. */
     source: string;
@@ -13,30 +25,28 @@ export interface ObligationEnrichment {
     penalty: string;
     /** Upper penalty bound in EUR used for the total-exposure stat. */
     penaltyMaxEur?: number;
-    /** Die Vorschrift, aus der `penaltyMaxEur` stammt — z. B. 'AO §152 Abs. 10'
-     *  oder 'VerpackG §36 Abs. 2 Nr. 3'.
+    /** Was ein Verstoss hoechstens kostet — belegt, in der Waehrung des
+     *  Gesetzes, mit Stand. Oder die ehrliche Auskunft, dass es dafuer keinen
+     *  Betrag gibt.
      *
-     *  WARUM DAS FELD EXISTIERT (Analyse 2026-09-17): `penaltyMaxEur` wird auf
-     *  vier Flaechen als Risikobetrag hochgezaehlt — AreaEnforcement,
-     *  AreaMetrics, MarketCalendar und RiskShowcase auf der STARTSEITE. Keine
-     *  der 75 Zahlen trug eine Fundstelle, und wo sich zwei Quellen zum selben
-     *  Bussgeld aeussern, widersprechen sie sich: beim niederlaendischen
-     *  Bussgeld um Faktor 33 (EUR 165 gegen EUR 5.514). Beide Werte sind fuer
-     *  sich plausibel — der eine die uebliche Praxis, der andere der
-     *  gesetzliche Hoechstbetrag. Ohne Fundstelle ist nicht entscheidbar,
-     *  welcher ins Produkt gehoert.
+     *  ERSETZT den Ansatz `penaltyBasis`, der eine Woche alt war und zu kurz
+     *  griff: eine Fundstelle allein reicht nicht, wenn `penaltyMaxEur`
+     *  drei verschiedene Dinge in einem Feld fuehrt. Die Pruefung am
+     *  Primaertext (2026-09-17) hat gezeigt, welche:
      *
-     *  DIE REGEL, die daraus folgt: gezeigt wird der gesetzliche HOECHSTBETRAG,
-     *  und er traegt die Vorschrift. Ein Hoechstbetrag steht im Gesetz und
-     *  laesst sich zitieren; "was ueblicherweise verhaengt wird" steht nirgends
-     *  und variiert je Behoerde. Untertreiben ist zudem schaedlicher als
-     *  uebertreiben: wer wegen einer zu niedrigen Zahl nichts unternimmt, hat
-     *  einen echten Schaden.
+     *    - einen gesetzlichen Betrag in EUR                     (33 Eintraege)
+     *    - eine UNDATIERTE UMRECHNUNG aus GBP, USD oder TRY     (21 Eintraege)
+     *      Das Gesetz nennt GBP 1.500 oder USD 120.000; wann und zu welchem
+     *      Kurs daraus ein Eurobetrag wurde, steht nirgends. Bei tuerkischer
+     *      Inflation ist so ein Wert nach Monaten sinnlos.
+     *    - eine SCHAETZUNG, wo das Gesetz gar keinen Betrag nennt (18 Eintraege)
+     *      PPWR Art. 68: "Bis zum 12. Februar 2027 erlassen die Mitgliedstaaten
+     *      Vorschriften ueber Sanktionen." Es GIBT dort keinen Betrag, den man
+     *      zitieren koennte — er ist noch nicht erlassen.
      *
-     *  Bis eine Zahl ihre Vorschrift traegt, ist sie Bestand ohne Beleg — die
-     *  Menge davon haelt obligationScope.test.ts fest und laesst sie nur
-     *  schrumpfen. */
-    penaltyBasis?: string;
+     *  Neben einen solchen Wert passt keine Fundstelle, ohne selbst zu luegen:
+     *  eine echte Vorschrift, die einen Betrag belegt, den sie nicht nennt. */
+    penaltyCeiling?: PenaltyCeiling;
     /** Cadence label: 'Quarterly' | 'Annual' | 'Monthly' | 'Ongoing' | 'One-off'. */
     due: string;
     /** Typical days until the next deadline; drives the median-deadline stat. */
@@ -105,32 +115,32 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
         ES: { source: 'RD 1055/2022 (Envases)', penalty: 'up to €100,000', penaltyMaxEur: 100000, due: 'Annual', dueDays: 60 },
         IT: { source: 'D.Lgs. 152/2006 (CONAI)', penalty: 'up to €60,000', penaltyMaxEur: 60000, due: 'Annual', dueDays: 60 },
         NL: { source: 'Besluit beheer verpakkingen (Afvalfonds)', penalty: 'recovery + administrative fines', penaltyMaxEur: 25000, due: 'Annual', dueDays: 60 },
-        default: { source: 'EU PPWR 2025/40', penalty: 'national EPR fines + sales ban', penaltyMaxEur: 50000, due: 'Annual', dueDays: 60, scope: 'national-pending' },
+        default: { source: 'EU PPWR 2025/40', penalty: 'national EPR fines + sales ban', penaltyMaxEur: 50000, due: 'Annual', dueDays: 60, scope: 'national-pending', penaltyCeiling: { kind: 'delegated', basis: 'PPWR (EU) 2025/40 Art. 68', note: 'Die Verordnung nennt keinen Betrag: nach Art. 68 Abs. 1 erlassen die Mitgliedstaaten die Sanktionen bis zum 12. Februar 2027. Fuer Verstoesse gegen Art. 24-29 muessen Geldbussen dabei sein (Abs. 2), ohne Hoehe.' } },
     },
     // PPWR is a Regulation: it binds whoever places packaging on the EU market,
     // identically in every member state, so there are no country overrides here.
     // The national layer (registration, licensing fees) sits in 'prod-epr'.
     'prod-packaging-conformity': {
-        default: { source: 'EU PPWR 2025/40 Art. 37–39 (Annex VII/VIII)', penalty: 'national penalties under Art. 68 + withdrawal from the market', penaltyMaxEur: 100000, due: 'Ongoing', appliesFrom: '2026-08-12', scope: 'eu' },
+        default: { source: 'EU PPWR 2025/40 Art. 37–39 (Annex VII/VIII)', penalty: 'national penalties under Art. 68 + withdrawal from the market', penaltyMaxEur: 100000, due: 'Ongoing', appliesFrom: '2026-08-12', scope: 'eu', penaltyCeiling: { kind: 'delegated', basis: 'PPWR (EU) 2025/40 Art. 68', note: 'Die Verordnung nennt keinen Betrag: nach Art. 68 Abs. 1 erlassen die Mitgliedstaaten die Sanktionen bis zum 12. Februar 2027. Fuer Verstoesse gegen Art. 24-29 muessen Geldbussen dabei sein (Abs. 2), ohne Hoehe.' } },
     },
     // The 2030 tranche. Same reasoning as above: a Regulation, so no country
     // overrides. Art. 24 additionally slips to "3 years after the implementing
     // act" if the Commission is late, so the date is a floor, not a promise —
     // said plainly in the source string rather than pretended away.
     'prod-packaging-recycled-content': {
-        default: { source: 'EU PPWR 2025/40 Art. 7 (post-consumer recyclate only)', penalty: 'national penalties under Art. 68 + withdrawal from the market', penaltyMaxEur: 100000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu' },
+        default: { source: 'EU PPWR 2025/40 Art. 7 (post-consumer recyclate only)', penalty: 'national penalties under Art. 68 + withdrawal from the market', penaltyMaxEur: 100000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu', penaltyCeiling: { kind: 'delegated', basis: 'PPWR (EU) 2025/40 Art. 68', note: 'Die Verordnung nennt keinen Betrag: nach Art. 68 Abs. 1 erlassen die Mitgliedstaaten die Sanktionen bis zum 12. Februar 2027. Fuer Verstoesse gegen Art. 24-29 muessen Geldbussen dabei sein (Abs. 2), ohne Hoehe.' } },
     },
     'prod-packaging-recyclability': {
-        default: { source: 'EU PPWR 2025/40 Art. 6 + Annex II (grade A–C; A/B from 2038)', penalty: 'national penalties under Art. 68 + withdrawal from the market', penaltyMaxEur: 100000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu' },
+        default: { source: 'EU PPWR 2025/40 Art. 6 + Annex II (grade A–C; A/B from 2038)', penalty: 'national penalties under Art. 68 + withdrawal from the market', penaltyMaxEur: 100000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu', penaltyCeiling: { kind: 'delegated', basis: 'PPWR (EU) 2025/40 Art. 68', note: 'Die Verordnung nennt keinen Betrag: nach Art. 68 Abs. 1 erlassen die Mitgliedstaaten die Sanktionen bis zum 12. Februar 2027. Fuer Verstoesse gegen Art. 24-29 muessen Geldbussen dabei sein (Abs. 2), ohne Hoehe.' } },
     },
     'prod-packaging-empty-space': {
-        default: { source: 'EU PPWR 2025/40 Art. 24 (50% cap, or 3 years after the implementing act)', penalty: 'national penalties under Art. 68 + withdrawal from the market', penaltyMaxEur: 75000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu' },
+        default: { source: 'EU PPWR 2025/40 Art. 24 (50% cap, or 3 years after the implementing act)', penalty: 'national penalties under Art. 68 + withdrawal from the market', penaltyMaxEur: 75000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu', penaltyCeiling: { kind: 'delegated', basis: 'PPWR (EU) 2025/40 Art. 68', note: 'Die Verordnung nennt keinen Betrag: nach Art. 68 Abs. 1 erlassen die Mitgliedstaaten die Sanktionen bis zum 12. Februar 2027. Fuer Verstoesse gegen Art. 24-29 muessen Geldbussen dabei sein (Abs. 2), ohne Hoehe.' } },
     },
     'prod-packaging-format-bans': {
-        default: { source: 'EU PPWR 2025/40 Art. 25 + Annex V', penalty: 'format may no longer be placed on the market', penaltyMaxEur: 75000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu' },
+        default: { source: 'EU PPWR 2025/40 Art. 25 + Annex V', penalty: 'format may no longer be placed on the market', penaltyMaxEur: 75000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu', penaltyCeiling: { kind: 'delegated', basis: 'PPWR (EU) 2025/40 Art. 68', note: 'Die Verordnung nennt keinen Betrag: nach Art. 68 Abs. 1 erlassen die Mitgliedstaaten die Sanktionen bis zum 12. Februar 2027. Fuer Verstoesse gegen Art. 24-29 muessen Geldbussen dabei sein (Abs. 2), ohne Hoehe.' } },
     },
     'prod-packaging-reuse-targets': {
-        default: { source: 'EU PPWR 2025/40 Art. 29 (40% transport / 10% grouped; cardboard exempt)', penalty: 'national penalties under Art. 68', penaltyMaxEur: 50000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu' },
+        default: { source: 'EU PPWR 2025/40 Art. 29 (40% transport / 10% grouped; cardboard exempt)', penalty: 'national penalties under Art. 68', penaltyMaxEur: 50000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu', penaltyCeiling: { kind: 'delegated', basis: 'PPWR (EU) 2025/40 Art. 68', note: 'Die Verordnung nennt keinen Betrag: nach Art. 68 Abs. 1 erlassen die Mitgliedstaaten die Sanktionen bis zum 12. Februar 2027. Fuer Verstoesse gegen Art. 24-29 muessen Geldbussen dabei sein (Abs. 2), ohne Hoehe.' } },
     },
     'prod-safety': {
         UK: { source: 'UK GPSR 2005', penalty: 'up to £20,000 + 12 months imprisonment', penaltyMaxEur: 23000, due: 'Ongoing' },
@@ -141,7 +151,7 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
         DE: { source: 'UWG §7 / GDPR Art. 7', penalty: 'up to €300,000 per campaign (UWG)', penaltyMaxEur: 300000, due: 'Ongoing' },
         TR: { source: 'ETK No. 6563 / KVKK', penalty: 'up to ₺1,000,000', penaltyMaxEur: 30000, due: 'Ongoing' },
         US: { source: 'CAN-SPAM / TCPA', penalty: 'up to $51,744 per email; $1,500 per call/text', penaltyMaxEur: 48000, due: 'Ongoing' },
-        default: { source: 'GDPR Art. 7 + ePrivacy Directive 2002/58', penalty: 'up to €20M or 4% of turnover', penaltyMaxEur: 100000, due: 'Ongoing', scope: 'national-pending' },
+        default: { source: 'GDPR Art. 7 + ePrivacy Directive 2002/58', penalty: 'up to €20M or 4% of turnover', penaltyMaxEur: 100000, due: 'Ongoing', scope: 'national-pending' , penaltyCeiling: { kind: 'turnover', percent: 4, orAmount: { value: 20000000, currency: 'EUR' }, basis: 'DSGVO Art. 83 Abs. 5 Buchst. a', asOf: '2026-09-17' } },
     },
     'mktg-health-claims': {
         default: { source: 'EU Reg. 1924/2006 (Health Claims)', penalty: 'national fines + mandatory withdrawal', penaltyMaxEur: 50000, due: 'Ongoing', scope: 'eu' },
@@ -151,10 +161,10 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
         UK: { source: 'UK GDPR / DPA 2018 Art. 13', penalty: 'up to £17.5M or 4% of turnover', penaltyMaxEur: 100000, due: 'Ongoing' },
         US: { source: 'CCPA/CPRA + state privacy acts', penalty: '$2,500–$7,500 per violation', penaltyMaxEur: 50000, due: 'Ongoing' },
         TR: { source: 'KVKK No. 6698 Art. 10', penalty: 'up to ₺13,000,000', penaltyMaxEur: 380000, due: 'Ongoing' },
-        default: { source: 'GDPR Art. 13 / Art. 6', penalty: 'up to €20M or 4% of turnover', penaltyMaxEur: 100000, due: 'Ongoing', scope: 'eu' },
+        default: { source: 'GDPR Art. 13 / Art. 6', penalty: 'up to €20M or 4% of turnover', penaltyMaxEur: 100000, due: 'Ongoing', scope: 'eu' , penaltyCeiling: { kind: 'turnover', percent: 4, orAmount: { value: 20000000, currency: 'EUR' }, basis: 'DSGVO Art. 83 Abs. 5 Buchst. a und b', asOf: '2026-09-17' } },
     },
     'data-hosting': {
-        default: { source: 'GDPR Chapter V (transfers) + SCCs', penalty: 'transfer suspension + GDPR fines', penaltyMaxEur: 50000, due: 'One-off', dueDays: 90, scope: 'eu' },
+        default: { source: 'GDPR Chapter V (transfers) + SCCs', penalty: 'transfer suspension + GDPR fines', penaltyMaxEur: 50000, due: 'One-off', dueDays: 90, scope: 'eu' , penaltyCeiling: { kind: 'turnover', percent: 4, orAmount: { value: 20000000, currency: 'EUR' }, basis: 'DSGVO Art. 83 Abs. 5 Buchst. c', asOf: '2026-09-17' } },
         US: { source: 'EU-US Data Privacy Framework', penalty: 'loss of certification; transfer freeze', penaltyMaxEur: 30000, due: 'Annual', dueDays: 180 },
     },
     'corp-registration': {
