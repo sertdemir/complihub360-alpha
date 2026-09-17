@@ -10,7 +10,7 @@
     "start:client": "../../node_modules/.bin/vite",
     "build": "../../node_modules/.bin/tsc && ../../node_modules/.bin/vite build",
     "lint": "../../node_modules/.bin/eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "typecheck": "../../node_modules/.bin/tsc --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "express": "^4.21.2",
