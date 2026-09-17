@@ -17,6 +17,25 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(dirname, "./src"),
+      // Resolve the engine from SOURCE, never from its build output.
+      //
+      // The package points at `dist/index.js`, dist/ is gitignored, and nothing
+      // in this app builds it — the root `tsc -b` project list does not even
+      // reference the engine. So it is only as current as whoever last ran a
+      // build. In a worktree it is worse: with no node_modules of its own it
+      // resolves up into the MAIN checkout and reads THAT dist, a state this
+      // checkout can neither see nor fix. On 2026-09-17 that burned two
+      // sessions — obligationScope.test.ts went red on a dist where
+      // mktg-consent.default.scope was still 'eu', and the red was reported as
+      // a product defect. Test and data were correct the whole time.
+      //
+      // Deliberately not test-only: dev, `vitest` and `vite build` take the
+      // same path, so what the tests prove is what ships. dist/ remains for
+      // services/compliance-api, which imports the package at runtime.
+      "@complihub/compliance-engine": path.resolve(
+        dirname,
+        "../../../packages/compliance-engine/index.ts",
+      ),
     },
   },
   cacheDir: './.vite',
