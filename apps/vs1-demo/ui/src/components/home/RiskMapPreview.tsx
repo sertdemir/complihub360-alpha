@@ -57,7 +57,7 @@ export function RiskMapPreview() {
     <div className="relative flex h-[588px] w-[760px] flex-col overflow-hidden rounded-[20px] border border-stroke-subtle bg-surface">
       {/* Topbar */}
       <div className="flex items-center justify-between border-b border-stroke-subtle px-7 py-3">
-        <Logo lockup="horizontal" tone="on-light" href={null} className="h-7" />
+        <Logo lockup="horizontal" href={null} className="h-7" />
         <span className="flex items-center gap-1.5 text-body-4xs font-semibold uppercase tracking-wide text-fg-tertiary">
           <Lock size={12} /> {t('riskMapPreview.guestNote')}
         </span>

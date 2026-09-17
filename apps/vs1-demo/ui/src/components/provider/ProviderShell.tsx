@@ -115,7 +115,7 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
       <Sidebar
         logo={
           <NavLink to={base} className="flex items-center gap-2">
-            <Logo lockup="horizontal" tone="on-light" href={null} className="h-[29px] w-auto" />
+            <Logo lockup="horizontal" href={null} className="h-[47px] w-auto" />
             {/* accent-STRONG: at 9px this needs 4.5:1, and gold-500 measures 2.10 on the
                 light sidebar. See --color-text-accent-strong in index.css. */}
             <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-fg-accent-strong">{t('shell.partnerBadge')}</span>

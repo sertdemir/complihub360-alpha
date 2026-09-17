@@ -427,7 +427,6 @@ export function AnimatedWizard({
               der Ausgang aus einer Vorschau, die gar keine Seite ist. */}
           <Logo
             lockup="horizontal"
-            tone="on-light"
             href={sp ? `/${i18n.resolvedLanguage || 'en'}` : null}
             className={sp ? 'h-[47px]' : 'h-7'}
           />

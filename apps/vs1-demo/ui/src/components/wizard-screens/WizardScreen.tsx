@@ -79,7 +79,7 @@ export function WizardScreen({
     <div className={cn('flex min-h-[640px] flex-col bg-surface', className)}>
       {/* Topbar */}
       <header className="flex items-center justify-between border-b border-stroke px-6 py-4 lg:px-10">
-        <Logo lockup="horizontal" tone="on-light" />
+        <Logo lockup="horizontal" />
         {topbarRight && <div className="flex items-center gap-3">{topbarRight}</div>}
       </header>
 
