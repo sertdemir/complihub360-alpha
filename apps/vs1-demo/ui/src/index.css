@@ -475,8 +475,9 @@ footer[id] {
    die die ganze Viewport-Breite einnimmt, verpufft der 180-%-Hub — die
    Wanderung wäre da kaum noch zu sehen. Größerer Auszug, eigene Periode:
    dieselbe Farbwelt, dieselbe 165°-Geometrie, nur sichtbar in Bewegung.
-   28 s = 20 % schneller als die erste Fassung (Nutzer-Entscheidung). */
+   12 s — Nutzer-Festlegung nach 34 → 28 → 24 → 19; die Fläche darf hier
+   deutlich lebendiger sein als unter den gerundeten Panels (26 s). */
 .bg-gradient-stage--bleed {
   background-size: 300% 300%;
-  animation-duration: 28s;
+  animation-duration: 12s;
 }
