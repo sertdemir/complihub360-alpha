@@ -221,8 +221,58 @@ jobs:
     needs: deploy-ui
     runs-on: ubuntu-latest
     steps:
+      # Was hier geprueft wird, und warum nicht mehr "== 401" (2026-09-17):
+      # Bis zum 30.08. forderte dieser Schritt starr HTTP 401. Am selben Tag
+      # wurde die Basic-Auth-Wand vor der Seite abgenommen (scripts/staging-
+      # wall.sh, Commit f7f502bf) — seitdem antwortet Staging mit 200, und
+      # jeder Deploy lief rot, obwohl build, install und Health-Check gruen
+      # waren. 15 Laeufe lang. Ein Deploy, der immer rot ist, sagt nichts mehr:
+      # ein echter Fehlschlag waere darin nicht mehr aufgefallen.
+      #
+      # Der Status ist deshalb kein Beweis, sondern nur ein Lebenszeichen —
+      # 200 (Wand ab) und 401 (Wand an) sind beide in Ordnung, damit das
+      # Wiederanbringen der Wand diesen Schritt nicht erneut rot faerbt.
+      # Bewiesen werden die zwei Dinge, die in BEIDEN Zustaenden gelten
+      # muessen: Staging bleibt unindexierbar, und auf der Platte liegt der
+      # Build DIESES Laufs.
       - name: Check staging from the public internet
         run: |
-          code=$(curl -s --max-time 20 -o /dev/null -w "%{http_code}" https://staging.complihub360.com/)
-          if [ "$code" != "401" ]; then echo "Unexpected status $code" && exit 1; fi
-          echo "✓ Staging up (auth wall active)"
+          set -uo pipefail
+          url=https://staging.complihub360.com
+
+          hdr=$(curl -sS --max-time 20 -D - -o /dev/null "$url") || {
+            echo "::error::$url war von aussen nicht erreichbar"
+            exit 1
+          }
+          code=$(printf '%s\n' "$hdr" | awk 'toupper($1) ~ /^HTTP/ { c = $2 } END { print c }')
+
+          case "$code" in
+            200) echo "✓ Seite antwortet — ohne Wand (scripts/staging-wall.sh on bringt sie zurueck)" ;;
+            401) echo "✓ Seite antwortet — hinter der Basic-Auth-Wand" ;;
+            *)   echo "::error::Unerwarteter Status $code von $url"; exit 1 ;;
+          esac
+
+          # noindex haelt Suchmaschinen fern, nicht die Wand — der Header muss
+          # also unabhaengig von ihr stehen. Faellt er weg, waere Staging
+          # indexierbar; das ist der Fehler, der hier wirklich wehtut.
+          if printf '%s\n' "$hdr" | grep -qi '^x-robots-tag:.*noindex'; then
+            echo "✓ noindex steht"
+          else
+            echo "::error::Kein X-Robots-Tag: noindex — Staging waere indexierbar"
+            printf '%s\n' "$hdr"
+            exit 1
+          fi
+
+          # Der eigentliche Beweis, dass dieser Deploy angekommen ist: build-ui
+          # schreibt die SHA in build-info.json. Ohne das belegt ein Lebens-
+          # zeichen nur, dass IRGENDEIN Stand ausgeliefert wird. Nur ohne Wand
+          # abrufbar — mit Wand kaeme 401 statt der Datei.
+          if [ "$code" = "200" ]; then
+            sha=$(curl -s --max-time 20 "$url/build-info.json" \
+              | tr -d ' \n' | sed -n 's/.*"sha":"\([0-9a-f]*\)".*/\1/p')
+            if [ "$sha" != "$GITHUB_SHA" ]; then
+              echo "::error::Ausgeliefert ist ${sha:-<keine build-info.json>}, erwartet $GITHUB_SHA"
+              exit 1
+            fi
+            echo "✓ Ausgelieferter Build ist ${GITHUB_SHA:0:8}"
+          fi
