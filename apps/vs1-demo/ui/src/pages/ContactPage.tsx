@@ -113,7 +113,7 @@ export function ContactPage() {
             </Reveal>
 
             <Reveal delay={0.1} className="mx-auto mt-11 max-w-[900px]">
-              <div className="grid grid-cols-1 gap-y-6 border-y border-accent-500/40 py-7 tablet:grid-cols-3 tablet:divide-x tablet:divide-stroke-subtle">
+              <div className="grid grid-cols-1 gap-y-6 border-y border-stroke-subtle py-7 tablet:grid-cols-3 tablet:divide-x tablet:divide-stroke-subtle">
                 {(['ways', 'day', 'human'] as const).map((k) => (
                   <div key={k} className="px-6 text-center">
                     <span className="font-serif text-[1.0625rem] font-bold text-fg">

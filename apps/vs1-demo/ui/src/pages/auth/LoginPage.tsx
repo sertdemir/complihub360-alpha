@@ -462,7 +462,7 @@ export function LoginPage() {
                                             components={{ em: <span className="font-semibold text-fg" /> }}
                                         />
                                     </p>
-                                    <div className="mx-auto mt-7 grid max-w-[420px] grid-cols-2 border-y border-accent-500/40 py-5">
+                                    <div className="mx-auto mt-7 grid max-w-[420px] grid-cols-2 border-y border-stroke-subtle py-5">
                                         <div>
                                             <p className="font-serif text-[1.0625rem] font-bold text-fg">
                                                 {t(view === "magic-sent" ? "login.facts.validMagic" : "login.facts.validReset")}
