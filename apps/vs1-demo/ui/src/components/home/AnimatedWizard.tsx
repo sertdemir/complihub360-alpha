@@ -429,7 +429,7 @@ export function AnimatedWizard({
             lockup="horizontal"
             tone="on-light"
             href={sp ? `/${i18n.resolvedLanguage || 'en'}` : null}
-            markClassName={sp ? 'h-9' : 'h-7'}
+            className={sp ? 'h-9' : 'h-7'}
           />
           {sp && (
             <div className="pointer-events-none absolute left-1/2 -translate-x-1/2">
