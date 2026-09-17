@@ -170,7 +170,7 @@ function HeroVisual({ showRiskMap, className }: { showRiskMap: boolean; classNam
         {/* Risk-map fades in on top; opaque, so it fully covers when shown. */}
         <div
           aria-hidden={!showRiskMap}
-          className={`absolute inset-0 z-10 transition-opacity duration-[700ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
+          className={`absolute inset-0 z-10 transition-opacity duration-700 ease-in-out ${
             showRiskMap ? 'opacity-100' : 'pointer-events-none opacity-0'
           }`}
         >
