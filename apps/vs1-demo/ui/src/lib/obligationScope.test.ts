@@ -197,97 +197,95 @@ describe('EU-Standard ausserhalb der EU', () => {
   });
 });
 
-// ─── Keine Risikozahl ohne Fundstelle ────────────────────────────────────────
-// `penaltyMaxEur` wird auf vier Flaechen als Risikobetrag hochgezaehlt —
-// AreaEnforcement ("schwerstes Bussgeld"), AreaMetrics (Summe), MarketCalendar
-// (Maximum) und RiskShowcase auf der STARTSEITE. Am 17.09.2026 trug keine der
-// 75 Zahlen eine Vorschrift, und wo sich zwei Quellen zum selben Bussgeld
-// aeussern, widersprechen sie sich — beim niederlaendischen um Faktor 33
-// (EUR 165 gegen EUR 5.514). Ohne Fundstelle ist nicht entscheidbar, welche
-// Zahl ins Produkt gehoert.
+// ─── Keine Risikozahl ohne belegte Obergrenze ────────────────────────────────
+// `penaltyMaxEur` fuehrt drei verschiedene Dinge in einem Feld. Die Pruefung am
+// Primaertext (2026-09-17) hat gezeigt, welche:
 //
-// DIESER TEST BEHEBT DAS NICHT, und er blendet auch nichts aus: 75 Zahlen auf
-// einmal verschwinden zu lassen waere eine groessere Aenderung am Produkt als
-// die, die hier ansteht. Er haelt den Bestand fest und laesst ihn nur
-// schrumpfen — und er verhindert, dass NEUE Pflichten ohne Beleg dazukommen.
-describe('Fundstelle zur Risikozahl', () => {
-  // Stand 2026-09-17. Diese Zahl darf nur FALLEN. Wer eine Fundstelle
-  // nachtraegt, zieht sie mit — der zweite Test erzwingt das.
-  const OHNE_FUNDSTELLE_STAND = 75;
+//   - einen gesetzlichen Betrag in EUR                       33 Eintraege
+//   - eine UNDATIERTE UMRECHNUNG aus GBP, USD oder TRY       21 Eintraege
+//   - eine SCHAETZUNG, wo das Gesetz keinen Betrag nennt     18 Eintraege
+//
+// Der letzte Fall ist der schwerste. PPWR Art. 68: "Bis zum 12. Februar 2027
+// erlassen die Mitgliedstaaten Vorschriften ueber Sanktionen." Es gibt dort
+// keinen Betrag, den man zitieren koennte — er ist noch nicht erlassen. Neben
+// so einen Wert passt keine Fundstelle, ohne selbst zu luegen.
+//
+// Deshalb ersetzt `penaltyCeiling` den eine Woche alten Ansatz `penaltyBasis`:
+// Betrag IN SEINER WAEHRUNG, mit Vorschrift und Stand — oder ausdruecklich
+// `delegated`, wenn es keinen gibt.
+//
+// DIESER TEST ENTFERNT NICHTS. `penaltyMaxEur` bleibt vorerst, weil vier
+// Flaechen davon leben (eine davon die Startseite); was dort statt einer Zahl
+// stehen soll, ist eine Produktentscheidung und keine Aufraeumarbeit. Der Test
+// haelt drei Beststaende fest und laesst sie nur schrumpfen.
+describe('Belegte Obergrenze', () => {
+  // Stand 2026-09-17. Belegt sind: 3x DSGVO Art. 83 Abs. 5 (20 Mio EUR oder
+  // 4 % Weltjahresumsatz) und 7x PPWR Art. 68 (delegiert, kein Betrag).
+  const OHNE_OBERGRENZE_STAND = 65;
+  // Eintraege, die eine delegierte Obergrenze UND trotzdem eine Eurozahl
+  // fuehren. Das ist der Widerspruch in Reinform: das Gesetz nennt keinen
+  // Betrag, die Oberflaeche zaehlt trotzdem einen hoch. Darf nur schrumpfen.
+  const DELEGIERT_MIT_ZAHL_STAND = 7;
 
-  // Die 21 Pflichten, die es am Stichtag gab. Eine Pflicht, die hier nicht
-  // steht, ist neu und muss ihre Fundstellen von Anfang an mitbringen: Bestand
-  // ohne Beleg ist eine Altlast, kein Bauplan.
-  //
-  // AUSGESCHRIEBEN, nicht aus der Map abgeleitet. Die erste Fassung stand als
-  // `new Set(Object.keys(ObligationEnrichmentMap))` da — und konnte damit nie
-  // anschlagen: eine neu ergaenzte Pflicht landet in derselben Map und gilt
-  // sofort als Bestand. Eine Gegenprobe hat es gezeigt, sonst waere die
-  // Zusicherung als gruener Test stehen geblieben.
   const BESTAND = new Set([
-    'corp-registration',
-    'data-hosting',
-    'data-privacy',
-    'legal-commercial-contracts',
-    'legal-consumer-terms',
-    'log-customs-classification',
-    'log-eori',
-    'log-intrastat',
-    'mktg-consent',
-    'mktg-health-claims',
-    'monitor-kyb',
-    'prod-epr',
-    'prod-packaging-conformity',
-    'prod-packaging-empty-space',
-    'prod-packaging-format-bans',
-    'prod-packaging-recyclability',
-    'prod-packaging-recycled-content',
-    'prod-packaging-reuse-targets',
-    'prod-safety',
-    'tax-corporate',
-    'tax-vat-registration',
+    'corp-registration', 'data-hosting', 'data-privacy', 'legal-commercial-contracts',
+    'legal-consumer-terms', 'log-customs-classification', 'log-eori', 'log-intrastat',
+    'mktg-consent', 'mktg-health-claims', 'monitor-kyb', 'prod-epr',
+    'prod-packaging-conformity', 'prod-packaging-empty-space', 'prod-packaging-format-bans',
+    'prod-packaging-recyclability', 'prod-packaging-recycled-content',
+    'prod-packaging-reuse-targets', 'prod-safety', 'tax-corporate', 'tax-vat-registration',
   ]);
 
-  const ohneFundstelle = () => {
-    const out: string[] = [];
+  type Eintrag = { penaltyMaxEur?: number; penaltyCeiling?: { kind: string; basis?: string; asOf?: string; note?: string } };
+  const alle = (): [string, Eintrag][] => {
+    const out: [string, Eintrag][] = [];
     for (const [id, byCountry] of Object.entries(ObligationEnrichmentMap)) {
-      for (const [code, e] of Object.entries(byCountry as Record<string, {
-        penaltyMaxEur?: number; penaltyBasis?: string } | undefined>)) {
-        if (!e?.penaltyMaxEur) continue;
-        if (!e.penaltyBasis?.trim()) out.push(`${code}/${id}`);
+      for (const [code, e] of Object.entries(byCountry as Record<string, Eintrag | undefined>)) {
+        if (e) out.push([`${code}/${id}`, e]);
       }
     }
-    return out.sort();
+    return out.sort(([a], [b]) => a.localeCompare(b));
   };
 
-  it('laesst den Bestand ohne Beleg nur schrumpfen', () => {
-    const ohne = ohneFundstelle();
+  const ohneObergrenze = () => alle().filter(([, e]) => e.penaltyMaxEur && !e.penaltyCeiling).map(([k]) => k);
+
+  it('laesst den Bestand ohne Obergrenze nur schrumpfen', () => {
+    const ohne = ohneObergrenze();
     expect(
       ohne.length,
-      ohne.length > OHNE_FUNDSTELLE_STAND
-        ? `Neue Risikozahl ohne Vorschrift. penaltyBasis ergaenzen — oder, wenn keine zu benennen ist, penaltyMaxEur weglassen:\n  ${ohne.slice(0, 10).join('\n  ')}`
-        : `Belegt! Bitte OHNE_FUNDSTELLE_STAND auf ${ohne.length} senken.`,
-    ).toBe(OHNE_FUNDSTELLE_STAND);
+      ohne.length > OHNE_OBERGRENZE_STAND
+        ? `Neue Risikozahl ohne belegte Obergrenze:\n  ${ohne.slice(0, 8).join('\n  ')}`
+        : `Belegt! Bitte OHNE_OBERGRENZE_STAND auf ${ohne.length} senken.`,
+    ).toBe(OHNE_OBERGRENZE_STAND);
   });
 
-  it('verlangt von jeder NEUEN Pflicht die Fundstelle', () => {
-    // Greift erst, wenn jemand eine Pflicht ergaenzt, die es am Stichtag nicht
-    // gab. Bis dahin ist die Menge leer und der Test still — genau so soll es
-    // sein: er kostet nichts, bis er gebraucht wird.
-    const neuOhneBeleg = ohneFundstelle().filter((k) => !BESTAND.has(k.split('/')[1]));
-    expect(neuOhneBeleg, 'Neue Pflicht: jede Zahl braucht ihre Vorschrift').toEqual([]);
+  it('laesst den Widerspruch "delegiert, aber mit Eurozahl" nur schrumpfen', () => {
+    const w = alle().filter(([, e]) => e.penaltyCeiling?.kind === 'delegated' && e.penaltyMaxEur).map(([k]) => k);
+    expect(
+      w.length,
+      w.length > DELEGIERT_MIT_ZAHL_STAND
+        ? `Das Gesetz nennt keinen Betrag, die Oberflaeche zaehlt trotzdem einen hoch:\n  ${w.join('\n  ')}`
+        : `Aufgeloest! Bitte DELEGIERT_MIT_ZAHL_STAND auf ${w.length} senken.`,
+    ).toBe(DELEGIERT_MIT_ZAHL_STAND);
   });
 
-  it('nimmt keine Fundstelle an, die nichts zitiert', () => {
-    // Dieselbe Falle wie bei den `placeholder`-Quellen: ein String, der wie
-    // eine Zitation AUSSIEHT, sitzt in derselben Zelle und im selben Gewicht
-    // wie "AO §152". Ein paar Worte sind keine Vorschrift.
-    for (const [id, byCountry] of Object.entries(ObligationEnrichmentMap)) {
-      for (const [code, e] of Object.entries(byCountry as Record<string, { penaltyBasis?: string } | undefined>)) {
-        const b = e?.penaltyBasis;
-        if (b === undefined) continue;
-        expect(b.trim().length, `${code}/${id}: leere Fundstelle`).toBeGreaterThan(3);
-        expect(b, `${code}/${id}: "${b}" nennt keine Vorschrift`).toMatch(/\d/);
+  it('verlangt von jeder NEUEN Pflicht die Obergrenze', () => {
+    const neu = ohneObergrenze().filter((k) => !BESTAND.has(k.split('/')[1]));
+    expect(neu, 'Neue Pflicht: jede Zahl braucht ihre belegte Obergrenze').toEqual([]);
+  });
+
+  it('nimmt keine Obergrenze an, die nichts belegt', () => {
+    for (const [k, e] of alle()) {
+      const c = e.penaltyCeiling;
+      if (!c) continue;
+      if (c.kind === 'delegated') {
+        expect(c.note?.trim().length ?? 0, `${k}: delegiert ohne Begruendung`).toBeGreaterThan(20);
+      } else {
+        // Dieselbe Falle wie bei den `placeholder`-Quellen: ein String, der wie
+        // eine Zitation AUSSIEHT, sitzt in derselben Zelle und im selben
+        // Gewicht wie "DSGVO Art. 83 Abs. 5".
+        expect(c.basis, `${k}: "${c.basis}" nennt keine Vorschrift`).toMatch(/\d/);
+        expect(c.asOf, `${k}: Stand fehlt oder ist kein Datum`).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       }
     }
   });

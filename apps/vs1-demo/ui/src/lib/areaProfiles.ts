@@ -1,4 +1,5 @@
 import {
+  type PenaltyCeiling,
   ComplianceDomain,
   CountryRiskMatrix,
   DomainTemplateLibrary,
@@ -81,9 +82,11 @@ export interface AreaObligation extends AreaSubdomain {
   /** Human penalty phrasing, e.g. 'up to €50,000'. */
   penalty: string;
   penaltyMaxEur?: number;
-  /** Die Vorschrift hinter `penaltyMaxEur`. Fehlt sie, ist die Zahl Bestand
-   *  ohne Beleg — die Oberflaeche darf sie dann nicht als belegt darstellen. */
-  penaltyBasis?: string;
+  /** Die belegte Obergrenze: Betrag in SEINER Waehrung mit Vorschrift und
+   *  Stand, oder `delegated`, wenn der Rechtsakt keinen Betrag nennt. Fehlt
+   *  sie, ist `penaltyMaxEur` Bestand ohne Beleg — die Oberflaeche darf ihn
+   *  dann nicht als belegt darstellen. */
+  penaltyCeiling?: PenaltyCeiling;
   /** Cadence label as the enrichment map states it, e.g. 'Quarterly'. */
   due: string;
   dueDays?: number;
@@ -202,7 +205,7 @@ export function getAreaObligations(slug: DomainSlug, code: CountryCode | 'EU'): 
       source: entry.source,
       penalty: entry.penalty,
       penaltyMaxEur: entry.penaltyMaxEur,
-      penaltyBasis: entry.penaltyBasis,
+      penaltyCeiling: entry.penaltyCeiling,
       due: entry.due,
       dueDays: entry.dueDays,
       appliesFrom: entry.appliesFrom,
