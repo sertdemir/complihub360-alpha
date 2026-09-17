@@ -324,8 +324,8 @@
     "download": "Descargar"
   },
   "comingSoon": {
-    "eyebrow": "Disponible en WK3",
-    "bannerTitle": "DISPONIBLE EN WK3 — {{title}}",
+    "eyebrow": "En preparación",
+    "bannerTitle": "EN PREPARACIÓN — {{title}}",
     "joinEarlyAccess": "Unirse al acceso anticipado",
     "alerts": {
       "title": "Alertas",

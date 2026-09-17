@@ -2447,7 +2447,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({
-                    overview_summary: "AI summary synthesized from knowledge chunks and deterministic engine rules.",
+                    // Says what the payload IS. The knowledge-chunk lookup above
+                    // still runs on a stub embedding and the assistant that would
+                    // ground a real summary is feature-flagged off, so the string
+                    // must not claim a synthesis that does not happen: everything
+                    // below `laws` comes out of the deterministic engine.
+                    overview_summary: "Obligations identified by the compliance engine for the requested markets and domains.",
                     providers: anonProviders,
                     // Enriched obligations payload: severity + statute + penalty +
                     // cadence from the engine's editorial map. `state` mirrors the
