@@ -177,7 +177,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
       <Sidebar
         logo={
           <NavLink to={`${base}/dashboard`} className="flex items-center gap-2">
-            <Logo lockup="horizontal" tone="on-light" href={null} className="h-[47px] w-auto" />
+            <Logo lockup="horizontal" href={null} className="h-[47px] w-auto" />
           </NavLink>
         }
         footer={

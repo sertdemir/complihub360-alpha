@@ -429,7 +429,7 @@ export function LoginPage() {
         const shown = email || (view === "reset-sent" ? "sie@kanzlei.de" : "sie@ihrunternehmen.de");
         return (
             <div className="flex min-h-screen flex-col bg-surface px-6 py-8 lg:px-16 lg:py-10">
-                <Logo lockup="horizontal" tone="on-light" href="/" className="h-[47px]" />
+                <Logo lockup="horizontal" href="/" className="h-[47px]" />
 
                 <div className="flex flex-1 items-center justify-center py-12">
                     <AnimatePresence mode="wait">
@@ -547,7 +547,7 @@ export function LoginPage() {
         <div className="flex min-h-screen flex-col bg-surface lg:flex-row">
             {/* LINKS · Narrativ auf dem Gradient */}
             <div className="flex flex-col justify-between gap-8 bg-gradient-stage px-6 pb-8 pt-8 lg:w-[57%] lg:gap-0 lg:px-16 lg:py-10">
-                <Logo lockup="horizontal" tone="on-light" href="/" className="h-[47px]" />
+                <Logo lockup="horizontal" href="/" className="h-[47px]" />
 
                 <div className="max-w-[520px] py-6 lg:py-0">
                     <p className="text-body-3xs font-bold uppercase tracking-[0.14em] text-brand">{narrative.eyebrow}</p>

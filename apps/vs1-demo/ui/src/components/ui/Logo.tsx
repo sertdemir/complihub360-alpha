@@ -1,4 +1,5 @@
 import { cn } from '../../lib/utils';
+import { useTheme } from '../../lib/theme';
 import {
   MARK_ARC,
   MARK_ARC_LOWER,
@@ -138,7 +139,16 @@ function Wortmarke({ tone }: { tone: LogoTone }) {
 export interface LogoProps {
   /** Entspricht der Figma-Property "Lockup". */
   lockup?: LogoLockup;
-  /** Entspricht der Figma-Property "Color". */
+  /**
+   * Entspricht der Figma-Property "Color". OHNE Angabe folgt das Logo dem
+   * App-Theme: hell → `on-light`, dunkel → `on-petrol`.
+   *
+   * Setzen muss man ihn nur dort, wo der Grund NICHT mit dem Theme kippt —
+   * eine fest dunkle Seite (`bg-[#0b1620]`, ein lokales `dark`), ein Foto,
+   * eine Marken-Fläche. Ein fest gesetztes `on-light` auf einer Fläche, die
+   * mitkippt, ist der Fehler, den dieser Default abschafft: im Dark Mode
+   * stand die Ink-Wortmarke auf dunklem Grund.
+   */
   tone?: LogoTone;
   /** Wrappt in einen Link. null rendert inline ohne Anker. */
   href?: string | null;
@@ -146,19 +156,16 @@ export interface LogoProps {
 }
 
 /** Nur die Bildmarke — Kurzform für `<Logo lockup="symbol" />`. */
-export function LogoMark({ tone = 'on-light', className }: { tone?: LogoTone; className?: string }) {
+export function LogoMark({ tone, className }: { tone?: LogoTone; className?: string }) {
   return <Logo lockup="symbol" tone={tone} href={null} className={className} />;
 }
 
-export function Logo({
-  lockup = 'horizontal',
-  tone = 'on-light',
-  href = '/',
-  className,
-}: LogoProps) {
+export function Logo({ lockup = 'horizontal', tone, href = '/', className }: LogoProps) {
+  const { isDark } = useTheme();
+  const resolved: LogoTone = tone ?? (isDark ? 'on-petrol' : 'on-light');
   const gradId = `ch-swoosh-${++seq}`;
   const box = BOX[lockup];
-  const needsGradient = TONE[tone].swoosh === null && lockup !== 'wortmarke';
+  const needsGradient = TONE[resolved].swoosh === null && lockup !== 'wortmarke';
 
   const svg = (
     <svg
@@ -179,9 +186,9 @@ export function Logo({
 
       {lockup === 'horizontal' && (
         <>
-          <Bildmarke tone={tone} gradId={gradId} />
+          <Bildmarke tone={resolved} gradId={gradId} />
           <g transform={`translate(${MARK_W + GAP_H} ${(MARK_H - WORD_H) / 2})`}>
-            <Wortmarke tone={tone} />
+            <Wortmarke tone={resolved} />
           </g>
         </>
       )}
@@ -189,16 +196,16 @@ export function Logo({
       {lockup === 'stacked' && (
         <>
           <g transform={`translate(${(WORD_W - MARK_W) / 2} 0)`}>
-            <Bildmarke tone={tone} gradId={gradId} />
+            <Bildmarke tone={resolved} gradId={gradId} />
           </g>
           <g transform={`translate(0 ${MARK_H + GAP_V})`}>
-            <Wortmarke tone={tone} />
+            <Wortmarke tone={resolved} />
           </g>
         </>
       )}
 
-      {lockup === 'symbol' && <Bildmarke tone={tone} gradId={gradId} />}
-      {lockup === 'wortmarke' && <Wortmarke tone={tone} />}
+      {lockup === 'symbol' && <Bildmarke tone={resolved} gradId={gradId} />}
+      {lockup === 'wortmarke' && <Wortmarke tone={resolved} />}
     </svg>
   );
 

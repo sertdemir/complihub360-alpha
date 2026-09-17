@@ -107,10 +107,10 @@ export function MarketingHeader({
               (1299 px), nur weniger deutlich. Die Wortmarke belegt 123 px —
               genau die Reserve, die hier fehlt. Ab 1440 passt beides. */}
           <span className="desktop-l:hidden">
-            <Logo lockup="symbol" tone={inverse ? 'on-petrol' : 'on-light'} href={userHref} className="h-[47px]" />
+            <Logo lockup="symbol" tone={inverse ? 'on-petrol' : undefined} href={userHref} className="h-[47px]" />
           </span>
           <span className="hidden desktop-l:block">
-            <Logo tone={inverse ? 'on-petrol' : 'on-light'} href={userHref} />
+            <Logo tone={inverse ? 'on-petrol' : undefined} href={userHref} />
           </span>
         </div>
         {/* Anchor group sits truly centered between the two flex-1 side zones. */}
@@ -182,7 +182,7 @@ export function MarketingHeader({
       <div className="desktop-m:hidden">
         <div className="flex h-16 items-center justify-between px-5">
           {/* Mobile: mark only — wordmark + claim dropped to save width. */}
-          <Logo lockup="symbol" tone={inverse ? 'on-petrol' : 'on-light'} />
+          <Logo lockup="symbol" tone={inverse ? 'on-petrol' : undefined} />
           <div className="flex items-center gap-2">
             <ThemeToggle inverse={inverse} size={40} />
             <LanguageMenu triggerClassName={`h-10 w-10 ${inverse ? 'text-fg-inverse hover:text-fg-inverse' : ''}`} />
