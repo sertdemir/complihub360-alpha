@@ -201,6 +201,10 @@ export default {
                 'container-lg': '1024px',
                 'container-xl': '1200px',
                 'container-2xl': '1440px',
+                /* Fluider Deckel ueber 1440 (Compass Grid · container/3xl).
+                   Die Huelle waechst bis hierhin mit; bei 1920 bleiben 80 px
+                   Rand je Seite. Lesespalten bleiben bei container-md. */
+                'container-3xl': '1760px',
             },
             fontFamily: {
                 sans: ['"Inter"', 'system-ui', 'sans-serif'],

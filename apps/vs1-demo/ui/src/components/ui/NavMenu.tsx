@@ -283,7 +283,7 @@ export function NavMenuPanel({ title, aside, className, children }: NavMenuPanel
           className,
         )}
       >
-        <div className="mx-auto flex max-w-container-2xl flex-col gap-8 px-4 py-9 lg:flex-row lg:px-10">
+        <div className="mx-auto flex max-w-container-3xl flex-col gap-8 px-4 py-9 lg:flex-row lg:px-10">
           <div className="min-w-0 flex-1">
             {title && (
               <p className="mb-6 text-body-3xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">

@@ -58,11 +58,15 @@ interface Palette {
 }
 
 const TONE: Record<LogoTone, Palette> = {
-  // claim-Werte: gold-800 (6,71:1 auf Weiß) bzw. ein aufgehelltes Gold
-  // (5,76:1 auf petrol-500). Dieselbe Rechnung, die in AdminShell und
-  // ProviderShell schon die 9-px-Badges auf accent-strong gezogen hat.
+  // claim-Werte sind KEINE Einzelfarben, sondern die Compass-Primitives
+  // accent/800 und accent/300 — dieselben Variablen, an die das
+  // Component-Set 2101:1151 seine Claim-Vektoren bindet:
+  //   accent/800  #6A5B1E   6,71:1 auf Weiß
+  //   accent/300  #F4C44A   6,01:1 auf petrol-500
+  // Dieselbe Rechnung, die in AdminShell und ProviderShell schon die
+  // 9-px-Badges auf accent-strong gezogen hat.
   'on-light': { ring: '#0D3B33', ink: '#012E27', gold: '#C5913B', swoosh: null, claim: '#6A5B1E' },
-  'on-petrol': { ring: '#FFFFFF', ink: '#FFFFFF', gold: '#C5913B', swoosh: null, claim: '#E0C46E' },
+  'on-petrol': { ring: '#FFFFFF', ink: '#FFFFFF', gold: '#C5913B', swoosh: null, claim: '#F4C44A' },
   'mono-white': { ring: '#FFFFFF', ink: '#FFFFFF', gold: '#FFFFFF', swoosh: '#FFFFFF', claim: '#FFFFFF' },
   'mono-black': { ring: '#0F172A', ink: '#0F172A', gold: '#0F172A', swoosh: '#0F172A', claim: '#0F172A' },
 };

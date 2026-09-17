@@ -28,7 +28,7 @@ export function EntryDoorDemo() {
 
   return (
     <section id="entry-door" className="overflow-hidden bg-surface py-20 lg:py-24">
-      <div className="mx-auto w-full max-w-[1440px] px-4 md:px-6 lg:px-10">
+      <div className="mx-auto w-full max-w-container-3xl px-4 md:px-6 lg:px-10">
         <div className="flex flex-col items-center gap-12 lg:flex-row lg:gap-[88px]">
           {/* Tinted demo panel on the stage Gradient — theme-aware since the
               dark G1 variant (2026-08-26); the wizard card on it keeps its own

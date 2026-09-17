@@ -97,7 +97,7 @@ export function MarketingHeader({
       {/* ── Desktop — from xl only: six entries with German labels do not
           survive 1024px (user finding on the GlobalNav twin, 2026-08-28); note
           xl is 1440 in this Tailwind scale, so the cut is desktop-m (1280). ── */}
-      <div className="mx-auto hidden h-20 max-w-container-2xl items-center gap-4 px-4 desktop-m:flex">
+      <div className="mx-auto hidden h-20 max-w-container-3xl items-center gap-4 px-4 desktop-m:flex">
         <div className="flex flex-1 basis-0 items-center gap-5">
           <Logo tone={inverse ? 'on-petrol' : 'on-light'} href={userHref} />
         </div>

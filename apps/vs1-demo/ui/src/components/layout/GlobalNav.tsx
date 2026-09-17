@@ -87,7 +87,7 @@ export function GlobalNav() {
             not survive 1024px, they clipped behind overflow-hidden. Below
             desktop-m (1280) the burger panel takes over — note xl is 1440 in
             this Tailwind scale. ── */}
-        <div className="hidden desktop-m:flex h-20 items-center justify-between gap-3 w-full max-w-[1440px] mx-auto pl-4 pr-8">
+        <div className="hidden desktop-m:flex h-20 items-center justify-between gap-3 w-full max-w-container-3xl mx-auto pl-4 pr-8">
 
         {/* Logo — the real lockup from the design system, never a rebuilt mark.
             This used to be a CircleDot glyph in a green square plus a text
