@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ObligationEnrichmentMap } from '@complihub/compliance-engine';
+import { isEuMember, ObligationEnrichmentMap } from '@complihub/compliance-engine';
 import { getAreaObligations } from './areaProfiles';
 import { getMarketProfile, MARKET_CODES } from './marketProfiles';
 import { DOMAINS } from './domains';
@@ -121,5 +121,78 @@ describe('market profiles', () => {
       const seen = getMarketProfile(code).byCadence.map((g) => order.indexOf(g.due));
       expect([...seen].sort((a, b) => a - b), `${code}`).toEqual(seen);
     }
+  });
+});
+
+// ─── Ein EU-Rechtsakt ist ausserhalb der EU keine Rechtsgrundlage ────────────
+// `scope: 'eu'` traegt im Code eine Begruendung mit: "Directly applicable and
+// identical in every member state, so there is no national text to hold: this
+// IS the applicable law. NOT a coverage gap, and must never be rendered as
+// one." Diese Begruendung gilt INNERHALB der Union.
+//
+// `getAreaObligations` filtert nicht nach Markt: fehlt einer Pflicht die
+// Landes-Ueberschreibung, greift `default`, und der ist fast immer ein
+// EU-Rechtsakt. Am gebauten Stand nachgemessen (2026-09-17):
+//
+//   US  log-intrastat   → EBS Reg. 2019/2152 (Intrastat)
+//   TR  log-intrastat   → EBS Reg. 2019/2152 (Intrastat)
+//   US  prod-epr        → EU PPWR 2025/40
+//
+// Intrastat ist die INNERGEMEINSCHAFTLICHE Handelsstatistik — fuer die USA und
+// die Tuerkei gibt es diese Pflicht nicht. Bei der PPWR liegt es anders: sie
+// bindet jeden, der Verpackungen auf dem EU-Markt in Verkehr bringt, also auch
+// einen US-Haendler. Falsch ist dort nicht der Rechtsakt, sondern die SPALTE —
+// unter "Markt USA" steht, was fuer den Verkauf in die EU gilt.
+//
+// Beides ist dieselbe Luecke: ausserhalb der EU fehlt der nationale Eintrag,
+// und der EU-Standard tritt an seine Stelle, ohne sich als Luecke zu zeigen.
+//
+// DIESER TEST BEHEBT DAS NICHT. Er haelt den Bestand fest und verhindert, dass
+// er waechst: eine neue Pflicht ohne nationalen Eintrag faellt hier sofort auf.
+// Die Liste ist die sichtbare Schuld — sie darf nur schrumpfen.
+describe('EU-Standard ausserhalb der EU', () => {
+  // Stand 2026-09-17: 29 Kombinationen. Jede Zeile heisst "dieser Markt sieht
+  // einen EU-Rechtsakt als seine Rechtsgrundlage, und wir wissen es".
+  const BEKANNTE_LUECKEN = new Set([
+    'TR/data-hosting', 'UK/data-hosting',
+    'TR/log-customs-classification', 'UK/log-customs-classification',
+    'US/log-eori',
+    'TR/log-intrastat', 'UK/log-intrastat', 'US/log-intrastat',
+    'TR/mktg-health-claims', 'UK/mktg-health-claims',
+    'TR/prod-packaging-conformity', 'UK/prod-packaging-conformity', 'US/prod-packaging-conformity',
+    'TR/prod-packaging-empty-space', 'UK/prod-packaging-empty-space', 'US/prod-packaging-empty-space',
+    'TR/prod-packaging-format-bans', 'UK/prod-packaging-format-bans', 'US/prod-packaging-format-bans',
+    'TR/prod-packaging-recyclability', 'UK/prod-packaging-recyclability', 'US/prod-packaging-recyclability',
+    'TR/prod-packaging-recycled-content', 'UK/prod-packaging-recycled-content', 'US/prod-packaging-recycled-content',
+    'TR/prod-packaging-reuse-targets', 'UK/prod-packaging-reuse-targets', 'US/prod-packaging-reuse-targets',
+    'TR/prod-safety',
+  ]);
+
+  const gefunden = () => {
+    const out = new Set<string>();
+    for (const code of MARKET_CODES) {
+      // MARKET_CODES fuehrt kein 'EU' — die Bloecksicht hat keine Nationalitaet
+      // und faellt deshalb gar nicht erst an.
+      if (isEuMember(code)) continue;
+      for (const domain of DOMAINS) {
+        for (const o of getAreaObligations(domain.slug, code)) {
+          if (o.scope === 'eu') out.add(`${code}/${o.id}`);
+        }
+      }
+    }
+    return out;
+  };
+
+  it('kennt keine unbekannte Luecke', () => {
+    const neu = [...gefunden()].filter((k) => !BEKANNTE_LUECKEN.has(k)).sort();
+    expect(neu, 'Neue Pflicht ohne nationalen Eintrag: entweder eine Landes-Ueberschreibung ergaenzen oder die Luecke hier eintragen und begruenden').toEqual([]);
+  });
+
+  it('fuehrt keine Luecke, die es nicht mehr gibt', () => {
+    // Ohne das verrottet die Liste: ein behobener Eintrag bliebe stehen und
+    // liesse die Schuld groesser aussehen, als sie ist.
+    const ist = gefunden();
+    const veraltet = [...BEKANNTE_LUECKEN].filter((k) => !ist.has(k)).sort();
+    expect(veraltet, 'Behoben — bitte aus BEKANNTE_LUECKEN entfernen').toEqual([]);
   });
 });

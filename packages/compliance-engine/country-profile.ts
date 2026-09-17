@@ -2,6 +2,19 @@ import { ComplianceDomain } from './domain-schema.js';
 
 export type CountryCode = 'DE' | 'FR' | 'US' | 'UK' | 'IT' | 'ES' | 'NL' | 'TR';
 
+/** Welche unserer Maerkte Mitgliedstaaten der EU sind.
+ *
+ *  Gebraucht wird das, weil `scope: 'eu'` in obligation-enrichment.ts eine
+ *  Begruendung mitfuehrt — "directly applicable and identical in every member
+ *  state, so there is no national text to hold" —, die NUR innerhalb der Union
+ *  traegt. Ausserhalb ist derselbe Eintrag keine erfuellte Zusage, sondern eine
+ *  Rechtsgrundlage, die fuer diesen Markt nicht gilt.
+ *
+ *  UK ist seit dem Brexit draussen; US und TR waren nie drin. */
+export const EU_MEMBER_STATES: readonly CountryCode[] = ['DE', 'FR', 'IT', 'ES', 'NL'];
+
+export const isEuMember = (code: CountryCode): boolean => EU_MEMBER_STATES.includes(code);
+
 export interface CountryRiskProfile {
     domainWeights: Record<ComplianceDomain, number>;
     enforcementIntensity: number; // 1-10 overall strictness
