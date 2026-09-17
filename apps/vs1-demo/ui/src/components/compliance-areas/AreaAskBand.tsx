@@ -56,7 +56,7 @@ export function AreaAskBand({ slug, title }: Props) {
   return (
     <div
       ref={ref}
-      className="flex items-center gap-14 border-y border-accent-500/40 py-12 desktop-s:gap-[4.5rem] desktop-s:py-14"
+      className="flex items-center gap-14 border-y border-stroke-subtle py-12 desktop-s:gap-[4.5rem] desktop-s:py-14"
     >
       {/* The bubble: 256px of gold line drawing, hidden where it would push
           the form off the screen. */}

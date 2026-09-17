@@ -103,7 +103,7 @@ export function PartnerApplyPage() {
                         ))}
                     </div>
 
-                    <div className="mt-6 grid grid-cols-3 border-y border-accent-500/40 py-4">
+                    <div className="mt-6 grid grid-cols-3 border-y border-stroke-subtle py-4">
                         {(['confirm', 'answer', 'fee'] as const).map((k, i) => (
                             <div key={k} className={'px-4 text-center ' + (i > 0 ? 'border-l border-stroke-subtle' : '')}>
                                 <span className="font-serif text-body-md font-bold tabular-nums text-fg">

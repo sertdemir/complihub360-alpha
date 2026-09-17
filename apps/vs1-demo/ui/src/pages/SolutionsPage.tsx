@@ -263,7 +263,7 @@ export function SolutionsPage() {
           <h2 className="mt-2.5 font-serif text-[1.75rem] font-bold leading-tight tracking-tight text-fg lg:text-[2rem]">
             {t('solutions.stats.title')}
           </h2>
-          <div className="mt-9 grid grid-cols-2 gap-y-8 border-y border-accent-500/40 py-9 tablet:grid-cols-4 tablet:divide-x tablet:divide-stroke-subtle">
+          <div className="mt-9 grid grid-cols-2 gap-y-8 border-y border-stroke-subtle py-9 tablet:grid-cols-4 tablet:divide-x tablet:divide-stroke-subtle">
             {PAGE_STATS.map((s) => (
               <div key={s.labelKey} className="min-w-0 px-5 text-left">
                 <p className="font-serif text-[2.25rem] font-bold leading-none tabular-nums text-fg">

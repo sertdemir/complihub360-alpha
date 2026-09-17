@@ -130,7 +130,7 @@ export function AiGovernancePage() {
         </div>
         {/* The principle closes the section between gold hairlines — the one
             sentence the six promises are derived from. */}
-        <Reveal delay={0.3} className="mt-9 border-y border-accent-500/40 py-7 text-center">
+        <Reveal delay={0.3} className="mt-9 border-y border-stroke-subtle py-7 text-center">
           <p className="mx-auto max-w-[760px] font-serif text-[1.25rem] font-bold leading-snug text-fg">
             {t('aiGov.behaviour.principle')}
           </p>

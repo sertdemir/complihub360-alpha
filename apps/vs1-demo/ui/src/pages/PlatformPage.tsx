@@ -223,7 +223,7 @@ export function PlatformPage() {
             </Stagger>
 
             <Reveal delay={0.15} className="mx-auto mt-9 max-w-[900px]">
-              <p className="border-y border-accent-500/40 py-6 text-center text-body-md font-medium leading-relaxed text-fg">
+              <p className="border-y border-stroke-subtle py-6 text-center text-body-md font-medium leading-relaxed text-fg">
                 {t('platform.rules.creed')}
               </p>
             </Reveal>
