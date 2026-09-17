@@ -515,23 +515,23 @@
     "saveProgress": {
       "eyebrow": "Kostenloses Konto",
       "title": "Fortschritt speichern",
-      "desc": "Behalten Sie Ihre Risk Map, lassen Sie sich mit Verified Partnern matchen und erhalten Sie Hinweise, wenn sich Regeln ändern — kostenlos, ohne Kreditkarte. Wir senden Ihnen einen Magic-Link per E-Mail, es gibt also kein Passwort zu merken.",
+      "desc": "Behalten Sie Ihre Risk Map und lassen Sie sich mit Verified Partnern matchen — kostenlos, ohne Kreditkarte. Hinweise bei Regeländerungen sind in Vorbereitung. Wir senden Ihnen einen Magic-Link per E-Mail, es gibt also kein Passwort zu merken.",
       "benefits": [
         "Ihr gespeichertes Risk-Map-Dossier",
         "Verified-Partner-Matching",
-        "Hinweise, wenn sich Vorschriften ändern"
+        "Hinweise bei Vorschriftenänderungen — in Vorbereitung"
       ],
       "confirm": "Ihr Fortschritt ist gesichert.",
       "cta": "Kostenloses Konto erstellen"
     },
     "freeAccount": {
       "eyebrow": "Kostenloses Konto",
-      "title": "Echtzeit-Hinweise, kostenlos",
-      "desc": "Erhalten Sie Echtzeit-Hinweise, sobald sich eine Vorschrift in Ihren Märkten ändert — plus Ihre gespeicherte Risk Map und Verified-Partner-Matching. Kostenlos, ohne Kreditkarte. Wir senden Ihnen einen Magic-Link per E-Mail, ein Passwort ist nicht nötig.",
+      "title": "Ihre Risk Map und Ihre Matches, kostenlos",
+      "desc": "Behalten Sie Ihre Risk Map und lassen Sie sich mit Verified Partnern in Ihren Märkten matchen. Kostenlos, ohne Kreditkarte. Regulatorische Hinweise sind in Vorbereitung und erscheinen in Ihrem Konto, sobald sie verfügbar sind. Wir senden Ihnen einen Magic-Link per E-Mail, ein Passwort ist nicht nötig.",
       "benefits": [
-        "Regulatorische Hinweise in Echtzeit",
         "Ihr gespeichertes Risk-Map-Dossier",
-        "Verified-Partner-Matching"
+        "Verified-Partner-Matching",
+        "Regulatorische Hinweise — in Vorbereitung"
       ],
       "confirm": "Klicken Sie auf den Link, um die Einrichtung Ihres kostenlosen Kontos abzuschließen.",
       "cta": "Kostenloses Konto erstellen"
@@ -1147,7 +1147,7 @@
     },
     "newsCard": {
       "title": "Neuigkeiten, die Sie betreffen.",
-      "desc": "Echtzeit-Hinweise, wenn Behörden sich in Ihren Märkten bewegen. Nach Bereich kuratiert, auf Ihre Tätigkeit zugeschnitten."
+      "desc": "Hinweise, wenn Behörden sich in Ihren Märkten bewegen — nach Bereich kuratiert, auf Ihre Tätigkeit zugeschnitten."
     },
     "learn": {
       "meta": "Webinar · 24 Min.",
@@ -1258,7 +1258,7 @@
     "subscribe": "Abonnieren",
     "success": "Sie stehen auf der Liste — prüfen Sie Ihren Posteingang.",
     "privacy": "Wir nutzen Ihre E-Mail nur für das Briefing. Abmeldung mit einem Klick. Siehe unsere Datenschutzerklärung.",
-    "accountLink": "Oder schalten Sie Echtzeit-Hinweise mit einem kostenlosen Konto frei",
+    "accountLink": "Oder erstellen Sie ein kostenloses Konto und behalten Sie Ihre Risk Map",
     "cardTitle": "Das monatliche Briefing"
   },
   "footer": {

@@ -515,23 +515,23 @@
     "saveProgress": {
       "eyebrow": "Free account",
       "title": "Save your progress",
-      "desc": "Keep your risk map, match with Verified Partners, and get alerts when the rules change — free, no credit card. We'll email you a magic link, so there's no password to remember.",
+      "desc": "Keep your risk map and match with Verified Partners — free, no credit card. Alerts for when the rules change are in preparation. We'll email you a magic link, so there's no password to remember.",
       "benefits": [
         "Your saved risk-map dossier",
         "Verified-Partner matching",
-        "Alerts when regulations move"
+        "Alerts when regulations move — in preparation"
       ],
       "confirm": "Your progress is safe.",
       "cta": "Create free account"
     },
     "freeAccount": {
       "eyebrow": "Free account",
-      "title": "Real-time alerts, free",
-      "desc": "Unlock real-time alerts the moment a regulation moves in your markets — plus your saved risk map and Verified-Partner matching. Free, no credit card. We'll email you a magic link, so there's no password.",
+      "title": "Your map and your matches, free",
+      "desc": "Keep your risk map and match with Verified Partners in your markets. Free, no credit card. Regulatory alerts are in preparation and arrive in your account when they ship. We'll email you a magic link, so there's no password.",
       "benefits": [
-        "Real-time regulatory alerts",
         "Your saved risk-map dossier",
-        "Verified-Partner matching"
+        "Verified-Partner matching",
+        "Regulatory alerts — in preparation"
       ],
       "confirm": "Click the link to finish setting up your free account.",
       "cta": "Create free account"
@@ -1147,7 +1147,7 @@
     },
     "newsCard": {
       "title": "Updates that affect you.",
-      "desc": "Real-time alerts when regulators move in markets you operate in. Curated by domain, scoped to your operation."
+      "desc": "Alerts when regulators move in markets you operate in — curated by domain, scoped to your operation."
     },
     "learn": {
       "meta": "Webinar · 24 min",
@@ -1258,7 +1258,7 @@
     "subscribe": "Subscribe",
     "success": "You're on the list — check your inbox.",
     "privacy": "We use your email only for the brief. Unsubscribe in one click. See our privacy policy.",
-    "accountLink": "Or unlock real-time alerts with a free account",
+    "accountLink": "Or create a free account to keep your risk map",
     "cardTitle": "The monthly briefing"
   },
   "footer": {

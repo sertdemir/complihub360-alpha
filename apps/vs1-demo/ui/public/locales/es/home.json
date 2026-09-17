@@ -515,23 +515,23 @@
     "saveProgress": {
       "eyebrow": "Cuenta gratuita",
       "title": "Guarde su progreso",
-      "desc": "Conserve su Risk Map, haga match con Verified Partners y reciba avisos cuando cambien las normas — gratis, sin tarjeta de crédito. Le enviaremos un Magic-Link por correo, así no hay contraseña que recordar.",
+      "desc": "Conserve su Risk Map y haga match con Verified Partners — gratis, sin tarjeta de crédito. Los avisos por cambios normativos están en preparación. Le enviaremos un Magic-Link por correo, así no hay contraseña que recordar.",
       "benefits": [
         "Su dossier de Risk Map guardado",
         "Matching con Verified Partners",
-        "Avisos cuando la normativa cambia"
+        "Avisos cuando la normativa cambia — en preparación"
       ],
       "confirm": "Su progreso está a salvo.",
       "cta": "Crear cuenta gratuita"
     },
     "freeAccount": {
       "eyebrow": "Cuenta gratuita",
-      "title": "Avisos en tiempo real, gratis",
-      "desc": "Active avisos en tiempo real en cuanto una norma cambie en sus mercados — además de su Risk Map guardada y el matching con Verified Partners. Gratis, sin tarjeta de crédito. Le enviaremos un Magic-Link por correo; no hay contraseña.",
+      "title": "Su Risk Map y sus matches, gratis",
+      "desc": "Conserve su Risk Map y haga match con Verified Partners en sus mercados. Gratis, sin tarjeta de crédito. Los avisos regulatorios están en preparación y llegarán a su cuenta cuando estén disponibles. Le enviaremos un Magic-Link por correo; no hay contraseña.",
       "benefits": [
-        "Avisos regulatorios en tiempo real",
         "Su dossier de Risk Map guardado",
-        "Matching con Verified Partners"
+        "Matching con Verified Partners",
+        "Avisos regulatorios — en preparación"
       ],
       "confirm": "Haga clic en el enlace para terminar de configurar su cuenta gratuita.",
       "cta": "Crear cuenta gratuita"
@@ -1147,7 +1147,7 @@
     },
     "newsCard": {
       "title": "Novedades que le afectan.",
-      "desc": "Avisos en tiempo real cuando los reguladores se mueven en sus mercados. Curado por área, ajustado a su operación."
+      "desc": "Avisos cuando los reguladores se mueven en sus mercados — curado por área, ajustado a su operación."
     },
     "learn": {
       "meta": "Webinar · 24 min",
@@ -1258,7 +1258,7 @@
     "subscribe": "Suscribirse",
     "success": "Está en la lista — revise su bandeja de entrada.",
     "privacy": "Usamos su correo solo para el briefing. Baja con un clic. Consulte nuestra política de privacidad.",
-    "accountLink": "O active avisos en tiempo real con una cuenta gratuita",
+    "accountLink": "O cree una cuenta gratuita para conservar su Risk Map",
     "cardTitle": "El briefing mensual"
   },
   "footer": {

@@ -324,8 +324,8 @@
     "download": "İndir"
   },
   "comingSoon": {
-    "eyebrow": "WK3'te geliyor",
-    "bannerTitle": "WK3'TE GELİYOR — {{title}}",
+    "eyebrow": "Hazırlanıyor",
+    "bannerTitle": "HAZIRLANIYOR — {{title}}",
     "joinEarlyAccess": "Erken erişime katılın",
     "alerts": {
       "title": "Uyarılar",

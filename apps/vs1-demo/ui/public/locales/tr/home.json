@@ -515,23 +515,23 @@
     "saveProgress": {
       "eyebrow": "Ücretsiz hesap",
       "title": "İlerlemenizi kaydedin",
-      "desc": "Risk Map'inizi saklayın, Verified Partner'larla eşleşin ve kurallar değiştiğinde bildirim alın — ücretsiz, kredi kartı gerekmez. Size e-postayla bir Magic-Link göndeririz; hatırlamanız gereken bir şifre olmaz.",
+      "desc": "Risk Map'inizi saklayın ve Verified Partner'larla eşleşin — ücretsiz, kredi kartı gerekmez. Kurallar değiştiğinde gönderilecek bildirimler hazırlanıyor. Size e-postayla bir Magic-Link göndeririz; hatırlamanız gereken bir şifre olmaz.",
       "benefits": [
         "Kaydedilmiş Risk Map dosyanız",
         "Verified Partner eşleştirmesi",
-        "Mevzuat değiştiğinde bildirimler"
+        "Mevzuat değiştiğinde bildirimler — hazırlanıyor"
       ],
       "confirm": "İlerlemeniz güvende.",
       "cta": "Ücretsiz hesap oluşturun"
     },
     "freeAccount": {
       "eyebrow": "Ücretsiz hesap",
-      "title": "Gerçek zamanlı bildirimler, ücretsiz",
-      "desc": "Pazarlarınızda bir mevzuat değiştiği anda gerçek zamanlı bildirimler alın — ayrıca kaydedilmiş Risk Map'iniz ve Verified Partner eşleştirmesi. Ücretsiz, kredi kartı gerekmez. Size e-postayla bir Magic-Link göndeririz; şifre yoktur.",
+      "title": "Risk Map'iniz ve eşleşmeleriniz, ücretsiz",
+      "desc": "Risk Map'inizi saklayın ve pazarlarınızdaki Verified Partner'larla eşleşin. Ücretsiz, kredi kartı gerekmez. Mevzuat bildirimleri hazırlanıyor; kullanıma sunulduğunda hesabınızda görünecek. Size e-postayla bir Magic-Link göndeririz; şifre yoktur.",
       "benefits": [
-        "Gerçek zamanlı mevzuat bildirimleri",
         "Kaydedilmiş Risk Map dosyanız",
-        "Verified Partner eşleştirmesi"
+        "Verified Partner eşleştirmesi",
+        "Mevzuat bildirimleri — hazırlanıyor"
       ],
       "confirm": "Ücretsiz hesabınızın kurulumunu tamamlamak için bağlantıya tıklayın.",
       "cta": "Ücretsiz hesap oluşturun"
@@ -1147,7 +1147,7 @@
     },
     "newsCard": {
       "title": "Sizi etkileyen gelişmeler.",
-      "desc": "Düzenleyiciler faaliyet gösterdiğiniz pazarlarda harekete geçtiğinde gerçek zamanlı bildirimler. Alana göre derlenmiş, operasyonunuza göre daraltılmış."
+      "desc": "Düzenleyiciler faaliyet gösterdiğiniz pazarlarda harekete geçtiğinde bildirimler — alana göre derlenmiş, operasyonunuza göre daraltılmış."
     },
     "learn": {
       "meta": "Web semineri · 24 dk",
@@ -1258,7 +1258,7 @@
     "subscribe": "Abone olun",
     "success": "Listedesiniz — gelen kutunuzu kontrol edin.",
     "privacy": "E-postanızı yalnızca bülten için kullanırız. Tek tıkla abonelikten çıkabilirsiniz. Gizlilik politikamıza bakın.",
-    "accountLink": "Veya gerçek zamanlı bildirimleri ücretsiz hesapla açın",
+    "accountLink": "Veya Risk Map'inizi saklamak için ücretsiz hesap oluşturun",
     "cardTitle": "Aylık briefing"
   },
   "footer": {
