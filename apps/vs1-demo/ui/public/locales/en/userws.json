@@ -382,7 +382,7 @@
     "askScopeSessions_one": "{{count}} session",
     "askScopeSessions_other": "{{count}} sessions",
     "askScopeNoSession": "no session",
-    "askPlaceholder": "Ask your question in your own words",
+    "askPlaceholder": "Ask in your own words",
     "askSuggest": "What applies to {{title}}?",
     "askThinking": "Checking the area knowledge …",
     "askDisclaimer": "General information, not legal or tax advice. For a binding answer:",

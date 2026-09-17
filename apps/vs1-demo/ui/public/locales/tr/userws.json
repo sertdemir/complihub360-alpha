@@ -382,7 +382,7 @@
     "askScopeSessions_one": "{{count}} oturum",
     "askScopeSessions_other": "{{count}} oturum",
     "askScopeNoSession": "oturum yok",
-    "askPlaceholder": "Sorunuzu kendi sözcüklerinizle yazın",
+    "askPlaceholder": "Kendi sözcüklerinizle sorun",
     "askSuggest": "{{title}} için ne geçerli?",
     "askThinking": "Alan bilgisi kontrol ediliyor …",
     "askDisclaimer": "Genel bilgidir, hukuki veya vergi danışmanlığı değildir. Bağlayıcı bir yanıt için:",

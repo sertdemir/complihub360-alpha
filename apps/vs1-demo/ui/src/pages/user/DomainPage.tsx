@@ -12,6 +12,7 @@ import { AREA_BY_SLUG } from '../../components/compliance-areas/areas';
 import { SEVERITY_STYLE } from '../../components/compliance-areas/severity';
 import { fetchDomainOverview, EMPTY_DOMAIN, type DomainObligation, type DomainOverview, type DomainSession } from '../../api/domain';
 import { isAreaSlug } from '../../lib/areaProfiles';
+import { useObligationText } from '../../lib/obligationText';
 import { DOMAINS, type DomainSlug } from '../../lib/domains';
 import { SLUG_TO_I18N } from './AnfragenTab';
 
@@ -61,6 +62,10 @@ export function DomainPage() {
 function DomainView({ slug }: { slug: DomainSlug }) {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation('userws');
+  // Die Engine nennt ihre Pflichten englisch ("VAT Registration & Filing").
+  // Matrix und Wissenskarten ziehen denselben Namen aus derselben Quelle
+  // (Befund 2026-09-16: zwei Vokabulare fuer dieselbe Pflicht).
+  const obText = useObligationText();
   const { openWizard } = useWizardDrawer();
   const locale = i18n.resolvedLanguage || 'en';
   const entered = useEntered();
@@ -255,7 +260,7 @@ function DomainView({ slug }: { slug: DomainSlug }) {
                             style={{ gridTemplateColumns: `minmax(0,1fr) repeat(${markets.length}, 56px) 170px` }}
                           >
                             <span className="min-w-0 truncate text-body-xs font-bold text-fg">
-                              {o.label}
+                              {obText.label(o.id, o.label)}
                               {euWide && <span className="ml-1.5 text-[10px] font-semibold text-fg-tertiary">{t('domainPage.matrixEuWide')}</span>}
                               {o.status === 'in_progress' && <span className="ml-1.5 text-[10px] font-semibold text-risk-medium">{t('domainPage.inProgress')}</span>}
                             </span>

@@ -113,12 +113,14 @@ export function KpiRing({ title, sub, chip, value, segs, on, format }: {
 }) {
   const n = useCountUp(value, on);
   return (
-    <div className="flex items-center gap-5 py-1">
-      {/* Der Textblock nimmt den Rest der Spalte, damit der Ring am SPALTENENDE
-          sitzt und nicht am Textende (Befund 2026-09-15: bei kurzem Untertitel
-          klebte der Ring am Text, drei Ringe einer Zeile standen auf drei
-          verschiedenen Hoehenlinien). */}
-      <div className="min-w-0 max-w-[220px] flex-1 text-left">
+    <div className="flex items-center gap-4 py-1">
+      {/* Der Textblock waechst auf eine FESTE Breite, damit die Ringe einer
+          Zeile auf derselben Linie stehen (Befund 2026-09-15: vorher sass der
+          Ring am Textende, drei Ringe standen auf drei Hoehenlinien) — aber
+          nur auf 180 px statt 220 (Befund 2026-09-16: die Korrektur war zu
+          weit gegangen, bei kurzem Untertitel klaffte zwischen Text und Ring
+          eine leere Spalte, und das Paar war nicht mehr als Paar zu lesen). */}
+      <div className="min-w-0 max-w-[180px] flex-1 text-left">
         <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{title}</p>
         <p className="mt-1.5 text-body-2xs leading-snug text-fg-secondary">{sub}</p>
         {chip && (

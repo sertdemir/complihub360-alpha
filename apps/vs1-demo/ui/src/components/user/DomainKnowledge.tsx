@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Segment } from '../compliance-areas/Segment';
 import { SEVERITY_STYLE } from '../compliance-areas/severity';
 import { getAreaObligations, getAreaProfile, type AreaObligation } from '../../lib/areaProfiles';
+import { useObligationText } from '../../lib/obligationText';
 import { MARKET_CODES } from '../../lib/marketProfiles';
 import type { CountryCode } from '../compliance-areas/types';
 import type { DomainSlug } from '../../lib/domains';
@@ -52,6 +53,10 @@ export function DomainKnowledge({ slug, markets, sessions }: {
 }) {
   const { t, i18n } = useTranslation('userws');
   const { t: tc } = useTranslation('common');
+  // Name, Kadenz und Beschreibung in der Sprache des Nutzers — dieselbe
+  // Quelle wie die Matrix darueber (Befund 2026-09-16: dort deutsch, hier
+  // englisch). Nur das Bussgeld bleibt, wie die Engine es traegt.
+  const ob = useObligationText();
   const navigate = useNavigate();
   const locale = i18n.resolvedLanguage || 'en';
   const mine = markets.map((m) => m.toUpperCase()).filter(isMarketCode);
@@ -112,18 +117,18 @@ export function DomainKnowledge({ slug, markets, sessions }: {
             <div className="flex items-start gap-2.5">
               <span className={`mt-[5px] h-2 w-2 shrink-0 rounded-full ${SEVERITY_STYLE[e.primary.severity].bar}`} />
               <div className="min-w-0 flex-1">
-                <h3 className="font-serif text-[16px] font-bold leading-tight text-fg">{e.primary.label}</h3>
+                <h3 className="font-serif text-[16px] font-bold leading-tight text-fg">{ob.label(e.id, e.primary.label)}</h3>
                 <p className="mt-0.5 text-body-4xs text-fg-tertiary">{e.primary.source}</p>
               </div>
               {e.own.length > 0 && <span className={TAG}>{t('domainPage.knowledgeInSession')}</span>}
             </div>
 
-            <p className="mt-2.5 text-body-3xs leading-relaxed text-fg-secondary">{e.primary.description}</p>
+            <p className="mt-2.5 text-body-3xs leading-relaxed text-fg-secondary">{ob.description(e.id, e.primary.description)}</p>
 
             <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-body-3xs">
               <div>
                 <dt className="text-body-4xs font-extrabold uppercase tracking-[0.06em] text-fg-tertiary">{t('domainPage.dossierCadence')}</dt>
-                <dd className="mt-0.5 font-semibold text-fg">{e.primary.due}</dd>
+                <dd className="mt-0.5 font-semibold text-fg">{ob.cadence(e.primary.due)}</dd>
               </div>
               <div>
                 <dt className="text-body-4xs font-extrabold uppercase tracking-[0.06em] text-fg-tertiary">{t('domainPage.dossierPenalty')}</dt>

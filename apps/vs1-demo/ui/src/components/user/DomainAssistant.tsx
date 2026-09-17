@@ -95,8 +95,12 @@ export function DomainAssistant({ slug, areaLabel, sessions, markets, openDuties
         {markets.length > 0 && <span className={TAG}>{markets.join(' · ')}</span>}
       </div>
 
-      {/* Verlauf */}
-      <div ref={logRef} className="mt-3 flex min-h-[120px] flex-1 flex-col gap-2 overflow-y-auto py-1">
+      {/* Verlauf. Die Mindesthoehe gilt erst, wenn etwas drinsteht: solange
+          niemand gefragt hat, stand unter dem Einleitungssatz ein leeres Feld
+          von 120 px, das wie ein fehlgeschlagener Ladevorgang aussah (Befund
+          2026-09-16). Sobald der erste Zug da ist, haelt sie den Verlauf
+          ruhig, damit die Karte beim Antworten nicht springt. */}
+      <div ref={logRef} className={'mt-3 flex flex-1 flex-col gap-2 overflow-y-auto py-1' + (turns.length ? ' min-h-[120px]' : '')}>
         {turns.length === 0 && (
           <p className="text-body-3xs leading-relaxed text-fg-tertiary">{t('domainPage.assistantIntro', { area: areaLabel })}</p>
         )}
