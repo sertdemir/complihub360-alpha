@@ -133,8 +133,24 @@ Die Reihenfolge API-vor-UI bleibt: `deploy-ui` wartet auf `deploy-api`. Ein
 halber Fehlschlag kann so nur die harmlose Kombination hinterlassen (neue API,
 alte UI) — umgekehrt hat es am 09.08. still die Risikokarte degradiert.
 
-`verify` prüft am Ende bewusst von **außen** (`ubuntu-latest`, HTTP 401 hinter
-der Auth-Schranke). Ein Test vom Server selbst würde Traefik und DNS überspringen.
+`verify` prüft am Ende bewusst von **außen** (`ubuntu-latest`) — ein Test vom
+Server selbst würde Traefik und DNS überspringen. Geprüft wird seit dem
+17.09.2026 **nicht mehr** starr `HTTP 401`: die Basic-Auth-Wand vor der Seite
+ist seit dem 30.08. abgenommen (`scripts/staging-wall.sh`), und der starre
+Vergleich färbte danach 15 Deploys in Folge rot, obwohl Build, Installation und
+Health-Check grün waren. Ein Schritt, der immer rot ist, verbirgt den echten
+Fehlschlag.
+
+Der Status gilt jetzt als Lebenszeichen — **200** (Wand ab) und **401** (Wand
+an) sind beide in Ordnung, alles andere ist rot. Bewiesen werden stattdessen die
+beiden Dinge, die in jedem der beiden Zustände gelten müssen:
+
+1. **`X-Robots-Tag: noindex` steht.** Suchmaschinen hält dieser Header fern,
+   nicht die Wand. Fällt er weg, wäre Staging indexierbar.
+2. **Der ausgelieferte Build ist der dieses Laufs.** `build-ui` schreibt die SHA
+   in `build-info.json`; `verify` liest sie zurück. Ohne diesen Abgleich belegt
+   ein 200 nur, dass *irgendein* Stand ausgeliefert wird — nicht der neue.
+   Nur ohne Wand abrufbar, mit Wand käme 401 statt der Datei.
 
 `concurrency: deploy-staging` erzwingt einen Deploy zur Zeit — zwei
 gleichzeitige Läufe würden sich um dasselbe Site-Verzeichnis streiten.
