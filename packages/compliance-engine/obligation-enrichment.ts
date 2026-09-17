@@ -13,6 +13,30 @@ export interface ObligationEnrichment {
     penalty: string;
     /** Upper penalty bound in EUR used for the total-exposure stat. */
     penaltyMaxEur?: number;
+    /** Die Vorschrift, aus der `penaltyMaxEur` stammt — z. B. 'AO §152 Abs. 10'
+     *  oder 'VerpackG §36 Abs. 2 Nr. 3'.
+     *
+     *  WARUM DAS FELD EXISTIERT (Analyse 2026-09-17): `penaltyMaxEur` wird auf
+     *  vier Flaechen als Risikobetrag hochgezaehlt — AreaEnforcement,
+     *  AreaMetrics, MarketCalendar und RiskShowcase auf der STARTSEITE. Keine
+     *  der 75 Zahlen trug eine Fundstelle, und wo sich zwei Quellen zum selben
+     *  Bussgeld aeussern, widersprechen sie sich: beim niederlaendischen
+     *  Bussgeld um Faktor 33 (EUR 165 gegen EUR 5.514). Beide Werte sind fuer
+     *  sich plausibel — der eine die uebliche Praxis, der andere der
+     *  gesetzliche Hoechstbetrag. Ohne Fundstelle ist nicht entscheidbar,
+     *  welcher ins Produkt gehoert.
+     *
+     *  DIE REGEL, die daraus folgt: gezeigt wird der gesetzliche HOECHSTBETRAG,
+     *  und er traegt die Vorschrift. Ein Hoechstbetrag steht im Gesetz und
+     *  laesst sich zitieren; "was ueblicherweise verhaengt wird" steht nirgends
+     *  und variiert je Behoerde. Untertreiben ist zudem schaedlicher als
+     *  uebertreiben: wer wegen einer zu niedrigen Zahl nichts unternimmt, hat
+     *  einen echten Schaden.
+     *
+     *  Bis eine Zahl ihre Vorschrift traegt, ist sie Bestand ohne Beleg — die
+     *  Menge davon haelt obligationScope.test.ts fest und laesst sie nur
+     *  schrumpfen. */
+    penaltyBasis?: string;
     /** Cadence label: 'Quarterly' | 'Annual' | 'Monthly' | 'Ongoing' | 'One-off'. */
     due: string;
     /** Typical days until the next deadline; drives the median-deadline stat. */
