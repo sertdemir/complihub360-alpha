@@ -468,8 +468,8 @@ The software never performs a regulated professional service. It identifies and 
 | `ComplianceDomain.ONGOING_MONITORING` (KYB/AML) | The literal word "monitoring" in the engine taxonomy | It is KYB/beneficial-ownership *information*; consider renaming the enum in-product |
 | Planned regulatory-change alerts | "Alerts when the rules change" is close to monitoring claims | **Decided:** Class 45 as information; any Class 42 clause stays tied to the user's prior assessment (Decision 2) |
 | Admin cockpit / SLA watchlist | Contains "monitoring" and "alerts" | Platform-operations monitoring, not regulatory |
-| `mktg-health-claims`, US row | **"FTC Act §5 / FDA labeling rules"** — a literal FDA reference in shipped product data | **Fixed in `c1e94fd4`** ("FTC Act §5 + FTC Health Products Compliance Guidance"), **pending merge into `main`**. See Part VI.D4.1 |
-| `/markets` US card, focus chip | **"FDA/Labeling"** — advertised FDA coverage in marketing copy, all four locales; closer to the exclusion than the data row is | **Fixed in `c1e94fd4`** ("FTC Advertising Rules", de/es/tr localised), **pending merge into `main`**. See Part VI.D4.1 |
+| `mktg-health-claims`, US row | Was **"FTC Act §5 / FDA labeling rules"** — a literal FDA reference in product data | **Resolved on `main` (`b54512ec`):** now "FTC Act §5 + FTC Health Products Compliance Guidance". See Part VI.D4.1 |
+| `/markets` US card, focus chip | Was **"FDA/Labeling"** — advertised FDA coverage in marketing copy, all four locales; the more exposed of the two | **Resolved on `main` (`b54512ec`):** now "FTC Advertising Rules", de/es/tr localised. See Part VI.D4.1 |
 | Health-claims trigger tags `health`, `supplements`, `medical` | Pulls the obligation in for exactly the FDA-regulated sectors | See Part VI.D |
 | US as a profiled market, now with region-level resolution | The exclusion is US-specific and the US is live | Confirm the exclusion covers the US market pages and US enrichment rows |
 
@@ -839,7 +839,7 @@ Both live in **generic compliance-management and compliance-monitoring software*
 
 The exclusion must be retained. Three findings:
 
-**D4.1 — Both literal FDA references are replaced in commit `c1e94fd4` (17 September 2026), which awaits merge into `main`.** There were two, not one, and the second was the more exposed of the pair. In `packages/compliance-engine/obligation-enrichment.ts`, the `mktg-health-claims` obligation carried a US row sourced to *"FTC Act §5 / FDA labeling rules"*. That row now reads:
+**D4.1 — Both literal FDA references have been removed from the product (17 September 2026).** There were two, not one, and the second was the more exposed of the pair. In `packages/compliance-engine/obligation-enrichment.ts`, the `mktg-health-claims` obligation carried a US row sourced to *"FTC Act §5 / FDA labeling rules"*. That row now reads:
 
 > `US: { source: 'FTC Act §5 + FTC Health Products Compliance Guidance', penalty: 'FTC injunctions + consumer redress', … }`
 
@@ -851,7 +851,9 @@ That reference sat **closer to the exclusion than the data row ever did.** The e
 
 It is replaced in the same commit with **"FTC Advertising Rules"**, localised in keeping with the existing convention on that card (acronym kept, descriptor translated): `FTC-Werberegeln` (de), `Normas publicitarias de la FTC` (es), `FTC Reklam Kuralları` (tr). The claim stays accurate — the FTC is the agency that polices advertising claims — and carries no FDA reference.
 
-**Status — committed, not yet merged.** Commit `c1e94fd4` on branch `claude/interesting-kapitsa-6e7679`: five files, five lines. Verified rendering in the running application across `/markets`, `/markets/us` and the Marketing Compliance area page with the United States selected, and a search of the entire shipped source and copy at that commit returns **no occurrence of "FDA" at all**. It is **not on `main`**, so the released product still carries both references until the merge lands. This note should be deleted once `main` carries the change.
+**Verification.** Merged to `main` as `b54512ec` on 17 September 2026 — five files, five lines. Verified by rendering in the running application across `/markets`, `/markets/us` and the Marketing Compliance area page with the United States selected, and by a `\bFDA\b` search across `apps/vs1-demo/ui/src`, `apps/vs1-demo/ui/public`, `packages/` and `services/*/src` **on `main`**, which returns no occurrence.
+
+**Counsel may rely on this:** the shipped product contains no literal reference to the Food and Drug Administration — neither as a cited authority in the obligation data nor as an advertised scope claim in any of the four locales.
 
 **D4.2 — The health-claims obligation targets exactly the FDA-regulated sectors.** Trigger tags `health`, `supplements`, `medical`; applicable model D2C; the highest risk weight in the library (10 of 10). At EU level it rests on Regulation (EC) 1924/2006, which is not FDA. The sector overlap is real.
 
@@ -909,7 +911,7 @@ The exclusion is about the **regulator**, not the subject. The Product Complianc
 
 **9 · Gaps in the current wording.** Scheduling software · report generation and export · document redaction and consent-gated AI processing · saved searches, providers and workspaces · obligation handling states · provider-side SaaS · the staged-disclosure engine · notification and alert-preference infrastructure · review capture feeding the ranking · jurisdiction-level resolution · source-provenance/drift verification · audit logging · AI/RAG functionality.
 
-**10 · Open questions.** (a) **Answered, pending merge.** Both literal FDA references — the enrichment source string and the `/markets` US focus chip — are replaced in commit `c1e94fd4`, which has not yet merged into `main` (Part VI.D4.1). Until it lands, the released product still names the FDA in both places. (b) How far should the identification go in naming the obligation-handling-state function, given it is the closest point of contact with the cited marks? (c) Should the document-redaction pipeline be named explicitly, as a distinctive function far from the crowded field?
+**10 · Open questions.** (a) **Closed.** Both literal FDA references — the enrichment source string and the `/markets` US focus chip — were removed on 17 September 2026 and are gone from `main` (Part VI.D4.1). Nothing in the shipped product names the FDA. (b) How far should the identification go in naming the obligation-handling-state function, given it is the closest point of contact with the cited marks? (c) Should the document-redaction pipeline be named explicitly, as a distinctive function far from the crowded field?
 
 ---
 
@@ -929,7 +931,7 @@ The exclusion is about the **regulator**, not the subject. The Product Complianc
 
 **7 · Evidence.** `/compliance` and `/compliance/:area` (×8) · `/markets` and `/markets/:code` (×8) · `/results` · `/dashboard/workbench/:domain` · `/how-it-works` · `/resources` · `src/lib/areaProfiles.ts`, `marketProfiles.ts`, `riskMapPdf.ts` · `packages/compliance-engine/obligation-enrichment.ts` · `scripts/tedb-vat-rates.mjs`.
 
-**8 · Limitations.** FDA exclusion retained. CompliHub360 is **not** a law firm, tax practice or regulated adviser and must not be described as providing legal advice or representation; the site, the footer and the code all state this, the last with an explicit reference to the German legal-services and tax-advice acts. Both literal FDA references — the marketing enrichment source string and the `/markets` US focus chip — are replaced in commit `c1e94fd4` of 17 September 2026, which awaits merge into `main`; until then both remain live in the released product (Part VI.D4.1).
+**8 · Limitations.** FDA exclusion retained. CompliHub360 is **not** a law firm, tax practice or regulated adviser and must not be described as providing legal advice or representation; the site, the footer and the code all state this, the last with an explicit reference to the German legal-services and tax-advice acts. Both literal FDA references — the marketing enrichment source string and the `/markets` US focus chip — were removed from the product on 17 September 2026 (Part VI.D4.1).
 
 **9 · Gaps in the current wording.** KYB/beneficial ownership/AML as a named field · consumer-protection and commercial-contract law as a named field · delivery as a **downloadable report** and through in-account surfaces, where the wording says "via a website" · regulatory-change alerts (decided for this class) · provider credential verification. Possibly **over-broad**: "environmental protection".
 
@@ -1025,11 +1027,11 @@ The exclusion is about the **regulator**, not the subject. The Product Complianc
 
 ### Three points counsel should see before signing the exclusion
 
-**(a) Two literal FDA references exist in the released product. Both are replaced in commit `c1e94fd4`, which awaits merge into `main`.** The first is in the obligation-enrichment map: the health-claims US row was sourced to *"FTC Act §5 / FDA labeling rules"* and now reads *"FTC Act §5 + FTC Health Products Compliance Guidance"* — the Commission's own 2022 guidance on how §5 applies to health claims, FTC authority throughout, no FDA component.
+**(a) Two literal FDA references existed in the product. Both have been removed (17 September 2026, on `main` as `b54512ec`).** The first was in the obligation-enrichment map: the health-claims US row was sourced to *"FTC Act §5 / FDA labeling rules"* and now reads *"FTC Act §5 + FTC Health Products Compliance Guidance"* — the Commission's own 2022 guidance on how §5 applies to health claims, FTC authority throughout, no FDA component.
 
-What was *not* right in an earlier draft of this note is the word "one". The second reference is in **marketing copy**: the `/markets` page advertises **"FDA/Labeling"** as a US focus area, in all four languages (`markets.regions.items.us.focus[2]`, rendered at `MarketsPage.tsx:304`). Unlike a citation inside a duty record, that is a statement of **what the service covers** — which is what an identification and its exclusion govern, so it sits **closer to the exclusion than the data row does**. The same commit replaces it with **"FTC Advertising Rules"** (localised de/es/tr).
+What was *not* right in an earlier draft of this note is the word "one". The second reference was in **marketing copy**: the `/markets` page advertised **"FDA/Labeling"** as a US focus area, in all four languages (`markets.regions.items.us.focus[2]`, rendered at `MarketsPage.tsx:304`). Unlike a citation inside a duty record, that is a statement of **what the service covers** — which is what an identification and its exclusion govern, so it sat **closer to the exclusion than the data row did**. It now reads **"FTC Advertising Rules"** (localised de/es/tr).
 
-**Net position for counsel.** Commit `c1e94fd4` is proven — verified rendering across `/markets`, `/markets/us` and the Marketing Compliance area page with the United States selected, and a search of the entire shipped source and copy at that commit returns no occurrence of "FDA". It is **not yet on `main`**, so counsel should treat both references as present in the released product until the merge lands.
+**Net position for counsel: the shipped product contains no literal FDA reference at all** — neither in engine data nor in marketing copy. Verified on `main` (`b54512ec`) by rendering in the running application and by a `\bFDA\b` search across the source and copy, which returns nothing.
 
 The surrounding facts are unaffected: the health-claims obligation's trigger tags are `health`, `supplements`, `medical`, and the **United States is one of eight live profiled markets** — now with a region- and locality-level data model built specifically for it. The exclusion operates against content the product actively serves.
 
