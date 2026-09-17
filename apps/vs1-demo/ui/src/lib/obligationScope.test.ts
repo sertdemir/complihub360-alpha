@@ -231,19 +231,35 @@ describe('EU-Standard ausserhalb der EU', () => {
 // stehen soll, ist eine Produktentscheidung und keine Aufraeumarbeit. Der Test
 // haelt drei Beststaende fest und laesst sie nur schrumpfen.
 describe('Belegte Obergrenze', () => {
-  // Stand 2026-09-17. Belegt sind 19: 3x DSGVO Art. 83 Abs. 5 (20 Mio EUR oder
-  // 4 % Weltjahresumsatz), 7x PPWR Art. 68 (delegiert, kein Betrag) und die
-  // 9 deutschen Eintraege, am Primaertext auf gesetze-im-internet.de gelesen.
-  const OHNE_OBERGRENZE_STAND = 56;
+  // Stand 2026-09-17. Belegt sind 29: 3x DSGVO Art. 83 Abs. 5 (20 Mio EUR oder
+  // 4 % Weltjahresumsatz), 7x PPWR Art. 68 (delegiert, kein Betrag), 9 deutsche
+  // Eintraege (gesetze-im-internet.de), 4 niederlaendische (wetten.overheid.nl)
+  // und 6 spanische (boe.es) — alle am Primaertext gelesen.
+  const OHNE_OBERGRENZE_STAND = 46;
   // Eintraege, deren Obergrenze GAR KEINEN absoluten Betrag nennt — delegiert,
-  // "es gibt keine Geldbusse", oder rein umsatzabhaengig — und die trotzdem
-  // eine Eurozahl fuehren. Das ist der Widerspruch in Reinform: das Gesetz
-  // nennt keinen Betrag, die Oberflaeche zaehlt trotzdem einen hoch.
+  // "es gibt keine Geldbusse", rein umsatz- oder steueranteilig — und die
+  // trotzdem eine Eurozahl fuehren. Das ist der Widerspruch in Reinform: das
+  // Gesetz nennt keinen Betrag, die Oberflaeche zaehlt trotzdem einen hoch.
   //
-  // Der Bestand ist von 7 auf 9 GESTIEGEN, weil die Pruefung bewusst weiter
-  // greift als vorher (frueher nur `delegated`). Die zwei neuen sind die
-  // deutschen Rechtsfolgen ohne Geldbusse. Ab hier darf er nur schrumpfen.
-  const OHNE_BETRAG_MIT_ZAHL_STAND = 9;
+  // Frueher eine Zahl, die "nur schrumpfen" durfte. Das trug nicht: jedes Mal,
+  // wenn eine Obergrenze BELEGT wird, kommt heraus, dass daneben eine Eurozahl
+  // ohne gesetzliche Entsprechung steht — der Bestand WAECHST beim Aufraeumen.
+  // Deshalb jetzt eine namentliche Liste. Sie darf nur kleiner werden, und
+  // jeder Neuzugang muss hier eingetragen werden, mit Namen und in Sichtweite
+  // des Reviews. Eine Zahl haette das verschluckt.
+  const OHNE_BETRAG_BEKANNT = [
+    'DE/legal-commercial-contracts', // keine Geldbusse, nur zivilrechtliche Folge
+    'DE/legal-consumer-terms', // 4 % Jahresumsatz, UWG § 19
+    'ES/tax-corporate', // 150 % der Steuerschuld, LGT Art. 191
+    'ES/tax-vat-registration', // 150 % der Steuerschuld, LGT Art. 191
+    'default/prod-epr', // PPWR Art. 68, delegiert
+    'default/prod-packaging-conformity',
+    'default/prod-packaging-empty-space',
+    'default/prod-packaging-format-bans',
+    'default/prod-packaging-recyclability',
+    'default/prod-packaging-recycled-content',
+    'default/prod-packaging-reuse-targets',
+  ];
 
   const BESTAND = new Set([
     'corp-registration', 'data-hosting', 'data-privacy', 'legal-commercial-contracts',
@@ -254,7 +270,7 @@ describe('Belegte Obergrenze', () => {
     'prod-packaging-reuse-targets', 'prod-safety', 'tax-corporate', 'tax-vat-registration',
   ]);
 
-  type Obergrenze = { kind: string; basis?: string; asOf?: string; note?: string; value?: number; currency?: string; orAmount?: { value: number } };
+  type Obergrenze = { kind: string; basis?: string; asOf?: string; note?: string; value?: number; currency?: string; of?: string; orAmount?: { value: number } };
   type Eintrag = { penaltyMaxEur?: number; penaltyCeiling?: Obergrenze };
   /** Nennt diese Obergrenze einen absoluten Betrag? */
   const nenntBetrag = (c: Obergrenze): boolean =>
@@ -281,16 +297,18 @@ describe('Belegte Obergrenze', () => {
     ).toBe(OHNE_OBERGRENZE_STAND);
   });
 
-  it('laesst den Widerspruch "kein Betrag im Gesetz, aber eine Eurozahl" nur schrumpfen', () => {
+  it('nennt jeden Widerspruch "kein Betrag im Gesetz, aber eine Eurozahl" beim Namen', () => {
     const w = alle()
       .filter(([, e]) => e.penaltyCeiling && e.penaltyMaxEur && !nenntBetrag(e.penaltyCeiling))
       .map(([k]) => k);
+    const neu = w.filter((k) => !OHNE_BETRAG_BEKANNT.includes(k));
     expect(
-      w.length,
-      w.length > OHNE_BETRAG_MIT_ZAHL_STAND
-        ? `Das Gesetz nennt keinen Betrag, die Oberflaeche zaehlt trotzdem einen hoch:\n  ${w.join('\n  ')}`
-        : `Aufgeloest! Bitte OHNE_BETRAG_MIT_ZAHL_STAND auf ${w.length} senken.`,
-    ).toBe(OHNE_BETRAG_MIT_ZAHL_STAND);
+      neu,
+      'Das Gesetz nennt keinen Betrag, die Oberflaeche zaehlt trotzdem einen hoch. '
+        + 'Entweder die Zahl faellt weg — oder der Eintrag kommt namentlich in OHNE_BETRAG_BEKANNT.',
+    ).toEqual([]);
+    const weg = OHNE_BETRAG_BEKANNT.filter((k) => !w.includes(k));
+    expect(weg, `Aufgeloest! Bitte aus OHNE_BETRAG_BEKANNT streichen: ${weg.join(', ')}`).toEqual([]);
   });
 
   it('haelt die Eurozahl und die belegte Euro-Obergrenze zusammen', () => {
@@ -324,6 +342,11 @@ describe('Belegte Obergrenze', () => {
         // Gewicht wie "DSGVO Art. 83 Abs. 5".
         expect(c.basis, `${k}: "${c.basis}" nennt keine Vorschrift`).toMatch(/\d/);
         expect(c.asOf, `${k}: Stand fehlt oder ist kein Datum`).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+        // Ein Prozentsatz ohne Bezugsgroesse ist keine Auskunft, sondern eine
+        // Zahl. "150 %" wovon — der Steuerschuld, des Umsatzes, des Gewinns?
+        if (c.kind === 'proportional') {
+          expect(c.of?.trim().length ?? 0, `${k}: Prozentsatz ohne Bezugsgroesse`).toBeGreaterThan(5);
+        }
       }
     }
   });
