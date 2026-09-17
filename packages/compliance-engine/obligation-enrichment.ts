@@ -208,7 +208,7 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
     // GIBT dort keinen Betrag zu zitieren, deshalb 'delegated' und kein
     // penaltyMaxEur — nach derselben Regel, die bei PPWR Art. 68 gilt.
     'env-weee-registration': {
-        DE: { source: 'ElektroG §6 (stiftung ear)', penalty: 'up to €100,000 + distribution ban', due: 'Annual', dueDays: 60, penaltyCeiling: { kind: 'amount', value: 100000, currency: 'EUR', basis: 'ElektroG §45 Abs. 2', asOf: '2026-09-18' } },
+        DE: { source: 'ElektroG §6 (stiftung ear)', penalty: 'up to €100,000 + distribution ban', penaltyMaxEur: 100000, due: 'Annual', dueDays: 60, penaltyCeiling: { kind: 'amount', value: 100000, currency: 'EUR', basis: 'ElektroG §45 Abs. 2', asOf: '2026-09-18' } },
         default: { source: 'WEEE Directive 2012/19/EU Art. 16(2)', penalty: 'national penalties; registration is a market-access condition', due: 'Annual', dueDays: 60, scope: 'national-pending', penaltyCeiling: { kind: 'delegated', basis: 'WEEE-Richtlinie 2012/19/EU Art. 22', note: 'Die Richtlinie nennt keinen Betrag: nach Art. 22 legen die Mitgliedstaaten die Sanktionen fest, sie muessen wirksam, verhaeltnismaessig und abschreckend sein. Als Richtlinie gilt sie ohnehin nur ueber das nationale Umsetzungsgesetz.' } },
     },
     'env-batteries-epr': {
