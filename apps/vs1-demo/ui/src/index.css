@@ -475,8 +475,8 @@ footer[id] {
    die die ganze Viewport-Breite einnimmt, verpufft der 180-%-Hub — die
    Wanderung wäre da kaum noch zu sehen. Größerer Auszug, eigene Periode:
    dieselbe Farbwelt, dieselbe 165°-Geometrie, nur sichtbar in Bewegung.
-   24 s nach zwei Nutzer-Korrekturen: 34 s war zu langsam, 28 s noch immer. */
+   19 s — vierte Fassung (34 → 28 → 24 → 19), jedes Mal auf Nutzer-Wunsch. */
 .bg-gradient-stage--bleed {
   background-size: 300% 300%;
-  animation-duration: 24s;
+  animation-duration: 19s;
 }
