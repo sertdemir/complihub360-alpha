@@ -26,14 +26,14 @@ function CodeCard({ label, demo, title, desc }: { label: string; demo: ReactNode
 
       <div className="flex flex-1 flex-col justify-center">
         {/* Live preview — collapsed until hover */}
-        <div className="grid grid-rows-[0fr] opacity-0 transition-all duration-[450ms] ease-out group-hover:mb-5 group-hover:grid-rows-[1fr] group-hover:opacity-100">
+        <div className="grid grid-rows-[0fr] opacity-0 transition-all duration-500 ease-out group-hover:mb-5 group-hover:grid-rows-[1fr] group-hover:opacity-100">
           <div className="overflow-hidden">{demo}</div>
         </div>
 
         <h3 className="font-serif text-[26px] font-bold leading-[1.15] text-fg">{title}</h3>
 
         {/* Explanation — collapsed until hover */}
-        <div className="grid grid-rows-[0fr] opacity-0 transition-all duration-[450ms] ease-out group-hover:mt-3 group-hover:grid-rows-[1fr] group-hover:opacity-100">
+        <div className="grid grid-rows-[0fr] opacity-0 transition-all duration-500 ease-out group-hover:mt-3 group-hover:grid-rows-[1fr] group-hover:opacity-100">
           <p className="overflow-hidden text-body-sm leading-relaxed text-fg-secondary">{desc}</p>
         </div>
       </div>
