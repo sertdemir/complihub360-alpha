@@ -17,7 +17,7 @@ import { DOMAIN_BY_SLUG } from '../../lib/domains';
 // destination does not say. Nothing new is authored for the menu.
 //
 // Two columns: eight single-column rows push the sheet past the fold on a
-// laptop, and the eight areas are peers rather than a ranked list.
+// laptop, and the nine areas are peers rather than a ranked list.
 
 export interface AreasMenuPanelProps {
   label: string;

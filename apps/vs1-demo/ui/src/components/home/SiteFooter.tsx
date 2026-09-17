@@ -25,12 +25,12 @@ import { NewsletterBand } from './NewsletterBand';
 type Link = { key: string; href?: string; beta?: boolean; fallback?: string };
 type Column = { key: string; links: Link[] };
 
-// The eight areas, membership and order straight from lib/domains so the
+// The nine areas, membership and order straight from lib/domains so the
 // column cannot drift out of sync again. Labels stay in the 'home' namespace
 // (loading 'userws' here would pull 360 dashboard keys into every marketing
 // page); the canonical English name is the fallback.
 const AREA_LINKS: Link[] = [
-  // The hub first, then the eight areas. Until 2026-08-21 all eight pointed at
+  // The hub first, then the nine areas. Until 2026-08-21 all of them pointed at
   // /compliance, because that page held every area's detail inside an
   // accordion and there was nothing more specific to link to. Each area has
   // its own page now, so the column finally goes where it says it goes.
