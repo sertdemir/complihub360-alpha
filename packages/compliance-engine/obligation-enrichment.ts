@@ -203,6 +203,20 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
         NL: { source: 'Intrastat (CBS aangifte)', penalty: 'bestuurlijke boetes CBS', penaltyMaxEur: 5000, due: 'Monthly', dueDays: 10 },
         default: { source: 'EBS Reg. 2019/2152 (Intrastat)', penalty: 'national statistical fines', penaltyMaxEur: 5000, due: 'Monthly', dueDays: 20, scope: 'eu' },
     },
+    // ─── Umwelt ──────────────────────────────────────────────────────────────
+    // Alle drei Rechtsakte delegieren die Sanktion an die Mitgliedstaaten. Es
+    // GIBT dort keinen Betrag zu zitieren, deshalb 'delegated' und kein
+    // penaltyMaxEur — nach derselben Regel, die bei PPWR Art. 68 gilt.
+    'env-weee-registration': {
+        DE: { source: 'ElektroG §6 (stiftung ear)', penalty: 'up to €100,000 + distribution ban', penaltyMaxEur: 100000, due: 'Annual', dueDays: 60, penaltyCeiling: { kind: 'amount', value: 100000, currency: 'EUR', basis: 'ElektroG §45 Abs. 2', asOf: '2026-09-18' } },
+        default: { source: 'WEEE Directive 2012/19/EU Art. 16(2)', penalty: 'national penalties; registration is a market-access condition', due: 'Annual', dueDays: 60, scope: 'national-pending', penaltyCeiling: { kind: 'delegated', basis: 'WEEE-Richtlinie 2012/19/EU Art. 22', note: 'Die Richtlinie nennt keinen Betrag: nach Art. 22 legen die Mitgliedstaaten die Sanktionen fest, sie muessen wirksam, verhaeltnismaessig und abschreckend sein. Als Richtlinie gilt sie ohnehin nur ueber das nationale Umsetzungsgesetz.' } },
+    },
+    'env-batteries-epr': {
+        default: { source: 'EU Batteries Regulation 2023/1542 Art. 56 (EPR)', penalty: 'national penalties; registration is a market-access condition', due: 'Annual', dueDays: 60, scope: 'eu', penaltyCeiling: { kind: 'delegated', basis: 'Batterieverordnung (EU) 2023/1542 Art. 93', note: 'Die Verordnung nennt keinen Betrag: nach Art. 93 erlassen die Mitgliedstaaten die Sanktionsvorschriften. Die Verordnung selbst gilt unmittelbar, die Sanktion nicht.' } },
+    },
+    'env-reach-substances': {
+        default: { source: 'REACH Regulation (EC) 1907/2006 Art. 33 (SVHC information duty)', penalty: 'national penalties up to a market ban', due: 'Ongoing', scope: 'eu', penaltyCeiling: { kind: 'delegated', basis: 'REACH-Verordnung (EG) 1907/2006 Art. 126', note: 'Die Verordnung nennt keinen Betrag: nach Art. 126 legen die Mitgliedstaaten die Sanktionen fest und teilen sie der Kommission mit.' } },
+    },
     'legal-consumer-terms': {
         DE: { source: 'BGB §312g / EGBGB Art. 246a', penalty: 'competitor warnings (Abmahnung) + injunctions', penaltyMaxEur: 15000, due: 'One-off', dueDays: 45, penaltyCeiling: { kind: 'turnover', percent: 4, basis: 'UWG § 19 Abs. 2 Satz 3 i.V.m. § 5c Abs. 1 (nur bei weitverbreitetem Verstoss; sonst 50.000 EUR nach Satz 1)', asOf: '2026-09-17' } },
         UK: { source: 'Consumer Rights Act 2015', penalty: 'CMA enforcement orders', penaltyMaxEur: 15000, due: 'One-off', dueDays: 45 },

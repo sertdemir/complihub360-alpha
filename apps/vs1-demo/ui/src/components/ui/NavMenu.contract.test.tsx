@@ -33,7 +33,7 @@ function Menu({ panel = 'sheet' as const } = {}) {
 describe('NavMenu — a disclosure, not a menu', () => {
   // role="menu" is for application commands. Under role="menuitem" an item stops
   // being announced as a link, and open-in-new-tab, cmd-click and the
-  // screen-reader link list all lose it. The eight areas are indexable
+  // screen-reader link list all lose it. The nine areas are indexable
   // destinations; they stay anchors.
   it('exposes destinations as real links, never as menuitems', async () => {
     const user = userEvent.setup();

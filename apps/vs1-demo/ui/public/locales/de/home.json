@@ -275,6 +275,10 @@
       "legalAdvisory": {
         "title": "Rechtsberatung",
         "desc": "Verträge, AGB, Verbraucherrecht"
+      },
+      "environment": {
+        "title": "Umwelt",
+        "desc": "WEEE, Batterien, Stoffrecht"
       }
     },
     "footer": {

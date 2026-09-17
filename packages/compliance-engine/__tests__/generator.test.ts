@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { generateRelevantSubdomains, aggregateCountryRiskProfiles } from '../generator';
 import { IndustryType, BusinessModel } from '../business-modifier';
+import { ComplianceDomain } from '../domain-schema';
 
 describe('Compliance Engine Generator', () => {
     it('1) DE + ECOMMERCE + MARKETPLACE_SELLER prioritizes VAT/EPR-like domains (TAX/PRODUCT)', () => {
@@ -198,5 +199,47 @@ describe('EU legal basis (CELEX → EUR-Lex)', () => {
         expect(reg).toBeDefined();
         expect(reg?.celex).toBeUndefined();
         expect(reg?.sourceUrl).toBeUndefined();
+    });
+});
+
+// ─── Umwelt als eigene Domaene (18.09.2026) ─────────────────────────────────
+// Bis hierher gab es Umweltrecht nur als Verpackung. Diese Tests halten fest,
+// was der Umbau leisten muss: die Domaene wird erkannt, ihre Pflichten tragen
+// eine belegte Quelle, und sie faellt NICHT mit Verpackung zusammen.
+describe('ENVIRONMENT domain', () => {
+    it('is returned when the user explicitly asks for it', () => {
+        const res = generateRelevantSubdomains({
+            countries: ['DE'],
+            businessModel: BusinessModel.DTC,
+            focusDomains: [ComplianceDomain.ENVIRONMENT],
+        });
+        const env = res.filter((r) => r.domain === ComplianceDomain.ENVIRONMENT);
+        expect(env.map((r) => r.id)).toContain('env-weee-registration');
+        // focus = vom Nutzer gewaehlt, also 'confirmed' im Payload
+        expect(env.every((r) => r.focus)).toBe(true);
+    });
+
+    it('does not collapse into packaging', () => {
+        const res = generateRelevantSubdomains({
+            countries: ['DE'],
+            businessModel: BusinessModel.DTC,
+            focusDomains: [ComplianceDomain.ENVIRONMENT],
+        });
+        const envIds = res.filter((r) => r.domain === ComplianceDomain.ENVIRONMENT).map((r) => r.id);
+        // prod-epr ist Verpackung und gehoert in PRODUCT, nicht hierher
+        expect(envIds).not.toContain('prod-epr');
+        expect(envIds.every((id) => id.startsWith('env-'))).toBe(true);
+    });
+
+    it('carries a citable source and no invented penalty figure', () => {
+        const res = generateRelevantSubdomains({
+            countries: ['DE'],
+            focusDomains: [ComplianceDomain.ENVIRONMENT],
+        });
+        for (const o of res.filter((r) => r.domain === ComplianceDomain.ENVIRONMENT)) {
+            expect(o.source, `${o.id} ohne Quelle`).toBeTruthy();
+            expect(o.celex, `${o.id} ohne CELEX`).toBeTruthy();
+            expect(o.sourceUrl).toContain('eur-lex.europa.eu');
+        }
     });
 });

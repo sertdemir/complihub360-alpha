@@ -275,6 +275,10 @@
       "legalAdvisory": {
         "title": "Hukuki Danışmanlık",
         "desc": "Sözleşmeler, koşullar, tüketici hukuku"
+      },
+      "environment": {
+        "title": "Çevre",
+        "desc": "WEEE, piller, maddeler"
       }
     },
     "footer": {

@@ -7,6 +7,7 @@ import {
   BadgeCheck,
   Truck,
   Scale,
+  Leaf,
 } from 'lucide-react';
 import type { ElementType } from 'react';
 import { DOMAINS, type DomainSlug } from '../../lib/domains';
@@ -40,9 +41,10 @@ const META: Record<DomainSlug, Omit<AreaMeta, 'slug'>> = {
   'product-compliance': { icon: BadgeCheck, wizardPath: '/wizard/product-compliance' },
   'logistics-customs': { icon: Truck, wizardPath: '/wizard/logistics-customs' },
   'legal-advisory': { icon: Scale, wizardPath: '/wizard/legal-advisory' },
+  environment: { icon: Leaf, wizardPath: '/wizard/environment' },
 };
 
-/** The eight areas in canonical order. */
+/** The nine areas in canonical order. */
 export const AREAS: AreaMeta[] = DOMAINS.map((d) => ({ slug: d.slug, ...META[d.slug] }));
 
 export const AREA_BY_SLUG: Record<string, AreaMeta> = Object.fromEntries(

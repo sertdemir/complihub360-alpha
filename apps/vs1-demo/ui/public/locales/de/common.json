@@ -554,7 +554,7 @@
       "personaFit": "Ideal für: Agenturen & DTC-Marken",
       "cov1": "Marketing-Compliance-Assistent – erfasst Branchensensibilität, Aussagentypen, Kanäle",
       "cov2": "Risikostufe fürs Marketing – Hochrisiko-Aussagenmuster werden markiert",
-      "cov3": "Routet zu Spezialisten in Werberecht und Verbraucherschutz",
+      "cov3": "Routet zu Werberechts-Spezialisten und zu Marketing-Dienstleistern — Agenturen, SEO und Paid Media",
       "fines": {
         "authorities": "Wettbewerbszentrale · DGCCRF · ASA · AGCM · FTC"
       },
@@ -722,6 +722,43 @@
         "Sie schließen Verträge mit Partnern in anderen Jurisdiktionen"
       ],
       "askPlaceholder": "Z. B.: Gilt mein deutsches Widerrufsrecht auch in Frankreich?"
+    },
+    "environment": {
+      "title": "Umwelt-Compliance",
+      "headline": "Herstellerverantwortung für Geräte und Batterien, und Stoffe in Ihren Waren",
+      "description": "Umweltpflichten jenseits der Verpackung: nationale Register für Elektrogeräte und Batterien, Rücknahme am Lebensende, und die Informationspflichten für Stoffe in den Erzeugnissen, die Sie verkaufen.",
+      "affected": "Alle, die Elektrogeräte, batteriebetriebene Waren oder chemisch behandelte Erzeugnisse auf einem europäischen Markt in Verkehr bringen — ob selbst hergestellt, importiert oder unter eigener Marke verkauft.",
+      "personaFit": "Passt zu: Hardware- und Elektronikhändlern",
+      "cov1": "Umwelt-Wizard — erfasst Produktkategorien, Batterieanteil und Importrolle",
+      "cov2": "Trennt die Register, die sich ähneln: Verpackung, WEEE und Batterien haben je ein eigenes",
+      "cov3": "Vermittelt an Spezialisten für Herstellerverantwortung und Stoffrecht",
+      "fines": {
+        "authorities": "stiftung ear · ADEME · ECHA · nationale Marktüberwachung"
+      },
+      "affectedRoles": [
+        {
+          "name": "Elektronikhändler",
+          "line": "bringen Geräte mit Stecker oder Chip in Verkehr"
+        },
+        {
+          "name": "Importeure",
+          "line": "werden zum Hersteller, sobald sie selbst einführen"
+        },
+        {
+          "name": "Marktplatzhändler",
+          "line": "haften für die Registrierung auch ohne lokale Gesellschaft"
+        },
+        {
+          "name": "Markeninhaber",
+          "line": "tragen Herstellerpflichten für fremdgefertigte Ware"
+        }
+      ],
+      "affectedChecks": [
+        "Ihre Produkte enthalten Elektronik, einen Stecker oder eine Batterie",
+        "Sie führen Waren selbst in die EU oder nach Großbritannien ein",
+        "Sie verkaufen Erzeugnisse, die chemisch behandelt oder beschichtet sind"
+      ],
+      "askPlaceholder": "Z. B.: Brauche ich eine WEEE-Registrierung, wenn ich nur über Amazon verkaufe?"
     },
     "areasEyebrow": "Acht Bereiche, ein Einstieg",
     "areasTitle": "Die acht Compliance-Bereiche",

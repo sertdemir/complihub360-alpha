@@ -19,8 +19,8 @@ import { obligationsForSession, SLUG_TO_ENGINE } from './dashboard.js';
 // entstehen aus `answers` durch die Engine. Der Browser muesste sonst je
 // Sitzung einen Suchlauf ausloesen.
 
-/** Produkt-Slug einer Engine-Pflicht. Die Engine kennt sieben Domaenen, das
- *  Produkt acht Bereiche: PRODUCT teilt sich in Verpackung und
+/** Produkt-Slug einer Engine-Pflicht. Die Engine kennt neun Domaenen, das
+ *  Produkt neun Bereiche: PRODUCT teilt sich in Verpackung und
  *  Produkt-Compliance, ONGOING_MONITORING faellt unter Unternehmen. Dieselbe
  *  Abbildung wie `lib/areaProfiles.ts` im Frontend — beide muessen gleich
  *  entscheiden, sonst steht eine Pflicht auf der einen Seite und fehlt auf der
@@ -38,6 +38,7 @@ const DOMAIN_TO_SLUG: Record<ComplianceDomain, string> = {
     [ComplianceDomain.ONGOING_MONITORING]: 'corporate-structure',
     [ComplianceDomain.LOGISTICS]: 'logistics-customs',
     [ComplianceDomain.LEGAL]: 'legal-advisory',
+    [ComplianceDomain.ENVIRONMENT]: 'environment',
 };
 export function slugForObligation(o: { id: string; domain: ComplianceDomain }): string {
     return SUBDOMAIN_SLUG_OVERRIDE[o.id] ?? DOMAIN_TO_SLUG[o.domain];

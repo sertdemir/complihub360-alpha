@@ -23,7 +23,7 @@ import { useInViewOnce } from '../../lib/useInViewOnce';
 
 // ─── S4 — The domain atlas (canvas "Was wir wissen" · Atlas, 2026-08-25) ─────
 // Replaces DomainsKnows ON THE HOMEPAGE ONLY — DomainsKnows stays in the tree.
-// The drawer content comes out of hiding onto the page: the eight areas as a
+// The drawer content comes out of hiding onto the page: the nine areas as a
 // rail on the left, the ACTIVE area's dossier standing on the Gradient panel
 // (CLAUDE.md) on the right — markets, intro, the six coverage points, and the
 // gold-tinted "when this matters" callout under the copy.
@@ -83,7 +83,7 @@ export function DomainsAtlas() {
         </Reveal>
 
         <div ref={ref} className="mx-auto mt-14 flex max-w-[1240px] flex-col gap-10 lg:flex-row lg:items-stretch lg:gap-12">
-          {/* Rail: the eight areas, pure petrol icons, the active one carded */}
+          {/* Rail: the nine areas, pure petrol icons, the active one carded */}
           <motion.div
             className="flex flex-col justify-center gap-1.5 lg:w-[400px] lg:shrink-0"
             variants={{ show: { transition: { staggerChildren: 0.08 } } }}

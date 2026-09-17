@@ -6,7 +6,13 @@ export enum ComplianceDomain {
     CORPORATE = 'CORPORATE',
     ONGOING_MONITORING = 'ONGOING_MONITORING',
     LOGISTICS = 'LOGISTICS',
-    LEGAL = 'LEGAL'
+    LEGAL = 'LEGAL',
+    /** Umweltrecht jenseits der Verpackung: Herstellerverantwortung fuer
+     *  Geraete und Batterien, Stoffrecht. Bewusst NICHT in PRODUCT gefaltet —
+     *  dort haengen Verpackung (PPWR) und Produktsicherheit (GPSR), also
+     *  Pflichten am Produkt selbst. Diese hier haengen am Stoff und am
+     *  Lebensende, haben eigene Register, eigene Fristen und eigene Anbieter. */
+    ENVIRONMENT = 'ENVIRONMENT'
 }
 
 export type ObligationSeverity = 'critical' | 'high' | 'medium' | 'low';
@@ -221,6 +227,46 @@ export const DomainTemplateLibrary: Record<ComplianceDomain, ComplianceSubdomain
             applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER'],
             riskWeight: 5,
             celex: '32019R2152',
+        }
+    ],
+    [ComplianceDomain.ENVIRONMENT]: [
+        // COVERAGE: bewusst schmal. Aufgenommen ist nur, was sich am Primaertext
+        // belegen laesst — alle drei Rechtsakte ueberlassen die Sanktion
+        // ausdruecklich den Mitgliedstaaten, deshalb traegt hier jeder Eintrag
+        // einen 'delegated'-Ceiling und KEINE Zahl.
+        //
+        // NICHT aufgenommen, obwohl thematisch hierher gehoerig: EUDR
+        // (EU) 2023/1115 und die CSRD-Berichtspflichten. Beider Geltungsbeginn
+        // ist in Bewegung, und ein Geltungsdatum, das wir nicht am Primaertext
+        // gepruefft haben, ist genau die Sorte Angabe, die der Drift-Waechter
+        // fuer die Steuersaetze verhindern soll. Sie gehoeren in denselben
+        // Pruefdurchgang, nicht in eine Schaetzung.
+        {
+            id: 'env-weee-registration',
+            label: 'WEEE Producer Registration',
+            description: 'Registration in the national register for electrical and electronic equipment before placing devices on the market, plus reporting and take-back duties at end of life.',
+            triggerTags: ['physical_goods', 'electronics', 'import'],
+            applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER'],
+            riskWeight: 7,
+            celex: '32012L0019',
+        },
+        {
+            id: 'env-batteries-epr',
+            label: 'Batteries — Producer Responsibility',
+            description: 'Producer registration and extended producer responsibility for batteries, including devices with built-in cells. Separate from packaging EPR and from WEEE.',
+            triggerTags: ['physical_goods', 'electronics', 'batteries'],
+            applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER'],
+            riskWeight: 7,
+            celex: '32023R1542',
+        },
+        {
+            id: 'env-reach-substances',
+            label: 'REACH — Substances in Articles',
+            description: 'Duties for substances in goods placed on the EU market: registration or notification where thresholds are met, and the information duty towards recipients for substances of very high concern.',
+            triggerTags: ['physical_goods', 'chemicals', 'import'],
+            applicableBusinessModels: ['DTC', 'MARKETPLACE_SELLER'],
+            riskWeight: 6,
+            celex: '32006R1907',
         }
     ],
     [ComplianceDomain.LEGAL]: [

@@ -554,7 +554,7 @@
       "personaFit": "Best for: Agencies & DTC brands",
       "cov1": "Marketing Compliance Wizard — captures industry sensitivity, claim types, channels",
       "cov2": "Marketing risk level – high-risk claim patterns get flagged",
-      "cov3": "Routes to specialists in advertising law and consumer protection",
+      "cov3": "Routes to advertising-law specialists and to marketing service providers — agencies, SEO and paid media",
       "fines": {
         "authorities": "Wettbewerbszentrale · DGCCRF · ASA · AGCM · FTC"
       },
@@ -722,6 +722,43 @@
         "You sign contracts with partners in other jurisdictions"
       ],
       "askPlaceholder": "E.g.: Does my German withdrawal policy also hold in France?"
+    },
+    "environment": {
+      "title": "Environmental Compliance",
+      "headline": "Producer responsibility for devices and batteries, and substances in your goods",
+      "description": "Environmental duties beyond packaging: national registers for electrical equipment and batteries, take-back at end of life, and the information duties that attach to substances in the articles you sell.",
+      "affected": "Anyone placing electrical devices, battery-powered goods or chemically treated articles on a European market — whether manufactured, imported or sold under their own brand.",
+      "personaFit": "Best for: Hardware & electronics sellers",
+      "cov1": "Environmental Wizard — captures product categories, battery content and import role",
+      "cov2": "Separates the registers that look alike: packaging, WEEE and batteries each have their own",
+      "cov3": "Routes to producer-responsibility specialists and substance-law advisors",
+      "fines": {
+        "authorities": "stiftung ear · ADEME · ECHA · national market surveillance"
+      },
+      "affectedRoles": [
+        {
+          "name": "Electronics sellers",
+          "line": "place devices with a plug or a chip on the market"
+        },
+        {
+          "name": "Importers",
+          "line": "become the producer when they bring goods in themselves"
+        },
+        {
+          "name": "Marketplace sellers",
+          "line": "answer for registration even without a local entity"
+        },
+        {
+          "name": "Brand owners",
+          "line": "carry producer duties for goods made by someone else"
+        }
+      ],
+      "affectedChecks": [
+        "Your products contain electronics, a plug or a battery",
+        "You import goods into the EU or the UK yourself",
+        "You sell articles that are chemically treated or coated"
+      ],
+      "askPlaceholder": "E.g.: Do I need a WEEE registration if I only sell through Amazon?"
     },
     "areasEyebrow": "Eight areas, one way in",
     "areasTitle": "The eight compliance areas",

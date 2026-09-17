@@ -2358,11 +2358,19 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     'tax-vat': ['vat', 'vat_oss', 'tax'],
                     'product-packaging': ['epr', 'packaging'],
                     'data-privacy': ['privacy', 'gdpr', 'dat', 'data-privacy'],
-                    'marketing-seo': ['marketing', 'seo'],
+                    // Beide Haelften des Feldes (Entscheidung 18.09.2026):
+                    // Werberechtler UND Marketing-Dienstleister. Bis dahin
+                    // routete nur 'marketing'/'seo' — Agenturen kamen in der
+                    // Copy als Kunden vor, nicht als Anbieter.
+                    'marketing-seo': ['marketing', 'seo', 'advertising_law', 'agency', 'content', 'paid_media'],
                     'corporate-structure': ['corporate', 'cst'],
                     'product-compliance': ['product_compliance', 'psf', 'ce'],
                     'logistics-customs': ['logistics', 'customs'],
                     'legal-advisory': ['legal', 'oth'],
+                    // Umwelt jenseits der Verpackung (18.09.2026). 'epr' bleibt
+                    // bewusst bei product-packaging: wer nur Verpackung macht,
+                    // ist kein WEEE- oder Stoffrecht-Anbieter.
+                    'environment': ['environment', 'weee', 'reach', 'batteries'],
                 };
                 // One group per requested domain — a group counts as matched if
                 // the provider carries ANY of its keys (keeps the overlap

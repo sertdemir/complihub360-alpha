@@ -275,6 +275,10 @@
       "legalAdvisory": {
         "title": "Legal Advisory",
         "desc": "Contracts, T&Cs, consumer law"
+      },
+      "environment": {
+        "title": "Environmental",
+        "desc": "WEEE, batteries, substances"
       }
     },
     "footer": {

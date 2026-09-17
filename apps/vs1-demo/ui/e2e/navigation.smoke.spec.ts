@@ -146,7 +146,7 @@ for (const surface of LANGUAGE_SURFACES) {
 }
 
 test.describe('AreaSwitcher · Bereichsseite', () => {
-  test('oeffnet die acht Bereiche als echte Links', async ({ page }) => {
+  test('oeffnet die neun Bereiche als echte Links', async ({ page }) => {
     await page.goto('/de/compliance/data-privacy', { waitUntil: 'domcontentloaded' });
 
     const trigger = page
@@ -156,7 +156,7 @@ test.describe('AreaSwitcher · Bereichsseite', () => {
     const panel = await openPanel(page, trigger);
 
     const links = panel.locator('a');
-    await expect(links).toHaveCount(8);
+    await expect(links).toHaveCount(9);
     for (const href of await links.evaluateAll((a) => a.map((x) => x.getAttribute('href')))) {
       expect(href).toMatch(/^\/de\/compliance\/[a-z-]+$/);
     }

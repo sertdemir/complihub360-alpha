@@ -57,7 +57,8 @@ export function aggregateCountryRiskProfiles(countries: CountryCode[]): CountryR
         [ComplianceDomain.CORPORATE]: 0,
         [ComplianceDomain.ONGOING_MONITORING]: 0,
         [ComplianceDomain.LOGISTICS]: 0,
-        [ComplianceDomain.LEGAL]: 0
+        [ComplianceDomain.LEGAL]: 0,
+        [ComplianceDomain.ENVIRONMENT]: 0
     };
 
     let maxStrictness = 0;

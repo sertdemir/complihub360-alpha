@@ -33,7 +33,8 @@
     "corporateStructure": "Unternehmen & Struktur",
     "productCompliance": "Produkt-Compliance",
     "logisticsCustoms": "Logistik & Zoll",
-    "legalAdvisory": "Rechtsberatung"
+    "legalAdvisory": "Rechtsberatung",
+    "environment": "Umwelt-Compliance"
   },
   "shell": {
     "groupWorkspace": "Arbeitsbereich",

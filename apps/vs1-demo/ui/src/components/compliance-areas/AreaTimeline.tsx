@@ -29,7 +29,7 @@ interface ThreadNode {
 }
 
 // ─── The thread of deadlines (canvas "Zeitachse" · Variante C, 2026-08-28) ───
-// The horizontal axis retired: only one of the eight areas has any future
+// The horizontal axis retired: only one of the nine areas has any future
 // commencement date at all, so on seven pages the axis was a single node —
 // and an axis with one point is not an axis (user finding). The section now
 // answers the question a reader actually has — WHAT COMES NEXT — as one
