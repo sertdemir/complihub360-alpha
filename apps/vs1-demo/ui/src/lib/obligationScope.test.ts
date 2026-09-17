@@ -219,13 +219,19 @@ describe('EU-Standard ausserhalb der EU', () => {
 // stehen soll, ist eine Produktentscheidung und keine Aufraeumarbeit. Der Test
 // haelt drei Beststaende fest und laesst sie nur schrumpfen.
 describe('Belegte Obergrenze', () => {
-  // Stand 2026-09-17. Belegt sind: 3x DSGVO Art. 83 Abs. 5 (20 Mio EUR oder
-  // 4 % Weltjahresumsatz) und 7x PPWR Art. 68 (delegiert, kein Betrag).
-  const OHNE_OBERGRENZE_STAND = 65;
-  // Eintraege, die eine delegierte Obergrenze UND trotzdem eine Eurozahl
-  // fuehren. Das ist der Widerspruch in Reinform: das Gesetz nennt keinen
-  // Betrag, die Oberflaeche zaehlt trotzdem einen hoch. Darf nur schrumpfen.
-  const DELEGIERT_MIT_ZAHL_STAND = 7;
+  // Stand 2026-09-17. Belegt sind 19: 3x DSGVO Art. 83 Abs. 5 (20 Mio EUR oder
+  // 4 % Weltjahresumsatz), 7x PPWR Art. 68 (delegiert, kein Betrag) und die
+  // 9 deutschen Eintraege, am Primaertext auf gesetze-im-internet.de gelesen.
+  const OHNE_OBERGRENZE_STAND = 56;
+  // Eintraege, deren Obergrenze GAR KEINEN absoluten Betrag nennt — delegiert,
+  // "es gibt keine Geldbusse", oder rein umsatzabhaengig — und die trotzdem
+  // eine Eurozahl fuehren. Das ist der Widerspruch in Reinform: das Gesetz
+  // nennt keinen Betrag, die Oberflaeche zaehlt trotzdem einen hoch.
+  //
+  // Der Bestand ist von 7 auf 9 GESTIEGEN, weil die Pruefung bewusst weiter
+  // greift als vorher (frueher nur `delegated`). Die zwei neuen sind die
+  // deutschen Rechtsfolgen ohne Geldbusse. Ab hier darf er nur schrumpfen.
+  const OHNE_BETRAG_MIT_ZAHL_STAND = 9;
 
   const BESTAND = new Set([
     'corp-registration', 'data-hosting', 'data-privacy', 'legal-commercial-contracts',
@@ -236,7 +242,11 @@ describe('Belegte Obergrenze', () => {
     'prod-packaging-reuse-targets', 'prod-safety', 'tax-corporate', 'tax-vat-registration',
   ]);
 
-  type Eintrag = { penaltyMaxEur?: number; penaltyCeiling?: { kind: string; basis?: string; asOf?: string; note?: string } };
+  type Obergrenze = { kind: string; basis?: string; asOf?: string; note?: string; value?: number; currency?: string; orAmount?: { value: number } };
+  type Eintrag = { penaltyMaxEur?: number; penaltyCeiling?: Obergrenze };
+  /** Nennt diese Obergrenze einen absoluten Betrag? */
+  const nenntBetrag = (c: Obergrenze): boolean =>
+    c.kind === 'amount' || (c.kind === 'turnover' && !!c.orAmount);
   const alle = (): [string, Eintrag][] => {
     const out: [string, Eintrag][] = [];
     for (const [id, byCountry] of Object.entries(ObligationEnrichmentMap)) {
@@ -259,14 +269,30 @@ describe('Belegte Obergrenze', () => {
     ).toBe(OHNE_OBERGRENZE_STAND);
   });
 
-  it('laesst den Widerspruch "delegiert, aber mit Eurozahl" nur schrumpfen', () => {
-    const w = alle().filter(([, e]) => e.penaltyCeiling?.kind === 'delegated' && e.penaltyMaxEur).map(([k]) => k);
+  it('laesst den Widerspruch "kein Betrag im Gesetz, aber eine Eurozahl" nur schrumpfen', () => {
+    const w = alle()
+      .filter(([, e]) => e.penaltyCeiling && e.penaltyMaxEur && !nenntBetrag(e.penaltyCeiling))
+      .map(([k]) => k);
     expect(
       w.length,
-      w.length > DELEGIERT_MIT_ZAHL_STAND
+      w.length > OHNE_BETRAG_MIT_ZAHL_STAND
         ? `Das Gesetz nennt keinen Betrag, die Oberflaeche zaehlt trotzdem einen hoch:\n  ${w.join('\n  ')}`
-        : `Aufgeloest! Bitte DELEGIERT_MIT_ZAHL_STAND auf ${w.length} senken.`,
-    ).toBe(DELEGIERT_MIT_ZAHL_STAND);
+        : `Aufgeloest! Bitte OHNE_BETRAG_MIT_ZAHL_STAND auf ${w.length} senken.`,
+    ).toBe(OHNE_BETRAG_MIT_ZAHL_STAND);
+  });
+
+  it('haelt die Eurozahl und die belegte Euro-Obergrenze zusammen', () => {
+    // Solange die vier Flaechen `penaltyMaxEur` lesen und die Obergrenze
+    // daneben steht, duerfen die beiden sich nicht widersprechen. Gilt nur fuer
+    // EUR — bei GBP/USD/TRY ist der Unterschied ja gerade der Punkt.
+    const ab = alle().filter(([, e]) => {
+      const c = e.penaltyCeiling;
+      return c?.kind === 'amount' && c.currency === 'EUR' && e.penaltyMaxEur !== c.value;
+    });
+    expect(
+      ab.map(([k, e]) => `${k}: Zahl ${e.penaltyMaxEur} vs. Obergrenze ${e.penaltyCeiling?.value}`),
+      'Belegter Eurobetrag und angezeigte Zahl gehen auseinander',
+    ).toEqual([]);
   });
 
   it('verlangt von jeder NEUEN Pflicht die Obergrenze', () => {
@@ -278,8 +304,8 @@ describe('Belegte Obergrenze', () => {
     for (const [k, e] of alle()) {
       const c = e.penaltyCeiling;
       if (!c) continue;
-      if (c.kind === 'delegated') {
-        expect(c.note?.trim().length ?? 0, `${k}: delegiert ohne Begruendung`).toBeGreaterThan(20);
+      if (c.kind === 'delegated' || c.kind === 'none') {
+        expect(c.note?.trim().length ?? 0, `${k}: ${c.kind} ohne Begruendung`).toBeGreaterThan(20);
       } else {
         // Dieselbe Falle wie bei den `placeholder`-Quellen: ein String, der wie
         // eine Zitation AUSSIEHT, sitzt in derselben Zelle und im selben
