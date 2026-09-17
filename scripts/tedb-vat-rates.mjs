@@ -34,6 +34,8 @@
 //   node scripts/tedb-vat-rates.mjs --record roh.xml     # Antwort mitschreiben
 //   node scripts/tedb-vat-rates.mjs --fixture roh.xml    # ohne Netz auswerten
 //   node scripts/tedb-vat-rates.mjs --json               # maschinenlesbar
+//   node scripts/tedb-vat-rates.mjs --dump AT            # Saetze eines Landes
+//                                                          mit ihren Kategorien
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -118,12 +120,31 @@ function compare(facts, rates) {
   const byState = new Map();
   for (const r of rates) {
     if (r.value === null) continue;
-    // Nur die allgemeinen Saetze: Eintraege mit Kategorie oder Warennummer
-    // gelten fuer einzelne Waren, nicht fuer den Regelsatz des Landes.
-    if (r.category) continue;
-    const e = byState.get(r.memberState) ?? { standard: null, reduced: new Set() };
-    if (r.rateType === 'DEFAULT') e.standard = r.value;
-    else if (r.rateType === 'REDUCED_RATE' || r.rateType === 'SUPER_REDUCED_RATE') e.reduced.add(r.value);
+    const e = byState.get(r.memberState) ?? { standard: null, reduced: new Map(), parking: new Set() };
+
+    if (r.rateType === 'DEFAULT') {
+      // Der Regelsatz ist der einzige Eintrag OHNE Kategorie — er gilt fuer
+      // alles, was nicht eigens ermaessigt ist.
+      e.standard = r.value;
+    } else if (r.rateType === 'REDUCED_RATE' || r.rateType === 'SUPER_REDUCED_RATE') {
+      // BEFUND aus dem ersten Live-Lauf (2026-09-17, 333 Eintraege fuer sechs
+      // Laender): ein ermaessigter Satz haengt in TEDB IMMER an einer Kategorie
+      // (Anhang III MwStSystRL) — einen kategorielosen "allgemeinen ermaessigten
+      // Satz" gibt es nicht. Die erste Fassung verwarf jeden Eintrag mit
+      // Kategorie und meldete deshalb fuer ALLE sechs Laender "keine Antwort".
+      //
+      // Die ermaessigten Saetze eines Landes sind die MENGE der verschiedenen
+      // Werte ueber alle Kategorien. Welche Kategorien hinter einem Wert
+      // stehen, bleibt erhalten — nur so laesst sich ein einzelner Ausreisser
+      // (etwa eine oertliche Ausnahme) von einem echten Satz unterscheiden;
+      // --dump zeigt es.
+      e.reduced.set(r.value, [...(e.reduced.get(r.value) ?? []), r.category ?? '(ohne Kategorie)']);
+    } else if (r.rateType === 'PARKING_RATE') {
+      // Der Parking Rate ist ein Bestandsschutz-Satz einzelner Mitgliedstaaten
+      // und in unserer Spalte `reduced_rates` bewusst nicht enthalten. Er wird
+      // getrennt ausgewiesen statt stillschweigend eingemischt.
+      e.parking.add(r.value);
+    }
     byState.set(r.memberState, e);
   }
 
@@ -149,7 +170,10 @@ function compare(facts, rates) {
     });
 
     const ourRed = percentages(own.reduced_rates?.text).sort((a, b) => a - b);
-    const theirRed = [...t.reduced].sort((a, b) => a - b);
+    // 0 % bleibt draussen: Nullsatz und Befreiung fuehrt unsere Spalte als
+    // Anmerkung ("Plus zero-rated (0%) and exempt categories"), nicht als
+    // ermaessigten Satz. Eingemischt wuerde es jeden Vergleich sprengen.
+    const theirRed = [...t.reduced.keys()].filter((v) => v > 0).sort((a, b) => a - b);
     const same = ourRed.length === theirRed.length && ourRed.every((v, i) => near(v, theirRed[i]));
     rows.push({
       market, key: 'reduced_rates',
@@ -157,8 +181,34 @@ function compare(facts, rates) {
       theirs: theirRed.length ? theirRed.map((v) => `${v}%`).join(', ') : '—',
       verdict: !theirRed.length ? 'keine Antwort' : same ? 'deckungsgleich' : 'ABWEICHUNG',
     });
+
+    if (t.parking.size) {
+      rows.push({
+        market, key: 'parking_rate',
+        ours: '— (fuehren wir nicht)',
+        theirs: [...t.parking].sort((a, b) => a - b).map((v) => `${v}%`).join(', '),
+        verdict: 'nur bei TEDB',
+      });
+    }
   }
   return rows;
+}
+
+/** --dump <ISO>: welche Kategorien hinter jedem Satz eines Landes stehen. */
+function dump(rates, iso) {
+  const byValue = new Map();
+  for (const r of rates) {
+    if (r.memberState !== iso || r.value === null) continue;
+    const k = `${r.value}% · ${r.rateType}`;
+    byValue.set(k, [...(byValue.get(k) ?? []), r.category ?? '(ohne Kategorie)']);
+  }
+  console.log(`TEDB · ${iso} · ${byValue.size} verschiedene Saetze\n`);
+  for (const [k, cats] of [...byValue].sort()) {
+    console.log(`${k}  (${cats.length} Kategorie${cats.length === 1 ? '' : 'n'})`);
+    for (const c of cats.slice(0, 12)) console.log(`    ${c}`);
+    if (cats.length > 12) console.log(`    … und ${cats.length - 12} weitere`);
+    console.log();
+  }
 }
 
 // ─── Abruf ───────────────────────────────────────────────────────────────────
@@ -225,6 +275,10 @@ async function main() {
   }
 
   const rates = parseRates(xml);
+
+  const dumpIso = arg('--dump');
+  if (dumpIso) { dump(rates, dumpIso.toUpperCase()); return; }
+
   const rows = compare(facts, rates);
 
   if (argv.includes('--json')) {
