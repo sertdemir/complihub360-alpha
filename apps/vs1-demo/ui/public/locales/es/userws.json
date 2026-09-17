@@ -33,7 +33,8 @@
     "corporateStructure": "Sociedad y estructura",
     "productCompliance": "Conformidad de producto",
     "logisticsCustoms": "Logística y aduanas",
-    "legalAdvisory": "Asesoría legal"
+    "legalAdvisory": "Asesoría legal",
+    "environment": "Cumplimiento ambiental"
   },
   "shell": {
     "groupWorkspace": "Espacio de trabajo",

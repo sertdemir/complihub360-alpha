@@ -35,6 +35,7 @@ export const SLUG_TO_ENGINE: Record<string, ComplianceDomain> = {
     'corporate-structure': ComplianceDomain.CORPORATE,
     'logistics-customs': ComplianceDomain.LOGISTICS,
     'legal-advisory': ComplianceDomain.LEGAL,
+    'environment': ComplianceDomain.ENVIRONMENT,
 };
 
 interface SessionRow {

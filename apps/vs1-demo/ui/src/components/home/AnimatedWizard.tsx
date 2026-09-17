@@ -21,6 +21,7 @@ import {
   MoreHorizontal,
   Truck,
   Scale,
+  Leaf,
   type LucideIcon,
 } from 'lucide-react';
 import { X } from 'lucide-react';
@@ -83,7 +84,8 @@ export const STEPS: StepDef[] = [
   {
     rail: 2,
     key: 'domains',
-    // Final 8 domains (decision 2026-08-04) — Full Coverage removed.
+    // Nine domains: die finalen 8 (04.08.) plus Umwelt (18.09.), das bis
+    // dahin nur als Verpackung existierte.
     cards: [
       { id: 'Tax & VAT', key: 'vatTax', icon: BarChart3 },
       { id: 'EPR & Packaging', key: 'eprPackaging', icon: Globe },
@@ -93,6 +95,7 @@ export const STEPS: StepDef[] = [
       { id: 'Product Compliance', key: 'productCompliance', icon: ShieldCheck },
       { id: 'Logistics & Customs', key: 'logisticsCustoms', icon: Truck },
       { id: 'Legal Advisory', key: 'legalAdvisory', icon: Scale },
+      { id: 'Environmental Compliance', key: 'environment', icon: Leaf },
     ],
     picks: ['Tax & VAT', 'EPR & Packaging', 'Data & Privacy'],
     footerKey: 'skipRoute',
@@ -112,7 +115,7 @@ const CATEGORY_CODE: Record<string, WizardCategory> = {
   'Tax & VAT': 'tax-vat', 'EPR & Packaging': 'product-packaging', 'Data & Privacy': 'data-privacy',
   'Marketing Compliance': 'marketing-seo', 'Corporate & Structure': 'corporate-structure',
   'Product Compliance': 'product-compliance', 'Logistics & Customs': 'logistics-customs',
-  'Legal Advisory': 'legal-advisory',
+  'Legal Advisory': 'legal-advisory', 'Environmental Compliance': 'environment',
 };
 const BUSINESS_CODE: Record<string, BusinessType> = {
   'D2C e-commerce': 'ecommerce', 'B2B / wholesale': 'other', Marketplace: 'marketplace',

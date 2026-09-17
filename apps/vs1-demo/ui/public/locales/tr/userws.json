@@ -33,7 +33,8 @@
     "corporateStructure": "Şirket ve Yapı",
     "productCompliance": "Ürün Uygunluğu",
     "logisticsCustoms": "Lojistik ve Gümrük",
-    "legalAdvisory": "Hukuki Danışmanlık"
+    "legalAdvisory": "Hukuki Danışmanlık",
+    "environment": "Çevresel Uyum"
   },
   "shell": {
     "groupWorkspace": "Çalışma Alanı",

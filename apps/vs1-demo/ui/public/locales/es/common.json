@@ -554,7 +554,7 @@
       "personaFit": "Ideal para: agencias y marcas DTC",
       "cov1": "Asistente de Compliance de marketing — captura la sensibilidad del sector, los tipos de afirmaciones y los canales",
       "cov2": "Nivel de riesgo de marketing – se marcan los patrones de afirmaciones de alto riesgo",
-      "cov3": "Le dirige a especialistas en derecho publicitario y protección del consumidor",
+      "cov3": "Le dirige a especialistas en derecho publicitario y a proveedores de servicios de marketing — agencias, SEO y medios de pago",
       "fines": {
         "authorities": "Wettbewerbszentrale · DGCCRF · ASA · AGCM · FTC"
       },
@@ -722,6 +722,43 @@
         "Firma contratos con socios en otras jurisdicciones"
       ],
       "askPlaceholder": "P. ej.: ¿Mi política alemana de desistimiento vale también en Francia?"
+    },
+    "environment": {
+      "title": "Cumplimiento ambiental",
+      "headline": "Responsabilidad del productor para aparatos y baterías, y sustancias en sus productos",
+      "description": "Obligaciones ambientales más allá del envase: registros nacionales para aparatos eléctricos y baterías, recogida al final de la vida útil, y los deberes de información sobre sustancias presentes en los artículos que vende.",
+      "affected": "Quienes introducen en un mercado europeo aparatos eléctricos, productos con batería o artículos tratados químicamente — fabricados, importados o vendidos bajo marca propia.",
+      "personaFit": "Ideal para: vendedores de hardware y electrónica",
+      "cov1": "Wizard ambiental — recoge categorías de producto, contenido de batería y rol importador",
+      "cov2": "Separa los registros que se parecen: envases, RAEE y baterías tienen cada uno el suyo",
+      "cov3": "Deriva a especialistas en responsabilidad del productor y derecho de sustancias",
+      "fines": {
+        "authorities": "stiftung ear · ADEME · ECHA · vigilancia del mercado nacional"
+      },
+      "affectedRoles": [
+        {
+          "name": "Vendedores de electrónica",
+          "line": "introducen aparatos con enchufe o chip en el mercado"
+        },
+        {
+          "name": "Importadores",
+          "line": "pasan a ser productores en cuanto importan ellos mismos"
+        },
+        {
+          "name": "Vendedores en marketplace",
+          "line": "responden del registro incluso sin entidad local"
+        },
+        {
+          "name": "Titulares de marca",
+          "line": "asumen deberes de productor sobre mercancía ajena"
+        }
+      ],
+      "affectedChecks": [
+        "Sus productos contienen electrónica, un enchufe o una batería",
+        "Importa mercancía usted mismo a la UE o al Reino Unido",
+        "Vende artículos tratados químicamente o recubiertos"
+      ],
+      "askPlaceholder": "P. ej.: ¿Necesito registro RAEE si solo vendo por Amazon?"
     },
     "areasEyebrow": "Ocho áreas, una puerta de entrada",
     "areasTitle": "Las ocho áreas de cumplimiento",

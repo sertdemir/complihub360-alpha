@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import {
   LayoutGrid, FolderClosed, Bell, BookOpen, Bookmark, Download, CalendarCheck,
   TriangleAlert, Calendar, Search, LogOut, Landmark, Package, ShieldCheck, Megaphone, Building2,
-  PackageCheck, Truck, Scale, ChevronRight,
+  PackageCheck, Truck, Scale,
+  Leaf, ChevronRight,
 } from 'lucide-react';
 import { DOMAINS as CANONICAL_DOMAINS, type DomainSlug } from '../../lib/domains';
 import { Sidebar, SidebarGroup, NavItem } from '../ui/AppShell';
@@ -70,7 +71,7 @@ const SIDEBAR: { group: string; groupKey: string; badgeKey?: string; items: Side
   },
 ];
 
-// Canonical 8 domains (lib/domains.ts) + shell-local presentation (icon, risk dot).
+// Canonical 9 domains (lib/domains.ts) + shell-local presentation (icon, risk dot).
 const DOMAIN_ICON: Record<DomainSlug, React.ComponentType<{ size?: number | string }>> = {
   'tax-vat': Landmark,
   'product-packaging': Package,
@@ -80,6 +81,7 @@ const DOMAIN_ICON: Record<DomainSlug, React.ComponentType<{ size?: number | stri
   'product-compliance': PackageCheck,
   'logistics-customs': Truck,
   'legal-advisory': Scale,
+  environment: Leaf,
 };
 // Die Punkte an den Bereichen kommen aus /dashboard (by_domain_high,
 // by_domain), nicht mehr aus einer festen Liste (bis 2026-09-13 standen
@@ -88,7 +90,7 @@ const DOMAIN_ICON: Record<DomainSlug, React.ComponentType<{ size?: number | stri
 // Produkt-Compliance teilen sich PRODUCT und damit den Punkt.
 const SLUG_TO_ENGINE_KEY: Record<DomainSlug, string> = {
   'tax-vat': 'TAX', 'product-packaging': 'PRODUCT', 'product-compliance': 'PRODUCT', 'data-privacy': 'DATA',
-  'marketing-seo': 'MARKETING', 'corporate-structure': 'CORPORATE', 'logistics-customs': 'LOGISTICS', 'legal-advisory': 'LEGAL',
+  'marketing-seo': 'MARKETING', 'corporate-structure': 'CORPORATE', 'logistics-customs': 'LOGISTICS', 'legal-advisory': 'LEGAL', environment: 'ENVIRONMENT',
 };
 const DOMAINS = CANONICAL_DOMAINS.map((d) => ({
   ...d,

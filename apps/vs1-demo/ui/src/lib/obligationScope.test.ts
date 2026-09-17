@@ -104,8 +104,8 @@ describe('market profiles', () => {
       expect(p.byCadence.length, `${code} cadence groups`).toBeGreaterThan(0);
       // No empty cadence column may reach the calendar.
       for (const g of p.byCadence) expect(g.items.length, `${code}/${g.due}`).toBeGreaterThan(0);
-      // The weights row is the spine into the area pages: all eight, always.
-      expect(p.weights.length, `${code} weights`).toBe(8);
+      // The weights row is the spine into the area pages: all nine, always.
+      expect(p.weights.length, `${code} weights`).toBe(9);
       // Aggregates the hero pills read.
       expect(p.exposureEur, `${code} exposure`).toBeGreaterThan(0);
       expect(p.heaviest, `${code} heaviest`).not.toBeNull();
@@ -151,7 +151,7 @@ describe('market profiles', () => {
 // er waechst: eine neue Pflicht ohne nationalen Eintrag faellt hier sofort auf.
 // Die Liste ist die sichtbare Schuld — sie darf nur schrumpfen.
 describe('EU-Standard ausserhalb der EU', () => {
-  // Stand 2026-09-17: 29 Kombinationen. Jede Zeile heisst "dieser Markt sieht
+  // Stand 2026-09-18: 35 Kombinationen. Jede Zeile heisst "dieser Markt sieht
   // einen EU-Rechtsakt als seine Rechtsgrundlage, und wir wissen es".
   const BEKANNTE_LUECKEN = new Set([
     'TR/data-hosting', 'UK/data-hosting',
@@ -166,6 +166,18 @@ describe('EU-Standard ausserhalb der EU', () => {
     'TR/prod-packaging-recycled-content', 'UK/prod-packaging-recycled-content', 'US/prod-packaging-recycled-content',
     'TR/prod-packaging-reuse-targets', 'UK/prod-packaging-reuse-targets', 'US/prod-packaging-reuse-targets',
     'TR/prod-safety',
+    // Umwelt-Domaene, neu am 18.09.2026. Batterieverordnung und REACH sind
+    // Unionsrecht und gelten ausserhalb der EU NICHT — die Fundstelle traegt
+    // fuer diese drei Maerkte also nicht. Nationale Entsprechungen existieren
+    // (UK REACH und die UK WEEE Regulations nach dem Brexit, in der Tuerkei die
+    // AEEE-Regulierung, in den USA Stoffrecht auf Bundes- und E-Schrott-Recht
+    // auf Bundesstaatenebene), aber keine davon ist hier am Primaertext
+    // geprueft. Sie zu raten waere schlimmer als die Luecke zu benennen —
+    // deshalb steht sie hier und nicht in der Enrichment-Map.
+    // WEEE selbst faellt nicht an: sein default traegt 'national-pending',
+    // weil eine Richtlinie ohnehin nur ueber nationales Umsetzungsrecht gilt.
+    'TR/env-batteries-epr', 'UK/env-batteries-epr', 'US/env-batteries-epr',
+    'TR/env-reach-substances', 'UK/env-reach-substances', 'US/env-reach-substances',
   ]);
 
   const gefunden = () => {

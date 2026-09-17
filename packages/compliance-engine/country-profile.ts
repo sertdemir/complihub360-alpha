@@ -31,7 +31,8 @@ export const CountryRiskMatrix: Record<CountryCode, CountryRiskProfile> = {
             [ComplianceDomain.CORPORATE]: 6,
             [ComplianceDomain.ONGOING_MONITORING]: 7,
             [ComplianceDomain.LOGISTICS]: 6,
-            [ComplianceDomain.LEGAL]: 5
+            [ComplianceDomain.LEGAL]: 5,
+            [ComplianceDomain.ENVIRONMENT]: 8
         },
         enforcementIntensity: 9,
         strictnessScore: 9
@@ -45,7 +46,8 @@ export const CountryRiskMatrix: Record<CountryCode, CountryRiskProfile> = {
             [ComplianceDomain.CORPORATE]: 7,
             [ComplianceDomain.ONGOING_MONITORING]: 6,
             [ComplianceDomain.LOGISTICS]: 6,
-            [ComplianceDomain.LEGAL]: 6
+            [ComplianceDomain.LEGAL]: 6,
+            [ComplianceDomain.ENVIRONMENT]: 8
         },
         enforcementIntensity: 8,
         strictnessScore: 8
@@ -59,7 +61,8 @@ export const CountryRiskMatrix: Record<CountryCode, CountryRiskProfile> = {
             [ComplianceDomain.CORPORATE]: 8,
             [ComplianceDomain.ONGOING_MONITORING]: 9,
             [ComplianceDomain.LOGISTICS]: 5,
-            [ComplianceDomain.LEGAL]: 6
+            [ComplianceDomain.LEGAL]: 6,
+            [ComplianceDomain.ENVIRONMENT]: 4
         },
         enforcementIntensity: 7,
         strictnessScore: 6
@@ -74,7 +77,8 @@ export const CountryRiskMatrix: Record<CountryCode, CountryRiskProfile> = {
             [ComplianceDomain.ONGOING_MONITORING]: 8,
             // Post-Brexit border formalities make customs a first-class risk.
             [ComplianceDomain.LOGISTICS]: 7,
-            [ComplianceDomain.LEGAL]: 5
+            [ComplianceDomain.LEGAL]: 5,
+            [ComplianceDomain.ENVIRONMENT]: 7
         },
         enforcementIntensity: 8,
         strictnessScore: 7
@@ -88,7 +92,8 @@ export const CountryRiskMatrix: Record<CountryCode, CountryRiskProfile> = {
             [ComplianceDomain.CORPORATE]: 7,
             [ComplianceDomain.ONGOING_MONITORING]: 6,
             [ComplianceDomain.LOGISTICS]: 6,
-            [ComplianceDomain.LEGAL]: 5
+            [ComplianceDomain.LEGAL]: 5,
+            [ComplianceDomain.ENVIRONMENT]: 6
         },
         enforcementIntensity: 7,
         strictnessScore: 7
@@ -102,7 +107,8 @@ export const CountryRiskMatrix: Record<CountryCode, CountryRiskProfile> = {
             [ComplianceDomain.CORPORATE]: 6,
             [ComplianceDomain.ONGOING_MONITORING]: 6,
             [ComplianceDomain.LOGISTICS]: 6,
-            [ComplianceDomain.LEGAL]: 5
+            [ComplianceDomain.LEGAL]: 5,
+            [ComplianceDomain.ENVIRONMENT]: 6
         },
         enforcementIntensity: 7,
         strictnessScore: 7
@@ -117,7 +123,8 @@ export const CountryRiskMatrix: Record<CountryCode, CountryRiskProfile> = {
             [ComplianceDomain.ONGOING_MONITORING]: 7,
             // Rotterdam gateway: heavy import/forwarding exposure.
             [ComplianceDomain.LOGISTICS]: 7,
-            [ComplianceDomain.LEGAL]: 5
+            [ComplianceDomain.LEGAL]: 5,
+            [ComplianceDomain.ENVIRONMENT]: 7
         },
         enforcementIntensity: 7,
         strictnessScore: 7
@@ -132,7 +139,8 @@ export const CountryRiskMatrix: Record<CountryCode, CountryRiskProfile> = {
             [ComplianceDomain.ONGOING_MONITORING]: 6,
             // EU customs-union edge cases (ATR, origin rules) dominate.
             [ComplianceDomain.LOGISTICS]: 8,
-            [ComplianceDomain.LEGAL]: 5
+            [ComplianceDomain.LEGAL]: 5,
+            [ComplianceDomain.ENVIRONMENT]: 4
         },
         enforcementIntensity: 6,
         strictnessScore: 6

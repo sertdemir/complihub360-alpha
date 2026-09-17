@@ -275,6 +275,10 @@
       "legalAdvisory": {
         "title": "Asesoría legal",
         "desc": "Contratos, condiciones, derecho del consumidor"
+      },
+      "environment": {
+        "title": "Medio ambiente",
+        "desc": "RAEE, baterías, sustancias"
       }
     },
     "footer": {

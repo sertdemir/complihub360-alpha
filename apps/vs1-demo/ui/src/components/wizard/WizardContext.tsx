@@ -11,6 +11,7 @@ export type WizardCategory =
     | "product-compliance"
     | "logistics-customs"
     | "legal-advisory"
+    | "environment"
     | "";
 
 export type BusinessType =

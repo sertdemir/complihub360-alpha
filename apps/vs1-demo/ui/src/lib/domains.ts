@@ -14,7 +14,8 @@ export type DomainSlug =
   | 'corporate-structure'
   | 'product-compliance'
   | 'logistics-customs'
-  | 'legal-advisory';
+  | 'legal-advisory'
+  | 'environment';
 
 export interface DomainDef {
   slug: DomainSlug;
@@ -31,6 +32,12 @@ export const DOMAINS: DomainDef[] = [
   { slug: 'product-compliance', label: 'Product Compliance', i18nKey: 'productCompliance' },
   { slug: 'logistics-customs', label: 'Logistics & Customs', i18nKey: 'logisticsCustoms' },
   { slug: 'legal-advisory', label: 'Legal Advisory', i18nKey: 'legalAdvisory' },
+  // Neunte Domain (18.09.2026). Die "finalen 8" vom 04.08. waren als
+  // abgeschlossen gedacht; Umwelt kommt dazu, weil die Markenanmeldung das Feld
+  // ausdruecklich fuehrt und es bis dahin nur als Verpackung existierte.
+  // Umweltrecht jenseits der Verpackung — WEEE, Batterien, Stoffrecht — hat
+  // eigene Register, eigene Fristen und eigene Anbieter.
+  { slug: 'environment', label: 'Environmental Compliance', i18nKey: 'environment' },
 ];
 
 /** Canonical label → i18n key (replaces the 5 duplicated DOMAIN_KEY maps). */

@@ -45,6 +45,7 @@ const DOMAIN_TO_SLUGS: Record<ComplianceDomain, DomainSlug[]> = {
   [ComplianceDomain.ONGOING_MONITORING]: ['corporate-structure'],
   [ComplianceDomain.LOGISTICS]: ['logistics-customs'],
   [ComplianceDomain.LEGAL]: ['legal-advisory'],
+  [ComplianceDomain.ENVIRONMENT]: ['environment'],
 };
 
 /** Subdomains whose slug cannot be read off their engine domain. */
