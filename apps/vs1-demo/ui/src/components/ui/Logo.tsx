@@ -44,13 +44,27 @@ interface Palette {
   gold: string;
   /** null = Gradient zwischen #C6923B und #B07E36, sonst Vollfläche. */
   swoosh: string | null;
+  /**
+   * Eigene Farbe für die Claim-Zeile. Sie ist die einzige echte TEXT-Fläche im
+   * Logo — 17,5 % der Logo-Höhe, also 6 px bei h-9 und 8 px bei h-[47px]. Das
+   * Marken-Gold #C5913B trägt sie nicht: 2,80:1 auf Weiß und 3,51:1 auf
+   * Petrol, beides unter den 4,5:1, die kleiner Text braucht. Ein einziger Ton
+   * schafft beide Gründe nicht, darum hängt er am Tone.
+   *
+   * Das gilt NUR für den Claim. "360" bleibt Marken-Gold: es ist Logotype,
+   * keine Fließschrift, und in der Wortmarken-Größe unverwechselbar.
+   */
+  claim: string;
 }
 
 const TONE: Record<LogoTone, Palette> = {
-  'on-light': { ring: '#0D3B33', ink: '#012E27', gold: '#C5913B', swoosh: null },
-  'on-petrol': { ring: '#FFFFFF', ink: '#FFFFFF', gold: '#C5913B', swoosh: null },
-  'mono-white': { ring: '#FFFFFF', ink: '#FFFFFF', gold: '#FFFFFF', swoosh: '#FFFFFF' },
-  'mono-black': { ring: '#0F172A', ink: '#0F172A', gold: '#0F172A', swoosh: '#0F172A' },
+  // claim-Werte: gold-800 (6,71:1 auf Weiß) bzw. ein aufgehelltes Gold
+  // (5,76:1 auf petrol-500). Dieselbe Rechnung, die in AdminShell und
+  // ProviderShell schon die 9-px-Badges auf accent-strong gezogen hat.
+  'on-light': { ring: '#0D3B33', ink: '#012E27', gold: '#C5913B', swoosh: null, claim: '#6A5B1E' },
+  'on-petrol': { ring: '#FFFFFF', ink: '#FFFFFF', gold: '#C5913B', swoosh: null, claim: '#E0C46E' },
+  'mono-white': { ring: '#FFFFFF', ink: '#FFFFFF', gold: '#FFFFFF', swoosh: '#FFFFFF', claim: '#FFFFFF' },
+  'mono-black': { ring: '#0F172A', ink: '#0F172A', gold: '#0F172A', swoosh: '#0F172A', claim: '#0F172A' },
 };
 
 // Maße aus dem Component-Set.
@@ -105,11 +119,13 @@ function Wortmarke({ tone }: { tone: LogoTone }) {
       {WORDMARK_GOLD.map((d, i) => (
         <path key={`g${i}`} d={d} fill={c.gold} />
       ))}
-      {/* Claim-Zeile: Linie · "Always on your side" · Linie, 4 px Abstand. */}
+      {/* Claim-Zeile: Linie · "Always on your side" · Linie, 4 px Abstand.
+          Linien und Schrift teilen sich c.claim — sie lesen sich als ein
+          Element, ein Farbsprung dazwischen zerfiele optisch. */}
       <g transform={`translate(0 ${WORD_H - 7})`}>
-        <rect x="0" y="3.5" width="13.5" height="0.7" fill={c.gold} />
-        <path d={CLAIM} fill={c.gold} transform="translate(17.5 0)" />
-        <rect x="87.5" y="3.5" width="13.5" height="0.7" fill={c.gold} />
+        <rect x="0" y="3.5" width="13.5" height="0.7" fill={c.claim} />
+        <path d={CLAIM} fill={c.claim} transform="translate(17.5 0)" />
+        <rect x="87.5" y="3.5" width="13.5" height="0.7" fill={c.claim} />
       </g>
     </>
   );

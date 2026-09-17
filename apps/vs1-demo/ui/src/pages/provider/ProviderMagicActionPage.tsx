@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LogoMark } from '../../components/ui/Logo';
+import { Logo } from '../../components/ui/Logo';
 import { Button } from '../../components/ui/Button';
 import { Tag } from '../../components/ui/Tag';
 import { verifyMagicToken, actOnEngagement, type EngagementDossier, type UnlockedDossier } from '../../api/engagement';
@@ -62,8 +62,7 @@ export function ProviderMagicActionPage() {
     <div className="dark flex min-h-screen items-center justify-center bg-surface px-4 text-fg">
       <div className="w-full max-w-[480px] rounded-xl border border-elevate/10 bg-elevate/[0.03] p-8 shadow-2xl shadow-black/40">
         <div className="mb-6 flex items-center gap-2">
-          <LogoMark tone="on-petrol" className="h-[22px] w-auto" />
-          <span className="text-[15px] font-semibold text-white">CompliHub360</span>
+          <Logo lockup="horizontal" tone="on-petrol" href={null} className="h-[29px] w-auto" />
           <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-fg-accent">{t('magicAction.partnerBadge')}</span>
         </div>
 
