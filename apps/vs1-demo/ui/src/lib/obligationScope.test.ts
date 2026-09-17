@@ -196,3 +196,99 @@ describe('EU-Standard ausserhalb der EU', () => {
     expect(veraltet, 'Behoben — bitte aus BEKANNTE_LUECKEN entfernen').toEqual([]);
   });
 });
+
+// ─── Keine Risikozahl ohne Fundstelle ────────────────────────────────────────
+// `penaltyMaxEur` wird auf vier Flaechen als Risikobetrag hochgezaehlt —
+// AreaEnforcement ("schwerstes Bussgeld"), AreaMetrics (Summe), MarketCalendar
+// (Maximum) und RiskShowcase auf der STARTSEITE. Am 17.09.2026 trug keine der
+// 75 Zahlen eine Vorschrift, und wo sich zwei Quellen zum selben Bussgeld
+// aeussern, widersprechen sie sich — beim niederlaendischen um Faktor 33
+// (EUR 165 gegen EUR 5.514). Ohne Fundstelle ist nicht entscheidbar, welche
+// Zahl ins Produkt gehoert.
+//
+// DIESER TEST BEHEBT DAS NICHT, und er blendet auch nichts aus: 75 Zahlen auf
+// einmal verschwinden zu lassen waere eine groessere Aenderung am Produkt als
+// die, die hier ansteht. Er haelt den Bestand fest und laesst ihn nur
+// schrumpfen — und er verhindert, dass NEUE Pflichten ohne Beleg dazukommen.
+describe('Fundstelle zur Risikozahl', () => {
+  // Stand 2026-09-17. Diese Zahl darf nur FALLEN. Wer eine Fundstelle
+  // nachtraegt, zieht sie mit — der zweite Test erzwingt das.
+  const OHNE_FUNDSTELLE_STAND = 75;
+
+  // Die 21 Pflichten, die es am Stichtag gab. Eine Pflicht, die hier nicht
+  // steht, ist neu und muss ihre Fundstellen von Anfang an mitbringen: Bestand
+  // ohne Beleg ist eine Altlast, kein Bauplan.
+  //
+  // AUSGESCHRIEBEN, nicht aus der Map abgeleitet. Die erste Fassung stand als
+  // `new Set(Object.keys(ObligationEnrichmentMap))` da — und konnte damit nie
+  // anschlagen: eine neu ergaenzte Pflicht landet in derselben Map und gilt
+  // sofort als Bestand. Eine Gegenprobe hat es gezeigt, sonst waere die
+  // Zusicherung als gruener Test stehen geblieben.
+  const BESTAND = new Set([
+    'corp-registration',
+    'data-hosting',
+    'data-privacy',
+    'legal-commercial-contracts',
+    'legal-consumer-terms',
+    'log-customs-classification',
+    'log-eori',
+    'log-intrastat',
+    'mktg-consent',
+    'mktg-health-claims',
+    'monitor-kyb',
+    'prod-epr',
+    'prod-packaging-conformity',
+    'prod-packaging-empty-space',
+    'prod-packaging-format-bans',
+    'prod-packaging-recyclability',
+    'prod-packaging-recycled-content',
+    'prod-packaging-reuse-targets',
+    'prod-safety',
+    'tax-corporate',
+    'tax-vat-registration',
+  ]);
+
+  const ohneFundstelle = () => {
+    const out: string[] = [];
+    for (const [id, byCountry] of Object.entries(ObligationEnrichmentMap)) {
+      for (const [code, e] of Object.entries(byCountry as Record<string, {
+        penaltyMaxEur?: number; penaltyBasis?: string } | undefined>)) {
+        if (!e?.penaltyMaxEur) continue;
+        if (!e.penaltyBasis?.trim()) out.push(`${code}/${id}`);
+      }
+    }
+    return out.sort();
+  };
+
+  it('laesst den Bestand ohne Beleg nur schrumpfen', () => {
+    const ohne = ohneFundstelle();
+    expect(
+      ohne.length,
+      ohne.length > OHNE_FUNDSTELLE_STAND
+        ? `Neue Risikozahl ohne Vorschrift. penaltyBasis ergaenzen — oder, wenn keine zu benennen ist, penaltyMaxEur weglassen:\n  ${ohne.slice(0, 10).join('\n  ')}`
+        : `Belegt! Bitte OHNE_FUNDSTELLE_STAND auf ${ohne.length} senken.`,
+    ).toBe(OHNE_FUNDSTELLE_STAND);
+  });
+
+  it('verlangt von jeder NEUEN Pflicht die Fundstelle', () => {
+    // Greift erst, wenn jemand eine Pflicht ergaenzt, die es am Stichtag nicht
+    // gab. Bis dahin ist die Menge leer und der Test still — genau so soll es
+    // sein: er kostet nichts, bis er gebraucht wird.
+    const neuOhneBeleg = ohneFundstelle().filter((k) => !BESTAND.has(k.split('/')[1]));
+    expect(neuOhneBeleg, 'Neue Pflicht: jede Zahl braucht ihre Vorschrift').toEqual([]);
+  });
+
+  it('nimmt keine Fundstelle an, die nichts zitiert', () => {
+    // Dieselbe Falle wie bei den `placeholder`-Quellen: ein String, der wie
+    // eine Zitation AUSSIEHT, sitzt in derselben Zelle und im selben Gewicht
+    // wie "AO §152". Ein paar Worte sind keine Vorschrift.
+    for (const [id, byCountry] of Object.entries(ObligationEnrichmentMap)) {
+      for (const [code, e] of Object.entries(byCountry as Record<string, { penaltyBasis?: string } | undefined>)) {
+        const b = e?.penaltyBasis;
+        if (b === undefined) continue;
+        expect(b.trim().length, `${code}/${id}: leere Fundstelle`).toBeGreaterThan(3);
+        expect(b, `${code}/${id}: "${b}" nennt keine Vorschrift`).toMatch(/\d/);
+      }
+    }
+  });
+});
