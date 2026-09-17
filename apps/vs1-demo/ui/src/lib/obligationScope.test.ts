@@ -330,6 +330,39 @@ describe('Belegte Obergrenze', () => {
     expect(neu, 'Neue Pflicht: jede Zahl braucht ihre belegte Obergrenze').toEqual([]);
   });
 
+  // Pflichten, bei denen ein Land NUR die Sanktion zum EU-Rechtsakt erlassen
+  // hat — die Pflicht selbst bleibt die europaeische. Deutschland hat das mit
+  // dem VerpackDG fuer die PPWR getan. Solche Eintraege sind Kopien: Quelle,
+  // Geltungsbeginn und `scope` MUESSEN mit dem `default` uebereinstimmen, sonst
+  // zeigt die deutsche Zeile eine andere Pflicht an als die europaeische.
+  const NATIONALE_BUSSE_ZUM_EU_AKT: [string, string][] = [
+    ['prod-packaging-conformity', 'DE'],
+    ['prod-packaging-empty-space', 'DE'],
+    ['prod-packaging-format-bans', 'DE'],
+    ['prod-packaging-recyclability', 'DE'],
+    ['prod-packaging-recycled-content', 'DE'],
+    ['prod-packaging-reuse-targets', 'DE'],
+  ];
+
+  it('haelt nationale Bussgeld-Zeilen an der EU-Pflicht, aus der sie stammen', () => {
+    for (const [id, code] of NATIONALE_BUSSE_ZUM_EU_AKT) {
+      const byCountry = (ObligationEnrichmentMap as Record<string, Record<string, Eintrag & {
+        source?: string; appliesFrom?: string; scope?: string;
+      }>>)[id];
+      const land = byCountry?.[code];
+      const eu = byCountry?.default;
+      expect(land, `${code}/${id}: Eintrag fehlt`).toBeTruthy();
+      expect(eu, `${id}: kein default, an dem der Eintrag haengen koennte`).toBeTruthy();
+      for (const feld of ['source', 'appliesFrom', 'scope'] as const) {
+        expect(
+          land?.[feld],
+          `${code}/${id}: "${feld}" weicht vom default ab. Das Land hat nur die Busse erlassen, `
+            + 'nicht die Pflicht geaendert — entweder nachziehen oder aus NATIONALE_BUSSE_ZUM_EU_AKT streichen.',
+        ).toBe(eu?.[feld]);
+      }
+    }
+  });
+
   it('nimmt keine Obergrenze an, die nichts belegt', () => {
     for (const [k, e] of alle()) {
       const c = e.penaltyCeiling;
