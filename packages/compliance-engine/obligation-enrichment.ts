@@ -121,7 +121,7 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
     },
     'mktg-health-claims': {
         default: { source: 'EU Reg. 1924/2006 (Health Claims)', penalty: 'national fines + mandatory withdrawal', penaltyMaxEur: 50000, due: 'Ongoing', scope: 'eu' },
-        US: { source: 'FTC Act §5 / FDA labeling rules', penalty: 'FTC injunctions + consumer redress', penaltyMaxEur: 90000, due: 'Ongoing' },
+        US: { source: 'FTC Act §5 + FTC Health Products Compliance Guidance', penalty: 'FTC injunctions + consumer redress', penaltyMaxEur: 90000, due: 'Ongoing' },
     },
     'data-privacy': {
         UK: { source: 'UK GDPR / DPA 2018 Art. 13', penalty: 'up to £17.5M or 4% of turnover', penaltyMaxEur: 100000, due: 'Ongoing' },
