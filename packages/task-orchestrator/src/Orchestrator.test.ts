@@ -1,11 +1,29 @@
-import * as assert from "node:assert";
-import type { AgentId } from "@complihub/agent-core";
+import { describe, expect, it } from "vitest";
+import type { AgentId, ExecutionEvent } from "@complihub/agent-core";
 import { Orchestrator } from "./Orchestrator.js";
 import { composeMiddlewares } from "./middleware.js";
 import type { Middleware, ExecutableAgent } from "./types.js";
-import { createMockTaskContext } from "@complihub360/types";
+import { createMockTaskContext, type PolicyContext } from "@complihub360/types";
 
-// Mock Registry for Test
+// Vorher war diese Datei ein `runTests()`-Skript mit node:assert und
+// console.log, das sich am Ende selbst aufrief. vitest fand darin keine Suite
+// ("No test suite found") und meldete die Datei als fehlgeschlagen — die
+// Assertions liefen zwar, aber ihr Ergebnis las niemand. Schlimmer: der Ablauf
+// war sequenziell hinter einem einzigen catch, also hat die erste scheiternde
+// Assertion (Capability-Ambiguität) alles danach stumm übersprungen. Intent-
+// Routing, Observability, Tenant-Isolation und Policy-Engine sind deshalb
+// über längere Zeit gar nicht geprüft worden.
+
+const mockCtx = createMockTaskContext();
+
+const agentRef = (id: string) => ({ id: id as AgentId, name: id, version: "1" });
+
+/** Führt eine Ausführung auf `id` zurück, die immer gelingt. */
+const okAgent = (id: string): ExecutableAgent => ({
+    id: id as AgentId,
+    execute: async () => ({ ok: true, durationMs: 0, agentId: id as AgentId }),
+});
+
 class MockRegistry {
     private mockAgents = [
         {
@@ -32,226 +50,260 @@ class MockRegistry {
 
     get(id: string) { return id ? { id, name: "Test", version: "1" } : undefined; }
     list() { return this.mockAgents; }
-    getByCapability(_name: string) { return []; }
+
+    // Gab früher bedingungslos [] zurück. Damit war nur der Null-Treffer-Zweig
+    // von executeByCapability erreichbar: die Ambiguitäts-Erwartung konnte gar
+    // nicht eintreten (sie war die Assertion, die den Rest der Datei abwürgte),
+    // und der Erfolgsfall lief ebenfalls ins Leere. Jetzt bedient der Mock alle
+    // drei Zweige — 0, >1 und genau 1 Treffer.
+    getByCapability(name: string) {
+        if (name === "ambiguous") return [agentRef("dup-one"), agentRef("dup-two")];
+        if (name === "code-generation") return [agentRef("repo-engineer")];
+        return [];
+    }
 }
 
-const mockCtx = createMockTaskContext();
+describe("composeMiddlewares", () => {
+    it("durchläuft die Kette als Zwiebel: hin 1-2, Kern 3, zurück 2-1", async () => {
+        const order: number[] = [];
+        const m1: Middleware = async (_ctx, next) => { order.push(1); const r = await next(); order.push(1); return r; };
+        const m2: Middleware = async (_ctx, next) => { order.push(2); const r = await next(); order.push(2); return r; };
 
-async function runTests() {
-    console.log("--- Running Orchestrator Tests ---");
+        const composed = composeMiddlewares([m1, m2]);
+        await composed(
+            mockCtx,
+            async () => { order.push(3); return { ok: true, durationMs: 0, agentId: "test-agent" as AgentId }; },
+            "test-agent" as AgentId,
+        );
 
-    // TEST 1: Middleware compose order
-    const orderList: number[] = [];
-    const m1: Middleware = async (ctx, next, _id) => { orderList.push(1); const res = await next(); orderList.push(1); return res; };
-    const m2: Middleware = async (ctx, next, _id) => { orderList.push(2); const res = await next(); orderList.push(2); return res; };
+        expect(order).toEqual([1, 2, 3, 2, 1]);
+    });
+});
 
-    const composed = composeMiddlewares([m1, m2]);
-    await composed(mockCtx, async () => { orderList.push(3); return { ok: true, durationMs: 0, agentId: "test-agent" as AgentId }; }, "test-agent" as AgentId);
-    assert.deepStrictEqual(orderList, [1, 2, 3, 2, 1], "Middleware order is incorrect");
-    console.log("✅ compose order passed");
+describe("Orchestrator.execute", () => {
+    it("lässt eine Middleware den Absturz eines Agenten abfangen", async () => {
+        const orch = new Orchestrator(new MockRegistry() as any);
+        orch.use(async (_ctx, next, id) => {
+            try { return await next(); }
+            catch (e) {
+                return { ok: false, error: { name: "Error", message: (e as Error).message }, durationMs: 5, agentId: id };
+            }
+        });
+        orch.registerExecutable({
+            id: "error-agent" as AgentId,
+            execute: async () => { throw new Error("Agent crashed!"); },
+        });
 
-    // TEST 2: ErrorBoundary Catching inside Executable
-    const errAgent: ExecutableAgent = {
-        id: "error-agent" as AgentId,
-        execute: async () => { throw new Error("Agent crashed!"); }
-    };
+        const res = await orch.execute("error-agent" as AgentId, mockCtx);
 
-    const orch1 = new Orchestrator(new MockRegistry() as any);
-    orch1.use(async (ctx, next, id) => {
-        try { return await next(); }
-        catch (e) {
-            return { ok: false, error: { name: "Error", message: (e as Error).message }, durationMs: 5, agentId: id };
+        expect(res.ok).toBe(false);
+        expect(!res.ok && res.error.message).toBe("Agent crashed!");
+    });
+
+    it("bricht eine Ausführung ab, die ihr Zeitbudget überschreitet", async () => {
+        const orch = new Orchestrator(new MockRegistry() as any);
+        orch.registerExecutable({
+            id: "slow-agent" as AgentId,
+            execute: async () => new Promise(resolve =>
+                setTimeout(() => resolve({ ok: true, durationMs: 100, agentId: "slow-agent" as AgentId }), 100)),
+        });
+
+        const res = await orch.execute("slow-agent" as AgentId, mockCtx, { timeoutMs: 10 });
+
+        expect(res.ok).toBe(false);
+        expect(!res.ok && res.error.code).toBe("TIMEOUT");
+    });
+
+    it("feuert die Lifecycle-Hooks um eine erfolgreiche Ausführung", async () => {
+        const hookLogs: string[] = [];
+        const orch = new Orchestrator(new MockRegistry() as any, {
+            beforeExecute: () => { hookLogs.push("before"); },
+            afterExecute: () => { hookLogs.push("after"); },
+        });
+        orch.registerExecutable(okAgent("normal-agent"));
+
+        await orch.execute("normal-agent" as AgentId, mockCtx);
+
+        expect(hookLogs).toEqual(["before", "after"]);
+    });
+});
+
+describe("Orchestrator.executeByCapability", () => {
+    it("weist eine unbekannte Fähigkeit ab", async () => {
+        const orch = new Orchestrator(new MockRegistry() as any);
+
+        const res = await orch.executeByCapability("missing", mockCtx);
+
+        expect(res.ok).toBe(false);
+        expect(!res.ok && res.error.code).toBe("CAPABILITY_NOT_FOUND");
+    });
+
+    it("rät nicht, wenn mehrere Agenten dieselbe Fähigkeit tragen", async () => {
+        const orch = new Orchestrator(new MockRegistry() as any);
+
+        const res = await orch.executeByCapability("ambiguous", mockCtx);
+
+        expect(res.ok).toBe(false);
+        expect(!res.ok && res.error.code).toBe("AMBIGUOUS_CAPABILITY");
+    });
+
+    it("führt den einen passenden Agenten aus", async () => {
+        const orch = new Orchestrator(new MockRegistry() as any);
+        orch.registerExecutable(okAgent("repo-engineer"));
+
+        const res = await orch.executeByCapability("code-generation", mockCtx);
+
+        expect(res.ok).toBe(true);
+        expect(res.ok && res.agentId).toBe("repo-engineer");
+    });
+});
+
+describe("Orchestrator.executeByIntent", () => {
+    const withAllAgents = () => {
+        const orch = new Orchestrator(new MockRegistry() as any);
+        for (const id of ["exact-match-agent", "tag-match-agent", "cap-name-agent", "a-tie-breaker", "z-tie-breaker"]) {
+            orch.registerExecutable(okAgent(id));
         }
-    });
-    orch1.registerExecutable(errAgent);
-
-    const resErr = await orch1.execute("error-agent" as AgentId, mockCtx);
-    assert.strictEqual(resErr.ok, false);
-    assert.strictEqual(!resErr.ok && resErr.error.message, "Agent crashed!");
-    console.log("✅ Error boundary caught runtime error");
-
-    // TEST 3: Timeout Execution
-    const slowAgent: ExecutableAgent = {
-        id: "slow-agent" as AgentId,
-        execute: async () => new Promise(resolve => setTimeout(() => resolve({ ok: true, durationMs: 100, agentId: "slow-agent" as AgentId }), 100))
+        return orch;
     };
 
-    const orch2 = new Orchestrator(new MockRegistry() as any);
-    orch2.registerExecutable(slowAgent);
+    it("lässt den exakten Intent-Treffer vor Tag plus Priorität gewinnen", async () => {
+        const res = await withAllAgents().executeByIntent("analyze_code", mockCtx);
 
-    const resTimeout = await orch2.execute("slow-agent" as AgentId, mockCtx, { timeoutMs: 10 });
-    assert.strictEqual(resTimeout.ok, false);
-    assert.strictEqual(!resTimeout.ok && resTimeout.error.code, "TIMEOUT");
-    console.log("✅ Timeout execution cleanly rejected slow execution");
-
-    // TEST 4: Lifecycle Hooks execution
-    const hookLogs: string[] = [];
-    const orchHooks = new Orchestrator(new MockRegistry() as any, {
-        beforeExecute: () => { hookLogs.push("before"); },
-        afterExecute: () => { hookLogs.push("after"); }
+        // Exakter Treffer zählt 10, Tag+Priorität nur 8.
+        expect(res.agentId).toBe("exact-match-agent");
     });
 
-    const normalAgent: ExecutableAgent = {
-        id: "normal-agent" as AgentId,
-        execute: async () => ({ ok: true, durationMs: 10, agentId: "normal-agent" as AgentId })
-    };
-    orchHooks.registerExecutable(normalAgent);
-    await orchHooks.execute("normal-agent" as AgentId, mockCtx);
+    it("löst Gleichstand deterministisch alphabetisch auf", async () => {
+        const res = await withAllAgents().executeByIntent("tie", mockCtx);
 
-    assert.deepStrictEqual(hookLogs, ["before", "after"]);
-    console.log("✅ Lifecycle hooks triggered accurately");
-
-    // TEST 5: Capability-based Execution
-    const orchCap = new Orchestrator(new MockRegistry() as any);
-
-    // Empty capability returns error
-    const emptyRes = await orchCap.executeByCapability("missing", mockCtx);
-    assert.strictEqual(emptyRes.ok, false);
-    assert.strictEqual(!emptyRes.ok && emptyRes.error.code, "CAPABILITY_NOT_FOUND");
-    console.log("✅ Capability routing cleanly rejects missing capabilities");
-
-    // Ambiguous capability returns error
-    const ambigRes = await orchCap.executeByCapability("ambiguous", mockCtx);
-    assert.strictEqual(ambigRes.ok, false);
-    assert.strictEqual(!ambigRes.ok && ambigRes.error.code, "AMBIGUOUS_CAPABILITY");
-    console.log("✅ Capability routing cleanly rejects ambiguous capabilities");
-
-    // Success falls back to standard execution
-    const validAgent: ExecutableAgent = {
-        id: "repo-engineer" as AgentId,
-        execute: async () => ({ ok: true, durationMs: 15, agentId: "repo-engineer" as AgentId })
-    };
-    orchCap.registerExecutable(validAgent);
-
-    const successRes = await orchCap.executeByCapability("code-generation", mockCtx);
-    assert.strictEqual(successRes.ok, true);
-    assert.strictEqual(successRes.ok && successRes.agentId, "repo-engineer");
-    console.log("✅ Capability routing properly executes matched agent");
-
-    // TEST 6: Intent-Based Routing Match & Priority
-    const orchIntent = new Orchestrator(new MockRegistry() as any);
-
-    // Register mock execution dummies based on MockRegistry agent IDs
-    orchIntent.registerExecutable({ id: "exact-match-agent" as AgentId, execute: async () => ({ ok: true, durationMs: 0, agentId: "exact-match-agent" as AgentId }) });
-    orchIntent.registerExecutable({ id: "tag-match-agent" as AgentId, execute: async () => ({ ok: true, durationMs: 0, agentId: "tag-match-agent" as AgentId }) });
-    orchIntent.registerExecutable({ id: "cap-name-agent" as AgentId, execute: async () => ({ ok: true, durationMs: 0, agentId: "cap-name-agent" as AgentId }) });
-    orchIntent.registerExecutable({ id: "a-tie-breaker" as AgentId, execute: async () => ({ ok: true, durationMs: 0, agentId: "a-tie-breaker" as AgentId }) });
-    orchIntent.registerExecutable({ id: "z-tie-breaker" as AgentId, execute: async () => ({ ok: true, durationMs: 0, agentId: "z-tie-breaker" as AgentId }) });
-
-    // 1. Exact Match overrides Tag match
-    const exactRes = await orchIntent.executeByIntent("analyze_code", mockCtx);
-    assert.strictEqual(exactRes.agentId, "exact-match-agent", "Exact match (10) should beat Tag+Priority (8)");
-
-    // 2. Tie Breaker (deterministic fallback alphabetical a-tie over z-tie)
-    const tieRes = await orchIntent.executeByIntent("tie", mockCtx);
-    assert.strictEqual(tieRes.agentId, "a-tie-breaker", "Alphabetical fallback failed");
-
-    // 3. No match throws standard execution error fallback (code INTENT_NOT_FOUND)
-    const missingIntentRes = await orchIntent.executeByIntent("missing_intent", mockCtx);
-    assert.strictEqual(missingIntentRes.ok, false);
-    assert.strictEqual(!missingIntentRes.ok && missingIntentRes.error.code, "INTENT_NOT_FOUND");
-
-    console.log("✅ Intent routing scoring and fallback successfully verified");
-
-    // TEST 7: Execution Observability
-    const observedEvents: any[] = [];
-    const orchObs = new Orchestrator(new MockRegistry() as any);
-    orchObs.addObserver({
-        onExecution: (event) => observedEvents.push(event)
+        expect(res.agentId).toBe("a-tie-breaker");
     });
 
-    orchObs.registerExecutable({ id: "exact-match-agent" as AgentId, execute: async () => ({ ok: true, durationMs: 0, agentId: "exact-match-agent" as AgentId }) });
+    it("weist einen Intent ohne jeden Treffer ab", async () => {
+        const res = await withAllAgents().executeByIntent("missing_intent", mockCtx);
 
-    // Test observer triggers on success with meta tags
-    await orchObs.executeByIntent("analyze_code", mockCtx);
-    assert.strictEqual(observedEvents.length, 1);
-    assert.strictEqual(observedEvents[0].agentId, "exact-match-agent");
-    assert.strictEqual(observedEvents[0].success, true);
-    assert.strictEqual(observedEvents[0].intent, "analyze_code");
-    assert.ok(observedEvents[0].startedAt > 0);
-    assert.ok(observedEvents[0].finishedAt >= observedEvents[0].startedAt);
+        expect(res.ok).toBe(false);
+        expect(!res.ok && res.error.code).toBe("INTENT_NOT_FOUND");
+    });
+});
 
-    // Test observer triggers on failure
-    orchObs.registerExecutable({ id: "fail-agent" as AgentId, execute: async () => ({ ok: false, durationMs: 0, error: { name: "Err", message: "Failed", code: "FAILED" }, agentId: "fail-agent" as AgentId }) });
-    const failCtx = createMockTaskContext({ requestId: "req-fail", correlationId: "fail-id" });
-    await orchObs.execute("fail-agent" as AgentId, failCtx);
+describe("Orchestrator-Observability", () => {
+    it("meldet eine erfolgreiche Ausführung mit Intent und Zeitstempeln", async () => {
+        const events: ExecutionEvent[] = [];
+        const orch = new Orchestrator(new MockRegistry() as any);
+        orch.addObserver({ onExecution: (event) => events.push(event) });
+        orch.registerExecutable(okAgent("exact-match-agent"));
 
-    assert.strictEqual(observedEvents.length, 2);
-    assert.strictEqual(observedEvents[1].agentId, "fail-agent");
-    assert.strictEqual(observedEvents[1].success, false);
-    assert.strictEqual(observedEvents[1].error.message, "Failed");
+        await orch.executeByIntent("analyze_code", mockCtx);
 
-    console.log("✅ Execution observability and audit tracking successfully verified");
+        expect(events).toHaveLength(1);
+        expect(events[0].agentId).toBe("exact-match-agent");
+        expect(events[0].success).toBe(true);
+        expect(events[0].intent).toBe("analyze_code");
+        expect(events[0].startedAt).toBeGreaterThan(0);
+        expect(events[0].finishedAt).toBeGreaterThanOrEqual(events[0].startedAt);
+    });
 
-    // TEST 8: Tenant Isolation
+    it("meldet auch eine gescheiterte Ausführung", async () => {
+        const events: ExecutionEvent[] = [];
+        const orch = new Orchestrator(new MockRegistry() as any);
+        orch.addObserver({ onExecution: (event) => events.push(event) });
+        orch.registerExecutable({
+            id: "fail-agent" as AgentId,
+            execute: async () => ({
+                ok: false, durationMs: 0,
+                error: { name: "Err", message: "Failed", code: "FAILED" },
+                agentId: "fail-agent" as AgentId,
+            }),
+        });
+
+        await orch.execute("fail-agent" as AgentId, createMockTaskContext({ requestId: "req-fail", correlationId: "fail-id" }));
+
+        expect(events).toHaveLength(1);
+        expect(events[0].agentId).toBe("fail-agent");
+        expect(events[0].success).toBe(false);
+        expect(events[0].error?.message).toBe("Failed");
+    });
+});
+
+describe("Mandantentrennung", () => {
     const tenantRegistry = {
         get: (id: string) => {
             if (id === "global-agent") return { id, name: "Global", version: "1" };
             if (id === "tenant-a-agent") return { id, name: "A", version: "1", tenantIds: ["tenant-a"] };
             return undefined;
-        }
+        },
     };
-    const orchTenant = new Orchestrator(tenantRegistry as any);
-    orchTenant.registerExecutable({ id: "global-agent" as AgentId, execute: async () => ({ ok: true, durationMs: 0, agentId: "global-agent" as AgentId }) });
-    orchTenant.registerExecutable({ id: "tenant-a-agent" as AgentId, execute: async () => ({ ok: true, durationMs: 0, agentId: "tenant-a-agent" as AgentId }) });
+    const orchestrator = () => {
+        const orch = new Orchestrator(tenantRegistry as any);
+        orch.registerExecutable(okAgent("global-agent"));
+        orch.registerExecutable(okAgent("tenant-a-agent"));
+        return orch;
+    };
 
-    // Global agent can be executed by anyone
-    const resGlobal = await orchTenant.execute("global-agent" as AgentId, { ...mockCtx, tenantId: "tenant-b" });
-    assert.strictEqual(resGlobal.ok, true);
+    it("lässt einen Agenten ohne Mandantenbindung für jeden laufen", async () => {
+        const res = await orchestrator().execute("global-agent" as AgentId, { ...mockCtx, tenantId: "tenant-b" });
 
-    // Tenant A agent executed by Tenant A
-    const resTenantA = await orchTenant.execute("tenant-a-agent" as AgentId, { ...mockCtx, tenantId: "tenant-a" });
-    assert.strictEqual(resTenantA.ok, true);
+        expect(res.ok).toBe(true);
+    });
 
-    // Tenant A agent executed by Tenant B -> Failure
-    const resTenantB = await orchTenant.execute("tenant-a-agent" as AgentId, { ...mockCtx, tenantId: "tenant-b" });
-    assert.strictEqual(resTenantB.ok, false);
-    assert.strictEqual(!resTenantB.ok && resTenantB.error.code, "TENANT_MISMATCH");
+    it("lässt den eigenen Mandanten seinen Agenten ausführen", async () => {
+        const res = await orchestrator().execute("tenant-a-agent" as AgentId, { ...mockCtx, tenantId: "tenant-a" });
 
-    console.log("✅ Tenant isolation routing securely verified");
+        expect(res.ok).toBe(true);
+    });
 
-    // TEST 9: Policy Engine Integration
+    it("verweigert einem fremden Mandanten denselben Agenten", async () => {
+        const res = await orchestrator().execute("tenant-a-agent" as AgentId, { ...mockCtx, tenantId: "tenant-b" });
+
+        expect(res.ok).toBe(false);
+        expect(!res.ok && res.error.code).toBe("TENANT_MISMATCH");
+    });
+});
+
+describe("Policy-Engine-Leitplanken", () => {
     const mockPolicyEngine = {
-        evaluate: (ctx: any) => {
+        evaluate: (ctx: PolicyContext) => {
             if (ctx.capability === "forbidden-cap") return { allowed: false, reason: "Capability denied" };
-            if (ctx.payload && (ctx.payload as any).size > 100) return { allowed: false, reason: "Payload too large" };
+            if (((ctx.payload as { size?: number } | undefined)?.size ?? 0) > 100) return { allowed: false, reason: "Payload too large" };
             return { allowed: true };
         },
-        acquire: (ctx: any) => {
-            if (ctx.agentId === "concurrent-agent") return false;
-            return true;
-        },
-        release: (_ctx: any) => { }
+        acquire: (ctx: PolicyContext) => ctx.agentId !== "concurrent-agent",
+        release: () => { },
+    };
+    const orchestrator = () => {
+        const orch = new Orchestrator(new MockRegistry() as any, {}, mockPolicyEngine as any);
+        orch.registerExecutable(okAgent("policy-agent"));
+        orch.registerExecutable(okAgent("concurrent-agent"));
+        return orch;
     };
 
-    const orchPolicy = new Orchestrator(new MockRegistry() as any, {}, mockPolicyEngine as any);
-    orchPolicy.registerExecutable({ id: "policy-agent" as AgentId, execute: async () => ({ ok: true, durationMs: 0, agentId: "policy-agent" as AgentId }) });
-    orchPolicy.registerExecutable({ id: "concurrent-agent" as AgentId, execute: async () => ({ ok: true, durationMs: 0, agentId: "concurrent-agent" as AgentId }) });
+    it("lässt eine erlaubte Ausführung durch", async () => {
+        const res = await orchestrator().execute("policy-agent" as AgentId, mockCtx);
 
-    // 1. Allowed Execution
-    const policyRes1 = await orchPolicy.execute("policy-agent" as AgentId, mockCtx);
-    assert.strictEqual(policyRes1.ok, true);
+        expect(res.ok).toBe(true);
+    });
 
-    // 2. Denied Capability
-    const policyRes2 = await orchPolicy.execute("policy-agent" as AgentId, mockCtx, { capability: "forbidden-cap" });
-    assert.strictEqual(policyRes2.ok, false);
-    assert.strictEqual(!policyRes2.ok && policyRes2.error.code, "POLICY_DENIED");
+    it("blockt eine verbotene Fähigkeit", async () => {
+        const res = await orchestrator().execute("policy-agent" as AgentId, mockCtx, { capability: "forbidden-cap" });
 
-    // 3. Payload Limit Exceeded
-    const policyRes3 = await orchPolicy.execute("policy-agent" as AgentId, createMockTaskContext({ payload: { size: 150 } }));
-    assert.strictEqual(policyRes3.ok, false);
-    assert.strictEqual(!policyRes3.ok && policyRes3.error.code, "POLICY_DENIED");
-    assert.ok(!policyRes3.ok && policyRes3.error.message.includes("Payload too large"));
+        expect(res.ok).toBe(false);
+        expect(!res.ok && res.error.code).toBe("POLICY_DENIED");
+    });
 
-    // 4. Concurrency Blocked
-    const policyRes4 = await orchPolicy.execute("concurrent-agent" as AgentId, mockCtx);
-    assert.strictEqual(policyRes4.ok, false);
-    assert.strictEqual(!policyRes4.ok && policyRes4.error.code, "CONCURRENCY_LIMITED");
+    it("blockt eine zu große Nutzlast und nennt den Grund", async () => {
+        const res = await orchestrator().execute("policy-agent" as AgentId, createMockTaskContext({ payload: { size: 150 } }));
 
-    console.log("✅ Policy Engine Guardrails natively verified");
-}
+        expect(res.ok).toBe(false);
+        expect(!res.ok && res.error.code).toBe("POLICY_DENIED");
+        expect(!res.ok && res.error.message).toContain("Payload too large");
+    });
 
-runTests().catch(e => {
-    console.error("Test failed", e);
-    process.exit(1);
+    it("blockt, wenn kein Nebenläufigkeits-Slot frei ist", async () => {
+        const res = await orchestrator().execute("concurrent-agent" as AgentId, mockCtx);
+
+        expect(res.ok).toBe(false);
+        expect(!res.ok && res.error.code).toBe("CONCURRENCY_LIMITED");
+    });
 });
