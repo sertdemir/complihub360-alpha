@@ -913,7 +913,7 @@
         "unproven": "Noch nicht belegt",
         "unprovenNote": "Die Zahl, mit der die Risikokarte rechnet, ist Bestand — wir haben sie nicht am Gesetzestext gelesen.",
         "perUnit": "{{amount}} je {{per}}",
-        "proportional": "{{percent}} % der {{of}}",
+        "proportional": "{{percent}} % {{of}}",
         "turnover": "{{percent}} % des weltweiten Jahresumsatzes",
         "turnoverOr": "{{amount}} oder {{percent}} % des weltweiten Jahresumsatzes — je nachdem, welcher Betrag höher ist",
         "subnational": "Wird eine Ebene tiefer gesetzt — {{level}}",
@@ -928,6 +928,50 @@
           "TX": "Texas",
           "NY": "New York",
           "FL": "Florida"
+        },
+        "basisNote": {
+          "frTaxTiers": "10 % ohne Mahnung, 40 % nach Mahnung, 80 % bei verdeckter Tätigkeit",
+          "frTaxIntent": "40 % bei Vorsatz, 80 % bei Steuerhinterziehung",
+          "frQuintuple4500": "Das Gesetz nennt 4.500 EUR für natürliche Personen; für Unternehmen gilt das Fünffache",
+          "frQuintuple200k": "Das Gesetz nennt 200.000 EUR für natürliche Personen; für Unternehmen gilt das Fünffache",
+          "frTwoRates75k": "75.000 EUR für juristische, 15.000 EUR für natürliche Personen",
+          "frPerUnitTwoRates": "Der Satz für juristische Personen; 1.500 EUR für natürliche",
+          "usMonthlyCap25": "5 % je angefangenem Monat, höchstens 25 % insgesamt",
+          "txCurePeriod": "Erst nach der Heilungsfrist: 30 Tage ab Mitteilung des Attorney General",
+          "ukLateFilingTiers": "Public Company, mehr als sechs Monate zu spät: 7.500 GBP, verdoppelt bei Versäumnis auch im Vorjahr. Private Company: 150 bis 1.500 GBP",
+          "itAccountsTiers": "Nichthinterlegung des Jahresabschlusses; ab 6 Mio. EUR Umsatz je Verzugsjahr, sonst 1.200 bis 60.000 EUR",
+          "esVeryGraveRange": "Sehr schwerer Verstoß: 100 bis 150 %",
+          "esPesetaLegacy": "Sehr schwerer Verstoß. 2001 aus Peseten umgestellt und seither nicht angepasst",
+          "esGainMultiple": "Sehr schwerer Verstoß. Überschreitbar bis zum Sechs- bis Achtfachen des unrechtmäßigen Gewinns",
+          "nlPaymentDefault": "Zahlungsversäumnis. Bei Vorsatz stattdessen 100 % der Steuer nach Art. 67f",
+          "widespreadOnly": "Nur bei weitverbreitetem Verstoß; sonst 50.000 EUR nach Satz 1",
+          "ukIndictmentVsSummary": "Auf Anklage. Im abgekürzten Verfahren gilt stattdessen das statutory maximum",
+          "nlFourthCategory": "Vierte Kategorie, Stand 1. Januar 2026",
+          "ukOverTwoYears": "Mehr als zwei Jahre verspätet",
+          "ukDeliberateConcealed": "Kategorie 1, vorsätzlich und verschleiert",
+          "deAssessedTaxes": "Erklärungsversäumnis bei Veranlagungssteuern",
+          "deLateSurchargeCap": "Verspätungszuschlag, Höchstbetrag",
+          "deliberateNoDisclosure": "Vorsätzlicher Verstoß, ohne Selbstanzeige",
+          "seriousRepeated": "Schwerwiegender, wiederholter oder systematischer Verstoß"
+        },
+        "ofKey": {
+          "domesticValue": "des Inlandswerts der Ware",
+          "taxRequiredToShow": "der auf der Erklärung auszuweisenden Steuer",
+          "itIncomeTax": "der geschuldeten Ertragsteuer (IRES und IRAP)",
+          "corporateTaxDue": "der geschuldeten Körperschaftsteuer",
+          "vatDue": "der geschuldeten Mehrwertsteuer",
+          "taxDue": "der geschuldeten Steuer",
+          "unremittedTax": "der nicht abgeführten Steuerschuld",
+          "unpaidCorporateTax": "der offenen Körperschaftsteuer",
+          "potentialLostRevenue": "der entgangenen Umsatzsteuer"
+        },
+        "perKey": {
+          "unitOrTonnePlaced": "Einheit oder Tonne in Verkehr gebrachten Produkts"
+        },
+        "levelKey": {
+          "states45AndDc": "45 Bundesstaaten und der District of Columbia",
+          "statesWithPrivacyActs": "die Bundesstaaten mit eigenem Datenschutzgesetz (Kalifornien und rund 20 weitere)",
+          "states50AndDc": "alle 50 Bundesstaaten und der District of Columbia"
         }
       }
     },

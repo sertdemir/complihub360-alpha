@@ -471,7 +471,7 @@ function CeilingFact({ o }: { o: AreaObligation }) {
   }
 
   const d = describeCeiling(c, i18n.language, o.states);
-  const { basis, asOf } = ceilingBasis(c);
+  const { basis, basisNote, asOf } = ceilingBasis(c);
   const p = provenance(o, i18n.language);
 
   const value =
@@ -481,13 +481,17 @@ function CeilingFact({ o }: { o: AreaObligation }) {
         ? t('compliance.area.ceiling.perUnit', {
             defaultValue: '{{amount}} per {{per}}',
             amount: d.amount,
-            per: d.per,
+            per: t(`compliance.area.ceiling.perKey.${d.per}`, { defaultValue: d.per }),
           })
         : d.form === 'proportional'
           ? t('compliance.area.ceiling.proportional', {
-              defaultValue: '{{percent}}% of {{of}}',
+              defaultValue: '{{percent}}% {{of}}',
               percent: d.percent,
-              of: d.of,
+              // `of`, `per` und `level` tragen Schluessel, keine Saetze — wie
+              // `basisNote`. Frueher stand hier deutsche Prosa, und in der
+              // englischen Oberflaeche las sich das als "80% of geschuldete
+              // Steuer".
+              of: t(`compliance.area.ceiling.ofKey.${d.of}`, { defaultValue: d.of }),
             })
           : d.form === 'turnover'
             ? d.orAmount
@@ -503,7 +507,7 @@ function CeilingFact({ o }: { o: AreaObligation }) {
             : d.form === 'subnational'
               ? t('compliance.area.ceiling.subnational', {
                   defaultValue: 'Set one level down — {{level}}',
-                  level: d.level,
+                  level: t(`compliance.area.ceiling.levelKey.${d.level}`, { defaultValue: d.level }),
                 })
               : d.form === 'delegated'
                 ? t('compliance.area.ceiling.delegated', 'No amount — the act leaves the penalty to member states')
@@ -560,6 +564,15 @@ function CeilingFact({ o }: { o: AreaObligation }) {
         </ul>
       )}
       <p className="mt-2 text-body-3xs text-fg-tertiary">{quelle}</p>
+      {/* Der erklaerende Zusatz stand frueher als deutsche Prosa IN der
+          Zitation. Er sagt etwas anderes als sie — wie der Betrag zustande
+          kommt, fuer wen er gilt — und gehoert deshalb in die Sprache des
+          Lesers, waehrend die Fundstelle ein Eigenname bleibt. */}
+      {basisNote && (
+        <p className="mt-1 text-body-3xs text-fg-tertiary">
+          {t(`compliance.area.ceiling.basisNote.${basisNote}`, { defaultValue: '' })}
+        </p>
+      )}
       {herkunft && <p className="mt-1 text-body-3xs italic text-fg-tertiary">{herkunft}</p>}
     </div>
   );

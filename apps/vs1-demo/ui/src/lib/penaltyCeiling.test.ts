@@ -65,6 +65,54 @@ describe('Obergrenze anzeigen', () => {
     }
   });
 
+  it('haelt jeden basisNote-Schluessel an einer Uebersetzung', async () => {
+    // `basisNote` traegt einen Schluessel, keinen Satz. Ein Schluessel ohne
+    // Eintrag faellt in der Oberflaeche NICHT auf: i18next gibt bei fehlendem
+    // Treffer den defaultValue zurueck, und der ist hier der leere String —
+    // die Zeile verschwaende lautlos. Genau deshalb prueft das ein Test und
+    // nicht das Auge.
+    const en = (await import('../../public/locales/en/common.json')).default as
+      { compliance: { area: { ceiling: { basisNote: Record<string, string> } } } };
+    const vorhanden = en.compliance.area.ceiling.basisNote;
+    const benutzt = new Set<string>();
+    for (const byCountry of Object.values(ObligationEnrichmentMap)) {
+      for (const e of Object.values(byCountry)) {
+        const n = e?.penaltyCeiling?.basisNote;
+        if (n) benutzt.add(n);
+        for (const st of Object.values(e?.states ?? {})) {
+          if (st?.penaltyCeiling?.basisNote) benutzt.add(st.penaltyCeiling.basisNote);
+        }
+      }
+    }
+    const ohne = [...benutzt].filter((k) => !vorhanden[k]);
+    expect(ohne, `basisNote ohne Uebersetzung: ${ohne.join(', ')}`).toEqual([]);
+
+    // `of`, `per` und `level` tragen aus demselben Grund Schluessel. Ein
+    // fehlender faellt hier genauso lautlos aus wie ein basisNote, nur steht
+    // dann der Schluessel selbst auf dem Bildschirm ("80% of taxDue").
+    const ceiling = (en.compliance.area as unknown as {
+      ceiling: Record<string, Record<string, string>>;
+    }).ceiling;
+    for (const [feld, schluesselfeld] of [['of', 'ofKey'], ['per', 'perKey'], ['level', 'levelKey']] as const) {
+      const da = ceiling[schluesselfeld] ?? {};
+      const gebraucht = new Set<string>();
+      for (const byCountry of Object.values(ObligationEnrichmentMap)) {
+        for (const e of Object.values(byCountry)) {
+          const v = (e?.penaltyCeiling as Record<string, unknown> | undefined)?.[feld];
+          if (typeof v === 'string') gebraucht.add(v);
+        }
+      }
+      const fehlt = [...gebraucht].filter((k) => !da[k]);
+      expect(fehlt, `${feld}: Schluessel ohne Uebersetzung: ${fehlt.join(', ')}`).toEqual([]);
+      expect(gebraucht.size, `${feld}: kein Eintrag nutzt das Feld`).toBeGreaterThan(0);
+    }
+    // Und andersherum: ein Schluessel, den niemand mehr benutzt, ist toter
+    // Text in vier Sprachen.
+    const tot = Object.keys(vorhanden).filter((k) => !benutzt.has(k));
+    expect(tot, `Uebersetzt, aber nirgends benutzt: ${tot.join(', ')}`).toEqual([]);
+    expect(benutzt.size, 'Kein Eintrag nutzt basisNote — Test ohne Gegenstand').toBeGreaterThan(0);
+  });
+
   it('gibt Fundstelle und Stand heraus, wo es einen gibt', () => {
     const mit = ceilingBasis({ kind: 'amount', value: 1, currency: 'EUR', basis: 'HGB § 14', asOf: '2026-09-17' });
     expect(mit.asOf).toBe('2026-09-17');

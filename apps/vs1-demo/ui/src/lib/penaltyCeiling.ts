@@ -111,8 +111,15 @@ const betragVon = (e: SubnationalCeiling): number =>
 
 /** Die Fundstelle mit Stand, wie sie unter der Zahl steht. `asOf` fehlt bei
  *  den Formen, die keinen Betrag nennen — dort gibt es nichts zu datieren. */
-export function ceilingBasis(ceiling: PenaltyCeiling): { basis: string; asOf?: string } {
-  return 'asOf' in ceiling ? { basis: ceiling.basis, asOf: ceiling.asOf } : { basis: ceiling.basis };
+export function ceilingBasis(
+  ceiling: PenaltyCeiling,
+): { basis: string; basisNote?: string; asOf?: string } {
+  // `basisNote` traegt einen SCHLUESSEL, keinen Satz — die Uebersetzung holt
+  // die Komponente. Siehe den Typ `BasisNote` in der Engine.
+  const note = ceiling.basisNote;
+  return 'asOf' in ceiling
+    ? { basis: ceiling.basis, basisNote: note, asOf: ceiling.asOf }
+    : { basis: ceiling.basis, basisNote: note };
 }
 
 /** Beantwortet fuer einen Eintrag, woher seine Eurozahl stammt.

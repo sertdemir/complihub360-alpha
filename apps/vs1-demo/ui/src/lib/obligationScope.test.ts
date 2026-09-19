@@ -291,7 +291,7 @@ describe('Belegte Obergrenze', () => {
     'prod-packaging-reuse-targets', 'prod-safety', 'tax-corporate', 'tax-vat-registration',
   ]);
 
-  type Obergrenze = { kind: string; basis?: string; asOf?: string; note?: string; value?: number; currency?: string; of?: string; per?: string; level?: string; orAmount?: { value: number; currency?: string } };
+  type Obergrenze = { kind: string; basis?: string; basisNote?: string; asOf?: string; note?: string; value?: number; statutoryValue?: number; currency?: string; of?: string; per?: string; level?: string; orAmount?: { value: number; currency?: string } };
   type Eintrag = {
     penaltyMaxEur?: number;
     penaltyCeiling?: Obergrenze;
@@ -567,13 +567,20 @@ describe('Belegte Obergrenze', () => {
   // nur die Ebene nicht. Wo der basis-String den Verweis nennt, rechnet der
   // Test die Multiplikation nach, statt sie zu glauben.
   it('rechnet den Fuenffach-Verweis auf Code penal Art. 131-38 nach', () => {
+    // Las den Sockel frueher aus dem basis-String. Das hielt genau so lange,
+    // bis die Prosa aus `basis` in `basisNote` umzog — dann stand dort keine
+    // Zahl mehr und der Test wurde rot. Er hatte recht: eine Rechengroesse
+    // gehoert in ein Feld. Seither `statutoryValue`.
     let geprueft = 0;
     for (const [k, e] of alle()) {
       const c = e.penaltyCeiling;
       if (!c?.basis || !/131-38/.test(c.basis)) continue;
-      const m = c.basis.match(/([\d.]+)\s*EUR/);
-      expect(m, `${k}: Verweis auf 131-38, aber kein Ausgangsbetrag im basis-String`).toBeTruthy();
-      const sockel = Number(String(m?.[1]).replace(/\./g, ''));
+      expect(
+        c.statutoryValue,
+        `${k}: Verweis auf 131-38, aber kein statutoryValue — der Sockel, `
+          + 'den der Sanktionsartikel selbst nennt, fehlt.',
+      ).toBeTypeOf('number');
+      const sockel = c.statutoryValue as number;
       expect(
         c.value,
         `${k}: ${sockel} EUR verfuenffacht sind ${sockel * 5}, gefuehrt wird ${c.value}. `
