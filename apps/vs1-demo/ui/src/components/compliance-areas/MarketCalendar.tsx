@@ -5,6 +5,7 @@ import { DOMAIN_BY_SLUG } from '../../lib/domains';
 import { useInViewOnce } from '../../lib/useInViewOnce';
 import { AreaSectionHeading, useAreaEyebrows } from './AreaSectionHeading';
 import type { MarketProfile } from '../../lib/marketProfiles';
+import { belegLage } from '../../lib/penaltyCeiling';
 
 interface Props {
   profile: MarketProfile;
@@ -74,6 +75,11 @@ export function MarketCalendar({ profile }: Props) {
             })}
           </Typography>
         )}
+        {/* Zweiter Satz statt eines laengeren ersten: der Befund und der
+            Vorbehalt sagen Verschiedenes, und jede Sprache kann beide
+            eigenstaendig bauen. In einen Satz gefaltet wuerde das auf
+            Tuerkisch unlesbar. */}
+        <BelegSatz profile={profile} />
       </div>
 
       <div className="min-w-0 flex-1">
@@ -166,5 +172,40 @@ export function MarketCalendar({ profile }: Props) {
         </ol>
       </div>
     </div>
+  );
+}
+
+/** Wie belastbar die beiden Zahlen darueber sind.
+ *
+ *  Steht nur, wo es etwas zu sagen gibt: sind alle Betraege gesetzlich in
+ *  Euro genannt, schweigt die Zeile. */
+function BelegSatz({ profile }: { profile: MarketProfile }) {
+  const { t } = useTranslation('common');
+  const l = belegLage(profile.obligations);
+  const teile: string[] = [];
+  if (l.umgerechnet > 0) {
+    teile.push(t('markets.country.exposureConverted', {
+      defaultValue: '{{count}} of them are converted from another currency',
+      count: l.umgerechnet,
+    }));
+  }
+  if (l.ohneBetrag + l.unbelegt > 0) {
+    teile.push(t('markets.country.exposureUnbacked', {
+      defaultValue: '{{count}} of {{total}} duties carry no amount stated in law',
+      count: l.ohneBetrag + l.unbelegt,
+      total: l.gesamt,
+    }));
+  }
+  if (teile.length === 0) return null;
+  return (
+    <Typography
+      variant="caption"
+      className="mt-2 block text-body-xs normal-case leading-relaxed tracking-normal text-fg-tertiary"
+    >
+      {t('markets.country.exposureCaveat', {
+        defaultValue: 'A caveat on those figures: {{what}}.',
+        what: teile.join(t('markets.country.exposureAnd', ', and ')),
+      })}
+    </Typography>
   );
 }

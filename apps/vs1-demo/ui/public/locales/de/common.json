@@ -382,7 +382,8 @@
         "risk": "Risiko",
         "time": "Handlungsfrist",
         "fine": "Typische Exposition",
-        "markets": "Aktive Märkte"
+        "markets": "Aktive Märkte",
+        "proven": "belegt"
       },
       "upTo": "bis zu {{sum}}",
       "marketsCount": "{{count}} von {{total}}"
@@ -814,7 +815,10 @@
         "ofTotal": "{{count}} von {{total}}",
         "laterLabel": "greifen erst später",
         "fromDate": "{{count}} ab {{date}}",
-        "nationalIn": "{{count}} mit Rechtsgrundlage in {{market}}"
+        "nationalIn": "{{count}} mit Rechtsgrundlage in {{market}}",
+        "exposureProven": "Belegte Sanktionssumme",
+        "exposureNoneProven": "Keine der {{total}} Pflichten nennt im Gesetz einen Betrag — die Sanktionen sind anteilig, je Einheit oder den Mitgliedstaaten überlassen.",
+        "exposureProvenNote": "{{proven}} von {{total}} Pflichten nennen im Gesetz einen Betrag. Die übrigen zählen mit null, sie werden nicht geschätzt."
       },
       "risk": {
         "title": "Risikoprofil",
@@ -1333,7 +1337,11 @@
       "relatedAreasFact_other": "{{count}} Pflichten in diesem Markt",
       "weightsFootCovered": "Eigene Quellen in {{covered}} von {{total}} Bereichen — EU-Verordnungen gelten unmittelbar und zählen nicht als Lücke.",
       "weightsFootPending": "Bei {{list}} existiert ein nationaler Text, den wir noch nicht führen — dort steht das benannte EU-Instrument.",
-      "weightsFootNone": "Für {{list}} führen wir noch keine benannte Quelle."
+      "weightsFootNone": "Für {{list}} führen wir noch keine benannte Quelle.",
+      "exposureCaveat": "Ein Vorbehalt zu diesen Zahlen: {{what}}.",
+      "exposureConverted": "{{count}} davon sind aus einer anderen Währung umgerechnet",
+      "exposureUnbacked": "{{count}} von {{total}} Pflichten führen keinen im Gesetz genannten Betrag",
+      "exposureAnd": ", und "
     },
     "cta": {
       "title": "Sehen, welche davon für Sie gelten.",

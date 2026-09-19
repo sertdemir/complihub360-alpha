@@ -340,12 +340,26 @@ describe('Belegte Obergrenze', () => {
     // Solange die vier Flaechen `penaltyMaxEur` lesen und die Obergrenze
     // daneben steht, duerfen die beiden sich nicht widersprechen. Gilt nur fuer
     // EUR — bei GBP/USD/TRY ist der Unterschied ja gerade der Punkt.
+    // Prueft seit dem 19.09. auch `turnover` MIT `orAmount` — dieselbe
+    // Unterscheidung, die `nenntBetrag` schon kennt. Solange sie hier fehlte,
+    // fuehrten drei EU-Eintraege 100.000 EUR, wo die DSGVO 20 Millionen nennt;
+    // die beiden britischen Pendants derselben Form waren laengst angeglichen.
+    // Eine Unterscheidung, die an einer Stelle richtig steht, muss ueberall
+    // gleich lauten, sonst haelt sie nur dort.
+    const euroBetrag = (c: Obergrenze): number | undefined =>
+      c.kind === 'amount' && c.currency === 'EUR'
+        ? c.value
+        : c.kind === 'turnover' && c.orAmount?.currency === 'EUR'
+          ? c.orAmount.value
+          : undefined;
     const ab = alle().filter(([, e]) => {
       const c = e.penaltyCeiling;
-      return c?.kind === 'amount' && c.currency === 'EUR' && e.penaltyMaxEur !== c.value;
+      if (!c) return false;
+      const b = euroBetrag(c);
+      return b != null && e.penaltyMaxEur !== b;
     });
     expect(
-      ab.map(([k, e]) => `${k}: Zahl ${e.penaltyMaxEur} vs. Obergrenze ${e.penaltyCeiling?.value}`),
+      ab.map(([k, e]) => `${k}: Zahl ${e.penaltyMaxEur} vs. Obergrenze ${euroBetrag(e.penaltyCeiling as Obergrenze)}`),
       'Belegter Eurobetrag und angezeigte Zahl gehen auseinander',
     ).toEqual([]);
   });

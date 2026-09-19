@@ -382,7 +382,8 @@
         "risk": "Risk",
         "time": "Harekete Geçme Süresi",
         "fine": "Tipik Risk Tutarı",
-        "markets": "Aktif Pazarlar"
+        "markets": "Aktif Pazarlar",
+        "proven": "belgelenmiş"
       },
       "upTo": "{{sum}} kadar",
       "marketsCount": "{{total}} pazarın {{count}} tanesi"
@@ -814,7 +815,10 @@
         "ofTotal": "{{total}} yükümlülükten {{count}}",
         "laterLabel": "daha sonra geçerli oluyor",
         "fromDate": "{{date}} tarihinden itibaren {{count}}",
-        "nationalIn": "{{market}} yasal dayanağıyla {{count}}"
+        "nationalIn": "{{market}} yasal dayanağıyla {{count}}",
+        "exposureProven": "Belgelenmiş ceza tutarı",
+        "exposureNoneProven": "Buradaki {{total}} yükümlülükten hiçbiri kanunda bir tutar belirtmiyor — yaptırımlar oransal, birim başına ya da üye devletlere bırakılmış.",
+        "exposureProvenNote": "{{total}} yükümlülükten {{proven}} tanesi kanunda bir tutar belirtiyor. Diğerleri sıfır sayılıyor, tahmin edilmiyor."
       },
       "risk": {
         "title": "Risk profili",
@@ -1333,7 +1337,11 @@
       "relatedAreasFact_other": "Bu pazarda {{count}} yükümlülük",
       "weightsFootCovered": "{{total}} alandan {{covered}} tanesinde kendi kaynaklarımız var — AB tüzükleri doğrudan geçerlidir ve eksik sayılmaz.",
       "weightsFootPending": "{{list}} için henüz taşımadığımız bir ulusal metin mevcut — yerinde belirtilen AB aracı duruyor.",
-      "weightsFootNone": "{{list}} için henüz adlandırılmış bir kaynağımız yok."
+      "weightsFootNone": "{{list}} için henüz adlandırılmış bir kaynağımız yok.",
+      "exposureCaveat": "Bu rakamlara ilişkin bir çekince: {{what}}.",
+      "exposureConverted": "bunlardan {{count}} tanesi başka bir para biriminden çevrilmiştir",
+      "exposureUnbacked": "{{total}} yükümlülükten {{count}} tanesi kanunda belirtilmiş bir tutar taşımıyor",
+      "exposureAnd": " ve "
     },
     "cta": {
       "title": "Bunlardan hangilerinin size uyduğunu görün.",

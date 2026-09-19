@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { FX_STAND, ObligationEnrichmentMap, type PenaltyCeiling } from '@complihub/compliance-engine';
-import { ceilingBasis, ceilingInEuro, describeCeiling, provenance } from './penaltyCeiling';
+import { belegLage, ceilingBasis, ceilingInEuro, describeCeiling, provenance } from './penaltyCeiling';
 
 // Die Anzeige der belegten Obergrenze. Der Punkt dieser Tests ist NICHT, dass
 // Intl richtig formatiert — das tut es. Es geht darum, dass keine der acht
@@ -194,5 +194,61 @@ describe('Herkunft der Eurozahl', () => {
     // die niemand belegen kann — genau der Zustand, den wir abgeraeumt haben.
     expect(ceilingInEuro({ kind: 'unlimited', basis: 'LASPO 2012 s. 85', note: 'n' })).toBeNull();
     expect(ceilingInEuro({ kind: 'proportional', percent: 80, of: 'Steuer', basis: 'CGI 1728', asOf: '2026-01-01' })).toBeNull();
+  });
+});
+
+describe('Beleglage einer Liste', () => {
+  const amount = (v: number, w: 'EUR' | 'GBP') =>
+    ({ kind: 'amount', value: v, currency: w, basis: 'b 1', asOf: '2026-01-01' }) as const;
+
+  it('zaehlt jeden der vier Zustaende getrennt', () => {
+    const l = belegLage([
+      { penaltyMaxEur: 5000, penaltyCeiling: amount(5000, 'EUR') },
+      { penaltyMaxEur: 17466, penaltyCeiling: amount(15000, 'GBP') },
+      { penaltyMaxEur: 20000, penaltyCeiling: { kind: 'proportional', percent: 80, of: 'taxDue', basis: 'b 1', asOf: '2026-01-01' } },
+      { penaltyMaxEur: 50000 },
+    ]);
+    expect(l).toMatchObject({ gesetzlich: 1, umgerechnet: 1, ohneBetrag: 1, unbelegt: 1, gesamt: 4 });
+  });
+
+  it('summiert NUR, was das Gesetz als Betrag nennt', () => {
+    const l = belegLage([
+      { penaltyMaxEur: 5000, penaltyCeiling: amount(5000, 'EUR') },
+      // Anteilig: die 30.000 stehen in keinem Gesetz und duerfen die Summe
+      // nicht aufblaehen. Genau das war der Zustand, den die Kennzahl bisher
+      // anzeigte — bei Verpackung/Frankreich 530.000 EUR aus sieben Pflichten,
+      // von denen keine einzige einen Betrag nennt.
+      { penaltyMaxEur: 30000, penaltyCeiling: { kind: 'perUnit', value: 7500, currency: 'EUR', per: 'x', basis: 'b 1', asOf: '2026-01-01' } },
+      { penaltyMaxEur: 50000 },
+    ]);
+    expect(l.belegteSummeEur).toBe(5000);
+    expect(l.bestandSummeEur, 'der alte Wert bleibt zum Vergleich erhalten').toBe(85000);
+  });
+
+  it('zaehlt eine Umsatz-Obergrenze MIT Betrag als belegt', () => {
+    // Dieselbe Unterscheidung wie in `nenntBetrag` und in `provenance`. Sie
+    // hat heute schon zweimal an zwei Stellen verschieden gelautet; hier ist
+    // die dritte Stelle, an der sie gleich lauten muss.
+    const l = belegLage([
+      { penaltyMaxEur: 20000000, penaltyCeiling: { kind: 'turnover', percent: 4, orAmount: { value: 20000000, currency: 'EUR' }, basis: 'DSGVO Art. 83 Abs. 5', asOf: '2026-09-17' } },
+      { penaltyMaxEur: 1, penaltyCeiling: { kind: 'turnover', percent: 4, basis: 'b 1', asOf: '2026-01-01' } },
+    ]);
+    expect(l.gesetzlich).toBe(1);
+    expect(l.ohneBetrag).toBe(1);
+    expect(l.belegteSummeEur).toBe(20000000);
+  });
+
+  it('rechnet Fremdwaehrung am eingefrorenen Kurs in die Summe', () => {
+    const l = belegLage([{ penaltyMaxEur: 17466, penaltyCeiling: amount(15000, 'GBP') }]);
+    expect(l.belegteSummeEur, 'muss die Zahl des Eintrags treffen').toBe(17466);
+  });
+
+  it('haelt einen Betrag ohne Kurs aus der Summe heraus', () => {
+    // Die tuerkische Lira hat einen Kurs; ein Waehrungscode ohne Kurs waere
+    // der Fall, in dem `inEuro` null gibt. Dann lieber eine kleinere Summe
+    // als eine erfundene Zahl.
+    const l = belegLage([{ penaltyMaxEur: 999, penaltyCeiling: { kind: 'amount', value: 999, currency: 'XXX' as never, basis: 'b 1', asOf: '2026-01-01' } }]);
+    expect(l.belegteSummeEur).toBe(0);
+    expect(l.ohneBetrag).toBe(1);
   });
 });
