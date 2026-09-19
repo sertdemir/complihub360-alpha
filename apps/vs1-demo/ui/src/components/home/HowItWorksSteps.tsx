@@ -32,7 +32,7 @@ export function HowItWorksSteps() {
           <p className="text-body-lg leading-relaxed text-fg-secondary">{t('howItWorks.lead')}</p>
         </Reveal>
 
-        <Stagger className="mx-auto mt-14 grid max-w-[1080px] gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <Stagger className="mx-auto mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {Array.from({ length: STAGE_COUNT }, (_, i) => (
             <StaggerItem
               key={i}

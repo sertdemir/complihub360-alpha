@@ -112,7 +112,7 @@ export function TwoReflexes() {
           </p>
         </div>
 
-        <div className="mx-auto mt-16 flex max-w-[1080px] flex-col gap-16 lg:mt-20 lg:gap-24">
+        <div className="mx-auto mt-16 flex flex-col gap-16 lg:mt-20 lg:gap-24">
           <Row
             cardSide="left"
             card={

@@ -334,7 +334,7 @@ export function ContactPage() {
                 {t('contact.faq.title')}
               </h2>
             </Reveal>
-            <Reveal delay={0.1} className="mx-auto mt-9 max-w-[1120px] border-t border-stroke-subtle">
+            <Reveal delay={0.1} className="mx-auto mt-9 border-t border-stroke-subtle">
               <FaqList
                 items={FAQ_IDS.map((id) => ({
                   q: t(`contact.faq.items.${id}.q`),
@@ -342,7 +342,7 @@ export function ContactPage() {
                 }))}
               />
             </Reveal>
-            <Reveal delay={0.15} className="mx-auto mt-6 max-w-[1120px]">
+            <Reveal delay={0.15} className="mx-auto mt-6">
               <p className="text-body-2xs text-fg-tertiary">{t('contact.faq.note')}</p>
             </Reveal>
           </Container>

@@ -69,7 +69,7 @@ export function AboutPage() {
 
       <section className="bg-surface-secondary py-16 lg:py-20">
         <Container size="xl">
-          <Stagger className="mx-auto grid max-w-[1040px] gap-4 md:grid-cols-3">
+          <Stagger className="mx-auto grid gap-4 md:grid-cols-3">
             {PILLARS.map((key) => (
               <StaggerItem key={key}>
                 <div className="flex h-full flex-col rounded-xl border border-stroke-subtle bg-surface p-6">
