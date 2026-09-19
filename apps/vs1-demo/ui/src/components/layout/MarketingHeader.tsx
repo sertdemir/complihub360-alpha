@@ -107,11 +107,13 @@ export function MarketingHeader({
               fuer dasselbe Problem faehrt. Diese Leiste ist der ENGSTE Fall
               der ganzen Site, enger als die Navigation:
 
-                Breite   rechte Kante endet bei   Logo
-                1280     1280                      48 px (Bildmarke)
-                1440     1432                     170 px (Lockup mit Claim)
-                1440     1471  ueberlaeuft        230 px (Lockup ohne Claim)
-                1520     1492                     230 px
+              Alles im Browser an der rechten Kante nachgemessen, bei 1440:
+
+                Logo-Hoehe   Lockup    rechte Kante bei 1440
+                47 px        170 px    1432   (mit Claim, Stand vor 19.09.)
+                47 px        230 px    1471   laeuft 31 px ueber
+                38 px        186 px    passt erst ab 1520     <- heutiger Stand
+                36 px        177 px    passt bei 1440
 
               Mit Claim blieben bei 1440 genau 8 px Luft. Das war schon vor
               dem groesseren Wortzeichen zu wenig: ein laengeres Label oder
@@ -126,7 +128,7 @@ export function MarketingHeader({
               nicht als Token, weil es eine Eigenschaft dieser Leiste ist,
               nicht des Rasters. */}
           <span className="min-[1520px]:hidden">
-            <Logo lockup="symbol" tone={inverse ? 'on-petrol' : undefined} href={userHref} className="h-[47px]" />
+            <Logo lockup="symbol" tone={inverse ? 'on-petrol' : undefined} href={userHref} className="h-[38px]" />
           </span>
           <span className="hidden min-[1520px]:block">
             <Logo tone={inverse ? 'on-petrol' : undefined} href={userHref} />

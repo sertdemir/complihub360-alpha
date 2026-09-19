@@ -111,7 +111,7 @@ export function GlobalNav() {
               verschwinden lassen. Eine Schwelle fuer beide. Begruendung
               ausfuehrlich in MarketingHeader. */}
           <span className="min-[1520px]:hidden">
-            <Logo lockup="symbol" href={null} className="h-[47px]" />
+            <Logo lockup="symbol" href={null} className="h-[38px]" />
           </span>
           <span className="hidden min-[1520px]:block">
             <Logo lockup="horizontal" href={null} />

@@ -179,13 +179,13 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
       <Sidebar
         logo={
           <NavLink to={`${base}/dashboard`} className="flex items-center gap-2">
-            {/* 40 statt 47 px: die Sidebar ist w-60 (240 px), mit px-4 bleiben 208 px
-                Spur. Das Lockup ohne Claim ist bei 47 px 230 px breit und liefe
-                22 px ueber. Bei 40 px sind es 196 px — 12 px Reserve.
-                Die Bildmarke wird dadurch kleiner, das WORTZEICHEN aber groesser
-                als vorher: 20,7 px statt 16,1 px bei 47 px mit Claim. Genau das
-                war am Dashboard-Logo die Beschwerde. */}
-            <Logo lockup="horizontal" href={null} className="h-[40px] w-auto" />
+            {/* 32 statt 38 px: die Sidebar ist w-60 (240 px), mit px-4 bleiben 208 px
+                Spur. Bei 38 px waere das Lockup 186 px breit — es passt, aber
+                mit 22 px Rest sitzt es in der schmalen Spur zu eng. Bei 32 px
+                sind es 157 px, also 51 px Reserve.
+                Die Bildmarke wird dadurch kleiner, das WORTZEICHEN bleibt
+                groesser als vor dem Claim-Wegfall: 16,6 px statt 11,0 px. */}
+            <Logo lockup="horizontal" href={null} className="h-[32px] w-auto" />
           </NavLink>
         }
         footer={
