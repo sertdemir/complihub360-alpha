@@ -83,7 +83,7 @@ export function PartnerApplyPage() {
                     </p>
                     <h1 className="mt-4 font-serif text-[1.75rem] font-bold leading-[1.16] tracking-tight text-fg lg:text-[2.125rem]">
                         {t('partnerApply.titlePre')}
-                        <span className="text-accent-700 dark:text-fg-accent-strong">{t('partnerApply.titleGold')}</span>
+                        <span className="text-fg-accent-emphasis">{t('partnerApply.titleGold')}</span>
                         {t('partnerApply.titlePost')}
                     </h1>
 

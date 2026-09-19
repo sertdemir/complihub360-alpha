@@ -105,7 +105,7 @@ export function EntryDoor() {
                 <div className="flex max-w-xl flex-col items-center text-center">
                   <span className="text-body-2xs font-semibold uppercase tracking-[0.18em] text-primary-500">{t('entryDoor.eyebrow')}</span>
                   <h2 className="mt-4 font-serif text-[2rem] font-bold leading-[1.1] tracking-tight text-neutral-900 sm:text-[2.75rem] lg:text-[3rem]">
-                    {t('entryDoor.title.pre')}<span className="text-accent-900">{t('entryDoor.title.highlight')}</span>{t('entryDoor.title.post')}
+                    {t('entryDoor.title.pre')}<span className="text-fg-accent-emphasis">{t('entryDoor.title.highlight')}</span>{t('entryDoor.title.post')}
                   </h2>
                   <p className="mt-5 max-w-md text-body-md leading-relaxed text-neutral-700 sm:text-[17px]">
                     {t('entryDoor.subtitle')}

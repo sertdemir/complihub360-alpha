@@ -63,7 +63,7 @@ function DemoCard({ children }: { children: React.ReactNode }) {
 
 function SourceChip({ children }: { children: React.ReactNode }) {
   return (
-    <span className="whitespace-nowrap rounded-md border border-accent-500/45 bg-accent-500/10 px-1.5 py-px text-body-4xs font-semibold text-accent-700 dark:text-fg-accent-strong">
+    <span className="whitespace-nowrap rounded-md border border-accent-500/45 bg-accent-500/10 px-1.5 py-px text-body-4xs font-semibold text-fg-accent-strong">
       {children}
     </span>
   );

@@ -96,7 +96,7 @@ export function AreaAskBand({ slug, title }: Props) {
       </motion.div>
 
       <div className="min-w-0 flex-1">
-        <span className="text-body-3xs font-bold uppercase tracking-[0.14em] text-accent-700 dark:text-fg-accent-strong">
+        <span className="text-body-3xs font-bold uppercase tracking-[0.14em] text-fg-accent-strong">
           {t('compliance.area.askEyebrow', 'Your question')}
         </span>
         <h2 className="mt-3 font-serif text-[1.625rem] font-bold leading-tight text-fg">

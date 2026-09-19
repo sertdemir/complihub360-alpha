@@ -43,6 +43,14 @@
     --gold-900: 61 52 17;
     --gold-950: 26 22 7;
 
+    /* Marken-Gold — der Ton, den die Wortmarke in der "360" traegt (#C5913B),
+       plus seine dunkle Schwester im selben Farbton. Nutzer-Festlegung
+       2026-09-19: Gold, das als TEXT auftritt, traegt immer diesen Messington,
+       nie mehr die Olivstufen gold-700/800 der Skala. Die Skala selbst bleibt
+       unveraendert — sie bedient weiter Flaechen, Rahmen und Icons. */
+    --gold-brand: 197 145 59;      /* #C5913B — Logo "360" */
+    --gold-brand-deep: 140 103 42; /* #8C672A — gleicher Farbton, AA fuer Kleintext */
+
     /* Neutral — warm-leaning */
     --neutral-50: 250 250 250;
     --neutral-100: 244 244 245;
@@ -112,21 +120,31 @@
     --color-text-disabled: var(--neutral-400);
     --color-text-inverse: 255 255 255;
     --color-text-brand: var(--petrol-500);
-    --color-text-accent: var(--gold-500);
+    --color-text-accent: var(--gold-brand);
     /* Typographic gold emphasis (the one highlighted word in a serif headline).
-       gold-500 is 2.10:1 on white and gold-600 2.56:1 — both fail even the 3:1
-       AA-large threshold, so light surfaces step down to gold-700: 3.88:1 on
-       white, 3.69:1 on bg-secondary, 3.21:1 on the warm canvas. AA-LARGE ONLY —
-       never use this at body size, use --color-text-brand there. */
-    --color-text-accent-emphasis: var(--gold-700);
-    /* Gold at CAPTION size. --color-text-accent-emphasis is AA-LARGE only; a 10px
-       gold eyebrow on a light card needs the full 4.5:1 and gold-700 reaches
-       only 3.71. gold-800 measures 6.43 on bg-secondary. Use this wherever gold
-       has to carry small text; use -emphasis for the headline word. */
-    --color-text-accent-strong: var(--gold-800);
+       Traegt seit 2026-09-19 exakt das Logo-Gold der "360" (#C5913B) — in BEIDEN
+       Themes derselbe Wert, damit Wortmarke und Headline-Wort denselben Ton
+       zeigen. Davor stand hier gold-700 (#96802a): rechnerisch kontrastreicher
+       (3,88:1 auf Weiss), aber ein Oliv, das neben dem Logo blass wirkte.
+       Gemessen: 2,80:1 auf Weiss · 2,69:1 auf bg-secondary · 2,20:1 auf dem
+       Gold-Ende des Stage-Gradients · 5,23:1 auf der dunklen Karte. Auf hellem
+       Grund liegt das unter der 3:1-Schwelle fuer AA-large — bewusste
+       Marken-Entscheidung des Nutzers, kein Versehen. DISPLAY-GROESSE ONLY:
+       nie unter 24 px / 19 px bold, nie fuer Fliesstext (dort
+       --color-text-brand), nie fuer Kleintext (dort -accent-strong). */
+    --color-text-accent-emphasis: var(--gold-brand);
+    /* Gold at CAPTION size. --color-text-accent-emphasis ist Display-only; ein
+       10px-Eyebrow auf heller Karte schuldet die vollen 4,5:1, und das
+       Logo-Gold reicht dort nur 2,80. gold-brand-deep (#8C672A) ist derselbe
+       Farbton eine Stufe tiefer und misst 5,14:1 auf Weiss / 4,92:1 auf
+       bg-secondary / 4,55:1 auf dem Petrol-Ende des Stage-Gradients. Loest
+       gold-800 (#6a5b1e) ab, das AA zwar hielt, aber als Oliv-Braun aus der
+       Messing-Familie fiel. Ueberall nutzen, wo Gold Kleintext traegt. */
+    --color-text-accent-strong: var(--gold-brand-deep);
     /* Gold emphasis on the always-dark brand panel. Fixed in both themes on
-       purpose: --color-text-accent-emphasis steps down to gold-700 for light
-       surfaces, which on this deep petrol drops to 2.54:1.
+       purpose: --color-text-accent-emphasis traegt das Logo-Gold #C5913B, das
+       auf diesem tiefen Petrol nur 3,51:1 misst — genug fuer ein Display-Wort,
+       zu wenig fuer den 12-pt-Eyebrow, der hier steht.
        gold-300 rather than gold-500 because the panel carries a radial petrol
        glow that lifts its core to #04604e — gold-500 measures 4.68:1 on the
        base but only 3.58:1 under the glow, which fails the 12 pt eyebrow.
@@ -341,12 +359,15 @@
     --color-text-tertiary: 140 154 161;   /* #8c9aa1 */
     --color-text-inverse: 15 23 42;
     --color-text-brand: 44 192 173;
-    /* On slate the step-down is unnecessary and wrong: gold-500 is 6.98:1 on
-       #1f2937 and 8.49:1 on #0f172a, so dark surfaces keep the full gold. */
-    --color-text-accent-emphasis: var(--gold-500);
-    /* Dark inverts the problem: gold-800 drops to 2.66 on the dark card while
-       gold-500 holds 8.49, so the strong stop and the emphasis stop coincide. */
-    --color-text-accent-strong: var(--gold-500);
+    /* Dark haelt denselben Logo-Ton wie Light — ein Gold im Text, egal welches
+       Theme. #C5913B misst 5,23:1 auf #1f2937 und 6,37:1 auf #0f172a, traegt
+       die Headline also mit Reserve. (Davor gold-500, 6,98 / 8,49 — heller,
+       aber eben nicht die Farbe der Wortmarke.) */
+    --color-text-accent-emphasis: var(--gold-brand);
+    /* Dark inverts the problem: gold-brand-deep faellt auf 2,86 auf der dunklen
+       Karte, waehrend das Logo-Gold 5,23 haelt — der Strong-Stop und der
+       Emphasis-Stop fallen hier also zusammen. */
+    --color-text-accent-strong: var(--gold-brand);
     --color-border-default: 55 65 81;
     --color-border-subtle: 42 51 64;
     --color-border-focus: 20 168 154;

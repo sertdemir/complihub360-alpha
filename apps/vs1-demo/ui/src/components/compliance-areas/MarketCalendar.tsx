@@ -115,7 +115,7 @@ export function MarketCalendar({ profile }: Props) {
                   count: group.items.length,
                 })}
                 {i === 0 && profile.byCadence.length > 1 && (
-                  <span className="ml-2 normal-case tracking-[0.08em] text-accent-700 dark:text-fg-accent-strong">
+                  <span className="ml-2 normal-case tracking-[0.08em] text-fg-accent-strong">
                     {t('markets.country.cadenceHot', 'Highest cadence load')}
                   </span>
                 )}
