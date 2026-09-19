@@ -431,7 +431,7 @@ export function AnimatedWizard({
           <Logo
             lockup="horizontal"
             href={sp ? `/${i18n.resolvedLanguage || 'en'}` : null}
-            className={sp ? 'h-[47px]' : 'h-7'}
+            className={sp ? 'h-[38px]' : 'h-7'}
           />
           {sp && (
             <div className="pointer-events-none absolute left-1/2 -translate-x-1/2">

@@ -47,7 +47,7 @@ interface Palette {
   swoosh: string | null;
   /**
    * Eigene Farbe für die Claim-Zeile. Sie ist die einzige echte TEXT-Fläche im
-   * Logo — 17,5 % der Logo-Höhe, also 6 px bei h-9 und 8 px bei h-[47px]. Das
+   * Logo — 17,5 % der Logo-Höhe, also 6,3 px bei h-9 und 6,6 px bei h-[38px]. Das
    * Marken-Gold #C5913B trägt sie nicht: 2,80:1 auf Weiß und 3,51:1 auf
    * Petrol, beides unter den 4,5:1, die kleiner Text braucht. Ein einziger Ton
    * schafft beide Gründe nicht, darum hängt er am Tone.
@@ -88,24 +88,28 @@ const GAP_H = 3;
 const GAP_V = 8;
 /**
  * Um diesen Faktor wächst das Wortzeichen, wenn der Claim wegfällt: es füllt
- * exakt die frei werdende Höhe, 13,7 → 20,701. Bei 47 px Logo-Höhe wächst es
- * damit von 16,1 auf 24,3 px.
+ * exakt die frei werdende Höhe, 13,7 → 20,701. Bei den 38 px, die jede echte
+ * Platzierung fährt, wächst das Wortzeichen damit von 13,0 auf 19,7 px.
  *
  * Das kostet Breite, denn es skaliert proportional mit: das Lockup geht von
- * 170 auf 230 px. Nachgemessen, welche Fensterbreite die beiden Kopfzeilen
- * dafür brauchen:
+ * 137 auf 186 px (bei 38 px Höhe).
  *
- *              volles Lockup passt ab      Reserve bei 1440
- *   GlobalNav            ~1451 px           51 px  (Nav-Inhalt 806 / Platz 857)
- *   MarketingHeader      ~1492 px            8 px  <- der enge Fall
+ * DAS KOSTET BREITE, und die Startseite ist dabei die Grenze, nicht die
+ * Navigation. Im Browser nachgemessen, jeweils die rechte Kante des
+ * MarketingHeader bei 1440:
  *
- * Die Startseite ist die Grenze, nicht die Navigation. Ihre Leiste hatte auch
- * VOR dieser Änderung nur 8 px Luft bei 1440 — ein längeres Label oder eine
- * andere Locale hätte sie ebenso gesprengt.
+ *   Logo-Höhe   Lockup    rechte Kante bei 1440
+ *   47 px       230 px    1471  — laeuft 31 px ueber
+ *   38 px       186 px    passt erst ab 1520
+ *   36 px       177 px    passt bei 1440
  *
- * Deshalb wandert der Umschaltpunkt Bildmarke → volles Lockup von 1440 auf
- * 1520 (siehe MarketingHeader und GlobalNav). Bis dahin trägt die Leiste nur
- * die Bildmarke — dieselbe Regel, die unter 1280 längst gilt.
+ * Deshalb steht der Umschaltpunkt Bildmarke → volles Lockup bei 1520 und
+ * nicht bei 1440 (siehe MarketingHeader und GlobalNav). Bis dahin trägt die
+ * Leiste nur die Bildmarke — dieselbe Regel, die unter 1280 längst gilt.
+ *
+ * Bei 36 px statt 38 käme das Wortzeichen schon bei 1440 zurück und der
+ * Sonderfall min-[1520px] könnte entfallen. Gemessen, nicht umgesetzt:
+ * die 38 px sind eine Nutzer-Entscheidung (Logo −20 %, 2026-09-19).
  */
 const WORD_SCALE = WORD_H / WORD_TEXT_H;
 
@@ -131,7 +135,7 @@ function boxFor(lockup: LogoLockup, claim: boolean): { w: number; h: number } {
 
 /** Default-Höhe je Lockup, wenn der Aufrufer keine Klasse mitgibt. */
 const DEFAULT_H: Record<LogoLockup, string> = {
-  horizontal: 'h-[47px]',
+  horizontal: 'h-[38px]',
   stacked: 'h-16',
   symbol: 'h-8',
   wortmarke: 'h-5',
@@ -198,7 +202,7 @@ export interface LogoProps {
    * Figma-Property "Claim" (Ohne · Mit).
    *
    * DEFAULT IST OHNE — und das ist eine Messung, keine Geschmacksfrage: der
-   * Claim ist 17 % der Logo-Höhe, also 8 px bei den 47 px, die JEDE echte
+   * Claim ist 17 % der Logo-Höhe, also 6,6 px bei den 38 px, die JEDE echte
    * Platzierung fährt (Header, Footer, Auth-Seiten, Shells). Bei 8 px ist er
    * nicht lesbar, egal in welcher Farbe — die Kontrastkorrektur auf accent/800
    * hat das Problem gemildert, nicht gelöst. Statt einer unlesbaren Zeile

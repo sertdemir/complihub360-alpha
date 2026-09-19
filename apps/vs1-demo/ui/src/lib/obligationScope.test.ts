@@ -239,7 +239,8 @@ describe('Belegte Obergrenze', () => {
   // federalregister.gov) — alle am Primaertext gelesen. Von den acht
   // amerikanischen sind drei `subnational`: dort setzt der Bund nichts.
   // Dazu `US/data-hosting`: der EU-US-Datenschutzrahmen kennt keine eigene Busse.
-  const OHNE_OBERGRENZE_STAND = 29;
+  // Seit 19.09. ausserdem 7 italienische (normattiva.it, ueber den Browser).
+  const OHNE_OBERGRENZE_STAND = 22;
   // Eintraege, deren Obergrenze GAR KEINEN absoluten Betrag nennt — delegiert,
   // "es gibt keine Geldbusse", rein umsatz- oder steueranteilig — und die
   // trotzdem eine Eurozahl fuehren. Das ist der Widerspruch in Reinform: das
@@ -255,6 +256,8 @@ describe('Belegte Obergrenze', () => {
     'DE/legal-commercial-contracts', // keine Geldbusse, nur zivilrechtliche Folge
     'DE/legal-consumer-terms', // 4 % Jahresumsatz, UWG § 19
     'ES/tax-corporate', // 150 % der Steuerschuld, LGT Art. 191
+    'IT/tax-corporate', // 120 % der Steuer, TU 173/2024 Art. 27
+    'IT/tax-vat-registration', // 120 % der Steuer, TU 173/2024 Art. 30
     'ES/tax-vat-registration', // 150 % der Steuerschuld, LGT Art. 191
     'UK/log-eori', // keine Geldbusse; EORI fehlt im Anhang zu SI 2003/3113
     'US/corp-registration', // Landesrecht, 50 Staaten
@@ -285,7 +288,11 @@ describe('Belegte Obergrenze', () => {
   ]);
 
   type Obergrenze = { kind: string; basis?: string; asOf?: string; note?: string; value?: number; currency?: string; of?: string; level?: string; orAmount?: { value: number; currency?: string } };
-  type Eintrag = { penaltyMaxEur?: number; penaltyCeiling?: Obergrenze };
+  type Eintrag = {
+    penaltyMaxEur?: number;
+    penaltyCeiling?: Obergrenze;
+    states?: Record<string, { source?: string; penaltyCeiling?: Obergrenze }>;
+  };
   /** Nennt diese Obergrenze einen absoluten Betrag? */
   const nenntBetrag = (c: Obergrenze): boolean =>
     c.kind === 'amount' || (c.kind === 'turnover' && !!c.orAmount);
@@ -408,6 +415,56 @@ describe('Belegte Obergrenze', () => {
             + 'nicht die Pflicht geaendert — entweder nachziehen oder aus NATIONALE_BUSSE_ZUM_EU_AKT streichen.',
         ).toBe(eu?.[feld]);
       }
+    }
+  });
+
+  // Gliedstaaten, deren Gesetzestext wir NICHT erreichen. Das ist eine Aussage
+  // ueber das Portal, nicht ueber das Recht: beide Staaten haben ein
+  // Datenschutzgesetz, wir kommen nur nicht an den Wortlaut.
+  //
+  // Wieder eine namentliche Liste statt einer Zahl (siehe OHNE_BETRAG_BEKANNT):
+  // sie darf nur schrumpfen, und wenn ein Portal zugaenglich wird, faellt es
+  // im Review auf, weil eine Zeile verschwindet — nicht nur eine Ziffer.
+  const STAATEN_OHNE_ZUGANG: Record<string, string> = {
+    TX: 'statutes.capitol.texas.gov liefert jede URL als dieselbe Geruestseite; '
+      + 'der Gesetzestext wird per JavaScript nachgeladen und kommt nicht an. '
+      + 'capitol.texas.gov und lrl.texas.gov stehen nicht auf der Allowlist.',
+    NY: 'www.nysenate.gov steht hinter einer Cloudflare-Bot-Schranke (403). '
+      + 'Das ist eine Entscheidung des Betreibers, keine Zugangsluecke.',
+  };
+  const GEFUEHRTE_STAATEN = ['CA', 'FL', 'NY', 'TX'];
+
+  it('haelt die Gliedstaaten an derselben Beweispflicht wie die Laender', () => {
+    for (const [k, e] of alle()) {
+      if (!e.states) continue;
+      // Staatszahlen gibt es nur, wo der Bund nichts setzt. Stuende daneben
+      // eine Bundesobergrenze, waere unklar, welche von beiden gilt.
+      expect(
+        e.penaltyCeiling?.kind,
+        `${k}: states gesetzt, aber die Obergrenze ist nicht 'subnational'`,
+      ).toBe('subnational');
+      for (const [staat, eintrag] of Object.entries(e.states)) {
+        expect(GEFUEHRTE_STAATEN, `${k}/${staat}: kein gefuehrter Staat`).toContain(staat);
+        expect(
+          STAATEN_OHNE_ZUGANG[staat],
+          `${k}/${staat}: Eintrag da, aber der Staat steht noch in STAATEN_OHNE_ZUGANG`,
+        ).toBeUndefined();
+        const c = eintrag.penaltyCeiling;
+        expect(c, `${k}/${staat}: keine Obergrenze`).toBeTruthy();
+        expect(eintrag.source, `${k}/${staat}: keine Vorschrift genannt`).toMatch(/\d/);
+        expect(c?.basis, `${k}/${staat}: "${c?.basis}" nennt keine Vorschrift`).toMatch(/\d/);
+        expect(c?.asOf, `${k}/${staat}: Stand fehlt oder ist kein Datum`)
+          .toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      }
+    }
+  });
+
+  it('laesst die Liste der unerreichbaren Staaten nur schrumpfen', () => {
+    // Zwei von vier. Wird einer zugaenglich, faellt hier eine Zeile weg — und
+    // der Test verlangt dann, dass die Zahlen auch wirklich nachgetragen sind.
+    expect(Object.keys(STAATEN_OHNE_ZUGANG).sort()).toEqual(['NY', 'TX']);
+    for (const [staat, grund] of Object.entries(STAATEN_OHNE_ZUGANG)) {
+      expect(grund.length, `${staat}: Grund zu duenn`).toBeGreaterThan(60);
     }
   });
 

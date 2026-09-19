@@ -48,6 +48,20 @@ export type PenaltyCeiling =
      *  "steht woanders" keine Auskunft. */
     | { kind: 'subnational'; level: string; basis: string; note: string };
 
+/** Die US-Gliedstaaten, fuer die das Produkt eigene Zahlen fuehrt.
+ *  Bewusst KEINE Erweiterung von `CountryCode`: dort haengen Marktgewichte,
+ *  EU-Mitgliedschaft und der Generator dran, und ein Gliedstaat ist kein Markt
+ *  im Sinne dieser Liste. */
+export type UsState = 'CA' | 'TX' | 'NY' | 'FL';
+
+/** Die Aufloesung zu `penaltyCeiling.kind === 'subnational'`: was der einzelne
+ *  Gliedstaat vorsieht, mit seiner eigenen Vorschrift. Der Bund hat hier keine. */
+export interface SubnationalCeiling {
+    /** Die Vorschrift DIESES Staates, nicht die des Bundes. */
+    source: string;
+    penaltyCeiling: PenaltyCeiling;
+}
+
 export interface ObligationEnrichment {
     /** Primary legal source, e.g. 'UStG §18i (OSS)'. */
     source: string;
@@ -81,6 +95,15 @@ export interface ObligationEnrichment {
      *  neuen Pflicht. Den lebenden Stand fuehrt der Waechter in
      *  `obligationScope.test.ts` — dort steht, wie viele noch unbelegt sind. */
     penaltyCeiling?: PenaltyCeiling;
+    /** Nur wo `penaltyCeiling.kind === 'subnational'` steht: je gefuehrtem
+     *  Gliedstaat der belegte Betrag. Die Karte bleibt nach Laendern
+     *  geschluesselt; dieses Feld haengt die Ebene darunter ein, ohne dass
+     *  Generator, Marktprofile oder Risikomatrix etwas davon wissen muessen.
+     *
+     *  Unvollstaendig zu sein ist hier der Normalfall und kein Mangel: nicht
+     *  jeder Staat stellt seinen Gesetzestext maschinell bereit. Welche fehlen
+     *  und warum, fuehrt der Waechter in `obligationScope.test.ts`. */
+    states?: Partial<Record<UsState, SubnationalCeiling>>;
     /** Cadence label: 'Quarterly' | 'Annual' | 'Monthly' | 'Ongoing' | 'One-off'. */
     due: string;
     /** Typical days until the next deadline; drives the median-deadline stat. */
@@ -125,7 +148,7 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
         DE: { source: 'UStG §18 / §18i (OSS)', penalty: 'late-filing surcharge up to 10%, max €25,000', penaltyMaxEur: 25000, due: 'Quarterly', dueDays: 30, penaltyCeiling: { kind: 'amount', value: 25000, currency: 'EUR', basis: 'AO § 152 Abs. 10 (Verspaetungszuschlag, Hoechstbetrag)', asOf: '2026-09-17' } },
         UK: { source: 'UK VATA 1994 §3', penalty: 'bis zu 100% der entgangenen Steuer', penaltyMaxEur: 23000, due: 'Quarterly', dueDays: 30, penaltyCeiling: { kind: 'proportional', percent: 100, of: 'potential lost revenue (entgangene Umsatzsteuer)', basis: 'FA 2008 Sch. 41 Abs. 6 Nr. 2 Buchst. a i.V.m. Abs. 1 (Tabelle, VAT: Sch. 1 VATA 1994; Kategorie 1, vorsaetzlich und verschleiert)', asOf: '2026-09-19' } },
         FR: { source: 'CGI Art. 256 / 287', penalty: '10–40% surcharge on VAT due', penaltyMaxEur: 20000, due: 'Monthly', dueDays: 24 },
-        IT: { source: 'DPR 633/1972 Art. 35', penalty: '120–240% of unpaid VAT', penaltyMaxEur: 30000, due: 'Quarterly', dueDays: 30 },
+        IT: { source: 'Testo unico IVA (D.Lgs. 10/2026), vorher DPR 633/1972 Art. 35', penalty: '120% der geschuldeten Steuer, mind. EUR 250', penaltyMaxEur: 30000, due: 'Quarterly', dueDays: 30, penaltyCeiling: { kind: 'proportional', percent: 120, of: 'geschuldete Mehrwertsteuer (tributo dovuto)', basis: 'Testo unico delle sanzioni tributarie (D.Lgs. 173/2024) Art. 30 Abs. 1 — omessa dichiarazione, Mindestbetrag 250 EUR; bei blosser Unrichtigkeit 70 % nach Abs. 5. Die frueheren 120 bis 240 % aus D.Lgs. 471/1997 Art. 5 gibt es nicht mehr: die Reform 2024 hat Bandbreiten durch feste Saetze ersetzt.', asOf: '2026-09-19' } },
         ES: { source: 'Ley 37/1992 (IVA) Art. 164', penalty: '50–150% of unpaid VAT', penaltyMaxEur: 25000, due: 'Quarterly', dueDays: 30, penaltyCeiling: { kind: 'proportional', percent: 150, of: 'nicht abgefuehrte Steuerschuld', basis: 'LGT (Ley 58/2003) Art. 191 Abs. 4 (infraccion muy grave: 100 bis 150 %)', asOf: '2026-09-17' } },
         NL: { source: 'Wet OB 1968 Art. 14', penalty: 'up to €6,709 per late payment', penaltyMaxEur: 6709, due: 'Quarterly', dueDays: 30, penaltyCeiling: { kind: 'amount', value: 6709, currency: 'EUR', basis: 'AWR Art. 67c Abs. 1 (Zahlungsversaeumnis; bei Vorsatz stattdessen 100 % der Steuer nach Art. 67f)', asOf: '2026-09-17' } },
         TR: { source: 'KDV Kanunu No. 3065', penalty: 'tax-loss fine: 1× the unpaid KDV', penaltyMaxEur: 15000, due: 'Monthly', dueDays: 26 },
@@ -136,7 +159,7 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
         DE: { source: 'KStG §7 / AO §149', penalty: 'late surcharge 0.25%/month of assessed tax', penaltyMaxEur: 25000, due: 'Annual', dueDays: 120, penaltyCeiling: { kind: 'amount', value: 25000, currency: 'EUR', basis: 'AO § 152 Abs. 10 (Verspaetungszuschlag, Hoechstbetrag)', asOf: '2026-09-17' } },
         UK: { source: 'CTA 2010 / HMRC CT600', penalty: '£200–£2,000 fest + bis zu 20% der offenen Steuer', penaltyMaxEur: 5000, due: 'Annual', dueDays: 120, penaltyCeiling: { kind: 'proportional', percent: 20, of: 'offene Koerperschaftsteuer (unpaid tax)', basis: 'FA 1998 Sch. 18 Abs. 18 Nr. 2 Buchst. b (ueber zwei Jahre verspaetet); dazu der Festbetrag nach Abs. 17 Nr. 2 und 3: 200/400, im dritten Wiederholungsfall 1.000/2.000 GBP (Betraege i.d.F. FA 2026 s. 265)', asOf: '2026-09-19' } },
         FR: { source: 'CGI Art. 205 (impôt sur les sociétés)', penalty: '10–40% majoration + intérêts de retard', penaltyMaxEur: 12000, due: 'Annual', dueDays: 105 },
-        IT: { source: 'TUIR DPR 917/1986 (IRES)', penalty: '90–180% dell’imposta non versata', penaltyMaxEur: 20000, due: 'Annual', dueDays: 120 },
+        IT: { source: 'TUIR DPR 917/1986 (IRES)', penalty: '120% bei unterlassener, 70% bei unrichtiger Erklaerung', penaltyMaxEur: 20000, due: 'Annual', dueDays: 120, penaltyCeiling: { kind: 'proportional', percent: 120, of: 'geschuldete Ertragsteuer (IRES und IRAP)', basis: 'Testo unico delle sanzioni tributarie (D.Lgs. 173/2024) Art. 27 Abs. 1 — omessa dichiarazione, Mindestbetrag 250 EUR; bei unrichtiger Erklaerung 70 % nach Abs. 3. Die frueheren 90 bis 180 % aus D.Lgs. 471/1997 Art. 1 sind mit dessen Aufhebung entfallen.', asOf: '2026-09-19' } },
         ES: { source: 'Ley 27/2014 (Impuesto sobre Sociedades)', penalty: '50–150% de la cuota + recargos', penaltyMaxEur: 15000, due: 'Annual', dueDays: 115, penaltyCeiling: { kind: 'proportional', percent: 150, of: 'nicht abgefuehrte Steuerschuld', basis: 'LGT (Ley 58/2003) Art. 191 Abs. 4 (infraccion muy grave: 100 bis 150 %)', asOf: '2026-09-17' } },
         NL: { source: 'Wet Vpb 1969 (vennootschapsbelasting)', penalty: 'verzuim-/vergrijpboete tot 100%', penaltyMaxEur: 6709, due: 'Annual', dueDays: 150, penaltyCeiling: { kind: 'amount', value: 6709, currency: 'EUR', basis: 'AWR Art. 67a Abs. 1 (Erklaerungsversaeumnis bei Veranlagungssteuern)', asOf: '2026-09-17' } },
         US: { source: 'IRC §11 / state franchise tax', penalty: '5%/month of unpaid tax, max 25%', penaltyMaxEur: 15000, due: 'Annual', dueDays: 105, penaltyCeiling: { kind: 'proportional', percent: 25, of: 'die auf der Erklaerung auszuweisende Steuer (tax required to be shown)', basis: '26 CFR § 301.6651-1 Buchst. a Nr. 1 (5 % je angefangenem Monat, hoechstens 25 % insgesamt)', asOf: '2026-09-19' } },
@@ -147,7 +170,7 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
         FR: { source: 'Code env. Art. L541-10 (AGEC)', penalty: 'up to €30,000 per year of default', penaltyMaxEur: 30000, due: 'Annual', dueDays: 60 },
         UK: { source: 'UK Packaging Waste Regs 2023 §7 (PackUK)', penalty: 'unbegrenzte Geldstrafe; Festbetragsstrafe £1.000', penaltyMaxEur: 50000, due: 'Annual', dueDays: 90, penaltyCeiling: { kind: 'unlimited', basis: 'SI 2024/1332 Reg. 119 Buchst. a und b Nr. i (Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024)', note: 'Auf Anklage und in England und Wales auch im abgekuerzten Verfahren "by a fine" — ohne Hoechstbetrag. Die variable Verwaltungsstrafe ist nach Sch. 13 Abs. 10 Nr. 2 auf das Hoechstmass dieser Geldstrafe begrenzt, das es nicht gibt; nur die Festbetragsstrafe nennt eine Zahl (1.000 GBP, Sch. 13 Abs. 2 Nr. 1).' } },
         ES: { source: 'RD 1055/2022 (Envases) / Ley 7/2022', penalty: 'up to €3,500,000 (infraccion muy grave)', penaltyMaxEur: 3500000, due: 'Annual', dueDays: 60, penaltyCeiling: { kind: 'amount', value: 3500000, currency: 'EUR', basis: 'Ley 7/2022 Art. 109 Abs. 1 Buchst. a Nr. 1 (infraccion muy grave)', asOf: '2026-09-17' } },
-        IT: { source: 'D.Lgs. 152/2006 (CONAI)', penalty: 'up to €60,000', penaltyMaxEur: 60000, due: 'Annual', dueDays: 60 },
+        IT: { source: 'D.Lgs. 152/2006 (CONAI)', penalty: 'EUR 15.500 bis 46.500', penaltyMaxEur: 46500, due: 'Annual', dueDays: 60, penaltyCeiling: { kind: 'amount', value: 46500, currency: 'EUR', basis: 'D.Lgs. 152/2006 Art. 261 Abs. 2 (kein eigenes System und kein Beitritt zu einem Konsortium nach Art. 223)', asOf: '2026-09-19' } },
         NL: { source: 'Besluit beheer verpakkingen (Afvalfonds)', penalty: 'recovery + administrative fines', penaltyMaxEur: 25000, due: 'Annual', dueDays: 60 },
         default: { source: 'EU PPWR 2025/40', penalty: 'national EPR fines + sales ban', penaltyMaxEur: 50000, due: 'Annual', dueDays: 60, scope: 'national-pending', penaltyCeiling: { kind: 'delegated', basis: 'PPWR (EU) 2025/40 Art. 68', note: 'Die Verordnung nennt keinen Betrag: nach Art. 68 Abs. 1 erlassen die Mitgliedstaaten die Sanktionen bis zum 12. Februar 2027. Fuer Verstoesse gegen Art. 24-29 muessen Geldbussen dabei sein (Abs. 2), ohne Hoehe.' } },
     },
@@ -199,7 +222,10 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
     },
     'data-privacy': {
         UK: { source: 'UK GDPR / DPA 2018 Art. 13', penalty: 'up to £17.5M or 4% of turnover', penaltyMaxEur: 100000, due: 'Ongoing', penaltyCeiling: { kind: 'turnover', percent: 4, orAmount: { value: 17500000, currency: 'GBP' }, basis: 'UK-DSGVO Art. 83 Abs. 5 Buchst. b (Art. 12 bis 21) i.V.m. DPA 2018 s. 157 Abs. 5 Buchst. a — der hoehere der beiden Werte', asOf: '2026-09-19' } },
-        US: { source: 'CCPA/CPRA + state privacy acts', penalty: '$2,500–$7,500 per violation', penaltyMaxEur: 50000, due: 'Ongoing', penaltyCeiling: { kind: 'subnational', level: 'Bundesstaaten mit eigenem Datenschutzgesetz (Kalifornien und rund 20 weitere)', basis: 'Cal. Civ. Code § 1798.155 (CCPA/CPRA) und die Parallelgesetze der uebrigen Staaten', note: 'Es gibt kein allgemeines Bundesdatenschutzgesetz. Die genannten 2.500 bis 7.500 je Verstoss sind die kalifornischen Saetze; die uebrigen Staaten haben eigene, teils abweichende. Erst ein Eintrag je Staat kann das ohne Verwechslung fuehren.' } },
+        US: { source: 'CCPA/CPRA + state privacy acts', penalty: '$2,500–$7,500 per violation', penaltyMaxEur: 50000, due: 'Ongoing', penaltyCeiling: { kind: 'subnational', level: 'Bundesstaaten mit eigenem Datenschutzgesetz (Kalifornien und rund 20 weitere)', basis: 'Cal. Civ. Code § 1798.155 (CCPA/CPRA) und die Parallelgesetze der uebrigen Staaten', note: 'Es gibt kein allgemeines Bundesdatenschutzgesetz; jeder Staat mit eigenem Gesetz setzt eigene Saetze. Die gefuehrten stehen in `states`. Fuer Texas und New York fehlt der Zugang zum Gesetzestext, nicht das Gesetz — siehe STAATEN_OHNE_ZUGANG im Waechter.' }, states: {
+            CA: { source: 'CCPA/CPRA, Cal. Civ. Code § 1798.155', penaltyCeiling: { kind: 'amount', value: 7500, currency: 'USD', basis: 'Cal. Civ. Code § 1798.155 Buchst. a — 2.500 USD je Verstoss, 7.500 USD je vorsaetzlichem Verstoss oder bei Daten Minderjaehriger unter 16. Nur der Sockel: nach § 1798.199.95 Buchst. d passt die California Privacy Protection Agency die Betraege zum 1. Januar jedes ungeraden Jahres an den Verbraucherpreisindex an und veroeffentlicht die geltenden Werte selbst; im Gesetzestext stehen sie nicht. Naechste Anpassung 1.1.2027.', asOf: '2026-09-19' } },
+            FL: { source: 'Florida Digital Bill of Rights, Fla. Stat. § 501.72', penaltyCeiling: { kind: 'amount', value: 150000, currency: 'USD', basis: 'Fla. Stat. § 501.72 Abs. 1 — 50.000 USD je Verstoss, verdreifacht bei Daten eines bekannten Kindes, bei Missachtung einer bestaetigten Loeschanfrage und bei fortgesetztem Verkauf nach Widerspruch. Ein Verstoss ist zugleich unfair and deceptive trade practice nach Teil II des Kapitels; durchsetzungsbefugt ist allein das Department of Legal Affairs.', asOf: '2026-09-19' } },
+        } },
         TR: { source: 'KVKK No. 6698 Art. 10', penalty: 'up to ₺13,000,000', penaltyMaxEur: 380000, due: 'Ongoing' },
         default: { source: 'GDPR Art. 13 / Art. 6', penalty: 'up to €20M or 4% of turnover', penaltyMaxEur: 100000, due: 'Ongoing', scope: 'eu' , penaltyCeiling: { kind: 'turnover', percent: 4, orAmount: { value: 20000000, currency: 'EUR' }, basis: 'DSGVO Art. 83 Abs. 5 Buchst. a und b', asOf: '2026-09-17' } },
     },
@@ -211,7 +237,7 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
         DE: { source: 'HGB §29 / GewO §14', penalty: 'coercive fines up to €5,000', penaltyMaxEur: 5000, due: 'One-off', dueDays: 30, penaltyCeiling: { kind: 'amount', value: 5000, currency: 'EUR', basis: 'HGB § 14 Satz 2 (einzelnes Zwangsgeld)', asOf: '2026-09-17' } },
         UK: { source: 'Companies Act 2006 §9', penalty: 'late-filing penalties up to £15,000', penaltyMaxEur: 1700, due: 'One-off', dueDays: 30, penaltyCeiling: { kind: 'amount', value: 15000, currency: 'GBP', basis: 'Companies Act 2006 s. 453 i.V.m. SI 2008/497 Reg. 4 Abs. 2 (Public Company, mehr als 6 Monate: 7.500, verdoppelt bei Versaeumnis auch im Vorjahr; Private Company 150 bis 1.500)', asOf: '2026-09-19' } },
         FR: { source: 'Code de commerce Art. L123 (RCS / Guichet unique)', penalty: 'amendes + radiation d’office', penaltyMaxEur: 4500, due: 'One-off', dueDays: 30 },
-        IT: { source: 'Registro delle Imprese (CCIAA), Art. 2196 c.c.', penalty: 'sanzioni €103–€1.032', penaltyMaxEur: 3000, due: 'One-off', dueDays: 30 },
+        IT: { source: 'Registro delle Imprese (CCIAA), Art. 2196 c.c.', penalty: 'sanzioni EUR 103 bis 1.032', penaltyMaxEur: 1032, due: 'One-off', dueDays: 30, penaltyCeiling: { kind: 'amount', value: 1032, currency: 'EUR', basis: 'Codice civile Art. 2630 Abs. 1 (unterlassene Anmeldung zum Handelsregister); innerhalb von 30 Tagen nachgeholt auf ein Drittel ermaessigt, bei unterlassener Bilanzhinterlegung um ein Drittel erhoeht', asOf: '2026-09-19' } },
         ES: { source: 'Registro Mercantil (RRM)', penalty: 'multas + cierre registral', penaltyMaxEur: 300000, due: 'One-off', dueDays: 30, penaltyCeiling: { kind: 'amount', value: 300000, currency: 'EUR', basis: 'RDLeg 1/2010 (LSC) Art. 283 Abs. 1 (Nichthinterlegung des Jahresabschlusses; ab 6 Mio. EUR Umsatz je Verzugsjahr, sonst 1.200 bis 60.000)', asOf: '2026-09-17' } },
         NL: { source: 'Handelsregisterwet (KVK-inschrijving)', penalty: 'boete + niet-inschrijving', penaltyMaxEur: 27500, due: 'One-off', dueDays: 8, penaltyCeiling: { kind: 'amount', value: 27500, currency: 'EUR', basis: 'WED Art. 6 Abs. 1 Nr. 5 i.V.m. Art. 1 Nr. 4 und Sr Art. 23 Abs. 4 (vierte Kategorie, Stand 1.1.2026)', asOf: '2026-09-17' } },
         US: { source: 'State incorporation + foreign qualification', penalty: 'loss of good standing + back fees', penaltyMaxEur: 5000, due: 'One-off', dueDays: 30, penaltyCeiling: { kind: 'subnational', level: 'alle 50 Bundesstaaten und der District of Columbia', basis: 'Gesellschaftsrecht der Einzelstaaten, z.B. Del. Code tit. 8 § 502 Buchst. c', note: 'Die Gruendung und die Registrierung einer auswaertigen Gesellschaft sind Landesrecht; der Bund kennt dafuer keine Vorschrift. Die Folge ist zudem meist nicht eine Busse, sondern der Verlust des good standing und die Nachzahlung rueckstaendiger Gebuehren.' } },
@@ -220,7 +246,7 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
     'monitor-kyb': {
         DE: { source: 'GwG §10 / §20 (Transparenzregister)', penalty: '€1,000–€5,000, serious cases up to €1M', penaltyMaxEur: 1000000, due: 'Ongoing', penaltyCeiling: { kind: 'amount', value: 1000000, currency: 'EUR', basis: 'GwG § 56 Abs. 3 Satz 1 Nr. 1 (schwerwiegender, wiederholter oder systematischer Verstoss)', asOf: '2026-09-17' } },
         FR: { source: 'Code monétaire et financier Art. L561 (RBE)', penalty: 'amendes AMF/ACPR + sanctions pénales', penaltyMaxEur: 120000, due: 'Ongoing' },
-        IT: { source: 'D.Lgs. 231/2007 (antiriciclaggio, Registro TE)', penalty: 'sanzioni €2.000–€1M', penaltyMaxEur: 120000, due: 'Ongoing' },
+        IT: { source: 'D.Lgs. 231/2007 (antiriciclaggio, Registro TE)', penalty: 'sanzioni EUR 103 bis 1.032', penaltyMaxEur: 1032, due: 'Ongoing', penaltyCeiling: { kind: 'amount', value: 1032, currency: 'EUR', basis: 'D.Lgs. 231/2007 Art. 21 Abs. 1 Satz 2 — verweist fuer die unterlassene Mitteilung des wirtschaftlich Berechtigten auf Codice civile Art. 2630. Die Saetze von 2.000 bis 1 Mio. EUR aus Art. 56 und 62 gelten nur fuer soggetti obbligati (Banken, Berufstraeger), nicht fuer die meldende Gesellschaft selbst.', asOf: '2026-09-19' } },
         default: { source: 'EU AMLD5 (2018/843)', penalty: 'national AML fines', penaltyMaxEur: 100000, due: 'Ongoing', scope: 'national-pending' },
     },
     'log-eori': {
@@ -234,7 +260,7 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
     },
     'log-intrastat': {
         DE: { source: 'Intrastat (EBS Reg. 2019/2152), threshold €500k arrivals', penalty: 'up to €5,000 per missed report', penaltyMaxEur: 50000, due: 'Monthly', dueDays: 20, penaltyCeiling: { kind: 'amount', value: 50000, currency: 'EUR', basis: 'AHStatG § 19 (verdraengt BStatG § 23 Abs. 3)', asOf: '2026-09-17' } },
-        IT: { source: 'Intrastat (Agenzia Dogane), modelli INTRA', penalty: 'sanzioni €500–€1.000 per modello', penaltyMaxEur: 5000, due: 'Monthly', dueDays: 25 },
+        IT: { source: 'Intrastat (Agenzia Dogane), modelli INTRA', penalty: 'sanzioni EUR 500 bis 1.000 je Liste', penaltyMaxEur: 1000, due: 'Monthly', dueDays: 25, penaltyCeiling: { kind: 'amount', value: 1000, currency: 'EUR', basis: 'Testo unico delle sanzioni tributarie (D.Lgs. 173/2024) Art. 36 Abs. 7 — je Liste; auf die Haelfte ermaessigt bei Vorlage binnen 30 Tagen nach Aufforderung', asOf: '2026-09-19' } },
         ES: { source: 'Intrastat (AEAT), umbral €400k', penalty: 'multas estadísticas hasta €30.000', penaltyMaxEur: 30050.61, due: 'Monthly', dueDays: 12, penaltyCeiling: { kind: 'amount', value: 30050.61, currency: 'EUR', basis: 'Ley 12/1989 Art. 51 Abs. 1 (infraccion muy grave; 2001 aus Peseten umgestellt, seither nicht angepasst)', asOf: '2026-09-17' } },
         NL: { source: 'Intrastat (CBS aangifte)', penalty: 'bestuurlijke boetes CBS', penaltyMaxEur: 5000, due: 'Monthly', dueDays: 10, penaltyCeiling: { kind: 'amount', value: 5000, currency: 'EUR', basis: 'Wet op het CBS Art. 43 Abs. 2 i.V.m. Art. 38b (Intrastat-Meldung)', asOf: '2026-09-17' } },
         default: { source: 'EBS Reg. 2019/2152 (Intrastat)', penalty: 'national statistical fines', penaltyMaxEur: 5000, due: 'Monthly', dueDays: 20, scope: 'eu' },
@@ -257,7 +283,7 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
         DE: { source: 'BGB §312g / EGBGB Art. 246a', penalty: 'competitor warnings (Abmahnung) + injunctions', penaltyMaxEur: 15000, due: 'One-off', dueDays: 45, penaltyCeiling: { kind: 'turnover', percent: 4, basis: 'UWG § 19 Abs. 2 Satz 3 i.V.m. § 5c Abs. 1 (nur bei weitverbreitetem Verstoss; sonst 50.000 EUR nach Satz 1)', asOf: '2026-09-17' } },
         UK: { source: 'Consumer Rights Act 2015', penalty: 'CMA: £300k oder 10% des Umsatzes', penaltyMaxEur: 15000, due: 'One-off', dueDays: 45, penaltyCeiling: { kind: 'turnover', percent: 10, orAmount: { value: 300000, currency: 'GBP' }, basis: 'DMCCA 2024 s. 182 Abs. 6 (Final infringement notice der CMA) i.V.m. Sch. 16 (CRA 2015 Teil 1 und 2 als relevant infringement; in Kraft 6.4.2025, SI 2025/272) — der hoehere der beiden Werte', asOf: '2026-09-19' } },
         FR: { source: 'Code de la consommation Art. L221 (droit de rétractation)', penalty: 'amendes DGCCRF + clauses réputées non écrites', penaltyMaxEur: 15000, due: 'One-off', dueDays: 45 },
-        IT: { source: 'Codice del Consumo D.Lgs. 206/2005', penalty: 'sanzioni AGCM + clausole nulle', penaltyMaxEur: 15000, due: 'One-off', dueDays: 45 },
+        IT: { source: 'Codice del Consumo D.Lgs. 206/2005', penalty: 'AGCM: EUR 5.000 bis 10.000.000; Klauseln nichtig', penaltyMaxEur: 10000000, due: 'One-off', dueDays: 45, penaltyCeiling: { kind: 'amount', value: 10000000, currency: 'EUR', basis: 'Codice del Consumo Art. 37-bis Abs. 1 Satz 2 — fuer Feststellung und Sanktion missbraeuchlicher Klauseln gilt Art. 27; dessen Abs. 9 nennt 5.000 bis 10.000.000 EUR', asOf: '2026-09-19' } },
         ES: { source: 'RDL 1/2007 (Ley General Consumidores)', penalty: 'sanciones de consumo + cláusulas nulas', penaltyMaxEur: 1000000, due: 'One-off', dueDays: 45, penaltyCeiling: { kind: 'amount', value: 1000000, currency: 'EUR', basis: 'RDL 1/2007 Art. 49 Abs. 1 Buchst. c (infraccion muy grave; ueberschreitbar bis zum Sechs- bis Achtfachen des unrechtmaessigen Gewinns)', asOf: '2026-09-17' } },
         default: { source: 'Consumer Rights Directive 2011/83/EU', penalty: 'national enforcement + void clauses', penaltyMaxEur: 15000, due: 'One-off', dueDays: 45, scope: 'national-pending' },
     },
