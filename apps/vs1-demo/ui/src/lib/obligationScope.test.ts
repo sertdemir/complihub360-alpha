@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isEuMember, ObligationEnrichmentMap } from '@complihub/compliance-engine';
+import { FX_JE_EUR, FX_STAND, inEuro, isEuMember, ObligationEnrichmentMap } from '@complihub/compliance-engine';
 import { getAreaObligations } from './areaProfiles';
 import { getMarketProfile, MARKET_CODES } from './marketProfiles';
 import { DOMAINS } from './domains';
@@ -346,11 +346,14 @@ describe('Belegte Obergrenze', () => {
     ).toEqual([]);
   });
 
-  // Die Gegenstuecke zur EUR-Pruefung darueber: hier IST ein Betrag belegt, nur
-  // eben in Pfund. Die Eurozahl daneben ist dann eine Umrechnung ohne Kurs und
-  // ohne Tag — genau das, was `penaltyCeiling` abschaffen sollte. Aufloesen
-  // kann das nur die Anzeige (Kurs plus Datum), nicht diese Karte; bis dahin
-  // steht der Widerspruch wenigstens namentlich da statt still.
+  // Frueher: "hier IST ein Betrag belegt, nur eben in Pfund, und die Eurozahl
+  // daneben ist eine Umrechnung ohne Kurs und ohne Tag". Das ist seit dem
+  // eingefrorenen EZB-Kurs aufgeloest — die Eurozahl MUSS jetzt die Umrechnung
+  // des belegten Betrags sein, und der Test rechnet nach.
+  //
+  // Die Liste bleibt trotzdem stehen, aber mit anderer Bedeutung: sie sagt,
+  // WELCHE Eintraege eine umgerechnete und keine gesetzliche Eurozahl fuehren.
+  // Das ist eine Eigenschaft, die man beim Lesen der Karte wissen will.
   const EUROZAHL_OHNE_KURS = [
     'UK/corp-registration', // GBP 15.000 vs. 1.700 — Faktor 10 daneben
     'UK/data-privacy', // GBP 17,5 Mio vs. 100.000
@@ -378,6 +381,43 @@ describe('Belegte Obergrenze', () => {
     ).toEqual([]);
     const weg = EUROZAHL_OHNE_KURS.filter((k) => !w.includes(k));
     expect(weg, `Aufgeloest! Bitte aus EUROZAHL_OHNE_KURS streichen: ${weg.join(', ')}`).toEqual([]);
+  });
+
+  it('rechnet jede Fremdwaehrungs-Eurozahl am eingefrorenen Kurs nach', () => {
+    // Der Kern von "der Betrag bleibt in seiner Waehrung": das Gesetz nennt
+    // Pfund, die Risikosumme braucht Euro — dann muss die Eurozahl die
+    // Umrechnung SEIN und nicht eine zweite, freie Behauptung.
+    const ab: string[] = [];
+    for (const [k, e] of alle()) {
+      const c = e.penaltyCeiling;
+      if (!c || !e.penaltyMaxEur) continue;
+      const betrag = c.kind === 'amount' ? c.value : c.orAmount?.value;
+      const waehrung = c.kind === 'amount' ? c.currency : c.orAmount?.currency;
+      if (!betrag || !waehrung || waehrung === 'EUR') continue;
+      const soll = inEuro(betrag, waehrung);
+      if (soll !== null && soll !== e.penaltyMaxEur) {
+        ab.push(`${k}: ${e.penaltyMaxEur} statt ${soll} (${betrag} ${waehrung} zum Kurs vom ${FX_STAND})`);
+      }
+    }
+    expect(
+      ab,
+      'Die Eurozahl ist nicht die Umrechnung des belegten Betrags. Entweder die '
+        + 'Kurse erneuern (node scripts/fetch-fx-rates.mjs) oder die Zahl nachziehen.',
+    ).toEqual([]);
+  });
+
+  it('meldet einen Kurs, der zu alt geworden ist', () => {
+    // Eingefroren heisst nicht vergessen. Ein halbes Jahr alter Kurs ist bei
+    // Pfund und Dollar noch vertretbar, bei der tuerkischen Lira laengst nicht
+    // mehr — deshalb lieber frueh meckern als spaet falsch rechnen.
+    const tage = Math.floor((Date.now() - Date.parse(FX_STAND)) / 86_400_000);
+    expect(
+      tage,
+      `Die EZB-Kurse sind ${tage} Tage alt (Stand ${FX_STAND}). `
+        + 'Erneuern mit: node scripts/fetch-fx-rates.mjs',
+    ).toBeLessThan(120);
+    expect(tage, `Kursdatum ${FX_STAND} liegt in der Zukunft`).toBeGreaterThanOrEqual(0);
+    expect(Object.keys(FX_JE_EUR).sort()).toEqual(['GBP', 'TRY', 'USD']);
   });
 
   it('verlangt von jeder NEUEN Pflicht die Obergrenze', () => {

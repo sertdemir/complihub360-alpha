@@ -4,3 +4,4 @@ export * from './business-modifier.js';
 export * from './generator.js';
 export * from './wizard-adapter.js';
 export * from './obligation-enrichment.js';
+export * from './fx-rates.generated.js';
