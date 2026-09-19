@@ -373,7 +373,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
           homeHref={`${base}/dashboard`}
           fallbackTitle={t('shell.navDashboard')}
           switchLabel={t('shell.switchTo', { defaultValue: 'Wechseln zu' })}
-          logo={<Logo lockup="symbol" href={null} className="h-[35px] w-auto" />}
+          logo={<Logo lockup="symbol" href={null} />}
           actions={
             <>
               <button type="button" aria-label={t('shell.search')} onClick={() => setSearchOpen(true)} className="grid h-11 w-11 place-items-center rounded-lg text-fg-secondary transition-colors hover:text-fg">

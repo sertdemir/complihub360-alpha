@@ -143,7 +143,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           homeHref={base}
           fallbackTitle="Control Center"
           switchLabel="Go to"
-          logo={<Logo lockup="symbol" href={null} className="h-[35px] w-auto" />}
+          logo={<Logo lockup="symbol" href={null} />}
           actions={
             <button type="button" aria-label="Search" className="grid h-11 w-11 place-items-center rounded-lg text-fg-secondary transition-colors hover:text-fg">
               <Search size={19} />

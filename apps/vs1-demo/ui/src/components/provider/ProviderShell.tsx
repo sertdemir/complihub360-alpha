@@ -210,7 +210,7 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
           homeHref={base}
           fallbackTitle={t('shell.partnerBadge')}
           switchLabel={t('shell.switchTo', { defaultValue: 'Wechseln zu' })}
-          logo={<Logo lockup="symbol" href={null} className="h-[35px] w-auto" />}
+          logo={<Logo lockup="symbol" href={null} />}
           actions={
             <>
               <button type="button" aria-label={t('shell.searchAria')} onClick={() => setSearchOpen(true)} className="grid h-11 w-11 place-items-center rounded-lg text-fg-secondary transition-colors hover:text-fg">
