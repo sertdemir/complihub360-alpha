@@ -16,6 +16,7 @@
     "lint": "eslint . --ext .ts,.tsx",
     "test": "npm run test --if-present --workspaces",
     "i18n:check": "node scripts/i18n-translate.mjs --check",
+    "tokens:check": "node scripts/check-token-export.mjs",
     "i18n:translate": "node scripts/i18n-translate.mjs",
     "format": "prettier --write .",
     "build": "npm run build --workspaces --if-present",

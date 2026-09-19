@@ -44,6 +44,12 @@ jobs:
         # Reads the locale files only — no DeepL call, so no API key needed.
         run: npm run i18n:check
 
+      - name: Check token export against the shipped CSS
+        # tokens.json liest kein Build — genau deshalb kann er still veralten,
+        # und genau deshalb steht er hier. Er ist das, was Figma und die Doku
+        # als "die Farben" lesen. Keine Abhaengigkeiten noetig.
+        run: npm run tokens:check
+
       - name: Build Core Dependencies
         run: npm run build:root
 

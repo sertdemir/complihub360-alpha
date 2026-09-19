@@ -340,6 +340,15 @@ function renderText(m: MagicLinkMail, t: MailStrings['magic']): string {
 // Branded HTML (same shell as the Supabase auth templates: dark slate card,
 // serif headline with ONE gold word, gold primary CTA). Table-based + inline
 // styles, no external images — see docs/email-templates/.
+//
+// Zwei Goldwerte, und der Unterschied ist Absicht (vgl. index.css der UI):
+//   #C5913B  das Gold-WORT — der Ton, den die Wortmarke in der "360" traegt.
+//            Auf der Karte (#1f2937) 5,23:1, traegt die 26-px-Serif sicher.
+//   #d4af37  die CTA-FLAECHE — gold-500, wie --color-bg-accent in der App.
+// Text wandert auf die Messing-Linie der Marke, Flaechen bleiben auf der
+// Skala. Wer hier vereinheitlicht, bricht die eine oder die andere Seite:
+// #C5913B als Knopffarbe macht die Flaeche stumpf, #d4af37 als Textfarbe
+// bringt das Wort wieder aus dem Logo-Ton.
 function renderHtml(m: MagicLinkMail, t: MailStrings['magic']): string {
     const redacted = m.message ? redactText(m.message, { profile: 'strict' }).sanitizedText : '—';
     const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -355,7 +364,7 @@ function renderHtml(m: MagicLinkMail, t: MailStrings['magic']): string {
 <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;">
 <tr><td style="padding:0 8px 24px 8px;"><img src="https://kqylqwogxbiwpnomkzsn.supabase.co/storage/v1/object/public/assets/logo-lockup-email.png" width="207" height="54" alt="CompliHub360 — Always on your side" style="display:block;border:0;"/></td></tr>
 <tr><td style="background-color:#1f2937;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:36px 32px;">
-<div style="font-family:Georgia,serif;font-size:26px;line-height:1.25;font-weight:bold;color:#ffffff;">${esc(t.headlinePre)}<span style="color:#d4af37;">${esc(t.headlineGold)}</span>${esc(t.headlinePost)}</div>
+<div style="font-family:Georgia,serif;font-size:26px;line-height:1.25;font-weight:bold;color:#ffffff;">${esc(t.headlinePre)}<span style="color:#C5913B;">${esc(t.headlineGold)}</span>${esc(t.headlinePost)}</div>
 <div style="padding-top:12px;font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#aeb8c4;">${esc(t.introPre)}<strong style="color:#ffffff;">${esc(t.introStrong)}</strong>${esc(t.introPost)}</div>
 <div style="margin-top:22px;background-color:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:18px 20px;font-family:Helvetica,Arial,sans-serif;font-size:13px;line-height:1.8;color:#aeb8c4;">
 <span style="font-size:10px;letter-spacing:1.2px;color:#77828f;text-transform:uppercase;">${esc(t.dossierLabel)}</span><br/>
@@ -450,7 +459,7 @@ export async function sendEmailChangeMail(p: {
 <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;">
 <tr><td style="padding:0 8px 24px 8px;"><img src="https://kqylqwogxbiwpnomkzsn.supabase.co/storage/v1/object/public/assets/logo-lockup-email.png" width="207" height="54" alt="CompliHub360" style="display:block;border:0;"/></td></tr>
 <tr><td style="background-color:#1f2937;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:36px 32px;">
-<div style="font-family:Georgia,serif;font-size:26px;line-height:1.25;font-weight:bold;color:#ffffff;">${escE(t.headlinePre)}<span style="color:#d4af37;">${escE(t.headlineGold)}</span>${escE(t.headlinePost)}</div>
+<div style="font-family:Georgia,serif;font-size:26px;line-height:1.25;font-weight:bold;color:#ffffff;">${escE(t.headlinePre)}<span style="color:#C5913B;">${escE(t.headlineGold)}</span>${escE(t.headlinePost)}</div>
 <div style="padding-top:12px;font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#aeb8c4;">${escE(t.bodyPre)}<strong style="color:#ffffff;">${escE(p.providerName)}</strong>${escE(t.bodyPost)}</div>
 <div style="padding-top:24px;"><a href="${url}" style="display:block;background-color:#d4af37;border-radius:12px;padding:14px 24px;text-align:center;font-family:Helvetica,Arial,sans-serif;font-size:15px;font-weight:bold;color:#101411;text-decoration:none;">${escE(t.cta)} &rarr;</a></div>
 <div style="margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.08);font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#77828f;">&#128274;&nbsp; ${escE(t.footOncePre)}<strong style="color:#aeb8c4;">${escE(t.footOnceStrong)}</strong>${escE(t.footOncePost)}<br/>${escE(t.footNotYou)}</div>
