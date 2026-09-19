@@ -36,7 +36,17 @@ export type PenaltyCeiling =
      *  "punishable ... by a fine" ohne Zusatz heisst unbegrenzt. Das ist weder
      *  `none` (eine Busse gibt es sehr wohl) noch `delegated` (der Gesetzgeber
      *  war taetig) noch `amount` (es gibt keine Zahl zu nennen). */
-    | { kind: 'unlimited'; basis: string; note: string };
+    | { kind: 'unlimited'; basis: string; note: string }
+    /** Die Sanktion wird eine Ebene UNTER der gesetzt, die dieser Eintrag
+     *  fuehrt. Nicht dasselbe wie `delegated`: dort hat der Gesetzgeber die
+     *  Zahl noch nicht erlassen und eine Frist laeuft; hier gibt es sie
+     *  laengst, nur eben fuenfundvierzigmal. Die US-Umsatzsteuer ist Sache
+     *  der Bundesstaaten, der Bund hat dafuer keine Zustaendigkeit.
+     *
+     *  Eine Zahl waere hier nicht ungenau, sondern eine Verwechslung der
+     *  Ebene. `level` benennt, WER sie setzt und wie viele — ohne das ist
+     *  "steht woanders" keine Auskunft. */
+    | { kind: 'subnational'; level: string; basis: string; note: string };
 
 export interface ObligationEnrichment {
     /** Primary legal source, e.g. 'UStG §18i (OSS)'. */
@@ -119,7 +129,7 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
         ES: { source: 'Ley 37/1992 (IVA) Art. 164', penalty: '50–150% of unpaid VAT', penaltyMaxEur: 25000, due: 'Quarterly', dueDays: 30, penaltyCeiling: { kind: 'proportional', percent: 150, of: 'nicht abgefuehrte Steuerschuld', basis: 'LGT (Ley 58/2003) Art. 191 Abs. 4 (infraccion muy grave: 100 bis 150 %)', asOf: '2026-09-17' } },
         NL: { source: 'Wet OB 1968 Art. 14', penalty: 'up to €6,709 per late payment', penaltyMaxEur: 6709, due: 'Quarterly', dueDays: 30, penaltyCeiling: { kind: 'amount', value: 6709, currency: 'EUR', basis: 'AWR Art. 67c Abs. 1 (Zahlungsversaeumnis; bei Vorsatz stattdessen 100 % der Steuer nach Art. 67f)', asOf: '2026-09-17' } },
         TR: { source: 'KDV Kanunu No. 3065', penalty: 'tax-loss fine: 1× the unpaid KDV', penaltyMaxEur: 15000, due: 'Monthly', dueDays: 26 },
-        US: { source: 'State economic-nexus rules (post-Wayfair)', penalty: 'per-state assessments + interest', penaltyMaxEur: 20000, due: 'Monthly', dueDays: 20 },
+        US: { source: 'State economic-nexus rules (post-Wayfair)', penalty: 'per-state assessments + interest', penaltyMaxEur: 20000, due: 'Monthly', dueDays: 20, penaltyCeiling: { kind: 'subnational', level: '45 Bundesstaaten und der District of Columbia', basis: 'South Dakota v. Wayfair, 585 U.S. 162 (2018); keine bundesrechtliche Umsatzsteuer', note: 'Der Bund erhebt keine Umsatzsteuer und setzt dafuer keine Sanktion. Jeder Bundesstaat mit Sales Tax fuehrt seine eigene — fuenfundvierzig verschiedene Antworten plus D.C. Eine davon als "die" US-Zahl zu fuehren waere keine Ungenauigkeit, sondern eine Verwechslung der Ebene.' } },
         default: { source: 'EU VAT Directive 2006/112/EC', penalty: 'national surcharges + interest', penaltyMaxEur: 20000, due: 'Quarterly', dueDays: 30, scope: 'national-pending' },
     },
     'tax-corporate': {
@@ -129,7 +139,7 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
         IT: { source: 'TUIR DPR 917/1986 (IRES)', penalty: '90–180% dell’imposta non versata', penaltyMaxEur: 20000, due: 'Annual', dueDays: 120 },
         ES: { source: 'Ley 27/2014 (Impuesto sobre Sociedades)', penalty: '50–150% de la cuota + recargos', penaltyMaxEur: 15000, due: 'Annual', dueDays: 115, penaltyCeiling: { kind: 'proportional', percent: 150, of: 'nicht abgefuehrte Steuerschuld', basis: 'LGT (Ley 58/2003) Art. 191 Abs. 4 (infraccion muy grave: 100 bis 150 %)', asOf: '2026-09-17' } },
         NL: { source: 'Wet Vpb 1969 (vennootschapsbelasting)', penalty: 'verzuim-/vergrijpboete tot 100%', penaltyMaxEur: 6709, due: 'Annual', dueDays: 150, penaltyCeiling: { kind: 'amount', value: 6709, currency: 'EUR', basis: 'AWR Art. 67a Abs. 1 (Erklaerungsversaeumnis bei Veranlagungssteuern)', asOf: '2026-09-17' } },
-        US: { source: 'IRC §11 / state franchise tax', penalty: '5%/month of unpaid tax, max 25%', penaltyMaxEur: 15000, due: 'Annual', dueDays: 105 },
+        US: { source: 'IRC §11 / state franchise tax', penalty: '5%/month of unpaid tax, max 25%', penaltyMaxEur: 15000, due: 'Annual', dueDays: 105, penaltyCeiling: { kind: 'proportional', percent: 25, of: 'die auf der Erklaerung auszuweisende Steuer (tax required to be shown)', basis: '26 CFR § 301.6651-1 Buchst. a Nr. 1 (5 % je angefangenem Monat, hoechstens 25 % insgesamt)', asOf: '2026-09-19' } },
         default: { source: 'National corporate income tax act', penalty: 'late surcharges + interest', penaltyMaxEur: 10000, due: 'Annual', dueDays: 120, scope: 'placeholder' },
     },
     'prod-epr': {
@@ -174,22 +184,22 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
     },
     'prod-safety': {
         UK: { source: 'UK GPSR 2005', penalty: 'up to £20,000 + 12 months imprisonment', penaltyMaxEur: 23000, due: 'Ongoing', penaltyCeiling: { kind: 'amount', value: 20000, currency: 'GBP', basis: 'SI 2005/1803 Reg. 20 Abs. 1 (Verstoss gegen Reg. 5 oder 8 Abs. 1 Buchst. a, auf Anklage; im abgekuerzten Verfahren gilt stattdessen das statutory maximum)', asOf: '2026-09-19' } },
-        US: { source: 'CPSA / CPSC recall rules', penalty: 'up to $120,000 per violation', penaltyMaxEur: 110000, due: 'Ongoing' },
+        US: { source: 'CPSA / CPSC recall rules', penalty: '$120,000 je Verstoss, $17,150,000 je Verstossreihe', penaltyMaxEur: 110000, due: 'Ongoing', penaltyCeiling: { kind: 'amount', value: 17150000, currency: 'USD', basis: 'CPSA § 20 Buchst. a Nr. 1 (15 U.S.C. 2069) i.d.F. der Anpassung 86 FR 68244 vom 1.12.2021, wirksam ab 1.1.2022: 120.000 je Verstoss, 17.150.000 je zusammenhaengender Verstossreihe. Die CPSC passt nur alle fuenf Jahre an; die naechste Bekanntmachung steht im Dezember 2026 an.', asOf: '2026-09-19' } },
         default: { source: 'EU GPSR 2023/988', penalty: 'up to 4% of annual turnover', penaltyMaxEur: 100000, due: 'Ongoing', scope: 'eu' },
     },
     'mktg-consent': {
         DE: { source: 'UWG §7 / GDPR Art. 7', penalty: 'up to €300,000 per campaign (UWG)', penaltyMaxEur: 300000, due: 'Ongoing', penaltyCeiling: { kind: 'amount', value: 300000, currency: 'EUR', basis: 'UWG § 20 Abs. 2 i.V.m. Abs. 1 Nr. 1 (unerlaubte Telefonwerbung)', asOf: '2026-09-17' } },
         TR: { source: 'ETK No. 6563 / KVKK', penalty: 'up to ₺1,000,000', penaltyMaxEur: 30000, due: 'Ongoing' },
-        US: { source: 'CAN-SPAM / TCPA', penalty: 'up to $51,744 per email; $1,500 per call/text', penaltyMaxEur: 48000, due: 'Ongoing' },
+        US: { source: 'CAN-SPAM / TCPA', penalty: 'up to $53,088 per email; $1,500 per call/text', penaltyMaxEur: 48000, due: 'Ongoing', penaltyCeiling: { kind: 'amount', value: 53088, currency: 'USD', basis: '16 CFR § 1.98 Buchst. p i.V.m. Buchst. d (FTC Act § 5 Buchst. m Nr. 1 Buchst. A, 15 U.S.C. 45); CAN-SPAM § 7 Buchst. a verweist auf diese Sanktion. Stand der Inflationsanpassung: 90 FR 5581 vom 17.1.2025. Die 1.500 je Anruf aus dem TCPA sind ein zivilrechtlicher Anspruch, keine Behoerdenbusse.', asOf: '2026-09-19' } },
         default: { source: 'GDPR Art. 7 + ePrivacy Directive 2002/58', penalty: 'up to €20M or 4% of turnover', penaltyMaxEur: 100000, due: 'Ongoing', scope: 'national-pending' , penaltyCeiling: { kind: 'turnover', percent: 4, orAmount: { value: 20000000, currency: 'EUR' }, basis: 'DSGVO Art. 83 Abs. 5 Buchst. a', asOf: '2026-09-17' } },
     },
     'mktg-health-claims': {
         default: { source: 'EU Reg. 1924/2006 (Health Claims)', penalty: 'national fines + mandatory withdrawal', penaltyMaxEur: 50000, due: 'Ongoing', scope: 'eu' },
-        US: { source: 'FTC Act §5 + FTC Health Products Compliance Guidance', penalty: 'FTC injunctions + consumer redress', penaltyMaxEur: 90000, due: 'Ongoing' },
+        US: { source: 'FTC Act §5 + FTC Health Products Compliance Guidance', penalty: 'bis zu $53,088 je Verstoss + consumer redress', penaltyMaxEur: 90000, due: 'Ongoing', penaltyCeiling: { kind: 'amount', value: 53088, currency: 'USD', basis: '16 CFR § 1.98 Buchst. e (FTC Act § 5 Buchst. m Nr. 1 Buchst. B, 15 U.S.C. 45), Stand 90 FR 5581 vom 17.1.2025. Die Rueckerstattung an Verbraucher nach § 19 kommt hinzu und kennt keine Obergrenze.', asOf: '2026-09-19' } },
     },
     'data-privacy': {
         UK: { source: 'UK GDPR / DPA 2018 Art. 13', penalty: 'up to £17.5M or 4% of turnover', penaltyMaxEur: 100000, due: 'Ongoing', penaltyCeiling: { kind: 'turnover', percent: 4, orAmount: { value: 17500000, currency: 'GBP' }, basis: 'UK-DSGVO Art. 83 Abs. 5 Buchst. b (Art. 12 bis 21) i.V.m. DPA 2018 s. 157 Abs. 5 Buchst. a — der hoehere der beiden Werte', asOf: '2026-09-19' } },
-        US: { source: 'CCPA/CPRA + state privacy acts', penalty: '$2,500–$7,500 per violation', penaltyMaxEur: 50000, due: 'Ongoing' },
+        US: { source: 'CCPA/CPRA + state privacy acts', penalty: '$2,500–$7,500 per violation', penaltyMaxEur: 50000, due: 'Ongoing', penaltyCeiling: { kind: 'subnational', level: 'Bundesstaaten mit eigenem Datenschutzgesetz (Kalifornien und rund 20 weitere)', basis: 'Cal. Civ. Code § 1798.155 (CCPA/CPRA) und die Parallelgesetze der uebrigen Staaten', note: 'Es gibt kein allgemeines Bundesdatenschutzgesetz. Die genannten 2.500 bis 7.500 je Verstoss sind die kalifornischen Saetze; die uebrigen Staaten haben eigene, teils abweichende. Erst ein Eintrag je Staat kann das ohne Verwechslung fuehren.' } },
         TR: { source: 'KVKK No. 6698 Art. 10', penalty: 'up to ₺13,000,000', penaltyMaxEur: 380000, due: 'Ongoing' },
         default: { source: 'GDPR Art. 13 / Art. 6', penalty: 'up to €20M or 4% of turnover', penaltyMaxEur: 100000, due: 'Ongoing', scope: 'eu' , penaltyCeiling: { kind: 'turnover', percent: 4, orAmount: { value: 20000000, currency: 'EUR' }, basis: 'DSGVO Art. 83 Abs. 5 Buchst. a und b', asOf: '2026-09-17' } },
     },
@@ -204,7 +214,7 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
         IT: { source: 'Registro delle Imprese (CCIAA), Art. 2196 c.c.', penalty: 'sanzioni €103–€1.032', penaltyMaxEur: 3000, due: 'One-off', dueDays: 30 },
         ES: { source: 'Registro Mercantil (RRM)', penalty: 'multas + cierre registral', penaltyMaxEur: 300000, due: 'One-off', dueDays: 30, penaltyCeiling: { kind: 'amount', value: 300000, currency: 'EUR', basis: 'RDLeg 1/2010 (LSC) Art. 283 Abs. 1 (Nichthinterlegung des Jahresabschlusses; ab 6 Mio. EUR Umsatz je Verzugsjahr, sonst 1.200 bis 60.000)', asOf: '2026-09-17' } },
         NL: { source: 'Handelsregisterwet (KVK-inschrijving)', penalty: 'boete + niet-inschrijving', penaltyMaxEur: 27500, due: 'One-off', dueDays: 8, penaltyCeiling: { kind: 'amount', value: 27500, currency: 'EUR', basis: 'WED Art. 6 Abs. 1 Nr. 5 i.V.m. Art. 1 Nr. 4 und Sr Art. 23 Abs. 4 (vierte Kategorie, Stand 1.1.2026)', asOf: '2026-09-17' } },
-        US: { source: 'State incorporation + foreign qualification', penalty: 'loss of good standing + back fees', penaltyMaxEur: 5000, due: 'One-off', dueDays: 30 },
+        US: { source: 'State incorporation + foreign qualification', penalty: 'loss of good standing + back fees', penaltyMaxEur: 5000, due: 'One-off', dueDays: 30, penaltyCeiling: { kind: 'subnational', level: 'alle 50 Bundesstaaten und der District of Columbia', basis: 'Gesellschaftsrecht der Einzelstaaten, z.B. Del. Code tit. 8 § 502 Buchst. c', note: 'Die Gruendung und die Registrierung einer auswaertigen Gesellschaft sind Landesrecht; der Bund kennt dafuer keine Vorschrift. Die Folge ist zudem meist nicht eine Busse, sondern der Verlust des good standing und die Nachzahlung rueckstaendiger Gebuehren.' } },
         default: { source: 'National commercial register act', penalty: 'administrative fines', penaltyMaxEur: 5000, due: 'One-off', dueDays: 30, scope: 'placeholder' },
     },
     'monitor-kyb': {
@@ -219,7 +229,7 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
         default: { source: 'UCC Reg. 952/2013 Art. 9', penalty: 'customs clearance blocked', penaltyMaxEur: 10000, due: 'One-off', dueDays: 14, scope: 'eu' },
     },
     'log-customs-classification': {
-        US: { source: '19 U.S.C. §1592 (CBP)', penalty: 'up to the domestic value of the goods', penaltyMaxEur: 60000, due: 'Ongoing' },
+        US: { source: '19 U.S.C. §1592 (CBP)', penalty: 'up to the domestic value of the goods', penaltyMaxEur: 60000, due: 'Ongoing', penaltyCeiling: { kind: 'proportional', percent: 100, of: 'Inlandswert der Ware (domestic value of the merchandise)', basis: '19 CFR § 162.73 Buchst. a Nr. 1 (vorsaetzlicher Verstoss, ohne Selbstanzeige); bei grober Fahrlaessigkeit das Geringere aus Inlandswert und dem Vierfachen des Abgabenausfalls, bei einfacher Fahrlaessigkeit dem Zweifachen', asOf: '2026-09-19' } },
         default: { source: 'UCC Reg. 952/2013 + Combined Nomenclature', penalty: 'back duties + up to 3× duty difference', penaltyMaxEur: 30000, due: 'Ongoing', scope: 'eu' },
     },
     'log-intrastat': {
