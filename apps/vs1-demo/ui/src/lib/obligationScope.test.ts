@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isEuMember, ObligationEnrichmentMap } from '@complihub/compliance-engine';
+import { FX_JE_EUR, FX_STAND, inEuro, isEuMember, ObligationEnrichmentMap } from '@complihub/compliance-engine';
 import { getAreaObligations } from './areaProfiles';
 import { getMarketProfile, MARKET_CODES } from './marketProfiles';
 import { DOMAINS } from './domains';
@@ -239,8 +239,9 @@ describe('Belegte Obergrenze', () => {
   // federalregister.gov) — alle am Primaertext gelesen. Von den acht
   // amerikanischen sind drei `subnational`: dort setzt der Bund nichts.
   // Dazu `US/data-hosting`: der EU-US-Datenschutzrahmen kennt keine eigene Busse.
-  // Seit 19.09. ausserdem 7 italienische (normattiva.it, ueber den Browser).
-  const OHNE_OBERGRENZE_STAND = 22;
+  // Seit 19.09. ausserdem 7 italienische (normattiva.it, ueber den Browser)
+  // und 6 franzoesische (legifrance.gouv.fr ueber die PISTE-API).
+  const OHNE_OBERGRENZE_STAND = 16;
   // Eintraege, deren Obergrenze GAR KEINEN absoluten Betrag nennt — delegiert,
   // "es gibt keine Geldbusse", rein umsatz- oder steueranteilig — und die
   // trotzdem eine Eurozahl fuehren. Das ist der Widerspruch in Reinform: das
@@ -256,6 +257,9 @@ describe('Belegte Obergrenze', () => {
     'DE/legal-commercial-contracts', // keine Geldbusse, nur zivilrechtliche Folge
     'DE/legal-consumer-terms', // 4 % Jahresumsatz, UWG § 19
     'ES/tax-corporate', // 150 % der Steuerschuld, LGT Art. 191
+    'FR/prod-epr', // 7.500 EUR JE Einheit/Tonne, Code env. Art. L541-9-5 — kein Deckel
+    'FR/tax-corporate', // 80 % der Steuer, CGI Art. 1728/1729
+    'FR/tax-vat-registration', // 80 % der Steuer, CGI Art. 1728
     'IT/tax-corporate', // 120 % der Steuer, TU 173/2024 Art. 27
     'IT/tax-vat-registration', // 120 % der Steuer, TU 173/2024 Art. 30
     'ES/tax-vat-registration', // 150 % der Steuerschuld, LGT Art. 191
@@ -287,7 +291,7 @@ describe('Belegte Obergrenze', () => {
     'prod-packaging-reuse-targets', 'prod-safety', 'tax-corporate', 'tax-vat-registration',
   ]);
 
-  type Obergrenze = { kind: string; basis?: string; asOf?: string; note?: string; value?: number; currency?: string; of?: string; level?: string; orAmount?: { value: number; currency?: string } };
+  type Obergrenze = { kind: string; basis?: string; asOf?: string; note?: string; value?: number; currency?: string; of?: string; per?: string; level?: string; orAmount?: { value: number; currency?: string } };
   type Eintrag = {
     penaltyMaxEur?: number;
     penaltyCeiling?: Obergrenze;
@@ -346,11 +350,14 @@ describe('Belegte Obergrenze', () => {
     ).toEqual([]);
   });
 
-  // Die Gegenstuecke zur EUR-Pruefung darueber: hier IST ein Betrag belegt, nur
-  // eben in Pfund. Die Eurozahl daneben ist dann eine Umrechnung ohne Kurs und
-  // ohne Tag — genau das, was `penaltyCeiling` abschaffen sollte. Aufloesen
-  // kann das nur die Anzeige (Kurs plus Datum), nicht diese Karte; bis dahin
-  // steht der Widerspruch wenigstens namentlich da statt still.
+  // Frueher: "hier IST ein Betrag belegt, nur eben in Pfund, und die Eurozahl
+  // daneben ist eine Umrechnung ohne Kurs und ohne Tag". Das ist seit dem
+  // eingefrorenen EZB-Kurs aufgeloest — die Eurozahl MUSS jetzt die Umrechnung
+  // des belegten Betrags sein, und der Test rechnet nach.
+  //
+  // Die Liste bleibt trotzdem stehen, aber mit anderer Bedeutung: sie sagt,
+  // WELCHE Eintraege eine umgerechnete und keine gesetzliche Eurozahl fuehren.
+  // Das ist eine Eigenschaft, die man beim Lesen der Karte wissen will.
   const EUROZAHL_OHNE_KURS = [
     'UK/corp-registration', // GBP 15.000 vs. 1.700 — Faktor 10 daneben
     'UK/data-privacy', // GBP 17,5 Mio vs. 100.000
@@ -378,6 +385,43 @@ describe('Belegte Obergrenze', () => {
     ).toEqual([]);
     const weg = EUROZAHL_OHNE_KURS.filter((k) => !w.includes(k));
     expect(weg, `Aufgeloest! Bitte aus EUROZAHL_OHNE_KURS streichen: ${weg.join(', ')}`).toEqual([]);
+  });
+
+  it('rechnet jede Fremdwaehrungs-Eurozahl am eingefrorenen Kurs nach', () => {
+    // Der Kern von "der Betrag bleibt in seiner Waehrung": das Gesetz nennt
+    // Pfund, die Risikosumme braucht Euro — dann muss die Eurozahl die
+    // Umrechnung SEIN und nicht eine zweite, freie Behauptung.
+    const ab: string[] = [];
+    for (const [k, e] of alle()) {
+      const c = e.penaltyCeiling;
+      if (!c || !e.penaltyMaxEur) continue;
+      const betrag = c.kind === 'amount' ? c.value : c.orAmount?.value;
+      const waehrung = c.kind === 'amount' ? c.currency : c.orAmount?.currency;
+      if (!betrag || !waehrung || waehrung === 'EUR') continue;
+      const soll = inEuro(betrag, waehrung);
+      if (soll !== null && soll !== e.penaltyMaxEur) {
+        ab.push(`${k}: ${e.penaltyMaxEur} statt ${soll} (${betrag} ${waehrung} zum Kurs vom ${FX_STAND})`);
+      }
+    }
+    expect(
+      ab,
+      'Die Eurozahl ist nicht die Umrechnung des belegten Betrags. Entweder die '
+        + 'Kurse erneuern (node scripts/fetch-fx-rates.mjs) oder die Zahl nachziehen.',
+    ).toEqual([]);
+  });
+
+  it('meldet einen Kurs, der zu alt geworden ist', () => {
+    // Eingefroren heisst nicht vergessen. Ein halbes Jahr alter Kurs ist bei
+    // Pfund und Dollar noch vertretbar, bei der tuerkischen Lira laengst nicht
+    // mehr — deshalb lieber frueh meckern als spaet falsch rechnen.
+    const tage = Math.floor((Date.now() - Date.parse(FX_STAND)) / 86_400_000);
+    expect(
+      tage,
+      `Die EZB-Kurse sind ${tage} Tage alt (Stand ${FX_STAND}). `
+        + 'Erneuern mit: node scripts/fetch-fx-rates.mjs',
+    ).toBeLessThan(120);
+    expect(tage, `Kursdatum ${FX_STAND} liegt in der Zukunft`).toBeGreaterThanOrEqual(0);
+    expect(Object.keys(FX_JE_EUR).sort()).toEqual(['GBP', 'TRY', 'USD']);
   });
 
   it('verlangt von jeder NEUEN Pflicht die Obergrenze', () => {
@@ -426,9 +470,8 @@ describe('Belegte Obergrenze', () => {
   // sie darf nur schrumpfen, und wenn ein Portal zugaenglich wird, faellt es
   // im Review auf, weil eine Zeile verschwindet — nicht nur eine Ziffer.
   const STAATEN_OHNE_ZUGANG: Record<string, string> = {
-    TX: 'statutes.capitol.texas.gov liefert jede URL als dieselbe Geruestseite; '
-      + 'der Gesetzestext wird per JavaScript nachgeladen und kommt nicht an. '
-      + 'capitol.texas.gov und lrl.texas.gov stehen nicht auf der Allowlist.',
+    // TX ist am 19.09. weggefallen: die Gerueststeite laedt ihren Text von
+    // tcss.legis.texas.gov nach, und ueber diesen Host kommt er auch per curl.
     NY: 'www.nysenate.gov steht hinter einer Cloudflare-Bot-Schranke (403). '
       + 'Das ist eine Entscheidung des Betreibers, keine Zugangsluecke.',
   };
@@ -460,9 +503,14 @@ describe('Belegte Obergrenze', () => {
   });
 
   it('laesst die Liste der unerreichbaren Staaten nur schrumpfen', () => {
-    // Zwei von vier. Wird einer zugaenglich, faellt hier eine Zeile weg — und
-    // der Test verlangt dann, dass die Zahlen auch wirklich nachgetragen sind.
-    expect(Object.keys(STAATEN_OHNE_ZUGANG).sort()).toEqual(['NY', 'TX']);
+    // Einer von vier. Texas ist am 19.09. weggefallen, und der Wegfall lief
+    // genau so, wie diese Liste es vorsieht: erst verschwand die Zeile, dann
+    // verlangte der Beweispflicht-Test die Zahlen — nicht umgekehrt.
+    //
+    // Bleibt New York. Das ist die andere Art von Hindernis: bei Texas fehlte
+    // uns ein Weg, bei New York sagt der Betreiber Nein. Nur das erste liess
+    // sich beheben.
+    expect(Object.keys(STAATEN_OHNE_ZUGANG).sort()).toEqual(['NY']);
     for (const [staat, grund] of Object.entries(STAATEN_OHNE_ZUGANG)) {
       expect(grund.length, `${staat}: Grund zu duenn`).toBeGreaterThan(60);
     }
@@ -499,7 +547,42 @@ describe('Belegte Obergrenze', () => {
         if (c.kind === 'proportional') {
           expect(c.of?.trim().length ?? 0, `${k}: Prozentsatz ohne Bezugsgroesse`).toBeGreaterThan(5);
         }
+        // Dasselbe fuer den Betrag je Einheit: "7.500 EUR" ohne die Einheit
+        // liest sich wie eine Obergrenze und ist das genaue Gegenteil.
+        if (c.kind === 'perUnit') {
+          expect(c.per?.trim().length ?? 0, `${k}: Betrag je Einheit ohne Bezugseinheit`).toBeGreaterThan(5);
+        }
       }
     }
+  });
+
+  // Frankreich rechnet Geldstrafen fuer Unternehmen nicht im Sanktionsartikel
+  // aus: Code penal Art. 131-38 setzt sie pauschal auf "le quintuple" des
+  // Satzes fuer natuerliche Personen. Der Satz im Artikel ist also NICHT die
+  // Zahl, die ein Unternehmen trifft — L574-5 nennt 200.000 EUR und meint
+  // fuer eine GmbH eine Million.
+  //
+  // Das ist dieselbe Fehlerklasse, die bei Italien zweimal zugeschlagen hat
+  // und bei FR/legal-consumer-terms ein drittes Mal: der belegte Text stimmt,
+  // nur die Ebene nicht. Wo der basis-String den Verweis nennt, rechnet der
+  // Test die Multiplikation nach, statt sie zu glauben.
+  it('rechnet den Fuenffach-Verweis auf Code penal Art. 131-38 nach', () => {
+    let geprueft = 0;
+    for (const [k, e] of alle()) {
+      const c = e.penaltyCeiling;
+      if (!c?.basis || !/131-38/.test(c.basis)) continue;
+      const m = c.basis.match(/([\d.]+)\s*EUR/);
+      expect(m, `${k}: Verweis auf 131-38, aber kein Ausgangsbetrag im basis-String`).toBeTruthy();
+      const sockel = Number(String(m?.[1]).replace(/\./g, ''));
+      expect(
+        c.value,
+        `${k}: ${sockel} EUR verfuenffacht sind ${sockel * 5}, gefuehrt wird ${c.value}. `
+          + 'Der Sanktionsartikel nennt den Satz fuer natuerliche Personen.',
+      ).toBe(sockel * 5);
+      geprueft += 1;
+    }
+    // Faellt der Verweis aus allen Eintraegen, ist der Test still gruen
+    // geworden, ohne je etwas geprueft zu haben.
+    expect(geprueft, 'Kein Eintrag verweist mehr auf 131-38 — Test ohne Gegenstand').toBeGreaterThan(0);
   });
 });
