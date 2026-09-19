@@ -48,6 +48,20 @@ export type PenaltyCeiling =
      *  "steht woanders" keine Auskunft. */
     | { kind: 'subnational'; level: string; basis: string; note: string };
 
+/** Die US-Gliedstaaten, fuer die das Produkt eigene Zahlen fuehrt.
+ *  Bewusst KEINE Erweiterung von `CountryCode`: dort haengen Marktgewichte,
+ *  EU-Mitgliedschaft und der Generator dran, und ein Gliedstaat ist kein Markt
+ *  im Sinne dieser Liste. */
+export type UsState = 'CA' | 'TX' | 'NY' | 'FL';
+
+/** Die Aufloesung zu `penaltyCeiling.kind === 'subnational'`: was der einzelne
+ *  Gliedstaat vorsieht, mit seiner eigenen Vorschrift. Der Bund hat hier keine. */
+export interface SubnationalCeiling {
+    /** Die Vorschrift DIESES Staates, nicht die des Bundes. */
+    source: string;
+    penaltyCeiling: PenaltyCeiling;
+}
+
 export interface ObligationEnrichment {
     /** Primary legal source, e.g. 'UStG §18i (OSS)'. */
     source: string;
@@ -81,6 +95,15 @@ export interface ObligationEnrichment {
      *  neuen Pflicht. Den lebenden Stand fuehrt der Waechter in
      *  `obligationScope.test.ts` — dort steht, wie viele noch unbelegt sind. */
     penaltyCeiling?: PenaltyCeiling;
+    /** Nur wo `penaltyCeiling.kind === 'subnational'` steht: je gefuehrtem
+     *  Gliedstaat der belegte Betrag. Die Karte bleibt nach Laendern
+     *  geschluesselt; dieses Feld haengt die Ebene darunter ein, ohne dass
+     *  Generator, Marktprofile oder Risikomatrix etwas davon wissen muessen.
+     *
+     *  Unvollstaendig zu sein ist hier der Normalfall und kein Mangel: nicht
+     *  jeder Staat stellt seinen Gesetzestext maschinell bereit. Welche fehlen
+     *  und warum, fuehrt der Waechter in `obligationScope.test.ts`. */
+    states?: Partial<Record<UsState, SubnationalCeiling>>;
     /** Cadence label: 'Quarterly' | 'Annual' | 'Monthly' | 'Ongoing' | 'One-off'. */
     due: string;
     /** Typical days until the next deadline; drives the median-deadline stat. */
@@ -199,7 +222,10 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
     },
     'data-privacy': {
         UK: { source: 'UK GDPR / DPA 2018 Art. 13', penalty: 'up to £17.5M or 4% of turnover', penaltyMaxEur: 100000, due: 'Ongoing', penaltyCeiling: { kind: 'turnover', percent: 4, orAmount: { value: 17500000, currency: 'GBP' }, basis: 'UK-DSGVO Art. 83 Abs. 5 Buchst. b (Art. 12 bis 21) i.V.m. DPA 2018 s. 157 Abs. 5 Buchst. a — der hoehere der beiden Werte', asOf: '2026-09-19' } },
-        US: { source: 'CCPA/CPRA + state privacy acts', penalty: '$2,500–$7,500 per violation', penaltyMaxEur: 50000, due: 'Ongoing', penaltyCeiling: { kind: 'subnational', level: 'Bundesstaaten mit eigenem Datenschutzgesetz (Kalifornien und rund 20 weitere)', basis: 'Cal. Civ. Code § 1798.155 (CCPA/CPRA) und die Parallelgesetze der uebrigen Staaten', note: 'Es gibt kein allgemeines Bundesdatenschutzgesetz. Die genannten Saetze sind die kalifornischen und am Primaertext belegt: Cal. Civ. Code § 1798.155 Buchst. a nennt 2.500 USD je Verstoss und 7.500 USD je vorsaetzlichem Verstoss oder bei Daten Minderjaehriger unter 16. ACHTUNG, das ist nur der Sockel: nach § 1798.199.95 Buchst. d passt die California Privacy Protection Agency diese Betraege zum 1. Januar jedes ungeraden Jahres an den Verbraucherpreisindex an und veroeffentlicht die geltenden Werte selbst — im Gesetzestext stehen sie nicht. Naechste Anpassung 1.1.2027. Die uebrigen Staaten haben eigene, teils abweichende Saetze; erst ein Eintrag je Staat kann das ohne Verwechslung fuehren.' } },
+        US: { source: 'CCPA/CPRA + state privacy acts', penalty: '$2,500–$7,500 per violation', penaltyMaxEur: 50000, due: 'Ongoing', penaltyCeiling: { kind: 'subnational', level: 'Bundesstaaten mit eigenem Datenschutzgesetz (Kalifornien und rund 20 weitere)', basis: 'Cal. Civ. Code § 1798.155 (CCPA/CPRA) und die Parallelgesetze der uebrigen Staaten', note: 'Es gibt kein allgemeines Bundesdatenschutzgesetz; jeder Staat mit eigenem Gesetz setzt eigene Saetze. Die gefuehrten stehen in `states`. Fuer Texas und New York fehlt der Zugang zum Gesetzestext, nicht das Gesetz — siehe STAATEN_OHNE_ZUGANG im Waechter.' }, states: {
+            CA: { source: 'CCPA/CPRA, Cal. Civ. Code § 1798.155', penaltyCeiling: { kind: 'amount', value: 7500, currency: 'USD', basis: 'Cal. Civ. Code § 1798.155 Buchst. a — 2.500 USD je Verstoss, 7.500 USD je vorsaetzlichem Verstoss oder bei Daten Minderjaehriger unter 16. Nur der Sockel: nach § 1798.199.95 Buchst. d passt die California Privacy Protection Agency die Betraege zum 1. Januar jedes ungeraden Jahres an den Verbraucherpreisindex an und veroeffentlicht die geltenden Werte selbst; im Gesetzestext stehen sie nicht. Naechste Anpassung 1.1.2027.', asOf: '2026-09-19' } },
+            FL: { source: 'Florida Digital Bill of Rights, Fla. Stat. § 501.72', penaltyCeiling: { kind: 'amount', value: 150000, currency: 'USD', basis: 'Fla. Stat. § 501.72 Abs. 1 — 50.000 USD je Verstoss, verdreifacht bei Daten eines bekannten Kindes, bei Missachtung einer bestaetigten Loeschanfrage und bei fortgesetztem Verkauf nach Widerspruch. Ein Verstoss ist zugleich unfair and deceptive trade practice nach Teil II des Kapitels; durchsetzungsbefugt ist allein das Department of Legal Affairs.', asOf: '2026-09-19' } },
+        } },
         TR: { source: 'KVKK No. 6698 Art. 10', penalty: 'up to ₺13,000,000', penaltyMaxEur: 380000, due: 'Ongoing' },
         default: { source: 'GDPR Art. 13 / Art. 6', penalty: 'up to €20M or 4% of turnover', penaltyMaxEur: 100000, due: 'Ongoing', scope: 'eu' , penaltyCeiling: { kind: 'turnover', percent: 4, orAmount: { value: 20000000, currency: 'EUR' }, basis: 'DSGVO Art. 83 Abs. 5 Buchst. a und b', asOf: '2026-09-17' } },
     },
