@@ -1029,7 +1029,13 @@
       "marketsPanelTitle": "Elegir un mercado",
       "allMarkets": "Todos los mercados",
       "marketsAsideBody": "Cada mercado indica qué vence allí y con qué frecuencia, qué áreas pesan más y dónde aún no tenemos fuente local.",
-      "marketFact": "{{count}} obligaciones en {{areas}} áreas"
+      "marketFact": "{{count}} obligaciones en {{areas}} áreas",
+      "openMenu": "Abrir menú",
+      "closeMenu": "Cerrar menú",
+      "back": "Atrás",
+      "menuLabel": "Navegación principal",
+      "areasCount": "{{count}} áreas",
+      "marketsCount": "{{count}} mercados"
     },
     "login": "Iniciar sesión",
     "language": "Idioma"

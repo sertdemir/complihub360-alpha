@@ -1,17 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { Logo } from '../ui/Logo';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { AreasMenuPanel } from './AreasMenuPanel';
 import { MarketsMenuPanel } from './MarketsMenuPanel';
 import { LanguageMenu } from './LanguageMenu';
+import { MobileNav } from './MobileNav';
 import { HEADER_NAV_LINKS } from './navLinks';
 
 // ─── MarketingHeader ──────────────────────────────────────────────────────────
-// The marketing navigation, responsive: desktop bar + mobile expanding pill panel.
+// The marketing navigation, responsive: desktop bar + the shared mobile
+// drill-down panel (MobileNav — the same one GlobalNav opens).
 // Compass: Header Marketing Desktop / Mobile.
 //
 // Multipager since 2026-08-18. The entries used to be in-page anchors with
@@ -32,7 +33,8 @@ export interface NavLink {
 }
 
 export interface MarketingHeaderProps {
-  /** Navigation entries. Defaults to NAV_LINKS. */
+  /** Navigation entries for the DESKTOP bar. Defaults to NAV_LINKS; the mobile
+   *  panel always reads navLinks.ts, which is the point of that file. */
   links?: NavLink[];
   /** Locale-aware home link on the logo. */
   userHref?: string;
@@ -75,9 +77,11 @@ export function MarketingHeader({
     return pathname === href || pathname.startsWith(`${href}/`);
   };
   const inverse = theme === 'inverse';
+  const lang = userHref.replace(/^\/|\/$/g, '') || 'en';
 
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const mobileNavId = useId();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -178,7 +182,7 @@ export function MarketingHeader({
         </div>
       </div>
 
-      {/* ── Mobile / Tablet (pill panel until the desktop bar fits) ── */}
+      {/* ── Mobile / Tablet (bar + drill-down panel until the desktop bar fits) ── */}
       <div className="desktop-m:hidden">
         <div className="flex h-16 items-center justify-between px-5">
           {/* Mobile: mark only — wordmark + claim dropped to save width. */}
@@ -187,53 +191,50 @@ export function MarketingHeader({
             <ThemeToggle inverse={inverse} size={40} />
             <LanguageMenu triggerClassName={`h-10 w-10 ${inverse ? 'text-fg-inverse hover:text-fg-inverse' : ''}`} />
             <button
-              aria-label={open ? 'Close menu' : 'Open menu'}
+              aria-label={t('header.nav.openMenu', 'Open menu')}
               aria-expanded={open}
-              onClick={() => setOpen((v) => !v)}
-              className={`grid h-[40px] w-[40px] place-items-center rounded-md ${inverse ? 'text-fg-inverse' : 'text-fg'}`}
+              aria-controls={mobileNavId}
+              onClick={() => setOpen(true)}
+              className={`grid h-11 w-11 place-items-center rounded-md ${inverse ? 'text-fg-inverse' : 'text-fg'}`}
             >
-              {open ? <X size={22} /> : <Menu size={22} />}
+              <Menu size={22} aria-hidden />
             </button>
           </div>
         </div>
-
-        <AnimatePresence initial={false}>
-          {open && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
-              className="overflow-hidden bg-surface"
-            >
-              {/* Button row */}
-              <div className="flex items-center gap-4 px-4 pb-1 pt-4">
-                <a href={loginHref} className="inline-flex h-[40px] flex-1 items-center justify-center rounded-md border-thin border-stroke-brand px-4 text-body-sm font-semibold text-fg-brand">
-                  {t('header.login')}
-                </a>
-                <a href={signupHref} className="inline-flex h-[40px] flex-1 items-center justify-center rounded-md bg-brand px-4 text-body-sm font-semibold text-fg-on-brand">
-                  {t('nav.signup')}
-                </a>
-              </div>
-              {/* Pill row (horizontal scroll) */}
-              <div className="flex gap-3 overflow-x-auto px-4 pb-5 pt-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {items.map((a) => (
-                  <Link
-                    key={a.to}
-                    to={hrefFor(a.to)}
-                    onClick={() => setOpen(false)}
-                    className={`shrink-0 whitespace-nowrap rounded-pill px-3.5 py-2 text-body-sm font-semibold transition-colors ${
-                      isActive(a.to) ? 'bg-brand text-fg-on-brand' : 'bg-surface-secondary text-fg'
-                    }`}
-                  >
-                    {a.labelKey ? t(a.labelKey, { defaultValue: a.label }) : a.label}
-                  </Link>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
+
+      {/* The panel covers the bar it opened from, so it carries its own — see
+          MobileNav. The lockup is the light-ground one even under `inverse`:
+          the panel itself is always on bg-surface. */}
+      <MobileNav
+        id={mobileNavId}
+        open={open}
+        onClose={() => setOpen(false)}
+        lang={lang}
+        logo={<Logo lockup="symbol" href={null} />}
+        utilities={
+          <>
+            <ThemeToggle size={40} />
+            <LanguageMenu triggerClassName="h-10 w-10" />
+          </>
+        }
+        actions={
+          <div className="flex items-center gap-3">
+            <a
+              href={loginHref}
+              className="inline-flex h-12 flex-1 items-center justify-center whitespace-nowrap rounded-md border-thin border-stroke-brand px-3 text-body-sm font-semibold text-fg-brand"
+            >
+              {t('header.login')}
+            </a>
+            <a
+              href={signupHref}
+              className="inline-flex h-12 flex-1 items-center justify-center whitespace-nowrap rounded-md bg-brand px-3 text-body-sm font-semibold text-fg-on-brand"
+            >
+              {t('nav.signup')}
+            </a>
+          </div>
+        }
+      />
     </header>
   );
 }

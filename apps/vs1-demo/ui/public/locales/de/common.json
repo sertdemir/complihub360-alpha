@@ -1029,7 +1029,13 @@
       "marketsPanelTitle": "Markt wählen",
       "allMarkets": "Alle Märkte",
       "marketsAsideBody": "Jeder Markt zeigt, was dort wann fällig wird, welche Bereiche am schwersten wiegen und wo wir noch keine lokale Quelle führen.",
-      "marketFact": "{{count}} Pflichten in {{areas}} Bereichen"
+      "marketFact": "{{count}} Pflichten in {{areas}} Bereichen",
+      "openMenu": "Menü öffnen",
+      "closeMenu": "Menü schließen",
+      "back": "Zurück",
+      "menuLabel": "Hauptnavigation",
+      "areasCount": "{{count}} Bereiche",
+      "marketsCount": "{{count}} Märkte"
     },
     "login": "Anmelden",
     "language": "Sprache"

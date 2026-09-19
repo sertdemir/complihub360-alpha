@@ -1029,7 +1029,13 @@
       "marketsPanelTitle": "Pazar seçin",
       "allMarkets": "Tüm pazarlar",
       "marketsAsideBody": "Her pazar orada neyin ne zaman gerektiğini, hangi alanların en ağır bastığını ve nerede henüz yerel kaynak taşımadığımızı gösterir.",
-      "marketFact": "{{areas}} alanda {{count}} yükümlülük"
+      "marketFact": "{{areas}} alanda {{count}} yükümlülük",
+      "openMenu": "Menüyü aç",
+      "closeMenu": "Menüyü kapat",
+      "back": "Geri",
+      "menuLabel": "Ana gezinme",
+      "areasCount": "{{count}} alan",
+      "marketsCount": "{{count}} pazar"
     },
     "login": "Giriş yap",
     "language": "Dil"
