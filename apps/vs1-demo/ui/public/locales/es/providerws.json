@@ -20,7 +20,8 @@
     "oooStartConfirm": "Activar ausencia",
     "oooEndTitle": "¿Finalizar la ausencia?",
     "oooEndConsequence": "Vuelve a estar disponible — las nuevas solicitudes se le asignan de nuevo y los temporizadores de SLA se reanudan de inmediato.",
-    "oooEndConfirm": "Finalizar ausencia"
+    "oooEndConfirm": "Finalizar ausencia",
+    "switchTo": "Ir a"
   },
   "bell": {
     "aria": "Notificaciones",

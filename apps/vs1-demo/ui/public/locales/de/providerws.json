@@ -20,7 +20,8 @@
     "oooStartConfirm": "Abwesenheit aktivieren",
     "oooEndTitle": "Abwesenheit beenden?",
     "oooEndConsequence": "Sie sind wieder verfügbar — neue Anfragen werden Ihnen wieder zugeleitet und SLA-Timer laufen sofort weiter.",
-    "oooEndConfirm": "Abwesenheit beenden"
+    "oooEndConfirm": "Abwesenheit beenden",
+    "switchTo": "Wechseln zu"
   },
   "bell": {
     "aria": "Benachrichtigungen",

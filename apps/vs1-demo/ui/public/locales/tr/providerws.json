@@ -20,7 +20,8 @@
     "oooStartConfirm": "Ofis dışı modunu etkinleştir",
     "oooEndTitle": "Ofis dışı modu bitirilsin mi?",
     "oooEndConsequence": "Yeniden Uygun durumuna dönersiniz — yeni talepler tekrar size yönlendirilir ve SLA sayaçları hemen devam eder.",
-    "oooEndConfirm": "Ofis dışı modunu bitir"
+    "oooEndConfirm": "Ofis dışı modunu bitir",
+    "switchTo": "Şuraya git"
   },
   "bell": {
     "aria": "Bildirimler",

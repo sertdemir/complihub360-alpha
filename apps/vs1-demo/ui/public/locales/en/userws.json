@@ -57,7 +57,8 @@
     "search": "Search",
     "sessionsToggle": "Expand or collapse sessions",
     "sessionsAll_one": "All {{count}} session",
-    "sessionsAll_other": "All {{count}} sessions"
+    "sessionsAll_other": "All {{count}} sessions",
+    "switchTo": "Go to"
   },
   "home": {
     "title": "Welcome back, <accent>{{name}}</accent>.",
