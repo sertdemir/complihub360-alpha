@@ -231,11 +231,12 @@ describe('EU-Standard ausserhalb der EU', () => {
 // stehen soll, ist eine Produktentscheidung und keine Aufraeumarbeit. Der Test
 // haelt drei Beststaende fest und laesst sie nur schrumpfen.
 describe('Belegte Obergrenze', () => {
-  // Stand 2026-09-17. Belegt sind 29: 3x DSGVO Art. 83 Abs. 5 (20 Mio EUR oder
-  // 4 % Weltjahresumsatz), 7x PPWR Art. 68 (delegiert, kein Betrag), 9 deutsche
-  // Eintraege (gesetze-im-internet.de), 4 niederlaendische (wetten.overheid.nl)
-  // und 6 spanische (boe.es) — alle am Primaertext gelesen.
-  const OHNE_OBERGRENZE_STAND = 46;
+  // Stand 2026-09-19. Belegt sind 47: 3x DSGVO Art. 83 Abs. 5 (20 Mio EUR oder
+  // 4 % Weltjahresumsatz), 7x PPWR Art. 68 (delegiert, kein Betrag), 15 deutsche
+  // Eintraege (gesetze-im-internet.de, davon 6 zur PPWR aus VerpackDG § 66),
+  // 4 niederlaendische (wetten.overheid.nl), 6 spanische (boe.es) und
+  // 8 britische (legislation.gov.uk) — alle am Primaertext gelesen.
+  const OHNE_OBERGRENZE_STAND = 38;
   // Eintraege, deren Obergrenze GAR KEINEN absoluten Betrag nennt — delegiert,
   // "es gibt keine Geldbusse", rein umsatz- oder steueranteilig — und die
   // trotzdem eine Eurozahl fuehren. Das ist der Widerspruch in Reinform: das
@@ -252,6 +253,10 @@ describe('Belegte Obergrenze', () => {
     'DE/legal-consumer-terms', // 4 % Jahresumsatz, UWG § 19
     'ES/tax-corporate', // 150 % der Steuerschuld, LGT Art. 191
     'ES/tax-vat-registration', // 150 % der Steuerschuld, LGT Art. 191
+    'UK/log-eori', // keine Geldbusse; EORI fehlt im Anhang zu SI 2003/3113
+    'UK/prod-epr', // unbegrenzte Geldstrafe, SI 2024/1332 Reg. 119
+    'UK/tax-corporate', // 20 % der offenen Steuer, FA 1998 Sch. 18 Abs. 18
+    'UK/tax-vat-registration', // 100 % der entgangenen Steuer, FA 2008 Sch. 41
     'default/prod-epr', // PPWR Art. 68, delegiert
     'default/prod-packaging-conformity',
     'default/prod-packaging-empty-space',
@@ -270,7 +275,7 @@ describe('Belegte Obergrenze', () => {
     'prod-packaging-reuse-targets', 'prod-safety', 'tax-corporate', 'tax-vat-registration',
   ]);
 
-  type Obergrenze = { kind: string; basis?: string; asOf?: string; note?: string; value?: number; currency?: string; of?: string; orAmount?: { value: number } };
+  type Obergrenze = { kind: string; basis?: string; asOf?: string; note?: string; value?: number; currency?: string; of?: string; orAmount?: { value: number; currency?: string } };
   type Eintrag = { penaltyMaxEur?: number; penaltyCeiling?: Obergrenze };
   /** Nennt diese Obergrenze einen absoluten Betrag? */
   const nenntBetrag = (c: Obergrenze): boolean =>
@@ -325,6 +330,37 @@ describe('Belegte Obergrenze', () => {
     ).toEqual([]);
   });
 
+  // Die Gegenstuecke zur EUR-Pruefung darueber: hier IST ein Betrag belegt, nur
+  // eben in Pfund. Die Eurozahl daneben ist dann eine Umrechnung ohne Kurs und
+  // ohne Tag — genau das, was `penaltyCeiling` abschaffen sollte. Aufloesen
+  // kann das nur die Anzeige (Kurs plus Datum), nicht diese Karte; bis dahin
+  // steht der Widerspruch wenigstens namentlich da statt still.
+  const EUROZAHL_OHNE_KURS = [
+    'UK/corp-registration', // GBP 15.000 vs. 1.700 — Faktor 10 daneben
+    'UK/data-privacy', // GBP 17,5 Mio vs. 100.000
+    'UK/legal-consumer-terms', // GBP 300.000 vs. 15.000
+    'UK/prod-safety', // GBP 20.000 vs. 23.000 — plausibel, aber unbelegt
+  ];
+
+  it('nennt jede Eurozahl neben einem Fremdwaehrungs-Betrag beim Namen', () => {
+    const w = alle()
+      .filter(([, e]) => {
+        const c = e.penaltyCeiling;
+        if (!c || !e.penaltyMaxEur) return false;
+        const waehrung = c.kind === 'amount' ? c.currency : c.orAmount?.currency;
+        return !!waehrung && waehrung !== 'EUR';
+      })
+      .map(([k]) => k);
+    const neu = w.filter((k) => !EUROZAHL_OHNE_KURS.includes(k));
+    expect(
+      neu,
+      'Das Gesetz nennt den Betrag in einer anderen Waehrung; die Eurozahl daneben '
+        + 'ist eine Umrechnung ohne Kurs und ohne Tag. Namentlich in EUROZAHL_OHNE_KURS eintragen.',
+    ).toEqual([]);
+    const weg = EUROZAHL_OHNE_KURS.filter((k) => !w.includes(k));
+    expect(weg, `Aufgeloest! Bitte aus EUROZAHL_OHNE_KURS streichen: ${weg.join(', ')}`).toEqual([]);
+  });
+
   it('verlangt von jeder NEUEN Pflicht die Obergrenze', () => {
     const neu = ohneObergrenze().filter((k) => !BESTAND.has(k.split('/')[1]));
     expect(neu, 'Neue Pflicht: jede Zahl braucht ihre belegte Obergrenze').toEqual([]);
@@ -367,8 +403,15 @@ describe('Belegte Obergrenze', () => {
     for (const [k, e] of alle()) {
       const c = e.penaltyCeiling;
       if (!c) continue;
-      if (c.kind === 'delegated' || c.kind === 'none') {
+      if (c.kind === 'delegated' || c.kind === 'none' || c.kind === 'unlimited') {
         expect(c.note?.trim().length ?? 0, `${k}: ${c.kind} ohne Begruendung`).toBeGreaterThan(20);
+        // Auch die begruendeten Formen nennen eine Vorschrift — "es gibt keinen
+        // Betrag" ist eine Rechtsaussage und braucht ihre Fundstelle wie jede
+        // andere. Nur `delegated` nicht: dort IST die Fundstelle der Rechtsakt,
+        // der noch nichts erlassen hat.
+        if (c.kind !== 'delegated') {
+          expect(c.basis, `${k}: "${c.basis}" nennt keine Vorschrift`).toMatch(/\d/);
+        }
       } else {
         // Dieselbe Falle wie bei den `placeholder`-Quellen: ein String, der wie
         // eine Zitation AUSSIEHT, sitzt in derselben Zelle und im selben
