@@ -62,7 +62,7 @@ export function ProviderMagicActionPage() {
     <div className="dark flex min-h-screen items-center justify-center bg-surface px-4 text-fg">
       <div className="w-full max-w-[480px] rounded-xl border border-elevate/10 bg-elevate/[0.03] p-8 shadow-2xl shadow-black/40">
         <div className="mb-6 flex items-center gap-2">
-          <Logo lockup="horizontal" tone="on-petrol" href={null} className="h-[38px] w-auto" />
+          <Logo lockup="horizontal" tone="on-petrol" href={null} className="h-[36px] w-auto" />
           <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-fg-accent">{t('magicAction.partnerBadge')}</span>
         </div>
 

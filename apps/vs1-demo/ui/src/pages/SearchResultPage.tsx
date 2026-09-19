@@ -63,7 +63,7 @@ export function SearchResultPage() {
       {/* Topbar */}
       <header className="sticky top-0 z-30 border-b border-stroke-subtle bg-surface/90 backdrop-blur-xl">
         <div className="mx-auto flex h-[68px] w-full max-w-[1100px] items-center justify-between px-4 md:px-8">
-          <Logo lockup="horizontal" href={`/${locale}`} className="h-[38px]" />
+          <Logo lockup="horizontal" href={`/${locale}`} className="h-[36px]" />
           <button type="button" onClick={startGuided} className="text-body-xs font-semibold text-fg-brand hover:underline">
             {t('search.navGuided')} →
           </button>

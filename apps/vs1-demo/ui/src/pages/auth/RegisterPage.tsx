@@ -247,7 +247,7 @@ export function RegisterPage() {
                     (step === 0 ? "lg:w-[52%]" : "lg:w-[42%]")
                 }
             >
-                <Logo lockup="horizontal" href="/" className="h-[38px]" />
+                <Logo lockup="horizontal" href="/" className="h-[36px]" />
 
                 <div className="max-w-[480px] py-6 lg:py-0">
                     <p className="text-body-3xs font-bold uppercase tracking-[0.14em] text-brand">

@@ -156,7 +156,7 @@ export function SiteFooter() {
         {/* Brand + link columns */}
         <div className="grid gap-10 py-16 lg:grid-cols-12">
           <div className="lg:col-span-4">
-            <Logo lockup="horizontal" href="/" className="h-[38px]" />
+            <Logo lockup="horizontal" href="/" className="h-[36px]" />
             <p className="mt-5 max-w-xs text-body-sm leading-relaxed text-fg-secondary">
               {t('footer.tagline')}
             </p>
