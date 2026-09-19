@@ -231,12 +231,14 @@ describe('EU-Standard ausserhalb der EU', () => {
 // stehen soll, ist eine Produktentscheidung und keine Aufraeumarbeit. Der Test
 // haelt drei Beststaende fest und laesst sie nur schrumpfen.
 describe('Belegte Obergrenze', () => {
-  // Stand 2026-09-19. Belegt sind 47: 3x DSGVO Art. 83 Abs. 5 (20 Mio EUR oder
+  // Stand 2026-09-19. Belegt sind 55: 3x DSGVO Art. 83 Abs. 5 (20 Mio EUR oder
   // 4 % Weltjahresumsatz), 7x PPWR Art. 68 (delegiert, kein Betrag), 15 deutsche
   // Eintraege (gesetze-im-internet.de, davon 6 zur PPWR aus VerpackDG § 66),
-  // 4 niederlaendische (wetten.overheid.nl), 6 spanische (boe.es) und
-  // 8 britische (legislation.gov.uk) — alle am Primaertext gelesen.
-  const OHNE_OBERGRENZE_STAND = 38;
+  // 4 niederlaendische (wetten.overheid.nl), 6 spanische (boe.es),
+  // 8 britische (legislation.gov.uk) und 8 US-Eintraege (ecfr.gov,
+  // federalregister.gov) — alle am Primaertext gelesen. Von den acht
+  // amerikanischen sind drei `subnational`: dort setzt der Bund nichts.
+  const OHNE_OBERGRENZE_STAND = 30;
   // Eintraege, deren Obergrenze GAR KEINEN absoluten Betrag nennt — delegiert,
   // "es gibt keine Geldbusse", rein umsatz- oder steueranteilig — und die
   // trotzdem eine Eurozahl fuehren. Das ist der Widerspruch in Reinform: das
@@ -254,6 +256,11 @@ describe('Belegte Obergrenze', () => {
     'ES/tax-corporate', // 150 % der Steuerschuld, LGT Art. 191
     'ES/tax-vat-registration', // 150 % der Steuerschuld, LGT Art. 191
     'UK/log-eori', // keine Geldbusse; EORI fehlt im Anhang zu SI 2003/3113
+    'US/corp-registration', // Landesrecht, 50 Staaten
+    'US/data-privacy', // Landesrecht, CCPA plus rund 20 weitere
+    'US/log-customs-classification', // 100 % des Inlandswerts, 19 CFR 162.73
+    'US/tax-corporate', // 25 % der Steuer, 26 CFR 301.6651-1
+    'US/tax-vat-registration', // Landesrecht, 45 Staaten plus D.C.
     'UK/prod-epr', // unbegrenzte Geldstrafe, SI 2024/1332 Reg. 119
     'UK/tax-corporate', // 20 % der offenen Steuer, FA 1998 Sch. 18 Abs. 18
     'UK/tax-vat-registration', // 100 % der entgangenen Steuer, FA 2008 Sch. 41
@@ -275,7 +282,7 @@ describe('Belegte Obergrenze', () => {
     'prod-packaging-reuse-targets', 'prod-safety', 'tax-corporate', 'tax-vat-registration',
   ]);
 
-  type Obergrenze = { kind: string; basis?: string; asOf?: string; note?: string; value?: number; currency?: string; of?: string; orAmount?: { value: number; currency?: string } };
+  type Obergrenze = { kind: string; basis?: string; asOf?: string; note?: string; value?: number; currency?: string; of?: string; level?: string; orAmount?: { value: number; currency?: string } };
   type Eintrag = { penaltyMaxEur?: number; penaltyCeiling?: Obergrenze };
   /** Nennt diese Obergrenze einen absoluten Betrag? */
   const nenntBetrag = (c: Obergrenze): boolean =>
@@ -340,6 +347,9 @@ describe('Belegte Obergrenze', () => {
     'UK/data-privacy', // GBP 17,5 Mio vs. 100.000
     'UK/legal-consumer-terms', // GBP 300.000 vs. 15.000
     'UK/prod-safety', // GBP 20.000 vs. 23.000 — plausibel, aber unbelegt
+    'US/mktg-consent', // USD 53.088 vs. 48.000
+    'US/mktg-health-claims', // USD 53.088 vs. 90.000
+    'US/prod-safety', // USD 17,15 Mio vs. 110.000 — Faktor 156
   ];
 
   it('nennt jede Eurozahl neben einem Fremdwaehrungs-Betrag beim Namen', () => {
@@ -403,7 +413,8 @@ describe('Belegte Obergrenze', () => {
     for (const [k, e] of alle()) {
       const c = e.penaltyCeiling;
       if (!c) continue;
-      if (c.kind === 'delegated' || c.kind === 'none' || c.kind === 'unlimited') {
+      if (c.kind === 'delegated' || c.kind === 'none' || c.kind === 'unlimited'
+        || c.kind === 'subnational') {
         expect(c.note?.trim().length ?? 0, `${k}: ${c.kind} ohne Begruendung`).toBeGreaterThan(20);
         // Auch die begruendeten Formen nennen eine Vorschrift — "es gibt keinen
         // Betrag" ist eine Rechtsaussage und braucht ihre Fundstelle wie jede
@@ -411,6 +422,12 @@ describe('Belegte Obergrenze', () => {
         // der noch nichts erlassen hat.
         if (c.kind !== 'delegated') {
           expect(c.basis, `${k}: "${c.basis}" nennt keine Vorschrift`).toMatch(/\d/);
+        }
+        // Dieselbe Logik wie `of` beim Prozentsatz: "die Sanktion steht
+        // woanders" ist erst dann eine Auskunft, wenn dabeisteht WO und wie
+        // viele es davon gibt. Sonst klingt es wie eine Luecke.
+        if (c.kind === 'subnational') {
+          expect(c.level?.trim().length ?? 0, `${k}: keine Ebene benannt`).toBeGreaterThan(5);
         }
       } else {
         // Dieselbe Falle wie bei den `placeholder`-Quellen: ein String, der wie
