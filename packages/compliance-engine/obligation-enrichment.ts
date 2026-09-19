@@ -55,7 +55,11 @@ export interface ObligationEnrichment {
      *      zitieren koennte — er ist noch nicht erlassen.
      *
      *  Neben einen solchen Wert passt keine Fundstelle, ohne selbst zu luegen:
-     *  eine echte Vorschrift, die einen Betrag belegt, den sie nicht nennt. */
+     *  eine echte Vorschrift, die einen Betrag belegt, den sie nicht nennt.
+     *
+     *  Die drei Zahlen oben sind der Stand vom 17.09.2026 und altern mit jeder
+     *  neuen Pflicht. Den lebenden Stand fuehrt der Waechter in
+     *  `obligationScope.test.ts` — dort steht, wie viele noch unbelegt sind. */
     penaltyCeiling?: PenaltyCeiling;
     /** Cadence label: 'Quarterly' | 'Annual' | 'Monthly' | 'Ongoing' | 'One-off'. */
     due: string;
@@ -131,6 +135,7 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
     // identically in every member state, so there are no country overrides here.
     // The national layer (registration, licensing fees) sits in 'prod-epr'.
     'prod-packaging-conformity': {
+        DE: { source: 'EU PPWR 2025/40 Art. 37–39 (Annex VII/VIII)', penalty: 'VerpackDG §66: bis zu €10.000 (Konformitaetsbewertung)', penaltyMaxEur: 10000, due: 'Ongoing', appliesFrom: '2026-08-12', scope: 'eu', penaltyCeiling: { kind: 'amount', value: 10000, currency: 'EUR', basis: 'VerpackDG § 66 Abs. 3 i.V.m. Abs. 2 Nr. 3 (Konformitaetsbewertung nach Art. 15 Abs. 2 PPWR)', asOf: '2026-09-17' } },
         default: { source: 'EU PPWR 2025/40 Art. 37–39 (Annex VII/VIII)', penalty: 'national penalties under Art. 68 + withdrawal from the market', penaltyMaxEur: 100000, due: 'Ongoing', appliesFrom: '2026-08-12', scope: 'eu', penaltyCeiling: { kind: 'delegated', basis: 'PPWR (EU) 2025/40 Art. 68', note: 'Die Verordnung nennt keinen Betrag: nach Art. 68 Abs. 1 erlassen die Mitgliedstaaten die Sanktionen bis zum 12. Februar 2027. Fuer Verstoesse gegen Art. 24-29 muessen Geldbussen dabei sein (Abs. 2), ohne Hoehe.' } },
     },
     // The 2030 tranche. Same reasoning as above: a Regulation, so no country
@@ -138,18 +143,23 @@ export const ObligationEnrichmentMap: EnrichmentMap = {
     // act" if the Commission is late, so the date is a floor, not a promise —
     // said plainly in the source string rather than pretended away.
     'prod-packaging-recycled-content': {
+        DE: { source: 'EU PPWR 2025/40 Art. 7 (post-consumer recyclate only)', penalty: 'VerpackDG §66: bis zu €10.000 + Marktruecknahme', penaltyMaxEur: 10000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu', penaltyCeiling: { kind: 'amount', value: 10000, currency: 'EUR', basis: 'VerpackDG § 66 Abs. 3 i.V.m. Abs. 2 Nr. 2 (Inverkehrbringen entgegen Art. 7 Abs. 1 und 2 PPWR)', asOf: '2026-09-17' } },
         default: { source: 'EU PPWR 2025/40 Art. 7 (post-consumer recyclate only)', penalty: 'national penalties under Art. 68 + withdrawal from the market', penaltyMaxEur: 100000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu', penaltyCeiling: { kind: 'delegated', basis: 'PPWR (EU) 2025/40 Art. 68', note: 'Die Verordnung nennt keinen Betrag: nach Art. 68 Abs. 1 erlassen die Mitgliedstaaten die Sanktionen bis zum 12. Februar 2027. Fuer Verstoesse gegen Art. 24-29 muessen Geldbussen dabei sein (Abs. 2), ohne Hoehe.' } },
     },
     'prod-packaging-recyclability': {
+        DE: { source: 'EU PPWR 2025/40 Art. 6 + Annex II (grade A–C; A/B from 2038)', penalty: 'VerpackDG §66: bis zu €10.000 + Marktruecknahme', penaltyMaxEur: 10000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu', penaltyCeiling: { kind: 'amount', value: 10000, currency: 'EUR', basis: 'VerpackDG § 66 Abs. 3 i.V.m. Abs. 2 Nr. 2 (Inverkehrbringen entgegen Art. 6 Abs. 1 PPWR)', asOf: '2026-09-17' } },
         default: { source: 'EU PPWR 2025/40 Art. 6 + Annex II (grade A–C; A/B from 2038)', penalty: 'national penalties under Art. 68 + withdrawal from the market', penaltyMaxEur: 100000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu', penaltyCeiling: { kind: 'delegated', basis: 'PPWR (EU) 2025/40 Art. 68', note: 'Die Verordnung nennt keinen Betrag: nach Art. 68 Abs. 1 erlassen die Mitgliedstaaten die Sanktionen bis zum 12. Februar 2027. Fuer Verstoesse gegen Art. 24-29 muessen Geldbussen dabei sein (Abs. 2), ohne Hoehe.' } },
     },
     'prod-packaging-empty-space': {
+        DE: { source: 'EU PPWR 2025/40 Art. 24 (50% cap, or 3 years after the implementing act)', penalty: 'VerpackDG §66: bis zu €10.000', penaltyMaxEur: 10000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu', penaltyCeiling: { kind: 'amount', value: 10000, currency: 'EUR', basis: 'VerpackDG § 66 Abs. 3 i.V.m. Abs. 2 Nr. 17 (Leerraumverhaeltnis nach Art. 24 Abs. 1 PPWR)', asOf: '2026-09-17' } },
         default: { source: 'EU PPWR 2025/40 Art. 24 (50% cap, or 3 years after the implementing act)', penalty: 'national penalties under Art. 68 + withdrawal from the market', penaltyMaxEur: 75000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu', penaltyCeiling: { kind: 'delegated', basis: 'PPWR (EU) 2025/40 Art. 68', note: 'Die Verordnung nennt keinen Betrag: nach Art. 68 Abs. 1 erlassen die Mitgliedstaaten die Sanktionen bis zum 12. Februar 2027. Fuer Verstoesse gegen Art. 24-29 muessen Geldbussen dabei sein (Abs. 2), ohne Hoehe.' } },
     },
     'prod-packaging-format-bans': {
+        DE: { source: 'EU PPWR 2025/40 Art. 25 + Annex V', penalty: 'VerpackDG §66: bis zu €10.000; Format nicht mehr verkehrsfaehig', penaltyMaxEur: 10000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu', penaltyCeiling: { kind: 'amount', value: 10000, currency: 'EUR', basis: 'VerpackDG § 66 Abs. 3 i.V.m. Abs. 2 Nr. 18 (Inverkehrbringen entgegen Art. 25 Abs. 1 PPWR)', asOf: '2026-09-17' } },
         default: { source: 'EU PPWR 2025/40 Art. 25 + Annex V', penalty: 'format may no longer be placed on the market', penaltyMaxEur: 75000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu', penaltyCeiling: { kind: 'delegated', basis: 'PPWR (EU) 2025/40 Art. 68', note: 'Die Verordnung nennt keinen Betrag: nach Art. 68 Abs. 1 erlassen die Mitgliedstaaten die Sanktionen bis zum 12. Februar 2027. Fuer Verstoesse gegen Art. 24-29 muessen Geldbussen dabei sein (Abs. 2), ohne Hoehe.' } },
     },
     'prod-packaging-reuse-targets': {
+        DE: { source: 'EU PPWR 2025/40 Art. 29 (40% transport / 10% grouped; cardboard exempt)', penalty: 'VerpackDG §66: bis zu €200.000 — hoechste Stufe', penaltyMaxEur: 200000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu', penaltyCeiling: { kind: 'amount', value: 200000, currency: 'EUR', basis: 'VerpackDG § 66 Abs. 3 i.V.m. Abs. 2 Nr. 23, 25 und 26 (Wiederverwendungsquoten nach Art. 29 PPWR)', asOf: '2026-09-17' } },
         default: { source: 'EU PPWR 2025/40 Art. 29 (40% transport / 10% grouped; cardboard exempt)', penalty: 'national penalties under Art. 68', penaltyMaxEur: 50000, due: 'Ongoing', appliesFrom: '2030-01-01', scope: 'eu', penaltyCeiling: { kind: 'delegated', basis: 'PPWR (EU) 2025/40 Art. 68', note: 'Die Verordnung nennt keinen Betrag: nach Art. 68 Abs. 1 erlassen die Mitgliedstaaten die Sanktionen bis zum 12. Februar 2027. Fuer Verstoesse gegen Art. 24-29 muessen Geldbussen dabei sein (Abs. 2), ohne Hoehe.' } },
     },
     'prod-safety': {
