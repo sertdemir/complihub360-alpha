@@ -246,12 +246,11 @@ These are genuinely open and want a call before anything is built.
 - *Hover with intent delay* (~150ms in, ~300ms out) — faster for mouse users, familiar from large marketing
   sites. Costs a second code path, needs a touch fallback, and misfires on a diagonal pointer path.
 
-**b) Mobile behaviour**
-- *Reuse the off-canvas* (recommended) — the areas become a section inside the existing mobile panel; no
-  floating panel on a 390px viewport. Fits `mobile-header-pill-nav.md`, which is already the canonical
-  mobile pattern.
-- *Same floating panel* — one component everywhere, but a 2-column panel at 390px is not a real option and
-  it would need a `columns` override anyway.
+**b) Mobile behaviour** — DECIDED 2026-09-19, see `mobile-nav-drilldown.md`.
+The areas are a second level inside the shared mobile panel (`MobileNav`), reached by drilling down
+from the entry rather than by a floating panel: a 2-column sheet at 390px was never a real option.
+The sheet's content survives the move — the same `AREAS` and the same `compliance.<slug>.headline`
+line — which is what made drill-down win over an inline accordion.
 
 **c) How much per item?**
 - *Label + icon + risk badge* (recommended for areas) — the badge is the one piece of information that helps

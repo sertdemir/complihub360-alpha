@@ -7,12 +7,13 @@ const DESCRIPTION = `
 
 - **One audience.** The provider landing and the switch between the two were removed on
   2026-08-18 — with a single audience left, a toggle and a cross-link had nothing to point at.
-- **Anchors, not pages.** Menu items are in-page section links with **scroll-spy** — the anchor for
-  the section currently in view is highlighted (petrol active state).
-- **Responsive.** Desktop = glassmorphism bar (solid + shadow on scroll). Mobile = collapsed bar
-  (logo · globe · hamburger) that **expands** into a panel: the login action above a
-  **horizontally-scrollable pill row** of anchors (active pill = scroll-spy; edge-clip instead of
-  visible controls).
+- **Pages, not anchors.** Menu items are real routes since 2026-08-18; the active state comes from
+  the URL, not from the scroll position. Two of them open a mega-menu sheet.
+- **Responsive.** Desktop (from 1280) = glassmorphism bar (solid + shadow on scroll). Below that =
+  collapsed bar (logo · theme · globe · hamburger) that opens the shared **\`MobileNav\`** panel:
+  six full-width rows, the two mega-menu entries drilling down into the nine compliance areas and
+  the eight markets, actions pinned to the bottom edge. \`GlobalNav\` opens the same panel — see
+  \`docs/design-system/mobile-nav-drilldown.md\`.
 - **Themes.** \`light\` for light pages, \`inverse\` over dark hero sections.
 - Built entirely on Compass tokens. Mirrors the Figma components *Header Marketing Desktop /
   Header Marketing Mobile*.

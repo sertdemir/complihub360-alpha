@@ -1029,7 +1029,13 @@
       "marketsPanelTitle": "Choose a market",
       "allMarkets": "All markets",
       "marketsAsideBody": "Every market lists what falls due there and how often, which areas weigh heaviest, and where we hold no local source yet.",
-      "marketFact": "{{count}} duties in {{areas}} areas"
+      "marketFact": "{{count}} duties in {{areas}} areas",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu",
+      "back": "Back",
+      "menuLabel": "Main navigation",
+      "areasCount": "{{count}} areas",
+      "marketsCount": "{{count}} markets"
     },
     "login": "Log in",
     "language": "Language"

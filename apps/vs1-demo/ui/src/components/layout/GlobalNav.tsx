@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useId, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -7,10 +7,11 @@ import { LanguageMenu } from './LanguageMenu';
 import { AreasMenuPanel } from './AreasMenuPanel';
 import { MarketsMenuPanel } from './MarketsMenuPanel';
 import { useAuthStore } from '../../store/useAuthStore';
-import { ChevronDown, LogOut, LayoutDashboard, Menu, X } from 'lucide-react';
+import { ChevronDown, LogOut, LayoutDashboard, Menu } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Logo } from '../ui/Logo';
 import { ThemeToggle } from '../ui/ThemeToggle';
+import { MobileNav } from './MobileNav';
 import { HEADER_NAV_LINKS } from './navLinks';
 
 const menuItemClass = (active: boolean) =>
@@ -32,6 +33,7 @@ export function GlobalNav() {
   const currentLang = supportedLngs.includes(pathLang) ? pathLang : i18n.resolvedLanguage || 'en';
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const mobileNavId = useId();
   const userMenuRef = useRef<HTMLDivElement>(null);
   const { isLoggedIn, role, userName, logout } = useAuthStore();
 
@@ -235,14 +237,13 @@ export function GlobalNav() {
         </div>
         </div>
 
-        {/* ── Mobile / Tablet (burger + expanding panel) ── */}
+        {/* ── Mobile / Tablet (burger + drill-down panel) ── */}
         {/* GlobalNav had NO mobile navigation until 2026-08-28 (user finding):
             the desktop row simply clipped its entries behind overflow-hidden.
-            This is the MarketingHeader's mobile anatomy — compact bar with the
-            mark, theme, language and a burger; the panel carries the account
-            actions and the nav entries as a scrollable pill row. The two mega
-            menus are plain links here: their overview pages list the same
-            children a sheet would. */}
+            The pill row that answered that then only moved the clipping into
+            the panel — see MobileNav for what replaced it on 2026-09-19 and
+            why. Both headers now open the same panel, so the two cannot
+            present different navigations on mobile either. */}
         <div className="desktop-m:hidden">
           <div className="flex h-16 items-center justify-between px-5">
             <button onClick={() => navTo('/')} className="flex items-center" aria-label="CompliHub360 Home">
@@ -252,105 +253,92 @@ export function GlobalNav() {
               <ThemeToggle size={40} />
               <LanguageMenu triggerClassName="h-10 w-10" />
               <button
-                aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+                aria-label={t('header.nav.openMenu', 'Open menu')}
                 aria-expanded={mobileOpen}
-                onClick={() => setMobileOpen((v) => !v)}
-                className="grid h-[40px] w-[40px] place-items-center rounded-md text-fg"
+                aria-controls={mobileNavId}
+                onClick={() => setMobileOpen(true)}
+                className="grid h-11 w-11 place-items-center rounded-md text-fg"
               >
-                {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+                <Menu size={22} aria-hidden />
               </button>
             </div>
           </div>
-
-          <AnimatePresence initial={false}>
-            {mobileOpen && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.25, ease: 'easeOut' }}
-                className="overflow-hidden bg-surface"
-              >
-                {/* Account row — the same actions the desktop bar's right zone
-                    carries, full-width so a thumb can hit them. */}
-                <div className="flex items-center gap-3 px-4 pb-1 pt-4">
-                  {isLoggedIn ? (
-                    <>
-                      <Button
-                        variant="outline"
-                        size="md"
-                        className="flex-1"
-                        onClick={() => {
-                          setMobileOpen(false);
-                          navTo(role === 'partner' ? '/partner-dashboard' : '/dashboard');
-                        }}
-                      >
-                        <LayoutDashboard size={16} className="mr-2" aria-hidden />
-                        Mein Dashboard
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="md"
-                        aria-label="Abmelden"
-                        onClick={() => {
-                          setMobileOpen(false);
-                          logout();
-                          navTo('/');
-                        }}
-                      >
-                        <LogOut size={16} aria-hidden />
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button
-                        variant="outline"
-                        size="md"
-                        className="flex-1"
-                        onClick={() => {
-                          setMobileOpen(false);
-                          navTo('/login');
-                        }}
-                      >
-                        {t('nav.login', 'Log in')}
-                      </Button>
-                      <Button
-                        variant="primary"
-                        size="md"
-                        className="flex-1"
-                        onClick={() => {
-                          setMobileOpen(false);
-                          navTo('/register');
-                        }}
-                      >
-                        {t('nav.signup', 'Sign up for free')}
-                      </Button>
-                    </>
-                  )}
-                </div>
-                {/* Pill row (horizontal scroll) — the MarketingHeader's move. */}
-                <div className="flex gap-3 overflow-x-auto px-4 pb-5 pt-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                  {HEADER_MENU.map((menu) => (
-                    <Link
-                      key={menu.id}
-                      to={`/${currentLang}${menu.path}`}
-                      onClick={() => setMobileOpen(false)}
-                      className={`shrink-0 whitespace-nowrap rounded-pill px-3.5 py-2 text-body-sm font-semibold transition-colors ${
-                        location.pathname.startsWith(`/${currentLang}${menu.path}`)
-                          ? 'bg-brand text-fg-on-brand'
-                          : 'bg-surface-secondary text-fg'
-                      }`}
-                    >
-                      {menu.label}
-                    </Link>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </div>
 
+      {/* The account actions the desktop bar's right zone carries, full-width
+          at the bottom edge where a thumb reaches them. */}
+      <MobileNav
+        id={mobileNavId}
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        lang={currentLang}
+        logo={<Logo lockup="symbol" href={null} />}
+        utilities={
+          <>
+            <ThemeToggle size={40} />
+            <LanguageMenu triggerClassName="h-10 w-10" />
+          </>
+        }
+        actions={
+          <div className="flex items-center gap-3">
+            {isLoggedIn ? (
+              <>
+                <Button
+                  variant="outline"
+                  size="md"
+                  className="h-12 flex-1"
+                  onClick={() => {
+                    setMobileOpen(false);
+                    navTo(role === 'partner' ? '/partner-dashboard' : '/dashboard');
+                  }}
+                >
+                  <LayoutDashboard size={16} className="mr-2" aria-hidden />
+                  Mein Dashboard
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="md"
+                  className="h-12"
+                  aria-label="Abmelden"
+                  onClick={() => {
+                    setMobileOpen(false);
+                    logout();
+                    navTo('/');
+                  }}
+                >
+                  <LogOut size={16} aria-hidden />
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="outline"
+                  size="md"
+                  className="h-12 flex-1"
+                  onClick={() => {
+                    setMobileOpen(false);
+                    navTo('/login');
+                  }}
+                >
+                  {t('nav.login', 'Log in')}
+                </Button>
+                <Button
+                  variant="primary"
+                  size="md"
+                  className="h-12 flex-1"
+                  onClick={() => {
+                    setMobileOpen(false);
+                    navTo('/register');
+                  }}
+                >
+                  {t('nav.signup', 'Sign up for free')}
+                </Button>
+              </>
+            )}
+          </div>
+        }
+      />
     </header>
   );
 }

@@ -1,4 +1,10 @@
-# Mobile Header — Pill Nav (FINAL · canonical)
+# Mobile Header — Pill Nav (SUPERSEDED in code, 2026-09-19)
+
+> **The runtime behaviour below is no longer what the app builds.** The pill row showed two
+> and a half of six entries at 390px with the scrollbar hidden, and it had no place for the
+> second level at all. `mobile-nav-drilldown.md` is the canonical mobile pattern now.
+> This page stays as the record of the Figma component sets on the Compass Header page
+> (`704:2`), which are unchanged, and of the anchor era the pattern was designed for.
 
 User-confirmed **final** mobile header pattern (chosen over the full-screen off-canvas, which is **kept**
 as an alternative, not deleted). Merged into proper Compass components on the Header page (`704:2`),
