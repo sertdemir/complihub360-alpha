@@ -57,10 +57,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       <Sidebar
         logo={
           <NavLink to={base} className="flex items-center gap-2">
-            {/* 32 statt 38 px: die Sidebar ist w-60 (240 px), mit px-4 bleiben 208 px
-                Spur. Bei 38 px waere das Lockup 186 px breit — es passt, aber
-                mit 22 px Rest sitzt es in der schmalen Spur zu eng. Bei 32 px
-                sind es 157 px, also 51 px Reserve.
+            {/* 32 statt 36 px: die Sidebar ist w-60 (240 px), mit px-4 bleiben
+                208 px Spur. Bei 36 px waere das Lockup 177 px breit — es
+                passt, fuellt die schmale Spur aber zu 85 %. Bei 32 px sind
+                es 157 px, also 75 % und 51 px Reserve.
                 Die Bildmarke wird dadurch kleiner, das WORTZEICHEN bleibt
                 groesser als vor dem Claim-Wegfall: 16,6 px statt 11,0 px. */}
             <Logo lockup="horizontal" href={null} className="h-[32px] w-auto" />

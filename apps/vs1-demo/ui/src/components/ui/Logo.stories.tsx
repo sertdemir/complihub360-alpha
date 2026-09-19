@@ -34,20 +34,20 @@ Code-Design-Systems ist (Badge, Alert und Stat verwenden sie ebenso). Die
 ### \`claim\` — und warum der Default \`false\` ist
 
 Der Claim "Always on your side" ist 17 % der Logo-Höhe, also **8 px** bei den
-38 px, die jede echte Platzierung fährt — Header, Footer, Auth-Seiten, Shells.
+36 px, die jede echte Platzierung fährt — Header, Footer, Auth-Seiten, Shells.
 Bei 8 px ist er nicht lesbar, in keiner Farbe; die Kontrastkorrektur auf
 \`accent/800\` hat das gemildert, nicht gelöst. Statt einer unlesbaren Zeile
-bekommt das Wortzeichen ihren Platz: es wächst um **51 %**, von 13,0 auf
-19,7 px bei 38 px Logo-Höhe.
+bekommt das Wortzeichen ihren Platz: es wächst um **51 %**, von 12,3 auf
+18,6 px bei 36 px Logo-Höhe.
 
 \`claim\` setzt man dort, wo das Logo groß genug dafür ist — Print, Keynote,
 eine Markenseite, ein Export ab etwa 90 px. Dort ist die Geometrie bitgenau
 die von vorher.
 
 Warum 1,40 und nicht die vollen 1,51: das Wortzeichen skaliert proportional in
-der Breite mit: bei 38 px Logo-Höhe ist das Lockup **186 px** breit statt 137.
-Der MarketingHeader trägt das erst ab 1520 px Fensterbreite — unter 1520 zeigen
-beide Kopfzeilen deshalb nur die Bildmarke.
+der Breite mit: bei 36 px Logo-Höhe ist das Lockup **177 px** breit statt 130.
+Der MarketingHeader trägt das ab 1440 — unter 1440 zeigen beide Kopfzeilen
+deshalb nur die Bildmarke, wie schon unter 1280.
 
 Die Höhe steuert \`className\` (\`h-7\`, \`h-9\`, …), die Breite folgt über \`w-auto\`.
 Der Claim ist bewusst untranslatiert — er liest sich in jeder Locale gleich.
@@ -166,7 +166,7 @@ export const MitUndOhneClaim: Story = {
       description: {
         story:
           'Links der Stand ohne Claim (Default), rechts mit. Die Zeile unter jedem Paar ' +
-          'nennt die Höhe des Wortzeichens in px — bei 38 px, der Höhe jeder echten ' +
+          'nennt die Höhe des Wortzeichens in px — bei 36 px, der Höhe jeder echten ' +
           'Platzierung, steht der Claim bei 8 px.',
       },
     },
@@ -175,7 +175,7 @@ export const MitUndOhneClaim: Story = {
     <div className="flex flex-col gap-10">
       {([
         [29, 'h-[29px]'],
-        [38, 'h-[38px]'],
+        [36, 'h-[36px]'],
         [96, 'h-[96px]'],
       ] as const).map(([px, h]) => (
         <div key={px} className="flex flex-col gap-3">

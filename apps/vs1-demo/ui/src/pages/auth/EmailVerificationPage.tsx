@@ -39,7 +39,7 @@ export function EmailVerificationPage() {
 
     return (
         <div className="flex min-h-screen flex-col bg-gradient-stage px-6 py-8 lg:px-16 lg:py-10">
-            <Logo lockup="horizontal" href="/" className="h-[38px]" />
+            <Logo lockup="horizontal" href="/" className="h-[36px]" />
 
             <div className="flex flex-1 items-center justify-center py-10">
                 <motion.div

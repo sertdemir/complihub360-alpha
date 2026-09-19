@@ -103,34 +103,35 @@ export function MarketingHeader({
           xl is 1440 in this Tailwind scale, so the cut is desktop-m (1280). ── */}
       <div className="mx-auto hidden h-20 max-w-container-3xl items-center gap-4 px-4 desktop-m:flex">
         <div className="flex flex-1 basis-0 items-center gap-5">
-          {/* Unter 1520 nur die Bildmarke — dasselbe Muster, das GlobalNav
+          {/* Unter 1440 nur die Bildmarke — dasselbe Muster, das GlobalNav
               fuer dasselbe Problem faehrt. Diese Leiste ist der ENGSTE Fall
-              der ganzen Site, enger als die Navigation:
+              der ganzen Site, enger als die Navigation.
 
               Alles im Browser an der rechten Kante nachgemessen, bei 1440:
 
                 Logo-Hoehe   Lockup    rechte Kante bei 1440
                 47 px        170 px    1432   (mit Claim, Stand vor 19.09.)
                 47 px        230 px    1471   laeuft 31 px ueber
-                38 px        186 px    passt erst ab 1520     <- heutiger Stand
-                36 px        177 px    passt bei 1440
+                38 px        186 px    passt erst ab 1520
+                36 px        177 px    passt bei 1440     <- heutiger Stand
 
               Mit Claim blieben bei 1440 genau 8 px Luft. Das war schon vor
               dem groesseren Wortzeichen zu wenig: ein laengeres Label oder
               eine andere Locale haette denselben Ueberlauf erzeugt. Der
               Registrieren-Knopf wird dabei still abgeschnitten, ohne
               Scrollbalken — das Element ist fixed, sein Ueberlauf taucht in
-              document.scrollWidth nicht auf.
+              document.scrollWidth nicht auf. Wer hier etwas vergroessert,
+              misst die rechte Kante der KINDER gegen innerWidth, nicht
+              scrollWidth.
 
-              1520 ist deshalb keine Breakpoint-Stufe aus dem Compass-Grid,
-              sondern eine gemessene Inhaltsschwelle: ab hier passt das
-              Lockup in BEIDE Kopfzeilen. Es steht als min-[1520px] da und
-              nicht als Token, weil es eine Eigenschaft dieser Leiste ist,
-              nicht des Rasters. */}
-          <span className="min-[1520px]:hidden">
-            <Logo lockup="symbol" tone={inverse ? 'on-petrol' : undefined} href={userHref} className="h-[38px]" />
+              Zwischenzeitlich stand hier min-[1520px], eine gemessene
+              Inhaltsschwelle statt einer Grid-Stufe. Mit 36 px statt 38
+              passt das Lockup wieder bei 1440, deshalb steht der
+              Umschaltpunkt zurueck auf dem Token desktop-l. */}
+          <span className="desktop-l:hidden">
+            <Logo lockup="symbol" tone={inverse ? 'on-petrol' : undefined} href={userHref} className="h-[36px]" />
           </span>
-          <span className="hidden min-[1520px]:block">
+          <span className="hidden desktop-l:block">
             <Logo tone={inverse ? 'on-petrol' : undefined} href={userHref} />
           </span>
         </div>
