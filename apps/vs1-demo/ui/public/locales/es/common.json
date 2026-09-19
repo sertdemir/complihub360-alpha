@@ -850,7 +850,8 @@
         "noNamedSource": "Todavía sin fuente citada",
         "placeholderNote": "El motor no incluye ninguna norma de {{market}} aquí: es una laguna de nuestra cobertura, no de la ley.",
         "pendingNote": "Fuente de la UE. {{market}} tiene además su propio texto, que aún no incluimos.",
-        "euDirect": "Reglamento de la UE: se aplica directamente, esta es la norma vigente aquí"
+        "euDirect": "Reglamento de la UE: se aplica directamente, esta es la norma vigente aquí",
+        "ceiling": "Límite acreditado"
       },
       "relatedOpen": "Abrir este ámbito",
       "relatedStrongest": "Conexión más fuerte",
@@ -907,7 +908,73 @@
       "askPlaceholder": "Haga su pregunta con sus propias palabras",
       "coverageNoteGaps": "{{specific}} de {{count}} obligaciones tienen una fuente específica de {{market}}. Del resto, {{gaps}} tienen un texto nacional que aún no incluimos; las demás son Reglamentos de la UE, de aplicación directa aquí.",
       "checkTitle": "¿Le aplica esto?",
-      "checkFoot": "Si uno aplica, esta área conlleva deberes para usted — el assessment los acota a su caso."
+      "checkFoot": "Si uno aplica, esta área conlleva deberes para usted — el assessment los acota a su caso.",
+      "ceiling": {
+        "unproven": "Aún sin acreditar",
+        "unprovenNote": "La cifra con la que calcula el mapa de riesgo es un valor heredado: no la hemos leído en el texto legal.",
+        "perUnit": "{{amount}} por {{per}}",
+        "proportional": "{{percent}} % {{of}}",
+        "turnover": "{{percent}} % del volumen de negocios anual mundial",
+        "turnoverOr": "{{amount}} o {{percent}} % del volumen de negocios anual mundial, la cantidad que sea mayor",
+        "subnational": "Se fija un nivel más abajo — {{level}}",
+        "delegated": "Sin importe — el acto deja la sanción a los Estados miembros",
+        "none": "Sin multa — la consecuencia es civil",
+        "unlimited": "Multa sin límite máximo",
+        "asOf": "{{basis}} · a fecha de {{date}}",
+        "converted": "La cifra en euros es nuestra conversión de {{from}}, al tipo del BCE de {{date}}.",
+        "noAmount": "La ley no menciona ningún importe, por lo que la cifra en euros no tiene equivalente legal.",
+        "state": {
+          "CA": "California",
+          "TX": "Texas",
+          "NY": "Nueva York",
+          "FL": "Florida"
+        },
+        "basisNote": {
+          "frTaxTiers": "10 % sin requerimiento, 40 % tras el requerimiento, 80 % por actividad oculta",
+          "frTaxIntent": "40 % por incumplimiento deliberado, 80 % por fraude fiscal",
+          "frQuintuple4500": "La ley fija 4.500 € para personas físicas; para las jurídicas es el quíntuplo",
+          "frQuintuple200k": "La ley fija 200.000 € para personas físicas; para las jurídicas es el quíntuplo",
+          "frTwoRates75k": "75.000 € para personas jurídicas, 15.000 € para personas físicas",
+          "frPerUnitTwoRates": "El importe para personas jurídicas; 1.500 € para personas físicas",
+          "usMonthlyCap25": "5 % por cada mes iniciado, con un máximo del 25 % en total",
+          "txCurePeriod": "Solo tras el plazo de subsanación: 30 días desde la notificación del Attorney General",
+          "ukLateFilingTiers": "Public company, con más de seis meses de retraso: 7.500 £, el doble si también se incumplió el año anterior. Private company: de 150 a 1.500 £",
+          "itAccountsTiers": "No depósito de las cuentas anuales; por año de retraso a partir de 6 M€ de facturación, en otro caso de 1.200 a 60.000 €",
+          "esVeryGraveRange": "Infracción muy grave: del 100 % al 150 %",
+          "esPesetaLegacy": "Infracción muy grave. Convertida de pesetas en 2001 y no actualizada desde entonces",
+          "esGainMultiple": "Infracción muy grave. Puede superarse hasta seis u ocho veces el beneficio ilícito",
+          "nlPaymentDefault": "Impago. En caso de dolo, el 100 % del impuesto según el art. 67f",
+          "widespreadOnly": "Solo en caso de infracción generalizada; en otro caso, 50.000 € conforme a la primera frase",
+          "ukIndictmentVsSummary": "Por vía de acusación formal. En el procedimiento sumario se aplica en su lugar el statutory maximum",
+          "nlFourthCategory": "Cuarta categoría, a 1 de enero de 2026",
+          "ukOverTwoYears": "Con más de dos años de retraso",
+          "ukDeliberateConcealed": "Categoría 1, deliberada y ocultada",
+          "deAssessedTaxes": "Falta de presentación, en impuestos liquidados",
+          "deLateSurchargeCap": "Recargo por presentación extemporánea, límite máximo",
+          "deliberateNoDisclosure": "Incumplimiento deliberado, sin regularización voluntaria",
+          "seriousRepeated": "Incumplimiento grave, reiterado o sistemático",
+          "nyShieldChain": "Nueva York no tiene una ley general de privacidad. La SHIELD Act regula la seguridad de los datos y remite la sanción dos niveles más allá, al derecho general de consumo. No notificar una brecha tiene su propio límite: según el § 899-aa, 5.000 $ o 20 $ por notificación omitida, con un tope de 250.000 $."
+        },
+        "ofKey": {
+          "domesticValue": "del valor interno de la mercancía",
+          "taxRequiredToShow": "del impuesto que debe figurar en la declaración",
+          "itIncomeTax": "del impuesto sobre la renta debido (IRES e IRAP)",
+          "corporateTaxDue": "del impuesto de sociedades debido",
+          "vatDue": "del IVA debido",
+          "taxDue": "del impuesto debido",
+          "unremittedTax": "de la deuda tributaria no ingresada",
+          "unpaidCorporateTax": "del impuesto de sociedades pendiente",
+          "potentialLostRevenue": "de la recaudación potencialmente perdida"
+        },
+        "perKey": {
+          "unitOrTonnePlaced": "unidad o tonelada de producto puesto en el mercado"
+        },
+        "levelKey": {
+          "states45AndDc": "45 estados y el Distrito de Columbia",
+          "statesWithPrivacyActs": "los estados con ley propia de privacidad (California y una veintena más)",
+          "states50AndDc": "los 50 estados y el Distrito de Columbia"
+        }
+      }
     },
     "riskBadge": "Riesgo: {{level}}"
   },
