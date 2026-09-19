@@ -238,7 +238,8 @@ describe('Belegte Obergrenze', () => {
   // 8 britische (legislation.gov.uk) und 8 US-Eintraege (ecfr.gov,
   // federalregister.gov) — alle am Primaertext gelesen. Von den acht
   // amerikanischen sind drei `subnational`: dort setzt der Bund nichts.
-  const OHNE_OBERGRENZE_STAND = 30;
+  // Dazu `US/data-hosting`: der EU-US-Datenschutzrahmen kennt keine eigene Busse.
+  const OHNE_OBERGRENZE_STAND = 29;
   // Eintraege, deren Obergrenze GAR KEINEN absoluten Betrag nennt — delegiert,
   // "es gibt keine Geldbusse", rein umsatz- oder steueranteilig — und die
   // trotzdem eine Eurozahl fuehren. Das ist der Widerspruch in Reinform: das
@@ -257,6 +258,7 @@ describe('Belegte Obergrenze', () => {
     'ES/tax-vat-registration', // 150 % der Steuerschuld, LGT Art. 191
     'UK/log-eori', // keine Geldbusse; EORI fehlt im Anhang zu SI 2003/3113
     'US/corp-registration', // Landesrecht, 50 Staaten
+    'US/data-hosting', // keine eigene Busse; Folge ist Streichung von der Liste
     'US/data-privacy', // Landesrecht, CCPA plus rund 20 weitere
     'US/log-customs-classification', // 100 % des Inlandswerts, 19 CFR 162.73
     'US/tax-corporate', // 25 % der Steuer, 26 CFR 301.6651-1
