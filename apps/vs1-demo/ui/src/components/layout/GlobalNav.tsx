@@ -103,10 +103,10 @@ export function GlobalNav() {
           {/* Mark only between desktop-m and desktop-l: the full lockup plus
               six German entries need the last ~130px the wordmark occupies. */}
           <span className="desktop-l:hidden">
-            <Logo lockup="symbol" href={null} className="h-7" />
+            <Logo lockup="symbol" href={null} className="h-[47px]" />
           </span>
           <span className="hidden desktop-l:block">
-            <Logo lockup="horizontal" href={null} className="h-7" />
+            <Logo lockup="horizontal" href={null} />
           </span>
         </button>
 
