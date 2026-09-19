@@ -43,8 +43,6 @@ export interface MobileNavProps {
   /** Logo for the root-level bar. The panel is always on `bg-surface`, so pass
    *  the light-ground lockup even from an inverse header. */
   logo: React.ReactNode;
-  /** Theme / language controls, shown next to the close button on level 1. */
-  utilities?: React.ReactNode;
   /** Pinned to the bottom edge on every level — the thumb zone, which is why it
    *  is no longer the first thing under the bar. */
   actions: React.ReactNode;
@@ -55,7 +53,7 @@ export interface MobileNavProps {
 const ROW = 'flex h-14 w-full items-center gap-2.5 border-b border-stroke-subtle px-5 text-left transition-colors';
 const ROW_LABEL = 'flex-1 text-body font-semibold tracking-[-0.01em]';
 
-export function MobileNav({ open, onClose, lang, logo, utilities, actions, id }: MobileNavProps) {
+export function MobileNav({ open, onClose, lang, logo, actions, id }: MobileNavProps) {
   const { t } = useTranslation('common');
   const { pathname } = useLocation();
   const [level, setLevel] = useState<Level>('root');
@@ -168,9 +166,14 @@ export function MobileNav({ open, onClose, lang, logo, utilities, actions, id }:
           transition={{ duration: 0.18, ease: 'easeOut' }}
           className="fixed inset-0 z-[60] flex flex-col bg-surface desktop-m:hidden"
         >
-          {/* ── Bar ── Level 1 carries the logo and the utilities; a sub-level
-              hands that space to the way back and the title, so the panel never
-              needs a second row to say where you are. */}
+          {/* ── Bar ── Logo and the way out, nothing else (user, 2026-09-19).
+              The theme and language controls used to sit here too, but this bar
+              and the header's own are two different elements: the panel's group
+              carried `-mr-2.5` and `gap-0.5` where the header had neither, so
+              every icon shifted 10–22px the moment the menu opened. One control
+              in the bar cannot drift; the two that could are reachable again the
+              moment the panel closes. A sub-level swaps the logo for the way
+              back and the title, so the panel never needs a second row. */}
           <div className="flex h-16 shrink-0 items-center gap-1 border-b border-stroke-subtle px-5">
             {level === 'root' ? (
               <>
@@ -178,10 +181,7 @@ export function MobileNav({ open, onClose, lang, logo, utilities, actions, id }:
                   {logo}
                 </Link>
                 <span className="flex-1" />
-                <div className="-mr-2.5 flex items-center gap-0.5">
-                  {utilities}
-                  {closeButton}
-                </div>
+                {closeButton}
               </>
             ) : (
               <>
@@ -198,7 +198,7 @@ export function MobileNav({ open, onClose, lang, logo, utilities, actions, id }:
                 <h2 className="ml-1 flex-1 truncate text-[17px] font-semibold tracking-[-0.01em] text-fg">
                   {subTitle}
                 </h2>
-                <div className="-mr-2.5">{closeButton}</div>
+                {closeButton}
               </>
             )}
           </div>
