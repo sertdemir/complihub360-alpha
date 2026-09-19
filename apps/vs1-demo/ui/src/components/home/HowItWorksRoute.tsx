@@ -214,7 +214,10 @@ export function HowItWorksRoute() {
           </div>
 
           <div className="mt-12 flex justify-center">
-            <Button size="lg" onClick={() => navigate(`/${locale ?? 'en'}/how-it-works`)}>
+            {/* wrap: das deutsche Label braucht mit Pfeil 387 px, bei 375 stehen
+                343 zur Verfuegung — ohne Umbruch ragte der Button je 6 px ueber
+                beide Seiten hinaus. Ab sm ist er wieder einzeilig. */}
+            <Button size="lg" wrap onClick={() => navigate(`/${locale ?? 'en'}/how-it-works`)}>
               {t('howItWorks.seeAll')} <ArrowRight size={16} className="ml-1.5" />
             </Button>
           </div>

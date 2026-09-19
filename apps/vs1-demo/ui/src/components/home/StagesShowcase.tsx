@@ -360,8 +360,10 @@ function StageRow({ index }: { index: number }) {
     </motion.div>
   );
 
+  // Basis-Spalte ebenfalls minmax(0,1fr): ohne sie erbt die einspaltige
+  // Mobil-Ansicht min-width:auto und waechst auf 406 px bei 358 px Platz.
   return (
-    <div ref={ref} className="grid gap-6 py-7 lg:grid-cols-[minmax(0,1fr)_44px_minmax(0,1fr)] lg:gap-x-10 lg:py-0">
+    <div ref={ref} className="grid grid-cols-[minmax(0,1fr)] gap-6 py-7 lg:grid-cols-[minmax(0,1fr)_44px_minmax(0,1fr)] lg:gap-x-10 lg:py-0">
       {copyLeft ? copy : panel}
       {/* The spine: golden connector with the numbered node — desktop only. */}
       <div className="hidden flex-col items-center self-stretch lg:flex">
