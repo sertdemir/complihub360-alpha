@@ -37,7 +37,7 @@ export function ProblemRecognition() {
           </p>
         </Reveal>
 
-        <div className="mx-auto mt-14 max-w-[1140px] rounded-xl bg-gradient-stage p-5 sm:p-12">
+        <div className="mx-auto mt-14 rounded-xl bg-gradient-stage p-5 sm:p-12">
         {/* User spec 2026-08-25: the cards appear one after another, smooth —
             0.18s apart so the sequence is clearly readable, not one wave. */}
         <Stagger stagger={0.18} className="grid gap-5 sm:grid-cols-2">

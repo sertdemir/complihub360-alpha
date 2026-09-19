@@ -496,7 +496,7 @@ export function PricingPage() {
               {t('pricing.faq.title')}
             </h2>
           </Reveal>
-          <Reveal delay={0.1} className="mx-auto mt-9 max-w-[1120px] border-t border-stroke-subtle">
+          <Reveal delay={0.1} className="mx-auto mt-9 border-t border-stroke-subtle">
             <FaqList
               items={Array.from({ length: FAQ_COUNT }, (_, i) => ({
                 q: t(`pricing.faq.items.${i}.q`),

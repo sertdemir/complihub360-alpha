@@ -118,7 +118,7 @@ export function MatchmakingDifference() {
 
         {/* Match cards — start as an overlapped stack, spread on scroll into a
             3-column grid with gaps (their final placement). */}
-        <div ref={ref} className="mx-auto mt-14 grid max-w-[1140px] gap-[24px] lg:grid-cols-3">
+        <div ref={ref} className="mx-auto mt-14 grid max-w-container-xl gap-[24px] lg:grid-cols-3">
           {MATCHES.map((m, i) => (
             <motion.div
               key={m.name}

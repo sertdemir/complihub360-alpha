@@ -150,7 +150,7 @@ export function DomainsKnows() {
 
         {/* Domain grid — stagger-reveal on scroll */}
         <motion.div
-          className="mx-auto mt-14 grid max-w-[1080px] gap-x-10 gap-y-4 sm:grid-cols-2 lg:grid-cols-3"
+          className="mx-auto mt-14 grid gap-x-10 gap-y-4 sm:grid-cols-2 lg:grid-cols-3"
           variants={{ show: { transition: { staggerChildren: 0.1 } } }}
           initial="hidden"
           whileInView="show"

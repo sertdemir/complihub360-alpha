@@ -376,7 +376,7 @@ function StageRow({ index }: { index: number }) {
 
 export function StagesShowcase() {
   return (
-    <div className="mx-auto flex max-w-[1240px] flex-col lg:gap-0">
+    <div className="mx-auto flex flex-col lg:gap-0">
       {Array.from({ length: STAGES }, (_, i) => (
         <StageRow key={i} index={i} />
       ))}

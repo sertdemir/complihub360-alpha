@@ -90,7 +90,7 @@ export function PlatformPage() {
         </section>
 
         <Container size="xl" className="relative z-10 -mt-14">
-          <Reveal delay={0.1} className="mx-auto max-w-[1040px]">
+          <Reveal delay={0.1} className="mx-auto">
             <div className="rounded-xl bg-surface p-7 shadow-[0_34px_80px_-32px_rgba(2,22,17,0.35)] dark:bg-surface-secondary lg:px-8">
               <div className="grid grid-cols-1 gap-y-7 sm:grid-cols-3 sm:divide-x sm:divide-stroke-subtle">
                 {(['confirm', 'answer', 'fee'] as const).map((k) => (

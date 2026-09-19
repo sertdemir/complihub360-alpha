@@ -82,7 +82,7 @@ export function HowItWorksPage() {
           height of every marketing hero (user ask 2026-08-28, hub = reference);
           the min-h floor keeps it there if the copy ever shortens. */}
       <section className="flex flex-col justify-center bg-gradient-stage px-4 pb-16 pt-32 md:px-6 lg:min-h-[38.3125rem] lg:px-10 lg:pb-[3.25rem] lg:pt-40">
-        <div className="mx-auto flex max-w-[1180px] flex-col gap-12 lg:flex-row lg:items-center lg:gap-[76px]">
+        <div className="mx-auto flex max-w-container-xl flex-col gap-12 lg:flex-row lg:items-center lg:gap-[76px]">
           <Reveal className="min-w-0 flex-1">
             <SectionEyebrow tone="brand">{t('howItWorks.eyebrow')}</SectionEyebrow>
             <h1 className="mt-3.5 font-serif text-[2.25rem] font-semibold leading-[1.14] tracking-tight text-fg lg:text-[3rem]">
@@ -147,7 +147,7 @@ export function HowItWorksPage() {
           already carries this page's hero and the stages showcase directly
           above, and a third tinted band in a row read as one long wash. */}
       <section className="bg-surface px-4 py-16 md:px-6 lg:px-10 lg:py-20">
-        <div className="mx-auto max-w-[1180px]">
+        <div className="mx-auto max-w-container-xl">
           <Reveal className="max-w-[720px]">
             <SectionEyebrow tone="brand">{t('howItWorks.closing.eyebrow')}</SectionEyebrow>
             <h2 className="mt-2.5 font-serif text-[1.75rem] font-bold leading-tight tracking-tight text-fg lg:text-[2rem]">

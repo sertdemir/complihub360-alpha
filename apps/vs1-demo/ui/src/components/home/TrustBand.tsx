@@ -35,7 +35,7 @@ export function TrustBand() {
           </h2>
         </Reveal>
 
-        <Stagger stagger={0.08} className="mx-auto mt-11 grid max-w-[1120px] sm:grid-cols-2 lg:grid-cols-3">
+        <Stagger stagger={0.08} className="mx-auto mt-11 grid sm:grid-cols-2 lg:grid-cols-3">
           {POINT_KEYS.map((key, i) => (
             <StaggerItem
               key={key}
