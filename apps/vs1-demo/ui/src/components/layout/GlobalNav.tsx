@@ -11,6 +11,7 @@ import { ChevronDown, LogOut, LayoutDashboard, Menu } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Logo } from '../ui/Logo';
 import { ThemeToggle } from '../ui/ThemeToggle';
+import { AccountActions } from './AccountActions';
 import { MobileNav } from './MobileNav';
 import { HEADER_NAV_LINKS } from './navLinks';
 
@@ -203,7 +204,7 @@ export function GlobalNav() {
                         className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-fg-secondary hover:bg-surface-secondary transition-colors"
                       >
                         <LayoutDashboard size={16} className="text-fg-tertiary" />
-                        Mein Dashboard
+                        {t('nav.dashboard', 'My dashboard')}
                       </button>
                       <button
                         onClick={() => {
@@ -214,7 +215,7 @@ export function GlobalNav() {
                         className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
                       >
                         <LogOut size={16} />
-                        Abmelden
+                        {t('nav.signOut', 'Sign out')}
                       </button>
                     </div>
                   </motion.div>
@@ -227,7 +228,7 @@ export function GlobalNav() {
                 className="text-fg-secondary hover:text-fg text-xs font-semibold px-2 md:px-3 py-1.5 rounded-lg hover:bg-surface-secondary transition-colors whitespace-nowrap"
                 onClick={() => navTo('/login')}
               >
-                {t('nav.login', 'Log in')}
+                {t('header.login', 'Log in')}
               </button>
               <Button variant="primary" size="sm" onClick={() => navTo('/register')}>
                 {t('nav.signup', 'Sign up for free')}
@@ -281,64 +282,7 @@ export function GlobalNav() {
         onClose={() => setMobileOpen(false)}
         lang={currentLang}
         logo={<Logo lockup="symbol" href={null} />}
-        actions={
-          <div className="flex items-center gap-3">
-            {isLoggedIn ? (
-              <>
-                <Button
-                  variant="outline"
-                  size="md"
-                  className="h-12 flex-1"
-                  onClick={() => {
-                    setMobileOpen(false);
-                    navTo(role === 'partner' ? '/partner-dashboard' : '/dashboard');
-                  }}
-                >
-                  <LayoutDashboard size={16} className="mr-2" aria-hidden />
-                  Mein Dashboard
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="md"
-                  className="h-12"
-                  aria-label="Abmelden"
-                  onClick={() => {
-                    setMobileOpen(false);
-                    logout();
-                    navTo('/');
-                  }}
-                >
-                  <LogOut size={16} aria-hidden />
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  variant="outline"
-                  size="md"
-                  className="h-12 flex-1"
-                  onClick={() => {
-                    setMobileOpen(false);
-                    navTo('/login');
-                  }}
-                >
-                  {t('nav.login', 'Log in')}
-                </Button>
-                <Button
-                  variant="primary"
-                  size="md"
-                  className="h-12 flex-1"
-                  onClick={() => {
-                    setMobileOpen(false);
-                    navTo('/register');
-                  }}
-                >
-                  {t('nav.signup', 'Sign up for free')}
-                </Button>
-              </>
-            )}
-          </div>
-        }
+        actions={<AccountActions lang={currentLang} onNavigate={() => setMobileOpen(false)} />}
       />
     </header>
   );

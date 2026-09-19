@@ -4,7 +4,6 @@
     "solutions": "Çözümler",
     "complianceAreas": "Uyum Alanları",
     "resources": "Kaynaklar",
-    "login": "Giriş yap",
     "signup": "Ücretsiz kayıt ol",
     "items": {
       "aiEngine": {
@@ -45,7 +44,9 @@
       }
     },
     "aiGovernance": "Yapay Zeka Yönetişimi",
-    "aiGovDesc": "Şeffaf ve uyumlu yapay zeka için çerçevemiz."
+    "aiGovDesc": "Şeffaf ve uyumlu yapay zeka için çerçevemiz.",
+    "dashboard": "Panelim",
+    "signOut": "Çıkış yap"
   },
   "hero": {
     "scenarios": {

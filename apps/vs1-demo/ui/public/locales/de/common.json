@@ -4,7 +4,6 @@
     "solutions": "Lösungen",
     "complianceAreas": "Compliance-Bereiche",
     "resources": "Ressourcen",
-    "login": "Login",
     "signup": "Kostenlos starten",
     "items": {
       "aiEngine": {
@@ -45,7 +44,9 @@
       }
     },
     "aiGovernance": "KI Governance",
-    "aiGovDesc": "Unser Framework für transparente und rechtskonforme KI."
+    "aiGovDesc": "Unser Framework für transparente und rechtskonforme KI.",
+    "dashboard": "Mein Dashboard",
+    "signOut": "Abmelden"
   },
   "hero": {
     "scenarios": {

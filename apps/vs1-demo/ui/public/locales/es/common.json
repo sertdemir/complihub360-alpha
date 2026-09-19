@@ -4,7 +4,6 @@
     "solutions": "Soluciones",
     "complianceAreas": "Áreas de Cumplimiento",
     "resources": "Recursos",
-    "login": "Iniciar sesión",
     "signup": "Regístrate gratis",
     "items": {
       "aiEngine": {
@@ -45,7 +44,9 @@
       }
     },
     "aiGovernance": "Gobernanza de IA",
-    "aiGovDesc": "Nuestro marco para una IA transparente y conforme a la ley."
+    "aiGovDesc": "Nuestro marco para una IA transparente y conforme a la ley.",
+    "dashboard": "Mi panel",
+    "signOut": "Cerrar sesión"
   },
   "hero": {
     "scenarios": {

@@ -1,12 +1,14 @@
 import { useEffect, useId, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Menu } from 'lucide-react';
+import { LayoutDashboard, Menu } from 'lucide-react';
 import { Logo } from '../ui/Logo';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { AreasMenuPanel } from './AreasMenuPanel';
 import { MarketsMenuPanel } from './MarketsMenuPanel';
 import { LanguageMenu } from './LanguageMenu';
+import { useAuthStore } from '../../store/useAuthStore';
+import { AccountActions } from './AccountActions';
 import { MobileNav } from './MobileNav';
 import { HEADER_NAV_LINKS } from './navLinks';
 
@@ -78,6 +80,12 @@ export function MarketingHeader({
   };
   const inverse = theme === 'inverse';
   const lang = userHref.replace(/^\/|\/$/g, '') || 'en';
+  // Bis 2026-09-19 las diese Kopfzeile den Anmeldezustand GAR NICHT: auf der
+  // Startseite bekam ein angemeldeter Nutzer "Anmelden" und "Kostenlos starten"
+  // angeboten, und einen Weg ins Dashboard gab es hier nirgends. GlobalNav
+  // wusste es laengst — dieselbe Seite, zwei Antworten.
+  const { isLoggedIn, role } = useAuthStore();
+  const dashHref = `/${lang}${role === 'partner' ? '/partner-dashboard' : '/dashboard'}`;
 
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -181,22 +189,36 @@ export function MarketingHeader({
         <div className="flex flex-1 basis-0 items-center justify-end gap-5">
           <ThemeToggle inverse={inverse} size={36} />
           <LanguageMenu triggerClassName={`h-9 w-9 ${inverse ? 'text-fg-inverse hover:text-fg-inverse' : ''}`} />
-          <a
-            href={loginHref}
-            className={`inline-flex h-[40px] items-center whitespace-nowrap rounded-md border-thin px-4 text-body-sm font-semibold ${
-              inverse ? 'border-white/40 text-fg-inverse' : 'border-stroke-brand text-fg-brand'
-            }`}
-          >
-            {t('header.login')}
-          </a>
-          <a
-            href={signupHref}
-            className={`inline-flex h-[40px] items-center whitespace-nowrap rounded-md px-4 text-body-sm font-semibold ${
-              inverse ? 'bg-white text-fg' : 'bg-brand text-fg-on-brand'
-            }`}
-          >
-            {t('nav.signup')}
-          </a>
+          {isLoggedIn ? (
+            <Link
+              to={dashHref}
+              className={`inline-flex h-[40px] items-center gap-2 whitespace-nowrap rounded-md px-4 text-body-sm font-semibold ${
+                inverse ? 'bg-white text-fg' : 'bg-brand text-fg-on-brand'
+              }`}
+            >
+              <LayoutDashboard size={16} aria-hidden />
+              {t('nav.dashboard', 'My dashboard')}
+            </Link>
+          ) : (
+            <>
+              <a
+                href={loginHref}
+                className={`inline-flex h-[40px] items-center whitespace-nowrap rounded-md border-thin px-4 text-body-sm font-semibold ${
+                  inverse ? 'border-white/40 text-fg-inverse' : 'border-stroke-brand text-fg-brand'
+                }`}
+              >
+                {t('header.login')}
+              </a>
+              <a
+                href={signupHref}
+                className={`inline-flex h-[40px] items-center whitespace-nowrap rounded-md px-4 text-body-sm font-semibold ${
+                  inverse ? 'bg-white text-fg' : 'bg-brand text-fg-on-brand'
+                }`}
+              >
+                {t('nav.signup')}
+              </a>
+            </>
+          )}
         </div>
       </div>
 
@@ -240,22 +262,7 @@ export function MarketingHeader({
         onClose={() => setOpen(false)}
         lang={lang}
         logo={<Logo lockup="symbol" href={null} />}
-        actions={
-          <div className="flex items-center gap-3">
-            <a
-              href={loginHref}
-              className="inline-flex h-12 flex-1 items-center justify-center whitespace-nowrap rounded-md border-thin border-stroke-brand px-3 text-body-sm font-semibold text-fg-brand"
-            >
-              {t('header.login')}
-            </a>
-            <a
-              href={signupHref}
-              className="inline-flex h-12 flex-1 items-center justify-center whitespace-nowrap rounded-md bg-brand px-3 text-body-sm font-semibold text-fg-on-brand"
-            >
-              {t('nav.signup')}
-            </a>
-          </div>
-        }
+        actions={<AccountActions lang={lang} onNavigate={() => setOpen(false)} />}
       />
     </header>
   );
