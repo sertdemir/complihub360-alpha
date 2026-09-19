@@ -469,12 +469,15 @@ describe('Belegte Obergrenze', () => {
   // Wieder eine namentliche Liste statt einer Zahl (siehe OHNE_BETRAG_BEKANNT):
   // sie darf nur schrumpfen, und wenn ein Portal zugaenglich wird, faellt es
   // im Review auf, weil eine Zeile verschwindet — nicht nur eine Ziffer.
-  const STAATEN_OHNE_ZUGANG: Record<string, string> = {
-    // TX ist am 19.09. weggefallen: die Gerueststeite laedt ihren Text von
-    // tcss.legis.texas.gov nach, und ueber diesen Host kommt er auch per curl.
-    NY: 'www.nysenate.gov steht hinter einer Cloudflare-Bot-Schranke (403). '
-      + 'Das ist eine Entscheidung des Betreibers, keine Zugangsluecke.',
-  };
+  // LEER, und das ist das Ergebnis eines Tages. Texas fiel weg, als der
+  // Netzwerk-Mitschnitt zeigte, woher die Geruestseite ihren Text laedt; New
+  // York, als die Cloudflare-Schranke nicht mehr da war — die Seiten
+  // antworten mit 200, wo sie im September noch 403 gaben.
+  //
+  // Die Liste bleibt trotzdem stehen. Sie hat jetzt eine andere Aufgabe: Wird
+  // ein Portal wieder dicht, kommt hier eine Zeile hinein und der Test
+  // darunter faellt, statt dass eine Zahl stillschweigend veraltet.
+  const STAATEN_OHNE_ZUGANG: Record<string, string> = {};
   const GEFUEHRTE_STAATEN = ['CA', 'FL', 'NY', 'TX'];
 
   it('haelt die Gliedstaaten an derselben Beweispflicht wie die Laender', () => {
@@ -503,14 +506,14 @@ describe('Belegte Obergrenze', () => {
   });
 
   it('laesst die Liste der unerreichbaren Staaten nur schrumpfen', () => {
-    // Einer von vier. Texas ist am 19.09. weggefallen, und der Wegfall lief
-    // genau so, wie diese Liste es vorsieht: erst verschwand die Zeile, dann
-    // verlangte der Beweispflicht-Test die Zahlen — nicht umgekehrt.
+    // Keiner von vier. Beide Wegfaelle liefen so, wie diese Liste es
+    // vorsieht: erst verschwand die Zeile, dann verlangte der
+    // Beweispflicht-Test die Zahlen — nicht umgekehrt.
     //
-    // Bleibt New York. Das ist die andere Art von Hindernis: bei Texas fehlte
-    // uns ein Weg, bei New York sagt der Betreiber Nein. Nur das erste liess
-    // sich beheben.
-    expect(Object.keys(STAATEN_OHNE_ZUGANG).sort()).toEqual(['NY']);
+    // Merke fuer das naechste Mal: "der Betreiber sagt Nein" war bei New York
+    // eine Momentaufnahme, keine Eigenschaft. Ein 403 ist ein Befund von
+    // heute, kein Urteil ueber morgen.
+    expect(Object.keys(STAATEN_OHNE_ZUGANG).sort()).toEqual([]);
     for (const [staat, grund] of Object.entries(STAATEN_OHNE_ZUGANG)) {
       expect(grund.length, `${staat}: Grund zu duenn`).toBeGreaterThan(60);
     }

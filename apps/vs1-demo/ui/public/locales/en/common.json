@@ -952,7 +952,8 @@
           "deAssessedTaxes": "Failure to file, for assessed taxes",
           "deLateSurchargeCap": "Late-filing surcharge, upper limit",
           "deliberateNoDisclosure": "Deliberate breach, without voluntary disclosure",
-          "seriousRepeated": "A serious, repeated or systematic breach"
+          "seriousRepeated": "A serious, repeated or systematic breach",
+          "nyShieldChain": "New York has no comprehensive privacy act. The SHIELD Act covers data security and routes the penalty two steps on, into general consumer-protection law. Failing to notify a breach is a separate ceiling: under § 899-aa the greater of $5,000 or $20 per missed notification, capped at $250,000."
         },
         "ofKey": {
           "domesticValue": "of the domestic value of the merchandise",

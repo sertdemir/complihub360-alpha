@@ -58,7 +58,10 @@ describe('Obergrenze anzeigen', () => {
     // Florida nennt das Zwanzigfache von Kalifornien. Alphabetisch sortiert
     // stuende CA oben und die Spanne — die eigentliche Aussage — verschwaende.
     expect(d.states[0]?.code, 'Der groesste Betrag gehoert nach oben').toBe('FL');
-    expect(d.states.length, 'CA, FL und TX sind belegt').toBe(3);
+    // Alle vier gefuehrten Staaten sind seit dem 19.09. belegt. Waechst die
+    // Liste der gefuehrten Staaten, faellt dieser Test — und das ist die
+    // Absicht: ein neuer Staat ohne Zahl soll nicht stumm durchrutschen.
+    expect(d.states.length, 'CA, FL, NY und TX sind belegt').toBe(4);
     for (const s of d.states) {
       expect(s.amount, `${s.code}: kein Betrag`).toMatch(/\d/);
       expect(s.source, `${s.code}: keine Vorschrift`).toMatch(/\d/);

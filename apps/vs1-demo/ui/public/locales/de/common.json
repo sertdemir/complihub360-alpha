@@ -952,7 +952,8 @@
           "deAssessedTaxes": "Erklärungsversäumnis bei Veranlagungssteuern",
           "deLateSurchargeCap": "Verspätungszuschlag, Höchstbetrag",
           "deliberateNoDisclosure": "Vorsätzlicher Verstoß, ohne Selbstanzeige",
-          "seriousRepeated": "Schwerwiegender, wiederholter oder systematischer Verstoß"
+          "seriousRepeated": "Schwerwiegender, wiederholter oder systematischer Verstoß",
+          "nyShieldChain": "New York hat kein umfassendes Datenschutzgesetz. Der SHIELD Act regelt die Datensicherheit und verweist für die Buße zwei Stufen weiter ins allgemeine Lauterkeitsrecht. Die unterlassene Benachrichtigung ist eine eigene Obergrenze: nach § 899-aa 5.000 USD oder 20 USD je versäumter Meldung, gedeckelt bei 250.000 USD."
         },
         "ofKey": {
           "domesticValue": "des Inlandswerts der Ware",

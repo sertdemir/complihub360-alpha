@@ -952,7 +952,8 @@
           "deAssessedTaxes": "Tarhiyata tabi vergilerde beyanname verilmemesi",
           "deLateSurchargeCap": "Gecikme zammı, üst sınır",
           "deliberateNoDisclosure": "Kasıtlı ihlal, kendiliğinden bildirim olmaksızın",
-          "seriousRepeated": "Ağır, tekrarlanan veya sistematik ihlal"
+          "seriousRepeated": "Ağır, tekrarlanan veya sistematik ihlal",
+          "nyShieldChain": "New York’in kapsamlı bir veri koruma kanunu yok. SHIELD Act veri güvenliğini düzenliyor ve cezayı iki kademe öteye, genel tüketici hukukuna yönlendiriyor. İhlal bildiriminin yapılmaması ayrı bir üst sınıra tabi: § 899-aa uyarınca 5.000 $ veya atlanan her bildirim için 20 $, en çok 250.000 $."
         },
         "ofKey": {
           "domesticValue": "malın yurt içi değeri",

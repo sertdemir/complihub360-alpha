@@ -952,7 +952,8 @@
           "deAssessedTaxes": "Falta de presentación, en impuestos liquidados",
           "deLateSurchargeCap": "Recargo por presentación extemporánea, límite máximo",
           "deliberateNoDisclosure": "Incumplimiento deliberado, sin regularización voluntaria",
-          "seriousRepeated": "Incumplimiento grave, reiterado o sistemático"
+          "seriousRepeated": "Incumplimiento grave, reiterado o sistemático",
+          "nyShieldChain": "Nueva York no tiene una ley general de privacidad. La SHIELD Act regula la seguridad de los datos y remite la sanción dos niveles más allá, al derecho general de consumo. No notificar una brecha tiene su propio límite: según el § 899-aa, 5.000 $ o 20 $ por notificación omitida, con un tope de 250.000 $."
         },
         "ofKey": {
           "domesticValue": "del valor interno de la mercancía",
