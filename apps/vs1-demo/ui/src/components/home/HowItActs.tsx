@@ -48,7 +48,14 @@ export function HowItActs() {
         </Reveal>
 
         <div className="mt-12 lg:mt-14">
-        <Stagger stagger={0.14} className="mx-auto grid max-w-container-xl gap-5 md:grid-cols-3">
+        {/* Drei nebeneinander erst ab lg, nicht ab md (frueher md:grid-cols-3):
+            bei 768 blieben je 227 px pro Karte. Darin bekam die Chronik-Zeile
+            in Karte 03 nach der 96-px-Datumsspalte null Platz fuer ihr Label,
+            das dann 18 px aus der Seite lief — und jede Fliesstext-Zeile brach
+            nach zwei Woertern. Dieselbe Staffelung wie MatchmakingDifference.
+            repeat(3,minmax(0,1fr)) statt grid-cols-3, damit die Spalten nicht
+            ueber min-width:auto an der breitesten Karte haengen. */}
+        <Stagger stagger={0.14} className="mx-auto grid max-w-container-xl gap-5 lg:grid-cols-[repeat(3,minmax(0,1fr))]">
           <Card
             n="01"
             title={t('howItActs.cards.0.title')}
@@ -95,7 +102,10 @@ export function HowItActs() {
                     <li key={i} className="flex items-center gap-3 text-body-xs">
                       <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
                       <span className="w-12 shrink-0 font-semibold text-fg">{t(`howItActs.panel3.timeline.${i}.date`)}</span>
-                      <span className="text-fg-secondary">{t(`howItActs.panel3.timeline.${i}.label`)}</span>
+                      {/* min-w-0: als Flex-Kind erbt der Label-Text sonst
+                          min-width:auto und laeuft, wenn die Spalte einmal zu
+                          eng wird, aus der Karte heraus statt umzubrechen. */}
+                      <span className="min-w-0 text-fg-secondary">{t(`howItActs.panel3.timeline.${i}.label`)}</span>
                     </li>
                   ))}
                 </ul>

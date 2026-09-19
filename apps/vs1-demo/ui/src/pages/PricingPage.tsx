@@ -45,6 +45,11 @@ function SlideIn({
   className?: string;
 }) {
   const [ref, inView] = useInViewOnce<HTMLDivElement>('-80px');
+  // Die 28 px sind ein transform, kein Layout: solange eine Zeile noch nicht
+  // in Sicht war, steht sie 28 px versetzt und treibt document.scrollWidth bei
+  // 390 auf 402. Waagerecht scrollen kann man deswegen nicht (body traegt
+  // overflow-x:hidden), und sobald die Animation laeuft, ist der Versatz weg.
+  // Ueberlauf-Messungen auf /pricing also erst nach einem Durchlauf glauben.
   return (
     <motion.div
       ref={ref}
