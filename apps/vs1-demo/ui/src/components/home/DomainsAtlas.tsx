@@ -157,7 +157,7 @@ export function DomainsAtlas() {
                   })()}
                 </div>
                 <p className="mt-4 text-body-sm leading-relaxed text-fg-secondary">{t(`${base}.intro`)}</p>
-                <p className="mt-4 rounded-[10px] border border-accent-500/35 bg-accent-500/10 px-4 py-3 text-body-xs leading-relaxed text-accent-700 dark:text-fg-accent-strong">
+                <p className="mt-4 rounded-[10px] border border-accent-500/35 bg-accent-500/10 px-4 py-3 text-body-xs leading-relaxed text-fg-accent-strong">
                   <span className="font-bold">{t('drawer.whenThisMatters')}:</span> {t(`${base}.matters.0`)}
                 </p>
                 <hr className="my-6 border-stroke-subtle" />

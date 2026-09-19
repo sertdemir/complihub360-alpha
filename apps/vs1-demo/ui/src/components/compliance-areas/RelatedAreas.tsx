@@ -140,7 +140,7 @@ export function RelatedAccordion({
                 <span
                   aria-hidden={!isTop}
                   className={`block text-body-4xs font-bold uppercase tracking-[0.12em] ${
-                    isTop ? 'text-accent-700 dark:text-fg-accent-strong' : 'invisible'
+                    isTop ? 'text-fg-accent-strong' : 'invisible'
                   }`}
                 >
                   {strongestLabel}
