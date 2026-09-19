@@ -12,6 +12,20 @@ import React, { forwardRef } from 'react';
 //   2xl  1440px — ★ Compass max
 //   full        — no cap (caller controls)
 
+// EINE Breite je Sektion (Messung 2026-09-18). Wer innerhalb eines Containers
+// noch einmal `max-w-[…px]` setzt, macht dessen Arbeit ein zweites Mal — meist
+// mit einer anderen Antwort. Von 22 solcher Kappen auf den Marketing-Flaechen
+// waren 17 schlicht wirkungslos: sie kappten bei 1120 oder 1140 in einer Box,
+// die dank `lg:px-20` nur 1040 breit ist. Niemand hat das gemerkt, weil nie
+// etwas passiert ist. Die Regel daraus:
+//
+//   Layout-Breite  -> Container (oder ein max-w-container-* Token)
+//   Lesebreite     -> bleibt am Text (max-w-[62ch], max-w-[720px] …)
+//
+// Eine Kappe neben dem Container ist nur dann richtig, wenn die Sektion
+// bewusst full-bleed aus ihm ausbricht (MatchShowcase-Buehne) — dann traegt
+// sie ein Token, keine freie Zahl.
+
 export type ContainerSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full';
 
 // Side margins. `fluid` is the Compass grid doctrine (mobile 16 → tablet 40 →

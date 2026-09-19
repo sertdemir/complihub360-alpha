@@ -180,7 +180,7 @@ export function MarketsIndexPage() {
       </section>
 
       <Container size="xl" className="relative z-10 -mt-14">
-        <Reveal delay={0.1} className="mx-auto max-w-[1040px]">
+        <Reveal delay={0.1} className="mx-auto">
           <MarketsKpiCard markets={markets} />
         </Reveal>
       </Container>
@@ -191,7 +191,7 @@ export function MarketsIndexPage() {
           two figures the sentence carries so a scanner needs neither. */}
       <section className="pb-16 pt-14 lg:pb-20 desktop-s:pt-16">
         <Container size="xl">
-          <Stagger className="mx-auto grid max-w-[1040px] gap-4 desktop-s:grid-cols-2">
+          <Stagger className="mx-auto grid gap-4 desktop-s:grid-cols-2">
             {markets.map((m) => {
               // The same instrument as everywhere else: severity derives from
               // the enforcement score, and the pill carries the real number.
@@ -258,7 +258,7 @@ export function MarketsIndexPage() {
           cards carried are gone — name, tier and focus statutes say it. */}
       <section className="py-16 lg:py-20">
         <Container size="xl">
-          <div className="mx-auto flex max-w-[1040px] flex-col gap-10 desktop-s:flex-row-reverse desktop-s:items-center desktop-s:gap-14">
+          <div className="mx-auto flex flex-col gap-10 desktop-s:flex-row-reverse desktop-s:items-center desktop-s:gap-14">
             {/* DOM order copy-first so mobile leads with the heading; the
                 row-reverse stands the panel left on desktop. */}
             <Reveal className="shrink-0 desktop-s:w-[360px]">

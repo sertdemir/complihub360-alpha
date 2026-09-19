@@ -69,7 +69,7 @@ export function ResourcesPage() {
 
       <section className="py-16 lg:py-20">
         <Container size="xl">
-          <Stagger className="mx-auto grid max-w-[1040px] gap-4 md:grid-cols-3">
+          <Stagger className="mx-auto grid gap-4 md:grid-cols-3">
             {entries.map((key) => (
               <StaggerItem key={key}>
                 <Link

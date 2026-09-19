@@ -128,7 +128,7 @@ export function HomeFaq() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.25, ease: 'easeOut' }}
-              className="mx-auto mt-9 max-w-[1120px] border-t border-stroke-subtle"
+              className="mx-auto mt-9 border-t border-stroke-subtle"
             >
               <FaqList
                 items={Array.from({ length: GROUP_COUNTS[group] }, (_, i) => ({

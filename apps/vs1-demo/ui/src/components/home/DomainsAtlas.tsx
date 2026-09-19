@@ -82,7 +82,7 @@ export function DomainsAtlas() {
           <p className="max-w-xl text-body leading-relaxed text-fg-secondary">{t('domains.subtitle')}</p>
         </Reveal>
 
-        <div ref={ref} className="mx-auto mt-14 flex max-w-[1240px] flex-col gap-10 lg:flex-row lg:items-stretch lg:gap-12">
+        <div ref={ref} className="mx-auto mt-14 flex flex-col gap-10 lg:flex-row lg:items-stretch lg:gap-12">
           {/* Rail: the nine areas, pure petrol icons, the active one carded */}
           <motion.div
             className="flex flex-col justify-center gap-1.5 lg:w-[400px] lg:shrink-0"
