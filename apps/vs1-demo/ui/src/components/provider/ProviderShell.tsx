@@ -3,6 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { CalendarCheck, LineChart, Globe, ReceiptEuro, Settings, Bell, CircleHelp, Search } from 'lucide-react';
 import { Sidebar, SidebarGroup, NavItem } from '../ui/AppShell';
+import { WorkspaceMobileBar, type WorkspaceNavGroup } from '../ui/WorkspaceMobileBar';
 import { Logo } from '../ui/Logo';
 import { PartnerStatusBadge, AvailabilityPill } from '../ui/ProviderBadges';
 import { SearchDrawer, HelpDrawer } from './ProviderDrawers';
@@ -106,13 +107,43 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // One source for both rails: below `lg` the panel renders exactly what the
+  // sidebar renders above it. "Hilfe & Support" stays a button in both — it
+  // opens a drawer, it is not a destination.
+  const mobileGroups: WorkspaceNavGroup[] = NAV.map((g) => ({
+    key: g.groupKey,
+    label: t(g.groupKey),
+    items: g.items.map((it) => {
+      const Icon = it.icon;
+      const label = t(it.labelKey);
+      return {
+        key: it.to,
+        to: it.to === 'help' ? undefined : `${base}/${it.to}`,
+        onSelect: it.to === 'help' ? () => setHelpOpen(true) : undefined,
+        label,
+        title: label,
+        icon: <Icon size={18} />,
+        count: badgeFor(it.to),
+        active: location.pathname.includes(`/partner-dashboard/${it.to}`),
+      };
+    }),
+  }));
+
+  const availabilityButton = (
+    <button type="button" onClick={togglAvailability} aria-label={t('shell.availabilityAria')} className="transition-opacity hover:opacity-80">
+      <AvailabilityPill status={availability === 'ooo' ? 'offline' : 'available'} label={availability === 'ooo' ? t('shell.outOfOffice') : undefined} />
+    </button>
+  );
+  const statusBadge = <PartnerStatusBadge status={vetted ? 'verified' : 'pending'} label={vetted ? 'Verified Partner' : 'Pending review'} />;
+
   return (
-    <div className="flex h-screen bg-surface text-fg">
+    <div className="flex h-dvh bg-surface text-fg">
       {/* Erst das Profil, dann der Workspace: solange das Onboarding nicht
           abgeschlossen ist, liegt das Modal ueber JEDER Workspace-Seite —
           deshalb hier in der Shell, nicht auf einer Route. */}
       <ProviderOnboardingModal />
       <Sidebar
+        className="hidden lg:flex"
         logo={
           <NavLink to={base} className="flex items-center gap-2">
             {/* 32 statt 36 px: die Sidebar ist w-60 (240 px), mit px-4 bleiben
@@ -146,10 +177,17 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
               const active = location.pathname.includes(`/partner-dashboard/${it.to}`);
               const Icon = it.icon;
               if (it.to === 'help') {
+                // NavItem IS the button (AppShell) — wrapping it in another one
+                // nested <button> inside <button>, which React flags and which no
+                // browser parses the way it reads. Its own onClick does the job.
                 return (
-                  <button key={it.to} type="button" className="block w-full text-left" onClick={() => setHelpOpen(true)}>
-                    <NavItem icon={<Icon size={16} />} label={t(it.labelKey)} active={false} />
-                  </button>
+                  <NavItem
+                    key={it.to}
+                    icon={<Icon size={16} />}
+                    label={t(it.labelKey)}
+                    active={false}
+                    onClick={() => setHelpOpen(true)}
+                  />
                 );
               }
               return (
@@ -163,17 +201,49 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
       </Sidebar>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-15 min-h-[60px] shrink-0 items-center justify-end gap-3 border-b border-elevate/10 px-6">
+        {/* Below lg the rail is gone and the bar carries the navigation. Search
+            and the bell stay in it; availability and the vetting badge move
+            under the open panel — they do not fit beside a title at 390px, and
+            they are status, not controls a provider reaches for mid-task. */}
+        <WorkspaceMobileBar
+          groups={mobileGroups}
+          homeHref={base}
+          fallbackTitle={t('shell.partnerBadge')}
+          switchLabel={t('shell.switchTo', { defaultValue: 'Wechseln zu' })}
+          logo={<Logo lockup="symbol" href={null} />}
+          actions={
+            <>
+              <button type="button" aria-label={t('shell.searchAria')} onClick={() => setSearchOpen(true)} className="grid h-11 w-11 place-items-center rounded-lg text-fg-secondary transition-colors hover:text-fg">
+                <Search size={19} />
+              </button>
+              <BellPopover unread={counts.unread} onAllRead={() => setCounts((c) => ({ ...c, unread: 0 }))} />
+            </>
+          }
+          footer={
+            <div className="flex flex-col gap-3 px-4 py-3">
+              <div className="flex items-center gap-2.5">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-accent text-[11px] font-bold text-fg-on-accent">GD</span>
+                <div className="min-w-0 flex-1 leading-tight">
+                  <p className="text-body-sm font-semibold text-fg">G. Dahlmann</p>
+                  <p className="text-body-2xs text-fg-tertiary">Dahlmann CPA</p>
+                </div>
+                {statusBadge}
+              </div>
+              {/* self-start: der Knopf ist blockbreit, die Pille darin zentriert
+                  sich sonst mitten im Panel und liest sich als Überschrift. */}
+              <div className="self-start">{availabilityButton}</div>
+            </div>
+          }
+        />
+        <header className="hidden h-15 min-h-[60px] shrink-0 items-center justify-end gap-3 border-b border-elevate/10 px-6 lg:flex">
           <button type="button" aria-label={t('shell.searchAria')} onClick={() => setSearchOpen(true)} className="mr-1 text-fg-tertiary transition-colors hover:text-fg">
             <Search size={18} />
           </button>
           <BellPopover unread={counts.unread} onAllRead={() => setCounts((c) => ({ ...c, unread: 0 }))} />
-          <button type="button" onClick={togglAvailability} aria-label={t('shell.availabilityAria')} className="transition-opacity hover:opacity-80">
-            <AvailabilityPill status={availability === 'ooo' ? 'offline' : 'available'} label={availability === 'ooo' ? t('shell.outOfOffice') : undefined} />
-          </button>
-          <PartnerStatusBadge status={vetted ? 'verified' : 'pending'} label={vetted ? 'Verified Partner' : 'Pending review'} />
+          {availabilityButton}
+          {statusBadge}
         </header>
-        <main className={cn('flex-1 overflow-y-auto px-8 py-6')}>
+        <main className={cn('flex-1 overflow-y-auto px-4 py-5 lg:px-8 lg:py-6')}>
           {/* O5-C: bis das Profil 100 % erreicht, steht der Vollstaendigkeits-
               Banner ueber JEDER Workspace-Seite — deshalb hier, nicht je Seite. */}
           <ProviderProfileBanner />

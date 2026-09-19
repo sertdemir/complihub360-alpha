@@ -20,7 +20,8 @@
     "oooStartConfirm": "Set out of office",
     "oooEndTitle": "End out of office?",
     "oooEndConsequence": "You go back to Available — new requests route to you again and SLA timers resume immediately.",
-    "oooEndConfirm": "End out of office"
+    "oooEndConfirm": "End out of office",
+    "switchTo": "Go to"
   },
   "bell": {
     "aria": "Notifications",

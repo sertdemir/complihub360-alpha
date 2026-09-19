@@ -57,7 +57,8 @@
     "search": "Ara",
     "sessionsToggle": "Oturumları aç veya kapat",
     "sessionsAll_one": "{{count}} oturumun tümü",
-    "sessionsAll_other": "{{count}} oturumun tümü"
+    "sessionsAll_other": "{{count}} oturumun tümü",
+    "switchTo": "Şuraya git"
   },
   "home": {
     "title": "Tekrar hoş geldiniz, <accent>{{name}}</accent>.",

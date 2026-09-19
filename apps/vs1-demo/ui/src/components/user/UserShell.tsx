@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { DOMAINS as CANONICAL_DOMAINS, type DomainSlug } from '../../lib/domains';
 import { Sidebar, SidebarGroup, NavItem } from '../ui/AppShell';
+import { WorkspaceMobileBar, type WorkspaceNavGroup } from '../ui/WorkspaceMobileBar';
 import { Logo } from '../ui/Logo';
 import { UserSearchDrawer } from './UserSearchDrawer';
 import { ThemeToggle } from '../ui/ThemeToggle';
@@ -174,9 +175,62 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
     return n ? String(n) : undefined;
   };
 
+  // One source for both rails: below `lg` the panel renders the same five groups
+  // the sidebar renders above it, from the same SIDEBAR + DOMAINS constants and
+  // with the same active test. The sessions sub-level is the one thing that does
+  // NOT come along — it grows with every session, and /dashboard/sessions is the
+  // page that lists exactly those.
+  const domainGroup: WorkspaceNavGroup = {
+    key: 'domains',
+    label: t('shell.groupDomains'),
+    items: DOMAINS.map((d) => {
+      const target = `${base}/dashboard/workbench/${d.slug}`;
+      const Icon = d.icon;
+      return {
+        key: d.slug,
+        to: target,
+        title: t(`domain.${d.key}`),
+        label: (
+          <span className="inline-flex items-center gap-1.5">
+            {t(`domain.${d.key}`)}
+            {domainDots[d.slug] && <span className={`h-1.5 w-1.5 rounded-full ${DOT[domainDots[d.slug] as 'high' | 'medium']}`} />}
+          </span>
+        ),
+        icon: <Icon size={18} />,
+        active: location.pathname.startsWith(target) || activeDomain === d.label,
+      };
+    }),
+  };
+  const mobileGroups: WorkspaceNavGroup[] = SIDEBAR.flatMap((g) => {
+    const group: WorkspaceNavGroup = {
+      key: g.group,
+      label: t(`shell.${g.groupKey}`),
+      badge: g.badgeKey ? t(`shell.${g.badgeKey}`) : undefined,
+      items: g.items.map((it) => {
+        const target = `${base}/${it.to}`;
+        const Icon = it.icon;
+        const label = t(`shell.${it.labelKey}`);
+        return {
+          key: it.to,
+          to: target,
+          label,
+          title: label,
+          icon: <Icon size={18} />,
+          count: it.count ?? badgeFor(it.to),
+          active: it.exact
+            ? location.pathname === target || location.pathname === `${target}/`
+            : location.pathname.startsWith(target),
+        };
+      }),
+    };
+    // Same place the rail puts them: straight after the workspace group.
+    return g.group === 'Workspace' ? [group, domainGroup] : [group];
+  });
+
   return (
-    <div className="flex h-screen bg-surface text-fg">
+    <div className="flex h-dvh bg-surface text-fg">
       <Sidebar
+        className="hidden lg:flex"
         logo={
           <NavLink to={`${base}/dashboard`} className="flex items-center gap-2">
             {/* 32 statt 36 px: die Sidebar ist w-60 (240 px), mit px-4 bleiben
@@ -310,7 +364,58 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
             gab es ihn nicht, obwohl jedes Token hier zweifarbig angelegt ist.
             Wer im Dunkelmodus arbeiten wollte, musste ihn auf der Startseite
             umstellen und zurücknavigieren. */}
-        <div className="flex items-center justify-end gap-1 border-b border-stroke px-4 py-1.5">
+        {/* Below lg the rail is gone and the bar carries the navigation: the
+            page title IS the switcher. Search and the bell stay in it; the
+            theme switch, the mock marker and the account block sit under the
+            open panel, where there is room. */}
+        <WorkspaceMobileBar
+          groups={mobileGroups}
+          homeHref={`${base}/dashboard`}
+          fallbackTitle={t('shell.navDashboard')}
+          switchLabel={t('shell.switchTo', { defaultValue: 'Wechseln zu' })}
+          logo={<Logo lockup="symbol" href={null} />}
+          actions={
+            <>
+              <button type="button" aria-label={t('shell.search')} onClick={() => setSearchOpen(true)} className="grid h-11 w-11 place-items-center rounded-lg text-fg-secondary transition-colors hover:text-fg">
+                <Search size={19} />
+              </button>
+              <Link
+                to={`/${locale}/dashboard/notifications`}
+                aria-label={t('shell.navNotifications')}
+                className="relative grid h-11 w-11 place-items-center rounded-lg text-fg-secondary transition-colors hover:text-fg"
+              >
+                <Bell size={19} />
+                {(counts.unread ?? 0) > 0 && (
+                  <span aria-hidden="true" className="absolute right-2 top-2 h-2 w-2 rounded-full bg-accent ring-2 ring-surface" />
+                )}
+              </Link>
+            </>
+          }
+          footer={
+            <div className="flex items-center gap-2.5 px-4 py-3">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-accent text-[11px] font-bold text-fg-on-accent">{initials}</span>
+              <div className="min-w-0 flex-1 leading-tight">
+                <p className="truncate text-body-sm font-semibold text-fg">{displayName}</p>
+                <p className="truncate text-body-2xs text-fg-tertiary">{displaySub}</p>
+              </div>
+              {isMockApi && (
+                <span className="rounded-full border border-accent/55 px-2 py-[2px] text-[9px] font-extrabold uppercase tracking-[0.06em] text-fg-accent-strong">
+                  Mock-Daten
+                </span>
+              )}
+              <ThemeToggle size={40} className="rounded-lg" />
+              <button
+                type="button"
+                aria-label={t('shell.signOut')}
+                onClick={async () => { await logout(); window.location.href = `/${locale}/login`; }}
+                className="grid h-11 w-11 place-items-center rounded-lg text-fg-tertiary transition-colors hover:text-fg"
+              >
+                <LogOut size={18} />
+              </button>
+            </div>
+          }
+        />
+        <div className="hidden items-center justify-end gap-1 border-b border-stroke px-4 py-1.5 lg:flex">
           <button type="button" aria-label={t('shell.search')} onClick={() => setSearchOpen(true)} className="grid h-9 w-9 place-items-center rounded-lg text-fg-secondary hover:text-fg">
             <Search size={17} />
           </button>
@@ -340,7 +445,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
               Knöpfe in der Leiste dieselbe Fläche haben. */}
           <ThemeToggle size={36} className="rounded-lg" />
         </div>
-        <main className="flex-1 overflow-y-auto px-8 py-6">{children}</main>
+        <main className="flex-1 overflow-y-auto px-4 py-5 lg:px-8 lg:py-6">{children}</main>
       </div>
       <UserSearchDrawer open={searchOpen} onClose={() => setSearchOpen(false)} />
       <AssistantWidget />
