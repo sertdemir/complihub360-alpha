@@ -851,7 +851,8 @@
         "noNamedSource": "Henüz adlandırılmış kaynak yok",
         "placeholderNote": "Motor burada {{market}} için bir mevzuat taşımıyor — bu, hukuktaki değil kapsamımızdaki bir boşluk.",
         "pendingNote": "AB kaynağı. {{market}} bunun üzerine kendi metnini de koyuyor; onu henüz taşımıyoruz.",
-        "euDirect": "AB Tüzüğü — doğrudan uygulanır, burada geçerli olan norm budur"
+        "euDirect": "AB Tüzüğü — doğrudan uygulanır, burada geçerli olan norm budur",
+        "ceiling": "Belgelenmiş üst sınır"
       },
       "relatedOpen": "Bu alanı aç",
       "relatedStrongest": "En güçlü bağlantı",
@@ -908,7 +909,73 @@
       "askPlaceholder": "Sorunuzu kendi sözcüklerinizle sorun",
       "coverageNoteGaps": "{{count}} yükümlülüğün {{specific}} tanesinin {{market}} için özel bir kaynağı var. Geri kalanların {{gaps}} tanesinin henüz taşımadığımız ulusal bir metni var; diğerleri burada doğrudan uygulanan AB Tüzükleri.",
       "checkTitle": "Bu size uyuyor mu?",
-      "checkFoot": "Biri geçerliyse bu alan sizin için yükümlülükler taşır — değerlendirme bunları durumunuza daraltır."
+      "checkFoot": "Biri geçerliyse bu alan sizin için yükümlülükler taşır — değerlendirme bunları durumunuza daraltır.",
+      "ceiling": {
+        "unproven": "Henüz belgelenmedi",
+        "unprovenNote": "Risk haritasının hesapladığı tutar devralınmış bir değerdir; kanun metninden okunmuş değildir.",
+        "perUnit": "{{per}} başına {{amount}}",
+        "proportional": "{{of}} tutarının %{{percent}} kadarı",
+        "turnover": "Dünya genelindeki yıllık cironun %{{percent}} kadarı",
+        "turnoverOr": "{{amount}} veya dünya genelindeki yıllık cironun %{{percent}} kadarı — hangisi yüksekse",
+        "subnational": "Bir alt düzeyde belirlenir — {{level}}",
+        "delegated": "Tutar yok — düzenleme yaptırımı üye devletlere bırakıyor",
+        "none": "Para cezası yok — sonuç hukuk davası niteliğindedir",
+        "unlimited": "Üst sınırı olmayan para cezası",
+        "asOf": "{{basis}} · {{date}} itibarıyla",
+        "converted": "Euro tutarı, {{from}} tutarından {{date}} tarihli AMB kuruyla yaptığımız çevirmedir.",
+        "noAmount": "Kanun herhangi bir tutar belirtmiyor; yanındaki euro tutarının kanuni bir karşılığı yok.",
+        "state": {
+          "CA": "Kaliforniya",
+          "TX": "Teksas",
+          "NY": "New York",
+          "FL": "Florida"
+        },
+        "basisNote": {
+          "frTaxTiers": "İhtarsız %10, ihtardan sonra %40, gizlenmiş faaliyette %80",
+          "frTaxIntent": "Kasıtlı ihlalde %40, vergi kaçakçılığında %80",
+          "frQuintuple4500": "Kanun gerçek kişiler için 4.500 € öngörüyor; şirketler için bunun beş katı geçerli",
+          "frQuintuple200k": "Kanun gerçek kişiler için 200.000 € öngörüyor; şirketler için bunun beş katı geçerli",
+          "frTwoRates75k": "Tüzel kişiler için 75.000 €, gerçek kişiler için 15.000 €",
+          "frPerUnitTwoRates": "Tüzel kişiler için geçerli tutar; gerçek kişiler için 1.500 €",
+          "usMonthlyCap25": "Başlayan her ay için %5, toplamda en fazla %25",
+          "txCurePeriod": "Yalnızca düzeltme süresinden sonra: Attorney General’ın bildiriminden itibaren 30 gün",
+          "ukLateFilingTiers": "Public company, altı aydan fazla gecikmede: 7.500 £, önceki yıl da gecikilmişse iki katı. Private company: 150 ila 1.500 £",
+          "itAccountsTiers": "Yıllık finansal tabloların sunulmaması; 6 milyon € ciro üzerinde her gecikme yılı için, aksi hâlde 1.200 ila 60.000 €",
+          "esVeryGraveRange": "Çok ağır ihlal: %100 ila %150",
+          "esPesetaLegacy": "Çok ağır ihlal. 2001’de pezetadan çevrildi ve o günden beri güncellenmedi",
+          "esGainMultiple": "Çok ağır ihlal. Haksız kazancın altı ila sekiz katına kadar aşılabilir",
+          "nlPaymentDefault": "Ödeme yapılmaması. Kasıt hâlinde bunun yerine Madde 67f uyarınca verginin %100’ü",
+          "widespreadOnly": "Yalnızca yaygın ihlalde; aksi hâlde birinci cümle uyarınca 50.000 €",
+          "ukIndictmentVsSummary": "İddianameyle görülen yargılamada. Basit yargılamada bunun yerine statutory maximum uygulanır",
+          "nlFourthCategory": "Dördüncü kategori, 1 Ocak 2026 itibarıyla",
+          "ukOverTwoYears": "İki yıldan fazla gecikmeli",
+          "ukDeliberateConcealed": "Kategori 1, kasıtlı ve gizlenmiş",
+          "deAssessedTaxes": "Tarhiyata tabi vergilerde beyanname verilmemesi",
+          "deLateSurchargeCap": "Gecikme zammı, üst sınır",
+          "deliberateNoDisclosure": "Kasıtlı ihlal, kendiliğinden bildirim olmaksızın",
+          "seriousRepeated": "Ağır, tekrarlanan veya sistematik ihlal",
+          "nyShieldChain": "New York’in kapsamlı bir veri koruma kanunu yok. SHIELD Act veri güvenliğini düzenliyor ve cezayı iki kademe öteye, genel tüketici hukukuna yönlendiriyor. İhlal bildiriminin yapılmaması ayrı bir üst sınıra tabi: § 899-aa uyarınca 5.000 $ veya atlanan her bildirim için 20 $, en çok 250.000 $."
+        },
+        "ofKey": {
+          "domesticValue": "malın yurt içi değeri",
+          "taxRequiredToShow": "beyannamede gösterilmesi gereken vergi",
+          "itIncomeTax": "ödenmesi gereken gelir vergisi (IRES ve IRAP)",
+          "corporateTaxDue": "ödenmesi gereken kurumlar vergisi",
+          "vatDue": "ödenmesi gereken katma değer vergisi",
+          "taxDue": "ödenmesi gereken vergi",
+          "unremittedTax": "ödenmemiş vergi borcu",
+          "unpaidCorporateTax": "ödenmemiş kurumlar vergisi",
+          "potentialLostRevenue": "potansiyel vergi kaybı"
+        },
+        "perKey": {
+          "unitOrTonnePlaced": "piyasaya arz edilen ürünün birimi veya tonu"
+        },
+        "levelKey": {
+          "states45AndDc": "45 eyalet ve Columbia Bölgesi",
+          "statesWithPrivacyActs": "kendi veri koruma kanunu olan eyaletler (Kaliforniya ve yaklaşık yirmi eyalet daha)",
+          "states50AndDc": "50 eyaletin tamamı ve Columbia Bölgesi"
+        }
+      }
     },
     "riskBadge": "Risk: {{level}}"
   },

@@ -851,7 +851,8 @@
         "noNamedSource": "No named source yet",
         "placeholderNote": "The engine carries no statute for {{market}} here — a gap in our coverage, not in the law.",
         "pendingNote": "EU-level source. {{market}} has its own text on top of it, which we do not carry yet.",
-        "euDirect": "EU Regulation — applies directly, this is the law here"
+        "euDirect": "EU Regulation — applies directly, this is the law here",
+        "ceiling": "Proven ceiling"
       },
       "relatedOpen": "Open this area",
       "relatedStrongest": "Strongest connection",
@@ -908,7 +909,73 @@
       "askPlaceholder": "Ask your question in your own words",
       "coverageNoteGaps": "{{specific}} of {{count}} duties have a source specific to {{market}}. Of the rest, {{gaps}} have a national text we do not carry yet — the others are EU Regulations, which apply here directly.",
       "checkTitle": "Does this apply to you?",
-      "checkFoot": "If one applies, this area carries duties for you — the assessment narrows them to your case."
+      "checkFoot": "If one applies, this area carries duties for you — the assessment narrows them to your case.",
+      "ceiling": {
+        "unproven": "Not proven yet",
+        "unprovenNote": "The figure the risk map counts with is carried stock — we have not read it off the statute.",
+        "perUnit": "{{amount}} per {{per}}",
+        "proportional": "{{percent}}% {{of}}",
+        "turnover": "{{percent}}% of annual worldwide turnover",
+        "turnoverOr": "{{amount}} or {{percent}}% of annual worldwide turnover — whichever is higher",
+        "subnational": "Set one level down — {{level}}",
+        "delegated": "No amount — the act leaves the penalty to member states",
+        "none": "No fine — the consequence is civil",
+        "unlimited": "Unlimited fine",
+        "asOf": "{{basis}} · as at {{date}}",
+        "converted": "The euro figure is our conversion from {{from}}, at the ECB rate of {{date}}.",
+        "noAmount": "The statute names no amount, so the euro figure beside it has no counterpart in law.",
+        "state": {
+          "CA": "California",
+          "TX": "Texas",
+          "NY": "New York",
+          "FL": "Florida"
+        },
+        "basisNote": {
+          "frTaxTiers": "10% without a reminder, 40% after one, 80% for undeclared activity",
+          "frTaxIntent": "40% for a deliberate breach, 80% for tax evasion",
+          "frQuintuple4500": "The statute names €4,500 for natural persons; for companies it is five times that",
+          "frQuintuple200k": "The statute names €200,000 for natural persons; for companies it is five times that",
+          "frTwoRates75k": "€75,000 for legal persons, €15,000 for natural persons",
+          "frPerUnitTwoRates": "The rate for legal persons; €1,500 for natural persons",
+          "usMonthlyCap25": "5% for each month begun, capped at 25% in total",
+          "txCurePeriod": "Only after the cure period: 30 days from the Attorney General’s notice",
+          "ukLateFilingTiers": "Public company, more than six months late: £7,500, doubled if the previous year was late too. Private company: £150 to £1,500",
+          "itAccountsTiers": "Failure to file the annual accounts; per year of delay above €6m turnover, otherwise €1,200 to €60,000",
+          "esVeryGraveRange": "Very serious infringement: 100% to 150%",
+          "esPesetaLegacy": "Very serious infringement. Converted from pesetas in 2001 and not adjusted since",
+          "esGainMultiple": "Very serious infringement. May be exceeded, up to six to eight times the unlawful gain",
+          "nlPaymentDefault": "Failure to pay. For a deliberate breach, 100% of the tax under Art. 67f instead",
+          "widespreadOnly": "Only for a widespread infringement; otherwise €50,000 under the first sentence",
+          "ukIndictmentVsSummary": "On indictment. In summary proceedings the statutory maximum applies instead",
+          "nlFourthCategory": "Fourth category, as at 1 January 2026",
+          "ukOverTwoYears": "More than two years late",
+          "ukDeliberateConcealed": "Category 1, deliberate and concealed",
+          "deAssessedTaxes": "Failure to file, for assessed taxes",
+          "deLateSurchargeCap": "Late-filing surcharge, upper limit",
+          "deliberateNoDisclosure": "Deliberate breach, without voluntary disclosure",
+          "seriousRepeated": "A serious, repeated or systematic breach",
+          "nyShieldChain": "New York has no comprehensive privacy act. The SHIELD Act covers data security and routes the penalty two steps on, into general consumer-protection law. Failing to notify a breach is a separate ceiling: under § 899-aa the greater of $5,000 or $20 per missed notification, capped at $250,000."
+        },
+        "ofKey": {
+          "domesticValue": "of the domestic value of the merchandise",
+          "taxRequiredToShow": "of the tax required to be shown on the return",
+          "itIncomeTax": "of the income tax due (IRES and IRAP)",
+          "corporateTaxDue": "of the corporate income tax due",
+          "vatDue": "of the VAT due",
+          "taxDue": "of the tax due",
+          "unremittedTax": "of the tax not remitted",
+          "unpaidCorporateTax": "of the unpaid corporate income tax",
+          "potentialLostRevenue": "of the potential lost revenue"
+        },
+        "perKey": {
+          "unitOrTonnePlaced": "unit or tonne of product placed on the market"
+        },
+        "levelKey": {
+          "states45AndDc": "45 states and the District of Columbia",
+          "statesWithPrivacyActs": "the states with their own privacy act (California and some twenty others)",
+          "states50AndDc": "all 50 states and the District of Columbia"
+        }
+      }
     },
     "riskBadge": "{{level}} Risk"
   },
