@@ -850,7 +850,8 @@
         "noNamedSource": "No named source yet",
         "placeholderNote": "The engine carries no statute for {{market}} here — a gap in our coverage, not in the law.",
         "pendingNote": "EU-level source. {{market}} has its own text on top of it, which we do not carry yet.",
-        "euDirect": "EU Regulation — applies directly, this is the law here"
+        "euDirect": "EU Regulation — applies directly, this is the law here",
+        "ceiling": "Proven ceiling"
       },
       "relatedOpen": "Open this area",
       "relatedStrongest": "Strongest connection",
@@ -907,7 +908,28 @@
       "askPlaceholder": "Ask your question in your own words",
       "coverageNoteGaps": "{{specific}} of {{count}} duties have a source specific to {{market}}. Of the rest, {{gaps}} have a national text we do not carry yet — the others are EU Regulations, which apply here directly.",
       "checkTitle": "Does this apply to you?",
-      "checkFoot": "If one applies, this area carries duties for you — the assessment narrows them to your case."
+      "checkFoot": "If one applies, this area carries duties for you — the assessment narrows them to your case.",
+      "ceiling": {
+        "unproven": "Not proven yet",
+        "unprovenNote": "The figure the risk map counts with is carried stock — we have not read it off the statute.",
+        "perUnit": "{{amount}} per {{per}}",
+        "proportional": "{{percent}}% of {{of}}",
+        "turnover": "{{percent}}% of annual worldwide turnover",
+        "turnoverOr": "{{amount}} or {{percent}}% of annual worldwide turnover — whichever is higher",
+        "subnational": "Set one level down — {{level}}",
+        "delegated": "No amount — the act leaves the penalty to member states",
+        "none": "No fine — the consequence is civil",
+        "unlimited": "Unlimited fine",
+        "asOf": "{{basis}} · as at {{date}}",
+        "converted": "The euro figure is our conversion from {{from}}, at the ECB rate of {{date}}.",
+        "noAmount": "The statute names no amount, so the euro figure beside it has no counterpart in law.",
+        "state": {
+          "CA": "California",
+          "TX": "Texas",
+          "NY": "New York",
+          "FL": "Florida"
+        }
+      }
     },
     "riskBadge": "{{level}} Risk"
   },

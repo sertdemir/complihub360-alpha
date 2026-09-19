@@ -1,5 +1,7 @@
 import {
   type PenaltyCeiling,
+  type SubnationalCeiling,
+  type UsState,
   ComplianceDomain,
   CountryRiskMatrix,
   DomainTemplateLibrary,
@@ -88,6 +90,10 @@ export interface AreaObligation extends AreaSubdomain {
    *  sie, ist `penaltyMaxEur` Bestand ohne Beleg — die Oberflaeche darf ihn
    *  dann nicht als belegt darstellen. */
   penaltyCeiling?: PenaltyCeiling;
+  /** Die Aufloesung zu `penaltyCeiling.kind === 'subnational'`: was der
+   *  einzelne Gliedstaat vorsieht. Nur dort gesetzt — wo der Bund eine Zahl
+   *  hat, gibt es nichts aufzuloesen. */
+  states?: Partial<Record<UsState, SubnationalCeiling>>;
   /** Cadence label as the enrichment map states it, e.g. 'Quarterly'. */
   due: string;
   dueDays?: number;
@@ -207,6 +213,7 @@ export function getAreaObligations(slug: DomainSlug, code: CountryCode | 'EU'): 
       penalty: entry.penalty,
       penaltyMaxEur: entry.penaltyMaxEur,
       penaltyCeiling: entry.penaltyCeiling,
+      states: entry.states,
       due: entry.due,
       dueDays: entry.dueDays,
       appliesFrom: entry.appliesFrom,

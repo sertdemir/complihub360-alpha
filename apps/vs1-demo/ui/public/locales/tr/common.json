@@ -850,7 +850,8 @@
         "noNamedSource": "Henüz adlandırılmış kaynak yok",
         "placeholderNote": "Motor burada {{market}} için bir mevzuat taşımıyor — bu, hukuktaki değil kapsamımızdaki bir boşluk.",
         "pendingNote": "AB kaynağı. {{market}} bunun üzerine kendi metnini de koyuyor; onu henüz taşımıyoruz.",
-        "euDirect": "AB Tüzüğü — doğrudan uygulanır, burada geçerli olan norm budur"
+        "euDirect": "AB Tüzüğü — doğrudan uygulanır, burada geçerli olan norm budur",
+        "ceiling": "Belgelenmiş üst sınır"
       },
       "relatedOpen": "Bu alanı aç",
       "relatedStrongest": "En güçlü bağlantı",
@@ -907,7 +908,28 @@
       "askPlaceholder": "Sorunuzu kendi sözcüklerinizle sorun",
       "coverageNoteGaps": "{{count}} yükümlülüğün {{specific}} tanesinin {{market}} için özel bir kaynağı var. Geri kalanların {{gaps}} tanesinin henüz taşımadığımız ulusal bir metni var; diğerleri burada doğrudan uygulanan AB Tüzükleri.",
       "checkTitle": "Bu size uyuyor mu?",
-      "checkFoot": "Biri geçerliyse bu alan sizin için yükümlülükler taşır — değerlendirme bunları durumunuza daraltır."
+      "checkFoot": "Biri geçerliyse bu alan sizin için yükümlülükler taşır — değerlendirme bunları durumunuza daraltır.",
+      "ceiling": {
+        "unproven": "Henüz belgelenmedi",
+        "unprovenNote": "Risk haritasının hesapladığı tutar devralınmış bir değerdir; kanun metninden okunmuş değildir.",
+        "perUnit": "{{per}} başına {{amount}}",
+        "proportional": "{{of}} tutarının %{{percent}} kadarı",
+        "turnover": "Dünya genelindeki yıllık cironun %{{percent}} kadarı",
+        "turnoverOr": "{{amount}} veya dünya genelindeki yıllık cironun %{{percent}} kadarı — hangisi yüksekse",
+        "subnational": "Bir alt düzeyde belirlenir — {{level}}",
+        "delegated": "Tutar yok — düzenleme yaptırımı üye devletlere bırakıyor",
+        "none": "Para cezası yok — sonuç hukuk davası niteliğindedir",
+        "unlimited": "Üst sınırı olmayan para cezası",
+        "asOf": "{{basis}} · {{date}} itibarıyla",
+        "converted": "Euro tutarı, {{from}} tutarından {{date}} tarihli AMB kuruyla yaptığımız çevirmedir.",
+        "noAmount": "Kanun herhangi bir tutar belirtmiyor; yanındaki euro tutarının kanuni bir karşılığı yok.",
+        "state": {
+          "CA": "Kaliforniya",
+          "TX": "Teksas",
+          "NY": "New York",
+          "FL": "Florida"
+        }
+      }
     },
     "riskBadge": "Risk: {{level}}"
   },

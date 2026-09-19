@@ -5,6 +5,7 @@ import { FileText } from 'lucide-react';
 import { Typography } from '../ui/Typography';
 import { RiskBadge } from '../ui/RiskBadge';
 import { getAreaObligations, type AreaObligation } from '../../lib/areaProfiles';
+import { ceilingBasis, describeCeiling, provenance } from '../../lib/penaltyCeiling';
 import { RailDossier } from './RailDossier';
 import { Segment } from './Segment';
 import { AREA_BY_SLUG } from './areas';
@@ -370,6 +371,14 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                           value={o.penalty}
                           emphasis
                         />
+                        {/* Die belegte Obergrenze steht NEBEN dem Rahmen, nicht
+                            an seiner Stelle. Die beiden sagen Verschiedenes:
+                            `penalty` ist die redaktionelle Spanne, die
+                            Obergrenze ist das, was im Gesetz steht — mit
+                            Fundstelle und Stand. Ersetzte das eine das andere,
+                            ginge entweder die Lesbarkeit oder der Beleg
+                            verloren. */}
+                        <CeilingFact o={o} />
                         <Fact
                           label={t('compliance.area.fact.cadence', 'Cadence')}
                           value={t(`markets.cadence.${o.due}`, { defaultValue: o.due })}
@@ -430,6 +439,128 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
         />
       )}
 
+    </div>
+  );
+}
+
+/** Die belegte Obergrenze einer Pflicht — Betrag in SEINER Waehrung, die
+ *  Vorschrift, der Stand, und woher die Eurozahl daneben stammt.
+ *
+ *  Vier Tage lang wurde jede Obergrenze am Primaertext belegt, und angezeigt
+ *  wurde davon nichts: `penaltyCeiling` reiste bis hierher und wurde fallen
+ *  gelassen. Die Karte zeigte weiter eine Eurozahl, der man nicht ansah, ob
+ *  sie im Gesetz steht, umgerechnet ist oder blosser Bestand. */
+function CeilingFact({ o }: { o: AreaObligation }) {
+  const { t, i18n } = useTranslation();
+  const c = o.penaltyCeiling;
+
+  // Ohne Beleg wird die Zeile NICHT weggelassen. Ein fehlender Beleg ist eine
+  // Auskunft — und zwar die unangenehme, die man sonst nie zu sehen bekaeme.
+  if (!c) {
+    return (
+      <Fact
+        label={t('compliance.area.fact.ceiling', 'Proven ceiling')}
+        value={t('compliance.area.ceiling.unproven', 'Not proven yet')}
+        note={t('compliance.area.ceiling.unprovenNote', {
+          defaultValue:
+            'The figure the risk map counts with is carried stock — we have not read it off the statute.',
+        })}
+        muted
+      />
+    );
+  }
+
+  const d = describeCeiling(c, i18n.language, o.states);
+  const { basis, asOf } = ceilingBasis(c);
+  const p = provenance(o, i18n.language);
+
+  const value =
+    d.form === 'amount'
+      ? d.amount
+      : d.form === 'perUnit'
+        ? t('compliance.area.ceiling.perUnit', {
+            defaultValue: '{{amount}} per {{per}}',
+            amount: d.amount,
+            per: d.per,
+          })
+        : d.form === 'proportional'
+          ? t('compliance.area.ceiling.proportional', {
+              defaultValue: '{{percent}}% of {{of}}',
+              percent: d.percent,
+              of: d.of,
+            })
+          : d.form === 'turnover'
+            ? d.orAmount
+              ? t('compliance.area.ceiling.turnoverOr', {
+                  defaultValue: '{{amount}} or {{percent}}% of annual worldwide turnover — whichever is higher',
+                  amount: d.orAmount,
+                  percent: d.percent,
+                })
+              : t('compliance.area.ceiling.turnover', {
+                  defaultValue: '{{percent}}% of annual worldwide turnover',
+                  percent: d.percent,
+                })
+            : d.form === 'subnational'
+              ? t('compliance.area.ceiling.subnational', {
+                  defaultValue: 'Set one level down — {{level}}',
+                  level: d.level,
+                })
+              : d.form === 'delegated'
+                ? t('compliance.area.ceiling.delegated', 'No amount — the act leaves the penalty to member states')
+                : d.form === 'none'
+                  ? t('compliance.area.ceiling.none', 'No fine — the consequence is civil')
+                  : t('compliance.area.ceiling.unlimited', 'Unlimited fine');
+
+  // Die Fundstelle traegt den Stand, wo es einen gibt. `delegated` und `none`
+  // haben keinen: dort ist nichts zu datieren, und ein erfundenes Datum waere
+  // schlimmer als keines.
+  const quelle = asOf
+    ? t('compliance.area.ceiling.asOf', {
+        defaultValue: '{{basis}} · as at {{date}}',
+        basis,
+        date: new Intl.DateTimeFormat(i18n.language, { dateStyle: 'medium' }).format(new Date(asOf)),
+      })
+    : basis;
+
+  const herkunft =
+    p.kind === 'converted'
+      ? t('compliance.area.ceiling.converted', {
+          defaultValue: 'The euro figure is our conversion from {{from}}, at the ECB rate of {{date}}.',
+          from: p.from,
+          date: new Intl.DateTimeFormat(i18n.language, { dateStyle: 'medium' }).format(new Date(p.rateAsOf)),
+        })
+      : p.kind === 'noAmount'
+        ? t('compliance.area.ceiling.noAmount', {
+            defaultValue: 'The statute names no amount, so the euro figure beside it has no counterpart in law.',
+          })
+        : undefined;
+
+  return (
+    <div className="bg-surface px-5 py-4">
+      <dt className="text-body-3xs font-bold uppercase tracking-[0.1em] text-fg-tertiary">
+        {t('compliance.area.fact.ceiling', 'Proven ceiling')}
+      </dt>
+      <dd className="mt-2 text-body-sm font-semibold tabular-nums text-fg">{value}</dd>
+      {d.form === 'subnational' && d.states.length > 0 && (
+        // Die Staaten stehen UNTER der Ebenen-Aussage, nicht an ihrer Stelle:
+        // dass der Bund hier nichts setzt, ist der Befund; die drei Zahlen
+        // sind seine Aufloesung.
+        <ul className="mt-3 space-y-1.5 border-l-2 border-border pl-3">
+          {d.states.map((st) => (
+            <li key={st.code} className="text-body-3xs">
+              <span className="font-semibold tabular-nums text-fg">{st.amount}</span>
+              <span className="text-fg-tertiary">
+                {' — '}
+                {t(`compliance.area.ceiling.state.${st.code}`, { defaultValue: st.code })}
+                {', '}
+                {st.source}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="mt-2 text-body-3xs text-fg-tertiary">{quelle}</p>
+      {herkunft && <p className="mt-1 text-body-3xs italic text-fg-tertiary">{herkunft}</p>}
     </div>
   );
 }

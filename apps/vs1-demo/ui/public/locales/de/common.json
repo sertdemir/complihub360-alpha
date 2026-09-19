@@ -850,7 +850,8 @@
         "noNamedSource": "Noch keine benannte Quelle",
         "placeholderNote": "Die Engine führt hier keine Norm für {{market}} — eine Lücke in unserer Abdeckung, nicht im Recht.",
         "pendingNote": "EU-Quelle. {{market}} hat darüber hinaus eine eigene Fassung, die wir noch nicht führen.",
-        "euDirect": "EU-Verordnung — gilt unmittelbar, das ist hier die geltende Norm"
+        "euDirect": "EU-Verordnung — gilt unmittelbar, das ist hier die geltende Norm",
+        "ceiling": "Belegte Obergrenze"
       },
       "relatedOpen": "Bereich öffnen",
       "relatedStrongest": "Stärkste Verbindung",
@@ -907,7 +908,28 @@
       "askPlaceholder": "Stellen Sie Ihre Frage in eigenen Worten",
       "coverageNoteGaps": "{{specific}} von {{count}} Pflichten haben eine Quelle speziell für {{market}}. Von den übrigen haben {{gaps}} eine nationale Fassung, die wir noch nicht führen — der Rest sind EU-Verordnungen, die hier unmittelbar gelten.",
       "checkTitle": "Trifft das auf Sie zu?",
-      "checkFoot": "Trifft eines zu, trägt dieser Bereich Pflichten für Sie — das Assessment grenzt sie auf Ihren Fall ein."
+      "checkFoot": "Trifft eines zu, trägt dieser Bereich Pflichten für Sie — das Assessment grenzt sie auf Ihren Fall ein.",
+      "ceiling": {
+        "unproven": "Noch nicht belegt",
+        "unprovenNote": "Die Zahl, mit der die Risikokarte rechnet, ist Bestand — wir haben sie nicht am Gesetzestext gelesen.",
+        "perUnit": "{{amount}} je {{per}}",
+        "proportional": "{{percent}} % der {{of}}",
+        "turnover": "{{percent}} % des weltweiten Jahresumsatzes",
+        "turnoverOr": "{{amount}} oder {{percent}} % des weltweiten Jahresumsatzes — je nachdem, welcher Betrag höher ist",
+        "subnational": "Wird eine Ebene tiefer gesetzt — {{level}}",
+        "delegated": "Kein Betrag — der Rechtsakt überlässt die Sanktion den Mitgliedstaaten",
+        "none": "Keine Geldbuße — die Folge ist zivilrechtlich",
+        "unlimited": "Geldstrafe ohne Obergrenze",
+        "asOf": "{{basis}} · Stand {{date}}",
+        "converted": "Die Eurozahl ist unsere Umrechnung aus {{from}}, zum EZB-Kurs vom {{date}}.",
+        "noAmount": "Das Gesetz nennt keinen Betrag; die Eurozahl daneben hat deshalb keine gesetzliche Entsprechung.",
+        "state": {
+          "CA": "Kalifornien",
+          "TX": "Texas",
+          "NY": "New York",
+          "FL": "Florida"
+        }
+      }
     },
     "riskBadge": "Risiko: {{level}}"
   },

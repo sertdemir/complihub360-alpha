@@ -850,7 +850,8 @@
         "noNamedSource": "Todavía sin fuente citada",
         "placeholderNote": "El motor no incluye ninguna norma de {{market}} aquí: es una laguna de nuestra cobertura, no de la ley.",
         "pendingNote": "Fuente de la UE. {{market}} tiene además su propio texto, que aún no incluimos.",
-        "euDirect": "Reglamento de la UE: se aplica directamente, esta es la norma vigente aquí"
+        "euDirect": "Reglamento de la UE: se aplica directamente, esta es la norma vigente aquí",
+        "ceiling": "Límite acreditado"
       },
       "relatedOpen": "Abrir este ámbito",
       "relatedStrongest": "Conexión más fuerte",
@@ -907,7 +908,28 @@
       "askPlaceholder": "Haga su pregunta con sus propias palabras",
       "coverageNoteGaps": "{{specific}} de {{count}} obligaciones tienen una fuente específica de {{market}}. Del resto, {{gaps}} tienen un texto nacional que aún no incluimos; las demás son Reglamentos de la UE, de aplicación directa aquí.",
       "checkTitle": "¿Le aplica esto?",
-      "checkFoot": "Si uno aplica, esta área conlleva deberes para usted — el assessment los acota a su caso."
+      "checkFoot": "Si uno aplica, esta área conlleva deberes para usted — el assessment los acota a su caso.",
+      "ceiling": {
+        "unproven": "Aún sin acreditar",
+        "unprovenNote": "La cifra con la que calcula el mapa de riesgo es un valor heredado: no la hemos leído en el texto legal.",
+        "perUnit": "{{amount}} por {{per}}",
+        "proportional": "{{percent}} % de {{of}}",
+        "turnover": "{{percent}} % del volumen de negocios anual mundial",
+        "turnoverOr": "{{amount}} o {{percent}} % del volumen de negocios anual mundial, la cantidad que sea mayor",
+        "subnational": "Se fija un nivel más abajo — {{level}}",
+        "delegated": "Sin importe — el acto deja la sanción a los Estados miembros",
+        "none": "Sin multa — la consecuencia es civil",
+        "unlimited": "Multa sin límite máximo",
+        "asOf": "{{basis}} · a fecha de {{date}}",
+        "converted": "La cifra en euros es nuestra conversión de {{from}}, al tipo del BCE de {{date}}.",
+        "noAmount": "La ley no menciona ningún importe, por lo que la cifra en euros no tiene equivalente legal.",
+        "state": {
+          "CA": "California",
+          "TX": "Texas",
+          "NY": "Nueva York",
+          "FL": "Florida"
+        }
+      }
     },
     "riskBadge": "Riesgo: {{level}}"
   },
