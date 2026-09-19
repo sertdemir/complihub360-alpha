@@ -77,16 +77,57 @@ const MARK_W = 40.594;
 const MARK_H = 40.018;
 const WORD_W = 101;
 const WORD_H = 20.701;
+/**
+ * Höhe des reinen Wortzeichens "CompliHub360", ohne die Claim-Zeile darunter.
+ * Kein geschätzter Wert: Bounding-Box der Pfade WORDMARK_INK + WORDMARK_GOLD,
+ * im Browser über getBBox() abgenommen. Der Claim belegt die restlichen 7,0.
+ */
+const WORD_TEXT_H = 13.7;
 /** Abstand Bildmarke → Wortmarke: 3 px nebeneinander, 8 px gestapelt. */
 const GAP_H = 3;
 const GAP_V = 8;
+/**
+ * Um diesen Faktor wächst das Wortzeichen, wenn der Claim wegfällt: es füllt
+ * exakt die frei werdende Höhe, 13,7 → 20,701. Bei 47 px Logo-Höhe wächst es
+ * damit von 16,1 auf 24,3 px.
+ *
+ * Das kostet Breite, denn es skaliert proportional mit: das Lockup geht von
+ * 170 auf 230 px. Nachgemessen, welche Fensterbreite die beiden Kopfzeilen
+ * dafür brauchen:
+ *
+ *              volles Lockup passt ab      Reserve bei 1440
+ *   GlobalNav            ~1451 px           51 px  (Nav-Inhalt 806 / Platz 857)
+ *   MarketingHeader      ~1492 px            8 px  <- der enge Fall
+ *
+ * Die Startseite ist die Grenze, nicht die Navigation. Ihre Leiste hatte auch
+ * VOR dieser Änderung nur 8 px Luft bei 1440 — ein längeres Label oder eine
+ * andere Locale hätte sie ebenso gesprengt.
+ *
+ * Deshalb wandert der Umschaltpunkt Bildmarke → volles Lockup von 1440 auf
+ * 1520 (siehe MarketingHeader und GlobalNav). Bis dahin trägt die Leiste nur
+ * die Bildmarke — dieselbe Regel, die unter 1280 längst gilt.
+ */
+const WORD_SCALE = WORD_H / WORD_TEXT_H;
 
-const BOX: Record<LogoLockup, { w: number; h: number }> = {
-  horizontal: { w: MARK_W + GAP_H + WORD_W, h: MARK_H },
-  stacked: { w: WORD_W, h: MARK_H + GAP_V + WORD_H },
-  symbol: { w: MARK_W, h: MARK_H },
-  wortmarke: { w: WORD_W, h: WORD_H },
-};
+/** Maße des Wortmarken-Blocks, je nachdem ob die Claim-Zeile mitläuft. */
+function wordBox(claim: boolean) {
+  const scale = claim ? 1 : WORD_SCALE;
+  return { scale, w: WORD_W * scale, h: (claim ? WORD_H : WORD_TEXT_H) * scale };
+}
+
+function boxFor(lockup: LogoLockup, claim: boolean): { w: number; h: number } {
+  const word = wordBox(claim);
+  switch (lockup) {
+    case 'horizontal':
+      return { w: MARK_W + GAP_H + word.w, h: MARK_H };
+    case 'stacked':
+      return { w: Math.max(word.w, MARK_W), h: MARK_H + GAP_V + word.h };
+    case 'symbol':
+      return { w: MARK_W, h: MARK_H };
+    case 'wortmarke':
+      return { w: word.w, h: word.h };
+  }
+}
 
 /** Default-Höhe je Lockup, wenn der Aufrufer keine Klasse mitgibt. */
 const DEFAULT_H: Record<LogoLockup, string> = {
@@ -114,7 +155,7 @@ function Bildmarke({ tone, gradId }: { tone: LogoTone; gradId: string }) {
   );
 }
 
-function Wortmarke({ tone }: { tone: LogoTone }) {
+function Wortmarke({ tone, claim }: { tone: LogoTone; claim: boolean }) {
   const c = TONE[tone];
   return (
     <>
@@ -127,11 +168,13 @@ function Wortmarke({ tone }: { tone: LogoTone }) {
       {/* Claim-Zeile: Linie · "Always on your side" · Linie, 4 px Abstand.
           Linien und Schrift teilen sich c.claim — sie lesen sich als ein
           Element, ein Farbsprung dazwischen zerfiele optisch. */}
-      <g transform={`translate(0 ${WORD_H - 7})`}>
-        <rect x="0" y="3.5" width="13.5" height="0.7" fill={c.claim} />
-        <path d={CLAIM} fill={c.claim} transform="translate(17.5 0)" />
-        <rect x="87.5" y="3.5" width="13.5" height="0.7" fill={c.claim} />
-      </g>
+      {claim && (
+        <g transform={`translate(0 ${WORD_H - 7})`}>
+          <rect x="0" y="3.5" width="13.5" height="0.7" fill={c.claim} />
+          <path d={CLAIM} fill={c.claim} transform="translate(17.5 0)" />
+          <rect x="87.5" y="3.5" width="13.5" height="0.7" fill={c.claim} />
+        </g>
+      )}
     </>
   );
 }
@@ -150,6 +193,22 @@ export interface LogoProps {
    * stand die Ink-Wortmarke auf dunklem Grund.
    */
   tone?: LogoTone;
+  /**
+   * Claim-Zeile "Always on your side" unter dem Wortzeichen. Entspricht der
+   * Figma-Property "Claim" (Ohne · Mit).
+   *
+   * DEFAULT IST OHNE — und das ist eine Messung, keine Geschmacksfrage: der
+   * Claim ist 17 % der Logo-Höhe, also 8 px bei den 47 px, die JEDE echte
+   * Platzierung fährt (Header, Footer, Auth-Seiten, Shells). Bei 8 px ist er
+   * nicht lesbar, egal in welcher Farbe — die Kontrastkorrektur auf accent/800
+   * hat das Problem gemildert, nicht gelöst. Statt einer unlesbaren Zeile
+   * bekommt das Wortzeichen ihren Platz und wächst um 40 %.
+   *
+   * `claim` setzt man dort, wo das Logo groß genug dafür ist: Print, Keynote,
+   * eine Markenseite, ein Export ab etwa 90 px Höhe. Dort ist die Geometrie
+   * bitgenau die von vorher.
+   */
+  claim?: boolean;
   /** Wrappt in einen Link. null rendert inline ohne Anker. */
   href?: string | null;
   className?: string;
@@ -160,11 +219,12 @@ export function LogoMark({ tone, className }: { tone?: LogoTone; className?: str
   return <Logo lockup="symbol" tone={tone} href={null} className={className} />;
 }
 
-export function Logo({ lockup = 'horizontal', tone, href = '/', className }: LogoProps) {
+export function Logo({ lockup = 'horizontal', tone, claim = false, href = '/', className }: LogoProps) {
   const { isDark } = useTheme();
   const resolved: LogoTone = tone ?? (isDark ? 'on-petrol' : 'on-light');
   const gradId = `ch-swoosh-${++seq}`;
-  const box = BOX[lockup];
+  const box = boxFor(lockup, claim);
+  const word = wordBox(claim);
   const needsGradient = TONE[resolved].swoosh === null && lockup !== 'wortmarke';
 
   const svg = (
@@ -187,25 +247,29 @@ export function Logo({ lockup = 'horizontal', tone, href = '/', className }: Log
       {lockup === 'horizontal' && (
         <>
           <Bildmarke tone={resolved} gradId={gradId} />
-          <g transform={`translate(${MARK_W + GAP_H} ${(MARK_H - WORD_H) / 2})`}>
-            <Wortmarke tone={resolved} />
+          <g transform={`translate(${MARK_W + GAP_H} ${(MARK_H - word.h) / 2}) scale(${word.scale})`}>
+            <Wortmarke tone={resolved} claim={claim} />
           </g>
         </>
       )}
 
       {lockup === 'stacked' && (
         <>
-          <g transform={`translate(${(WORD_W - MARK_W) / 2} 0)`}>
+          <g transform={`translate(${(box.w - MARK_W) / 2} 0)`}>
             <Bildmarke tone={resolved} gradId={gradId} />
           </g>
-          <g transform={`translate(0 ${MARK_H + GAP_V})`}>
-            <Wortmarke tone={resolved} />
+          <g transform={`translate(${(box.w - word.w) / 2} ${MARK_H + GAP_V}) scale(${word.scale})`}>
+            <Wortmarke tone={resolved} claim={claim} />
           </g>
         </>
       )}
 
       {lockup === 'symbol' && <Bildmarke tone={resolved} gradId={gradId} />}
-      {lockup === 'wortmarke' && <Wortmarke tone={resolved} />}
+      {lockup === 'wortmarke' && (
+        <g transform={`scale(${word.scale})`}>
+          <Wortmarke tone={resolved} claim={claim} />
+        </g>
+      )}
     </svg>
   );
 
