@@ -115,7 +115,13 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
       <Sidebar
         logo={
           <NavLink to={base} className="flex items-center gap-2">
-            <Logo lockup="horizontal" href={null} className="h-[47px] w-auto" />
+            {/* 40 statt 47 px: die Sidebar ist w-60 (240 px), mit px-4 bleiben 208 px
+                Spur. Das Lockup ohne Claim ist bei 47 px 230 px breit und liefe
+                22 px ueber. Bei 40 px sind es 196 px — 12 px Reserve.
+                Die Bildmarke wird dadurch kleiner, das WORTZEICHEN aber groesser
+                als vorher: 20,7 px statt 16,1 px bei 47 px mit Claim. Genau das
+                war am Dashboard-Logo die Beschwerde. */}
+            <Logo lockup="horizontal" href={null} className="h-[40px] w-auto" />
             {/* accent-STRONG: at 9px this needs 4.5:1, and gold-500 measures 2.10 on the
                 light sidebar. See --color-text-accent-strong in index.css. */}
             <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-fg-accent-strong">{t('shell.partnerBadge')}</span>

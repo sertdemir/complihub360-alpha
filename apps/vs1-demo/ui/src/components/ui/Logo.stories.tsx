@@ -13,12 +13,12 @@ Das CompliHub360-Logo, 1:1 aus Compass (Figma-Node \`2101:1151\`).
 
 Das Component-Set führt zwei Properties — diese API bildet sie ab:
 
-| \`lockup\` | Aufbau | Maße |
-| --- | --- | --- |
-| \`horizontal\` | Bildmarke + Wortmarke nebeneinander | 144.594 × 40.018 |
-| \`stacked\` | Bildmarke über Wortmarke | 101 × 68.719 |
-| \`symbol\` | nur die Bildmarke | 40.594 × 40.018 |
-| \`wortmarke\` | nur der Schriftzug | 101 × 20.701 |
+| \`lockup\` | Aufbau | ohne Claim | mit Claim |
+| --- | --- | --- | --- |
+| \`horizontal\` | Bildmarke + Wortmarke nebeneinander | 184.994 × 40.018 | 144.594 × 40.018 |
+| \`stacked\` | Bildmarke über Wortmarke | 141.4 × 67.198 | 101 × 68.719 |
+| \`symbol\` | nur die Bildmarke | 40.594 × 40.018 | — |
+| \`wortmarke\` | nur der Schriftzug | 141.4 × 19.18 | 101 × 20.701 |
 
 | \`tone\` | Wofür |
 | --- | --- |
@@ -31,6 +31,24 @@ Der Prop heißt \`tone\` statt \`color\`, weil das die Hauskonvention des
 Code-Design-Systems ist (Badge, Alert und Stat verwenden sie ebenso). Die
 **Werte** sind die aus Figma, damit Design und Code dieselbe Sprache sprechen.
 
+### \`claim\` — und warum der Default \`false\` ist
+
+Der Claim "Always on your side" ist 17 % der Logo-Höhe, also **8 px** bei den
+47 px, die jede echte Platzierung fährt — Header, Footer, Auth-Seiten, Shells.
+Bei 8 px ist er nicht lesbar, in keiner Farbe; die Kontrastkorrektur auf
+\`accent/800\` hat das gemildert, nicht gelöst. Statt einer unlesbaren Zeile
+bekommt das Wortzeichen ihren Platz: es wächst um **40 %**, von 16,1 auf
+22,5 px bei 47 px Logo-Höhe.
+
+\`claim\` setzt man dort, wo das Logo groß genug dafür ist — Print, Keynote,
+eine Markenseite, ein Export ab etwa 90 px. Dort ist die Geometrie bitgenau
+die von vorher.
+
+Warum 1,40 und nicht die vollen 1,51: das Wortzeichen skaliert proportional in
+der Breite mit. Bei 1,51 wäre das Lockup 230 px breit, die Navigationsleiste
+hat bei 1440 aber nur 51 px Reserve — 9 px zu wenig, und die Nav trägt
+\`overflow:hidden\`. 1,40 landet bei 209 px und lässt 12 px Luft.
+
 Die Höhe steuert \`className\` (\`h-7\`, \`h-9\`, …), die Breite folgt über \`w-auto\`.
 Der Claim ist bewusst untranslatiert — er liest sich in jeder Locale gleich.
         `,
@@ -40,6 +58,7 @@ Der Claim ist bewusst untranslatiert — er liest sich in jeder Locale gleich.
   argTypes: {
     lockup: { control: 'select', options: ['horizontal', 'stacked', 'symbol', 'wortmarke'] },
     tone: { control: 'select', options: ['on-light', 'on-petrol', 'mono-white', 'mono-black'] },
+    claim: { control: 'boolean' },
     href: { control: 'text' },
   },
 } satisfies Meta<typeof Logo>;
@@ -134,6 +153,49 @@ export const AufEchtenGruenden: Story = {
           <span className={`text-xs ${s.tone === 'on-light' ? 'text-neutral-500' : 'text-white/60'}`}>
             {s.label}
           </span>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+export const MitUndOhneClaim: Story = {
+  args: { href: null },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Links der Stand ohne Claim (Default), rechts mit. Die Zeile unter jedem Paar ' +
+          'nennt die Höhe des Wortzeichens in px — bei 47 px, der Höhe jeder echten ' +
+          'Platzierung, steht der Claim bei 8 px.',
+      },
+    },
+  },
+  render: () => (
+    <div className="flex flex-col gap-10">
+      {([
+        [29, 'h-[29px]'],
+        [47, 'h-[47px]'],
+        [96, 'h-[96px]'],
+      ] as const).map(([px, h]) => (
+        <div key={px} className="flex flex-col gap-3">
+          <div className="text-body-4xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary">
+            {px} px
+          </div>
+          <div className="flex flex-wrap items-end gap-10">
+            <div className="flex flex-col gap-2">
+              <Logo lockup="horizontal" tone="on-light" href={null} className={h} />
+              <span className="text-body-4xs text-fg-tertiary">
+                ohne Claim · Wortzeichen {(13.7 * 1.4 * (px / 40.018)).toFixed(1)} px
+              </span>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Logo lockup="horizontal" tone="on-light" claim href={null} className={h} />
+              <span className="text-body-4xs text-fg-tertiary">
+                mit Claim · Claim {(7 * (px / 40.018)).toFixed(1)} px
+              </span>
+            </div>
+          </div>
         </div>
       ))}
     </div>

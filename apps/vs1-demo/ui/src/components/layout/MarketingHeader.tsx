@@ -99,17 +99,32 @@ export function MarketingHeader({
           xl is 1440 in this Tailwind scale, so the cut is desktop-m (1280). ── */}
       <div className="mx-auto hidden h-20 max-w-container-3xl items-center gap-4 px-4 desktop-m:flex">
         <div className="flex flex-1 basis-0 items-center gap-5">
-          {/* Zwischen 1280 und 1440 nur die Bildmarke — dasselbe Muster, das
-              GlobalNav fuer dasselbe Problem schon faehrt. Gemessen am
-              gebauten Stand brauchte die Leiste bei 1280 mit vollem Lockup
-              1339 px bei 1280 verfuegbaren; der Registrieren-Knopf wurde
-              abgeschnitten. Das galt schon vor der Logo-Vergroesserung
-              (1299 px), nur weniger deutlich. Die Wortmarke belegt 123 px —
-              genau die Reserve, die hier fehlt. Ab 1440 passt beides. */}
-          <span className="desktop-l:hidden">
+          {/* Unter 1520 nur die Bildmarke — dasselbe Muster, das GlobalNav
+              fuer dasselbe Problem faehrt. Diese Leiste ist der ENGSTE Fall
+              der ganzen Site, enger als die Navigation:
+
+                Breite   rechte Kante endet bei   Logo
+                1280     1280                      48 px (Bildmarke)
+                1440     1432                     170 px (Lockup mit Claim)
+                1440     1471  ueberlaeuft        230 px (Lockup ohne Claim)
+                1520     1492                     230 px
+
+              Mit Claim blieben bei 1440 genau 8 px Luft. Das war schon vor
+              dem groesseren Wortzeichen zu wenig: ein laengeres Label oder
+              eine andere Locale haette denselben Ueberlauf erzeugt. Der
+              Registrieren-Knopf wird dabei still abgeschnitten, ohne
+              Scrollbalken — das Element ist fixed, sein Ueberlauf taucht in
+              document.scrollWidth nicht auf.
+
+              1520 ist deshalb keine Breakpoint-Stufe aus dem Compass-Grid,
+              sondern eine gemessene Inhaltsschwelle: ab hier passt das
+              Lockup in BEIDE Kopfzeilen. Es steht als min-[1520px] da und
+              nicht als Token, weil es eine Eigenschaft dieser Leiste ist,
+              nicht des Rasters. */}
+          <span className="min-[1520px]:hidden">
             <Logo lockup="symbol" tone={inverse ? 'on-petrol' : undefined} href={userHref} className="h-[47px]" />
           </span>
-          <span className="hidden desktop-l:block">
+          <span className="hidden min-[1520px]:block">
             <Logo tone={inverse ? 'on-petrol' : undefined} href={userHref} />
           </span>
         </div>

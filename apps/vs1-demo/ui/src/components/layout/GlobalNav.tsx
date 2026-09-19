@@ -100,12 +100,18 @@ export function GlobalNav() {
           className="flex shrink-0 items-center px-2"
           aria-label="CompliHub360 Home"
         >
-          {/* Mark only between desktop-m and desktop-l: the full lockup plus
-              six German entries need the last ~130px the wordmark occupies. */}
-          <span className="desktop-l:hidden">
+          {/* Unter 1520 nur die Bildmarke: das volle Lockup und die sechs
+              deutschen Eintraege brauchen dieselben Pixel. Diese Leiste
+              allein kaeme ab ~1451 aus (Nav-Inhalt 806 px, Platz 857 bei
+              1440), der MarketingHeader erst ab ~1492 — und zwei
+              verschiedene Schwellen haetten das Wortzeichen beim Wechsel
+              von der Startseite auf eine Unterseite erscheinen und wieder
+              verschwinden lassen. Eine Schwelle fuer beide. Begruendung
+              ausfuehrlich in MarketingHeader. */}
+          <span className="min-[1520px]:hidden">
             <Logo lockup="symbol" href={null} className="h-[47px]" />
           </span>
-          <span className="hidden desktop-l:block">
+          <span className="hidden min-[1520px]:block">
             <Logo lockup="horizontal" href={null} />
           </span>
         </button>
