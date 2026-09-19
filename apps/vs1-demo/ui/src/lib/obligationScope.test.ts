@@ -470,9 +470,8 @@ describe('Belegte Obergrenze', () => {
   // sie darf nur schrumpfen, und wenn ein Portal zugaenglich wird, faellt es
   // im Review auf, weil eine Zeile verschwindet — nicht nur eine Ziffer.
   const STAATEN_OHNE_ZUGANG: Record<string, string> = {
-    TX: 'statutes.capitol.texas.gov liefert jede URL als dieselbe Geruestseite; '
-      + 'der Gesetzestext wird per JavaScript nachgeladen und kommt nicht an. '
-      + 'capitol.texas.gov und lrl.texas.gov stehen nicht auf der Allowlist.',
+    // TX ist am 19.09. weggefallen: die Gerueststeite laedt ihren Text von
+    // tcss.legis.texas.gov nach, und ueber diesen Host kommt er auch per curl.
     NY: 'www.nysenate.gov steht hinter einer Cloudflare-Bot-Schranke (403). '
       + 'Das ist eine Entscheidung des Betreibers, keine Zugangsluecke.',
   };
@@ -504,9 +503,14 @@ describe('Belegte Obergrenze', () => {
   });
 
   it('laesst die Liste der unerreichbaren Staaten nur schrumpfen', () => {
-    // Zwei von vier. Wird einer zugaenglich, faellt hier eine Zeile weg — und
-    // der Test verlangt dann, dass die Zahlen auch wirklich nachgetragen sind.
-    expect(Object.keys(STAATEN_OHNE_ZUGANG).sort()).toEqual(['NY', 'TX']);
+    // Einer von vier. Texas ist am 19.09. weggefallen, und der Wegfall lief
+    // genau so, wie diese Liste es vorsieht: erst verschwand die Zeile, dann
+    // verlangte der Beweispflicht-Test die Zahlen — nicht umgekehrt.
+    //
+    // Bleibt New York. Das ist die andere Art von Hindernis: bei Texas fehlte
+    // uns ein Weg, bei New York sagt der Betreiber Nein. Nur das erste liess
+    // sich beheben.
+    expect(Object.keys(STAATEN_OHNE_ZUGANG).sort()).toEqual(['NY']);
     for (const [staat, grund] of Object.entries(STAATEN_OHNE_ZUGANG)) {
       expect(grund.length, `${staat}: Grund zu duenn`).toBeGreaterThan(60);
     }
