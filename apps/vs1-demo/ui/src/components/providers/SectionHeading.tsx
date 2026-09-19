@@ -110,14 +110,18 @@ export function SectionEyebrow({
  * Highlights exactly one word in a serif headline with the Accent-Gold treatment,
  * per the C360 "gold word-highlight" pattern.
  *
- * The tone is a semantic token, not a palette class: the pattern was designed on
- * the dark App-Workspace surfaces, where full gold-500 is 6.98:1, but the same
- * gold on the light marketing surfaces is 2.10:1 — a WCAG failure even at
- * display size. fg-accent-emphasis carries the step-down (gold-700 on light,
- * gold-500 on dark) so one class stays correct in both themes.
+ * Der Ton ist ein semantisches Token, keine Palettenklasse: fg-accent-emphasis
+ * traegt seit der Nutzer-Festlegung vom 2026-09-19 exakt das Logo-Gold der
+ * Wortmarken-"360" (#C5913B) — in beiden Themes derselbe Wert, damit das
+ * hervorgehobene Wort und das Logo im selben Messing stehen. Vorher lief hier
+ * die Oliv-Stufe gold-700 (#96802a), rechnerisch kontrastreicher, im Blattbild
+ * aber stumpf neben der Marke.
  *
- * Headline-only by contract: at 3.88:1 on white this clears AA-large (3:1) but
- * not AA body (4.5:1). For gold-toned body copy use text-fg-brand.
+ * DISPLAY-ONLY per Vertrag, und schaerfer als vorher: 2,80:1 auf Weiss liegt
+ * unter der AA-large-Schwelle (3:1) — bewusst getragen, weil die Marke hier
+ * vorgeht. Deshalb nur an Woertern ab ~24 px (bzw. 19 px bold) einsetzen, nie
+ * an Fliesstext (dort text-fg-brand) und nie an Kleintext oder Eyebrows (dort
+ * text-fg-accent-strong, #8C672A / 5,14:1).
  */
 export function GoldWord({ children }: { children: React.ReactNode }) {
   return <span className="whitespace-nowrap text-fg-accent-emphasis">{children}</span>;

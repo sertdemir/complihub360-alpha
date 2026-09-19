@@ -198,7 +198,11 @@ export function ComplianceAreasPage() {
                 'Each opens a page with the duties it carries, the statute behind each one, and what it costs to get wrong.',
             })}
           </p>
-          <div className="mt-9 grid gap-4 tablet:grid-cols-2">
+          {/* minmax(0,1fr): ohne das erbt die Spalte min-width:auto und waechst
+              auf die Mindestbreite der Bereichskarte — 427 px bei 342 px Platz,
+              also 61 px waagerechtes Scrollen bei 390. Die Karte selbst traegt
+              innen bereits min-w-0; die Untergrenze sass in der Spalte. */}
+          <div className="mt-9 grid grid-cols-[minmax(0,1fr)] gap-4 tablet:grid-cols-[repeat(2,minmax(0,1fr))]">
             {AREAS.map((area, i) => (
               <AreaCard key={area.slug} area={area} index={i} selectedCountry={selectedCountry} />
             ))}

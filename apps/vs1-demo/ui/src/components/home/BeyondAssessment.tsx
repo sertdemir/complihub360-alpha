@@ -235,7 +235,13 @@ export function BeyondAssessment() {
           <p className="mt-5 text-body leading-relaxed text-fg-secondary">{t('beyond.subtitle')}</p>
         </Reveal>
 
-        <Stagger stagger={0.14} className="mt-14 grid gap-5 lg:grid-cols-[7fr_5fr]">
+        {/* minmax(0,1fr) statt 1fr: Grid-Items haben min-width:auto, die Spalte
+            waechst also auf die MINDESTBREITE ihres breitesten Kindes. Hier ist
+            das die 391 px breite Werkzeugleiste im Mock-Fenster — bei 390 px
+            Fensterbreite zwang sie die Spalte auf 479 px und die Startseite um
+            105 px ins waagerechte Scrollen. Gemessen per Sektions-Ausblenden,
+            nicht geraten. minmax(0,…) setzt die Untergrenze auf 0 zurueck. */}
+        <Stagger stagger={0.14} className="mt-14 grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
           <Tile
             big
             title={t('beyond.workspace.title')}
@@ -243,7 +249,7 @@ export function BeyondAssessment() {
             window={<DashboardWindow />}
             desc={t('beyond.workspace.desc')}
           />
-          <div className="grid gap-5">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-5">
             <Tile
               title={t('beyond.newsCard.title')}
               pill={<Pill tone="beta">{t('beyond.pills.beta')}</Pill>}

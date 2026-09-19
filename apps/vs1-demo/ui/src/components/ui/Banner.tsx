@@ -121,18 +121,23 @@ const SURFACES: Record<BannerStatus, Record<BannerSurface, SurfaceStyle>> = {
   },
   // Gold — upsell/expansion banners ("Explore expansion"). Matches the Compass
   // tokens bg/accent-translucent + border/accent-soft (screen specs 2694:81).
+  // Der accent-Slot (Icon + Titel) laeuft seit 2026-09-19 auf der Messing-Linie
+  // der Wortmarke (Farbton 37 Grad, wie #C5913B) statt auf den Oliv-Stufen der
+  // Skala: #8c672a misst 4.80:1 auf gold/10 und 4.46:1 auf gold/20, #6b4e1f
+  // 6.3:1 auf gold/35 — durchweg mehr Kontrast als die abgeloesten #96802a
+  // (3.62 / 3.37) und derselbe Ton wie das Gold im Logo.
   accent: {
     light: {
       surface: 'bg-[#d4af37]/10 border-[#d4af37]/35 text-[#6a5b1e] dark:bg-[#d4af37]/[0.12] dark:border-[#d4af37]/35 dark:text-white',
-      accent: 'text-[#96802a] dark:text-[#d4af37]',
+      accent: 'text-[#8c672a] dark:text-[#d4af37]',
     },
     medium: {
       surface: 'bg-[#d4af37]/20 border-[#d4af37]/55 text-[#6a5b1e] dark:bg-[#d4af37]/25 dark:border-[#d4af37]/55 dark:text-white',
-      accent: 'text-[#96802a] dark:text-[#e6c964]',
+      accent: 'text-[#8c672a] dark:text-[#e6c964]',
     },
     strong: {
       surface: 'bg-[#d4af37]/35 border-[#d4af37] text-[#3d3411] dark:bg-[#d4af37]/40 dark:border-[#d4af37] dark:text-white',
-      accent: 'text-[#6a5b1e] dark:text-[#f0d67d]',
+      accent: 'text-[#6b4e1f] dark:text-[#f0d67d]',
     },
     solid: {
       surface: 'bg-[#d4af37] border-[#d4af37] text-[#101411] dark:bg-[#d4af37] dark:border-[#d4af37] dark:text-[#101411]',

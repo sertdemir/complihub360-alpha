@@ -185,7 +185,7 @@ export function AreaEnforcement({ slug, selectedCountry }: Props) {
               the pill stacks grow into. */}
           <div className="mt-28 flex items-center gap-6">
             <div className="w-[7.5rem] shrink-0">
-              <p className="font-serif text-[1.75rem] font-bold leading-none tabular-nums text-accent-700 dark:text-fg-accent-strong">
+              <p className="font-serif text-[1.75rem] font-bold leading-none tabular-nums text-fg-accent-strong">
                 {oneDecimal.format(countedIntensity)}
                 <span className="text-body-sm font-semibold text-fg-tertiary"> / 10</span>
               </p>
@@ -245,7 +245,7 @@ export function AreaEnforcement({ slug, selectedCountry }: Props) {
                             transition={{ duration: 0.35, ease: 'easeOut', delay: 0.35 + gi * 0.12 + si * 0.07 }}
                             className={`w-[1.75rem] rounded-full border py-0.5 text-center text-body-4xs font-bold ${
                               own
-                                ? 'border-accent-500 bg-accent-500/15 text-accent-700 dark:text-fg-accent-strong'
+                                ? 'border-accent-500 bg-accent-500/15 text-fg-accent-strong'
                                 : 'border-brand/40 bg-brand/10 text-fg-brand'
                             }`}
                           >

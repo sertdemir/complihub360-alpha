@@ -115,7 +115,7 @@ export function MarketCalendar({ profile }: Props) {
                   count: group.items.length,
                 })}
                 {i === 0 && profile.byCadence.length > 1 && (
-                  <span className="ml-2 normal-case tracking-[0.08em] text-accent-700 dark:text-fg-accent-strong">
+                  <span className="ml-2 normal-case tracking-[0.08em] text-fg-accent-strong">
                     {t('markets.country.cadenceHot', 'Highest cadence load')}
                   </span>
                 )}
@@ -124,11 +124,22 @@ export function MarketCalendar({ profile }: Props) {
                 {group.items.map((o, j) => (
                   <div
                     key={o.subdomainId}
-                    className={`flex flex-col gap-0.5 py-1.5 tablet:flex-row tablet:items-baseline tablet:gap-3 ${
+                    className={`flex flex-col gap-0.5 py-1.5 tablet:flex-row tablet:items-baseline tablet:gap-3 desktop-s:flex-col desktop-s:gap-0.5 desktop-m:flex-row desktop-m:items-baseline desktop-m:gap-3 ${
                       j > 0 ? 'border-t border-stroke-subtle/60' : ''
                     }`}
                   >
-                    <span className="whitespace-nowrap text-body-sm font-bold leading-snug text-fg">
+                    {/* Label und Quelle stehen nur nebeneinander, wo die Kalender-
+                        spalte breit genug ist — und die haengt nicht an der
+                        Fensterbreite, sondern daran, ob die 380-px-Seitenspalte
+                        schon danebensteht. Gemessen: 640 px bei tablet (Spalte
+                        noch gestapelt), 388 px bei desktop-s (Seitenspalte da,
+                        Seite aber erst 1024 breit), ab desktop-m wieder 564 px.
+                        Das laengste Pflicht-Label braucht 366 px. Also nebenein-
+                        ander bei tablet, im desktop-s-Band gestapelt, ab
+                        desktop-m wieder nebeneinander. Ohne den Ruecksetzer lief
+                        /de/markets/de bei 1024 um 14 px ins Scrollen, ohne das
+                        nowrap-Gate bei 390 um 26 px. */}
+                    <span className="text-body-sm font-bold leading-snug text-fg tablet:whitespace-nowrap desktop-s:whitespace-normal desktop-m:whitespace-nowrap">
                       {o.label}
                     </span>
                     <span className="min-w-0 flex-1 text-body-2xs leading-snug text-fg-tertiary">
