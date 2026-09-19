@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LayoutDashboard } from 'lucide-react';
+import { LayoutDashboard, LogIn } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 
 // ─── AccountActions ──────────────────────────────────────────────────────────
@@ -16,11 +16,19 @@ import { useAuthStore } from '../../store/useAuthStore';
 //                    visitor was offered "Anmelden" and "Kostenlos starten", and
 //                    the mobile menu carried no way into the dashboard at all.
 //
-// User, 2026-09-19: signed in it is the dashboard, signed out it is sign-in, and
-// the icon on the right can go. The sign-out button went with it — a nav panel
-// is for going somewhere, and signing out is neither a destination nor something
-// anyone wants one thumb-width from "Dashboard". It stays where it belongs, in
-// the account menu and in the workspace rail.
+// User, 2026-09-19: ONE button, in both states, and both times the filled
+// primary with its icon in front — signed in it goes to the dashboard, signed
+// out it goes to sign-in. Nothing beside it.
+//
+// What that costs, stated so nobody has to rediscover it: the signup CTA
+// ("Kostenlos starten") is no longer in the mobile menu. Registering runs over
+// the page CTAs — hero, pricing, the area pages — which is where it was always
+// the loudest anyway. The menu answers "where do I go", not "what should I buy".
+//
+// The sign-out button went in the same pass. A nav panel is for going somewhere,
+// and signing out is neither a destination nor something anyone wants one
+// thumb-width from "Dashboard". It stays in the account menu and in the
+// workspace rail.
 //
 // Reading the store here rather than in each header is what keeps the answer the
 // same on both surfaces.
@@ -32,36 +40,29 @@ export interface AccountActionsProps {
   onNavigate?: () => void;
 }
 
-const BASE =
-  'inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 text-body-sm font-semibold transition-colors';
-const OUTLINE = `${BASE} flex-1 border-thin border-stroke-brand text-fg-brand hover:bg-brand-light`;
-const PRIMARY = `${BASE} flex-1 bg-brand text-fg-on-brand hover:bg-brand/90`;
-
 export function AccountActions({ lang, onNavigate }: AccountActionsProps) {
   const { t } = useTranslation('common');
   const { isLoggedIn, role } = useAuthStore();
 
-  // Signed in: one destination, full width, filled — there is nothing to weigh
-  // it against, and a lone outline button reads like a secondary choice with no
-  // primary in sight.
-  if (isLoggedIn) {
-    const to = `/${lang}${role === 'partner' ? '/partner-dashboard' : '/dashboard'}`;
-    return (
-      <Link to={to} onClick={onNavigate} className={`${PRIMARY} w-full`}>
-        <LayoutDashboard size={17} aria-hidden />
-        {t('nav.dashboard', 'My dashboard')}
-      </Link>
-    );
-  }
+  // One shape, two fillings. Everything that differs sits in these three lines,
+  // so the two states cannot drift apart in height, weight or position.
+  const to = isLoggedIn
+    ? `/${lang}${role === 'partner' ? '/partner-dashboard' : '/dashboard'}`
+    : `/${lang}/login`;
+  const Icon = isLoggedIn ? LayoutDashboard : LogIn;
+  const label = isLoggedIn ? t('nav.dashboard', 'My dashboard') : t('header.login', 'Log in');
 
+  // h-[48px] als Pixelwert, NICHT h-12: die spacing-Skala dieses Projekts ist
+  // ueberschrieben, 12 steht dort auf 96 px (siehe Button.tsx, das aus demselben
+  // Grund ueberall Pixel setzt). Mit h-12 war der Knopf doppelt so hoch.
   return (
-    <div className="flex items-center gap-3">
-      <Link to={`/${lang}/login`} onClick={onNavigate} className={OUTLINE}>
-        {t('header.login', 'Log in')}
-      </Link>
-      <Link to={`/${lang}/register`} onClick={onNavigate} className={PRIMARY}>
-        {t('nav.signup', 'Sign up for free')}
-      </Link>
-    </div>
+    <Link
+      to={to}
+      onClick={onNavigate}
+      className="inline-flex h-[48px] w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-brand px-4 text-body-sm font-semibold text-fg-on-brand transition-colors hover:bg-brand/90"
+    >
+      <Icon size={17} aria-hidden />
+      {label}
+    </Link>
   );
 }
