@@ -34,11 +34,16 @@ const LANGUAGES = [
 ] as const;
 
 export interface LanguageMenuProps {
-  /** Styling for the trigger — the two headers size and tint it differently. */
+  /** Styling for the trigger — the two headers size and tint it differently.
+   *  Beware `h-10 w-10`: the project's spacing scale maps 10 → 64px, so that
+   *  reads as 40 and renders 64. Use h-11 w-11 (44, not remapped) or px values. */
   triggerClassName?: string;
+  /** Globe size in px. The optical gap in a bar is glyph-to-glyph, so a bar
+   *  that tightens its spacing raises this to match its neighbours. */
+  iconSize?: number;
 }
 
-export function LanguageMenu({ triggerClassName }: LanguageMenuProps) {
+export function LanguageMenu({ triggerClassName, iconSize = 18 }: LanguageMenuProps) {
   const { t } = useTranslation('common');
   const { pathname, search, hash } = useLocation();
 
@@ -59,7 +64,7 @@ export function LanguageMenu({ triggerClassName }: LanguageMenuProps) {
       <NavMenu.Trigger
         label={t('header.language', 'Language')}
         iconOnly
-        icon={<Globe size={18} />}
+        icon={<Globe size={iconSize} />}
         className={triggerClassName}
       />
       <NavMenu.Panel className="min-w-[180px]">

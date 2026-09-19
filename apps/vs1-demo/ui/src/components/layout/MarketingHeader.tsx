@@ -205,9 +205,19 @@ export function MarketingHeader({
         <div className="flex h-16 items-center justify-between px-5">
           {/* Mobile: mark only — wordmark + claim dropped to save width. */}
           <Logo lockup="symbol" tone={inverse ? 'on-petrol' : undefined} />
-          <div className="flex items-center gap-2">
-            <ThemeToggle inverse={inverse} size={40} />
-            <LanguageMenu triggerClassName={`h-10 w-10 ${inverse ? 'text-fg-inverse hover:text-fg-inverse' : ''}`} />
+            {/* Drei gleiche Boxen (44 px) mit drei gleichen Glyphen (22 px) und
+                2 px dazwischen — macht 24 px von Glyph zu Glyph, so wie der
+                Nutzer es sieht (Festlegung 2026-09-19). Vorher waren es 41 px:
+                nicht wegen des gap, sondern weil `h-10 w-10` am Sprachknopf in
+                DIESEM Projekt 64 px ergibt — spacing['10'] ist auf 64 gemappt,
+                nicht auf 40 (siehe Button.tsx). 11 ist nicht umgemappt und
+                bleibt 44, also die Groesse, die auch das Tippziel verlangt. */}
+          <div className="flex items-center gap-[2px]">
+            <ThemeToggle inverse={inverse} size={44} iconSize={22} />
+            <LanguageMenu
+              iconSize={22}
+              triggerClassName={`h-11 w-11 ${inverse ? 'text-fg-inverse hover:text-fg-inverse' : ''}`}
+            />
             <button
               aria-label={t('header.nav.openMenu', 'Open menu')}
               aria-expanded={open}
@@ -230,12 +240,6 @@ export function MarketingHeader({
         onClose={() => setOpen(false)}
         lang={lang}
         logo={<Logo lockup="symbol" href={null} />}
-        utilities={
-          <>
-            <ThemeToggle size={40} />
-            <LanguageMenu triggerClassName="h-10 w-10" />
-          </>
-        }
         actions={
           <div className="flex items-center gap-3">
             <a
