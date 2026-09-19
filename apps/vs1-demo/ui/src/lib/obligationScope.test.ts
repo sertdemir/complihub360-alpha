@@ -239,8 +239,9 @@ describe('Belegte Obergrenze', () => {
   // federalregister.gov) — alle am Primaertext gelesen. Von den acht
   // amerikanischen sind drei `subnational`: dort setzt der Bund nichts.
   // Dazu `US/data-hosting`: der EU-US-Datenschutzrahmen kennt keine eigene Busse.
-  // Seit 19.09. ausserdem 7 italienische (normattiva.it, ueber den Browser).
-  const OHNE_OBERGRENZE_STAND = 22;
+  // Seit 19.09. ausserdem 7 italienische (normattiva.it, ueber den Browser)
+  // und 6 franzoesische (legifrance.gouv.fr ueber die PISTE-API).
+  const OHNE_OBERGRENZE_STAND = 16;
   // Eintraege, deren Obergrenze GAR KEINEN absoluten Betrag nennt — delegiert,
   // "es gibt keine Geldbusse", rein umsatz- oder steueranteilig — und die
   // trotzdem eine Eurozahl fuehren. Das ist der Widerspruch in Reinform: das
@@ -256,6 +257,9 @@ describe('Belegte Obergrenze', () => {
     'DE/legal-commercial-contracts', // keine Geldbusse, nur zivilrechtliche Folge
     'DE/legal-consumer-terms', // 4 % Jahresumsatz, UWG § 19
     'ES/tax-corporate', // 150 % der Steuerschuld, LGT Art. 191
+    'FR/prod-epr', // 7.500 EUR JE Einheit/Tonne, Code env. Art. L541-9-5 — kein Deckel
+    'FR/tax-corporate', // 80 % der Steuer, CGI Art. 1728/1729
+    'FR/tax-vat-registration', // 80 % der Steuer, CGI Art. 1728
     'IT/tax-corporate', // 120 % der Steuer, TU 173/2024 Art. 27
     'IT/tax-vat-registration', // 120 % der Steuer, TU 173/2024 Art. 30
     'ES/tax-vat-registration', // 150 % der Steuerschuld, LGT Art. 191
@@ -287,7 +291,7 @@ describe('Belegte Obergrenze', () => {
     'prod-packaging-reuse-targets', 'prod-safety', 'tax-corporate', 'tax-vat-registration',
   ]);
 
-  type Obergrenze = { kind: string; basis?: string; asOf?: string; note?: string; value?: number; currency?: string; of?: string; level?: string; orAmount?: { value: number; currency?: string } };
+  type Obergrenze = { kind: string; basis?: string; asOf?: string; note?: string; value?: number; currency?: string; of?: string; per?: string; level?: string; orAmount?: { value: number; currency?: string } };
   type Eintrag = {
     penaltyMaxEur?: number;
     penaltyCeiling?: Obergrenze;
@@ -539,7 +543,42 @@ describe('Belegte Obergrenze', () => {
         if (c.kind === 'proportional') {
           expect(c.of?.trim().length ?? 0, `${k}: Prozentsatz ohne Bezugsgroesse`).toBeGreaterThan(5);
         }
+        // Dasselbe fuer den Betrag je Einheit: "7.500 EUR" ohne die Einheit
+        // liest sich wie eine Obergrenze und ist das genaue Gegenteil.
+        if (c.kind === 'perUnit') {
+          expect(c.per?.trim().length ?? 0, `${k}: Betrag je Einheit ohne Bezugseinheit`).toBeGreaterThan(5);
+        }
       }
     }
+  });
+
+  // Frankreich rechnet Geldstrafen fuer Unternehmen nicht im Sanktionsartikel
+  // aus: Code penal Art. 131-38 setzt sie pauschal auf "le quintuple" des
+  // Satzes fuer natuerliche Personen. Der Satz im Artikel ist also NICHT die
+  // Zahl, die ein Unternehmen trifft — L574-5 nennt 200.000 EUR und meint
+  // fuer eine GmbH eine Million.
+  //
+  // Das ist dieselbe Fehlerklasse, die bei Italien zweimal zugeschlagen hat
+  // und bei FR/legal-consumer-terms ein drittes Mal: der belegte Text stimmt,
+  // nur die Ebene nicht. Wo der basis-String den Verweis nennt, rechnet der
+  // Test die Multiplikation nach, statt sie zu glauben.
+  it('rechnet den Fuenffach-Verweis auf Code penal Art. 131-38 nach', () => {
+    let geprueft = 0;
+    for (const [k, e] of alle()) {
+      const c = e.penaltyCeiling;
+      if (!c?.basis || !/131-38/.test(c.basis)) continue;
+      const m = c.basis.match(/([\d.]+)\s*EUR/);
+      expect(m, `${k}: Verweis auf 131-38, aber kein Ausgangsbetrag im basis-String`).toBeTruthy();
+      const sockel = Number(String(m?.[1]).replace(/\./g, ''));
+      expect(
+        c.value,
+        `${k}: ${sockel} EUR verfuenffacht sind ${sockel * 5}, gefuehrt wird ${c.value}. `
+          + 'Der Sanktionsartikel nennt den Satz fuer natuerliche Personen.',
+      ).toBe(sockel * 5);
+      geprueft += 1;
+    }
+    // Faellt der Verweis aus allen Eintraegen, ist der Test still gruen
+    // geworden, ohne je etwas geprueft zu haben.
+    expect(geprueft, 'Kein Eintrag verweist mehr auf 131-38 — Test ohne Gegenstand').toBeGreaterThan(0);
   });
 });
