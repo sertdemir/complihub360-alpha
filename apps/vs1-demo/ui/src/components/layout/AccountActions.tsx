@@ -65,13 +65,36 @@ export function AccountActions({ lang, onNavigate }: AccountActionsProps) {
     );
   }
 
+  // Nebeneinander, solange beide passen; sonst untereinander, mit Anmelden
+  // UNTEN (Nutzer 2026-09-19). Beides ohne Breakpoint:
+  //
+  //   flex-wrap-reverse  kehrt die Querachse um. Die erste Zeile liegt damit
+  //                      unten — Anmelden steht im Markup zuerst und landet
+  //                      beim Umbruch also UNTER "Kostenlos starten", waehrend
+  //                      es nebeneinander LINKS steht. Eine Klasse, beide
+  //                      Anordnungen, eine Reihenfolge im DOM.
+  //   basis-[160px]      ist der Boden. Mit flex-1 (basis 0) wuerde nie
+  //                      umgebrochen, sondern nur geschrumpft, bis der Text
+  //                      bricht.
+  //
+  // Der Umbruchpunkt ist dadurch SPRACHABHAENGIG, und das ist gewollt: wo die
+  // Beschriftung laenger ist als der Boden, hebt min-width:auto die Basis auf
+  // die Inhaltsbreite an, und die Zeile bricht frueher. Im Browser gemessen,
+  // Geraetebreite gegen Anordnung:
+  //
+  //             430   390   375   360   320   280
+  //     DE/ES   neben neben STAPEL …
+  //     EN/TR   neben neben neben STAPEL …
+  //
+  // Bis hinunter zu 280 px wird kein Text geschnitten (scrollWidth gegen
+  // clientWidth geprueft, nicht nach Augenmass).
   return (
-    <div className="flex items-center gap-3">
-      <Link to={`/${lang}/login`} onClick={onNavigate} className={`${PRIMARY} flex-1`}>
+    <div className="flex flex-wrap-reverse items-center gap-3">
+      <Link to={`/${lang}/login`} onClick={onNavigate} className={`${PRIMARY} grow basis-[160px]`}>
         <LogIn size={17} aria-hidden />
         {t('header.login', 'Log in')}
       </Link>
-      <Link to={`/${lang}/register`} onClick={onNavigate} className={`${SECONDARY} flex-1`}>
+      <Link to={`/${lang}/register`} onClick={onNavigate} className={`${SECONDARY} grow basis-[160px]`}>
         {t('nav.signup', 'Sign up for free')}
       </Link>
     </div>
