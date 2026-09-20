@@ -282,22 +282,7 @@
     "dayYesterday": "Ayer"
   },
   "library": {
-    "title": "Biblioteca de <accent>conocimiento</accent>.",
-    "sub": "212 elementos · 84 vídeos · 76 artículos · 18 webinarios · 26 guías · 8 herramientas",
-    "rowType": "Tipo",
-    "rowDomain": "Área",
-    "filterAll": "Todos · 212",
-    "filterVideos": "Vídeos · 84",
-    "filterArticles": "Artículos · 76",
-    "filterWebinars": "Webinarios · 18",
-    "filterGuides": "Guías · 26",
-    "filterTools": "Herramientas · 8",
-    "filterAllDomains": "Todas las áreas · 212",
-    "filterTaxVat": "Impuestos e IVA · 68",
-    "filterPrivacy": "Privacidad · 42",
-    "filterPackaging": "Embalaje · 31",
-    "filterMarketing": "Marketing · 28",
-    "filterCorporate": "Sociedades · 24"
+    "title": "Biblioteca de <accent>conocimiento</accent>."
   },
   "savedProviders": {
     "title": "<accent>Proveedores</accent> guardados",
@@ -348,6 +333,16 @@
       "feature2": "Vencimientos por área",
       "feature3": "Sincronización con Google / Outlook",
       "feature4": "Recordatorios antes de cada fecha"
+    },
+    "library": {
+      "title": "Biblioteca",
+      "sub": "Conocimiento, tutoriales y herramientas · próximamente — asegure su acceso anticipado",
+      "panelTitle": "Conocimiento, tutoriales y herramientas",
+      "panelSub": "Contenidos verificados de especialistas, ordenados por área y mercado — cada uno indica la norma que explica.",
+      "feature1": "Tutoriales por área",
+      "feature2": "Guías por país",
+      "feature3": "Seminarios web con especialistas",
+      "feature4": "Calculadoras y plantillas"
     }
   },
   "domainPage": {
