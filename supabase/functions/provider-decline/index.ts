@@ -21,12 +21,16 @@ function page(title: string, heading: string, body: string, color: string, form?
       <head>
         <title>${title}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- Gold ist hier ueberall #C5913B, der Ton der Wortmarken-"360"
+             (Nutzer-Festlegung 2026-09-20, wie in den Mail-Vorlagen, von denen
+             aus man hier landet). Auf der Karte #0f172a misst er 6,37:1, das
+             Knopflabel #101411 darauf 6,62:1. -->
         <style>
           body { font-family: system-ui, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; background: #1f2937; margin: 0; }
           .card { background: #0f172a; color: #e8eded; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.4); text-align: center; max-width: 420px; }
           h1 { color: ${color}; margin-top: 0; }
           p { color: #9cb8af; }
-          button { background: #d4af37; color: #101411; font-weight: 600; border: 0; border-radius: 8px; padding: 0.7rem 1.4rem; font-size: 1rem; cursor: pointer; }
+          button { background: #C5913B; color: #101411; font-weight: 600; border: 0; border-radius: 8px; padding: 0.7rem 1.4rem; font-size: 1rem; cursor: pointer; }
         </style>
       </head>
       <body><div class="card"><h1>${heading}</h1><p>${body}</p>${form ?? ''}</div></body>
@@ -45,7 +49,7 @@ Deno.serve(async (req: Request) => {
   // GET never mutates: show an interstitial that POSTs the same URL.
   if (req.method === 'GET') {
     const form = `<form method="POST"><button type="submit">Decline this request</button></form>`;
-    return new Response(page('Decline request', 'Decline this engagement request?', 'The client will be seamlessly redirected to the next best matched provider.', '#d4af37', form), {
+    return new Response(page('Decline request', 'Decline this engagement request?', 'The client will be seamlessly redirected to the next best matched provider.', '#C5913B', form), {
       headers: { 'Content-Type': 'text/html' },
       status: 200,
     });
