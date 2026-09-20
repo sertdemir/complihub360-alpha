@@ -253,7 +253,7 @@ function Detail({ p, ctx, areaLabel, reviews, slots, entered, locale, onBook, on
       <div className="flex items-start justify-between gap-6">
         <div className="flex min-w-0 items-start gap-3.5">
           {match !== null && (
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[10px] bg-accent text-body-xs font-extrabold text-primary-950">
+            <span className="grid h-[40px] w-[40px] shrink-0 place-items-center rounded-[10px] bg-accent text-body-xs font-extrabold text-primary-950">
               {match}
             </span>
           )}

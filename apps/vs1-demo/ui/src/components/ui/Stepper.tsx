@@ -28,10 +28,14 @@ export interface StepperProps {
   className?: string;
 }
 
+// Pixelwerte statt `h-10`: die spacing-Skala dieses Projekts ist ueberschrieben,
+// 10 steht dort auf 64 px. `lg` rendert dadurch einen 64er-Kasten mit 15px-Text
+// und sprengt die eigene Reihe (sm 24 → md 32 → lg 64). 40 setzt sie fort und
+// ist zugleich die `md`-Stufe der Compass-Avatar-Skala (24/32/40/48/64).
 const SIZE: Record<StepperSize, { box: string; text: string; icon: number; ring: string }> = {
   sm: { box: 'h-6 w-6 text-[11px]', text: 'text-[11px]', icon: 13, ring: 'ring-2' },
   md: { box: 'h-8 w-8 text-[13px]', text: 'text-[12px]', icon: 16, ring: 'ring-4' },
-  lg: { box: 'h-10 w-10 text-[15px]', text: 'text-[14px]', icon: 20, ring: 'ring-4' },
+  lg: { box: 'h-[40px] w-[40px] text-[15px]', text: 'text-[14px]', icon: 20, ring: 'ring-4' },
 };
 
 function Indicator({ state, n, size }: { state: StepState; n: number; size: StepperSize }) {
