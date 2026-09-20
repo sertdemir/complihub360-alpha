@@ -4,7 +4,6 @@
     "solutions": "Solutions",
     "complianceAreas": "Compliance Areas",
     "resources": "Resources",
-    "login": "Log in",
     "signup": "Sign up for free",
     "items": {
       "aiEngine": {
@@ -45,7 +44,9 @@
       }
     },
     "aiGovernance": "AI Governance",
-    "aiGovDesc": "Our framework for transparent and compliant AI."
+    "aiGovDesc": "Our framework for transparent and compliant AI.",
+    "dashboard": "My dashboard",
+    "signOut": "Sign out"
   },
   "hero": {
     "scenarios": {
