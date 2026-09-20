@@ -1,6 +1,5 @@
 {
   "shared": {
-    "bookmarks": "Bookmarks (12)",
     "seeAll": "See all",
     "startNewSearch": "Start new search",
     "open": "Open",
@@ -50,7 +49,6 @@
     "navNotifications": "Notifications",
     "navLibrary": "Library",
     "navSavedProviders": "Saved Providers",
-    "navExports": "Exports",
     "navAlerts": "Alerts",
     "navCalendar": "Calendar",
     "signOut": "Sign out",
@@ -284,32 +282,6 @@
   "library": {
     "title": "Knowledge <accent>library</accent>."
   },
-  "savedProviders": {
-    "title": "Saved <accent>providers</accent>",
-    "sub": "Providers you bookmarked from your risk maps and threads.",
-    "filterAll": "All · 2",
-    "filterVat": "VAT · 2",
-    "filterPrivacy": "Privacy",
-    "filterPackaging": "Packaging",
-    "filterMarketing": "Marketing",
-    "filterCorporate": "Corporate"
-  },
-  "exports": {
-    "title": "Exports",
-    "sub": "Your generated PDFs and data exports · links sent to your email",
-    "filterAll": "All · 24",
-    "filterPdfs": "PDFs · 14",
-    "filterData": "Data · 6",
-    "filterReports": "Reports · 3",
-    "filterPending": "Pending · 1",
-    "colFile": "File",
-    "colDetails": "Details",
-    "colStatus": "Status",
-    "colActions": "Actions",
-    "statusReady": "ready",
-    "statusGenerating": "generating",
-    "download": "Download"
-  },
   "comingSoon": {
     "eyebrow": "In preparation",
     "bannerTitle": "IN PREPARATION — {{title}}",
@@ -343,6 +315,16 @@
       "feature2": "Country guides",
       "feature3": "Webinars with specialists",
       "feature4": "Calculators & templates"
+    },
+    "savedProviders": {
+      "title": "Saved providers",
+      "sub": "Bookmark providers and find them again · coming soon",
+      "panelTitle": "Bookmark providers",
+      "panelSub": "One bookmark on every provider — in a risk map, in a conversation, on the provider page. Collected here.",
+      "feature1": "Bookmark from anywhere",
+      "feature2": "Why you saved it, kept with it",
+      "feature3": "Filter by area and market",
+      "feature4": "Send an enquiry straight from the list"
     }
   },
   "domainPage": {

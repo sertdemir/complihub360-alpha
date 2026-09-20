@@ -3,7 +3,7 @@ import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useTranslation } from 'react-i18next';
 import {
-  LayoutGrid, FolderClosed, Bell, BookOpen, Bookmark, Download, CalendarCheck,
+  LayoutGrid, FolderClosed, Bell, BookOpen, Bookmark, CalendarCheck,
   TriangleAlert, Calendar, Search, LogOut, Landmark, Package, ShieldCheck, Megaphone, Building2,
   PackageCheck, Truck, Scale,
   Leaf, ChevronRight,
@@ -59,9 +59,13 @@ const SIDEBAR: { group: string; groupKey: string; badgeKey?: string; items: Side
   {
     group: 'Saved',
     groupKey: 'groupSaved',
+    // "Bald" (2026-09-20): die Flaeche laeuft auf ComingSoonPage, bis es das
+    // Lesezeichen an den Anbietern gibt. Exporte entfiel am selben Tag — der
+    // echte PDF-Export lebt auf der Ergebnisseite und im Sitzungs-Menue, und
+    // er legt nichts ab, was sich auflisten liesse.
+    badgeKey: 'badgeSoon',
     items: [
       { to: 'dashboard/saved-providers', labelKey: 'navSavedProviders', icon: Bookmark },
-      { to: 'dashboard/exports', labelKey: 'navExports', icon: Download },
     ],
   },
   {

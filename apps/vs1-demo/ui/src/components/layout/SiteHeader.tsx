@@ -44,7 +44,7 @@ export function SiteHeader() {
     return null;
   }
   // The user App-Workspace pages (v2, own UserShell) — no global header.
-  const USER_WORKSPACE = ['sessions', 'requests', 'termine', 'notifications', 'library', 'saved-providers', 'exports', 'alerts', 'calendar', 'workbench'];
+  const USER_WORKSPACE = ['sessions', 'requests', 'termine', 'notifications', 'library', 'saved-providers', 'alerts', 'calendar', 'workbench'];
   if (localeOk && seg[1] === 'dashboard' && (seg.length === 2 || USER_WORKSPACE.includes(seg[2]))) {
     return null;
   }

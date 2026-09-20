@@ -1,6 +1,5 @@
 {
   "shared": {
-    "bookmarks": "Yer imleri (12)",
     "seeAll": "Tümünü gör",
     "startNewSearch": "Yeni arama başlat",
     "open": "Aç",
@@ -50,7 +49,6 @@
     "navNotifications": "Bildirimler",
     "navLibrary": "Kitaplık",
     "navSavedProviders": "Kaydedilen Sağlayıcılar",
-    "navExports": "Dışa Aktarımlar",
     "navAlerts": "Uyarılar",
     "navCalendar": "Takvim",
     "signOut": "Oturumu kapat",
@@ -284,32 +282,6 @@
   "library": {
     "title": "Bilgi <accent>kitaplığı</accent>."
   },
-  "savedProviders": {
-    "title": "Kaydedilen <accent>sağlayıcılar</accent>",
-    "sub": "Risk Map'lerinizden ve yazışmalarınızdan yer imlerine eklediğiniz sağlayıcılar.",
-    "filterAll": "Tümü · 2",
-    "filterVat": "KDV · 2",
-    "filterPrivacy": "Gizlilik",
-    "filterPackaging": "Ambalaj",
-    "filterMarketing": "Pazarlama",
-    "filterCorporate": "Şirket"
-  },
-  "exports": {
-    "title": "Dışa Aktarımlar",
-    "sub": "Oluşturduğunuz PDF'ler ve veri dışa aktarımları · bağlantılar e-postanıza gönderilir",
-    "filterAll": "Tümü · 24",
-    "filterPdfs": "PDF'ler · 14",
-    "filterData": "Veri · 6",
-    "filterReports": "Raporlar · 3",
-    "filterPending": "Beklemede · 1",
-    "colFile": "Dosya",
-    "colDetails": "Ayrıntılar",
-    "colStatus": "Durum",
-    "colActions": "İşlemler",
-    "statusReady": "hazır",
-    "statusGenerating": "oluşturuluyor",
-    "download": "İndir"
-  },
   "comingSoon": {
     "eyebrow": "Hazırlanıyor",
     "bannerTitle": "HAZIRLANIYOR — {{title}}",
@@ -343,6 +315,16 @@
       "feature2": "Ülke rehberleri",
       "feature3": "Uzmanlarla web seminerleri",
       "feature4": "Hesaplayıcılar ve şablonlar"
+    },
+    "savedProviders": {
+      "title": "Kaydedilen sağlayıcılar",
+      "sub": "Sağlayıcıları kaydedin ve yeniden bulun · yakında",
+      "panelTitle": "Sağlayıcıları kaydetme",
+      "panelSub": "Her sağlayıcıda bir yer imi — risk haritasında, görüşmede, sağlayıcı sayfasında. Burada toplanır.",
+      "feature1": "Her yerden kaydetme",
+      "feature2": "Nereden kaydedildiği birlikte kalır",
+      "feature3": "Alana ve pazara göre filtreleme",
+      "feature4": "Listeden doğrudan talep gönderme"
     }
   },
   "domainPage": {
