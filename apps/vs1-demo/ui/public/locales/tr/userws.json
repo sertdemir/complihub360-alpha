@@ -282,22 +282,7 @@
     "dayYesterday": "Dün"
   },
   "library": {
-    "title": "Bilgi <accent>kitaplığı</accent>.",
-    "sub": "212 içerik · 84 video · 76 makale · 18 web semineri · 26 rehber · 8 araç",
-    "rowType": "Tür",
-    "rowDomain": "Alan",
-    "filterAll": "Tümü · 212",
-    "filterVideos": "Videolar · 84",
-    "filterArticles": "Makaleler · 76",
-    "filterWebinars": "Web seminerleri · 18",
-    "filterGuides": "Rehberler · 26",
-    "filterTools": "Araçlar · 8",
-    "filterAllDomains": "Tüm alanlar · 212",
-    "filterTaxVat": "Vergi ve KDV · 68",
-    "filterPrivacy": "Gizlilik · 42",
-    "filterPackaging": "Ambalaj · 31",
-    "filterMarketing": "Pazarlama · 28",
-    "filterCorporate": "Şirket · 24"
+    "title": "Bilgi <accent>kitaplığı</accent>."
   },
   "savedProviders": {
     "title": "Kaydedilen <accent>sağlayıcılar</accent>",
@@ -348,6 +333,16 @@
       "feature2": "Alan bazında vade tarihleri",
       "feature3": "Google / Outlook ile eşitleme",
       "feature4": "Her tarihten önce hatırlatmalar"
+    },
+    "library": {
+      "title": "Kitaplık",
+      "sub": "Bilgi, eğitimler ve araçlar · yakında — erken erişim hakkınızı ayırtın",
+      "panelTitle": "Bilgi, eğitimler ve araçlar",
+      "panelSub": "Uzmanlardan doğrulanmış içerikler, alana ve pazara göre sıralanır — her biri açıkladığı mevzuatı belirtir.",
+      "feature1": "Alana göre eğitimler",
+      "feature2": "Ülke rehberleri",
+      "feature3": "Uzmanlarla web seminerleri",
+      "feature4": "Hesaplayıcılar ve şablonlar"
     }
   },
   "domainPage": {

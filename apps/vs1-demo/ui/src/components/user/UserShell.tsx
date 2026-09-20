@@ -51,6 +51,9 @@ const SIDEBAR: { group: string; groupKey: string; badgeKey?: string; items: Side
   {
     group: 'Library',
     groupKey: 'groupLibrary',
+    // "Bald" wie bei Monitoring (2026-09-20): die Fläche laeuft auf
+    // ComingSoonPage, und das soll man vor dem Klick sehen.
+    badgeKey: 'badgeSoon',
     items: [{ to: 'dashboard/library', labelKey: 'navLibrary', icon: BookOpen }],
   },
   {

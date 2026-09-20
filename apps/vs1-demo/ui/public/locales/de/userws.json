@@ -282,22 +282,7 @@
     "dayYesterday": "Gestern"
   },
   "library": {
-    "title": "Wissens<accent>bibliothek</accent>.",
-    "sub": "212 Einträge · 84 Videos · 76 Artikel · 18 Webinare · 26 Leitfäden · 8 Tools",
-    "rowType": "Typ",
-    "rowDomain": "Bereich",
-    "filterAll": "Alle · 212",
-    "filterVideos": "Videos · 84",
-    "filterArticles": "Artikel · 76",
-    "filterWebinars": "Webinare · 18",
-    "filterGuides": "Leitfäden · 26",
-    "filterTools": "Tools · 8",
-    "filterAllDomains": "Alle Bereiche · 212",
-    "filterTaxVat": "Steuern & USt · 68",
-    "filterPrivacy": "Datenschutz · 42",
-    "filterPackaging": "Verpackung · 31",
-    "filterMarketing": "Marketing · 28",
-    "filterCorporate": "Unternehmen · 24"
+    "title": "Wissens<accent>bibliothek</accent>."
   },
   "savedProviders": {
     "title": "Gespeicherte <accent>Anbieter</accent>",
@@ -348,6 +333,16 @@
       "feature2": "Fälligkeiten pro Bereich",
       "feature3": "Synchronisierung mit Google / Outlook",
       "feature4": "Erinnerungen vor jedem Termin"
+    },
+    "library": {
+      "title": "Bibliothek",
+      "sub": "Wissen, Tutorials & Werkzeuge · bald verfügbar — sichern Sie sich Early Access",
+      "panelTitle": "Wissen, Tutorials & Werkzeuge",
+      "panelSub": "Geprüfte Beiträge von Fachleuten, nach Bereich und Markt sortiert — jeder nennt die Vorschrift, die er erklärt.",
+      "feature1": "Tutorials je Bereich",
+      "feature2": "Länder-Leitfäden",
+      "feature3": "Webinare mit Fachleuten",
+      "feature4": "Rechner & Vorlagen"
     }
   },
   "domainPage": {
