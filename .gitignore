@@ -59,6 +59,7 @@ __pycache__/
 .claude/*
 !.claude/skills/
 !.claude/launch.json
+!.claude/settings.json
 
 # Accidental early-session scaffold (5 files, superseded by the real repo layout)
 apps/complihub360-alpha/
