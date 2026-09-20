@@ -1,6 +1,5 @@
 {
   "shared": {
-    "bookmarks": "Marcadores (12)",
     "seeAll": "Ver todo",
     "startNewSearch": "Iniciar nueva búsqueda",
     "open": "Abrir",
@@ -50,7 +49,6 @@
     "navNotifications": "Notificaciones",
     "navLibrary": "Biblioteca",
     "navSavedProviders": "Proveedores guardados",
-    "navExports": "Exportaciones",
     "navAlerts": "Alertas",
     "navCalendar": "Calendario",
     "signOut": "Cerrar sesión",
@@ -284,32 +282,6 @@
   "library": {
     "title": "Biblioteca de <accent>conocimiento</accent>."
   },
-  "savedProviders": {
-    "title": "<accent>Proveedores</accent> guardados",
-    "sub": "Proveedores que marcó desde sus Risk Maps e hilos.",
-    "filterAll": "Todos · 2",
-    "filterVat": "IVA · 2",
-    "filterPrivacy": "Privacidad",
-    "filterPackaging": "Embalaje",
-    "filterMarketing": "Marketing",
-    "filterCorporate": "Sociedades"
-  },
-  "exports": {
-    "title": "Exportaciones",
-    "sub": "Sus PDF generados y exportaciones de datos · enlaces enviados a su correo",
-    "filterAll": "Todos · 24",
-    "filterPdfs": "PDF · 14",
-    "filterData": "Datos · 6",
-    "filterReports": "Informes · 3",
-    "filterPending": "Pendientes · 1",
-    "colFile": "Archivo",
-    "colDetails": "Detalles",
-    "colStatus": "Estado",
-    "colActions": "Acciones",
-    "statusReady": "listo",
-    "statusGenerating": "generando",
-    "download": "Descargar"
-  },
   "comingSoon": {
     "eyebrow": "En preparación",
     "bannerTitle": "EN PREPARACIÓN — {{title}}",
@@ -343,6 +315,16 @@
       "feature2": "Guías por país",
       "feature3": "Seminarios web con especialistas",
       "feature4": "Calculadoras y plantillas"
+    },
+    "savedProviders": {
+      "title": "Proveedores guardados",
+      "sub": "Guarde proveedores y vuelva a encontrarlos · próximamente",
+      "panelTitle": "Guardar proveedores",
+      "panelSub": "Un marcador en cada proveedor — en un mapa de riesgos, en una conversación, en su ficha. Reunidos aquí.",
+      "feature1": "Guardar desde cualquier sitio",
+      "feature2": "Se conserva de dónde lo guardó",
+      "feature3": "Filtrar por área y mercado",
+      "feature4": "Enviar una solicitud desde la lista"
     }
   },
   "domainPage": {
