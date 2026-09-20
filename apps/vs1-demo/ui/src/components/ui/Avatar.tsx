@@ -5,7 +5,7 @@ import { cn } from '../../lib/utils';
 // ─── Avatar ───────────────────────────────────────────────────────────────────
 // Mirrors the Compass "Avatar" set (482:2). Type resolves automatically:
 // image (src) → initials → icon → placeholder. Sizes XS/SM/MD/LG/XL (24/32/40/48/64),
-// initials on a petrol (brand) fill with white (`text/on-brand`). Optional status
+// initials on a petrol (brand), brand-light (`soft`) or gold (`accent`) fill. Optional status
 // dot (online/away/offline) with a surface-coloured ring. Light + dark: the ring
 // flips to the dark app surface so the dot reads as a cut-out on dark dashboards.
 
@@ -26,7 +26,17 @@ const STATUS_FILL: Record<Exclude<AvatarStatus, 'none'>, string> = {
   offline: 'bg-neutral-400',
 };
 
-export type AvatarTone = 'solid' | 'soft';
+export type AvatarTone = 'solid' | 'soft' | 'accent';
+
+// Die Fuellung je Ton fuer Initialen-Avatare. `accent` ist seit 2026-09-20
+// dabei: gefuellte Knoepfe tragen kein Gold mehr (PR #184), Avatare schon —
+// und im Produkt laufen alle sieben Personen-Avatare darueber. Vorher war das
+// siebenmal von Hand gebaut, in drei Groessen mit 11px-Text.
+const INITIALS_TONE: Record<AvatarTone, { surface: string; text: string }> = {
+  solid: { surface: 'bg-brand', text: 'text-fg-on-brand' },
+  soft: { surface: 'bg-brand-light', text: 'text-fg-brand' },
+  accent: { surface: 'bg-brand-accent', text: 'text-fg-on-accent' },
+};
 
 export interface AvatarProps {
   size?: AvatarSize;
@@ -53,13 +63,13 @@ export function Avatar({ size = 'md', src, alt = '', initials, tone = 'solid', i
     inner = <img src={src} alt={alt} className="h-full w-full object-cover" />;
     surface = 'bg-neutral-200 dark:bg-neutral-700';
   } else if (initials) {
-    const soft = tone === 'soft';
+    const t = INITIALS_TONE[tone];
     inner = (
-      <span className={cn('font-sans font-semibold leading-none', soft ? 'text-fg-brand' : 'text-fg-on-brand')}>
+      <span className={cn('font-sans font-semibold leading-none', t.text)}>
         {initials.slice(0, 2).toUpperCase()}
       </span>
     );
-    surface = soft ? 'bg-brand-light' : 'bg-brand';
+    surface = t.surface;
   } else if (icon) {
     inner = <span className="text-fg-secondary">{icon}</span>;
     surface = 'bg-neutral-100 dark:bg-neutral-800';
