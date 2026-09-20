@@ -161,3 +161,58 @@ export function ceilingInEuro(ceiling: PenaltyCeiling): number | null {
   if (ceiling.kind !== 'amount') return null;
   return inEuro(ceiling.value, ceiling.currency);
 }
+
+/** Wie es um die Belege einer LISTE von Pflichten steht.
+ *
+ *  Vier Flaechen stellen dieselbe Frage — die Kennzahl, die Matrix, die
+ *  Kalender-Fussnote und die Bereichsseite. Sie muss ueberall gleich
+ *  beantwortet werden, sonst zaehlt eine Flaeche anders als die daneben.
+ *  Genau daran ist die Unterscheidung "nennt das Gesetz einen Betrag" heute
+ *  schon zweimal gescheitert. */
+export interface BelegLage {
+  gesetzlich: number;
+  umgerechnet: number;
+  /** Obergrenze belegt, aber ohne absoluten Betrag: anteilig, je Einheit,
+   *  delegiert, unbegrenzt, eine Ebene tiefer. */
+  ohneBetrag: number;
+  /** Ueberhaupt keine Obergrenze gelesen. */
+  unbelegt: number;
+  gesamt: number;
+  /** Summe NUR der Betraege, die das Gesetz nennt — in Euro, Fremdwaehrung am
+   *  eingefrorenen Kurs. Was keinen Betrag nennt, wird NICHT mitgezaehlt:
+   *  eine Kennzahl soll messen, was sie behauptet. */
+  belegteSummeEur: number;
+  /** Die bisherige Summe ueber `penaltyMaxEur`, zum Vergleich. */
+  bestandSummeEur: number;
+}
+
+export function belegLage(
+  entries: { penaltyMaxEur?: number; penaltyCeiling?: PenaltyCeiling }[],
+): BelegLage {
+  const l: BelegLage = {
+    gesetzlich: 0, umgerechnet: 0, ohneBetrag: 0, unbelegt: 0,
+    gesamt: entries.length, belegteSummeEur: 0, bestandSummeEur: 0,
+  };
+  for (const e of entries) {
+    l.bestandSummeEur += e.penaltyMaxEur ?? 0;
+    const c = e.penaltyCeiling;
+    if (!c) { l.unbelegt += 1; continue; }
+    const b = statutoryAmount(c);
+    if (!b) { l.ohneBetrag += 1; continue; }
+    const eur = b.currency === 'EUR' ? b.value : inEuro(b.value, b.currency);
+    // Fehlt fuer eine Waehrung der Kurs, zaehlt der Eintrag NICHT als belegt.
+    // Lieber eine kleinere Summe als eine, die eine Zahl erfindet.
+    if (eur == null) { l.ohneBetrag += 1; continue; }
+    l.belegteSummeEur += eur;
+    if (b.currency === 'EUR') l.gesetzlich += 1; else l.umgerechnet += 1;
+  }
+  return l;
+}
+
+/** Der Betrag, den das Gesetz nennt — oder null. Dieselbe Unterscheidung wie
+ *  `nenntBetrag` im Engine-Waechter: `turnover` MIT `orAmount` nennt einen. */
+function statutoryAmount(c: PenaltyCeiling): { value: number; currency: string } | null {
+  if (c.kind === 'amount') return { value: c.value, currency: c.currency };
+  if (c.kind === 'turnover' && c.orAmount) return c.orAmount;
+  return null;
+}

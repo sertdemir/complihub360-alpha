@@ -8,6 +8,7 @@ import { RiskBadge } from '../ui/RiskBadge';
 import { SectionEyebrow, Reveal } from '../providers/SectionHeading';
 import { DOMAIN_BY_SLUG, type DomainSlug } from '../../lib/domains';
 import { getAreaObligations, getAreaProfile, rankAreasForMarket } from '../../lib/areaProfiles';
+import { belegLage } from '../../lib/penaltyCeiling';
 import { useInViewOnce } from '../../lib/useInViewOnce';
 import { AREAS } from './areas';
 import { SEVERITY_FALLBACK, severityKey } from './severity';
@@ -116,7 +117,11 @@ function TableView({ selectedCountry }: Props) {
           weight,
           severity: severityFromRiskWeight(weight),
           leadDays,
-          exposure: obligations.reduce((sum, o) => sum + (o.penaltyMaxEur ?? 0), 0),
+          // Nur Betraege, die ein Gesetz nennt — dieselbe Rechnung wie im
+          // Kennzahlenband. Die Spalte daneben sagt, auf wie vielen Pflichten
+          // die Summe ueberhaupt ruht: "0 / 7" ist eine Auskunft, die eine
+          // Zahl allein nicht geben kann.
+          lage: belegLage(obligations),
         };
       }).sort((a, b) => b.weight - a.weight),
     [selectedCountry],
@@ -134,11 +139,12 @@ function TableView({ selectedCountry }: Props) {
 
   return (
     <div>
-      <div className="grid grid-cols-[1.5fr_0.8fr_1fr] gap-x-3 border-b border-stroke-subtle pb-2 text-body-4xs font-bold uppercase tracking-[0.08em] text-fg-tertiary sm:grid-cols-[1.5fr_0.7fr_1fr_0.9fr]">
+      <div className="grid grid-cols-[1.5fr_0.8fr_1fr] gap-x-3 border-b border-stroke-subtle pb-2 text-body-4xs font-bold uppercase tracking-[0.08em] text-fg-tertiary sm:grid-cols-[1.5fr_0.7fr_0.9fr_0.85fr_0.55fr]">
         <span>{t('compliance.matrix.area', 'Compliance Area')}</span>
         <span>{t('compliance.matrix.col.risk', 'Risk')}</span>
         <span>{t('compliance.matrix.col.time', 'Time to Act')}</span>
         <span className="hidden sm:block">{t('compliance.matrix.col.fine', 'Typical Exposure')}</span>
+        <span className="hidden text-right sm:block">{t('compliance.matrix.col.proven', 'Proven')}</span>
       </div>
       {rows.map((row, i) => (
         <motion.div
@@ -146,7 +152,7 @@ function TableView({ selectedCountry }: Props) {
           initial={reduced ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3, delay: i * 0.05 }}
-          className={`grid grid-cols-[1.5fr_0.8fr_1fr] items-center gap-x-3 py-2.5 sm:grid-cols-[1.5fr_0.7fr_1fr_0.9fr] ${
+          className={`grid grid-cols-[1.5fr_0.8fr_1fr] items-center gap-x-3 py-2.5 sm:grid-cols-[1.5fr_0.7fr_0.9fr_0.85fr_0.55fr] ${
             i < rows.length - 1 ? 'border-b border-stroke-subtle' : ''
           }`}
         >
@@ -165,9 +171,19 @@ function TableView({ selectedCountry }: Props) {
             {row.leadDays == null ? '—' : t('markets.country.leadTime', { days: row.leadDays })}
           </span>
           <span className="hidden text-body-2xs text-fg-secondary sm:block">
-            {row.exposure > 0
-              ? t('compliance.matrix.upTo', { defaultValue: 'up to {{sum}}', sum: money(row.exposure) })
+            {row.lage.belegteSummeEur > 0
+              ? t('compliance.matrix.upTo', { defaultValue: 'up to {{sum}}', sum: money(row.lage.belegteSummeEur) })
               : '—'}
+          </span>
+          {/* Zaehlt, statt anzudeuten. Gefaerbt nur, wo ueberhaupt etwas
+              belegt ist — eine rote Null waere ein Vorwurf, und der Befund
+              gehoert dem Gesetz, nicht uns. */}
+          <span
+            className={`hidden text-right text-body-2xs tabular-nums sm:block ${
+              row.lage.gesetzlich + row.lage.umgerechnet > 0 ? 'text-fg-secondary' : 'text-fg-tertiary'
+            }`}
+          >
+            {row.lage.gesetzlich + row.lage.umgerechnet} / {row.lage.gesamt}
           </span>
         </motion.div>
       ))}

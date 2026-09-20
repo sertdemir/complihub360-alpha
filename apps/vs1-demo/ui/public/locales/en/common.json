@@ -382,7 +382,8 @@
         "risk": "Risk",
         "time": "Time to Act",
         "fine": "Typical Exposure",
-        "markets": "Active Markets"
+        "markets": "Active Markets",
+        "proven": "Proven"
       },
       "upTo": "up to {{sum}}",
       "marketsCount": "{{count}} of {{total}}"
@@ -814,7 +815,10 @@
         "ofTotal": "{{count}} of {{total}}",
         "laterLabel": "apply only later",
         "fromDate": "{{count}} from {{date}}",
-        "nationalIn": "{{count}} on a legal basis in {{market}}"
+        "nationalIn": "{{count}} on a legal basis in {{market}}",
+        "exposureProven": "Proven penalty exposure",
+        "exposureNoneProven": "None of the {{total}} duties here names an amount in law — the penalties are proportional, per unit or left to member states.",
+        "exposureProvenNote": "{{proven}} of {{total}} duties name an amount in law. The others are counted at zero, not estimated."
       },
       "risk": {
         "title": "Risk profile",
@@ -1333,7 +1337,11 @@
       "relatedAreasFact_other": "{{count}} duties in this market",
       "weightsFootCovered": "Own sources in {{covered}} of {{total}} areas — EU Regulations apply directly and do not count as missing.",
       "weightsFootPending": "For {{list}} a national text exists that we do not carry yet — the named EU instrument stands in.",
-      "weightsFootNone": "For {{list}} we hold no named source yet."
+      "weightsFootNone": "For {{list}} we hold no named source yet.",
+      "exposureCaveat": "A caveat on those figures: {{what}}.",
+      "exposureConverted": "{{count}} of them are converted from another currency",
+      "exposureUnbacked": "{{count}} of {{total}} duties carry no amount stated in law",
+      "exposureAnd": ", and "
     },
     "cta": {
       "title": "See which of these apply to you.",

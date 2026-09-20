@@ -382,7 +382,8 @@
         "risk": "Riesgo",
         "time": "Plazo para actuar",
         "fine": "Exposición típica",
-        "markets": "Mercados activos"
+        "markets": "Mercados activos",
+        "proven": "acreditado"
       },
       "upTo": "hasta {{sum}}",
       "marketsCount": "{{count}} de {{total}}"
@@ -814,7 +815,10 @@
         "ofTotal": "{{count}} de {{total}}",
         "laterLabel": "se aplican más adelante",
         "fromDate": "{{count}} desde {{date}}",
-        "nationalIn": "{{count}} con base jurídica en {{market}}"
+        "nationalIn": "{{count}} con base jurídica en {{market}}",
+        "exposureProven": "Sanción máxima acreditada",
+        "exposureNoneProven": "Ninguna de las {{total}} obligaciones fija un importe en la ley: las sanciones son proporcionales, por unidad o se dejan a los Estados miembros.",
+        "exposureProvenNote": "{{proven}} de {{total}} obligaciones fijan un importe en la ley. Las demás cuentan como cero, no se estiman."
       },
       "risk": {
         "title": "Perfil de riesgo",
@@ -1333,7 +1337,11 @@
       "relatedAreasFact_other": "{{count}} obligaciones en este mercado",
       "weightsFootCovered": "Fuentes propias en {{covered}} de {{total}} áreas — los reglamentos de la UE se aplican directamente y no cuentan como carencia.",
       "weightsFootPending": "Para {{list}} existe un texto nacional que aún no incorporamos — en su lugar figura el instrumento de la UE indicado.",
-      "weightsFootNone": "Para {{list}} aún no tenemos una fuente con nombre."
+      "weightsFootNone": "Para {{list}} aún no tenemos una fuente con nombre.",
+      "exposureCaveat": "Una advertencia sobre estas cifras: {{what}}.",
+      "exposureConverted": "{{count}} de ellas están convertidas desde otra moneda",
+      "exposureUnbacked": "{{count}} de {{total}} obligaciones no fijan ningún importe en la ley",
+      "exposureAnd": " y "
     },
     "cta": {
       "title": "Vea cuáles se aplican a su caso.",

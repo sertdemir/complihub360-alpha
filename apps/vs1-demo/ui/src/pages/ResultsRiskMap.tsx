@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef, Fragment } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
+import type { PenaltyCeiling } from '@complihub/compliance-engine';
+import { describeCeiling } from '../lib/penaltyCeiling';
 import { saveWizardSession, fetchSessions, type SessionRowData } from '../api/sessions';
 import { runSearch, type AnonProvider, type SearchLaw } from '../api/search';
 import { useApiData } from '../lib/useApiData';
@@ -235,7 +238,9 @@ function StatePill({ state, onAnswer }: { state: State; onAnswer: () => void }) 
 }
 
 export function ResultsRiskMap() {
-  const { t } = useTranslation('results');
+  // Zwei Namensraeume: die Seite spricht 'results', die belegte Obergrenze
+  // lebt in 'common' und wird von vier weiteren Flaechen genauso gelesen.
+  const { t } = useTranslation(['results', 'common']);
   const location = useLocation();
   // Profile survives the magic-link roundtrip via localStorage (Wave A2):
   // router state is lost when the user returns from the e-mail.
@@ -302,7 +307,12 @@ export function ResultsRiskMap() {
         // dass Strafhöhen nicht der primäre Untertitel jeder Pflicht sind —
         // zugänglich bleiben sie, führend sind sie nicht mehr. Der Präfix war
         // ausserdem hartkodiertes Englisch ('Penalty:') im deutschen UI.
-        detail: [l.source_url ? null : l.source, l.penalty ? t('detail.penalty', { value: l.penalty }) : null]
+        // Die BELEGTE Obergrenze, wo es eine gibt — sonst der redaktionelle
+        // Satz. Beide standen bisher nebeneinander in der Welt, ohne dass
+        // etwas sie zusammenhielt: hier stand "up to EUR 30,000 per year",
+        // waehrend die Obergrenze zu derselben Pflicht 7.500 EUR JE EINHEIT
+        // lautete und keinen Deckel hat. Eine Quelle, ein Satz.
+        detail: [l.source_url ? null : l.source, bussgeldZeile(l, t, i18n.language)]
           .filter(Boolean)
           .join(' · '),
         sourceLabel: l.source_url ? (l.source ?? l.celex ?? undefined) : undefined,
@@ -681,4 +691,52 @@ export function ResultsRiskMap() {
       <FreeAccountDrawer open={saveOpen} onClose={() => setSaveOpen(false)} />
     </div>
   );
+}
+
+/** Die Bussgeldzeile einer Pflicht auf der Risikokarte.
+ *
+ *  Bevorzugt die BELEGTE Obergrenze; der redaktionelle Satz ist nur noch der
+ *  Rueckfall. Vorher waren es zwei unabhaengige Quellen zur selben Pflicht,
+ *  und sie liefen auseinander, ohne dass es jemandem auffiel — bei der
+ *  franzoesischen AGEC-Busse stand hier "up to EUR 30,000 per year", waehrend
+ *  die belegte Obergrenze 7.500 EUR je Einheit ohne Deckel lautet.
+ *
+ *  Die Markenregel bleibt gewahrt: kein Geld in den Kopfzahlen, keine neue
+ *  Stelle fuer Betraege. Es ist dieselbe Zeile wie bisher, nur belegt. */
+function bussgeldZeile(
+  l: { penalty?: string | null; penalty_ceiling?: PenaltyCeiling | null },
+  t: TFunction<['results', 'common']>,
+  locale: string,
+): string | null {
+  const c = l.penalty_ceiling;
+  if (!c) return l.penalty ? t('detail.penalty', { value: l.penalty }) : null;
+
+  const d = describeCeiling(c, locale);
+  const wert =
+    d.form === 'amount'
+      ? d.amount
+      : d.form === 'perUnit'
+        ? t('common:compliance.area.ceiling.perUnit', {
+            amount: d.amount,
+            per: t(`common:compliance.area.ceiling.perKey.${d.per}`, { defaultValue: d.per }),
+          })
+        : d.form === 'proportional'
+          ? t('common:compliance.area.ceiling.proportional', {
+              percent: d.percent,
+              of: t(`common:compliance.area.ceiling.ofKey.${d.of}`, { defaultValue: d.of }),
+            })
+          : d.form === 'turnover'
+            ? d.orAmount
+              ? t('common:compliance.area.ceiling.turnoverOr', { amount: d.orAmount, percent: d.percent })
+              : t('common:compliance.area.ceiling.turnover', { percent: d.percent })
+            : d.form === 'subnational'
+              ? t('common:compliance.area.ceiling.subnational', {
+                  level: t(`common:compliance.area.ceiling.levelKey.${d.level}`, { defaultValue: d.level }),
+                })
+              : d.form === 'delegated'
+                ? t('common:compliance.area.ceiling.delegated')
+                : d.form === 'none'
+                  ? t('common:compliance.area.ceiling.none')
+                  : t('common:compliance.area.ceiling.unlimited');
+  return t('detail.penalty', { value: wert });
 }

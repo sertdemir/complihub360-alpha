@@ -2481,6 +2481,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         source_url: r.sourceUrl ?? null,
                         penalty: r.penalty ?? null,
                         penalty_max_eur: r.penaltyMaxEur ?? null,
+                        // Die belegte Obergrenze mit Fundstelle und Stand.
+                        // `penalty` bleibt daneben stehen, solange Flaechen
+                        // davon leben — aber die Risikokarte liest ab jetzt
+                        // diese hier, damit Karte und Bereichsseite nicht zwei
+                        // verschiedene Zahlen zur selben Pflicht zeigen.
+                        penalty_ceiling: r.penaltyCeiling ?? null,
                         due: r.due ?? null,
                         due_days: r.dueDays ?? null,
                         // ISO date an obligation starts to apply. Null for the

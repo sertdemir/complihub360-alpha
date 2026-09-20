@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useCountUp } from '../../lib/useCountUp';
 import { useInViewOnce } from '../../lib/useInViewOnce';
-import { getAreaObligations } from '../../lib/areaProfiles';
+import { getAreaObligations, type AreaObligation } from '../../lib/areaProfiles';
+import { provenance } from '../../lib/penaltyCeiling';
 import { getMarketProfile, MARKET_CODES } from '../../lib/marketProfiles';
 import type { DomainSlug } from '../../lib/domains';
 import type { CountryCode } from './types';
@@ -162,6 +163,11 @@ export function AreaEnforcement({ slug, selectedCountry }: Props) {
               {t('compliance.area.heaviestPenalty', 'Highest single penalty')}
             </p>
             <p className="mt-1 text-body-xs text-fg-secondary">{heaviest.label}</p>
+            {/* Woher die Eurozahl stammt. Ohne diese Zeile sah die groesste
+                Zahl der Seite bei einer Umrechnung genauso aus wie bei einem
+                Betrag, der so im Gesetz steht — und genauso wie bei einem, den
+                niemand je belegt hat. */}
+            <HerkunftZeile o={heaviest} />
           </div>
         )}
       </div>
@@ -287,4 +293,33 @@ export function AreaEnforcement({ slug, selectedCountry }: Props) {
       </div>
     </div>
   );
+}
+
+/** Eine Zeile unter der groessten Zahl der Seite: woher sie kommt.
+ *
+ *  Vier Zustaende, die vorher nicht zu unterscheiden waren — im Gesetz
+ *  genannt, von uns umgerechnet, ohne gesetzliche Entsprechung, oder gar
+ *  nicht belegt. Bleibt still, wo nichts zu sagen ist: bei einem Betrag, den
+ *  das Gesetz selbst in Euro nennt, waere die Zeile eine Selbstverstaendlichkeit. */
+function HerkunftZeile({ o }: { o: AreaObligation }) {
+  const { t, i18n } = useTranslation();
+  const p = provenance(o, i18n.language);
+  if (p.kind === 'statutory') return null;
+  const datum = (iso: string) =>
+    new Intl.DateTimeFormat(i18n.language, { dateStyle: 'medium' }).format(new Date(iso));
+  const text =
+    p.kind === 'converted'
+      ? t('compliance.area.ceiling.converted', {
+          defaultValue: 'The euro figure is our conversion from {{from}}, at the ECB rate of {{date}}.',
+          from: p.from,
+          date: datum(p.rateAsOf),
+        })
+      : p.kind === 'noAmount'
+        ? t('compliance.area.ceiling.noAmount', {
+            defaultValue: 'The statute names no amount, so the euro figure beside it has no counterpart in law.',
+          })
+        : t('compliance.area.ceiling.unprovenNote', {
+            defaultValue: 'The figure the risk map counts with is carried stock — we have not read it off the statute.',
+          });
+  return <p className="mt-2 max-w-[34ch] text-body-3xs leading-relaxed text-fg-tertiary">{text}</p>;
 }
