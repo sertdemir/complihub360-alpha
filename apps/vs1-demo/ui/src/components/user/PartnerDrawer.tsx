@@ -163,7 +163,7 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
       headerExtra={
         step === 'profil' ? (
           <div className="flex items-center gap-3">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[10px] bg-accent text-body-xs font-extrabold text-primary-950">
+            <span className="grid h-[40px] w-[40px] shrink-0 place-items-center rounded-[10px] bg-accent text-body-xs font-extrabold text-primary-950">
               {provider.match}
             </span>
             <div className="min-w-0">

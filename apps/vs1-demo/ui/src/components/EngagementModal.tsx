@@ -46,7 +46,10 @@ export function EngagementModal({
 
     const isStep1Valid = formData.email.trim() !== "" && formData.message.trim() !== "" && formData.consent;
 
-    const selectClasses = "flex h-10 w-full rounded-md border-medium border-neutral-300 bg-white px-3 py-2 text-body placeholder:text-neutral-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors appearance-none";
+    // h-11 (44) ist die `md`-Stufe aus Select.tsx (36/44/52). Vorher stand hier
+    // h-10 — das sind in diesem Projekt 64 px, eine Hoehe, die in keiner Stufe
+    // der Select-Skala vorkommt und neben den 40px-Buttons falsch aussah.
+    const selectClasses = "flex h-11 w-full rounded-md border-medium border-neutral-300 bg-white px-3 py-2 text-body placeholder:text-neutral-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors appearance-none";
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-neutral-900/80 backdrop-blur-md px-4">

@@ -83,8 +83,14 @@ export function GlobalNav() {
       {/* h-16 lg:h-20 is the MarketingHeader's bar height — the two headers sit
           on the same routes' shared layout, so they must be the same height, or
           every page that clears the fixed bar with padding is wrong on half the
-          site. Fixed height, not padding: the tallest child (h-10 actions) must
-          never grow the bar. */}
+          site. Fixed height, not padding: the tallest child (the 40px action
+          row) must never grow the bar.
+
+          Die Zeile stand bis 2026-09-20 auf `h-10` — in diesem Projekt 64 px,
+          nicht 40 (siehe Button.tsx und die spacing-Skala). Sichtbar kaputt war
+          nichts, weil die Leiste `h-20` (80) traegt und 64 hineinpasst; die
+          Begruendung oben rechnete aber mit 40, und mit 24 px Totraum in der
+          Zeile stimmt sie nicht mehr, sobald jemand die Leistenhoehe anfasst. */}
       <div className="pointer-events-auto w-full bg-surface backdrop-blur-xl border-b border-stroke-subtle shadow-[0_4px_32px_rgba(0,0,0,0.08)]">
         {/* ── Desktop bar — from xl only: six entries with German labels do
             not survive 1024px, they clipped behind overflow-hidden. Below
@@ -159,7 +165,7 @@ export function GlobalNav() {
         <div className="w-px h-5 bg-stroke shrink-0 hidden md:block" />
 
         {/* Actions */}
-        <div className="flex items-center gap-1 shrink-0 h-10">
+        <div className="flex items-center gap-1 shrink-0 h-[40px]">
           <ThemeToggle size={36} />
           <LanguageMenu triggerClassName="h-9 w-9" />
 

@@ -81,7 +81,7 @@ function AnonMatchCard({ m }: { m: (typeof MATCHES)[number] }) {
     <div className="flex h-full w-full flex-col rounded-xl border border-stroke-subtle bg-surface px-5 py-4 shadow-[0_34px_80px_-30px_rgba(2,22,17,0.4)] dark:bg-surface-secondary">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-surface-secondary">
+          <span className="grid h-[40px] w-[40px] shrink-0 place-items-center rounded-full bg-surface-secondary">
             <Lock size={15} className="text-fg-tertiary" />
           </span>
           <div className="flex flex-col gap-1.5">
