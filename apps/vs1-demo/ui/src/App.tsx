@@ -50,7 +50,6 @@ const UserNotificationsPage = lazy(() => import("./pages/user/UserNotificationsP
 const SavedProvidersPage = lazy(() => import("./pages/user/SavedProvidersPage").then((m) => ({ default: m.SavedProvidersPage })));
 const ExportsPage = lazy(() => import("./pages/user/ExportsPage").then((m) => ({ default: m.ExportsPage })));
 const ComingSoonPage = lazy(() => import("./pages/user/ComingSoonPage").then((m) => ({ default: m.ComingSoonPage })));
-const LibraryPage = lazy(() => import("./pages/user/LibraryPage").then((m) => ({ default: m.LibraryPage })));
 // Wizard Shell Steps
 // Individualized Category Wizards
 // Auth
@@ -234,7 +233,7 @@ function AppContent() {
                         <Route path="dashboard/exports" element={<ExportsPage />} />
                         <Route path="dashboard/alerts" element={<ComingSoonPage page="alerts" />} />
                         <Route path="dashboard/calendar" element={<ComingSoonPage page="calendar" />} />
-                        <Route path="dashboard/library" element={<LibraryPage />} />
+                        <Route path="dashboard/library" element={<ComingSoonPage page="library" />} />
                         <Route path="dashboard/*" element={<LocaleRedirect to="dashboard" />} />
                     </Route>
                     

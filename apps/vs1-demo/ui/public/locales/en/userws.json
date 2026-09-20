@@ -282,22 +282,7 @@
     "dayYesterday": "Yesterday"
   },
   "library": {
-    "title": "Knowledge <accent>library</accent>.",
-    "sub": "212 items · 84 videos · 76 articles · 18 webinars · 26 guides · 8 tools",
-    "rowType": "Type",
-    "rowDomain": "Domain",
-    "filterAll": "All · 212",
-    "filterVideos": "Videos · 84",
-    "filterArticles": "Articles · 76",
-    "filterWebinars": "Webinars · 18",
-    "filterGuides": "Guides · 26",
-    "filterTools": "Tools · 8",
-    "filterAllDomains": "All domains · 212",
-    "filterTaxVat": "Tax & VAT · 68",
-    "filterPrivacy": "Privacy · 42",
-    "filterPackaging": "Packaging · 31",
-    "filterMarketing": "Marketing · 28",
-    "filterCorporate": "Corporate · 24"
+    "title": "Knowledge <accent>library</accent>."
   },
   "savedProviders": {
     "title": "Saved <accent>providers</accent>",
@@ -348,6 +333,16 @@
       "feature2": "Per-domain due dates",
       "feature3": "Sync to Google / Outlook",
       "feature4": "Reminders before each date"
+    },
+    "library": {
+      "title": "Library",
+      "sub": "Knowledge, tutorials & tools · coming soon — secure early access",
+      "panelTitle": "Knowledge, tutorials & tools",
+      "panelSub": "Reviewed pieces from specialists, sorted by area and market — each naming the statute it explains.",
+      "feature1": "Tutorials per area",
+      "feature2": "Country guides",
+      "feature3": "Webinars with specialists",
+      "feature4": "Calculators & templates"
     }
   },
   "domainPage": {
