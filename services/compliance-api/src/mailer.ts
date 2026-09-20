@@ -341,19 +341,18 @@ function renderText(m: MagicLinkMail, t: MailStrings['magic']): string {
 // serif headline with ONE gold word, gold primary CTA). Table-based + inline
 // styles, no external images — see docs/email-templates/.
 //
-// Zwei Goldwerte, und der Unterschied ist Absicht (vgl. index.css der UI):
-//   #C5913B  das Gold-WORT — der Ton, den die Wortmarke in der "360" traegt.
-//            Auf der Karte (#1f2937) 5,23:1, traegt die 26-px-Serif sicher.
-//   #d4af37  die CTA-FLAECHE — gold-500, wie --color-bg-accent in der App.
-// Text wandert auf die Messing-Linie der Marke, Flaechen bleiben auf der
-// Skala. Wer hier vereinheitlicht, bricht die eine oder die andere Seite:
-// #C5913B als Knopffarbe macht die Flaeche stumpf, #d4af37 als Textfarbe
-// bringt das Wort wieder aus dem Logo-Ton.
+// EIN Goldwert, #C5913B — der Ton, den die Wortmarke in der "360" traegt.
+// Wort UND Knopf. Nutzer-Festlegung 2026-09-20: in der Mail steht die Marke
+// fuer sich, und zwei Gelbtoene 200 px auseinander liest man als Fehler, nicht
+// als System. Die App trennt weiter (Text Messing, Flaechen gold-500), weil
+// dort die goldenen Flaechen in Menge auftreten und eine eigene Sprache haben.
+// Gemessen: Knopflabel #101411 auf #C5913B 6,62:1, die Flaeche gegen die
+// Karte (#1f2937) 5,23:1 — beides mit Reserve ueber den Schwellen.
 function renderHtml(m: MagicLinkMail, t: MailStrings['magic']): string {
     const redacted = m.message ? redactText(m.message, { profile: 'strict' }).sanitizedText : '—';
     const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const btn = (label: string, url: string, primary: boolean) => primary
-        ? `<a href="${url}" style="display:block;background-color:#d4af37;border-radius:12px;padding:14px 24px;text-align:center;font-family:Helvetica,Arial,sans-serif;font-size:15px;font-weight:bold;color:#101411;text-decoration:none;">${label} &rarr;</a>`
+        ? `<a href="${url}" style="display:block;background-color:#C5913B;border-radius:12px;padding:14px 24px;text-align:center;font-family:Helvetica,Arial,sans-serif;font-size:15px;font-weight:bold;color:#101411;text-decoration:none;">${label} &rarr;</a>`
         : `<a href="${url}" style="display:inline-block;border:1px solid rgba(255,255,255,0.25);border-radius:10px;padding:10px 18px;font-family:Helvetica,Arial,sans-serif;font-size:13px;font-weight:bold;color:#e5e7eb;text-decoration:none;">${label}</a>`;
     // NOTE: Die neue Bildmarke liegt als docs/email-templates/assets/
     // logo-lockup-email.png im Repo (dark-Variante, 390x108 fuer 195x54 @2x,
@@ -461,7 +460,7 @@ export async function sendEmailChangeMail(p: {
 <tr><td style="background-color:#1f2937;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:36px 32px;">
 <div style="font-family:Georgia,serif;font-size:26px;line-height:1.25;font-weight:bold;color:#ffffff;">${escE(t.headlinePre)}<span style="color:#C5913B;">${escE(t.headlineGold)}</span>${escE(t.headlinePost)}</div>
 <div style="padding-top:12px;font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#aeb8c4;">${escE(t.bodyPre)}<strong style="color:#ffffff;">${escE(p.providerName)}</strong>${escE(t.bodyPost)}</div>
-<div style="padding-top:24px;"><a href="${url}" style="display:block;background-color:#d4af37;border-radius:12px;padding:14px 24px;text-align:center;font-family:Helvetica,Arial,sans-serif;font-size:15px;font-weight:bold;color:#101411;text-decoration:none;">${escE(t.cta)} &rarr;</a></div>
+<div style="padding-top:24px;"><a href="${url}" style="display:block;background-color:#C5913B;border-radius:12px;padding:14px 24px;text-align:center;font-family:Helvetica,Arial,sans-serif;font-size:15px;font-weight:bold;color:#101411;text-decoration:none;">${escE(t.cta)} &rarr;</a></div>
 <div style="margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.08);font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#77828f;">&#128274;&nbsp; ${escE(t.footOncePre)}<strong style="color:#aeb8c4;">${escE(t.footOnceStrong)}</strong>${escE(t.footOncePost)}<br/>${escE(t.footNotYou)}</div>
 </td></tr>
 </table></td></tr></table>`;
