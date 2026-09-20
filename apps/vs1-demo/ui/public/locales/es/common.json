@@ -591,7 +591,7 @@
       "description": "Navegar la constitución internacional de empresas, elegir la forma jurídica correcta, establecer sustancia local y gestionar los registros corporativos en nuevas jurisdicciones.",
       "affected": "Personas o empresas que planean registrar entidades legales, expandir equipos o establecer presencia corporativa en mercados extranjeros.",
       "personaFit": "Ideal para: equipos de expansión internacional",
-      "cov1": "Asistente Corporativo y de Estructura — evalúa el estado actual, mercados deseados, complejidad del equipo",
+      "cov1": "Asistente de Constitución y Presentaciones — evalúa el estado actual, mercados deseados, complejidad del equipo",
       "cov2": "Necesidad de entidad por mercado – determina si su configuración requiere una sociedad propia",
       "cov3": "Enrutamiento inteligente a rutas de guías educativas para fundadores indecisos",
       "fines": {
@@ -693,12 +693,12 @@
       "askPlaceholder": "P. ej.: ¿Necesito un número EORI para importar desde Turquía?"
     },
     "legal-advisory": {
-      "title": "Asesoría Jurídica",
+      "title": "Apoyo jurídico",
       "headline": "Condiciones de consumo, contratos mercantiles y ley aplicable",
       "description": "La capa contractual de una venta transfronteriza: deberes de información al consumidor, condiciones que resisten en el mercado de destino y qué ley rige el acuerdo.",
       "affected": "Empresas que venden en mercados con derecho de consumo distinto al propio, y quienes contratan con proveedores o socios en otras jurisdicciones.",
       "personaFit": "Ideal para: venta transfronteriza y alianzas",
-      "cov1": "Asistente de Asesoría Jurídica — identifica qué documentos contractuales exige su configuración",
+      "cov1": "Asistente de Apoyo Jurídico — identifica qué documentos contractuales exige su configuración",
       "cov2": "Señala dónde el derecho de consumo del destino desplaza sus condiciones estándar",
       "cov3": "Enrutamiento a abogados colegiados en la jurisdicción pertinente — CompliHub360 no presta asesoramiento jurídico",
       "fines": {
@@ -1506,7 +1506,7 @@
     "specialist": {
       "kicker": "Lo que cuesta el especialista",
       "title": "Los honorarios del especialista — presupuestados antes de que usted se comprometa.",
-      "body": "El asesoramiento en sí no es gratuito, y no vamos a fingir lo contrario. Cada Verified Partner publica una estimación fija antes de que usted acepte el encargo, de modo que nunca tendrá que aguantar una llamada exploratoria solo para conocer el precio."
+      "body": "El asesoramiento en sí no es gratuito, y no vamos a fingir lo contrario. Cada Verified Provider publica una estimación fija antes de que usted acepte el encargo, de modo que nunca tendrá que aguantar una llamada exploratoria solo para conocer el precio."
     },
     "cta": {
       "title": "Empiece donde tenga sentido para usted.",
@@ -1519,7 +1519,7 @@
       "feePaidBy": "la asume el partner",
       "match": "{{pct}} % match",
       "noSlot": "Ningún puesto en venta",
-      "verified": "Verified Partner",
+      "verified": "Verified Provider",
       "rangeLabel": "Estimación de honorarios",
       "range": "180–240 €",
       "perHour": "/ hora",
@@ -1554,7 +1554,7 @@
         },
         {
           "q": "¿Cuánto cuesta el asesoramiento del especialista?",
-          "a": "Los honorarios los fija el especialista: cada Verified Partner publica una estimación fija antes de que usted acepte el encargo — sin una primera llamada solo para conocer el precio."
+          "a": "Los honorarios los fija el especialista: cada Verified Provider publica una estimación fija antes de que usted acepte el encargo — sin una primera llamada solo para conocer el precio."
         },
         {
           "q": "¿Ve el especialista mis datos antes de la reserva?",

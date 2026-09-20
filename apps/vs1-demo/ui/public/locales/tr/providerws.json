@@ -113,7 +113,7 @@
     "factorReplyQualityNote": "müşteri tarafından onaylanan görevler",
     "factorCoverageFit": "Kapsam uyumu (pazarlar · diller)",
     "factorCoverageFitNote": "2 pazar · 3 dil",
-    "factorVerifiedStanding": "Verified Partner statüsü",
+    "factorVerifiedStanding": "Verified Provider statüsü",
     "factorVerifiedStandingNote": "aktif · otomatik yenilenir"
   },
   "helpDrawer": {
@@ -542,10 +542,10 @@
       "productPackaging": "EPR ve Ambalaj",
       "dataPrivacy": "Veri ve Gizlilik",
       "marketingSeo": "Pazarlama",
-      "corporateStructure": "Şirket ve Yapı",
+      "corporateStructure": "Şirket Kuruluşu ve Bildirimler",
       "productCompliance": "Ürün Uyumu",
       "logisticsCustoms": "Lojistik ve Gümrük",
-      "legalAdvisory": "Hukuki Danışmanlık"
+      "legalAdvisory": "Hukuki destek"
     },
     "banner": {
       "text": "Profil %{{pct}} tamam — eksik profiller sıralamada daha aşağıda yer alır.",

@@ -17,7 +17,7 @@ const MAIL_FROM = process.env.MAIL_FROM || 'CompliHub360 <onboarding@resend.dev>
 // ─── i18n ─────────────────────────────────────────────────────────────────────
 // Transactional-mail copy in the four product languages (EN/DE/ES/TR), mirroring
 // the app's i18next locales. Conventions: DE = Sie, ES = usted, TR = siz;
-// product terms (CompliHub360, Verified Partner, Magic-Link) stay untranslated.
+// product terms (CompliHub360, Verified Provider, Magic-Link) stay untranslated.
 // Unknown / missing locales fall back to 'en'.
 
 type MailLocale = 'en' | 'de' | 'es' | 'tr';

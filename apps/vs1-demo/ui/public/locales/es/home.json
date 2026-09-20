@@ -84,7 +84,7 @@
       "line2": "Simplificado."
     },
     "lead": "Entienda sus obligaciones. Encuentre a los especialistas adecuados. Manténgase conforme — allí donde venda.",
-    "ctaRiskMap": "Iniciar el Risk Map",
+    "ctaRiskMap": "Evaluar mis necesidades",
     "ask": {
       "placeholder": "Describa su caso",
       "send": "Enviar"
@@ -261,7 +261,7 @@
         "desc": "Consentimiento, cookies, normas publicitarias"
       },
       "corporate": {
-        "title": "Sociedad y estructura",
+        "title": "Constitución y presentaciones",
         "desc": "Entidades, establecimiento permanente, declaraciones"
       },
       "productCompliance": {
@@ -273,7 +273,7 @@
         "desc": "EORI, códigos HS, Intrastat, aduanas"
       },
       "legalAdvisory": {
-        "title": "Asesoría legal",
+        "title": "Apoyo jurídico",
         "desc": "Contratos, condiciones, derecho del consumidor"
       },
       "environment": {
@@ -304,7 +304,7 @@
     "header": "Mercados",
     "title": "Otros mercados",
     "count": "{{selected}} seleccionados · {{total}} disponibles",
-    "desc": "Fuera de la selección principal. Elija los mercados en los que opera: mapeamos su normativa y le derivamos al Verified Partner adecuado.",
+    "desc": "Fuera de la selección principal. Elija los mercados en los que opera: mapeamos su normativa y le derivamos al Verified Provider adecuado.",
     "searchPlaceholder": "Buscar por nombre o código de país",
     "european": "Mercados europeos",
     "expanding": "Cobertura en expansión",
@@ -519,10 +519,10 @@
     "saveProgress": {
       "eyebrow": "Cuenta gratuita",
       "title": "Guarde su progreso",
-      "desc": "Conserve su Risk Map y haga match con Verified Partners — gratis, sin tarjeta de crédito. Los avisos por cambios normativos están en preparación. Le enviaremos un Magic-Link por correo, así no hay contraseña que recordar.",
+      "desc": "Conserve su Risk Map y haga match con Verified Providers — gratis, sin tarjeta de crédito. Los avisos por cambios normativos están en preparación. Le enviaremos un Magic-Link por correo, así no hay contraseña que recordar.",
       "benefits": [
         "Su dossier de Risk Map guardado",
-        "Matching con Verified Partners",
+        "Matching con Verified Providers",
         "Avisos cuando la normativa cambia — en preparación"
       ],
       "confirm": "Su progreso está a salvo.",
@@ -531,10 +531,10 @@
     "freeAccount": {
       "eyebrow": "Cuenta gratuita",
       "title": "Su Risk Map y sus matches, gratis",
-      "desc": "Conserve su Risk Map y haga match con Verified Partners en sus mercados. Gratis, sin tarjeta de crédito. Los avisos regulatorios están en preparación y llegarán a su cuenta cuando estén disponibles. Le enviaremos un Magic-Link por correo; no hay contraseña.",
+      "desc": "Conserve su Risk Map y haga match con Verified Providers en sus mercados. Gratis, sin tarjeta de crédito. Los avisos regulatorios están en preparación y llegarán a su cuenta cuando estén disponibles. Le enviaremos un Magic-Link por correo; no hay contraseña.",
       "benefits": [
         "Su dossier de Risk Map guardado",
-        "Matching con Verified Partners",
+        "Matching con Verified Providers",
         "Avisos regulatorios — en preparación"
       ],
       "confirm": "Haga clic en el enlace para terminar de configurar su cuenta gratuita.",
@@ -648,7 +648,7 @@
       },
       {
         "value": "3",
-        "label": "Verified Partners listos"
+        "label": "Verified Providers listos"
       }
     ],
     "rows": [
@@ -709,7 +709,7 @@
         "dueSub": "continuo"
       }
     ],
-    "partnersEyebrow": "3 Verified Partners con match",
+    "partnersEyebrow": "3 Verified Providers con match",
     "partnersTitle": "Hemos encontrado quién puede actuar sobre esto.",
     "unlock": "Desbloquee los matches con una cuenta gratuita",
     "save": {
@@ -732,7 +732,7 @@
       },
       {
         "value": "3",
-        "label": "Verified Partners"
+        "label": "Verified Providers"
       }
     ]
   },
@@ -842,7 +842,7 @@
     "row2": [
       {
         "title": "Verificados por nosotros, no autoinscritos",
-        "desc": "Cada Verified Partner se evalúa por cobertura, tiempo de respuesta y resultados reales acreditados — no es un directorio."
+        "desc": "Cada Verified Provider se evalúa por cobertura, tiempo de respuesta y resultados reales acreditados — no es un directorio."
       },
       {
         "title": "Responsabilidad compartida de serie",
@@ -940,7 +940,7 @@
         ]
       },
       {
-        "title": "Sociedad y estructura",
+        "title": "Constitución y presentaciones",
         "markets": "DE · AT · CH",
         "desc": "Saber dónde su estructura genera obligaciones: establecimiento permanente, presentaciones, titulares reales.",
         "intro": "Obligaciones a nivel de entidad en la región DACH. Las cuentas anuales, la transparencia de titulares reales y los contratos intragrupo tienen sus propios plazos y sanciones.",
@@ -997,10 +997,10 @@
         ]
       },
       {
-        "title": "Asesoría legal",
+        "title": "Apoyo jurídico",
         "markets": "TODA LA UE",
         "desc": "Saber cuándo una cuestión necesita de verdad a un abogado, y llegar a uno que ya conoce su caso.",
-        "intro": "Las cuestiones que necesitan una respuesta cualificada y no una lista de comprobación: contratos, condiciones, derechos del consumidor, litigios. CompliHub360 no es un despacho — los Verified Partners asesoran bajo su propia responsabilidad profesional, y nos ocupamos de que quien le atienda ya conozca su caso.",
+        "intro": "Las cuestiones que necesitan una respuesta cualificada y no una lista de comprobación: contratos, condiciones, derechos del consumidor, litigios. CompliHub360 no es un despacho — los Verified Providers asesoran bajo su propia responsabilidad profesional, y nos ocupamos de que quien le atienda ya conozca su caso.",
         "cover": [
           "Condiciones y deberes de información al consumidor",
           "Contratos con proveedores y plataformas",
@@ -1029,7 +1029,7 @@
     "cards": [
       {
         "title": "El coste, antes de comprometerse.",
-        "desc": "Cada Verified Partner publica una estimación fija antes de que usted acepte el encargo. Sin discovery calls solo para saber cuánto cuesta algo."
+        "desc": "Cada Verified Provider publica una estimación fija antes de que usted acepte el encargo. Sin discovery calls solo para saber cuánto cuesta algo."
       },
       {
         "title": "La respuesta, con el reloj en marcha.",
@@ -1094,9 +1094,9 @@
         "desc": "El stepper dorado del asistente marca dónde está usted sin abrumar. El camino hacia delante siempre tiene el ancho de una sola decisión."
       },
       {
-        "label": "Marca — Verified Partner",
+        "label": "Marca — Verified Provider",
         "title": "Una señal discreta de responsabilidad.",
-        "desc": "Los Verified Partners son asesores evaluados que aceptan una responsabilidad compartida por su asunto. La marca dorada es contención, no promoción."
+        "desc": "Los Verified Providers son asesores evaluados que aceptan una responsabilidad compartida por su asunto. La marca dorada es contención, no promoción."
       }
     ],
     "demo": {
@@ -1127,7 +1127,7 @@
         "value": "2"
       },
       {
-        "label": "Verified Partners con match",
+        "label": "Verified Providers con match",
         "value": "3"
       },
       {
@@ -1198,19 +1198,19 @@
         "items": [
           {
             "q": "¿Me están dando asesoramiento jurídico?",
-            "a": "No. CompliHub360 mapea obligaciones y muestra lo que probablemente aplica a su operación — no es asesoramiento jurídico. Cuando un asunto requiere una opinión vinculante, le conectamos con un Verified Partner que puede darla."
+            "a": "No. CompliHub360 mapea obligaciones y muestra lo que probablemente aplica a su operación — no es asesoramiento jurídico. Cuando un asunto requiere una opinión vinculante, le conectamos con un Verified Provider que puede darla."
           },
           {
-            "q": "¿Cómo se verifica a los Verified Partners?",
+            "q": "¿Cómo se verifica a los Verified Providers?",
             "a": "Nosotros evaluamos a cada partner por cobertura de áreas, tiempo de respuesta y resultados reales acreditados — no es un directorio de autoinscripción. Cada encargo es contractual, con responsabilidad compartida por el asunto."
           },
           {
             "q": "¿Cuánto cuesta un encargo?",
-            "a": "Cada Verified Partner publica una estimación fija antes de que usted acepte — sin discovery calls solo para conocer el precio. Ve el rango y el alcance por adelantado y los aprueba antes de que empiece cualquier trabajo."
+            "a": "Cada Verified Provider publica una estimación fija antes de que usted acepte — sin discovery calls solo para conocer el precio. Ve el rango y el alcance por adelantado y los aprueba antes de que empiece cualquier trabajo."
           },
           {
             "q": "¿Con qué rapidez responde un partner?",
-            "a": "24–48 horas hasta la primera respuesta, acordado por contrato. Si se retrasa, derivamos su solicitud automáticamente al siguiente Verified Partner disponible."
+            "a": "24–48 horas hasta la primera respuesta, acordado por contrato. Si se retrasa, derivamos su solicitud automáticamente al siguiente Verified Provider disponible."
           },
           {
             "q": "¿Estoy vinculado a un partner?",
@@ -1287,10 +1287,10 @@
           "productPackaging": "EPR y envases",
           "dataPrivacy": "Datos y privacidad",
           "marketingSeo": "Compliance de marketing",
-          "corporateStructure": "Sociedad y estructura",
+          "corporateStructure": "Constitución y presentaciones",
           "productCompliance": "Conformidad de producto",
           "logisticsCustoms": "Logística y aduanas",
-          "legalAdvisory": "Asesoría legal"
+          "legalAdvisory": "Apoyo jurídico"
         }
       },
       "markets": {
@@ -1323,7 +1323,7 @@
       "list": "Alemania · Reino Unido · Países Bajos · Francia · Italia · España",
       "post": ". Más países se incorporarán a lo largo de 2026."
     },
-    "disclaimer": "CompliHub360 es una plataforma de orquestación — no un despacho de abogados. El asesoramiento jurídico, fiscal y regulatorio lo prestan Verified Partners bajo su propia responsabilidad profesional. No prestamos Rechtsberatung en el sentido de los §§ RDG / StBerG.",
+    "disclaimer": "CompliHub360 es una plataforma de orquestación — no un despacho de abogados. El asesoramiento jurídico, fiscal y regulatorio lo prestan Verified Providers bajo su propia responsabilidad profesional. No prestamos Rechtsberatung en el sentido de los §§ RDG / StBerG.",
     "copyright": "© 2026 CompliHub360.",
     "legal": {
       "privacy": "Política de privacidad",

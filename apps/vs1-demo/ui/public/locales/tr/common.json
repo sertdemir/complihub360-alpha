@@ -591,7 +591,7 @@
       "description": "Uluslararası şirket kuruluşunda yol alma, doğru hukuki formu seçme, yerel alt yapı oluşturma ve yeni yargı bölgelerinde kurumsal kayıtları yönetme.",
       "affected": "Yabancı pazarlarda hukuki kuruluşlar kaydetmeyi, ekipleri genişletmeyi veya kurumsal varlık oluşturmayı planlayan bireyler veya şirketler.",
       "personaFit": "En uygun: Uluslararası büyüme ekipleri",
-      "cov1": "Kurumsal ve Yapı Asistanı — mevcut durumu, istenen pazarları, ekip karmaşıklığını değerlendirir",
+      "cov1": "Şirket Kuruluşu ve Bildirimler Asistanı — mevcut durumu, istenen pazarları, ekip karmaşıklığını değerlendirir",
       "cov2": "Pazar başına şirket ihtiyacı – kurulumunuzun kendi şirketini gerektirip gerektirmediğini belirler",
       "cov3": "Belirsiz kurucular için eğitim rehberi yollarına akıllı yönlendirme",
       "fines": {
@@ -693,12 +693,12 @@
       "askPlaceholder": "Örn.: Türkiye’den ithalat için EORI numarası gerekir mi?"
     },
     "legal-advisory": {
-      "title": "Hukuki Danışmanlık",
+      "title": "Hukuki Destek",
       "headline": "Tüketici koşulları, ticari sözleşmeler ve uygulanacak hukuk",
       "description": "Sınır ötesi satışın sözleşme katmanı: tüketiciyi bilgilendirme yükümlülükleri, hedef pazarda geçerli olan koşullar ve anlaşmaya hangi hukukun uygulanacağı.",
       "affected": "Kendi hukukundan farklı tüketici mevzuatına sahip pazarlara satış yapan işletmeler ve farklı yargı bölgelerindeki tedarikçi veya ortaklarla sözleşme yapan herkes.",
       "personaFit": "En uygun: Sınır ötesi satış ve ortaklıklar",
-      "cov1": "Hukuki Danışmanlık Asistanı — kurulumunuzun hangi sözleşme belgelerini gerektirdiğini belirler",
+      "cov1": "Hukuki Destek Asistanı — kurulumunuzun hangi sözleşme belgelerini gerektirdiğini belirler",
       "cov2": "Hedef pazar tüketici hukukunun standart koşullarınızı nerede geçersiz kıldığını gösterir",
       "cov3": "İlgili yargı bölgesindeki yetkili avukatlara yönlendirir — CompliHub360 hukuki danışmanlık vermez",
       "fines": {
@@ -1506,7 +1506,7 @@
     "specialist": {
       "kicker": "Uzmanın ücreti",
       "title": "Kendi ücreti — siz karar vermeden önce belirtilir.",
-      "body": "Danışmanlığın kendisi ücretsiz değildir; bunun aksini de iddia etmeyeceğiz. Her Verified Partner, işi kabul etmenizden önce sabit bir fiyat tahmini yayımlar; böylece yalnızca fiyatı öğrenmek için bir ön görüşmeye katlanmak zorunda kalmazsınız."
+      "body": "Danışmanlığın kendisi ücretsiz değildir; bunun aksini de iddia etmeyeceğiz. Her Verified Provider, işi kabul etmenizden önce sabit bir fiyat tahmini yayımlar; böylece yalnızca fiyatı öğrenmek için bir ön görüşmeye katlanmak zorunda kalmazsınız."
     },
     "cta": {
       "title": "Sizin için anlamlı olan yerden başlayın.",
@@ -1519,7 +1519,7 @@
       "feePaidBy": "partner karşılar",
       "match": "%{{pct}} eşleşme",
       "noSlot": "Satılık sıra yok",
-      "verified": "Verified Partner",
+      "verified": "Verified Provider",
       "rangeLabel": "Ücret tahmini",
       "range": "180–240 €",
       "perHour": "/ saat",
@@ -1554,7 +1554,7 @@
         },
         {
           "q": "Uzmanın danışmanlığı ne kadar tutar?",
-          "a": "Ücreti uzman belirler: Her Verified Partner, siz görevi kabul etmeden önce sabit bir tahmin yayımlar — fiyatı öğrenmek için bir ilk görüşmeye katlanmazsınız."
+          "a": "Ücreti uzman belirler: Her Verified Provider, siz görevi kabul etmeden önce sabit bir tahmin yayımlar — fiyatı öğrenmek için bir ilk görüşmeye katlanmazsınız."
         },
         {
           "q": "Uzman, rezervasyondan önce bilgilerimi görür mü?",

@@ -29,10 +29,10 @@
     "productPackaging": "EPR & Verpackung",
     "dataPrivacy": "Daten & Datenschutz",
     "marketingSeo": "Marketing-Compliance",
-    "corporateStructure": "Unternehmen & Struktur",
+    "corporateStructure": "Gründung & Meldungen",
     "productCompliance": "Produkt-Compliance",
     "logisticsCustoms": "Logistik & Zoll",
-    "legalAdvisory": "Rechtsberatung",
+    "legalAdvisory": "Rechtliche Unterstützung",
     "environment": "Umwelt-Compliance"
   },
   "shell": {
@@ -119,9 +119,9 @@
       "product-compliance": "Produkt-Compliance",
       "data-privacy": "Daten & Datenschutz",
       "marketing-seo": "Marketing",
-      "corporate-structure": "Unternehmen",
+      "corporate-structure": "Gründung",
       "logistics-customs": "Logistik & Zoll",
-      "legal-advisory": "Rechtsberatung"
+      "legal-advisory": "Rechtliche Unterstützung"
     },
     "emptyStep1Title": "Beschreiben",
     "emptyStep1Body": "Vier Fragen zu Land, Märkten und Sortiment.",
@@ -565,7 +565,7 @@
     "close": "Assistent schließen",
     "thinking": "Prüfe die Wissensbasis…",
     "sources": "Quellen",
-    "disclaimer": "Allgemeine regulatorische Information, keine Rechts- oder Steuerberatung. Für eine verbindliche Einschätzung beauftragen Sie einen Verified Partner.",
+    "disclaimer": "Allgemeine regulatorische Information, keine Rechts- oder Steuerberatung. Für eine verbindliche Einschätzung beauftragen Sie einen Verified Provider.",
     "error": "Das hat nicht geklappt — bitte versuchen Sie es gleich erneut.",
     "notConfigured": "Der Assistent ist in dieser Umgebung noch nicht angebunden.",
     "quota": "Tageslimit erreicht — der Upgrade-Plan kommt in Kürze.",

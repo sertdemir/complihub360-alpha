@@ -54,7 +54,7 @@ export function EntryDoor() {
   const { locale = 'en' } = useParams();
   const [started, setStarted] = useState(false);
 
-  // Petrol statt Gold. Gold bedeutet in Compass ausschliesslich Verified Partner
+  // Petrol statt Gold. Gold bedeutet in Compass ausschliesslich Verified Provider
   // und Monetarisierung — hier trug es den KOSTENLOSEN Einstieg, auf dem groessten
   // Einzelfarbfeld der Seite (1440x1071 px, 6,7 % der Landingpage). bg-brand-surface
   // ist der Vertrauensanker und bleibt in beiden Themes tiefes Petrol, der weisse

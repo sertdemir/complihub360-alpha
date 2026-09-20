@@ -7,7 +7,7 @@ import type { AnonProvider } from '../../api/search';
 // EINE Darstellung fuer Anbieter im Arbeitsbereich (Nutzer-Vorgabe
 // 2026-09-13): Sitzungsseite (Canvas G9, gestapelt in der rechten Spalte)
 // und Bereichsseite (5D) zeigen dieselbe Karte — Match-Zahl im Kasten,
-// „Verified Partner"-Marke, Pseudonym, Region · aktiv seit, Antwortzeit ·
+// „Verified Provider"-Marke, Pseudonym, Region · aktiv seit, Antwortzeit ·
 // Abrechnung, darunter die Match-Basis als Haken-Liste und GENAU EIN Knopf:
 // „Details ansehen". Keine Anfrage von der Karte aus — eine Anfrage braucht
 // den ausgewaehlten Anbieter, der Weg geht ueber die Detailseite.

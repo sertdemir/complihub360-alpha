@@ -29,15 +29,15 @@
     "productPackaging": "EPR & Packaging",
     "dataPrivacy": "Data & Privacy",
     "marketingSeo": "Marketing Compliance",
-    "corporateStructure": "Corporate & Structure",
+    "corporateStructure": "Company Setup & Filings",
     "productCompliance": "Product Compliance",
     "logisticsCustoms": "Logistics & Customs",
-    "legalAdvisory": "Legal Advisory",
+    "legalAdvisory": "Legal Support",
     "environment": "Environmental Compliance"
   },
   "shell": {
     "groupWorkspace": "Workspace",
-    "groupDomains": "Domains",
+    "groupDomains": "Areas",
     "groupLibrary": "Library",
     "groupSaved": "Saved",
     "groupMonitoring": "Monitoring",
@@ -119,9 +119,9 @@
       "product-compliance": "Product compliance",
       "data-privacy": "Data & privacy",
       "marketing-seo": "Marketing",
-      "corporate-structure": "Corporate",
+      "corporate-structure": "Company setup",
       "logistics-customs": "Logistics & customs",
-      "legal-advisory": "Legal advisory"
+      "legal-advisory": "Legal support"
     },
     "emptyStep1Title": "Describe",
     "emptyStep1Body": "Four questions on country, markets and range.",

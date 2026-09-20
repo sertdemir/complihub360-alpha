@@ -177,7 +177,7 @@ export const STATS = [
   // Tageszahl statt fertigem String: die Einheit gehoert in die Sprachdatei,
   // sonst steht "14 days" im deutschen UI (DNA-Addendum V2, P1).
   { value: '14', days: 14, label: 'median deadline' },
-  { value: '3', label: 'Verified Partners ready' },
+  { value: '3', label: 'Verified Providers ready' },
 ];
 
 const MATCHES = ['100%', '87%', '73%'];
@@ -381,7 +381,7 @@ export function ResultsRiskMap() {
       { value: String(rows.length), label: 'obligations identified' },
       { value: String(soon), label: `with a deadline in ${SOON_DAYS} days` },
       { value: median != null ? String(median) : '', days: median ?? undefined, label: 'median deadline' },
-      { value: String(anonProviders.length), label: 'Verified Partners ready' },
+      { value: String(anonProviders.length), label: 'Verified Providers ready' },
     ];
   })();
 
