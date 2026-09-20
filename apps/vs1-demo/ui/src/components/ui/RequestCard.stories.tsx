@@ -22,7 +22,7 @@ export const Default: Story = {
     tag: 'DE · EPR',
     meta: 'D2C · €4.2M revenue · target launch Q3 · sells furniture cross-border via own webshop + Amazon DE/AT marketplaces',
     slaValue: '23h 48m',
-    action: <Button variant="accent" size="sm">Open · confirm</Button>,
+    action: <Button variant="primary" size="sm">Open · confirm</Button>,
   },
 };
 
@@ -36,7 +36,7 @@ export const StatesDark: Story = {
         company="Möbel-Berater Müller GmbH" tag="DE · EPR"
         meta="D2C · €4.2M revenue · target launch Q3 · sells furniture cross-border via own webshop + Amazon DE/AT marketplaces"
         slaValue="23h 48m"
-        action={<Button variant="accent" size="sm">Open · confirm</Button>}
+        action={<Button variant="primary" size="sm">Open · confirm</Button>}
       />
       <RequestCard
         idLine="RQ-0228 · Yesterday" status="awaiting-reply"

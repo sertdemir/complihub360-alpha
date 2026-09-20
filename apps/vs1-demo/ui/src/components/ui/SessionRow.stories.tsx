@@ -18,7 +18,7 @@ export const Default: Story = {
     country: 'IT', domain: 'Tax & VAT', status: 'Needs refresh',
     updated: '· Updated 2h ago', title: 'VAT registration · Italy',
     riskLine: '● High risk · threshold reached · 1 markets', risk: 'high',
-    onMenu: () => {}, action: <Button variant="accent" size="sm">Open</Button>,
+    onMenu: () => {}, action: <Button variant="primary" size="sm">Open</Button>,
   },
 };
 
@@ -29,13 +29,13 @@ export const ListDark: Story = {
     <div className="dark min-h-screen space-y-2.5 bg-[#1F2937] p-8">
       <SessionRow country="IT" domain="Tax & VAT" status="Needs refresh" updated="· Updated 2h ago"
         title="VAT registration · Italy" riskLine="● High risk · threshold reached · 1 markets" risk="high"
-        onMenu={() => {}} action={<Button variant="accent" size="sm">Open</Button>} />
+        onMenu={() => {}} action={<Button variant="primary" size="sm">Open</Button>} />
       <SessionRow country="FR" domain="EPR & Packaging" updated="· Updated 1d ago"
         title="EPR registration · France" riskLine="● Medium risk · deadline Q3 2026 · 1 markets" risk="medium"
-        onMenu={() => {}} action={<Button variant="accent" size="sm">Open</Button>} />
+        onMenu={() => {}} action={<Button variant="primary" size="sm">Open</Button>} />
       <SessionRow country="ES" domain="Tax & VAT" updated="· Updated 7d ago"
         title="VAT thresholds · Spain" riskLine="● Low risk · monitoring only · 1 markets" risk="low"
-        onMenu={() => {}} action={<Button variant="accent" size="sm">Open</Button>} />
+        onMenu={() => {}} action={<Button variant="primary" size="sm">Open</Button>} />
     </div>
   ),
 };

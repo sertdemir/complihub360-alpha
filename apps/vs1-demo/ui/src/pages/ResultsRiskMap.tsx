@@ -520,7 +520,7 @@ export function ResultsRiskMap() {
               <Lock size={13} /> {t('topbar.guestBadge')}
             </span>
             <Button
-              variant="accent"
+              variant="primary"
               size="md"
               shape="soft"
               type="button"
@@ -676,12 +676,12 @@ export function ResultsRiskMap() {
             {t('cta.body')}
           </p>
           <Button
-            variant="accent"
+            variant="primary"
             size="xl"
             shape="soft"
             type="button"
             onClick={() => setSaveOpen(true)}
-            className="mt-8 text-primary-950 shadow-[0_18px_34px_-14px_rgba(212,175,55,0.6)] transition-transform duration-200 hover:-translate-y-0.5"
+            className="mt-8 shadow-[0_18px_34px_-14px_rgba(0,77,64,0.55)] transition-transform duration-200 hover:-translate-y-0.5"
           >
             {t('cta.button')} <ArrowRight size={17} />
           </Button>

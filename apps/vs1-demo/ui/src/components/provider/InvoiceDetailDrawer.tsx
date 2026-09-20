@@ -46,7 +46,7 @@ export function InvoiceDetailDrawer({ invoice, onClose }: { invoice: Invoice | n
                 <Button variant="secondary" size="sm">{t('invoiceDetail.downloadPdf')}</Button>
               </a>
               <a href={invoice.hosted_invoice_url} target="_blank" rel="noreferrer">
-                <Button variant="accent" size="sm">
+                <Button variant="primary" size="sm">
                   {invoice.status === 'open' ? t('invoiceDetail.payAtStripe') : t('invoiceDetail.viewAtStripe')}
                 </Button>
               </a>

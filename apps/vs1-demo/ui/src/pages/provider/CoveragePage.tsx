@@ -120,7 +120,7 @@ export function CoveragePage() {
         <Banner
           status="accent"
           title={t('coverage.expansionBannerTitle')}
-          action={<Button size="sm" variant="accent">{t('coverage.exploreExpansion')}</Button>}
+          action={<Button size="sm" variant="primary">{t('coverage.exploreExpansion')}</Button>}
         >
           {t('coverage.expansionBannerBody')}
         </Banner>

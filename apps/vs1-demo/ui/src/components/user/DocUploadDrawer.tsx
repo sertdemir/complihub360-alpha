@@ -91,7 +91,7 @@ export function DocUploadDrawer({ open, onClose, domainLabel }: DocUploadDrawerP
         ) : (
           <div className="flex w-full items-center justify-end gap-2">
             <Button variant="ghost" size="sm" onClick={() => { reset(); onClose(); }}>{t('shared.cancel')}</Button>
-            <Button variant="accent" size="sm" onClick={submit} disabled={busy || text.trim().length < 5}>
+            <Button variant="primary" size="sm" onClick={submit} disabled={busy || text.trim().length < 5}>
               {busy ? t('docUpload.sanitizing') : t('docUpload.uploadSanitize')}
             </Button>
           </div>

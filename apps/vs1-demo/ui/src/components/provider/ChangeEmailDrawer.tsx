@@ -55,7 +55,7 @@ export function ChangeEmailDrawer({ open, currentEmail, onClose }: ChangeEmailDr
         ) : (
           <div className="flex w-full items-center justify-end gap-2">
             <Button variant="ghost" size="sm" onClick={onClose}>{t('changeEmail.cancel')}</Button>
-            <Button variant="accent" size="sm" onClick={submit} disabled={!valid || busy}>
+            <Button variant="primary" size="sm" onClick={submit} disabled={!valid || busy}>
               {busy ? '…' : t('changeEmail.sendVerification')}
             </Button>
           </div>

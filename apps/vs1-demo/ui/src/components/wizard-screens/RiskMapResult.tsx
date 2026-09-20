@@ -132,7 +132,7 @@ export function RiskMapResult() {
           <span className="flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wide text-fg-tertiary">
             <Lock size={13} /> Guest map · expires in 30 min
           </span>
-          <Button className="bg-accent-500 text-fg-on-accent hover:bg-accent-600">
+          <Button>
             Save this map <ArrowRight size={14} className="ml-1.5" />
           </Button>
         </>
@@ -226,7 +226,7 @@ export function RiskMapResult() {
           Free account. No credit card. Founding-member access through Beta launch.
         </p>
         <div className="mt-6 flex justify-center">
-          <Button className="bg-accent-500 text-fg-on-accent hover:bg-accent-600">
+          <Button>
             Create free account <ArrowRight size={16} className="ml-1.5" />
           </Button>
         </div>

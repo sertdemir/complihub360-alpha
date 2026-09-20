@@ -291,7 +291,7 @@ export function TerminePage() {
         {r.status === 'completed' && (
           reviewed.has(r.id)
             ? <span className="text-[12px] text-fg-brand">{t('termine.reviewed')}</span>
-            : <Button variant="accent" size="sm" onClick={() => setReviewFor({ bookingId: r.id, providerKey: r.providerKey, providerName: r.provider })}>{t('termine.review')}</Button>
+            : <Button variant="primary" size="sm" onClick={() => setReviewFor({ bookingId: r.id, providerKey: r.providerKey, providerName: r.provider })}>{t('termine.review')}</Button>
         )}
         {r.status === 'no_show' && (
           <span className="max-w-[260px] text-right text-[12px] text-fg-tertiary">{t('termine.noShowNote')}</span>
@@ -360,7 +360,7 @@ export function TerminePage() {
         {r.status === 'completed' && (
           reviewed.has(r.id)
             ? <span className="text-[12px] text-fg-brand">{t('termine.reviewed')}</span>
-            : <Button variant="accent" size="sm" onClick={() => setReviewFor({ bookingId: r.id, providerKey: r.providerKey, providerName: r.provider })}>{t('termine.review')}</Button>
+            : <Button variant="primary" size="sm" onClick={() => setReviewFor({ bookingId: r.id, providerKey: r.providerKey, providerName: r.provider })}>{t('termine.review')}</Button>
         )}
         {r.status === 'no_show' && (
           <span className="text-[12px] text-fg-tertiary">{t('termine.noShowNote')}</span>

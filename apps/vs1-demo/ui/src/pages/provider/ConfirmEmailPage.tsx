@@ -50,7 +50,7 @@ export function ConfirmEmailPage() {
             <p className="mt-2 text-[13px] leading-relaxed text-fg-secondary">
               {t('confirmEmail.doneBody', { email })}
             </p>
-            <Link to={`/${locale}/partner-dashboard/settings`} className="mt-6 inline-block rounded-xl bg-brand-accent px-6 py-3 text-[14px] font-bold text-fg-on-accent">
+            <Link to={`/${locale}/partner-dashboard/settings`} className="mt-6 inline-block rounded-xl bg-brand px-6 py-3 text-[14px] font-bold text-fg-on-brand">
               {t('confirmEmail.backToSettings')}
             </Link>
           </>

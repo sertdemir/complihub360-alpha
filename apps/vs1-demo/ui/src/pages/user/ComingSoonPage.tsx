@@ -34,7 +34,7 @@ export function ComingSoonPage({ page }: { page: 'alerts' | 'calendar' | 'librar
         <Banner
           status="accent"
           title={t('comingSoon.bannerTitle', { title: t(`${k}.panelTitle`) })}
-          action={<Button size="sm" variant="accent">{t('comingSoon.joinEarlyAccess')}</Button>}
+          action={<Button size="sm" variant="primary">{t('comingSoon.joinEarlyAccess')}</Button>}
         >
           {t(`${k}.panelSub`)}
         </Banner>
@@ -46,7 +46,7 @@ export function ComingSoonPage({ page }: { page: 'alerts' | 'calendar' | 'librar
             <h2 className="mt-1 text-[18px] font-semibold text-fg">{t(`${k}.panelTitle`)}</h2>
             <p className="mt-1.5 text-[12px] leading-relaxed text-fg-secondary">{t(`${k}.panelSub`)}</p>
             <div className="mt-4 flex justify-center">
-              <Button size="sm" variant="accent">{t('comingSoon.joinEarlyAccess')}</Button>
+              <Button size="sm" variant="primary">{t('comingSoon.joinEarlyAccess')}</Button>
             </div>
             <ul className="mx-auto mt-5 max-w-[280px] space-y-1.5 text-left">
               {features.map((f) => (

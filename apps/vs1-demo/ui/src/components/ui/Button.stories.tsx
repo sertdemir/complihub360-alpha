@@ -106,7 +106,7 @@ export const Variants: Story = {
       <Button variant="success">Success</Button>
       <Button variant="danger">Error</Button>
       <Button variant="info">Info</Button>
-      <Button variant="accent">View ranking impact</Button>
+      <Button variant="primary">View ranking impact</Button>
     </div>
   ),
 };
@@ -142,7 +142,7 @@ export const DarkVariants: Story = {
       <Button variant="success">Success</Button>
       <Button variant="danger">Error</Button>
       <Button variant="info">Info</Button>
-      <Button variant="accent">Explore expansion</Button>
+      <Button variant="primary">Explore expansion</Button>
       <Button loading>Saving…</Button>
       <Button iconLeft={<Plus size={16} />}>Add</Button>
       <Button iconOnly aria-label="Settings"><Settings size={16} /></Button>

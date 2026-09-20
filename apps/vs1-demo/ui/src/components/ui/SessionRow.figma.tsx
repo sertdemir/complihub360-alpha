@@ -20,7 +20,7 @@ figma.connect(
       <SessionRow
         country={country} domain={domain} status={status} updated={updated}
         title={title} riskLine={riskLine} risk={risk}
-        action={<Button variant="accent" size="sm">Open</Button>}
+        action={<Button variant="primary" size="sm">Open</Button>}
       />
     ),
   }

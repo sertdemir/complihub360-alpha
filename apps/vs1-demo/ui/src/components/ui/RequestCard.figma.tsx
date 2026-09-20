@@ -24,7 +24,7 @@ figma.connect(
       <RequestCard
         idLine={idLine} status={status} statusLabel={statusLabel}
         company={company} tag={tag} meta={meta} slaValue={slaValue}
-        action={<Button variant="accent" size="sm">Open · confirm</Button>}
+        action={<Button variant="primary" size="sm">Open · confirm</Button>}
       />
     ),
   }
