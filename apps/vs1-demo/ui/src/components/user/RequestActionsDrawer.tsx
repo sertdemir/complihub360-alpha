@@ -114,7 +114,7 @@ export function RequestActionsDrawer({ target, onClose, onOpenThread, onWithdraw
                   {t('requestActions.remindDesc')}
                 </p>
               </div>
-              <Button size="sm" variant="accent" onClick={remind} disabled={!actionable || busy !== null || reminded}>
+              <Button size="sm" variant="primary" onClick={remind} disabled={!actionable || busy !== null || reminded}>
                 {busy === 'remind' ? '…' : reminded ? t('requestActions.remindSent') : t('requestActions.remind')}
               </Button>
             </div>
@@ -152,7 +152,7 @@ export function RequestActionsDrawer({ target, onClose, onOpenThread, onWithdraw
               ) : (
                 <div className="flex shrink-0 items-center gap-2">
                   <Button size="sm" variant="ghost" onClick={() => setConfirmWithdraw(false)} disabled={busy !== null}>{t('requestActions.keep')}</Button>
-                  <Button size="sm" variant="accent" onClick={withdraw} disabled={busy !== null}>
+                  <Button size="sm" variant="primary" onClick={withdraw} disabled={busy !== null}>
                     {busy === 'withdraw' ? '…' : t('requestActions.confirmWithdraw')}
                   </Button>
                 </div>

@@ -182,7 +182,7 @@ export function ThreadDrawer({ open, engagementId, viewer, onClose }: ThreadDraw
                   <button key={m} type="button" onClick={() => setModel(model === m ? '' : m)}
                     className={
                       'rounded-full border px-2.5 py-1 text-[11px] transition-colors ' +
-                      (model === m ? 'border-brand-accent/60 bg-brand-accent/15 text-fg' : 'border-elevate/10 text-fg-tertiary hover:text-fg')
+                      (model === m ? 'border-brand/60 bg-brand-light text-fg' : 'border-elevate/10 text-fg-tertiary hover:text-fg')
                     }>
                     {MODEL_KEY[m] ? t(`thread.${MODEL_KEY[m]}`) : m}
                   </button>
@@ -204,7 +204,7 @@ export function ThreadDrawer({ open, engagementId, viewer, onClose }: ThreadDraw
             {viewer === 'provider' && !proposalOpen && (
               <Button variant="ghost" size="sm" onClick={() => setProposalOpen(true)}>{t('thread.addProposal')}</Button>
             )}
-            <Button variant="accent" size="sm" onClick={send} disabled={sending || draft.trim().length < 2}>
+            <Button variant="primary" size="sm" onClick={send} disabled={sending || draft.trim().length < 2}>
               {sending ? '…' : t('shared.send')}
             </Button>
           </div>

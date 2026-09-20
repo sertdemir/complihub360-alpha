@@ -267,7 +267,7 @@ export function ProviderOnboardingModal() {
             >
                 ← {t('onboarding.back')}
             </button>
-            <Button variant="accent" size="sm" disabled={!canProceed} onClick={next}>
+            <Button variant="primary" size="sm" disabled={!canProceed} onClick={next}>
                 {last ? t('onboarding.activate') : t('onboarding.next')} <ArrowRight size={14} className="ml-1.5" />
             </Button>
         </div>
@@ -320,7 +320,7 @@ export function ProviderOnboardingModal() {
                                     </div>
                                 ))}
                             </div>
-                            <Button variant="accent" size="md" className="mt-5 w-full" onClick={next}>
+                            <Button variant="primary" size="md" className="mt-5 w-full" onClick={next}>
                                 {t('onboarding.welcome.cta')} <ArrowRight size={15} className="ml-1.5" />
                             </Button>
                             <p className="mt-3 text-center text-body-3xs text-fg-tertiary">{t('onboarding.welcome.note')}</p>
@@ -400,7 +400,7 @@ export function ProviderOnboardingModal() {
                                     <span className="block h-full rounded-full bg-gradient-to-r from-[var(--fg-brand,#34d399)] to-[#D4AF37]" style={{ width: `${completeness(data)}%` }} />
                                 </span>
                             </div>
-                            <Button variant="accent" size="md" className="mt-5 w-full" onClick={() => setDismissed(true)}>
+                            <Button variant="primary" size="md" className="mt-5 w-full" onClick={() => setDismissed(true)}>
                                 {t('onboarding.done.cta')} <ArrowRight size={15} className="ml-1.5" />
                             </Button>
                         </div>

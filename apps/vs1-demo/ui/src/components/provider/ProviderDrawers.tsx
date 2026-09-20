@@ -123,7 +123,7 @@ export function HelpDrawer({ open, onClose }: { open: boolean; onClose: () => vo
     <Drawer open={open} onClose={onClose} side="right" size="md" eyebrow={t('helpDrawer.eyebrow')} title={t('helpDrawer.title')}
       footer={
         <a href="mailto:support@complihub360.com" className="w-full">
-          <Button variant="accent" size="sm" className="w-full">{t('helpDrawer.contactSupport')}</Button>
+          <Button variant="primary" size="sm" className="w-full">{t('helpDrawer.contactSupport')}</Button>
         </a>
       }>
       <div className="space-y-2">

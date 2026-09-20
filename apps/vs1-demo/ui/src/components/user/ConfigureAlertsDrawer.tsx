@@ -70,7 +70,7 @@ export function ConfigureAlertsDrawer({ open, onClose }: { open: boolean; onClos
       footer={
         <div className="flex w-full items-center justify-between gap-3">
           <p className="text-[11px] text-fg-tertiary">{saved ? t('configureAlerts.savedNote') : t('configureAlerts.deliveryNote')}</p>
-          <Button variant="accent" size="sm" onClick={save} disabled={busy || !loaded}>{busy ? '…' : t('configureAlerts.savePreferences')}</Button>
+          <Button variant="primary" size="sm" onClick={save} disabled={busy || !loaded}>{busy ? '…' : t('configureAlerts.savePreferences')}</Button>
         </div>
       }
     >

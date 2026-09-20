@@ -70,7 +70,7 @@ export function AddMarketDrawer({ open, onClose, onAdded }: AddMarketDrawerProps
       footer={
         <div className="flex w-full items-center justify-between gap-3">
           <p className="text-[11px] leading-snug text-fg-tertiary">{t('addMarket.footerNote')}</p>
-          <Button variant="accent" size="sm" onClick={submit} disabled={!selected || busy}>
+          <Button variant="primary" size="sm" onClick={submit} disabled={!selected || busy}>
             {busy ? '…' : selected ? t('addMarket.addSelected', { code: selected }) : t('addMarket.addButton')}
           </Button>
         </div>

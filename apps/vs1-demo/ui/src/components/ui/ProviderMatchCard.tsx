@@ -129,7 +129,7 @@ export function ProviderMatchCard({
           <p className="mt-0.5 text-[16px] font-medium text-fg">{billing}</p>
         </div>
         {action ?? (
-          <Button variant="accent" size="sm" onClick={onDetails}>Details</Button>
+          <Button variant="primary" size="sm" onClick={onDetails}>Details</Button>
         )}
       </div>
     </div>

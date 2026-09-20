@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '../../lib/utils';
 
 export type ButtonVariant =
-  | 'primary' | 'secondary' | 'ghost' | 'outline' | 'danger' | 'success' | 'info' | 'accent'
+  | 'primary' | 'secondary' | 'ghost' | 'outline' | 'danger' | 'success' | 'info'
   // The two shapes the marketing dark bands repeat. Those grounds paint a fixed
   // dark hex and do NOT flip with the theme, so a token that resolves to petrol
   // in light would vanish there. These variants stay fixed on purpose.
@@ -135,11 +135,16 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       success: 'bg-emerald-600 text-white hover:bg-emerald-700 active:bg-emerald-800 focus:ring-emerald-500',
       // Static sky.
       info: 'bg-sky-600 text-white hover:bg-sky-700 active:bg-sky-800 focus:ring-sky-500',
-      // Gold CTA (Compass Button Style=Accent) — Verified-Partner / monetization
-      // moments ("View ranking impact", "Explore expansion"). Dark text #101411
-      // for contrast on gold; pressed = darker gold (interactive/accent-active).
-      accent:
-        'bg-[#d4af37] text-[#101411] hover:bg-[#e6a514] active:bg-[#96802a] focus:ring-[#d4af37] dark:hover:bg-[#e6a514] dark:active:bg-[#bca033]',
+      // ENTFALLEN 2026-09-20: der goldene CTA (Compass Button Style=Accent).
+      // Gold traegt ab jetzt nur noch Marken, Kanten, Eyebrows und Grafiken —
+      // KEINE Knopfflaechen mehr. Jeder gefuellte Knopf laeuft ueber `primary`
+      // und damit ueber den Marken-Token (Petrol hell / Teal dunkel).
+      //
+      // Die Variante wurde aus dem Typ GESTRICHEN statt auf Petrol umgefaerbt:
+      // eine zweite Variante, die aussieht wie `primary`, waere ein Name ohne
+      // Unterschied — und tsc haette keine einzige Aufrufstelle gemeldet.
+      // So war der Compiler die Migrationsliste. Der Waechter in
+      // lib/designSystem.guard.test.ts haelt das Ergebnis.
         // Inverted CTA on a dark band: white plate, petrol label.
         inverse:
           'bg-white text-primary-900 shadow-lg hover:bg-surface-tertiary focus:ring-white',

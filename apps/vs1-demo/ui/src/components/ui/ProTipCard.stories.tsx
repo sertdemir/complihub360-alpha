@@ -25,7 +25,7 @@ export const Default: Story = {
   args: {
     title: 'Did you know?',
     description: 'Companies structured as a GmbH must have a minimum starting capital of €25,000 in Germany.',
-    variant: 'accent',
+    variant: 'primary',
   },
 };
 

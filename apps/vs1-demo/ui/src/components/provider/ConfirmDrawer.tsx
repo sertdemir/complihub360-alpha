@@ -61,7 +61,7 @@ export function ConfirmDrawer({ spec, onClose, labels }: { spec: ConfirmSpec | n
       footer={
         <div className="flex w-full items-center justify-end gap-2">
           <Button variant="ghost" size="sm" onClick={onClose} disabled={busy}>{L.cancel}</Button>
-          <Button variant="accent" size="sm" onClick={run} disabled={!armed || busy}>
+          <Button variant="primary" size="sm" onClick={run} disabled={!armed || busy}>
             {busy ? '…' : spec?.confirmLabel ?? L.confirm}
           </Button>
         </div>
