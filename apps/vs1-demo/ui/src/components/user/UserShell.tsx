@@ -20,6 +20,7 @@ import { isMockApi } from '../../lib/supabase';
 import { fetchSessions, type SessionRowData } from '../../api/sessions';
 import { fetchDashboard } from '../../api/dashboard';
 import { fetchMyNotifications } from '../../api/notifications';
+import { Avatar } from '../ui/Avatar';
 
 // ─── UserShell ────────────────────────────────────────────────────────────────
 // The user App-Workspace frame (always dark slate), mirroring the Figma User
@@ -252,7 +253,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
         footer={
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-2.5">
-              <span className="grid h-8 w-8 place-items-center rounded-full bg-brand-accent text-[11px] font-bold text-fg-on-accent">{initials}</span>
+              <Avatar size="md" initials={initials} tone="accent" />
               <div className="leading-tight">
                 <p className="text-[12px] font-semibold text-fg">{displayName}</p>
                 <p className="text-[10px] text-fg-tertiary">{displaySub}</p>
@@ -400,7 +401,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
           }
           footer={
             <div className="flex items-center gap-2.5 px-4 py-3">
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-accent text-[11px] font-bold text-fg-on-accent">{initials}</span>
+              <Avatar size="md" initials={initials} tone="accent" className="shrink-0" />
               <div className="min-w-0 flex-1 leading-tight">
                 <p className="truncate text-body-sm font-semibold text-fg">{displayName}</p>
                 <p className="truncate text-body-2xs text-fg-tertiary">{displaySub}</p>

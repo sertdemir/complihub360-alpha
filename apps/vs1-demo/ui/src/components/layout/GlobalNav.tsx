@@ -14,6 +14,7 @@ import { ThemeToggle } from '../ui/ThemeToggle';
 import { AccountActions } from './AccountActions';
 import { MobileNav } from './MobileNav';
 import { HEADER_NAV_LINKS } from './navLinks';
+import { Avatar } from '../ui/Avatar';
 
 const menuItemClass = (active: boolean) =>
   `flex items-center gap-1 px-2 desktop-l:px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${
@@ -175,9 +176,7 @@ export function GlobalNav() {
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-surface-secondary transition-colors"
               >
-                <div className="w-7 h-7 rounded-full bg-brand flex items-center justify-center text-fg-on-brand text-xs font-bold">
-                  {(userName || 'U').charAt(0).toUpperCase()}
-                </div>
+                <Avatar size="sm" initials={(userName || 'U').charAt(0)} tone="accent" />
                 <span className="text-xs font-semibold text-fg-secondary hidden md:block">
                   {userName || (role === 'partner' ? 'Partner' : 'User')}
                 </span>

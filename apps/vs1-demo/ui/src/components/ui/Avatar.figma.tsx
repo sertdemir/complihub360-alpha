@@ -11,7 +11,7 @@ figma.connect(
     props: {
       size: figma.enum("Size", { XS: "xs", SM: "sm", MD: "md", LG: "lg", XL: "xl" }),
       status: figma.enum("Status", { None: "none", Online: "online", Away: "away", Offline: "offline" }),
-      tone: figma.enum("Tone", { Solid: "solid", Soft: "soft" }),
+      tone: figma.enum("Tone", { Solid: "solid", Soft: "soft", Accent: "accent" }),
     },
     example: ({ size, status, tone }) => <Avatar size={size} initials="GD" status={status} tone={tone} />,
   }

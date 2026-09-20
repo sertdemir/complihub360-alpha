@@ -14,6 +14,7 @@ import { fetchProviderBookings } from '../../api/bookings';
 import { fetchEventLogFeed } from '../../api/notifications';
 import { fetchCoverage, setAvailability, AVAILABILITY_EVENT, DEMO_PROVIDER_KEY } from '../../api/provider';
 import { cn } from '../../lib/utils';
+import { Avatar } from '../ui/Avatar';
 
 // ─── ProviderShell ────────────────────────────────────────────────────────────
 // The provider App-Workspace frame, mirroring the Figma dashboards (always dark
@@ -161,7 +162,7 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
         footer={
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-2.5">
-              <span className="grid h-8 w-8 place-items-center rounded-full bg-brand-accent text-[11px] font-bold text-fg-on-accent">GD</span>
+              <Avatar size="md" initials="GD" tone="accent" />
               <div className="leading-tight">
                 <p className="text-[12px] font-semibold text-fg">G. Dahlmann</p>
                 <p className="text-[10px] text-fg-tertiary">Dahlmann CPA</p>
@@ -222,7 +223,7 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
           footer={
             <div className="flex flex-col gap-3 px-4 py-3">
               <div className="flex items-center gap-2.5">
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-accent text-[11px] font-bold text-fg-on-accent">GD</span>
+                <Avatar size="md" initials="GD" tone="accent" className="shrink-0" />
                 <div className="min-w-0 flex-1 leading-tight">
                   <p className="text-body-sm font-semibold text-fg">G. Dahlmann</p>
                   <p className="text-body-2xs text-fg-tertiary">Dahlmann CPA</p>
