@@ -142,7 +142,15 @@ npm run build        # Build über alle Workspaces
 npm run dev:ui       # UI (@vs1-demo/ui)
 npm run dev:service  # API (@complihub/compliance-api)
 npm run i18n:check   # Übersetzungen prüfen
+npm run terminology:check  # verbotene Begriffe in den Sprachdateien
+npm run db:test      # Migrationen + pgTAP gegen eine Wegwerf-Datenbank
 ```
+
+> `npm run db:test` braucht ein laufendes Postgres 16 mit `pgtap` und `vector`
+> (`apt install postgresql-16-pgtap postgresql-16-pgvector`) und respektiert
+> `PGHOST`/`PGPORT`/`PGUSER`/`PGPASSWORD`. Er spielt **alle** Migrationen in
+> Reihenfolge ein — ein Lauf beantwortet damit auch die Frage, ob sich der
+> Stand von Staging noch aus dem Repo herstellen lässt.
 
 CI (`quality-gates`) läuft bei jedem PR gegen `main`. Vor dem Push mindestens `typecheck` und `test` lokal grün haben.
 
