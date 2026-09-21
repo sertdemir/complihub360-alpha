@@ -591,7 +591,7 @@
       "description": "Navigation internationaler Unternehmensgründung, Wahl der richtigen Rechtsform, Aufbau lokaler Substanz und Handhabung von Unternehmensregistrierungen in neuen Jurisdiktionen.",
       "affected": "Einzelpersonen oder Unternehmen, die juristische Einheiten registrieren, Teams erweitern oder Unternehmenspräsenz in ausländischen Märkten aufbauen möchten.",
       "personaFit": "Ideal für: Internationale Expansionsteams",
-      "cov1": "Unternehmens- & Strukturassistent – bewertet aktuellen Status, gewünschte Märkte, Team-Komplexität",
+      "cov1": "Gründungs- & Meldungsassistent – bewertet aktuellen Status, gewünschte Märkte, Team-Komplexität",
       "cov2": "Strukturbedarf je Markt – bestimmt, ob Ihr Setup eine eigene Gesellschaft braucht",
       "cov3": "Intelligente Weiterleitung zu Bildungsleitfaden-Pfaden für unsichere Gründer",
       "fines": {
@@ -693,12 +693,12 @@
       "askPlaceholder": "Z. B.: Brauche ich eine EORI-Nummer für Importe aus der Türkei?"
     },
     "legal-advisory": {
-      "title": "Rechtsberatung",
+      "title": "Rechtliche Unterstützung",
       "headline": "Verbraucher-AGB, Handelsverträge und anwendbares Recht",
       "description": "Die Vertragsebene um einen grenzüberschreitenden Verkauf: Verbraucherinformationspflichten, Bedingungen, die im Zielmarkt standhalten, und die Frage, welches Recht gilt.",
       "affected": "Unternehmen, die in Märkte mit abweichendem Verbraucherrecht verkaufen, sowie alle, die mit Lieferanten oder Partnern über Jurisdiktionen hinweg kontrahieren.",
       "personaFit": "Ideal für: Grenzüberschreitender Handel & Partnerschaften",
-      "cov1": "Rechtsberatungs-Assistent – ermittelt, welche Vertragsdokumente Ihr Setup erfordert",
+      "cov1": "Assistent für rechtliche Unterstützung – ermittelt, welche Vertragsdokumente Ihr Setup erfordert",
       "cov2": "Zeigt auf, wo das Verbraucherrecht des Zielmarkts Ihre Standardbedingungen verdrängt",
       "cov3": "Weiterleitung an zugelassene Anwälte in der jeweiligen Jurisdiktion – CompliHub360 leistet keine Rechtsberatung",
       "fines": {
@@ -1506,7 +1506,7 @@
     "specialist": {
       "kicker": "Was die Fachperson kostet",
       "title": "Ihr Honorar — beziffert, bevor Sie sich binden.",
-      "body": "Die Beratung selbst ist nicht kostenlos, und wir tun nicht so. Jeder Verified Partner veröffentlicht eine feste Schätzung, bevor Sie das Mandat annehmen — Sie sitzen also kein Erstgespräch ab, nur um den Preis zu erfahren."
+      "body": "Die Beratung selbst ist nicht kostenlos, und wir tun nicht so. Jeder Verified Provider veröffentlicht eine feste Schätzung, bevor Sie das Mandat annehmen — Sie sitzen also kein Erstgespräch ab, nur um den Preis zu erfahren."
     },
     "cta": {
       "title": "Fangen Sie dort an, wo es für Sie Sinn ergibt.",
@@ -1519,7 +1519,7 @@
       "feePaidBy": "trägt der Partner",
       "match": "{{pct}} % Match",
       "noSlot": "Kein Platz zu verkaufen",
-      "verified": "Verified Partner",
+      "verified": "Verified Provider",
       "rangeLabel": "Honorarschätzung",
       "range": "180–240 €",
       "perHour": "/ Stunde",
@@ -1554,7 +1554,7 @@
         },
         {
           "q": "Was kostet die Beratung bei der Fachperson?",
-          "a": "Das Honorar legt die Fachperson fest: Jeder Verified Partner veröffentlicht eine feste Schätzung, bevor Sie das Mandat annehmen — Sie sitzen kein Erstgespräch ab, nur um den Preis zu erfahren."
+          "a": "Das Honorar legt die Fachperson fest: Jeder Verified Provider veröffentlicht eine feste Schätzung, bevor Sie das Mandat annehmen — Sie sitzen kein Erstgespräch ab, nur um den Preis zu erfahren."
         },
         {
           "q": "Sieht die Fachperson meine Daten vor der Buchung?",

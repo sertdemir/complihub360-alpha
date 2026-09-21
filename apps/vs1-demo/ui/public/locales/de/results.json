@@ -21,7 +21,7 @@
       "label": "mediane Frist"
     },
     "3": {
-      "label": "Verified Partner bereit"
+      "label": "Verified Provider bereit"
     }
   },
   "table": {
@@ -107,7 +107,7 @@
     }
   },
   "partners": {
-    "eyebrow": "3 Verified Partner gefunden",
+    "eyebrow": "3 Verified Provider gefunden",
     "title": "Wir haben gefunden, wer das für Sie umsetzen kann.",
     "unlocked": "Matches freigeschaltet",
     "unlockCta": "Matches mit kostenlosem Konto freischalten",
@@ -143,7 +143,7 @@
     },
     "questionsOpen": "{{total}} Fragen offen",
     "sources": "Quellen",
-    "disclaimer": "CompliHub360 ist eine Orchestrierungsplattform und keine Rechtsanwaltskanzlei. Rechts-, Steuer- und Regulierungsberatung erbringen Verified Partners in eigener beruflicher Haftung."
+    "disclaimer": "CompliHub360 ist eine Orchestrierungsplattform und keine Rechtsanwaltskanzlei. Rechts-, Steuer- und Regulierungsberatung erbringen Verified Providers in eigener beruflicher Haftung."
   },
   "detail": {
     "back": "Zurück zur Anbieterliste",
@@ -275,7 +275,7 @@
     "guidesTitle": "Wo Sie weiterlesen können",
     "guideRead": "Ansehen",
     "bridgeTitle": "Möchten Sie sehen, was für Ihr Unternehmen gilt?",
-    "bridgeBody": "Ihre Risk Map ist auf Ihre Märkte und Ihr Geschäftsmodell abgestimmt und zeigt die Verified Partner, die zu Ihrem tatsächlichen Bedarf passen.",
+    "bridgeBody": "Ihre Risk Map ist auf Ihre Märkte und Ihr Geschäftsmodell abgestimmt und zeigt die Verified Provider, die zu Ihrem tatsächlichen Bedarf passen.",
     "bridgeCta": "Meinen Bedarf ermitteln",
     "previewBadge": "Vorschau · Antwort-Engine noch nicht angebunden",
     "entries": {
@@ -293,10 +293,10 @@
     "productPackaging": "EPR & Verpackung",
     "dataPrivacy": "Daten & Datenschutz",
     "marketingSeo": "Marketing-Compliance",
-    "corporateStructure": "Unternehmen & Struktur",
+    "corporateStructure": "Gründung & Meldungen",
     "productCompliance": "Produkt-Compliance",
     "logisticsCustoms": "Logistik & Zoll",
-    "legalAdvisory": "Rechtsberatung"
+    "legalAdvisory": "Rechtliche Unterstützung"
   },
   "matchBasis": {
     "market": "Deckt Ihren Markt ab ({{country}})",
@@ -343,7 +343,7 @@
     "copyOpenList": "In den Sitzungen öffnen",
     "copyError": "Die Kopie konnte nicht angelegt werden.",
     "copyUnavailable": "Erst speichern, dann lässt sich eine Variante anlegen.",
-    "verifiedPartner": "Verified Partner",
+    "verifiedPartner": "Verified Provider",
     "activeSince": "aktiv seit {{year}}",
     "responseTime": "Ø {{hours}} Std. Antwortzeit",
     "billing": {

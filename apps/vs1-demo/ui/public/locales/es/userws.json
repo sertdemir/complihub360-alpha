@@ -29,10 +29,10 @@
     "productPackaging": "EPR y envases",
     "dataPrivacy": "Datos y privacidad",
     "marketingSeo": "Compliance de marketing",
-    "corporateStructure": "Sociedad y estructura",
+    "corporateStructure": "Constitución y presentaciones",
     "productCompliance": "Conformidad de producto",
     "logisticsCustoms": "Logística y aduanas",
-    "legalAdvisory": "Asesoría legal",
+    "legalAdvisory": "Apoyo jurídico",
     "environment": "Cumplimiento ambiental"
   },
   "shell": {
@@ -119,9 +119,9 @@
       "product-compliance": "Conformidad de producto",
       "data-privacy": "Datos y privacidad",
       "marketing-seo": "Marketing",
-      "corporate-structure": "Sociedad",
+      "corporate-structure": "Constitución",
       "logistics-customs": "Logística y aduanas",
-      "legal-advisory": "Asesoría jurídica"
+      "legal-advisory": "Apoyo jurídico"
     },
     "emptyStep1Title": "Describir",
     "emptyStep1Body": "Cuatro preguntas sobre país, mercados y gama.",
@@ -565,7 +565,7 @@
     "close": "Cerrar asistente",
     "thinking": "Consultando la base de conocimiento…",
     "sources": "Fuentes",
-    "disclaimer": "Información regulatoria general, no asesoramiento legal ni fiscal. Para una evaluación vinculante, contrate a un Verified Partner.",
+    "disclaimer": "Información regulatoria general, no asesoramiento legal ni fiscal. Para una evaluación vinculante, contrate a un Verified Provider.",
     "error": "No ha funcionado — inténtelo de nuevo en un momento.",
     "notConfigured": "El asistente aún no está conectado en este entorno.",
     "quota": "Límite diario alcanzado — el plan de mejora llegará pronto.",

@@ -84,7 +84,7 @@
       "line2": "Basitleştirildi."
     },
     "lead": "Yükümlülüklerinizi anlayın. Doğru uzmanları bulun. Sattığınız her yerde uyumlu kalın.",
-    "ctaRiskMap": "Risk Map’i başlat",
+    "ctaRiskMap": "İhtiyacımı değerlendir",
     "ask": {
       "placeholder": "Talebinizi kısaca anlatın",
       "send": "Gönder"
@@ -261,7 +261,7 @@
         "desc": "Onay, çerezler, reklam kuralları"
       },
       "corporate": {
-        "title": "Şirket ve Yapı",
+        "title": "Şirket Kuruluşu ve Bildirimler",
         "desc": "Tüzel kişiler, daimi işyeri, bildirimler"
       },
       "productCompliance": {
@@ -273,7 +273,7 @@
         "desc": "EORI, HS kodları, Intrastat, gümrük"
       },
       "legalAdvisory": {
-        "title": "Hukuki Danışmanlık",
+        "title": "Hukuki Destek",
         "desc": "Sözleşmeler, koşullar, tüketici hukuku"
       },
       "environment": {
@@ -304,7 +304,7 @@
     "header": "Pazarlar",
     "title": "Diğer pazarlar",
     "count": "{{selected}} seçildi · {{total}} mevcut",
-    "desc": "Ana listenin dışında. Faaliyet gösterdiğiniz pazarları seçin — mevzuatlarını haritalar ve sizi doğru Verified Partner'a yönlendiririz.",
+    "desc": "Ana listenin dışında. Faaliyet gösterdiğiniz pazarları seçin — mevzuatlarını haritalar ve sizi doğru Verified Provider'a yönlendiririz.",
     "searchPlaceholder": "Ada veya ülke koduna göre arayın",
     "european": "Avrupa pazarları",
     "expanding": "Kapsam genişliyor",
@@ -519,10 +519,10 @@
     "saveProgress": {
       "eyebrow": "Ücretsiz hesap",
       "title": "İlerlemenizi kaydedin",
-      "desc": "Risk Map'inizi saklayın ve Verified Partner'larla eşleşin — ücretsiz, kredi kartı gerekmez. Kurallar değiştiğinde gönderilecek bildirimler hazırlanıyor. Size e-postayla bir Magic-Link göndeririz; hatırlamanız gereken bir şifre olmaz.",
+      "desc": "Risk Map'inizi saklayın ve Verified Provider'larla eşleşin — ücretsiz, kredi kartı gerekmez. Kurallar değiştiğinde gönderilecek bildirimler hazırlanıyor. Size e-postayla bir Magic-Link göndeririz; hatırlamanız gereken bir şifre olmaz.",
       "benefits": [
         "Kaydedilmiş Risk Map dosyanız",
-        "Verified Partner eşleştirmesi",
+        "Verified Provider eşleştirmesi",
         "Mevzuat değiştiğinde bildirimler — hazırlanıyor"
       ],
       "confirm": "İlerlemeniz güvende.",
@@ -531,10 +531,10 @@
     "freeAccount": {
       "eyebrow": "Ücretsiz hesap",
       "title": "Risk Map'iniz ve eşleşmeleriniz, ücretsiz",
-      "desc": "Risk Map'inizi saklayın ve pazarlarınızdaki Verified Partner'larla eşleşin. Ücretsiz, kredi kartı gerekmez. Mevzuat bildirimleri hazırlanıyor; kullanıma sunulduğunda hesabınızda görünecek. Size e-postayla bir Magic-Link göndeririz; şifre yoktur.",
+      "desc": "Risk Map'inizi saklayın ve pazarlarınızdaki Verified Provider'larla eşleşin. Ücretsiz, kredi kartı gerekmez. Mevzuat bildirimleri hazırlanıyor; kullanıma sunulduğunda hesabınızda görünecek. Size e-postayla bir Magic-Link göndeririz; şifre yoktur.",
       "benefits": [
         "Kaydedilmiş Risk Map dosyanız",
-        "Verified Partner eşleştirmesi",
+        "Verified Provider eşleştirmesi",
         "Mevzuat bildirimleri — hazırlanıyor"
       ],
       "confirm": "Ücretsiz hesabınızın kurulumunu tamamlamak için bağlantıya tıklayın.",
@@ -648,7 +648,7 @@
       },
       {
         "value": "3",
-        "label": "Verified Partner hazır"
+        "label": "Verified Provider hazır"
       }
     ],
     "rows": [
@@ -709,7 +709,7 @@
         "dueSub": "sürekli"
       }
     ],
-    "partnersEyebrow": "3 Verified Partner eşleşti",
+    "partnersEyebrow": "3 Verified Provider eşleşti",
     "partnersTitle": "Bunu kimin çözebileceğini bulduk.",
     "unlock": "Eşleşmeleri ücretsiz hesapla açın",
     "save": {
@@ -732,7 +732,7 @@
       },
       {
         "value": "3",
-        "label": "Verified Partner"
+        "label": "Verified Provider"
       }
     ]
   },
@@ -842,7 +842,7 @@
     "row2": [
       {
         "title": "Kendi kaydıyla değil, bizim doğrulamamızla",
-        "desc": "Her Verified Partner kapsam, yanıt süresi ve belgelenmiş gerçek sonuçlar üzerinden denetlenir — bir dizin değildir."
+        "desc": "Her Verified Provider kapsam, yanıt süresi ve belgelenmiş gerçek sonuçlar üzerinden denetlenir — bir dizin değildir."
       },
       {
         "title": "Ortak sorumluluk baştan kurulu",
@@ -940,7 +940,7 @@
         ]
       },
       {
-        "title": "Şirket ve Yapı",
+        "title": "Şirket Kuruluşu ve Bildirimler",
         "markets": "DE · AT · CH",
         "desc": "Yapınızın nerede yükümlülük doğurduğunu bilin — işyeri, beyanlar, gerçek faydalanıcılar.",
         "intro": "DACH bölgesinde şirket düzeyindeki yükümlülükler. Yıllık beyanlar, gerçek faydalanıcı şeffaflığı ve grup içi sözleşmelerin her birinin kendi vadeleri ve yaptırımları vardır.",
@@ -997,10 +997,10 @@
         ]
       },
       {
-        "title": "Hukuki Danışmanlık",
+        "title": "Hukuki Destek",
         "markets": "AB GENELİ",
         "desc": "Bir sorunun gerçekten avukat gerektirip gerektirmediğini bilin — ve dosyanızı zaten bilen birine ulaşın.",
-        "intro": "Kontrol listesi değil, nitelikli yanıt gerektiren sorular: sözleşmeler, koşullar, tüketici hakları, uyuşmazlıklar. CompliHub360 bir hukuk bürosu değildir — Verified Partner’lar kendi mesleki sorumlulukları altında danışmanlık verir ve biz ulaştığınız kişinin dosyanızı zaten bilmesini sağlarız.",
+        "intro": "Kontrol listesi değil, nitelikli yanıt gerektiren sorular: sözleşmeler, koşullar, tüketici hakları, uyuşmazlıklar. CompliHub360 bir hukuk bürosu değildir — Verified Provider’lar kendi mesleki sorumlulukları altında danışmanlık verir ve biz ulaştığınız kişinin dosyanızı zaten bilmesini sağlarız.",
         "cover": [
           "Koşullar ve tüketiciyi bilgilendirme yükümlülükleri",
           "Tedarikçi ve platform sözleşmeleri",
@@ -1029,7 +1029,7 @@
     "cards": [
       {
         "title": "Taahhütten önce maliyet.",
-        "desc": "Her Verified Partner, işi kabul etmenizden önce sabit bir tahmin yayımlar. Yalnızca fiyatı öğrenmek için discovery call yok."
+        "desc": "Her Verified Provider, işi kabul etmenizden önce sabit bir tahmin yayımlar. Yalnızca fiyatı öğrenmek için discovery call yok."
       },
       {
         "title": "Yanıt, saat işlerken.",
@@ -1094,9 +1094,9 @@
         "desc": "Sihirbazın altın adım göstergesi, bunaltmadan nerede olduğunuzu işaretler. İleriye giden yol her zaman tek karar genişliğindedir."
       },
       {
-        "label": "Marka işareti — Verified Partner",
+        "label": "Marka işareti — Verified Provider",
         "title": "Sorumluluğun sessiz işareti.",
-        "desc": "Verified Partner'lar, dosyanız için ortak sorumluluk üstlenen, denetlenmiş danışmanlardır. Altın işaret özdenetimdir, tanıtım değil."
+        "desc": "Verified Provider'lar, dosyanız için ortak sorumluluk üstlenen, denetlenmiş danışmanlardır. Altın işaret özdenetimdir, tanıtım değil."
       }
     ],
     "demo": {
@@ -1127,7 +1127,7 @@
         "value": "2"
       },
       {
-        "label": "Eşleşen Verified Partner",
+        "label": "Eşleşen Verified Provider",
         "value": "3"
       },
       {
@@ -1198,19 +1198,19 @@
         "items": [
           {
             "q": "Bana hukuki danışmanlık mı veriyorsunuz?",
-            "a": "Hayır. CompliHub360 yükümlülükleri haritalar ve operasyonunuza muhtemelen neyin uygulanacağını gösterir — bu hukuki danışmanlık değildir. Bir konu bağlayıcı görüş gerektirdiğinde, sizi bunu verebilecek bir Verified Partner ile buluştururuz."
+            "a": "Hayır. CompliHub360 yükümlülükleri haritalar ve operasyonunuza muhtemelen neyin uygulanacağını gösterir — bu hukuki danışmanlık değildir. Bir konu bağlayıcı görüş gerektirdiğinde, sizi bunu verebilecek bir Verified Provider ile buluştururuz."
           },
           {
-            "q": "Verified Partner'lar nasıl denetleniyor?",
+            "q": "Verified Provider'lar nasıl denetleniyor?",
             "a": "Her partner; alan kapsamı, yanıt süresi ve belgelenmiş gerçek sonuçlar üzerinden bizim tarafımızdan incelenir — kendi kaydını oluşturan bir dizin değildir. Her iş sözleşmeye bağlıdır ve dosya için ortak sorumluluk içerir."
           },
           {
             "q": "Bir iş ne kadara mal olur?",
-            "a": "Her Verified Partner, siz kabul etmeden önce sabit bir tahmin yayımlar — yalnızca fiyatı öğrenmek için discovery call yok. Aralığı ve kapsamı önceden görür, herhangi bir çalışma başlamadan onaylarsınız."
+            "a": "Her Verified Provider, siz kabul etmeden önce sabit bir tahmin yayımlar — yalnızca fiyatı öğrenmek için discovery call yok. Aralığı ve kapsamı önceden görür, herhangi bir çalışma başlamadan onaylarsınız."
           },
           {
             "q": "Bir partner ne kadar hızlı yanıt verir?",
-            "a": "İlk yanıta kadar 24–48 saat, sözleşmeyle güvence altında. Gecikme olursa talebinizi otomatik olarak bir sonraki uygun Verified Partner'a yönlendiririz."
+            "a": "İlk yanıta kadar 24–48 saat, sözleşmeyle güvence altında. Gecikme olursa talebinizi otomatik olarak bir sonraki uygun Verified Provider'a yönlendiririz."
           },
           {
             "q": "Tek bir partnere bağlı mıyım?",
@@ -1287,10 +1287,10 @@
           "productPackaging": "EPR ve Ambalaj",
           "dataPrivacy": "Veri ve Gizlilik",
           "marketingSeo": "Pazarlama Uyumu",
-          "corporateStructure": "Şirket ve Yapı",
+          "corporateStructure": "Şirket Kuruluşu ve Bildirimler",
           "productCompliance": "Ürün Uygunluğu",
           "logisticsCustoms": "Lojistik ve Gümrük",
-          "legalAdvisory": "Hukuki Danışmanlık"
+          "legalAdvisory": "Hukuki Destek"
         }
       },
       "markets": {
@@ -1323,7 +1323,7 @@
       "list": "Almanya · Birleşik Krallık · Hollanda · Fransa · İtalya · İspanya",
       "post": ". 2026 boyunca daha fazla ülke ekleniyor."
     },
-    "disclaimer": "CompliHub360 bir orkestrasyon platformudur — hukuk bürosu değildir. Hukuki, vergisel ve mevzuata ilişkin danışmanlık, kendi mesleki sorumlulukları altında Verified Partner'lar tarafından verilir. §§ RDG / StBerG anlamında Rechtsberatung sunmuyoruz.",
+    "disclaimer": "CompliHub360 bir orkestrasyon platformudur — hukuk bürosu değildir. Hukuki, vergisel ve mevzuata ilişkin danışmanlık, kendi mesleki sorumlulukları altında Verified Provider'lar tarafından verilir. §§ RDG / StBerG anlamında Rechtsberatung sunmuyoruz.",
     "copyright": "© 2026 CompliHub360.",
     "legal": {
       "privacy": "Gizlilik Politikası",

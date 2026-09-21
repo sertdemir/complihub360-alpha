@@ -135,7 +135,7 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
       <AvailabilityPill status={availability === 'ooo' ? 'offline' : 'available'} label={availability === 'ooo' ? t('shell.outOfOffice') : undefined} />
     </button>
   );
-  const statusBadge = <PartnerStatusBadge status={vetted ? 'verified' : 'pending'} label={vetted ? 'Verified Partner' : 'Pending review'} />;
+  const statusBadge = <PartnerStatusBadge status={vetted ? 'verified' : 'pending'} label={vetted ? 'Verified Provider' : 'Pending review'} />;
 
   return (
     <div className="flex h-dvh bg-surface text-fg">

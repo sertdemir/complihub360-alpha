@@ -84,7 +84,7 @@
       "line2": "Vereinfacht."
     },
     "lead": "Verstehen Sie Ihre Pflichten. Finden Sie die richtigen Fachleute. Bleiben Sie konform — überall, wo Sie verkaufen.",
-    "ctaRiskMap": "Risk Map starten",
+    "ctaRiskMap": "Bedarf ermitteln",
     "ask": {
       "placeholder": "Beschreiben Sie Ihr Anliegen",
       "send": "Senden"
@@ -261,7 +261,7 @@
         "desc": "Einwilligung, Cookies, Werberecht"
       },
       "corporate": {
-        "title": "Unternehmen & Struktur",
+        "title": "Gründung & Meldungen",
         "desc": "Gesellschaften, Betriebsstätte, Meldungen"
       },
       "productCompliance": {
@@ -273,7 +273,7 @@
         "desc": "EORI, HS-Codes, Intrastat, Zoll"
       },
       "legalAdvisory": {
-        "title": "Rechtsberatung",
+        "title": "Rechtliche Unterstützung",
         "desc": "Verträge, AGB, Verbraucherrecht"
       },
       "environment": {
@@ -304,7 +304,7 @@
     "header": "Märkte",
     "title": "Weitere Märkte",
     "count": "{{selected}} ausgewählt · {{total}} verfügbar",
-    "desc": "Außerhalb der Hauptauswahl. Wählen Sie die Märkte, in denen Sie tätig sind — wir kartieren deren Vorschriften und leiten an den passenden Verified Partner weiter.",
+    "desc": "Außerhalb der Hauptauswahl. Wählen Sie die Märkte, in denen Sie tätig sind — wir kartieren deren Vorschriften und leiten an den passenden Verified Provider weiter.",
     "searchPlaceholder": "Nach Name oder Ländercode suchen",
     "european": "Europäische Märkte",
     "expanding": "Abdeckung im Ausbau",
@@ -519,7 +519,7 @@
     "saveProgress": {
       "eyebrow": "Kostenloses Konto",
       "title": "Fortschritt speichern",
-      "desc": "Behalten Sie Ihre Risk Map und lassen Sie sich mit Verified Partnern matchen — kostenlos, ohne Kreditkarte. Hinweise bei Regeländerungen sind in Vorbereitung. Wir senden Ihnen einen Magic-Link per E-Mail, es gibt also kein Passwort zu merken.",
+      "desc": "Behalten Sie Ihre Risk Map und lassen Sie sich mit Verified Providern matchen — kostenlos, ohne Kreditkarte. Hinweise bei Regeländerungen sind in Vorbereitung. Wir senden Ihnen einen Magic-Link per E-Mail, es gibt also kein Passwort zu merken.",
       "benefits": [
         "Ihr gespeichertes Risk-Map-Dossier",
         "Verified-Partner-Matching",
@@ -531,7 +531,7 @@
     "freeAccount": {
       "eyebrow": "Kostenloses Konto",
       "title": "Ihre Risk Map und Ihre Matches, kostenlos",
-      "desc": "Behalten Sie Ihre Risk Map und lassen Sie sich mit Verified Partnern in Ihren Märkten matchen. Kostenlos, ohne Kreditkarte. Regulatorische Hinweise sind in Vorbereitung und erscheinen in Ihrem Konto, sobald sie verfügbar sind. Wir senden Ihnen einen Magic-Link per E-Mail, ein Passwort ist nicht nötig.",
+      "desc": "Behalten Sie Ihre Risk Map und lassen Sie sich mit Verified Providern in Ihren Märkten matchen. Kostenlos, ohne Kreditkarte. Regulatorische Hinweise sind in Vorbereitung und erscheinen in Ihrem Konto, sobald sie verfügbar sind. Wir senden Ihnen einen Magic-Link per E-Mail, ein Passwort ist nicht nötig.",
       "benefits": [
         "Ihr gespeichertes Risk-Map-Dossier",
         "Verified-Partner-Matching",
@@ -648,7 +648,7 @@
       },
       {
         "value": "3",
-        "label": "Verified Partner bereit"
+        "label": "Verified Provider bereit"
       }
     ],
     "rows": [
@@ -709,7 +709,7 @@
         "dueSub": "laufend"
       }
     ],
-    "partnersEyebrow": "3 Verified Partner gematcht",
+    "partnersEyebrow": "3 Verified Provider gematcht",
     "partnersTitle": "Wir haben gefunden, wer das umsetzen kann.",
     "unlock": "Matches mit kostenlosem Konto freischalten",
     "save": {
@@ -732,7 +732,7 @@
       },
       {
         "value": "3",
-        "label": "Verified Partner"
+        "label": "Verified Provider"
       }
     ]
   },
@@ -842,7 +842,7 @@
     "row2": [
       {
         "title": "Von uns verifiziert, nicht selbst eingetragen",
-        "desc": "Jeder Verified Partner wird auf Abdeckung, Reaktionszeit und belegte Ergebnisse geprüft — kein Verzeichnis."
+        "desc": "Jeder Verified Provider wird auf Abdeckung, Reaktionszeit und belegte Ergebnisse geprüft — kein Verzeichnis."
       },
       {
         "title": "Gemeinsame Verantwortung eingebaut",
@@ -940,7 +940,7 @@
         ]
       },
       {
-        "title": "Unternehmen & Struktur",
+        "title": "Gründung & Meldungen",
         "markets": "DE · AT · CH",
         "desc": "Wissen, wo Ihre Aufstellung Pflichten auslöst — Betriebsstätte, Meldungen, wirtschaftlich Berechtigte.",
         "intro": "Pflichten auf Unternehmensebene in der DACH-Region. Jahresabschlüsse, Transparenz über wirtschaftlich Berechtigte und konzerninterne Verträge haben jeweils eigene Fristen und Sanktionen.",
@@ -997,10 +997,10 @@
         ]
       },
       {
-        "title": "Rechtsberatung",
+        "title": "Rechtliche Unterstützung",
         "markets": "EU-WEIT",
         "desc": "Wissen, wann eine Frage wirklich eine Anwältin braucht — und jemanden erreichen, der Ihren Fall schon kennt.",
-        "intro": "Die Fragen, die eine qualifizierte Antwort brauchen statt einer Checkliste: Verträge, AGB, Verbraucherrechte, Streitfälle. CompliHub360 ist keine Kanzlei — Verified Partner beraten unter eigener Berufshaftung, und wir sorgen dafür, dass die Person, die Sie erreichen, Ihren Fall bereits kennt.",
+        "intro": "Die Fragen, die eine qualifizierte Antwort brauchen statt einer Checkliste: Verträge, AGB, Verbraucherrechte, Streitfälle. CompliHub360 ist keine Kanzlei — Verified Provider beraten unter eigener Berufshaftung, und wir sorgen dafür, dass die Person, die Sie erreichen, Ihren Fall bereits kennt.",
         "cover": [
           "AGB und verbraucherrechtliche Informationspflichten",
           "Lieferanten- und Plattformverträge",
@@ -1029,7 +1029,7 @@
     "cards": [
       {
         "title": "Kosten, bevor Sie sich binden.",
-        "desc": "Jeder Verified Partner veröffentlicht eine feste Schätzung, bevor Sie das Mandat annehmen. Keine Discovery-Calls, nur um den Preis zu erfahren."
+        "desc": "Jeder Verified Provider veröffentlicht eine feste Schätzung, bevor Sie das Mandat annehmen. Keine Discovery-Calls, nur um den Preis zu erfahren."
       },
       {
         "title": "Antwort, mit laufender Uhr.",
@@ -1094,9 +1094,9 @@
         "desc": "Der goldene Pill-Stepper des Assistenten zeigt, wo Sie stehen, ohne zu überfordern. Der Weg nach vorn ist immer eine Entscheidung breit."
       },
       {
-        "label": "Markenzeichen — Verified Partner",
+        "label": "Markenzeichen — Verified Provider",
         "title": "Ein leises Zeichen von Verantwortung.",
-        "desc": "Verified Partner sind geprüfte Berater, die gemeinsame Verantwortung für Ihre Sache übernehmen. Das goldene Zeichen ist Zurückhaltung, keine Werbung."
+        "desc": "Verified Provider sind geprüfte Berater, die gemeinsame Verantwortung für Ihre Sache übernehmen. Das goldene Zeichen ist Zurückhaltung, keine Werbung."
       }
     ],
     "demo": {
@@ -1127,7 +1127,7 @@
         "value": "2"
       },
       {
-        "label": "Gematchte Verified Partner",
+        "label": "Gematchte Verified Provider",
         "value": "3"
       },
       {
@@ -1198,19 +1198,19 @@
         "items": [
           {
             "q": "Erhalte ich hier Rechtsberatung?",
-            "a": "Nein. CompliHub360 kartiert Pflichten und zeigt auf, was wahrscheinlich für Ihren Betrieb gilt — das ist keine Rechtsberatung. Wenn eine Sache eine verbindliche Einschätzung braucht, verbinden wir Sie mit einem Verified Partner, der sie geben kann."
+            "a": "Nein. CompliHub360 kartiert Pflichten und zeigt auf, was wahrscheinlich für Ihren Betrieb gilt — das ist keine Rechtsberatung. Wenn eine Sache eine verbindliche Einschätzung braucht, verbinden wir Sie mit einem Verified Provider, der sie geben kann."
           },
           {
-            "q": "Wie werden Verified Partner geprüft?",
+            "q": "Wie werden Verified Provider geprüft?",
             "a": "Jeder Partner wird von uns auf Bereichsabdeckung, Reaktionszeit und belegte Ergebnisse geprüft — kein Selbsteintrags-Verzeichnis. Jedes Mandat ist vertraglich geregelt, mit gemeinsamer Verantwortung für die Sache."
           },
           {
             "q": "Was kostet ein Mandat?",
-            "a": "Jeder Verified Partner veröffentlicht eine feste Schätzung, bevor Sie annehmen — keine Discovery-Calls, nur um den Preis zu erfahren. Sie sehen Spanne und Umfang vorab und geben sie frei, bevor Arbeit beginnt."
+            "a": "Jeder Verified Provider veröffentlicht eine feste Schätzung, bevor Sie annehmen — keine Discovery-Calls, nur um den Preis zu erfahren. Sie sehen Spanne und Umfang vorab und geben sie frei, bevor Arbeit beginnt."
           },
           {
             "q": "Wie schnell antwortet ein Partner?",
-            "a": "24–48 Stunden bis zur ersten Antwort, vertraglich vereinbart. Bei Verzug leiten wir Ihre Anfrage automatisch an den nächsten verfügbaren Verified Partner weiter."
+            "a": "24–48 Stunden bis zur ersten Antwort, vertraglich vereinbart. Bei Verzug leiten wir Ihre Anfrage automatisch an den nächsten verfügbaren Verified Provider weiter."
           },
           {
             "q": "Bin ich an einen Partner gebunden?",
@@ -1287,10 +1287,10 @@
           "productPackaging": "EPR & Verpackung",
           "dataPrivacy": "Daten & Datenschutz",
           "marketingSeo": "Marketing-Compliance",
-          "corporateStructure": "Unternehmen & Struktur",
+          "corporateStructure": "Gründung & Meldungen",
           "productCompliance": "Produkt-Compliance",
           "logisticsCustoms": "Logistik & Zoll",
-          "legalAdvisory": "Rechtsberatung"
+          "legalAdvisory": "Rechtliche Unterstützung"
         }
       },
       "markets": {
@@ -1323,7 +1323,7 @@
       "list": "Deutschland · Vereinigtes Königreich · Niederlande · Frankreich · Italien · Spanien",
       "post": ". Weitere Länder folgen im Lauf des Jahres 2026."
     },
-    "disclaimer": "CompliHub360 ist eine Orchestrierungsplattform — keine Kanzlei. Rechts-, Steuer- und Regulierungsberatung erbringen Verified Partner in eigener beruflicher Haftung. Wir erbringen keine Rechtsberatung im Sinne der §§ RDG / StBerG.",
+    "disclaimer": "CompliHub360 ist eine Orchestrierungsplattform — keine Kanzlei. Rechts-, Steuer- und Regulierungsberatung erbringen Verified Provider in eigener beruflicher Haftung. Wir erbringen keine Rechtsberatung im Sinne der §§ RDG / StBerG.",
     "copyright": "© 2026 CompliHub360.",
     "legal": {
       "privacy": "Datenschutzerklärung",

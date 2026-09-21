@@ -44,7 +44,7 @@ export const Scale: Story = {
 
       <p className="mb-2 mt-8 font-sans text-sm font-semibold text-fg">Label & Caption · Inter</p>
       <Row style="label/md ★" spec="14 / 140 / SemiBold"><span className="text-[14px] font-semibold">Engagement Request senden</span></Row>
-      <Row style="label/xs" spec="11 / +2 / SemiBold UPPER"><span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-fg-brand">For verified partners</span></Row>
+      <Row style="label/xs" spec="11 / +2 / SemiBold UPPER"><span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-fg-brand">For verified providers</span></Row>
       <Row style="caption/md" spec="12 / 145"><span className="text-[12px] text-fg-tertiary">UStG §18i · last updated 2026-05</span></Row>
     </div>
   ),

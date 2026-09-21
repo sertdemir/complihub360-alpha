@@ -93,7 +93,7 @@ export function ProviderMatchCard({
               verschiedene Gelbtoene in einer Karte. */}
           {isVerified && (
             <span className="flex items-center gap-1 rounded-full border border-[#d4af37]/40 bg-[#d4af37]/10 px-2 py-[3px] text-[11px] font-medium text-fg-accent-strong">
-              <CheckIcon /> Verified Partner
+              <CheckIcon /> Verified Provider
             </span>
           )}
           <span className={cn('rounded-full border px-2.5 py-1 text-[13px] font-medium', MATCH_PILL[matchTier])}>

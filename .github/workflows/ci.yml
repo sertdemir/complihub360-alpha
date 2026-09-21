@@ -50,6 +50,13 @@ jobs:
         # als "die Farben" lesen. Keine Abhaengigkeiten noetig.
         run: npm run tokens:check
 
+      - name: Check terminology against the acceptance checklist
+        # Die Acceptance-Checklist v1.0 verlangt einen Sprachdatei-Test, der bei
+        # verbotenen Begriffen fehlschlaegt. Er prueft alle vier Sprachen und
+        # braucht keine Abhaengigkeiten — deshalb steht er hier oben, wo er
+        # schnell scheitert.
+        run: npm run terminology:check
+
       - name: Build Core Dependencies
         run: npm run build:root
 

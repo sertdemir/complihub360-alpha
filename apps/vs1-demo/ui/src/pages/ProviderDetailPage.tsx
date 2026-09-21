@@ -21,7 +21,7 @@ import { SLUG_TO_I18N } from './user/AnfragenTab';
 // Arbeitsbereich und nicht auf einer eigenen weissen Flaeche:
 //
 //   1B  In der Shell, Kopf wie die Bereichsseite: Brotkrumen, Match-Zahl im
-//       Kasten, Titel serif mit goldenem Ort, „Verified Partner", Lage-Satz
+//       Kasten, Titel serif mit goldenem Ort, „Verified Provider", Lage-Satz
 //       mit Bezug zur Sitzung, rechts der Rueckweg; drei Ringe (Passung ·
 //       Bewertung · Bestaetigungsquote).
 //   2C  Matrix Pflicht × Markt wie auf der Bereichsseite — die Maerkte, die

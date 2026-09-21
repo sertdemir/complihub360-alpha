@@ -113,7 +113,7 @@
     "factorReplyQualityNote": "encargos confirmados por el cliente",
     "factorCoverageFit": "Ajuste de cobertura (mercados · idiomas)",
     "factorCoverageFitNote": "2 mercados · 3 idiomas",
-    "factorVerifiedStanding": "Estatus de Verified Partner",
+    "factorVerifiedStanding": "Estatus de Verified Provider",
     "factorVerifiedStandingNote": "activo · se renueva automáticamente"
   },
   "helpDrawer": {
@@ -542,10 +542,10 @@
       "productPackaging": "EPR y envases",
       "dataPrivacy": "Datos y privacidad",
       "marketingSeo": "Marketing",
-      "corporateStructure": "Sociedad y estructura",
+      "corporateStructure": "Constitución y presentaciones",
       "productCompliance": "Conformidad de producto",
       "logisticsCustoms": "Logística y aduanas",
-      "legalAdvisory": "Asesoría jurídica"
+      "legalAdvisory": "Apoyo jurídico"
     },
     "banner": {
       "text": "Perfil {{pct}} % completo — los perfiles incompletos aparecen más abajo en el ranking.",

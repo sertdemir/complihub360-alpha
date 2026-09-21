@@ -13,7 +13,7 @@ const PARTNER: Record<PartnerStatus, { cls: string; icon: React.ReactNode; label
   verified: {
     cls: 'bg-accent-50 text-accent-800 ring-1 ring-inset ring-accent-200 dark:bg-accent-500/15 dark:text-accent-300 dark:ring-accent-500/30',
     icon: <BadgeCheck size={13} strokeWidth={2.5} />,
-    label: 'Verified partner',
+    label: 'Verified provider',
   },
   pending: {
     cls: 'bg-neutral-100 text-neutral-600 ring-1 ring-inset ring-neutral-200 dark:bg-white/10 dark:text-neutral-300 dark:ring-white/10',

@@ -29,10 +29,10 @@
     "productPackaging": "EPR ve Ambalaj",
     "dataPrivacy": "Veri ve Gizlilik",
     "marketingSeo": "Pazarlama Uyumu",
-    "corporateStructure": "Şirket ve Yapı",
+    "corporateStructure": "Şirket Kuruluşu ve Bildirimler",
     "productCompliance": "Ürün Uygunluğu",
     "logisticsCustoms": "Lojistik ve Gümrük",
-    "legalAdvisory": "Hukuki Danışmanlık",
+    "legalAdvisory": "Hukuki Destek",
     "environment": "Çevresel Uyum"
   },
   "shell": {
@@ -119,9 +119,9 @@
       "product-compliance": "Ürün uyumu",
       "data-privacy": "Veri & gizlilik",
       "marketing-seo": "Pazarlama",
-      "corporate-structure": "Şirket",
+      "corporate-structure": "Şirket kuruluşu",
       "logistics-customs": "Lojistik & gümrük",
-      "legal-advisory": "Hukuki danışmanlık"
+      "legal-advisory": "Hukuki destek"
     },
     "emptyStep1Title": "Anlatın",
     "emptyStep1Body": "Ülke, pazarlar ve ürün yelpazesi hakkında dört soru.",
@@ -565,7 +565,7 @@
     "close": "Asistanı kapat",
     "thinking": "Bilgi tabanı kontrol ediliyor…",
     "sources": "Kaynaklar",
-    "disclaimer": "Genel düzenleyici bilgidir; hukuki veya vergi danışmanlığı değildir. Bağlayıcı bir değerlendirme için bir Verified Partner görevlendirin.",
+    "disclaimer": "Genel düzenleyici bilgidir; hukuki veya vergi danışmanlığı değildir. Bağlayıcı bir değerlendirme için bir Verified Provider görevlendirin.",
     "error": "Bu işlem başarısız oldu — lütfen birazdan tekrar deneyin.",
     "notConfigured": "Asistan bu ortamda henüz bağlı değil.",
     "quota": "Günlük ücretsiz limite ulaşıldı — yükseltme planı yakında geliyor.",

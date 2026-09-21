@@ -21,7 +21,7 @@
       "label": "plazo mediano"
     },
     "3": {
-      "label": "Verified Partners disponibles"
+      "label": "Verified Providers disponibles"
     }
   },
   "table": {
@@ -107,7 +107,7 @@
     }
   },
   "partners": {
-    "eyebrow": "3 Verified Partners encontrados",
+    "eyebrow": "3 Verified Providers encontrados",
     "title": "Hemos encontrado quién puede actuar sobre esto.",
     "unlocked": "Coincidencias desbloqueadas",
     "unlockCta": "Desbloquee las coincidencias con una cuenta gratuita",
@@ -143,7 +143,7 @@
     },
     "questionsOpen": "{{total}} preguntas pendientes",
     "sources": "Fuentes",
-    "disclaimer": "CompliHub360 es una plataforma de orquestación, no un bufete de abogados. El asesoramiento legal, fiscal y regulatorio lo prestan los Verified Partners bajo su propia responsabilidad profesional."
+    "disclaimer": "CompliHub360 es una plataforma de orquestación, no un bufete de abogados. El asesoramiento legal, fiscal y regulatorio lo prestan los Verified Providers bajo su propia responsabilidad profesional."
   },
   "detail": {
     "back": "Volver a los proveedores",
@@ -275,7 +275,7 @@
     "guidesTitle": "Dónde seguir leyendo",
     "guideRead": "Abrir",
     "bridgeTitle": "¿Quiere ver qué se aplica a su empresa?",
-    "bridgeBody": "Su risk map se ajusta a sus mercados y a su modelo de negocio, y muestra los Verified Partners que encajan con lo que realmente necesita.",
+    "bridgeBody": "Su risk map se ajusta a sus mercados y a su modelo de negocio, y muestra los Verified Providers que encajan con lo que realmente necesita.",
     "bridgeCta": "Evaluar mis necesidades",
     "previewBadge": "Vista previa · el motor de respuestas aún no está conectado",
     "entries": {
@@ -293,10 +293,10 @@
     "productPackaging": "EPR y envases",
     "dataPrivacy": "Datos y privacidad",
     "marketingSeo": "Compliance de marketing",
-    "corporateStructure": "Sociedad y estructura",
+    "corporateStructure": "Constitución y presentaciones",
     "productCompliance": "Conformidad de producto",
     "logisticsCustoms": "Logística y aduanas",
-    "legalAdvisory": "Asesoría legal"
+    "legalAdvisory": "Apoyo jurídico"
   },
   "matchBasis": {
     "market": "Cubre su mercado ({{country}})",
@@ -343,7 +343,7 @@
     "copyOpenList": "Abrir en sesiones",
     "copyError": "No se pudo crear la copia.",
     "copyUnavailable": "Guarde primero y podrá crear una variante.",
-    "verifiedPartner": "Verified Partner",
+    "verifiedPartner": "Verified Provider",
     "activeSince": "activo desde {{year}}",
     "responseTime": "Ø {{hours}} h de respuesta",
     "billing": {

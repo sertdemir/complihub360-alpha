@@ -362,7 +362,7 @@
     },
     "kpi": {
       "jurisdictions": "Jurisdictions Covered",
-      "domains": "Compliance Domains",
+      "domains": "Compliance Areas",
       "time": "Guided Assessment",
       "specialists": "Verified Specialists Network"
     },
@@ -591,7 +591,7 @@
       "description": "Navigating international company setup, choosing the correct legal form, establishing local substance, and handling corporate registrations in new jurisdictions.",
       "affected": "Individuals or companies planning to register legal entities, expand teams, or establish corporate presence in foreign markets.",
       "personaFit": "Best for: International expansion teams",
-      "cov1": "Corporate & Structure Wizard — evaluates current status, desired markets, team complexity",
+      "cov1": "Company Setup & Filings Wizard — evaluates current status, desired markets, team complexity",
       "cov2": "Entity need per market – determines whether your setup requires its own company",
       "cov3": "Intelligent routing to educational guide paths for uncertain founders",
       "fines": {
@@ -693,12 +693,12 @@
       "askPlaceholder": "E.g.: Do I need an EORI number for imports from Türkiye?"
     },
     "legal-advisory": {
-      "title": "Legal Advisory",
+      "title": "Legal Support",
       "headline": "Consumer terms, commercial contracts and governing law",
       "description": "The contract layer around a cross-border sale: consumer information duties, terms that hold up in the destination market, and which law governs the deal.",
       "affected": "Businesses selling into markets whose consumer law differs from their own, and anyone contracting with suppliers or partners across jurisdictions.",
       "personaFit": "Best for: Cross-border sellers & partnerships",
-      "cov1": "Legal Advisory Wizard — identifies which contract documents your setup requires",
+      "cov1": "Legal Support Wizard — identifies which contract documents your setup requires",
       "cov2": "Flags where destination-market consumer law overrides your standard terms",
       "cov3": "Routes to qualified lawyers in the relevant jurisdiction — CompliHub360 does not give legal advice",
       "fines": {
@@ -1506,7 +1506,7 @@
     "specialist": {
       "kicker": "What the specialist costs",
       "title": "Their fee — quoted before you commit.",
-      "body": "The advice itself is not free, and we will not pretend otherwise. Every Verified Partner publishes a fixed estimate before you accept the engagement, so you never sit through a discovery call just to learn the price."
+      "body": "The advice itself is not free, and we will not pretend otherwise. Every Verified Provider publishes a fixed estimate before you accept the engagement, so you never sit through a discovery call just to learn the price."
     },
     "cta": {
       "title": "Start where it makes sense for you.",
@@ -1519,7 +1519,7 @@
       "feePaidBy": "borne by the partner",
       "match": "{{pct}}% match",
       "noSlot": "No slot for sale",
-      "verified": "Verified Partner",
+      "verified": "Verified Provider",
       "rangeLabel": "Fee estimate",
       "range": "€180–240",
       "perHour": "/ hour",
@@ -1554,7 +1554,7 @@
         },
         {
           "q": "What does the specialist's advice cost?",
-          "a": "The specialist sets the fee: every Verified Partner publishes a fixed estimate before you accept the engagement — you never sit through a first call just to learn the price."
+          "a": "The specialist sets the fee: every Verified Provider publishes a fixed estimate before you accept the engagement — you never sit through a first call just to learn the price."
         },
         {
           "q": "Does the specialist see my details before I book?",
