@@ -2351,54 +2351,63 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 //    billing_model and a match score. Identity is revealed post-booking.
                 const country = requestData.country as string | undefined;
                 const rawCats: string[] = requestedSlugs;
-                // The wizard sends the canonical final-8 domain slugs; provider
-                // rows carry legacy DB category keys. Expand slugs → DB keys so
-                // the overlap scoring matches both vocabularies.
-                const DOMAIN_TO_DB: Record<string, string[]> = {
-                    'tax-vat': ['vat', 'vat_oss', 'tax'],
-                    'product-packaging': ['epr', 'packaging'],
-                    'data-privacy': ['privacy', 'gdpr', 'dat', 'data-privacy'],
-                    // Beide Haelften des Feldes (Entscheidung 18.09.2026):
-                    // Werberechtler UND Marketing-Dienstleister. Bis dahin
-                    // routete nur 'marketing'/'seo' — Agenturen kamen in der
-                    // Copy als Kunden vor, nicht als Anbieter.
-                    'marketing-seo': ['marketing', 'seo', 'advertising_law', 'agency', 'content', 'paid_media'],
-                    'corporate-structure': ['corporate', 'cst'],
-                    'product-compliance': ['product_compliance', 'psf', 'ce'],
-                    'logistics-customs': ['logistics', 'customs'],
-                    'legal-advisory': ['legal', 'oth'],
-                    // Umwelt jenseits der Verpackung (18.09.2026). 'epr' bleibt
-                    // bewusst bei product-packaging: wer nur Verpackung macht,
-                    // ist kein WEEE- oder Stoffrecht-Anbieter.
-                    'environment': ['environment', 'weee', 'reach', 'batteries'],
-                };
-                // One group per requested domain — a group counts as matched if
-                // the provider carries ANY of its keys (keeps the overlap
-                // denominator = number of requested domains, not synonym count).
-                const wantedGroups: string[][] = rawCats.map((c) => [c, ...(DOMAIN_TO_DB[c] ?? [])]);
 
-                // Downgraded providers (review watchdog, decision 2026-08-06)
-                // stay listed but with heavily reduced visibility — "weniger
-                // sichtbar", not invisible. Inactive (unvetted) never appear.
-                const providers = ((await supabaseApi.select('providers', {})) as any[])
-                    .filter((p: any) => p.partner_status === 'active' || p.partner_status === 'downgraded');
+                // Sichtbarkeit kommt aus `matchable_provider_services` (§3 × §4 × §19):
+                // freigegebene Leistung × freigegebener Markt × gueltiger Kontostatus,
+                // als UND-Kette in der View statt als gespeichertes Flag. Eine
+                // abgelaufene Freigabe faellt damit von selbst heraus — niemand muss
+                // einen Status nachziehen.
+                //
+                // Absichtlich NICHT gefiltert: `bookable_chargeable`. Das Gate aus
+                // §21.1 sperrt die Buchung, nicht das Matching. Wer es hierher zieht,
+                // laesst den Zahlungsstatus ueber Sichtbarkeit entscheiden — genau das,
+                // was §14 verbietet.
+                //
+                // `partner_status` und `countries_supported` entscheiden ab hier
+                // nichts mehr. Sie bleiben Anzeige- und Ranking-Merkmale (Verified-
+                // Badge, Watchdog-Abzug), bis sie entfallen.
+                const matchable = (await supabaseApi.select(
+                    'matchable_provider_services',
+                    country ? { country_code: country } : {},
+                )) as any[];
 
-                const eligible = country
-                    ? providers.filter((p: any) => (p.countries_supported || []).includes(country))
-                    : providers;
+                // Je Anbieter: die freigegebenen Bereiche und die freigegebenen
+                // Leistungsnamen. `area_code` rollt eine Unterkategorie auf den
+                // Bereich hoch, den der Wizard sendet — deshalb braucht die API keine
+                // eigene Abbildung mehr. DOMAIN_TO_DB ist damit ersatzlos entfallen;
+                // die Zuordnung lebt in `service_categories`, an einer Stelle.
+                const approvedAreas = new Map<string, Set<string>>();
+                const approvedNames = new Map<string, Set<string>>();
+                for (const row of matchable) {
+                    const key = row.provider_key as string;
+                    if (!approvedAreas.has(key)) {
+                        approvedAreas.set(key, new Set<string>());
+                        approvedNames.set(key, new Set<string>());
+                    }
+                    if (row.area_code) approvedAreas.get(key)!.add(row.area_code);
+                    if (row.service_name) approvedNames.get(key)!.add(row.service_name);
+                }
+
+                // Bewertung, Reaktionszeit, Pseudonym und Region haengen weiter am
+                // Anbieter, nicht an der Leistung — die View traegt sie bewusst nicht.
+                const eligible = ((await supabaseApi.select('providers', {})) as any[])
+                    .filter((p: any) => approvedAreas.has(p.provider_key));
 
                 const scoreOf = (p: any) => {
-                    const countryMatch = country && (p.countries_supported || []).includes(country) ? 1 : 0;
-                    const cats: string[] = p.categories || [];
-                    // Which of the REQUESTED domains this provider actually covers.
-                    // Kept as indices into rawCats so the wire carries the caller's
-                    // own domain slugs back, not our internal synonyms.
-                    const coveredIdx = wantedGroups
-                        .map((g, i) => (g.some((c) => cats.includes(c)) ? i : -1))
+                    // Die View ist bereits nach `country` gefiltert: wer hier steht,
+                    // hat eine gueltige Freigabe fuer diesen Markt. Ohne Land in der
+                    // Anfrage gibt es nichts zu treffen.
+                    const countryMatch = country ? 1 : 0;
+                    const areas = approvedAreas.get(p.provider_key) ?? new Set<string>();
+                    // Welche der ANGEFRAGTEN Bereiche dieser Anbieter freigegeben hat —
+                    // nicht, welche er von sich behauptet. Als Indizes auf rawCats,
+                    // damit der Draht die Slugs des Aufrufers zurueckgibt.
+                    const coveredIdx = rawCats
+                        .map((slug, i) => (areas.has(slug) ? i : -1))
                         .filter((i) => i >= 0);
-                    const catOverlap = wantedGroups.length
-                        ? coveredIdx.length / wantedGroups.length
-                        : (cats.length ? 0.5 : 0);
+                    const catOverlap = rawCats.length
+                        ? coveredIdx.length / rawCats.length
+                        : (areas.size ? 0.5 : 0);
                     const relevance = 0.6 * countryMatch + 0.4 * catOverlap;
 
                     const ratingN = (p.rating != null ? Number(p.rating) : 4.5) / 5;
@@ -2426,7 +2435,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                                 || `Verifizierter Spezialist${p.region ? ' · ' + p.region : ''}`,
                             region: p.region ?? null,
                             active_since: p.active_since ?? null,
-                            specializations: p.categories || [],
+                            // Freigegebene Leistungsnamen aus der Taxonomie, nicht die
+                            // Selbstauskunft aus `categories`. Wenn die Freigabe
+                            // entscheidet, wer erscheint, darf daneben keine
+                            // ungepruefte Liste stehen.
+                            specializations: Array.from(approvedNames.get(p.provider_key) ?? []).sort(),
                             languages: p.languages || [],
                             rating: p.rating != null ? Number(p.rating) : null,
                             completed_count: p.completed_count ?? null,

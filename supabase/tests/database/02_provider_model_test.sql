@@ -13,7 +13,7 @@
 -- soll an diesem Test scheitern.
 
 begin;
-select plan(38);
+select plan(42);
 
 -- ─── Struktur ───────────────────────────────────────────────────────────────
 
@@ -194,6 +194,55 @@ select is((select count(*)::int from public.service_categories where parent_code
           9, 'Neun Bereiche — Spec §11 nennt acht, die Plattform trennt Verpackung und Stoffrecht');
 select cmp_ok((select count(*)::int from public.service_categories where parent_code is not null),
               '>', 0, 'Jeder Bereich hat Unterkategorien');
+
+
+-- ─── area_code: der Bereich kommt aus der Taxonomie, nicht aus der API ──────
+--
+-- Gehoert zu 20260921000000_matchable_area_code.sql. Der Wizard sendet
+-- Bereichs-Slugs; eine Leistung darf nach §11 eine Unterkategorie sein. Ohne
+-- diese Spalte muesste das Matching die Taxonomie ein zweites Mal nachbauen.
+--
+-- Eigener Anbieter, weil der Fixture oben die Statusachsen durchgespielt hat.
+
+insert into public.providers (provider_key, name, partner_status, lifecycle_status)
+values ('t-area', 'Bereichstest', 'active', 'active');
+
+insert into public.provider_services (id, provider_key, service_code, service_name, status)
+values ('bbbbbbbb-0000-0000-0000-000000000001', 't-area', 'tax-vat',         'Bereich direkt',  'approved'),
+       ('bbbbbbbb-0000-0000-0000-000000000002', 't-area', 'tax-vat.oss-ioss', 'Unterkategorie', 'approved');
+
+insert into public.provider_service_coverage (service_id, country_code, status)
+values ('bbbbbbbb-0000-0000-0000-000000000001', 'DE', 'approved'),
+       ('bbbbbbbb-0000-0000-0000-000000000002', 'DE', 'approved');
+
+select is((select area_code from matchable_provider_services
+           where service_id = 'bbbbbbbb-0000-0000-0000-000000000001'),
+          'tax-vat', 'Ein Bereich rollt auf sich selbst');
+select is((select area_code from matchable_provider_services
+           where service_id = 'bbbbbbbb-0000-0000-0000-000000000002'),
+          'tax-vat', 'Eine Unterkategorie rollt auf ihren Bereich hoch — der Wizard-Slug trifft sie');
+
+-- Der Taxonomie-JOIN darf die Sichtbarkeitsgrenze nicht verschieben. Er ist
+-- ueber einen Fremdschluessel angebunden und damit nicht einschraenkend —
+-- diese Zeile haelt das fest, damit ein spaeterer LEFT/INNER-Umbau oder ein
+-- nachlaessiges ON auffaellt, statt still Anbieter aus dem Matching zu werfen.
+select is(
+  (select count(*)::int from matchable_provider_services),
+  (select count(*)::int
+     from public.provider_services s
+     join public.provider_service_coverage c on c.service_id = s.id
+     join public.providers p on p.provider_key = s.provider_key
+    where (p.lifecycle_status in ('active','limited')
+           or (p.lifecycle_status = 'reverification_due'
+               and p.reverification_grace_until is not null
+               and p.reverification_grace_until > now()))
+      and s.status in ('approved','limited')
+      and c.status in ('approved','limited')
+      and (c.expires_at is null or c.expires_at > now())),
+  'Die Taxonomie anzujoinen kostet keine einzige Zeile');
+
+select is((select count(*)::int from matchable_provider_services where area_code is null),
+          0, 'Keine matchbare Leistung ohne Bereich — sonst faende der Wizard sie nie');
 
 select * from finish();
 rollback;
