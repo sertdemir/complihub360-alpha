@@ -1,14 +1,15 @@
 import { cn } from '../../lib/utils';
 import { useTheme } from '../../lib/theme';
+import { useEffect, useRef } from 'react';
 import {
   MARK_ARC,
   MARK_ARC_LOWER,
   MARK_SWOOSH,
-  GLOBE,
   WORDMARK_INK,
   WORDMARK_GOLD,
   CLAIM,
 } from './logo-paths';
+import { RUHE_PFAD, dreheMit } from './globe-spin';
 
 // ─── Logo ─────────────────────────────────────────────────────────────────────
 // Compass-Komponente "Logo" (Figma-Node 2101:1151). Das Component-Set führt zwei
@@ -143,11 +144,23 @@ let seq = 0;
 
 function Bildmarke({ tone, gradId }: { tone: LogoTone; gradId: string }) {
   const c = TONE[tone];
+  const globus = useRef<SVGPathElement>(null);
+
+  // Die Erde dreht sich — sphaerisch gerechnet, nicht als Bildfolge, damit sie
+  // Vektor bleibt und sich ueber die Tones umfaerbt. Der Taktgeber laeuft fuer
+  // alle Marken der Seite gemeinsam und haelt an, sobald keine mehr im Bild ist.
+  // Bei prefers-reduced-motion startet er nicht; dann bleibt RUHE_PFAD stehen,
+  // und genau der steht auch im Markup, bevor JavaScript laeuft.
+  useEffect(() => {
+    const el = globus.current;
+    return el ? dreheMit(el) : undefined;
+  }, []);
+
   return (
     <>
       <path d={MARK_ARC} fill={c.ring} transform="translate(2.11 0)" />
       <path d={MARK_ARC_LOWER} fill={c.ring} transform="translate(10.101 29.798)" />
-      <path d={GLOBE} fill={c.ink} transform="translate(19.496 16.996)" />
+      <path ref={globus} d={RUHE_PFAD} fill={c.ink} />
       <path
         d={MARK_SWOOSH}
         fill={c.swoosh ?? `url(#${gradId})`}
