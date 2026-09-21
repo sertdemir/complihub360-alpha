@@ -21,7 +21,7 @@
       "label": "medyan son tarih"
     },
     "3": {
-      "label": "hazır Verified Partner"
+      "label": "hazır Verified Provider"
     }
   },
   "table": {
@@ -107,7 +107,7 @@
     }
   },
   "partners": {
-    "eyebrow": "3 Verified Partner eşleşti",
+    "eyebrow": "3 Verified Provider eşleşti",
     "title": "Bu konuda kimin harekete geçebileceğini bulduk.",
     "unlocked": "Eşleşmeler açıldı",
     "unlockCta": "Eşleşmeleri ücretsiz bir hesapla açın",
@@ -143,7 +143,7 @@
     },
     "questionsOpen": "{{total}} soru açık",
     "sources": "Kaynaklar",
-    "disclaimer": "CompliHub360 bir orkestrasyon platformudur, hukuk bürosu değildir. Hukuki, vergisel ve düzenleyici danışmanlık, Verified Partners tarafından kendi mesleki sorumlulukları altında sunulur."
+    "disclaimer": "CompliHub360 bir orkestrasyon platformudur, hukuk bürosu değildir. Hukuki, vergisel ve düzenleyici danışmanlık, Verified Providers tarafından kendi mesleki sorumlulukları altında sunulur."
   },
   "detail": {
     "back": "Sağlayıcı listesine dön",
@@ -275,7 +275,7 @@
     "guidesTitle": "Nereden devam edebilirsiniz",
     "guideRead": "Aç",
     "bridgeTitle": "İşletmeniz için neyin geçerli olduğunu görmek ister misiniz?",
-    "bridgeBody": "Risk haritanız pazarlarınıza ve iş modelinize göre eşleştirilir ve gerçek ihtiyacınıza uyan Verified Partner'ları gösterir.",
+    "bridgeBody": "Risk haritanız pazarlarınıza ve iş modelinize göre eşleştirilir ve gerçek ihtiyacınıza uyan Verified Provider'ları gösterir.",
     "bridgeCta": "İhtiyaçlarımı değerlendir",
     "previewBadge": "Önizleme · yanıt motoru henüz bağlı değil",
     "entries": {
@@ -293,10 +293,10 @@
     "productPackaging": "EPR ve Ambalaj",
     "dataPrivacy": "Veri ve Gizlilik",
     "marketingSeo": "Pazarlama Uyumu",
-    "corporateStructure": "Şirket ve Yapı",
+    "corporateStructure": "Şirket Kuruluşu ve Bildirimler",
     "productCompliance": "Ürün Uygunluğu",
     "logisticsCustoms": "Lojistik ve Gümrük",
-    "legalAdvisory": "Hukuki Danışmanlık"
+    "legalAdvisory": "Hukuki Destek"
   },
   "matchBasis": {
     "market": "Pazarınızı kapsıyor ({{country}})",
@@ -343,7 +343,7 @@
     "copyOpenList": "Oturumlarda aç",
     "copyError": "Kopya oluşturulamadı.",
     "copyUnavailable": "Önce kaydedin, sonra varyant oluşturabilirsiniz.",
-    "verifiedPartner": "Verified Partner",
+    "verifiedPartner": "Verified Provider",
     "activeSince": "{{year}} yılından beri aktif",
     "responseTime": "Ø {{hours}} sa. yanıt süresi",
     "billing": {

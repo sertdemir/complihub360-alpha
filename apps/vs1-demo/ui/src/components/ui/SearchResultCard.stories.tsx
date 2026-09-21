@@ -43,7 +43,7 @@ const ResultList = () => (
     <SearchResultCard
       type="contact"
       title="Helios Tax Partners"
-      snippet={<>Verified partner specialising in cross-border <Hi>VAT</Hi> and indirect-tax compliance for SaaS businesses.</>}
+      snippet={<>Verified provider specialising in cross-border <Hi>VAT</Hi> and indirect-tax compliance for SaaS businesses.</>}
       meta="Partner · DE · responds in 4h"
       onClick={() => {}}
     />

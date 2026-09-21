@@ -77,7 +77,7 @@ function WizardPathDemo() {
   );
 }
 
-function VerifiedPartnerDemo() {
+function VerifiedProviderDemo() {
   const { t } = useTranslation('home');
   return (
     <div className="flex items-center gap-3">
@@ -151,7 +151,7 @@ export function BrandCodePreview() {
           />
           <CodeCard
             label={t('brandCode.cards.2.label')}
-            demo={<VerifiedPartnerDemo />}
+            demo={<VerifiedProviderDemo />}
             title={t('brandCode.cards.2.title')}
             desc={t('brandCode.cards.2.desc')}
           />

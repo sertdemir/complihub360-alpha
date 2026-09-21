@@ -542,10 +542,10 @@
       "productPackaging": "EPR & Packaging",
       "dataPrivacy": "Data & Privacy",
       "marketingSeo": "Marketing",
-      "corporateStructure": "Corporate & Structure",
+      "corporateStructure": "Company Setup & Filings",
       "productCompliance": "Product compliance",
       "logisticsCustoms": "Logistics & Customs",
-      "legalAdvisory": "Legal advisory"
+      "legalAdvisory": "Legal support"
     },
     "banner": {
       "text": "Profile {{pct}}% complete — incomplete profiles rank further down.",

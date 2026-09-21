@@ -7,6 +7,7 @@ import { WorkspaceMobileBar, type WorkspaceNavGroup } from '../ui/WorkspaceMobil
 import { Logo } from '../ui/Logo';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { cn } from '../../lib/utils';
+import { Avatar } from '../ui/Avatar';
 
 // ─── AdminShell ───────────────────────────────────────────────────────────────
 // The internal Control-Center frame (Figma page "Admin", 2966:4): always-dark
@@ -109,7 +110,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         }
         footer={
           <div className="flex items-center gap-2.5 px-1">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-brand-accent text-[11px] font-bold text-fg-on-accent">AD</span>
+            <Avatar size="md" initials="AD" tone="accent" />
             <div className="leading-tight">
               <p className="text-[12px] font-semibold text-fg">Admin</p>
               <p className="text-[10px] text-fg-tertiary">CompliHub360 Ops</p>
@@ -151,7 +152,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           }
           footer={
             <div className="flex items-center gap-2.5 px-4 py-3">
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-accent text-[11px] font-bold text-fg-on-accent">AD</span>
+              <Avatar size="md" initials="AD" tone="accent" className="shrink-0" />
               <div className="min-w-0 flex-1 leading-tight">
                 <p className="text-body-sm font-semibold text-fg">Admin</p>
                 <p className="text-body-2xs text-fg-tertiary">CompliHub360 Ops</p>

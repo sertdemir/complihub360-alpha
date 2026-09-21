@@ -47,10 +47,7 @@ import { ProviderDetailPage } from "./pages/ProviderDetailPage";
 import { ProviderSchedulePage } from "./pages/ProviderSchedulePage";
 const DomainPage = lazy(() => import("./pages/user/DomainPage").then((m) => ({ default: m.DomainPage })));
 const UserNotificationsPage = lazy(() => import("./pages/user/UserNotificationsPage").then((m) => ({ default: m.UserNotificationsPage })));
-const SavedProvidersPage = lazy(() => import("./pages/user/SavedProvidersPage").then((m) => ({ default: m.SavedProvidersPage })));
-const ExportsPage = lazy(() => import("./pages/user/ExportsPage").then((m) => ({ default: m.ExportsPage })));
 const ComingSoonPage = lazy(() => import("./pages/user/ComingSoonPage").then((m) => ({ default: m.ComingSoonPage })));
-const LibraryPage = lazy(() => import("./pages/user/LibraryPage").then((m) => ({ default: m.LibraryPage })));
 // Wizard Shell Steps
 // Individualized Category Wizards
 // Auth
@@ -230,11 +227,10 @@ function AppContent() {
                         <Route path="provider/:key/schedule" element={<ProviderSchedulePage />} />
                         <Route path="dashboard/workbench/:domain" element={<DomainPage />} />
                         <Route path="dashboard/notifications" element={<UserNotificationsPage />} />
-                        <Route path="dashboard/saved-providers" element={<SavedProvidersPage />} />
-                        <Route path="dashboard/exports" element={<ExportsPage />} />
+                        <Route path="dashboard/saved-providers" element={<ComingSoonPage page="savedProviders" />} />
                         <Route path="dashboard/alerts" element={<ComingSoonPage page="alerts" />} />
                         <Route path="dashboard/calendar" element={<ComingSoonPage page="calendar" />} />
-                        <Route path="dashboard/library" element={<LibraryPage />} />
+                        <Route path="dashboard/library" element={<ComingSoonPage page="library" />} />
                         <Route path="dashboard/*" element={<LocaleRedirect to="dashboard" />} />
                     </Route>
                     

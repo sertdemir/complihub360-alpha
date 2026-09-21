@@ -86,13 +86,14 @@ export function ProviderMatchCard({
           {eyebrow && <p className="text-[13px] text-fg-tertiary">{eyebrow}</p>}
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1.5">
-          {/* Gold-700 (#96802a) misst auf dem 10-%-Goldgrund 3.88:1 und reisst bei
-              11 px die AA-Schwelle. accent-800 haelt dieselbe Goldfamilie und
-              kommt ueber 4.5:1 — gleiche Korrektur wie beim Verified-Badge auf
-              /compliance. Dunkel bleibt gold-500, dort ist der Grund dunkel. */}
+          {/* Traegt den Messington der Wortmarke: --color-text-accent-strong
+              ist im Light gold-brand-deep (#8C672A) und misst auf dem
+              10-%-Goldgrund 4.80:1, im Dark das Logo-Gold #C5913B. Der
+              Vorgaenger war accent-800/#d4af37 — AA-sicher, aber zwei
+              verschiedene Gelbtoene in einer Karte. */}
           {isVerified && (
-            <span className="flex items-center gap-1 rounded-full border border-[#d4af37]/40 bg-[#d4af37]/10 px-2 py-[3px] text-[11px] font-medium text-accent-800 dark:text-[#d4af37]">
-              <CheckIcon /> Verified Partner
+            <span className="flex items-center gap-1 rounded-full border border-[#d4af37]/40 bg-[#d4af37]/10 px-2 py-[3px] text-[11px] font-medium text-fg-accent-strong">
+              <CheckIcon /> Verified Provider
             </span>
           )}
           <span className={cn('rounded-full border px-2.5 py-1 text-[13px] font-medium', MATCH_PILL[matchTier])}>
@@ -128,7 +129,7 @@ export function ProviderMatchCard({
           <p className="mt-0.5 text-[16px] font-medium text-fg">{billing}</p>
         </div>
         {action ?? (
-          <Button variant="accent" size="sm" onClick={onDetails}>Details</Button>
+          <Button variant="primary" size="sm" onClick={onDetails}>Details</Button>
         )}
       </div>
     </div>

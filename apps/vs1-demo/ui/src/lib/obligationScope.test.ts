@@ -291,7 +291,7 @@ describe('Belegte Obergrenze', () => {
     'prod-packaging-reuse-targets', 'prod-safety', 'tax-corporate', 'tax-vat-registration',
   ]);
 
-  type Obergrenze = { kind: string; basis?: string; asOf?: string; note?: string; value?: number; currency?: string; of?: string; per?: string; level?: string; orAmount?: { value: number; currency?: string } };
+  type Obergrenze = { kind: string; basis?: string; basisNote?: string; asOf?: string; note?: string; value?: number; statutoryValue?: number; currency?: string; of?: string; per?: string; level?: string; orAmount?: { value: number; currency?: string } };
   type Eintrag = {
     penaltyMaxEur?: number;
     penaltyCeiling?: Obergrenze;
@@ -340,12 +340,26 @@ describe('Belegte Obergrenze', () => {
     // Solange die vier Flaechen `penaltyMaxEur` lesen und die Obergrenze
     // daneben steht, duerfen die beiden sich nicht widersprechen. Gilt nur fuer
     // EUR — bei GBP/USD/TRY ist der Unterschied ja gerade der Punkt.
+    // Prueft seit dem 19.09. auch `turnover` MIT `orAmount` — dieselbe
+    // Unterscheidung, die `nenntBetrag` schon kennt. Solange sie hier fehlte,
+    // fuehrten drei EU-Eintraege 100.000 EUR, wo die DSGVO 20 Millionen nennt;
+    // die beiden britischen Pendants derselben Form waren laengst angeglichen.
+    // Eine Unterscheidung, die an einer Stelle richtig steht, muss ueberall
+    // gleich lauten, sonst haelt sie nur dort.
+    const euroBetrag = (c: Obergrenze): number | undefined =>
+      c.kind === 'amount' && c.currency === 'EUR'
+        ? c.value
+        : c.kind === 'turnover' && c.orAmount?.currency === 'EUR'
+          ? c.orAmount.value
+          : undefined;
     const ab = alle().filter(([, e]) => {
       const c = e.penaltyCeiling;
-      return c?.kind === 'amount' && c.currency === 'EUR' && e.penaltyMaxEur !== c.value;
+      if (!c) return false;
+      const b = euroBetrag(c);
+      return b != null && e.penaltyMaxEur !== b;
     });
     expect(
-      ab.map(([k, e]) => `${k}: Zahl ${e.penaltyMaxEur} vs. Obergrenze ${e.penaltyCeiling?.value}`),
+      ab.map(([k, e]) => `${k}: Zahl ${e.penaltyMaxEur} vs. Obergrenze ${euroBetrag(e.penaltyCeiling as Obergrenze)}`),
       'Belegter Eurobetrag und angezeigte Zahl gehen auseinander',
     ).toEqual([]);
   });
@@ -469,12 +483,15 @@ describe('Belegte Obergrenze', () => {
   // Wieder eine namentliche Liste statt einer Zahl (siehe OHNE_BETRAG_BEKANNT):
   // sie darf nur schrumpfen, und wenn ein Portal zugaenglich wird, faellt es
   // im Review auf, weil eine Zeile verschwindet — nicht nur eine Ziffer.
-  const STAATEN_OHNE_ZUGANG: Record<string, string> = {
-    // TX ist am 19.09. weggefallen: die Gerueststeite laedt ihren Text von
-    // tcss.legis.texas.gov nach, und ueber diesen Host kommt er auch per curl.
-    NY: 'www.nysenate.gov steht hinter einer Cloudflare-Bot-Schranke (403). '
-      + 'Das ist eine Entscheidung des Betreibers, keine Zugangsluecke.',
-  };
+  // LEER, und das ist das Ergebnis eines Tages. Texas fiel weg, als der
+  // Netzwerk-Mitschnitt zeigte, woher die Geruestseite ihren Text laedt; New
+  // York, als die Cloudflare-Schranke nicht mehr da war — die Seiten
+  // antworten mit 200, wo sie im September noch 403 gaben.
+  //
+  // Die Liste bleibt trotzdem stehen. Sie hat jetzt eine andere Aufgabe: Wird
+  // ein Portal wieder dicht, kommt hier eine Zeile hinein und der Test
+  // darunter faellt, statt dass eine Zahl stillschweigend veraltet.
+  const STAATEN_OHNE_ZUGANG: Record<string, string> = {};
   const GEFUEHRTE_STAATEN = ['CA', 'FL', 'NY', 'TX'];
 
   it('haelt die Gliedstaaten an derselben Beweispflicht wie die Laender', () => {
@@ -503,14 +520,14 @@ describe('Belegte Obergrenze', () => {
   });
 
   it('laesst die Liste der unerreichbaren Staaten nur schrumpfen', () => {
-    // Einer von vier. Texas ist am 19.09. weggefallen, und der Wegfall lief
-    // genau so, wie diese Liste es vorsieht: erst verschwand die Zeile, dann
-    // verlangte der Beweispflicht-Test die Zahlen — nicht umgekehrt.
+    // Keiner von vier. Beide Wegfaelle liefen so, wie diese Liste es
+    // vorsieht: erst verschwand die Zeile, dann verlangte der
+    // Beweispflicht-Test die Zahlen — nicht umgekehrt.
     //
-    // Bleibt New York. Das ist die andere Art von Hindernis: bei Texas fehlte
-    // uns ein Weg, bei New York sagt der Betreiber Nein. Nur das erste liess
-    // sich beheben.
-    expect(Object.keys(STAATEN_OHNE_ZUGANG).sort()).toEqual(['NY']);
+    // Merke fuer das naechste Mal: "der Betreiber sagt Nein" war bei New York
+    // eine Momentaufnahme, keine Eigenschaft. Ein 403 ist ein Befund von
+    // heute, kein Urteil ueber morgen.
+    expect(Object.keys(STAATEN_OHNE_ZUGANG).sort()).toEqual([]);
     for (const [staat, grund] of Object.entries(STAATEN_OHNE_ZUGANG)) {
       expect(grund.length, `${staat}: Grund zu duenn`).toBeGreaterThan(60);
     }
@@ -567,13 +584,20 @@ describe('Belegte Obergrenze', () => {
   // nur die Ebene nicht. Wo der basis-String den Verweis nennt, rechnet der
   // Test die Multiplikation nach, statt sie zu glauben.
   it('rechnet den Fuenffach-Verweis auf Code penal Art. 131-38 nach', () => {
+    // Las den Sockel frueher aus dem basis-String. Das hielt genau so lange,
+    // bis die Prosa aus `basis` in `basisNote` umzog — dann stand dort keine
+    // Zahl mehr und der Test wurde rot. Er hatte recht: eine Rechengroesse
+    // gehoert in ein Feld. Seither `statutoryValue`.
     let geprueft = 0;
     for (const [k, e] of alle()) {
       const c = e.penaltyCeiling;
       if (!c?.basis || !/131-38/.test(c.basis)) continue;
-      const m = c.basis.match(/([\d.]+)\s*EUR/);
-      expect(m, `${k}: Verweis auf 131-38, aber kein Ausgangsbetrag im basis-String`).toBeTruthy();
-      const sockel = Number(String(m?.[1]).replace(/\./g, ''));
+      expect(
+        c.statutoryValue,
+        `${k}: Verweis auf 131-38, aber kein statutoryValue — der Sockel, `
+          + 'den der Sanktionsartikel selbst nennt, fehlt.',
+      ).toBeTypeOf('number');
+      const sockel = c.statutoryValue as number;
       expect(
         c.value,
         `${k}: ${sockel} EUR verfuenffacht sind ${sockel * 5}, gefuehrt wird ${c.value}. `

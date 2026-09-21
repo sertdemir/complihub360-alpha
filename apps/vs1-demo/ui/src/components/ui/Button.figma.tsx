@@ -16,7 +16,7 @@ figma.connect(
         Success: "success",
         Error: "danger",
         Info: "info",
-        Accent: "accent",
+        // Accent (Gold) entfiel 2026-09-20 — Knoepfe tragen kein Gold mehr.
       }),
       size: figma.enum("Size", {
         Small: "sm",

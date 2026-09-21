@@ -7,7 +7,7 @@ import type { AnonProvider } from '../../api/search';
 // EINE Darstellung fuer Anbieter im Arbeitsbereich (Nutzer-Vorgabe
 // 2026-09-13): Sitzungsseite (Canvas G9, gestapelt in der rechten Spalte)
 // und Bereichsseite (5D) zeigen dieselbe Karte — Match-Zahl im Kasten,
-// „Verified Partner"-Marke, Pseudonym, Region · aktiv seit, Antwortzeit ·
+// „Verified Provider"-Marke, Pseudonym, Region · aktiv seit, Antwortzeit ·
 // Abrechnung, darunter die Match-Basis als Haken-Liste und GENAU EIN Knopf:
 // „Details ansehen". Keine Anfrage von der Karte aus — eine Anfrage braucht
 // den ausgewaehlten Anbieter, der Weg geht ueber die Detailseite.
@@ -42,7 +42,7 @@ export function PartnerCard({ provider: p, top, basis, onDetails, booking, class
     <div className={`${CARD} flex flex-col p-4 ${className}`}>
       <div className="flex items-center gap-2.5">
         <span
-          className={'grid h-10 w-10 shrink-0 place-items-center rounded-[10px] text-body-xs font-extrabold '
+          className={'grid h-[40px] w-[40px] shrink-0 place-items-center rounded-[10px] text-body-xs font-extrabold '
             + (top ? 'bg-accent text-primary-950' : 'bg-brand-light text-fg-brand')}
         >
           {p.match}

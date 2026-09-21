@@ -130,7 +130,7 @@ export function RequestQuoteModal({ provider, country, category, domainLabel, re
             </div>
             <div className="flex items-center justify-end gap-2 border-t border-elevate/10 px-6 py-4">
               <Button variant="ghost" size="sm" onClick={onClose}>{t('shared.cancel')}</Button>
-              <Button variant="accent" size="sm" onClick={submit} disabled={phase === 'sending' || message.trim().length < 10}>
+              <Button variant="primary" size="sm" onClick={submit} disabled={phase === 'sending' || message.trim().length < 10}>
                 {phase === 'sending' ? t('requestQuote.sending') : t('requestQuote.sendRequest')}
               </Button>
             </div>

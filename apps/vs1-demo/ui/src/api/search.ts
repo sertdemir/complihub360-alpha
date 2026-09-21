@@ -1,3 +1,4 @@
+import type { PenaltyCeiling } from '@complihub/compliance-engine';
 import { apiFetch } from './client';
 import type { SearchProfile } from '../components/wizard/WizardContext';
 
@@ -47,6 +48,10 @@ export interface SearchLaw {
   source_url?: string | null;
   penalty?: string | null;
   penalty_max_eur?: number | null;
+  /** Die belegte Obergrenze mit Fundstelle und Stand. Seit dem 19.09. die
+   *  Quelle fuer die Bussgeldzeile der Karte; `penalty` bleibt nur noch der
+   *  Rueckfall, wo keine Obergrenze belegt ist. */
+  penalty_ceiling?: PenaltyCeiling | null;
   due?: string | null;
   due_days?: number | null;
   /** ISO date (YYYY-MM-DD) the obligation starts to apply; null = already in

@@ -4,7 +4,6 @@
     "solutions": "Soluciones",
     "complianceAreas": "Áreas de Cumplimiento",
     "resources": "Recursos",
-    "login": "Iniciar sesión",
     "signup": "Regístrate gratis",
     "items": {
       "aiEngine": {
@@ -45,7 +44,9 @@
       }
     },
     "aiGovernance": "Gobernanza de IA",
-    "aiGovDesc": "Nuestro marco para una IA transparente y conforme a la ley."
+    "aiGovDesc": "Nuestro marco para una IA transparente y conforme a la ley.",
+    "dashboard": "Mi panel",
+    "signOut": "Cerrar sesión"
   },
   "hero": {
     "scenarios": {
@@ -382,7 +383,8 @@
         "risk": "Riesgo",
         "time": "Plazo para actuar",
         "fine": "Exposición típica",
-        "markets": "Mercados activos"
+        "markets": "Mercados activos",
+        "proven": "acreditado"
       },
       "upTo": "hasta {{sum}}",
       "marketsCount": "{{count}} de {{total}}"
@@ -589,7 +591,7 @@
       "description": "Navegar la constitución internacional de empresas, elegir la forma jurídica correcta, establecer sustancia local y gestionar los registros corporativos en nuevas jurisdicciones.",
       "affected": "Personas o empresas que planean registrar entidades legales, expandir equipos o establecer presencia corporativa en mercados extranjeros.",
       "personaFit": "Ideal para: equipos de expansión internacional",
-      "cov1": "Asistente Corporativo y de Estructura — evalúa el estado actual, mercados deseados, complejidad del equipo",
+      "cov1": "Asistente de Constitución y Presentaciones — evalúa el estado actual, mercados deseados, complejidad del equipo",
       "cov2": "Necesidad de entidad por mercado – determina si su configuración requiere una sociedad propia",
       "cov3": "Enrutamiento inteligente a rutas de guías educativas para fundadores indecisos",
       "fines": {
@@ -691,12 +693,12 @@
       "askPlaceholder": "P. ej.: ¿Necesito un número EORI para importar desde Turquía?"
     },
     "legal-advisory": {
-      "title": "Asesoría Jurídica",
+      "title": "Apoyo jurídico",
       "headline": "Condiciones de consumo, contratos mercantiles y ley aplicable",
       "description": "La capa contractual de una venta transfronteriza: deberes de información al consumidor, condiciones que resisten en el mercado de destino y qué ley rige el acuerdo.",
       "affected": "Empresas que venden en mercados con derecho de consumo distinto al propio, y quienes contratan con proveedores o socios en otras jurisdicciones.",
       "personaFit": "Ideal para: venta transfronteriza y alianzas",
-      "cov1": "Asistente de Asesoría Jurídica — identifica qué documentos contractuales exige su configuración",
+      "cov1": "Asistente de Apoyo Jurídico — identifica qué documentos contractuales exige su configuración",
       "cov2": "Señala dónde el derecho de consumo del destino desplaza sus condiciones estándar",
       "cov3": "Enrutamiento a abogados colegiados en la jurisdicción pertinente — CompliHub360 no presta asesoramiento jurídico",
       "fines": {
@@ -814,7 +816,10 @@
         "ofTotal": "{{count}} de {{total}}",
         "laterLabel": "se aplican más adelante",
         "fromDate": "{{count}} desde {{date}}",
-        "nationalIn": "{{count}} con base jurídica en {{market}}"
+        "nationalIn": "{{count}} con base jurídica en {{market}}",
+        "exposureProven": "Sanción máxima acreditada",
+        "exposureNoneProven": "Ninguna de las {{total}} obligaciones fija un importe en la ley: las sanciones son proporcionales, por unidad o se dejan a los Estados miembros.",
+        "exposureProvenNote": "{{proven}} de {{total}} obligaciones fijan un importe en la ley. Las demás cuentan como cero, no se estiman."
       },
       "risk": {
         "title": "Perfil de riesgo",
@@ -850,7 +855,8 @@
         "noNamedSource": "Todavía sin fuente citada",
         "placeholderNote": "El motor no incluye ninguna norma de {{market}} aquí: es una laguna de nuestra cobertura, no de la ley.",
         "pendingNote": "Fuente de la UE. {{market}} tiene además su propio texto, que aún no incluimos.",
-        "euDirect": "Reglamento de la UE: se aplica directamente, esta es la norma vigente aquí"
+        "euDirect": "Reglamento de la UE: se aplica directamente, esta es la norma vigente aquí",
+        "ceiling": "Límite acreditado"
       },
       "relatedOpen": "Abrir este ámbito",
       "relatedStrongest": "Conexión más fuerte",
@@ -907,7 +913,73 @@
       "askPlaceholder": "Haga su pregunta con sus propias palabras",
       "coverageNoteGaps": "{{specific}} de {{count}} obligaciones tienen una fuente específica de {{market}}. Del resto, {{gaps}} tienen un texto nacional que aún no incluimos; las demás son Reglamentos de la UE, de aplicación directa aquí.",
       "checkTitle": "¿Le aplica esto?",
-      "checkFoot": "Si uno aplica, esta área conlleva deberes para usted — el assessment los acota a su caso."
+      "checkFoot": "Si uno aplica, esta área conlleva deberes para usted — el assessment los acota a su caso.",
+      "ceiling": {
+        "unproven": "Aún sin acreditar",
+        "unprovenNote": "La cifra con la que calcula el mapa de riesgo es un valor heredado: no la hemos leído en el texto legal.",
+        "perUnit": "{{amount}} por {{per}}",
+        "proportional": "{{percent}} % {{of}}",
+        "turnover": "{{percent}} % del volumen de negocios anual mundial",
+        "turnoverOr": "{{amount}} o {{percent}} % del volumen de negocios anual mundial, la cantidad que sea mayor",
+        "subnational": "Se fija un nivel más abajo — {{level}}",
+        "delegated": "Sin importe — el acto deja la sanción a los Estados miembros",
+        "none": "Sin multa — la consecuencia es civil",
+        "unlimited": "Multa sin límite máximo",
+        "asOf": "{{basis}} · a fecha de {{date}}",
+        "converted": "La cifra en euros es nuestra conversión de {{from}}, al tipo del BCE de {{date}}.",
+        "noAmount": "La ley no menciona ningún importe, por lo que la cifra en euros no tiene equivalente legal.",
+        "state": {
+          "CA": "California",
+          "TX": "Texas",
+          "NY": "Nueva York",
+          "FL": "Florida"
+        },
+        "basisNote": {
+          "frTaxTiers": "10 % sin requerimiento, 40 % tras el requerimiento, 80 % por actividad oculta",
+          "frTaxIntent": "40 % por incumplimiento deliberado, 80 % por fraude fiscal",
+          "frQuintuple4500": "La ley fija 4.500 € para personas físicas; para las jurídicas es el quíntuplo",
+          "frQuintuple200k": "La ley fija 200.000 € para personas físicas; para las jurídicas es el quíntuplo",
+          "frTwoRates75k": "75.000 € para personas jurídicas, 15.000 € para personas físicas",
+          "frPerUnitTwoRates": "El importe para personas jurídicas; 1.500 € para personas físicas",
+          "usMonthlyCap25": "5 % por cada mes iniciado, con un máximo del 25 % en total",
+          "txCurePeriod": "Solo tras el plazo de subsanación: 30 días desde la notificación del Attorney General",
+          "ukLateFilingTiers": "Public company, con más de seis meses de retraso: 7.500 £, el doble si también se incumplió el año anterior. Private company: de 150 a 1.500 £",
+          "itAccountsTiers": "No depósito de las cuentas anuales; por año de retraso a partir de 6 M€ de facturación, en otro caso de 1.200 a 60.000 €",
+          "esVeryGraveRange": "Infracción muy grave: del 100 % al 150 %",
+          "esPesetaLegacy": "Infracción muy grave. Convertida de pesetas en 2001 y no actualizada desde entonces",
+          "esGainMultiple": "Infracción muy grave. Puede superarse hasta seis u ocho veces el beneficio ilícito",
+          "nlPaymentDefault": "Impago. En caso de dolo, el 100 % del impuesto según el art. 67f",
+          "widespreadOnly": "Solo en caso de infracción generalizada; en otro caso, 50.000 € conforme a la primera frase",
+          "ukIndictmentVsSummary": "Por vía de acusación formal. En el procedimiento sumario se aplica en su lugar el statutory maximum",
+          "nlFourthCategory": "Cuarta categoría, a 1 de enero de 2026",
+          "ukOverTwoYears": "Con más de dos años de retraso",
+          "ukDeliberateConcealed": "Categoría 1, deliberada y ocultada",
+          "deAssessedTaxes": "Falta de presentación, en impuestos liquidados",
+          "deLateSurchargeCap": "Recargo por presentación extemporánea, límite máximo",
+          "deliberateNoDisclosure": "Incumplimiento deliberado, sin regularización voluntaria",
+          "seriousRepeated": "Incumplimiento grave, reiterado o sistemático",
+          "nyShieldChain": "Nueva York no tiene una ley general de privacidad. La SHIELD Act regula la seguridad de los datos y remite la sanción dos niveles más allá, al derecho general de consumo. No notificar una brecha tiene su propio límite: según el § 899-aa, 5.000 $ o 20 $ por notificación omitida, con un tope de 250.000 $."
+        },
+        "ofKey": {
+          "domesticValue": "del valor interno de la mercancía",
+          "taxRequiredToShow": "del impuesto que debe figurar en la declaración",
+          "itIncomeTax": "del impuesto sobre la renta debido (IRES e IRAP)",
+          "corporateTaxDue": "del impuesto de sociedades debido",
+          "vatDue": "del IVA debido",
+          "taxDue": "del impuesto debido",
+          "unremittedTax": "de la deuda tributaria no ingresada",
+          "unpaidCorporateTax": "del impuesto de sociedades pendiente",
+          "potentialLostRevenue": "de la recaudación potencialmente perdida"
+        },
+        "perKey": {
+          "unitOrTonnePlaced": "unidad o tonelada de producto puesto en el mercado"
+        },
+        "levelKey": {
+          "states45AndDc": "45 estados y el Distrito de Columbia",
+          "statesWithPrivacyActs": "los estados con ley propia de privacidad (California y una veintena más)",
+          "states50AndDc": "los 50 estados y el Distrito de Columbia"
+        }
+      }
     },
     "riskBadge": "Riesgo: {{level}}"
   },
@@ -1266,7 +1338,11 @@
       "relatedAreasFact_other": "{{count}} obligaciones en este mercado",
       "weightsFootCovered": "Fuentes propias en {{covered}} de {{total}} áreas — los reglamentos de la UE se aplican directamente y no cuentan como carencia.",
       "weightsFootPending": "Para {{list}} existe un texto nacional que aún no incorporamos — en su lugar figura el instrumento de la UE indicado.",
-      "weightsFootNone": "Para {{list}} aún no tenemos una fuente con nombre."
+      "weightsFootNone": "Para {{list}} aún no tenemos una fuente con nombre.",
+      "exposureCaveat": "Una advertencia sobre estas cifras: {{what}}.",
+      "exposureConverted": "{{count}} de ellas están convertidas desde otra moneda",
+      "exposureUnbacked": "{{count}} de {{total}} obligaciones no fijan ningún importe en la ley",
+      "exposureAnd": " y "
     },
     "cta": {
       "title": "Vea cuáles se aplican a su caso.",
@@ -1430,7 +1506,7 @@
     "specialist": {
       "kicker": "Lo que cuesta el especialista",
       "title": "Los honorarios del especialista — presupuestados antes de que usted se comprometa.",
-      "body": "El asesoramiento en sí no es gratuito, y no vamos a fingir lo contrario. Cada Verified Partner publica una estimación fija antes de que usted acepte el encargo, de modo que nunca tendrá que aguantar una llamada exploratoria solo para conocer el precio."
+      "body": "El asesoramiento en sí no es gratuito, y no vamos a fingir lo contrario. Cada Verified Provider publica una estimación fija antes de que usted acepte el encargo, de modo que nunca tendrá que aguantar una llamada exploratoria solo para conocer el precio."
     },
     "cta": {
       "title": "Empiece donde tenga sentido para usted.",
@@ -1443,7 +1519,7 @@
       "feePaidBy": "la asume el partner",
       "match": "{{pct}} % match",
       "noSlot": "Ningún puesto en venta",
-      "verified": "Verified Partner",
+      "verified": "Verified Provider",
       "rangeLabel": "Estimación de honorarios",
       "range": "180–240 €",
       "perHour": "/ hora",
@@ -1478,7 +1554,7 @@
         },
         {
           "q": "¿Cuánto cuesta el asesoramiento del especialista?",
-          "a": "Los honorarios los fija el especialista: cada Verified Partner publica una estimación fija antes de que usted acepte el encargo — sin una primera llamada solo para conocer el precio."
+          "a": "Los honorarios los fija el especialista: cada Verified Provider publica una estimación fija antes de que usted acepte el encargo — sin una primera llamada solo para conocer el precio."
         },
         {
           "q": "¿Ve el especialista mis datos antes de la reserva?",

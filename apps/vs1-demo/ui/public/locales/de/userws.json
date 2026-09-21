@@ -1,6 +1,5 @@
 {
   "shared": {
-    "bookmarks": "Lesezeichen (12)",
     "seeAll": "Alle anzeigen",
     "startNewSearch": "Neue Suche starten",
     "open": "Öffnen",
@@ -30,10 +29,10 @@
     "productPackaging": "EPR & Verpackung",
     "dataPrivacy": "Daten & Datenschutz",
     "marketingSeo": "Marketing-Compliance",
-    "corporateStructure": "Unternehmen & Struktur",
+    "corporateStructure": "Gründung & Meldungen",
     "productCompliance": "Produkt-Compliance",
     "logisticsCustoms": "Logistik & Zoll",
-    "legalAdvisory": "Rechtsberatung",
+    "legalAdvisory": "Rechtliche Unterstützung",
     "environment": "Umwelt-Compliance"
   },
   "shell": {
@@ -50,7 +49,6 @@
     "navNotifications": "Benachrichtigungen",
     "navLibrary": "Bibliothek",
     "navSavedProviders": "Gespeicherte Anbieter",
-    "navExports": "Exporte",
     "navAlerts": "Alerts",
     "navCalendar": "Kalender",
     "signOut": "Abmelden",
@@ -121,9 +119,9 @@
       "product-compliance": "Produkt-Compliance",
       "data-privacy": "Daten & Datenschutz",
       "marketing-seo": "Marketing",
-      "corporate-structure": "Unternehmen",
+      "corporate-structure": "Gründung",
       "logistics-customs": "Logistik & Zoll",
-      "legal-advisory": "Rechtsberatung"
+      "legal-advisory": "Rechtliche Unterstützung"
     },
     "emptyStep1Title": "Beschreiben",
     "emptyStep1Body": "Vier Fragen zu Land, Märkten und Sortiment.",
@@ -282,48 +280,7 @@
     "dayYesterday": "Gestern"
   },
   "library": {
-    "title": "Wissens<accent>bibliothek</accent>.",
-    "sub": "212 Einträge · 84 Videos · 76 Artikel · 18 Webinare · 26 Leitfäden · 8 Tools",
-    "rowType": "Typ",
-    "rowDomain": "Bereich",
-    "filterAll": "Alle · 212",
-    "filterVideos": "Videos · 84",
-    "filterArticles": "Artikel · 76",
-    "filterWebinars": "Webinare · 18",
-    "filterGuides": "Leitfäden · 26",
-    "filterTools": "Tools · 8",
-    "filterAllDomains": "Alle Bereiche · 212",
-    "filterTaxVat": "Steuern & USt · 68",
-    "filterPrivacy": "Datenschutz · 42",
-    "filterPackaging": "Verpackung · 31",
-    "filterMarketing": "Marketing · 28",
-    "filterCorporate": "Unternehmen · 24"
-  },
-  "savedProviders": {
-    "title": "Gespeicherte <accent>Anbieter</accent>",
-    "sub": "Anbieter, die Sie aus Ihren Risk Maps und Threads gespeichert haben.",
-    "filterAll": "Alle · 2",
-    "filterVat": "USt · 2",
-    "filterPrivacy": "Datenschutz",
-    "filterPackaging": "Verpackung",
-    "filterMarketing": "Marketing",
-    "filterCorporate": "Unternehmen"
-  },
-  "exports": {
-    "title": "Exporte",
-    "sub": "Ihre erzeugten PDFs und Datenexporte · Links werden an Ihre E-Mail gesendet",
-    "filterAll": "Alle · 24",
-    "filterPdfs": "PDFs · 14",
-    "filterData": "Daten · 6",
-    "filterReports": "Berichte · 3",
-    "filterPending": "Ausstehend · 1",
-    "colFile": "Datei",
-    "colDetails": "Details",
-    "colStatus": "Status",
-    "colActions": "Aktionen",
-    "statusReady": "bereit",
-    "statusGenerating": "wird erstellt",
-    "download": "Herunterladen"
+    "title": "Wissens<accent>bibliothek</accent>."
   },
   "comingSoon": {
     "eyebrow": "In Vorbereitung",
@@ -348,6 +305,26 @@
       "feature2": "Fälligkeiten pro Bereich",
       "feature3": "Synchronisierung mit Google / Outlook",
       "feature4": "Erinnerungen vor jedem Termin"
+    },
+    "library": {
+      "title": "Bibliothek",
+      "sub": "Wissen, Tutorials & Werkzeuge · bald verfügbar — sichern Sie sich Early Access",
+      "panelTitle": "Wissen, Tutorials & Werkzeuge",
+      "panelSub": "Geprüfte Beiträge von Fachleuten, nach Bereich und Markt sortiert — jeder nennt die Vorschrift, die er erklärt.",
+      "feature1": "Tutorials je Bereich",
+      "feature2": "Länder-Leitfäden",
+      "feature3": "Webinare mit Fachleuten",
+      "feature4": "Rechner & Vorlagen"
+    },
+    "savedProviders": {
+      "title": "Gespeicherte Anbieter",
+      "sub": "Anbieter merken und wiederfinden · bald verfügbar",
+      "panelTitle": "Anbieter merken",
+      "panelSub": "Ein Lesezeichen an jedem Anbieter — in der Risk Map, im Gespräch, auf der Anbieterseite. Hier gesammelt.",
+      "feature1": "Von überall merken",
+      "feature2": "Woher gemerkt, bleibt dabei",
+      "feature3": "Nach Bereich und Markt filtern",
+      "feature4": "Anfrage direkt aus der Liste"
     }
   },
   "domainPage": {
@@ -588,7 +565,7 @@
     "close": "Assistent schließen",
     "thinking": "Prüfe die Wissensbasis…",
     "sources": "Quellen",
-    "disclaimer": "Allgemeine regulatorische Information, keine Rechts- oder Steuerberatung. Für eine verbindliche Einschätzung beauftragen Sie einen Verified Partner.",
+    "disclaimer": "Allgemeine regulatorische Information, keine Rechts- oder Steuerberatung. Für eine verbindliche Einschätzung beauftragen Sie einen Verified Provider.",
     "error": "Das hat nicht geklappt — bitte versuchen Sie es gleich erneut.",
     "notConfigured": "Der Assistent ist in dieser Umgebung noch nicht angebunden.",
     "quota": "Tageslimit erreicht — der Upgrade-Plan kommt in Kürze.",

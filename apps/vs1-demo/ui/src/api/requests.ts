@@ -28,14 +28,14 @@ export interface ProviderRequest {
   meta: string;
   sla?: string;
   createdAt?: string; // raw ISO — C1 new-since-last-seen banner
-  action: { label: string; variant: 'accent' | 'primary' | 'ghost' };
+  action: { label: string; variant: 'primary' | 'primary' | 'ghost' };
 }
 
 // Engagement lifecycle → RequestCard status axis.
 const STATUS_MAP: Record<string, { status: RequestStatus; label: string; action: ProviderRequest['action'] }> = {
-  created: { status: 'awaiting-confirm', label: 'Awaiting confirm', action: { label: 'Open · confirm', variant: 'accent' } },
-  delivered: { status: 'awaiting-confirm', label: 'Awaiting confirm', action: { label: 'Open · confirm', variant: 'accent' } },
-  viewed: { status: 'awaiting-confirm', label: 'Awaiting confirm', action: { label: 'Open · confirm', variant: 'accent' } },
+  created: { status: 'awaiting-confirm', label: 'Awaiting confirm', action: { label: 'Open · confirm', variant: 'primary' } },
+  delivered: { status: 'awaiting-confirm', label: 'Awaiting confirm', action: { label: 'Open · confirm', variant: 'primary' } },
+  viewed: { status: 'awaiting-confirm', label: 'Awaiting confirm', action: { label: 'Open · confirm', variant: 'primary' } },
   confirmed: { status: 'awaiting-reply', label: 'Awaiting reply', action: { label: 'Reply', variant: 'primary' } },
   replied: { status: 'active', label: 'Active', action: { label: 'View', variant: 'ghost' } },
 };
@@ -94,7 +94,7 @@ export interface UserRequestRow {
   company: string;
   partner?: boolean;
   meta: string;
-  action: { label: string; variant: 'accent' | 'secondary' };
+  action: { label: string; variant: 'primary' | 'secondary' };
   bucket: 'confirm' | 'confirmed' | 'replied' | 'overdue' | 'active' | 'closed';
   /** Raw engagement status — the B14 actions drawer gates remind/withdraw on it. */
   rawStatus?: string;
@@ -109,9 +109,9 @@ export interface UserRequestRow {
 }
 
 const USER_VIEW: Record<string, Pick<UserRequestRow, 'status' | 'statusLabel' | 'action' | 'bucket'>> = {
-  created:   { status: 'awaiting-confirm', statusLabel: 'Awaiting confirmation', action: { label: 'Send reminder', variant: 'accent' }, bucket: 'confirm' },
-  delivered: { status: 'awaiting-confirm', statusLabel: 'Awaiting confirmation', action: { label: 'Send reminder', variant: 'accent' }, bucket: 'confirm' },
-  viewed:    { status: 'awaiting-confirm', statusLabel: 'Awaiting confirmation', action: { label: 'Send reminder', variant: 'accent' }, bucket: 'confirm' },
+  created:   { status: 'awaiting-confirm', statusLabel: 'Awaiting confirmation', action: { label: 'Send reminder', variant: 'primary' }, bucket: 'confirm' },
+  delivered: { status: 'awaiting-confirm', statusLabel: 'Awaiting confirmation', action: { label: 'Send reminder', variant: 'primary' }, bucket: 'confirm' },
+  viewed:    { status: 'awaiting-confirm', statusLabel: 'Awaiting confirmation', action: { label: 'Send reminder', variant: 'primary' }, bucket: 'confirm' },
   confirmed: { status: 'active', statusLabel: 'Provider confirmed', action: { label: 'View thread', variant: 'secondary' }, bucket: 'confirmed' },
   replied:   { status: 'awaiting-reply', statusLabel: 'Provider replied', action: { label: 'Open thread', variant: 'secondary' }, bucket: 'replied' },
   // Matrix-Befund 7 (2026-09-05): eine Ablehnung ist abgeschlossen, nicht

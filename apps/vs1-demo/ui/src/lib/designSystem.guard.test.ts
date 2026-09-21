@@ -58,6 +58,21 @@ function collect(dir: string, recursive: boolean): string[] {
 
 const FILES = SCOPE.flatMap((s) => collect(s.dir, s.recursive));
 
+// Der Gold-Waechter unten hat einen EIGENEN, weiteren Geltungsbereich: die
+// Festlegung "Knoepfe tragen kein Gold" gilt fuer die ganze App, nicht nur
+// fuer die Marketing-Flaeche. Stories sind absichtlich dabei — ein Storybook-
+// Beispiel mit goldenem Knopf lehrt das Muster, das wir abgeschafft haben.
+function alleQuellen(dir: string): string[] {
+  const out: string[] = [];
+  for (const entry of readdirSync(dir)) {
+    const full = join(dir, entry);
+    if (statSync(full).isDirectory()) out.push(...alleQuellen(full));
+    else if (/\.tsx$/.test(entry) && !/\.test\.tsx$/.test(entry)) out.push(full);
+  }
+  return out;
+}
+const ALLE = alleQuellen(SRC);
+
 describe('Design-System-Waechter · Marketing-Flaeche', () => {
   it('erfasst ueberhaupt Dateien (schuetzt den Waechter vor sich selbst)', () => {
     expect(FILES.length).toBeGreaterThanOrEqual(30);
@@ -134,9 +149,9 @@ function baseClassNames(tag: string): string {
 }
 
 /** Ein <button …> vom Namen bis zu seinem schliessenden > — Ausdruecke inklusive. */
-function buttonTags(src: string): { index: number; tag: string }[] {
+function tagsMatching(src: string, re: RegExp): { index: number; tag: string }[] {
   const out: { index: number; tag: string }[] = [];
-  for (const m of src.matchAll(/<button\b/g)) {
+  for (const m of src.matchAll(re)) {
     let i = m.index! + m[0].length;
     let depth = 0;
     let quote: string | null = null;
@@ -154,6 +169,17 @@ function buttonTags(src: string): { index: number; tag: string }[] {
   }
   return out;
 }
+
+/** Rohe <button>-Elemente. */
+const buttonTags = (src: string) => tagsMatching(src, /<button\b/g);
+
+/**
+ * Alles, was der Nutzer anklicken kann: das rohe Element, die Komponente und
+ * die beiden Link-Formen. Die Komponente MUSS mit hinein — sonst rutscht
+ * `<Button className="bg-accent-500">` durch, und genau so standen die zwei
+ * Gold-CTAs in RiskMapResult.tsx, die am 2026-09-20 entfielen.
+ */
+const klickziele = (src: string) => tagsMatching(src, /<(?:button|Button|Link|a)\b/g);
 
 describe('Design-System-Waechter · Komponente statt Nachbau', () => {
   it('baut keinen CTA aus einem rohen <button> nach', () => {
@@ -178,6 +204,54 @@ describe('Design-System-Waechter · Komponente statt Nachbau', () => {
         '  wrap                                      Label darf umbrechen\n' +
         'Gefunden:\n  ' + found.join('\n  '),
     ).toEqual([]);
+  });
+
+  // ─── Kein Gold an Knoepfen (Festlegung 2026-09-20) ────────────────────────
+  // Gold traegt Marken, Kanten, Eyebrows, Fortschrittsbalken und Grafiken.
+  // KEINE Knopfflaechen: jeder gefuellte Knopf laeuft ueber den Marken-Token.
+  // Die Button-Variante `accent` wurde dafuer aus dem Typ gestrichen, damit
+  // tsc jede Aufrufstelle meldet — das fand unter anderem eine BERECHNETE
+  // Variante (ProviderMagicActionPage: `action === 'decline' ? 'danger' :
+  // 'accent'`), die keine Attribut-Suche gefunden haette.
+  //
+  // Dieser Waechter deckt ab, was tsc NICHT sieht: Gold, das per className an
+  // ein Klickziel geschrieben wird.
+  const GOLD = String.raw`(?:accent|gold)-\d00|#[dD]4[aA][fF]37|#[cC]5913[bB]|#96802[aA]|#8[cC]672[aA]|#e6a514|brand-accent`;
+
+  it('schreibt kein Gold auf eine Knopfflaeche', () => {
+    const found: string[] = [];
+    // Nur FLAECHE und Schatten zaehlen. Ein goldener Rand, ein goldener
+    // Text oder ein goldenes Icon an einem Knopf bleiben erlaubt — verboten
+    // ist der goldene KNOPF, nicht die goldene Akzentuierung an ihm.
+    const flaeche = new RegExp(String.raw`\bbg-(?:${GOLD})\b|\bbg-\[#(?:[dD]4[aA][fF]37|e6a514|96802[aA])\]|shadow-\[[^\]]*212,\s*175,\s*55`);
+    for (const file of ALLE) {
+      const src = readFileSync(file, 'utf8');
+      for (const { index, tag } of klickziele(src)) {
+        if (flaeche.test(tag)) {
+          found.push(`${relative(SRC, file)}:${src.slice(0, index).split('\n').length}`);
+        }
+      }
+    }
+    expect(
+      found,
+      'Goldene Knopfflaeche. Seit 2026-09-20 tragen Knoepfe die Markenfarbe:\n' +
+        '  <Button>…</Button>                        primary = Petrol hell / Teal dunkel\n' +
+        '  bg-brand + text-fg-on-brand               wenn es wirklich ein Link sein muss\n' +
+        'Gold bleibt fuer Marken, Kanten, Eyebrows, Balken und Grafiken.\n' +
+        'Gefunden:\n  ' + found.join('\n  '),
+    ).toEqual([]);
+  });
+
+  it('der Gold-Waechter sieht die ganze App, nicht nur das Marketing', () => {
+    expect(ALLE.length).toBeGreaterThan(FILES.length * 3);
+    expect(ALLE.some((f) => f.includes('pages/user'))).toBe(true);
+    expect(ALLE.some((f) => f.includes('pages/provider'))).toBe(true);
+  });
+
+  it('die Button-Variante accent gibt es nicht mehr', () => {
+    const quelle = readFileSync(join(SRC, 'components/ui/Button.tsx'), 'utf8');
+    expect(quelle, 'accent ist zurueck im ButtonVariant-Typ').not.toMatch(/\|\s*'accent'/);
+    expect(quelle, 'accent ist zurueck in der Klassen-Tabelle').not.toMatch(/^\s{6}accent:/m);
   });
 
   it('nutzt die Komponente inzwischen mehr als doppelt so oft wie vorher', () => {

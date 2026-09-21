@@ -58,7 +58,7 @@ function DrawerDemo() {
           </p>
         }
         footer={
-          <Button fullWidth className="bg-brand-accent text-fg-on-accent hover:bg-accent-600">
+          <Button fullWidth>
             See if this applies to you <ArrowRight size={16} className="ml-1.5" />
           </Button>
         }

@@ -94,7 +94,7 @@ const Req = () => <span aria-hidden className="text-fg-brand">*</span>;
 function RankBadge() {
     const { t } = useTranslation('providerws');
     return (
-        <span className="inline-flex items-center gap-1 rounded-full border border-accent-500/40 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.06em] text-accent-500">
+        <span className="inline-flex items-center gap-1 rounded-full border border-accent-500/40 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.06em] text-fg-accent-strong">
             <TrendingUp size={10} aria-hidden /> {t('onboarding.rankBadge')}
         </span>
     );
@@ -267,7 +267,7 @@ export function ProviderOnboardingModal() {
             >
                 ← {t('onboarding.back')}
             </button>
-            <Button variant="accent" size="sm" disabled={!canProceed} onClick={next}>
+            <Button variant="primary" size="sm" disabled={!canProceed} onClick={next}>
                 {last ? t('onboarding.activate') : t('onboarding.next')} <ArrowRight size={14} className="ml-1.5" />
             </Button>
         </div>
@@ -305,14 +305,14 @@ export function ProviderOnboardingModal() {
                             </p>
                             <h2 className="mt-2.5 font-serif text-[1.375rem] font-bold leading-snug text-fg">
                                 {t('onboarding.welcome.titlePre')}
-                                <span className="text-accent-500">{t('onboarding.welcome.titleGold')}</span>
+                                <span className="text-fg-accent-emphasis">{t('onboarding.welcome.titleGold')}</span>
                                 {t('onboarding.welcome.titlePost')}
                             </h2>
                             <p className="mt-3 text-body-sm leading-relaxed text-fg-secondary">{t('onboarding.welcome.body')}</p>
                             <div className="mt-4 divide-y divide-elevate/10 border-y border-elevate/10">
                                 {FORM_STEPS.map((s, i) => (
                                     <div key={s} className="flex gap-3.5 py-3">
-                                        <span className="font-serif text-body-sm font-bold text-accent-500">0{i + 1}</span>
+                                        <span className="font-serif text-body-sm font-bold text-fg-accent-strong">0{i + 1}</span>
                                         <span className="min-w-0">
                                             <span className="block text-body-sm font-bold text-fg">{t(`onboarding.steps.${s}`)}</span>
                                             <span className="block text-body-3xs text-fg-tertiary">{t(`onboarding.stepSubs.${s}`)}</span>
@@ -320,7 +320,7 @@ export function ProviderOnboardingModal() {
                                     </div>
                                 ))}
                             </div>
-                            <Button variant="accent" size="md" className="mt-5 w-full" onClick={next}>
+                            <Button variant="primary" size="md" className="mt-5 w-full" onClick={next}>
                                 {t('onboarding.welcome.cta')} <ArrowRight size={15} className="ml-1.5" />
                             </Button>
                             <p className="mt-3 text-center text-body-3xs text-fg-tertiary">{t('onboarding.welcome.note')}</p>
@@ -387,7 +387,7 @@ export function ProviderOnboardingModal() {
                             <div className="mt-4 divide-y divide-elevate/10 border-y border-elevate/10 text-left">
                                 {(['dossier', 'sla', 'rank'] as const).map((k, i) => (
                                     <div key={k} className="flex gap-3.5 py-2.5">
-                                        <span className="font-serif text-body-sm font-bold text-accent-500">0{i + 1}</span>
+                                        <span className="font-serif text-body-sm font-bold text-fg-accent-strong">0{i + 1}</span>
                                         <span className="text-body-xs leading-relaxed text-fg-secondary">{t(`onboarding.done.${k}`)}</span>
                                     </div>
                                 ))}
@@ -400,7 +400,7 @@ export function ProviderOnboardingModal() {
                                     <span className="block h-full rounded-full bg-gradient-to-r from-[var(--fg-brand,#34d399)] to-[#D4AF37]" style={{ width: `${completeness(data)}%` }} />
                                 </span>
                             </div>
-                            <Button variant="accent" size="md" className="mt-5 w-full" onClick={() => setDismissed(true)}>
+                            <Button variant="primary" size="md" className="mt-5 w-full" onClick={() => setDismissed(true)}>
                                 {t('onboarding.done.cta')} <ArrowRight size={15} className="ml-1.5" />
                             </Button>
                         </div>

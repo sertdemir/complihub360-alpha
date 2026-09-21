@@ -11,8 +11,10 @@ import { ChevronDown, LogOut, LayoutDashboard, Menu } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Logo } from '../ui/Logo';
 import { ThemeToggle } from '../ui/ThemeToggle';
+import { AccountActions } from './AccountActions';
 import { MobileNav } from './MobileNav';
 import { HEADER_NAV_LINKS } from './navLinks';
+import { Avatar } from '../ui/Avatar';
 
 const menuItemClass = (active: boolean) =>
   `flex items-center gap-1 px-2 desktop-l:px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${
@@ -82,8 +84,14 @@ export function GlobalNav() {
       {/* h-16 lg:h-20 is the MarketingHeader's bar height — the two headers sit
           on the same routes' shared layout, so they must be the same height, or
           every page that clears the fixed bar with padding is wrong on half the
-          site. Fixed height, not padding: the tallest child (h-10 actions) must
-          never grow the bar. */}
+          site. Fixed height, not padding: the tallest child (the 40px action
+          row) must never grow the bar.
+
+          Die Zeile stand bis 2026-09-20 auf `h-10` — in diesem Projekt 64 px,
+          nicht 40 (siehe Button.tsx und die spacing-Skala). Sichtbar kaputt war
+          nichts, weil die Leiste `h-20` (80) traegt und 64 hineinpasst; die
+          Begruendung oben rechnete aber mit 40, und mit 24 px Totraum in der
+          Zeile stimmt sie nicht mehr, sobald jemand die Leistenhoehe anfasst. */}
       <div className="pointer-events-auto w-full bg-surface backdrop-blur-xl border-b border-stroke-subtle shadow-[0_4px_32px_rgba(0,0,0,0.08)]">
         {/* ── Desktop bar — from xl only: six entries with German labels do
             not survive 1024px, they clipped behind overflow-hidden. Below
@@ -158,7 +166,7 @@ export function GlobalNav() {
         <div className="w-px h-5 bg-stroke shrink-0 hidden md:block" />
 
         {/* Actions */}
-        <div className="flex items-center gap-1 shrink-0 h-10">
+        <div className="flex items-center gap-1 shrink-0 h-[40px]">
           <ThemeToggle size={36} />
           <LanguageMenu triggerClassName="h-9 w-9" />
 
@@ -168,9 +176,7 @@ export function GlobalNav() {
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-surface-secondary transition-colors"
               >
-                <div className="w-7 h-7 rounded-full bg-brand flex items-center justify-center text-fg-on-brand text-xs font-bold">
-                  {(userName || 'U').charAt(0).toUpperCase()}
-                </div>
+                <Avatar size="sm" initials={(userName || 'U').charAt(0)} tone="accent" />
                 <span className="text-xs font-semibold text-fg-secondary hidden md:block">
                   {userName || (role === 'partner' ? 'Partner' : 'User')}
                 </span>
@@ -203,7 +209,7 @@ export function GlobalNav() {
                         className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-fg-secondary hover:bg-surface-secondary transition-colors"
                       >
                         <LayoutDashboard size={16} className="text-fg-tertiary" />
-                        Mein Dashboard
+                        {t('nav.dashboard', 'My dashboard')}
                       </button>
                       <button
                         onClick={() => {
@@ -214,7 +220,7 @@ export function GlobalNav() {
                         className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
                       >
                         <LogOut size={16} />
-                        Abmelden
+                        {t('nav.signOut', 'Sign out')}
                       </button>
                     </div>
                   </motion.div>
@@ -227,7 +233,7 @@ export function GlobalNav() {
                 className="text-fg-secondary hover:text-fg text-xs font-semibold px-2 md:px-3 py-1.5 rounded-lg hover:bg-surface-secondary transition-colors whitespace-nowrap"
                 onClick={() => navTo('/login')}
               >
-                {t('nav.login', 'Log in')}
+                {t('header.login', 'Log in')}
               </button>
               <Button variant="primary" size="sm" onClick={() => navTo('/register')}>
                 {t('nav.signup', 'Sign up for free')}
@@ -281,64 +287,7 @@ export function GlobalNav() {
         onClose={() => setMobileOpen(false)}
         lang={currentLang}
         logo={<Logo lockup="symbol" href={null} />}
-        actions={
-          <div className="flex items-center gap-3">
-            {isLoggedIn ? (
-              <>
-                <Button
-                  variant="outline"
-                  size="md"
-                  className="h-12 flex-1"
-                  onClick={() => {
-                    setMobileOpen(false);
-                    navTo(role === 'partner' ? '/partner-dashboard' : '/dashboard');
-                  }}
-                >
-                  <LayoutDashboard size={16} className="mr-2" aria-hidden />
-                  Mein Dashboard
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="md"
-                  className="h-12"
-                  aria-label="Abmelden"
-                  onClick={() => {
-                    setMobileOpen(false);
-                    logout();
-                    navTo('/');
-                  }}
-                >
-                  <LogOut size={16} aria-hidden />
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  variant="outline"
-                  size="md"
-                  className="h-12 flex-1"
-                  onClick={() => {
-                    setMobileOpen(false);
-                    navTo('/login');
-                  }}
-                >
-                  {t('nav.login', 'Log in')}
-                </Button>
-                <Button
-                  variant="primary"
-                  size="md"
-                  className="h-12 flex-1"
-                  onClick={() => {
-                    setMobileOpen(false);
-                    navTo('/register');
-                  }}
-                >
-                  {t('nav.signup', 'Sign up for free')}
-                </Button>
-              </>
-            )}
-          </div>
-        }
+        actions={<AccountActions lang={currentLang} onNavigate={() => setMobileOpen(false)} />}
       />
     </header>
   );

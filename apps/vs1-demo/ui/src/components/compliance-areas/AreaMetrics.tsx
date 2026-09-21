@@ -2,6 +2,7 @@ import { Fragment, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Container } from '../ui/Container';
 import { getAreaObligations } from '../../lib/areaProfiles';
+import { belegLage } from '../../lib/penaltyCeiling';
 import { useInViewOnce } from '../../lib/useInViewOnce';
 import type { DomainSlug } from '../../lib/domains';
 import type { CountryCode } from './types';
@@ -48,7 +49,13 @@ export function AreaMetrics({ slug, selectedCountry }: Props) {
 
   const metrics = useMemo(() => {
     const today = new Date();
-    const exposure = obligations.reduce((sum, o) => sum + (o.penaltyMaxEur ?? 0), 0);
+    // Die Kennzahl summiert seit dem 19.09. NUR noch Betraege, die ein Gesetz
+    // nennt. Vorher addierte sie `penaltyMaxEur` ueber alles — bei
+    // Verpackung/Frankreich 530.000 EUR aus sieben Pflichten, von denen keine
+    // einzige einen Betrag im Gesetz hat. Eine Kennzahl muss messen, was ihre
+    // Beschriftung behauptet; sonst ist die Praezision geliehen.
+    const lage = belegLage(obligations);
+    const exposure = lage.belegteSummeEur;
     const soonest = obligations
       .filter((o) => o.dueDays != null)
       .sort((a, b) => (a.dueDays as number) - (b.dueDays as number))[0];
@@ -95,16 +102,29 @@ export function AreaMetrics({ slug, selectedCountry }: Props) {
             tone: 'text-fg',
           }
         : null,
-      exposure > 0
+      // Steht auch bei 0 EUR. Dass in einem Bereich KEINE Pflicht einen
+      // gesetzlichen Betrag nennt, ist die Auskunft — sie wegzulassen hiesse,
+      // den unbequemsten Befund unsichtbar zu machen. Die Notiz sagt dann,
+      // warum die Null keine Luecke ist.
+      lage.gesamt > 0
         ? {
             key: 'exposure',
             value: money.format(exposure),
-            label: t('compliance.area.metrics.exposure', 'Maximum penalty exposure'),
-            note: t(
-              'compliance.area.metrics.exposureNote',
-              'Sum of the upper bounds, not the expected value',
-            ),
-            tone: 'text-risk-on-critical',
+            label: t('compliance.area.metrics.exposureProven', 'Proven penalty exposure'),
+            note:
+              lage.gesetzlich + lage.umgerechnet === 0
+                ? t('compliance.area.metrics.exposureNoneProven', {
+                    defaultValue:
+                      'None of the {{total}} duties here names an amount in law — the penalties are proportional, per unit or left to member states.',
+                    total: lage.gesamt,
+                  })
+                : t('compliance.area.metrics.exposureProvenNote', {
+                    defaultValue:
+                      '{{proven}} of {{total}} duties name an amount in law. The others are counted at zero, not estimated.',
+                    proven: lage.gesetzlich + lage.umgerechnet,
+                    total: lage.gesamt,
+                  }),
+            tone: exposure > 0 ? 'text-risk-on-critical' : 'text-fg-tertiary',
           }
         : null,
       soonest

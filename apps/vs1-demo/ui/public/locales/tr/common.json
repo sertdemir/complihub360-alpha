@@ -4,7 +4,6 @@
     "solutions": "Çözümler",
     "complianceAreas": "Uyum Alanları",
     "resources": "Kaynaklar",
-    "login": "Giriş yap",
     "signup": "Ücretsiz kayıt ol",
     "items": {
       "aiEngine": {
@@ -45,7 +44,9 @@
       }
     },
     "aiGovernance": "Yapay Zeka Yönetişimi",
-    "aiGovDesc": "Şeffaf ve uyumlu yapay zeka için çerçevemiz."
+    "aiGovDesc": "Şeffaf ve uyumlu yapay zeka için çerçevemiz.",
+    "dashboard": "Panelim",
+    "signOut": "Çıkış yap"
   },
   "hero": {
     "scenarios": {
@@ -382,7 +383,8 @@
         "risk": "Risk",
         "time": "Harekete Geçme Süresi",
         "fine": "Tipik Risk Tutarı",
-        "markets": "Aktif Pazarlar"
+        "markets": "Aktif Pazarlar",
+        "proven": "belgelenmiş"
       },
       "upTo": "{{sum}} kadar",
       "marketsCount": "{{total}} pazarın {{count}} tanesi"
@@ -589,7 +591,7 @@
       "description": "Uluslararası şirket kuruluşunda yol alma, doğru hukuki formu seçme, yerel alt yapı oluşturma ve yeni yargı bölgelerinde kurumsal kayıtları yönetme.",
       "affected": "Yabancı pazarlarda hukuki kuruluşlar kaydetmeyi, ekipleri genişletmeyi veya kurumsal varlık oluşturmayı planlayan bireyler veya şirketler.",
       "personaFit": "En uygun: Uluslararası büyüme ekipleri",
-      "cov1": "Kurumsal ve Yapı Asistanı — mevcut durumu, istenen pazarları, ekip karmaşıklığını değerlendirir",
+      "cov1": "Şirket Kuruluşu ve Bildirimler Asistanı — mevcut durumu, istenen pazarları, ekip karmaşıklığını değerlendirir",
       "cov2": "Pazar başına şirket ihtiyacı – kurulumunuzun kendi şirketini gerektirip gerektirmediğini belirler",
       "cov3": "Belirsiz kurucular için eğitim rehberi yollarına akıllı yönlendirme",
       "fines": {
@@ -691,12 +693,12 @@
       "askPlaceholder": "Örn.: Türkiye’den ithalat için EORI numarası gerekir mi?"
     },
     "legal-advisory": {
-      "title": "Hukuki Danışmanlık",
+      "title": "Hukuki Destek",
       "headline": "Tüketici koşulları, ticari sözleşmeler ve uygulanacak hukuk",
       "description": "Sınır ötesi satışın sözleşme katmanı: tüketiciyi bilgilendirme yükümlülükleri, hedef pazarda geçerli olan koşullar ve anlaşmaya hangi hukukun uygulanacağı.",
       "affected": "Kendi hukukundan farklı tüketici mevzuatına sahip pazarlara satış yapan işletmeler ve farklı yargı bölgelerindeki tedarikçi veya ortaklarla sözleşme yapan herkes.",
       "personaFit": "En uygun: Sınır ötesi satış ve ortaklıklar",
-      "cov1": "Hukuki Danışmanlık Asistanı — kurulumunuzun hangi sözleşme belgelerini gerektirdiğini belirler",
+      "cov1": "Hukuki Destek Asistanı — kurulumunuzun hangi sözleşme belgelerini gerektirdiğini belirler",
       "cov2": "Hedef pazar tüketici hukukunun standart koşullarınızı nerede geçersiz kıldığını gösterir",
       "cov3": "İlgili yargı bölgesindeki yetkili avukatlara yönlendirir — CompliHub360 hukuki danışmanlık vermez",
       "fines": {
@@ -814,7 +816,10 @@
         "ofTotal": "{{total}} yükümlülükten {{count}}",
         "laterLabel": "daha sonra geçerli oluyor",
         "fromDate": "{{date}} tarihinden itibaren {{count}}",
-        "nationalIn": "{{market}} yasal dayanağıyla {{count}}"
+        "nationalIn": "{{market}} yasal dayanağıyla {{count}}",
+        "exposureProven": "Belgelenmiş ceza tutarı",
+        "exposureNoneProven": "Buradaki {{total}} yükümlülükten hiçbiri kanunda bir tutar belirtmiyor — yaptırımlar oransal, birim başına ya da üye devletlere bırakılmış.",
+        "exposureProvenNote": "{{total}} yükümlülükten {{proven}} tanesi kanunda bir tutar belirtiyor. Diğerleri sıfır sayılıyor, tahmin edilmiyor."
       },
       "risk": {
         "title": "Risk profili",
@@ -850,7 +855,8 @@
         "noNamedSource": "Henüz adlandırılmış kaynak yok",
         "placeholderNote": "Motor burada {{market}} için bir mevzuat taşımıyor — bu, hukuktaki değil kapsamımızdaki bir boşluk.",
         "pendingNote": "AB kaynağı. {{market}} bunun üzerine kendi metnini de koyuyor; onu henüz taşımıyoruz.",
-        "euDirect": "AB Tüzüğü — doğrudan uygulanır, burada geçerli olan norm budur"
+        "euDirect": "AB Tüzüğü — doğrudan uygulanır, burada geçerli olan norm budur",
+        "ceiling": "Belgelenmiş üst sınır"
       },
       "relatedOpen": "Bu alanı aç",
       "relatedStrongest": "En güçlü bağlantı",
@@ -907,7 +913,73 @@
       "askPlaceholder": "Sorunuzu kendi sözcüklerinizle sorun",
       "coverageNoteGaps": "{{count}} yükümlülüğün {{specific}} tanesinin {{market}} için özel bir kaynağı var. Geri kalanların {{gaps}} tanesinin henüz taşımadığımız ulusal bir metni var; diğerleri burada doğrudan uygulanan AB Tüzükleri.",
       "checkTitle": "Bu size uyuyor mu?",
-      "checkFoot": "Biri geçerliyse bu alan sizin için yükümlülükler taşır — değerlendirme bunları durumunuza daraltır."
+      "checkFoot": "Biri geçerliyse bu alan sizin için yükümlülükler taşır — değerlendirme bunları durumunuza daraltır.",
+      "ceiling": {
+        "unproven": "Henüz belgelenmedi",
+        "unprovenNote": "Risk haritasının hesapladığı tutar devralınmış bir değerdir; kanun metninden okunmuş değildir.",
+        "perUnit": "{{per}} başına {{amount}}",
+        "proportional": "{{of}} tutarının %{{percent}} kadarı",
+        "turnover": "Dünya genelindeki yıllık cironun %{{percent}} kadarı",
+        "turnoverOr": "{{amount}} veya dünya genelindeki yıllık cironun %{{percent}} kadarı — hangisi yüksekse",
+        "subnational": "Bir alt düzeyde belirlenir — {{level}}",
+        "delegated": "Tutar yok — düzenleme yaptırımı üye devletlere bırakıyor",
+        "none": "Para cezası yok — sonuç hukuk davası niteliğindedir",
+        "unlimited": "Üst sınırı olmayan para cezası",
+        "asOf": "{{basis}} · {{date}} itibarıyla",
+        "converted": "Euro tutarı, {{from}} tutarından {{date}} tarihli AMB kuruyla yaptığımız çevirmedir.",
+        "noAmount": "Kanun herhangi bir tutar belirtmiyor; yanındaki euro tutarının kanuni bir karşılığı yok.",
+        "state": {
+          "CA": "Kaliforniya",
+          "TX": "Teksas",
+          "NY": "New York",
+          "FL": "Florida"
+        },
+        "basisNote": {
+          "frTaxTiers": "İhtarsız %10, ihtardan sonra %40, gizlenmiş faaliyette %80",
+          "frTaxIntent": "Kasıtlı ihlalde %40, vergi kaçakçılığında %80",
+          "frQuintuple4500": "Kanun gerçek kişiler için 4.500 € öngörüyor; şirketler için bunun beş katı geçerli",
+          "frQuintuple200k": "Kanun gerçek kişiler için 200.000 € öngörüyor; şirketler için bunun beş katı geçerli",
+          "frTwoRates75k": "Tüzel kişiler için 75.000 €, gerçek kişiler için 15.000 €",
+          "frPerUnitTwoRates": "Tüzel kişiler için geçerli tutar; gerçek kişiler için 1.500 €",
+          "usMonthlyCap25": "Başlayan her ay için %5, toplamda en fazla %25",
+          "txCurePeriod": "Yalnızca düzeltme süresinden sonra: Attorney General’ın bildiriminden itibaren 30 gün",
+          "ukLateFilingTiers": "Public company, altı aydan fazla gecikmede: 7.500 £, önceki yıl da gecikilmişse iki katı. Private company: 150 ila 1.500 £",
+          "itAccountsTiers": "Yıllık finansal tabloların sunulmaması; 6 milyon € ciro üzerinde her gecikme yılı için, aksi hâlde 1.200 ila 60.000 €",
+          "esVeryGraveRange": "Çok ağır ihlal: %100 ila %150",
+          "esPesetaLegacy": "Çok ağır ihlal. 2001’de pezetadan çevrildi ve o günden beri güncellenmedi",
+          "esGainMultiple": "Çok ağır ihlal. Haksız kazancın altı ila sekiz katına kadar aşılabilir",
+          "nlPaymentDefault": "Ödeme yapılmaması. Kasıt hâlinde bunun yerine Madde 67f uyarınca verginin %100’ü",
+          "widespreadOnly": "Yalnızca yaygın ihlalde; aksi hâlde birinci cümle uyarınca 50.000 €",
+          "ukIndictmentVsSummary": "İddianameyle görülen yargılamada. Basit yargılamada bunun yerine statutory maximum uygulanır",
+          "nlFourthCategory": "Dördüncü kategori, 1 Ocak 2026 itibarıyla",
+          "ukOverTwoYears": "İki yıldan fazla gecikmeli",
+          "ukDeliberateConcealed": "Kategori 1, kasıtlı ve gizlenmiş",
+          "deAssessedTaxes": "Tarhiyata tabi vergilerde beyanname verilmemesi",
+          "deLateSurchargeCap": "Gecikme zammı, üst sınır",
+          "deliberateNoDisclosure": "Kasıtlı ihlal, kendiliğinden bildirim olmaksızın",
+          "seriousRepeated": "Ağır, tekrarlanan veya sistematik ihlal",
+          "nyShieldChain": "New York’in kapsamlı bir veri koruma kanunu yok. SHIELD Act veri güvenliğini düzenliyor ve cezayı iki kademe öteye, genel tüketici hukukuna yönlendiriyor. İhlal bildiriminin yapılmaması ayrı bir üst sınıra tabi: § 899-aa uyarınca 5.000 $ veya atlanan her bildirim için 20 $, en çok 250.000 $."
+        },
+        "ofKey": {
+          "domesticValue": "malın yurt içi değeri",
+          "taxRequiredToShow": "beyannamede gösterilmesi gereken vergi",
+          "itIncomeTax": "ödenmesi gereken gelir vergisi (IRES ve IRAP)",
+          "corporateTaxDue": "ödenmesi gereken kurumlar vergisi",
+          "vatDue": "ödenmesi gereken katma değer vergisi",
+          "taxDue": "ödenmesi gereken vergi",
+          "unremittedTax": "ödenmemiş vergi borcu",
+          "unpaidCorporateTax": "ödenmemiş kurumlar vergisi",
+          "potentialLostRevenue": "potansiyel vergi kaybı"
+        },
+        "perKey": {
+          "unitOrTonnePlaced": "piyasaya arz edilen ürünün birimi veya tonu"
+        },
+        "levelKey": {
+          "states45AndDc": "45 eyalet ve Columbia Bölgesi",
+          "statesWithPrivacyActs": "kendi veri koruma kanunu olan eyaletler (Kaliforniya ve yaklaşık yirmi eyalet daha)",
+          "states50AndDc": "50 eyaletin tamamı ve Columbia Bölgesi"
+        }
+      }
     },
     "riskBadge": "Risk: {{level}}"
   },
@@ -1266,7 +1338,11 @@
       "relatedAreasFact_other": "Bu pazarda {{count}} yükümlülük",
       "weightsFootCovered": "{{total}} alandan {{covered}} tanesinde kendi kaynaklarımız var — AB tüzükleri doğrudan geçerlidir ve eksik sayılmaz.",
       "weightsFootPending": "{{list}} için henüz taşımadığımız bir ulusal metin mevcut — yerinde belirtilen AB aracı duruyor.",
-      "weightsFootNone": "{{list}} için henüz adlandırılmış bir kaynağımız yok."
+      "weightsFootNone": "{{list}} için henüz adlandırılmış bir kaynağımız yok.",
+      "exposureCaveat": "Bu rakamlara ilişkin bir çekince: {{what}}.",
+      "exposureConverted": "bunlardan {{count}} tanesi başka bir para biriminden çevrilmiştir",
+      "exposureUnbacked": "{{total}} yükümlülükten {{count}} tanesi kanunda belirtilmiş bir tutar taşımıyor",
+      "exposureAnd": " ve "
     },
     "cta": {
       "title": "Bunlardan hangilerinin size uyduğunu görün.",
@@ -1430,7 +1506,7 @@
     "specialist": {
       "kicker": "Uzmanın ücreti",
       "title": "Kendi ücreti — siz karar vermeden önce belirtilir.",
-      "body": "Danışmanlığın kendisi ücretsiz değildir; bunun aksini de iddia etmeyeceğiz. Her Verified Partner, işi kabul etmenizden önce sabit bir fiyat tahmini yayımlar; böylece yalnızca fiyatı öğrenmek için bir ön görüşmeye katlanmak zorunda kalmazsınız."
+      "body": "Danışmanlığın kendisi ücretsiz değildir; bunun aksini de iddia etmeyeceğiz. Her Verified Provider, işi kabul etmenizden önce sabit bir fiyat tahmini yayımlar; böylece yalnızca fiyatı öğrenmek için bir ön görüşmeye katlanmak zorunda kalmazsınız."
     },
     "cta": {
       "title": "Sizin için anlamlı olan yerden başlayın.",
@@ -1443,7 +1519,7 @@
       "feePaidBy": "partner karşılar",
       "match": "%{{pct}} eşleşme",
       "noSlot": "Satılık sıra yok",
-      "verified": "Verified Partner",
+      "verified": "Verified Provider",
       "rangeLabel": "Ücret tahmini",
       "range": "180–240 €",
       "perHour": "/ saat",
@@ -1478,7 +1554,7 @@
         },
         {
           "q": "Uzmanın danışmanlığı ne kadar tutar?",
-          "a": "Ücreti uzman belirler: Her Verified Partner, siz görevi kabul etmeden önce sabit bir tahmin yayımlar — fiyatı öğrenmek için bir ilk görüşmeye katlanmazsınız."
+          "a": "Ücreti uzman belirler: Her Verified Provider, siz görevi kabul etmeden önce sabit bir tahmin yayımlar — fiyatı öğrenmek için bir ilk görüşmeye katlanmazsınız."
         },
         {
           "q": "Uzman, rezervasyondan önce bilgilerimi görür mü?",

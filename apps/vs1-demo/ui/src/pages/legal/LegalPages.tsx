@@ -77,7 +77,7 @@ export function PrivacyPage() {
         </Section>
         <Section heading={t('privacy.headings.purposes')}>
           <p>
-            Vertragserfüllung und Vermittlung an Verified Partner (Art. 6 Abs. 1 lit. b DSGVO) · KI-gestützte Analyse Ihrer
+            Vertragserfüllung und Vermittlung an Verified Provider (Art. 6 Abs. 1 lit. b DSGVO) · KI-gestützte Analyse Ihrer
             Dokumente ausschließlich nach ausdrücklicher Einwilligung (Art. 6 Abs. 1 lit. a DSGVO, jederzeit widerruflich) ·
             Sicherheits-Protokollierung und Missbrauchsabwehr (Art. 6 Abs. 1 lit. f DSGVO).
           </p>
@@ -95,7 +95,7 @@ export function PrivacyPage() {
           <p>
             Hosting: Hostinger ({PLACEHOLDER('Serverstandort, z. B. Deutschland')}) · Datenbank/Auth: Supabase (Region EU) ·
             KI-Dienste: Anthropic (nur bereinigte Inhalte, gemäß Abschnitt 4). Mit allen Dienstleistern bestehen
-            Auftragsverarbeitungsverträge nach Art. 28 DSGVO. Verified Partner erhalten Ihre Anfragedaten nur, wenn Sie eine
+            Auftragsverarbeitungsverträge nach Art. 28 DSGVO. Verified Provider erhalten Ihre Anfragedaten nur, wenn Sie eine
             Anfrage an sie richten.
           </p>
         </Section>
@@ -141,7 +141,7 @@ export function PrivacyPage() {
       </Section>
       <Section heading={t('privacy.headings.purposes')}>
         <p>
-          Contract performance and matching with Verified Partners (Art. 6(1)(b) GDPR) · AI-assisted analysis of your documents
+          Contract performance and matching with Verified Providers (Art. 6(1)(b) GDPR) · AI-assisted analysis of your documents
           only after explicit consent (Art. 6(1)(a) GDPR, revocable at any time) · security logging and abuse prevention
           (Art. 6(1)(f) GDPR).
         </p>
@@ -158,7 +158,7 @@ export function PrivacyPage() {
         <p>
           Hosting: Hostinger ({PLACEHOLDER('server location, e.g. Germany')}) · Database/Auth: Supabase (EU region) · AI
           services: Anthropic (sanitized content only, per section 4). Data processing agreements under Art. 28 GDPR are in
-          place with all providers. Verified Partners receive your request data only when you direct a request to them.
+          place with all providers. Verified Providers receive your request data only when you direct a request to them.
         </p>
       </Section>
       <Section heading={t('privacy.headings.retention')}>
@@ -230,7 +230,7 @@ export function ImprintPage() {
         <Section heading={t('imprint.headings.notice')}>
           <p>
             CompliHub360 ist eine Orchestrierungsplattform — keine Kanzlei. Rechts-, Steuer- und Regulierungsberatung erbringen
-            Verified Partner in eigener beruflicher Verantwortung. Wir erbringen keine Rechtsberatung im Sinne von RDG/StBerG.
+            Verified Provider in eigener beruflicher Verantwortung. Wir erbringen keine Rechtsberatung im Sinne von RDG/StBerG.
           </p>
         </Section>
       </LegalShell>
@@ -275,7 +275,7 @@ export function ImprintPage() {
       <Section heading={t('imprint.headings.notice')}>
         <p>
           CompliHub360 is an orchestration platform — not a law firm. Legal, tax, and regulatory advice is delivered by
-          Verified Partners under their own professional liability.
+          Verified Providers under their own professional liability.
         </p>
       </Section>
     </LegalShell>
@@ -284,7 +284,7 @@ export function ImprintPage() {
 
 // ─── Terms of Service ─────────────────────────────────────────────────────────
 // SCAFFOLD. Sections 2, 3, 4 and 7 describe the system as it actually behaves
-// (orchestration not advice, Verified Partners carry their own professional
+// (orchestration not advice, Verified Providers carry their own professional
 // liability, SLA windows) and can stand. Everything that is contract substance —
 // entity, fees, liability caps, term, governing law — is a [PLACEHOLDER] and MUST
 // be drafted by legal counsel. The entity is US-incorporated while customers are
@@ -309,7 +309,7 @@ export function TermsPage() {
         <Section heading={t('terms.headings.service')}>
           <p>
             CompliHub360 strukturiert Ihren Geschäftskontext über einen adaptiven Assistenten, berechnet daraus ein
-            Risikoprofil auf Basis hinterlegter Quellen und vermittelt Ihnen passende Verified Partner. Gegenstand der
+            Risikoprofil auf Basis hinterlegter Quellen und vermittelt Ihnen passende Verified Provider. Gegenstand der
             Leistung ist die Orchestrierung: Strukturierung, Risikodarstellung, Vermittlung und Nachverfolgung der
             Anfrage. Die fachliche Beratung selbst ist nicht Gegenstand dieses Vertrags.
           </p>
@@ -323,7 +323,7 @@ export function TermsPage() {
         </Section>
         <Section heading={t('terms.headings.partners')}>
           <p>
-            Verified Partner erbringen ihre Leistungen im eigenen Namen, auf eigene Rechnung und in eigener beruflicher
+            Verified Provider erbringen ihre Leistungen im eigenen Namen, auf eigene Rechnung und in eigener beruflicher
             Verantwortung. Der Beratungsvertrag kommt unmittelbar zwischen Ihnen und dem Partner zustande; CompliHub360
             ist daran nicht beteiligt und haftet nicht für dessen Leistung.{' '}
             {PLACEHOLDER('Prüf- und Aufnahmekriterien für Partner, Folgen bei Ausschluss')}
@@ -378,7 +378,7 @@ export function TermsPage() {
       <Section heading={t('terms.headings.service')}>
         <p>
           CompliHub360 structures your business context through an adaptive wizard, derives a risk profile from validated
-          sources, and matches you with suitable Verified Partners. What we owe is the orchestration: structuring, risk
+          sources, and matches you with suitable Verified Providers. What we owe is the orchestration: structuring, risk
           presentation, matching, and tracking of the request. The professional advice itself is not part of this contract.
         </p>
       </Section>
@@ -390,7 +390,7 @@ export function TermsPage() {
       </Section>
       <Section heading={t('terms.headings.partners')}>
         <p>
-          Verified Partners act in their own name, for their own account, and under their own professional liability. The
+          Verified Providers act in their own name, for their own account, and under their own professional liability. The
           advisory contract is concluded directly between you and the partner; CompliHub360 is not a party to it and is not
           liable for the partner&apos;s performance. {PLACEHOLDER('vetting criteria, consequences of removal')}
         </p>

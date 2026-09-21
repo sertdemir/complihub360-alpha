@@ -236,7 +236,7 @@ export async function generateRiskMapPdf(opts: {
     doc.setDrawColor(LINE).setLineWidth(0.5).line(M, H - 48, W - M, H - 48);
     doc.setFont('helvetica', 'normal').setFontSize(7).setTextColor(MUTED);
     doc.text(
-      L('pdf.disclaimer', 'CompliHub360 is an orchestration platform, not a law firm. Legal, tax and regulatory advice is delivered by Verified Partners under their own professional liability.'),
+      L('pdf.disclaimer', 'CompliHub360 is an orchestration platform, not a law firm. Legal, tax and regulatory advice is delivered by Verified Providers under their own professional liability.'),
       M, H - 36, { maxWidth: W - 2 * M - 60 },
     );
     doc.text(`${p} / ${pages}`, W - M, H - 36, { align: 'right' });

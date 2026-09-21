@@ -44,6 +44,40 @@ jobs:
         # Reads the locale files only — no DeepL call, so no API key needed.
         run: npm run i18n:check
 
+      - name: Check token export against the shipped CSS
+        # tokens.json liest kein Build — genau deshalb kann er still veralten,
+        # und genau deshalb steht er hier. Er ist das, was Figma und die Doku
+        # als "die Farben" lesen. Keine Abhaengigkeiten noetig.
+        run: npm run tokens:check
+
+      - name: Check terminology against the acceptance checklist
+        # Die Acceptance-Checklist v1.0 verlangt einen Sprachdatei-Test, der bei
+        # verbotenen Begriffen fehlschlaegt. Er prueft alle vier Sprachen und
+        # braucht keine Abhaengigkeiten — deshalb steht er hier oben, wo er
+        # schnell scheitert.
+        run: npm run terminology:check
+
+      - name: Datenbank-Tests (Postgres 16, pgTAP)
+        # `supabase/tests/database/` lag seit Monaten im Repo und lief in
+        # KEINEM Schritt — drei Dateien, 54 Zusicherungen, nie geprueft. Eine
+        # Zusicherung, die nie laeuft, ist eine Notiz.
+        #
+        # Der Lauf spielt ALLE Migrationen in Reihenfolge ein, nicht einen
+        # Schema-Dump: nur so faellt auf, wenn sich der Stand, den Staging
+        # faehrt, nicht mehr aus dem Repo herstellen laesst.
+        #
+        # Kein Service-Container, sondern das auf dem Runner vorinstallierte
+        # Postgres 16 — die beiden noetigen Erweiterungen liegen in
+        # ubuntu/noble/universe, und ein Service-Container laesst sich
+        # nachtraeglich nicht mit Paketen bestuecken.
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-16-pgtap postgresql-16-pgvector
+          sudo systemctl start postgresql@16-main || sudo pg_ctlcluster 16 main start
+          sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
+          PGHOST=localhost PGPORT=5432 PGUSER=postgres PGPASSWORD=postgres \
+            scripts/run-db-tests.sh
+
       - name: Build Core Dependencies
         run: npm run build:root
 

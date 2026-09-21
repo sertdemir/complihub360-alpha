@@ -31,7 +31,7 @@ type Fixture = {
   tag?: string;
   meta: string;
   sla?: string;
-  action: { label: string; variant: 'accent' | 'primary' | 'ghost' };
+  action: { label: string; variant: 'primary' | 'primary' | 'ghost' };
 };
 
 // Fixture rows: company names, RQ-IDs, tags and meta descriptions are request
@@ -42,19 +42,19 @@ const REQUESTS: Fixture[] = [
     id: 'RQ-0234 · 12 min ago', status: 'awaiting-confirm', statusLabel: 'Awaiting confirm',
     company: 'Möbel-Berater Müller GmbH', tag: 'DE · EPR',
     meta: 'D2C · €4.2M revenue · target launch Q3 · sells furniture cross-border via own webshop + Amazon DE/AT marketplaces',
-    sla: '23h 48m', action: { label: 'Open · confirm', variant: 'accent' },
+    sla: '23h 48m', action: { label: 'Open · confirm', variant: 'primary' },
   },
   {
     id: 'RQ-0233 · 2h ago', status: 'awaiting-confirm', statusLabel: 'Awaiting confirm',
     company: 'TexTec OÜ (Estonia)', tag: 'DE+AT · VAT',
     meta: 'B2B · €1.8M revenue · OSS registered DE only · expanding into AT under reverse-charge regime',
-    sla: '21h 40m', action: { label: 'Open · confirm', variant: 'accent' },
+    sla: '21h 40m', action: { label: 'Open · confirm', variant: 'primary' },
   },
   {
     id: 'RQ-0232 · 8h ago', status: 'awaiting-confirm', statusLabel: 'Awaiting confirm',
     company: 'Smart-Stage UG', tag: 'DE · Data Privacy',
     meta: 'SaaS · €600k revenue · processes EU resident data · needs DPIA + GDPR Art. 30 records',
-    sla: '14h 12m', action: { label: 'Open · confirm', variant: 'accent' },
+    sla: '14h 12m', action: { label: 'Open · confirm', variant: 'primary' },
   },
   {
     id: 'RQ-0228 · Yesterday', status: 'awaiting-reply', statusLabel: 'Awaiting reply',

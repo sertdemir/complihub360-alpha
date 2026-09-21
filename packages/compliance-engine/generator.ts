@@ -1,7 +1,7 @@
 import { ComplianceDomain, DomainTemplateLibrary, ObligationSeverity, severityFromRiskWeight } from './domain-schema.js';
 import { CountryCode, CountryRiskProfile, getCountryRiskProfile } from './country-profile.js';
 import { calculateBusinessModifier, IndustryType, BusinessModel } from './business-modifier.js';
-import { resolveEnrichment } from './obligation-enrichment.js';
+import { resolveEnrichment, type PenaltyCeiling } from './obligation-enrichment.js';
 
 export interface GeneratorContext {
     countries: CountryCode[];
@@ -26,6 +26,13 @@ export interface EnrichedSubdomain {
     source?: string;
     penalty?: string;
     penaltyMaxEur?: number;
+    /** Die belegte Obergrenze, so wie das Gesetz sie fuehrt. Reist seit dem
+     *  19.09. mit, damit die Risikokarte dieselbe Quelle liest wie die
+     *  Bereichsseiten — `penalty` ist ein redaktioneller Satz und kann von der
+     *  belegten Zahl abweichen, ohne dass es auffaellt. Genau das war der
+     *  Fall: dort stand "up to EUR 30,000 per year", waehrend die Obergrenze
+     *  laengst 7.500 EUR JE EINHEIT lautete. */
+    penaltyCeiling?: PenaltyCeiling;
     due?: string;
     dueDays?: number;
     /** ISO date the obligation starts to apply; absent = applicable today. */
@@ -140,6 +147,7 @@ export function generateRelevantSubdomains(context: GeneratorContext): EnrichedS
                 source: enrichment?.source,
                 penalty: enrichment?.penalty,
                 penaltyMaxEur: enrichment?.penaltyMaxEur,
+                penaltyCeiling: enrichment?.penaltyCeiling,
                 due: enrichment?.due,
                 dueDays: enrichment?.dueDays,
                 appliesFrom: enrichment?.appliesFrom,

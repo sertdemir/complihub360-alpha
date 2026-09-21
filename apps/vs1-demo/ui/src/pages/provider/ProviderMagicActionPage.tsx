@@ -121,7 +121,7 @@ export function ProviderMagicActionPage() {
               {action === 'decline' ? t('magicAction.pressNoteDecline') : t('magicAction.pressNoteAccept')}
             </p>
             <Button
-              variant={action === 'decline' ? 'danger' : 'accent'}
+              variant={action === 'decline' ? 'danger' : 'primary'}
               className="mt-5 w-full"
               onClick={act}
               disabled={phase === 'working' || (action === 'reply' && message.trim().length < 5)}

@@ -1,6 +1,5 @@
 {
   "shared": {
-    "bookmarks": "Bookmarks (12)",
     "seeAll": "See all",
     "startNewSearch": "Start new search",
     "open": "Open",
@@ -30,15 +29,15 @@
     "productPackaging": "EPR & Packaging",
     "dataPrivacy": "Data & Privacy",
     "marketingSeo": "Marketing Compliance",
-    "corporateStructure": "Corporate & Structure",
+    "corporateStructure": "Company Setup & Filings",
     "productCompliance": "Product Compliance",
     "logisticsCustoms": "Logistics & Customs",
-    "legalAdvisory": "Legal Advisory",
+    "legalAdvisory": "Legal Support",
     "environment": "Environmental Compliance"
   },
   "shell": {
     "groupWorkspace": "Workspace",
-    "groupDomains": "Domains",
+    "groupDomains": "Areas",
     "groupLibrary": "Library",
     "groupSaved": "Saved",
     "groupMonitoring": "Monitoring",
@@ -50,7 +49,6 @@
     "navNotifications": "Notifications",
     "navLibrary": "Library",
     "navSavedProviders": "Saved Providers",
-    "navExports": "Exports",
     "navAlerts": "Alerts",
     "navCalendar": "Calendar",
     "signOut": "Sign out",
@@ -121,9 +119,9 @@
       "product-compliance": "Product compliance",
       "data-privacy": "Data & privacy",
       "marketing-seo": "Marketing",
-      "corporate-structure": "Corporate",
+      "corporate-structure": "Company setup",
       "logistics-customs": "Logistics & customs",
-      "legal-advisory": "Legal advisory"
+      "legal-advisory": "Legal support"
     },
     "emptyStep1Title": "Describe",
     "emptyStep1Body": "Four questions on country, markets and range.",
@@ -282,48 +280,7 @@
     "dayYesterday": "Yesterday"
   },
   "library": {
-    "title": "Knowledge <accent>library</accent>.",
-    "sub": "212 items · 84 videos · 76 articles · 18 webinars · 26 guides · 8 tools",
-    "rowType": "Type",
-    "rowDomain": "Domain",
-    "filterAll": "All · 212",
-    "filterVideos": "Videos · 84",
-    "filterArticles": "Articles · 76",
-    "filterWebinars": "Webinars · 18",
-    "filterGuides": "Guides · 26",
-    "filterTools": "Tools · 8",
-    "filterAllDomains": "All domains · 212",
-    "filterTaxVat": "Tax & VAT · 68",
-    "filterPrivacy": "Privacy · 42",
-    "filterPackaging": "Packaging · 31",
-    "filterMarketing": "Marketing · 28",
-    "filterCorporate": "Corporate · 24"
-  },
-  "savedProviders": {
-    "title": "Saved <accent>providers</accent>",
-    "sub": "Providers you bookmarked from your risk maps and threads.",
-    "filterAll": "All · 2",
-    "filterVat": "VAT · 2",
-    "filterPrivacy": "Privacy",
-    "filterPackaging": "Packaging",
-    "filterMarketing": "Marketing",
-    "filterCorporate": "Corporate"
-  },
-  "exports": {
-    "title": "Exports",
-    "sub": "Your generated PDFs and data exports · links sent to your email",
-    "filterAll": "All · 24",
-    "filterPdfs": "PDFs · 14",
-    "filterData": "Data · 6",
-    "filterReports": "Reports · 3",
-    "filterPending": "Pending · 1",
-    "colFile": "File",
-    "colDetails": "Details",
-    "colStatus": "Status",
-    "colActions": "Actions",
-    "statusReady": "ready",
-    "statusGenerating": "generating",
-    "download": "Download"
+    "title": "Knowledge <accent>library</accent>."
   },
   "comingSoon": {
     "eyebrow": "In preparation",
@@ -348,6 +305,26 @@
       "feature2": "Per-domain due dates",
       "feature3": "Sync to Google / Outlook",
       "feature4": "Reminders before each date"
+    },
+    "library": {
+      "title": "Library",
+      "sub": "Knowledge, tutorials & tools · coming soon — secure early access",
+      "panelTitle": "Knowledge, tutorials & tools",
+      "panelSub": "Reviewed pieces from specialists, sorted by area and market — each naming the statute it explains.",
+      "feature1": "Tutorials per area",
+      "feature2": "Country guides",
+      "feature3": "Webinars with specialists",
+      "feature4": "Calculators & templates"
+    },
+    "savedProviders": {
+      "title": "Saved providers",
+      "sub": "Bookmark providers and find them again · coming soon",
+      "panelTitle": "Bookmark providers",
+      "panelSub": "One bookmark on every provider — in a risk map, in a conversation, on the provider page. Collected here.",
+      "feature1": "Bookmark from anywhere",
+      "feature2": "Why you saved it, kept with it",
+      "feature3": "Filter by area and market",
+      "feature4": "Send an enquiry straight from the list"
     }
   },
   "domainPage": {

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Banner } from './Banner';
+import { Button } from './Button';
 
 const DESCRIPTION = `
 **Banner / Alert** — derived from the **screens** (provider dashboard sticky warning
@@ -146,12 +147,9 @@ export const BrandAccentDark: Story = {
         status="accent"
         title="Expanding into Customs & Excise (CST) would unlock rank-#1 contender position"
         action={
-          <button
-            type="button"
-            className="rounded-lg bg-[#d4af37] px-3.5 py-2 text-[12px] font-semibold text-[#101411] no-underline transition-colors hover:bg-[#e6c964]"
-          >
+          <Button size="sm">
             Explore expansion
-          </button>
+          </Button>
         }
       >
         14 customers ran Risk Maps last month with DE + CST coverage gaps · only 4 partners cover both.

@@ -116,7 +116,7 @@ const STATS: { value: string; label: string }[] = [
   { value: '8', label: 'obligations identified' },
   { value: '4', label: 'with a deadline in 30 days' },
   { value: '14 days', label: 'median deadline' },
-  { value: '3', label: 'Verified Partners ready' },
+  { value: '3', label: 'Verified Providers ready' },
 ];
 
 const PARTNERS = [94, 88, 81];
@@ -132,7 +132,7 @@ export function RiskMapResult() {
           <span className="flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wide text-fg-tertiary">
             <Lock size={13} /> Guest map · expires in 30 min
           </span>
-          <Button className="bg-accent-500 text-fg-on-accent hover:bg-accent-600">
+          <Button>
             Save this map <ArrowRight size={14} className="ml-1.5" />
           </Button>
         </>
@@ -198,7 +198,7 @@ export function RiskMapResult() {
       </div>
 
       {/* 3 — Partners section */}
-      <p className="mt-10 text-[11px] font-semibold uppercase tracking-wide text-fg-brand">3 Verified Partners matched</p>
+      <p className="mt-10 text-[11px] font-semibold uppercase tracking-wide text-fg-brand">3 Verified Providers matched</p>
       <div className="flex items-center justify-between">
         <h3 className="font-serif text-[22px] font-bold text-fg">We've found who can act on this.</h3>
         <a className="flex items-center gap-1.5 text-[13px] font-medium text-fg-brand" href="#">
@@ -226,7 +226,7 @@ export function RiskMapResult() {
           Free account. No credit card. Founding-member access through Beta launch.
         </p>
         <div className="mt-6 flex justify-center">
-          <Button className="bg-accent-500 text-fg-on-accent hover:bg-accent-600">
+          <Button>
             Create free account <ArrowRight size={16} className="ml-1.5" />
           </Button>
         </div>

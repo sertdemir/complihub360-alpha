@@ -4,7 +4,6 @@
     "solutions": "Lösungen",
     "complianceAreas": "Compliance-Bereiche",
     "resources": "Ressourcen",
-    "login": "Login",
     "signup": "Kostenlos starten",
     "items": {
       "aiEngine": {
@@ -45,7 +44,9 @@
       }
     },
     "aiGovernance": "KI Governance",
-    "aiGovDesc": "Unser Framework für transparente und rechtskonforme KI."
+    "aiGovDesc": "Unser Framework für transparente und rechtskonforme KI.",
+    "dashboard": "Mein Dashboard",
+    "signOut": "Abmelden"
   },
   "hero": {
     "scenarios": {
@@ -382,7 +383,8 @@
         "risk": "Risiko",
         "time": "Handlungsfrist",
         "fine": "Typische Exposition",
-        "markets": "Aktive Märkte"
+        "markets": "Aktive Märkte",
+        "proven": "belegt"
       },
       "upTo": "bis zu {{sum}}",
       "marketsCount": "{{count}} von {{total}}"
@@ -589,7 +591,7 @@
       "description": "Navigation internationaler Unternehmensgründung, Wahl der richtigen Rechtsform, Aufbau lokaler Substanz und Handhabung von Unternehmensregistrierungen in neuen Jurisdiktionen.",
       "affected": "Einzelpersonen oder Unternehmen, die juristische Einheiten registrieren, Teams erweitern oder Unternehmenspräsenz in ausländischen Märkten aufbauen möchten.",
       "personaFit": "Ideal für: Internationale Expansionsteams",
-      "cov1": "Unternehmens- & Strukturassistent – bewertet aktuellen Status, gewünschte Märkte, Team-Komplexität",
+      "cov1": "Gründungs- & Meldungsassistent – bewertet aktuellen Status, gewünschte Märkte, Team-Komplexität",
       "cov2": "Strukturbedarf je Markt – bestimmt, ob Ihr Setup eine eigene Gesellschaft braucht",
       "cov3": "Intelligente Weiterleitung zu Bildungsleitfaden-Pfaden für unsichere Gründer",
       "fines": {
@@ -691,12 +693,12 @@
       "askPlaceholder": "Z. B.: Brauche ich eine EORI-Nummer für Importe aus der Türkei?"
     },
     "legal-advisory": {
-      "title": "Rechtsberatung",
+      "title": "Rechtliche Unterstützung",
       "headline": "Verbraucher-AGB, Handelsverträge und anwendbares Recht",
       "description": "Die Vertragsebene um einen grenzüberschreitenden Verkauf: Verbraucherinformationspflichten, Bedingungen, die im Zielmarkt standhalten, und die Frage, welches Recht gilt.",
       "affected": "Unternehmen, die in Märkte mit abweichendem Verbraucherrecht verkaufen, sowie alle, die mit Lieferanten oder Partnern über Jurisdiktionen hinweg kontrahieren.",
       "personaFit": "Ideal für: Grenzüberschreitender Handel & Partnerschaften",
-      "cov1": "Rechtsberatungs-Assistent – ermittelt, welche Vertragsdokumente Ihr Setup erfordert",
+      "cov1": "Assistent für rechtliche Unterstützung – ermittelt, welche Vertragsdokumente Ihr Setup erfordert",
       "cov2": "Zeigt auf, wo das Verbraucherrecht des Zielmarkts Ihre Standardbedingungen verdrängt",
       "cov3": "Weiterleitung an zugelassene Anwälte in der jeweiligen Jurisdiktion – CompliHub360 leistet keine Rechtsberatung",
       "fines": {
@@ -814,7 +816,10 @@
         "ofTotal": "{{count}} von {{total}}",
         "laterLabel": "greifen erst später",
         "fromDate": "{{count}} ab {{date}}",
-        "nationalIn": "{{count}} mit Rechtsgrundlage in {{market}}"
+        "nationalIn": "{{count}} mit Rechtsgrundlage in {{market}}",
+        "exposureProven": "Belegte Sanktionssumme",
+        "exposureNoneProven": "Keine der {{total}} Pflichten nennt im Gesetz einen Betrag — die Sanktionen sind anteilig, je Einheit oder den Mitgliedstaaten überlassen.",
+        "exposureProvenNote": "{{proven}} von {{total}} Pflichten nennen im Gesetz einen Betrag. Die übrigen zählen mit null, sie werden nicht geschätzt."
       },
       "risk": {
         "title": "Risikoprofil",
@@ -850,7 +855,8 @@
         "noNamedSource": "Noch keine benannte Quelle",
         "placeholderNote": "Die Engine führt hier keine Norm für {{market}} — eine Lücke in unserer Abdeckung, nicht im Recht.",
         "pendingNote": "EU-Quelle. {{market}} hat darüber hinaus eine eigene Fassung, die wir noch nicht führen.",
-        "euDirect": "EU-Verordnung — gilt unmittelbar, das ist hier die geltende Norm"
+        "euDirect": "EU-Verordnung — gilt unmittelbar, das ist hier die geltende Norm",
+        "ceiling": "Belegte Obergrenze"
       },
       "relatedOpen": "Bereich öffnen",
       "relatedStrongest": "Stärkste Verbindung",
@@ -907,7 +913,73 @@
       "askPlaceholder": "Stellen Sie Ihre Frage in eigenen Worten",
       "coverageNoteGaps": "{{specific}} von {{count}} Pflichten haben eine Quelle speziell für {{market}}. Von den übrigen haben {{gaps}} eine nationale Fassung, die wir noch nicht führen — der Rest sind EU-Verordnungen, die hier unmittelbar gelten.",
       "checkTitle": "Trifft das auf Sie zu?",
-      "checkFoot": "Trifft eines zu, trägt dieser Bereich Pflichten für Sie — das Assessment grenzt sie auf Ihren Fall ein."
+      "checkFoot": "Trifft eines zu, trägt dieser Bereich Pflichten für Sie — das Assessment grenzt sie auf Ihren Fall ein.",
+      "ceiling": {
+        "unproven": "Noch nicht belegt",
+        "unprovenNote": "Die Zahl, mit der die Risikokarte rechnet, ist Bestand — wir haben sie nicht am Gesetzestext gelesen.",
+        "perUnit": "{{amount}} je {{per}}",
+        "proportional": "{{percent}} % {{of}}",
+        "turnover": "{{percent}} % des weltweiten Jahresumsatzes",
+        "turnoverOr": "{{amount}} oder {{percent}} % des weltweiten Jahresumsatzes — je nachdem, welcher Betrag höher ist",
+        "subnational": "Wird eine Ebene tiefer gesetzt — {{level}}",
+        "delegated": "Kein Betrag — der Rechtsakt überlässt die Sanktion den Mitgliedstaaten",
+        "none": "Keine Geldbuße — die Folge ist zivilrechtlich",
+        "unlimited": "Geldstrafe ohne Obergrenze",
+        "asOf": "{{basis}} · Stand {{date}}",
+        "converted": "Die Eurozahl ist unsere Umrechnung aus {{from}}, zum EZB-Kurs vom {{date}}.",
+        "noAmount": "Das Gesetz nennt keinen Betrag; die Eurozahl daneben hat deshalb keine gesetzliche Entsprechung.",
+        "state": {
+          "CA": "Kalifornien",
+          "TX": "Texas",
+          "NY": "New York",
+          "FL": "Florida"
+        },
+        "basisNote": {
+          "frTaxTiers": "10 % ohne Mahnung, 40 % nach Mahnung, 80 % bei verdeckter Tätigkeit",
+          "frTaxIntent": "40 % bei Vorsatz, 80 % bei Steuerhinterziehung",
+          "frQuintuple4500": "Das Gesetz nennt 4.500 EUR für natürliche Personen; für Unternehmen gilt das Fünffache",
+          "frQuintuple200k": "Das Gesetz nennt 200.000 EUR für natürliche Personen; für Unternehmen gilt das Fünffache",
+          "frTwoRates75k": "75.000 EUR für juristische, 15.000 EUR für natürliche Personen",
+          "frPerUnitTwoRates": "Der Satz für juristische Personen; 1.500 EUR für natürliche",
+          "usMonthlyCap25": "5 % je angefangenem Monat, höchstens 25 % insgesamt",
+          "txCurePeriod": "Erst nach der Heilungsfrist: 30 Tage ab Mitteilung des Attorney General",
+          "ukLateFilingTiers": "Public Company, mehr als sechs Monate zu spät: 7.500 GBP, verdoppelt bei Versäumnis auch im Vorjahr. Private Company: 150 bis 1.500 GBP",
+          "itAccountsTiers": "Nichthinterlegung des Jahresabschlusses; ab 6 Mio. EUR Umsatz je Verzugsjahr, sonst 1.200 bis 60.000 EUR",
+          "esVeryGraveRange": "Sehr schwerer Verstoß: 100 bis 150 %",
+          "esPesetaLegacy": "Sehr schwerer Verstoß. 2001 aus Peseten umgestellt und seither nicht angepasst",
+          "esGainMultiple": "Sehr schwerer Verstoß. Überschreitbar bis zum Sechs- bis Achtfachen des unrechtmäßigen Gewinns",
+          "nlPaymentDefault": "Zahlungsversäumnis. Bei Vorsatz stattdessen 100 % der Steuer nach Art. 67f",
+          "widespreadOnly": "Nur bei weitverbreitetem Verstoß; sonst 50.000 EUR nach Satz 1",
+          "ukIndictmentVsSummary": "Auf Anklage. Im abgekürzten Verfahren gilt stattdessen das statutory maximum",
+          "nlFourthCategory": "Vierte Kategorie, Stand 1. Januar 2026",
+          "ukOverTwoYears": "Mehr als zwei Jahre verspätet",
+          "ukDeliberateConcealed": "Kategorie 1, vorsätzlich und verschleiert",
+          "deAssessedTaxes": "Erklärungsversäumnis bei Veranlagungssteuern",
+          "deLateSurchargeCap": "Verspätungszuschlag, Höchstbetrag",
+          "deliberateNoDisclosure": "Vorsätzlicher Verstoß, ohne Selbstanzeige",
+          "seriousRepeated": "Schwerwiegender, wiederholter oder systematischer Verstoß",
+          "nyShieldChain": "New York hat kein umfassendes Datenschutzgesetz. Der SHIELD Act regelt die Datensicherheit und verweist für die Buße zwei Stufen weiter ins allgemeine Lauterkeitsrecht. Die unterlassene Benachrichtigung ist eine eigene Obergrenze: nach § 899-aa 5.000 USD oder 20 USD je versäumter Meldung, gedeckelt bei 250.000 USD."
+        },
+        "ofKey": {
+          "domesticValue": "des Inlandswerts der Ware",
+          "taxRequiredToShow": "der auf der Erklärung auszuweisenden Steuer",
+          "itIncomeTax": "der geschuldeten Ertragsteuer (IRES und IRAP)",
+          "corporateTaxDue": "der geschuldeten Körperschaftsteuer",
+          "vatDue": "der geschuldeten Mehrwertsteuer",
+          "taxDue": "der geschuldeten Steuer",
+          "unremittedTax": "der nicht abgeführten Steuerschuld",
+          "unpaidCorporateTax": "der offenen Körperschaftsteuer",
+          "potentialLostRevenue": "der entgangenen Umsatzsteuer"
+        },
+        "perKey": {
+          "unitOrTonnePlaced": "Einheit oder Tonne in Verkehr gebrachten Produkts"
+        },
+        "levelKey": {
+          "states45AndDc": "45 Bundesstaaten und der District of Columbia",
+          "statesWithPrivacyActs": "die Bundesstaaten mit eigenem Datenschutzgesetz (Kalifornien und rund 20 weitere)",
+          "states50AndDc": "alle 50 Bundesstaaten und der District of Columbia"
+        }
+      }
     },
     "riskBadge": "Risiko: {{level}}"
   },
@@ -1266,7 +1338,11 @@
       "relatedAreasFact_other": "{{count}} Pflichten in diesem Markt",
       "weightsFootCovered": "Eigene Quellen in {{covered}} von {{total}} Bereichen — EU-Verordnungen gelten unmittelbar und zählen nicht als Lücke.",
       "weightsFootPending": "Bei {{list}} existiert ein nationaler Text, den wir noch nicht führen — dort steht das benannte EU-Instrument.",
-      "weightsFootNone": "Für {{list}} führen wir noch keine benannte Quelle."
+      "weightsFootNone": "Für {{list}} führen wir noch keine benannte Quelle.",
+      "exposureCaveat": "Ein Vorbehalt zu diesen Zahlen: {{what}}.",
+      "exposureConverted": "{{count}} davon sind aus einer anderen Währung umgerechnet",
+      "exposureUnbacked": "{{count}} von {{total}} Pflichten führen keinen im Gesetz genannten Betrag",
+      "exposureAnd": ", und "
     },
     "cta": {
       "title": "Sehen, welche davon für Sie gelten.",
@@ -1430,7 +1506,7 @@
     "specialist": {
       "kicker": "Was die Fachperson kostet",
       "title": "Ihr Honorar — beziffert, bevor Sie sich binden.",
-      "body": "Die Beratung selbst ist nicht kostenlos, und wir tun nicht so. Jeder Verified Partner veröffentlicht eine feste Schätzung, bevor Sie das Mandat annehmen — Sie sitzen also kein Erstgespräch ab, nur um den Preis zu erfahren."
+      "body": "Die Beratung selbst ist nicht kostenlos, und wir tun nicht so. Jeder Verified Provider veröffentlicht eine feste Schätzung, bevor Sie das Mandat annehmen — Sie sitzen also kein Erstgespräch ab, nur um den Preis zu erfahren."
     },
     "cta": {
       "title": "Fangen Sie dort an, wo es für Sie Sinn ergibt.",
@@ -1443,7 +1519,7 @@
       "feePaidBy": "trägt der Partner",
       "match": "{{pct}} % Match",
       "noSlot": "Kein Platz zu verkaufen",
-      "verified": "Verified Partner",
+      "verified": "Verified Provider",
       "rangeLabel": "Honorarschätzung",
       "range": "180–240 €",
       "perHour": "/ Stunde",
@@ -1478,7 +1554,7 @@
         },
         {
           "q": "Was kostet die Beratung bei der Fachperson?",
-          "a": "Das Honorar legt die Fachperson fest: Jeder Verified Partner veröffentlicht eine feste Schätzung, bevor Sie das Mandat annehmen — Sie sitzen kein Erstgespräch ab, nur um den Preis zu erfahren."
+          "a": "Das Honorar legt die Fachperson fest: Jeder Verified Provider veröffentlicht eine feste Schätzung, bevor Sie das Mandat annehmen — Sie sitzen kein Erstgespräch ab, nur um den Preis zu erfahren."
         },
         {
           "q": "Sieht die Fachperson meine Daten vor der Buchung?",

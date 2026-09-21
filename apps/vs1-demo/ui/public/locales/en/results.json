@@ -21,7 +21,7 @@
       "label": "median deadline"
     },
     "3": {
-      "label": "Verified Partners ready"
+      "label": "Verified Providers ready"
     }
   },
   "table": {
@@ -107,7 +107,7 @@
     }
   },
   "partners": {
-    "eyebrow": "3 Verified Partners matched",
+    "eyebrow": "3 Verified Providers matched",
     "title": "We've found who can act on this.",
     "unlocked": "Matches unlocked",
     "unlockCta": "Unlock matches with a free account",
@@ -138,12 +138,12 @@
       "anonymousScope": "Anonymous assessment · example scope",
       "anonymous": "Anonymous assessment",
       "markets": "Markets",
-      "domains": "Domains",
+      "domains": "Areas",
       "operations": "Operations"
     },
     "questionsOpen": "{{total}} questions open",
     "sources": "Sources",
-    "disclaimer": "CompliHub360 is an orchestration platform, not a law firm. Legal, tax and regulatory advice is delivered by Verified Partners under their own professional liability."
+    "disclaimer": "CompliHub360 is an orchestration platform, not a law firm. Legal, tax and regulatory advice is delivered by Verified Providers under their own professional liability."
   },
   "detail": {
     "back": "Back to providers",
@@ -275,7 +275,7 @@
     "guidesTitle": "Where to read on",
     "guideRead": "Open",
     "bridgeTitle": "Want to see what applies to your business?",
-    "bridgeBody": "Your risk map is matched to your markets and your business model, and shows the Verified Partners who fit what you actually need.",
+    "bridgeBody": "Your risk map is matched to your markets and your business model, and shows the Verified Providers who fit what you actually need.",
     "bridgeCta": "Assess My Needs",
     "previewBadge": "Preview · answer engine not connected yet",
     "entries": {
@@ -293,10 +293,10 @@
     "productPackaging": "EPR & Packaging",
     "dataPrivacy": "Data & Privacy",
     "marketingSeo": "Marketing Compliance",
-    "corporateStructure": "Corporate & Structure",
+    "corporateStructure": "Company Setup & Filings",
     "productCompliance": "Product Compliance",
     "logisticsCustoms": "Logistics & Customs",
-    "legalAdvisory": "Legal Advisory"
+    "legalAdvisory": "Legal Support"
   },
   "matchBasis": {
     "market": "Covers your market ({{country}})",
@@ -343,7 +343,7 @@
     "copyOpenList": "Open in sessions",
     "copyError": "The copy could not be created.",
     "copyUnavailable": "Save first, then you can create a variant.",
-    "verifiedPartner": "Verified Partner",
+    "verifiedPartner": "Verified Provider",
     "activeSince": "active since {{year}}",
     "responseTime": "Ø {{hours}} h response time",
     "billing": {
