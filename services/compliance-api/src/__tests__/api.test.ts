@@ -134,6 +134,36 @@ function seedProvider(over: Record<string, any> = {}) {
         ...over,
     };
     (db.providers ??= []).push(row);
+
+    // Matchbarkeit haengt ab jetzt an `matchable_provider_services`, nicht an
+    // `partner_status`. Das Fixture bildet nach, was die Migration aus dem
+    // Bestand macht: eine freigegebene Leistung je Bereich, freigegeben in
+    // jedem angegebenen Markt — und nur fuer Anbieter, deren Lifecycle das
+    // erlaubt (active und downgraded werden beide zu 'active' uebernommen).
+    //
+    // `areas` traegt die Bereichs-Slugs des Wizards; `categories` oben bleibt
+    // die Selbstauskunft, die auf dem Draht nichts mehr entscheidet.
+    const areas: string[] = over.areas ?? ['tax-vat'];
+    delete (row as any).areas;
+    const matchbar = row.partner_status === 'active' || row.partner_status === 'downgraded';
+    if (matchbar) {
+        const view = (db.matchable_provider_services ??= []);
+        for (const area of areas) {
+            for (const land of row.countries_supported ?? []) {
+                view.push({
+                    service_id: randomUUID(),
+                    provider_key: row.provider_key,
+                    service_code: area,
+                    service_name: area === 'tax-vat' ? 'Tax and VAT' : area,
+                    area_code: area,
+                    country_code: land,
+                    provider_availability: row.availability,
+                    bookable_chargeable: false,
+                    provider_lifecycle_status: 'active',
+                });
+            }
+        }
+    }
     return row;
 }
 
@@ -239,7 +269,7 @@ describe('auth gate', () => {
 });
 
 describe('POST /api/v1/search', () => {
-    it('matches canonical wizard slugs against legacy provider categories and anonymizes the result', async () => {
+    it('matches a wizard slug against an APPROVED service and anonymizes the result', async () => {
         seedProvider();
         const r = await api('/api/v1/search', {
             method: 'POST',
@@ -248,13 +278,53 @@ describe('POST /api/v1/search', () => {
         expect(r.status).toBe(200);
         expect(r.body.providers).toHaveLength(1);
         const p = r.body.providers[0];
-        // Slug 'tax-vat' must hit the legacy 'vat'/'vat_oss' categories.
         expect(p.pseudonym_label).toContain('Steuerkanzlei');
         expect(p.match).toBeGreaterThan(0);
+        expect(p.match_basis.domains_matched).toEqual(['tax-vat']);
+        // Auf dem Draht steht die freigegebene Leistung, nicht die
+        // Selbstauskunft aus `categories` ('vat', 'vat_oss').
+        expect(p.specializations).toEqual(['Tax and VAT']);
         // Stage-1 anonymity: no identity fields on the wire.
         expect(p.name).toBeUndefined();
         expect(p.contact_email).toBeUndefined();
         expect(p.website_url).toBeUndefined();
+    });
+
+    // Der eigentliche Umbau: ein aktiver Anbieter OHNE freigegebene Leistung in
+    // diesem Markt erscheint nicht mehr. Vorher entschied `partner_status` plus
+    // `countries_supported`, und diese Zeile waere gruen gewesen, obwohl nichts
+    // geprueft war (§19).
+    it('hides an active provider that has no approved service — partner_status alone is not enough', async () => {
+        seedProvider({ provider_key: 'ungeprueft', areas: [] });
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], domains: ['tax-vat'] } }),
+        });
+        expect(r.status).toBe(200);
+        expect(r.body.providers).toEqual([]);
+    });
+
+    // Gegenprobe zur Freigabe je Markt (§19): dieselbe Leistung, anderes Land.
+    it('hides a provider whose service is approved for another market only', async () => {
+        seedProvider({ countries_supported: ['AT'] });
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], domains: ['tax-vat'] } }),
+        });
+        expect(r.status).toBe(200);
+        expect(r.body.providers).toEqual([]);
+    });
+
+    // §14: die Abrechnung darf die Sichtbarkeit nicht steuern. Die View meldet
+    // `bookable_chargeable` nur — wer daraus einen Filter macht, faellt hier.
+    it('still matches a provider that is not billing-ready (§14)', async () => {
+        seedProvider();
+        (db.matchable_provider_services ?? []).forEach((r: any) => { r.bookable_chargeable = false; });
+        const r = await api('/api/v1/search', {
+            method: 'POST',
+            body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], domains: ['tax-vat'] } }),
+        });
+        expect(r.body.providers).toHaveLength(1);
     });
 
     it('returns enriched laws: focus domains confirmed and sorted first, with statute + severity', async () => {
