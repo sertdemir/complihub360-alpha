@@ -105,7 +105,13 @@ function schneide(
  * kann ueber 130° Breite ueberspannen, und das ist auf der Kugel ein Bogen.
  */
 export function globusPfad(mittenLaengeGrad: number): string {
-  const d = -mittenLaengeGrad * GRAD;
+  // Erst auf −180°..180° falten. Die Kugel ist in 360° periodisch, der Beschnitt
+  // unten ist es NICHT: er probiert die Ring-Kopien k ∈ {−1, 0, 1}, und die
+  // reichen nur, solange |d| ≤ 180° bleibt. Bei −390° liegen die drei Kopien auf
+  // 30°, 390° und 750°, und der Antarktis fehlt die, die sie braucht — sie
+  // bekam gegen Ende jeder Umdrehung ein Loch.
+  const gefaltet = ((((mittenLaengeGrad + 180) % 360) + 360) % 360) - 180;
+  const d = -gefaltet * GRAD;
   const HALB = Math.PI / 2;
   const UMLAUF = 2 * Math.PI;
   let out = '';
@@ -189,7 +195,11 @@ function takt(jetzt: number): void {
     letzterRahmen = jetzt;
     if (!anfang) anfang = jetzt;
     const anteil = (((jetzt - anfang) / 1000) % UMLAUF_SEKUNDEN) / UMLAUF_SEKUNDEN;
-    const d = globusPfad(RUHE_LAENGE + anteil * 360);
+    // MINUS, nicht plus: die Erde dreht nach Osten, und von aussen gesehen mit
+    // Norden oben liegt Osten rechts — die Landmassen wandern also nach RECHTS
+    // und verschwinden am rechten Rand. In x = sin(Laenge − Mittenlaenge) heisst
+    // das eine FALLENDE Mittenlaenge. Mit Plus lief die Erde rueckwaerts.
+    const d = globusPfad(RUHE_LAENGE - anteil * 360);
     for (const el of laeuft) if (sichtbar.has(el)) el.setAttribute('d', d);
   }
   angefordert = requestAnimationFrame(takt);
