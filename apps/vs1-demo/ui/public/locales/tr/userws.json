@@ -36,6 +36,7 @@
     "environment": "Çevresel Uyum"
   },
   "shell": {
+    "newAssessment": "Yeni değerlendirme",
     "groupWorkspace": "Çalışma Alanı",
     "domainNews_one": "{{count}} yeni gelişme",
     "domainNews_other": "{{count}} yeni gelişme",

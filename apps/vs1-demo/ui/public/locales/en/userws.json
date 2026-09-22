@@ -36,6 +36,7 @@
     "environment": "Environmental Compliance"
   },
   "shell": {
+    "newAssessment": "New assessment",
     "groupWorkspace": "Workspace",
     "domainNews_one": "{{count}} update",
     "domainNews_other": "{{count}} updates",
