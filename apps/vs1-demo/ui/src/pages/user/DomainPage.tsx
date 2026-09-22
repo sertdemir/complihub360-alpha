@@ -156,13 +156,6 @@ function DomainView({ slug }: { slug: DomainSlug }) {
             </div>
             {/* Kein "Frage stellen" mehr im Kopf (Nutzer 2026-09-13): der Assistent
                 steht als Karte rechts daneben, der Knopf war doppelt. */}
-            {/* Erst wenn die Daten da sind: waehrend des Ladens ist `empty` noch
-                false, der Knopf blitzte beim Bereichswechsel kurz auf. */}
-            {data && !empty && (
-              <div className="mt-0.5 flex shrink-0 items-center">
-                <Button onClick={() => openWizard()}>{t('shared.startNewSearch')}</Button>
-              </div>
-            )}
           </div>
 
           {/* Kennzahl-Ringe wie Dashboard und Sitzungen: ohne Karte, Zahl nur im Kreis. */}

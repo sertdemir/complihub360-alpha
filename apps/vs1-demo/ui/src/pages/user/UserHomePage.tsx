@@ -205,7 +205,6 @@ export function UserHomePage() {
           </p>
         )}
       </div>
-      <Button className="mt-0.5 shrink-0" onClick={() => openWizard()}>{t('shared.startNewSearch')}</Button>
     </div>
   );
 
