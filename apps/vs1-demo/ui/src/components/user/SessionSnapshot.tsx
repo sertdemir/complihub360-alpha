@@ -276,7 +276,7 @@ function GroupCard({ label, sub, dot, rows, entered, offset, taskOf, statusRowOf
 }
 
 export function SessionSnapshot({
-  rows, providers, sessionId, title, meta, kpis, matchBasis, onExportPdf, onEditAnswers, onProviderDetails, answersDrawer, partnerDrawer, bookings,
+  rows, providers, sessionId, title, meta, kpis, matchBasis, onExportPdf, onEditAnswers, onProviderDetails, answersDrawer, partnerDrawer, bookings, emptyState,
 }: {
   rows: SnapshotRow[];
   providers: AnonProvider[];
@@ -287,7 +287,9 @@ export function SessionSnapshot({
   title: string;
   meta: string;
   kpis: { total: number; soon: number; open: number; critical: number; high: number; rest: number };
-  onExportPdf: () => void;
+  /** Fehlt er, fehlt der Export-Link — eine PDF ohne Pflichten laese sich
+   *  als Entwarnung (siehe emptyState). */
+  onExportPdf?: () => void;
   onEditAnswers: () => void;
   onProviderDetails: (key: string) => void;
   /** Die Partner-Schublade des Aufrufers (Canvas 1C) — sie haengt am Zustand
@@ -298,6 +300,10 @@ export function SessionSnapshot({
   /** Die Schublade "Antworten bearbeiten" — der Aufrufer besitzt sie, weil er
    *  die Sitzungsdaten und das Neuladen kennt; sie haengt hier im Baum. */
   answersDrawer?: React.ReactNode;
+  /** Steht an Stelle der Pflichten-Gruppen, wenn es keine Zeile gibt. Ohne
+   *  ihn bliebe dort eine leere Spalte — kommentarlos, und damit lesbar als
+   *  "alles in Ordnung". */
+  emptyState?: React.ReactNode;
 }) {
   const { t, i18n } = useTranslation('results');
   const { t: tw } = useTranslation('userws');
@@ -413,7 +419,9 @@ export function SessionSnapshot({
                   "Offene Fragen" darunter; im Spalt zwischen den Reihen
                   zerschnitten sie das Raster (Nutzer 2026-08-29). */}
               <div className="flex shrink-0 items-center gap-5 pb-0.5">
-                <button type="button" onClick={onExportPdf} className={TEXT_LINK}>{t('snapshot.exportPdf')}</button>
+                {onExportPdf && (
+                  <button type="button" onClick={onExportPdf} className={TEXT_LINK}>{t('snapshot.exportPdf')}</button>
+                )}
                 {/* "Als Variante kopieren" steht seit 2026-09-05 hier zwischen
                     den beiden anderen Textlinks (Nutzer-Vorgabe) — nicht mehr
                     in der Fortschrittskarte. Ohne gespeicherte Sitzung
@@ -453,6 +461,7 @@ export function SessionSnapshot({
             {/* Pflichten + Verlauf, beide Spalten enden auf einer Kante */}
             <div className="mt-[18px] flex flex-col items-stretch gap-[18px] xl:flex-row">
               <motion.div variants={ITEM} className="flex min-w-0 flex-1 flex-col gap-3.5">
+                {groups.length === 0 && emptyState}
                 {groups.map((g, gi) => (
                   <GroupCard
                     key={g.key}

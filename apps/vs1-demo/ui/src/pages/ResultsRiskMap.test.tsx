@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -11,7 +12,7 @@ import type { AnonProvider, SearchLaw } from '../api/search';
 // then resolves and mounts a tree nobody owns, so the *next* test found two
 // "On the radar" headers. vi.mock is hoisted above imports, so the mocks
 // below still apply; the transform cost now lands in the untimed collect phase.
-import { ResultsRiskMap } from './ResultsRiskMap';
+import { ResultsRiskMap, OBLIGATIONS } from './ResultsRiskMap';
 
 // ─── Risk map · "Now" / "On the radar" grouping ──────────────────────────────
 // The PPWR 2030 tranche put five obligations on the map that are law today but
@@ -20,12 +21,17 @@ import { ResultsRiskMap } from './ResultsRiskMap';
 
 const runSearch = vi.fn();
 vi.mock('../api/search', () => ({ runSearch: (...a: unknown[]) => runSearch(...a) }));
+const fetchSessions = vi.hoisted(() => vi.fn());
 vi.mock('../api/sessions', () => ({
   saveWizardSession: vi.fn().mockResolvedValue(undefined),
-  fetchSessions: vi.fn().mockResolvedValue([]),
+  fetchSessions: (...a: unknown[]) => fetchSessions(...a),
+  duplicateSession: vi.fn(),
 }));
 vi.mock('../lib/riskMapPdf', () => ({ generateRiskMapPdf: vi.fn() }));
-vi.mock('../store/useAuthStore', () => ({ useAuthStore: () => ({ isLoggedIn: false }) }));
+// Veraenderbar, damit ein Test die eingeloggte Ansicht pruefen kann.
+const auth = vi.hoisted(() => ({ isLoggedIn: false }));
+vi.mock('../store/useAuthStore', () => ({ useAuthStore: () => auth }));
+vi.mock('../components/user/UserShell', () => ({ UserShell: ({ children }: { children: ReactNode }) => <>{children}</> }));
 // t() resolves to the canonical EN default so assertions read as the user sees.
 // Without a default it returns the key, with `count` and `pct` appended — so a
 // test can tell "3 matched" from "1 matched" without a translation file.
@@ -57,13 +63,15 @@ const inDays = (n: number) => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 };
 
-const renderPage = () => {
-  render(<MemoryRouter><ResultsRiskMap /></MemoryRouter>);
+const renderPage = (url = '/en/results') => {
+  render(<MemoryRouter initialEntries={[url]}><ResultsRiskMap /></MemoryRouter>);
 };
 
 beforeEach(() => {
   vi.clearAllMocks();
   localStorage.clear();
+  auth.isLoggedIn = false;
+  fetchSessions.mockResolvedValue([]);
 });
 
 describe('ResultsRiskMap grouping', () => {
@@ -190,5 +198,48 @@ describe('ResultsRiskMap provider teaser', () => {
     expect(screen.queryByText(/partners\.eyebrow/)).not.toBeInTheDocument();
     expect(screen.queryByText('partners.none')).not.toBeInTheDocument();
     expect(screen.queryByText(/100%/)).not.toBeInTheDocument();
+  });
+});
+
+// ─── Risk map · the engine found nothing ─────────────────────────────────────
+// Until 2026-09-22 an empty engine answer fell back to the design fixture: the
+// page showed eight invented obligations as if the engine had found them. An
+// empty answer is a result, not a loading state.
+
+describe('ResultsRiskMap with zero obligations', () => {
+  it('shows the approved state instead of the fixture — guest view', async () => {
+    runSearch.mockResolvedValue({ providers: [], laws: [] });
+    renderPage();
+
+    expect(await screen.findByText('common:states.noRequirements.heading')).toBeInTheDocument();
+    expect(screen.getByText('common:states.noRequirements.message')).toBeInTheDocument();
+    expect(screen.queryByText(OBLIGATIONS[0].title)).not.toBeInTheDocument();
+    expect(screen.queryByText('table.obligation')).not.toBeInTheDocument();
+    // A guest has no saved answers to review — the wizard would open empty.
+    expect(screen.queryByRole('button', { name: 'common:states.actions.reviewMyAnswers' })).not.toBeInTheDocument();
+  });
+
+  it('ignores knowledge hits without a severity — they are not obligations', async () => {
+    runSearch.mockResolvedValue({ providers: [], laws: [{ ...law({ id: 'kb', title: 'Background note' }), severity: undefined }] });
+    renderPage();
+
+    expect(await screen.findByText('common:states.noRequirements.heading')).toBeInTheDocument();
+    expect(screen.queryByText('Background note')).not.toBeInTheDocument();
+  });
+
+  it('shows the state in the signed-in view, with a way to the answers and no empty PDF', async () => {
+    auth.isLoggedIn = true;
+    fetchSessions.mockResolvedValue([{
+      id: 's1', country: 'AT', markets: ['AT'], categories: ['data-privacy'], label: 'Austria',
+      answers: null, status: 'active', risk_summary: null,
+      created_at: '2026-09-01T00:00:00Z', updated_at: '2026-09-01T00:00:00Z',
+    }]);
+    runSearch.mockResolvedValue({ providers: [], laws: [] });
+    renderPage('/en/results?session=s1');
+
+    expect(await screen.findByText('common:states.noRequirements.heading')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'common:states.actions.reviewMyAnswers' })).toBeInTheDocument();
+    expect(screen.queryByText(OBLIGATIONS[0].title)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'snapshot.exportPdf' })).not.toBeInTheDocument();
   });
 });

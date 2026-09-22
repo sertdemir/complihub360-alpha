@@ -1,5 +1,5 @@
 ---
-title: "PDF-Export der Sitzungsseite exportiert die echte Risk Map"
+title: "Keine Fixture als Inhalt: Sitzungs-PDF und Risk Map ohne Pflichten"
 assignee: "Claude"
 status: "review"
 ---
@@ -65,15 +65,45 @@ Eine PDF mit null Zeilen liest sich auf Papier als Entwarnung. Der Satz, der
 das verhindert — *"This does not mean that no obligations apply"* — steht
 nur im abgenommenen Zustand, nicht in der PDF.
 
-## Gefunden, nicht in diesem Ticket
+## Teil 2 (Nutzerauftrag 2026-09-22): die Risk Map bei null Pflichten
 
-**Die Risk-Map-Seite zeigt bei null Engine-Pflichten die Fixture.**
-`isLive = liveLaws.length > 0` — findet die Engine nichts, fällt die Seite auf
-`OBLIGATIONS` zurück und zeigt acht erfundene Pflichten. Öffnet man also eine
-Sitzung ohne Pflichten, sieht man acht. Der Export sagt jetzt korrekt "keine
-unmittelbaren Anforderungen" — die Seite widerspricht ihm. Das ist Zustand 4
-aus der Wahrheitstabelle von TKT-COPY-01 (*No requirements identified* auf der
-Risk Map) und der nächste logische Schritt.
+Beim Export gefunden: die Risk-Map-Seite selbst fiel bei null Engine-Pflichten
+auf `OBLIGATIONS` zurück (`isLive = liveLaws.length > 0`) und zeigte acht
+erfundene Pflichten. Wer eine Sitzung ohne Pflichten öffnete, sah acht — der
+Export derselben Sitzung sagte korrekt "keine unmittelbaren Anforderungen".
+
+Jetzt unterscheidet die Seite drei Fälle, die vorher einer waren:
+
+| `source` | Pflichten mit `severity` | Anzeige |
+|---|---|---|
+| `api` | ≥ 1 | Tabelle bzw. Gruppen, wie bisher |
+| `api` | 0 | **abgenommener Zustand *No immediate requirements identified*** |
+| `fixture` (Laden, API-Fehler) | — | Fixture, **unverändert** — siehe unten |
+
+- **Gast-Ansicht:** der Zustand steht an Stelle der Tabelle.
+- **Eingeloggte Ansicht:** `SessionSnapshot` hat einen neuen Slot `emptyState`
+  und zeigt ihn statt einer leeren, kommentarlosen Spalte. Der Export-Link
+  entfällt (`onExportPdf` ist jetzt optional) — eine PDF ohne Pflichten läse
+  sich als Entwarnung.
+- **„Review My Answers" nur, wo er stimmt:** eingeloggt mit gespeicherter
+  Sitzung öffnet er deren Antworten-Schublade. Für Gäste fehlt der Knopf — der
+  Wizard stellt frühere Antworten nicht wieder her, er öffnete einen leeren.
+- Knowledge-Treffer ohne `severity` zählen nicht als Pflicht (unverändert,
+  jetzt mit Test).
+- Kennzahl „median deadline": bei null Pflichten ein Strich statt „ongoing".
+  „ongoing" ist richtig, wenn es Pflichten ohne Frist gibt, nicht wenn es
+  keine gibt.
+
+Drei Tests; Sabotage A (Rückfall auf die Fixture) → alle drei fallen;
+Sabotage B (Review-Knopf auch für Gäste) → der Gast-Test fällt.
+
+## Weiter offen
+
+**Laden und API-Fehler zeigen auf der Risk Map weiterhin die Fixture.** Das
+sind die Zustände *Risk Map loading* und *Risk Map failed* aus der
+Wahrheitstabelle von TKT-COPY-01. Beide Copy-Aussagen wären wahr; es fehlt die
+Fläche. Nicht Teil dieses Auftrags, aber derselbe Fehlertyp und der letzte
+Ort, an dem die Fixture auf der Risk Map noch als Inhalt erscheint.
 
 ## DNA-Check
 
@@ -94,3 +124,4 @@ Betroffen: **Copy und Microcopy** (drei abgenommene Zustände verdrahtet),
 ## Agent Audit Log
 
 - [2026-09-22] **Claude**: Abbildung extrahiert, Export auf die Sitzung umgestellt, drei Zustände verdrahtet, vier Tests, zwei Sabotagen. (Status: review)
+- [2026-09-22] **Claude**: Risk Map bei null Pflichten: Zustand statt Fixture in Gast- und eingeloggter Ansicht, drei Tests, zwei Sabotagen. (Status: review)

@@ -14,6 +14,7 @@ import { RiskBadge, type RiskLevel } from '../components/ui/RiskBadge';
 import { FreeAccountDrawer } from '../components/home/MarketsDrawer';
 import type { SearchProfile } from '../components/wizard/WizardContext';
 import { Button } from '../components/ui/Button';
+import { Banner } from '../components/ui/Banner';
 import { Badge } from '../components/ui/Badge';
 import { SessionSnapshot, type SnapshotRow } from '../components/user/SessionSnapshot';
 import { AnswersDrawer } from '../components/user/AnswersDrawer';
@@ -158,7 +159,9 @@ export function riskMapStats(laws: SearchLaw[], rowCount: number, providers: num
   return [
     { value: String(rowCount), label: 'obligations identified' },
     { value: String(soon), label: `with a deadline in ${SOON_DAYS} days` },
-    { value: median != null ? String(median) : '', days: median ?? undefined, label: 'median deadline' },
+    // Leer heisst in der Anzeige "ongoing" — richtig, wenn es Pflichten ohne
+    // Frist gibt, falsch, wenn es gar keine gibt. Dann ein Strich.
+    { value: median != null ? String(median) : rowCount ? '' : '—', days: median ?? undefined, label: 'median deadline' },
     { value: providers != null ? String(providers) : '—', label: 'Verified Providers ready' },
   ];
 }
@@ -397,7 +400,20 @@ export function ResultsRiskMap() {
   // results:obligations.* translations only apply to the fixture.
   const liveLaws = searchData.laws.filter((l) => l.severity);
   const isLive = liveLaws.length > 0;
-  const rows: Obligation[] = isLive ? liveObligations(liveLaws, t, i18n.language, locale) : OBLIGATIONS;
+  // Die Engine hat geantwortet und keine bewertete Pflicht gefunden. Das ist
+  // ein ERGEBNIS, kein Ladezustand. Bis 2026-09-22 fiel die Seite hier auf die
+  // Design-Fixture zurueck und zeigte acht erfundene Pflichten, als haette die
+  // Engine sie gefunden — und widersprach damit dem PDF-Export derselben
+  // Sitzung, der korrekt "nichts gefunden" meldet. Jetzt: keine Zeilen, und
+  // der abgenommene Zustand sagt, was das bedeutet und was nicht.
+  //
+  // Beim Laden und bei einem API-Fehler (source 'fixture') bleibt es vorerst
+  // bei der Fixture; das sind die Zustaende "Risk Map loading" und "Risk Map
+  // failed", ein eigener Schritt.
+  const noRequirements = searchSource === 'api' && !isLive;
+  const rows: Obligation[] = isLive
+    ? liveObligations(liveLaws, t, i18n.language, locale)
+    : noRequirements ? [] : OBLIGATIONS;
 
   // Two groups, not two tables: "Now" is what the user is accountable for
   // today, "On the radar" is adopted law that only bites later. Keeping the
@@ -423,9 +439,32 @@ export function ResultsRiskMap() {
   // screen was a threat. Penalties are still shown per obligation (they are
   // facts, and useful for prioritising), but the headline stat now conveys
   // URGENCY instead of DREAD: how many deadlines are actually near.
-  const stats = isLive
+  const stats = isLive || noRequirements
     ? riskMapStats(liveLaws, rows.length, providersLive ? anonProviders.length : null)
     : STATS;
+
+  // Abgenommene Copy (Checklist v1.0, "No requirements identified"). Der Satz
+  // "This does not mean that no obligations apply" ist der Grund, warum eine
+  // leere Liste nicht als Entwarnung gelesen wird. "Review My Answers" nur, wo
+  // der Knopf die Antworten auch zeigt: bei einer gespeicherten Sitzung oeffnet
+  // er deren Antworten-Schublade. Fuer einen Gast gibt es das nicht — der
+  // Wizard stellt fruehere Antworten nicht wieder her, der Knopf oeffnete
+  // einen leeren.
+  // Die Schublade haengt nur in der eingeloggten Ansicht im Baum.
+  const canReviewAnswers = !!(isLoggedIn && sessionId && searchData.session);
+  const noRequirementsState = (
+    <Banner
+      status="info"
+      title={t('common:states.noRequirements.heading')}
+      action={canReviewAnswers ? (
+        <Button size="sm" variant="secondary" onClick={() => setAnswersOpen(true)}>
+          {t('common:states.actions.reviewMyAnswers')}
+        </Button>
+      ) : undefined}
+    >
+      {t('common:states.noRequirements.message')}
+    </Banner>
+  );
 
   // Wave A1: arriving from the wizard persists the session (the editable
   // dossier). Guest-anchored via guest_key; fire-and-forget — the page renders
@@ -493,7 +532,8 @@ export function ResultsRiskMap() {
         }}
         matchBasis={(p) => (p.match_basis ? <MatchBasis basis={p.match_basis} /> : null)}
         bookings={booked}
-        onExportPdf={exportPdf}
+        onExportPdf={noRequirements ? undefined : exportPdf}
+        emptyState={noRequirements ? noRequirementsState : undefined}
         // Mit gespeicherter Sitzung oeffnet sich die Schublade; ohne (Fixture,
         // Gast-Profil) bleibt der Weg zum Erst-Wizard.
         onEditAnswers={() => (sessionId && session ? setAnswersOpen(true) : navigate(`/${locale}/wizard`))}
@@ -591,72 +631,77 @@ export function ResultsRiskMap() {
           ))}
         </div>
 
-        {/* Obligations table */}
-        <div className="mt-12 overflow-hidden rounded-xl border border-stroke-subtle">
-          <div className="grid grid-cols-[100px_1fr_120px_110px_160px] gap-4 border-b border-stroke-subtle bg-surface-secondary px-6 py-3.5 text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary">
-            <span>{t('table.severity')}</span>
-            <span>{t('table.obligation')}</span>
-            <span>{t('table.market')}</span>
-            <span>{t('table.due')}</span>
-            <span className="text-right">{t('table.state')}</span>
-          </div>
-          {grouped.map((g) => (
-            <Fragment key={g.key}>
-              {g.label && (
-                <div className="flex items-baseline gap-2 border-b border-stroke-subtle bg-surface-secondary/40 px-6 py-2.5">
-                  <span className="text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-secondary">{g.label}</span>
-                  <span className="text-body-3xs text-fg-tertiary">{g.items.length}</span>
-                </div>
-              )}
-              {g.items.map(({ o, i }) => (
-            <div
-              key={o.title}
-              className="grid grid-cols-[100px_1fr_120px_110px_160px] items-center gap-4 border-b border-stroke-subtle px-6 py-5 last:border-b-0 transition-colors hover:bg-surface-secondary/50"
-            >
-              <span>
-                <RiskBadge level={o.severity as RiskLevel} styleVariant="soft" size="sm">
-                  {t(`severity.${o.severity}`, { defaultValue: o.severity.charAt(0).toUpperCase() + o.severity.slice(1) })}
-                </RiskBadge>
-              </span>
-              <span className="min-w-0">
-                <span className="block text-body-md font-bold text-fg">{isLive ? o.title : t(`obligations.${i}.title`, { defaultValue: o.title })}</span>
-                {/* Source leads, penalty follows in a muted tone (Brand Map
-                    §11: penalties are facts worth showing, but must not be the
-                    first thing the eye lands on). */}
-                <span className="mt-0.5 block text-body-2xs leading-relaxed text-fg-brand">
-                  {o.sourceUrl && (
-                    <>
-                      <a
-                        href={o.sourceUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="underline decoration-dotted underline-offset-2 hover:decoration-solid"
-                        title={t('sourceLinkTitle', { defaultValue: 'Open the official text on EUR-Lex' })}
-                      >
-                        {o.sourceLabel} ↗
-                      </a>
-                      {o.detail ? ' · ' : ''}
-                    </>
-                  )}
-                  <span className={o.sourceUrl ? 'text-fg-tertiary' : undefined}>
-                    {isLive ? o.detail : t(`obligations.${i}.detail`, { defaultValue: o.detail })}
+        {/* Obligations table — oder, wenn die Engine nichts gefunden hat, der
+            abgenommene Zustand statt einer leeren Tabelle. */}
+        {noRequirements ? (
+          <div className="mt-12">{noRequirementsState}</div>
+        ) : (
+          <div className="mt-12 overflow-hidden rounded-xl border border-stroke-subtle">
+            <div className="grid grid-cols-[100px_1fr_120px_110px_160px] gap-4 border-b border-stroke-subtle bg-surface-secondary px-6 py-3.5 text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary">
+              <span>{t('table.severity')}</span>
+              <span>{t('table.obligation')}</span>
+              <span>{t('table.market')}</span>
+              <span>{t('table.due')}</span>
+              <span className="text-right">{t('table.state')}</span>
+            </div>
+            {grouped.map((g) => (
+              <Fragment key={g.key}>
+                {g.label && (
+                  <div className="flex items-baseline gap-2 border-b border-stroke-subtle bg-surface-secondary/40 px-6 py-2.5">
+                    <span className="text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-secondary">{g.label}</span>
+                    <span className="text-body-3xs text-fg-tertiary">{g.items.length}</span>
+                  </div>
+                )}
+                {g.items.map(({ o, i }) => (
+              <div
+                key={o.title}
+                className="grid grid-cols-[100px_1fr_120px_110px_160px] items-center gap-4 border-b border-stroke-subtle px-6 py-5 last:border-b-0 transition-colors hover:bg-surface-secondary/50"
+              >
+                <span>
+                  <RiskBadge level={o.severity as RiskLevel} styleVariant="soft" size="sm">
+                    {t(`severity.${o.severity}`, { defaultValue: o.severity.charAt(0).toUpperCase() + o.severity.slice(1) })}
+                  </RiskBadge>
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-body-md font-bold text-fg">{isLive ? o.title : t(`obligations.${i}.title`, { defaultValue: o.title })}</span>
+                  {/* Source leads, penalty follows in a muted tone (Brand Map
+                      §11: penalties are facts worth showing, but must not be the
+                      first thing the eye lands on). */}
+                  <span className="mt-0.5 block text-body-2xs leading-relaxed text-fg-brand">
+                    {o.sourceUrl && (
+                      <>
+                        <a
+                          href={o.sourceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="underline decoration-dotted underline-offset-2 hover:decoration-solid"
+                          title={t('sourceLinkTitle', { defaultValue: 'Open the official text on EUR-Lex' })}
+                        >
+                          {o.sourceLabel} ↗
+                        </a>
+                        {o.detail ? ' · ' : ''}
+                      </>
+                    )}
+                    <span className={o.sourceUrl ? 'text-fg-tertiary' : undefined}>
+                      {isLive ? o.detail : t(`obligations.${i}.detail`, { defaultValue: o.detail })}
+                    </span>
                   </span>
                 </span>
-              </span>
-              <span className="text-body-sm text-fg-secondary">{isLive ? o.market : t(`obligations.${i}.market`, { defaultValue: o.market })}</span>
-              <span>
-                <span className="block text-body-sm font-semibold text-fg">{isLive ? o.due : t(`obligations.${i}.due`, { defaultValue: o.due })}</span>
-                <span className="block text-body-2xs text-fg-tertiary">{isLive ? o.dueSub : t(`obligations.${i}.dueSub`, { defaultValue: o.dueSub })}</span>
-              </span>
-              <span className="flex justify-end">
-                <StatePill state={o.state} onAnswer={() => setSaveOpen(true)} />
-              </span>
-            </div>
-              ))}
-            </Fragment>
-          ))}
-        </div>
+                <span className="text-body-sm text-fg-secondary">{isLive ? o.market : t(`obligations.${i}.market`, { defaultValue: o.market })}</span>
+                <span>
+                  <span className="block text-body-sm font-semibold text-fg">{isLive ? o.due : t(`obligations.${i}.due`, { defaultValue: o.due })}</span>
+                  <span className="block text-body-2xs text-fg-tertiary">{isLive ? o.dueSub : t(`obligations.${i}.dueSub`, { defaultValue: o.dueSub })}</span>
+                </span>
+                <span className="flex justify-end">
+                  <StatePill state={o.state} onAnswer={() => setSaveOpen(true)} />
+                </span>
+              </div>
+                ))}
+              </Fragment>
+            ))}
+          </div>
+        )}
 
         {/* Partners matched — echte Treffer der Engine, sonst nichts.
             Die Karten bleiben gesperrt (Identitaet erst nach Registrierung),
