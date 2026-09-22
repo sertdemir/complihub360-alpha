@@ -16,7 +16,9 @@ import { fetchSessions, patchSession, type SessionRowData } from '../../api/sess
 import { fetchDashboard, type DashboardData } from '../../api/dashboard';
 import type { SearchProfile } from '../../components/wizard/WizardContext';
 import { generateRiskMapPdf } from '../../lib/riskMapPdf';
-import { OBLIGATIONS, STATS } from '../ResultsRiskMap';
+import { liveObligations, riskMapStats, pdfObligations } from '../ResultsRiskMap';
+import { runSearch } from '../../api/search';
+import { Banner } from '../../components/ui/Banner';
 import { DOMAINS } from '../../lib/domains';
 import { SLUG_TO_I18N } from './AnfragenTab';
 
@@ -109,7 +111,7 @@ function toRow(s: SessionRowData, dash: DashSession | undefined): Row {
 export function SessionsPage() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation('userws');
-  const { t: tResults } = useTranslation('results');
+  const { t: tResults } = useTranslation(['results', 'common']);
   const { openWizard } = useWizardDrawer();
   const locale = i18n.resolvedLanguage || 'en';
   const [live, setLive] = useState<Row[] | null>(null);
@@ -117,6 +119,8 @@ export function SessionsPage() {
   const [archivedOpen, setArchivedOpen] = useState(false);
   const [actionsFor, setActionsFor] = useState<SessionActionsTarget | null>(null);
   const [answersFor, setAnswersFor] = useState<Row | null>(null);
+  // Rueckmeldung zum PDF-Export einer Kachel: laeuft · nichts gefunden · gescheitert.
+  const [exportNote, setExportNote] = useState<{ kind: 'busy' | 'none' | 'failed'; row: Row } | null>(null);
   const entered = useEntered();
 
   const domainLabel = (slug: string) => (SLUG_TO_I18N[slug] ? t(`domain.${SLUG_TO_I18N[slug]}`) : slug);
@@ -157,27 +161,36 @@ export function SessionsPage() {
   const current = active.filter((r) => !attention.includes(r)).sort(byRecent);
 
   const openSession = (r: Row) => navigate(`/${locale}/results?session=${r.id}`);
-  // Derselbe PII-freie Schnappschuss wie auf /results und im Dashboard.
-  const exportPdf = async () => {
-    let profile = null;
-    try { profile = JSON.parse(localStorage.getItem('ch360_last_profile') || 'null'); } catch { /* fixture */ }
-    await generateRiskMapPdf({
-      profile,
-      t: tResults,
-      stats: STATS.map((s, i) => ({ value: s.value, label: tResults(`stats.${i}.label`, { defaultValue: s.label }) })),
-      obligations: OBLIGATIONS.map((o, i) => ({
-        severity: o.severity,
-        title: tResults(`obligations.${i}.title`, { defaultValue: o.title }),
-        detail: tResults(`obligations.${i}.detail`, { defaultValue: o.detail }),
-        market: tResults(`obligations.${i}.market`, { defaultValue: o.market }),
-        due: tResults(`obligations.${i}.due`, { defaultValue: o.due }),
-        dueSub: tResults(`obligations.${i}.dueSub`, { defaultValue: o.dueSub }),
-        stateLabel:
-          o.state.kind === 'confirmed' ? tResults('state.confirmed', { defaultValue: 'Confirmed' })
-          : o.state.kind === 'likely' ? tResults('state.likely', { defaultValue: 'Likely' })
-          : tResults('pdf.questionsOpen', { defaultValue: '{{total}} questions open', total: o.state.count }),
-      })),
-    });
+  // Die PDF einer Sitzung ist die Risk Map DIESER Sitzung: dieselbe Abfrage wie
+  // "Oeffnen" (/results?session=<id> fragt mit Land und Bereichen der Sitzung),
+  // dieselbe Abbildung wie die Risk-Map-Seite (liveObligations & Co.).
+  //
+  // Bis 2026-09-22 stand hier die Design-Fixture: jede Kachel exportierte
+  // dieselben acht erfundenen Pflichten und "3 Verified Providers ready", mit
+  // dem Profil des letzten Wizard-Laufs aus dem localStorage als Kopfzeile —
+  // ein Dokument ueber das Geschaeft des Nutzers, dessen Inhalt erfunden war.
+  //
+  // Antwortet die Engine nicht, gibt es keine PDF. Findet sie nichts, auch
+  // nicht: eine leere Liste auf Papier liest sich als Entwarnung, und der Satz
+  // "This does not mean that no obligations apply" gehoert dazu.
+  const exportPdf = async (r: Row) => {
+    setExportNote({ kind: 'busy', row: r });
+    try {
+      const res = await runSearch({ country: r.profile.country, categories: r.categories as SearchProfile['categories'] });
+      const laws = (res.laws ?? []).filter((l) => l.severity);
+      if (!laws.length) { setExportNote({ kind: 'none', row: r }); return; }
+      const rows = liveObligations(laws, tResults, i18n.language, locale);
+      await generateRiskMapPdf({
+        profile: r.profile as SearchProfile,
+        t: tResults,
+        stats: riskMapStats(laws, rows.length, res.providers?.length ?? null)
+          .map((s, i) => ({ value: s.value, label: tResults(`stats.${i}.label`, { defaultValue: s.label }) })),
+        obligations: pdfObligations(rows, tResults),
+      });
+      setExportNote(null);
+    } catch {
+      setExportNote({ kind: 'failed', row: r });
+    }
   };
   const restore = async (r: Row) => {
     try { await patchSession(r.id, { status: 'active' }); } catch { /* die Liste bleibt, wie sie war */ }
@@ -205,7 +218,7 @@ export function SessionsPage() {
           align="start"
           label={t('sessions.moreActions')}
           items={[
-            { label: t('sessions.exportPdf'), onClick: () => { void exportPdf(); } },
+            { label: t('sessions.exportPdf'), onClick: () => { void exportPdf(r); } },
             { label: t('sessions.rename'), onClick: () => setActionsFor(target(r, 'rename')) },
             { label: t('sessions.archive'), danger: true, onClick: () => setActionsFor(target(r, 'archive')) },
           ]}
@@ -318,6 +331,31 @@ export function SessionsPage() {
               segs={active.length ? [{ frac: stale.length / active.length, cls: 'text-fg-accent' }] : []}
             />
           </div>
+
+          {/* PDF-Export: abgenommene Zustands-Copy (Checklist v1.0). Alle drei
+              Aussagen stimmen auf dieser Flaeche: "Try Again" wiederholt den
+              Export, "Contact Support" fuehrt zur Kontaktseite, "Review My
+              Answers" oeffnet die Antworten-Schublade dieser Sitzung. */}
+          {exportNote && (
+            <Banner
+              className="mt-6"
+              status={exportNote.kind === 'failed' ? 'error' : 'info'}
+              title={t(`common:states.${exportNote.kind === 'busy' ? 'riskMapLoading' : exportNote.kind === 'none' ? 'noRequirements' : 'riskMapFailed'}.heading`)}
+              onClose={exportNote.kind === 'busy' ? undefined : () => setExportNote(null)}
+              action={
+                exportNote.kind === 'failed' ? (
+                  <span className="flex flex-wrap gap-2">
+                    <Button size="sm" variant="secondary" onClick={() => { void exportPdf(exportNote.row); }}>{t('common:states.actions.tryAgain')}</Button>
+                    <Button size="sm" variant="ghost" onClick={() => navigate(`/${locale}/contact`)}>{t('common:states.actions.contactSupport')}</Button>
+                  </span>
+                ) : exportNote.kind === 'none' ? (
+                  <Button size="sm" variant="secondary" onClick={() => { setAnswersFor(exportNote.row); setExportNote(null); }}>{t('common:states.actions.reviewMyAnswers')}</Button>
+                ) : undefined
+              }
+            >
+              {t(`common:states.${exportNote.kind === 'busy' ? 'riskMapLoading' : exportNote.kind === 'none' ? 'noRequirements' : 'riskMapFailed'}.message`)}
+            </Banner>
+          )}
 
           {/* 2C · Gruppen statt Filter */}
           {attention.length > 0 && (

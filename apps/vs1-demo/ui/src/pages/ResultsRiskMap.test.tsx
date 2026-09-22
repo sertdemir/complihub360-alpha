@@ -1,4 +1,5 @@
-import { render, screen, within } from '@testing-library/react';
+import type { ReactNode } from 'react';
+import { render, screen, within, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { AnonProvider, SearchLaw } from '../api/search';
@@ -13,6 +14,10 @@ import type { AnonProvider, SearchLaw } from '../api/search';
 // below still apply; the transform cost now lands in the untimed collect phase.
 import { ResultsRiskMap } from './ResultsRiskMap';
 
+// Erster Titel der Design-Fixture, die bis 2026-09-22 auf der Risk Map stand.
+// Die Fixture ist geloescht; der Titel bleibt als Anker, dass sie nicht zurueckkehrt.
+const FORMER_FIXTURE_TITLE = 'OSS quarterly return';
+
 // ─── Risk map · "Now" / "On the radar" grouping ──────────────────────────────
 // The PPWR 2030 tranche put five obligations on the map that are law today but
 // only apply in ~2030. This pins the split so they cannot drift back into
@@ -20,12 +25,17 @@ import { ResultsRiskMap } from './ResultsRiskMap';
 
 const runSearch = vi.fn();
 vi.mock('../api/search', () => ({ runSearch: (...a: unknown[]) => runSearch(...a) }));
+const fetchSessions = vi.hoisted(() => vi.fn());
 vi.mock('../api/sessions', () => ({
   saveWizardSession: vi.fn().mockResolvedValue(undefined),
-  fetchSessions: vi.fn().mockResolvedValue([]),
+  fetchSessions: (...a: unknown[]) => fetchSessions(...a),
+  duplicateSession: vi.fn(),
 }));
 vi.mock('../lib/riskMapPdf', () => ({ generateRiskMapPdf: vi.fn() }));
-vi.mock('../store/useAuthStore', () => ({ useAuthStore: () => ({ isLoggedIn: false }) }));
+// Veraenderbar, damit ein Test die eingeloggte Ansicht pruefen kann.
+const auth = vi.hoisted(() => ({ isLoggedIn: false }));
+vi.mock('../store/useAuthStore', () => ({ useAuthStore: () => auth }));
+vi.mock('../components/user/UserShell', () => ({ UserShell: ({ children }: { children: ReactNode }) => <>{children}</> }));
 // t() resolves to the canonical EN default so assertions read as the user sees.
 // Without a default it returns the key, with `count` and `pct` appended — so a
 // test can tell "3 matched" from "1 matched" without a translation file.
@@ -57,13 +67,20 @@ const inDays = (n: number) => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 };
 
-const renderPage = () => {
-  render(<MemoryRouter><ResultsRiskMap /></MemoryRouter>);
+const renderPage = (url = '/en/results') => {
+  render(<MemoryRouter initialEntries={[url]}><ResultsRiskMap /></MemoryRouter>);
 };
 
 beforeEach(() => {
   vi.clearAllMocks();
+  // clearAllMocks leert nur die Aufruf-Historie, nicht die Warteschlange der
+  // mockResolvedValueOnce-Antworten. Scheitert ein Test, bevor er seine
+  // Einmal-Antwort verbraucht, bekaeme sonst der NAECHSTE Test sie — und
+  // scheiterte mit, obwohl an ihm nichts falsch ist.
+  runSearch.mockReset();
   localStorage.clear();
+  auth.isLoggedIn = false;
+  fetchSessions.mockResolvedValue([]);
 });
 
 describe('ResultsRiskMap grouping', () => {
@@ -190,5 +207,102 @@ describe('ResultsRiskMap provider teaser', () => {
     expect(screen.queryByText(/partners\.eyebrow/)).not.toBeInTheDocument();
     expect(screen.queryByText('partners.none')).not.toBeInTheDocument();
     expect(screen.queryByText(/100%/)).not.toBeInTheDocument();
+  });
+});
+
+// ─── Risk map · the engine found nothing ─────────────────────────────────────
+// Until 2026-09-22 an empty engine answer fell back to the design fixture: the
+// page showed eight invented obligations as if the engine had found them. An
+// empty answer is a result, not a loading state.
+
+describe('ResultsRiskMap with zero obligations', () => {
+  it('shows the approved state instead of the fixture — guest view', async () => {
+    runSearch.mockResolvedValue({ providers: [], laws: [] });
+    renderPage();
+
+    expect(await screen.findByText('common:states.noRequirements.heading')).toBeInTheDocument();
+    expect(screen.getByText('common:states.noRequirements.message')).toBeInTheDocument();
+    expect(screen.queryByText(FORMER_FIXTURE_TITLE)).not.toBeInTheDocument();
+    expect(screen.queryByText('table.obligation')).not.toBeInTheDocument();
+    // A guest has no saved answers to review — the wizard would open empty.
+    expect(screen.queryByRole('button', { name: 'common:states.actions.reviewMyAnswers' })).not.toBeInTheDocument();
+  });
+
+  it('ignores knowledge hits without a severity — they are not obligations', async () => {
+    runSearch.mockResolvedValue({ providers: [], laws: [{ ...law({ id: 'kb', title: 'Background note' }), severity: undefined }] });
+    renderPage();
+
+    expect(await screen.findByText('common:states.noRequirements.heading')).toBeInTheDocument();
+    expect(screen.queryByText('Background note')).not.toBeInTheDocument();
+  });
+
+  it('shows the state in the signed-in view, with a way to the answers and no empty PDF', async () => {
+    auth.isLoggedIn = true;
+    fetchSessions.mockResolvedValue([{
+      id: 's1', country: 'AT', markets: ['AT'], categories: ['data-privacy'], label: 'Austria',
+      answers: null, status: 'active', risk_summary: null,
+      created_at: '2026-09-01T00:00:00Z', updated_at: '2026-09-01T00:00:00Z',
+    }]);
+    runSearch.mockResolvedValue({ providers: [], laws: [] });
+    renderPage('/en/results?session=s1');
+
+    expect(await screen.findByText('common:states.noRequirements.heading')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'common:states.actions.reviewMyAnswers' })).toBeInTheDocument();
+    expect(screen.queryByText(FORMER_FIXTURE_TITLE)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'snapshot.exportPdf' })).not.toBeInTheDocument();
+  });
+});
+
+// ─── Risk map · loading and failure ──────────────────────────────────────────
+// Until 2026-09-22 both showed the design fixture — eight invented obligations,
+// "8 obligations identified" — while the engine was still computing or had not
+// answered at all. The fixture is gone; both are approved states now.
+
+describe('ResultsRiskMap while loading and on failure', () => {
+  it('says it is working while the engine computes — no numbers, no rows', async () => {
+    runSearch.mockReturnValue(new Promise(() => {})); // never answers
+    renderPage();
+
+    expect(await screen.findByText('common:states.riskMapLoading.heading')).toBeInTheDocument();
+    expect(screen.getByText('common:states.riskMapLoading.message')).toBeInTheDocument();
+    expect(screen.queryByText(FORMER_FIXTURE_TITLE)).not.toBeInTheDocument();
+    expect(screen.queryByText('obligations identified')).not.toBeInTheDocument();
+    expect(screen.queryByText('table.obligation')).not.toBeInTheDocument();
+    // No map yet — so nothing to save, and no "Here's what applies to you."
+    expect(screen.queryByText('topbar.saveMap')).not.toBeInTheDocument();
+    expect(screen.queryByText('cta.title')).not.toBeInTheDocument();
+    expect(screen.queryByText('header.title')).not.toBeInTheDocument();
+  });
+
+  it('says it failed when the engine does not answer, and Try Again really asks again', async () => {
+    runSearch.mockRejectedValueOnce(new Error('offline'));
+    renderPage();
+
+    expect(await screen.findByText('common:states.riskMapFailed.heading')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'common:states.actions.contactSupport' })).toBeInTheDocument();
+    expect(screen.queryByText(FORMER_FIXTURE_TITLE)).not.toBeInTheDocument();
+    expect(screen.queryByText('obligations identified')).not.toBeInTheDocument();
+    expect(screen.queryByText('topbar.saveMap')).not.toBeInTheDocument();
+    expect(screen.queryByText('header.title')).not.toBeInTheDocument();
+
+    runSearch.mockResolvedValueOnce({ providers: [], laws: [law({ id: 'vat', title: 'VAT return' })] });
+    fireEvent.click(screen.getByRole('button', { name: 'common:states.actions.tryAgain' }));
+
+    expect(await screen.findByText('VAT return')).toBeInTheDocument();
+    expect(screen.queryByText('common:states.riskMapFailed.heading')).not.toBeInTheDocument();
+    // With a result the map can be saved again.
+    expect(screen.getByText('topbar.saveMap')).toBeInTheDocument();
+    expect(screen.getByText('header.title')).toBeInTheDocument();
+    expect(runSearch).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows no rings and no PDF link in the signed-in view while there is no result', async () => {
+    auth.isLoggedIn = true;
+    runSearch.mockRejectedValue(new Error('offline'));
+    renderPage();
+
+    expect(await screen.findByText('common:states.riskMapFailed.heading')).toBeInTheDocument();
+    expect(screen.queryByText('snapshot.kpiTotal')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'snapshot.exportPdf' })).not.toBeInTheDocument();
   });
 });
