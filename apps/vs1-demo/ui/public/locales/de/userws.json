@@ -38,9 +38,7 @@
   "shell": {
     "groupWorkspace": "Arbeitsbereich",
     "groupDomains": "Bereiche",
-    "groupLibrary": "Bibliothek",
-    "groupSaved": "Gespeichert",
-    "groupMonitoring": "Monitoring",
+    "groupNewFeatures": "Neue Funktionen",
     "badgeSoon": "Bald",
     "navDashboard": "Dashboard",
     "navSessions": "Sitzungen",

@@ -38,9 +38,7 @@
   "shell": {
     "groupWorkspace": "Çalışma Alanı",
     "groupDomains": "Alanlar",
-    "groupLibrary": "Kitaplık",
-    "groupSaved": "Kaydedilenler",
-    "groupMonitoring": "İzleme",
+    "groupNewFeatures": "Yeni özellikler",
     "badgeSoon": "Yakında",
     "navDashboard": "Panel",
     "navSessions": "Oturumlar",

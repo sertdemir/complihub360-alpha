@@ -25,8 +25,8 @@ import { initialsOf } from '../../lib/initials';
 
 // ─── UserShell ────────────────────────────────────────────────────────────────
 // The user App-Workspace frame (always dark slate), mirroring the Figma User
-// Dashboard v2 two-axis navigation: slim left sidebar (WORKSPACE / LIBRARY /
-// SAVED / MONITORING) + global Domain Bar on top of the content column.
+// Dashboard v2 two-axis navigation: slim left sidebar (WORKSPACE / DOMAINS /
+// NEW FEATURES) + global Domain Bar on top of the content column.
 // Nav copy lives in the 'userws' namespace; group/domain identifiers stay
 // canonical English (React keys + activeDomain matching).
 
@@ -51,30 +51,17 @@ const SIDEBAR: { group: string; groupKey: string; badgeKey?: string; items: Side
     ],
   },
   {
-    group: 'Library',
-    groupKey: 'groupLibrary',
-    // "Bald" wie bei Monitoring (2026-09-20): die Fläche laeuft auf
-    // ComingSoonPage, und das soll man vor dem Klick sehen.
-    badgeKey: 'badgeSoon',
-    items: [{ to: 'dashboard/library', labelKey: 'navLibrary', icon: BookOpen }],
-  },
-  {
-    group: 'Saved',
-    groupKey: 'groupSaved',
-    // "Bald" (2026-09-20): die Flaeche laeuft auf ComingSoonPage, bis es das
-    // Lesezeichen an den Anbietern gibt. Exporte entfiel am selben Tag — der
-    // echte PDF-Export lebt auf der Ergebnisseite und im Sitzungs-Menue, und
-    // er legt nichts ab, was sich auflisten liesse.
+    // Nutzer-Wahl 2026-09-22 (Dashboard Iteration 2): Bibliothek, Gespeichert
+    // und Monitoring stehen unter EINER Ueberschrift "Neue Funktionen". Alle
+    // vier Flaechen laufen noch auf ComingSoonPage — das "Bald" bleibt, damit
+    // man das vor dem Klick sieht. Exporte entfiel am 2026-09-20: der echte
+    // PDF-Export lebt auf der Ergebnisseite und im Sitzungs-Menue.
+    group: 'NewFeatures',
+    groupKey: 'groupNewFeatures',
     badgeKey: 'badgeSoon',
     items: [
+      { to: 'dashboard/library', labelKey: 'navLibrary', icon: BookOpen },
       { to: 'dashboard/saved-providers', labelKey: 'navSavedProviders', icon: Bookmark },
-    ],
-  },
-  {
-    group: 'Monitoring',
-    groupKey: 'groupMonitoring',
-    badgeKey: 'badgeSoon',
-    items: [
       { to: 'dashboard/alerts', labelKey: 'navAlerts', icon: TriangleAlert },
       { to: 'dashboard/calendar', labelKey: 'navCalendar', icon: Calendar },
     ],
@@ -184,7 +171,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
     return n ? String(n) : undefined;
   };
 
-  // One source for both rails: below `lg` the panel renders the same five groups
+  // One source for both rails: below `lg` the panel renders the same three groups
   // the sidebar renders above it, from the same SIDEBAR + DOMAINS constants and
   // with the same active test. The sessions sub-level is the one thing that does
   // NOT come along — it grows with every session, and /dashboard/sessions is the
