@@ -7,7 +7,7 @@ import { UserShell } from '../../components/user/UserShell';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Button } from '../../components/ui/Button';
 import { Segment } from '../../components/compliance-areas';
-import { KpiRing, useEntered, EASE } from '../../components/ui/Stats';
+import { UnitGrid, unitsPer, useCountUp, useEntered, EASE } from '../../components/ui/Stats';
 import { EmptyState } from '../../components/user/EmptyState';
 import { RescheduleDrawer, type RescheduleTarget } from '../../components/user/RescheduleDrawer';
 import { SessionTile } from '../../components/user/SessionTile';
@@ -45,6 +45,12 @@ type Sev = 'critical' | 'high' | 'medium' | 'low';
 
 const CARD = 'rounded-xl border border-stroke-subtle bg-surface shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]';
 const TEXT_LINK = 'text-body-2xs font-bold text-brand underline underline-offset-[3px] transition-colors hover:text-brand-700';
+
+/** Hochzaehlende Zahl (Z2) — dieselbe Kurve wie die Ringe vorher. */
+function CountUp({ value, on, className }: { value: number; on: boolean; className?: string }) {
+  const n = useCountUp(value, on);
+  return <span className={className} aria-label={String(value)}>{n}</span>;
+}
 
 function SectionHead({ title, count, to, extra }: { title: string; count?: string; to: string; extra?: ReactNode }) {
   const { t, i18n } = useTranslation('userws');
@@ -170,9 +176,24 @@ export function UserHomePage() {
     .sort((a, b) => b.total - a.total)
     .slice(0, 6);
   const chartMax = Math.max(1, ...chartData.map((m) => m.total));
-  const marktAnteile = Object.values(dash.obligations.by_market);
-  const marktSumme = Math.max(1, marktAnteile.reduce((a, b) => a + b, 0));
-  const MARKT_CLS = ['text-brand', 'text-fg-accent', 'text-risk-low', 'text-brand/60', 'text-fg-accent/60', 'text-risk-low/60'];
+  const maerkte = Object.keys(dash.obligations.by_market);
+
+  // Z2: Pflichten nach Risiko als Kaestchen. Mittel als FLAECHE in #D4A017 statt
+  // des Text-Tons risk-medium (#A16207): der ist neben Rot kaum trennbar
+  // (Palette-Pruefung 2026-09-22, dE 12,5 < 15). Kompass-Luecke: Mark-Ton.
+  const pflichtGruppen = [
+    { key: 'h', n: hoch, cls: 'bg-risk-high', label: t('home.unitHigh'), tip: t('home.unitHighTip') },
+    { key: 'm', n: mittel, cls: 'bg-[#D4A017] dark:bg-risk-medium', label: t('home.unitMedium'), tip: t('home.unitMediumTip') },
+    { key: 'l', n: niedrig, cls: 'bg-risk-low', label: t('home.unitLow'), tip: t('home.unitLowTip') },
+  ];
+  const proKaestchen = unitsPer(offen);
+  // Anfragen: wartet auf Sie (Antwort/Frist) · beim Anbieter (unbestaetigt) · laeuft.
+  const laufen = Math.max(0, offeneAnfragen.length - aufSie.length - wartend);
+  const anfrageTeile = [
+    { n: aufSie.length, cls: 'bg-brand', label: t('home.reqYouTip'), legend: t('home.reqYou', { count: aufSie.length }) },
+    { n: wartend, cls: 'bg-brand/45', label: t('home.reqProviderTip'), legend: t('home.reqProvider', { count: wartend }) },
+    { n: laufen, cls: 'bg-brand/15', label: t('home.reqRunningTip'), legend: t('home.reqRunning', { count: laufen }) },
+  ];
 
   const zuletzt = [...dash.sessions.items].sort((a, b) => b.updated_at.localeCompare(a.updated_at))[0];
   const nichts = !loading && dash.sessions.total === 0 && offeneAnfragen.length === 0 && termine.length === 0;
@@ -269,44 +290,77 @@ export function UserHomePage() {
         <div className="mx-auto max-w-[1200px]">
           {kopf}
 
-          {/* Kennzahlen ohne Karte, auf dem Gradient (2A nach Vorgabe) */}
-          <div className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-2 xl:grid-cols-4">
-            <KpiRing
-              on={entered}
-              title={t('home.kpiRequests')}
-              value={offeneAnfragen.length}
-              sub={t('home.kpiRequestsSub', { waiting: wartend, active: offeneAnfragen.length - wartend })}
-              chip={wartend > 0 ? t('home.kpiRequestsChip', { count: wartend }) : undefined}
-              segs={offeneAnfragen.length
-                ? [{ frac: wartend / offeneAnfragen.length, cls: 'text-fg-accent' },
-                   { frac: (offeneAnfragen.length - wartend) / offeneAnfragen.length, cls: 'text-brand' }]
-                : []}
-            />
-            <KpiRing
-              on={entered}
-              title={t('home.kpiDuties')}
-              value={offen}
-              sub={t('home.kpiDutiesSub', { count: dash.sessions.total })}
-              segs={offen
-                ? [{ frac: hoch / offen, cls: 'text-risk-high' },
-                   { frac: mittel / offen, cls: 'text-risk-medium' },
-                   { frac: niedrig / offen, cls: 'text-risk-low' }]
-                : []}
-            />
-            <KpiRing
-              on={entered}
-              title={t('home.kpiSessions')}
-              value={dash.sessions.total}
-              sub={t('home.kpiSessionsSub', { count: marktAnteile.length })}
-              segs={marktAnteile.map((n, i) => ({ frac: n / marktSumme, cls: MARKT_CLS[i % MARKT_CLS.length] }))}
-            />
-            <KpiRing
-              on={entered}
-              title={t('home.kpiRisk')}
-              value={hoch}
-              sub={t('home.kpiRiskSub', { count: offen })}
-              segs={offen ? [{ frac: hoch / offen, cls: 'text-risk-high' }] : []}
-            />
+          {/* Kennzahlen als Einheiten-Grafik (Canvas Z2, Nutzer-Wahl 2026-09-22).
+              Die vier Ringe sind weg: ihre Farben erklaerte nichts, und "Hohes
+              Risiko" war eine Teilmenge von "Offene Pflichten". Jetzt: jedes
+              Kaestchen ein Ding, jede Farbe mit ihrem Wort daneben. */}
+          <div className="mt-6 grid gap-x-12 gap-y-7 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+            <div>
+              <div className="flex items-baseline gap-3">
+                <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('home.kpiDuties')}</p>
+                <CountUp value={offen} on={entered} className="font-serif text-[30px] font-bold leading-none text-fg" />
+              </div>
+              {offen > 0 ? (
+                <>
+                  <div className="mt-3 flex flex-wrap gap-x-7 gap-y-4">
+                    {pflichtGruppen.filter((g) => g.n > 0).map((g, gi, arr) => (
+                      <div key={g.key}>
+                        <p className="mb-1.5 flex items-center gap-1.5 text-body-2xs text-fg-secondary">
+                          <span aria-hidden="true" className={'h-2.5 w-2.5 rounded-[2px] ' + g.cls} />
+                          {g.label} <b className="text-fg">{g.n}</b>
+                        </p>
+                        <UnitGrid
+                          on={entered} cols={5} perUnit={proKaestchen}
+                          delayOffset={arr.slice(0, gi).reduce((a, x) => a + Math.ceil(x.n / proKaestchen), 0)}
+                          parts={[{ n: g.n, cls: g.cls, label: g.tip }]}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  {proKaestchen > 1 && <p className="mt-2 text-body-3xs text-fg-tertiary">{t('home.unitsPer', { count: proKaestchen })}</p>}
+                </>
+              ) : (
+                <p className="mt-2 text-body-xs text-fg-tertiary">{t('home.noDuties')}</p>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-6">
+              <div>
+                <div className="flex items-baseline gap-3">
+                  <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('home.kpiRequests')}</p>
+                  <CountUp value={offeneAnfragen.length} on={entered} className="font-serif text-[30px] font-bold leading-none text-fg" />
+                </div>
+                {offeneAnfragen.length > 0 && (
+                  <>
+                    <div className="mt-2.5">
+                      <UnitGrid on={entered} perUnit={unitsPer(offeneAnfragen.length, 20)} parts={anfrageTeile} />
+                    </div>
+                    <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-body-2xs text-fg-secondary">
+                      {anfrageTeile.filter((p) => p.n > 0).map((p) => (
+                        <span key={p.cls} className="inline-flex items-center gap-1.5">
+                          <span aria-hidden="true" className={'h-2.5 w-2.5 rounded-[2px] ' + p.cls} />
+                          {p.legend}
+                        </span>
+                      ))}
+                    </p>
+                  </>
+                )}
+              </div>
+              <div>
+                <div className="flex items-baseline gap-3">
+                  <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('home.kpiSessions')}</p>
+                  <CountUp value={dash.sessions.total} on={entered} className="font-serif text-[30px] font-bold leading-none text-fg" />
+                </div>
+                {maerkte.length > 0 && (
+                  <p className="mt-2 flex flex-wrap items-center gap-1.5 text-body-2xs text-fg-secondary">
+                    {t('home.kpiSessionsIn')}
+                    {maerkte.map((m) => (
+                      <span key={m} className="rounded-full border border-stroke bg-surface px-2 py-[1px] text-[11px] font-extrabold tracking-[0.04em] text-fg">{m}</span>
+                    ))}
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="mt-7 flex flex-col gap-[18px] xl:flex-row">

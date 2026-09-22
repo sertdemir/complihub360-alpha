@@ -133,3 +133,68 @@ export function KpiRing({ title, sub, chip, value, segs, on, format }: {
     </div>
   );
 }
+
+// ─── UnitGrid · Einheiten-Grafik (Canvas Z2, Nutzer-Wahl 2026-09-22) ─────────
+// Ersetzt auf dem Dashboard die Ringe: deren Farben erklaerte nichts, der
+// Nutzer musste raten, was Gold oder Rot im Kreis bedeutet. Bei kleinen Zahlen
+// ist ZAEHLEN verstaendlicher als jede Flaeche — ein Kaestchen ist ein Ding
+// (eine Pflicht, eine Anfrage). Die Bedeutung traegt die Beschriftung des
+// Aufrufers, die Farbe verstaerkt nur.
+//
+// Die Kaestchen erscheinen nacheinander (22 ms Versatz, Pop mit EASE); bei
+// reduced motion stehen sie sofort. Ab `perUnit` > 1 steht ein Kaestchen fuer
+// mehrere Dinge — der Aufrufer sagt das in der Beschriftung.
+
+export interface UnitPart {
+  n: number;
+  /** Tailwind-Hintergrund, z. B. 'bg-risk-high'. */
+  cls: string;
+  /** Tooltip und Screenreader-Text je Kaestchen. */
+  label: string;
+}
+
+export function UnitGrid({ parts, on, cols, perUnit = 1, size = 16, gap = 4, delayOffset = 0 }: {
+  parts: UnitPart[];
+  on: boolean;
+  /** Spalten; ohne Angabe fliesst die Reihe in voller Laenge. */
+  cols?: number;
+  perUnit?: number;
+  size?: number;
+  gap?: number;
+  /** Versatz in Kaestchen, damit mehrere Gruppen nacheinander aufgehen. */
+  delayOffset?: number;
+}) {
+  const cells: { cls: string; label: string }[] = [];
+  for (const p of parts) {
+    const k = Math.ceil(p.n / perUnit);
+    for (let i = 0; i < k; i++) cells.push({ cls: p.cls, label: p.label });
+  }
+  return (
+    <div
+      aria-hidden="true"
+      className="grid"
+      style={{ gap, gridTemplateColumns: cols ? `repeat(${cols}, ${size}px)` : `repeat(${cells.length || 1}, ${size}px)` }}
+    >
+      {cells.map((c, i) => (
+        <span
+          key={i}
+          title={c.label}
+          className={'block rounded-[4px] ' + c.cls}
+          style={{
+            width: size, height: size,
+            opacity: on ? 1 : 0,
+            transform: on ? 'scale(1)' : 'scale(0.2)',
+            transition: `opacity 320ms ${EASE} ${(delayOffset + i) * 22}ms, transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1) ${(delayOffset + i) * 22}ms`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/** Wie viele Dinge ein Kaestchen traegt, damit das Raster lesbar bleibt. */
+export function unitsPer(total: number, max = 60): number {
+  if (total <= max) return 1;
+  for (const s of [2, 5, 10, 25, 50, 100]) if (total / s <= max) return s;
+  return Math.ceil(total / max);
+}
