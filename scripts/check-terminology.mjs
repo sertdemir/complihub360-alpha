@@ -44,18 +44,23 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const LOCALES = resolve(ROOT, 'apps/vs1-demo/ui/public/locales');
 
 /** Verbotener Begriff → geforderter Ersatz. Quelle: Checklist v1.0,
- *  Abschnitt "Terminology and Design System Tests". */
+ *  Abschnitt "Terminology and Design System Tests".
+ *
+ *  Alle Muster mit `i`. Bis 2026-09-22 standen sie ohne, und der Waechter
+ *  meldete gruen, waehrend "Unlock matches with a free account", "Generate my
+ *  risk map" und "a verified partner" im Englischen standen — der Satzanfang
+ *  der Tabelle ist Title Case, die Oberflaeche meist nicht. Ein Begriff ist
+ *  derselbe Begriff, egal wie er geschrieben wird. */
 const VERBOTEN = [
   // ── Englisch, die Quelle ──
-  { muster: /Corporate\s*&(?:amp;)?\s*Structure|Corporate and Structure/g,
+  { muster: /Corporate\s*&(?:amp;)?\s*Structure|Corporate and Structure/gi,
     statt: 'Company Setup & Filings' },
   { muster: /\bLegal Advisory\b/gi,       statt: 'Legal Support' },
-  { muster: /\bVerified Partners?\b/g,    statt: 'Verified Provider' },
-  { muster: /\bStart the Risk Map\b/g,    statt: 'Assess My Needs' },
-  { muster: /\bGenerate My Risk Map\b/g,  statt: 'Create My Risk Map' },
-  { muster: /\bUnlock Matches\b/g,        statt: 'See My Best Matches' },
-  { muster: /\bStart New Search\b/g,      statt: 'Start New Assessment' },
-  { muster: /\bSaved Sessions\b/g,        statt: 'Saved Risk Maps' },
+  { muster: /\bVerified Partners?\b/gi,    statt: 'Verified Provider' },
+  { muster: /\bStart the Risk Map\b/gi,    statt: 'Assess My Needs' },
+  { muster: /\bGenerate My Risk Map\b/gi,  statt: 'Create My Risk Map' },
+  { muster: /\bUnlock Matches\b/gi,        statt: 'See My Best Matches' },
+  { muster: /\bStart New Search\b/gi,      statt: 'Start New Assessment' },
   // "Domain" nur als eigenstaendiges Wort: eine E-Mail-Domain und eine
   // Internet-Domain bleiben Domains, ein Fachbereich heisst Area.
   { muster: /\b(?:Compliance )?Domains?\b(?!\s*(?:name|Name|-))/g, statt: 'Area(s)',
@@ -101,6 +106,14 @@ const AUSGESETZT = [
   ['Immediate / Critical → Urgent',
    '2026-09-20: dieselbe Kette wie Severity. Nur das Label zu aendern ergaebe ' +
    'genau das von der Checklist verbotene "risk.severity.critical zeigt Urgent".'],
+  ['Saved Sessions → Saved Risk Maps',
+   '2026-09-22: kein Wort, sondern ein Konzept. 71 EN-Werte tragen "session", ' +
+   'die meisten meinen eine gespeicherte Risk Map (Seitentitel "Your compliance ' +
+   'sessions", "No session saved yet", Suchhinweis), einige die Anmeldung ' +
+   '("Your session has expired" — die bleibt). Nur die sechs woertlichen ' +
+   '"saved sessions" zu tauschen gaebe eine Navigation mit "Saved Risk Maps" ' +
+   'ueber einer Seite mit "sessions". Dazu haengen Tabelle `sessions`, ' +
+   'Parameter `?session=` und die Sitzungs-Kachel dran.'],
 ];
 
 function* blaetter(o, pfad = '') {

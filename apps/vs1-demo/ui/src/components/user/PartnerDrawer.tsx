@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight, Eye, ShieldCheck } from 'lucide-react';
 import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
+import { Banner } from '../ui/Banner';
 import { ApiError } from '../../api/client';
 import {
   createBooking, fetchProviderDetail, fetchSlots,
@@ -202,6 +203,14 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
           </>
         ) : step === 'termin' ? (
           <>
+            {/* Abgenommene Zustands-Copy (Checklist v1.0, "Booking processing").
+                Der Knopf bleibt gesperrt, solange die Anfrage laeuft — das ist
+                die Vorgabe "prevent duplicate submission". */}
+            {sending && (
+              <Banner status="info" title={t('common:states.bookingProcessing.heading')} className="mb-3">
+                {t('common:states.bookingProcessing.message')}
+              </Banner>
+            )}
             <Button
               size="lg"
               shape="soft"
@@ -211,7 +220,7 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
               onClick={book}
               className="disabled:opacity-50"
             >
-              {sending ? t('schedule.sending') : t('schedule.confirmCta')}
+              {t('schedule.confirmCta')}
             </Button>
             <p className="mt-2 text-center text-body-3xs text-fg-tertiary">
               {selected

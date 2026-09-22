@@ -1875,5 +1875,104 @@
       "phone": "número de teléfono",
       "hours": "horario de atención"
     }
+  },
+  "states": {
+    "riskMapLoading": {
+      "heading": "Creando su Risk Map",
+      "message": "Estamos revisando sus respuestas y ordenando los requisitos que podrían aplicarse."
+    },
+    "riskMapDelayed": {
+      "heading": "Esto está tardando un poco más de lo previsto",
+      "message": "Sus respuestas están guardadas. Puede esperar aquí o volver e intentarlo de nuevo."
+    },
+    "riskMapFailed": {
+      "heading": "No pudimos crear su Risk Map",
+      "message": "Inténtelo de nuevo. Si el problema persiste, póngase en contacto con el soporte."
+    },
+    "noRequirements": {
+      "heading": "No se han identificado requisitos inmediatos",
+      "message": "Según la información facilitada, no hemos identificado ningún requisito inmediato. Esto no significa que no se aplique ninguna obligación. Revise sus respuestas o actualice su Risk Map cuando su negocio cambie."
+    },
+    "moreInfoNeeded": {
+      "heading": "Necesitamos un poco más de información",
+      "message": "Responda las preguntas pendientes para que podamos evaluar esta área con más precisión."
+    },
+    "noProviderMatch": {
+      "heading": "Todavía no hay ningún Verified Provider disponible para esta solicitud",
+      "message": "Actualmente no tenemos ningún Verified Provider que cubra esta combinación de mercado y servicio. Puede solicitar este mercado y elegir recibir un aviso cuando haya cobertura."
+    },
+    "oneProviderMatch": {
+      "heading": "Hemos encontrado un proveedor que se ajusta a sus necesidades actuales",
+      "message": "Revise la especialidad, la cobertura, el rango de precios previsto y la disponibilidad del proveedor antes de decidir si reserva una cita."
+    },
+    "multipleProviderMatches": {
+      "heading": "Compare sus mejores coincidencias",
+      "message": "Revise coincidencias anónimas de proveedores según especialidad relevante, cobertura, calidad del servicio, disponibilidad y ajuste."
+    },
+    "limitedCoverage": {
+      "heading": "La cobertura de proveedores es limitada por ahora",
+      "message": "Hemos encontrado una cobertura limitada para este mercado o servicio. Puede revisar la coincidencia disponible o solicitar más cobertura."
+    },
+    "providerResponseOverdue": {
+      "heading": "El proveedor todavía no ha respondido",
+      "message": "Ha pasado el tiempo de respuesta previsto. Puede seguir esperando o pedir a CompliHub360 que le muestre otra coincidencia. Su información no se compartirá con otro proveedor sin su aprobación."
+    },
+    "alternativeAvailable": {
+      "heading": "Puede haber otro proveedor disponible",
+      "message": "Revise la coincidencia alternativa antes de decidir. No compartiremos su información a menos que elija y reserve al proveedor."
+    },
+    "bookingProcessing": {
+      "heading": "Reservando su cita",
+      "message": "Mantenga esta página abierta mientras confirmamos su solicitud."
+    },
+    "bookingConfirmed": {
+      "heading": "Su cita está reservada",
+      "message": "La identidad y el perfil completo del proveedor ya están disponibles. Solo hemos compartido la información que aparece en la confirmación de su reserva."
+    },
+    "bookingFailed": {
+      "heading": "No pudimos completar su reserva",
+      "message": "No se ha creado ninguna reserva y su información no se ha compartido. Inténtelo de nuevo o póngase en contacto con el soporte."
+    },
+    "marketUnavailable": {
+      "heading": "Todavía no hay cobertura para este mercado",
+      "message": "Solicite este mercado y elija si desea recibir un aviso de disponibilidad."
+    },
+    "sessionExpired": {
+      "heading": "Su sesión ha caducado",
+      "message": "Por su seguridad, inicie sesión de nuevo para continuar. Su información guardada permanece en su cuenta."
+    },
+    "formErrorSummary": {
+      "heading": "Revise la información resaltada",
+      "message": "Falta información o hay que corregirla antes de poder continuar."
+    },
+    "actions": {
+      "tryAgain": "Intentar de nuevo",
+      "returnToAssessment": "Volver a la evaluación",
+      "contactSupport": "Contactar con soporte",
+      "reviewMyAnswers": "Revisar mis respuestas",
+      "answerQuestions": "Responder preguntas",
+      "doThisLater": "Hacerlo más tarde",
+      "requestThisMarket": "Solicitar este mercado",
+      "returnToMyRiskMap": "Volver a mi Risk Map",
+      "reviewMatch": "Revisar coincidencia",
+      "viewMyMatches": "Ver mis coincidencias",
+      "reviewAvailableMatch": "Revisar la coincidencia disponible",
+      "requestMoreCoverage": "Solicitar más cobertura",
+      "keepWaiting": "Seguir esperando",
+      "seeAnotherMatch": "Ver otra coincidencia",
+      "reviewAlternative": "Revisar la alternativa",
+      "keepCurrentRequest": "Mantener la solicitud actual",
+      "viewProviderProfile": "Ver el perfil del proveedor",
+      "viewBooking": "Ver la reserva",
+      "exploreOtherMarkets": "Explorar otros mercados",
+      "signIn": "Iniciar sesión"
+    },
+    "sharingReview": {
+      "heading": "Revise lo que se compartirá",
+      "body": "Para tramitar su solicitud de cita, CompliHub360 compartirá la información que figura a continuación con el proveedor que ha seleccionado. Su información no se compartirá con otros proveedores a menos que haga otra selección y la apruebe.",
+      "confirmation": "Lo entiendo y deseo continuar con esta reserva.",
+      "confirmAndBook": "Confirmar y reservar",
+      "goBack": "Volver"
+    }
   }
 }

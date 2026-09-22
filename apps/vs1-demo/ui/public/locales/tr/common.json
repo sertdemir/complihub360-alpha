@@ -1875,5 +1875,104 @@
       "phone": "telefon numarası",
       "hours": "hizmet saatleri"
     }
+  },
+  "states": {
+    "riskMapLoading": {
+      "heading": "Risk Map'iniz oluşturuluyor",
+      "message": "Yanıtlarınızı inceliyor ve geçerli olabilecek gereklilikleri düzenliyoruz."
+    },
+    "riskMapDelayed": {
+      "heading": "Bu işlem beklenenden biraz uzun sürüyor",
+      "message": "Yanıtlarınız kaydedildi. Burada bekleyebilir ya da geri dönüp tekrar deneyebilirsiniz."
+    },
+    "riskMapFailed": {
+      "heading": "Risk Map'inizi oluşturamadık",
+      "message": "Lütfen tekrar deneyin. Sorun devam ederse destek ekibiyle iletişime geçin."
+    },
+    "noRequirements": {
+      "heading": "Acil bir gereklilik tespit edilmedi",
+      "message": "Verdiğiniz bilgilere göre acil bir gereklilik tespit etmedik. Bu, hiçbir yükümlülüğün geçerli olmadığı anlamına gelmez. İşiniz değiştiğinde yanıtlarınızı gözden geçirin veya Risk Map'inizi güncelleyin."
+    },
+    "moreInfoNeeded": {
+      "heading": "Biraz daha bilgiye ihtiyacımız var",
+      "message": "Bu alanı daha doğru değerlendirebilmemiz için kalan soruları yanıtlayın."
+    },
+    "noProviderMatch": {
+      "heading": "Bu talep için henüz uygun bir Verified Provider yok",
+      "message": "Şu anda bu pazar ve hizmet kombinasyonunu karşılayan bir Verified Provider'ımız bulunmuyor. Bu pazarı talep edebilir ve kapsam sağlandığında bildirim almayı seçebilirsiniz."
+    },
+    "oneProviderMatch": {
+      "heading": "Mevcut ihtiyaçlarınıza uyan bir sağlayıcı bulduk",
+      "message": "Randevu alıp almayacağınıza karar vermeden önce sağlayıcının uzmanlığını, kapsamını, beklenen fiyat aralığını ve müsaitliğini inceleyin."
+    },
+    "multipleProviderMatches": {
+      "heading": "En iyi eşleşmelerinizi karşılaştırın",
+      "message": "Anonim sağlayıcı eşleşmelerini ilgili uzmanlık, kapsam, hizmet kalitesi, müsaitlik ve uyum açısından inceleyin."
+    },
+    "limitedCoverage": {
+      "heading": "Sağlayıcı kapsamı şu anda sınırlı",
+      "message": "Bu pazar veya hizmet için sınırlı kapsam bulduk. Mevcut eşleşmeyi inceleyebilir veya ek kapsam talep edebilirsiniz."
+    },
+    "providerResponseOverdue": {
+      "heading": "Sağlayıcı henüz yanıt vermedi",
+      "message": "Beklenen yanıt süresi doldu. Beklemeye devam edebilir veya CompliHub360'tan size başka bir eşleşme göstermesini isteyebilirsiniz. Bilgileriniz, onayınız olmadan başka bir sağlayıcıyla paylaşılmaz."
+    },
+    "alternativeAvailable": {
+      "heading": "Başka bir sağlayıcı müsait olabilir",
+      "message": "Karar vermeden önce alternatif eşleşmeyi inceleyin. Sağlayıcıyı seçip randevu almadığınız sürece bilgilerinizi paylaşmayız."
+    },
+    "bookingProcessing": {
+      "heading": "Randevunuz alınıyor",
+      "message": "Talebinizi onaylarken lütfen bu sayfayı açık tutun."
+    },
+    "bookingConfirmed": {
+      "heading": "Randevunuz alındı",
+      "message": "Sağlayıcının kimliği ve tam profili artık görüntülenebilir. Yalnızca randevu onayınızda gösterilen bilgileri paylaştık."
+    },
+    "bookingFailed": {
+      "heading": "Randevunuzu tamamlayamadık",
+      "message": "Randevu oluşturulmadı ve bilgileriniz paylaşılmadı. Lütfen tekrar deneyin veya destek ekibiyle iletişime geçin."
+    },
+    "marketUnavailable": {
+      "heading": "Bu pazar için henüz kapsam yok",
+      "message": "Bu pazarı talep edin ve müsaitlik güncellemesi almak isteyip istemediğinizi seçin."
+    },
+    "sessionExpired": {
+      "heading": "Oturumunuzun süresi doldu",
+      "message": "Güvenliğiniz için devam etmek üzere lütfen tekrar giriş yapın. Kaydettiğiniz bilgiler hesabınızda kalır."
+    },
+    "formErrorSummary": {
+      "heading": "Lütfen işaretlenen bilgileri gözden geçirin",
+      "message": "Devam edebilmeniz için bazı bilgiler eksik veya düzeltilmesi gerekiyor."
+    },
+    "actions": {
+      "tryAgain": "Tekrar dene",
+      "returnToAssessment": "Değerlendirmeye dön",
+      "contactSupport": "Destekle iletişime geç",
+      "reviewMyAnswers": "Yanıtlarımı gözden geçir",
+      "answerQuestions": "Soruları yanıtla",
+      "doThisLater": "Daha sonra yap",
+      "requestThisMarket": "Bu pazarı talep et",
+      "returnToMyRiskMap": "Risk Map'ime dön",
+      "reviewMatch": "Eşleşmeyi incele",
+      "viewMyMatches": "Eşleşmelerimi gör",
+      "reviewAvailableMatch": "Mevcut eşleşmeyi incele",
+      "requestMoreCoverage": "Daha fazla kapsam talep et",
+      "keepWaiting": "Beklemeye devam et",
+      "seeAnotherMatch": "Başka bir eşleşme gör",
+      "reviewAlternative": "Alternatifi incele",
+      "keepCurrentRequest": "Mevcut talebi koru",
+      "viewProviderProfile": "Sağlayıcı profilini gör",
+      "viewBooking": "Randevuyu gör",
+      "exploreOtherMarkets": "Diğer pazarları keşfet",
+      "signIn": "Giriş yap"
+    },
+    "sharingReview": {
+      "heading": "Paylaşılacak bilgileri gözden geçirin",
+      "body": "Randevu talebinizi işleme alabilmek için CompliHub360, aşağıda listelenen bilgileri seçtiğiniz sağlayıcıyla paylaşacaktır. Başka bir seçim yapıp onaylamadığınız sürece bilgileriniz diğer sağlayıcılarla paylaşılmaz.",
+      "confirmation": "Anladım ve bu randevuyla devam etmek istiyorum.",
+      "confirmAndBook": "Onayla ve randevu al",
+      "goBack": "Geri dön"
+    }
   }
 }

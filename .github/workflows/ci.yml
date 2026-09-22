@@ -57,6 +57,13 @@ jobs:
         # schnell scheitert.
         run: npm run terminology:check
 
+      - name: Check approved state copy against the acceptance checklist
+        # "Use the approved state copy in this document." Die 17 Zustaende und
+        # der Sharing-Dialog muessen im Englischen wortgleich zur Vorlage
+        # bleiben — eine Umformulierung braucht eine neue Abnahme, nicht nur
+        # einen Commit. Ohne Abhaengigkeiten, deshalb ebenfalls hier oben.
+        run: npm run copy:check
+
       - name: Datenbank-Tests (Postgres 16, pgTAP)
         # `supabase/tests/database/` lag seit Monaten im Repo und lief in
         # KEINEM Schritt — drei Dateien, 54 Zusicherungen, nie geprueft. Eine

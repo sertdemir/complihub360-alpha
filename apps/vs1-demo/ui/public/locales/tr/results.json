@@ -110,7 +110,7 @@
     "eyebrow": "3 Verified Provider eşleşti",
     "title": "Bu konuda kimin harekete geçebileceğini bulduk.",
     "unlocked": "Eşleşmeler açıldı",
-    "unlockCta": "Eşleşmeleri ücretsiz bir hesapla açın",
+    "unlockCta": "En iyi eşleşmelerinizi ücretsiz bir hesapla görün",
     "match": "{{pct}} uyum",
     "requestQuote": "Teklif isteyin",
     "0": {
@@ -237,7 +237,6 @@
     "pickSlotDrawer": "Yukarıdan bir saat seçin.",
     "messageLabel": "Konunuz",
     "messageFromSession": "Konu: „{{session}}“ oturumum.",
-    "sending": "Alınıyor …",
     "duration": "30 dk",
     "noSlots": "Bu sağlayıcının şu anda boş randevusu yok. Birkaç gün sonra tekrar deneyin.",
     "failed": "Randevu alınamadı. Lütfen birazdan tekrar deneyin.",

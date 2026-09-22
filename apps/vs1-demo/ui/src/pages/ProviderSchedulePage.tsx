@@ -6,6 +6,7 @@ import { Logo } from '../components/ui/Logo';
 import { useApiData } from '../lib/useApiData';
 import { fetchSlots, createBooking, type BookingConfirmation } from '../api/bookings';
 import { Button } from '../components/ui/Button';
+import { Banner } from '../components/ui/Banner';
 
 // ─── Native Scheduling (stage 3) — Phase-3 wiring ────────────────────────────
 // Mirrors the Figma "Scheduling — Buchung" screens: slot picker (from
@@ -168,6 +169,12 @@ export function ProviderSchedulePage() {
             >
               {t('schedule.confirmCta')}
             </Button>
+            {/* Abgenommene Zustands-Copy (Checklist v1.0, "Booking processing"). */}
+            {state === 'sending' && (
+              <Banner status="info" title={t('common:states.bookingProcessing.heading')}>
+                {t('common:states.bookingProcessing.message')}
+              </Banner>
+            )}
             {failed && (
               <p className="text-body-3xs leading-relaxed text-[#8A3B3B] dark:text-[#F1A88C]">{t('schedule.failed')}</p>
             )}

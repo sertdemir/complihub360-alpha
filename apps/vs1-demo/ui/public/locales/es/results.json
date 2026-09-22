@@ -110,7 +110,7 @@
     "eyebrow": "3 Verified Providers encontrados",
     "title": "Hemos encontrado quién puede actuar sobre esto.",
     "unlocked": "Coincidencias desbloqueadas",
-    "unlockCta": "Desbloquee las coincidencias con una cuenta gratuita",
+    "unlockCta": "Vea sus mejores coincidencias con una cuenta gratuita",
     "match": "{{pct}} de coincidencia",
     "requestQuote": "Solicitar presupuesto",
     "0": {
@@ -237,7 +237,6 @@
     "pickSlotDrawer": "Elija una hora arriba.",
     "messageLabel": "Su consulta",
     "messageFromSession": "Se trata de mi sesión «{{session}}».",
-    "sending": "Reservando …",
     "duration": "30 min",
     "noSlots": "Este proveedor no tiene horas libres ahora mismo. Inténtelo de nuevo en unos días.",
     "failed": "No se pudo reservar la cita. Inténtelo de nuevo en un momento.",
