@@ -12,7 +12,6 @@ import { DOMAINS as CANONICAL_DOMAINS, type DomainSlug } from '../../lib/domains
 import { Sidebar, SidebarGroup, NavItem } from '../ui/AppShell';
 import { WorkspaceMobileBar, type WorkspaceNavGroup } from '../ui/WorkspaceMobileBar';
 import { Logo } from '../ui/Logo';
-import { Button } from '../ui/Button';
 import { useWizardDrawer } from './WizardDrawer';
 import { UserSearchDrawer } from './UserSearchDrawer';
 import { ThemeToggle } from '../ui/ThemeToggle';
@@ -389,10 +388,11 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
           logo={<Logo lockup="symbol" href={null} />}
           actions={
             <>
-              {/* Mobil ist fuer den ausgeschriebenen Knopf kein Platz: dieselbe
-                  Aktion als Plus, beschriftet fuer Screenreader. */}
-              <button type="button" aria-label={t('shared.startNewSearch')} title={t('shared.startNewSearch')} onClick={() => openWizard()} className="grid h-11 w-11 place-items-center rounded-lg text-fg-brand transition-colors hover:text-fg">
-                <Plus size={20} />
+              {/* Mobil nur das Plus im Kreis, beschriftet fuer Screenreader. */}
+              <button type="button" aria-label={t('shell.newAssessment')} title={t('shell.newAssessment')} onClick={() => openWizard()} className="grid h-11 w-11 place-items-center rounded-lg">
+                <span aria-hidden="true" className="grid h-7 w-7 place-items-center rounded-full border border-stroke-brand bg-brand-light text-fg-brand">
+                  <Plus size={15} strokeWidth={2.4} />
+                </span>
               </button>
               <button type="button" aria-label={t('shell.search')} onClick={() => setSearchOpen(true)} className="grid h-11 w-11 place-items-center rounded-lg text-fg-secondary transition-colors hover:text-fg">
                 <Search size={19} />
@@ -428,7 +428,15 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
           {/* Hauptaktion links in der Topbar (Nutzer-Wahl 2026-09-22): auf JEDER
               Seite des Arbeitsbereichs an derselben Stelle, statt in drei
               Seitenkoepfen (Dashboard, Sitzungen, Bereich) je eigen. */}
-          <Button size="sm" onClick={() => openWizard()} className="mr-auto">{t('shared.startNewSearch')}</Button>
+          {/* Zurueckgenommen (Nutzer 2026-09-22): kein gefuellter Primaer-Knopf,
+              sondern Plus im Kreis und die kurze Beschriftung — praesent, aber
+              nicht das Lauteste der Leiste. */}
+          <button type="button" onClick={() => openWizard()} className="group mr-auto inline-flex items-center gap-2 rounded-full py-1 pl-1 pr-2 text-[13px] font-semibold text-fg-secondary transition-colors hover:text-fg">
+            <span aria-hidden="true" className="grid h-7 w-7 place-items-center rounded-full border border-stroke-brand bg-brand-light text-fg-brand transition-colors group-hover:bg-brand group-hover:text-fg-on-brand">
+              <Plus size={15} strokeWidth={2.4} />
+            </span>
+            {t('shell.newAssessment')}
+          </button>
           <button type="button" aria-label={t('shell.search')} onClick={() => setSearchOpen(true)} className="grid h-9 w-9 place-items-center rounded-lg text-fg-secondary hover:text-fg">
             <Search size={17} />
           </button>

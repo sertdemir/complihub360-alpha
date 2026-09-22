@@ -36,6 +36,7 @@
     "environment": "Umwelt-Compliance"
   },
   "shell": {
+    "newAssessment": "Neues Assessment",
     "groupWorkspace": "Arbeitsbereich",
     "domainNews_one": "{{count}} Neuigkeit",
     "domainNews_other": "{{count}} Neuigkeiten",

@@ -36,6 +36,7 @@
     "environment": "Cumplimiento ambiental"
   },
   "shell": {
+    "newAssessment": "Nueva evaluación",
     "groupWorkspace": "Espacio de trabajo",
     "domainNews_one": "{{count}} novedad",
     "domainNews_other": "{{count}} novedades",
