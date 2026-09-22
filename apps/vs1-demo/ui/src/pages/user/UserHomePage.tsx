@@ -178,33 +178,44 @@ export function UserHomePage() {
   const zuletzt = [...dash.sessions.items].sort((a, b) => b.updated_at.localeCompare(a.updated_at))[0];
   const nichts = !loading && dash.sessions.total === 0 && offeneAnfragen.length === 0 && termine.length === 0;
 
-  // 1B: der Lage-Satz — nur Teile, die es gibt; sonst der ruhige Satz.
-  const lageTeile: ReactNode[] = [];
-  if (aufSie.length) lageTeile.push(<strong key="a" className="text-fg">{t('home.todayRequests', { count: aufSie.length })}</strong>);
-  if (ergebnisfragen) lageTeile.push(<span key="e">{t('home.todayOutcomes', { count: ergebnisfragen })}</span>);
-  if (hoch) lageTeile.push(<strong key="r" className="text-[#8A3B3B] dark:text-[#F1A88C]">{t('home.todayRisk', { count: hoch })}</strong>);
+  // Kopf (Canvas K2, Nutzer-Wahl 2026-09-22): die Lage als Sprungmarken. Jeder
+  // Teil fuehrt dorthin, wo er sich erledigen laesst. Was auf Sie wartet, steht
+  // zuerst und traegt die Markenfarbe; das Risiko steht zuletzt, als Punkt statt
+  // roter Fettschrift ("Prioritaet statt Panik", DNA). Ein Teil mit null
+  // entfaellt, ist alles null, steht der ruhige Satz. Die Hauptaktion ("Neues
+  // Assessment starten") sitzt seit demselben Tag links in der Topbar.
+  const marken: { key: string; to: string; label: string; primary?: boolean; risk?: boolean }[] = [];
+  if (aufSie.length) marken.push({ key: 'a', to: 'dashboard/termine?tab=anfragen', label: t('home.todayRequests', { count: aufSie.length }), primary: true });
+  if (ergebnisfragen) marken.push({ key: 'e', to: 'dashboard/termine', label: t('home.todayOutcomes', { count: ergebnisfragen }) });
+  if (hoch) marken.push({ key: 'r', to: 'dashboard/sessions', label: t('home.todayRisk', { count: hoch }), risk: true });
 
   const kopf = (
-    <div className="flex items-start justify-between gap-4">
-      <div className="min-w-0">
-        <h1 className="font-serif text-[22px] font-bold leading-tight text-fg">
-          {firstName
-            ? <Trans t={t} i18nKey="home.title" values={{ name: firstName }} components={{ accent: <span className="text-fg-accent-emphasis" /> }} />
-            : t('home.titleNoName')}
-        </h1>
-        {!loading && (
-          <p className="mt-1.5 text-body-sm text-fg-secondary">
-            {lageTeile.length ? (
-              <>
-                {t('home.todayPrefix')}{' '}
-                {lageTeile.map((teil, i) => (
-                  <span key={i}>{i > 0 && <span className="text-fg-tertiary"> · </span>}{teil}</span>
-                ))}
-              </>
-            ) : t('home.todayCalm')}
-          </p>
-        )}
-      </div>
+    <div>
+      <h1 className="font-serif text-[22px] font-bold leading-tight text-fg">
+        {firstName
+          ? <Trans t={t} i18nKey="home.title" values={{ name: firstName }} components={{ accent: <span className="text-fg-accent-emphasis" /> }} />
+          : t('home.titleNoName')}
+      </h1>
+      {!loading && (marken.length ? (
+        <nav aria-label={t('home.todayPrefix')} className="mt-3 flex flex-wrap gap-2">
+          {marken.map((m) => (
+            <Link
+              key={m.key}
+              to={`/${locale}/${m.to}`}
+              className={'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-body-xs font-semibold transition-colors '
+                + (m.primary
+                  ? 'border-brand bg-brand text-fg-on-brand hover:brightness-110'
+                  : 'border-stroke bg-surface/75 text-fg-secondary hover:border-stroke-brand hover:text-fg')}
+            >
+              {m.risk && <span aria-hidden="true" className="h-[7px] w-[7px] rounded-full bg-risk-high" />}
+              {m.label}
+              <ArrowRight aria-hidden="true" size={13} className={m.primary ? 'text-[rgb(var(--gold-300))]' : 'text-fg-tertiary'} />
+            </Link>
+          ))}
+        </nav>
+      ) : (
+        <p className="mt-1.5 text-body-sm text-fg-secondary">{t('home.todayCalm')}</p>
+      ))}
     </div>
   );
 
