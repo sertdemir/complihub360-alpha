@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { CalendarCheck, LineChart, Globe, ReceiptEuro, Settings, Bell, CircleHelp, Search } from 'lucide-react';
+import { CalendarCheck, LineChart, Globe, ShieldCheck, ReceiptEuro, Settings, Bell, CircleHelp, Search } from 'lucide-react';
 import { Sidebar, SidebarGroup, NavItem } from '../ui/AppShell';
 import { WorkspaceMobileBar, type WorkspaceNavGroup } from '../ui/WorkspaceMobileBar';
 import { Logo } from '../ui/Logo';
@@ -9,7 +9,7 @@ import { PartnerStatusBadge, AvailabilityPill } from '../ui/ProviderBadges';
 import { SearchDrawer, HelpDrawer } from './ProviderDrawers';
 import { BellPopover } from './BellPopover';
 import { ConfirmDrawer, type ConfirmSpec } from './ConfirmDrawer';
-import { ProviderOnboardingModal, ProviderProfileBanner } from './ProviderOnboardingModal';
+import { ApplicationStatusBanner } from './ApplicationStatusBanner';
 import { fetchProviderBookings } from '../../api/bookings';
 import { fetchEventLogFeed } from '../../api/notifications';
 import { fetchCoverage, setAvailability, AVAILABILITY_EVENT } from '../../api/provider';
@@ -35,6 +35,8 @@ const NAV = [
     groupKey: 'shell.groupBusiness',
     items: [
       { to: 'coverage', labelKey: 'shell.navCoverage', icon: Globe },
+      // Phase 2: Bewerbung + Verification Center (Dossier, Freigabematrix).
+      { to: 'verification', labelKey: 'shell.navVerification', icon: ShieldCheck },
       { to: 'billing', labelKey: 'shell.navBilling', icon: ReceiptEuro },
     ],
   },
@@ -139,10 +141,6 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-dvh bg-surface text-fg">
-      {/* Erst das Profil, dann der Workspace: solange das Onboarding nicht
-          abgeschlossen ist, liegt das Modal ueber JEDER Workspace-Seite —
-          deshalb hier in der Shell, nicht auf einer Route. */}
-      <ProviderOnboardingModal />
       <Sidebar
         className="hidden lg:flex"
         logo={
@@ -175,7 +173,7 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
         {NAV.map((g) => (
           <SidebarGroup key={g.groupKey} label={t(g.groupKey)}>
             {g.items.map((it) => {
-              const active = location.pathname.includes(`/partner-dashboard/${it.to}`);
+              const active = location.pathname.includes(`/partner-dashboard/${it.to}`) || (it.to === 'verification' && location.pathname.includes('/partner-dashboard/application'));
               const Icon = it.icon;
               if (it.to === 'help') {
                 // NavItem IS the button (AppShell) — wrapping it in another one
@@ -245,9 +243,10 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
           {statusBadge}
         </header>
         <main className={cn('flex-1 overflow-y-auto px-4 py-5 lg:px-8 lg:py-6')}>
-          {/* O5-C: bis das Profil 100 % erreicht, steht der Vollstaendigkeits-
-              Banner ueber JEDER Workspace-Seite — deshalb hier, nicht je Seite. */}
-          <ProviderProfileBanner />
+          {/* Phase 2: solange das Konto nicht aktiv ist, steht der Bewerbungs-
+              stand ueber JEDER Workspace-Seite — deshalb hier, nicht je Seite.
+              Quelle ist /me/provider, nicht mehr der localStorage. */}
+          <ApplicationStatusBanner />
           {children}
         </main>
       </div>

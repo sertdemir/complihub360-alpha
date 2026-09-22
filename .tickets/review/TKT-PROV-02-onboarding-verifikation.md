@@ -14,8 +14,8 @@ Annahme je Dokument → Einreichen · **5B** Freigabematrix · **6A** Prüf-Queu
 als Tabelle · **7A** Split-View · **8A** Matrix mit Zell-Aktionen und
 Gate-Leiste.
 
-Dieser PR ist der **Backend-Teil**. Die UI folgt nach dem UI-Workflow
-(Figma → lokal → Staging), sobald der Figma-Connector verbunden ist.
+Backend, Figma und lokale UI in einem PR (UI-Workflow: Canvas → Figma →
+lokal; Staging nach dem Review des Nutzers).
 
 ## Objective
 
@@ -63,6 +63,22 @@ Dieser PR ist der **Backend-Teil**. Die UI folgt nach dem UI-Workflow
 - [x] Notify-Typen `verification_*`, `evidence_expiring`;
   `sendVerificationMail` (info_requested, activated) in en/de/es/tr.
 - [x] Typen in `packages/types/src/provider.ts`; OpenAPI für alle Routen.
+- [x] **Figma** (CompliHub-360, Seite „Provider Onboarding (Phase 2)"): vier
+  Frames aus Compass-Instanzen und -Variablen — Dossier, Verification Center,
+  Prüf-Queue, Prüfung; Uptake-Kandidaten (ApprovalCell, GateItem,
+  ChapterNav/Item, EvidenceRow) als Notiz auf der Seite.
+- [x] **UI lokal**: `api/application.ts`, `api/review.ts`;
+  `ApplicationPage` (Dossier, 6 Kapitel, Upload Browser → Bucket → Confirm,
+  VIES-Abfrage, Annahmen mit Version, Einreichen mit benannten Lücken),
+  `VerificationPage` (Matrix, Checkliste, Historie ohne Reviewer-IDs),
+  `AdminProvidersPage` (Queue), `AdminProviderReviewPage` (Split-View,
+  Gate-Leiste aus der API-Antwort, Zell-Aktionen mit Pflichtgrund).
+  Routen `partner-dashboard/application|verification`,
+  `admin/providers[/:key]`; Nav „Verifizierung"; Locales
+  `providerws.application.*`, `providerws.verification.*`,
+  `shell.applicationBanner.*` (en/de/es/tr). `ProviderOnboardingModal`
+  (localStorage) entfernt — der Stand kommt aus `/me/provider`. Mock-Modus
+  liefert einen Anbieter mitten in der Prüfung.
 - [x] `api.test.ts`: 20 neue Tests (Dossier, Kontingent, Upload-Flow,
   Registerabfrage, Annahmen, Submit-Validierung, Queue, Dossier-Download,
   Zell-Aktion, Nachfrage → Confirm, Gate je Bedingung, Transitions, Watcher).
@@ -102,7 +118,9 @@ Kandidat für dieselbe Überarbeitung.
 
 ## Nicht in diesem Ticket
 
-- UI (Dossier, Verification Center, Queue, Prüfung) → UI-Workflow Stufe 2–4.
+- Staging-Rollout der UI → nach dem lokalen Review des Nutzers (Stufe 4).
+- `PartnerApplyPage` als öffentlicher Einstieg (Konto anlegen → Intake mit
+  JWT → Dossier): braucht einen Intake ohne Einladungs-Token — eigener Schritt.
 - Change Control mit Fristen (Spec §18) → Phase 6; Änderungen an
   Rechtsform werden bis dahin nur protokolliert.
 - Prüfdienst für die Identität der vertretungsberechtigten Person.
@@ -115,4 +133,9 @@ Kandidat für dieselbe Überarbeitung.
 
 - `npm run db:test` → 6 Dateien, 114 Tests.
 - `compliance-api`: 211 Tests (27 Regeln, 20 Phase 2).
-- `typecheck`, `lint`, `build`.
+- `typecheck`, `lint`, `build`, `i18n:check`, `terminology:check`,
+  `tokens:check`; UI `vitest --project unit` 230 grün. Die Storybook-
+  Browser-Tests laufen in der Remote-Sandbox nicht (Preload-Assets ohne
+  Netz) — CI prüft sie.
+- Screenshots im Mock-Modus (`VITE_MOCK_API=1`): Dossier, Verification
+  Center, Queue, Prüfung, Banner über „Termine".

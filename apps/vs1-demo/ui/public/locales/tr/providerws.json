@@ -21,7 +21,17 @@
     "oooEndTitle": "Ofis dışı modu bitirilsin mi?",
     "oooEndConsequence": "Yeniden Uygun durumuna dönersiniz — yeni talepler tekrar size yönlendirilir ve SLA sayaçları hemen devam eder.",
     "oooEndConfirm": "Ofis dışı modunu bitir",
-    "switchTo": "Şuraya git"
+    "switchTo": "Şuraya git",
+    "navVerification": "Doğrulama",
+    "applicationBanner": {
+      "draft": "Başvurunuz hâlâ taslak. İncelemenin başlayabilmesi için dosyayı tamamlayın.",
+      "more_info_required": "İnceleme ekibi bir belge daha istedi. Siz yüklerken başvurunuz yerini korur.",
+      "submitted": "Başvurunuz inceleme ekibinde. Her kararı Verification Center'da takip edebilirsiniz.",
+      "cta": {
+        "application": "Dosyaya git",
+        "verification": "Verification Center"
+      }
+    }
   },
   "bell": {
     "aria": "Bildirimler",
@@ -462,99 +472,277 @@
     "errorTitle": "Gönderim başarısız",
     "errorBody": "Paket gönderilemedi. Kayıt bağlantını kontrol et veya tekrar dene — ya da partners@complihub360.com ile iletişime geç."
   },
-  "onboarding": {
-    "steps": {
-      "contact": "İletişim",
-      "coverage": "Kapsam",
-      "listing": "Listeleme"
+  "application": {
+    "title": "Başvuru",
+    "subtitle": "Doğrulama dosyanız: hesap, hukuki yapı, ülke bazında hizmetler, belgeler ve onaylar. Nelerin eksik olduğunu her zaman görürsünüz.",
+    "navHint": "Başvurunuz yalnızca siz gönderdiğinizde incelenir. O zamana kadar her bölümü istediğiniz zaman değiştirebilirsiniz.",
+    "loading": "Dosyanız yükleniyor …",
+    "loadError": "Dosyanız şu anda yüklenemedi. Lütfen biraz sonra tekrar deneyin.",
+    "save": "Kaydet",
+    "saving": "Kaydediliyor …",
+    "saved": "Kaydedildi",
+    "saveError": "Kaydetme başarısız oldu. Hiçbir şey kaybolmadı — lütfen tekrar deneyin.",
+    "chapter": {
+      "account": "Hesap",
+      "legal": "Hukuki yapı ve temsil",
+      "services": "Hizmetler ve ülkeler",
+      "evidence": "Belgeler",
+      "agreements": "Onaylar",
+      "submit": "Gönder"
     },
-    "stepSubs": {
-      "contact": "İlgili kişi ve yanıt kutusu",
-      "coverage": "Ülkeler, diller, alanlar, SLA hedefi",
-      "listing": "Herkese açık profiliniz"
+    "state": {
+      "complete": "Tamam",
+      "open": "Açık",
+      "ready": "Hazır",
+      "notReady": "Henüz mümkün değil"
     },
-    "welcome": {
-      "eyebrow": "CompliHub360'a hoş geldiniz",
-      "titlePre": "İlk dosyalar gelmeden önce: ",
-      "titleGold": "profiliniz",
-      "titlePost": ".",
-      "body": "Başvurunuz incelendi, erişiminiz aktif. Eşleştirmenin sizi bulması ve müvekkillerin sizi listede görmesi için üç şeye ihtiyacımız var:",
-      "cta": "Profili tamamla",
-      "note": "Yaklaşık 5 dakika sürer. Girdileriniz size hangi dosyaların ulaşacağını belirler."
+    "account": {
+      "name": "Şirket adı",
+      "email": "İletişim e-postası",
+      "website": "Web sitesi",
+      "languages": "Diller (virgülle ayrılmış)",
+      "region": "Bölge"
     },
-    "contact": {
-      "title": "Kim yanıtlıyor — ve nereye?",
-      "lead": "Özellikle posta kutusunu kontrol edin: dosyalar oraya gider.",
-      "name": "İlgili kişi",
-      "namePh": "Adınız",
-      "inbox": "Yanıt kutusu",
-      "inboxHint": "Dosyalar ve sihirli bağlantılar buraya gelir — ekibinizin gerçekten okuduğu kutu.",
-      "firm": "Büro / şirket",
-      "website": "Web sitesi"
+    "legal": {
+      "note": "Bu bilgileri yalnızca inceleme ekibimiz görür. Kartınızda asla görünmez.",
+      "entityType": "Hukuki yapı",
+      "registrationNumber": "Sicil numarası",
+      "registeredAddress": "Kayıtlı adres",
+      "representative": "Temsile yetkili kişi",
+      "representativeTitle": "Görev",
+      "insuranceProvider": "Sigorta şirketi",
+      "insuranceValidUntil": "Sigorta geçerlilik tarihi"
     },
-    "coverage": {
-      "title": "Neyi kapsıyorsunuz",
-      "lead": "Eşleştirme size yalnızca bu seçimden dosyalar gösterir.",
-      "countries": "Ülkeler",
-      "langs": "Diller",
-      "areas": "Uzmanlık alanları",
-      "sla": "SLA hedefiniz",
-      "slaDefault": "24s içinde onay · 48s içinde yanıt",
-      "slaFast": "Daha hızlı: 12s / 24s"
+    "services": {
+      "intro": "Her hizmet bir gövdedir; altındaki ülkeler onay istediğiniz pazarlardır. Yeni ülkeler «talep edildi» olarak başlar ve ülke bazında incelenir.",
+      "add": "Hizmet ekle",
+      "addCountry": "Ülke ekle",
+      "countryPlaceholder": "ISO-2, örn. AT",
+      "codePlaceholder": "Hizmet kodu, örn. tax-vat.returns",
+      "namePlaceholder": "Hizmet adı",
+      "licenceHint": "Vergi ve hukuk danışmanlığı için inceleme, ülke bazında bir ruhsat ister.",
+      "allowanceHint": "Kota: planınız henüz seçilmedi. Ana kategori sayısı şimdi değil, aktivasyon sırasında plana göre kontrol edilir.",
+      "allowanceError": "Planınız bunun için gerekenden daha az ana kategori kapsıyor.",
+      "pricingModel": "Fiyat modeli",
+      "priceRange": "Fiyat aralığı",
+      "responseTime": "Yanıt süresi",
+      "capacity": "Kapasite",
+      "countries": "{{count}} ülke",
+      "colCountry": "Ülke",
+      "colJurisdiction": "Yargı alanı",
+      "colStatus": "Durum",
+      "colNote": "İnceleme ekibinin notu",
+      "wholeCountry": "tüm ülke",
+      "remove": "Kaldır",
+      "retire": "Devre dışı bırak",
+      "empty": "Henüz hizmet yok. İlkini ekleyin — inceleme burada listelediklerinizle başlar.",
+      "status": {
+        "draft": "Taslak",
+        "pending_verification": "İnceleme için talep edildi",
+        "approved": "Onaylandı",
+        "limited": "Kısmen onaylandı",
+        "paused": "Duraklatıldı",
+        "retired": "Devre dışı"
+      }
     },
-    "listing": {
-      "title": "Herkese açık profiliniz",
-      "lead": "Eşleştirmede böyle görünürsünüz. Altın alanlar isteğe bağlıdır — ve sıralamada sayılır.",
-      "displayName": "Görünen ad",
-      "shortDesc": "Kısa açıklama",
-      "shortDescPh": "Müvekkillere nasıl yardım ettiğiniz, bir iki cümleyle.",
-      "credentials": "Ruhsat / meslek",
-      "credentialsPh": "örn. Avukat (DE) · BT hukuku uzmanı",
-      "certs": "Sertifikalar",
-      "certsPh": "örn. ISO 27001 Baş Denetçi",
-      "activeSince": "Şu tarihten beri aktif",
-      "teamSize": "Ekip büyüklüğü"
+    "coverageStatus": {
+      "pending": "Talep edildi",
+      "approved": "Onaylandı",
+      "rejected": "Reddedildi",
+      "limited": "Sınırlı",
+      "suspended": "Askıya alındı",
+      "expired": "Süresi doldu"
     },
-    "done": {
-      "titlePre": "Artık ",
-      "titleEm": "listedesiniz",
-      "titlePost": ".",
-      "lead": "Profiliniz aktif. Şimdi ne olacak:",
-      "dossier": "Kapsamınıza uyan bir dosya, sihirli bağlantıyla yanıt kutunuza gelir.",
-      "sla": "Onayınız SLA sayacını durdurur — artık yanıt süreleriniz geçerli.",
-      "rank": "Altın alanları dilediğiniz zaman tamamlayın — sıralamada sayılırlar.",
-      "meterLabel": "Profil %{{pct}} tamam",
-      "cta": "Panele git"
+    "evidence": {
+      "intro": "Liste, hizmetlerinizden ve ülkelerinizden türetilir — aynı hizmetlere sahip her sağlayıcı için aynıdır. Belgeler doğrudan korumalı depolamamıza yüklenir; KDV numarası belge olmadan sicilde kontrol edilir.",
+      "type": {
+        "incorporation": "Ticaret sicili kaydı",
+        "vat_id": "KDV numarası (sicil sorgusu)",
+        "insurance": "Mesleki sorumluluk sigortası",
+        "representative_identity": "Temsil yetkisi",
+        "professional_licence": "Mesleki ruhsat"
+      },
+      "scopeAccount": "Hesap",
+      "scopeDocument": "Belge",
+      "scopeRegistry": "Sicil",
+      "state": {
+        "missing": "Eksik",
+        "uploading": "Yükleniyor",
+        "received": "Alındı",
+        "reviewed": "Doğrulandı",
+        "rejected": "Reddedildi",
+        "expired": "Süresi doldu"
+      },
+      "upload": "Yükle",
+      "replace": "Değiştir",
+      "uploadHint": "20 MB'a kadar PDF, PNG veya JPEG.",
+      "uploadError": "Yükleme başarısız oldu. Hiçbir şey kaydedilmedi — lütfen tekrar deneyin.",
+      "checkRegistry": "Sicilde kontrol et",
+      "vatPlaceholder": "örn. DE123456789",
+      "registryHint": "Belge değil, sonuç kaydedilir.",
+      "registryValid": "Sicilde doğrulandı",
+      "registryInvalid": "Sicilde bulunamadı — lütfen numarayı kontrol edin.",
+      "registryUnavailable": "Sicile şu anda ulaşılamıyor. İnceleme ekibi belge üzerinden karar verecek.",
+      "reviewerHint": "İnceleme ekibi sicil kaydı üzerinden karar verir — yükleme gerekmez.",
+      "licenceHint": "Göndermeden önce değil, aktivasyondan önce gerekli.",
+      "uploadedOn": "{{date}} tarihinde yüklendi"
     },
-    "rankBadge": "sıralamanızı güçlendirir",
-    "back": "Geri",
-    "next": "İleri",
-    "activate": "Profili etkinleştir",
-    "languages": {
-      "de": "Almanca",
-      "en": "İngilizce",
-      "fr": "Fransızca",
-      "nl": "Felemenkçe",
-      "es": "İspanyolca",
-      "tr": "Türkçe"
+    "agreements": {
+      "intro": "Her onay sürüm, dil, ad ve görevle kaydedilir. Yeni bir sürüm eskisinin yerini alır ama onu silmez — bir rezervasyon anındaki durum kanıtlanabilir kalır.",
+      "doc": {
+        "provider_agreement": "Sağlayıcı sözleşmesi",
+        "privacy_notice": "Sağlayıcılar için gizlilik bildirimi",
+        "billing_authorization": "Faturalandırma yetkisi",
+        "commercial_terms": "Ticari koşullar"
+      },
+      "version": "Sürüm {{version}} · {{language}}",
+      "acceptedOn": "{{date}} tarihinde {{name}} tarafından kabul edildi",
+      "notAccepted": "Henüz kabul edilmedi.",
+      "billingNote": "Aboneliği ve lead ücretlerini kayıtlı ödeme yönteminden tahsil etmemize izin verir.",
+      "open": "Belgeyi aç",
+      "accept": "Oku ve kabul et",
+      "acceptTitle": "{{doc}} kabul et",
+      "nameLabel": "Adınız",
+      "titleLabel": "Göreviniz",
+      "confirm": "Sürüm {{version}} kabul et",
+      "cancel": "İptal"
     },
-    "areas": {
-      "taxVat": "Vergi ve KDV",
-      "productPackaging": "EPR ve Ambalaj",
-      "dataPrivacy": "Veri ve Gizlilik",
-      "marketingSeo": "Pazarlama",
-      "corporateStructure": "Şirket Kuruluşu ve Bildirimler",
-      "productCompliance": "Ürün Uyumu",
-      "logisticsCustoms": "Lojistik ve Gümrük",
-      "legalAdvisory": "Hukuki destek"
+    "submit": {
+      "missingTitle": "Hâlâ eksik",
+      "readyTitle": "Hazır",
+      "cta": "Başvuruyu gönder",
+      "note": "Gönderdikten sonra dosyanızı bir insan inceler. Durumu her zaman Verification Center'da görebilirsiniz; sorular e-posta ile ve orada gelir.",
+      "licenceNote": "Ülke bazında ruhsatlar gönderimden sonra da gelebilir — hâlâ eksikse inceleme ekibi ülke bazında ister.",
+      "done": "Gönderildi. Dosyanızı şimdi bir insan inceliyor.",
+      "notSubmittable": "Bu durumdaki bir başvuru gönderilemez.",
+      "ready": {
+        "accountLegal": "Hesap ve hukuki yapı tamam",
+        "services": "{{countries}} ülkede {{services}} hizmet",
+        "evidence": "Sicil kaydı, sigorta, KDV numarası",
+        "agreements": "{{total}} onaydan {{done}} tanesi"
+      }
     },
+    "missing": {
+      "account": {
+        "name": "Şirket adı",
+        "contact_email": "İletişim e-postası"
+      },
+      "legal": {
+        "entity_type": "Hukuki yapı",
+        "registration_number": "Sicil numarası",
+        "registered_address": "Kayıtlı adres",
+        "representative_name": "Temsile yetkili kişi"
+      },
+      "services": {
+        "none": "En az bir hizmet",
+        "no_country": "Hizmet başına en az bir ülke"
+      },
+      "evidence": {
+        "incorporation": "Belge: ticaret sicili kaydı",
+        "vat_id": "Belge: sicilde KDV numarası",
+        "insurance": "Belge: mesleki sorumluluk sigortası",
+        "representative_identity": "Belge: temsil yetkisi",
+        "professional_licence": "Belge: mesleki ruhsat"
+      },
+      "agreements": {
+        "provider_agreement": "Onay: sağlayıcı sözleşmesi",
+        "privacy_notice": "Onay: gizlilik bildirimi",
+        "billing_authorization": "Onay: faturalandırma yetkisi"
+      }
+    }
+  },
+  "verification": {
+    "title": "Verification Center",
+    "subtitle": "Hizmet ve ülke bazında onaylar, açık talepler ve hesabınızla ilgili kararlar.",
+    "loading": "Yükleniyor …",
+    "loadError": "Doğrulama durumu şu anda yüklenemedi.",
     "banner": {
-      "text": "Profil %{{pct}} tamam — eksik profiller sıralamada daha aşağıda yer alır.",
-      "cta": "Profili tamamla",
-      "dismiss": "Bu oturumda gizle",
-      "dismissTitle": "Gizle — profil tamamlanana dek bir sonraki ziyarette yeniden görünür"
+      "title": "İnceleme ekibinin bir belgeye daha ihtiyacı var",
+      "cta": "Dosyaya git · Belgeler"
     },
-    "deferLabel": "Kapat — daha sonra devam et",
-    "deferTitle": "Bu oturum için katılım sürecini kapatır. Girdileriniz saklanır; üstteki bildirim geri götürür."
+    "requestFor": "{{country}} için",
+    "stat": {
+      "status": "Hesap durumu",
+      "approvals": "Onaylar",
+      "approvalsHint": "hizmet × ülke hücresi onaylandı",
+      "evidence": "Belgeler",
+      "evidenceHint": "doğrulandı",
+      "requests": "Açık talepler",
+      "since": "{{date}} tarihinden beri"
+    },
+    "lifecycle": {
+      "draft": "Taslak",
+      "submitted": "Gönderildi",
+      "more_info_required": "Belge talep edildi",
+      "under_verification": "İnceleniyor",
+      "approved_pending_activation": "Onaylandı · aktivasyon bekliyor",
+      "active": "Aktif",
+      "limited": "Sınırlı aktif",
+      "reverification_due": "Yeniden doğrulama gerekli",
+      "paused": "Duraklatıldı",
+      "suspended": "Askıya alındı",
+      "terminated": "Kapatıldı"
+    },
+    "lifecycleHint": {
+      "more_info_required": "yüklemenin ardından otomatik olarak incelemeye geri döner",
+      "submitted": "dosyanızı bir insan inceleyecek",
+      "under_verification": "dosyanız şu anda inceleniyor",
+      "reverification_due": "{{date}} tarihine kadar görünür kalırsınız; lütfen belgeyi yenileyin"
+    },
+    "matrix": {
+      "title": "Hizmet ve ülke bazında onaylar",
+      "intro": "Her hücre ayrı ayrı karara bağlanır. Onaylanan hücreler, hesabınız aktif olur olmaz işletmelere görünür — diğer hücreler hâlâ açık olsa bile.",
+      "service": "Hizmet",
+      "empty": "Henüz hizmet kaydedilmedi."
+    },
+    "cell": {
+      "approved": "Onaylandı",
+      "limited": "Sınırlı",
+      "pending": "Talep edildi",
+      "requested": "Belge talep edildi",
+      "rejected": "Reddedildi",
+      "suspended": "Askıya alındı",
+      "expired": "Süresi doldu",
+      "sinceDate": "{{date}} tarihinden beri",
+      "inReview": "İnceleniyor"
+    },
+    "checklist": {
+      "title": "Belgeler"
+    },
+    "history": {
+      "title": "Kararlar",
+      "intro": "Neye ve neden karar verildi — kimin verdiği değil.",
+      "actor": {
+        "reviewer": "İnceleme ekibi",
+        "provider": "Siz",
+        "system": "Sistem"
+      },
+      "empty": "Henüz karar yok."
+    },
+    "action": {
+      "requested": "Belge talep edildi",
+      "fulfilled": "Talep karşılandı",
+      "withdrawn": "Talep geri çekildi",
+      "approve": "Onaylandı",
+      "limit": "Sınırlandı",
+      "reject": "Reddedildi",
+      "pause": "Duraklatıldı",
+      "reopen": "Yeniden açıldı",
+      "request_info": "Belge talep edildi",
+      "transition": "Durum değişti",
+      "submitted": "Başvuru gönderildi",
+      "requests_fulfilled": "İncelemeye geri döndü",
+      "registry_check": "Sicil sorgusu",
+      "decide": "Belge karara bağlandı",
+      "expired": "Belgenin süresi doldu",
+      "reverification_due": "Yeniden doğrulama gerekli",
+      "created": "Hizmet eklendi",
+      "updated": "Hizmet güncellendi",
+      "deleted": "Hizmet kaldırıldı",
+      "retired": "Hizmet devre dışı bırakıldı",
+      "countries_set": "Ülkeler değişti",
+      "status_from_coverage": "Hizmet durumu güncellendi",
+      "legal_fields_changed": "Hukuki bilgiler değişti"
+    }
   }
 }
