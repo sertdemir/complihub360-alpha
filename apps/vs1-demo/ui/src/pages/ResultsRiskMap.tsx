@@ -20,7 +20,7 @@ import { AnswersDrawer } from '../components/user/AnswersDrawer';
 import { MatchBasis } from '../components/user/PartnerCard';
 import { PartnerDrawer } from '../components/user/PartnerDrawer';
 import { loadBookingsByKey, type BookingByKey } from '../components/user/DomainProviders';
-import { generateRiskMapPdf } from '../lib/riskMapPdf';
+import { generateRiskMapPdf, type PdfObligation } from '../lib/riskMapPdf';
 
 // ─── Results · Risk Map · Figma 1667:215 ────────────────────────────────────
 // The generated risk map shown after the wizard. A guest "map" — obligations
@@ -86,6 +86,99 @@ const withinHorizon = (iso?: string | null): number | null => {
   const d = daysUntil(iso);
   return d != null && d <= DEADLINE_HORIZON_DAYS ? d : null;
 };
+
+type RiskT = TFunction<['results', 'common']>;
+
+// ─── Eine Abbildung, zwei Flaechen ───────────────────────────────────────────
+// Die Risk-Map-Seite und der PDF-Export der Sitzungsseite rechnen mit
+// denselben drei Funktionen. Bis 2026-09-22 hatte die Sitzungsseite keine
+// eigene Abbildung und nahm deshalb die Design-Fixture — jede Sitzung
+// exportierte dieselben acht erfundenen Pflichten.
+
+/** Engine-Pflichten → Tabellenzeilen. Nur Pflichten mit `severity` zaehlen;
+ *  die uebrigen sind Knowledge-Treffer ohne Bewertung. */
+export function liveObligations(laws: SearchLaw[], t: RiskT, lang: string, locale: string): Obligation[] {
+  return laws.filter((l) => l.severity).map((l) => ({
+    id: l.id,
+    severity: l.severity as Severity,
+    title: l.title,
+    // Rechtsgrundlage zuerst, Bußgeld danach. Das DNA-Addendum V2 verlangt,
+    // dass Strafhöhen nicht der primäre Untertitel jeder Pflicht sind —
+    // zugänglich bleiben sie, führend sind sie nicht mehr. Der Präfix war
+    // ausserdem hartkodiertes Englisch ('Penalty:') im deutschen UI.
+    // Die BELEGTE Obergrenze, wo es eine gibt — sonst der redaktionelle
+    // Satz. Beide standen bisher nebeneinander in der Welt, ohne dass
+    // etwas sie zusammenhielt: hier stand "up to EUR 30,000 per year",
+    // waehrend die Obergrenze zu derselben Pflicht 7.500 EUR JE EINHEIT
+    // lautete und keinen Deckel hat. Eine Quelle, ein Satz.
+    detail: [l.source_url ? null : l.source, bussgeldZeile(l, t, lang)]
+      .filter(Boolean)
+      .join(' · '),
+    sourceLabel: l.source_url ? (l.source ?? l.celex ?? undefined) : undefined,
+    sourceUrl: l.source_url ?? undefined,
+    market: l.markets && l.markets.length ? l.markets.join(' · ') : t('euWide'),
+    // Die Norm im Klartext, wenn es keine verlinkbare Fundstelle gibt —
+    // sonst stuende unter dem Titel nur der Markt (Befund 2026-09-05).
+    law: l.source_url ? undefined : (l.source ?? undefined),
+    // A duty that has not started yet must not read "Ongoing · Live" — that
+    // would tell the user they are already in breach. Until its start date
+    // the Due cell shows that date plus the countdown; from the day it
+    // applies the row silently reverts to its normal cadence.
+    due: daysUntil(l.applies_from) != null
+      ? new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' })
+          .format(new Date(`${l.applies_from}T00:00:00`))
+      : l.due === 'Ongoing' ? t('ongoing') : l.due ?? '—',
+    dueSub: withinHorizon(l.applies_from) != null
+      ? t('appliesIn', { count: withinHorizon(l.applies_from) as number, defaultValue: `applies in ${withinHorizon(l.applies_from)} days` })
+      : daysUntil(l.applies_from) != null ? ''   // far future: the date says enough
+      : l.due_days != null ? t('days', { count: l.due_days }) : l.due === 'Ongoing' ? 'Live' : '',
+    dueDays: l.due_days ?? undefined,
+    state: { kind: l.state === 'confirmed' ? 'confirmed' : 'likely' },
+    // Same horizon as the stats: a duty landing in days is "now" even
+    // though it has not started; one landing in 2030 is not.
+    radar: daysUntil(l.applies_from) != null && withinHorizon(l.applies_from) == null,
+  }));
+}
+
+/** Near-term deadlines count inside this window. */
+const SOON_DAYS = 30;
+
+/** Kennzahlen zu Live-Pflichten. `providers` null heisst: die Engine hat keine
+ *  Anbieter geliefert (laedt, Fehler) — dann steht "—" statt einer Zahl. */
+export function riskMapStats(laws: SearchLaw[], rowCount: number, providers: number | null) {
+  // A not-yet-applicable duty has a real, dated deadline — the day it starts
+  // to apply. Counting it keeps the "near deadlines" stat honest; without it
+  // a rule landing in two days would be invisible in the headline numbers.
+  // Only inside the horizon, though: the 2030 tranche is a roadmap, and
+  // averaging it in would report a median deadline three years out.
+  const days = laws.filter((l) => l.severity).map((l) => l.due_days ?? withinHorizon(l.applies_from))
+    .filter((d): d is number => d != null).sort((a, b) => a - b);
+  const median = days.length ? days[Math.floor(days.length / 2)] : null;
+  const soon = days.filter((d) => d <= SOON_DAYS).length;
+  return [
+    { value: String(rowCount), label: 'obligations identified' },
+    { value: String(soon), label: `with a deadline in ${SOON_DAYS} days` },
+    { value: median != null ? String(median) : '', days: median ?? undefined, label: 'median deadline' },
+    { value: providers != null ? String(providers) : '—', label: 'Verified Providers ready' },
+  ];
+}
+
+/** Tabellenzeilen → PDF-Zeilen. Live-Zeilen stehen wortgleich (die Engine
+ *  spricht Englisch), die Fixture uebersetzt positionsweise. */
+export function pdfObligations(rows: Obligation[], isLive: boolean, t: RiskT): PdfObligation[] {
+  return rows.map((o, i) => ({
+    severity: o.severity,
+    title: isLive ? o.title : t(`obligations.${i}.title`, { defaultValue: o.title }),
+    detail: isLive ? o.detail : t(`obligations.${i}.detail`, { defaultValue: o.detail }),
+    market: isLive ? o.market : t(`obligations.${i}.market`, { defaultValue: o.market }),
+    due: isLive ? o.due : t(`obligations.${i}.due`, { defaultValue: o.due }),
+    dueSub: isLive ? o.dueSub : t(`obligations.${i}.dueSub`, { defaultValue: o.dueSub }),
+    stateLabel:
+      o.state.kind === 'confirmed' ? t('state.confirmed', { defaultValue: 'Confirmed' })
+      : o.state.kind === 'likely' ? t('state.likely', { defaultValue: 'Likely' })
+      : t('pdf.questionsOpen', { defaultValue: '{{total}} questions open', total: o.state.count }),
+  }));
+}
 
 export const OBLIGATIONS: Obligation[] = [
   {
@@ -304,48 +397,7 @@ export function ResultsRiskMap() {
   // results:obligations.* translations only apply to the fixture.
   const liveLaws = searchData.laws.filter((l) => l.severity);
   const isLive = liveLaws.length > 0;
-  const rows: Obligation[] = isLive
-    ? liveLaws.map((l) => ({
-        id: l.id,
-        severity: l.severity as Severity,
-        title: l.title,
-        // Rechtsgrundlage zuerst, Bußgeld danach. Das DNA-Addendum V2 verlangt,
-        // dass Strafhöhen nicht der primäre Untertitel jeder Pflicht sind —
-        // zugänglich bleiben sie, führend sind sie nicht mehr. Der Präfix war
-        // ausserdem hartkodiertes Englisch ('Penalty:') im deutschen UI.
-        // Die BELEGTE Obergrenze, wo es eine gibt — sonst der redaktionelle
-        // Satz. Beide standen bisher nebeneinander in der Welt, ohne dass
-        // etwas sie zusammenhielt: hier stand "up to EUR 30,000 per year",
-        // waehrend die Obergrenze zu derselben Pflicht 7.500 EUR JE EINHEIT
-        // lautete und keinen Deckel hat. Eine Quelle, ein Satz.
-        detail: [l.source_url ? null : l.source, bussgeldZeile(l, t, i18n.language)]
-          .filter(Boolean)
-          .join(' · '),
-        sourceLabel: l.source_url ? (l.source ?? l.celex ?? undefined) : undefined,
-        sourceUrl: l.source_url ?? undefined,
-        market: l.markets && l.markets.length ? l.markets.join(' · ') : t('euWide'),
-        // Die Norm im Klartext, wenn es keine verlinkbare Fundstelle gibt —
-        // sonst stuende unter dem Titel nur der Markt (Befund 2026-09-05).
-        law: l.source_url ? undefined : (l.source ?? undefined),
-        // A duty that has not started yet must not read "Ongoing · Live" — that
-        // would tell the user they are already in breach. Until its start date
-        // the Due cell shows that date plus the countdown; from the day it
-        // applies the row silently reverts to its normal cadence.
-        due: daysUntil(l.applies_from) != null
-          ? new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' })
-              .format(new Date(`${l.applies_from}T00:00:00`))
-          : l.due === 'Ongoing' ? t('ongoing') : l.due ?? '—',
-        dueSub: withinHorizon(l.applies_from) != null
-          ? t('appliesIn', { count: withinHorizon(l.applies_from) as number, defaultValue: `applies in ${withinHorizon(l.applies_from)} days` })
-          : daysUntil(l.applies_from) != null ? ''   // far future: the date says enough
-          : l.due_days != null ? t('days', { count: l.due_days }) : l.due === 'Ongoing' ? 'Live' : '',
-        dueDays: l.due_days ?? undefined,
-        state: { kind: l.state === 'confirmed' ? 'confirmed' : 'likely' },
-        // Same horizon as the stats: a duty landing in days is "now" even
-        // though it has not started; one landing in 2030 is not.
-        radar: daysUntil(l.applies_from) != null && withinHorizon(l.applies_from) == null,
-      }))
-    : OBLIGATIONS;
+  const rows: Obligation[] = isLive ? liveObligations(liveLaws, t, i18n.language, locale) : OBLIGATIONS;
 
   // Two groups, not two tables: "Now" is what the user is accountable for
   // today, "On the radar" is adopted law that only bites later. Keeping the
@@ -371,25 +423,9 @@ export function ResultsRiskMap() {
   // screen was a threat. Penalties are still shown per obligation (they are
   // facts, and useful for prioritising), but the headline stat now conveys
   // URGENCY instead of DREAD: how many deadlines are actually near.
-  const SOON_DAYS = 30;
-  const stats = (() => {
-    if (!isLive) return STATS;
-    // A not-yet-applicable duty has a real, dated deadline — the day it starts
-    // to apply. Counting it keeps the "near deadlines" stat honest; without it
-    // a rule landing in two days would be invisible in the headline numbers.
-    // Only inside the horizon, though: the 2030 tranche is a roadmap, and
-    // averaging it in would report a median deadline three years out.
-    const days = liveLaws.map((l) => l.due_days ?? withinHorizon(l.applies_from))
-      .filter((d): d is number => d != null).sort((a, b) => a - b);
-    const median = days.length ? days[Math.floor(days.length / 2)] : null;
-    const soon = days.filter((d) => d <= SOON_DAYS).length;
-    return [
-      { value: String(rows.length), label: 'obligations identified' },
-      { value: String(soon), label: `with a deadline in ${SOON_DAYS} days` },
-      { value: median != null ? String(median) : '', days: median ?? undefined, label: 'median deadline' },
-      { value: providersLive ? String(anonProviders.length) : '—', label: 'Verified Providers ready' },
-    ];
-  })();
+  const stats = isLive
+    ? riskMapStats(liveLaws, rows.length, providersLive ? anonProviders.length : null)
+    : STATS;
 
   // Wave A1: arriving from the wizard persists the session (the editable
   // dossier). Guest-anchored via guest_key; fire-and-forget — the page renders
@@ -426,18 +462,7 @@ export function ResultsRiskMap() {
       profile: profile ?? null,
       t,
       stats: stats.map((s2, i) => ({ value: s2.value, label: t(`stats.${i}.label`, { defaultValue: s2.label }) })),
-      obligations: rows.map((o, i) => ({
-        severity: o.severity,
-        title: isLive ? o.title : t(`obligations.${i}.title`, { defaultValue: o.title }),
-        detail: isLive ? o.detail : t(`obligations.${i}.detail`, { defaultValue: o.detail }),
-        market: isLive ? o.market : t(`obligations.${i}.market`, { defaultValue: o.market }),
-        due: isLive ? o.due : t(`obligations.${i}.due`, { defaultValue: o.due }),
-        dueSub: isLive ? o.dueSub : t(`obligations.${i}.dueSub`, { defaultValue: o.dueSub }),
-        stateLabel:
-          o.state.kind === 'confirmed' ? t('state.confirmed', { defaultValue: 'Confirmed' })
-          : o.state.kind === 'likely' ? t('state.likely', { defaultValue: 'Likely' })
-          : t('pdf.questionsOpen', { defaultValue: '{{total}} questions open', total: o.state.count }),
-      })),
+      obligations: pdfObligations(rows, isLive, t),
     });
   };
 
