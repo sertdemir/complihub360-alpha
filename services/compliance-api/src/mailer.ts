@@ -800,3 +800,95 @@ export async function sendReviewMail(p: {
         } catch { /* double fault */ }
     }
 }
+
+// ─── Verifikation (Phase 2 Onboarding) ───────────────────────────────────────
+// Zwei Anlaesse, an denen ein Anbieter eine Mail bekommt: der Reviewer braucht
+// einen weiteren Nachweis, und das Konto ist aktiv. Beides sachlich, ohne
+// Frist im Betreff, ohne Drohung: was fehlt, steht im Dashboard, und ein
+// Mensch antwortet auf die Mail. Produkt-Copy siezt (DE), usted (ES), siz (TR).
+
+export type VerificationMailKind = 'info_requested' | 'activated';
+
+const VERIFICATION_STRINGS: Record<MailLocale, Record<VerificationMailKind, { subject: string; body: string }>> = {
+    en: {
+        info_requested: {
+            subject: 'One more document for your CompliHub360 verification',
+            body: 'Thank you for your application. To complete the verification, our review team has asked for one more piece of evidence.\n\nYou can see exactly what is needed, and upload it, in your dashboard under Verification. Your application keeps its place in the queue while you do.\n\nIf anything is unclear, reply to this email — a person will answer.\n\n→ Partner dashboard → Verification',
+        },
+        activated: {
+            subject: 'Your CompliHub360 provider account is active',
+            body: 'Your verification is complete. Your approved services are now visible to businesses in the markets you were approved for.\n\nWhich services and countries are approved, and any that are still open, you can see in your dashboard under Verification.\n\nThank you for your trust.\n\n→ Partner dashboard → Verification',
+        },
+    },
+    de: {
+        info_requested: {
+            subject: 'Ein weiterer Nachweis für Ihre CompliHub360-Verifizierung',
+            body: 'Vielen Dank für Ihre Bewerbung. Um die Verifizierung abzuschließen, hat unser Prüfteam einen weiteren Nachweis angefordert.\n\nWas genau benötigt wird, sehen Sie in Ihrem Dashboard unter Verifizierung — dort können Sie den Nachweis auch direkt hochladen. Ihre Bewerbung behält währenddessen ihren Platz in der Prüfung.\n\nWenn etwas unklar ist, antworten Sie einfach auf diese E-Mail — ein Mensch antwortet Ihnen.\n\n→ Partner-Dashboard → Verifizierung',
+        },
+        activated: {
+            subject: 'Ihr CompliHub360-Anbieterkonto ist aktiv',
+            body: 'Ihre Verifizierung ist abgeschlossen. Ihre freigegebenen Leistungen sind ab jetzt für Unternehmen in den freigegebenen Märkten sichtbar.\n\nWelche Leistungen und Länder freigegeben sind und welche noch offen sind, sehen Sie in Ihrem Dashboard unter Verifizierung.\n\nVielen Dank für Ihr Vertrauen.\n\n→ Partner-Dashboard → Verifizierung',
+        },
+    },
+    es: {
+        info_requested: {
+            subject: 'Un documento más para su verificación en CompliHub360',
+            body: 'Gracias por su solicitud. Para completar la verificación, nuestro equipo de revisión ha pedido un justificante adicional.\n\nPuede ver exactamente qué se necesita, y subirlo, en su panel en Verificación. Su solicitud mantiene su lugar en la cola mientras tanto.\n\nSi algo no está claro, responda a este correo — le contestará una persona.\n\n→ Panel de socio → Verificación',
+        },
+        activated: {
+            subject: 'Su cuenta de proveedor en CompliHub360 está activa',
+            body: 'Su verificación se ha completado. Sus servicios aprobados ya son visibles para las empresas en los mercados aprobados.\n\nQué servicios y países están aprobados, y cuáles siguen abiertos, lo puede ver en su panel en Verificación.\n\nGracias por su confianza.\n\n→ Panel de socio → Verificación',
+        },
+    },
+    tr: {
+        info_requested: {
+            subject: 'CompliHub360 doğrulamanız için bir belge daha',
+            body: 'Başvurunuz için teşekkür ederiz. Doğrulamayı tamamlamak için inceleme ekibimiz bir belge daha talep etti.\n\nTam olarak neyin gerekli olduğunu panelinizde Doğrulama bölümünde görebilir ve belgeyi oradan yükleyebilirsiniz. Bu sırada başvurunuz sıradaki yerini korur.\n\nBir şey net değilse bu e-postayı yanıtlayın — size bir insan cevap verir.\n\n→ Partner paneli → Doğrulama',
+        },
+        activated: {
+            subject: 'CompliHub360 sağlayıcı hesabınız aktif',
+            body: 'Doğrulamanız tamamlandı. Onaylanan hizmetleriniz artık onaylandığınız pazarlardaki işletmeler tarafından görülebilir.\n\nHangi hizmet ve ülkelerin onaylandığını ve hangilerinin hâlâ açık olduğunu panelinizde Doğrulama bölümünde görebilirsiniz.\n\nGüveniniz için teşekkür ederiz.\n\n→ Partner paneli → Doğrulama',
+        },
+    },
+};
+
+export async function sendVerificationMail(p: {
+    kind: VerificationMailKind;
+    to: string | null;
+    providerKey: string;
+    locale?: string;
+    correlationId?: string;
+}): Promise<void> {
+    const t = VERIFICATION_STRINGS[resolveLocale(p.locale)][p.kind];
+    const apiKey = process.env.RESEND_API_KEY;
+    try {
+        if (!p.to) {
+            await supabaseApi.insert('event_log', { type: 'email_skipped_no_address', payload: { providerKey: p.providerKey, kind: `verification_${p.kind}` } });
+            return;
+        }
+        if (!apiKey) {
+            await supabaseApi.insert('event_log', {
+                type: 'email_outbox',
+                payload: { providerKey: p.providerKey, to: p.to, subject: t.subject, text: t.body, mode: 'log-only', kind: `verification_${p.kind}` },
+            });
+            return;
+        }
+        const res = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ from: MAIL_FROM, to: [p.to], subject: t.subject, text: t.body }),
+        });
+        const body = await res.json().catch(() => ({}));
+        await supabaseApi.insert('event_log', {
+            type: res.ok ? 'email_sent' : 'email_failed',
+            payload: { providerKey: p.providerKey, to: p.to, subject: t.subject, providerId: (body as { id?: string }).id, status: res.status, kind: `verification_${p.kind}` },
+        });
+    } catch (err) {
+        structuredLog('error', 'Verification mail failed', {
+            correlationId: p.correlationId ?? 'review', route: 'mailer', severity: 'error', errorCode: 'ERR_MAIL',
+        });
+        try {
+            await supabaseApi.insert('event_log', { type: 'email_failed', payload: { providerKey: p.providerKey, to: p.to, error: String(err), kind: `verification_${p.kind}` } });
+        } catch { /* double fault */ }
+    }
+}

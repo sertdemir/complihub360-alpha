@@ -74,6 +74,9 @@ export interface TickSummary {
     reviewRequests: number;
     reviewWarnings: number;
     reviewDowngrades: number;
+    evidenceExpiringNotices: number;
+    evidenceExpired: number;
+    reverificationDue: number;
 }
 
 // ─── Shared reminder core ─────────────────────────────────────────────────────
@@ -164,7 +167,7 @@ async function mark(base: string, shadow: boolean, payload: Record<string, unkno
 export async function runWatcherTick(): Promise<TickSummary> {
     const shadow = watcherConfig.shadow;
     const now = Date.now();
-    const summary: TickSummary = { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0, reviewRequests: 0, reviewWarnings: 0, reviewDowngrades: 0 };
+    const summary: TickSummary = { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0, reviewRequests: 0, reviewWarnings: 0, reviewDowngrades: 0, evidenceExpiringNotices: 0, evidenceExpired: 0, reverificationDue: 0 };
 
     let engagements: Engagement[];
     try {
@@ -291,6 +294,15 @@ export async function runWatcherTick(): Promise<TickSummary> {
         summary.reviewWarnings = rv.warnings;
         summary.reviewDowngrades = rv.downgrades;
         summary.errors += rv.errors;
+    } catch { summary.errors++; }
+
+    // Nachweis-Ablauf (Phase 2 Onboarding): Vorwarnung, Ablauf, Reverifizierung.
+    try {
+        const ev = await runEvidenceTick(shadow);
+        summary.evidenceExpiringNotices = ev.expiringNotices;
+        summary.evidenceExpired = ev.expired;
+        summary.reverificationDue = ev.reverificationDue;
+        summary.errors += ev.errors;
     } catch { summary.errors++; }
 
     structuredLog("info", "Watcher tick complete", {
@@ -432,4 +444,116 @@ export function startSlaWatchers(): NodeJS.Timeout | null {
     const handle = setInterval(() => { void runWatcherTick(); }, watcherConfig.tickMs);
     if (typeof handle.unref === "function") handle.unref();
     return handle;
+}
+
+// ─── Nachweis-Ablauf (Phase 2 Onboarding) ─────────────────────────────────────
+// Spec A §7: jeder Nachweis hat ein Ablaufdatum, und ein abgelaufener Nachweis
+// darf nicht stillschweigend weitergelten. Drei Schritte, jeder einmal je
+// Nachweis (Marker in event_log wie bei den anderen Passes):
+//
+//   T-30d  Vorwarnung an den Anbieter (Benachrichtigung, dedupe je Nachweis).
+//          Kein Countdown und keine Drohung: eine Information mit Datum.
+//   T      result = 'expired'. Ist das Konto aktiv oder eingeschraenkt aktiv,
+//          wechselt es nach reverification_due mit 14 Tagen Frist — in dieser
+//          Zeit bleibt der Anbieter matchbar (View prueft grace_until), danach
+//          nicht mehr, ohne dass jemand einen Status nachzieht.
+//
+// Coverage-Zellen mit eigenem expires_at brauchen keinen Watcher: die View
+// filtert sie am Datum.
+
+export interface EvidenceTickCounts { expiringNotices: number; expired: number; reverificationDue: number; errors: number }
+
+const EVIDENCE_WARN_DAYS = 30;
+const REVERIFICATION_GRACE_DAYS = 14;
+
+// loadMarkers() oben schluesselt auf engagementId — hier zaehlt der Nachweis.
+async function loadEvidenceMarkers(base: string, shadow: boolean): Promise<Set<string>> {
+    const rows = (await supabaseApi.select("event_log", { type: markerType(base, shadow) }, { limit: 5000 })) as EventRow[];
+    const set = new Set<string>();
+    for (const r of rows) {
+        const id = r.payload?.evidenceId;
+        if (typeof id === "string") set.add(id);
+    }
+    return set;
+}
+
+type EvidenceRow = { id: string; provider_key: string; evidence_type: string; result: string; expires_at: string | null };
+type ProviderRow = { provider_key: string; name: string; lifecycle_status: string; reverification_grace_until: string | null };
+
+export async function runEvidenceTick(shadow: boolean): Promise<EvidenceTickCounts> {
+    const counts: EvidenceTickCounts = { expiringNotices: 0, expired: 0, reverificationDue: 0, errors: 0 };
+    const today = new Date().toISOString().slice(0, 10);
+    const horizon = new Date(Date.now() + EVIDENCE_WARN_DAYS * 86400_000).toISOString().slice(0, 10);
+    let evidence: EvidenceRow[];
+    try {
+        evidence = (await supabaseApi.select("provider_evidence", {}, { order: "expires_at.asc", limit: 5000 })) as EvidenceRow[];
+    } catch { counts.errors++; return counts; }
+    const relevant = evidence.filter((e) => e.expires_at && e.result !== 'rejected' && e.result !== 'expired' && String(e.expires_at).slice(0, 10) <= horizon);
+    if (!relevant.length) return counts;
+
+    const [warned, expiredMarks] = await Promise.all([
+        loadEvidenceMarkers("evidence_expiring_notice", shadow),
+        loadEvidenceMarkers("evidence_expired", shadow),
+    ]);
+    const providerCache = new Map<string, ProviderRow | null>();
+    const memberCache = new Map<string, string | null>();
+    const provider = async (key: string) => {
+        if (!providerCache.has(key)) {
+            const rows = (await supabaseApi.select("providers", { provider_key: key }, { limit: 1 })) as ProviderRow[];
+            providerCache.set(key, rows[0] ?? null);
+        }
+        return providerCache.get(key) ?? null;
+    };
+    const member = async (key: string) => {
+        if (!memberCache.has(key)) {
+            const rows = (await supabaseApi.select("provider_members", { provider_key: key }, { limit: 1 })) as Array<{ user_id: string }>;
+            memberCache.set(key, rows[0]?.user_id ?? null);
+        }
+        return memberCache.get(key) ?? null;
+    };
+
+    for (const e of relevant) {
+        const exp = String(e.expires_at).slice(0, 10);
+        try {
+            const p = await provider(e.provider_key);
+            if (!p || p.lifecycle_status === 'terminated' || p.lifecycle_status === 'draft') continue;
+            if (exp <= today) {
+                if (expiredMarks.has(e.id)) continue;
+                await mark("evidence_expired", shadow, { evidenceId: e.id, providerKey: e.provider_key, evidenceType: e.evidence_type, expiresAt: exp });
+                counts.expired++;
+                if (shadow) continue;
+                const now = new Date().toISOString();
+                await supabaseApi.update("provider_evidence", { id: e.id }, { result: 'expired', updated_at: now });
+                await supabaseApi.insert("provider_review_log", {
+                    provider_key: e.provider_key, subject: 'evidence', subject_id: e.id, action: 'expired', from_value: e.result, to_value: 'expired',
+                    reason: `Ablaufdatum ${exp} erreicht`, actor_kind: 'system',
+                }).catch(() => { /* Protokoll ist Beiwerk */ });
+                if (p.lifecycle_status === 'active' || p.lifecycle_status === 'limited') {
+                    const grace = new Date(Date.now() + REVERIFICATION_GRACE_DAYS * 86400_000).toISOString();
+                    await supabaseApi.update("providers", { provider_key: e.provider_key }, {
+                        lifecycle_status: 'reverification_due', lifecycle_status_reason: `Nachweis ${e.evidence_type} abgelaufen am ${exp}`,
+                        reverification_due_at: now, reverification_grace_until: grace, updated_at: now,
+                    });
+                    await supabaseApi.insert("provider_review_log", {
+                        provider_key: e.provider_key, subject: 'lifecycle', action: 'reverification_due', from_value: p.lifecycle_status, to_value: 'reverification_due',
+                        reason: `Nachweis ${e.evidence_type} abgelaufen; Frist ${REVERIFICATION_GRACE_DAYS} Tage`, actor_kind: 'system',
+                    }).catch(() => { /* Protokoll ist Beiwerk */ });
+                    p.lifecycle_status = 'reverification_due';
+                    counts.reverificationDue++;
+                }
+                await notify({ to: await member(e.provider_key), type: 'verification_decided', subject: 'provider', subjectId: e.provider_key,
+                    payload: { providerKey: e.provider_key, providerName: p.name, to: exp }, dedupeKey: `evidence_expired:${e.id}` });
+            } else {
+                if (warned.has(e.id)) continue;
+                await mark("evidence_expiring_notice", shadow, { evidenceId: e.id, providerKey: e.provider_key, evidenceType: e.evidence_type, expiresAt: exp });
+                counts.expiringNotices++;
+                if (shadow) continue;
+                await notify({ to: await member(e.provider_key), type: 'evidence_expiring', subject: 'provider', subjectId: e.provider_key,
+                    payload: { providerKey: e.provider_key, providerName: p.name, to: exp, label: e.evidence_type }, dedupeKey: `evidence_expiring:${e.id}` });
+            }
+        } catch {
+            counts.errors++;
+        }
+    }
+    return counts;
 }

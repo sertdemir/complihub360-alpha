@@ -280,6 +280,8 @@ export interface MatchableProviderService {
     service_id: string;
     provider_key: string;
     service_code: string;
+    /** Bereichs-Code der Leistung (Migration 20260921000000): 'tax-vat.returns' → 'tax-vat'. */
+    area_code: string;
     service_name: string;
     coverage_id: string;
     country_code: string;
@@ -299,4 +301,82 @@ export interface MatchableProviderService {
     provider_availability: 'available' | 'ooo';
     bookable_chargeable: boolean;
     provider_lifecycle_status: ProviderLifecycleStatus;
+}
+
+// ─── Phase 2: Onboarding und Verifikation (Migration 20260924000000) ─────────
+
+/** Vertrauliche Verifikationsdaten, physisch getrennt von `providers` (Spec §1). Deny-all RLS. */
+export interface ProviderConfidential {
+    provider_key: string;
+    registration_number: string | null;
+    entity_type: string | null;
+    registered_address: string | null;
+    operating_address: string | null;
+    tax_number: string | null;
+    representative_name: string | null;
+    representative_title: string | null;
+    representative_verified_at: string | null;
+    /** Referenz beim Pruefdienst — nie das Ausweisdokument. */
+    representative_id_ref: string | null;
+    beneficial_owners: unknown;
+    insurance_provider: string | null;
+    insurance_type: string | null;
+    insurance_valid_until: string | null;
+}
+
+/** Login → Anbieter (Migration 20260922000000). Zum Launch genau ein Login je Anbieter. */
+export interface ProviderMember {
+    provider_key: string;
+    user_id: string;
+    role: 'owner' | 'admin' | 'member';
+    created_at: string;
+}
+
+/** Datei-Metadaten eines hochgeladenen Nachweises. `upload_confirmed` erst, wenn die API das Objekt gesehen hat. */
+export interface ProviderEvidenceFile {
+    original_name: string | null;
+    mime_type: string | null;
+    size_bytes: number | null;
+    uploaded_at: string | null;
+    upload_confirmed: boolean;
+}
+
+/** Nachforderung eines Nachweises durch den Reviewer. Offen, bis ein bestaetigter Upload sie erfuellt. */
+export interface ProviderEvidenceRequest {
+    id: string;
+    provider_key: string;
+    evidence_type: string;
+    service_id: string | null;
+    country_code: string | null;
+    message: string;
+    status: 'open' | 'fulfilled' | 'withdrawn';
+    requested_by: string | null;
+    requested_at: string;
+    fulfilled_at: string | null;
+    fulfilled_evidence_id: string | null;
+}
+
+/** Eine Zeile des append-only Entscheidungsprotokolls (Spec §25). */
+export interface ProviderReviewLogEntry {
+    id: string;
+    provider_key: string;
+    subject: 'evidence' | 'coverage' | 'service' | 'lifecycle' | 'request' | 'application';
+    subject_id: string | null;
+    action: string;
+    from_value: string | null;
+    to_value: string | null;
+    reason: string | null;
+    actor_id: string | null;
+    actor_kind: 'reviewer' | 'provider' | 'system';
+    created_at: string;
+}
+
+/** Was das Aktivierungs-Gate antwortet (providerReview.ts / verificationRules.ts). */
+export interface ActivationGateVerdict {
+    ok: boolean;
+    /** Schluessel je fehlendem Punkt: evidence.<typ>, coverage.none_approved, agreements.<typ>, billing.<grund>, plan.category_allowance. */
+    missing: string[];
+    target: 'active' | 'limited';
+    approved_cells: number;
+    total_cells: number;
 }

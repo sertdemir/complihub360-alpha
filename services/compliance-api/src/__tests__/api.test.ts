@@ -72,6 +72,30 @@ vi.mock('../supabase.js', () => ({
     },
 }));
 
+// Storage (Phase 2 Onboarding): kein Netz im Test. `uploaded` sagt, welche
+// Objektpfade "im Bucket liegen" — objectInfo() antwortet danach.
+const { uploaded } = vi.hoisted(() => ({ uploaded: new Set<string>() }));
+vi.mock('../storage.js', async (importOriginal) => {
+    const real = await importOriginal<typeof import('../storage.js')>();
+    return {
+        ...real,
+        async signedUploadUrl(_bucket: string, path: string) {
+            return { url: `https://storage.test/upload/${path}`, token: 'tok', method: 'PUT', expiresAt: new Date(Date.now() + 7200_000).toISOString() };
+        },
+        async signedDownloadUrl(_bucket: string, path: string) { return `https://storage.test/signed/${path}?token=x`; },
+        async objectInfo(_bucket: string, path: string) { return uploaded.has(path) ? { size: 4321, mimeType: 'application/pdf' } : null; },
+    };
+});
+// VIES: 'DE' + 9 Ziffern gilt, alles andere ist ungueltig — deterministisch.
+vi.mock('../vies.js', () => ({
+    normaliseVatId: (raw: string) => raw.toUpperCase().replace(/[^A-Z0-9]/g, ''),
+    async checkVatId(raw: string) {
+        const vatId = raw.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        const valid = /^DE\d{9}$/.test(vatId);
+        return { status: valid ? 'valid' : 'invalid', vatId, countryCode: vatId.slice(0, 2), name: valid ? 'Testkanzlei' : null, checkedAt: new Date().toISOString() };
+    },
+}));
+
 const PORT = 3611;
 const BASE = `http://127.0.0.1:${PORT}`;
 const API_KEY = 'test-api-key';
@@ -194,7 +218,7 @@ beforeAll(async () => {
     throw new Error('test server did not come up');
 });
 
-beforeEach(() => resetDb());
+beforeEach(() => { resetDb(); uploaded.clear(); });
 
 describe('auth gate', () => {
     it('lets /health through without credentials', async () => {
@@ -621,6 +645,12 @@ describe('Ownership: Anbieter-eigene Routen gehoeren ihren Mitgliedern', () => {
         ['GET', '/bookings'], ['GET', '/coverage'], ['PATCH', '/coverage'], ['PATCH', '/profile'],
         ['GET', '/invoices'], ['PATCH', '/availability'], ['POST', '/billing-portal'],
         ['POST', '/change-email'], ['GET', '/billing/preview'],
+        // Phase 2 Onboarding
+        ['GET', '/application'], ['PATCH', '/application'], ['POST', '/services'],
+        ['PATCH', '/services/00000000-0000-0000-0000-000000000001'], ['DELETE', '/services/00000000-0000-0000-0000-000000000001'],
+        ['PUT', '/services/00000000-0000-0000-0000-000000000001/coverage'],
+        ['POST', '/evidence/upload-url'], ['POST', '/evidence/registry'], ['POST', '/evidence/00000000-0000-0000-0000-000000000001/confirm'],
+        ['POST', '/agreements'], ['POST', '/submit'], ['GET', '/verification'],
     ];
 
     it.each(EIGENE_ROUTEN)('%s …%s: fremder Login bekommt 404 und aendert nichts', async (method, suffix) => {
@@ -1381,5 +1411,345 @@ describe('Anfragen gehoeren ihrem Ersteller', () => {
         );
         const r = await api('/api/v1/requests', { auth: 'key' });
         expect(r.body.requests).toHaveLength(2);
+    });
+});
+
+// ─── Phase 2: Onboarding und Verifikation ────────────────────────────────────
+
+function seedTaxonomy() {
+    (db.service_categories ??= []).push(
+        { code: 'tax-vat', parent_code: null, label_en: 'Tax and VAT', active: true },
+        { code: 'tax-vat.returns', parent_code: 'tax-vat', label_en: 'VAT returns', active: true },
+        { code: 'data-privacy', parent_code: null, label_en: 'Data and Privacy', active: true },
+        { code: 'legal-advisory', parent_code: null, label_en: 'Legal Support', active: true },
+    );
+}
+
+/** Ein Anbieter im Entwurf mit eigenem Login — der Normalfall der Bewerbungsstrecke. */
+function seedApplicant(over: Record<string, any> = {}) {
+    const p = seedProvider({ provider_key: 'neue-kanzlei', name: 'Neue Kanzlei', partner_status: 'inactive', lifecycle_status: 'draft', billing_ready: false, billing_block_reasons: ['no_payment_method'], ...over });
+    (db.provider_members ??= []).push({ provider_key: 'neue-kanzlei', user_id: USER_ID, role: 'owner' });
+    seedTaxonomy();
+    return p;
+}
+
+const own = (path: string, init: RequestInit = {}) => api(`/api/v1/provider/neue-kanzlei${path}`, { auth: 'jwt', ...init });
+const ADMIN_JWT = () => signJwt({ sub: randomUUID(), app_metadata: { role: 'admin' } });
+async function adminApi(path: string, init: RequestInit = {}) {
+    const res = await fetch(`${BASE}${path}`, { ...init, headers: { 'content-type': 'application/json', authorization: `Bearer ${ADMIN_JWT()}`, ...(init.headers as any) } });
+    return { status: res.status, body: await res.json().catch(() => ({})) };
+}
+
+/** Fuellt das Dossier bis kurz vor dem Einreichen: Rechtsform, eine Leistung in DE, Nachweise, Annahmen. */
+async function fillDossier() {
+    await own('/application', { method: 'PATCH', body: JSON.stringify({ contact_email: 'k@neue.test', entity_type: 'GmbH', registration_number: 'HRB 4711', registered_address: 'Weg 1, Hamburg', representative_name: 'Anna Beispiel' }) });
+    const svc = await own('/services', { method: 'POST', body: JSON.stringify({ service_code: 'data-privacy', service_name: 'Datenschutz-Paket' }) });
+    await own(`/services/${svc.body.service.id}/coverage`, { method: 'PUT', body: JSON.stringify({ countries: ['DE'] }) });
+    for (const type of ['incorporation', 'insurance']) {
+        const up = await own('/evidence/upload-url', { method: 'POST', body: JSON.stringify({ evidence_type: type, original_name: `${type}.pdf`, mime_type: 'application/pdf', size_bytes: 1000 }) });
+        uploaded.add(up.body.file_ref);
+        await own(`/evidence/${up.body.evidence_id}/confirm`, { method: 'POST', body: '{}' });
+    }
+    await own('/evidence/registry', { method: 'POST', body: JSON.stringify({ evidence_type: 'vat_id', vat_id: 'DE 123456789' }) });
+    for (const agreement_type of ['provider_agreement', 'privacy_notice', 'billing_authorization']) {
+        await own('/agreements', { method: 'POST', body: JSON.stringify({ agreement_type, version: '2026-09', language: 'de', accepted_by_name: 'Anna Beispiel', accepted_by_title: 'GF' }) });
+    }
+    return svc.body.service.id as string;
+}
+
+describe('Bewerbungsstrecke: Dossier, Leistungen, Nachweise (Phase 2)', () => {
+    it('liefert das Dossier mit Kapitelstatus und ohne Reviewer-Interna', async () => {
+        seedApplicant();
+        const r = await own('/application');
+        expect(r.status).toBe(200);
+        expect(r.body.chapters.submit.ready).toBe(false);
+        expect(r.body.chapters.legal.complete).toBe(false);
+        expect(r.body.checklist.map((c: any) => c.type)).toEqual(['incorporation', 'vat_id', 'insurance', 'representative_identity']);
+        expect(JSON.stringify(r.body)).not.toContain('stripe_customer_id');
+    });
+
+    it('schreibt Rechtsform getrennt in provider_confidential, nicht in providers', async () => {
+        seedApplicant();
+        const r = await own('/application', { method: 'PATCH', body: JSON.stringify({ name: 'Neue Kanzlei GmbH', registration_number: 'HRB 1' }) });
+        expect(r.status).toBe(200);
+        expect(db.providers[0].name).toBe('Neue Kanzlei GmbH');
+        expect((db.providers[0] as any).registration_number).toBeUndefined();
+        expect(db.provider_confidential[0].registration_number).toBe('HRB 1');
+    });
+
+    it('legt eine Leistung als pending_verification an und Laender als pending-Zeilen (2B)', async () => {
+        seedApplicant();
+        const svc = await own('/services', { method: 'POST', body: JSON.stringify({ service_code: 'tax-vat.returns' }) });
+        expect(svc.status).toBe(201);
+        expect(svc.body.service.status).toBe('pending_verification');
+        expect(svc.body.service.service_name).toBe('VAT returns');
+        const cov = await own(`/services/${svc.body.service.id}/coverage`, { method: 'PUT', body: JSON.stringify({ countries: ['DE', 'AT', 'DE'] }) });
+        expect(cov.status).toBe(200);
+        expect(cov.body.coverage.map((c: any) => `${c.country_code}:${c.status}`)).toEqual(['AT:pending', 'DE:pending']);
+        // Die Checkliste verlangt jetzt eine Zulassung je Land.
+        const dossier = await own('/application');
+        expect(dossier.body.checklist.filter((c: any) => c.type === 'professional_licence').map((c: any) => c.country_code).sort()).toEqual(['AT', 'DE']);
+    });
+
+    it('weist unbekannte Codes und Dubletten ab', async () => {
+        seedApplicant();
+        expect((await own('/services', { method: 'POST', body: JSON.stringify({ service_code: 'astrologie' }) })).status).toBe(422);
+        await own('/services', { method: 'POST', body: JSON.stringify({ service_code: 'tax-vat' }) });
+        expect((await own('/services', { method: 'POST', body: JSON.stringify({ service_code: 'tax-vat' }) })).status).toBe(409);
+    });
+
+    it('setzt das Kategorie-Kontingent durch: Essential und eine zweite Hauptkategorie → 422', async () => {
+        seedApplicant();
+        seedPricing();
+        seedSubscription('neue-kanzlei', 'essential');
+        expect((await own('/services', { method: 'POST', body: JSON.stringify({ service_code: 'tax-vat' }) })).status).toBe(201);
+        const zweite = await own('/services', { method: 'POST', body: JSON.stringify({ service_code: 'data-privacy' }) });
+        expect(zweite.status).toBe(422);
+        expect(zweite.body.errorCode).toBe('CATEGORY_ALLOWANCE');
+        expect(zweite.body).toMatchObject({ allowance: 1, used: 2, plan: 'essential' });
+        // Eine Unterkategorie derselben Hauptkategorie ist frei.
+        expect((await own('/services', { method: 'POST', body: JSON.stringify({ service_code: 'tax-vat.returns' }) })).status).toBe(201);
+    });
+
+    it('sperrt ohne Abo nicht — der Plan fehlt dann im Gate, nicht beim Eintragen', async () => {
+        seedApplicant();
+        expect((await own('/services', { method: 'POST', body: JSON.stringify({ service_code: 'tax-vat' }) })).status).toBe(201);
+        expect((await own('/services', { method: 'POST', body: JSON.stringify({ service_code: 'data-privacy' }) })).status).toBe(201);
+    });
+
+    it('stellt eine Upload-URL nur fuer erlaubte Typen und Groessen aus und bestaetigt erst, wenn die Datei da ist', async () => {
+        seedApplicant();
+        const zip = await own('/evidence/upload-url', { method: 'POST', body: JSON.stringify({ evidence_type: 'incorporation', original_name: 'a.zip', mime_type: 'application/zip', size_bytes: 10 }) });
+        expect(zip.status).toBe(415);
+        const gross = await own('/evidence/upload-url', { method: 'POST', body: JSON.stringify({ evidence_type: 'incorporation', original_name: 'a.pdf', mime_type: 'application/pdf', size_bytes: 21 * 1024 * 1024 }) });
+        expect(gross.status).toBe(413);
+        expect(db.provider_evidence ?? []).toHaveLength(0);
+
+        const up = await own('/evidence/upload-url', { method: 'POST', body: JSON.stringify({ evidence_type: 'incorporation', original_name: 'HR Auszug (2026).pdf', mime_type: 'application/pdf', size_bytes: 1000 }) });
+        expect(up.status).toBe(201);
+        expect(up.body.file_ref).toBe(`neue-kanzlei/${up.body.evidence_id}/HR-Auszug-2026-.pdf`);
+        expect(up.body.upload.method).toBe('PUT');
+        expect(db.provider_evidence[0].upload_confirmed).toBe(false);
+
+        const zuFrueh = await own(`/evidence/${up.body.evidence_id}/confirm`, { method: 'POST', body: '{}' });
+        expect(zuFrueh.status).toBe(409);
+        expect(zuFrueh.body.errorCode).toBe('UPLOAD_NOT_FOUND');
+
+        uploaded.add(up.body.file_ref);
+        const ok = await own(`/evidence/${up.body.evidence_id}/confirm`, { method: 'POST', body: '{}' });
+        expect(ok.status).toBe(200);
+        expect(db.provider_evidence[0]).toMatchObject({ upload_confirmed: true, size_bytes: 4321 });
+    });
+
+    it('speichert die Registerabfrage statt eines Dokuments', async () => {
+        seedApplicant();
+        const r = await own('/evidence/registry', { method: 'POST', body: JSON.stringify({ evidence_type: 'vat_id', vat_id: 'de-123456789' }) });
+        expect(r.status).toBe(201);
+        expect(r.body.evidence).toMatchObject({ source: 'registry_check', result: 'independently_verified', identifier: 'DE123456789' });
+        expect(db.providers[0]).toMatchObject({ vat_id: 'DE123456789', vat_id_status: 'valid' });
+        const schlecht = await own('/evidence/registry', { method: 'POST', body: JSON.stringify({ vat_id: 'XX1' }) });
+        expect(schlecht.body.evidence.result).toBe('rejected');
+    });
+
+    it('haelt Annahmen versioniert und loest die alte Fassung ab, ohne sie zu loeschen', async () => {
+        seedApplicant();
+        await own('/agreements', { method: 'POST', body: JSON.stringify({ agreement_type: 'provider_agreement', version: 'v1', accepted_by_name: 'A' }) });
+        await own('/agreements', { method: 'POST', body: JSON.stringify({ agreement_type: 'provider_agreement', version: 'v2', accepted_by_name: 'A' }) });
+        expect(db.provider_agreement_acceptance).toHaveLength(2);
+        expect(db.provider_agreement_acceptance.find((a: any) => a.version === 'v1').superseded_at).toBeTruthy();
+        expect(db.provider_agreement_acceptance.find((a: any) => a.version === 'v2').superseded_at).toBeUndefined();
+        expect((await own('/agreements', { method: 'POST', body: JSON.stringify({ agreement_type: 'nda', version: 'v1', accepted_by_name: 'A' }) })).status).toBe(400);
+    });
+});
+
+describe('Einreichen (4A): nichts geht raus, was unvollstaendig ist', () => {
+    it('nennt die fehlenden Punkte statt nur abzulehnen', async () => {
+        seedApplicant();
+        const r = await own('/submit', { method: 'POST', body: '{}' });
+        expect(r.status).toBe(422);
+        expect(r.body.errorCode).toBe('INCOMPLETE');
+        expect(r.body.missing).toEqual(expect.arrayContaining(['legal.entity_type', 'services.none', 'evidence.incorporation', 'agreements.provider_agreement']));
+        expect(db.providers[0].lifecycle_status).toBe('draft');
+    });
+
+    it('setzt submitted, sobald alles da ist — und nur einmal', async () => {
+        seedApplicant();
+        await fillDossier();
+        const r = await own('/submit', { method: 'POST', body: '{}' });
+        expect(r.status).toBe(200);
+        expect(db.providers[0].lifecycle_status).toBe('submitted');
+        expect(db.provider_review_log.some((l: any) => l.subject === 'lifecycle' && l.to_value === 'submitted' && l.actor_kind === 'provider')).toBe(true);
+        const nochmal = await own('/submit', { method: 'POST', body: '{}' });
+        expect(nochmal.status).toBe(409);
+    });
+});
+
+describe('Review-Arbeitsplatz (6A/7A/8A): nur Admin, Zell-Aktionen, Gate', () => {
+    it('ist fuer normale Logins und Gaeste zu — auch /admin/stats', async () => {
+        seedApplicant();
+        expect((await api('/api/v1/admin/review/queue', { auth: 'jwt' })).status).toBe(403);
+        expect((await api('/api/v1/admin/review/neue-kanzlei', { auth: 'jwt' })).status).toBe(403);
+        expect((await api('/api/v1/admin/stats', { auth: 'jwt' })).status).toBe(403);
+        expect((await api('/api/v1/admin/review/queue', { auth: 'none' })).status).toBe(401);
+    });
+
+    it('zeigt eingereichte Bewerbungen in der Queue mit Risiko', async () => {
+        seedApplicant();
+        await fillDossier();
+        await own('/submit', { method: 'POST', body: '{}' });
+        const q = await adminApi('/api/v1/admin/review/queue');
+        expect(q.status).toBe(200);
+        expect(q.body.rows).toEqual([expect.objectContaining({ kind: 'application', provider_key: 'neue-kanzlei', risk: 'medium', lifecycle_status: 'submitted' })]);
+    });
+
+    it('liefert dem Reviewer das Dossier mit signierter Download-URL je bestaetigtem Nachweis', async () => {
+        seedApplicant();
+        await fillDossier();
+        const d = await adminApi('/api/v1/admin/review/neue-kanzlei');
+        expect(d.status).toBe(200);
+        const docs = d.body.evidence.filter((e: any) => e.source === 'document');
+        expect(docs).toHaveLength(2);
+        expect(docs.every((e: any) => e.download_url?.startsWith('https://storage.test/signed/'))).toBe(true);
+        expect(d.body.evidence.find((e: any) => e.source === 'registry_check').download_url).toBeNull();
+        expect(d.body.gate.ok).toBe(false);
+        expect(d.body.confidential.registration_number).toBe('HRB 4711');
+    });
+
+    it('Zell-Aktion approve hebt den Service-Status; request_info legt eine Nachfrage an und setzt more_info_required', async () => {
+        seedApplicant();
+        const serviceId = await fillDossier();
+        await own(`/services/${serviceId}/coverage`, { method: 'PUT', body: JSON.stringify({ countries: ['DE', 'AT'] }) });
+        await own('/submit', { method: 'POST', body: '{}' });
+        const cells = db.provider_service_coverage.filter((c: any) => c.service_id === serviceId);
+        const de = cells.find((c: any) => c.country_code === 'DE');
+        const at = cells.find((c: any) => c.country_code === 'AT');
+
+        const ohneGrund = await adminApi(`/api/v1/admin/review/neue-kanzlei/coverage/${at.id}`, { method: 'POST', body: JSON.stringify({ action: 'reject' }) });
+        expect(ohneGrund.status).toBe(400);
+
+        const ok = await adminApi(`/api/v1/admin/review/neue-kanzlei/coverage/${de.id}`, { method: 'POST', body: JSON.stringify({ action: 'approve' }) });
+        expect(ok.status).toBe(200);
+        expect(ok.body.service_status).toBe('limited');            // AT ist noch offen
+        expect(db.provider_services.find((s: any) => s.id === serviceId).status).toBe('limited');
+
+        const frage = await adminApi(`/api/v1/admin/review/neue-kanzlei/coverage/${at.id}`, { method: 'POST', body: JSON.stringify({ action: 'request_info', evidence_type: 'professional_licence', reason: 'Bitte die Zulassung fuer Oesterreich nachreichen.' }) });
+        expect(frage.status).toBe(201);
+        expect(db.provider_evidence_requests).toEqual([expect.objectContaining({ evidence_type: 'professional_licence', country_code: 'AT', status: 'open' })]);
+        expect(db.providers[0].lifecycle_status).toBe('more_info_required');
+        // Der Anbieter erfaehrt es: Benachrichtigung an den Dashboard-Login, Mail im Outbox-Log.
+        expect(db.notifications.some((n: any) => n.user_id === USER_ID && n.type === 'verification_info_requested' && n.subject === 'provider')).toBe(true);
+        expect(db.event_log.some((e: any) => e.type === 'email_outbox' && e.payload?.kind === 'verification_info_requested')).toBe(true);
+        // Der Anbieter sieht die Nachfrage im Verification Center.
+        const v = await own('/verification');
+        expect(v.body.open_requests).toHaveLength(1);
+        expect(v.body.matrix[0].cells.map((c: any) => `${c.country_code}:${c.status}`).sort()).toEqual(['AT:pending', 'DE:approved']);
+        expect(JSON.stringify(v.body.history)).not.toContain('actor_id');
+    });
+
+    it('der bestaetigte Upload erfuellt die Nachfrage und holt das Konto zurueck in die Pruefung', async () => {
+        seedApplicant();
+        const serviceId = await fillDossier();
+        await own('/submit', { method: 'POST', body: '{}' });
+        await adminApi('/api/v1/admin/review/neue-kanzlei/request', { method: 'POST', body: JSON.stringify({ evidence_type: 'insurance', message: 'Die Police ist nicht mehr gueltig — bitte die aktuelle.' }) });
+        expect(db.providers[0].lifecycle_status).toBe('more_info_required');
+        const up = await own('/evidence/upload-url', { method: 'POST', body: JSON.stringify({ evidence_type: 'insurance', original_name: 'police-2027.pdf', mime_type: 'application/pdf', size_bytes: 500 }) });
+        uploaded.add(up.body.file_ref);
+        const c = await own(`/evidence/${up.body.evidence_id}/confirm`, { method: 'POST', body: '{}' });
+        expect(c.status).toBe(200);
+        expect(c.body.fulfilled_requests).toHaveLength(1);
+        expect(db.provider_evidence_requests[0]).toMatchObject({ status: 'fulfilled', fulfilled_evidence_id: up.body.evidence_id });
+        expect(db.providers[0].lifecycle_status).toBe('under_verification');
+        void serviceId;
+    });
+
+    it('Gate: active erst, wenn Nachweise geprueft, eine Zelle frei, Annahmen da und Billing bereit — die Antwort nennt, was fehlt', async () => {
+        seedApplicant();
+        const serviceId = await fillDossier();
+        await own('/submit', { method: 'POST', body: '{}' });
+        await adminApi('/api/v1/admin/review/neue-kanzlei/lifecycle', { method: 'POST', body: JSON.stringify({ to: 'under_verification' }) });
+
+        const zu = await adminApi('/api/v1/admin/review/neue-kanzlei/lifecycle', { method: 'POST', body: JSON.stringify({ to: 'active' }) });
+        expect(zu.status).toBe(422);
+        expect(zu.body.errorCode).toBe('GATE_NOT_MET');
+        expect(zu.body.gate.missing).toEqual(expect.arrayContaining(['evidence.incorporation', 'evidence.insurance', 'evidence.representative_identity', 'coverage.none_approved', 'billing.not_ready', 'billing.no_payment_method']));
+        expect(db.providers[0].lifecycle_status).toBe('under_verification');
+
+        // Reviewer prueft die Dokumente, gibt die Zelle frei, Billing wird bereit.
+        for (const e of db.provider_evidence.filter((x: any) => x.source === 'document')) {
+            const r = await adminApi(`/api/v1/admin/review/neue-kanzlei/evidence/${e.id}`, { method: 'POST', body: JSON.stringify({ result: 'reviewed', notes: 'passt' }) });
+            expect(r.status).toBe(200);
+        }
+        const vertretung = await own('/evidence/upload-url', { method: 'POST', body: JSON.stringify({ evidence_type: 'representative_identity', original_name: 'vollmacht.pdf', mime_type: 'application/pdf', size_bytes: 500 }) });
+        uploaded.add(vertretung.body.file_ref);
+        await own(`/evidence/${vertretung.body.evidence_id}/confirm`, { method: 'POST', body: '{}' });
+        await adminApi(`/api/v1/admin/review/neue-kanzlei/evidence/${vertretung.body.evidence_id}`, { method: 'POST', body: JSON.stringify({ result: 'reviewed' }) });
+        const cell = db.provider_service_coverage.find((c: any) => c.service_id === serviceId);
+        await adminApi(`/api/v1/admin/review/neue-kanzlei/coverage/${cell.id}`, { method: 'POST', body: JSON.stringify({ action: 'approve' }) });
+
+        const nurBilling = await adminApi('/api/v1/admin/review/neue-kanzlei/gate');
+        expect(nurBilling.body.gate.missing).toEqual(['billing.not_ready', 'billing.no_payment_method']);
+
+        Object.assign(db.providers[0], { billing_ready: true, billing_block_reasons: [] });
+        const auf = await adminApi('/api/v1/admin/review/neue-kanzlei/lifecycle', { method: 'POST', body: JSON.stringify({ to: 'active' }) });
+        expect(auf.status).toBe(200);
+        expect(db.providers[0]).toMatchObject({ lifecycle_status: 'active', partner_status: 'active' });
+        expect(db.notifications.some((n: any) => n.type === 'verification_activated')).toBe(true);
+        expect(db.event_log.some((e: any) => e.type === 'email_outbox' && e.payload?.kind === 'verification_activated')).toBe(true);
+    });
+
+    it('Gate: active verlangt alle Zellen frei — sonst nur limited', async () => {
+        seedApplicant();
+        const serviceId = await fillDossier();
+        await own(`/services/${serviceId}/coverage`, { method: 'PUT', body: JSON.stringify({ countries: ['DE', 'AT'] }) });
+        await own('/submit', { method: 'POST', body: '{}' });
+        await adminApi('/api/v1/admin/review/neue-kanzlei/lifecycle', { method: 'POST', body: JSON.stringify({ to: 'under_verification' }) });
+        for (const e of db.provider_evidence.filter((x: any) => x.source === 'document')) {
+            await adminApi(`/api/v1/admin/review/neue-kanzlei/evidence/${e.id}`, { method: 'POST', body: JSON.stringify({ result: 'reviewed' }) });
+        }
+        db.provider_evidence.push({ id: randomUUID(), provider_key: 'neue-kanzlei', evidence_type: 'representative_identity', source: 'registry_check', result: 'independently_verified', upload_confirmed: true });
+        const de = db.provider_service_coverage.find((c: any) => c.service_id === serviceId && c.country_code === 'DE');
+        await adminApi(`/api/v1/admin/review/neue-kanzlei/coverage/${de.id}`, { method: 'POST', body: JSON.stringify({ action: 'approve' }) });
+        Object.assign(db.providers[0], { billing_ready: true, billing_block_reasons: [] });
+
+        const active = await adminApi('/api/v1/admin/review/neue-kanzlei/lifecycle', { method: 'POST', body: JSON.stringify({ to: 'active' }) });
+        expect(active.status).toBe(422);
+        expect(active.body.errorCode).toBe('GATE_TARGET_LIMITED');
+        const limited = await adminApi('/api/v1/admin/review/neue-kanzlei/lifecycle', { method: 'POST', body: JSON.stringify({ to: 'limited' }) });
+        expect(limited.status).toBe(200);
+        expect(db.providers[0].lifecycle_status).toBe('limited');
+    });
+
+    it('verbietet Statuswechsel, die kein Reviewer setzt', async () => {
+        seedApplicant();
+        const r = await adminApi('/api/v1/admin/review/neue-kanzlei/lifecycle', { method: 'POST', body: JSON.stringify({ to: 'submitted' }) });
+        expect(r.status).toBe(409);
+        expect(r.body.errorCode).toBe('TRANSITION_NOT_ALLOWED');
+        const ohneGrund = await adminApi('/api/v1/admin/review/neue-kanzlei/lifecycle', { method: 'POST', body: JSON.stringify({ to: 'terminated' }) });
+        expect(ohneGrund.status).toBe(409); // draft → terminated ist nicht erlaubt; ein Reviewer beendet keinen Entwurf
+    });
+});
+
+describe('Watcher: Nachweis-Ablauf', () => {
+    it('warnt 30 Tage vorher einmal und setzt bei Ablauf reverification_due mit Frist', async () => {
+        seedApplicant({ lifecycle_status: 'active', partner_status: 'active' });
+        const bald = new Date(Date.now() + 10 * 86400_000).toISOString().slice(0, 10);
+        const vorbei = new Date(Date.now() - 86400_000).toISOString().slice(0, 10);
+        db.provider_evidence = [
+            { id: 'e-bald', provider_key: 'neue-kanzlei', evidence_type: 'insurance', source: 'document', result: 'reviewed', upload_confirmed: true, expires_at: bald },
+            { id: 'e-vorbei', provider_key: 'neue-kanzlei', evidence_type: 'professional_licence', source: 'document', result: 'reviewed', upload_confirmed: true, expires_at: vorbei },
+        ];
+        process.env.WATCHERS_SHADOW = 'false';
+        try {
+            const r1 = await api('/api/v1/admin/watchers/tick', { method: 'POST', body: '{}' });
+            expect(r1.body.summary).toMatchObject({ evidenceExpiringNotices: 1, evidenceExpired: 1, reverificationDue: 1 });
+            expect(db.provider_evidence.find((e: any) => e.id === 'e-vorbei').result).toBe('expired');
+            expect(db.providers[0].lifecycle_status).toBe('reverification_due');
+            expect(db.providers[0].reverification_grace_until).toBeTruthy();
+            expect(db.notifications.filter((n: any) => n.type === 'evidence_expiring')).toHaveLength(1);
+            const r2 = await api('/api/v1/admin/watchers/tick', { method: 'POST', body: '{}' });
+            expect(r2.body.summary).toMatchObject({ evidenceExpiringNotices: 0, evidenceExpired: 0, reverificationDue: 0 });
+        } finally {
+            delete process.env.WATCHERS_SHADOW;
+        }
     });
 });

@@ -26,7 +26,13 @@ export type NotificationType =
     | 'engagement_message'      // Neue Nachricht im Verlauf einer Anfrage
     | 'engagement_expired'      // Niemand hat innerhalb der Frist reagiert
     | 'booking_rescheduled'     // Der Termin wurde verschoben
-    | 'booking_cancelled';      // Der Termin wurde abgesagt
+    | 'booking_cancelled'       // Der Termin wurde abgesagt
+    // Verifikation eines Anbieterkontos (Phase 2). Empfaenger ist der
+    // Dashboard-Login des Anbieters (provider_members).
+    | 'verification_info_requested'  // Der Reviewer braucht einen weiteren Nachweis
+    | 'verification_decided'         // Eine Zelle Leistung x Land wurde entschieden
+    | 'verification_activated'       // Das Konto ist aktiv oder eingeschraenkt aktiv
+    | 'evidence_expiring';           // Ein Nachweis laeuft in den naechsten 30 Tagen ab
 
 /**
  * Die erlaubten Nutzlast-Felder. Bewusst eine geschlossene Liste: alles, was
@@ -66,7 +72,7 @@ export interface NotifyArgs {
     /** Wer sie ausgeloest hat. Gleich dem Empfaenger → keine Nachricht. */
     actor?: string | null;
     type: NotificationType;
-    subject?: 'engagement' | 'booking' | 'session';
+    subject?: 'engagement' | 'booking' | 'session' | 'provider';
     subjectId?: string | null;
     payload?: PayloadFelder;
     /**
