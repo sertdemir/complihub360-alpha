@@ -6,7 +6,7 @@ import {
   LayoutGrid, FolderClosed, Bell, BookOpen, Bookmark, CalendarCheck,
   TriangleAlert, Calendar, Search, LogOut, Landmark, Package, ShieldCheck, Megaphone, Building2,
   PackageCheck, Truck, Scale,
-  Leaf, ChevronRight,
+  Leaf,
 } from 'lucide-react';
 import { DOMAINS as CANONICAL_DOMAINS, type DomainSlug } from '../../lib/domains';
 import { Sidebar, SidebarGroup, NavItem } from '../ui/AppShell';
@@ -111,11 +111,13 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
   const [searchOpen, setSearchOpen] = useState(false);
   const [counts, setCounts] = useState<{ requests?: number; unread?: number }>({});
   const [domainDots, setDomainDots] = useState<Partial<Record<DomainSlug, 'high' | 'medium'>>>({});
-  // ─── Sitzungen als zweite Nav-Ebene (Canvas N, Variante N3b) ──────────────
-  // Zugeklappt, damit die Nav nicht mit jeder neuen Sitzung waechst — aber die
-  // AKTIVE bleibt sichtbar, sonst weiss niemand, worin er gerade steckt.
+  // Sitzungen: nur noch die Anzahl am Nav-Eintrag (Nutzer-Wahl 2026-09-22,
+  // Dashboard Iteration 2). Die zweite Nav-Ebene mit Chevron und "Alle N
+  // Sitzungen" entfiel — erreichbar sind Sitzungen allein ueber die
+  // Uebersichtsseite /dashboard/sessions. Gezaehlt werden die AKTIVEN — so
+  // wie "Gespeicherte Sitzungen" auf dem Dashboard; Archivierte liegen auf der
+  // Uebersicht eingeklappt und zaehlen nicht mit.
   const [sessions, setSessions] = useState<SessionRowData[]>([]);
-  const [sessionsOpen, setSessionsOpen] = useState(false);
   // /api/v1/bookings und /notifications verlangen einen echten Supabase-JWT
   // (services/compliance-api/src/index.ts:114 — beide stehen NICHT in
   // PUBLIC_ROUTES). Der Demo-Login auf Staging setzt nur ein localStorage-Flag
@@ -153,29 +155,22 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
     }
     // Die Sitzungsliste ist eine OEFFENTLICHE Route (guest_key als Ausweis)
     // und laeuft deshalb auch ohne Anmeldung — sie feuert ohnehin nur, wenn
-    // ueberhaupt ein guest_key vorliegt. Ohne API bleibt die Liste leer und
-    // die Nav-Ebene erscheint gar nicht; eine Fixture-Sitzung in der
-    // Navigation waere eine Behauptung.
+    // ueberhaupt ein guest_key vorliegt. Ohne API bleibt die Zahl weg; eine
+    // Fixture-Zahl in der Navigation waere eine Behauptung.
     fetchSessions().then(setSessions).catch(() => {});
   }, [hasSession]);
 
-  // Welche Sitzung ist offen? /results?session=<id> ist der einzige Ort, an
-  // dem eine einzelne Sitzung angezeigt wird.
-  const activeSessionId = new URLSearchParams(location.search).get('session');
-  const activeSession = sessions.find((s2) => s2.id === activeSessionId) ?? null;
-  const shownSessions = sessionsOpen ? sessions : (activeSession ? [activeSession] : []);
-  const sessionLabel = (s2: SessionRowData) =>
-    s2.label || [s2.country, (s2.categories ?? [])[0]].filter(Boolean).join(' · ') || t('shell.navSessions');
   const badgeFor = (to: string): string | undefined => {
-    const n = to === 'dashboard/termine' ? counts.requests : to === 'dashboard/notifications' ? counts.unread : undefined;
+    const n = to === 'dashboard/termine' ? counts.requests
+      : to === 'dashboard/notifications' ? counts.unread
+      : to === 'dashboard/sessions' ? sessions.filter((s2) => s2.status !== 'archived').length
+      : undefined;
     return n ? String(n) : undefined;
   };
 
   // One source for both rails: below `lg` the panel renders the same three groups
   // the sidebar renders above it, from the same SIDEBAR + DOMAINS constants and
-  // with the same active test. The sessions sub-level is the one thing that does
-  // NOT come along — it grows with every session, and /dashboard/sessions is the
-  // page that lists exactly those.
+  // with the same active test and the same counts.
   const domainGroup: WorkspaceNavGroup = {
     key: 'domains',
     label: t('shell.groupDomains'),
@@ -268,54 +263,6 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
                   ? location.pathname === target || location.pathname === `${target}/`
                   : location.pathname.startsWith(target);
                 const Icon = it.icon;
-                if (it.to === 'dashboard/sessions') {
-                  return (
-                    <React.Fragment key={it.to}>
-                      <div className="flex items-center">
-                        <NavLink to={target} className="min-w-0 flex-1">
-                          <NavItem icon={<Icon size={16} />} label={t(`shell.${it.labelKey}`)} count={it.count ?? badgeFor(it.to)} active={active} />
-                        </NavLink>
-                        {sessions.length > 0 && (
-                          <button
-                            type="button"
-                            aria-expanded={sessionsOpen}
-                            aria-label={t('shell.sessionsToggle', { defaultValue: 'Sitzungen ein- und ausklappen' })}
-                            onClick={() => setSessionsOpen((v) => !v)}
-                            className="shrink-0 rounded-md p-1 text-fg-tertiary transition-colors hover:text-fg"
-                          >
-                            <ChevronRight size={13} className={'transition-transform ' + (sessionsOpen ? 'rotate-90' : '')} />
-                          </button>
-                        )}
-                      </div>
-                      {shownSessions.map((s2) => (
-                        <NavLink key={s2.id} to={`${base}/results?session=${s2.id}`} className="block">
-                          <span
-                            className={'ml-6 flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[12px] transition-colors '
-                              + (s2.id === activeSessionId
-                                ? 'bg-brand-light font-bold text-fg'
-                                : 'text-fg-secondary hover:bg-elevate/5')}
-                          >
-                            {s2.country && (
-                              <span className="shrink-0 text-[9px] font-extrabold uppercase tracking-[0.05em] text-fg-accent-emphasis">
-                                {s2.country}
-                              </span>
-                            )}
-                            <span className="truncate">{sessionLabel(s2)}</span>
-                          </span>
-                        </NavLink>
-                      ))}
-                      {!sessionsOpen && sessions.length > (activeSession ? 1 : 0) && (
-                        <button
-                          type="button"
-                          onClick={() => setSessionsOpen(true)}
-                          className="ml-6 block px-2.5 py-1 text-left text-[11px] font-semibold text-brand underline underline-offset-2"
-                        >
-                          {t('shell.sessionsAll', { count: sessions.length })}
-                        </button>
-                      )}
-                    </React.Fragment>
-                  );
-                }
                 return (
                   <NavLink key={it.to} to={target}>
                     <NavItem icon={<Icon size={16} />} label={t(`shell.${it.labelKey}`)} count={it.count ?? badgeFor(it.to)} active={active} />

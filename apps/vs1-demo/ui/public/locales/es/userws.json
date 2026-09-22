@@ -51,9 +51,6 @@
     "navCalendar": "Calendario",
     "signOut": "Cerrar sesión",
     "search": "Buscar",
-    "sessionsToggle": "Desplegar o plegar sesiones",
-    "sessionsAll_one": "Las {{count}} sesión",
-    "sessionsAll_other": "Las {{count}} sesiones",
     "switchTo": "Ir a"
   },
   "home": {
