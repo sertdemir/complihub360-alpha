@@ -2,7 +2,7 @@
 
 > Stand 2026-07-11 · Quelle für „Soll": GoogleDrive_Docs `User Flows (Complete)` / `Provider Flows (Complete)` / `Addendum — Dossier Handover (2026-07-10)` / Drawer-Direktive (Gap-Lists 2026-06-19) · Figma-Drawer auf Seite „Dashboards", Section `▣ DRAWERS`.
 >
-> **Status:** ✅ verdrahtet · 🟡 teilweise (Handler ohne echte Wirkung / Demo) · ⛔ Kulisse
+> **Status:** ✅ verdrahtet · 🟡 teilweise (Handler ohne echte Wirkung / Demo) · ⛔ Kulisse · ⊘ entfallen (die Fläche gibt es nicht mehr, kein offener Punkt)
 > **Welle:** A = Akquise-Kreis · B = Drawer-Welle · C = Sekundäraktionen · D = Polish/Tooltips
 > Regel aus der Drawer-Direktive: *jede* Edit-/Detail-/Configure-Aktion öffnet einen Drawer, nie eine neue Seite.
 
@@ -77,7 +77,7 @@ Alle 16 Drawer existieren in Figma (Section `▣ DRAWERS`) und die `Drawer`-Komp
 | C5 | „Replace" (Avatar), Settings-Rows | /settings | ⛔ | Upload/Drawer je Zeile | Storage |
 | C6 | „Resume" / „Start new" / „Refine existing" | User Home, Workbench | ✅ | Resume → /results (ch360_last_profile); Start new → /wizard frisch; Refine → /wizard?refine=1 = vorbefüllt + Start im Review-Schritt (Edit springt mit erhaltener Auswahl zurück) | — |
 | C7 | „See full plan" / „See all" | Workbench | ⛔ | Expand inline bzw. Link auf Sessions/Provider-Liste | — |
-| C8 | Exports „Download" | /exports | ⛔ | Datei-Download (PDF-Flow §9) | A6/PDF-Renderer |
+| C8 | ~~Exports „Download"~~ | ~~/exports~~ | ⊘ entfallen | Route und Seite am 2026-09-20 ersatzlos gestrichen. `generateRiskMapPdf` baut das PDF im Browser und lädt es sofort — es gibt keinen Speicherort, auf den ein „Download" zeigen könnte. Kein offener Punkt mehr. | — |
 | C9 | „Join early access" | Alerts/Calendar | ⛔ | Interest-Flag ins event_log | — |
 | C10 | Admin „Open watchlist"/„Escalate"/„View" | /admin | ⛔ | Scroll zur Watchlist / Reminder-Trigger / Drawer mit Engagement-Detail | Reminder-Endpoint |
 | C11 | Admin-Stubs (Providers/Security/Privacy/Alerts/Status) | /admin/* | 🟡 Stub | Verdrahten nach Figma-Vorlage (Seite „Admin") | security-Events, provider-GETs |
