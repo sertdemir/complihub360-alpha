@@ -94,6 +94,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 
     res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PATCH, PUT');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-correlation-id, Authorization, x-api-key');
+    // Ohne Expose bleibt der Antwort-Header fuer den Browser unsichtbar, sobald
+    // UI und API auf verschiedenen Origins liegen (Staging).
+    res.setHeader('Access-Control-Expose-Headers', 'x-correlation-id');
 
     if (req.method === 'OPTIONS') {
         res.writeHead(204);
@@ -2363,11 +2366,22 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             }
         });
     } else if (req.method === 'POST' && req.url === '/api/v1/search') {
+        // Die Referenz-ID steht auf JEDER Antwort, nicht nur auf Fehlern: der
+        // Browser kennt sie ohnehin (er hat sie geschickt), und so laesst sich
+        // auch eine erfolgreiche, aber falsche Risk Map im Log wiederfinden.
+        res.setHeader('x-correlation-id', correlationId);
         let body = '';
         req.on('data', (chunk: any) => body += chunk.toString());
         req.on('end', async () => {
+            let requestData: any;
             try {
-                const requestData = JSON.parse(body);
+                requestData = JSON.parse(body);
+            } catch {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INVALID_JSON', message: 'Invalid JSON payload', correlationId }));
+                return;
+            }
+            try {
                 // 1. Compliance Engine - Generate structural subdomains.
                 //    The engine only knows a subset of country profiles — an
                 //    unknown country must not kill the search (providers are
@@ -2588,8 +2602,23 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     tips: []
                 }));
             } catch (err) {
-                res.writeHead(400);
-                res.end(JSON.stringify({ error: String(err) }));
+                // Bis 2026-09-22: `400 { error: String(err) }` fuer JEDEN Fehler —
+                // ein Datenbankausfall hiess "deine Anfrage ist falsch", die
+                // interne Meldung ging roh an den Browser, und im Log stand
+                // nichts. Der Nutzer sah "Risk Map failed" ohne Spur, der
+                // Support hatte keine. Jetzt: Log mit Referenz-ID, 500, und
+                // nach aussen nur die ID.
+                structuredLog('error', 'Search failed', {
+                    correlationId,
+                    errorCode: 'ERR_SEARCH',
+                    severity: 'error',
+                    route: '/api/v1/search',
+                    // Die Ursache gehoert ins Log, nicht in die Antwort. Gekappt,
+                    // weil ein PostgREST-Fehlertext beliebig lang sein kann.
+                    detail: String(err).slice(0, 500),
+                });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Search failed', correlationId }));
             }
         });
     } else if (req.method === 'POST' && req.url === '/api/v1/assistant/chat') {

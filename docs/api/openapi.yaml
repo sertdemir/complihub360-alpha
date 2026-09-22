@@ -25,6 +25,8 @@ paths:
   /search:
     post:
       summary: Search and Wizard endpoint
+      parameters:
+        - $ref: '#/components/parameters/CorrelationId'
       requestBody:
         required: true
         content:
@@ -42,10 +44,33 @@ paths:
       responses:
         '200':
           description: Results
+          headers:
+            x-correlation-id:
+              $ref: '#/components/headers/CorrelationId'
           content:
             application/json:
               schema:
                 type: object
+        '400':
+          description: Body ist kein JSON (`INVALID_JSON`)
+          headers:
+            x-correlation-id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: >-
+            Die Suche ist gescheitert (`INTERNAL`). Die Ursache steht im
+            Server-Log unter der Referenz-ID, nicht in der Antwort.
+          headers:
+            x-correlation-id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /engagement:
     post:
@@ -321,6 +346,37 @@ paths:
           description: Stripe nicht konfiguriert (ausser dry_run)
 
 components:
+  parameters:
+    CorrelationId:
+      name: x-correlation-id
+      in: header
+      required: false
+      description: >-
+        Referenz-ID des Aufrufs, vom Browser je Anfrage erzeugt. Der Server
+        uebernimmt sie, wenn sie 8 bis 64 Zeichen aus Buchstaben, Ziffern und
+        Bindestrich hat, und erzeugt sonst eine eigene. Unter dieser ID steht
+        ein Fehler im Log; die UI zeigt sie unter "Technical details".
+      schema:
+        type: string
+        pattern: '^[A-Za-z0-9-]{8,64}$'
+  headers:
+    CorrelationId:
+      description: Die ID, unter der der Server den Aufruf geloggt hat.
+      schema:
+        type: string
+  schemas:
+    ErrorResponse:
+      type: object
+      required: [errorCode, message, correlationId]
+      properties:
+        errorCode:
+          type: string
+          example: INTERNAL
+        message:
+          type: string
+          description: Kurz und ohne interne Details.
+        correlationId:
+          type: string
   securitySchemes:
     bearerAuth:
       type: http

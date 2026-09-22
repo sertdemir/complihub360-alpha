@@ -1980,7 +1980,14 @@
       "confirmation": "Lo entiendo y deseo continuar con esta reserva.",
       "confirmAndBook": "Confirmar y reservar",
       "goBack": "Volver"
-    }
+    },
+    "scope": {
+      "triedToAssess": "Lo que intentamos evaluar",
+      "checked": "Lo que revisamos",
+      "markets": "Mercados",
+      "areas": "Áreas"
+    },
+    "technicalDetails": "Detalles técnicos"
   },
   "errorBoundary": {
     "title": "No se pudo mostrar esta página.",

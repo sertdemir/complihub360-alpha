@@ -378,6 +378,69 @@ describe('POST /api/v1/search', () => {
     });
 });
 
+// ─── Referenz-ID ("Technical details", Canvas-Wahl B3) ────────────────────────
+// Scheitert die Risk Map, zeigt der Zustand "Risk Map failed" eine Referenz-ID,
+// die der Nutzer dem Support nennt. Das funktioniert nur, wenn der Browser und
+// das Log DIESELBE ID kennen. Der Browser schickt sie als `x-correlation-id`;
+// diese Tests halten fest, dass der Server sie annimmt, zurueckgibt und im
+// Fehlerfall ins Log schreibt — und dass er nichts Internes preisgibt.
+describe('POST /api/v1/search — Referenz-ID', () => {
+    const REF = '3f2b8c1e-5d4a-4e6f-9a7b-1c2d3e4f5a6b';
+    const suche = (headers: Record<string, string>, body = JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], domains: ['tax-vat'] } })) =>
+        fetch(`${BASE}/api/v1/search`, { method: 'POST', headers: { 'content-type': 'application/json', ...headers }, body });
+
+    it('gibt die ID des Browsers auf jeder Antwort zurueck, auch bei Erfolg', async () => {
+        const res = await suche({ 'x-correlation-id': REF });
+        expect(res.status).toBe(200);
+        expect(res.headers.get('x-correlation-id')).toBe(REF);
+        // Staging: UI und API auf verschiedenen Origins — ohne Expose sieht
+        // der Browser den Header nicht.
+        expect(res.headers.get('access-control-expose-headers')).toContain('x-correlation-id');
+    });
+
+    it('ersetzt einen Wert, der keine ID ist, statt ihn zu uebernehmen', async () => {
+        for (const fremd of ['kurz', 'a'.repeat(65), 'ref mit leerzeichen', '"}{"level":"info"']) {
+            const res = await suche({ 'x-correlation-id': fremd });
+            const id = res.headers.get('x-correlation-id');
+            expect(id).not.toBe(fremd);
+            expect(id).toMatch(/^[A-Za-z0-9-]{8,64}$/);
+        }
+    });
+
+    it('schreibt die ID bei einem Fehler ins Log und nennt nach aussen nur sie', async () => {
+        const { supabaseApi } = await import('../supabase.js');
+        const select = vi.spyOn(supabaseApi, 'select').mockRejectedValueOnce(
+            new Error('Supabase select failed: connection to db.internal:5432 refused'),
+        );
+        const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+        try {
+            const res = await suche({ 'x-correlation-id': REF });
+            const body = await res.json();
+
+            // Ein Datenbankausfall ist kein Fehler der Anfrage.
+            expect(res.status).toBe(500);
+            expect(body).toEqual({ errorCode: 'INTERNAL', message: 'Search failed', correlationId: REF });
+            expect(JSON.stringify(body)).not.toContain('db.internal');
+
+            // Der Support findet die Ursache unter genau dieser ID.
+            const zeile = log.mock.calls.map((c) => String(c[0])).find((l) => l.includes('Search failed'));
+            expect(zeile).toBeDefined();
+            const eintrag = JSON.parse(zeile!);
+            expect(eintrag.correlationId).toBe(REF);
+            expect(eintrag.detail).toContain('db.internal');
+        } finally {
+            select.mockRestore();
+            log.mockRestore();
+        }
+    });
+
+    it('meldet kaputtes JSON als Fehler der Anfrage, mit ID', async () => {
+        const res = await suche({ 'x-correlation-id': REF }, '{kein json');
+        expect(res.status).toBe(400);
+        expect(await res.json()).toEqual({ errorCode: 'INVALID_JSON', message: 'Invalid JSON payload', correlationId: REF });
+    });
+});
+
 describe('POST /api/v1/scheduling (booking = paid lead)', () => {
     it('requires a logged-in user — the server api key is not enough', async () => {
         const r = await api('/api/v1/scheduling', { method: 'POST', body: '{}', auth: 'key' });

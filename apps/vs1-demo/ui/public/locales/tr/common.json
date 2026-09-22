@@ -1980,7 +1980,14 @@
       "confirmation": "Anladım ve bu randevuyla devam etmek istiyorum.",
       "confirmAndBook": "Onayla ve randevu al",
       "goBack": "Geri dön"
-    }
+    },
+    "scope": {
+      "triedToAssess": "Değerlendirmeye çalıştıklarımız",
+      "checked": "Kontrol ettiklerimiz",
+      "markets": "Pazarlar",
+      "areas": "Alanlar"
+    },
+    "technicalDetails": "Teknik ayrıntılar"
   },
   "errorBoundary": {
     "title": "Bu sayfa görüntülenemedi.",

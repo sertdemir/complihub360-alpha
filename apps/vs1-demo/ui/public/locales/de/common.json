@@ -1980,7 +1980,14 @@
       "confirmation": "Ich habe das verstanden und möchte mit dieser Buchung fortfahren.",
       "confirmAndBook": "Bestätigen und buchen",
       "goBack": "Zurück"
-    }
+    },
+    "scope": {
+      "triedToAssess": "Was wir prüfen wollten",
+      "checked": "Was wir geprüft haben",
+      "markets": "Märkte",
+      "areas": "Bereiche"
+    },
+    "technicalDetails": "Technische Details"
   },
   "errorBoundary": {
     "title": "Diese Seite ließ sich nicht anzeigen.",

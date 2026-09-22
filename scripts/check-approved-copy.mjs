@@ -30,7 +30,8 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const EN = resolve(ROOT, 'apps/vs1-demo/ui/public/locales/en/common.json');
 
 /** Die Vorlage, wortgleich. Quelle: Checklist v1.0, "Approved UX State Copy"
- *  und "Information Sharing Confirmation". */
+ *  und "Information Sharing Confirmation"; dazu die Canvas-Abnahme vom
+ *  22.09.2026 (Block am Ende). */
 const VORLAGE = {
   "riskMapLoading": {
     "heading": "Creating your Risk Map",
@@ -128,7 +129,21 @@ const VORLAGE = {
     "confirmation": "I understand and want to continue with this booking.",
     "confirmAndBook": "Confirm and Book",
     "goBack": "Go Back"
-  }
+  },
+  // ── Zweite Abnahme: Canvas "Risk Map · leere Zustaende", Wahl A3/B3/C3 ──
+  // Vom Nutzer am 22.09.2026 abgenommen ("Copy ist abgenommen"). Nicht aus
+  // der Checklist, aber mit demselben Status: umformulieren nur mit Abnahme.
+  // B3 (Risk Map failed) nennt, was geprueft werden SOLLTE; C3 (keine
+  // Pflichten) nennt, was geprueft WURDE — derselbe Kasten, andere Aussage.
+  "scope": {
+    "triedToAssess": "What we tried to assess",
+    "checked": "What we checked",
+    "markets": "Markets",
+    "areas": "Areas"
+  },
+  // Aufklappbar unter "Risk Map failed": Referenz-ID und Zeitpunkt (UTC) des
+  // gescheiterten Aufrufs, damit der Support ihn im Log findet.
+  "technicalDetails": "Technical details"
 };
 
 /** Welche Aktionen zu welchem Zustand gehoeren, in der Reihenfolge der
@@ -225,7 +240,7 @@ for (const [zustand, aktionen] of Object.entries(AKTIONEN_JE_ZUSTAND)) {
 
 if (fehler.length === 0) {
   const n = Object.keys(AKTIONEN_JE_ZUSTAND).length;
-  console.log(`Abgenommene Zustands-Copy wortgleich (${n} Zustaende, ${Object.keys(VORLAGE.actions).length} Aktionen, Sharing-Dialog).`);
+  console.log(`Abgenommene Zustands-Copy wortgleich (${n} Zustaende, ${Object.keys(VORLAGE.actions).length} Aktionen, Sharing-Dialog, Umfang und Technical details).`);
   process.exit(0);
 }
 
