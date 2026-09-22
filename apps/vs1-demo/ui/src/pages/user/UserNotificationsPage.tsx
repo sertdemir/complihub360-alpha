@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { Bell, CalendarClock, CheckCheck, MessageSquare, XCircle, AlarmClock, CalendarX2 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { UserShell } from '../../components/user/UserShell';
+import { useAuthStore } from '../../store/useAuthStore';
+import { isMockApi } from '../../lib/supabase';
 import { EmptyState } from '../../components/user/EmptyState';
 import { FilterChip } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
@@ -78,9 +80,17 @@ export function UserNotificationsPage() {
   // leeres Fach, kein Dauerzustand — sonst dreht sich die Seite fuer immer.
   const [feed, setFeed] = useState<NotificationsFeed | null>(null);
 
+  // Nur mit echter Sitzung (oder im Mock) anfragen — dieselbe Regel wie die
+  // Glocke in der UserShell: /api/v1/notifications verlangt einen Supabase-JWT.
+  // Der Demo-Login auf Staging hat keinen; die Anfrage lief dort in die
+  // Traefik-Basic-Auth-Wand, deren 401 der Browser als Login-Dialog oeffnet.
+  // Ohne Sitzung gibt es keine Post — das leere Fach ist dann die Wahrheit.
+  const session = useAuthStore((st) => st.session);
+  const darfLaden = !!session || isMockApi;
   useEffect(() => {
+    if (!darfLaden) { setFeed(LEERES_FACH); return; }
     fetchMyNotifications().then(setFeed).catch(() => setFeed(LEERES_FACH));
-  }, []);
+  }, [darfLaden]);
 
   const items = feed?.items ?? [];
   const passt = (n: Notification) =>
