@@ -1112,6 +1112,14 @@
     "login": "Iniciar sesión",
     "language": "Idioma"
   },
+  "account": {
+    "fallbackName": "Mi cuenta",
+    "role": {
+      "user": "Empresa",
+      "partner": "Socio asesor",
+      "admin": "Administración"
+    }
+  },
   "howItWorks": {
     "meta": {
       "title": "Cómo funciona · CompliHub360"

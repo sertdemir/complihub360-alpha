@@ -37,7 +37,10 @@ export interface NavMenuContextValue {
   columns: 1 | 2 | 3;
   panelId: string;
   triggerRef: React.RefObject<HTMLButtonElement>;
-  itemsRef: React.MutableRefObject<HTMLAnchorElement[]>;
+  /** Alle Eintraege in DOM-Reihenfolge. HTMLElement, nicht HTMLAnchorElement:
+   *  seit dem Konto-Menue steht in derselben Pfeiltasten-Ordnung auch ein
+   *  Button (Abmelden ist eine Aktion, kein Ziel). */
+  itemsRef: React.MutableRefObject<HTMLElement[]>;
   /** Focus the item at index, wrapping at both ends. */
   focusItem: (index: number) => void;
   /** Open the panel and focus the item at index once it has mounted. */
@@ -78,7 +81,7 @@ export function NavMenu({
   const panelId = React.useId();
   const rootRef = React.useRef<HTMLDivElement>(null);
   const triggerRef = React.useRef<HTMLButtonElement>(null);
-  const itemsRef = React.useRef<HTMLAnchorElement[]>([]);
+  const itemsRef = React.useRef<HTMLElement[]>([]);
 
   const close = React.useCallback((returnFocus = true) => {
     setOpen(false);
@@ -257,13 +260,16 @@ export function NavMenuTrigger({
 export interface NavMenuPanelProps {
   /** Optional heading above the columns; `sheet` only. */
   title?: string;
+  /** Block ueber den Eintraegen — im Konto-Menue Name und Rolle. Anders als
+   *  `title` (eine Eyebrow-Zeile) traegt er beliebigen Inhalt. */
+  header?: React.ReactNode;
   /** Trailing region beside the columns — a footer link, a cross-link column. */
   aside?: React.ReactNode;
   className?: string;
   children: React.ReactNode;
 }
 
-export function NavMenuPanel({ title, aside, className, children }: NavMenuPanelProps) {
+export function NavMenuPanel({ title, header, aside, className, children }: NavMenuPanelProps) {
   const { open, panel, align, columns, panelId } = useNavMenu('NavMenu.Panel');
   if (!open) return null;
 
@@ -285,6 +291,7 @@ export function NavMenuPanel({ title, aside, className, children }: NavMenuPanel
       >
         <div className="mx-auto flex max-w-container-3xl flex-col gap-8 px-4 py-9 lg:flex-row lg:px-10">
           <div className="min-w-0 flex-1">
+            {header}
             {title && (
               <p className="mb-6 text-body-3xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
                 {title}
@@ -313,6 +320,7 @@ export function NavMenuPanel({ title, aside, className, children }: NavMenuPanel
         className,
       )}
     >
+      {header && <div className="border-b border-stroke-subtle px-3 pb-2.5 pt-1.5">{header}</div>}
       {title && (
         <p className="px-3 pb-1.5 pt-1 text-body-3xs font-semibold uppercase tracking-[0.14em] text-fg-tertiary">
           {title}
@@ -487,7 +495,92 @@ export function NavMenuFooter({
   );
 }
 
+export interface NavMenuActionProps
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
+  icon?: React.ReactNode;
+  /** `danger` faerbt die Zeile in die Fehler-Tokens — fuer Abmelden. */
+  tone?: 'default' | 'danger';
+  children: React.ReactNode;
+}
+
+// ─── NavMenu.Action ───────────────────────────────────────────────────────────
+// Ein Eintrag, der KEIN Ziel ist. Die Kopfzeilen-Disclosure fuehrt fast nur
+// Links, aber Abmelden veraendert den Zustand und gehoert deshalb auf einen
+// <button>: ein <a href="#"> dafuer taucht in der Linkliste eines Screenreaders
+// auf, laesst sich in einem neuen Tab oeffnen und fuehrt dort ins Leere.
+//
+// Die Pfeiltasten-Ordnung ist dieselbe wie bei Item und Footer — alle drei
+// registrieren sich in itemsRef, und `focusItem` kennt nur HTMLElement.
+//
+// Die Farben von `danger` sind gerechnet, nicht gegriffen. Bis 2026-09-22 stand
+// hier in GlobalNav `text-red-600` mit `hover:bg-red-50`; im Dunkelmodus ergab
+// das 3,04:1 auf dem Panel — unter 4,5 — und der Hover-Grund war fast weiss.
+// Mit den Projekt-Tokens:
+//
+//   hell    error-700 auf bg-surface        7,58:1   Hover error-bg      6,48:1
+//   dunkel  error-300 auf dem dunklen Panel 5,68:1   Hover error-800/70  4,76:1
+//
+// error-800/70 und nicht error-900: bei 900 betraegt der Flaechensprung vom
+// Panel zum Hover 1,03:1, der Zustand ist also praktisch unsichtbar. 70 % von
+// error-800 landet bei 1,19:1 und damit dort, wo die helle Seite steht (1,17).
+export function NavMenuAction({
+  icon, tone = 'default', className, children, onClick, ...rest
+}: NavMenuActionProps) {
+  const { itemsRef, focusItem, close } = useNavMenu('NavMenu.Action');
+  const ref = React.useRef<HTMLButtonElement>(null);
+
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const list = itemsRef.current;
+    if (!list.includes(el)) list.push(el);
+    return () => {
+      const i = list.indexOf(el);
+      if (i >= 0) list.splice(i, 1);
+    };
+  });
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    const items = itemsRef.current.filter(Boolean);
+    const i = items.indexOf(ref.current!);
+    switch (e.key) {
+      case 'ArrowDown': e.preventDefault(); focusItem(i + 1); return;
+      case 'ArrowUp': e.preventDefault(); focusItem(i - 1); return;
+      case 'Home': e.preventDefault(); focusItem(0); return;
+      case 'End': e.preventDefault(); focusItem(items.length - 1); return;
+      default: return;
+    }
+  };
+
+  return (
+    <li>
+      <button
+        ref={ref}
+        type="button"
+        onKeyDown={onKeyDown}
+        onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+          onClick?.(e);
+          close(false);
+        }}
+        className={cn(
+          'group flex min-h-[44px] w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-1',
+          tone === 'danger'
+            ? 'text-error-700 hover:bg-error-bg dark:text-error-300 dark:hover:bg-error-800/70'
+            : 'text-fg hover:bg-surface-secondary',
+          className,
+        )}
+        {...rest}
+      >
+        {icon && <span aria-hidden className="shrink-0">{icon}</span>}
+        <span className="min-w-0 flex-1 text-body-sm font-semibold">{children}</span>
+      </button>
+    </li>
+  );
+}
+
 NavMenu.Trigger = NavMenuTrigger;
 NavMenu.Panel = NavMenuPanel;
 NavMenu.Item = NavMenuItem;
+NavMenu.Action = NavMenuAction;
 NavMenu.Footer = NavMenuFooter;

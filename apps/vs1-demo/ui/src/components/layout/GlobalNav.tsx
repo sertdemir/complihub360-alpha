@@ -1,20 +1,19 @@
-import { useState, useEffect, useId, useRef } from 'react';
+import { useState, useId } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { supportedLngs } from '../../i18n/config';
 import { LanguageMenu } from './LanguageMenu';
 import { AreasMenuPanel } from './AreasMenuPanel';
 import { MarketsMenuPanel } from './MarketsMenuPanel';
 import { useAuthStore } from '../../store/useAuthStore';
-import { ChevronDown, LogOut, LayoutDashboard, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Logo } from '../ui/Logo';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { AccountActions } from './AccountActions';
 import { MobileNav } from './MobileNav';
+import { AccountMenu } from './AccountMenu';
 import { HEADER_NAV_LINKS } from './navLinks';
-import { Avatar } from '../ui/Avatar';
 
 const menuItemClass = (active: boolean) =>
   `flex items-center gap-1 px-2 desktop-l:px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${
@@ -33,27 +32,12 @@ export function GlobalNav() {
   // language. The path segment is what actually says which locale you are on.
   const pathLang = location.pathname.split('/').filter(Boolean)[0];
   const currentLang = supportedLngs.includes(pathLang) ? pathLang : i18n.resolvedLanguage || 'en';
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const mobileNavId = useId();
-  const userMenuRef = useRef<HTMLDivElement>(null);
-  const { isLoggedIn, role, userName, logout } = useAuthStore();
+  const { isLoggedIn } = useAuthStore();
 
   const pathWithoutLang = location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/';
   const isHidden = HIDDEN_PATHS.includes(pathWithoutLang) || pathWithoutLang.startsWith('/wizard');
-
-  useEffect(() => {
-    const handleScroll = () => setUserMenuOpen(false);
-    const handleClick = (e: MouseEvent) => {
-      if (userMenuRef.current && !(e.target as Element).closest('.user-menu-trigger')) setUserMenuOpen(false);
-    };
-    window.addEventListener('scroll', handleScroll);
-    window.addEventListener('click', handleClick);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('click', handleClick);
-    };
-  }, []);
 
   const navTo = (path: string) => {
     if (path.startsWith('/')) {
@@ -171,62 +155,11 @@ export function GlobalNav() {
           <LanguageMenu triggerClassName="h-9 w-9" />
 
           {isLoggedIn ? (
-            <div className="relative user-menu-trigger" ref={userMenuRef}>
-              <button
-                onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-surface-secondary transition-colors"
-              >
-                <Avatar size="sm" initials={(userName || 'U').charAt(0)} tone="accent" />
-                <span className="text-xs font-semibold text-fg-secondary hidden md:block">
-                  {userName || (role === 'partner' ? 'Partner' : 'User')}
-                </span>
-                <ChevronDown
-                  size={12}
-                  className={`transition-transform duration-200 text-fg-tertiary ${userMenuOpen ? 'rotate-180' : ''}`}
-                />
-              </button>
-
-              <AnimatePresence>
-                {userMenuOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -4, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -4, scale: 0.95 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute right-0 top-full mt-2 w-52 bg-surface border border-stroke rounded-xl shadow-lg ring-1 ring-black/5 overflow-hidden z-50"
-                  >
-                    <div className="px-4 py-3 border-b border-stroke-subtle">
-                      <p className="text-sm font-semibold text-fg">{userName || 'User'}</p>
-                      <p className="text-xs text-fg-tertiary mt-0.5">{role === 'partner' ? 'Beratungspartner' : 'Unternehmen'}</p>
-                    </div>
-                    <div className="py-1">
-                      <button
-                        onClick={() => {
-                          setUserMenuOpen(false);
-                          const dashPath = role === 'partner' ? '/partner-dashboard' : '/dashboard';
-                          navTo(dashPath);
-                        }}
-                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-fg-secondary hover:bg-surface-secondary transition-colors"
-                      >
-                        <LayoutDashboard size={16} className="text-fg-tertiary" />
-                        {t('nav.dashboard', 'My dashboard')}
-                      </button>
-                      <button
-                        onClick={() => {
-                          setUserMenuOpen(false);
-                          logout();
-                          navTo('/');
-                        }}
-                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                      >
-                        <LogOut size={16} />
-                        {t('nav.signOut', 'Sign out')}
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+            /* Seit 2026-09-22 ein gemeinsames Bauteil beider Kopfzeilen — der
+               Block, der hier stand, war die vierte handgebaute Fassung dieses
+               Musters. Die Begruendung und die Messwerte stehen in
+               AccountMenu.tsx. */
+            <AccountMenu lang={currentLang} closeKey={location.pathname} />
           ) : (
             <>
               <button

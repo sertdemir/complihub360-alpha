@@ -1112,6 +1112,14 @@
     "login": "Giriş yap",
     "language": "Dil"
   },
+  "account": {
+    "fallbackName": "Hesabım",
+    "role": {
+      "user": "Şirket",
+      "partner": "Danışman ortak",
+      "admin": "Yönetim"
+    }
+  },
   "howItWorks": {
     "meta": {
       "title": "Nasıl çalışır · CompliHub360"
