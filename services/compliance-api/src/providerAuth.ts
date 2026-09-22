@@ -49,6 +49,27 @@ export async function providerKeyForUser(userId: string): Promise<{ providerKey:
     return rows[0] ? { providerKey: rows[0].provider_key, role: rows[0].role ?? 'owner' } : null;
 }
 
+/**
+ * Adresse -> Login-UUID. Geht ueber `auth_user_id_by_email`, weil das Schema
+ * `auth` in PostgREST nicht offenliegt (und nicht offenliegen soll: dort
+ * stehen Passwort-Hashes und Token). Die Funktion gibt NULL zurueck, wenn
+ * keine oder mehr als eine Zeile passt.
+ */
+export async function authUserIdByEmail(email: string): Promise<string | null> {
+    const wert = email.trim();
+    if (!wert) return null;
+    const roh = await supabaseApi.rpc('auth_user_id_by_email', { p_email: wert });
+    // PostgREST antwortet auf eine Funktion mit Skalar-Rueckgabe mit dem Wert
+    // selbst. Die Zeilenform wird trotzdem mitgelesen: sie ist das, was jede
+    // andere Stelle hier von `rpc` zurueckbekommt, und eine stumme Fehlannahme
+    // waere hier eine Verknuepfung, die nicht zustande kommt — ohne dass
+    // jemand sieht, warum.
+    const wert_aus_zeile = Array.isArray(roh)
+        ? (roh[0] as Record<string, unknown> | undefined)?.auth_user_id_by_email
+        : roh;
+    return typeof wert_aus_zeile === 'string' && wert_aus_zeile ? wert_aus_zeile : null;
+}
+
 function json(res: ServerResponse, status: number, body: unknown) {
     res.writeHead(status, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(body));
@@ -106,9 +127,18 @@ export async function handleAdminLinkMember(req: IncomingMessage, res: ServerRes
             const d = JSON.parse(body || '{}');
             let userId: string | null = typeof d.user_id === 'string' ? d.user_id : null;
             if (!userId && typeof d.email === 'string') {
-                const email = d.email.trim().toLowerCase();
-                const users = (await supabaseApi.select('users', { email }, { limit: 2 })) as any[];
-                if (users.length === 1) userId = users[0].id;
+                // KORREKTUR 2026-09-22: die Adresse wurde vorher in
+                // `public.users` gesucht. Dort steht ein frisch angelegter
+                // Login nicht — die Profilzeile entsteht erst, wenn jemand
+                // eine Gast-Sitzung uebernimmt (adoption.ts). Ein Anbieter,
+                // der nie den Assistenten benutzt hat, war damit per E-Mail
+                // unauffindbar, obwohl sein Konto existiert und er sich
+                // anmelden kann.
+                //
+                // Die Funktion liefert nur bei GENAU einem Treffer eine UUID
+                // (Migration 20260922010000) — dieselbe Regel wie vorher, nur
+                // jetzt in der Tabelle, in der die Logins wirklich liegen.
+                userId = await authUserIdByEmail(d.email);
             }
             if (!userId) {
                 json(res, 400, { errorCode: 'VALIDATION_ERROR', message: 'user_id or a known email required', correlationId });
