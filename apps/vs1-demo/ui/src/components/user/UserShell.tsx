@@ -21,6 +21,7 @@ import { fetchSessions, type SessionRowData } from '../../api/sessions';
 import { fetchDashboard } from '../../api/dashboard';
 import { fetchMyNotifications } from '../../api/notifications';
 import { Avatar } from '../ui/Avatar';
+import { initialsOf } from '../../lib/initials';
 
 // ─── UserShell ────────────────────────────────────────────────────────────────
 // The user App-Workspace frame (always dark slate), mirroring the Figma User
@@ -117,7 +118,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
   const { userName, user, session, logout } = useAuthStore();
   const displayName = userName || 'Alex Weber';
   const displaySub = user?.email || 'Acme GmbH';
-  const initials = displayName.split(/[\s._-]+/).map((p) => p[0]).join('').slice(0, 2).toUpperCase();
+  const initials = initialsOf(displayName);
   const base = `/${locale}`;
   // B16: workspace search drawer · C1: live sidebar badges (hidden in fixture mode).
   const [searchOpen, setSearchOpen] = useState(false);
