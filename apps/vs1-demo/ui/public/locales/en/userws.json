@@ -37,10 +37,10 @@
   },
   "shell": {
     "groupWorkspace": "Workspace",
+    "domainNews_one": "{{count}} update",
+    "domainNews_other": "{{count}} updates",
     "groupDomains": "Areas",
-    "groupLibrary": "Library",
-    "groupSaved": "Saved",
-    "groupMonitoring": "Monitoring",
+    "groupNewFeatures": "New features",
     "badgeSoon": "Soon",
     "navDashboard": "Dashboard",
     "navSessions": "Sessions",
@@ -53,9 +53,6 @@
     "navCalendar": "Calendar",
     "signOut": "Sign out",
     "search": "Search",
-    "sessionsToggle": "Expand or collapse sessions",
-    "sessionsAll_one": "All {{count}} session",
-    "sessionsAll_other": "All {{count}} sessions",
     "switchTo": "Go to"
   },
   "home": {

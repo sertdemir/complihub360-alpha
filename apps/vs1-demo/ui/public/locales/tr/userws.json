@@ -37,10 +37,10 @@
   },
   "shell": {
     "groupWorkspace": "Çalışma Alanı",
+    "domainNews_one": "{{count}} yeni gelişme",
+    "domainNews_other": "{{count}} yeni gelişme",
     "groupDomains": "Alanlar",
-    "groupLibrary": "Kitaplık",
-    "groupSaved": "Kaydedilenler",
-    "groupMonitoring": "İzleme",
+    "groupNewFeatures": "Yeni özellikler",
     "badgeSoon": "Yakında",
     "navDashboard": "Panel",
     "navSessions": "Oturumlar",
@@ -53,9 +53,6 @@
     "navCalendar": "Takvim",
     "signOut": "Oturumu kapat",
     "search": "Ara",
-    "sessionsToggle": "Oturumları aç veya kapat",
-    "sessionsAll_one": "{{count}} oturumun tümü",
-    "sessionsAll_other": "{{count}} oturumun tümü",
     "switchTo": "Şuraya git"
   },
   "home": {

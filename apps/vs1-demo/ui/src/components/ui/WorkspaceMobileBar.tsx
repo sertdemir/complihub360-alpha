@@ -4,6 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { NAV_GROUP_BADGE } from './AppShell';
 
 // ─── WorkspaceMobileBar ──────────────────────────────────────────────────────
 // The App-Workspace navigation below `lg`, once, for all three shells (user,
@@ -191,9 +192,7 @@ function MobilePanel({
                     {g.label}
                   </span>
                   {g.badge && (
-                    <span className="text-[10px] font-semibold uppercase tracking-wide text-fg-tertiary">
-                      {g.badge}
-                    </span>
+                    <span className={NAV_GROUP_BADGE}>{g.badge}</span>
                   )}
                 </div>
                 {g.items.map((it) => (
