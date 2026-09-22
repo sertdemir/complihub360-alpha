@@ -407,13 +407,121 @@ function patchSession(id: string, body: Record<string, unknown>) {
   return { ok: true, id, session: s ?? null };
 }
 
+
+// ─── Phase 2 · Onboarding und Verifikation ───────────────────────────────────
+// Ein Anbieter mitten in der Pruefung (Rueckfrage offen), damit Dossier,
+// Verification Center, Queue und Reviewer-Pruefung alle Zustaende zeigen.
+const SVC_PRIVACY = uuid(1, 7); const SVC_VAT = uuid(2, 7);
+const COV = { privDe: uuid(11, 7), privAt: uuid(12, 7), vatDe: uuid(13, 7), vatAt: uuid(14, 7) };
+const EV = { incorporation: uuid(21, 7), vat: uuid(22, 7), insurance: uuid(23, 7), licenceDe: uuid(24, 7) };
+const REQ_AT = uuid(31, 7);
+
+function p2Services() {
+  return [
+    { id: SVC_PRIVACY, service_code: 'data-privacy.notices', service_name: 'Datenschutz-Paket', description: 'Datenschutzerklärung, Cookie-Banner, AV-Verträge für Online-Shops.', pricing_model: 'project', price_min: 1200, price_max: 2400, currency: 'EUR', pricing_basis: 'je Paket', response_time_hours: 48, completion_days_estimate: 10, capacity_status: 'open', status: 'limited',
+      coverage: [
+        { id: COV.privDe, service_id: SVC_PRIVACY, country_code: 'DE', jurisdiction_code: null, status: 'approved', limitations: null, approved_at: iso(-1, 14, 5), expires_at: null },
+        { id: COV.privAt, service_id: SVC_PRIVACY, country_code: 'AT', jurisdiction_code: null, status: 'pending', limitations: null, approved_at: null, expires_at: null },
+      ] },
+    { id: SVC_VAT, service_code: 'tax-vat.returns', service_name: 'USt-Voranmeldungen', description: null, pricing_model: 'project', price_min: 350, price_max: 900, currency: 'EUR', pricing_basis: 'je Quartal', response_time_hours: 24, completion_days_estimate: 5, capacity_status: 'open', status: 'pending_verification',
+      coverage: [
+        { id: COV.vatDe, service_id: SVC_VAT, country_code: 'DE', jurisdiction_code: null, status: 'rejected', limitations: 'Die vorgelegte Zulassung gilt für Wirtschaftsprüfung, nicht Steuerberatung.', approved_at: null, expires_at: null },
+        { id: COV.vatAt, service_id: SVC_VAT, country_code: 'AT', jurisdiction_code: null, status: 'pending', limitations: null, approved_at: null, expires_at: null },
+      ] },
+  ];
+}
+function p2Checklist() {
+  return [
+    { type: 'incorporation', source: 'document', service_code: null, country_code: null, required_for_submit: true, state: 'reviewed', evidence_id: EV.incorporation },
+    { type: 'vat_id', source: 'registry_check', service_code: null, country_code: null, required_for_submit: true, state: 'reviewed', evidence_id: EV.vat },
+    { type: 'insurance', source: 'document', service_code: null, country_code: null, required_for_submit: true, state: 'received', evidence_id: EV.insurance },
+    { type: 'representative_identity', source: 'registry_check', service_code: null, country_code: null, required_for_submit: false, state: 'missing', evidence_id: null },
+    { type: 'professional_licence', source: 'document', service_code: 'tax-vat', country_code: 'DE', required_for_submit: false, state: 'rejected', evidence_id: EV.licenceDe },
+    { type: 'professional_licence', source: 'document', service_code: 'tax-vat', country_code: 'AT', required_for_submit: false, state: 'missing', evidence_id: null },
+  ];
+}
+function p2Evidence(admin = false) {
+  const rows = [
+    { id: EV.incorporation, evidence_type: 'incorporation', source: 'document', result: 'reviewed', original_name: 'HR-Auszug-2026.pdf', size_bytes: 1_240_000, upload_confirmed: true, uploaded_at: iso(-2, 16, 10), identifier: 'HRB 4711', expires_at: null, supports_countries: [], supports_service_codes: [], reviewer_notes: 'Auszug aktuell, Firma stimmt.', reviewed_at: iso(-1, 14, 0) },
+    { id: EV.vat, evidence_type: 'vat_id', source: 'registry_check', result: 'independently_verified', original_name: null, size_bytes: null, upload_confirmed: true, uploaded_at: null, identifier: 'DE123456789', expires_at: null, supports_countries: [], supports_service_codes: [], reviewer_notes: 'VIES valid', reviewed_at: iso(-2, 16, 20) },
+    { id: EV.insurance, evidence_type: 'insurance', source: 'document', result: 'received', original_name: 'Police-2027.pdf', size_bytes: 640_000, upload_confirmed: true, uploaded_at: iso(-2, 16, 30), identifier: null, expires_at: '2027-03-31', supports_countries: [], supports_service_codes: [], reviewer_notes: null, reviewed_at: null },
+    { id: EV.licenceDe, evidence_type: 'professional_licence', source: 'document', result: 'rejected', original_name: 'Zulassung-WP.pdf', size_bytes: 210_000, upload_confirmed: true, uploaded_at: iso(-2, 17, 0), identifier: null, expires_at: null, supports_countries: ['DE'], supports_service_codes: ['tax-vat'], reviewer_notes: 'Die Zulassung gilt für Wirtschaftsprüfung, nicht Steuerberatung.', reviewed_at: iso(-1, 14, 2) },
+  ];
+  return rows.map((r) => admin
+    ? { ...r, issuing_authority: null, covered_entity: 'Neue Kanzlei GmbH', registry_reference: r.source === 'registry_check' ? 'vies:DE:2026-09-21' : null, download_url: r.source === 'document' ? `https://storage.mock/signed/${r.original_name}?token=mock` : null, download_expires_in_sec: r.source === 'document' ? 600 : null }
+    : (({ reviewer_notes: _n, reviewed_at: _r, ...rest }) => rest)(r));
+}
+function p2Requests() {
+  return [{ id: REQ_AT, evidence_type: 'professional_licence', service_id: SVC_VAT, country_code: 'AT', message: 'Bitte die Zulassung zur Steuerberatung für Österreich nachreichen (Kammerbescheid oder Registerauszug).', status: 'open', requested_at: iso(-1, 14, 12) }];
+}
+function p2Agreements() {
+  return [
+    { agreement_type: 'provider_agreement', version: '2026-09', language: 'de', accepted_at: iso(-2, 15, 0), accepted_by_name: 'Anna Beispiel' },
+    { agreement_type: 'privacy_notice', version: '2026-09', language: 'de', accepted_at: iso(-2, 15, 1), accepted_by_name: 'Anna Beispiel' },
+    { agreement_type: 'billing_authorization', version: '2026-09', language: 'de', accepted_at: iso(-2, 15, 2), accepted_by_name: 'Anna Beispiel' },
+  ];
+}
+function p2History() {
+  const h = (n: number, subject: string, action: string, from: string | null, to: string | null, reason: string | null, actor: string, when: string) => ({ id: uuid(40 + n, 7), subject, subject_id: null, action, from, to, reason, actor_kind: actor, created_at: when });
+  return [
+    h(1, 'request', 'requested', null, 'professional_licence:AT', 'Bitte die Zulassung zur Steuerberatung für Österreich nachreichen.', 'reviewer', iso(-1, 14, 12)),
+    h(2, 'lifecycle', 'request_info', 'under_verification', 'more_info_required', 'Zulassung AT fehlt', 'reviewer', iso(-1, 14, 12)),
+    h(3, 'coverage', 'approve', 'pending', 'approved', null, 'reviewer', iso(-1, 14, 5)),
+    h(4, 'coverage', 'reject', 'pending', 'rejected', 'Die vorgelegte Zulassung gilt für Wirtschaftsprüfung, nicht Steuerberatung.', 'reviewer', iso(-1, 14, 2)),
+    h(5, 'lifecycle', 'transition', 'submitted', 'under_verification', null, 'reviewer', iso(-1, 13, 40)),
+    h(6, 'lifecycle', 'submitted', 'draft', 'submitted', null, 'provider', iso(-1, 9, 40)),
+    h(7, 'evidence', 'registry_check', null, 'independently_verified', 'VIES valid', 'provider', iso(-2, 16, 20)),
+  ];
+}
+function p2Provider() {
+  return { provider_key: 'dahlmann-cpa', name: 'Neue Kanzlei GmbH', website_url: 'https://neue-kanzlei.de', contact_email: 'verifizierung@neue-kanzlei.de', languages: ['de', 'en'], region: 'Hamburg', active_since: 2015, vat_id: 'DE123456789', vat_id_status: 'valid', vat_id_checked_at: iso(-2, 16, 20), billing_country: 'DE', work_mode: null, lifecycle_status: 'more_info_required', lifecycle_status_since: iso(-1, 14, 12), lifecycle_status_reason: 'Zulassung AT fehlt', billing_ready: false, billing_block_reasons: ['no_payment_method'] };
+}
+function p2Confidential() {
+  return { entity_type: 'GmbH', registration_number: 'HRB 4711 · Amtsgericht Hamburg', registered_address: 'Beispielweg 1, 20095 Hamburg', operating_address: null, tax_number: null, representative_name: 'Anna Beispiel', representative_title: 'Geschäftsführerin', insurance_provider: 'HDI', insurance_type: 'Berufshaftpflicht', insurance_valid_until: '2027-03-31' };
+}
+function p2Application() {
+  const missing = ['evidence.insurance'];
+  return { ok: true, provider: p2Provider(), confidential: p2Confidential(),
+    chapters: { account: { complete: true, missing: [] }, legal: { complete: true, missing: [] }, services: { complete: true, missing: [] }, evidence: { complete: false, missing }, agreements: { complete: true, missing: [] }, submit: { ready: false, missing } },
+    services: p2Services(), checklist: p2Checklist(), evidence: p2Evidence(), agreements: p2Agreements(), open_requests: p2Requests() };
+}
+function p2Matrix() {
+  return p2Services().map((s) => ({ service_id: s.id, service_code: s.service_code, service_name: s.service_name, status: s.status, cells: s.coverage.map((c) => ({ coverage_id: c.id, country_code: c.country_code, jurisdiction_code: c.jurisdiction_code, status: c.status, limitations: c.limitations, approved_at: c.approved_at, expires_at: c.expires_at })) }));
+}
+function p2Verification() {
+  const p = p2Provider();
+  return { ok: true, lifecycle: { status: p.lifecycle_status, since: p.lifecycle_status_since, reason: p.lifecycle_status_reason, reverification_due_at: null, grace_until: null }, matrix: p2Matrix(), checklist: p2Checklist(), open_requests: p2Requests(), history: p2History() };
+}
+function p2Gate() {
+  return { ok: false, missing: ['evidence.insurance', 'evidence.representative_identity', 'agreements.none', 'billing.not_ready', 'billing.no_payment_method'].filter((m) => m !== 'agreements.none'), target: 'limited', approved_cells: 1, total_cells: 4, allowance: null };
+}
+function p2Queue() {
+  const rows = [
+    { kind: 'application', provider_key: 'dahlmann-cpa', provider_name: 'Neue Kanzlei GmbH', lifecycle_status: 'more_info_required', since: iso(-3, 9, 40), due_at: null, risk: 'high', detail: 'tax-vat, data-privacy', ref_id: null },
+    { kind: 'application', provider_key: 'lex-iberia', provider_name: 'Lex Iberia Abogados', lifecycle_status: 'submitted', since: iso(-1, 11, 0), due_at: null, risk: 'high', detail: 'legal-advisory', ref_id: null },
+    { kind: 'change_request', provider_key: 'studio-bianchi', provider_name: 'Studio Bianchi', lifecycle_status: 'active', since: iso(0, 8, 0), due_at: plus(9 * H), risk: 'high', detail: 'licence', ref_id: uuid(51, 7) },
+    { kind: 'application', provider_key: 'packwise', provider_name: 'Packwise Compliance', lifecycle_status: 'under_verification', since: iso(-2, 10, 0), due_at: null, risk: 'medium', detail: 'product-packaging', ref_id: null },
+    { kind: 'application', provider_key: 'nordic-privacy', provider_name: 'Nordic Privacy Partners', lifecycle_status: 'submitted', since: plus(-5 * H), due_at: null, risk: 'medium', detail: 'data-privacy', ref_id: null },
+    { kind: 'reverification', provider_key: 'schmidt-partner', provider_name: 'Schmidt & Partner', lifecycle_status: 'reverification_due', since: iso(-4, 6, 0), due_at: iso(10, 6, 0), risk: 'low', detail: 'tax-vat', ref_id: null },
+    { kind: 'expiring_evidence', provider_key: 'madrid-tax', provider_name: 'Madrid Tax Advisors', lifecycle_status: 'active', since: iso(-30, 9, 0), due_at: iso(23, 0, 0).slice(0, 10), risk: 'low', detail: 'insurance', ref_id: uuid(52, 7) },
+  ];
+  return { ok: true, rows, counts: { total: rows.length, high: rows.filter((r) => r.risk === 'high').length, applications: rows.filter((r) => r.kind === 'application').length } };
+}
+function p2ReviewDossier(key: string) {
+  if (key !== 'dahlmann-cpa') return { __status: 404, errorCode: 'NOT_FOUND', message: 'Provider not found' };
+  const p = p2Provider();
+  return { ok: true, provider: p, confidential: p2Confidential(), has_dashboard_user: true, services: p2Services(), matrix: p2Matrix(), checklist: p2Checklist(), evidence: p2Evidence(true),
+    registry: { vat: { vat_id: p.vat_id, status: p.vat_id_status, checked_at: p.vat_id_checked_at } }, agreements: p2Agreements(), required_agreements: ['provider_agreement', 'privacy_notice', 'billing_authorization'],
+    open_requests: p2Requests(), gate: p2Gate(), history: p2History() };
+}
+
 function route(method: string, path: string, body: Record<string, unknown> = {}): unknown {
   const seg = path.split('/').filter(Boolean); // ['api','v1',...]
   const p = seg.slice(2);
   if (method === 'GET') {
     if (p[0] === 'dashboard') return dashboard();
     // Mock-Login = der Demo-Anbieter (echte API: provider_members, 20260922000000)
-    if (p[0] === 'me' && p[1] === 'provider') return { ok: true, provider_key: 'dahlmann-cpa', role: 'owner', name: 'Dahlmann CPA', lifecycle_status: 'active' };
+    if (p[0] === 'me' && p[1] === 'provider') return { ok: true, provider_key: 'dahlmann-cpa', role: 'owner', name: 'Dahlmann CPA', lifecycle_status: 'more_info_required' };
     if (p[0] === 'domain' && p[1]) return domainOverview(p[1]);
     if (p[0] === 'bookings') return { ok: true, bookings: bookings() };
     if (p[0] === 'requests') return { ok: true, requests: requests() };
@@ -421,6 +529,12 @@ function route(method: string, path: string, body: Record<string, unknown> = {})
     if (p[0] === 'sessions') return { ok: true, sessions: SESSIONS.map(({ open: _open, total: _total, severity: _severity, ...s }) => s) };
     if (p[0] === 'session' && p[2] === 'obligations') return obligations(p[1]);
     if (p[0] === 'engagement' && p.length === 2) return engagement(p[1]);
+    // Phase 2 · Onboarding: der Demo-Anbieter steckt in der Pruefung (Rueckfrage offen).
+    if (p[0] === 'provider' && p[2] === 'application') return p2Application();
+    if (p[0] === 'provider' && p[2] === 'verification') return p2Verification();
+    if (p[0] === 'admin' && p[1] === 'review' && p[2] === 'queue') return p2Queue();
+    if (p[0] === 'admin' && p[1] === 'review' && p[2] && p[3] === 'gate') return { ok: true, gate: p2Gate() };
+    if (p[0] === 'admin' && p[1] === 'review' && p[2] && !p[3]) return p2ReviewDossier(p[2]);
     if (p[0] === 'provider' && p[2] === 'detail') return providerDetail(p[1]);
     if (p[0] === 'provider' && p[2] === 'slots') return providerSlots();
     if (p[0] === 'provider' && p[2] === 'reviews') return providerReviews(p[1]);
@@ -434,6 +548,17 @@ function route(method: string, path: string, body: Record<string, unknown> = {})
   if (p[0] === 'session' && p[2] === 'duplicate') return duplicateSession(p[1], body);
   if (p[0] === 'session' && p.length === 2 && method === 'PATCH') return patchSession(p[1], body);
   if (p[0] === 'notifications' && p[1] === 'read') return { ok: true, marked: 3 };
+  // Phase 2 · schreibende Aufrufe: plausible Antworten, keine Aenderung am Datensatz.
+  if (p[0] === 'provider' && p[2] === 'services' && !p[3] && method === 'POST') return { ok: true, service: { id: uuid(99, 7), service_code: String(body.service_code ?? 'tax-vat'), service_name: String(body.service_name ?? 'Neue Leistung'), description: null, pricing_model: null, price_min: null, price_max: null, currency: null, pricing_basis: null, response_time_hours: null, completion_days_estimate: null, capacity_status: 'open', status: 'pending_verification', coverage: [] } };
+  if (p[0] === 'provider' && p[2] === 'services' && p[4] === 'coverage') return { ok: true, coverage: (Array.isArray(body.countries) ? body.countries : []).map((c, i) => ({ id: uuid(60 + i, 7), service_id: p[3], country_code: typeof c === 'string' ? c : (c as { country_code: string }).country_code, jurisdiction_code: null, status: 'pending', limitations: null, approved_at: null, expires_at: null })), added: [], removed: [], withdrawn: [] };
+  if (p[0] === 'provider' && p[2] === 'evidence' && p[3] === 'upload-url') return { ok: true, evidence_id: uuid(98, 7), file_ref: `dahlmann-cpa/${uuid(98, 7)}/${String(body.original_name ?? 'file.pdf')}`, upload: { url: '/api/v1/mock-upload', token: 'mock', method: 'PUT', headers: { 'Content-Type': String(body.mime_type ?? 'application/pdf') }, expiresAt: plus(2 * H) } };
+  if (p[0] === 'mock-upload') return { ok: true };
+  if (p[0] === 'provider' && p[2] === 'evidence' && p[4] === 'confirm') return { ok: true, evidence: { id: p[3], evidence_type: 'insurance', source: 'document', result: 'received', original_name: 'upload.pdf', size_bytes: 4321, upload_confirmed: true, uploaded_at: plus(0), identifier: null, expires_at: null, supports_countries: [], supports_service_codes: [] }, fulfilled_requests: [], lifecycle_status: 'more_info_required' };
+  if (p[0] === 'provider' && p[2] === 'evidence' && p[3] === 'registry') { const v = String(body.vat_id ?? '').toUpperCase().replace(/[^A-Z0-9]/g, ''); const valid = /^DE\d{9}$/.test(v); return { ok: true, evidence: { id: uuid(97, 7), evidence_type: 'vat_id', source: 'registry_check', result: valid ? 'independently_verified' : 'rejected', original_name: null, size_bytes: null, upload_confirmed: true, uploaded_at: null, identifier: v, expires_at: null, supports_countries: [], supports_service_codes: [] }, vat: { status: valid ? 'valid' : 'invalid', vat_id: v, country_code: v.slice(0, 2), name: valid ? 'Neue Kanzlei GmbH' : null, checked_at: plus(0) } }; }
+  if (p[0] === 'provider' && p[2] === 'submit') return { ok: false, __status: 422, errorCode: 'INCOMPLETE', message: 'A few things are still missing before we can review your application', missing: ['evidence.insurance'] };
+  if (p[0] === 'admin' && p[1] === 'review' && p[3] === 'lifecycle') return String(body.to) === 'active' || String(body.to) === 'limited' ? { __status: 422, errorCode: 'GATE_NOT_MET', message: 'Activation is not possible yet', gate: p2Gate() } : { ok: true, from: 'more_info_required', to: body.to, gate: null };
+  if (p[0] === 'admin' && p[1] === 'review' && p[3] === 'coverage') return String(body.action) === 'request_info' ? { ok: true, request: { ...p2Requests()[0], id: uuid(96, 7), country_code: 'AT' }, lifecycle_status: 'more_info_required' } : { ok: true, coverage: { id: p[4], status: body.action === 'approve' ? 'approved' : body.action === 'reject' ? 'rejected' : body.action === 'limit' ? 'limited' : body.action === 'pause' ? 'suspended' : 'pending' }, service_status: 'limited' };
+  if (p[0] === 'admin' && p[1] === 'review' && p[3] === 'request') return { ok: true, request: { ...p2Requests()[0], id: uuid(95, 7) }, lifecycle_status: 'more_info_required' };
   return { ok: true };
 }
 

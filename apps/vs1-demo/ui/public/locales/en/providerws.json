@@ -21,7 +21,17 @@
     "oooEndTitle": "End out of office?",
     "oooEndConsequence": "You go back to Available — new requests route to you again and SLA timers resume immediately.",
     "oooEndConfirm": "End out of office",
-    "switchTo": "Go to"
+    "switchTo": "Go to",
+    "navVerification": "Verification",
+    "applicationBanner": {
+      "draft": "Your application is still a draft. Complete the dossier so the review can start.",
+      "more_info_required": "The review team asked for one more piece of evidence. Your application keeps its place while you upload it.",
+      "submitted": "Your application is with the review team. You can follow every decision in the Verification Center.",
+      "cta": {
+        "application": "To the dossier",
+        "verification": "Verification Center"
+      }
+    }
   },
   "bell": {
     "aria": "Notifications",
@@ -462,99 +472,277 @@
     "errorTitle": "Submission failed",
     "errorBody": "The package could not be submitted. Check your intake link or try again — or contact partners@complihub360.com."
   },
-  "onboarding": {
-    "steps": {
-      "contact": "Contact",
-      "coverage": "Coverage",
-      "listing": "Listing"
+  "application": {
+    "title": "Application",
+    "subtitle": "Your dossier for verification: account, legal entity, services per country, evidence and agreements. You can always see what is still missing.",
+    "navHint": "Your application is reviewed only once you submit it. Until then you can change every chapter at any time.",
+    "loading": "Loading your dossier …",
+    "loadError": "We could not load your dossier right now. Please try again in a moment.",
+    "save": "Save",
+    "saving": "Saving …",
+    "saved": "Saved",
+    "saveError": "Saving did not work. Nothing was lost — please try again.",
+    "chapter": {
+      "account": "Account",
+      "legal": "Legal entity & representation",
+      "services": "Services & countries",
+      "evidence": "Evidence",
+      "agreements": "Agreements",
+      "submit": "Submit"
     },
-    "stepSubs": {
-      "contact": "Contact person and reply inbox",
-      "coverage": "Countries, languages, areas, SLA target",
-      "listing": "Your public profile"
+    "state": {
+      "complete": "Complete",
+      "open": "Open",
+      "ready": "Ready",
+      "notReady": "Not yet possible"
     },
-    "welcome": {
-      "eyebrow": "Welcome to CompliHub360",
-      "titlePre": "Before the first dossiers arrive: ",
-      "titleGold": "your profile",
-      "titlePost": ".",
-      "body": "Your application is vetted, your access is live. For the matching to find you and clients to see you listed, we need three things:",
-      "cta": "Complete your profile",
-      "note": "Takes about 5 minutes. What you enter here decides which dossiers reach you."
+    "account": {
+      "name": "Company name",
+      "email": "Contact email",
+      "website": "Website",
+      "languages": "Languages (comma-separated)",
+      "region": "Region"
     },
-    "contact": {
-      "title": "Who answers — and where?",
-      "lead": "Check the inbox especially: that is where the dossiers go.",
-      "name": "Contact person",
-      "namePh": "Your name",
-      "inbox": "Reply inbox",
-      "inboxHint": "Dossiers and magic links go here — the inbox your team actually reads.",
-      "firm": "Firm / company",
-      "website": "Website"
+    "legal": {
+      "note": "Only our review team sees these details. They never appear on your card.",
+      "entityType": "Legal form",
+      "registrationNumber": "Registration number",
+      "registeredAddress": "Registered address",
+      "representative": "Authorised representative",
+      "representativeTitle": "Role",
+      "insuranceProvider": "Insurance provider",
+      "insuranceValidUntil": "Insurance valid until"
     },
-    "coverage": {
-      "title": "What you cover",
-      "lead": "The matching shows you only dossiers from this selection.",
-      "countries": "Countries",
-      "langs": "Languages",
-      "areas": "Practice areas",
-      "sla": "Your SLA target",
-      "slaDefault": "Confirm in 24h · reply in 48h",
-      "slaFast": "Faster: 12h / 24h"
+    "services": {
+      "intro": "Each service is a stem; the countries below it are the markets you request approval for. New countries start as “requested” and are reviewed per country.",
+      "add": "Add service",
+      "addCountry": "Add country",
+      "countryPlaceholder": "ISO-2, e.g. AT",
+      "codePlaceholder": "Service code, e.g. tax-vat.returns",
+      "namePlaceholder": "Service name",
+      "licenceHint": "For tax and legal advice the review requires a licence per country.",
+      "allowanceHint": "Allowance: your plan is not chosen yet. The number of main categories is checked against the plan when activating, not now.",
+      "allowanceError": "Your plan covers fewer main categories than this would need.",
+      "pricingModel": "Pricing model",
+      "priceRange": "Price range",
+      "responseTime": "Response time",
+      "capacity": "Capacity",
+      "countries": "{{count}} countries",
+      "colCountry": "Country",
+      "colJurisdiction": "Jurisdiction",
+      "colStatus": "Status",
+      "colNote": "Note from the review team",
+      "wholeCountry": "whole country",
+      "remove": "Remove",
+      "retire": "Retire",
+      "empty": "No services yet. Add the first one — the review starts with what you list here.",
+      "status": {
+        "draft": "Draft",
+        "pending_verification": "Requested for review",
+        "approved": "Approved",
+        "limited": "Partly approved",
+        "paused": "Paused",
+        "retired": "Retired"
+      }
     },
-    "listing": {
-      "title": "Your public profile",
-      "lead": "This is how you appear in the matching. Gold fields are optional — and count in the ranking.",
-      "displayName": "Public display name",
-      "shortDesc": "Short description",
-      "shortDescPh": "What you help clients with, in one or two sentences.",
-      "credentials": "Admission / profession",
-      "credentialsPh": "e.g. Attorney (DE) · Certified IT law specialist",
-      "certs": "Certifications",
-      "certsPh": "e.g. ISO 27001 Lead Auditor",
-      "activeSince": "Active since",
-      "teamSize": "Team size"
+    "coverageStatus": {
+      "pending": "Requested",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "limited": "Limited",
+      "suspended": "Suspended",
+      "expired": "Expired"
     },
-    "done": {
-      "titlePre": "You are ",
-      "titleEm": "listed",
-      "titlePost": ".",
-      "lead": "Your profile is live. What happens now:",
-      "dossier": "When a dossier matches your coverage, it arrives in your reply inbox via magic link.",
-      "sla": "Your confirmation stops the SLA timer — your response times apply from now on.",
-      "rank": "Complete the gold fields whenever you like — they count in the ranking.",
-      "meterLabel": "Profile {{pct}}% complete",
-      "cta": "To the dashboard"
+    "evidence": {
+      "intro": "The list follows from your services and countries — it is the same for every provider with the same services. Documents go straight into our protected storage; a VAT ID is checked in the registry, without a document.",
+      "type": {
+        "incorporation": "Commercial register extract",
+        "vat_id": "VAT ID (registry check)",
+        "insurance": "Professional liability insurance",
+        "representative_identity": "Authorised representative",
+        "professional_licence": "Professional licence"
+      },
+      "scopeAccount": "Account",
+      "scopeDocument": "Document",
+      "scopeRegistry": "Registry",
+      "state": {
+        "missing": "Missing",
+        "uploading": "Uploading",
+        "received": "Received",
+        "reviewed": "Verified",
+        "rejected": "Rejected",
+        "expired": "Expired"
+      },
+      "upload": "Upload",
+      "replace": "Replace",
+      "uploadHint": "PDF, PNG or JPEG up to 20 MB.",
+      "uploadError": "The upload did not work. Nothing was saved — please try again.",
+      "checkRegistry": "Check in registry",
+      "vatPlaceholder": "e.g. DE123456789",
+      "registryHint": "We store the result, not a document.",
+      "registryValid": "Confirmed in the registry",
+      "registryInvalid": "Not found in the registry — please check the number.",
+      "registryUnavailable": "The registry is not reachable right now. The review team will decide on the document.",
+      "reviewerHint": "Decided by the review team on the register extract — no upload needed.",
+      "licenceHint": "Needed before activation, not before submitting.",
+      "uploadedOn": "uploaded {{date}}"
     },
-    "rankBadge": "boosts your ranking",
-    "back": "Back",
-    "next": "Next",
-    "activate": "Activate profile",
-    "languages": {
-      "de": "German",
-      "en": "English",
-      "fr": "French",
-      "nl": "Dutch",
-      "es": "Spanish",
-      "tr": "Turkish"
+    "agreements": {
+      "intro": "Every acceptance is recorded with version, language, name and role. A new version replaces the old one but does not delete it — the state at the time of a booking remains verifiable.",
+      "doc": {
+        "provider_agreement": "Provider agreement",
+        "privacy_notice": "Privacy notice for providers",
+        "billing_authorization": "Billing authorisation",
+        "commercial_terms": "Commercial terms"
+      },
+      "version": "Version {{version}} · {{language}}",
+      "acceptedOn": "Accepted on {{date}} by {{name}}",
+      "notAccepted": "Not yet accepted.",
+      "billingNote": "It allows us to charge subscription and lead fees to the payment method on file.",
+      "open": "Open document",
+      "accept": "Read and accept",
+      "acceptTitle": "Accept {{doc}}",
+      "nameLabel": "Your name",
+      "titleLabel": "Your role",
+      "confirm": "Accept version {{version}}",
+      "cancel": "Cancel"
     },
-    "areas": {
-      "taxVat": "Tax & VAT",
-      "productPackaging": "EPR & Packaging",
-      "dataPrivacy": "Data & Privacy",
-      "marketingSeo": "Marketing",
-      "corporateStructure": "Company Setup & Filings",
-      "productCompliance": "Product compliance",
-      "logisticsCustoms": "Logistics & Customs",
-      "legalAdvisory": "Legal support"
+    "submit": {
+      "missingTitle": "Still missing",
+      "readyTitle": "Ready",
+      "cta": "Submit application",
+      "note": "After submitting, a person reviews your dossier. You can see the status at any time in the Verification Center; questions come by email and there.",
+      "licenceNote": "Licences per country can follow after submitting — the review team requests them per country if they are still missing.",
+      "done": "Submitted. A person will now review your dossier.",
+      "notSubmittable": "An application in this status cannot be submitted.",
+      "ready": {
+        "accountLegal": "Account and legal entity complete",
+        "services": "{{services}} services in {{countries}} countries",
+        "evidence": "Register extract, insurance, VAT ID",
+        "agreements": "{{done}} of {{total}} agreements"
+      }
     },
+    "missing": {
+      "account": {
+        "name": "Company name",
+        "contact_email": "Contact email"
+      },
+      "legal": {
+        "entity_type": "Legal form",
+        "registration_number": "Registration number",
+        "registered_address": "Registered address",
+        "representative_name": "Authorised representative"
+      },
+      "services": {
+        "none": "At least one service",
+        "no_country": "At least one country per service"
+      },
+      "evidence": {
+        "incorporation": "Evidence: commercial register extract",
+        "vat_id": "Evidence: VAT ID registry check",
+        "insurance": "Evidence: professional liability insurance",
+        "representative_identity": "Evidence: authorised representative",
+        "professional_licence": "Evidence: professional licence"
+      },
+      "agreements": {
+        "provider_agreement": "Agreement: provider agreement",
+        "privacy_notice": "Agreement: privacy notice",
+        "billing_authorization": "Agreement: billing authorisation"
+      }
+    }
+  },
+  "verification": {
+    "title": "Verification Center",
+    "subtitle": "Approvals per service and country, open requests and the decisions about your account.",
+    "loading": "Loading …",
+    "loadError": "We could not load the verification status right now.",
     "banner": {
-      "text": "Profile {{pct}}% complete — incomplete profiles rank further down.",
-      "cta": "Complete your profile",
-      "dismiss": "Hide for this session",
-      "dismissTitle": "Hide — returns on your next visit until the profile is complete"
+      "title": "The review team needs one more piece of evidence",
+      "cta": "To the dossier · Evidence"
     },
-    "deferLabel": "Close — continue later",
-    "deferTitle": "Closes onboarding for this session. Your entries are kept; the banner above leads back."
+    "requestFor": "For {{country}}",
+    "stat": {
+      "status": "Account status",
+      "approvals": "Approvals",
+      "approvalsHint": "cells service × country approved",
+      "evidence": "Evidence",
+      "evidenceHint": "verified",
+      "requests": "Open requests",
+      "since": "since {{date}}"
+    },
+    "lifecycle": {
+      "draft": "Draft",
+      "submitted": "Submitted",
+      "more_info_required": "Evidence requested",
+      "under_verification": "Under review",
+      "approved_pending_activation": "Approved · activation pending",
+      "active": "Active",
+      "limited": "Active with limits",
+      "reverification_due": "Re-verification due",
+      "paused": "Paused",
+      "suspended": "Suspended",
+      "terminated": "Closed"
+    },
+    "lifecycleHint": {
+      "more_info_required": "goes back into review automatically once you upload",
+      "submitted": "a person will review your dossier",
+      "under_verification": "your dossier is being reviewed",
+      "reverification_due": "until {{date}} you stay visible; please renew the evidence"
+    },
+    "matrix": {
+      "title": "Approvals per service and country",
+      "intro": "Each cell is decided on its own. Approved cells are visible to businesses as soon as your account is active — even if other cells are still open.",
+      "service": "Service",
+      "empty": "No services listed yet."
+    },
+    "cell": {
+      "approved": "Approved",
+      "limited": "Limited",
+      "pending": "Requested",
+      "requested": "Evidence requested",
+      "rejected": "Rejected",
+      "suspended": "Suspended",
+      "expired": "Expired",
+      "sinceDate": "Since {{date}}",
+      "inReview": "In review"
+    },
+    "checklist": {
+      "title": "Evidence"
+    },
+    "history": {
+      "title": "Decisions",
+      "intro": "What was decided and why — not by whom.",
+      "actor": {
+        "reviewer": "Review team",
+        "provider": "You",
+        "system": "System"
+      },
+      "empty": "No decisions yet."
+    },
+    "action": {
+      "requested": "Evidence requested",
+      "fulfilled": "Request fulfilled",
+      "withdrawn": "Request withdrawn",
+      "approve": "Approved",
+      "limit": "Limited",
+      "reject": "Rejected",
+      "pause": "Paused",
+      "reopen": "Reopened",
+      "request_info": "Evidence requested",
+      "transition": "Status changed",
+      "submitted": "Application submitted",
+      "requests_fulfilled": "Back into review",
+      "registry_check": "Registry check",
+      "decide": "Evidence decided",
+      "expired": "Evidence expired",
+      "reverification_due": "Re-verification due",
+      "created": "Service added",
+      "updated": "Service updated",
+      "deleted": "Service removed",
+      "retired": "Service retired",
+      "countries_set": "Countries changed",
+      "status_from_coverage": "Service status updated",
+      "legal_fields_changed": "Legal details changed"
+    }
   }
 }
