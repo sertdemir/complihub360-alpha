@@ -84,6 +84,16 @@ Die Privacy-Architektur ist deterministisch und der AI immer vorgelagert. Detail
   Sektionen je drei Varianten in EINEM Canvas abbilden — nicht Sektion für
   Sektion nachliefern. Der Nutzer geht dann alles in einem Durchgang durch und
   nennt seine Wahl je Sektion; erst danach wird ausgerollt.
+- **UI-Workflow** (Festlegung 2026-09-22): Neue Screens und Komponenten
+  entstehen in dieser Reihenfolge, keine Stufe wird übersprungen:
+  1. **Canvas der Session** (Artifact) zum Bearbeiten und Anpassen — nach
+     dem Redesign-Workflow oben, bis der Nutzer abnimmt.
+  2. **Figma**: erst nach der Abnahme den finalen Screen aufbauen, mit
+     Compass-Komponenten und -Variablen.
+  3. **Lokal** ausrollen (Feature-Branch, `npm run dev:ui`, Screenshots) —
+     dann Review durch den Nutzer.
+  4. **Staging** erst nach diesem Review.
+  Backend-Anteile dürfen parallel zu 1–2 entstehen; der UI-Rollout wartet.
 
 ## Ansprache
 

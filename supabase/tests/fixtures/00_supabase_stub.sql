@@ -29,3 +29,33 @@ CREATE OR REPLACE FUNCTION auth.uid() RETURNS uuid
 
 CREATE OR REPLACE FUNCTION auth.jwt() RETURNS jsonb
   LANGUAGE sql STABLE AS $$ SELECT '{}'::jsonb $$;
+
+-- ─── Die Rollen, mit denen der Browser spricht ──────────────────────────────
+--
+-- Supabase legt `anon` und `authenticated` an und gibt ihnen per Default-
+-- Privileges ALLE Rechte auf jede neue Tabelle und View in `public`. Was sie
+-- dann noch sehen, entscheidet allein RLS — und bei Views, die ohne
+-- security_invoker laufen, nicht einmal das: die pruefen gegen den Owner.
+--
+-- Ohne diese Nachbildung koennte kein Test sagen, was der oeffentliche Key
+-- wirklich lesen kann. Mit ihr laesst sich `SET ROLE anon` fahren und zaehlen.
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
+    CREATE ROLE anon NOLOGIN NOINHERIT;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
+    CREATE ROLE authenticated NOLOGIN NOINHERIT;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'service_role') THEN
+    CREATE ROLE service_role NOLOGIN NOINHERIT BYPASSRLS;
+  END IF;
+END $$;
+
+GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
+GRANT USAGE ON SCHEMA auth   TO anon, authenticated, service_role;
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA auth TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES    TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON FUNCTIONS TO anon, authenticated, service_role;

@@ -6,7 +6,6 @@ import { Button } from '../../components/ui/Button';
 import { Drawer } from '../../components/ui/Drawer';
 import { useApiData } from '../../lib/useApiData';
 import { fetchProviderBookings, submitReview, type BookingStatus } from '../../api/bookings';
-import { DEMO_PROVIDER_KEY } from '../../api/provider';
 
 // ─── Provider · Termine & Leads ──────────────────────────────────────────────
 // Matchmaking v2: the booking IS the paid lead. The dossier (user identity +
@@ -40,7 +39,7 @@ export function LeadsPage() {
   const { data: rows } = useApiData<Row[]>(async () => {
     const df = new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
     const tf = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' });
-    return (await fetchProviderBookings(DEMO_PROVIDER_KEY)).map((b) => {
+    return (await fetchProviderBookings()).map((b) => {
       const start = new Date(b.slotStart); const end = b.slotEnd ? new Date(b.slotEnd) : null;
       return {
         id: b.id,
@@ -62,7 +61,7 @@ export function LeadsPage() {
   const rateLead = (r: Row) => {
     if (leadRating < 1) return;
     setLeadRated((s) => new Set(s).add(r.id));
-    submitReview({ bookingId: r.id, providerKey: DEMO_PROVIDER_KEY, fromRole: 'provider', rating: leadRating, categories: [] }).catch(() => {});
+    submitReview({ bookingId: r.id, fromRole: 'provider', rating: leadRating, categories: [] }).catch(() => {});
   };
   const upcoming = rows.filter((r) => r.status === 'confirmed');
   const past = rows.filter((r) => r.status !== 'confirmed');

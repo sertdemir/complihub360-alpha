@@ -1,5 +1,5 @@
 import { apiFetch } from './client';
-import { DEMO_PROVIDER_KEY } from './provider';
+import { myProviderKey } from './provider';
 
 // ─── Billing API (wiring map B7) ─────────────────────────────────────────────
 // Invoice history + line items. Stripe becomes the issuer once C3 lands; the
@@ -32,8 +32,8 @@ export function euro(cents: number): string {
   return '€' + (cents / 100).toLocaleString('en-IE', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 }
 
-export async function fetchInvoices(providerKey: string = DEMO_PROVIDER_KEY): Promise<Invoice[]> {
-  const res = await apiFetch<{ ok: boolean; invoices: Invoice[] }>(`/api/v1/provider/${providerKey}/invoices`);
+export async function fetchInvoices(providerKey?: string): Promise<Invoice[]> {
+  const res = await apiFetch<{ ok: boolean; invoices: Invoice[] }>(`/api/v1/provider/${providerKey ?? await myProviderKey()}/invoices`);
   return res.invoices;
 }
 
@@ -49,16 +49,16 @@ export interface BillingPreview {
   total_cents: number;
 }
 
-export async function fetchBillingPreview(providerKey: string = DEMO_PROVIDER_KEY): Promise<BillingPreview> {
-  return apiFetch<BillingPreview & { ok: boolean }>(`/api/v1/provider/${providerKey}/billing/preview`);
+export async function fetchBillingPreview(providerKey?: string): Promise<BillingPreview> {
+  return apiFetch<BillingPreview & { ok: boolean }>(`/api/v1/provider/${providerKey ?? await myProviderKey()}/billing/preview`);
 }
 
 // ─── Stripe billing portal (wiring map C3) ───────────────────────────────────
 // Resolves to the portal URL, or 'not-configured' while STRIPE_SECRET_KEY is
 // missing on the API (503) — the page shows an honest note instead of a dead end.
-export async function openBillingPortal(providerKey: string = DEMO_PROVIDER_KEY): Promise<string | 'not-configured'> {
+export async function openBillingPortal(providerKey?: string): Promise<string | 'not-configured'> {
   try {
-    const res = await apiFetch<{ ok: boolean; url: string }>(`/api/v1/provider/${providerKey}/billing-portal`, {
+    const res = await apiFetch<{ ok: boolean; url: string }>(`/api/v1/provider/${providerKey ?? await myProviderKey()}/billing-portal`, {
       method: 'POST',
       body: '{}',
     });

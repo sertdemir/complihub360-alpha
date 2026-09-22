@@ -1,10 +1,38 @@
 import { apiFetch } from './client';
+import { getAccessToken } from '../lib/supabase';
 
 // ─── Provider profile API (wiring map B5) ────────────────────────────────────
-// Coverage read + market add. The demo workspace acts as 'dahlmann-cpa' until
-// real provider auth lands (B8).
+// Coverage read + market add.
 
-export const DEMO_PROVIDER_KEY = 'dahlmann-cpa';
+// ─── Welcher Anbieter bin ich? ───────────────────────────────────────────────
+// Bis 2026-09-22 war der ganze Workspace fest auf 'dahlmann-cpa' verdrahtet —
+// jeder Partner-Login sah und aenderte denselben Anbieter. Jetzt fragt die UI
+// die API (GET /api/v1/me/provider, Grundlage provider_members) und nimmt den
+// Anbieter, der zu DIESEM Login gehoert. Gehoert der Login zu keinem, wirft
+// der Aufruf — die Seiten zeigen dann ihren Leerzustand statt fremder Daten.
+//
+// Ein Demo-Anbieter ohne Zuordnung nur noch explizit fuer die lokale
+// Entwicklung: VITE_DEMO_PROVIDER_KEY=dahlmann-cpa. Der Mock-Modus
+// (VITE_MOCK_API=1) liefert /me/provider selbst.
+
+let resolved: { token: string | null; key: Promise<string> } | null = null;
+
+export async function myProviderKey(): Promise<string> {
+  const token = await getAccessToken();
+  // Pro Login cachen: meldet sich jemand anderes an, gilt der alte Schluessel nicht.
+  if (!resolved || resolved.token !== token) {
+    const key = apiFetch<{ ok: boolean; provider_key: string }>('/api/v1/me/provider')
+      .then((r) => r.provider_key)
+      .catch((err: unknown) => {
+        resolved = null;
+        const demo = import.meta.env.DEV ? (import.meta.env.VITE_DEMO_PROVIDER_KEY as string | undefined) : undefined;
+        if (demo) return demo;
+        throw err;
+      });
+    resolved = { token, key };
+  }
+  return resolved.key;
+}
 
 export interface ProviderCoverage {
   provider_key: string;
@@ -25,16 +53,18 @@ export function broadcastAvailability(status: 'available' | 'ooo') {
   window.dispatchEvent(new CustomEvent(AVAILABILITY_EVENT, { detail: status }));
 }
 
-export async function setAvailability(status: 'available' | 'ooo', providerKey: string = DEMO_PROVIDER_KEY): Promise<void> {
-  await apiFetch(`/api/v1/provider/${providerKey}/availability`, {
+export async function setAvailability(status: 'available' | 'ooo', providerKey?: string): Promise<void> {
+  const key = providerKey ?? await myProviderKey();
+  await apiFetch(`/api/v1/provider/${key}/availability`, {
     method: 'PATCH',
     body: JSON.stringify({ status }),
   });
   broadcastAvailability(status);
 }
 
-export async function fetchCoverage(providerKey: string = DEMO_PROVIDER_KEY): Promise<ProviderCoverage> {
-  const res = await apiFetch<{ ok: boolean; coverage: ProviderCoverage }>(`/api/v1/provider/${providerKey}/coverage`);
+export async function fetchCoverage(providerKey?: string): Promise<ProviderCoverage> {
+  const key = providerKey ?? await myProviderKey();
+  const res = await apiFetch<{ ok: boolean; coverage: ProviderCoverage }>(`/api/v1/provider/${key}/coverage`);
   return res.coverage;
 }
 
@@ -53,16 +83,16 @@ export interface MatchmakingProfile {
   active_since: number | null;
 }
 
-export async function updateMatchmakingProfile(patch: Partial<MatchmakingProfile>, providerKey: string = DEMO_PROVIDER_KEY): Promise<void> {
-  await apiFetch(`/api/v1/provider/${providerKey}/profile`, {
+export async function updateMatchmakingProfile(patch: Partial<MatchmakingProfile>, providerKey?: string): Promise<void> {
+  await apiFetch(`/api/v1/provider/${providerKey ?? await myProviderKey()}/profile`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(patch),
   });
 }
 
-export async function addMarket(country: string, providerKey: string = DEMO_PROVIDER_KEY): Promise<string[]> {
-  const res = await apiFetch<{ ok: boolean; countries_supported: string[] }>(`/api/v1/provider/${providerKey}/coverage`, {
+export async function addMarket(country: string, providerKey?: string): Promise<string[]> {
+  const res = await apiFetch<{ ok: boolean; countries_supported: string[] }>(`/api/v1/provider/${providerKey ?? await myProviderKey()}/coverage`, {
     method: 'PATCH',
     body: JSON.stringify({ add_country: country }),
   });

@@ -4,7 +4,7 @@ import { MailCheck } from 'lucide-react';
 import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
 import { apiFetch } from '../../api/client';
-import { DEMO_PROVIDER_KEY } from '../../api/provider';
+import { myProviderKey } from '../../api/provider';
 
 // ─── Change-Email drawer (Figma 2652:234 · wiring map B8) ────────────────────
 // Verify-first: a single-use link (1h) goes to the NEW address; the change
@@ -30,7 +30,7 @@ export function ChangeEmailDrawer({ open, currentEmail, onClose }: ChangeEmailDr
   const submit = async () => {
     setBusy(true); setError('');
     try {
-      await apiFetch(`/api/v1/provider/${DEMO_PROVIDER_KEY}/change-email`, {
+      await apiFetch(`/api/v1/provider/${await myProviderKey()}/change-email`, {
         method: 'POST',
         body: JSON.stringify({ new_email: email.trim() }),
       });
