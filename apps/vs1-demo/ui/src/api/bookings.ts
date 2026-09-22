@@ -1,3 +1,4 @@
+import { myProviderKey } from './provider';
 import { apiFetch } from './client';
 
 // ─── Bookings (Termine) — user side ──────────────────────────────────────────
@@ -65,8 +66,9 @@ export interface ProviderBooking {
   message: string | null;
 }
 
-export async function fetchProviderBookings(providerKey: string): Promise<ProviderBooking[]> {
-  const res = await apiFetch<{ ok: boolean; bookings: Array<{ id: string; slot_start: string; slot_end: string | null; status: BookingStatus; lead_charged: boolean; user_email: string | null; message: string | null }> }>(`/api/v1/provider/${providerKey}/bookings`);
+export async function fetchProviderBookings(providerKey?: string): Promise<ProviderBooking[]> {
+  const key = providerKey ?? await myProviderKey();
+  const res = await apiFetch<{ ok: boolean; bookings: Array<{ id: string; slot_start: string; slot_end: string | null; status: BookingStatus; lead_charged: boolean; user_email: string | null; message: string | null }> }>(`/api/v1/provider/${key}/bookings`);
   return (res.bookings || []).map((b) => ({
     id: b.id,
     slotStart: b.slot_start,
@@ -146,8 +148,10 @@ export async function createBooking(providerKey: string, slotStart: string, mess
 
 // ─── Reviews (two-sided, v2 §2 of the alerts concept) ────────────────────────
 export interface ReviewSubmission {
-  bookingId?: string;
-  providerKey: string;
+  // Pflicht seit 2026-09-22: die API nimmt nur Bewertungen aus einer
+  // gehaltenen Buchung an und liest den Anbieter aus ihr, nicht aus dem Body.
+  bookingId: string;
+  providerKey?: string;
   fromRole: 'user' | 'provider';
   rating: number;         // 1–5
   categories: string[];
@@ -159,8 +163,7 @@ export async function submitReview(r: ReviewSubmission): Promise<void> {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      booking_id: r.bookingId ?? null,
-      provider_key: r.providerKey,
+      booking_id: r.bookingId,
       from_role: r.fromRole,
       rating: r.rating,
       categories: r.categories,

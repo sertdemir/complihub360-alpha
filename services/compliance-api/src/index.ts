@@ -18,6 +18,7 @@ import { handleBillingRun, handleBillingPreview, syncOpenInvoices } from "./bill
 import { checkVatId } from "./vies.js";
 import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
 import { buildCockpit } from "./cockpit.js";
+import { ownProviderRouteKey, canAccessProvider, handleMeProvider, handleAdminLinkMember } from "./providerAuth.js";
 import { redactText } from "@complihub360/redaction";
 
 // P0 #1: shared magic-link verification — SHA-256 hash lookup, engagement +
@@ -35,7 +36,9 @@ async function verifyAndBurnMagicToken(engagementId: string, action: 'confirm' |
 
 // Security Hardening: Rate limiting state
 const ipRateLimits = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT_MAX = 100;
+// Per env ueberschreibbar, damit die In-Process-Tests (alle von 127.0.0.1)
+// nicht ab dem hundertsten Request an ihrem eigenen Limit scheitern.
+const RATE_LIMIT_MAX = Number(process.env.RATE_LIMIT_MAX) || 100;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 
 // Start Background Critical Flow Monitor
@@ -210,6 +213,35 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     if (req.method === 'GET' && req.url === '/ready') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ status: "ready" }));
+        return;
+    }
+
+    // Ownership: Anbieter-eigene Routen nur fuer Mitglieder (providerAuth.ts).
+    // Einmal hier statt in jedem Handler — eine neue Route unter dem Pfad ist
+    // damit von Anfang an geschuetzt. 404 statt 403 fuer Fremde, damit die
+    // Antwort nicht verraet, welche Anbieter-Schluessel es gibt.
+    const ownKey = ownProviderRouteKey(req.url);
+    if (ownKey) {
+        const allowed = await canAccessProvider(
+            { userId: authUserId, isAdmin: authIsAdmin, viaApiKey: authViaApiKey }, ownKey,
+        ).catch(() => false);
+        if (!allowed) {
+            res.setHeader('x-correlation-id', correlationId);
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId }));
+            return;
+        }
+    }
+
+    if (req.method === 'GET' && req.url === '/api/v1/me/provider') {
+        await handleMeProvider(res, correlationId, authUserId);
+        return;
+    }
+
+    const linkMatch = /^\/api\/v1\/admin\/provider\/([a-z0-9-]+)\/member$/.exec(req.url || '');
+    if (req.method === 'POST' && linkMatch) {
+        await handleAdminLinkMember(req, res, correlationId,
+            { userId: authUserId, isAdmin: authIsAdmin, viaApiKey: authViaApiKey }, linkMatch[1]);
         return;
     }
 
@@ -1154,33 +1186,64 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     const d = JSON.parse(revBody || '{}');
                     const fromRole = d.from_role === 'provider' ? 'provider' : 'user';
                     const rating = typeof d.rating === 'number' ? Math.max(0, Math.min(5, d.rating)) : null;
-                    if (!d.provider_key || rating === null) {
+                    // Bewertungen tragen 0.3 des Ranking-Scores. Bis 2026-09-22
+                    // nahm diese Route jede Bewertung ohne Buchung an und
+                    // stempelte sie `verified: true` — damit war das Ranking
+                    // kaeuflich per Fake-Account. Jetzt: nur aus einer echten,
+                    // bereits stattgefundenen Buchung, nur von deren Beteiligten,
+                    // einmal je Seite. Der Anbieter kommt aus der Buchung, nie
+                    // aus dem Body.
+                    if (typeof d.booking_id !== 'string' || !d.booking_id || rating === null) {
                         res.writeHead(400, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'provider_key and rating required', correlationId }));
+                        res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'booking_id and rating required', correlationId }));
                         return;
                     }
+                    const booking = ((await supabaseApi.select('scheduling', { id: d.booking_id }, { limit: 1 })) as any[])[0];
+                    const beteiligt = booking && (fromRole === 'user'
+                        ? (authViaApiKey || booking.user_id === authUserId)
+                        : await canAccessProvider({ userId: authUserId, isAdmin: authIsAdmin, viaApiKey: authViaApiKey }, booking.provider_key));
+                    if (!booking || !beteiligt) {
+                        res.writeHead(404, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Booking not found', correlationId }));
+                        return;
+                    }
+                    const stattgefunden = booking.status !== 'cancelled'
+                        && (booking.status === 'completed' || (booking.slot_start && new Date(booking.slot_start).getTime() <= Date.now()));
+                    if (!stattgefunden) {
+                        res.writeHead(409, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ errorCode: 'BOOKING_NOT_HELD', message: 'Reviews are possible after the consultation took place', correlationId }));
+                        return;
+                    }
+                    const schon = (await supabaseApi.select('reviews', { booking_id: d.booking_id, from_role: fromRole }, { limit: 1 })) as any[];
+                    if (schon.length) {
+                        res.writeHead(409, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ errorCode: 'ALREADY_REVIEWED', message: 'This booking has already been reviewed', correlationId }));
+                        return;
+                    }
+                    const providerKey: string = booking.provider_key;
                     await supabaseApi.insert('reviews', {
-                        booking_id: d.booking_id ?? null,
-                        provider_key: d.provider_key,
+                        booking_id: d.booking_id,
+                        provider_key: providerKey,
                         from_role: fromRole,
                         to_role: fromRole === 'user' ? 'provider' : 'user',
                         rating,
                         categories: Array.isArray(d.categories) ? d.categories : [],
                         body: typeof d.body === 'string' ? d.body.slice(0, 2000) : null,
-                        verified: true,
+                        verified: true, // jetzt begruendet: an eine gehaltene Buchung gebunden
                     });
                     if (fromRole === 'user') {
-                        // Recompute the provider's aggregate rating from verified user reviews.
+                        // Aggregat nur aus buchungsgebundenen Bewertungen. Alt-Zeilen
+                        // ohne booking_id zaehlen nicht mehr mit.
                         try {
-                            const all = (await supabaseApi.select('reviews', { provider_key: d.provider_key, from_role: 'user' }, { limit: 500 })) as any[];
-                            const rated = all.filter((r: any) => r.rating != null);
+                            const all = (await supabaseApi.select('reviews', { provider_key: providerKey, from_role: 'user' }, { limit: 500 })) as any[];
+                            const rated = all.filter((r: any) => r.rating != null && r.booking_id);
                             if (rated.length) {
                                 const avg = rated.reduce((s: number, r: any) => s + Number(r.rating), 0) / rated.length;
-                                await supabaseApi.update('providers', { provider_key: d.provider_key }, { rating: Math.round(avg * 10) / 10 });
+                                await supabaseApi.update('providers', { provider_key: providerKey }, { rating: Math.round(avg * 10) / 10 });
                             }
                         } catch { /* aggregate must not break the write */ }
                     }
-                    await supabaseApi.insert('event_log', { type: 'review_submitted', payload: { providerKey: d.provider_key, bookingId: d.booking_id ?? null, fromRole, rating } });
+                    await supabaseApi.insert('event_log', { type: 'review_submitted', payload: { providerKey, bookingId: d.booking_id, fromRole, rating } });
                     res.writeHead(201, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ ok: true, correlationId }));
                 } catch {
@@ -1249,6 +1312,16 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     work_mode: typeof d.work_mode === 'string' ? d.work_mode.slice(0, 120) : null,
                 });
                 await supabaseApi.insert('event_log', { type: 'provider_intake_submitted', payload: { providerKey, certifications: Array.isArray(d.certifications) ? d.certifications.length : 0, vatIdStatus: vat?.status ?? null } });
+                // Kommt der Intake mit einem Login, gehoert der neue Anbieter
+                // diesem Login (provider_members). Ohne Login verknuepft ein
+                // Admin spaeter per POST /api/v1/admin/provider/:key/member.
+                // Ein Login, der schon einem Anbieter gehoert, bekommt keinen zweiten.
+                if (authUserId && !authViaApiKey) {
+                    const schonMitglied = (await supabaseApi.select('provider_members', { user_id: authUserId }, { limit: 1 })) as any[];
+                    if (!schonMitglied.length) {
+                        await supabaseApi.insert('provider_members', { provider_key: providerKey, user_id: authUserId, role: 'owner' });
+                    }
+                }
                 res.writeHead(201, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ ok: true, provider_key: providerKey, status: 'in_review', vat_id_status: vat?.status ?? null, correlationId }));
             } catch {

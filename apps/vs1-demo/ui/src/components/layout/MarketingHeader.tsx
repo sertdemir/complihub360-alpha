@@ -1,7 +1,7 @@
 import { useEffect, useId, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LayoutDashboard, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { Logo } from '../ui/Logo';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { AreasMenuPanel } from './AreasMenuPanel';
@@ -9,6 +9,7 @@ import { MarketsMenuPanel } from './MarketsMenuPanel';
 import { LanguageMenu } from './LanguageMenu';
 import { useAuthStore } from '../../store/useAuthStore';
 import { AccountActions } from './AccountActions';
+import { AccountMenu } from './AccountMenu';
 import { MobileNav } from './MobileNav';
 import { HEADER_NAV_LINKS } from './navLinks';
 
@@ -84,8 +85,7 @@ export function MarketingHeader({
   // Startseite bekam ein angemeldeter Nutzer "Anmelden" und "Kostenlos starten"
   // angeboten, und einen Weg ins Dashboard gab es hier nirgends. GlobalNav
   // wusste es laengst — dieselbe Seite, zwei Antworten.
-  const { isLoggedIn, role } = useAuthStore();
-  const dashHref = `/${lang}${role === 'partner' ? '/partner-dashboard' : '/dashboard'}`;
+  const { isLoggedIn } = useAuthStore();
 
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -190,15 +190,13 @@ export function MarketingHeader({
           <ThemeToggle inverse={inverse} size={36} />
           <LanguageMenu triggerClassName={`h-9 w-9 ${inverse ? 'text-fg-inverse hover:text-fg-inverse' : ''}`} />
           {isLoggedIn ? (
-            <Link
-              to={dashHref}
-              className={`inline-flex h-[40px] items-center gap-2 whitespace-nowrap rounded-md px-4 text-body-sm font-semibold ${
-                inverse ? 'bg-white text-fg' : 'bg-brand text-fg-on-brand'
-              }`}
-            >
-              <LayoutDashboard size={16} aria-hidden />
-              {t('nav.dashboard', 'My dashboard')}
-            </Link>
+            /* Bis 2026-09-22 stand hier ein gefuellter "Mein Dashboard"-Knopf,
+               und sonst nichts: kein Name, kein Abmelden. Damit war Abmelden
+               auf der Startseite gar nicht erreichbar — auch das Mobile-Panel
+               traegt dort nur den Dashboard-Knopf. Nutzer-Entscheidung
+               2026-09-22 (Variante A): dasselbe Konto-Menue wie ueberall.
+               Begruendung und Messwerte in AccountMenu.tsx. */
+            <AccountMenu lang={lang} inverse={inverse} closeKey={pathname} />
           ) : (
             <>
               <a

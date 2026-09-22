@@ -1112,6 +1112,14 @@
     "login": "Log in",
     "language": "Language"
   },
+  "account": {
+    "fallbackName": "My account",
+    "role": {
+      "user": "Company",
+      "partner": "Advisory partner",
+      "admin": "Administration"
+    }
+  },
   "howItWorks": {
     "meta": {
       "title": "How it works · CompliHub360"

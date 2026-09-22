@@ -23,10 +23,9 @@ select policies_are(
     'public',
     'providers',
     ARRAY[
-        'Providers are globally readable',
         'Only Admins can update providers'
     ],
-    'providers should be readable by all, writable by admins'
+    'providers: keine Lese-Policy mehr (seit 20260922000000) — anonym vor der Buchung, siehe 03_public_access_test'
 );
 
 select policies_are(
