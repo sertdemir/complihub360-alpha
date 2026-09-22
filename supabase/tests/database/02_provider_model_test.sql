@@ -13,7 +13,7 @@
 -- soll an diesem Test scheitern.
 
 begin;
-select plan(42);
+select plan(44);
 
 -- ─── Struktur ───────────────────────────────────────────────────────────────
 
@@ -49,6 +49,27 @@ select is((select relrowsecurity from pg_class where oid = 'public.provider_fiel
 select is((select count(*)::int from pg_policies
            where schemaname = 'public' and tablename = 'provider_confidential'),
           0, 'provider_confidential darf keine einzige Policy haben');
+
+-- ─── Und die View darf diese RLS nicht umgehen ──────────────────────────────
+--
+-- BEFUND 22.09.2026 auf Staging: sie tat es. Eine View ist in Postgres per
+-- Voreinstellung SECURITY DEFINER und laeuft als ihr Eigentuemer; die sieben
+-- Zusicherungen darueber galten also fuer die Tabellen und nicht fuer den Weg,
+-- den tatsaechlich jemand nimmt. Mit dem anon-Schluessel kamen Preise,
+-- Marktfreigaben und der Klarschluessel des Anbieters heraus.
+--
+-- Diese beiden Zeilen sind der Grund, warum das nicht wiederkommt. Wer die
+-- View spaeter mit CREATE OR REPLACE anfasst und die Option vergisst, faellt
+-- hier auf — nicht erst im naechsten Lint-Bericht.
+select ok((select reloptions from pg_class
+           where oid = 'public.matchable_provider_services'::regclass)
+          @> ARRAY['security_invoker=on'],
+          'die View fragt mit den Rechten des Aufrufers, nicht des Eigentuemers');
+select is((select count(*)::int from information_schema.role_table_grants
+           where table_schema = 'public'
+             and table_name   = 'matchable_provider_services'
+             and grantee in ('anon', 'authenticated')),
+          0, 'anon und authenticated haben kein Recht auf die Matching-View');
 
 -- ─── Fixture ────────────────────────────────────────────────────────────────
 -- Ein Anbieter, zwei Leistungen, zwei Maerkte je Leistung.
