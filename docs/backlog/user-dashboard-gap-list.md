@@ -32,12 +32,20 @@ WORKSPACE: Dashboard · Sessions · Requests · **Notifications** · LIBRARY: **
 | # | Missing page | Why | Status |
 |---|---|---|---|
 | UH-1 | **Notifications feed** | Sidebar "Notifications (2)" — user bell feed; no frame. | 🔴 |
-| UP-1 | **Saved Providers** | Sidebar "Saved" → list of bookmarked providers; no frame. | 🔴 |
-| UP-2 | **Exports** | Sidebar "Saved" → exports/downloads list; no frame. | 🔴 |
+| UP-1 | **Saved Providers** | Sidebar "Saved" → list of bookmarked providers. Läuft seit 2026-09-20 auf `ComingSoonPage`: die Fixture-Seite behauptete gemerkte Anbieter, ohne dass es irgendwo einen Merken-Knopf gab. Die Fläche wartet auf `saved_providers` (Tabelle, zwei Endpunkte, Knopf auf Detailseite/Karte/Drawer). | 🟡 |
 | UH-2 | **Settings / Account** | Bottom ⚙ + mobile "More"; profile/account/subscription/sign-out; no frame. | 🔴 |
 | UDH-1 | **Domain workbenches ×5** | Product&Packaging · Data&Privacy · Marketing&SEO · Corporate&Structure · Full Support (only Tax&VAT `2051:60` exists). Templated off Tax&VAT. | 🔴 |
 | MON-1 | **Alerts (MONITORING · SOON)** | Sidebar "Alerts" — coming-soon / primer state. | 🟡 |
 | MON-2 | **Calendar (MONITORING · SOON)** | Sidebar "Calendar" — coming-soon / primer state. | 🟡 |
+
+> **UP-2 „Exports" ist am 2026-09-20 ersatzlos entfallen** und zählt nicht mehr
+> als Lücke. Die Seite listete vier erfundene Dateien und wies darunter den
+> DSGVO-Datenexport (Art. 20) als „bereit" aus — ein Betroffenenrecht, das es
+> als Selbstbedienung nicht gibt. Sie kommt auch nicht als ComingSoon zurück:
+> der echte Export (`generateRiskMapPdf`) baut das PDF im Browser und lädt es
+> sofort, er legt NICHTS ab. Eine Liste früherer Exporte ist deshalb nicht
+> „noch leer", sondern ohne Speicherort gar nicht möglich. Wer sie wieder
+> aufnehmen will, braucht zuerst diesen Speicherort.
 
 ### Drawers still to design (per directive — Desktop + Mobile)
 | # | Missing drawer | Why | Status |

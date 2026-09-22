@@ -15,7 +15,7 @@
 -- (supabase/tests/fixtures/00_supabase_stub.sql).
 
 begin;
-select plan(12);
+select plan(15);
 
 -- ─── Fixture, als Owner angelegt ───────────────────────────────────────────
 
@@ -82,6 +82,29 @@ select is((select count(*)::int from pg_policies
 select is((select coalesce('security_invoker=true' = any(reloptions), false)
            from pg_class where oid = 'public.matchable_provider_services'::regclass),
           true, 'Die Matching-View prueft gegen den Aufrufer, nicht gegen ihren Owner');
+
+-- ─── Die Adress-Nachschlage-Funktion (20260922010000) ──────────────────────
+--
+-- Sie ist SECURITY DEFINER und greift auf `auth.users` zu — also genau die
+-- Bauart, die bei der Matching-View schon einmal mehr hergab als gedacht.
+-- Drei Eigenschaften halten sie eng, und alle drei stehen hier.
+
+select is((select prosecdef from pg_proc
+           where oid = 'public.auth_user_id_by_email(text)'::regprocedure),
+          true, 'Die Nachschlage-Funktion laeuft als Definer — sonst erreicht sie auth.users nicht');
+
+-- Ohne festen search_path bestimmt der Aufrufer, welche Tabelle "auth.users"
+-- meint. Bei SECURITY DEFINER ist das die Luecke, nicht eine Feinheit.
+select ok((select proconfig from pg_proc
+           where oid = 'public.auth_user_id_by_email(text)'::regprocedure)
+          @> ARRAY['search_path=pg_catalog, public, auth, pg_temp'],
+          'Die Nachschlage-Funktion hat einen fest verdrahteten search_path');
+
+select is((select count(*)::int from information_schema.role_routine_grants
+           where routine_schema = 'public'
+             and routine_name   = 'auth_user_id_by_email'
+             and grantee in ('anon', 'authenticated', 'PUBLIC')),
+          0, 'anon und authenticated duerfen die Nachschlage-Funktion nicht ausfuehren');
 
 select * from finish();
 rollback;

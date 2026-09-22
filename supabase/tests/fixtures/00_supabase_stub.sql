@@ -24,6 +24,13 @@ CREATE TABLE IF NOT EXISTS auth.users (
   email text
 );
 
+-- `deleted_at` traegt Supabase selbst: ein geloeschtes Konto bleibt als Zeile
+-- stehen und wird nur markiert. Wer danach filtert — etwa
+-- `auth_user_id_by_email` aus 20260922010000, damit ein geloeschtes Konto eine
+-- lebende Adresse nicht mehrdeutig macht — braucht die Spalte hier, sonst
+-- scheitert die Migration im Testlauf an etwas, das in Wahrheit existiert.
+ALTER TABLE auth.users ADD COLUMN IF NOT EXISTS deleted_at timestamptz;
+
 CREATE OR REPLACE FUNCTION auth.uid() RETURNS uuid
   LANGUAGE sql STABLE AS $$ SELECT NULL::uuid $$;
 

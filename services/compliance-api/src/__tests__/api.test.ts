@@ -68,7 +68,21 @@ vi.mock('../supabase.js', () => ({
             db[table] = store.filter((r) => !gone.includes(r));
             return gone;
         },
-        async rpc() { return []; },
+        // `auth.users` liegt in PostgREST nicht offen; die API fragt die
+        // Adresse deshalb ueber die Funktion aus 20260922010000 nach. Der
+        // Speicher hier bildet `auth.users` als eigene Tabelle ab — bewusst
+        // getrennt von `db.users` (public.users), weil genau deren
+        // Verwechslung der Fehler war, den diese Aenderung behebt.
+        async rpc(fn: string, params: Record<string, any> = {}) {
+            if (fn === 'auth_user_id_by_email') {
+                const gesucht = String(params.p_email ?? '').trim().toLowerCase();
+                const treffer = (db.auth_users ?? []).filter(
+                    (u) => String(u.email).toLowerCase() === gesucht && !u.deleted_at);
+                // Genau eine, oder keine — wie die SQL-Funktion.
+                return treffer.length === 1 ? treffer[0].id : null;
+            }
+            throw new Error(`unmocked rpc in test store: ${fn}`);
+        },
     },
 }));
 
@@ -693,7 +707,7 @@ describe('POST /api/v1/admin/provider/:key/member', () => {
 
     it('verknuepft per E-Mail und haelt die Launch-Grenze: ein Login je Anbieter', async () => {
         seedProvider();
-        (db.users ??= []).push({ id: USER_ID, email: 'test@complihub.test' });
+        (db.auth_users ??= []).push({ id: USER_ID, email: 'test@complihub.test' });
         const r = await api('/api/v1/admin/provider/test-kanzlei/member', {
             method: 'POST', body: JSON.stringify({ email: 'Test@Complihub.test' }),
         });
@@ -703,6 +717,50 @@ describe('POST /api/v1/admin/provider/:key/member', () => {
             method: 'POST', body: JSON.stringify({ user_id: randomUUID() }),
         });
         expect(zweiter.status).toBe(409);
+    });
+
+    // ─── Der Fehler vom 22.09.2026, festgenagelt ────────────────────────────
+    // Vier Logins waren in Supabase angelegt, bestaetigt und anmeldefaehig.
+    // Der Endpunkt sagte trotzdem "user_id or a known email required", weil er
+    // die Adresse in `public.users` suchte — und die Profilzeile dort entsteht
+    // erst, wenn jemand eine Gast-Sitzung uebernimmt. Ein Anbieter, der nie
+    // den Assistenten benutzt hat, hat keine.
+    //
+    // Dieser Test laesst `db.users` ABSICHTLICH leer. Er faellt zurueck auf
+    // 400, sobald wieder in der Profiltabelle gesucht wird.
+    it('findet den Login auch ohne Profilzeile in public.users', async () => {
+        seedProvider();
+        (db.auth_users ??= []).push({ id: USER_ID, email: 'frisch@complihub.test' });
+        expect(db.users ?? []).toHaveLength(0);
+        const r = await api('/api/v1/admin/provider/test-kanzlei/member', {
+            method: 'POST', body: JSON.stringify({ email: 'frisch@complihub.test' }),
+        });
+        expect(r.status).toBe(201);
+        expect(db.provider_members).toEqual([expect.objectContaining({ user_id: USER_ID })]);
+    });
+
+    it('verknuepft nichts, wenn die Adresse kein Konto hat', async () => {
+        seedProvider();
+        const r = await api('/api/v1/admin/provider/test-kanzlei/member', {
+            method: 'POST', body: JSON.stringify({ email: 'niemand@complihub.test' }),
+        });
+        expect(r.status).toBe(400);
+        expect(db.provider_members ?? []).toHaveLength(0);
+    });
+
+    // Mehrdeutig heisst nicht "nimm den ersten". Lieber keine Mitgliedschaft
+    // als eine an der falschen Person — dieselbe Regel wie im Backfill.
+    it('verknuepft nichts, wenn zwei Konten dieselbe Adresse tragen', async () => {
+        seedProvider();
+        (db.auth_users ??= []).push(
+            { id: randomUUID(), email: 'doppelt@complihub.test' },
+            { id: randomUUID(), email: 'doppelt@complihub.test' },
+        );
+        const r = await api('/api/v1/admin/provider/test-kanzlei/member', {
+            method: 'POST', body: JSON.stringify({ email: 'doppelt@complihub.test' }),
+        });
+        expect(r.status).toBe(400);
+        expect(db.provider_members ?? []).toHaveLength(0);
     });
 });
 
