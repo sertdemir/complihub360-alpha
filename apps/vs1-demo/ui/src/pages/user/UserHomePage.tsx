@@ -146,9 +146,8 @@ export function UserHomePage() {
   const aufSie = offeneAnfragen.filter((r) => r.bucket === 'replied' || r.bucket === 'overdue');
   const wartend = offeneAnfragen.filter((r) => r.status === 'awaiting-confirm' && r.bucket === 'confirm').length;
 
-  // Termine: kommend (ggf. verschoben) und offene Ergebnisfragen.
+  // Termine: kommend (ggf. verschoben).
   const termine = kommende(bookings.map((b) => (moved[b.id] ? { ...b, slotStart: moved[b.id] } : b)));
-  const ergebnisfragen = bookings.filter((b) => b.status === 'confirmed' && new Date(b.slotStart).getTime() < jetzt).length;
 
   const sev = dash.obligations.by_severity;
   const hoch = (sev.critical ?? 0) + (sev.high ?? 0);
@@ -178,45 +177,16 @@ export function UserHomePage() {
   const zuletzt = [...dash.sessions.items].sort((a, b) => b.updated_at.localeCompare(a.updated_at))[0];
   const nichts = !loading && dash.sessions.total === 0 && offeneAnfragen.length === 0 && termine.length === 0;
 
-  // Kopf (Canvas K2, Nutzer-Wahl 2026-09-22): die Lage als Sprungmarken. Jeder
-  // Teil fuehrt dorthin, wo er sich erledigen laesst. Was auf Sie wartet, steht
-  // zuerst und traegt die Markenfarbe; das Risiko steht zuletzt, als Punkt statt
-  // roter Fettschrift ("Prioritaet statt Panik", DNA). Ein Teil mit null
-  // entfaellt, ist alles null, steht der ruhige Satz. Die Hauptaktion ("Neues
-  // Assessment starten") sitzt seit demselben Tag links in der Topbar.
-  const marken: { key: string; to: string; label: string; primary?: boolean; risk?: boolean }[] = [];
-  if (aufSie.length) marken.push({ key: 'a', to: 'dashboard/termine?tab=anfragen', label: t('home.todayRequests', { count: aufSie.length }), primary: true });
-  if (ergebnisfragen) marken.push({ key: 'e', to: 'dashboard/termine', label: t('home.todayOutcomes', { count: ergebnisfragen }) });
-  if (hoch) marken.push({ key: 'r', to: 'dashboard/sessions', label: t('home.todayRisk', { count: hoch }), risk: true });
-
+  // Kopf: nur die Begruessung. Die Lage-Zeile (zuletzt als Sprungmarken, K2)
+  // hat der Nutzer am 2026-09-22 wieder herausgenommen — sie wiederholte, was
+  // die Kennzahlen und Karten darunter ohnehin zeigen. Die Hauptaktion sitzt
+  // links in der Topbar.
   const kopf = (
-    <div>
-      <h1 className="font-serif text-[22px] font-bold leading-tight text-fg">
-        {firstName
-          ? <Trans t={t} i18nKey="home.title" values={{ name: firstName }} components={{ accent: <span className="text-fg-accent-emphasis" /> }} />
-          : t('home.titleNoName')}
-      </h1>
-      {!loading && (marken.length ? (
-        <nav aria-label={t('home.todayPrefix')} className="mt-3 flex flex-wrap gap-2">
-          {marken.map((m) => (
-            <Link
-              key={m.key}
-              to={`/${locale}/${m.to}`}
-              className={'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-body-xs font-semibold transition-colors '
-                + (m.primary
-                  ? 'border-brand bg-brand text-fg-on-brand hover:brightness-110'
-                  : 'border-stroke bg-surface/75 text-fg-secondary hover:border-stroke-brand hover:text-fg')}
-            >
-              {m.risk && <span aria-hidden="true" className="h-[7px] w-[7px] rounded-full bg-risk-high" />}
-              {m.label}
-              <ArrowRight aria-hidden="true" size={13} className={m.primary ? 'text-[rgb(var(--gold-300))]' : 'text-fg-tertiary'} />
-            </Link>
-          ))}
-        </nav>
-      ) : (
-        <p className="mt-1.5 text-body-sm text-fg-secondary">{t('home.todayCalm')}</p>
-      ))}
-    </div>
+    <h1 className="font-serif text-[22px] font-bold leading-tight text-fg">
+      {firstName
+        ? <Trans t={t} i18nKey="home.title" values={{ name: firstName }} components={{ accent: <span className="text-fg-accent-emphasis" /> }} />
+        : t('home.titleNoName')}
+    </h1>
   );
 
   if (loading) {
