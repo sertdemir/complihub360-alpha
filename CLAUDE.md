@@ -164,7 +164,9 @@ npm run db:test      # Migrationen + pgTAP gegen eine Wegwerf-Datenbank
 
 CI (`quality-gates`) läuft bei jedem PR gegen `main`. Vor dem Push mindestens `typecheck` und `test` lokal grün haben.
 
-> `npm run typecheck` deckt die **Testdateien der UI nicht ab** — ein Typfehler in
-> `apps/vs1-demo/ui/src/**/*.test.ts` fällt erst bei `npm run build` auf (dort
-> läuft `npx tsc` ohne die Einschränkung). Wer nur `typecheck` fährt, hält einen
-> roten Build für grün.
+> `npm run typecheck` deckt **die UI gar nicht ab** — `@vs1-demo/ui` hat kein
+> `typecheck`-Skript, `--if-present` überspringt den Workspace still. Ein
+> Typfehler irgendwo unter `apps/vs1-demo/ui/src/` (Quelltext wie Tests) fällt
+> erst bei `npm run build` auf, wo `npx tsc` läuft. Wer bei UI-Änderungen nur
+> `typecheck` fährt, hält einen roten Build für grün. (Nachgemessen 2026-09-22:
+> ein falscher Prop-Typ in `ResultsRiskMap.tsx` — `typecheck` 0 Fehler, `build` rot.)

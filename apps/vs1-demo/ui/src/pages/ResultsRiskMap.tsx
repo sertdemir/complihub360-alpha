@@ -166,135 +166,22 @@ export function riskMapStats(laws: SearchLaw[], rowCount: number, providers: num
   ];
 }
 
-/** Tabellenzeilen → PDF-Zeilen. Live-Zeilen stehen wortgleich (die Engine
- *  spricht Englisch), die Fixture uebersetzt positionsweise. */
-export function pdfObligations(rows: Obligation[], isLive: boolean, t: RiskT): PdfObligation[] {
-  return rows.map((o, i) => ({
+/** Tabellenzeilen → PDF-Zeilen. Die Zeilen stehen wortgleich — die Engine
+ *  spricht Englisch; uebersetzt werden nur Zustands-Beschriftungen. */
+export function pdfObligations(rows: Obligation[], t: RiskT): PdfObligation[] {
+  return rows.map((o) => ({
     severity: o.severity,
-    title: isLive ? o.title : t(`obligations.${i}.title`, { defaultValue: o.title }),
-    detail: isLive ? o.detail : t(`obligations.${i}.detail`, { defaultValue: o.detail }),
-    market: isLive ? o.market : t(`obligations.${i}.market`, { defaultValue: o.market }),
-    due: isLive ? o.due : t(`obligations.${i}.due`, { defaultValue: o.due }),
-    dueSub: isLive ? o.dueSub : t(`obligations.${i}.dueSub`, { defaultValue: o.dueSub }),
+    title: o.title,
+    detail: o.detail,
+    market: o.market,
+    due: o.due,
+    dueSub: o.dueSub,
     stateLabel:
       o.state.kind === 'confirmed' ? t('state.confirmed', { defaultValue: 'Confirmed' })
       : o.state.kind === 'likely' ? t('state.likely', { defaultValue: 'Likely' })
       : t('pdf.questionsOpen', { defaultValue: '{{total}} questions open', total: o.state.count }),
   }));
 }
-
-export const OBLIGATIONS: Obligation[] = [
-  {
-    severity: 'critical',
-    title: 'OSS quarterly return',
-    law: 'UStG §18i (OSS)',
-    detail: 'Last filed: Q1 2025 · Penalty: €5,000 + 1%/month · UStG §18i (OSS)',
-    market: 'DE · NL',
-    due: 'Apr 30',
-    dueSub: '6 days',
-    state: { kind: 'confirmed' },
-  },
-  {
-    severity: 'critical',
-    title: 'VAT registration — UK',
-    law: 'UK VATA 1994 §3',
-    detail: 'Post-Brexit threshold check needed · Penalty: up to £20,000 · UK VATA 1994 §3',
-    market: 'UK',
-    due: 'May 15',
-    dueSub: '21 days',
-    state: { kind: 'likely' },
-  },
-  {
-    severity: 'critical',
-    title: 'EPR packaging registration (LUCID)',
-    law: 'VerpackG Art. 9 Abs. 1',
-    detail: 'Producer status to confirm · Penalty: up to €50,000 · VerpackG Art. 9 Abs. 1',
-    market: 'DE',
-    due: 'May 02',
-    dueSub: '8 days',
-    state: { kind: 'likely' },
-  },
-  {
-    severity: 'high',
-    title: 'EPR registration renewal (PackUK)',
-    law: 'UK Packaging Regs. 2023 §7',
-    detail: 'Last filed: Apr 2024 · Penalty: 4% of UK revenue · UK Packaging Regs. 2023 §7',
-    market: 'UK',
-    due: 'May 15',
-    dueSub: '21 days',
-    state: { kind: 'likely' },
-  },
-  {
-    severity: 'high',
-    title: 'Cookie banner + consent records',
-    law: 'GDPR Art. 6/7 · TTDSG §25',
-    detail: 'B2C EU users → required · GDPR Art. 6/7 · TTDSG §25',
-    market: 'EU-wide',
-    due: 'Ongoing',
-    dueSub: 'Live',
-    state: { kind: 'confirmed' },
-  },
-  {
-    severity: 'medium',
-    title: 'DPIA for tracking pixels',
-    law: 'GDPR Art. 35',
-    detail: 'Depends on tracking stack · GDPR Art. 35',
-    market: 'EU-wide',
-    due: '—',
-    dueSub: 'Depends on tools',
-    state: { kind: 'answer', count: 2 },
-  },
-  {
-    severity: 'medium',
-    title: 'Reverse-charge mechanism',
-    law: 'UStG §13b',
-    detail: 'Applies only if cross-border B2B share >0 · UStG §13b',
-    market: 'DE · NL',
-    due: '—',
-    dueSub: 'Depends on B2B mix',
-    state: { kind: 'answer', count: 2 },
-  },
-  {
-    severity: 'medium',
-    title: 'Beneficial-owner update',
-    law: 'GwG §20 Abs. 1',
-    detail: 'Last filed: Mar 2025 · Penalty: €1,000–5,000 · GwG §20 Abs. 1',
-    market: 'DE',
-    due: 'Jun 30',
-    dueSub: 'ongoing',
-    state: { kind: 'confirmed' },
-  },
-];
-
-export const STATS = [
-  { value: '8', label: 'obligations identified' },
-  // 4 of the fixture rows carry a deadline inside 30 days (6 · 21 · 8 · 21).
-  { value: '4', label: 'with a deadline in 30 days' },
-  // Tageszahl statt fertigem String: die Einheit gehoert in die Sprachdatei,
-  // sonst steht "14 days" im deutschen UI (DNA-Addendum V2, P1).
-  { value: '14', days: 14, label: 'median deadline' },
-  { value: '3', label: 'Verified Providers ready' },
-];
-
-
-// Real partners behind the unlock (seeded provider_keys on staging).
-// `match` holds the raw percentage; the "match" wording is translated at render.
-// `sub` keeps the English ground truth; rendering translates via results:partners.<i>.sub.
-// Phase-3 wiring: design fixture in the ANONYMOUS wire shape — replaced by the
-// live, scored /search providers when the backend answers.
-const PARTNERS_ANON: AnonProvider[] = [
-  // Die Werte sind die, die die Engine tatsaechlich erzeugen KANN. Ihr Score ist
-  // 60 * Marktabdeckung + 40 * (getroffene / angefragte Bereiche); da /search
-  // vorab nach Land filtert, ist die Marktabdeckung bei gelisteten Anbietern
-  // immer 1. Bei drei angefragten Bereichen sind also nur 60/73/87/100 moeglich
-  // — die frueheren 94/88/81 waren erfunden und mit keiner Eingabe herstellbar.
-  { provider_key: 'studio-bianchi', pseudonym_label: 'Verifizierte Steuerkanzlei · Norditalien', region: 'Norditalien', active_since: 2015, specializations: ['VAT & OSS', 'E-Commerce', 'EU-weit'], languages: ['IT', 'DE', 'EN'], rating: 4.9, completed_count: 210, avg_response_hours: 3, billing_model: 'project', is_verified: true, match: 100, match_tier: 'high',
-    match_basis: { country: 'DE', country_covered: true, domains_requested: ['tax-vat', 'product-packaging', 'data-privacy'], domains_matched: ['tax-vat', 'product-packaging', 'data-privacy'] } },
-  { provider_key: 'schmidt-partner', pseudonym_label: 'Verifizierte Steuerberatung · Norddeutschland', region: 'Norddeutschland', active_since: 2013, specializations: ['OSS/IOSS', 'Cross-border Tax'], languages: ['DE', 'EN'], rating: 4.7, completed_count: 96, avg_response_hours: 5, billing_model: 'abo', is_verified: true, match: 87, match_tier: 'strong',
-    match_basis: { country: 'DE', country_covered: true, domains_requested: ['tax-vat', 'product-packaging', 'data-privacy'], domains_matched: ['tax-vat', 'product-packaging'] } },
-  { provider_key: 'madrid-tax', pseudonym_label: 'Verifizierter Tax-Spezialist · Spanien', region: 'Spanien', active_since: 2020, specializations: ['Iberian VAT', 'Marketplace'], languages: ['ES', 'EN'], rating: 4.5, completed_count: 41, avg_response_hours: 8, billing_model: 'hourly', is_verified: true, match: 73, match_tier: 'moderate',
-    match_basis: { country: 'DE', country_covered: true, domains_requested: ['tax-vat', 'product-packaging', 'data-privacy'], domains_matched: ['tax-vat'] } },
-];
 
 // ─── Warum 87 % 87 % sind ─────────────────────────────────────────────────────
 // Das DNA-Addendum V2 (P1) verlangt sichtbare ✓/Lücken-Kriterien hinter der
@@ -373,7 +260,7 @@ export function ResultsRiskMap() {
   // ?session=<id> re-queries /search with that session's stored profile.
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session');
-  const { data: searchData, source: searchSource } = useApiData<{ providers: AnonProvider[]; laws: SearchLaw[]; session: SessionRowData | null }>(async () => {
+  const { data: searchData, source: searchSource, loading: searchLoading } = useApiData<{ providers: AnonProvider[]; laws: SearchLaw[]; session: SessionRowData | null }>(async () => {
     let query: Parameters<typeof runSearch>[0] = profile ?? {};
     let session: SessionRowData | null = null;
     if (sessionId) {
@@ -384,42 +271,40 @@ export function ResultsRiskMap() {
     }
     const res = await runSearch(query);
     return { providers: res.providers, laws: res.laws ?? [], session };
-  }, { providers: PARTNERS_ANON, laws: [], session: null }, [sessionId, reloadKey]);
-  // Anbieter zaehlen nur, wenn die Engine sie geliefert hat. Waehrend des
-  // Ladens und bei einem API-Fehler steht in `searchData` die Design-Fixture —
-  // drei erfundene Anbieter mit 100/87/73 %. Die taugt als Formvertrag fuer
-  // useApiData, aber nie als Treffer: sie wuerde einem Nutzer ohne einen
-  // einzigen passenden Anbieter drei zeigen (Entscheidung 2026-09-22,
+  }, { providers: [], laws: [], session: null }, [sessionId, reloadKey]);
+  // Anbieter zaehlen nur, wenn die Engine sie geliefert hat. Bis 2026-09-22
+  // stand hier beim Laden und bei einem API-Fehler eine Design-Fixture mit drei
+  // erfundenen Anbietern (100/87/73 %); sie haette einem Nutzer ohne einen
+  // einzigen passenden Anbieter drei gezeigt (Entscheidung 2026-09-22,
   // "echte Zahl"; DNA §4.5 "Never give false reassurance").
   const providersLive = searchSource === 'api';
   const anonProviders = providersLive ? searchData.providers : [];
 
-  // Obligations enrichment: live engine laws (severity/statute/penalty/cadence)
-  // replace the design fixture as soon as the payload carries severity. Live
-  // rows render verbatim (engine ground truth is English) — the indexed
-  // results:obligations.* translations only apply to the fixture.
+  // Vier Zustaende, die bis 2026-09-22 einer waren. Vorher galt: was nicht
+  // live ist, ist die Design-Fixture — beim Laden, bei einem API-Fehler und
+  // wenn die Engine nichts fand, sah der Nutzer dieselben acht erfundenen
+  // Pflichten, als haette die Engine sie gefunden.
+  //
+  //   live     die Engine hat bewertete Pflichten geliefert → Tabelle
+  //   none     die Engine hat geantwortet und nichts gefunden → Zustand
+  //   loading  die Engine rechnet noch → Zustand
+  //   failed   die Engine hat nicht geantwortet → Zustand, Try Again
+  //
+  // Die Fixture gibt es seitdem nicht mehr. `useApiData` braucht nur noch
+  // die Form; Inhalt kommt ausschliesslich aus der Engine. Live-Zeilen stehen
+  // wortgleich (die Engine spricht Englisch).
   const liveLaws = searchData.laws.filter((l) => l.severity);
   const isLive = liveLaws.length > 0;
-  // Die Engine hat geantwortet und keine bewertete Pflicht gefunden. Das ist
-  // ein ERGEBNIS, kein Ladezustand. Bis 2026-09-22 fiel die Seite hier auf die
-  // Design-Fixture zurueck und zeigte acht erfundene Pflichten, als haette die
-  // Engine sie gefunden — und widersprach damit dem PDF-Export derselben
-  // Sitzung, der korrekt "nichts gefunden" meldet. Jetzt: keine Zeilen, und
-  // der abgenommene Zustand sagt, was das bedeutet und was nicht.
-  //
-  // Beim Laden und bei einem API-Fehler (source 'fixture') bleibt es vorerst
-  // bei der Fixture; das sind die Zustaende "Risk Map loading" und "Risk Map
-  // failed", ein eigener Schritt.
-  const noRequirements = searchSource === 'api' && !isLive;
-  const rows: Obligation[] = isLive
-    ? liveObligations(liveLaws, t, i18n.language, locale)
-    : noRequirements ? [] : OBLIGATIONS;
+  const pageState: 'live' | 'none' | 'loading' | 'failed' = isLive
+    ? 'live'
+    : searchSource === 'api' ? 'none'
+    : searchLoading ? 'loading' : 'failed';
+  const noRequirements = pageState === 'none';
+  const rows: Obligation[] = isLive ? liveObligations(liveLaws, t, i18n.language, locale) : [];
 
   // Two groups, not two tables: "Now" is what the user is accountable for
-  // today, "On the radar" is adopted law that only bites later. Keeping the
-  // original index alongside each row matters — the design fixture translates
-  // its cells positionally via results:obligations.<i>, so partitioning must
-  // not renumber them. filter() is stable, so order inside each group holds.
+  // today, "On the radar" is adopted law that only bites later. filter() is
+  // stable, so order inside each group holds.
   const indexed = rows.map((o, i) => ({ o, i }));
   const nowRows = indexed.filter((x) => !x.o.radar);
   const radarRows = indexed.filter((x) => x.o.radar);
@@ -439,30 +324,52 @@ export function ResultsRiskMap() {
   // screen was a threat. Penalties are still shown per obligation (they are
   // facts, and useful for prioritising), but the headline stat now conveys
   // URGENCY instead of DREAD: how many deadlines are actually near.
+  // Kennzahlen nur, wenn die Engine geantwortet hat. Beim Laden und bei einem
+  // Fehler gibt es keine — "0 obligations identified" waere dann eine
+  // Behauptung ueber ein Ergebnis, das es nicht gibt.
   const stats = isLive || noRequirements
     ? riskMapStats(liveLaws, rows.length, providersLive ? anonProviders.length : null)
-    : STATS;
+    : null;
 
-  // Abgenommene Copy (Checklist v1.0, "No requirements identified"). Der Satz
-  // "This does not mean that no obligations apply" ist der Grund, warum eine
-  // leere Liste nicht als Entwarnung gelesen wird. "Review My Answers" nur, wo
-  // der Knopf die Antworten auch zeigt: bei einer gespeicherten Sitzung oeffnet
-  // er deren Antworten-Schublade. Fuer einen Gast gibt es das nicht — der
-  // Wizard stellt fruehere Antworten nicht wieder her, der Knopf oeffnete
-  // einen leeren.
+  // Abgenommene Zustands-Copy (Checklist v1.0) fuer alles, was keine Tabelle
+  // ist. Alle drei Aussagen stimmen hier:
+  //   loading  "We're reviewing your answers…" — die Engine rechnet gerade.
+  //            Keine Aktion, der Banner meldet den Fortschritt als role=status.
+  //   failed   "Please try again. If the problem continues, contact support." —
+  //            Try Again stoesst die Abfrage neu an, Contact Support fuehrt auf
+  //            die Kontaktseite.
+  //   none     "This does not mean that no obligations apply" — der Grund,
+  //            warum eine leere Liste nicht als Entwarnung gelesen wird.
+  //            "Review My Answers" nur, wo der Knopf die Antworten zeigt: bei
+  //            einer gespeicherten Sitzung. Fuer einen Gast gibt es das nicht —
+  //            der Wizard stellt fruehere Antworten nicht wieder her.
   // Die Schublade haengt nur in der eingeloggten Ansicht im Baum.
   const canReviewAnswers = !!(isLoggedIn && sessionId && searchData.session);
-  const noRequirementsState = (
+  const stateKey = pageState === 'none' ? 'noRequirements'
+    : pageState === 'loading' ? 'riskMapLoading'
+    : pageState === 'failed' ? 'riskMapFailed' : null;
+  const stateNode = stateKey && (
     <Banner
-      status="info"
-      title={t('common:states.noRequirements.heading')}
-      action={canReviewAnswers ? (
-        <Button size="sm" variant="secondary" onClick={() => setAnswersOpen(true)}>
-          {t('common:states.actions.reviewMyAnswers')}
-        </Button>
-      ) : undefined}
+      status={pageState === 'failed' ? 'error' : 'info'}
+      title={t(`common:states.${stateKey}.heading`)}
+      action={
+        pageState === 'failed' ? (
+          <span className="flex flex-wrap gap-2">
+            <Button size="sm" variant="secondary" onClick={() => setReloadKey((k) => k + 1)}>
+              {t('common:states.actions.tryAgain')}
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => navigate(`/${locale}/contact`)}>
+              {t('common:states.actions.contactSupport')}
+            </Button>
+          </span>
+        ) : pageState === 'none' && canReviewAnswers ? (
+          <Button size="sm" variant="secondary" onClick={() => setAnswersOpen(true)}>
+            {t('common:states.actions.reviewMyAnswers')}
+          </Button>
+        ) : undefined
+      }
     >
-      {t('common:states.noRequirements.message')}
+      {t(`common:states.${stateKey}.message`)}
     </Banner>
   );
 
@@ -485,10 +392,10 @@ export function ResultsRiskMap() {
   const snapshotRows: SnapshotRow[] = indexed.map(({ o, i }) => ({
     obligationId: o.id,
     severity: o.severity,
-    title: isLive ? o.title : t(`obligations.${i}.title`, { defaultValue: o.title }),
-    market: isLive ? o.market : t(`obligations.${i}.market`, { defaultValue: o.market }),
-    due: isLive ? o.due : t(`obligations.${i}.due`, { defaultValue: o.due }),
-    dueSub: isLive ? o.dueSub : t(`obligations.${i}.dueSub`, { defaultValue: o.dueSub }),
+    title: o.title,
+    market: o.market,
+    due: o.due,
+    dueSub: o.dueSub,
     dueDays: o.dueDays,
     state: o.state,
     sourceLabel: o.sourceLabel,
@@ -497,11 +404,12 @@ export function ResultsRiskMap() {
   }));
 
   const exportPdf = async () => {
+    if (!stats) return;
     await generateRiskMapPdf({
       profile: profile ?? null,
       t,
       stats: stats.map((s2, i) => ({ value: s2.value, label: t(`stats.${i}.label`, { defaultValue: s2.label }) })),
-      obligations: pdfObligations(rows, isLive, t),
+      obligations: pdfObligations(rows, t),
     });
   };
 
@@ -522,18 +430,18 @@ export function ResultsRiskMap() {
         sessionId={sessionId}
         title={session?.label || t('snapshot.fallbackTitle')}
         meta={[markets, areas ? t('snapshot.areas', { count: areas }) : null].filter(Boolean).join(' · ')}
-        kpis={{
+        kpis={stats ? {
           total: rows.length,
-          soon: Number(stats[1]?.value ?? 0) || 0,
+          soon: Number(stats[1].value) || 0,
           open,
           critical,
           high,
           rest: Math.max(0, rows.length - critical - high),
-        }}
+        } : undefined}
         matchBasis={(p) => (p.match_basis ? <MatchBasis basis={p.match_basis} /> : null)}
         bookings={booked}
-        onExportPdf={noRequirements ? undefined : exportPdf}
-        emptyState={noRequirements ? noRequirementsState : undefined}
+        onExportPdf={isLive ? exportPdf : undefined}
+        emptyState={stateNode || undefined}
         // Mit gespeicherter Sitzung oeffnet sich die Schublade; ohne (Fixture,
         // Gast-Profil) bleibt der Weg zum Erst-Wizard.
         onEditAnswers={() => (sessionId && session ? setAnswersOpen(true) : navigate(`/${locale}/wizard`))}
@@ -618,23 +526,25 @@ export function ResultsRiskMap() {
           </p>
         </div>
 
-        {/* Stat strip */}
-        <div className="mx-auto mt-10 flex max-w-4xl flex-wrap items-center justify-between gap-y-4 rounded-xl border border-stroke-subtle bg-surface px-8 py-6 shadow-[0_18px_44px_-32px_rgba(2,22,17,0.3)]">
-          {stats.map((s, i) => (
-            <div key={s.label} className="flex items-center">
-              {i > 0 && <span className="mr-8 hidden h-8 w-px bg-stroke-subtle sm:block" />}
-              <span className="text-[1.5rem] font-bold text-fg">
-                {s.days != null ? t('days', { count: s.days }) : s.value || t('ongoing')}
-              </span>
-              <span className="ml-2 text-body-sm text-fg-secondary">{t(`stats.${i}.label`, { defaultValue: s.label })}</span>
-            </div>
-          ))}
-        </div>
+        {/* Stat strip — nur, wenn die Engine geantwortet hat */}
+        {stats && (
+          <div className="mx-auto mt-10 flex max-w-4xl flex-wrap items-center justify-between gap-y-4 rounded-xl border border-stroke-subtle bg-surface px-8 py-6 shadow-[0_18px_44px_-32px_rgba(2,22,17,0.3)]">
+            {stats.map((s, i) => (
+              <div key={s.label} className="flex items-center">
+                {i > 0 && <span className="mr-8 hidden h-8 w-px bg-stroke-subtle sm:block" />}
+                <span className="text-[1.5rem] font-bold text-fg">
+                  {s.days != null ? t('days', { count: s.days }) : s.value || t('ongoing')}
+                </span>
+                <span className="ml-2 text-body-sm text-fg-secondary">{t(`stats.${i}.label`, { defaultValue: s.label })}</span>
+              </div>
+            ))}
+          </div>
+        )}
 
-        {/* Obligations table — oder, wenn die Engine nichts gefunden hat, der
-            abgenommene Zustand statt einer leeren Tabelle. */}
-        {noRequirements ? (
-          <div className="mt-12">{noRequirementsState}</div>
+        {/* Obligations table — oder, solange es keine Engine-Pflichten gibt,
+            der abgenommene Zustand (laedt · gescheitert · nichts gefunden). */}
+        {stateNode ? (
+          <div className="mt-12">{stateNode}</div>
         ) : (
           <div className="mt-12 overflow-hidden rounded-xl border border-stroke-subtle">
             <div className="grid grid-cols-[100px_1fr_120px_110px_160px] gap-4 border-b border-stroke-subtle bg-surface-secondary px-6 py-3.5 text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary">
@@ -663,7 +573,7 @@ export function ResultsRiskMap() {
                   </RiskBadge>
                 </span>
                 <span className="min-w-0">
-                  <span className="block text-body-md font-bold text-fg">{isLive ? o.title : t(`obligations.${i}.title`, { defaultValue: o.title })}</span>
+                  <span className="block text-body-md font-bold text-fg">{o.title}</span>
                   {/* Source leads, penalty follows in a muted tone (Brand Map
                       §11: penalties are facts worth showing, but must not be the
                       first thing the eye lands on). */}
@@ -684,14 +594,14 @@ export function ResultsRiskMap() {
                       </>
                     )}
                     <span className={o.sourceUrl ? 'text-fg-tertiary' : undefined}>
-                      {isLive ? o.detail : t(`obligations.${i}.detail`, { defaultValue: o.detail })}
+                      {o.detail}
                     </span>
                   </span>
                 </span>
-                <span className="text-body-sm text-fg-secondary">{isLive ? o.market : t(`obligations.${i}.market`, { defaultValue: o.market })}</span>
+                <span className="text-body-sm text-fg-secondary">{o.market}</span>
                 <span>
-                  <span className="block text-body-sm font-semibold text-fg">{isLive ? o.due : t(`obligations.${i}.due`, { defaultValue: o.due })}</span>
-                  <span className="block text-body-2xs text-fg-tertiary">{isLive ? o.dueSub : t(`obligations.${i}.dueSub`, { defaultValue: o.dueSub })}</span>
+                  <span className="block text-body-sm font-semibold text-fg">{o.due}</span>
+                  <span className="block text-body-2xs text-fg-tertiary">{o.dueSub}</span>
                 </span>
                 <span className="flex justify-end">
                   <StatePill state={o.state} onAnswer={() => setSaveOpen(true)} />

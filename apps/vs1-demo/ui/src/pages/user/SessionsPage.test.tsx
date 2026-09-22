@@ -5,7 +5,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { SessionRowData } from '../../api/sessions';
 import type { SearchLaw, SearchResult } from '../../api/search';
 import { SessionsPage } from './SessionsPage';
-import { OBLIGATIONS } from '../ResultsRiskMap';
+
+// Erster Titel der Design-Fixture, die bis 2026-09-22 auf der Risk Map stand.
+// Die Fixture ist geloescht; der Titel bleibt als Anker, dass sie nicht zurueckkehrt.
+const FORMER_FIXTURE_TITLE = 'OSS quarterly return';
 
 // ─── Sitzungsseite · PDF-Export ──────────────────────────────────────────────
 // Bis 2026-09-22 exportierte jede Kachel dieselbe PDF: die acht erfundenen
@@ -90,7 +93,7 @@ describe('SessionsPage · PDF-Export', () => {
     expect(pdf.profile.categories).toEqual(query.categories);
     // Inhalt: die Engine, nicht die Fixture.
     expect(pdf.obligations.map((o) => o.title)).toEqual(['Records of processing activities']);
-    expect(pdf.obligations.map((o) => o.title)).not.toContain(OBLIGATIONS[0].title);
+    expect(pdf.obligations.map((o) => o.title)).not.toContain(FORMER_FIXTURE_TITLE);
     expect(pdf.stats[0].value).toBe('1');
   });
 

@@ -185,7 +185,7 @@ export function SessionsPage() {
         t: tResults,
         stats: riskMapStats(laws, rows.length, res.providers?.length ?? null)
           .map((s, i) => ({ value: s.value, label: tResults(`stats.${i}.label`, { defaultValue: s.label }) })),
-        obligations: pdfObligations(rows, true, tResults),
+        obligations: pdfObligations(rows, tResults),
       });
       setExportNote(null);
     } catch {

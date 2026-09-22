@@ -286,7 +286,9 @@ export function SessionSnapshot({
   sessionId: string | null;
   title: string;
   meta: string;
-  kpis: { total: number; soon: number; open: number; critical: number; high: number; rest: number };
+  /** Fehlt, solange es kein Engine-Ergebnis gibt (laedt, gescheitert) — dann
+   *  keine Ringe statt "0 Pflichten". */
+  kpis?: { total: number; soon: number; open: number; critical: number; high: number; rest: number };
   /** Fehlt er, fehlt der Export-Link — eine PDF ohne Pflichten laese sich
    *  als Entwarnung (siehe emptyState). */
   onExportPdf?: () => void;
@@ -363,7 +365,7 @@ export function SessionSnapshot({
   const nProg = withId.filter((r) => taskOf(r) === 'in_progress').length;
   const nRel = Math.max(1, withId.length - nNa);
 
-  const total = Math.max(1, kpis.total);
+  const total = Math.max(1, kpis?.total ?? 0);
 
   // Legt eine Kopie an und springt sofort auf sie — mit offener Schublade
   // "Antworten bearbeiten" (Canvas-Wahl 2B, 2026-09-05): Variante anlegen
@@ -442,21 +444,23 @@ export function SessionSnapshot({
 
             {/* Kennzahl-Ringe wie auf dem Dashboard (Nutzer-Vorgabe
                 2026-09-05): ohne Karte, Zahl nur im Kreis. */}
-            <motion.div variants={ITEM} className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-3">
-              <KpiRing
-                on={entered}
-                title={t('snapshot.kpiTotal')}
-                value={kpis.total}
-                sub={t('snapshot.kpiTotalSub', { now: kpis.critical, high: kpis.high, rest: kpis.rest })}
-                segs={[
-                  { frac: kpis.critical / total, cls: 'text-risk-critical' },
-                  { frac: kpis.high / total, cls: 'text-risk-high' },
-                  { frac: kpis.rest / total, cls: 'text-risk-medium' },
-                ]}
-              />
-              <KpiRing on={entered} title={t('snapshot.kpiSoon')} value={kpis.soon} sub={t('snapshot.kpiSoonSub')} segs={[{ frac: kpis.soon / total, cls: 'text-fg-accent' }]} />
-              <KpiRing on={entered} title={t('snapshot.kpiOpen')} value={kpis.open} sub={t('snapshot.kpiOpenSub', { count: kpis.open })} segs={[{ frac: kpis.open / total, cls: 'text-brand' }]} />
-            </motion.div>
+            {kpis && (
+              <motion.div variants={ITEM} className="mt-6 grid gap-x-10 gap-y-6 sm:grid-cols-3">
+                <KpiRing
+                  on={entered}
+                  title={t('snapshot.kpiTotal')}
+                  value={kpis.total}
+                  sub={t('snapshot.kpiTotalSub', { now: kpis.critical, high: kpis.high, rest: kpis.rest })}
+                  segs={[
+                    { frac: kpis.critical / total, cls: 'text-risk-critical' },
+                    { frac: kpis.high / total, cls: 'text-risk-high' },
+                    { frac: kpis.rest / total, cls: 'text-risk-medium' },
+                  ]}
+                />
+                <KpiRing on={entered} title={t('snapshot.kpiSoon')} value={kpis.soon} sub={t('snapshot.kpiSoonSub')} segs={[{ frac: kpis.soon / total, cls: 'text-fg-accent' }]} />
+                <KpiRing on={entered} title={t('snapshot.kpiOpen')} value={kpis.open} sub={t('snapshot.kpiOpenSub', { count: kpis.open })} segs={[{ frac: kpis.open / total, cls: 'text-brand' }]} />
+              </motion.div>
+            )}
 
             {/* Pflichten + Verlauf, beide Spalten enden auf einer Kante */}
             <div className="mt-[18px] flex flex-col items-stretch gap-[18px] xl:flex-row">

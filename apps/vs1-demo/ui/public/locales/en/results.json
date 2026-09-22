@@ -48,64 +48,6 @@
     "likely": "Likely",
     "answer": "Answer {{total}} questions"
   },
-  "obligations": {
-    "0": {
-      "title": "OSS quarterly return",
-      "detail": "Last filed: Q1 2025 · Penalty: €5,000 + 1%/month · UStG §18i (OSS)",
-      "market": "DE · NL",
-      "due": "Apr 30",
-      "dueSub": "6 days"
-    },
-    "1": {
-      "title": "VAT registration — UK",
-      "detail": "Post-Brexit threshold check needed · Penalty: up to £20,000 · UK VATA 1994 §3",
-      "market": "UK",
-      "due": "May 15",
-      "dueSub": "21 days"
-    },
-    "2": {
-      "title": "EPR packaging registration (LUCID)",
-      "detail": "Producer status to confirm · Penalty: up to €50,000 · VerpackG Art. 9 Abs. 1",
-      "market": "DE",
-      "due": "May 02",
-      "dueSub": "8 days"
-    },
-    "3": {
-      "title": "EPR registration renewal (PackUK)",
-      "detail": "Last filed: Apr 2024 · Penalty: 4% of UK revenue · UK Packaging Regs. 2023 §7",
-      "market": "UK",
-      "due": "May 15",
-      "dueSub": "21 days"
-    },
-    "4": {
-      "title": "Cookie banner + consent records",
-      "detail": "B2C EU users → required · GDPR Art. 6/7 · TTDSG §25",
-      "market": "EU-wide",
-      "due": "Ongoing",
-      "dueSub": "Live"
-    },
-    "5": {
-      "title": "DPIA for tracking pixels",
-      "detail": "Depends on tracking stack · GDPR Art. 35",
-      "market": "EU-wide",
-      "due": "—",
-      "dueSub": "Depends on tools"
-    },
-    "6": {
-      "title": "Reverse-charge mechanism",
-      "detail": "Applies only if cross-border B2B share >0 · UStG §13b",
-      "market": "DE · NL",
-      "due": "—",
-      "dueSub": "Depends on B2B mix"
-    },
-    "7": {
-      "title": "Beneficial-owner update",
-      "detail": "Last filed: Mar 2025 · Penalty: €1,000–5,000 · GwG §20 Abs. 1",
-      "market": "DE",
-      "due": "Jun 30",
-      "dueSub": "ongoing"
-    }
-  },
   "partners": {
     "eyebrow_one": "{{count}} Verified Provider matched",
     "eyebrow_other": "{{count}} Verified Providers matched",
@@ -114,16 +56,7 @@
     "unlocked": "Matches unlocked",
     "unlockCta": "See my best matches with a free account",
     "match": "{{pct}} match",
-    "requestQuote": "Request quote",
-    "0": {
-      "sub": "Italian VAT registration + fiscal representation · DE·IT bilingual"
-    },
-    "1": {
-      "sub": "OSS/IOSS setup · 12 years cross-border tax · 8 EU offices"
-    },
-    "2": {
-      "sub": "Iberian VAT (ES/PT) · monthly filing · marketplace optimization"
-    }
+    "requestQuote": "Request quote"
   },
   "cta": {
     "title": "Save this map. Unlock the partners.",

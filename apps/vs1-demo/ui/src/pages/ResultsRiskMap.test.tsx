@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, within, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { AnonProvider, SearchLaw } from '../api/search';
@@ -12,7 +12,11 @@ import type { AnonProvider, SearchLaw } from '../api/search';
 // then resolves and mounts a tree nobody owns, so the *next* test found two
 // "On the radar" headers. vi.mock is hoisted above imports, so the mocks
 // below still apply; the transform cost now lands in the untimed collect phase.
-import { ResultsRiskMap, OBLIGATIONS } from './ResultsRiskMap';
+import { ResultsRiskMap } from './ResultsRiskMap';
+
+// Erster Titel der Design-Fixture, die bis 2026-09-22 auf der Risk Map stand.
+// Die Fixture ist geloescht; der Titel bleibt als Anker, dass sie nicht zurueckkehrt.
+const FORMER_FIXTURE_TITLE = 'OSS quarterly return';
 
 // ─── Risk map · "Now" / "On the radar" grouping ──────────────────────────────
 // The PPWR 2030 tranche put five obligations on the map that are law today but
@@ -69,6 +73,11 @@ const renderPage = (url = '/en/results') => {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  // clearAllMocks leert nur die Aufruf-Historie, nicht die Warteschlange der
+  // mockResolvedValueOnce-Antworten. Scheitert ein Test, bevor er seine
+  // Einmal-Antwort verbraucht, bekaeme sonst der NAECHSTE Test sie — und
+  // scheiterte mit, obwohl an ihm nichts falsch ist.
+  runSearch.mockReset();
   localStorage.clear();
   auth.isLoggedIn = false;
   fetchSessions.mockResolvedValue([]);
@@ -213,7 +222,7 @@ describe('ResultsRiskMap with zero obligations', () => {
 
     expect(await screen.findByText('common:states.noRequirements.heading')).toBeInTheDocument();
     expect(screen.getByText('common:states.noRequirements.message')).toBeInTheDocument();
-    expect(screen.queryByText(OBLIGATIONS[0].title)).not.toBeInTheDocument();
+    expect(screen.queryByText(FORMER_FIXTURE_TITLE)).not.toBeInTheDocument();
     expect(screen.queryByText('table.obligation')).not.toBeInTheDocument();
     // A guest has no saved answers to review — the wizard would open empty.
     expect(screen.queryByRole('button', { name: 'common:states.actions.reviewMyAnswers' })).not.toBeInTheDocument();
@@ -239,7 +248,52 @@ describe('ResultsRiskMap with zero obligations', () => {
 
     expect(await screen.findByText('common:states.noRequirements.heading')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'common:states.actions.reviewMyAnswers' })).toBeInTheDocument();
-    expect(screen.queryByText(OBLIGATIONS[0].title)).not.toBeInTheDocument();
+    expect(screen.queryByText(FORMER_FIXTURE_TITLE)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'snapshot.exportPdf' })).not.toBeInTheDocument();
+  });
+});
+
+// ─── Risk map · loading and failure ──────────────────────────────────────────
+// Until 2026-09-22 both showed the design fixture — eight invented obligations,
+// "8 obligations identified" — while the engine was still computing or had not
+// answered at all. The fixture is gone; both are approved states now.
+
+describe('ResultsRiskMap while loading and on failure', () => {
+  it('says it is working while the engine computes — no numbers, no rows', async () => {
+    runSearch.mockReturnValue(new Promise(() => {})); // never answers
+    renderPage();
+
+    expect(await screen.findByText('common:states.riskMapLoading.heading')).toBeInTheDocument();
+    expect(screen.getByText('common:states.riskMapLoading.message')).toBeInTheDocument();
+    expect(screen.queryByText(FORMER_FIXTURE_TITLE)).not.toBeInTheDocument();
+    expect(screen.queryByText('obligations identified')).not.toBeInTheDocument();
+    expect(screen.queryByText('table.obligation')).not.toBeInTheDocument();
+  });
+
+  it('says it failed when the engine does not answer, and Try Again really asks again', async () => {
+    runSearch.mockRejectedValueOnce(new Error('offline'));
+    renderPage();
+
+    expect(await screen.findByText('common:states.riskMapFailed.heading')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'common:states.actions.contactSupport' })).toBeInTheDocument();
+    expect(screen.queryByText(FORMER_FIXTURE_TITLE)).not.toBeInTheDocument();
+    expect(screen.queryByText('obligations identified')).not.toBeInTheDocument();
+
+    runSearch.mockResolvedValueOnce({ providers: [], laws: [law({ id: 'vat', title: 'VAT return' })] });
+    fireEvent.click(screen.getByRole('button', { name: 'common:states.actions.tryAgain' }));
+
+    expect(await screen.findByText('VAT return')).toBeInTheDocument();
+    expect(screen.queryByText('common:states.riskMapFailed.heading')).not.toBeInTheDocument();
+    expect(runSearch).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows no rings and no PDF link in the signed-in view while there is no result', async () => {
+    auth.isLoggedIn = true;
+    runSearch.mockRejectedValue(new Error('offline'));
+    renderPage();
+
+    expect(await screen.findByText('common:states.riskMapFailed.heading')).toBeInTheDocument();
+    expect(screen.queryByText('snapshot.kpiTotal')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'snapshot.exportPdf' })).not.toBeInTheDocument();
   });
 });
