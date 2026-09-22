@@ -1,7 +1,7 @@
 {
   "shared": {
     "seeAll": "Alle anzeigen",
-    "startNewSearch": "Neue Suche starten",
+    "startNewSearch": "Neues Assessment starten",
     "open": "Öffnen",
     "cancel": "Abbrechen",
     "send": "Senden",
@@ -365,7 +365,7 @@
     "askSuggest": "Was gilt für {{title}}?",
     "askThinking": "Prüfe das Bereichswissen …",
     "askDisclaimer": "Allgemeine Information, keine Rechts- oder Steuerberatung. Für eine verbindliche Antwort:",
-    "askPartner": "Anfrage an einen verifizierten Partner",
+    "askPartner": "Anfrage an einen Verified Provider",
     "knowledgeTitle": "Wissen zum Bereich",
     "knowledgeMine": "Meine Märkte",
     "knowledgeAll": "Alle Märkte",

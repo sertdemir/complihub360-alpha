@@ -96,7 +96,7 @@
       },
       {
         "title": "Die richtigen Fachleute",
-        "desc": "Wir matchen Sie mit verifizierten Partnern, die zu Ihrem Fall passen."
+        "desc": "Wir matchen Sie mit Verified Providern, die zu Ihrem Fall passen."
       },
       {
         "title": "Ins Handeln kommen",
@@ -711,7 +711,7 @@
     ],
     "partnersEyebrow": "3 Verified Provider gematcht",
     "partnersTitle": "Wir haben gefunden, wer das umsetzen kann.",
-    "unlock": "Matches mit kostenlosem Konto freischalten",
+    "unlock": "Meine besten Matches mit kostenlosem Konto ansehen",
     "save": {
       "title": "Diese Map speichern. Partner freischalten.",
       "subtitle": "Kostenloses Konto. Keine Kreditkarte. Founding-Member-Zugang bis zum Beta-Launch.",
@@ -1223,7 +1223,7 @@
         "items": [
           {
             "q": "Brauche ich ein Konto?",
-            "a": "Für das Assessment nicht — es läuft ohne Konto im Browser. Ein kostenloses Konto brauchen Sie erst, wenn Sie Ihre Risk Map behalten, Matches freischalten oder Hinweise erhalten wollen."
+            "a": "Für das Assessment nicht — es läuft ohne Konto im Browser. Ein kostenloses Konto brauchen Sie erst, wenn Sie Ihre Risk Map behalten, Ihre besten Matches ansehen oder Hinweise erhalten wollen."
           },
           {
             "q": "Wie werden meine Daten behandelt?",

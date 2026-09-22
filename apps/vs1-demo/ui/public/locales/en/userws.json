@@ -1,7 +1,7 @@
 {
   "shared": {
     "seeAll": "See all",
-    "startNewSearch": "Start new search",
+    "startNewSearch": "Start new assessment",
     "open": "Open",
     "cancel": "Cancel",
     "send": "Send",
@@ -365,7 +365,7 @@
     "askSuggest": "What applies to {{title}}?",
     "askThinking": "Checking the area knowledge …",
     "askDisclaimer": "General information, not legal or tax advice. For a binding answer:",
-    "askPartner": "Send a request to a verified partner",
+    "askPartner": "Send a request to a Verified Provider",
     "knowledgeTitle": "Knowledge for this area",
     "knowledgeMine": "My markets",
     "knowledgeAll": "All markets",
@@ -565,7 +565,7 @@
     "close": "Close assistant",
     "thinking": "Checking the knowledge base…",
     "sources": "Sources",
-    "disclaimer": "General regulatory information, not legal or tax advice. For a binding assessment, engage a verified partner.",
+    "disclaimer": "General regulatory information, not legal or tax advice. For a binding assessment, engage a Verified Provider.",
     "error": "That didn’t work — please try again in a moment.",
     "notConfigured": "The assistant isn’t connected yet on this environment.",
     "quota": "Daily free limit reached — the upgrade plan is coming soon.",

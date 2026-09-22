@@ -110,7 +110,7 @@
     "eyebrow": "3 Verified Providers matched",
     "title": "We've found who can act on this.",
     "unlocked": "Matches unlocked",
-    "unlockCta": "Unlock matches with a free account",
+    "unlockCta": "See my best matches with a free account",
     "match": "{{pct}} match",
     "requestQuote": "Request quote",
     "0": {
@@ -237,7 +237,6 @@
     "pickSlotDrawer": "Pick a slot above.",
     "messageLabel": "What it is about",
     "messageFromSession": "This is about my session “{{session}}”.",
-    "sending": "Booking …",
     "duration": "30 min",
     "noSlots": "This provider has no free slots right now. Try again in a few days.",
     "failed": "The appointment could not be booked. Please try again in a moment.",

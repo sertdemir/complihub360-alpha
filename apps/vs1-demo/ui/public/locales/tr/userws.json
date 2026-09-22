@@ -1,7 +1,7 @@
 {
   "shared": {
     "seeAll": "Tümünü gör",
-    "startNewSearch": "Yeni arama başlat",
+    "startNewSearch": "Yeni değerlendirme başlat",
     "open": "Aç",
     "cancel": "İptal",
     "send": "Gönder",
@@ -365,7 +365,7 @@
     "askSuggest": "{{title}} için ne geçerli?",
     "askThinking": "Alan bilgisi kontrol ediliyor …",
     "askDisclaimer": "Genel bilgidir, hukuki veya vergi danışmanlığı değildir. Bağlayıcı bir yanıt için:",
-    "askPartner": "Doğrulanmış bir ortağa talep gönderin",
+    "askPartner": "Bir Verified Provider'a talep gönderin",
     "knowledgeTitle": "Alan bilgisi",
     "knowledgeMine": "Pazarlarım",
     "knowledgeAll": "Tüm pazarlar",

@@ -1875,5 +1875,104 @@
       "phone": "phone number",
       "hours": "service hours"
     }
+  },
+  "states": {
+    "riskMapLoading": {
+      "heading": "Creating your Risk Map",
+      "message": "We’re reviewing your answers and organizing the requirements that may apply."
+    },
+    "riskMapDelayed": {
+      "heading": "This is taking a little longer than expected",
+      "message": "Your answers are saved. You can wait here or return and try again."
+    },
+    "riskMapFailed": {
+      "heading": "We couldn’t create your Risk Map",
+      "message": "Please try again. If the problem continues, contact support."
+    },
+    "noRequirements": {
+      "heading": "No immediate requirements identified",
+      "message": "Based on the information provided, we did not identify an immediate requirement. This does not mean that no obligations apply. Review your answers or update your Risk Map when your business changes."
+    },
+    "moreInfoNeeded": {
+      "heading": "We need a little more information",
+      "message": "Answer the remaining questions so we can assess this area more accurately."
+    },
+    "noProviderMatch": {
+      "heading": "No verified provider is available for this request yet",
+      "message": "We do not currently have a verified provider covering this combination of market and service. You can request this market and choose to be notified when coverage becomes available."
+    },
+    "oneProviderMatch": {
+      "heading": "We found one provider that matches your current needs",
+      "message": "Review the provider’s expertise, coverage, expected price range, and availability before deciding whether to book a consultation."
+    },
+    "multipleProviderMatches": {
+      "heading": "Compare your best matches",
+      "message": "Review anonymous provider matches based on relevant expertise, coverage, service quality, availability, and fit."
+    },
+    "limitedCoverage": {
+      "heading": "Provider coverage is currently limited",
+      "message": "We found limited coverage for this market or service. You can review the available match or request additional coverage."
+    },
+    "providerResponseOverdue": {
+      "heading": "The provider has not responded yet",
+      "message": "The expected response time has passed. You can continue waiting or ask CompliHub360 to show you another match. Your information will not be shared with another provider unless you approve it."
+    },
+    "alternativeAvailable": {
+      "heading": "Another provider may be available",
+      "message": "Review the alternative match before deciding. We will not share your information unless you choose and book the provider."
+    },
+    "bookingProcessing": {
+      "heading": "Booking your consultation",
+      "message": "Please keep this page open while we confirm your request."
+    },
+    "bookingConfirmed": {
+      "heading": "Your consultation is booked",
+      "message": "The provider’s identity and full profile are now available. We have shared only the information shown in your booking confirmation."
+    },
+    "bookingFailed": {
+      "heading": "We couldn’t complete your booking",
+      "message": "No booking was created and your information was not shared. Please try again or contact support."
+    },
+    "marketUnavailable": {
+      "heading": "Coverage is not available for this market yet",
+      "message": "Request this market and choose whether you would like to receive an availability update."
+    },
+    "sessionExpired": {
+      "heading": "Your session has expired",
+      "message": "For your security, please sign in again to continue. Your saved information remains in your account."
+    },
+    "formErrorSummary": {
+      "heading": "Please review the highlighted information",
+      "message": "Some information is missing or needs to be corrected before you can continue."
+    },
+    "actions": {
+      "tryAgain": "Try Again",
+      "returnToAssessment": "Return to Assessment",
+      "contactSupport": "Contact Support",
+      "reviewMyAnswers": "Review My Answers",
+      "answerQuestions": "Answer Questions",
+      "doThisLater": "Do This Later",
+      "requestThisMarket": "Request This Market",
+      "returnToMyRiskMap": "Return to My Risk Map",
+      "reviewMatch": "Review Match",
+      "viewMyMatches": "View My Matches",
+      "reviewAvailableMatch": "Review Available Match",
+      "requestMoreCoverage": "Request More Coverage",
+      "keepWaiting": "Keep Waiting",
+      "seeAnotherMatch": "See Another Match",
+      "reviewAlternative": "Review Alternative",
+      "keepCurrentRequest": "Keep Current Request",
+      "viewProviderProfile": "View Provider Profile",
+      "viewBooking": "View Booking",
+      "exploreOtherMarkets": "Explore Other Markets",
+      "signIn": "Sign In"
+    },
+    "sharingReview": {
+      "heading": "Review what will be shared",
+      "body": "To process your consultation request, CompliHub360 will share the information listed below with the provider you selected. Your information will not be shared with other providers unless you make another selection and approve it.",
+      "confirmation": "I understand and want to continue with this booking.",
+      "confirmAndBook": "Confirm and Book",
+      "goBack": "Go Back"
+    }
   }
 }

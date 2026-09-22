@@ -91,7 +91,7 @@ function Dashboard({ dark }: { dark?: boolean }) {
               </h1>
               <p className="mt-1 text-body-sm text-fg-secondary">3 active requests · 2 sessions need a refresh · last activity 2h ago</p>
             </div>
-            <Button>Start new search</Button>
+            <Button>Start new assessment</Button>
           </div>
           <div className="mt-6 rounded-xl border border-stroke bg-surface p-5 text-fg-secondary">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-fg-brand">Resume where you left off</p>

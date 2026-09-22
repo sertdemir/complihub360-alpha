@@ -96,7 +96,7 @@
       },
       {
         "title": "The right specialists",
-        "desc": "We match you with verified partners who fit your case."
+        "desc": "We match you with Verified Providers who fit your case."
       },
       {
         "title": "Get things done",
@@ -296,7 +296,7 @@
     },
     "skipHint": "Not sure? Skip and we'll route based on your business model and markets.",
     "back": "Back",
-    "generate": "Generate my risk map",
+    "generate": "Create my Risk Map",
     "removeMarket": "Remove {{market}}",
     "aboutMarket": "About {{market}}"
   },
@@ -711,7 +711,7 @@
     ],
     "partnersEyebrow": "3 Verified Providers matched",
     "partnersTitle": "We've found who can act on this.",
-    "unlock": "Unlock matches with a free account",
+    "unlock": "See my best matches with a free account",
     "save": {
       "title": "Save this map. Unlock the partners.",
       "subtitle": "Free account. No credit card. Founding-member access through Beta launch.",
@@ -1223,7 +1223,7 @@
         "items": [
           {
             "q": "Do I need an account?",
-            "a": "Not for the assessment — it runs in your browser without one. You only need a free account to keep your Risk Map, unlock matches or receive alerts."
+            "a": "Not for the assessment — it runs in your browser without one. You only need a free account to keep your Risk Map, see your best matches or receive alerts."
           },
           {
             "q": "How is my data handled?",

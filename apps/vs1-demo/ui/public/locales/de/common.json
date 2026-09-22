@@ -1875,5 +1875,104 @@
       "phone": "Telefonnummer",
       "hours": "Servicezeiten"
     }
+  },
+  "states": {
+    "riskMapLoading": {
+      "heading": "Ihre Risk Map wird erstellt",
+      "message": "Wir prüfen Ihre Antworten und ordnen die Anforderungen, die gelten könnten."
+    },
+    "riskMapDelayed": {
+      "heading": "Das dauert etwas länger als erwartet",
+      "message": "Ihre Antworten sind gespeichert. Sie können hier warten oder zurückgehen und es erneut versuchen."
+    },
+    "riskMapFailed": {
+      "heading": "Wir konnten Ihre Risk Map nicht erstellen",
+      "message": "Bitte versuchen Sie es erneut. Wenn das Problem bestehen bleibt, wenden Sie sich an den Support."
+    },
+    "noRequirements": {
+      "heading": "Keine unmittelbaren Anforderungen erkannt",
+      "message": "Auf Grundlage Ihrer Angaben haben wir keine unmittelbare Anforderung erkannt. Das bedeutet nicht, dass keine Pflichten gelten. Prüfen Sie Ihre Antworten oder aktualisieren Sie Ihre Risk Map, wenn sich Ihr Geschäft verändert."
+    },
+    "moreInfoNeeded": {
+      "heading": "Wir brauchen noch ein paar Angaben",
+      "message": "Beantworten Sie die offenen Fragen, damit wir diesen Bereich genauer einschätzen können."
+    },
+    "noProviderMatch": {
+      "heading": "Für diese Anfrage ist noch kein Verified Provider verfügbar",
+      "message": "Derzeit deckt kein Verified Provider diese Kombination aus Markt und Leistung ab. Sie können diesen Markt anfragen und sich benachrichtigen lassen, sobald er abgedeckt ist."
+    },
+    "oneProviderMatch": {
+      "heading": "Wir haben einen Anbieter gefunden, der zu Ihrem aktuellen Bedarf passt",
+      "message": "Prüfen Sie Fachgebiet, Abdeckung, erwartete Preisspanne und Verfügbarkeit des Anbieters, bevor Sie entscheiden, ob Sie einen Termin buchen."
+    },
+    "multipleProviderMatches": {
+      "heading": "Vergleichen Sie Ihre besten Matches",
+      "message": "Prüfen Sie anonyme Anbieter-Matches nach relevantem Fachgebiet, Abdeckung, Servicequalität, Verfügbarkeit und Passung."
+    },
+    "limitedCoverage": {
+      "heading": "Die Anbieterabdeckung ist derzeit begrenzt",
+      "message": "Für diesen Markt oder diese Leistung haben wir nur begrenzte Abdeckung gefunden. Sie können das verfügbare Match prüfen oder weitere Abdeckung anfragen."
+    },
+    "providerResponseOverdue": {
+      "heading": "Der Anbieter hat noch nicht geantwortet",
+      "message": "Die erwartete Antwortzeit ist verstrichen. Sie können weiter warten oder CompliHub360 bitten, Ihnen ein anderes Match zu zeigen. Ihre Angaben werden nur mit Ihrer Zustimmung an einen anderen Anbieter weitergegeben."
+    },
+    "alternativeAvailable": {
+      "heading": "Möglicherweise ist ein anderer Anbieter verfügbar",
+      "message": "Prüfen Sie das alternative Match, bevor Sie entscheiden. Wir geben Ihre Angaben erst weiter, wenn Sie den Anbieter auswählen und buchen."
+    },
+    "bookingProcessing": {
+      "heading": "Ihr Termin wird gebucht",
+      "message": "Bitte lassen Sie diese Seite geöffnet, während wir Ihre Anfrage bestätigen."
+    },
+    "bookingConfirmed": {
+      "heading": "Ihr Termin ist gebucht",
+      "message": "Identität und vollständiges Profil des Anbieters sind jetzt sichtbar. Wir haben nur die Angaben weitergegeben, die in Ihrer Buchungsbestätigung aufgeführt sind."
+    },
+    "bookingFailed": {
+      "heading": "Wir konnten Ihre Buchung nicht abschließen",
+      "message": "Es wurde keine Buchung angelegt, und Ihre Angaben wurden nicht weitergegeben. Bitte versuchen Sie es erneut oder wenden Sie sich an den Support."
+    },
+    "marketUnavailable": {
+      "heading": "Für diesen Markt gibt es noch keine Abdeckung",
+      "message": "Fragen Sie diesen Markt an und entscheiden Sie, ob Sie über die Verfügbarkeit informiert werden möchten."
+    },
+    "sessionExpired": {
+      "heading": "Ihre Sitzung ist abgelaufen",
+      "message": "Bitte melden Sie sich zu Ihrer Sicherheit erneut an, um fortzufahren. Ihre gespeicherten Angaben bleiben in Ihrem Konto erhalten."
+    },
+    "formErrorSummary": {
+      "heading": "Bitte prüfen Sie die markierten Angaben",
+      "message": "Einige Angaben fehlen oder müssen korrigiert werden, bevor Sie fortfahren können."
+    },
+    "actions": {
+      "tryAgain": "Erneut versuchen",
+      "returnToAssessment": "Zurück zum Assessment",
+      "contactSupport": "Support kontaktieren",
+      "reviewMyAnswers": "Meine Antworten prüfen",
+      "answerQuestions": "Fragen beantworten",
+      "doThisLater": "Später erledigen",
+      "requestThisMarket": "Diesen Markt anfragen",
+      "returnToMyRiskMap": "Zurück zu meiner Risk Map",
+      "reviewMatch": "Match prüfen",
+      "viewMyMatches": "Meine Matches ansehen",
+      "reviewAvailableMatch": "Verfügbares Match prüfen",
+      "requestMoreCoverage": "Weitere Abdeckung anfragen",
+      "keepWaiting": "Weiter warten",
+      "seeAnotherMatch": "Anderes Match ansehen",
+      "reviewAlternative": "Alternative prüfen",
+      "keepCurrentRequest": "Aktuelle Anfrage behalten",
+      "viewProviderProfile": "Anbieterprofil ansehen",
+      "viewBooking": "Buchung ansehen",
+      "exploreOtherMarkets": "Andere Märkte ansehen",
+      "signIn": "Anmelden"
+    },
+    "sharingReview": {
+      "heading": "Prüfen Sie, was weitergegeben wird",
+      "body": "Um Ihre Terminanfrage zu bearbeiten, gibt CompliHub360 die unten aufgeführten Angaben an den von Ihnen gewählten Anbieter weiter. An andere Anbieter werden Ihre Angaben nur weitergegeben, wenn Sie eine weitere Auswahl treffen und zustimmen.",
+      "confirmation": "Ich habe das verstanden und möchte mit dieser Buchung fortfahren.",
+      "confirmAndBook": "Bestätigen und buchen",
+      "goBack": "Zurück"
+    }
   }
 }

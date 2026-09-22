@@ -96,7 +96,7 @@
       },
       {
         "title": "Doğru uzmanlar",
-        "desc": "Sizi durumunuza uygun, doğrulanmış partnerlerle eşleştiriyoruz."
+        "desc": "Sizi durumunuza uygun Verified Provider'larla eşleştiriyoruz."
       },
       {
         "title": "Harekete geçin",
@@ -711,7 +711,7 @@
     ],
     "partnersEyebrow": "3 Verified Provider eşleşti",
     "partnersTitle": "Bunu kimin çözebileceğini bulduk.",
-    "unlock": "Eşleşmeleri ücretsiz hesapla açın",
+    "unlock": "En iyi eşleşmelerinizi ücretsiz hesapla görün",
     "save": {
       "title": "Bu haritayı kaydedin. Partner'ların kilidini açın.",
       "subtitle": "Ücretsiz hesap. Kredi kartı gerekmez. Beta lansmanına kadar kurucu üye erişimi.",
@@ -1223,7 +1223,7 @@
         "items": [
           {
             "q": "Hesaba ihtiyacım var mı?",
-            "a": "Değerlendirme için hayır — tarayıcınızda hesapsız çalışır. Ücretsiz bir hesaba yalnızca Risk Map'inizi saklamak, eşleşmeleri açmak veya bildirim almak istediğinizde ihtiyacınız olur."
+            "a": "Değerlendirme için hayır — tarayıcınızda hesapsız çalışır. Ücretsiz bir hesaba yalnızca Risk Map'inizi saklamak, en iyi eşleşmelerinizi görmek veya bildirim almak istediğinizde ihtiyacınız olur."
           },
           {
             "q": "Verilerim nasıl işleniyor?",

@@ -110,7 +110,7 @@
     "eyebrow": "3 Verified Provider gefunden",
     "title": "Wir haben gefunden, wer das für Sie umsetzen kann.",
     "unlocked": "Matches freigeschaltet",
-    "unlockCta": "Matches mit kostenlosem Konto freischalten",
+    "unlockCta": "Meine besten Matches mit kostenlosem Konto ansehen",
     "match": "{{pct}} Übereinstimmung",
     "requestQuote": "Angebot anfordern",
     "0": {
@@ -237,7 +237,6 @@
     "pickSlotDrawer": "Wählen Sie oben einen Termin.",
     "messageLabel": "Ihr Anliegen",
     "messageFromSession": "Es geht um meine Sitzung „{{session}}“.",
-    "sending": "Wird gebucht …",
     "duration": "30 Min",
     "noSlots": "Dieser Anbieter hat gerade keine freien Termine. Versuchen Sie es in ein paar Tagen erneut.",
     "failed": "Der Termin konnte nicht gebucht werden. Bitte versuchen Sie es in einem Moment erneut.",

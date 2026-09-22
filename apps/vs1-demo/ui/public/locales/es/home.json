@@ -96,7 +96,7 @@
       },
       {
         "title": "Los especialistas adecuados",
-        "desc": "Hacemos match entre usted y partners verificados que encajan con su caso."
+        "desc": "Hacemos match entre usted y Verified Providers que encajan con su caso."
       },
       {
         "title": "Pase a la acción",
@@ -296,7 +296,7 @@
     },
     "skipHint": "¿No está seguro? Omita el paso y derivaremos según su modelo de negocio y sus mercados.",
     "back": "Atrás",
-    "generate": "Generar mi Risk Map",
+    "generate": "Crear mi Risk Map",
     "removeMarket": "Quitar {{market}}",
     "aboutMarket": "Acerca de {{market}}"
   },
@@ -711,7 +711,7 @@
     ],
     "partnersEyebrow": "3 Verified Providers con match",
     "partnersTitle": "Hemos encontrado quién puede actuar sobre esto.",
-    "unlock": "Desbloquee los matches con una cuenta gratuita",
+    "unlock": "Vea sus mejores matches con una cuenta gratuita",
     "save": {
       "title": "Guarde este mapa. Desbloquee los partners.",
       "subtitle": "Cuenta gratuita. Sin tarjeta de crédito. Acceso de miembro fundador hasta el lanzamiento de la Beta.",
@@ -1223,7 +1223,7 @@
         "items": [
           {
             "q": "¿Necesito una cuenta?",
-            "a": "Para la evaluación no — funciona en su navegador sin cuenta. Solo necesita una cuenta gratuita para conservar su Risk Map, desbloquear matches o recibir avisos."
+            "a": "Para la evaluación no — funciona en su navegador sin cuenta. Solo necesita una cuenta gratuita para conservar su Risk Map, ver sus mejores matches o recibir avisos."
           },
           {
             "q": "¿Cómo se tratan mis datos?",

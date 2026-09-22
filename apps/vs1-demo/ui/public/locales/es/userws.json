@@ -1,7 +1,7 @@
 {
   "shared": {
     "seeAll": "Ver todo",
-    "startNewSearch": "Iniciar nueva búsqueda",
+    "startNewSearch": "Iniciar nueva evaluación",
     "open": "Abrir",
     "cancel": "Cancelar",
     "send": "Enviar",
@@ -365,7 +365,7 @@
     "askSuggest": "¿Qué aplica a {{title}}?",
     "askThinking": "Consultando el conocimiento del área …",
     "askDisclaimer": "Información general, no asesoramiento legal ni fiscal. Para una respuesta vinculante:",
-    "askPartner": "Enviar una solicitud a un socio verificado",
+    "askPartner": "Enviar una solicitud a un Verified Provider",
     "knowledgeTitle": "Conocimiento del área",
     "knowledgeMine": "Mis mercados",
     "knowledgeAll": "Todos los mercados",
