@@ -1,7 +1,7 @@
 ---
 title: "Provider Phase 0 — Sicherheit & Identität"
 assignee: "Claude"
-status: "review"
+status: "done"
 ---
 
 # Provider Phase 0 — Sicherheit & Identität

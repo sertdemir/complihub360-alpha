@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
 import { Tag } from '../ui/Tag';
-import { euro, type Invoice } from '../../api/billing';
+import { money, type Invoice } from '../../api/billing';
 
 // ─── Invoice-Detail drawer (Figma 2653:92 · wiring map B7) ───────────────────
 // Line items + totals for one invoice. Stripe-issued rows (monthly billing
@@ -88,14 +88,14 @@ export function InvoiceDetailDrawer({ invoice, onClose }: { invoice: Invoice | n
               <div key={li.label} className="flex items-baseline justify-between gap-3 border-b border-elevate/5 px-4 py-3 last:border-b-0">
                 <div className="min-w-0">
                   <p className="text-[13px] font-medium text-fg">{li.label}</p>
-                  <p className="mt-0.5 text-[11px] text-fg-tertiary">{li.qty} × {euro(li.unit_cents)}</p>
+                  <p className="mt-0.5 text-[11px] text-fg-tertiary">{li.qty} × {money(li.unit_cents, invoice.currency)}</p>
                 </div>
-                <p className="shrink-0 text-[13px] font-semibold text-fg">{euro(li.amount_cents)}</p>
+                <p className="shrink-0 text-[13px] font-semibold text-fg">{money(li.amount_cents, invoice.currency)}</p>
               </div>
             ))}
             <div className="flex items-baseline justify-between border-t border-elevate/10 px-4 py-3">
               <p className="text-[12px] font-semibold uppercase tracking-[0.06em] text-fg-secondary">{t('invoiceDetail.total')}</p>
-              <p className="text-[16px] font-bold text-fg">{euro(invoice.amount_cents)}</p>
+              <p className="text-[16px] font-bold text-fg">{money(invoice.amount_cents, invoice.currency)}</p>
             </div>
           </div>
 

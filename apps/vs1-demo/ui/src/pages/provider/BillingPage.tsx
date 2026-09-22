@@ -8,7 +8,7 @@ import { Table, THead, TBody, TR, TH, TD } from '../../components/ui/Table';
 import { Tag } from '../../components/ui/Tag';
 import { InvoiceDetailDrawer } from '../../components/provider/InvoiceDetailDrawer';
 import { useApiData } from '../../lib/useApiData';
-import { fetchInvoices, fetchBillingPreview, openBillingPortal, euro, type Invoice, type BillingPreview } from '../../api/billing';
+import { fetchInvoices, fetchBillingPreview, openBillingPortal, money, type Invoice, type BillingPreview } from '../../api/billing';
 
 // ─── Provider /billing ────────────────────────────────────────────────────────
 // Mirrors "Provider Dashboard v1 · /billing (Desktop · payment-failed)"
@@ -48,17 +48,34 @@ const FIXTURE: Invoice[] = [
     ] },
 ];
 
-// Design fixture for the current-period preview (pricing decision 2026-08-09):
-// no abo, past the free allowance, a busy month.
+// Design fixture for the current-cycle preview (Pricing v2, ADR-0003):
+// Growth, zwei rabattierte Leads verbraucht, einer offen.
 const PREVIEW_FIXTURE: BillingPreview = {
-  period: '2026-08',
-  subscription: { plan: 'none', since: null },
-  usage: { leads: 3, detail_opens: 14, free_leads_left: 0 },
-  lines: [
-    { label: 'Leads (bestätigte Termine) · 3 gesamt', qty: 3, unit_cents: 12000, amount_cents: 36000 },
-    { label: 'Detail-Opens (qualifizierte Profilansichten) · 14×', qty: 14, unit_cents: 300, amount_cents: 4200 },
-  ],
-  total_cents: 40200,
+  period: '2026-09',
+  currency: 'USD',
+  subscription: {
+    plan_code: 'growth', label: 'Growth', cadence: 'monthly', status: 'active',
+    current_period_start: '2026-09-01', current_period_end: '2026-10-01',
+    monthly_cents: 9900, annual_cents: 99000, category_allowance: 5, analytics_level: 'enhanced', api_eligible: false,
+  },
+  discount: { pct: 10, count: 3, used: 2, remaining: 1, cycle_start: '2026-09-01' },
+  leads: { count: 2, standard_cents: 24800, discount_cents: 2480, final_cents: 22320 },
+  credit_balance_cents: 0,
+  lines: [{ label: 'Growth · monthly · 2026-09', qty: 1, unit_cents: 9900, amount_cents: 9900 }],
+  total_cents: 32220,
+  pricing: {
+    plans: [
+      { code: 'essential', label: 'Essential', monthly_cents: 5900, annual_cents: 59000, currency: 'USD', category_allowance: 1, lead_discount_pct: 0, lead_discount_count: 0 },
+      { code: 'growth', label: 'Growth', monthly_cents: 9900, annual_cents: 99000, currency: 'USD', category_allowance: 5, lead_discount_pct: 10, lead_discount_count: 3 },
+      { code: 'global', label: 'Global', monthly_cents: 18900, annual_cents: 189000, currency: 'USD', category_allowance: null, lead_discount_pct: 15, lead_discount_count: 6 },
+    ],
+    bands: [
+      { band: 1, label: 'Focused', fee_cents: 9900, currency: 'USD' },
+      { band: 2, label: 'Core', fee_cents: 14900, currency: 'USD' },
+      { band: 3, label: 'Advanced', fee_cents: 29900, currency: 'USD' },
+      { band: 4, label: 'Strategic', fee_cents: 49900, currency: 'USD' },
+    ],
+  },
 };
 
 const STATUS_META: Record<Invoice['status'], { labelKey: string; tone: 'success' | 'error' | 'warning' | 'neutral' }> = {
@@ -95,18 +112,19 @@ export function BillingPage() {
   const latest = invoices[0];
   const failed = invoices.find((i) => i.status === 'failed');
   const ytd = invoices.filter((i) => i.period.startsWith('2026')).reduce((n, i) => n + i.amount_cents, 0);
-  const planLabel = preview.subscription.plan === 'monthly' ? t('billing.planMonthly')
-    : preview.subscription.plan === 'annual' ? t('billing.planAnnual')
+  const cur = preview.currency;
+  const planLabel = preview.subscription
+    ? `${preview.subscription.label} · ${t(preview.subscription.cadence === 'annual' ? 'billing.planCadenceAnnual' : 'billing.planCadenceMonthly')}`
     : t('billing.planNone');
   const kpis = [
-    { label: t('billing.kpiThisMonth'), value: euro(preview.total_cents),
-      trend: { value: '—', direction: 'neutral' as const, label: t('billing.kpiThisMonthUsage', { leads: preview.usage.leads, opens: preview.usage.detail_opens }) } },
-    { label: t('billing.kpiLastInvoice'), value: latest ? euro(latest.amount_cents) : '—',
+    { label: t('billing.kpiThisMonth'), value: money(preview.total_cents, cur),
+      trend: { value: '—', direction: 'neutral' as const, label: t('billing.kpiThisMonthUsage', { leads: preview.leads.count, remaining: preview.discount.remaining }) } },
+    { label: t('billing.kpiLastInvoice'), value: latest ? money(latest.amount_cents, latest.currency) : '—',
       trend: latest?.status === 'failed'
         ? { value: '↘', direction: 'down' as const, label: `${latest.invoice_number} · ${t('billing.kpiPaymentFailed')}` }
         : { value: '—', direction: 'neutral' as const, label: latest ? `${latest.invoice_number} · ${latest.status}` : '' } },
     { label: t('billing.kpiNextInvoice'), value: '2026-08-01', trend: { value: '—', direction: 'neutral' as const, label: t('billing.kpiMonthlyFirst') } },
-    { label: t('billing.kpiYtd'), value: euro(ytd), trend: { value: '↗', direction: 'up' as const, label: t('billing.kpiAcrossMonths', { count: invoices.length }) } },
+    { label: t('billing.kpiYtd'), value: money(ytd, latest?.currency ?? cur), trend: { value: '↗', direction: 'up' as const, label: t('billing.kpiAcrossMonths', { count: invoices.length }) } },
   ];
 
   return (
@@ -138,8 +156,9 @@ export function BillingPage() {
           ))}
         </div>
 
-        {/* Current period (pricing decision 2026-08-09): live charge preview —
-            the same computation the monthly Stripe run will invoice. */}
+        {/* Laufender Zyklus (Pricing v2, ADR-0003): Abo-Zeile des Monats plus
+            die Lead-Belastungen des Zyklus aus dem Ledger — Standard, Rabatt,
+            Endbetrag, wie Spec B es verlangt. */}
         <section className="space-y-3">
           <div className="flex items-end justify-between">
             <div>
@@ -148,8 +167,8 @@ export function BillingPage() {
             </div>
             <div className="text-right">
               <p className="text-[12px] text-fg-tertiary">{t('billing.planLabel')}: <span className="font-semibold text-fg">{planLabel}</span></p>
-              {preview.usage.free_leads_left > 0 && (
-                <p className="text-[12px] text-fg-brand">{t('billing.freeLeadsLeft', { count: preview.usage.free_leads_left })}</p>
+              {preview.discount.count > 0 && (
+                <p className="text-[12px] text-fg-brand">{t('billing.discountRemaining', { remaining: preview.discount.remaining, count: preview.discount.count, pct: preview.discount.pct })}</p>
               )}
             </div>
           </div>
@@ -159,12 +178,18 @@ export function BillingPage() {
             ) : preview.lines.map((l) => (
               <div key={l.label} className="flex items-center justify-between border-b border-stroke px-5 py-3 text-[13px] last:border-b-0">
                 <span className="min-w-0 truncate text-fg-secondary">{l.label}</span>
-                <span className="ml-4 shrink-0 tabular-nums text-fg">{l.qty} × {euro(l.unit_cents)} = <span className="font-semibold">{euro(l.amount_cents)}</span></span>
+                <span className="ml-4 shrink-0 tabular-nums text-fg">{l.qty} × {money(l.unit_cents, cur)} = <span className="font-semibold">{money(l.amount_cents, cur)}</span></span>
               </div>
             ))}
+            {preview.leads.count > 0 && (
+              <div className="flex items-center justify-between border-b border-stroke px-5 py-3 text-[13px]">
+                <span className="min-w-0 truncate text-fg-secondary">{t('billing.leadsLine', { count: preview.leads.count, discount: money(preview.leads.discount_cents, cur) })}</span>
+                <span className="ml-4 shrink-0 tabular-nums text-fg"><s className="text-fg-tertiary">{money(preview.leads.standard_cents, cur)}</s> <span className="font-semibold">{money(preview.leads.final_cents, cur)}</span></span>
+              </div>
+            )}
             <div className="flex items-center justify-between px-5 py-3 text-[13px]">
               <span className="font-semibold text-fg">{t('billing.currentPeriodTotal')}</span>
-              <span className="font-bold tabular-nums text-fg-accent">{euro(preview.total_cents)}</span>
+              <span className="font-bold tabular-nums text-fg-accent">{money(preview.total_cents, cur)}</span>
             </div>
           </div>
         </section>
@@ -191,7 +216,7 @@ export function BillingPage() {
                   <TR key={inv.id} className="cursor-pointer transition-colors hover:bg-elevate/[0.04]" onClick={() => setDetail(inv)}>
                     <TD bold>{inv.invoice_number}</TD>
                     <TD>{inv.period}</TD>
-                    <TD numeric>{euro(inv.amount_cents)}</TD>
+                    <TD numeric>{money(inv.amount_cents, inv.currency)}</TD>
                     <TD><Tag tone={m.tone}>{t(m.labelKey)}</Tag></TD>
                     <TD className="text-fg-secondary">{inv.status === 'failed' ? t('billing.rowActionFailed') : t('billing.rowActionView')}</TD>
                   </TR>

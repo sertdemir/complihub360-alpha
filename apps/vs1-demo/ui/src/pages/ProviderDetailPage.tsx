@@ -41,8 +41,9 @@ import { SLUG_TO_I18N } from './user/AnfragenTab';
 // Sitzung, nur damit eine Sektion gefuellt ist.
 //
 // Stufe 2 bleibt anonym: Name und Kontakt gibt es erst nach der Buchung
-// (spec §5). Das Oeffnen ist das bezahlte Ereignis `provider_detail_opened`
-// (serverseitig 1×/Nutzer/30 Tage entprellt).
+// (spec §5). Das Oeffnen schreibt das Ereignis `provider_detail_opened`
+// (serverseitig 1×/Nutzer/30 Tage entprellt) — seit Pricing v2 (ADR-0003)
+// nur noch Analytik, keine Gebuehr.
 //
 // NICHT VERLINKT (Nutzer-Entscheidung 2026-09-15). Bereichs- und Sitzungsseite
 // oeffnen einen Anbieter seither als Schublade (components/user/PartnerDrawer,

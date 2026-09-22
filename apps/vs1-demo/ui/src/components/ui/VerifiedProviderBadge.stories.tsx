@@ -4,8 +4,8 @@ import { VerifiedProviderBadge } from './VerifiedProviderBadge';
 const DESCRIPTION = `
 A brand trust badge for **verified providers** (Molecule). A thin wrapper around
 **PartnerStatusBadge** (\`status="verified"\` → the gold mark is the trust signal),
-adding tier-specific labels: **Verified** · **Gold** · **Platinum** provider.
-Pass \`label\` to override. Light + dark.
+There is exactly one tier — verification is a fact, not a purchasable level
+(ADR-0003). Pass \`label\` to override. Light + dark.
 `;
 
 const meta = {
@@ -19,9 +19,8 @@ type Story = StoryObj<typeof VerifiedProviderBadge>;
 
 const Demo = () => (
   <div className="flex flex-wrap items-center gap-3">
-    <VerifiedProviderBadge tier="verified" />
-    <VerifiedProviderBadge tier="gold" />
-    <VerifiedProviderBadge tier="platinum" />
+    <VerifiedProviderBadge />
+    <VerifiedProviderBadge label="Verified Provider · DE" />
   </div>
 );
 

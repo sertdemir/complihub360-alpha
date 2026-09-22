@@ -132,7 +132,7 @@
   },
   "billing": {
     "title": "Abrechnung",
-    "subtitle": "Abrechnung pro gebuchtem Lead (120 €, die ersten 2 frei) und pro Detail-Open (3 €, gedeckelt) — oder im Partner-Abo: 149 €/Monat bzw. 1.490 €/Jahr (2 Monate geschenkt) inkl. 1 Lead/Monat + unbegrenzte Detail-Opens.",
+    "subtitle": "Ihr Tarif (Essential, Growth oder Global) wird monatlich oder jährlich abgerechnet — ein Jahr kostet zehn Monate. Jeder gebuchte Lead wird nach seinem Opportunity-Band berechnet ($99 bis $499); Growth und Global erhalten einen Rabatt auf die ersten Leads jedes Zyklus. Ihr Tarif hat nie Einfluss auf Ihr Ranking.",
     "statusPaid": "bezahlt",
     "statusFailedGrace": "fehlgeschlagen · Kulanzfrist",
     "statusOpen": "offen",
@@ -165,11 +165,12 @@
     "currentPeriodEmpty": "Diesen Monat noch keine abrechenbare Aktivität.",
     "currentPeriodTotal": "Zwischensumme",
     "planLabel": "Tarif",
-    "planMonthly": "Partner-Abo (monatlich, 149 €)",
-    "planAnnual": "Partner-Abo (jährlich, 1.490 € — 2 Monate geschenkt)",
-    "planNone": "Pay per Use (kein Abo)",
-    "freeLeadsLeft": "Noch {{count}} Lead(s) im Freikontingent",
-    "kpiThisMonthUsage": "{{leads}} Leads · {{opens}} Detail-Opens"
+    "planNone": "Kein Abo",
+    "kpiThisMonthUsage": "{{leads}} Leads · noch {{remaining}} rabattiert",
+    "planCadenceMonthly": "monatlich",
+    "planCadenceAnnual": "jährlich (12 Monate zum Preis von 10)",
+    "discountRemaining": "Noch {{remaining}} von {{count}} rabattierten Leads in diesem Zyklus ({{pct}} %)",
+    "leadsLine": "Leads in diesem Zyklus · {{count}} berechnet · {{discount}} Tarif-Rabatt"
   },
   "confirmEmail": {
     "working": "Ihre neue Adresse wird bestätigt…",

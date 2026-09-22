@@ -222,6 +222,104 @@ paths:
         '409':
           description: Termin noch nicht stattgefunden (BOOKING_NOT_HELD) oder schon bewertet (ALREADY_REVIEWED)
 
+  # ─── Pricing v2 (ADR-0003, 2026-09-22) ─────────────────────────────────────
+  # Plaene, Baender und Rabatte kommen aus plan_catalog / lead_band_config /
+  # lead_band_rules / lead_fee_eligibility. Nichts davon erreicht /search.
+
+  /provider/{key}/billing/preview:
+    get:
+      summary: Laufender Abrechnungszyklus des Anbieters (Pricing v2)
+      description: >
+        Plan, Rabattkontingent (genutzt/offen), Lead-Belastungen des Zyklus aus
+        dem Ledger (Standard, Rabatt, Endbetrag), Guthaben, Preisliste.
+        Nur fuer Mitglieder des Anbieters, Admin oder Server-Key.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Vorschau
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  period: { type: string, example: '2026-09' }
+                  currency: { type: string, example: USD }
+                  subscription:
+                    type: object
+                    nullable: true
+                    properties:
+                      plan_code: { type: string, enum: [essential, growth, global] }
+                      label: { type: string }
+                      cadence: { type: string, enum: [monthly, annual] }
+                      status: { type: string, enum: [active, past_due, cancelled, ended] }
+                      current_period_start: { type: string, format: date }
+                      current_period_end: { type: string, format: date }
+                      monthly_cents: { type: integer }
+                      annual_cents: { type: integer, description: zehn Monatspreise }
+                      category_allowance: { type: integer, nullable: true, description: 'null = alle' }
+                      analytics_level: { type: string, enum: [basic, enhanced, advanced] }
+                      api_eligible: { type: boolean }
+                  discount:
+                    type: object
+                    properties:
+                      pct: { type: integer }
+                      count: { type: integer }
+                      used: { type: integer }
+                      remaining: { type: integer }
+                      cycle_start: { type: string, format: date }
+                  leads:
+                    type: object
+                    properties:
+                      count: { type: integer }
+                      standard_cents: { type: integer }
+                      discount_cents: { type: integer }
+                      final_cents: { type: integer }
+                  credit_balance_cents: { type: integer }
+                  lines:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        label: { type: string }
+                        qty: { type: integer }
+                        unit_cents: { type: integer }
+                        amount_cents: { type: integer }
+                  total_cents: { type: integer }
+                  pricing:
+                    type: object
+                    description: Aktuelle Preisliste (Plaene und Baender), nur zur Anzeige im Dashboard
+        '404':
+          description: Anbieter unbekannt oder nicht der eigene
+
+  /admin/billing/run:
+    post:
+      summary: Abo-Rechnungen einer Periode ausstellen (nur Server-Key)
+      description: >
+        Stellt je aktivem Abo die Abo-Zeile der Periode als Stripe-Rechnung aus
+        (monatlich jede Periode, jaehrlich im Jubilaeumsmonat). Leads laufen
+        NICHT hier — sie werden je Buchung belastet und stehen im Ledger.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                period: { type: string, pattern: '^\\d{4}-\\d{2}$' }
+                dry_run: { type: boolean }
+      responses:
+        '200':
+          description: Ergebnis je Anbieter
+        '403':
+          description: Kein Server-Key
+        '503':
+          description: Stripe nicht konfiguriert (ausser dry_run)
+
 components:
   securitySchemes:
     bearerAuth:

@@ -132,7 +132,7 @@
   },
   "billing": {
     "title": "Facturación",
-    "subtitle": "Facturación por lead reservado (120 €, los 2 primeros gratis) y por vista de perfil (3 €, con tope) — o la suscripción Partner: 149 €/mes o 1.490 €/año (2 meses gratis) incl. 1 lead/mes + vistas ilimitadas.",
+    "subtitle": "Su plan (Essential, Growth o Global) se factura mensual o anualmente — un año cuesta diez meses. Cada lead reservado se cobra según su banda de oportunidad ($99 a $499); Growth y Global reciben un descuento en los primeros leads de cada ciclo. Su plan nunca influye en su posición.",
     "statusPaid": "pagada",
     "statusFailedGrace": "fallida · gracia",
     "statusOpen": "abierta",
@@ -165,11 +165,12 @@
     "currentPeriodEmpty": "Aún no hay actividad facturable este mes.",
     "currentPeriodTotal": "Total acumulado",
     "planLabel": "Plan",
-    "planMonthly": "Suscripción Partner (mensual, 149 €)",
-    "planAnnual": "Suscripción Partner (anual, 1.490 € — 2 meses gratis)",
-    "planNone": "Pago por uso (sin suscripción)",
-    "freeLeadsLeft": "Quedan {{count}} lead(s) gratuitos",
-    "kpiThisMonthUsage": "{{leads}} leads · {{opens}} vistas de perfil"
+    "planNone": "Sin suscripción",
+    "kpiThisMonthUsage": "{{leads}} leads · {{remaining}} con descuento restantes",
+    "planCadenceMonthly": "mensual",
+    "planCadenceAnnual": "anual (12 meses al precio de 10)",
+    "discountRemaining": "Quedan {{remaining}} de {{count}} leads con descuento en este ciclo ({{pct}} %)",
+    "leadsLine": "Leads de este ciclo · {{count}} cobrados · {{discount}} descuento del plan"
   },
   "confirmEmail": {
     "working": "Confirmando su nueva dirección…",

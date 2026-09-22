@@ -2,8 +2,8 @@ import { apiFetch } from './client';
 import { myProviderKey } from './provider';
 
 // ─── Billing API (wiring map B7) ─────────────────────────────────────────────
-// Invoice history + line items. Stripe becomes the issuer once C3 lands; the
-// rows and the pricing model (€92/confirm + €2/click) are real already.
+// Invoice history + line items (Stripe-issued) and the live preview of the
+// running cycle under Pricing v2 (Spec B, ADR-0003, 2026-09-22).
 
 export interface InvoiceLineItem {
   label: string;
@@ -28,8 +28,10 @@ export interface Invoice {
   invoice_pdf?: string | null;
 }
 
-export function euro(cents: number): string {
-  return '€' + (cents / 100).toLocaleString('en-IE', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+// Betraege tragen ihre Waehrung mit: Abo und Leads laufen seit Pricing v2 in
+// USD, Alt-Rechnungen aus Phase 1 stehen in EUR.
+export function money(cents: number, currency: string = 'USD'): string {
+  return (cents / 100).toLocaleString('en-US', { style: 'currency', currency, minimumFractionDigits: 0, maximumFractionDigits: 2 });
 }
 
 export async function fetchInvoices(providerKey?: string): Promise<Invoice[]> {
@@ -37,16 +39,31 @@ export async function fetchInvoices(providerKey?: string): Promise<Invoice[]> {
   return res.invoices;
 }
 
-// ─── Current-period preview (pricing decision 2026-08-09) ────────────────────
-// Live charges of the running month: abo (149 €/M or 1.490 €/J), leads
-// (120 €, first 2 ever free, 1/month included in the abo), detail opens
-// (3 €, 50 € cap, free for subscribers). Pure computation server-side.
+// ─── Current-cycle preview (Pricing v2) ──────────────────────────────────────
+// Spec B: "The dashboard must show allowance used, allowance remaining,
+// standard fee, discount, and final charge." Plan, Rabattkontingent des
+// laufenden Zyklus, Lead-Belastungen aus dem Ledger, Guthaben, Preisliste.
+// Pure computation server-side; nothing here is a ranking input.
+export type PlanCode = 'essential' | 'growth' | 'global';
+
 export interface BillingPreview {
   period: string;
-  subscription: { plan: 'none' | 'monthly' | 'annual'; since: string | null };
-  usage: { leads: number; detail_opens: number; free_leads_left: number };
+  currency: string;
+  subscription: {
+    plan_code: PlanCode; label: string; cadence: 'monthly' | 'annual'; status: string;
+    current_period_start: string; current_period_end: string;
+    monthly_cents: number; annual_cents: number; category_allowance: number | null;
+    analytics_level: 'basic' | 'enhanced' | 'advanced'; api_eligible: boolean;
+  } | null;
+  discount: { pct: number; count: number; used: number; remaining: number; cycle_start: string };
+  leads: { count: number; standard_cents: number; discount_cents: number; final_cents: number };
+  credit_balance_cents: number;
   lines: InvoiceLineItem[];
   total_cents: number;
+  pricing: {
+    plans: Array<{ code: PlanCode; label: string; monthly_cents: number; annual_cents: number; currency: string; category_allowance: number | null; lead_discount_pct: number; lead_discount_count: number }>;
+    bands: Array<{ band: 1 | 2 | 3 | 4; label: string; fee_cents: number; currency: string }>;
+  };
 }
 
 export async function fetchBillingPreview(providerKey?: string): Promise<BillingPreview> {

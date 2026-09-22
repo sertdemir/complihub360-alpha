@@ -132,7 +132,7 @@
   },
   "billing": {
     "title": "Billing",
-    "subtitle": "Billing per booked lead (€120, first 2 free) and per profile detail open (€3, capped) — or the Partner subscription: €149/month or €1,490/year (2 months free) incl. 1 lead/month + unlimited detail opens.",
+    "subtitle": "Your plan (Essential, Growth or Global) is billed monthly or annually — a year costs ten months. Each booked lead is charged at its opportunity band ($99 to $499); Growth and Global get a discount on the first leads of every cycle. Your plan never affects your ranking.",
     "statusPaid": "paid",
     "statusFailedGrace": "failed · grace",
     "statusOpen": "open",
@@ -165,11 +165,12 @@
     "currentPeriodEmpty": "No billable activity yet this month.",
     "currentPeriodTotal": "Running total",
     "planLabel": "Plan",
-    "planMonthly": "Partner subscription (monthly, €149)",
-    "planAnnual": "Partner subscription (annual, €1,490 — 2 months free)",
-    "planNone": "Pay per use (no subscription)",
-    "freeLeadsLeft": "{{count}} free lead(s) remaining",
-    "kpiThisMonthUsage": "{{leads}} leads · {{opens}} detail opens"
+    "planNone": "No subscription",
+    "kpiThisMonthUsage": "{{leads}} leads · {{remaining}} discounted leads left",
+    "planCadenceMonthly": "monthly",
+    "planCadenceAnnual": "annual (12 months for the price of 10)",
+    "discountRemaining": "{{remaining}} of {{count}} discounted leads left this cycle ({{pct}}%)",
+    "leadsLine": "Leads this cycle · {{count}} charged · {{discount}} plan discount"
   },
   "confirmEmail": {
     "working": "Confirming your new address…",

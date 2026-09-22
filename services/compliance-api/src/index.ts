@@ -737,8 +737,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         });
     } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/detail$/.test(req.url || '')) {
         // Matchmaking v2 (spec §8): stage-2 ANONYMOUS provider detail. Opening it
-        // is the monetised event `provider_detail_opened`, deduped server-side to
-        // 1× per (user, provider) per rolling 30 days (spec §11 P3). Requires auth
+        // writes the event `provider_detail_opened`, deduped server-side to
+        // 1× per (user, provider) per rolling 30 days — analytics only since
+        // Pricing v2 (ADR-0003); nothing bills on it anymore. Requires auth
         // (listing sits behind the register gate). Never leaks name/contact.
         const providerKey = (req.url || '').split('/')[4];
         res.setHeader('x-correlation-id', correlationId);

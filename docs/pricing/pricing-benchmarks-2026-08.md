@@ -1,6 +1,14 @@
 # CompliHub360 · Pricing-Benchmarks & State of the Art
 
-**Stand: 08.08.2026 · Basis: Markt-Recherche Vergleichsplattformen · Status: ENTSCHIEDEN 2026-08-09**
+**Stand: 08.08.2026 · Basis: Markt-Recherche Vergleichsplattformen · Status: ABGELÖST 2026-09-22**
+
+> **Abgelöst durch [ADR-0003](../decisions/ADR-0003-provider-pricing-v2.md) (2026-09-22):**
+> Die Spec *Provider Dashboard Pricing and Operations* v1.0 ersetzt den Beschluss
+> vom 09.08. vollständig — drei Pläne (Essential $59 · Growth $99 · Global $189,
+> Jahr = zehn Monate), vier Lead-Bänder nach Opportunity ($99 / $149 / $299 /
+> $499), Monatsrabatte auf die ersten Leads, keine Gebühr je Detail-Öffnung,
+> keine Gratis-Leads, USD. Die Recherche darunter bleibt als Quelle lesbar;
+> die Zahlen darin gelten nicht mehr.
 
 > **Beschluss 2026-08-09:** Vorschlag übernommen und implementiert (billing.ts,
 > env-überschreibbar): Lead-Fee **120 €** · Abo **149 €/Monat** oder

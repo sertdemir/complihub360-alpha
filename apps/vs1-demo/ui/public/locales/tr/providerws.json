@@ -132,7 +132,7 @@
   },
   "billing": {
     "title": "Faturalama",
-    "subtitle": "Rezerve edilen lead başına (120 €, ilk 2 ücretsiz) ve profil görüntüleme başına (3 €, üst sınırlı) faturalandırma — veya Partner aboneliği: ayda 149 € ya da yılda 1.490 € (2 ay hediye), ayda 1 lead + sınırsız görüntüleme dahil.",
+    "subtitle": "Planınız (Essential, Growth veya Global) aylık ya da yıllık faturalandırılır — bir yıl on ay fiyatınadır. Rezerve edilen her lead, fırsat bandına göre ücretlendirilir ($99 – $499); Growth ve Global her döngünün ilk lead'lerinde indirim alır. Planınız sıralamanızı asla etkilemez.",
     "statusPaid": "ödendi",
     "statusFailedGrace": "başarısız · ek süre",
     "statusOpen": "açık",
@@ -165,11 +165,12 @@
     "currentPeriodEmpty": "Bu ay henüz faturalandırılabilir etkinlik yok.",
     "currentPeriodTotal": "Ara toplam",
     "planLabel": "Plan",
-    "planMonthly": "Partner aboneliği (aylık, 149 €)",
-    "planAnnual": "Partner aboneliği (yıllık, 1.490 € — 2 ay hediye)",
-    "planNone": "Kullanım başına ödeme (abonelik yok)",
-    "freeLeadsLeft": "{{count}} ücretsiz lead hakkı kaldı",
-    "kpiThisMonthUsage": "{{leads}} lead · {{opens}} profil görüntüleme"
+    "planNone": "Abonelik yok",
+    "kpiThisMonthUsage": "{{leads}} lead · {{remaining}} indirimli hak kaldı",
+    "planCadenceMonthly": "aylık",
+    "planCadenceAnnual": "yıllık (10 ay fiyatına 12 ay)",
+    "discountRemaining": "Bu döngüde {{count}} indirimli lead hakkından {{remaining}} kaldı (%{{pct}})",
+    "leadsLine": "Bu döngüdeki lead'ler · {{count}} ücretlendirildi · {{discount}} plan indirimi"
   },
   "confirmEmail": {
     "working": "Yeni adresiniz doğrulanıyor…",
