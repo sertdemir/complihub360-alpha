@@ -6,7 +6,7 @@ import {
   LayoutGrid, FolderClosed, Bell, BookOpen, Bookmark, CalendarCheck,
   TriangleAlert, Calendar, Search, LogOut, Landmark, Package, ShieldCheck, Megaphone, Building2,
   PackageCheck, Truck, Scale,
-  Leaf,
+  Leaf, ChevronRight,
 } from 'lucide-react';
 import { DOMAINS as CANONICAL_DOMAINS, type DomainSlug } from '../../lib/domains';
 import { Sidebar, SidebarGroup, NavItem } from '../ui/AppShell';
@@ -20,6 +20,7 @@ import { isMockApi } from '../../lib/supabase';
 import { fetchSessions, type SessionRowData } from '../../api/sessions';
 import { fetchDashboard } from '../../api/dashboard';
 import { fetchMyNotifications } from '../../api/notifications';
+import { fetchUserRequests } from '../../api/requests';
 import { Avatar } from '../ui/Avatar';
 import { initialsOf } from '../../lib/initials';
 
@@ -96,6 +97,16 @@ const DOMAINS = CANONICAL_DOMAINS.map((d) => ({
 }));
 
 const DOT: Record<'high' | 'medium', string> = { high: 'bg-red-400', medium: 'bg-amber-400' };
+const DOMAINS_OPEN_KEY = 'c360_nav_domains_open';
+
+/** Neu-Zaehler an Bereichen: Petrol-Pille, auch als Bubble am Icon. */
+function NewsPill({ n, className = '' }: { n: number; className?: string }) {
+  return (
+    <span className={'inline-grid h-[18px] min-w-[18px] place-items-center rounded-full bg-brand px-[5px] text-[10.5px] font-bold leading-none tabular-nums text-fg-on-brand ' + className}>
+      {n}
+    </span>
+  );
+}
 
 export function UserShell({ activeDomain, children }: { activeDomain?: string; children: React.ReactNode }) {
   const { t, i18n } = useTranslation('userws');
@@ -111,6 +122,19 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
   const [searchOpen, setSearchOpen] = useState(false);
   const [counts, setCounts] = useState<{ requests?: number; unread?: number }>({});
   const [domainDots, setDomainDots] = useState<Partial<Record<DomainSlug, 'high' | 'medium'>>>({});
+  const [domainNews, setDomainNews] = useState<Partial<Record<DomainSlug, number>>>({});
+  // Bereiche eingeklappt als Icon-Leiste (Canvas V3, 2026-09-22). Offen, wenn
+  // man gerade IN einem Bereich steht — sonst weiss niemand, wo er ist. Die
+  // eigene Wahl merkt sich der Browser, weil jede Seite ihre Shell neu baut.
+  const inDomain = location.pathname.includes('/dashboard/workbench/') || !!activeDomain;
+  const [domainsOpen, setDomainsOpen] = useState<boolean>(() => {
+    if (inDomain) return true;
+    try { return localStorage.getItem(DOMAINS_OPEN_KEY) === '1'; } catch { return false; }
+  });
+  const toggleDomains = () => setDomainsOpen((v) => {
+    try { localStorage.setItem(DOMAINS_OPEN_KEY, v ? '0' : '1'); } catch { /* privat/gesperrt: nur fuer diese Seite */ }
+    return !v;
+  });
   // Sitzungen: nur noch die Anzahl am Nav-Eintrag (Nutzer-Wahl 2026-09-22,
   // Dashboard Iteration 2). Die zweite Nav-Ebene mit Chevron und "Alle N
   // Sitzungen" entfiel — erreichbar sind Sitzungen allein ueber die
@@ -138,9 +162,26 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
       // Ungelesene haengen jetzt an der Zeile selbst (read_at), nicht mehr an
       // einem Wasserstand pro Flaeche: der zaehlte alles Neuere als ungelesen,
       // auch was nie jemanden anging.
-      fetchMyNotifications()
+      const post = fetchMyNotifications();
+      post
         .then((f) => setCounts((c) => ({ ...c, unread: f.unread })))
         .catch(() => setCounts((c) => ({ ...c, unread: 0 })));
+      // Neu-Zaehler je Bereich (Canvas V3, 2026-09-22): ungelesene Post zu
+      // Anfragen, deren Bereich die Anfrage selbst traegt. Offene Pflichten
+      // mit hohem Risiko zaehlen bewusst NICHT — das ist ein Zustand, keine
+      // Neuigkeit, und als Zaehler waere es ein Dauer-Alarm (DNA).
+      Promise.all([post, fetchUserRequests()])
+        .then(([f, rs]) => {
+          const bereichVon = new Map(rs.map((r) => [r.uuid, r.category]));
+          const neu: Partial<Record<DomainSlug, number>> = {};
+          for (const n of f.items) {
+            if (!n.unread || n.subject !== 'engagement' || !n.subjectId) continue;
+            const slug = bereichVon.get(n.subjectId) as DomainSlug | undefined;
+            if (slug && slug in DOMAIN_ICON) neu[slug] = (neu[slug] ?? 0) + 1;
+          }
+          setDomainNews(neu);
+        })
+        .catch(() => {});
       fetchDashboard().then((d) => {
         const dots: Partial<Record<DomainSlug, 'high' | 'medium'>> = {};
         for (const dom of CANONICAL_DOMAINS) {
@@ -188,6 +229,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
           </span>
         ),
         icon: <Icon size={18} />,
+        count: domainNews[d.slug] ? String(domainNews[d.slug]) : undefined,
         active: location.pathname.startsWith(target) || activeDomain === d.label,
       };
     }),
@@ -273,27 +315,66 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
             {/* Nav decision 2026-08-04: domains live as a sidebar group (final 8),
                 the horizontal Domain Bar is gone. */}
             {g.group === 'Workspace' && (
-              <SidebarGroup label={t('shell.groupDomains')}>
-                {DOMAINS.map((d) => {
-                  const target = `${base}/dashboard/workbench/${d.slug}`;
-                  const active = location.pathname.startsWith(target) || activeDomain === d.label;
-                  const Icon = d.icon;
-                  return (
-                    <NavLink key={d.slug} to={target}>
-                      <NavItem
-                        icon={<Icon size={16} />}
-                        label={
-                          <span className="inline-flex items-center gap-1.5">
-                            {t(`domain.${d.key}`)}
-                            {domainDots[d.slug] && <span className={`h-1.5 w-1.5 rounded-full ${DOT[domainDots[d.slug] as 'high' | 'medium']}`} />}
-                          </span>
-                        }
-                        active={active}
-                      />
-                    </NavLink>
-                  );
-                })}
-              </SidebarGroup>
+              <div className="px-3 py-2">
+                <button
+                  type="button"
+                  aria-expanded={domainsOpen}
+                  aria-controls="nav-domains"
+                  onClick={toggleDomains}
+                  className="mb-1 flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left transition-colors hover:bg-black/[0.035] dark:hover:bg-white/[0.05]"
+                >
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{t('shell.groupDomains')}</span>
+                  <ChevronRight size={14} className={'ml-auto text-fg-tertiary transition-transform ' + (domainsOpen ? 'rotate-90' : '')} />
+                </button>
+                <div id="nav-domains">
+                  {domainsOpen ? (
+                    <div className="space-y-0.5">
+                      {DOMAINS.map((d) => {
+                        const target = `${base}/dashboard/workbench/${d.slug}`;
+                        const active = location.pathname.startsWith(target) || activeDomain === d.label;
+                        const Icon = d.icon;
+                        const neu = domainNews[d.slug];
+                        return (
+                          <NavLink key={d.slug} to={target}>
+                            <NavItem
+                              icon={<Icon size={16} />}
+                              label={
+                                <span className="inline-flex items-center gap-1.5">
+                                  {t(`domain.${d.key}`)}
+                                  {domainDots[d.slug] && <span className={`h-1.5 w-1.5 rounded-full ${DOT[domainDots[d.slug] as 'high' | 'medium']}`} />}
+                                </span>
+                              }
+                              count={neu ? <NewsPill n={neu} /> : undefined}
+                              active={active}
+                            />
+                          </NavLink>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-5 gap-1 px-1.5 pb-1 pt-0.5">
+                      {DOMAINS.map((d) => {
+                        const target = `${base}/dashboard/workbench/${d.slug}`;
+                        const Icon = d.icon;
+                        const name = t(`domain.${d.key}`);
+                        const neu = domainNews[d.slug];
+                        return (
+                          <NavLink
+                            key={d.slug}
+                            to={target}
+                            title={name}
+                            aria-label={neu ? `${name} · ${t('shell.domainNews', { count: neu })}` : name}
+                            className="relative grid h-[34px] place-items-center rounded-lg text-fg-tertiary transition-colors hover:bg-black/[0.04] hover:text-fg-brand dark:hover:bg-white/[0.05]"
+                          >
+                            <Icon size={16} />
+                            {neu ? <NewsPill n={neu} className="absolute right-0.5 top-0 h-4 min-w-4 text-[9.5px] ring-2 ring-white dark:ring-[#0F162A]" /> : null}
+                          </NavLink>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
             )}
           </React.Fragment>
         ))}

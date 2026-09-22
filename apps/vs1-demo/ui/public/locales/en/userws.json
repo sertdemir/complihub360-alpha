@@ -37,6 +37,8 @@
   },
   "shell": {
     "groupWorkspace": "Workspace",
+    "domainNews_one": "{{count}} update",
+    "domainNews_other": "{{count}} updates",
     "groupDomains": "Areas",
     "groupNewFeatures": "New features",
     "badgeSoon": "Soon",

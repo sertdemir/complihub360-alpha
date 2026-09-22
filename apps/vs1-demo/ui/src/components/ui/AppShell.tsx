@@ -21,13 +21,18 @@ export function Sidebar({ logo, children, footer, className }: { logo?: React.Re
   );
 }
 
+/** "Bald"-Badge an einer Nav-Gruppe (Canvas B2, 2026-09-22): Petrol-Flaeche,
+ *  Gold-Schrift, in beiden Themes gleich — ein Siegel, kein grauer Hinweis. */
+export const NAV_GROUP_BADGE =
+  'rounded-full bg-[rgb(var(--petrol-500))] px-2 py-1 text-[9.5px] font-extrabold uppercase leading-none tracking-[0.1em] text-[rgb(var(--gold-300))]';
+
 export function SidebarGroup({ label, badge, children }: { label?: string; badge?: string; children: React.ReactNode }) {
   return (
     <div className="px-3 py-2">
       {label && (
         <div className="mb-1 flex items-center justify-between px-2">
           <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{label}</span>
-          {badge && <span className="text-[10px] font-semibold uppercase tracking-wide text-fg-tertiary">{badge}</span>}
+          {badge && <span className={NAV_GROUP_BADGE}>{badge}</span>}
         </div>
       )}
       <div className="space-y-0.5">{children}</div>
