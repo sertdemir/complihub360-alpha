@@ -4,7 +4,7 @@ import { useAuthStore } from '../../store/useAuthStore';
 import { useTranslation } from 'react-i18next';
 import {
   LayoutGrid, FolderClosed, Bell, BookOpen, Bookmark, CalendarCheck,
-  TriangleAlert, Calendar, Search, LogOut, Landmark, Package, ShieldCheck, Megaphone, Building2,
+  TriangleAlert, Calendar, Search, Landmark, Package, ShieldCheck, Megaphone, Building2,
   PackageCheck, Truck, Scale,
   Leaf, ChevronRight,
 } from 'lucide-react';
@@ -21,8 +21,6 @@ import { fetchSessions, type SessionRowData } from '../../api/sessions';
 import { fetchDashboard } from '../../api/dashboard';
 import { fetchMyNotifications } from '../../api/notifications';
 import { fetchUserRequests } from '../../api/requests';
-import { Avatar } from '../ui/Avatar';
-import { initialsOf } from '../../lib/initials';
 
 // ─── UserShell ────────────────────────────────────────────────────────────────
 // The user App-Workspace frame (always dark slate), mirroring the Figma User
@@ -98,6 +96,8 @@ const DOMAINS = CANONICAL_DOMAINS.map((d) => ({
 
 const DOT: Record<'high' | 'medium', string> = { high: 'bg-red-400', medium: 'bg-amber-400' };
 const DOMAINS_OPEN_KEY = 'c360_nav_domains_open';
+/** "Abmelden" als reiner Textknopf: keine Unterstreichung, kein Icon. */
+const SIGN_OUT = 'rounded-lg text-[13px] font-medium text-fg-secondary transition-colors hover:text-fg';
 
 /** Neu-Zaehler an Bereichen: Petrol-Pille, auch als Bubble am Icon. */
 function NewsPill({ n, className = '' }: { n: number; className?: string }) {
@@ -112,11 +112,17 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
   const { t, i18n } = useTranslation('userws');
   const locale = i18n.resolvedLanguage || 'en';
   const location = useLocation();
-  // Real session identity when present; the design fixture only as fallback.
-  const { userName, user, session, logout } = useAuthStore();
-  const displayName = userName || 'Alex Weber';
-  const displaySub = user?.email || 'Acme GmbH';
-  const initials = initialsOf(displayName);
+  // Konto in der Topbar (Nutzer-Wahl 2026-09-22, Dashboard Iteration 2): nur
+  // der FIRMENNAME und "Abmelden" als Textknopf — kein Avatar, kein
+  // Personenname. Der Firmenname kommt aus der Registrierung
+  // (user_metadata.company_name); ohne echte Sitzung (Demo-Login) steht der
+  // Design-Platzhalter, mit Sitzung aber ohne Firma steht nichts statt einer
+  // erfundenen.
+  const { user, session, logout } = useAuthStore();
+  const companyName = session
+    ? ((user?.user_metadata?.company_name as string | undefined)?.trim() || null)
+    : 'Acme GmbH';
+  const signOut = async () => { await logout(); window.location.href = `/${locale}/login`; };
   const base = `/${locale}`;
   // B16: workspace search drawer · C1: live sidebar badges (hidden in fixture mode).
   const [searchOpen, setSearchOpen] = useState(false);
@@ -275,26 +281,6 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
             <Logo lockup="horizontal" href={null} className="h-[32px] w-auto" />
           </NavLink>
         }
-        footer={
-          <div className="flex items-center justify-between px-1">
-            <div className="flex items-center gap-2.5">
-              <Avatar size="md" initials={initials} tone="accent" />
-              <div className="leading-tight">
-                <p className="text-[12px] font-semibold text-fg">{displayName}</p>
-                <p className="text-[10px] text-fg-tertiary">{displaySub}</p>
-              </div>
-            </div>
-            <button
-              type="button"
-              aria-label={t('shell.signOut')}
-              title={t('shell.signOut')}
-              onClick={async () => { await logout(); window.location.href = `/${locale}/login`; }}
-              className="text-fg-tertiary transition-colors hover:text-fg"
-            >
-              <LogOut size={15} />
-            </button>
-          </div>
-        }
       >
         {SIDEBAR.map((g) => (
           <React.Fragment key={g.group}>
@@ -417,24 +403,15 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
           }
           footer={
             <div className="flex items-center gap-2.5 px-4 py-3">
-              <Avatar size="md" initials={initials} tone="accent" className="shrink-0" />
-              <div className="min-w-0 flex-1 leading-tight">
-                <p className="truncate text-body-sm font-semibold text-fg">{displayName}</p>
-                <p className="truncate text-body-2xs text-fg-tertiary">{displaySub}</p>
-              </div>
+              <p className="min-w-0 flex-1 truncate text-body-sm font-semibold text-fg">{companyName}</p>
               {isMockApi && (
                 <span className="rounded-full border border-accent/55 px-2 py-[2px] text-[9px] font-extrabold uppercase tracking-[0.06em] text-fg-accent-strong">
                   Mock-Daten
                 </span>
               )}
               <ThemeToggle size={40} className="rounded-lg" />
-              <button
-                type="button"
-                aria-label={t('shell.signOut')}
-                onClick={async () => { await logout(); window.location.href = `/${locale}/login`; }}
-                className="grid h-11 w-11 place-items-center rounded-lg text-fg-tertiary transition-colors hover:text-fg"
-              >
-                <LogOut size={18} />
+              <button type="button" onClick={signOut} className={SIGN_OUT + ' h-11 px-2'}>
+                {t('shell.signOut')}
               </button>
             </div>
           }
@@ -468,6 +445,14 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
           {/* 36 px und rounded-lg statt der Vorgaben der Komponente, damit die
               Knöpfe in der Leiste dieselbe Fläche haben. */}
           <ThemeToggle size={36} className="rounded-lg" />
+          {companyName && (
+            <span className="ml-2 max-w-[220px] truncate border-l border-stroke pl-3 text-[13px] font-semibold text-fg" title={companyName}>
+              {companyName}
+            </span>
+          )}
+          <button type="button" onClick={signOut} className={SIGN_OUT + ' h-9 px-2'}>
+            {t('shell.signOut')}
+          </button>
         </div>
         <main className="flex-1 overflow-y-auto px-4 py-5 lg:px-8 lg:py-6">{children}</main>
       </div>
