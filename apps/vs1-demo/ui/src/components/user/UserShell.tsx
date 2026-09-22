@@ -6,12 +6,14 @@ import {
   LayoutGrid, FolderClosed, Bell, BookOpen, Bookmark, CalendarCheck,
   TriangleAlert, Calendar, Search, Landmark, Package, ShieldCheck, Megaphone, Building2,
   PackageCheck, Truck, Scale,
-  Leaf, ChevronRight,
+  Leaf, ChevronRight, Plus,
 } from 'lucide-react';
 import { DOMAINS as CANONICAL_DOMAINS, type DomainSlug } from '../../lib/domains';
 import { Sidebar, SidebarGroup, NavItem } from '../ui/AppShell';
 import { WorkspaceMobileBar, type WorkspaceNavGroup } from '../ui/WorkspaceMobileBar';
 import { Logo } from '../ui/Logo';
+import { Button } from '../ui/Button';
+import { useWizardDrawer } from './WizardDrawer';
 import { UserSearchDrawer } from './UserSearchDrawer';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { AssistantWidget } from './AssistantWidget';
@@ -119,6 +121,7 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
   // Design-Platzhalter, mit Sitzung aber ohne Firma steht nichts statt einer
   // erfundenen.
   const { user, session, logout } = useAuthStore();
+  const { openWizard } = useWizardDrawer();
   const companyName = session
     ? ((user?.user_metadata?.company_name as string | undefined)?.trim() || null)
     : 'Acme GmbH';
@@ -386,6 +389,11 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
           logo={<Logo lockup="symbol" href={null} />}
           actions={
             <>
+              {/* Mobil ist fuer den ausgeschriebenen Knopf kein Platz: dieselbe
+                  Aktion als Plus, beschriftet fuer Screenreader. */}
+              <button type="button" aria-label={t('shared.startNewSearch')} title={t('shared.startNewSearch')} onClick={() => openWizard()} className="grid h-11 w-11 place-items-center rounded-lg text-fg-brand transition-colors hover:text-fg">
+                <Plus size={20} />
+              </button>
               <button type="button" aria-label={t('shell.search')} onClick={() => setSearchOpen(true)} className="grid h-11 w-11 place-items-center rounded-lg text-fg-secondary transition-colors hover:text-fg">
                 <Search size={19} />
               </button>
@@ -416,7 +424,11 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
             </div>
           }
         />
-        <div className="hidden items-center justify-end gap-1 border-b border-stroke px-4 py-1.5 lg:flex">
+        <div className="hidden items-center gap-1 border-b border-stroke px-4 py-1.5 lg:flex">
+          {/* Hauptaktion links in der Topbar (Nutzer-Wahl 2026-09-22): auf JEDER
+              Seite des Arbeitsbereichs an derselben Stelle, statt in drei
+              Seitenkoepfen (Dashboard, Sitzungen, Bereich) je eigen. */}
+          <Button size="sm" onClick={() => openWizard()} className="mr-auto">{t('shared.startNewSearch')}</Button>
           <button type="button" aria-label={t('shell.search')} onClick={() => setSearchOpen(true)} className="grid h-9 w-9 place-items-center rounded-lg text-fg-secondary hover:text-fg">
             <Search size={17} />
           </button>

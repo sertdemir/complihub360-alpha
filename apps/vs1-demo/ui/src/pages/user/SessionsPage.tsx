@@ -299,7 +299,6 @@ export function SessionsPage() {
                 ))}
               </p>
             </div>
-            <Button className="mt-0.5 shrink-0" onClick={() => openWizard()}>{t('shared.startNewSearch')}</Button>
           </div>
 
           {/* Kennzahl-Ringe wie auf dem Dashboard (Nutzer-Vorgabe 2026-09-05):
