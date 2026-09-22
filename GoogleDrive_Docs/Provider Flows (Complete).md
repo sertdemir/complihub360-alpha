@@ -343,8 +343,10 @@ Recommended v1 logic:
 
 1. Eligibility filter  
 * match country \+ category  
-2. Partner boost  
-* partner providers appear first within relevant set  
+2. ~~Partner boost~~  
+* ~~partner providers appear first within relevant set~~  
+
+> **Korrektur 2026-09-22 ([ADR-0003](../docs/decisions/ADR-0003-provider-pricing-v2.md)):** Kein Vorrang für zahlende Partner. Schritt 2 entfällt; Reihenfolge ergibt sich aus Relevanz und verifizierter Qualität (Schritt 1 und 3).
 3. Quality adjustment (future)  
 * response rate  
 * SLA performance

@@ -81,8 +81,9 @@ export async function fetchProviderBookings(providerKey?: string): Promise<Provi
 }
 
 // ─── Stage-2 detail + native scheduling (Phase-3 wiring) ─────────────────────
-// GET /provider/:key/detail — the monetised, still-anonymous detail payload
-// (fires provider_detail_opened server-side, deduped 1×/user/30d).
+// GET /provider/:key/detail — the still-anonymous detail payload (fires
+// provider_detail_opened server-side, deduped 1×/user/30d — analytics only
+// since Pricing v2, ADR-0003; it is not billed).
 export interface ProviderDetail {
   provider_key: string;
   pseudonym_label: string;

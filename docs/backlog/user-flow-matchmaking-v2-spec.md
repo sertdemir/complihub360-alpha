@@ -148,7 +148,7 @@ CompliHub360 ist ein **kuratierter Matchmaking-Marktplatz**: Ein User (Firma) kl
 `Total = 0.6·Relevance + 0.3·Quality + 0.1·Priority`, absteigend sortiert.
 - **Relevance:** Country-Match · Kategorie-/Domänen-Spezialisierung · Branchen-/Kontext-Fit (aus SearchProfile).
 - **Quality:** Ø-Antwortzeit · Confirmation-Rate · User-Rating · (SLA-Breach-Count negativ).
-- **Priority:** `partner_status=active` Boost · ggf. Sponsored (später).
+- **Priority:** `partner_status=active` Boost (Verifikation, kein Plan). ~~ggf. Sponsored (später)~~ — **Korrektur 2026-09-22 ([ADR-0003](../decisions/ADR-0003-provider-pricing-v2.md)):** es wird keine bezahlte Priorität geben; der Faktor wird in Phase 3 auf verifizierte Performance umgestellt.
 - **Deterministisch** (nicht AI): Sortierreihenfolge, Scores. AI nur für `overview_summary`/Tips (mit Quellen).
 - **Match-%** = normalisierter Relevance-Anteil, user-facing.
 - Provider mit Verfügbarkeit `ooo` / eingefrorenem Rank → nicht oder nachrangig gelistet (Feld existiert).

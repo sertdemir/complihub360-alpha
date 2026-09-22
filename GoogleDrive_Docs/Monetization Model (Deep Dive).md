@@ -80,9 +80,11 @@ Optional Phase 2+
 
 Partner pays monthly to:
 
-* Appear in priority ranking  
+* ~~Appear in priority ranking~~  
 * Access analytics  
 * Receive badge
+
+> **Korrektur 2026-09-22 ([ADR-0003](../docs/decisions/ADR-0003-provider-pricing-v2.md)):** Ein Abo verbessert das Ranking nie. Das widerspricht der DNA (Fairness zwischen Providern, *Quality before brand recognition*), Spec A §14 und Spec B („Ranking benefit: Never"). Das Abo kauft Kategorie-Kontingent, Lead-Rabatte und Analytics-Tiefe — keine Sichtbarkeit. Ein Test stellt sicher, dass identische Anbieter mit verschiedenen Plänen denselben Score bekommen.
 
 Revenue Type:
 

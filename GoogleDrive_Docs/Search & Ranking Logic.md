@@ -194,7 +194,9 @@ Factors:
 
 • partner status
 
-• sponsored placements
+• ~~sponsored placements~~
+
+> **Korrektur 2026-09-22 ([ADR-0003](../docs/decisions/ADR-0003-provider-pricing-v2.md)):** Es gibt keine bezahlten Platzierungen im organischen Ranking. „Partner status" meint Verifikation (aktiv/inaktiv), nicht einen bezahlten Plan.
 
 ---
 
@@ -250,9 +252,11 @@ Main Content
 
 Right Sidebar
 
-• Featured providers
+• ~~Featured providers~~
 
-• monetization slots
+• ~~monetization slots~~
+
+> **Korrektur 2026-09-22 ([ADR-0003](../docs/decisions/ADR-0003-provider-pricing-v2.md)):** Keine bezahlten Hervorhebungen neben oder in der Ergebnisliste. Widerspricht DNA §3 und Spec A §14.
 
 ---
 
@@ -282,7 +286,7 @@ The ranking system must protect the platform’s revenue model.
 
 Safeguards include:
 
-• partner providers receive priority boost
+• ~~partner providers receive priority boost~~ — **Korrektur 2026-09-22 ([ADR-0003](../docs/decisions/ADR-0003-provider-pricing-v2.md)):** kein bezahlter Vorrang; Verifikation und verifizierte Performance dürfen ranken, ein Plan nie.
 
 • provider contact only via engagement flow
 

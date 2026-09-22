@@ -706,27 +706,113 @@ describe('POST /api/v1/admin/provider/:key/member', () => {
     });
 });
 
-describe('GET /api/v1/provider/:key/billing/preview', () => {
-    it('returns the current-period charge preview with usage and pricing', async () => {
-        seedProvider({ subscription_plan: 'none', subscription_since: null });
-        const period = new Date().toISOString().slice(0, 7);
-        (db.event_log ??= []).push(
-            { id: randomUUID(), type: 'provider_lead_charged', timestamp: `${period}-05T10:00:00Z`, payload: { providerKey: 'test-kanzlei' } },
-            { id: randomUUID(), type: 'provider_lead_charged', timestamp: `${period}-06T10:00:00Z`, payload: { providerKey: 'test-kanzlei' } },
-            { id: randomUUID(), type: 'provider_lead_charged', timestamp: `${period}-07T10:00:00Z`, payload: { providerKey: 'test-kanzlei' } },
-            { id: randomUUID(), type: 'provider_detail_opened', timestamp: `${period}-05T09:00:00Z`, payload: { providerKey: 'test-kanzlei' } },
+// Pricing v2 (Spec B, ADR-0003): Katalog und Baender, wie die Migration sie seedet.
+function seedPricing() {
+    (db.plan_catalog ??= []).push(
+        { code: 'essential', version: 1, label: 'Essential', currency: 'USD', monthly_cents: 5900, annual_cents: 59000, category_allowance: 1, lead_discount_pct: 0, lead_discount_count: 0, included_blog_articles: 0, api_eligible: false, analytics_level: 'basic', effective_from: '2026-09-22' },
+        { code: 'growth', version: 1, label: 'Growth', currency: 'USD', monthly_cents: 9900, annual_cents: 99000, category_allowance: 5, lead_discount_pct: 10, lead_discount_count: 3, included_blog_articles: 1, api_eligible: false, analytics_level: 'enhanced', effective_from: '2026-09-22' },
+        { code: 'global', version: 1, label: 'Global', currency: 'USD', monthly_cents: 18900, annual_cents: 189000, category_allowance: null, lead_discount_pct: 15, lead_discount_count: 6, included_blog_articles: 2, api_eligible: true, analytics_level: 'advanced', effective_from: '2026-09-22' },
+    );
+    (db.lead_band_config ??= []).push(
+        { band: 1, version: 1, label: 'Focused', fee_cents: 9900, currency: 'USD', effective_from: '2026-09-22' },
+        { band: 2, version: 1, label: 'Core', fee_cents: 14900, currency: 'USD', effective_from: '2026-09-22' },
+        { band: 3, version: 1, label: 'Advanced', fee_cents: 29900, currency: 'USD', effective_from: '2026-09-22' },
+        { band: 4, version: 1, label: 'Strategic', fee_cents: 49900, currency: 'USD', effective_from: '2026-09-22' },
+    );
+    db.lead_band_rules ??= [];
+    (db.lead_fee_eligibility ??= []).push({ area_code: 'legal-advisory', country_code: '*', enabled: false });
+}
+
+function seedSubscription(providerKey: string, planCode: string, over: Record<string, any> = {}) {
+    const row = {
+        id: randomUUID(), provider_key: providerKey, plan_code: planCode, plan_version: 1, cadence: 'monthly', status: 'active',
+        current_period_start: '2026-09-01', current_period_end: '2026-10-01', started_at: '2026-09-01T00:00:00Z', ended_at: null, ...over,
+    };
+    (db.provider_subscriptions ??= []).push(row);
+    return row;
+}
+
+describe('GET /api/v1/provider/:key/billing/preview — Pricing v2', () => {
+    it('zeigt Plan, Kontingent (genutzt/offen), Ledger-Summen und Guthaben', async () => {
+        seedProvider();
+        seedPricing();
+        seedSubscription('test-kanzlei', 'growth', { current_period_start: '2020-01-01', started_at: '2020-01-01T00:00:00Z' });
+        (db.provider_discount_counter ??= []).push({ provider_key: 'test-kanzlei', cycle_start: '2020-01-01', used: 2 });
+        (db.provider_lead_ledger ??= []).push(
+            { id: randomUUID(), kind: 'charge', provider_key: 'test-kanzlei', standard_fee_cents: 9900, final_fee_cents: 8910, created_at: '2026-01-01T00:00:00Z' },
+            { id: randomUUID(), kind: 'charge', provider_key: 'test-kanzlei', standard_fee_cents: 14900, final_fee_cents: 13410, created_at: '2026-01-02T00:00:00Z' },
+            { id: randomUUID(), kind: 'credit', provider_key: 'test-kanzlei', standard_fee_cents: 0, final_fee_cents: 0, created_at: '2026-01-03T00:00:00Z' },
         );
+        (db.provider_credits ??= []).push({ provider_key: 'test-kanzlei', amount_cents: 2673, currency: 'USD', reason: 'user_no_rebook_30pct' });
         const r = await api('/api/v1/provider/test-kanzlei/billing/preview');
         expect(r.status).toBe(200);
-        expect(r.body.usage).toEqual({ leads: 3, detail_opens: 1, free_leads_left: 2 });
-        // 3 leads − 2 free = 1×120 € + 1 detail open ×3 €
-        expect(r.body.total_cents).toBe(12000 + 300);
-        expect(r.body.pricing.abo_annual_cents).toBe(149000);
+        expect(r.body.currency).toBe('USD');
+        expect(r.body.subscription).toMatchObject({ plan_code: 'growth', label: 'Growth', cadence: 'monthly', category_allowance: 5 });
+        expect(r.body.discount).toMatchObject({ pct: 10, count: 3, used: 2, remaining: 1 });
+        expect(r.body.leads).toEqual({ count: 2, standard_cents: 24800, discount_cents: 2480, final_cents: 22320 });
+        expect(r.body.credit_balance_cents).toBe(2673);
+        // Abo-Zeile des laufenden Monats + Leads des Zyklus
+        expect(r.body.lines).toHaveLength(1);
+        expect(r.body.total_cents).toBe(9900 + 22320);
+        expect(r.body.pricing.plans.map((p: any) => p.code)).toEqual(['essential', 'growth', 'global']);
+        expect(r.body.pricing.bands.map((b: any) => b.fee_cents)).toEqual([9900, 14900, 29900, 49900]);
+    });
+
+    it('ohne Abo: kein Plan, kein Rabatt, Standardpreise sichtbar', async () => {
+        seedProvider();
+        seedPricing();
+        const r = await api('/api/v1/provider/test-kanzlei/billing/preview');
+        expect(r.status).toBe(200);
+        expect(r.body.subscription).toBeNull();
+        expect(r.body.discount).toMatchObject({ pct: 0, count: 0, used: 0, remaining: 0 });
+        expect(r.body.total_cents).toBe(0);
     });
 
     it('is not public — guests get 401', async () => {
         const r = await api('/api/v1/provider/test-kanzlei/billing/preview', { auth: 'none' });
         expect(r.status).toBe(401);
+    });
+});
+
+describe('Kommerzielle Neutralitaet: das Abo ist kein Ranking-Merkmal', () => {
+    // Spec A §14, Spec B Grundsaetze, DNA §3. Zwei bis auf den Plan identische
+    // Anbieter muessen denselben Score bekommen, und ein Planwechsel darf die
+    // Reihenfolge nicht aendern. Wer das Abo je in den Scorer zieht, scheitert hier.
+    const suche = () => api('/api/v1/search', {
+        method: 'POST', auth: 'none',
+        body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], domains: ['tax-vat'] } }),
+    });
+
+    it('Essential und Global: gleicher Score, gleiche Reihenfolge wie ohne Abo', async () => {
+        seedPricing();
+        seedProvider({ provider_key: 'ohne-abo', rating: 4.6 });
+        seedProvider({ provider_key: 'kanzlei-zwei', rating: 4.6 });
+        seedProvider({ provider_key: 'kanzlei-drei', rating: 4.6 });
+        seedSubscription('kanzlei-zwei', 'essential');
+        seedSubscription('kanzlei-drei', 'global');
+        const r = await suche();
+        expect(r.status).toBe(200);
+        const scores = new Map(r.body.providers.map((p: any) => [p.provider_key, p.match]));
+        expect(scores.get('kanzlei-drei')).toBe(scores.get('ohne-abo'));
+        expect(scores.get('kanzlei-zwei')).toBe(scores.get('ohne-abo'));
+        // Kein Feld auf dem Draht verraet den Plan.
+        for (const p of r.body.providers) {
+            expect(Object.keys(p).join(' ')).not.toMatch(/plan|subscription/i);
+            expect(JSON.stringify(Object.values(p))).not.toMatch(/"(essential|growth|global)"/i);
+        }
+    });
+
+    it('ein Planwechsel aendert die Reihenfolge nicht', async () => {
+        seedPricing();
+        seedProvider({ provider_key: 'a-kanzlei', rating: 4.9 });
+        seedProvider({ provider_key: 'b-kanzlei', rating: 4.1 });
+        seedSubscription('b-kanzlei', 'global');
+        const vorher = (await suche()).body.providers.map((p: any) => p.provider_key);
+        db.provider_subscriptions = [];
+        seedSubscription('a-kanzlei', 'global');
+        const nachher = (await suche()).body.providers.map((p: any) => p.provider_key);
+        expect(nachher).toEqual(vorher);
+        expect(vorher[0]).toBe('a-kanzlei');
     });
 });
 
