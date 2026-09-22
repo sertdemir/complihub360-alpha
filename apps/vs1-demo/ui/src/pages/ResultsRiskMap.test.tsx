@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { SearchLaw } from '../api/search';
+import type { AnonProvider, SearchLaw } from '../api/search';
 // Imported statically on purpose. Pulling the page in with await import()
 // inside the test body charged the whole cold module graph (page + jspdf +
 // lucide + router) to the first test's 5s budget, which CI — running this
@@ -27,10 +27,16 @@ vi.mock('../api/sessions', () => ({
 vi.mock('../lib/riskMapPdf', () => ({ generateRiskMapPdf: vi.fn() }));
 vi.mock('../store/useAuthStore', () => ({ useAuthStore: () => ({ isLoggedIn: false }) }));
 // t() resolves to the canonical EN default so assertions read as the user sees.
+// Without a default it returns the key, with `count` and `pct` appended — so a
+// test can tell "3 matched" from "1 matched" without a translation file.
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, opts?: Record<string, unknown>) =>
-      typeof opts?.defaultValue === 'string' ? (opts.defaultValue as string) : key,
+    t: (key: string, opts?: Record<string, unknown>) => {
+      if (typeof opts?.defaultValue === 'string') return opts.defaultValue as string;
+      const count = opts?.count !== undefined ? `#${String(opts.count)}` : '';
+      const pct = opts?.pct !== undefined ? `@${String(opts.pct)}` : '';
+      return `${key}${count}${pct}`;
+    },
     i18n: { resolvedLanguage: 'en' },
   }),
 }));
@@ -124,5 +130,65 @@ describe('ResultsRiskMap grouping', () => {
     // Single group → the table looks exactly as it did before the split.
     expect(screen.queryByText('Now')).not.toBeInTheDocument();
     expect(screen.queryByText('On the radar')).not.toBeInTheDocument();
+  });
+});
+
+// ─── Risk map · provider teaser ──────────────────────────────────────────────
+// Until 2026-09-22 the teaser read "3 Verified Providers matched" with cards at
+// 100/87/73 % for EVERY guest — hard-coded, whatever the engine found. Decision
+// of that day: real count, real percentages, and nothing at all while the page
+// only holds the design fixture (loading, API down).
+
+const prov = (key: string, match: number): AnonProvider => ({
+  provider_key: key, pseudonym_label: key, region: null, active_since: null,
+  specializations: [], languages: [], rating: null, completed_count: null,
+  avg_response_hours: null, billing_model: 'project', is_verified: true,
+  match, match_tier: 'moderate',
+});
+
+describe('ResultsRiskMap provider teaser', () => {
+  it('shows no cards and no sign-up prompt when the engine finds nobody', async () => {
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return' })] });
+    renderPage();
+
+    expect(await screen.findByText('partners.none')).toBeInTheDocument();
+    expect(screen.queryAllByTestId('teaser-card')).toHaveLength(0);
+    expect(screen.queryByText('partners.unlockCta')).not.toBeInTheDocument();
+  });
+
+  it('shows the real count and the real match percentages', async () => {
+    runSearch.mockResolvedValue({ providers: [prov('a', 87), prov('b', 60)], laws: [] });
+    renderPage();
+
+    expect(await screen.findByText('partners.eyebrow#2')).toBeInTheDocument();
+    const cards = screen.getAllByTestId('teaser-card');
+    expect(cards).toHaveLength(2);
+    expect(within(cards[0]).getByText('partners.match@87%')).toBeInTheDocument();
+    expect(within(cards[1]).getByText('partners.match@60%')).toBeInTheDocument();
+    expect(screen.queryByText('partners.none')).not.toBeInTheDocument();
+  });
+
+  it('counts every match but shows at most three cards', async () => {
+    runSearch.mockResolvedValue({
+      providers: [prov('a', 100), prov('b', 87), prov('c', 73), prov('d', 60), prov('e', 60)],
+      laws: [],
+    });
+    renderPage();
+
+    expect(await screen.findByText('partners.eyebrow#5')).toBeInTheDocument();
+    expect(screen.getAllByTestId('teaser-card')).toHaveLength(3);
+  });
+
+  it('claims nothing when the engine did not answer — the fixture is not a match', async () => {
+    runSearch.mockRejectedValue(new Error('offline'));
+    renderPage();
+    // The table falls back to its fixture rows; wait for the page to settle.
+    await screen.findAllByText(/./);
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(screen.queryAllByTestId('teaser-card')).toHaveLength(0);
+    expect(screen.queryByText(/partners\.eyebrow/)).not.toBeInTheDocument();
+    expect(screen.queryByText('partners.none')).not.toBeInTheDocument();
+    expect(screen.queryByText(/100%/)).not.toBeInTheDocument();
   });
 });

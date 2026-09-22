@@ -180,7 +180,6 @@ export const STATS = [
   { value: '3', label: 'Verified Providers ready' },
 ];
 
-const MATCHES = ['100%', '87%', '73%'];
 
 // Real partners behind the unlock (seeded provider_keys on staging).
 // `match` holds the raw percentage; the "match" wording is translated at render.
@@ -278,7 +277,7 @@ export function ResultsRiskMap() {
   // ?session=<id> re-queries /search with that session's stored profile.
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session');
-  const { data: searchData } = useApiData<{ providers: AnonProvider[]; laws: SearchLaw[]; session: SessionRowData | null }>(async () => {
+  const { data: searchData, source: searchSource } = useApiData<{ providers: AnonProvider[]; laws: SearchLaw[]; session: SessionRowData | null }>(async () => {
     let query: Parameters<typeof runSearch>[0] = profile ?? {};
     let session: SessionRowData | null = null;
     if (sessionId) {
@@ -290,7 +289,14 @@ export function ResultsRiskMap() {
     const res = await runSearch(query);
     return { providers: res.providers, laws: res.laws ?? [], session };
   }, { providers: PARTNERS_ANON, laws: [], session: null }, [sessionId, reloadKey]);
-  const anonProviders = searchData.providers;
+  // Anbieter zaehlen nur, wenn die Engine sie geliefert hat. Waehrend des
+  // Ladens und bei einem API-Fehler steht in `searchData` die Design-Fixture —
+  // drei erfundene Anbieter mit 100/87/73 %. Die taugt als Formvertrag fuer
+  // useApiData, aber nie als Treffer: sie wuerde einem Nutzer ohne einen
+  // einzigen passenden Anbieter drei zeigen (Entscheidung 2026-09-22,
+  // "echte Zahl"; DNA §4.5 "Never give false reassurance").
+  const providersLive = searchSource === 'api';
+  const anonProviders = providersLive ? searchData.providers : [];
 
   // Obligations enrichment: live engine laws (severity/statute/penalty/cadence)
   // replace the design fixture as soon as the payload carries severity. Live
@@ -381,7 +387,7 @@ export function ResultsRiskMap() {
       { value: String(rows.length), label: 'obligations identified' },
       { value: String(soon), label: `with a deadline in ${SOON_DAYS} days` },
       { value: median != null ? String(median) : '', days: median ?? undefined, label: 'median deadline' },
-      { value: String(anonProviders.length), label: 'Verified Providers ready' },
+      { value: providersLive ? String(anonProviders.length) : '—', label: 'Verified Providers ready' },
     ];
   })();
 
@@ -627,42 +633,58 @@ export function ResultsRiskMap() {
           ))}
         </div>
 
-        {/* Partners matched */}
-        <div className="mt-16">
-          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <span className="text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-brand">
-                {t('partners.eyebrow')}
-              </span>
-              <h2 className="mt-2 font-serif text-[1.75rem] font-bold leading-tight text-fg">
-                {t('partners.title')}
-              </h2>
-            </div>
-            <button
-              type="button"
-              onClick={() => setSaveOpen(true)}
-              className="inline-flex items-center gap-1.5 text-body-sm font-semibold text-fg-brand transition-colors hover:text-brand"
-            >
-              <Lock size={14} /> {t('partners.unlockCta')} <ArrowRight size={14} />
-            </button>
-          </div>
-
-          <div className="mt-6 grid gap-5 sm:grid-cols-3">
-            {MATCHES.map((m) => (
-              <div
-                key={m}
-                className="flex flex-col items-center gap-4 rounded-xl border border-stroke-subtle bg-surface-secondary px-6 py-8"
-              >
-                <Lock size={22} className="text-fg-tertiary" />
-                <div className="w-full space-y-2">
-                  <div className="mx-auto h-2.5 w-3/4 rounded-full bg-neutral-200" />
-                  <div className="mx-auto h-2.5 w-1/2 rounded-full bg-neutral-200" />
+        {/* Partners matched — echte Treffer der Engine, sonst nichts.
+            Die Karten bleiben gesperrt (Identitaet erst nach Registrierung),
+            aber Anzahl und Match-Prozent sind die tatsaechlichen. Bei null
+            Treffern gibt es keine Karten und keinen CTA: eine Registrierung,
+            hinter der nichts wartet, ist kein Angebot (Checklist v1.0: "Zero,
+            one, limited, and multiple match results use the correct singular
+            or plural copy"). Solange die Engine noch nicht geantwortet hat,
+            bleibt der Abschnitt leer statt etwas zu behaupten. */}
+        {providersLive && (
+          <div className="mt-16">
+            {anonProviders.length === 0 ? (
+              <p className="text-body-sm text-fg-secondary">{t('partners.none')}</p>
+            ) : (
+              <>
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <span className="text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-brand">
+                      {t('partners.eyebrow', { count: anonProviders.length })}
+                    </span>
+                    <h2 className="mt-2 font-serif text-[1.75rem] font-bold leading-tight text-fg">
+                      {t('partners.title')}
+                    </h2>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSaveOpen(true)}
+                    className="inline-flex items-center gap-1.5 text-body-sm font-semibold text-fg-brand transition-colors hover:text-brand"
+                  >
+                    <Lock size={14} /> {t('partners.unlockCta')} <ArrowRight size={14} />
+                  </button>
                 </div>
-                <span className="text-body-md font-bold text-fg-brand">{t('partners.match', { pct: m })}</span>
-              </div>
-            ))}
+
+                <div className="mt-6 grid gap-5 sm:grid-cols-3">
+                  {anonProviders.slice(0, 3).map((p) => (
+                    <div
+                      key={p.provider_key}
+                      data-testid="teaser-card"
+                      className="flex flex-col items-center gap-4 rounded-xl border border-stroke-subtle bg-surface-secondary px-6 py-8"
+                    >
+                      <Lock size={22} className="text-fg-tertiary" />
+                      <div className="w-full space-y-2">
+                        <div className="mx-auto h-2.5 w-3/4 rounded-full bg-neutral-200" />
+                        <div className="mx-auto h-2.5 w-1/2 rounded-full bg-neutral-200" />
+                      </div>
+                      <span className="text-body-md font-bold text-fg-brand">{t('partners.match', { pct: `${p.match}%` })}</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
-        </div>
+        )}
       </main>
 
       {/* Save CTA band */}

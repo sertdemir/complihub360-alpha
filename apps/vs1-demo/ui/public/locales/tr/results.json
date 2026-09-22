@@ -107,8 +107,10 @@
     }
   },
   "partners": {
-    "eyebrow": "3 Verified Provider eşleşti",
+    "eyebrow_one": "{{count}} Verified Provider eşleşti",
+    "eyebrow_other": "{{count}} Verified Provider eşleşti",
     "title": "Bu konuda kimin harekete geçebileceğini bulduk.",
+    "none": "Bu alanı kapsayan sağlayıcı henüz yok.",
     "unlocked": "Eşleşmeler açıldı",
     "unlockCta": "En iyi eşleşmelerinizi ücretsiz bir hesapla görün",
     "match": "{{pct}} uyum",

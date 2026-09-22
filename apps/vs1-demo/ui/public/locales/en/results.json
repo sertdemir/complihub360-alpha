@@ -107,8 +107,10 @@
     }
   },
   "partners": {
-    "eyebrow": "3 Verified Providers matched",
+    "eyebrow_one": "{{count}} Verified Provider matched",
+    "eyebrow_other": "{{count}} Verified Providers matched",
     "title": "We've found who can act on this.",
+    "none": "No provider covers this area yet.",
     "unlocked": "Matches unlocked",
     "unlockCta": "See my best matches with a free account",
     "match": "{{pct}} match",
