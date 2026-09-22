@@ -24,6 +24,7 @@ und verdrahtet sie nur dort, wo ihre Aussage heute schon stimmt.
 - [x] `npm run copy:check` hält EN wortgleich, in CI als eigener Schritt. Drei Sabotagen erkannt.
 - [x] "Booking processing" auf beiden Buchungsflächen verdrahtet, mit Test.
 - [x] Loch im Terminologie-Wächter aus #187 geschlossen.
+- [x] Risk-Map-Teaser zeigt die echte Trefferzahl (Nutzerentscheidung), mit Test.
 
 ## Design / Tech Details
 
@@ -47,7 +48,7 @@ Deshalb gilt: **Copy darf erst auf eine Fläche, wenn ihre Aussage stimmt.**
 | 5 | More information needed | keine | ja | Zustand je Bereich |
 | 6 | No provider match | `userws:domainPage.providersNone` | **nein** — *"You can request this market and choose to be notified"*: gibt es weder in UI noch Backend | Markt anfragen + Benachrichtigung |
 | 7 | One provider match | keine | teilweise — *"expected price range"*: die anonyme Karte trägt keine Preisspanne | Preisspanne aus `provider_services` auf die Karte |
-| 8 | Multiple provider matches | Risk-Map-Teaser | **Konflikt, siehe unten** | Entscheidung |
+| 8 | Multiple provider matches | Risk-Map-Teaser | war **falsch** (feste "3 matched"), jetzt echte Zahl — siehe unten | die Copy der Vorlage selbst ist noch nicht verdrahtet |
 | 9 | Limited coverage | keine | **nein** — *"request additional coverage"* | wie 6 |
 | 10 | Provider response overdue | keine | **nein** — *"ask CompliHub360 to show you another match"* | Überfälligkeits-Erkennung, Alternativ-Match |
 | 11 | Alternative available | keine | **nein** | wie 10 |
@@ -109,33 +110,58 @@ Betroffen: **Copy und Microcopy**, **Registrierung und Gating** (Teaser, s. u.).
   Fähigkeit verspricht ("request this market", "we have shared only…"), wird
   bewusst nicht verdrahtet. Eine abgenommene Formulierung ist kein Beweis, dass
   ihre Aussage stimmt.
-- **Hilft es dem User zu verstehen — statt nur zu konvertieren?** Hier liegt der
-  offene Konflikt, siehe nächster Abschnitt.
+- **Hilft es dem User zu verstehen — statt nur zu konvertieren?** Der Teaser
+  zeigte erfundene Treffer als Registrierungsanreiz. Eskaliert, vom Nutzer
+  entschieden, umgesetzt — nächster Abschnitt.
 
-### Offener DNA-Konflikt — nicht selbst aufgelöst
+### DNA-Konflikt: der Risk-Map-Teaser — eskaliert, vom Nutzer entschieden
 
-Der Anbieter-Abschnitt der Risk Map (`ResultsRiskMap.tsx`) zeigt jedem Gast
+Der Anbieter-Abschnitt der Risk Map (`ResultsRiskMap.tsx`) zeigte jedem Gast
 unabhängig vom Ergebnis:
 
-- `results:partners.eyebrow` = *"3 Verified Providers matched"* — die Zahl steht fest im Text
-- `results:partners.title` = *"We've found who can act on this."*
-- drei gesperrte Karten aus `MATCHES = ['100%', '87%', '73%']`, hart kodiert (Z. 183)
+- `results:partners.eyebrow` = *"3 Verified Providers matched"* — die Zahl stand fest im Text
+- drei gesperrte Karten aus `MATCHES = ['100%', '87%', '73%']`, hart kodiert
 
-Findet die Engine null Anbieter, sieht der Nutzer trotzdem "3 matched, 100 %"
+Fand die Engine null Anbieter, sah der Nutzer trotzdem "3 matched, 100 %"
 hinter einem Schloss, verbunden mit der Aufforderung, ein Konto anzulegen.
+Verletzt: *"Hilft es dem User zu verstehen — statt nur zu konvertieren?"*,
+*"Stärkt es das Vertrauen — statt es auszugeben?"*, DNA §3 Prinzip 4, §4.5
+*"Never give false reassurance"*.
 
-Verletzt: *"Hilft es dem User zu verstehen — statt nur zu konvertieren?"* und
-*"Stärkt es das Vertrauen — statt es auszugeben?"*; DNA §3 Prinzip 4 (*"Show
-value before asking for commitment"* — hier wird erfundener Wert gezeigt);
-§4.5 *"Never give false reassurance"*. Die Checklist selbst verlangt:
-*"Zero, one, limited, and multiple match results use the correct singular or
-plural copy."*
+Nach `.agents/rules/dna-decision-filter.md` nicht selbst aufgelöst, sondern
+dem Nutzer mit drei Optionen vorgelegt. **Entscheidung 2026-09-22: "echte
+Zahl".**
 
-**Nicht angefasst.** Nach `.agents/rules/dna-decision-filter.md` wird ein
-DNA-Konflikt benannt und eskaliert, nicht selbst aufgelöst. Die Umbenennung des
-CTA-Labels (`unlockCta`) ist davon getrennt — sie ist eine Terminologie-Pflicht
-der Checklist und ändert am Teaser nichts.
+Umsetzung:
+
+- Überschrift mit der echten Trefferzahl, Singular und Plural
+  (`partners.eyebrow_one` / `_other`) — die Checklist verlangt *"Zero, one,
+  limited, and multiple match results use the correct singular or plural copy."*
+- Karten aus den gelieferten Anbietern, höchstens drei, mit deren echtem
+  Match-Prozent. Die Identität bleibt gesperrt.
+- Bei null Treffern: keine Karten, kein CTA, ein Satz (`partners.none`).
+- **Solange die Engine nicht geantwortet hat — beim Laden und bei einem
+  API-Fehler — zeigt der Abschnitt nichts.** Das gehört zur Entscheidung:
+  `useApiData` liefert in diesen Fällen die Design-Fixture mit genau den drei
+  erfundenen Anbietern. Dieselbe Regel gilt für die Anbieterliste der
+  eingeloggten Ansicht (`SessionSnapshot`) und die Kennzahl "Verified
+  Providers ready" (zeigt dann "—" statt "3").
+
+Tests: vier Fälle (null, zwei, fünf, API-Ausfall). Sabotage A (Fixture wieder
+als Treffer) → Fall 4 fällt; Sabotage B (Anzahl fest auf 3) → Fall 2 und 3 fallen.
+
+Die Umbenennung des CTA-Labels (`unlockCta`) ist davon getrennt — sie ist
+eine Terminologie-Pflicht der Checklist.
+
+### Beim Nachziehen gefunden, nicht in diesem PR
+
+Der PDF-Export auf der **Sitzungsseite** (`SessionsPage.tsx`, `exportPdf`)
+baut die Risk-Map-PDF aus der Design-Fixture — `OBLIGATIONS` (8 erfundene
+Pflichten) und `STATS` ("3 Verified Providers ready") — statt aus den Daten
+des Nutzers. Ein Dokument, das jemand weiterleitet. Derselbe Fehlertyp wie
+der Teaser, aber eine andere Fläche mit eigenem Datenweg: eigener Schritt.
 
 ## Agent Audit Log
 
 - [2026-09-22] **Claude**: Copy angelegt, Wahrheitstabelle erstellt, Booking processing verdrahtet, Wächter-Loch geschlossen, DNA-Konflikt eskaliert. (Status: review)
+- [2026-09-22] **Claude**: Teaser nach Nutzerentscheidung "echte Zahl" umgebaut; Fixture-Export der Sitzungsseite gemeldet. (Status: review)

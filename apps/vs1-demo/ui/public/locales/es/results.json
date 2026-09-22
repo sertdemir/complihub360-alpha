@@ -107,8 +107,10 @@
     }
   },
   "partners": {
-    "eyebrow": "3 Verified Providers encontrados",
+    "eyebrow_one": "{{count}} Verified Provider encontrado",
+    "eyebrow_other": "{{count}} Verified Providers encontrados",
     "title": "Hemos encontrado quién puede actuar sobre esto.",
+    "none": "Aún no hay proveedor con cobertura en esta área.",
     "unlocked": "Coincidencias desbloqueadas",
     "unlockCta": "Vea sus mejores coincidencias con una cuenta gratuita",
     "match": "{{pct}} de coincidencia",

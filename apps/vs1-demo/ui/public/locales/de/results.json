@@ -107,8 +107,10 @@
     }
   },
   "partners": {
-    "eyebrow": "3 Verified Provider gefunden",
+    "eyebrow_one": "{{count}} Verified Provider gefunden",
+    "eyebrow_other": "{{count}} Verified Provider gefunden",
     "title": "Wir haben gefunden, wer das für Sie umsetzen kann.",
+    "none": "Noch kein Anbieter mit Abdeckung in diesem Bereich.",
     "unlocked": "Matches freigeschaltet",
     "unlockCta": "Meine besten Matches mit kostenlosem Konto ansehen",
     "match": "{{pct}} Übereinstimmung",
