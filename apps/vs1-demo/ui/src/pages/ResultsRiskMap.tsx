@@ -300,6 +300,9 @@ export function ResultsRiskMap() {
     : searchSource === 'api' ? 'none'
     : searchLoading ? 'loading' : 'failed';
   const noRequirements = pageState === 'none';
+  // Die Engine hat geantwortet — mit oder ohne Pflichten. Nur dann gibt es
+  // eine Map, die man speichern kann, und eine Aussage "what applies to you".
+  const hasResult = pageState === 'live' || pageState === 'none';
   const rows: Obligation[] = isLive ? liveObligations(liveLaws, t, i18n.language, locale) : [];
 
   // Two groups, not two tables: "Now" is what the user is accountable for
@@ -494,21 +497,25 @@ export function ResultsRiskMap() {
               <ArrowLeft size={14} /> {t('topbar.backHome')}
             </Link>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="hidden items-center gap-2 text-body-2xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary sm:inline-flex">
-              <Lock size={13} /> {t('topbar.guestBadge')}
-            </span>
-            <Button
-              variant="primary"
-              size="md"
-              shape="soft"
-              type="button"
-              onClick={() => setSaveOpen(true)}
-              className="text-primary-950 transition-transform duration-200 hover:-translate-y-0.5"
-            >
-              {t('topbar.saveMap')} <ArrowRight size={15} />
-            </Button>
-          </div>
+          {/* Ohne Ergebnis gibt es keine Map, die ablaeuft oder gespeichert
+              werden koennte — Badge und Knopf behaupteten sonst eine. */}
+          {hasResult && (
+            <div className="flex items-center gap-4">
+              <span className="hidden items-center gap-2 text-body-2xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary sm:inline-flex">
+                <Lock size={13} /> {t('topbar.guestBadge')}
+              </span>
+              <Button
+                variant="primary"
+                size="md"
+                shape="soft"
+                type="button"
+                onClick={() => setSaveOpen(true)}
+                className="text-primary-950 transition-transform duration-200 hover:-translate-y-0.5"
+              >
+                {t('topbar.saveMap')} <ArrowRight size={15} />
+              </Button>
+            </div>
+          )}
         </div>
       </header>
 
@@ -516,14 +523,25 @@ export function ResultsRiskMap() {
         {/* Header */}
         <div className="mx-auto mt-14 max-w-3xl text-center">
           <span className="text-body-2xs font-semibold uppercase tracking-[0.16em] text-fg-brand">{t('header.eyebrow')}</span>
-          <h1 className="mt-3 font-serif text-[2.75rem] font-bold leading-[1.05] tracking-tight text-fg sm:text-[3.25rem]">
-            {t('header.title')}
+          {/* "Here's what applies to you." nur, wenn es ein Ergebnis gibt — ueber
+              "We couldn't create your Risk Map" waere es das Gegenteil dessen,
+              was darunter steht. Ohne Ergebnis traegt der Zustand die Aussage;
+              die Ueberschrift bleibt fuer Screenreader als Seitentitel. */}
+          <h1 className={hasResult
+            ? 'mt-3 font-serif text-[2.75rem] font-bold leading-[1.05] tracking-tight text-fg sm:text-[3.25rem]'
+            : 'sr-only'}
+          >
+            {hasResult ? t('header.title') : t('header.eyebrow')}
           </h1>
-          <p className="mt-4 text-body-md leading-relaxed text-fg-secondary">
-            {profile?.country
-              ? t('header.subtitleProfile', { total: profile.categories?.length ?? 0 })
-              : t('header.subtitleDefault')}
-          </p>
+          {/* Nur mit Profil. Der fruehere Standard-Untertitel beschrieb ein
+              erfundenes Unternehmen ("Germany · United Kingdom · Netherlands.
+              D2C e-commerce, €2M—€5M revenue") — fuer jeden, der ohne Profil
+              ankam, als waere es seines. */}
+          {hasResult && profile?.country && (
+            <p className="mt-4 text-body-md leading-relaxed text-fg-secondary">
+              {t('header.subtitleProfile', { total: profile.categories?.length ?? 0 })}
+            </p>
+          )}
         </div>
 
         {/* Stat strip — nur, wenn die Engine geantwortet hat */}
@@ -667,28 +685,30 @@ export function ResultsRiskMap() {
         )}
       </main>
 
-      {/* Save CTA band */}
-      <section className="border-t border-stroke-subtle bg-surface-secondary py-16">
-        <div className="mx-auto max-w-2xl px-4 text-center">
-          <ShieldCheck size={26} className="mx-auto text-fg-brand" />
-          <h2 className="mt-4 font-serif text-[2rem] font-bold leading-tight tracking-tight text-fg">
-            {t('cta.title')}
-          </h2>
-          <p className="mx-auto mt-3 max-w-md text-body-md leading-relaxed text-fg-secondary">
-            {t('cta.body')}
-          </p>
-          <Button
-            variant="primary"
-            size="xl"
-            shape="soft"
-            type="button"
-            onClick={() => setSaveOpen(true)}
-            className="mt-8 shadow-[0_18px_34px_-14px_rgba(0,77,64,0.55)] transition-transform duration-200 hover:-translate-y-0.5"
-          >
-            {t('cta.button')} <ArrowRight size={17} />
-          </Button>
-        </div>
-      </section>
+      {/* Save CTA band — nur mit Ergebnis (s. o.) */}
+      {hasResult && (
+        <section className="border-t border-stroke-subtle bg-surface-secondary py-16">
+          <div className="mx-auto max-w-2xl px-4 text-center">
+            <ShieldCheck size={26} className="mx-auto text-fg-brand" />
+            <h2 className="mt-4 font-serif text-[2rem] font-bold leading-tight tracking-tight text-fg">
+              {t('cta.title')}
+            </h2>
+            <p className="mx-auto mt-3 max-w-md text-body-md leading-relaxed text-fg-secondary">
+              {t('cta.body')}
+            </p>
+            <Button
+              variant="primary"
+              size="xl"
+              shape="soft"
+              type="button"
+              onClick={() => setSaveOpen(true)}
+              className="mt-8 shadow-[0_18px_34px_-14px_rgba(0,77,64,0.55)] transition-transform duration-200 hover:-translate-y-0.5"
+            >
+              {t('cta.button')} <ArrowRight size={17} />
+            </Button>
+          </div>
+        </section>
+      )}
 
       <FreeAccountDrawer open={saveOpen} onClose={() => setSaveOpen(false)} />
     </div>

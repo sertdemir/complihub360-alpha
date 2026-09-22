@@ -7,8 +7,7 @@
   "header": {
     "eyebrow": "Su Risk Map",
     "title": "Esto es lo que le aplica.",
-    "subtitleProfile": "Basado en su evaluación. {{total}} ámbitos en alcance.",
-    "subtitleDefault": "Basado en Alemania · Reino Unido · Países Bajos. E-commerce D2C, €2M—€5M de facturación. VAT · EPR · Privacidad en alcance."
+    "subtitleProfile": "Basado en su evaluación. {{total}} ámbitos en alcance."
   },
   "stats": {
     "0": {

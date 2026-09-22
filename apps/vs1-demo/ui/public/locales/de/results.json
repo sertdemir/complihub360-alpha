@@ -7,8 +7,7 @@
   "header": {
     "eyebrow": "Ihre Risk Map",
     "title": "Das gilt für Sie.",
-    "subtitleProfile": "Basierend auf Ihrer Einschätzung. {{total}} Bereiche im Fokus.",
-    "subtitleDefault": "Basierend auf Deutschland · Vereinigtes Königreich · Niederlande. D2C-E-Commerce, €2M—€5M Umsatz. VAT · EPR · Datenschutz im Fokus."
+    "subtitleProfile": "Basierend auf Ihrer Einschätzung. {{total}} Bereiche im Fokus."
   },
   "stats": {
     "0": {

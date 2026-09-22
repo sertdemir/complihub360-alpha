@@ -268,6 +268,10 @@ describe('ResultsRiskMap while loading and on failure', () => {
     expect(screen.queryByText(FORMER_FIXTURE_TITLE)).not.toBeInTheDocument();
     expect(screen.queryByText('obligations identified')).not.toBeInTheDocument();
     expect(screen.queryByText('table.obligation')).not.toBeInTheDocument();
+    // No map yet — so nothing to save, and no "Here's what applies to you."
+    expect(screen.queryByText('topbar.saveMap')).not.toBeInTheDocument();
+    expect(screen.queryByText('cta.title')).not.toBeInTheDocument();
+    expect(screen.queryByText('header.title')).not.toBeInTheDocument();
   });
 
   it('says it failed when the engine does not answer, and Try Again really asks again', async () => {
@@ -278,12 +282,17 @@ describe('ResultsRiskMap while loading and on failure', () => {
     expect(screen.getByRole('button', { name: 'common:states.actions.contactSupport' })).toBeInTheDocument();
     expect(screen.queryByText(FORMER_FIXTURE_TITLE)).not.toBeInTheDocument();
     expect(screen.queryByText('obligations identified')).not.toBeInTheDocument();
+    expect(screen.queryByText('topbar.saveMap')).not.toBeInTheDocument();
+    expect(screen.queryByText('header.title')).not.toBeInTheDocument();
 
     runSearch.mockResolvedValueOnce({ providers: [], laws: [law({ id: 'vat', title: 'VAT return' })] });
     fireEvent.click(screen.getByRole('button', { name: 'common:states.actions.tryAgain' }));
 
     expect(await screen.findByText('VAT return')).toBeInTheDocument();
     expect(screen.queryByText('common:states.riskMapFailed.heading')).not.toBeInTheDocument();
+    // With a result the map can be saved again.
+    expect(screen.getByText('topbar.saveMap')).toBeInTheDocument();
+    expect(screen.getByText('header.title')).toBeInTheDocument();
     expect(runSearch).toHaveBeenCalledTimes(2);
   });
 

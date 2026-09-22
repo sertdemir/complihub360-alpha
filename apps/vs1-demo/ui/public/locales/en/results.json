@@ -7,8 +7,7 @@
   "header": {
     "eyebrow": "Your risk map",
     "title": "Here's what applies to you.",
-    "subtitleProfile": "Based on your assessment. {{total}} domains in scope.",
-    "subtitleDefault": "Based on Germany · United Kingdom · Netherlands. D2C e-commerce, €2M—€5M revenue. VAT · EPR · Privacy in scope."
+    "subtitleProfile": "Based on your assessment. {{total}} domains in scope."
   },
   "stats": {
     "0": {

@@ -7,8 +7,7 @@
   "header": {
     "eyebrow": "Risk Map'iniz",
     "title": "Sizin için geçerli olanlar.",
-    "subtitleProfile": "Değerlendirmenize dayanmaktadır. Kapsamda {{total}} alan bulunuyor.",
-    "subtitleDefault": "Almanya · Birleşik Krallık · Hollanda temel alınmıştır. D2C e-ticaret, €2M—€5M ciro. Kapsamda VAT · EPR · Gizlilik."
+    "subtitleProfile": "Değerlendirmenize dayanmaktadır. Kapsamda {{total}} alan bulunuyor."
   },
   "stats": {
     "0": {
