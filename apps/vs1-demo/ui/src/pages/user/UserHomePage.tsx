@@ -291,10 +291,15 @@ export function UserHomePage() {
           {kopf}
 
           {/* Kennzahlen als Einheiten-Grafik (Canvas Z2, Nutzer-Wahl 2026-09-22).
+              Drei gleichberechtigte Spalten; die Pflichten stehen als EIN Feld
+              (hoch, dann mittel, dann niedrig), 8 bis 15 Spalten breit, damit
+              es hoechstens vier Reihen hoch wird. Befund Staging: 52 Pflichten
+              standen als zwei Saeulen von bis zu sieben Reihen, rechts klaffte
+              eine Luecke.
               Die vier Ringe sind weg: ihre Farben erklaerte nichts, und "Hohes
               Risiko" war eine Teilmenge von "Offene Pflichten". Jetzt: jedes
               Kaestchen ein Ding, jede Farbe mit ihrem Wort daneben. */}
-          <div className="mt-6 grid gap-x-12 gap-y-7 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+          <div className="mt-6 grid gap-x-12 gap-y-7 md:grid-cols-2 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)]">
             <div>
               <div className="flex items-baseline gap-3">
                 <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('home.kpiDuties')}</p>
@@ -302,20 +307,20 @@ export function UserHomePage() {
               </div>
               {offen > 0 ? (
                 <>
-                  <div className="mt-3 flex flex-wrap gap-x-7 gap-y-4">
-                    {pflichtGruppen.filter((g) => g.n > 0).map((g, gi, arr) => (
-                      <div key={g.key}>
-                        <p className="mb-1.5 flex items-center gap-1.5 text-body-2xs text-fg-secondary">
-                          <span aria-hidden="true" className={'h-2.5 w-2.5 rounded-[2px] ' + g.cls} />
-                          {g.label} <b className="text-fg">{g.n}</b>
-                        </p>
-                        <UnitGrid
-                          on={entered} cols={5} perUnit={proKaestchen}
-                          delayOffset={arr.slice(0, gi).reduce((a, x) => a + Math.ceil(x.n / proKaestchen), 0)}
-                          parts={[{ n: g.n, cls: g.cls, label: g.tip }]}
-                        />
-                      </div>
+                  <p className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-body-2xs text-fg-secondary">
+                    {pflichtGruppen.filter((g) => g.n > 0).map((g) => (
+                      <span key={g.key} className="inline-flex items-center gap-1.5">
+                        <span aria-hidden="true" className={'h-2.5 w-2.5 rounded-[2px] ' + g.cls} />
+                        {g.label} <b className="text-fg">{g.n}</b>
+                      </span>
                     ))}
+                  </p>
+                  <div className="mt-2.5">
+                    <UnitGrid
+                      on={entered} perUnit={proKaestchen}
+                      cols={Math.min(15, Math.max(8, Math.ceil(Math.ceil(offen / proKaestchen) / 4)))}
+                      parts={pflichtGruppen.map((g) => ({ n: g.n, cls: g.cls, label: g.tip }))}
+                    />
                   </div>
                   {proKaestchen > 1 && <p className="mt-2 text-body-3xs text-fg-tertiary">{t('home.unitsPer', { count: proKaestchen })}</p>}
                 </>
@@ -324,8 +329,7 @@ export function UserHomePage() {
               )}
             </div>
 
-            <div className="flex flex-col gap-6">
-              <div>
+            <div>
                 <div className="flex items-baseline gap-3">
                   <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('home.kpiRequests')}</p>
                   <CountUp value={offeneAnfragen.length} on={entered} className="font-serif text-[30px] font-bold leading-none text-fg" />
@@ -345,8 +349,8 @@ export function UserHomePage() {
                     </p>
                   </>
                 )}
-              </div>
-              <div>
+            </div>
+            <div>
                 <div className="flex items-baseline gap-3">
                   <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('home.kpiSessions')}</p>
                   <CountUp value={dash.sessions.total} on={entered} className="font-serif text-[30px] font-bold leading-none text-fg" />
@@ -359,7 +363,6 @@ export function UserHomePage() {
                     ))}
                   </p>
                 )}
-              </div>
             </div>
           </div>
 
