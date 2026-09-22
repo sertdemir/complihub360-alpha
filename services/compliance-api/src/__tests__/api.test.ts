@@ -182,6 +182,7 @@ beforeAll(async () => {
     process.env.API_KEY = API_KEY;
     process.env.SUPABASE_JWT_SECRET = JWT_SECRET;
     process.env.WATCHERS_ENABLED = 'false';
+    process.env.RATE_LIMIT_MAX = '10000'; // die Suite laeuft komplett von 127.0.0.1
     process.env.NODE_ENV = 'development';
     delete process.env.RESEND_API_KEY; // mailer → email_outbox events, no network
     await import('../index.js');
@@ -521,18 +522,187 @@ describe('PATCH /api/v1/scheduling/:id — Absage', () => {
     });
 });
 
-describe('POST /api/v1/reviews', () => {
-    it('stores the review and recomputes the provider aggregate rating', async () => {
+describe('POST /api/v1/reviews — nur aus einer gehaltenen Buchung', () => {
+    // Bewertungen tragen 0.3 des Ranking-Scores. Frueher nahm die Route jede
+    // Bewertung ohne Buchung an und stempelte sie verified — Ranking per
+    // Fake-Account. Diese Tests halten die Tuer zu.
+    const vergangen = () => new Date(Date.now() - 2 * 3600_000).toISOString();
+    function seedBooking(over: Record<string, any> = {}) {
+        const b = { id: randomUUID(), provider_key: 'test-kanzlei', user_id: USER_ID, status: 'confirmed', slot_start: vergangen(), ...over };
+        (db.scheduling ??= []).push(b);
+        return b;
+    }
+
+    it('speichert die Bewertung und rechnet das Aggregat nur aus buchungsgebundenen Bewertungen', async () => {
         const p = seedProvider({ rating: 5 });
-        (db.reviews ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', from_role: 'user', rating: 5 });
+        (db.reviews ??= []).push({ id: randomUUID(), booking_id: randomUUID(), provider_key: 'test-kanzlei', from_role: 'user', rating: 5 });
+        // Alt-Zeile ohne Buchung: zaehlt nicht mehr
+        db.reviews.push({ id: randomUUID(), booking_id: null, provider_key: 'test-kanzlei', from_role: 'user', rating: 1 });
+        const b = seedBooking();
         const r = await api('/api/v1/reviews', {
             method: 'POST', auth: 'jwt',
-            body: JSON.stringify({ provider_key: 'test-kanzlei', from_role: 'user', rating: 4, categories: ['expertise'] }),
+            body: JSON.stringify({ booking_id: b.id, from_role: 'user', rating: 4, categories: ['expertise'] }),
         });
         expect(r.status).toBe(201);
-        expect(db.reviews).toHaveLength(2);
         expect(p.rating).toBe(4.5);
         expect(db.event_log.some((e) => e.type === 'review_submitted')).toBe(true);
+    });
+
+    it('lehnt eine Bewertung ohne booking_id ab (400)', async () => {
+        seedProvider();
+        const r = await api('/api/v1/reviews', {
+            method: 'POST', auth: 'jwt',
+            body: JSON.stringify({ provider_key: 'test-kanzlei', from_role: 'user', rating: 1 }),
+        });
+        expect(r.status).toBe(400);
+        expect(db.reviews ?? []).toHaveLength(0);
+    });
+
+    it('nimmt den Anbieter aus der Buchung, nicht aus dem Body', async () => {
+        seedProvider();
+        seedProvider({ provider_key: 'andere-kanzlei', rating: 5 });
+        const b = seedBooking();
+        const r = await api('/api/v1/reviews', {
+            method: 'POST', auth: 'jwt',
+            body: JSON.stringify({ booking_id: b.id, provider_key: 'andere-kanzlei', from_role: 'user', rating: 1 }),
+        });
+        expect(r.status).toBe(201);
+        expect(db.reviews[0].provider_key).toBe('test-kanzlei');
+    });
+
+    it('verbirgt fremde Buchungen als 404', async () => {
+        seedProvider();
+        const b = seedBooking({ user_id: randomUUID() });
+        const r = await api('/api/v1/reviews', {
+            method: 'POST', auth: 'jwt',
+            body: JSON.stringify({ booking_id: b.id, from_role: 'user', rating: 1 }),
+        });
+        expect(r.status).toBe(404);
+    });
+
+    it('lehnt eine Bewertung vor dem Termin ab (409)', async () => {
+        seedProvider();
+        const b = seedBooking({ slot_start: new Date(Date.now() + 86_400_000).toISOString() });
+        const r = await api('/api/v1/reviews', {
+            method: 'POST', auth: 'jwt',
+            body: JSON.stringify({ booking_id: b.id, from_role: 'user', rating: 5 }),
+        });
+        expect(r.status).toBe(409);
+    });
+
+    it('nimmt je Buchung und Seite genau eine Bewertung an (409 beim zweiten Mal)', async () => {
+        seedProvider();
+        const b = seedBooking();
+        const send = () => api('/api/v1/reviews', {
+            method: 'POST', auth: 'jwt',
+            body: JSON.stringify({ booking_id: b.id, from_role: 'user', rating: 5 }),
+        });
+        expect((await send()).status).toBe(201);
+        expect((await send()).status).toBe(409);
+    });
+
+    it('laesst den Anbieter nur als Mitglied den Lead bewerten', async () => {
+        seedProvider();
+        const b = seedBooking({ user_id: randomUUID() });
+        const send = () => api('/api/v1/reviews', {
+            method: 'POST', auth: 'jwt',
+            body: JSON.stringify({ booking_id: b.id, from_role: 'provider', rating: 4 }),
+        });
+        expect((await send()).status).toBe(404);
+        (db.provider_members ??= []).push({ provider_key: 'test-kanzlei', user_id: USER_ID, role: 'owner' });
+        expect((await send()).status).toBe(201);
+    });
+});
+
+describe('Ownership: Anbieter-eigene Routen gehoeren ihren Mitgliedern', () => {
+    // Frueher reichte irgendein Login, um fremde Profile zu aendern, fremde
+    // Leads samt Nutzer-E-Mails zu lesen und fremde Stripe-Portale zu oeffnen.
+    const EIGENE_ROUTEN: Array<[string, string]> = [
+        ['GET', '/bookings'], ['GET', '/coverage'], ['PATCH', '/coverage'], ['PATCH', '/profile'],
+        ['GET', '/invoices'], ['PATCH', '/availability'], ['POST', '/billing-portal'],
+        ['POST', '/change-email'], ['GET', '/billing/preview'],
+    ];
+
+    it.each(EIGENE_ROUTEN)('%s …%s: fremder Login bekommt 404 und aendert nichts', async (method, suffix) => {
+        const p = seedProvider();
+        const vorher = JSON.stringify(p);
+        const r = await api(`/api/v1/provider/test-kanzlei${suffix}`, {
+            method, auth: 'jwt',
+            body: method === 'GET' ? undefined : JSON.stringify({ countries_supported: ['US'], pseudonym_label: 'x', status: 'ooo', email: 'boese@example.test' }),
+        });
+        expect(r.status).toBe(404);
+        expect(JSON.stringify(p)).toBe(vorher);
+    });
+
+    it('laesst das Mitglied auf den eigenen Anbieter', async () => {
+        seedProvider();
+        (db.provider_members ??= []).push({ provider_key: 'test-kanzlei', user_id: USER_ID, role: 'owner' });
+        const r = await api('/api/v1/provider/test-kanzlei/billing/preview', { auth: 'jwt' });
+        expect(r.status).toBe(200);
+    });
+
+    it('laesst das Mitglied NICHT auf einen anderen Anbieter', async () => {
+        seedProvider();
+        seedProvider({ provider_key: 'andere-kanzlei' });
+        (db.provider_members ??= []).push({ provider_key: 'test-kanzlei', user_id: USER_ID, role: 'owner' });
+        const r = await api('/api/v1/provider/andere-kanzlei/bookings', { auth: 'jwt' });
+        expect(r.status).toBe(404);
+    });
+
+    it('laesst Admin-JWT und Server-Key durch', async () => {
+        seedProvider();
+        const admin = signJwt({ sub: randomUUID(), app_metadata: { role: 'admin' } });
+        const r1 = await fetch(`${BASE}/api/v1/provider/test-kanzlei/billing/preview`, { headers: { authorization: `Bearer ${admin}` } });
+        expect(r1.status).toBe(200);
+        const r2 = await api('/api/v1/provider/test-kanzlei/billing/preview');
+        expect(r2.status).toBe(200);
+    });
+
+    it('laesst die Nutzer-Routen eines Anbieters offen (Detail, Slots, Reviews)', async () => {
+        seedProvider();
+        const r = await api('/api/v1/provider/test-kanzlei/reviews', { auth: 'jwt' });
+        expect(r.status).not.toBe(404);
+    });
+});
+
+describe('GET /api/v1/me/provider', () => {
+    it('meldet ehrlich 404, wenn der Login keinem Anbieter gehoert', async () => {
+        const r = await api('/api/v1/me/provider', { auth: 'jwt' });
+        expect(r.status).toBe(404);
+        expect(r.body.errorCode).toBe('NOT_A_PROVIDER');
+    });
+
+    it('liefert den eigenen Anbieter', async () => {
+        seedProvider();
+        (db.provider_members ??= []).push({ provider_key: 'test-kanzlei', user_id: USER_ID, role: 'owner' });
+        const r = await api('/api/v1/me/provider', { auth: 'jwt' });
+        expect(r.status).toBe(200);
+        expect(r.body.provider_key).toBe('test-kanzlei');
+    });
+});
+
+describe('POST /api/v1/admin/provider/:key/member', () => {
+    it('ist fuer normale Logins gesperrt', async () => {
+        seedProvider();
+        const r = await api('/api/v1/admin/provider/test-kanzlei/member', {
+            method: 'POST', auth: 'jwt', body: JSON.stringify({ user_id: USER_ID }),
+        });
+        expect(r.status).toBe(403);
+        expect(db.provider_members ?? []).toHaveLength(0);
+    });
+
+    it('verknuepft per E-Mail und haelt die Launch-Grenze: ein Login je Anbieter', async () => {
+        seedProvider();
+        (db.users ??= []).push({ id: USER_ID, email: 'test@complihub.test' });
+        const r = await api('/api/v1/admin/provider/test-kanzlei/member', {
+            method: 'POST', body: JSON.stringify({ email: 'Test@Complihub.test' }),
+        });
+        expect(r.status).toBe(201);
+        expect(db.provider_members).toEqual([expect.objectContaining({ provider_key: 'test-kanzlei', user_id: USER_ID })]);
+        const zweiter = await api('/api/v1/admin/provider/test-kanzlei/member', {
+            method: 'POST', body: JSON.stringify({ user_id: randomUUID() }),
+        });
+        expect(zweiter.status).toBe(409);
     });
 });
 

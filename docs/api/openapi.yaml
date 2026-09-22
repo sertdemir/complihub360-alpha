@@ -130,3 +130,102 @@ paths:
       responses:
         '200':
           description: Processed
+
+  # ─── Anbieter-Identitaet und Ownership (Phase 0, 2026-09-22) ───────────────
+  # Alle Anbieter-eigenen Routen /provider/{key}/(bookings|coverage|profile|
+  # invoices|availability|billing-portal|change-email|billing/preview) sind nur
+  # fuer Mitglieder des Anbieters (provider_members), Admins und den
+  # Server-Key erreichbar. Fremde bekommen 404, damit die Antwort nicht
+  # verraet, welche Anbieter-Schluessel existieren.
+
+  /me/provider:
+    get:
+      summary: Anbieter-Konto des eingeloggten Nutzers
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Der Login gehoert zu diesem Anbieter
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  provider_key: { type: string }
+                  role: { type: string, enum: [owner, admin, member] }
+                  name: { type: string, nullable: true }
+                  lifecycle_status: { type: string, nullable: true }
+        '401':
+          description: Kein Login
+        '404':
+          description: Login gehoert zu keinem Anbieter (errorCode NOT_A_PROVIDER)
+
+  /admin/provider/{key}/member:
+    post:
+      summary: Login mit einem Anbieter verknuepfen (nur Admin oder Server-Key)
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: user_id oder eine eindeutige E-Mail aus public.users
+              properties:
+                user_id: { type: string, format: uuid }
+                email: { type: string, format: email }
+      responses:
+        '201':
+          description: Verknuepft (idempotent fuer dieselbe Kombination)
+        '400':
+          description: Weder user_id noch bekannte E-Mail
+        '403':
+          description: Kein Admin
+        '404':
+          description: Anbieter unbekannt
+        '409':
+          description: Launch-Grenze verletzt (PROVIDER_HAS_USER oder USER_HAS_PROVIDER)
+
+  /reviews:
+    post:
+      summary: Bewertung zu einer gehaltenen Buchung abgeben
+      description: >
+        Nur von Beteiligten der Buchung (Nutzer der Buchung bzw. Mitglied des
+        Anbieters), erst nach dem Termin, einmal je Buchung und Seite. Der
+        Anbieter wird aus der Buchung gelesen, nie aus dem Body.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [booking_id, rating]
+              properties:
+                booking_id: { type: string, format: uuid }
+                from_role: { type: string, enum: [user, provider], default: user }
+                rating: { type: number, minimum: 0, maximum: 5 }
+                categories: { type: array, items: { type: string } }
+                body: { type: string, maxLength: 2000 }
+      responses:
+        '201':
+          description: Gespeichert
+        '400':
+          description: booking_id oder rating fehlt
+        '404':
+          description: Buchung unbekannt oder nicht die eigene
+        '409':
+          description: Termin noch nicht stattgefunden (BOOKING_NOT_HELD) oder schon bewertet (ALREADY_REVIEWED)
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Supabase-Access-Token des Nutzers

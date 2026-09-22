@@ -412,6 +412,8 @@ function route(method: string, path: string, body: Record<string, unknown> = {})
   const p = seg.slice(2);
   if (method === 'GET') {
     if (p[0] === 'dashboard') return dashboard();
+    // Mock-Login = der Demo-Anbieter (echte API: provider_members, 20260922000000)
+    if (p[0] === 'me' && p[1] === 'provider') return { ok: true, provider_key: 'dahlmann-cpa', role: 'owner', name: 'Dahlmann CPA', lifecycle_status: 'active' };
     if (p[0] === 'domain' && p[1]) return domainOverview(p[1]);
     if (p[0] === 'bookings') return { ok: true, bookings: bookings() };
     if (p[0] === 'requests') return { ok: true, requests: requests() };

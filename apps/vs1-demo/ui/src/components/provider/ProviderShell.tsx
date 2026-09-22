@@ -12,7 +12,7 @@ import { ConfirmDrawer, type ConfirmSpec } from './ConfirmDrawer';
 import { ProviderOnboardingModal, ProviderProfileBanner } from './ProviderOnboardingModal';
 import { fetchProviderBookings } from '../../api/bookings';
 import { fetchEventLogFeed } from '../../api/notifications';
-import { fetchCoverage, setAvailability, AVAILABILITY_EVENT, DEMO_PROVIDER_KEY } from '../../api/provider';
+import { fetchCoverage, setAvailability, AVAILABILITY_EVENT } from '../../api/provider';
 import { cn } from '../../lib/utils';
 import { Avatar } from '../ui/Avatar';
 
@@ -59,7 +59,7 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
   // hidden until the API answers (fixture mode shows no counts).
   const [counts, setCounts] = useState<{ requests?: number; unread?: number }>({});
   useEffect(() => {
-    fetchProviderBookings(DEMO_PROVIDER_KEY)
+    fetchProviderBookings()
       .then((bs) => setCounts((c) => ({ ...c, requests: bs.filter((b) => b.status === 'confirmed').length })))
       .catch(() => {});
     // Der Anbieter-Bereich haengt noch am Betriebsprotokoll: eine eigene
