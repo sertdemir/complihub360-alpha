@@ -19,6 +19,7 @@ import { checkVatId } from "./vies.js";
 import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
 import { buildCockpit } from "./cockpit.js";
 import { ownProviderRouteKey, canAccessProvider, handleMeProvider, handleAdminLinkMember } from "./providerAuth.js";
+import { handleListSaved, handleSaveProvider, handleUnsaveProvider, savedProviderRouteKey } from "./savedProviders.js";
 import { redactText } from "@complihub360/redaction";
 
 // P0 #1: shared magic-link verification — SHA-256 hash lookup, engagement +
@@ -122,6 +123,13 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         ['POST', /^\/api\/v1\/search$/],                   // guest risk map
         ['POST', /^\/api\/v1\/session$/],                  // guest wizard-session save (guest_key)
         ['GET', /^\/api\/v1\/sessions(\?|$)/],             // guest session list (guest_key = bearer)
+        // Anbieter-Lesezeichen: ein Gast darf merken, bevor er ein Konto hat
+        // (Migration 20260923010000). Der guest_key ist hier der Ausweis —
+        // dieselbe Konstruktion wie bei den Gast-Sitzungen darueber. Ein
+        // mitgesendeter JWT wird trotzdem geprueft und schlaegt den guest_key.
+        ['GET', /^\/api\/v1\/me\/saved-providers(\/|\?|$)/],
+        ['POST', /^\/api\/v1\/me\/saved-providers$/],
+        ['DELETE', /^\/api\/v1\/me\/saved-providers\//],
         ['POST', /^\/api\/v1\/provider\/intake$/],         // intake token checked in-handler
         ['GET', /^\/api\/v1\/provider\/magic\//],          // single-use token IS the credential
         ['POST', /^\/api\/v1\/provider\/confirm$/],
@@ -235,6 +243,25 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 
     if (req.method === 'GET' && req.url === '/api/v1/me/provider') {
         await handleMeProvider(res, correlationId, authUserId);
+        return;
+    }
+
+    // ─── Anbieter-Lesezeichen (savedProviders.ts) ────────────────────────────
+    // Gast oder Konto; die Rangfolge steht im Modul. Die Flaeche
+    // /dashboard/saved-providers bleibt vorerst "In Vorbereitung" — der
+    // Leerzustand wird erst moeglich, wenn es etwas zu merken gibt.
+    if (req.method === 'GET' && req.url?.startsWith('/api/v1/me/saved-providers')
+        && !savedProviderRouteKey(req.url)) {
+        await handleListSaved(req, res, correlationId, authUserId);
+        return;
+    }
+    if (req.method === 'POST' && req.url === '/api/v1/me/saved-providers') {
+        await handleSaveProvider(req, res, correlationId, authUserId);
+        return;
+    }
+    const unsaveKey = req.method === 'DELETE' ? savedProviderRouteKey(req.url) : null;
+    if (unsaveKey) {
+        await handleUnsaveProvider(req, res, correlationId, authUserId, unsaveKey);
         return;
     }
 

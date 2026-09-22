@@ -83,14 +83,38 @@ export function handleAuthAdopt(
                 adopted += updated.length;
             }
 
+            // 3. Dasselbe fuer die Anbieter-Lesezeichen (Migration 20260923010000).
+            //
+            // Ohne diesen Schritt verloere ein Gast seine Merkliste genau in dem
+            // Moment, in dem er ein Konto anlegt — die Liste haengt danach an
+            // einem guest_key, den die angemeldete Ansicht nicht mehr fragt.
+            //
+            // Hat das Konto denselben Anbieter schon gemerkt, bleibt die
+            // Gast-Zeile liegen statt den Teil-Index zu verletzen. Sie ist
+            // dann doppelt und wird beim naechsten Aufraeumen unauffaellig;
+            // die Konto-Zeile gewinnt, weil sie die aeltere Absicht traegt.
+            const gemerkt = (await supabaseApi.select('saved_providers', { guest_key: guestKey })) as
+                Array<{ id: string; provider_key: string; user_id: string | null }>;
+            const schonImKonto = new Set(((await supabaseApi.select('saved_providers',
+                { user_id: identity.userId })) as Array<{ provider_key: string }>).map((r) => r.provider_key));
+            let lesezeichen = 0;
+            for (const row of gemerkt) {
+                if (row.user_id) continue;
+                if (schonImKonto.has(row.provider_key)) continue;
+                const updated = (await supabaseApi.update('saved_providers', { id: row.id },
+                    { user_id: identity.userId, guest_key: null })) as unknown[];
+                lesezeichen += updated.length;
+                schonImKonto.add(row.provider_key);
+            }
+
             // Event log without PII: counts only, no email / keys.
             await supabaseApi.insert('event_log', {
                 type: 'sessions_adopted',
-                payload: { adopted, total_for_key: rows.length },
+                payload: { adopted, total_for_key: rows.length, saved_providers: lesezeichen },
             }).catch(() => { /* non-blocking */ });
 
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ ok: true, adopted, correlationId }));
+            res.end(JSON.stringify({ ok: true, adopted, savedProviders: lesezeichen, correlationId }));
         } catch {
             structuredLog('error', 'Signup adoption failed', { correlationId, errorCode: 'ERR_ADOPTION', severity: 'error', route: '/api/v1/auth/adopt' });
             res.writeHead(500, { 'Content-Type': 'application/json' });

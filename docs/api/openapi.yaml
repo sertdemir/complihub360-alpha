@@ -138,6 +138,105 @@ paths:
   # Server-Key erreichbar. Fremde bekommen 404, damit die Antwort nicht
   # verraet, welche Anbieter-Schluessel existieren.
 
+  # ─── Anbieter-Lesezeichen ─────────────────────────────────────────────────
+  # Gast ODER Konto, nie beides. Ein verifizierter JWT schlaegt den guest_key:
+  # der steht im localStorage EINES Browsers, das Konto gilt ueberall. Bei der
+  # Registrierung uebernimmt das Konto die Gast-Zeilen (/auth/adopt).
+
+  /me/saved-providers:
+    get:
+      summary: Die eigene Merkliste
+      description: >-
+        Ohne Login ist der guest_key der Ausweis. Liefert ausschliesslich
+        eigene Zeilen; eine fremde Merkliste ist ueber diesen Weg nicht
+        erreichbar.
+      parameters:
+        - name: guest_key
+          in: query
+          required: false
+          description: Pflicht, solange kein Login vorliegt.
+          schema: { type: string, pattern: '^[A-Za-z0-9._-]{8,100}$' }
+      responses:
+        '200':
+          description: Die Merkliste, neueste zuerst
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  saved:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: string, format: uuid }
+                        provider_key: { type: string }
+                        source: { type: string, enum: [risk_map, thread, provider_page] }
+                        session_id: { type: string, format: uuid, nullable: true }
+                        created_at: { type: string, format: date-time }
+        '400':
+          description: Weder Login noch brauchbarer guest_key
+    post:
+      summary: Einen Anbieter merken
+      description: >-
+        Idempotent. Ist der Anbieter schon gemerkt, kommt die bestehende Zeile
+        mit created=false zurueck — samt ihrer urspruenglichen Herkunft. Ein
+        zweites Merken ueberschreibt source NICHT: "woher gemerkt" meint das
+        erste Mal.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [provider_key, source]
+              properties:
+                provider_key: { type: string }
+                source:
+                  type: string
+                  enum: [risk_map, thread, provider_page]
+                  description: Von welcher Flaeche gemerkt wurde.
+                session_id:
+                  type: string
+                  format: uuid
+                  description: >-
+                    Bei einem Treffer aus der Risk Map, aus welcher. Ein Wert in
+                    falscher Form wird still weggelassen — das Lesezeichen ist
+                    wichtiger als seine Herkunft.
+                guest_key: { type: string, pattern: '^[A-Za-z0-9._-]{8,100}$' }
+      responses:
+        '201':
+          description: Neu gemerkt
+        '200':
+          description: War schon gemerkt (created=false)
+        '400':
+          description: Fehlender Ausweis, unbekannte Herkunft oder kein provider_key
+        '404':
+          description: Diesen Anbieter gibt es nicht
+
+  /me/saved-providers/{provider_key}:
+    delete:
+      summary: Einen Anbieter vergessen
+      description: >-
+        Ebenfalls idempotent. War nichts gemerkt, ist danach nichts gemerkt und
+        die Antwort bleibt 200 mit removed=0 — ein 404 waere eine Fehlermeldung
+        fuer genau den Zustand, den der Aufrufer herstellen wollte.
+      parameters:
+        - name: provider_key
+          in: path
+          required: true
+          schema: { type: string }
+        - name: guest_key
+          in: query
+          required: false
+          schema: { type: string, pattern: '^[A-Za-z0-9._-]{8,100}$' }
+      responses:
+        '200':
+          description: Entfernt (removed = 0 oder 1)
+        '400':
+          description: Weder Login noch brauchbarer guest_key
+
   /me/provider:
     get:
       summary: Anbieter-Konto des eingeloggten Nutzers
@@ -174,7 +273,13 @@ paths:
           application/json:
             schema:
               type: object
-              description: user_id oder eine eindeutige E-Mail aus public.users
+              description: >-
+                user_id oder eine eindeutige E-Mail. Die Adresse wird in auth.users
+                aufgeloest (Funktion auth_user_id_by_email, Migration
+                20260922010000) — NICHT in public.users: die Profilzeile dort
+                entsteht erst, wenn jemand eine Gast-Sitzung uebernimmt, ein
+                frisch angelegter Login hat keine. Mehr als ein Treffer gilt
+                als keiner.
               properties:
                 user_id: { type: string, format: uuid }
                 email: { type: string, format: email }

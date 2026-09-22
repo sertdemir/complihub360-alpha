@@ -1441,3 +1441,159 @@ describe('Anfragen gehoeren ihrem Ersteller', () => {
         expect(r.body.requests).toHaveLength(2);
     });
 });
+
+// ─── Anbieter-Lesezeichen ───────────────────────────────────────────────────
+// Entscheidung 2026-09-20 (Nutzer-Wahl 1b/1c/1d), Tabelle 20260923010000.
+// Geprueft wird das, was beim Bauen entschieden wurde und sonst niemand sieht:
+// ein Gast darf merken, zweimal merken aendert die Herkunft nicht, und die
+// Merkliste eines anderen bleibt unsichtbar.
+describe('Anbieter-Lesezeichen', () => {
+    const GAST = 'gast-abc12345';
+
+    it('ein Gast darf merken — ohne Konto, ohne Schluessel', async () => {
+        seedProvider();
+        const r = await api('/api/v1/me/saved-providers', {
+            method: 'POST', auth: 'none',
+            body: JSON.stringify({ guest_key: GAST, provider_key: 'test-kanzlei', source: 'risk_map' }),
+        });
+        expect(r.status).toBe(201);
+        expect(r.body.created).toBe(true);
+        expect(db.saved_providers).toEqual([expect.objectContaining({
+            guest_key: GAST, provider_key: 'test-kanzlei', source: 'risk_map',
+        })]);
+    });
+
+    // Zweimal auf dasselbe Lesezeichen zu tippen ist kein Fehler, den der
+    // Nutzer sehen sollte — und die Herkunft meint das ERSTE Mal.
+    it('zweimal merken legt nichts Neues an und laesst die Herkunft stehen', async () => {
+        seedProvider();
+        const erst = await api('/api/v1/me/saved-providers', {
+            method: 'POST', auth: 'none',
+            body: JSON.stringify({ guest_key: GAST, provider_key: 'test-kanzlei', source: 'risk_map' }),
+        });
+        expect(erst.status).toBe(201);
+        const zweit = await api('/api/v1/me/saved-providers', {
+            method: 'POST', auth: 'none',
+            body: JSON.stringify({ guest_key: GAST, provider_key: 'test-kanzlei', source: 'provider_page' }),
+        });
+        expect(zweit.status).toBe(200);
+        expect(zweit.body.created).toBe(false);
+        expect(db.saved_providers).toHaveLength(1);
+        expect(db.saved_providers[0].source).toBe('risk_map');
+    });
+
+    it('ein angemeldeter Login schlaegt den guest_key', async () => {
+        seedProvider();
+        const r = await api('/api/v1/me/saved-providers', {
+            method: 'POST', auth: 'jwt',
+            body: JSON.stringify({ guest_key: GAST, provider_key: 'test-kanzlei', source: 'thread' }),
+        });
+        expect(r.status).toBe(201);
+        expect(db.saved_providers[0]).toEqual(expect.objectContaining({ user_id: USER_ID }));
+        expect(db.saved_providers[0].guest_key).toBeUndefined();
+    });
+
+    it('die Merkliste eines anderen Gastes bleibt unsichtbar', async () => {
+        seedProvider();
+        (db.saved_providers ??= []).push(
+            { id: randomUUID(), guest_key: GAST, provider_key: 'test-kanzlei', source: 'risk_map' },
+            { id: randomUUID(), guest_key: 'gast-fremder', provider_key: 'test-kanzlei', source: 'risk_map' },
+        );
+        const r = await api(`/api/v1/me/saved-providers?guest_key=${GAST}`, { auth: 'none' });
+        expect(r.status).toBe(200);
+        expect(r.body.saved).toHaveLength(1);
+        expect(JSON.stringify(r.body)).not.toContain('gast-fremder');
+    });
+
+    it('ohne Ausweis gibt es keine Liste', async () => {
+        const r = await api('/api/v1/me/saved-providers', { auth: 'none' });
+        expect(r.status).toBe(400);
+    });
+
+    // Ein zu kurzer guest_key ist kein Ausweis — sonst reichte 'x'.
+    it('ein guest_key ausserhalb der Form zaehlt nicht', async () => {
+        seedProvider();
+        const r = await api('/api/v1/me/saved-providers', {
+            method: 'POST', auth: 'none',
+            body: JSON.stringify({ guest_key: 'kurz', provider_key: 'test-kanzlei', source: 'risk_map' }),
+        });
+        expect(r.status).toBe(400);
+        expect(db.saved_providers ?? []).toHaveLength(0);
+    });
+
+    it('eine Herkunft ausserhalb der drei Flaechen wird abgewiesen', async () => {
+        seedProvider();
+        const r = await api('/api/v1/me/saved-providers', {
+            method: 'POST', auth: 'none',
+            body: JSON.stringify({ guest_key: GAST, provider_key: 'test-kanzlei', source: 'irgendwo' }),
+        });
+        expect(r.status).toBe(400);
+        expect(db.saved_providers ?? []).toHaveLength(0);
+    });
+
+    it('einen Anbieter, den es nicht gibt, kann man nicht merken', async () => {
+        const r = await api('/api/v1/me/saved-providers', {
+            method: 'POST', auth: 'none',
+            body: JSON.stringify({ guest_key: GAST, provider_key: 'gibt-es-nicht', source: 'risk_map' }),
+        });
+        expect(r.status).toBe(404);
+    });
+
+    // Vergessen ist idempotent: war nichts gemerkt, ist danach nichts gemerkt.
+    // Ein 404 waere eine Fehlermeldung fuer den Zustand, den der Nutzer wollte.
+    it('vergessen geht auch, wenn nichts gemerkt war', async () => {
+        const r = await api(`/api/v1/me/saved-providers/test-kanzlei?guest_key=${GAST}`, {
+            method: 'DELETE', auth: 'none',
+        });
+        expect(r.status).toBe(200);
+        expect(r.body.removed).toBe(0);
+    });
+
+    it('vergessen entfernt nur das eigene Lesezeichen', async () => {
+        seedProvider();
+        (db.saved_providers ??= []).push(
+            { id: randomUUID(), guest_key: GAST, provider_key: 'test-kanzlei', source: 'risk_map' },
+            { id: randomUUID(), guest_key: 'gast-fremder', provider_key: 'test-kanzlei', source: 'risk_map' },
+        );
+        const r = await api(`/api/v1/me/saved-providers/test-kanzlei?guest_key=${GAST}`, {
+            method: 'DELETE', auth: 'none',
+        });
+        expect(r.status).toBe(200);
+        expect(r.body.removed).toBe(1);
+        expect(db.saved_providers).toEqual([expect.objectContaining({ guest_key: 'gast-fremder' })]);
+    });
+});
+
+// ─── Registrierung nimmt die Merkliste mit ──────────────────────────────────
+describe('POST /api/v1/auth/adopt — Lesezeichen', () => {
+    const GAST = 'gast-abc12345';
+
+    it('das Konto uebernimmt die Gast-Lesezeichen', async () => {
+        seedProvider();
+        (db.saved_providers ??= []).push(
+            { id: randomUUID(), guest_key: GAST, provider_key: 'test-kanzlei', source: 'risk_map', user_id: null },
+        );
+        const r = await api('/api/v1/auth/adopt', {
+            method: 'POST', auth: 'jwt', body: JSON.stringify({ guest_key: GAST }),
+        });
+        expect(r.status).toBe(200);
+        expect(r.body.savedProviders).toBe(1);
+        expect(db.saved_providers[0]).toEqual(expect.objectContaining({ user_id: USER_ID, guest_key: null }));
+    });
+
+    // Sonst schluege der Teil-Index zu: ein Anbieter, zweimal in derselben
+    // Konto-Merkliste.
+    it('was das Konto schon gemerkt hat, wird nicht doppelt uebernommen', async () => {
+        seedProvider();
+        (db.saved_providers ??= []).push(
+            { id: randomUUID(), user_id: USER_ID, provider_key: 'test-kanzlei', source: 'thread' },
+            { id: randomUUID(), guest_key: GAST, provider_key: 'test-kanzlei', source: 'risk_map', user_id: null },
+        );
+        const r = await api('/api/v1/auth/adopt', {
+            method: 'POST', auth: 'jwt', body: JSON.stringify({ guest_key: GAST }),
+        });
+        expect(r.status).toBe(200);
+        expect(r.body.savedProviders).toBe(0);
+        expect(db.saved_providers.filter((z: any) => z.user_id === USER_ID)).toHaveLength(1);
+    });
+});
