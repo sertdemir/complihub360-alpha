@@ -492,9 +492,11 @@ export async function sendEmailChangeMail(p: {
 
 // ─── Review-watchdog mails (decision 2026-08-06) ─────────────────────────────
 // After a completed meeting both sides are asked to review within 2 days.
-// Provider reviews are MANDATORY (ranking depends on them): no reaction →
-// warning → downgrade + reduced visibility. User reviews are incentivized
-// (better service / personalisation / faster reaction to problems).
+// Provider reviews are required (ranking depends on them): no review after
+// 2 days → one reminder → after 2 more days partner status "downgraded" +
+// reduced visibility. User reviews are incentivized, never enforced.
+// Voice (DNA, KN-BRAND-001): state the rule and the consequence, no threat
+// tone, no capitals; formal address (Sie/usted/siz) like the other mails.
 
 export type ReviewMailKind = 'request_user' | 'request_provider' | 'warning_provider' | 'downgraded_provider';
 
@@ -505,70 +507,70 @@ const REVIEW_STRINGS: Record<MailLocale, Record<ReviewMailKind, { subject: strin
             body: 'Your intro call has taken place. Rate your specialist within the next 2 days — your feedback personalises your matching, helps us react faster to problems and improves your service. Reviews are verified and appear anonymised.\n\n→ Dashboard → Appointments → "Rate provider"',
         },
         request_provider: {
-            subject: 'Action required: review your lead (within 2 days)',
-            body: 'Your booked appointment has taken place. As a CompliHub360 partner your lead review is REQUIRED within 2 days — your ranking and visibility depend on an active review loop. Missing reviews lead to a warning and subsequently to a downgrade with reduced visibility.\n\n→ Partner dashboard → Appointments → open dossier → "Rate this lead"',
+            subject: 'Please review your lead within 2 days',
+            body: 'Your booked appointment has taken place. Please rate this lead within the next 2 days. Lead reviews are part of the CompliHub360 partnership: they feed the ranking that brings users and providers together. If no review has been submitted after 2 days, we send one reminder; if it is still missing after another 2 days, the partner status is set to "downgraded" and visibility in matchings is reduced.\n\n→ Partner dashboard → Appointments → open dossier → "Rate this lead"',
         },
         warning_provider: {
-            subject: 'Warning: review overdue — downgrade imminent',
-            body: 'Your lead review is overdue (deadline: 2 days after the appointment). This is a formal warning: if the review is still missing 2 days from now, your partner status will be downgraded and your visibility to users reduced.\n\n→ Partner dashboard → Appointments → open dossier → "Rate this lead"',
+            subject: 'Reminder: lead review still outstanding',
+            body: 'The review for your lead has not been submitted yet; the 2-day window after the appointment has passed. Under the partnership rules, the partner status is set to "downgraded" if the review is still missing after 2 more days, and visibility in user matchings is then reduced. Submitting the review closes the matter.\n\n→ Partner dashboard → Appointments → open dossier → "Rate this lead"',
         },
         downgraded_provider: {
-            subject: 'Your partner status has been downgraded',
-            body: 'Despite our warning the required lead review was not submitted. Your partner status has been downgraded — your visibility in user matchings is reduced. Submit the outstanding review and contact partners@complihub360.com to restore your status.',
+            subject: 'Partner status changed: lead review outstanding',
+            body: 'The review for your lead was not submitted within the 4-day window. As set out in the partnership rules, your partner status is now "downgraded" and your visibility in user matchings is reduced. To restore your status, submit the outstanding review and write to partners@complihub360.com — we take care of the rest.',
         },
     },
     de: {
         request_user: {
-            subject: 'Wie war dein Termin? 2 Minuten für deine Bewertung',
-            body: 'Dein Erstgespräch hat stattgefunden. Bewerte deinen Spezialisten innerhalb der nächsten 2 Tage — dein Feedback personalisiert dein Matching, hilft uns, schneller auf Missstände zu reagieren, und verbessert deinen Service. Bewertungen sind verifiziert und erscheinen anonymisiert.\n\n→ Dashboard → Termine → „Provider bewerten"',
+            subject: 'Wie war Ihr Termin? 2 Minuten für Ihre Bewertung',
+            body: 'Ihr Erstgespräch hat stattgefunden. Bewerten Sie Ihren Spezialisten innerhalb der nächsten 2 Tage — Ihr Feedback personalisiert Ihr Matching, hilft uns, schneller auf Probleme zu reagieren, und verbessert Ihren Service. Bewertungen sind verifiziert und erscheinen anonymisiert.\n\n→ Dashboard → Termine → „Provider bewerten"',
         },
         request_provider: {
-            subject: 'Aktion erforderlich: Lead bewerten (innerhalb von 2 Tagen)',
-            body: 'Dein gebuchter Termin hat stattgefunden. Als CompliHub360-Partner ist deine Lead-Bewertung innerhalb von 2 Tagen VERPFLICHTEND — dein Ranking und deine Sichtbarkeit hängen an einer aktiven Review-Schleife. Fehlende Bewertungen führen zu einer Verwarnung und anschließend zur Herabstufung mit reduzierter Sichtbarkeit.\n\n→ Partner-Dashboard → Termine → Dossier öffnen → „Lead bewerten"',
+            subject: 'Bitte bewerten Sie Ihren Lead innerhalb von 2 Tagen',
+            body: 'Ihr gebuchter Termin hat stattgefunden. Bitte bewerten Sie diesen Lead innerhalb der nächsten 2 Tage. Lead-Bewertungen sind Teil der CompliHub360-Partnerschaft: Sie fließen in das Ranking ein, über das User und Provider zusammenfinden. Liegt nach 2 Tagen keine Bewertung vor, erinnern wir Sie einmal; fehlt sie nach weiteren 2 Tagen weiterhin, wird der Partner-Status auf „herabgestuft" gesetzt und die Sichtbarkeit in Matchings reduziert.\n\n→ Partner-Dashboard → Termine → Dossier öffnen → „Lead bewerten"',
         },
         warning_provider: {
-            subject: 'Verwarnung: Bewertung überfällig — Herabstufung droht',
-            body: 'Deine Lead-Bewertung ist überfällig (Frist: 2 Tage nach dem Termin). Dies ist eine formale Verwarnung: Fehlt die Bewertung in 2 weiteren Tagen weiterhin, wird dein Partner-Status herabgestuft und deine Sichtbarkeit für User reduziert.\n\n→ Partner-Dashboard → Termine → Dossier öffnen → „Lead bewerten"',
+            subject: 'Erinnerung: Lead-Bewertung steht noch aus',
+            body: 'Die Bewertung für Ihren Lead liegt noch nicht vor; die Frist von 2 Tagen nach dem Termin ist abgelaufen. Nach den Partnerschaftsregeln wird der Partner-Status auf „herabgestuft" gesetzt, wenn die Bewertung nach weiteren 2 Tagen noch fehlt; die Sichtbarkeit in User-Matchings ist dann reduziert. Mit der Bewertung ist die Sache erledigt.\n\n→ Partner-Dashboard → Termine → Dossier öffnen → „Lead bewerten"',
         },
         downgraded_provider: {
-            subject: 'Dein Partner-Status wurde herabgestuft',
-            body: 'Trotz Verwarnung wurde die verpflichtende Lead-Bewertung nicht abgegeben. Dein Partner-Status wurde herabgestuft — deine Sichtbarkeit in User-Matchings ist reduziert. Reiche die ausstehende Bewertung nach und melde dich unter partners@complihub360.com, um deinen Status wiederherzustellen.',
+            subject: 'Partner-Status geändert: Lead-Bewertung ausstehend',
+            body: 'Die Bewertung für Ihren Lead wurde innerhalb der 4-Tage-Frist nicht abgegeben. Wie in den Partnerschaftsregeln festgelegt, ist Ihr Partner-Status jetzt „herabgestuft" und Ihre Sichtbarkeit in User-Matchings reduziert. Um den Status wiederherzustellen, reichen Sie die ausstehende Bewertung nach und schreiben Sie an partners@complihub360.com — wir kümmern uns um den Rest.',
         },
     },
     es: {
         request_user: {
-            subject: '¿Qué tal tu cita? 2 minutos para tu valoración',
-            body: 'Tu llamada inicial ha tenido lugar. Valora a tu especialista en los próximos 2 días — tu feedback personaliza tu matching, nos ayuda a reaccionar más rápido ante problemas y mejora tu servicio. Las valoraciones son verificadas y aparecen anonimizadas.\n\n→ Dashboard → Citas → «Valorar proveedor»',
+            subject: '¿Qué tal su cita? 2 minutos para su valoración',
+            body: 'Su llamada inicial ha tenido lugar. Valore a su especialista en los próximos 2 días — su feedback personaliza su matching, nos ayuda a reaccionar más rápido ante problemas y mejora su servicio. Las valoraciones son verificadas y aparecen anonimizadas.\n\n→ Dashboard → Citas → «Valorar proveedor»',
         },
         request_provider: {
-            subject: 'Acción requerida: valora tu lead (en 2 días)',
-            body: 'Tu cita reservada ha tenido lugar. Como partner de CompliHub360, tu valoración del lead es OBLIGATORIA en un plazo de 2 días — tu ranking y visibilidad dependen de un ciclo de valoraciones activo. Las valoraciones ausentes conllevan una advertencia y posteriormente una degradación con visibilidad reducida.\n\n→ Panel de partner → Citas → abrir dossier → «Valorar este lead»',
+            subject: 'Valore su lead en un plazo de 2 días',
+            body: 'Su cita reservada ha tenido lugar. Valore este lead en los próximos 2 días. Las valoraciones de leads forman parte de la colaboración con CompliHub360: alimentan el ranking que conecta a usuarios y proveedores. Si tras 2 días no hay valoración, le enviamos un recordatorio; si sigue faltando tras otros 2 días, el estado de partner pasa a «degradado» y la visibilidad en los matchings se reduce.\n\n→ Panel de partner → Citas → abrir dossier → «Valorar este lead»',
         },
         warning_provider: {
-            subject: 'Advertencia: valoración vencida — degradación inminente',
-            body: 'Tu valoración del lead está vencida (plazo: 2 días tras la cita). Esta es una advertencia formal: si la valoración sigue faltando dentro de 2 días, tu estado de partner será degradado y tu visibilidad ante los usuarios reducida.\n\n→ Panel de partner → Citas → abrir dossier → «Valorar este lead»',
+            subject: 'Recordatorio: valoración del lead pendiente',
+            body: 'La valoración de su lead aún no se ha enviado; el plazo de 2 días tras la cita ha vencido. Según las reglas de la colaboración, el estado de partner pasa a «degradado» si la valoración sigue faltando tras otros 2 días, y la visibilidad en los matchings queda entonces reducida. Con la valoración el asunto queda cerrado.\n\n→ Panel de partner → Citas → abrir dossier → «Valorar este lead»',
         },
         downgraded_provider: {
-            subject: 'Tu estado de partner ha sido degradado',
-            body: 'A pesar de la advertencia, la valoración obligatoria del lead no fue enviada. Tu estado de partner ha sido degradado — tu visibilidad en los matchings se ha reducido. Envía la valoración pendiente y contacta con partners@complihub360.com para restaurar tu estado.',
+            subject: 'Estado de partner modificado: valoración del lead pendiente',
+            body: 'La valoración de su lead no se envió dentro del plazo de 4 días. Tal como establecen las reglas de la colaboración, su estado de partner es ahora «degradado» y su visibilidad en los matchings está reducida. Para restaurar su estado, envíe la valoración pendiente y escriba a partners@complihub360.com — nosotros nos ocupamos del resto.',
         },
     },
     tr: {
         request_user: {
-            subject: 'Randevun nasıldı? Değerlendirmen için 2 dakika',
-            body: 'İlk görüşmen gerçekleşti. Uzmanını önümüzdeki 2 gün içinde değerlendir — geri bildirimin eşleştirmeni kişiselleştirir, sorunlara daha hızlı tepki vermemize yardımcı olur ve hizmetini iyileştirir. Değerlendirmeler doğrulanır ve anonim görünür.\n\n→ Panel → Randevular → «Sağlayıcıyı değerlendir»',
+            subject: 'Randevunuz nasıldı? Değerlendirmeniz için 2 dakika',
+            body: 'İlk görüşmeniz gerçekleşti. Uzmanınızı önümüzdeki 2 gün içinde değerlendirin — geri bildiriminiz eşleştirmenizi kişiselleştirir, sorunlara daha hızlı tepki vermemize yardımcı olur ve hizmetinizi iyileştirir. Değerlendirmeler doğrulanır ve anonim görünür.\n\n→ Panel → Randevular → «Sağlayıcıyı değerlendir»',
         },
         request_provider: {
-            subject: 'İşlem gerekli: lead değerlendirmesi (2 gün içinde)',
-            body: 'Rezerve edilen randevun gerçekleşti. CompliHub360 partneri olarak lead değerlendirmen 2 gün içinde ZORUNLUDUR — sıralaman ve görünürlüğün aktif bir değerlendirme döngüsüne bağlıdır. Eksik değerlendirmeler uyarıya ve ardından görünürlüğü azaltılmış bir düşürmeye yol açar.\n\n→ Partner paneli → Randevular → dosyayı aç → «Bu lead\'i değerlendir»',
+            subject: 'Lütfen lead\'inizi 2 gün içinde değerlendirin',
+            body: 'Rezerve ettiğiniz randevu gerçekleşti. Lütfen bu lead\'i önümüzdeki 2 gün içinde değerlendirin. Lead değerlendirmeleri CompliHub360 partnerliğinin bir parçasıdır: kullanıcılarla sağlayıcıları bir araya getiren sıralamaya katkı sağlar. 2 gün sonra değerlendirme yoksa size bir hatırlatma göndeririz; 2 gün daha geçtikten sonra hâlâ eksikse partner statüsü «düşürüldü» olarak ayarlanır ve eşleştirmelerdeki görünürlük azaltılır.\n\n→ Partner paneli → Randevular → dosyayı aç → «Bu lead\'i değerlendir»',
         },
         warning_provider: {
-            subject: 'Uyarı: değerlendirme gecikti — düşürme yaklaşıyor',
-            body: 'Lead değerlendirmen gecikti (süre: randevudan 2 gün sonra). Bu resmi bir uyarıdır: değerlendirme 2 gün içinde hâlâ eksikse partner statün düşürülecek ve kullanıcılara görünürlüğün azaltılacaktır.\n\n→ Partner paneli → Randevular → dosyayı aç → «Bu lead\'i değerlendir»',
+            subject: 'Hatırlatma: lead değerlendirmesi bekliyor',
+            body: 'Lead\'inizin değerlendirmesi henüz gönderilmedi; randevudan sonraki 2 günlük süre doldu. Partnerlik kurallarına göre, değerlendirme 2 gün daha eksik kalırsa partner statüsü «düşürüldü» olarak ayarlanır ve eşleştirmelerdeki görünürlük o zaman azaltılır. Değerlendirmeyi gönderdiğinizde konu kapanır.\n\n→ Partner paneli → Randevular → dosyayı aç → «Bu lead\'i değerlendir»',
         },
         downgraded_provider: {
-            subject: 'Partner statün düşürüldü',
-            body: 'Uyarıya rağmen zorunlu lead değerlendirmesi gönderilmedi. Partner statün düşürüldü — eşleştirmelerdeki görünürlüğün azaltıldı. Bekleyen değerlendirmeyi gönder ve statünü geri almak için partners@complihub360.com ile iletişime geç.',
+            subject: 'Partner statüsü değişti: lead değerlendirmesi bekliyor',
+            body: 'Lead\'inizin değerlendirmesi 4 günlük süre içinde gönderilmedi. Partnerlik kurallarında belirtildiği gibi partner statünüz artık «düşürüldü» ve eşleştirmelerdeki görünürlüğünüz azaltıldı. Statünüzü geri almak için bekleyen değerlendirmeyi gönderin ve partners@complihub360.com adresine yazın — gerisini biz hallederiz.',
         },
     },
 };
