@@ -1982,5 +1982,12 @@
       "confirmAndBook": "Onayla ve randevu al",
       "goBack": "Geri dön"
     }
+  },
+  "errorBoundary": {
+    "title": "Bu sayfa görüntülenemedi.",
+    "body": "Sayfa oluşturulurken bir hata oluştu. Sayfayı yeniden yüklemek işe yarayabilir. Olmazsa ana sayfadan devam edebilirsiniz.",
+    "reload": "Yeniden yükle",
+    "home": "Ana sayfaya git",
+    "details": "Teknik bilgi"
   }
 }

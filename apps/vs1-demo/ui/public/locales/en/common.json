@@ -1982,5 +1982,12 @@
       "confirmAndBook": "Confirm and Book",
       "goBack": "Go Back"
     }
+  },
+  "errorBoundary": {
+    "title": "This page couldn't be displayed.",
+    "body": "Something went wrong while building this page. Reloading may help. If it doesn't, the home page will get you back on track.",
+    "reload": "Reload",
+    "home": "Go to home page",
+    "details": "Technical detail"
   }
 }

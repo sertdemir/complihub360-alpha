@@ -1982,5 +1982,12 @@
       "confirmAndBook": "Confirmar y reservar",
       "goBack": "Volver"
     }
+  },
+  "errorBoundary": {
+    "title": "No se pudo mostrar esta página.",
+    "body": "Se produjo un error al cargar la página. Volver a cargarla puede ayudar. Si no, puede volver desde la página de inicio.",
+    "reload": "Volver a cargar",
+    "home": "Ir a la página de inicio",
+    "details": "Detalle técnico"
   }
 }

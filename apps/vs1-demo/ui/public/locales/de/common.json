@@ -1982,5 +1982,12 @@
       "confirmAndBook": "Bestätigen und buchen",
       "goBack": "Zurück"
     }
+  },
+  "errorBoundary": {
+    "title": "Diese Seite ließ sich nicht anzeigen.",
+    "body": "Beim Aufbau der Seite ist ein Fehler aufgetreten. Neu laden kann helfen. Wenn nicht, finden Sie über die Startseite zurück.",
+    "reload": "Neu laden",
+    "home": "Zur Startseite",
+    "details": "Technische Angabe"
   }
 }

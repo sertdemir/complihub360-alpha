@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { MotionConfig } from "framer-motion";
 import App from "./App";
+import { AppErrorBoundary } from "./components/ui/AppErrorBoundary";
 import "./index.css";
 import "./i18n/config";
 
@@ -14,9 +15,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             die Trennung, auf die es ankommt, denn Bewegung loest vestibulaere
             Beschwerden aus, ein Einblenden nicht. Eine Zeile statt 38 Dateien. */}
         <MotionConfig reducedMotion="user">
-            <React.Suspense fallback={null}>
-                <App />
-            </React.Suspense>
+            <AppErrorBoundary>
+                <React.Suspense fallback={null}>
+                    <App />
+                </React.Suspense>
+            </AppErrorBoundary>
         </MotionConfig>
     </React.StrictMode>
 );

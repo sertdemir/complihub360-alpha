@@ -1,0 +1,17 @@
+import { chromium } from 'playwright';
+const [S, port] = [process.argv[2], process.argv[3]];
+const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
+p.on('pageerror', e => console.log('PAGEERROR', e.message, (e.stack||'').split('\n').slice(0,3).join(' | ')));
+p.on('console', m => { if (m.type() === 'error') console.log('CONSOLE', m.text().slice(0, 300)); });
+p.on('response', r => { if (r.status() >= 400) console.log('HTTP', r.status(), r.url()); });
+await p.goto(`http://localhost:${port}/de/dashboard`);
+await p.evaluate(() => { localStorage.setItem('demo_is_logged_in','true'); localStorage.setItem('demo_user_role','user'); });
+await p.goto(`http://localhost:${port}/de/dashboard`, { waitUntil: 'networkidle' }); await p.waitForTimeout(1500);
+console.log('--- dashboard ok:', (await p.innerText('body')).length);
+await p.click('a[href="/de/dashboard/notifications"][aria-label] >> nth=-1'); await p.waitForTimeout(2500);
+console.log('--- after bell:', p.url(), (await p.innerText('body')).length);
+await p.reload({ waitUntil: 'networkidle' }); await p.waitForTimeout(2000);
+console.log('--- after reload:', (await p.innerText('body')).length);
+await p.screenshot({ path: S + '/w.png' });
+await b.close();

@@ -445,14 +445,14 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
           {/* 36 px und rounded-lg statt der Vorgaben der Komponente, damit die
               Knöpfe in der Leiste dieselbe Fläche haben. */}
           <ThemeToggle size={36} className="rounded-lg" />
-          <button type="button" onClick={signOut} className={SIGN_OUT + ' ml-1 h-9 px-2'}>
-            {t('shell.signOut')}
-          </button>
           {companyName && (
-            <span className="ml-1 max-w-[220px] truncate border-l border-stroke pl-3 text-[13px] font-semibold text-fg" title={companyName}>
+            <span className="ml-2 max-w-[220px] truncate border-l border-stroke pl-3 text-[13px] font-semibold text-fg" title={companyName}>
               {companyName}
             </span>
           )}
+          <button type="button" onClick={signOut} className={SIGN_OUT + ' h-9 px-2'}>
+            {t('shell.signOut')}
+          </button>
         </div>
         <main className="flex-1 overflow-y-auto px-4 py-5 lg:px-8 lg:py-6">{children}</main>
       </div>
