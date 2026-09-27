@@ -171,14 +171,11 @@ export function UserHomePage() {
   const bereich = (slug?: string) => (slug && SLUG_TO_I18N[slug] ? t(`domain.${SLUG_TO_I18N[slug]}`) : slug ?? '');
   const regionName = useMemo(() => { try { return new Intl.DisplayNames([locale], { type: 'region' }); } catch { return null; } }, [locale]);
   const markt = (code?: string) => { try { return code ? (regionName?.of(code.toUpperCase()) ?? code) : ''; } catch { return code ?? ''; } };
-  // Thema eines Termins: Bereich und Markt der juengsten Anfrage beim selben
-  // Anbieter. Gibt es keine, bleibt es leer — geraten wird nicht.
-  const themaVon = (providerKey: string) => {
-    const r = requests
-      .filter((q) => q.providerKey === providerKey)
-      .sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''))[0];
-    return r ? [bereich(r.category), r.country?.toUpperCase()].filter(Boolean).join(' · ') : '';
-  };
+  // Thema eines Termins (Phase 3): die Beschreibung, unter der der Anbieter
+  // vor der Buchung stand (Bereiche · Region). Bis zum 27.09. kam das Thema
+  // ueber den Anbieter-Schluessel aus den Anfragen — den traegt eine Buchung
+  // nicht mehr (ADR-0004); die Beschreibung sagt dasselbe direkt.
+  const themaVon = (descriptor: string) => descriptor;
 
   // Balken: Maerkte oder Bereiche, beides aus denselben offenen Pflichten.
   const quelle = chartView === 'markets'
@@ -663,8 +660,8 @@ export function UserHomePage() {
                     )}
                     <ul className={ohneErgebnis.length ? '' : 'mt-2'}>
                       {termine.slice(0, 3).map((a, i) => {
-                        const provider = a.providerName + (a.providerRegion ? ` — ${a.providerRegion}` : '');
-                        const thema = themaVon(a.providerKey);
+                        const provider = a.providerName + (a.identityRevealed && a.providerRegion ? ` — ${a.providerRegion}` : '');
+                        const thema = themaVon(a.providerDescriptor);
                         return (
                           <li key={a.id} className={'flex items-center gap-3 py-2.5' + (i > 0 ? ' border-t border-stroke-subtle' : '')}>
                             <DatumsMarke iso={a.slotStart} locale={i18n.resolvedLanguage || 'en'} />

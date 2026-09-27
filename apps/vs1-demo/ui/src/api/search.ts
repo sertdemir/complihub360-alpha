@@ -7,9 +7,33 @@ import type { SearchProfile } from '../components/wizard/WizardContext';
 // (0.6 relevance + 0.3 quality + 0.1 priority, spec §6). The wire shape is the
 // anonymous stage-1 card — no name/contact before booking.
 
+/** Die Fakten hinter der REIHENFOLGE — Verifikationstiefe, Antwortzeit,
+ *  Bestaetigungsrate, Bewertungen aus Buchungen. Fakten, keine Gewichte
+ *  (Canvas 2B, ADR-0004). */
+export interface RankBasis {
+  verification: 'independent' | 'reviewed' | 'partial' | 'none';
+  verified_count: number;
+  required_count: number;
+  response_hours: number | null;
+  confirmation_rate: number | null;
+  rating: number | null;
+  reviews_count: number | null;
+}
+
+// Phase 3 (ADR-0004): kein provider_key, kein pseudonym_label mehr auf dem
+// Draht. Der Anbieter heisst vor der Buchung "Verified Provider B" — der
+// Buchstabe ist seine Position in DIESER Liste, nicht ueber Sitzungen stabil —
+// und traegt eine Beschreibung aus freigegebenen Bereichen und Region, die
+// das System bildet, nicht der Anbieter.
 export interface AnonProvider {
-  provider_key: string;
-  pseudonym_label: string;
+  /** Opaker Bezeichner (zwoelf Hex-Zeichen). Das Einzige, womit die UI einen Anbieter anspricht. */
+  public_ref: string;
+  /** "Verified Provider B" */
+  title: string;
+  /** "B" — fuer die Monogramm-Kachel (Canvas 1A). */
+  letter: string;
+  /** "Tax and VAT · Norditalien" — vom System, nie vom Anbieter. */
+  descriptor: string;
   region: string | null;
   active_since: number | null;
   specializations: string[];
@@ -29,6 +53,7 @@ export interface AnonProvider {
     domains_requested: string[];   // the caller's own domain slugs
     domains_matched: string[];     // subset this provider actually covers
   };
+  rank_basis?: RankBasis;
 }
 
 // Enriched obligation from the engine's editorial map. Older payloads carry

@@ -650,7 +650,8 @@
       "termine": "Citas"
     },
     "tabUpcoming": "Próximas",
-    "tabPast": "Pasadas"
+    "tabPast": "Pasadas",
+    "origin": "era «{{descriptor}}» antes de la reserva"
   },
   "review": {
     "eyebrow": "VALORACIÓN",

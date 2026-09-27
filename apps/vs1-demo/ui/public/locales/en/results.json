@@ -235,7 +235,8 @@
     "market": "Covers your market ({{country}})",
     "marketMissing": "Does not cover your market",
     "areas": "{{matched}} of {{total}} of your areas",
-    "how": "The percentage is market coverage plus how much of what you asked for this specialist actually does."
+    "how": "The percentage is market coverage plus how much of what you asked for this specialist actually does.",
+    "groupFit": "Fits your request"
   },
   "snapshot": {
     "fallbackTitle": "Your risk map",
@@ -309,5 +310,38 @@
     "bookedOn": "Appointment {{when}}",
     "providerBooked": "View appointment",
     "booked": "Booked"
+  },
+  "rankBasis": {
+    "group": "Verified and measured",
+    "verificationLine": {
+      "independent": "All {{total}} required proofs independently verified",
+      "reviewed": "All {{total}} required proofs reviewed by CompliHub360",
+      "partial": "{{verified}} of {{total}} required proofs verified",
+      "none": "Proofs not yet verified"
+    },
+    "verification": {
+      "independent": "Required proofs independently verified",
+      "reviewed": "Required proofs reviewed",
+      "partial": "Required proofs partly verified",
+      "none": "Proofs not yet verified"
+    },
+    "response": "Replies in ~{{hours}} h",
+    "confirmed": "{{pct}} % of appointments confirmed",
+    "reviews": "{{rating}} from {{count}} reviews after appointments",
+    "reviewsNone": "No review after an appointment yet",
+    "responseLabel": "Response time",
+    "hours": "~{{hours}} h",
+    "confirmedLabel": "Appointments confirmed",
+    "reviewsLabel": "Reviews after appointments",
+    "planLabel": "Plan or payment",
+    "never": "never"
+  },
+  "anonNotice": {
+    "title": "Verified by CompliHub360, still without a name for you.",
+    "body": "You compare by fit and performance, not by reputation. Name and contact appear after booking."
+  },
+  "reveal": {
+    "was": "was {{title}}",
+    "wasInSession": "was {{title}} in your session “{{session}}”"
   }
 }

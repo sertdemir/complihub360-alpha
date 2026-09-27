@@ -9,6 +9,7 @@ import { KpiRing, useEntered } from '../components/ui/Stats';
 import { SEVERITY_STYLE } from '../components/compliance-areas/severity';
 import { ApiError } from '../api/client';
 import { fetchProviderDetail, fetchProviderReviews, fetchSlots, type ProviderDetail, type ProviderReview } from '../api/bookings';
+import { AnonNotice, RankBasis } from '../components/user/PartnerCard';
 import { loadProviderContext, type ContextDuty, type ProviderContext } from '../lib/providerContext';
 import { DOMAINS } from '../lib/domains';
 import { SLUG_TO_I18N } from './user/AnfragenTab';
@@ -57,7 +58,8 @@ type State = { kind: 'loading' } | { kind: 'ready'; p: ProviderDetail } | { kind
 const CARD = 'rounded-xl border border-stroke-subtle bg-surface shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]';
 
 export function ProviderDetailPage() {
-  const { key = '' } = useParams();
+  // Phase 3: die Route traegt den opaken Ref, nie den Schluessel.
+  const { ref: key = '' } = useParams();
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation('results');
@@ -118,7 +120,7 @@ export function ProviderDetailPage() {
   const activeDomain = ctx?.areaSlug ? DOMAINS.find((d) => d.slug === ctx.areaSlug)?.label : undefined;
 
   const book = (slot?: string) =>
-    navigate(`/${locale}/provider/${key}/schedule${slot ? `?slot=${encodeURIComponent(slot)}` : ''}`);
+    navigate(`/${locale}/p/${key}/schedule${slot ? `?slot=${encodeURIComponent(slot)}` : ''}`);
 
   return (
     <UserShell activeDomain={activeDomain}>
@@ -176,8 +178,8 @@ function Detail({ p, ctx, areaLabel, reviews, slots, entered, locale, onBook, on
   const { t } = useTranslation('results');
 
   const covered = useMemo(
-    () => new Set((p.countries_supported ?? []).map((c) => c.toUpperCase())),
-    [p.countries_supported],
+    () => new Set((p.markets ?? []).map((c) => c.toUpperCase())),
+    [p.markets],
   );
   const markets = ctx?.markets ?? [];
   const coveredCount = markets.filter((m) => covered.has(m)).length;
@@ -186,12 +188,11 @@ function Detail({ p, ctx, areaLabel, reviews, slots, entered, locale, onBook, on
   const domainsMatched = basis ? basis.domains_matched.length : null;
   const domainsRequested = basis ? basis.domains_requested.length : null;
 
-  // Titel: der Ort hinter dem Mittelpunkt steht in Gold — wie „Ihre
-  // Compliance-Sitzungen." auf den anderen Seiten des Arbeitsbereichs.
-  const [head, ...rest] = (p.pseudonym_label || '').split(' · ');
-  const title = rest.length
-    ? <>{head} · <span className="text-fg-accent-emphasis">{rest.join(' · ')}</span></>
-    : <>{head}</>;
+  // Titel (Phase 3): „Verified Provider" ohne Buchstaben — den kennt nur die
+  // Liste, aus der geklickt wurde (ctx.self). Die Beschreibung in Gold, wie
+  // „Ihre Compliance-Sitzungen." auf den anderen Seiten des Arbeitsbereichs.
+  const title = ctx?.self?.title ?? t('snapshot.verifiedPartner');
+  const descriptor = p.descriptor || ctx?.self?.descriptor || '';
 
   // 1B · Lage-Satz — nur die Teile, die es wirklich gibt.
   const lage: ReactNode[] = [];
@@ -231,7 +232,9 @@ function Detail({ p, ctx, areaLabel, reviews, slots, entered, locale, onBook, on
   // Ring zeigte 4,5, waehrend darunter „noch keine Bewertung" stand).
   const rating = reviews?.average ?? null;
   const ratingCount = reviews?.count ?? 0;
-  const confirm = p.confirmation_rate != null ? Math.round(p.confirmation_rate * 100) : null;
+  // Die Bestaetigungsrate kommt seit Phase 3 als Aussage in rank_basis, nicht
+  // mehr als Rohfeld der Zeile (Register: internal).
+  const confirm = p.rank_basis?.confirmation_rate != null ? Math.round(p.rank_basis.confirmation_rate * 100) : null;
 
   return (
     <>
@@ -247,7 +250,7 @@ function Detail({ p, ctx, areaLabel, reviews, slots, entered, locale, onBook, on
         )}
         <span>{t('detail.crumbProviders')}</span>
         <span>›</span>
-        <span className="font-semibold text-fg">{p.pseudonym_label}</span>
+        <span className="font-semibold text-fg">{title}</span>
       </nav>
 
       {/* 1B · Kopf */}
@@ -260,7 +263,9 @@ function Detail({ p, ctx, areaLabel, reviews, slots, entered, locale, onBook, on
           )}
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2.5">
-              <h1 className="font-serif text-[23px] font-bold leading-tight text-fg">{title}</h1>
+              <h1 className="font-serif text-[23px] font-bold leading-tight text-fg">
+                {title}{descriptor && <> · <span className="text-fg-accent-emphasis">{descriptor}</span></>}
+              </h1>
               {p.is_verified && (
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/55 px-2.5 py-[3px] text-[9.5px] font-extrabold uppercase tracking-[0.06em] text-fg-accent-strong">
                   <ShieldCheck size={13} strokeWidth={2.2} aria-hidden /> {t('snapshot.verifiedPartner')}
@@ -323,7 +328,14 @@ function Detail({ p, ctx, areaLabel, reviews, slots, entered, locale, onBook, on
         </div>
       )}
 
-      <p className="mt-4 max-w-[760px] text-body-3xs leading-relaxed text-fg-tertiary">{t('detail.anonNote')}</p>
+      {/* Canvas 3B: derselbe Kasten wie in der Schublade, an derselben Stelle. */}
+      <AnonNotice className="mt-4 max-w-[760px]" />
+      {p.rank_basis && (
+        <div className={`${CARD} mt-4 max-w-[760px] px-[18px] py-4`}>
+          <p className="text-body-4xs font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('rankBasis.group')}</p>
+          <div className="mt-2"><RankBasis basis={p.rank_basis} compact /></div>
+        </div>
+      )}
 
       {/* 6B · zweispaltig, rechts klebt die Buchung */}
       <div className="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
@@ -422,7 +434,7 @@ function Dossier({ p, ctx, covered }: { p: ProviderDetail; ctx: ProviderContext 
   const services = p.services ?? [];
   const credentials = p.credentials ?? [];
   const mine = ctx?.markets ?? [];
-  const others = (p.countries_supported ?? []).map((c) => c.toUpperCase()).filter((c) => !mine.includes(c));
+  const others = (p.markets ?? []).map((c) => c.toUpperCase()).filter((c) => !mine.includes(c));
 
   return (
     <section>

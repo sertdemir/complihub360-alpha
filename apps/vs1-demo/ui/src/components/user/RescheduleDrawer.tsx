@@ -12,7 +12,8 @@ import { fetchSlots, rescheduleBooking } from '../../api/bookings';
 
 export interface RescheduleTarget {
   bookingId: string;
-  providerKey: string;
+  /** Opaker Anbieter-Bezeichner (Phase 3) — fuer die Terminliste. */
+  publicRef: string;
   providerName: string;
   currentLine: string;   // "Mo, 12. Aug 2026 · 10:00" — shown as context
 }
@@ -47,7 +48,7 @@ export function RescheduleDrawer({ target, onClose, onRescheduled }: {
   useEffect(() => {
     if (!target) return;
     setSelected(null); setState('idle');
-    fetchSlots(target.providerKey).then(setSlots).catch(() => setSlots(fixtureSlots()));
+    fetchSlots(target.publicRef).then(setSlots).catch(() => setSlots(fixtureSlots()));
   }, [target]);
 
   const df = useMemo(() => new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short' }), [locale]);

@@ -1062,7 +1062,7 @@ describe('Anonymitaet auf dem Draht (Phase 3, ADR-0004)', () => {
     // Ein Freitext, der den Anbieter nennt — Altbestand, den das Netz beim Lesen faengt.
     const mitLeck = () => seedProvider({
         depth: 'independent',
-        services: ['USt-Registrierung', 'Beratung durch Testkanzlei Schmidt GmbH'],
+        services: ['USt-Registrierung', 'Beratung durch Testkanzlei Schmidt GmbH', { title: 'OSS-Betreuung durch Schmidt', includes: ['Quartalsmeldungen', 'Fristen — siehe testkanzlei-schmidt.example'] }],
         credentials: ['Steuerberater seit 2010, siehe testkanzlei-schmidt.example'],
         work_mode: 'Remote, Kontakt: geheim@testkanzlei.example',
         pricing_table: [{ service: 'VAT', price: 'ab 900 €', note: 'HRB 12345' }],
@@ -1083,6 +1083,7 @@ describe('Anonymitaet auf dem Draht (Phase 3, ADR-0004)', () => {
         sauber(r.body);
         const d = r.body.detail;
         expect(d.services[1]).toBe('Beratung durch […]');
+        expect(d.services[2]).toEqual({ title: 'OSS-Betreuung durch […]', includes: ['Quartalsmeldungen', 'Fristen — siehe […]'] });
         expect(d.credentials[0]).toContain('[…]');
         expect(d.work_mode).toBe('Remote, Kontakt: […]');
         expect(d.pricing_table[0].note).toBe('[…]');

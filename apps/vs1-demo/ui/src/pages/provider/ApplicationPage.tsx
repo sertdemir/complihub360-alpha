@@ -13,7 +13,7 @@ import { Tag } from '../../components/ui/Tag';
 import { FormField } from '../../components/ui/FormField';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { Skeleton } from '../../components/ui/Skeleton';
-import { ApiError } from '../../api/client';
+import { ApiError, identityHintFrom } from '../../api/client';
 import {
   acceptAgreement, checkVatRegistry, createService, fetchApplication, patchApplication, putCoverage, removeService, submitApplication, uploadEvidence,
   type AgreementType, type Application, type ApplicationPatch, type ChecklistItem, type Evidence, type EvidenceType, type Service,
@@ -225,7 +225,7 @@ function ServicesPanel({ app, onChanged }: { app: Application; onChanged: () => 
   const add = async () => {
     setBusy(true); setErr(null);
     try { const s = await createService({ service_code: code.trim(), service_name: name.trim() || undefined }); setOpen(s.id); setAdding(false); setCode(''); setName(''); await onChanged(); }
-    catch (e) { setErr(e instanceof ApiError && e.status === 422 && /categor/i.test(e.message) ? t('application.services.allowanceError') : (e instanceof Error ? e.message : t('application.saveError'))); }
+    catch (e) { setErr(identityHintFrom(e, t) ?? (e instanceof ApiError && e.status === 422 && /categor/i.test(e.message) ? t('application.services.allowanceError') : (e instanceof Error ? e.message : t('application.saveError')))); }
     finally { setBusy(false); }
   };
 

@@ -100,21 +100,25 @@ async function matchableRows(providerKey: string): Promise<any[]> {
 
 const identityCtx = (p: any): IdentityContext => ({ providerName: p?.name ?? null, website: p?.website_url ?? null });
 
-/** Freitexte eines Dossiers maskiert — das Netz beim Lesen; Schreiben wird blockiert. */
+/** Freitexte eines Dossiers maskiert — das Netz beim Lesen; Schreiben wird
+ *  blockiert. Laeuft durch verschachtelte Strukturen (services als
+ *  [{title, includes[]}], credentials als [{label, note}], pricing_table),
+ *  damit kein Objektfeld am Netz vorbeikommt. */
+function deepMask(v: unknown, ctx: IdentityContext): unknown {
+    if (typeof v === 'string') return maskIdentity(v, ctx);
+    if (Array.isArray(v)) return v.map((x) => deepMask(x, ctx));
+    if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v as Record<string, unknown>).map(([k, x]) => [k, deepMask(x, ctx)]));
+    return v ?? null;
+}
 function maskDossier(p: any) {
     const ctx = identityCtx(p);
-    const list = (v: unknown) => Array.isArray(v) ? v.map((x) => typeof x === 'string' ? maskIdentity(x, ctx) : x) : v ?? null;
     return {
-        services: list(p.services),
-        credentials: list(p.credentials),
-        excluded_services: list(p.excluded_services),
-        work_mode: typeof p.work_mode === 'string' ? maskIdentity(p.work_mode, ctx) : null,
-        region: typeof p.region === 'string' ? maskIdentity(p.region, ctx) : null,
-        pricing_table: Array.isArray(p.pricing_table)
-            ? p.pricing_table.map((row: any) => row && typeof row === 'object'
-                ? Object.fromEntries(Object.entries(row).map(([k, v]) => [k, typeof v === 'string' ? maskIdentity(v, ctx) : v]))
-                : row)
-            : p.pricing_table ?? null,
+        services: deepMask(p.services, ctx),
+        credentials: deepMask(p.credentials, ctx),
+        excluded_services: deepMask(p.excluded_services, ctx),
+        work_mode: deepMask(p.work_mode, ctx),
+        region: deepMask(p.region, ctx),
+        pricing_table: deepMask(p.pricing_table, ctx),
     };
 }
 

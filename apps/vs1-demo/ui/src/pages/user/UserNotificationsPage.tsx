@@ -232,7 +232,8 @@ export function UserNotificationsPage() {
             <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{tag}</p>
             {zeilen.map((n) => {
               const Icon = ICON[n.type];
-              const anbieter = n.payload.providerName || n.payload.providerKey;
+              // Nur ein Name ist zeigbar. Der Ref (Phase 3) ist opak und bleibt es.
+              const anbieter = n.payload.providerName;
               return (
                 <EntityCard
                   key={n.id}

@@ -49,12 +49,29 @@ interface Row {
   slotEndIso: string | null;
   dateLine: string;   // "Mo, 12. Aug 2026"
   timeLine: string;   // "10:00–10:30 · Video-Call"
-  provider: string;   // clear name — revealed at booking
-  providerKey: string;
+  provider: string;   // clear name — revealed at booking; before that "Verified Provider"
+  publicRef: string | null;
+  /** "Tax and VAT · Norditalien" — unter dieser Beschreibung stand der Anbieter vor der Buchung (Canvas 4B). */
+  descriptor: string;
+  revealed: boolean;
   website: string | null;  // affiliate 1b — post-booking reveal only
   meta: string;
   status: BookingStatus;
   needsOutcome?: boolean; // slot passed, outcome not recorded (watchdog §1)
+}
+
+// Canvas 4B: die Herkunft eines Termins. Nach der Offenlegung steht unter dem
+// Klarnamen, unter welcher Beschreibung der Anbieter vor der Buchung stand —
+// so findet der Mandant „welcher war das?" wieder. Einen Buchstaben gibt es
+// hier nicht: den kannte nur die Liste, aus der gebucht wurde.
+function Herkunft({ r }: { r: Pick<Row, 'descriptor' | 'revealed'> }) {
+  const { t } = useTranslation('userws');
+  if (!r.descriptor) return null;
+  return (
+    <p className="truncate text-[11.5px] text-fg-tertiary">
+      {r.revealed ? t('termine.origin', { descriptor: r.descriptor }) : r.descriptor}
+    </p>
+  );
 }
 
 const STATUS_TONE: Record<BookingStatus, 'success' | 'neutral' | 'error' | 'warning'> = {
@@ -73,8 +90,10 @@ function toRows(bookings: UserBooking[], locale: string): Row[] {
       slotEndIso: b.slotEnd,
       dateLine: df.format(start),
       timeLine: `${tf.format(start)}${end ? `–${tf.format(end)}` : ''} · Video-Call`,
-      provider: b.providerName + (b.providerRegion ? ` — ${b.providerRegion}` : ''),
-      providerKey: b.providerKey,
+      provider: b.providerName + (b.identityRevealed && b.providerRegion ? ` — ${b.providerRegion}` : ''),
+      publicRef: b.publicRef,
+      descriptor: b.providerDescriptor,
+      revealed: b.identityRevealed,
       website: b.providerWebsite,
       meta: b.message || '—',
       status: b.status,
@@ -241,7 +260,7 @@ export function TerminePage() {
     markOutcome(id, status).catch(() => {});
   };
   const onReschedule = (r: Row) => setRescheduleFor({
-    bookingId: r.id, providerKey: r.providerKey, providerName: r.provider,
+    bookingId: r.id, publicRef: r.publicRef ?? '', providerName: r.provider,
     currentLine: `${r.dateLine} · ${r.timeLine}`,
   });
 
@@ -256,12 +275,13 @@ export function TerminePage() {
       <DatumsMarke iso={r.slotStartIso} locale={locale} soon={next?.id === r.id} />
       <div className="min-w-0 flex-1">
         <p className="truncate text-[15px] font-semibold text-fg">{r.provider}</p>
+        <Herkunft r={r} />
         <p className="truncate text-[12px] text-fg-tertiary">{r.dateLine} · {r.timeLine}{r.meta !== '—' ? ` · ${r.meta}` : ''}</p>
         {r.website && !r.needsOutcome && (
           // Affiliate 1b: provider website, revealed only post-booking.
           // Routed through the counted outclick endpoint.
           <a
-            href={providerWebsiteHref(r.providerKey)}
+            href={providerWebsiteHref(r.publicRef ?? '')}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-0.5 inline-flex items-center gap-1 text-[12px] font-medium text-fg-brand hover:underline"
@@ -291,7 +311,7 @@ export function TerminePage() {
         {r.status === 'completed' && (
           reviewed.has(r.id)
             ? <span className="text-[12px] text-fg-brand">{t('termine.reviewed')}</span>
-            : <Button variant="primary" size="sm" onClick={() => setReviewFor({ bookingId: r.id, providerKey: r.providerKey, providerName: r.provider })}>{t('termine.review')}</Button>
+            : <Button variant="primary" size="sm" onClick={() => setReviewFor({ bookingId: r.id, providerName: r.provider })}>{t('termine.review')}</Button>
         )}
         {r.status === 'no_show' && (
           <span className="max-w-[260px] text-right text-[12px] text-fg-tertiary">{t('termine.noShowNote')}</span>
@@ -330,10 +350,11 @@ export function TerminePage() {
       </div>
       <div className="min-w-0">
         <p className="truncate text-[15px] font-semibold text-fg">{r.provider}</p>
+        <Herkunft r={r} />
         <p className="text-[12px] text-fg-tertiary">{r.dateLine} · {r.timeLine}{r.meta !== '—' ? ` · ${r.meta}` : ''}</p>
         {r.website && (
           <a
-            href={providerWebsiteHref(r.providerKey)}
+            href={providerWebsiteHref(r.publicRef ?? '')}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-0.5 inline-flex items-center gap-1 text-[12px] font-medium text-fg-brand hover:underline"
@@ -360,7 +381,7 @@ export function TerminePage() {
         {r.status === 'completed' && (
           reviewed.has(r.id)
             ? <span className="text-[12px] text-fg-brand">{t('termine.reviewed')}</span>
-            : <Button variant="primary" size="sm" onClick={() => setReviewFor({ bookingId: r.id, providerKey: r.providerKey, providerName: r.provider })}>{t('termine.review')}</Button>
+            : <Button variant="primary" size="sm" onClick={() => setReviewFor({ bookingId: r.id, providerName: r.provider })}>{t('termine.review')}</Button>
         )}
         {r.status === 'no_show' && (
           <span className="text-[12px] text-fg-tertiary">{t('termine.noShowNote')}</span>

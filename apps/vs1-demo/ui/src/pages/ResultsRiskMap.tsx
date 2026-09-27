@@ -460,7 +460,7 @@ export function ResultsRiskMap() {
         // Mit gespeicherter Sitzung oeffnet sich die Schublade; ohne (Fixture,
         // Gast-Profil) bleibt der Weg zum Erst-Wizard.
         onEditAnswers={() => (sessionId && session ? setAnswersOpen(true) : navigate(`/${locale}/wizard`))}
-        onProviderDetails={(key) => setPartnerOpen(anonProviders.find((p) => p.provider_key === key) ?? null)}
+        onProviderDetails={(ref) => setPartnerOpen(anonProviders.find((p) => p.public_ref === ref) ?? null)}
         partnerDrawer={
           <PartnerDrawer
             open={partnerOpen !== null}
@@ -468,7 +468,7 @@ export function ResultsRiskMap() {
             provider={partnerOpen}
             basisNode={partnerOpen?.match_basis ? <MatchBasis basis={partnerOpen.match_basis} /> : undefined}
             sessionMessage={session?.label ? t('schedule.messageFromSession', { session: session.label }) : undefined}
-            booking={partnerOpen ? booked[partnerOpen.provider_key] ?? null : null}
+            booking={partnerOpen ? booked[partnerOpen.public_ref] ?? null : null}
             onBooked={(key, b) => setBooked((prev) => ({ ...prev, [key]: b }))}
           />
         }
@@ -710,7 +710,7 @@ export function ResultsRiskMap() {
                 <div className="mt-6 grid gap-5 sm:grid-cols-3">
                   {anonProviders.slice(0, 3).map((p) => (
                     <div
-                      key={p.provider_key}
+                      key={p.public_ref}
                       data-testid="teaser-card"
                       className="flex flex-col items-center gap-4 rounded-xl border border-stroke-subtle bg-surface-secondary px-6 py-8"
                     >

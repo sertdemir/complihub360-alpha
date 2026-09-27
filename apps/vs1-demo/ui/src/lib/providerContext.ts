@@ -62,17 +62,17 @@ const up = (list: (string | null | undefined)[]) =>
  *  fehl, fehlt eben dieser Teil — die Seite bleibt benutzbar. */
 export async function loadProviderContext(
   params: URLSearchParams,
-  providerKey: string,
+  publicRef: string,
   locale: string,
 ): Promise<ProviderContext | null> {
   const area = params.get('area');
   const sessionId = params.get('session');
-  if (area && isAreaSlug(area)) return areaContext(area, providerKey, locale);
-  if (sessionId) return sessionContext(sessionId, providerKey, locale);
+  if (area && isAreaSlug(area)) return areaContext(area, publicRef, locale);
+  if (sessionId) return sessionContext(sessionId, publicRef, locale);
   return null;
 }
 
-async function areaContext(slug: string, providerKey: string, locale: string): Promise<ProviderContext | null> {
+async function areaContext(slug: string, publicRef: string, locale: string): Promise<ProviderContext | null> {
   const d = await fetchDomainOverview(slug).catch(() => null);
   if (!d) return null;
   const sessions = d.sessions ?? [];
@@ -89,11 +89,11 @@ async function areaContext(slug: string, providerKey: string, locale: string): P
     duties,
     domains: [slug],
     sessionCount: sessions.length,
-    self: await matchFor(providerKey, markets[0] ?? 'DE', [slug]),
+    self: await matchFor(publicRef, markets[0] ?? 'DE', [slug]),
   };
 }
 
-async function sessionContext(sessionId: string, providerKey: string, locale: string): Promise<ProviderContext | null> {
+async function sessionContext(sessionId: string, publicRef: string, locale: string): Promise<ProviderContext | null> {
   const session = await fetchSessions().then((all) => all.find((s) => s.id === sessionId) ?? null).catch(() => null);
   if (!session) return null;
   const domains = (session.categories ?? []).filter(isAreaSlug);
@@ -123,16 +123,16 @@ async function sessionContext(sessionId: string, providerKey: string, locale: st
     duties,
     domains,
     sessionCount: 1,
-    self: await matchFor(providerKey, markets[0] ?? session.country ?? 'DE', domains),
+    self: await matchFor(publicRef, markets[0] ?? session.country ?? 'DE', domains),
   };
 }
 
 /** Dieselbe Suche, die auch die Karte gefüllt hat — damit die Zahl auf der
  *  Detailseite dieselbe ist wie die auf der Karte, aus der geklickt wurde. */
-async function matchFor(providerKey: string, country: string, categories: string[]): Promise<AnonProvider | null> {
+async function matchFor(publicRef: string, country: string, categories: string[]): Promise<AnonProvider | null> {
   if (!categories.length) return null;
   const res = await runSearch({ country, categories: categories as SearchProfile['categories'] }).catch(() => null);
-  return res?.providers?.find((p) => p.provider_key === providerKey) ?? null;
+  return res?.providers?.find((p) => p.public_ref === publicRef) ?? null;
 }
 
 function sessionLabel(label: string | null, country: string | null): string {

@@ -26,9 +26,9 @@ vi.mock('react-i18next', () => ({
 
 function renderPage() {
   return render(
-    <MemoryRouter initialEntries={[`/en/provider/test-kanzlei/book?slot=${encodeURIComponent(SLOT)}`]}>
+    <MemoryRouter initialEntries={[`/en/p/a1b2c3d4e5f6/book?slot=${encodeURIComponent(SLOT)}`]}>
       <Routes>
-        <Route path="/:locale/provider/:key/book" element={<ProviderSchedulePage />} />
+        <Route path="/:locale/p/:ref/book" element={<ProviderSchedulePage />} />
       </Routes>
     </MemoryRouter>,
   );

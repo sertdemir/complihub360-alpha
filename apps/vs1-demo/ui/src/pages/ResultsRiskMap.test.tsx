@@ -158,7 +158,7 @@ describe('ResultsRiskMap grouping', () => {
 // only holds the design fixture (loading, API down).
 
 const prov = (key: string, match: number): AnonProvider => ({
-  provider_key: key, pseudonym_label: key, region: null, active_since: null,
+  public_ref: key.padEnd(12, '0').slice(0, 12), title: `Verified Provider ${key}`, letter: key.slice(0, 1).toUpperCase(), descriptor: '', region: null, active_since: null,
   specializations: [], languages: [], rating: null, completed_count: null,
   avg_response_hours: null, billing_model: 'project', is_verified: true,
   match, match_tier: 'moderate',

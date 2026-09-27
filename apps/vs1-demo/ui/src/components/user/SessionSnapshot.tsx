@@ -28,7 +28,7 @@ import type { AnonProvider } from '../../api/search';
 // - Keine Links "Ansehen"/"Mit heute vergleichen" im Verlauf: die API fuehrt
 //   weder results_snapshot noch version, es gaebe also nichts zu zeigen.
 // - Kein Sammel-Knopf "Anbieter anfragen": eine Anfrage braucht einen
-//   ausgewaehlten Anbieter (provider_key), der Weg geht ueber "Details ansehen".
+//   ausgewaehlten Anbieter (public_ref), der Weg geht ueber "Details ansehen".
 
 type Severity = 'critical' | 'high' | 'medium' | 'low';
 type State = { kind: 'confirmed' } | { kind: 'likely' } | { kind: 'answer'; count: number };
@@ -293,7 +293,7 @@ export function SessionSnapshot({
    *  als Entwarnung (siehe emptyState). */
   onExportPdf?: () => void;
   onEditAnswers: () => void;
-  onProviderDetails: (key: string) => void;
+  onProviderDetails: (publicRef: string) => void;
   /** Die Partner-Schublade des Aufrufers (Canvas 1C) — sie haengt am Zustand
    *  der Seite, nicht an dieser Darstellung. */
   partnerDrawer?: React.ReactNode;
@@ -509,12 +509,12 @@ export function SessionSnapshot({
                     Zwischenuebersicht (Nutzer-Entscheidung 2026-08-29). */}
                 {providers.map((p, i) => (
                   <PartnerCard
-                    key={p.provider_key}
+                    key={p.public_ref}
                     provider={p}
                     top={i === 0}
                     basis={matchBasis?.(p)}
-                    booking={bookings?.[p.provider_key] ?? null}
-                    onDetails={() => onProviderDetails(p.provider_key)}
+                    booking={bookings?.[p.public_ref] ?? null}
+                    onDetails={() => onProviderDetails(p.public_ref)}
                   />
                 ))}
               </motion.aside>
