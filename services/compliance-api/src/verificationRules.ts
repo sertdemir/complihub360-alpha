@@ -150,8 +150,10 @@ export function evidenceChecklist(required: RequiredEvidence[], evidence: Eviden
  * sie schon zum Einreichen verlangt, laesst einen Anbieter ein Zahlungsmandat
  * erteilen, bevor er weiss, ob er ueberhaupt angenommen wird.
  *
- * Spec A §23 fuehrt alle drei gemeinsam; die Trennung geht vor und ist in
- * `.tickets/` begruendet. `commercial_terms` steht in keiner der beiden
+ * Spec A §4 listet die Annahmen aller drei Dokumente VOR dem Review; die
+ * Trennung weicht davon bewusst ab (Nachweis im Ticket). §23 regelt nur, WAS
+ * festgehalten wird — Fassung, Sprache, Zeitstempel, Vertretung — und sagt zum
+ * Zeitpunkt nichts; die Forderung stand nie dort. `commercial_terms` steht in keiner der beiden
  * Listen: die kommerziellen Bedingungen haengen am Tarif und koennen nicht
  * angenommen werden, solange keiner gewaehlt ist.
  */
@@ -229,8 +231,13 @@ export interface GateVerdict extends Verdict {
  *   · jeder Pflichtnachweis geprueft (nicht nur hochgeladen)
  *   · mindestens eine Leistung in mindestens einem Land freigegeben
  *   · die Annahmen liegen vor, hier einschliesslich der Abrechnungsermaechtigung
- *   · billing_ready (Spec §21.1) — auch fuer 'limited'. "Limited" heisst
- *     "nur Teile frei", nicht "ohne Abrechnung".
+ *   · billing_ready — auch fuer 'limited'. "Limited" heisst "nur Teile frei",
+ *     nicht "ohne Abrechnung". ACHTUNG, offener Punkt (2026-09-27): §21.1
+ *     schreibt das so nicht. Seine sechs Zeilen lauten "Block chargeable
+ *     booking eligibility when: ..." — sie sperren die gebuehrenpflichtige
+ *     Buchbarkeit, nicht den Status. Dass Billing hier das Aktivieren sperrt,
+ *     ist eine Auslegung, keine Spec-Vorgabe. Bewusst nicht mit veraendert;
+ *     benannt in .tickets/review/TKT-PROV-03-annahmen-zwei-stufen.md.
  *   · das Kategorie-Kontingent des Plans ist eingehalten
  *   · das Konto ist nicht beendet
  */

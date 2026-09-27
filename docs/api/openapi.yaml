@@ -549,7 +549,7 @@ paths:
   /provider/{key}/submit:
     post:
       summary: Antrag einreichen (Canvas 4A)
-      description: Prueft Konto, Rechtsform, mindestens eine Leistung mit einem Land, Registerauszug und Versicherung bestaetigt, USt-ID abgefragt, zwei Annahmen (provider_agreement, privacy_notice). Die billing_authorization gehoert NICHT hierher: sie verlangt das Aktivierungs-Gate, weil sie erst gebraucht wird, bevor Geld fliesst (Canvas 4C, Nutzer-Entscheidung 2026-09-27). Bei Luecken 422 INCOMPLETE mit missing[] — Schluessel je Punkt, nicht nur "unvollstaendig". Setzt draft|more_info_required → submitted.
+      description: Prueft Konto, Rechtsform, mindestens eine Leistung mit einem Land, Registerauszug und Versicherung bestaetigt, USt-ID abgefragt, zwei Annahmen (provider_agreement, privacy_notice). Die billing_authorization gehoert NICHT hierher: sie verlangt das Aktivierungs-Gate, weil sie erst gebraucht wird, bevor Geld fliesst (Canvas 4C, Nutzer-Entscheidung 2026-09-27; weicht bewusst von Spec A §4 ab, das alle drei vor dem Review auffuehrt). Bei Luecken 422 INCOMPLETE mit missing[] — Schluessel je Punkt, nicht nur "unvollstaendig". Setzt draft|more_info_required → submitted.
       security: [ { bearerAuth: [] } ]
       parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
       responses:

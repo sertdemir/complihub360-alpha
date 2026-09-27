@@ -23,7 +23,9 @@ Version") — die Versionierung bleibt, die Bündelung fällt.
 | Aktivieren | dieselben drei | dieselben drei — unverändert |
 
 Das Aktivierungs-Gate ist bewusst **nicht** angefasst: ab der Aktivierung
-fließt Geld, und Spec A §21.1 verlangt `billing_ready` auch für `limited`.
+fließt Geld, und das bestehende Gate verlangt `billing_ready` auch für `limited`
+(siehe die Korrektur unten: das ist eine Auslegung des Phase-2-Codes, nicht der
+Wortlaut von §21.1).
 Die Ermächtigung wird also nicht abgeschafft, sondern an die Stelle
 verschoben, an der sie gebraucht wird.
 
@@ -91,15 +93,60 @@ Monetarisierung (das Zahlungsmandat als Zugangsbedingung).
 Nicht betroffen und deshalb nicht abgehakt: Dringlichkeitssprache (hier ist
 keine), Zugang zum Menschen, Ranking und Matching, AI-Verhalten.
 
-## Offen — beim Nutzer, nicht bei mir
+## Spec-Abgleich (2026-09-27, beide Specs gelesen)
 
-**Spec A §23 führt alle drei Annahmen gemeinsam.** Das Spec-Dokument
-(*Provider Verification and Dashboard Implementation Specification* v1.0)
-liegt nicht im Repository; ich kann §23 nicht im Wortlaut lesen. Code und
-OpenAPI sind auf die Trennung korrigiert und benennen den Widerspruch — der
-Spec selbst nicht, weil er hier nicht liegt.
+Die Frage war, ob die Bündelung einen rechtlichen Grund hat. **Sie hat keinen.**
 
-Zu klären, bevor das auf Staging geht: **hat §23 einen rechtlichen Grund?**
-Wenn die Partnervereinbarung ihrerseits verlangt, dass die Ermächtigung bei
-Antragstellung vorliegt, ist die Trennung nicht nur eine UX-Entscheidung. Das
-kann ich von hier nicht beurteilen und entscheide es nicht selbst.
+**Spec A §30, erster Satz:** „This is an implementation specification, **not final
+contractual language**." §31 behält dem späteren Onboarding-Dossier ausdrücklich
+vor: „Declarations, signatures and formal attestations", „Final Provider Agreement
+and Privacy Notice text", „**Approved payment-authorization forms**". Die
+Formulare, an denen eine Zeitpunkt-Pflicht hängen könnte, existieren also noch
+nicht. Spec B sagt dasselbe für seinen Teil („rules that must later appear in the
+Partner Agreement …") und regelt Abonnement, Leads, Buchung, Blog und API — nichts
+zum Zeitpunkt der Annahmen.
+
+**§23 war die falsche Fundstelle.** Der Code-Kommentar begründete die drei
+Pflicht-Annahmen mit §23. §23 („Agreement acceptance and audit trail") ist eine
+Liste dessen, was **festgehalten** werden muss — Fassung, Sprache, Datum,
+Vertretungsberechtigung, Zeitstempel, Reacceptance bei wesentlicher Änderung. Zum
+Zeitpunkt steht dort kein Wort. Unsere Umsetzung erfüllt §23 unverändert.
+
+**Die echte Abweichung ist §4.** Spec A §4 listet die Bewerbungsstrecke als
+Reihenfolge, und darin steht „Acceptance of the Provider Agreement, Provider
+Privacy Notice and billing authorization" **vor** „CompliHub360 review,
+independent checks and resolution of discrepancies". Der Spec will die drei
+Annahmen also vor der Prüfung. Davon weicht 4C bewusst ab — Nutzer-Entscheidung
+vom 2026-09-27, und nach CLAUDE.md gewinnt die DNA gegen einen Spec. Die
+Abweichung ist hiermit benannt, nicht still umgangen.
+
+Dabei hilft, dass §4 den Zeitpunkt nicht erzwingt: die einzige harte Sperre im
+ganzen Dokument ist der Satz „The system **must block activation** until all
+mandatory requirements … are satisfied." „must block" kommt genau einmal vor, und
+zwar für die Aktivierung. Ein „must block submission" gibt es nirgends. §4 ist
+eine Aufzählung der Strecke, kein Gate.
+
+## Korrektur meiner eigenen Begründung
+
+Commit, PR-Text und dieses Ticket behaupteten in der ersten Fassung: „Spec A §21.1
+verlangt `billing_ready` auch für `limited`". **Das steht nicht in §21.1.** Alle
+sechs Zeilen von §21.1 lauten „Block **chargeable booking eligibility** when: …" —
+sie sperren die Gebührenpflicht einer Buchung, nicht die Aktivierung. Ich hatte
+den Kommentar aus dem Phase-2-Code übernommen und als Spec-Aussage weitergegeben,
+ohne die Stelle gelesen zu haben. Die Trennung in zwei Stufen bleibt richtig; ihre
+Begründung war an dieser Stelle falsch belegt.
+
+## Neuer Befund — nicht in diesem PR
+
+Daraus folgt eine Frage an das bestehende Aktivierungs-Gate, das ich hier
+absichtlich nicht angefasst habe: es verlangt `billing_ready`, um überhaupt zu
+aktivieren. Nach §21.1 sperren fehlende Zahlungsmethode, unvollständige
+Abrechnungsdaten und zurückgezogene Ermächtigung die **gebührenpflichtige
+Buchbarkeit** — nicht den Status. Ein Anbieter mit geprüften Nachweisen und
+freigegebenen Zellen, aber ohne Zahlungsmethode, könnte nach Spec `limited` oder
+`active` sein und nur nicht gebührenpflichtig gebucht werden; heute bleibt er
+gesperrt.
+
+Das ist derselbe Befund in anderer Form — eine kommerzielle Bedingung steht
+früher als der Spec sie setzt. Es gehört aber nicht in diesen PR: es ändert das
+Gate, und das ist eine eigene Entscheidung. Hier nur benannt.
