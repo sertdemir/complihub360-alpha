@@ -17,6 +17,14 @@ import { getAccessToken } from '../lib/supabase';
 
 let resolved: { token: string | null; key: Promise<string> } | null = null;
 
+export interface MyProvider { provider_key: string; role: string; name: string | null; lifecycle_status: string | null }
+
+/** GET /me/provider ungecacht — fuer Stellen, die den Lebenszyklus brauchen, nicht nur den Schluessel. */
+export async function fetchMyProvider(): Promise<MyProvider & { lifecycle_status: import('./application').LifecycleStatus }> {
+  const r = await apiFetch<{ ok: boolean } & MyProvider>('/api/v1/me/provider');
+  return { ...r, lifecycle_status: (r.lifecycle_status ?? 'draft') as import('./application').LifecycleStatus };
+}
+
 export async function myProviderKey(): Promise<string> {
   const token = await getAccessToken();
   // Pro Login cachen: meldet sich jemand anderes an, gilt der alte Schluessel nicht.

@@ -320,6 +320,348 @@ paths:
         '503':
           description: Stripe nicht konfiguriert (ausser dry_run)
 
+  # ─── Phase 2: Onboarding und Verifikation (Anbieterseite) ──────────────────
+  # Alle /provider/{key}/…-Routen unten liegen hinter dem Ownership-Guard:
+  # Mitglied des Anbieters, Admin-JWT oder Server-Key; Fremde bekommen 404.
+
+  /provider/{key}/application:
+    get:
+      summary: Dossier des Anbieters (Canvas 1B)
+      description: Kapitelstatus (Konto, Rechtsform, Leistungen, Nachweise, Annahmen, Einreichen), Leistungen mit Laenderzeilen, abgeleitete Nachweis-Checkliste, gueltige Annahmen, offene Nachfragen. Ohne Reviewer-Notizen und ohne Abrechnungsinterna.
+      security: [ { bearerAuth: [] } ]
+      parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
+      responses:
+        '200': { description: Dossier }
+        '404': { description: Kein Zugriff oder unbekannt }
+    patch:
+      summary: Kapitel Konto und Rechtsform pflegen
+      description: Oeffentliche Felder gehen nach providers, vertrauliche (Rechtsform, Registernummer, Adressen, Vertretung, Versicherung) nach provider_confidential — getrennt gespeichert, getrennt zurueckgegeben.
+      security: [ { bearerAuth: [] } ]
+      parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                contact_email: { type: string, format: email }
+                website_url: { type: string }
+                languages: { type: array, items: { type: string } }
+                entity_type: { type: string }
+                registration_number: { type: string }
+                registered_address: { type: string }
+                operating_address: { type: string }
+                representative_name: { type: string }
+                representative_title: { type: string }
+                insurance_provider: { type: string }
+                insurance_type: { type: string }
+                insurance_valid_until: { type: string, format: date }
+      responses:
+        '200': { description: Aktualisierte Felder }
+        '400': { description: Kein gueltiges Feld }
+        '409': { description: Konto beendet (ACCOUNT_CLOSED) }
+
+  /provider/{key}/services:
+    post:
+      summary: Leistung anlegen (Canvas 2B, Stamm)
+      description: service_code aus service_categories. Startet in pending_verification. Prueft das Kategorie-Kontingent des Plans (Spec B) — bei Ueberschreitung 422 CATEGORY_ALLOWANCE mit allowance/used/over; ohne Abo keine Sperre (das Gate meldet den fehlenden Plan).
+      security: [ { bearerAuth: [] } ]
+      parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [service_code]
+              properties:
+                service_code: { type: string, example: tax-vat.returns }
+                service_name: { type: string }
+                description: { type: string }
+                deliverables: { type: array, items: { type: string } }
+                exclusions: { type: array, items: { type: string } }
+                pricing_model: { type: string, enum: [fixed, hourly, retainer, project, mixed] }
+                price_min: { type: number }
+                price_max: { type: number }
+                currency: { type: string }
+                pricing_basis: { type: string }
+                response_time_hours: { type: integer }
+                completion_days_estimate: { type: integer }
+                capacity_status: { type: string, enum: [open, limited, full] }
+      responses:
+        '201': { description: Leistung angelegt }
+        '409': { description: Schon gelistet (SERVICE_EXISTS) }
+        '422': { description: UNKNOWN_SERVICE_CODE oder CATEGORY_ALLOWANCE }
+
+  /provider/{key}/services/{id}:
+    patch:
+      summary: Leistung pflegen
+      description: service_code ist fest (422 SERVICE_CODE_FIXED) — Kategoriewechsel heisst stilllegen und neu anlegen. Aenderungen an freigegebenen Leistungen werden protokolliert.
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: Aktualisiert }
+        '404': { description: Unbekannt }
+        '409': { description: Stillgelegt (SERVICE_RETIRED) }
+    delete:
+      summary: Leistung entfernen oder stilllegen
+      description: Nie freigegeben → Zeile weg (Coverage kaskadiert). Einmal freigegeben → status retired, die Zeile bleibt (Buchungen zeigen darauf).
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: removed true|false }
+
+  /provider/{key}/services/{id}/coverage:
+    put:
+      summary: Laender einer Leistung setzen (Canvas 2B, Zeilen)
+      description: Neue Laender als pending. Nicht mehr gelistete pending/rejected-Zeilen werden entfernt; freigegebene werden auf suspended gesetzt (zurueckgezogen), nicht geloescht.
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                countries:
+                  type: array
+                  items:
+                    oneOf:
+                      - { type: string, example: DE }
+                      - { type: object, properties: { country_code: { type: string }, jurisdiction_code: { type: string, nullable: true } } }
+      responses:
+        '200': { description: coverage, added, removed, withdrawn }
+
+  /provider/{key}/evidence/upload-url:
+    post:
+      summary: Nachweis ankuendigen und signierte Upload-URL holen (Canvas 3A)
+      description: Legt provider_evidence an (received, upload_confirmed=false) und liefert eine signierte PUT-URL in den privaten Bucket provider-evidence (zwei Stunden). PDF, PNG, JPEG bis 20 MB. Das Dokument geht Browser → Storage, nie durch die API.
+      security: [ { bearerAuth: [] } ]
+      parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [evidence_type, original_name, mime_type, size_bytes]
+              properties:
+                evidence_type: { type: string, enum: [incorporation, insurance, representative_identity, professional_licence] }
+                original_name: { type: string }
+                mime_type: { type: string, enum: [application/pdf, image/png, image/jpeg] }
+                size_bytes: { type: integer }
+                issuing_authority: { type: string }
+                identifier: { type: string }
+                issue_date: { type: string, format: date }
+                expires_at: { type: string, format: date }
+                supports_service_codes: { type: array, items: { type: string } }
+                supports_countries: { type: array, items: { type: string } }
+      responses:
+        '201':
+          description: evidence_id, file_ref, upload {url, token, method, headers, expiresAt}
+        '413': { description: FILE_TOO_LARGE }
+        '415': { description: UNSUPPORTED_MEDIA_TYPE }
+        '503': { description: STORAGE_UNAVAILABLE — nichts gespeichert }
+
+  /provider/{key}/evidence/{id}/confirm:
+    post:
+      summary: Upload bestaetigen
+      description: Prueft, ob das Objekt im Bucket liegt; setzt upload_confirmed, uebernimmt Groesse und Typ aus dem Storage; erfuellt offene Nachfragen desselben Typs. Waren es die letzten, geht ein Konto in more_info_required zurueck nach under_verification.
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: evidence, fulfilled_requests, lifecycle_status }
+        '409': { description: UPLOAD_NOT_FOUND oder NOT_A_DOCUMENT }
+        '503': { description: STORAGE_UNAVAILABLE }
+
+  /provider/{key}/evidence/registry:
+    post:
+      summary: Registerabfrage statt Dokument (USt-IdNr. via VIES)
+      description: Speichert das Ergebnis als Nachweis mit source registry_check — valid → independently_verified, invalid → rejected, VIES nicht erreichbar → received (der Reviewer entscheidet). Nie wird ein Ausfall als Ablehnung gespeichert.
+      security: [ { bearerAuth: [] } ]
+      parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, required: [vat_id], properties: { evidence_type: { type: string, enum: [vat_id] }, vat_id: { type: string } } }
+      responses:
+        '201': { description: evidence, vat {status, vat_id, country_code, name, checked_at} }
+        '422': { description: REGISTRY_UNSUPPORTED }
+
+  /provider/{key}/agreements:
+    post:
+      summary: Annahme eines Dokuments mit Version festhalten (Canvas 4A)
+      description: Append-only mit Version, Sprache, Name, Funktion und audit_ref (Request-ID plus IP-Hash). Eine neue Fassung setzt superseded_at auf die alte, loescht sie nicht.
+      security: [ { bearerAuth: [] } ]
+      parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [agreement_type, version, accepted_by_name]
+              properties:
+                agreement_type: { type: string, enum: [provider_agreement, privacy_notice, billing_authorization, commercial_terms] }
+                version: { type: string }
+                language: { type: string, example: de }
+                accepted_by_name: { type: string }
+                accepted_by_title: { type: string }
+      responses:
+        '201': { description: Annahme festgehalten }
+
+  /provider/{key}/submit:
+    post:
+      summary: Antrag einreichen (Canvas 4A)
+      description: Prueft Konto, Rechtsform, mindestens eine Leistung mit einem Land, Registerauszug und Versicherung bestaetigt, USt-ID abgefragt, drei Annahmen (provider_agreement, privacy_notice, billing_authorization). Bei Luecken 422 INCOMPLETE mit missing[] — Schluessel je Punkt, nicht nur "unvollstaendig". Setzt draft|more_info_required → submitted.
+      security: [ { bearerAuth: [] } ]
+      parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
+      responses:
+        '200': { description: lifecycle_status submitted }
+        '409': { description: NOT_SUBMITTABLE (Status erlaubt kein Einreichen) }
+        '422': { description: INCOMPLETE mit missing[] und chapters }
+
+  /provider/{key}/verification:
+    get:
+      summary: Verification Center (Canvas 5B)
+      description: Lifecycle, Matrix Leistung × Land mit Zellstatus, Checkliste, offene Nachfragen, Entscheidungs-Historie (ohne Reviewer-IDs).
+      security: [ { bearerAuth: [] } ]
+      parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
+      responses:
+        '200': { description: Matrix und Historie }
+
+  # ─── Phase 2: Review-Arbeitsplatz (Admin-JWT oder Server-Key, sonst 403) ───
+
+  /admin/review/queue:
+    get:
+      summary: Pruef-Queue (Canvas 6A)
+      description: Zeilen fuer Bewerbungen (submitted, more_info_required, under_verification, approved_pending_activation), Reverifizierungen, offene Aenderungsmeldungen und Nachweise, die in 30 Tagen ablaufen. Spalten kind, provider, lifecycle_status, since, due_at, risk (high = regulierter Bereich oder Sperre, medium = Bewerbung/Aenderung, low = Ablauf), detail.
+      security: [ { bearerAuth: [] } ]
+      responses:
+        '200': { description: rows[], counts }
+        '403': { description: Kein Admin }
+
+  /admin/review/{key}:
+    get:
+      summary: Dossier fuer den Reviewer (Canvas 7A)
+      description: Alles aus dem Anbieter-Dossier plus provider_confidential, je bestaetigtem Dokument eine signierte Download-URL (zehn Minuten), Registerergebnis (VIES), Gate-Stand, vollstaendiges Protokoll.
+      security: [ { bearerAuth: [] } ]
+      parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
+      responses:
+        '200': { description: Dossier mit gate }
+        '403': { description: Kein Admin }
+        '404': { description: Unbekannt }
+
+  /admin/review/{key}/gate:
+    get:
+      summary: Gate-Leiste (Canvas 8A) ohne Aenderung
+      security: [ { bearerAuth: [] } ]
+      parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
+      responses:
+        '200': { description: gate {ok, missing[], target, approved_cells, total_cells, allowance} }
+
+  /admin/review/{key}/evidence/{id}:
+    post:
+      summary: Nachweis entscheiden
+      description: result reviewed|independently_verified|rejected|expired; rejected braucht notes. Ein Dokument ohne bestaetigten Upload kann nur abgelehnt werden (409 UPLOAD_NOT_CONFIRMED). Schreibt provider_review_log.
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [result]
+              properties:
+                result: { type: string, enum: [reviewed, independently_verified, rejected, expired] }
+                notes: { type: string }
+                expires_at: { type: string, format: date }
+                next_review_at: { type: string, format: date }
+                limitations: { type: string }
+      responses:
+        '200': { description: evidence }
+
+  /admin/review/{key}/coverage/{id}:
+    post:
+      summary: Zell-Aktion Leistung × Land (Canvas 8A)
+      description: approve|limit|reject|pause|request_info|reopen. Alles ausser approve/reopen braucht reason — der Anbieter liest ihn. request_info legt eine provider_evidence_requests-Zeile an und setzt das Konto auf more_info_required. Der Leistungsstatus folgt seinen Zellen (approved / limited / pending_verification). Benachrichtigt den Dashboard-Login des Anbieters.
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action: { type: string, enum: [approve, limit, reject, pause, request_info, reopen] }
+                reason: { type: string }
+                limitations: { type: string }
+                expires_at: { type: string, format: date }
+                next_review_at: { type: string, format: date }
+                evidence_type: { type: string, description: nur bei request_info }
+      responses:
+        '200': { description: coverage, service_status }
+        '201': { description: request angelegt (request_info) }
+        '400': { description: Grund fehlt }
+
+  /admin/review/{key}/lifecycle:
+    post:
+      summary: Kontostatus setzen — durch das Gate
+      description: to nach REVIEWER_TRANSITIONS (verificationRules.ts); active und limited laufen durch activationGate() — bei Luecken 422 GATE_NOT_MET mit gate.missing[]; active mit offenen Zellen 422 GATE_TARGET_LIMITED. paused, suspended, terminated, more_info_required brauchen reason. Aktivierung benachrichtigt und mailt den Anbieter.
+      security: [ { bearerAuth: [] } ]
+      parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, required: [to], properties: { to: { type: string }, reason: { type: string } } }
+      responses:
+        '200': { description: from, to, gate }
+        '409': { description: TRANSITION_NOT_ALLOWED }
+        '422': { description: GATE_NOT_MET oder GATE_TARGET_LIMITED }
+
+  /admin/review/{key}/request:
+    post:
+      summary: Nachweis nachfordern ohne Zellbezug
+      security: [ { bearerAuth: [] } ]
+      parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, required: [evidence_type, message], properties: { evidence_type: { type: string }, message: { type: string }, service_id: { type: string, format: uuid }, country_code: { type: string } } }
+      responses:
+        '201': { description: request, lifecycle_status }
+
+  /admin/review/{key}/request/{id}:
+    delete:
+      summary: Offene Nachfrage zuruecknehmen (status withdrawn)
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: Zurueckgenommen }
+        '409': { description: REQUEST_CLOSED }
+
 components:
   securitySchemes:
     bearerAuth:

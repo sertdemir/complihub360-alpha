@@ -39,7 +39,7 @@ export function SiteHeader() {
   }
   // The new provider App-Workspace pages ship the ProviderShell (own sidebar +
   // topbar, always dark) — no global header on top.
-  const PROVIDER_WORKSPACE = ['requests', 'termine', 'performance', 'coverage', 'billing', 'settings', 'notifications', 'help'];
+  const PROVIDER_WORKSPACE = ['requests', 'termine', 'performance', 'coverage', 'verification', 'application', 'billing', 'settings', 'notifications', 'help'];
   if (localeOk && seg[1] === 'partner-dashboard' && PROVIDER_WORKSPACE.includes(seg[2])) {
     return null;
   }

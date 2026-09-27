@@ -21,7 +21,17 @@
     "oooEndTitle": "¿Finalizar la ausencia?",
     "oooEndConsequence": "Vuelve a estar disponible — las nuevas solicitudes se le asignan de nuevo y los temporizadores de SLA se reanudan de inmediato.",
     "oooEndConfirm": "Finalizar ausencia",
-    "switchTo": "Ir a"
+    "switchTo": "Ir a",
+    "navVerification": "Verificación",
+    "applicationBanner": {
+      "draft": "Su solicitud sigue siendo un borrador. Complete el expediente para que la revisión pueda empezar.",
+      "more_info_required": "El equipo de revisión ha pedido un justificante más. Su solicitud mantiene su lugar mientras lo sube.",
+      "submitted": "Su solicitud está con el equipo de revisión. Puede seguir cada decisión en el Verification Center.",
+      "cta": {
+        "application": "Al expediente",
+        "verification": "Verification Center"
+      }
+    }
   },
   "bell": {
     "aria": "Notificaciones",
@@ -462,99 +472,277 @@
     "errorTitle": "Error al enviar",
     "errorBody": "No se pudo enviar el paquete. Comprueba tu enlace de alta o inténtalo de nuevo — o contacta con partners@complihub360.com."
   },
-  "onboarding": {
-    "steps": {
-      "contact": "Contacto",
-      "coverage": "Cobertura",
-      "listing": "Publicación"
+  "application": {
+    "title": "Solicitud",
+    "subtitle": "Su expediente para la verificación: cuenta, forma jurídica, servicios por país, justificantes y aceptaciones. Siempre ve lo que aún falta.",
+    "navHint": "Su solicitud se revisa solo cuando la envía. Hasta entonces puede modificar cada capítulo en cualquier momento.",
+    "loading": "Cargando su expediente …",
+    "loadError": "No hemos podido cargar su expediente ahora mismo. Inténtelo de nuevo en un momento.",
+    "save": "Guardar",
+    "saving": "Guardando …",
+    "saved": "Guardado",
+    "saveError": "No se pudo guardar. No se ha perdido nada — inténtelo de nuevo.",
+    "chapter": {
+      "account": "Cuenta",
+      "legal": "Forma jurídica y representación",
+      "services": "Servicios y países",
+      "evidence": "Justificantes",
+      "agreements": "Aceptaciones",
+      "submit": "Enviar"
     },
-    "stepSubs": {
-      "contact": "Persona de contacto y buzón de respuesta",
-      "coverage": "Países, idiomas, áreas, objetivo SLA",
-      "listing": "Su perfil público"
+    "state": {
+      "complete": "Completo",
+      "open": "Abierto",
+      "ready": "Listo",
+      "notReady": "Aún no es posible"
     },
-    "welcome": {
-      "eyebrow": "Bienvenido a CompliHub360",
-      "titlePre": "Antes de que lleguen los primeros expedientes: ",
-      "titleGold": "su perfil",
-      "titlePost": ".",
-      "body": "Su solicitud está verificada y su acceso activo. Para que el matching le encuentre y los clientes le vean publicado, necesitamos tres cosas:",
-      "cta": "Completar el perfil",
-      "note": "Lleva unos 5 minutos. Sus datos deciden qué expedientes le llegan."
+    "account": {
+      "name": "Nombre de la empresa",
+      "email": "Correo de contacto",
+      "website": "Sitio web",
+      "languages": "Idiomas (separados por comas)",
+      "region": "Región"
     },
-    "contact": {
-      "title": "¿Quién responde — y adónde?",
-      "lead": "Revise sobre todo el buzón: ahí llegan los expedientes.",
-      "name": "Persona de contacto",
-      "namePh": "Su nombre",
-      "inbox": "Buzón de respuesta",
-      "inboxHint": "Aquí llegan los expedientes y los enlaces mágicos: el buzón que su equipo realmente lee.",
-      "firm": "Despacho / empresa",
-      "website": "Sitio web"
+    "legal": {
+      "note": "Solo nuestro equipo de revisión ve estos datos. Nunca aparecen en su tarjeta.",
+      "entityType": "Forma jurídica",
+      "registrationNumber": "Número de registro",
+      "registeredAddress": "Domicilio social",
+      "representative": "Persona con poder de representación",
+      "representativeTitle": "Cargo",
+      "insuranceProvider": "Aseguradora",
+      "insuranceValidUntil": "Seguro válido hasta"
     },
-    "coverage": {
-      "title": "Qué cubre usted",
-      "lead": "El matching solo le muestra expedientes de esta selección.",
-      "countries": "Países",
-      "langs": "Idiomas",
-      "areas": "Áreas de práctica",
-      "sla": "Su objetivo SLA",
-      "slaDefault": "Confirmación en 24h · respuesta en 48h",
-      "slaFast": "Más rápido: 12h / 24h"
+    "services": {
+      "intro": "Cada servicio es un tronco; los países debajo son los mercados para los que solicita aprobación. Los países nuevos empiezan como «solicitados» y se revisan por país.",
+      "add": "Añadir servicio",
+      "addCountry": "Añadir país",
+      "countryPlaceholder": "ISO-2, p. ej. AT",
+      "codePlaceholder": "Código de servicio, p. ej. tax-vat.returns",
+      "namePlaceholder": "Nombre del servicio",
+      "licenceHint": "Para asesoría fiscal y legal la revisión exige una licencia por país.",
+      "allowanceHint": "Cupo: aún no ha elegido plan. El número de categorías principales se comprueba contra el plan al activar, no ahora.",
+      "allowanceError": "Su plan cubre menos categorías principales de las necesarias.",
+      "pricingModel": "Modelo de precios",
+      "priceRange": "Rango de precios",
+      "responseTime": "Tiempo de respuesta",
+      "capacity": "Capacidad",
+      "countries": "{{count}} países",
+      "colCountry": "País",
+      "colJurisdiction": "Jurisdicción",
+      "colStatus": "Estado",
+      "colNote": "Nota del equipo de revisión",
+      "wholeCountry": "todo el país",
+      "remove": "Quitar",
+      "retire": "Retirar",
+      "empty": "Aún no hay servicios. Añada el primero — la revisión empieza con lo que indique aquí.",
+      "status": {
+        "draft": "Borrador",
+        "pending_verification": "Solicitado para revisión",
+        "approved": "Aprobado",
+        "limited": "Aprobado en parte",
+        "paused": "En pausa",
+        "retired": "Retirado"
+      }
     },
-    "listing": {
-      "title": "Su perfil público",
-      "lead": "Así aparece en el matching. Los campos dorados son opcionales — y cuentan en el ranking.",
-      "displayName": "Nombre público",
-      "shortDesc": "Descripción breve",
-      "shortDescPh": "En qué ayuda a sus clientes, en una o dos frases.",
-      "credentials": "Colegiación / profesión",
-      "credentialsPh": "p. ej. Abogada (DE) · Especialista en derecho TI",
-      "certs": "Certificaciones",
-      "certsPh": "p. ej. ISO 27001 Lead Auditor",
-      "activeSince": "Activo desde",
-      "teamSize": "Tamaño del equipo"
+    "coverageStatus": {
+      "pending": "Solicitado",
+      "approved": "Aprobado",
+      "rejected": "Rechazado",
+      "limited": "Limitado",
+      "suspended": "Suspendido",
+      "expired": "Caducado"
     },
-    "done": {
-      "titlePre": "Está usted ",
-      "titleEm": "publicado",
-      "titlePost": ".",
-      "lead": "Su perfil está activo. Qué pasa ahora:",
-      "dossier": "Cuando un expediente encaja con su cobertura, llega a su buzón mediante enlace mágico.",
-      "sla": "Su confirmación detiene el contador del SLA — desde ahora rigen sus tiempos de respuesta.",
-      "rank": "Complete los campos dorados cuando quiera — cuentan en el ranking.",
-      "meterLabel": "Perfil {{pct}} % completo",
-      "cta": "Al panel"
+    "evidence": {
+      "intro": "La lista se deriva de sus servicios y países — es la misma para cualquier proveedor con los mismos servicios. Los documentos van directamente a nuestro almacenamiento protegido; un NIF-IVA se comprueba en el registro, sin documento.",
+      "type": {
+        "incorporation": "Extracto del registro mercantil",
+        "vat_id": "NIF-IVA (consulta al registro)",
+        "insurance": "Seguro de responsabilidad profesional",
+        "representative_identity": "Poder de representación",
+        "professional_licence": "Licencia profesional"
+      },
+      "scopeAccount": "Cuenta",
+      "scopeDocument": "Documento",
+      "scopeRegistry": "Registro",
+      "state": {
+        "missing": "Falta",
+        "uploading": "Subiendo",
+        "received": "Recibido",
+        "reviewed": "Verificado",
+        "rejected": "Rechazado",
+        "expired": "Caducado"
+      },
+      "upload": "Subir",
+      "replace": "Sustituir",
+      "uploadHint": "PDF, PNG o JPEG hasta 20 MB.",
+      "uploadError": "La subida no funcionó. No se guardó nada — inténtelo de nuevo.",
+      "checkRegistry": "Comprobar en el registro",
+      "vatPlaceholder": "p. ej. ESB12345678",
+      "registryHint": "Guardamos el resultado, no un documento.",
+      "registryValid": "Confirmado en el registro",
+      "registryInvalid": "No encontrado en el registro — revise el número.",
+      "registryUnavailable": "El registro no está disponible ahora. El equipo de revisión decidirá con el documento.",
+      "reviewerHint": "El equipo de revisión lo decide con el extracto del registro — no hace falta subir nada.",
+      "licenceHint": "Necesario antes de la activación, no antes del envío.",
+      "uploadedOn": "subido el {{date}}"
     },
-    "rankBadge": "mejora su ranking",
-    "back": "Atrás",
-    "next": "Siguiente",
-    "activate": "Activar perfil",
-    "languages": {
-      "de": "Alemán",
-      "en": "Inglés",
-      "fr": "Francés",
-      "nl": "Neerlandés",
-      "es": "Español",
-      "tr": "Turco"
+    "agreements": {
+      "intro": "Cada aceptación se registra con versión, idioma, nombre y cargo. Una versión nueva sustituye a la anterior pero no la borra — el estado en el momento de una reserva sigue siendo verificable.",
+      "doc": {
+        "provider_agreement": "Acuerdo de proveedor",
+        "privacy_notice": "Aviso de privacidad para proveedores",
+        "billing_authorization": "Autorización de facturación",
+        "commercial_terms": "Condiciones comerciales"
+      },
+      "version": "Versión {{version}} · {{language}}",
+      "acceptedOn": "Aceptado el {{date}} por {{name}}",
+      "notAccepted": "Aún no aceptado.",
+      "billingNote": "Nos permite cobrar la suscripción y las tarifas por lead con el método de pago registrado.",
+      "open": "Abrir documento",
+      "accept": "Leer y aceptar",
+      "acceptTitle": "Aceptar {{doc}}",
+      "nameLabel": "Su nombre",
+      "titleLabel": "Su cargo",
+      "confirm": "Aceptar la versión {{version}}",
+      "cancel": "Cancelar"
     },
-    "areas": {
-      "taxVat": "Impuestos e IVA",
-      "productPackaging": "EPR y envases",
-      "dataPrivacy": "Datos y privacidad",
-      "marketingSeo": "Marketing",
-      "corporateStructure": "Constitución y presentaciones",
-      "productCompliance": "Conformidad de producto",
-      "logisticsCustoms": "Logística y aduanas",
-      "legalAdvisory": "Apoyo jurídico"
+    "submit": {
+      "missingTitle": "Aún falta",
+      "readyTitle": "Listo",
+      "cta": "Enviar solicitud",
+      "note": "Tras el envío, una persona revisa su expediente. Puede ver el estado en cualquier momento en el Verification Center; las consultas llegan por correo y allí.",
+      "licenceNote": "Las licencias por país pueden llegar después del envío — el equipo de revisión las pide por país si aún faltan.",
+      "done": "Enviado. Una persona revisa ahora su expediente.",
+      "notSubmittable": "Una solicitud en este estado no puede enviarse.",
+      "ready": {
+        "accountLegal": "Cuenta y forma jurídica completas",
+        "services": "{{services}} servicios en {{countries}} países",
+        "evidence": "Extracto del registro, seguro, NIF-IVA",
+        "agreements": "{{done}} de {{total}} aceptaciones"
+      }
     },
+    "missing": {
+      "account": {
+        "name": "Nombre de la empresa",
+        "contact_email": "Correo de contacto"
+      },
+      "legal": {
+        "entity_type": "Forma jurídica",
+        "registration_number": "Número de registro",
+        "registered_address": "Domicilio social",
+        "representative_name": "Persona con poder de representación"
+      },
+      "services": {
+        "none": "Al menos un servicio",
+        "no_country": "Al menos un país por servicio"
+      },
+      "evidence": {
+        "incorporation": "Justificante: extracto del registro mercantil",
+        "vat_id": "Justificante: NIF-IVA en el registro",
+        "insurance": "Justificante: seguro de responsabilidad profesional",
+        "representative_identity": "Justificante: poder de representación",
+        "professional_licence": "Justificante: licencia profesional"
+      },
+      "agreements": {
+        "provider_agreement": "Aceptación: acuerdo de proveedor",
+        "privacy_notice": "Aceptación: aviso de privacidad",
+        "billing_authorization": "Aceptación: autorización de facturación"
+      }
+    }
+  },
+  "verification": {
+    "title": "Verification Center",
+    "subtitle": "Aprobaciones por servicio y país, consultas abiertas y las decisiones sobre su cuenta.",
+    "loading": "Cargando …",
+    "loadError": "No hemos podido cargar el estado de verificación ahora mismo.",
     "banner": {
-      "text": "Perfil {{pct}} % completo — los perfiles incompletos aparecen más abajo en el ranking.",
-      "cta": "Completar el perfil",
-      "dismiss": "Ocultar en esta sesión",
-      "dismissTitle": "Ocultar — vuelve en su próxima visita hasta completar el perfil"
+      "title": "El equipo de revisión necesita un justificante más",
+      "cta": "Al expediente · Justificantes"
     },
-    "deferLabel": "Cerrar — continuar más tarde",
-    "deferTitle": "Cierra el onboarding durante esta sesión. Sus datos se conservan; el aviso superior le lleva de vuelta."
+    "requestFor": "Para {{country}}",
+    "stat": {
+      "status": "Estado de la cuenta",
+      "approvals": "Aprobaciones",
+      "approvalsHint": "celdas servicio × país aprobadas",
+      "evidence": "Justificantes",
+      "evidenceHint": "verificados",
+      "requests": "Consultas abiertas",
+      "since": "desde el {{date}}"
+    },
+    "lifecycle": {
+      "draft": "Borrador",
+      "submitted": "Enviada",
+      "more_info_required": "Justificante solicitado",
+      "under_verification": "En revisión",
+      "approved_pending_activation": "Aprobada · activación pendiente",
+      "active": "Activa",
+      "limited": "Activa con límites",
+      "reverification_due": "Reverificación pendiente",
+      "paused": "En pausa",
+      "suspended": "Suspendida",
+      "terminated": "Cerrada"
+    },
+    "lifecycleHint": {
+      "more_info_required": "vuelve a revisión automáticamente en cuanto suba el justificante",
+      "submitted": "una persona revisará su expediente",
+      "under_verification": "su expediente se está revisando",
+      "reverification_due": "hasta el {{date}} sigue visible; renueve el justificante"
+    },
+    "matrix": {
+      "title": "Aprobaciones por servicio y país",
+      "intro": "Cada celda se decide por separado. Las celdas aprobadas son visibles para las empresas en cuanto su cuenta esté activa — aunque otras celdas sigan abiertas.",
+      "service": "Servicio",
+      "empty": "Aún no hay servicios registrados."
+    },
+    "cell": {
+      "approved": "Aprobado",
+      "limited": "Limitado",
+      "pending": "Solicitado",
+      "requested": "Justificante solicitado",
+      "rejected": "Rechazado",
+      "suspended": "Suspendido",
+      "expired": "Caducado",
+      "sinceDate": "Desde el {{date}}",
+      "inReview": "En revisión"
+    },
+    "checklist": {
+      "title": "Justificantes"
+    },
+    "history": {
+      "title": "Decisiones",
+      "intro": "Qué se decidió y por qué — no quién.",
+      "actor": {
+        "reviewer": "Equipo de revisión",
+        "provider": "Usted",
+        "system": "Sistema"
+      },
+      "empty": "Aún no hay decisiones."
+    },
+    "action": {
+      "requested": "Justificante solicitado",
+      "fulfilled": "Consulta atendida",
+      "withdrawn": "Consulta retirada",
+      "approve": "Aprobado",
+      "limit": "Limitado",
+      "reject": "Rechazado",
+      "pause": "En pausa",
+      "reopen": "Reabierto",
+      "request_info": "Justificante solicitado",
+      "transition": "Estado cambiado",
+      "submitted": "Solicitud enviada",
+      "requests_fulfilled": "De vuelta en revisión",
+      "registry_check": "Consulta al registro",
+      "decide": "Justificante decidido",
+      "expired": "Justificante caducado",
+      "reverification_due": "Reverificación pendiente",
+      "created": "Servicio añadido",
+      "updated": "Servicio modificado",
+      "deleted": "Servicio eliminado",
+      "retired": "Servicio retirado",
+      "countries_set": "Países modificados",
+      "status_from_coverage": "Estado del servicio actualizado",
+      "legal_fields_changed": "Datos jurídicos modificados"
+    }
   }
 }

@@ -40,6 +40,10 @@ const CoveragePage = lazy(() => import("./pages/provider/CoveragePage").then((m)
 const BillingPage = lazy(() => import("./pages/provider/BillingPage").then((m) => ({ default: m.BillingPage })));
 const SettingsPage = lazy(() => import("./pages/provider/SettingsPage").then((m) => ({ default: m.SettingsPage })));
 const NotificationsPage = lazy(() => import("./pages/provider/NotificationsPage").then((m) => ({ default: m.NotificationsPage })));
+const ApplicationPage = lazy(() => import("./pages/provider/ApplicationPage").then((m) => ({ default: m.ApplicationPage })));
+const VerificationPage = lazy(() => import("./pages/provider/VerificationPage").then((m) => ({ default: m.VerificationPage })));
+const AdminProvidersPage = lazy(() => import("./pages/admin/AdminProvidersPage").then((m) => ({ default: m.AdminProvidersPage })));
+const AdminProviderReviewPage = lazy(() => import("./pages/admin/AdminProviderReviewPage").then((m) => ({ default: m.AdminProviderReviewPage })));
 const UserHomePage = lazy(() => import("./pages/user/UserHomePage").then((m) => ({ default: m.UserHomePage })));
 const SessionsPage = lazy(() => import("./pages/user/SessionsPage").then((m) => ({ default: m.SessionsPage })));
 const TerminePage = lazy(() => import("./pages/user/TerminePage").then((m) => ({ default: m.TerminePage })));
@@ -246,6 +250,9 @@ function AppContent() {
                         <Route path="partner-dashboard/billing" element={<BillingPage />} />
                         <Route path="partner-dashboard/settings" element={<SettingsPage />} />
                         <Route path="partner-dashboard/notifications" element={<NotificationsPage />} />
+                        {/* Phase 2 Onboarding: Dossier + Verification Center */}
+                        <Route path="partner-dashboard/application" element={<ApplicationPage />} />
+                        <Route path="partner-dashboard/verification" element={<VerificationPage />} />
                         <Route path="partner-dashboard/*" element={<LocaleRedirect to="partner-dashboard/requests" />} />
                     </Route>
 
@@ -254,7 +261,9 @@ function AppContent() {
                         <Route path="admin" element={<AdminOverviewPage />} />
                         <Route path="admin/cockpit" element={<CockpitPage />} />
                         <Route path="admin/events" element={<AdminEventsPage />} />
-                        <Route path="admin/providers" element={<AdminComingSoonPage />} />
+                        {/* Phase 2: Pruef-Queue + Reviewer-Pruefung */}
+                        <Route path="admin/providers" element={<AdminProvidersPage />} />
+                        <Route path="admin/providers/:key" element={<AdminProviderReviewPage />} />
                         <Route path="admin/security" element={<AdminComingSoonPage />} />
                         <Route path="admin/privacy" element={<AdminComingSoonPage />} />
                         <Route path="admin/alerts" element={<AdminComingSoonPage />} />

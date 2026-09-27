@@ -66,3 +66,22 @@ GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA auth TO anon, authenticated, service_ro
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES    TO anon, authenticated, service_role;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON FUNCTIONS TO anon, authenticated, service_role;
+
+-- ─── Storage: der Bucket-Katalog ─────────────────────────────────────────────
+--
+-- Die Onboarding-Migration (20260924000000) legt den privaten Bucket
+-- `provider-evidence` per INSERT in storage.buckets an — auf Supabase eine
+-- Plattform-Tabelle, hier nachgebildet mit genau den Spalten, die die
+-- Migration schreibt. Objekte selbst gehen ueber die Storage-REST-API, nicht
+-- ueber SQL, und kommen deshalb im Harness nicht vor.
+
+CREATE SCHEMA IF NOT EXISTS storage;
+
+CREATE TABLE IF NOT EXISTS storage.buckets (
+  id                 text PRIMARY KEY,
+  name               text NOT NULL,
+  public             boolean NOT NULL DEFAULT false,
+  file_size_limit    bigint,
+  allowed_mime_types text[],
+  created_at         timestamptz NOT NULL DEFAULT now()
+);

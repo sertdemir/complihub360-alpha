@@ -19,6 +19,8 @@ import { checkVatId } from "./vies.js";
 import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
 import { buildCockpit } from "./cockpit.js";
 import { ownProviderRouteKey, canAccessProvider, handleMeProvider, handleAdminLinkMember } from "./providerAuth.js";
+import { handleProviderApplication } from "./providerApplication.js";
+import { handleProviderReview } from "./providerReview.js";
 import { redactText } from "@complihub360/redaction";
 
 // P0 #1: shared magic-link verification — SHA-256 hash lookup, engagement +
@@ -92,7 +94,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         res.setHeader('Access-Control-Allow-Origin', '*');
     }
 
-    res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PATCH, PUT');
+    res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PATCH, PUT, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-correlation-id, Authorization, x-api-key');
 
     if (req.method === 'OPTIONS') {
@@ -244,6 +246,15 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             { userId: authUserId, isAdmin: authIsAdmin, viaApiKey: authViaApiKey }, linkMatch[1]);
         return;
     }
+
+    // Phase 2 — Onboarding (Anbieterseite, hinter dem Guard oben) und
+    // Review-Arbeitsplatz (Admin). Beide Module sagen selbst, ob die URL
+    // ihnen gehoert; sonst laeuft die Kette unten weiter.
+    const caller = { userId: authUserId, isAdmin: authIsAdmin, viaApiKey: authViaApiKey };
+    const forwardedIp = typeof req.headers['x-forwarded-for'] === 'string'
+        ? (req.headers['x-forwarded-for'] as string).split(',')[0].trim() : (req.socket.remoteAddress || 'unknown');
+    if (await handleProviderApplication(req, res, correlationId, caller, forwardedIp)) return;
+    if (await handleProviderReview(req, res, correlationId, caller)) return;
 
     if (req.method === 'POST' && req.url === '/api/compliance/check') {
         const startTime = Date.now();
@@ -1881,6 +1892,15 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         // Admin control center: one aggregated read across engagements, the
         // audit log and the privacy pipeline. Approximations share the caveats
         // of /metrics (no per-transition timestamps yet).
+        // Befund Phase 2 (2026-09-22): bis dahin reichte jeder Login — das
+        // Protokoll mit Anbieter-Schluesseln und Anfragen-Status war fuer jeden
+        // Nutzer lesbar. Jetzt wie Cockpit: Admin-JWT oder Server-Key.
+        res.setHeader('x-correlation-id', correlationId);
+        if (!authViaApiKey && !authIsAdmin) {
+            res.writeHead(403, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'FORBIDDEN', message: 'Admin stats are admin-only', correlationId }));
+            return;
+        }
         try {
             const dayStart = new Date(); dayStart.setUTCHours(0, 0, 0, 0);
             const engagements = (await supabaseApi.select('engagement_requests', {}, { order: 'created_at.desc', limit: 500 })) as
