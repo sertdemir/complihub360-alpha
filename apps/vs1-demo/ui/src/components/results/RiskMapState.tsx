@@ -28,13 +28,15 @@ export function RiskMapStateHero({
   children?: ReactNode;
 }) {
   const { t } = useTranslation('results');
+  // 1040 statt der 877 aus Figma: IBM Plex Serif setzt die Ueberschrift
+  // breiter als Figma — EN 880, DE 1030, ES 1012 px (Staging, 27.09.).
   return (
-    <div role="status" className="flex max-w-[877px] flex-col items-center gap-4 text-center">
+    <div role="status" className="flex max-w-[1040px] flex-col items-center gap-4 text-center">
       {/* Versalien per CSS: Compass hat keinen Versalien-Stil (Uebergabe-Notiz). */}
       <span className="text-body-2xs font-semibold uppercase tracking-[0.16em] text-fg-brand">
         {t('header.eyebrow')}
       </span>
-      <h1 className="font-serif text-[2.25rem] font-bold leading-[1.1] tracking-[-0.02em] text-fg sm:text-[3rem]">
+      <h1 className="text-balance font-serif text-[2.25rem] font-bold leading-[1.1] tracking-[-0.02em] text-fg sm:text-[3rem]">
         {heading}
       </h1>
       <p className="max-w-[720px] text-[1.125rem] leading-[1.6] text-fg-secondary">{message}</p>

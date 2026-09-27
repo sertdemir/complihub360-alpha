@@ -72,6 +72,89 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /market-requests:
+    post:
+      summary: Request a market the engine does not cover yet
+      description: >-
+        Aktion „Request This Market“ des Zustands `marketUnavailable`. Oeffentlich
+        (Gast mit `guest_key`) oder mit JWT; die Identitaet kommt nur aus dem
+        geprueften JWT, eine `user_id` im Body wird ignoriert. Eine Zeile je
+        Anfragendem und Markt, eine Wiederholung aktualisiert sie. Ein Update zur
+        Verfuegbarkeit (`notify`) gibt es nur mit Konto; fuer Gaeste wird keine
+        E-Mail gespeichert.
+      parameters:
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [market]
+              properties:
+                market:
+                  type: string
+                  description: ISO-Laendercode, zwei Buchstaben (Gross-/Kleinschreibung egal)
+                  example: BR
+                domains:
+                  type: array
+                  description: Bereichs-Slugs des Wizards; unbekannte werden verworfen
+                  items:
+                    type: string
+                  example: [tax-vat, data-privacy]
+                guest_key:
+                  type: string
+                  pattern: '^[A-Za-z0-9_-]{8,64}$'
+                  description: Pflicht ohne JWT
+                notify:
+                  type: boolean
+                  default: false
+                  description: Update per Mail, sobald der Markt abgedeckt ist — nur mit Konto
+      responses:
+        '200':
+          description: Anfrage gespeichert (neu oder aktualisiert)
+          headers:
+            x-correlation-id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  market:
+                    type: string
+                  notify:
+                    type: boolean
+        '400':
+          description: Body kein JSON (`INVALID_JSON`), Markt falsch geformt oder `guest_key` fehlt (`VALIDATION_ERROR`)
+          headers:
+            x-correlation-id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: '`notify` ohne Konto (`NOTIFY_REQUIRES_ACCOUNT`)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Der Markt ist bereits abgedeckt (`MARKET_COVERED`)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Speichern gescheitert (`INTERNAL`); Ursache im Log unter der Referenz-ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /engagement:
     post:
       summary: Create an engagement request
