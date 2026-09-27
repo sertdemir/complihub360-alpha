@@ -163,7 +163,16 @@
     "outcomeMore_one": "{{count}} more",
     "outcomeMore_other": "{{count}} more",
     "outcomeMoreLink": "answer on the appointments page",
-    "upNext": "Up next"
+    "upNext": "Up next",
+    "unitDoneTip": "Completed obligation",
+    "unitOpenTip": "Open obligation",
+    "sessionUnnamed": "No name yet",
+    "colSession": "Session",
+    "colMarkets": "Markets",
+    "colDuties": "Obligations",
+    "colEdited": "Edited",
+    "sessionDone": "<b>{{done}} of {{total}}</b> done",
+    "sessionNoHigh": "none high"
   },
   "sessions": {
     "title": "Your compliance <accent>sessions</accent>.",

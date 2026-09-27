@@ -1486,6 +1486,17 @@ describe('GET /api/v1/dashboard', () => {
             .reduce((a, b) => a + b, 0);
         expect(summe).toBe(r.body.obligations.open);
     });
+
+    it('liefert je Sitzung die Maerkte und die offenen Pflichten nach Stufe', async () => {
+        // Dashboard S2/S3 (2026-09-27): ein Kaestchen je Pflicht, nach Risiko
+        // gefaerbt — die Stufen muessen sich zu "open" der Sitzung summieren.
+        seedSession({ country: 'DE', markets: ['FR', 'DE'] });
+        const r = await api('/api/v1/dashboard', { auth: 'jwt' });
+        const s = r.body.sessions.items[0];
+        expect(s.markets).toEqual(['DE', 'FR']);
+        const summe = Object.values(s.by_severity as Record<string, number>).reduce((a, b) => a + b, 0);
+        expect(summe).toBe(s.open);
+    });
 });
 
 

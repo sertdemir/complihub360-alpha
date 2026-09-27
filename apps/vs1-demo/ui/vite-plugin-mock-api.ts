@@ -76,10 +76,10 @@ function requests() {
 // Veraenderlich: Duplikate, Umbenennen und Archivieren wirken fuer die
 // Laufzeit des Dev-Servers — sonst sieht man eine angelegte Kopie nie.
 const SESSIONS: Array<Record<string, any>> = [
-  { id: uuid(1, 1), label: 'EU-Expansion Shop', country: 'DE', markets: ['DE', 'IT', 'ES'], categories: ['tax-vat', 'product-packaging', 'data-privacy'], answers: { country: 'DE', markets: ['DE', 'IT', 'ES'], categories: ['tax-vat', 'product-packaging', 'data-privacy'], businessType: 'ecommerce', businessTypeNote: 'D2C e-commerce', marketScope: 'eu' }, status: 'active', risk_summary: { level: 'high' }, created_at: iso(-20), updated_at: iso(-2), open: 13, total: 14, severity: 'critical' },
-  { id: uuid(2, 1), label: 'UK nach Brexit', country: 'UK', markets: ['UK'], categories: ['tax-vat'], status: 'active', risk_summary: { level: 'high' }, created_at: iso(-9), updated_at: iso(-9), open: 6, total: 8, severity: 'high' },
-  { id: uuid(3, 1), label: null, country: 'ES', markets: ['ES'], categories: ['marketing-seo', 'legal-advisory'], status: 'active', risk_summary: { level: 'low' }, created_at: iso(-120), updated_at: iso(-100), open: 7, total: 9, severity: 'low' },
-  { id: uuid(4, 1), label: 'Archiv: Testlauf 2025', country: 'DE', markets: ['DE'], categories: ['tax-vat'], status: 'archived', risk_summary: { level: 'low' }, created_at: iso(-200), updated_at: iso(-190), open: 0, total: 5, severity: null },
+  { id: uuid(1, 1), label: 'EU-Expansion Shop', country: 'DE', markets: ['DE', 'IT', 'ES'], categories: ['tax-vat', 'product-packaging', 'data-privacy'], answers: { country: 'DE', markets: ['DE', 'IT', 'ES'], categories: ['tax-vat', 'product-packaging', 'data-privacy'], businessType: 'ecommerce', businessTypeNote: 'D2C e-commerce', marketScope: 'eu' }, status: 'active', risk_summary: { level: 'high' }, created_at: iso(-20), updated_at: iso(-2), open: 13, total: 14, severity: 'critical', by_severity: { critical: 2, high: 7, medium: 3, low: 1 } },
+  { id: uuid(2, 1), label: 'UK nach Brexit', country: 'UK', markets: ['UK'], categories: ['tax-vat'], status: 'active', risk_summary: { level: 'high' }, created_at: iso(-9), updated_at: iso(-9), open: 6, total: 8, severity: 'high', by_severity: { critical: 0, high: 3, medium: 2, low: 1 } },
+  { id: uuid(3, 1), label: null, country: 'ES', markets: ['ES'], categories: ['marketing-seo', 'legal-advisory'], status: 'active', risk_summary: { level: 'low' }, created_at: iso(-120), updated_at: iso(-100), open: 7, total: 9, severity: 'low', by_severity: { critical: 0, high: 0, medium: 0, low: 7 } },
+  { id: uuid(4, 1), label: 'Archiv: Testlauf 2025', country: 'DE', markets: ['DE'], categories: ['tax-vat'], status: 'archived', risk_summary: { level: 'low' }, created_at: iso(-200), updated_at: iso(-190), open: 0, total: 5, severity: null, by_severity: { critical: 0, high: 0, medium: 0, low: 0 } },
 ];
 
 // Pflichten der Sitzung "EU-Expansion Shop" — Titel auf Deutsch, weil das
@@ -339,7 +339,7 @@ function dashboard() {
   const aktive = SESSIONS.filter((s) => s.status === 'active');
   return {
     ok: true,
-    sessions: { total: aktive.length, items: aktive.map(({ id, label, country, categories, open, total, severity, created_at, updated_at }) => ({ id, label, country, categories, open, total, severity, created_at, updated_at })) },
+    sessions: { total: aktive.length, items: aktive.map(({ id, label, country, markets, categories, open, total, severity, by_severity, created_at, updated_at }) => ({ id, label, country, markets: [...new Set([country, ...(markets ?? [])].filter(Boolean))], categories, open, total, severity, by_severity, created_at, updated_at })) },
     obligations: {
       open: 26, by_severity: { critical: 4, high: 11, medium: 8, low: 3 },
       by_market: { DE: 13, ES: 7, UK: 6 }, by_market_high: { DE: 9, ES: 3, UK: 3 },
@@ -526,7 +526,7 @@ function route(method: string, path: string, body: Record<string, unknown> = {})
     if (p[0] === 'bookings') return { ok: true, bookings: bookings() };
     if (p[0] === 'requests') return { ok: true, requests: requests() };
     if (p[0] === 'notifications') { const rows = notifications(); return { ok: true, notifications: rows, unread: rows.filter((r) => !r.read_at).length }; }
-    if (p[0] === 'sessions') return { ok: true, sessions: SESSIONS.map(({ open: _open, total: _total, severity: _severity, ...s }) => s) };
+    if (p[0] === 'sessions') return { ok: true, sessions: SESSIONS.map(({ open: _open, total: _total, severity: _severity, by_severity: _bySeverity, ...s }) => s) };
     if (p[0] === 'session' && p[2] === 'obligations') return obligations(p[1]);
     if (p[0] === 'engagement' && p.length === 2) return engagement(p[1]);
     // Phase 2 · Onboarding: der Demo-Anbieter steckt in der Pruefung (Rueckfrage offen).
