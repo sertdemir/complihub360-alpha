@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
 import { render, screen, within, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { AnonProvider, SearchLaw } from '../api/search';
+import { ApiError } from '../api/client';
 // Imported statically on purpose. Pulling the page in with await import()
 // inside the test body charged the whole cold module graph (page + jspdf +
 // lucide + router) to the first test's 5s budget, which CI — running this
@@ -174,7 +175,7 @@ describe('ResultsRiskMap provider teaser', () => {
   });
 
   it('shows the real count and the real match percentages', async () => {
-    runSearch.mockResolvedValue({ providers: [prov('a', 87), prov('b', 60)], laws: [] });
+    runSearch.mockResolvedValue({ providers: [prov('a', 87), prov('b', 60)], laws: [law({ id: 'vat', title: 'VAT return' })] });
     renderPage();
 
     expect(await screen.findByText('partners.eyebrow#2')).toBeInTheDocument();
@@ -188,7 +189,7 @@ describe('ResultsRiskMap provider teaser', () => {
   it('counts every match but shows at most three cards', async () => {
     runSearch.mockResolvedValue({
       providers: [prov('a', 100), prov('b', 87), prov('c', 73), prov('d', 60), prov('e', 60)],
-      laws: [],
+      laws: [law({ id: 'vat', title: 'VAT return' })],
     });
     renderPage();
 
@@ -267,7 +268,8 @@ describe('ResultsRiskMap while loading and on failure', () => {
     expect(screen.getByText('common:states.riskMapLoading.message')).toBeInTheDocument();
     expect(screen.queryByText(FORMER_FIXTURE_TITLE)).not.toBeInTheDocument();
     expect(screen.queryByText('obligations identified')).not.toBeInTheDocument();
-    expect(screen.queryByText('table.obligation')).not.toBeInTheDocument();
+    // Only the skeleton's column heads — decorative, hidden from assistive tech.
+    expect(screen.getByText('table.obligation').closest('[aria-hidden="true"]')).not.toBeNull();
     // No map yet — so nothing to save, and no "Here's what applies to you."
     expect(screen.queryByText('topbar.saveMap')).not.toBeInTheDocument();
     expect(screen.queryByText('cta.title')).not.toBeInTheDocument();
@@ -304,5 +306,93 @@ describe('ResultsRiskMap while loading and on failure', () => {
     expect(await screen.findByText('common:states.riskMapFailed.heading')).toBeInTheDocument();
     expect(screen.queryByText('snapshot.kpiTotal')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'snapshot.exportPdf' })).not.toBeInTheDocument();
+  });
+});
+
+// ─── Risk map · the states as designed (Canvas A3 · B3 · C3, Figma 3390:14594) ─
+// The state is the page: eyebrow, h1, one sentence, then what the state needs.
+// Scope box only with a wizard profile, Technical details only with a real
+// reference from the API client — never an invented one.
+
+describe('ResultsRiskMap states as designed', () => {
+  const PROFILE = { country: 'DE', markets: ['NL', 'BR'], categories: ['tax-vat', 'data-privacy'] };
+  beforeEach(() => {
+    localStorage.setItem('ch360_last_profile', JSON.stringify(PROFILE));
+  });
+  afterEach(() => {
+    localStorage.removeItem('ch360_last_profile');
+  });
+
+  it('puts the state in the page heading, not in a banner under a hidden one', async () => {
+    runSearch.mockReturnValue(new Promise(() => {}));
+    renderPage();
+
+    expect(await screen.findByRole('heading', { level: 1, name: 'common:states.riskMapLoading.heading' })).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('common:states.riskMapLoading.message');
+    // Nothing to assess yet, so no scope box while loading.
+    expect(screen.queryByText('common:states.scope.triedToAssess')).not.toBeInTheDocument();
+  });
+
+  it('names what we tried to assess and gives the reference when the search fails', async () => {
+    runSearch.mockRejectedValue(new ApiError('Search failed', 500, 'ref-3f2b8c1e', '2026-09-22T14:32:07.000Z'));
+    renderPage();
+
+    expect(await screen.findByRole('heading', { level: 1, name: 'common:states.riskMapFailed.heading' })).toBeInTheDocument();
+    const scope = screen.getByRole('region', { name: 'common:states.scope.triedToAssess' });
+    // The request as it was made — including a market the engine cannot check.
+    expect(within(scope).getByText('Germany')).toBeInTheDocument();
+    expect(within(scope).getByText('Netherlands')).toBeInTheDocument();
+    expect(within(scope).getByText('Brazil')).toBeInTheDocument();
+    expect(within(scope).getByText('Tax & VAT')).toBeInTheDocument();
+    expect(within(scope).getByText('Data & Privacy')).toBeInTheDocument();
+
+    // Closed by default; opens to the id and the UTC time support searches for.
+    const toggle = screen.getByRole('button', { name: 'common:states.technicalDetails' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByText('ref-3f2b8c1e')).not.toBeInTheDocument();
+    fireEvent.click(toggle);
+    expect(await screen.findByText('ref-3f2b8c1e')).toBeInTheDocument();
+    expect(screen.getByText('2026-09-22 14:32:07 UTC')).toBeInTheDocument();
+  });
+
+  it('shows no technical details when there is no reference to give', async () => {
+    runSearch.mockRejectedValue(new Error('not from the API client'));
+    renderPage();
+
+    expect(await screen.findByRole('heading', { level: 1, name: 'common:states.riskMapFailed.heading' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'common:states.technicalDetails' })).not.toBeInTheDocument();
+  });
+
+  it('lists only the markets the engine actually checked when it finds nothing', async () => {
+    runSearch.mockResolvedValue({ providers: [], laws: [] });
+    renderPage();
+
+    const scope = await screen.findByRole('region', { name: 'common:states.scope.checked' });
+    expect(within(scope).getByText('Germany')).toBeInTheDocument();
+    expect(within(scope).getByText('Netherlands')).toBeInTheDocument();
+    // No country profile for BR — the engine drops it, so we must not say we checked it.
+    expect(within(scope).queryByText('Brazil')).not.toBeInTheDocument();
+  });
+
+  it('offers no numbers, no providers and no sign-up band when nothing was identified', async () => {
+    runSearch.mockResolvedValue({ providers: [prov('a', 87)], laws: [] });
+    renderPage();
+
+    expect(await screen.findByRole('heading', { level: 1, name: 'common:states.noRequirements.heading' })).toBeInTheDocument();
+    expect(screen.queryByText('obligations identified')).not.toBeInTheDocument();
+    expect(screen.queryAllByTestId('teaser-card')).toHaveLength(0);
+    expect(screen.queryByText('partners.none')).not.toBeInTheDocument();
+    expect(screen.queryByText('cta.title')).not.toBeInTheDocument();
+    // The map exists and can still be saved from the top bar.
+    expect(screen.getByText('topbar.saveMap')).toBeInTheDocument();
+  });
+
+  it('shows no scope box for a guest without a wizard profile', async () => {
+    localStorage.removeItem('ch360_last_profile');
+    runSearch.mockResolvedValue({ providers: [], laws: [] });
+    renderPage();
+
+    expect(await screen.findByRole('heading', { level: 1, name: 'common:states.noRequirements.heading' })).toBeInTheDocument();
+    expect(screen.queryByText('common:states.scope.checked')).not.toBeInTheDocument();
   });
 });

@@ -1,7 +1,7 @@
 ---
 title: "Referenz-ID für \"Technical details\" (Risk Map failed, Canvas-Wahl B3)"
 assignee: "Claude"
-status: "review"
+status: "done"
 ---
 
 # Referenz-ID für "Technical details"
@@ -82,3 +82,4 @@ Betroffen: **Copy und Microcopy** (fünf neu abgenommene Strings als Vertrag).
 ## Agent Audit Log
 
 - [2026-09-22] **Claude**: Server (Fehlerzweig, Validierung, Expose), Client (alle Fehlerwege mit ID + UTC), Hook, Copy, OpenAPI; 13 Tests, 4 Sabotagen. (Status: review)
+- [2026-09-27] **Claude**: PR #211 gemerged. Die Fläche dazu (Technical details unter B3) kommt mit TKT-RM-STATES-03. (Status: done)
