@@ -163,7 +163,16 @@
     "outcomeMore_one": "{{count}} más",
     "outcomeMore_other": "{{count}} más",
     "outcomeMoreLink": "responder en la página de citas",
-    "upNext": "A continuación"
+    "upNext": "A continuación",
+    "unitDoneTip": "Obligación completada",
+    "unitOpenTip": "Obligación abierta",
+    "sessionUnnamed": "Sin nombre propio",
+    "colSession": "Sesión",
+    "colMarkets": "Mercados",
+    "colDuties": "Obligaciones",
+    "colEdited": "Editada",
+    "sessionDone": "<b>{{done}} de {{total}}</b> completadas",
+    "sessionNoHigh": "ninguna alta"
   },
   "sessions": {
     "title": "Sus <accent>sesiones</accent> de cumplimiento.",

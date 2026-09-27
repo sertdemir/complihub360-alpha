@@ -13,6 +13,7 @@ import { handleAssistantChat, handleAssistantCheckout, handleAssistantVerify } f
 import { handleDomain } from "./domain.js";
 import { handleAuthAdopt } from "./adoption.js";
 import { handleDashboard, SLUG_TO_ENGINE } from "./dashboard.js";
+import { checkMarketRequest } from "./marketRequests.js";
 import { notify, handleNotificationsList, handleNotificationsRead } from "./notifications.js";
 import { handleBillingRun, handleBillingPreview, syncOpenInvoices } from "./billing.js";
 import { checkVatId } from "./vies.js";
@@ -223,6 +224,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     const PUBLIC_ROUTES: Array<[string, RegExp]> = [
         ['POST', /^\/api\/v1\/search$/],                   // guest risk map
         ['POST', /^\/api\/v1\/session$/],                  // guest wizard-session save (guest_key)
+        ['POST', /^\/api\/v1\/market-requests$/],          // „Request This Market“ (guest_key or JWT)
         ['GET', /^\/api\/v1\/sessions(\?|$)/],             // guest session list (guest_key = bearer)
         ['POST', /^\/api\/v1\/provider\/intake$/],         // intake token checked in-handler
         ['GET', /^\/api\/v1\/provider\/magic\//],          // single-use token IS the credential
@@ -1846,6 +1848,42 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 structuredLog('error', 'Alert prefs save failed', { correlationId, errorCode: 'ERR_ALERT_PREFS', severity: 'error', route: req.url });
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Alert prefs save failed', correlationId }));
+            }
+        });
+    } else if (req.method === 'POST' && req.url === '/api/v1/market-requests') {
+        // „Request This Market“ (Zustand marketUnavailable). Pruefung und Zeile
+        // in marketRequests.ts; hier nur Upsert und Protokoll. Das Protokoll
+        // traegt den Markt, nie den guest_key.
+        let body = '';
+        req.on('data', (chunk: any) => body += chunk.toString());
+        req.on('end', async () => {
+            res.setHeader('x-correlation-id', correlationId);
+            let input: Record<string, unknown>;
+            try {
+                input = JSON.parse(body || '{}');
+            } catch {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INVALID_JSON', message: 'Invalid JSON payload', correlationId }));
+                return;
+            }
+            const check = checkMarketRequest(input, authUserId);
+            if (!check.ok) {
+                res.writeHead(check.status, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: check.errorCode, message: check.message, correlationId }));
+                return;
+            }
+            try {
+                await supabaseApi.upsert('market_requests', 'requester_key,market', check.row);
+                await supabaseApi.insert('event_log', {
+                    type: 'market_requested',
+                    payload: { market: check.row.market, account: !!check.row.user_id, notify: check.row.notify },
+                });
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, market: check.row.market, notify: check.row.notify }));
+            } catch (err) {
+                structuredLog('error', 'Market request failed', { correlationId, errorCode: 'ERR_MARKET_REQUEST', severity: 'error', route: req.url, detail: String(err).slice(0, 500) });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Market request failed', correlationId }));
             }
         });
     } else if (req.method === 'POST' && req.url === '/api/v1/session') {

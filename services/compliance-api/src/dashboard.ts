@@ -53,13 +53,20 @@ interface SessionRow {
 /** Die Pflichten EINER Sitzung, so wie die Ergebnisseite sie auch rechnet:
  *  dieselbe Engine, dieselben Eingaben. Faellt die Engine ueber ein
  *  unbekanntes Land, bleibt die Liste leer statt den Aufruf zu sprengen. */
-export function obligationsForSession(row: SessionRow): EnrichedSubdomain[] {
+/** Die Laender einer Sitzung: Heimatland plus Zielmaerkte, ohne Doppel —
+ *  dieselbe Liste, fuer die die Engine rechnet. */
+export function marketsForSession(row: SessionRow): CountryCode[] {
     const answers = (row.answers ?? {}) as Record<string, unknown>;
     const markets = Array.isArray(row.markets) && row.markets.length
         ? row.markets
         : (Array.isArray(answers.markets) ? (answers.markets as string[]) : []);
-    const countries = [...new Set([row.country || answers.country || 'DE', ...markets])]
+    return [...new Set([row.country || answers.country || 'DE', ...markets])]
         .filter((c): c is CountryCode => isKnownCountry(String(c)));
+}
+
+export function obligationsForSession(row: SessionRow): EnrichedSubdomain[] {
+    const answers = (row.answers ?? {}) as Record<string, unknown>;
+    const countries = marketsForSession(row);
     if (!countries.length) return [];
 
     const slugs = (Array.isArray(row.categories) && row.categories.length
@@ -132,10 +139,14 @@ export async function handleDashboard(
             const fertig = status[s.id] ?? new Set<string>();
             const rest = alle.filter((o) => !fertig.has(o.id));
             let hoechste: string | null = null;
+            // Je Sitzung die offenen Pflichten nach Stufe (Dashboard S2/S3:
+            // ein Kaestchen je Pflicht, nach Risiko gefaerbt).
+            const stufen: Record<string, number> = { critical: 0, high: 0, medium: 0, low: 0 };
             for (const o of rest) {
                 offen += 1;
                 const sev = String(o.severity ?? 'low');
                 bySeverity[sev] = (bySeverity[sev] ?? 0) + 1;
+                stufen[sev] = (stufen[sev] ?? 0) + 1;
                 if (hoechste === null || RANG[sev] > RANG[hoechste]) hoechste = sev;
                 const schwer = sev === 'high' || sev === 'critical';
                 byDomain[String(o.domain)] = (byDomain[String(o.domain)] ?? 0) + 1;
@@ -152,8 +163,10 @@ export async function handleDashboard(
                 id: s.id,
                 label: s.label,
                 country: s.country,
+                markets: marketsForSession(s),
                 categories: s.categories ?? [],
                 open: rest.length,
+                by_severity: stufen,
                 total: alle.length,
                 severity: hoechste,
                 created_at: s.created_at,

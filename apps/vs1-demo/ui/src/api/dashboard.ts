@@ -10,9 +10,14 @@ export interface DashboardSession {
   id: string;
   label: string | null;
   country: string | null;
+  /** Heimatland plus Zielmaerkte, so wie die Engine rechnet (seit 2026-09-27;
+   *  aeltere Server liefern es nicht). */
+  markets?: string[];
   categories: string[];
   /** Pflichten, die weder erledigt noch als nicht zutreffend markiert sind. */
   open: number;
+  /** Die offenen Pflichten nach Stufe — summiert zu `open` (seit 2026-09-27). */
+  by_severity?: Partial<Record<'critical' | 'high' | 'medium' | 'low', number>>;
   total: number;
   /** Hoechster Schweregrad unter den OFFENEN Pflichten; null = nichts offen. */
   severity: 'critical' | 'high' | 'medium' | 'low' | null;

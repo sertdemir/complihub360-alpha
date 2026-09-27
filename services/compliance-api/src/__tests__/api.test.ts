@@ -1487,6 +1487,17 @@ describe('GET /api/v1/dashboard', () => {
             .reduce((a, b) => a + b, 0);
         expect(summe).toBe(r.body.obligations.open);
     });
+
+    it('liefert je Sitzung die Maerkte und die offenen Pflichten nach Stufe', async () => {
+        // Dashboard S2/S3 (2026-09-27): ein Kaestchen je Pflicht, nach Risiko
+        // gefaerbt — die Stufen muessen sich zu "open" der Sitzung summieren.
+        seedSession({ country: 'DE', markets: ['FR', 'DE'] });
+        const r = await api('/api/v1/dashboard', { auth: 'jwt' });
+        const s = r.body.sessions.items[0];
+        expect(s.markets).toEqual(['DE', 'FR']);
+        const summe = Object.values(s.by_severity as Record<string, number>).reduce((a, b) => a + b, 0);
+        expect(summe).toBe(s.open);
+    });
 });
 
 
@@ -2086,5 +2097,76 @@ describe('Watcher: Nachweis-Ablauf', () => {
         } finally {
             delete process.env.WATCHERS_SHADOW;
         }
+    });
+});
+
+// ─── „Request This Market“ (Zustand marketUnavailable) ───────────────────────
+// Entscheidung 2026-09-27: anfragen darf jeder, ein Update gibt es nur mit
+// Konto, und fuer Gaeste speichern wir keine Adresse. Die Identitaet kommt
+// allein aus dem geprueften JWT.
+
+describe('POST /api/v1/market-requests', () => {
+    const post = (body: Record<string, unknown>, auth: 'none' | 'jwt' = 'none') =>
+        api('/api/v1/market-requests', { method: 'POST', auth, body: JSON.stringify(body) });
+
+    it('lets a guest request a market the engine does not cover — one row, no address', async () => {
+        const res = await post({ market: 'br', domains: ['tax-vat', 'data-privacy'], guest_key: 'guest-abc-123' });
+        expect(res.status).toBe(200);
+        expect(res.body).toMatchObject({ ok: true, market: 'BR', notify: false });
+
+        const rows = db.market_requests ?? [];
+        expect(rows).toHaveLength(1);
+        expect(rows[0]).toMatchObject({ requester_key: 'guest:guest-abc-123', guest_key: 'guest-abc-123', user_id: null, market: 'BR', notify: false });
+        expect(Object.keys(rows[0])).not.toContain('email');
+        // Das Protokoll zaehlt den Markt, nicht den Gast.
+        const ev = (db.event_log ?? []).find((e) => e.type === 'market_requested');
+        expect(ev?.payload).toEqual({ market: 'BR', account: false, notify: false });
+    });
+
+    it('counts a person once per market — asking again updates the row', async () => {
+        await post({ market: 'BR', domains: ['tax-vat'], guest_key: 'guest-abc-123' });
+        await post({ market: 'BR', domains: ['tax-vat', 'environment'], guest_key: 'guest-abc-123' });
+        const rows = db.market_requests ?? [];
+        expect(rows).toHaveLength(1);
+        expect(rows[0].domains).toEqual(['tax-vat', 'environment']);
+    });
+
+    it('refuses an availability update for a guest — we would need an address', async () => {
+        const res = await post({ market: 'BR', guest_key: 'guest-abc-123', notify: true });
+        expect(res.status).toBe(403);
+        expect(res.body.errorCode).toBe('NOTIFY_REQUIRES_ACCOUNT');
+        expect(db.market_requests ?? []).toHaveLength(0);
+    });
+
+    it('takes the account from the token, never from the body', async () => {
+        const someoneElse = randomUUID();
+        const res = await post({ market: 'AR', notify: true, user_id: someoneElse, guest_key: 'guest-abc-123' }, 'jwt');
+        expect(res.status).toBe(200);
+        expect(res.body.notify).toBe(true);
+        const rows = db.market_requests ?? [];
+        expect(rows).toHaveLength(1);
+        expect(rows[0]).toMatchObject({ requester_key: `user:${USER_ID}`, user_id: USER_ID, guest_key: null, notify: true });
+    });
+
+    it('says so when the market is already covered', async () => {
+        const res = await post({ market: 'DE', guest_key: 'guest-abc-123' });
+        expect(res.status).toBe(409);
+        expect(res.body.errorCode).toBe('MARKET_COVERED');
+        expect(db.market_requests ?? []).toHaveLength(0);
+    });
+
+    it('rejects a malformed market, a missing guest key and unknown areas', async () => {
+        expect((await post({ market: 'Brazil', guest_key: 'guest-abc-123' })).status).toBe(400);
+        expect((await post({ market: 'BR' })).status).toBe(400);
+        expect((await post({ market: 'BR', guest_key: 'a b' })).status).toBe(400);
+        await post({ market: 'BR', domains: ['tax-vat', 'not-a-domain', 42], guest_key: 'guest-abc-123' });
+        expect((db.market_requests ?? [])[0].domains).toEqual(['tax-vat']);
+    });
+
+    it('answers broken JSON with 400 and a reference', async () => {
+        const res = await api('/api/v1/market-requests', { method: 'POST', auth: 'none', body: '{broken' });
+        expect(res.status).toBe(400);
+        expect(res.body.errorCode).toBe('INVALID_JSON');
+        expect(typeof res.body.correlationId).toBe('string');
     });
 });

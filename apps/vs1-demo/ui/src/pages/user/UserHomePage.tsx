@@ -9,7 +9,6 @@ import { Button } from '../../components/ui/Button';
 import { Segment } from '../../components/compliance-areas';
 import { UnitGrid, unitsPer, useCountUp, useEntered, EASE } from '../../components/ui/Stats';
 import { EmptyState } from '../../components/user/EmptyState';
-import { SessionTile } from '../../components/user/SessionTile';
 import { fetchDashboard, EMPTY_DASHBOARD, type DashboardData, type DashboardSession } from '../../api/dashboard';
 import { fetchUserRequests, type UserRequestRow } from '../../api/requests';
 import { fetchUserBookings, markOutcome, type UserBooking } from '../../api/bookings';
@@ -33,9 +32,11 @@ import { ladeIcs } from './TerminePage';
 //       Termine seit Canvas T2 (2026-09-27): oben, was eine Antwort braucht
 //       (vergangene Termine ohne Ergebnis), darunter "Als Naechstes" kompakt
 //       mit Thema aus der Anfrage beim selben Anbieter.
-//   6B  Sitzungen als Kacheln mit Risiko-Tag, Bereichs-/Land-Chips, Balken
-//       und "Oeffnen"-Link direkt auf die Sitzung — dieselbe Kachel wie auf der
-//       Sitzungen-Seite (SessionTile, Canvas 3B vom 2026-09-09).
+//   6B  Sitzungen seit Canvas S3/S2 (2026-09-27) in der Hauptspalte unter den
+//       Anfragen: ab md eine Liste, mobil wischbare Karten. Jede Pflicht ein
+//       Kaestchen (offen nach Risiko, erledigt hell), alle Maerkte, die ganze
+//       Zeile bzw. Karte klickbar, zuletzt bearbeitet zuerst. Die
+//       Sitzungen-Seite behaelt vorerst ihre SessionTile.
 //
 // Die Zahlen kommen weiterhin aus drei Aufrufen: /api/v1/dashboard (Sitzungen
 // und Pflichten, serverseitig durch die Engine gerechnet), /requests,
@@ -43,11 +44,11 @@ import { ladeIcs } from './TerminePage';
 // Was bewusst FEHLT: eine Kachel "Naechste Frist" — die Kadenzen der Engine
 // sind redaktionelle Rhythmen, keine Termine.
 
-type Sev = 'critical' | 'high' | 'medium' | 'low';
-
 const REST_CLS = 'bg-[#9CB8B2] dark:bg-brand/40';
+const DONE_CLS = 'bg-[#E3EBE9] ring-1 ring-inset ring-[#C9D6D3] dark:bg-white/10 dark:ring-white/15';
+const SESS_GRID = 'grid grid-cols-[minmax(0,1.5fr)_104px_minmax(172px,1.3fr)_92px_auto] items-center gap-4';
+const MARKT_CHIP = 'rounded-full border border-stroke px-[7px] py-[1px] text-[10.5px] font-bold text-fg';
 const CARD = 'rounded-xl border border-stroke-subtle bg-surface shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]';
-const TEXT_LINK = 'text-body-2xs font-bold text-brand underline underline-offset-[3px] transition-colors hover:text-brand-700';
 
 /** Hochzaehlende Zahl (Z2) — dieselbe Kurve wie die Ringe vorher. */
 function CountUp({ value, on, className }: { value: number; on: boolean; className?: string }) {
@@ -113,13 +114,6 @@ function kommende(bookings: UserBooking[]): UserBooking[] {
   return bookings
     .filter((b) => b.status === 'confirmed' && new Date(b.slotStart).getTime() > jetzt)
     .sort((a, b) => a.slotStart.localeCompare(b.slotStart));
-}
-
-/** Der Titel einer Sitzung: die eigene Bezeichnung, sonst Bereiche und Land. */
-function sitzungsTitel(s: DashboardSession, domainLabel: (k: string) => string): string {
-  if (s.label) return s.label;
-  const bereiche = s.categories.map((c) => domainLabel(c)).join(', ');
-  return [bereiche, s.country].filter(Boolean).join(' · ') || '—';
 }
 
 /** Datums-Blockmarke (5B) — Tag gross, Monat klein, wie auf der Termine-Seite. */
@@ -208,6 +202,27 @@ export function UserHomePage() {
     { key: 'l', n: niedrig, cls: 'bg-risk-low', label: t('home.unitLow'), tip: t('home.unitLowTip') },
   ];
   const proKaestchen = unitsPer(offen);
+
+  // Gespeicherte Sitzungen (S3/S2): zuletzt bearbeitet zuerst, hoechstens fuenf.
+  // EIN Massstab fuer alle Zeilen, sonst waeren die Kaestchen nicht vergleichbar.
+  const sitzungen = [...dash.sessions.items].sort((a, b) => b.updated_at.localeCompare(a.updated_at)).slice(0, 5);
+  const sitzungProKaestchen = unitsPer(Math.max(0, ...sitzungen.map((x) => x.total)), 40);
+  const sitzungTeile = (x: DashboardSession) => {
+    const b = x.by_severity;
+    const erledigt = { n: Math.max(0, x.total - x.open), cls: DONE_CLS, label: t('home.unitDoneTip') };
+    // Aeltere Server liefern keine Stufen: dann offen neutral statt geraten.
+    if (!b) return [{ n: x.open, cls: REST_CLS, label: t('home.unitOpenTip') }, erledigt];
+    return [
+      { n: (b.critical ?? 0) + (b.high ?? 0), cls: 'bg-risk-high', label: t('home.unitHighTip') },
+      { n: b.medium ?? 0, cls: 'bg-[#D4A017] dark:bg-risk-medium', label: t('home.unitMediumTip') },
+      { n: b.low ?? 0, cls: 'bg-risk-low', label: t('home.unitLowTip') },
+      erledigt,
+    ];
+  };
+  const sitzungName = (x: DashboardSession) => x.label || x.categories.map(domainLabel).join(', ') || '—';
+  const sitzungUnter = (x: DashboardSession) => (x.label ? x.categories.map(domainLabel).join(' · ') : t('home.sessionUnnamed'));
+  const sitzungMaerkte = (x: DashboardSession) => (x.markets?.length ? x.markets : [x.country].filter((c): c is string => !!c));
+  const sitzungHoch = (x: DashboardSession) => (x.by_severity ? (x.by_severity.critical ?? 0) + (x.by_severity.high ?? 0) : null);
   // Anfragen: wartet auf Sie (Antwort/Frist) · beim Anbieter (unbestaetigt) · laeuft.
   const laufen = Math.max(0, offeneAnfragen.length - aufSie.length - wartend);
   const anfrageTeile = [
@@ -548,6 +563,70 @@ export function UserHomePage() {
                   <p className="py-6 text-center text-body-xs text-fg-tertiary">{t('home.noRequests')}</p>
                 )}
               </div>
+
+              {/* Gespeicherte Sitzungen (Canvas S3 + S2, Nutzer-Wahl 2026-09-27):
+                  ab md eine Liste in der Hauptspalte, mobil Karten zum Wischen. */}
+              {sitzungen.length > 0 && (
+                <div className="md:rounded-xl md:border md:border-stroke-subtle md:bg-surface md:px-6 md:py-5 md:shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]">
+                  <SectionHead title={t('home.savedSessions')} count={String(dash.sessions.total)} to="dashboard/sessions" />
+
+                  {/* S3: Liste */}
+                  <div className="hidden md:block">
+                    <div aria-hidden="true" className={SESS_GRID + ' pb-2 text-[10.5px] font-extrabold uppercase tracking-[0.07em] text-fg-tertiary'}>
+                      <span>{t('home.colSession')}</span><span>{t('home.colMarkets')}</span><span>{t('home.colDuties')}</span><span>{t('home.colEdited')}</span><span />
+                    </div>
+                    <ul>
+                      {sitzungen.map((x, i) => (
+                        <li key={x.id} className="border-t border-stroke-subtle">
+                          <button type="button" onClick={() => oeffneSitzung(x.id)} className={SESS_GRID + ' group w-full py-3.5 text-left'}>
+                            <span className="min-w-0">
+                              <span className="block truncate text-body-xs font-bold text-fg">{sitzungName(x)}</span>
+                              <span className="block truncate text-body-3xs text-fg-tertiary">{sitzungUnter(x)}</span>
+                            </span>
+                            <span className="flex flex-wrap gap-1">{sitzungMaerkte(x).map((m) => <span key={m} className={MARKT_CHIP}>{m}</span>)}</span>
+                            <span className="min-w-0">
+                              <UnitGrid parts={sitzungTeile(x)} on={entered} fluid size={9} gap={3} perUnit={sitzungProKaestchen} delayOffset={i * 4} />
+                              <span className="mt-1 block text-body-3xs text-fg-tertiary">
+                                <Trans t={t} i18nKey="home.sessionDone" values={{ done: x.total - x.open, total: x.total }} components={{ b: <b className="text-fg" /> }} />
+                              </span>
+                            </span>
+                            <span className="text-body-3xs text-fg-tertiary">{relZeit(x.updated_at, locale)}</span>
+                            <span className="whitespace-nowrap text-body-2xs font-bold text-brand group-hover:underline group-hover:underline-offset-[3px]">{t('shared.open')} →</span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* S2: Karten, von rechts nach links wischbar; die naechste
+                      schaut an der Kante hervor, damit das Wischen sich anbietet. */}
+                  <ul className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] md:hidden [&::-webkit-scrollbar]:hidden">
+                    {sitzungen.map((x, i) => {
+                      const hochN = sitzungHoch(x);
+                      return (
+                        <li key={x.id} className="w-[84%] max-w-[340px] shrink-0 snap-start">
+                          <button type="button" onClick={() => oeffneSitzung(x.id)} className={CARD + ' flex h-full w-full flex-col gap-2.5 p-4 text-left'}>
+                            <span className="flex items-start justify-between gap-2">
+                              <span className="text-body-xs font-bold text-fg">{sitzungName(x)}</span>
+                              <span className="whitespace-nowrap text-body-2xs font-bold text-brand">{t('shared.open')} →</span>
+                            </span>
+                            <span className="-mt-1 text-body-3xs text-fg-tertiary">{sitzungUnter(x)}</span>
+                            <span className="flex flex-wrap gap-1">{sitzungMaerkte(x).map((m) => <span key={m} className={MARKT_CHIP}>{m}</span>)}</span>
+                            <UnitGrid parts={sitzungTeile(x)} on={entered} fluid size={11} gap={3} perUnit={sitzungProKaestchen} delayOffset={i * 4} />
+                            <span className="mt-auto flex justify-between gap-2 text-body-3xs text-fg-tertiary">
+                              <span>
+                                <Trans t={t} i18nKey="home.sessionDone" values={{ done: x.total - x.open, total: x.total }} components={{ b: <b className="text-fg" /> }} />
+                                {hochN !== null && <> · {hochN > 0 ? <b className="text-risk-high">{t('home.dutiesHigh', { count: hochN })}</b> : t('home.sessionNoHigh')}</>}
+                              </span>
+                              <span className="whitespace-nowrap">{relZeit(x.updated_at, locale)}</span>
+                            </span>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
             </div>
 
             {/* Rechte Spalte (5B): nur noch Termine */}
@@ -609,33 +688,6 @@ export function UserHomePage() {
             </div>
           </div>
 
-          {/* 6B: Gespeicherte Sitzungen als Kacheln mit Risiko-Tag und Chips */}
-          {dash.sessions.items.length > 0 && (
-            <div className="mt-[18px]">
-              <SectionHead title={t('home.savedSessions')} count={String(dash.sessions.total)} to="dashboard/sessions" />
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {dash.sessions.items.slice(0, 3).map((s, i) => (
-                  <SessionTile
-                    key={s.id}
-                    title={sitzungsTitel(s, domainLabel)}
-                    severity={(s.severity ?? 'low') as Sev}
-                    domains={s.categories.map(domainLabel)}
-                    country={s.country}
-                    open={s.open}
-                    total={s.total}
-                    updatedLabel={relZeit(s.updated_at, locale)}
-                    entered={entered}
-                    index={i}
-                    footer={
-                      <div className="flex justify-end">
-                        <button type="button" onClick={() => oeffneSitzung(s.id)} className={TEXT_LINK}>{t('shared.open')}</button>
-                      </div>
-                    }
-                  />
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </UserShell>

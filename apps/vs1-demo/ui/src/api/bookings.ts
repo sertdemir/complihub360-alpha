@@ -1,6 +1,7 @@
 import { myProviderKey } from './provider';
 import { apiFetch } from './client';
 import type { RankBasis } from './search';
+import { isMockApi } from '../lib/supabase'; // TEMP-DUMMY-TERMINE
 
 // ─── Bookings (Termine) — user side ──────────────────────────────────────────
 // Matchmaking v2: the booking IS the paid lead; provider identity is revealed
@@ -48,7 +49,43 @@ export function providerWebsiteHref(publicRef: string): string {
   return `${base}/api/v1/p/${publicRef}/website`;
 }
 
+// ─── TEMP-DUMMY-TERMINE (2026-09-27) ─────────────────────────────────────────
+// Nutzer-Wunsch fuer das Review auf Staging: die Termine-Karte war dort leer.
+// Greift NUR im Staging-Build (VITE_DEMO_LOGIN=1, gesetzt allein in
+// deploy-staging.yml) und nur, wenn keine echten Termine kommen. Produktion und
+// der lokale Mock sind unberuehrt. Wieder entfernen: diesen Block, den
+// Fallback in fetchUserBookings und den Import von isMockApi (Suche nach
+// "TEMP-DUMMY-TERMINE").
+const DUMMY_TERMINE_AKTIV = import.meta.env.VITE_DEMO_LOGIN === '1' && !isMockApi;
+function dummyTermine(): UserBooking[] {
+  const um = (tage: number, stunde: number) => {
+    const d = new Date(); d.setDate(d.getDate() + tage); d.setHours(stunde, 0, 0, 0); return d.toISOString();
+  };
+  const t = (id: string, ref: string, name: string, descriptor: string, region: string, tage: number, stunde: number): UserBooking => ({
+    id, publicRef: ref, providerName: name, providerDescriptor: descriptor, providerRegion: region,
+    providerWebsite: null, identityRevealed: true,
+    slotStart: um(tage, stunde), slotEnd: new Date(new Date(um(tage, stunde)).getTime() + 30 * 60_000).toISOString(),
+    status: 'confirmed', message: null,
+  });
+  return [
+    t('dummy-b1', 'd0d0d0d0a001', 'Studio Bianchi & Partner', 'Tax & VAT · Norditalien', 'Norditalien', -1, 14),
+    t('dummy-b2', 'd0d0d0d0a002', 'OSS Experts GmbH', 'Tax & VAT · Berlin', 'Berlin', -3, 10),
+    t('dummy-b3', 'd0d0d0d0a003', 'Schmidt & Partner Steuerberatung', 'Tax & VAT · Norddeutschland', 'Norddeutschland', 1, 9),
+    t('dummy-b4', 'd0d0d0d0a004', 'LUCID Registrierungsdienst Hamburg', 'Packaging · Hamburg', 'Hamburg', 3, 11),
+    t('dummy-b5', 'd0d0d0d0a005', 'Dahlmann CPA', 'Tax & VAT · USA', 'USA', 6, 15),
+  ];
+}
+
 export async function fetchUserBookings(): Promise<UserBooking[]> {
+  // TEMP-DUMMY-TERMINE: auf Staging bei Fehler oder leerer Liste die Dummies.
+  if (DUMMY_TERMINE_AKTIV) {
+    const echte = await fetchEchteBookings().catch(() => [] as UserBooking[]);
+    return echte.length ? echte : dummyTermine();
+  }
+  return fetchEchteBookings();
+}
+
+async function fetchEchteBookings(): Promise<UserBooking[]> {
   const res = await apiFetch<{ ok: boolean; bookings: ApiBookingRow[] }>('/api/v1/bookings');
   return (res.bookings || []).map((b) => ({
     id: b.id,
