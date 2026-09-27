@@ -1,7 +1,7 @@
 ---
 title: "Provider Phase 3 — Anonymes Matching"
 assignee: "Claude"
-status: "doing"
+status: "done"
 ---
 
 # Provider Phase 3 — Anonymes Matching
@@ -14,6 +14,10 @@ Scan **blockiert und benennt** · Prioritätsanteil = **Verifikationstiefe**.
 Backend, Canvas, Figma und lokale UI nach dem UI-Workflow (Canvas → Figma →
 lokal; Staging nach dem Review des Nutzers). Canvas:
 https://claude.ai/artifact/NhkK1DvuT6wEr6WF9oGECE
+
+**Erledigt 2026-09-27:** Backend PR #219 (Squash `578a34d8`, Staging-Migration
+`provider_anonymity` per Supabase-MCP eingespielt), UI PR #223 (Squash
+`bb55d655`). Offen bleibt der Staging-Rollout der UI (Stufe 4) nach dem Review.
 
 ## Objective
 
