@@ -102,8 +102,8 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
     return <Button size="sm" variant={variant} onClick={() => oeffnen(r)}>{label}</Button>;
   };
 
-  const FRIST_TONE = { ok: 'text-fg-brand', warn: 'text-fg-accent-strong', err: 'text-[#8A3B3B]' };
-  const BALKEN_TONE = { ok: 'bg-brand', warn: 'bg-[#d4af37]', err: 'bg-[#B55353]' };
+  const FRIST_TONE = { ok: 'text-fg-brand', warn: 'text-fg-accent-strong', err: 'text-error-700 dark:text-error-300' };
+  const BALKEN_TONE = { ok: 'bg-brand', warn: 'bg-warning-500', err: 'bg-error-500' };
 
   const karte = (r: UserRequestRow) => {
     const f = frist(r);

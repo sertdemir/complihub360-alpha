@@ -279,7 +279,7 @@ export function SessionsPage() {
 
   // 1B: der Lage-Satz — nur Teile, die es gibt.
   const lage: ReactNode[] = [<span key="n">{t('sessions.lageSessions', { count: active.length })}</span>];
-  if (byRisk.high > 0) lage.push(<strong key="h" className="text-[#8A3B3B] dark:text-[#F1A88C]">{t('sessions.lageHigh', { count: byRisk.high })}</strong>);
+  if (byRisk.high > 0) lage.push(<strong key="h" className="text-risk-high">{t('sessions.lageHigh', { count: byRisk.high })}</strong>);
   if (openDuties !== null && openDuties > 0) lage.push(<span key="o">{t('sessions.lageOpen', { count: openDuties })}</span>);
   if (stale.length > 0) lage.push(<strong key="s" className="text-fg-accent-strong">{t('sessions.lageStale', { count: stale.length, months: staleMonths })}</strong>);
 
@@ -359,7 +359,7 @@ export function SessionsPage() {
           {/* 2C · Gruppen statt Filter */}
           {attention.length > 0 && (
             <section className="mt-7">
-              <GroupHead label={t('sessions.groupAttention')} count={attention.length} tone="text-[#8A3B3B] dark:text-[#F1A88C]" />
+              <GroupHead label={t('sessions.groupAttention')} count={attention.length} tone="text-risk-high" />
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{attention.map(tile)}</div>
             </section>
           )}

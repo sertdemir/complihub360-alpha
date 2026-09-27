@@ -176,7 +176,7 @@ export function ProviderSchedulePage() {
               </Banner>
             )}
             {failed && (
-              <p className="text-body-3xs leading-relaxed text-[#8A3B3B] dark:text-[#F1A88C]">{t('schedule.failed')}</p>
+              <p className="text-body-3xs leading-relaxed text-error-700 dark:text-error-300">{t('schedule.failed')}</p>
             )}
             <p className="text-center text-body-3xs text-fg-tertiary">{t('schedule.freeNote')}</p>
           </aside>

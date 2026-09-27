@@ -289,7 +289,7 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
           </div>
 
           {failed && (
-            <p className="mt-3 text-body-3xs leading-relaxed text-[#8A3B3B] dark:text-[#F1A88C]">{t('schedule.failed')}</p>
+            <p className="mt-3 text-body-3xs leading-relaxed text-error-700 dark:text-error-300">{t('schedule.failed')}</p>
           )}
           <p className="mt-3 text-center text-body-3xs text-fg-tertiary">{t('schedule.freeNote')}</p>
         </>

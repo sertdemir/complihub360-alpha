@@ -14,6 +14,7 @@ import { fetchUserRequests, type UserRequestRow } from '../../api/requests';
 import { fetchUserBookings, markOutcome, type UserBooking } from '../../api/bookings';
 import { SLUG_TO_I18N, relZeit } from './AnfragenTab';
 import { ladeIcs } from './TerminePage';
+import { DateMark } from '../../components/ui/DateMark';
 
 // ─── User Dashboard · Home v4 ────────────────────────────────────────────────
 // Canvas "Dashboard · Arbeitsbereich", Nutzer-Wahl 2026-09-05:
@@ -44,8 +45,8 @@ import { ladeIcs } from './TerminePage';
 // Was bewusst FEHLT: eine Kachel "Naechste Frist" — die Kadenzen der Engine
 // sind redaktionelle Rhythmen, keine Termine.
 
-const REST_CLS = 'bg-[#9CB8B2] dark:bg-brand/40';
-const DONE_CLS = 'bg-[#E3EBE9] ring-1 ring-inset ring-[#C9D6D3] dark:bg-white/10 dark:ring-white/15';
+const REST_CLS = 'bg-unit-rest';
+const DONE_CLS = 'bg-unit-done ring-1 ring-inset ring-unit-done-line';
 const SESS_GRID = 'grid grid-cols-[minmax(0,1.5fr)_104px_minmax(172px,1.3fr)_92px_auto] items-center gap-4';
 const MARKT_CHIP = 'rounded-full border border-stroke px-[7px] py-[1px] text-[10.5px] font-bold text-fg';
 const CARD = 'rounded-xl border border-stroke-subtle bg-surface shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]';
@@ -116,16 +117,6 @@ function kommende(bookings: UserBooking[]): UserBooking[] {
     .sort((a, b) => a.slotStart.localeCompare(b.slotStart));
 }
 
-/** Datums-Blockmarke (5B) — Tag gross, Monat klein, wie auf der Termine-Seite. */
-function DatumsMarke({ iso, locale }: { iso: string; locale: string }) {
-  const d = new Date(iso);
-  return (
-    <div aria-hidden="true" className="grid h-9 w-9 shrink-0 place-content-center rounded-[7px] border border-stroke-brand/40 bg-brand-light text-center leading-[1.1] text-fg-brand">
-      <span className="text-[13px] font-bold">{d.getDate()}</span>
-      <span className="text-[7.5px] font-bold uppercase tracking-[0.08em]">{d.toLocaleDateString(locale, { month: 'short' }).replace('.', '')}</span>
-    </div>
-  );
-}
 
 export function UserHomePage() {
   const navigate = useNavigate();
@@ -198,10 +189,11 @@ export function UserHomePage() {
 
   // Z2: Pflichten nach Risiko als Kaestchen. Mittel als FLAECHE in #D4A017 statt
   // des Text-Tons risk-medium (#A16207): der ist neben Rot kaum trennbar
-  // (Palette-Pruefung 2026-09-22, dE 12,5 < 15). Kompass-Luecke: Mark-Ton.
+  // (Palette-Pruefung 2026-09-22, dE 12,5 < 15). Seit 2026-09-27 der Token
+  // risk-medium-mark (Figma: risk/medium-mark).
   const pflichtGruppen = [
     { key: 'h', n: hoch, cls: 'bg-risk-high', label: t('home.unitHigh'), tip: t('home.unitHighTip') },
-    { key: 'm', n: mittel, cls: 'bg-[#D4A017] dark:bg-risk-medium', label: t('home.unitMedium'), tip: t('home.unitMediumTip') },
+    { key: 'm', n: mittel, cls: 'bg-risk-medium-mark', label: t('home.unitMedium'), tip: t('home.unitMediumTip') },
     { key: 'l', n: niedrig, cls: 'bg-risk-low', label: t('home.unitLow'), tip: t('home.unitLowTip') },
   ];
   const proKaestchen = unitsPer(offen);
@@ -217,7 +209,7 @@ export function UserHomePage() {
     if (!b) return [{ n: x.open, cls: REST_CLS, label: t('home.unitOpenTip') }, erledigt];
     return [
       { n: (b.critical ?? 0) + (b.high ?? 0), cls: 'bg-risk-high', label: t('home.unitHighTip') },
-      { n: b.medium ?? 0, cls: 'bg-[#D4A017] dark:bg-risk-medium', label: t('home.unitMediumTip') },
+      { n: b.medium ?? 0, cls: 'bg-risk-medium-mark', label: t('home.unitMediumTip') },
       { n: b.low ?? 0, cls: 'bg-risk-low', label: t('home.unitLowTip') },
       erledigt,
     ];
@@ -535,9 +527,9 @@ export function UserHomePage() {
                                 : 'now' in st && st.now === k
                                   ? 'bg-surface ring-[3px] ring-inset ring-brand shadow-[0_0_0_4px_rgb(var(--petrol-500)/0.12)]'
                                   : 'miss' in st && st.miss === k
-                                    ? 'bg-[#D4A017] shadow-[0_0_0_4px_rgba(212,160,23,0.18)]'
+                                    ? 'bg-risk-medium-mark shadow-[0_0_0_4px_rgb(var(--color-risk-medium-mark)/0.18)]'
                                     : 'next' in st && st.next === k
-                                      ? 'bg-surface ring-2 ring-inset ring-[#9CB8B2]'
+                                      ? 'bg-surface ring-2 ring-inset ring-unit-rest'
                                       : 'bg-surface ring-2 ring-inset ring-stroke';
                               return (
                                 <span
@@ -667,7 +659,7 @@ export function UserHomePage() {
                         const thema = themaVon(a.providerKey);
                         return (
                           <li key={a.id} className={'flex items-center gap-3 py-2.5' + (i > 0 ? ' border-t border-stroke-subtle' : '')}>
-                            <DatumsMarke iso={a.slotStart} locale={i18n.resolvedLanguage || 'en'} />
+                            <DateMark iso={a.slotStart} locale={i18n.resolvedLanguage || 'en'} size="sm" soon />
                             <div className="min-w-0 flex-1">
                               <p className="truncate text-body-xs font-bold text-fg" title={a.providerName}>{a.providerName}</p>
                               <p className="truncate text-body-3xs text-fg-tertiary">
