@@ -41,7 +41,9 @@ export type NotificationType =
  * Freitexte aus Nachrichten und keine Kontaktdaten.
  */
 export interface PayloadFelder {
-    /** Anbieter-Schluessel, damit die Oberflaeche den Namen nachschlagen kann. */
+    /** Opaker Anbieter-Bezeichner (public_ref) — an Nutzer geht seit Phase 3 nie der Schluessel. */
+    providerRef?: string;
+    /** Anbieter-Schluessel — nur in Nachrichten an den Anbieter selbst (Watcher). */
     providerKey?: string;
     /** Anzeigename des Anbieters, sofern schon aufgeloest. */
     providerName?: string;
@@ -53,7 +55,7 @@ export interface PayloadFelder {
     label?: string;
 }
 
-const PAYLOAD_KEYS: Array<keyof PayloadFelder> = ['providerKey', 'providerName', 'from', 'to', 'label'];
+const PAYLOAD_KEYS: Array<keyof PayloadFelder> = ['providerRef', 'providerKey', 'providerName', 'from', 'to', 'label'];
 
 function nutzlast(roh: PayloadFelder): Record<string, string> {
     const out: Record<string, string> = {};

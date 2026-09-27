@@ -7,6 +7,7 @@ import { describeCeiling } from '../lib/penaltyCeiling';
 import { saveWizardSession, fetchSessions, type SessionRowData } from '../api/sessions';
 import { runSearch, type AnonProvider, type SearchLaw } from '../api/search';
 import { useApiData } from '../lib/useApiData';
+import { referenceOf } from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
 import { Lock, Check, Info, ArrowRight, ArrowLeft, ShieldCheck } from 'lucide-react';
 import { Logo } from '../components/ui/Logo';
@@ -22,6 +23,14 @@ import { MatchBasis } from '../components/user/PartnerCard';
 import { PartnerDrawer } from '../components/user/PartnerDrawer';
 import { loadBookingsByKey, type BookingByKey } from '../components/user/DomainProviders';
 import { generateRiskMapPdf, type PdfObligation } from '../lib/riskMapPdf';
+import {
+  RiskMapStateHero,
+  IndeterminateProgress,
+  RiskMapTableSkeleton,
+  RiskMapScopePanel,
+  TechnicalDetails,
+  scopeOf,
+} from '../components/results/RiskMapState';
 
 // ─── Results · Risk Map · Figma 1667:215 ────────────────────────────────────
 // The generated risk map shown after the wizard. A guest "map" — obligations
@@ -260,7 +269,7 @@ export function ResultsRiskMap() {
   // ?session=<id> re-queries /search with that session's stored profile.
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session');
-  const { data: searchData, source: searchSource, loading: searchLoading } = useApiData<{ providers: AnonProvider[]; laws: SearchLaw[]; session: SessionRowData | null }>(async () => {
+  const { data: searchData, source: searchSource, loading: searchLoading, error: searchError } = useApiData<{ providers: AnonProvider[]; laws: SearchLaw[]; session: SessionRowData | null }>(async () => {
     let query: Parameters<typeof runSearch>[0] = profile ?? {};
     let session: SessionRowData | null = null;
     if (sessionId) {
@@ -347,6 +356,9 @@ export function ResultsRiskMap() {
   //            einer gespeicherten Sitzung. Fuer einen Gast gibt es das nicht —
   //            der Wizard stellt fruehere Antworten nicht wieder her.
   // Die Schublade haengt nur in der eingeloggten Ansicht im Baum.
+  // Als Banner erscheint der Zustand nur noch in der eingeloggten Ansicht
+  // (SessionSnapshot, Slot emptyState — ohne Figma-Pendant). Die Gast-Seite
+  // rendert ihn als ganze Seite nach Figma 3390:14594, s. u.
   const canReviewAnswers = !!(isLoggedIn && sessionId && searchData.session);
   const stateKey = pageState === 'none' ? 'noRequirements'
     : pageState === 'loading' ? 'riskMapLoading'
@@ -510,7 +522,9 @@ export function ResultsRiskMap() {
                 shape="soft"
                 type="button"
                 onClick={() => setSaveOpen(true)}
-                className="text-primary-950 transition-transform duration-200 hover:-translate-y-0.5"
+                // Ohne Farbueberschreibung: die Primaer-Flaeche ist seit 2026-09-20
+                // Petrol, dunkle Schrift darauf verfehlte den Kontrast (Figma C3: weiss).
+                className="transition-transform duration-200 hover:-translate-y-0.5"
               >
                 {t('topbar.saveMap')} <ArrowRight size={15} />
               </Button>
@@ -519,25 +533,60 @@ export function ResultsRiskMap() {
         </div>
       </header>
 
+      {/* ─── Leere Zustaende (A3 · B3 · C3, Figma 3390:14594) ──────────────
+          Laedt, gescheitert oder nichts gefunden: der Zustand ist die Seite.
+          Keine Kennzahlen, keine Anbieter, kein Schluss-Band — "0 obligations
+          identified" oder Partner-Karten unter "No immediate requirements"
+          wuerden einen Bedarf anbieten, den wir nicht festgestellt haben. */}
+      {!isLive && stateKey && (
+        <main className="mx-auto flex w-full max-w-container-3xl flex-col items-center gap-8 px-4 pb-20 pt-16 md:px-8 lg:px-16">
+          <RiskMapStateHero
+            heading={t(`common:states.${stateKey}.heading`)}
+            message={t(`common:states.${stateKey}.message`)}
+          >
+            {pageState === 'loading' && <IndeterminateProgress />}
+            {pageState === 'failed' && (
+              <div className="flex flex-wrap justify-center gap-3 pt-2">
+                <Button size="lg" onClick={() => setReloadKey((k) => k + 1)}>
+                  {t('common:states.actions.tryAgain')}
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={() => navigate(`/${locale}/contact`)}
+                  className="border-stroke-brand bg-surface text-fg-brand hover:bg-brand-light dark:border-stroke-brand dark:text-fg-brand"
+                >
+                  {t('common:states.actions.contactSupport')}
+                </Button>
+              </div>
+            )}
+          </RiskMapStateHero>
+          {pageState === 'loading' && <RiskMapTableSkeleton />}
+          {/* Umfang nur mit Profil: gescheitert nennt die Anfrage, nichts
+              gefunden nennt, was die Engine tatsaechlich geprueft hat. */}
+          {profile && pageState !== 'loading' && (
+            <RiskMapScopePanel
+              label={t(`common:states.scope.${pageState === 'failed' ? 'triedToAssess' : 'checked'}`)}
+              {...scopeOf(profile, pageState === 'failed' ? 'requested' : 'checked')}
+            />
+          )}
+          {pageState === 'failed' && <TechnicalDetails reference={referenceOf(searchError)} />}
+        </main>
+      )}
+
+      {isLive && (
       <main className="mx-auto w-full max-w-container-3xl px-4 pb-20 md:px-8 lg:px-16">
         {/* Header */}
         <div className="mx-auto mt-14 max-w-3xl text-center">
           <span className="text-body-2xs font-semibold uppercase tracking-[0.16em] text-fg-brand">{t('header.eyebrow')}</span>
-          {/* "Here's what applies to you." nur, wenn es ein Ergebnis gibt — ueber
-              "We couldn't create your Risk Map" waere es das Gegenteil dessen,
-              was darunter steht. Ohne Ergebnis traegt der Zustand die Aussage;
-              die Ueberschrift bleibt fuer Screenreader als Seitentitel. */}
-          <h1 className={hasResult
-            ? 'mt-3 font-serif text-[2.75rem] font-bold leading-[1.05] tracking-tight text-fg sm:text-[3.25rem]'
-            : 'sr-only'}
-          >
-            {hasResult ? t('header.title') : t('header.eyebrow')}
+          <h1 className="mt-3 font-serif text-[2.75rem] font-bold leading-[1.05] tracking-tight text-fg sm:text-[3.25rem]">
+            {t('header.title')}
           </h1>
           {/* Nur mit Profil. Der fruehere Standard-Untertitel beschrieb ein
               erfundenes Unternehmen ("Germany · United Kingdom · Netherlands.
               D2C e-commerce, €2M—€5M revenue") — fuer jeden, der ohne Profil
               ankam, als waere es seines. */}
-          {hasResult && profile?.country && (
+          {profile?.country && (
             <p className="mt-4 text-body-md leading-relaxed text-fg-secondary">
               {t('header.subtitleProfile', { total: profile.categories?.length ?? 0 })}
             </p>
@@ -559,11 +608,7 @@ export function ResultsRiskMap() {
           </div>
         )}
 
-        {/* Obligations table — oder, solange es keine Engine-Pflichten gibt,
-            der abgenommene Zustand (laedt · gescheitert · nichts gefunden). */}
-        {stateNode ? (
-          <div className="mt-12">{stateNode}</div>
-        ) : (
+        {/* Obligations table */}
           <div className="mt-12 overflow-hidden rounded-xl border border-stroke-subtle">
             <div className="grid grid-cols-[100px_1fr_120px_110px_160px] gap-4 border-b border-stroke-subtle bg-surface-secondary px-6 py-3.5 text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary">
               <span>{t('table.severity')}</span>
@@ -629,7 +674,6 @@ export function ResultsRiskMap() {
               </Fragment>
             ))}
           </div>
-        )}
 
         {/* Partners matched — echte Treffer der Engine, sonst nichts.
             Die Karten bleiben gesperrt (Identitaet erst nach Registrierung),
@@ -684,9 +728,10 @@ export function ResultsRiskMap() {
           </div>
         )}
       </main>
+      )}
 
-      {/* Save CTA band — nur mit Ergebnis (s. o.) */}
-      {hasResult && (
+      {/* Save CTA band — nur mit Pflichten (s. o.) */}
+      {isLive && (
         <section className="border-t border-stroke-subtle bg-surface-secondary py-16">
           <div className="mx-auto max-w-2xl px-4 text-center">
             <ShieldCheck size={26} className="mx-auto text-fg-brand" />

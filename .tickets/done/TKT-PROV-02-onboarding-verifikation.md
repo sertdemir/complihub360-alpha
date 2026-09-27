@@ -1,7 +1,7 @@
 ---
 title: "Provider Phase 2 — Onboarding und Verifikation (Backend)"
 assignee: "Claude"
-status: "review"
+status: "done"
 ---
 
 # Provider Phase 2 — Onboarding und Verifikation

@@ -380,3 +380,73 @@ export interface ActivationGateVerdict {
     approved_cells: number;
     total_cells: number;
 }
+
+// ─── Phase 3: Anonymes Matching (Migration 20260928000000, ADR-0004) ─────────
+
+/** Opaker Anbieter-Bezeichner: zwoelf Hex-Zeichen, Zufall. Das Einzige, was ein Nutzer von einem Anbieter als Kennung sieht. */
+export type PublicRef = string;
+
+/** Der Titel vor der Buchung — vom System, nie vom Anbieter. */
+export interface PublicTitle {
+    /** "Verified Provider B"; der Buchstabe ist die Position in der gelieferten Liste. */
+    label: string;
+    letter: string;
+    /** "Tax and VAT · Norditalien" — bis zu zwei freigegebene Bereiche plus Region. */
+    descriptor: string;
+}
+
+export type VerificationLevel = 'independent' | 'reviewed' | 'partial' | 'none';
+
+/** Die Fakten hinter der Reihenfolge einer Ergebnisliste. Keine Gewichte. */
+export interface RankBasis {
+    verification: VerificationLevel;
+    verified_count: number;
+    required_count: number;
+    response_hours: number | null;
+    confirmation_rate: number | null;
+    /** Nur aus Bewertungen, die an einer Buchung haengen. */
+    rating: number | null;
+    reviews_count: number | null;
+}
+
+export type IdentityFindingType = 'email' | 'phone' | 'domain' | 'handle' | 'legal_form' | 'registry' | 'own_name';
+
+/** Ein Fund des deterministischen Identitaets-Scans — die 422-Antwort `IDENTITY_IN_TEXT` nennt Feld, Typ und Stelle. */
+export interface IdentityFinding {
+    field: string;
+    type: IdentityFindingType;
+    match: string;
+    index: number;
+}
+
+/** Ein Anbieter in der Ergebnisliste (Stufe 1). Felder der Klasse `anonymous` plus Titel, Match und Rangfakten. */
+export interface AnonProviderCard {
+    public_ref: PublicRef;
+    title: string;
+    letter: string;
+    descriptor: string;
+    region: string | null;
+    active_since: number | null;
+    specializations: string[];
+    languages: string[];
+    rating: number | null;
+    completed_count: number | null;
+    avg_response_hours: number | null;
+    billing_model: 'abo' | 'hourly' | 'project' | 'mixed';
+    is_verified: true;
+    match: number;
+    match_tier: 'high' | 'strong' | 'moderate';
+    match_basis: { country: string | null; country_covered: boolean; domains_requested: string[]; domains_matched: string[] };
+    rank_basis: RankBasis;
+}
+
+/** Das anonyme Detail (Stufe 2): Karte plus Dossier-Freitexte, maskiert. Kein Buchstabe — den kennt nur die Liste. */
+export interface AnonProviderDetail extends Omit<AnonProviderCard, 'title' | 'letter' | 'match' | 'match_tier' | 'match_basis'> {
+    markets: string[];
+    services: string[] | null;
+    credentials: string[] | null;
+    excluded_services: string[] | null;
+    work_mode: string | null;
+    pricing_table: Array<Record<string, unknown>> | null;
+    availability: 'available' | 'ooo';
+}

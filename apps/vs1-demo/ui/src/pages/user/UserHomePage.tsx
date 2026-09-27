@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { Play, ArrowRight, CalendarPlus, Compass } from 'lucide-react';
+import { CalendarPlus, Compass } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { useWizardDrawer } from '../../components/user/WizardDrawer';
@@ -9,12 +9,11 @@ import { Button } from '../../components/ui/Button';
 import { Segment } from '../../components/compliance-areas';
 import { UnitGrid, unitsPer, useCountUp, useEntered, EASE } from '../../components/ui/Stats';
 import { EmptyState } from '../../components/user/EmptyState';
-import { RescheduleDrawer, type RescheduleTarget } from '../../components/user/RescheduleDrawer';
 import { SessionTile } from '../../components/user/SessionTile';
 import { fetchDashboard, EMPTY_DASHBOARD, type DashboardData, type DashboardSession } from '../../api/dashboard';
 import { fetchUserRequests, type UserRequestRow } from '../../api/requests';
-import { fetchUserBookings, type UserBooking } from '../../api/bookings';
-import { SLUG_TO_I18N, STATUS_KEY, relZeit } from './AnfragenTab';
+import { fetchUserBookings, markOutcome, type UserBooking } from '../../api/bookings';
+import { SLUG_TO_I18N, relZeit } from './AnfragenTab';
 import { ladeIcs } from './TerminePage';
 
 // ─── User Dashboard · Home v4 ────────────────────────────────────────────────
@@ -28,9 +27,12 @@ import { ladeIcs } from './TerminePage';
 //   4B  Anfragen als Posteingangs-Zeilen — dasselbe Vokabular wie die
 //       Termine-Seite: lokalisierte Pille, Bereich · Markt, "Frist · Anbieter",
 //       eine Aktion je Zeile, EIN "Alle anzeigen" im Kopf.
-//   5B  Rechts zwei Karten: Termine mit Datumsmarke und echten Aktionen (In
-//       den Kalender, Verschieben), "Da weitermachen" mit Fortsetzen. Der
-//       "Naechste Schritt" und "Termin vorschlagen" (ohne Funktion) entfallen.
+//   5B  Rechts die Termine. "Da weitermachen" ist seit 2026-09-27 gestrichen:
+//       es zeigte nur die zuletzt geaenderte Sitzung, die als erste Kachel
+//       unter "Gespeicherte Sitzungen" ohnehin steht.
+//       Termine seit Canvas T2 (2026-09-27): oben, was eine Antwort braucht
+//       (vergangene Termine ohne Ergebnis), darunter "Als Naechstes" kompakt
+//       mit Thema aus der Anfrage beim selben Anbieter.
 //   6B  Sitzungen als Kacheln mit Risiko-Tag, Bereichs-/Land-Chips, Balken
 //       und "Oeffnen"-Link direkt auf die Sitzung — dieselbe Kachel wie auf der
 //       Sitzungen-Seite (SessionTile, Canvas 3B vom 2026-09-09).
@@ -124,9 +126,9 @@ function sitzungsTitel(s: DashboardSession, domainLabel: (k: string) => string):
 function DatumsMarke({ iso, locale }: { iso: string; locale: string }) {
   const d = new Date(iso);
   return (
-    <div aria-hidden="true" className="grid h-11 w-11 shrink-0 place-content-center rounded-lg border border-stroke-brand/40 bg-brand-light text-center leading-[1.1] text-fg-brand">
-      <span className="text-[16px] font-bold">{d.getDate()}</span>
-      <span className="text-[8.5px] font-bold uppercase tracking-[0.08em]">{d.toLocaleDateString(locale, { month: 'short' }).replace('.', '')}</span>
+    <div aria-hidden="true" className="grid h-9 w-9 shrink-0 place-content-center rounded-[7px] border border-stroke-brand/40 bg-brand-light text-center leading-[1.1] text-fg-brand">
+      <span className="text-[13px] font-bold">{d.getDate()}</span>
+      <span className="text-[7.5px] font-bold uppercase tracking-[0.08em]">{d.toLocaleDateString(locale, { month: 'short' }).replace('.', '')}</span>
     </div>
   );
 }
@@ -137,8 +139,7 @@ export function UserHomePage() {
   const { t, i18n } = useTranslation('userws');
   const { openWizard } = useWizardDrawer();
   const [chartView, setChartView] = useState<'markets' | 'areas'>('markets');
-  const [rescheduleFor, setRescheduleFor] = useState<RescheduleTarget | null>(null);
-  const [moved, setMoved] = useState<Record<string, string>>({});
+  const [outcomes, setOutcomes] = useState<Record<string, 'completed' | 'no_show'>>({});
   const entered = useEntered();
   const { dash, requests, bookings, loading } = useLage();
   const jetzt = Date.now();
@@ -153,8 +154,17 @@ export function UserHomePage() {
   const aufSie = offeneAnfragen.filter((r) => r.bucket === 'replied' || r.bucket === 'overdue');
   const wartend = offeneAnfragen.filter((r) => r.status === 'awaiting-confirm' && r.bucket === 'confirm').length;
 
-  // Termine: kommend (ggf. verschoben).
-  const termine = kommende(bookings.map((b) => (moved[b.id] ? { ...b, slotStart: moved[b.id] } : b)));
+  // Termine (T2): kommende, und davor die vergangenen ohne Ergebnis — dieselbe
+  // Regel wie "Braucht Ihre Antwort" auf der Termine-Seite. Beide zaehlen, so
+  // steht auf der Karte dieselbe Zahl wie in der Seitenleiste.
+  const termine = kommende(bookings);
+  const ohneErgebnis = bookings
+    .filter((b) => b.status === 'confirmed' && !outcomes[b.id] && new Date(b.slotStart).getTime() <= jetzt)
+    .sort((a, b) => b.slotStart.localeCompare(a.slotStart));
+  const ergebnis = (id: string, status: 'completed' | 'no_show') => {
+    setOutcomes((o) => ({ ...o, [id]: status }));
+    markOutcome(id, status).catch(() => {});
+  };
 
   const sev = dash.obligations.by_severity;
   const hoch = (sev.critical ?? 0) + (sev.high ?? 0);
@@ -167,6 +177,14 @@ export function UserHomePage() {
   const bereich = (slug?: string) => (slug && SLUG_TO_I18N[slug] ? t(`domain.${SLUG_TO_I18N[slug]}`) : slug ?? '');
   const regionName = useMemo(() => { try { return new Intl.DisplayNames([locale], { type: 'region' }); } catch { return null; } }, [locale]);
   const markt = (code?: string) => { try { return code ? (regionName?.of(code.toUpperCase()) ?? code) : ''; } catch { return code ?? ''; } };
+  // Thema eines Termins: Bereich und Markt der juengsten Anfrage beim selben
+  // Anbieter. Gibt es keine, bleibt es leer — geraten wird nicht.
+  const themaVon = (providerKey: string) => {
+    const r = requests
+      .filter((q) => q.providerKey === providerKey)
+      .sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''))[0];
+    return r ? [bereich(r.category), r.country?.toUpperCase()].filter(Boolean).join(' · ') : '';
+  };
 
   // Balken: Maerkte oder Bereiche, beides aus denselben offenen Pflichten.
   const quelle = chartView === 'markets'
@@ -201,7 +219,6 @@ export function UserHomePage() {
     { n: laufen, cls: 'bg-brand/15', label: t('home.reqRunningTip'), legend: t('home.reqRunning', { count: laufen }) },
   ];
 
-  const zuletzt = [...dash.sessions.items].sort((a, b) => b.updated_at.localeCompare(a.updated_at))[0];
   const nichts = !loading && dash.sessions.total === 0 && offeneAnfragen.length === 0 && termine.length === 0;
 
   // Kopf: nur die Begruessung. Die Lage-Zeile (zuletzt als Sprungmarken, K2)
@@ -271,21 +288,41 @@ export function UserHomePage() {
       pct: Math.max(3, Math.min(100, Math.round((left / (r.slaWindowMs ?? 24 * 3_600_000)) * 100))),
     };
   };
-  const FRIST_TONE = { ok: 'text-fg-brand', warn: 'text-fg-accent-strong', err: 'text-[#8A3B3B]' };
-  const BALKEN_TONE = { ok: 'bg-brand', warn: 'bg-[#d4af37]', err: 'bg-[#B55353]' };
-  const PILL: Record<string, string> = {
-    'awaiting-confirm': 'bg-[#d4af37]/10 border-[#d4af37]/35 text-fg-accent-strong dark:bg-[#d4af37]/15 dark:border-[#d4af37]/40',
-    'awaiting-reply': 'bg-surface-secondary border-stroke text-fg-secondary',
-    active: 'bg-[#004d40]/10 border-[#258d78]/35 text-fg-brand dark:bg-[#004d40]/25 dark:border-[#258d78]/40',
-    closed: 'bg-surface-secondary border-stroke text-fg-tertiary',
+  // A3 (Nutzer-Wahl 2026-09-27): jede Anfrage als Strecke
+  // Gesendet → Bestaetigt → Antwort → Termin. Der Zustand ergibt sich aus der
+  // Position, nicht aus Pille + Frist-Label + "verpasst" (das waren bis zu drei
+  // Aussagen fuer denselben Zustand). Eine verpasste Frist ist ein Versaeumnis
+  // des ANBIETERS: kein Rot, sondern ein unterbrochener Schritt in Amber und
+  // der Ausweg "Anderen anfragen" (DNA: always on your side).
+  const STEP_POS = [0, 100 / 3, 200 / 3, 100];
+  const strecke = (r: UserRequestRow) => {
+    const f = frist(r);
+    const warten = f && f.tone !== 'err' ? (100 - f.pct) / 100 : 0;
+    if (r.bucket === 'replied') return { done: 2, now: 2, fill: STEP_POS[2], action: 'read' as const };
+    if (r.bucket === 'overdue') {
+      const bei = r.rawStatus === 'confirmed' ? 2 : 1;
+      return { done: bei - 1, miss: bei, fill: STEP_POS[bei - 1], action: 'other' as const, missTip: bei === 2 ? t('home.reqMissedReply') : t('home.reqMissedConfirm') };
+    }
+    if (r.bucket === 'confirmed') return { done: 1, next: 2, fill: STEP_POS[1] + warten * (STEP_POS[2] - STEP_POS[1]), left: r.slaDeadline };
+    return { done: 0, next: 1, fill: warten * STEP_POS[1], left: r.slaDeadline };
   };
+  const restzeit = (iso?: string | null) => {
+    if (!iso) return null;
+    const ms = new Date(iso).getTime() - jetzt;
+    if (ms <= 0) return null;
+    const h = Math.floor(ms / 3_600_000);
+    return h >= 1 ? t('home.reqLeftHours', { count: h }) : t('home.reqLeftMinutes', { count: Math.max(1, Math.floor(ms / 60_000)) });
+  };
+  const SCHRITTE = [t('home.stepSent'), t('home.stepConfirmed'), t('home.stepReply'), t('home.stepMeeting')];
   const anfragenZeilen = [...aufSie, ...offeneAnfragen.filter((r) => !aufSie.includes(r))].slice(0, 3);
 
   // 5B: "Heute · 09:00" / "Morgen · 09:00" / "Mo., 8. Sep. · 09:00".
   const wann = (iso: string) => {
     const d = new Date(iso);
-    const tage = Math.floor((new Date(iso).setHours(0, 0, 0, 0) - new Date().setHours(0, 0, 0, 0)) / 86_400_000);
-    const tag = tage <= 0 ? t('home.today') : tage === 1 ? t('home.tomorrow')
+    const tage = Math.round((new Date(iso).setHours(0, 0, 0, 0) - new Date().setHours(0, 0, 0, 0)) / 86_400_000);
+    // Vergangene Termine (T2, Ergebnis offen) brauchen "Gestern" — vorher
+    // stand fuer alles vor heute "Heute".
+    const tag = tage === 0 ? t('home.today') : tage === 1 ? t('home.tomorrow') : tage === -1 ? t('home.yesterday')
       : d.toLocaleDateString(i18n.resolvedLanguage || 'en', { weekday: 'short', day: 'numeric', month: 'short' });
     return `${tag} · ${d.toLocaleTimeString(i18n.resolvedLanguage || 'en', { hour: '2-digit', minute: '2-digit' })}`;
   };
@@ -438,39 +475,74 @@ export function UserHomePage() {
                 )}
               </div>
 
-              {/* 4B: Anfragen als Posteingangs-Zeilen */}
+              {/* Aktive Anfragen als Strecken (Canvas A3) */}
               <div className={CARD + ' px-6 py-5'}>
                 <SectionHead title={t('home.activeRequests')} count={String(offeneAnfragen.length)} to="dashboard/termine?tab=anfragen" />
                 {anfragenZeilen.length ? (
                   <div>
+                    <div aria-hidden="true" className="hidden grid-cols-[34%_1fr_150px] gap-3 sm:grid">
+                      <span />
+                      <div className="relative mx-7 h-4 text-[9.5px] font-bold uppercase tracking-[0.04em] text-fg-tertiary">
+                        {SCHRITTE.map((s2, k) => (
+                          <span key={k} className="absolute top-0 whitespace-nowrap" style={{ left: `${STEP_POS[k]}%`, transform: 'translateX(-50%)' }}>{s2}</span>
+                        ))}
+                      </div>
+                      <span />
+                    </div>
                     {anfragenZeilen.map((r, i, arr) => {
-                      const f = frist(r);
-                      const pille = r.statusLabel ? t(`status.${STATUS_KEY[r.statusLabel] ?? ''}`, r.statusLabel) : r.statusLabel;
+                      const st = strecke(r);
+                      const rest = 'left' in st ? restzeit(st.left) : null;
                       return (
-                        <div key={r.uuid} className={'flex items-center gap-4 py-3 ' + (i < arr.length - 1 ? 'border-b border-stroke-subtle' : '')}>
-                          <div className="min-w-0 flex-1">
-                            <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-body-xs font-bold text-fg">
-                              <span className="truncate">{r.company}</span>
-                              <span className={'inline-flex whitespace-nowrap rounded-full border px-2.5 py-[2px] text-[10px] font-bold ' + (PILL[r.status] ?? PILL.closed)}>{pille}</span>
-                            </p>
+                        <div key={r.uuid} className={'grid grid-cols-1 items-center gap-x-3 gap-y-2 py-3 sm:grid-cols-[34%_1fr_150px] ' + (i < arr.length - 1 ? 'border-b border-stroke-subtle' : '')}>
+                          <div className="min-w-0">
+                            <button type="button" title={r.company} onClick={() => oeffneVerlauf(r.uuid)} className="block max-w-full truncate text-left text-body-xs font-bold text-fg hover:underline">{r.company}</button>
                             <p className="mt-0.5 truncate text-[10.5px] text-fg-tertiary">
                               {[bereich(r.category), markt(r.country), relZeit(r.createdAt, locale)].filter(Boolean).join(' · ')}
                             </p>
                           </div>
-                          <div className="hidden w-[120px] shrink-0 sm:block">
-                            {f && (
-                              <>
-                                <p className="text-[9.5px] font-bold uppercase tracking-[0.06em] text-fg-tertiary">{t('requests.slaLabelProvider')}</p>
-                                <p className={'text-[13px] font-medium ' + FRIST_TONE[f.tone]}>{f.label}</p>
-                                <span className="mt-1 block h-[3px] overflow-hidden rounded-full bg-surface-tertiary">
-                                  <span className={'block h-full rounded-full ' + BALKEN_TONE[f.tone]} style={{ width: `${f.pct}%` }} />
-                                </span>
-                              </>
+                          <div
+                            role="img"
+                            aria-label={[
+                              SCHRITTE.slice(0, st.done + 1).join(' → '),
+                              'miss' in st ? st.missTip : null,
+                              rest,
+                            ].filter(Boolean).join(' · ')}
+                            className="relative mx-7 h-3"
+                          >
+                            <span className="absolute inset-x-0 top-[5px] h-[2px] bg-stroke" />
+                            <span
+                              className="absolute left-0 top-[5px] h-[2px] bg-brand"
+                              style={{ width: entered ? `${st.fill}%` : 0, transition: `width 900ms ${EASE} ${120 + i * 90}ms` }}
+                            />
+                            {STEP_POS.map((pos, k) => {
+                              const cls = k <= st.done && !('now' in st && st.now === k)
+                                ? 'bg-brand'
+                                : 'now' in st && st.now === k
+                                  ? 'bg-surface ring-[3px] ring-inset ring-brand shadow-[0_0_0_4px_rgb(var(--petrol-500)/0.12)]'
+                                  : 'miss' in st && st.miss === k
+                                    ? 'bg-[#D4A017] shadow-[0_0_0_4px_rgba(212,160,23,0.18)]'
+                                    : 'next' in st && st.next === k
+                                      ? 'bg-surface ring-2 ring-inset ring-[#9CB8B2]'
+                                      : 'bg-surface ring-2 ring-inset ring-stroke';
+                              return (
+                                <span
+                                  key={k}
+                                  title={'miss' in st && st.miss === k ? st.missTip : SCHRITTE[k]}
+                                  className={'absolute top-0 h-3 w-3 -translate-x-1/2 rounded-full ' + cls}
+                                  style={{ left: `${pos}%` }}
+                                />
+                              );
+                            })}
+                          </div>
+                          <div className="flex justify-start sm:justify-end">
+                            {st.action === 'read' ? (
+                              <Button size="sm" variant="primary" className="shrink-0" onClick={() => oeffneVerlauf(r.uuid)}>{t('requests.actionRead')}</Button>
+                            ) : st.action === 'other' ? (
+                              <Button size="sm" variant="outline" className="shrink-0" onClick={() => openWizard(r.category ? { categories: [r.category] } : undefined)}>{t('home.reqAskOther')}</Button>
+                            ) : (
+                              <span className="whitespace-nowrap text-body-2xs text-fg-secondary">{rest ?? '—'}</span>
                             )}
                           </div>
-                          <Button size="sm" variant={r.bucket === 'replied' ? 'primary' : 'secondary'} className="shrink-0" onClick={() => oeffneVerlauf(r.uuid)}>
-                            {r.bucket === 'replied' ? t('requests.actionRead') : t('requests.actionOpen')}
-                          </Button>
                         </div>
                       );
                     })}
@@ -481,70 +553,62 @@ export function UserHomePage() {
               </div>
             </div>
 
-            {/* Rechte Spalte (5B) */}
+            {/* Rechte Spalte (5B): nur noch Termine */}
             <div className="flex min-w-0 flex-1 flex-col gap-[18px]">
               <div className={CARD + ' p-5'}>
-                <SectionHead title={t('home.termine')} count={String(termine.length)} to="dashboard/termine" />
-                {termine.slice(0, 2).map((a, i) => {
-                  const provider = a.providerName + (a.providerRegion ? ` — ${a.providerRegion}` : '');
+                <SectionHead title={t('home.termine')} count={String(termine.length + ohneErgebnis.length)} to="dashboard/termine" />
+                {ohneErgebnis.length > 0 && (() => {
+                  const o = ohneErgebnis[0];
                   return (
-                    <div key={a.id} className={i > 0 ? 'mt-3 border-t border-stroke-subtle pt-3' : ''}>
-                      <div className="flex items-center gap-3 py-1">
-                        <DatumsMarke iso={a.slotStart} locale={i18n.resolvedLanguage || 'en'} />
-                        <div className="min-w-0">
-                          <p className="text-[10px] font-bold uppercase tracking-[0.06em] text-fg-brand/70">{wann(a.slotStart)}</p>
-                          <p className="mt-0.5 truncate text-body-xs font-bold text-fg">{a.providerName}</p>
-                          <p className="truncate text-[10px] text-fg-tertiary">{[a.providerRegion, 'Video-Call'].filter(Boolean).join(' · ')}</p>
-                        </div>
+                    <div className="mt-3.5 rounded-[10px] border border-warning-200 bg-warning-bg px-3.5 py-3 dark:border-amber-500/30 dark:bg-amber-500/15">
+                      <p className="text-body-xs font-bold text-warning-800 dark:text-amber-300">{t('termine.outcomeQuestion')}</p>
+                      <p className="mt-1.5 truncate text-body-xs font-bold text-fg">{o.providerName}</p>
+                      <p className="text-body-3xs text-fg-tertiary">{wann(o.slotStart)}</p>
+                      <div className="mt-2.5 flex flex-wrap gap-2">
+                        <Button size="sm" variant="primary" onClick={() => ergebnis(o.id, 'completed')}>{t('home.outcomeYes')}</Button>
+                        <Button size="sm" variant="outline" onClick={() => ergebnis(o.id, 'no_show')}>{t('termine.outcomeNo')}</Button>
                       </div>
-                      <div className="mt-2.5 flex gap-2">
-                        <Button size="sm" variant="outline" iconLeft={<CalendarPlus size={14} />}
-                          onClick={() => ladeIcs({ id: a.id, slotStartIso: a.slotStart, slotEndIso: a.slotEnd, provider, meta: a.message || '—' })}>
-                          {t('termine.addToCalendar')}
-                        </Button>
-                        <Button size="sm" variant="ghost"
-                          onClick={() => setRescheduleFor({
-                            bookingId: a.id, providerKey: a.providerKey, providerName: provider,
-                            currentLine: wann(a.slotStart),
-                          })}>
-                          {t('termine.reschedule')}
-                        </Button>
-                      </div>
+                      {ohneErgebnis.length > 1 && (
+                        <p className="mt-2.5 text-body-3xs text-warning-800 dark:text-amber-300">
+                          {t('home.outcomeMore', { count: ohneErgebnis.length - 1 })}{' · '}
+                          <Link to={`/${locale}/dashboard/termine`} className="font-bold underline underline-offset-[3px]">{t('home.outcomeMoreLink')}</Link>
+                        </p>
+                      )}
                     </div>
                   );
-                })}
-                {!termine.length && <p className="py-4 text-center text-body-2xs text-fg-tertiary">{t('home.noTermine')}</p>}
+                })()}
+                {termine.length > 0 && (
+                  <>
+                    {ohneErgebnis.length > 0 && (
+                      <p className="mb-1 mt-4 text-[10.5px] font-extrabold uppercase tracking-[0.07em] text-fg-tertiary">{t('home.upNext')}</p>
+                    )}
+                    <ul className={ohneErgebnis.length ? '' : 'mt-2'}>
+                      {termine.slice(0, 3).map((a, i) => {
+                        const provider = a.providerName + (a.providerRegion ? ` — ${a.providerRegion}` : '');
+                        const thema = themaVon(a.providerKey);
+                        return (
+                          <li key={a.id} className={'flex items-center gap-3 py-2.5' + (i > 0 ? ' border-t border-stroke-subtle' : '')}>
+                            <DatumsMarke iso={a.slotStart} locale={i18n.resolvedLanguage || 'en'} />
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-body-xs font-bold text-fg" title={a.providerName}>{a.providerName}</p>
+                              <p className="truncate text-body-3xs text-fg-tertiary">
+                                {wann(a.slotStart)}
+                                {thema && <> · <span className="font-semibold text-fg-secondary">{thema}</span></>}
+                              </p>
+                            </div>
+                            <Button size="sm" variant="outline" iconOnly aria-label={t('termine.addToCalendar')} title={t('termine.addToCalendar')}
+                              onClick={() => ladeIcs({ id: a.id, slotStartIso: a.slotStart, slotEndIso: a.slotEnd, provider, meta: a.message || '—' })}>
+                              <CalendarPlus size={14} />
+                            </Button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </>
+                )}
+                {!termine.length && !ohneErgebnis.length && <p className="py-4 text-center text-body-2xs text-fg-tertiary">{t('home.noTermine')}</p>}
               </div>
 
-              {/* Da weitermachen — goldgerahmt, an der zuletzt bearbeiteten Sitzung. */}
-              {zuletzt && (
-                <div className={CARD + ' border-brand-accent/50 bg-brand-accent-light/40 p-5'}>
-                  <div className="flex items-center gap-2.5">
-                    <span className="shrink-0 text-fg-accent-strong">
-                      <Play size={30} fill="currentColor" strokeWidth={1.5} />
-                    </span>
-                    <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-accent-strong">{t('home.resumeEyebrow')}</p>
-                  </div>
-                  <p className="mt-2.5 text-body-sm font-bold text-fg">{sitzungsTitel(zuletzt, domainLabel)}</p>
-                  <p className="mt-0.5 text-body-3xs text-fg-tertiary">
-                    {t('home.resumeMeta', { open: zuletzt.open, total: zuletzt.total })}
-                  </p>
-                  <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-surface-secondary">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-brand to-brand-accent"
-                      style={{
-                        width: entered && zuletzt.total ? `${((zuletzt.total - zuletzt.open) / zuletzt.total) * 100}%` : 0,
-                        transition: `width 900ms ${EASE} 250ms`,
-                      }}
-                    />
-                  </div>
-                  <div className="mt-3 flex justify-end">
-                    <Button variant="primary" onClick={() => oeffneSitzung(zuletzt.id)}>
-                      {t('home.resume')} <ArrowRight size={14} className="ml-1" />
-                    </Button>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
 
@@ -577,7 +641,6 @@ export function UserHomePage() {
           )}
         </div>
       </div>
-      <RescheduleDrawer target={rescheduleFor} onClose={() => setRescheduleFor(null)} onRescheduled={(id, iso) => setMoved((m) => ({ ...m, [id]: iso }))} />
     </UserShell>
   );
 }

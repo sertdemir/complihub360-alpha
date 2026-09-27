@@ -521,7 +521,7 @@ paths:
           application/json:
             schema: { type: object, required: [vat_id], properties: { evidence_type: { type: string, enum: [vat_id] }, vat_id: { type: string } } }
       responses:
-        '201': { description: evidence, vat {status, vat_id, country_code, name, checked_at} }
+        '201': { description: "evidence, vat {status, vat_id, country_code, name, checked_at}" }
         '422': { description: REGISTRY_UNSUPPORTED }
 
   /provider/{key}/agreements:
@@ -555,7 +555,7 @@ paths:
       responses:
         '200': { description: lifecycle_status submitted }
         '409': { description: NOT_SUBMITTABLE (Status erlaubt kein Einreichen) }
-        '422': { description: INCOMPLETE mit missing[] und chapters }
+        '422': { description: "INCOMPLETE mit missing[] und chapters" }
 
   /provider/{key}/verification:
     get:
@@ -566,6 +566,99 @@ paths:
       responses:
         '200': { description: Matrix und Historie }
 
+  # ─── Phase 3: Anonymes Matching (ADR-0004) ───────────────────────────────
+  # Alles, was ein Nutzer ueber einen Anbieter sieht, laeuft ueber `public_ref`
+  # (zwoelf Hex-Zeichen, zufaellig). `provider_key` steht in keiner dieser
+  # Antworten. Die alten Pfade /provider/{key}/(detail|slots|reviews|website)
+  # antworten 404.
+
+  /p/{ref}/detail:
+    get:
+      summary: Anonymes Anbieter-Detail (Stufe 2)
+      description: >-
+        Felder nach dem Register `provider_field_visibility` (Klasse
+        `anonymous`), Freitexte durch das Identitaets-Netz maskiert,
+        `specializations` und `markets` aus der View, `rank_basis` mit den
+        Fakten hinter der Reihenfolge. Sichtbar ist, wer in
+        `matchable_provider_services` steht — nie `partner_status`.
+      security: [ { bearerAuth: [] } ]
+      parameters: [ { name: ref, in: path, required: true, schema: { $ref: '#/components/schemas/PublicRef' } } ]
+      responses:
+        '200':
+          description: Detail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail: { $ref: '#/components/schemas/AnonProviderDetail' }
+                  detail_open_charged: { type: boolean }
+        '401': { description: Login noetig }
+        '404': { description: Unbekannter Ref oder nicht matchbar }
+
+  /p/{ref}/slots:
+    get:
+      summary: Buchbare Termine eines Anbieters
+      security: [ { bearerAuth: [] } ]
+      parameters: [ { name: ref, in: path, required: true, schema: { $ref: '#/components/schemas/PublicRef' } } ]
+      responses:
+        '200': { description: "`{ public_ref, slots[] }`" }
+        '404': { description: Unbekannter Ref }
+
+  /p/{ref}/reviews:
+    get:
+      summary: Bewertungen aus Buchungen, Text durch das Identitaets-Netz
+      security: [ { bearerAuth: [] } ]
+      parameters: [ { name: ref, in: path, required: true, schema: { $ref: '#/components/schemas/PublicRef' } } ]
+      responses:
+        '200': { description: "`{ reviews[], summary }`" }
+        '404': { description: Unbekannter Ref }
+
+  /p/{ref}/website:
+    get:
+      summary: Gezaehlter Klick zur Website — nur nach Offenlegung
+      security: [ { bearerAuth: [] } ]
+      parameters: [ { name: ref, in: path, required: true, schema: { $ref: '#/components/schemas/PublicRef' } } ]
+      responses:
+        '302': { description: Weiterleitung }
+        '403': { description: Ohne Buchung mit Offenlegung }
+        '404': { description: Unbekannter Ref oder keine Website }
+
+  /scheduling:
+    post:
+      summary: Termin buchen (bezahlter Lead, Offenlegung Stufe 3)
+      description: >-
+        Nimmt `public_ref`, nie `provider_key`. Buchbar ist, wer matchbar UND
+        zahlungsbereit ist (Spec A §21.1); fehlt die Zahlungsbereitschaft,
+        antwortet 409 `BILLING_NOT_READY` statt still 404.
+      security: [ { bearerAuth: [] } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [public_ref, slot_start]
+              properties:
+                public_ref: { $ref: '#/components/schemas/PublicRef' }
+                slot_start: { type: string, format: date-time }
+                message: { type: string, maxLength: 2000 }
+      responses:
+        '201': { description: "`{ booking: { id, public_ref, slot_start, slot_end, status }, provider_identity: { name, website_url, contact_email } }`" }
+        '404': { description: Unbekannter Ref oder nicht matchbar }
+        '409': { description: Anbieter noch nicht zahlungsbereit (`BILLING_NOT_READY`) }
+
+  /bookings:
+    get:
+      summary: Termine des Nutzers
+      description: >-
+        Je Termin `public_ref`, `provider_name` (Klarname erst bei
+        `identity_revealed`, sonst "Verified Provider"), `provider_descriptor`
+        (Bereiche · Region), `provider_website` erst nach Offenlegung.
+      security: [ { bearerAuth: [] } ]
+      responses:
+        '200': { description: Termine }
+
   # ─── Phase 2: Review-Arbeitsplatz (Admin-JWT oder Server-Key, sonst 403) ───
 
   /admin/review/queue:
@@ -574,7 +667,7 @@ paths:
       description: Zeilen fuer Bewerbungen (submitted, more_info_required, under_verification, approved_pending_activation), Reverifizierungen, offene Aenderungsmeldungen und Nachweise, die in 30 Tagen ablaufen. Spalten kind, provider, lifecycle_status, since, due_at, risk (high = regulierter Bereich oder Sperre, medium = Bewerbung/Aenderung, low = Ablauf), detail.
       security: [ { bearerAuth: [] } ]
       responses:
-        '200': { description: rows[], counts }
+        '200': { description: "rows[], counts" }
         '403': { description: Kein Admin }
 
   /admin/review/{key}:
@@ -594,7 +687,7 @@ paths:
       security: [ { bearerAuth: [] } ]
       parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
       responses:
-        '200': { description: gate {ok, missing[], target, approved_cells, total_cells, allowance} }
+        '200': { description: "gate {ok, missing[], target, approved_cells, total_cells, allowance}" }
 
   /admin/review/{key}/evidence/{id}:
     post:
@@ -707,6 +800,62 @@ components:
       schema:
         type: string
   schemas:
+    PublicRef:
+      type: string
+      pattern: '^[0-9a-f]{12}$'
+      description: Opaker Anbieter-Bezeichner (Phase 3). Zufall, nicht aus dem Namen ableitbar.
+    RankBasis:
+      type: object
+      description: Die Fakten hinter der Reihenfolge — keine Gewichte.
+      properties:
+        verification: { type: string, enum: [independent, reviewed, partial, none] }
+        verified_count: { type: integer }
+        required_count: { type: integer }
+        response_hours: { type: number, nullable: true }
+        confirmation_rate: { type: number, nullable: true }
+        rating: { type: number, nullable: true, description: Nur aus Buchungen. }
+        reviews_count: { type: integer, nullable: true }
+    AnonProviderCard:
+      type: object
+      description: Ein Anbieter in der Ergebnisliste von POST /search (Stufe 1).
+      properties:
+        public_ref: { $ref: '#/components/schemas/PublicRef' }
+        title: { type: string, example: Verified Provider B }
+        letter: { type: string, example: B, description: Position in DIESER Liste; nicht ueber Sitzungen stabil. }
+        descriptor: { type: string, example: 'Tax and VAT · Norditalien', description: Freigegebene Bereiche und Region — vom System, nie vom Anbieter. }
+        region: { type: string, nullable: true }
+        active_since: { type: integer, nullable: true }
+        specializations: { type: array, items: { type: string } }
+        languages: { type: array, items: { type: string } }
+        rating: { type: number, nullable: true }
+        completed_count: { type: integer, nullable: true }
+        avg_response_hours: { type: number, nullable: true }
+        billing_model: { type: string, enum: [abo, hourly, project, mixed] }
+        is_verified: { type: boolean }
+        match: { type: integer }
+        match_tier: { type: string, enum: [high, strong, moderate] }
+        match_basis: { type: object }
+        rank_basis: { $ref: '#/components/schemas/RankBasis' }
+    AnonProviderDetail:
+      allOf:
+        - $ref: '#/components/schemas/AnonProviderCard'
+        - type: object
+          properties:
+            markets: { type: array, items: { type: string } }
+            services: { type: array, items: { type: string }, nullable: true }
+            credentials: { type: array, items: { type: string }, nullable: true }
+            excluded_services: { type: array, items: { type: string }, nullable: true }
+            work_mode: { type: string, nullable: true }
+            pricing_table: { type: array, items: { type: object }, nullable: true }
+            availability: { type: string, enum: [available, ooo] }
+    IdentityFinding:
+      type: object
+      description: Ein Fund des Identitaets-Scans in einem Freitext (422 `IDENTITY_IN_TEXT`).
+      properties:
+        field: { type: string, example: 'services[1]' }
+        type: { type: string, enum: [email, phone, domain, handle, legal_form, registry, own_name] }
+        match: { type: string }
+        index: { type: integer }
     ErrorResponse:
       type: object
       required: [errorCode, message, correlationId]
