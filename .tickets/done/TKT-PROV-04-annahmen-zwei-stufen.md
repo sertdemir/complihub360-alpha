@@ -1,11 +1,15 @@
 ---
 title: "Annahmen in zwei Stufen — Abrechnungsermächtigung raus aus dem Einreich-Gate"
 assignee: "Claude"
-status: "review"
+status: "done"
 ---
 
 # Annahmen in zwei Stufen (Canvas 4C)
 
+> Gemergt als PR #216, Squash `7b2fff91` (2026-09-27). Der Staging-Rollout
+> der UI steht noch aus — das Aktivierungs-Gate ist unveraendert, es geht nur
+> um Kapitel 5 der Bewerbungsstrecke.
+>
 > Hiess bis zum Merge von #219 TKT-PROV-03. Die Nummer ging an das
 > anonyme Matching, das sie zuerst auf `main` hatte; dieses Ticket ist
 > nachgerueckt.
