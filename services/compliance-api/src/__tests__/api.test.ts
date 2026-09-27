@@ -149,12 +149,17 @@ async function api(path: string, init: RequestInit & { auth?: 'key' | 'jwt' | 'n
     return { status: res.status, body: await res.json().catch(() => ({})) };
 }
 
+/** Der opake Ref eines Test-Anbieters — deterministisch aus dem Schluessel, damit Tests ihn nachschlagen koennen. */
+const refOf = (key: string) => createHash('md5').update(`ref:${key}`).digest('hex').slice(0, 12);
+
 function seedProvider(over: Record<string, any> = {}) {
+    const key = over.provider_key ?? 'test-kanzlei';
     const row = {
         provider_key: 'test-kanzlei',
+        public_ref: refOf(key),
         name: 'Testkanzlei Schmidt GmbH',
         contact_email: 'geheim@testkanzlei.example',
-        website_url: 'https://testkanzlei.example',
+        website_url: 'https://testkanzlei-schmidt.example',
         pseudonym_label: 'Verifizierte Steuerkanzlei · Norddeutschland',
         region: 'Norddeutschland',
         active_since: 2015,
@@ -183,6 +188,34 @@ function seedProvider(over: Record<string, any> = {}) {
     // die Selbstauskunft, die auf dem Draht nichts mehr entscheidet.
     const areas: string[] = over.areas ?? ['tax-vat'];
     delete (row as any).areas;
+    // Zahlungsbereit (Spec §21.1) — entscheidet die Buchung, nie das Matching.
+    const bookable: boolean = over.bookable ?? true;
+    delete (row as any).bookable;
+    // Nachweise fuer die Verifikationstiefe (Phase 3): 'independent' | 'reviewed' | 'none'.
+    const depth: 'independent' | 'reviewed' | 'none' = over.depth ?? 'none';
+    delete (row as any).depth;
+    if (depth !== 'none') {
+        const result = depth === 'independent' ? 'independently_verified' : 'reviewed';
+        for (const t of ['incorporation', 'vat_id', 'insurance', 'representative_identity']) {
+            (db.provider_evidence ??= []).push({
+                id: randomUUID(), provider_key: row.provider_key, evidence_type: t, source: t === 'vat_id' ? 'registry_check' : 'document',
+                result, upload_confirmed: true,
+            });
+        }
+        // Regulierte Bereiche verlangen eine Zulassung je Land (verificationRules).
+        for (const area of areas) if (area === 'tax-vat' || area === 'legal-advisory') for (const land of row.countries_supported ?? []) {
+            (db.provider_evidence ??= []).push({
+                id: randomUUID(), provider_key: row.provider_key, evidence_type: 'professional_licence', source: 'document',
+                result, upload_confirmed: true, supports_service_codes: [area], supports_countries: [land],
+            });
+        }
+    }
+    // Bereichsnamen fuer die Beschreibung ("Tax and VAT · Region") — einmal je Test.
+    for (const area of areas) {
+        if (!(db.service_categories ??= []).some((c) => c.code === area)) {
+            db.service_categories.push({ code: area, parent_code: null, label_en: area === 'tax-vat' ? 'Tax and VAT' : area === 'legal-advisory' ? 'Legal Support' : area, active: true });
+        }
+    }
     const matchbar = row.partner_status === 'active' || row.partner_status === 'downgraded';
     if (matchbar) {
         const view = (db.matchable_provider_services ??= []);
@@ -196,7 +229,7 @@ function seedProvider(over: Record<string, any> = {}) {
                     area_code: area,
                     country_code: land,
                     provider_availability: row.availability,
-                    bookable_chargeable: false,
+                    bookable_chargeable: bookable,
                     provider_lifecycle_status: 'active',
                 });
             }
@@ -309,7 +342,7 @@ describe('auth gate', () => {
 
 describe('POST /api/v1/search', () => {
     it('matches a wizard slug against an APPROVED service and anonymizes the result', async () => {
-        seedProvider();
+        seedProvider({ depth: 'independent' });
         const r = await api('/api/v1/search', {
             method: 'POST',
             body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], domains: ['tax-vat'] } }),
@@ -317,7 +350,15 @@ describe('POST /api/v1/search', () => {
         expect(r.status).toBe(200);
         expect(r.body.providers).toHaveLength(1);
         const p = r.body.providers[0];
-        expect(p.pseudonym_label).toContain('Steuerkanzlei');
+        // Phase 3: der Titel entsteht im System — Buchstabe je Liste plus
+        // Beschreibung aus freigegebenem Bereich und Region.
+        expect(p.title).toBe('Verified Provider A');
+        expect(p.letter).toBe('A');
+        expect(p.descriptor).toBe('Tax and VAT · Norddeutschland');
+        expect(p.public_ref).toBe(refOf('test-kanzlei'));
+        expect(p.provider_key).toBeUndefined();
+        expect(p.pseudonym_label).toBeUndefined();
+        expect(p.rank_basis.verification).toBe('independent');
         expect(p.match).toBeGreaterThan(0);
         expect(p.match_basis.domains_matched).toEqual(['tax-vat']);
         // Auf dem Draht steht die freigegebene Leistung, nicht die
@@ -476,10 +517,12 @@ describe('POST /api/v1/scheduling (booking = paid lead)', () => {
         const slot = new Date(Date.now() + 86_400_000).toISOString();
         const r = await api('/api/v1/scheduling', {
             method: 'POST', auth: 'jwt',
-            body: JSON.stringify({ provider_key: 'test-kanzlei', slot_start: slot, message: 'Erstgespräch' }),
+            body: JSON.stringify({ public_ref: refOf('test-kanzlei'), slot_start: slot, message: 'Erstgespräch' }),
         });
         expect(r.status).toBe(201);
         expect(r.body.booking.status).toBe('confirmed');
+        expect(r.body.booking.public_ref).toBe(refOf('test-kanzlei'));
+        expect(r.body.booking.provider_key).toBeUndefined();
         // Stage-3 reveal happens exactly here.
         expect(r.body.provider_identity.name).toBe('Testkanzlei Schmidt GmbH');
         const row = db.scheduling[0];
@@ -490,13 +533,26 @@ describe('POST /api/v1/scheduling (booking = paid lead)', () => {
         expect(events).toContain('provider_lead_charged');
     });
 
-    it('404s for a provider that is not active', async () => {
-        seedProvider({ partner_status: 'downgraded' });
+    it('404s for a provider that is not matchable — partner_status entscheidet nichts', async () => {
+        // inactive: das Fixture legt keine View-Zeile an. Ein Konto ausserhalb
+        // der UND-Kette ist nicht buchbar, egal was partner_status sagt.
+        seedProvider({ partner_status: 'inactive' });
         const r = await api('/api/v1/scheduling', {
             method: 'POST', auth: 'jwt',
-            body: JSON.stringify({ provider_key: 'test-kanzlei', slot_start: new Date(Date.now() + 86_400_000).toISOString() }),
+            body: JSON.stringify({ public_ref: refOf('test-kanzlei'), slot_start: new Date(Date.now() + 86_400_000).toISOString() }),
         });
         expect(r.status).toBe(404);
+    });
+
+    it('409 mit Grund, wenn der Anbieter matchbar, aber nicht zahlungsbereit ist (§21.1)', async () => {
+        seedProvider({ bookable: false });
+        const r = await api('/api/v1/scheduling', {
+            method: 'POST', auth: 'jwt',
+            body: JSON.stringify({ public_ref: refOf('test-kanzlei'), slot_start: new Date(Date.now() + 86_400_000).toISOString() }),
+        });
+        expect(r.status).toBe(409);
+        expect(r.body.errorCode).toBe('BILLING_NOT_READY');
+        expect(db.scheduling ?? []).toHaveLength(0);
     });
 });
 
@@ -765,10 +821,14 @@ describe('Ownership: Anbieter-eigene Routen gehoeren ihren Mitgliedern', () => {
         expect(r2.status).toBe(200);
     });
 
-    it('laesst die Nutzer-Routen eines Anbieters offen (Detail, Slots, Reviews)', async () => {
+    it('laesst die Nutzer-Routen eines Anbieters offen — ueber den Ref, nie ueber den Schluessel', async () => {
         seedProvider();
-        const r = await api('/api/v1/provider/test-kanzlei/reviews', { auth: 'jwt' });
-        expect(r.status).not.toBe(404);
+        const r = await api(`/api/v1/p/${refOf('test-kanzlei')}/reviews`, { auth: 'jwt' });
+        expect(r.status).toBe(200);
+        // Der alte Pfad mit dem Schluessel ist weg: er laege ausserhalb des
+        // Guards und waere ein Rueckkanal vom Ref zum Namen.
+        const alt = await api('/api/v1/provider/test-kanzlei/reviews', { auth: 'jwt' });
+        expect(alt.status).toBe(404);
     });
 });
 
@@ -943,9 +1003,9 @@ describe('Kommerzielle Neutralitaet: das Abo ist kein Ranking-Merkmal', () => {
         seedSubscription('kanzlei-drei', 'global');
         const r = await suche();
         expect(r.status).toBe(200);
-        const scores = new Map(r.body.providers.map((p: any) => [p.provider_key, p.match]));
-        expect(scores.get('kanzlei-drei')).toBe(scores.get('ohne-abo'));
-        expect(scores.get('kanzlei-zwei')).toBe(scores.get('ohne-abo'));
+        const scores = new Map(r.body.providers.map((p: any) => [p.public_ref, p.match]));
+        expect(scores.get(refOf('kanzlei-drei'))).toBe(scores.get(refOf('ohne-abo')));
+        expect(scores.get(refOf('kanzlei-zwei'))).toBe(scores.get(refOf('ohne-abo')));
         // Kein Feld auf dem Draht verraet den Plan.
         for (const p of r.body.providers) {
             expect(Object.keys(p).join(' ')).not.toMatch(/plan|subscription/i);
@@ -958,12 +1018,164 @@ describe('Kommerzielle Neutralitaet: das Abo ist kein Ranking-Merkmal', () => {
         seedProvider({ provider_key: 'a-kanzlei', rating: 4.9 });
         seedProvider({ provider_key: 'b-kanzlei', rating: 4.1 });
         seedSubscription('b-kanzlei', 'global');
-        const vorher = (await suche()).body.providers.map((p: any) => p.provider_key);
+        const vorher = (await suche()).body.providers.map((p: any) => p.public_ref);
         db.provider_subscriptions = [];
         seedSubscription('a-kanzlei', 'global');
-        const nachher = (await suche()).body.providers.map((p: any) => p.provider_key);
+        const nachher = (await suche()).body.providers.map((p: any) => p.public_ref);
         expect(nachher).toEqual(vorher);
-        expect(vorher[0]).toBe('a-kanzlei');
+        expect(vorher[0]).toBe(refOf('a-kanzlei'));
+    });
+
+    // Phase 3 (ADR-0004): auch `partner_status` ist kein Ranking-Merkmal mehr.
+    // Was zaehlt, ist die Verifikationstiefe — unabhaengig geprueft e
+    // Pflichtnachweise —, und die kann jeder Anbieter sofort erreichen.
+    it('partner_status aendert weder Score noch Reihenfolge', async () => {
+        seedProvider({ provider_key: 'aktiv', rating: 4.6, partner_status: 'active' });
+        seedProvider({ provider_key: 'abgestuft', rating: 4.6, partner_status: 'downgraded' });
+        const r = await suche();
+        const byRef = new Map(r.body.providers.map((p: any) => [p.public_ref, p]));
+        expect(byRef.get(refOf('abgestuft')).match).toBe(byRef.get(refOf('aktiv')).match);
+        expect(byRef.get(refOf('abgestuft')).is_verified).toBe(true);
+        expect(byRef.get(refOf('abgestuft')).rank_basis).toEqual(byRef.get(refOf('aktiv')).rank_basis);
+    });
+
+    it('unabhaengig geprueft e Nachweise stehen vor nur gesichteten — bei gleicher Passung und Leistung', async () => {
+        seedProvider({ provider_key: 'gesichtet', rating: 4.6, depth: 'reviewed' });
+        seedProvider({ provider_key: 'unabhaengig', rating: 4.6, depth: 'independent' });
+        seedProvider({ provider_key: 'ohne', rating: 4.6, depth: 'none' });
+        const r = await suche();
+        expect(r.body.providers.map((p: any) => p.public_ref)).toEqual([refOf('unabhaengig'), refOf('gesichtet'), refOf('ohne')]);
+        expect(r.body.providers.map((p: any) => p.rank_basis.verification)).toEqual(['independent', 'reviewed', 'none']);
+        expect(r.body.providers.map((p: any) => p.letter)).toEqual(['A', 'B', 'C']);
+    });
+});
+
+describe('Anonymitaet auf dem Draht (Phase 3, ADR-0004)', () => {
+    // Was ein Nutzer vor der Buchung bekommt, darf den Anbieter nicht
+    // verraten: kein Schluessel, kein Name, keine Domain, keine Kontaktdaten —
+    // in keiner Antwort, auch nicht als Wert in einem Freitext.
+    const VERRAETER = [/provider_key/, /pseudonym_label/, /Testkanzlei/i, /Schmidt/i, /testkanzlei-schmidt/i, /test-kanzlei/, /contact_email/, /website_url/, /geheim@/];
+    const sauber = (body: unknown) => {
+        const text = JSON.stringify(body);
+        for (const rx of VERRAETER) expect(text).not.toMatch(rx);
+    };
+    // Ein Freitext, der den Anbieter nennt — Altbestand, den das Netz beim Lesen faengt.
+    const mitLeck = () => seedProvider({
+        depth: 'independent',
+        services: ['USt-Registrierung', 'Beratung durch Testkanzlei Schmidt GmbH'],
+        credentials: ['Steuerberater seit 2010, siehe testkanzlei-schmidt.example'],
+        work_mode: 'Remote, Kontakt: geheim@testkanzlei.example',
+        pricing_table: [{ service: 'VAT', price: 'ab 900 €', note: 'HRB 12345' }],
+    });
+
+    it('Suche', async () => {
+        mitLeck();
+        const r = await api('/api/v1/search', { method: 'POST', auth: 'none', body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], domains: ['tax-vat'] } }) });
+        expect(r.status).toBe(200);
+        expect(r.body.providers).toHaveLength(1);
+        sauber(r.body.providers);
+    });
+
+    it('Detail — Freitexte maskiert, Register-Felder internal fehlen', async () => {
+        mitLeck();
+        const r = await api(`/api/v1/p/${refOf('test-kanzlei')}/detail`, { auth: 'jwt' });
+        expect(r.status).toBe(200);
+        sauber(r.body);
+        const d = r.body.detail;
+        expect(d.services[1]).toBe('Beratung durch […]');
+        expect(d.credentials[0]).toContain('[…]');
+        expect(d.work_mode).toBe('Remote, Kontakt: […]');
+        expect(d.pricing_table[0].note).toBe('[…]');
+        expect(d.confirmation_rate).toBeUndefined();
+        expect(d.countries_supported).toBeUndefined();
+        expect(d.markets).toEqual(['DE']);
+        expect(d.specializations).toEqual(['Tax and VAT']);
+        expect(d.descriptor).toBe('Tax and VAT · Norddeutschland');
+        expect(d.rank_basis.verification).toBe('independent');
+    });
+
+    it('Bewertungen — ein Mandant, der den Anbieter nennt, verraet ihn nicht', async () => {
+        mitLeck();
+        (db.reviews ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', from_role: 'user', verified: true, booking_id: randomUUID(), rating: 5, body: 'Frau Schmidt von der Testkanzlei war super.', created_at: new Date().toISOString() });
+        const r = await api(`/api/v1/p/${refOf('test-kanzlei')}/reviews`, { auth: 'jwt' });
+        expect(r.status).toBe(200);
+        sauber(r.body);
+        expect(r.body.reviews[0].body).toContain('[…]');
+    });
+
+    it('Slots und Termine vor der Offenlegung', async () => {
+        mitLeck();
+        const slots = await api(`/api/v1/p/${refOf('test-kanzlei')}/slots`, { auth: 'jwt' });
+        expect(slots.status).toBe(200);
+        sauber(slots.body);
+        (db.scheduling ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', user_id: USER_ID, slot_start: new Date().toISOString(), slot_end: new Date().toISOString(), status: 'confirmed', identity_revealed: false });
+        const b = await api('/api/v1/bookings', { auth: 'jwt' });
+        expect(b.status).toBe(200);
+        sauber(b.body);
+        expect(b.body.bookings[0].provider_name).toBe('Verified Provider');
+        expect(b.body.bookings[0].provider_descriptor).toBe('Tax and VAT · Norddeutschland');
+        expect(b.body.bookings[0].public_ref).toBe(refOf('test-kanzlei'));
+    });
+
+    it('Termine nach der Offenlegung tragen den Namen, aber weiter keinen Schluessel', async () => {
+        mitLeck();
+        (db.scheduling ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', user_id: USER_ID, slot_start: new Date().toISOString(), slot_end: new Date().toISOString(), status: 'confirmed', identity_revealed: true });
+        const b = await api('/api/v1/bookings', { auth: 'jwt' });
+        expect(b.body.bookings[0].provider_name).toBe('Testkanzlei Schmidt GmbH');
+        expect(b.body.bookings[0].provider_website).toBe('https://testkanzlei-schmidt.example');
+        expect(JSON.stringify(b.body)).not.toMatch(/provider_key|test-kanzlei/);
+    });
+
+    it('ein unbekannter oder sprechender Ref ist 404', async () => {
+        seedProvider();
+        expect((await api('/api/v1/p/000000000000/detail', { auth: 'jwt' })).status).toBe(404);
+        expect((await api('/api/v1/p/test-kanzlei/detail', { auth: 'jwt' })).status).toBe(404);
+        expect((await api('/api/v1/provider/test-kanzlei/detail', { auth: 'jwt' })).status).toBe(404);
+    });
+
+    it('Nachrichten an Nutzer tragen den Ref, nicht den Schluessel', async () => {
+        seedProvider();
+        (db.scheduling ??= []).push({ id: 'b1', provider_key: 'test-kanzlei', user_id: USER_ID, slot_start: new Date(Date.now() + 86_400_000).toISOString(), slot_end: new Date(Date.now() + 90_000_000).toISOString(), status: 'confirmed', identity_revealed: true });
+        const r = await api('/api/v1/scheduling/b1', { method: 'PATCH', auth: 'key', body: JSON.stringify({ status: 'cancelled' }) });
+        expect(r.status).toBe(200);
+        const n = (db.notifications ?? []).find((x: any) => x.type === 'booking_cancelled');
+        expect(n).toBeDefined();
+        expect(n.payload.providerRef).toBe(refOf('test-kanzlei'));
+        expect(n.payload.providerKey).toBeUndefined();
+    });
+});
+
+describe('Identitaets-Scan an den Schreibrouten (Phase 3)', () => {
+    // Blockieren und benennen (Nutzer-Entscheidung 2026-09-27): ein Freitext
+    // mit Firmenname, Domain oder Rechtsform wird nicht gespeichert; die
+    // Antwort sagt, was wo gefunden wurde — ohne Verstoss-Sprache.
+    it('PATCH /profile: Rechtsform in der Region → 422 mit Fundstelle', async () => {
+        seedProvider();
+        const r = await api('/api/v1/provider/test-kanzlei/profile', { method: 'PATCH', auth: 'key', body: JSON.stringify({ region: 'Hamburg, Mustermann GmbH' }) });
+        expect(r.status).toBe(422);
+        expect(r.body.errorCode).toBe('IDENTITY_IN_TEXT');
+        expect(r.body.findings[0]).toMatchObject({ field: 'region', type: 'legal_form', match: 'Mustermann GmbH' });
+        expect(r.body.message).not.toMatch(/violat|verstoss|verstoß/i);
+        expect(db.providers[0].region).toBe('Norddeutschland');
+    });
+
+    it('PATCH /profile: Domain in der Preistabelle → 422; der eigene Name → own_name', async () => {
+        seedProvider();
+        const r = await api('/api/v1/provider/test-kanzlei/profile', { method: 'PATCH', auth: 'key', body: JSON.stringify({ pricing_table: [{ service: 'VAT', note: 'siehe beispiel.de' }] }) });
+        expect(r.status).toBe(422);
+        expect(r.body.findings[0].type).toBe('domain');
+        const r2 = await api('/api/v1/provider/test-kanzlei/profile', { method: 'PATCH', auth: 'key', body: JSON.stringify({ region: 'Schmidt-Land' }) });
+        expect(r2.status).toBe(422);
+        expect(r2.body.findings[0].type).toBe('own_name');
+    });
+
+    it('PATCH /profile: sauberer Text → 200; pseudonym_label wird still ignoriert', async () => {
+        seedProvider();
+        const r = await api('/api/v1/provider/test-kanzlei/profile', { method: 'PATCH', auth: 'key', body: JSON.stringify({ region: 'Norditalien', pseudonym_label: 'Testkanzlei Schmidt' }) });
+        expect(r.status).toBe(200);
+        expect(r.body.updated).toContain('region');
+        expect(r.body.updated).not.toContain('pseudonym_label');
+        expect(db.providers[0].pseudonym_label).toBe('Verifizierte Steuerkanzlei · Norddeutschland');
     });
 });
 
@@ -1538,7 +1750,8 @@ describe('Anfragen gehoeren ihrem Ersteller', () => {
 // ─── Phase 2: Onboarding und Verifikation ────────────────────────────────────
 
 function seedTaxonomy() {
-    (db.service_categories ??= []).push(
+    db.service_categories = [];
+    db.service_categories.push(
         { code: 'tax-vat', parent_code: null, label_en: 'Tax and VAT', active: true },
         { code: 'tax-vat.returns', parent_code: 'tax-vat', label_en: 'VAT returns', active: true },
         { code: 'data-privacy', parent_code: null, label_en: 'Data and Privacy', active: true },

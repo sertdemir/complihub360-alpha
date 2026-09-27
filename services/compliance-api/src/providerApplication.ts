@@ -5,6 +5,7 @@ import { supabaseApi } from './supabase.js';
 import type { Caller } from './providerAuth.js';
 import { categoryAllowanceCheck, getActiveSubscription, loadPricingConfig } from './billing.js';
 import { checkVatId } from './vies.js';
+import { scanFields, type IdentityContext } from './anonymity.js';
 import {
     EVIDENCE_ALLOWED_MIME, EVIDENCE_BUCKET, EVIDENCE_MAX_BYTES, evidenceObjectPath, objectInfo, signedUploadUrl,
 } from './storage.js';
@@ -62,6 +63,27 @@ const strList = (v: unknown, max = 50): string[] | undefined =>
     Array.isArray(v) ? v.filter((x) => typeof x === 'string').map((x) => x.trim().slice(0, 200)).filter(Boolean).slice(0, max) : undefined;
 const isUuid = (v: unknown): v is string => typeof v === 'string' && /^[0-9a-f-]{36}$/i.test(v);
 const isCountry = (v: unknown): v is string => typeof v === 'string' && /^[A-Z]{2}$/.test(v);
+
+// ─── Identitaet in Freitexten (Phase 3) ──────────────────────────────────────
+// Was ein Nutzer vor der Buchung liest, darf den Anbieter nicht verraten.
+// Gefunden wird benannt (422 mit Feld, Typ, Stelle), nicht still gespeichert.
+const identityCtx = (p: any): IdentityContext => ({ providerName: p?.name ?? null, website: p?.website_url ?? null });
+function rejectIdentity(res: ServerResponse, correlationId: string, findings: ReturnType<typeof scanFields>): boolean {
+    if (!findings.length) return false;
+    json(res, 422, {
+        errorCode: 'IDENTITY_IN_TEXT',
+        message: 'Please keep these texts free of names, domains and registration numbers — they stay anonymous until booking.',
+        findings, correlationId,
+    });
+    return true;
+}
+/** Die Felder einer Leistung, die ein Nutzer sieht — Personenangaben (supervising_professional) sind internal und bleiben aussen vor. */
+const SERVICE_TEXT_FIELDS = ['service_name', 'description', 'provider_keywords', 'deliverables', 'exclusions', 'prerequisites', 'required_user_documents', 'pricing_basis', 'min_engagement', 'additional_costs'] as const;
+function serviceTexts(patch: Record<string, unknown>): Record<string, unknown> {
+    const out: Record<string, unknown> = {};
+    for (const k of SERVICE_TEXT_FIELDS) if (k in patch) out[k] = patch[k];
+    return out;
+}
 
 /** Ein Eintrag im Entscheidungsprotokoll. Nie ueber den Vorgang hinaus werfen — das Protokoll ist Beiwerk. */
 export async function reviewLog(entry: {
@@ -206,6 +228,9 @@ async function patchApplication(req: IncomingMessage, res: ServerResponse, corre
     if (!Object.keys(pub).length && !Object.keys(conf).length) {
         json(res, 400, { errorCode: 'VALIDATION_ERROR', message: 'No valid application fields', correlationId }); return;
     }
+    // Region und Arbeitsweise stehen auf der anonymen Karte; der Name aus
+    // demselben PATCH zaehlt schon als Kontext.
+    if (rejectIdentity(res, correlationId, scanFields({ region: pub.region, work_mode: pub.work_mode }, identityCtx({ ...providers[0], ...pub })))) return;
     const now = new Date().toISOString();
     if (Object.keys(pub).length) await supabaseApi.update('providers', { provider_key: providerKey }, { ...pub, updated_at: now });
     if (Object.keys(conf).length) await supabaseApi.upsert('provider_confidential', 'provider_key', { provider_key: providerKey, ...conf, updated_at: now });
@@ -282,6 +307,10 @@ async function createService(req: IncomingMessage, res: ServerResponse, correlat
         return;
     }
     const patch = servicePatchFrom(d);
+    {
+        const own = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[];
+        if (rejectIdentity(res, correlationId, scanFields(serviceTexts(patch), identityCtx(own[0])))) return;
+    }
     const row = {
         provider_key: providerKey, service_code: code,
         service_name: (patch.service_name as string) || cat[0].label_en,
@@ -309,6 +338,10 @@ async function patchService(req: IncomingMessage, res: ServerResponse, correlati
     }
     const patch = servicePatchFrom(d);
     if (!Object.keys(patch).length) { json(res, 400, { errorCode: 'VALIDATION_ERROR', message: 'No valid service fields', correlationId }); return; }
+    {
+        const own = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[];
+        if (rejectIdentity(res, correlationId, scanFields(serviceTexts(patch), identityCtx(own[0])))) return;
+    }
     patch.updated_at = new Date().toISOString();
     await supabaseApi.update('provider_services', { id: serviceId }, patch);
     // Eine freigegebene Leistung darf ihre Beschreibung und Preise pflegen;
