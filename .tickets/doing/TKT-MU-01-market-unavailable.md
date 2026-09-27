@@ -29,7 +29,7 @@ Market“-Aktion, die tatsächlich etwas tut.
 - [x] Canvas-Wahl D3 · E3 · F3 (27.09.) → Figma 3470:2011 / 2129 / 2221, abgenommen
 - [x] Migration auf Staging-Supabase eingespielt; Endpunkt live geprüft (200 Gast, Upsert, 403, 409), Testzeile entfernt
 - [x] Lokal: Zustand statt C3, Zeilen je Markt (Gast), Bestätigung, Opt-in mit Konto; 7 Tests, 6 Sabotagen erkannt; Screenshots EN/DE/Mobil
-- [ ] Neue Copy abnehmen (`results:marketRequest.*`, bewusst nicht unter `common:states.*`)
+- [x] Neue Copy abgenommen (27.09.) → `common:states.marketRequest.*`, im Copy-Waechter; „You can switch it off any time“ bleibt weg (Nutzer: „Abschalten weglassen“)
 - [ ] Staging
 - [ ] Versand des Updates, sobald ein Markt abgedeckt ist (`notified_at` liegt bereit, der Versand ist noch offen)
 
@@ -48,7 +48,7 @@ Betroffen sind **Risk Map** (Darstellung), **Registrierung und Gating** (Update 
 
 ## Offene Punkte für den Nutzer (Stufe 3)
 
-- **„You can switch it off any time.“** ist aus der F3-Hilfe gestrichen: Abschalten gibt es noch nicht (TKT-COPY-01: keine Copy für Verhalten, das fehlt). Entweder bauen oder weglassen.
+- ~~„You can switch it off any time.“~~ Entschieden 27.09.: bleibt weg, kein Abschalten.
 - **Das Update selbst wird noch nicht versendet** (`notified_at` liegt bereit). F3 speichert den Wunsch ehrlich, aber vor einem Livegang muss der Versand stehen, sonst verspricht die Checkbox etwas.
 - **Die abgenommene Hero-Copy** sagt auch Gästen „choose whether you would like to receive an availability update“. Gäste können das nach der Entscheidung vom 27.09. nicht. Entweder eine Gast-Variante abnehmen oder so lassen.
 - **Angemeldete Ansicht:** Die Anbieter-Spalte zeigt auch bei marketUnavailable Anbieter („Does not cover your market“), wie schon bei C3. Die Gast-Seite zeigt keine.

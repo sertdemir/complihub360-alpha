@@ -424,10 +424,10 @@ describe('ResultsRiskMap when no requested market can be checked', () => {
     const box = screen.getByRole('region', { name: 'common:states.scope.triedToAssess' });
     expect(within(box).getByText('Brazil')).toBeInTheDocument();
     expect(within(box).getByText('Argentina')).toBeInTheDocument();
-    expect(within(box).getByText('results:marketRequest.notCovered · Tax & VAT, Data & Privacy')).toBeInTheDocument();
-    expect(within(box).getByText('results:marketRequest.alsoNotCovered · Tax & VAT, Data & Privacy')).toBeInTheDocument();
+    expect(within(box).getByText('common:states.marketRequest.notCovered · Tax & VAT, Data & Privacy')).toBeInTheDocument();
+    expect(within(box).getByText('common:states.marketRequest.alsoNotCovered · Tax & VAT, Data & Privacy')).toBeInTheDocument();
     // A guest can request, but is not offered an update: we would need an address.
-    expect(screen.queryByText('results:marketRequest.notifyLabel')).not.toBeInTheDocument();
+    expect(screen.queryByText('common:states.marketRequest.notifyLabel')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'common:states.actions.exploreOtherMarkets' })).toBeInTheDocument();
   });
 
@@ -441,13 +441,13 @@ describe('ResultsRiskMap when no requested market can be checked', () => {
     expect(requestMarket).toHaveBeenCalledWith({ market: 'BR', domains: ['tax-vat'], notify: false, asGuest: true });
     // Brazil confirms in place; Argentina can still be requested.
     const box = screen.getByRole('region', { name: 'common:states.scope.triedToAssess' });
-    expect(await within(box).findByText('results:marketRequest.sent')).toBeInTheDocument();
+    expect(await within(box).findByText('common:states.marketRequest.sent')).toBeInTheDocument();
     expect(within(box).getByRole('button', { name: 'common:states.actions.requestThisMarket: Argentina' })).toBeInTheDocument();
 
     fireEvent.click(within(box).getByRole('button', { name: 'common:states.actions.requestThisMarket: Argentina' }));
     // All requested: the box gives way to the confirmation, and the way to
     // other markets moves into it — once, not twice.
-    expect(await screen.findByText('results:marketRequest.sentBody')).toBeInTheDocument();
+    expect(await screen.findByText('common:states.marketRequest.sentBody')).toBeInTheDocument();
     expect(screen.queryByRole('region', { name: 'common:states.scope.triedToAssess' })).not.toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: 'common:states.actions.exploreOtherMarkets' })).toHaveLength(1);
   });
@@ -459,9 +459,9 @@ describe('ResultsRiskMap when no requested market can be checked', () => {
     renderPage();
 
     fireEvent.click(await screen.findByRole('button', { name: 'common:states.actions.requestThisMarket: Brazil' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('results:marketRequest.failed');
+    expect(await screen.findByRole('alert')).toHaveTextContent('common:states.marketRequest.failed');
     expect(screen.getByRole('button', { name: 'common:states.actions.requestThisMarket: Brazil' })).toBeEnabled();
-    expect(screen.queryByText('results:marketRequest.sentBody')).not.toBeInTheDocument();
+    expect(screen.queryByText('common:states.marketRequest.sentBody')).not.toBeInTheDocument();
   });
 
   it('stays "no requirements" when at least one market was checked (DE + BR)', async () => {
@@ -486,11 +486,11 @@ describe('ResultsRiskMap when no requested market can be checked', () => {
     expect(screen.queryByText('snapshot.kpiTotal')).not.toBeInTheDocument();
     const optIn = screen.getByRole('checkbox');
     expect(optIn).not.toBeChecked();
-    expect(screen.getByText('results:marketRequest.notifyLabel')).toBeInTheDocument();
+    expect(screen.getByText('common:states.marketRequest.notifyLabel')).toBeInTheDocument();
     fireEvent.click(optIn);
     fireEvent.click(screen.getByRole('button', { name: 'common:states.actions.requestThisMarket' }));
     expect(requestMarket).toHaveBeenCalledWith({ market: 'BR', domains: ['tax-vat'], notify: true, asGuest: false });
-    expect(await screen.findByText('results:marketRequest.sentBody')).toBeInTheDocument();
+    expect(await screen.findByText('common:states.marketRequest.sentBody')).toBeInTheDocument();
   });
 
   it('sends as a guest from a demo login, which has no token to identify it', async () => {

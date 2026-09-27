@@ -1987,7 +1987,16 @@
       "markets": "Märkte",
       "areas": "Bereiche"
     },
-    "technicalDetails": "Technische Details"
+    "technicalDetails": "Technische Details",
+    "marketRequest": {
+      "notCovered": "Noch nicht abgedeckt",
+      "alsoNotCovered": "Ebenfalls noch nicht abgedeckt",
+      "sent": "Anfrage für {{markets}} gesendet",
+      "sentBody": "Wir zählen Anfragen je Markt, um zu entscheiden, wo die Abdeckung als Nächstes wächst. Einen Termin können wir nicht zusagen.",
+      "notifyLabel": "Per E-Mail informieren, sobald {{market}} abgedeckt ist",
+      "notifyHelp": "Wir schreiben Ihnen an {{email}}. Nur zu diesem Markt.",
+      "failed": "Ihre Anfrage konnte nicht gesendet werden. Bitte versuchen Sie es erneut."
+    }
   },
   "errorBoundary": {
     "title": "Diese Seite ließ sich nicht anzeigen.",

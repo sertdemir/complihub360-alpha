@@ -18,9 +18,9 @@ import { scopeOf } from './RiskMapState';
 // dort eine Aussage ueber eine Pruefung, die nicht stattgefunden hat. Gemischte
 // Faelle (DE + BR) bleiben C3.
 //
-// Die Copy unterhalb der Ueberschrift ist NEU und noch nicht abgenommen; sie
-// liegt deshalb unter `results:marketRequest.*` und nicht unter
-// `common:states.*`, wo der Copy-Waechter nur Abgenommenes duldet.
+// Die Copy unter `common:states.marketRequest.*` ist am 27.09.2026 abgenommen
+// und steht im Copy-Waechter (scripts/check-approved-copy.mjs). Ein Abschalten
+// des Updates gibt es nicht, also verspricht die Hilfe auch keines.
 
 type Profile = { country?: string; markets?: string[]; categories?: string[] };
 
@@ -94,10 +94,10 @@ export function ExploreOtherMarkets({ onClick }: { onClick: () => void }) {
 const outlineBrand = 'border-stroke-brand bg-surface text-fg-brand hover:bg-brand-light dark:border-stroke-brand dark:text-fg-brand';
 
 function Failed() {
-  const { t } = useTranslation(['results']);
+  const { t } = useTranslation(['common']);
   return (
     <span role="alert" className="text-body-xs text-error-500">
-      {t('results:marketRequest.failed')}
+      {t('common:states.marketRequest.failed')}
     </span>
   );
 }
@@ -131,7 +131,7 @@ export function MarketRequestList({
       <ul>
         {markets.map((m, i) => {
           const s = status[m] ?? 'idle';
-          const lead = t(i === 0 ? 'results:marketRequest.notCovered' : 'results:marketRequest.alsoNotCovered');
+          const lead = t(i === 0 ? 'common:states.marketRequest.notCovered' : 'common:states.marketRequest.alsoNotCovered');
           return (
             <li
               key={m}
@@ -143,7 +143,7 @@ export function MarketRequestList({
               </span>
               {s === 'sent' ? (
                 <span role="status" className="inline-flex shrink-0 items-center gap-2 text-body-sm font-semibold text-fg-brand">
-                  <Check size={16} aria-hidden /> {t('results:marketRequest.sent', { markets: names.market(m) })}
+                  <Check size={16} aria-hidden /> {t('common:states.marketRequest.sent', { markets: names.market(m) })}
                 </span>
               ) : (
                 <span className="flex shrink-0 flex-col items-start gap-1.5 sm:items-end">
@@ -171,7 +171,7 @@ export function MarketRequestList({
 /** E3 — die Bestaetigung. Kein Konto-Hinweis: die Anfrage selbst braucht
  *  keines, und wir verkaufen es hier nicht. */
 export function MarketRequestSent({ markets, onExplore }: { markets: string[]; onExplore?: () => void }) {
-  const { t } = useTranslation(['results']);
+  const { t } = useTranslation(['common']);
   const names = useNames();
   return (
     <div
@@ -183,9 +183,9 @@ export function MarketRequestSent({ markets, onExplore }: { markets: string[]; o
       </span>
       <span className="flex min-w-0 flex-col items-start gap-1.5">
         <span className="text-body font-bold text-fg">
-          {t('results:marketRequest.sent', { markets: names.list(markets.map(names.market)) })}
+          {t('common:states.marketRequest.sent', { markets: names.list(markets.map(names.market)) })}
         </span>
-        <span className="text-body-sm leading-[1.55] text-fg-secondary">{t('results:marketRequest.sentBody')}</span>
+        <span className="text-body-sm leading-[1.55] text-fg-secondary">{t('common:states.marketRequest.sentBody')}</span>
         {onExplore && <span className="-ml-4 pt-1"><ExploreOtherMarkets onClick={onExplore} /></span>}
       </span>
     </div>
@@ -232,8 +232,8 @@ export function MarketRequestCard({
           className="items-start"
           label={
             <span className="flex flex-col gap-0.5">
-              <span className="text-body-sm font-semibold text-fg">{t('results:marketRequest.notifyLabel', { market: name })}</span>
-              <span className="text-body-sm text-fg-tertiary">{t('results:marketRequest.notifyHelp', { email })}</span>
+              <span className="text-body-sm font-semibold text-fg">{t('common:states.marketRequest.notifyLabel', { market: name })}</span>
+              <span className="text-body-sm text-fg-tertiary">{t('common:states.marketRequest.notifyHelp', { email })}</span>
             </span>
           }
         />
