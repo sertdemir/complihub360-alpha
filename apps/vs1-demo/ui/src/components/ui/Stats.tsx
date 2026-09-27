@@ -153,7 +153,7 @@ export interface UnitPart {
   label: string;
 }
 
-export function UnitGrid({ parts, on, cols, perUnit = 1, size = 16, gap = 4, delayOffset = 0 }: {
+export function UnitGrid({ parts, on, cols, perUnit = 1, size = 16, gap = 4, delayOffset = 0, fluid = false }: {
   parts: UnitPart[];
   on: boolean;
   /** Spalten; ohne Angabe fliesst die Reihe in voller Laenge. */
@@ -163,6 +163,8 @@ export function UnitGrid({ parts, on, cols, perUnit = 1, size = 16, gap = 4, del
   gap?: number;
   /** Versatz in Kaestchen, damit mehrere Gruppen nacheinander aufgehen. */
   delayOffset?: number;
+  /** Bricht auf schmalen Flaechen um; `cols` ist dann die HOECHSTE Breite. */
+  fluid?: boolean;
 }) {
   const cells: { cls: string; label: string }[] = [];
   for (const p of parts) {
@@ -173,20 +175,28 @@ export function UnitGrid({ parts, on, cols, perUnit = 1, size = 16, gap = 4, del
     <div
       aria-hidden="true"
       className="grid"
-      style={{ gap, gridTemplateColumns: cols ? `repeat(${cols}, ${size}px)` : `repeat(${cells.length || 1}, ${size}px)` }}
+      style={fluid
+        ? { gap, gridTemplateColumns: `repeat(auto-fill, ${size}px)`, maxWidth: (cols ?? cells.length) * (size + gap) }
+        : { gap, gridTemplateColumns: cols ? `repeat(${cols}, ${size}px)` : `repeat(${cells.length || 1}, ${size}px)` }}
     >
       {cells.map((c, i) => (
         <span
           key={i}
-          title={c.label}
-          className={'block rounded-[4px] ' + c.cls}
+          className={'group/cell relative block rounded-[4px] hover:z-10 ' + c.cls}
           style={{
             width: size, height: size,
             opacity: on ? 1 : 0,
             transform: on ? 'scale(1)' : 'scale(0.2)',
             transition: `opacity 320ms ${EASE} ${(delayOffset + i) * 22}ms, transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1) ${(delayOffset + i) * 22}ms`,
           }}
-        />
+        >
+          {/* Sofort-Tooltip beim Hover (Nutzer 2026-09-27: "bei jedem Hover auf
+              ein Kaestchen soll der Markt angezeigt werden") — das native
+              title-Attribut kommt erst nach einer Sekunde. */}
+          <span className="pointer-events-none absolute bottom-full left-1/2 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md bg-[#111827] px-2 py-1 text-[11px] font-semibold leading-none text-white opacity-0 shadow-md transition-opacity duration-100 group-hover/cell:opacity-100 dark:bg-white dark:text-[#111827]">
+            {c.label}
+          </span>
+        </span>
       ))}
     </div>
   );
