@@ -237,7 +237,7 @@ export interface GateVerdict extends Verdict {
  *     booking eligibility when: ..." — sie sperren die gebuehrenpflichtige
  *     Buchbarkeit, nicht den Status. Dass Billing hier das Aktivieren sperrt,
  *     ist eine Auslegung, keine Spec-Vorgabe. Bewusst nicht mit veraendert;
- *     benannt in .tickets/review/TKT-PROV-03-annahmen-zwei-stufen.md.
+ *     benannt in .tickets/review/TKT-PROV-04-annahmen-zwei-stufen.md.
  *   · das Kategorie-Kontingent des Plans ist eingehalten
  *   · das Konto ist nicht beendet
  */

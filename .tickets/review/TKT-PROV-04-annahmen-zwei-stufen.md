@@ -6,6 +6,10 @@ status: "review"
 
 # Annahmen in zwei Stufen (Canvas 4C)
 
+> Hiess bis zum Merge von #219 TKT-PROV-03. Die Nummer ging an das
+> anonyme Matching, das sie zuerst auf `main` hatte; dieses Ticket ist
+> nachgerueckt.
+
 Nachtrag zu Phase 2 (#207). Die Bewerbungsstrecke verlangte drei Annahmen,
 bevor ein Antrag überhaupt eingereicht werden konnte — darunter die
 **Abrechnungsermächtigung**. Ein Anbieter musste also ein Zahlungsmandat
