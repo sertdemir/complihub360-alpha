@@ -163,7 +163,16 @@
     "outcomeMore_one": "Noch {{count}} weiterer",
     "outcomeMore_other": "Noch {{count}} weitere",
     "outcomeMoreLink": "auf der Termine-Seite beantworten",
-    "upNext": "Als Nächstes"
+    "upNext": "Als Nächstes",
+    "unitDoneTip": "Erledigte Pflicht",
+    "unitOpenTip": "Offene Pflicht",
+    "sessionUnnamed": "Ohne eigenen Namen",
+    "colSession": "Sitzung",
+    "colMarkets": "Märkte",
+    "colDuties": "Pflichten",
+    "colEdited": "Bearbeitet",
+    "sessionDone": "<b>{{done}} von {{total}}</b> erledigt",
+    "sessionNoHigh": "keine hohen"
   },
   "sessions": {
     "title": "Ihre Compliance-<accent>Sitzungen</accent>.",

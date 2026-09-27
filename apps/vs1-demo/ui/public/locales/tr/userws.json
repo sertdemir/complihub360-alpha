@@ -163,7 +163,16 @@
     "outcomeMore_one": "{{count}} tane daha",
     "outcomeMore_other": "{{count}} tane daha",
     "outcomeMoreLink": "randevular sayfasında yanıtlayın",
-    "upNext": "Sıradaki"
+    "upNext": "Sıradaki",
+    "unitDoneTip": "Tamamlanan yükümlülük",
+    "unitOpenTip": "Açık yükümlülük",
+    "sessionUnnamed": "Adı yok",
+    "colSession": "Oturum",
+    "colMarkets": "Pazarlar",
+    "colDuties": "Yükümlülükler",
+    "colEdited": "Düzenlendi",
+    "sessionDone": "<b>{{total}} yükümlülükten {{done}}</b> tamamlandı",
+    "sessionNoHigh": "yüksek yok"
   },
   "sessions": {
     "title": "Uyum <accent>oturumlarınız</accent>.",
