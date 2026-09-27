@@ -214,7 +214,7 @@ function Detail({ p, ctx, areaLabel, reviews, slots, entered, locale, onBook, on
     if (markets.length) {
       const missing = markets.filter((m) => !covered.has(m));
       lage.push(
-        <strong key="m" className={missing.length ? 'text-[#8A3B3B] dark:text-[#F1A88C]' : 'text-fg-accent-strong'}>
+        <strong key="m" className={missing.length ? 'text-error-700 dark:text-error-300' : 'text-fg-accent-strong'}>
           {missing.length
             ? t('detail.lageMarketsPartial', { covered: coveredCount, total: markets.length, missing: missing.join(' · ') })
             : t('detail.lageMarketsAll', { count: markets.length })}

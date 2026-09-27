@@ -78,6 +78,13 @@ export default {
                     DEFAULT: 'rgb(var(--color-bg-accent) / <alpha-value>)',
                     light: 'rgb(var(--color-bg-accent-light) / <alpha-value>)',
                 },
+                /* Kompass 2026-09-27: Hinweis-Ton "Neu"/"Bald" und Unit Grid. */
+                announce: 'rgb(var(--color-bg-announce) / <alpha-value>)',
+                unit: {
+                    rest: 'rgb(var(--color-bg-unit-rest) / <alpha-value>)',
+                    done: 'rgb(var(--color-bg-unit-done) / <alpha-value>)',
+                    'done-line': 'rgb(var(--color-border-unit-done) / <alpha-value>)',
+                },
                 /* Translucent depth overlay — see index.css. Flips direction per theme. */
                 elevate: 'rgb(var(--color-elevate) / <alpha-value>)',
                 surface: {
@@ -100,6 +107,7 @@ export default {
                     'on-brand-fixed': 'rgb(var(--color-text-on-brand-fixed) / <alpha-value>)',
                     'on-brand-accent': 'rgb(var(--color-text-on-brand-accent) / <alpha-value>)',
                     'on-accent': 'rgb(var(--color-text-on-accent) / <alpha-value>)',
+                    'on-announce': 'rgb(var(--color-text-on-announce) / <alpha-value>)',
                 },
                 stroke: {
                     DEFAULT: 'rgb(var(--color-border-default) / <alpha-value>)',
@@ -108,6 +116,7 @@ export default {
                     'strong-a11y': 'rgb(var(--color-border-strong-a11y) / <alpha-value>)',
                     input: 'rgb(var(--color-border-input) / <alpha-value>)',
                     brand: 'rgb(var(--color-border-brand) / <alpha-value>)',
+                    'brand-soft': 'rgb(var(--color-border-brand-soft) / <alpha-value>)',
                     accent: 'rgb(var(--color-border-accent) / <alpha-value>)',
                     focus: 'rgb(var(--color-border-focus) / <alpha-value>)',
                 },
@@ -120,6 +129,7 @@ export default {
                     'medium-bg': 'rgb(var(--color-risk-medium-bg) / <alpha-value>)',
                     'high-bg': 'rgb(var(--color-risk-high-bg) / <alpha-value>)',
                     'critical-bg': 'rgb(var(--color-risk-critical-bg) / <alpha-value>)',
+                    'medium-mark': 'rgb(var(--color-risk-medium-mark) / <alpha-value>)',
                     /* Foreground for the soft variant — text ON the *-bg tint. */
                     'on-low': 'rgb(var(--color-risk-text-on-low) / <alpha-value>)',
                     'on-medium': 'rgb(var(--color-risk-text-on-medium) / <alpha-value>)',

@@ -22,6 +22,7 @@ import { fetchSessions, type SessionRowData } from '../../api/sessions';
 import { fetchDashboard } from '../../api/dashboard';
 import { fetchMyNotifications } from '../../api/notifications';
 import { fetchUserRequests } from '../../api/requests';
+import { NavBadge } from '../ui/NavBadge';
 
 // ─── UserShell ────────────────────────────────────────────────────────────────
 // The user App-Workspace frame (always dark slate), mirroring the Figma User
@@ -102,11 +103,7 @@ const SIGN_OUT = 'rounded-lg text-[13px] font-medium text-fg-secondary transitio
 
 /** Neu-Zaehler an Bereichen: Petrol-Pille, auch als Bubble am Icon. */
 function NewsPill({ n, className = '' }: { n: number; className?: string }) {
-  return (
-    <span className={'inline-grid h-[18px] min-w-[18px] place-items-center rounded-full bg-brand px-[5px] text-[10.5px] font-bold leading-none tabular-nums text-fg-on-brand ' + className}>
-      {n}
-    </span>
-  );
+  return <NavBadge type="count" className={className}>{n}</NavBadge>;
 }
 
 export function UserShell({ activeDomain, children }: { activeDomain?: string; children: React.ReactNode }) {

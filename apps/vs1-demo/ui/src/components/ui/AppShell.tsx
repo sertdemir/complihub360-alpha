@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
+import { NAV_BADGE } from './NavBadge';
 
 // ─── AppShell ─────────────────────────────────────────────────────────────────
 // Mirrors the Compass "AppShell" (974:2) and the User/Provider dashboards. The
@@ -21,10 +22,9 @@ export function Sidebar({ logo, children, footer, className }: { logo?: React.Re
   );
 }
 
-/** "Bald"-Badge an einer Nav-Gruppe (Canvas B2, 2026-09-22): Petrol-Flaeche,
- *  Gold-Schrift, in beiden Themes gleich — ein Siegel, kein grauer Hinweis. */
-export const NAV_GROUP_BADGE =
-  'rounded-full bg-[rgb(var(--petrol-500))] px-2 py-1 text-[9.5px] font-extrabold uppercase leading-none tracking-[0.1em] text-[rgb(var(--gold-300))]';
+/** "Bald"-Badge an einer Nav-Gruppe (Canvas B2, 2026-09-22) — seit 2026-09-27
+ *  der Compass-Nav-Badge Type=Soon im Hinweis-Ton (siehe NavBadge.tsx). */
+export const NAV_GROUP_BADGE = NAV_BADGE.soon;
 
 export function SidebarGroup({ label, badge, children }: { label?: string; badge?: string; children: React.ReactNode }) {
   return (

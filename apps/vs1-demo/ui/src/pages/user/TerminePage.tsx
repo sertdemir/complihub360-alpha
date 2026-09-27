@@ -15,6 +15,7 @@ import { Tabs, TabList, Tab } from '../../components/ui/Tabs';
 import { useSearchParams } from 'react-router-dom';
 import { fetchUserRequests, type UserRequestRow } from '../../api/requests';
 import { AnfragenTab } from './AnfragenTab';
+import { DateMark } from '../../components/ui/DateMark';
 
 // ─── User Dashboard · Termine (bookings) ─────────────────────────────────────
 // Die Buchung IST der bezahlte Lead — Anbieter-Identität ist seit der Buchung
@@ -139,27 +140,6 @@ export function ladeIcs(r: Pick<Row, 'id' | 'slotStartIso' | 'slotEndIso' | 'pro
   a.remove();
 }
 
-// ─── Datums-Blockmarke (3B) ──────────────────────────────────────────────────
-// Tag gross, Monat klein — in jeder Sprache gleich breit, der nächste Termin
-// in Petrol. Das Jahr fällt aus der Marke; dafür trägt die Zeile daneben die
-// volle Datumszeile (bewusst hingenommene Kante der gewählten Variante).
-function DatumsMarke({ iso, locale, soon }: { iso: string; locale: string; soon?: boolean }) {
-  const d = new Date(iso);
-  return (
-    <div
-      aria-hidden="true"
-      className={`grid h-[60px] w-[60px] shrink-0 place-content-center rounded-xl border text-center leading-tight ${
-        soon ? 'border-stroke-brand bg-brand-light text-fg-brand' : 'border-stroke bg-surface text-fg'
-      }`}
-    >
-      <span className="text-[22px] font-bold">{d.getDate()}</span>
-      <span className={`text-[10px] font-bold uppercase tracking-[0.08em] ${soon ? '' : 'text-fg-tertiary'}`}>
-        {d.toLocaleDateString(locale, { month: 'short' }).replace('.', '')}
-      </span>
-    </div>
-  );
-}
-
 export function TerminePage() {
   const { t, i18n } = useTranslation('userws');
   const { openWizard } = useWizardDrawer();
@@ -272,7 +252,7 @@ export function TerminePage() {
         opts.flatTop ? 'rounded-b-xl border-t-0' : 'rounded-xl'
       }`}
     >
-      <DatumsMarke iso={r.slotStartIso} locale={locale} soon={next?.id === r.id} />
+      <DateMark iso={r.slotStartIso} locale={locale} size="lg" soon={next?.id === r.id} />
       <div className="min-w-0 flex-1">
         <p className="truncate text-[15px] font-semibold text-fg">{r.provider}</p>
         <Herkunft r={r} />
@@ -345,7 +325,7 @@ export function TerminePage() {
   const karte = (r: Row) => (
     <div key={r.id} className="flex flex-col gap-3 rounded-xl border border-stroke bg-surface p-4">
       <div className="flex items-start justify-between gap-3">
-        <DatumsMarke iso={r.slotStartIso} locale={locale} soon={next?.id === r.id} />
+        <DateMark iso={r.slotStartIso} locale={locale} size="lg" soon={next?.id === r.id} />
         <Tag tone={STATUS_TONE[r.status]}>{t(`termine.status.${r.status}`)}</Tag>
       </div>
       <div className="min-w-0">
@@ -421,7 +401,7 @@ export function TerminePage() {
             einem abonnierbaren Feed. */}
         {next && (
           <div className="flex flex-col gap-4 rounded-xl border border-stroke-brand/30 bg-brand-light px-6 py-5 sm:flex-row sm:items-center">
-            <DatumsMarke iso={next.slotStartIso} locale={locale} soon />
+            <DateMark iso={next.slotStartIso} locale={locale} size="lg" soon />
             <div className="min-w-0 flex-1">
               <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-fg-brand/70">
                 {t('termine.nextLabel')} · {nextRelativ}
