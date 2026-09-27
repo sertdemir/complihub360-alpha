@@ -118,7 +118,6 @@
     "nextStepBody": "{{total}} yükümlülükten {{open}} tanesi hâlâ açık.",
     "nextStepCta": "Oturumu aç",
     "resumeEyebrow": "Kaldığınız yerden devam edin",
-    "resumeMeta": "{{total}} yükümlülükten {{open}} tanesi açık",
     "resume": "Devam et",
     "savedSessions": "Kayıtlı oturumlar",
     "sessionOpen_one": "{{count}} açık",

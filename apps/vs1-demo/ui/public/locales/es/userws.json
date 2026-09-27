@@ -118,7 +118,6 @@
     "nextStepBody": "{{open}} de {{total}} obligaciones siguen abiertas.",
     "nextStepCta": "Abrir sesión",
     "resumeEyebrow": "Continuar donde lo dejó",
-    "resumeMeta": "{{open}} de {{total}} obligaciones abiertas",
     "resume": "Continuar",
     "savedSessions": "Sesiones guardadas",
     "sessionOpen_one": "{{count}} abierta",

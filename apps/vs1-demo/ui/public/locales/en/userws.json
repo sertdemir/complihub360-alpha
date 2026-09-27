@@ -118,7 +118,6 @@
     "nextStepBody": "{{open}} of {{total}} obligations are still open.",
     "nextStepCta": "Open session",
     "resumeEyebrow": "Pick up where you left off",
-    "resumeMeta": "{{open}} of {{total}} obligations open",
     "resume": "Continue",
     "savedSessions": "Saved sessions",
     "sessionOpen_one": "{{count}} open",
