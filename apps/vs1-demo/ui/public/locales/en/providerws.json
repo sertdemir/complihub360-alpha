@@ -591,6 +591,13 @@
     },
     "agreements": {
       "intro": "Every acceptance is recorded with version, language, name and role. A new version replaces the old one but does not delete it — the state at the time of a booking remains verifiable.",
+      "groupSubmit": "So we can review your application",
+      "tagRequired": "Required",
+      "groupSubmitHint": "Without these two we cannot accept an application.",
+      "groupLater": "Before anything is billed through CompliHub360",
+      "tagLater": "Can come later",
+      "groupLaterHint": "Needed before your account is activated — not in order to submit. You can grant it now or later.",
+      "commercialNote": "Commercial terms belong to your plan and are shown there, not here.",
       "doc": {
         "provider_agreement": "Provider agreement",
         "privacy_notice": "Privacy notice for providers",

@@ -591,6 +591,13 @@
     },
     "agreements": {
       "intro": "Her onay sürüm, dil, ad ve görevle kaydedilir. Yeni bir sürüm eskisinin yerini alır ama onu silmez — bir rezervasyon anındaki durum kanıtlanabilir kalır.",
+      "groupSubmit": "Başvurunuzu inceleyebilmemiz için",
+      "tagRequired": "Zorunlu",
+      "groupSubmitHint": "Bu ikisi olmadan bir başvuruyu kabul edemeyiz.",
+      "groupLater": "CompliHub360 üzerinden herhangi bir faturalama başlamadan önce",
+      "tagLater": "Sonra da olur",
+      "groupLaterHint": "Hesabınız etkinleştirilmeden önce gerekli — başvuruyu göndermek için değil. Şimdi ya da daha sonra verebilirsiniz.",
+      "commercialNote": "Ticari koşullar tarifenizin bir parçasıdır ve burada değil, orada gösterilir.",
       "doc": {
         "provider_agreement": "Sağlayıcı sözleşmesi",
         "privacy_notice": "Sağlayıcılar için gizlilik bildirimi",

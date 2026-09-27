@@ -591,6 +591,13 @@
     },
     "agreements": {
       "intro": "Jede Annahme wird mit Fassung, Sprache, Name und Funktion festgehalten. Eine neue Fassung ersetzt die alte, löscht sie aber nicht — der Stand zum Zeitpunkt einer Buchung bleibt belegbar.",
+      "groupSubmit": "Damit wir Ihre Bewerbung prüfen dürfen",
+      "tagRequired": "Erforderlich",
+      "groupSubmitHint": "Ohne diese beiden nehmen wir keine Bewerbung an.",
+      "groupLater": "Bevor über CompliHub360 abgerechnet wird",
+      "tagLater": "Später möglich",
+      "groupLaterHint": "Nötig, bevor Ihr Konto aktiviert wird — nicht, um einzureichen. Sie können sie jetzt oder später erteilen.",
+      "commercialNote": "Die kommerziellen Bedingungen gehören zur Wahl Ihres Tarifs und werden dort gezeigt, nicht hier.",
       "doc": {
         "provider_agreement": "Partnervereinbarung",
         "privacy_notice": "Datenschutzhinweise für Anbieter",
