@@ -1,5 +1,6 @@
 import { myProviderKey } from './provider';
 import { apiFetch } from './client';
+import { isMockApi } from '../lib/supabase'; // TEMP-DUMMY-TERMINE
 
 // ─── Bookings (Termine) — user side ──────────────────────────────────────────
 // Matchmaking v2: the booking IS the paid lead; provider identity is revealed
@@ -40,7 +41,42 @@ export function providerWebsiteHref(providerKey: string): string {
   return `${base}/api/v1/provider/${providerKey}/website`;
 }
 
+// ─── TEMP-DUMMY-TERMINE (2026-09-27) ─────────────────────────────────────────
+// Nutzer-Wunsch fuer das Review auf Staging: die Termine-Karte war dort leer.
+// Greift NUR im Staging-Build (VITE_DEMO_LOGIN=1, gesetzt allein in
+// deploy-staging.yml) und nur, wenn keine echten Termine kommen. Produktion und
+// der lokale Mock sind unberuehrt. Wieder entfernen: diesen Block, den
+// Fallback in fetchUserBookings und den Import von isMockApi (Suche nach
+// "TEMP-DUMMY-TERMINE").
+const DUMMY_TERMINE_AKTIV = import.meta.env.VITE_DEMO_LOGIN === '1' && !isMockApi;
+function dummyTermine(): UserBooking[] {
+  const um = (tage: number, stunde: number) => {
+    const d = new Date(); d.setDate(d.getDate() + tage); d.setHours(stunde, 0, 0, 0); return d.toISOString();
+  };
+  const t = (id: string, key: string, name: string, region: string, tage: number, stunde: number): UserBooking => ({
+    id, providerKey: key, providerName: name, providerRegion: region, providerWebsite: null,
+    slotStart: um(tage, stunde), slotEnd: new Date(new Date(um(tage, stunde)).getTime() + 30 * 60_000).toISOString(),
+    status: 'confirmed', message: null,
+  });
+  return [
+    t('dummy-b1', 'dummy-studio-bianchi', 'Studio Bianchi & Partner', 'Norditalien', -1, 14),
+    t('dummy-b2', 'dummy-oss-experts', 'OSS Experts GmbH', 'Berlin', -3, 10),
+    t('dummy-b3', 'dummy-schmidt-partner', 'Schmidt & Partner Steuerberatung', 'Norddeutschland', 1, 9),
+    t('dummy-b4', 'dummy-lucid-reg', 'LUCID Registrierungsdienst Hamburg', 'Hamburg', 3, 11),
+    t('dummy-b5', 'dummy-dahlmann-cpa', 'Dahlmann CPA', 'USA', 6, 15),
+  ];
+}
+
 export async function fetchUserBookings(): Promise<UserBooking[]> {
+  // TEMP-DUMMY-TERMINE: auf Staging bei Fehler oder leerer Liste die Dummies.
+  if (DUMMY_TERMINE_AKTIV) {
+    const echte = await fetchEchteBookings().catch(() => [] as UserBooking[]);
+    return echte.length ? echte : dummyTermine();
+  }
+  return fetchEchteBookings();
+}
+
+async function fetchEchteBookings(): Promise<UserBooking[]> {
   const res = await apiFetch<{ ok: boolean; bookings: ApiBookingRow[] }>('/api/v1/bookings');
   return (res.bookings || []).map((b) => ({
     id: b.id,
