@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { Play, ArrowRight, CalendarPlus, Compass } from 'lucide-react';
+import { CalendarPlus, Compass } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { useWizardDrawer } from '../../components/user/WizardDrawer';
@@ -27,7 +27,9 @@ import { ladeIcs } from './TerminePage';
 //   4B  Anfragen als Posteingangs-Zeilen — dasselbe Vokabular wie die
 //       Termine-Seite: lokalisierte Pille, Bereich · Markt, "Frist · Anbieter",
 //       eine Aktion je Zeile, EIN "Alle anzeigen" im Kopf.
-//   5B  Rechts zwei Karten: Termine und "Da weitermachen" mit Fortsetzen.
+//   5B  Rechts die Termine. "Da weitermachen" ist seit 2026-09-27 gestrichen:
+//       es zeigte nur die zuletzt geaenderte Sitzung, die als erste Kachel
+//       unter "Gespeicherte Sitzungen" ohnehin steht.
 //       Termine seit Canvas T2 (2026-09-27): oben, was eine Antwort braucht
 //       (vergangene Termine ohne Ergebnis), darunter "Als Naechstes" kompakt
 //       mit Thema aus der Anfrage beim selben Anbieter.
@@ -217,7 +219,6 @@ export function UserHomePage() {
     { n: laufen, cls: 'bg-brand/15', label: t('home.reqRunningTip'), legend: t('home.reqRunning', { count: laufen }) },
   ];
 
-  const zuletzt = [...dash.sessions.items].sort((a, b) => b.updated_at.localeCompare(a.updated_at))[0];
   const nichts = !loading && dash.sessions.total === 0 && offeneAnfragen.length === 0 && termine.length === 0;
 
   // Kopf: nur die Begruessung. Die Lage-Zeile (zuletzt als Sprungmarken, K2)
@@ -552,7 +553,7 @@ export function UserHomePage() {
               </div>
             </div>
 
-            {/* Rechte Spalte (5B) */}
+            {/* Rechte Spalte (5B): nur noch Termine */}
             <div className="flex min-w-0 flex-1 flex-col gap-[18px]">
               <div className={CARD + ' p-5'}>
                 <SectionHead title={t('home.termine')} count={String(termine.length + ohneErgebnis.length)} to="dashboard/termine" />
@@ -608,35 +609,6 @@ export function UserHomePage() {
                 {!termine.length && !ohneErgebnis.length && <p className="py-4 text-center text-body-2xs text-fg-tertiary">{t('home.noTermine')}</p>}
               </div>
 
-              {/* Da weitermachen — goldgerahmt, an der zuletzt bearbeiteten Sitzung. */}
-              {zuletzt && (
-                <div className={CARD + ' border-brand-accent/50 bg-brand-accent-light/40 p-5'}>
-                  <div className="flex items-center gap-2.5">
-                    <span className="shrink-0 text-fg-accent-strong">
-                      <Play size={30} fill="currentColor" strokeWidth={1.5} />
-                    </span>
-                    <p className="text-[10px] font-extrabold uppercase tracking-[0.09em] text-fg-accent-strong">{t('home.resumeEyebrow')}</p>
-                  </div>
-                  <p className="mt-2.5 text-body-sm font-bold text-fg">{sitzungsTitel(zuletzt, domainLabel)}</p>
-                  <p className="mt-0.5 text-body-3xs text-fg-tertiary">
-                    {t('home.resumeMeta', { open: zuletzt.open, total: zuletzt.total })}
-                  </p>
-                  <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-surface-secondary">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-brand to-brand-accent"
-                      style={{
-                        width: entered && zuletzt.total ? `${((zuletzt.total - zuletzt.open) / zuletzt.total) * 100}%` : 0,
-                        transition: `width 900ms ${EASE} 250ms`,
-                      }}
-                    />
-                  </div>
-                  <div className="mt-3 flex justify-end">
-                    <Button variant="primary" onClick={() => oeffneSitzung(zuletzt.id)}>
-                      {t('home.resume')} <ArrowRight size={14} className="ml-1" />
-                    </Button>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
 
