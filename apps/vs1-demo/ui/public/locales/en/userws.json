@@ -153,12 +153,18 @@
     "dutiesHigh_other": "{{count}} high",
     "today": "Today",
     "tomorrow": "Tomorrow",
+    "yesterday": "Yesterday",
     "riskTag": {
       "critical": "Critical",
       "high": "High risk",
       "medium": "Medium risk",
       "low": "Low risk"
-    }
+    },
+    "outcomeYes": "Yes",
+    "outcomeMore_one": "{{count}} more",
+    "outcomeMore_other": "{{count}} more",
+    "outcomeMoreLink": "answer on the appointments page",
+    "upNext": "Up next"
   },
   "sessions": {
     "title": "Your compliance <accent>sessions</accent>.",

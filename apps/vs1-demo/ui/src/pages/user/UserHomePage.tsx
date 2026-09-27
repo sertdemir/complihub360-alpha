@@ -9,11 +9,10 @@ import { Button } from '../../components/ui/Button';
 import { Segment } from '../../components/compliance-areas';
 import { UnitGrid, unitsPer, useCountUp, useEntered, EASE } from '../../components/ui/Stats';
 import { EmptyState } from '../../components/user/EmptyState';
-import { RescheduleDrawer, type RescheduleTarget } from '../../components/user/RescheduleDrawer';
 import { SessionTile } from '../../components/user/SessionTile';
 import { fetchDashboard, EMPTY_DASHBOARD, type DashboardData, type DashboardSession } from '../../api/dashboard';
 import { fetchUserRequests, type UserRequestRow } from '../../api/requests';
-import { fetchUserBookings, type UserBooking } from '../../api/bookings';
+import { fetchUserBookings, markOutcome, type UserBooking } from '../../api/bookings';
 import { SLUG_TO_I18N, relZeit } from './AnfragenTab';
 import { ladeIcs } from './TerminePage';
 
@@ -28,9 +27,10 @@ import { ladeIcs } from './TerminePage';
 //   4B  Anfragen als Posteingangs-Zeilen — dasselbe Vokabular wie die
 //       Termine-Seite: lokalisierte Pille, Bereich · Markt, "Frist · Anbieter",
 //       eine Aktion je Zeile, EIN "Alle anzeigen" im Kopf.
-//   5B  Rechts zwei Karten: Termine mit Datumsmarke und echten Aktionen (In
-//       den Kalender, Verschieben), "Da weitermachen" mit Fortsetzen. Der
-//       "Naechste Schritt" und "Termin vorschlagen" (ohne Funktion) entfallen.
+//   5B  Rechts zwei Karten: Termine und "Da weitermachen" mit Fortsetzen.
+//       Termine seit Canvas T2 (2026-09-27): oben, was eine Antwort braucht
+//       (vergangene Termine ohne Ergebnis), darunter "Als Naechstes" kompakt
+//       mit Thema aus der Anfrage beim selben Anbieter.
 //   6B  Sitzungen als Kacheln mit Risiko-Tag, Bereichs-/Land-Chips, Balken
 //       und "Oeffnen"-Link direkt auf die Sitzung — dieselbe Kachel wie auf der
 //       Sitzungen-Seite (SessionTile, Canvas 3B vom 2026-09-09).
@@ -124,9 +124,9 @@ function sitzungsTitel(s: DashboardSession, domainLabel: (k: string) => string):
 function DatumsMarke({ iso, locale }: { iso: string; locale: string }) {
   const d = new Date(iso);
   return (
-    <div aria-hidden="true" className="grid h-11 w-11 shrink-0 place-content-center rounded-lg border border-stroke-brand/40 bg-brand-light text-center leading-[1.1] text-fg-brand">
-      <span className="text-[16px] font-bold">{d.getDate()}</span>
-      <span className="text-[8.5px] font-bold uppercase tracking-[0.08em]">{d.toLocaleDateString(locale, { month: 'short' }).replace('.', '')}</span>
+    <div aria-hidden="true" className="grid h-9 w-9 shrink-0 place-content-center rounded-[7px] border border-stroke-brand/40 bg-brand-light text-center leading-[1.1] text-fg-brand">
+      <span className="text-[13px] font-bold">{d.getDate()}</span>
+      <span className="text-[7.5px] font-bold uppercase tracking-[0.08em]">{d.toLocaleDateString(locale, { month: 'short' }).replace('.', '')}</span>
     </div>
   );
 }
@@ -137,8 +137,7 @@ export function UserHomePage() {
   const { t, i18n } = useTranslation('userws');
   const { openWizard } = useWizardDrawer();
   const [chartView, setChartView] = useState<'markets' | 'areas'>('markets');
-  const [rescheduleFor, setRescheduleFor] = useState<RescheduleTarget | null>(null);
-  const [moved, setMoved] = useState<Record<string, string>>({});
+  const [outcomes, setOutcomes] = useState<Record<string, 'completed' | 'no_show'>>({});
   const entered = useEntered();
   const { dash, requests, bookings, loading } = useLage();
   const jetzt = Date.now();
@@ -153,8 +152,17 @@ export function UserHomePage() {
   const aufSie = offeneAnfragen.filter((r) => r.bucket === 'replied' || r.bucket === 'overdue');
   const wartend = offeneAnfragen.filter((r) => r.status === 'awaiting-confirm' && r.bucket === 'confirm').length;
 
-  // Termine: kommend (ggf. verschoben).
-  const termine = kommende(bookings.map((b) => (moved[b.id] ? { ...b, slotStart: moved[b.id] } : b)));
+  // Termine (T2): kommende, und davor die vergangenen ohne Ergebnis — dieselbe
+  // Regel wie "Braucht Ihre Antwort" auf der Termine-Seite. Beide zaehlen, so
+  // steht auf der Karte dieselbe Zahl wie in der Seitenleiste.
+  const termine = kommende(bookings);
+  const ohneErgebnis = bookings
+    .filter((b) => b.status === 'confirmed' && !outcomes[b.id] && new Date(b.slotStart).getTime() <= jetzt)
+    .sort((a, b) => b.slotStart.localeCompare(a.slotStart));
+  const ergebnis = (id: string, status: 'completed' | 'no_show') => {
+    setOutcomes((o) => ({ ...o, [id]: status }));
+    markOutcome(id, status).catch(() => {});
+  };
 
   const sev = dash.obligations.by_severity;
   const hoch = (sev.critical ?? 0) + (sev.high ?? 0);
@@ -167,6 +175,14 @@ export function UserHomePage() {
   const bereich = (slug?: string) => (slug && SLUG_TO_I18N[slug] ? t(`domain.${SLUG_TO_I18N[slug]}`) : slug ?? '');
   const regionName = useMemo(() => { try { return new Intl.DisplayNames([locale], { type: 'region' }); } catch { return null; } }, [locale]);
   const markt = (code?: string) => { try { return code ? (regionName?.of(code.toUpperCase()) ?? code) : ''; } catch { return code ?? ''; } };
+  // Thema eines Termins: Bereich und Markt der juengsten Anfrage beim selben
+  // Anbieter. Gibt es keine, bleibt es leer — geraten wird nicht.
+  const themaVon = (providerKey: string) => {
+    const r = requests
+      .filter((q) => q.providerKey === providerKey)
+      .sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''))[0];
+    return r ? [bereich(r.category), r.country?.toUpperCase()].filter(Boolean).join(' · ') : '';
+  };
 
   // Balken: Maerkte oder Bereiche, beides aus denselben offenen Pflichten.
   const quelle = chartView === 'markets'
@@ -302,8 +318,10 @@ export function UserHomePage() {
   // 5B: "Heute · 09:00" / "Morgen · 09:00" / "Mo., 8. Sep. · 09:00".
   const wann = (iso: string) => {
     const d = new Date(iso);
-    const tage = Math.floor((new Date(iso).setHours(0, 0, 0, 0) - new Date().setHours(0, 0, 0, 0)) / 86_400_000);
-    const tag = tage <= 0 ? t('home.today') : tage === 1 ? t('home.tomorrow')
+    const tage = Math.round((new Date(iso).setHours(0, 0, 0, 0) - new Date().setHours(0, 0, 0, 0)) / 86_400_000);
+    // Vergangene Termine (T2, Ergebnis offen) brauchen "Gestern" — vorher
+    // stand fuer alles vor heute "Heute".
+    const tag = tage === 0 ? t('home.today') : tage === 1 ? t('home.tomorrow') : tage === -1 ? t('home.yesterday')
       : d.toLocaleDateString(i18n.resolvedLanguage || 'en', { weekday: 'short', day: 'numeric', month: 'short' });
     return `${tag} · ${d.toLocaleTimeString(i18n.resolvedLanguage || 'en', { hour: '2-digit', minute: '2-digit' })}`;
   };
@@ -537,36 +555,57 @@ export function UserHomePage() {
             {/* Rechte Spalte (5B) */}
             <div className="flex min-w-0 flex-1 flex-col gap-[18px]">
               <div className={CARD + ' p-5'}>
-                <SectionHead title={t('home.termine')} count={String(termine.length)} to="dashboard/termine" />
-                {termine.slice(0, 2).map((a, i) => {
-                  const provider = a.providerName + (a.providerRegion ? ` — ${a.providerRegion}` : '');
+                <SectionHead title={t('home.termine')} count={String(termine.length + ohneErgebnis.length)} to="dashboard/termine" />
+                {ohneErgebnis.length > 0 && (() => {
+                  const o = ohneErgebnis[0];
                   return (
-                    <div key={a.id} className={i > 0 ? 'mt-3 border-t border-stroke-subtle pt-3' : ''}>
-                      <div className="flex items-center gap-3 py-1">
-                        <DatumsMarke iso={a.slotStart} locale={i18n.resolvedLanguage || 'en'} />
-                        <div className="min-w-0">
-                          <p className="text-[10px] font-bold uppercase tracking-[0.06em] text-fg-brand/70">{wann(a.slotStart)}</p>
-                          <p className="mt-0.5 truncate text-body-xs font-bold text-fg">{a.providerName}</p>
-                          <p className="truncate text-[10px] text-fg-tertiary">{[a.providerRegion, 'Video-Call'].filter(Boolean).join(' · ')}</p>
-                        </div>
+                    <div className="mt-3.5 rounded-[10px] border border-warning-200 bg-warning-bg px-3.5 py-3 dark:border-amber-500/30 dark:bg-amber-500/15">
+                      <p className="text-body-xs font-bold text-warning-800 dark:text-amber-300">{t('termine.outcomeQuestion')}</p>
+                      <p className="mt-1.5 truncate text-body-xs font-bold text-fg">{o.providerName}</p>
+                      <p className="text-body-3xs text-fg-tertiary">{wann(o.slotStart)}</p>
+                      <div className="mt-2.5 flex flex-wrap gap-2">
+                        <Button size="sm" variant="primary" onClick={() => ergebnis(o.id, 'completed')}>{t('home.outcomeYes')}</Button>
+                        <Button size="sm" variant="outline" onClick={() => ergebnis(o.id, 'no_show')}>{t('termine.outcomeNo')}</Button>
                       </div>
-                      <div className="mt-2.5 flex gap-2">
-                        <Button size="sm" variant="outline" iconLeft={<CalendarPlus size={14} />}
-                          onClick={() => ladeIcs({ id: a.id, slotStartIso: a.slotStart, slotEndIso: a.slotEnd, provider, meta: a.message || '—' })}>
-                          {t('termine.addToCalendar')}
-                        </Button>
-                        <Button size="sm" variant="ghost"
-                          onClick={() => setRescheduleFor({
-                            bookingId: a.id, providerKey: a.providerKey, providerName: provider,
-                            currentLine: wann(a.slotStart),
-                          })}>
-                          {t('termine.reschedule')}
-                        </Button>
-                      </div>
+                      {ohneErgebnis.length > 1 && (
+                        <p className="mt-2.5 text-body-3xs text-warning-800 dark:text-amber-300">
+                          {t('home.outcomeMore', { count: ohneErgebnis.length - 1 })}{' · '}
+                          <Link to={`/${locale}/dashboard/termine`} className="font-bold underline underline-offset-[3px]">{t('home.outcomeMoreLink')}</Link>
+                        </p>
+                      )}
                     </div>
                   );
-                })}
-                {!termine.length && <p className="py-4 text-center text-body-2xs text-fg-tertiary">{t('home.noTermine')}</p>}
+                })()}
+                {termine.length > 0 && (
+                  <>
+                    {ohneErgebnis.length > 0 && (
+                      <p className="mb-1 mt-4 text-[10.5px] font-extrabold uppercase tracking-[0.07em] text-fg-tertiary">{t('home.upNext')}</p>
+                    )}
+                    <ul className={ohneErgebnis.length ? '' : 'mt-2'}>
+                      {termine.slice(0, 3).map((a, i) => {
+                        const provider = a.providerName + (a.providerRegion ? ` — ${a.providerRegion}` : '');
+                        const thema = themaVon(a.providerKey);
+                        return (
+                          <li key={a.id} className={'flex items-center gap-3 py-2.5' + (i > 0 ? ' border-t border-stroke-subtle' : '')}>
+                            <DatumsMarke iso={a.slotStart} locale={i18n.resolvedLanguage || 'en'} />
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-body-xs font-bold text-fg" title={a.providerName}>{a.providerName}</p>
+                              <p className="truncate text-body-3xs text-fg-tertiary">
+                                {wann(a.slotStart)}
+                                {thema && <> · <span className="font-semibold text-fg-secondary">{thema}</span></>}
+                              </p>
+                            </div>
+                            <Button size="sm" variant="outline" iconOnly aria-label={t('termine.addToCalendar')} title={t('termine.addToCalendar')}
+                              onClick={() => ladeIcs({ id: a.id, slotStartIso: a.slotStart, slotEndIso: a.slotEnd, provider, meta: a.message || '—' })}>
+                              <CalendarPlus size={14} />
+                            </Button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </>
+                )}
+                {!termine.length && !ohneErgebnis.length && <p className="py-4 text-center text-body-2xs text-fg-tertiary">{t('home.noTermine')}</p>}
               </div>
 
               {/* Da weitermachen — goldgerahmt, an der zuletzt bearbeiteten Sitzung. */}
@@ -630,7 +669,6 @@ export function UserHomePage() {
           )}
         </div>
       </div>
-      <RescheduleDrawer target={rescheduleFor} onClose={() => setRescheduleFor(null)} onRescheduled={(id, iso) => setMoved((m) => ({ ...m, [id]: iso }))} />
     </UserShell>
   );
 }
