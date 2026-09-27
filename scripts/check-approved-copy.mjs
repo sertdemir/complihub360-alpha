@@ -30,8 +30,8 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const EN = resolve(ROOT, 'apps/vs1-demo/ui/public/locales/en/common.json');
 
 /** Die Vorlage, wortgleich. Quelle: Checklist v1.0, "Approved UX State Copy"
- *  und "Information Sharing Confirmation"; dazu die Canvas-Abnahme vom
- *  22.09.2026 (Block am Ende). */
+ *  und "Information Sharing Confirmation"; dazu die Canvas-Abnahmen vom
+ *  22.09.2026 und 27.09.2026 (Bloecke am Ende). */
 const VORLAGE = {
   "riskMapLoading": {
     "heading": "Creating your Risk Map",
@@ -143,7 +143,21 @@ const VORLAGE = {
   },
   // Aufklappbar unter "Risk Map failed": Referenz-ID und Zeitpunkt (UTC) des
   // gescheiterten Aufrufs, damit der Support ihn im Log findet.
-  "technicalDetails": "Technical details"
+  "technicalDetails": "Technical details",
+  // ── Dritte Abnahme: Canvas "Risk Map · Markt ohne Abdeckung", Wahl
+  // D3/E3/F3 (Figma 3470:2011/2129/2221). Vom Nutzer am 27.09.2026
+  // abgenommen ("Copy abgenommen, Abschalten weglassen"): "You can switch it
+  // off any time" steht bewusst NICHT in notifyHelp — ein Abschalten gibt es
+  // nicht, und Copy fuer fehlendes Verhalten kommt nicht auf die Flaeche.
+  "marketRequest": {
+    "notCovered": "Not covered yet",
+    "alsoNotCovered": "Also not covered yet",
+    "sent": "Request sent for {{markets}}",
+    "sentBody": "We count requests per market to decide where coverage comes next. We can’t promise a date.",
+    "notifyLabel": "Email me when {{market}} is covered",
+    "notifyHelp": "We’ll email you at {{email}}. Only for this market.",
+    "failed": "We couldn’t send your request. Please try again."
+  }
 };
 
 /** Welche Aktionen zu welchem Zustand gehoeren, in der Reihenfolge der

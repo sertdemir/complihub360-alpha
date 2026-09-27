@@ -31,6 +31,15 @@ import {
   TechnicalDetails,
   scopeOf,
 } from '../components/results/RiskMapState';
+import {
+  ExploreOtherMarkets,
+  MarketRequestCard,
+  MarketRequestList,
+  MarketRequestSent,
+  isMarketUnavailable,
+  unavailableMarketsOf,
+  useMarketRequests,
+} from '../components/results/MarketRequest';
 
 // ─── Results · Risk Map · Figma 1667:215 ────────────────────────────────────
 // The generated risk map shown after the wizard. A guest "map" — obligations
@@ -261,7 +270,7 @@ export function ResultsRiskMap() {
     return () => { alive = false; };
   }, []);
   const [reloadKey, setReloadKey] = useState(0);
-  const { isLoggedIn } = useAuthStore();
+  const { isLoggedIn, user } = useAuthStore();
   const navigate = useNavigate();
   const { i18n } = useTranslation();
   const locale = i18n.resolvedLanguage || 'en';
@@ -269,7 +278,10 @@ export function ResultsRiskMap() {
   // ?session=<id> re-queries /search with that session's stored profile.
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session');
-  const { data: searchData, source: searchSource, loading: searchLoading, error: searchError } = useApiData<{ providers: AnonProvider[]; laws: SearchLaw[]; session: SessionRowData | null }>(async () => {
+  // `query` haelt fest, womit tatsaechlich gesucht wurde — der Umfang der
+  // leeren Zustaende (welche Maerkte geprueft wurden) muss dieselbe Frage
+  // beschreiben, nicht das lokale Profil, wenn eine Sitzung es ersetzt hat.
+  const { data: searchData, source: searchSource, loading: searchLoading, error: searchError } = useApiData<{ providers: AnonProvider[]; laws: SearchLaw[]; session: SessionRowData | null; query: Parameters<typeof runSearch>[0] | null }>(async () => {
     let query: Parameters<typeof runSearch>[0] = profile ?? {};
     let session: SessionRowData | null = null;
     if (sessionId) {
@@ -279,8 +291,8 @@ export function ResultsRiskMap() {
       } catch { /* fall back to the local profile */ }
     }
     const res = await runSearch(query);
-    return { providers: res.providers, laws: res.laws ?? [], session };
-  }, { providers: [], laws: [], session: null }, [sessionId, reloadKey]);
+    return { providers: res.providers, laws: res.laws ?? [], session, query };
+  }, { providers: [], laws: [], session: null, query: null }, [sessionId, reloadKey]);
   // Anbieter zaehlen nur, wenn die Engine sie geliefert hat. Bis 2026-09-22
   // stand hier beim Laden und bei einem API-Fehler eine Design-Fixture mit drei
   // erfundenen Anbietern (100/87/73 %); sie haette einem Nutzer ohne einen
@@ -309,6 +321,20 @@ export function ResultsRiskMap() {
     : searchSource === 'api' ? 'none'
     : searchLoading ? 'loading' : 'failed';
   const noRequirements = pageState === 'none';
+
+  // marketUnavailable (Canvas D3 · E3 · F3, Figma 3470:2011/2129/2221): die
+  // Engine hat geantwortet, aber keinen der angefragten Maerkte pruefen
+  // koennen. Dann waere C3 ("No immediate requirements identified") eine
+  // Aussage ueber eine Pruefung, die es nicht gab. Gemischte Faelle (DE + BR)
+  // bleiben C3 (Entscheidung 2026-09-27).
+  const scopeProfile = searchData.query ?? profile ?? null;
+  const marketUnavailable = pageState === 'none' && isMarketUnavailable(scopeProfile);
+  const unavailable = marketUnavailable && scopeProfile ? unavailableMarketsOf(scopeProfile) : [];
+  const requestAreas = scopeProfile ? scopeOf(scopeProfile, 'requested').areas : [];
+  // Als Gast zaehlt, wer kein echtes Konto hat — auch ein Demo-Login: der
+  // hat keinen JWT, der Server braucht dann den guest_key (sonst 400).
+  const { status: requestStatus, send: sendRequest } = useMarketRequests({ areas: requestAreas, asGuest: !user });
+  const allRequested = unavailable.length > 0 && unavailable.every((m) => requestStatus[m] === 'sent');
   // Die Engine hat geantwortet — mit oder ohne Pflichten. Nur dann gibt es
   // eine Map, die man speichern kann, und eine Aussage "what applies to you".
   const hasResult = pageState === 'live' || pageState === 'none';
@@ -339,7 +365,9 @@ export function ResultsRiskMap() {
   // Kennzahlen nur, wenn die Engine geantwortet hat. Beim Laden und bei einem
   // Fehler gibt es keine — "0 obligations identified" waere dann eine
   // Behauptung ueber ein Ergebnis, das es nicht gibt.
-  const stats = isLive || noRequirements
+  // Auch nicht bei marketUnavailable: die Engine hat nichts geprueft, "0"
+  // waere ein Ergebnis, das es nicht gibt.
+  const stats = isLive || (noRequirements && !marketUnavailable)
     ? riskMapStats(liveLaws, rows.length, providersLive ? anonProviders.length : null)
     : null;
 
@@ -360,10 +388,16 @@ export function ResultsRiskMap() {
   // (SessionSnapshot, Slot emptyState — ohne Figma-Pendant). Die Gast-Seite
   // rendert ihn als ganze Seite nach Figma 3390:14594, s. u.
   const canReviewAnswers = !!(isLoggedIn && sessionId && searchData.session);
-  const stateKey = pageState === 'none' ? 'noRequirements'
+
+  // Zurueck zur Marktwahl: mit gespeicherter Sitzung die Antworten-Schublade,
+  // sonst der Wizard (wie "Edit answers" im Snapshot).
+  const exploreOtherMarkets = () => (canReviewAnswers ? setAnswersOpen(true) : navigate(`/${locale}/wizard`));
+
+  const stateKey = marketUnavailable ? 'marketUnavailable'
+    : pageState === 'none' ? 'noRequirements'
     : pageState === 'loading' ? 'riskMapLoading'
     : pageState === 'failed' ? 'riskMapFailed' : null;
-  const stateNode = stateKey && (
+  const stateBanner = stateKey && (
     <Banner
       status={pageState === 'failed' ? 'error' : 'info'}
       title={t(`common:states.${stateKey}.heading`)}
@@ -387,6 +421,24 @@ export function ResultsRiskMap() {
       {t(`common:states.${stateKey}.message`)}
     </Banner>
   );
+  // Mit Konto (F3): je Markt eine Karte mit Opt-in fuer das Update. Die
+  // Adresse ist die des Kontos; ein Konto ohne Adresse bekommt kein Angebot.
+  const stateNode = marketUnavailable ? (
+    <div className="flex flex-col gap-4">
+      {stateBanner}
+      {unavailable.map((m) => (
+        <MarketRequestCard
+          key={m}
+          market={m}
+          areas={requestAreas}
+          email={user?.email ?? null}
+          status={requestStatus[m] ?? 'idle'}
+          onRequest={(notify) => sendRequest(m, notify)}
+          onExplore={exploreOtherMarkets}
+        />
+      ))}
+    </div>
+  ) : stateBanner;
 
   // Wave A1: arriving from the wizard persists the session (the editable
   // dossier). Guest-anchored via guest_key; fire-and-forget — the page renders
@@ -545,6 +597,9 @@ export function ResultsRiskMap() {
             message={t(`common:states.${stateKey}.message`)}
           >
             {pageState === 'loading' && <IndeterminateProgress />}
+            {/* D3: der Weg zur Marktwahl steht unter dem Satz; nach der
+                Anfrage wandert er in die Bestaetigung (E3). */}
+            {marketUnavailable && !allRequested && <ExploreOtherMarkets onClick={exploreOtherMarkets} />}
             {pageState === 'failed' && (
               <div className="flex flex-wrap justify-center gap-3 pt-2">
                 <Button size="lg" onClick={() => setReloadKey((k) => k + 1)}>
@@ -564,7 +619,18 @@ export function ResultsRiskMap() {
           {pageState === 'loading' && <RiskMapTableSkeleton />}
           {/* Umfang nur mit Profil: gescheitert nennt die Anfrage, nichts
               gefunden nennt, was die Engine tatsaechlich geprueft hat. */}
-          {profile && pageState !== 'loading' && (
+          {marketUnavailable && (allRequested ? (
+            <MarketRequestSent markets={unavailable} onExplore={exploreOtherMarkets} />
+          ) : (
+            <MarketRequestList
+              label={t('common:states.scope.triedToAssess')}
+              markets={unavailable}
+              areas={requestAreas}
+              status={requestStatus}
+              onRequest={(m) => sendRequest(m)}
+            />
+          ))}
+          {profile && pageState !== 'loading' && !marketUnavailable && (
             <RiskMapScopePanel
               label={t(`common:states.scope.${pageState === 'failed' ? 'triedToAssess' : 'checked'}`)}
               {...scopeOf(profile, pageState === 'failed' ? 'requested' : 'checked')}

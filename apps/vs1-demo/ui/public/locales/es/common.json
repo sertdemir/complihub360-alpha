@@ -1987,7 +1987,16 @@
       "markets": "Mercados",
       "areas": "Áreas"
     },
-    "technicalDetails": "Detalles técnicos"
+    "technicalDetails": "Detalles técnicos",
+    "marketRequest": {
+      "notCovered": "Aún sin cobertura",
+      "alsoNotCovered": "Tampoco tiene cobertura aún",
+      "sent": "Solicitud enviada para {{markets}}",
+      "sentBody": "Contamos las solicitudes por mercado para decidir dónde ampliar la cobertura. No podemos prometer una fecha.",
+      "notifyLabel": "Avisarme por correo cuando {{market}} tenga cobertura",
+      "notifyHelp": "Le escribiremos a {{email}}. Solo sobre este mercado.",
+      "failed": "No hemos podido enviar su solicitud. Inténtelo de nuevo."
+    }
   },
   "errorBoundary": {
     "title": "No se pudo mostrar esta página.",

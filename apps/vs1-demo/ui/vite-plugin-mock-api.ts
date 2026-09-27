@@ -1,4 +1,5 @@
 import type { Plugin } from 'vite';
+import { isKnownCountry } from '@complihub/compliance-engine';
 
 // ─── Mock-API für den lokalen Dev-Server ─────────────────────────────────────
 // `VITE_MOCK_API=1 npm run dev` (Repo-Root: `npm run dev:ui:mock`): jede
@@ -182,7 +183,7 @@ const titled = (p: (typeof PROVIDERS)[number], i: number) => {
 function search(body: unknown) {
   // runSearch schickt die Bereiche als `domains` (der Server erwartet das so);
   // `categories` bleibt als zweite Schreibweise stehen.
-  const req = (body ?? {}) as { domains?: unknown; categories?: unknown; country?: unknown };
+  const req = (body ?? {}) as { domains?: unknown; categories?: unknown; country?: unknown; structured_answers?: { markets?: unknown } };
   const asked = Array.isArray(req.domains) && req.domains.length ? req.domains
     : Array.isArray(req.categories) && req.categories.length ? req.categories
     : null;
@@ -200,7 +201,12 @@ function search(body: unknown) {
       },
     };
   });
-  return { ok: true, providers, laws: LAWS };
+  // Wie der Server (index.ts, /search): ohne einen einzigen Markt mit
+  // Laenderprofil keine Pflichten, statt still deutsche Gesetze zu zeigen. So
+  // ist der Zustand marketUnavailable lokal erreichbar (Wizard: nur Brasilien).
+  const markets = Array.isArray(req.structured_answers?.markets) ? (req.structured_answers.markets as string[]) : [];
+  const anyKnown = [country, ...markets].some((c) => isKnownCountry(String(c).toUpperCase()));
+  return { ok: true, providers, laws: anyKnown ? LAWS : [] };
 }
 
 type MockDetail = {
@@ -562,6 +568,13 @@ function route(method: string, path: string, body: Record<string, unknown> = {})
     return { ok: true, items: [], providers: [], laws: [], documents: [], exports: [] };
   }
   if (p[0] === 'search') return search(body);
+  // Marktanfrage: der Server prueft und schreibt (marketRequests.ts); hier
+  // nur die Antwortform. Ein abgedeckter Markt bekaeme dort 409.
+  if (p[0] === 'market-requests' && method === 'POST') {
+    const market = String(body.market ?? '').toUpperCase();
+    if (isKnownCountry(market)) return { __status: 409, errorCode: 'MARKET_COVERED', message: 'This market is already covered' };
+    return { ok: true, market, notify: body.notify === true };
+  }
   if (p[0] === 'scheduling' && p.length === 1 && method === 'POST') return createBooking(body);
   if (p[0] === 'assistant' && p[1] === 'chat') return assistantChat(body);
   if (p[0] === 'session' && p.length === 1) return { ok: true, id: uuid(9, 1) };

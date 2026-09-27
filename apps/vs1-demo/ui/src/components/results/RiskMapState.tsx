@@ -39,7 +39,8 @@ export function RiskMapStateHero({
       <h1 className="text-balance font-serif text-[2.25rem] font-bold leading-[1.1] tracking-[-0.02em] text-fg sm:text-[3rem]">
         {heading}
       </h1>
-      <p className="max-w-[720px] text-[1.125rem] leading-[1.6] text-fg-secondary">{message}</p>
+      {/* text-pretty: kein einzelnes Wort in der letzten Zeile (Figma-Notiz D3). */}
+      <p className="max-w-[720px] text-pretty text-[1.125rem] leading-[1.6] text-fg-secondary">{message}</p>
       {children}
     </div>
   );

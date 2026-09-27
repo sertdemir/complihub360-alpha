@@ -34,7 +34,9 @@ vi.mock('../api/sessions', () => ({
 }));
 vi.mock('../lib/riskMapPdf', () => ({ generateRiskMapPdf: vi.fn() }));
 // Veraenderbar, damit ein Test die eingeloggte Ansicht pruefen kann.
-const auth = vi.hoisted(() => ({ isLoggedIn: false }));
+const auth = vi.hoisted(() => ({ isLoggedIn: false, user: null as { email?: string } | null }));
+const requestMarket = vi.hoisted(() => vi.fn());
+vi.mock('../api/marketRequests', () => ({ requestMarket: (...a: unknown[]) => requestMarket(...a) }));
 vi.mock('../store/useAuthStore', () => ({ useAuthStore: () => auth }));
 vi.mock('../components/user/UserShell', () => ({ UserShell: ({ children }: { children: ReactNode }) => <>{children}</> }));
 // t() resolves to the canonical EN default so assertions read as the user sees.
@@ -81,7 +83,9 @@ beforeEach(() => {
   runSearch.mockReset();
   localStorage.clear();
   auth.isLoggedIn = false;
+  auth.user = null;
   fetchSessions.mockResolvedValue([]);
+  requestMarket.mockReset();
 });
 
 describe('ResultsRiskMap grouping', () => {
@@ -240,7 +244,8 @@ describe('ResultsRiskMap with zero obligations', () => {
   it('shows the state in the signed-in view, with a way to the answers and no empty PDF', async () => {
     auth.isLoggedIn = true;
     fetchSessions.mockResolvedValue([{
-      id: 's1', country: 'AT', markets: ['AT'], categories: ['data-privacy'], label: 'Austria',
+      // NL, nicht AT: fuer AT hat die Engine kein Profil, das waere marketUnavailable.
+      id: 's1', country: 'NL', markets: ['NL'], categories: ['data-privacy'], label: 'Netherlands',
       answers: null, status: 'active', risk_summary: null,
       created_at: '2026-09-01T00:00:00Z', updated_at: '2026-09-01T00:00:00Z',
     }]);
@@ -394,5 +399,120 @@ describe('ResultsRiskMap states as designed', () => {
 
     expect(await screen.findByRole('heading', { level: 1, name: 'common:states.noRequirements.heading' })).toBeInTheDocument();
     expect(screen.queryByText('common:states.scope.checked')).not.toBeInTheDocument();
+  });
+});
+
+// ─── Risk map · no market could be checked (Canvas D3 · E3 · F3, Figma 3470:*) ─
+// With only markets the engine has no profile for, "No immediate requirements
+// identified" would describe a check that never happened. The page says so and
+// lets the user request the market — as a guest without an update offer, with
+// an account behind an opt-in that starts unchecked.
+
+describe('ResultsRiskMap when no requested market can be checked', () => {
+  const setProfile = (p: object) => localStorage.setItem('ch360_last_profile', JSON.stringify(p));
+  afterEach(() => {
+    localStorage.removeItem('ch360_last_profile');
+  });
+
+  it('shows marketUnavailable, not "no requirements", with one request per market (D3)', async () => {
+    setProfile({ country: 'BR', markets: ['AR'], categories: ['tax-vat', 'data-privacy'] });
+    runSearch.mockResolvedValue({ providers: [], laws: [] });
+    renderPage();
+
+    expect(await screen.findByRole('heading', { level: 1, name: 'common:states.marketUnavailable.heading' })).toBeInTheDocument();
+    expect(screen.queryByText('common:states.noRequirements.heading')).not.toBeInTheDocument();
+    const box = screen.getByRole('region', { name: 'common:states.scope.triedToAssess' });
+    expect(within(box).getByText('Brazil')).toBeInTheDocument();
+    expect(within(box).getByText('Argentina')).toBeInTheDocument();
+    expect(within(box).getByText('common:states.marketRequest.notCovered · Tax & VAT, Data & Privacy')).toBeInTheDocument();
+    expect(within(box).getByText('common:states.marketRequest.alsoNotCovered · Tax & VAT, Data & Privacy')).toBeInTheDocument();
+    // A guest can request, but is not offered an update: we would need an address.
+    expect(screen.queryByText('common:states.marketRequest.notifyLabel')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'common:states.actions.exploreOtherMarkets' })).toBeInTheDocument();
+  });
+
+  it('sends a guest request without notify and confirms it, row by row, then as a whole (E3)', async () => {
+    setProfile({ country: 'BR', markets: ['AR'], categories: ['tax-vat'] });
+    runSearch.mockResolvedValue({ providers: [], laws: [] });
+    requestMarket.mockResolvedValue(undefined);
+    renderPage();
+
+    fireEvent.click(await screen.findByRole('button', { name: 'common:states.actions.requestThisMarket: Brazil' }));
+    expect(requestMarket).toHaveBeenCalledWith({ market: 'BR', domains: ['tax-vat'], notify: false, asGuest: true });
+    // Brazil confirms in place; Argentina can still be requested.
+    const box = screen.getByRole('region', { name: 'common:states.scope.triedToAssess' });
+    expect(await within(box).findByText('common:states.marketRequest.sent')).toBeInTheDocument();
+    expect(within(box).getByRole('button', { name: 'common:states.actions.requestThisMarket: Argentina' })).toBeInTheDocument();
+
+    fireEvent.click(within(box).getByRole('button', { name: 'common:states.actions.requestThisMarket: Argentina' }));
+    // All requested: the box gives way to the confirmation, and the way to
+    // other markets moves into it — once, not twice.
+    expect(await screen.findByText('common:states.marketRequest.sentBody')).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'common:states.scope.triedToAssess' })).not.toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: 'common:states.actions.exploreOtherMarkets' })).toHaveLength(1);
+  });
+
+  it('keeps the request button and says so when sending fails', async () => {
+    setProfile({ country: 'BR', categories: [] });
+    runSearch.mockResolvedValue({ providers: [], laws: [] });
+    requestMarket.mockRejectedValue(new ApiError('boom', 500, 'ref-1'));
+    renderPage();
+
+    fireEvent.click(await screen.findByRole('button', { name: 'common:states.actions.requestThisMarket: Brazil' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('common:states.marketRequest.failed');
+    expect(screen.getByRole('button', { name: 'common:states.actions.requestThisMarket: Brazil' })).toBeEnabled();
+    expect(screen.queryByText('common:states.marketRequest.sentBody')).not.toBeInTheDocument();
+  });
+
+  it('stays "no requirements" when at least one market was checked (DE + BR)', async () => {
+    setProfile({ country: 'DE', markets: ['BR'], categories: ['tax-vat'] });
+    runSearch.mockResolvedValue({ providers: [], laws: [] });
+    renderPage();
+
+    expect(await screen.findByRole('heading', { level: 1, name: 'common:states.noRequirements.heading' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /requestThisMarket/ })).not.toBeInTheDocument();
+  });
+
+  it('offers the update to an account holder, unchecked, and sends the choice (F3)', async () => {
+    auth.isLoggedIn = true;
+    auth.user = { email: 'jm@example.com' };
+    setProfile({ country: 'BR', categories: ['tax-vat'] });
+    runSearch.mockResolvedValue({ providers: [], laws: [] });
+    requestMarket.mockResolvedValue(undefined);
+    renderPage();
+
+    expect(await screen.findByText('common:states.marketUnavailable.heading')).toBeInTheDocument();
+    // Nothing was checked, so no rings claiming "0 obligations".
+    expect(screen.queryByText('snapshot.kpiTotal')).not.toBeInTheDocument();
+    const optIn = screen.getByRole('checkbox');
+    expect(optIn).not.toBeChecked();
+    expect(screen.getByText('common:states.marketRequest.notifyLabel')).toBeInTheDocument();
+    fireEvent.click(optIn);
+    fireEvent.click(screen.getByRole('button', { name: 'common:states.actions.requestThisMarket' }));
+    expect(requestMarket).toHaveBeenCalledWith({ market: 'BR', domains: ['tax-vat'], notify: true, asGuest: false });
+    expect(await screen.findByText('common:states.marketRequest.sentBody')).toBeInTheDocument();
+  });
+
+  it('sends as a guest from a demo login, which has no token to identify it', async () => {
+    auth.isLoggedIn = true; // demo flag, no Supabase user behind it
+    setProfile({ country: 'BR', categories: [] });
+    runSearch.mockResolvedValue({ providers: [], laws: [] });
+    requestMarket.mockResolvedValue(undefined);
+    renderPage();
+
+    fireEvent.click(await screen.findByRole('button', { name: 'common:states.actions.requestThisMarket' }));
+    expect(requestMarket).toHaveBeenCalledWith({ market: 'BR', domains: [], notify: false, asGuest: true });
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+  });
+
+  it('offers no update when the account has no address to send it to', async () => {
+    auth.isLoggedIn = true;
+    auth.user = {};
+    setProfile({ country: 'BR', categories: [] });
+    runSearch.mockResolvedValue({ providers: [], laws: [] });
+    renderPage();
+
+    expect(await screen.findByRole('button', { name: 'common:states.actions.requestThisMarket' })).toBeInTheDocument();
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
   });
 });
