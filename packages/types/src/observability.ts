@@ -8,11 +8,23 @@ export function generateCorrelationId(): string {
 }
 
 /**
+ * Was als Referenz-ID von aussen uebernommen wird: 8 bis 64 Zeichen aus
+ * Buchstaben, Ziffern und Bindestrich. Eine UUID passt, ebenso das
+ * `corr-…`-Format oben.
+ *
+ * Die ID steht im Log, in der Antwort und — als "Technical details" — vor dem
+ * Nutzer, der sie dem Support nennt. Bis 2026-09-22 wurde jeder Header-Wert
+ * ungeprueft uebernommen: beliebig lang, beliebiger Text, von jedem Aufrufer.
+ */
+const ACCEPTED_CORRELATION_ID = /^[A-Za-z0-9-]{8,64}$/;
+
+/**
  * Normalizes an incoming correlation ID from a request header, or generates a new one.
+ * A value that does not look like an ID is replaced, not trusted.
  */
 export function normalizeCorrelationId(headerValue: string | string[] | undefined | null): string {
-    if (!headerValue) return generateCorrelationId();
-    return Array.isArray(headerValue) ? headerValue[0] : headerValue;
+    const value = Array.isArray(headerValue) ? headerValue[0] : headerValue;
+    return value && ACCEPTED_CORRELATION_ID.test(value) ? value : generateCorrelationId();
 }
 
 /**

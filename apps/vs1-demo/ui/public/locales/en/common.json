@@ -1980,7 +1980,14 @@
       "confirmation": "I understand and want to continue with this booking.",
       "confirmAndBook": "Confirm and Book",
       "goBack": "Go Back"
-    }
+    },
+    "scope": {
+      "triedToAssess": "What we tried to assess",
+      "checked": "What we checked",
+      "markets": "Markets",
+      "areas": "Areas"
+    },
+    "technicalDetails": "Technical details"
   },
   "errorBoundary": {
     "title": "This page couldn't be displayed.",

@@ -93,4 +93,19 @@ describe('useApiData', () => {
     expect(result.current.data).toBe(ADMIN_FIXTURE);
     expect(result.current.source).toBe('fixture');
   });
+
+  // Ohne den Fehler selbst kann eine Seite keine Referenz-ID zeigen
+  // ("Technical details", Zustand Risk Map failed).
+  it('reicht den Fehler des Abrufs weiter — und nur dann', async () => {
+    vi.spyOn(console, 'info').mockImplementation(() => {});
+    const fehler = new Error('500');
+    const gescheitert = renderHook(() => useApiData(async () => { throw fehler; }, ADMIN_FIXTURE));
+    await waitFor(() => expect(gescheitert.result.current.loading).toBe(false));
+    expect(gescheitert.result.current.error).toBe(fehler);
+
+    const live: AdminLike = { stats: { breaches: 9 }, watchlist: [], events: [] };
+    const geklappt = renderHook(() => useApiData(async () => live, ADMIN_FIXTURE));
+    await waitFor(() => expect(geklappt.result.current.source).toBe('api'));
+    expect(geklappt.result.current.error).toBeNull();
+  });
 });

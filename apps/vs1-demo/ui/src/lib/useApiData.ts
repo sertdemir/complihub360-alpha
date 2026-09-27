@@ -57,10 +57,13 @@ export function usable<T>(result: unknown, fixture: T): result is T {
 
 /** `deps`: wenn sich einer der Werte aendert, wird neu geladen (z. B. nach
  *  dem Speichern geaenderter Antworten). Ohne `deps` laedt der Hook einmal. */
-export function useApiData<T>(fetcher: () => Promise<T>, fixture: T, deps: unknown[] = []): { data: T; source: DataSource; loading: boolean } {
+export function useApiData<T>(fetcher: () => Promise<T>, fixture: T, deps: unknown[] = []): { data: T; source: DataSource; loading: boolean; error: unknown } {
   const [data, setData] = useState<T>(fixture);
   const [source, setSource] = useState<DataSource>('fixture');
   const [loading, setLoading] = useState(true);
+  // Der Fehler des LETZTEN Ladeversuchs, sonst null. Eine Seite braucht ihn
+  // fuer "Technical details" (Referenz-ID, `referenceOf` in api/client).
+  const [error, setError] = useState<unknown>(null);
   const fetcherRef = useRef(fetcher);
   fetcherRef.current = fetcher;
   // Ueber ein Ref, weil mehrere Aufrufer ihre Fixture inline bauen
@@ -72,6 +75,7 @@ export function useApiData<T>(fetcher: () => Promise<T>, fixture: T, deps: unkno
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setError(null);
     fetcherRef
       .current()
       .then((result) => {
@@ -86,6 +90,7 @@ export function useApiData<T>(fetcher: () => Promise<T>, fixture: T, deps: unkno
         }
       })
       .catch((err) => {
+        if (!cancelled) setError(err);
         console.info('[useApiData] falling back to design fixture:', err?.message ?? err);
       })
       .finally(() => {
@@ -97,5 +102,5 @@ export function useApiData<T>(fetcher: () => Promise<T>, fixture: T, deps: unkno
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
-  return { data, source, loading };
+  return { data, source, loading, error };
 }
