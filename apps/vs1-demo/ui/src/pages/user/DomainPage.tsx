@@ -122,7 +122,7 @@ function DomainView({ slug }: { slug: DomainSlug }) {
   const lage: ReactNode[] = [];
   if (data && !empty) {
     lage.push(<span key="o">{t('domainPage.lageOpen', { count: open.length })} {t('domainPage.lageSessions', { count: sessions.length })}</span>);
-    if (high > 0) lage.push(<strong key="h" className="text-[#8A3B3B] dark:text-[#F1A88C]">{t('domainPage.lageHigh', { count: high })}</strong>);
+    if (high > 0) lage.push(<strong key="h" className="text-risk-high">{t('domainPage.lageHigh', { count: high })}</strong>);
     if (markets.length) lage.push(<span key="m">{markets.join(' · ')}</span>);
     if (nextDue !== null) lage.push(<strong key="d" className="text-fg-accent-strong">{nextDue <= 0 ? t('domainPage.lageNextDueToday') : t('domainPage.lageNextDue', { count: nextDue })}</strong>);
   }

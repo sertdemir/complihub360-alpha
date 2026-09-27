@@ -160,10 +160,6 @@
     --color-border-strong-a11y: var(--neutral-500); /* AA, UI-bearing/selected */
     --color-border-input: var(--neutral-400);    /* AA, mandatory for inputs */
     --color-border-brand: var(--petrol-500);
-    /* Compass color/border/brand-soft (tokens.json): Kante getoenter Marken-
-       Flaechen, z. B. die Bestaetigung einer Marktanfrage (Figma E3). Traegt
-       die Deckkraft selbst — Tailwind setzt sie hier nicht per /xx. */
-    --color-border-brand-soft: 37 141 120 / 0.35;
     --color-border-accent: var(--gold-500);
     --color-border-focus: var(--petrol-500);     /* mandatory, >=2px */
 
@@ -203,6 +199,18 @@
     --color-risk-text-on-medium: 113 63 18;     /* #713F12  7.45:1 */
     --color-risk-text-on-high: 124 45 18;       /* #7C2D12  6.92:1 */
     --color-risk-text-on-critical: 127 29 29;   /* #7F1D1D  6.93:1 */
+    /* Kompass 2026-09-27 (Figma-Tokens gleichen Namens): risk-medium als
+       FLAECHE — risk-medium ist ein Text-Ton und neben risk-high kaum trennbar. */
+    --color-risk-medium-mark: 212 160 23;       /* #D4A017 */
+    /* Hinweis-Ton fuer "Neu"/"Bald" — bewusst kein Gold (Gold = Verified Partner). */
+    --color-bg-announce: 207 237 230;           /* #CFEDE6 */
+    --color-text-on-announce: 0 77 64;          /* #004D40 */
+    /* Unit Grid (Kaestchen-Grafik): uebrige und erledigte Einheiten. */
+    --color-bg-unit-rest: 156 184 178;          /* #9CB8B2 */
+    --color-bg-unit-done: 227 235 233;          /* #E3EBE9 */
+    --color-border-unit-done: 201 214 211;      /* #C9D6D3 */
+    /* Weiche Petrol-Kante (Figma: color/border/brand-soft), in beiden Themes gleich. */
+    --color-border-brand-soft: 37 141 120;      /* #258D78 */
 
     /* ============================================================
        COMPASS — RADIUS (9 stops · default 2xl=12px)
@@ -318,7 +326,6 @@
        which is no border at all. Follows --color-bg-brand to the lighter
        dark-mode teal: 4.96:1, clearing the 3:1 that non-text contrast needs. */
     --color-border-brand: 20 168 154;
-    --color-border-brand-soft: 37 141 120 / 0.40;
     --color-bg-brand-light: 29 61 71;
     /* Was unmapped and therefore stayed gold-50 (253 248 230) on the dark slate:
        --color-text-primary on it measured 1.02:1, i.e. invisible. Flattened like
@@ -395,6 +402,12 @@
     --color-risk-medium-bg: 113 63 18;          /* #713F12 */
     --color-risk-high-bg: 124 45 18;            /* #7C2D12 */
     --color-risk-critical-bg: 127 29 29;        /* #7F1D1D */
+    --color-risk-medium-mark: 250 204 21;       /* #FACC15 */
+    --color-bg-announce: 19 78 74;              /* #134E4A */
+    --color-text-on-announce: 153 246 228;      /* #99F6E4 */
+    --color-bg-unit-rest: 43 93 89;             /* #2B5D59 */
+    --color-bg-unit-done: 42 52 65;             /* #2A3441 */
+    --color-border-unit-done: 58 70 86;         /* #3A4656 */
     /* Text ON the soft risk surfaces — light tints of the same hue. */
     --color-risk-text-on-low: 134 239 172;      /* #86EFAC  6.49:1 on its -bg */
     --color-risk-text-on-medium: 253 230 138;   /* #FDE68A  6.96:1 */

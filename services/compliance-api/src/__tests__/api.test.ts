@@ -1787,7 +1787,7 @@ async function adminApi(path: string, init: RequestInit = {}) {
 }
 
 /** Fuellt das Dossier bis kurz vor dem Einreichen: Rechtsform, eine Leistung in DE, Nachweise, Annahmen. */
-async function fillDossier() {
+async function fillDossier(annahmen: string[] = ['provider_agreement', 'privacy_notice', 'billing_authorization']) {
     await own('/application', { method: 'PATCH', body: JSON.stringify({ contact_email: 'k@neue.test', entity_type: 'GmbH', registration_number: 'HRB 4711', registered_address: 'Weg 1, Hamburg', representative_name: 'Anna Beispiel' }) });
     const svc = await own('/services', { method: 'POST', body: JSON.stringify({ service_code: 'data-privacy', service_name: 'Datenschutz-Paket' }) });
     await own(`/services/${svc.body.service.id}/coverage`, { method: 'PUT', body: JSON.stringify({ countries: ['DE'] }) });
@@ -1797,7 +1797,7 @@ async function fillDossier() {
         await own(`/evidence/${up.body.evidence_id}/confirm`, { method: 'POST', body: '{}' });
     }
     await own('/evidence/registry', { method: 'POST', body: JSON.stringify({ evidence_type: 'vat_id', vat_id: 'DE 123456789' }) });
-    for (const agreement_type of ['provider_agreement', 'privacy_notice', 'billing_authorization']) {
+    for (const agreement_type of annahmen) {
         await own('/agreements', { method: 'POST', body: JSON.stringify({ agreement_type, version: '2026-09', language: 'de', accepted_by_name: 'Anna Beispiel', accepted_by_title: 'GF' }) });
     }
     return svc.body.service.id as string;
@@ -1908,7 +1908,7 @@ describe('Bewerbungsstrecke: Dossier, Leistungen, Nachweise (Phase 2)', () => {
     });
 });
 
-describe('Einreichen (4A): nichts geht raus, was unvollstaendig ist', () => {
+describe('Einreichen (4C): nichts geht raus, was unvollstaendig ist', () => {
     it('nennt die fehlenden Punkte statt nur abzulehnen', async () => {
         seedApplicant();
         const r = await own('/submit', { method: 'POST', body: '{}' });
@@ -1927,6 +1927,24 @@ describe('Einreichen (4A): nichts geht raus, was unvollstaendig ist', () => {
         expect(db.provider_review_log.some((l: any) => l.subject === 'lifecycle' && l.to_value === 'submitted' && l.actor_kind === 'provider')).toBe(true);
         const nochmal = await own('/submit', { method: 'POST', body: '{}' });
         expect(nochmal.status).toBe(409);
+    });
+
+    it('nimmt den Antrag ohne Abrechnungsermaechtigung an (4C)', async () => {
+        // Gegenprobe an der echten Strecke: nur die beiden Annahmen der ersten
+        // Stufe sind erteilt. Vor der Trennung war das ein 422.
+        seedApplicant();
+        await fillDossier(['provider_agreement', 'privacy_notice']);
+        const r = await own('/submit', { method: 'POST', body: '{}' });
+        expect(r.status).toBe(200);
+        expect(db.providers[0].lifecycle_status).toBe('submitted');
+    });
+
+    it('das Kapitel Annahmen zaehlt nur die Einreich-Stufe', async () => {
+        seedApplicant();
+        await fillDossier(['provider_agreement', 'privacy_notice']);
+        const r = await own('/application');
+        expect(r.body.chapters.agreements.complete).toBe(true);
+        expect(r.body.chapters.submit.ready).toBe(true);
     });
 });
 

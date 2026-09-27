@@ -83,10 +83,10 @@ const completeSubmit = () => ({
     services: [svc('a', 'data-privacy')],
     coverage: [cov('a', 'DE')],
     checklist: fullChecklist('received'),
-    agreements: ['provider_agreement', 'privacy_notice', 'billing_authorization'],
+    agreements: ['provider_agreement', 'privacy_notice'],
 });
 
-describe('submitValidation — was vor dem Einreichen da sein muss (4A)', () => {
+describe('submitValidation — was vor dem Einreichen da sein muss (4C)', () => {
     it('laesst ein vollstaendiges Dossier durch', () => {
         expect(submitValidation(completeSubmit())).toEqual({ ok: true, missing: [] });
     });
@@ -97,10 +97,24 @@ describe('submitValidation — was vor dem Einreichen da sein muss (4A)', () => 
         expect(v.missing).toEqual(expect.arrayContaining([
             'account.name', 'account.contact_email', 'legal.entity_type', 'legal.registration_number', 'legal.registered_address',
             'legal.representative_name', 'services.none', 'evidence.incorporation', 'evidence.vat_id', 'evidence.insurance',
-            'agreements.provider_agreement', 'agreements.privacy_notice', 'agreements.billing_authorization',
+            'agreements.provider_agreement', 'agreements.privacy_notice',
         ]));
         // Die Vertretungsidentitaet ist keine Einreich-Pflicht.
         expect(v.missing).not.toContain('evidence.representative_identity');
+        // Und die Abrechnungsermaechtigung auch nicht (4C).
+        expect(v.missing).not.toContain('agreements.billing_authorization');
+    });
+
+    it('laesst einreichen, ohne dass ein Zahlungsmandat erteilt ist (4C)', () => {
+        // Die Gegenprobe zur Trennung: genau die Annahme, die vorher gesperrt
+        // hat, fehlt — und der Antrag geht trotzdem durch.
+        const v = submitValidation({ ...completeSubmit(), agreements: ['provider_agreement', 'privacy_notice'] });
+        expect(v).toEqual({ ok: true, missing: [] });
+    });
+
+    it('verlangt aber Vertrag und Datenschutzhinweis', () => {
+        expect(submitValidation({ ...completeSubmit(), agreements: ['billing_authorization'] }).missing)
+            .toEqual(['agreements.provider_agreement', 'agreements.privacy_notice']);
     });
 
     it('verlangt mindestens ein Land je Leistung', () => {
@@ -151,6 +165,14 @@ describe('activationGate — jede Bedingung einzeln, und die Antwort nennt, was 
 
     it('ohne Annahme: agreements.<typ>', () => {
         expect(activationGate({ ...gateOk(), agreements: ['provider_agreement'] }).missing).toEqual(['agreements.privacy_notice', 'agreements.billing_authorization']);
+    });
+
+    it('das Gate verlangt die Abrechnungsermaechtigung weiterhin (4C)', () => {
+        // Was zum Einreichen fehlen darf, darf zum Aktivieren nicht fehlen:
+        // ab hier fliesst Geld.
+        const g = activationGate({ ...gateOk(), agreements: ['provider_agreement', 'privacy_notice'] });
+        expect(g.ok).toBe(false);
+        expect(g.missing).toEqual(['agreements.billing_authorization']);
     });
 
     it('ohne Billing: billing.not_ready plus jeden Grund — auch fuer limited', () => {

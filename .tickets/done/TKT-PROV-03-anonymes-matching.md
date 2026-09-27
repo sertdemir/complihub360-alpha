@@ -1,7 +1,7 @@
 ---
 title: "Provider Phase 3 — Anonymes Matching"
 assignee: "Claude"
-status: "doing"
+status: "done"
 ---
 
 # Provider Phase 3 — Anonymes Matching
@@ -14,6 +14,12 @@ Scan **blockiert und benennt** · Prioritätsanteil = **Verifikationstiefe**.
 Backend, Canvas, Figma und lokale UI nach dem UI-Workflow (Canvas → Figma →
 lokal; Staging nach dem Review des Nutzers). Canvas:
 https://claude.ai/artifact/NhkK1DvuT6wEr6WF9oGECE
+
+**Erledigt 2026-09-27:** Backend PR #219 (Squash `578a34d8`, Staging-Migration
+`provider_anonymity` per Supabase-MCP eingespielt), UI PR #223 (Squash
+`bb55d655`). Stufe 4: Deploy-Staging-Läufe 231 (#223) und 232 (#224) grün,
+Staging liefert `036b6159`; Gast-Suche gegen Staging trägt `public_ref`, Titel,
+Beschreibung und `rank_basis`, kein `provider_key`, kein Pseudonym im JSON.
 
 ## Objective
 
@@ -88,8 +94,7 @@ https://claude.ai/artifact/NhkK1DvuT6wEr6WF9oGECE
 
 Merkliste (Entscheidung 2026-09-22 bleibt) · Affiliate-Link · Entfernen der
 Spalten `partner_status`, `categories`, `countries_supported`,
-`pseudonym_label` · `PartnerApplyPage` als öffentlicher Einstieg ·
-Staging-Rollout der UI (Stufe 4).
+`pseudonym_label` · `PartnerApplyPage` als öffentlicher Einstieg.
 
 ## DNA-Check
 

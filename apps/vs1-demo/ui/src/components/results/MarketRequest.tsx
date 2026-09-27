@@ -176,7 +176,7 @@ export function MarketRequestSent({ markets, onExplore }: { markets: string[]; o
   return (
     <div
       role="status"
-      className="flex w-full max-w-[720px] items-start gap-4 rounded-2xl border border-stroke-brand-soft bg-brand-light px-7 py-[22px] text-left"
+      className="flex w-full max-w-[720px] items-start gap-4 rounded-2xl border border-stroke-brand-soft/35 bg-brand-light dark:border-stroke-brand-soft/40 px-7 py-[22px] text-left"
     >
       <span aria-hidden className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand text-fg-on-brand">
         <Check size={18} strokeWidth={2.4} />

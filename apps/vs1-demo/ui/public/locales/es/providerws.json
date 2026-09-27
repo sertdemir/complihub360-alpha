@@ -591,6 +591,13 @@
     },
     "agreements": {
       "intro": "Cada aceptación se registra con versión, idioma, nombre y cargo. Una versión nueva sustituye a la anterior pero no la borra — el estado en el momento de una reserva sigue siendo verificable.",
+      "groupSubmit": "Para que podamos revisar su solicitud",
+      "tagRequired": "Obligatorio",
+      "groupSubmitHint": "Sin estos dos no podemos aceptar una solicitud.",
+      "groupLater": "Antes de que se facture nada a través de CompliHub360",
+      "tagLater": "Puede esperar",
+      "groupLaterHint": "Se necesita antes de activar su cuenta, no para enviar la solicitud. Puede otorgarla ahora o más tarde.",
+      "commercialNote": "Las condiciones comerciales forman parte de su plan y se muestran allí, no aquí.",
       "doc": {
         "provider_agreement": "Acuerdo de proveedor",
         "privacy_notice": "Aviso de privacidad para proveedores",

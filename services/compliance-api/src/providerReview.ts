@@ -8,7 +8,7 @@ import { EVIDENCE_BUCKET, signedDownloadUrl } from './storage.js';
 import { scanFields } from './anonymity.js';
 import { allowanceFor, coverageMatrix, loadDossier, readJson, reviewLog, type Dossier } from './providerApplication.js';
 import {
-    activationGate, serviceStatusFromCoverage, transitionAllowed, REQUIRED_AGREEMENTS, type GateVerdict,
+    activationGate, serviceStatusFromCoverage, transitionAllowed, ACTIVATION_AGREEMENTS, type GateVerdict,
 } from './verificationRules.js';
 
 // ─── Der Review-Arbeitsplatz ─────────────────────────────────────────────────
@@ -190,7 +190,9 @@ async function dossier(res: ServerResponse, correlationId: string, providerKey: 
             vat: { vat_id: d.provider.vat_id ?? null, status: d.provider.vat_id_status ?? null, checked_at: d.provider.vat_id_checked_at ?? null },
         },
         agreements: d.agreements,
-        required_agreements: REQUIRED_AGREEMENTS,
+        // Was das Gate verlangt, nicht was das Einreichen verlangte: der
+        // Reviewer entscheidet ueber die Aktivierung.
+        required_agreements: ACTIVATION_AGREEMENTS,
         open_requests: d.requests,
         gate,
         history: log,
