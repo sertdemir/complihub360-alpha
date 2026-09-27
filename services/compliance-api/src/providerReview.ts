@@ -5,6 +5,7 @@ import type { Caller } from './providerAuth.js';
 import { notify } from './notifications.js';
 import { sendVerificationMail } from './mailer.js';
 import { EVIDENCE_BUCKET, signedDownloadUrl } from './storage.js';
+import { scanFields } from './anonymity.js';
 import { allowanceFor, coverageMatrix, loadDossier, readJson, reviewLog, type Dossier } from './providerApplication.js';
 import {
     activationGate, serviceStatusFromCoverage, transitionAllowed, REQUIRED_AGREEMENTS, type GateVerdict,
@@ -167,9 +168,18 @@ async function dossier(res: ServerResponse, correlationId: string, providerKey: 
     const gate = await gateFor(d);
     const log = (await supabaseApi.select('provider_review_log', { provider_key: providerKey }, { order: 'created_at.desc', limit: 100 })) as any[];
     const member = await providerUserId(providerKey);
+    // Phase 3: was das Identitaets-Netz in den Freitexten greifen wuerde —
+    // zur Kenntnis fuer den Reviewer, keine Sperre. Schreiben blockiert ohnehin;
+    // hier faellt Altbestand auf.
+    const ctx = { providerName: d.provider.name ?? null, website: d.provider.website_url ?? null };
+    const identity_findings = [
+        ...scanFields({ region: d.provider.region, work_mode: d.provider.work_mode, services: d.provider.services, credentials: d.provider.credentials, excluded_services: d.provider.excluded_services, pricing_table: d.provider.pricing_table }, ctx),
+        ...d.services.flatMap((s) => scanFields({ [`service:${s.id}`]: { service_name: s.service_name, description: s.description, provider_keywords: s.provider_keywords, deliverables: s.deliverables, exclusions: s.exclusions, prerequisites: s.prerequisites, pricing_basis: s.pricing_basis } }, ctx)),
+    ];
     json(res, 200, {
         ok: true,
         provider: d.provider,
+        identity_findings,
         confidential: d.confidential,
         has_dashboard_user: !!member,
         services: d.services.map((s) => ({ ...s, coverage: d.coverage.filter((c) => c.service_id === s.id) })),

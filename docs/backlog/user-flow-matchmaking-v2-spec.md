@@ -20,7 +20,7 @@ CompliHub360 ist ein **kuratierter Matchmaking-Marktplatz**: Ein User (Firma) kl
 | # | Entscheidung | Wert |
 |---|---|---|
 | D1 | **Register-Gate** | Login-Wall: volle Risk Map + Provider-Liste erst nach Registrierung. |
-| D2 | **Provider-Ranking** | **Scored**: Relevance 0.6 + Quality 0.3 + Partner-Priority 0.1. |
+| D2 | **Provider-Ranking** | **Scored**: Relevance 0.6 + Quality 0.3 + Priority 0.1 — Priority = Verifikationstiefe seit Phase 3 ([ADR-0004](../decisions/ADR-0004-anonymity-public-ref-and-title.md)), nie ein Status oder Plan. |
 | D3 | **Anonymität** | **3-Stufen Progressive Disclosure** (Identität zuletzt, siehe §5). |
 | D4 | **Scheduling** | **Nativ bei uns gebaut**, per API gegen Provider-Kalender synchronisiert. |
 | D5 | **Monetarisierung** | Provider zahlt bei (a) Detail-Page-Open, (b) Scheduling = bezahlter Lead. |
@@ -127,7 +127,7 @@ CompliHub360 ist ein **kuratierter Matchmaking-Marktplatz**: Ein User (Firma) kl
 
 | Attribut | Stufe 1 · Listing | Stufe 2 · Detail (bezahlt) | Stufe 3 · nach Scheduling |
 |---|:---:|:---:|:---:|
-| Pseudonym-Label | ✅ | ✅ | — |
+| Titel „Verified Provider A/B/C“ + Beschreibung (Bereiche · Region) — systemseitig, seit Phase 3 statt Pseudonym-Label | ✅ | ✅ (nur Beschreibung) | — |
 | Spezialisierung / Kategorien | ✅ | ✅ (detailliert) | ✅ |
 | Länder / Sprachen | ✅ | ✅ | ✅ |
 | Rating / #Mandate / Ø-Antwortzeit / Confirmation-Rate | ✅ | ✅ | ✅ |
@@ -148,7 +148,7 @@ CompliHub360 ist ein **kuratierter Matchmaking-Marktplatz**: Ein User (Firma) kl
 `Total = 0.6·Relevance + 0.3·Quality + 0.1·Priority`, absteigend sortiert.
 - **Relevance:** Country-Match · Kategorie-/Domänen-Spezialisierung · Branchen-/Kontext-Fit (aus SearchProfile).
 - **Quality:** Ø-Antwortzeit · Confirmation-Rate · User-Rating · (SLA-Breach-Count negativ).
-- **Priority:** `partner_status=active` Boost (Verifikation, kein Plan). ~~ggf. Sponsored (später)~~ — **Korrektur 2026-09-22 ([ADR-0003](../decisions/ADR-0003-provider-pricing-v2.md)):** es wird keine bezahlte Priorität geben; der Faktor wird in Phase 3 auf verifizierte Performance umgestellt.
+- **Priority:** ~~`partner_status=active` Boost~~ — **Korrektur 2026-09-22 ([ADR-0003](../decisions/ADR-0003-provider-pricing-v2.md)):** es wird keine bezahlte Priorität geben. **Umgesetzt 2026-09-27 ([ADR-0004](../decisions/ADR-0004-anonymity-public-ref-and-title.md)):** Priority = **Verifikationstiefe**, der Anteil unabhängig geprüfter Pflichtnachweise (1 je `independently_verified`, 0.5 je `reviewed`); `partner_status` und der Watchdog-Faktor sind aus dem Scorer entfernt, Verstöße zählen über `breach_count` in Quality. Die Fakten hinter der Reihenfolge stehen als `rank_basis` auf der Karte.
 - **Deterministisch** (nicht AI): Sortierreihenfolge, Scores. AI nur für `overview_summary`/Tips (mit Quellen).
 - **Match-%** = normalisierter Relevance-Anteil, user-facing.
 - Provider mit Verfügbarkeit `ooo` / eingefrorenem Rank → nicht oder nachrangig gelistet (Feld existiert).

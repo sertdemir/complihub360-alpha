@@ -22,6 +22,10 @@ import { ownProviderRouteKey, canAccessProvider, handleMeProvider, handleAdminLi
 import { handleProviderApplication } from "./providerApplication.js";
 import { handleProviderReview } from "./providerReview.js";
 import { redactText } from "@complihub360/redaction";
+import {
+    loadVisibility, maskIdentity, publicTitle, rankBasis, requiredFor, scanFields, serializeProvider, verificationDepth,
+    type IdentityContext, type RegisterRow,
+} from "./anonymity.js";
 
 // P0 #1: shared magic-link verification — SHA-256 hash lookup, engagement +
 // action match, expiry, single-use (burned before the state mutation).
@@ -60,6 +64,95 @@ const policyEngine = new DefaultPolicyEngine(policyStore);
 const orchestrator = new Orchestrator(registry, {}, policyEngine);
 
 // Register the agent executable
+
+// ─── Anonymes Matching (Phase 3, ADR-0004) ───────────────────────────────────
+//
+// Alles, was ein Nutzer ueber einen Anbieter sieht, laeuft ab hier ueber
+// `public_ref` (opak, zufaellig) statt `provider_key` (aus dem Firmennamen).
+// Die alten Pfade /provider/:key/(detail|slots|reviews|website) antworten
+// 404: sie liegen ausserhalb des Ownership-Guards und waeren sonst ein
+// Rueckkanal vom Ref zum Namen.
+
+const PUBLIC_REF_RX = /^[0-9a-f]{12}$/;
+
+async function resolveRef(ref: string): Promise<any | null> {
+    if (!PUBLIC_REF_RX.test(ref)) return null;
+    const rows = (await supabaseApi.select('providers', { public_ref: ref }, { limit: 1 })) as any[];
+    return rows[0] ?? null;
+}
+
+/** public_ref zu einem Schluessel — fuer Nachrichten an Nutzer, die nur den Ref kennen duerfen. */
+async function refOf(providerKey: string | null | undefined): Promise<string | undefined> {
+    if (!providerKey) return undefined;
+    const rows = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[];
+    return rows[0]?.public_ref ?? undefined;
+}
+
+const visibilityRegister = () => loadVisibility(
+    async () => (await supabaseApi.select('provider_field_visibility', {}, { limit: 500 })) as RegisterRow[],
+);
+
+/** Ist der Anbieter matchbar (mindestens eine Zeile in der View)? Sichtbarkeit entscheidet die UND-Kette, nie partner_status. */
+async function matchableRows(providerKey: string): Promise<any[]> {
+    return (await supabaseApi.select('matchable_provider_services', { provider_key: providerKey }, { limit: 500 })) as any[];
+}
+
+const identityCtx = (p: any): IdentityContext => ({ providerName: p?.name ?? null, website: p?.website_url ?? null });
+
+/** Freitexte eines Dossiers maskiert — das Netz beim Lesen; Schreiben wird blockiert. */
+function maskDossier(p: any) {
+    const ctx = identityCtx(p);
+    const list = (v: unknown) => Array.isArray(v) ? v.map((x) => typeof x === 'string' ? maskIdentity(x, ctx) : x) : v ?? null;
+    return {
+        services: list(p.services),
+        credentials: list(p.credentials),
+        excluded_services: list(p.excluded_services),
+        work_mode: typeof p.work_mode === 'string' ? maskIdentity(p.work_mode, ctx) : null,
+        region: typeof p.region === 'string' ? maskIdentity(p.region, ctx) : null,
+        pricing_table: Array.isArray(p.pricing_table)
+            ? p.pricing_table.map((row: any) => row && typeof row === 'object'
+                ? Object.fromEntries(Object.entries(row).map(([k, v]) => [k, typeof v === 'string' ? maskIdentity(v, ctx) : v]))
+                : row)
+            : p.pricing_table ?? null,
+    };
+}
+
+/** Freigegebene Bereichs- und Leistungsnamen eines Anbieters aus der View. */
+function approvedNamesOf(rows: any[]): { areas: string[]; services: string[] } {
+    const areas = new Set<string>(); const services = new Set<string>();
+    for (const r of rows) { if (r.area_code) areas.add(r.area_code); if (r.service_name) services.add(r.service_name); }
+    return { areas: [...areas], services: [...services].sort() };
+}
+
+/** Bereichsname aus der Taxonomie; faellt auf den Code zurueck. */
+async function areaLabels(codes: string[]): Promise<Map<string, string>> {
+    const out = new Map<string, string>();
+    if (!codes.length) return out;
+    const cats = (await supabaseApi.select('service_categories', {}, { limit: 500 })) as any[];
+    for (const c of cats) if (c.parent_code == null && c.code) out.set(c.code, c.label_en ?? c.code);
+    for (const code of codes) if (!out.has(code)) out.set(code, code);
+    return out;
+}
+
+/** Pflichtnachweise und Verifikationstiefe aus View-Zeilen und Nachweisen. */
+function depthFor(viewRows: any[], evidence: any[]) {
+    const services = [...new Map(viewRows.map((r) => [r.service_id, { id: r.service_id, service_code: r.service_code, status: 'approved' }])).values()];
+    const coverage = viewRows.map((r) => ({ service_id: r.service_id, country_code: r.country_code, status: 'approved' }));
+    const required = requiredFor(services, coverage);
+    const usable = evidence.filter((e) => e.source === 'registry_check' || e.upload_confirmed);
+    return { required, usable, depth: verificationDepth(required, usable) };
+}
+
+/** Die 422-Antwort, wenn ein Freitext Identitaet traegt — nennt Feld, Typ und Fundstelle. */
+function identityRejection(res: ServerResponse, correlationId: string, findings: Array<{ field: string; type: string; match: string; index: number }>) {
+    res.writeHead(422, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+        errorCode: 'IDENTITY_IN_TEXT',
+        message: 'Please keep these texts free of names, domains and registration numbers — they stay anonymous until booking.',
+        findings, correlationId,
+    }));
+}
+
 import { complianceCheckAgent } from "@complihub/agent-core";
 import type { AgentId } from "@complihub/agent-core";
 
@@ -749,27 +842,28 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Session duplicate failed', correlationId }));
         }
         });
-    } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/detail$/.test(req.url || '')) {
-        // Matchmaking v2 (spec §8): stage-2 ANONYMOUS provider detail. Opening it
-        // writes the event `provider_detail_opened`, deduped server-side to
-        // 1× per (user, provider) per rolling 30 days — analytics only since
-        // Pricing v2 (ADR-0003); nothing bills on it anymore. Requires auth
-        // (listing sits behind the register gate). Never leaks name/contact.
-        const providerKey = (req.url || '').split('/')[4];
+    } else if (req.method === 'GET' && /^\/api\/v1\/p\/[0-9a-f]{12}\/detail$/.test(req.url || '')) {
+        // Matchmaking v2 (spec §8): stage-2 ANONYMOUS provider detail, ab Phase 3
+        // ueber den opaken public_ref. Sichtbar ist, wer in der View steht
+        // (§3 × §4 × §19), nicht wer `partner_status = active` traegt. Welche
+        // Felder die Antwort traegt, entscheidet das Register (§13); Freitexte
+        // gehen durch das Identitaets-Netz. Oeffnen schreibt das Event
+        // `provider_detail_opened`, dedupliziert je (user, provider) auf 30 Tage.
+        const ref = (req.url || '').split('/')[4];
         res.setHeader('x-correlation-id', correlationId);
         if (!authUserId && !authViaApiKey) {
             res.writeHead(401, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'UNAUTHORIZED', message: 'Login required', correlationId }));
         } else {
             try {
-                const rows = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[];
-                const p = rows[0];
-                if (!p || p.partner_status !== 'active') {
+                const p = await resolveRef(ref);
+                const view = p ? await matchableRows(p.provider_key) : [];
+                if (!p || !view.length) {
                     res.writeHead(404, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId }));
                     return;
                 }
-                // Dedup: only charge if no detail-open by this user for this provider in the last 30d.
+                const providerKey = p.provider_key as string;
                 let charged = false;
                 try {
                     const recent = (await supabaseApi.select('event_log', { type: 'provider_detail_opened' }, { order: 'timestamp.desc', limit: 200 })) as any[];
@@ -785,32 +879,42 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         charged = true;
                     }
                 } catch { /* event logging must never break the read */ }
+
+                const reg = await visibilityRegister();
+                const { areas, services: specializations } = approvedNamesOf(view);
+                const labels = await areaLabels(areas);
+                const evidence = (await supabaseApi.select('provider_evidence', { provider_key: providerKey }, { limit: 200 })) as any[];
+                const { required, usable } = depthFor(view, evidence);
+                const reviewRows = (await supabaseApi.select('reviews', { provider_key: providerKey, from_role: 'user' }, { limit: 500 })) as any[];
+                const usableReviews = reviewRows.filter((r: any) => r.verified !== false && r.booking_id && r.rating != null);
+                const ratingFromBookings = usableReviews.length
+                    ? Math.round((usableReviews.reduce((sum: number, r: any) => sum + Number(r.rating), 0) / usableReviews.length) * 10) / 10 : null;
+                // Ohne Listenposition gibt es keinen Buchstaben — das Detail traegt
+                // nur die Beschreibung; den Buchstaben kennt die aufrufende Liste.
+                const title = publicTitle(0, areas.map((a) => labels.get(a) ?? a), p.region ?? null);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({
                     ok: true,
                     detail: {
-                        provider_key: p.provider_key,
-                        pseudonym_label: p.pseudonym_label || `Verifizierter Spezialist${p.region ? ' · ' + p.region : ''}`,
-                        region: p.region ?? null,
-                        active_since: p.active_since ?? null,
-                        specializations: p.categories || [],
-                        languages: p.languages || [],
-                        countries_supported: p.countries_supported || [],
+                        ...serializeProvider(p, reg, 'anonymous'),
+                        ...maskDossier(p),
+                        descriptor: title.descriptor,
+                        // Freigegebene Leistungsnamen aus der View — nicht die
+                        // Selbstauskunft aus `categories`.
+                        specializations,
+                        // Maerkte, in denen mindestens eine Leistung freigegeben ist.
+                        markets: [...new Set(view.map((r: any) => r.country_code as string))].sort(),
                         rating: p.rating != null ? Number(p.rating) : null,
                         completed_count: p.completed_count ?? null,
                         avg_response_hours: p.avg_response_hours != null ? Number(p.avg_response_hours) : null,
                         billing_model: p.billing_model || 'project',
-                        pricing_table: p.pricing_table ?? null, // stage-2 reveal: full pricing
                         is_verified: true,
                         availability: p.availability || 'available',
-                        // Dossier (Partnerseite 3B): was der Anbieter tut und was er
-                        // vorweisen kann. NULL heisst hier "nichts hinterlegt" — die
-                        // Karte bleibt dann leer, statt etwas zu behaupten.
-                        confirmation_rate: p.confirmation_rate != null ? Number(p.confirmation_rate) : null,
-                        services: p.services ?? null,
-                        credentials: p.credentials ?? null,
-                        excluded_services: p.excluded_services ?? null,
-                        work_mode: p.work_mode ?? null,
+                        rank_basis: rankBasis({
+                            required, evidence: usable,
+                            avg_response_hours: p.avg_response_hours, confirmation_rate: p.confirmation_rate,
+                            rating: ratingFromBookings, reviews_count: usableReviews.length,
+                        }),
                     },
                     detail_open_charged: charged,
                     correlationId,
@@ -821,13 +925,21 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Provider detail failed', correlationId }));
             }
         }
-    } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/slots$/.test(req.url || '')) {
+    } else if (req.method === 'GET' && /^\/api\/v1\/p\/[0-9a-f]{12}\/slots$/.test(req.url || '')) {
         // Matchmaking v2: bookable slots for the scheduling page. Until the
         // calendar-sync integration (spec §11 P4) lands, generate business-hour
         // slots for the next 5 business days minus already-booked ones.
-        const providerKey = (req.url || '').split('/')[4];
+        // Phase 3: Aufloesung ueber public_ref; auf dem Draht steht nur der Ref.
+        const ref = (req.url || '').split('/')[4];
         res.setHeader('x-correlation-id', correlationId);
         try {
+            const prov = await resolveRef(ref);
+            if (!prov) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId }));
+                return;
+            }
+            const providerKey = prov.provider_key as string;
             const booked = (await supabaseApi.select('scheduling', { provider_key: providerKey, status: 'confirmed' }, { limit: 200 })) as any[];
             const bookedSet = new Set(booked.map((b: any) => new Date(b.slot_start).toISOString()));
             const slots: string[] = [];
@@ -845,13 +957,13 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 }
             }
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ ok: true, providerKey, slots, correlationId }));
+            res.end(JSON.stringify({ ok: true, public_ref: ref, slots, correlationId }));
         } catch {
             structuredLog('error', 'Slots fetch failed', { correlationId, errorCode: 'ERR_SLOTS', severity: 'error', route: req.url });
             res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Slots fetch failed', correlationId }));
         }
-    } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/reviews$/.test(req.url || '')) {
+    } else if (req.method === 'GET' && /^\/api\/v1\/p\/[0-9a-f]{12}\/reviews$/.test(req.url || '')) {
         // Bewertungen eines Anbieters fuer die Partnerseite (Canvas 5B).
         //
         // Nur Bewertungen, die an einer echten Buchung haengen: `from_role='user'`
@@ -862,13 +974,23 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         //
         // Ausgegeben wird, was niemanden identifiziert: Note, Text, Kategorien,
         // Monat. Die Tabelle fuehrt keine user_id, der Mandant bleibt anonym.
-        const providerKey = (req.url || '').split('/')[4];
+        // Phase 3: der Text geht durch das Identitaets-Netz — ein Mandant, der
+        // den Anbieter beim Namen nennt, verraet ihn sonst vor der Buchung.
+        const ref = (req.url || '').split('/')[4];
         res.setHeader('x-correlation-id', correlationId);
         if (!authUserId && !authViaApiKey) {
             res.writeHead(401, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'UNAUTHORIZED', message: 'Login required', correlationId }));
         } else {
             try {
+                const prov = await resolveRef(ref);
+                if (!prov) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId }));
+                    return;
+                }
+                const providerKey = prov.provider_key as string;
+                const ctx = identityCtx(prov);
                 const rows = (await supabaseApi.select('reviews', { provider_key: providerKey, from_role: 'user' }, { order: 'created_at.desc', limit: 500 })) as any[];
                 const usable = rows.filter((r: any) => r.verified !== false && r.booking_id && r.rating != null);
                 const average = usable.length
@@ -879,7 +1001,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     ok: true,
                     reviews: usable.slice(0, 50).map((r: any) => ({
                         rating: Number(r.rating),
-                        body: typeof r.body === 'string' && r.body.trim() ? r.body : null,
+                        body: typeof r.body === 'string' && r.body.trim() ? maskIdentity(r.body, ctx) : null,
                         categories: r.categories || [],
                         created_at: r.created_at,
                     })),
@@ -905,17 +1027,26 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const provs = (await supabaseApi.select('providers', {})) as any[];
                 const byKey: Record<string, any> = {};
                 provs.forEach((p: any) => { byKey[p.provider_key] = p; });
+                // Phase 3: auf dem Draht steht der public_ref, nie der Schluessel.
+                // Vor der Offenlegung heisst der Anbieter "Verified Provider" mit
+                // seiner Beschreibung; einen Listenbuchstaben gibt es hier nicht.
+                const viewAll = (await supabaseApi.select('matchable_provider_services', {}, { limit: 5000 })) as any[];
+                const labels = await areaLabels([...new Set(viewAll.map((r: any) => r.area_code as string).filter(Boolean))]);
                 const bookings = rows.map((b: any) => {
                     const p = byKey[b.provider_key] || {};
+                    const areas = [...new Set(viewAll.filter((r: any) => r.provider_key === b.provider_key).map((r: any) => r.area_code as string).filter(Boolean))];
+                    const title = publicTitle(0, areas.map((a) => labels.get(a) ?? a), p.region ?? null);
                     return {
                         id: b.id,
-                        provider_key: b.provider_key,
-                        provider_name: b.identity_revealed ? (p.name ?? b.provider_key) : (p.pseudonym_label ?? 'Verifizierter Spezialist'),
+                        public_ref: p.public_ref ?? null,
+                        provider_name: b.identity_revealed ? (p.name ?? 'Verified Provider') : 'Verified Provider',
+                        provider_descriptor: title.descriptor,
                         provider_region: p.region ?? null,
+                        identity_revealed: !!b.identity_revealed,
                         // Affiliate 1b: the provider's website is a POST-BOOKING
                         // reveal only — never before, to preserve stage-1/2 anonymity.
-                        // The outclick is routed through /provider/:key/website so
-                        // it can be counted (future affiliate revenue line).
+                        // The outclick is routed through /p/:ref/website so it can
+                        // be counted (future affiliate revenue line).
                         provider_website: b.identity_revealed ? (p.website_url ?? null) : null,
                         slot_start: b.slot_start,
                         slot_end: b.slot_end,
@@ -931,26 +1062,32 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Bookings fetch failed', correlationId }));
             }
         }
-    } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/website$/.test(req.url || '')) {
+    } else if (req.method === 'GET' && /^\/api\/v1\/p\/[0-9a-f]{12}\/website$/.test(req.url || '')) {
         // Affiliate 1b: counted outclick to the provider website. Only a user
         // who has ALREADY booked this provider may follow it (post-booking
         // reveal) — this is the tracking hook for the later affiliate revenue
         // line, not yet monetised. Logs provider_website_outclick, 302-redirects.
-        const providerKey = (req.url || '').split('/')[4];
+        const ref = (req.url || '').split('/')[4];
         res.setHeader('x-correlation-id', correlationId);
         if (!authUserId) {
             res.writeHead(401, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'UNAUTHORIZED', message: 'Login required', correlationId }));
         } else {
             try {
+                const prov = await resolveRef(ref);
+                if (!prov) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId }));
+                    return;
+                }
+                const providerKey = prov.provider_key as string;
                 const booked = (await supabaseApi.select('scheduling', { user_id: authUserId, provider_key: providerKey }, { limit: 1 })) as any[];
                 if (!booked[0] || !booked[0].identity_revealed) {
                     res.writeHead(403, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ errorCode: 'FORBIDDEN', message: 'Website is revealed after booking only', correlationId }));
                     return;
                 }
-                const provs = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[];
-                const url = provs[0]?.website_url;
+                const url = prov.website_url;
                 if (!url) {
                     res.writeHead(404, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'No website on file', correlationId }));
@@ -1050,7 +1187,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     await notify({
                         to: b.user_id, actor: authUserId, type: 'booking_rescheduled',
                         subject: 'booking', subjectId: bookingId,
-                        payload: { providerKey: b.provider_key, from: b.slot_start, to: start.toISOString() },
+                        payload: { providerRef: await refOf(b.provider_key), from: b.slot_start, to: start.toISOString() },
                     });
                     // Notify the provider (fire-and-forget, in their language):
                     // the user moved the slot, the provider's calendar must not
@@ -1091,7 +1228,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     await notify({
                         to: b.user_id, actor: authUserId, type: 'booking_cancelled',
                         subject: 'booking', subjectId: bookingId,
-                        payload: { providerKey: b.provider_key, from: b.slot_start },
+                        payload: { providerRef: await refOf(b.provider_key), from: b.slot_start },
                     });
                     // Der Anbieter erfuhr bis 2026-08-31 GAR NICHTS von einer
                     // Absage — der Verschieben-Pfad mailte, dieser nicht. Er
@@ -1141,20 +1278,31 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             req.on('end', async () => {
                 try {
                     const d = JSON.parse(schedBody || '{}');
-                    const providerKey = typeof d.provider_key === 'string' ? d.provider_key : '';
+                    // Phase 3: der Browser kennt nur den public_ref. Der Schluessel
+                    // wird hier aufgeloest und bleibt serverseitig.
+                    const ref = typeof d.public_ref === 'string' ? d.public_ref : '';
                     const slotStart = typeof d.slot_start === 'string' ? d.slot_start : '';
-                    if (!providerKey || Number.isNaN(Date.parse(slotStart))) {
+                    if (!ref || Number.isNaN(Date.parse(slotStart))) {
                         res.writeHead(400, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'provider_key and slot_start (ISO) required', correlationId }));
+                        res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'public_ref and slot_start (ISO) required', correlationId }));
                         return;
                     }
-                    const rows = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[];
-                    const p = rows[0];
-                    if (!p || p.partner_status !== 'active') {
+                    const p = await resolveRef(ref);
+                    const view = p ? await matchableRows(p.provider_key) : [];
+                    if (!p || !view.length) {
                         res.writeHead(404, { 'Content-Type': 'application/json' });
                         res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId }));
                         return;
                     }
+                    // Buchbar heisst matchbar UND zahlungsbereit (Spec A §21.1). Das
+                    // Gate sperrt die Buchung, nie das Matching (§14) — und es sagt,
+                    // was es tut, statt still 404 zu antworten.
+                    if (!view.some((r: any) => r.bookable_chargeable)) {
+                        res.writeHead(409, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ errorCode: 'BILLING_NOT_READY', message: 'This provider cannot take bookings yet', correlationId }));
+                        return;
+                    }
+                    const providerKey = p.provider_key as string;
                     const slotEnd = new Date(Date.parse(slotStart) + 30 * 60 * 1000).toISOString();
                     const inserted = (await supabaseApi.insert('scheduling', {
                         provider_key: providerKey,
@@ -1172,7 +1320,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     res.writeHead(201, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({
                         ok: true,
-                        booking: { id: booking?.id, provider_key: providerKey, slot_start: slotStart, slot_end: slotEnd, status: 'confirmed' },
+                        booking: { id: booking?.id, public_ref: ref, slot_start: slotStart, slot_end: slotEnd, status: 'confirmed' },
                         // Stage-3 reveal: identity becomes visible at booking (spec §5).
                         provider_identity: { name: p.name, website_url: p.website_url ?? null, contact_email: p.contact_email ?? null },
                         correlationId,
@@ -1294,6 +1442,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     return;
                 }
                 const providerKey = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+                // Phase 3: Freitexte, die ein Nutzer vor der Buchung sieht, duerfen
+                // keine Identitaet tragen. Gefunden wird benannt, nicht still
+                // gespeichert — der Anbieter soll wissen, was er aendern muss.
+                const intakeFindings = scanFields({
+                    region: d.region, work_mode: d.work_mode, services: d.services, credentials: d.certifications,
+                    excluded_services: d.excluded_services, pricing_table: d.pricing_table,
+                }, { providerName: name, website: typeof d.website_url === 'string' ? d.website_url : null });
+                if (intakeFindings.length) { identityRejection(res, correlationId, intakeFindings); return; }
                 // B2B evidence for the reverse-charge invoicing (VAT brief #4):
                 // validate the VAT ID against VIES and persist the verdict WITH
                 // its timestamp. Fail-soft — a VIES outage must not block intake,
@@ -1314,7 +1470,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     categories: Array.isArray(d.categories) ? d.categories : [],
                     billing_model: ['abo', 'hourly', 'project', 'mixed'].includes(d.billing_model) ? d.billing_model : 'project',
                     pricing_table: d.pricing_table ?? null,
-                    pseudonym_label: d.pseudonym_label ?? null,
+                    // pseudonym_label wird nicht mehr angenommen: der Titel vor der
+                    // Buchung entsteht in der API (anonymity.ts).
                     region: d.region ?? null,
                     active_since: Number.isInteger(d.active_since) ? d.active_since : null,
                     // Dossier fuer die Partnerseite: bisher zaehlte der Intake die
@@ -1423,8 +1580,15 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const patch: Record<string, unknown> = {};
                 if (typeof d.billing_model === 'string' && ['abo', 'hourly', 'project', 'mixed'].includes(d.billing_model)) patch.billing_model = d.billing_model;
                 if (d.pricing_table !== undefined) patch.pricing_table = d.pricing_table;
-                if (typeof d.pseudonym_label === 'string') patch.pseudonym_label = d.pseudonym_label.slice(0, 120);
+                // pseudonym_label wird seit Phase 3 ignoriert (kein Fehler): der
+                // Titel entsteht in der API. Region und Preistabelle laufen durch
+                // den Identitaets-Scan, weil ein Nutzer sie vor der Buchung sieht.
                 if (typeof d.region === 'string') patch.region = d.region.slice(0, 80);
+                {
+                    const own = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[];
+                    const findings = scanFields({ region: patch.region, pricing_table: patch.pricing_table }, identityCtx(own[0]));
+                    if (findings.length) { identityRejection(res, correlationId, findings); return; }
+                }
                 if (Number.isInteger(d.active_since)) patch.active_since = d.active_since;
                 if (Object.keys(patch).length === 0) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -1800,7 +1964,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     await notify({
                         to: msgEng[0]?.user_id, type: 'engagement_message',
                         subject: 'engagement', subjectId: engagementId,
-                        payload: { providerKey: msgEng[0]?.provider_key ?? undefined },
+                        payload: { providerRef: await refOf(msgEng[0]?.provider_key) },
                     });
                 }
                 if (proposal) {
@@ -2272,7 +2436,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 await notify({
                     to: eng?.user_id, type: 'provider_confirmed',
                     subject: 'engagement', subjectId: engagementId,
-                    payload: { providerKey: eng?.provider_key ?? undefined },
+                    payload: { providerRef: await refOf(eng?.provider_key) },
                 });
                 const unlocked = eng ? {
                     message: eng.message || '',
@@ -2334,7 +2498,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 await notify({
                     to: replyEng[0]?.user_id, type: 'provider_replied',
                     subject: 'engagement', subjectId: engagementId,
-                    payload: { providerKey: replyEng[0]?.provider_key ?? undefined },
+                    payload: { providerRef: await refOf(replyEng[0]?.provider_key) },
                 });
 
                 res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -2375,7 +2539,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 await notify({
                     to: declEng[0]?.user_id, type: 'provider_declined',
                     subject: 'engagement', subjectId: engagementId,
-                    payload: { providerKey: declEng[0]?.provider_key ?? undefined },
+                    payload: { providerRef: await refOf(declEng[0]?.provider_key) },
                 });
 
                 res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -2496,10 +2660,32 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     if (row.service_name) approvedNames.get(key)!.add(row.service_name);
                 }
 
-                // Bewertung, Reaktionszeit, Pseudonym und Region haengen weiter am
-                // Anbieter, nicht an der Leistung — die View traegt sie bewusst nicht.
+                // Bewertung, Reaktionszeit und Region haengen weiter am Anbieter,
+                // nicht an der Leistung — die View traegt sie bewusst nicht.
                 const eligible = ((await supabaseApi.select('providers', {})) as any[])
                     .filter((p: any) => approvedAreas.has(p.provider_key));
+
+                // Phase 3 (ADR-0004): der Prioritaetsanteil haengt an der
+                // Verifikationstiefe — Anteil unabhaengig geprueft er Pflichtnach-
+                // weise —, nicht mehr an `partner_status`. Jeder neue Anbieter
+                // kann ihn sofort erreichen; Groesse, Alter und Plan zaehlen nicht.
+                // Der Watchdog-Abzug (downgraded ×0.4) entfaellt: Verstoesse
+                // stecken als breach_count in der Qualitaet, und ein Konto, das
+                // gesperrt gehoert, ist ueber den Lifecycle nicht in der View.
+                const evidenceAll = eligible.length
+                    ? ((await supabaseApi.select('provider_evidence', {}, { limit: 5000 })) as any[])
+                    : [];
+                const reviewsAll = eligible.length
+                    ? ((await supabaseApi.select('reviews', { from_role: 'user' }, { limit: 5000 })) as any[])
+                        .filter((r: any) => r.verified !== false && r.booking_id && r.rating != null)
+                    : [];
+                const viewByKey = new Map<string, any[]>();
+                for (const row of matchable) {
+                    if (!viewByKey.has(row.provider_key)) viewByKey.set(row.provider_key, []);
+                    viewByKey.get(row.provider_key)!.push(row);
+                }
+                const reg = await visibilityRegister();
+                const labels = await areaLabels([...new Set(matchable.map((r: any) => r.area_code as string).filter(Boolean))]);
 
                 const scoreOf = (p: any) => {
                     // Die View ist bereits nach `country` gefiltert: wer hier steht,
@@ -2518,61 +2704,79 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         : (areas.size ? 0.5 : 0);
                     const relevance = 0.6 * countryMatch + 0.4 * catOverlap;
 
-                    const ratingN = (p.rating != null ? Number(p.rating) : 4.5) / 5;
+                    const ownReviews = reviewsAll.filter((r: any) => r.provider_key === p.provider_key);
+                    const ratingFromBookings = ownReviews.length
+                        ? ownReviews.reduce((sum: number, r: any) => sum + Number(r.rating), 0) / ownReviews.length : null;
+                    const ratingN = (ratingFromBookings ?? (p.rating != null ? Number(p.rating) : 4.5)) / 5;
                     const confN = p.confirmation_rate != null ? Number(p.confirmation_rate) : 0.8;
                     const respN = p.avg_response_hours != null
                         ? Math.max(0, 1 - Number(p.avg_response_hours) / 24) : 0.7;
                     const breachN = Math.max(0, 1 - (p.breach_count || 0) * 0.1);
                     const quality = 0.4 * ratingN + 0.3 * confN + 0.2 * respN + 0.1 * breachN;
 
-                    const priority = p.partner_status === 'active' ? 1 : 0;
+                    const rows = viewByKey.get(p.provider_key) ?? [];
+                    const { required, usable, depth } = depthFor(rows, evidenceAll.filter((e: any) => e.provider_key === p.provider_key));
+                    const priority = depth;
                     let total = 0.6 * relevance + 0.3 * quality + 0.1 * priority;
                     if (p.availability === 'ooo') total *= 0.5; // out-of-office → rank frozen/low
-                    if (p.partner_status === 'downgraded') total *= 0.4; // review-watchdog penalty
-                    return { relevance, total, countryMatch, coveredIdx };
+                    const basis = rankBasis({
+                        required, evidence: usable,
+                        avg_response_hours: p.avg_response_hours, confirmation_rate: p.confirmation_rate,
+                        rating: ratingFromBookings != null ? Math.round(ratingFromBookings * 10) / 10 : null, reviews_count: ownReviews.length,
+                    });
+                    return { relevance, total, countryMatch, coveredIdx, basis };
                 };
                 const tierOf = (pct: number) => pct >= 90 ? 'high' : pct >= 75 ? 'strong' : 'moderate';
 
                 const anonProviders = eligible
                     .map((p: any) => {
-                        const { relevance, total, countryMatch, coveredIdx } = scoreOf(p);
+                        const { relevance, total, countryMatch, coveredIdx, basis } = scoreOf(p);
                         const match = Math.round(relevance * 100);
                         return {
-                            provider_key: p.provider_key, // opaque handle for the (monetised) detail-open
-                            pseudonym_label: p.pseudonym_label
-                                || `Verifizierter Spezialist${p.region ? ' · ' + p.region : ''}`,
-                            region: p.region ?? null,
+                            // Nur Felder der Klasse anonymous (Register §13) plus
+                            // public_ref. provider_key und pseudonym_label sind ab
+                            // hier nie mehr auf dem Draht.
+                            ...serializeProvider(p, reg, 'anonymous'),
+                            region: typeof p.region === 'string' ? maskIdentity(p.region, identityCtx(p)) : null,
                             active_since: p.active_since ?? null,
                             // Freigegebene Leistungsnamen aus der Taxonomie, nicht die
-                            // Selbstauskunft aus `categories`. Wenn die Freigabe
-                            // entscheidet, wer erscheint, darf daneben keine
-                            // ungepruefte Liste stehen.
+                            // Selbstauskunft aus `categories`.
                             specializations: Array.from(approvedNames.get(p.provider_key) ?? []).sort(),
                             languages: p.languages || [],
-                            rating: p.rating != null ? Number(p.rating) : null,
+                            rating: basis.rating ?? (p.rating != null ? Number(p.rating) : null),
                             completed_count: p.completed_count ?? null,
                             avg_response_hours: p.avg_response_hours != null ? Number(p.avg_response_hours) : null,
                             billing_model: p.billing_model || 'project',
-                            is_verified: p.partner_status === 'active',
+                            // Wer in der View steht, ist verifiziert — sonst stuende
+                            // er nicht drin. partner_status entscheidet nichts mehr.
+                            is_verified: true,
                             match,                       // percentage, relevance-normalised
                             match_tier: tierOf(match),
                             // The percentage decomposed, so the UI can show WHY it is
                             // what it is instead of asserting a bare number:
                             //   match = 60 * country_covered + 40 * (matched / requested)
-                            // Nothing here is new information — specializations and
-                            // region are already on the wire; this only names which of
-                            // the caller's own requested domains were hit.
                             match_basis: {
                                 country: country ?? null,
                                 country_covered: countryMatch === 1,
                                 domains_requested: rawCats,
                                 domains_matched: coveredIdx.map((i: number) => rawCats[i]),
                             },
+                            // Die Fakten hinter der REIHENFOLGE — Verifikationstiefe,
+                            // Antwortzeit, Bestaetigungsrate, Bewertungen aus Buchungen.
+                            // Fakten, keine Gewichte (Canvas Sektion 2).
+                            rank_basis: basis,
                             _rank: total,
+                            _areas: Array.from(approvedAreas.get(p.provider_key) ?? []),
+                            _region: p.region ?? null,
                         };
                     })
                     .sort((a: any, b: any) => b._rank - a._rank)
-                    .map(({ _rank, ...pub }: any) => pub); // drop internal rank from the wire
+                    // Der Buchstabe ist die Position in DIESER Liste (A, B, C …);
+                    // die Beschreibung kommt aus freigegebenen Bereichen und Region.
+                    .map(({ _rank, _areas, _region, ...pub }: any, i: number) => {
+                        const title = publicTitle(i, _areas.map((a: string) => labels.get(a) ?? a), pub.region ?? _region);
+                        return { ...pub, title: title.label, letter: title.letter, descriptor: title.descriptor };
+                    });
 
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({
