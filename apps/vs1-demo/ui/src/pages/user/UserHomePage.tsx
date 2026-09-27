@@ -43,6 +43,7 @@ import { ladeIcs } from './TerminePage';
 
 type Sev = 'critical' | 'high' | 'medium' | 'low';
 
+const REST_CLS = 'bg-[#9CB8B2] dark:bg-brand/40';
 const CARD = 'rounded-xl border border-stroke-subtle bg-surface shadow-[0_1px_2px_rgba(11,21,18,0.04),0_8px_24px_-18px_rgba(11,21,18,0.12)]';
 const TEXT_LINK = 'text-body-2xs font-bold text-brand underline underline-offset-[3px] transition-colors hover:text-brand-700';
 
@@ -169,13 +170,18 @@ export function UserHomePage() {
 
   // Balken: Maerkte oder Bereiche, beides aus denselben offenen Pflichten.
   const quelle = chartView === 'markets'
-    ? { total: dash.obligations.by_market, high: dash.obligations.by_market_high, label: (k: string) => k }
-    : { total: dash.obligations.by_domain, high: dash.obligations.by_domain_high, label: domainLabel };
+    ? { total: dash.obligations.by_market, high: dash.obligations.by_market_high, label: (k: string) => k, to: () => 'dashboard/sessions' }
+    : { total: dash.obligations.by_domain, high: dash.obligations.by_domain_high, label: domainLabel, to: (k: string) => `dashboard/workbench/${k}` };
   const chartData = Object.entries(quelle.total)
-    .map(([key, total]) => ({ key, label: quelle.label(key), total, high: quelle.high[key] ?? 0 }))
+    .map(([key, total]) => ({ key, label: quelle.label(key), total, high: quelle.high[key] ?? 0, to: quelle.to(key) }))
     .sort((a, b) => b.total - a.total)
     .slice(0, 6);
   const chartMax = Math.max(1, ...chartData.map((m) => m.total));
+  // Eine Reihe hoechstens 30 Kaestchen breit; darueber fasst ein Kaestchen
+  // mehrere Pflichten zusammen (fuer alle Reihen gleich, damit sie vergleichbar
+  // bleiben), und die Zeile darunter sagt es.
+  const ortProKaestchen = unitsPer(chartMax, 30);
+  const ortSpalten = Math.ceil(chartMax / ortProKaestchen);
   const maerkte = Object.keys(dash.obligations.by_market);
 
   // Z2: Pflichten nach Risiko als Kaestchen. Mittel als FLAECHE in #D4A017 statt
@@ -369,39 +375,63 @@ export function UserHomePage() {
           <div className="mt-7 flex flex-col gap-[18px] xl:flex-row">
             {/* Hauptspalte */}
             <div className="flex min-w-0 flex-[1.9] flex-col gap-[18px]">
-              {/* 3B: Offene Pflichten als Balken quer */}
+              {/* Offene Pflichten nach Ort (Canvas P2, Nutzer-Wahl 2026-09-27): je
+                  Markt bzw. Bereich eine Reihe Kaestchen, eines je Pflicht, die
+                  hohen zuerst — dieselbe Sprache wie die Kennzahlen darueber.
+                  Jedes Kaestchen nennt beim Hover seinen Ort. Eine Pflicht kann
+                  in mehreren MAERKTEN gelten und zaehlt dann in jedem
+                  (dashboard.ts) — das steht darunter, sonst wirkt die Summe
+                  falsch. Bereiche ueberschneiden sich nicht. */}
               <div className={CARD + ' p-6'}>
-                <SectionHead
-                  title={t('home.marketsTitle')} count={String(offen)} to="dashboard/sessions"
-                  extra={
-                    <span className="ml-3 inline-flex gap-1.5">
-                      <Segment selected={chartView === 'markets'} onClick={() => setChartView('markets')}>{t('home.tabMarkets')}</Segment>
-                      <Segment selected={chartView === 'areas'} onClick={() => setChartView('areas')}>{t('home.tabAreas')}</Segment>
-                    </span>
-                  }
-                />
+                <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2">
+                  <h2 className="text-body-md font-bold text-fg">
+                    {chartView === 'markets' ? t('home.dutiesByMarket') : t('home.dutiesByArea')}
+                  </h2>
+                  <span className="order-last flex basis-full gap-1.5 sm:order-none sm:ml-2 sm:basis-auto">
+                    <Segment selected={chartView === 'markets'} onClick={() => setChartView('markets')}>{t('home.tabMarkets')}</Segment>
+                    <Segment selected={chartView === 'areas'} onClick={() => setChartView('areas')}>{t('home.tabAreas')}</Segment>
+                  </span>
+                  <Link to={`/${locale}/dashboard/sessions`} className="ml-auto text-body-2xs text-fg-secondary underline-offset-2 hover:underline">
+                    {t('shared.seeAll')}
+                  </Link>
+                </div>
                 {chartData.length ? (
                   <div>
-                    {chartData.map((m, i) => (
-                      <div key={m.key} className="grid grid-cols-[minmax(40px,auto)_1fr_150px] items-center gap-3.5 py-[9px]">
-                        <span className="truncate text-body-xs font-extrabold text-fg">{m.label}</span>
-                        <div className="relative h-3 overflow-hidden rounded-full bg-surface-secondary">
-                          <div
-                            className="absolute inset-y-0 left-0 rounded-full bg-brand"
-                            style={{ width: entered ? `${(m.total / chartMax) * 100}%` : 0, transition: `width 750ms ${EASE} ${140 + i * 90}ms` }}
-                          />
-                          <div
-                            className="absolute inset-y-0 left-0 rounded-full bg-risk-high"
-                            style={{ width: entered && m.high > 0 ? `${(m.high / chartMax) * 100}%` : 0, transition: `width 750ms ${EASE} ${220 + i * 90}ms` }}
-                          />
+                    <p className="mb-3 flex gap-4 text-body-2xs text-fg-secondary">
+                      <span className="inline-flex items-center gap-1.5"><span aria-hidden="true" className="h-2.5 w-2.5 rounded-[2px] bg-risk-high" />{t('home.unitHighShort')}</span>
+                      <span className="inline-flex items-center gap-1.5"><span aria-hidden="true" className={'h-2.5 w-2.5 rounded-[2px] ' + REST_CLS} />{t('home.unitRest')}</span>
+                    </p>
+                    <div className="flex flex-col gap-3">
+                      {chartData.map((m, i) => (
+                        <div key={m.key} className="grid grid-cols-[minmax(34px,auto)_1fr_auto] items-center gap-3 sm:grid-cols-[minmax(34px,auto)_1fr_auto_auto]">
+                          <span className="truncate text-body-xs font-extrabold text-fg">{m.label}</span>
+                          <div className="min-w-0 overflow-visible">
+                            <UnitGrid
+                              on={entered} fluid size={11} gap={3} perUnit={ortProKaestchen} delayOffset={i * 6}
+                              cols={Math.min(ortSpalten, Math.ceil(m.total / ortProKaestchen)) || 1}
+                              parts={[
+                                { n: m.high, cls: 'bg-risk-high', label: t('home.unitTipHigh', { place: m.label }) },
+                                { n: m.total - m.high, cls: REST_CLS, label: t('home.unitTipRest', { place: m.label }) },
+                              ]}
+                            />
+                          </div>
+                          <span className="whitespace-nowrap text-right text-body-2xs text-fg-secondary">
+                            <b className="text-fg">{m.total}</b>
+                            {m.high > 0 && <> · <span className="text-risk-high">{t('home.dutiesHigh', { count: m.high })}</span></>}
+                          </span>
+                          <Link to={`/${locale}/${m.to}`} className="hidden whitespace-nowrap text-body-2xs font-bold text-fg-brand hover:underline sm:inline">
+                            {t('home.rowOpen')} →
+                          </Link>
                         </div>
-                        <span className="text-right text-body-2xs text-fg-secondary">
-                          <b className="text-fg">{t('home.dutiesCount', { count: m.total })}</b>
-                          {m.high > 0 && <> · <span className="text-risk-high">{t('home.dutiesHigh', { count: m.high })}</span></>}
-                        </span>
-                      </div>
-                    ))}
-                    <p className="mt-2 text-body-3xs text-fg-tertiary">{t('home.marketsLegend')}</p>
+                      ))}
+                    </div>
+                    {(chartView === 'markets' || ortProKaestchen > 1) && (
+                      <p className="mt-3 text-body-3xs text-fg-tertiary">
+                        {chartView === 'markets' && t('home.marketsOverlap')}
+                        {chartView === 'markets' && ortProKaestchen > 1 && ' · '}
+                        {ortProKaestchen > 1 && t('home.unitsPer', { count: ortProKaestchen })}
+                      </p>
+                    )}
                   </div>
                 ) : (
                   <p className="py-10 text-center text-body-xs text-fg-tertiary">{t('home.noDuties')}</p>
