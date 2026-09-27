@@ -137,8 +137,26 @@ export function evidenceChecklist(required: RequiredEvidence[], evidence: Eviden
     });
 }
 
-/** Die drei Annahmen, ohne die kein Antrag eingereicht wird (Spec A §23; commercial_terms kommt mit dem Plan). */
-export const REQUIRED_AGREEMENTS = ['provider_agreement', 'privacy_notice', 'billing_authorization'] as const;
+/**
+ * Die Annahmen in zwei Stufen (Canvas 4C, Nutzer-Entscheidung 2026-09-27) —
+ * weil an den beiden Stufen zwei verschiedene Dinge haengen.
+ *
+ * SUBMIT_AGREEMENTS regeln, unter welchen Bedingungen wir die Angaben
+ * ueberhaupt entgegennehmen und pruefen duerfen. Ohne sie gibt es keinen
+ * Antrag.
+ *
+ * ACTIVATION_AGREEMENTS fuegen die Abrechnungsermaechtigung hinzu. Sie wird
+ * gebraucht, bevor Geld fliesst — nicht, bevor jemand sich bewerben darf. Wer
+ * sie schon zum Einreichen verlangt, laesst einen Anbieter ein Zahlungsmandat
+ * erteilen, bevor er weiss, ob er ueberhaupt angenommen wird.
+ *
+ * Spec A §23 fuehrt alle drei gemeinsam; die Trennung geht vor und ist in
+ * `.tickets/` begruendet. `commercial_terms` steht in keiner der beiden
+ * Listen: die kommerziellen Bedingungen haengen am Tarif und koennen nicht
+ * angenommen werden, solange keiner gewaehlt ist.
+ */
+export const SUBMIT_AGREEMENTS = ['provider_agreement', 'privacy_notice'] as const;
+export const ACTIVATION_AGREEMENTS = ['provider_agreement', 'privacy_notice', 'billing_authorization'] as const;
 
 export interface SubmitInput {
     provider: { name?: string | null; contact_email?: string | null; website_url?: string | null; countries_supported?: string[] | null };
@@ -153,7 +171,7 @@ export interface SubmitInput {
 export interface Verdict { ok: boolean; missing: string[] }
 
 /**
- * Darf der Antrag eingereicht werden (4A)? Die Liste `missing` ist die
+ * Darf der Antrag eingereicht werden (4C)? Die Liste `missing` ist die
  * Sprache der Oberflaeche: ein Schluessel je fehlendem Punkt, damit die
  * Zusammenfassung sagen kann, WAS fehlt, statt nur "unvollstaendig".
  */
@@ -177,7 +195,7 @@ export function submitValidation(input: SubmitInput): Verdict {
             missing.push(`evidence.${item.type}`);
         }
     }
-    for (const a of REQUIRED_AGREEMENTS) {
+    for (const a of SUBMIT_AGREEMENTS) {
         if (!input.agreements.includes(a)) missing.push(`agreements.${a}`);
     }
     return { ok: missing.length === 0, missing };
@@ -210,7 +228,7 @@ export interface GateVerdict extends Verdict {
  * Bedingungen, jede einzeln benannt:
  *   · jeder Pflichtnachweis geprueft (nicht nur hochgeladen)
  *   · mindestens eine Leistung in mindestens einem Land freigegeben
- *   · die drei Annahmen liegen vor
+ *   · die Annahmen liegen vor, hier einschliesslich der Abrechnungsermaechtigung
  *   · billing_ready (Spec §21.1) — auch fuer 'limited'. "Limited" heisst
  *     "nur Teile frei", nicht "ohne Abrechnung".
  *   · das Kategorie-Kontingent des Plans ist eingehalten
@@ -229,7 +247,7 @@ export function activationGate(input: GateInput): GateVerdict {
     const cells = input.coverage.filter((c) => live.some((s) => s.id === c.service_id));
     const approved = cells.filter((c) => c.status === 'approved' || c.status === 'limited');
     if (!approved.length) missing.push('coverage.none_approved');
-    for (const a of REQUIRED_AGREEMENTS) {
+    for (const a of ACTIVATION_AGREEMENTS) {
         if (!input.agreements.includes(a)) missing.push(`agreements.${a}`);
     }
     if (!input.billing_ready) {

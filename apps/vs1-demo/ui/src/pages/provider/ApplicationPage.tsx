@@ -34,7 +34,12 @@ type ChapterKey = (typeof CHAPTERS)[number];
 const STATE_TONE: Record<ChecklistItem['state'], BadgeTone> = { missing: 'warning', uploading: 'info', received: 'info', reviewed: 'success', rejected: 'error', expired: 'error' };
 const COVERAGE_TONE: Record<Service['coverage'][number]['status'], BadgeTone> = { pending: 'warning', approved: 'success', rejected: 'error', limited: 'info', suspended: 'neutral', expired: 'neutral' };
 const SERVICE_TONE: Record<Service['status'], BadgeTone> = { draft: 'neutral', pending_verification: 'warning', approved: 'success', limited: 'info', paused: 'neutral', retired: 'neutral' };
-const REQUIRED_AGREEMENTS: AgreementType[] = ['provider_agreement', 'privacy_notice', 'billing_authorization'];
+// Zwei Stufen (4C): ohne die ersten beiden nehmen wir keine Bewerbung an; die
+// Abrechnungsermaechtigung wird gebraucht, bevor Geld fliesst, und darf
+// deshalb spaeter kommen. `commercial_terms` fehlt hier bewusst — die
+// kommerziellen Bedingungen haengen am Tarif und werden dort gezeigt.
+const SUBMIT_AGREEMENTS: AgreementType[] = ['provider_agreement', 'privacy_notice'];
+const LATER_AGREEMENTS: AgreementType[] = ['billing_authorization'];
 const AGREEMENT_VERSION = '2026-09';
 
 function fmtDate(iso: string | null | undefined, locale: string): string {
@@ -393,7 +398,7 @@ function EvidencePanel({ app, locale, onChanged }: { app: Application; locale: s
   );
 }
 
-// ─── 5 · Annahmen (4A) ───────────────────────────────────────────────────────
+// ─── 5 · Annahmen, zwei Stufen (4C) ─────────────────────────────────────────
 
 function AgreementsPanel({ app, locale, onChanged }: { app: Application; locale: string; onChanged: () => Promise<void> | void }) {
   const { t, i18n } = useTranslation('providerws');
@@ -401,31 +406,47 @@ function AgreementsPanel({ app, locale, onChanged }: { app: Application; locale:
   const [name, setName] = useState(app.confidential?.representative_name ?? '');
   const [title, setTitle] = useState(app.confidential?.representative_title ?? '');
   const [busy, setBusy] = useState(false);
-  const done = REQUIRED_AGREEMENTS.filter((a) => app.agreements.some((x) => x.agreement_type === a));
+  const done = SUBMIT_AGREEMENTS.filter((a) => app.agreements.some((x) => x.agreement_type === a));
   const accept = async () => {
     if (!modal) return;
     setBusy(true);
     try { await acceptAgreement({ agreement_type: modal, version: AGREEMENT_VERSION, language: i18n.resolvedLanguage || 'en', accepted_by_name: name.trim(), accepted_by_title: title.trim() || undefined }); setModal(null); await onChanged(); }
     finally { setBusy(false); }
   };
+  // Eine fehlende Annahme der zweiten Stufe ist kein Mangel: sie bekommt
+  // deshalb keinen Warnrahmen, sondern denselben ruhigen wie eine erteilte.
+  const row = (a: AgreementType, pflicht: boolean) => {
+    const acc = app.agreements.find((x) => x.agreement_type === a);
+    return (
+      <div key={a} className={cn('flex flex-wrap items-start gap-3 rounded-md border px-4 py-3', acc || !pflicht ? 'border-stroke-subtle' : 'border-warning-500/50')}>
+        <Checkbox checked={!!acc} readOnly aria-label={t(`application.agreements.doc.${a}`)} className="mt-0.5" />
+        <div className="min-w-0 flex-1">
+          <p className="text-[13px] font-medium text-fg">{t(`application.agreements.doc.${a}`)} <span className="ml-2 text-[11px] font-normal text-fg-tertiary">{t('application.agreements.version', { version: acc?.version ?? AGREEMENT_VERSION, language: (acc?.language ?? i18n.resolvedLanguage ?? 'en').toUpperCase() })}</span></p>
+          <p className="text-[12px] text-fg-tertiary">{acc ? t('application.agreements.acceptedOn', { date: fmtDate(acc.accepted_at, locale), name: acc.accepted_by_name ?? '' }) : `${t('application.agreements.notAccepted')}${a === 'billing_authorization' ? ' ' + t('application.agreements.billingNote') : ''}`}</p>
+        </div>
+        <Button size="sm" variant={acc ? 'ghost' : 'secondary'} onClick={() => setModal(a)}>{acc ? t('application.agreements.open') : t('application.agreements.accept')}</Button>
+      </div>
+    );
+  };
+  const group = (titel: string, marke: string, hinweis: string, typen: AgreementType[], pflicht: boolean) => (
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-baseline gap-2">
+        <h3 className="text-[12px] font-semibold text-fg">{titel}</h3>
+        <span className={cn('rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em]',
+          pflicht ? 'bg-warning-50 text-warning-700' : 'bg-surface-secondary text-fg-tertiary')}>{marke}</span>
+      </div>
+      <p className="max-w-3xl text-[12px] leading-relaxed text-fg-tertiary">{hinweis}</p>
+      {typen.map((a) => row(a, pflicht))}
+    </div>
+  );
   return (
     <Card styleVariant="outlined" className="space-y-4 p-5">
-      <PanelHeader n={5} title={t('application.chapter.agreements')} badge={<Badge tone={done.length === REQUIRED_AGREEMENTS.length ? 'success' : 'warning'} size="sm">{done.length} / {REQUIRED_AGREEMENTS.length}</Badge>} />
+      <PanelHeader n={5} title={t('application.chapter.agreements')} badge={<Badge tone={done.length === SUBMIT_AGREEMENTS.length ? 'success' : 'warning'} size="sm">{done.length} / {SUBMIT_AGREEMENTS.length}</Badge>} />
       <p className="max-w-3xl text-[12px] leading-relaxed text-fg-tertiary">{t('application.agreements.intro')}</p>
-      <div className="space-y-2">
-        {REQUIRED_AGREEMENTS.map((a) => {
-          const acc = app.agreements.find((x) => x.agreement_type === a);
-          return (
-            <div key={a} className={cn('flex flex-wrap items-start gap-3 rounded-md border px-4 py-3', acc ? 'border-stroke-subtle' : 'border-warning-500/50')}>
-              <Checkbox checked={!!acc} readOnly aria-label={t(`application.agreements.doc.${a}`)} className="mt-0.5" />
-              <div className="min-w-0 flex-1">
-                <p className="text-[13px] font-medium text-fg">{t(`application.agreements.doc.${a}`)} <span className="ml-2 text-[11px] font-normal text-fg-tertiary">{t('application.agreements.version', { version: acc?.version ?? AGREEMENT_VERSION, language: (acc?.language ?? i18n.resolvedLanguage ?? 'en').toUpperCase() })}</span></p>
-                <p className="text-[12px] text-fg-tertiary">{acc ? t('application.agreements.acceptedOn', { date: fmtDate(acc.accepted_at, locale), name: acc.accepted_by_name ?? '' }) : `${t('application.agreements.notAccepted')}${a === 'billing_authorization' ? ' ' + t('application.agreements.billingNote') : ''}`}</p>
-              </div>
-              <Button size="sm" variant={acc ? 'ghost' : 'secondary'} onClick={() => setModal(a)}>{acc ? t('application.agreements.open') : t('application.agreements.accept')}</Button>
-            </div>
-          );
-        })}
+      <div className="space-y-5">
+        {group(t('application.agreements.groupSubmit'), t('application.agreements.tagRequired'), t('application.agreements.groupSubmitHint'), SUBMIT_AGREEMENTS, true)}
+        {group(t('application.agreements.groupLater'), t('application.agreements.tagLater'), t('application.agreements.groupLaterHint'), LATER_AGREEMENTS, false)}
+        <p className="max-w-3xl text-[12px] leading-relaxed text-fg-tertiary">{t('application.agreements.commercialNote')}</p>
       </div>
       <Modal open={!!modal} onClose={() => setModal(null)} title={modal ? t('application.agreements.acceptTitle', { doc: t(`application.agreements.doc.${modal}`) }) : ''} size="md"
         footer={<div className="flex justify-end gap-2"><Button variant="ghost" onClick={() => setModal(null)}>{t('application.agreements.cancel')}</Button><Button disabled={busy || !name.trim()} onClick={accept}>{t('application.agreements.confirm', { version: AGREEMENT_VERSION })}</Button></div>}>
@@ -450,7 +471,7 @@ function SubmitPanel({ app, onChanged }: { app: Application; onChanged: () => Pr
   const missing = app.chapters.submit.missing;
   const submittable = app.provider.lifecycle_status === 'draft' || app.provider.lifecycle_status === 'more_info_required';
   const countries = new Set(app.services.flatMap((s) => s.coverage.map((c) => c.country_code)));
-  const agreementsDone = REQUIRED_AGREEMENTS.filter((a) => app.agreements.some((x) => x.agreement_type === a)).length;
+  const agreementsDone = SUBMIT_AGREEMENTS.filter((a) => app.agreements.some((x) => x.agreement_type === a)).length;
   const submit = async () => {
     setBusy(true); setNote(null);
     try { const r = await submitApplication(); setNote(r.ok ? t('application.submit.done') : null); await onChanged(); }
@@ -472,7 +493,7 @@ function SubmitPanel({ app, onChanged }: { app: Application; onChanged: () => Pr
           {app.chapters.account.complete && app.chapters.legal.complete && <p className="flex items-center gap-2 text-[13px] text-fg-secondary"><CheckCircle2 size={15} className="text-success-600" />{t('application.submit.ready.accountLegal')}</p>}
           {app.services.length > 0 && <p className="flex items-center gap-2 text-[13px] text-fg-secondary"><CheckCircle2 size={15} className="text-success-600" />{t('application.submit.ready.services', { services: app.services.filter((s) => s.status !== 'retired').length, countries: countries.size })}</p>}
           {app.chapters.evidence.complete && <p className="flex items-center gap-2 text-[13px] text-fg-secondary"><CheckCircle2 size={15} className="text-success-600" />{t('application.submit.ready.evidence')}</p>}
-          <p className="flex items-center gap-2 text-[13px] text-fg-secondary"><CheckCircle2 size={15} className={agreementsDone === REQUIRED_AGREEMENTS.length ? 'text-success-600' : 'text-fg-tertiary'} />{t('application.submit.ready.agreements', { done: agreementsDone, total: REQUIRED_AGREEMENTS.length })}</p>
+          <p className="flex items-center gap-2 text-[13px] text-fg-secondary"><CheckCircle2 size={15} className={agreementsDone === SUBMIT_AGREEMENTS.length ? 'text-success-600' : 'text-fg-tertiary'} />{t('application.submit.ready.agreements', { done: agreementsDone, total: SUBMIT_AGREEMENTS.length })}</p>
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-4">

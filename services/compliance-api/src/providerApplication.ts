@@ -9,7 +9,7 @@ import {
     EVIDENCE_ALLOWED_MIME, EVIDENCE_BUCKET, EVIDENCE_MAX_BYTES, evidenceObjectPath, objectInfo, signedUploadUrl,
 } from './storage.js';
 import {
-    areaCodeOf, evidenceChecklist, requiredEvidence, submitValidation, REQUIRED_AGREEMENTS,
+    areaCodeOf, evidenceChecklist, requiredEvidence, submitValidation, SUBMIT_AGREEMENTS,
     type ChecklistItem, type EvidenceType,
 } from './verificationRules.js';
 
@@ -27,7 +27,7 @@ import {
 //       /services/:id/coverage.
 //   3A  Checkliste je Nachweistyp — abgeleitet (verificationRules.ts), nie
 //       vom Anbieter gewaehlt.
-//   4A  Zusammenfassung → Annahme je Dokument → Einreichen — /agreements
+//   4C  Zusammenfassung → Annahmen in zwei Stufen → Einreichen — /agreements
 //       schreibt append-only mit Version, /submit prueft und setzt den Status.
 //   5B  Freigabematrix — GET /verification.
 //
@@ -652,4 +652,4 @@ export async function handleProviderApplication(
     }
 }
 
-export { REQUIRED_AGREEMENTS };
+export { SUBMIT_AGREEMENTS };
