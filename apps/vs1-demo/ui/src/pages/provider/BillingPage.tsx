@@ -123,7 +123,8 @@ export function BillingPage() {
       trend: latest?.status === 'failed'
         ? { value: '↘', direction: 'down' as const, label: `${latest.invoice_number} · ${t('billing.kpiPaymentFailed')}` }
         : { value: '—', direction: 'neutral' as const, label: latest ? `${latest.invoice_number} · ${latest.status}` : '' } },
-    { label: t('billing.kpiNextInvoice'), value: '2026-08-01', trend: { value: '—', direction: 'neutral' as const, label: t('billing.kpiMonthlyFirst') } },
+    // Naechste Rechnung = Ende des laufenden Zyklus (vorher fest '2026-08-01').
+    { label: t('billing.kpiNextInvoice'), value: preview.subscription?.current_period_end ?? '—', trend: { value: '—', direction: 'neutral' as const, label: t('billing.kpiMonthlyFirst') } },
     { label: t('billing.kpiYtd'), value: money(ytd, latest?.currency ?? cur), trend: { value: '↗', direction: 'up' as const, label: t('billing.kpiAcrossMonths', { count: invoices.length }) } },
   ];
 

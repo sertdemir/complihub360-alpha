@@ -29,8 +29,14 @@ const USER_ID = 'fa49d5ab-4dc9-4bb4-a84d-fe624e2eea2e';
 // Phase 3 (ADR-0004): auf dem Draht steht der opake public_ref, nie der
 // Schluessel. Die Abbildung hier ist die des Mocks; in der API kommt der Ref
 // aus `providers.public_ref`.
-const REF: Record<string, string> = { 'studio-bianchi': 'a1b2c3d4e5f6', 'schmidt-partner': 'b2c3d4e5f6a1', 'madrid-tax': 'c3d4e5f6a1b2', 'lucid-reg': 'd4e5f6a1b2c3', 'dahlmann-cpa': 'e5f6a1b2c3d4', 'paris-legal': 'f6a1b2c3d4e5', 'ams-privacy': '0a1b2c3d4e5f', 'oss-experts': '1b2c3d4e5f60' };
-const DESCRIPTOR: Record<string, string> = { 'studio-bianchi': 'Tax and VAT, Product & Packaging · Norditalien', 'schmidt-partner': 'Tax and VAT, Product & Packaging · Norddeutschland', 'madrid-tax': 'Tax and VAT · Spanien', 'lucid-reg': 'Product & Packaging · Hamburg', 'dahlmann-cpa': 'Corporate Structure, Tax and VAT · USA', 'paris-legal': 'Legal Support · Île-de-France', 'ams-privacy': 'Data & Privacy · Niederlande', 'oss-experts': 'Tax and VAT · Berlin' };
+// Demo-Geschichte (2026-09-27): Acme GmbH, D2C-Shop aus Hamburg, mit drei
+// Sitzungen (EU-Expansion DE/IT/ES, UK nach Brexit, Marketing & Recht ES).
+// Jeder Anbieter passt zu einem Markt und Bereich dieser Sitzungen — keiner
+// steht in einem Land, das der Nutzer gar nicht bearbeitet. Schmidt & Partner
+// ist zugleich die Partner-Persona des Partner-Dashboards: dort erscheinen
+// dieselben Acme-Anfragen aus Anbietersicht.
+const REF: Record<string, string> = { 'studio-bianchi': 'a1b2c3d4e5f6', 'schmidt-partner': 'b2c3d4e5f6a1', 'madrid-tax': 'c3d4e5f6a1b2', 'lucid-reg': 'd4e5f6a1b2c3', 'thames-vat': 'e5f6a1b2c3d4', 'costa-legal': 'f6a1b2c3d4e5', 'datenschutz-nord': '0a1b2c3d4e5f', 'oss-experts': '1b2c3d4e5f60' };
+const DESCRIPTOR: Record<string, string> = { 'studio-bianchi': 'Tax and VAT, Product & Packaging · Norditalien', 'schmidt-partner': 'Tax and VAT, Product & Packaging, Data & Privacy · Norddeutschland', 'madrid-tax': 'Tax and VAT · Spanien', 'lucid-reg': 'Product & Packaging · Hamburg', 'thames-vat': 'Tax and VAT · Vereinigtes Königreich', 'costa-legal': 'Legal Support · Spanien', 'datenschutz-nord': 'Data & Privacy · Hamburg', 'oss-experts': 'Tax and VAT · Berlin' };
 const keyOfRef = (ref: string) => Object.keys(REF).find((k) => REF[k] === ref) ?? null;
 
 function bookings() {
@@ -44,40 +50,138 @@ function bookings() {
     // Klarnamen und der Normalfall — Pseudonym, „Details ansehen" — war nicht
     // mehr zu sehen.
     b('m0ck-b03', 'lucid-reg', 'LUCID Registrierungsdienst Hamburg', 'Hamburg', null, iso(4, 11), iso(4, 11, 30), 'confirmed'),
-    b('m0ck-b04', 'dahlmann-cpa', 'Dahlmann CPA', 'USA', null, iso(6, 15), iso(6, 15, 30), 'confirmed'),
-    b('m0ck-b05', 'paris-legal', 'Cabinet Durand & Associés — Droit des affaires', 'Île-de-France', null, iso(12, 10), iso(12, 10, 30), 'confirmed'),
-    b('m0ck-b06', 'ams-privacy', 'Amsterdam Privacy Partners', 'Niederlande', null, iso(19, 13), iso(19, 13, 30), 'confirmed'),
+    b('m0ck-b04', 'thames-vat', 'Thames VAT Partners LLP', 'London', null, iso(6, 15), iso(6, 15, 30), 'confirmed'),
+    b('m0ck-b05', 'costa-legal', 'Bufete Costa Legal S.L.P.', 'Barcelona', null, iso(12, 10), iso(12, 10, 30), 'confirmed'),
+    b('m0ck-b06', 'datenschutz-nord', 'Datenschutz Nord GmbH', 'Hamburg', null, iso(19, 13), iso(19, 13, 30), 'confirmed'),
     b('m0ck-b07', 'lucid-reg', 'LUCID Registrierungsdienst Hamburg', 'Hamburg', null, iso(-1, 14), iso(-1, 14, 30), 'confirmed'),
     b('m0ck-b08', 'oss-experts', 'OSS Experts GmbH', 'Berlin', null, iso(-2, 10), iso(-2, 10, 30), 'confirmed'),
     b('m0ck-b09', 'oss-experts', 'OSS Experts GmbH', 'Berlin', null, iso(-8, 9), iso(-8, 9, 30), 'completed'),
-    b('m0ck-b10', 'dahlmann-cpa', 'Dahlmann CPA', 'USA', null, iso(-17, 16), iso(-17, 16, 30), 'cancelled'),
-    b('m0ck-b11', 'ams-privacy', 'Amsterdam Privacy Partners', 'Niederlande', null, iso(-21, 11), iso(-21, 11, 30), 'no_show'),
+    b('m0ck-b10', 'thames-vat', 'Thames VAT Partners LLP', 'London', null, iso(-17, 16), iso(-17, 16, 30), 'cancelled'),
+    b('m0ck-b11', 'datenschutz-nord', 'Datenschutz Nord GmbH', 'Hamburg', null, iso(-21, 11), iso(-21, 11, 30), 'no_show'),
     b('m0ck-b12', 'schmidt-partner', 'Schmidt & Partner Steuerberatungsgesellschaft mbH', 'Norddeutschland', null, iso(-30, 15), iso(-30, 15, 30), 'completed'),
-    b('m0ck-b13', 'paris-legal', 'Cabinet Durand & Associés', 'Paris', null, iso(-45, 10), iso(-45, 10, 30), 'completed'),
+    b('m0ck-b13', 'costa-legal', 'Bufete Costa Legal S.L.P.', 'Barcelona', null, iso(-45, 10), iso(-45, 10, 30), 'completed'),
   ];
 }
 
+// Anfrage-IDs: die ersten vier Zeichen sind die sichtbare "RQ-XXXX" —
+// vorher begannen alle mit 5eed und hiessen "RQ-5EED".
+const RQ_PREFIX = ['a3f1', 'b82c', 'c41d', 'd9e7', 'e2a4', 'f63b', '1c8e', '2d5f', '3e92', '4fa6', '5b17', '6c28'];
+const rid = (n: number) => `${RQ_PREFIX[n - 1]}0000-0000-4000-8000-${String(n).padStart(12, '0')}`;
+// Das Anliegen folgt Markt und Bereich — vorher trug jede Anfrage den Italien-Text.
+const ANLIEGEN: Record<string, string> = {
+  'IT/tax-vat': 'Wir starten den Verkauf nach Italien und brauchen eine USt-Registrierung (Partita IVA) inkl. Fiskalvertretung.',
+  'IT/product-packaging': 'Für Italien brauchen wir die Verpackungsregistrierung (CONAI) und die Kennzeichnung nach D.Lgs. 116/2020.',
+  'DE/product-packaging': 'LUCID-Registrierung, Systembeteiligung und Mengenmeldung für unseren Shop in Deutschland.',
+  'DE/data-privacy': 'Cookie-Banner, Einwilligungsnachweise und AV-Verträge für den Shop prüfen lassen.',
+  'DE/tax-vat': 'Umstellung auf das OSS-Verfahren für Fernverkäufe nach Italien und Spanien.',
+  'DE/legal-advisory': 'AGB und Widerrufsbelehrung für den Marktplatz-Start prüfen.',
+  'ES/tax-vat': 'Spanische USt-Registrierung und laufende Voranmeldungen für den Marktplatzverkauf.',
+  'ES/legal-advisory': 'Rechtliche Prüfung unserer Werbeaussagen und Preisangaben für Spanien.',
+  'UK/tax-vat': 'UK-VAT-Registrierung nach dem Brexit, inkl. Postponed VAT Accounting beim Import.',
+};
 function requests() {
-  const r = (n: number, over: Record<string, unknown>) => ({
-    id: uuid(n), user_id: USER_ID, provider_key: 'studio-bianchi', country: 'IT', category: 'tax-vat', created_at: iso(-1),
-    message: 'Wir expandieren nach Italien und brauchen eine USt-Registrierung inkl. Fiskalvertretung.',
-    structured_answers: { company: 'Acme GmbH' }, ...over,
-  });
+  const r = (n: number, over: Record<string, unknown>) => {
+    const row = {
+      id: rid(n), user_id: USER_ID, provider_key: 'studio-bianchi', country: 'IT', category: 'tax-vat', created_at: iso(-1),
+      structured_answers: { company: 'Acme GmbH' }, ...over,
+    } as Record<string, unknown>;
+    return { ...row, message: ANLIEGEN[`${row.country}/${row.category}`] ?? '' } as Record<string, any>;
+  };
   return [
     r(1, { status: 'replied', created_at: iso(-3), provider_key: 'schmidt-partner', country: 'DE', category: 'product-packaging' }),
-    r(2, { status: 'replied', created_at: iso(0, 7), provider_key: 'dahlmann-cpa', country: 'US', category: 'corporate-structure' }),
+    r(2, { status: 'replied', created_at: iso(0, 7), provider_key: 'thames-vat', country: 'UK', category: 'tax-vat' }),
     r(3, { status: 'expired', created_at: iso(-2), sla_confirm_deadline: plus(-26 * H) }),
     r(4, { status: 'confirmed', created_at: iso(-4), sla_reply_deadline: plus(-5 * H), provider_key: 'madrid-tax', country: 'ES' }),
-    r(5, { status: 'created', created_at: iso(0, 9), sla_confirm_deadline: plus(22 * H), provider_key: 'dahlmann-cpa', country: 'US', category: 'corporate-structure' }),
+    r(5, { status: 'created', created_at: iso(0, 9), sla_confirm_deadline: plus(22 * H), provider_key: 'datenschutz-nord', country: 'DE', category: 'data-privacy' }),
     r(6, { status: 'delivered', created_at: iso(-1, 20), sla_confirm_deadline: plus(2.5 * H), provider_key: 'schmidt-partner', country: 'DE', category: 'data-privacy' }),
-    r(7, { status: 'viewed', created_at: iso(-1, 22), sla_confirm_deadline: plus(-1 * H), provider_key: 'madrid-tax', country: 'ES', category: 'marketing-seo' }),
-    r(8, { status: 'confirmed', created_at: iso(-1), sla_reply_deadline: plus(31 * H) }),
-    r(9, { status: 'confirmed', created_at: iso(-1, 12), sla_reply_deadline: plus(0.4 * H), provider_key: 'dahlmann-cpa', country: 'US', category: 'logistics-customs' }),
+    r(7, { status: 'viewed', created_at: iso(-1, 22), sla_confirm_deadline: plus(-1 * H), provider_key: 'costa-legal', country: 'ES', category: 'legal-advisory' }),
+    r(8, { status: 'confirmed', created_at: iso(-1), sla_reply_deadline: plus(31 * H), category: 'product-packaging' }),
+    r(9, { status: 'confirmed', created_at: iso(-1, 12), sla_reply_deadline: plus(0.4 * H), provider_key: 'oss-experts', country: 'DE', category: 'tax-vat' }),
     r(10, { status: 'declined', created_at: iso(-5), provider_key: 'madrid-tax', country: 'ES' }),
     r(11, { status: 'withdrawn', created_at: iso(-9), provider_key: 'madrid-tax', country: 'ES' }),
     r(12, { status: 'declined', created_at: iso(-12), provider_key: 'schmidt-partner', country: 'DE', category: 'legal-advisory' }),
-    r(13, { status: 'withdrawn', created_at: iso(-40), provider_key: 'dahlmann-cpa', country: 'US', category: 'product-compliance' }),
   ];
+}
+
+// ─── Partnersicht: Schmidt & Partner ─────────────────────────────────────────
+// Dieselben Acme-Anfragen an Schmidt & Partner (1, 6, 12) plus Anfragen
+// anderer Mandanten. Vor der Bestaetigung bleibt der Mandant anonym — die
+// Karte zeigt dann nur Markt und Bereich (Dossier-Regel).
+const PARTNER_KEY = 'schmidt-partner';
+const PRQ_PREFIX = ['7c41', '7b3e', '7a92', '79d8', '78f1'];
+const prid = (n: number) => `${PRQ_PREFIX[n - 1]}0000-0000-4000-8000-${String(90 + n).padStart(12, '0')}`;
+function partnerRequests() {
+  const eigene = requests().filter((r) => r.provider_key === PARTNER_KEY);
+  const q = (n: number, company: string, over: Record<string, unknown>, message: string) =>
+    ({ id: prid(n), user_id: null, provider_key: PARTNER_KEY, structured_answers: { company }, message, ...over }) as Record<string, any>;
+  return [
+    q(1, 'Nordlicht Textil GmbH', { status: 'created', created_at: plus(-0.2 * H), sla_confirm_deadline: plus(23.8 * H), country: 'DE', category: 'product-packaging' },
+      'EPR-Setup für den Marktplatz-Start in Deutschland: LUCID, Systembeteiligung, Mengenmeldung.'),
+    q(2, 'Kaffeerösterei Elbe GmbH', { status: 'delivered', created_at: plus(-2 * H), sla_confirm_deadline: plus(22 * H), country: 'DE', category: 'tax-vat' },
+      'USt-Prüfung für Deutschland und Österreich, Umstieg auf OSS geplant.'),
+    q(3, 'Smart-Stage UG', { status: 'viewed', created_at: plus(-9.8 * H), sla_confirm_deadline: plus(14.2 * H), country: 'DE', category: 'data-privacy' },
+      'DSFA und AV-Verträge für ein SaaS-Produkt mit Nutzerdaten aus der EU.'),
+    q(4, 'Brunnen Living GmbH', { status: 'confirmed', created_at: plus(-26 * H), sla_reply_deadline: plus(30 * H), country: 'AT', category: 'tax-vat' },
+      'USt-Registrierung und Fiskalvertretung in Österreich für den Möbelversand.'),
+    q(5, 'Möbelwerk Süd GmbH', { status: 'replied', created_at: iso(-14), country: 'DE', category: 'product-packaging' },
+      'EPR-Registrierung für Möbelverpackungen, Mengen ab dem dritten Quartal.'),
+    ...eigene,
+  ];
+}
+function partnerBookings() {
+  const k = (id: string, start: string, status: string, email: string, message: string) =>
+    ({ id, slot_start: start, slot_end: new Date(new Date(start).getTime() + 30 * 60_000).toISOString(), status, lead_charged: true, user_email: email, message });
+  return [
+    k('m0ck-b02', iso(1, 9), 'confirmed', 'a.weber@acme-gmbh.example', 'EPR & Verpackung · DE — LUCID-Registrierung, Mengenmeldung (Acme GmbH)'),
+    k('pb-3', iso(-9, 10), 'completed', 'einkauf@moebelwerk-sued.example', 'EPR-Registrierung Möbelverpackungen · stattgefunden (Möbelwerk Süd GmbH)'),
+    k('pb-4', iso(-18, 15), 'no_show', 'info@hafenkontor.example', 'USt · DE — OSS-Umstellung (Hafenkontor Handels GmbH)'),
+    k('m0ck-b12', iso(-30, 15), 'completed', 'a.weber@acme-gmbh.example', 'USt · DE — OSS-Erstgespräch (Acme GmbH)'),
+  ];
+}
+function partnerCoverage() {
+  return { ok: true, coverage: { provider_key: PARTNER_KEY, name: 'Schmidt & Partner Steuerberatungsgesellschaft mbH', countries_supported: ['DE', 'AT'], languages: ['DE', 'EN'], sla_target_confirm_hours: 24, availability: 'available', ooo_until: null, partner_status: 'active' } };
+}
+const monat = (offset: number) => { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() + offset); return d.toISOString().slice(0, 7); };
+// Pricing v2 (ADR-0003): Tarif + Leads nach Band, Rabatt auf die ersten Leads
+// des Zyklus. Keine Gebuehr fuer Profilaufrufe. Alles in USD wie die Baender.
+function partnerInvoices() {
+  const inv = (n: number, offset: number, leads: number) => {
+    const rabattLeads = Math.min(3, leads);
+    const lines = [
+      { label: `Growth · monthly · ${monat(offset)}`, qty: 1, unit_cents: 9900, amount_cents: 9900 },
+      { label: 'Leads · Core', qty: leads, unit_cents: 14900, amount_cents: leads * 14900 },
+      { label: 'Tarif-Rabatt 10 %', qty: rabattLeads, unit_cents: -1490, amount_cents: -1490 * rabattLeads },
+    ];
+    const total = lines.reduce((sum, l) => sum + l.amount_cents, 0);
+    const issued = `${monat(offset + 1)}-01`;
+    return { id: `inv-${n}`, invoice_number: `INV-2026-${String(n).padStart(3, '0')}`, period: monat(offset), amount_cents: total, currency: 'USD', status: 'paid', line_items: lines, issued_at: issued, due_at: `${monat(offset + 1)}-15`, paid_at: `${monat(offset + 1)}-03`, hosted_invoice_url: null, invoice_pdf: null };
+  };
+  return { ok: true, invoices: [inv(8, -1, 4), inv(7, -2, 3), inv(6, -3, 5), inv(5, -4, 2)] };
+}
+function partnerBillingPreview() {
+  const leads = 3; const standard = leads * 14900; const discount = Math.round(standard * 0.1);
+  return {
+    ok: true, period: monat(0), currency: 'USD',
+    subscription: { plan_code: 'growth', label: 'Growth', cadence: 'monthly', status: 'active', current_period_start: `${monat(0)}-01`, current_period_end: `${monat(1)}-01`, monthly_cents: 9900, annual_cents: 99000, category_allowance: 5, analytics_level: 'enhanced', api_eligible: false },
+    discount: { pct: 10, count: 3, used: 3, remaining: 0, cycle_start: `${monat(0)}-01` },
+    leads: { count: leads, standard_cents: standard, discount_cents: discount, final_cents: standard - discount },
+    credit_balance_cents: 0,
+    lines: [{ label: `Growth · monthly · ${monat(0)}`, qty: 1, unit_cents: 9900, amount_cents: 9900 }],
+    total_cents: 9900 + standard - discount,
+    pricing: {
+      plans: [
+        { code: 'essential', label: 'Essential', monthly_cents: 5900, annual_cents: 59000, currency: 'USD', category_allowance: 1, lead_discount_pct: 0, lead_discount_count: 0 },
+        { code: 'growth', label: 'Growth', monthly_cents: 9900, annual_cents: 99000, currency: 'USD', category_allowance: 5, lead_discount_pct: 10, lead_discount_count: 3 },
+        { code: 'global', label: 'Global', monthly_cents: 18900, annual_cents: 189000, currency: 'USD', category_allowance: null, lead_discount_pct: 15, lead_discount_count: 6 },
+      ],
+      bands: [
+        { band: 1, label: 'Focused', fee_cents: 9900, currency: 'USD' },
+        { band: 2, label: 'Core', fee_cents: 14900, currency: 'USD' },
+        { band: 3, label: 'Advanced', fee_cents: 29900, currency: 'USD' },
+        { band: 4, label: 'Strategic', fee_cents: 49900, currency: 'USD' },
+      ],
+    },
+  };
 }
 
 // Veraenderlich: Duplikate, Umbenennen und Archivieren wirken fuer die
@@ -151,7 +255,7 @@ function assistantChat(body: Record<string, unknown>) {
 // „1 von 3 Bereichen", wo der Nutzer genau einen Bereich offen hatte.
 const COVERS: Record<string, string[]> = {
   'studio-bianchi': ['tax-vat', 'product-packaging', 'data-privacy'],
-  'schmidt-partner': ['tax-vat', 'product-packaging'],
+  'schmidt-partner': ['tax-vat', 'product-packaging', 'data-privacy'],
   'madrid-tax': ['tax-vat'],
 };
 const DEFAULT_REQUEST = ['tax-vat', 'product-packaging', 'data-privacy'];
@@ -162,8 +266,8 @@ const BASIS = (matched: string[]) => ({ country: 'DE', country_covered: true, do
 const RANK = (verification: 'independent' | 'reviewed' | 'partial' | 'none', verified: number, required: number, hours: number | null, conf: number | null, rating: number | null, reviews: number | null) =>
   ({ verification, verified_count: verified, required_count: required, response_hours: hours, confirmation_rate: conf, rating, reviews_count: reviews });
 const PROVIDERS = [
-  { _key: 'studio-bianchi', public_ref: REF['studio-bianchi'], region: 'Norditalien', active_since: 2015, specializations: ['VAT & OSS', 'E-Commerce', 'EU-weit'], languages: ['IT', 'DE', 'EN'], rating: 4.9, completed_count: 210, avg_response_hours: 3, billing_model: 'project', is_verified: true, match: 100, match_tier: 'high', match_basis: BASIS(['tax-vat', 'product-packaging', 'data-privacy']), rank_basis: RANK('independent', 5, 5, 3, 0.97, 4.9, 12) },
-  { _key: 'schmidt-partner', public_ref: REF['schmidt-partner'], region: 'Norddeutschland', active_since: 2013, specializations: ['OSS/IOSS', 'Cross-border Tax'], languages: ['DE', 'EN'], rating: 4.7, completed_count: 96, avg_response_hours: 5, billing_model: 'abo', is_verified: true, match: 87, match_tier: 'strong', match_basis: BASIS(['tax-vat', 'product-packaging']), rank_basis: RANK('independent', 4, 4, 5, 0.92, 4.7, 7) },
+  { _key: 'studio-bianchi', public_ref: REF['studio-bianchi'], region: 'Norditalien', active_since: 2015, specializations: ['VAT & OSS', 'E-Commerce', 'EU-weit'], languages: ['IT', 'DE', 'EN'], rating: 4.7, completed_count: 210, avg_response_hours: 3, billing_model: 'project', is_verified: true, match: 100, match_tier: 'high', match_basis: BASIS(['tax-vat', 'product-packaging', 'data-privacy']), rank_basis: RANK('independent', 5, 5, 3, 0.97, 4.7, 3) },
+  { _key: 'schmidt-partner', public_ref: REF['schmidt-partner'], region: 'Norddeutschland', active_since: 2013, specializations: ['OSS/IOSS', 'Cross-border Tax'], languages: ['DE', 'EN'], rating: 4.7, completed_count: 96, avg_response_hours: 5, billing_model: 'abo', is_verified: true, match: 87, match_tier: 'strong', match_basis: BASIS(['tax-vat', 'product-packaging']), rank_basis: RANK('independent', 4, 4, 5, 0.92, 4.7, 3) },
   { _key: 'madrid-tax', public_ref: REF['madrid-tax'], region: 'Spanien', active_since: 2020, specializations: ['Iberian VAT', 'Marketplace'], languages: ['ES', 'EN'], rating: 4.5, completed_count: 41, avg_response_hours: 8, billing_model: 'hourly', is_verified: true, match: 73, match_tier: 'moderate', match_basis: BASIS(['tax-vat']), rank_basis: RANK('partial', 3, 4, 8, 0.91, null, 0) },
 ];
 const LETTER = (i: number) => String.fromCharCode(65 + i);
@@ -238,7 +342,7 @@ const PROVIDER_DETAIL: Record<string, MockDetail> = {
     excluded_services: ['Zoll', 'Markenrecht'],
   },
   'schmidt-partner': {
-    markets: ['DE', 'NL', 'AT', 'FR'],
+    markets: ['DE', 'AT'],
     pricing_table: [
       { service: 'OSS/IOSS-Registrierung', price: 'im Abo enthalten' },
       { service: 'Compliance-Abo (bis 3 Märkte)', price: '290 € / Monat' },
@@ -248,7 +352,8 @@ const PROVIDER_DETAIL: Record<string, MockDetail> = {
     services: [
       { title: 'OSS/IOSS-Registrierung', includes: ['Anmeldung beim BZSt', 'Erste Quartalsmeldung', 'Fristenüberwachung'] },
       { title: 'Laufende USt-Betreuung EU', includes: ['Voranmeldungen DE', 'Reverse Charge', 'Intrastat ab Schwelle'] },
-      { title: 'Cross-border Tax', includes: ['Betriebsstättenprüfung', 'Lieferketten-Strukturierung'] },
+      { title: 'EPR & Verpackung', includes: ['LUCID-Registrierung', 'Systembeteiligung', 'Mengenmeldung'] },
+      { title: 'Datenschutz für Shops', includes: ['Cookie-Banner & Einwilligung', 'AV-Verträge', 'DSFA'] },
     ],
     credentials: [
       { label: 'Steuerberater-Zulassung (DE)', note: 'seit 2013 · Kammer geprüft' },
@@ -256,7 +361,7 @@ const PROVIDER_DETAIL: Record<string, MockDetail> = {
       { label: 'Kanzlei mit ISO 27001', note: 'Zertifikat 2025 vorgelegt' },
       { label: 'DATEV · Amazon SPN gelistet', note: 'Plattform-Nachweise' },
     ],
-    excluded_services: ['Zoll', 'Datenschutz', 'Markenrecht'],
+    excluded_services: ['Zoll', 'Markenrecht'],
   },
   // Dossier bewusst leer — der Leerfall der Karten.
   'madrid-tax': {
@@ -291,7 +396,7 @@ const PROVIDER_REVIEWS: Record<string, Array<{ rating: number; body: string | nu
   'schmidt-partner': [
     { rating: 5, body: 'OSS-Umstellung in zwei Wochen sauber durch, Fristen kamen als Erinnerung vor uns an.', categories: ['Fristen', 'Fachlich'], daysAgo: 88 },
     { rating: 5, body: 'Reverse-Charge-Fragen wurden am selben Tag beantwortet. Preis wie besprochen.', categories: ['Erreichbarkeit', 'Preis'], daysAgo: 150 },
-    { rating: 4, body: 'Gut bei Steuern, für Verpackung mussten wir woanders hin — sagt er aber selbst offen.', categories: ['Fachlich'], daysAgo: 190 },
+    { rating: 4, body: 'Stark bei USt und Verpackung, für den Zoll mussten wir woanders hin — sagen sie aber selbst offen.', categories: ['Fachlich'], daysAgo: 190 },
   ],
   'madrid-tax': [],
 };
@@ -359,10 +464,13 @@ function dashboard() {
     ok: true,
     sessions: { total: aktive.length, items: aktive.map(({ id, label, country, markets, categories, open, total, severity, by_severity, created_at, updated_at }) => ({ id, label, country, markets: [...new Set([country, ...(markets ?? [])].filter(Boolean))], categories, open, total, severity, by_severity, created_at, updated_at })) },
     obligations: {
-      open: 26, by_severity: { critical: 4, high: 11, medium: 8, low: 3 },
-      by_market: { DE: 13, ES: 7, UK: 6 }, by_market_high: { DE: 9, ES: 3, UK: 3 },
-      by_domain: { 'tax-vat': 9, 'product-packaging': 8, 'data-privacy': 4, 'marketing-seo': 3, 'legal-advisory': 2 },
-      by_domain_high: { 'tax-vat': 6, 'product-packaging': 5, 'data-privacy': 3, 'marketing-seo': 1, 'legal-advisory': 0 },
+      // Summe der Sitzungen: EU-Expansion 13 (2 krit., 7 hoch, 3 mittel, 1 niedr.),
+      // UK 6 (3/2/1), ES 7 (alle niedrig). Maerkte ueberlappen (eine EU-Pflicht
+      // zaehlt in DE, IT und ES), Bereiche nicht.
+      open: 26, by_severity: { critical: 2, high: 10, medium: 5, low: 9 },
+      by_market: { DE: 9, IT: 5, ES: 11, UK: 6 }, by_market_high: { DE: 6, IT: 4, ES: 2, UK: 3 },
+      by_domain: { 'tax-vat': 11, 'product-packaging': 5, 'data-privacy': 3, 'marketing-seo': 4, 'legal-advisory': 3 },
+      by_domain_high: { 'tax-vat': 7, 'product-packaging': 4, 'data-privacy': 1, 'marketing-seo': 0, 'legal-advisory': 0 },
     },
   };
 }
@@ -371,12 +479,12 @@ function notifications() {
   const n = (i: number, type: string, subject: string, subjectId: string, payload: Record<string, unknown>, hoursAgo: number, read: boolean) =>
     ({ id: uuid(i, 4), type, subject, subject_id: subjectId, payload, created_at: plus(-hoursAgo * H), read_at: read ? plus(-(hoursAgo - 1) * H) : null });
   return [
-    n(1, 'provider_replied', 'engagement', uuid(1), { providerRef: REF['schmidt-partner'], providerName: 'Verified Provider · Tax and VAT, Product & Packaging · Norddeutschland' }, 2, false),
-    n(2, 'provider_confirmed', 'engagement', uuid(8), { providerRef: REF['studio-bianchi'], providerName: 'Verified Provider · Tax and VAT, Product & Packaging · Norditalien' }, 5, false),
+    n(1, 'provider_replied', 'engagement', rid(2), { providerRef: REF['thames-vat'], providerName: 'Verifizierter VAT-Spezialist · Vereinigtes Königreich' }, 2, false),
+    n(2, 'provider_confirmed', 'engagement', rid(8), { providerRef: REF['studio-bianchi'], providerName: 'Verifizierte Steuerkanzlei · Norditalien' }, 5, false),
     n(3, 'booking_rescheduled', 'booking', 'm0ck-b02', { providerName: 'Schmidt & Partner Steuerberatungsgesellschaft mbH', from: iso(1, 11), to: iso(1, 9) }, 9, false),
-    n(4, 'provider_declined', 'engagement', uuid(10), { providerRef: REF['madrid-tax'], providerName: 'Verified Provider · Tax and VAT · Spanien' }, 30, true),
-    n(5, 'booking_cancelled', 'booking', 'm0ck-b10', { providerName: 'Dahlmann CPA', from: iso(-17, 16) }, 60, true),
-    n(6, 'provider_replied', 'engagement', uuid(2), { providerRef: REF['dahlmann-cpa'], providerName: 'Verified Provider · Corporate Structure, Tax and VAT · USA' }, 80, true),
+    n(4, 'provider_declined', 'engagement', rid(10), { providerRef: REF['madrid-tax'], providerName: 'Verifizierter Tax-Spezialist · Spanien' }, 30, true),
+    n(5, 'booking_cancelled', 'booking', 'm0ck-b10', { providerName: 'Thames VAT Partners LLP', from: iso(-17, 16) }, 60, true),
+    n(6, 'provider_replied', 'engagement', rid(1), { providerRef: REF['schmidt-partner'], providerName: 'Verifizierte Steuerberatung · Norddeutschland' }, 70, true),
   ];
 }
 
@@ -390,12 +498,14 @@ function obligations(sessionId: string) {
 }
 
 function engagement(id: string) {
-  const e = requests().find((r) => r.id === id) ?? requests()[0];
+  const e = [...requests(), ...partnerRequests()].find((r) => r.id === id) ?? requests()[0];
   return { ok: true, engagement: e, messages: [
     { id: 'm1', author: 'user', body: e.message, created_at: e.created_at },
     { id: 'm2', author: 'system', body: 'Anfrage zugestellt — der Anbieter hat 24 Stunden zur Bestätigung.', created_at: e.created_at },
     ...(['confirmed', 'replied'].includes(e.status) ? [{ id: 'm3', author: 'system', body: 'Der Anbieter hat bestätigt. Identität und Kontakt sind jetzt freigeschaltet.', created_at: plus(-20 * H) }] : []),
-    ...(e.status === 'replied' ? [{ id: 'm4', author: 'provider', body: 'Vielen Dank für Ihre Anfrage. Wir übernehmen die Registrierung inkl. LUCID-Eintrag; Vorschlag anbei.', proposal: { price_range: '900–1.400 €', timeline: '3–4 Wochen', deliverables: ['USt-Registrierung', 'LUCID-Registrierung', 'Erstberatung 60 min'], engagement_model: 'Projektbasiert' }, created_at: plus(-6 * H) }] : []),
+    ...(e.status === 'replied' ? [{ id: 'm4', author: 'provider', ...(e.category === 'product-packaging'
+      ? { body: 'Vielen Dank für Ihre Anfrage. Wir übernehmen die LUCID-Registrierung und die Mengenmeldung; Vorschlag anbei.', proposal: { price_range: '600–900 €', timeline: '2–3 Wochen', deliverables: ['LUCID-Registrierung', 'Systembeteiligung', 'Erstberatung 60 min'], engagement_model: 'Projektbasiert' } }
+      : { body: 'Vielen Dank für Ihre Anfrage. Wir übernehmen die Registrierung und die ersten Meldungen; Vorschlag anbei.', proposal: { price_range: '900–1.400 €', timeline: '3–4 Wochen', deliverables: ['USt-Registrierung', 'Erste Voranmeldung', 'Erstberatung 60 min'], engagement_model: 'Projektbasiert' } }), created_at: plus(-6 * H) }] : []),
   ] };
 }
 
@@ -497,7 +607,71 @@ function p2Provider() {
 function p2Confidential() {
   return { entity_type: 'GmbH', registration_number: 'HRB 4711 · Amtsgericht Hamburg', registered_address: 'Beispielweg 1, 20095 Hamburg', operating_address: null, tax_number: null, representative_name: 'Anna Beispiel', representative_title: 'Geschäftsführerin', insurance_provider: 'HDI', insurance_type: 'Berufshaftpflicht', insurance_valid_until: '2027-03-31' };
 }
-function p2Application() {
+// Schmidt & Partner ist AKTIV: Dossier vollstaendig, alle Nachweise geprueft,
+// Abdeckung genehmigt (Oesterreich-EPR noch in Pruefung). Die jaehrliche
+// Re-Verifizierung steht in zehn Tagen an — dieselbe Zeile, die die
+// Admin-Queue als "reverification_due" fuehrt.
+const SP = { vat: uuid(61, 8), epr: uuid(62, 8), priv: uuid(63, 8), ev1: uuid(71, 8), ev2: uuid(72, 8), ev3: uuid(73, 8), ev4: uuid(74, 8), ev5: uuid(75, 8) };
+function spProvider() {
+  return { provider_key: PARTNER_KEY, name: 'Schmidt & Partner Steuerberatungsgesellschaft mbH', website_url: 'https://schmidt-partner.example', contact_email: 'kanzlei@schmidt-partner.example', languages: ['de', 'en'], region: 'Hamburg', active_since: 2013, vat_id: 'DE287654321', vat_id_status: 'valid', vat_id_checked_at: iso(-60, 9, 0), billing_country: 'DE', work_mode: 'remote · Portal', lifecycle_status: 'active', lifecycle_status_since: iso(-355, 10, 0), lifecycle_status_reason: null, billing_ready: true, billing_block_reasons: [] };
+}
+function spServices() {
+  const cov = (id: string, svc: string, cc: string, status: string, days: number | null) => ({ id, service_id: svc, country_code: cc, jurisdiction_code: null, status, limitations: null, approved_at: days === null ? null : iso(days, 11, 0), expires_at: null });
+  return [
+    { id: SP.vat, service_code: 'tax-vat.returns', service_name: 'USt & OSS-Betreuung', description: 'Registrierung, Voranmeldungen und OSS-Quartalsmeldungen für Online-Händler.', pricing_model: 'subscription', price_min: 290, price_max: 290, currency: 'EUR', pricing_basis: 'je Monat (bis 3 Märkte)', response_time_hours: 24, completion_days_estimate: 5, capacity_status: 'open', status: 'active',
+      coverage: [cov(uuid(81, 8), SP.vat, 'DE', 'approved', -355), cov(uuid(82, 8), SP.vat, 'AT', 'approved', -200)] },
+    { id: SP.epr, service_code: 'product-packaging.registration', service_name: 'EPR & Verpackung', description: 'LUCID-Registrierung, Systembeteiligung und Mengenmeldung.', pricing_model: 'project', price_min: 600, price_max: 900, currency: 'EUR', pricing_basis: 'je Projekt', response_time_hours: 24, completion_days_estimate: 14, capacity_status: 'open', status: 'active',
+      coverage: [cov(uuid(83, 8), SP.epr, 'DE', 'approved', -300), cov(uuid(84, 8), SP.epr, 'AT', 'pending', null)] },
+    { id: SP.priv, service_code: 'data-privacy.notices', service_name: 'Datenschutz für Shops', description: 'Cookie-Banner, Einwilligungsnachweise, AV-Verträge und DSFA.', pricing_model: 'project', price_min: 1200, price_max: 2400, currency: 'EUR', pricing_basis: 'je Paket', response_time_hours: 48, completion_days_estimate: 10, capacity_status: 'open', status: 'active',
+      coverage: [cov(uuid(85, 8), SP.priv, 'DE', 'approved', -120)] },
+  ];
+}
+function spChecklist() {
+  return [
+    { type: 'incorporation', source: 'document', service_code: null, country_code: null, required_for_submit: true, state: 'reviewed', evidence_id: SP.ev1 },
+    { type: 'vat_id', source: 'registry_check', service_code: null, country_code: null, required_for_submit: true, state: 'reviewed', evidence_id: SP.ev2 },
+    { type: 'insurance', source: 'document', service_code: null, country_code: null, required_for_submit: true, state: 'reviewed', evidence_id: SP.ev3 },
+    { type: 'representative_identity', source: 'registry_check', service_code: null, country_code: null, required_for_submit: false, state: 'reviewed', evidence_id: SP.ev4 },
+    { type: 'professional_licence', source: 'document', service_code: 'tax-vat', country_code: 'DE', required_for_submit: false, state: 'reviewed', evidence_id: SP.ev5 },
+  ];
+}
+function spEvidence() {
+  const e = (id: string, type: string, source: string, result: string, name: string | null, identifier: string | null, days: number, expires: string | null, countries: string[] = [], services: string[] = []) =>
+    ({ id, evidence_type: type, source, result, original_name: name, size_bytes: name ? 480_000 : null, upload_confirmed: true, uploaded_at: iso(days, 10, 0), identifier, expires_at: expires, supports_countries: countries, supports_service_codes: services });
+  return [
+    e(SP.ev1, 'incorporation', 'document', 'reviewed', 'Handelsregister-Auszug.pdf', 'HRB 128844', -360, null),
+    e(SP.ev2, 'vat_id', 'registry_check', 'independently_verified', null, 'DE287654321', -60, null),
+    e(SP.ev3, 'insurance', 'document', 'reviewed', 'Berufshaftpflicht-2027.pdf', null, -40, '2027-06-30'),
+    e(SP.ev4, 'representative_identity', 'registry_check', 'independently_verified', null, null, -360, null),
+    e(SP.ev5, 'professional_licence', 'document', 'reviewed', 'Bestellungsurkunde-StB.pdf', null, -360, null, ['DE'], ['tax-vat']),
+  ];
+}
+function spAgreements() {
+  return ['provider_agreement', 'privacy_notice', 'billing_authorization'].map((t, i) => ({ agreement_type: t, version: '2026-09', language: 'de', accepted_at: iso(-20, 9, i), accepted_by_name: 'Katrin Schmidt' }));
+}
+function spHistory() {
+  const h = (n: number, subject: string, action: string, from: string | null, to: string | null, reason: string | null, actor: string, when: string) => ({ id: uuid(90 + n, 8), subject, subject_id: null, action, from, to, reason, actor_kind: actor, created_at: when });
+  return [
+    h(1, 'coverage', 'submitted', null, 'pending', 'EPR & Verpackung · AT', 'provider', iso(-3, 10, 0)),
+    h(2, 'coverage', 'approve', 'pending', 'approved', null, 'reviewer', iso(-120, 11, 0)),
+    h(3, 'lifecycle', 'transition', 'under_verification', 'active', null, 'reviewer', iso(-355, 10, 0)),
+    h(4, 'lifecycle', 'transition', 'submitted', 'under_verification', null, 'reviewer', iso(-358, 9, 0)),
+    h(5, 'lifecycle', 'submitted', 'draft', 'submitted', null, 'provider', iso(-360, 16, 0)),
+  ];
+}
+function spMatrix() {
+  return spServices().map((sv) => ({ service_id: sv.id, service_code: sv.service_code, service_name: sv.service_name, status: sv.status, cells: sv.coverage.map((c) => ({ coverage_id: c.id, country_code: c.country_code, jurisdiction_code: c.jurisdiction_code, status: c.status, limitations: c.limitations, approved_at: c.approved_at, expires_at: c.expires_at })) }));
+}
+function spConfidential() {
+  return { entity_type: 'GmbH', registration_number: 'HRB 128844 · Amtsgericht Hamburg', registered_address: 'Große Elbstraße 14, 22767 Hamburg', operating_address: null, tax_number: null, representative_name: 'Katrin Schmidt', representative_title: 'Geschäftsführende Partnerin', insurance_provider: 'HDI', insurance_type: 'Berufshaftpflicht', insurance_valid_until: '2027-06-30' };
+}
+function p2Application(key?: string) {
+  if (key === PARTNER_KEY) {
+    const done = { complete: true, missing: [] as string[] };
+    return { ok: true, provider: spProvider(), confidential: spConfidential(),
+      chapters: { account: done, legal: done, services: done, evidence: done, agreements: done, submit: { ready: false, missing: [] } },
+      services: spServices(), checklist: spChecklist(), evidence: spEvidence(), agreements: spAgreements(), open_requests: [] };
+  }
   const missing = ['evidence.insurance'];
   return { ok: true, provider: p2Provider(), confidential: p2Confidential(),
     chapters: { account: { complete: true, missing: [] }, legal: { complete: true, missing: [] }, services: { complete: true, missing: [] }, evidence: { complete: false, missing }, agreements: { complete: true, missing: [] }, submit: { ready: false, missing } },
@@ -506,7 +680,11 @@ function p2Application() {
 function p2Matrix() {
   return p2Services().map((s) => ({ service_id: s.id, service_code: s.service_code, service_name: s.service_name, status: s.status, cells: s.coverage.map((c) => ({ coverage_id: c.id, country_code: c.country_code, jurisdiction_code: c.jurisdiction_code, status: c.status, limitations: c.limitations, approved_at: c.approved_at, expires_at: c.expires_at })) }));
 }
-function p2Verification() {
+function p2Verification(key?: string) {
+  if (key === PARTNER_KEY) {
+    const sp = spProvider();
+    return { ok: true, lifecycle: { status: sp.lifecycle_status, since: sp.lifecycle_status_since, reason: null, reverification_due_at: iso(10, 6, 0), grace_until: null }, matrix: spMatrix(), checklist: spChecklist(), open_requests: [], history: spHistory() };
+  }
   const p = p2Provider();
   return { ok: true, lifecycle: { status: p.lifecycle_status, since: p.lifecycle_status_since, reason: p.lifecycle_status_reason, reverification_due_at: null, grace_until: null }, matrix: p2Matrix(), checklist: p2Checklist(), open_requests: p2Requests(), history: p2History() };
 }
@@ -533,23 +711,33 @@ function p2ReviewDossier(key: string) {
     open_requests: p2Requests(), gate: p2Gate(), history: p2History() };
 }
 
-function route(method: string, path: string, body: Record<string, unknown> = {}): unknown {
+function route(method: string, path: string, body: Record<string, unknown> = {}, role = ''): unknown {
   const seg = path.split('/').filter(Boolean); // ['api','v1',...]
   const p = seg.slice(2);
   if (method === 'GET') {
     if (p[0] === 'dashboard') return dashboard();
     // Mock-Login = der Demo-Anbieter (echte API: provider_members, 20260922000000)
-    if (p[0] === 'me' && p[1] === 'provider') return { ok: true, provider_key: 'dahlmann-cpa', role: 'owner', name: 'Dahlmann CPA', lifecycle_status: 'more_info_required' };
+    if (p[0] === 'me' && p[1] === 'provider') return { ok: true, provider_key: PARTNER_KEY, role: 'owner', name: 'Schmidt & Partner', lifecycle_status: 'active' };
     if (p[0] === 'domain' && p[1]) return domainOverview(p[1]);
     if (p[0] === 'bookings') return { ok: true, bookings: bookings() };
-    if (p[0] === 'requests') return { ok: true, requests: requests() };
+    // Dieselbe Route wie beim echten Server; dort trennt der Login die Sicht,
+    // hier die Demo-Rolle aus dem Header x-demo-role.
+    if (p[0] === 'requests') return { ok: true, requests: role === 'partner' ? partnerRequests() : requests() };
+    if (p[0] === 'provider' && p[2] === 'bookings') return { ok: true, bookings: partnerBookings() };
+    if (p[0] === 'provider' && p[2] === 'coverage') return partnerCoverage();
+    if (p[0] === 'provider' && p[2] === 'invoices') return partnerInvoices();
+    if (p[0] === 'provider' && p[2] === 'billing' && p[3] === 'preview') return partnerBillingPreview();
+    if (p[0] === 'reads') return { ok: true, last_seen_at: plus(-30 * H) };
+    // Das Betriebsprotokoll ist admin-pflichtig (echter Server: 403) — der
+    // Partner-Feed faellt dann wie in echt auf seine eigene Darstellung zurueck.
+    if (p[0] === 'admin' && p[1] === 'events' && role !== 'admin') return { __status: 403, errorCode: 'FORBIDDEN', message: 'Admin only' };
     if (p[0] === 'notifications') { const rows = notifications(); return { ok: true, notifications: rows, unread: rows.filter((r) => !r.read_at).length }; }
     if (p[0] === 'sessions') return { ok: true, sessions: SESSIONS.map(({ open: _open, total: _total, severity: _severity, by_severity: _bySeverity, ...s }) => s) };
     if (p[0] === 'session' && p[2] === 'obligations') return obligations(p[1]);
     if (p[0] === 'engagement' && p.length === 2) return engagement(p[1]);
     // Phase 2 · Onboarding: der Demo-Anbieter steckt in der Pruefung (Rueckfrage offen).
-    if (p[0] === 'provider' && p[2] === 'application') return p2Application();
-    if (p[0] === 'provider' && p[2] === 'verification') return p2Verification();
+    if (p[0] === 'provider' && p[2] === 'application') return p2Application(p[1]);
+    if (p[0] === 'provider' && p[2] === 'verification') return p2Verification(p[1]);
     if (p[0] === 'admin' && p[1] === 'review' && p[2] === 'queue') return p2Queue();
     if (p[0] === 'admin' && p[1] === 'review' && p[2] && p[3] === 'gate') return { ok: true, gate: p2Gate() };
     if (p[0] === 'admin' && p[1] === 'review' && p[2] && !p[3]) return p2ReviewDossier(p[2]);
@@ -558,7 +746,9 @@ function route(method: string, path: string, body: Record<string, unknown> = {})
     if (p[0] === 'p' && p[2] === 'detail') return providerDetail(p[1]);
     if (p[0] === 'p' && p[2] === 'slots') return keyOfRef(p[1]) ? providerSlots() : { __status: 404, errorCode: 'NOT_FOUND', message: 'Provider not found' };
     if (p[0] === 'p' && p[2] === 'reviews') return providerReviews(p[1]);
-    if (p[0] === 'metrics') return { ok: true, sla: { confirm_rate: 0.86, avg_reply_hours: 5.2 } };
+    // Form wie der Server (api/metrics.ts) — vorher kam { sla } und die Seite
+    // fiel stumm auf ihre Fixture zurueck. Werte passen zu den Partner-Anfragen.
+    if (p[0] === 'metrics') return { ok: true, metrics: { total: 42, confirm_rate: 0.88, reply_rate: 0.81, sla_breach_rate: 0.03, avg_confirm_ms: 4.2 * H, avg_reply_ms: 17 * H } };
     return { ok: true, items: [], providers: [], laws: [], documents: [], exports: [] };
   }
   if (p[0] === 'search') return search(body);
@@ -598,7 +788,8 @@ export function mockApiPlugin(): Plugin {
         req.on('end', () => {
         let parsed: Record<string, unknown> = {};
         try { parsed = raw ? JSON.parse(raw) : {}; } catch { /* kein JSON */ }
-        const body = route(req.method ?? 'GET', url.pathname, parsed);
+        const role = String(req.headers['x-demo-role'] ?? '');
+        const body = route(req.method ?? 'GET', url.pathname, parsed, role);
         res.setHeader('content-type', 'application/json');
         res.setHeader('x-mock-api', '1');
         // Eine Antwort darf ihren Status mitbringen (404 fuer unbekannte Anbieter).

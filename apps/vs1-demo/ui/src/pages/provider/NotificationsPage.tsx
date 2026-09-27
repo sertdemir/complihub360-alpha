@@ -31,21 +31,21 @@ function buildFeedFixture(t: (k: string, o?: Record<string, unknown>) => string)
     {
       day: t('notifications.dayToday'),
       items: [
-        { title: `${t('notifications.itemNewRequest')} · Möbel-Berater Müller GmbH`, event: 'request_routed', time: t('notifications.timeMinAgo', { count: 12 }), unread: true, kind: 'request',
-          desc: t('notifications.descRq0234'), action: t('notifications.actionOpenRq', { id: 'RQ-0234' }) },
-        { title: `${t('notifications.itemNewRequest')} · TexTec OÜ (Estonia)`, event: 'request_routed', time: t('notifications.timeHoursAgo', { count: 2 }), unread: true, kind: 'request',
-          desc: t('notifications.descRq0233'), action: t('notifications.actionOpenRq', { id: 'RQ-0233' }) },
-        { title: `${t('notifications.itemSlaReminder')} · RQ-0232 · Smart-Stage UG`, event: 'sla_reminder_sent', time: t('notifications.timeHoursAgo', { count: 4 }), kind: 'sla',
-          desc: t('notifications.descRq0232'), action: t('notifications.actionOpenRq', { id: 'RQ-0232' }) },
+        { title: `${t('notifications.itemNewRequest')} · EPR & Verpackung · DE`, event: 'request_routed', time: t('notifications.timeMinAgo', { count: 12 }), unread: true, kind: 'request',
+          desc: t('notifications.descRq0234'), action: t('notifications.actionOpenRq', { id: 'RQ-7C41' }) },
+        { title: `${t('notifications.itemNewRequest')} · USt · DE + AT`, event: 'request_routed', time: t('notifications.timeHoursAgo', { count: 2 }), unread: true, kind: 'request',
+          desc: t('notifications.descRq0233'), action: t('notifications.actionOpenRq', { id: 'RQ-7B3E' }) },
+        { title: `${t('notifications.itemSlaReminder')} · RQ-7A92 · Datenschutz · DE`, event: 'sla_reminder_sent', time: t('notifications.timeHoursAgo', { count: 4 }), kind: 'sla',
+          desc: t('notifications.descRq0232'), action: t('notifications.actionOpenRq', { id: 'RQ-7A92' }) },
       ],
     },
     {
       day: t('notifications.dayYesterday'),
       items: [
-        { title: `${t('notifications.itemEngagementClosed')} · Lampada B.V. · NL VAT cleanup`, event: 'engagement_completed', time: `${t('notifications.dayYesterday')} · 18:34`, kind: 'system',
+        { title: `${t('notifications.itemEngagementClosed')} · Möbelwerk Süd GmbH · EPR-Registrierung`, event: 'engagement_completed', time: `${t('notifications.dayYesterday')} · 18:34`, kind: 'system',
           desc: t('notifications.descEngagementClosed') },
-        { title: `${t('notifications.itemNewReview')} · Lampada B.V.`, event: 'client_review_posted', time: `${t('notifications.dayYesterday')} · 18:34`, kind: 'review',
-          desc: '"Schneller Turnaround, präzise Kommunikation. Hat exakt unsere Lücke geschlossen." — Marlies Hertog, Managing Director' },
+        { title: `${t('notifications.itemNewReview')} · Möbelwerk Süd GmbH`, event: 'client_review_posted', time: `${t('notifications.dayYesterday')} · 18:34`, kind: 'review',
+          desc: '"Schneller Turnaround, präzise Kommunikation. Hat exakt unsere Lücke geschlossen." — Geschäftsführung, Möbelwerk Süd' },
       ],
     },
   ];

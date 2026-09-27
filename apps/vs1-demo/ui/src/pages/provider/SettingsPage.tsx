@@ -78,7 +78,7 @@ export function SettingsPage() {
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{t('settings.legalName')}</p>
               <div className="mt-1.5 flex items-center gap-2.5">
-                <p className="text-[14px] font-medium text-fg">Dahlmann CPA Steuerberatungs GmbH</p>
+                <p className="text-[14px] font-medium text-fg">Schmidt & Partner Steuerberatungsgesellschaft mbH</p>
                 <Tag tone="neutral">{t('settings.lockedTag')}</Tag>
               </div>
             </div>
@@ -87,8 +87,7 @@ export function SettingsPage() {
               <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{t('settings.bioLabel')}</p>
               <Card styleVariant="filled" className="mt-1.5 p-4">
                 <p className="text-[13px] leading-relaxed text-fg-secondary">
-                  Boutique Steuerberatungs-Praxis · Munich · 8 partners, 24 staff · specialist in cross-border
-                  e-commerce VAT, EPR registrations, and German GoBD compliance audits for D2C + marketplace seller segment.
+                  Steuerberatungskanzlei · Hamburg · 6 Partner, 18 Mitarbeitende · grenzüberschreitende USt und OSS, EPR & Verpackung, Datenschutz für Online-Händler und Marktplatz-Verkäufer.
                 </p>
               </Card>
             </div>

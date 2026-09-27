@@ -72,7 +72,7 @@ function dummyTermine(): UserBooking[] {
     t('dummy-b2', 'd0d0d0d0a002', 'OSS Experts GmbH', 'Tax & VAT · Berlin', 'Berlin', -3, 10),
     t('dummy-b3', 'd0d0d0d0a003', 'Schmidt & Partner Steuerberatung', 'Tax & VAT · Norddeutschland', 'Norddeutschland', 1, 9),
     t('dummy-b4', 'd0d0d0d0a004', 'LUCID Registrierungsdienst Hamburg', 'Packaging · Hamburg', 'Hamburg', 3, 11),
-    t('dummy-b5', 'd0d0d0d0a005', 'Dahlmann CPA', 'Tax & VAT · USA', 'USA', 6, 15),
+    t('dummy-b5', 'd0d0d0d0a005', 'Thames VAT Partners LLP', 'Tax & VAT · Vereinigtes Königreich', 'London', 6, 15),
   ];
 }
 

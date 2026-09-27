@@ -84,12 +84,11 @@ export function CoveragePage() {
         <section className="space-y-3">
           <SectionHeader title={t('coverage.publicIdentityTitle')} sub={t('coverage.publicIdentitySub')} editLabel={t('coverage.edit')} />
           <Card styleVariant="outlined" className="flex items-center gap-4 p-4">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-accent text-[13px] font-bold text-fg-on-accent">DC</span>
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-accent text-[13px] font-bold text-fg-on-accent">SP</span>
             <div className="min-w-0">
-              <p className="font-serif text-[17px] font-semibold text-fg">Dahlmann CPA Steuerberatungs GmbH</p>
+              <p className="font-serif text-[17px] font-semibold text-fg">Schmidt & Partner Steuerberatungsgesellschaft mbH</p>
               <p className="mt-0.5 truncate text-[12px] text-fg-secondary">
-                Boutique Steuerberatungs-Praxis · Munich · 8 partners, 24 staff · cross-border e-commerce VAT, EPR
-                registrations, GoBD audits for D2C + marketplace seller segment.
+                Steuerberatungskanzlei · Hamburg · 6 Partner, 18 Mitarbeitende · grenzüberschreitende USt und OSS, EPR & Verpackung, Datenschutz für Online-Händler und Marktplatz-Verkäufer.
               </p>
             </div>
           </Card>
