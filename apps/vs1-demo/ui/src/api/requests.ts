@@ -103,6 +103,9 @@ export interface UserRequestRow {
   createdAt?: string;
   category?: string;
   country?: string;
+  /** Der angefragte Anbieter — daran haengt das Dashboard einem Termin sein
+   *  Thema an (Buchungen tragen weder Bereich noch Markt). */
+  providerKey?: string;
   /** Die gerade laufende Frist (confirm 24h / reply 48h) — null, wenn keine läuft. */
   slaDeadline?: string | null;
   slaWindowMs?: number;
@@ -154,6 +157,7 @@ export async function fetchUserRequests(): Promise<UserRequestRow[]> {
       createdAt: r.created_at,
       category: r.category,
       country: r.country,
+      providerKey: r.provider_key,
       slaDeadline,
       slaWindowMs: v.bucket === 'confirmed' ? 48 * 3_600_000 : 24 * 3_600_000,
     };

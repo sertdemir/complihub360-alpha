@@ -153,12 +153,18 @@
     "dutiesHigh_other": "{{count}} hoch",
     "today": "Heute",
     "tomorrow": "Morgen",
+    "yesterday": "Gestern",
     "riskTag": {
       "critical": "Kritisch",
       "high": "Hohes Risiko",
       "medium": "Mittleres Risiko",
       "low": "Niedriges Risiko"
-    }
+    },
+    "outcomeYes": "Ja",
+    "outcomeMore_one": "Noch {{count}} weiterer",
+    "outcomeMore_other": "Noch {{count}} weitere",
+    "outcomeMoreLink": "auf der Termine-Seite beantworten",
+    "upNext": "Als Nächstes"
   },
   "sessions": {
     "title": "Ihre Compliance-<accent>Sitzungen</accent>.",

@@ -153,12 +153,18 @@
     "dutiesHigh_other": "{{count}} yüksek",
     "today": "Bugün",
     "tomorrow": "Yarın",
+    "yesterday": "Dün",
     "riskTag": {
       "critical": "Kritik",
       "high": "Yüksek risk",
       "medium": "Orta risk",
       "low": "Düşük risk"
-    }
+    },
+    "outcomeYes": "Evet",
+    "outcomeMore_one": "{{count}} tane daha",
+    "outcomeMore_other": "{{count}} tane daha",
+    "outcomeMoreLink": "randevular sayfasında yanıtlayın",
+    "upNext": "Sıradaki"
   },
   "sessions": {
     "title": "Uyum <accent>oturumlarınız</accent>.",

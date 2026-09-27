@@ -153,12 +153,18 @@
     "dutiesHigh_other": "{{count}} altas",
     "today": "Hoy",
     "tomorrow": "Mañana",
+    "yesterday": "Ayer",
     "riskTag": {
       "critical": "Crítico",
       "high": "Riesgo alto",
       "medium": "Riesgo medio",
       "low": "Riesgo bajo"
-    }
+    },
+    "outcomeYes": "Sí",
+    "outcomeMore_one": "{{count}} más",
+    "outcomeMore_other": "{{count}} más",
+    "outcomeMoreLink": "responder en la página de citas",
+    "upNext": "A continuación"
   },
   "sessions": {
     "title": "Sus <accent>sesiones</accent> de cumplimiento.",
