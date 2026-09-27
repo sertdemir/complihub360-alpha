@@ -14,7 +14,7 @@ import { SessionTile } from '../../components/user/SessionTile';
 import { fetchDashboard, EMPTY_DASHBOARD, type DashboardData, type DashboardSession } from '../../api/dashboard';
 import { fetchUserRequests, type UserRequestRow } from '../../api/requests';
 import { fetchUserBookings, type UserBooking } from '../../api/bookings';
-import { SLUG_TO_I18N, STATUS_KEY, relZeit } from './AnfragenTab';
+import { SLUG_TO_I18N, relZeit } from './AnfragenTab';
 import { ladeIcs } from './TerminePage';
 
 // ─── User Dashboard · Home v4 ────────────────────────────────────────────────
@@ -271,14 +271,32 @@ export function UserHomePage() {
       pct: Math.max(3, Math.min(100, Math.round((left / (r.slaWindowMs ?? 24 * 3_600_000)) * 100))),
     };
   };
-  const FRIST_TONE = { ok: 'text-fg-brand', warn: 'text-fg-accent-strong', err: 'text-[#8A3B3B]' };
-  const BALKEN_TONE = { ok: 'bg-brand', warn: 'bg-[#d4af37]', err: 'bg-[#B55353]' };
-  const PILL: Record<string, string> = {
-    'awaiting-confirm': 'bg-[#d4af37]/10 border-[#d4af37]/35 text-fg-accent-strong dark:bg-[#d4af37]/15 dark:border-[#d4af37]/40',
-    'awaiting-reply': 'bg-surface-secondary border-stroke text-fg-secondary',
-    active: 'bg-[#004d40]/10 border-[#258d78]/35 text-fg-brand dark:bg-[#004d40]/25 dark:border-[#258d78]/40',
-    closed: 'bg-surface-secondary border-stroke text-fg-tertiary',
+  // A3 (Nutzer-Wahl 2026-09-27): jede Anfrage als Strecke
+  // Gesendet → Bestaetigt → Antwort → Termin. Der Zustand ergibt sich aus der
+  // Position, nicht aus Pille + Frist-Label + "verpasst" (das waren bis zu drei
+  // Aussagen fuer denselben Zustand). Eine verpasste Frist ist ein Versaeumnis
+  // des ANBIETERS: kein Rot, sondern ein unterbrochener Schritt in Amber und
+  // der Ausweg "Anderen anfragen" (DNA: always on your side).
+  const STEP_POS = [0, 100 / 3, 200 / 3, 100];
+  const strecke = (r: UserRequestRow) => {
+    const f = frist(r);
+    const warten = f && f.tone !== 'err' ? (100 - f.pct) / 100 : 0;
+    if (r.bucket === 'replied') return { done: 2, now: 2, fill: STEP_POS[2], action: 'read' as const };
+    if (r.bucket === 'overdue') {
+      const bei = r.rawStatus === 'confirmed' ? 2 : 1;
+      return { done: bei - 1, miss: bei, fill: STEP_POS[bei - 1], action: 'other' as const, missTip: bei === 2 ? t('home.reqMissedReply') : t('home.reqMissedConfirm') };
+    }
+    if (r.bucket === 'confirmed') return { done: 1, next: 2, fill: STEP_POS[1] + warten * (STEP_POS[2] - STEP_POS[1]), left: r.slaDeadline };
+    return { done: 0, next: 1, fill: warten * STEP_POS[1], left: r.slaDeadline };
   };
+  const restzeit = (iso?: string | null) => {
+    if (!iso) return null;
+    const ms = new Date(iso).getTime() - jetzt;
+    if (ms <= 0) return null;
+    const h = Math.floor(ms / 3_600_000);
+    return h >= 1 ? t('home.reqLeftHours', { count: h }) : t('home.reqLeftMinutes', { count: Math.max(1, Math.floor(ms / 60_000)) });
+  };
+  const SCHRITTE = [t('home.stepSent'), t('home.stepConfirmed'), t('home.stepReply'), t('home.stepMeeting')];
   const anfragenZeilen = [...aufSie, ...offeneAnfragen.filter((r) => !aufSie.includes(r))].slice(0, 3);
 
   // 5B: "Heute · 09:00" / "Morgen · 09:00" / "Mo., 8. Sep. · 09:00".
@@ -438,39 +456,74 @@ export function UserHomePage() {
                 )}
               </div>
 
-              {/* 4B: Anfragen als Posteingangs-Zeilen */}
+              {/* Aktive Anfragen als Strecken (Canvas A3) */}
               <div className={CARD + ' px-6 py-5'}>
                 <SectionHead title={t('home.activeRequests')} count={String(offeneAnfragen.length)} to="dashboard/termine?tab=anfragen" />
                 {anfragenZeilen.length ? (
                   <div>
+                    <div aria-hidden="true" className="hidden grid-cols-[34%_1fr_150px] gap-3 sm:grid">
+                      <span />
+                      <div className="relative mx-7 h-4 text-[9.5px] font-bold uppercase tracking-[0.04em] text-fg-tertiary">
+                        {SCHRITTE.map((s2, k) => (
+                          <span key={k} className="absolute top-0 whitespace-nowrap" style={{ left: `${STEP_POS[k]}%`, transform: 'translateX(-50%)' }}>{s2}</span>
+                        ))}
+                      </div>
+                      <span />
+                    </div>
                     {anfragenZeilen.map((r, i, arr) => {
-                      const f = frist(r);
-                      const pille = r.statusLabel ? t(`status.${STATUS_KEY[r.statusLabel] ?? ''}`, r.statusLabel) : r.statusLabel;
+                      const st = strecke(r);
+                      const rest = 'left' in st ? restzeit(st.left) : null;
                       return (
-                        <div key={r.uuid} className={'flex items-center gap-4 py-3 ' + (i < arr.length - 1 ? 'border-b border-stroke-subtle' : '')}>
-                          <div className="min-w-0 flex-1">
-                            <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-body-xs font-bold text-fg">
-                              <span className="truncate">{r.company}</span>
-                              <span className={'inline-flex whitespace-nowrap rounded-full border px-2.5 py-[2px] text-[10px] font-bold ' + (PILL[r.status] ?? PILL.closed)}>{pille}</span>
-                            </p>
+                        <div key={r.uuid} className={'grid grid-cols-1 items-center gap-x-3 gap-y-2 py-3 sm:grid-cols-[34%_1fr_150px] ' + (i < arr.length - 1 ? 'border-b border-stroke-subtle' : '')}>
+                          <div className="min-w-0">
+                            <button type="button" title={r.company} onClick={() => oeffneVerlauf(r.uuid)} className="block max-w-full truncate text-left text-body-xs font-bold text-fg hover:underline">{r.company}</button>
                             <p className="mt-0.5 truncate text-[10.5px] text-fg-tertiary">
                               {[bereich(r.category), markt(r.country), relZeit(r.createdAt, locale)].filter(Boolean).join(' · ')}
                             </p>
                           </div>
-                          <div className="hidden w-[120px] shrink-0 sm:block">
-                            {f && (
-                              <>
-                                <p className="text-[9.5px] font-bold uppercase tracking-[0.06em] text-fg-tertiary">{t('requests.slaLabelProvider')}</p>
-                                <p className={'text-[13px] font-medium ' + FRIST_TONE[f.tone]}>{f.label}</p>
-                                <span className="mt-1 block h-[3px] overflow-hidden rounded-full bg-surface-tertiary">
-                                  <span className={'block h-full rounded-full ' + BALKEN_TONE[f.tone]} style={{ width: `${f.pct}%` }} />
-                                </span>
-                              </>
+                          <div
+                            role="img"
+                            aria-label={[
+                              SCHRITTE.slice(0, st.done + 1).join(' → '),
+                              'miss' in st ? st.missTip : null,
+                              rest,
+                            ].filter(Boolean).join(' · ')}
+                            className="relative mx-7 h-3"
+                          >
+                            <span className="absolute inset-x-0 top-[5px] h-[2px] bg-stroke" />
+                            <span
+                              className="absolute left-0 top-[5px] h-[2px] bg-brand"
+                              style={{ width: entered ? `${st.fill}%` : 0, transition: `width 900ms ${EASE} ${120 + i * 90}ms` }}
+                            />
+                            {STEP_POS.map((pos, k) => {
+                              const cls = k <= st.done && !('now' in st && st.now === k)
+                                ? 'bg-brand'
+                                : 'now' in st && st.now === k
+                                  ? 'bg-surface ring-[3px] ring-inset ring-brand shadow-[0_0_0_4px_rgb(var(--petrol-500)/0.12)]'
+                                  : 'miss' in st && st.miss === k
+                                    ? 'bg-[#D4A017] shadow-[0_0_0_4px_rgba(212,160,23,0.18)]'
+                                    : 'next' in st && st.next === k
+                                      ? 'bg-surface ring-2 ring-inset ring-[#9CB8B2]'
+                                      : 'bg-surface ring-2 ring-inset ring-stroke';
+                              return (
+                                <span
+                                  key={k}
+                                  title={'miss' in st && st.miss === k ? st.missTip : SCHRITTE[k]}
+                                  className={'absolute top-0 h-3 w-3 -translate-x-1/2 rounded-full ' + cls}
+                                  style={{ left: `${pos}%` }}
+                                />
+                              );
+                            })}
+                          </div>
+                          <div className="flex justify-start sm:justify-end">
+                            {st.action === 'read' ? (
+                              <Button size="sm" variant="primary" className="shrink-0" onClick={() => oeffneVerlauf(r.uuid)}>{t('requests.actionRead')}</Button>
+                            ) : st.action === 'other' ? (
+                              <Button size="sm" variant="outline" className="shrink-0" onClick={() => openWizard(r.category ? { categories: [r.category] } : undefined)}>{t('home.reqAskOther')}</Button>
+                            ) : (
+                              <span className="whitespace-nowrap text-body-2xs text-fg-secondary">{rest ?? '—'}</span>
                             )}
                           </div>
-                          <Button size="sm" variant={r.bucket === 'replied' ? 'primary' : 'secondary'} className="shrink-0" onClick={() => oeffneVerlauf(r.uuid)}>
-                            {r.bucket === 'replied' ? t('requests.actionRead') : t('requests.actionOpen')}
-                          </Button>
                         </div>
                       );
                     })}
