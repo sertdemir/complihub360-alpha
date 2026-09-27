@@ -160,6 +160,10 @@
     --color-border-strong-a11y: var(--neutral-500); /* AA, UI-bearing/selected */
     --color-border-input: var(--neutral-400);    /* AA, mandatory for inputs */
     --color-border-brand: var(--petrol-500);
+    /* Compass color/border/brand-soft (tokens.json): Kante getoenter Marken-
+       Flaechen, z. B. die Bestaetigung einer Marktanfrage (Figma E3). Traegt
+       die Deckkraft selbst — Tailwind setzt sie hier nicht per /xx. */
+    --color-border-brand-soft: 37 141 120 / 0.35;
     --color-border-accent: var(--gold-500);
     --color-border-focus: var(--petrol-500);     /* mandatory, >=2px */
 
@@ -314,6 +318,7 @@
        which is no border at all. Follows --color-bg-brand to the lighter
        dark-mode teal: 4.96:1, clearing the 3:1 that non-text contrast needs. */
     --color-border-brand: 20 168 154;
+    --color-border-brand-soft: 37 141 120 / 0.40;
     --color-bg-brand-light: 29 61 71;
     /* Was unmapped and therefore stayed gold-50 (253 248 230) on the dark slate:
        --color-text-primary on it measured 1.02:1, i.e. invisible. Flattened like

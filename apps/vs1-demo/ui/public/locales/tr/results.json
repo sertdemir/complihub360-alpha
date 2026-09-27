@@ -343,5 +343,14 @@
   "reveal": {
     "was": "{{title}} idi",
     "wasInSession": "„{{session}}“ oturumunuzda {{title}} idi"
+  },
+  "marketRequest": {
+    "notCovered": "Henüz kapsanmıyor",
+    "alsoNotCovered": "Bu da henüz kapsanmıyor",
+    "sent": "{{markets}} için talep gönderildi",
+    "sentBody": "Kapsamı bir sonraki adımda nereye genişleteceğimize karar vermek için talepleri pazar bazında sayıyoruz. Bir tarih sözü veremiyoruz.",
+    "notifyLabel": "{{market}} kapsandığında bana e-posta gönderin",
+    "notifyHelp": "{{email}} adresine yazacağız. Yalnızca bu pazar için.",
+    "failed": "Talebiniz gönderilemedi. Lütfen tekrar deneyin."
   }
 }

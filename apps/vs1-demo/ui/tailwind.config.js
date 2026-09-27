@@ -108,6 +108,8 @@ export default {
                     'strong-a11y': 'rgb(var(--color-border-strong-a11y) / <alpha-value>)',
                     input: 'rgb(var(--color-border-input) / <alpha-value>)',
                     brand: 'rgb(var(--color-border-brand) / <alpha-value>)',
+                    /* Deckkraft steckt in der Variable (Compass: 35 % hell, 40 % dunkel). */
+                    'brand-soft': 'rgb(var(--color-border-brand-soft))',
                     accent: 'rgb(var(--color-border-accent) / <alpha-value>)',
                     focus: 'rgb(var(--color-border-focus) / <alpha-value>)',
                 },

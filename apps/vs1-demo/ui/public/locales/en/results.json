@@ -343,5 +343,14 @@
   "reveal": {
     "was": "was {{title}}",
     "wasInSession": "was {{title}} in your session “{{session}}”"
+  },
+  "marketRequest": {
+    "notCovered": "Not covered yet",
+    "alsoNotCovered": "Also not covered yet",
+    "sent": "Request sent for {{markets}}",
+    "sentBody": "We count requests per market to decide where coverage comes next. We can’t promise a date.",
+    "notifyLabel": "Email me when {{market}} is covered",
+    "notifyHelp": "We’ll email you at {{email}}. Only for this market.",
+    "failed": "We couldn’t send your request. Please try again."
   }
 }
