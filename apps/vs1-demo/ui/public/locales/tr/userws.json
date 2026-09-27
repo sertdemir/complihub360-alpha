@@ -641,7 +641,8 @@
       "termine": "Randevular"
     },
     "tabUpcoming": "Yaklaşan",
-    "tabPast": "Geçmiş"
+    "tabPast": "Geçmiş",
+    "origin": "rezervasyondan önce „{{descriptor}}“ idi"
   },
   "review": {
     "eyebrow": "DEĞERLENDİRME",

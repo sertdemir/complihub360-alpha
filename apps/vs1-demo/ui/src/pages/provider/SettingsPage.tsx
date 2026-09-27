@@ -8,6 +8,7 @@ import { Banner } from '../../components/ui/Banner';
 import { ConfirmDrawer, type ConfirmSpec } from '../../components/provider/ConfirmDrawer';
 import { ChangeEmailDrawer } from '../../components/provider/ChangeEmailDrawer';
 import { fetchCoverage, updateMatchmakingProfile, type BillingModel, type PricingRow } from '../../api/provider';
+import { identityHintFrom } from '../../api/client';
 import { Input } from '../../components/ui/Input';
 import { FilterChip } from '../../components/ui/Badge';
 
@@ -169,7 +170,6 @@ export function SettingsPage() {
 function MatchmakingPanel() {
   const { t } = useTranslation('providerws');
   const [billing, setBilling] = useState<BillingModel>('project');
-  const [pseudonym, setPseudonym] = useState('Verifizierte Steuerkanzlei · Norditalien');
   const [region, setRegion] = useState('Norditalien');
   const [activeSince, setActiveSince] = useState('2015');
   const [rows, setRows] = useState<PricingRow[]>([
@@ -178,18 +178,26 @@ function MatchmakingPanel() {
     { service: 'Fachberatung (Stundensatz)', price: '€140 / Std.' },
   ]);
   const [saved, setSaved] = useState<'idle' | 'saving' | 'done'>('idle');
+  const [identityHint, setIdentityHint] = useState<string | null>(null);
 
   const save = async () => {
     setSaved('saving');
+    setIdentityHint(null);
     try {
       await updateMatchmakingProfile({
         billing_model: billing,
         pricing_table: rows,
-        pseudonym_label: pseudonym,
         region,
         active_since: parseInt(activeSince, 10) || null,
       });
-    } catch { /* fixture mode: keep local state */ }
+    } catch (e) {
+      // Phase 3: der Identitaets-Scan blockiert und benennt die Stelle (422).
+      // Sachlich, ohne Verstoss-Sprache — der Anbieter soll wissen, was er
+      // aendern muss, nicht, dass er etwas falsch gemacht haette.
+      const hint = identityHintFrom(e, t);
+      if (hint) { setIdentityHint(hint); setSaved('idle'); return; }
+      /* fixture mode: keep local state */
+    }
     setSaved('done');
     setTimeout(() => setSaved('idle'), 2000);
   };
@@ -211,11 +219,15 @@ function MatchmakingPanel() {
           ))}
         </div>
       </div>
-      <div className="grid gap-3 sm:grid-cols-3">
-        <div>
-          <p className="mb-1 text-[12px] font-medium text-fg-secondary">{t('settings.pseudonymLabel')}</p>
-          <Input value={pseudonym} onChange={(e) => setPseudonym(e.target.value)} />
-        </div>
+      {/* Phase 3: kein Pseudonym-Feld mehr. Der Titel vor der Buchung entsteht
+          im System aus freigegebenen Bereichen und Region — hier die Vorschau. */}
+      <div className="rounded-lg border border-brand/40 bg-brand-light px-3.5 py-3">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-fg-brand">{t('settings.previewTitle')}</p>
+        <p className="mt-1 text-[14px] font-bold text-fg">Verified Provider <span className="text-fg-tertiary">A/B/C</span></p>
+        <p className="text-[12px] text-fg-secondary">{[t('settings.previewAreas'), region.trim()].filter(Boolean).join(' · ')}</p>
+        <p className="mt-1.5 text-[11px] text-fg-tertiary">{t('settings.previewNote')}</p>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
         <div>
           <p className="mb-1 text-[12px] font-medium text-fg-secondary">{t('settings.regionLabel')}</p>
           <Input value={region} onChange={(e) => setRegion(e.target.value)} />
@@ -250,6 +262,7 @@ function MatchmakingPanel() {
         </div>
         <p className="mt-2 text-[11px] text-fg-tertiary">{t('settings.pricingNoteV2')}</p>
       </div>
+      {identityHint && <Banner status="warning" title={identityHint} />}
       <div className="flex items-center gap-3">
         <Button size="sm" onClick={save} disabled={saved === 'saving'}>{t('settings.matchmakingSave')}</Button>
         {saved === 'done' && <span className="text-[12px] text-fg-brand">{t('settings.matchmakingSaved')}</span>}

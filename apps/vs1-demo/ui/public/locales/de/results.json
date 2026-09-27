@@ -235,7 +235,8 @@
     "market": "Deckt Ihren Markt ab ({{country}})",
     "marketMissing": "Deckt Ihren Markt nicht ab",
     "areas": "{{matched}} von {{total}} Ihrer Bereiche",
-    "how": "Der Prozentwert ist die Marktabdeckung plus der Anteil dessen, was Sie angefragt haben und diese Fachperson tatsächlich abdeckt."
+    "how": "Der Prozentwert ist die Marktabdeckung plus der Anteil dessen, was Sie angefragt haben und diese Fachperson tatsächlich abdeckt.",
+    "groupFit": "Passt zu Ihrer Anfrage"
   },
   "snapshot": {
     "fallbackTitle": "Ihre Risk Map",
@@ -309,5 +310,38 @@
     "bookedOn": "Termin {{when}}",
     "providerBooked": "Termin ansehen",
     "booked": "Gebucht"
+  },
+  "rankBasis": {
+    "group": "Geprüft und gemessen",
+    "verificationLine": {
+      "independent": "Alle {{total}} Pflichtnachweise unabhängig geprüft",
+      "reviewed": "Alle {{total}} Pflichtnachweise von CompliHub360 gesichtet",
+      "partial": "{{verified}} von {{total}} Pflichtnachweisen geprüft",
+      "none": "Nachweise noch nicht geprüft"
+    },
+    "verification": {
+      "independent": "Pflichtnachweise unabhängig geprüft",
+      "reviewed": "Pflichtnachweise gesichtet",
+      "partial": "Pflichtnachweise teilweise geprüft",
+      "none": "Nachweise noch nicht geprüft"
+    },
+    "response": "Antwortet in ~{{hours}} h",
+    "confirmed": "{{pct}} % der Termine bestätigt",
+    "reviews": "{{rating}} aus {{count}} Bewertungen nach Terminen",
+    "reviewsNone": "Noch keine Bewertung nach einem Termin",
+    "responseLabel": "Antwortzeit",
+    "hours": "~{{hours}} h",
+    "confirmedLabel": "Termine bestätigt",
+    "reviewsLabel": "Bewertungen nach Terminen",
+    "planLabel": "Plan oder Zahlung",
+    "never": "nie"
+  },
+  "anonNotice": {
+    "title": "Von CompliHub360 geprüft, für Sie noch ohne Namen.",
+    "body": "Sie vergleichen nach Passung und Leistung, nicht nach Bekanntheit. Name und Kontakt sehen Sie nach der Buchung."
+  },
+  "reveal": {
+    "was": "war {{title}}",
+    "wasInSession": "war {{title}} in Ihrer Sitzung „{{session}}“"
   }
 }

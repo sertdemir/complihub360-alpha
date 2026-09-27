@@ -59,15 +59,30 @@ https://claude.ai/artifact/NhkK1DvuT6wEr6WF9oGECE
   `IdentityFinding`, `PublicTitle`), OpenAPI, ADR-0004, Korrektur in
   `docs/backlog/user-flow-matchmaking-v2-spec.md` §5/§6.
 
-### UI (nach Canvas-Wahl und Figma)
+### UI (Canvas-Wahl 2026-09-27: 1A · 2B · 3B · 4B)
 
-- [ ] Figma-Seite „Anonymes Matching (Phase 3)" mit vier Frames.
-- [ ] Clients auf `public_ref`, `title`, `descriptor`, `rank_basis`; Routen
-  `p/:ref`; Karten, Drawer, Detail, Termine, Benachrichtigungen.
-- [ ] Verified-Marke an `is_verified` statt an Position 1.
-- [ ] Anbieterseite: Pseudonym-Feld raus, Vorschau „So erscheinen Sie vor
-  der Buchung", Scan-Fehler als Feldhinweis mit Fundstelle.
-- [ ] Locales en/de/es/tr, Mock-Modus, Screenshots.
+- [x] Figma-Seite „Anonymes Matching (Phase 3)" (Node 3464:12771) mit vier
+  Frames: Ergebnisliste 3464:12772, Schublade Profil 3464:12773, Schublade
+  Gebucht 3464:12774, Termine 3464:12775; Uptake-Notiz 3468:833 (Monogram,
+  RankBasisRow, AnonNotice, RevealCard).
+- [x] Clients auf `public_ref`, `title`, `letter`, `descriptor`, `rank_basis`;
+  Routen `p/:ref`, `p/:ref/schedule`; Karten (1A Monogramm, 2B zwei
+  Gruppen), Schublade (3B Petrol-Kasten, Rang-Gruppe mit „Plan oder
+  Zahlung: nie", 4B Offenlegungskarte), Detailseite, Termine (Herkunfts-
+  zeile), Benachrichtigungen (`providerRef`, nie angezeigt).
+- [x] Verified-Marke an `is_verified` statt an Position 1; die Pille entfällt
+  auf der Karte (steckt im Titel).
+- [x] Anbieterseite: Pseudonym-Feld raus (Settings, Intake), Vorschau „So
+  erscheinen Sie vor der Buchung", 422 `IDENTITY_IN_TEXT` als Satz mit
+  Fundstelle (`identityHintFrom`), `ApiError.body` trägt den Fehlerkörper.
+- [x] Locales en/de/es/tr (`matchBasis.groupFit`, `rankBasis.*`,
+  `anonNotice.*`, `reveal.*`, `termine.origin`, `settings.preview*`,
+  `intake.titleNote`, `identity.*`), Mock-Modus auf `/p/:ref/…`,
+  Storybook-only `ProviderMatchCard` und `RiskMapResult` gelöscht.
+- [x] API-Nachtrag: `maskDossier` maskiert auch Objektfelder
+  (`services[{title,includes}]`, `credentials[{label,note}]`).
+- [x] Screenshots Ergebnisliste, Schublade (Profil, Gebucht), Termine,
+  Detail, Einstellungen im Mock-Modus.
 
 ## Nicht in diesem Ticket
 

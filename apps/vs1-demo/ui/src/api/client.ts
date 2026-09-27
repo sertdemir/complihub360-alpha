@@ -11,10 +11,15 @@ export class ApiError extends Error {
    *  Referenz-ID unter "Technical details" — der Support sucht mit beidem. */
   public readonly at: string;
 
-  constructor(message: string, public status: number, public correlationId: string, at?: string) {
+  /** Der Fehlerkoerper des Servers, sofern es einen gab — etwa `errorCode`
+   *  und `findings` einer 422 (Identitaets-Scan, Phase 3). */
+  public readonly body: Record<string, unknown>;
+
+  constructor(message: string, public status: number, public correlationId: string, at?: string, body?: Record<string, unknown>) {
     super(message);
     this.name = 'ApiError';
     this.at = at ?? new Date().toISOString();
+    this.body = body ?? {};
   }
 }
 
@@ -60,7 +65,7 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
   const loggedAs = res.headers.get('x-correlation-id') || correlationId;
   if (!res.ok) {
     const data = await res.json().catch(() => ({} as { message?: string; correlationId?: string }));
-    throw new ApiError(data.message || `HTTP ${res.status}`, res.status, data.correlationId || loggedAs);
+    throw new ApiError(data.message || `HTTP ${res.status}`, res.status, data.correlationId || loggedAs, undefined, data as Record<string, unknown>);
   }
   try {
     return (await res.json()) as T;
@@ -68,4 +73,24 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
     // 200 mit kaputtem Koerper (Proxy-Fehlerseite o. ae.) ist ein Fehler wie jeder andere.
     throw new ApiError('Invalid response body', res.status, loggedAs);
   }
+}
+
+/** Ein Fund des Identitaets-Scans (Phase 3, 422 `IDENTITY_IN_TEXT`). */
+export interface IdentityFinding { field: string; type: string; match: string; index: number }
+
+/** Die Funde einer 422 `IDENTITY_IN_TEXT`, sonst null. */
+export function identityFindingsOf(err: unknown): IdentityFinding[] | null {
+  if (!(err instanceof ApiError) || err.status !== 422 || err.body.errorCode !== 'IDENTITY_IN_TEXT') return null;
+  const f = err.body.findings;
+  return Array.isArray(f) ? (f as IdentityFinding[]) : [];
+}
+
+/** Ein Satz fuer den Anbieter: welcher Fund, in welchem Feld — sachlich, ohne
+ *  Verstoss-Sprache. `t` ist der providerws-Uebersetzer. */
+export function identityHintFrom(err: unknown, t: (key: string, opts?: Record<string, unknown>) => string): string | null {
+  const findings = identityFindingsOf(err);
+  if (!findings) return null;
+  const f = findings[0];
+  if (!f) return t('identity.hintGeneric');
+  return t('identity.hint', { match: f.match, field: f.field, kind: t(`identity.kind.${f.type}`, { defaultValue: f.type }) });
 }

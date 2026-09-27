@@ -410,7 +410,6 @@
       "project": "Projektbasiert",
       "mixed": "Gemischt"
     },
-    "pseudonymLabel": "Pseudonym-Label",
     "regionLabel": "Region",
     "activeSinceLabel": "Aktiv seit",
     "pricingTableLabel": "Preistabelle — sichtbar auf deiner Detail-Seite",
@@ -420,7 +419,10 @@
     "pricingPricePh": "Preis",
     "pricingNoteV2": "Auf der Listing-Card erscheint kein konkreter Preis — nur das Abrechnungs-Modell. Die volle Tabelle zeigt der (abgerechnete) Detail-Open.",
     "matchmakingSave": "Matchmaking-Profil speichern",
-    "matchmakingSaved": "Gespeichert."
+    "matchmakingSaved": "Gespeichert.",
+    "previewTitle": "So erscheinen Sie vor der Buchung",
+    "previewAreas": "Ihre freigegebenen Bereiche",
+    "previewNote": "Titel und Beschreibung bildet CompliHub360: ein Buchstabe je Ergebnisliste plus Ihre freigegebenen Bereiche und Region. Nichts davon schreiben Sie selbst — so wird jeder Anbieter gleich verglichen."
   },
   "termine": {
     "title": "Termine & <accent>Leads</accent>.",
@@ -458,7 +460,6 @@
     "languages": "Sprachen (kommagetrennt)",
     "domains": "Compliance-Bereiche",
     "secMatchmaking": "Matchmaking-Profil",
-    "pseudonymPh": "z. B. Verifizierte Steuerkanzlei · Norditalien",
     "secCerts": "Zertifizierungen & Statuten",
     "certs": "Zertifizierungen (eine pro Zeile)",
     "certsPh": "Dottore Commercialista · Kammer Mailand\nISO 27001",
@@ -470,7 +471,8 @@
     "doneBody": "Danke! Unser Team prüft deine Angaben jetzt gegen die Partnerrichtlinien. Du hörst von uns — in der Regel innerhalb von 2 Werktagen. Dein Workspace bleibt bis zur Freischaltung inaktiv.",
     "doneNote": "Fragen? partners@complihub360.com",
     "errorTitle": "Einreichen fehlgeschlagen",
-    "errorBody": "Das Paket konnte nicht übermittelt werden. Prüfe deinen Intake-Link oder versuche es erneut — oder kontaktiere partners@complihub360.com."
+    "errorBody": "Das Paket konnte nicht übermittelt werden. Prüfe deinen Intake-Link oder versuche es erneut — oder kontaktiere partners@complihub360.com.",
+    "titleNote": "Vor der Buchung sehen Nutzer Sie als „Verified Provider A/B/C“ mit Ihren freigegebenen Bereichen und Ihrer Region — diesen Titel bildet CompliHub360, Sie müssen ihn nicht schreiben."
   },
   "application": {
     "title": "Bewerbung",
@@ -743,6 +745,19 @@
       "countries_set": "Länder geändert",
       "status_from_coverage": "Leistungsstatus angepasst",
       "legal_fields_changed": "Rechtsform-Angaben geändert"
+    }
+  },
+  "identity": {
+    "hint": "Bitte ohne {{kind}}: „{{match}}“ in {{field}}. Diese Texte bleiben bis zur Buchung anonym.",
+    "hintGeneric": "Bitte ohne Namen, Webadressen und Registernummern — diese Texte bleiben bis zur Buchung anonym.",
+    "kind": {
+      "email": "E-Mail-Adresse",
+      "phone": "Telefonnummer",
+      "domain": "Webadresse",
+      "handle": "Social-Media-Handle",
+      "legal_form": "Firmenname",
+      "registry": "Registernummer",
+      "own_name": "Ihren Firmennamen"
     }
   }
 }

@@ -3,7 +3,6 @@ import { MarketsStep } from './MarketsStep';
 import { OperationsStep } from './OperationsStep';
 import { DomainsStep } from './DomainsStep';
 import { ReviewStep } from './ReviewStep';
-import { RiskMapResult } from './RiskMapResult';
 
 // The 5 compliance-wizard step screens (Screens file 1199:403) rebuilt on the
 // Compass DS — mode-aware, so they render in DARK via a `.dark` ancestor.
@@ -56,8 +55,6 @@ export const DomainsDesktop: Story = { name: '03 Domains · Desktop', render: ()
 export const DomainsMobile: Story = { name: '03 Domains · Mobile', render: () => <Phone><DomainsStep className="h-full" /></Phone> };
 export const ReviewDesktop: Story = { name: '04 Review · Desktop', render: () => <Desktop el={<ReviewStep />} /> };
 export const ReviewMobile: Story = { name: '04 Review · Mobile', render: () => <Mobile el={<ReviewStep />} /> };
-export const RiskMapDesktop: Story = { name: '05 Risk Map · Desktop', render: () => <Desktop el={<RiskMapResult />} /> };
-export const RiskMapMobile: Story = { name: '05 Risk Map · Mobile', render: () => <Mobile el={<RiskMapResult />} /> };
 
 // All four input steps stacked (dark) for a quick overview.
 export const AllStepsDesktop: Story = {

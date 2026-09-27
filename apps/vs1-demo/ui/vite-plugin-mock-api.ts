@@ -26,9 +26,16 @@ const uuid = (n: number, block = 2) => `5eed000${block}-0000-4000-8000-${String(
 
 const USER_ID = 'fa49d5ab-4dc9-4bb4-a84d-fe624e2eea2e';
 
+// Phase 3 (ADR-0004): auf dem Draht steht der opake public_ref, nie der
+// Schluessel. Die Abbildung hier ist die des Mocks; in der API kommt der Ref
+// aus `providers.public_ref`.
+const REF: Record<string, string> = { 'studio-bianchi': 'a1b2c3d4e5f6', 'schmidt-partner': 'b2c3d4e5f6a1', 'madrid-tax': 'c3d4e5f6a1b2', 'lucid-reg': 'd4e5f6a1b2c3', 'dahlmann-cpa': 'e5f6a1b2c3d4', 'paris-legal': 'f6a1b2c3d4e5', 'ams-privacy': '0a1b2c3d4e5f', 'oss-experts': '1b2c3d4e5f60' };
+const DESCRIPTOR: Record<string, string> = { 'studio-bianchi': 'Tax and VAT, Product & Packaging · Norditalien', 'schmidt-partner': 'Tax and VAT, Product & Packaging · Norddeutschland', 'madrid-tax': 'Tax and VAT · Spanien', 'lucid-reg': 'Product & Packaging · Hamburg', 'dahlmann-cpa': 'Corporate Structure, Tax and VAT · USA', 'paris-legal': 'Legal Support · Île-de-France', 'ams-privacy': 'Data & Privacy · Niederlande', 'oss-experts': 'Tax and VAT · Berlin' };
+const keyOfRef = (ref: string) => Object.keys(REF).find((k) => REF[k] === ref) ?? null;
+
 function bookings() {
   const b = (id: string, key: string, name: string, region: string, web: string | null, start: string, end: string, status: string) =>
-    ({ id, provider_key: key, provider_name: name, provider_region: region, provider_website: web, slot_start: start, slot_end: end, status, message: null });
+    ({ id, public_ref: REF[key] ?? null, provider_name: name, provider_descriptor: DESCRIPTOR[key] ?? '', provider_region: region, provider_website: web, identity_revealed: true, slot_start: start, slot_end: end, status, message: null });
   return [
     b('m0ck-b01', 'studio-bianchi', 'Studio Bianchi & Partner Commercialisti Associati S.r.l.', 'Norditalien', 'https://example.org', iso(0, 16), iso(0, 16, 30), 'confirmed'),
     b('m0ck-b02', 'schmidt-partner', 'Schmidt & Partner Steuerberatungsgesellschaft mbH', 'Norddeutschland', 'https://example.org', iso(1, 9), iso(1, 9, 30), 'confirmed'),
@@ -149,11 +156,21 @@ const COVERS: Record<string, string[]> = {
 };
 const DEFAULT_REQUEST = ['tax-vat', 'product-packaging', 'data-privacy'];
 const BASIS = (matched: string[]) => ({ country: 'DE', country_covered: true, domains_requested: DEFAULT_REQUEST, domains_matched: matched });
+// Die drei Anbieter der Suche. Titel und Beschreibung entstehen wie im
+// Backend: der Buchstabe ist die Position in der Liste, die Beschreibung
+// kommt aus freigegebenen Bereichen und Region (anonymity.ts).
+const RANK = (verification: 'independent' | 'reviewed' | 'partial' | 'none', verified: number, required: number, hours: number | null, conf: number | null, rating: number | null, reviews: number | null) =>
+  ({ verification, verified_count: verified, required_count: required, response_hours: hours, confirmation_rate: conf, rating, reviews_count: reviews });
 const PROVIDERS = [
-  { provider_key: 'studio-bianchi', pseudonym_label: 'Verifizierte Steuerkanzlei · Norditalien', region: 'Norditalien', active_since: 2015, specializations: ['VAT & OSS', 'E-Commerce', 'EU-weit'], languages: ['IT', 'DE', 'EN'], rating: 4.9, completed_count: 210, avg_response_hours: 3, billing_model: 'project', is_verified: true, match: 100, match_tier: 'high', match_basis: BASIS(['tax-vat', 'product-packaging', 'data-privacy']) },
-  { provider_key: 'schmidt-partner', pseudonym_label: 'Verifizierte Steuerberatung · Norddeutschland', region: 'Norddeutschland', active_since: 2013, specializations: ['OSS/IOSS', 'Cross-border Tax'], languages: ['DE', 'EN'], rating: 4.7, completed_count: 96, avg_response_hours: 5, billing_model: 'abo', is_verified: true, match: 87, match_tier: 'strong', match_basis: BASIS(['tax-vat', 'product-packaging']) },
-  { provider_key: 'madrid-tax', pseudonym_label: 'Verifizierter Tax-Spezialist · Spanien', region: 'Spanien', active_since: 2020, specializations: ['Iberian VAT', 'Marketplace'], languages: ['ES', 'EN'], rating: 4.5, completed_count: 41, avg_response_hours: 8, billing_model: 'hourly', is_verified: true, match: 73, match_tier: 'moderate', match_basis: BASIS(['tax-vat']) },
+  { _key: 'studio-bianchi', public_ref: REF['studio-bianchi'], region: 'Norditalien', active_since: 2015, specializations: ['VAT & OSS', 'E-Commerce', 'EU-weit'], languages: ['IT', 'DE', 'EN'], rating: 4.9, completed_count: 210, avg_response_hours: 3, billing_model: 'project', is_verified: true, match: 100, match_tier: 'high', match_basis: BASIS(['tax-vat', 'product-packaging', 'data-privacy']), rank_basis: RANK('independent', 5, 5, 3, 0.97, 4.9, 12) },
+  { _key: 'schmidt-partner', public_ref: REF['schmidt-partner'], region: 'Norddeutschland', active_since: 2013, specializations: ['OSS/IOSS', 'Cross-border Tax'], languages: ['DE', 'EN'], rating: 4.7, completed_count: 96, avg_response_hours: 5, billing_model: 'abo', is_verified: true, match: 87, match_tier: 'strong', match_basis: BASIS(['tax-vat', 'product-packaging']), rank_basis: RANK('independent', 4, 4, 5, 0.92, 4.7, 7) },
+  { _key: 'madrid-tax', public_ref: REF['madrid-tax'], region: 'Spanien', active_since: 2020, specializations: ['Iberian VAT', 'Marketplace'], languages: ['ES', 'EN'], rating: 4.5, completed_count: 41, avg_response_hours: 8, billing_model: 'hourly', is_verified: true, match: 73, match_tier: 'moderate', match_basis: BASIS(['tax-vat']), rank_basis: RANK('partial', 3, 4, 8, 0.91, null, 0) },
 ];
+const LETTER = (i: number) => String.fromCharCode(65 + i);
+const titled = (p: (typeof PROVIDERS)[number], i: number) => {
+  const { _key, ...pub } = p;
+  return { ...pub, title: `Verified Provider ${LETTER(i)}`, letter: LETTER(i), descriptor: DESCRIPTOR[_key] };
+};
 
 // Stufe-2-Detail je Anbieter (Spec §4.6): dieselben anonymen Felder wie die
 // Karte plus Abdeckung und volle Preistabelle. Unbekannter Schluessel → 404,
@@ -171,13 +188,13 @@ function search(body: unknown) {
     : null;
   const requested = (asked as string[] | null) ?? DEFAULT_REQUEST;
   const country = typeof req.country === 'string' && req.country ? req.country.toUpperCase() : 'DE';
-  const providers = PROVIDERS.map((p) => {
-    const covers = COVERS[p.provider_key] ?? [];
+  const providers = PROVIDERS.map((p, i) => {
+    const covers = COVERS[p._key] ?? [];
     return {
-      ...p,
+      ...titled(p, i),
       match_basis: {
         country,
-        country_covered: (PROVIDER_DETAIL[p.provider_key]?.countries_supported ?? []).includes(country),
+        country_covered: (PROVIDER_DETAIL[p._key]?.markets ?? []).includes(country),
         domains_requested: requested,
         domains_matched: requested.filter((d) => covers.includes(d)),
       },
@@ -187,9 +204,8 @@ function search(body: unknown) {
 }
 
 type MockDetail = {
-  countries_supported: string[];
+  markets: string[];
   pricing_table: Array<{ service: string; price: string }> | null;
-  confirmation_rate: number | null;
   work_mode: string | null;
   services: Array<{ title: string; includes: string[] }> | null;
   credentials: Array<{ label: string; note: string }> | null;
@@ -202,14 +218,13 @@ type MockDetail = {
 // erfundenen Leistungen.
 const PROVIDER_DETAIL: Record<string, MockDetail> = {
   'studio-bianchi': {
-    countries_supported: ['IT', 'DE', 'AT'],
+    markets: ['IT', 'DE', 'AT'],
     pricing_table: [
       { service: 'USt-Erstregistrierung Italien (Partita IVA)', price: 'ab 450 € · einmalig' },
       { service: 'Laufende OSS-Betreuung', price: '180 € / Quartal' },
       { service: 'Fachberatung (Stundensatz)', price: '140 € / Std.' },
       { service: 'Komplettpaket E-Commerce-Setup', price: 'auf Anfrage' },
     ],
-    confirmation_rate: 0.97,
     work_mode: 'remote · Portal',
     services: [
       { title: 'USt-Registrierung Italien', includes: ['Partita IVA beantragen', 'Vertretung gegenüber Agenzia delle Entrate'] },
@@ -223,13 +238,12 @@ const PROVIDER_DETAIL: Record<string, MockDetail> = {
     excluded_services: ['Zoll', 'Markenrecht'],
   },
   'schmidt-partner': {
-    countries_supported: ['DE', 'NL', 'AT', 'FR'],
+    markets: ['DE', 'NL', 'AT', 'FR'],
     pricing_table: [
       { service: 'OSS/IOSS-Registrierung', price: 'im Abo enthalten' },
       { service: 'Compliance-Abo (bis 3 Märkte)', price: '290 € / Monat' },
       { service: 'Jeder weitere Markt', price: '60 € / Monat' },
     ],
-    confirmation_rate: 0.92,
     work_mode: 'remote · Portal',
     services: [
       { title: 'OSS/IOSS-Registrierung', includes: ['Anmeldung beim BZSt', 'Erste Quartalsmeldung', 'Fristenüberwachung'] },
@@ -246,22 +260,24 @@ const PROVIDER_DETAIL: Record<string, MockDetail> = {
   },
   // Dossier bewusst leer — der Leerfall der Karten.
   'madrid-tax': {
-    countries_supported: ['ES', 'PT'],
+    markets: ['ES', 'PT'],
     pricing_table: null,
-    confirmation_rate: null,
     work_mode: null,
     services: null,
     credentials: null,
     excluded_services: null,
   },
 };
-function providerDetail(key: string) {
-  const p = PROVIDERS.find((x) => x.provider_key === key);
-  const d = PROVIDER_DETAIL[key];
-  if (!p || !d) return { __status: 404, errorCode: 'NOT_FOUND', message: 'Provider not found' };
-  const { match, match_tier, match_basis, ...anon } = p;
-  void match; void match_tier; void match_basis;
-  return { ok: true, detail: { ...anon, ...d, availability: 'available' }, detail_open_charged: false };
+// /p/:ref/detail — ohne Buchstaben (den kennt nur die Liste), mit
+// Beschreibung, Maerkten und rank_basis; unbekannter Ref → 404.
+function providerDetail(ref: string) {
+  const key = keyOfRef(ref);
+  const p = PROVIDERS.find((x) => x._key === key);
+  const d = key ? PROVIDER_DETAIL[key] : undefined;
+  if (!p || !d || !key) return { __status: 404, errorCode: 'NOT_FOUND', message: 'Provider not found' };
+  const { match, match_tier, match_basis, _key, ...anon } = p;
+  void match; void match_tier; void match_basis; void _key;
+  return { ok: true, detail: { ...anon, descriptor: DESCRIPTOR[key], ...d, availability: 'available' }, detail_open_charged: false };
 }
 
 // Bewertungen: nur, was an einer Buchung haengt (so wie der Server filtert).
@@ -279,8 +295,9 @@ const PROVIDER_REVIEWS: Record<string, Array<{ rating: number; body: string | nu
   ],
   'madrid-tax': [],
 };
-function providerReviews(key: string) {
-  const list = PROVIDER_REVIEWS[key];
+function providerReviews(ref: string) {
+  const key = keyOfRef(ref);
+  const list = key ? PROVIDER_REVIEWS[key] : undefined;
   if (!list) return { __status: 404, errorCode: 'NOT_FOUND', message: 'Provider not found' };
   const reviews = list.map((r) => ({
     rating: r.rating,
@@ -305,17 +322,18 @@ const PROVIDER_IDENTITY: Record<string, { name: string; website_url: string | nu
 // POST /scheduling — die Buchung ist der bezahlte Lead UND der Moment, in dem
 // beide Seiten Namen und Kontakt bekommen.
 function createBooking(body: unknown) {
-  const d = (body ?? {}) as { provider_key?: unknown; slot_start?: unknown; message?: unknown };
-  const key = typeof d.provider_key === 'string' ? d.provider_key : '';
+  const d = (body ?? {}) as { public_ref?: unknown; slot_start?: unknown; message?: unknown };
+  const ref = typeof d.public_ref === 'string' ? d.public_ref : '';
+  const key = keyOfRef(ref);
   const slot = typeof d.slot_start === 'string' ? d.slot_start : '';
-  const identity = PROVIDER_IDENTITY[key];
-  if (!key || !slot || !identity) {
-    return { __status: 400, errorCode: 'VALIDATION_ERROR', message: 'provider_key and slot_start required' };
+  const identity = key ? PROVIDER_IDENTITY[key] : undefined;
+  if (!ref || !slot || !identity) {
+    return { __status: 400, errorCode: 'VALIDATION_ERROR', message: 'public_ref and slot_start required' };
   }
   const end = new Date(new Date(slot).getTime() + 30 * 60 * 1000).toISOString();
   return {
     ok: true,
-    booking: { id: `m0ck-new-${key}`, provider_key: key, slot_start: slot, slot_end: end, status: 'confirmed' },
+    booking: { id: `m0ck-new-${ref}`, public_ref: ref, slot_start: slot, slot_end: end, status: 'confirmed' },
     provider_identity: identity,
   };
 }
@@ -353,12 +371,12 @@ function notifications() {
   const n = (i: number, type: string, subject: string, subjectId: string, payload: Record<string, unknown>, hoursAgo: number, read: boolean) =>
     ({ id: uuid(i, 4), type, subject, subject_id: subjectId, payload, created_at: plus(-hoursAgo * H), read_at: read ? plus(-(hoursAgo - 1) * H) : null });
   return [
-    n(1, 'provider_replied', 'engagement', uuid(1), { providerKey: 'schmidt-partner', providerName: 'Verifizierte Steuerberatung · Norddeutschland' }, 2, false),
-    n(2, 'provider_confirmed', 'engagement', uuid(8), { providerKey: 'studio-bianchi', providerName: 'Verifizierte Steuerkanzlei · Norditalien' }, 5, false),
+    n(1, 'provider_replied', 'engagement', uuid(1), { providerRef: REF['schmidt-partner'], providerName: 'Verified Provider · Tax and VAT, Product & Packaging · Norddeutschland' }, 2, false),
+    n(2, 'provider_confirmed', 'engagement', uuid(8), { providerRef: REF['studio-bianchi'], providerName: 'Verified Provider · Tax and VAT, Product & Packaging · Norditalien' }, 5, false),
     n(3, 'booking_rescheduled', 'booking', 'm0ck-b02', { providerName: 'Schmidt & Partner Steuerberatungsgesellschaft mbH', from: iso(1, 11), to: iso(1, 9) }, 9, false),
-    n(4, 'provider_declined', 'engagement', uuid(10), { providerKey: 'madrid-tax', providerName: 'Verifizierter Tax-Spezialist · Spanien' }, 30, true),
+    n(4, 'provider_declined', 'engagement', uuid(10), { providerRef: REF['madrid-tax'], providerName: 'Verified Provider · Tax and VAT · Spanien' }, 30, true),
     n(5, 'booking_cancelled', 'booking', 'm0ck-b10', { providerName: 'Dahlmann CPA', from: iso(-17, 16) }, 60, true),
-    n(6, 'provider_replied', 'engagement', uuid(2), { providerKey: 'dahlmann-cpa', providerName: 'Verifizierter Steuerexperte · USA' }, 80, true),
+    n(6, 'provider_replied', 'engagement', uuid(2), { providerRef: REF['dahlmann-cpa'], providerName: 'Verified Provider · Corporate Structure, Tax and VAT · USA' }, 80, true),
   ];
 }
 
@@ -535,9 +553,11 @@ function route(method: string, path: string, body: Record<string, unknown> = {})
     if (p[0] === 'admin' && p[1] === 'review' && p[2] === 'queue') return p2Queue();
     if (p[0] === 'admin' && p[1] === 'review' && p[2] && p[3] === 'gate') return { ok: true, gate: p2Gate() };
     if (p[0] === 'admin' && p[1] === 'review' && p[2] && !p[3]) return p2ReviewDossier(p[2]);
-    if (p[0] === 'provider' && p[2] === 'detail') return providerDetail(p[1]);
-    if (p[0] === 'provider' && p[2] === 'slots') return providerSlots();
-    if (p[0] === 'provider' && p[2] === 'reviews') return providerReviews(p[1]);
+    // Phase 3: Nutzer-Routen ueber den opaken Ref; die alten Pfade mit dem
+    // Schluessel gibt es nicht mehr (die API antwortet dort 404).
+    if (p[0] === 'p' && p[2] === 'detail') return providerDetail(p[1]);
+    if (p[0] === 'p' && p[2] === 'slots') return keyOfRef(p[1]) ? providerSlots() : { __status: 404, errorCode: 'NOT_FOUND', message: 'Provider not found' };
+    if (p[0] === 'p' && p[2] === 'reviews') return providerReviews(p[1]);
     if (p[0] === 'metrics') return { ok: true, sla: { confirm_rate: 0.86, avg_reply_hours: 5.2 } };
     return { ok: true, items: [], providers: [], laws: [], documents: [], exports: [] };
   }

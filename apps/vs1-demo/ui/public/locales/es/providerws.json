@@ -410,7 +410,6 @@
       "project": "Por proyecto",
       "mixed": "Mixto"
     },
-    "pseudonymLabel": "Etiqueta de seudónimo",
     "regionLabel": "Región",
     "activeSinceLabel": "Activo desde",
     "pricingTableLabel": "Tabla de precios — visible en tu página de detalle",
@@ -420,7 +419,10 @@
     "pricingPricePh": "Precio",
     "pricingNoteV2": "En la tarjeta del listado no aparece ningún precio concreto — solo el modelo de facturación. La tabla completa se muestra al abrir el detalle (facturado).",
     "matchmakingSave": "Guardar perfil de matchmaking",
-    "matchmakingSaved": "Guardado."
+    "matchmakingSaved": "Guardado.",
+    "previewTitle": "Así aparece antes de la reserva",
+    "previewAreas": "Sus áreas aprobadas",
+    "previewNote": "CompliHub360 forma el título y la descripción: una letra por lista de resultados más sus áreas aprobadas y su región. Nada de esto lo escribe usted, así todos los proveedores se comparan igual."
   },
   "termine": {
     "title": "Citas y <accent>leads</accent>.",
@@ -458,7 +460,6 @@
     "languages": "Idiomas (separados por comas)",
     "domains": "Áreas de compliance",
     "secMatchmaking": "Perfil de matchmaking",
-    "pseudonymPh": "p. ej. Despacho fiscal verificado · Norte de Italia",
     "secCerts": "Certificaciones y estatutos",
     "certs": "Certificaciones (una por línea)",
     "certsPh": "Dottore Commercialista · Colegio de Milán\nISO 27001",
@@ -470,7 +471,8 @@
     "doneBody": "¡Gracias! Nuestro equipo verifica ahora tu información según las directrices de partner. Tendrás noticias — normalmente en 2 días laborables. Tu workspace permanece inactivo hasta la activación.",
     "doneNote": "¿Preguntas? partners@complihub360.com",
     "errorTitle": "Error al enviar",
-    "errorBody": "No se pudo enviar el paquete. Comprueba tu enlace de alta o inténtalo de nuevo — o contacta con partners@complihub360.com."
+    "errorBody": "No se pudo enviar el paquete. Comprueba tu enlace de alta o inténtalo de nuevo — o contacta con partners@complihub360.com.",
+    "titleNote": "Antes de la reserva, los usuarios le ven como «Verified Provider A/B/C» con sus áreas aprobadas y su región; ese título lo forma CompliHub360, no tiene que escribirlo."
   },
   "application": {
     "title": "Solicitud",
@@ -743,6 +745,19 @@
       "countries_set": "Países modificados",
       "status_from_coverage": "Estado del servicio actualizado",
       "legal_fields_changed": "Datos jurídicos modificados"
+    }
+  },
+  "identity": {
+    "hint": "Por favor, sin {{kind}}: «{{match}}» en {{field}}. Estos textos permanecen anónimos hasta la reserva.",
+    "hintGeneric": "Por favor, sin nombres, direcciones web ni números de registro: estos textos permanecen anónimos hasta la reserva.",
+    "kind": {
+      "email": "dirección de correo",
+      "phone": "número de teléfono",
+      "domain": "dirección web",
+      "handle": "perfil en redes",
+      "legal_form": "nombre de empresa",
+      "registry": "número de registro",
+      "own_name": "el nombre de su empresa"
     }
   }
 }

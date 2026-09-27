@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight, Eye, ShieldCheck } from 'lucide-react';
+import { AnonNotice, Monogram, OriginLine, RankBasis } from './PartnerCard';
 import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
 import { Banner } from '../ui/Banner';
@@ -57,7 +58,7 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
   booking?: { name: string; slotStart: string } | null;
   /** Die frische Buchung nach oben melden, damit die Liste dahinter sofort
    *  den Klarnamen und den Termin traegt. */
-  onBooked?: (key: string, b: { name: string; slotStart: string }) => void;
+  onBooked?: (publicRef: string, b: { name: string; slotStart: string }) => void;
 }) {
   const { t, i18n } = useTranslation('results');
   const navigate = useNavigate();
@@ -72,7 +73,8 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
   const [failed, setFailed] = useState(false);
   const [confirmation, setConfirmation] = useState<BookingConfirmation | null>(null);
 
-  const key = provider?.provider_key ?? '';
+  // Phase 3: die Schublade spricht den Anbieter nur ueber den opaken Ref an.
+  const key = provider?.public_ref ?? '';
 
   // Jeder neu geoeffnete Anbieter faengt beim Profil an — sonst stuende der
   // naechste Anbieter im Buchungsschritt des vorigen.
@@ -143,12 +145,12 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
   if (!provider) return null;
   const d = detail.kind === 'ready' ? detail.d : null;
   const meta = [
-    provider.region,
+    provider.descriptor,
     provider.active_since ? t('snapshot.activeSince', { year: provider.active_since }) : null,
     provider.completed_count ? `${provider.completed_count} ${t('detail.mandates')}` : null,
   ].filter(Boolean).join(' · ');
 
-  const title = step === 'profil' ? (booking?.name ?? provider.pseudonym_label)
+  const title = step === 'profil' ? (booking?.name ?? provider.title)
     : step === 'termin' ? t('schedule.title')
     : t('schedule.doneTitle');
   const eyebrow = step === 'fertig' ? t('schedule.doneEyebrow') : t('detail.crumbProviders');
@@ -163,22 +165,30 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
       title={title}
       headerExtra={
         step === 'profil' ? (
-          <div className="flex items-center gap-3">
-            <span className="grid h-[40px] w-[40px] shrink-0 place-items-center rounded-[10px] bg-accent text-body-xs font-extrabold text-primary-950">
-              {provider.match}
-            </span>
-            <div className="min-w-0">
-              <p className="text-body-3xs text-fg-tertiary">{meta}</p>
-              {booking ? (
-                <span className="mt-1 inline-flex rounded-full bg-brand-light px-2 py-[2px] text-body-4xs font-extrabold uppercase tracking-[0.06em] text-fg-brand">
-                  {t('snapshot.bookedOn', { when: new Date(booking.slotStart).toLocaleString(locale, { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) })}
-                </span>
-              ) : provider.is_verified && (
-                <span className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-accent/55 px-2 py-[2px] text-body-4xs font-extrabold uppercase tracking-[0.06em] text-fg-accent-strong">
-                  <ShieldCheck size={12} strokeWidth={2.2} aria-hidden /> {t('snapshot.verifiedPartner')}
-                </span>
-              )}
+          <div>
+            <div className="flex items-center gap-3">
+              <Monogram letter={provider.letter} size={48} />
+              <div className="min-w-0 flex-1">
+                <p className="text-body-3xs text-fg-tertiary">{meta}</p>
+                {booking ? (
+                  <>
+                    <OriginLine letter={provider.letter} title={provider.title} />
+                    <span className="mt-1 inline-flex rounded-full bg-brand-light px-2 py-[2px] text-body-4xs font-extrabold uppercase tracking-[0.06em] text-fg-brand">
+                      {t('snapshot.bookedOn', { when: new Date(booking.slotStart).toLocaleString(locale, { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) })}
+                    </span>
+                  </>
+                ) : provider.is_verified && (
+                  <span className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-accent/55 px-2 py-[2px] text-body-4xs font-extrabold uppercase tracking-[0.06em] text-fg-accent-strong">
+                    <ShieldCheck size={12} strokeWidth={2.2} aria-hidden /> {t('snapshot.verifiedPartner')}
+                  </span>
+                )}
+              </div>
+              <span className="grid h-[40px] w-[40px] shrink-0 place-items-center rounded-[10px] bg-accent text-body-xs font-extrabold text-primary-950">
+                {provider.match}
+              </span>
             </div>
+            {/* Canvas 3B: warum ohne Namen — dort, wo die Frage entsteht. */}
+            {!booking && <AnonNotice className="mt-3" />}
           </div>
         ) : step === 'termin' ? (
           <div>
@@ -189,7 +199,7 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
             >
               <ArrowLeft size={13} aria-hidden /> {t('schedule.back')}
             </button>
-            <p className="mt-1.5 text-body-3xs text-fg-tertiary">{provider.pseudonym_label} · {t('schedule.sub')}</p>
+            <p className="mt-1.5 text-body-3xs text-fg-tertiary">{provider.title} · {t('schedule.sub')}</p>
           </div>
         ) : undefined
       }
@@ -300,10 +310,17 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
           <p className="text-body-sm text-fg">
             {df.format(new Date(confirmation.booking.slot_start))} · {tf.format(new Date(confirmation.booking.slot_start))} · {t('schedule.duration')}
           </p>
-          {/* Stufe 3 — ab hier hat der Anbieter einen Namen. */}
+          {/* Stufe 3 — ab hier hat der Anbieter einen Namen. Canvas 4B: die
+              Karte zeigt, was er vorher war, mit Pfeil zum Klarnamen. */}
           <div className="mt-4 rounded-xl border border-stroke-subtle bg-surface px-5 py-4">
-            <p className="text-body-4xs font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('schedule.revealLabel')}</p>
-            <p className="mt-1.5 text-body font-bold text-fg">{confirmation.provider_identity.name}</p>
+            <p className="flex items-center gap-2 text-body-3xs text-fg-tertiary">
+              <Monogram letter={provider.letter} size={22} />
+              <span className="line-through decoration-fg-tertiary">{provider.title}</span>
+              <ArrowRight size={13} className="text-fg-brand" aria-hidden />
+            </p>
+            <p className="mt-2 text-body-4xs font-extrabold uppercase tracking-[0.09em] text-fg-accent-strong">{t('schedule.revealLabel')}</p>
+            <p className="mt-1 text-body font-bold text-fg">{confirmation.provider_identity.name}</p>
+            <p className="mt-0.5 text-body-3xs text-fg-secondary">{provider.descriptor}</p>
             {confirmation.provider_identity.contact_email && (
               <p className="mt-0.5 text-body-xs text-fg-secondary">{confirmation.provider_identity.contact_email}</p>
             )}
@@ -345,8 +362,16 @@ function Profil({ provider, detail, d, basisNode }: {
           wurde. Die Zahl oben ist damit nicht nur eine Behauptung. */}
       {basisNode && (
         <section>
-          <h3 className="text-body-4xs font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('detail.ringMatch')}</h3>
+          <h3 className="text-body-4xs font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('matchBasis.groupFit')} · {provider.match} %</h3>
           <div className="mt-2">{basisNode}</div>
+        </section>
+      )}
+      {/* Canvas 2B/2C: warum der Anbieter an dieser Stelle steht — mit der
+          Zeile, die sagt, was NICHT zaehlt. */}
+      {(d?.rank_basis ?? provider.rank_basis) && (
+        <section className={basisNode ? 'mt-5 border-t border-stroke-subtle pt-4' : ''}>
+          <h3 className="text-body-4xs font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('rankBasis.group')}</h3>
+          <div className="mt-2"><RankBasis basis={(d?.rank_basis ?? provider.rank_basis)!} compact /></div>
         </section>
       )}
 
@@ -361,7 +386,7 @@ function Profil({ provider, detail, d, basisNode }: {
 
       {d && (
         <>
-          <section className={basisNode ? 'mt-5 border-t border-stroke-subtle pt-4' : ''}>
+          <section className="mt-5 border-t border-stroke-subtle pt-4">
             <h3 className="text-body-4xs font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('detail.servicesTitle')}</h3>
             {d.services?.length ? (
               <ul className="mt-2 flex flex-col gap-2">
@@ -390,7 +415,7 @@ function Profil({ provider, detail, d, basisNode }: {
             )}
             <p className="mt-2.5 text-body-3xs text-fg-secondary">
               {[
-                `${t('detail.coverage')}: ${(d.countries_supported ?? []).join(' · ') || '—'}`,
+                `${t('detail.coverage')}: ${(d.markets ?? []).join(' · ') || '—'}`,
                 `${t('detail.languages')}: ${d.languages.join(' · ') || '—'}`,
                 d.work_mode,
               ].filter(Boolean).join(' · ')}
@@ -433,9 +458,6 @@ function Profil({ provider, detail, d, basisNode }: {
             </p>
           </section>
 
-          <p className="mt-5 border-t border-stroke-subtle pt-4 text-body-3xs leading-relaxed text-fg-tertiary">
-            {t('detail.anonNote')}
-          </p>
         </>
       )}
     </>

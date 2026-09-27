@@ -86,7 +86,6 @@ export interface PricingRow { service: string; price: string }
 export interface MatchmakingProfile {
   billing_model: BillingModel;
   pricing_table: PricingRow[] | null;
-  pseudonym_label: string | null;
   region: string | null;
   active_since: number | null;
 }

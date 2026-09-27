@@ -410,7 +410,6 @@
       "project": "Proje bazlı",
       "mixed": "Karma"
     },
-    "pseudonymLabel": "Takma ad etiketi",
     "regionLabel": "Bölge",
     "activeSinceLabel": "Şu tarihten beri aktif",
     "pricingTableLabel": "Fiyat tablosu — detay sayfanda görünür",
@@ -420,7 +419,10 @@
     "pricingPricePh": "Fiyat",
     "pricingNoteV2": "Listeleme kartında somut fiyat görünmez — yalnızca faturalama modeli. Tam tablo (faturalanan) detay açılışında gösterilir.",
     "matchmakingSave": "Eşleştirme profilini kaydet",
-    "matchmakingSaved": "Kaydedildi."
+    "matchmakingSaved": "Kaydedildi.",
+    "previewTitle": "Rezervasyondan önce böyle görünürsünüz",
+    "previewAreas": "Onaylı alanlarınız",
+    "previewNote": "Başlığı ve açıklamayı CompliHub360 oluşturur: sonuç listesi başına bir harf artı onaylı alanlarınız ve bölgeniz. Bunları siz yazmazsınız; böylece her sağlayıcı aynı şekilde karşılaştırılır."
   },
   "termine": {
     "title": "Randevular ve <accent>lead'ler</accent>.",
@@ -458,7 +460,6 @@
     "languages": "Diller (virgülle)",
     "domains": "Uyum alanları",
     "secMatchmaking": "Eşleştirme profili",
-    "pseudonymPh": "örn. Doğrulanmış vergi firması · Kuzey İtalya",
     "secCerts": "Sertifikalar ve tüzük",
     "certs": "Sertifikalar (her satıra bir)",
     "certsPh": "Dottore Commercialista · Milano Odası\nISO 27001",
@@ -470,7 +471,8 @@
     "doneBody": "Teşekkürler! Ekibimiz bilgilerini partner yönergelerine göre inceliyor. Genellikle 2 iş günü içinde haber alırsın. Çalışma alanın aktivasyona kadar pasif kalır.",
     "doneNote": "Sorular? partners@complihub360.com",
     "errorTitle": "Gönderim başarısız",
-    "errorBody": "Paket gönderilemedi. Kayıt bağlantını kontrol et veya tekrar dene — ya da partners@complihub360.com ile iletişime geç."
+    "errorBody": "Paket gönderilemedi. Kayıt bağlantını kontrol et veya tekrar dene — ya da partners@complihub360.com ile iletişime geç.",
+    "titleNote": "Rezervasyondan önce kullanıcılar sizi onaylı alanlarınız ve bölgenizle „Verified Provider A/B/C“ olarak görür; bu başlığı CompliHub360 oluşturur, sizin yazmanız gerekmez."
   },
   "application": {
     "title": "Başvuru",
@@ -743,6 +745,19 @@
       "countries_set": "Ülkeler değişti",
       "status_from_coverage": "Hizmet durumu güncellendi",
       "legal_fields_changed": "Hukuki bilgiler değişti"
+    }
+  },
+  "identity": {
+    "hint": "Lütfen {{kind}} olmadan: {{field}} içinde „{{match}}“. Bu metinler rezervasyona kadar anonim kalır.",
+    "hintGeneric": "Lütfen ad, web adresi ve sicil numarası olmadan; bu metinler rezervasyona kadar anonim kalır.",
+    "kind": {
+      "email": "e-posta adresi",
+      "phone": "telefon numarası",
+      "domain": "web adresi",
+      "handle": "sosyal medya hesabı",
+      "legal_form": "şirket adı",
+      "registry": "sicil numarası",
+      "own_name": "şirketinizin adı"
     }
   }
 }

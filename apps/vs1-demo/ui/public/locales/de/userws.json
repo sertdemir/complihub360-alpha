@@ -641,7 +641,8 @@
       "termine": "Termine"
     },
     "tabUpcoming": "Kommend",
-    "tabPast": "Vergangen"
+    "tabPast": "Vergangen",
+    "origin": "war vor der Buchung „{{descriptor}}“"
   },
   "review": {
     "eyebrow": "BEWERTUNG",

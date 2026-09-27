@@ -10,7 +10,7 @@ import { Banner } from '../components/ui/Banner';
 
 // ─── Native Scheduling (stage 3) — Phase-3 wiring ────────────────────────────
 // Mirrors the Figma "Scheduling — Buchung" screens: slot picker (from
-// GET /provider/:key/slots) + booking summary. Booking = the paid lead + the
+// GET /p/:ref/slots) + booking summary. Booking = the paid lead + the
 // two-sided identity reveal (spec §11 P7) — confirmed instantly, charged even
 // on a later no-show (the provider receives the dossier at booking).
 
@@ -30,7 +30,7 @@ function fixtureSlots(): string[] {
 }
 
 export function ProviderSchedulePage() {
-  const { key = '' } = useParams();
+  const { ref: key = '' } = useParams();
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation('results');

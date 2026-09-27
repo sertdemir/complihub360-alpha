@@ -235,7 +235,8 @@
     "market": "Pazarınızı kapsıyor ({{country}})",
     "marketMissing": "Pazarınızı kapsamıyor",
     "areas": "{{total}} alanınızdan {{matched}} tanesi",
-    "how": "Yüzde, pazar kapsamı ile talep ettiklerinizin bu uzman tarafından gerçekten karşılanan kısmının toplamıdır."
+    "how": "Yüzde, pazar kapsamı ile talep ettiklerinizin bu uzman tarafından gerçekten karşılanan kısmının toplamıdır.",
+    "groupFit": "Talebinize uyuyor"
   },
   "snapshot": {
     "fallbackTitle": "Risk haritanız",
@@ -309,5 +310,38 @@
     "bookedOn": "Randevu {{when}}",
     "providerBooked": "Randevuyu gör",
     "booked": "Alındı"
+  },
+  "rankBasis": {
+    "group": "Doğrulandı ve ölçüldü",
+    "verificationLine": {
+      "independent": "{{total}} zorunlu kanıtın tümü bağımsız olarak doğrulandı",
+      "reviewed": "{{total}} zorunlu kanıtın tümü CompliHub360 tarafından incelendi",
+      "partial": "{{total}} zorunlu kanıttan {{verified}} tanesi doğrulandı",
+      "none": "Kanıtlar henüz doğrulanmadı"
+    },
+    "verification": {
+      "independent": "Zorunlu kanıtlar bağımsız olarak doğrulandı",
+      "reviewed": "Zorunlu kanıtlar incelendi",
+      "partial": "Zorunlu kanıtlar kısmen doğrulandı",
+      "none": "Kanıtlar henüz doğrulanmadı"
+    },
+    "response": "~{{hours}} saatte yanıt verir",
+    "confirmed": "Randevuların %{{pct}}’i onaylandı",
+    "reviews": "Randevu sonrası {{count}} değerlendirmeden {{rating}}",
+    "reviewsNone": "Randevu sonrası henüz değerlendirme yok",
+    "responseLabel": "Yanıt süresi",
+    "hours": "~{{hours}} sa",
+    "confirmedLabel": "Onaylanan randevular",
+    "reviewsLabel": "Randevu sonrası değerlendirmeler",
+    "planLabel": "Plan veya ödeme",
+    "never": "asla"
+  },
+  "anonNotice": {
+    "title": "CompliHub360 tarafından doğrulandı, sizin için henüz adsız.",
+    "body": "Tanınırlığa göre değil, uyum ve performansa göre karşılaştırırsınız. Ad ve iletişim bilgileri rezervasyondan sonra görünür."
+  },
+  "reveal": {
+    "was": "{{title}} idi",
+    "wasInSession": "„{{session}}“ oturumunuzda {{title}} idi"
   }
 }

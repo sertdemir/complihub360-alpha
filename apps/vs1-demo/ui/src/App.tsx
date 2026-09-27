@@ -226,9 +226,11 @@ function AppContent() {
                             hier auf und behalten ihre Parameter (?thread=…). */}
                         <Route path="dashboard/requests" element={<RequestsRedirect />} />
                         <Route path="dashboard/termine" element={<TerminePage />} />
-                        {/* Phase-3: stage-2 detail (monetised open) + native scheduling */}
-                        <Route path="provider/:key" element={<ProviderDetailPage />} />
-                        <Route path="provider/:key/schedule" element={<ProviderSchedulePage />} />
+                        {/* Stage-2 detail + native scheduling. Seit Phase 3 (ADR-0004)
+                            ueber den opaken public_ref — der Schluessel aus dem
+                            Firmennamen erreicht den Browser nicht mehr. */}
+                        <Route path="p/:ref" element={<ProviderDetailPage />} />
+                        <Route path="p/:ref/schedule" element={<ProviderSchedulePage />} />
                         <Route path="dashboard/workbench/:domain" element={<DomainPage />} />
                         <Route path="dashboard/notifications" element={<UserNotificationsPage />} />
                         <Route path="dashboard/saved-providers" element={<ComingSoonPage page="savedProviders" />} />

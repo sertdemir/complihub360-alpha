@@ -410,7 +410,6 @@
       "project": "Project-based",
       "mixed": "Mixed"
     },
-    "pseudonymLabel": "Pseudonym label",
     "regionLabel": "Region",
     "activeSinceLabel": "Active since",
     "pricingTableLabel": "Pricing table — revealed on your detail page",
@@ -420,7 +419,10 @@
     "pricingPricePh": "Price",
     "pricingNoteV2": "No concrete price appears on the listing card — only the billing model. The full table is shown on the (billed) detail open.",
     "matchmakingSave": "Save matchmaking profile",
-    "matchmakingSaved": "Saved."
+    "matchmakingSaved": "Saved.",
+    "previewTitle": "How you appear before booking",
+    "previewAreas": "Your approved areas",
+    "previewNote": "Title and description come from CompliHub360: a letter per result list plus your approved areas and region. Nothing here is written by you, so every provider is compared the same way."
   },
   "termine": {
     "title": "Appointments & <accent>leads</accent>.",
@@ -458,7 +460,6 @@
     "languages": "Languages (comma-separated)",
     "domains": "Compliance domains",
     "secMatchmaking": "Matchmaking profile",
-    "pseudonymPh": "e.g. Verified tax firm · Northern Italy",
     "secCerts": "Certifications & statutes",
     "certs": "Certifications (one per line)",
     "certsPh": "Dottore Commercialista · Chamber of Milan\nISO 27001",
@@ -470,7 +471,8 @@
     "doneBody": "Thanks! Our team now vets your information against the partner guidelines. You will hear from us — typically within 2 business days. Your workspace stays inactive until activation.",
     "doneNote": "Questions? partners@complihub360.com",
     "errorTitle": "Submission failed",
-    "errorBody": "The package could not be submitted. Check your intake link or try again — or contact partners@complihub360.com."
+    "errorBody": "The package could not be submitted. Check your intake link or try again — or contact partners@complihub360.com.",
+    "titleNote": "Before booking, users see you as “Verified Provider A/B/C” with your approved areas and region — CompliHub360 forms that title, you do not need to."
   },
   "application": {
     "title": "Application",
@@ -743,6 +745,19 @@
       "countries_set": "Countries changed",
       "status_from_coverage": "Service status updated",
       "legal_fields_changed": "Legal details changed"
+    }
+  },
+  "identity": {
+    "hint": "Please keep this without {{kind}}: “{{match}}” in {{field}}. These texts stay anonymous until booking.",
+    "hintGeneric": "Please keep these texts free of names, domains and registration numbers — they stay anonymous until booking.",
+    "kind": {
+      "email": "an e-mail address",
+      "phone": "a phone number",
+      "domain": "a web address",
+      "handle": "a social handle",
+      "legal_form": "a company name",
+      "registry": "a registration number",
+      "own_name": "your company name"
     }
   }
 }

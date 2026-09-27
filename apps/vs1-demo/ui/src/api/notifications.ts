@@ -33,6 +33,8 @@ export type NotificationType =
 
 /** Die Felder, die der Server durchlaesst. Keine Kontaktdaten, keine Freitexte. */
 export interface NotificationPayload {
+  /** Opaker Anbieter-Bezeichner (Phase 3). Wird nie angezeigt — nur der Name, wenn der Server ihn mitgibt. */
+  providerRef?: string;
   providerKey?: string;
   providerName?: string;
   from?: string;
@@ -194,7 +196,7 @@ const TITLE: Record<string, string> = {
 // alles, was nach einer Adresse aussieht, bleiben draussen — der Abzug lief
 // frueher ueber alle Felder und trug damit die Mailadressen der
 // `email_sent`-Zeilen ins Bild.
-const EVENT_PAYLOAD_KEYS = ['engagementId', 'bookingId', 'providerKey', 'provider_key', 'status', 'stage', 'sessionId'];
+const EVENT_PAYLOAD_KEYS = ['engagementId', 'bookingId', 'providerRef', 'providerKey', 'provider_key', 'status', 'stage', 'sessionId'];
 
 function eventDesc(payload: Record<string, unknown> | undefined): string {
   if (!payload) return '';

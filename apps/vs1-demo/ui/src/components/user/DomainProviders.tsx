@@ -26,9 +26,10 @@ import type { SearchProfile } from '../wizard/WizardContext';
 // Laden wie unmittelbar nach einer Buchung in der Schublade (Nutzer
 // 2026-09-15). Drei Karten nebeneinander, ohne Umbruch.
 
-/** Termin je Anbieter — nur bestaetigte und abgeschlossene zaehlen; eine
- *  abgesagte Buchung nimmt den Klarnamen nicht zurueck, aber sie ist kein
- *  Termin mehr und soll auf der Karte nicht als einer stehen. */
+/** Termin je Anbieter (Schluessel: public_ref) — nur bestaetigte und
+ *  abgeschlossene zaehlen; eine abgesagte Buchung nimmt den Klarnamen nicht
+ *  zurueck, aber sie ist kein Termin mehr und soll auf der Karte nicht als
+ *  einer stehen. */
 export type BookingByKey = Record<string, { name: string; slotStart: string }>;
 
 export async function loadBookingsByKey(): Promise<BookingByKey> {
@@ -36,10 +37,11 @@ export async function loadBookingsByKey(): Promise<BookingByKey> {
   const out: BookingByKey = {};
   for (const b of rows) {
     if (b.status !== 'confirmed' && b.status !== 'completed') continue;
-    const prev = out[b.providerKey];
+    if (!b.publicRef || !b.identityRevealed) continue;
+    const prev = out[b.publicRef];
     // Der naechstliegende Termin gewinnt die Karte.
     if (!prev || new Date(b.slotStart) < new Date(prev.slotStart)) {
-      out[b.providerKey] = { name: b.providerName, slotStart: b.slotStart };
+      out[b.publicRef] = { name: b.providerName, slotStart: b.slotStart };
     }
   }
   return out;
@@ -93,11 +95,11 @@ export const DomainProviders = forwardRef<HTMLElement, {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {providers.map((p, i) => (
             <PartnerCard
-              key={p.provider_key}
+              key={p.public_ref}
               provider={p}
               top={i === 0}
               basis={p.match_basis ? <MatchBasis basis={p.match_basis} /> : undefined}
-              booking={booked[p.provider_key] ?? null}
+              booking={booked[p.public_ref] ?? null}
               onDetails={() => setOpen(p)}
             />
           ))}
@@ -108,7 +110,7 @@ export const DomainProviders = forwardRef<HTMLElement, {
         onClose={() => setOpen(null)}
         provider={open}
         basisNode={open?.match_basis ? <MatchBasis basis={open.match_basis} /> : undefined}
-        booking={open ? booked[open.provider_key] ?? null : null}
+        booking={open ? booked[open.public_ref] ?? null : null}
         onBooked={(key, b) => setBooked((prev) => ({ ...prev, [key]: b }))}
       />
     </section>

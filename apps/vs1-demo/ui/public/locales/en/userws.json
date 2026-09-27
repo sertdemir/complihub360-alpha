@@ -641,7 +641,8 @@
       "termine": "Appointments"
     },
     "tabUpcoming": "Upcoming",
-    "tabPast": "Past"
+    "tabPast": "Past",
+    "origin": "was “{{descriptor}}” before booking"
   },
   "review": {
     "eyebrow": "REVIEW",

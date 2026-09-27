@@ -13,7 +13,6 @@ import { submitReview } from '../../api/bookings';
 
 export interface ReviewTarget {
   bookingId: string;
-  providerKey: string;
   providerName: string;
 }
 
@@ -37,8 +36,9 @@ export function ReviewDrawer({ target, onClose, onSubmitted }: {
     if (!target || rating < 1) return;
     setState('sending');
     submitReview({
+      // Der Server liest den Anbieter aus der Buchung — der Browser kennt
+      // seit Phase 3 keinen Schluessel mehr.
       bookingId: target.bookingId,
-      providerKey: target.providerKey,
       fromRole: 'user',
       rating,
       categories: [...cats],

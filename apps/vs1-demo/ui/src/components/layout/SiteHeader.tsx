@@ -29,7 +29,12 @@ export function SiteHeader() {
   if (localeOk && seg.length === 2 && (seg[1] === 'results' || seg[1] === 'partner-onboarding' || seg[1] === 'provider-intake')) {
     return null;
   }
-  // Phase-3 funnel pages (stage-2 detail + scheduling) carry their own slim header.
+  // Funnel pages (stage-2 detail + scheduling) carry their own slim header.
+  // Seit Phase 3 (ADR-0004) liegen sie unter /p/:ref; /provider/:key/… bleibt
+  // fuer die Anbieter-eigenen Seiten (action, confirm-email) ausgenommen.
+  if (localeOk && seg[1] === 'p' && seg.length >= 3) {
+    return null;
+  }
   if (localeOk && seg[1] === 'provider' && seg.length >= 3 && seg[2] !== 'action' && seg[2] !== 'confirm-email') {
     return null;
   }

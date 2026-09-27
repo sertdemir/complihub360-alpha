@@ -235,7 +235,8 @@
     "market": "Cubre su mercado ({{country}})",
     "marketMissing": "No cubre su mercado",
     "areas": "{{matched}} de {{total}} de sus áreas",
-    "how": "El porcentaje es la cobertura de mercado más la parte de lo que usted solicitó que este especialista cubre realmente."
+    "how": "El porcentaje es la cobertura de mercado más la parte de lo que usted solicitó que este especialista cubre realmente.",
+    "groupFit": "Encaja con su solicitud"
   },
   "snapshot": {
     "fallbackTitle": "Su mapa de riesgos",
@@ -309,5 +310,38 @@
     "bookedOn": "Cita {{when}}",
     "providerBooked": "Ver la cita",
     "booked": "Reservado"
+  },
+  "rankBasis": {
+    "group": "Verificado y medido",
+    "verificationLine": {
+      "independent": "Las {{total}} pruebas obligatorias verificadas de forma independiente",
+      "reviewed": "Las {{total}} pruebas obligatorias revisadas por CompliHub360",
+      "partial": "{{verified}} de {{total}} pruebas obligatorias verificadas",
+      "none": "Pruebas aún sin verificar"
+    },
+    "verification": {
+      "independent": "Pruebas obligatorias verificadas de forma independiente",
+      "reviewed": "Pruebas obligatorias revisadas",
+      "partial": "Pruebas obligatorias parcialmente verificadas",
+      "none": "Pruebas aún sin verificar"
+    },
+    "response": "Responde en ~{{hours}} h",
+    "confirmed": "{{pct}} % de citas confirmadas",
+    "reviews": "{{rating}} de {{count}} valoraciones tras citas",
+    "reviewsNone": "Aún sin valoración tras una cita",
+    "responseLabel": "Tiempo de respuesta",
+    "hours": "~{{hours}} h",
+    "confirmedLabel": "Citas confirmadas",
+    "reviewsLabel": "Valoraciones tras citas",
+    "planLabel": "Plan o pago",
+    "never": "nunca"
+  },
+  "anonNotice": {
+    "title": "Verificado por CompliHub360, todavía sin nombre para usted.",
+    "body": "Usted compara por encaje y rendimiento, no por notoriedad. Nombre y contacto aparecen tras la reserva."
+  },
+  "reveal": {
+    "was": "era {{title}}",
+    "wasInSession": "era {{title}} en su sesión «{{session}}»"
   }
 }

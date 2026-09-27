@@ -1,5 +1,6 @@
 import { myProviderKey } from './provider';
 import { apiFetch } from './client';
+import type { RankBasis } from './search';
 
 // ─── Bookings (Termine) — user side ──────────────────────────────────────────
 // Matchmaking v2: the booking IS the paid lead; provider identity is revealed
@@ -10,10 +11,15 @@ export type BookingStatus = 'confirmed' | 'cancelled' | 'completed' | 'no_show';
 
 export interface UserBooking {
   id: string;
-  providerKey: string;
-  providerName: string;   // clear name — identity revealed post-booking
+  /** Opaker Anbieter-Bezeichner (Phase 3) — nie der Schluessel. */
+  publicRef: string | null;
+  /** Klarname ab der Offenlegung, davor "Verified Provider". */
+  providerName: string;
+  /** "Tax and VAT · Norditalien" — die Beschreibung, unter der der Anbieter vor der Buchung stand. */
+  providerDescriptor: string;
   providerRegion: string | null;
   providerWebsite: string | null;  // affiliate 1b — post-booking reveal only
+  identityRevealed: boolean;
   slotStart: string;      // ISO
   slotEnd: string | null;
   status: BookingStatus;
@@ -22,10 +28,12 @@ export interface UserBooking {
 
 interface ApiBookingRow {
   id: string;
-  provider_key: string;
+  public_ref: string | null;
   provider_name: string;
+  provider_descriptor: string;
   provider_region: string | null;
   provider_website: string | null;
+  identity_revealed: boolean;
   slot_start: string;
   slot_end: string | null;
   status: BookingStatus;
@@ -35,18 +43,20 @@ interface ApiBookingRow {
 // Affiliate 1b: the counted outclick URL to a provider's website. The server
 // verifies the caller has booked this provider, logs the click and 302-
 // redirects — so this is a plain <a href>, not an apiFetch.
-export function providerWebsiteHref(providerKey: string): string {
+export function providerWebsiteHref(publicRef: string): string {
   const base = (import.meta.env.VITE_API_URL as string | undefined) || '';
-  return `${base}/api/v1/provider/${providerKey}/website`;
+  return `${base}/api/v1/p/${publicRef}/website`;
 }
 
 export async function fetchUserBookings(): Promise<UserBooking[]> {
   const res = await apiFetch<{ ok: boolean; bookings: ApiBookingRow[] }>('/api/v1/bookings');
   return (res.bookings || []).map((b) => ({
     id: b.id,
-    providerKey: b.provider_key,
+    publicRef: b.public_ref ?? null,
     providerName: b.provider_name,
+    providerDescriptor: b.provider_descriptor ?? '',
     providerRegion: b.provider_region,
+    identityRevealed: !!b.identity_revealed,
     providerWebsite: b.provider_website,
     slotStart: b.slot_start,
     slotEnd: b.slot_end,
@@ -81,17 +91,23 @@ export async function fetchProviderBookings(providerKey?: string): Promise<Provi
 }
 
 // ─── Stage-2 detail + native scheduling (Phase-3 wiring) ─────────────────────
-// GET /provider/:key/detail — the still-anonymous detail payload (fires
+// GET /p/:ref/detail — the still-anonymous detail payload (fires
 // provider_detail_opened server-side, deduped 1×/user/30d — analytics only
-// since Pricing v2, ADR-0003; it is not billed).
+// since Pricing v2, ADR-0003; it is not billed). Seit Phase 3 (ADR-0004)
+// entscheidet das Sichtbarkeits-Register, welche Felder hier ankommen:
+// Freitexte sind durch das Identitaets-Netz gelaufen, `confirmation_rate`
+// und `countries_supported` (Klasse internal) fehlen — Maerkte kommen als
+// `markets` aus der View, die Bestaetigungsrate als Aussage in `rank_basis`.
 export interface ProviderDetail {
-  provider_key: string;
-  pseudonym_label: string;
+  public_ref: string;
+  /** "Tax and VAT · Norditalien" — kein Buchstabe: den kennt nur die Liste. */
+  descriptor: string;
   region: string | null;
   active_since: number | null;
   specializations: string[];
+  /** Maerkte, in denen mindestens eine Leistung freigegeben ist. */
+  markets: string[];
   languages: string[];
-  countries_supported: string[];
   rating: number | null;
   completed_count: number | null;
   avg_response_hours: number | null;
@@ -99,8 +115,7 @@ export interface ProviderDetail {
   pricing_table: Array<{ service: string; price: string }> | null;
   is_verified: boolean;
   availability: 'available' | 'ooo';
-  /** Anteil bestaetigter Termine, 0..1. Kennzahl auf der Partnerseite. */
-  confirmation_rate?: number | null;
+  rank_basis?: RankBasis;
   /** Dossier (Partnerseite 3B). null = der Anbieter hat nichts hinterlegt —
    *  die Karte sagt das, statt eine Leistung zu erfinden. */
   services?: Array<{ title: string; includes?: string[] }> | null;
@@ -118,32 +133,32 @@ export interface ProviderReview {
   created_at: string;
 }
 
-export async function fetchProviderDetail(key: string): Promise<ProviderDetail> {
-  const res = await apiFetch<{ ok: boolean; detail: ProviderDetail }>(`/api/v1/provider/${key}/detail`);
+export async function fetchProviderDetail(publicRef: string): Promise<ProviderDetail> {
+  const res = await apiFetch<{ ok: boolean; detail: ProviderDetail }>(`/api/v1/p/${publicRef}/detail`);
   return res.detail;
 }
 
-export async function fetchProviderReviews(key: string): Promise<{ reviews: ProviderReview[]; count: number; average: number | null }> {
-  const res = await apiFetch<{ ok: boolean; reviews: ProviderReview[]; summary: { count: number; average: number | null } }>(`/api/v1/provider/${key}/reviews`);
+export async function fetchProviderReviews(publicRef: string): Promise<{ reviews: ProviderReview[]; count: number; average: number | null }> {
+  const res = await apiFetch<{ ok: boolean; reviews: ProviderReview[]; summary: { count: number; average: number | null } }>(`/api/v1/p/${publicRef}/reviews`);
   return { reviews: res.reviews || [], count: res.summary?.count ?? 0, average: res.summary?.average ?? null };
 }
 
-export async function fetchSlots(key: string): Promise<string[]> {
-  const res = await apiFetch<{ ok: boolean; slots: string[] }>(`/api/v1/provider/${key}/slots`);
+export async function fetchSlots(publicRef: string): Promise<string[]> {
+  const res = await apiFetch<{ ok: boolean; slots: string[] }>(`/api/v1/p/${publicRef}/slots`);
   return res.slots || [];
 }
 
 export interface BookingConfirmation {
-  booking: { id: string; provider_key: string; slot_start: string; slot_end: string; status: string };
+  booking: { id: string; public_ref: string; slot_start: string; slot_end: string; status: string };
   // Stage-3 reveal — identity becomes visible at booking (spec §5).
   provider_identity: { name: string; website_url: string | null; contact_email: string | null };
 }
 
-export async function createBooking(providerKey: string, slotStart: string, message?: string): Promise<BookingConfirmation> {
+export async function createBooking(publicRef: string, slotStart: string, message?: string): Promise<BookingConfirmation> {
   return apiFetch<BookingConfirmation & { ok: boolean }>('/api/v1/scheduling', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ provider_key: providerKey, slot_start: slotStart, message: message || undefined }),
+    body: JSON.stringify({ public_ref: publicRef, slot_start: slotStart, message: message || undefined }),
   });
 }
 

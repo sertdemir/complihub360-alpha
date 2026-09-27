@@ -26,7 +26,6 @@ export function ProviderIntakePage() {
   const [languages, setLanguages] = useState('');
   const [cats, setCats] = useState<Set<string>>(new Set());
   const [billing, setBilling] = useState<BillingModel>('project');
-  const [pseudonym, setPseudonym] = useState('');
   const [region, setRegion] = useState('');
   const [activeSince, setActiveSince] = useState('');
   const [certs, setCerts] = useState('');
@@ -48,7 +47,6 @@ export function ProviderIntakePage() {
           languages: languages.split(',').map((s) => s.trim().toUpperCase()).filter(Boolean),
           categories: [...cats],
           billing_model: billing,
-          pseudonym_label: pseudonym.trim() || null,
           region: region.trim() || null,
           active_since: parseInt(activeSince, 10) || null,
           certifications: certs.split('\n').map((s) => s.trim()).filter(Boolean),
@@ -136,8 +134,9 @@ export function ProviderIntakePage() {
             ))}
           </div>,
         )}
-        <div className="grid gap-3 sm:grid-cols-3">
-          {field(t('settings.pseudonymLabel'), <Input value={pseudonym} onChange={(e) => setPseudonym(e.target.value)} placeholder={t('intake.pseudonymPh')} />)}
+        {/* Phase 3: kein Pseudonym — der Titel vor der Buchung entsteht im System. */}
+        <p className="text-[12px] leading-relaxed text-fg-tertiary">{t('intake.titleNote')}</p>
+        <div className="grid gap-3 sm:grid-cols-2">
           {field(t('settings.regionLabel'), <Input value={region} onChange={(e) => setRegion(e.target.value)} placeholder="Norditalien" />)}
           {field(t('settings.activeSinceLabel'), <Input value={activeSince} onChange={(e) => setActiveSince(e.target.value)} placeholder="2015" />)}
         </div>
