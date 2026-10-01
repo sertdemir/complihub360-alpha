@@ -1105,6 +1105,7 @@ describe('Ownership: Anbieter-eigene Routen gehoeren ihren Mitgliedern', () => {
         ['GET', '/bookings'], ['GET', '/coverage'], ['PATCH', '/coverage'], ['PATCH', '/profile'],
         ['GET', '/invoices'], ['PATCH', '/availability'], ['POST', '/billing-portal'],
         ['POST', '/change-email'], ['GET', '/billing/preview'],
+        ['GET', '/subscription'], ['POST', '/subscription'],
         // Phase 2 Onboarding
         ['GET', '/application'], ['PATCH', '/application'], ['POST', '/services'],
         ['PATCH', '/services/00000000-0000-0000-0000-000000000001'], ['DELETE', '/services/00000000-0000-0000-0000-000000000001'],
@@ -2650,5 +2651,231 @@ describe('Watcher: Markt-Update', () => {
         expect(mails()).toHaveLength(0);
         expect((db.event_log ?? []).filter((e) => e.type === 'market_covered_notice_shadow')).toHaveLength(1);
         expect(db.market_requests.find((r: any) => r.id === 'mr-de').notified_at).toBeNull();
+    });
+});
+
+// ─── Ein Abo kann entstehen (TKT-PROV-07) ────────────────────────────────────
+// Bis zum 2026-10-01 hatte `provider_subscriptions` keinen Schreiber: kein
+// Checkout, keine Admin-Zuweisung. Weil `billingReadiness` ein laufendes Abo
+// verlangt, war damit niemand buchbar. Diese Tests nageln den Weg hinein fest —
+// und die beiden Grenzen, die dabei nicht verrutschen durften: kein stiller
+// Tarifwechsel, und ein Tarif macht allein noch nicht buchbar.
+
+describe('Abo-Schreiber — Tarifwahl, Admin-Zuweisung, Periode', () => {
+    it('GET /subscription zeigt vorher kein Abo, aber die waehlbaren Tarife', async () => {
+        seedProvider();
+        seedPricing();
+        const r = await api('/api/v1/provider/test-kanzlei/subscription');
+        expect(r.status).toBe(200);
+        expect(r.body.subscription).toBeNull();
+        expect(r.body.plans.map((p: any) => p.code)).toEqual(['essential', 'growth', 'global']);
+        expect(r.body.plans[1]).toMatchObject({ monthly_cents: 9900, annual_cents: 99000, currency: 'USD' });
+    });
+
+    it('die Tarifwahl legt das Abo an, mit Periode, Herkunft und Protokolleintrag', async () => {
+        seedProvider();
+        seedPricing();
+        const r = await api('/api/v1/provider/test-kanzlei/subscription', {
+            method: 'POST', body: JSON.stringify({ plan_code: 'growth', cadence: 'monthly' }),
+        });
+        expect(r.status).toBe(201);
+        expect(r.body.subscription).toMatchObject({ plan_code: 'growth', cadence: 'monthly', status: 'active' });
+
+        const row = db.provider_subscriptions[0];
+        expect(row).toMatchObject({ provider_key: 'test-kanzlei', plan_code: 'growth', source: 'provider_self_serve', status: 'active' });
+        // Der Stub setzt keine Spalten-Defaults: hier undefined, in Postgres
+        // NULL. `openRow` prueft auf falsy, beides traegt.
+        expect(row.ended_at ?? null).toBeNull();
+        // Die Periode ist einen Monat lang und das Ende ist auch das
+        // Verlaengerungsdatum — daran haengt der Rabattzyklus.
+        expect(row.current_period_end).toBe(row.renewal_date);
+        expect(row.current_period_end > row.current_period_start).toBe(true);
+
+        // Der Anbieter sieht den Vorgang in seiner eigenen Historie.
+        expect(db.provider_review_log.map((l: any) => [l.subject, l.action, l.to_value]))
+            .toContainEqual(['subscription', 'subscription_started', 'growth/monthly']);
+        expect(db.event_log.map((e: any) => e.type)).toContain('provider_subscription_started');
+    });
+
+    it('das Jahresabo laeuft zwoelf Monate — die zehn Monate stehen im Preis', async () => {
+        seedProvider();
+        seedPricing();
+        const r = await api('/api/v1/provider/test-kanzlei/subscription', {
+            method: 'POST', body: JSON.stringify({ plan_code: 'global', cadence: 'annual' }),
+        });
+        expect(r.status).toBe(201);
+        const { current_period_start: s, current_period_end: e } = db.provider_subscriptions[0];
+        expect(Number(e.slice(0, 4)) - Number(s.slice(0, 4))).toBe(1);
+        expect(e.slice(5)).toBe(s.slice(5));
+    });
+
+    it('ein zweites Abo wird abgelehnt — ein Tarifwechsel ist hier bewusst nicht moeglich', async () => {
+        // Spec B laesst "proration, cancellation notice, grace period,
+        // failed-payment retry, and reactivation rules" ausdruecklich offen.
+        // Ein Wechsel per Tarifwahl wuerde eine Pro-rata-Regel erfinden.
+        seedProvider();
+        seedPricing();
+        await api('/api/v1/provider/test-kanzlei/subscription', {
+            method: 'POST', body: JSON.stringify({ plan_code: 'essential', cadence: 'monthly' }),
+        });
+        const second = await api('/api/v1/provider/test-kanzlei/subscription', {
+            method: 'POST', body: JSON.stringify({ plan_code: 'global', cadence: 'monthly' }),
+        });
+        expect(second.status).toBe(409);
+        expect(second.body.errorCode).toBe('SUBSCRIPTION_EXISTS');
+        expect(db.provider_subscriptions).toHaveLength(1);
+        expect(db.provider_subscriptions[0].plan_code).toBe('essential');
+    });
+
+    it('weist einen unbekannten Tarif und eine unbekannte Zahlweise ab', async () => {
+        seedProvider();
+        seedPricing();
+        const a = await api('/api/v1/provider/test-kanzlei/subscription', {
+            method: 'POST', body: JSON.stringify({ plan_code: 'platinum', cadence: 'monthly' }),
+        });
+        expect(a.status).toBe(400);
+        expect(a.body.errorCode).toBe('UNKNOWN_PLAN');
+        const b = await api('/api/v1/provider/test-kanzlei/subscription', {
+            method: 'POST', body: JSON.stringify({ plan_code: 'growth', cadence: 'weekly' }),
+        });
+        expect(b.status).toBe(400);
+        expect(db.provider_subscriptions ?? []).toHaveLength(0);
+    });
+
+    it('ein Tarif allein macht noch nicht buchbar — die Zahlungsmethode fehlt weiter', async () => {
+        // Die Grenze aus TKT-PROV-05: das Abo ist EINE von sieben Bedingungen.
+        // Waere das anders, wuerde ein bezahlter Tarif Buchbarkeit kaufen.
+        seedProvider({ billing_ready: false, billing_block_reasons: ['inactive_subscription'] });
+        seedPricing();
+        const r = await api('/api/v1/provider/test-kanzlei/subscription', {
+            method: 'POST', body: JSON.stringify({ plan_code: 'growth', cadence: 'monthly' }),
+        });
+        expect(r.status).toBe(201);
+        const p = db.providers.find((x: any) => x.provider_key === 'test-kanzlei');
+        expect(p.billing_ready).toBe(false);
+        expect(p.billing_block_reasons).toContain('no_payment_method');
+        expect(p.billing_block_reasons).not.toContain('inactive_subscription');
+    });
+
+    it.each([['terminated'], ['suspended']])(
+        'ein %s Konto kann keinen Tarif beginnen — auch nicht per Admin-Zuweisung', async (status) => {
+        // Geld von einem Konto zu nehmen, das nicht vermittelt werden kann,
+        // waere Geld fuer nichts: "Businesses should not pay for services they
+        // do not need."
+        seedProvider({ lifecycle_status: status });
+        seedPricing();
+        const self = await api('/api/v1/provider/test-kanzlei/subscription', {
+            method: 'POST', body: JSON.stringify({ plan_code: 'growth', cadence: 'monthly' }),
+        });
+        expect(self.status).toBe(409);
+        expect(self.body.errorCode).toBe('PROVIDER_NOT_ELIGIBLE');
+
+        const admin = await api('/api/v1/admin/provider-subscriptions', {
+            method: 'POST', body: JSON.stringify({ provider_key: 'test-kanzlei', action: 'start', plan_code: 'growth', cadence: 'monthly' }),
+        });
+        expect(admin.status).toBe(409);
+        expect(admin.body.errorCode).toBe('PROVIDER_NOT_ELIGIBLE');
+        expect(db.provider_subscriptions ?? []).toHaveLength(0);
+    });
+
+    it.each([['draft'], ['submitted'], ['paused']])(
+        'ein %s Konto darf dagegen einen Tarif beginnen — Abrechnung und Aktivierung sind zwei Achsen', async (status) => {
+        seedProvider({ lifecycle_status: status });
+        seedPricing();
+        const r = await api('/api/v1/provider/test-kanzlei/subscription', {
+            method: 'POST', body: JSON.stringify({ plan_code: 'essential', cadence: 'monthly' }),
+        });
+        expect(r.status).toBe(201);
+    });
+
+    it('Admin-Zuweisung: beenden und neu beginnen sind zwei sichtbare Vorgaenge', async () => {
+        seedProvider();
+        seedPricing();
+        const start = await api('/api/v1/admin/provider-subscriptions', {
+            method: 'POST', body: JSON.stringify({ provider_key: 'test-kanzlei', action: 'start', plan_code: 'essential', cadence: 'monthly' }),
+        });
+        expect(start.status).toBe(201);
+        expect(db.provider_subscriptions[0].source).toBe('admin');
+
+        // Ohne Beenden kein Wechsel — auch nicht fuer den Admin.
+        const blocked = await api('/api/v1/admin/provider-subscriptions', {
+            method: 'POST', body: JSON.stringify({ provider_key: 'test-kanzlei', action: 'start', plan_code: 'growth', cadence: 'monthly' }),
+        });
+        expect(blocked.status).toBe(409);
+
+        const ended = await api('/api/v1/admin/provider-subscriptions', {
+            method: 'POST', body: JSON.stringify({ provider_key: 'test-kanzlei', action: 'end', reason: 'Umstellung auf Growth' }),
+        });
+        expect(ended.status).toBe(200);
+        expect(ended.body.ended_plan).toBe('essential');
+        // 'ended' und ended_at gehoeren zusammen — die Tabelle verlangt das.
+        expect(db.provider_subscriptions[0].status).toBe('ended');
+        expect(db.provider_subscriptions[0].ended_at).toBeTruthy();
+
+        const again = await api('/api/v1/admin/provider-subscriptions', {
+            method: 'POST', body: JSON.stringify({ provider_key: 'test-kanzlei', action: 'start', plan_code: 'growth', cadence: 'annual' }),
+        });
+        expect(again.status).toBe(201);
+        expect(db.provider_subscriptions).toHaveLength(2);
+        expect(db.provider_review_log.filter((l: any) => l.subject === 'subscription')).toHaveLength(3);
+    });
+
+    it('Beenden ohne laufendes Abo ist ein 409, kein stiller Erfolg', async () => {
+        seedProvider();
+        seedPricing();
+        const r = await api('/api/v1/admin/provider-subscriptions', {
+            method: 'POST', body: JSON.stringify({ provider_key: 'test-kanzlei', action: 'end' }),
+        });
+        expect(r.status).toBe(409);
+        expect(r.body.errorCode).toBe('NO_SUBSCRIPTION');
+    });
+
+    it('die Admin-Zuweisung ist nicht fuer einen angemeldeten Anbieter offen', async () => {
+        seedProvider();
+        seedPricing();
+        const r = await api('/api/v1/admin/provider-subscriptions', {
+            auth: 'jwt', method: 'POST',
+            body: JSON.stringify({ provider_key: 'test-kanzlei', action: 'start', plan_code: 'global', cadence: 'monthly' }),
+        });
+        expect(r.status).toBe(403);
+        expect(db.provider_subscriptions ?? []).toHaveLength(0);
+    });
+
+    it('der Waechter-Pass rollt eine abgelaufene Periode weiter', async () => {
+        seedProvider();
+        seedPricing();
+        seedSubscription('test-kanzlei', 'growth', {
+            current_period_start: '2026-01-01', current_period_end: '2026-02-01', started_at: '2026-01-01T00:00:00Z',
+        });
+        const { runSubscriptionPeriodTick } = await import('../subscriptions.js');
+        const r = await runSubscriptionPeriodTick(false, new Date('2026-03-15T00:00:00Z'));
+        expect(r.rolled).toBe(1);
+        expect(db.provider_subscriptions[0]).toMatchObject({ current_period_start: '2026-03-01', current_period_end: '2026-04-01' });
+        expect(db.event_log.map((e: any) => e.type)).toContain('provider_subscription_period_rolled');
+    });
+
+    it('der Waechter-Pass laesst ein beendetes Abo in Ruhe', async () => {
+        seedProvider();
+        seedPricing();
+        seedSubscription('test-kanzlei', 'growth', {
+            current_period_start: '2026-01-01', current_period_end: '2026-02-01',
+            status: 'ended', ended_at: '2026-02-01T00:00:00Z',
+        });
+        const { runSubscriptionPeriodTick } = await import('../subscriptions.js');
+        const r = await runSubscriptionPeriodTick(false, new Date('2026-03-15T00:00:00Z'));
+        expect(r.rolled).toBe(0);
+        expect(db.provider_subscriptions[0].current_period_end).toBe('2026-02-01');
+    });
+
+    it('Shadow zaehlt, schreibt aber nicht', async () => {
+        seedProvider();
+        seedPricing();
+        seedSubscription('test-kanzlei', 'growth', {
+            current_period_start: '2026-01-01', current_period_end: '2026-02-01',
+        });
+        const { runSubscriptionPeriodTick } = await import('../subscriptions.js');
+        const r = await runSubscriptionPeriodTick(true, new Date('2026-03-15T00:00:00Z'));
+        expect(r.rolled).toBe(1);
+        expect(db.provider_subscriptions[0].current_period_end).toBe('2026-02-01');
     });
 });

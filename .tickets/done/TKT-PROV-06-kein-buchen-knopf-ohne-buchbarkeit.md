@@ -1,7 +1,7 @@
 ---
 title: "Kein Buchen-Knopf ohne Buchbarkeit — und die Regel liegt bei syncBillingReadiness"
 assignee: "Claude"
-status: "review"
+status: "done"
 ---
 
 # Kein Buchen-Knopf ohne Buchbarkeit
@@ -116,3 +116,7 @@ einen Tarif anzulegen (Checkout oder Zuweisung), fehlt. Zu prüfen, bevor
 jemand erwartet, dass eine Buchung durchgeht.
 
 **Drittens:** Die neue Copy ist nicht abgenommen.
+
+---
+
+Gemergt am 2026-10-01 mit PR #233 (Squash `1d861061`).
