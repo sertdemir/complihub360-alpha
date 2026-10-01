@@ -1,7 +1,7 @@
 ---
 title: "marketUnavailable statt C3, wenn die Engine keinen Markt prüfen kann"
 assignee: "Claude"
-status: "doing"
+status: "review"
 ---
 
 # marketUnavailable statt C3
@@ -51,6 +51,7 @@ Betroffen sind **Risk Map** (Darstellung), **Registrierung und Gating** (Update 
 - [2026-10-01] **Claude**: Versand des Markt-Updates (Migration, Mailer, Watcher, Client-Sprache). Offen: Mail-Copy-Abnahme, Staging-Migration. (Status: doing)
 - [2026-10-01] **Claude**: #231 gemergt, Staging Ende-zu-Ende geprüft, Mail-Copy abgenommen. Offen bleiben nur die Hero-Copy für Gäste und die Anbieter-Spalte (s. u.). (Status: doing)
 - [2026-10-01] **Claude**: G2 + H3 Canvas → Figma (3537:15183, 3537:15204) → lokal; 4 Sabotagen erkannt. (Status: doing)
+- [2026-10-01] **Claude**: #237 gemergt (`6a93c839`), G2 auf Staging geprüft (EN/DE), H3 lokal und im Test. Alle Kriterien erfüllt → review (Nutzer: „schieb das Ticket nach review“). (Status: review)
 
 ## Offene Punkte für den Nutzer (Stufe 3)
 
