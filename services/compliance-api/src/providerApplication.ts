@@ -281,10 +281,12 @@ function servicePatchFrom(d: any): Record<string, unknown> {
  *
  * Bis zum 2026-10-01 stand hier, das Gate fange den Fall "kein Abo" ueber
  * `billing_ready`. Das traegt nicht mehr: Billing sperrt das Aktivieren nicht
- * (TKT-PROV-05), und `billing_ready` ist abgeloest (TKT-PROV-06). Ohne Abo
- * kann ein Anbieter also aktiviert werden — er ist dann nur nicht buchbar, und
- * die Oberflaeche zeigt keinen Buchen-Knopf. Ob ein Konto ohne Tarif
- * ueberhaupt gelistet werden soll, ist eine offene Frage im Ticket.
+ * mehr, es wird nur gemeldet (TKT-PROV-05). Die Spalte selbst gibt es weiter —
+ * `syncBillingReadiness` (leadCharge.ts) pflegt sie —, sie entscheidet aber
+ * nicht mehr ueber das Aktivieren. Ohne Abo kann ein Anbieter also aktiviert
+ * werden; er ist dann nur nicht buchbar, und die Oberflaeche zeigt keinen
+ * Buchen-Knopf (TKT-PROV-06). Ob ein Konto ohne Tarif ueberhaupt gelistet
+ * werden soll, ist eine offene Frage im Ticket.
  */
 export async function allowanceFor(providerKey: string, services: any[], extraArea?: string): Promise<{ ok: boolean; allowance: number | null; used: number; over: string[]; plan: string | null } | null> {
     const sub = await getActiveSubscription(providerKey);
