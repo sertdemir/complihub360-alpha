@@ -713,7 +713,7 @@ function p2Gate() {
   // gebuehrenpflichtige Buchung, nicht die Aktivierung (Spec A §21.1). Sie wird
   // gemeldet — und muss hier stehen, sonst greift die Gate-Leiste ins Leere.
   return { ok: false, missing: ['evidence.insurance', 'evidence.representative_identity'], target: 'limited', approved_cells: 1, total_cells: 4, allowance: null,
-    billing: { ready: false, blocks_chargeable_booking: ['not_ready', 'inactive_subscription'] } };
+    billing: { ready: false, blocks_chargeable_booking: ['not_ready', 'no_payment_method'] } };
 }
 function p2Queue() {
   const rows = [

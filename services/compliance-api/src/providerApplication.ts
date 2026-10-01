@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { structuredLog } from '@complihub360/types';
 import { supabaseApi } from './supabase.js';
 import type { Caller } from './providerAuth.js';
-import { categoryAllowanceCheck, chargeableFromSubscription, getActiveSubscription, loadPricingConfig, type ChargeableVerdict } from './billing.js';
+import { categoryAllowanceCheck, getActiveSubscription, loadPricingConfig } from './billing.js';
 import { checkVatId } from './vies.js';
 import { scanFields, type IdentityContext } from './anonymity.js';
 import {
@@ -135,10 +135,10 @@ export async function loadDossier(providerKey: string): Promise<Dossier | null> 
 
 /**
  * Was der Anbieter von sich selbst sieht — ohne Abrechnungsinterna und ohne
- * Stripe-IDs. `zahlbar` wird gereicht statt gelesen: `providers.billing_ready`
- * ist seit 2026-10-01 abgeloest (TKT-PROV-06) und hatte nie einen Schreiber.
+ * Stripe-IDs. `billing_ready` und die Gruende kommen aus den Spalten, die
+ * syncBillingReadiness (leadCharge.ts, #234) pflegt.
  */
-function providerView(p: any, zahlbar: ChargeableVerdict) {
+function providerView(p: any) {
     return {
         provider_key: p.provider_key, name: p.name, website_url: p.website_url ?? null, contact_email: p.contact_email ?? null,
         languages: p.languages ?? [], region: p.region ?? null, active_since: p.active_since ?? null,
@@ -146,7 +146,7 @@ function providerView(p: any, zahlbar: ChargeableVerdict) {
         billing_country: p.billing_country ?? null, work_mode: p.work_mode ?? null,
         lifecycle_status: p.lifecycle_status ?? 'draft', lifecycle_status_since: p.lifecycle_status_since ?? null,
         lifecycle_status_reason: p.lifecycle_status_reason ?? null,
-        billing_ready: zahlbar.ready, billing_block_reasons: zahlbar.reasons,
+        billing_ready: !!p.billing_ready, billing_block_reasons: p.billing_block_reasons ?? [],
     };
 }
 
@@ -175,10 +175,10 @@ function chapters(d: Dossier) {
     };
 }
 
-function dossierResponse(d: Dossier, correlationId: string, zahlbar: ChargeableVerdict) {
+function dossierResponse(d: Dossier, correlationId: string) {
     return {
         ok: true,
-        provider: providerView(d.provider, zahlbar),
+        provider: providerView(d.provider),
         confidential: d.confidential ? {
             entity_type: d.confidential.entity_type ?? null, registration_number: d.confidential.registration_number ?? null,
             registered_address: d.confidential.registered_address ?? null, operating_address: d.confidential.operating_address ?? null,
@@ -662,8 +662,7 @@ export async function handleProviderApplication(
             if (method === 'GET') {
                 const d = await loadDossier(providerKey);
                 if (!d) json(res, 404, { errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId });
-                else json(res, 200, dossierResponse(d, correlationId,
-                    chargeableFromSubscription(await getActiveSubscription(providerKey).catch(() => null), new Date())));
+                else json(res, 200, dossierResponse(d, correlationId));
                 return true;
             }
             if (method === 'PATCH') { await patchApplication(req, res, correlationId, caller, providerKey); return true; }

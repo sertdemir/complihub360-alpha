@@ -7,7 +7,9 @@ vi.mock('../supabase.js', () => ({ supabaseApi: {} }));
 import {
     annualPriceCents, computeLeadBand, applyMonthlyDiscount, categoryAllowanceCheck,
     leadFeeEnabled, subscriptionChargeForPeriod, quoteLeadFee, LEAD_FEE_POLICY_VERSION,
-    type PlanConfig, type BandRule, type PricingConfig, type Subscription, chargeableFromSubscription } from '../billing.js';
+    billingReadiness, resolveLedgerStatus,
+    type PlanConfig, type BandRule, type PricingConfig, type Subscription,
+} from '../billing.js';
 
 // ─── Pricing v2 (Spec B, ADR-0003) ───────────────────────────────────────────
 // Nagelt jede Regel fest: Jahr = 10 Monate; vier Baender nach Opportunity,
@@ -250,39 +252,41 @@ describe('quoteLeadFee — das Angebot, das die Buchung ausfuehrt', () => {
     });
 });
 
-// ─── Zahlungsbereitschaft (TKT-PROV-06) ──────────────────────────────────────
+// ─── Phase 4: Zahlungsbereitschaft und Ledger-Status ─────────────────────────
 
-describe('chargeableFromSubscription — buchbar heisst laufender bezahlter Tarif', () => {
-    const sub = (over: Record<string, any> = {}) => ({
-        id: 's1', providerKey: 'p', planCode: 'growth', planVersion: 1, cadence: 'monthly' as const,
-        status: 'active', currentPeriodStart: '2026-10-01', currentPeriodEnd: '2026-10-31',
-        startedAt: '2026-10-01T00:00:00Z', ...over,
-    }) as any;
-    const heute = new Date('2026-10-15T12:00:00Z');
-
-    it('laufender Tarif: abrechenbar, keine Gruende', () => {
-        expect(chargeableFromSubscription(sub(), heute)).toEqual({ ready: true, reasons: [] });
+describe('billingReadiness — die sechs Gruende aus §21.1 plus payment_failed', () => {
+    const alles = { hasDefaultPaymentMethod: true, billingInfoComplete: true, subscriptionStatus: 'active' as const, authorizationAccepted: true, overdueInvoices: 0, paused: false, lastPaymentFailed: false };
+    it('alles da: bereit, keine Gruende', () => {
+        expect(billingReadiness(alles)).toEqual({ ready: true, reasons: [] });
     });
-
-    it('kein Tarif: nicht abrechenbar, Grund in der Sprache von §21.1', () => {
-        expect(chargeableFromSubscription(null, heute)).toEqual({ ready: false, reasons: ['inactive_subscription'] });
+    it('jeder Grund fuer sich', () => {
+        expect(billingReadiness({ ...alles, hasDefaultPaymentMethod: false }).reasons).toEqual(['no_payment_method']);
+        expect(billingReadiness({ ...alles, billingInfoComplete: false }).reasons).toEqual(['incomplete_billing_info']);
+        expect(billingReadiness({ ...alles, subscriptionStatus: null }).reasons).toEqual(['inactive_subscription']);
+        expect(billingReadiness({ ...alles, subscriptionStatus: 'ended' }).reasons).toEqual(['inactive_subscription']);
+        expect(billingReadiness({ ...alles, authorizationAccepted: false }).reasons).toEqual(['withdrawn_authorization']);
+        expect(billingReadiness({ ...alles, overdueInvoices: 2 }).reasons).toEqual(['overdue_invoice']);
+        expect(billingReadiness({ ...alles, paused: true }).reasons).toEqual(['account_paused']);
+        expect(billingReadiness({ ...alles, lastPaymentFailed: true }).reasons).toEqual(['payment_failed']);
     });
-
-    it('Tarif nicht aktiv (past_due, cancelled, ended) zaehlt nicht', () => {
-        for (const status of ['past_due', 'cancelled', 'ended']) {
-            expect(chargeableFromSubscription(sub({ status }), heute).ready).toBe(false);
-        }
+    it('past_due ist kein inaktives Abo — die ueberfaellige Rechnung ist der Grund', () => {
+        expect(billingReadiness({ ...alles, subscriptionStatus: 'past_due', overdueInvoices: 1 }).reasons).toEqual(['overdue_invoice']);
     });
-
-    it('abgelaufene Periode zaehlt nicht — und der letzte Tag zaehlt noch', () => {
-        expect(chargeableFromSubscription(sub({ currentPeriodEnd: '2026-10-14' }), heute).ready).toBe(false);
-        expect(chargeableFromSubscription(sub({ currentPeriodEnd: '2026-10-15' }), heute).ready).toBe(true);
+    it('mehrere Gruende stehen alle da, in fester Reihenfolge', () => {
+        expect(billingReadiness({ ...alles, hasDefaultPaymentMethod: false, overdueInvoices: 1, lastPaymentFailed: true }))
+            .toEqual({ ready: false, reasons: ['no_payment_method', 'overdue_invoice', 'payment_failed'] });
     });
+});
 
-    it('eine offene Rechnung sperrt NICHT — die Kulanzfrist ist offen', () => {
-        // Gegenprobe gegen ein Zuviel: am 2026-10-01 wurde ausdruecklich
-        // entschieden, die Frist spaeter zu besprechen. Wer hier eine Zahl
-        // einbaut, faellt ueber diesen Test.
-        expect(chargeableFromSubscription(sub(), heute).ready).toBe(true);
+describe('resolveLedgerStatus — das juengste Ereignis zaehlt', () => {
+    it('ohne Ereignisse der Stand beim Schreiben, ohne den auch: captured (Altbestand)', () => {
+        expect(resolveLedgerStatus({ payment_status: 'pending' }, [])).toBe('pending');
+        expect(resolveLedgerStatus({}, [])).toBe('captured');
+    });
+    it('mit Ereignissen das juengste, unabhaengig von der Reihenfolge der Eingabe', () => {
+        expect(resolveLedgerStatus({ payment_status: 'pending' }, [
+            { status: 'refunded', created_at: '2026-10-01T10:05:00Z' },
+            { status: 'captured', created_at: '2026-10-01T10:00:00Z' },
+        ])).toBe('refunded');
     });
 });

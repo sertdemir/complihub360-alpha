@@ -64,6 +64,14 @@ message is stored once; the redacted variant is computed, not persisted.
   shared anonymized; your identity is revealed only after the provider
   confirms."
 
+> **Korrektur 2026-10-01 (ADR-0005, Spec B „Booking confirmation and data
+> handover"):** Die Offenlegung hängt nicht mehr an einer Bestätigung durch den
+> Anbieter, sondern an der **Buchung des Nutzers** plus erfolgreicher
+> Belastung der Anbieterkarte. Der Nutzer bestätigt vor der Buchung eine
+> versionierte Fassung (welche Felder fließen, Follow-up-Recht, 10 % Rabatt);
+> beide Seiten sehen einander erst nach der Belastung. Der Engagement-Request-
+> Pfad mit Action A gilt nur noch für den Altbestand.
+
 ## 5. Events
 
 - `dossier_unlocked` — logged at confirm, payload: engagementId (identity

@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
+import { LEAD_FEE_POLICY_VERSION } from '../billing.js';
 import { createHash, createHmac, randomUUID, generateKeyPairSync, sign as cryptoSign } from 'node:crypto';
 import { createServer as createHttpServer } from 'node:http';
 
@@ -94,6 +95,37 @@ vi.mock('../supabase.js', () => ({
 // Storage (Phase 2 Onboarding): kein Netz im Test. `uploaded` sagt, welche
 // Objektpfade "im Bucket liegen" — objectInfo() antwortet danach.
 const { uploaded } = vi.hoisted(() => ({ uploaded: new Set<string>() }));
+// Stripe (Phase 4): kein Netz im Test. Alles, was api.stripe.com erreichen
+// koennte, geht durch stripe.ts — und das hier ersetzt es als Ganzes. Nicht
+// globalThis.fetch: darueber spricht die Suite mit dem eigenen Server.
+const { stripeMock } = vi.hoisted(() => ({
+    stripeMock: {
+        configured: true,
+        getCustomerBilling: vi.fn(),
+        createPaymentIntent: vi.fn(),
+        refundPaymentIntent: vi.fn(),
+        stripeRequest: vi.fn(),
+    },
+}));
+vi.mock('../stripe.js', async (importOriginal) => {
+    const real = await importOriginal<typeof import('../stripe.js')>();
+    return {
+        ...real,
+        isStripeConfigured: () => stripeMock.configured,
+        getCustomerBilling: (...a: any[]) => stripeMock.getCustomerBilling(...a),
+        createPaymentIntent: (...a: any[]) => stripeMock.createPaymentIntent(...a),
+        refundPaymentIntent: (...a: any[]) => stripeMock.refundPaymentIntent(...a),
+        stripeRequest: (...a: any[]) => stripeMock.stripeRequest(...a),
+        ensureStripeCustomer: async (key: string) => `cus_${key}`,
+    };
+});
+function resetStripe() {
+    stripeMock.configured = true;
+    stripeMock.getCustomerBilling.mockReset().mockResolvedValue({ defaultPaymentMethodId: 'pm_test_1', paymentMethodLabel: 'visa ····4242', email: 'geheim@testkanzlei.example', billingInfoComplete: true, delinquent: false });
+    stripeMock.createPaymentIntent.mockReset().mockResolvedValue({ ok: true, paymentIntentId: 'pi_test_1', status: 'succeeded' });
+    stripeMock.refundPaymentIntent.mockReset().mockResolvedValue({ refundId: 're_test_1' });
+    stripeMock.stripeRequest.mockReset().mockImplementation(async (_m: string, path: string) => { throw new Error(`unmocked stripe call: ${path}`); });
+}
 vi.mock('../storage.js', async (importOriginal) => {
     const real = await importOriginal<typeof import('../storage.js')>();
     return {
@@ -193,9 +225,8 @@ function seedProvider(over: Record<string, any> = {}) {
     // die Selbstauskunft, die auf dem Draht nichts mehr entscheidet.
     const areas: string[] = over.areas ?? ['tax-vat'];
     delete (row as any).areas;
-    // `bookable` wird nur noch entgegengenommen und verworfen: Buchbarkeit
-    // entsteht seit TKT-PROV-06 aus einem laufenden Tarif (makeBookable), nicht
-    // aus einer View-Spalte. `providers.billing_ready` hatte nie einen Schreiber.
+    // Zahlungsbereit (Spec §21.1) — entscheidet die Buchung, nie das Matching.
+    const bookable: boolean = over.bookable ?? true;
     delete (row as any).bookable;
     // Nachweise fuer die Verifikationstiefe (Phase 3): 'independent' | 'reviewed' | 'none'.
     const depth: 'independent' | 'reviewed' | 'none' = over.depth ?? 'none';
@@ -235,23 +266,13 @@ function seedProvider(over: Record<string, any> = {}) {
                     area_code: area,
                     country_code: land,
                     provider_availability: row.availability,
+                    bookable_chargeable: bookable,
                     provider_lifecycle_status: 'active',
                 });
             }
         }
     }
     return row;
-}
-
-/**
- * Macht einen Anbieter buchbar: ein laufender Tarif, Periode relativ zu heute,
- * damit kein Test an einem Kalendertag kippt. Bewusst EXPLIZIT und nicht in
- * seedProvider — ein Abo in der gemeinsamen Fixture aendert Kontingent und Gate
- * fuer jeden Test, der nur einen Anbieter braucht.
- */
-function makeBookable(providerKey: string) {
-    const inEinemMonat = new Date(Date.now() + 30 * 86_400_000).toISOString().slice(0, 10);
-    return seedSubscription(providerKey, 'growth', { current_period_end: inEinemMonat });
 }
 
 beforeAll(async () => {
@@ -281,7 +302,7 @@ beforeAll(async () => {
     throw new Error('test server did not come up');
 });
 
-beforeEach(() => { resetDb(); uploaded.clear(); });
+beforeEach(() => { resetDb(); uploaded.clear(); resetStripe(); });
 
 describe('auth gate', () => {
     it('lets /health through without credentials', async () => {
@@ -411,13 +432,11 @@ describe('POST /api/v1/search', () => {
         expect(r.body.providers).toEqual([]);
     });
 
-    // §14: die Abrechnung darf die Sichtbarkeit nicht steuern. Seit TKT-PROV-06
-    // haengt die Buchbarkeit am laufenden Tarif — wer DEN ins Matching zieht,
-    // faellt hier. (Vorher setzte dieser Test eine View-Spalte, die es nicht
-    // mehr gibt; der Waechter prueft jetzt den echten Mechanismus.)
-    it('still matches a provider that cannot be charged (§14)', async () => {
+    // §14: die Abrechnung darf die Sichtbarkeit nicht steuern. Die View meldet
+    // `bookable_chargeable` nur — wer daraus einen Filter macht, faellt hier.
+    it('still matches a provider that is not billing-ready (§14)', async () => {
         seedProvider();
-        db.provider_subscriptions = [];
+        (db.matchable_provider_services ?? []).forEach((r: any) => { r.bookable_chargeable = false; });
         const r = await api('/api/v1/search', {
             method: 'POST',
             body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], domains: ['tax-vat'] } }),
@@ -524,55 +543,343 @@ describe('POST /api/v1/search — Referenz-ID', () => {
     });
 });
 
-describe('POST /api/v1/scheduling (booking = paid lead)', () => {
+// ─── Phase 4: Buchung → Bestaetigung → Belastung → Offenlegung ───────────────
+
+function seedAcknowledgement() {
+    (db.booking_acknowledgements ??= []).push(
+        { version: 'booking-ack-v1', language: 'en', body: 'With this booking … 10 % …', shared_fields: ['email', 'company_name', 'message'], effective_from: '2026-10-01' },
+        { version: 'booking-ack-v1', language: 'de', body: 'Mit dieser Buchung … 10 % …', shared_fields: ['email', 'company_name', 'message'], effective_from: '2026-10-01' },
+    );
+}
+function seedUserDiscountPolicy() {
+    (db.user_discount_policy ??= []).push({ version: 1, pct: 10, recurring_treatment: 'undecided', effective_from: '2026-10-01' });
+}
+function seedSession(over: Record<string, any> = {}) {
+    const row = { id: randomUUID(), user_id: USER_ID, country: 'DE', markets: ['DE'], categories: ['tax-vat'], answers: {}, status: 'active', ...over };
+    (db.sessions ??= []).push(row);
+    return row;
+}
+const MEMBER_ID = randomUUID();
+function seedMember(providerKey = 'test-kanzlei', userId = MEMBER_ID) {
+    (db.provider_members ??= []).push({ provider_key: providerKey, user_id: userId, role: 'owner' });
+}
+/** Alles, was eine Buchung mit Belastung braucht: Anbieter mit Karte, Preise, Text, Policy, Sitzung. */
+function seedBookable(providerOver: Record<string, any> = {}, plan: string | null = 'growth') {
+    const p = seedProvider({ stripe_customer_id: 'cus_test', ...providerOver });
+    seedPricing();
+    if (plan) seedSubscription(p.provider_key, plan, { current_period_start: '2020-01-01', started_at: '2020-01-01T00:00:00Z' });
+    seedAcknowledgement();
+    seedUserDiscountPolicy();
+    seedMember(p.provider_key);
+    return { provider: p, session: seedSession() };
+}
+const inAWeek = () => new Date(Date.now() + 7 * 86_400_000).toISOString();
+const book = (body: Record<string, unknown>) => api('/api/v1/scheduling', { method: 'POST', auth: 'jwt', body: JSON.stringify(body) });
+const standardBody = (session: { id: string }, over: Record<string, unknown> = {}) => ({
+    public_ref: refOf('test-kanzlei'), slot_start: inAWeek(), message: 'Erstgespräch', acknowledgement_version: 'booking-ack-v1', session_id: session.id, ...over,
+});
+
+describe('POST /api/v1/scheduling — Buchung ist der bezahlte Lead (Phase 4, ADR-0005)', () => {
     it('requires a logged-in user — the server api key is not enough', async () => {
         const r = await api('/api/v1/scheduling', { method: 'POST', body: '{}', auth: 'key' });
         expect(r.status).toBe(401);
     });
 
-    it('creates the booking, charges the lead and reveals the identity', async () => {
-        seedProvider();
-        makeBookable('test-kanzlei');
-        const slot = new Date(Date.now() + 86_400_000).toISOString();
-        const r = await api('/api/v1/scheduling', {
-            method: 'POST', auth: 'jwt',
-            body: JSON.stringify({ public_ref: refOf('test-kanzlei'), slot_start: slot, message: 'Erstgespräch' }),
-        });
+    it('Happy Path: Ledger → Stripe → Buchung → Offenlegung, Zaehler, Events, Anbieter informiert', async () => {
+        const { session } = seedBookable();
+        (db.provider_discount_counter ??= []).push({ provider_key: 'test-kanzlei', cycle_start: '2020-01-01', used: 1 });
+        const r = await book(standardBody(session));
         expect(r.status).toBe(201);
-        expect(r.body.booking.status).toBe('confirmed');
-        expect(r.body.booking.public_ref).toBe(refOf('test-kanzlei'));
-        expect(r.body.booking.provider_key).toBeUndefined();
-        // Stage-3 reveal happens exactly here.
+        expect(r.body.booking).toMatchObject({ status: 'confirmed', public_ref: refOf('test-kanzlei'), acknowledgement_version: 'booking-ack-v1', shared_fields: ['email', 'company_name', 'message'], user_discount: { pct: 10, policy_version: 1 } });
+        // Offenlegung genau hier, nach der Belastung.
         expect(r.body.provider_identity.name).toBe('Testkanzlei Schmidt GmbH');
+
+        // Ledger VOR der Buchung, pending → captured als Ereignis, Idempotency-Key = Ledger-ID.
+        const ledger = db.provider_lead_ledger[0];
+        expect(ledger).toMatchObject({ kind: 'charge', provider_key: 'test-kanzlei', user_id: USER_ID, booking_id: null, area_code: 'tax-vat', countries: ['DE'], computed_band: 1, standard_fee_cents: 9900, plan_code_at_charge: 'growth', discount_pct: 10, discount_sequence: 2, final_fee_cents: 8910, currency: 'USD', payment_status: 'pending', policy_version: LEAD_FEE_POLICY_VERSION });
+        expect(db.provider_lead_ledger_payment_events).toEqual([expect.objectContaining({ ledger_id: ledger.id, status: 'captured', stripe_ref: 'pi_test_1' })]);
+        expect(stripeMock.createPaymentIntent).toHaveBeenCalledTimes(1);
+        expect(stripeMock.createPaymentIntent.mock.calls[0][0]).toMatchObject({ customerId: 'cus_test', paymentMethodId: 'pm_test_1', amountCents: 8910, currency: 'USD', idempotencyKey: ledger.id, metadata: expect.objectContaining({ ledger_id: ledger.id }) });
+
+        // Die Buchung traegt alles, was die Checkliste beweisen will.
         const row = db.scheduling[0];
-        expect(row.user_id).toBe(USER_ID);
-        expect(row.lead_charged).toBe(true);
+        expect(row).toMatchObject({ user_id: USER_ID, lead_charged: true, identity_revealed: true, lead_ledger_id: ledger.id, acknowledgement_version: 'booking-ack-v1', shared_fields: ['email', 'company_name', 'message'], user_discount_pct: 10, user_discount_policy_version: 1 });
+        expect(row.sharing_confirmed_at).toBeTruthy();
+        expect(row.price_snapshot).toMatchObject({ included: [], terms_version: null });
+        expect(row.service_id).toBeTruthy();
+        // Zaehler: zweiter Rabatt im Zyklus.
+        expect(db.provider_discount_counter[0]).toMatchObject({ provider_key: 'test-kanzlei', cycle_start: '2020-01-01', used: 2 });
         const events = db.event_log.map((e) => e.type);
-        expect(events).toContain('scheduling_confirmed');
-        expect(events).toContain('provider_lead_charged');
+        expect(events).toEqual(expect.arrayContaining(['scheduling_confirmed', 'provider_lead_charged', 'lead.revealed']));
+        const revealed = db.event_log.find((e) => e.type === 'lead.revealed');
+        expect(revealed.payload).toMatchObject({ bookingId: row.id, sharedFields: ['email', 'company_name', 'message'], acknowledgementVersion: 'booking-ack-v1' });
+        await new Promise((r) => setTimeout(r, 20));
+        expect(db.notifications).toEqual([expect.objectContaining({ user_id: MEMBER_ID, type: 'booking_created' })]);
+        expect(db.event_log.some((e) => e.type === 'email_outbox' && e.payload.kind === 'booking_provider')).toBe(true);
+    });
+
+    it('Leak-Guard: Band, Gebuehr, Ledger und Stripe stehen nicht auf dem Nutzer-Draht', async () => {
+        const { session } = seedBookable();
+        const r = await book(standardBody(session));
+        expect(r.status).toBe(201);
+        const text = JSON.stringify(r.body);
+        for (const rx of [/fee/i, /band/i, /ledger/i, /stripe/i, /discount_sequence/, /pi_test/, /cus_test/, /provider_key/]) expect(text).not.toMatch(rx);
+        expect(r.body.booking.user_discount).toEqual({ pct: 10, policy_version: 1 });
+    });
+
+    it('Rabattfolge: der vierte Growth-Lead zahlt voll', async () => {
+        const { session } = seedBookable();
+        (db.provider_discount_counter ??= []).push({ provider_key: 'test-kanzlei', cycle_start: '2020-01-01', used: 3 });
+        const r = await book(standardBody(session));
+        expect(r.status).toBe(201);
+        expect(db.provider_lead_ledger[0]).toMatchObject({ discount_pct: 0, discount_sequence: null, final_fee_cents: 9900 });
+        expect(db.provider_discount_counter[0].used).toBe(3);
+    });
+
+    it('Legal Support: keine Gebuehr, kein Stripe-Aufruf, Ledger n/a — die Offenlegung kommt trotzdem', async () => {
+        seedBookable({ areas: ['legal-advisory'] });
+        const session = seedSession({ categories: ['legal-advisory'] });
+        const r = await book(standardBody(session));
+        expect(r.status).toBe(201);
+        expect(r.body.provider_identity.name).toBe('Testkanzlei Schmidt GmbH');
+        expect(stripeMock.createPaymentIntent).not.toHaveBeenCalled();
+        expect(db.provider_lead_ledger[0]).toMatchObject({ area_code: 'legal-advisory', standard_fee_cents: 0, final_fee_cents: 0, payment_status: 'n/a' });
+        expect(db.provider_lead_ledger_payment_events ?? []).toHaveLength(0);
+        expect(db.scheduling[0]).toMatchObject({ lead_charged: false, identity_revealed: true });
+    });
+
+    it('Karte abgelehnt: keine Buchung, neutraler Satz, Anbieter gesperrt und informiert', async () => {
+        const { session } = seedBookable();
+        stripeMock.createPaymentIntent.mockResolvedValue({ ok: false, kind: 'card', reason: 'card_declined', stripeRef: 'pi_fail', detail: 'generic_decline' });
+        const r = await book(standardBody(session));
+        expect(r.status).toBe(409);
+        expect(r.body).toMatchObject({ errorCode: 'BOOKING_NOT_COMPLETED', reason: 'provider_billing' });
+        expect(JSON.stringify(r.body)).not.toMatch(/declin|card|stripe|Testkanzlei/i);
+        expect(db.scheduling ?? []).toHaveLength(0);
+        expect(db.provider_discount_counter ?? []).toHaveLength(0);
+        // Die Spur bleibt: Ledger pending, Ereignis failed.
+        expect(db.provider_lead_ledger).toHaveLength(1);
+        expect(db.provider_lead_ledger_payment_events).toEqual([expect.objectContaining({ status: 'failed', stripe_ref: 'pi_fail' })]);
+        const p = db.providers[0];
+        expect(p.billing_ready).toBe(false);
+        expect(p.billing_block_reasons).toEqual(['payment_failed']);
+        expect(p.last_payment_failure).toMatchObject({ payment_method_id: 'pm_test_1', reason: 'card_declined' });
+        expect(db.event_log.map((e) => e.type)).toContain('lead_payment_failed');
+        expect(db.notifications).toEqual([expect.objectContaining({ user_id: MEMBER_ID, type: 'payment_failed' })]);
+        expect(db.event_log.some((e) => e.type === 'email_outbox' && e.payload.kind === 'payment_failed_provider')).toBe(true);
+    });
+
+    it('Stripe nicht erreichbar: 502, keine Buchung, billing_ready unberuehrt', async () => {
+        const { session } = seedBookable();
+        stripeMock.createPaymentIntent.mockResolvedValue({ ok: false, kind: 'stripe', reason: 'stripe_error', stripeRef: null, detail: 'ECONNRESET' });
+        const r = await book(standardBody(session));
+        expect(r.status).toBe(502);
+        expect(r.body.errorCode).toBe('BILLING_ERROR');
+        expect(db.scheduling ?? []).toHaveLength(0);
+        expect(db.providers[0].billing_ready).toBeUndefined();
+        expect(db.event_log.map((e) => e.type)).toContain('lead_payment_error');
+        expect(db.notifications ?? []).toHaveLength(0);
+    });
+
+    it('Fassung fehlt oder veraltet: 400 / 409 mit der gueltigen Version, kein Ledger', async () => {
+        const { session } = seedBookable();
+        const r1 = await book(standardBody(session, { acknowledgement_version: undefined }));
+        expect(r1.status).toBe(400);
+        const r2 = await book(standardBody(session, { acknowledgement_version: 'booking-ack-v0' }));
+        expect(r2.status).toBe(409);
+        expect(r2.body).toMatchObject({ errorCode: 'ACKNOWLEDGEMENT_OUTDATED', current_version: 'booking-ack-v1' });
+        expect(db.provider_lead_ledger ?? []).toHaveLength(0);
+        expect(stripeMock.createPaymentIntent).not.toHaveBeenCalled();
+    });
+
+    it('Slot schon vergeben: 409 vor jeder Belastung', async () => {
+        const { session } = seedBookable();
+        const slot = inAWeek();
+        (db.scheduling ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', user_id: randomUUID(), slot_start: slot, status: 'confirmed' });
+        const r = await book(standardBody(session, { slot_start: slot }));
+        expect(r.status).toBe(409);
+        expect(r.body.errorCode).toBe('SLOT_TAKEN');
+        expect(stripeMock.createPaymentIntent).not.toHaveBeenCalled();
+        expect(db.provider_lead_ledger ?? []).toHaveLength(0);
+    });
+
+    it('kein Zahlungsmittel hinterlegt: 409 BILLING_NOT_READY, kein Ledger, Grund am Anbieter', async () => {
+        const { session } = seedBookable();
+        stripeMock.getCustomerBilling.mockResolvedValue({ defaultPaymentMethodId: null, paymentMethodLabel: null, email: null, billingInfoComplete: false, delinquent: false });
+        const r = await book(standardBody(session));
+        expect(r.status).toBe(409);
+        expect(r.body.errorCode).toBe('BILLING_NOT_READY');
+        expect(db.provider_lead_ledger ?? []).toHaveLength(0);
+        expect(db.providers[0].billing_block_reasons).toEqual(expect.arrayContaining(['no_payment_method']));
+    });
+
+    it('fremde Sitzung → 404; ohne Sitzung und ohne Bereich → 400 OPPORTUNITY_REQUIRED', async () => {
+        seedBookable({ areas: ['tax-vat', 'data-privacy'] });
+        const fremd = seedSession({ user_id: randomUUID() });
+        const r1 = await book(standardBody(fremd));
+        expect(r1.status).toBe(404);
+        const r2 = await book(standardBody({ id: '' }, { session_id: undefined }));
+        expect(r2.status).toBe(400);
+        expect(r2.body.errorCode).toBe('OPPORTUNITY_REQUIRED');
+        expect(db.provider_lead_ledger ?? []).toHaveLength(0);
+    });
+
+    it('Kompensation: scheitert die Buchung nach der Belastung, wird erstattet und protokolliert', async () => {
+        const { session } = seedBookable();
+        const { supabaseApi } = await import('../supabase.js');
+        const realInsert = supabaseApi.insert;
+        const spy = vi.spyOn(supabaseApi, 'insert').mockImplementation(async (table: string, data: any) => {
+            if (table === 'scheduling') throw new Error('duplicate key value violates unique constraint "scheduling_confirmed_slot_uq" (23505)');
+            return realInsert(table, data);
+        });
+        try {
+            const r = await book(standardBody(session));
+            expect(r.status).toBe(409);
+            expect(r.body.errorCode).toBe('SLOT_TAKEN');
+        } finally { spy.mockRestore(); }
+        expect(stripeMock.refundPaymentIntent).toHaveBeenCalledWith('pi_test_1', expect.stringMatching(/:refund$/));
+        expect(db.provider_lead_ledger_payment_events.map((e: any) => e.status)).toEqual(['captured', 'refunded']);
+        expect(db.event_log.map((e) => e.type)).toContain('lead_charge_reversed');
+        expect(db.scheduling ?? []).toHaveLength(0);
+    });
+
+    it('Neutralitaet: Essential und Global bekommen fuer dieselbe Opportunity dasselbe Band und dieselbe Standardgebuehr', async () => {
+        seedPricing(); seedAcknowledgement(); seedUserDiscountPolicy();
+        const a = seedProvider({ provider_key: 'ess-kanzlei', name: 'Essential Kanzlei', stripe_customer_id: 'cus_a' });
+        const b = seedProvider({ provider_key: 'glo-kanzlei', name: 'Global Kanzlei', stripe_customer_id: 'cus_b' });
+        seedSubscription(a.provider_key, 'essential', { current_period_start: '2020-01-01' });
+        seedSubscription(b.provider_key, 'global', { current_period_start: '2020-01-01' });
+        const session = seedSession();
+        const r1 = await book({ public_ref: refOf('ess-kanzlei'), slot_start: inAWeek(), acknowledgement_version: 'booking-ack-v1', session_id: session.id });
+        const r2 = await book({ public_ref: refOf('glo-kanzlei'), slot_start: inAWeek(), acknowledgement_version: 'booking-ack-v1', session_id: session.id });
+        expect([r1.status, r2.status]).toEqual([201, 201]);
+        const [l1, l2] = db.provider_lead_ledger;
+        expect(l1.computed_band).toBe(l2.computed_band);
+        expect(l1.standard_fee_cents).toBe(l2.standard_fee_cents);
+        expect(l1.final_fee_cents).toBe(9900);           // Essential: kein Rabatt
+        expect(l2.final_fee_cents).toBe(8415);           // Global: 15 % auf den ersten Lead
     });
 
     it('404s for a provider that is not matchable — partner_status entscheidet nichts', async () => {
-        // inactive: das Fixture legt keine View-Zeile an. Ein Konto ausserhalb
-        // der UND-Kette ist nicht buchbar, egal was partner_status sagt.
-        seedProvider({ partner_status: 'inactive' });
-        const r = await api('/api/v1/scheduling', {
-            method: 'POST', auth: 'jwt',
-            body: JSON.stringify({ public_ref: refOf('test-kanzlei'), slot_start: new Date(Date.now() + 86_400_000).toISOString() }),
-        });
+        seedBookable({ partner_status: 'inactive' });
+        const r = await book({ public_ref: refOf('test-kanzlei'), slot_start: inAWeek(), acknowledgement_version: 'booking-ack-v1' });
         expect(r.status).toBe(404);
     });
 
     it('409 mit Grund, wenn der Anbieter matchbar, aber nicht zahlungsbereit ist (§21.1)', async () => {
-        // Kein Tarif, also nicht abrechenbar — matchbar bleibt er trotzdem.
-        seedProvider();
-        const r = await api('/api/v1/scheduling', {
-            method: 'POST', auth: 'jwt',
-            body: JSON.stringify({ public_ref: refOf('test-kanzlei'), slot_start: new Date(Date.now() + 86_400_000).toISOString() }),
-        });
+        seedBookable({ bookable: false });
+        const r = await book({ public_ref: refOf('test-kanzlei'), slot_start: inAWeek(), acknowledgement_version: 'booking-ack-v1' });
         expect(r.status).toBe(409);
         expect(r.body.errorCode).toBe('BILLING_NOT_READY');
         expect(db.scheduling ?? []).toHaveLength(0);
+        expect(db.provider_lead_ledger ?? []).toHaveLength(0);
+    });
+});
+
+describe('GET /api/v1/acknowledgement — der Text vor der Buchung', () => {
+    it('ist oeffentlich, kennt Sprache und Rabatt', async () => {
+        seedAcknowledgement(); seedUserDiscountPolicy();
+        const r = await api('/api/v1/acknowledgement?lang=de', { auth: 'none' });
+        expect(r.status).toBe(200);
+        expect(r.body).toMatchObject({ version: 'booking-ack-v1', language: 'de', shared_fields: ['email', 'company_name', 'message'], user_discount: { pct: 10, policy_version: 1, recurring_treatment: 'undecided' } });
+        expect(r.body.body).toContain('10 %');
+    });
+    it('faellt auf Englisch zurueck', async () => {
+        seedAcknowledgement();
+        const r = await api('/api/v1/acknowledgement?lang=tr', { auth: 'none' });
+        expect(r.body.language).toBe('en');
+        expect(r.body.user_discount).toBeNull();
+    });
+});
+
+describe('Anbieterseite: Lead-Karte, Selbstauskunft, Zahlungsbereitschaft (Phase 4)', () => {
+    async function gebucht() {
+        const { session } = seedBookable();
+        const r = await book(standardBody(session));
+        expect(r.status).toBe(201);
+        return r.body.booking.id as string;
+    }
+
+    it('GET /provider/:key/bookings traegt Gebuehr, Rabatt, 10 % und die Selbstauskunft', async () => {
+        const bookingId = await gebucht();
+        (db.users ??= []).push({ id: USER_ID, email: 'test@complihub.test' });
+        const r = await api('/api/v1/provider/test-kanzlei/bookings', { auth: 'key' });
+        expect(r.status).toBe(200);
+        const b = r.body.bookings.find((x: any) => x.id === bookingId);
+        expect(b.lead).toEqual({ band: 1, standard_fee_cents: 9900, discount_pct: 10, discount_sequence: 1, final_fee_cents: 8910, currency: 'USD', payment_status: 'captured', fee_enabled: true });
+        expect(b.user_discount_pct).toBe(10);
+        expect(b.proposal).toBeNull();
+        expect(b.acknowledgement_version).toBe('booking-ack-v1');
+        expect(b.price_snapshot).toBeTruthy();
+    });
+
+    it('PATCH …/proposal: Upsert, Validierung, nur die eigene Buchung', async () => {
+        const bookingId = await gebucht();
+        const r0 = await api(`/api/v1/provider/test-kanzlei/bookings/${bookingId}/proposal`, { method: 'PATCH', auth: 'key', body: JSON.stringify({ proposal_issued: false, discount_shown: true }) });
+        expect(r0.status).toBe(400);
+        const r1 = await api(`/api/v1/provider/test-kanzlei/bookings/${bookingId}/proposal`, { method: 'PATCH', auth: 'key', body: JSON.stringify({ proposal_issued: true, discount_shown: true }) });
+        expect(r1.status).toBe(200);
+        expect(r1.body.proposal).toMatchObject({ proposal_issued: true, discount_shown: true });
+        const r2 = await api(`/api/v1/provider/test-kanzlei/bookings/${bookingId}/proposal`, { method: 'PATCH', auth: 'key', body: JSON.stringify({ proposal_issued: true, discount_shown: false }) });
+        expect(r2.status).toBe(200);
+        expect(db.lead_proposal_reports).toHaveLength(1);
+        expect(db.lead_proposal_reports[0]).toMatchObject({ booking_id: bookingId, discount_shown: false, discount_pct: 10, policy_version: 1 });
+        expect(db.event_log.filter((e) => e.type === 'lead_proposal_reported')).toHaveLength(2);
+        const r3 = await api(`/api/v1/provider/test-kanzlei/bookings/${randomUUID()}/proposal`, { method: 'PATCH', auth: 'key', body: JSON.stringify({ proposal_issued: true, discount_shown: true }) });
+        expect(r3.status).toBe(404);
+        const rb = await api('/api/v1/provider/test-kanzlei/bookings', { auth: 'key' });
+        expect(rb.body.bookings[0].proposal).toMatchObject({ proposal_issued: true, discount_shown: false });
+    });
+
+    it('die Selbstauskunft ist Anbieter-eigen: ein fremder Login bekommt 404 vom Guard', async () => {
+        const bookingId = await gebucht();
+        const r = await api(`/api/v1/provider/test-kanzlei/bookings/${bookingId}/proposal`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ proposal_issued: true, discount_shown: true }) });
+        expect(r.status).toBe(404);
+    });
+
+    it('POST /provider/:key/billing/sync setzt billing_ready aus Karte, Abo und Mandat', async () => {
+        seedProvider({ stripe_customer_id: 'cus_test', billing_ready: false, billing_block_reasons: ['no_payment_method'] });
+        seedPricing();
+        seedSubscription('test-kanzlei', 'growth');
+        (db.provider_agreement_acceptance ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', agreement_type: 'billing_authorization', version: '2026-09', superseded_at: null });
+        const r = await api('/api/v1/provider/test-kanzlei/billing/sync', { method: 'POST', auth: 'key', body: '{}' });
+        expect(r.status).toBe(200);
+        expect(r.body.readiness).toMatchObject({ ready: true, reasons: [], payment_method: 'visa ····4242', changed: true });
+        expect(db.providers[0]).toMatchObject({ billing_ready: true, billing_block_reasons: [] });
+        expect(db.providers[0].billing_synced_at).toBeTruthy();
+        expect(db.event_log.map((e) => e.type)).toContain('billing_readiness_changed');
+    });
+
+    it('payment_failed verschwindet nur mit einem anderen Zahlungsmittel', async () => {
+        seedProvider({ stripe_customer_id: 'cus_test', billing_ready: false, billing_block_reasons: ['payment_failed'], last_payment_failure: { at: '2026-10-01T10:00:00Z', payment_method_id: 'pm_test_1', reason: 'card_declined' } });
+        seedPricing(); seedSubscription('test-kanzlei', 'growth');
+        (db.provider_agreement_acceptance ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', agreement_type: 'billing_authorization', version: '2026-09', superseded_at: null });
+        const r1 = await api('/api/v1/provider/test-kanzlei/billing/sync', { method: 'POST', auth: 'key', body: '{}' });
+        expect(r1.body.readiness).toMatchObject({ ready: false, reasons: ['payment_failed'] });
+        stripeMock.getCustomerBilling.mockResolvedValue({ defaultPaymentMethodId: 'pm_test_2', paymentMethodLabel: 'mastercard ····4444', email: null, billingInfoComplete: true, delinquent: false });
+        const r2 = await api('/api/v1/provider/test-kanzlei/billing/sync', { method: 'POST', auth: 'key', body: '{}' });
+        expect(r2.body.readiness).toMatchObject({ ready: true, reasons: [] });
+    });
+
+    it('ohne Stripe-Schluessel antwortet der Sync 503, und der Watcher ueberspringt ihn', async () => {
+        seedProvider({ stripe_customer_id: 'cus_test' });
+        stripeMock.configured = false;
+        const r = await api('/api/v1/provider/test-kanzlei/billing/sync', { method: 'POST', auth: 'key', body: '{}' });
+        expect(r.status).toBe(503);
+        const { runBillingReadinessTick } = await import('../leadCharge.js');
+        expect(await runBillingReadinessTick(false)).toEqual({ synced: 0, changed: 0, errors: 0 });
+    });
+
+    it('der Watcher prueft die aeltesten zuerst und zaehlt Aenderungen', async () => {
+        seedProvider({ stripe_customer_id: 'cus_test', lifecycle_status: 'active', billing_ready: false, billing_block_reasons: [] });
+        seedPricing(); seedSubscription('test-kanzlei', 'growth');
+        (db.provider_agreement_acceptance ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', agreement_type: 'billing_authorization', version: '2026-09', superseded_at: null });
+        const { runBillingReadinessTick } = await import('../leadCharge.js');
+        expect(await runBillingReadinessTick(true)).toEqual({ synced: 1, changed: 0, errors: 0 });
+        expect(db.providers[0].billing_ready).toBe(false);                 // Shadow schreibt nur Marker
+        expect(db.event_log.map((e) => e.type)).toContain('billing_readiness_sync_shadow');
+        expect(await runBillingReadinessTick(false)).toEqual({ synced: 1, changed: 1, errors: 0 });
+        expect(db.providers[0].billing_ready).toBe(true);
     });
 });
 
@@ -970,8 +1277,10 @@ describe('GET /api/v1/provider/:key/billing/preview — Pricing v2', () => {
         seedSubscription('test-kanzlei', 'growth', { current_period_start: '2020-01-01', started_at: '2020-01-01T00:00:00Z' });
         (db.provider_discount_counter ??= []).push({ provider_key: 'test-kanzlei', cycle_start: '2020-01-01', used: 2 });
         (db.provider_lead_ledger ??= []).push(
-            { id: randomUUID(), kind: 'charge', provider_key: 'test-kanzlei', standard_fee_cents: 9900, final_fee_cents: 8910, created_at: '2026-01-01T00:00:00Z' },
-            { id: randomUUID(), kind: 'charge', provider_key: 'test-kanzlei', standard_fee_cents: 14900, final_fee_cents: 13410, created_at: '2026-01-02T00:00:00Z' },
+            { id: randomUUID(), kind: 'charge', provider_key: 'test-kanzlei', standard_fee_cents: 9900, final_fee_cents: 8910, payment_status: 'captured', created_at: '2026-01-01T00:00:00Z' },
+            { id: randomUUID(), kind: 'charge', provider_key: 'test-kanzlei', standard_fee_cents: 14900, final_fee_cents: 13410, payment_status: 'captured', created_at: '2026-01-02T00:00:00Z' },
+            // Eine gescheiterte Belastung steht im Ledger, zaehlt aber nicht (Phase 4).
+            { id: randomUUID(), kind: 'charge', provider_key: 'test-kanzlei', standard_fee_cents: 14900, final_fee_cents: 13410, payment_status: 'pending', created_at: '2026-01-02T01:00:00Z' },
             { id: randomUUID(), kind: 'credit', provider_key: 'test-kanzlei', standard_fee_cents: 0, final_fee_cents: 0, created_at: '2026-01-03T00:00:00Z' },
         );
         (db.provider_credits ??= []).push({ provider_key: 'test-kanzlei', amount_cents: 2673, currency: 'USD', reason: 'user_no_rebook_30pct' });
@@ -981,6 +1290,7 @@ describe('GET /api/v1/provider/:key/billing/preview — Pricing v2', () => {
         expect(r.body.subscription).toMatchObject({ plan_code: 'growth', label: 'Growth', cadence: 'monthly', category_allowance: 5 });
         expect(r.body.discount).toMatchObject({ pct: 10, count: 3, used: 2, remaining: 1 });
         expect(r.body.leads).toEqual({ count: 2, standard_cents: 24800, discount_cents: 2480, final_cents: 22320 });
+        expect(r.body.readiness).toEqual({ ready: false, reasons: [], synced_at: null });
         expect(r.body.credit_balance_cents).toBe(2673);
         // Abo-Zeile des laufenden Monats + Leads des Zyklus
         expect(r.body.lines).toHaveLength(1);
@@ -2056,7 +2366,9 @@ describe('Review-Arbeitsplatz (6A/7A/8A): nur Admin, Zell-Aktionen, Gate', () =>
         expect(zu.status).toBe(422);
         expect(zu.body.errorCode).toBe('GATE_NOT_MET');
         expect(zu.body.gate.missing).toEqual(expect.arrayContaining(['evidence.incorporation', 'evidence.insurance', 'evidence.representative_identity', 'coverage.none_approved']));
-        // Billing taucht hier nicht auf — auch nicht, solange noch etwas fehlt.
+        // Billing taucht hier nicht auf — §21.1 sperrt die gebuehrenpflichtige
+        // Buchung, nicht die Aktivierung (TKT-PROV-05). Auch nicht, solange
+        // noch etwas anderes fehlt.
         expect(zu.body.gate.missing.filter((m: string) => m.startsWith('billing.'))).toEqual([]);
         expect(db.providers[0].lifecycle_status).toBe('under_verification');
 
@@ -2073,14 +2385,13 @@ describe('Review-Arbeitsplatz (6A/7A/8A): nur Admin, Zell-Aktionen, Gate', () =>
         const cell = db.provider_service_coverage.find((c: any) => c.service_id === serviceId);
         await adminApi(`/api/v1/admin/review/neue-kanzlei/coverage/${cell.id}`, { method: 'POST', body: JSON.stringify({ action: 'approve' }) });
 
-        // Der Anbieter hat keinen laufenden Tarif, ist also nicht abrechenbar —
-        // der Grund wird seit TKT-PROV-06 aus dem Abo abgeleitet statt aus der
-        // nie geschriebenen Spalte billing_ready gelesen. Vorher stand genau das
-        // in `missing`, und das Gate ging fuer keinen Anbieter je auf.
+        // Der Anbieter steht auf billing_ready=false mit Grund 'no_payment_method'.
+        // Vorher stand genau das in `missing`, und weil niemand das Flag setzte,
+        // ging das Gate fuer keinen Anbieter je auf. Jetzt wird es GEMELDET.
         const offen = await adminApi('/api/v1/admin/review/neue-kanzlei/gate');
         expect(offen.body.gate.missing).toEqual([]);
         expect(offen.body.gate.ok).toBe(true);
-        expect(offen.body.gate.billing).toEqual({ ready: false, blocks_chargeable_booking: ['not_ready', 'inactive_subscription'] });
+        expect(offen.body.gate.billing).toEqual({ ready: false, blocks_chargeable_booking: ['not_ready', 'no_payment_method'] });
 
         // Aktivieren OHNE billing_ready anzufassen.
         const auf = await adminApi('/api/v1/admin/review/neue-kanzlei/lifecycle', { method: 'POST', body: JSON.stringify({ to: 'active' }) });
@@ -2102,6 +2413,7 @@ describe('Review-Arbeitsplatz (6A/7A/8A): nur Admin, Zell-Aktionen, Gate', () =>
         db.provider_evidence.push({ id: randomUUID(), provider_key: 'neue-kanzlei', evidence_type: 'representative_identity', source: 'registry_check', result: 'independently_verified', upload_confirmed: true });
         const de = db.provider_service_coverage.find((c: any) => c.service_id === serviceId && c.country_code === 'DE');
         await adminApi(`/api/v1/admin/review/neue-kanzlei/coverage/${de.id}`, { method: 'POST', body: JSON.stringify({ action: 'approve' }) });
+        Object.assign(db.providers[0], { billing_ready: true, billing_block_reasons: [] });
 
         const active = await adminApi('/api/v1/admin/review/neue-kanzlei/lifecycle', { method: 'POST', body: JSON.stringify({ to: 'active' }) });
         expect(active.status).toBe(422);

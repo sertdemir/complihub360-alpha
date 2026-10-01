@@ -1,6 +1,7 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { structuredLog } from "@complihub360/types";
 import { supabaseApi } from "./supabase.js";
+import { ensureStripeCustomer, isStripeConfigured, stripeRequest } from "./stripe.js";
 
 // ─── Provider Pricing v2 ─────────────────────────────────────────────────────
 //
@@ -229,6 +230,53 @@ export function cycleStartFor(sub: Subscription | null, today: Date): string {
 
 // ─── Angebot fuer einen Lead (Phase 4 fuehrt es aus) ─────────────────────────
 
+// ─── Zahlungsbereitschaft (Spec A §21.1) ─────────────────────────────────────
+//
+// Sechs Gruende aus der Spec, dazu seit Phase 4 `payment_failed`. Rein: die
+// Eingaenge sammelt leadCharge.syncBillingReadiness aus Stripe und Datenbank,
+// die Regel steht hier und ist ohne Netz testbar. Was hier NICHT steht:
+// irgendein Einfluss auf das Matching — der Zustand sperrt die Buchung, nie
+// die Sichtbarkeit (§14).
+
+export type BillingBlockReason =
+    | 'no_payment_method' | 'incomplete_billing_info' | 'inactive_subscription'
+    | 'withdrawn_authorization' | 'overdue_invoice' | 'account_paused' | 'payment_failed';
+
+export interface ReadinessInput {
+    hasDefaultPaymentMethod: boolean;
+    billingInfoComplete: boolean;
+    subscriptionStatus: Subscription['status'] | null;
+    authorizationAccepted: boolean;
+    overdueInvoices: number;
+    paused: boolean;
+    /** Die letzte Belastung scheiterte UND das Zahlungsmittel ist noch dasselbe. */
+    lastPaymentFailed: boolean;
+}
+
+export function billingReadiness(i: ReadinessInput): { ready: boolean; reasons: BillingBlockReason[] } {
+    const reasons: BillingBlockReason[] = [];
+    if (!i.hasDefaultPaymentMethod) reasons.push('no_payment_method');
+    if (!i.billingInfoComplete) reasons.push('incomplete_billing_info');
+    if (!i.subscriptionStatus || i.subscriptionStatus === 'cancelled' || i.subscriptionStatus === 'ended') reasons.push('inactive_subscription');
+    if (!i.authorizationAccepted) reasons.push('withdrawn_authorization');
+    if (i.overdueInvoices > 0) reasons.push('overdue_invoice');
+    if (i.paused) reasons.push('account_paused');
+    if (i.lastPaymentFailed) reasons.push('payment_failed');
+    return { ready: reasons.length === 0, reasons };
+}
+
+/** Der wirksame Zahlungsstatus einer Ledger-Zeile: das juengste Ereignis, sonst der Stand beim Schreiben. */
+export function resolveLedgerStatus(
+    row: { payment_status?: string | null },
+    events: Array<{ status: string; created_at?: string }>,
+): string {
+    if (events.length) {
+        const latest = [...events].sort((a, b) => String(a.created_at ?? '').localeCompare(String(b.created_at ?? '')))[events.length - 1];
+        return latest.status;
+    }
+    return row.payment_status ?? 'captured';
+}
+
 export interface LeadFeeQuote {
     enabled: boolean;                   // false = fuer diese Kategorie/Land keine Gebuehr (regulierter Beruf)
     band: 1 | 2 | 3 | 4;
@@ -313,43 +361,6 @@ export async function loadPricingConfig(): Promise<PricingConfig> {
     };
 }
 
-/**
- * Darf bei diesem Anbieter gebuehrenpflichtig gebucht werden?
- *
- * Nutzer-Entscheidungen 2026-10-01 (TKT-PROV-06):
- *   · Buchbar ist nur, wer einen laufenden bezahlten Tarif hat.
- *   · Jedes Mal neu berechnen, nie als Flag pflegen. Vorher stand das in
- *     `providers.billing_ready` — einer Spalte mit DEFAULT false und ohne
- *     jeden Schreiber, weshalb kein Anbieter je buchbar war.
- *
- * Rein und ohne Datenbank, damit die Regel an einer Stelle steht und sich
- * pruefen laesst. Der Grundcode folgt der Sprache von §21.1, damit die
- * Oberflaeche ihn ohne neue Uebersetzung anzeigen kann.
- *
- * WAS §21.1 NOCH NENNT und hier bewusst NICHT geprueft wird:
- *   · Zahlungsmethode, Mandat, zurueckgezogene Ermaechtigung — dazu muesste
- *     der Zahlungsdienstleister Meldungen schicken; es gibt keine Stelle, die
- *     sie annimmt. Eine Bedingung zu behaupten, die wir nicht kennen, waere
- *     schlimmer als sie zu benennen.
- *   · Ueberfaellige Rechnung — braucht eine Kulanzfrist, und die ist am
- *     2026-10-01 ausdruecklich OFFEN (zu besprechen). Deshalb sperrt sie hier
- *     nicht; eine erfundene Frist waere eine Entscheidung, die mir nicht
- *     gehoert.
- *   · Konto pausiert oder gesperrt — faellt schon aus der Sichtbarkeits-View
- *     heraus, hier also nicht doppelt.
- */
-export interface ChargeableVerdict {
-    ready: boolean;
-    /** Gruende in der Sprache von §21.1. Leer, wenn abgerechnet werden kann. */
-    reasons: string[];
-}
-
-export function chargeableFromSubscription(sub: Subscription | null, today: Date): ChargeableVerdict {
-    const heute = today.toISOString().slice(0, 10);
-    const laufend = !!sub && sub.status === 'active' && String(sub.currentPeriodEnd) >= heute;
-    return laufend ? { ready: true, reasons: [] } : { ready: false, reasons: ['inactive_subscription'] };
-}
-
 export async function getActiveSubscription(providerKey: string): Promise<Subscription | null> {
     const rows = (await supabaseApi.select('provider_subscriptions', { provider_key: providerKey }, { order: 'started_at.desc', limit: 5 })) as any[];
     const open = rows.find((r) => !r.ended_at);
@@ -365,35 +376,6 @@ export async function getActiveSubscription(providerKey: string): Promise<Subscr
 export async function getDiscountCounter(providerKey: string, cycleStart: string): Promise<number> {
     const rows = (await supabaseApi.select('provider_discount_counter', { provider_key: providerKey, cycle_start: cycleStart }, { limit: 1 })) as any[];
     return rows[0]?.used ?? 0;
-}
-
-// ─── Stripe (Abo-Rechnung) ───────────────────────────────────────────────────
-
-const stripeForm = async (stripeKey: string, method: 'POST' | 'GET', path: string, params?: Record<string, string>) => {
-    const url = `https://api.stripe.com/v1/${path}${method === 'GET' && params ? `?${new URLSearchParams(params)}` : ''}`;
-    const resp = await fetch(url, {
-        method,
-        headers: { 'Authorization': `Bearer ${stripeKey}`, ...(method === 'POST' ? { 'Content-Type': 'application/x-www-form-urlencoded' } : {}) },
-        ...(method === 'POST' && params ? { body: new URLSearchParams(params).toString() } : {}),
-    });
-    const body = await resp.json() as Record<string, unknown> & { error?: { message?: string } };
-    if (!resp.ok) throw new Error(`Stripe ${path}: ${body.error?.message || resp.status}`);
-    return body;
-};
-
-async function ensureStripeCustomer(stripeKey: string, providerKey: string): Promise<string> {
-    const rows = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as
-        Array<{ name: string; contact_email?: string | null; stripe_customer_id?: string | null }>;
-    if (!rows[0]) throw new Error(`Provider not found: ${providerKey}`);
-    if (rows[0].stripe_customer_id) return rows[0].stripe_customer_id;
-    const customer = await stripeForm(stripeKey, 'POST', 'customers', {
-        name: rows[0].name || providerKey,
-        ...(rows[0].contact_email ? { email: rows[0].contact_email } : {}),
-        'metadata[provider_key]': providerKey,
-    });
-    const customerId = String(customer.id);
-    await supabaseApi.update('providers', { provider_key: providerKey }, { stripe_customer_id: customerId });
-    return customerId;
 }
 
 // POST /api/v1/admin/billing/run — {period?: 'YYYY-MM', dry_run?: boolean}.
@@ -414,8 +396,7 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
             const period = typeof d.period === 'string' && /^\d{4}-\d{2}$/.test(d.period)
                 ? d.period : new Date().toISOString().slice(0, 7);
             const dryRun = d.dry_run === true;
-            const stripeKey = process.env.STRIPE_SECRET_KEY;
-            if (!stripeKey && !dryRun) {
+            if (!isStripeConfigured() && !dryRun) {
                 res.writeHead(503, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'STRIPE_NOT_CONFIGURED', message: 'Stripe is not connected yet', correlationId }));
                 return;
@@ -447,8 +428,8 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
                     continue;
                 }
                 const currency = plan.currency.toLowerCase();
-                const customerId = await ensureStripeCustomer(stripeKey!, providerKey);
-                const invoice = await stripeForm(stripeKey!, 'POST', 'invoices', {
+                const customerId = await ensureStripeCustomer(providerKey);
+                const invoice = await stripeRequest('POST', 'invoices', {
                     customer: customerId,
                     collection_method: 'send_invoice',
                     days_until_due: '14',
@@ -459,18 +440,18 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
                     'metadata[plan_code]': plan.code,
                 });
                 const invoiceId = String(invoice.id);
-                await stripeForm(stripeKey!, 'POST', 'invoiceitems', {
+                await stripeRequest('POST', 'invoiceitems', {
                     customer: customerId, invoice: invoiceId,
                     amount: String(line.amount_cents), currency, description: line.label,
                 });
-                const finalized = await stripeForm(stripeKey!, 'POST', `invoices/${invoiceId}/finalize`) as {
+                const finalized = await stripeRequest('POST', `invoices/${invoiceId}/finalize`) as {
                     id: string; number?: string; status?: string; total?: number;
                     hosted_invoice_url?: string; invoice_pdf?: string; due_date?: number;
                 };
                 // send_invoice verschickt nur ueber den expliziten send-Call;
                 // ein Fehler dort darf die ausgestellte Rechnung nicht verlieren.
                 try {
-                    await stripeForm(stripeKey!, 'POST', `invoices/${invoiceId}/send`);
+                    await stripeRequest('POST', `invoices/${invoiceId}/send`);
                 } catch (sendErr) {
                     await supabaseApi.insert('event_log', { type: 'invoice_send_failed', payload: { providerKey, invoiceId, error: String(sendErr) } }).catch(() => { /* non-blocking */ });
                 }
@@ -525,7 +506,15 @@ export async function handleBillingPreview(res: ServerResponse, correlationId: s
         const subLine = subscriptionChargeForPeriod(sub, plan, period);
 
         const ledger = (await supabaseApi.select('provider_lead_ledger', { provider_key: providerKey, kind: 'charge' }, { order: 'created_at.desc', limit: 500 })) as any[];
-        const inCycle = ledger.filter((l) => String(l.created_at).slice(0, 10) >= cycleStart);
+        // Seit Phase 4 stehen auch pending und failed im Ledger (die Spur einer
+        // Belastung, die nicht zustande kam). Gezaehlt wird, was belastet
+        // wurde oder gebuehrenfrei war — nie, was scheiterte.
+        const inCycleAll = ledger.filter((l) => String(l.created_at).slice(0, 10) >= cycleStart).slice(0, 100);
+        const statuses = await Promise.all(inCycleAll.map(async (l) => {
+            const ev = (await supabaseApi.select('provider_lead_ledger_payment_events', { ledger_id: l.id }, { order: 'created_at.asc', limit: 20 })) as any[];
+            return resolveLedgerStatus(l, ev);
+        }));
+        const inCycle = inCycleAll.filter((_, i) => statuses[i] === 'captured' || statuses[i] === 'n/a');
         const leads = {
             count: inCycle.length,
             standard_cents: inCycle.reduce((s, l) => s + (l.standard_fee_cents || 0), 0),
@@ -553,6 +542,11 @@ export async function handleBillingPreview(res: ServerResponse, correlationId: s
                 cycle_start: cycleStart,
             },
             leads,
+            readiness: {
+                ready: !!providers[0].billing_ready,
+                reasons: Array.isArray(providers[0].billing_block_reasons) ? providers[0].billing_block_reasons : [],
+                synced_at: providers[0].billing_synced_at ?? null,
+            },
             credit_balance_cents: creditBalance,
             lines: subLine ? [subLine] : [],
             total_cents: (subLine?.amount_cents ?? 0) + leads.final_cents,
@@ -572,14 +566,13 @@ export async function handleBillingPreview(res: ServerResponse, correlationId: s
 // Webhook-Ersatz: Zahlungsstatus offener Stripe-Rechnungen nachziehen, wenn
 // der Anbieter seine Rechnungsliste oeffnet (nur offene Zeilen, max. 5).
 export async function syncOpenInvoices(providerKey: string): Promise<void> {
-    const stripeKey = process.env.STRIPE_SECRET_KEY;
-    if (!stripeKey) return;
+    if (!isStripeConfigured()) return;
     const rows = (await supabaseApi.select('invoices', { provider_key: providerKey, status: 'open' }, { limit: 5 })) as
         Array<{ id: string; stripe_invoice_id?: string | null }>;
     for (const row of rows) {
         if (!row.stripe_invoice_id) continue;
         try {
-            const inv = await stripeForm(stripeKey, 'GET', `invoices/${row.stripe_invoice_id}`) as {
+            const inv = await stripeRequest('GET', `invoices/${row.stripe_invoice_id}`) as {
                 status?: string; status_transitions?: { paid_at?: number | null };
             };
             const mapped = inv.status === 'paid' ? 'paid'
