@@ -17,7 +17,10 @@ const { SLOT, createBooking } = vi.hoisted(() => ({
 
 vi.mock('../api/bookings', () => ({
   fetchSlots: vi.fn().mockResolvedValue([SLOT]),
+  // Phase 4: die Seite laedt den Bestaetigungstext, bevor sie bucht.
+  fetchAcknowledgement: vi.fn().mockResolvedValue({ version: 'booking-ack-v1', language: 'en', body: 'a\n\nb\n\nc', sharedFields: ['email'], userDiscount: { pct: 10, policyVersion: 1 }, lines: ['a', 'b', 'c'] }),
   createBooking: (...a: unknown[]) => createBooking(...a),
+  bookingFailureFrom: () => ({ kind: 'generic' }),
 }));
 // t() gibt den Schluessel zurueck: geprueft wird die Verdrahtung, nicht die Copy.
 vi.mock('react-i18next', () => ({
@@ -55,6 +58,8 @@ describe('ProviderSchedulePage · Booking processing', () => {
     createBooking.mockReturnValue(new Promise(() => {})); // Anfrage bleibt offen
     renderPage();
     const knopf = screen.getByRole('button', { name: 'schedule.confirmCta' });
+    // Phase 4: der Knopf oeffnet sich erst, wenn die Bestaetigung geladen ist.
+    await waitFor(() => expect(knopf).toBeEnabled());
     fireEvent.click(knopf);
 
     const status = await screen.findByRole('status');
@@ -66,7 +71,9 @@ describe('ProviderSchedulePage · Booking processing', () => {
   it('nimmt den Zustand nach einem Fehler zurueck und sagt, dass nicht gebucht wurde', async () => {
     createBooking.mockRejectedValue(new Error('500'));
     renderPage();
-    fireEvent.click(screen.getByRole('button', { name: 'schedule.confirmCta' }));
+    const knopf = screen.getByRole('button', { name: 'schedule.confirmCta' });
+    await waitFor(() => expect(knopf).toBeEnabled());
+    fireEvent.click(knopf);
 
     await waitFor(() => expect(screen.getByText('schedule.failed')).toBeInTheDocument());
     expect(screen.queryByText(HEADING)).not.toBeInTheDocument();

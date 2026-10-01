@@ -5,12 +5,23 @@ import { Tag } from '../../components/ui/Tag';
 import { Button } from '../../components/ui/Button';
 import { Drawer } from '../../components/ui/Drawer';
 import { useApiData } from '../../lib/useApiData';
-import { fetchProviderBookings, submitReview, type BookingStatus } from '../../api/bookings';
+import { money } from '../../api/billing';
+import {
+  fetchProviderBookings, reportProposal, submitReview,
+  type BookingStatus, type LeadProposal, type ProviderBookingLead,
+} from '../../api/bookings';
 
 // ─── Provider · Termine & Leads ──────────────────────────────────────────────
 // Matchmaking v2: the booking IS the paid lead. The dossier (user identity +
 // intake context) is delivered at booking time — no confirm gate, no unlock.
 // Replaces the retired request/confirm pipeline as the primary nav item.
+//
+// Phase 4 (ADR-0005, Canvas-Wahl 3A): unter jedem Termin eine Abrechnungs-
+// zeile — Band, durchgestrichener Standard, Endbetrag, Rabattzaehler, Status —
+// und darunter der 10 %-Block fuer den Nutzer mit zwei Umschaltern („Angebot
+// erstellt?", „10 % ausgewiesen?"). Spec B sagt „auf jedem Lead", nicht
+// „irgendwo": der Anbieter sieht im selben Blick, was er zahlt und was er
+// schuldet. Zaehler statt Prozentgewirr.
 
 interface Row {
   id: string;
@@ -21,17 +32,28 @@ interface Row {
   meta: string;
   status: BookingStatus;
   leadCharged: boolean;
+  lead: ProviderBookingLead | null;
+  userDiscountPct: number | null;
+  proposal: LeadProposal | null;
 }
 
+const lead = (band: 1 | 2 | 3 | 4, standard: number, pct: number, seq: number | null, status: ProviderBookingLead['paymentStatus'] = 'captured'): ProviderBookingLead =>
+  ({ band, standardFeeCents: standard, discountPct: pct, discountSequence: seq, finalFeeCents: Math.round(standard * (100 - pct) / 100), currency: 'USD', paymentStatus: status, feeEnabled: true });
+
 const FIXTURE: Row[] = [
-  { id: 'fx-1', dateLine: 'Mo, 12. Aug 2026', timeLine: '10:00–10:30 · Video-Call', company: 'Acme GmbH — E-Commerce, München', email: 'alex.weber@acme.example', meta: 'VAT-Registrierung Italien · D2C + Amazon · €145k IT-Umsatz', status: 'confirmed', leadCharged: true },
-  { id: 'fx-2', dateLine: 'Mi, 14. Aug 2026', timeLine: '09:30–10:00 · Video-Call', company: 'Brunnen Living Ltd. — Möbel, London', email: 'ops@brunnen.example', meta: 'OSS-Meldung + Fiskalvertretung · Marketplace EU-weit', status: 'confirmed', leadCharged: true },
-  { id: 'fx-3', dateLine: 'Di, 29. Jul 2026', timeLine: '11:00–11:30 · Video-Call', company: 'Acme GmbH — E-Commerce, München', email: 'alex.weber@acme.example', meta: 'VAT-Registrierung Italien · stattgefunden', status: 'completed', leadCharged: true },
+  { id: 'fx-1', dateLine: 'Mo, 12. Aug 2026', timeLine: '10:00–10:30 · Video-Call', company: 'Acme GmbH — E-Commerce, München', email: 'alex.weber@acme.example', meta: 'VAT-Registrierung Italien · D2C + Amazon · €145k IT-Umsatz', status: 'confirmed', leadCharged: true,
+    lead: lead(2, 14900, 10, 2), userDiscountPct: 10, proposal: { proposalIssued: true, discountShown: true, reportedAt: '2026-08-02T09:00:00Z' } },
+  { id: 'fx-2', dateLine: 'Mi, 14. Aug 2026', timeLine: '09:30–10:00 · Video-Call', company: 'Brunnen Living Ltd. — Möbel, London', email: 'ops@brunnen.example', meta: 'OSS-Meldung + Fiskalvertretung · Marketplace EU-weit', status: 'confirmed', leadCharged: true,
+    lead: lead(4, 49900, 0, null), userDiscountPct: 10, proposal: null },
+  { id: 'fx-3', dateLine: 'Di, 29. Jul 2026', timeLine: '11:00–11:30 · Video-Call', company: 'Acme GmbH — E-Commerce, München', email: 'alex.weber@acme.example', meta: 'VAT-Registrierung Italien · stattgefunden', status: 'completed', leadCharged: true,
+    lead: lead(2, 14900, 10, 1), userDiscountPct: 10, proposal: { proposalIssued: true, discountShown: false, reportedAt: '2026-07-30T14:00:00Z' } },
 ];
 
 const STATUS_TONE: Record<BookingStatus, 'success' | 'neutral' | 'error' | 'warning'> = {
   confirmed: 'success', completed: 'neutral', cancelled: 'error', no_show: 'warning',
 };
+
+const BAND_LABEL: Record<1 | 2 | 3 | 4, string> = { 1: 'Focused', 2: 'Core', 3: 'Advanced', 4: 'Strategic' };
 
 export function LeadsPage() {
   const { t, i18n } = useTranslation('providerws');
@@ -50,6 +72,9 @@ export function LeadsPage() {
         meta: b.message ?? '—',
         status: b.status,
         leadCharged: b.leadCharged,
+        lead: b.lead,
+        userDiscountPct: b.userDiscountPct,
+        proposal: b.proposal,
       };
     });
   }, FIXTURE);
@@ -63,26 +88,106 @@ export function LeadsPage() {
     setLeadRated((s) => new Set(s).add(r.id));
     submitReview({ bookingId: r.id, fromRole: 'provider', rating: leadRating, categories: [] }).catch(() => {});
   };
+
+  // Selbstauskunft je Lead: lokal sofort, dann an den Server. Antwortet er
+  // nicht, bleibt der alte Stand stehen — kein erfundenes „gemeldet".
+  const [proposals, setProposals] = useState<Record<string, LeadProposal | null>>({});
+  const [proposalBusy, setProposalBusy] = useState<string | null>(null);
+  const proposalOf = (r: Row) => (r.id in proposals ? proposals[r.id] : r.proposal);
+  const report = async (r: Row, next: { proposalIssued: boolean; discountShown: boolean }) => {
+    setProposalBusy(r.id);
+    try {
+      const saved = await reportProposal(r.id, next);
+      setProposals((p) => ({ ...p, [r.id]: saved }));
+    } catch {
+      // Der Server hat nicht gespeichert; der Umschalter zeigt weiter den alten Stand.
+    }
+    setProposalBusy(null);
+  };
+
   const upcoming = rows.filter((r) => r.status === 'confirmed');
   const past = rows.filter((r) => r.status !== 'confirmed');
 
-  const card = (r: Row) => (
-    <div key={r.id} className="flex items-center gap-5 rounded-xl border border-stroke bg-surface-secondary/40 px-6 py-4">
-      <div className="w-[175px] shrink-0">
-        <p className="text-[14px] font-medium text-fg">{r.dateLine}</p>
-        <p className="text-[12px] text-fg-tertiary">{r.timeLine}</p>
+  const toggle = (label: string, on: boolean, onClick: () => void, disabled: boolean) => (
+    <button
+      type="button"
+      aria-pressed={on}
+      disabled={disabled}
+      onClick={onClick}
+      className={'rounded-full border px-2.5 py-[3px] text-[11px] font-semibold transition-colors disabled:opacity-60 '
+        + (on ? 'border-brand bg-brand text-white' : 'border-stroke bg-surface text-fg-secondary hover:border-brand hover:text-fg-brand')}
+    >
+      {label}
+    </button>
+  );
+
+  const leadLine = (r: Row) => {
+    const l = r.lead;
+    if (!l) return null;
+    const discounted = l.discountPct > 0 && l.finalFeeCents !== l.standardFeeCents;
+    const counter = l.discountSequence
+      ? t('termine.leadDiscountCounter', { pct: l.discountPct, n: l.discountSequence })
+      : l.feeEnabled ? t('termine.leadStandardFee') : t('termine.leadNoFee');
+    return (
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-stroke bg-surface-secondary/60 px-6 py-2.5 text-[12px]">
+        <span className="rounded-md bg-brand-light px-2 py-[2px] text-[11px] font-semibold uppercase tracking-[0.04em] text-fg-brand">
+          {t('termine.leadBand', { band: l.band, label: BAND_LABEL[l.band] })}
+        </span>
+        {discounted && <s className="text-fg-tertiary">{money(l.standardFeeCents, l.currency)}</s>}
+        <span className="font-semibold tabular-nums text-fg">{l.feeEnabled ? money(l.finalFeeCents, l.currency) : money(0, l.currency)}</span>
+        <span className="text-fg-secondary">{counter}</span>
+        <span className="ml-auto text-fg-tertiary">{t(`termine.leadPayment.${l.paymentStatus === 'n/a' ? 'na' : l.paymentStatus}`)}</span>
       </div>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-[15px] font-semibold text-fg">{r.company}</p>
-        <p className="truncate text-[12px] text-fg-tertiary">{r.meta}</p>
-      </div>
-      <div className="flex shrink-0 flex-col items-end gap-2">
-        <div className="flex items-center gap-2">
-          {r.leadCharged && <span className="text-[11px] text-fg-tertiary">{t('termine.leadCharged')}</span>}
-          <Tag tone={STATUS_TONE[r.status]}>{t(`termine.status.${r.status}`)}</Tag>
+    );
+  };
+
+  const discountBlock = (r: Row) => {
+    if (r.userDiscountPct === null) return null;
+    const p = proposalOf(r);
+    const busy = proposalBusy === r.id;
+    const issued = !!p?.proposalIssued;
+    const shown = !!p?.discountShown;
+    return (
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-stroke px-6 py-2.5">
+        <div className="min-w-0 flex-1">
+          <p className="text-[12px] font-semibold text-fg">{t('termine.userDiscountTitle', { pct: r.userDiscountPct })}</p>
+          <p className="text-[11px] text-fg-tertiary">{t('termine.userDiscountHint')}</p>
         </div>
-        <Button size="sm" onClick={() => setDossierFor(r)}>{t('termine.openDossier')}</Button>
+        <div className="flex items-center gap-1.5 text-[11px] text-fg-secondary">
+          <span>{t('termine.proposalIssued')}</span>
+          {toggle(t('termine.yes'), issued, () => report(r, { proposalIssued: true, discountShown: shown }), busy)}
+          {toggle(t('termine.notYet'), !!p && !issued, () => report(r, { proposalIssued: false, discountShown: false }), busy)}
+        </div>
+        <div className="flex items-center gap-1.5 text-[11px] text-fg-secondary">
+          <span>{t('termine.discountShown', { pct: r.userDiscountPct })}</span>
+          {toggle(t('termine.yes'), shown, () => report(r, { proposalIssued: true, discountShown: true }), busy || !issued)}
+          {toggle(t('termine.no'), issued && !shown, () => report(r, { proposalIssued: true, discountShown: false }), busy || !issued)}
+        </div>
       </div>
+    );
+  };
+
+  const card = (r: Row) => (
+    <div key={r.id} className="overflow-hidden rounded-xl border border-stroke bg-surface-secondary/40">
+      <div className="flex items-center gap-5 px-6 py-4">
+        <div className="w-[175px] shrink-0">
+          <p className="text-[14px] font-medium text-fg">{r.dateLine}</p>
+          <p className="text-[12px] text-fg-tertiary">{r.timeLine}</p>
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[15px] font-semibold text-fg">{r.company}</p>
+          <p className="truncate text-[12px] text-fg-tertiary">{r.meta}</p>
+        </div>
+        <div className="flex shrink-0 flex-col items-end gap-2">
+          <div className="flex items-center gap-2">
+            {r.leadCharged && !r.lead && <span className="text-[11px] text-fg-tertiary">{t('termine.leadCharged')}</span>}
+            <Tag tone={STATUS_TONE[r.status]}>{t(`termine.status.${r.status}`)}</Tag>
+          </div>
+          <Button size="sm" onClick={() => setDossierFor(r)}>{t('termine.openDossier')}</Button>
+        </div>
+      </div>
+      {leadLine(r)}
+      {discountBlock(r)}
     </div>
   );
 

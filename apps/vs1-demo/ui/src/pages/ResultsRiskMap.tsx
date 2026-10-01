@@ -519,6 +519,7 @@ export function ResultsRiskMap() {
             onClose={() => setPartnerOpen(null)}
             provider={partnerOpen}
             basisNode={partnerOpen?.match_basis ? <MatchBasis basis={partnerOpen.match_basis} /> : undefined}
+            sessionId={sessionId}
             sessionMessage={session?.label ? t('schedule.messageFromSession', { session: session.label }) : undefined}
             booking={partnerOpen ? booked[partnerOpen.public_ref] ?? null : null}
             onBooked={(key, b) => setBooked((prev) => ({ ...prev, [key]: b }))}

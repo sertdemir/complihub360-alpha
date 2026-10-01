@@ -1,18 +1,24 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, Eye } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Logo } from '../components/ui/Logo';
 import { useApiData } from '../lib/useApiData';
-import { fetchSlots, createBooking, type BookingConfirmation } from '../api/bookings';
+import { fetchSlots, fetchAcknowledgement, createBooking, bookingFailureFrom, type BookingAcknowledgement, type BookingConfirmation, type BookingFailure } from '../api/bookings';
 import { Button } from '../components/ui/Button';
 import { Banner } from '../components/ui/Banner';
+import { AcknowledgementFooterLine, AcknowledgementList, BookingFailureCard } from '../components/user/BookingAcknowledgement';
 
 // ─── Native Scheduling (stage 3) — Phase-3 wiring ────────────────────────────
 // Mirrors the Figma "Scheduling — Buchung" screens: slot picker (from
 // GET /p/:ref/slots) + booking summary. Booking = the paid lead + the
 // two-sided identity reveal (spec §11 P7) — confirmed instantly, charged even
 // on a later no-show (the provider receives the dossier at booking).
+//
+// Phase 4 (ADR-0005, Canvas-Wahl 1B · 2A): die Bestaetigung mit Fassung steht
+// ueber dem Button, die Buchung traegt sie zurueck; scheitert die Belastung
+// des Anbieters, gibt es keinen Termin — der Button weicht einem neutralen
+// Kasten, Auswahl und Nachricht bleiben.
 
 function fixtureSlots(): string[] {
   const out: string[] = [];
@@ -41,8 +47,15 @@ export function ProviderSchedulePage() {
   const [selected, setSelected] = useState<string | null>(params.get('slot'));
   const [message, setMessage] = useState('');
   const [state, setState] = useState<'idle' | 'sending' | 'done'>('idle');
-  const [failed, setFailed] = useState(false);
+  const [failure, setFailure] = useState<BookingFailure | null>(null);
   const [confirmation, setConfirmation] = useState<BookingConfirmation | null>(null);
+  const [ack, setAck] = useState<BookingAcknowledgement | null>(null);
+  const [ackKey, setAckKey] = useState(0);
+  useEffect(() => {
+    let alive = true;
+    fetchAcknowledgement(locale).then((a) => { if (alive) setAck(a); }).catch(() => { if (alive) setAck(null); });
+    return () => { alive = false; };
+  }, [locale, ackKey]);
 
   const df = useMemo(() => new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short' }), [locale]);
   const tf = useMemo(() => new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }), [locale]);
@@ -56,22 +69,23 @@ export function ProviderSchedulePage() {
   }, [slots, df]);
 
   const book = async () => {
-    if (!selected) return;
+    if (!selected || !ack) return;
     setState('sending');
-    setFailed(false);
+    setFailure(null);
     try {
-      setConfirmation(await createBooking(key, selected, message.trim() || undefined));
+      setConfirmation(await createBooking(key, selected, { message: message.trim() || undefined, acknowledgementVersion: ack.version, language: locale }));
       setState('done');
-    } catch {
+    } catch (err) {
       // Frueher stand hier eine Fixture-Identitaet („Studio Bianchi SRL") fuer
       // JEDEN Schluessel, damit der Trichter vorfuehrbar bleibt. Das ist eine
       // Bestaetigung fuer einen Termin, den es nicht gibt, mit dem Namen eines
       // Anbieters, der nichts davon weiss. Ein Fehler sagt jetzt, dass nicht
-      // gebucht wurde.
-      setFailed(true);
+      // gebucht wurde — in dem Satz, der zur Lage passt.
+      setFailure(bookingFailureFrom(err));
       setState('idle');
     }
   };
+  const slotLine = selected ? `${df.format(new Date(selected))} · ${tf.format(new Date(selected))} · 30 Min` : null;
 
   if (state === 'done' && confirmation) {
     return (
@@ -145,12 +159,8 @@ export function ProviderSchedulePage() {
           <aside className="h-fit space-y-4 rounded-xl border border-stroke-subtle bg-surface-secondary p-7">
             <h2 className="text-body-md font-semibold text-fg">{t('schedule.summaryTitle')}</h2>
             <p className="text-body-xs text-fg-secondary">
-              {selected ? `${df.format(new Date(selected))} · ${tf.format(new Date(selected))} · 30 Min` : t('schedule.pickSlot')}
+              {slotLine ?? t('schedule.pickSlot')}
             </p>
-            <div className="flex items-start gap-2.5 rounded-lg border border-brand/40 px-3.5 py-3">
-              <Eye size={16} className="mt-0.5 shrink-0 text-fg-brand" />
-              <p className="text-body-2xs leading-relaxed text-fg-secondary">{t('schedule.revealNote')}</p>
-            </div>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
@@ -158,27 +168,41 @@ export function ProviderSchedulePage() {
               placeholder={t('schedule.messagePh')}
               className="w-full rounded-lg border border-stroke-subtle bg-transparent px-3.5 py-2.5 text-body-xs text-fg placeholder:text-fg-tertiary focus:outline-none focus:ring-1 focus:ring-brand"
             />
-            <Button
-              size="lg"
-              shape="soft"
-              fullWidth
-              type="button"
-              disabled={!selected || state === 'sending'}
-              onClick={book}
-              className="disabled:opacity-50"
-            >
-              {t('schedule.confirmCta')}
-            </Button>
-            {/* Abgenommene Zustands-Copy (Checklist v1.0, "Booking processing"). */}
-            {state === 'sending' && (
-              <Banner status="info" title={t('common:states.bookingProcessing.heading')}>
-                {t('common:states.bookingProcessing.message')}
-              </Banner>
+            {/* Canvas 1B: die Bestaetigung ist der Text selbst, ueber dem Button. */}
+            <AcknowledgementList ack={ack} className="border-t border-stroke-subtle pt-4" />
+            {failure && failure.kind !== 'generic' ? (
+              // Canvas 2A: der Kasten steht an der Stelle des Buttons.
+              <BookingFailureCard
+                failure={failure}
+                onRetry={() => setFailure(null)}
+                onReread={() => { setFailure(null); setAckKey((k) => k + 1); }}
+                onPickSlot={() => { setFailure(null); setSelected(null); }}
+              />
+            ) : (
+              <>
+                <Button
+                  size="lg"
+                  shape="soft"
+                  fullWidth
+                  type="button"
+                  disabled={!selected || !ack || state === 'sending'}
+                  onClick={book}
+                  className="disabled:opacity-50"
+                >
+                  {t('schedule.confirmCta')}
+                </Button>
+                {/* Abgenommene Zustands-Copy (Checklist v1.0, "Booking processing"). */}
+                {state === 'sending' && (
+                  <Banner status="info" title={t('common:states.bookingProcessing.heading')}>
+                    {t('common:states.bookingProcessing.message')}
+                  </Banner>
+                )}
+                {failure?.kind === 'generic' && (
+                  <p className="text-body-3xs leading-relaxed text-error-700 dark:text-error-300">{t('schedule.failed')}</p>
+                )}
+                <AcknowledgementFooterLine ack={ack} slotLine={null} />
+              </>
             )}
-            {failed && (
-              <p className="text-body-3xs leading-relaxed text-error-700 dark:text-error-300">{t('schedule.failed')}</p>
-            )}
-            <p className="text-center text-body-3xs text-fg-tertiary">{t('schedule.freeNote')}</p>
           </aside>
         </div>
       </main>

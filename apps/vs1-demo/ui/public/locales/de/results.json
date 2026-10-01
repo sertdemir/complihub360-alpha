@@ -174,7 +174,35 @@
     "duration": "30 Min",
     "noSlots": "Dieser Anbieter hat gerade keine freien Termine. Versuchen Sie es in ein paar Tagen erneut.",
     "failed": "Der Termin konnte nicht gebucht werden. Bitte versuchen Sie es in einem Moment erneut.",
-    "doneNote": "Die Einladung liegt in Ihrem Postfach. Unter „Termine\" können Sie den Termin verschieben oder absagen."
+    "doneNote": "Die Einladung liegt in Ihrem Postfach. Unter „Termine\" können Sie den Termin verschieben oder absagen.",
+    "ackLabel": "Was Sie mit dieser Buchung bestätigen",
+    "ackLoading": "Die Buchungsbedingungen werden geladen …",
+    "ackConfirmLine_one": "Mit der Buchung bestätigen Sie den Punkt oben (Fassung {{version}})",
+    "ackConfirmLine_other": "Mit der Buchung bestätigen Sie die {{count}} Punkte oben (Fassung {{version}})",
+    "fail": {
+      "not_completed": {
+        "title": "Die Buchung konnte nicht abgeschlossen werden.",
+        "body": "Das liegt nicht an Ihnen: Auf Seiten des Anbieters fehlt gerade eine Voraussetzung. Ihr Termin ist nicht gebucht, es wurde nichts geteilt. Der Anbieter wurde informiert."
+      },
+      "slot_taken": {
+        "title": "Dieser Termin ist gerade vergeben worden.",
+        "body": "Jemand anderes hat ihn vor einem Moment gebucht. Ihr Termin ist nicht gebucht, es wurde nichts geteilt — wählen Sie einen anderen Termin."
+      },
+      "acknowledgement_outdated": {
+        "title": "Die Buchungsbedingungen haben sich geändert.",
+        "body": "Bitte lesen Sie die aktualisierten Punkte noch einmal, bevor Sie buchen. Ihr Termin ist nicht gebucht, es wurde nichts geteilt."
+      },
+      "generic": {
+        "title": "Der Termin konnte nicht gebucht werden.",
+        "body": "Bitte versuchen Sie es in einem Moment erneut. Ihr Termin ist nicht gebucht, es wurde nichts geteilt."
+      },
+      "otherProvider": "Anderen Anbieter wählen",
+      "retryLater": "Später erneut versuchen",
+      "retryNow": "Erneut versuchen",
+      "pickOtherSlot": "Anderen Termin wählen",
+      "reread": "Aktualisierte Bedingungen lesen",
+      "keepNote": "Ihre Nachricht und Ihre Auswahl bleiben erhalten."
+    }
   },
   "search": {
     "navGuided": "Meinen Bedarf ermitteln",

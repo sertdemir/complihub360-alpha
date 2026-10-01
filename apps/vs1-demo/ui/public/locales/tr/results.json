@@ -174,7 +174,35 @@
     "duration": "30 dk",
     "noSlots": "Bu sağlayıcının şu anda boş randevusu yok. Birkaç gün sonra tekrar deneyin.",
     "failed": "Randevu alınamadı. Lütfen birazdan tekrar deneyin.",
-    "doneNote": "Davet gelen kutunuzda. „Randevular\" altında erteleyebilir veya iptal edebilirsiniz."
+    "doneNote": "Davet gelen kutunuzda. „Randevular\" altında erteleyebilir veya iptal edebilirsiniz.",
+    "ackLabel": "Bu rezervasyonla onayladıklarınız",
+    "ackLoading": "Rezervasyon koşulları yükleniyor …",
+    "ackConfirmLine_one": "Rezervasyonla yukarıdaki maddeyi onaylarsınız (sürüm {{version}})",
+    "ackConfirmLine_other": "Rezervasyonla yukarıdaki {{count}} maddeyi onaylarsınız (sürüm {{version}})",
+    "fail": {
+      "not_completed": {
+        "title": "Rezervasyon tamamlanamadı.",
+        "body": "Bu sizden kaynaklanmıyor: Şu anda sağlayıcı tarafında bir koşul eksik. Randevunuz alınmadı, hiçbir şey paylaşılmadı. Sağlayıcı bilgilendirildi."
+      },
+      "slot_taken": {
+        "title": "Bu saat az önce dolduruldu.",
+        "body": "Başka biri biraz önce rezerve etti. Randevunuz alınmadı, hiçbir şey paylaşılmadı — başka bir saat seçin."
+      },
+      "acknowledgement_outdated": {
+        "title": "Rezervasyon koşulları değişti.",
+        "body": "Rezervasyon yapmadan önce güncellenen maddeleri bir kez daha okuyun. Randevunuz alınmadı, hiçbir şey paylaşılmadı."
+      },
+      "generic": {
+        "title": "Randevu alınamadı.",
+        "body": "Lütfen biraz sonra tekrar deneyin. Randevunuz alınmadı, hiçbir şey paylaşılmadı."
+      },
+      "otherProvider": "Başka sağlayıcı seç",
+      "retryLater": "Daha sonra tekrar dene",
+      "retryNow": "Tekrar dene",
+      "pickOtherSlot": "Başka saat seç",
+      "reread": "Güncellenen koşulları oku",
+      "keepNote": "Mesajınız ve seçiminiz korunur."
+    }
   },
   "search": {
     "navGuided": "İhtiyaçlarımı değerlendir",

@@ -135,15 +135,43 @@ function partnerRequests() {
     ...eigene,
   ];
 }
+// Phase 4: je Lead, was er gekostet hat (Band, Standard, Rabatt, Endbetrag),
+// die 10 % fuer den Nutzer und die Selbstauskunft des Anbieters. Die
+// Selbstauskunft ist veraenderlich (PATCH unten), sonst saehe man nie, dass
+// ein Umschalter greift.
+const PROPOSALS: Record<string, { proposal_issued: boolean; discount_shown: boolean; reported_at: string } | null> = {
+  'm0ck-b02': { proposal_issued: true, discount_shown: true, reported_at: iso(0, 8) },
+  'pb-3': { proposal_issued: true, discount_shown: false, reported_at: iso(-8, 9) },
+  'pb-4': null,
+  'm0ck-b12': null,
+};
 function partnerBookings() {
-  const k = (id: string, start: string, status: string, email: string, message: string) =>
-    ({ id, slot_start: start, slot_end: new Date(new Date(start).getTime() + 30 * 60_000).toISOString(), status, lead_charged: true, user_email: email, message });
+  const lead = (band: number, standard: number, pct: number, seq: number | null) =>
+    ({ band, standard_fee_cents: standard, discount_pct: pct, discount_sequence: seq, final_fee_cents: Math.round(standard * (100 - pct) / 100), currency: 'USD', payment_status: 'captured', fee_enabled: true });
+  const k = (id: string, start: string, status: string, email: string, message: string, l: ReturnType<typeof lead> | null) =>
+    ({ id, slot_start: start, slot_end: new Date(new Date(start).getTime() + 30 * 60_000).toISOString(), status, lead_charged: true, user_email: email, message,
+       lead: l, user_discount_pct: l ? 10 : null, proposal: PROPOSALS[id] ?? null, acknowledgement_version: l ? 'booking-ack-v1' : null, price_snapshot: null });
   return [
-    k('m0ck-b02', iso(1, 9), 'confirmed', 'a.weber@acme-gmbh.example', 'EPR & Verpackung · DE — LUCID-Registrierung, Mengenmeldung (Acme GmbH)'),
-    k('pb-3', iso(-9, 10), 'completed', 'einkauf@moebelwerk-sued.example', 'EPR-Registrierung Möbelverpackungen · stattgefunden (Möbelwerk Süd GmbH)'),
-    k('pb-4', iso(-18, 15), 'no_show', 'info@hafenkontor.example', 'USt · DE — OSS-Umstellung (Hafenkontor Handels GmbH)'),
-    k('m0ck-b12', iso(-30, 15), 'completed', 'a.weber@acme-gmbh.example', 'USt · DE — OSS-Erstgespräch (Acme GmbH)'),
+    k('m0ck-b02', iso(1, 9), 'confirmed', 'a.weber@acme-gmbh.example', 'EPR & Verpackung · DE — LUCID-Registrierung, Mengenmeldung (Acme GmbH)', lead(2, 14900, 10, 3)),
+    k('pb-3', iso(-9, 10), 'completed', 'einkauf@moebelwerk-sued.example', 'EPR-Registrierung Möbelverpackungen · stattgefunden (Möbelwerk Süd GmbH)', lead(4, 49900, 10, 2)),
+    k('pb-4', iso(-18, 15), 'no_show', 'info@hafenkontor.example', 'USt · DE — OSS-Umstellung (Hafenkontor Handels GmbH)', lead(2, 14900, 10, 1)),
+    // Aus der Zeit vor Phase 4: kein Ledger, nur das Wort „Lead berechnet".
+    k('m0ck-b12', iso(-30, 15), 'completed', 'a.weber@acme-gmbh.example', 'USt · DE — OSS-Erstgespräch (Acme GmbH)', null),
   ];
+}
+function reportProposal(bookingId: string, body: Record<string, unknown>) {
+  if (!(bookingId in PROPOSALS)) return { __status: 404, errorCode: 'NOT_FOUND', message: 'Booking not found' };
+  const issued = body.proposal_issued === true; const shown = body.discount_shown === true;
+  if (shown && !issued) return { __status: 400, errorCode: 'VALIDATION_ERROR', message: 'A discount cannot be shown without a proposal' };
+  PROPOSALS[bookingId] = { proposal_issued: issued, discount_shown: shown, reported_at: plus(0) };
+  return { ok: true, proposal: PROPOSALS[bookingId] };
+}
+// Zahlungsbereitschaft: gesperrt, bis „Jetzt pruefen" einmal gelaufen ist —
+// so zeigt die Demo beide Zustaende des Kastens (Canvas 4A).
+let READINESS = { ready: false, reasons: ['payment_failed', 'overdue_invoice'] as string[], synced_at: plus(-3 * H), payment_method: 'Visa ····4242' };
+function syncReadiness() {
+  READINESS = { ready: true, reasons: [], synced_at: plus(0), payment_method: 'Visa ····1881' };
+  return { ok: true, readiness: { ...READINESS, changed: true } };
 }
 function partnerCoverage() {
   return { ok: true, coverage: { provider_key: PARTNER_KEY, name: 'Schmidt & Partner Steuerberatungsgesellschaft mbH', countries_supported: ['DE', 'AT'], languages: ['DE', 'EN'], sla_target_confirm_hours: 24, availability: 'available', ooo_until: null, partner_status: 'active' } };
@@ -172,6 +200,7 @@ function partnerBillingPreview() {
     subscription: { plan_code: 'growth', label: 'Growth', cadence: 'monthly', status: 'active', current_period_start: `${monat(0)}-01`, current_period_end: `${monat(1)}-01`, monthly_cents: 9900, annual_cents: 99000, category_allowance: 5, analytics_level: 'enhanced', api_eligible: false },
     discount: { pct: 10, count: 3, used: 3, remaining: 0, cycle_start: `${monat(0)}-01` },
     leads: { count: leads, standard_cents: standard, discount_cents: discount, final_cents: standard - discount },
+    readiness: { ...READINESS },
     credit_balance_cents: 0,
     lines: [{ label: `Growth · monthly · ${monat(0)}`, qty: 1, unit_cents: 9900, amount_cents: 9900 }],
     total_cents: 9900 + standard - discount,
@@ -436,10 +465,26 @@ const PROVIDER_IDENTITY: Record<string, { name: string; website_url: string | nu
   'madrid-tax': { name: 'Madrid Tax Advisors', website_url: null, contact_email: 'hola@madridtax.example' },
 };
 
+// Phase 4: der Text, den der Nutzer vor der Buchung bestaetigt — eine Fassung,
+// vier Sprachen, dieselben Absaetze wie die Migration booking_charge.
+const ACK_VERSION = 'booking-ack-v1';
+const ACK_BODY: Record<string, string> = {
+  en: 'With this booking, the provider\'s name and contact details become visible to you, and the provider receives your company name, your e-mail address and your message.\n\nThe provider may contact you about this request — including scheduling, a proposal and reasonable follow-up — even if you cancel, do not attend or stop responding. Marketing on other topics requires your separate permission.\n\nYou receive a 10 % discount on the provider\'s professional fees for this request because you booked through CompliHub360. The booking itself costs you nothing.',
+  de: 'Mit dieser Buchung werden Name und Kontakt des Anbieters für Sie sichtbar; der Anbieter erhält Ihren Firmennamen, Ihre E-Mail-Adresse und Ihre Nachricht.\n\nDer Anbieter darf Sie zu diesem Anliegen kontaktieren — zu Terminen, einem Angebot und angemessenen Rückfragen — auch wenn Sie absagen, nicht erscheinen oder nicht mehr antworten. Werbung zu anderen Themen braucht Ihre gesonderte Erlaubnis.\n\nSie erhalten 10 % Rabatt auf das Honorar des Anbieters für dieses Anliegen, weil Sie über CompliHub360 buchen. Die Buchung selbst kostet Sie nichts.',
+  es: 'Con esta reserva, el nombre y los datos de contacto del proveedor pasan a ser visibles para usted, y el proveedor recibe el nombre de su empresa, su dirección de correo electrónico y su mensaje.\n\nEl proveedor puede contactarle sobre esta solicitud — citas, una propuesta y consultas razonables — aunque usted cancele, no asista o deje de responder. La publicidad sobre otros temas requiere su permiso por separado.\n\nUsted recibe un 10 % de descuento sobre los honorarios del proveedor para esta solicitud porque reserva a través de CompliHub360. La reserva en sí no le cuesta nada.',
+  tr: 'Bu rezervasyonla sağlayıcının adı ve iletişim bilgileri sizin için görünür olur; sağlayıcı şirket adınızı, e-posta adresinizi ve mesajınızı alır.\n\nSağlayıcı bu talep hakkında sizinle iletişime geçebilir — randevular, bir teklif ve makul takip soruları dahil — iptal etseniz, katılmasanız veya yanıt vermeyi kesseniz bile. Başka konulardaki reklamlar için ayrı izniniz gerekir.\n\nCompliHub360 üzerinden rezervasyon yaptığınız için bu talep için sağlayıcının ücretlerinde % 10 indirim alırsınız. Rezervasyonun kendisi size hiçbir şey maliyet getirmez.',
+};
+function acknowledgement(lang: string) {
+  const l = ACK_BODY[lang] ? lang : 'en';
+  return { ok: true, version: ACK_VERSION, language: l, body: ACK_BODY[l], shared_fields: ['email', 'company_name', 'message'], user_discount: { pct: 10, policy_version: 1, recurring_treatment: 'undecided' } };
+}
+
 // POST /scheduling — die Buchung ist der bezahlte Lead UND der Moment, in dem
-// beide Seiten Namen und Kontakt bekommen.
+// beide Seiten Namen und Kontakt bekommen. Seit Phase 4 nur mit der Fassung
+// der Bestaetigung; die 15:30-Termine spielen den Fall durch, dass die Karte
+// des Anbieters nicht belastet werden kann (409 ohne Buchung, Canvas 2A).
 function createBooking(body: unknown) {
-  const d = (body ?? {}) as { public_ref?: unknown; slot_start?: unknown; message?: unknown };
+  const d = (body ?? {}) as { public_ref?: unknown; slot_start?: unknown; message?: unknown; acknowledgement_version?: unknown };
   const ref = typeof d.public_ref === 'string' ? d.public_ref : '';
   const key = keyOfRef(ref);
   const slot = typeof d.slot_start === 'string' ? d.slot_start : '';
@@ -447,10 +492,20 @@ function createBooking(body: unknown) {
   if (!ref || !slot || !identity) {
     return { __status: 400, errorCode: 'VALIDATION_ERROR', message: 'public_ref and slot_start required' };
   }
-  const end = new Date(new Date(slot).getTime() + 30 * 60 * 1000).toISOString();
+  if (typeof d.acknowledgement_version !== 'string' || !d.acknowledgement_version) {
+    return { __status: 400, errorCode: 'VALIDATION_ERROR', message: 'acknowledgement_version required' };
+  }
+  if (d.acknowledgement_version !== ACK_VERSION) {
+    return { __status: 409, errorCode: 'ACKNOWLEDGEMENT_OUTDATED', message: 'The booking acknowledgement has changed — please read it again', current_version: ACK_VERSION };
+  }
+  const at = new Date(slot);
+  if (at.getHours() === 15 && at.getMinutes() === 30) {
+    return { __status: 409, errorCode: 'BOOKING_NOT_COMPLETED', message: 'The booking could not be completed. This is not on your side — the provider has been informed.', reason: 'provider_billing' };
+  }
+  const end = new Date(at.getTime() + 30 * 60 * 1000).toISOString();
   return {
     ok: true,
-    booking: { id: `m0ck-new-${ref}`, public_ref: ref, slot_start: slot, slot_end: end, status: 'confirmed' },
+    booking: { id: `m0ck-new-${ref}`, public_ref: ref, slot_start: slot, slot_end: end, status: 'confirmed', acknowledgement_version: ACK_VERSION, shared_fields: ['email', 'company_name', 'message'], user_discount: { pct: 10, policy_version: 1 } },
     provider_identity: identity,
   };
 }
@@ -723,11 +778,12 @@ function p2ReviewDossier(key: string) {
     open_requests: p2Requests(), gate: p2Gate(), history: p2History() };
 }
 
-export function route(method: string, path: string, body: Record<string, unknown> = {}, role = ''): unknown {
+export function route(method: string, path: string, body: Record<string, unknown> = {}, role = '', query: URLSearchParams = new URLSearchParams()): unknown {
   const seg = path.split('/').filter(Boolean); // ['api','v1',...]
   const p = seg.slice(2);
   if (method === 'GET') {
     if (p[0] === 'dashboard') return dashboard();
+    if (p[0] === 'acknowledgement') return acknowledgement((query.get('lang') ?? 'en').slice(0, 2).toLowerCase());
     // Mock-Login = der Demo-Anbieter (echte API: provider_members, 20260922000000)
     if (p[0] === 'me' && p[1] === 'provider') return { ok: true, provider_key: PARTNER_KEY, role: 'owner', name: 'Schmidt & Partner', lifecycle_status: 'active' };
     if (p[0] === 'domain' && p[1]) return domainOverview(p[1]);
@@ -772,6 +828,8 @@ export function route(method: string, path: string, body: Record<string, unknown
     return { ok: true, market, notify: body.notify === true };
   }
   if (p[0] === 'scheduling' && p.length === 1 && method === 'POST') return createBooking(body);
+  if (p[0] === 'provider' && p[2] === 'bookings' && p[4] === 'proposal' && method === 'PATCH') return reportProposal(p[3], body);
+  if (p[0] === 'provider' && p[2] === 'billing' && p[3] === 'sync' && method === 'POST') return syncReadiness();
   if (p[0] === 'assistant' && p[1] === 'chat') return assistantChat(body);
   if (p[0] === 'session' && p.length === 1) return { ok: true, id: uuid(9, 1) };
   if (p[0] === 'session' && p[2] === 'duplicate') return duplicateSession(p[1], body);

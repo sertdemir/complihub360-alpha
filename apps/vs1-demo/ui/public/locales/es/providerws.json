@@ -180,7 +180,24 @@
     "planCadenceMonthly": "mensual",
     "planCadenceAnnual": "anual (12 meses al precio de 10)",
     "discountRemaining": "Quedan {{remaining}} de {{count}} leads con descuento en este ciclo ({{pct}} %)",
-    "leadsLine": "Leads de este ciclo · {{count}} cobrados · {{discount}} descuento del plan"
+    "leadsLine": "Leads de este ciclo · {{count}} cobrados · {{discount}} descuento del plan",
+    "readinessLabel": "Disponibilidad de cobro",
+    "readinessChecked": "última comprobación {{when}}",
+    "blockedTitle": "Reservas en pausa",
+    "readyTitle": "Reservable y listo para el cobro",
+    "checkNow": "Comprobar ahora",
+    "changePaymentInPortal": "Cambiar el método de pago en el portal",
+    "stillVisibleNote": "Sigue visible en los resultados — solo la reserva está en pausa hasta resolver los puntos anteriores.",
+    "syncFailed": "La comprobación no se completó — inténtelo de nuevo en un momento.",
+    "reason": {
+      "no_payment_method": "No hay ningún método de pago registrado. Añada una tarjeta en el portal.",
+      "incomplete_billing_info": "Los datos de facturación están incompletos. Complételos en el portal.",
+      "inactive_subscription": "Su suscripción no está activa. Reactívela para aceptar reservas.",
+      "withdrawn_authorization": "La autorización de cobro ha sido retirada. Acepte la versión actual para continuar.",
+      "overdue_invoice": "Hay una factura vencida. Páguela en el portal.",
+      "account_paused": "Su cuenta está en pausa.",
+      "payment_failed": "El último cobro de lead falló. Otro método de pago levanta el bloqueo — la misma tarjeta no."
+    }
   },
   "confirmEmail": {
     "working": "Confirmando su nueva dirección…",
@@ -445,7 +462,26 @@
     },
     "rateLead": "Valorar este lead",
     "rated": "✓ Lead valorado",
-    "rateNote": "¿El lead era cualificado? Tu valoración alimenta nuestra calidad interna de leads."
+    "rateNote": "¿El lead era cualificado? Tu valoración alimenta nuestra calidad interna de leads.",
+    "leadBand": "Banda {{band}} · {{label}}",
+    "leadDiscountCounter": "Descuento del plan {{pct}} % · lead {{n}} de este ciclo",
+    "leadStandardFee": "Tarifa estándar · cupo agotado",
+    "leadNoFee": "Sin tarifa de lead para esta área",
+    "leadPayment": {
+      "captured": "Cobrado · recibo por correo",
+      "pending": "Cobro pendiente",
+      "authorized": "Autorizado",
+      "failed": "Cobro fallido",
+      "refunded": "Reembolsado",
+      "na": "No cobrado"
+    },
+    "userDiscountTitle": "{{pct}} % para el cliente",
+    "userDiscountHint": "Se aplica a este encargo porque el cliente reservó a través de CompliHub360 · política de descuento versión 1",
+    "proposalIssued": "¿Propuesta enviada?",
+    "discountShown": "¿{{pct}} % indicado?",
+    "yes": "Sí",
+    "no": "No",
+    "notYet": "Todavía no"
   },
   "intake": {
     "inviteOnlyTitle": "El alta de partners es solo por invitación.",

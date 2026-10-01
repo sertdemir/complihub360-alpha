@@ -180,7 +180,24 @@
     "planCadenceMonthly": "monatlich",
     "planCadenceAnnual": "jährlich (12 Monate zum Preis von 10)",
     "discountRemaining": "Noch {{remaining}} von {{count}} rabattierten Leads in diesem Zyklus ({{pct}} %)",
-    "leadsLine": "Leads in diesem Zyklus · {{count}} berechnet · {{discount}} Tarif-Rabatt"
+    "leadsLine": "Leads in diesem Zyklus · {{count}} berechnet · {{discount}} Tarif-Rabatt",
+    "readinessLabel": "Zahlungsbereitschaft",
+    "readinessChecked": "zuletzt geprüft {{when}}",
+    "blockedTitle": "Buchungen gesperrt",
+    "readyTitle": "Buchbar und zahlungsbereit",
+    "checkNow": "Jetzt prüfen",
+    "changePaymentInPortal": "Zahlungsmittel im Portal ändern",
+    "stillVisibleNote": "Sie bleiben in den Ergebnissen sichtbar — nur die Buchung ist gesperrt, bis die Punkte oben erledigt sind.",
+    "syncFailed": "Die Prüfung ist nicht durchgelaufen — bitte in einem Moment erneut versuchen.",
+    "reason": {
+      "no_payment_method": "Kein Zahlungsmittel hinterlegt. Hinterlegen Sie eine Karte im Portal.",
+      "incomplete_billing_info": "Die Rechnungsdaten sind unvollständig. Vervollständigen Sie sie im Portal.",
+      "inactive_subscription": "Ihr Abo ist nicht aktiv. Aktivieren Sie es, um Buchungen anzunehmen.",
+      "withdrawn_authorization": "Das Zahlungsmandat wurde widerrufen. Bestätigen Sie die aktuelle Fassung, um weiterzumachen.",
+      "overdue_invoice": "Eine Rechnung ist überfällig. Bezahlen Sie sie im Portal.",
+      "account_paused": "Ihr Konto ist pausiert.",
+      "payment_failed": "Die letzte Lead-Belastung ist gescheitert. Ein anderes Zahlungsmittel hebt die Sperre auf — dieselbe Karte nicht."
+    }
   },
   "confirmEmail": {
     "working": "Ihre neue Adresse wird bestätigt…",
@@ -445,7 +462,26 @@
     },
     "rateLead": "Lead bewerten",
     "rated": "✓ Lead bewertet",
-    "rateNote": "War der Lead qualifiziert? Deine Bewertung speist unsere interne Lead-Qualität."
+    "rateNote": "War der Lead qualifiziert? Deine Bewertung speist unsere interne Lead-Qualität.",
+    "leadBand": "Band {{band}} · {{label}}",
+    "leadDiscountCounter": "Tarif-Rabatt {{pct}} % · Lead {{n}} in diesem Zyklus",
+    "leadStandardFee": "Standardgebühr · Kontingent verbraucht",
+    "leadNoFee": "Keine Lead-Gebühr für diesen Bereich",
+    "leadPayment": {
+      "captured": "Belastet · Beleg per E-Mail",
+      "pending": "Belastung ausstehend",
+      "authorized": "Autorisiert",
+      "failed": "Belastung gescheitert",
+      "refunded": "Erstattet",
+      "na": "Nicht belastet"
+    },
+    "userDiscountTitle": "{{pct}} % für den Mandanten",
+    "userDiscountHint": "Gilt für dieses Mandat, weil der Mandant über CompliHub360 gebucht hat · Rabatt-Policy Fassung 1",
+    "proposalIssued": "Angebot erstellt?",
+    "discountShown": "{{pct}} % ausgewiesen?",
+    "yes": "Ja",
+    "no": "Nein",
+    "notYet": "Noch nicht"
   },
   "intake": {
     "inviteOnlyTitle": "Partner-Intake nur mit Einladung.",

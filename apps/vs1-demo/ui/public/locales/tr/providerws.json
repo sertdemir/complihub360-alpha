@@ -180,7 +180,24 @@
     "planCadenceMonthly": "aylık",
     "planCadenceAnnual": "yıllık (10 ay fiyatına 12 ay)",
     "discountRemaining": "Bu döngüde {{count}} indirimli lead hakkından {{remaining}} kaldı (%{{pct}})",
-    "leadsLine": "Bu döngüdeki lead'ler · {{count}} ücretlendirildi · {{discount}} plan indirimi"
+    "leadsLine": "Bu döngüdeki lead'ler · {{count}} ücretlendirildi · {{discount}} plan indirimi",
+    "readinessLabel": "Ödeme hazırlığı",
+    "readinessChecked": "son kontrol {{when}}",
+    "blockedTitle": "Rezervasyonlar duraklatıldı",
+    "readyTitle": "Rezerve edilebilir ve ödemeye hazır",
+    "checkNow": "Şimdi kontrol et",
+    "changePaymentInPortal": "Ödeme yöntemini portalda değiştir",
+    "stillVisibleNote": "Sonuçlarda görünür kalırsınız — yukarıdaki maddeler çözülene kadar yalnızca rezervasyon duraklatılır.",
+    "syncFailed": "Kontrol tamamlanamadı — lütfen biraz sonra tekrar deneyin.",
+    "reason": {
+      "no_payment_method": "Kayıtlı ödeme yöntemi yok. Portalda bir kart ekleyin.",
+      "incomplete_billing_info": "Fatura bilgileri eksik. Portalda tamamlayın.",
+      "inactive_subscription": "Aboneliğiniz etkin değil. Rezervasyon almak için yeniden etkinleştirin.",
+      "withdrawn_authorization": "Ödeme yetkisi geri çekildi. Devam etmek için güncel sürümü onaylayın.",
+      "overdue_invoice": "Vadesi geçmiş bir fatura var. Portalda ödeyin.",
+      "account_paused": "Hesabınız duraklatıldı.",
+      "payment_failed": "Son lead tahsilatı başarısız oldu. Farklı bir ödeme yöntemi engeli kaldırır — aynı kart kaldırmaz."
+    }
   },
   "confirmEmail": {
     "working": "Yeni adresiniz doğrulanıyor…",
@@ -445,7 +462,26 @@
     },
     "rateLead": "Bu lead'i değerlendir",
     "rated": "✓ Lead değerlendirildi",
-    "rateNote": "Lead nitelikli miydi? Puanın iç lead kalitemizi besler."
+    "rateNote": "Lead nitelikli miydi? Puanın iç lead kalitemizi besler.",
+    "leadBand": "Bant {{band}} · {{label}}",
+    "leadDiscountCounter": "Plan indirimi % {{pct}} · bu dönemin {{n}}. lead'i",
+    "leadStandardFee": "Standart ücret · kontenjan doldu",
+    "leadNoFee": "Bu alan için lead ücreti yok",
+    "leadPayment": {
+      "captured": "Tahsil edildi · makbuz e-postayla",
+      "pending": "Tahsilat bekliyor",
+      "authorized": "Yetkilendirildi",
+      "failed": "Tahsilat başarısız",
+      "refunded": "İade edildi",
+      "na": "Tahsil edilmedi"
+    },
+    "userDiscountTitle": "Müşteri için % {{pct}}",
+    "userDiscountHint": "Müşteri CompliHub360 üzerinden rezervasyon yaptığı için bu iş için geçerlidir · indirim politikası sürüm 1",
+    "proposalIssued": "Teklif gönderildi mi?",
+    "discountShown": "% {{pct}} gösterildi mi?",
+    "yes": "Evet",
+    "no": "Hayır",
+    "notYet": "Henüz değil"
   },
   "intake": {
     "inviteOnlyTitle": "Partner kaydı yalnızca davetle.",

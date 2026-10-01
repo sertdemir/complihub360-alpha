@@ -18,8 +18,11 @@ Backend, Canvas, Figma und lokale UI nach dem UI-Workflow (Canvas → Figma →
 lokal; Staging nach dem Review des Nutzers).
 
 **Backend gemergt 2026-10-01:** PR #234, Squash `8686e28c`; Staging-Migration
-`booking_charge` per Supabase-MCP eingespielt. Canvas:
-https://claude.ai/artifact/Vk4dLmmyBP6zz4Tx4hkBXP — UI folgt nach der Wahl.
+`booking_charge` per Supabase-MCP eingespielt (in Stücken, Ledger-Zeile von
+Hand). Canvas: https://claude.ai/artifact/Vk4dLmmyBP6zz4Tx4hkBXP — **Wahl des
+Nutzers 2026-10-01: 1B · 2A · 3A · 4A.** Figma-Seite „Buchung & Belastung
+(Phase 4)" (Node 3540:2) mit vier Frames und Uptake-Notiz. UI lokal im
+zweiten PR.
 
 ## Objective
 
@@ -87,16 +90,21 @@ https://claude.ai/artifact/Vk4dLmmyBP6zz4Tx4hkBXP — UI folgt nach der Wahl.
 
 ### UI (Canvas → Figma → lokal)
 
-- [x] Canvas mit vier Sektionen × drei Varianten (veröffentlicht); Wahl des Nutzers offen.
-- [ ] Figma-Seite „Buchung & Belastung (Phase 4)" (Compass-Instanzen,
-  Uptake-Kandidaten).
-- [ ] Drawer und Terminseite: Acknowledgement mit Version vor dem CTA,
-  Zustände `BOOKING_NOT_COMPLETED`, `SLOT_TAKEN`, `ACKNOWLEDGEMENT_OUTDATED`.
-- [ ] LeadsPage: Band, Standard → Endbetrag, Rabattfolge, 10 %-Pflicht mit
-  Bestätigung. BillingPage: Zahlungsbereitschaft mit Gründen, Sync beim
-  Rückweg aus dem Portal, Leads-Zeile echt.
-- [ ] Mock-Modus (`vite-plugin-mock-api.ts`, `mock/demoApi.ts`), Locales
-  en/de/es/tr, Screenshots.
+- [x] Canvas mit vier Sektionen × drei Varianten (veröffentlicht); Wahl 1B · 2A · 3A · 4A.
+- [x] Figma-Seite „Buchung & Belastung (Phase 4)" (Compass-Instanzen,
+  Uptake-Kandidaten: AcknowledgementList, StateCard neutral, LeadBillingLine,
+  ReadinessBox).
+- [x] Drawer und Terminseite: Acknowledgement mit Version vor dem CTA
+  (`BookingAcknowledgement.tsx`), Zustände `BOOKING_NOT_COMPLETED` /
+  `BILLING_NOT_READY`, `SLOT_TAKEN`, `ACKNOWLEDGEMENT_OUTDATED` als neutraler
+  Kasten an der Stelle des Buttons; `sessionId` aus der Ergebnisseite.
+- [x] LeadsPage: Band, Standard → Endbetrag, Rabattzähler, Status, 10 %-Block
+  mit zwei Umschaltern (PATCH proposal). BillingPage: Status-Kasten gesperrt /
+  bereit mit Gründen, Portal-Button, „Jetzt prüfen", Sync bei `?from=portal`.
+- [x] Mock-Modus (`/acknowledgement`, Fassung Pflicht, 15:30-Termine →
+  `BOOKING_NOT_COMPLETED`, Leads mit Ledger, Proposal-PATCH, `billing/sync`
+  mit Zustandswechsel), Locales en/de/es/tr, Screenshots im PR.
+- [ ] Review des Nutzers lokal, dann Staging (Stufe 4).
 
 ## Nicht in diesem Ticket
 

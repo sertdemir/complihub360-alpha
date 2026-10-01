@@ -174,7 +174,35 @@
     "duration": "30 min",
     "noSlots": "This provider has no free slots right now. Try again in a few days.",
     "failed": "The appointment could not be booked. Please try again in a moment.",
-    "doneNote": "The invitation is in your inbox. Under “Appointments” you can move or cancel it."
+    "doneNote": "The invitation is in your inbox. Under “Appointments” you can move or cancel it.",
+    "ackLabel": "What you confirm with this booking",
+    "ackLoading": "Loading the booking terms …",
+    "ackConfirmLine_one": "With the booking you confirm the point above (version {{version}})",
+    "ackConfirmLine_other": "With the booking you confirm the {{count}} points above (version {{version}})",
+    "fail": {
+      "not_completed": {
+        "title": "The booking could not be completed.",
+        "body": "This is not on your side: a requirement on the provider's side is missing right now. Your appointment is not booked and nothing was shared. The provider has been informed."
+      },
+      "slot_taken": {
+        "title": "This slot has just been taken.",
+        "body": "Someone else booked it a moment ago. Your appointment is not booked and nothing was shared — pick another slot."
+      },
+      "acknowledgement_outdated": {
+        "title": "The booking terms have changed.",
+        "body": "Please read the updated points once more before you book. Your appointment is not booked and nothing was shared."
+      },
+      "generic": {
+        "title": "The appointment could not be booked.",
+        "body": "Please try again in a moment. Your appointment is not booked and nothing was shared."
+      },
+      "otherProvider": "Choose another provider",
+      "retryLater": "Try again later",
+      "retryNow": "Try again",
+      "pickOtherSlot": "Pick another slot",
+      "reread": "Read the updated terms",
+      "keepNote": "Your message and your selection stay as they are."
+    }
   },
   "search": {
     "navGuided": "Assess My Needs",

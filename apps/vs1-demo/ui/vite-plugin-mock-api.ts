@@ -24,7 +24,7 @@ export function mockApiPlugin(): Plugin {
         let parsed: Record<string, unknown> = {};
         try { parsed = raw ? JSON.parse(raw) : {}; } catch { /* kein JSON */ }
         const role = String(req.headers['x-demo-role'] ?? '');
-        const body = route(req.method ?? 'GET', url.pathname, parsed, role);
+        const body = route(req.method ?? 'GET', url.pathname, parsed, role, url.searchParams);
         res.setHeader('content-type', 'application/json');
         res.setHeader('x-mock-api', '1');
         // Eine Antwort darf ihren Status mitbringen (404 fuer unbekannte Anbieter).
