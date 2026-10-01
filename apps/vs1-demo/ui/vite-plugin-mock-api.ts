@@ -695,7 +695,11 @@ function p2Verification(key?: string) {
   return { ok: true, lifecycle: { status: p.lifecycle_status, since: p.lifecycle_status_since, reason: p.lifecycle_status_reason, reverification_due_at: null, grace_until: null }, matrix: p2Matrix(), checklist: p2Checklist(), open_requests: p2Requests(), history: p2History() };
 }
 function p2Gate() {
-  return { ok: false, missing: ['evidence.insurance', 'evidence.representative_identity', 'agreements.none', 'billing.not_ready', 'billing.no_payment_method'].filter((m) => m !== 'agreements.none'), target: 'limited', approved_cells: 1, total_cells: 4, allowance: null };
+  // Kein billing.* in `missing`: die Zahlungsbereitschaft sperrt die
+  // gebuehrenpflichtige Buchung, nicht die Aktivierung (Spec A §21.1). Sie wird
+  // gemeldet — und muss hier stehen, sonst greift die Gate-Leiste ins Leere.
+  return { ok: false, missing: ['evidence.insurance', 'evidence.representative_identity'], target: 'limited', approved_cells: 1, total_cells: 4, allowance: null,
+    billing: { ready: false, blocks_chargeable_booking: ['not_ready', 'no_payment_method'] } };
 }
 function p2Queue() {
   const rows = [

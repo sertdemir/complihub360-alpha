@@ -770,7 +770,7 @@ paths:
       security: [ { bearerAuth: [] } ]
       parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
       responses:
-        '200': { description: "gate {ok, missing[], target, approved_cells, total_cells, allowance}" }
+        '200': { description: "gate {ok, missing[], target, approved_cells, total_cells, allowance, billing}. billing {ready, blocks_chargeable_booking[]} wird GEMELDET, nicht gesperrt: §21.1 sperrt die gebuehrenpflichtige Buchung (409 BILLING_NOT_READY an POST /scheduling), nicht die Aktivierung. Kein billing.* in missing[] (Nutzer-Entscheidung 2026-10-01, TKT-PROV-05)." }
 
   /admin/review/{key}/evidence/{id}:
     post:

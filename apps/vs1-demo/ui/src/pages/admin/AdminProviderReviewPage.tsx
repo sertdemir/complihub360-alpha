@@ -44,10 +44,13 @@ const RESULT: Record<ReviewEvidence['result'], { label: string; tone: BadgeTone 
 const GATE_LABEL: Record<string, string> = {
   'evidence.incorporation': 'Register extract verified', 'evidence.vat_id': 'VAT ID confirmed (VIES)', 'evidence.insurance': 'Insurance verified', 'evidence.representative_identity': 'Representative verified',
   'coverage.none_approved': '≥ 1 cell approved', 'agreements.provider_agreement': 'Provider agreement accepted', 'agreements.privacy_notice': 'Privacy notice accepted', 'agreements.billing_authorization': 'Billing authorisation accepted',
-  'billing.not_ready': 'Billing ready', 'billing.no_payment_method': 'no payment method', 'billing.incomplete_billing_info': 'billing details incomplete', 'billing.inactive_subscription': 'no active subscription', 'billing.withdrawn_authorization': 'authorisation withdrawn', 'billing.overdue_invoice': 'overdue invoice', 'billing.account_paused': 'account paused',
+  'billing.not_ready': 'not ready', 'billing.no_payment_method': 'no payment method', 'billing.incomplete_billing_info': 'billing details incomplete', 'billing.inactive_subscription': 'no active subscription', 'billing.withdrawn_authorization': 'authorisation withdrawn', 'billing.overdue_invoice': 'overdue invoice', 'billing.account_paused': 'account paused',
   'plan.category_allowance': 'Plan category allowance', 'lifecycle.terminated': 'Account closed',
 };
-const GATE_ITEMS = ['evidence.incorporation', 'evidence.vat_id', 'evidence.insurance', 'evidence.representative_identity', 'coverage.none_approved', 'agreements.provider_agreement', 'agreements.privacy_notice', 'agreements.billing_authorization', 'billing.not_ready', 'plan.category_allowance'];
+// Ohne 'billing.not_ready': Zahlungsbereitschaft sperrt die gebuehrenpflichtige
+// Buchung, nicht die Aktivierung (Spec A §21.1). Sie steht unter der Leiste als
+// Information, damit der Reviewer sie sieht, ohne daran zu scheitern.
+const GATE_ITEMS = ['evidence.incorporation', 'evidence.vat_id', 'evidence.insurance', 'evidence.representative_identity', 'coverage.none_approved', 'agreements.provider_agreement', 'agreements.privacy_notice', 'agreements.billing_authorization', 'plan.category_allowance'];
 
 function fmt(iso: string | null | undefined, locale: string, time = false): string {
   if (!iso) return '—';
@@ -120,7 +123,7 @@ export function AdminProviderReviewPage() {
               <div className="grid gap-2 md:grid-cols-4">
                 {GATE_ITEMS.map((g) => {
                   const missing = gate?.missing.includes(g) ?? true;
-                  const reasons = g === 'billing.not_ready' ? (gate?.missing ?? []).filter((m) => m.startsWith('billing.') && m !== 'billing.not_ready').map((m) => GATE_LABEL[m] ?? m) : g === 'plan.category_allowance' && gate?.allowance ? [gate.allowance.plan ? `over: ${gate.allowance.over.join(', ')}` : 'no plan chosen'] : [];
+                  const reasons = g === 'plan.category_allowance' && gate?.allowance ? [gate.allowance.plan ? `over: ${gate.allowance.over.join(', ')}` : 'no plan chosen'] : [];
                   return (
                     <div key={g} className={cn('rounded-md px-3 py-2 text-[12px]', missing ? 'bg-warning-bg text-fg' : 'bg-surface-secondary text-fg-secondary')}>
                       <span className="flex items-center gap-1.5">{missing ? <AlertCircle size={14} className="text-warning-600" /> : <CheckCircle2 size={14} className="text-success-600" />}{GATE_LABEL[g]}</span>
@@ -129,6 +132,15 @@ export function AdminProviderReviewPage() {
                   );
                 })}
               </div>
+              {gate && !gate.billing.ready && (
+                <div className="rounded-md border border-stroke-subtle bg-surface-secondary px-3 py-2 text-[12px] text-fg-secondary">
+                  <strong className="font-medium text-fg">Not chargeable for bookings yet</strong>
+                  {gate.billing.blocks_chargeable_booking.filter((r) => r !== 'not_ready').length > 0 && (
+                    <> — {gate.billing.blocks_chargeable_booking.filter((r) => r !== 'not_ready').map((r) => GATE_LABEL[`billing.${r}`] ?? r).join(' · ')}</>
+                  )}
+                  . This does not block activation: billing readiness blocks the chargeable booking, not the status (Spec A §21.1). A booking attempt answers 409 BILLING_NOT_READY.
+                </div>
+              )}
               <div className="flex flex-wrap items-center gap-2">
                 <span className="mr-auto max-w-xl text-[12px] text-fg-tertiary">Activation is possible only once every condition is met. The API returns the same points — this bar is not a copy, it is the same state.</span>
                 <Button size="sm" variant="secondary" onClick={() => setDialog({ kind: 'request' })}>Request evidence</Button>
