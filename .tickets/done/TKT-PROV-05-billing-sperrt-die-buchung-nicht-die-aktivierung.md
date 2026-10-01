@@ -1,7 +1,7 @@
 ---
 title: "Billing sperrt die Buchung, nicht die Aktivierung — das Gate meldet statt zu sperren"
 assignee: "Claude"
-status: "review"
+status: "done"
 ---
 
 # Billing sperrt die Buchung, nicht die Aktivierung
@@ -126,3 +126,7 @@ ohne jeden Tarif kann jetzt aktiviert werden. Nach §21.1 ist das richtig
 („Inactive subscription where required" sperrt die Buchung), aber ob ein Konto
 ohne Tarif gelistet werden soll, ist eine eigene Frage. Der Kommentar ist
 richtiggestellt; die Frage bleibt offen.
+
+---
+
+Gemergt am 2026-10-01 mit PR #233 (Squash `1d861061`).

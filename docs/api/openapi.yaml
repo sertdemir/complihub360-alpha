@@ -253,7 +253,8 @@ paths:
 
   # ─── Anbieter-Identitaet und Ownership (Phase 0, 2026-09-22) ───────────────
   # Alle Anbieter-eigenen Routen /provider/{key}/(bookings|coverage|profile|
-  # invoices|availability|billing-portal|change-email|billing/preview) sind nur
+  # invoices|availability|billing-portal|change-email|billing/preview|
+  # subscription) sind nur
   # fuer Mitglieder des Anbieters (provider_members), Admins und den
   # Server-Key erreichbar. Fremde bekommen 404, damit die Antwort nicht
   # verraet, welche Anbieter-Schluessel existieren.
@@ -345,6 +346,147 @@ paths:
   # ─── Pricing v2 (ADR-0003, 2026-09-22) ─────────────────────────────────────
   # Plaene, Baender und Rabatte kommen aus plan_catalog / lead_band_config /
   # lead_band_rules / lead_fee_eligibility. Nichts davon erreicht /search.
+
+  /provider/{key}/subscription:
+    get:
+      summary: Eigenes Abo und waehlbare Tarife
+      description: >
+        Das laufende Abo (oder `null`) und die Tarife mit Preis und Kontingent.
+        Nur fuer Mitglieder des Anbieters, Admin oder Server-Key — Spec B:
+        Abo-Daten sind fuer den Anbieter und berechtigte Admins, nie fuer die
+        Nutzerseite. Der Tarif hat keinen Einfluss auf Matching oder Ranking.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Abo und Tarife
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  subscription:
+                    type: object
+                    nullable: true
+                    properties:
+                      plan_code: { type: string, enum: [essential, growth, global] }
+                      cadence: { type: string, enum: [monthly, annual] }
+                      status: { type: string, enum: [active, past_due, cancelled, ended] }
+                      current_period_start: { type: string, format: date }
+                      current_period_end: { type: string, format: date }
+                      started_at: { type: string, format: date-time }
+                  plans:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code: { type: string }
+                        label: { type: string }
+                        currency: { type: string, example: USD }
+                        monthly_cents: { type: integer, example: 9900 }
+                        annual_cents: { type: integer, example: 99000 }
+                        category_allowance: { type: integer, nullable: true }
+                        lead_discount_pct: { type: integer }
+                        lead_discount_count: { type: integer }
+        '404': { description: Kein Zugriff auf diesen Anbieter }
+    post:
+      summary: Tarif waehlen (erstes Abo)
+      description: >
+        Legt das Abo an. Die Abo-GEBUEHR laeuft NICHT ueber ein Stripe-Abo,
+        sondern ueber den Monatslauf `POST /admin/billing/run`, der je Periode
+        eine Stripe-Rechnung ausstellt (`send_invoice`, 14 Tage).
+
+
+        Ein Tarif allein macht nicht buchbar: das Abo ist eine von sieben
+        Bedingungen der Zahlungsbereitschaft (Spec A §21.1) — ohne
+        Zahlungsmethode bleibt der Anbieter unbuchbar.
+
+
+        Laeuft schon ein Abo, antwortet die Route mit 409
+        `SUBSCRIPTION_EXISTS`. Ein Wechsel ist bewusst nicht moeglich: Spec B
+        laesst "proration, cancellation notice, grace period, failed-payment
+        retry, and reactivation rules" ausdruecklich offen.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [plan_code, cadence]
+              properties:
+                plan_code: { type: string, enum: [essential, growth, global] }
+                cadence: { type: string, enum: [monthly, annual] }
+      responses:
+        '201':
+          description: Abo angelegt
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  subscription:
+                    type: object
+                    properties:
+                      plan_code: { type: string }
+                      cadence: { type: string, enum: [monthly, annual] }
+                      status: { type: string, example: active }
+                      current_period_start: { type: string, format: date }
+                      current_period_end: { type: string, format: date }
+        '400': { description: VALIDATION_ERROR oder UNKNOWN_PLAN }
+        '404': { description: Kein Zugriff auf diesen Anbieter }
+        '409': { description: 'SUBSCRIPTION_EXISTS (es laeuft schon ein Abo) oder PROVIDER_NOT_ELIGIBLE (Konto gesperrt oder beendet)' }
+
+  /admin/provider-subscriptions:
+    post:
+      summary: Abo zuweisen oder beenden (Admin)
+      description: >
+        Zwei getrennte Vorgaenge, bewusst kein "wechsle auf": `action: start`
+        und `action: end`. So steht jeder Schritt einzeln im
+        Entscheidungsprotokoll, und niemand muss eine Pro-rata-Regel annehmen,
+        die noch nicht beschlossen ist.
+
+
+        Es bewegt sich kein Geld: keine Erstattung, keine Pro rata. Die Periode,
+        die schon in Rechnung steht, bleibt in Rechnung.
+
+
+        Server-Key oder Admin.
+      security:
+        - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [provider_key, action]
+              properties:
+                provider_key: { type: string }
+                action: { type: string, enum: [start, end] }
+                plan_code: { type: string, enum: [essential, growth, global], description: 'Pflicht bei action=start' }
+                cadence: { type: string, enum: [monthly, annual], description: 'Pflicht bei action=start' }
+                reason: { type: string, maxLength: 500 }
+      responses:
+        '200': { description: Abo beendet }
+        '201': { description: Abo angelegt }
+        '400': { description: VALIDATION_ERROR oder UNKNOWN_PLAN }
+        '403': { description: FORBIDDEN — nur Admin oder Server-Key }
+        '404': { description: Anbieter unbekannt }
+        '409': { description: 'SUBSCRIPTION_EXISTS, NO_SUBSCRIPTION oder PROVIDER_NOT_ELIGIBLE' }
 
   /provider/{key}/billing/preview:
     get:

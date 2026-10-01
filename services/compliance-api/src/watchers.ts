@@ -2,6 +2,7 @@ import * as crypto from "node:crypto";
 import { structuredLog } from "@complihub360/types";
 import { supabaseApi } from "./supabase.js";
 import { runBillingReadinessTick } from "./leadCharge.js";
+import { runSubscriptionPeriodTick } from "./subscriptions.js";
 import { isKnownCountry } from "@complihub/compliance-engine";
 import { sendMagicLinkMail, sendReviewMail, sendMarketCoveredMail } from "./mailer.js";
 import { notify } from "./notifications.js";
@@ -81,6 +82,7 @@ export interface TickSummary {
     reverificationDue: number;
     marketCoveredNotices: number;
     billingSynced: number;
+    subscriptionPeriodsRolled: number;
     billingChanged: number;
 }
 
@@ -172,7 +174,7 @@ async function mark(base: string, shadow: boolean, payload: Record<string, unkno
 export async function runWatcherTick(): Promise<TickSummary> {
     const shadow = watcherConfig.shadow;
     const now = Date.now();
-    const summary: TickSummary = { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0, reviewRequests: 0, reviewWarnings: 0, reviewDowngrades: 0, evidenceExpiringNotices: 0, evidenceExpired: 0, reverificationDue: 0, marketCoveredNotices: 0, billingSynced: 0, billingChanged: 0 };
+    const summary: TickSummary = { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0, reviewRequests: 0, reviewWarnings: 0, reviewDowngrades: 0, evidenceExpiringNotices: 0, evidenceExpired: 0, reverificationDue: 0, marketCoveredNotices: 0, billingSynced: 0, billingChanged: 0, subscriptionPeriodsRolled: 0 };
 
     let engagements: Engagement[];
     try {
@@ -317,6 +319,15 @@ export async function runWatcherTick(): Promise<TickSummary> {
         summary.billingSynced = br.synced;
         summary.billingChanged = br.changed;
         summary.errors += br.errors;
+    } catch { summary.errors++; }
+
+    // Abo-Perioden fortschreiben: ohne diesen Pass bliebe
+    // `current_period_end` in der Vergangenheit stehen — und weil der
+    // Rabattzyklus am Periodenbeginn haengt, wuerde der Zaehler der
+    // Lead-Rabatte nie zuruecksetzen. Kein Geld, nur Daten.
+    try {
+        const sp = await runSubscriptionPeriodTick(shadow);
+        summary.subscriptionPeriodsRolled = sp.rolled;
     } catch { summary.errors++; }
 
     // Markt-Update: angefragte Maerkte, die die Engine inzwischen prueft.
