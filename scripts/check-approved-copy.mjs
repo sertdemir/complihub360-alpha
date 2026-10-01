@@ -156,7 +156,11 @@ const VORLAGE = {
     "sentBody": "We count requests per market to decide where coverage comes next. We can’t promise a date.",
     "notifyLabel": "Email me when {{market}} is covered",
     "notifyHelp": "We’ll email you at {{email}}. Only for this market.",
-    "failed": "We couldn’t send your request. Please try again."
+    "failed": "We couldn’t send your request. Please try again.",
+    // Canvas-Wahl G2 (01.10.2026, "ok übernehme deine Empfehlung"): der Satz
+    // unter der Überschrift für Gäste — ohne die Update-Wahl, die nur ein
+    // Konto hat. Eingeloggt bleibt marketUnavailable.message.
+    "guestMessage": "Request this market. We count requests per market to decide where coverage comes next."
   }
 };
 

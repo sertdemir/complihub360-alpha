@@ -311,7 +311,8 @@
     "copyLabel": "Copy of {{label}}",
     "bookedOn": "Appointment {{when}}",
     "providerBooked": "View appointment",
-    "booked": "Booked"
+    "booked": "Booked",
+    "providersEyebrow": "Verified Providers"
   },
   "rankBasis": {
     "group": "Verified and measured",

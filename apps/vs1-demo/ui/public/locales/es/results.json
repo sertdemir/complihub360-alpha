@@ -311,7 +311,8 @@
     "copyLabel": "Copia de {{label}}",
     "bookedOn": "Cita {{when}}",
     "providerBooked": "Ver la cita",
-    "booked": "Reservado"
+    "booked": "Reservado",
+    "providersEyebrow": "Verified Providers"
   },
   "rankBasis": {
     "group": "Verificado y medido",

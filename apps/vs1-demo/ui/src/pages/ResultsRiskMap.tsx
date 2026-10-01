@@ -37,6 +37,7 @@ import {
   MarketRequestList,
   MarketRequestSent,
   isMarketUnavailable,
+  NoVerifiedProvider,
   unavailableMarketsOf,
   useMarketRequests,
 } from '../components/results/MarketRequest';
@@ -493,7 +494,10 @@ export function ResultsRiskMap() {
     return (
       <SessionSnapshot
         rows={snapshotRows}
-        providers={anonProviders}
+        // H3 (01.10.2026): kein Markt geprueft → keine Anbieter-Karten mit
+        // "Does not cover your market", sondern der abgenommene Zustand.
+        providers={marketUnavailable ? [] : anonProviders}
+        providersEmptyState={marketUnavailable ? <NoVerifiedProvider /> : undefined}
         sessionId={sessionId}
         title={session?.label || t('snapshot.fallbackTitle')}
         meta={[markets, areas ? t('snapshot.areas', { count: areas }) : null].filter(Boolean).join(' · ')}
@@ -594,7 +598,9 @@ export function ResultsRiskMap() {
         <main className="mx-auto flex w-full max-w-container-3xl flex-col items-center gap-8 px-4 pb-20 pt-16 md:px-8 lg:px-16">
           <RiskMapStateHero
             heading={t(`common:states.${stateKey}.heading`)}
-            message={t(`common:states.${stateKey}.message`)}
+            // G2 (01.10.2026): Gaeste haben keine Update-Wahl — ihr Satz
+            // sagt nur, was fuer sie gilt. Eingeloggt bleibt der abgenommene.
+            message={t(marketUnavailable ? 'common:states.marketRequest.guestMessage' : `common:states.${stateKey}.message`)}
           >
             {pageState === 'loading' && <IndeterminateProgress />}
             {/* D3: der Weg zur Marktwahl steht unter dem Satz; nach der

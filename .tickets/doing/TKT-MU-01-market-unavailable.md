@@ -50,10 +50,11 @@ Betroffen sind **Risk Map** (Darstellung), **Registrierung und Gating** (Update 
 - [2026-09-27] **Claude**: Staging-Migration, Figma D3/E3/F3, lokaler Rollout. Offen: Copy-Abnahme, Staging, Versand. (Status: doing)
 - [2026-10-01] **Claude**: Versand des Markt-Updates (Migration, Mailer, Watcher, Client-Sprache). Offen: Mail-Copy-Abnahme, Staging-Migration. (Status: doing)
 - [2026-10-01] **Claude**: #231 gemergt, Staging Ende-zu-Ende geprüft, Mail-Copy abgenommen. Offen bleiben nur die Hero-Copy für Gäste und die Anbieter-Spalte (s. u.). (Status: doing)
+- [2026-10-01] **Claude**: G2 + H3 Canvas → Figma (3537:15183, 3537:15204) → lokal; 4 Sabotagen erkannt. (Status: doing)
 
 ## Offene Punkte für den Nutzer (Stufe 3)
 
 - ~~„You can switch it off any time.“~~ Entschieden 27.09.: bleibt weg, kein Abschalten.
 - ~~Versand des Updates fehlt~~ gebaut 01.10.
-- **Die abgenommene Hero-Copy** sagt auch Gästen „choose whether you would like to receive an availability update“. Gäste können das nach der Entscheidung vom 27.09. nicht. Entweder eine Gast-Variante abnehmen oder so lassen.
-- **Angemeldete Ansicht:** Die Anbieter-Spalte zeigt auch bei marketUnavailable Anbieter („Does not cover your market“), wie schon bei C3. Die Gast-Seite zeigt keine.
+- ~~Hero-Copy für Gäste~~ Canvas-Wahl G2 (01.10.): eigener Gast-Satz ohne Update-Wahl (`common:states.marketRequest.guestMessage`), eingeloggt bleibt der abgenommene.
+- ~~Anbieter-Spalte eingeloggt~~ Canvas-Wahl H3 (01.10.): bei marketUnavailable keine Anbieter-Karten, sondern der abgenommene Zustand `noProviderMatch`.
