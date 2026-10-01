@@ -230,6 +230,53 @@ export function cycleStartFor(sub: Subscription | null, today: Date): string {
 
 // ─── Angebot fuer einen Lead (Phase 4 fuehrt es aus) ─────────────────────────
 
+// ─── Zahlungsbereitschaft (Spec A §21.1) ─────────────────────────────────────
+//
+// Sechs Gruende aus der Spec, dazu seit Phase 4 `payment_failed`. Rein: die
+// Eingaenge sammelt leadCharge.syncBillingReadiness aus Stripe und Datenbank,
+// die Regel steht hier und ist ohne Netz testbar. Was hier NICHT steht:
+// irgendein Einfluss auf das Matching — der Zustand sperrt die Buchung, nie
+// die Sichtbarkeit (§14).
+
+export type BillingBlockReason =
+    | 'no_payment_method' | 'incomplete_billing_info' | 'inactive_subscription'
+    | 'withdrawn_authorization' | 'overdue_invoice' | 'account_paused' | 'payment_failed';
+
+export interface ReadinessInput {
+    hasDefaultPaymentMethod: boolean;
+    billingInfoComplete: boolean;
+    subscriptionStatus: Subscription['status'] | null;
+    authorizationAccepted: boolean;
+    overdueInvoices: number;
+    paused: boolean;
+    /** Die letzte Belastung scheiterte UND das Zahlungsmittel ist noch dasselbe. */
+    lastPaymentFailed: boolean;
+}
+
+export function billingReadiness(i: ReadinessInput): { ready: boolean; reasons: BillingBlockReason[] } {
+    const reasons: BillingBlockReason[] = [];
+    if (!i.hasDefaultPaymentMethod) reasons.push('no_payment_method');
+    if (!i.billingInfoComplete) reasons.push('incomplete_billing_info');
+    if (!i.subscriptionStatus || i.subscriptionStatus === 'cancelled' || i.subscriptionStatus === 'ended') reasons.push('inactive_subscription');
+    if (!i.authorizationAccepted) reasons.push('withdrawn_authorization');
+    if (i.overdueInvoices > 0) reasons.push('overdue_invoice');
+    if (i.paused) reasons.push('account_paused');
+    if (i.lastPaymentFailed) reasons.push('payment_failed');
+    return { ready: reasons.length === 0, reasons };
+}
+
+/** Der wirksame Zahlungsstatus einer Ledger-Zeile: das juengste Ereignis, sonst der Stand beim Schreiben. */
+export function resolveLedgerStatus(
+    row: { payment_status?: string | null },
+    events: Array<{ status: string; created_at?: string }>,
+): string {
+    if (events.length) {
+        const latest = [...events].sort((a, b) => String(a.created_at ?? '').localeCompare(String(b.created_at ?? '')))[events.length - 1];
+        return latest.status;
+    }
+    return row.payment_status ?? 'captured';
+}
+
 export interface LeadFeeQuote {
     enabled: boolean;                   // false = fuer diese Kategorie/Land keine Gebuehr (regulierter Beruf)
     band: 1 | 2 | 3 | 4;
@@ -459,7 +506,15 @@ export async function handleBillingPreview(res: ServerResponse, correlationId: s
         const subLine = subscriptionChargeForPeriod(sub, plan, period);
 
         const ledger = (await supabaseApi.select('provider_lead_ledger', { provider_key: providerKey, kind: 'charge' }, { order: 'created_at.desc', limit: 500 })) as any[];
-        const inCycle = ledger.filter((l) => String(l.created_at).slice(0, 10) >= cycleStart);
+        // Seit Phase 4 stehen auch pending und failed im Ledger (die Spur einer
+        // Belastung, die nicht zustande kam). Gezaehlt wird, was belastet
+        // wurde oder gebuehrenfrei war — nie, was scheiterte.
+        const inCycleAll = ledger.filter((l) => String(l.created_at).slice(0, 10) >= cycleStart).slice(0, 100);
+        const statuses = await Promise.all(inCycleAll.map(async (l) => {
+            const ev = (await supabaseApi.select('provider_lead_ledger_payment_events', { ledger_id: l.id }, { order: 'created_at.asc', limit: 20 })) as any[];
+            return resolveLedgerStatus(l, ev);
+        }));
+        const inCycle = inCycleAll.filter((_, i) => statuses[i] === 'captured' || statuses[i] === 'n/a');
         const leads = {
             count: inCycle.length,
             standard_cents: inCycle.reduce((s, l) => s + (l.standard_fee_cents || 0), 0),
@@ -487,6 +542,11 @@ export async function handleBillingPreview(res: ServerResponse, correlationId: s
                 cycle_start: cycleStart,
             },
             leads,
+            readiness: {
+                ready: !!providers[0].billing_ready,
+                reasons: Array.isArray(providers[0].billing_block_reasons) ? providers[0].billing_block_reasons : [],
+                synced_at: providers[0].billing_synced_at ?? null,
+            },
             credit_balance_cents: creditBalance,
             lines: subLine ? [subLine] : [],
             total_cents: (subLine?.amount_cents ?? 0) + leads.final_cents,

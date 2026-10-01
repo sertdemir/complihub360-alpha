@@ -72,7 +72,8 @@ export type BillingBlockReason =
     | 'inactive_subscription'
     | 'withdrawn_authorization'
     | 'overdue_invoice'
-    | 'account_paused';
+    | 'account_paused'
+    | 'payment_failed';      // Phase 4: letzte Lead-Belastung mit dem aktuellen Zahlungsmittel gescheitert
 
 /** Ergebnis einer Nachweispruefung (Spec §7). */
 export type EvidenceResult =

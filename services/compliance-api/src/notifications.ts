@@ -27,6 +27,9 @@ export type NotificationType =
     | 'engagement_expired'      // Niemand hat innerhalb der Frist reagiert
     | 'booking_rescheduled'     // Der Termin wurde verschoben
     | 'booking_cancelled'       // Der Termin wurde abgesagt
+    // Phase 4: an den Anbieter (provider_members).
+    | 'booking_created'         // Ein Nutzer hat gebucht — der bezahlte Lead
+    | 'payment_failed'          // Die Lead-Belastung scheiterte; Buchungen sind gesperrt
     // Verifikation eines Anbieterkontos (Phase 2). Empfaenger ist der
     // Dashboard-Login des Anbieters (provider_members).
     | 'verification_info_requested'  // Der Reviewer braucht einen weiteren Nachweis
@@ -53,9 +56,11 @@ export interface PayloadFelder {
     to?: string;
     /** Selbstvergebener Titel einer Sitzung. */
     label?: string;
+    /** Gebuchter Termin (ISO) — Phase 4, an den Anbieter. */
+    slot?: string;
 }
 
-const PAYLOAD_KEYS: Array<keyof PayloadFelder> = ['providerRef', 'providerKey', 'providerName', 'from', 'to', 'label'];
+const PAYLOAD_KEYS: Array<keyof PayloadFelder> = ['providerRef', 'providerKey', 'providerName', 'from', 'to', 'label', 'slot'];
 
 function nutzlast(roh: PayloadFelder): Record<string, string> {
     const out: Record<string, string> = {};

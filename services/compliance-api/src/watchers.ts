@@ -1,6 +1,7 @@
 import * as crypto from "node:crypto";
 import { structuredLog } from "@complihub360/types";
 import { supabaseApi } from "./supabase.js";
+import { runBillingReadinessTick } from "./leadCharge.js";
 import { sendMagicLinkMail, sendReviewMail } from "./mailer.js";
 import { notify } from "./notifications.js";
 
@@ -77,6 +78,8 @@ export interface TickSummary {
     evidenceExpiringNotices: number;
     evidenceExpired: number;
     reverificationDue: number;
+    billingSynced: number;
+    billingChanged: number;
 }
 
 // ─── Shared reminder core ─────────────────────────────────────────────────────
@@ -167,7 +170,7 @@ async function mark(base: string, shadow: boolean, payload: Record<string, unkno
 export async function runWatcherTick(): Promise<TickSummary> {
     const shadow = watcherConfig.shadow;
     const now = Date.now();
-    const summary: TickSummary = { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0, reviewRequests: 0, reviewWarnings: 0, reviewDowngrades: 0, evidenceExpiringNotices: 0, evidenceExpired: 0, reverificationDue: 0 };
+    const summary: TickSummary = { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0, reviewRequests: 0, reviewWarnings: 0, reviewDowngrades: 0, evidenceExpiringNotices: 0, evidenceExpired: 0, reverificationDue: 0, billingSynced: 0, billingChanged: 0 };
 
     let engagements: Engagement[];
     try {
@@ -303,6 +306,15 @@ export async function runWatcherTick(): Promise<TickSummary> {
         summary.evidenceExpired = ev.expired;
         summary.reverificationDue = ev.reverificationDue;
         summary.errors += ev.errors;
+    } catch { summary.errors++; }
+
+    // Zahlungsbereitschaft (Phase 4): die aeltesten Pruefungen zuerst, ohne
+    // Stripe-Schluessel ein No-op. Shadow schreibt nur Marker.
+    try {
+        const br = await runBillingReadinessTick(shadow);
+        summary.billingSynced = br.synced;
+        summary.billingChanged = br.changed;
+        summary.errors += br.errors;
     } catch { summary.errors++; }
 
     structuredLog("info", "Watcher tick complete", {

@@ -8,15 +8,16 @@ import { generateRelevantSubdomains, isKnownCountry, type CountryCode, type Indu
 
 import { supabaseApi } from "./supabase.js";
 import { verifySupabaseJwt } from "./supabaseJwt.js";
-import { sendMagicLinkMail, sendEmailChangeMail, sendRescheduleMail, sendCancellationMail } from "./mailer.js";
+import { sendMagicLinkMail, sendEmailChangeMail, sendRescheduleMail, sendCancellationMail, sendBookingMail } from "./mailer.js";
 import { handleAssistantChat, handleAssistantCheckout, handleAssistantVerify } from "./assistant.js";
 import { handleDomain } from "./domain.js";
 import { handleAuthAdopt } from "./adoption.js";
 import { handleDashboard, SLUG_TO_ENGINE } from "./dashboard.js";
 import { checkMarketRequest } from "./marketRequests.js";
 import { notify, handleNotificationsList, handleNotificationsRead } from "./notifications.js";
-import { handleBillingRun, handleBillingPreview, syncOpenInvoices } from "./billing.js";
-import { ensureStripeCustomer, isStripeConfigured, stripeRequest } from "./stripe.js";
+import { handleBillingRun, handleBillingPreview, syncOpenInvoices, loadPricingConfig, getActiveSubscription, getDiscountCounter, cycleStartFor, quoteLeadFee, resolveLedgerStatus } from "./billing.js";
+import { SHARED_FIELDS_V1, currentAcknowledgement, deriveOpportunity, priceSnapshotFrom, chargeLeadFee, recordPaymentFailure, syncBillingReadiness } from "./leadCharge.js";
+import { ensureStripeCustomer, isStripeConfigured, stripeRequest, getCustomerBilling, refundPaymentIntent } from "./stripe.js";
 import { checkVatId } from "./vies.js";
 import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
 import { buildCockpit } from "./cockpit.js";
@@ -226,6 +227,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         ['POST', /^\/api\/v1\/search$/],                   // guest risk map
         ['POST', /^\/api\/v1\/session$/],                  // guest wizard-session save (guest_key)
         ['POST', /^\/api\/v1\/market-requests$/],          // „Request This Market“ (guest_key or JWT)
+        ['GET', /^\/api\/v1\/acknowledgement(\?|$)/],       // booking acknowledgement text (public legal copy)
         ['GET', /^\/api\/v1\/sessions(\?|$)/],             // guest session list (guest_key = bearer)
         ['POST', /^\/api\/v1\/provider\/intake$/],         // intake token checked in-handler
         ['GET', /^\/api\/v1\/provider\/magic\//],          // single-use token IS the credential
@@ -1109,6 +1111,76 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Website outclick failed', correlationId }));
             }
         }
+    } else if (req.method === 'PATCH' && /^\/api\/v1\/provider\/[a-z0-9-]+\/bookings\/[0-9a-f-]+\/proposal$/.test(req.url || '')) {
+        // Phase 4 (Spec B "Mandatory user discount"): der Anbieter bestaetigt je
+        // Lead, ob ein Angebot erstellt und der 10 %-Rabatt ausgewiesen wurde.
+        // Eine Zeile je Buchung, Korrektur per Upsert, Historie im Protokoll.
+        const parts = (req.url || '').split('/');
+        const providerKey = parts[4]; const bookingId = parts[6];
+        res.setHeader('x-correlation-id', correlationId);
+        let prBody = '';
+        req.on('data', (chunk: any) => prBody += chunk.toString());
+        req.on('end', async () => {
+            try {
+                const d = JSON.parse(prBody || '{}');
+                if (typeof d.proposal_issued !== 'boolean' || typeof d.discount_shown !== 'boolean') {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'proposal_issued and discount_shown (boolean) required', correlationId }));
+                    return;
+                }
+                if (d.discount_shown && !d.proposal_issued) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'A discount cannot be shown without a proposal', correlationId }));
+                    return;
+                }
+                const rows = (await supabaseApi.select('scheduling', { id: bookingId, provider_key: providerKey }, { limit: 1 })) as any[];
+                if (!rows[0]) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Booking not found', correlationId }));
+                    return;
+                }
+                const now = new Date().toISOString();
+                const report = {
+                    booking_id: bookingId, provider_key: providerKey,
+                    proposal_issued: d.proposal_issued, discount_shown: d.discount_shown,
+                    discount_pct: rows[0].user_discount_pct ?? null, policy_version: rows[0].user_discount_policy_version ?? null,
+                    note: typeof d.note === 'string' ? d.note.slice(0, 500) : null,
+                    reported_by: authUserId, reported_at: now,
+                };
+                await supabaseApi.upsert('lead_proposal_reports', 'booking_id', report);
+                await supabaseApi.insert('event_log', { type: 'lead_proposal_reported', payload: { bookingId, providerKey, proposalIssued: d.proposal_issued, discountShown: d.discount_shown, by: authUserId } });
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, proposal: { proposal_issued: d.proposal_issued, discount_shown: d.discount_shown, reported_at: now }, correlationId }));
+            } catch {
+                structuredLog('error', 'Proposal report failed', { correlationId, errorCode: 'ERR_PROPOSAL', severity: 'error', route: req.url });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Proposal report failed', correlationId }));
+            }
+        });
+    } else if (req.method === 'POST' && /^\/api\/v1\/provider\/[a-z0-9-]+\/billing\/sync$/.test(req.url || '')) {
+        // Phase 4: Zahlungsbereitschaft aus Stripe und Datenbank neu berechnen —
+        // beim Rueckweg aus dem Portal und auf Knopfdruck. Nie im Buchungspfad.
+        const providerKey = (req.url || '').split('/')[4];
+        res.setHeader('x-correlation-id', correlationId);
+        try {
+            if (!isStripeConfigured()) {
+                res.writeHead(503, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'STRIPE_NOT_CONFIGURED', message: 'Stripe is not connected yet', correlationId }));
+                return;
+            }
+            const r = await syncBillingReadiness(providerKey);
+            if (!r) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId }));
+                return;
+            }
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ok: true, readiness: { ready: r.ready, reasons: r.reasons, synced_at: r.syncedAt, payment_method: r.paymentMethodLabel, changed: r.changed }, correlationId }));
+        } catch {
+            structuredLog('error', 'Billing sync failed', { correlationId, errorCode: 'ERR_BILLING_SYNC', severity: 'error', route: req.url });
+            res.writeHead(502, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'STRIPE_ERROR', message: 'Stripe request failed', correlationId }));
+        }
     } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/bookings$/.test(req.url || '')) {
         // Matchmaking v2: the provider's paid leads (bookings). The dossier —
         // user identity + intake message — is included from booking time
@@ -1120,15 +1192,38 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             const users = (await supabaseApi.select('users', {})) as any[];
             const byId: Record<string, any> = {};
             users.forEach((u: any) => { byId[u.id] = u; });
-            const bookings = rows.map((b: any) => ({
-                id: b.id,
-                slot_start: b.slot_start,
-                slot_end: b.slot_end,
-                status: b.status,
-                lead_charged: !!b.lead_charged,
-                user_email: b.user_id && byId[b.user_id] ? byId[b.user_id].email : null,
-                message: b.message ?? null,
-            }));
+            // Phase 4: je Lead, was er gekostet hat (Spec B "standard fee,
+            // discount, final charge") und die 10 % fuer den Nutzer samt
+            // Selbstauskunft des Anbieters.
+            const ledgerIds = rows.map((b: any) => b.lead_ledger_id).filter(Boolean);
+            const ledgerRows = (await Promise.all(ledgerIds.map((id: string) => supabaseApi.select('provider_lead_ledger', { id }, { limit: 1 }) as Promise<any[]>))).flat();
+            const eventRows = (await Promise.all(ledgerIds.map((id: string) => supabaseApi.select('provider_lead_ledger_payment_events', { ledger_id: id }, { order: 'created_at.asc', limit: 20 }) as Promise<any[]>))).flat();
+            const reports = (await supabaseApi.select('lead_proposal_reports', { provider_key: providerKey }, { limit: 500 })) as any[];
+            const ledgerById: Record<string, any> = {}; ledgerRows.forEach((l: any) => { ledgerById[l.id] = l; });
+            const reportByBooking: Record<string, any> = {}; reports.forEach((r: any) => { reportByBooking[r.booking_id] = r; });
+            const bookings = rows.map((b: any) => {
+                const l = b.lead_ledger_id ? ledgerById[b.lead_ledger_id] : null;
+                const rep = reportByBooking[b.id];
+                return {
+                    id: b.id,
+                    slot_start: b.slot_start,
+                    slot_end: b.slot_end,
+                    status: b.status,
+                    lead_charged: !!b.lead_charged,
+                    user_email: b.user_id && byId[b.user_id] ? byId[b.user_id].email : null,
+                    message: b.message ?? null,
+                    acknowledgement_version: b.acknowledgement_version ?? null,
+                    price_snapshot: b.price_snapshot ?? null,
+                    lead: l ? {
+                        band: l.computed_band, standard_fee_cents: l.standard_fee_cents, discount_pct: l.discount_pct,
+                        discount_sequence: l.discount_sequence ?? null, final_fee_cents: l.final_fee_cents, currency: l.currency,
+                        payment_status: resolveLedgerStatus(l, eventRows.filter((e: any) => e.ledger_id === l.id)),
+                        fee_enabled: l.payment_status !== 'n/a',
+                    } : null,
+                    user_discount_pct: b.user_discount_pct ?? null,
+                    proposal: rep ? { proposal_issued: !!rep.proposal_issued, discount_shown: !!rep.discount_shown, reported_at: rep.reported_at } : null,
+                };
+            });
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, providerKey, bookings, correlationId }));
         } catch {
@@ -1270,11 +1365,41 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Booking patch failed', correlationId }));
             }
         });
+    } else if (req.method === 'GET' && /^\/api\/v1\/acknowledgement(\?|$)/.test(req.url || '')) {
+        // Phase 4: der Text, den der Nutzer vor der Buchung bestaetigt, mit
+        // Fassung und der Liste der geteilten Felder. Oeffentlich — er steht
+        // ohnehin auf dem Bildschirm, bevor jemand bucht.
+        res.setHeader('x-correlation-id', correlationId);
+        try {
+            const lang = (new URL(req.url || '/', 'http://x').searchParams.get('lang') || 'en').slice(0, 2).toLowerCase();
+            const rows = (await supabaseApi.select('booking_acknowledgements', {}, { limit: 100 })) as any[];
+            const ack = currentAcknowledgement(rows, lang);
+            const policies = (await supabaseApi.select('user_discount_policy', {}, { limit: 50 })) as any[];
+            const today = new Date().toISOString().slice(0, 10);
+            const policy = policies.filter((r) => String(r.effective_from) <= today).sort((a, b) => b.version - a.version)[0] ?? null;
+            if (!ack) {
+                res.writeHead(503, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'ACKNOWLEDGEMENT_MISSING', message: 'No booking acknowledgement is configured', correlationId }));
+                return;
+            }
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+                ok: true, version: ack.version, language: ack.language, body: ack.body, shared_fields: ack.shared_fields,
+                user_discount: policy ? { pct: policy.pct, policy_version: policy.version, recurring_treatment: policy.recurring_treatment } : null,
+                correlationId,
+            }));
+        } catch {
+            structuredLog('error', 'Acknowledgement fetch failed', { correlationId, errorCode: 'ERR_ACK', severity: 'error', route: req.url });
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Acknowledgement fetch failed', correlationId }));
+        }
     } else if (req.method === 'POST' && req.url === '/api/v1/scheduling') {
-        // Matchmaking v2 (spec §11 P7): booking a slot IS the paid lead. On
-        // create: scheduling row + `scheduling_confirmed` + `provider_lead_charged`
-        // events + identity reveal (both sides). Charged even if a no-show occurs
-        // later — the provider receives the dossier (value) at booking time.
+        // Phase 4 (Spec B "Booking confirmation and data handover", ADR-0005):
+        // Bestaetigung mit Fassung → Preis-Snapshot → Band + Rabatt → Belastung
+        // der Anbieterkarte → ERST DANN die Buchung mit Offenlegung. Scheitert
+        // die Belastung, gibt es keine Buchung, keinen Namen, keinen Slot-
+        // Verlust; der Nutzer liest einen neutralen Satz, der Anbieter den
+        // Grund. Reihenfolge und Fehlerzweige: leadCharge.ts.
         res.setHeader('x-correlation-id', correlationId);
         if (!authUserId) {
             res.writeHead(401, { 'Content-Type': 'application/json' });
@@ -1283,52 +1408,177 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             let schedBody = '';
             req.on('data', (chunk: any) => schedBody += chunk.toString());
             req.on('end', async () => {
+                const fail = (status: number, errorCode: string, message: string, extra: Record<string, unknown> = {}) => {
+                    res.writeHead(status, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ errorCode, message, ...extra, correlationId }));
+                };
                 try {
                     const d = JSON.parse(schedBody || '{}');
-                    // Phase 3: der Browser kennt nur den public_ref. Der Schluessel
-                    // wird hier aufgeloest und bleibt serverseitig.
                     const ref = typeof d.public_ref === 'string' ? d.public_ref : '';
                     const slotStart = typeof d.slot_start === 'string' ? d.slot_start : '';
+                    const ackVersion = typeof d.acknowledgement_version === 'string' ? d.acknowledgement_version.slice(0, 40) : '';
+                    const lang = typeof d.language === 'string' ? d.language.slice(0, 2).toLowerCase() : 'en';
                     if (!ref || Number.isNaN(Date.parse(slotStart))) {
-                        res.writeHead(400, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'public_ref and slot_start (ISO) required', correlationId }));
-                        return;
+                        fail(400, 'VALIDATION_ERROR', 'public_ref and slot_start (ISO) required'); return;
                     }
+                    if (Date.parse(slotStart) < Date.now()) { fail(400, 'VALIDATION_ERROR', 'slot_start is in the past'); return; }
+                    if (!ackVersion) { fail(400, 'VALIDATION_ERROR', 'acknowledgement_version required'); return; }
+
                     const p = await resolveRef(ref);
                     const view = p ? await matchableRows(p.provider_key) : [];
-                    if (!p || !view.length) {
-                        res.writeHead(404, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId }));
-                        return;
-                    }
+                    if (!p || !view.length) { fail(404, 'NOT_FOUND', 'Provider not found'); return; }
                     // Buchbar heisst matchbar UND zahlungsbereit (Spec A §21.1). Das
-                    // Gate sperrt die Buchung, nie das Matching (§14) — und es sagt,
-                    // was es tut, statt still 404 zu antworten.
+                    // Gate sperrt die Buchung, nie das Matching (§14).
                     if (!view.some((r: any) => r.bookable_chargeable)) {
-                        res.writeHead(409, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({ errorCode: 'BILLING_NOT_READY', message: 'This provider cannot take bookings yet', correlationId }));
-                        return;
+                        fail(409, 'BILLING_NOT_READY', 'This provider cannot take bookings yet'); return;
                     }
                     const providerKey = p.provider_key as string;
+
+                    // Die Fassung, die der Nutzer gesehen hat, muss die gueltige sein.
+                    const ackRows = (await supabaseApi.select('booking_acknowledgements', {}, { limit: 100 })) as any[];
+                    const ack = currentAcknowledgement(ackRows, lang);
+                    if (!ack) { fail(503, 'ACKNOWLEDGEMENT_MISSING', 'No booking acknowledgement is configured'); return; }
+                    if (ack.version !== ackVersion) {
+                        fail(409, 'ACKNOWLEDGEMENT_OUTDATED', 'The booking acknowledgement has changed — please read it again', { current_version: ack.version }); return;
+                    }
+
+                    // Ein bestaetigter Termin je Slot — vor der Belastung geprueft, vom
+                    // Unique Index garantiert.
+                    const clash = (await supabaseApi.select('scheduling', { provider_key: providerKey, status: 'confirmed', slot_start: slotStart }, { limit: 1 })) as any[];
+                    if (clash.length) { fail(409, 'SLOT_TAKEN', 'This slot has just been taken'); return; }
+
+                    // Opportunity aus der Sitzung des Nutzers, begrenzt auf das Angebot.
+                    let session: { country?: string | null; categories?: string[] | null; markets?: string[] | null } | null = null;
+                    if (typeof d.session_id === 'string' && d.session_id) {
+                        const own = (await supabaseApi.select('sessions', { id: d.session_id }, { limit: 1 })) as any[];
+                        if (!own[0] || own[0].user_id !== authUserId) { fail(404, 'NOT_FOUND', 'Session not found'); return; }
+                        session = own[0];
+                    }
+                    const opp = deriveOpportunity(view, session, d);
+                    if (!opp.ok) { fail(400, opp.code, 'The booking needs the area and markets it refers to'); return; }
+
+                    // Band, Rabatt, Policy, Snapshot — alles Konfiguration, nichts Hardcoding.
+                    const [cfg, sub] = await Promise.all([loadPricingConfig(), getActiveSubscription(providerKey)]);
+                    const now = new Date();
+                    const cycleStart = cycleStartFor(sub, now);
+                    const used = await getDiscountCounter(providerKey, cycleStart);
+                    const quote = quoteLeadFee(cfg, sub, opp.opp, used, now);
+                    const policies = (await supabaseApi.select('user_discount_policy', {}, { limit: 50 })) as any[];
+                    const today = now.toISOString().slice(0, 10);
+                    const policy = policies.filter((r) => String(r.effective_from) <= today).sort((a, b) => b.version - a.version)[0] ?? null;
+                    const svcRows = (await supabaseApi.select('provider_services', { id: opp.serviceRow.service_id }, { limit: 1 })) as any[];
+                    const terms = (await supabaseApi.select('provider_agreement_acceptance', { provider_key: providerKey, agreement_type: 'commercial_terms' }, { limit: 10 })) as any[];
+                    const termsVersion = terms.find((t) => !t.superseded_at)?.version ?? null;
+                    const snapshot = priceSnapshotFrom(opp.serviceRow, svcRows[0] ?? null, termsVersion, now);
+
+                    // Zahlungsmittel: ohne Karte wird nichts versucht und nichts geschrieben.
+                    const chargeable = quote.enabled && quote.finalFeeCents > 0;
+                    let paymentMethodId: string | null = null;
+                    if (chargeable) {
+                        const customerId = p.stripe_customer_id ? String(p.stripe_customer_id) : null;
+                        if (customerId && isStripeConfigured()) {
+                            try { paymentMethodId = (await getCustomerBilling(customerId)).defaultPaymentMethodId; } catch { paymentMethodId = null; }
+                        }
+                        if (!customerId || !paymentMethodId) {
+                            await syncBillingReadiness(providerKey).catch(() => null);
+                            fail(409, 'BILLING_NOT_READY', 'This provider cannot take bookings yet'); return;
+                        }
+                    }
+
+                    // ── Ab hier wird geschrieben: Ledger → Stripe → Buchung ──
+                    const charge = await chargeLeadFee({
+                        providerKey, userId: authUserId, quote, opp: opp.opp,
+                        customerId: p.stripe_customer_id ? String(p.stripe_customer_id) : null, paymentMethodId,
+                        receiptEmail: p.contact_email ?? null, correlationId,
+                    });
+                    if (charge.outcome === 'failed') {
+                        if (charge.result.kind === 'card') {
+                            await recordPaymentFailure({ providerKey, ledgerId: charge.ledgerId, result: charge.result, paymentMethodId, correlationId });
+                            // Neutral und ohne Decline-Code: das liegt nicht am Nutzer.
+                            fail(409, 'BOOKING_NOT_COMPLETED', 'The booking could not be completed. This is not on your side — the provider has been informed.', { reason: 'provider_billing' });
+                        } else {
+                            await supabaseApi.insert('event_log', { type: 'lead_payment_error', payload: { providerKey, ledgerId: charge.ledgerId, detail: charge.result.detail.slice(0, 200) } }).catch(() => {});
+                            structuredLog('error', 'Lead charge failed at Stripe', { correlationId, errorCode: 'ERR_LEAD_CHARGE', severity: 'error', route: req.url });
+                            fail(502, 'BILLING_ERROR', 'The payment service did not answer. Please try again in a moment.');
+                        }
+                        return;
+                    }
+
                     const slotEnd = new Date(Date.parse(slotStart) + 30 * 60 * 1000).toISOString();
-                    const inserted = (await supabaseApi.insert('scheduling', {
-                        provider_key: providerKey,
-                        user_id: authUserId,
-                        slot_start: slotStart,
-                        slot_end: slotEnd,
-                        status: 'confirmed',
-                        message: typeof d.message === 'string' ? d.message.slice(0, 2000) : null,
-                        lead_charged: true,
-                        identity_revealed: true,
-                    })) as any[];
-                    const booking = inserted?.[0];
-                    await supabaseApi.insert('event_log', { type: 'scheduling_confirmed', payload: { bookingId: booking?.id, providerKey, userId: authUserId, slotStart } });
-                    await supabaseApi.insert('event_log', { type: 'provider_lead_charged', payload: { bookingId: booking?.id, providerKey, userId: authUserId } });
+                    const sharingAt = now.toISOString();
+                    let booking: any;
+                    try {
+                        const inserted = (await supabaseApi.insert('scheduling', {
+                            provider_key: providerKey,
+                            user_id: authUserId,
+                            slot_start: slotStart,
+                            slot_end: slotEnd,
+                            status: 'confirmed',
+                            message: typeof d.message === 'string' ? d.message.slice(0, 2000) : null,
+                            lead_charged: charge.outcome === 'captured',
+                            identity_revealed: true,
+                            service_id: opp.serviceRow.service_id ?? null,
+                            price_snapshot: snapshot,
+                            shared_fields: [...SHARED_FIELDS_V1],
+                            sharing_confirmed_at: sharingAt,
+                            acknowledgement_version: ack.version,
+                            lead_ledger_id: charge.ledgerId,
+                            user_discount_pct: policy?.pct ?? null,
+                            user_discount_policy_version: policy?.version ?? null,
+                        })) as any[];
+                        booking = inserted?.[0];
+                        if (!booking?.id) throw new Error('scheduling insert returned no row');
+                    } catch (insErr) {
+                        // Belastet, aber keine Buchung: erstatten und protokollieren.
+                        if (charge.outcome === 'captured') {
+                            try {
+                                await refundPaymentIntent(charge.paymentIntentId, `${charge.ledgerId}:refund`);
+                                await supabaseApi.insert('provider_lead_ledger_payment_events', { ledger_id: charge.ledgerId, status: 'refunded', stripe_ref: charge.paymentIntentId, detail: 'booking insert failed' });
+                                await supabaseApi.insert('event_log', { type: 'lead_charge_reversed', payload: { providerKey, ledgerId: charge.ledgerId, paymentIntentId: charge.paymentIntentId } });
+                            } catch (refErr) {
+                                await supabaseApi.insert('event_log', { type: 'lead_charge_reversed_failed', payload: { providerKey, ledgerId: charge.ledgerId, paymentIntentId: charge.paymentIntentId, error: String(refErr).slice(0, 200) } }).catch(() => {});
+                            }
+                        }
+                        const dup = /23505|duplicate|unique/i.test(String(insErr));
+                        if (dup) fail(409, 'SLOT_TAKEN', 'This slot has just been taken');
+                        else { structuredLog('error', 'Scheduling insert failed after charge', { correlationId, errorCode: 'ERR_SCHEDULING', severity: 'error', route: req.url }); fail(500, 'INTERNAL', 'Scheduling create failed'); }
+                        return;
+                    }
+
+                    if (quote.enabled) {
+                        await supabaseApi.upsert('provider_discount_counter', 'provider_key,cycle_start', {
+                            provider_key: providerKey, cycle_start: cycleStart, used: quote.counterUsedAfter, updated_at: sharingAt,
+                        }).catch(() => {});
+                    }
+                    await supabaseApi.insert('event_log', { type: 'scheduling_confirmed', payload: { bookingId: booking.id, providerKey, userId: authUserId, slotStart, ledgerId: charge.ledgerId } });
+                    await supabaseApi.insert('event_log', { type: 'provider_lead_charged', payload: {
+                        bookingId: booking.id, providerKey, userId: authUserId, ledgerId: charge.ledgerId,
+                        band: quote.band, finalFeeCents: quote.finalFeeCents, currency: quote.currency,
+                        paymentIntentId: charge.outcome === 'captured' ? charge.paymentIntentId : null, feeEnabled: quote.enabled,
+                    } });
+                    await supabaseApi.insert('event_log', { type: 'lead.revealed', payload: {
+                        bookingId: booking.id, providerKey, userId: authUserId, sharedFields: [...SHARED_FIELDS_V1],
+                        acknowledgementVersion: ack.version, sharingConfirmedAt: sharingAt,
+                    } });
+                    // Der Anbieter erfaehrt es im Dashboard und per Mail; beides ohne Nutzeridentitaet im Text.
+                    (async () => {
+                        const members = (await supabaseApi.select('provider_members', { provider_key: providerKey }, { limit: 20 })) as Array<{ user_id: string }>;
+                        for (const m of members) {
+                            await notify({ to: m.user_id, actor: authUserId, type: 'booking_created', subject: 'booking', subjectId: booking.id,
+                                payload: { providerKey, slot: slotStart }, dedupeKey: `booking_created:${booking.id}:${m.user_id}` });
+                        }
+                        await sendBookingMail({ to: p.contact_email ?? null, bookingId: booking.id, providerKey, slotIso: slotStart, locale: p.languages?.[0], correlationId });
+                    })().catch(() => { /* non-blocking */ });
+
                     res.writeHead(201, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({
                         ok: true,
-                        booking: { id: booking?.id, public_ref: ref, slot_start: slotStart, slot_end: slotEnd, status: 'confirmed' },
-                        // Stage-3 reveal: identity becomes visible at booking (spec §5).
+                        booking: {
+                            id: booking.id, public_ref: ref, slot_start: slotStart, slot_end: slotEnd, status: 'confirmed',
+                            acknowledgement_version: ack.version, shared_fields: [...SHARED_FIELDS_V1],
+                            user_discount: policy ? { pct: policy.pct, policy_version: policy.version } : null,
+                        },
+                        // Offenlegung erst jetzt (Spec B Schritt 5): Name und Kontakt nach der Belastung.
                         provider_identity: { name: p.name, website_url: p.website_url ?? null, contact_email: p.contact_email ?? null },
                         correlationId,
                     }));
