@@ -55,9 +55,11 @@ __pycache__/
 .playwright-mcp/
 .DS_Store
 
-# Claude workspace internals — only skills + launch config are project assets
+# Claude workspace internals — only skills, agents, hooks + config are project assets
 .claude/*
 !.claude/skills/
+!.claude/agents/
+!.claude/hooks/
 !.claude/launch.json
 !.claude/settings.json
 
