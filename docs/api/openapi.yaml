@@ -664,6 +664,11 @@ paths:
         `specializations` und `markets` aus der View, `rank_basis` mit den
         Fakten hinter der Reihenfolge. Sichtbar ist, wer in
         `matchable_provider_services` steht — nie `partner_status`.
+        `bookable_chargeable` sagt, ob gebucht werden kann: berechnet aus dem
+        laufenden Tarif (§21.1), nicht aus einem gespeicherten Flag. Bei false
+        zeigt die Oberflaeche KEINEN Buchen-Knopf, statt den Nutzer erst beim
+        Absenden mit 409 BILLING_NOT_READY abzuweisen (Nutzer-Entscheidung
+        2026-10-01, TKT-PROV-06).
       security: [ { bearerAuth: [] } ]
       parameters: [ { name: ref, in: path, required: true, schema: { $ref: '#/components/schemas/PublicRef' } } ]
       responses:

@@ -188,8 +188,9 @@ function seedProvider(over: Record<string, any> = {}) {
     // die Selbstauskunft, die auf dem Draht nichts mehr entscheidet.
     const areas: string[] = over.areas ?? ['tax-vat'];
     delete (row as any).areas;
-    // Zahlungsbereit (Spec §21.1) — entscheidet die Buchung, nie das Matching.
-    const bookable: boolean = over.bookable ?? true;
+    // `bookable` wird nur noch entgegengenommen und verworfen: Buchbarkeit
+    // entsteht seit TKT-PROV-06 aus einem laufenden Tarif (makeBookable), nicht
+    // aus einer View-Spalte. `providers.billing_ready` hatte nie einen Schreiber.
     delete (row as any).bookable;
     // Nachweise fuer die Verifikationstiefe (Phase 3): 'independent' | 'reviewed' | 'none'.
     const depth: 'independent' | 'reviewed' | 'none' = over.depth ?? 'none';
@@ -229,13 +230,23 @@ function seedProvider(over: Record<string, any> = {}) {
                     area_code: area,
                     country_code: land,
                     provider_availability: row.availability,
-                    bookable_chargeable: bookable,
                     provider_lifecycle_status: 'active',
                 });
             }
         }
     }
     return row;
+}
+
+/**
+ * Macht einen Anbieter buchbar: ein laufender Tarif, Periode relativ zu heute,
+ * damit kein Test an einem Kalendertag kippt. Bewusst EXPLIZIT und nicht in
+ * seedProvider — ein Abo in der gemeinsamen Fixture aendert Kontingent und Gate
+ * fuer jeden Test, der nur einen Anbieter braucht.
+ */
+function makeBookable(providerKey: string) {
+    const inEinemMonat = new Date(Date.now() + 30 * 86_400_000).toISOString().slice(0, 10);
+    return seedSubscription(providerKey, 'growth', { current_period_end: inEinemMonat });
 }
 
 beforeAll(async () => {
@@ -395,11 +406,13 @@ describe('POST /api/v1/search', () => {
         expect(r.body.providers).toEqual([]);
     });
 
-    // §14: die Abrechnung darf die Sichtbarkeit nicht steuern. Die View meldet
-    // `bookable_chargeable` nur — wer daraus einen Filter macht, faellt hier.
-    it('still matches a provider that is not billing-ready (§14)', async () => {
+    // §14: die Abrechnung darf die Sichtbarkeit nicht steuern. Seit TKT-PROV-06
+    // haengt die Buchbarkeit am laufenden Tarif — wer DEN ins Matching zieht,
+    // faellt hier. (Vorher setzte dieser Test eine View-Spalte, die es nicht
+    // mehr gibt; der Waechter prueft jetzt den echten Mechanismus.)
+    it('still matches a provider that cannot be charged (§14)', async () => {
         seedProvider();
-        (db.matchable_provider_services ?? []).forEach((r: any) => { r.bookable_chargeable = false; });
+        db.provider_subscriptions = [];
         const r = await api('/api/v1/search', {
             method: 'POST',
             body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], domains: ['tax-vat'] } }),
@@ -514,6 +527,7 @@ describe('POST /api/v1/scheduling (booking = paid lead)', () => {
 
     it('creates the booking, charges the lead and reveals the identity', async () => {
         seedProvider();
+        makeBookable('test-kanzlei');
         const slot = new Date(Date.now() + 86_400_000).toISOString();
         const r = await api('/api/v1/scheduling', {
             method: 'POST', auth: 'jwt',
@@ -545,7 +559,8 @@ describe('POST /api/v1/scheduling (booking = paid lead)', () => {
     });
 
     it('409 mit Grund, wenn der Anbieter matchbar, aber nicht zahlungsbereit ist (§21.1)', async () => {
-        seedProvider({ bookable: false });
+        // Kein Tarif, also nicht abrechenbar — matchbar bleibt er trotzdem.
+        seedProvider();
         const r = await api('/api/v1/scheduling', {
             method: 'POST', auth: 'jwt',
             body: JSON.stringify({ public_ref: refOf('test-kanzlei'), slot_start: new Date(Date.now() + 86_400_000).toISOString() }),
@@ -2053,13 +2068,14 @@ describe('Review-Arbeitsplatz (6A/7A/8A): nur Admin, Zell-Aktionen, Gate', () =>
         const cell = db.provider_service_coverage.find((c: any) => c.service_id === serviceId);
         await adminApi(`/api/v1/admin/review/neue-kanzlei/coverage/${cell.id}`, { method: 'POST', body: JSON.stringify({ action: 'approve' }) });
 
-        // Der Anbieter steht auf billing_ready=false mit Grund 'no_payment_method'
-        // (seedProvider). Vorher stand genau das in `missing` — und weil niemand
-        // billing_ready setzt, ging das Gate fuer keinen Anbieter je auf.
+        // Der Anbieter hat keinen laufenden Tarif, ist also nicht abrechenbar —
+        // der Grund wird seit TKT-PROV-06 aus dem Abo abgeleitet statt aus der
+        // nie geschriebenen Spalte billing_ready gelesen. Vorher stand genau das
+        // in `missing`, und das Gate ging fuer keinen Anbieter je auf.
         const offen = await adminApi('/api/v1/admin/review/neue-kanzlei/gate');
         expect(offen.body.gate.missing).toEqual([]);
         expect(offen.body.gate.ok).toBe(true);
-        expect(offen.body.gate.billing).toEqual({ ready: false, blocks_chargeable_booking: ['not_ready', 'no_payment_method'] });
+        expect(offen.body.gate.billing).toEqual({ ready: false, blocks_chargeable_booking: ['not_ready', 'inactive_subscription'] });
 
         // Aktivieren OHNE billing_ready anzufassen.
         const auf = await adminApi('/api/v1/admin/review/neue-kanzlei/lifecycle', { method: 'POST', body: JSON.stringify({ to: 'active' }) });

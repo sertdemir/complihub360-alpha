@@ -313,6 +313,43 @@ export async function loadPricingConfig(): Promise<PricingConfig> {
     };
 }
 
+/**
+ * Darf bei diesem Anbieter gebuehrenpflichtig gebucht werden?
+ *
+ * Nutzer-Entscheidungen 2026-10-01 (TKT-PROV-06):
+ *   · Buchbar ist nur, wer einen laufenden bezahlten Tarif hat.
+ *   · Jedes Mal neu berechnen, nie als Flag pflegen. Vorher stand das in
+ *     `providers.billing_ready` — einer Spalte mit DEFAULT false und ohne
+ *     jeden Schreiber, weshalb kein Anbieter je buchbar war.
+ *
+ * Rein und ohne Datenbank, damit die Regel an einer Stelle steht und sich
+ * pruefen laesst. Der Grundcode folgt der Sprache von §21.1, damit die
+ * Oberflaeche ihn ohne neue Uebersetzung anzeigen kann.
+ *
+ * WAS §21.1 NOCH NENNT und hier bewusst NICHT geprueft wird:
+ *   · Zahlungsmethode, Mandat, zurueckgezogene Ermaechtigung — dazu muesste
+ *     der Zahlungsdienstleister Meldungen schicken; es gibt keine Stelle, die
+ *     sie annimmt. Eine Bedingung zu behaupten, die wir nicht kennen, waere
+ *     schlimmer als sie zu benennen.
+ *   · Ueberfaellige Rechnung — braucht eine Kulanzfrist, und die ist am
+ *     2026-10-01 ausdruecklich OFFEN (zu besprechen). Deshalb sperrt sie hier
+ *     nicht; eine erfundene Frist waere eine Entscheidung, die mir nicht
+ *     gehoert.
+ *   · Konto pausiert oder gesperrt — faellt schon aus der Sichtbarkeits-View
+ *     heraus, hier also nicht doppelt.
+ */
+export interface ChargeableVerdict {
+    ready: boolean;
+    /** Gruende in der Sprache von §21.1. Leer, wenn abgerechnet werden kann. */
+    reasons: string[];
+}
+
+export function chargeableFromSubscription(sub: Subscription | null, today: Date): ChargeableVerdict {
+    const heute = today.toISOString().slice(0, 10);
+    const laufend = !!sub && sub.status === 'active' && String(sub.currentPeriodEnd) >= heute;
+    return laufend ? { ready: true, reasons: [] } : { ready: false, reasons: ['inactive_subscription'] };
+}
+
 export async function getActiveSubscription(providerKey: string): Promise<Subscription | null> {
     const rows = (await supabaseApi.select('provider_subscriptions', { provider_key: providerKey }, { order: 'started_at.desc', limit: 5 })) as any[];
     const open = rows.find((r) => !r.ended_at);

@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { structuredLog } from '@complihub360/types';
 import { supabaseApi } from './supabase.js';
 import type { Caller } from './providerAuth.js';
-import { categoryAllowanceCheck, getActiveSubscription, loadPricingConfig } from './billing.js';
+import { categoryAllowanceCheck, chargeableFromSubscription, getActiveSubscription, loadPricingConfig, type ChargeableVerdict } from './billing.js';
 import { checkVatId } from './vies.js';
 import { scanFields, type IdentityContext } from './anonymity.js';
 import {
@@ -133,8 +133,12 @@ export async function loadDossier(providerKey: string): Promise<Dossier | null> 
     return { provider: providers[0], confidential: conf[0] ?? null, services, coverage, evidence, agreements, requests, checklist };
 }
 
-/** Was der Anbieter von sich selbst sieht — ohne Abrechnungsinterna und ohne Stripe-IDs. */
-function providerView(p: any) {
+/**
+ * Was der Anbieter von sich selbst sieht — ohne Abrechnungsinterna und ohne
+ * Stripe-IDs. `zahlbar` wird gereicht statt gelesen: `providers.billing_ready`
+ * ist seit 2026-10-01 abgeloest (TKT-PROV-06) und hatte nie einen Schreiber.
+ */
+function providerView(p: any, zahlbar: ChargeableVerdict) {
     return {
         provider_key: p.provider_key, name: p.name, website_url: p.website_url ?? null, contact_email: p.contact_email ?? null,
         languages: p.languages ?? [], region: p.region ?? null, active_since: p.active_since ?? null,
@@ -142,7 +146,7 @@ function providerView(p: any) {
         billing_country: p.billing_country ?? null, work_mode: p.work_mode ?? null,
         lifecycle_status: p.lifecycle_status ?? 'draft', lifecycle_status_since: p.lifecycle_status_since ?? null,
         lifecycle_status_reason: p.lifecycle_status_reason ?? null,
-        billing_ready: !!p.billing_ready, billing_block_reasons: p.billing_block_reasons ?? [],
+        billing_ready: zahlbar.ready, billing_block_reasons: zahlbar.reasons,
     };
 }
 
@@ -171,10 +175,10 @@ function chapters(d: Dossier) {
     };
 }
 
-function dossierResponse(d: Dossier, correlationId: string) {
+function dossierResponse(d: Dossier, correlationId: string, zahlbar: ChargeableVerdict) {
     return {
         ok: true,
-        provider: providerView(d.provider),
+        provider: providerView(d.provider, zahlbar),
         confidential: d.confidential ? {
             entity_type: d.confidential.entity_type ?? null, registration_number: d.confidential.registration_number ?? null,
             registered_address: d.confidential.registered_address ?? null, operating_address: d.confidential.operating_address ?? null,
@@ -272,9 +276,15 @@ function servicePatchFrom(d: any): Record<string, unknown> {
 /**
  * Das Kategorie-Kontingent (Spec B): Essential eine Hauptkategorie, Growth
  * bis fuenf, Global alle. Gemessen an den Bereichen der nicht stillgelegten
- * Leistungen plus dem neuen. Ohne Abo wird hier nicht gesperrt — dann sperrt
- * das Gate ueber billing_ready, und der Anbieter sieht dort, dass ein Plan
- * fehlt. Ein Anbieter soll sein Dossier fuellen koennen, bevor er zahlt.
+ * Leistungen plus dem neuen. Ohne Abo wird hier nicht gesperrt — ein Anbieter
+ * soll sein Dossier fuellen koennen, bevor er zahlt.
+ *
+ * Bis zum 2026-10-01 stand hier, das Gate fange den Fall "kein Abo" ueber
+ * `billing_ready`. Das traegt nicht mehr: Billing sperrt das Aktivieren nicht
+ * (TKT-PROV-05), und `billing_ready` ist abgeloest (TKT-PROV-06). Ohne Abo
+ * kann ein Anbieter also aktiviert werden — er ist dann nur nicht buchbar, und
+ * die Oberflaeche zeigt keinen Buchen-Knopf. Ob ein Konto ohne Tarif
+ * ueberhaupt gelistet werden soll, ist eine offene Frage im Ticket.
  */
 export async function allowanceFor(providerKey: string, services: any[], extraArea?: string): Promise<{ ok: boolean; allowance: number | null; used: number; over: string[]; plan: string | null } | null> {
     const sub = await getActiveSubscription(providerKey);
@@ -652,7 +662,8 @@ export async function handleProviderApplication(
             if (method === 'GET') {
                 const d = await loadDossier(providerKey);
                 if (!d) json(res, 404, { errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId });
-                else json(res, 200, dossierResponse(d, correlationId));
+                else json(res, 200, dossierResponse(d, correlationId,
+                    chargeableFromSubscription(await getActiveSubscription(providerKey).catch(() => null), new Date())));
                 return true;
             }
             if (method === 'PATCH') { await patchApplication(req, res, correlationId, caller, providerKey); return true; }

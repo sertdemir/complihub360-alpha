@@ -15,7 +15,7 @@ import { handleAuthAdopt } from "./adoption.js";
 import { handleDashboard, SLUG_TO_ENGINE } from "./dashboard.js";
 import { checkMarketRequest } from "./marketRequests.js";
 import { notify, handleNotificationsList, handleNotificationsRead } from "./notifications.js";
-import { handleBillingRun, handleBillingPreview, syncOpenInvoices } from "./billing.js";
+import { handleBillingRun, handleBillingPreview, syncOpenInvoices, getActiveSubscription, chargeableFromSubscription } from "./billing.js";
 import { checkVatId } from "./vies.js";
 import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
 import { buildCockpit } from "./cockpit.js";
@@ -898,6 +898,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 // Ohne Listenposition gibt es keinen Buchstaben — das Detail traegt
                 // nur die Beschreibung; den Buchstaben kennt die aufrufende Liste.
                 const title = publicTitle(0, areas.map((a) => labels.get(a) ?? a), p.region ?? null);
+                // Kann bei diesem Anbieter ueberhaupt gebucht werden? Die Seite soll
+                // dann GAR KEINEN Buchen-Knopf zeigen, statt den Nutzer erst nach der
+                // Terminwahl abzuweisen (Nutzer-Entscheidung 2026-10-01, TKT-PROV-06).
+                const aboDetail = await getActiveSubscription(providerKey).catch(() => null);
+                const buchbar = chargeableFromSubscription(aboDetail, new Date()).ready;
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({
                     ok: true,
@@ -916,6 +921,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         billing_model: p.billing_model || 'project',
                         is_verified: true,
                         availability: p.availability || 'available',
+                        bookable_chargeable: buchbar,
                         rank_basis: rankBasis({
                             required, evidence: usable,
                             avg_response_hours: p.avg_response_hours, confirmation_rate: p.confirmation_rate,
@@ -1303,7 +1309,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     // Buchbar heisst matchbar UND zahlungsbereit (Spec A §21.1). Das
                     // Gate sperrt die Buchung, nie das Matching (§14) — und es sagt,
                     // was es tut, statt still 404 zu antworten.
-                    if (!view.some((r: any) => r.bookable_chargeable)) {
+                    //
+                    // Die Zahlungsbereitschaft kommt seit 2026-10-01 aus dem
+                    // laufenden Tarif und nicht mehr aus einer View-Spalte
+                    // (TKT-PROV-06): `providers.billing_ready` hatte nie einen
+                    // Schreiber, und die View soll ueberhaupt keine
+                    // Abrechnungsinformation tragen.
+                    const abo = await getActiveSubscription(p.provider_key as string).catch(() => null);
+                    if (!chargeableFromSubscription(abo, new Date()).ready) {
                         res.writeHead(409, { 'Content-Type': 'application/json' });
                         res.end(JSON.stringify({ errorCode: 'BILLING_NOT_READY', message: 'This provider cannot take bookings yet', correlationId }));
                         return;

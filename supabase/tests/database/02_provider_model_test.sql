@@ -143,13 +143,16 @@ update public.provider_service_coverage set expires_at = null
 -- WHERE-Klausel der View, entschiede ein Zahlungsstatus darueber, wer
 -- ueberhaupt erscheint — genau das verbietet §14.
 
-select is((select billing_ready from public.providers where provider_key = 't-model'),
-          false, 'Fixture-Anbieter ist nicht zahlungsbereit');
+-- Seit 2026-10-01 (TKT-PROV-06) traegt die View GAR KEINE Abrechnungsinformation
+-- mehr: "kann abgerechnet werden" beantwortet die API aus dem laufenden Tarif.
+-- Der Waechter wird damit scharfer — er verlangt die Abwesenheit der Spalte,
+-- statt ihren Wert zu pruefen.
+select is((select count(*)::int from public.provider_subscriptions where provider_key = 't-model'),
+          0, 'Fixture-Anbieter hat keinen Tarif');
 select is((select count(*)::int from matchable_provider_services where provider_key = 't-model'),
-          3, 'Nicht zahlungsbereit und trotzdem matchbar: Abrechnung darf die Sichtbarkeit nicht steuern (§14)');
-select is((select bool_and(bookable_chargeable = false) from matchable_provider_services
-           where provider_key = 't-model'),
-          true, 'Die View meldet den Zustand, statt ihn zu filtern');
+          3, 'Ohne Tarif und trotzdem matchbar: Abrechnung darf die Sichtbarkeit nicht steuern (§14)');
+select hasnt_column('public', 'matchable_provider_services', 'bookable_chargeable',
+          'Die View traegt keine Abrechnungsinformation — auch nicht als Meldung');
 
 -- ─── Zusicherungen auf Feldebene ────────────────────────────────────────────
 

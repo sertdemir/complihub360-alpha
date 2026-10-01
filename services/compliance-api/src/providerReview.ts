@@ -7,6 +7,7 @@ import { sendVerificationMail } from './mailer.js';
 import { EVIDENCE_BUCKET, signedDownloadUrl } from './storage.js';
 import { scanFields } from './anonymity.js';
 import { allowanceFor, coverageMatrix, loadDossier, readJson, reviewLog, type Dossier } from './providerApplication.js';
+import { chargeableFromSubscription, getActiveSubscription } from './billing.js';
 import {
     activationGate, serviceStatusFromCoverage, transitionAllowed, ACTIVATION_AGREEMENTS, type GateVerdict,
 } from './verificationRules.js';
@@ -62,10 +63,14 @@ async function tellProvider(providerKey: string, providerName: string | null, co
 
 export async function gateFor(d: Dossier): Promise<GateVerdict & { allowance: { ok: boolean; over: string[]; allowance: number | null; plan: string | null } | null }> {
     const allowance = await allowanceFor(d.provider.provider_key, d.services).catch(() => null);
+    // Berechnet, nicht gelesen: providers.billing_ready ist seit 2026-10-01
+    // abgeloest (TKT-PROV-06) — die Spalte hatte nie einen Schreiber.
+    const sub = await getActiveSubscription(d.provider.provider_key).catch(() => null);
+    const zahlbar = chargeableFromSubscription(sub, new Date());
     const verdict = activationGate({
         checklist: d.checklist, services: d.services, coverage: d.coverage,
         agreements: d.agreements.map((a) => a.agreement_type),
-        billing_ready: !!d.provider.billing_ready, billing_block_reasons: d.provider.billing_block_reasons ?? [],
+        billing_ready: zahlbar.ready, billing_block_reasons: zahlbar.reasons,
         allowance: allowance ? { ok: allowance.ok, over: allowance.over } : null,
         lifecycle_status: d.provider.lifecycle_status ?? 'draft',
     });

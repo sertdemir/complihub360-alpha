@@ -7,8 +7,7 @@ vi.mock('../supabase.js', () => ({ supabaseApi: {} }));
 import {
     annualPriceCents, computeLeadBand, applyMonthlyDiscount, categoryAllowanceCheck,
     leadFeeEnabled, subscriptionChargeForPeriod, quoteLeadFee, LEAD_FEE_POLICY_VERSION,
-    type PlanConfig, type BandRule, type PricingConfig, type Subscription,
-} from '../billing.js';
+    type PlanConfig, type BandRule, type PricingConfig, type Subscription, chargeableFromSubscription } from '../billing.js';
 
 // ─── Pricing v2 (Spec B, ADR-0003) ───────────────────────────────────────────
 // Nagelt jede Regel fest: Jahr = 10 Monate; vier Baender nach Opportunity,
@@ -248,5 +247,42 @@ describe('quoteLeadFee — das Angebot, das die Buchung ausfuehrt', () => {
         expect(e.standardFeeCents).toBe(g.standardFeeCents);
         expect(e.finalFeeCents).toBe(9900);
         expect(g.finalFeeCents).toBe(8415);
+    });
+});
+
+// ─── Zahlungsbereitschaft (TKT-PROV-06) ──────────────────────────────────────
+
+describe('chargeableFromSubscription — buchbar heisst laufender bezahlter Tarif', () => {
+    const sub = (over: Record<string, any> = {}) => ({
+        id: 's1', providerKey: 'p', planCode: 'growth', planVersion: 1, cadence: 'monthly' as const,
+        status: 'active', currentPeriodStart: '2026-10-01', currentPeriodEnd: '2026-10-31',
+        startedAt: '2026-10-01T00:00:00Z', ...over,
+    }) as any;
+    const heute = new Date('2026-10-15T12:00:00Z');
+
+    it('laufender Tarif: abrechenbar, keine Gruende', () => {
+        expect(chargeableFromSubscription(sub(), heute)).toEqual({ ready: true, reasons: [] });
+    });
+
+    it('kein Tarif: nicht abrechenbar, Grund in der Sprache von §21.1', () => {
+        expect(chargeableFromSubscription(null, heute)).toEqual({ ready: false, reasons: ['inactive_subscription'] });
+    });
+
+    it('Tarif nicht aktiv (past_due, cancelled, ended) zaehlt nicht', () => {
+        for (const status of ['past_due', 'cancelled', 'ended']) {
+            expect(chargeableFromSubscription(sub({ status }), heute).ready).toBe(false);
+        }
+    });
+
+    it('abgelaufene Periode zaehlt nicht — und der letzte Tag zaehlt noch', () => {
+        expect(chargeableFromSubscription(sub({ currentPeriodEnd: '2026-10-14' }), heute).ready).toBe(false);
+        expect(chargeableFromSubscription(sub({ currentPeriodEnd: '2026-10-15' }), heute).ready).toBe(true);
+    });
+
+    it('eine offene Rechnung sperrt NICHT — die Kulanzfrist ist offen', () => {
+        // Gegenprobe gegen ein Zuviel: am 2026-10-01 wurde ausdruecklich
+        // entschieden, die Frist spaeter zu besprechen. Wer hier eine Zahl
+        // einbaut, faellt ueber diesen Test.
+        expect(chargeableFromSubscription(sub(), heute).ready).toBe(true);
     });
 });

@@ -267,14 +267,18 @@ export interface BookingPriceSnapshot {
 /**
  * Die UND-Kette: was ist matchbar (Spec §3 × §4 × §19).
  *
- * Bildet die View `matchable_provider_services` ab. Zwei Spalten sind
- * bewusst Meldung statt Filter:
+ * Bildet die View `matchable_provider_services` ab. Eine Spalte ist bewusst
+ * Meldung statt Filter:
  *
- *  - `bookable_chargeable` — das Billing-Gate (§21.1) sperrt die BUCHUNG,
- *    nicht das Matching. Wer die Abrechnung ins Matching zieht, baut genau
- *    das, was §14 verbietet.
  *  - `provider_availability` — 'ooo' halbiert im Ranking den Score, statt
  *    auszuschliessen. Diese Entscheidung gehoert dem Ranker.
+ *
+ * `bookable_chargeable` stand hier bis zum 2026-10-01 (TKT-PROV-06). Die View
+ * traegt seither GAR KEINE Abrechnungsinformation: "kann abgerechnet werden"
+ * beantwortet die API aus dem laufenden Tarif (chargeableFromSubscription).
+ * §21.1 sperrt die Buchung, nicht das Matching; §14 verbietet, dass der
+ * Zahlungsstatus über die Sichtbarkeit entscheidet — und ein Waechter in
+ * 04_provider_pricing_test.sql haelt jede Pricing-Tabelle aus der View heraus.
  */
 export interface MatchableProviderService {
     service_id: string;
@@ -299,7 +303,6 @@ export interface MatchableProviderService {
     capacity_status: 'open' | 'limited' | 'full';
 
     provider_availability: 'available' | 'ooo';
-    bookable_chargeable: boolean;
     provider_lifecycle_status: ProviderLifecycleStatus;
 }
 

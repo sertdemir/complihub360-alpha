@@ -388,7 +388,11 @@ function providerDetail(ref: string) {
   if (!p || !d || !key) return { __status: 404, errorCode: 'NOT_FOUND', message: 'Provider not found' };
   const { match, match_tier, match_basis, _key, ...anon } = p;
   void match; void match_tier; void match_basis; void _key;
-  return { ok: true, detail: { ...anon, descriptor: DESCRIPTOR[key], ...d, availability: 'available' }, detail_open_charged: false };
+  // bookable_chargeable: der Server berechnet es aus dem laufenden Tarif
+  // (TKT-PROV-06). Hier absichtlich EIN Anbieter ohne Buchbarkeit, damit der
+  // Fall "kein Buchen-Knopf" lokal erreichbar ist und nicht nur in Tests.
+  const buchbar = key !== 'madrid-tax';
+  return { ok: true, detail: { ...anon, descriptor: DESCRIPTOR[key], ...d, availability: 'available', bookable_chargeable: buchbar }, detail_open_charged: false };
 }
 
 // Bewertungen: nur, was an einer Buchung haengt (so wie der Server filtert).

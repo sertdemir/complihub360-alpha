@@ -95,6 +95,8 @@
     "bookSub": "Llamada inicial gratuita · 30 min · sin compromiso",
     "bookCta": "Reservar cita",
     "revealNote": "La identidad se muestra tras la reserva.",
+    "notBookableTitle": "Por ahora no acepta reservas",
+    "notBookableNote": "No ofrecemos una cita que no podamos confirmar. Los datos de esta página siguen disponibles y puede seguir comparando otras coincidencias.",
     "penalty": "Sanción: {{value}}",
     "loading": "Cargando proveedor …",
     "notFoundTitle": "Este proveedor ya no está disponible",
