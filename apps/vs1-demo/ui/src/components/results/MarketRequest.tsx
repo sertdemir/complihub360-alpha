@@ -6,6 +6,7 @@ import { DOMAIN_BY_SLUG } from '../../lib/domains';
 import { requestMarket } from '../../api/marketRequests';
 import { Button } from '../ui/Button';
 import { Checkbox } from '../ui/Checkbox';
+import { Banner } from '../ui/Banner';
 import { scopeOf } from './RiskMapState';
 
 // ─── Risk Map · Markt ohne Abdeckung (Canvas-Wahl D3 · E3 · F3) ──────────────
@@ -16,7 +17,7 @@ import { scopeOf } from './RiskMapState';
 // Erscheint statt C3, wenn die Engine KEINEN der angefragten Maerkte pruefen
 // kann (Entscheidung 2026-09-27). "No immediate requirements identified" waere
 // dort eine Aussage ueber eine Pruefung, die nicht stattgefunden hat. Gemischte
-// Faelle (DE + BR) bleiben C3.
+// Faelle (DE + BR) bleiben C3 und bekommen I1 · J1 · K3 (unten).
 //
 // Die Copy unter `common:states.marketRequest.*` ist am 27.09.2026 abgenommen
 // und steht im Copy-Waechter (scripts/check-approved-copy.mjs). Ein Abschalten
@@ -27,6 +28,13 @@ type Profile = { country?: string; markets?: string[]; categories?: string[] };
 /** Die angefragten Maerkte, fuer die die Engine kein Laenderprofil hat. */
 export function unavailableMarketsOf(profile: Profile): string[] {
   return scopeOf(profile, 'requested').markets.filter((c) => !isKnownCountry(c));
+}
+
+/** Gemischte Maerkte (I1 · J1 · K3): mindestens ein Markt geprueft und
+ *  mindestens einer nicht — die ungeprueften, sonst leer. */
+export function partialMarketsOf(profile: Profile | null | undefined): string[] {
+  if (!profile || scopeOf(profile, 'checked').markets.length === 0) return [];
+  return unavailableMarketsOf(profile);
 }
 
 /** marketUnavailable statt C3: angefragt wurde etwas, geprueft nichts. */
@@ -271,6 +279,163 @@ export function NoVerifiedProvider() {
       </span>
       <h2 className="text-body font-bold leading-[1.35] text-fg">{t('common:states.noProviderMatch.heading')}</h2>
       <p className="text-body-sm leading-[1.55] text-fg-secondary">{t('common:states.noProviderMatch.message')}</p>
+    </section>
+  );
+}
+
+// ─── Gemischte Maerkte (Canvas-Wahl I1 · J1 · K3) ────────────────────────────
+// Figma: Section 3390:14594 — I1 3546:2497 (Gast mit Pflichten), J1 3546:2657
+// (Gast ohne Pflichten), K3 3546:20736 (mit Konto). Abgenommen 01.10.2026.
+//
+// DE + BR: die Engine prueft DE und verwirft BR still. Ohne Hinweis liest sich
+// die Map als vollstaendig — fuer einen Markt, den niemand angesehen hat. Jede
+// Flaeche sagt deshalb, was NICHT geprueft wurde, und bietet die Anfrage an.
+// Kein Alarm: Status Brand, nicht Warning — es fehlt Abdeckung, kein Risiko.
+
+/** I1 — je ungeprueftem Markt ein Hinweis zwischen Kennzahlen und Tabelle. */
+export function PartialMarketNotice({
+  market,
+  status,
+  onRequest,
+}: {
+  market: string;
+  status: MarketRequestStatus;
+  onRequest: () => void;
+}) {
+  const { t } = useTranslation(['common']);
+  const names = useNames();
+  const name = names.market(market);
+  if (status === 'sent') {
+    return (
+      <Banner status="brand" icon={<Check size={18} aria-hidden />} title={t('common:states.marketRequest.sent', { markets: name })}>
+        {t('common:states.marketRequest.sentBody')}
+      </Banner>
+    );
+  }
+  return (
+    <Banner status="brand" title={t('common:states.marketPartial.heading', { market: name })}>
+      <span className="flex flex-col items-start gap-2.5">
+        <span>{t('common:states.marketPartial.message', { market: name })}</span>
+        <span className="flex flex-wrap items-center gap-3">
+          <Button
+            size="sm"
+            variant="outline"
+            className={outlineBrand}
+            loading={status === 'sending'}
+            onClick={onRequest}
+            aria-label={`${t('common:states.actions.requestThisMarket')}: ${name}`}
+          >
+            {t('common:states.actions.requestThisMarket')}
+          </Button>
+          {status === 'failed' && <Failed />}
+        </span>
+      </span>
+    </Banner>
+  );
+}
+
+/** J1 — die Zeile "Not checked" unten in "What we checked". */
+export function NotCheckedRow({
+  market,
+  status,
+  onRequest,
+}: {
+  market: string;
+  status: MarketRequestStatus;
+  onRequest: () => void;
+}) {
+  const { t } = useTranslation(['common']);
+  const names = useNames();
+  const name = names.market(market);
+  return (
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+      <span className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
+        {/* Kein fester w-24 wie Markets/Areas: "Not checked" (DE "Nicht
+            geprueft") ist laenger und braeche sonst um. */}
+        <span className="min-w-24 shrink-0 whitespace-nowrap pr-2 text-body-sm font-semibold text-fg-secondary">{t('common:states.marketPartial.notChecked')}</span>
+        <span className="text-body-sm font-semibold text-fg">{name}</span>
+        <span className="text-body-xs text-fg-tertiary">· {t('common:states.marketRequest.notCovered')}</span>
+      </span>
+      {status === 'sent' ? (
+        <span role="status" className="inline-flex shrink-0 items-center gap-2 text-body-sm font-semibold text-fg-brand">
+          <Check size={16} aria-hidden /> {t('common:states.marketRequest.sent', { markets: name })}
+        </span>
+      ) : (
+        <span className="flex shrink-0 flex-col items-start gap-1.5 sm:items-end">
+          <Button
+            size="md"
+            variant="outline"
+            className={outlineBrand}
+            loading={status === 'sending'}
+            onClick={onRequest}
+            aria-label={`${t('common:states.actions.requestThisMarket')}: ${name}`}
+          >
+            {t('common:states.actions.requestThisMarket')}
+          </Button>
+          {status === 'failed' && <Failed />}
+        </span>
+      )}
+    </div>
+  );
+}
+
+/** K3 — mit Konto: eine gestrichelte Karte oben in der Anbieter-Spalte. Die
+ *  Anbieter darunter bleiben, sie gelten fuer die geprueften Maerkte. Update-
+ *  Wunsch wie F3: standardmaessig aus, nur mit bekannter Adresse. */
+export function NotCheckedCard({
+  market,
+  email,
+  status,
+  onRequest,
+}: {
+  market: string;
+  email: string | null;
+  status: MarketRequestStatus;
+  onRequest: (notify: boolean) => void;
+}) {
+  const { t } = useTranslation(['common']);
+  const names = useNames();
+  const [notify, setNotify] = useState(false);
+  const name = names.market(market);
+  return (
+    <section
+      aria-label={`${t('common:states.marketPartial.notChecked')}: ${name}`}
+      className="flex flex-col gap-2.5 rounded-2xl border border-dashed border-stroke bg-surface px-[22px] py-5"
+    >
+      <span className="text-body-2xs font-semibold uppercase tracking-[0.16em] text-fg-tertiary">
+        {t('common:states.marketPartial.notChecked')}
+      </span>
+      <span className="text-body font-bold leading-[1.35] text-fg">{name}</span>
+      {status === 'sent' ? (
+        <span role="status" className="flex flex-col gap-1">
+          <span className="inline-flex items-center gap-2 text-body-sm font-semibold text-fg-brand">
+            <Check size={16} aria-hidden /> {t('common:states.marketRequest.sent', { markets: name })}
+          </span>
+          <span className="text-body-xs leading-[1.55] text-fg-secondary">{t('common:states.marketRequest.sentBody')}</span>
+        </span>
+      ) : (
+        <>
+          <span className="text-body-sm text-fg-secondary">{t('common:states.marketPartial.notIncluded')}</span>
+          {email && (
+            <Checkbox
+              checked={notify}
+              onChange={(e) => setNotify(e.target.checked)}
+              disabled={status === 'sending'}
+              label={<span className="text-body-xs text-fg">{t('common:states.marketRequest.notifyLabel', { market: name })}</span>}
+            />
+          )}
+          <Button
+            size="md"
+            className="w-full"
+            loading={status === 'sending'}
+            onClick={() => onRequest(notify)}
+            aria-label={`${t('common:states.actions.requestThisMarket')}: ${name}`}
+          >
+            {t('common:states.actions.requestThisMarket')}
+          </Button>
+          {status === 'failed' && <Failed />}
+        </>
+      )}
     </section>
   );
 }

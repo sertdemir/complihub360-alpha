@@ -1997,6 +1997,12 @@
       "notifyHelp": "{{email}} adresine yazacağız. Yalnızca bu pazar için.",
       "failed": "Talebiniz gönderilemedi. Lütfen tekrar deneyin.",
       "guestMessage": "Bu pazarı talep edin. Kapsamı bir sonraki adımda nereye genişleteceğimize karar vermek için talepleri pazar bazında sayıyoruz."
+    },
+    "marketPartial": {
+      "heading": "{{market}} kontrol edilmedi",
+      "message": "{{market}} henüz kapsamımızda değil, bu nedenle bu yükümlülükler onu içermiyor.",
+      "notChecked": "Kontrol edilmedi",
+      "notIncluded": "Henüz kapsanmıyor · bu Risk Map’e dahil değil"
     }
   },
   "errorBoundary": {
