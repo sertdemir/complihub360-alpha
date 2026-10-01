@@ -20,6 +20,7 @@
     "terminology:check": "node scripts/check-terminology.mjs --all",
     "copy:check": "node scripts/check-approved-copy.mjs",
     "db:test": "bash scripts/run-db-tests.sh",
+    "hooks:test": "node --test .claude/hooks/hooks.test.mjs",
     "i18n:translate": "node scripts/i18n-translate.mjs",
     "format": "prettier --write .",
     "build": "npm run build --workspaces --if-present",

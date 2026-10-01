@@ -20,10 +20,11 @@ import type { IncomingMessage, ServerResponse } from "http";
 //   /intake, /magic/*, /confirm, /reply, /decline, /confirm-email — dort ist
 //     ein Einmal-Token bzw. das Intake-Secret der Ausweis.
 //
+// Phase 4 (Buchung): bookings/:id/proposal, billing/sync.
 // Phase 2 (Onboarding): application, services[/:id[/coverage]],
 // evidence/(upload-url|registry|:id/confirm), agreements, submit, verification.
 const OWN_PROVIDER_ROUTE =
-    /^\/api\/v1\/provider\/([a-z0-9-]+)\/(bookings|coverage|profile|invoices|availability|billing-portal|change-email|billing\/preview|application|services(?:\/[^/?]+(?:\/coverage)?)?|evidence\/(?:upload-url|registry|[^/?]+\/confirm)|agreements|submit|verification)(\?.*)?$/;
+    /^\/api\/v1\/provider\/([a-z0-9-]+)\/(bookings(?:\/[0-9a-f-]+\/proposal)?|coverage|profile|invoices|availability|billing-portal|change-email|billing\/preview|billing\/sync|application|services(?:\/[^/?]+(?:\/coverage)?)?|evidence\/(?:upload-url|registry|[^/?]+\/confirm)|agreements|submit|verification)(\?.*)?$/;
 
 /** Liefert den provider_key, wenn die URL eine Anbieter-eigene Route ist. */
 export function ownProviderRouteKey(url: string | undefined): string | null {

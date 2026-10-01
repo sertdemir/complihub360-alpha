@@ -894,3 +894,195 @@ export async function sendVerificationMail(p: {
         } catch { /* double fault */ }
     }
 }
+
+// ─── Phase 4: Buchung und gescheiterte Belastung — an den Anbieter ──────────
+
+const BOOKING_STRINGS: Record<MailLocale, { subject: string; intro: string; whenLabel: string; note: string }> = {
+    en: {
+        subject: 'New booking: a client has booked an intro call with you',
+        intro: 'A client has booked an intro call through CompliHub360. Company, contact and message are in your partner dashboard under Appointments.',
+        whenLabel: 'Booked slot',
+        note: 'The lead fee for this booking was charged to your card on file; the receipt comes from Stripe. Please remember the 10 % CompliHub360 discount on your fees for this request.',
+    },
+    de: {
+        subject: 'Neue Buchung: ein Mandant hat ein Erstgespräch mit Ihnen gebucht',
+        intro: 'Ein Mandant hat über CompliHub360 ein Erstgespräch gebucht. Firma, Kontakt und Nachricht finden Sie im Partner-Dashboard unter Termine.',
+        whenLabel: 'Gebuchter Termin',
+        note: 'Die Lead-Gebühr für diese Buchung wurde Ihrer hinterlegten Karte belastet; der Beleg kommt von Stripe. Bitte denken Sie an die 10 % CompliHub360-Rabatt auf Ihr Honorar für dieses Anliegen.',
+    },
+    es: {
+        subject: 'Nueva reserva: un cliente ha reservado una llamada inicial con usted',
+        intro: 'Un cliente ha reservado una llamada inicial a través de CompliHub360. Empresa, contacto y mensaje están en su panel de partner, en Citas.',
+        whenLabel: 'Horario reservado',
+        note: 'La tarifa de lead de esta reserva se ha cargado a su tarjeta registrada; el recibo lo envía Stripe. Recuerde el 10 % de descuento CompliHub360 sobre sus honorarios para esta solicitud.',
+    },
+    tr: {
+        subject: 'Yeni rezervasyon: bir müşteri sizinle ilk görüşme rezerve etti',
+        intro: 'Bir müşteri CompliHub360 üzerinden ilk görüşme rezerve etti. Şirket, iletişim ve mesaj partner panelinizde Randevular bölümünde.',
+        whenLabel: 'Rezerve edilen zaman',
+        note: 'Bu rezervasyonun lead ücreti kayıtlı kartınızdan tahsil edildi; makbuz Stripe tarafından gönderilir. Bu talep için ücretlerinizde % 10 CompliHub360 indirimini lütfen unutmayın.',
+    },
+};
+
+const PAYMENT_FAILED_STRINGS: Record<MailLocale, { subject: string; intro: string; note: string }> = {
+    en: {
+        subject: 'Action needed: a lead charge did not go through',
+        intro: 'A client wanted to book an intro call with you, but the lead fee could not be charged to your card on file. The booking did not take place and no data was shared.',
+        note: 'Bookings stay paused until a different payment method is on file. Open your partner dashboard under Billing to update it; the check runs again right after. You remain visible in search results.',
+    },
+    de: {
+        subject: 'Handlung nötig: eine Lead-Belastung ist nicht durchgegangen',
+        intro: 'Ein Mandant wollte ein Erstgespräch mit Ihnen buchen, aber die Lead-Gebühr konnte Ihrer hinterlegten Karte nicht belastet werden. Die Buchung ist nicht zustande gekommen, es wurden keine Daten geteilt.',
+        note: 'Buchungen bleiben ausgesetzt, bis ein anderes Zahlungsmittel hinterlegt ist. Öffnen Sie im Partner-Dashboard den Bereich Abrechnung, um es zu ändern; die Prüfung läuft direkt danach erneut. In den Suchergebnissen bleiben Sie sichtbar.',
+    },
+    es: {
+        subject: 'Acción necesaria: un cargo de lead no se ha realizado',
+        intro: 'Un cliente quería reservar una llamada inicial con usted, pero la tarifa de lead no se pudo cargar a su tarjeta registrada. La reserva no se realizó y no se compartió ningún dato.',
+        note: 'Las reservas quedan en pausa hasta que haya otro método de pago registrado. Abra Facturación en su panel de partner para cambiarlo; la comprobación se repite justo después. Sigue siendo visible en los resultados de búsqueda.',
+    },
+    tr: {
+        subject: 'İşlem gerekli: bir lead ücreti tahsil edilemedi',
+        intro: 'Bir müşteri sizinle ilk görüşme rezerve etmek istedi, ancak lead ücreti kayıtlı kartınızdan tahsil edilemedi. Rezervasyon gerçekleşmedi ve hiçbir veri paylaşılmadı.',
+        note: 'Farklı bir ödeme yöntemi kaydedilene kadar rezervasyonlar duraklatılır. Değiştirmek için partner panelinde Faturalandırma bölümünü açın; kontrol hemen ardından yeniden çalışır. Arama sonuçlarında görünür kalırsınız.',
+    },
+};
+
+async function deliverProviderMail(p: { to: string | null; kind: string; ref: Record<string, unknown>; subject: string; text: string; correlationId?: string }): Promise<void> {
+    const apiKey = process.env.RESEND_API_KEY;
+    try {
+        if (!p.to) {
+            await supabaseApi.insert('event_log', { type: 'email_skipped_no_address', payload: { ...p.ref, kind: p.kind } });
+            return;
+        }
+        if (!apiKey) {
+            await supabaseApi.insert('event_log', { type: 'email_outbox', payload: { ...p.ref, to: p.to, subject: p.subject, text: p.text, mode: 'log-only', kind: p.kind } });
+            return;
+        }
+        const res = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ from: MAIL_FROM, to: [p.to], subject: p.subject, text: p.text }),
+        });
+        const body = await res.json().catch(() => ({}));
+        await supabaseApi.insert('event_log', {
+            type: res.ok ? 'email_sent' : 'email_failed',
+            payload: { ...p.ref, to: p.to, subject: p.subject, providerId: (body as { id?: string }).id, status: res.status, kind: p.kind },
+        });
+    } catch (err) {
+        structuredLog('error', 'Provider mail failed', { correlationId: p.correlationId ?? 'scheduling', route: 'mailer', severity: 'error', errorCode: 'ERR_MAIL' });
+        try {
+            await supabaseApi.insert('event_log', { type: 'email_failed', payload: { ...p.ref, to: p.to, error: String(err), kind: p.kind } });
+        } catch { /* double fault */ }
+    }
+}
+
+/** Neue Buchung an den Anbieter. Ohne Nutzeridentitaet im Text — die steht im Dashboard, nicht in einer Mail. */
+export async function sendBookingMail(p: { to: string | null; bookingId: string; providerKey: string; slotIso: string; locale?: string; correlationId?: string }): Promise<void> {
+    const loc = resolveLocale(p.locale);
+    const t = BOOKING_STRINGS[loc];
+    const fmt = new Intl.DateTimeFormat(loc, {
+        weekday: 'short', day: 'numeric', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin', timeZoneName: 'short',
+    });
+    const text = [t.intro, ``, `${t.whenLabel}: ${fmt.format(new Date(p.slotIso))}`, ``, t.note].join('\n');
+    await deliverProviderMail({ to: p.to, kind: 'booking_provider', ref: { bookingId: p.bookingId, providerKey: p.providerKey }, subject: t.subject, text, correlationId: p.correlationId });
+}
+
+/** Gescheiterte Belastung an den Anbieter. Nennt weder den Nutzer noch den Decline-Code — nur den Weg zur Behebung. */
+export async function sendPaymentFailedMail(p: { to: string | null; providerKey: string; locale?: string; correlationId?: string }): Promise<void> {
+    const loc = resolveLocale(p.locale);
+    const t = PAYMENT_FAILED_STRINGS[loc];
+    const text = [t.intro, ``, t.note].join('\n');
+    await deliverProviderMail({ to: p.to, kind: 'payment_failed_provider', ref: { providerKey: p.providerKey }, subject: t.subject, text, correlationId: p.correlationId });
+}
+
+
+// ─── Markt-Update (market_requests.notify) ────────────────────────────────────
+// "Email me when <market> is covered" (Risk Map F3). Genau eine Mail je
+// Anfrage; der Watcher (runMarketCoverageTick) setzt vorher notified_at.
+//
+// DNA: Information, kein Verkauf. Kein "jetzt schnell", kein Upsell, keine
+// Behauptung ueber Pflichten ("may apply"). Der Schlusssatz sagt, dass es bei
+// dieser einen Mail bleibt — ein Abschalten gibt es nicht und braucht es
+// nicht. Copy abgenommen am 01.10.2026 nach dem Staging-Durchlauf (echte
+// Mail, DE); der Test in api.test.ts haelt den EN- und DE-Text wortgleich.
+
+const MARKET_COVERED_STRINGS: Record<MailLocale, { subject: string; body: string; cta: string; once: string }> = {
+    en: {
+        subject: '{market} is now covered on CompliHub360',
+        body: 'You asked us to let you know when we cover {market}. We do now.\n\nYou can create a Risk Map for {market} and see which requirements may apply to your business.',
+        cta: 'Create a Risk Map',
+        once: 'This is the only email we send about this request.',
+    },
+    de: {
+        subject: '{market} ist jetzt auf CompliHub360 abgedeckt',
+        body: 'Sie hatten uns gebeten, Ihnen Bescheid zu geben, sobald wir {market} abdecken. Das ist jetzt der Fall.\n\nSie können eine Risk Map für {market} erstellen und sehen, welche Anforderungen für Ihr Unternehmen gelten können.',
+        cta: 'Risk Map erstellen',
+        once: 'Dies ist die einzige E-Mail, die wir zu dieser Anfrage senden.',
+    },
+    es: {
+        subject: '{market} ya tiene cobertura en CompliHub360',
+        body: 'Nos pidió que le avisáramos cuando cubriéramos {market}. Ya es así.\n\nPuede crear un Risk Map para {market} y ver qué requisitos pueden aplicarse a su empresa.',
+        cta: 'Crear un Risk Map',
+        once: 'Este es el único correo que le enviaremos sobre esta solicitud.',
+    },
+    tr: {
+        subject: '{market} artık CompliHub360\'ta kapsanıyor',
+        body: '{market} kapsandığında size haber vermemizi istemiştiniz. Artık kapsıyoruz.\n\n{market} için bir Risk Map oluşturabilir ve işletmeniz için hangi gerekliliklerin geçerli olabileceğini görebilirsiniz.',
+        cta: 'Risk Map oluşturun',
+        once: 'Bu talep hakkında göndereceğimiz tek e-posta budur.',
+    },
+};
+
+/** Betreff und Text des Markt-Updates, in der Sprache der Anfrage. Exportiert
+ *  fuer die Tests — sie pruefen, was tatsaechlich im Postfach landet. */
+export function renderMarketCoveredMail(market: string, locale?: string | null): { subject: string; text: string } {
+    const loc = resolveLocale(locale ?? undefined);
+    const t = MARKET_COVERED_STRINGS[loc];
+    let name = market;
+    try { name = new Intl.DisplayNames([loc], { type: 'region' }).of(market) ?? market; } catch { /* Code statt Name */ }
+    const fill = (s: string) => s.split('{market}').join(name);
+    const url = `${PUBLIC_APP_URL}/${loc}/wizard`;
+    return { subject: fill(t.subject), text: [fill(t.body), ``, `→ ${t.cta}: ${url}`, ``, t.once].join('\n') };
+}
+
+export async function sendMarketCoveredMail(p: {
+    to: string | null;
+    requestId: string;
+    market: string;
+    locale?: string | null;
+}): Promise<void> {
+    const { subject, text } = renderMarketCoveredMail(p.market, p.locale);
+    const kind = 'market_covered';
+    const apiKey = process.env.RESEND_API_KEY;
+    try {
+        if (!p.to) {
+            await supabaseApi.insert('event_log', { type: 'email_skipped_no_address', payload: { requestId: p.requestId, market: p.market, kind } });
+            return;
+        }
+        if (!apiKey) {
+            await supabaseApi.insert('event_log', {
+                type: 'email_outbox',
+                payload: { requestId: p.requestId, market: p.market, to: p.to, subject, text, mode: 'log-only', kind },
+            });
+            return;
+        }
+        const res = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ from: MAIL_FROM, to: [p.to], subject, text }),
+        });
+        const body = await res.json().catch(() => ({}));
+        await supabaseApi.insert('event_log', {
+            type: res.ok ? 'email_sent' : 'email_failed',
+            payload: { requestId: p.requestId, market: p.market, to: p.to, subject, providerId: (body as { id?: string }).id, status: res.status, kind },
+        });
+    } catch (err) {
+        structuredLog('error', 'Market covered mail failed', {
+            correlationId: 'watchers', route: 'mailer', severity: 'error', errorCode: 'ERR_MAIL',
+        });
+        try {
+            await supabaseApi.insert('event_log', { type: 'email_failed', payload: { requestId: p.requestId, market: p.market, to: p.to, error: String(err), kind } });
+        } catch { /* double fault */ }
+    }
+}

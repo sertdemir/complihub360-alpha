@@ -95,6 +95,8 @@
     "bookSub": "Free intro call · 30 min · non-binding",
     "bookCta": "Book appointment",
     "revealNote": "Identity becomes visible after booking.",
+    "notBookableTitle": "Not open for bookings right now",
+    "notBookableNote": "We do not offer an appointment we cannot confirm. The details on this page stay available, and you can keep comparing other matches.",
     "penalty": "Penalty: {{value}}",
     "loading": "Loading provider …",
     "notFoundTitle": "This provider is no longer available",
@@ -316,7 +318,8 @@
     "copyLabel": "Copy of {{label}}",
     "bookedOn": "Appointment {{when}}",
     "providerBooked": "View appointment",
-    "booked": "Booked"
+    "booked": "Booked",
+    "providersEyebrow": "Verified Providers"
   },
   "rankBasis": {
     "group": "Verified and measured",

@@ -130,6 +130,9 @@ export interface ProviderDetail {
   pricing_table: Array<{ service: string; price: string }> | null;
   is_verified: boolean;
   availability: 'available' | 'ooo';
+  /** false = es kann nicht gebucht werden; die Seite zeigt dann keinen Knopf
+   *  (Nutzer-Entscheidung 2026-10-01). Wird aus dem laufenden Tarif berechnet. */
+  bookable_chargeable?: boolean;
   rank_basis?: RankBasis;
   /** Dossier (Partnerseite 3B). null = der Anbieter hat nichts hinterlegt —
    *  die Karte sagt das, statt eine Leistung zu erfinden. */

@@ -35,6 +35,12 @@ jobs:
         # auf dem Staging-VPS, und dieses Repository ist oeffentlich.
         run: node scripts/check-workflow-runners.mjs
 
+      - name: Test Claude guard hooks
+        # Ebenfalls ohne Abhaengigkeiten: die Hooks unter .claude/hooks/ sind
+        # die mechanische Stuetze der Agenten-Regeln (Privacy, Git-Hooks,
+        # geschuetzte Configs) und duerfen nicht still verrotten.
+        run: npm run hooks:test
+
       - name: Install dependencies
         # npm ci can sometimes be unreliable with complex local workspace linking
         # we fallback to a standard npm install to ensure resilient CI builds.

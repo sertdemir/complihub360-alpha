@@ -72,7 +72,8 @@ export type BillingBlockReason =
     | 'inactive_subscription'
     | 'withdrawn_authorization'
     | 'overdue_invoice'
-    | 'account_paused';
+    | 'account_paused'
+    | 'payment_failed';      // Phase 4: letzte Lead-Belastung mit dem aktuellen Zahlungsmittel gescheitert
 
 /** Ergebnis einer Nachweispruefung (Spec §7). */
 export type EvidenceResult =
@@ -450,3 +451,88 @@ export interface AnonProviderDetail extends Omit<AnonProviderCard, 'title' | 'le
     pricing_table: Array<Record<string, unknown>> | null;
     availability: 'available' | 'ooo';
 }
+
+// ─── Phase 4: Buchung, Bestaetigung, Belastung (ADR-0005) ────────────────────
+
+/** Der Text, den der Nutzer vor der Buchung bestaetigt (booking_acknowledgements). */
+export interface BookingAcknowledgement {
+    version: string;
+    language: string;
+    body: string;
+    shared_fields: string[];
+    user_discount: { pct: number; policy_version: number; recurring_treatment: 'undecided' | 'first_invoice_only' | 'all_invoices' } | null;
+}
+
+/** Der Pflichtrabatt fuer Nutzer (user_discount_policy), versioniert. */
+export interface UserDiscountPolicy {
+    version: number;
+    pct: number;
+    recurring_treatment: 'undecided' | 'first_invoice_only' | 'all_invoices';
+    effective_from: string;
+}
+
+export type LeadLedgerPaymentStatus = 'pending' | 'authorized' | 'captured' | 'failed' | 'refunded' | 'n/a';
+
+/** Was ein Lead den Anbieter gekostet hat — Spec B "standard fee, discount, final charge". */
+export interface ProviderBookingLead {
+    band: 1 | 2 | 3 | 4;
+    standard_fee_cents: number;
+    discount_pct: number;
+    discount_sequence: number | null;
+    final_fee_cents: number;
+    currency: string;
+    payment_status: LeadLedgerPaymentStatus;
+    fee_enabled: boolean;
+}
+
+/** Selbstauskunft des Anbieters je Lead (lead_proposal_reports). */
+export interface LeadProposalReport {
+    proposal_issued: boolean;
+    discount_shown: boolean;
+    reported_at: string;
+}
+
+/** Zahlungsbereitschaft eines Anbieters, berechnet aus Stripe und Datenbank (Spec A §21.1). */
+export interface BillingReadiness {
+    ready: boolean;
+    reasons: BillingBlockReason[];
+    synced_at: string | null;
+}
+
+/** Body von POST /scheduling (Phase 4). */
+export interface BookingCreateRequest {
+    public_ref: string;
+    slot_start: string;
+    message?: string;
+    acknowledgement_version: string;
+    language?: string;
+    session_id?: string;
+    area_code?: string;
+    countries?: string[];
+    service_id?: string;
+}
+
+/** Antwort von POST /scheduling. Traegt weder Band noch Gebuehr — die sieht nur der Anbieter. */
+export interface BookingCreateResponse {
+    ok: true;
+    booking: {
+        id: string;
+        public_ref: string;
+        slot_start: string;
+        slot_end: string;
+        status: 'confirmed';
+        acknowledgement_version: string;
+        shared_fields: string[];
+        user_discount: { pct: number; policy_version: number } | null;
+    };
+    provider_identity: { name: string; website_url: string | null; contact_email: string | null };
+}
+
+/** Fehlercodes der Buchung, die eine Oberflaeche unterscheiden muss. */
+export type BookingErrorCode =
+    | 'BILLING_NOT_READY'          // Anbieter nicht zahlungsbereit — nichts versucht
+    | 'ACKNOWLEDGEMENT_OUTDATED'   // Fassung hat sich geaendert, `current_version` in der Antwort
+    | 'SLOT_TAKEN'                 // Termin gerade vergeben
+    | 'BOOKING_NOT_COMPLETED'      // Belastung gescheitert — keine Buchung, Grund `provider_billing`
+    | 'BILLING_ERROR'              // Zahlungsdienst nicht erreichbar (502)
+    | 'OPPORTUNITY_REQUIRED' | 'AREA_NOT_OFFERED' | 'SERVICE_NOT_FOUND';

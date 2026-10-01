@@ -400,7 +400,15 @@ function providerDetail(ref: string) {
   if (!p || !d || !key) return { __status: 404, errorCode: 'NOT_FOUND', message: 'Provider not found' };
   const { match, match_tier, match_basis, _key, ...anon } = p;
   void match; void match_tier; void match_basis; void _key;
-  return { ok: true, detail: { ...anon, descriptor: DESCRIPTOR[key], area_codes: AREAS[key] ?? [], descriptor_region: REGION[key] ?? null, ...d, availability: 'available' }, detail_open_charged: false };
+  // bookable_chargeable: der Server berechnet es aus dem laufenden Tarif
+  // (TKT-PROV-06). Im Mock sind ALLE drei buchbar, und das mit Absicht: von den
+  // Anbietern mit Detailseite ist 'madrid-tax' der einzige ohne Termin, also
+  // genau der, den man anklickt, um die Buchung zu sehen (siehe Kommentar an
+  // den Mock-Buchungen). Ihn zu sperren nimmt dem Datensatz seinen Zweck.
+  // Wer den Fall "kein Buchen-Knopf" lokal sehen will, setzt hier einmal
+  // `false` — abgesichert ist er durch die Waechter in
+  // ProviderDetailPage.guard.test.ts.
+  return { ok: true, detail: { ...anon, descriptor: DESCRIPTOR[key], area_codes: AREAS[key] ?? [], descriptor_region: REGION[key] ?? null, ...d, availability: 'available', bookable_chargeable: true }, detail_open_charged: false };
 }
 
 // Bewertungen: nur, was an einer Buchung haengt (so wie der Server filtert).
@@ -707,7 +715,11 @@ function p2Verification(key?: string) {
   return { ok: true, lifecycle: { status: p.lifecycle_status, since: p.lifecycle_status_since, reason: p.lifecycle_status_reason, reverification_due_at: null, grace_until: null }, matrix: p2Matrix(), checklist: p2Checklist(), open_requests: p2Requests(), history: p2History() };
 }
 function p2Gate() {
-  return { ok: false, missing: ['evidence.insurance', 'evidence.representative_identity', 'agreements.none', 'billing.not_ready', 'billing.no_payment_method'].filter((m) => m !== 'agreements.none'), target: 'limited', approved_cells: 1, total_cells: 4, allowance: null };
+  // Kein billing.* in `missing`: die Zahlungsbereitschaft sperrt die
+  // gebuehrenpflichtige Buchung, nicht die Aktivierung (Spec A §21.1). Sie wird
+  // gemeldet — und muss hier stehen, sonst greift die Gate-Leiste ins Leere.
+  return { ok: false, missing: ['evidence.insurance', 'evidence.representative_identity'], target: 'limited', approved_cells: 1, total_cells: 4, allowance: null,
+    billing: { ready: false, blocks_chargeable_booking: ['not_ready', 'no_payment_method'] } };
 }
 function p2Queue() {
   const rows = [

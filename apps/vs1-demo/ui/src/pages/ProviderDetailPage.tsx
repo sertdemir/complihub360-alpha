@@ -689,6 +689,26 @@ function BookingRail({ p, slots, locale, onBook, ctx }: {
   const next = (slots ?? []).slice(0, 3);
   const when = (iso: string) => new Date(iso).toLocaleString(locale, { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 
+  // Kein Knopf, wenn nicht gebucht werden kann (Nutzer-Entscheidung 2026-10-01).
+  // Vorher durfte der Nutzer einen Termin waehlen und wurde erst beim Absenden
+  // mit 409 abgewiesen — ein Korb nach der Terminwahl ist die schlechteste
+  // Variante. Die Termine bleiben deshalb auch weg: eine Liste freier Zeiten
+  // laedt zum Klick ein, der ins Nichts fuehrt. Die Angaben bleiben sichtbar,
+  // der Grund bleibt beim Anbieter — er ist nicht Sache des Nutzers.
+  if (p.bookable_chargeable === false) {
+    return (
+      <aside className={`${CARD} sticky top-6 p-5`}>
+        <h2 className="text-body-sm font-bold text-fg">{t('detail.notBookableTitle')}</h2>
+        <p className="mt-1.5 text-body-3xs leading-relaxed text-fg-tertiary">{t('detail.notBookableNote')}</p>
+        {p.billing_model && (
+          <p className="mt-4 border-t border-stroke-subtle pt-3.5 text-body-3xs text-fg-tertiary">
+            {t('detail.billing')}: {t(`snapshot.billing.${p.billing_model}`)}
+          </p>
+        )}
+      </aside>
+    );
+  }
+
   return (
     <aside className={`${CARD} sticky top-6 p-5`}>
       <h2 className="text-body-sm font-bold text-fg">{t('detail.bookTitle')}</h2>

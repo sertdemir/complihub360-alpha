@@ -178,6 +178,7 @@ CompliHub360 ist ein **kuratierter Matchmaking-Marktplatz**: Ein User (Firma) kl
 - `GET /api/v1/provider/:key/detail` → Stufe-2-Payload (anonym) + Kalender-Vorschau; **löst `provider_detail_opened` + Billing** aus (server-seitig, gegen Klick-Betrug absichern: pro User/Provider deduplizieren).
 - `GET /api/v1/provider/:key/availability` → Slots aus Kalender-Sync.
 - `POST /api/v1/scheduling` → Booking anlegen (`scheduling_started`); `POST /api/v1/scheduling/:id/confirm` → `scheduling_confirmed` + Billing-Lead + **Identitäts-Reveal** (Stufe 3, server-seitig zur Read-Zeit erzwungen).
+  > **Korrektur 2026-10-01 (ADR-0005, Spec B):** Es gibt keinen separaten `/confirm`-Schritt. `POST /api/v1/scheduling` nimmt `acknowledgement_version` (Bestätigung des Nutzers mit Fassung), berechnet Band und Rabatt, belastet die Karte des Anbieters (PaymentIntent off-session) und legt **erst dann** die Buchung mit Offenlegung an. Scheitert die Belastung, gibt es keine Buchung (409 `BOOKING_NOT_COMPLETED`). Das Detail-Open kostet seit ADR-0003 nichts mehr.
 - **Provider-Intake:** `POST /api/v1/provider/intake` (token-gated Link) → Formular-Payload speichern; Vetting-Übergänge admin-seitig.
 - **Billing-Hook:** Detail-Open + Scheduling-Lead → bestehende Stripe-Provider-Verrechnung (`billing.ts`).
 

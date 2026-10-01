@@ -1995,7 +1995,8 @@
       "sentBody": "Kapsamı bir sonraki adımda nereye genişleteceğimize karar vermek için talepleri pazar bazında sayıyoruz. Bir tarih sözü veremiyoruz.",
       "notifyLabel": "{{market}} kapsandığında bana e-posta gönderin",
       "notifyHelp": "{{email}} adresine yazacağız. Yalnızca bu pazar için.",
-      "failed": "Talebiniz gönderilemedi. Lütfen tekrar deneyin."
+      "failed": "Talebiniz gönderilemedi. Lütfen tekrar deneyin.",
+      "guestMessage": "Bu pazarı talep edin. Kapsamı bir sonraki adımda nereye genişleteceğimize karar vermek için talepleri pazar bazında sayıyoruz."
     }
   },
   "errorBoundary": {

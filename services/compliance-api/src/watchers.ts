@@ -1,7 +1,9 @@
 import * as crypto from "node:crypto";
 import { structuredLog } from "@complihub360/types";
 import { supabaseApi } from "./supabase.js";
-import { sendMagicLinkMail, sendReviewMail } from "./mailer.js";
+import { runBillingReadinessTick } from "./leadCharge.js";
+import { isKnownCountry } from "@complihub/compliance-engine";
+import { sendMagicLinkMail, sendReviewMail, sendMarketCoveredMail } from "./mailer.js";
 import { notify } from "./notifications.js";
 
 // ─── SLA Watchers (Beta) ──────────────────────────────────────────────────────
@@ -77,6 +79,9 @@ export interface TickSummary {
     evidenceExpiringNotices: number;
     evidenceExpired: number;
     reverificationDue: number;
+    marketCoveredNotices: number;
+    billingSynced: number;
+    billingChanged: number;
 }
 
 // ─── Shared reminder core ─────────────────────────────────────────────────────
@@ -167,7 +172,7 @@ async function mark(base: string, shadow: boolean, payload: Record<string, unkno
 export async function runWatcherTick(): Promise<TickSummary> {
     const shadow = watcherConfig.shadow;
     const now = Date.now();
-    const summary: TickSummary = { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0, reviewRequests: 0, reviewWarnings: 0, reviewDowngrades: 0, evidenceExpiringNotices: 0, evidenceExpired: 0, reverificationDue: 0 };
+    const summary: TickSummary = { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0, reviewRequests: 0, reviewWarnings: 0, reviewDowngrades: 0, evidenceExpiringNotices: 0, evidenceExpired: 0, reverificationDue: 0, marketCoveredNotices: 0, billingSynced: 0, billingChanged: 0 };
 
     let engagements: Engagement[];
     try {
@@ -303,6 +308,22 @@ export async function runWatcherTick(): Promise<TickSummary> {
         summary.evidenceExpired = ev.expired;
         summary.reverificationDue = ev.reverificationDue;
         summary.errors += ev.errors;
+    } catch { summary.errors++; }
+
+    // Zahlungsbereitschaft (Phase 4): die aeltesten Pruefungen zuerst, ohne
+    // Stripe-Schluessel ein No-op. Shadow schreibt nur Marker.
+    try {
+        const br = await runBillingReadinessTick(shadow);
+        summary.billingSynced = br.synced;
+        summary.billingChanged = br.changed;
+        summary.errors += br.errors;
+    } catch { summary.errors++; }
+
+    // Markt-Update: angefragte Maerkte, die die Engine inzwischen prueft.
+    try {
+        const mc = await runMarketCoverageTick(shadow);
+        summary.marketCoveredNotices = mc.notices;
+        summary.errors += mc.errors;
     } catch { summary.errors++; }
 
     structuredLog("info", "Watcher tick complete", {
@@ -552,6 +573,66 @@ export async function runEvidenceTick(shadow: boolean): Promise<EvidenceTickCoun
                     payload: { providerKey: e.provider_key, providerName: p.name, to: exp, label: e.evidence_type }, dedupeKey: `evidence_expiring:${e.id}` });
             }
         } catch {
+            counts.errors++;
+        }
+    }
+    return counts;
+}
+
+// ─── Markt-Update (market_requests.notify) ────────────────────────────────────
+// "Email me when <market> is covered" (Risk Map F3, Entscheidung 2026-09-27:
+// nur mit Konto). Abgedeckt heisst: die Engine hat ein Laenderprofil fuer den
+// Markt — dieselbe Frage, die /search und die Oberflaeche stellen
+// (isKnownCountry). Kommt ein Land in die Engine, verschickt der erste Takt
+// nach dem Deploy die Mails; nichts muss von Hand angestossen werden.
+//
+// Einmal je Zeile. Live wird die Zeile zuerst ueber notified_at beansprucht
+// (PATCH nur, solange notified_at leer ist) und erst dann gemailt — zwei
+// Takte oder zwei Container koennen dieselbe Mail so nicht zweimal schicken.
+// Scheitert der Versand danach, steht das als email_failed im Protokoll; ein
+// erneuter Versuch waere eine zweite "einzige" Mail.
+//
+// Die Adresse wird erst jetzt gelesen, aus auth.users
+// (auth_user_email_by_id, 20261001000000) — market_requests speichert keine.
+// Shadow schreibt nur Marker und fasst weder Zeile noch Postfach an.
+
+type MarketRequestRow = { id: string; user_id: string | null; market: string; notify: boolean; notified_at: string | null; locale?: string | null };
+
+export interface MarketCoverageCounts { notices: number; errors: number }
+
+export async function runMarketCoverageTick(shadow: boolean): Promise<MarketCoverageCounts> {
+    const counts: MarketCoverageCounts = { notices: 0, errors: 0 };
+    const rows = (await supabaseApi.select("market_requests", { notify: true }, { limit: 5000 })) as MarketRequestRow[];
+    const due = rows.filter((r) => r.user_id && !r.notified_at && isKnownCountry(r.market));
+    if (!due.length) return counts;
+
+    const shadowSeen = new Set<string>();
+    if (shadow) {
+        const marks = (await supabaseApi.select("event_log", { type: markerType("market_covered_notice", true) }, { limit: 5000 })) as EventRow[];
+        for (const m of marks) if (typeof m.payload?.requestId === "string") shadowSeen.add(m.payload.requestId as string);
+    }
+
+    for (const r of due) {
+        try {
+            if (shadow) {
+                if (shadowSeen.has(r.id)) continue;
+                await mark("market_covered_notice", true, { requestId: r.id, market: r.market });
+                counts.notices++;
+                continue;
+            }
+            const claimed = (await supabaseApi.updateWhere("market_requests",
+                { id: `eq.${r.id}`, notified_at: "is.null" },
+                { notified_at: new Date().toISOString() })) as unknown[];
+            if (!Array.isArray(claimed) || claimed.length !== 1) continue; // ein anderer Takt war schneller
+            // Skalar wie bei auth_user_id_by_email (providerAuth.ts): PostgREST
+            // liefert den Wert selbst; die Zeilenform wird mitgelesen.
+            const roh = await supabaseApi.rpc("auth_user_email_by_id", { p_user_id: r.user_id });
+            const email = Array.isArray(roh) ? (roh[0] as Record<string, unknown> | undefined)?.auth_user_email_by_id : roh;
+            await sendMarketCoveredMail({ to: typeof email === "string" && email ? email : null, requestId: r.id, market: r.market, locale: r.locale });
+            await mark("market_covered_notice", false, { requestId: r.id, market: r.market });
+            counts.notices++;
+        } catch {
+            structuredLog("error", "Market coverage notice failed", { correlationId: "watchers", errorCode: "ERR_MARKET_NOTICE", severity: "error", route: "watchers/market-coverage" });
             counts.errors++;
         }
     }
