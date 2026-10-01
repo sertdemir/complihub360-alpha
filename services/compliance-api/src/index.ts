@@ -16,6 +16,7 @@ import { handleDashboard, SLUG_TO_ENGINE } from "./dashboard.js";
 import { checkMarketRequest } from "./marketRequests.js";
 import { notify, handleNotificationsList, handleNotificationsRead } from "./notifications.js";
 import { handleBillingRun, handleBillingPreview, syncOpenInvoices } from "./billing.js";
+import { ensureStripeCustomer, isStripeConfigured, stripeRequest } from "./stripe.js";
 import { checkVatId } from "./vies.js";
 import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
 import { buildCockpit } from "./cockpit.js";
@@ -1674,8 +1675,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         // 503 with a clear code until STRIPE_SECRET_KEY is configured.
         const providerKey = (req.url || '').split('/')[4];
         try {
-            const stripeKey = process.env.STRIPE_SECRET_KEY;
-            if (!stripeKey) {
+            if (!isStripeConfigured()) {
                 res.writeHead(503, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'STRIPE_NOT_CONFIGURED', message: 'Stripe is not connected yet', correlationId }));
                 return;
@@ -1687,30 +1687,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId }));
                 return;
             }
-            const stripe = async (path: string, params: Record<string, string>) => {
-                const resp = await fetch(`https://api.stripe.com/v1/${path}`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${stripeKey}`, 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams(params).toString(),
-                });
-                const body = await resp.json();
-                if (!resp.ok) throw new Error(`Stripe ${path}: ${(body as { error?: { message?: string } }).error?.message || resp.status}`);
-                return body as Record<string, unknown>;
-            };
-            let customerId = rows[0].stripe_customer_id ?? null;
-            if (!customerId) {
-                const customer = await stripe('customers', {
-                    name: rows[0].name || providerKey,
-                    ...(rows[0].contact_email ? { email: rows[0].contact_email } : {}),
-                    'metadata[provider_key]': providerKey,
-                });
-                customerId = String(customer.id);
-                await supabaseApi.update('providers', { provider_key: providerKey }, { stripe_customer_id: customerId });
-            }
+            const customerId = await ensureStripeCustomer(providerKey);
             const appUrl = (process.env.PUBLIC_APP_URL || 'https://staging.complihub360.com').replace(/\/$/, '');
-            const session = await stripe('billing_portal/sessions', {
+            // `?from=portal`: die Abrechnungsseite stoesst beim Rueckweg den
+            // Readiness-Sync an (Phase 4) — so wird aus einer neuen Karte ohne
+            // Webhook sofort `billing_ready`.
+            const session = await stripeRequest('POST', 'billing_portal/sessions', {
                 customer: customerId,
-                return_url: `${appUrl}/en/partner-dashboard/billing`,
+                return_url: `${appUrl}/en/partner-dashboard/billing?from=portal`,
             });
             await supabaseApi.insert('event_log', { type: 'billing_portal_opened', payload: { providerKey } });
             res.setHeader('x-correlation-id', correlationId);

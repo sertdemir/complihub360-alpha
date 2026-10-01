@@ -1,6 +1,7 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { structuredLog } from "@complihub360/types";
 import { supabaseApi } from "./supabase.js";
+import { ensureStripeCustomer, isStripeConfigured, stripeRequest } from "./stripe.js";
 
 // ─── Provider Pricing v2 ─────────────────────────────────────────────────────
 //
@@ -330,35 +331,6 @@ export async function getDiscountCounter(providerKey: string, cycleStart: string
     return rows[0]?.used ?? 0;
 }
 
-// ─── Stripe (Abo-Rechnung) ───────────────────────────────────────────────────
-
-const stripeForm = async (stripeKey: string, method: 'POST' | 'GET', path: string, params?: Record<string, string>) => {
-    const url = `https://api.stripe.com/v1/${path}${method === 'GET' && params ? `?${new URLSearchParams(params)}` : ''}`;
-    const resp = await fetch(url, {
-        method,
-        headers: { 'Authorization': `Bearer ${stripeKey}`, ...(method === 'POST' ? { 'Content-Type': 'application/x-www-form-urlencoded' } : {}) },
-        ...(method === 'POST' && params ? { body: new URLSearchParams(params).toString() } : {}),
-    });
-    const body = await resp.json() as Record<string, unknown> & { error?: { message?: string } };
-    if (!resp.ok) throw new Error(`Stripe ${path}: ${body.error?.message || resp.status}`);
-    return body;
-};
-
-async function ensureStripeCustomer(stripeKey: string, providerKey: string): Promise<string> {
-    const rows = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as
-        Array<{ name: string; contact_email?: string | null; stripe_customer_id?: string | null }>;
-    if (!rows[0]) throw new Error(`Provider not found: ${providerKey}`);
-    if (rows[0].stripe_customer_id) return rows[0].stripe_customer_id;
-    const customer = await stripeForm(stripeKey, 'POST', 'customers', {
-        name: rows[0].name || providerKey,
-        ...(rows[0].contact_email ? { email: rows[0].contact_email } : {}),
-        'metadata[provider_key]': providerKey,
-    });
-    const customerId = String(customer.id);
-    await supabaseApi.update('providers', { provider_key: providerKey }, { stripe_customer_id: customerId });
-    return customerId;
-}
-
 // POST /api/v1/admin/billing/run — {period?: 'YYYY-MM', dry_run?: boolean}.
 // Stellt die ABO-Rechnungen der Periode aus. Leads laufen nicht hier: die
 // werden je Buchung belastet und stehen im Ledger. Server-Key only.
@@ -377,8 +349,7 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
             const period = typeof d.period === 'string' && /^\d{4}-\d{2}$/.test(d.period)
                 ? d.period : new Date().toISOString().slice(0, 7);
             const dryRun = d.dry_run === true;
-            const stripeKey = process.env.STRIPE_SECRET_KEY;
-            if (!stripeKey && !dryRun) {
+            if (!isStripeConfigured() && !dryRun) {
                 res.writeHead(503, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'STRIPE_NOT_CONFIGURED', message: 'Stripe is not connected yet', correlationId }));
                 return;
@@ -410,8 +381,8 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
                     continue;
                 }
                 const currency = plan.currency.toLowerCase();
-                const customerId = await ensureStripeCustomer(stripeKey!, providerKey);
-                const invoice = await stripeForm(stripeKey!, 'POST', 'invoices', {
+                const customerId = await ensureStripeCustomer(providerKey);
+                const invoice = await stripeRequest('POST', 'invoices', {
                     customer: customerId,
                     collection_method: 'send_invoice',
                     days_until_due: '14',
@@ -422,18 +393,18 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
                     'metadata[plan_code]': plan.code,
                 });
                 const invoiceId = String(invoice.id);
-                await stripeForm(stripeKey!, 'POST', 'invoiceitems', {
+                await stripeRequest('POST', 'invoiceitems', {
                     customer: customerId, invoice: invoiceId,
                     amount: String(line.amount_cents), currency, description: line.label,
                 });
-                const finalized = await stripeForm(stripeKey!, 'POST', `invoices/${invoiceId}/finalize`) as {
+                const finalized = await stripeRequest('POST', `invoices/${invoiceId}/finalize`) as {
                     id: string; number?: string; status?: string; total?: number;
                     hosted_invoice_url?: string; invoice_pdf?: string; due_date?: number;
                 };
                 // send_invoice verschickt nur ueber den expliziten send-Call;
                 // ein Fehler dort darf die ausgestellte Rechnung nicht verlieren.
                 try {
-                    await stripeForm(stripeKey!, 'POST', `invoices/${invoiceId}/send`);
+                    await stripeRequest('POST', `invoices/${invoiceId}/send`);
                 } catch (sendErr) {
                     await supabaseApi.insert('event_log', { type: 'invoice_send_failed', payload: { providerKey, invoiceId, error: String(sendErr) } }).catch(() => { /* non-blocking */ });
                 }
@@ -535,14 +506,13 @@ export async function handleBillingPreview(res: ServerResponse, correlationId: s
 // Webhook-Ersatz: Zahlungsstatus offener Stripe-Rechnungen nachziehen, wenn
 // der Anbieter seine Rechnungsliste oeffnet (nur offene Zeilen, max. 5).
 export async function syncOpenInvoices(providerKey: string): Promise<void> {
-    const stripeKey = process.env.STRIPE_SECRET_KEY;
-    if (!stripeKey) return;
+    if (!isStripeConfigured()) return;
     const rows = (await supabaseApi.select('invoices', { provider_key: providerKey, status: 'open' }, { limit: 5 })) as
         Array<{ id: string; stripe_invoice_id?: string | null }>;
     for (const row of rows) {
         if (!row.stripe_invoice_id) continue;
         try {
-            const inv = await stripeForm(stripeKey, 'GET', `invoices/${row.stripe_invoice_id}`) as {
+            const inv = await stripeRequest('GET', `invoices/${row.stripe_invoice_id}`) as {
                 status?: string; status_transitions?: { paid_at?: number | null };
             };
             const mapped = inv.status === 'paid' ? 'paid'
