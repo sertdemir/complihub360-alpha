@@ -152,7 +152,14 @@
     "slotsAll": "Bu haftanın tüm randevuları",
     "lageAreaYes": "{{area}} alanını kapsıyor",
     "lageAreaNo": "{{area}} alanını kapsamıyor",
-    "drawerBookNote": "Ücretsiz ilk görüşme · 30 dk · kimlik randevudan sonra görünür"
+    "drawerBookNote": "Ücretsiz ilk görüşme · 30 dk · kimlik randevudan sonra görünür",
+    "yourAppointment": "Randevunuz",
+    "appointmentMeta": "{{minutes}} dk · onaylandı",
+    "appointmentConfirmed": "onaylandı",
+    "toAppointments": "Randevularınıza gidin",
+    "bookAnother": "Başka bir randevu alın",
+    "revealedTitle": "Ad ve iletişim bilgileri görünür.",
+    "revealedBody": "Rezervasyonunuzdan bu yana bu sağlayıcının kim olduğunu görebilirsiniz."
   },
   "schedule": {
     "back": "Profile dön",

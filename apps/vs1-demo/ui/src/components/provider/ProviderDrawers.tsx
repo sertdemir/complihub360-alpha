@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useRequestContext } from '../../lib/requestContext';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Search } from 'lucide-react';
@@ -20,6 +21,9 @@ export function SearchDrawer({ open, onClose }: { open: boolean; onClose: () => 
   const locale = i18n.resolvedLanguage || 'en';
   const [q, setQ] = useState('');
   const [rows, setRows] = useState<ProviderRequest[] | null>(null);
+  // Gleiche Kontextzeile wie die Anfragekarte (1 V3): Bereich · Markt · Eingang · ID.
+  const { kontext } = useRequestContext();
+  const kontextVon = (r: ProviderRequest) => kontext({ category: r.category, country: r.country, createdAt: r.createdAt, ref: r.ref });
 
   useEffect(() => {
     if (!open) return;
@@ -29,7 +33,7 @@ export function SearchDrawer({ open, onClose }: { open: boolean; onClose: () => 
 
   const hits = (rows ?? []).filter((r) => {
     if (q.trim().length < 2) return false;
-    const hay = `${r.idLine} ${r.company} ${r.tag ?? ''} ${r.meta} ${r.statusLabel}`.toLowerCase();
+    const hay = `${kontextVon(r)} ${r.company} ${r.meta} ${r.statusLabel}`.toLowerCase();
     return q.toLowerCase().split(/\s+/).every((tk) => hay.includes(tk));
   });
 
@@ -62,7 +66,7 @@ export function SearchDrawer({ open, onClose }: { open: boolean; onClose: () => 
               className="flex w-full items-center justify-between gap-3 rounded-lg border border-elevate/10 bg-elevate/[0.03] px-3.5 py-3 text-left transition-colors hover:border-fg-brand/50"
             >
               <span>
-                <span className="block text-[13px] font-semibold text-fg">{r.idLine}</span>
+                <span className="block text-[13px] font-semibold text-fg">{kontextVon(r)}</span>
                 <span className="block text-[11px] text-fg-tertiary">{r.company} · {r.meta}</span>
               </span>
               <Tag tone={r.status === 'active' ? 'brand' : 'warning'}>{r.statusLabel}</Tag>

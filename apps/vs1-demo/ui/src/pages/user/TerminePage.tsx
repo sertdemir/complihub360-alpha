@@ -15,6 +15,7 @@ import { Tabs, TabList, Tab } from '../../components/ui/Tabs';
 import { useSearchParams } from 'react-router-dom';
 import { fetchUserRequests, type UserRequestRow } from '../../api/requests';
 import { AnfragenTab } from './AnfragenTab';
+import { useRequestContext } from '../../lib/requestContext';
 import { DateMark } from '../../components/ui/DateMark';
 
 // ─── User Dashboard · Termine (bookings) ─────────────────────────────────────
@@ -54,6 +55,9 @@ interface Row {
   publicRef: string | null;
   /** "Tax and VAT · Norditalien" — unter dieser Beschreibung stand der Anbieter vor der Buchung (Canvas 4B). */
   descriptor: string;
+  /** 3 V3: Bereichscodes + Region fuer die uebersetzte Beschreibung. */
+  areaCodes: string[];
+  region: string | null;
   revealed: boolean;
   website: string | null;  // affiliate 1b — post-booking reveal only
   meta: string;
@@ -65,12 +69,14 @@ interface Row {
 // Klarnamen, unter welcher Beschreibung der Anbieter vor der Buchung stand —
 // so findet der Mandant „welcher war das?" wieder. Einen Buchstaben gibt es
 // hier nicht: den kannte nur die Liste, aus der gebucht wurde.
-function Herkunft({ r }: { r: Pick<Row, 'descriptor' | 'revealed'> }) {
+function Herkunft({ r }: { r: Pick<Row, 'descriptor' | 'areaCodes' | 'region' | 'revealed'> }) {
   const { t } = useTranslation('userws');
-  if (!r.descriptor) return null;
+  const { beschreibung } = useRequestContext();
+  const text = beschreibung({ areaCodes: r.areaCodes, region: r.region, fallback: r.descriptor });
+  if (!text) return null;
   return (
     <p className="truncate text-[11.5px] text-fg-tertiary">
-      {r.revealed ? t('termine.origin', { descriptor: r.descriptor }) : r.descriptor}
+      {r.revealed ? t('termine.origin', { descriptor: text }) : text}
     </p>
   );
 }
@@ -90,10 +96,13 @@ function toRows(bookings: UserBooking[], locale: string): Row[] {
       slotStartIso: b.slotStart,
       slotEndIso: b.slotEnd,
       dateLine: df.format(start),
-      timeLine: `${tf.format(start)}${end ? `–${tf.format(end)}` : ''} · Video-Call`,
+      // Kein "Video-Call": das Format kennen wir nicht (wie Partner-Termine, 2 V1).
+      timeLine: `${tf.format(start)}${end ? `–${tf.format(end)}` : ''}`,
       provider: b.providerName + (b.identityRevealed && b.providerRegion ? ` — ${b.providerRegion}` : ''),
       publicRef: b.publicRef,
       descriptor: b.providerDescriptor,
+      areaCodes: b.providerAreaCodes,
+      region: b.providerRegion,
       revealed: b.identityRevealed,
       website: b.providerWebsite,
       meta: b.message || '—',

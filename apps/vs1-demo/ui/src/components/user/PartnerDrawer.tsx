@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useRequestContext } from '../../lib/requestContext';
 import { ArrowLeft, ArrowRight, Eye, ShieldCheck } from 'lucide-react';
 import { AnonNotice, Monogram, OriginLine, RankBasis } from './PartnerCard';
 import { Drawer } from '../ui/Drawer';
@@ -61,6 +62,8 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
   onBooked?: (publicRef: string, b: { name: string; slotStart: string }) => void;
 }) {
   const { t, i18n } = useTranslation('results');
+  // 3 V3: Beschreibung in der Sprache des Nutzers statt der englischen Server-Zeile.
+  const { beschreibung } = useRequestContext();
   const navigate = useNavigate();
   const locale = i18n.resolvedLanguage || 'en';
 
@@ -144,8 +147,9 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
 
   if (!provider) return null;
   const d = detail.kind === 'ready' ? detail.d : null;
+  const beschreibungText = beschreibung({ areaCodes: provider.area_codes, region: provider.descriptor_region, fallback: provider.descriptor });
   const meta = [
-    provider.descriptor,
+    beschreibungText,
     provider.active_since ? t('snapshot.activeSince', { year: provider.active_since }) : null,
     provider.completed_count ? `${provider.completed_count} ${t('detail.mandates')}` : null,
   ].filter(Boolean).join(' · ');
@@ -320,7 +324,7 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
             </p>
             <p className="mt-2 text-body-4xs font-extrabold uppercase tracking-[0.09em] text-fg-accent-strong">{t('schedule.revealLabel')}</p>
             <p className="mt-1 text-body font-bold text-fg">{confirmation.provider_identity.name}</p>
-            <p className="mt-0.5 text-body-3xs text-fg-secondary">{provider.descriptor}</p>
+            <p className="mt-0.5 text-body-3xs text-fg-secondary">{beschreibungText}</p>
             {confirmation.provider_identity.contact_email && (
               <p className="mt-0.5 text-body-xs text-fg-secondary">{confirmation.provider_identity.contact_email}</p>
             )}

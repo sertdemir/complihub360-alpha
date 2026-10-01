@@ -351,7 +351,7 @@
     "emptyTitle": "Henüz talep yok",
     "emptyDescription": "Profiliniz yayında. Yeni talepler buraya + gelen kutunuza Magic-Link olarak düşer — çoğu partner ilk talebini 5 gün içinde alır.",
     "previewProfile": "Herkese açık profili önizle",
-    "companyAnonymized": "🔒 Anonimleştirildi · onay sonrası açılır"
+    "companyAnonymized": "🔒 Anonim talep"
   },
   "settings": {
     "title": "Ayarlar",
@@ -426,11 +426,13 @@
   },
   "termine": {
     "title": "Randevular ve <accent>lead'ler</accent>.",
-    "sub": "Planlanmış ilk görüşmeler — dosya (kimlik + bağlam) rezervasyondan itibaren senin. Her rezervasyon faturalanmış bir lead.",
+    "sub": "Planlanmış ilk görüşmeler. Kimlik ve talep bilgilerini içeren dosya rezervasyondan itibaren sizindir. Her rezervasyon faturalanmış bir lead’dir.",
     "upcoming": "YAKLAŞAN",
     "past": "GEÇMİŞ",
     "leadCharged": "Lead faturalandı",
     "openDossier": "Dosyayı aç",
+    "companyMissing": "Şirket belirtilmemiş",
+    "minutes": "{{count}} dk",
     "dossierEyebrow": "LEAD DOSYASI",
     "dossierContact": "İletişim ve randevu",
     "dossierContext": "Başvuru bağlamı",
@@ -658,6 +660,14 @@
         "privacy_notice": "Onay: gizlilik bildirimi",
         "billing_authorization": "Onay: faturalandırma yetkisi"
       }
+    },
+    "edit": "Düzenle",
+    "cancelEdit": "Vazgeç",
+    "settled": {
+      "title": "Başvuru tamamlandı",
+      "titleSince": "Başvuru tamamlandı · {{date}} tarihinden beri aktif",
+      "body": "Bilgilerinizi istediğiniz zaman değiştirebilirsiniz. Hukuki yapı, temsil ve sigortaya ilişkin değişiklikler ayrıca inceleme ekibimize iletilir.",
+      "navHint": "Başvurunuz incelendi. Bir bölümü güncellemek için “Düzenle”yi kullanın."
     }
   },
   "verification": {

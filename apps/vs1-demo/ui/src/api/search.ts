@@ -34,6 +34,10 @@ export interface AnonProvider {
   letter: string;
   /** "Tax and VAT · Norditalien" — vom System, nie vom Anbieter. */
   descriptor: string;
+  /** 3 V3: freigegebene Bereiche als Codes — das UI uebersetzt sie. */
+  area_codes?: string[];
+  /** Region der Beschreibung (identitaets-geprueft). */
+  descriptor_region?: string | null;
   region: string | null;
   active_since: number | null;
   specializations: string[];

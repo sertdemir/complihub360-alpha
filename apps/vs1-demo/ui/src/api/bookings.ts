@@ -17,6 +17,8 @@ export interface UserBooking {
   providerName: string;
   /** "Tax and VAT · Norditalien" — die Beschreibung, unter der der Anbieter vor der Buchung stand. */
   providerDescriptor: string;
+  /** 3 V3: Bereichscodes der Beschreibung — das UI uebersetzt sie. */
+  providerAreaCodes: string[];
   providerRegion: string | null;
   providerWebsite: string | null;  // affiliate 1b — post-booking reveal only
   identityRevealed: boolean;
@@ -31,6 +33,7 @@ interface ApiBookingRow {
   public_ref: string | null;
   provider_name: string;
   provider_descriptor: string;
+  provider_area_codes?: string[];
   provider_region: string | null;
   provider_website: string | null;
   identity_revealed: boolean;
@@ -55,6 +58,7 @@ export async function fetchUserBookings(): Promise<UserBooking[]> {
     publicRef: b.public_ref ?? null,
     providerName: b.provider_name,
     providerDescriptor: b.provider_descriptor ?? '',
+    providerAreaCodes: b.provider_area_codes ?? [],
     providerRegion: b.provider_region,
     identityRevealed: !!b.identity_revealed,
     providerWebsite: b.provider_website,
@@ -73,12 +77,17 @@ export interface ProviderBooking {
   status: BookingStatus;
   leadCharged: boolean;
   userEmail: string | null;  // dossier: identity delivered at booking
+  /** Firma aus der Anfrage an diesen Anbieter (2 V1) — null ohne Angabe. */
+  userCompany: string | null;
+  /** Thema der Anfrage, roh (das UI uebersetzt). */
+  category: string | null;
+  country: string | null;
   message: string | null;
 }
 
 export async function fetchProviderBookings(providerKey?: string): Promise<ProviderBooking[]> {
   const key = providerKey ?? await myProviderKey();
-  const res = await apiFetch<{ ok: boolean; bookings: Array<{ id: string; slot_start: string; slot_end: string | null; status: BookingStatus; lead_charged: boolean; user_email: string | null; message: string | null }> }>(`/api/v1/provider/${key}/bookings`);
+  const res = await apiFetch<{ ok: boolean; bookings: Array<{ id: string; slot_start: string; slot_end: string | null; status: BookingStatus; lead_charged: boolean; user_email: string | null; user_company?: string | null; category?: string | null; country?: string | null; message: string | null }> }>(`/api/v1/provider/${key}/bookings`);
   return (res.bookings || []).map((b) => ({
     id: b.id,
     slotStart: b.slot_start,
@@ -86,6 +95,9 @@ export async function fetchProviderBookings(providerKey?: string): Promise<Provi
     status: b.status,
     leadCharged: b.lead_charged,
     userEmail: b.user_email,
+    userCompany: b.user_company ?? null,
+    category: b.category ?? null,
+    country: b.country ?? null,
     message: b.message,
   }));
 }
@@ -102,6 +114,9 @@ export interface ProviderDetail {
   public_ref: string;
   /** "Tax and VAT · Norditalien" — kein Buchstabe: den kennt nur die Liste. */
   descriptor: string;
+  /** 3 V3: Bereichscodes + Region, damit das UI uebersetzt. */
+  area_codes?: string[];
+  descriptor_region?: string | null;
   region: string | null;
   active_since: number | null;
   specializations: string[];

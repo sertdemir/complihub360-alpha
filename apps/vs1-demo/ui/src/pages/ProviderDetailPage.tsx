@@ -8,7 +8,9 @@ import { Badge } from '../components/ui/Badge';
 import { KpiRing, useEntered } from '../components/ui/Stats';
 import { SEVERITY_STYLE } from '../components/compliance-areas/severity';
 import { ApiError } from '../api/client';
-import { fetchProviderDetail, fetchProviderReviews, fetchSlots, type ProviderDetail, type ProviderReview } from '../api/bookings';
+import { fetchProviderDetail, fetchProviderReviews, fetchSlots, fetchUserBookings, type ProviderDetail, type ProviderReview, type UserBooking } from '../api/bookings';
+import { DateMark } from '../components/ui/DateMark';
+import { useRequestContext } from '../lib/requestContext';
 import { AnonNotice, RankBasis } from '../components/user/PartnerCard';
 import { loadProviderContext, type ContextDuty, type ProviderContext } from '../lib/providerContext';
 import { DOMAINS } from '../lib/domains';
@@ -70,6 +72,7 @@ export function ProviderDetailPage() {
   const [ctx, setCtx] = useState<ProviderContext | null>(null);
   const [reviews, setReviews] = useState<{ reviews: ProviderReview[]; count: number; average: number | null } | null>(null);
   const [slots, setSlots] = useState<string[] | null>(null);
+  const [booking, setBooking] = useState<UserBooking | null>(null);
 
   const search = params.toString();
 
@@ -114,6 +117,24 @@ export function ProviderDetailPage() {
     return () => { alive = false; };
   }, [key]);
 
+  // 4 V1 (2026-10-01): steht schon ein bestaetigter Termin mit diesem Anbieter,
+  // zeigt die Seite ihn (und den freigegebenen Namen) statt "Termin buchen".
+  // Der naechste kommende gewinnt; ohne kommenden der juengste vergangene.
+  useEffect(() => {
+    let alive = true;
+    setBooking(null);
+    fetchUserBookings()
+      .then((bs) => {
+        if (!alive) return;
+        const mine = bs.filter((b) => b.publicRef === key && b.status === 'confirmed');
+        const now = Date.now();
+        const kommend = mine.filter((b) => new Date(b.slotStart).getTime() >= now).sort((a, b) => a.slotStart.localeCompare(b.slotStart));
+        setBooking(kommend[0] ?? null);
+      })
+      .catch(() => { if (alive) setBooking(null); });
+    return () => { alive = false; };
+  }, [key]);
+
   const areaLabel = ctx?.areaSlug && SLUG_TO_I18N[ctx.areaSlug]
     ? t(`domains.${SLUG_TO_I18N[ctx.areaSlug]}`, { defaultValue: ctx.areaSlug })
     : null;
@@ -152,6 +173,7 @@ export function ProviderDetailPage() {
               areaLabel={areaLabel}
               reviews={reviews}
               slots={slots}
+              booking={booking}
               entered={entered}
               locale={locale}
               onBook={book}
@@ -164,12 +186,13 @@ export function ProviderDetailPage() {
   );
 }
 
-function Detail({ p, ctx, areaLabel, reviews, slots, entered, locale, onBook, onBack }: {
+function Detail({ p, ctx, areaLabel, reviews, slots, booking, entered, locale, onBook, onBack }: {
   p: ProviderDetail;
   ctx: ProviderContext | null;
   areaLabel: string | null;
   reviews: { reviews: ProviderReview[]; count: number; average: number | null } | null;
   slots: string[] | null;
+  booking: UserBooking | null;
   entered: boolean;
   locale: string;
   onBook: (slot?: string) => void;
@@ -191,8 +214,16 @@ function Detail({ p, ctx, areaLabel, reviews, slots, entered, locale, onBook, on
   // Titel (Phase 3): „Verified Provider" ohne Buchstaben — den kennt nur die
   // Liste, aus der geklickt wurde (ctx.self). Die Beschreibung in Gold, wie
   // „Ihre Compliance-Sitzungen." auf den anderen Seiten des Arbeitsbereichs.
-  const title = ctx?.self?.title ?? t('snapshot.verifiedPartner');
-  const descriptor = p.descriptor || ctx?.self?.descriptor || '';
+  // 3 V3: Titel und Beschreibung getrennt — die Bereiche stehen uebersetzt als
+  // Marken unter der Ueberschrift, statt als englische Goldzeile in ihr.
+  // 4 V1: nach der Offenlegung der Klarname aus der Buchung.
+  const { bereich } = useRequestContext();
+  const revealed = !!booking?.identityRevealed;
+  const title = revealed ? booking!.providerName : (ctx?.self?.title ?? t('snapshot.verifiedPartner'));
+  const areaCodes = p.area_codes ?? ctx?.self?.area_codes ?? [];
+  const areaNames = areaCodes.map((c) => bereich(c)).filter(Boolean);
+  const region = p.descriptor_region ?? p.region ?? null;
+  const descriptorFallback = areaNames.length ? '' : (p.descriptor || ctx?.self?.descriptor || '');
 
   // 1B · Lage-Satz — nur die Teile, die es wirklich gibt.
   const lage: ReactNode[] = [];
@@ -264,7 +295,7 @@ function Detail({ p, ctx, areaLabel, reviews, slots, entered, locale, onBook, on
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2.5">
               <h1 className="font-serif text-[23px] font-bold leading-tight text-fg">
-                {title}{descriptor && <> · <span className="text-fg-accent-emphasis">{descriptor}</span></>}
+                {title}{descriptorFallback && <> · <span className="text-fg-accent-emphasis">{descriptorFallback}</span></>}
               </h1>
               {p.is_verified && (
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/55 px-2.5 py-[3px] text-[9.5px] font-extrabold uppercase tracking-[0.06em] text-fg-accent-strong">
@@ -272,6 +303,12 @@ function Detail({ p, ctx, areaLabel, reviews, slots, entered, locale, onBook, on
                 </span>
               )}
             </div>
+            {areaNames.length > 0 && (
+              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                {areaNames.map((n) => <Badge key={n} tone="brand" appearance="outline" shape="pill" size="md">{n}</Badge>)}
+                {region && <span className="text-body-sm text-fg-secondary">· {region}</span>}
+              </div>
+            )}
             {lage.length > 0 && (
               <p className="mt-1.5 text-body-sm text-fg">
                 {lage.map((part, i) => (
@@ -329,7 +366,7 @@ function Detail({ p, ctx, areaLabel, reviews, slots, entered, locale, onBook, on
       )}
 
       {/* Canvas 3B: derselbe Kasten wie in der Schublade, an derselben Stelle. */}
-      <AnonNotice className="mt-4 max-w-[760px]" />
+      {revealed ? <RevealedNotice className="mt-4 max-w-[760px]" /> : <AnonNotice className="mt-4 max-w-[760px]" />}
       {p.rank_basis && (
         <div className={`${CARD} mt-4 max-w-[760px] px-[18px] py-4`}>
           <p className="text-body-4xs font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('rankBasis.group')}</p>
@@ -345,7 +382,7 @@ function Detail({ p, ctx, areaLabel, reviews, slots, entered, locale, onBook, on
           <Packages p={p} />
           <Reviews data={reviews} p={p} confirm={confirm} locale={locale} />
         </div>
-        <BookingRail p={p} slots={slots} locale={locale} onBook={onBook} ctx={ctx} />
+        {booking ? <AppointmentRail booking={booking} locale={locale} onBook={onBook} /> : <BookingRail p={p} slots={slots} locale={locale} onBook={onBook} ctx={ctx} />}
       </div>
     </>
   );
@@ -705,5 +742,50 @@ function BookingRail({ p, slots, locale, onBook, ctx }: {
         </div>
       )}
     </aside>
+  );
+}
+
+// ─── 4 V1 · nach der Buchung: die Buchungskarte wird zur Terminkarte ─────────
+// Gleiche Stelle, gleiche Klebe-Logik wie BookingRail. Die Datumsmarke ist
+// dieselbe wie im Dashboard. "Weiteren Termin buchen" bleibt erreichbar, tritt
+// aber hinter den bestehenden Termin zurueck.
+function AppointmentRail({ booking, locale, onBook }: { booking: UserBooking; locale: string; onBook: (slot?: string) => void }) {
+  const { t } = useTranslation('results');
+  const navigate = useNavigate();
+  const start = new Date(booking.slotStart);
+  const minuten = booking.slotEnd ? Math.round((new Date(booking.slotEnd).getTime() - start.getTime()) / 60_000) : null;
+  const tag = start.toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' });
+  const zeit = start.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+  return (
+    <aside className={`${CARD} sticky top-6 p-5`}>
+      <p className="text-body-4xs font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('detail.yourAppointment')}</p>
+      <div className="mt-3 flex items-center gap-3">
+        <DateMark iso={booking.slotStart} locale={locale} size="md" soon />
+        <div className="min-w-0">
+          <p className="text-body-sm font-bold text-fg">{tag}, {zeit}</p>
+          <p className="text-body-3xs text-fg-tertiary">{minuten ? t('detail.appointmentMeta', { minutes: minuten }) : t('detail.appointmentConfirmed')}</p>
+        </div>
+      </div>
+      <Button size="lg" shape="soft" fullWidth type="button" className="mt-4" onClick={() => navigate(`/${locale}/dashboard/termine`)}>
+        {t('detail.toAppointments')} <ArrowRight size={15} />
+      </Button>
+      <Button size="lg" shape="soft" variant="secondary" fullWidth type="button" className="mt-2" onClick={() => onBook()}>
+        {t('detail.bookAnother')}
+      </Button>
+    </aside>
+  );
+}
+
+// 4 V1: nach der Offenlegung ersetzt die Freigabe-Info den Anonymitaets-Hinweis.
+function RevealedNotice({ className = '' }: { className?: string }) {
+  const { t } = useTranslation('results');
+  return (
+    <div className={`flex items-start gap-2.5 rounded-lg border border-success-200 bg-success-50 px-3.5 py-3 dark:border-emerald-400/30 dark:bg-emerald-500/10 ${className}`}>
+      <ShieldCheck size={16} className="mt-[1px] shrink-0 text-success-700 dark:text-emerald-300" aria-hidden />
+      <p className="text-body-3xs leading-relaxed text-fg-secondary">
+        <span className="font-bold text-fg">{t('detail.revealedTitle')}</span>{' '}
+        {t('detail.revealedBody')}
+      </p>
+    </div>
   );
 }

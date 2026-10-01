@@ -905,6 +905,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         ...serializeProvider(p, reg, 'anonymous'),
                         ...maskDossier(p),
                         descriptor: title.descriptor,
+                        // 3 V3 (2026-10-01): die Bereiche als Codes, damit das UI
+                        // sie in der Sprache des Nutzers zeigt — `descriptor`
+                        // traegt die englischen Taxonomie-Namen.
+                        area_codes: [...areas].sort(),
+                        descriptor_region: p.region ?? null,
                         // Freigegebene Leistungsnamen aus der View — nicht die
                         // Selbstauskunft aus `categories`.
                         specializations,
@@ -1047,6 +1052,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         public_ref: p.public_ref ?? null,
                         provider_name: b.identity_revealed ? (p.name ?? 'Verified Provider') : 'Verified Provider',
                         provider_descriptor: title.descriptor,
+                        provider_area_codes: [...areas].sort(),
                         provider_region: p.region ?? null,
                         identity_revealed: !!b.identity_revealed,
                         // Affiliate 1b: the provider's website is a POST-BOOKING
@@ -1119,15 +1125,37 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             const users = (await supabaseApi.select('users', {})) as any[];
             const byId: Record<string, any> = {};
             users.forEach((u: any) => { byId[u.id] = u; });
-            const bookings = rows.map((b: any) => ({
-                id: b.id,
-                slot_start: b.slot_start,
-                slot_end: b.slot_end,
-                status: b.status,
-                lead_charged: !!b.lead_charged,
-                user_email: b.user_id && byId[b.user_id] ? byId[b.user_id].email : null,
-                message: b.message ?? null,
-            }));
+            // Canvas-Wahl 2 V1 (2026-10-01): die Firma kommt aus der Anfrage des
+            // Nutzers an DIESEN Anbieter (structured_answers.company), dazu
+            // Bereich und Markt als Thema. Vorher riet das UI die Firma aus der
+            // E-Mail-Domain. Die Buchung hat die Identitaet bereits freigegeben
+            // (Dossier-Regel); ohne Anfrage oder ohne Angabe bleibt sie null —
+            // das UI schreibt dann "Firma nicht angegeben", nie eine Domain.
+            const engagements = (await supabaseApi.select('engagement_requests', { provider_key: providerKey }, { order: 'created_at.desc', limit: 200 })) as any[];
+            const anfrageVon: Record<string, any> = {};
+            for (const e of engagements) {
+                if (!e.user_id) continue;
+                const bisher = anfrageVon[e.user_id];
+                // Neueste Anfrage gewinnt; eine aeltere fuellt nur eine fehlende Firma.
+                if (!bisher) anfrageVon[e.user_id] = e;
+                else if (!bisher.structured_answers?.company && e.structured_answers?.company) anfrageVon[e.user_id] = { ...bisher, structured_answers: { ...bisher.structured_answers, company: e.structured_answers.company } };
+            }
+            const bookings = rows.map((b: any) => {
+                const anfrage = b.user_id ? anfrageVon[b.user_id] : undefined;
+                const company = typeof anfrage?.structured_answers?.company === 'string' ? anfrage.structured_answers.company.trim() : '';
+                return {
+                    id: b.id,
+                    slot_start: b.slot_start,
+                    slot_end: b.slot_end,
+                    status: b.status,
+                    lead_charged: !!b.lead_charged,
+                    user_email: b.user_id && byId[b.user_id] ? byId[b.user_id].email : null,
+                    user_company: company || null,
+                    category: anfrage?.category ?? null,
+                    country: anfrage?.country ?? null,
+                    message: b.message ?? null,
+                };
+            });
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, providerKey, bookings, correlationId }));
         } catch {
@@ -2817,7 +2845,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     // die Beschreibung kommt aus freigegebenen Bereichen und Region.
                     .map(({ _rank, _areas, _region, ...pub }: any, i: number) => {
                         const title = publicTitle(i, _areas.map((a: string) => labels.get(a) ?? a), pub.region ?? _region);
-                        return { ...pub, title: title.label, letter: title.letter, descriptor: title.descriptor };
+                        return { ...pub, title: title.label, letter: title.letter, descriptor: title.descriptor, area_codes: [..._areas].sort(), descriptor_region: pub.region ?? _region };
                     });
 
                 res.writeHead(200, { 'Content-Type': 'application/json' });
