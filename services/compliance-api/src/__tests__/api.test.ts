@@ -82,7 +82,7 @@ vi.mock('../supabase.js', () => ({
                 // Genau eine, oder keine — wie die SQL-Funktion.
                 return treffer.length === 1 ? treffer[0].id : null;
             }
-            // Gegenstueck aus 20261001000000: nur bestaetigte, lebende Logins.
+            // Gegenstueck aus 20261001184141: nur bestaetigte, lebende Logins.
             if (fn === 'auth_user_email_by_id') {
                 const u = (db.auth_users ?? []).find((x) => x.id === params.p_user_id && !x.deleted_at && x.email_confirmed_at);
                 return u ? u.email : null;

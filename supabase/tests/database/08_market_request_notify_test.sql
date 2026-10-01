@@ -1,6 +1,6 @@
 -- ─── Marktanfragen: Sprache und Adresse fuer den Versand des Updates ─────────
 --
--- Gehoert zu 20261001000000_market_request_notify.sql. Geprueft wird:
+-- Gehoert zu 20261001184141_market_request_notify.sql. Geprueft wird:
 --
 --   1. Die Sprache ist eine der vier Produktsprachen oder leer.
 --   2. Die Adresse kommt nur fuer einen bestaetigten, lebenden Login heraus.

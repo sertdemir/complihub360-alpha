@@ -593,7 +593,7 @@ export async function runEvidenceTick(shadow: boolean): Promise<EvidenceTickCoun
 // erneuter Versuch waere eine zweite "einzige" Mail.
 //
 // Die Adresse wird erst jetzt gelesen, aus auth.users
-// (auth_user_email_by_id, 20261001000000) — market_requests speichert keine.
+// (auth_user_email_by_id, 20261001184141) — market_requests speichert keine.
 // Shadow schreibt nur Marker und fasst weder Zeile noch Postfach an.
 
 type MarketRequestRow = { id: string; user_id: string | null; market: string; notify: boolean; notified_at: string | null; locale?: string | null };

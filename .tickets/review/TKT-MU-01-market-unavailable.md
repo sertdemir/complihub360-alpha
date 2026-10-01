@@ -31,9 +31,9 @@ Market“-Aktion, die tatsächlich etwas tut.
 - [x] Lokal: Zustand statt C3, Zeilen je Markt (Gast), Bestätigung, Opt-in mit Konto; 7 Tests, 6 Sabotagen erkannt; Screenshots EN/DE/Mobil
 - [x] Neue Copy abgenommen (27.09.) → `common:states.marketRequest.*`, im Copy-Waechter; „You can switch it off any time“ bleibt weg (Nutzer: „Abschalten weglassen“)
 - [x] Staging (27.09., Build `ccee4718`)
-- [x] Versand des Updates (01.10.): Watcher-Pass `runMarketCoverageTick`, einmal je Zeile mit Claim über `notified_at`, Adresse aus `auth.users` per `auth_user_email_by_id` (nur bestätigt), Sprache der Anfrage (`locale`, Migration 20261001000000); 7 API-Tests + 9 pgTAP, 5 Sabotagen erkannt
+- [x] Versand des Updates (01.10.): Watcher-Pass `runMarketCoverageTick`, einmal je Zeile mit Claim über `notified_at`, Adresse aus `auth.users` per `auth_user_email_by_id` (nur bestätigt), Sprache der Anfrage (`locale`, Migration 20261001184141); 7 API-Tests + 9 pgTAP, 5 Sabotagen erkannt
 - [x] Mail-Copy abgenommen (01.10., nach echter Mail auf Staging); EN und DE im Test wortgleich festgehalten
-- [x] Migration 20261001000000 auf Staging (vor dem Merge von #231)
+- [x] Migration 20261001184141 auf Staging (vor dem Merge von #231)
 - [x] Staging Ende-zu-Ende (01.10., Build `48488f1c`): Gast-Anfrage mit `de-DE` → `locale = de`; Testzeile DE + notify mit Konto `+madrid` → nächster Takt sendet über Resend (200), Mail kommt an (DE, Link `/de/wizard`), `notified_at` gesetzt, der folgende Takt sendet nicht erneut; Testzeilen entfernt
 
 ## DNA-Check
