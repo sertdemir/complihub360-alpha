@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS auth.users (
 -- scheitert die Migration im Testlauf an etwas, das in Wahrheit existiert.
 ALTER TABLE auth.users ADD COLUMN IF NOT EXISTS deleted_at timestamptz;
 
--- `email_confirmed_at` ebenso: `auth_user_email_by_id` aus 20261001000000
+-- `email_confirmed_at` ebenso: `auth_user_email_by_id` aus 20261001184141
 -- gibt nur bestaetigte Adressen heraus.
 ALTER TABLE auth.users ADD COLUMN IF NOT EXISTS email_confirmed_at timestamptz;
 
