@@ -95,6 +95,8 @@
     "bookSub": "Kostenloses Erstgespräch · 30 Min · unverbindlich",
     "bookCta": "Termin buchen",
     "revealNote": "Identität wird nach der Buchung sichtbar.",
+    "notBookableTitle": "Derzeit nicht buchbar",
+    "notBookableNote": "Wir bieten keinen Termin an, den wir nicht bestätigen können. Die Angaben auf dieser Seite bleiben Ihnen erhalten, und Sie können weitere Treffer vergleichen.",
     "penalty": "Bußgeld: {{value}}",
     "loading": "Anbieter wird geladen …",
     "notFoundTitle": "Dieser Anbieter ist nicht mehr verfügbar",

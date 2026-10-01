@@ -919,6 +919,13 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         billing_model: p.billing_model || 'project',
                         is_verified: true,
                         availability: p.availability || 'available',
+                        // Kann hier gebucht werden? Dieselbe Quelle wie der
+                        // Buchungspfad (View-Spalte, gepflegt von
+                        // syncBillingReadiness). Bei false zeigt die Seite GAR
+                        // KEINEN Buchen-Knopf, statt den Nutzer erst nach der
+                        // Terminwahl mit 409 abzuweisen (Nutzer-Entscheidung
+                        // 2026-10-01, TKT-PROV-06).
+                        bookable_chargeable: view.some((r: any) => r.bookable_chargeable),
                         rank_basis: rankBasis({
                             required, evidence: usable,
                             avg_response_hours: p.avg_response_hours, confirmation_rate: p.confirmation_rate,

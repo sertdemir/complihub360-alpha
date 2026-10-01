@@ -65,6 +65,9 @@ export async function gateFor(d: Dossier): Promise<GateVerdict & { allowance: { 
     const verdict = activationGate({
         checklist: d.checklist, services: d.services, coverage: d.coverage,
         agreements: d.agreements.map((a) => a.agreement_type),
+        // Gelesen, nicht berechnet: syncBillingReadiness (leadCharge.ts, #234)
+        // pflegt beide Spalten aus allen sieben Bedingungen — Stripe
+        // eingeschlossen. Das Gate MELDET sie nur noch (TKT-PROV-05).
         billing_ready: !!d.provider.billing_ready, billing_block_reasons: d.provider.billing_block_reasons ?? [],
         allowance: allowance ? { ok: allowance.ok, over: allowance.over } : null,
         lifecycle_status: d.provider.lifecycle_status ?? 'draft',

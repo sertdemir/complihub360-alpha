@@ -133,7 +133,11 @@ export async function loadDossier(providerKey: string): Promise<Dossier | null> 
     return { provider: providers[0], confidential: conf[0] ?? null, services, coverage, evidence, agreements, requests, checklist };
 }
 
-/** Was der Anbieter von sich selbst sieht — ohne Abrechnungsinterna und ohne Stripe-IDs. */
+/**
+ * Was der Anbieter von sich selbst sieht — ohne Abrechnungsinterna und ohne
+ * Stripe-IDs. `billing_ready` und die Gruende kommen aus den Spalten, die
+ * syncBillingReadiness (leadCharge.ts, #234) pflegt.
+ */
 function providerView(p: any) {
     return {
         provider_key: p.provider_key, name: p.name, website_url: p.website_url ?? null, contact_email: p.contact_email ?? null,
@@ -272,9 +276,17 @@ function servicePatchFrom(d: any): Record<string, unknown> {
 /**
  * Das Kategorie-Kontingent (Spec B): Essential eine Hauptkategorie, Growth
  * bis fuenf, Global alle. Gemessen an den Bereichen der nicht stillgelegten
- * Leistungen plus dem neuen. Ohne Abo wird hier nicht gesperrt — dann sperrt
- * das Gate ueber billing_ready, und der Anbieter sieht dort, dass ein Plan
- * fehlt. Ein Anbieter soll sein Dossier fuellen koennen, bevor er zahlt.
+ * Leistungen plus dem neuen. Ohne Abo wird hier nicht gesperrt — ein Anbieter
+ * soll sein Dossier fuellen koennen, bevor er zahlt.
+ *
+ * Bis zum 2026-10-01 stand hier, das Gate fange den Fall "kein Abo" ueber
+ * `billing_ready`. Das traegt nicht mehr: Billing sperrt das Aktivieren nicht
+ * mehr, es wird nur gemeldet (TKT-PROV-05). Die Spalte selbst gibt es weiter —
+ * `syncBillingReadiness` (leadCharge.ts) pflegt sie —, sie entscheidet aber
+ * nicht mehr ueber das Aktivieren. Ohne Abo kann ein Anbieter also aktiviert
+ * werden; er ist dann nur nicht buchbar, und die Oberflaeche zeigt keinen
+ * Buchen-Knopf (TKT-PROV-06). Ob ein Konto ohne Tarif ueberhaupt gelistet
+ * werden soll, ist eine offene Frage im Ticket.
  */
 export async function allowanceFor(providerKey: string, services: any[], extraArea?: string): Promise<{ ok: boolean; allowance: number | null; used: number; over: string[]; plan: string | null } | null> {
     const sub = await getActiveSubscription(providerKey);

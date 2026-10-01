@@ -95,6 +95,8 @@
     "bookSub": "Ücretsiz ilk görüşme · 30 dk · bağlayıcı değil",
     "bookCta": "Randevu al",
     "revealNote": "Kimlik rezervasyondan sonra görünür.",
+    "notBookableTitle": "Şu anda randevu alınamıyor",
+    "notBookableNote": "Onaylayamayacağımız bir randevuyu sunmayız. Bu sayfadaki bilgiler sizde kalır ve diğer eşleşmeleri karşılaştırmaya devam edebilirsiniz.",
     "penalty": "Ceza: {{value}}",
     "loading": "Sağlayıcı yükleniyor …",
     "notFoundTitle": "Bu sağlayıcı artık mevcut değil",

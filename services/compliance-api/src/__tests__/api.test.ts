@@ -2356,7 +2356,7 @@ describe('Review-Arbeitsplatz (6A/7A/8A): nur Admin, Zell-Aktionen, Gate', () =>
         void serviceId;
     });
 
-    it('Gate: active erst, wenn Nachweise geprueft, eine Zelle frei, Annahmen da und Billing bereit — die Antwort nennt, was fehlt', async () => {
+    it('Gate: active, wenn Nachweise geprueft, eine Zelle frei und die Annahmen da sind — Billing sperrt nicht (TKT-PROV-05)', async () => {
         seedApplicant();
         const serviceId = await fillDossier();
         await own('/submit', { method: 'POST', body: '{}' });
@@ -2365,10 +2365,15 @@ describe('Review-Arbeitsplatz (6A/7A/8A): nur Admin, Zell-Aktionen, Gate', () =>
         const zu = await adminApi('/api/v1/admin/review/neue-kanzlei/lifecycle', { method: 'POST', body: JSON.stringify({ to: 'active' }) });
         expect(zu.status).toBe(422);
         expect(zu.body.errorCode).toBe('GATE_NOT_MET');
-        expect(zu.body.gate.missing).toEqual(expect.arrayContaining(['evidence.incorporation', 'evidence.insurance', 'evidence.representative_identity', 'coverage.none_approved', 'billing.not_ready', 'billing.no_payment_method']));
+        expect(zu.body.gate.missing).toEqual(expect.arrayContaining(['evidence.incorporation', 'evidence.insurance', 'evidence.representative_identity', 'coverage.none_approved']));
+        // Billing taucht hier nicht auf — §21.1 sperrt die gebuehrenpflichtige
+        // Buchung, nicht die Aktivierung (TKT-PROV-05). Auch nicht, solange
+        // noch etwas anderes fehlt.
+        expect(zu.body.gate.missing.filter((m: string) => m.startsWith('billing.'))).toEqual([]);
         expect(db.providers[0].lifecycle_status).toBe('under_verification');
 
-        // Reviewer prueft die Dokumente, gibt die Zelle frei, Billing wird bereit.
+        // Reviewer prueft die Dokumente und gibt die Zelle frei. Billing bleibt
+        // absichtlich unbereit — es darf das Aktivieren nicht sperren (§21.1).
         for (const e of db.provider_evidence.filter((x: any) => x.source === 'document')) {
             const r = await adminApi(`/api/v1/admin/review/neue-kanzlei/evidence/${e.id}`, { method: 'POST', body: JSON.stringify({ result: 'reviewed', notes: 'passt' }) });
             expect(r.status).toBe(200);
@@ -2380,10 +2385,15 @@ describe('Review-Arbeitsplatz (6A/7A/8A): nur Admin, Zell-Aktionen, Gate', () =>
         const cell = db.provider_service_coverage.find((c: any) => c.service_id === serviceId);
         await adminApi(`/api/v1/admin/review/neue-kanzlei/coverage/${cell.id}`, { method: 'POST', body: JSON.stringify({ action: 'approve' }) });
 
-        const nurBilling = await adminApi('/api/v1/admin/review/neue-kanzlei/gate');
-        expect(nurBilling.body.gate.missing).toEqual(['billing.not_ready', 'billing.no_payment_method']);
+        // Der Anbieter steht auf billing_ready=false mit Grund 'no_payment_method'.
+        // Vorher stand genau das in `missing`, und weil niemand das Flag setzte,
+        // ging das Gate fuer keinen Anbieter je auf. Jetzt wird es GEMELDET.
+        const offen = await adminApi('/api/v1/admin/review/neue-kanzlei/gate');
+        expect(offen.body.gate.missing).toEqual([]);
+        expect(offen.body.gate.ok).toBe(true);
+        expect(offen.body.gate.billing).toEqual({ ready: false, blocks_chargeable_booking: ['not_ready', 'no_payment_method'] });
 
-        Object.assign(db.providers[0], { billing_ready: true, billing_block_reasons: [] });
+        // Aktivieren OHNE billing_ready anzufassen.
         const auf = await adminApi('/api/v1/admin/review/neue-kanzlei/lifecycle', { method: 'POST', body: JSON.stringify({ to: 'active' }) });
         expect(auf.status).toBe(200);
         expect(db.providers[0]).toMatchObject({ lifecycle_status: 'active', partner_status: 'active' });

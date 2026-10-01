@@ -175,9 +175,34 @@ describe('activationGate — jede Bedingung einzeln, und die Antwort nennt, was 
         expect(g.missing).toEqual(['agreements.billing_authorization']);
     });
 
-    it('ohne Billing: billing.not_ready plus jeden Grund — auch fuer limited', () => {
+    it('ohne Billing: das Gate oeffnet trotzdem und MELDET die Lage (TKT-PROV-05)', () => {
+        // §21.1 sperrt die gebuehrenpflichtige Buchung, nicht den Status. Vor dem
+        // 2026-10-01 stand hier billing.not_ready in `missing` — und weil niemand
+        // billing_ready setzt, konnte das Gate fuer keinen Anbieter aufgehen.
         const g = activationGate({ ...gateOk(), billing_ready: false, billing_block_reasons: ['no_payment_method', 'inactive_subscription'] });
-        expect(g.missing).toEqual(['billing.not_ready', 'billing.no_payment_method', 'billing.inactive_subscription']);
+        expect(g.ok).toBe(true);
+        expect(g.missing).toEqual([]);
+        expect(g.billing).toEqual({
+            ready: false,
+            blocks_chargeable_booking: ['not_ready', 'no_payment_method', 'inactive_subscription'],
+        });
+    });
+
+    it('kein billing.* mehr in missing, egal welcher Grund', () => {
+        const g = activationGate({ ...gateOk(), billing_ready: false, billing_block_reasons: ['overdue_invoice', 'withdrawn_authorization', 'account_paused'] });
+        expect(g.missing.filter((m) => m.startsWith('billing.'))).toEqual([]);
+    });
+
+    it('mit Billing meldet es leer', () => {
+        expect(activationGate(gateOk()).billing).toEqual({ ready: true, blocks_chargeable_booking: [] });
+    });
+
+    it('das Kontingent sperrt weiter — Billing und Plan sind zwei Dinge', () => {
+        // Gegenprobe gegen ein Zuviel: der Schnitt gilt fuer die
+        // Zahlungsbereitschaft, nicht fuer das Kategorie-Kontingent (Spec B).
+        const g = activationGate({ ...gateOk(), allowance: { ok: false, over: ['tax'] } });
+        expect(g.ok).toBe(false);
+        expect(g.missing).toEqual(['plan.category_allowance']);
     });
 
     it('Kontingent ueberschritten: plan.category_allowance', () => {

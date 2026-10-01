@@ -735,6 +735,11 @@ paths:
         `specializations` und `markets` aus der View, `rank_basis` mit den
         Fakten hinter der Reihenfolge. Sichtbar ist, wer in
         `matchable_provider_services` steht — nie `partner_status`.
+        `bookable_chargeable` sagt, ob gebucht werden kann — dieselbe Quelle wie
+        der Buchungspfad (View-Spalte, gepflegt von syncBillingReadiness). Bei
+        false zeigt die Oberflaeche KEINEN Buchen-Knopf, statt den Nutzer erst
+        beim Absenden mit 409 BILLING_NOT_READY abzuweisen (Nutzer-Entscheidung
+        2026-10-01, TKT-PROV-06).
       security: [ { bearerAuth: [] } ]
       parameters: [ { name: ref, in: path, required: true, schema: { $ref: '#/components/schemas/PublicRef' } } ]
       responses:
@@ -866,7 +871,7 @@ paths:
       security: [ { bearerAuth: [] } ]
       parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
       responses:
-        '200': { description: "gate {ok, missing[], target, approved_cells, total_cells, allowance}" }
+        '200': { description: "gate {ok, missing[], target, approved_cells, total_cells, allowance, billing}. billing {ready, blocks_chargeable_booking[]} wird GEMELDET, nicht gesperrt: §21.1 sperrt die gebuehrenpflichtige Buchung (409 BILLING_NOT_READY an POST /scheduling), nicht die Aktivierung. Kein billing.* in missing[] (Nutzer-Entscheidung 2026-10-01, TKT-PROV-05)." }
 
   /admin/review/{key}/evidence/{id}:
     post:
