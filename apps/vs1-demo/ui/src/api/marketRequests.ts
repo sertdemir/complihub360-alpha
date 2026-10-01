@@ -13,6 +13,8 @@ export async function requestMarket(input: {
   domains: string[];
   notify?: boolean;
   asGuest: boolean;
+  /** Sprache der Seite — darin schreibt der Server spaeter das Update. */
+  locale?: string;
 }): Promise<void> {
   await apiFetch('/api/v1/market-requests', {
     method: 'POST',
@@ -20,6 +22,7 @@ export async function requestMarket(input: {
       market: input.market,
       domains: input.domains,
       notify: input.notify === true,
+      ...(input.locale ? { locale: input.locale } : {}),
       ...(input.asGuest ? { guest_key: ensureGuestKey() } : {}),
     }),
   });

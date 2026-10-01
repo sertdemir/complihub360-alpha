@@ -40,16 +40,18 @@ export type MarketRequestStatus = 'idle' | 'sending' | 'sent' | 'failed';
 /** Status je Markt und das Absenden. Der Aufrufer braucht den Stand, weil
  *  "Explore Other Markets" vom Kopf in die Bestaetigung wandert (D3 → E3). */
 export function useMarketRequests({ areas, asGuest }: { areas: string[]; asGuest: boolean }) {
+  const { i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage || 'en';
   const [status, setStatus] = useState<Record<string, MarketRequestStatus>>({});
   const send = useCallback(async (market: string, notify = false) => {
     setStatus((s) => ({ ...s, [market]: 'sending' }));
     try {
-      await requestMarket({ market, domains: areas, notify: !asGuest && notify, asGuest });
+      await requestMarket({ market, domains: areas, notify: !asGuest && notify, asGuest, locale });
       setStatus((s) => ({ ...s, [market]: 'sent' }));
     } catch {
       setStatus((s) => ({ ...s, [market]: 'failed' }));
     }
-  }, [areas, asGuest]);
+  }, [areas, asGuest, locale]);
   return { status, send };
 }
 

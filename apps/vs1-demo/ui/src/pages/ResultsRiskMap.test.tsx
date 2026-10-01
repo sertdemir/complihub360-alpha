@@ -438,7 +438,7 @@ describe('ResultsRiskMap when no requested market can be checked', () => {
     renderPage();
 
     fireEvent.click(await screen.findByRole('button', { name: 'common:states.actions.requestThisMarket: Brazil' }));
-    expect(requestMarket).toHaveBeenCalledWith({ market: 'BR', domains: ['tax-vat'], notify: false, asGuest: true });
+    expect(requestMarket).toHaveBeenCalledWith({ market: 'BR', domains: ['tax-vat'], notify: false, asGuest: true, locale: 'en' });
     // Brazil confirms in place; Argentina can still be requested.
     const box = screen.getByRole('region', { name: 'common:states.scope.triedToAssess' });
     expect(await within(box).findByText('common:states.marketRequest.sent')).toBeInTheDocument();
@@ -489,7 +489,7 @@ describe('ResultsRiskMap when no requested market can be checked', () => {
     expect(screen.getByText('common:states.marketRequest.notifyLabel')).toBeInTheDocument();
     fireEvent.click(optIn);
     fireEvent.click(screen.getByRole('button', { name: 'common:states.actions.requestThisMarket' }));
-    expect(requestMarket).toHaveBeenCalledWith({ market: 'BR', domains: ['tax-vat'], notify: true, asGuest: false });
+    expect(requestMarket).toHaveBeenCalledWith({ market: 'BR', domains: ['tax-vat'], notify: true, asGuest: false, locale: 'en' });
     expect(await screen.findByText('common:states.marketRequest.sentBody')).toBeInTheDocument();
   });
 
@@ -501,7 +501,7 @@ describe('ResultsRiskMap when no requested market can be checked', () => {
     renderPage();
 
     fireEvent.click(await screen.findByRole('button', { name: 'common:states.actions.requestThisMarket' }));
-    expect(requestMarket).toHaveBeenCalledWith({ market: 'BR', domains: [], notify: false, asGuest: true });
+    expect(requestMarket).toHaveBeenCalledWith({ market: 'BR', domains: [], notify: false, asGuest: true, locale: 'en' });
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
   });
 

@@ -17,12 +17,16 @@ import { SLUG_TO_ENGINE } from "./dashboard.js";
 const GUEST_KEY = /^[A-Za-z0-9_-]{8,64}$/;
 const MARKET = /^[A-Z]{2}$/;
 const MAX_DOMAINS = 12;
+// Die Sprache, in der das Update spaeter geschrieben wird (20261001000000).
+// Unbekannt oder fehlend → null, der Mailer schreibt dann Englisch.
+const LOCALES = new Set(['en', 'de', 'es', 'tr']);
 
 export type MarketRequestInput = {
     market?: unknown;
     domains?: unknown;
     notify?: unknown;
     guest_key?: unknown;
+    locale?: unknown;
 };
 
 export type MarketRequestRow = {
@@ -32,6 +36,7 @@ export type MarketRequestRow = {
     market: string;
     domains: string[];
     notify: boolean;
+    locale: string | null;
     updated_at: string;
 };
 
@@ -58,6 +63,8 @@ export function checkMarketRequest(input: MarketRequestInput, authUserId: string
         : [];
 
     const notify = input.notify === true;
+    const rawLocale = typeof input.locale === 'string' ? input.locale.toLowerCase().slice(0, 2) : '';
+    const locale = LOCALES.has(rawLocale) ? rawLocale : null;
     if (notify && !authUserId) {
         return { ok: false, status: 403, errorCode: 'NOTIFY_REQUIRES_ACCOUNT', message: 'An availability update needs an account' };
     }
@@ -65,7 +72,7 @@ export function checkMarketRequest(input: MarketRequestInput, authUserId: string
     if (authUserId) {
         return {
             ok: true,
-            row: { requester_key: `user:${authUserId}`, user_id: authUserId, guest_key: null, market, domains, notify, updated_at: now.toISOString() },
+            row: { requester_key: `user:${authUserId}`, user_id: authUserId, guest_key: null, market, domains, notify, locale, updated_at: now.toISOString() },
         };
     }
     const guestKey = typeof input.guest_key === 'string' ? input.guest_key : '';
@@ -74,6 +81,6 @@ export function checkMarketRequest(input: MarketRequestInput, authUserId: string
     }
     return {
         ok: true,
-        row: { requester_key: `guest:${guestKey}`, user_id: null, guest_key: guestKey, market, domains, notify: false, updated_at: now.toISOString() },
+        row: { requester_key: `guest:${guestKey}`, user_id: null, guest_key: guestKey, market, domains, notify: false, locale, updated_at: now.toISOString() },
     };
 }
