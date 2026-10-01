@@ -38,6 +38,10 @@ import {
   MarketRequestSent,
   isMarketUnavailable,
   NoVerifiedProvider,
+  NotCheckedCard,
+  NotCheckedRow,
+  PartialMarketNotice,
+  partialMarketsOf,
   unavailableMarketsOf,
   useMarketRequests,
 } from '../components/results/MarketRequest';
@@ -327,11 +331,17 @@ export function ResultsRiskMap() {
   // Engine hat geantwortet, aber keinen der angefragten Maerkte pruefen
   // koennen. Dann waere C3 ("No immediate requirements identified") eine
   // Aussage ueber eine Pruefung, die es nicht gab. Gemischte Faelle (DE + BR)
-  // bleiben C3 (Entscheidung 2026-09-27).
+  // bleiben C3 (Entscheidung 2026-09-27), mit I1 · J1 · K3 (unten).
   const scopeProfile = searchData.query ?? profile ?? null;
   const marketUnavailable = pageState === 'none' && isMarketUnavailable(scopeProfile);
   const unavailable = marketUnavailable && scopeProfile ? unavailableMarketsOf(scopeProfile) : [];
   const requestAreas = scopeProfile ? scopeOf(scopeProfile, 'requested').areas : [];
+  // Gemischte Maerkte (Canvas I1 · J1 · K3, Figma 3546:2497/2657/20736): DE
+  // geprueft, BR nicht. Die Map darf dann nicht vollstaendig wirken — jede
+  // Flaeche nennt den ungeprueften Markt und bietet die Anfrage an.
+  const partial = (pageState === 'live' || pageState === 'none') && !marketUnavailable
+    ? partialMarketsOf(scopeProfile)
+    : [];
   // Als Gast zaehlt, wer kein echtes Konto hat — auch ein Demo-Login: der
   // hat keinen JWT, der Server braucht dann den guest_key (sonst 400).
   const { status: requestStatus, send: sendRequest } = useMarketRequests({ areas: requestAreas, asGuest: !user });
@@ -498,6 +508,21 @@ export function ResultsRiskMap() {
         // "Does not cover your market", sondern der abgenommene Zustand.
         providers={marketUnavailable ? [] : anonProviders}
         providersEmptyState={marketUnavailable ? <NoVerifiedProvider /> : undefined}
+        // K3 (01.10.2026): der ungepruefte Markt steht oben in der Spalte,
+        // die Anbieter fuer die geprueften Maerkte bleiben darunter.
+        providersTop={partial.length > 0 ? (
+          <>
+            {partial.map((m) => (
+              <NotCheckedCard
+                key={m}
+                market={m}
+                email={user?.email ?? null}
+                status={requestStatus[m] ?? 'idle'}
+                onRequest={(notify) => sendRequest(m, notify)}
+              />
+            ))}
+          </>
+        ) : undefined}
         sessionId={sessionId}
         title={session?.label || t('snapshot.fallbackTitle')}
         meta={[markets, areas ? t('snapshot.areas', { count: areas }) : null].filter(Boolean).join(' · ')}
@@ -640,7 +665,12 @@ export function ResultsRiskMap() {
             <RiskMapScopePanel
               label={t(`common:states.scope.${pageState === 'failed' ? 'triedToAssess' : 'checked'}`)}
               {...scopeOf(profile, pageState === 'failed' ? 'requested' : 'checked')}
-            />
+            >
+              {/* J1: was angefragt, aber nicht geprueft wurde. */}
+              {partial.length > 0 && partial.map((m) => (
+                <NotCheckedRow key={m} market={m} status={requestStatus[m] ?? 'idle'} onRequest={() => sendRequest(m)} />
+              ))}
+            </RiskMapScopePanel>
           )}
           {pageState === 'failed' && <TechnicalDetails reference={referenceOf(searchError)} />}
         </main>
@@ -680,8 +710,18 @@ export function ResultsRiskMap() {
           </div>
         )}
 
-        {/* Obligations table */}
-          <div className="mt-12 overflow-hidden rounded-xl border border-stroke-subtle">
+        {/* I1: ungepruefte Maerkte zwischen Kennzahlen und Tabelle — die
+            Pflichten darunter gelten nur fuer die geprueften. */}
+        {partial.length > 0 && (
+          <div className="mt-10 flex flex-col gap-3">
+            {partial.map((m) => (
+              <PartialMarketNotice key={m} market={m} status={requestStatus[m] ?? 'idle'} onRequest={() => sendRequest(m)} />
+            ))}
+          </div>
+        )}
+
+        {/* Obligations table — direkt unter dem Hinweis (I1), sonst mit Luft */}
+          <div className={`${partial.length > 0 ? 'mt-5' : 'mt-12'} overflow-hidden rounded-xl border border-stroke-subtle`}>
             <div className="grid grid-cols-[100px_1fr_120px_110px_160px] gap-4 border-b border-stroke-subtle bg-surface-secondary px-6 py-3.5 text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary">
               <span>{t('table.severity')}</span>
               <span>{t('table.obligation')}</span>

@@ -124,10 +124,13 @@ export function RiskMapScopePanel({
   label,
   markets,
   areas,
+  children,
 }: {
   label: string;
   markets: string[];
   areas: string[];
+  /** Zeilen unter einer Trennlinie — J1: was NICHT geprueft wurde. */
+  children?: ReactNode;
 }) {
   const { t, i18n } = useTranslation(['common', 'results']);
   const locale = i18n.resolvedLanguage || 'en';
@@ -165,6 +168,7 @@ export function RiskMapScopePanel({
       <span className="text-body-2xs font-semibold uppercase tracking-[0.16em] text-fg-tertiary">{label}</span>
       {markets.length > 0 && <Row title={t('common:states.scope.markets')} items={markets.map(marketName)} />}
       {areas.length > 0 && <Row title={t('common:states.scope.areas')} items={areas.map(areaName)} />}
+      {children && <div className="flex flex-col gap-3 border-t border-stroke-subtle pt-3">{children}</div>}
     </section>
   );
 }
