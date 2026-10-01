@@ -28,6 +28,33 @@ Keine — Sandbox geclaimt, Integration läuft.
 Key nur in der VPS-.env (nicht im Repo) · Portal-Konfiguration per API angelegt
 (`bpc_1TsqL5PiuS3HfybDMKRcsmzO`).
 
+## Phase 4 (2026-10-01): Lead-Belastung bei der Buchung — Rechte des Restricted Key
+
+`POST /scheduling` belastet seit Phase 4 die Karte des Anbieters mit einem
+PaymentIntent off-session (ADR-0005). Dafür braucht der Restricted Key auf
+Staging zusätzlich zu den bisherigen Rechten (Customers write, Invoices write,
+Billing Portal write, Checkout Sessions write):
+
+| Ressource | Recht | Wofür |
+|---|---|---|
+| PaymentIntents | **write** | die Belastung (`payment_intents`, `confirm=true`, `off_session=true`) |
+| Customers | read (write ist schon da) | `GET customers/:id?expand[]=invoice_settings.default_payment_method` für die Zahlungsbereitschaft |
+| Refunds | **write** | Kompensation, wenn der Buchungs-Insert nach dem Capture scheitert |
+
+Ohne diese Rechte antwortet die erste Buchung 502 `BILLING_ERROR` (ehrlich,
+aber rot) und `billing/sync` 502 `STRIPE_ERROR`. Der Schlüssel bleibt in der
+VPS-`.env`; Änderung über das Stripe-Dashboard (Sandbox → Developers → API
+keys → Restricted key bearbeiten), danach `docker compose up -d
+--force-recreate` für den API-Container.
+
+**Zahlungsmittel hinterlegen:** weiter über das Billing-Portal („Update payment
+method"). Der Rückweg trägt `?from=portal`; die Abrechnungsseite ruft dann
+`POST /provider/:key/billing/sync`, der die Zahlungsbereitschaft aus Stripe
+und Datenbank setzt. Kein Webhook nötig. Hinweis: Karten aus dem Portal tragen
+nicht zwingend ein off-session-Mandat; verlangt Stripe eine Authentifizierung,
+zählt das als gescheiterte Belastung (`payment_failed`) — Testkarte 4242
+funktioniert, `4000 0025 0000 3155` erzwingt den Fall.
+
 ## Invoicing (seit 2026-07-15 live)
 
 **Monatslauf:** `POST /api/v1/admin/billing/run` (nur `x-api-key`, JWT-User → 403).

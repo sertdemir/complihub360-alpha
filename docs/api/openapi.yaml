@@ -339,7 +339,9 @@ paths:
       summary: Laufender Abrechnungszyklus des Anbieters (Pricing v2)
       description: >
         Plan, Rabattkontingent (genutzt/offen), Lead-Belastungen des Zyklus aus
-        dem Ledger (Standard, Rabatt, Endbetrag), Guthaben, Preisliste.
+        dem Ledger (Standard, Rabatt, Endbetrag — nur wirksam belastete oder
+        gebuehrenfreie Leads), Guthaben, Preisliste, `readiness { ready,
+        reasons[], synced_at }` (Phase 4).
         Nur fuer Mitglieder des Anbieters, Admin oder Server-Key.
       security:
         - bearerAuth: []
@@ -404,6 +406,63 @@ paths:
                     description: Aktuelle Preisliste (Plaene und Baender), nur zur Anzeige im Dashboard
         '404':
           description: Anbieter unbekannt oder nicht der eigene
+
+  /provider/{key}/billing/sync:
+    post:
+      summary: Zahlungsbereitschaft neu berechnen (Phase 4)
+      description: >-
+        Liest Stripe (Default-Zahlungsmittel, Rechnungsdaten), Abo, Mandat
+        (`billing_authorization`), ueberfaellige Rechnungen und die letzte
+        gescheiterte Belastung und setzt `billing_ready` mit Gruenden
+        (Spec A §21.1 plus `payment_failed`). Laeuft beim Rueckweg aus dem
+        Portal (`?from=portal`) und auf Knopfdruck; nie im Buchungspfad.
+        Nur fuer Mitglieder des Anbieters, Admin oder Server-Key.
+      security: [ { bearerAuth: [] } ]
+      parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
+      responses:
+        '200': { description: "`{ readiness: { ready, reasons[], synced_at, payment_method, changed } }`" }
+        '503': { description: Stripe nicht konfiguriert }
+
+  /provider/{key}/bookings:
+    get:
+      summary: Bezahlte Leads des Anbieters
+      description: >-
+        Je Buchung Termin, Status, `user_email`, Nachricht, und seit Phase 4
+        `lead { band, standard_fee_cents, discount_pct, discount_sequence,
+        final_fee_cents, currency, payment_status, fee_enabled } | null`,
+        `user_discount_pct`, `proposal { proposal_issued, discount_shown,
+        reported_at } | null`, `acknowledgement_version`, `price_snapshot`.
+      security: [ { bearerAuth: [] } ]
+      parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
+      responses:
+        '200': { description: "bookings[]" }
+
+  /provider/{key}/bookings/{id}/proposal:
+    patch:
+      summary: Selbstauskunft zum Nutzerrabatt (Phase 4)
+      description: >-
+        Spec B "Mandatory user discount": der Anbieter bestaetigt je Lead, ob
+        ein Angebot erstellt und der 10 %-Rabatt ausgewiesen wurde. Eine Zeile
+        je Buchung, Korrektur per Upsert, Historie im Protokoll.
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [proposal_issued, discount_shown]
+              properties:
+                proposal_issued: { type: boolean }
+                discount_shown: { type: boolean, description: Nur true, wenn proposal_issued true ist }
+                note: { type: string, maxLength: 500 }
+      responses:
+        '200': { description: "`{ proposal: { proposal_issued, discount_shown, reported_at } }`" }
+        '400': { description: Rabatt gezeigt ohne Angebot, oder Felder fehlen }
+        '404': { description: Buchung gehoert nicht diesem Anbieter }
 
   /admin/billing/run:
     post:
@@ -632,7 +691,7 @@ paths:
   /provider/{key}/submit:
     post:
       summary: Antrag einreichen (Canvas 4A)
-      description: Prueft Konto, Rechtsform, mindestens eine Leistung mit einem Land, Registerauszug und Versicherung bestaetigt, USt-ID abgefragt, zwei Annahmen (provider_agreement, privacy_notice). Die billing_authorization gehoert NICHT hierher: sie verlangt das Aktivierungs-Gate, weil sie erst gebraucht wird, bevor Geld fliesst (Canvas 4C, Nutzer-Entscheidung 2026-09-27; weicht bewusst von Spec A §4 ab, das alle drei vor dem Review auffuehrt). Bei Luecken 422 INCOMPLETE mit missing[] — Schluessel je Punkt, nicht nur "unvollstaendig". Setzt draft|more_info_required → submitted.
+      description: "Prueft Konto, Rechtsform, mindestens eine Leistung mit einem Land, Registerauszug und Versicherung bestaetigt, USt-ID abgefragt, zwei Annahmen (provider_agreement, privacy_notice). Die billing_authorization gehoert NICHT hierher: sie verlangt das Aktivierungs-Gate, weil sie erst gebraucht wird, bevor Geld fliesst (Canvas 4C, Nutzer-Entscheidung 2026-09-27; weicht bewusst von Spec A §4 ab, das alle drei vor dem Review auffuehrt). Bei Luecken 422 INCOMPLETE mit missing[] — Schluessel je Punkt, nicht nur \"unvollstaendig\". Setzt draft|more_info_required → submitted."
       security: [ { bearerAuth: [] } ]
       parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
       responses:
@@ -707,13 +766,30 @@ paths:
         '403': { description: Ohne Buchung mit Offenlegung }
         '404': { description: Unbekannter Ref oder keine Website }
 
+  /acknowledgement:
+    get:
+      summary: Bestaetigungstext vor der Buchung (Phase 4)
+      description: >-
+        Der Text, den der Nutzer mit der Buchung bestaetigt, mit Fassung,
+        Sprache, der Liste der geteilten Felder und dem Nutzerrabatt.
+        Oeffentlich — er steht ohnehin auf dem Bildschirm. `?lang=de|en|es|tr`,
+        Rueckfall Englisch.
+      responses:
+        '200': { description: "`{ version, language, body, shared_fields[], user_discount: { pct, policy_version, recurring_treatment } | null }`" }
+        '503': { description: Keine Fassung konfiguriert (`ACKNOWLEDGEMENT_MISSING`) }
+
   /scheduling:
     post:
-      summary: Termin buchen (bezahlter Lead, Offenlegung Stufe 3)
+      summary: Termin buchen (bezahlter Lead, Offenlegung nach der Belastung)
       description: >-
-        Nimmt `public_ref`, nie `provider_key`. Buchbar ist, wer matchbar UND
-        zahlungsbereit ist (Spec A §21.1); fehlt die Zahlungsbereitschaft,
-        antwortet 409 `BILLING_NOT_READY` statt still 404.
+        Phase 4 (ADR-0005): Bestaetigung mit Fassung → Preis-Snapshot → Band +
+        Rabatt → Belastung der Anbieterkarte (PaymentIntent off-session, synchron)
+        → ERST DANN Buchung und Offenlegung. Nimmt `public_ref`, nie
+        `provider_key`. Buchbar ist, wer matchbar UND zahlungsbereit ist
+        (Spec A §21.1). Die Opportunity fuer das Band kommt aus `session_id`
+        (Bereiche und Maerkte der Sitzung) oder aus `area_code`/`countries`,
+        immer begrenzt auf das Angebot des Anbieters. Die Antwort traegt weder
+        Band noch Gebuehr — das sieht nur der Anbieter.
       security: [ { bearerAuth: [] } ]
       requestBody:
         required: true
@@ -721,15 +797,23 @@ paths:
           application/json:
             schema:
               type: object
-              required: [public_ref, slot_start]
+              required: [public_ref, slot_start, acknowledgement_version]
               properties:
                 public_ref: { $ref: '#/components/schemas/PublicRef' }
                 slot_start: { type: string, format: date-time }
                 message: { type: string, maxLength: 2000 }
+                acknowledgement_version: { type: string, description: Die Fassung aus GET /acknowledgement, die der Nutzer gesehen hat }
+                language: { type: string, maxLength: 2 }
+                session_id: { type: string, format: uuid, description: Eigene Sitzung; liefert Bereiche und Maerkte fuer das Band }
+                area_code: { type: string, description: Bereich, falls keine Sitzung; muss im Angebot des Anbieters sein }
+                countries: { type: array, items: { type: string } }
+                service_id: { type: string, format: uuid }
       responses:
-        '201': { description: "`{ booking: { id, public_ref, slot_start, slot_end, status }, provider_identity: { name, website_url, contact_email } }`" }
-        '404': { description: Unbekannter Ref oder nicht matchbar }
-        '409': { description: Anbieter noch nicht zahlungsbereit (`BILLING_NOT_READY`) }
+        '201': { description: "`{ booking: { id, public_ref, slot_start, slot_end, status, acknowledgement_version, shared_fields[], user_discount: { pct, policy_version } | null }, provider_identity: { name, website_url, contact_email } }`" }
+        '400': { description: "Eingabe (`VALIDATION_ERROR`) oder Opportunity fehlt (`OPPORTUNITY_REQUIRED`, `AREA_NOT_OFFERED`, `SERVICE_NOT_FOUND`)" }
+        '404': { description: Unbekannter Ref, nicht matchbar oder fremde Sitzung }
+        '409': { description: "`BILLING_NOT_READY` (nicht zahlungsbereit, nichts versucht) · `ACKNOWLEDGEMENT_OUTDATED` (mit `current_version`) · `SLOT_TAKEN` · `BOOKING_NOT_COMPLETED` (Belastung gescheitert, Grund `provider_billing`, keine Buchung)" }
+        '502': { description: Zahlungsdienst nicht erreichbar (`BILLING_ERROR`); keine Buchung, Anbieter unberuehrt }
 
   /bookings:
     get:
