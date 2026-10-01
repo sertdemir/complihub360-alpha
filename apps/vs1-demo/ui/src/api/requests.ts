@@ -132,6 +132,11 @@ const PROVIDER_NAMES: Record<string, string> = {
   'schmidt-partner': 'Verifizierte Steuerberatung · Norddeutschland',
   'madrid-tax': 'Verifizierter Tax-Spezialist · Spanien',
   'dahlmann-cpa': 'Verifizierter Steuerexperte · USA',
+  'thames-vat': 'Verifizierter VAT-Spezialist · Vereinigtes Königreich',
+  'costa-legal': 'Verifizierte Kanzlei · Spanien',
+  'datenschutz-nord': 'Verifizierte Datenschutzkanzlei · Norddeutschland',
+  'oss-experts': 'Verifizierte Steuerberatung · Berlin',
+  'lucid-reg': 'Verifizierter EPR-Dienstleister · Hamburg',
 };
 
 export async function fetchUserRequests(): Promise<UserRequestRow[]> {

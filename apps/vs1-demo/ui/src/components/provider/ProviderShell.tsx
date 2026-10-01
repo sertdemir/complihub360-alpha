@@ -160,10 +160,10 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
         footer={
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-2.5">
-              <Avatar size="md" initials="GD" tone="accent" />
+              <Avatar size="md" initials="KS" tone="accent" />
               <div className="leading-tight">
-                <p className="text-[12px] font-semibold text-fg">G. Dahlmann</p>
-                <p className="text-[10px] text-fg-tertiary">Dahlmann CPA</p>
+                <p className="text-[12px] font-semibold text-fg">K. Schmidt</p>
+                <p className="text-[10px] text-fg-tertiary">Schmidt & Partner</p>
               </div>
             </div>
             <Settings size={15} className="text-fg-tertiary" />
@@ -221,10 +221,10 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
           footer={
             <div className="flex flex-col gap-3 px-4 py-3">
               <div className="flex items-center gap-2.5">
-                <Avatar size="md" initials="GD" tone="accent" className="shrink-0" />
+                <Avatar size="md" initials="KS" tone="accent" className="shrink-0" />
                 <div className="min-w-0 flex-1 leading-tight">
-                  <p className="text-body-sm font-semibold text-fg">G. Dahlmann</p>
-                  <p className="text-body-2xs text-fg-tertiary">Dahlmann CPA</p>
+                  <p className="text-body-sm font-semibold text-fg">K. Schmidt</p>
+                  <p className="text-body-2xs text-fg-tertiary">Schmidt & Partner</p>
                 </div>
                 {statusBadge}
               </div>

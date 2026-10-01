@@ -49,6 +49,12 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
   if (token) headers['Authorization'] = `Bearer ${token}`;
   const devKey = import.meta.env.VITE_DEV_API_KEY as string | undefined;
   if (devKey) headers['x-api-key'] = devKey;
+  // Nur im lokalen Mock (DEV + VITE_MOCK_API): der echte Server trennt die
+  // Rollen ueber den Login, der Mock-Login hat keinen. Mit der Demo-Rolle
+  // antwortet der Mock auf /requests je nach Sicht (Nutzer oder Partner).
+  if (isMockApi) {
+    try { headers['x-demo-role'] = localStorage.getItem('demo_user_role') ?? ''; } catch { /* kein Storage */ }
+  }
 
   let res: Response;
   try {
