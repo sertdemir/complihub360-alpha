@@ -1131,6 +1131,27 @@ describe('Ownership: Anbieter-eigene Routen gehoeren ihren Mitgliedern', () => {
         expect(r.status).toBe(200);
     });
 
+    it('Partner-Termine tragen die Firma aus der Anfrage, ohne Anfrage null (2 V1)', async () => {
+        seedProvider();
+        (db.provider_members ??= []).push({ provider_key: 'test-kanzlei', user_id: USER_ID, role: 'owner' });
+        const mitAnfrage = randomUUID(), ohneAnfrage = randomUUID();
+        (db.users ??= []).push({ id: mitAnfrage, email: 'alex.weber@acme.example' }, { id: ohneAnfrage, email: 'info@hafenkontor.example' });
+        (db.engagement_requests ??= []).push(
+            { id: randomUUID(), provider_key: 'test-kanzlei', user_id: mitAnfrage, category: 'product-packaging', country: 'DE', structured_answers: { company: 'Acme GmbH' }, created_at: '2026-09-30T08:00:00Z' },
+            { id: randomUUID(), provider_key: 'andere-kanzlei', user_id: ohneAnfrage, category: 'tax-vat', country: 'DE', structured_answers: { company: 'Fremde Firma' }, created_at: '2026-09-30T08:00:00Z' },
+        );
+        (db.scheduling ??= []).push(
+            { id: randomUUID(), provider_key: 'test-kanzlei', user_id: mitAnfrage, slot_start: '2026-10-02T07:00:00Z', slot_end: '2026-10-02T07:30:00Z', status: 'confirmed' },
+            { id: randomUUID(), provider_key: 'test-kanzlei', user_id: ohneAnfrage, slot_start: '2026-09-13T13:00:00Z', slot_end: '2026-09-13T13:30:00Z', status: 'no_show' },
+        );
+        const r = await api('/api/v1/provider/test-kanzlei/bookings', { auth: 'jwt' });
+        expect(r.status).toBe(200);
+        const [neu, alt] = r.body.bookings;
+        expect(neu).toMatchObject({ user_company: 'Acme GmbH', category: 'product-packaging', country: 'DE', user_email: 'alex.weber@acme.example' });
+        // Die Anfrage an einen ANDEREN Anbieter verraet hier nichts.
+        expect(alt).toMatchObject({ user_company: null, category: null, country: null });
+    });
+
     it('laesst das Mitglied NICHT auf einen anderen Anbieter', async () => {
         seedProvider();
         seedProvider({ provider_key: 'andere-kanzlei' });
@@ -1422,6 +1443,9 @@ describe('Anonymitaet auf dem Draht (Phase 3, ADR-0004)', () => {
         expect(d.markets).toEqual(['DE']);
         expect(d.specializations).toEqual(['Tax and VAT']);
         expect(d.descriptor).toBe('Tax and VAT · Norddeutschland');
+        // 3 V3: Codes fuer die Uebersetzung im UI, die Region roh.
+        expect(d.area_codes).toEqual(['tax-vat']);
+        expect(d.descriptor_region).toBe('Norddeutschland');
         expect(d.rank_basis.verification).toBe('independent');
     });
 
@@ -1445,6 +1469,7 @@ describe('Anonymitaet auf dem Draht (Phase 3, ADR-0004)', () => {
         sauber(b.body);
         expect(b.body.bookings[0].provider_name).toBe('Verified Provider');
         expect(b.body.bookings[0].provider_descriptor).toBe('Tax and VAT · Norddeutschland');
+        expect(b.body.bookings[0].provider_area_codes).toEqual(['tax-vat']);
         expect(b.body.bookings[0].public_ref).toBe(refOf('test-kanzlei'));
     });
 

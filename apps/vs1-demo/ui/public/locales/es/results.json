@@ -154,7 +154,14 @@
     "slotsAll": "Todas las citas de esta semana",
     "lageAreaYes": "Cubre {{area}}",
     "lageAreaNo": "No cubre {{area}}",
-    "drawerBookNote": "Primera consulta gratuita · 30 min · identidad visible tras la reserva"
+    "drawerBookNote": "Primera consulta gratuita · 30 min · identidad visible tras la reserva",
+    "yourAppointment": "Su cita",
+    "appointmentMeta": "{{minutes}} min · confirmada",
+    "appointmentConfirmed": "confirmada",
+    "toAppointments": "Ir a sus citas",
+    "bookAnother": "Reservar otra cita",
+    "revealedTitle": "Nombre y contacto ya están visibles.",
+    "revealedBody": "Desde su reserva puede ver quién es este proveedor."
   },
   "schedule": {
     "back": "Volver al perfil",

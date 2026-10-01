@@ -31,6 +31,15 @@ import { cn } from '../../lib/utils';
 const CHAPTERS = ['account', 'legal', 'services', 'evidence', 'agreements', 'submit'] as const;
 type ChapterKey = (typeof CHAPTERS)[number];
 
+// Canvas-Wahl 5 V1 (2026-10-01): nach der Pruefung ist die Bewerbung
+// abgeschlossen. Dann gibt es kein "Einreichen" mehr, Konto und Rechtsform
+// stehen im Lesemodus und oeffnen sich erst ueber "Ändern". Der Hinweis sagt,
+// was beim Speichern wirklich passiert: die Aenderung gilt sofort, Rechtsform,
+// Vertretung und Versicherung gehen zusaetzlich ans Pruefteam (Review-Log).
+// Eine Pruefung VOR der Veroeffentlichung gibt es erst mit dem Change-Control
+// (Phase 6) — bis dahin verspricht die Seite sie nicht.
+const SETTLED = new Set(['approved_pending_activation', 'active', 'limited', 'reverification_due']);
+
 const STATE_TONE: Record<ChecklistItem['state'], BadgeTone> = { missing: 'warning', uploading: 'info', received: 'info', reviewed: 'success', rejected: 'error', expired: 'error' };
 const COVERAGE_TONE: Record<Service['coverage'][number]['status'], BadgeTone> = { pending: 'warning', approved: 'success', rejected: 'error', limited: 'info', suspended: 'neutral', expired: 'neutral' };
 const SERVICE_TONE: Record<Service['status'], BadgeTone> = { draft: 'neutral', pending_verification: 'warning', approved: 'success', limited: 'info', paused: 'neutral', retired: 'neutral' };
@@ -66,6 +75,28 @@ function StateBadge({ complete, labels }: { complete: boolean; labels: { complet
   return <Badge tone={complete ? 'success' : 'warning'} size="sm">{complete ? labels.complete : labels.open}</Badge>;
 }
 
+/** Lesemodus eines Kapitels (5 V1): Beschriftung ueber Wert, leer als Strich. */
+// Im Lesemodus faellt der Eingabehinweis in Klammern weg ("Sprachen (kommagetrennt)").
+const ohneHinweis = (label: string) => label.replace(/\s*\([^)]*\)\s*$/, '');
+
+function ReadFields({ fields }: { fields: Array<{ label: string; value: string | null | undefined }> }) {
+  return (
+    <dl className="grid gap-x-6 gap-y-3 md:grid-cols-2">
+      {fields.map((f) => (
+        <div key={f.label} className="min-w-0">
+          <dt className="text-[12px] text-fg-tertiary">{ohneHinweis(f.label)}</dt>
+          <dd className="mt-0.5 break-words text-[14px] text-fg">{f.value || '—'}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+function EditToggle({ editing, onToggle }: { editing: boolean; onToggle: () => void }) {
+  const { t } = useTranslation('providerws');
+  return <Button size="sm" variant="secondary" onClick={onToggle}>{editing ? t('application.cancelEdit') : t('application.edit')}</Button>;
+}
+
 export function ApplicationPage() {
   const { t, i18n } = useTranslation('providerws');
   const locale = i18n.resolvedLanguage || 'en';
@@ -78,6 +109,12 @@ export function ApplicationPage() {
   useEffect(() => { void reload(); }, [reload]);
 
   const jump = (k: ChapterKey) => { setActive(k); refs.current[k]?.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+
+  const settled = !!app && SETTLED.has(app.provider.lifecycle_status);
+  const chapters = settled ? CHAPTERS.filter((k) => k !== 'submit') : CHAPTERS;
+  const since = app?.provider.lifecycle_status === 'active' && app.provider.lifecycle_status_since
+    ? new Date(app.provider.lifecycle_status_since).toLocaleDateString(locale, { month: 'long', year: 'numeric' })
+    : null;
 
   const chapterState = (k: ChapterKey): boolean => {
     if (!app) return false;
@@ -94,6 +131,11 @@ export function ApplicationPage() {
         </div>
 
         {error && <Banner status="warning" title={error} />}
+        {settled && (
+          <Banner status="success" title={since ? t('application.settled.titleSince', { date: since }) : t('application.settled.title')}>
+            {t('application.settled.body')}
+          </Banner>
+        )}
         {!app && !error && (
           <div className="grid gap-4 lg:grid-cols-[264px_1fr]"><Skeleton variant="rect" height={280} /><Skeleton variant="rect" height={480} /></div>
         )}
@@ -104,7 +146,7 @@ export function ApplicationPage() {
             <aside className="lg:sticky lg:top-2">
               <Card styleVariant="outlined" className="p-2">
                 <ol className="space-y-0.5">
-                  {CHAPTERS.map((k, i) => {
+                  {chapters.map((k, i) => {
                     const done = chapterState(k);
                     const isActive = active === k;
                     return (
@@ -120,16 +162,16 @@ export function ApplicationPage() {
                   })}
                 </ol>
               </Card>
-              <p className="mt-3 px-3 text-[12px] leading-relaxed text-fg-tertiary">{t('application.navHint')}</p>
+              <p className="mt-3 px-3 text-[12px] leading-relaxed text-fg-tertiary">{settled ? t('application.settled.navHint') : t('application.navHint')}</p>
             </aside>
 
             <div className="space-y-4">
-              <section ref={(el) => { refs.current.account = el; }}><AccountPanel app={app} onSaved={reload} /></section>
-              <section ref={(el) => { refs.current.legal = el; }}><LegalPanel app={app} onSaved={reload} /></section>
+              <section ref={(el) => { refs.current.account = el; }}><AccountPanel app={app} settled={settled} onSaved={reload} /></section>
+              <section ref={(el) => { refs.current.legal = el; }}><LegalPanel app={app} settled={settled} onSaved={reload} /></section>
               <section ref={(el) => { refs.current.services = el; }}><ServicesPanel app={app} onChanged={reload} /></section>
               <section ref={(el) => { refs.current.evidence = el; }}><EvidencePanel app={app} locale={locale} onChanged={reload} /></section>
               <section ref={(el) => { refs.current.agreements = el; }}><AgreementsPanel app={app} locale={locale} onChanged={reload} /></section>
-              <section ref={(el) => { refs.current.submit = el; }}><SubmitPanel app={app} onChanged={reload} /></section>
+              {!settled && <section ref={(el) => { refs.current.submit = el; }}><SubmitPanel app={app} onChanged={reload} /></section>}
             </div>
           </div>
         )}
@@ -145,22 +187,30 @@ function useSave(onSaved: () => Promise<void> | void) {
   const [state, setState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const save = async (patch: ApplicationPatch) => {
     setState('saving');
-    try { await patchApplication(patch); await onSaved(); setState('saved'); setTimeout(() => setState('idle'), 2000); }
-    catch { setState('error'); }
+    try { await patchApplication(patch); await onSaved(); setState('saved'); setTimeout(() => setState('idle'), 2000); return true; }
+    catch { setState('error'); return false; }
   };
   const label = state === 'saving' ? t('application.saving') : state === 'saved' ? t('application.saved') : t('application.save');
   return { save, state, label };
 }
 
-function AccountPanel({ app, onSaved }: { app: Application; onSaved: () => Promise<void> | void }) {
+function AccountPanel({ app, settled, onSaved }: { app: Application; settled: boolean; onSaved: () => Promise<void> | void }) {
   const { t } = useTranslation('providerws');
   const p = app.provider;
+  const [editing, setEditing] = useState(!settled);
   const [f, setF] = useState({ name: p.name ?? '', contact_email: p.contact_email ?? '', website_url: p.website_url ?? '', languages: (p.languages ?? []).join(', '), region: p.region ?? '' });
   const { save, state, label } = useSave(onSaved);
   const labels = { complete: t('application.state.complete'), open: t('application.state.open') };
   return (
     <Card styleVariant="outlined" className="space-y-4 p-5">
-      <PanelHeader n={1} title={t('application.chapter.account')} badge={<StateBadge complete={app.chapters.account.complete} labels={labels} />} />
+      <PanelHeader n={1} title={t('application.chapter.account')} badge={<div className="flex items-center gap-2"><StateBadge complete={app.chapters.account.complete} labels={labels} />{settled && <EditToggle editing={editing} onToggle={() => setEditing(!editing)} />}</div>} />
+      {!editing ? (
+        <ReadFields fields={[
+          { label: t('application.account.name'), value: p.name }, { label: t('application.account.email'), value: p.contact_email },
+          { label: t('application.account.website'), value: p.website_url }, { label: t('application.account.region'), value: p.region },
+          { label: t('application.account.languages'), value: (p.languages ?? []).join(', ') },
+        ]} />
+      ) : (<>
       <div className="grid gap-4 md:grid-cols-2">
         <FormField label={t('application.account.name')} required><Input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} /></FormField>
         <FormField label={t('application.account.email')} required><Input type="email" value={f.contact_email} onChange={(e) => setF({ ...f, contact_email: e.target.value })} /></FormField>
@@ -171,26 +221,37 @@ function AccountPanel({ app, onSaved }: { app: Application; onSaved: () => Promi
         <FormField label={t('application.account.region')}><Input value={f.region} onChange={(e) => setF({ ...f, region: e.target.value })} /></FormField>
       </div>
       <div className="flex items-center gap-3">
-        <Button size="sm" variant="secondary" disabled={state === 'saving'} onClick={() => save({ name: f.name, contact_email: f.contact_email, website_url: f.website_url, languages: f.languages.split(',').map((s) => s.trim()).filter(Boolean), region: f.region })}>{label}</Button>
+        <Button size="sm" variant="secondary" disabled={state === 'saving'} onClick={async () => { if (await save({ name: f.name, contact_email: f.contact_email, website_url: f.website_url, languages: f.languages.split(',').map((s) => s.trim()).filter(Boolean), region: f.region }) && settled) setEditing(false); }}>{label}</Button>
         {state === 'error' && <span className="text-[12px] text-error-500">{t('application.saveError')}</span>}
       </div>
+      </>)}
     </Card>
   );
 }
 
 // ─── 2 · Rechtsform ──────────────────────────────────────────────────────────
 
-function LegalPanel({ app, onSaved }: { app: Application; onSaved: () => Promise<void> | void }) {
-  const { t } = useTranslation('providerws');
+function LegalPanel({ app, settled, onSaved }: { app: Application; settled: boolean; onSaved: () => Promise<void> | void }) {
+  const { t, i18n } = useTranslation('providerws');
   const c = app.confidential;
+  const [editing, setEditing] = useState(!settled);
   const [f, setF] = useState({ entity_type: c?.entity_type ?? '', registration_number: c?.registration_number ?? '', registered_address: c?.registered_address ?? '', representative_name: c?.representative_name ?? '', representative_title: c?.representative_title ?? '', insurance_provider: c?.insurance_provider ?? '', insurance_valid_until: c?.insurance_valid_until ?? '' });
   const { save, state, label } = useSave(onSaved);
   const labels = { complete: t('application.state.complete'), open: t('application.state.open') };
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) => setF({ ...f, [k]: e.target.value });
   return (
     <Card styleVariant="outlined" className="space-y-4 p-5">
-      <PanelHeader n={2} title={t('application.chapter.legal')} badge={<StateBadge complete={app.chapters.legal.complete} labels={labels} />} />
+      <PanelHeader n={2} title={t('application.chapter.legal')} badge={<div className="flex items-center gap-2"><StateBadge complete={app.chapters.legal.complete} labels={labels} />{settled && <EditToggle editing={editing} onToggle={() => setEditing(!editing)} />}</div>} />
       <p className="text-[12px] text-fg-tertiary">{t('application.legal.note')}</p>
+      {!editing ? (
+        <ReadFields fields={[
+          { label: t('application.legal.entityType'), value: c?.entity_type }, { label: t('application.legal.registrationNumber'), value: c?.registration_number },
+          { label: t('application.legal.registeredAddress'), value: c?.registered_address },
+          { label: t('application.legal.representative'), value: [c?.representative_name, c?.representative_title].filter(Boolean).join(' · ') },
+          { label: t('application.legal.insuranceProvider'), value: c?.insurance_provider },
+          { label: t('application.legal.insuranceValidUntil'), value: fmtDate(c?.insurance_valid_until, i18n.resolvedLanguage || 'en') },
+        ]} />
+      ) : (<>
       <div className="grid gap-4 md:grid-cols-[200px_1fr_240px]">
         <FormField label={t('application.legal.entityType')} required><Input value={f.entity_type} onChange={set('entity_type')} /></FormField>
         <FormField label={t('application.legal.registrationNumber')} required><Input value={f.registration_number} onChange={set('registration_number')} /></FormField>
@@ -208,9 +269,10 @@ function LegalPanel({ app, onSaved }: { app: Application; onSaved: () => Promise
         <FormField label={t('application.legal.insuranceValidUntil')}><Input type="date" value={f.insurance_valid_until} onChange={set('insurance_valid_until')} /></FormField>
       </div>
       <div className="flex items-center gap-3">
-        <Button size="sm" variant="secondary" disabled={state === 'saving'} onClick={() => save(f)}>{label}</Button>
+        <Button size="sm" variant="secondary" disabled={state === 'saving'} onClick={async () => { if (await save(f) && settled) setEditing(false); }}>{label}</Button>
         {state === 'error' && <span className="text-[12px] text-error-500">{t('application.saveError')}</span>}
       </div>
+      </>)}
     </Card>
   );
 }

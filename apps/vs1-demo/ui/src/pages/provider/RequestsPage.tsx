@@ -8,6 +8,7 @@ import { Banner } from '../../components/ui/Banner';
 import { FilterChip } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { RequestCard, type RequestStatus } from '../../components/ui/RequestCard';
+import { useRequestContext } from '../../lib/requestContext';
 import { ThreadDrawer } from '../../components/shared/ThreadDrawer';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { useApiData } from '../../lib/useApiData';
@@ -25,52 +26,58 @@ const REQUESTS_VIEWER = 'provider-requests';
 
 type Fixture = {
   id: string;
+  /** Kurz-ID am Ende der Kontextzeile. */
+  ref: string;
+  category: string;
+  country: string;
+  createdAt: string;
   status: RequestStatus;
   statusLabel: string;
   company: string;
-  tag?: string;
   meta: string;
   sla?: string;
   action: { label: string; variant: 'primary' | 'primary' | 'ghost' };
 };
 
-// Fixture rows: company names, RQ-IDs, tags and meta descriptions are request
-// data and stay verbatim. statusLabel / action.label are re-mapped to localized
-// strings at render (also covers api-delivered rows via defaultValue).
+// Fixture rows: company names, IDs and meta descriptions are request data and
+// stay verbatim. statusLabel / action.label are re-mapped to localized strings
+// at render (also covers api-delivered rows via defaultValue). Bereich, Markt
+// und Eingang kommen roh und werden wie bei echten Zeilen uebersetzt (1 V3).
+const vor = (min: number) => new Date(Date.now() - min * 60_000).toISOString();
 const REQUESTS: Fixture[] = [
   {
-    id: 'RQ-0234 · 12 min ago', status: 'awaiting-confirm', statusLabel: 'Awaiting confirm',
-    company: 'Möbel-Berater Müller GmbH', tag: 'DE · EPR',
+    id: 'fx-0234', ref: 'RQ-0234', category: 'product-packaging', country: 'DE', createdAt: vor(12),
+    status: 'awaiting-confirm', statusLabel: 'Awaiting confirm', company: 'Möbel-Berater Müller GmbH',
     meta: 'D2C · €4.2M revenue · target launch Q3 · sells furniture cross-border via own webshop + Amazon DE/AT marketplaces',
     sla: '23h 48m', action: { label: 'Open · confirm', variant: 'primary' },
   },
   {
-    id: 'RQ-0233 · 2h ago', status: 'awaiting-confirm', statusLabel: 'Awaiting confirm',
-    company: 'TexTec OÜ (Estonia)', tag: 'DE+AT · VAT',
+    id: 'fx-0233', ref: 'RQ-0233', category: 'tax-vat', country: 'AT', createdAt: vor(120),
+    status: 'awaiting-confirm', statusLabel: 'Awaiting confirm', company: 'TexTec OÜ (Estonia)',
     meta: 'B2B · €1.8M revenue · OSS registered DE only · expanding into AT under reverse-charge regime',
     sla: '21h 40m', action: { label: 'Open · confirm', variant: 'primary' },
   },
   {
-    id: 'RQ-0232 · 8h ago', status: 'awaiting-confirm', statusLabel: 'Awaiting confirm',
-    company: 'Smart-Stage UG', tag: 'DE · Data Privacy',
+    id: 'fx-0232', ref: 'RQ-0232', category: 'data-privacy', country: 'DE', createdAt: vor(480),
+    status: 'awaiting-confirm', statusLabel: 'Awaiting confirm', company: 'Smart-Stage UG',
     meta: 'SaaS · €600k revenue · processes EU resident data · needs DPIA + GDPR Art. 30 records',
     sla: '14h 12m', action: { label: 'Open · confirm', variant: 'primary' },
   },
   {
-    id: 'RQ-0228 · Yesterday', status: 'awaiting-reply', statusLabel: 'Awaiting reply',
-    company: 'Brunnen Living Ltd.', tag: 'DE+UK · VAT',
+    id: 'fx-0228', ref: 'RQ-0228', category: 'tax-vat', country: 'GB', createdAt: vor(1500),
+    status: 'awaiting-reply', statusLabel: 'Awaiting reply', company: 'Brunnen Living Ltd.',
     meta: 'D2C + Marketplace · €12M revenue · renewing annual VAT advisory retainer · prior engagements 2023+2024',
     sla: '36h 18m', action: { label: 'Reply', variant: 'primary' },
   },
   {
-    id: 'RQ-0227 · 2 days ago', status: 'awaiting-reply', statusLabel: 'Awaiting reply',
-    company: 'Nordic Decor AS', tag: 'NO · VAT',
+    id: 'fx-0227', ref: 'RQ-0227', category: 'tax-vat', country: 'NO', createdAt: vor(2900),
+    status: 'awaiting-reply', statusLabel: 'Awaiting reply', company: 'Nordic Decor AS',
     meta: 'D2C · €3M revenue · expanding to Norway · needs VOEC scheme guidance + cross-border invoicing',
     sla: '11h 04m', action: { label: 'Reply', variant: 'primary' },
   },
   {
-    id: 'RQ-0225 · 4 days ago', status: 'active', statusLabel: 'Active',
-    company: 'KraftKaffee GmbH', tag: 'DE · VAT',
+    id: 'fx-0225', ref: 'RQ-0225', category: 'tax-vat', country: 'DE', createdAt: vor(5800),
+    status: 'active', statusLabel: 'Active', company: 'KraftKaffee GmbH',
     meta: 'D2C · €2.4M revenue · quarterly OSS filing in progress · Q2 deadline 2026-07-31',
     action: { label: 'View', variant: 'ghost' },
   },
@@ -102,6 +109,7 @@ const ACTION_LABEL_KEY: Record<string, string> = {
 
 export function RequestsPage() {
   const { t } = useTranslation('providerws');
+  const { kontext } = useRequestContext();
   // Demo states (Figma: OOO + First-Request-empty): append ?state=ooo | empty.
   const [params] = useSearchParams();
   const demoState = params.get('state');
@@ -212,11 +220,10 @@ export function RequestsPage() {
           {list.map((r) => (
             <RequestCard
               key={r.id}
-              idLine={'idLine' in r ? (r as { idLine: string }).idLine : r.id}
+              context={kontext({ category: r.category, country: r.country, createdAt: r.createdAt, ref: r.ref })}
               status={r.status}
               statusLabel={t(STATUS_LABEL_KEY[r.status], { defaultValue: r.statusLabel })}
               company={r.company === ANON_COMPANY ? t('requests.companyAnonymized', { defaultValue: r.company }) : r.company}
-              tag={r.tag}
               meta={r.meta}
               slaValue={r.sla}
               action={

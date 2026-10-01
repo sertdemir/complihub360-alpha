@@ -154,7 +154,14 @@
     "slotsAll": "All appointments this week",
     "lageAreaYes": "Covers {{area}}",
     "lageAreaNo": "Does not cover {{area}}",
-    "drawerBookNote": "Free first call · 30 min · identity visible after booking"
+    "drawerBookNote": "Free first call · 30 min · identity visible after booking",
+    "yourAppointment": "Your appointment",
+    "appointmentMeta": "{{minutes}} min · confirmed",
+    "appointmentConfirmed": "confirmed",
+    "toAppointments": "Go to your appointments",
+    "bookAnother": "Book another appointment",
+    "revealedTitle": "Name and contact are now visible.",
+    "revealedBody": "Since your booking you can see who this provider is."
   },
   "schedule": {
     "back": "Back to the profile",

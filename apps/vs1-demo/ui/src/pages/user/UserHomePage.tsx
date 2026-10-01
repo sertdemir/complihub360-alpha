@@ -13,6 +13,7 @@ import { fetchDashboard, EMPTY_DASHBOARD, type DashboardData, type DashboardSess
 import { fetchUserRequests, type UserRequestRow } from '../../api/requests';
 import { fetchUserBookings, markOutcome, type UserBooking } from '../../api/bookings';
 import { SLUG_TO_I18N, relZeit } from './AnfragenTab';
+import { useRequestContext } from '../../lib/requestContext';
 import { ladeIcs } from './TerminePage';
 import { DateMark } from '../../components/ui/DateMark';
 
@@ -166,7 +167,10 @@ export function UserHomePage() {
   // vor der Buchung stand (Bereiche · Region). Bis zum 27.09. kam das Thema
   // ueber den Anbieter-Schluessel aus den Anfragen — den traegt eine Buchung
   // nicht mehr (ADR-0004); die Beschreibung sagt dasselbe direkt.
-  const themaVon = (descriptor: string) => descriptor;
+  // 3 V3: uebersetzt aus den Bereichscodes, nicht die englische Server-Zeile.
+  const { beschreibung } = useRequestContext();
+  const themaVon = (b: { providerAreaCodes: string[]; providerRegion: string | null; providerDescriptor: string }) =>
+    beschreibung({ areaCodes: b.providerAreaCodes, region: b.providerRegion, fallback: b.providerDescriptor });
 
   // Balken: Maerkte oder Bereiche, beides aus denselben offenen Pflichten.
   const quelle = chartView === 'markets'
@@ -653,7 +657,7 @@ export function UserHomePage() {
                     <ul className={ohneErgebnis.length ? '' : 'mt-2'}>
                       {termine.slice(0, 3).map((a, i) => {
                         const provider = a.providerName + (a.identityRevealed && a.providerRegion ? ` — ${a.providerRegion}` : '');
-                        const thema = themaVon(a.providerDescriptor);
+                        const thema = themaVon(a);
                         return (
                           <li key={a.id} className={'flex items-center gap-3 py-2.5' + (i > 0 ? ' border-t border-stroke-subtle' : '')}>
                             <DateMark iso={a.slotStart} locale={i18n.resolvedLanguage || 'en'} size="sm" soon />

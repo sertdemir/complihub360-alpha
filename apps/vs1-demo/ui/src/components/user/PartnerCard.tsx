@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useRequestContext } from '../../lib/requestContext';
 import { Check } from 'lucide-react';
 import { Button } from '../ui/Button';
 import type { AnonProvider, RankBasis as RankBasisData } from '../../api/search';
@@ -60,6 +61,7 @@ export function PartnerCard({ provider: p, top, basis, rankBasis, onDetails, boo
   className?: string;
 }) {
   const { t, i18n } = useTranslation('results');
+  const { beschreibung } = useRequestContext();
   const locale = i18n.resolvedLanguage || 'en';
   const when = booking
     ? new Date(booking.slotStart).toLocaleString(locale, { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
@@ -78,7 +80,7 @@ export function PartnerCard({ provider: p, top, basis, rankBasis, onDetails, boo
           {booking ? (
             <OriginLine letter={p.letter} title={p.title} />
           ) : (
-            <p className="text-[10.5px] leading-snug text-fg-secondary">{p.descriptor}</p>
+            <p className="text-[10.5px] leading-snug text-fg-secondary">{beschreibung({ areaCodes: p.area_codes, region: p.descriptor_region, fallback: p.descriptor })}</p>
           )}
         </div>
         <span
