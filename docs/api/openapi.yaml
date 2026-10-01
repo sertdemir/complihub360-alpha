@@ -551,6 +551,7 @@ paths:
                 insurance_type: { type: string }
                 insurance_valid_until: { type: string, format: date }
                 change_note: { type: string, maxLength: 1000, description: Notiz des Partners zum Pruefvorgang }
+                dry_run: { type: boolean, description: "true → nichts schreiben, nur die Aufteilung zurueckgeben: `{ dry_run, instant[], review[], held[] }` (Canvas B V2)" }
       responses:
         '200': { description: "`{ updated[], held[], change_request_ids[] }` — held nennt die Felder, die auf Freigabe warten" }
         '400': { description: Kein gueltiges Feld }
@@ -595,8 +596,8 @@ paths:
         service_code ist fest (422 SERVICE_CODE_FIXED) — Kategoriewechsel heisst stilllegen und neu anlegen. Bei
         einer freigegebenen Leistung (approved, limited, paused) eines aktiven Partners gilt das Change-Control
         (§18–20): Preis, Umfang, Lieferzeit und Subunternehmer warten auf Freigabe; nach der aktuellen Policy
-        (`direction`) gilt eine Senkung von Preis oder Lieferzeit sofort, mit Pruefvorgang. Antwort wie bei
-        PATCH /application.
+        (`direction`) gilt eine Senkung von Preis oder Lieferzeit sofort, mit Pruefvorgang. Antwort und
+        `dry_run` wie bei PATCH /application.
       security: [ { bearerAuth: [] } ]
       parameters:
         - { name: key, in: path, required: true, schema: { type: string } }
@@ -785,7 +786,7 @@ paths:
                 service_ids: { oneOf: [ { type: string, enum: [all] }, { type: array, items: { type: string, format: uuid } } ] }
                 note: { type: string, maxLength: 1000 }
       responses:
-        '201': { description: "`{ change_request_id, paused_service_ids[] }`" }
+        '201': { description: "`{ change_request_id, paused_service_ids[], users_notified }` — Nutzer mit kommendem Termin im pausierten Bereich bekommen eine Mail (ohne Grund, mit kostenfreier Absage)" }
         '400': { description: VALIDATION_ERROR }
         '404': { description: Unbekannte Leistung }
 
@@ -909,7 +910,9 @@ paths:
         `identity_revealed`, sonst "Verified Provider"), `provider_descriptor`
         (Bereiche · Region, englische Taxonomie-Namen), `provider_area_codes`
         (dieselben Bereiche als Codes, das UI uebersetzt sie), `provider_website`
-        erst nach Offenlegung.
+        erst nach Offenlegung. `provider_paused`: der kommende Termin liegt in
+        einem Bereich, den der Anbieter nach einem wesentlichen Ereignis
+        pausiert hat (Change-Control, Canvas F V1).
       security: [ { bearerAuth: [] } ]
       responses:
         '200': { description: Termine }
@@ -1054,6 +1057,7 @@ paths:
         der Live-Wert seither geaendert hat), reject, require_reverification · applied: approve,
         require_reverification · pause: resume (stellt den vorherigen Status jeder Leistung wieder her),
         keep_paused. reject, require_reverification und keep_paused brauchen eine note, die der Partner liest.
+        Jede Entscheidung, die fuer den Partner etwas aendert, geht ihm per Mail zu (§26), mit der note.
       security: [ { bearerAuth: [] } ]
       parameters:
         - { name: key, in: path, required: true, schema: { type: string } }

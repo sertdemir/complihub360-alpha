@@ -3,7 +3,7 @@ import { structuredLog } from '@complihub360/types';
 import { supabaseApi } from './supabase.js';
 import type { Caller } from './providerAuth.js';
 import { notify } from './notifications.js';
-import { sendVerificationMail } from './mailer.js';
+import { sendChangeDecisionMail, sendVerificationMail, type ChangeDecisionMailKind } from './mailer.js';
 import { EVIDENCE_BUCKET, signedDownloadUrl } from './storage.js';
 import { scanFields } from './anonymity.js';
 import { RULES, same } from './changeControl.js';
@@ -447,6 +447,16 @@ async function decideChange(req: IncomingMessage, res: ServerResponse, correlati
     }
     await reviewLog({ providerKey, subject: serviceId ? 'service' : 'application', subjectId: serviceId, action: `change_${decision}`, to: c.field_path ?? c.event_type ?? null, reason: note, actorId: caller.userId, actorKind: 'reviewer' });
     await supabaseApi.insert('event_log', { type: 'provider_change_decided', payload: { providerKey, changeId, decision } });
+    // §26 "change status": der Partner erfaehrt jede Entscheidung, die etwas
+    // fuer ihn aendert. Ein schon uebernommener Wert, der nur bestaetigt wird,
+    // braucht keine Mail.
+    const mailKind: ChangeDecisionMailKind | null = decision === 'approve' ? (c.effect === 'held' ? 'approved' : null)
+        : decision === 'reject' ? 'rejected' : decision === 'require_reverification' ? 'reverification'
+        : decision === 'resume' ? 'resumed' : decision === 'keep_paused' ? 'kept_paused' : null;
+    if (mailKind) {
+        const p = ((await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[])[0];
+        await sendChangeDecisionMail({ to: p?.contact_email ?? null, providerKey, changeId, kind: mailKind, submittedAt: c.submitted_at ?? now, note, locale: p?.languages?.[0], correlationId });
+    }
     json(res, 200, { ok: true, decision, correlationId });
 }
 

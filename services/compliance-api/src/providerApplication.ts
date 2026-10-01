@@ -5,12 +5,14 @@ import { supabaseApi } from './supabase.js';
 import type { Caller } from './providerAuth.js';
 import { categoryAllowanceCheck, getActiveSubscription, loadPricingConfig } from './billing.js';
 import { checkVatId } from './vies.js';
+import { sendServicePausedMail } from './mailer.js';
+import { bookingAffected, localeFromCountry, pausedAreasByProvider, requestOf } from './changeImpact.js';
 import { scanFields, type IdentityContext } from './anonymity.js';
 import {
     EVIDENCE_ALLOWED_MIME, EVIDENCE_BUCKET, EVIDENCE_MAX_BYTES, evidenceObjectPath, objectInfo, signedUploadUrl,
 } from './storage.js';
 import {
-    changeRow, classify, CONTROLLED_LIFECYCLE, CONTROLLED_SERVICE, MATERIAL_EVENTS, RULES, type ClassifiedField,
+    changeRow, classify, CONTROLLED_LIFECYCLE, CONTROLLED_SERVICE, MATERIAL_EVENTS, RULES, type Classification, type ClassifiedField,
 } from './changeControl.js';
 import {
     areaCodeOf, evidenceChecklist, requiredEvidence, submitValidation, SUBMIT_AGREEMENTS,
@@ -248,6 +250,9 @@ async function patchApplication(req: IncomingMessage, res: ServerResponse, corre
         : null;
     const pubC = classify(pub, providers[0], controlled);
     const confC = classify(conf, confRow, controlled);
+    // Canvas B V2: die Oberflaeche fragt vor dem Absenden, was sofort gilt und
+    // was wartet — dieselbe Regel, ohne zu schreiben.
+    if (d.dry_run === true) { json(res, 200, dryRunBody(pubC, confC, correlationId)); return; }
     const now = new Date().toISOString();
     if (Object.keys(pubC.write).length) await supabaseApi.update('providers', { provider_key: providerKey }, { ...pubC.write, updated_at: now });
     if (Object.keys(confC.write).length) await supabaseApi.upsert('provider_confidential', 'provider_key', { provider_key: providerKey, ...confC.write, updated_at: now });
@@ -260,6 +265,16 @@ async function patchApplication(req: IncomingMessage, res: ServerResponse, corre
         await reviewLog({ providerKey, subject: 'application', action: 'legal_fields_changed', to: Object.keys(confC.write).join(','), actorId: caller.userId, actorKind: 'provider' });
     }
     json(res, 200, { ok: true, updated: written, held: changes.held, change_request_ids: changes.ids, correlationId });
+}
+
+/** Antwort auf dry_run: dieselbe Aufteilung wie beim Speichern, nichts geschrieben. */
+function dryRunBody(a: Classification, b: Classification | null, correlationId: string) {
+    const fields = (xs: ClassifiedField[]) => xs.map((f) => ({ field: f.field, old: f.old, new: f.new, change_type: f.changeType }));
+    const review = [...a.review, ...(b?.review ?? [])];
+    const held = [...a.held, ...(b?.held ?? [])];
+    const write = { ...a.write, ...(b?.write ?? {}) };
+    const instant = Object.keys(write).filter((k) => !review.some((f) => f.field === k));
+    return { ok: true, dry_run: true, instant, review: fields(review), held: fields(held), correlationId };
 }
 
 /**
@@ -382,8 +397,23 @@ async function materialEvent(req: IncomingMessage, res: ServerResponse, correlat
         applied_at: now, submitted_at: now,
     }) as any[];
     await reviewLog({ providerKey, subject: 'application', action: 'material_event', to: `${eventType}:${targets.length}`, actorId: caller.userId, actorKind: 'provider' });
+    // Canvas F V1: wer einen kommenden Termin in einem pausierten Bereich hat,
+    // erfaehrt es per Mail — ohne Grund, mit kostenfreier Absage und Mensch.
+    let notified = 0;
+    if (targets.length) {
+        const paused = (await pausedAreasByProvider(providerKey)).get(providerKey);
+        const upcoming = ((await supabaseApi.select('scheduling', { provider_key: providerKey }, { limit: 500 })) as any[])
+            .filter((b) => b.slot_start > now && b.status !== 'cancelled');
+        for (const b of upcoming) {
+            const r = await requestOf(b.user_id ?? null, providerKey);
+            if (!bookingAffected(paused, r?.category)) continue;
+            const u = b.user_id ? ((await supabaseApi.select('users', { id: b.user_id }, { limit: 1 })) as any[])[0] : null;
+            await sendServicePausedMail({ to: u?.email ?? null, bookingId: b.id, slotIso: b.slot_start, locale: localeFromCountry(r?.country), correlationId });
+            notified++;
+        }
+    }
     await supabaseApi.insert('event_log', { type: 'provider_material_event', payload: { providerKey, eventType, paused: targets.map((sv) => sv.id) } });
-    json(res, 201, { ok: true, change_request_id: rows?.[0]?.id ?? null, paused_service_ids: targets.map((sv) => sv.id), correlationId });
+    json(res, 201, { ok: true, change_request_id: rows?.[0]?.id ?? null, paused_service_ids: targets.map((sv) => sv.id), users_notified: notified, correlationId });
 }
 
 // ─── Leistungen (2B: Stamm) ──────────────────────────────────────────────────
@@ -499,6 +529,7 @@ async function patchService(req: IncomingMessage, res: ServerResponse, correlati
     const provider = ((await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[])[0];
     const controlled = CONTROLLED_LIFECYCLE.has(provider?.lifecycle_status) && CONTROLLED_SERVICE.has(s.status);
     const c = classify(patch, s, controlled);
+    if (d.dry_run === true) { json(res, 200, dryRunBody(c, null, correlationId)); return; }
     const written = Object.keys(c.write);
     if (written.length) await supabaseApi.update('provider_services', { id: serviceId }, { ...c.write, updated_at: new Date().toISOString() });
     const changes = await recordChanges(providerKey, serviceId, c.review, c.held, str(d.change_note, 1000) || null, caller);

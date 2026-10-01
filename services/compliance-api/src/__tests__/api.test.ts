@@ -2592,6 +2592,53 @@ describe('Change-Control fuer aktive Partner (§18–20)', () => {
         expect(svc.status).toBe('approved');
     });
 
+    it('dry_run sagt vorher, was wartet und was sofort gilt — ohne zu schreiben (B V2)', async () => {
+        const svc = seedActivePartner();
+        const r = await own(`/services/${svc.id}`, { method: 'PATCH', body: JSON.stringify({ price_max: 2600, completion_days_estimate: 10, capacity_status: 'limited', dry_run: true }) });
+        expect(r.status).toBe(200);
+        expect(r.body).toMatchObject({ dry_run: true, instant: ['capacity_status'] });
+        expect(r.body.held).toEqual([{ field: 'price_max', old: 2400, new: 2600, change_type: 'pricing' }]);
+        expect(r.body.review.map((f: any) => f.field)).toEqual(['completion_days_estimate']);
+        expect(svc).toMatchObject({ price_max: 2400, completion_days_estimate: 15 });
+        expect(changes()).toHaveLength(0);
+    });
+
+    it('der Partner erfaehrt die Entscheidung per Mail, mit der Begruendung (§26)', async () => {
+        const svc = seedActivePartner();
+        db.providers[0].contact_email = 'kanzlei@neue.test';
+        db.providers[0].languages = ['de'];
+        await own(`/services/${svc.id}`, { method: 'PATCH', body: JSON.stringify({ price_max: 2600 }) });
+        await adminApi(`/api/v1/admin/review/neue-kanzlei/change/${changes()[0].id}`, { method: 'POST', body: JSON.stringify({ decision: 'reject', note: 'Bitte die Preisbasis nennen.' }) });
+        const mail = db.event_log.find((e) => e.type === 'email_outbox' && e.payload.kind === 'change_rejected');
+        expect(mail.payload).toMatchObject({ to: 'kanzlei@neue.test', subject: 'Ihre Änderung wurde nicht übernommen' });
+        expect(mail.payload.text).toContain('Hinweis unseres Prüfteams: Bitte die Preisbasis nennen.');
+        expect(mail.payload.text).toContain('ein Mensch antwortet Ihnen');
+    });
+
+    it('eine Pause erreicht nur Nutzer mit Termin im pausierten Bereich — per Mail und als Flag an ihren Terminen (F V1)', async () => {
+        const svc = seedActivePartner();
+        const morgen = new Date(Date.now() + 86400_000).toISOString();
+        const andererNutzer = randomUUID();
+        (db.users ??= []).push({ id: USER_ID, email: 'test@complihub.test' }, { id: andererNutzer, email: 'datenschutz@kunde.test' });
+        (db.engagement_requests ??= []).push(
+            { id: randomUUID(), user_id: USER_ID, provider_key: 'neue-kanzlei', category: 'tax-vat', country: 'de', created_at: new Date().toISOString() },
+            { id: randomUUID(), user_id: andererNutzer, provider_key: 'neue-kanzlei', category: 'data-privacy', country: 'es', created_at: new Date().toISOString() },
+        );
+        (db.scheduling ??= []).push(
+            { id: randomUUID(), provider_key: 'neue-kanzlei', user_id: USER_ID, slot_start: morgen, slot_end: morgen, status: 'confirmed' },
+            { id: randomUUID(), provider_key: 'neue-kanzlei', user_id: andererNutzer, slot_start: morgen, slot_end: morgen, status: 'confirmed' },
+        );
+        const r = await own('/material-event', { method: 'POST', body: JSON.stringify({ event_type: 'insurance_lost', occurred_on: '2026-09-30', service_ids: [svc.id] }) });
+        expect(r.body.users_notified).toBe(1);
+        const mails = db.event_log.filter((e) => e.type === 'email_outbox' && e.payload.kind === 'booking_provider_paused');
+        expect(mails.map((m) => m.payload.to)).toEqual(['test@complihub.test']);
+        expect(mails[0].payload.text).toContain('kostenfrei absagen');
+        expect(mails[0].payload.text).not.toMatch(/Versicherung|insurance/i);
+
+        const termine = await api('/api/v1/bookings', { auth: 'jwt' });
+        expect(termine.body.bookings.map((b: any) => b.provider_paused)).toEqual([true]);
+    });
+
     it('ist fuer normale Logins zu', async () => {
         const svc = seedActivePartner();
         await own(`/services/${svc.id}`, { method: 'PATCH', body: JSON.stringify({ price_max: 2600 }) });
