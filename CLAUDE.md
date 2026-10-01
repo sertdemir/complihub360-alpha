@@ -50,6 +50,8 @@ Regelwerk: [`.agents/rules/dna-decision-filter.md`](.agents/rules/dna-decision-f
 
 Subagenten erben diese Datei **nicht** zuverlässig — in der Remote-Umgebung erhalten sie empirisch gar keinen Projektkontext (geprüft 2026-08-20 mit `general-purpose`). Delegierst du eine Aufgabe aus dem Auslöserkatalog oben, gib die harten Grenzen und den Pfad zu `KN-BRAND-001` **explizit im Prompt mit**. Sonst arbeitet der Subagent ohne DNA.
 
+Eigene Projekt-Agenten unter [`.claude/agents/`](.claude/agents/) tragen diesen Block deshalb fest im Prompt (z. B. `silent-failure-hunter`). Wer einen neuen Agenten anlegt, gibt ihm denselben Block mit.
+
 ---
 
 # Privacy — ebenfalls nicht verhandelbar
@@ -129,6 +131,8 @@ Die Privacy-Architektur ist deterministisch und der AI immer vorgelagert. Detail
 | `docs/api/openapi.yaml` | maßgeblich für Backend und Services |
 | `.agents/rules/` | bindende Regeln für Agenten |
 | `.tickets/` | Ticket-Lifecycle (`doing` → `review` → `done`) |
+| `.claude/hooks/` | Guard-Hooks für Claude Code (Git-Hooks, geschützte Configs/Regeln, Privacy-Gate, UI-Typecheck) — Übersicht im README dort |
+| `.claude/agents/` | Projekt-Subagenten mit festem DNA- und Privacy-Block |
 
 ## Drei Dinge heißen „Vault" — sie sind nicht dasselbe
 
@@ -154,6 +158,7 @@ npm run dev:service  # API (@complihub/compliance-api)
 npm run i18n:check   # Übersetzungen prüfen
 npm run terminology:check  # verbotene Begriffe in den Sprachdateien
 npm run db:test      # Migrationen + pgTAP gegen eine Wegwerf-Datenbank
+npm run hooks:test   # Tests der Guard-Hooks unter .claude/hooks/
 ```
 
 > `npm run db:test` braucht ein laufendes Postgres 16 mit `pgtap` und `vector`
@@ -170,3 +175,6 @@ CI (`quality-gates`) läuft bei jedem PR gegen `main`. Vor dem Push mindestens `
 > erst bei `npm run build` auf, wo `npx tsc` läuft. Wer bei UI-Änderungen nur
 > `typecheck` fährt, hält einen roten Build für grün. (Nachgemessen 2026-09-22:
 > ein falscher Prop-Typ in `ResultsRiskMap.tsx` — `typecheck` 0 Fehler, `build` rot.)
+> In Claude-Code-Sessions fängt das jetzt der Hook `.claude/hooks/ui-typecheck.mjs`
+> nach jedem Edit unter `apps/vs1-demo/ui/src/` ab. Vor dem Push bleibt
+> `npm run build` trotzdem Pflicht: Der Hook sieht keine Änderungen über Bash.
