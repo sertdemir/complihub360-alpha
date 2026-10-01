@@ -1004,7 +1004,8 @@ export async function sendPaymentFailedMail(p: { to: string | null; providerKey:
 // DNA: Information, kein Verkauf. Kein "jetzt schnell", kein Upsell, keine
 // Behauptung ueber Pflichten ("may apply"). Der Schlusssatz sagt, dass es bei
 // dieser einen Mail bleibt — ein Abschalten gibt es nicht und braucht es
-// nicht. Copy noch nicht abgenommen (TKT-MU-01).
+// nicht. Copy abgenommen am 01.10.2026 nach dem Staging-Durchlauf (echte
+// Mail, DE); der Test in api.test.ts haelt den EN- und DE-Text wortgleich.
 
 const MARKET_COVERED_STRINGS: Record<MailLocale, { subject: string; body: string; cta: string; once: string }> = {
     en: {

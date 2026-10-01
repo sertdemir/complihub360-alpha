@@ -32,8 +32,9 @@ Market“-Aktion, die tatsächlich etwas tut.
 - [x] Neue Copy abgenommen (27.09.) → `common:states.marketRequest.*`, im Copy-Waechter; „You can switch it off any time“ bleibt weg (Nutzer: „Abschalten weglassen“)
 - [x] Staging (27.09., Build `ccee4718`)
 - [x] Versand des Updates (01.10.): Watcher-Pass `runMarketCoverageTick`, einmal je Zeile mit Claim über `notified_at`, Adresse aus `auth.users` per `auth_user_email_by_id` (nur bestätigt), Sprache der Anfrage (`locale`, Migration 20261001000000); 7 API-Tests + 9 pgTAP, 5 Sabotagen erkannt
-- [ ] Mail-Copy abnehmen (EN/DE/ES/TR in `mailer.ts`, `MARKET_COVERED_STRINGS`)
-- [ ] Migration 20261001000000 auf Staging
+- [x] Mail-Copy abgenommen (01.10., nach echter Mail auf Staging); EN und DE im Test wortgleich festgehalten
+- [x] Migration 20261001000000 auf Staging (vor dem Merge von #231)
+- [x] Staging Ende-zu-Ende (01.10., Build `48488f1c`): Gast-Anfrage mit `de-DE` → `locale = de`; Testzeile DE + notify mit Konto `+madrid` → nächster Takt sendet über Resend (200), Mail kommt an (DE, Link `/de/wizard`), `notified_at` gesetzt, der folgende Takt sendet nicht erneut; Testzeilen entfernt
 
 ## DNA-Check
 
@@ -48,6 +49,7 @@ Betroffen sind **Risk Map** (Darstellung), **Registrierung und Gating** (Update 
 - [2026-09-27] **Claude**: Backend (Migration, pgTAP, API, Tests, OpenAPI) und Canvas. UI wartet auf die Wahl. (Status: doing)
 - [2026-09-27] **Claude**: Staging-Migration, Figma D3/E3/F3, lokaler Rollout. Offen: Copy-Abnahme, Staging, Versand. (Status: doing)
 - [2026-10-01] **Claude**: Versand des Markt-Updates (Migration, Mailer, Watcher, Client-Sprache). Offen: Mail-Copy-Abnahme, Staging-Migration. (Status: doing)
+- [2026-10-01] **Claude**: #231 gemergt, Staging Ende-zu-Ende geprüft, Mail-Copy abgenommen. Offen bleiben nur die Hero-Copy für Gäste und die Anbieter-Spalte (s. u.). (Status: doing)
 
 ## Offene Punkte für den Nutzer (Stufe 3)
 
