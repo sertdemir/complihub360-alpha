@@ -87,7 +87,7 @@ function serviceTexts(patch: Record<string, unknown>): Record<string, unknown> {
 
 /** Ein Eintrag im Entscheidungsprotokoll. Nie ueber den Vorgang hinaus werfen — das Protokoll ist Beiwerk. */
 export async function reviewLog(entry: {
-    providerKey: string; subject: 'evidence' | 'coverage' | 'service' | 'lifecycle' | 'request' | 'application';
+    providerKey: string; subject: 'evidence' | 'coverage' | 'service' | 'lifecycle' | 'request' | 'application' | 'subscription';
     subjectId?: string | null; action: string; from?: string | null; to?: string | null; reason?: string | null;
     actorId?: string | null; actorKind: 'reviewer' | 'provider' | 'system';
 }): Promise<void> {

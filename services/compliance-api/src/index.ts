@@ -23,6 +23,7 @@ import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
 import { buildCockpit } from "./cockpit.js";
 import { ownProviderRouteKey, canAccessProvider, handleMeProvider, handleAdminLinkMember } from "./providerAuth.js";
 import { handleProviderApplication } from "./providerApplication.js";
+import { handleSubscriptionGet, handleSubscriptionSelect, handleAdminSubscription } from "./subscriptions.js";
 import { handleProviderReview } from "./providerReview.js";
 import { redactText } from "@complihub360/redaction";
 import {
@@ -3161,6 +3162,19 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     } else if (req.method === 'POST' && req.url === '/api/v1/assistant/checkout') {
         // Phase ③: Stripe Checkout for Assistant Pro (12 $/month).
         handleAssistantCheckout(req, res, correlationId, { userId: authUserId, email: authEmail }, ip);
+    } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/subscription$/.test(req.url || '')) {
+        // Das eigene Abo: Tarif, Zyklus, Periode und die waehlbaren Tarife.
+        // Nur fuer den Anbieter selbst (Ownership-Guard oben) — Spec B haelt
+        // Abo-Daten aus allem Nutzerseitigen heraus.
+        await handleSubscriptionGet(res, correlationId, (req.url || '').split('/')[4]);
+    } else if (req.method === 'POST' && /^\/api\/v1\/provider\/[a-z0-9-]+\/subscription$/.test(req.url || '')) {
+        // Tarifwahl. Legt das Abo an; die Abo-RECHNUNG stellt weiter der
+        // Monatslauf (/admin/billing/run) — es gibt kein Stripe-Abo, sonst
+        // wuerde zweimal abgerechnet.
+        await handleSubscriptionSelect(req, res, correlationId, caller, (req.url || '').split('/')[4]);
+    } else if (req.method === 'POST' && req.url === '/api/v1/admin/provider-subscriptions') {
+        // Admin-Zuweisung: {provider_key, action: 'start'|'end', ...}.
+        await handleAdminSubscription(req, res, correlationId, caller);
     } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/billing\/preview$/.test(req.url || '')) {
         // Current-period charge preview for the provider billing page (pricing
         // decision 2026-08-09) — behind the normal auth gate, no Stripe needed.
