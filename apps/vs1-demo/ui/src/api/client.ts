@@ -31,6 +31,37 @@ export function referenceOf(err: unknown): { id: string; at: string } | null {
   return err instanceof ApiError ? { id: err.correlationId, at: err.at } : null;
 }
 
+// ─── TEMP-DEMO-DATEN (2026-10-01) ────────────────────────────────────────────
+// Nutzer-Wunsch: der stimmige Demo-Datensatz (Acme GmbH ↔ Schmidt & Partner,
+// PR #229) soll auch auf Staging zu sehen sein. Der Demo-Login dort hat keine
+// Supabase-Sitzung, der Server antwortet ihm auf alles Geschuetzte mit 401 —
+// also beantwortet der Browser seine Aufrufe aus demselben Datensatz wie der
+// lokale Mock (`src/mock/demoApi.ts`). Echte Logins und anonyme Besucher
+// bleiben beim echten Server. Greift NUR im Staging-Build (VITE_DEMO_LOGIN=1,
+// gesetzt allein in deploy-staging.yml); in Produktion faellt der Zweig samt
+// Chunk beim Build weg. Wieder entfernen: diesen Block und die eine Zeile in
+// apiFetch (Suche nach "TEMP-DEMO-DATEN").
+const DEMO_DATEN_AKTIV = import.meta.env.VITE_DEMO_LOGIN === '1' && !isMockApi;
+
+function demoLoginAktiv(): boolean {
+  try { return localStorage.getItem('demo_is_logged_in') === 'true'; } catch { return false; }
+}
+
+async function demoAntwort<T>(path: string, init: RequestInit, correlationId: string): Promise<T> {
+  const { route } = await import('../mock/demoApi');
+  let body: Record<string, unknown> = {};
+  try { body = typeof init.body === 'string' && init.body ? JSON.parse(init.body) : {}; } catch { /* kein JSON */ }
+  let role = '';
+  try { role = localStorage.getItem('demo_user_role') ?? ''; } catch { /* kein Storage */ }
+  const pathname = path.split('?')[0];
+  const result = route(init.method ?? 'GET', pathname, body, role);
+  const { __status, ...payload } = (result ?? {}) as { __status?: number } & Record<string, unknown>;
+  if (__status && __status >= 400) {
+    throw new ApiError(String(payload.message ?? `HTTP ${__status}`), __status, correlationId, undefined, payload);
+  }
+  return payload as T;
+}
+
 export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   const correlationId = generateCorrelationId();
   // Im Mock-Modus bleiben alle Aufrufe relativ, damit sie die Vite-Middleware
@@ -46,6 +77,8 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
   };
 
   const token = await getAccessToken();
+  // TEMP-DEMO-DATEN: Demo-Login auf Staging ohne echte Sitzung → Demo-Datensatz.
+  if (DEMO_DATEN_AKTIV && !token && demoLoginAktiv()) return demoAntwort<T>(path, init, correlationId);
   if (token) headers['Authorization'] = `Bearer ${token}`;
   const devKey = import.meta.env.VITE_DEV_API_KEY as string | undefined;
   if (devKey) headers['x-api-key'] = devKey;

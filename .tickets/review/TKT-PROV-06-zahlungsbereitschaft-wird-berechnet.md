@@ -57,8 +57,13 @@ bleibt beim Anbieter: dass sein Tarif fehlt, ist nicht Sache des Nutzers.
 - [x] `ProviderDetailPage`: früher Rücksprung ohne Knopf und ohne Slots; zwei
   neue Copy-Schlüssel in en/de/es/tr (unter `results:detail.*`, also noch
   **nicht abgenommene** Copy — `common:states.*` duldet nur Abgenommenes).
-- [x] Mock-API: ein Anbieter (`madrid-tax`) bewusst nicht buchbar, damit der
-  Fall bei `npm run dev:ui` erreichbar ist und nicht nur in Tests.
+- [x] Mock-API (`src/mock/demoApi.ts`, nach dem Umzug in #230): `p2Gate` liefert
+  `billing` mit, das Detail `bookable_chargeable`. Im Mock sind **alle** drei
+  Anbieter buchbar, und das mit Absicht — von den Anbietern mit Detailseite ist
+  `madrid-tax` der einzige ohne Termin, also genau der, den man anklickt, um die
+  Buchung zu sehen. Ihn zu sperren hätte dem Datensatz seinen Zweck genommen.
+  Für den lokalen Blick auf den gesperrten Fall genügt eine Zeile; abgesichert
+  ist er durch die drei Wächter.
 - [x] `openapi.yaml`: das Detailfeld dokumentiert.
 - [x] Tests: 5 neue Regel-Tests (inkl. letzter Tag der Periode und einer
   Gegenprobe, dass eine offene Rechnung NICHT sperrt), 3 UI-Wächter, pgTAP auf
