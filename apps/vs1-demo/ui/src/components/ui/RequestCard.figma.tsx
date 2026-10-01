@@ -8,10 +8,9 @@ figma.connect(
   "https://www.figma.com/design/a4BeKbsBGoHkcudhKXUJTl?node-id=1444-605",
   {
     props: {
-      idLine: figma.string("ID Line"),
+      context: figma.string("Context"),
       statusLabel: figma.string("Status Label"),
       company: figma.string("Company"),
-      tag: figma.string("Tag"),
       meta: figma.string("Meta"),
       slaValue: figma.string("SLA Value"),
       status: figma.enum("Status", {
@@ -20,10 +19,10 @@ figma.connect(
         Active: "active",
       }),
     },
-    example: ({ idLine, status, statusLabel, company, tag, meta, slaValue }) => (
+    example: ({ context, status, statusLabel, company, meta, slaValue }) => (
       <RequestCard
-        idLine={idLine} status={status} statusLabel={statusLabel}
-        company={company} tag={tag} meta={meta} slaValue={slaValue}
+        context={context} status={status} statusLabel={statusLabel}
+        company={company} meta={meta} slaValue={slaValue}
         action={<Button variant="primary" size="sm">Open · confirm</Button>}
       />
     ),

@@ -1132,6 +1132,27 @@ describe('Ownership: Anbieter-eigene Routen gehoeren ihren Mitgliedern', () => {
         expect(r.status).toBe(200);
     });
 
+    it('Partner-Termine tragen die Firma aus der Anfrage, ohne Anfrage null (2 V1)', async () => {
+        seedProvider();
+        (db.provider_members ??= []).push({ provider_key: 'test-kanzlei', user_id: USER_ID, role: 'owner' });
+        const mitAnfrage = randomUUID(), ohneAnfrage = randomUUID();
+        (db.users ??= []).push({ id: mitAnfrage, email: 'alex.weber@acme.example' }, { id: ohneAnfrage, email: 'info@hafenkontor.example' });
+        (db.engagement_requests ??= []).push(
+            { id: randomUUID(), provider_key: 'test-kanzlei', user_id: mitAnfrage, category: 'product-packaging', country: 'DE', structured_answers: { company: 'Acme GmbH' }, created_at: '2026-09-30T08:00:00Z' },
+            { id: randomUUID(), provider_key: 'andere-kanzlei', user_id: ohneAnfrage, category: 'tax-vat', country: 'DE', structured_answers: { company: 'Fremde Firma' }, created_at: '2026-09-30T08:00:00Z' },
+        );
+        (db.scheduling ??= []).push(
+            { id: randomUUID(), provider_key: 'test-kanzlei', user_id: mitAnfrage, slot_start: '2026-10-02T07:00:00Z', slot_end: '2026-10-02T07:30:00Z', status: 'confirmed' },
+            { id: randomUUID(), provider_key: 'test-kanzlei', user_id: ohneAnfrage, slot_start: '2026-09-13T13:00:00Z', slot_end: '2026-09-13T13:30:00Z', status: 'no_show' },
+        );
+        const r = await api('/api/v1/provider/test-kanzlei/bookings', { auth: 'jwt' });
+        expect(r.status).toBe(200);
+        const [neu, alt] = r.body.bookings;
+        expect(neu).toMatchObject({ user_company: 'Acme GmbH', category: 'product-packaging', country: 'DE', user_email: 'alex.weber@acme.example' });
+        // Die Anfrage an einen ANDEREN Anbieter verraet hier nichts.
+        expect(alt).toMatchObject({ user_company: null, category: null, country: null });
+    });
+
     it('laesst das Mitglied NICHT auf einen anderen Anbieter', async () => {
         seedProvider();
         seedProvider({ provider_key: 'andere-kanzlei' });
@@ -1423,6 +1444,9 @@ describe('Anonymitaet auf dem Draht (Phase 3, ADR-0004)', () => {
         expect(d.markets).toEqual(['DE']);
         expect(d.specializations).toEqual(['Tax and VAT']);
         expect(d.descriptor).toBe('Tax and VAT · Norddeutschland');
+        // 3 V3: Codes fuer die Uebersetzung im UI, die Region roh.
+        expect(d.area_codes).toEqual(['tax-vat']);
+        expect(d.descriptor_region).toBe('Norddeutschland');
         expect(d.rank_basis.verification).toBe('independent');
     });
 
@@ -1446,6 +1470,7 @@ describe('Anonymitaet auf dem Draht (Phase 3, ADR-0004)', () => {
         sauber(b.body);
         expect(b.body.bookings[0].provider_name).toBe('Verified Provider');
         expect(b.body.bookings[0].provider_descriptor).toBe('Tax and VAT · Norddeutschland');
+        expect(b.body.bookings[0].provider_area_codes).toEqual(['tax-vat']);
         expect(b.body.bookings[0].public_ref).toBe(refOf('test-kanzlei'));
     });
 
@@ -2641,6 +2666,29 @@ describe('Watcher: Markt-Update', () => {
         expect(en.text).toContain('/en/wizard');
         expect(en.text).toContain('This is the only email we send about this request.');
         expect(renderMarketCoveredMail('BR', 'tr').subject).toBe('Brezilya artık CompliHub360\'ta kapsanıyor');
+        // Abgenommen 01.10.2026 (Nutzer, nach der echten Mail auf Staging):
+        // wortgleich halten — eine Aenderung braucht eine neue Abnahme.
+        const url = (loc: string) => `${(process.env.PUBLIC_APP_URL || 'https://staging.complihub360.com').replace(/\/$/, '')}/${loc}/wizard`;
+        expect(en.text).toBe([
+            'You asked us to let you know when we cover Brazil. We do now.',
+            '',
+            'You can create a Risk Map for Brazil and see which requirements may apply to your business.',
+            '',
+            `→ Create a Risk Map: ${url('en')}`,
+            '',
+            'This is the only email we send about this request.',
+        ].join('\n'));
+        const de = renderMarketCoveredMail('DE', 'de');
+        expect(de.subject).toBe('Deutschland ist jetzt auf CompliHub360 abgedeckt');
+        expect(de.text).toBe([
+            'Sie hatten uns gebeten, Ihnen Bescheid zu geben, sobald wir Deutschland abdecken. Das ist jetzt der Fall.',
+            '',
+            'Sie können eine Risk Map für Deutschland erstellen und sehen, welche Anforderungen für Ihr Unternehmen gelten können.',
+            '',
+            `→ Risk Map erstellen: ${url('de')}`,
+            '',
+            'Dies ist die einzige E-Mail, die wir zu dieser Anfrage senden.',
+        ].join('\n'));
         expect(renderMarketCoveredMail('BR', 'xx').subject).toBe(en.subject);
     });
 

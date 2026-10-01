@@ -6,6 +6,8 @@ import { Button } from '../../components/ui/Button';
 import { Drawer } from '../../components/ui/Drawer';
 import { useApiData } from '../../lib/useApiData';
 import { fetchProviderBookings, submitReview, type BookingStatus } from '../../api/bookings';
+import { DateMark } from '../../components/ui/DateMark';
+import { useRequestContext } from '../../lib/requestContext';
 
 // ─── Provider · Termine & Leads ──────────────────────────────────────────────
 // Matchmaking v2: the booking IS the paid lead. The dossier (user identity +
@@ -14,19 +16,26 @@ import { fetchProviderBookings, submitReview, type BookingStatus } from '../../a
 
 interface Row {
   id: string;
+  start: string;        // ISO — Datumsmarke
   dateLine: string;
   timeLine: string;
-  company: string;      // user identity — revealed at booking
+  /** Dauer aus Slot-Beginn und -Ende; fehlt das Ende, steht keine Dauer da. */
+  minutes?: number;
+  /** Firma aus der Anfrage (2 V1). null: nicht angegeben — nie aus der Domain geraten. */
+  company: string | null;
   email: string;
+  category?: string;
+  country?: string;
   meta: string;
   status: BookingStatus;
   leadCharged: boolean;
 }
 
+// Kein "Video-Call" mehr: das Format kennen wir nicht, nur die Dauer.
 const FIXTURE: Row[] = [
-  { id: 'fx-1', dateLine: 'Mo, 12. Aug 2026', timeLine: '10:00–10:30 · Video-Call', company: 'Acme GmbH — E-Commerce, München', email: 'alex.weber@acme.example', meta: 'VAT-Registrierung Italien · D2C + Amazon · €145k IT-Umsatz', status: 'confirmed', leadCharged: true },
-  { id: 'fx-2', dateLine: 'Mi, 14. Aug 2026', timeLine: '09:30–10:00 · Video-Call', company: 'Brunnen Living Ltd. — Möbel, London', email: 'ops@brunnen.example', meta: 'OSS-Meldung + Fiskalvertretung · Marketplace EU-weit', status: 'confirmed', leadCharged: true },
-  { id: 'fx-3', dateLine: 'Di, 29. Jul 2026', timeLine: '11:00–11:30 · Video-Call', company: 'Acme GmbH — E-Commerce, München', email: 'alex.weber@acme.example', meta: 'VAT-Registrierung Italien · stattgefunden', status: 'completed', leadCharged: true },
+  { id: 'fx-1', start: '2026-08-12T10:00:00', dateLine: 'Mo., 12. Aug. 2026', timeLine: '10:00–10:30', minutes: 30, company: 'Acme GmbH', email: 'alex.weber@acme.example', category: 'tax-vat', country: 'IT', meta: 'VAT-Registrierung Italien · D2C + Amazon · €145k IT-Umsatz', status: 'confirmed', leadCharged: true },
+  { id: 'fx-2', start: '2026-08-14T09:30:00', dateLine: 'Mi., 14. Aug. 2026', timeLine: '09:30–10:00', minutes: 30, company: 'Brunnen Living Ltd.', email: 'ops@brunnen.example', category: 'tax-vat', country: 'GB', meta: 'OSS-Meldung + Fiskalvertretung · Marketplace EU-weit', status: 'confirmed', leadCharged: true },
+  { id: 'fx-3', start: '2026-07-29T11:00:00', dateLine: 'Di., 29. Juli 2026', timeLine: '11:00–11:30', minutes: 30, company: null, email: 'alex.weber@acme.example', category: 'tax-vat', country: 'IT', meta: 'VAT-Registrierung Italien · stattgefunden', status: 'completed', leadCharged: true },
 ];
 
 const STATUS_TONE: Record<BookingStatus, 'success' | 'neutral' | 'error' | 'warning'> = {
@@ -36,6 +45,7 @@ const STATUS_TONE: Record<BookingStatus, 'success' | 'neutral' | 'error' | 'warn
 export function LeadsPage() {
   const { t, i18n } = useTranslation('providerws');
   const locale = i18n.resolvedLanguage || 'en';
+  const { bereich, markt } = useRequestContext();
   const { data: rows } = useApiData<Row[]>(async () => {
     const df = new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
     const tf = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' });
@@ -44,9 +54,13 @@ export function LeadsPage() {
       return {
         id: b.id,
         dateLine: df.format(start),
-        timeLine: `${tf.format(start)}${end ? `–${tf.format(end)}` : ''} · Video-Call`,
-        company: b.userEmail ? b.userEmail.split('@')[1] ?? b.userEmail : '—',
+        start: b.slotStart,
+        timeLine: `${tf.format(start)}${end ? `–${tf.format(end)}` : ''}`,
+        minutes: end ? Math.round((end.getTime() - start.getTime()) / 60_000) : undefined,
+        company: b.userCompany,
         email: b.userEmail ?? '—',
+        category: b.category ?? undefined,
+        country: b.country ?? undefined,
         meta: b.message ?? '—',
         status: b.status,
         leadCharged: b.leadCharged,
@@ -66,15 +80,16 @@ export function LeadsPage() {
   const upcoming = rows.filter((r) => r.status === 'confirmed');
   const past = rows.filter((r) => r.status !== 'confirmed');
 
+  // 2 V1 (2026-10-01): Datumsmarke · Firma · Kontakt · Zeit, Dauer und Thema.
+  const minuten = (r: Row) => (r.minutes ? t('termine.minutes', { count: r.minutes }) : '');
+  const thema = (r: Row) => [bereich(r.category), markt(r.country)].filter(Boolean).join(' · ');
   const card = (r: Row) => (
-    <div key={r.id} className="flex items-center gap-5 rounded-xl border border-stroke bg-surface-secondary/40 px-6 py-4">
-      <div className="w-[175px] shrink-0">
-        <p className="text-[14px] font-medium text-fg">{r.dateLine}</p>
-        <p className="text-[12px] text-fg-tertiary">{r.timeLine}</p>
-      </div>
+    <div key={r.id} className="flex items-center gap-4 rounded-xl border border-stroke bg-surface-secondary/40 px-5 py-4">
+      <DateMark iso={r.start} locale={locale} size="md" soon={r.id === upcoming[0]?.id} />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-[15px] font-semibold text-fg">{r.company}</p>
-        <p className="truncate text-[12px] text-fg-tertiary">{r.meta}</p>
+        <p className={`truncate text-[15px] ${r.company ? 'font-semibold text-fg' : 'font-medium text-fg-tertiary'}`}>{r.company ?? t('termine.companyMissing')}</p>
+        <p className="truncate text-[13px] text-fg-secondary">{r.email}</p>
+        <p className="truncate text-[12px] text-fg-tertiary">{[r.dateLine, r.timeLine, minuten(r), thema(r)].filter(Boolean).join(' · ')}</p>
       </div>
       <div className="flex shrink-0 flex-col items-end gap-2">
         <div className="flex items-center gap-2">
@@ -105,7 +120,7 @@ export function LeadsPage() {
         open={!!dossierFor}
         onClose={() => setDossierFor(null)}
         eyebrow={t('termine.dossierEyebrow')}
-        title={dossierFor?.company ?? ''}
+        title={dossierFor ? (dossierFor.company ?? t('termine.companyMissing')) : ''}
       >
         {dossierFor && (
           <div className="space-y-4">

@@ -1995,7 +1995,8 @@
       "sentBody": "Wir zählen Anfragen je Markt, um zu entscheiden, wo die Abdeckung als Nächstes wächst. Einen Termin können wir nicht zusagen.",
       "notifyLabel": "Per E-Mail informieren, sobald {{market}} abgedeckt ist",
       "notifyHelp": "Wir schreiben Ihnen an {{email}}. Nur zu diesem Markt.",
-      "failed": "Ihre Anfrage konnte nicht gesendet werden. Bitte versuchen Sie es erneut."
+      "failed": "Ihre Anfrage konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
+      "guestMessage": "Fragen Sie diesen Markt an. Wir zählen Anfragen je Markt, um zu entscheiden, wo die Abdeckung als Nächstes wächst."
     }
   },
   "errorBoundary": {

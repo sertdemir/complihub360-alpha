@@ -586,10 +586,16 @@ paths:
         final_fee_cents, currency, payment_status, fee_enabled } | null`,
         `user_discount_pct`, `proposal { proposal_issued, discount_shown,
         reported_at } | null`, `acknowledgement_version`, `price_snapshot`.
+        Dazu aus der Anfrage des Nutzers an DIESEN Anbieter `user_company`
+        (structured_answers.company, sonst null), `category` und `country`
+        (roh, das UI uebersetzt). Die Identitaet ist mit der Buchung
+        freigegeben (Dossier-Regel); eine Anfrage an einen anderen Anbieter
+        fliesst nie ein.
       security: [ { bearerAuth: [] } ]
       parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
       responses:
-        '200': { description: "bookings[]" }
+        '200': { description: "`{ ok, providerKey, bookings[] }`" }
+        '404': { description: Kein Mitglied dieses Anbieters }
 
   /provider/{key}/bookings/{id}/proposal:
     patch:
@@ -980,7 +986,9 @@ paths:
       description: >-
         Je Termin `public_ref`, `provider_name` (Klarname erst bei
         `identity_revealed`, sonst "Verified Provider"), `provider_descriptor`
-        (Bereiche · Region), `provider_website` erst nach Offenlegung.
+        (Bereiche · Region, englische Taxonomie-Namen), `provider_area_codes`
+        (dieselben Bereiche als Codes, das UI uebersetzt sie), `provider_website`
+        erst nach Offenlegung.
       security: [ { bearerAuth: [] } ]
       responses:
         '200': { description: Termine }
@@ -1149,6 +1157,8 @@ components:
         title: { type: string, example: Verified Provider B }
         letter: { type: string, example: B, description: Position in DIESER Liste; nicht ueber Sitzungen stabil. }
         descriptor: { type: string, example: 'Tax and VAT · Norditalien', description: Freigegebene Bereiche und Region — vom System, nie vom Anbieter. }
+        area_codes: { type: array, items: { type: string }, example: [tax-vat], description: Die Bereiche der Beschreibung als Codes — das UI zeigt sie in der Sprache des Nutzers. }
+        descriptor_region: { type: string, nullable: true, description: Region der Beschreibung (hat den Identitaets-Scan passiert). }
         region: { type: string, nullable: true }
         active_since: { type: integer, nullable: true }
         specializations: { type: array, items: { type: string } }

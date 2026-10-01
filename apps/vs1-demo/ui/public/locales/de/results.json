@@ -154,7 +154,14 @@
     "slotsAll": "Alle Termine dieser Woche",
     "lageAreaYes": "Deckt {{area}} ab",
     "lageAreaNo": "Deckt {{area}} nicht ab",
-    "drawerBookNote": "Kostenloses Erstgespräch · 30 Min · Identität nach der Buchung sichtbar"
+    "drawerBookNote": "Kostenloses Erstgespräch · 30 Min · Identität nach der Buchung sichtbar",
+    "yourAppointment": "Ihr Termin",
+    "appointmentMeta": "{{minutes}} Min. · bestätigt",
+    "appointmentConfirmed": "bestätigt",
+    "toAppointments": "Zu Ihren Terminen",
+    "bookAnother": "Weiteren Termin buchen",
+    "revealedTitle": "Name und Kontakt sind freigegeben.",
+    "revealedBody": "Seit Ihrer Buchung sehen Sie, wer dieser Anbieter ist."
   },
   "schedule": {
     "back": "Zurück zum Profil",
@@ -311,7 +318,8 @@
     "copyLabel": "Kopie von {{label}}",
     "bookedOn": "Termin {{when}}",
     "providerBooked": "Termin ansehen",
-    "booked": "Gebucht"
+    "booked": "Gebucht",
+    "providersEyebrow": "Verified Provider"
   },
   "rankBasis": {
     "group": "Geprüft und gemessen",
