@@ -311,7 +311,8 @@
     "copyLabel": "{{label}} kopyası",
     "bookedOn": "Randevu {{when}}",
     "providerBooked": "Randevuyu gör",
-    "booked": "Alındı"
+    "booked": "Alındı",
+    "providersEyebrow": "Verified Provider’lar"
   },
   "rankBasis": {
     "group": "Doğrulandı ve ölçüldü",

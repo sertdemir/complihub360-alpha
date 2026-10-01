@@ -421,6 +421,9 @@ describe('ResultsRiskMap when no requested market can be checked', () => {
 
     expect(await screen.findByRole('heading', { level: 1, name: 'common:states.marketUnavailable.heading' })).toBeInTheDocument();
     expect(screen.queryByText('common:states.noRequirements.heading')).not.toBeInTheDocument();
+    // G2: a guest has no update to choose, so the sentence does not offer one.
+    expect(screen.getByText('common:states.marketRequest.guestMessage')).toBeInTheDocument();
+    expect(screen.queryByText('common:states.marketUnavailable.message')).not.toBeInTheDocument();
     const box = screen.getByRole('region', { name: 'common:states.scope.triedToAssess' });
     expect(within(box).getByText('Brazil')).toBeInTheDocument();
     expect(within(box).getByText('Argentina')).toBeInTheDocument();
@@ -503,6 +506,31 @@ describe('ResultsRiskMap when no requested market can be checked', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'common:states.actions.requestThisMarket' }));
     expect(requestMarket).toHaveBeenCalledWith({ market: 'BR', domains: [], notify: false, asGuest: true, locale: 'en' });
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+  });
+
+  it('keeps the approved sentence for an account and shows no providers for an unchecked market (H3)', async () => {
+    auth.isLoggedIn = true;
+    auth.user = { email: 'jm@example.com' };
+    setProfile({ country: 'BR', categories: ['tax-vat'] });
+    runSearch.mockResolvedValue({ providers: [prov('alpha', 100), prov('beta', 87)], laws: [] });
+    renderPage();
+
+    expect(await screen.findByText('common:states.marketUnavailable.message')).toBeInTheDocument();
+    expect(screen.queryByText('common:states.marketRequest.guestMessage')).not.toBeInTheDocument();
+    // Providers that cover none of the requested markets are no offer here.
+    expect(screen.queryByText('Verified Provider alpha')).not.toBeInTheDocument();
+    const col = screen.getByRole('region', { name: 'common:states.noProviderMatch.heading' });
+    expect(within(col).getByText('common:states.noProviderMatch.message')).toBeInTheDocument();
+  });
+
+  it('still lists providers for an account when a market was checked', async () => {
+    auth.isLoggedIn = true;
+    setProfile({ country: 'DE', categories: ['tax-vat'] });
+    runSearch.mockResolvedValue({ providers: [prov('alpha', 100)], laws: [] });
+    renderPage();
+
+    expect(await screen.findByText('Verified Provider alpha')).toBeInTheDocument();
+    expect(screen.queryByText('common:states.noProviderMatch.heading')).not.toBeInTheDocument();
   });
 
   it('offers no update when the account has no address to send it to', async () => {

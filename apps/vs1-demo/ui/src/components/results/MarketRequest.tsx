@@ -253,3 +253,24 @@ export function MarketRequestCard({
     </section>
   );
 }
+
+/** H3 — die Anbieter-Spalte, wenn kein angefragter Markt geprueft wurde.
+ *  Abgenommener Zustand noProviderMatch statt Karten von Anbietern, die den
+ *  Markt nicht abdecken: die waeren ein Angebot fuer einen Bedarf, den wir
+ *  nicht festgestellt haben. Der Satz "You can request this market and
+ *  choose to be notified" stimmt seit dem Versand (PR #231). */
+export function NoVerifiedProvider() {
+  const { t } = useTranslation(['common', 'results']);
+  return (
+    <section
+      aria-label={t('common:states.noProviderMatch.heading')}
+      className="flex flex-col gap-2 rounded-2xl border border-dashed border-stroke bg-surface px-[22px] py-5"
+    >
+      <span className="text-body-2xs font-semibold uppercase tracking-[0.16em] text-fg-tertiary">
+        {t('results:snapshot.providersEyebrow')}
+      </span>
+      <h2 className="text-body font-bold leading-[1.35] text-fg">{t('common:states.noProviderMatch.heading')}</h2>
+      <p className="text-body-sm leading-[1.55] text-fg-secondary">{t('common:states.noProviderMatch.message')}</p>
+    </section>
+  );
+}
