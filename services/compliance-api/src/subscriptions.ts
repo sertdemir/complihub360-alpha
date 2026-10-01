@@ -38,14 +38,9 @@ const CADENCES: Cadence[] = ['monthly', 'annual'];
 // ─── Datums-Mathematik, rein und ohne Netz pruefbar ──────────────────────────
 
 /**
- * Das Ende der Periode, die am `start` beginnt: ein Monat bzw. zwoelf Monate
- * spaeter. Laeuft der Tag im Zielmonat nicht auf (31. Januar + 1 Monat), wird
- * auf den letzten Tag des Zielmonats gekuerzt — sonst spraenge der 31.01. auf
- * den 03.03. und die Periode waere laenger als ein Monat.
- *
- * Spec B: "Annual subscriptions charge ten months of the applicable monthly
- * price and provide twelve months of access." Die zehn Monate stehen im Preis
- * (`plan_catalog.annual_cents`), die zwoelf Monate hier.
+ * Verschiebt ein Datum um Monate. Laeuft der Tag im Zielmonat nicht auf
+ * (31. Januar + 1 Monat), wird auf den letzten Tag des Zielmonats gekuerzt —
+ * sonst spraenge der 31.01. auf den 03.03.
  */
 export function addMonths(dateIso: string, months: number): string {
     const [y, m, d] = dateIso.slice(0, 10).split('-').map(Number);
@@ -57,25 +52,64 @@ export function addMonths(dateIso: string, months: number): string {
     return `${ty}-${String(tm + 1).padStart(2, '0')}-${String(td).padStart(2, '0')}`;
 }
 
-export function periodEndFor(startIso: string, cadence: Cadence): string {
-    return addMonths(startIso, cadence === 'annual' ? 12 : 1);
+/**
+ * Das Ende des Zyklus, der am `start` beginnt — IMMER ein Monat, auch bei
+ * jaehrlicher Zahlweise.
+ *
+ * `current_period_*` ist der **Monatszyklus**, nicht die Abo-Laufzeit. Spec B:
+ * *"The counter resets on the monthly billing-cycle date and does not roll
+ * over."* Darum nennt Spec B in den Backend-Anforderungen die **renewal date**
+ * als eigenes Feld, und darum hat die Tabelle beides: `current_period_*` fuer
+ * den Zyklus, `renewal_date` fuer die Verlaengerung.
+ *
+ * Waere der Zyklus bei einem Jahresabo ein Jahr lang, bekaeme der Anbieter
+ * seine 3 bzw. 6 rabattierten Leads einmal im JAHR statt im Monat — zu seinen
+ * Lasten. Genau das hatte ich hier zuerst gebaut.
+ */
+export function cycleEndFor(startIso: string): string {
+    return addMonths(startIso, 1);
 }
 
 /**
- * Wie oft die Periode weiterzurollen ist, damit `today` wieder in ihr liegt.
- * Rein, damit auch der Fall "mehrere Perioden verpasst" pruefbar ist, ohne die
- * Uhr zu stellen. Null bedeutet: die Periode ist aktuell.
+ * Der naechste Verlaengerungstermin, gerechnet vom Beginn des Abos: beim
+ * Jahresabo der naechste Jahrestag, beim Monatsabo der naechste Monatstag.
+ *
+ * Vom Beginn aus gerechnet und nicht fortgeschrieben, damit der Termin auch
+ * nach einer Luecke im Watcher-Lauf stimmt und der Tag nicht durch
+ * wiederholtes Kuerzen nach vorne wandert.
+ *
+ * Spec B: "Annual subscriptions charge ten months of the applicable monthly
+ * price and provide twelve months of access." Die zehn Monate stehen im Preis
+ * (`plan_catalog.annual_cents`), die zwoelf Monate hier.
  */
-export function rollPeriod(
-    start: string, end: string, cadence: Cadence, today: string,
+export function renewalAfter(startedOn: string, cadence: Cadence, today: string): string {
+    const step = cadence === 'annual' ? 12 : 1;
+    const from = startedOn.slice(0, 10);
+    for (let k = 1; k <= 400; k++) {
+        const d = addMonths(from, step * k);
+        if (d > today) return d;
+    }
+    // Deckel erreicht: ueber 33 Jahre alt. Dann lieber der naechste Schritt ab
+    // heute als eine Zahl, die in der Vergangenheit liegt.
+    return addMonths(today, step);
+}
+
+/**
+ * Wie weit der Zyklus zu rollen ist, damit `today` wieder in ihm liegt — in
+ * Monatsschritten, unabhaengig von der Zahlweise. Rein, damit auch der Fall
+ * "mehrere Zyklen verpasst" pruefbar ist, ohne die Uhr zu stellen. Null
+ * bedeutet: der Zyklus ist aktuell.
+ */
+export function rollCycle(
+    start: string, end: string, today: string,
 ): { start: string; end: string } | null {
     let s = start.slice(0, 10), e = end.slice(0, 10);
     if (today < e) return null;
     // Deckel: 400 Monatsschritte sind ueber 33 Jahre — eine Zeile, die so alt
-    // ist, ist ein Datenfehler und keine Periode, die man nachrollt.
+    // ist, ist ein Datenfehler und kein Zyklus, den man nachrollt.
     for (let i = 0; i < 400 && today >= e; i++) {
         s = e;
-        e = periodEndFor(e, cadence);
+        e = cycleEndFor(e);
     }
     return today < e ? { start: s, end: e } : null;
 }
@@ -146,7 +180,10 @@ export async function startSubscription(
     if (await openRow(i.providerKey)) return { ok: false, code: 'SUBSCRIPTION_EXISTS' };
 
     const start = today();
-    const end = periodEndFor(start, i.cadence);
+    // Zwei verschiedene Termine: der Zyklus ist immer ein Monat (daran haengt
+    // der Rabattzaehler), die Verlaengerung richtet sich nach der Zahlweise.
+    const end = cycleEndFor(start);
+    const renewal = renewalAfter(start, i.cadence, start);
     const inserted = await supabaseApi.insert('provider_subscriptions', {
         provider_key: i.providerKey,
         plan_code: plan.code,
@@ -155,7 +192,7 @@ export async function startSubscription(
         status: 'active',
         current_period_start: start,
         current_period_end: end,
-        renewal_date: end,
+        renewal_date: renewal,
         source: i.source,
     });
     const row = Array.isArray(inserted) ? inserted[0] : inserted;
@@ -218,10 +255,10 @@ export async function endSubscription(
 }
 
 /**
- * Rollt abgelaufene Perioden weiter. Ohne das bliebe `current_period_end` fuer
- * immer in der Vergangenheit stehen — und weil `cycleStartFor` (billing.ts) den
- * Rabattzyklus am Periodenbeginn festmacht, wuerde der Zaehler der
- * Lead-Rabatte nie zuruecksetzen.
+ * Rollt abgelaufene Zyklen weiter und rechnet den Verlaengerungstermin nach.
+ * Ohne das bliebe `current_period_end` fuer immer in der Vergangenheit stehen —
+ * und weil `cycleStartFor` (billing.ts) den Rabattzyklus am Zyklusbeginn
+ * festmacht, wuerde der Zaehler der Lead-Rabatte nie zuruecksetzen.
  *
  * Nur ein Fortschreiben von Daten: kein Preis, keine Rechnung, keine
  * Verlaengerungsentscheidung. Die Rechnung stellt der Monatslauf.
@@ -235,13 +272,17 @@ export async function runSubscriptionPeriodTick(
     for (const row of rows) {
         if (row.ended_at || row.status === 'ended' || row.status === 'cancelled') continue;
         checked++;
-        const next = rollPeriod(String(row.current_period_start), String(row.current_period_end),
-            row.cadence === 'annual' ? 'annual' : 'monthly', day);
+        const next = rollCycle(String(row.current_period_start), String(row.current_period_end), day);
         if (!next) continue;
         // Shadow zaehlt, schreibt aber nicht — wie die uebrigen Waechter-Paesse.
         if (shadow) { rolled++; continue; }
+        const cadence: Cadence = row.cadence === 'annual' ? 'annual' : 'monthly';
         await supabaseApi.update('provider_subscriptions', { id: row.id }, {
-            current_period_start: next.start, current_period_end: next.end, renewal_date: next.end,
+            current_period_start: next.start, current_period_end: next.end,
+            // Der Verlaengerungstermin wird vom Abo-Beginn aus neu gerechnet,
+            // nicht vom Zyklus fortgeschrieben — beim Jahresabo liegt er elf
+            // Monatszyklen weiter als das Zyklusende.
+            renewal_date: renewalAfter(String(row.started_at), cadence, day),
         });
         await supabaseApi.insert('event_log', {
             type: 'provider_subscription_period_rolled',

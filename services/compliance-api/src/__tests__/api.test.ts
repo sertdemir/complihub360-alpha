@@ -2654,6 +2654,16 @@ describe('Watcher: Markt-Update', () => {
     });
 });
 
+/** Monatsschritt mit Kuerzung — spiegelt addMonths aus subscriptions.ts. */
+function addMonthsIso(dateIso: string, months: number): string {
+    const [y, m, d] = dateIso.slice(0, 10).split('-').map(Number);
+    const t = m - 1 + months;
+    const ty = y + Math.floor(t / 12);
+    const tm = ((t % 12) + 12) % 12;
+    const last = new Date(Date.UTC(ty, tm + 1, 0)).getUTCDate();
+    return `${ty}-${String(tm + 1).padStart(2, '0')}-${String(Math.min(d, last)).padStart(2, '0')}`;
+}
+
 // ─── Ein Abo kann entstehen (TKT-PROV-07) ────────────────────────────────────
 // Bis zum 2026-10-01 hatte `provider_subscriptions` keinen Schreiber: kein
 // Checkout, keine Admin-Zuweisung. Weil `billingReadiness` ein laufendes Abo
@@ -2686,8 +2696,8 @@ describe('Abo-Schreiber — Tarifwahl, Admin-Zuweisung, Periode', () => {
         // Der Stub setzt keine Spalten-Defaults: hier undefined, in Postgres
         // NULL. `openRow` prueft auf falsy, beides traegt.
         expect(row.ended_at ?? null).toBeNull();
-        // Die Periode ist einen Monat lang und das Ende ist auch das
-        // Verlaengerungsdatum — daran haengt der Rabattzyklus.
+        // Beim Monatsabo fallen Zyklusende und Verlaengerung zusammen; beim
+        // Jahresabo nicht (eigener Test unten).
         expect(row.current_period_end).toBe(row.renewal_date);
         expect(row.current_period_end > row.current_period_start).toBe(true);
 
@@ -2697,16 +2707,26 @@ describe('Abo-Schreiber — Tarifwahl, Admin-Zuweisung, Periode', () => {
         expect(db.event_log.map((e: any) => e.type)).toContain('provider_subscription_started');
     });
 
-    it('das Jahresabo laeuft zwoelf Monate — die zehn Monate stehen im Preis', async () => {
+    it('Jahresabo: der Zyklus bleibt ein MONAT, nur die Verlaengerung liegt ein Jahr weiter', async () => {
+        // Die erste Fassung dieses PRs hat hier einen ein Jahr langen Zyklus
+        // gesetzt. Weil `cycleStartFor` den Rabattzaehler am Zyklusbeginn
+        // festmacht, haette der Anbieter seine 15 % auf die ersten sechs Leads
+        // dann einmal im JAHR bekommen statt im Monat — zu seinen Lasten.
+        // Spec B: "The counter resets on the monthly billing-cycle date."
         seedProvider();
         seedPricing();
         const r = await api('/api/v1/provider/test-kanzlei/subscription', {
             method: 'POST', body: JSON.stringify({ plan_code: 'global', cadence: 'annual' }),
         });
         expect(r.status).toBe(201);
-        const { current_period_start: s, current_period_end: e } = db.provider_subscriptions[0];
-        expect(Number(e.slice(0, 4)) - Number(s.slice(0, 4))).toBe(1);
-        expect(e.slice(5)).toBe(s.slice(5));
+        const row = db.provider_subscriptions[0];
+        const { current_period_start: s, current_period_end: e, renewal_date: ren } = row;
+
+        // Zyklus: genau ein Monat.
+        expect(e).toBe(addMonthsIso(s, 1));
+        // Verlaengerung: ein Jahr — und damit NICHT das Zyklusende.
+        expect(ren).toBe(addMonthsIso(s, 12));
+        expect(ren).not.toBe(e);
     });
 
     it('ein zweites Abo wird abgelehnt — ein Tarifwechsel ist hier bewusst nicht moeglich', async () => {
@@ -2839,6 +2859,24 @@ describe('Abo-Schreiber — Tarifwahl, Admin-Zuweisung, Periode', () => {
         });
         expect(r.status).toBe(403);
         expect(db.provider_subscriptions ?? []).toHaveLength(0);
+    });
+
+    it('der Waechter-Pass rollt den Zyklus eines JAHRESabos monatlich weiter', async () => {
+        // Der Fall, der vorher falsch war: zwoelf Zyklen im Jahr, nicht einer.
+        // Der Verlaengerungstermin wird dabei vom Abo-Beginn aus gerechnet.
+        seedProvider();
+        seedPricing();
+        seedSubscription('test-kanzlei', 'global', {
+            cadence: 'annual', current_period_start: '2026-08-05', current_period_end: '2026-09-05',
+            started_at: '2026-08-05T00:00:00Z', renewal_date: '2027-08-05',
+        });
+        const { runSubscriptionPeriodTick } = await import('../subscriptions.js');
+        const r = await runSubscriptionPeriodTick(false, new Date('2026-11-20T00:00:00Z'));
+        expect(r.rolled).toBe(1);
+        expect(db.provider_subscriptions[0]).toMatchObject({
+            current_period_start: '2026-11-05', current_period_end: '2026-12-05',
+            renewal_date: '2027-08-05',
+        });
     });
 
     it('der Waechter-Pass rollt eine abgelaufene Periode weiter', async () => {

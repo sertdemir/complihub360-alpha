@@ -43,6 +43,38 @@ COMMENT ON COLUMN public.provider_subscriptions.source IS
   'Woher das Abo kommt: provider_self_serve (Tarifwahl im Portal) oder admin '
   '(Zuweisung durch CompliHub360). Reine Herkunft — entscheidet nichts.';
 
+-- ─── 3. Welcher Termin was bedeutet ─────────────────────────────────────────
+--
+-- Der bisherige Kommentar an `current_period_start` lautete "Der Zyklus, gegen
+-- den Rabattzaehler und Abo-Rechnung laufen" — und hat mich beim Bau dieses
+-- Schreibers in die Irre gefuehrt: ich hielt die Periode fuer die Abo-LAUFZEIT
+-- und setzte sie beim Jahresabo auf zwoelf Monate. Damit waere der
+-- Rabattzaehler einmal im Jahr zurueckgesetzt worden statt monatlich.
+--
+-- Zwei Gruende, dass es anders gemeint ist:
+--   * Spec B: "The counter resets on the monthly billing-cycle date and does
+--     not roll over" — der Zyklustermin ist monatlich.
+--   * Spec B nennt in den Backend-Anforderungen die "renewal date" als eigenes
+--     zu speicherndes Feld. Gaebe `current_period_end` die Verlaengerung an,
+--     waere `renewal_date` leer.
+--
+-- Die Abo-RECHNUNG laeuft uebrigens an keinem von beiden: handleBillingRun
+-- vergleicht die angefragte Periode mit dem Monat von `started_at`.
+
+COMMENT ON COLUMN public.provider_subscriptions.current_period_start IS
+  'Beginn des laufenden RABATT-Zyklus — immer ein Monat, auch bei jaehrlicher '
+  'Zahlweise (Spec B: "The counter resets on the monthly billing-cycle date"). '
+  'NICHT die Abo-Laufzeit; die steht in renewal_date.';
+
+COMMENT ON COLUMN public.provider_subscriptions.current_period_end IS
+  'Ende des laufenden Rabatt-Zyklus, exklusiv. Einen Monat nach dem Beginn, '
+  'unabhaengig von der Zahlweise. provider_discount_counter haengt daran.';
+
+COMMENT ON COLUMN public.provider_subscriptions.renewal_date IS
+  'Der naechste Verlaengerungstermin: beim Jahresabo der Jahrestag, beim '
+  'Monatsabo der Monatstag. Vom Abo-Beginn aus gerechnet, nicht vom Zyklus '
+  'fortgeschrieben. Spec B fuehrt die "renewal date" als eigenes Feld.';
+
 COMMENT ON COLUMN public.provider_subscriptions.stripe_subscription_id IS
   'Bleibt heute leer. Die Abo-GEBUEHR laeuft NICHT ueber ein Stripe-Abo, '
   'sondern ueber den Monatslauf (POST /api/v1/admin/billing/run), der je '

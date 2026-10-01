@@ -222,7 +222,17 @@ export function subscriptionChargeForPeriod(sub: Subscription | null, plan: Plan
     return { label: `${plan.label} · annual (12 months for the price of 10) · from ${period}`, qty: 1, unit_cents: plan.annualCents, amount_cents: plan.annualCents };
 }
 
-/** Beginn des laufenden Rabatt-Zyklus: der Periodenbeginn des Abos, sonst der Monatserste. */
+/**
+ * Beginn des laufenden Rabatt-Zyklus: der Zyklusbeginn des Abos, sonst der
+ * Monatserste.
+ *
+ * `current_period_start` ist der MONATS-Zyklus, auch bei jaehrlicher Zahlweise
+ * (Spec B: "The counter resets on the monthly billing-cycle date and does not
+ * roll over"). Die Verlaengerung steht in `renewal_date`. Gepflegt wird der
+ * Zyklus von `runSubscriptionPeriodTick` (subscriptions.ts); wer ihn je auf die
+ * Abo-Laufzeit setzt, gibt dem Anbieter seine rabattierten Leads einmal im
+ * Jahr statt im Monat.
+ */
 export function cycleStartFor(sub: Subscription | null, today: Date): string {
     if (sub) return sub.currentPeriodStart;
     return today.toISOString().slice(0, 8) + '01';

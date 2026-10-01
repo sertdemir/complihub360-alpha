@@ -101,10 +101,59 @@ vergleicht die Pfadsegmente. Der Test sagt selbst, was er beweist (jedes in
 Route wirklich trifft — das prüft die 404-Tabelle in `api.test.ts` Route für
 Route, jetzt um beide Abo-Routen erweitert).
 
+## Korrektur: der Rabattzyklus — ich hatte es zuerst umgedreht
+
+Die erste Fassung dieses Tickets meldete einen Fehler in `cycleStartFor`
+(`billing.ts`): der Rabattzyklus hänge am Abo-Periodenbeginn, bei einem
+Jahresabo also an einem Jahr. **Das war falsch, und der Fehler war meiner.**
+
+Was mich in die Irre geführt hat, war der Spaltenkommentar in
+`20260923000000`: *„Der Zyklus, gegen den Rabattzähler und Abo-Rechnung
+laufen."* Ich las „Periode" als Abo-**Laufzeit** und setzte sie beim Jahresabo
+auf zwölf Monate. Damit hätte der Zähler einmal im Jahr zurückgesetzt — der
+Anbieter hätte seine 3 bzw. 6 rabattierten Leads **pro Jahr** bekommen statt
+pro Monat. Genau den Schaden, den ich gemeldet hatte, hätte ich eingebaut.
+
+Drei Belege, dass die Spalten anders gemeint sind:
+
+1. **Spec B, wörtlich:** *„The counter resets on the **monthly billing-cycle
+   date** and does not roll over."* Es gibt einen monatlichen Zyklustermin.
+2. **Spec B, Backend-Anforderungen:** dort steht die *„renewal date"* als
+   eigenes zu speicherndes Feld. Gäbe `current_period_end` die Verlängerung an,
+   wäre `renewal_date` leer — und genau das hatte meine erste Fassung getan
+   (`renewal_date = current_period_end`).
+3. **Die zwei Zeilen, die es auf Staging schon gibt** (von Hand angelegt, nicht
+   aus Repo-Code): `schmidt-partner` ist **jährlich**, hat aber
+   `current_period_end` einen **Monat** nach Beginn und `renewal_date`
+   `2027-08-05`, ein Jahr nach `started_at`. `studio-bianchi` ist monatlich,
+   dort fallen beide zusammen. Beide passen genau auf die Regel unten.
+
+Deshalb jetzt zwei getrennte Termine:
+
+| Feld | Bedeutung | Länge |
+|---|---|---|
+| `current_period_start` / `_end` | der **Rabatt**-Zyklus, daran hängt `provider_discount_counter` | **immer ein Monat**, bei jeder Zahlweise |
+| `renewal_date` | der Verlängerungstermin | Jahresabo ein Jahr, Monatsabo ein Monat |
+
+Im Code: `cycleEndFor(start)` (ohne Zahlweise) und
+`renewalAfter(startedOn, cadence, today)` — letzteres rechnet vom **Abo-Beginn**
+und nicht vom letzten Termin, damit der Tag nach einer Lücke im Watcher-Lauf
+stimmt und nicht durch wiederholtes Kürzen nach vorne wandert. Der Watcher rollt
+den Zyklus in Monatsschritten, unabhängig von der Zahlweise.
+
+`cycleStartFor` selbst bleibt **unverändert** — es war richtig. Die
+Spaltenkommentare sagen jetzt, was welcher Termin bedeutet, und an
+`cycleStartFor` steht, was passiert, wenn jemand den Zyklus doch auf die
+Laufzeit setzt.
+
+Die Abo-**Rechnung** läuft übrigens an keinem der beiden Termine:
+`handleBillingRun` vergleicht die angefragte Periode mit dem Monat von
+`started_at`. Der alte Spaltenkommentar behauptete das Gegenteil.
+
 ## Geprüft
 
 `typecheck` · UI-`tsc` · `i18n:check` · `terminology:check` · `build` grün.
-**350 API-Tests** (davon 12 reine Datums-Tests und 3 Guard-Tests),
+**354 API-Tests** (davon 15 reine Datums-Tests und 3 Guard-Tests),
 **259 UI-Tests**, **173 DB-Checks** (`Result: PASS`, davon 9 neu).
 
 Gegenproben gefahren:
@@ -162,19 +211,10 @@ Nicht berührt: Risk Map, Wizard, Ranking, AI-Verhalten, Provider-Policies.
 
 ## Offen
 
-1. **Der Rabattzyklus eines Jahresabos ist zu lang.** Spec B sagt „10% on first
-   3 **monthly** leads" und „Unused **monthly** lead discounts do not roll
-   over" — der Zyklus ist monatlich. `cycleStartFor` (`billing.ts`) nimmt aber
-   den **Abo**-Periodenbeginn: bei einem Jahresabo ist das ein Jahr, der
-   Anbieter bekäme 3 bzw. 6 rabattierte Leads **pro Jahr** statt pro Monat.
-   Das ist zu Lasten des Anbieters und älter als dieser PR. **Nicht hier
-   geändert** — es greift in den Lead-Belastungspfad aus #234 und gehört in
-   einen eigenen, gezielten PR. Vorher nicht aufgefallen, weil es noch kein
-   einziges Abo gab.
-2. **Kein Weg für die Tarifwahl in der Oberfläche.** Der UI-Workflow verlangt
+1. **Kein Weg für die Tarifwahl in der Oberfläche.** Der UI-Workflow verlangt
    Canvas → Figma → lokal → Staging; ein Tarifwahl-Screen ist ein neuer Screen
    und wartet auf diesen Weg. Die Routen stehen.
-3. **Die Kulanzfrist** aus TKT-PROV-06 ist weiter offen und steht faktisch auf
+2. **Die Kulanzfrist** aus TKT-PROV-06 ist weiter offen und steht faktisch auf
    null.
-4. **Tarifwechsel und Kündigung durch den Anbieter selbst** — erst nach den
+3. **Tarifwechsel und Kündigung durch den Anbieter selbst** — erst nach den
    Entscheidungen, die Spec B reserviert.
