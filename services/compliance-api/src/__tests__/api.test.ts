@@ -2630,6 +2630,29 @@ describe('Watcher: Markt-Update', () => {
         expect(en.text).toContain('/en/wizard');
         expect(en.text).toContain('This is the only email we send about this request.');
         expect(renderMarketCoveredMail('BR', 'tr').subject).toBe('Brezilya artık CompliHub360\'ta kapsanıyor');
+        // Abgenommen 01.10.2026 (Nutzer, nach der echten Mail auf Staging):
+        // wortgleich halten — eine Aenderung braucht eine neue Abnahme.
+        const url = (loc: string) => `${(process.env.PUBLIC_APP_URL || 'https://staging.complihub360.com').replace(/\/$/, '')}/${loc}/wizard`;
+        expect(en.text).toBe([
+            'You asked us to let you know when we cover Brazil. We do now.',
+            '',
+            'You can create a Risk Map for Brazil and see which requirements may apply to your business.',
+            '',
+            `→ Create a Risk Map: ${url('en')}`,
+            '',
+            'This is the only email we send about this request.',
+        ].join('\n'));
+        const de = renderMarketCoveredMail('DE', 'de');
+        expect(de.subject).toBe('Deutschland ist jetzt auf CompliHub360 abgedeckt');
+        expect(de.text).toBe([
+            'Sie hatten uns gebeten, Ihnen Bescheid zu geben, sobald wir Deutschland abdecken. Das ist jetzt der Fall.',
+            '',
+            'Sie können eine Risk Map für Deutschland erstellen und sehen, welche Anforderungen für Ihr Unternehmen gelten können.',
+            '',
+            `→ Risk Map erstellen: ${url('de')}`,
+            '',
+            'Dies ist die einzige E-Mail, die wir zu dieser Anfrage senden.',
+        ].join('\n'));
         expect(renderMarketCoveredMail('BR', 'xx').subject).toBe(en.subject);
     });
 
