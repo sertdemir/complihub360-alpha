@@ -40,7 +40,7 @@ Drei Fragen ließ die Spec offen, und an ihnen unterscheidet sich die Arbeit mat
 
 ## Consequences
 
-- `scheduling` trägt nach jeder Buchung `price_snapshot`, `shared_fields`, `sharing_confirmed_at`, `acknowledgement_version`, `lead_ledger_id`, `user_discount_pct`. Die Checklisten-Tests „Audit record" und „Data minimization" sind beweisbar: `shared_fields` ist dieselbe Liste, die die Fassung nennt (pgTAP 08 und API-Test halten das fest).
+- `scheduling` trägt nach jeder Buchung `price_snapshot`, `shared_fields`, `sharing_confirmed_at`, `acknowledgement_version`, `lead_ledger_id`, `user_discount_pct`. Die Checklisten-Tests „Audit record" und „Data minimization" sind beweisbar: `shared_fields` ist dieselbe Liste, die die Fassung nennt (pgTAP 09 und API-Test halten das fest).
 - Der Nutzer-Draht trägt kein Band, keine Gebühr, kein Ledger, kein Stripe-Feld (Leak-Guard-Test). `user_discount {pct, policy_version}` ist das einzige Geldwort, das ihn erreicht — es ist sein Rabatt.
 - `handleBillingPreview` zählt nur Ledger-Zeilen mit wirksamem Status `captured` oder `n/a`; gescheiterte stehen im Ledger, nicht in der Summe. Die Antwort trägt `readiness`.
 - Der erste Live-Tick des Readiness-Watchers setzt jeden Anbieter ohne Karte, Abo oder Mandat auf `billing_ready = false`. Auf Staging sind das heute alle vier. Das ist gewollt und sichtbar zu machen: Shadow zuerst, dann die Anbieter über das Portal und `billing/sync` nachziehen.

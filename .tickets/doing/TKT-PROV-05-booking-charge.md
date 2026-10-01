@@ -49,7 +49,7 @@ lokal; Staging nach dem Review des Nutzers).
   `undecided`), `lead_proposal_reports`, `scheduling` +
   `acknowledgement_version`, `lead_ledger_id`, `user_discount_pct`,
   `user_discount_policy_version`, Partial Unique Index auf bestätigte Slots;
-  `providers` + `billing_synced_at`, `last_payment_failure`. pgTAP 08.
+  `providers` + `billing_synced_at`, `last_payment_failure`. pgTAP 09.
 - [ ] `billingReadiness()` rein mit den sechs §21.1-Gründen plus
   `payment_failed`; `handleBillingPreview` zählt nur `captured`/`n/a` und
   trägt `readiness`.

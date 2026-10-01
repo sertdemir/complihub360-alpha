@@ -82,6 +82,11 @@ paths:
         Anfragendem und Markt, eine Wiederholung aktualisiert sie. Ein Update zur
         Verfuegbarkeit (`notify`) gibt es nur mit Konto; fuer Gaeste wird keine
         E-Mail gespeichert.
+
+        Versand: Sobald die Engine den Markt prueft, schickt der Watcher je
+        Zeile mit `notify` genau eine Mail an die bestaetigte Adresse des
+        Kontos (aus `auth.users`, erst beim Versand gelesen) und setzt
+        `notified_at`.
       parameters:
         - $ref: '#/components/parameters/CorrelationId'
       requestBody:
@@ -110,6 +115,13 @@ paths:
                   type: boolean
                   default: false
                   description: Update per Mail, sobald der Markt abgedeckt ist — nur mit Konto
+                locale:
+                  type: string
+                  enum: [en, de, es, tr]
+                  description: >-
+                    Sprache des Updates (Seiten-Sprache). Regionale Tags wie
+                    `de-DE` werden gekuerzt, andere Sprachen verworfen — der
+                    Mailer schreibt dann Englisch.
       responses:
         '200':
           description: Anfrage gespeichert (neu oder aktualisiert)
