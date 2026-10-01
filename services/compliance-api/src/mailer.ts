@@ -894,3 +894,92 @@ export async function sendVerificationMail(p: {
         } catch { /* double fault */ }
     }
 }
+
+// ─── Markt-Update (market_requests.notify) ────────────────────────────────────
+// "Email me when <market> is covered" (Risk Map F3). Genau eine Mail je
+// Anfrage; der Watcher (runMarketCoverageTick) setzt vorher notified_at.
+//
+// DNA: Information, kein Verkauf. Kein "jetzt schnell", kein Upsell, keine
+// Behauptung ueber Pflichten ("may apply"). Der Schlusssatz sagt, dass es bei
+// dieser einen Mail bleibt — ein Abschalten gibt es nicht und braucht es
+// nicht. Copy noch nicht abgenommen (TKT-MU-01).
+
+const MARKET_COVERED_STRINGS: Record<MailLocale, { subject: string; body: string; cta: string; once: string }> = {
+    en: {
+        subject: '{market} is now covered on CompliHub360',
+        body: 'You asked us to let you know when we cover {market}. We do now.\n\nYou can create a Risk Map for {market} and see which requirements may apply to your business.',
+        cta: 'Create a Risk Map',
+        once: 'This is the only email we send about this request.',
+    },
+    de: {
+        subject: '{market} ist jetzt auf CompliHub360 abgedeckt',
+        body: 'Sie hatten uns gebeten, Ihnen Bescheid zu geben, sobald wir {market} abdecken. Das ist jetzt der Fall.\n\nSie können eine Risk Map für {market} erstellen und sehen, welche Anforderungen für Ihr Unternehmen gelten können.',
+        cta: 'Risk Map erstellen',
+        once: 'Dies ist die einzige E-Mail, die wir zu dieser Anfrage senden.',
+    },
+    es: {
+        subject: '{market} ya tiene cobertura en CompliHub360',
+        body: 'Nos pidió que le avisáramos cuando cubriéramos {market}. Ya es así.\n\nPuede crear un Risk Map para {market} y ver qué requisitos pueden aplicarse a su empresa.',
+        cta: 'Crear un Risk Map',
+        once: 'Este es el único correo que le enviaremos sobre esta solicitud.',
+    },
+    tr: {
+        subject: '{market} artık CompliHub360\'ta kapsanıyor',
+        body: '{market} kapsandığında size haber vermemizi istemiştiniz. Artık kapsıyoruz.\n\n{market} için bir Risk Map oluşturabilir ve işletmeniz için hangi gerekliliklerin geçerli olabileceğini görebilirsiniz.',
+        cta: 'Risk Map oluşturun',
+        once: 'Bu talep hakkında göndereceğimiz tek e-posta budur.',
+    },
+};
+
+/** Betreff und Text des Markt-Updates, in der Sprache der Anfrage. Exportiert
+ *  fuer die Tests — sie pruefen, was tatsaechlich im Postfach landet. */
+export function renderMarketCoveredMail(market: string, locale?: string | null): { subject: string; text: string } {
+    const loc = resolveLocale(locale ?? undefined);
+    const t = MARKET_COVERED_STRINGS[loc];
+    let name = market;
+    try { name = new Intl.DisplayNames([loc], { type: 'region' }).of(market) ?? market; } catch { /* Code statt Name */ }
+    const fill = (s: string) => s.split('{market}').join(name);
+    const url = `${PUBLIC_APP_URL}/${loc}/wizard`;
+    return { subject: fill(t.subject), text: [fill(t.body), ``, `→ ${t.cta}: ${url}`, ``, t.once].join('\n') };
+}
+
+export async function sendMarketCoveredMail(p: {
+    to: string | null;
+    requestId: string;
+    market: string;
+    locale?: string | null;
+}): Promise<void> {
+    const { subject, text } = renderMarketCoveredMail(p.market, p.locale);
+    const kind = 'market_covered';
+    const apiKey = process.env.RESEND_API_KEY;
+    try {
+        if (!p.to) {
+            await supabaseApi.insert('event_log', { type: 'email_skipped_no_address', payload: { requestId: p.requestId, market: p.market, kind } });
+            return;
+        }
+        if (!apiKey) {
+            await supabaseApi.insert('event_log', {
+                type: 'email_outbox',
+                payload: { requestId: p.requestId, market: p.market, to: p.to, subject, text, mode: 'log-only', kind },
+            });
+            return;
+        }
+        const res = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ from: MAIL_FROM, to: [p.to], subject, text }),
+        });
+        const body = await res.json().catch(() => ({}));
+        await supabaseApi.insert('event_log', {
+            type: res.ok ? 'email_sent' : 'email_failed',
+            payload: { requestId: p.requestId, market: p.market, to: p.to, subject, providerId: (body as { id?: string }).id, status: res.status, kind },
+        });
+    } catch (err) {
+        structuredLog('error', 'Market covered mail failed', {
+            correlationId: 'watchers', route: 'mailer', severity: 'error', errorCode: 'ERR_MAIL',
+        });
+        try {
+            await supabaseApi.insert('event_log', { type: 'email_failed', payload: { requestId: p.requestId, market: p.market, to: p.to, error: String(err), kind } });
+        } catch { /* double fault */ }
+    }
+}

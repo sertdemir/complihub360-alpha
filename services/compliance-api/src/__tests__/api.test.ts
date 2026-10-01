@@ -81,6 +81,11 @@ vi.mock('../supabase.js', () => ({
                 // Genau eine, oder keine — wie die SQL-Funktion.
                 return treffer.length === 1 ? treffer[0].id : null;
             }
+            // Gegenstueck aus 20261001000000: nur bestaetigte, lebende Logins.
+            if (fn === 'auth_user_email_by_id') {
+                const u = (db.auth_users ?? []).find((x) => x.id === params.p_user_id && !x.deleted_at && x.email_confirmed_at);
+                return u ? u.email : null;
+            }
             throw new Error(`unmocked rpc in test store: ${fn}`);
         },
     },
@@ -2181,10 +2186,134 @@ describe('POST /api/v1/market-requests', () => {
         expect((db.market_requests ?? [])[0].domains).toEqual(['tax-vat']);
     });
 
+    it('keeps the language of the request for the update, and only the four we write', async () => {
+        await post({ market: 'AR', notify: true, locale: 'de-DE' }, 'jwt');
+        await post({ market: 'BR', notify: true, locale: 'fr' }, 'jwt');
+        const byMarket = Object.fromEntries((db.market_requests ?? []).map((r) => [r.market, r.locale]));
+        expect(byMarket).toEqual({ AR: 'de', BR: null });
+    });
+
     it('answers broken JSON with 400 and a reference', async () => {
         const res = await api('/api/v1/market-requests', { method: 'POST', auth: 'none', body: '{broken' });
         expect(res.status).toBe(400);
         expect(res.body.errorCode).toBe('INVALID_JSON');
         expect(typeof res.body.correlationId).toBe('string');
+    });
+});
+
+// ─── Markt-Update: der Versand (Watcher) ─────────────────────────────────────
+// "Email me when <market> is covered" (F3). Abgedeckt heisst: die Engine hat ein
+// Laenderprofil. BR hat keins, DE schon — eine DE-Zeile steht hier fuer einen
+// Markt, der nach der Anfrage in die Engine gekommen ist (ueber die API laesst
+// sie sich nicht anlegen, die antwortet 409).
+
+describe('Watcher: Markt-Update', () => {
+    const OTHER = '00000000-0000-4000-8000-0000000000b2';
+    const seed = () => {
+        db.auth_users = [
+            { id: USER_ID, email: 'jana@example.com', email_confirmed_at: '2026-09-01T00:00:00Z' },
+            { id: OTHER, email: 'offen@example.com', email_confirmed_at: null },
+        ];
+        db.market_requests = [
+            { id: 'mr-de', requester_key: `user:${USER_ID}`, user_id: USER_ID, guest_key: null, market: 'DE', notify: true, notified_at: null, locale: 'de' },
+            { id: 'mr-br', requester_key: `user:${USER_ID}`, user_id: USER_ID, guest_key: null, market: 'BR', notify: true, notified_at: null, locale: 'de' },
+            { id: 'mr-nl-no', requester_key: `user:${USER_ID}`, user_id: USER_ID, guest_key: null, market: 'NL', notify: false, notified_at: null, locale: null },
+            { id: 'mr-nl-guest', requester_key: 'guest:guest-abc-123', user_id: null, guest_key: 'guest-abc-123', market: 'NL', notify: false, notified_at: null, locale: null },
+        ];
+    };
+    const tick = () => api('/api/v1/admin/watchers/tick', { method: 'POST', body: '{}' });
+    const mails = () => (db.event_log ?? []).filter((e) => e.payload?.kind === 'market_covered');
+
+    it('mails once, in the language of the request, only for a covered market someone asked an update for', async () => {
+        seed();
+        process.env.WATCHERS_SHADOW = 'false';
+        try {
+            const r1 = await tick();
+            expect(r1.body.summary.marketCoveredNotices).toBe(1);
+            const sent = mails();
+            expect(sent).toHaveLength(1);
+            expect(sent[0].type).toBe('email_outbox');
+            expect(sent[0].payload).toMatchObject({ requestId: 'mr-de', market: 'DE', to: 'jana@example.com' });
+            expect(sent[0].payload.subject).toBe('Deutschland ist jetzt auf CompliHub360 abgedeckt');
+            expect(sent[0].payload.text).toContain('/de/wizard');
+            expect(db.market_requests.find((r: any) => r.id === 'mr-de').notified_at).toBeTruthy();
+            // Nicht abgedeckt, kein Update gewuenscht, Gast: nichts.
+            for (const id of ['mr-br', 'mr-nl-no', 'mr-nl-guest']) {
+                expect(db.market_requests.find((r: any) => r.id === id).notified_at).toBeNull();
+            }
+            const r2 = await tick();
+            expect(r2.body.summary.marketCoveredNotices).toBe(0);
+            expect(mails()).toHaveLength(1);
+        } finally {
+            delete process.env.WATCHERS_SHADOW;
+        }
+    });
+
+    it('does not mail a row another tick has already claimed', async () => {
+        seed();
+        db.market_requests.find((r: any) => r.id === 'mr-de').notified_at = '2026-10-01T08:00:00Z';
+        process.env.WATCHERS_SHADOW = 'false';
+        try {
+            await tick();
+            expect(mails()).toHaveLength(0);
+        } finally {
+            delete process.env.WATCHERS_SHADOW;
+        }
+    });
+
+    it('sends one mail when two passes run at the same time (claim before send)', async () => {
+        seed();
+        const { runMarketCoverageTick } = await import('../watchers.js');
+        const { supabaseApi } = await import('../supabase.js');
+        // Der Testspeicher gibt Objekt-Referenzen heraus; eine echte Datenbank
+        // liefert einen Schnappschuss. Ohne Kopie saehe der zweite Durchlauf
+        // die Aenderung des ersten und der Claim bliebe ungeprueft.
+        const original = supabaseApi.select.bind(supabaseApi);
+        const spy = vi.spyOn(supabaseApi, 'select').mockImplementation(async (...args: Parameters<typeof original>) =>
+            JSON.parse(JSON.stringify(await original(...args))));
+        try {
+            // Beide lesen dieselbe offene Zeile; nur einer bekommt den Claim.
+            const [a, b] = await Promise.all([runMarketCoverageTick(false), runMarketCoverageTick(false)]);
+            expect(a.notices + b.notices).toBe(1);
+            expect(mails()).toHaveLength(1);
+        } finally {
+            spy.mockRestore();
+        }
+    });
+
+    it('writes to no unconfirmed address — and does not try again', async () => {
+        seed();
+        db.market_requests = [{ id: 'mr-x', requester_key: `user:${OTHER}`, user_id: OTHER, guest_key: null, market: 'DE', notify: true, notified_at: null, locale: null }];
+        process.env.WATCHERS_SHADOW = 'false';
+        try {
+            await tick();
+            await tick();
+            const ev = mails();
+            expect(ev).toHaveLength(1);
+            expect(ev[0].type).toBe('email_skipped_no_address');
+            expect(JSON.stringify(ev[0].payload)).not.toContain('offen@example.com');
+        } finally {
+            delete process.env.WATCHERS_SHADOW;
+        }
+    });
+
+    it('says what happened and what is possible now — no pressure, one mail only', async () => {
+        const { renderMarketCoveredMail } = await import('../mailer.js');
+        const en = renderMarketCoveredMail('BR', null);
+        expect(en.subject).toBe('Brazil is now covered on CompliHub360');
+        expect(en.text).toContain('which requirements may apply');
+        expect(en.text).toContain('/en/wizard');
+        expect(en.text).toContain('This is the only email we send about this request.');
+        expect(renderMarketCoveredMail('BR', 'tr').subject).toBe('Brezilya artık CompliHub360\'ta kapsanıyor');
+        expect(renderMarketCoveredMail('BR', 'xx').subject).toBe(en.subject);
+    });
+
+    it('in shadow mode only marks — no mail, the row stays open', async () => {
+        seed();
+        await tick();
+        await tick();
+        expect(mails()).toHaveLength(0);
+        expect((db.event_log ?? []).filter((e) => e.type === 'market_covered_notice_shadow')).toHaveLength(1);
+        expect(db.market_requests.find((r: any) => r.id === 'mr-de').notified_at).toBeNull();
     });
 });
