@@ -1,6 +1,7 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { structuredLog } from "@complihub360/types";
 import { supabaseApi } from "./supabase.js";
+import { stripeRequest } from "./stripe.js";
 import { DOMAIN_SLUGS, domainKnowledge, loadDomainSessions } from "./domain.js";
 import { jurisdictionChain, resolveFacts } from './jurisdiction.js';
 
@@ -57,18 +58,6 @@ async function isSubscriber(userKey: string | null): Promise<boolean> {
         return !row.current_period_end || new Date(row.current_period_end).getTime() + 24 * 60 * 60 * 1000 > Date.now();
     } catch { return false; }
 }
-
-const stripeForm = async (stripeKey: string, method: 'POST' | 'GET', path: string, params?: Record<string, string>) => {
-    const url = `https://api.stripe.com/v1/${path}${method === 'GET' && params ? `?${new URLSearchParams(params)}` : ''}`;
-    const resp = await fetch(url, {
-        method,
-        headers: { 'Authorization': `Bearer ${stripeKey}`, ...(method === 'POST' ? { 'Content-Type': 'application/x-www-form-urlencoded' } : {}) },
-        ...(method === 'POST' && params ? { body: new URLSearchParams(params).toString() } : {}),
-    });
-    const body = await resp.json() as Record<string, unknown> & { error?: { message?: string } };
-    if (!resp.ok) throw new Error(`Stripe ${path}: ${body.error?.message || resp.status}`);
-    return body;
-};
 
 async function embedQuery(apiKey: string, text: string): Promise<number[]> {
     const res = await fetch(`${GEMINI_BASE}/${EMBED_MODEL}:embedContent?key=${apiKey}`, {
@@ -297,7 +286,7 @@ export function handleAssistantCheckout(req: IncomingMessage, res: ServerRespons
             const returnPath = typeof d.return_path === 'string' && d.return_path.startsWith('/') && !d.return_path.startsWith('//')
                 ? d.return_path : '/en/dashboard';
             const glue = returnPath.includes('?') ? '&' : '?';
-            const session = await stripeForm(stripeKey, 'POST', 'checkout/sessions', {
+            const session = await stripeRequest('POST', 'checkout/sessions', {
                 mode: 'subscription',
                 // EUR to match the rest of the platform (provider billing is EUR).
                 'line_items[0][price_data][currency]': 'eur',
@@ -341,7 +330,7 @@ export function handleAssistantVerify(req: IncomingMessage, res: ServerResponse,
                 res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'session_id required', correlationId }));
                 return;
             }
-            const session = await stripeForm(stripeKey, 'GET', `checkout/sessions/${sessionId}`, { 'expand[]': 'subscription' }) as {
+            const session = await stripeRequest('GET', `checkout/sessions/${sessionId}`, { 'expand[]': 'subscription' }) as {
                 metadata?: { user_key?: string }; customer?: string; payment_status?: string;
                 subscription?: { id: string; status: string; current_period_end?: number; items?: { data?: Array<{ current_period_end?: number }> } } | null;
             };

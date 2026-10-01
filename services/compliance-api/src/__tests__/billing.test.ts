@@ -7,6 +7,7 @@ vi.mock('../supabase.js', () => ({ supabaseApi: {} }));
 import {
     annualPriceCents, computeLeadBand, applyMonthlyDiscount, categoryAllowanceCheck,
     leadFeeEnabled, subscriptionChargeForPeriod, quoteLeadFee, LEAD_FEE_POLICY_VERSION,
+    billingReadiness, resolveLedgerStatus,
     type PlanConfig, type BandRule, type PricingConfig, type Subscription,
 } from '../billing.js';
 
@@ -248,5 +249,44 @@ describe('quoteLeadFee — das Angebot, das die Buchung ausfuehrt', () => {
         expect(e.standardFeeCents).toBe(g.standardFeeCents);
         expect(e.finalFeeCents).toBe(9900);
         expect(g.finalFeeCents).toBe(8415);
+    });
+});
+
+// ─── Phase 4: Zahlungsbereitschaft und Ledger-Status ─────────────────────────
+
+describe('billingReadiness — die sechs Gruende aus §21.1 plus payment_failed', () => {
+    const alles = { hasDefaultPaymentMethod: true, billingInfoComplete: true, subscriptionStatus: 'active' as const, authorizationAccepted: true, overdueInvoices: 0, paused: false, lastPaymentFailed: false };
+    it('alles da: bereit, keine Gruende', () => {
+        expect(billingReadiness(alles)).toEqual({ ready: true, reasons: [] });
+    });
+    it('jeder Grund fuer sich', () => {
+        expect(billingReadiness({ ...alles, hasDefaultPaymentMethod: false }).reasons).toEqual(['no_payment_method']);
+        expect(billingReadiness({ ...alles, billingInfoComplete: false }).reasons).toEqual(['incomplete_billing_info']);
+        expect(billingReadiness({ ...alles, subscriptionStatus: null }).reasons).toEqual(['inactive_subscription']);
+        expect(billingReadiness({ ...alles, subscriptionStatus: 'ended' }).reasons).toEqual(['inactive_subscription']);
+        expect(billingReadiness({ ...alles, authorizationAccepted: false }).reasons).toEqual(['withdrawn_authorization']);
+        expect(billingReadiness({ ...alles, overdueInvoices: 2 }).reasons).toEqual(['overdue_invoice']);
+        expect(billingReadiness({ ...alles, paused: true }).reasons).toEqual(['account_paused']);
+        expect(billingReadiness({ ...alles, lastPaymentFailed: true }).reasons).toEqual(['payment_failed']);
+    });
+    it('past_due ist kein inaktives Abo — die ueberfaellige Rechnung ist der Grund', () => {
+        expect(billingReadiness({ ...alles, subscriptionStatus: 'past_due', overdueInvoices: 1 }).reasons).toEqual(['overdue_invoice']);
+    });
+    it('mehrere Gruende stehen alle da, in fester Reihenfolge', () => {
+        expect(billingReadiness({ ...alles, hasDefaultPaymentMethod: false, overdueInvoices: 1, lastPaymentFailed: true }))
+            .toEqual({ ready: false, reasons: ['no_payment_method', 'overdue_invoice', 'payment_failed'] });
+    });
+});
+
+describe('resolveLedgerStatus — das juengste Ereignis zaehlt', () => {
+    it('ohne Ereignisse der Stand beim Schreiben, ohne den auch: captured (Altbestand)', () => {
+        expect(resolveLedgerStatus({ payment_status: 'pending' }, [])).toBe('pending');
+        expect(resolveLedgerStatus({}, [])).toBe('captured');
+    });
+    it('mit Ereignissen das juengste, unabhaengig von der Reihenfolge der Eingabe', () => {
+        expect(resolveLedgerStatus({ payment_status: 'pending' }, [
+            { status: 'refunded', created_at: '2026-10-01T10:05:00Z' },
+            { status: 'captured', created_at: '2026-10-01T10:00:00Z' },
+        ])).toBe('refunded');
     });
 });
