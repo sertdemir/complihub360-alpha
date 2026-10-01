@@ -54,9 +54,13 @@ derselbe Punkt, der bei der Kulanzfrist aus TKT-PROV-06 noch offen ist.
 
 ## Was jetzt im Repo ist
 
-**Migration `20261001010000_subscription_writer.sql`** — Zeitstempel bewusst
-01:00, weil auf `main` schon zwei Migrationen mit `20261001000000` liegen und
-`version` im Ledger Primärschlüssel ist.
+**Migration `20261001190000_subscription_writer.sql`** — Zeitstempel bewusst
+**nach** `20261001184141_market_request_notify`. Dessen Version ist die, unter
+der es auf Staging schon eingespielt ist (#241 hat die Datei genau darauf
+umbenannt). Eine früher nummerierte Migration würde lokal **vor** ihm und auf
+Staging **danach** eingespielt — dieselbe Reihenfolge-Drift, die #241 gerade
+beseitigt hat. (Die erste Fassung dieses PRs nannte als Grund noch die
+Versionskollision `20261001000000`; die ist mit #241 behoben.)
 
 - `provider_review_log.subject` kennt `'subscription'`. Spec B: *„All sensitive
   actions create audit logs."* Ein Tarifwechsel gehört in die Historie, die der

@@ -8,9 +8,11 @@
 -- niemand buchbar. Die Tabelle selbst bleibt unveraendert richtig; es fehlten
 -- nur zwei Dinge am Rand.
 --
--- Zeitstempel bewusst 01:00 und nicht 00:00: auf `main` liegen bereits
--- 20261001000000_booking_charge.sql und 20261001000000_market_request_notify.sql
--- mit identischem Praefix. Im Ledger ist `version` Primaerschluessel.
+-- Zeitstempel bewusst nach 20261001184141_market_request_notify: dessen
+-- Version ist die, unter der es auf Staging schon eingespielt ist (#241). Eine
+-- frueher nummerierte Migration waere lokal VOR ihm eingespielt und auf
+-- Staging danach — dieselbe Reihenfolge-Drift, die #241 gerade beseitigt hat.
+-- Im Ledger ist `version` Primaerschluessel.
 --
 -- Was hier NICHT passiert: nichts an Preisen, nichts am Matching. Der
 -- pgTAP-Waechter aus 04_provider_pricing_test.sql (Test 28) haelt jede

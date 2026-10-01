@@ -1,6 +1,6 @@
 -- ─── Ein Abo kann entstehen: die Tabelle traegt den Schreiber ────────────────
 --
--- Gehoert zu 20261001010000_subscription_writer.sql. Geprueft wird:
+-- Gehoert zu 20261001190000_subscription_writer.sql. Geprueft wird:
 --
 --   1. Das Entscheidungsprotokoll nimmt 'subscription' an (und nichts Beliebiges).
 --   2. `source` ist Pflicht, hat einen Default und laesst nur zwei Werte zu.
