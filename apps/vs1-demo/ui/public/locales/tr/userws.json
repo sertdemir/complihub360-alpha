@@ -651,7 +651,13 @@
     },
     "tabUpcoming": "Yaklaşan",
     "tabPast": "Geçmiş",
-    "origin": "rezervasyondan önce „{{descriptor}}“ idi"
+    "origin": "rezervasyondan önce „{{descriptor}}“ idi",
+    "paused": {
+      "body": "Sağlayıcı bu hizmeti şu anda sunamıyor. Randevunuz kayıtlı kalmaya devam ediyor. Nasıl devam edileceği netleşir netleşmez size döneceğiz.",
+      "short": "Sağlayıcı bu hizmeti şu anda sunamıyor. Ayrıntılar aşağıda.",
+      "cancel": "Randevuyu ücretsiz iptal et",
+      "talk": "Bizimle konuşun"
+    }
   },
   "review": {
     "eyebrow": "DEĞERLENDİRME",

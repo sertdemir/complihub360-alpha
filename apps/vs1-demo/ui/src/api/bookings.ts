@@ -26,6 +26,8 @@ export interface UserBooking {
   slotEnd: string | null;
   status: BookingStatus;
   message: string | null;
+  /** Canvas F V1: der Anbieter hat die Leistung dieses Termins nach einem wesentlichen Ereignis pausiert. */
+  providerPaused: boolean;
 }
 
 interface ApiBookingRow {
@@ -41,6 +43,7 @@ interface ApiBookingRow {
   slot_end: string | null;
   status: BookingStatus;
   message: string | null;
+  provider_paused?: boolean;
 }
 
 // Affiliate 1b: the counted outclick URL to a provider's website. The server
@@ -59,6 +62,7 @@ export async function fetchUserBookings(): Promise<UserBooking[]> {
     providerName: b.provider_name,
     providerDescriptor: b.provider_descriptor ?? '',
     providerAreaCodes: b.provider_area_codes ?? [],
+    providerPaused: !!b.provider_paused,
     providerRegion: b.provider_region,
     identityRevealed: !!b.identity_revealed,
     providerWebsite: b.provider_website,
