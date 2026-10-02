@@ -1995,7 +1995,8 @@
       "sentBody": "Contamos las solicitudes por mercado para decidir dónde ampliar la cobertura. No podemos prometer una fecha.",
       "notifyLabel": "Avisarme por correo cuando {{market}} tenga cobertura",
       "notifyHelp": "Le escribiremos a {{email}}. Solo sobre este mercado.",
-      "failed": "No hemos podido enviar su solicitud. Inténtelo de nuevo."
+      "failed": "No hemos podido enviar su solicitud. Inténtelo de nuevo.",
+      "guestMessage": "Solicite este mercado. Contamos las solicitudes por mercado para decidir dónde ampliar la cobertura."
     }
   },
   "errorBoundary": {

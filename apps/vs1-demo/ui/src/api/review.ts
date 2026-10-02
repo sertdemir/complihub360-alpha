@@ -33,6 +33,8 @@ export interface Gate {
   approved_cells: number;
   total_cells: number;
   allowance: { ok: boolean; over: string[]; allowance: number | null; plan: string | null } | null;
+  /** Gemeldet, nicht sperrend (Spec A §21.1) — sperrt die Buchung, nicht die Aktivierung. */
+  billing: { ready: boolean; blocks_chargeable_booking: string[] };
 }
 
 export interface ReviewEvidence extends Evidence {

@@ -1,7 +1,7 @@
 ---
 title: "marketUnavailable statt C3, wenn die Engine keinen Markt prüfen kann"
 assignee: "Claude"
-status: "doing"
+status: "review"
 ---
 
 # marketUnavailable statt C3
@@ -31,9 +31,10 @@ Market“-Aktion, die tatsächlich etwas tut.
 - [x] Lokal: Zustand statt C3, Zeilen je Markt (Gast), Bestätigung, Opt-in mit Konto; 7 Tests, 6 Sabotagen erkannt; Screenshots EN/DE/Mobil
 - [x] Neue Copy abgenommen (27.09.) → `common:states.marketRequest.*`, im Copy-Waechter; „You can switch it off any time“ bleibt weg (Nutzer: „Abschalten weglassen“)
 - [x] Staging (27.09., Build `ccee4718`)
-- [x] Versand des Updates (01.10.): Watcher-Pass `runMarketCoverageTick`, einmal je Zeile mit Claim über `notified_at`, Adresse aus `auth.users` per `auth_user_email_by_id` (nur bestätigt), Sprache der Anfrage (`locale`, Migration 20261001000000); 7 API-Tests + 9 pgTAP, 5 Sabotagen erkannt
-- [ ] Mail-Copy abnehmen (EN/DE/ES/TR in `mailer.ts`, `MARKET_COVERED_STRINGS`)
-- [ ] Migration 20261001000000 auf Staging
+- [x] Versand des Updates (01.10.): Watcher-Pass `runMarketCoverageTick`, einmal je Zeile mit Claim über `notified_at`, Adresse aus `auth.users` per `auth_user_email_by_id` (nur bestätigt), Sprache der Anfrage (`locale`, Migration 20261001184141); 7 API-Tests + 9 pgTAP, 5 Sabotagen erkannt
+- [x] Mail-Copy abgenommen (01.10., nach echter Mail auf Staging); EN und DE im Test wortgleich festgehalten
+- [x] Migration 20261001184141 auf Staging (vor dem Merge von #231)
+- [x] Staging Ende-zu-Ende (01.10., Build `48488f1c`): Gast-Anfrage mit `de-DE` → `locale = de`; Testzeile DE + notify mit Konto `+madrid` → nächster Takt sendet über Resend (200), Mail kommt an (DE, Link `/de/wizard`), `notified_at` gesetzt, der folgende Takt sendet nicht erneut; Testzeilen entfernt
 
 ## DNA-Check
 
@@ -48,10 +49,13 @@ Betroffen sind **Risk Map** (Darstellung), **Registrierung und Gating** (Update 
 - [2026-09-27] **Claude**: Backend (Migration, pgTAP, API, Tests, OpenAPI) und Canvas. UI wartet auf die Wahl. (Status: doing)
 - [2026-09-27] **Claude**: Staging-Migration, Figma D3/E3/F3, lokaler Rollout. Offen: Copy-Abnahme, Staging, Versand. (Status: doing)
 - [2026-10-01] **Claude**: Versand des Markt-Updates (Migration, Mailer, Watcher, Client-Sprache). Offen: Mail-Copy-Abnahme, Staging-Migration. (Status: doing)
+- [2026-10-01] **Claude**: #231 gemergt, Staging Ende-zu-Ende geprüft, Mail-Copy abgenommen. Offen bleiben nur die Hero-Copy für Gäste und die Anbieter-Spalte (s. u.). (Status: doing)
+- [2026-10-01] **Claude**: G2 + H3 Canvas → Figma (3537:15183, 3537:15204) → lokal; 4 Sabotagen erkannt. (Status: doing)
+- [2026-10-01] **Claude**: #237 gemergt (`6a93c839`), G2 auf Staging geprüft (EN/DE), H3 lokal und im Test. Alle Kriterien erfüllt → review (Nutzer: „schieb das Ticket nach review“). (Status: review)
 
 ## Offene Punkte für den Nutzer (Stufe 3)
 
 - ~~„You can switch it off any time.“~~ Entschieden 27.09.: bleibt weg, kein Abschalten.
 - ~~Versand des Updates fehlt~~ gebaut 01.10.
-- **Die abgenommene Hero-Copy** sagt auch Gästen „choose whether you would like to receive an availability update“. Gäste können das nach der Entscheidung vom 27.09. nicht. Entweder eine Gast-Variante abnehmen oder so lassen.
-- **Angemeldete Ansicht:** Die Anbieter-Spalte zeigt auch bei marketUnavailable Anbieter („Does not cover your market“), wie schon bei C3. Die Gast-Seite zeigt keine.
+- ~~Hero-Copy für Gäste~~ Canvas-Wahl G2 (01.10.): eigener Gast-Satz ohne Update-Wahl (`common:states.marketRequest.guestMessage`), eingeloggt bleibt der abgenommene.
+- ~~Anbieter-Spalte eingeloggt~~ Canvas-Wahl H3 (01.10.): bei marketUnavailable keine Anbieter-Karten, sondern der abgenommene Zustand `noProviderMatch`.

@@ -499,6 +499,54 @@ export interface BillingReadiness {
     synced_at: string | null;
 }
 
+// ─── Abo (TKT-PROV-07) ───────────────────────────────────────────────────────
+//
+// Die Abo-GEBUEHR laeuft NICHT ueber ein Stripe-Abo, sondern ueber den
+// Monatslauf, der je Periode eine Stripe-Rechnung ausstellt. `source` ist reine
+// Herkunft und entscheidet nichts. Nichts davon erreicht die Nutzerseite —
+// Spec B: "Subscription fields never appear in the user matching interface."
+
+export type SubscriptionCadence = 'monthly' | 'annual';
+export type SubscriptionStatus = 'active' | 'past_due' | 'cancelled' | 'ended';
+export type SubscriptionSource = 'provider_self_serve' | 'admin';
+
+/** Das laufende Abo, wie der Anbieter es sieht (GET /provider/{key}/subscription). */
+export interface ProviderSubscriptionView {
+    plan_code: string;
+    cadence: SubscriptionCadence;
+    status: SubscriptionStatus;
+    current_period_start: string;
+    current_period_end: string;
+    started_at: string;
+}
+
+/** Ein waehlbarer Tarif. Ohne jede Wirkung auf Matching oder Ranking. */
+export interface SelectablePlan {
+    code: string;
+    label: string;
+    currency: string;
+    monthly_cents: number;
+    annual_cents: number;
+    category_allowance: number | null;
+    lead_discount_pct: number;
+    lead_discount_count: number;
+}
+
+/** Body von POST /provider/{key}/subscription. */
+export interface SubscriptionSelectRequest {
+    plan_code: string;
+    cadence: SubscriptionCadence;
+}
+
+/** Body von POST /admin/provider-subscriptions. Zwei Vorgaenge, kein Wechsel. */
+export interface AdminSubscriptionRequest {
+    provider_key: string;
+    action: 'start' | 'end';
+    plan_code?: string;
+    cadence?: SubscriptionCadence;
+    reason?: string;
+}
+
 /** Body von POST /scheduling (Phase 4). */
 export interface BookingCreateRequest {
     public_ref: string;

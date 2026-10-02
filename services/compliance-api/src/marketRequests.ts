@@ -17,7 +17,7 @@ import { SLUG_TO_ENGINE } from "./dashboard.js";
 const GUEST_KEY = /^[A-Za-z0-9_-]{8,64}$/;
 const MARKET = /^[A-Z]{2}$/;
 const MAX_DOMAINS = 12;
-// Die Sprache, in der das Update spaeter geschrieben wird (20261001000000).
+// Die Sprache, in der das Update spaeter geschrieben wird (20261001184141).
 // Unbekannt oder fehlend → null, der Mailer schreibt dann Englisch.
 const LOCALES = new Set(['en', 'de', 'es', 'tr']);
 

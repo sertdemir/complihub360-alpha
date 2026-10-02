@@ -23,6 +23,7 @@ import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
 import { buildCockpit } from "./cockpit.js";
 import { ownProviderRouteKey, canAccessProvider, handleMeProvider, handleAdminLinkMember } from "./providerAuth.js";
 import { handleProviderApplication } from "./providerApplication.js";
+import { handleSubscriptionGet, handleSubscriptionSelect, handleAdminSubscription } from "./subscriptions.js";
 import { handleProviderReview } from "./providerReview.js";
 import { redactText } from "@complihub360/redaction";
 import {
@@ -908,6 +909,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         ...serializeProvider(p, reg, 'anonymous'),
                         ...maskDossier(p),
                         descriptor: title.descriptor,
+                        // 3 V3 (2026-10-01): die Bereiche als Codes, damit das UI
+                        // sie in der Sprache des Nutzers zeigt — `descriptor`
+                        // traegt die englischen Taxonomie-Namen.
+                        area_codes: [...areas].sort(),
+                        descriptor_region: p.region ?? null,
                         // Freigegebene Leistungsnamen aus der View — nicht die
                         // Selbstauskunft aus `categories`.
                         specializations,
@@ -919,6 +925,13 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         billing_model: p.billing_model || 'project',
                         is_verified: true,
                         availability: p.availability || 'available',
+                        // Kann hier gebucht werden? Dieselbe Quelle wie der
+                        // Buchungspfad (View-Spalte, gepflegt von
+                        // syncBillingReadiness). Bei false zeigt die Seite GAR
+                        // KEINEN Buchen-Knopf, statt den Nutzer erst nach der
+                        // Terminwahl mit 409 abzuweisen (Nutzer-Entscheidung
+                        // 2026-10-01, TKT-PROV-06).
+                        bookable_chargeable: view.some((r: any) => r.bookable_chargeable),
                         rank_basis: rankBasis({
                             required, evidence: usable,
                             avg_response_hours: p.avg_response_hours, confirmation_rate: p.confirmation_rate,
@@ -1050,6 +1063,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         public_ref: p.public_ref ?? null,
                         provider_name: b.identity_revealed ? (p.name ?? 'Verified Provider') : 'Verified Provider',
                         provider_descriptor: title.descriptor,
+                        provider_area_codes: [...areas].sort(),
                         provider_region: p.region ?? null,
                         identity_revealed: !!b.identity_revealed,
                         // Affiliate 1b: the provider's website is a POST-BOOKING
@@ -1192,6 +1206,21 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             const users = (await supabaseApi.select('users', {})) as any[];
             const byId: Record<string, any> = {};
             users.forEach((u: any) => { byId[u.id] = u; });
+            // Canvas-Wahl 2 V1 (2026-10-01): die Firma kommt aus der Anfrage des
+            // Nutzers an DIESEN Anbieter (structured_answers.company), dazu
+            // Bereich und Markt als Thema. Vorher riet das UI die Firma aus der
+            // E-Mail-Domain. Die Buchung hat die Identitaet bereits freigegeben
+            // (Dossier-Regel); ohne Anfrage oder ohne Angabe bleibt sie null —
+            // das UI schreibt dann "Firma nicht angegeben", nie eine Domain.
+            const engagements = (await supabaseApi.select('engagement_requests', { provider_key: providerKey }, { order: 'created_at.desc', limit: 200 })) as any[];
+            const anfrageVon: Record<string, any> = {};
+            for (const e of engagements) {
+                if (!e.user_id) continue;
+                const bisher = anfrageVon[e.user_id];
+                // Neueste Anfrage gewinnt; eine aeltere fuellt nur eine fehlende Firma.
+                if (!bisher) anfrageVon[e.user_id] = e;
+                else if (!bisher.structured_answers?.company && e.structured_answers?.company) anfrageVon[e.user_id] = { ...bisher, structured_answers: { ...bisher.structured_answers, company: e.structured_answers.company } };
+            }
             // Phase 4: je Lead, was er gekostet hat (Spec B "standard fee,
             // discount, final charge") und die 10 % fuer den Nutzer samt
             // Selbstauskunft des Anbieters.
@@ -1202,6 +1231,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             const ledgerById: Record<string, any> = {}; ledgerRows.forEach((l: any) => { ledgerById[l.id] = l; });
             const reportByBooking: Record<string, any> = {}; reports.forEach((r: any) => { reportByBooking[r.booking_id] = r; });
             const bookings = rows.map((b: any) => {
+                const anfrage = b.user_id ? anfrageVon[b.user_id] : undefined;
+                const company = typeof anfrage?.structured_answers?.company === 'string' ? anfrage.structured_answers.company.trim() : '';
                 const l = b.lead_ledger_id ? ledgerById[b.lead_ledger_id] : null;
                 const rep = reportByBooking[b.id];
                 return {
@@ -1211,6 +1242,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     status: b.status,
                     lead_charged: !!b.lead_charged,
                     user_email: b.user_id && byId[b.user_id] ? byId[b.user_id].email : null,
+                    user_company: company || null,
+                    category: anfrage?.category ?? null,
+                    country: anfrage?.country ?? null,
                     message: b.message ?? null,
                     acknowledgement_version: b.acknowledgement_version ?? null,
                     price_snapshot: b.price_snapshot ?? null,
@@ -3051,7 +3085,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     // die Beschreibung kommt aus freigegebenen Bereichen und Region.
                     .map(({ _rank, _areas, _region, ...pub }: any, i: number) => {
                         const title = publicTitle(i, _areas.map((a: string) => labels.get(a) ?? a), pub.region ?? _region);
-                        return { ...pub, title: title.label, letter: title.letter, descriptor: title.descriptor };
+                        return { ...pub, title: title.label, letter: title.letter, descriptor: title.descriptor, area_codes: [..._areas].sort(), descriptor_region: pub.region ?? _region };
                     });
 
                 res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -3128,6 +3162,19 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
     } else if (req.method === 'POST' && req.url === '/api/v1/assistant/checkout') {
         // Phase ③: Stripe Checkout for Assistant Pro (12 $/month).
         handleAssistantCheckout(req, res, correlationId, { userId: authUserId, email: authEmail }, ip);
+    } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/subscription$/.test(req.url || '')) {
+        // Das eigene Abo: Tarif, Zyklus, Periode und die waehlbaren Tarife.
+        // Nur fuer den Anbieter selbst (Ownership-Guard oben) — Spec B haelt
+        // Abo-Daten aus allem Nutzerseitigen heraus.
+        await handleSubscriptionGet(res, correlationId, (req.url || '').split('/')[4]);
+    } else if (req.method === 'POST' && /^\/api\/v1\/provider\/[a-z0-9-]+\/subscription$/.test(req.url || '')) {
+        // Tarifwahl. Legt das Abo an; die Abo-RECHNUNG stellt weiter der
+        // Monatslauf (/admin/billing/run) — es gibt kein Stripe-Abo, sonst
+        // wuerde zweimal abgerechnet.
+        await handleSubscriptionSelect(req, res, correlationId, caller, (req.url || '').split('/')[4]);
+    } else if (req.method === 'POST' && req.url === '/api/v1/admin/provider-subscriptions') {
+        // Admin-Zuweisung: {provider_key, action: 'start'|'end', ...}.
+        await handleAdminSubscription(req, res, correlationId, caller);
     } else if (req.method === 'GET' && /^\/api\/v1\/provider\/[a-z0-9-]+\/billing\/preview$/.test(req.url || '')) {
         // Current-period charge preview for the provider billing page (pricing
         // decision 2026-08-09) — behind the normal auth gate, no Stripe needed.

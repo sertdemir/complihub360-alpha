@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { MoreHorizontal, Inbox } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +8,7 @@ import { Button } from '../../components/ui/Button';
 import { RequestCard, type RequestStatus } from '../../components/ui/RequestCard';
 import { ThreadDrawer } from '../../components/shared/ThreadDrawer';
 import { RequestActionsDrawer, type RequestActionsTarget } from '../../components/user/RequestActionsDrawer';
-import { DOMAINS } from '../../lib/domains';
+import { useRequestContext } from '../../lib/requestContext';
 import type { UserRequestRow } from '../../api/requests';
 
 // ─── Anfragen — der Reiter in der Termine-Seite ──────────────────────────────
@@ -29,23 +29,11 @@ import type { UserRequestRow } from '../../api/requests';
 //        Zeitangaben (Intl.RelativeTimeFormat) und uebersetzte Bereichs-/
 //        Marktnamen statt roher Slugs ("tax-vat · IT").
 
-export const SLUG_TO_I18N: Record<string, string> = Object.fromEntries(DOMAINS.map((d) => [d.slug, d.i18nKey]));
-
-/** "vor 2 Std." / "hace 2 h" — lokalisiert ohne eigene Schluessel. */
-export function relZeit(iso: string | undefined, locale: string): string {
-  if (!iso) return '';
-  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto', style: 'short' });
-  const diffMs = new Date(iso).getTime() - Date.now();
-  const mins = Math.round(diffMs / 60_000);
-  if (Math.abs(mins) < 60) return rtf.format(mins, 'minute');
-  const hours = Math.round(mins / 60);
-  if (Math.abs(hours) < 24) return rtf.format(hours, 'hour');
-  return rtf.format(Math.round(hours / 24), 'day');
-}
+// Seit 1 V3 (2026-10-01) gemeinsam mit der Partnerseite in lib/requestContext.
+export { SLUG_TO_I18N, relZeit } from '../../lib/requestContext';
 
 export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
-  const { t, i18n } = useTranslation('userws');
-  const locale = i18n.resolvedLanguage || 'en';
+  const { t } = useTranslation('userws');
   const { openWizard } = useWizardDrawer();
   const [threadFor, setThreadFor] = useState<string | null>(null);
   // Deep-Link (Glocke, Suche): ?thread=<uuid> oeffnet den Verlauf direkt.
@@ -73,9 +61,7 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
   const aufAnbieter = effective.filter((r) => r.bucket === 'confirm' || r.bucket === 'confirmed');
   const abgeschlossen = effective.filter((r) => r.bucket === 'closed' || r.bucket === 'active');
 
-  const regionName = useMemo(() => new Intl.DisplayNames([locale], { type: 'region' }), [locale]);
-  const bereich = (slug?: string) => (slug && SLUG_TO_I18N[slug] ? t(`domain.${SLUG_TO_I18N[slug]}`) : slug ?? '');
-  const markt = (code?: string) => { try { return code ? (regionName.of(code.toUpperCase()) ?? code) : ''; } catch { return code ?? ''; } };
+  const { kontext } = useRequestContext();
 
   // 4B: die gerade laufende Frist als Restzeit + Balkenanteil.
   const frist = (r: UserRequestRow) => {
@@ -111,12 +97,11 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
       <RequestCard
         key={r.uuid}
         className="rounded-none border-0 border-t border-stroke-subtle bg-transparent px-5"
-        idLine={`${r.id} · ${relZeit(r.createdAt, locale)}`}
+        context={kontext({ category: r.category, country: r.country, createdAt: r.createdAt, ref: r.id }) || r.meta}
         status={r.status}
         statusLabel={r.statusLabel ? t(`status.${STATUS_KEY[r.statusLabel] ?? ''}`, r.statusLabel) : r.statusLabel}
         company={r.company}
         tag={r.partner ? 'PARTNER' : undefined}
-        meta={[bereich(r.category), markt(r.country)].filter(Boolean).join(' · ') || r.meta}
         slaLabel={t('requests.slaLabelProvider')}
         slaValue={f ? (
           <span className="block">

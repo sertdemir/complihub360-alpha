@@ -82,7 +82,7 @@ vi.mock('../supabase.js', () => ({
                 // Genau eine, oder keine — wie die SQL-Funktion.
                 return treffer.length === 1 ? treffer[0].id : null;
             }
-            // Gegenstueck aus 20261001000000: nur bestaetigte, lebende Logins.
+            // Gegenstueck aus 20261001184141: nur bestaetigte, lebende Logins.
             if (fn === 'auth_user_email_by_id') {
                 const u = (db.auth_users ?? []).find((x) => x.id === params.p_user_id && !x.deleted_at && x.email_confirmed_at);
                 return u ? u.email : null;
@@ -1105,6 +1105,7 @@ describe('Ownership: Anbieter-eigene Routen gehoeren ihren Mitgliedern', () => {
         ['GET', '/bookings'], ['GET', '/coverage'], ['PATCH', '/coverage'], ['PATCH', '/profile'],
         ['GET', '/invoices'], ['PATCH', '/availability'], ['POST', '/billing-portal'],
         ['POST', '/change-email'], ['GET', '/billing/preview'],
+        ['GET', '/subscription'], ['POST', '/subscription'],
         // Phase 2 Onboarding
         ['GET', '/application'], ['PATCH', '/application'], ['POST', '/services'],
         ['PATCH', '/services/00000000-0000-0000-0000-000000000001'], ['DELETE', '/services/00000000-0000-0000-0000-000000000001'],
@@ -1129,6 +1130,27 @@ describe('Ownership: Anbieter-eigene Routen gehoeren ihren Mitgliedern', () => {
         (db.provider_members ??= []).push({ provider_key: 'test-kanzlei', user_id: USER_ID, role: 'owner' });
         const r = await api('/api/v1/provider/test-kanzlei/billing/preview', { auth: 'jwt' });
         expect(r.status).toBe(200);
+    });
+
+    it('Partner-Termine tragen die Firma aus der Anfrage, ohne Anfrage null (2 V1)', async () => {
+        seedProvider();
+        (db.provider_members ??= []).push({ provider_key: 'test-kanzlei', user_id: USER_ID, role: 'owner' });
+        const mitAnfrage = randomUUID(), ohneAnfrage = randomUUID();
+        (db.users ??= []).push({ id: mitAnfrage, email: 'alex.weber@acme.example' }, { id: ohneAnfrage, email: 'info@hafenkontor.example' });
+        (db.engagement_requests ??= []).push(
+            { id: randomUUID(), provider_key: 'test-kanzlei', user_id: mitAnfrage, category: 'product-packaging', country: 'DE', structured_answers: { company: 'Acme GmbH' }, created_at: '2026-09-30T08:00:00Z' },
+            { id: randomUUID(), provider_key: 'andere-kanzlei', user_id: ohneAnfrage, category: 'tax-vat', country: 'DE', structured_answers: { company: 'Fremde Firma' }, created_at: '2026-09-30T08:00:00Z' },
+        );
+        (db.scheduling ??= []).push(
+            { id: randomUUID(), provider_key: 'test-kanzlei', user_id: mitAnfrage, slot_start: '2026-10-02T07:00:00Z', slot_end: '2026-10-02T07:30:00Z', status: 'confirmed' },
+            { id: randomUUID(), provider_key: 'test-kanzlei', user_id: ohneAnfrage, slot_start: '2026-09-13T13:00:00Z', slot_end: '2026-09-13T13:30:00Z', status: 'no_show' },
+        );
+        const r = await api('/api/v1/provider/test-kanzlei/bookings', { auth: 'jwt' });
+        expect(r.status).toBe(200);
+        const [neu, alt] = r.body.bookings;
+        expect(neu).toMatchObject({ user_company: 'Acme GmbH', category: 'product-packaging', country: 'DE', user_email: 'alex.weber@acme.example' });
+        // Die Anfrage an einen ANDEREN Anbieter verraet hier nichts.
+        expect(alt).toMatchObject({ user_company: null, category: null, country: null });
     });
 
     it('laesst das Mitglied NICHT auf einen anderen Anbieter', async () => {
@@ -1422,6 +1444,9 @@ describe('Anonymitaet auf dem Draht (Phase 3, ADR-0004)', () => {
         expect(d.markets).toEqual(['DE']);
         expect(d.specializations).toEqual(['Tax and VAT']);
         expect(d.descriptor).toBe('Tax and VAT · Norddeutschland');
+        // 3 V3: Codes fuer die Uebersetzung im UI, die Region roh.
+        expect(d.area_codes).toEqual(['tax-vat']);
+        expect(d.descriptor_region).toBe('Norddeutschland');
         expect(d.rank_basis.verification).toBe('independent');
     });
 
@@ -1445,6 +1470,7 @@ describe('Anonymitaet auf dem Draht (Phase 3, ADR-0004)', () => {
         sauber(b.body);
         expect(b.body.bookings[0].provider_name).toBe('Verified Provider');
         expect(b.body.bookings[0].provider_descriptor).toBe('Tax and VAT · Norddeutschland');
+        expect(b.body.bookings[0].provider_area_codes).toEqual(['tax-vat']);
         expect(b.body.bookings[0].public_ref).toBe(refOf('test-kanzlei'));
     });
 
@@ -2356,7 +2382,7 @@ describe('Review-Arbeitsplatz (6A/7A/8A): nur Admin, Zell-Aktionen, Gate', () =>
         void serviceId;
     });
 
-    it('Gate: active erst, wenn Nachweise geprueft, eine Zelle frei, Annahmen da und Billing bereit — die Antwort nennt, was fehlt', async () => {
+    it('Gate: active, wenn Nachweise geprueft, eine Zelle frei und die Annahmen da sind — Billing sperrt nicht (TKT-PROV-05)', async () => {
         seedApplicant();
         const serviceId = await fillDossier();
         await own('/submit', { method: 'POST', body: '{}' });
@@ -2365,10 +2391,15 @@ describe('Review-Arbeitsplatz (6A/7A/8A): nur Admin, Zell-Aktionen, Gate', () =>
         const zu = await adminApi('/api/v1/admin/review/neue-kanzlei/lifecycle', { method: 'POST', body: JSON.stringify({ to: 'active' }) });
         expect(zu.status).toBe(422);
         expect(zu.body.errorCode).toBe('GATE_NOT_MET');
-        expect(zu.body.gate.missing).toEqual(expect.arrayContaining(['evidence.incorporation', 'evidence.insurance', 'evidence.representative_identity', 'coverage.none_approved', 'billing.not_ready', 'billing.no_payment_method']));
+        expect(zu.body.gate.missing).toEqual(expect.arrayContaining(['evidence.incorporation', 'evidence.insurance', 'evidence.representative_identity', 'coverage.none_approved']));
+        // Billing taucht hier nicht auf — §21.1 sperrt die gebuehrenpflichtige
+        // Buchung, nicht die Aktivierung (TKT-PROV-05). Auch nicht, solange
+        // noch etwas anderes fehlt.
+        expect(zu.body.gate.missing.filter((m: string) => m.startsWith('billing.'))).toEqual([]);
         expect(db.providers[0].lifecycle_status).toBe('under_verification');
 
-        // Reviewer prueft die Dokumente, gibt die Zelle frei, Billing wird bereit.
+        // Reviewer prueft die Dokumente und gibt die Zelle frei. Billing bleibt
+        // absichtlich unbereit — es darf das Aktivieren nicht sperren (§21.1).
         for (const e of db.provider_evidence.filter((x: any) => x.source === 'document')) {
             const r = await adminApi(`/api/v1/admin/review/neue-kanzlei/evidence/${e.id}`, { method: 'POST', body: JSON.stringify({ result: 'reviewed', notes: 'passt' }) });
             expect(r.status).toBe(200);
@@ -2380,10 +2411,15 @@ describe('Review-Arbeitsplatz (6A/7A/8A): nur Admin, Zell-Aktionen, Gate', () =>
         const cell = db.provider_service_coverage.find((c: any) => c.service_id === serviceId);
         await adminApi(`/api/v1/admin/review/neue-kanzlei/coverage/${cell.id}`, { method: 'POST', body: JSON.stringify({ action: 'approve' }) });
 
-        const nurBilling = await adminApi('/api/v1/admin/review/neue-kanzlei/gate');
-        expect(nurBilling.body.gate.missing).toEqual(['billing.not_ready', 'billing.no_payment_method']);
+        // Der Anbieter steht auf billing_ready=false mit Grund 'no_payment_method'.
+        // Vorher stand genau das in `missing`, und weil niemand das Flag setzte,
+        // ging das Gate fuer keinen Anbieter je auf. Jetzt wird es GEMELDET.
+        const offen = await adminApi('/api/v1/admin/review/neue-kanzlei/gate');
+        expect(offen.body.gate.missing).toEqual([]);
+        expect(offen.body.gate.ok).toBe(true);
+        expect(offen.body.gate.billing).toEqual({ ready: false, blocks_chargeable_booking: ['not_ready', 'no_payment_method'] });
 
-        Object.assign(db.providers[0], { billing_ready: true, billing_block_reasons: [] });
+        // Aktivieren OHNE billing_ready anzufassen.
         const auf = await adminApi('/api/v1/admin/review/neue-kanzlei/lifecycle', { method: 'POST', body: JSON.stringify({ to: 'active' }) });
         expect(auf.status).toBe(200);
         expect(db.providers[0]).toMatchObject({ lifecycle_status: 'active', partner_status: 'active' });
@@ -2630,6 +2666,29 @@ describe('Watcher: Markt-Update', () => {
         expect(en.text).toContain('/en/wizard');
         expect(en.text).toContain('This is the only email we send about this request.');
         expect(renderMarketCoveredMail('BR', 'tr').subject).toBe('Brezilya artık CompliHub360\'ta kapsanıyor');
+        // Abgenommen 01.10.2026 (Nutzer, nach der echten Mail auf Staging):
+        // wortgleich halten — eine Aenderung braucht eine neue Abnahme.
+        const url = (loc: string) => `${(process.env.PUBLIC_APP_URL || 'https://staging.complihub360.com').replace(/\/$/, '')}/${loc}/wizard`;
+        expect(en.text).toBe([
+            'You asked us to let you know when we cover Brazil. We do now.',
+            '',
+            'You can create a Risk Map for Brazil and see which requirements may apply to your business.',
+            '',
+            `→ Create a Risk Map: ${url('en')}`,
+            '',
+            'This is the only email we send about this request.',
+        ].join('\n'));
+        const de = renderMarketCoveredMail('DE', 'de');
+        expect(de.subject).toBe('Deutschland ist jetzt auf CompliHub360 abgedeckt');
+        expect(de.text).toBe([
+            'Sie hatten uns gebeten, Ihnen Bescheid zu geben, sobald wir Deutschland abdecken. Das ist jetzt der Fall.',
+            '',
+            'Sie können eine Risk Map für Deutschland erstellen und sehen, welche Anforderungen für Ihr Unternehmen gelten können.',
+            '',
+            `→ Risk Map erstellen: ${url('de')}`,
+            '',
+            'Dies ist die einzige E-Mail, die wir zu dieser Anfrage senden.',
+        ].join('\n'));
         expect(renderMarketCoveredMail('BR', 'xx').subject).toBe(en.subject);
     });
 
@@ -2640,5 +2699,269 @@ describe('Watcher: Markt-Update', () => {
         expect(mails()).toHaveLength(0);
         expect((db.event_log ?? []).filter((e) => e.type === 'market_covered_notice_shadow')).toHaveLength(1);
         expect(db.market_requests.find((r: any) => r.id === 'mr-de').notified_at).toBeNull();
+    });
+});
+
+/** Monatsschritt mit Kuerzung — spiegelt addMonths aus subscriptions.ts. */
+function addMonthsIso(dateIso: string, months: number): string {
+    const [y, m, d] = dateIso.slice(0, 10).split('-').map(Number);
+    const t = m - 1 + months;
+    const ty = y + Math.floor(t / 12);
+    const tm = ((t % 12) + 12) % 12;
+    const last = new Date(Date.UTC(ty, tm + 1, 0)).getUTCDate();
+    return `${ty}-${String(tm + 1).padStart(2, '0')}-${String(Math.min(d, last)).padStart(2, '0')}`;
+}
+
+// ─── Ein Abo kann entstehen (TKT-PROV-07) ────────────────────────────────────
+// Bis zum 2026-10-01 hatte `provider_subscriptions` keinen Schreiber: kein
+// Checkout, keine Admin-Zuweisung. Weil `billingReadiness` ein laufendes Abo
+// verlangt, war damit niemand buchbar. Diese Tests nageln den Weg hinein fest —
+// und die beiden Grenzen, die dabei nicht verrutschen durften: kein stiller
+// Tarifwechsel, und ein Tarif macht allein noch nicht buchbar.
+
+describe('Abo-Schreiber — Tarifwahl, Admin-Zuweisung, Periode', () => {
+    it('GET /subscription zeigt vorher kein Abo, aber die waehlbaren Tarife', async () => {
+        seedProvider();
+        seedPricing();
+        const r = await api('/api/v1/provider/test-kanzlei/subscription');
+        expect(r.status).toBe(200);
+        expect(r.body.subscription).toBeNull();
+        expect(r.body.plans.map((p: any) => p.code)).toEqual(['essential', 'growth', 'global']);
+        expect(r.body.plans[1]).toMatchObject({ monthly_cents: 9900, annual_cents: 99000, currency: 'USD' });
+    });
+
+    it('die Tarifwahl legt das Abo an, mit Periode, Herkunft und Protokolleintrag', async () => {
+        seedProvider();
+        seedPricing();
+        const r = await api('/api/v1/provider/test-kanzlei/subscription', {
+            method: 'POST', body: JSON.stringify({ plan_code: 'growth', cadence: 'monthly' }),
+        });
+        expect(r.status).toBe(201);
+        expect(r.body.subscription).toMatchObject({ plan_code: 'growth', cadence: 'monthly', status: 'active' });
+
+        const row = db.provider_subscriptions[0];
+        expect(row).toMatchObject({ provider_key: 'test-kanzlei', plan_code: 'growth', source: 'provider_self_serve', status: 'active' });
+        // Der Stub setzt keine Spalten-Defaults: hier undefined, in Postgres
+        // NULL. `openRow` prueft auf falsy, beides traegt.
+        expect(row.ended_at ?? null).toBeNull();
+        // Beim Monatsabo fallen Zyklusende und Verlaengerung zusammen; beim
+        // Jahresabo nicht (eigener Test unten).
+        expect(row.current_period_end).toBe(row.renewal_date);
+        expect(row.current_period_end > row.current_period_start).toBe(true);
+
+        // Der Anbieter sieht den Vorgang in seiner eigenen Historie.
+        expect(db.provider_review_log.map((l: any) => [l.subject, l.action, l.to_value]))
+            .toContainEqual(['subscription', 'subscription_started', 'growth/monthly']);
+        expect(db.event_log.map((e: any) => e.type)).toContain('provider_subscription_started');
+    });
+
+    it('Jahresabo: der Zyklus bleibt ein MONAT, nur die Verlaengerung liegt ein Jahr weiter', async () => {
+        // Die erste Fassung dieses PRs hat hier einen ein Jahr langen Zyklus
+        // gesetzt. Weil `cycleStartFor` den Rabattzaehler am Zyklusbeginn
+        // festmacht, haette der Anbieter seine 15 % auf die ersten sechs Leads
+        // dann einmal im JAHR bekommen statt im Monat — zu seinen Lasten.
+        // Spec B: "The counter resets on the monthly billing-cycle date."
+        seedProvider();
+        seedPricing();
+        const r = await api('/api/v1/provider/test-kanzlei/subscription', {
+            method: 'POST', body: JSON.stringify({ plan_code: 'global', cadence: 'annual' }),
+        });
+        expect(r.status).toBe(201);
+        const row = db.provider_subscriptions[0];
+        const { current_period_start: s, current_period_end: e, renewal_date: ren } = row;
+
+        // Zyklus: genau ein Monat.
+        expect(e).toBe(addMonthsIso(s, 1));
+        // Verlaengerung: ein Jahr — und damit NICHT das Zyklusende.
+        expect(ren).toBe(addMonthsIso(s, 12));
+        expect(ren).not.toBe(e);
+    });
+
+    it('ein zweites Abo wird abgelehnt — ein Tarifwechsel ist hier bewusst nicht moeglich', async () => {
+        // Spec B laesst "proration, cancellation notice, grace period,
+        // failed-payment retry, and reactivation rules" ausdruecklich offen.
+        // Ein Wechsel per Tarifwahl wuerde eine Pro-rata-Regel erfinden.
+        seedProvider();
+        seedPricing();
+        await api('/api/v1/provider/test-kanzlei/subscription', {
+            method: 'POST', body: JSON.stringify({ plan_code: 'essential', cadence: 'monthly' }),
+        });
+        const second = await api('/api/v1/provider/test-kanzlei/subscription', {
+            method: 'POST', body: JSON.stringify({ plan_code: 'global', cadence: 'monthly' }),
+        });
+        expect(second.status).toBe(409);
+        expect(second.body.errorCode).toBe('SUBSCRIPTION_EXISTS');
+        expect(db.provider_subscriptions).toHaveLength(1);
+        expect(db.provider_subscriptions[0].plan_code).toBe('essential');
+    });
+
+    it('weist einen unbekannten Tarif und eine unbekannte Zahlweise ab', async () => {
+        seedProvider();
+        seedPricing();
+        const a = await api('/api/v1/provider/test-kanzlei/subscription', {
+            method: 'POST', body: JSON.stringify({ plan_code: 'platinum', cadence: 'monthly' }),
+        });
+        expect(a.status).toBe(400);
+        expect(a.body.errorCode).toBe('UNKNOWN_PLAN');
+        const b = await api('/api/v1/provider/test-kanzlei/subscription', {
+            method: 'POST', body: JSON.stringify({ plan_code: 'growth', cadence: 'weekly' }),
+        });
+        expect(b.status).toBe(400);
+        expect(db.provider_subscriptions ?? []).toHaveLength(0);
+    });
+
+    it('ein Tarif allein macht noch nicht buchbar — die Zahlungsmethode fehlt weiter', async () => {
+        // Die Grenze aus TKT-PROV-05: das Abo ist EINE von sieben Bedingungen.
+        // Waere das anders, wuerde ein bezahlter Tarif Buchbarkeit kaufen.
+        seedProvider({ billing_ready: false, billing_block_reasons: ['inactive_subscription'] });
+        seedPricing();
+        const r = await api('/api/v1/provider/test-kanzlei/subscription', {
+            method: 'POST', body: JSON.stringify({ plan_code: 'growth', cadence: 'monthly' }),
+        });
+        expect(r.status).toBe(201);
+        const p = db.providers.find((x: any) => x.provider_key === 'test-kanzlei');
+        expect(p.billing_ready).toBe(false);
+        expect(p.billing_block_reasons).toContain('no_payment_method');
+        expect(p.billing_block_reasons).not.toContain('inactive_subscription');
+    });
+
+    it.each([['terminated'], ['suspended']])(
+        'ein %s Konto kann keinen Tarif beginnen — auch nicht per Admin-Zuweisung', async (status) => {
+        // Geld von einem Konto zu nehmen, das nicht vermittelt werden kann,
+        // waere Geld fuer nichts: "Businesses should not pay for services they
+        // do not need."
+        seedProvider({ lifecycle_status: status });
+        seedPricing();
+        const self = await api('/api/v1/provider/test-kanzlei/subscription', {
+            method: 'POST', body: JSON.stringify({ plan_code: 'growth', cadence: 'monthly' }),
+        });
+        expect(self.status).toBe(409);
+        expect(self.body.errorCode).toBe('PROVIDER_NOT_ELIGIBLE');
+
+        const admin = await api('/api/v1/admin/provider-subscriptions', {
+            method: 'POST', body: JSON.stringify({ provider_key: 'test-kanzlei', action: 'start', plan_code: 'growth', cadence: 'monthly' }),
+        });
+        expect(admin.status).toBe(409);
+        expect(admin.body.errorCode).toBe('PROVIDER_NOT_ELIGIBLE');
+        expect(db.provider_subscriptions ?? []).toHaveLength(0);
+    });
+
+    it.each([['draft'], ['submitted'], ['paused']])(
+        'ein %s Konto darf dagegen einen Tarif beginnen — Abrechnung und Aktivierung sind zwei Achsen', async (status) => {
+        seedProvider({ lifecycle_status: status });
+        seedPricing();
+        const r = await api('/api/v1/provider/test-kanzlei/subscription', {
+            method: 'POST', body: JSON.stringify({ plan_code: 'essential', cadence: 'monthly' }),
+        });
+        expect(r.status).toBe(201);
+    });
+
+    it('Admin-Zuweisung: beenden und neu beginnen sind zwei sichtbare Vorgaenge', async () => {
+        seedProvider();
+        seedPricing();
+        const start = await api('/api/v1/admin/provider-subscriptions', {
+            method: 'POST', body: JSON.stringify({ provider_key: 'test-kanzlei', action: 'start', plan_code: 'essential', cadence: 'monthly' }),
+        });
+        expect(start.status).toBe(201);
+        expect(db.provider_subscriptions[0].source).toBe('admin');
+
+        // Ohne Beenden kein Wechsel — auch nicht fuer den Admin.
+        const blocked = await api('/api/v1/admin/provider-subscriptions', {
+            method: 'POST', body: JSON.stringify({ provider_key: 'test-kanzlei', action: 'start', plan_code: 'growth', cadence: 'monthly' }),
+        });
+        expect(blocked.status).toBe(409);
+
+        const ended = await api('/api/v1/admin/provider-subscriptions', {
+            method: 'POST', body: JSON.stringify({ provider_key: 'test-kanzlei', action: 'end', reason: 'Umstellung auf Growth' }),
+        });
+        expect(ended.status).toBe(200);
+        expect(ended.body.ended_plan).toBe('essential');
+        // 'ended' und ended_at gehoeren zusammen — die Tabelle verlangt das.
+        expect(db.provider_subscriptions[0].status).toBe('ended');
+        expect(db.provider_subscriptions[0].ended_at).toBeTruthy();
+
+        const again = await api('/api/v1/admin/provider-subscriptions', {
+            method: 'POST', body: JSON.stringify({ provider_key: 'test-kanzlei', action: 'start', plan_code: 'growth', cadence: 'annual' }),
+        });
+        expect(again.status).toBe(201);
+        expect(db.provider_subscriptions).toHaveLength(2);
+        expect(db.provider_review_log.filter((l: any) => l.subject === 'subscription')).toHaveLength(3);
+    });
+
+    it('Beenden ohne laufendes Abo ist ein 409, kein stiller Erfolg', async () => {
+        seedProvider();
+        seedPricing();
+        const r = await api('/api/v1/admin/provider-subscriptions', {
+            method: 'POST', body: JSON.stringify({ provider_key: 'test-kanzlei', action: 'end' }),
+        });
+        expect(r.status).toBe(409);
+        expect(r.body.errorCode).toBe('NO_SUBSCRIPTION');
+    });
+
+    it('die Admin-Zuweisung ist nicht fuer einen angemeldeten Anbieter offen', async () => {
+        seedProvider();
+        seedPricing();
+        const r = await api('/api/v1/admin/provider-subscriptions', {
+            auth: 'jwt', method: 'POST',
+            body: JSON.stringify({ provider_key: 'test-kanzlei', action: 'start', plan_code: 'global', cadence: 'monthly' }),
+        });
+        expect(r.status).toBe(403);
+        expect(db.provider_subscriptions ?? []).toHaveLength(0);
+    });
+
+    it('der Waechter-Pass rollt den Zyklus eines JAHRESabos monatlich weiter', async () => {
+        // Der Fall, der vorher falsch war: zwoelf Zyklen im Jahr, nicht einer.
+        // Der Verlaengerungstermin wird dabei vom Abo-Beginn aus gerechnet.
+        seedProvider();
+        seedPricing();
+        seedSubscription('test-kanzlei', 'global', {
+            cadence: 'annual', current_period_start: '2026-08-05', current_period_end: '2026-09-05',
+            started_at: '2026-08-05T00:00:00Z', renewal_date: '2027-08-05',
+        });
+        const { runSubscriptionPeriodTick } = await import('../subscriptions.js');
+        const r = await runSubscriptionPeriodTick(false, new Date('2026-11-20T00:00:00Z'));
+        expect(r.rolled).toBe(1);
+        expect(db.provider_subscriptions[0]).toMatchObject({
+            current_period_start: '2026-11-05', current_period_end: '2026-12-05',
+            renewal_date: '2027-08-05',
+        });
+    });
+
+    it('der Waechter-Pass rollt eine abgelaufene Periode weiter', async () => {
+        seedProvider();
+        seedPricing();
+        seedSubscription('test-kanzlei', 'growth', {
+            current_period_start: '2026-01-01', current_period_end: '2026-02-01', started_at: '2026-01-01T00:00:00Z',
+        });
+        const { runSubscriptionPeriodTick } = await import('../subscriptions.js');
+        const r = await runSubscriptionPeriodTick(false, new Date('2026-03-15T00:00:00Z'));
+        expect(r.rolled).toBe(1);
+        expect(db.provider_subscriptions[0]).toMatchObject({ current_period_start: '2026-03-01', current_period_end: '2026-04-01' });
+        expect(db.event_log.map((e: any) => e.type)).toContain('provider_subscription_period_rolled');
+    });
+
+    it('der Waechter-Pass laesst ein beendetes Abo in Ruhe', async () => {
+        seedProvider();
+        seedPricing();
+        seedSubscription('test-kanzlei', 'growth', {
+            current_period_start: '2026-01-01', current_period_end: '2026-02-01',
+            status: 'ended', ended_at: '2026-02-01T00:00:00Z',
+        });
+        const { runSubscriptionPeriodTick } = await import('../subscriptions.js');
+        const r = await runSubscriptionPeriodTick(false, new Date('2026-03-15T00:00:00Z'));
+        expect(r.rolled).toBe(0);
+        expect(db.provider_subscriptions[0].current_period_end).toBe('2026-02-01');
+    });
+
+    it('Shadow zaehlt, schreibt aber nicht', async () => {
+        seedProvider();
+        seedPricing();
+        seedSubscription('test-kanzlei', 'growth', {
+            current_period_start: '2026-01-01', current_period_end: '2026-02-01',
+        });
+        const { runSubscriptionPeriodTick } = await import('../subscriptions.js');
+        const r = await runSubscriptionPeriodTick(true, new Date('2026-03-15T00:00:00Z'));
+        expect(r.rolled).toBe(1);
+        expect(db.provider_subscriptions[0].current_period_end).toBe('2026-02-01');
     });
 });

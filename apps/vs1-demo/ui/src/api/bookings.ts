@@ -17,6 +17,8 @@ export interface UserBooking {
   providerName: string;
   /** "Tax and VAT · Norditalien" — die Beschreibung, unter der der Anbieter vor der Buchung stand. */
   providerDescriptor: string;
+  /** 3 V3: Bereichscodes der Beschreibung — das UI uebersetzt sie. */
+  providerAreaCodes: string[];
   providerRegion: string | null;
   providerWebsite: string | null;  // affiliate 1b — post-booking reveal only
   identityRevealed: boolean;
@@ -31,6 +33,7 @@ interface ApiBookingRow {
   public_ref: string | null;
   provider_name: string;
   provider_descriptor: string;
+  provider_area_codes?: string[];
   provider_region: string | null;
   provider_website: string | null;
   identity_revealed: boolean;
@@ -55,6 +58,7 @@ export async function fetchUserBookings(): Promise<UserBooking[]> {
     publicRef: b.public_ref ?? null,
     providerName: b.provider_name,
     providerDescriptor: b.provider_descriptor ?? '',
+    providerAreaCodes: b.provider_area_codes ?? [],
     providerRegion: b.provider_region,
     identityRevealed: !!b.identity_revealed,
     providerWebsite: b.provider_website,
@@ -95,6 +99,11 @@ export interface ProviderBooking {
   status: BookingStatus;
   leadCharged: boolean;
   userEmail: string | null;  // dossier: identity delivered at booking
+  /** Firma aus der Anfrage an diesen Anbieter (2 V1) — null ohne Angabe. */
+  userCompany: string | null;
+  /** Thema der Anfrage, roh (das UI uebersetzt). */
+  category: string | null;
+  country: string | null;
   message: string | null;
   /** null = Buchung aus der Zeit vor Phase 4, ohne Ledger. */
   lead: ProviderBookingLead | null;
@@ -105,7 +114,8 @@ export interface ProviderBooking {
 }
 
 interface ApiProviderBookingRow {
-  id: string; slot_start: string; slot_end: string | null; status: BookingStatus; lead_charged: boolean; user_email: string | null; message: string | null;
+  id: string; slot_start: string; slot_end: string | null; status: BookingStatus; lead_charged: boolean; user_email: string | null;
+  user_company?: string | null; category?: string | null; country?: string | null; message: string | null;
   lead?: { band: 1 | 2 | 3 | 4; standard_fee_cents: number; discount_pct: number; discount_sequence: number | null; final_fee_cents: number; currency: string; payment_status: LeadPaymentStatus; fee_enabled: boolean } | null;
   user_discount_pct?: number | null;
   proposal?: { proposal_issued: boolean; discount_shown: boolean; reported_at: string } | null;
@@ -122,6 +132,9 @@ export async function fetchProviderBookings(providerKey?: string): Promise<Provi
     status: b.status,
     leadCharged: b.lead_charged,
     userEmail: b.user_email,
+    userCompany: b.user_company ?? null,
+    category: b.category ?? null,
+    country: b.country ?? null,
     message: b.message,
     lead: b.lead ? {
       band: b.lead.band, standardFeeCents: b.lead.standard_fee_cents, discountPct: b.lead.discount_pct, discountSequence: b.lead.discount_sequence,
@@ -158,6 +171,9 @@ export interface ProviderDetail {
   public_ref: string;
   /** "Tax and VAT · Norditalien" — kein Buchstabe: den kennt nur die Liste. */
   descriptor: string;
+  /** 3 V3: Bereichscodes + Region, damit das UI uebersetzt. */
+  area_codes?: string[];
+  descriptor_region?: string | null;
   region: string | null;
   active_since: number | null;
   specializations: string[];
@@ -171,6 +187,9 @@ export interface ProviderDetail {
   pricing_table: Array<{ service: string; price: string }> | null;
   is_verified: boolean;
   availability: 'available' | 'ooo';
+  /** false = es kann nicht gebucht werden; die Seite zeigt dann keinen Knopf
+   *  (Nutzer-Entscheidung 2026-10-01). Wird aus dem laufenden Tarif berechnet. */
+  bookable_chargeable?: boolean;
   rank_basis?: RankBasis;
   /** Dossier (Partnerseite 3B). null = der Anbieter hat nichts hinterlegt —
    *  die Karte sagt das, statt eine Leistung zu erfinden. */

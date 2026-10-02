@@ -95,6 +95,8 @@
     "bookSub": "Ücretsiz ilk görüşme · 30 dk · bağlayıcı değil",
     "bookCta": "Randevu al",
     "revealNote": "Kimlik rezervasyondan sonra görünür.",
+    "notBookableTitle": "Şu anda randevu alınamıyor",
+    "notBookableNote": "Onaylayamayacağımız bir randevuyu sunmayız. Bu sayfadaki bilgiler sizde kalır ve diğer eşleşmeleri karşılaştırmaya devam edebilirsiniz.",
     "penalty": "Ceza: {{value}}",
     "loading": "Sağlayıcı yükleniyor …",
     "notFoundTitle": "Bu sağlayıcı artık mevcut değil",
@@ -152,7 +154,14 @@
     "slotsAll": "Bu haftanın tüm randevuları",
     "lageAreaYes": "{{area}} alanını kapsıyor",
     "lageAreaNo": "{{area}} alanını kapsamıyor",
-    "drawerBookNote": "Ücretsiz ilk görüşme · 30 dk · kimlik randevudan sonra görünür"
+    "drawerBookNote": "Ücretsiz ilk görüşme · 30 dk · kimlik randevudan sonra görünür",
+    "yourAppointment": "Randevunuz",
+    "appointmentMeta": "{{minutes}} dk · onaylandı",
+    "appointmentConfirmed": "onaylandı",
+    "toAppointments": "Randevularınıza gidin",
+    "bookAnother": "Başka bir randevu alın",
+    "revealedTitle": "Ad ve iletişim bilgileri görünür.",
+    "revealedBody": "Rezervasyonunuzdan bu yana bu sağlayıcının kim olduğunu görebilirsiniz."
   },
   "schedule": {
     "back": "Profile dön",
@@ -337,7 +346,8 @@
     "copyLabel": "{{label}} kopyası",
     "bookedOn": "Randevu {{when}}",
     "providerBooked": "Randevuyu gör",
-    "booked": "Alındı"
+    "booked": "Alındı",
+    "providersEyebrow": "Verified Provider’lar"
   },
   "rankBasis": {
     "group": "Doğrulandı ve ölçüldü",

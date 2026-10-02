@@ -368,7 +368,7 @@
     "emptyTitle": "No requests yet",
     "emptyDescription": "Your profile is live. New requests land here + in your inbox as magic-links — most partners receive their first request within 5 days.",
     "previewProfile": "Preview public profile",
-    "companyAnonymized": "🔒 Anonymized · unlocks on confirm"
+    "companyAnonymized": "🔒 Anonymized request"
   },
   "settings": {
     "title": "Settings",
@@ -443,11 +443,13 @@
   },
   "termine": {
     "title": "Appointments & <accent>leads</accent>.",
-    "sub": "Booked intro calls — the dossier (identity + intake context) is yours from booking time. Every booking is a billed lead.",
+    "sub": "Booked intro calls. The dossier with identity and request is yours from the moment of booking. Every booking is a billed lead.",
     "upcoming": "UPCOMING",
     "past": "PAST",
     "leadCharged": "Lead billed",
     "openDossier": "Open dossier",
+    "companyMissing": "Company not provided",
+    "minutes": "{{count}} min",
     "dossierEyebrow": "LEAD DOSSIER",
     "dossierContact": "Contact & slot",
     "dossierContext": "Intake context",
@@ -694,6 +696,14 @@
         "privacy_notice": "Agreement: privacy notice",
         "billing_authorization": "Agreement: billing authorisation"
       }
+    },
+    "edit": "Edit",
+    "cancelEdit": "Cancel",
+    "settled": {
+      "title": "Application complete",
+      "titleSince": "Application complete · active since {{date}}",
+      "body": "You can change your details at any time. Changes to legal form, representation and insurance are also sent to our review team.",
+      "navHint": "Your application has been reviewed. Use “Edit” to update a chapter."
     }
   },
   "verification": {

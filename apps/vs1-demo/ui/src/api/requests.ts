@@ -20,14 +20,17 @@ export interface EngagementRow {
 
 export interface ProviderRequest {
   id: string;
-  idLine: string;
+  /** Kurz-ID "RQ-7C41" — steht am Ende der Kontextzeile (1 V3). */
+  ref: string;
+  /** Rohwerte; Bereich, Markt und Eingang uebersetzt das UI (lib/requestContext). */
+  category?: string;
+  country?: string;
   status: RequestStatus;
   statusLabel: string;
   company: string;
-  tag?: string;
   meta: string;
   sla?: string;
-  createdAt?: string; // raw ISO — C1 new-since-last-seen banner
+  createdAt?: string; // raw ISO — Kontextzeile + C1 new-since-last-seen banner
   action: { label: string; variant: 'primary' | 'primary' | 'ghost' };
 }
 
@@ -43,15 +46,6 @@ const STATUS_MAP: Record<string, { status: RequestStatus; label: string; action:
 // Dossier rule (Addendum 2026-07-10): the requester identity unlocks only
 // after the provider confirms — before that the card stays anonymized.
 const UNLOCKED_STATUSES = new Set(['confirmed', 'replied']);
-
-function relTime(iso: string): string {
-  const diffMs = Date.now() - new Date(iso).getTime();
-  const h = Math.floor(diffMs / 3_600_000);
-  if (h < 1) return `${Math.max(1, Math.floor(diffMs / 60_000))} min ago`;
-  if (h < 24) return `${h}h ago`;
-  const d = Math.floor(h / 24);
-  return d === 1 ? 'Yesterday' : `${d} days ago`;
-}
 
 function slaLeft(iso?: string): string | undefined {
   if (!iso) return undefined;
@@ -70,13 +64,14 @@ export async function fetchProviderRequests(): Promise<ProviderRequest[]> {
       const m = STATUS_MAP[r.status];
       return {
         id: r.id,
-        idLine: `RQ-${r.id.slice(0, 4).toUpperCase()} · ${relTime(r.created_at)}`,
+        ref: `RQ-${r.id.slice(0, 4).toUpperCase()}`,
+        category: r.category,
+        country: r.country,
         status: m.status,
         statusLabel: m.label,
         company: UNLOCKED_STATUSES.has(r.status)
           ? r.structured_answers?.company ?? 'Requester'
           : '🔒 Anonymized · unlocks on confirm',
-        tag: [r.country, r.category].filter(Boolean).join(' · ') || undefined,
         meta: r.message || '',
         sla: m.status === 'active' ? undefined : slaLeft(r.status === 'confirmed' ? r.sla_reply_deadline : r.sla_confirm_deadline),
         createdAt: r.created_at,

@@ -210,7 +210,12 @@ export interface GateInput {
     agreements: string[];
     billing_ready: boolean;
     billing_block_reasons: string[];
-    /** Ergebnis der Kontingentpruefung gegen den Plan (billing.ts). null = kein Abo, dann faellt es unter billing. */
+    /**
+     * Ergebnis der Kontingentpruefung gegen den Plan (billing.ts). null = kein
+     * Abo. Dann sperrt hier NICHTS mehr: seit 2026-10-01 sperrt die
+     * Zahlungsbereitschaft das Aktivieren nicht, also faengt das Gate den Fall
+     * "kein Abo" auch nicht mehr ueber `billing_ready`. Siehe TKT-PROV-05.
+     */
     allowance: { ok: boolean; over: string[] } | null;
     lifecycle_status: string;
 }
@@ -220,6 +225,12 @@ export interface GateVerdict extends Verdict {
     target: 'active' | 'limited';
     approved_cells: number;
     total_cells: number;
+    /**
+     * Gemeldet, NICHT sperrend (Spec A §21.1). Fehlt die Zahlungsbereitschaft,
+     * wird der Anbieter aktiv und matchbar — nur eine gebuehrenpflichtige
+     * Buchung geht nicht. Der Reviewer soll es sehen, nicht daran scheitern.
+     */
+    billing: { ready: boolean; blocks_chargeable_booking: string[] };
 }
 
 /**
@@ -231,15 +242,23 @@ export interface GateVerdict extends Verdict {
  *   · jeder Pflichtnachweis geprueft (nicht nur hochgeladen)
  *   · mindestens eine Leistung in mindestens einem Land freigegeben
  *   · die Annahmen liegen vor, hier einschliesslich der Abrechnungsermaechtigung
- *   · billing_ready — auch fuer 'limited'. "Limited" heisst "nur Teile frei",
- *     nicht "ohne Abrechnung". ACHTUNG, offener Punkt (2026-09-27): §21.1
- *     schreibt das so nicht. Seine sechs Zeilen lauten "Block chargeable
- *     booking eligibility when: ..." — sie sperren die gebuehrenpflichtige
- *     Buchbarkeit, nicht den Status. Dass Billing hier das Aktivieren sperrt,
- *     ist eine Auslegung, keine Spec-Vorgabe. Bewusst nicht mit veraendert;
- *     benannt in Ticket TKT-PROV-04 (Ordner wechselt mit dem Lebenszyklus).
  *   · das Kategorie-Kontingent des Plans ist eingehalten
  *   · das Konto ist nicht beendet
+ *
+ * Was hier BEWUSST NICHT sperrt (Nutzer-Entscheidung 2026-10-01, Ticket
+ * TKT-PROV-05): die Zahlungsbereitschaft. §21.1 heisst "Billing readiness
+ * gate", und alle sechs Zeilen darunter lauten "Block chargeable booking
+ * eligibility when: ..." — sie sperren die gebuehrenpflichtige BUCHUNG, nicht
+ * den Status. Das Datenmodell wusste das schon: der Kommentar an
+ * `matchable_provider_services` (20260920000000) nennt `billing_ready`
+ * ausdruecklich "absichtlich KEIN Filter — sonst entschiede der Zahlungsstatus
+ * ueber die Sichtbarkeit, was §14 verbietet". Da der View ueber
+ * `lifecycle_status IN ('active','limited')` filtert, tat das Gate genau das:
+ * ueber Billing zu sperren hiess, ueber die Sichtbarkeit zu entscheiden.
+ *
+ * Die Buchung ist weiterhin gesperrt, an der richtigen Stelle: `/scheduling`
+ * prueft `bookable_chargeable` und antwortet 409 BILLING_NOT_READY. Das Gate
+ * MELDET die Lage nur noch (`billing` im Verdikt).
  */
 export function activationGate(input: GateInput): GateVerdict {
     const missing: string[] = [];
@@ -257,10 +276,6 @@ export function activationGate(input: GateInput): GateVerdict {
     for (const a of ACTIVATION_AGREEMENTS) {
         if (!input.agreements.includes(a)) missing.push(`agreements.${a}`);
     }
-    if (!input.billing_ready) {
-        missing.push('billing.not_ready');
-        for (const r of input.billing_block_reasons) missing.push(`billing.${r}`);
-    }
     if (input.allowance && !input.allowance.ok) missing.push('plan.category_allowance');
     if (input.lifecycle_status === 'terminated') missing.push('lifecycle.terminated');
 
@@ -270,6 +285,10 @@ export function activationGate(input: GateInput): GateVerdict {
         target: approved.length === cells.length && cells.length > 0 ? 'active' : 'limited',
         approved_cells: approved.length,
         total_cells: cells.length,
+        billing: {
+            ready: input.billing_ready,
+            blocks_chargeable_booking: input.billing_ready ? [] : ['not_ready', ...input.billing_block_reasons],
+        },
     };
 }
 

@@ -368,7 +368,7 @@
     "emptyTitle": "Noch keine Anfragen",
     "emptyDescription": "Ihr Profil ist live. Neue Anfragen landen hier + als Magic-Links in Ihrem Posteingang — die meisten Partner erhalten ihre erste Anfrage innerhalb von 5 Tagen.",
     "previewProfile": "Öffentliches Profil ansehen",
-    "companyAnonymized": "🔒 Anonymisiert · wird nach Bestätigung freigeschaltet"
+    "companyAnonymized": "🔒 Anonymisierte Anfrage"
   },
   "settings": {
     "title": "Einstellungen",
@@ -443,11 +443,13 @@
   },
   "termine": {
     "title": "Termine & <accent>Leads</accent>.",
-    "sub": "Gebuchte Erstgespräche — das Dossier (Identität + Intake-Kontext) gehört dir ab Buchung. Jede Buchung ist ein abgerechneter Lead.",
+    "sub": "Gebuchte Erstgespräche. Das Dossier mit Identität und Anliegen gehört Ihnen ab der Buchung. Jede Buchung ist ein abgerechneter Lead.",
     "upcoming": "KOMMEND",
     "past": "VERGANGEN",
     "leadCharged": "Lead berechnet",
     "openDossier": "Dossier öffnen",
+    "companyMissing": "Firma nicht angegeben",
+    "minutes": "{{count}} Min.",
     "dossierEyebrow": "LEAD-DOSSIER",
     "dossierContact": "Kontakt & Termin",
     "dossierContext": "Intake-Kontext",
@@ -694,6 +696,14 @@
         "privacy_notice": "Annahme: Datenschutzhinweise",
         "billing_authorization": "Annahme: Abrechnungsermächtigung"
       }
+    },
+    "edit": "Ändern",
+    "cancelEdit": "Abbrechen",
+    "settled": {
+      "title": "Bewerbung abgeschlossen",
+      "titleSince": "Bewerbung abgeschlossen · aktiv seit {{date}}",
+      "body": "Sie können Ihre Angaben jederzeit ändern. Änderungen an Rechtsform, Vertretung und Versicherung erhält zusätzlich unser Prüfteam.",
+      "navHint": "Ihre Bewerbung ist geprüft. Über „Ändern“ passen Sie ein Kapitel an."
     }
   },
   "verification": {

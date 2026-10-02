@@ -368,7 +368,7 @@
     "emptyTitle": "Aún no hay solicitudes",
     "emptyDescription": "Su perfil está publicado. Las nuevas solicitudes llegan aquí + a su bandeja como Magic-Links — la mayoría de los partners reciben su primera solicitud en 5 días.",
     "previewProfile": "Ver perfil público",
-    "companyAnonymized": "🔒 Anonimizado · se desbloquea al confirmar"
+    "companyAnonymized": "🔒 Solicitud anonimizada"
   },
   "settings": {
     "title": "Configuración",
@@ -443,11 +443,13 @@
   },
   "termine": {
     "title": "Citas y <accent>leads</accent>.",
-    "sub": "Llamadas iniciales reservadas — el dossier (identidad + contexto) es tuyo desde la reserva. Cada reserva es un lead facturado.",
+    "sub": "Llamadas iniciales reservadas. El dossier con identidad y solicitud es suyo desde la reserva. Cada reserva es un lead facturado.",
     "upcoming": "PRÓXIMAS",
     "past": "PASADAS",
     "leadCharged": "Lead facturado",
     "openDossier": "Abrir dossier",
+    "companyMissing": "Empresa no indicada",
+    "minutes": "{{count}} min",
     "dossierEyebrow": "DOSSIER DEL LEAD",
     "dossierContact": "Contacto y cita",
     "dossierContext": "Contexto de admisión",
@@ -694,6 +696,14 @@
         "privacy_notice": "Aceptación: aviso de privacidad",
         "billing_authorization": "Aceptación: autorización de facturación"
       }
+    },
+    "edit": "Editar",
+    "cancelEdit": "Cancelar",
+    "settled": {
+      "title": "Solicitud completada",
+      "titleSince": "Solicitud completada · activo desde {{date}}",
+      "body": "Puede modificar sus datos en cualquier momento. Los cambios en la forma jurídica, la representación y el seguro también llegan a nuestro equipo de revisión.",
+      "navHint": "Su solicitud ha sido revisada. Con “Editar” actualiza un capítulo."
     }
   },
   "verification": {

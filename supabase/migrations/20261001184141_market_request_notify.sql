@@ -1,5 +1,10 @@
 -- ─── Marktanfragen: das Update wirklich verschicken ──────────────────────────
 --
+-- Dateiname = Version im Staging-Ledger (20261001184141, eingespielt per
+-- apply_migration). Hiess zuerst 20261001000000_… und teilte sich damit die
+-- Version mit 20261001000000_booking_charge — zwei Dateien, eine Version, das
+-- haelt kein Migrations-Ledger aus (umbenannt 2026-10-02).
+--
 -- Seit 20260929000000 speichert `market_requests` den Wunsch "Email me when
 -- <market> is covered" (`notify`, nur mit Konto). Verschickt wurde nichts —
 -- die Checkbox versprach etwas, das nicht passierte (Nutzer 2026-10-01: "bau

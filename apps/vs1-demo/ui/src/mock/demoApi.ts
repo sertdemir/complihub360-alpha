@@ -44,11 +44,15 @@ const USER_ID = 'fa49d5ab-4dc9-4bb4-a84d-fe624e2eea2e';
 // dieselben Acme-Anfragen aus Anbietersicht.
 const REF: Record<string, string> = { 'studio-bianchi': 'a1b2c3d4e5f6', 'schmidt-partner': 'b2c3d4e5f6a1', 'madrid-tax': 'c3d4e5f6a1b2', 'lucid-reg': 'd4e5f6a1b2c3', 'thames-vat': 'e5f6a1b2c3d4', 'costa-legal': 'f6a1b2c3d4e5', 'datenschutz-nord': '0a1b2c3d4e5f', 'oss-experts': '1b2c3d4e5f60' };
 const DESCRIPTOR: Record<string, string> = { 'studio-bianchi': 'Tax and VAT, Product & Packaging · Norditalien', 'schmidt-partner': 'Tax and VAT, Product & Packaging, Data & Privacy · Norddeutschland', 'madrid-tax': 'Tax and VAT · Spanien', 'lucid-reg': 'Product & Packaging · Hamburg', 'thames-vat': 'Tax and VAT · Vereinigtes Königreich', 'costa-legal': 'Legal Support · Spanien', 'datenschutz-nord': 'Data & Privacy · Hamburg', 'oss-experts': 'Tax and VAT · Berlin' };
+// 3 V3: Bereiche als Codes und Region getrennt — wie der Server (area_codes,
+// descriptor_region); das UI uebersetzt. DESCRIPTOR bleibt als Rueckfall.
+const AREAS: Record<string, string[]> = { 'studio-bianchi': ['product-packaging', 'tax-vat'], 'schmidt-partner': ['data-privacy', 'product-packaging', 'tax-vat'], 'madrid-tax': ['tax-vat'], 'lucid-reg': ['product-packaging'], 'thames-vat': ['tax-vat'], 'costa-legal': ['legal-advisory'], 'datenschutz-nord': ['data-privacy'], 'oss-experts': ['tax-vat'] };
+const REGION: Record<string, string> = { 'studio-bianchi': 'Norditalien', 'schmidt-partner': 'Norddeutschland', 'madrid-tax': 'Spanien', 'lucid-reg': 'Hamburg', 'thames-vat': 'Vereinigtes Königreich', 'costa-legal': 'Spanien', 'datenschutz-nord': 'Hamburg', 'oss-experts': 'Berlin' };
 const keyOfRef = (ref: string) => Object.keys(REF).find((k) => REF[k] === ref) ?? null;
 
 function bookings() {
   const b = (id: string, key: string, name: string, region: string, web: string | null, start: string, end: string, status: string) =>
-    ({ id, public_ref: REF[key] ?? null, provider_name: name, provider_descriptor: DESCRIPTOR[key] ?? '', provider_region: region, provider_website: web, identity_revealed: true, slot_start: start, slot_end: end, status, message: null });
+    ({ id, public_ref: REF[key] ?? null, provider_name: name, provider_descriptor: DESCRIPTOR[key] ?? '', provider_area_codes: AREAS[key] ?? [], provider_region: region, provider_website: web, identity_revealed: true, slot_start: start, slot_end: end, status, message: null });
   return [
     b('m0ck-b01', 'studio-bianchi', 'Studio Bianchi & Partner Commercialisti Associati S.r.l.', 'Norditalien', 'https://example.org', iso(0, 16), iso(0, 16, 30), 'confirmed'),
     b('m0ck-b02', 'schmidt-partner', 'Schmidt & Partner Steuerberatungsgesellschaft mbH', 'Norddeutschland', 'https://example.org', iso(1, 9), iso(1, 9, 30), 'confirmed'),
@@ -148,15 +152,17 @@ const PROPOSALS: Record<string, { proposal_issued: boolean; discount_shown: bool
 function partnerBookings() {
   const lead = (band: number, standard: number, pct: number, seq: number | null) =>
     ({ band, standard_fee_cents: standard, discount_pct: pct, discount_sequence: seq, final_fee_cents: Math.round(standard * (100 - pct) / 100), currency: 'USD', payment_status: 'captured', fee_enabled: true });
-  const k = (id: string, start: string, status: string, email: string, message: string, l: ReturnType<typeof lead> | null) =>
-    ({ id, slot_start: start, slot_end: new Date(new Date(start).getTime() + 30 * 60_000).toISOString(), status, lead_charged: true, user_email: email, message,
+  // 2 V1: Firma, Bereich und Markt kommen wie beim Server aus der Anfrage;
+  // Hafenkontor hat keine Firma angegeben -> das UI zeigt "nicht angegeben".
+  const k = (id: string, start: string, status: string, email: string, company: string | null, category: string, country: string, message: string, l: ReturnType<typeof lead> | null) =>
+    ({ id, slot_start: start, slot_end: new Date(new Date(start).getTime() + 30 * 60_000).toISOString(), status, lead_charged: true, user_email: email, user_company: company, category, country, message,
        lead: l, user_discount_pct: l ? 10 : null, proposal: PROPOSALS[id] ?? null, acknowledgement_version: l ? 'booking-ack-v1' : null, price_snapshot: null });
   return [
-    k('m0ck-b02', iso(1, 9), 'confirmed', 'a.weber@acme-gmbh.example', 'EPR & Verpackung · DE — LUCID-Registrierung, Mengenmeldung (Acme GmbH)', lead(2, 14900, 10, 3)),
-    k('pb-3', iso(-9, 10), 'completed', 'einkauf@moebelwerk-sued.example', 'EPR-Registrierung Möbelverpackungen · stattgefunden (Möbelwerk Süd GmbH)', lead(4, 49900, 10, 2)),
-    k('pb-4', iso(-18, 15), 'no_show', 'info@hafenkontor.example', 'USt · DE — OSS-Umstellung (Hafenkontor Handels GmbH)', lead(2, 14900, 10, 1)),
+    k('m0ck-b02', iso(1, 9), 'confirmed', 'a.weber@acme-gmbh.example', 'Acme GmbH', 'product-packaging', 'DE', 'LUCID-Registrierung und Mengenmeldung für den Marktplatz-Start.', lead(2, 14900, 10, 3)),
+    k('pb-3', iso(-9, 10), 'completed', 'einkauf@moebelwerk-sued.example', 'Möbelwerk Süd GmbH', 'product-packaging', 'DE', 'EPR-Registrierung für Möbelverpackungen.', lead(4, 49900, 10, 2)),
+    k('pb-4', iso(-18, 15), 'no_show', 'info@hafenkontor.example', null, 'tax-vat', 'DE', 'Umstellung auf OSS.', lead(2, 14900, 10, 1)),
     // Aus der Zeit vor Phase 4: kein Ledger, nur das Wort „Lead berechnet".
-    k('m0ck-b12', iso(-30, 15), 'completed', 'a.weber@acme-gmbh.example', 'USt · DE — OSS-Erstgespräch (Acme GmbH)', null),
+    k('m0ck-b12', iso(-30, 15), 'completed', 'a.weber@acme-gmbh.example', 'Acme GmbH', 'tax-vat', 'DE', 'OSS-Erstgespräch.', null),
   ];
 }
 function reportProposal(bookingId: string, body: Record<string, unknown>) {
@@ -309,7 +315,7 @@ const PROVIDERS = [
 const LETTER = (i: number) => String.fromCharCode(65 + i);
 const titled = (p: (typeof PROVIDERS)[number], i: number) => {
   const { _key, ...pub } = p;
-  return { ...pub, title: `Verified Provider ${LETTER(i)}`, letter: LETTER(i), descriptor: DESCRIPTOR[_key] };
+  return { ...pub, title: `Verified Provider ${LETTER(i)}`, letter: LETTER(i), descriptor: DESCRIPTOR[_key], area_codes: AREAS[_key] ?? [], descriptor_region: REGION[_key] ?? null };
 };
 
 // Stufe-2-Detail je Anbieter (Spec §4.6): dieselben anonymen Felder wie die
@@ -423,7 +429,15 @@ function providerDetail(ref: string) {
   if (!p || !d || !key) return { __status: 404, errorCode: 'NOT_FOUND', message: 'Provider not found' };
   const { match, match_tier, match_basis, _key, ...anon } = p;
   void match; void match_tier; void match_basis; void _key;
-  return { ok: true, detail: { ...anon, descriptor: DESCRIPTOR[key], ...d, availability: 'available' }, detail_open_charged: false };
+  // bookable_chargeable: der Server berechnet es aus dem laufenden Tarif
+  // (TKT-PROV-06). Im Mock sind ALLE drei buchbar, und das mit Absicht: von den
+  // Anbietern mit Detailseite ist 'madrid-tax' der einzige ohne Termin, also
+  // genau der, den man anklickt, um die Buchung zu sehen (siehe Kommentar an
+  // den Mock-Buchungen). Ihn zu sperren nimmt dem Datensatz seinen Zweck.
+  // Wer den Fall "kein Buchen-Knopf" lokal sehen will, setzt hier einmal
+  // `false` — abgesichert ist er durch die Waechter in
+  // ProviderDetailPage.guard.test.ts.
+  return { ok: true, detail: { ...anon, descriptor: DESCRIPTOR[key], area_codes: AREAS[key] ?? [], descriptor_region: REGION[key] ?? null, ...d, availability: 'available', bookable_chargeable: true }, detail_open_charged: false };
 }
 
 // Bewertungen: nur, was an einer Buchung haengt (so wie der Server filtert).
@@ -756,7 +770,11 @@ function p2Verification(key?: string) {
   return { ok: true, lifecycle: { status: p.lifecycle_status, since: p.lifecycle_status_since, reason: p.lifecycle_status_reason, reverification_due_at: null, grace_until: null }, matrix: p2Matrix(), checklist: p2Checklist(), open_requests: p2Requests(), history: p2History() };
 }
 function p2Gate() {
-  return { ok: false, missing: ['evidence.insurance', 'evidence.representative_identity', 'agreements.none', 'billing.not_ready', 'billing.no_payment_method'].filter((m) => m !== 'agreements.none'), target: 'limited', approved_cells: 1, total_cells: 4, allowance: null };
+  // Kein billing.* in `missing`: die Zahlungsbereitschaft sperrt die
+  // gebuehrenpflichtige Buchung, nicht die Aktivierung (Spec A §21.1). Sie wird
+  // gemeldet — und muss hier stehen, sonst greift die Gate-Leiste ins Leere.
+  return { ok: false, missing: ['evidence.insurance', 'evidence.representative_identity'], target: 'limited', approved_cells: 1, total_cells: 4, allowance: null,
+    billing: { ready: false, blocks_chargeable_booking: ['not_ready', 'no_payment_method'] } };
 }
 function p2Queue() {
   const rows = [

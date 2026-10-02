@@ -1995,7 +1995,8 @@
       "sentBody": "We count requests per market to decide where coverage comes next. We can’t promise a date.",
       "notifyLabel": "Email me when {{market}} is covered",
       "notifyHelp": "We’ll email you at {{email}}. Only for this market.",
-      "failed": "We couldn’t send your request. Please try again."
+      "failed": "We couldn’t send your request. Please try again.",
+      "guestMessage": "Request this market. We count requests per market to decide where coverage comes next."
     }
   },
   "errorBoundary": {
