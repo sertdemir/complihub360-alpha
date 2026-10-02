@@ -651,7 +651,13 @@
     },
     "tabUpcoming": "Upcoming",
     "tabPast": "Past",
-    "origin": "was “{{descriptor}}” before booking"
+    "origin": "was “{{descriptor}}” before booking",
+    "paused": {
+      "body": "The provider cannot offer this service at the moment. Your appointment is still in place. We will get back to you as soon as it is clear how things continue.",
+      "short": "The provider cannot offer this service at the moment. Details below.",
+      "cancel": "Cancel appointment free of charge",
+      "talk": "Talk to us"
+    }
   },
   "review": {
     "eyebrow": "REVIEW",

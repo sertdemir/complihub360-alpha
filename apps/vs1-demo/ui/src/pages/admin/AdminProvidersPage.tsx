@@ -13,6 +13,7 @@ import { EmptyState } from '../../components/ui/EmptyState';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { fetchQueue, type Queue, type QueueKind, type QueueRow, type Risk } from '../../api/review';
 import type { LifecycleStatus } from '../../api/application';
+import { ChangeDrawer } from '../../components/admin/ChangeDrawer';
 
 // ─── Admin · Prüf-Queue (Figma "Admin · Prüf-Queue v2", Canvas 6A) ──────────
 // Eine Tabelle, nach Risiko und Frist sortiert — die Sortierung macht die API
@@ -56,7 +57,10 @@ export function AdminProvidersPage() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | QueueKind>('all');
   const [q, setQ] = useState('');
-  useEffect(() => { fetchQueue().then(setQueue).catch(() => setError('The queue could not be loaded. The API answers 403 without an admin login.')); }, []);
+  const load = () => fetchQueue().then(setQueue).catch(() => setError('The queue could not be loaded. The API answers 403 without an admin login.'));
+  useEffect(() => { void load(); }, []);
+  // Canvas E V1: ein Change request oeffnet den Drawer statt des Dossiers.
+  const [change, setChange] = useState<QueueRow | null>(null);
 
   const rows = useMemo(() => (queue?.rows ?? []).filter((r) => (filter === 'all' || r.kind === filter) && (!q || `${r.provider_name} ${r.provider_key}`.toLowerCase().includes(q.toLowerCase()))), [queue, filter, q]);
   const count = (k: 'all' | QueueKind) => (queue?.rows ?? []).filter((r) => k === 'all' || r.kind === k).length;
@@ -102,7 +106,9 @@ export function AdminProvidersPage() {
                           <td className="px-4 py-3 text-fg-secondary">{r.detail ?? '—'}</td>
                           <td className="px-4 py-3 text-fg-secondary">{r.due_at ? `due ${relative(r.due_at, locale)}` : relative(r.since, locale)}</td>
                           <td className="px-4 py-3"><Badge tone={RISK[r.risk].tone} appearance={RISK[r.risk].appearance} size="sm">{RISK[r.risk].label}</Badge></td>
-                          <td className="px-4 py-3 text-right"><Link to={`${base}/${r.provider_key}`}><Button size="sm" variant={primary ? 'primary' : 'secondary'}>{primary ? 'Review' : 'Open'}</Button></Link></td>
+                          <td className="px-4 py-3 text-right">{r.kind === 'change_request' && r.ref_id
+                            ? <Button size="sm" variant="primary" onClick={() => setChange(r)}>Decide</Button>
+                            : <Link to={`${base}/${r.provider_key}`}><Button size="sm" variant={primary ? 'primary' : 'secondary'}>{primary ? 'Review' : 'Open'}</Button></Link>}</td>
                         </tr>
                       );
                     })}
@@ -117,6 +123,7 @@ export function AdminProvidersPage() {
           </>
         )}
       </div>
+      <ChangeDrawer providerKey={change?.provider_key ?? ''} providerName={change?.provider_name ?? ''} changeId={change?.ref_id ?? null} onClose={() => setChange(null)} onDecided={() => void load()} />
     </AdminShell>
   );
 }

@@ -651,7 +651,13 @@
     },
     "tabUpcoming": "Próximas",
     "tabPast": "Pasadas",
-    "origin": "era «{{descriptor}}» antes de la reserva"
+    "origin": "era «{{descriptor}}» antes de la reserva",
+    "paused": {
+      "body": "El proveedor no puede ofrecer este servicio en este momento. Su cita sigue registrada. Le escribiremos en cuanto esté claro cómo sigue.",
+      "short": "El proveedor no puede ofrecer este servicio en este momento. Detalles abajo.",
+      "cancel": "Cancelar la cita sin coste",
+      "talk": "Hablar con nosotros"
+    }
   },
   "review": {
     "eyebrow": "VALORACIÓN",

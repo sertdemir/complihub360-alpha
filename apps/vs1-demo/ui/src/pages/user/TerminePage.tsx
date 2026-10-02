@@ -12,7 +12,7 @@ import { RescheduleDrawer, type RescheduleTarget } from '../../components/user/R
 import { ConfirmDrawer, type ConfirmSpec } from '../../components/provider/ConfirmDrawer';
 import { EmptyState } from '../../components/user/EmptyState';
 import { Tabs, TabList, Tab } from '../../components/ui/Tabs';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { fetchUserRequests, type UserRequestRow } from '../../api/requests';
 import { AnfragenTab } from './AnfragenTab';
 import { useRequestContext } from '../../lib/requestContext';
@@ -63,6 +63,8 @@ interface Row {
   meta: string;
   status: BookingStatus;
   needsOutcome?: boolean; // slot passed, outcome not recorded (watchdog §1)
+  /** Canvas F V1: Leistung beim Anbieter pausiert. */
+  paused: boolean;
 }
 
 // Canvas 4B: die Herkunft eines Termins. Nach der Offenlegung steht unter dem
@@ -108,6 +110,7 @@ function toRows(bookings: UserBooking[], locale: string): Row[] {
       meta: b.message || '—',
       status: b.status,
       needsOutcome: b.status === 'confirmed' && start.getTime() < Date.now(),
+      paused: b.providerPaused,
     };
   });
 }
@@ -200,7 +203,7 @@ export function TerminePage() {
     if (moved[r.id]) {
       const start = new Date(moved[r.id]);
       const end = new Date(start.getTime() + 30 * 60 * 1000);
-      return { ...r, slotStartIso: start.toISOString(), slotEndIso: end.toISOString(), dateLine: df.format(start), timeLine: `${tf.format(start)}–${tf.format(end)} · Video-Call`, needsOutcome: false };
+      return { ...r, slotStartIso: start.toISOString(), slotEndIso: end.toISOString(), dateLine: df.format(start), timeLine: `${tf.format(start)}–${tf.format(end)}`, needsOutcome: false };
     }
     return r;
   });
@@ -252,6 +255,19 @@ export function TerminePage() {
     bookingId: r.id, publicRef: r.publicRef ?? '', providerName: r.provider,
     currentLine: `${r.dateLine} · ${r.timeLine}`,
   });
+
+  // ── Anbieter pausiert (Canvas F V1, 2026-10-01) ────────────────────────────
+  // Ohne Grund — der gehoert dem Anbieter und dem Pruefteam —, ohne Angst-
+  // Sprache. Absagen ohne Nachteil, und ein Mensch ist erreichbar.
+  const pausedNotice = (r: Row) => r.paused && r.status === 'confirmed' && !r.needsOutcome ? (
+    <div className="space-y-2.5 rounded-lg bg-brand-light px-3.5 py-3 text-[13px] font-medium leading-relaxed text-fg-brand">
+      <p>{t('termine.paused.body')}</p>
+      <div className="flex flex-wrap gap-2">
+        <Button size="sm" variant="secondary" onClick={() => onCancel(r)}>{t('termine.paused.cancel')}</Button>
+        <Link to={`/${locale}/contact`}><Button size="sm" variant="ghost">{t('termine.paused.talk')}</Button></Link>
+      </div>
+    </div>
+  ) : null;
 
   // ── Terminzeile (3B) ────────────────────────────────────────────────────────
   const card = (r: Row, opts: { flatTop?: boolean } = {}) => (
@@ -352,6 +368,7 @@ export function TerminePage() {
           </a>
         )}
       </div>
+      {pausedNotice(r)}
       <div className="mt-auto flex flex-wrap items-center gap-2 pt-1">
         {r.status === 'confirmed' && (
           <>
@@ -419,6 +436,7 @@ export function TerminePage() {
               <p className="truncate text-[13px] text-fg-brand">
                 {next.dateLine} · {next.timeLine}{next.meta !== '—' ? ` · ${next.meta}` : ''}
               </p>
+              {next.paused && <p className="mt-1 text-[12.5px] font-medium text-fg-brand">{t('termine.paused.short')}</p>}
             </div>
             <div className="flex shrink-0 items-center gap-2">
               <Button size="sm" iconLeft={<CalendarPlus size={14} />} onClick={() => ladeIcs(next)}>
