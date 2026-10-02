@@ -183,7 +183,35 @@
     "duration": "30 min",
     "noSlots": "Este proveedor no tiene horas libres ahora mismo. Inténtelo de nuevo en unos días.",
     "failed": "No se pudo reservar la cita. Inténtelo de nuevo en un momento.",
-    "doneNote": "La invitación está en su bandeja de entrada. En «Citas» puede moverla o cancelarla."
+    "doneNote": "La invitación está en su bandeja de entrada. En «Citas» puede moverla o cancelarla.",
+    "ackLabel": "Lo que confirma con esta reserva",
+    "ackLoading": "Cargando las condiciones de reserva …",
+    "ackConfirmLine_one": "Con la reserva confirma el punto anterior (versión {{version}})",
+    "ackConfirmLine_other": "Con la reserva confirma los {{count}} puntos anteriores (versión {{version}})",
+    "fail": {
+      "not_completed": {
+        "title": "No se pudo completar la reserva.",
+        "body": "No depende de usted: en este momento falta un requisito por parte del proveedor. Su cita no está reservada y no se ha compartido nada. El proveedor ha sido informado."
+      },
+      "slot_taken": {
+        "title": "Esta franja acaba de ser ocupada.",
+        "body": "Otra persona la reservó hace un momento. Su cita no está reservada y no se ha compartido nada — elija otra franja."
+      },
+      "acknowledgement_outdated": {
+        "title": "Las condiciones de reserva han cambiado.",
+        "body": "Lea de nuevo los puntos actualizados antes de reservar. Su cita no está reservada y no se ha compartido nada."
+      },
+      "generic": {
+        "title": "No se pudo reservar la cita.",
+        "body": "Inténtelo de nuevo en un momento. Su cita no está reservada y no se ha compartido nada."
+      },
+      "otherProvider": "Elegir otro proveedor",
+      "retryLater": "Intentarlo más tarde",
+      "retryNow": "Intentar de nuevo",
+      "pickOtherSlot": "Elegir otra franja",
+      "reread": "Leer las condiciones actualizadas",
+      "keepNote": "Su mensaje y su selección se conservan."
+    }
   },
   "search": {
     "navGuided": "Evaluar mis necesidades",

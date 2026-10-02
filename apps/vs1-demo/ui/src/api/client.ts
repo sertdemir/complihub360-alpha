@@ -53,8 +53,8 @@ async function demoAntwort<T>(path: string, init: RequestInit, correlationId: st
   try { body = typeof init.body === 'string' && init.body ? JSON.parse(init.body) : {}; } catch { /* kein JSON */ }
   let role = '';
   try { role = localStorage.getItem('demo_user_role') ?? ''; } catch { /* kein Storage */ }
-  const pathname = path.split('?')[0];
-  const result = route(init.method ?? 'GET', pathname, body, role);
+  const [pathname, search] = path.split('?');
+  const result = route(init.method ?? 'GET', pathname, body, role, new URLSearchParams(search ?? ''));
   const { __status, ...payload } = (result ?? {}) as { __status?: number } & Record<string, unknown>;
   if (__status && __status >= 400) {
     throw new ApiError(String(payload.message ?? `HTTP ${__status}`), __status, correlationId, undefined, payload);

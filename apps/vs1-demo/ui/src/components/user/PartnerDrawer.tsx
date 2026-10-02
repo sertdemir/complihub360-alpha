@@ -2,15 +2,16 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useRequestContext } from '../../lib/requestContext';
-import { ArrowLeft, ArrowRight, Eye, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ShieldCheck } from 'lucide-react';
 import { AnonNotice, Monogram, OriginLine, RankBasis } from './PartnerCard';
+import { AcknowledgementFooterLine, AcknowledgementList, BookingFailureCard } from './BookingAcknowledgement';
 import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
 import { Banner } from '../ui/Banner';
 import { ApiError } from '../../api/client';
 import {
-  createBooking, fetchProviderDetail, fetchSlots,
-  type BookingConfirmation, type ProviderDetail,
+  bookingFailureFrom, createBooking, fetchAcknowledgement, fetchProviderDetail, fetchSlots,
+  type BookingAcknowledgement, type BookingConfirmation, type BookingFailure, type ProviderDetail,
 } from '../../api/bookings';
 import type { AnonProvider } from '../../api/search';
 
@@ -40,13 +41,22 @@ import type { AnonProvider } from '../../api/search';
 // steht das da — keine Bestaetigung fuer einen Termin, den es nicht gibt.
 // (Die alte Buchungsseite fiel dafuer auf eine Fixture-Identitaet zurueck,
 // „Studio Bianchi SRL" fuer jeden Schluessel; das ist mit diesem Stand weg.)
+//
+// Phase 4 (ADR-0005, Canvas-Wahl 1B · 2A): vor dem Button steht die
+// Bestaetigung mit Fassung — drei Zeilen, was fliesst, Nachfassrecht, 10 %.
+// Die Buchung traegt die Fassung zurueck. Scheitert die Belastung des
+// Anbieters, gibt es keinen Termin und keinen Namen; der Button weicht einem
+// neutralen Kasten, Slots und Nachricht bleiben stehen.
 
 type Detail = { kind: 'loading' } | { kind: 'ready'; d: ProviderDetail } | { kind: 'missing' } | { kind: 'error' };
 type Step = 'profil' | 'termin' | 'fertig';
 
-export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessage, booking, onBooked }: {
+export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessage, sessionId, booking, onBooked }: {
   open: boolean;
   onClose: () => void;
+  /** Die Sitzung hinter der Suche — Bereich und Maerkte der Opportunity
+   *  kommen daraus; ohne Sitzung leitet der Server sie aus dem Angebot ab. */
+  sessionId?: string | null;
   /** Der Anbieter aus der Suche — traegt Match-Zahl und Pseudonym schon; die
    *  Schublade muss dafuer nichts nachladen. */
   provider: AnonProvider | null;
@@ -73,8 +83,11 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
   const [selected, setSelected] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [failure, setFailure] = useState<BookingFailure | null>(null);
   const [confirmation, setConfirmation] = useState<BookingConfirmation | null>(null);
+  const [ack, setAck] = useState<BookingAcknowledgement | null>(null);
+  const [ackKey, setAckKey] = useState(0);
+  const [slotsKey, setSlotsKey] = useState(0);
 
   // Phase 3: die Schublade spricht den Anbieter nur ueber den opaken Ref an.
   const key = provider?.public_ref ?? '';
@@ -87,9 +100,21 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
     setSelected(null);
     setMessage(sessionMessage ?? '');
     setSending(false);
-    setFailed(false);
+    setFailure(null);
     setConfirmation(null);
   }, [open, key, sessionMessage]);
+
+  // Die Bestaetigung in der Sprache des Nutzers — geladen, sobald der
+  // Termin-Schritt offen ist; neu geladen, wenn der Server eine neuere
+  // Fassung meldet.
+  useEffect(() => {
+    if (step !== 'termin') return;
+    let alive = true;
+    fetchAcknowledgement(locale)
+      .then((a) => { if (alive) setAck(a); })
+      .catch(() => { if (alive) setAck(null); });
+    return () => { alive = false; };
+  }, [step, locale, ackKey]);
 
   useEffect(() => {
     if (!open || !key) return;
@@ -113,7 +138,7 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
       .then((s) => { if (alive) setSlots(s); })
       .catch(() => { if (alive) setSlots([]); });
     return () => { alive = false; };
-  }, [step, key]);
+  }, [step, key, slotsKey]);
 
   const df = useMemo(() => new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long' }), [locale]);
   const tf = useMemo(() => new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }), [locale]);
@@ -127,23 +152,30 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
   }, [slots, df]);
 
   const book = async () => {
-    if (!selected) return;
+    if (!selected || !ack) return;
     setSending(true);
-    setFailed(false);
+    setFailure(null);
     try {
-      const res = await createBooking(key, selected, message.trim() || undefined);
+      const res = await createBooking(key, selected, {
+        message: message.trim() || undefined,
+        acknowledgementVersion: ack.version,
+        language: locale,
+        sessionId: sessionId ?? undefined,
+      });
       setConfirmation(res);
       // Die Liste dahinter erfaehrt es sofort — ohne Neuladen, ohne dass der
       // Mandant die Schublade schliessen und suchen muss.
       onBooked?.(key, { name: res.provider_identity.name, slotStart: res.booking.slot_start });
       setStep('fertig');
-    } catch {
+    } catch (err) {
       // Kein erfundener Anbieter als Rueckfall: der Termin ist nicht gebucht,
-      // und genau das steht dann da.
-      setFailed(true);
+      // und genau das steht dann da — in dem Satz, der zur Lage passt.
+      setFailure(bookingFailureFrom(err));
     }
     setSending(false);
   };
+
+  const slotLine = selected ? `${df.format(new Date(selected))} · ${tf.format(new Date(selected))} · ${t('schedule.duration')}` : null;
 
   if (!provider) return null;
   const d = detail.kind === 'ready' ? detail.d : null;
@@ -216,32 +248,42 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
             <p className="mt-2 text-center text-body-3xs text-fg-tertiary">{t('detail.drawerBookNote')}</p>
           </>
         ) : step === 'termin' ? (
-          <>
-            {/* Abgenommene Zustands-Copy (Checklist v1.0, "Booking processing").
-                Der Knopf bleibt gesperrt, solange die Anfrage laeuft — das ist
-                die Vorgabe "prevent duplicate submission". */}
-            {sending && (
-              <Banner status="info" title={t('common:states.bookingProcessing.heading')} className="mb-3">
-                {t('common:states.bookingProcessing.message')}
-              </Banner>
-            )}
-            <Button
-              size="lg"
-              shape="soft"
-              fullWidth
-              type="button"
-              disabled={!selected || sending}
-              onClick={book}
-              className="disabled:opacity-50"
-            >
-              {t('schedule.confirmCta')}
-            </Button>
-            <p className="mt-2 text-center text-body-3xs text-fg-tertiary">
+          failure ? (
+            // Canvas 2A: der Kasten steht an der Stelle des Buttons; Slots und
+            // Nachricht im Body bleiben, der Nutzer verliert nichts.
+            <BookingFailureCard
+              failure={failure}
+              onOtherProvider={onClose}
+              onRetry={() => setFailure(null)}
+              onReread={() => { setFailure(null); setAckKey((k) => k + 1); }}
+              onPickSlot={() => { setFailure(null); setSelected(null); setSlotsKey((k) => k + 1); }}
+            />
+          ) : (
+            <>
+              {/* Abgenommene Zustands-Copy (Checklist v1.0, "Booking processing").
+                  Der Knopf bleibt gesperrt, solange die Anfrage laeuft — das ist
+                  die Vorgabe "prevent duplicate submission". */}
+              {sending && (
+                <Banner status="info" title={t('common:states.bookingProcessing.heading')} className="mb-3">
+                  {t('common:states.bookingProcessing.message')}
+                </Banner>
+              )}
+              <Button
+                size="lg"
+                shape="soft"
+                fullWidth
+                type="button"
+                disabled={!selected || !ack || sending}
+                onClick={book}
+                className="disabled:opacity-50"
+              >
+                {t('schedule.confirmCta')}
+              </Button>
               {selected
-                ? `${df.format(new Date(selected))} · ${tf.format(new Date(selected))} · ${t('schedule.duration')}`
-                : t('schedule.pickSlotDrawer')}
-            </p>
-          </>
+                ? <AcknowledgementFooterLine ack={ack} slotLine={slotLine} className="mt-2" />
+                : <p className="mt-2 text-center text-body-3xs text-fg-tertiary">{t('schedule.pickSlotDrawer')}</p>}
+            </>
+          )
         ) : (
           <Button size="lg" shape="soft" fullWidth type="button" onClick={() => navigate(`/${locale}/dashboard/termine`)}>
             {t('schedule.toAppointments')} <ArrowRight size={15} />
@@ -297,15 +339,13 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
             />
           </div>
 
-          <div className="mt-4 flex items-start gap-2.5 rounded-lg border border-brand/40 px-3.5 py-3">
-            <Eye size={16} className="mt-0.5 shrink-0 text-fg-brand" aria-hidden />
-            <p className="text-body-3xs leading-relaxed text-fg-secondary">{t('schedule.revealNote')}</p>
+          {/* Canvas 1B: die Bestaetigung ist der Text selbst — je Absatz der
+              Fassung eine Zeile mit Haken, direkt ueber dem Button. Sie
+              ersetzt den frueheren Hinweiskasten „Nach der Buchung werden
+              Name und Kontakt sichtbar": das steht jetzt in Zeile 1. */}
+          <div className="mt-5 border-t border-stroke-subtle pt-4">
+            <AcknowledgementList ack={ack} />
           </div>
-
-          {failed && (
-            <p className="mt-3 text-body-3xs leading-relaxed text-error-700 dark:text-error-300">{t('schedule.failed')}</p>
-          )}
-          <p className="mt-3 text-center text-body-3xs text-fg-tertiary">{t('schedule.freeNote')}</p>
         </>
       )}
 

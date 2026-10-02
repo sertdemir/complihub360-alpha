@@ -17,6 +17,13 @@ ohne Buchung**, neutral benannt.
 Backend, Canvas, Figma und lokale UI nach dem UI-Workflow (Canvas → Figma →
 lokal; Staging nach dem Review des Nutzers).
 
+**Backend gemergt 2026-10-01:** PR #234, Squash `8686e28c`; Staging-Migration
+`booking_charge` per Supabase-MCP eingespielt (in Stücken, Ledger-Zeile von
+Hand). Canvas: https://claude.ai/artifact/Vk4dLmmyBP6zz4Tx4hkBXP — **Wahl des
+Nutzers 2026-10-01: 1B · 2A · 3A · 4A.** Figma-Seite „Buchung & Belastung
+(Phase 4)" (Node 3540:2) mit vier Frames und Uptake-Notiz. UI lokal im
+zweiten PR.
+
 ## Objective
 
 1. Vor der Offenlegung steht eine Bestätigung des Nutzers mit Version, die
@@ -40,24 +47,24 @@ lokal; Staging nach dem Review des Nutzers).
 
 ### Backend
 
-- [ ] `stripe.ts`: ein Modul für `stripeRequest` (Idempotency-Key),
+- [x] `stripe.ts`: ein Modul für `stripeRequest` (Idempotency-Key),
   `ensureStripeCustomer`, `getCustomerBilling`, `createPaymentIntent`
   (off-session, `confirm=true`), `refundPaymentIntent`; billing.ts,
   assistant.ts und Portal-Route nutzen es.
-- [ ] Migration `20261001000000_booking_charge.sql`: `booking_acknowledgements`
+- [x] Migration `20261001000000_booking_charge.sql`: `booking_acknowledgements`
   (v1 in en/de/es/tr, öffentlich lesbar), `user_discount_policy` (v1 10 %
   `undecided`), `lead_proposal_reports`, `scheduling` +
   `acknowledgement_version`, `lead_ledger_id`, `user_discount_pct`,
   `user_discount_policy_version`, Partial Unique Index auf bestätigte Slots;
   `providers` + `billing_synced_at`, `last_payment_failure`. pgTAP 09.
-- [ ] `billingReadiness()` rein mit den sechs §21.1-Gründen plus
+- [x] `billingReadiness()` rein mit den sechs §21.1-Gründen plus
   `payment_failed`; `handleBillingPreview` zählt nur `captured`/`n/a` und
   trägt `readiness`.
-- [ ] `leadCharge.ts`: `deriveOpportunity` (Area nur aus dem Angebot des
+- [x] `leadCharge.ts`: `deriveOpportunity` (Area nur aus dem Angebot des
   Anbieters), `priceSnapshotFrom`, `currentAcknowledgement`,
   `resolveLedgerStatus`, `chargeLeadFee` (Ledger → Stripe → Event),
   `recordPaymentFailure`, `syncBillingReadiness`.
-- [ ] `POST /scheduling`: Version Pflicht (409 `ACKNOWLEDGEMENT_OUTDATED`),
+- [x] `POST /scheduling`: Version Pflicht (409 `ACKNOWLEDGEMENT_OUTDATED`),
   Slot-Kollision (409 `SLOT_TAKEN`), Opportunity aus `session_id` oder Body,
   Zahlungsmittel-Check, Ledger → Stripe → `scheduling` mit allen Feldern,
   Zähler, Events `scheduling_confirmed`, `provider_lead_charged`,
@@ -65,34 +72,39 @@ lokal; Staging nach dem Review des Nutzers).
   Fehler Stripe → 502 ohne `billing_ready`-Änderung; Kompensation per
   Erstattung bei Insert-Fehler nach Capture. Kein Band, keine Gebühr auf
   dem Nutzer-Draht.
-- [ ] `GET /acknowledgement` öffentlich; `GET /provider/:key/bookings` mit
+- [x] `GET /acknowledgement` öffentlich; `GET /provider/:key/bookings` mit
   `lead`, `user_discount_pct`, `proposal`, `price_snapshot`; `PATCH
   /provider/:key/bookings/:id/proposal`; `POST /provider/:key/billing/sync`;
   Ownership-Regex; `runBillingReadinessTick` (Shadow zuerst).
-- [ ] Benachrichtigungen `booking_created`, `payment_failed`; Mails
+- [x] Benachrichtigungen `booking_created`, `payment_failed`; Mails
   `sendBookingMail`, `sendPaymentFailedMail` (ohne Nutzeridentität, ohne
   Decline-Code).
-- [ ] Tests: Stripe als Modul-Mock; Happy Path, Rabattfolge, Legal Support
+- [x] Tests: Stripe als Modul-Mock; Happy Path, Rabattfolge, Legal Support
   ohne Gebühr, Karte abgelehnt, Stripe-Fehler, Version veraltet, Slot belegt,
   kein Zahlungsmittel, fremde Session, Kompensation, Neutralität (Band
   unabhängig vom Plan), Leak-Guard, Acknowledgement, Proposal, Sync, Preview,
   Watcher.
-- [ ] Typen, OpenAPI, ADR-0005, `docs/stripe-setup.md` (Key-Rechte),
+- [x] Typen, OpenAPI, ADR-0005, `docs/stripe-setup.md` (Key-Rechte),
   Korrekturnotizen in `user-flow-matchmaking-v2-spec.md` §8 und
   `Addendum — Dossier Handover` §4.
 
 ### UI (Canvas → Figma → lokal)
 
-- [ ] Canvas mit vier Sektionen × drei Varianten; Wahl des Nutzers.
-- [ ] Figma-Seite „Buchung & Belastung (Phase 4)" (Compass-Instanzen,
-  Uptake-Kandidaten).
-- [ ] Drawer und Terminseite: Acknowledgement mit Version vor dem CTA,
-  Zustände `BOOKING_NOT_COMPLETED`, `SLOT_TAKEN`, `ACKNOWLEDGEMENT_OUTDATED`.
-- [ ] LeadsPage: Band, Standard → Endbetrag, Rabattfolge, 10 %-Pflicht mit
-  Bestätigung. BillingPage: Zahlungsbereitschaft mit Gründen, Sync beim
-  Rückweg aus dem Portal, Leads-Zeile echt.
-- [ ] Mock-Modus (`vite-plugin-mock-api.ts`, `mock/demoApi.ts`), Locales
-  en/de/es/tr, Screenshots.
+- [x] Canvas mit vier Sektionen × drei Varianten (veröffentlicht); Wahl 1B · 2A · 3A · 4A.
+- [x] Figma-Seite „Buchung & Belastung (Phase 4)" (Compass-Instanzen,
+  Uptake-Kandidaten: AcknowledgementList, StateCard neutral, LeadBillingLine,
+  ReadinessBox).
+- [x] Drawer und Terminseite: Acknowledgement mit Version vor dem CTA
+  (`BookingAcknowledgement.tsx`), Zustände `BOOKING_NOT_COMPLETED` /
+  `BILLING_NOT_READY`, `SLOT_TAKEN`, `ACKNOWLEDGEMENT_OUTDATED` als neutraler
+  Kasten an der Stelle des Buttons; `sessionId` aus der Ergebnisseite.
+- [x] LeadsPage: Band, Standard → Endbetrag, Rabattzähler, Status, 10 %-Block
+  mit zwei Umschaltern (PATCH proposal). BillingPage: Status-Kasten gesperrt /
+  bereit mit Gründen, Portal-Button, „Jetzt prüfen", Sync bei `?from=portal`.
+- [x] Mock-Modus (`/acknowledgement`, Fassung Pflicht, 15:30-Termine →
+  `BOOKING_NOT_COMPLETED`, Leads mit Ledger, Proposal-PATCH, `billing/sync`
+  mit Zustandswechsel), Locales en/de/es/tr, Screenshots im PR.
+- [ ] Review des Nutzers lokal, dann Staging (Stufe 4).
 
 ## Nicht in diesem Ticket
 

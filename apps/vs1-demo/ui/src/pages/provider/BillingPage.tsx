@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ProviderShell } from '../../components/provider/ProviderShell';
 import { Banner } from '../../components/ui/Banner';
@@ -8,12 +9,19 @@ import { Table, THead, TBody, TR, TH, TD } from '../../components/ui/Table';
 import { Tag } from '../../components/ui/Tag';
 import { InvoiceDetailDrawer } from '../../components/provider/InvoiceDetailDrawer';
 import { useApiData } from '../../lib/useApiData';
-import { fetchInvoices, fetchBillingPreview, openBillingPortal, money, type Invoice, type BillingPreview } from '../../api/billing';
+import { fetchInvoices, fetchBillingPreview, openBillingPortal, syncBillingReadiness, money, type Invoice, type BillingPreview, type BillingReadiness } from '../../api/billing';
 
 // ─── Provider /billing ────────────────────────────────────────────────────────
 // Mirrors "Provider Dashboard v1 · /billing (Desktop · payment-failed)"
 // (1911:370): payment-failed banner · 4 month KPIs · invoice history table.
 // B7: rows come from the invoices table; a row click opens the detail drawer.
+//
+// Phase 4 (ADR-0005, Canvas-Wahl 4A): oben ein Status-Kasten mit zwei
+// Zustaenden. Gesperrt: jeder Grund als Satz mit dem Weg zur Behebung, Button
+// ins Portal, „Jetzt pruefen". Bereit: eine gruene Zeile mit Karte, Plan,
+// Mandat, Pruefzeit. Der Satz „Sie bleiben sichtbar" nimmt die Angst, die
+// Spec A §14 ohnehin ausschliesst. Beim Rueckweg aus dem Portal (`?from=portal`)
+// stoesst die Seite den Sync an — nie im Buchungspfad.
 
 const FIXTURE: Invoice[] = [
   { id: 'f-026', invoice_number: 'INV-026', period: '2026-05', amount_cents: 216400, currency: 'EUR', status: 'failed',
@@ -60,6 +68,7 @@ const PREVIEW_FIXTURE: BillingPreview = {
   },
   discount: { pct: 10, count: 3, used: 2, remaining: 1, cycle_start: '2026-09-01' },
   leads: { count: 2, standard_cents: 24800, discount_cents: 2480, final_cents: 22320 },
+  readiness: { ready: false, reasons: ['payment_failed', 'overdue_invoice'], synced_at: '2026-10-01T08:42:00Z', payment_method: 'Visa ····4242' },
   credit_balance_cents: 0,
   lines: [{ label: 'Growth · monthly · 2026-09', qty: 1, unit_cents: 9900, amount_cents: 9900 }],
   total_cents: 32220,
@@ -86,10 +95,35 @@ const STATUS_META: Record<Invoice['status'], { labelKey: string; tone: 'success'
 };
 
 export function BillingPage() {
-  const { t } = useTranslation('providerws');
+  const { t, i18n } = useTranslation('providerws');
+  const locale = i18n.resolvedLanguage || 'en';
   const { data: invoices } = useApiData(fetchInvoices, FIXTURE);
   const { data: preview } = useApiData(fetchBillingPreview, PREVIEW_FIXTURE);
   const [detail, setDetail] = useState<Invoice | null>(null);
+
+  // Zahlungsbereitschaft: aus der Vorschau, bis ein Sync etwas Neueres weiss.
+  const [synced, setSynced] = useState<BillingReadiness | null>(null);
+  const [syncState, setSyncState] = useState<'idle' | 'busy' | 'not-configured' | 'failed'>('idle');
+  const readiness: BillingReadiness | null = synced ?? preview.readiness ?? null;
+  const sync = async () => {
+    setSyncState('busy');
+    try {
+      const r = await syncBillingReadiness();
+      if (r === 'not-configured') { setSyncState('not-configured'); return; }
+      setSynced(r);
+      setSyncState('idle');
+    } catch {
+      setSyncState('failed');
+    }
+  };
+  // `?from=portal`: der Anbieter kommt aus dem Stripe-Portal zurueck — jetzt
+  // kann sich etwas geaendert haben (neue Karte, Rechnung bezahlt).
+  const [params, setParams] = useSearchParams();
+  useEffect(() => {
+    if (params.get('from') !== 'portal') return;
+    const next = new URLSearchParams(params); next.delete('from'); setParams(next, { replace: true });
+    void sync();
+  }, []);
   // C3: "Update payment method" → Stripe billing portal; honest note until
   // STRIPE_SECRET_KEY lands on the API.
   const [portalBusy, setPortalBusy] = useState(false);
@@ -137,6 +171,51 @@ export function BillingPage() {
             {t('billing.subtitle')}
           </p>
         </div>
+
+        {/* Canvas 4A: der Status-Kasten. Gesperrt nennt jeden Grund mit dem
+            Weg zur Behebung; bereit ist eine Zeile. */}
+        {readiness && (
+          readiness.ready ? (
+            <div className="flex flex-wrap items-center gap-3 rounded-xl border border-success-500/40 bg-success-50 px-5 py-3.5 dark:bg-success-950/30">
+              <span className="text-[16px] font-bold text-success-700 dark:text-success-300" aria-hidden>✓</span>
+              <div className="min-w-0 flex-1">
+                <p className="text-[13px] font-semibold text-fg">{t('billing.readyTitle')}</p>
+                <p className="text-[12px] text-fg-secondary">
+                  {[readiness.payment_method, planLabel, readiness.synced_at ? t('billing.readinessChecked', { when: new Date(readiness.synced_at).toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' }) }) : null].filter(Boolean).join(' · ')}
+                </p>
+              </div>
+              <Button size="sm" variant="ghost" onClick={sync} disabled={syncState === 'busy'}>{syncState === 'busy' ? '…' : t('billing.checkNow')}</Button>
+            </div>
+          ) : (
+            <section className="rounded-xl border border-warning-500/50 bg-warning-50 px-5 py-4 dark:bg-warning-950/30" aria-labelledby="billing-readiness">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <h2 id="billing-readiness" className="text-[15px] font-semibold text-fg">{t('billing.blockedTitle')}</h2>
+                <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-fg-tertiary">
+                  {t('billing.readinessLabel')}{readiness.synced_at ? ` · ${t('billing.readinessChecked', { when: new Date(readiness.synced_at).toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' }) })}` : ''}
+                </span>
+              </div>
+              <ul className="mt-3 space-y-1.5">
+                {readiness.reasons.map((r) => (
+                  <li key={r} className="flex items-start gap-2 text-[13px] text-fg">
+                    <span className="mt-[1px] font-bold text-warning-700 dark:text-warning-300" aria-hidden>!</span>
+                    <span>{t(`billing.reason.${r}`)}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button size="sm" onClick={updatePayment} disabled={portalBusy}>{portalBusy ? '…' : t('billing.changePaymentInPortal')}</Button>
+                <Button size="sm" variant="secondary" onClick={sync} disabled={syncState === 'busy'}>{syncState === 'busy' ? '…' : t('billing.checkNow')}</Button>
+              </div>
+              <p className="mt-3 text-[12px] text-fg-tertiary">{t('billing.stillVisibleNote')}</p>
+            </section>
+          )
+        )}
+        {syncState === 'not-configured' && (
+          <p className="rounded-lg border border-elevate/10 bg-elevate/[0.04] px-4 py-3 text-[12px] text-fg-secondary">{t('billing.portalNotConfigured')}</p>
+        )}
+        {syncState === 'failed' && (
+          <p className="rounded-lg border border-elevate/10 bg-elevate/[0.04] px-4 py-3 text-[12px] text-fg-secondary">{t('billing.syncFailed')}</p>
+        )}
 
         {failed && (
           <Banner

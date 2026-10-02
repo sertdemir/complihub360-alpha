@@ -57,6 +57,9 @@ export interface BillingPreview {
   } | null;
   discount: { pct: number; count: number; used: number; remaining: number; cycle_start: string };
   leads: { count: number; standard_cents: number; discount_cents: number; final_cents: number };
+  /** Phase 4: ob das Konto gerade Buchungen annehmen kann, und warum nicht.
+   *  Optional, weil aeltere Antworten (und Fixtures) das Feld nicht tragen. */
+  readiness?: BillingReadiness;
   credit_balance_cents: number;
   lines: InvoiceLineItem[];
   total_cents: number;
@@ -68,6 +71,38 @@ export interface BillingPreview {
 
 export async function fetchBillingPreview(providerKey?: string): Promise<BillingPreview> {
   return apiFetch<BillingPreview & { ok: boolean }>(`/api/v1/provider/${providerKey ?? await myProviderKey()}/billing/preview`);
+}
+
+// ─── Zahlungsbereitschaft (Phase 4, Spec A §21.1) ────────────────────────────
+// Sechs Gruende aus der Spec plus `payment_failed` (letzte Lead-Belastung
+// gescheitert; verschwindet nur mit einem anderen Zahlungsmittel). Der Zustand
+// sperrt die Buchung, nie die Sichtbarkeit (§14).
+export type BillingBlockReason =
+  | 'no_payment_method' | 'incomplete_billing_info' | 'inactive_subscription'
+  | 'withdrawn_authorization' | 'overdue_invoice' | 'account_paused' | 'payment_failed';
+
+export interface BillingReadiness {
+  ready: boolean;
+  reasons: BillingBlockReason[];
+  synced_at: string | null;
+  /** „Visa ····4242" — nur der Sync aus Stripe kennt es. */
+  payment_method?: string | null;
+}
+
+/** Neu berechnen aus Stripe und Datenbank: beim Rueckweg aus dem Portal
+ *  (`?from=portal`) und auf „Jetzt pruefen". Antwortet 503, solange Stripe
+ *  nicht angebunden ist — dann bleibt der Stand aus der Vorschau stehen. */
+export async function syncBillingReadiness(providerKey?: string): Promise<BillingReadiness | 'not-configured'> {
+  try {
+    const res = await apiFetch<{ ok: boolean; readiness: BillingReadiness & { changed?: boolean } }>(`/api/v1/provider/${providerKey ?? await myProviderKey()}/billing/sync`, {
+      method: 'POST',
+      body: '{}',
+    });
+    return res.readiness;
+  } catch (e) {
+    if (e && typeof e === 'object' && 'status' in e && (e as { status: number }).status === 503) return 'not-configured';
+    throw e;
+  }
 }
 
 // ─── Stripe billing portal (wiring map C3) ───────────────────────────────────

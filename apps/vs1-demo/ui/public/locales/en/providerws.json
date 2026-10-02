@@ -180,7 +180,24 @@
     "planCadenceMonthly": "monthly",
     "planCadenceAnnual": "annual (12 months for the price of 10)",
     "discountRemaining": "{{remaining}} of {{count}} discounted leads left this cycle ({{pct}}%)",
-    "leadsLine": "Leads this cycle · {{count}} charged · {{discount}} plan discount"
+    "leadsLine": "Leads this cycle · {{count}} charged · {{discount}} plan discount",
+    "readinessLabel": "Booking readiness",
+    "readinessChecked": "last checked {{when}}",
+    "blockedTitle": "Bookings paused",
+    "readyTitle": "Bookable and ready to be charged",
+    "checkNow": "Check now",
+    "changePaymentInPortal": "Change payment method in the portal",
+    "stillVisibleNote": "You stay visible in the results — only booking is paused until the points above are resolved.",
+    "syncFailed": "The check did not go through — please try again in a moment.",
+    "reason": {
+      "no_payment_method": "No payment method on file. Add a card in the portal.",
+      "incomplete_billing_info": "Billing details are incomplete. Complete them in the portal.",
+      "inactive_subscription": "Your subscription is not active. Reactivate it to take bookings.",
+      "withdrawn_authorization": "The billing authorisation has been withdrawn. Accept the current version to continue.",
+      "overdue_invoice": "An invoice is overdue. Pay it in the portal.",
+      "account_paused": "Your account is paused.",
+      "payment_failed": "The last lead charge failed. A different payment method lifts this — the same card does not."
+    }
   },
   "confirmEmail": {
     "working": "Confirming your new address…",
@@ -447,7 +464,26 @@
     },
     "rateLead": "Rate this lead",
     "rated": "✓ Lead rated",
-    "rateNote": "Was the lead qualified? Your rating feeds our internal lead quality."
+    "rateNote": "Was the lead qualified? Your rating feeds our internal lead quality.",
+    "leadBand": "Band {{band}} · {{label}}",
+    "leadDiscountCounter": "Plan discount {{pct}} % · lead {{n}} of this cycle",
+    "leadStandardFee": "Standard fee · allowance used",
+    "leadNoFee": "No lead fee for this area",
+    "leadPayment": {
+      "captured": "Charged · receipt by e-mail",
+      "pending": "Charge pending",
+      "authorized": "Authorised",
+      "failed": "Charge failed",
+      "refunded": "Refunded",
+      "na": "Not charged"
+    },
+    "userDiscountTitle": "{{pct}} % for the client",
+    "userDiscountHint": "Applies to this engagement because the client booked through CompliHub360 · discount policy version 1",
+    "proposalIssued": "Proposal sent?",
+    "discountShown": "{{pct}} % shown?",
+    "yes": "Yes",
+    "no": "No",
+    "notYet": "Not yet"
   },
   "intake": {
     "inviteOnlyTitle": "Partner intake is invite-only.",
