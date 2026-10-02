@@ -1,7 +1,7 @@
 ---
 title: "Provider Phase 4 — Buchung, Bestätigung, Belastung, Offenlegung"
 assignee: "Claude"
-status: "doing"
+status: "review"
 ---
 
 # Provider Phase 4 — Buchung, Bestätigung, Belastung, Offenlegung
@@ -21,8 +21,9 @@ lokal; Staging nach dem Review des Nutzers).
 `booking_charge` per Supabase-MCP eingespielt (in Stücken, Ledger-Zeile von
 Hand). Canvas: https://claude.ai/artifact/Vk4dLmmyBP6zz4Tx4hkBXP — **Wahl des
 Nutzers 2026-10-01: 1B · 2A · 3A · 4A.** Figma-Seite „Buchung & Belastung
-(Phase 4)" (Node 3540:2) mit vier Frames und Uptake-Notiz. UI lokal im
-zweiten PR.
+(Phase 4)" (Node 3540:2) mit vier Frames und Uptake-Notiz. **UI gemergt
+2026-10-02:** PR #243, Squash `95ec284a` — der Nutzer hat gemergt, damit ist
+das Review erfolgt; Staging deployt automatisch (Stufe 4 läuft).
 
 ## Objective
 
@@ -104,7 +105,11 @@ zweiten PR.
 - [x] Mock-Modus (`/acknowledgement`, Fassung Pflicht, 15:30-Termine →
   `BOOKING_NOT_COMPLETED`, Leads mit Ledger, Proposal-PATCH, `billing/sync`
   mit Zustandswechsel), Locales en/de/es/tr, Screenshots im PR.
-- [ ] Review des Nutzers lokal, dann Staging (Stufe 4).
+- [x] Review des Nutzers (Merge von #243 am 2026-10-02).
+- [ ] Stufe 4 auf Staging prüfen: Buchung mit Bestätigung, Fehlerkasten,
+  Leads-Zeile, Abrechnungs-Kasten. Vorher extern: Restricted Stripe Key um
+  `payment_intents: write`, `customers: read`, `refunds: write` erweitern;
+  dann Shadow-Tick und `billing/sync` je Staging-Anbieter.
 
 ## Nicht in diesem Ticket
 
