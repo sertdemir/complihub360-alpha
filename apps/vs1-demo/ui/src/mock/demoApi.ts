@@ -71,7 +71,9 @@ function bookings() {
     b('m0ck-b11', 'datenschutz-nord', 'Datenschutz Nord GmbH', 'Hamburg', null, iso(-21, 11), iso(-21, 11, 30), 'no_show'),
     b('m0ck-b12', 'schmidt-partner', 'Schmidt & Partner Steuerberatungsgesellschaft mbH', 'Norddeutschland', null, iso(-30, 15), iso(-30, 15, 30), 'completed'),
     b('m0ck-b13', 'costa-legal', 'Bufete Costa Legal S.L.P.', 'Barcelona', null, iso(-45, 10), iso(-45, 10, 30), 'completed'),
-  ];
+  // Canvas F V1: Datenschutz Nord hat nach einem wesentlichen Ereignis die
+  // Leistung pausiert — der kommende Termin traegt das Flag.
+  ].map((x) => ({ ...x, provider_paused: x.id === 'm0ck-b06' }));
 }
 
 // Anfrage-IDs: die ersten vier Zeichen sind die sichtbare "RQ-XXXX" —
@@ -699,11 +701,11 @@ function spProvider() {
 function spServices() {
   const cov = (id: string, svc: string, cc: string, status: string, days: number | null) => ({ id, service_id: svc, country_code: cc, jurisdiction_code: null, status, limitations: null, approved_at: days === null ? null : iso(days, 11, 0), expires_at: null });
   return [
-    { id: SP.vat, service_code: 'tax-vat.returns', service_name: 'USt & OSS-Betreuung', description: 'Registrierung, Voranmeldungen und OSS-Quartalsmeldungen für Online-Händler.', pricing_model: 'subscription', price_min: 290, price_max: 290, currency: 'EUR', pricing_basis: 'je Monat (bis 3 Märkte)', response_time_hours: 24, completion_days_estimate: 5, capacity_status: 'open', status: 'active',
+    { id: SP.vat, service_code: 'tax-vat.returns', service_name: 'USt & OSS-Betreuung', description: 'Registrierung, Voranmeldungen und OSS-Quartalsmeldungen für Online-Händler.', pricing_model: 'subscription', price_min: 290, price_max: 290, currency: 'EUR', pricing_basis: 'je Monat (bis 3 Märkte)', response_time_hours: 24, completion_days_estimate: 5, capacity_status: 'open', status: 'approved',
       coverage: [cov(uuid(81, 8), SP.vat, 'DE', 'approved', -355), cov(uuid(82, 8), SP.vat, 'AT', 'approved', -200)] },
-    { id: SP.epr, service_code: 'product-packaging.registration', service_name: 'EPR & Verpackung', description: 'LUCID-Registrierung, Systembeteiligung und Mengenmeldung.', pricing_model: 'project', price_min: 600, price_max: 900, currency: 'EUR', pricing_basis: 'je Projekt', response_time_hours: 24, completion_days_estimate: 14, capacity_status: 'open', status: 'active',
+    { id: SP.epr, service_code: 'product-packaging.registration', service_name: 'EPR & Verpackung', description: 'LUCID-Registrierung, Systembeteiligung und Mengenmeldung.', pricing_model: 'project', price_min: 600, price_max: 900, currency: 'EUR', pricing_basis: 'je Projekt', response_time_hours: 24, completion_days_estimate: 14, capacity_status: 'open', status: 'approved',
       coverage: [cov(uuid(83, 8), SP.epr, 'DE', 'approved', -300), cov(uuid(84, 8), SP.epr, 'AT', 'pending', null)] },
-    { id: SP.priv, service_code: 'data-privacy.notices', service_name: 'Datenschutz für Shops', description: 'Cookie-Banner, Einwilligungsnachweise, AV-Verträge und DSFA.', pricing_model: 'project', price_min: 1200, price_max: 2400, currency: 'EUR', pricing_basis: 'je Paket', response_time_hours: 48, completion_days_estimate: 10, capacity_status: 'open', status: 'active',
+    { id: SP.priv, service_code: 'data-privacy.notices', service_name: 'Datenschutz für Shops', description: 'Cookie-Banner, Einwilligungsnachweise, AV-Verträge und DSFA.', pricing_model: 'project', price_min: 1200, price_max: 2400, currency: 'EUR', pricing_basis: 'je Paket', response_time_hours: 48, completion_days_estimate: 10, capacity_status: 'open', status: 'approved',
       coverage: [cov(uuid(85, 8), SP.priv, 'DE', 'approved', -120)] },
   ];
 }
@@ -776,11 +778,45 @@ function p2Gate() {
   return { ok: false, missing: ['evidence.insurance', 'evidence.representative_identity'], target: 'limited', approved_cells: 1, total_cells: 4, allowance: null,
     billing: { ready: false, blocks_chargeable_booking: ['not_ready', 'no_payment_method'] } };
 }
+// ─── Change-Control (TKT-PROV-07, Canvas-Wahl 01.10.2026) ────────────────────
+// Schmidt & Partner hat eine Preiserhoehung beim Datenschutz-Paket in Pruefung
+// (C V1) und eine abgelehnte Aenderung der Ausschluesse bei EPR. Studio
+// Bianchi hat eine eingeschraenkte Zulassung gemeldet (Pause, E V1).
+const CC = { held: uuid(53, 7), rejected: uuid(54, 7), event: uuid(51, 7) };
+function spChanges() {
+  return [
+    { id: CC.held, service_id: SP.priv, change_type: 'pricing', field_path: 'price_max', old_value: { price_max: 2400 }, new_value: { price_max: 2600 }, effect: 'held', status: 'submitted', deadline_class: 'before_effective_date', submitted_at: iso(-1, 9, 12), reviewed_at: null, reviewer_note: null, provider_note: null },
+    { id: CC.rejected, service_id: SP.epr, change_type: 'scope', field_path: 'exclusions', old_value: { exclusions: [] }, new_value: { exclusions: ['Buchhaltung'] }, effect: 'held', status: 'rejected', deadline_class: 'before_effective_date', submitted_at: iso(-6, 10, 0), reviewed_at: iso(-5, 15, 0), reviewer_note: 'Bitte nennen Sie, welche Buchhaltungsleistungen genau entfallen.', provider_note: null },
+  ];
+}
+// Dieselbe Regel wie changeControl.ts (direction), verkuerzt auf die vier
+// Felder, die "Konditionen ändern" anbietet.
+function serviceChange(serviceId: string, body: Record<string, unknown>) {
+  const svc = spServices().find((x) => x.id === serviceId) as Record<string, unknown> | undefined;
+  const instant: string[] = []; const review: unknown[] = []; const held: unknown[] = [];
+  for (const k of ['price_min', 'price_max', 'completion_days_estimate', 'response_time_hours']) {
+    if (!(k in body)) continue;
+    const old = svc?.[k] ?? null; const nw = body[k] ?? null;
+    if (old === nw) continue;
+    const f = { field: k, old, new: nw, change_type: k.startsWith('price') ? 'pricing' : k === 'response_time_hours' ? 'support' : 'timeline' };
+    const lower = typeof old === 'number' && typeof nw === 'number' && nw <= old;
+    (lower ? review : held).push(f);
+  }
+  if (body.dry_run === true) return { ok: true, dry_run: true, instant, review, held };
+  return { ok: true, updated: (review as Array<{ field: string }>).map((f) => f.field), held: (held as Array<{ field: string }>).map((f) => f.field), change_request_ids: [] };
+}
+function changeDetail(id: string) {
+  if (id === CC.event) return { ok: true, change: { id, service_id: null, change_type: 'material_event', field_path: null, old_value: { services: [] }, new_value: { services: [] }, effect: 'pause', status: 'submitted', deadline_class: 'immediate_24h', event_type: 'licence_restricted', occurred_on: iso(-1, 0, 0).slice(0, 10), affected_service_ids: [uuid(91, 7)], submitted_at: iso(0, 8, 0), reviewed_at: null, reviewer_note: null, provider_note: 'Die Kammer hat die Zulassung für Steuerberatung in Italien bis zur Klärung eingeschränkt.' }, live: null, stale: false, service: null, upcoming_bookings: 1 };
+  if (id === CC.held) return { ok: true, change: { ...spChanges()[0] }, live: { price_max: 2400 }, stale: false, service: { id: SP.priv, service_code: 'data-privacy.notices', service_name: 'Datenschutz für Shops', status: 'approved' }, upcoming_bookings: 2 };
+  return { __status: 404, errorCode: 'NOT_FOUND', message: 'Change not found' };
+}
+
 function p2Queue() {
   const rows = [
     { kind: 'application', provider_key: 'dahlmann-cpa', provider_name: 'Neue Kanzlei GmbH', lifecycle_status: 'more_info_required', since: iso(-3, 9, 40), due_at: null, risk: 'high', detail: 'tax-vat, data-privacy', ref_id: null },
     { kind: 'application', provider_key: 'lex-iberia', provider_name: 'Lex Iberia Abogados', lifecycle_status: 'submitted', since: iso(-1, 11, 0), due_at: null, risk: 'high', detail: 'legal-advisory', ref_id: null },
-    { kind: 'change_request', provider_key: 'studio-bianchi', provider_name: 'Studio Bianchi', lifecycle_status: 'active', since: iso(0, 8, 0), due_at: plus(9 * H), risk: 'high', detail: 'licence', ref_id: uuid(51, 7) },
+    { kind: 'change_request', provider_key: 'studio-bianchi', provider_name: 'Studio Bianchi', lifecycle_status: 'active', since: iso(0, 8, 0), due_at: plus(9 * H), risk: 'high', detail: 'licence_restricted', ref_id: CC.event },
+    { kind: 'change_request', provider_key: 'schmidt-partner', provider_name: 'Schmidt & Partner', lifecycle_status: 'active', since: iso(-1, 9, 12), due_at: null, risk: 'medium', detail: 'pricing', ref_id: CC.held },
     { kind: 'application', provider_key: 'packwise', provider_name: 'Packwise Compliance', lifecycle_status: 'under_verification', since: iso(-2, 10, 0), due_at: null, risk: 'medium', detail: 'product-packaging', ref_id: null },
     { kind: 'application', provider_key: 'nordic-privacy', provider_name: 'Nordic Privacy Partners', lifecycle_status: 'submitted', since: plus(-5 * H), due_at: null, risk: 'medium', detail: 'data-privacy', ref_id: null },
     { kind: 'reverification', provider_key: 'schmidt-partner', provider_name: 'Schmidt & Partner', lifecycle_status: 'reverification_due', since: iso(-4, 6, 0), due_at: iso(10, 6, 0), risk: 'low', detail: 'tax-vat', ref_id: null },
@@ -826,6 +862,8 @@ export function route(method: string, path: string, body: Record<string, unknown
     if (p[0] === 'provider' && p[2] === 'verification') return p2Verification(p[1]);
     if (p[0] === 'admin' && p[1] === 'review' && p[2] === 'queue') return p2Queue();
     if (p[0] === 'admin' && p[1] === 'review' && p[2] && p[3] === 'gate') return { ok: true, gate: p2Gate() };
+    if (p[0] === 'admin' && p[1] === 'review' && p[2] && p[3] === 'change' && p[4]) return changeDetail(p[4]);
+    if (p[0] === 'provider' && p[2] === 'changes') return { ok: true, changes: p[1] === PARTNER_KEY ? spChanges() : [] };
     if (p[0] === 'admin' && p[1] === 'review' && p[2] && !p[3]) return p2ReviewDossier(p[2]);
     // Phase 3: Nutzer-Routen ueber den opaken Ref; die alten Pfade mit dem
     // Schluessel gibt es nicht mehr (die API antwortet dort 404).
@@ -854,6 +892,10 @@ export function route(method: string, path: string, body: Record<string, unknown
   if (p[0] === 'session' && p.length === 2 && method === 'PATCH') return patchSession(p[1], body);
   if (p[0] === 'notifications' && p[1] === 'read') return { ok: true, marked: 3 };
   // Phase 2 · schreibende Aufrufe: plausible Antworten, keine Aenderung am Datensatz.
+  if (p[0] === 'provider' && p[2] === 'services' && p[3] && !p[4] && method === 'PATCH') return serviceChange(p[3], body);
+  if (p[0] === 'provider' && p[2] === 'changes' && p[3] && method === 'DELETE') return { ok: true, status: 'withdrawn' };
+  if (p[0] === 'provider' && p[2] === 'material-event') return { ok: true, change_request_id: uuid(97, 7), paused_service_ids: Array.isArray(body.service_ids) ? body.service_ids : spServices().map((x) => x.id), users_notified: 1 };
+  if (p[0] === 'admin' && p[1] === 'review' && p[3] === 'change' && p[4]) return { ok: true, decision: body.decision };
   if (p[0] === 'provider' && p[2] === 'services' && !p[3] && method === 'POST') return { ok: true, service: { id: uuid(99, 7), service_code: String(body.service_code ?? 'tax-vat'), service_name: String(body.service_name ?? 'Neue Leistung'), description: null, pricing_model: null, price_min: null, price_max: null, currency: null, pricing_basis: null, response_time_hours: null, completion_days_estimate: null, capacity_status: 'open', status: 'pending_verification', coverage: [] } };
   if (p[0] === 'provider' && p[2] === 'services' && p[4] === 'coverage') return { ok: true, coverage: (Array.isArray(body.countries) ? body.countries : []).map((c, i) => ({ id: uuid(60 + i, 7), service_id: p[3], country_code: typeof c === 'string' ? c : (c as { country_code: string }).country_code, jurisdiction_code: null, status: 'pending', limitations: null, approved_at: null, expires_at: null })), added: [], removed: [], withdrawn: [] };
   if (p[0] === 'provider' && p[2] === 'evidence' && p[3] === 'upload-url') return { ok: true, evidence_id: uuid(98, 7), file_ref: `dahlmann-cpa/${uuid(98, 7)}/${String(body.original_name ?? 'file.pdf')}`, upload: { url: '/api/v1/mock-upload', token: 'mock', method: 'PUT', headers: { 'Content-Type': String(body.mime_type ?? 'application/pdf') }, expiresAt: plus(2 * H) } };

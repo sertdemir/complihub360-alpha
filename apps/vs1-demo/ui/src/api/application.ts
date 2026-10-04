@@ -226,3 +226,55 @@ export interface Verification {
 export async function fetchVerification(providerKey?: string): Promise<Verification> {
   return apiFetch<Verification>(`/api/v1/provider/${await key(providerKey)}/verification`);
 }
+
+// ─── Change-Control (Spec A §18, Canvas-Wahl 01.10.2026) ─────────────────────
+// Bei einem aktiven Partner entscheidet der Server je Feld: sofort, sofort
+// mit Pruefvorgang oder wartet. Die Oberflaeche fragt vorher per dry_run
+// (B V2) und zeigt offene Vorgaenge am Feld (C V1).
+
+export interface ChangeField { field: string; old: unknown; new: unknown; change_type: string }
+export interface ChangePreview { instant: string[]; review: ChangeField[]; held: ChangeField[] }
+export interface SaveResult { updated: string[]; held: string[] }
+
+export type ChangeEffect = 'held' | 'applied' | 'pause';
+export type ChangeStatus = 'submitted' | 'under_review' | 'approved' | 'rejected' | 'applied' | 'withdrawn';
+export interface ProviderChange {
+  id: string;
+  service_id: string | null;
+  change_type: string;
+  field_path: string | null;
+  old_value: Record<string, unknown> | null;
+  new_value: Record<string, unknown> | null;
+  effect: ChangeEffect;
+  status: ChangeStatus;
+  submitted_at: string;
+  reviewed_at: string | null;
+  reviewer_note: string | null;
+  requires_reverification?: boolean;
+  event_type?: string | null;
+  affected_service_ids?: string[];
+}
+
+export async function previewService(serviceId: string, patch: Partial<ServiceInput>, providerKey?: string): Promise<ChangePreview> {
+  return apiFetch<ChangePreview>(`/api/v1/provider/${await key(providerKey)}/services/${serviceId}`, { method: 'PATCH', body: JSON.stringify({ ...patch, dry_run: true }) });
+}
+
+export async function saveService(serviceId: string, patch: Partial<ServiceInput>, providerKey?: string): Promise<SaveResult> {
+  return apiFetch<SaveResult>(`/api/v1/provider/${await key(providerKey)}/services/${serviceId}`, { method: 'PATCH', body: JSON.stringify(patch) });
+}
+
+export async function fetchChanges(providerKey?: string): Promise<ProviderChange[]> {
+  const res = await apiFetch<{ ok: boolean; changes: ProviderChange[] }>(`/api/v1/provider/${await key(providerKey)}/changes`);
+  return res.changes;
+}
+
+export async function withdrawChange(changeId: string, providerKey?: string): Promise<void> {
+  await apiFetch(`/api/v1/provider/${await key(providerKey)}/changes/${changeId}`, { method: 'DELETE' });
+}
+
+export const MATERIAL_EVENTS = ['licence_restricted', 'authority_lost', 'insurance_lost', 'security_incident', 'insolvency_or_closure', 'booking_unfulfillable', 'integrity_concern', 'account_compromised'] as const;
+export type MaterialEvent = typeof MATERIAL_EVENTS[number];
+
+export async function reportMaterialEvent(input: { event_type: MaterialEvent; occurred_on: string; service_ids: string[] | 'all'; note?: string }, providerKey?: string): Promise<{ paused_service_ids: string[] }> {
+  return apiFetch<{ ok: boolean; paused_service_ids: string[] }>(`/api/v1/provider/${await key(providerKey)}/material-event`, { method: 'POST', body: JSON.stringify(input) });
+}

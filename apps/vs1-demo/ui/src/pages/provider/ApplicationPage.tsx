@@ -15,8 +15,8 @@ import { EmptyState } from '../../components/ui/EmptyState';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { ApiError, identityHintFrom } from '../../api/client';
 import {
-  acceptAgreement, checkVatRegistry, createService, fetchApplication, patchApplication, putCoverage, removeService, submitApplication, uploadEvidence,
-  type AgreementType, type Application, type ApplicationPatch, type ChecklistItem, type Evidence, type EvidenceType, type Service,
+  acceptAgreement, checkVatRegistry, createService, fetchApplication, fetchChanges, patchApplication, previewService, putCoverage, removeService, saveService, submitApplication, uploadEvidence, withdrawChange,
+  type AgreementType, type Application, type ApplicationPatch, type ChangePreview, type ChecklistItem, type Evidence, type EvidenceType, type ProviderChange, type Service, type ServiceInput,
 } from '../../api/application';
 import { cn } from '../../lib/utils';
 
@@ -34,11 +34,13 @@ type ChapterKey = (typeof CHAPTERS)[number];
 // Canvas-Wahl 5 V1 (2026-10-01): nach der Pruefung ist die Bewerbung
 // abgeschlossen. Dann gibt es kein "Einreichen" mehr, Konto und Rechtsform
 // stehen im Lesemodus und oeffnen sich erst ueber "Ändern". Der Hinweis sagt,
-// was beim Speichern wirklich passiert: die Aenderung gilt sofort, Rechtsform,
-// Vertretung und Versicherung gehen zusaetzlich ans Pruefteam (Review-Log).
-// Eine Pruefung VOR der Veroeffentlichung gibt es erst mit dem Change-Control
-// (Phase 6) — bis dahin verspricht die Seite sie nicht.
+// was beim Speichern wirklich passiert — seit dem Change-Control (TKT-PROV-07,
+// Canvas A V3): was fuer Nutzer ungünstiger wird, erscheint erst nach der
+// Pruefung; alles andere gilt sofort, Rechtsform & Co. prueft das Team danach.
 const SETTLED = new Set(['approved_pending_activation', 'active', 'limited', 'reverification_due']);
+// Ab hier entscheidet der Server je Feld (changeControl.ts CONTROLLED_LIFECYCLE).
+const CONTROLLED = new Set(['active', 'limited', 'reverification_due', 'paused', 'suspended']);
+const OPEN = new Set(['submitted', 'under_review']);
 
 const STATE_TONE: Record<ChecklistItem['state'], BadgeTone> = { missing: 'warning', uploading: 'info', received: 'info', reviewed: 'success', rejected: 'error', expired: 'error' };
 const COVERAGE_TONE: Record<Service['coverage'][number]['status'], BadgeTone> = { pending: 'warning', approved: 'success', rejected: 'error', limited: 'info', suspended: 'neutral', expired: 'neutral' };
@@ -105,7 +107,12 @@ export function ApplicationPage() {
   const [active, setActive] = useState<ChapterKey>('account');
   const refs = useRef<Record<ChapterKey, HTMLElement | null>>({ account: null, legal: null, services: null, evidence: null, agreements: null, submit: null });
 
-  const reload = useCallback(() => fetchApplication().then((a) => { setApp(a); setError(null); }).catch(() => setError(t('application.loadError'))), [t]);
+  const [changes, setChanges] = useState<ProviderChange[]>([]);
+  const reload = useCallback(() => fetchApplication().then(async (a) => {
+    setApp(a); setError(null);
+    // Offene und zuletzt entschiedene Vorgaenge (Canvas C V1) — nur, wo es sie geben kann.
+    setChanges(CONTROLLED.has(a.provider.lifecycle_status) ? await fetchChanges().catch(() => []) : []);
+  }).catch(() => setError(t('application.loadError'))), [t]);
   useEffect(() => { void reload(); }, [reload]);
 
   const jump = (k: ChapterKey) => { setActive(k); refs.current[k]?.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
@@ -168,7 +175,7 @@ export function ApplicationPage() {
             <div className="space-y-4">
               <section ref={(el) => { refs.current.account = el; }}><AccountPanel app={app} settled={settled} onSaved={reload} /></section>
               <section ref={(el) => { refs.current.legal = el; }}><LegalPanel app={app} settled={settled} onSaved={reload} /></section>
-              <section ref={(el) => { refs.current.services = el; }}><ServicesPanel app={app} onChanged={reload} /></section>
+              <section ref={(el) => { refs.current.services = el; }}><ServicesPanel app={app} changes={changes} onChanged={reload} /></section>
               <section ref={(el) => { refs.current.evidence = el; }}><EvidencePanel app={app} locale={locale} onChanged={reload} /></section>
               <section ref={(el) => { refs.current.agreements = el; }}><AgreementsPanel app={app} locale={locale} onChanged={reload} /></section>
               {!settled && <section ref={(el) => { refs.current.submit = el; }}><SubmitPanel app={app} onChanged={reload} /></section>}
@@ -279,7 +286,7 @@ function LegalPanel({ app, settled, onSaved }: { app: Application; settled: bool
 
 // ─── 3 · Leistungen & Laender (2B) ───────────────────────────────────────────
 
-function ServicesPanel({ app, onChanged }: { app: Application; onChanged: () => Promise<void> | void }) {
+function ServicesPanel({ app, changes, onChanged }: { app: Application; changes: ProviderChange[]; onChanged: () => Promise<void> | void }) {
   const { t } = useTranslation('providerws');
   const [open, setOpen] = useState<string | null>(app.services[0]?.id ?? null);
   const [adding, setAdding] = useState(false);
@@ -302,7 +309,7 @@ function ServicesPanel({ app, onChanged }: { app: Application; onChanged: () => 
       <p className="max-w-3xl text-[12px] leading-relaxed text-fg-tertiary">{t('application.services.intro')}</p>
       {app.services.length === 0 && !adding && <EmptyState size="compact" title={t('application.services.empty')} action={<Button size="sm" onClick={() => setAdding(true)}>{t('application.services.add')}</Button>} />}
       {app.services.filter((s) => s.status !== 'retired').map((s) => (
-        <ServiceCard key={s.id} service={s} expanded={open === s.id} onToggle={() => setOpen(open === s.id ? null : s.id)} onChanged={onChanged} />
+        <ServiceCard key={s.id} service={s} changes={changes.filter((c) => c.service_id === s.id)} expanded={open === s.id} onToggle={() => setOpen(open === s.id ? null : s.id)} onChanged={onChanged} />
       ))}
       {adding ? (
         <div className="flex flex-wrap items-end gap-3 rounded-lg border border-stroke p-3">
@@ -324,14 +331,74 @@ function ServicesPanel({ app, onChanged }: { app: Application; onChanged: () => 
   );
 }
 
-function ServiceCard({ service: s, expanded, onToggle, onChanged }: { service: Service; expanded: boolean; onToggle: () => void; onChanged: () => Promise<void> | void }) {
-  const { t } = useTranslation('providerws');
+// ─── Change-Control an der Leistung (Canvas B V2 · C V1, 2026-10-01) ─────────
+// B V2: "Konditionen ändern" fragt vor dem Absenden per dry_run, was sofort
+// gilt und was wartet — die Zusammenfassung erscheint nur, wenn etwas wartet.
+// C V1: ein wartender Wert steht am Feld neben dem Live-Wert, mit "in Prüfung
+// seit" und "Änderung zurückziehen". Das Formular ist mit dem WARTENDEN Wert
+// vorbelegt (die Absicht des Partners) und schickt nur geaenderte Felder —
+// passend zur Server-Regel "gleich Live ist keine Aenderung".
+
+const TERMS = ['price_min', 'price_max', 'completion_days_estimate', 'response_time_hours'] as const;
+type TermKey = (typeof TERMS)[number];
+
+function useTermFormat() {
+  const { t, i18n } = useTranslation('providerws');
+  const locale = i18n.resolvedLanguage || 'en';
+  return (field: string, v: unknown, currency: string | null) => {
+    if (v == null || v === '') return '—';
+    if (field === 'price_min' || field === 'price_max') return new Intl.NumberFormat(locale, { style: 'currency', currency: currency || 'EUR', maximumFractionDigits: 0 }).format(Number(v));
+    if (field === 'completion_days_estimate') return t('application.change.days', { count: Number(v) });
+    if (field === 'response_time_hours') return t('application.change.hours', { count: Number(v) });
+    return Array.isArray(v) ? v.join(', ') : String(v);
+  };
+}
+
+function ServiceCard({ service: s, changes, expanded, onToggle, onChanged }: { service: Service; changes: ProviderChange[]; expanded: boolean; onToggle: () => void; onChanged: () => Promise<void> | void }) {
+  const { t, i18n } = useTranslation('providerws');
+  const locale = i18n.resolvedLanguage || 'en';
+  const fmt = useTermFormat();
   const [country, setCountry] = useState('');
   const [busy, setBusy] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
   const codes = useMemo(() => s.coverage.map((c) => c.country_code), [s.coverage]);
   const setCountries = async (next: string[]) => { setBusy(true); try { await putCoverage(s.id, next); await onChanged(); } finally { setBusy(false); } };
   const remove = async () => { setBusy(true); try { await removeService(s.id); await onChanged(); } finally { setBusy(false); } };
   const Chevron = expanded ? ChevronDown : ChevronRight;
+
+  const pending = changes.find((c) => c.effect === 'held' && OPEN.has(c.status)) ?? null;
+  const pendingValue = (k: string) => (pending?.new_value && k in pending.new_value ? pending.new_value[k] : undefined);
+  // Die letzte Entscheidung, die der Partner lesen soll: abgelehnt oder Nachweis verlangt.
+  const lastWord = changes.filter((c) => (c.status === 'rejected' || (c.status === 'under_review' && c.requires_reverification)) && c.reviewer_note)
+    .sort((a, b) => String(b.reviewed_at ?? '').localeCompare(String(a.reviewed_at ?? '')))[0] ?? null;
+  const fieldList = (c: ProviderChange) => (c.field_path ?? '').split(',').filter(Boolean).map((f) => t(`application.change.field.${f}`, { defaultValue: f })).join(', ');
+  const since = pending ? new Date(pending.submitted_at).toLocaleDateString(locale, { day: '2-digit', month: '2-digit' }) : '';
+
+  const withdraw = async () => {
+    if (!pending) return;
+    setBusy(true);
+    try { await withdrawChange(pending.id); await onChanged(); } finally { setBusy(false); }
+  };
+
+  const priceLive = s.price_min != null || s.price_max != null ? `${fmt('price_min', s.price_min, s.currency)} – ${fmt('price_max', s.price_max, s.currency)}` : '—';
+  const pricePending = pendingValue('price_min') !== undefined || pendingValue('price_max') !== undefined
+    ? `${fmt('price_min', pendingValue('price_min') ?? s.price_min, s.currency)} – ${fmt('price_max', pendingValue('price_max') ?? s.price_max, s.currency)}` : null;
+  const otherPending = pending ? Object.keys(pending.new_value ?? {}).filter((k) => !TERMS.includes(k as TermKey)) : [];
+
+  const Pending = ({ value }: { value: string | null }) => value == null ? null : (
+    <span className="mt-1 flex flex-wrap items-center gap-2">
+      <span className="font-semibold text-fg-brand">{value}</span>
+      <Badge tone="warning" size="sm">{t('application.change.pendingSince', { date: since })}</Badge>
+    </span>
+  );
+  const term = (k: TermKey) => {
+    const p = pendingValue(k);
+    return { live: fmt(k, s[k], s.currency), pending: p === undefined ? null : fmt(k, p, s.currency) };
+  };
+  const days = term('completion_days_estimate');
+  const hours = term('response_time_hours');
+
   return (
     <div className="rounded-lg border border-stroke">
       <button type="button" onClick={onToggle} className="flex w-full items-center gap-3 px-4 py-3 text-left">
@@ -339,18 +406,42 @@ function ServiceCard({ service: s, expanded, onToggle, onChanged }: { service: S
         <span className="text-[14px] font-medium text-fg">{s.service_name}</span>
         <Tag tone="neutral">{s.service_code}</Tag>
         <span className="ml-auto flex items-center gap-3">
+          {pending && <Badge tone="warning" size="sm">{t('application.change.pendingShort')}</Badge>}
           <Badge tone={SERVICE_TONE[s.status]} size="sm">{t(`application.services.status.${s.status}`)}</Badge>
           <span className="text-[12px] text-fg-tertiary">{t('application.services.countries', { count: s.coverage.length })}</span>
         </span>
       </button>
       {expanded && (
         <div className="space-y-3 border-t border-stroke-subtle px-4 pb-4 pt-3">
-          <div className="grid gap-3 md:grid-cols-4 text-[12px] text-fg-secondary">
-            <div><span className="block text-fg-tertiary">{t('application.services.pricingModel')}</span>{s.pricing_model ?? '—'}</div>
-            <div><span className="block text-fg-tertiary">{t('application.services.priceRange')}</span>{s.price_min != null || s.price_max != null ? `${s.currency ?? ''} ${s.price_min ?? ''} – ${s.price_max ?? ''} ${s.pricing_basis ? `· ${s.pricing_basis}` : ''}` : '—'}</div>
-            <div><span className="block text-fg-tertiary">{t('application.services.responseTime')}</span>{s.response_time_hours != null ? `${s.response_time_hours} h` : '—'}</div>
-            <div><span className="block text-fg-tertiary">{t('application.services.capacity')}</span>{s.capacity_status}</div>
-          </div>
+          {editing ? (
+            <TermsEditor service={s} pending={pending} onDone={async (msg) => { setEditing(false); setNotice(msg); await onChanged(); }} onCancel={() => setEditing(false)} />
+          ) : (
+            <>
+              <div className="flex items-start gap-3">
+                <div className="grid flex-1 gap-3 text-[12px] text-fg-secondary md:grid-cols-[1.6fr_1fr_1fr_1fr]">
+                  <div>
+                    <span className="block text-fg-tertiary">{t('application.services.priceRange')}</span>
+                    <span>{priceLive}{pricePending && <span className="text-fg-tertiary"> · {t('application.change.live')}</span>}</span>
+                    <Pending value={pricePending} />
+                  </div>
+                  <div><span className="block text-fg-tertiary">{t('application.change.field.completion_days_estimate')}</span>{days.live}<Pending value={days.pending} /></div>
+                  <div><span className="block text-fg-tertiary">{t('application.services.responseTime')}</span>{hours.live}<Pending value={hours.pending} /></div>
+                  <div><span className="block text-fg-tertiary">{t('application.services.capacity')}</span>{s.capacity_status}</div>
+                </div>
+                {s.status !== 'retired' && <Button size="sm" variant="secondary" onClick={() => { setNotice(null); setEditing(true); }}>{t('application.change.edit')}</Button>}
+              </div>
+              {otherPending.length > 0 && <p className="text-[12px] text-fg-tertiary">{t('application.change.morePending', { fields: otherPending.map((f) => t(`application.change.field.${f}`, { defaultValue: f })).join(', ') })}</p>}
+              {pending && <button type="button" disabled={busy} onClick={withdraw} className="text-[12px] font-medium text-fg-brand underline underline-offset-2 hover:no-underline">{t('application.change.withdraw')}</button>}
+              {notice && <p className="text-[12px] text-fg-secondary">{notice}</p>}
+              {lastWord && (
+                <div className="rounded-md bg-surface-secondary px-3 py-2 text-[12.5px] text-fg-secondary">
+                  {lastWord.status === 'rejected'
+                    ? <><span className="font-semibold text-fg">{t('application.change.rejected', { fields: fieldList(lastWord) })}</span> {t('application.change.reviewerSays', { note: lastWord.reviewer_note })}</>
+                    : <span>{t('application.change.reverification', { note: lastWord.reviewer_note })}</span>}
+                </div>
+              )}
+            </>
+          )}
           <div className="overflow-hidden rounded-md border border-stroke-subtle">
             <div className="grid grid-cols-[180px_160px_170px_1fr_40px] bg-surface-secondary px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">
               <span>{t('application.services.colCountry')}</span><span>{t('application.services.colJurisdiction')}</span><span>{t('application.services.colStatus')}</span><span>{t('application.services.colNote')}</span><span />
@@ -373,6 +464,98 @@ function ServiceCard({ service: s, expanded, onToggle, onChanged }: { service: S
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function TermsEditor({ service: s, pending, onDone, onCancel }: { service: Service; pending: ProviderChange | null; onDone: (notice: string) => void | Promise<void>; onCancel: () => void }) {
+  const { t } = useTranslation('providerws');
+  const fmt = useTermFormat();
+  const start = (k: TermKey) => {
+    const p = pending?.new_value && k in pending.new_value ? pending.new_value[k] : s[k];
+    return p == null ? '' : String(p);
+  };
+  const [form, setForm] = useState<Record<TermKey, string>>(() => Object.fromEntries(TERMS.map((k) => [k, start(k)])) as Record<TermKey, string>);
+  const [preview, setPreview] = useState<{ patch: Partial<ServiceInput>; result: ChangePreview } | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  // Nur geaenderte Felder — gemessen am vorbelegten Wert, nicht am Live-Wert.
+  const dirty = (): Partial<ServiceInput> => {
+    const out: Record<string, number | null> = {};
+    for (const k of TERMS) if (form[k] !== start(k)) out[k] = form[k].trim() === '' ? null : Number(form[k]);
+    return out as Partial<ServiceInput>;
+  };
+  const invalid = TERMS.some((k) => form[k].trim() !== '' && !(Number(form[k]) >= 0));
+
+  const next = async () => {
+    const patch = dirty();
+    if (!Object.keys(patch).length) { onCancel(); return; }
+    setBusy(true); setErr(null);
+    try {
+      const result = await previewService(s.id, patch);
+      if (result.held.length) setPreview({ patch, result });
+      else { await saveService(s.id, patch); await onDone(t('application.change.saved')); }
+    } catch (e) { setErr(identityHintFrom(e, t) ?? (e instanceof Error ? e.message : t('application.saveError'))); }
+    finally { setBusy(false); }
+  };
+  const send = async () => {
+    if (!preview) return;
+    setBusy(true); setErr(null);
+    try { await saveService(s.id, preview.patch); await onDone(t('application.change.sent')); }
+    catch (e) { setErr(e instanceof Error ? e.message : t('application.saveError')); }
+    finally { setBusy(false); }
+  };
+
+  if (preview) {
+    const { held, review, instant } = preview.result;
+    const now = [...review, ...instant.filter((k) => !review.some((f) => f.field === k)).map((k) => ({ field: k, old: (s as unknown as Record<string, unknown>)[k], new: (preview.patch as Record<string, unknown>)[k], change_type: '' }))];
+    const Line = ({ f }: { f: { field: string; old: unknown; new: unknown } }) => (
+      <div className="grid grid-cols-[120px_1fr] items-baseline gap-2 text-[13px]">
+        <span className="text-[12px] text-fg-tertiary">{t(`application.change.field.${f.field}`, { defaultValue: f.field })}</span>
+        <span><span className="text-fg-tertiary line-through">{fmt(f.field, f.old, s.currency)}</span> → <span className="font-semibold text-fg-brand">{fmt(f.field, f.new, s.currency)}</span></span>
+      </div>
+    );
+    return (
+      <div className="space-y-3 rounded-lg border border-stroke-brand p-4" role="region" aria-label={t('application.change.summaryTitle')}>
+        <p className="text-[15px] font-semibold text-fg">{t('application.change.summaryTitle')}</p>
+        <div className="space-y-1.5 rounded-md bg-surface-secondary px-3 py-2.5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{t('application.change.groupHeld')}</p>
+          {held.map((f) => <Line key={f.field} f={f} />)}
+        </div>
+        {now.length > 0 && (
+          <div className="space-y-1.5 rounded-md bg-surface-secondary px-3 py-2.5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{t('application.change.groupInstant')}</p>
+            {now.map((f) => <Line key={f.field} f={f} />)}
+          </div>
+        )}
+        <p className="text-[12.5px] text-fg-secondary">{t('application.change.summaryNote')}</p>
+        {err && <p className="text-[12px] text-error-500">{err}</p>}
+        <div className="flex gap-2">
+          <Button size="sm" disabled={busy} onClick={send}>{t('application.change.send')}</Button>
+          <Button size="sm" variant="secondary" disabled={busy} onClick={() => setPreview(null)}>{t('application.change.back')}</Button>
+        </div>
+      </div>
+    );
+  }
+
+  const label = (k: TermKey) => k === 'price_min' || k === 'price_max'
+    ? t(`application.change.form.${k}`, { currency: s.currency || 'EUR' }) : t(`application.change.form.${k}`);
+  return (
+    <div className="space-y-3 rounded-lg border border-stroke p-4">
+      <p className="text-[13px] font-semibold text-fg">{t('application.change.edit')}</p>
+      <div className="grid gap-3 md:grid-cols-4">
+        {TERMS.map((k) => (
+          <FormField key={k} label={label(k)}>
+            <Input inputSize="sm" type="number" min={0} inputMode="numeric" value={form[k]} onChange={(e) => setForm({ ...form, [k]: e.target.value })} />
+          </FormField>
+        ))}
+      </div>
+      {err && <p className="text-[12px] text-error-500">{err}</p>}
+      <div className="flex gap-2">
+        <Button size="sm" disabled={busy || invalid} onClick={next}>{t('application.change.next')}</Button>
+        <Button size="sm" variant="ghost" disabled={busy} onClick={onCancel}>{t('application.change.cancel')}</Button>
+      </div>
     </div>
   );
 }

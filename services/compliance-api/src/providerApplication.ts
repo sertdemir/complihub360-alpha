@@ -5,10 +5,15 @@ import { supabaseApi } from './supabase.js';
 import type { Caller } from './providerAuth.js';
 import { categoryAllowanceCheck, getActiveSubscription, loadPricingConfig } from './billing.js';
 import { checkVatId } from './vies.js';
+import { sendServicePausedMail } from './mailer.js';
+import { bookingAffected, localeFromCountry, pausedAreasByProvider, requestOf } from './changeImpact.js';
 import { scanFields, type IdentityContext } from './anonymity.js';
 import {
     EVIDENCE_ALLOWED_MIME, EVIDENCE_BUCKET, EVIDENCE_MAX_BYTES, evidenceObjectPath, objectInfo, signedUploadUrl,
 } from './storage.js';
+import {
+    changeRow, classify, CONTROLLED_LIFECYCLE, CONTROLLED_SERVICE, MATERIAL_EVENTS, RULES, type Classification, type ClassifiedField,
+} from './changeControl.js';
 import {
     areaCodeOf, evidenceChecklist, requiredEvidence, submitValidation, SUBMIT_AGREEMENTS,
     type ChecklistItem, type EvidenceType,
@@ -235,17 +240,180 @@ async function patchApplication(req: IncomingMessage, res: ServerResponse, corre
     // Region und Arbeitsweise stehen auf der anonymen Karte; der Name aus
     // demselben PATCH zaehlt schon als Kontext.
     if (rejectIdentity(res, correlationId, scanFields({ region: pub.region, work_mode: pub.work_mode }, identityCtx({ ...providers[0], ...pub })))) return;
+
+    // Change-Control (§18): bei einem aktiven Partner entscheidet je Feld
+    // changeControl.ts, ob es sofort gilt, sofort gilt und geprueft wird oder
+    // wartet. Vor der Aktivierung laeuft alles durch das Review der Bewerbung.
+    const controlled = CONTROLLED_LIFECYCLE.has(providers[0].lifecycle_status);
+    const confRow = Object.keys(conf).length
+        ? ((await supabaseApi.select('provider_confidential', { provider_key: providerKey }, { limit: 1 })) as any[])[0] ?? null
+        : null;
+    const pubC = classify(pub, providers[0], controlled);
+    const confC = classify(conf, confRow, controlled);
+    // Canvas B V2: die Oberflaeche fragt vor dem Absenden, was sofort gilt und
+    // was wartet — dieselbe Regel, ohne zu schreiben.
+    if (d.dry_run === true) { json(res, 200, dryRunBody(pubC, confC, correlationId)); return; }
     const now = new Date().toISOString();
-    if (Object.keys(pub).length) await supabaseApi.update('providers', { provider_key: providerKey }, { ...pub, updated_at: now });
-    if (Object.keys(conf).length) await supabaseApi.upsert('provider_confidential', 'provider_key', { provider_key: providerKey, ...conf, updated_at: now });
-    await supabaseApi.insert('event_log', { type: 'provider_application_updated', payload: { providerKey, fields: [...Object.keys(pub), ...Object.keys(conf)] } });
-    // Nach dem Einreichen ist jede Aenderung an Rechtsform oder Vertretung
-    // meldepflichtig (Spec A §18) — vorerst als Protokollzeile, das Change-
-    // Control mit Fristen kommt in Phase 6.
-    if (EDITABLE_AFTER_SUBMIT.has(providers[0].lifecycle_status) && Object.keys(conf).length) {
-        await reviewLog({ providerKey, subject: 'application', action: 'legal_fields_changed', to: Object.keys(conf).join(','), actorId: caller.userId, actorKind: 'provider' });
+    if (Object.keys(pubC.write).length) await supabaseApi.update('providers', { provider_key: providerKey }, { ...pubC.write, updated_at: now });
+    if (Object.keys(confC.write).length) await supabaseApi.upsert('provider_confidential', 'provider_key', { provider_key: providerKey, ...confC.write, updated_at: now });
+    const written = [...Object.keys(pubC.write), ...Object.keys(confC.write)];
+    const changes = await recordChanges(providerKey, null, [...pubC.review, ...confC.review], [...pubC.held, ...confC.held], str(d.change_note, 1000) || null, caller);
+    await supabaseApi.insert('event_log', { type: 'provider_application_updated', payload: { providerKey, fields: written, held: changes.held } });
+    // Vor der Aktivierung, aber nach dem Einreichen: Rechtsform und
+    // Vertretung bleiben eine Protokollzeile fuer das laufende Review.
+    if (!controlled && EDITABLE_AFTER_SUBMIT.has(providers[0].lifecycle_status) && Object.keys(confC.write).length) {
+        await reviewLog({ providerKey, subject: 'application', action: 'legal_fields_changed', to: Object.keys(confC.write).join(','), actorId: caller.userId, actorKind: 'provider' });
     }
-    json(res, 200, { ok: true, updated: [...Object.keys(pub), ...Object.keys(conf)], correlationId });
+    json(res, 200, { ok: true, updated: written, held: changes.held, change_request_ids: changes.ids, correlationId });
+}
+
+/** Antwort auf dry_run: dieselbe Aufteilung wie beim Speichern, nichts geschrieben. */
+function dryRunBody(a: Classification, b: Classification | null, correlationId: string) {
+    const fields = (xs: ClassifiedField[]) => xs.map((f) => ({ field: f.field, old: f.old, new: f.new, change_type: f.changeType }));
+    const review = [...a.review, ...(b?.review ?? [])];
+    const held = [...a.held, ...(b?.held ?? [])];
+    const write = { ...a.write, ...(b?.write ?? {}) };
+    const instant = Object.keys(write).filter((k) => !review.some((f) => f.field === k));
+    return { ok: true, dry_run: true, instant, review: fields(review), held: fields(held), correlationId };
+}
+
+/**
+ * Legt die Vorgaenge eines Speicherns an: einen fuer das sofort Uebernommene
+ * (pruefpflichtig), einen fuer das Wartende. Ein offener wartender Vorgang
+ * desselben Ziels wird fortgeschrieben statt verdoppelt — sonst koennte das
+ * Pruefteam den aelteren Wert ueber den neueren freigeben.
+ *
+ * Ein Feld, das dem Live-Wert gleicht, ist "keine Aenderung" — nie ein
+ * Zurueckziehen. Die Oberflaeche schickt beim Speichern das ganze Kapitel;
+ * sonst wuerde jedes Speichern still verwerfen, was gerade wartet.
+ * Zurueckgezogen wird nur ausdruecklich: DELETE /changes/:id.
+ */
+async function recordChanges(providerKey: string, serviceId: string | null, review: ClassifiedField[], held: ClassifiedField[], note: string | null, caller: Caller): Promise<{ ids: string[]; held: string[] }> {
+    const ids: string[] = [];
+    if (review.length) {
+        const rows = await supabaseApi.insert('provider_change_requests', changeRow(providerKey, serviceId, review, 'applied', note)) as any[];
+        if (rows?.[0]?.id) ids.push(rows[0].id);
+    }
+    const open = ((await supabaseApi.select('provider_change_requests', { provider_key: providerKey, effect: 'held' }, { limit: 200 })) as any[])
+        .find((c) => (c.service_id ?? null) === serviceId && (c.status === 'submitted' || c.status === 'under_review'));
+    let heldFields = held.map((f) => f.field);
+    if (open) {
+        const oldValue: Record<string, unknown> = { ...open.old_value };
+        const newValue: Record<string, unknown> = { ...open.new_value };
+        for (const f of held) { if (!(f.field in oldValue)) oldValue[f.field] = f.old; newValue[f.field] = f.new; }
+        heldFields = Object.keys(newValue);
+        if (held.length) {
+            const fields = heldFields.map((k) => ({ field: k, old: oldValue[k], new: newValue[k], changeType: RULES[k]?.changeType ?? 'other', deadline: RULES[k]?.deadline ?? 'within_3_business_days' })) as ClassifiedField[];
+            const row = changeRow(providerKey, serviceId, fields, 'held', note ?? open.provider_note ?? null);
+            await supabaseApi.update('provider_change_requests', { id: open.id }, {
+                change_type: row.change_type, field_path: row.field_path, old_value: oldValue, new_value: newValue,
+                deadline_class: row.deadline_class, provider_note: row.provider_note, submitted_at: row.submitted_at,
+            });
+            ids.push(open.id);
+        }
+    } else if (held.length) {
+        const rows = await supabaseApi.insert('provider_change_requests', changeRow(providerKey, serviceId, held, 'held', note)) as any[];
+        if (rows?.[0]?.id) ids.push(rows[0].id);
+    }
+    if (review.length || held.length) {
+        await reviewLog({ providerKey, subject: serviceId ? 'service' : 'application', subjectId: serviceId, action: 'change_submitted',
+            to: [...review.map((f) => f.field), ...held.map((f) => `${f.field}:held`)].join(','), actorId: caller.userId, actorKind: 'provider' });
+    }
+    return { ids, held: heldFields };
+}
+
+// ─── Aenderungen: Liste, Zurueckziehen, wesentliches Ereignis (§18) ───────────
+
+/** Was der Partner von seinen Vorgaengen sieht — ohne Reviewer-Interna. */
+function changeView(c: any) {
+    const { reviewer_id, ...rest } = c;
+    void reviewer_id;
+    return rest;
+}
+
+async function listChanges(res: ServerResponse, correlationId: string, providerKey: string) {
+    const rows = (await supabaseApi.select('provider_change_requests', { provider_key: providerKey }, { order: 'submitted_at.desc', limit: 50 })) as any[];
+    json(res, 200, { ok: true, changes: rows.map(changeView), correlationId });
+}
+
+async function withdrawChange(res: ServerResponse, correlationId: string, caller: Caller, providerKey: string, changeId: string) {
+    if (!isUuid(changeId)) { json(res, 404, { errorCode: 'NOT_FOUND', message: 'Change not found', correlationId }); return; }
+    const c = ((await supabaseApi.select('provider_change_requests', { id: changeId, provider_key: providerKey }, { limit: 1 })) as any[])[0];
+    if (!c) { json(res, 404, { errorCode: 'NOT_FOUND', message: 'Change not found', correlationId }); return; }
+    // Nur was noch wartet, laesst sich zurueckziehen. Ein uebernommener Wert
+    // wird geaendert, indem man ihn neu speichert; ein Ereignis klaert das
+    // Pruefteam mit dem Partner.
+    if (c.effect !== 'held' || !['submitted', 'under_review'].includes(c.status)) {
+        json(res, 409, { errorCode: 'CHANGE_NOT_WITHDRAWABLE', message: 'Only a change that is still waiting can be withdrawn', correlationId }); return;
+    }
+    await supabaseApi.update('provider_change_requests', { id: changeId }, { status: 'withdrawn', reviewed_at: new Date().toISOString() });
+    await reviewLog({ providerKey, subject: c.service_id ? 'service' : 'application', subjectId: c.service_id ?? null, action: 'change_withdrawn', to: c.field_path ?? null, actorId: caller.userId, actorKind: 'provider' });
+    json(res, 200, { ok: true, status: 'withdrawn', correlationId });
+}
+
+/**
+ * Ein wesentliches Ereignis (§18, 24 Stunden): Zulassung eingeschraenkt,
+ * Versicherung entfallen, Insolvenz … Die gewaehlten Leistungen pausieren
+ * sofort und fallen damit aus der Match-View; das Pruefteam entscheidet, wann
+ * sie wieder laufen. `service_ids` ist Pflicht und ausdruecklich — 'all' oder
+ * eine Liste, auch eine leere (ein Termin, der nicht haltbar ist, pausiert
+ * keine Leistung). Wer meldet, handelt richtig: die Antwort sagt, was jetzt
+ * pausiert ist, nicht was droht.
+ */
+async function materialEvent(req: IncomingMessage, res: ServerResponse, correlationId: string, caller: Caller, providerKey: string) {
+    const d = await readJson(req);
+    const eventType = str(d.event_type, 40);
+    if (!eventType || !(MATERIAL_EVENTS as readonly string[]).includes(eventType)) {
+        json(res, 400, { errorCode: 'VALIDATION_ERROR', message: `event_type must be one of ${MATERIAL_EVENTS.join(', ')}`, correlationId }); return;
+    }
+    const occurredOn = str(d.occurred_on, 10);
+    if (!occurredOn || !/^\d{4}-\d{2}-\d{2}$/.test(occurredOn) || occurredOn > new Date().toISOString().slice(0, 10)) {
+        json(res, 400, { errorCode: 'VALIDATION_ERROR', message: 'occurred_on must be a date (YYYY-MM-DD), not in the future', correlationId }); return;
+    }
+    if (d.service_ids !== 'all' && !(Array.isArray(d.service_ids) && d.service_ids.every(isUuid))) {
+        json(res, 400, { errorCode: 'VALIDATION_ERROR', message: "service_ids must be 'all' or a list of service ids", correlationId }); return;
+    }
+    const services = (await supabaseApi.select('provider_services', { provider_key: providerKey }, { limit: 200 })) as any[];
+    const pausable = services.filter((sv) => sv.status === 'approved' || sv.status === 'limited');
+    let targets: any[];
+    if (d.service_ids === 'all') targets = pausable;
+    else {
+        const unknown = (d.service_ids as string[]).filter((id) => !services.some((sv) => sv.id === id));
+        if (unknown.length) { json(res, 404, { errorCode: 'NOT_FOUND', message: 'Service not found', unknown, correlationId }); return; }
+        targets = pausable.filter((sv) => (d.service_ids as string[]).includes(sv.id));
+    }
+    const now = new Date().toISOString();
+    // Was vorher galt, VOR dem Pausieren festgehalten — damit die Freigabe
+    // genau diesen Stand wiederherstellt.
+    const before = targets.map((sv) => ({ id: sv.id, status: sv.status as string }));
+    for (const sv of targets) await supabaseApi.update('provider_services', { id: sv.id }, { status: 'paused', status_since: now, updated_at: now });
+    const rows = await supabaseApi.insert('provider_change_requests', {
+        provider_key: providerKey, service_id: null, change_type: 'material_event', field_path: null,
+        old_value: { services: before },
+        new_value: { services: targets.map((sv) => ({ id: sv.id, status: 'paused' })) },
+        deadline_class: 'immediate_24h', effect: 'pause', status: 'submitted',
+        pauses_affected_services: targets.length > 0, event_type: eventType, occurred_on: occurredOn,
+        affected_service_ids: targets.map((sv) => sv.id), provider_note: str(d.note, 1000) || null,
+        applied_at: now, submitted_at: now,
+    }) as any[];
+    await reviewLog({ providerKey, subject: 'application', action: 'material_event', to: `${eventType}:${targets.length}`, actorId: caller.userId, actorKind: 'provider' });
+    // Canvas F V1: wer einen kommenden Termin in einem pausierten Bereich hat,
+    // erfaehrt es per Mail — ohne Grund, mit kostenfreier Absage und Mensch.
+    let notified = 0;
+    if (targets.length) {
+        const paused = (await pausedAreasByProvider(providerKey)).get(providerKey);
+        const upcoming = ((await supabaseApi.select('scheduling', { provider_key: providerKey }, { limit: 500 })) as any[])
+            .filter((b) => b.slot_start > now && b.status !== 'cancelled');
+        for (const b of upcoming) {
+            const r = await requestOf(b.user_id ?? null, providerKey);
+            if (!bookingAffected(paused, r?.category)) continue;
+            const u = b.user_id ? ((await supabaseApi.select('users', { id: b.user_id }, { limit: 1 })) as any[])[0] : null;
+            await sendServicePausedMail({ to: u?.email ?? null, bookingId: b.id, slotIso: b.slot_start, locale: localeFromCountry(r?.country), correlationId });
+            notified++;
+        }
+    }
+    await supabaseApi.insert('event_log', { type: 'provider_material_event', payload: { providerKey, eventType, paused: targets.map((sv) => sv.id) } });
+    json(res, 201, { ok: true, change_request_id: rows?.[0]?.id ?? null, paused_service_ids: targets.map((sv) => sv.id), users_notified: notified, correlationId });
 }
 
 // ─── Leistungen (2B: Stamm) ──────────────────────────────────────────────────
@@ -354,13 +522,21 @@ async function patchService(req: IncomingMessage, res: ServerResponse, correlati
         const own = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[];
         if (rejectIdentity(res, correlationId, scanFields(serviceTexts(patch), identityCtx(own[0])))) return;
     }
-    patch.updated_at = new Date().toISOString();
-    await supabaseApi.update('provider_services', { id: serviceId }, patch);
-    // Eine freigegebene Leistung darf ihre Beschreibung und Preise pflegen;
-    // die Freigabe haengt an Leistung × Land, nicht am Preis (Spec A §4). Was
-    // meldepflichtig ist (Preis, Verantwortung), steht im Protokoll.
-    await reviewLog({ providerKey, subject: 'service', subjectId: serviceId, action: 'updated', to: Object.keys(patch).filter((k) => k !== 'updated_at').join(','), actorId: caller.userId, actorKind: 'provider' });
-    json(res, 200, { ok: true, updated: Object.keys(patch).filter((k) => k !== 'updated_at'), correlationId });
+    // Change-Control (§18–20): eine freigegebene Leistung eines aktiven
+    // Partners uebernimmt Preis, Umfang und Lieferzeit erst nach der Freigabe
+    // (je nach CHANGE_POLICY auch nur, wenn es fuer Nutzer ungünstiger wird).
+    // Eine neue oder noch nicht freigegebene Leistung wird als Ganzes geprueft.
+    const provider = ((await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[])[0];
+    const controlled = CONTROLLED_LIFECYCLE.has(provider?.lifecycle_status) && CONTROLLED_SERVICE.has(s.status);
+    const c = classify(patch, s, controlled);
+    if (d.dry_run === true) { json(res, 200, dryRunBody(c, null, correlationId)); return; }
+    const written = Object.keys(c.write);
+    if (written.length) await supabaseApi.update('provider_services', { id: serviceId }, { ...c.write, updated_at: new Date().toISOString() });
+    const changes = await recordChanges(providerKey, serviceId, c.review, c.held, str(d.change_note, 1000) || null, caller);
+    if (!controlled && written.length) {
+        await reviewLog({ providerKey, subject: 'service', subjectId: serviceId, action: 'updated', to: written.join(','), actorId: caller.userId, actorKind: 'provider' });
+    }
+    json(res, 200, { ok: true, updated: written, held: changes.held, change_request_ids: changes.ids, correlationId });
 }
 
 async function retireService(res: ServerResponse, correlationId: string, caller: Caller, providerKey: string, serviceId: string) {
@@ -645,7 +821,7 @@ async function verification(res: ServerResponse, correlationId: string, provider
 
 // ─── Router ──────────────────────────────────────────────────────────────────
 
-const ROUTE = /^\/api\/v1\/provider\/([a-z0-9-]+)\/(application|services|evidence|agreements|submit|verification)(?:\/([^/?]+))?(?:\/([^/?]+))?(?:\?.*)?$/;
+const ROUTE = /^\/api\/v1\/provider\/([a-z0-9-]+)\/(application|services|evidence|agreements|submit|verification|changes|material-event)(?:\/([^/?]+))?(?:\/([^/?]+))?(?:\?.*)?$/;
 
 /**
  * Nimmt eine Anbieter-Route an oder gibt false zurueck, damit index.ts weiter
@@ -683,6 +859,9 @@ export async function handleProviderApplication(
         if (section === 'agreements' && !a && method === 'POST') { await acceptAgreement(req, res, correlationId, caller, providerKey, ip); return true; }
         if (section === 'submit' && !a && method === 'POST') { await submit(res, correlationId, caller, providerKey); return true; }
         if (section === 'verification' && !a && method === 'GET') { await verification(res, correlationId, providerKey); return true; }
+        if (section === 'changes' && !a && method === 'GET') { await listChanges(res, correlationId, providerKey); return true; }
+        if (section === 'changes' && a && !b && method === 'DELETE') { await withdrawChange(res, correlationId, caller, providerKey, a); return true; }
+        if (section === 'material-event' && !a && method === 'POST') { await materialEvent(req, res, correlationId, caller, providerKey); return true; }
         json(res, 405, { errorCode: 'METHOD_NOT_ALLOWED', message: 'Not supported on this route', correlationId });
         return true;
     } catch (err) {

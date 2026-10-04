@@ -662,7 +662,15 @@ paths:
         '404': { description: Kein Zugriff oder unbekannt }
     patch:
       summary: Kapitel Konto und Rechtsform pflegen
-      description: Oeffentliche Felder gehen nach providers, vertrauliche (Rechtsform, Registernummer, Adressen, Vertretung, Versicherung) nach provider_confidential — getrennt gespeichert, getrennt zurueckgegeben.
+      description: >-
+        Oeffentliche Felder gehen nach providers, vertrauliche (Rechtsform, Registernummer, Adressen, Vertretung,
+        Versicherung) nach provider_confidential — getrennt gespeichert, getrennt zurueckgegeben. Bei einem aktiven
+        Partner (active, limited, reverification_due, paused, suspended) entscheidet das Change-Control je Feld
+        (changeControl.ts, Spec A §18): sofort uebernehmen, sofort uebernehmen mit Pruefvorgang
+        (`provider_change_requests.effect = applied`) oder warten (`effect = held`, der Live-Wert bleibt bis zur
+        Freigabe). Ein offener wartender Vorgang wird fortgeschrieben, nicht verdoppelt. Ein Feld gleich dem
+        Live-Wert ist keine Aenderung und zieht nichts zurueck (die Oberflaeche schickt ganze Kapitel);
+        zurueckgezogen wird nur per DELETE /provider/{key}/changes/{id}.
       security: [ { bearerAuth: [] } ]
       parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
       requestBody:
@@ -684,8 +692,10 @@ paths:
                 insurance_provider: { type: string }
                 insurance_type: { type: string }
                 insurance_valid_until: { type: string, format: date }
+                change_note: { type: string, maxLength: 1000, description: Notiz des Partners zum Pruefvorgang }
+                dry_run: { type: boolean, description: "true → nichts schreiben, nur die Aufteilung zurueckgeben: `{ dry_run, instant[], review[], held[] }` (Canvas B V2)" }
       responses:
-        '200': { description: Aktualisierte Felder }
+        '200': { description: "`{ updated[], held[], change_request_ids[] }` — held nennt die Felder, die auf Freigabe warten" }
         '400': { description: Kein gueltiges Feld }
         '409': { description: Konto beendet (ACCOUNT_CLOSED) }
 
@@ -724,7 +734,12 @@ paths:
   /provider/{key}/services/{id}:
     patch:
       summary: Leistung pflegen
-      description: service_code ist fest (422 SERVICE_CODE_FIXED) — Kategoriewechsel heisst stilllegen und neu anlegen. Aenderungen an freigegebenen Leistungen werden protokolliert.
+      description: >-
+        service_code ist fest (422 SERVICE_CODE_FIXED) — Kategoriewechsel heisst stilllegen und neu anlegen. Bei
+        einer freigegebenen Leistung (approved, limited, paused) eines aktiven Partners gilt das Change-Control
+        (§18–20): Preis, Umfang, Lieferzeit und Subunternehmer warten auf Freigabe; nach der aktuellen Policy
+        (`direction`) gilt eine Senkung von Preis oder Lieferzeit sofort, mit Pruefvorgang. Antwort und
+        `dry_run` wie bei PATCH /application.
       security: [ { bearerAuth: [] } ]
       parameters:
         - { name: key, in: path, required: true, schema: { type: string } }
@@ -868,6 +883,55 @@ paths:
       responses:
         '200': { description: Matrix und Historie }
 
+  /provider/{key}/changes:
+    get:
+      summary: Eigene Aenderungsvorgaenge (Change-Control, §18)
+      description: Die letzten 50 Vorgaenge, neueste zuerst, mit effect (held, applied, pause), status, Vorher/Nachher und der Begruendung des Pruefteams. Ohne reviewer_id.
+      security: [ { bearerAuth: [] } ]
+      parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
+      responses:
+        '200': { description: "`{ changes[] }`" }
+
+  /provider/{key}/changes/{id}:
+    delete:
+      summary: Wartende Aenderung zurueckziehen
+      description: Nur effect = held mit status submitted oder under_review. Sonst 409 CHANGE_NOT_WITHDRAWABLE.
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: status withdrawn }
+        '404': { description: Unbekannt }
+        '409': { description: CHANGE_NOT_WITHDRAWABLE }
+
+  /provider/{key}/material-event:
+    post:
+      summary: Wesentliches Ereignis melden (§18, 24 Stunden)
+      description: >-
+        Pausiert die gewaehlten freigegebenen Leistungen sofort (status paused, damit raus aus
+        matchable_provider_services) und legt einen Vorgang effect = pause, deadline_class = immediate_24h an.
+        service_ids ist Pflicht und ausdruecklich: 'all' oder eine Liste, auch leer (ein nicht haltbarer Termin
+        pausiert keine Leistung). Das Pruefteam setzt mit decision resume genau den vorherigen Stand zurueck.
+      security: [ { bearerAuth: [] } ]
+      parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [event_type, occurred_on, service_ids]
+              properties:
+                event_type: { type: string, enum: [licence_restricted, authority_lost, insurance_lost, security_incident, insolvency_or_closure, booking_unfulfillable, integrity_concern, account_compromised] }
+                occurred_on: { type: string, format: date, description: nicht in der Zukunft }
+                service_ids: { oneOf: [ { type: string, enum: [all] }, { type: array, items: { type: string, format: uuid } } ] }
+                note: { type: string, maxLength: 1000 }
+      responses:
+        '201': { description: "`{ change_request_id, paused_service_ids[], users_notified }` — Nutzer mit kommendem Termin im pausierten Bereich bekommen eine Mail (ohne Grund, mit kostenfreier Absage)" }
+        '400': { description: VALIDATION_ERROR }
+        '404': { description: Unbekannte Leistung }
+
   # ─── Phase 3: Anonymes Matching (ADR-0004) ───────────────────────────────
   # Alles, was ein Nutzer ueber einen Anbieter sieht, laeuft ueber `public_ref`
   # (zwoelf Hex-Zeichen, zufaellig). `provider_key` steht in keiner dieser
@@ -988,7 +1052,9 @@ paths:
         `identity_revealed`, sonst "Verified Provider"), `provider_descriptor`
         (Bereiche · Region, englische Taxonomie-Namen), `provider_area_codes`
         (dieselben Bereiche als Codes, das UI uebersetzt sie), `provider_website`
-        erst nach Offenlegung.
+        erst nach Offenlegung. `provider_paused`: der kommende Termin liegt in
+        einem Bereich, den der Anbieter nach einem wesentlichen Ereignis
+        pausiert hat (Change-Control, Canvas F V1).
       security: [ { bearerAuth: [] } ]
       responses:
         '200': { description: Termine }
@@ -1113,6 +1179,45 @@ paths:
       responses:
         '200': { description: Zurueckgenommen }
         '409': { description: REQUEST_CLOSED }
+
+  /admin/review/{key}/change/{id}:
+    get:
+      summary: Aenderungsvorgang ansehen (Change-Control)
+      description: Vorgang, aktueller Live-Wert je Feld, stale (Live-Wert weicht vom "vorher" ab), betroffene Leistung und die Zahl kommender Termine.
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: "`{ change, live, stale, service, upcoming_bookings }`" }
+        '403': { description: Kein Admin }
+        '404': { description: Unbekannt }
+    post:
+      summary: Aenderungsvorgang entscheiden
+      description: >-
+        Erlaubte Entscheidungen je effect — held: approve (uebernimmt den neuen Wert; 409 STALE_CHANGE, wenn sich
+        der Live-Wert seither geaendert hat), reject, require_reverification · applied: approve,
+        require_reverification · pause: resume (stellt den vorherigen Status jeder Leistung wieder her),
+        keep_paused. reject, require_reverification und keep_paused brauchen eine note, die der Partner liest.
+        Jede Entscheidung, die fuer den Partner etwas aendert, geht ihm per Mail zu (§26), mit der note.
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decision]
+              properties:
+                decision: { type: string, enum: [approve, reject, require_reverification, resume, keep_paused] }
+                note: { type: string, maxLength: 1000 }
+      responses:
+        '200': { description: Entschieden }
+        '400': { description: Entscheidung passt nicht zum effect, oder note fehlt }
+        '409': { description: ALREADY_DECIDED oder STALE_CHANGE }
 
 components:
   parameters:

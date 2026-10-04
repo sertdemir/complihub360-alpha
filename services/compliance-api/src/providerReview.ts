@@ -3,9 +3,10 @@ import { structuredLog } from '@complihub360/types';
 import { supabaseApi } from './supabase.js';
 import type { Caller } from './providerAuth.js';
 import { notify } from './notifications.js';
-import { sendVerificationMail } from './mailer.js';
+import { sendChangeDecisionMail, sendVerificationMail, type ChangeDecisionMailKind } from './mailer.js';
 import { EVIDENCE_BUCKET, signedDownloadUrl } from './storage.js';
 import { scanFields } from './anonymity.js';
+import { RULES, same } from './changeControl.js';
 import { allowanceFor, coverageMatrix, loadDossier, readJson, reviewLog, type Dossier } from './providerApplication.js';
 import {
     activationGate, serviceStatusFromCoverage, transitionAllowed, ACTIVATION_AGREEMENTS, type GateVerdict,
@@ -119,16 +120,20 @@ async function queue(res: ServerResponse, correlationId: string) {
             risk: queueRisk(kind, areas, p.lifecycle_status), detail: areas.join(', ') || null, ref_id: null,
         });
     }
-    // Offene Aenderungsmeldungen (Spec A §18) — die Tabelle existiert seit dem
-    // Datenmodell, befuellt wird sie ab Phase 6; die Queue zeigt sie schon.
-    const changes = (await supabaseApi.select('provider_change_requests', { status: 'submitted' }, { order: 'submitted_at.asc', limit: 200 })) as any[];
+    // Offene Aenderungsmeldungen (Spec A §18), geschrieben von changeControl.ts.
+    // Offen ist, was noch eingereicht oder in Pruefung ist (auch nach
+    // "Re-Verifizierung verlangt").
+    const changes = [
+        ...((await supabaseApi.select('provider_change_requests', { status: 'submitted' }, { order: 'submitted_at.asc', limit: 200 })) as any[]),
+        ...((await supabaseApi.select('provider_change_requests', { status: 'under_review' }, { order: 'submitted_at.asc', limit: 200 })) as any[]),
+    ];
     for (const c of changes) {
         const p = providers.find((x) => x.provider_key === c.provider_key);
         if (!p) continue;
         rows.push({
             kind: 'change_request', provider_key: c.provider_key, provider_name: p.name, lifecycle_status: p.lifecycle_status,
             since: c.submitted_at ?? null, due_at: null,
-            risk: c.deadline_class === 'immediate_24h' ? 'high' : 'medium', detail: c.change_type ?? null, ref_id: c.id,
+            risk: c.deadline_class === 'immediate_24h' ? 'high' : 'medium', detail: c.event_type ?? c.change_type ?? null, ref_id: c.id,
         });
     }
     // Ablaufende Nachweise in den naechsten 30 Tagen.
@@ -338,6 +343,123 @@ async function lifecycle(req: IncomingMessage, res: ServerResponse, correlationI
     json(res, 200, { ok: true, from, to, gate, correlationId });
 }
 
+// ─── Aenderungsvorgang ansehen und entscheiden (§18) ──────────────────────────
+
+async function liveRows(providerKey: string, serviceId: string | null) {
+    if (serviceId) {
+        const sv = ((await supabaseApi.select('provider_services', { id: serviceId, provider_key: providerKey }, { limit: 1 })) as any[])[0] ?? null;
+        return { provider_services: sv };
+    }
+    const p = ((await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[])[0] ?? null;
+    const conf = ((await supabaseApi.select('provider_confidential', { provider_key: providerKey }, { limit: 1 })) as any[])[0] ?? null;
+    return { providers: p, provider_confidential: conf };
+}
+
+function liveValue(rows: Record<string, any>, field: string, serviceId: string | null) {
+    const table = serviceId ? 'provider_services' : (RULES[field]?.table ?? 'providers');
+    return rows[table]?.[field] ?? null;
+}
+
+async function changeDetail(res: ServerResponse, correlationId: string, providerKey: string, changeId: string) {
+    if (!isUuid(changeId)) { json(res, 404, { errorCode: 'NOT_FOUND', message: 'Change not found', correlationId }); return; }
+    const c = ((await supabaseApi.select('provider_change_requests', { id: changeId, provider_key: providerKey }, { limit: 1 })) as any[])[0];
+    if (!c) { json(res, 404, { errorCode: 'NOT_FOUND', message: 'Change not found', correlationId }); return; }
+    const rows = c.effect === 'pause' ? {} : await liveRows(providerKey, c.service_id ?? null);
+    const live = c.effect === 'pause' ? null : Object.fromEntries(Object.keys(c.old_value ?? {}).map((k) => [k, liveValue(rows, k, c.service_id ?? null)]));
+    // Wen es betrifft: kommende Termine behalten ihren Preis (Snapshot, §20),
+    // aber eine Pause beruehrt sie — das soll der Reviewer vor dem Entscheid sehen.
+    const nowIso = new Date().toISOString();
+    const upcoming = ((await supabaseApi.select('scheduling', { provider_key: providerKey }, { limit: 500 })) as any[])
+        .filter((b) => b.slot_start > nowIso && b.status !== 'cancelled').length;
+    const service = c.service_id ? ((await supabaseApi.select('provider_services', { id: c.service_id }, { limit: 1 })) as any[])[0] ?? null : null;
+    json(res, 200, {
+        ok: true, change: c, live, upcoming_bookings: upcoming,
+        service: service ? { id: service.id, service_code: service.service_code, service_name: service.service_name, status: service.status } : null,
+        // Weicht der Live-Wert vom "vorher" ab, ist der Vorgang ueberholt.
+        stale: live ? Object.keys(live).some((k) => !same(live[k], c.old_value?.[k])) : false,
+        correlationId,
+    });
+}
+
+const DECISIONS: Record<string, readonly string[]> = {
+    held: ['approve', 'reject', 'require_reverification'],
+    applied: ['approve', 'require_reverification'],
+    pause: ['resume', 'keep_paused'],
+};
+
+async function decideChange(req: IncomingMessage, res: ServerResponse, correlationId: string, caller: Caller, providerKey: string, changeId: string) {
+    const d = await readJson(req);
+    if (!isUuid(changeId)) { json(res, 404, { errorCode: 'NOT_FOUND', message: 'Change not found', correlationId }); return; }
+    const c = ((await supabaseApi.select('provider_change_requests', { id: changeId, provider_key: providerKey }, { limit: 1 })) as any[])[0];
+    if (!c) { json(res, 404, { errorCode: 'NOT_FOUND', message: 'Change not found', correlationId }); return; }
+    if (!['submitted', 'under_review'].includes(c.status)) {
+        json(res, 409, { errorCode: 'ALREADY_DECIDED', message: `This change is already ${c.status}`, correlationId }); return;
+    }
+    const decision = str(d.decision, 40) ?? '';
+    const allowed = DECISIONS[c.effect] ?? [];
+    if (!allowed.includes(decision)) {
+        json(res, 400, { errorCode: 'VALIDATION_ERROR', message: `decision must be one of ${allowed.join(', ')}`, correlationId }); return;
+    }
+    const note = str(d.note, 1000) || null;
+    // Der Partner liest, warum — ohne Begruendung keine Ablehnung, keine
+    // Nachforderung und keine verlaengerte Pause.
+    if (['reject', 'require_reverification', 'keep_paused'].includes(decision) && !note) {
+        json(res, 400, { errorCode: 'VALIDATION_ERROR', message: 'This decision needs a note the provider will read', correlationId }); return;
+    }
+    const now = new Date().toISOString();
+    const done = { reviewed_at: now, reviewer_id: caller.userId ?? null, reviewer_note: note };
+    const serviceId: string | null = c.service_id ?? null;
+
+    if (decision === 'approve' && c.effect === 'held') {
+        // Nur uebernehmen, was noch auf dem Stand von damals steht. Hat sich
+        // der Live-Wert seither geaendert, wuerde die Freigabe ihn ueberschreiben.
+        const rows = await liveRows(providerKey, serviceId);
+        if (serviceId && !rows.provider_services) { json(res, 404, { errorCode: 'NOT_FOUND', message: 'Service not found', correlationId }); return; }
+        const stale = Object.keys(c.old_value ?? {}).filter((k) => !same(liveValue(rows, k, serviceId), c.old_value[k]));
+        if (stale.length) {
+            json(res, 409, { errorCode: 'STALE_CHANGE', message: 'The live value changed since this was submitted — reject it with a note instead', stale, correlationId }); return;
+        }
+        const byTable: Record<string, Record<string, unknown>> = {};
+        for (const [k, v] of Object.entries(c.new_value ?? {})) {
+            const table = serviceId ? 'provider_services' : (RULES[k]?.table ?? 'providers');
+            (byTable[table] ??= {})[k] = v;
+        }
+        if (byTable.provider_services) await supabaseApi.update('provider_services', { id: serviceId }, { ...byTable.provider_services, updated_at: now });
+        if (byTable.providers) await supabaseApi.update('providers', { provider_key: providerKey }, { ...byTable.providers, updated_at: now });
+        if (byTable.provider_confidential) await supabaseApi.upsert('provider_confidential', 'provider_key', { provider_key: providerKey, ...byTable.provider_confidential, updated_at: now });
+        await supabaseApi.update('provider_change_requests', { id: changeId }, { ...done, status: 'applied', applied_at: now, effective_at: now });
+    } else if (decision === 'approve') {
+        await supabaseApi.update('provider_change_requests', { id: changeId }, { ...done, status: 'approved' });
+    } else if (decision === 'reject') {
+        await supabaseApi.update('provider_change_requests', { id: changeId }, { ...done, status: 'rejected' });
+    } else if (decision === 'require_reverification') {
+        await supabaseApi.update('provider_change_requests', { id: changeId }, { ...done, status: 'under_review', requires_reverification: true });
+    } else if (decision === 'resume') {
+        // Genau den Stand von vorher wiederherstellen — und nur, wo die
+        // Leistung noch pausiert ist (eine inzwischen stillgelegte bleibt es).
+        for (const prev of (c.old_value?.services ?? []) as Array<{ id: string; status: string }>) {
+            const sv = ((await supabaseApi.select('provider_services', { id: prev.id, provider_key: providerKey }, { limit: 1 })) as any[])[0];
+            if (sv?.status === 'paused') await supabaseApi.update('provider_services', { id: prev.id }, { status: prev.status, status_since: now, updated_at: now });
+        }
+        await supabaseApi.update('provider_change_requests', { id: changeId }, { ...done, status: 'approved' });
+    } else {
+        await supabaseApi.update('provider_change_requests', { id: changeId }, { ...done, status: 'under_review' });
+    }
+    await reviewLog({ providerKey, subject: serviceId ? 'service' : 'application', subjectId: serviceId, action: `change_${decision}`, to: c.field_path ?? c.event_type ?? null, reason: note, actorId: caller.userId, actorKind: 'reviewer' });
+    await supabaseApi.insert('event_log', { type: 'provider_change_decided', payload: { providerKey, changeId, decision } });
+    // §26 "change status": der Partner erfaehrt jede Entscheidung, die etwas
+    // fuer ihn aendert. Ein schon uebernommener Wert, der nur bestaetigt wird,
+    // braucht keine Mail.
+    const mailKind: ChangeDecisionMailKind | null = decision === 'approve' ? (c.effect === 'held' ? 'approved' : null)
+        : decision === 'reject' ? 'rejected' : decision === 'require_reverification' ? 'reverification'
+        : decision === 'resume' ? 'resumed' : decision === 'keep_paused' ? 'kept_paused' : null;
+    if (mailKind) {
+        const p = ((await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[])[0];
+        await sendChangeDecisionMail({ to: p?.contact_email ?? null, providerKey, changeId, kind: mailKind, submittedAt: c.submitted_at ?? now, note, locale: p?.languages?.[0], correlationId });
+    }
+    json(res, 200, { ok: true, decision, correlationId });
+}
+
 // ─── Nachfrage ohne Zellbezug ────────────────────────────────────────────────
 
 async function requestInfo(req: IncomingMessage, res: ServerResponse, correlationId: string, caller: Caller, providerKey: string) {
@@ -377,7 +499,7 @@ async function withdrawRequest(res: ServerResponse, correlationId: string, calle
 
 // ─── Router ──────────────────────────────────────────────────────────────────
 
-const ROUTE = /^\/api\/v1\/admin\/review(?:\/([a-z0-9-]+))?(?:\/(evidence|coverage|lifecycle|request|gate))?(?:\/([^/?]+))?(?:\?.*)?$/;
+const ROUTE = /^\/api\/v1\/admin\/review(?:\/([a-z0-9-]+))?(?:\/(evidence|coverage|lifecycle|request|gate|change))?(?:\/([^/?]+))?(?:\?.*)?$/;
 
 export async function handleProviderReview(req: IncomingMessage, res: ServerResponse, correlationId: string, caller: Caller): Promise<boolean> {
     const m = ROUTE.exec(req.url || '');
@@ -400,6 +522,8 @@ export async function handleProviderReview(req: IncomingMessage, res: ServerResp
         if (key && section === 'lifecycle' && !id && method === 'POST') { await lifecycle(req, res, correlationId, caller, key); return true; }
         if (key && section === 'request' && !id && method === 'POST') { await requestInfo(req, res, correlationId, caller, key); return true; }
         if (key && section === 'request' && id && method === 'DELETE') { await withdrawRequest(res, correlationId, caller, key, id); return true; }
+        if (key && section === 'change' && id && method === 'GET') { await changeDetail(res, correlationId, key, id); return true; }
+        if (key && section === 'change' && id && method === 'POST') { await decideChange(req, res, correlationId, caller, key, id); return true; }
         json(res, 405, { errorCode: 'METHOD_NOT_ALLOWED', message: 'Not supported on this route', correlationId });
         return true;
     } catch (err) {

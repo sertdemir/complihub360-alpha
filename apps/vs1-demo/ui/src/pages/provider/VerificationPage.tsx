@@ -10,6 +10,7 @@ import { Banner } from '../../components/ui/Banner';
 import { Tag } from '../../components/ui/Tag';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { EmptyState } from '../../components/ui/EmptyState';
+import { MaterialEventCard } from '../../components/provider/MaterialEventCard';
 import { fetchVerification, type ChecklistItem, type CoverageStatus, type LifecycleStatus, type MatrixCell, type Verification } from '../../api/application';
 
 // ─── Provider · Verification Center ──────────────────────────────────────────
@@ -65,7 +66,10 @@ export function VerificationPage() {
   const base = `/${locale}/partner-dashboard`;
   const [v, setV] = useState<Verification | null>(null);
   const [error, setError] = useState<string | null>(null);
-  useEffect(() => { fetchVerification().then(setV).catch(() => setError(t('verification.loadError'))); }, [t]);
+  const load = () => fetchVerification().then(setV).catch(() => setError(t('verification.loadError')));
+  useEffect(() => { void load(); }, [t]);
+  // Canvas D V2: melden kann, wessen Leistungen oeffentlich sind (changeControl.ts CONTROLLED_LIFECYCLE).
+  const controlled = !!v && ['active', 'limited', 'reverification_due'].includes(v.lifecycle.status);
 
   const countries = v ? Array.from(new Set(v.matrix.flatMap((r) => r.cells.map((c) => c.country_code)))).sort() : [];
   const requested = new Set((v?.open_requests ?? []).filter((r) => r.country_code).map((r) => `${r.service_id ?? '*'}:${r.country_code}`));
@@ -167,6 +171,7 @@ export function VerificationPage() {
                 ))}
               </Card>
             </div>
+            {controlled && <MaterialEventCard services={v.matrix} onReported={load} />}
           </>
         )}
       </div>

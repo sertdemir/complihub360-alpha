@@ -651,7 +651,13 @@
     },
     "tabUpcoming": "Kommend",
     "tabPast": "Vergangen",
-    "origin": "war vor der Buchung „{{descriptor}}“"
+    "origin": "war vor der Buchung „{{descriptor}}“",
+    "paused": {
+      "body": "Der Anbieter kann diese Leistung gerade nicht anbieten. Ihr Termin ist weiter eingetragen. Wir melden uns, sobald klar ist, wie es weitergeht.",
+      "short": "Der Anbieter kann diese Leistung gerade nicht anbieten. Details unten.",
+      "cancel": "Termin kostenfrei absagen",
+      "talk": "Mit uns sprechen"
+    }
   },
   "review": {
     "eyebrow": "BEWERTUNG",

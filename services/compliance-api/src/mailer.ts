@@ -1086,3 +1086,90 @@ export async function sendMarketCoveredMail(p: {
         } catch { /* double fault */ }
     }
 }
+
+// ─── Change-Control (Spec A §18, §26) ────────────────────────────────────────
+// Zwei Anlaesse: das Pruefteam hat ueber eine Aenderung entschieden (an den
+// Partner), und eine Leistung pausiert, fuer die ein Nutzer einen Termin hat
+// (an den Nutzer, Canvas F V1). Beides ohne Drohung und ohne Grund fuer den
+// Nutzer — der Grund gehoert dem Partner und dem Pruefteam. Ein Mensch ist
+// immer erreichbar.
+
+export type ChangeDecisionMailKind = 'approved' | 'rejected' | 'reverification' | 'resumed' | 'kept_paused';
+
+const CHANGE_DECISION_STRINGS: Record<MailLocale, Record<ChangeDecisionMailKind, { subject: string; body: string }> & { noteLabel: string; human: string }> = {
+    en: {
+        noteLabel: 'Note from our review team',
+        human: 'If anything is unclear, reply to this email — a person will answer.',
+        approved: { subject: 'Your change is live', body: 'Our review team has approved your change from {date}. It is now visible to businesses.\n\n→ Partner dashboard → Application' },
+        rejected: { subject: 'Your change was not applied', body: 'Our review team did not apply your change from {date}. Your previous details stay in place.\n\nYou can adjust the details and send them again.' },
+        reverification: { subject: 'One document for your change', body: 'For your change from {date}, our review team needs a current document.\n\nYou can upload it in your partner dashboard under Application → Evidence.' },
+        resumed: { subject: 'Your services can be booked again', body: 'We have reviewed your report. The paused services are visible and bookable again.\n\nThank you for reporting the change right away.' },
+        kept_paused: { subject: 'Your report: the services stay paused for now', body: 'We have reviewed your report. The affected services stay paused for now.' },
+    },
+    de: {
+        noteLabel: 'Hinweis unseres Prüfteams',
+        human: 'Wenn etwas unklar ist, antworten Sie einfach auf diese E-Mail — ein Mensch antwortet Ihnen.',
+        approved: { subject: 'Ihre Änderung ist übernommen', body: 'Unser Prüfteam hat Ihre Änderung vom {date} freigegeben. Sie ist ab jetzt für Unternehmen sichtbar.\n\n→ Partner-Dashboard → Bewerbung' },
+        rejected: { subject: 'Ihre Änderung wurde nicht übernommen', body: 'Unser Prüfteam hat Ihre Änderung vom {date} nicht übernommen. Es gilt weiter der bisherige Stand.\n\nSie können die Angaben anpassen und erneut senden.' },
+        reverification: { subject: 'Ein Nachweis zu Ihrer Änderung', body: 'Zu Ihrer Änderung vom {date} braucht unser Prüfteam einen aktuellen Nachweis.\n\nSie laden ihn im Partner-Dashboard unter Bewerbung → Nachweise hoch.' },
+        resumed: { subject: 'Ihre Leistungen sind wieder buchbar', body: 'Wir haben Ihre Meldung geprüft. Die pausierten Leistungen sind wieder sichtbar und buchbar.\n\nDanke, dass Sie die Änderung gleich gemeldet haben.' },
+        kept_paused: { subject: 'Ihre Meldung: die Leistungen bleiben vorerst pausiert', body: 'Wir haben Ihre Meldung geprüft. Die betroffenen Leistungen bleiben vorerst pausiert.' },
+    },
+    es: {
+        noteLabel: 'Nota de nuestro equipo de revisión',
+        human: 'Si algo no está claro, responda a este correo — le contestará una persona.',
+        approved: { subject: 'Su cambio ya está publicado', body: 'Nuestro equipo de revisión ha aprobado su cambio del {date}. Ya es visible para las empresas.\n\n→ Panel de socio → Solicitud' },
+        rejected: { subject: 'Su cambio no se ha aplicado', body: 'Nuestro equipo de revisión no ha aplicado su cambio del {date}. Siguen vigentes sus datos anteriores.\n\nPuede ajustar los datos y enviarlos de nuevo.' },
+        reverification: { subject: 'Un documento para su cambio', body: 'Para su cambio del {date}, nuestro equipo de revisión necesita un documento actual.\n\nPuede subirlo en su panel de socio en Solicitud → Justificantes.' },
+        resumed: { subject: 'Sus servicios vuelven a poder reservarse', body: 'Hemos revisado su aviso. Los servicios en pausa vuelven a ser visibles y reservables.\n\nGracias por avisar del cambio enseguida.' },
+        kept_paused: { subject: 'Su aviso: los servicios siguen en pausa por ahora', body: 'Hemos revisado su aviso. Los servicios afectados siguen en pausa por ahora.' },
+    },
+    tr: {
+        noteLabel: 'İnceleme ekibimizin notu',
+        human: 'Bir şey net değilse bu e-postayı yanıtlayın — size bir insan cevap verir.',
+        approved: { subject: 'Değişikliğiniz yayında', body: 'İnceleme ekibimiz {date} tarihli değişikliğinizi onayladı. Artık işletmeler tarafından görülebilir.\n\n→ Partner paneli → Başvuru' },
+        rejected: { subject: 'Değişikliğiniz uygulanmadı', body: 'İnceleme ekibimiz {date} tarihli değişikliğinizi uygulamadı. Önceki bilgileriniz geçerli kalır.\n\nBilgileri düzenleyip yeniden gönderebilirsiniz.' },
+        reverification: { subject: 'Değişikliğiniz için bir belge', body: '{date} tarihli değişikliğiniz için inceleme ekibimizin güncel bir belgeye ihtiyacı var.\n\nBelgeyi partner panelinde Başvuru → Belgeler bölümünden yükleyebilirsiniz.' },
+        resumed: { subject: 'Hizmetleriniz yeniden rezerve edilebilir', body: 'Bildiriminizi inceledik. Duraklatılan hizmetler yeniden görünür ve rezerve edilebilir.\n\nDeğişikliği hemen bildirdiğiniz için teşekkür ederiz.' },
+        kept_paused: { subject: 'Bildiriminiz: hizmetler şimdilik duraklatılmış kalıyor', body: 'Bildiriminizi inceledik. İlgili hizmetler şimdilik duraklatılmış kalıyor.' },
+    },
+};
+
+/** Betreff und Text der Entscheidungs-Mail. Exportiert fuer die Tests. */
+export function renderChangeDecisionMail(kind: ChangeDecisionMailKind, submittedAt: string, note: string | null, locale?: string | null): { subject: string; text: string } {
+    const loc = resolveLocale(locale ?? undefined);
+    const s = CHANGE_DECISION_STRINGS[loc];
+    let date = submittedAt.slice(0, 10);
+    try { date = new Intl.DateTimeFormat(loc, { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(submittedAt)); } catch { /* ISO-Datum */ }
+    const parts = [s[kind].body.split('{date}').join(date)];
+    if (note) parts.push(`${s.noteLabel}: ${note}`);
+    parts.push(s.human);
+    return { subject: s[kind].subject, text: parts.join('\n\n') };
+}
+
+export async function sendChangeDecisionMail(p: { to: string | null; providerKey: string; changeId: string; kind: ChangeDecisionMailKind; submittedAt: string; note: string | null; locale?: string | null; correlationId?: string }): Promise<void> {
+    const { subject, text } = renderChangeDecisionMail(p.kind, p.submittedAt, p.note, p.locale);
+    await deliverProviderMail({ to: p.to, kind: `change_${p.kind}`, ref: { providerKey: p.providerKey, changeId: p.changeId }, subject, text, correlationId: p.correlationId });
+}
+
+const SERVICE_PAUSED_STRINGS: Record<MailLocale, { subject: string; body: string }> = {
+    en: { subject: 'Your appointment on {date}', body: 'The provider of your appointment on {date} cannot offer the booked service at the moment. Your appointment is still in place.\n\nWe will get back to you as soon as it is clear how things continue. If you would rather not wait, you can cancel the appointment free of charge in your dashboard under Appointments.\n\nQuestions? Reply to this email — a person will answer.\n\n→ Dashboard → Appointments' },
+    de: { subject: 'Ihr Termin am {date}', body: 'Der Anbieter Ihres Termins am {date} kann die gebuchte Leistung gerade nicht anbieten. Ihr Termin ist weiter eingetragen.\n\nWir melden uns, sobald klar ist, wie es weitergeht. Wenn Sie nicht warten möchten, können Sie den Termin in Ihrem Dashboard unter Termine kostenfrei absagen.\n\nFragen? Antworten Sie einfach auf diese E-Mail — ein Mensch antwortet Ihnen.\n\n→ Dashboard → Termine' },
+    es: { subject: 'Su cita del {date}', body: 'El proveedor de su cita del {date} no puede ofrecer el servicio reservado en este momento. Su cita sigue registrada.\n\nLe escribiremos en cuanto esté claro cómo sigue. Si prefiere no esperar, puede cancelar la cita sin coste en su panel, en Citas.\n\n¿Preguntas? Responda a este correo — le contestará una persona.\n\n→ Panel → Citas' },
+    tr: { subject: '{date} tarihli randevunuz', body: '{date} tarihli randevunuzun sağlayıcısı rezerve edilen hizmeti şu anda sunamıyor. Randevunuz kayıtlı kalmaya devam ediyor.\n\nNasıl devam edileceği netleşir netleşmez size döneceğiz. Beklemek istemezseniz randevuyu panelinizde Randevular bölümünden ücretsiz iptal edebilirsiniz.\n\nSorularınız mı var? Bu e-postayı yanıtlayın — size bir insan cevap verir.\n\n→ Panel → Randevular' },
+};
+
+/** Betreff und Text der Nutzer-Mail bei einer Pause. Exportiert fuer die Tests. */
+export function renderServicePausedMail(slotIso: string, locale?: string | null): { subject: string; text: string } {
+    const loc = resolveLocale(locale ?? undefined);
+    const s = SERVICE_PAUSED_STRINGS[loc];
+    let date = slotIso.slice(0, 10);
+    try { date = new Intl.DateTimeFormat(loc, { day: 'numeric', month: 'long' }).format(new Date(slotIso)); } catch { /* ISO-Datum */ }
+    const fill = (x: string) => x.split('{date}').join(date);
+    return { subject: fill(s.subject), text: fill(s.body) };
+}
+
+export async function sendServicePausedMail(p: { to: string | null; bookingId: string; slotIso: string; locale?: string | null; correlationId?: string }): Promise<void> {
+    const { subject, text } = renderServicePausedMail(p.slotIso, p.locale);
+    await deliverProviderMail({ to: p.to, kind: 'booking_provider_paused', ref: { bookingId: p.bookingId }, subject, text, correlationId: p.correlationId });
+}

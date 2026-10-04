@@ -25,6 +25,7 @@ import { ownProviderRouteKey, canAccessProvider, handleMeProvider, handleAdminLi
 import { handleProviderApplication } from "./providerApplication.js";
 import { handleSubscriptionGet, handleSubscriptionSelect, handleAdminSubscription } from "./subscriptions.js";
 import { handleProviderReview } from "./providerReview.js";
+import { bookingAffected, pausedAreasByProvider, requestOf } from "./changeImpact.js";
 import { redactText } from "@complihub360/redaction";
 import {
     loadVisibility, maskIdentity, publicTitle, rankBasis, requiredFor, scanFields, serializeProvider, verificationDepth,
@@ -1054,6 +1055,17 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 // seiner Beschreibung; einen Listenbuchstaben gibt es hier nicht.
                 const viewAll = (await supabaseApi.select('matchable_provider_services', {}, { limit: 5000 })) as any[];
                 const labels = await areaLabels([...new Set(viewAll.map((r: any) => r.area_code as string).filter(Boolean))]);
+                // Canvas F V1: ein kommender Termin bei einer pausierten
+                // Leistung traegt das Flag, damit "Termine" es sagt statt zu
+                // schweigen. Ohne Pause kostet das genau eine Abfrage.
+                const paused = await pausedAreasByProvider();
+                const nowIso = new Date().toISOString();
+                const pausedFlag: Record<string, boolean> = {};
+                for (const b of rows) {
+                    if (!paused.has(b.provider_key) || b.slot_start <= nowIso || b.status === 'cancelled') continue;
+                    const r = await requestOf(authUserId, b.provider_key);
+                    pausedFlag[b.id] = bookingAffected(paused.get(b.provider_key), r?.category);
+                }
                 const bookings = rows.map((b: any) => {
                     const p = byKey[b.provider_key] || {};
                     const areas = [...new Set(viewAll.filter((r: any) => r.provider_key === b.provider_key).map((r: any) => r.area_code as string).filter(Boolean))];
@@ -1075,6 +1087,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         slot_end: b.slot_end,
                         status: b.status,
                         message: b.message ?? null,
+                        provider_paused: !!pausedFlag[b.id],
                     };
                 });
                 res.writeHead(200, { 'Content-Type': 'application/json' });

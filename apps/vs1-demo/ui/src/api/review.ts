@@ -100,3 +100,22 @@ export async function requestInfo(providerKey: string, input: { evidence_type: s
 export async function withdrawRequest(providerKey: string, requestId: string): Promise<void> {
   await apiFetch(`/api/v1/admin/review/${providerKey}/request/${requestId}`, { method: 'DELETE' });
 }
+
+// ─── Change-Control: Vorgang ansehen und entscheiden (Canvas E V1) ───────────
+
+export type ChangeDecision = 'approve' | 'reject' | 'require_reverification' | 'resume' | 'keep_paused';
+export interface ChangeDetail {
+  change: import('./application').ProviderChange & { deadline_class: 'immediate_24h' | 'within_3_business_days' | 'before_effective_date'; provider_note?: string | null; occurred_on?: string | null };
+  live: Record<string, unknown> | null;
+  stale: boolean;
+  service: { id: string; service_code: string; service_name: string; status: string } | null;
+  upcoming_bookings: number;
+}
+
+export async function fetchChangeDetail(providerKey: string, changeId: string): Promise<ChangeDetail> {
+  return apiFetch<ChangeDetail>(`/api/v1/admin/review/${providerKey}/change/${changeId}`);
+}
+
+export async function decideChange(providerKey: string, changeId: string, decision: ChangeDecision, note?: string): Promise<void> {
+  await apiFetch(`/api/v1/admin/review/${providerKey}/change/${changeId}`, { method: 'POST', body: JSON.stringify({ decision, note: note || undefined }) });
+}
