@@ -87,6 +87,14 @@ export interface Subscription {
     currentPeriodStart: string;     // 'YYYY-MM-DD'
     currentPeriodEnd: string;
     startedAt: string;              // ISO
+    /**
+     * Die Verlaengerung — bei einem Jahresabo ein Jahr nach dem Beginn, bei
+     * einem Monatsabo das Ende der laufenden Periode. NICHT dasselbe wie
+     * `currentPeriodEnd`: der Zyklus ist bei jeder Zahlweise monatlich, weil
+     * der Rabattzaehler monatlich zurueckgesetzt wird (Spec B). Wer die beiden
+     * gleichsetzt, gibt einem Jahreskunden seine Rabatt-Leads pro JAHR.
+     */
+    renewalDate: string | null;
 }
 
 // ─── Reine Regeln ────────────────────────────────────────────────────────────
@@ -380,6 +388,7 @@ export async function getActiveSubscription(providerKey: string): Promise<Subscr
         cadence: open.cadence, status: open.status,
         currentPeriodStart: String(open.current_period_start), currentPeriodEnd: String(open.current_period_end),
         startedAt: String(open.started_at),
+        renewalDate: open.renewal_date ? String(open.renewal_date) : null,
     };
 }
 
@@ -422,6 +431,7 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
                     cadence: row.cadence, status: row.status,
                     currentPeriodStart: String(row.current_period_start), currentPeriodEnd: String(row.current_period_end),
                     startedAt: String(row.started_at),
+                    renewalDate: row.renewal_date ? String(row.renewal_date) : null,
                 };
                 const plan = cfg.plans.find((p) => p.code === sub.planCode) ?? null;
                 const line = subscriptionChargeForPeriod(sub, plan, period);

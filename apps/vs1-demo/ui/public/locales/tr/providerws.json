@@ -31,7 +31,8 @@
         "application": "Dosyaya git",
         "verification": "Verification Center"
       }
-    }
+    },
+    "navSubscription": "Tarife"
   },
   "bell": {
     "aria": "Bildirimler",
@@ -898,5 +899,78 @@
       "registry": "sicil numarası",
       "own_name": "şirketinizin adı"
     }
+  },
+  "subscription": {
+    "eyebrow": "Tarife",
+    "title": "Sunduğunuz hizmete hangi tarife uyuyor?",
+    "subtitle": "Yalnızca ana kategori sayısı sınırlanır. Alt kategoriler, hizmetler ve ülkeler tarifenize değil, doğrulamanıza bağlıdır.",
+    "releasedLeadOne": "Bugün {{n}} ana kategori için onaylısınız:",
+    "releasedLeadMany": "Bugün {{n}} ana kategori için onaylısınız:",
+    "cadenceLabel": "Ödeme şekli",
+    "cadenceMonthly": "Aylık",
+    "cadenceAnnual": "Yıllık",
+    "cadenceMonthlyLower": "aylık ödeme",
+    "cadenceAnnualLower": "yıllık ödeme",
+    "annualRule": "Yıllık ödeme on iki ay için bir kez alınır — on ayın fiyatına.",
+    "perMonth": "/ ay",
+    "perYear": "/ yıl",
+    "orAnnual": "veya yılda {{price}}",
+    "orMonthly": "veya ayda {{price}}",
+    "featCategories": "Kategoriler",
+    "featDiscount": "Lead indirimi",
+    "allowanceAll": "onaylı olduğunuz tüm kategoriler",
+    "allowanceOne": "1 ana kategori",
+    "allowanceMany": "en fazla {{n}} ana kategori",
+    "discountNone": "yok",
+    "discountValue": "Her ay ücretlendirilen ilk {{n}} lead için %{{pct}}",
+    "choose": "{{plan}} seç",
+    "promiseTitle": "Bir tarifenin değiştirmediği şeyler",
+    "promiseLead": "Eşleştirme yalnızca doğrulanmış uygunluk ve hizmet verilerini kullanır.",
+    "promise": {
+      "rank": "Arama sonuçlarındaki sıranız",
+      "match": "Hangi taleplerle eşleştirildiğiniz",
+      "reviews": "Değerlendirmeleriniz ve performans puanınız",
+      "profile": "Herkese açık profilinizin görünümü"
+    },
+    "confirmTitle": "{{plan}} başlat, {{cadence}}",
+    "factPrice": "Fiyat",
+    "factStart": "Başlangıç",
+    "factStartValue": "bugün, {{date}}",
+    "factInvoice": "İlk fatura",
+    "factInvoiceValue": "bu dönemle birlikte, 14 gün içinde ödenir",
+    "factRenewal": "Yenileme",
+    "notBookableTitle": "Bu, sizi henüz rezervasyona açık hale getirmez.",
+    "notBookableBody": "Rezervasyonlar için ayrıca kayıtlı bir ödeme yöntemi gerekir — bunu Faturalandırma altında eklersiniz.",
+    "confirmStart": "{{plan}} başlat",
+    "back": "Geri",
+    "failExists": "Zaten çalışan bir tarife var. Tarife değişikliğini burada henüz sunmuyoruz.",
+    "failGeneric": "Şu anda olmadı. Lütfen tekrar deneyin veya {{mail}} adresine yazın.",
+    "startedNote": "Tarifeniz çalışıyor. Rezervasyonlar için ayrıca kayıtlı bir ödeme yöntemi gerekir.",
+    "contact": "İletişime geçin",
+    "running": {
+      "title": "Tarifeniz",
+      "badge": "Çalışıyor",
+      "price": "Fiyat",
+      "perMonth": "ayda {{price}}",
+      "perYear": "yılda {{price}}",
+      "renewal": "Yenileme",
+      "categories": "Kategoriler",
+      "categoriesUsed": "en fazla {{allowance}} — {{used}} tanesini kullanıyorsunuz",
+      "discount": "Lead indirimi",
+      "discountValue": "Her ay ücretlendirilen ilk {{n}} lead için %{{pct}}",
+      "noChangeReason": "Tarife değişikliğini burada henüz sunmuyoruz. Oransal ücretlendirme ve fesih bildirim süresi kuralları henüz belirlenmedi; o zamana kadar bunu elle yapıyoruz, böylece onaylamadığınız hiçbir şey tahsil edilmez. {{mail}} adresine yazın."
+    },
+    "blocked": {
+      "suspended": {
+        "title": "Bir bildirimi incelerken hesabınız duraklatıldı",
+        "body": "Bu tamamlandığında bir tarife başlatabilirsiniz. Profiliniz ve faturalarınız bundan etkilenmez. Konuşmak isterseniz {{mail}} adresine yazın."
+      },
+      "terminated": {
+        "title": "Bu hesap kapatıldı",
+        "body": "Bunun için artık tarife başlatılamaz. Faturalarınız ve faturalandırma geçmişiniz erişilebilir kalır. Görüşmek isterseniz {{mail}} adresine yazın."
+      }
+    },
+    "cadenceMonthlyAdj": "aylık",
+    "cadenceAnnualAdj": "yıllık"
   }
 }

@@ -218,6 +218,7 @@ export async function startSubscription(
             id: String(row?.id ?? ''), providerKey: i.providerKey, planCode: plan.code as Subscription['planCode'],
             planVersion: plan.version ?? 1, cadence: i.cadence, status: 'active',
             currentPeriodStart: start, currentPeriodEnd: end, startedAt: String(row?.started_at ?? new Date().toISOString()),
+            renewalDate: renewal,
         },
     };
 }
@@ -310,6 +311,36 @@ async function readJson(req: IncomingMessage, cap = 4_000): Promise<any> {
 }
 
 /**
+ * Die Hauptkategorien, fuer die dieser Anbieter freigegeben ist — fuer seine
+ * eigene Seite, damit die Tarifwahl an seinen Daten haengt und nicht an einer
+ * Empfehlung von uns.
+ *
+ * Gelesen wird `provider_services`, ABSICHTLICH NICHT die View
+ * `matchable_provider_services`. Die View filtert zusaetzlich auf
+ * `lifecycle_status` — ein pausiertes Konto haette dort null Zeilen, und die
+ * Seite wuerde dem Anbieter "0 Hauptkategorien freigegeben" sagen, obwohl seine
+ * Leistungen unveraendert freigegeben sind. Freigabe einer Leistung und
+ * Sichtbarkeit des Kontos sind zwei verschiedene Achsen; hier ist die Freigabe
+ * gemeint. (Dieselbe Trennung wie bei der Eignung: `draft`, `submitted` und
+ * `paused` duerfen waehlen.)
+ */
+export async function releasedAreasOf(providerKey: string): Promise<Array<{ code: string; label: string }>> {
+    const services = (await supabaseApi.select('provider_services', { provider_key: providerKey }, { limit: 500 })) as any[];
+    const approved = services.filter((r) => r.status === 'approved' || r.status === 'limited');
+    if (!approved.length) return [];
+    const cats = (await supabaseApi.select('service_categories', {}, { limit: 500 })) as any[];
+    const byCode = new Map<string, any>(cats.map((c) => [c.code, c]));
+    const areas = new Map<string, string>();
+    for (const r of approved) {
+        const cat = byCode.get(r.service_code);
+        // Unterkategorie auf ihren Bereich hochrollen; ein unbekannter Code bleibt er selbst.
+        const areaCode = cat?.parent_code ?? cat?.code ?? r.service_code;
+        if (!areas.has(areaCode)) areas.set(areaCode, byCode.get(areaCode)?.label_en ?? areaCode);
+    }
+    return [...areas].map(([code, label]) => ({ code, label })).sort((a, b) => a.label.localeCompare(b.label));
+}
+
+/**
  * Was der Anbieter ueber sein eigenes Abo sieht: Tarif, Zyklus, Periode und die
  * waehlbaren Tarife. Nur fuer ihn — Spec B: *"Subscription information is
  * visible only to the provider and authorized CompliHub360 administrators."*
@@ -317,14 +348,36 @@ async function readJson(req: IncomingMessage, cap = 4_000): Promise<any> {
  */
 export async function handleSubscriptionGet(res: ServerResponse, correlationId: string, providerKey: string): Promise<void> {
     res.setHeader('x-correlation-id', correlationId);
-    const [sub, cfg] = await Promise.all([getActiveSubscription(providerKey), loadPricingConfig()]);
+    const [sub, cfg, released, prov] = await Promise.all([
+        getActiveSubscription(providerKey), loadPricingConfig(), releasedAreasOf(providerKey),
+        supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 }) as Promise<any[]>,
+    ]);
+    const lifecycle = String(prov[0]?.lifecycle_status ?? '');
     json(res, 200, {
         ok: true,
         subscription: sub ? {
             plan_code: sub.planCode, cadence: sub.cadence, status: sub.status,
             current_period_start: sub.currentPeriodStart, current_period_end: sub.currentPeriodEnd,
             started_at: sub.startedAt,
+            // Die Verlaengerung steht getrennt vom Periodenende: der Zyklus ist
+            // immer monatlich (Rabattzaehler), die Verlaengerung folgt der
+            // Zahlweise. Die Oberflaeche muss beides getrennt zeigen koennen.
+            renewal_date: sub.renewalDate,
         } : null,
+        // Die freigegebenen Hauptkategorien des Anbieters — die Zahl, an der die
+        // Tarifwahl haengt. Sie kommt aus seinen Daten, nicht aus einer
+        // Empfehlung von uns ("we do not create needs").
+        released_categories: released,
+        // Ob dieses Konto ueberhaupt ein Abo beginnen kann — und warum nicht.
+        // Die POST-Route antwortet sonst erst nach dem Klick mit 409, und der
+        // Anbieter erfuehre die Grenze erst, nachdem er sich entschieden hat.
+        // `terminated` und `suspended` sind zwei verschiedene Lagen und
+        // brauchen zwei verschiedene Saetze — deshalb der Grund, nicht nur ein
+        // Flag.
+        eligibility: {
+            can_start: !NOT_ELIGIBLE.has(lifecycle),
+            reason: NOT_ELIGIBLE.has(lifecycle) ? lifecycle : null,
+        },
         // Die Tarife mit Preis — und ohne jede Andeutung, der Tarif beeinflusse
         // die Sichtbarkeit. Er tut es nicht.
         plans: cfg.plans.map((p) => ({

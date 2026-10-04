@@ -57,8 +57,49 @@ Verworfen und warum — damit niemand es später „verbessert":
 - [x] **Stufe 1 Canvas** — abgenommen 2026-10-04 (Wahl oben).
 - [x] **Stufe 2 Figma** — gebaut 2026-10-04, Seite `🧾 Provider · Tarifwahl`
       in `C360 - Design System` (`a4BeKbsBGoHkcudhKXUJTl`).
-- [ ] **Stufe 3 lokal** — Feature-Branch, `npm run dev:ui`, Screenshots, Review.
+- [x] **Stufe 3 lokal** — gebaut 2026-10-04, `npm run dev:ui`, alle vier
+      Zustaende als Screenshot aufgenommen. Review durch den Nutzer steht aus.
 - [ ] **Stufe 4 Staging**.
+
+### Was Stufe 3 gebaut hat
+
+**Oberflaeche**
+- `apps/vs1-demo/ui/src/pages/provider/SubscriptionPage.tsx` — die Seite, vier
+  Zustaende in einer Komponente: Wahl (A3 · B1 · C1 · D2), Bestaetigung (E2,
+  als `Modal`), laufender Tarif (F2), Konto nicht berechtigt (G3).
+- `apps/vs1-demo/ui/src/api/subscription.ts` — Client. Der interessante Teil
+  ist die Fehlerzuordnung: beide Absagen der Route kommen als **409**, sind
+  aber zwei voellig verschiedene Flaechen.
+- Route `partner-dashboard/subscription`, Sidebar-Eintrag `Tarif` (Icon
+  `Gauge`), Copy in **en, de, es, tr**.
+
+**Backend** (drei Felder, die die Oberflaeche braucht und die GET nicht hatte)
+- `renewal_date` — die Verlaengerung. Ohne sie koennte E2 den vierten Eckwert
+  nicht zeigen, und `current_period_end` waere die falsche Zahl: der Zyklus ist
+  immer monatlich, die Verlaengerung folgt der Zahlweise.
+- `released_categories` — die freigegebenen Hauptkategorien. Gelesen aus
+  `provider_services`, **nicht** aus `matchable_provider_services`: die View
+  filtert zusaetzlich auf `lifecycle_status`, ein pausiertes Konto haette dort
+  null Zeilen, und A3 wuerde einem Anbieter mit freigegebenen Leistungen
+  „0 Hauptkategorien freigegeben" sagen. Sieben Tests halten das fest.
+- `eligibility` — ob das Konto ueberhaupt beginnen kann, **mit Grund**. Ohne
+  das erfuehre der Anbieter die Grenze erst nach dem Klick (409) — genau das
+  Muster, das bei E3 verworfen wurde. `suspended` und `terminated` bekommen
+  zwei verschiedene Saetze; ein Sammelsatz liesse das eine wie das andere
+  klingen.
+
+### Befund aus Stufe 3
+
+**`SiteHeader` doppelt die Routentabelle.** Die neue Seite lief, sah aber
+falsch aus: ueber der ProviderShell lag der **Marketing-Header**. Grund ist
+die Liste `PROVIDER_WORKSPACE` in `SiteHeader.tsx`, die jede Workspace-Seite
+einzeln aufzaehlt und `subscription` nicht kannte. Weder Typecheck noch Build
+noch ein Test schlugen an — aufgefallen ist es erst im Screenshot.
+
+Eintrag ergaenzt und mit `SiteHeader.workspace.guard.test.ts` abgesichert: der
+Test liest beide Dateien und vergleicht sie. Gegengeprobt — nimmt man den
+Eintrag wieder heraus, faellt er.
+
 
 ### Was in Figma liegt
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { CalendarCheck, LineChart, Globe, ShieldCheck, ReceiptEuro, Settings, Bell, CircleHelp, Search } from 'lucide-react';
+import { CalendarCheck, LineChart, Globe, ShieldCheck, ReceiptEuro, Gauge, Settings, Bell, CircleHelp, Search } from 'lucide-react';
 import { Sidebar, SidebarGroup, NavItem } from '../ui/AppShell';
 import { WorkspaceMobileBar, type WorkspaceNavGroup } from '../ui/WorkspaceMobileBar';
 import { Logo } from '../ui/Logo';
@@ -38,6 +38,11 @@ const NAV = [
       // Phase 2: Bewerbung + Verification Center (Dossier, Freigabematrix).
       { to: 'verification', labelKey: 'shell.navVerification', icon: ShieldCheck },
       { to: 'billing', labelKey: 'shell.navBilling', icon: ReceiptEuro },
+      // TKT-PROV-09: eigener Eintrag statt Unterseite von Billing — die
+      // Tarifwahl ist eine eigene Route und ein eigener Vorgang. Gauge, nicht
+      // Star: ein Stern laese sich wie ein Guetesiegel, und die DNA schliesst
+      // Siegel ohne Beleg aus.
+      { to: 'subscription', labelKey: 'shell.navSubscription', icon: Gauge },
     ],
   },
   {
