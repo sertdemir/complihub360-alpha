@@ -724,7 +724,9 @@ export function ResultsRiskMap() {
               ankam, als waere es seines. */}
           {profile?.country && (
             <p className="mt-4 text-body-md leading-relaxed text-fg-secondary">
-              {t('header.subtitleProfile', { total: profile.categories?.length ?? 0 })}
+              {/* `count`, nicht `total`: nur so waehlt i18next die Einzahl
+                  ("1 Bereich im Fokus" statt "1 Bereiche"). */}
+              {t('header.subtitleProfile', { count: profile.categories?.length ?? 0 })}
             </p>
           )}
           <GuestExpiryNote />

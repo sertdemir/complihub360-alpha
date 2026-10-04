@@ -7,7 +7,8 @@
   "header": {
     "eyebrow": "Ihre Risk Map",
     "title": "Das gilt für Sie.",
-    "subtitleProfile": "Basierend auf Ihrer Einschätzung. {{total}} Bereiche im Fokus."
+    "subtitleProfile_one": "Basierend auf Ihrer Einschätzung. {{count}} Bereich im Fokus.",
+    "subtitleProfile_other": "Basierend auf Ihrer Einschätzung. {{count}} Bereiche im Fokus."
   },
   "stats": {
     "0": {

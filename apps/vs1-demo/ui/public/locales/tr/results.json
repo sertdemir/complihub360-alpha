@@ -7,7 +7,8 @@
   "header": {
     "eyebrow": "Risk Map'iniz",
     "title": "Sizin için geçerli olanlar.",
-    "subtitleProfile": "Değerlendirmenize dayanmaktadır. Kapsamda {{total}} alan bulunuyor."
+    "subtitleProfile_one": "Değerlendirmenize dayanmaktadır. Kapsamda {{count}} alan bulunuyor.",
+    "subtitleProfile_other": "Değerlendirmenize dayanmaktadır. Kapsamda {{count}} alan bulunuyor."
   },
   "stats": {
     "0": {

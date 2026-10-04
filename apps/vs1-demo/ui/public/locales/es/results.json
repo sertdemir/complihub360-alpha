@@ -7,7 +7,8 @@
   "header": {
     "eyebrow": "Su Risk Map",
     "title": "Esto es lo que le aplica.",
-    "subtitleProfile": "Basado en su evaluación. {{total}} ámbitos en alcance."
+    "subtitleProfile_one": "Basado en su evaluación. {{count}} ámbito en alcance.",
+    "subtitleProfile_other": "Basado en su evaluación. {{count}} ámbitos en alcance."
   },
   "stats": {
     "0": {

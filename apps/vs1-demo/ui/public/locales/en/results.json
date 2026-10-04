@@ -7,7 +7,8 @@
   "header": {
     "eyebrow": "Your risk map",
     "title": "Here's what applies to you.",
-    "subtitleProfile": "Based on your assessment. {{total}} domains in scope."
+    "subtitleProfile_one": "Based on your assessment. {{count}} domain in scope.",
+    "subtitleProfile_other": "Based on your assessment. {{count}} domains in scope."
   },
   "stats": {
     "0": {
