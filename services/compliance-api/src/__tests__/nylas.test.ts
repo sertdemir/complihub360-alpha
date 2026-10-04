@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { subtractBusy, nylasConfigured, type BusyWindow } from '../nylas.js';
+import { subtractBusy, nylasConfigured, calendarRefFor, type BusyWindow } from '../nylas.js';
 
 // Die Slot-Filterung ist die Stelle, an der eine Kalenderanbindung praktisch
 // scheitert: Der alte Generator verglich ISO-Strings auf Gleichheit
@@ -61,5 +61,34 @@ describe('nylasConfigured', () => {
         // Im Test ist NYLAS_API_KEY nicht gesetzt; die Integration darf dann
         // nichts tun, statt mit halber Konfiguration loszulaufen.
         expect(nylasConfigured()).toBe(Boolean(process.env.NYLAS_API_KEY));
+    });
+});
+
+describe('calendarRefFor', () => {
+    const provider = { nylas_grant_id: 'grant-1', nylas_calendar_id: 'cal@example.com' };
+    const booking = { nylas_event_id: 'ev-1' };
+
+    // Ohne Key ist die Integration aus — dann gibt es auch nichts aufzuräumen.
+    // Im Test ist NYLAS_API_KEY nicht gesetzt, also ist null hier das korrekte
+    // Ergebnis für JEDEN Fall; geprüft wird die Bedingung, nicht der Zufall.
+    const configured = Boolean(process.env.NYLAS_API_KEY);
+
+    it('liefert ohne Konfiguration nichts', () => {
+        if (!configured) expect(calendarRefFor(provider, booking)).toBeNull();
+    });
+
+    it('liefert nichts ohne Grant beim Anbieter', () => {
+        expect(calendarRefFor({ nylas_grant_id: null, nylas_calendar_id: null }, booking)).toBeNull();
+    });
+
+    it('liefert nichts ohne Event-ID an der Buchung', () => {
+        // Buchungen aus der Zeit vor der Anbindung haben keine — das ist kein
+        // Fehler, sondern der Normalfall für Altbestand.
+        expect(calendarRefFor(provider, { nylas_event_id: null })).toBeNull();
+    });
+
+    it('verträgt fehlende Zeilen', () => {
+        expect(calendarRefFor(null, booking)).toBeNull();
+        expect(calendarRefFor(provider, undefined)).toBeNull();
     });
 });

@@ -129,3 +129,38 @@ export function subtractBusy(slotsIso: string[], busy: BusyWindow[], slotMinutes
         return !busy.some((w) => start < w.end && end > w.start);
     });
 }
+
+/** Verschiebt einen bestehenden Termin. true = Nylas hat bestaetigt. */
+export async function updateEventTime(grantId: string, calendarId: string, eventId: string, startSec: number, endSec: number): Promise<boolean> {
+    const out = await call<unknown>(
+        `/v3/grants/${encodeURIComponent(grantId)}/events/${encodeURIComponent(eventId)}?calendar_id=${encodeURIComponent(calendarId)}`,
+        { method: 'PUT', body: JSON.stringify({ when: { start_time: startSec, end_time: endSec } }) },
+    );
+    return out !== null;
+}
+
+export interface CalendarRef {
+    grantId: string;
+    calendarId: string;
+    eventId: string;
+}
+
+/**
+ * Entscheidet, ob fuer eine Buchung ueberhaupt etwas im Kalender zu tun ist.
+ *
+ * Rein, damit die Bedingung testbar bleibt statt in zwei Routen verstreut zu
+ * leben: Es braucht die Konfiguration, einen Grant beim Anbieter UND eine
+ * gespeicherte Event-ID. Fehlt eines, ist nichts zu tun — und das ist kein
+ * Fehler: Buchungen aus der Zeit vor der Anbindung haben keine Event-ID, und
+ * Anbieter ohne verbundenen Kalender bekommen nie eine.
+ */
+export function calendarRefFor(
+    provider: { nylas_grant_id?: string | null; nylas_calendar_id?: string | null } | null | undefined,
+    booking: { nylas_event_id?: string | null } | null | undefined,
+): CalendarRef | null {
+    if (!nylasConfigured()) return null;
+    const grantId = provider?.nylas_grant_id;
+    const eventId = booking?.nylas_event_id;
+    if (!grantId || !eventId) return null;
+    return { grantId, calendarId: provider?.nylas_calendar_id || '', eventId };
+}
