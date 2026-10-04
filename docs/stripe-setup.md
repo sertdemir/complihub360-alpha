@@ -40,7 +40,7 @@ Billing Portal write, Checkout Sessions write):
 | PaymentIntents | **write** | die Belastung (`payment_intents`, `confirm=true`, `off_session=true`) |
 | Customers | read (write ist schon da) | `GET customers/:id?expand[]=invoice_settings.default_payment_method` für die Zahlungsbereitschaft |
 | Refunds | **write** | Kompensation, wenn der Buchungs-Insert nach dem Capture scheitert |
-| Payment Methods | **read** | der Kunden-Aufruf expandiert `invoice_settings.default_payment_method`; ein Restricted Key darf nur expandieren, worauf er selbst Leserecht hat — ohne dieses Recht antwortet Stripe `permission_error`, und `billing/sync` meldet 502 (Befund Staging 2026-10-04) |
+| Payment Methods | **read** | der Kunden-Aufruf expandiert `invoice_settings.default_payment_method`, und `billing/sync` listet die angehängten Karten (`GET payment_methods?customer=…`), weil das Portal eine neue Karte anhängt, aber nicht als Standard setzt — der Sync macht sie dann dazu (`POST customers/:id`, Customers write; Befund Staging 2026-10-05); ein Restricted Key darf nur expandieren, worauf er selbst Leserecht hat — ohne dieses Recht antwortet Stripe `permission_error`, und `billing/sync` meldet 502 (Befund Staging 2026-10-04) |
 
 Ohne diese Rechte antwortet die erste Buchung 502 `BILLING_ERROR` (ehrlich,
 aber rot) und `billing/sync` 502 `STRIPE_ERROR`. Der Schlüssel bleibt in der

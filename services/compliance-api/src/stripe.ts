@@ -14,8 +14,8 @@ import { supabaseApi } from "./supabase.js";
 // Kein SDK, weiter form-encoded `fetch`: die Oberflaeche, die wir brauchen,
 // sind sechs Pfade. Der Schluessel kommt aus STRIPE_SECRET_KEY (auf Staging
 // ein Restricted Key in der VPS-.env, nie im Repo). Fuer Phase 4 braucht er
-// zusaetzlich `payment_intents: write`, `customers: read`, `refunds: write`
-// (docs/stripe-setup.md).
+// zusaetzlich `payment_intents: write`, `customers: write`, `refunds: write`,
+// `payment_methods: read` (docs/stripe-setup.md).
 
 export function isStripeConfigured(): boolean {
     return !!process.env.STRIPE_SECRET_KEY;
@@ -85,12 +85,35 @@ export interface CustomerBilling {
     /** Name und Land des Kunden stehen — mehr verlangt der Processor fuer eine Belastung nicht. */
     billingInfoComplete: boolean;
     delinquent: boolean;
+    /** Die Karte hing am Kunden, war aber kein Standard — dieser Aufruf hat sie dazu gemacht. */
+    promotedDefault: boolean;
 }
 
-/** Was Stripe ueber den Kunden weiss, soweit die Zahlungsbereitschaft davon abhaengt. */
+/**
+ * Was Stripe ueber den Kunden weiss, soweit die Zahlungsbereitschaft davon
+ * abhaengt.
+ *
+ * Das Kundenportal haengt eine neue Karte an den Kunden, setzt sie aber nicht
+ * als Standard (`invoice_settings.default_payment_method`) — Befund Staging
+ * 2026-10-05: Karte 4242 hinterlegt, Abgleich meldet weiter „kein
+ * Zahlungsmittel". Ohne Standard laeuft weder die Belastung off-session noch
+ * die Monatsrechnung. Haengt also eine Karte am Kunden und keine ist Standard,
+ * wird die juengste es; der Aufrufer erfaehrt das ueber `promotedDefault` und
+ * protokolliert es.
+ */
 export async function getCustomerBilling(customerId: string): Promise<CustomerBilling> {
     const c = await stripeRequest('GET', `customers/${customerId}`, { 'expand[]': 'invoice_settings.default_payment_method' });
-    const pm = c.invoice_settings?.default_payment_method ?? null;
+    let pm = c.invoice_settings?.default_payment_method ?? null;
+    let promotedDefault = false;
+    if (!pm) {
+        const list = await stripeRequest('GET', 'payment_methods', { customer: customerId, type: 'card', limit: '1' });
+        const attached = Array.isArray(list.data) ? list.data[0] : null;
+        if (attached?.id) {
+            await stripeRequest('POST', `customers/${customerId}`, { 'invoice_settings[default_payment_method]': String(attached.id) });
+            pm = attached;
+            promotedDefault = true;
+        }
+    }
     const pmId = typeof pm === 'string' ? pm : pm?.id ?? null;
     const card = typeof pm === 'object' && pm ? pm.card : null;
     return {
@@ -99,6 +122,7 @@ export async function getCustomerBilling(customerId: string): Promise<CustomerBi
         email: c.email ?? null,
         billingInfoComplete: !!(c.name && (c.address?.country || c.tax_ids?.data?.length)),
         delinquent: !!c.delinquent,
+        promotedDefault,
     };
 }
 
