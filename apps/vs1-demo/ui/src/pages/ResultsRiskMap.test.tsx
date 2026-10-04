@@ -641,3 +641,42 @@ describe('ResultsRiskMap with mixed markets', () => {
     expect(screen.queryByText('common:states.marketPartial.notChecked')).not.toBeInTheDocument();
   });
 });
+
+// ─── Risk map · obligations on a phone (Canvas L1 · M1 · N1, Figma 3574:17253) ─
+// One node per obligation for both widths: below lg it is a card, from lg the
+// table row. Before, a fixed five-column grid applied at every width and broke
+// titles on 390 px almost letter by letter.
+
+describe('ResultsRiskMap obligations on small screens', () => {
+  it('lays each obligation out as a card below lg and as a table row from lg', async () => {
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10) })] });
+    renderPage();
+
+    await screen.findByText('VAT return');
+    const rows = screen.getAllByTestId('obligation-row');
+    expect(rows).toHaveLength(1);
+    const cls = rows[0].className.split(/\s+/);
+    // The five fixed columns only from lg — never as the base layout.
+    expect(cls).toContain('lg:grid-cols-[100px_1fr_120px_110px_160px]');
+    expect(cls).not.toContain('grid-cols-[100px_1fr_120px_110px_160px]');
+    // The column header row is table chrome: there only from lg.
+    const header = screen.getByText('table.obligation').parentElement!;
+    expect(header.className.split(/\s+/)).toEqual(expect.arrayContaining(['hidden', 'lg:grid']));
+  });
+
+  it('puts the penalty in its own line under the source (N1)', async () => {
+    runSearch.mockResolvedValue({
+      providers: [],
+      laws: [law({ id: 'vat', title: 'VAT return', source: 'UStG §18', penalty: 'up to €25,000', due: inDays(10) })],
+    });
+    renderPage();
+
+    await screen.findByText('VAT return');
+    // The penalty is an element of its own — block below lg, inline from lg —
+    // and carries nothing but the penalty; the source stays in front of it.
+    const penalty = screen.getByText('detail.penalty');
+    expect(penalty.textContent).toBe('detail.penalty');
+    expect(penalty.className.split(/\s+/)).toEqual(expect.arrayContaining(['block', 'lg:inline']));
+    expect(penalty.parentElement!.textContent!.indexOf('UStG §18')).toBe(0);
+  });
+});

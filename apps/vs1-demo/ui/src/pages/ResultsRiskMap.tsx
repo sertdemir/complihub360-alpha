@@ -83,6 +83,9 @@ type Obligation = {
    *  Ende, mal in der Mitte). Statutennamen sind sprachneutral, deshalb
    *  keine eigene i18n-Zeile. */
   law?: string;
+  /** Die Bussgeld-Zeile allein. Mobil steht sie unter der Quelle (Canvas
+   *  N1); `detail` bleibt fuer das PDF die zusammengesetzte Zeile. */
+  penalty?: string;
 };
 
 /** Whole days from today until an ISO date, or null once the date has passed
@@ -144,6 +147,7 @@ export function liveObligations(laws: SearchLaw[], t: RiskT, lang: string, local
     // Die Norm im Klartext, wenn es keine verlinkbare Fundstelle gibt —
     // sonst stuende unter dem Titel nur der Markt (Befund 2026-09-05).
     law: l.source_url ? undefined : (l.source ?? undefined),
+    penalty: bussgeldZeile(l, t, lang) ?? undefined,
     // A duty that has not started yet must not read "Ongoing · Live" — that
     // would tell the user they are already in breach. Until its start date
     // the Due cell shows that date plus the countdown; from the day it
@@ -721,9 +725,18 @@ export function ResultsRiskMap() {
           </div>
         )}
 
-        {/* Obligations table — direkt unter dem Hinweis (I1), sonst mit Luft */}
-          <div className={`${partial.length > 0 ? 'mt-5' : 'mt-12'} overflow-hidden rounded-xl border border-stroke-subtle`}>
-            <div className="grid grid-cols-[100px_1fr_120px_110px_160px] gap-4 border-b border-stroke-subtle bg-surface-secondary px-6 py-3.5 text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary">
+        {/* Obligations — ab lg die Tabelle, darunter je Pflicht eine Karte
+            (Canvas L1 · M1 · N1, Figma 3574:17253, abgenommen 04.10.2026).
+            Dieselben Knoten fuer beide: bis lg legt ein Zwei-Spalten-Grid
+            Prioritaet und Status nach oben, Titel und Quelle in die Mitte,
+            Markt und Frist nach unten; ab lg ordnet die Fuenf-Spalten-Zeile
+            sie in DOM-Reihenfolge. So steht jede Pflicht genau einmal im
+            Baum. Vorher galt das feste Fuenf-Spalten-Grid auf jeder Breite
+            und brach Titel auf 390 px fast Buchstabe fuer Buchstabe um. Die
+            Grenze ist lg, nicht md: auf 768 px bleiben der Pflicht-Spalte
+            rund 100 px, die Titel brachen dort genauso. */}
+          <div className={`${partial.length > 0 ? 'mt-5' : 'mt-12'} flex flex-col gap-3 lg:block lg:overflow-hidden lg:rounded-xl lg:border lg:border-stroke-subtle`}>
+            <div className="hidden grid-cols-[100px_1fr_120px_110px_160px] gap-4 border-b border-stroke-subtle bg-surface-secondary px-6 py-3.5 text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary lg:grid">
               <span>{t('table.severity')}</span>
               <span>{t('table.obligation')}</span>
               <span>{t('table.market')}</span>
@@ -733,53 +746,50 @@ export function ResultsRiskMap() {
             {grouped.map((g) => (
               <Fragment key={g.key}>
                 {g.label && (
-                  <div className="flex items-baseline gap-2 border-b border-stroke-subtle bg-surface-secondary/40 px-6 py-2.5">
+                  <div className="flex items-baseline gap-2 pt-1 lg:border-b lg:border-stroke-subtle lg:bg-surface-secondary/40 lg:px-6 lg:py-2.5">
                     <span className="text-body-3xs font-semibold uppercase tracking-[0.1em] text-fg-secondary">{g.label}</span>
                     <span className="text-body-3xs text-fg-tertiary">{g.items.length}</span>
                   </div>
                 )}
-                {g.items.map(({ o, i }) => (
+                {g.items.map(({ o }) => (
               <div
                 key={o.title}
-                className="grid grid-cols-[100px_1fr_120px_110px_160px] items-center gap-4 border-b border-stroke-subtle px-6 py-5 last:border-b-0 transition-colors hover:bg-surface-secondary/50"
+                data-testid="obligation-row"
+                className="grid grid-cols-[minmax(0,1fr)_auto] gap-y-2.5 rounded-xl border border-stroke-subtle bg-surface p-4 lg:grid-cols-[100px_1fr_120px_110px_160px] lg:items-center lg:gap-4 lg:rounded-none lg:border-0 lg:border-b lg:px-6 lg:py-5 lg:transition-colors lg:last:border-b-0 lg:hover:bg-surface-secondary/50"
               >
-                <span>
+                <span className="col-start-1 row-start-1 self-center lg:col-start-auto lg:row-start-auto">
                   <RiskBadge level={o.severity as RiskLevel} styleVariant="soft" size="sm">
                     {t(`severity.${o.severity}`, { defaultValue: o.severity.charAt(0).toUpperCase() + o.severity.slice(1) })}
                   </RiskBadge>
                 </span>
-                <span className="min-w-0">
+                <span className="col-span-2 row-start-2 min-w-0 lg:col-span-1 lg:row-start-auto">
                   <span className="block text-body-md font-bold text-fg">{o.title}</span>
                   {/* Source leads, penalty follows in a muted tone (Brand Map
                       §11: penalties are facts worth showing, but must not be the
-                      first thing the eye lands on). */}
-                  <span className="mt-0.5 block text-body-2xs leading-relaxed text-fg-brand">
-                    {o.sourceUrl && (
-                      <>
-                        <a
-                          href={o.sourceUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          className="underline decoration-dotted underline-offset-2 hover:decoration-solid"
-                          title={t('sourceLinkTitle', { defaultValue: 'Open the official text on EUR-Lex' })}
-                        >
-                          {o.sourceLabel} ↗
-                        </a>
-                        {o.detail ? ' · ' : ''}
-                      </>
-                    )}
-                    <span className={o.sourceUrl ? 'text-fg-tertiary' : undefined}>
-                      {o.detail}
-                    </span>
+                      first thing the eye lands on). Bis lg je eine Zeile (N1). */}
+                  <span className="mt-1 block text-body-2xs leading-relaxed text-fg-brand lg:mt-0.5">
+                    {o.sourceUrl ? (
+                      <a
+                        href={o.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="underline decoration-dotted underline-offset-2 hover:decoration-solid"
+                        title={t('sourceLinkTitle', { defaultValue: 'Open the official text on EUR-Lex' })}
+                      >
+                        {o.sourceLabel} ↗
+                      </a>
+                    ) : o.law}
+                    {(o.sourceUrl || o.law) && o.penalty && <span className="hidden lg:inline"> · </span>}
+                    {o.penalty && <span className="mt-0.5 block text-fg-tertiary lg:mt-0 lg:inline">{o.penalty}</span>}
                   </span>
                 </span>
-                <span className="text-body-sm text-fg-secondary">{o.market}</span>
-                <span>
-                  <span className="block text-body-sm font-semibold text-fg">{o.due}</span>
-                  <span className="block text-body-2xs text-fg-tertiary">{o.dueSub}</span>
+                <span className="col-start-1 row-start-3 border-t border-stroke-subtle pt-2.5 text-body-sm text-fg-secondary lg:col-start-auto lg:row-start-auto lg:border-0 lg:pt-0">{o.market}</span>
+                <span className="col-start-2 row-start-3 border-t border-stroke-subtle pt-2.5 text-right lg:col-start-auto lg:row-start-auto lg:border-0 lg:pt-0 lg:text-left">
+                  <span className="text-body-sm font-semibold text-fg lg:block">{o.due}</span>
+                  {o.dueSub && <span className="ml-1.5 text-body-2xs text-fg-tertiary lg:ml-0 lg:block">{o.dueSub}</span>}
                 </span>
-                <span className="flex justify-end">
+                <span className="col-start-2 row-start-1 flex justify-end lg:col-start-auto lg:row-start-auto">
                   <StatePill state={o.state} onAnswer={() => setSaveOpen(true)} />
                 </span>
               </div>
