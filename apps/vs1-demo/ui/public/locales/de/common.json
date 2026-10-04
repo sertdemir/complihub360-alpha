@@ -778,7 +778,8 @@
       "AGENCY": "Agentur / Dienstleistung"
     },
     "card": {
-      "obligations": "{{count}} Pflichten",
+      "obligations_one": "{{count}} Pflicht",
+      "obligations_other": "{{count}} Pflichten",
       "marketSpecific": "{{count}} speziell für {{market}}",
       "open": "Bereich öffnen"
     },
@@ -789,11 +790,12 @@
       "obligationsLead": "Jede Pflicht unten führt auf eine benannte Rechtsgrundlage zurück. Markt wechseln zeigt die Quelle, die dort gilt.",
       "euWideSource": "EU-weite Quelle",
       "appliesFrom": "Gilt ab {{date}}",
-      "coverageNote": "{{specific}} von {{count}} Pflichten haben eine Quelle speziell für {{market}}. Die übrigen sind EU-Verordnungen — sie gelten hier unmittelbar, es gibt also keine nationale Fassung zu führen.",
       "enforcementTitle": "Wer prüft, und was es kostet",
-      "enforcementLead": "Die Zahlen stammen aus den Quellen, die die Engine für {{market}} führt — {{count}} Pflichten mit benanntem Bußgeldrahmen. Obergrenzen, wie sie dort stehen, keine Erwartungswerte.",
+      "enforcementLead_one": "Die Zahlen stammen aus den Quellen, die die Engine für {{market}} führt — {{count}} Pflicht mit benanntem Bußgeldrahmen. Die Obergrenze, wie sie dort steht, kein Erwartungswert.",
+      "enforcementLead_other": "Die Zahlen stammen aus den Quellen, die die Engine für {{market}} führt — {{count}} Pflichten mit benanntem Bußgeldrahmen. Obergrenzen, wie sie dort stehen, keine Erwartungswerte.",
       "timelineTitle": "Was als Nächstes ansteht",
-      "timelineLead": "Ein Strang, zeitlich sortiert: erst die Meldungen, die der laufende Betrieb verlangt, dann der Tag, an dem neues Recht dazukommt. {{deferred}} der {{total}} Pflichten sind beschlossen, gelten aber noch nicht.",
+      "timelineLead_one": "Ein Strang, zeitlich sortiert: erst die Meldungen, die der laufende Betrieb verlangt, dann der Tag, an dem neues Recht dazukommt. {{deferred}} der {{total}} Pflichten ist beschlossen, gilt aber noch nicht.",
+      "timelineLead_other": "Ein Strang, zeitlich sortiert: erst die Meldungen, die der laufende Betrieb verlangt, dann der Tag, an dem neues Recht dazukommt. {{deferred}} der {{total}} Pflichten sind beschlossen, gelten aber noch nicht.",
       "marketsTitle": "Derselbe Bereich, acht Gewichte",
       "marketsLead": "{{top}} gewichtet diesen Bereich am schwersten — {{topWeight}} von 10, gegenüber {{second}} mit {{secondWeight}}. Wer beide Märkte bedient, plant nach {{top}}.",
       "coversTitle": "So kommt CompliHub360 dahin",
@@ -806,7 +808,8 @@
         "obligationsNote": "{{count}} davon mit einer Quelle speziell für diesen Markt",
         "exposure": "Maximale Bußgeld-Exposition",
         "exposureNote": "Summe der Obergrenzen, nicht der Erwartungswert",
-        "days": "{{count}} Tage",
+        "days_one": "{{count}} Tag",
+        "days_other": "{{count}} Tage",
         "lead": "Kürzeste Vorlaufzeit",
         "leadNote": "Die Pflicht, die Teams zuerst einholt",
         "later": "Noch nicht anwendbar",
@@ -818,8 +821,10 @@
         "fromDate": "{{count}} ab {{date}}",
         "nationalIn": "{{count}} mit Rechtsgrundlage in {{market}}",
         "exposureProven": "Belegte Sanktionssumme",
-        "exposureNoneProven": "Keine der {{total}} Pflichten nennt im Gesetz einen Betrag — die Sanktionen sind anteilig, je Einheit oder den Mitgliedstaaten überlassen.",
-        "exposureProvenNote": "{{proven}} von {{total}} Pflichten nennen im Gesetz einen Betrag. Die übrigen zählen mit null, sie werden nicht geschätzt."
+        "exposureNoneProven_one": "Die eine Pflicht hier nennt im Gesetz keinen Betrag — die Sanktion ist anteilig, je Einheit oder den Mitgliedstaaten überlassen.",
+        "exposureNoneProven_other": "Keine der {{total}} Pflichten nennt im Gesetz einen Betrag — die Sanktionen sind anteilig, je Einheit oder den Mitgliedstaaten überlassen.",
+        "exposureProvenNote_one": "{{proven}} von {{total}} Pflichten nennt im Gesetz einen Betrag. Die übrigen zählen mit null, sie werden nicht geschätzt.",
+        "exposureProvenNote_other": "{{proven}} von {{total}} Pflichten nennen im Gesetz einen Betrag. Die übrigen zählen mit null, sie werden nicht geschätzt."
       },
       "risk": {
         "title": "Risikoprofil",
@@ -830,15 +835,18 @@
         "strictness": "Regelungsdichte",
         "strictnessNote": "Eine Eigenschaft des Marktes, nicht dieses Bereichs",
         "outOfTen": "von 10 · Domänengewicht",
-        "marketsCompared": "{{count}} Märkte im Vergleich"
+        "marketsCompared_one": "{{count}} Markt im Vergleich",
+        "marketsCompared_other": "{{count}} Märkte im Vergleich"
       },
       "timeline": {
         "liveNow": "Gilt heute",
         "togetherCount": "{{count}} Pflichten landen an einem Tag",
         "aheadOne": "{{source}} wird anwendbar.",
         "aheadMany": "{{names}} greifen am selben Tag.",
-        "inDays": "In {{count}} Tagen",
-        "dueBody": "Takt: {{cadence}} — {{days}} Tage Vorlauf.",
+        "inDays_one": "In {{count}} Tag",
+        "inDays_other": "In {{count}} Tagen",
+        "dueBody_one": "Takt: {{cadence}} — {{days}} Tag Vorlauf.",
+        "dueBody_other": "Takt: {{cadence}} — {{days}} Tage Vorlauf.",
         "ongoingBody": "Laufende Pflicht ohne festen Meldetermin.",
         "ongoingMany": "{{count}} Pflichten gelten laufend",
         "sinceTag": "gilt seit {{date}}",
@@ -863,14 +871,17 @@
       "sharedTriggers_one": "{{count}} gemeinsamer Auslöser",
       "sharedTriggers_other": "{{count}} gemeinsame Auslöser",
       "allAreasLink": "Alle acht Bereiche im Überblick",
-      "coverageNoteEu": "Die Engine trägt {{count}} Pflichten für diesen Bereich, alle mit einer Quelle auf EU-Ebene. Wähle einen Markt, um zu sehen, wo eine nationale Quelle dazukommt.",
+      "coverageNoteEu_one": "Die Engine trägt {{count}} Pflicht für diesen Bereich, mit einer Quelle auf EU-Ebene. Wähle einen Markt, um zu sehen, wo eine nationale Quelle dazukommt.",
+      "coverageNoteEu_other": "Die Engine trägt {{count}} Pflichten für diesen Bereich, alle mit einer Quelle auf EU-Ebene. Wähle einen Markt, um zu sehen, wo eine nationale Quelle dazukommt.",
       "startShort": "Assessment jetzt starten",
       "sourcePromise": "Jede Pflicht führt auf eine benannte Rechtsgrundlage zurück — keine Einschätzung ohne Quelle.",
       "facts": {
-        "duties": "{{count}} Pflichten",
+        "duties_one": "{{count}} Pflicht",
+        "duties_other": "{{count}} Pflichten",
         "allEu": "alle auf EU-Ebene",
         "national": "{{count}} mit nationaler Rechtsgrundlage",
-        "later": "{{count}} greifen erst später"
+        "later_one": "{{count}} greift erst später",
+        "later_other": "{{count}} greifen erst später"
       },
       "eyebrow": {
         "affected": "Betroffenheit",
@@ -895,11 +906,14 @@
       "appliesToModels": "Gilt für:",
       "noneForMarket": "Die Engine trägt für diesen Bereich in {{market}} noch keine Pflicht. Das ist eine echte Deckungslücke, kein Freibrief.",
       "heaviestPenalty": "Höchstes Einzelbußgeld",
-      "enforcementTop": "höchster Wert aller {{total}} Märkte",
+      "enforcementTop_one": "der einzige Markt im Vergleich",
+      "enforcementTop_other": "höchster Wert aller {{total}} Märkte",
       "enforcementRank": "Rang {{rank}} von {{total}} Märkten",
-      "enforcementAvg": "Durchschnitt über {{total}} Märkte",
+      "enforcementAvg_one": "Durchschnitt über {{total}} Markt",
+      "enforcementAvg_other": "Durchschnitt über {{total}} Märkte",
       "authorities": "Zuständige Behörden",
-      "enforcementLeadEu": "Die Zahlen stammen aus den Quellen, die die Engine auf EU-Ebene führt — {{count}} Pflichten mit benanntem Bußgeldrahmen. Obergrenzen, wie sie dort stehen, keine Erwartungswerte.",
+      "enforcementLeadEu_one": "Die Zahlen stammen aus den Quellen, die die Engine auf EU-Ebene führt — {{count}} Pflicht mit benanntem Bußgeldrahmen. Die Obergrenze, wie sie dort steht, kein Erwartungswert.",
+      "enforcementLeadEu_other": "Die Zahlen stammen aus den Quellen, die die Engine auf EU-Ebene führt — {{count}} Pflichten mit benanntem Bußgeldrahmen. Obergrenzen, wie sie dort stehen, keine Erwartungswerte.",
       "enforcementScaleSub": "Alle acht Märkte auf einer Skala — der goldene Marker ist der Wert, mit dem die Engine hier rechnet.",
       "timelineLeadAllLive": "Jede Pflicht gilt bereits — der Strang zeigt, in welchem Takt sie zurückkommen und wie viel Vorlauf jede braucht. Der Marktwechsel oben rechnet die Vorläufe um.",
       "marketsLeadTied": "{{count}} Märkte gewichten diesen Bereich gleich schwer ({{weight}} von 10). Wer mehrere bedient, plant nach dem strengsten.",
@@ -910,7 +924,6 @@
       "askQuestion": "Frage stellen",
       "askEyebrow": "Ihre Frage",
       "askPlaceholder": "Stellen Sie Ihre Frage in eigenen Worten",
-      "coverageNoteGaps": "{{specific}} von {{count}} Pflichten haben eine Quelle speziell für {{market}}. Von den übrigen haben {{gaps}} eine nationale Fassung, die wir noch nicht führen — der Rest sind EU-Verordnungen, die hier unmittelbar gelten.",
       "checkTitle": "Trifft das auf Sie zu?",
       "checkFoot": "Trifft eines zu, trägt dieser Bereich Pflichten für Sie — das Assessment grenzt sie auf Ihren Fall ein.",
       "ceiling": {
@@ -978,7 +991,12 @@
           "statesWithPrivacyActs": "die Bundesstaaten mit eigenem Datenschutzgesetz (Kalifornien und rund 20 weitere)",
           "states50AndDc": "alle 50 Bundesstaaten und der District of Columbia"
         }
-      }
+      },
+      "coverageNoteSpecific_one": "{{count}} von {{total}} Pflichten hat eine Quelle speziell für {{market}}.",
+      "coverageNoteSpecific_other": "{{count}} von {{total}} Pflichten haben eine Quelle speziell für {{market}}.",
+      "coverageNoteEuRest": "Die übrigen sind EU-Verordnungen — sie gelten hier unmittelbar, es gibt also keine nationale Fassung zu führen.",
+      "coverageNoteGapsRest_one": "Von den übrigen hat {{count}} eine nationale Fassung, die wir noch nicht führen — der Rest sind EU-Verordnungen, die hier unmittelbar gelten.",
+      "coverageNoteGapsRest_other": "Von den übrigen haben {{count}} eine nationale Fassung, die wir noch nicht führen — der Rest sind EU-Verordnungen, die hier unmittelbar gelten."
     },
     "riskBadge": "Risiko: {{level}}"
   },
@@ -1100,13 +1118,13 @@
       "marketsPanelTitle": "Markt wählen",
       "allMarkets": "Alle Märkte",
       "marketsAsideBody": "Jeder Markt zeigt, was dort wann fällig wird, welche Bereiche am schwersten wiegen und wo wir noch keine lokale Quelle führen.",
-      "marketFact": "{{count}} Pflichten in {{areas}} Bereichen",
       "openMenu": "Menü öffnen",
       "closeMenu": "Menü schließen",
       "back": "Zurück",
       "menuLabel": "Hauptnavigation",
       "areasCount": "{{count}} Bereiche",
-      "marketsCount": "{{count}} Märkte"
+      "marketsCount": "{{count}} Märkte",
+      "marketFact": "{{duties}} in {{areas}}"
     },
     "login": "Anmelden",
     "language": "Sprache"
@@ -1303,14 +1321,14 @@
     "country": {
       "eyebrow": "Markt",
       "title": "Tätig in {{country}}.",
-      "lead": "{{count}} Pflichten in {{areas}} Bereichen, mit nationaler Rechtsgrundlage. Diese Seite zeigt, was hier zusammenkommt und wann — was die einzelne Pflicht verlangt, steht in ihrem Bereich.",
       "weightsTitle": "Was hier am schwersten wiegt",
       "weightsLead": "{{top}} wiegt hier am schwersten — {{topWeight}} von 10, gegenüber {{second}} mit {{secondWeight}}. Jeder Bereich führt auf seine eigene Seite; dort steht, was die einzelne Pflicht verlangt.",
       "obligationsTitle": "Pflichten, für die wir eine Quelle führen",
       "obligationsLead": "Jeder Eintrag nennt die Norm, aus der er stammt. Beruht die Pflicht auf EU-Recht, ist der amtliche Text einen Klick entfernt.",
       "sourceLabel": "Quelle",
       "dueLabel": "Turnus",
-      "leadTime": "{{days}} Tage Vorlauf",
+      "leadTime_one": "{{days}} Tag Vorlauf",
+      "leadTime_other": "{{days}} Tage Vorlauf",
       "backToMarkets": "Alle Märkte",
       "notFound": "Für dieses Kürzel führen wir noch kein Marktprofil.",
       "profileTitle": "Marktprofil",
@@ -1322,8 +1340,8 @@
       "sourcePromise": "Jede Pflicht hier nennt ihre nationale Rechtsgrundlage. Wo wir keine führen, steht das EU-Instrument — und es steht dran.",
       "weightsLeadTied": "{{count}} Bereiche wiegen hier gleich schwer ({{weight}} von 10). Jeder führt auf seine eigene Seite.",
       "calendarTitle": "Was hier zusammenkommt, und wie oft",
-      "calendarLead": "{{count}} Pflichten aus {{areas}} Bereichen in einer Ansicht — nach Turnus, nicht nach Bereich. Niemand plant einen Markt bereichsweise, sondern gegen einen Kalender.",
-      "leadDays": "{{count}} Tage Vorlauf",
+      "leadDays_one": "{{count}} Tag Vorlauf",
+      "leadDays_other": "{{count}} Tage Vorlauf",
       "exposureNote": "Höchstes Einzelbußgeld in diesem Markt: {{max}} auf {{duty}}. Die benannten Obergrenzen summieren sich auf {{total}} — ein Deckel, falls alles gleichzeitig schiefginge, keine Prognose.",
       "ctaBody": "Das Assessment grenzt diesen Markt auf Ihr Unternehmen, Ihr Produkt und Ihre Bereiche ein — in unter fünf Minuten.",
       "allAreas": "Alle Bereiche",
@@ -1347,9 +1365,13 @@
       "weightsFootPending": "Bei {{list}} existiert ein nationaler Text, den wir noch nicht führen — dort steht das benannte EU-Instrument.",
       "weightsFootNone": "Für {{list}} führen wir noch keine benannte Quelle.",
       "exposureCaveat": "Ein Vorbehalt zu diesen Zahlen: {{what}}.",
-      "exposureConverted": "{{count}} davon sind aus einer anderen Währung umgerechnet",
-      "exposureUnbacked": "{{count}} von {{total}} Pflichten führen keinen im Gesetz genannten Betrag",
-      "exposureAnd": ", und "
+      "exposureConverted_one": "{{count}} davon ist aus einer anderen Währung umgerechnet",
+      "exposureConverted_other": "{{count}} davon sind aus einer anderen Währung umgerechnet",
+      "exposureUnbacked_one": "{{count}} von {{total}} Pflichten führt keinen im Gesetz genannten Betrag",
+      "exposureUnbacked_other": "{{count}} von {{total}} Pflichten führen keinen im Gesetz genannten Betrag",
+      "exposureAnd": ", und ",
+      "lead": "{{duties}} in {{areas}}, mit nationaler Rechtsgrundlage. Diese Seite zeigt, was hier zusammenkommt und wann — was die einzelne Pflicht verlangt, steht in ihrem Bereich.",
+      "calendarLead": "{{duties}} aus {{areas}} in einer Ansicht — nach Turnus, nicht nach Bereich. Niemand plant einen Markt bereichsweise, sondern gegen einen Kalender."
     },
     "cta": {
       "title": "Sehen, welche davon für Sie gelten.",
@@ -2011,5 +2033,13 @@
     "reload": "Neu laden",
     "home": "Zur Startseite",
     "details": "Technische Angabe"
+  },
+  "counts": {
+    "duties_one": "{{count}} Pflicht",
+    "duties_other": "{{count}} Pflichten",
+    "areasIn_one": "{{count}} Bereich",
+    "areasIn_other": "{{count}} Bereichen",
+    "areasFrom_one": "{{count}} Bereich",
+    "areasFrom_other": "{{count}} Bereichen"
   }
 }

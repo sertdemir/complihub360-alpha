@@ -46,7 +46,8 @@
   "state": {
     "confirmed": "Confirmada",
     "likely": "Probable",
-    "answer": "Responder {{total}} preguntas"
+    "answer_one": "Responder {{total}} pregunta",
+    "answer_other": "Responder {{total}} preguntas"
   },
   "partners": {
     "eyebrow_one": "{{count}} Verified Provider encontrado",
@@ -76,7 +77,8 @@
       "domains": "Ámbitos",
       "operations": "Actividad"
     },
-    "questionsOpen": "{{total}} preguntas pendientes",
+    "questionsOpen_one": "{{total}} pregunta pendiente",
+    "questionsOpen_other": "{{total}} preguntas pendientes",
     "sources": "Fuentes",
     "disclaimer": "CompliHub360 es una plataforma de orquestación, no un bufete de abogados. El asesoramiento legal, fiscal y regulatorio lo prestan los Verified Providers bajo su propia responsabilidad profesional."
   },
@@ -109,17 +111,19 @@
     "backToSession": "Volver a la sesión",
     "lageAreasArea": "Cubre {{matched}} de {{total}} áreas ({{area}})",
     "lageAreasSession": "Coincide con {{matched}} de {{total}} áreas de su sesión «{{session}}»",
-    "lageMarketsAll": "los {{count}} mercados cubiertos",
-    "lageMarketsPartial": "{{covered}} de {{total}} mercados cubiertos · {{missing}} no",
+    "lageMarketsAll_one": "{{count}} mercado cubierto",
+    "lageMarketsAll_other": "los {{count}} mercados cubiertos",
+    "lageMarketsPartial_one": "{{covered}} de {{total}} mercado cubierto · {{missing}} no",
+    "lageMarketsPartial_other": "{{covered}} de {{total}} mercados cubiertos · {{missing}} no",
     "ringMatch": "Coincidencia",
     "ringMatchSub": "{{matched}} de {{total}} áreas · {{markets}}",
     "ringRating": "Valoración",
-    "ringRatingSub": "{{count}} valoraciones · {{mandates}} mandatos",
     "ringRatingSubNone": "todavía sin valoración tras una cita",
     "ringConfirm": "Tasa de confirmación",
     "ringConfirmSub": "citas confirmadas",
     "matrixTitle": "Sus obligaciones y los mercados de este proveedor",
-    "matrixCovered": "{{covered}} de {{total}} mercados",
+    "matrixCovered_one": "{{covered}} de {{total}} mercado",
+    "matrixCovered_other": "{{covered}} de {{total}} mercados",
     "matrixSession": "Sesión",
     "matrixNone": "En este contexto no hay nada abierto ahora mismo.",
     "matrixNotCovered": "Este proveedor no cubre este mercado.",
@@ -144,7 +148,8 @@
     "reviewsNone": "Todavía no hay ninguna valoración de una cita reservada con este proveedor.",
     "reviewsVerified": "verificada tras la reserva",
     "reviewsFoot": "Las valoraciones solo surgen de citas reservadas a través de CompliHub360. Los nombres permanecen anónimos.",
-    "figureRating": "Valoración · {{count}} votos",
+    "figureRating_one": "Valoración · {{count}} voto",
+    "figureRating_other": "Valoración · {{count}} votos",
     "figureMandates": "Mandatos vía CompliHub360",
     "figureConfirm": "Tasa de confirmación",
     "figureResponse": "Tiempo de respuesta",
@@ -163,7 +168,12 @@
     "bookAnother": "Reservar otra cita",
     "revealedTitle": "Nombre y contacto ya están visibles.",
     "revealedBody": "Desde su reserva puede ver quién es este proveedor.",
-    "plannedPrice": "A partir del {{date}}: {{service}} {{price}}. Las reservas anteriores mantienen el precio actual."
+    "plannedPrice": "A partir del {{date}}: {{service}} {{price}}. Las reservas anteriores mantienen el precio actual.",
+    "ringRatingSub": "{{reviews}} · {{mandates}}",
+    "reviewsCount_one": "{{count}} valoración",
+    "reviewsCount_other": "{{count}} valoraciones",
+    "mandatesCount_one": "{{count}} mandato",
+    "mandatesCount_other": "{{count}} mandatos"
   },
   "schedule": {
     "back": "Volver al perfil",
@@ -368,7 +378,8 @@
     },
     "response": "Responde en ~{{hours}} h",
     "confirmed": "{{pct}} % de citas confirmadas",
-    "reviews": "{{rating}} de {{count}} valoraciones tras citas",
+    "reviews_one": "{{rating}} de {{count}} valoración tras una cita",
+    "reviews_other": "{{rating}} de {{count}} valoraciones tras citas",
     "reviewsNone": "Aún sin valoración tras una cita",
     "responseLabel": "Tiempo de respuesta",
     "hours": "~{{hours}} h",

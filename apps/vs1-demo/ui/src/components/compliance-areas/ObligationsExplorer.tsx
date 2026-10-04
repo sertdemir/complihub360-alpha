@@ -238,22 +238,21 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                     'The engine carries {{count}} duties for this area, all of them on an EU-level source. Pick a market to see where a national source adds to them.',
                   count: all.length,
                 })
-              : gapCount > 0
-                ? t('compliance.area.coverageNoteGaps', {
-                    defaultValue:
-                      '{{specific}} of {{count}} duties have a source specific to {{market}}. Of the rest, {{gaps}} have a national text we do not carry yet — the others are EU Regulations, which apply here directly.',
-                    count: all.length,
-                    specific: all.filter((o) => o.marketSpecific).length,
-                    gaps: gapCount,
-                    market: marketLabel,
-                  })
-                : t('compliance.area.coverageNote', {
-                    defaultValue:
-                      '{{specific}} of {{count}} duties have a source specific to {{market}}. The rest are EU Regulations — they apply here directly, so there is no national text to hold.',
-                    count: all.length,
-                    specific: all.filter((o) => o.marketSpecific).length,
-                    market: marketLabel,
-                  })}
+              : // Zwei Saetze, zwei Zahlen: das Verb haengt im ersten an den
+                // marktspezifischen Pflichten, im zweiten an den Luecken —
+                // ein Key mit einem `count` traefe nur eine davon.
+                `${t('compliance.area.coverageNoteSpecific', {
+                  defaultValue: '{{count}} of {{total}} duties have a source specific to {{market}}.',
+                  count: all.filter((o) => o.marketSpecific).length,
+                  total: all.length,
+                  market: marketLabel,
+                })} ${gapCount > 0
+                  ? t('compliance.area.coverageNoteGapsRest', {
+                      defaultValue:
+                        'Of the rest, {{count}} have a national text we do not carry yet — the others are EU Regulations, which apply here directly.',
+                      count: gapCount,
+                    })
+                  : t('compliance.area.coverageNoteEuRest', 'The rest are EU Regulations — they apply here directly, so there is no national text to hold.')}`}
           </Typography>
             </>
           }
@@ -384,7 +383,7 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                           value={t(`markets.cadence.${o.due}`, { defaultValue: o.due })}
                           note={
                             o.dueDays != null
-                              ? t('markets.country.leadTime', { days: o.dueDays })
+                              ? t('markets.country.leadTime', { days: o.dueDays, count: o.dueDays })
                               : undefined
                           }
                         />

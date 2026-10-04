@@ -46,7 +46,8 @@
   "state": {
     "confirmed": "Onaylandı",
     "likely": "Muhtemel",
-    "answer": "{{total}} soruyu yanıtlayın"
+    "answer_one": "{{total}} soruyu yanıtlayın",
+    "answer_other": "{{total}} soruyu yanıtlayın"
   },
   "partners": {
     "eyebrow_one": "{{count}} Verified Provider eşleşti",
@@ -76,7 +77,8 @@
       "domains": "Alanlar",
       "operations": "Faaliyet"
     },
-    "questionsOpen": "{{total}} soru açık",
+    "questionsOpen_one": "{{total}} soru açık",
+    "questionsOpen_other": "{{total}} soru açık",
     "sources": "Kaynaklar",
     "disclaimer": "CompliHub360 bir orkestrasyon platformudur, hukuk bürosu değildir. Hukuki, vergisel ve düzenleyici danışmanlık, Verified Providers tarafından kendi mesleki sorumlulukları altında sunulur."
   },
@@ -109,17 +111,19 @@
     "backToSession": "Oturuma dön",
     "lageAreasArea": "{{total}} alanın {{matched}} tanesini kapsıyor ({{area}})",
     "lageAreasSession": "„{{session}}“ oturumunuzdaki {{total}} alanın {{matched}} tanesine uyuyor",
-    "lageMarketsAll": "{{count}} pazarın tamamı kapsanıyor",
-    "lageMarketsPartial": "{{total}} pazarın {{covered}} tanesi kapsanıyor · {{missing}} kapsanmıyor",
+    "lageMarketsAll_one": "{{count}} pazar kapsanıyor",
+    "lageMarketsAll_other": "{{count}} pazarın tamamı kapsanıyor",
+    "lageMarketsPartial_one": "{{total}} pazarın {{covered}} tanesi kapsanıyor · {{missing}} kapsanmıyor",
+    "lageMarketsPartial_other": "{{total}} pazarın {{covered}} tanesi kapsanıyor · {{missing}} kapsanmıyor",
     "ringMatch": "Uyum",
     "ringMatchSub": "{{total}} alanın {{matched}} tanesi · {{markets}}",
     "ringRating": "Değerlendirme",
-    "ringRatingSub": "{{count}} değerlendirme · {{mandates}} iş",
     "ringRatingSubNone": "randevu sonrası henüz değerlendirme yok",
     "ringConfirm": "Onay oranı",
     "ringConfirmSub": "onaylanan randevular",
     "matrixTitle": "Yükümlülükleriniz ve bu sağlayıcının pazarları",
-    "matrixCovered": "{{total}} pazarın {{covered}} tanesi",
+    "matrixCovered_one": "{{total}} pazarın {{covered}} tanesi",
+    "matrixCovered_other": "{{total}} pazarın {{covered}} tanesi",
     "matrixSession": "Oturum",
     "matrixNone": "Bu bağlamda şu anda açık bir şey yok.",
     "matrixNotCovered": "Bu sağlayıcı bu pazarı kapsamıyor.",
@@ -144,7 +148,8 @@
     "reviewsNone": "Bu sağlayıcı için alınmış bir randevudan gelen değerlendirme henüz yok.",
     "reviewsVerified": "randevu sonrası doğrulandı",
     "reviewsFoot": "Değerlendirmeler yalnızca CompliHub360 üzerinden alınan randevulardan doğar. İsimler anonim kalır.",
-    "figureRating": "Değerlendirme · {{count}} oy",
+    "figureRating_one": "Değerlendirme · {{count}} oy",
+    "figureRating_other": "Değerlendirme · {{count}} oy",
     "figureMandates": "CompliHub360 üzerinden iş",
     "figureConfirm": "Onay oranı",
     "figureResponse": "Yanıt süresi",
@@ -163,7 +168,12 @@
     "bookAnother": "Başka bir randevu alın",
     "revealedTitle": "Ad ve iletişim bilgileri görünür.",
     "revealedBody": "Rezervasyonunuzdan bu yana bu sağlayıcının kim olduğunu görebilirsiniz.",
-    "plannedPrice": "{{date}} tarihinden itibaren: {{service}} {{price}}. Bu tarihten önceki rezervasyonlarda bugünkü fiyat geçerlidir."
+    "plannedPrice": "{{date}} tarihinden itibaren: {{service}} {{price}}. Bu tarihten önceki rezervasyonlarda bugünkü fiyat geçerlidir.",
+    "ringRatingSub": "{{reviews}} · {{mandates}}",
+    "reviewsCount_one": "{{count}} değerlendirme",
+    "reviewsCount_other": "{{count}} değerlendirme",
+    "mandatesCount_one": "{{count}} iş",
+    "mandatesCount_other": "{{count}} iş"
   },
   "schedule": {
     "back": "Profile dön",
@@ -368,7 +378,8 @@
     },
     "response": "~{{hours}} saatte yanıt verir",
     "confirmed": "Randevuların %{{pct}}’i onaylandı",
-    "reviews": "Randevu sonrası {{count}} değerlendirmeden {{rating}}",
+    "reviews_one": "Randevu sonrası {{count}} değerlendirmeden {{rating}}",
+    "reviews_other": "Randevu sonrası {{count}} değerlendirmeden {{rating}}",
     "reviewsNone": "Randevu sonrası henüz değerlendirme yok",
     "responseLabel": "Yanıt süresi",
     "hours": "~{{hours}} sa",

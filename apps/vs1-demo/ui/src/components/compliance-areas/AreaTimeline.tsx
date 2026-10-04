@@ -124,6 +124,7 @@ export function AreaTimeline({ slug, selectedCountry }: Props) {
         body: t('compliance.area.timeline.dueBody', 'Cadence: {{cadence}} — {{days}} days of lead time.', {
           cadence: t(`markets.cadence.${o.due}`, { defaultValue: o.due }),
           days: o.dueDays,
+          count: o.dueDays,
         }),
       });
     }
@@ -194,6 +195,8 @@ export function AreaTimeline({ slug, selectedCountry }: Props) {
                   defaultValue:
                     'One thread, in time order: first the filings that day-to-day operation demands, then the day new law lands. {{deferred}} of the {{total}} duties are settled law but not yet applicable.',
                   deferred,
+                  // `count` waehlt die Form ("1 … is" / "3 … are").
+                  count: deferred,
                   total: obligations.length,
                 })
               : t('compliance.area.timelineLeadAllLive', {

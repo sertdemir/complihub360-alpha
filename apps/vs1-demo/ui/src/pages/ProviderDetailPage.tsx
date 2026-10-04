@@ -247,7 +247,7 @@ function Detail({ p, ctx, areaLabel, reviews, slots, booking, entered, locale, o
       lage.push(
         <strong key="m" className={missing.length ? 'text-error-700 dark:text-error-300' : 'text-fg-accent-strong'}>
           {missing.length
-            ? t('detail.lageMarketsPartial', { covered: coveredCount, total: markets.length, missing: missing.join(' · ') })
+            ? t('detail.lageMarketsPartial', { covered: coveredCount, total: markets.length, count: markets.length, missing: missing.join(' · ') })
             : t('detail.lageMarketsAll', { count: markets.length })}
         </strong>,
       );
@@ -348,7 +348,10 @@ function Detail({ p, ctx, areaLabel, reviews, slots, booking, entered, locale, o
               title={t('detail.ringRating')}
               value={Math.round(rating * 10)}
               format={(n) => (n / 10).toLocaleString(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
-              sub={t('detail.ringRatingSub', { count: ratingCount, mandates: p.completed_count ?? 0 })}
+              sub={t('detail.ringRatingSub', {
+                reviews: t('detail.reviewsCount', { count: ratingCount }),
+                mandates: t('detail.mandatesCount', { count: p.completed_count ?? 0 }),
+              })}
               segs={[{ frac: rating / 5, cls: 'text-brand' }]}
             />
           )}
@@ -413,7 +416,7 @@ function Matrix({ ctx, covered }: { ctx: ProviderContext | null; covered: Set<st
     <section>
       <h2 className="mb-3 text-body-md font-bold text-fg">
         {t('detail.matrixTitle')}{' '}
-        <span className="text-fg-brand">{t('detail.matrixCovered', { covered: coveredCount, total: markets.length })}</span>
+        <span className="text-fg-brand">{t('detail.matrixCovered', { covered: coveredCount, total: markets.length, count: markets.length })}</span>
       </h2>
       <div className={`${CARD} overflow-x-auto px-[18px] py-3.5`}>
         <div className="min-w-[640px]">

@@ -331,9 +331,9 @@ export function MobileNav({ open, onClose, lang, logo, actions, id }: MobileNavP
                               </span>
                               <span className="text-body-xs leading-snug text-fg-secondary">
                                 {t('header.nav.marketFact', {
-                                  defaultValue: '{{count}} duties in {{areas}} areas',
-                                  count: p.obligations.length,
-                                  areas: p.byDomain.length,
+                                  defaultValue: '{{duties}} in {{areas}}',
+                                  duties: t('counts.duties', { defaultValue: '{{count}} duties', count: p.obligations.length }),
+                                  areas: t('counts.areasIn', { defaultValue: '{{count}} areas', count: p.byDomain.length }),
                                 })}
                               </span>
                             </span>

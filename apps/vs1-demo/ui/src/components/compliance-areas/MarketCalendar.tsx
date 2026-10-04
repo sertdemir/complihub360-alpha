@@ -53,9 +53,9 @@ export function MarketCalendar({ profile }: Props) {
           title={t('markets.country.calendarTitle', 'What comes together here, and how often')}
           lead={t('markets.country.calendarLead', {
             defaultValue:
-              '{{count}} duties from {{areas}} areas in one view — by cadence, not by area. Nobody plans a market area by area; they plan it against a calendar.',
-            count: profile.obligations.length,
-            areas: profile.byDomain.length,
+              '{{duties}} from {{areas}} in one view — by cadence, not by area. Nobody plans a market area by area; they plan it against a calendar.',
+            duties: t('counts.duties', { defaultValue: '{{count}} duties', count: profile.obligations.length }),
+            areas: t('counts.areasFrom', { defaultValue: '{{count}} areas', count: profile.byDomain.length }),
           })}
         />
         {/* Two numbers, not a section: on a market page the calendar is the

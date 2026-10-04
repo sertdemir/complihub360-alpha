@@ -778,7 +778,8 @@
       "AGENCY": "Agencia / servicios"
     },
     "card": {
-      "obligations": "{{count}} obligaciones",
+      "obligations_one": "{{count}} obligación",
+      "obligations_other": "{{count}} obligaciones",
       "marketSpecific": "{{count}} específicas de {{market}}",
       "open": "Abrir área"
     },
@@ -789,11 +790,12 @@
       "obligationsLead": "Cada obligación remite a una norma concreta. Cambie de mercado para ver la fuente que se aplica allí.",
       "euWideSource": "Fuente a nivel UE",
       "appliesFrom": "Aplica desde {{date}}",
-      "coverageNote": "{{specific}} de {{count}} obligaciones tienen una fuente específica de {{market}}. El resto son Reglamentos de la UE: se aplican aquí directamente, así que no hay texto nacional que incluir.",
       "enforcementTitle": "Quién controla y cuánto cuesta",
-      "enforcementLead": "Las cifras proceden de las fuentes que el motor mantiene para {{market}}: {{count}} obligaciones con un rango de sanción declarado. Son límites máximos tal como están escritos, no un coste esperado.",
+      "enforcementLead_one": "Las cifras proceden de las fuentes que el motor mantiene para {{market}}: {{count}} obligación con un rango de sanción declarado. Es un límite máximo tal como está escrito, no un coste esperado.",
+      "enforcementLead_other": "Las cifras proceden de las fuentes que el motor mantiene para {{market}}: {{count}} obligaciones con un rango de sanción declarado. Son límites máximos tal como están escritos, no un coste esperado.",
       "timelineTitle": "Qué viene ahora",
-      "timelineLead": "Un solo hilo, en orden temporal: primero las presentaciones que exige la operación diaria, después el día en que llega nueva normativa. {{deferred}} de las {{total}} obligaciones son derecho aprobado que aún no aplica.",
+      "timelineLead_one": "Un solo hilo, en orden temporal: primero las presentaciones que exige la operación diaria, después el día en que llega nueva normativa. {{deferred}} de las {{total}} obligaciones es derecho aprobado que aún no aplica.",
+      "timelineLead_other": "Un solo hilo, en orden temporal: primero las presentaciones que exige la operación diaria, después el día en que llega nueva normativa. {{deferred}} de las {{total}} obligaciones son derecho aprobado que aún no aplica.",
       "marketsTitle": "La misma área, ocho pesos",
       "marketsLead": "{{top}} es el mercado que más peso da a esta área: {{topWeight}} sobre 10, frente a {{second}} con {{secondWeight}}. Quien atienda ambos planifica según {{top}}.",
       "coversTitle": "Cómo llega CompliHub360 hasta ahí",
@@ -806,7 +808,8 @@
         "obligationsNote": "{{count}} con una fuente específica para este mercado",
         "exposure": "Exposición máxima a sanciones",
         "exposureNote": "Suma de los límites superiores, no el valor esperado",
-        "days": "{{count}} días",
+        "days_one": "{{count}} día",
+        "days_other": "{{count}} días",
         "lead": "Plazo más corto",
         "leadNote": "La obligación que primero pilla a los equipos",
         "later": "Aún no aplicable",
@@ -818,8 +821,10 @@
         "fromDate": "{{count}} desde {{date}}",
         "nationalIn": "{{count}} con base jurídica en {{market}}",
         "exposureProven": "Sanción máxima acreditada",
-        "exposureNoneProven": "Ninguna de las {{total}} obligaciones fija un importe en la ley: las sanciones son proporcionales, por unidad o se dejan a los Estados miembros.",
-        "exposureProvenNote": "{{proven}} de {{total}} obligaciones fijan un importe en la ley. Las demás cuentan como cero, no se estiman."
+        "exposureNoneProven_one": "La única obligación de aquí no fija ningún importe en la ley: la sanción es proporcional, por unidad o se deja a los Estados miembros.",
+        "exposureNoneProven_other": "Ninguna de las {{total}} obligaciones fija un importe en la ley: las sanciones son proporcionales, por unidad o se dejan a los Estados miembros.",
+        "exposureProvenNote_one": "{{proven}} de {{total}} obligaciones fija un importe en la ley. Las demás cuentan como cero, no se estiman.",
+        "exposureProvenNote_other": "{{proven}} de {{total}} obligaciones fijan un importe en la ley. Las demás cuentan como cero, no se estiman."
       },
       "risk": {
         "title": "Perfil de riesgo",
@@ -830,15 +835,18 @@
         "strictness": "Densidad regulatoria",
         "strictnessNote": "Una propiedad del mercado, no de este ámbito",
         "outOfTen": "de 10 · peso del ámbito",
-        "marketsCompared": "{{count}} mercados comparados"
+        "marketsCompared_one": "{{count}} mercado comparado",
+        "marketsCompared_other": "{{count}} mercados comparados"
       },
       "timeline": {
         "liveNow": "Se aplica hoy",
         "togetherCount": "{{count}} obligaciones llegan el mismo día",
         "aheadOne": "{{source}} pasa a ser aplicable.",
         "aheadMany": "{{names}} entran en vigor el mismo día.",
-        "inDays": "En {{count}} días",
-        "dueBody": "Ritmo: {{cadence}} — {{days}} días de antelación.",
+        "inDays_one": "En {{count}} día",
+        "inDays_other": "En {{count}} días",
+        "dueBody_one": "Ritmo: {{cadence}} — {{days}} día de antelación.",
+        "dueBody_other": "Ritmo: {{cadence}} — {{days}} días de antelación.",
         "ongoingBody": "Obligación continua sin fecha fija de presentación.",
         "ongoingMany": "{{count}} obligaciones aplican de forma continua",
         "sinceTag": "en vigor desde {{date}}",
@@ -863,14 +871,17 @@
       "sharedTriggers_one": "{{count}} disparador compartido",
       "sharedTriggers_other": "{{count}} disparadores compartidos",
       "allAreasLink": "Las ocho áreas de un vistazo",
-      "coverageNoteEu": "El motor recoge {{count}} obligaciones para este ámbito, todas con una fuente a nivel de la UE. Elige un mercado para ver dónde se añade una fuente nacional.",
+      "coverageNoteEu_one": "El motor recoge {{count}} obligación para este ámbito, con una fuente a nivel de la UE. Elige un mercado para ver dónde se añade una fuente nacional.",
+      "coverageNoteEu_other": "El motor recoge {{count}} obligaciones para este ámbito, todas con una fuente a nivel de la UE. Elige un mercado para ver dónde se añade una fuente nacional.",
       "startShort": "Iniciar la evaluación",
       "sourcePromise": "Cada obligación remite a una base jurídica citada — ninguna valoración sin fuente.",
       "facts": {
-        "duties": "{{count}} obligaciones",
+        "duties_one": "{{count}} obligación",
+        "duties_other": "{{count}} obligaciones",
         "allEu": "todas con fuente a nivel de la UE",
         "national": "{{count}} con base jurídica nacional",
-        "later": "{{count}} se aplican a partir de una fecha posterior"
+        "later_one": "{{count}} se aplica a partir de una fecha posterior",
+        "later_other": "{{count}} se aplican a partir de una fecha posterior"
       },
       "eyebrow": {
         "affected": "Aplicabilidad",
@@ -895,11 +906,14 @@
       "appliesToModels": "Se aplica a:",
       "noneForMarket": "El motor todavía no incluye ninguna obligación de esta área en {{market}}. Es una laguna real de cobertura, no un visto bueno.",
       "heaviestPenalty": "Sanción individual más alta",
-      "enforcementTop": "el valor más alto de los {{total}} mercados",
+      "enforcementTop_one": "el único mercado comparado",
+      "enforcementTop_other": "el valor más alto de los {{total}} mercados",
       "enforcementRank": "puesto {{rank}} de {{total}} mercados",
-      "enforcementAvg": "media de los {{total}} mercados",
+      "enforcementAvg_one": "media de {{total}} mercado",
+      "enforcementAvg_other": "media de los {{total}} mercados",
       "authorities": "Autoridades competentes",
-      "enforcementLeadEu": "Las cifras proceden de las fuentes que el motor mantiene a nivel de la UE: {{count}} obligaciones con un rango de sanción declarado. Son límites máximos tal como están escritos, no un coste esperado.",
+      "enforcementLeadEu_one": "Las cifras proceden de las fuentes que el motor mantiene a nivel de la UE: {{count}} obligación con un rango de sanción declarado. Es un límite máximo tal como está escrito, no un coste esperado.",
+      "enforcementLeadEu_other": "Las cifras proceden de las fuentes que el motor mantiene a nivel de la UE: {{count}} obligaciones con un rango de sanción declarado. Son límites máximos tal como están escritos, no un coste esperado.",
       "enforcementScaleSub": "Los ocho mercados en una misma escala — el marcador dorado es el valor con el que calcula el motor aquí.",
       "timelineLeadAllLive": "Cada obligación ya aplica — el hilo muestra el ritmo con el que vuelve cada una y la antelación que necesita. El selector de mercado de arriba recalcula las antelaciones.",
       "marketsLeadTied": "{{count}} mercados dan a esta área el mismo peso ({{weight}} sobre 10). Atender varios significa planificar según el más estricto.",
@@ -910,7 +924,6 @@
       "askQuestion": "Hacer una pregunta",
       "askEyebrow": "Su pregunta",
       "askPlaceholder": "Haga su pregunta con sus propias palabras",
-      "coverageNoteGaps": "{{specific}} de {{count}} obligaciones tienen una fuente específica de {{market}}. Del resto, {{gaps}} tienen un texto nacional que aún no incluimos; las demás son Reglamentos de la UE, de aplicación directa aquí.",
       "checkTitle": "¿Le aplica esto?",
       "checkFoot": "Si uno aplica, esta área conlleva deberes para usted — el assessment los acota a su caso.",
       "ceiling": {
@@ -978,7 +991,12 @@
           "statesWithPrivacyActs": "los estados con ley propia de privacidad (California y una veintena más)",
           "states50AndDc": "los 50 estados y el Distrito de Columbia"
         }
-      }
+      },
+      "coverageNoteSpecific_one": "{{count}} de {{total}} obligaciones tiene una fuente específica de {{market}}.",
+      "coverageNoteSpecific_other": "{{count}} de {{total}} obligaciones tienen una fuente específica de {{market}}.",
+      "coverageNoteEuRest": "El resto son Reglamentos de la UE: se aplican aquí directamente, así que no hay texto nacional que incluir.",
+      "coverageNoteGapsRest_one": "Del resto, {{count}} tiene un texto nacional que aún no incluimos; las demás son Reglamentos de la UE, de aplicación directa aquí.",
+      "coverageNoteGapsRest_other": "Del resto, {{count}} tienen un texto nacional que aún no incluimos; las demás son Reglamentos de la UE, de aplicación directa aquí."
     },
     "riskBadge": "Riesgo: {{level}}"
   },
@@ -1100,13 +1118,13 @@
       "marketsPanelTitle": "Elegir un mercado",
       "allMarkets": "Todos los mercados",
       "marketsAsideBody": "Cada mercado indica qué vence allí y con qué frecuencia, qué áreas pesan más y dónde aún no tenemos fuente local.",
-      "marketFact": "{{count}} obligaciones en {{areas}} áreas",
       "openMenu": "Abrir menú",
       "closeMenu": "Cerrar menú",
       "back": "Atrás",
       "menuLabel": "Navegación principal",
       "areasCount": "{{count}} áreas",
-      "marketsCount": "{{count}} mercados"
+      "marketsCount": "{{count}} mercados",
+      "marketFact": "{{duties}} en {{areas}}"
     },
     "login": "Iniciar sesión",
     "language": "Idioma"
@@ -1303,14 +1321,14 @@
     "country": {
       "eyebrow": "Mercado",
       "title": "Operar en {{country}}.",
-      "lead": "{{count}} obligaciones en {{areas}} áreas, con base legal nacional. Esta página muestra qué confluye aquí y cuándo; lo que exige cada obligación se detalla en su área.",
       "weightsTitle": "Qué pesa más aquí",
       "weightsLead": "{{top}} es lo que más pesa aquí: {{topWeight}} sobre 10, frente a {{second}} con {{secondWeight}}. Cada área lleva a su propia página, donde se detalla qué exige cada obligación.",
       "obligationsTitle": "Obligaciones para las que tenemos una fuente",
       "obligationsLead": "Cada entrada nombra la norma de la que procede. Si la obligación se basa en derecho de la UE, el texto oficial está a un clic.",
       "sourceLabel": "Fuente",
       "dueLabel": "Periodicidad",
-      "leadTime": "{{days}} días de antelación",
+      "leadTime_one": "{{days}} día de antelación",
+      "leadTime_other": "{{days}} días de antelación",
       "backToMarkets": "Todos los mercados",
       "notFound": "Todavía no tenemos un perfil de mercado para este código.",
       "profileTitle": "Perfil del mercado",
@@ -1322,8 +1340,8 @@
       "sourcePromise": "Cada obligación cita aquí su base legal nacional. Donde no tenemos ninguna, rige el instrumento de la UE, y así se indica.",
       "weightsLeadTied": "{{count}} áreas pesan lo mismo aquí ({{weight}} sobre 10). Cada una lleva a su propia página.",
       "calendarTitle": "Qué confluye aquí, y con qué frecuencia",
-      "calendarLead": "{{count}} obligaciones de {{areas}} áreas en una vista, por periodicidad y no por área. Nadie planifica un mercado área por área: lo planifica contra un calendario.",
-      "leadDays": "{{count}} días de antelación",
+      "leadDays_one": "{{count}} día de antelación",
+      "leadDays_other": "{{count}} días de antelación",
       "exposureNote": "Sanción individual más alta en este mercado: {{max}} sobre {{duty}}. Los límites declarados suman {{total}}: un techo si todo saliera mal a la vez, no una previsión.",
       "ctaBody": "La evaluación acota este mercado a su empresa, su producto y sus áreas, en menos de cinco minutos.",
       "allAreas": "Todas las áreas",
@@ -1347,9 +1365,13 @@
       "weightsFootPending": "Para {{list}} existe un texto nacional que aún no incorporamos — en su lugar figura el instrumento de la UE indicado.",
       "weightsFootNone": "Para {{list}} aún no tenemos una fuente con nombre.",
       "exposureCaveat": "Una advertencia sobre estas cifras: {{what}}.",
-      "exposureConverted": "{{count}} de ellas están convertidas desde otra moneda",
-      "exposureUnbacked": "{{count}} de {{total}} obligaciones no fijan ningún importe en la ley",
-      "exposureAnd": " y "
+      "exposureConverted_one": "{{count}} de ellas está convertida desde otra moneda",
+      "exposureConverted_other": "{{count}} de ellas están convertidas desde otra moneda",
+      "exposureUnbacked_one": "{{count}} de {{total}} obligaciones no fija ningún importe en la ley",
+      "exposureUnbacked_other": "{{count}} de {{total}} obligaciones no fijan ningún importe en la ley",
+      "exposureAnd": " y ",
+      "lead": "{{duties}} en {{areas}}, con base legal nacional. Esta página muestra qué confluye aquí y cuándo; lo que exige cada obligación se detalla en su área.",
+      "calendarLead": "{{duties}} de {{areas}} en una vista, por periodicidad y no por área. Nadie planifica un mercado área por área: lo planifica contra un calendario."
     },
     "cta": {
       "title": "Vea cuáles se aplican a su caso.",
@@ -2011,5 +2033,13 @@
     "reload": "Volver a cargar",
     "home": "Ir a la página de inicio",
     "details": "Detalle técnico"
+  },
+  "counts": {
+    "duties_one": "{{count}} obligación",
+    "duties_other": "{{count}} obligaciones",
+    "areasIn_one": "{{count}} área",
+    "areasIn_other": "{{count}} áreas",
+    "areasFrom_one": "{{count}} área",
+    "areasFrom_other": "{{count}} áreas"
   }
 }

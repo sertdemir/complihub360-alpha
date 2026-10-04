@@ -168,7 +168,7 @@ function TableView({ selectedCountry }: Props) {
             </RiskBadge>
           </span>
           <span className="text-body-2xs text-fg-secondary">
-            {row.leadDays == null ? '—' : t('markets.country.leadTime', { days: row.leadDays })}
+            {row.leadDays == null ? '—' : t('markets.country.leadTime', { days: row.leadDays, count: row.leadDays })}
           </span>
           <span className="hidden text-body-2xs text-fg-secondary sm:block">
             {row.lage.belegteSummeEur > 0

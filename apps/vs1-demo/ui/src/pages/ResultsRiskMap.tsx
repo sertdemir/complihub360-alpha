@@ -206,7 +206,7 @@ export function pdfObligations(rows: Obligation[], t: RiskT): PdfObligation[] {
     stateLabel:
       o.state.kind === 'confirmed' ? t('state.confirmed', { defaultValue: 'Confirmed' })
       : o.state.kind === 'likely' ? t('state.likely', { defaultValue: 'Likely' })
-      : t('pdf.questionsOpen', { defaultValue: '{{total}} questions open', total: o.state.count }),
+      : t('pdf.questionsOpen', { defaultValue: '{{total}} questions open', total: o.state.count, count: o.state.count }),
   }));
 }
 
@@ -252,7 +252,7 @@ function StatePill({ state, onAnswer }: { state: State; onAnswer: () => void }) 
       onClick={onAnswer}
       className="transition-transform duration-200 hover:-translate-y-0.5"
     >
-      {t('state.answer', { total: state.count })} <ArrowRight size={14} />
+      {t('state.answer', { total: state.count, count: state.count })} <ArrowRight size={14} />
     </Button>
   );
 }

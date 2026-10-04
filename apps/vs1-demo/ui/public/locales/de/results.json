@@ -46,7 +46,8 @@
   "state": {
     "confirmed": "Bestätigt",
     "likely": "Wahrscheinlich",
-    "answer": "{{total}} Fragen beantworten"
+    "answer_one": "{{total}} Frage beantworten",
+    "answer_other": "{{total}} Fragen beantworten"
   },
   "partners": {
     "eyebrow_one": "{{count}} Verified Provider gefunden",
@@ -76,7 +77,8 @@
       "domains": "Bereiche",
       "operations": "Geschäftstätigkeit"
     },
-    "questionsOpen": "{{total}} Fragen offen",
+    "questionsOpen_one": "{{total}} Frage offen",
+    "questionsOpen_other": "{{total}} Fragen offen",
     "sources": "Quellen",
     "disclaimer": "CompliHub360 ist eine Orchestrierungsplattform und keine Rechtsanwaltskanzlei. Rechts-, Steuer- und Regulierungsberatung erbringen Verified Providers in eigener beruflicher Haftung."
   },
@@ -109,17 +111,19 @@
     "backToSession": "Zur Sitzung",
     "lageAreasArea": "Deckt {{matched}} von {{total}} Bereichen ab ({{area}})",
     "lageAreasSession": "Passt zu {{matched}} von {{total}} Bereichen Ihrer Sitzung „{{session}}“",
-    "lageMarketsAll": "alle {{count}} Märkte abgedeckt",
-    "lageMarketsPartial": "{{covered}} von {{total}} Märkten abgedeckt · {{missing}} nicht",
+    "lageMarketsAll_one": "{{count}} Markt abgedeckt",
+    "lageMarketsAll_other": "alle {{count}} Märkte abgedeckt",
+    "lageMarketsPartial_one": "{{covered}} von {{total}} Markt abgedeckt · {{missing}} nicht",
+    "lageMarketsPartial_other": "{{covered}} von {{total}} Märkten abgedeckt · {{missing}} nicht",
     "ringMatch": "Passung",
     "ringMatchSub": "{{matched}} von {{total}} Bereichen · {{markets}}",
     "ringRating": "Bewertung",
-    "ringRatingSub": "{{count}} Bewertungen · {{mandates}} Mandate",
     "ringRatingSubNone": "noch keine Bewertung nach Buchung",
     "ringConfirm": "Bestätigungsquote",
     "ringConfirmSub": "bestätigte Termine",
     "matrixTitle": "Ihre Pflichten und die Märkte dieses Anbieters",
-    "matrixCovered": "{{covered}} von {{total}} Märkten",
+    "matrixCovered_one": "{{covered}} von {{total}} Markt",
+    "matrixCovered_other": "{{covered}} von {{total}} Märkten",
     "matrixSession": "Sitzung",
     "matrixNone": "In diesem Bezug ist gerade nichts offen.",
     "matrixNotCovered": "Diesen Markt deckt der Anbieter nicht ab.",
@@ -144,7 +148,8 @@
     "reviewsNone": "Für diesen Anbieter liegt noch keine Bewertung aus einem gebuchten Termin vor.",
     "reviewsVerified": "verifiziert nach Buchung",
     "reviewsFoot": "Bewertungen entstehen nur nach einem über CompliHub360 gebuchten Termin. Namen bleiben anonym.",
-    "figureRating": "Bewertung · {{count}} Stimmen",
+    "figureRating_one": "Bewertung · {{count}} Stimme",
+    "figureRating_other": "Bewertung · {{count}} Stimmen",
     "figureMandates": "Mandate über CompliHub360",
     "figureConfirm": "Bestätigungsquote",
     "figureResponse": "Antwortzeit",
@@ -163,7 +168,12 @@
     "bookAnother": "Weiteren Termin buchen",
     "revealedTitle": "Name und Kontakt sind freigegeben.",
     "revealedBody": "Seit Ihrer Buchung sehen Sie, wer dieser Anbieter ist.",
-    "plannedPrice": "Ab {{date}}: {{service}} {{price}}. Für Buchungen vorher gilt der heutige Preis."
+    "plannedPrice": "Ab {{date}}: {{service}} {{price}}. Für Buchungen vorher gilt der heutige Preis.",
+    "ringRatingSub": "{{reviews}} · {{mandates}}",
+    "reviewsCount_one": "{{count}} Bewertung",
+    "reviewsCount_other": "{{count}} Bewertungen",
+    "mandatesCount_one": "{{count}} Mandat",
+    "mandatesCount_other": "{{count}} Mandate"
   },
   "schedule": {
     "back": "Zurück zum Profil",
@@ -368,7 +378,8 @@
     },
     "response": "Antwortet in ~{{hours}} h",
     "confirmed": "{{pct}} % der Termine bestätigt",
-    "reviews": "{{rating}} aus {{count}} Bewertungen nach Terminen",
+    "reviews_one": "{{rating}} aus {{count}} Bewertung nach einem Termin",
+    "reviews_other": "{{rating}} aus {{count}} Bewertungen nach Terminen",
     "reviewsNone": "Noch keine Bewertung nach einem Termin",
     "responseLabel": "Antwortzeit",
     "hours": "~{{hours}} h",

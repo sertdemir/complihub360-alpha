@@ -482,9 +482,10 @@ export function MarketPage() {
               <Typography variant="body" className="mt-4 text-body-lg leading-relaxed text-fg-secondary">
                 {t('markets.country.lead', {
                   defaultValue:
-                    '{{count}} duties across {{areas}} areas, with a national legal basis. This page shows what comes together here and when — what a single duty requires is set out in its area.',
-                  count: profile.obligations.length,
-                  areas: profile.byDomain.length,
+                    '{{duties}} across {{areas}}, with a national legal basis. This page shows what comes together here and when — what a single duty requires is set out in its area.',
+                  // Zwei Zahlen, zwei Formen ("1 duty across 3 areas").
+                  duties: t('counts.duties', { defaultValue: '{{count}} duties', count: profile.obligations.length }),
+                  areas: t('counts.areasIn', { defaultValue: '{{count}} areas', count: profile.byDomain.length }),
                 })}
               </Typography>
 

@@ -46,7 +46,8 @@
   "state": {
     "confirmed": "Confirmed",
     "likely": "Likely",
-    "answer": "Answer {{total}} questions"
+    "answer_one": "Answer {{total}} question",
+    "answer_other": "Answer {{total}} questions"
   },
   "partners": {
     "eyebrow_one": "{{count}} Verified Provider matched",
@@ -76,7 +77,8 @@
       "domains": "Areas",
       "operations": "Operations"
     },
-    "questionsOpen": "{{total}} questions open",
+    "questionsOpen_one": "{{total}} question open",
+    "questionsOpen_other": "{{total}} questions open",
     "sources": "Sources",
     "disclaimer": "CompliHub360 is an orchestration platform, not a law firm. Legal, tax and regulatory advice is delivered by Verified Providers under their own professional liability."
   },
@@ -109,17 +111,19 @@
     "backToSession": "Back to the session",
     "lageAreasArea": "Covers {{matched}} of {{total}} areas ({{area}})",
     "lageAreasSession": "Matches {{matched}} of {{total}} areas in your session “{{session}}”",
-    "lageMarketsAll": "all {{count}} markets covered",
-    "lageMarketsPartial": "{{covered}} of {{total}} markets covered · not {{missing}}",
+    "lageMarketsAll_one": "{{count}} market covered",
+    "lageMarketsAll_other": "all {{count}} markets covered",
+    "lageMarketsPartial_one": "{{covered}} of {{total}} market covered · not {{missing}}",
+    "lageMarketsPartial_other": "{{covered}} of {{total}} markets covered · not {{missing}}",
     "ringMatch": "Match",
     "ringMatchSub": "{{matched}} of {{total}} areas · {{markets}}",
     "ringRating": "Rating",
-    "ringRatingSub": "{{count}} reviews · {{mandates}} mandates",
     "ringRatingSubNone": "no review after a booking yet",
     "ringConfirm": "Confirmation rate",
     "ringConfirmSub": "confirmed appointments",
     "matrixTitle": "Your obligations and this provider's markets",
-    "matrixCovered": "{{covered}} of {{total}} markets",
+    "matrixCovered_one": "{{covered}} of {{total}} market",
+    "matrixCovered_other": "{{covered}} of {{total}} markets",
     "matrixSession": "Session",
     "matrixNone": "Nothing is open in this context right now.",
     "matrixNotCovered": "This provider does not cover this market.",
@@ -144,7 +148,8 @@
     "reviewsNone": "No review from a booked appointment yet for this provider.",
     "reviewsVerified": "verified after booking",
     "reviewsFoot": "Reviews only come from appointments booked through CompliHub360. Names stay anonymous.",
-    "figureRating": "Rating · {{count}} voices",
+    "figureRating_one": "Rating · {{count}} voice",
+    "figureRating_other": "Rating · {{count}} voices",
     "figureMandates": "Mandates via CompliHub360",
     "figureConfirm": "Confirmation rate",
     "figureResponse": "Response time",
@@ -163,7 +168,12 @@
     "bookAnother": "Book another appointment",
     "revealedTitle": "Name and contact are now visible.",
     "revealedBody": "Since your booking you can see who this provider is.",
-    "plannedPrice": "From {{date}}: {{service}} {{price}}. Bookings made before then keep today’s price."
+    "plannedPrice": "From {{date}}: {{service}} {{price}}. Bookings made before then keep today’s price.",
+    "ringRatingSub": "{{reviews}} · {{mandates}}",
+    "reviewsCount_one": "{{count}} review",
+    "reviewsCount_other": "{{count}} reviews",
+    "mandatesCount_one": "{{count}} mandate",
+    "mandatesCount_other": "{{count}} mandates"
   },
   "schedule": {
     "back": "Back to the profile",
@@ -368,7 +378,8 @@
     },
     "response": "Replies in ~{{hours}} h",
     "confirmed": "{{pct}} % of appointments confirmed",
-    "reviews": "{{rating}} from {{count}} reviews after appointments",
+    "reviews_one": "{{rating}} from {{count}} review after an appointment",
+    "reviews_other": "{{rating}} from {{count}} reviews after appointments",
     "reviewsNone": "No review after an appointment yet",
     "responseLabel": "Response time",
     "hours": "~{{hours}} h",
