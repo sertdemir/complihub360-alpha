@@ -160,7 +160,7 @@ export function MatchBasis({ basis }: { basis: NonNullable<AnonProvider['match_b
     'tax-vat': 'taxVat', 'product-packaging': 'productPackaging', 'data-privacy': 'dataPrivacy',
     'marketing-seo': 'marketingSeo', 'corporate-structure': 'corporateStructure',
     'product-compliance': 'productCompliance', 'logistics-customs': 'logisticsCustoms',
-    'legal-advisory': 'legalAdvisory',
+    'legal-advisory': 'legalAdvisory', 'environment': 'environment',
   };
   const label = (slug: string) => t(`domains.${KEY[slug] ?? slug}`, { defaultValue: slug });
 

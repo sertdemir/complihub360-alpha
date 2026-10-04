@@ -266,7 +266,8 @@
     "corporateStructure": "Constitución y presentaciones",
     "productCompliance": "Conformidad de producto",
     "logisticsCustoms": "Logística y aduanas",
-    "legalAdvisory": "Apoyo jurídico"
+    "legalAdvisory": "Apoyo jurídico",
+    "environment": "Cumplimiento ambiental"
   },
   "matchBasis": {
     "market": "Cubre su mercado ({{country}})",
