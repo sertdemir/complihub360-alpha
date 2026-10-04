@@ -1014,6 +1014,25 @@
           "Un litigio afecta a un cliente de otro país",
           "Recibe una reclamación formal o una consulta de una autoridad"
         ]
+      },
+      {
+        "title": "Cumplimiento ambiental",
+        "markets": "UE · REINO UNIDO",
+        "desc": "Registros para aparatos y baterías, recogida al final de la vida útil y qué debe informar sobre las sustancias.",
+        "intro": "Obligaciones ambientales más allá del envase: registros nacionales para aparatos eléctricos y baterías, recogida al final de la vida útil, y los deberes de información sobre sustancias en los artículos que vende.",
+        "cover": [
+          "Registro RAEE antes de introducir el primer aparato",
+          "Responsabilidad del productor y recogida de baterías",
+          "Deberes de información sobre sustancias en artículos",
+          "Registros que se parecen: envases, RAEE y baterías",
+          "Obligaciones de registro sin entidad local",
+          "Autoridades: stiftung ear, ADEME, ECHA"
+        ],
+        "matters": [
+          "Sus productos contienen electrónica, un enchufe o una batería",
+          "Importa mercancía usted mismo a la UE o al Reino Unido",
+          "Vende artículos tratados químicamente o recubiertos"
+        ]
       }
     ],
     "learnMore": "Más información"
