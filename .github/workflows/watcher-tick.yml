@@ -1,0 +1,71 @@
+# ─── Sicherheitsnetz: ein Waechter-Tick von aussen ──────────────────────────
+#
+# Der Waechter (services/compliance-api/src/watchers.ts) laeuft im API-Prozess
+# alle WATCHERS_TICK_MS (5 Minuten). Auf Staging ist er seit 2026-08-09 scharf.
+# Das genuegt, solange der Prozess laeuft. Startet der Dienst neu oder haengt
+# ein Deploy, faellt der Tick aus, und seit dem „gilt ab“-Datum (TKT-PROV-10)
+# haengt daran, dass eine eingeplante Preisaenderung an ihrem Tag live geht.
+#
+# Dieser Lauf ruft stuendlich POST /api/v1/admin/watchers/tick auf. Doppelte
+# Ticks sind harmlos: jeder Pass merkt sich in event_log, was er schon getan
+# hat, und eine eingeplante Aenderung wird nur einmal uebernommen.
+#
+# Er fuehrt keinen Repository-Code aus — kein checkout, nur curl auf
+# ubuntu-latest. Secrets (im Repository unter Settings → Secrets → Actions):
+#   STAGING_API_URL  Basis-URL der API, ohne Pfad (z. B. https://…)
+#   STAGING_API_KEY  der Server-Key (API_KEY der API), Header x-api-key
+# Fehlen sie, meldet der Lauf das und endet gruen — kein Alarm, bevor jemand
+# ihn eingerichtet hat.
+
+name: Watcher Tick
+
+on:
+  schedule:
+    # Stuendlich zu Minute 7: nicht zur vollen Stunde, wenn GitHub die meisten
+    # geplanten Laeufe startet und verspaetet. Der erste Lauf nach Mitternacht
+    # UTC traegt die Aenderungen des Tages.
+    - cron: '7 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: watcher-tick
+  cancel-in-progress: false
+
+jobs:
+  tick:
+    name: Waechter-Tick auf Staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: POST /api/v1/admin/watchers/tick
+        env:
+          API_URL: ${{ secrets.STAGING_API_URL }}
+          API_KEY: ${{ secrets.STAGING_API_KEY }}
+        run: |
+          set -uo pipefail
+          if [ -z "${API_URL:-}" ] || [ -z "${API_KEY:-}" ]; then
+            echo "::warning::STAGING_API_URL oder STAGING_API_KEY fehlt — Tick uebersprungen"
+            exit 0
+          fi
+          body=$(mktemp)
+          code=$(curl -sS --max-time 120 -o "$body" -w '%{http_code}' \
+            -X POST "${API_URL%/}/api/v1/admin/watchers/tick" \
+            -H "x-api-key: ${API_KEY}" -H 'content-type: application/json' -d '{}') || {
+            echo "::error::Staging-API war nicht erreichbar"
+            exit 1
+          }
+          case "$code" in
+            200)
+              # Nur die Zusammenfassung — Zaehler, keine Daten.
+              summary=$(tr -d '\n' < "$body" | sed -n 's/.*"summary":\({[^}]*}\).*/\1/p')
+              echo "✓ Tick gelaufen: ${summary:-<ohne Zusammenfassung>}"
+              if printf '%s' "$summary" | grep -q '"errors":[1-9]'; then
+                echo "::warning::Der Tick meldet Fehler in einzelnen Paessen — Logs der API ansehen"
+              fi
+              ;;
+            401|403) echo "::error::Tick abgewiesen ($code) — STAGING_API_KEY passt nicht zum API_KEY der API, oder die Basic-Auth-Wand steht vor /api"; exit 1 ;;
+            *)       echo "::error::Unerwarteter Status $code"; exit 1 ;;
+          esac
