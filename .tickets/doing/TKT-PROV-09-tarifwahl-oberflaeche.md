@@ -55,9 +55,49 @@ Verworfen und warum — damit niemand es später „verbessert":
 ## Stand im UI-Workflow
 
 - [x] **Stufe 1 Canvas** — abgenommen 2026-10-04 (Wahl oben).
-- [ ] **Stufe 2 Figma** — finaler Screen mit Compass-Komponenten und -Variablen.
+- [x] **Stufe 2 Figma** — gebaut 2026-10-04, Seite `🧾 Provider · Tarifwahl`
+      in `C360 - Design System` (`a4BeKbsBGoHkcudhKXUJTl`).
 - [ ] **Stufe 3 lokal** — Feature-Branch, `npm run dev:ui`, Screenshots, Review.
 - [ ] **Stufe 4 Staging**.
+
+### Was in Figma liegt
+
+Vier Screens à 1440 px, alle auf derselben Seite, dazu oben eine Lesehilfe:
+
+| Zustand | Node | Inhalt |
+|---|---|---|
+| Auswahl (A3 · B1 · C1 · D2) | `2194:3` | der Normalfall, ohne laufendes Abo |
+| Bestätigung (E2) | `2203:206` | Dialog über dem Auswahl-Screen |
+| Tarif läuft (F2) | `2205:344` | laufendes Abo plus echter Grund |
+| Konto pausiert (G3) | `2206:443` | `409 PROVIDER_NOT_ELIGIBLE` |
+| Lesehilfe | `2210:539` | Wahl, Komponenten, Befunde, Offenes |
+
+Verwendete Compass-Komponenten: `AppShell / Sidebar — Provider v2` ·
+`AppShell / Topbar — Provider` · `Partner Status Badge` · `Availability Pill` ·
+`Desktop Tabbar` (Boxed, als Umschalter) · `Button` (Primary, Secondary) ·
+`Chip` (Brand, Success) · `Divider` · `Alert` (Warning, Light).
+Farben, Radien und Strichstärken sind an Variablen gebunden, Text an die
+Textstile — keine losen Hex-Werte.
+
+## Befunde aus Stufe 2
+
+1. **Compass hat keine Tarifkarte.** `Card Base` trägt nur Titel und
+   Fließtext — keine Preiszeile, keine Leistungsliste, keinen Fuß-Button. Die
+   drei Karten sind deshalb aus Primitives gesetzt. Vorschlag: `Card / Plan`
+   als eigene Komponente aufnehmen, **bevor** das in den Code geht; sonst
+   entsteht die Karte zweimal unterschiedlich.
+2. **Die Opacity-Variablen binden auf ein Hundertstel.** Die Collection
+   speichert 0–1 (`opacity/scrim` = 0.5), Figma liest das Knotenfeld aber als
+   Prozent: gebunden ergibt der Scrim 0.005, `opacity/100` ergibt 0.01.
+   Gegenprobe an einem Wegwerf-Knoten bestätigt es für drei Variablen. Der
+   Scrim in E2 ist deshalb bewusst **nicht** gebunden. Der Fix gehört ins
+   System, nicht in diesen Screen.
+3. **Die Provider-Sidebar hat keinen Eintrag für den Tarif.** Hier steht
+   `Billing` aktiv, weil die Seite im Abrechnungsbereich liegt. Ob der Tarif
+   einen eigenen Eintrag bekommt oder Unterseite von Billing bleibt, ist offen.
+4. **Die Überschrift „Ihr Tarif" in F2 ist neue Microcopy** — sie war nicht
+   Teil der Canvas-Abnahme, weil das F2-Board nur die Karte zeigte.
+   Abnahmepflichtig wie die übrige Copy.
 
 ## Was unabhängig von der Wahl entsteht
 
