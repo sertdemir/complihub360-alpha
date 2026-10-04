@@ -6,6 +6,15 @@ status: "doing"
 
 # Change-Control für aktive Partner
 
+> **Umbenannt am 2026-10-04 von `TKT-PROV-07` auf `TKT-PROV-08`.** Die Nummer 07
+> war doppelt belegt: dieses Ticket (angelegt in #242) und
+> `TKT-PROV-07-ein-abo-kann-entstehen` (angelegt in #240, inzwischen in `done`)
+> trugen beide die 07, weil zwei Sessions parallel die nächste freie Nummer
+> gezogen haben. Jeder Verweis auf „TKT-PROV-07" war damit zweideutig. Dieses
+> Ticket ist das jüngere und wechselt die Nummer; das Abo-Ticket behält die 07.
+> Mitgezogen: der Verweis in `TKT-PROV-02`, der Kommentar in `demoApi.ts` und
+> der in `ApplicationPage.tsx`.
+
 Nutzer-Auftrag 2026-10-01: "baue das Change-Control für aktive Partner". Das war
 in TKT-PROV-02 als Phase 6 vertagt. Bis dahin ging jede Änderung eines aktiven
 Partners sofort live, auch Preise. Rechtsform und Vertretung landeten nur im
