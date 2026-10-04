@@ -200,6 +200,12 @@ Wizard, Empty State, Table, AppShell.
 Each Compass component manual (per Getting Started §07) documents: ① Anatomie · ② Variants & States ·
 ③ Props & API · ④ A11y · ⑤ Do/Don't · ⑥ Code-Snippet.
 
+**Added 2026-10-04 (TKT-PROV-09):** `Card / Plan` on the Cards page — the plan card for
+`/subscription`: plan name, amount, unit, optional annual alternative, five individually optional
+feature rows, CTA as an exposed Button instance. No highlight state and no seal: a "most popular
+plan" would be steering without evidence. `AppShell / Sidebar — Provider v2` gained a **Tarif**
+entry (BUSINESS, after Billing, icon `gauge`).
+
 ---
 
 ## 9 · Core doctrines (How to use Compass)
@@ -227,6 +233,12 @@ The existing code token bridge is ~70% aligned but has drift to fix in Phase A:
 - **Missing**: `risk/*` tokens, `color/border/focus|input|strong-a11y`, the 6 semantic namespaces as
   CSS vars (`--color-bg-brand`, `--color-text-primary`…), `.dark` block, container tokens.
 - **Fonts**: code already uses Inter (sans) + IBM Plex Serif (serif) ✓ — matches Compass.
+- **Opacity scale — deliberately different on the two sides.** Since 2026-10-04 the Figma
+  collection stores **percent (0–100)**: Figma reads the opacity field as a percentage, so a 0–1
+  value binds to one hundredth of its intent (measured: variable `50` → `0.5`, variable `0.5` →
+  `0.005`). In code the same token stays **CSS opacity 0–1** (`index.css`, mirrored in
+  `tokens.json`). → Divide by 100 on export. Do **not** "align" one side to the other — the
+  divergence is the fix, not the drift.
 
 Implementation lands in: `src/index.css` (primitive + semantic CSS vars + `.dark` scaffold),
 `tailwind.config.js` (utilities `bg-brand`/`text-primary`/`border-default`/`ring-focus`/container

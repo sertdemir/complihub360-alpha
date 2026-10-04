@@ -72,32 +72,49 @@ Vier Screens à 1440 px, alle auf derselben Seite, dazu oben eine Lesehilfe:
 | Konto pausiert (G3) | `2206:443` | `409 PROVIDER_NOT_ELIGIBLE` |
 | Lesehilfe | `2210:539` | Wahl, Komponenten, Befunde, Offenes |
 
-Verwendete Compass-Komponenten: `AppShell / Sidebar — Provider v2` ·
+Verwendete Compass-Komponenten: `Card / Plan` (neu, siehe Befunde) ·
+`AppShell / Sidebar — Provider v2` ·
 `AppShell / Topbar — Provider` · `Partner Status Badge` · `Availability Pill` ·
 `Desktop Tabbar` (Boxed, als Umschalter) · `Button` (Primary, Secondary) ·
 `Chip` (Brand, Success) · `Divider` · `Alert` (Warning, Light).
 Farben, Radien und Strichstärken sind an Variablen gebunden, Text an die
 Textstile — keine losen Hex-Werte.
 
-## Befunde aus Stufe 2
+## Befunde aus Stufe 2 — und was daraus wurde
 
-1. **Compass hat keine Tarifkarte.** `Card Base` trägt nur Titel und
-   Fließtext — keine Preiszeile, keine Leistungsliste, keinen Fuß-Button. Die
-   drei Karten sind deshalb aus Primitives gesetzt. Vorschlag: `Card / Plan`
-   als eigene Komponente aufnehmen, **bevor** das in den Code geht; sonst
-   entsteht die Karte zweimal unterschiedlich.
-2. **Die Opacity-Variablen binden auf ein Hundertstel.** Die Collection
-   speichert 0–1 (`opacity/scrim` = 0.5), Figma liest das Knotenfeld aber als
-   Prozent: gebunden ergibt der Scrim 0.005, `opacity/100` ergibt 0.01.
-   Gegenprobe an einem Wegwerf-Knoten bestätigt es für drei Variablen. Der
-   Scrim in E2 ist deshalb bewusst **nicht** gebunden. Der Fix gehört ins
-   System, nicht in diesen Screen.
-3. **Die Provider-Sidebar hat keinen Eintrag für den Tarif.** Hier steht
-   `Billing` aktiv, weil die Seite im Abrechnungsbereich liegt. Ob der Tarif
-   einen eigenen Eintrag bekommt oder Unterseite von Billing bleibt, ist offen.
-4. **Die Überschrift „Ihr Tarif" in F2 ist neue Microcopy** — sie war nicht
-   Teil der Canvas-Abnahme, weil das F2-Board nur die Karte zeigte.
-   Abnahmepflichtig wie die übrige Copy.
+Drei davon sind erledigt, einer bleibt offen.
+
+1. **Compass hatte keine Tarifkarte — `Card / Plan` gebaut.** `Card Base` trägt
+   nur Titel und Fließtext. Die neue Komponente liegt auf der Cards-Seite und
+   hat 20 Eigenschaften: Tarifname, Betrag, Einheit, abschaltbare
+   Jahresalternative und fünf einzeln abschaltbare Leistungszeilen; der CTA ist
+   eine freigelegte Button-Instanz. Die drei Karten auf den Screens sind jetzt
+   Instanzen davon, nicht mehr handgesetzt. Bewusst **ohne**
+   Hervorhebungs-Zustand und ohne Siegel — ein „beliebtester Tarif" wäre
+   Lenkung ohne Beleg.
+
+2. **Die Opacity-Variablen binden nicht mehr auf ein Hundertstel.** Gemessen an
+   Wegwerf-Variablen: Figma liest das Opacity-Feld als Prozent — `50` ergibt
+   `0.5`, `0.5` ergibt `0.005`. Die zehn Variablen stehen jetzt auf **0–100**,
+   tragen den Hinweis in ihrer Beschreibung und sind auf den Scope `OPACITY`
+   begrenzt. Gegenprobe: der Scrim im Bestätigungs-Screen ist gebunden und
+   liegt bei 0,5.
+
+   Im Code bleibt derselbe Token **CSS-Opacity 0–1**. `tokens.json` ist laut
+   eigenem `$meta` ein Spiegel von `index.css`, und `check-token-export.mjs`
+   vergleicht ihn gegen die CSS, nicht gegen Figma — die Skalen dürfen und
+   sollen sich unterscheiden. Damit das niemand „korrigiert", steht es in
+   `docs/design-system/compass-reference.md` §10.
+
+3. **Die Provider-Sidebar hat einen Eintrag `Tarif`** — unter BUSINESS, hinter
+   Billing, Icon `gauge`. Nicht `star`: ein Stern läse sich wie ein Gütesiegel,
+   und das schließt die DNA aus. Auf allen vier Screens ist er der aktive
+   Eintrag. Die Änderung sitzt in `AppShell / Sidebar — Provider v2` und wirkt
+   damit auf jede Fläche, die diese Sidebar benutzt.
+
+4. **Offen: die Überschrift „Ihr Tarif" in F2 ist neue Microcopy.** Sie war
+   nicht Teil der Canvas-Abnahme, weil das F2-Board nur die Karte zeigte —
+   abnahmepflichtig wie die übrige Copy.
 
 ## Was unabhängig von der Wahl entsteht
 
