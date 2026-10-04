@@ -1,7 +1,7 @@
 ---
 title: "Gemischte Märkte: die Risk Map nennt, was sie nicht geprüft hat"
 assignee: "Claude"
-status: "doing"
+status: "review"
 ---
 
 # Gemischte Märkte (DE + BR)
@@ -27,5 +27,8 @@ bietet die bestehende Anfrage an (`POST /api/v1/market-requests`).
 - [x] I1 · J1 · K3 in `ResultsRiskMap` (Auslöser: Engine hat geantwortet, mindestens ein Markt geprüft, mindestens einer nicht)
 - [x] 5 neue Tests, 2 bestehende angepasst; 5 Sabotagen erkannt
 - [x] Mock-Screenshots (Desktop, mobil, DE, mit Konto, Kontrolle nur DE)
-- [ ] Review durch den Nutzer
-- [ ] Staging
+- [x] Review durch den Nutzer, PR #244 gemergt (Squash `f9afe7aa`)
+- [x] Staging (Deploy grün, 04.10.2026):
+  - [x] I1 live geprüft auf Englisch, Deutsch und 390 px. Die Anfrage lieferte 200, danach stand die Bestätigung an der Stelle. Die Kontrolle mit nur DE zeigte nichts davon. Die Testzeile ist entfernt.
+  - [ ] J1 auf Staging nicht erreichbar: Die echte Engine findet für jeden bekannten Markt in jedem Bereich Pflichten. Abgesichert lokal im Mock und durch Tests.
+  - [ ] K3 nicht live geprüft: Dafür ist ein echtes Login nötig. Abgesichert lokal und durch Tests, wie H3.
