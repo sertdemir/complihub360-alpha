@@ -1997,6 +1997,12 @@
       "notifyHelp": "Wir schreiben Ihnen an {{email}}. Nur zu diesem Markt.",
       "failed": "Ihre Anfrage konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
       "guestMessage": "Fragen Sie diesen Markt an. Wir zählen Anfragen je Markt, um zu entscheiden, wo die Abdeckung als Nächstes wächst."
+    },
+    "marketPartial": {
+      "heading": "{{market}} wurde nicht geprüft",
+      "message": "Wir decken {{market}} noch nicht ab, deshalb enthalten diese Pflichten den Markt nicht.",
+      "notChecked": "Nicht geprüft",
+      "notIncluded": "Noch nicht abgedeckt · nicht in dieser Risk Map enthalten"
     }
   },
   "errorBoundary": {

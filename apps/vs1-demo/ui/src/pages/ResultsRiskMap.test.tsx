@@ -375,8 +375,10 @@ describe('ResultsRiskMap states as designed', () => {
     const scope = await screen.findByRole('region', { name: 'common:states.scope.checked' });
     expect(within(scope).getByText('Germany')).toBeInTheDocument();
     expect(within(scope).getByText('Netherlands')).toBeInTheDocument();
-    // No country profile for BR — the engine drops it, so we must not say we checked it.
-    expect(within(scope).queryByText('Brazil')).not.toBeInTheDocument();
+    // No country profile for BR — the engine drops it, so we must not say we
+    // checked it: no chip, only the "Not checked" row under the line (J1).
+    expect(within(scope).getAllByRole('listitem').map((li) => li.textContent)).not.toContain('Brazil');
+    expect(within(scope).getByText('common:states.marketPartial.notChecked')).toBeInTheDocument();
   });
 
   it('offers no numbers, no providers and no sign-up band when nothing was identified', async () => {
@@ -473,7 +475,9 @@ describe('ResultsRiskMap when no requested market can be checked', () => {
     renderPage();
 
     expect(await screen.findByRole('heading', { level: 1, name: 'common:states.noRequirements.heading' })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /requestThisMarket/ })).not.toBeInTheDocument();
+    expect(screen.queryByText('common:states.marketUnavailable.heading')).not.toBeInTheDocument();
+    // The mixed case (J1, below) asks for Brazil inside the scope box only.
+    expect(screen.queryByRole('region', { name: 'common:states.scope.triedToAssess' })).not.toBeInTheDocument();
   });
 
   it('offers the update to an account holder, unchecked, and sends the choice (F3)', async () => {
@@ -542,5 +546,98 @@ describe('ResultsRiskMap when no requested market can be checked', () => {
 
     expect(await screen.findByRole('button', { name: 'common:states.actions.requestThisMarket' })).toBeInTheDocument();
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+  });
+});
+
+// ─── Risk map · mixed markets (Canvas I1 · J1 · K3, Figma 3546:*) ─────────────
+// DE is checked, BR is not. Without a word about BR the map reads as complete
+// for a market nobody looked at. Every surface names the unchecked market and
+// offers the request; providers for the checked markets stay where they are.
+
+describe('ResultsRiskMap with mixed markets', () => {
+  const setProfile = (p: object) => localStorage.setItem('ch360_last_profile', JSON.stringify(p));
+  afterEach(() => {
+    localStorage.removeItem('ch360_last_profile');
+  });
+
+  it('tells a guest which market the obligations leave out, and sends the request (I1)', async () => {
+    setProfile({ country: 'DE', markets: ['BR'], categories: ['tax-vat'] });
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10) })] });
+    requestMarket.mockResolvedValue(undefined);
+    renderPage();
+
+    expect(await screen.findByText('VAT return')).toBeInTheDocument();
+    expect(screen.getByText('common:states.marketPartial.heading')).toBeInTheDocument();
+    expect(screen.getByText('common:states.marketPartial.message')).toBeInTheDocument();
+    // Coverage is missing, not a risk: the notice must not read as an alarm.
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'common:states.actions.requestThisMarket: Brazil' }));
+    expect(requestMarket).toHaveBeenCalledWith({ market: 'BR', domains: ['tax-vat'], notify: false, asGuest: true, locale: 'en' });
+    expect(await screen.findByText('common:states.marketRequest.sentBody')).toBeInTheDocument();
+    expect(screen.queryByText('common:states.marketPartial.heading')).not.toBeInTheDocument();
+    // The obligations stay: the request adds to the map, it does not replace it.
+    expect(screen.getByText('VAT return')).toBeInTheDocument();
+  });
+
+  it('adds a "Not checked" row to the scope box when nothing was identified (J1)', async () => {
+    setProfile({ country: 'DE', markets: ['BR'], categories: ['tax-vat'] });
+    runSearch.mockResolvedValue({ providers: [], laws: [] });
+    requestMarket.mockResolvedValue(undefined);
+    renderPage();
+
+    const scope = await screen.findByRole('region', { name: 'common:states.scope.checked' });
+    expect(within(scope).getByText('Germany')).toBeInTheDocument();
+    expect(within(scope).getByText('common:states.marketPartial.notChecked')).toBeInTheDocument();
+    expect(within(scope).getByText('Brazil')).toBeInTheDocument();
+
+    fireEvent.click(within(scope).getByRole('button', { name: 'common:states.actions.requestThisMarket: Brazil' }));
+    expect(requestMarket).toHaveBeenCalledWith({ market: 'BR', domains: ['tax-vat'], notify: false, asGuest: true, locale: 'en' });
+    expect(await within(scope).findByText('common:states.marketRequest.sent')).toBeInTheDocument();
+    expect(within(scope).queryByRole('button', { name: /requestThisMarket/ })).not.toBeInTheDocument();
+  });
+
+  it('puts the unchecked market above the providers for an account, opt-in unchecked (K3)', async () => {
+    auth.isLoggedIn = true;
+    auth.user = { email: 'jm@example.com' };
+    setProfile({ country: 'DE', markets: ['BR'], categories: ['tax-vat'] });
+    runSearch.mockResolvedValue({ providers: [prov('alpha', 100)], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10) })] });
+    requestMarket.mockResolvedValue(undefined);
+    renderPage();
+
+    const card = await screen.findByRole('region', { name: 'common:states.marketPartial.notChecked: Brazil' });
+    expect(within(card).getByText('common:states.marketPartial.notIncluded')).toBeInTheDocument();
+    // The providers for Germany stay — they answer the part we did check.
+    expect(screen.getByText('Verified Provider alpha')).toBeInTheDocument();
+    expect(card.compareDocumentPosition(screen.getByText('Verified Provider alpha')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.queryByText('common:states.noProviderMatch.heading')).not.toBeInTheDocument();
+
+    const optIn = within(card).getByRole('checkbox');
+    expect(optIn).not.toBeChecked();
+    fireEvent.click(optIn);
+    fireEvent.click(within(card).getByRole('button', { name: 'common:states.actions.requestThisMarket: Brazil' }));
+    expect(requestMarket).toHaveBeenCalledWith({ market: 'BR', domains: ['tax-vat'], notify: true, asGuest: false, locale: 'en' });
+    expect(await within(card).findByText('common:states.marketRequest.sentBody')).toBeInTheDocument();
+  });
+
+  it('says nothing about other markets when every requested one was checked', async () => {
+    setProfile({ country: 'DE', markets: ['NL'], categories: ['tax-vat'] });
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10) })] });
+    renderPage();
+
+    expect(await screen.findByText('VAT return')).toBeInTheDocument();
+    expect(screen.queryByText('common:states.marketPartial.heading')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /requestThisMarket/ })).not.toBeInTheDocument();
+  });
+
+  it('says nothing about other markets for an account when every requested one was checked', async () => {
+    auth.isLoggedIn = true;
+    auth.user = { email: 'jm@example.com' };
+    setProfile({ country: 'DE', categories: ['tax-vat'] });
+    runSearch.mockResolvedValue({ providers: [prov('alpha', 100)], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10) })] });
+    renderPage();
+
+    expect(await screen.findByText('Verified Provider alpha')).toBeInTheDocument();
+    expect(screen.queryByText('common:states.marketPartial.notChecked')).not.toBeInTheDocument();
   });
 });

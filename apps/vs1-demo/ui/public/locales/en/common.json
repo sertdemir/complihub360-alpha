@@ -1997,6 +1997,12 @@
       "notifyHelp": "We’ll email you at {{email}}. Only for this market.",
       "failed": "We couldn’t send your request. Please try again.",
       "guestMessage": "Request this market. We count requests per market to decide where coverage comes next."
+    },
+    "marketPartial": {
+      "heading": "{{market}} was not checked",
+      "message": "We don’t cover {{market}} yet, so these obligations don’t include it.",
+      "notChecked": "Not checked",
+      "notIncluded": "Not covered yet · not included in this map"
     }
   },
   "errorBoundary": {

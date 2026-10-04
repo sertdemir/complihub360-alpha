@@ -161,6 +161,16 @@ const VORLAGE = {
     // unter der Überschrift für Gäste — ohne die Update-Wahl, die nur ein
     // Konto hat. Eingeloggt bleibt marketUnavailable.message.
     "guestMessage": "Request this market. We count requests per market to decide where coverage comes next."
+  },
+  // ── Vierte Abnahme: gemischte Märkte (DE + BR), Canvas-Wahl I1 · J1 · K3,
+  // Figma 3546:2497 / 2657 / 20736, abgenommen 01.10.2026. Mindestens ein
+  // Markt geprüft, mindestens ein angefragter nicht — die Map darf dann nicht
+  // so tun, als sei sie vollständig.
+  "marketPartial": {
+    "heading": "{{market}} was not checked",
+    "message": "We don’t cover {{market}} yet, so these obligations don’t include it.",
+    "notChecked": "Not checked",
+    "notIncluded": "Not covered yet · not included in this map"
   }
 };
 

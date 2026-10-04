@@ -276,7 +276,7 @@ function GroupCard({ label, sub, dot, rows, entered, offset, taskOf, statusRowOf
 }
 
 export function SessionSnapshot({
-  rows, providers, sessionId, title, meta, kpis, matchBasis, onExportPdf, onEditAnswers, onProviderDetails, answersDrawer, partnerDrawer, bookings, emptyState, providersEmptyState,
+  rows, providers, sessionId, title, meta, kpis, matchBasis, onExportPdf, onEditAnswers, onProviderDetails, answersDrawer, partnerDrawer, bookings, emptyState, providersEmptyState, providersTop,
 }: {
   rows: SnapshotRow[];
   providers: AnonProvider[];
@@ -309,6 +309,9 @@ export function SessionSnapshot({
   /** Steht an Stelle der Anbieter-Karten, wenn es keine passenden gibt und
    *  der Aufrufer weiss, warum (marketUnavailable, Canvas H3). */
   providersEmptyState?: React.ReactNode;
+  /** Steht ueber den Anbieter-Karten — K3: ein angefragter Markt, den die
+   *  Engine nicht geprueft hat. Die Anbieter bleiben darunter stehen. */
+  providersTop?: React.ReactNode;
 }) {
   const { t, i18n } = useTranslation('results');
   const { t: tw } = useTranslation('userws');
@@ -510,6 +513,7 @@ export function SessionSnapshot({
                 {/* Passende Anbieter — je eine Karte, gestapelt in der
                     Spalte (Canvas-Wahl 2C); kein Sammellink, keine
                     Zwischenuebersicht (Nutzer-Entscheidung 2026-08-29). */}
+                {providersTop}
                 {providers.length === 0 && providersEmptyState}
                 {providers.map((p, i) => (
                   <PartnerCard
