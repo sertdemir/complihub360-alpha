@@ -6,7 +6,7 @@ import { DefaultPolicyEngine } from "@complihub/policy-engine";
 import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeCorrelationId, structuredLog, type AnalyticsEvent } from "@complihub360/types";
 import { generateRelevantSubdomains, isKnownCountry, type CountryCode, type IndustryType, type BusinessModel, type EnrichedSubdomain } from "@complihub/compliance-engine";
 
-import { nylasConfigured, fetchBusy, createEvent, subtractBusy } from './nylas.js';
+import { nylasConfigured, fetchBusy, createEvent, cancelEvent, updateEventTime, calendarRefFor, subtractBusy } from './nylas.js';
 import { supabaseApi } from "./supabase.js";
 import { verifySupabaseJwt } from "./supabaseJwt.js";
 import { sendMagicLinkMail, sendEmailChangeMail, sendRescheduleMail, sendCancellationMail, sendBookingMail } from "./mailer.js";
@@ -1353,6 +1353,16 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     const end = new Date(start.getTime() + 30 * 60 * 1000);
                     await supabaseApi.update('scheduling', { id: bookingId }, { slot_start: start.toISOString(), slot_end: end.toISOString(), updated_at: new Date().toISOString() });
                     await supabaseApi.insert('event_log', { type: 'booking_rescheduled', payload: { bookingId, providerKey: b.provider_key, userId: b.user_id, from: b.slot_start, to: start.toISOString() } });
+                    // Der Kalendereintrag muss mitwandern. Sonst steht beim
+                    // Anbieter weiter die alte Uhrzeit, und die Mail unten
+                    // widerspricht seinem eigenen Kalender.
+                    (async () => {
+                        const provRows = (await supabaseApi.select('providers', { provider_key: b.provider_key }, { limit: 1 })) as any[];
+                        const ref = calendarRefFor(provRows[0], b);
+                        if (!ref) return;
+                        const ok = await updateEventTime(ref.grantId, ref.calendarId, ref.eventId, Math.floor(start.getTime() / 1000), Math.floor(end.getTime() / 1000));
+                        if (!ok) await supabaseApi.insert('event_log', { type: 'calendar_event_move_failed', payload: { bookingId, providerKey: b.provider_key, to: start.toISOString() } }).catch(() => {});
+                    })().catch(() => { /* Kalender darf das Verschieben nicht kippen */ });
                     // `actor` gesetzt: wer selbst verschiebt, bekommt keine
                     // Nachricht darueber. Uebrig bleibt der Fall, dass jemand
                     // anderes den Termin bewegt hat.
@@ -1397,6 +1407,18 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const evType = status === 'cancelled' ? 'user_cancelled' : status === 'no_show' ? 'no_show' : 'outcome_check';
                 await supabaseApi.insert('event_log', { type: evType, payload: { bookingId, providerKey: b.provider_key, userId: b.user_id, status } });
                 if (status === 'cancelled') {
+                    // Bis hierher blieb der Termin im Anbieterkalender stehen:
+                    // abgesagt im System, gebucht im Kalender. Derselbe Fehler
+                    // wie 2026-08-31 bei der fehlenden Absage-Mail, eine Ebene
+                    // tiefer — der Anbieter haelt den Slot frei fuer nichts.
+                    (async () => {
+                        const provRows = (await supabaseApi.select('providers', { provider_key: b.provider_key }, { limit: 1 })) as any[];
+                        const ref = calendarRefFor(provRows[0], b);
+                        if (!ref) return;
+                        const ok = await cancelEvent(ref.grantId, ref.calendarId, ref.eventId);
+                        if (ok) await supabaseApi.update('scheduling', { id: bookingId }, { nylas_event_id: null }).catch(() => {});
+                        else await supabaseApi.insert('event_log', { type: 'calendar_event_cancel_failed', payload: { bookingId, providerKey: b.provider_key, eventId: ref.eventId } }).catch(() => {});
+                    })().catch(() => { /* Absage gilt auch ohne Kalender */ });
                     await notify({
                         to: b.user_id, actor: authUserId, type: 'booking_cancelled',
                         subject: 'booking', subjectId: bookingId,
