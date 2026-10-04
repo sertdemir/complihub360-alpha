@@ -40,4 +40,9 @@ Canvas mit den Flächen A–E, je drei Varianten, editierbar. Wahl des Nutzers
 ## Abschluss
 
 - Gemergt als #255 am 2026-10-04. Die Migration ist am selben Tag auf Staging eingespielt; die Tabelle war leer, die neue Bedingung greift also an keinem Altbestand.
-- **Offen für den Betrieb:** Der Watcher läuft standardmäßig im Shadow-Modus. Damit geplante Änderungen am Datum live gehen, braucht Staging `WATCHERS_SHADOW=false` und einen regelmäßigen Aufruf von `POST /api/v1/admin/watchers/tick`.
+- **Betrieb:** Auf Staging läuft der Watcher bereits scharf.
+  - `WATCHERS_SHADOW=false` ist seit 2026-08-09 gesetzt, siehe `docs/backlog/notifications-alerts-concept.md`.
+  - Der Scheduler läuft im API-Prozess alle 5 Minuten (`WATCHERS_ENABLED`, `WATCHERS_TICK_MS`).
+  - Beleg: echte Marker ohne `_shadow` in `event_log`, zuletzt 2026-10-01; Shadow-Marker gibt es seit August keine mehr.
+  - Eingeplante Änderungen gehen damit beim ersten Tick nach Mitternacht UTC live, ohne weitere Einstellung.
+- **Restrisiko:** Der Tick hängt am laufenden API-Prozess. Schläft die Instanz oder startet sie neu, wird der Tick erst beim nächsten Lauf nachgeholt. Das ist idempotent, die Übernahme kommt dann nur später.
