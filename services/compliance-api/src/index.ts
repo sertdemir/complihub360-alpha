@@ -6,6 +6,7 @@ import { DefaultPolicyEngine } from "@complihub/policy-engine";
 import { createTaskContext, ComplianceCheckRequest, type TaskContext, normalizeCorrelationId, structuredLog, type AnalyticsEvent } from "@complihub360/types";
 import { generateRelevantSubdomains, isKnownCountry, type CountryCode, type IndustryType, type BusinessModel, type EnrichedSubdomain } from "@complihub/compliance-engine";
 
+import { nylasConfigured, fetchBusy, createEvent, subtractBusy } from './nylas.js';
 import { supabaseApi } from "./supabase.js";
 import { verifySupabaseJwt } from "./supabaseJwt.js";
 import { sendMagicLinkMail, sendEmailChangeMail, sendRescheduleMail, sendCancellationMail, sendBookingMail } from "./mailer.js";
@@ -983,8 +984,22 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     if (!bookedSet.has(iso)) slots.push(iso);
                 }
             }
+            // Hat der Anbieter seinen Kalender verbunden, zaehlt dessen echte
+            // Belegung — der Generator oben liefert nur noch die Kandidaten.
+            // Faellt Nylas aus, bleiben die Kandidaten stehen: lieber ein Slot
+            // zu viel (der Anbieter sagt ab) als eine leere Buchungsseite.
+            let out = slots;
+            let calendarChecked = false;
+            const grant = (prov as any).nylas_grant_id as string | undefined;
+            if (nylasConfigured() && grant) {
+                const from = Math.floor(Date.now() / 1000);
+                const to = from + 21 * 24 * 3600;
+                const busy = await fetchBusy(grant, ((prov as any).nylas_calendar_id as string) || '', from, to);
+                out = subtractBusy(slots, busy);
+                calendarChecked = true;
+            }
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ ok: true, public_ref: ref, slots, correlationId }));
+            res.end(JSON.stringify({ ok: true, public_ref: ref, slots: out, calendar_checked: calendarChecked, correlationId }));
         } catch {
             structuredLog('error', 'Slots fetch failed', { correlationId, errorCode: 'ERR_SLOTS', severity: 'error', route: req.url });
             res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -1604,6 +1619,27 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         await supabaseApi.upsert('provider_discount_counter', 'provider_key,cycle_start', {
                             provider_key: providerKey, cycle_start: cycleStart, used: quote.counterUsedAfter, updated_at: sharingAt,
                         }).catch(() => {});
+                    }
+                    // Kalendereintrag beim Anbieter. BEWUSST nach dem Insert und
+                    // bewusst nicht fatal: Die Buchung ist bezahlt und gilt — ein
+                    // Kalender, der gerade nicht antwortet, darf sie nicht kippen.
+                    // Scheitert es, steht es im event_log; der Termin fehlt dann im
+                    // Kalender, nicht im System.
+                    const provGrant = (p as any).nylas_grant_id as string | undefined;
+                    if (nylasConfigured() && provGrant) {
+                        const ev = await createEvent({
+                            grantId: provGrant,
+                            calendarId: ((p as any).nylas_calendar_id as string) || '',
+                            title: 'CompliHub360 — Beratungstermin',
+                            description: `Gebucht ueber CompliHub360. Buchung ${booking.id}.`,
+                            startSec: Math.floor(Date.parse(slotStart) / 1000),
+                            endSec: Math.floor(Date.parse(slotEnd) / 1000),
+                        });
+                        if (ev) {
+                            await supabaseApi.update('scheduling', { id: booking.id }, { nylas_event_id: ev.id }).catch(() => {});
+                        } else {
+                            await supabaseApi.insert('event_log', { type: 'calendar_event_failed', payload: { bookingId: booking.id, providerKey, slotStart } }).catch(() => {});
+                        }
                     }
                     await supabaseApi.insert('event_log', { type: 'scheduling_confirmed', payload: { bookingId: booking.id, providerKey, userId: authUserId, slotStart, ledgerId: charge.ledgerId } });
                     await supabaseApi.insert('event_log', { type: 'provider_lead_charged', payload: {
