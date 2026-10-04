@@ -161,7 +161,8 @@
     "toAppointments": "Zu Ihren Terminen",
     "bookAnother": "Weiteren Termin buchen",
     "revealedTitle": "Name und Kontakt sind freigegeben.",
-    "revealedBody": "Seit Ihrer Buchung sehen Sie, wer dieser Anbieter ist."
+    "revealedBody": "Seit Ihrer Buchung sehen Sie, wer dieser Anbieter ist.",
+    "plannedPrice": "Ab {{date}}: {{service}} {{price}}. Für Buchungen vorher gilt der heutige Preis."
   },
   "schedule": {
     "back": "Zurück zum Profil",

@@ -752,7 +752,22 @@
         "uses_subcontractors": "Alt yükleniciler",
         "service_name": "Hizmet adı",
         "description": "Açıklama"
-      }
+      },
+      "whenLabel": "Değişiklik ne zaman geçerli olsun?",
+      "whenNow": "Hemen",
+      "whenDate": "Belirli bir tarihten itibaren",
+      "dateLabel": "Geçerlilik tarihi",
+      "dateHint": "Yarından itibaren, en fazla bir yıl sonrası. Bu tarihten sonra onaylanırsa değişiklik onay anından itibaren geçerli olur.",
+      "dateInvalid": "Lütfen yarından itibaren, en fazla bir yıl sonrasına kadar bir tarih seçin.",
+      "groupHeldDated": "İncelemeden sonra, {{date}} tarihinden itibaren görünür",
+      "groupScheduled": "İncelemesiz, {{date}} tarihinden itibaren görünür",
+      "summaryNoteDated": "{{date}} tarihine kadar işletmeler mevcut koşullarınızı görür. Rezerve edilmiş randevular fiyatlarını korur.",
+      "sentDated": "Gönderildi. Değişiklik, gerekiyorsa incelememizden sonra, {{date}} tarihinden itibaren geçerli olur.",
+      "pendingFrom": "incelemede · {{date}} tarihinden itibaren",
+      "approvedFrom": "onaylandı, {{date}} tarihinden itibaren",
+      "plannedFrom": "{{date}} tarihinden itibaren planlandı",
+      "plannedShort": "Değişiklik planlandı",
+      "withdrawFields": "Geri çek: {{fields}}"
     }
   },
   "verification": {

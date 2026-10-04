@@ -161,7 +161,8 @@
     "toAppointments": "Go to your appointments",
     "bookAnother": "Book another appointment",
     "revealedTitle": "Name and contact are now visible.",
-    "revealedBody": "Since your booking you can see who this provider is."
+    "revealedBody": "Since your booking you can see who this provider is.",
+    "plannedPrice": "From {{date}}: {{service}} {{price}}. Bookings made before then keep today’s price."
   },
   "schedule": {
     "back": "Back to the profile",

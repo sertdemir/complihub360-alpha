@@ -752,7 +752,22 @@
         "uses_subcontractors": "Subunternehmer",
         "service_name": "Name der Leistung",
         "description": "Beschreibung"
-      }
+      },
+      "whenLabel": "Wann gilt die Änderung?",
+      "whenNow": "Ab sofort",
+      "whenDate": "Ab einem Datum",
+      "dateLabel": "Gilt ab",
+      "dateHint": "Ab morgen, höchstens ein Jahr voraus. Wird erst nach dem Datum freigegeben, gilt die Änderung ab der Freigabe.",
+      "dateInvalid": "Bitte ein Datum ab morgen wählen, höchstens ein Jahr voraus.",
+      "groupHeldDated": "Nach Prüfung, ab {{date}} sichtbar",
+      "groupScheduled": "Ohne Prüfung, ab {{date}} sichtbar",
+      "summaryNoteDated": "Bis zum {{date}} sehen Nutzer die bisherigen Konditionen. Gebuchte Termine behalten ihren Preis.",
+      "sentDated": "Gesendet. Die Änderung gilt ab {{date}}, wo nötig nach unserer Prüfung.",
+      "pendingFrom": "in Prüfung · ab {{date}}",
+      "approvedFrom": "freigegeben, ab {{date}}",
+      "plannedFrom": "geplant ab {{date}}",
+      "plannedShort": "Änderung geplant",
+      "withdrawFields": "Zurückziehen: {{fields}}"
     }
   },
   "verification": {
