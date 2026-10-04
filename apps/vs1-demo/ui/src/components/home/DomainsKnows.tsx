@@ -15,7 +15,9 @@ import {
   ArrowRight,
   ChevronRight,
   Leaf,
+  type LucideIcon,
 } from 'lucide-react';
+import { DOMAINS, type DomainSlug } from '../../lib/domains';
 import { Container } from '../ui/Container';
 import { Button } from '../ui/Button';
 import { SectionEyebrow, GoldWord } from '../providers/SectionHeading';
@@ -26,22 +28,21 @@ import { SectionEyebrow, GoldWord } from '../providers/SectionHeading';
 // (Figma 1650:5764) with cover/when-this-matters detail.
 // All copy lives in the 'home' namespace under domains.items.<index>.*.
 
-// One icon per canonical domain, in the order of lib/domains.ts — this array
-// drives the grid, so its length IS the number of cards rendered. It had six
-// entries while the app had eight domains, and the sixth was the long-removed
-// "Full Compliance Coverage"; the section therefore under-sold the coverage it
-// was supposed to demonstrate. Adding a domain means adding an icon here.
-const DOMAIN_ICONS = [
-  BarChart3,     // Tax & VAT
-  Package,       // EPR & Packaging
-  Lock,          // Data & Privacy
-  MessageSquare, // Marketing Compliance
-  Building2,     // Corporate & Structure
-  ShieldCheck,   // Product Compliance
-  Truck,         // Logistics & Customs
-  Scale,         // Legal Advisory
-  Leaf,          // Environmental Compliance (neunte Domaene seit 2026-09-18)
-] as const;
+// One icon per canonical domain. Keyed by slug and typed as a complete
+// Record<DomainSlug, …>: adding a domain to lib/domains.ts makes this fail to
+// compile until its icon is here. Am 18.09. blieb die frühere Array-Fassung
+// stumm bei acht, als die neunte Domäne dazukam (PR #252).
+const DOMAIN_ICONS: Record<DomainSlug, LucideIcon> = {
+  'tax-vat': BarChart3,
+  'product-packaging': Package,
+  'data-privacy': Lock,
+  'marketing-seo': MessageSquare,
+  'corporate-structure': Building2,
+  'product-compliance': ShieldCheck,
+  'logistics-customs': Truck,
+  'legal-advisory': Scale,
+  'environment': Leaf,
+};
 const COVER_COUNT = 6;
 const MATTERS_COUNT = 3;
 
@@ -144,7 +145,7 @@ export function DomainsKnows() {
             {t('domains.subtitle')}
           </p>
           <div className="mt-3 flex items-center gap-3">
-            {DOMAIN_ICONS.map((_, i) => (
+            {DOMAINS.map((_, i) => (
               <span key={i} className="h-1.5 w-1.5 rounded-full bg-brand" />
             ))}
           </div>
@@ -158,7 +159,7 @@ export function DomainsKnows() {
           whileInView="show"
           viewport={{ once: true, margin: '-80px' }}
         >
-          {DOMAIN_ICONS.map((Icon, i) => (
+          {DOMAINS.map((domain, i) => { const Icon = DOMAIN_ICONS[domain.slug]; return (
             <motion.button
               key={i}
               type="button"
@@ -175,7 +176,7 @@ export function DomainsKnows() {
                 {t('domains.cardCta')} <ChevronRight size={13} className="transition-transform group-hover:translate-x-0.5" />
               </span>
             </motion.button>
-          ))}
+          ); })}
         </motion.div>
       </Container>
 

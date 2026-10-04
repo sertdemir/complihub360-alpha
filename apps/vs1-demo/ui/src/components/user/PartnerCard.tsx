@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRequestContext } from '../../lib/requestContext';
+import { DOMAIN_BY_SLUG } from '../../lib/domains';
 import { Check } from 'lucide-react';
 import { Button } from '../ui/Button';
 import type { AnonProvider, RankBasis as RankBasisData } from '../../api/search';
@@ -156,13 +157,10 @@ const Row = ({ hit, children, value }: { hit: boolean; children: ReactNode; valu
 export function MatchBasis({ basis }: { basis: NonNullable<AnonProvider['match_basis']> }) {
   const { t } = useTranslation('results');
   const matched = new Set(basis.domains_matched);
-  const KEY: Record<string, string> = {
-    'tax-vat': 'taxVat', 'product-packaging': 'productPackaging', 'data-privacy': 'dataPrivacy',
-    'marketing-seo': 'marketingSeo', 'corporate-structure': 'corporateStructure',
-    'product-compliance': 'productCompliance', 'logistics-customs': 'logisticsCustoms',
-    'legal-advisory': 'legalAdvisory', 'environment': 'environment',
-  };
-  const label = (slug: string) => t(`domains.${KEY[slug] ?? slug}`, { defaultValue: slug });
+  // Kein eigenes Slug→Key-Verzeichnis mehr: lib/domains.ts ist die Quelle.
+  // Die frühere Kopie blieb bei acht und zeigte für Umwelt den rohen Slug.
+  const label = (slug: string) =>
+    t(`domains.${DOMAIN_BY_SLUG[slug]?.i18nKey ?? slug}`, { defaultValue: slug });
 
   return (
     <ul className="flex flex-col gap-1.5 text-body-xs">

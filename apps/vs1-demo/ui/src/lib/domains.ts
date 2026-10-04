@@ -1,4 +1,4 @@
-// ─── Canonical compliance domains (final 8, decided 2026-08-04) ──────────────
+// ─── Canonical compliance domains (9 — 8 decided 2026-08-04, Umwelt 2026-09-18) ─
 // Single source of truth for every domain list in the app: DomainBar, workbench
 // routes, filters, drawers, provider coverage. "Full Support" was removed;
 // Product Compliance, Logistics & Customs and Legal Advisory were added.

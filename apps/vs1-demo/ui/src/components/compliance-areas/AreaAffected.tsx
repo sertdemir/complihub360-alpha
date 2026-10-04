@@ -46,7 +46,9 @@ interface Props {
 // compliance.area.checkTitle/checkFoot. Icons are presentation, so they live
 // here, aligned by index with the locale arrays.
 
-const ROLE_ICONS: Record<string, LucideIcon[]> = {
+// Record<DomainSlug, …>: eine neue Domäne in lib/domains.ts bricht hier den
+// Build, statt still auf das generische Personen-Icon zurückzufallen.
+const ROLE_ICONS: Record<DomainSlug, LucideIcon[]> = {
   'tax-vat': [ShoppingCart, Store, Laptop, Globe],
   'product-packaging': [Store, Factory, Repeat, Package],
   'data-privacy': [Rocket, Cloud, Database, MousePointerClick],
