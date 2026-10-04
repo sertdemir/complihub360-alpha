@@ -217,6 +217,17 @@ export function pdfObligations(rows: Obligation[], t: RiskT): PdfObligation[] {
 // Deshalb wird hier NICHTS geschätzt — es wird nur ausgeschrieben, was der
 // Score ohnehin ist. Fehlt match_basis (ältere Payloads), erscheint gar nichts:
 // eine erfundene Begründung wäre schlechter als eine nackte Zahl.
+/** U3: Unter lg steht der Ablauf-Hinweis im Seitenkopf statt in der Topbar —
+ *  ruhig, und bewusst nicht neben dem Speichern-Knopf. */
+function GuestExpiryNote() {
+  const { t } = useTranslation('results');
+  return (
+    <p data-testid="guest-expiry-mobile" className="mt-3 inline-flex items-center gap-1.5 text-body-xs text-fg-secondary lg:hidden">
+      <Lock size={13} aria-hidden /> {t('topbar.guestBadge')}
+    </p>
+  );
+}
+
 function StatePill({ state, onAnswer }: { state: State; onAnswer: () => void }) {
   const { t } = useTranslation('results');
   if (state.kind === 'confirmed') {
@@ -578,28 +589,45 @@ export function ResultsRiskMap() {
   }
 
   return (
-    <div className="min-h-screen bg-surface">
+    // Unter md klebt "Diese Karte speichern" unten (Canvas T3 · U3, Figma
+    // 3577:2831, abgenommen 04.10.2026); der Platz darunter haelt die
+    // letzte Zeile der Seite frei.
+    <div className={`min-h-screen bg-surface ${hasResult ? 'pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pb-0' : ''}`}>
       {/* Topbar */}
       <header className="sticky top-0 z-30 border-b border-stroke-subtle bg-surface/90 backdrop-blur-xl">
         <div className="mx-auto flex h-[72px] w-full max-w-container-3xl items-center justify-between px-4 md:px-8 lg:px-16">
-          <div className="flex min-w-0 items-center gap-4">
+          <div className="flex min-w-0 items-center gap-0.5 md:gap-4">
+            {/* Unter md der Ausweg als Pfeil links vom Logo (U3): vorher gab
+                es auf dem Handy gar keinen. Das Logo bleibt voll (T3). */}
+            <Link
+              to={`/${locale}`}
+              aria-label={t('topbar.backHome')}
+              data-testid="back-home-mobile"
+              className="-ml-2.5 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-fg-secondary transition-colors hover:text-fg-brand md:hidden"
+            >
+              <ArrowLeft size={20} />
+            </Link>
             <Logo lockup="horizontal" href="/" className="h-[36px]" />
             {/* The guest map deliberately drops the site nav to stay focused, which
                 left no visible way out — the logo was the only exit and nobody
                 reads a logo as "back". This is that exit, spelled out. */}
-            <span aria-hidden className="hidden h-5 w-px bg-stroke sm:block" />
+            <span aria-hidden className="hidden h-5 w-px bg-stroke md:block" />
             <Link
               to={`/${locale}`}
-              className="hidden items-center gap-1.5 text-body-xs font-semibold text-fg-secondary transition-colors hover:text-fg-brand sm:inline-flex"
+              className="hidden items-center gap-1.5 whitespace-nowrap text-body-xs font-semibold text-fg-secondary transition-colors hover:text-fg-brand md:inline-flex"
             >
               <ArrowLeft size={14} /> {t('topbar.backHome')}
             </Link>
           </div>
           {/* Ohne Ergebnis gibt es keine Map, die ablaeuft oder gespeichert
-              werden koennte — Badge und Knopf behaupteten sonst eine. */}
+              werden koennte — Badge und Knopf behaupteten sonst eine. Auf
+              390 px ueberdeckte der Knopf das Logo (DE 27 px, TR 18, ES 9),
+              zwischen 640 und ~900 px brach "Zurueck zum Start" in den
+              Badge. Darum: Knopf unter md unten, Badge erst ab lg, darunter
+              steht der Hinweis im Seitenkopf. */}
           {hasResult && (
-            <div className="flex items-center gap-4">
-              <span className="hidden items-center gap-2 text-body-2xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary sm:inline-flex">
+            <div className="hidden items-center gap-4 md:flex">
+              <span className="hidden items-center gap-2 text-body-2xs font-semibold uppercase tracking-[0.1em] text-fg-tertiary lg:inline-flex">
                 <Lock size={13} /> {t('topbar.guestBadge')}
               </span>
               <Button
@@ -636,6 +664,7 @@ export function ResultsRiskMap() {
             {/* D3: der Weg zur Marktwahl steht unter dem Satz; nach der
                 Anfrage wandert er in die Bestaetigung (E3). */}
             {marketUnavailable && !allRequested && <ExploreOtherMarkets onClick={exploreOtherMarkets} />}
+            {pageState === 'none' && <GuestExpiryNote />}
             {pageState === 'failed' && (
               <div className="flex flex-wrap justify-center gap-3 pt-2">
                 <Button size="lg" onClick={() => setReloadKey((k) => k + 1)}>
@@ -698,6 +727,7 @@ export function ResultsRiskMap() {
               {t('header.subtitleProfile', { total: profile.categories?.length ?? 0 })}
             </p>
           )}
+          <GuestExpiryNote />
         </div>
 
         {/* Stat strip — nur, wenn die Engine geantwortet hat */}
@@ -878,6 +908,19 @@ export function ResultsRiskMap() {
         </section>
       )}
 
+      {/* T3: unter md die Speichern-Leiste unten, volle Breite. Ohne den
+          Ablauf-Hinweis daneben — der steht im Seitenkopf, damit aus der
+          Information kein Druck am Knopf wird (DNA). */}
+      {hasResult && (
+        <div
+          data-testid="save-bar-mobile"
+          className="fixed inset-x-0 bottom-0 z-30 border-t border-stroke-subtle bg-surface/95 px-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))] pt-3 shadow-[0_-10px_30px_-20px_rgba(2,22,17,0.25)] backdrop-blur-xl md:hidden"
+        >
+          <Button variant="primary" size="lg" shape="soft" type="button" onClick={() => setSaveOpen(true)} className="w-full">
+            {t('topbar.saveMap')} <ArrowRight size={15} />
+          </Button>
+        </div>
+      )}
       <FreeAccountDrawer open={saveOpen} onClose={() => setSaveOpen(false)} />
     </div>
   );
