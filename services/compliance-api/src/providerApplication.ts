@@ -14,6 +14,7 @@ import {
 import {
     changeRow, classify, CONTROLLED_LIFECYCLE, CONTROLLED_SERVICE, MATERIAL_EVENTS, RULES, type Classification, type ClassifiedField,
 } from './changeControl.js';
+import { isPending, isUnreviewedPlan, parseEffectiveDate, withSchedule } from './changeSchedule.js';
 import {
     areaCodeOf, evidenceChecklist, requiredEvidence, submitValidation, SUBMIT_AGREEMENTS,
     type ChecklistItem, type EvidenceType,
@@ -268,58 +269,89 @@ async function patchApplication(req: IncomingMessage, res: ServerResponse, corre
 }
 
 /** Antwort auf dry_run: dieselbe Aufteilung wie beim Speichern, nichts geschrieben. */
-function dryRunBody(a: Classification, b: Classification | null, correlationId: string) {
+function dryRunBody(a: Classification, b: Classification | null, correlationId: string, plan: { at: string | null; scheduled: ClassifiedField[] } = { at: null, scheduled: [] }) {
     const fields = (xs: ClassifiedField[]) => xs.map((f) => ({ field: f.field, old: f.old, new: f.new, change_type: f.changeType }));
     const review = [...a.review, ...(b?.review ?? [])];
     const held = [...a.held, ...(b?.held ?? [])];
     const write = { ...a.write, ...(b?.write ?? {}) };
     const instant = Object.keys(write).filter((k) => !review.some((f) => f.field === k));
-    return { ok: true, dry_run: true, instant, review: fields(review), held: fields(held), correlationId };
+    return { ok: true, dry_run: true, instant, review: fields(review), held: fields(held), scheduled: fields(plan.scheduled), effective_at: plan.at, correlationId };
 }
 
 /**
  * Legt die Vorgaenge eines Speicherns an: einen fuer das sofort Uebernommene
- * (pruefpflichtig), einen fuer das Wartende. Ein offener wartender Vorgang
- * desselben Ziels wird fortgeschrieben statt verdoppelt — sonst koennte das
- * Pruefteam den aelteren Wert ueber den neueren freigeben.
+ * (pruefpflichtig), einen fuer das Wartende, einen fuer das ohne Pruefung
+ * Geplante ("gilt ab", guenstigere Richtung). Ein offener Vorgang derselben
+ * Art und desselben Ziels wird fortgeschrieben statt verdoppelt — sonst
+ * koennte das Pruefteam den aelteren Wert ueber den neueren freigeben. Das
+ * Datum des Speicherns ersetzt das bisherige ("ab sofort" heisst: keins).
+ *
+ * Das letzte Speichern eines Feldes gewinnt: steht es noch in einem anderen
+ * offenen Vorgang desselben Ziels (wartend oder geplant), faellt es dort
+ * heraus; bleibt ein Vorgang leer, gilt er als zurueckgezogen.
  *
  * Ein Feld, das dem Live-Wert gleicht, ist "keine Aenderung" — nie ein
  * Zurueckziehen. Die Oberflaeche schickt beim Speichern das ganze Kapitel;
  * sonst wuerde jedes Speichern still verwerfen, was gerade wartet.
  * Zurueckgezogen wird nur ausdruecklich: DELETE /changes/:id.
  */
-async function recordChanges(providerKey: string, serviceId: string | null, review: ClassifiedField[], held: ClassifiedField[], note: string | null, caller: Caller): Promise<{ ids: string[]; held: string[] }> {
+async function recordChanges(providerKey: string, serviceId: string | null, review: ClassifiedField[], held: ClassifiedField[], note: string | null, caller: Caller,
+    plan: { at: string | null; scheduled: ClassifiedField[] } = { at: null, scheduled: [] }): Promise<{ ids: string[]; held: string[]; scheduled: string[] }> {
     const ids: string[] = [];
     if (review.length) {
         const rows = await supabaseApi.insert('provider_change_requests', changeRow(providerKey, serviceId, review, 'applied', note)) as any[];
         if (rows?.[0]?.id) ids.push(rows[0].id);
     }
-    const open = ((await supabaseApi.select('provider_change_requests', { provider_key: providerKey, effect: 'held' }, { limit: 200 })) as any[])
-        .find((c) => (c.service_id ?? null) === serviceId && (c.status === 'submitted' || c.status === 'under_review'));
-    let heldFields = held.map((f) => f.field);
-    if (open) {
+    const pending = ((await supabaseApi.select('provider_change_requests', { provider_key: providerKey, effect: 'held' }, { limit: 200 })) as any[])
+        .filter((c) => (c.service_id ?? null) === serviceId && isPending(c));
+    const openHeld = pending.find((c) => c.status === 'submitted' || c.status === 'under_review') ?? null;
+    const openPlan = pending.find(isUnreviewedPlan) ?? null;
+    const names = (xs: ClassifiedField[]) => new Set(xs.map((f) => f.field));
+    const touched = new Set([...names(review), ...names(held), ...names(plan.scheduled)]);
+
+    /** Schreibt einen offenen Vorgang fort: `add` hinein, `drop` heraus. */
+    const carry = async (open: any | null, add: ClassifiedField[], drop: Set<string>, insertExtra: Record<string, unknown>): Promise<string[]> => {
+        if (!open) {
+            if (!add.length) return [];
+            const rows = await supabaseApi.insert('provider_change_requests', { ...changeRow(providerKey, serviceId, add, 'held', note), ...insertExtra, effective_at: plan.at }) as any[];
+            if (rows?.[0]?.id) ids.push(rows[0].id);
+            return add.map((f) => f.field);
+        }
         const oldValue: Record<string, unknown> = { ...open.old_value };
         const newValue: Record<string, unknown> = { ...open.new_value };
-        for (const f of held) { if (!(f.field in oldValue)) oldValue[f.field] = f.old; newValue[f.field] = f.new; }
-        heldFields = Object.keys(newValue);
-        if (held.length) {
-            const fields = heldFields.map((k) => ({ field: k, old: oldValue[k], new: newValue[k], changeType: RULES[k]?.changeType ?? 'other', deadline: RULES[k]?.deadline ?? 'within_3_business_days' })) as ClassifiedField[];
-            const row = changeRow(providerKey, serviceId, fields, 'held', note ?? open.provider_note ?? null);
-            await supabaseApi.update('provider_change_requests', { id: open.id }, {
-                change_type: row.change_type, field_path: row.field_path, old_value: oldValue, new_value: newValue,
-                deadline_class: row.deadline_class, provider_note: row.provider_note, submitted_at: row.submitted_at,
-            });
-            ids.push(open.id);
+        for (const k of drop) { delete oldValue[k]; delete newValue[k]; }
+        for (const f of add) { if (!(f.field in oldValue)) oldValue[f.field] = f.old; newValue[f.field] = f.new; }
+        const fieldsNow = Object.keys(newValue);
+        const changed = add.length > 0 || fieldsNow.length !== Object.keys(open.new_value ?? {}).length;
+        if (!changed) return fieldsNow;
+        if (!fieldsNow.length) {
+            await supabaseApi.update('provider_change_requests', { id: open.id }, { status: 'withdrawn', reviewed_at: new Date().toISOString() });
+            await reviewLog({ providerKey, subject: serviceId ? 'service' : 'application', subjectId: serviceId, action: 'change_superseded', to: open.field_path ?? null, actorId: caller.userId, actorKind: 'provider' });
+            return [];
         }
-    } else if (held.length) {
-        const rows = await supabaseApi.insert('provider_change_requests', changeRow(providerKey, serviceId, held, 'held', note)) as any[];
-        if (rows?.[0]?.id) ids.push(rows[0].id);
-    }
-    if (review.length || held.length) {
+        const fields = fieldsNow.map((k) => ({ field: k, old: oldValue[k], new: newValue[k], changeType: RULES[k]?.changeType ?? 'other', deadline: RULES[k]?.deadline ?? 'within_3_business_days' })) as ClassifiedField[];
+        const row = changeRow(providerKey, serviceId, fields, 'held', note ?? open.provider_note ?? null);
+        await supabaseApi.update('provider_change_requests', { id: open.id }, {
+            change_type: row.change_type, field_path: row.field_path, old_value: oldValue, new_value: newValue,
+            deadline_class: row.deadline_class, provider_note: row.provider_note,
+            // Nur wer etwas hinzufuegt, setzt Zeitpunkt und Datum neu.
+            ...(add.length ? { submitted_at: row.submitted_at, effective_at: plan.at } : {}),
+        });
+        if (add.length) ids.push(open.id);
+        return fieldsNow;
+    };
+
+    const heldFields = await carry(openHeld, held, new Set([...names(review), ...names(plan.scheduled)]), {});
+    const scheduledFields = await carry(openPlan, plan.scheduled, new Set([...names(review), ...names(held)]), { status: 'approved' });
+    // Freigegeben und eingeplant: nichts kommt hinzu, Ueberholtes faellt heraus.
+    for (const other of pending.filter((c) => c !== openHeld && c !== openPlan)) await carry(other, [], touched, {});
+
+    if (review.length || held.length || plan.scheduled.length) {
         await reviewLog({ providerKey, subject: serviceId ? 'service' : 'application', subjectId: serviceId, action: 'change_submitted',
-            to: [...review.map((f) => f.field), ...held.map((f) => `${f.field}:held`)].join(','), actorId: caller.userId, actorKind: 'provider' });
+            to: [...review.map((f) => f.field), ...held.map((f) => `${f.field}:held`), ...plan.scheduled.map((f) => `${f.field}:scheduled`)].join(','),
+            reason: plan.at ? `effective ${plan.at.slice(0, 10)}` : null, actorId: caller.userId, actorKind: 'provider' });
     }
-    return { ids, held: heldFields };
+    return { ids, held: heldFields, scheduled: scheduledFields };
 }
 
 // ─── Aenderungen: Liste, Zurueckziehen, wesentliches Ereignis (§18) ───────────
@@ -340,11 +372,13 @@ async function withdrawChange(res: ServerResponse, correlationId: string, caller
     if (!isUuid(changeId)) { json(res, 404, { errorCode: 'NOT_FOUND', message: 'Change not found', correlationId }); return; }
     const c = ((await supabaseApi.select('provider_change_requests', { id: changeId, provider_key: providerKey }, { limit: 1 })) as any[])[0];
     if (!c) { json(res, 404, { errorCode: 'NOT_FOUND', message: 'Change not found', correlationId }); return; }
-    // Nur was noch wartet, laesst sich zurueckziehen. Ein uebernommener Wert
+    // Nur was noch wartet oder geplant ist, laesst sich zurueckziehen. Ein uebernommener Wert
     // wird geaendert, indem man ihn neu speichert; ein Ereignis klaert das
     // Pruefteam mit dem Partner.
-    if (c.effect !== 'held' || !['submitted', 'under_review'].includes(c.status)) {
-        json(res, 409, { errorCode: 'CHANGE_NOT_WITHDRAWABLE', message: 'Only a change that is still waiting can be withdrawn', correlationId }); return;
+    // Geplant zaehlt mit: bis zum Datum laesst sich auch eine freigegebene
+    // Aenderung zurueckziehen (Canvas C V1).
+    if (!isPending(c)) {
+        json(res, 409, { errorCode: 'CHANGE_NOT_WITHDRAWABLE', message: 'Only a change that is still waiting or scheduled can be withdrawn', correlationId }); return;
     }
     await supabaseApi.update('provider_change_requests', { id: changeId }, { status: 'withdrawn', reviewed_at: new Date().toISOString() });
     await reviewLog({ providerKey, subject: c.service_id ? 'service' : 'application', subjectId: c.service_id ?? null, action: 'change_withdrawn', to: c.field_path ?? null, actorId: caller.userId, actorKind: 'provider' });
@@ -528,15 +562,27 @@ async function patchService(req: IncomingMessage, res: ServerResponse, correlati
     // Eine neue oder noch nicht freigegebene Leistung wird als Ganzes geprueft.
     const provider = ((await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[])[0];
     const controlled = CONTROLLED_LIFECYCLE.has(provider?.lifecycle_status) && CONTROLLED_SERVICE.has(s.status);
-    const c = classify(patch, s, controlled);
-    if (d.dry_run === true) { json(res, 200, dryRunBody(c, null, correlationId)); return; }
+    // "Gilt ab" (A V2): ein Datum gilt fuer alle Konditionen des Speicherns,
+    // in beide Richtungen. Ohne Change-Control gibt es keinen Vorgang, der
+    // ein Datum tragen koennte — dann sagt die API das, statt es zu verwerfen.
+    const date = parseEffectiveDate(d.effective_at);
+    if (!date.ok) {
+        json(res, 400, { errorCode: 'EFFECTIVE_DATE_INVALID', reason: date.reason, message: 'effective_at must be a date (YYYY-MM-DD) after today and within a year', correlationId }); return;
+    }
+    if (date.at && !controlled) {
+        json(res, 422, { errorCode: 'EFFECTIVE_DATE_NOT_APPLICABLE', message: 'Only an approved service of an active provider can schedule a change', correlationId }); return;
+    }
+    const classified = classify(patch, s, controlled);
+    const { now: c, scheduled } = date.at ? withSchedule(classified) : { now: classified, scheduled: [] as ClassifiedField[] };
+    const plan = { at: date.at, scheduled };
+    if (d.dry_run === true) { json(res, 200, dryRunBody(c, null, correlationId, plan)); return; }
     const written = Object.keys(c.write);
     if (written.length) await supabaseApi.update('provider_services', { id: serviceId }, { ...c.write, updated_at: new Date().toISOString() });
-    const changes = await recordChanges(providerKey, serviceId, c.review, c.held, str(d.change_note, 1000) || null, caller);
+    const changes = await recordChanges(providerKey, serviceId, c.review, c.held, str(d.change_note, 1000) || null, caller, plan);
     if (!controlled && written.length) {
         await reviewLog({ providerKey, subject: 'service', subjectId: serviceId, action: 'updated', to: written.join(','), actorId: caller.userId, actorKind: 'provider' });
     }
-    json(res, 200, { ok: true, updated: written, held: changes.held, change_request_ids: changes.ids, correlationId });
+    json(res, 200, { ok: true, updated: written, held: changes.held, scheduled: changes.scheduled, effective_at: date.at, change_request_ids: changes.ids, correlationId });
 }
 
 async function retireService(res: ServerResponse, correlationId: string, caller: Caller, providerKey: string, serviceId: string) {

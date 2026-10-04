@@ -6,7 +6,8 @@ import { notify } from './notifications.js';
 import { sendChangeDecisionMail, sendVerificationMail, type ChangeDecisionMailKind } from './mailer.js';
 import { EVIDENCE_BUCKET, signedDownloadUrl } from './storage.js';
 import { scanFields } from './anonymity.js';
-import { RULES, same } from './changeControl.js';
+import { same } from './changeControl.js';
+import { applyHeldValues, liveRows, liveValue, staleFields } from './changeSchedule.js';
 import { allowanceFor, coverageMatrix, loadDossier, readJson, reviewLog, type Dossier } from './providerApplication.js';
 import {
     activationGate, serviceStatusFromCoverage, transitionAllowed, ACTIVATION_AGREEMENTS, type GateVerdict,
@@ -132,7 +133,9 @@ async function queue(res: ServerResponse, correlationId: string) {
         if (!p) continue;
         rows.push({
             kind: 'change_request', provider_key: c.provider_key, provider_name: p.name, lifecycle_status: p.lifecycle_status,
-            since: c.submitted_at ?? null, due_at: null,
+            since: c.submitted_at ?? null,
+            // E V2: das "gilt ab"-Datum ist die Frist — bis dahin sollte entschieden sein.
+            due_at: c.effect === 'held' ? (c.effective_at ?? null) : null,
             risk: c.deadline_class === 'immediate_24h' ? 'high' : 'medium', detail: c.event_type ?? c.change_type ?? null, ref_id: c.id,
         });
     }
@@ -345,21 +348,6 @@ async function lifecycle(req: IncomingMessage, res: ServerResponse, correlationI
 
 // ─── Aenderungsvorgang ansehen und entscheiden (§18) ──────────────────────────
 
-async function liveRows(providerKey: string, serviceId: string | null) {
-    if (serviceId) {
-        const sv = ((await supabaseApi.select('provider_services', { id: serviceId, provider_key: providerKey }, { limit: 1 })) as any[])[0] ?? null;
-        return { provider_services: sv };
-    }
-    const p = ((await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[])[0] ?? null;
-    const conf = ((await supabaseApi.select('provider_confidential', { provider_key: providerKey }, { limit: 1 })) as any[])[0] ?? null;
-    return { providers: p, provider_confidential: conf };
-}
-
-function liveValue(rows: Record<string, any>, field: string, serviceId: string | null) {
-    const table = serviceId ? 'provider_services' : (RULES[field]?.table ?? 'providers');
-    return rows[table]?.[field] ?? null;
-}
-
 async function changeDetail(res: ServerResponse, correlationId: string, providerKey: string, changeId: string) {
     if (!isUuid(changeId)) { json(res, 404, { errorCode: 'NOT_FOUND', message: 'Change not found', correlationId }); return; }
     const c = ((await supabaseApi.select('provider_change_requests', { id: changeId, provider_key: providerKey }, { limit: 1 })) as any[])[0];
@@ -410,24 +398,25 @@ async function decideChange(req: IncomingMessage, res: ServerResponse, correlati
     const done = { reviewed_at: now, reviewer_id: caller.userId ?? null, reviewer_note: note };
     const serviceId: string | null = c.service_id ?? null;
 
+    // Geplant: liegt das "gilt ab"-Datum noch vor uns, plant die Freigabe die
+    // Aenderung nur ein — uebernommen wird sie im Waechter-Lauf am Datum.
+    // Liegt es hinter uns (oder fehlt es), gilt sie ab jetzt, nie rueckwirkend.
+    const scheduled = decision === 'approve' && c.effect === 'held' && !!c.effective_at && new Date(c.effective_at).getTime() > Date.parse(now);
     if (decision === 'approve' && c.effect === 'held') {
         // Nur uebernehmen, was noch auf dem Stand von damals steht. Hat sich
         // der Live-Wert seither geaendert, wuerde die Freigabe ihn ueberschreiben.
-        const rows = await liveRows(providerKey, serviceId);
-        if (serviceId && !rows.provider_services) { json(res, 404, { errorCode: 'NOT_FOUND', message: 'Service not found', correlationId }); return; }
-        const stale = Object.keys(c.old_value ?? {}).filter((k) => !same(liveValue(rows, k, serviceId), c.old_value[k]));
-        if (stale.length) {
-            json(res, 409, { errorCode: 'STALE_CHANGE', message: 'The live value changed since this was submitted — reject it with a note instead', stale, correlationId }); return;
+        // Beim Einplanen dieselbe Pruefung schon jetzt — am Datum noch einmal.
+        if (scheduled) {
+            const stale = await staleFields(c);
+            if (stale === null) { json(res, 404, { errorCode: 'NOT_FOUND', message: 'Service not found', correlationId }); return; }
+            if (stale.length) { json(res, 409, { errorCode: 'STALE_CHANGE', message: 'The live value changed since this was submitted — reject it with a note instead', stale, correlationId }); return; }
+            await supabaseApi.update('provider_change_requests', { id: changeId }, { ...done, status: 'approved' });
+        } else {
+            const r = await applyHeldValues(c, now);
+            if (!r.ok && r.reason === 'not_found') { json(res, 404, { errorCode: 'NOT_FOUND', message: 'Service not found', correlationId }); return; }
+            if (!r.ok && r.reason === 'stale') { json(res, 409, { errorCode: 'STALE_CHANGE', message: 'The live value changed since this was submitted — reject it with a note instead', stale: r.stale, correlationId }); return; }
+            await supabaseApi.update('provider_change_requests', { id: changeId }, { ...done, status: 'applied', applied_at: now, effective_at: now });
         }
-        const byTable: Record<string, Record<string, unknown>> = {};
-        for (const [k, v] of Object.entries(c.new_value ?? {})) {
-            const table = serviceId ? 'provider_services' : (RULES[k]?.table ?? 'providers');
-            (byTable[table] ??= {})[k] = v;
-        }
-        if (byTable.provider_services) await supabaseApi.update('provider_services', { id: serviceId }, { ...byTable.provider_services, updated_at: now });
-        if (byTable.providers) await supabaseApi.update('providers', { provider_key: providerKey }, { ...byTable.providers, updated_at: now });
-        if (byTable.provider_confidential) await supabaseApi.upsert('provider_confidential', 'provider_key', { provider_key: providerKey, ...byTable.provider_confidential, updated_at: now });
-        await supabaseApi.update('provider_change_requests', { id: changeId }, { ...done, status: 'applied', applied_at: now, effective_at: now });
     } else if (decision === 'approve') {
         await supabaseApi.update('provider_change_requests', { id: changeId }, { ...done, status: 'approved' });
     } else if (decision === 'reject') {
@@ -450,14 +439,14 @@ async function decideChange(req: IncomingMessage, res: ServerResponse, correlati
     // §26 "change status": der Partner erfaehrt jede Entscheidung, die etwas
     // fuer ihn aendert. Ein schon uebernommener Wert, der nur bestaetigt wird,
     // braucht keine Mail.
-    const mailKind: ChangeDecisionMailKind | null = decision === 'approve' ? (c.effect === 'held' ? 'approved' : null)
+    const mailKind: ChangeDecisionMailKind | null = decision === 'approve' ? (c.effect === 'held' ? (scheduled ? 'approved_scheduled' : 'approved') : null)
         : decision === 'reject' ? 'rejected' : decision === 'require_reverification' ? 'reverification'
         : decision === 'resume' ? 'resumed' : decision === 'keep_paused' ? 'kept_paused' : null;
     if (mailKind) {
         const p = ((await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[])[0];
-        await sendChangeDecisionMail({ to: p?.contact_email ?? null, providerKey, changeId, kind: mailKind, submittedAt: c.submitted_at ?? now, note, locale: p?.languages?.[0], correlationId });
+        await sendChangeDecisionMail({ to: p?.contact_email ?? null, providerKey, changeId, kind: mailKind, submittedAt: c.submitted_at ?? now, effectiveAt: scheduled ? c.effective_at : null, note, locale: p?.languages?.[0], correlationId });
     }
-    json(res, 200, { ok: true, decision, correlationId });
+    json(res, 200, { ok: true, decision, ...(scheduled ? { scheduled_for: c.effective_at } : {}), correlationId });
 }
 
 // ─── Nachfrage ohne Zellbezug ────────────────────────────────────────────────

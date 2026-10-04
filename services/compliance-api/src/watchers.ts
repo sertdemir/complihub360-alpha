@@ -3,6 +3,7 @@ import { structuredLog } from "@complihub360/types";
 import { supabaseApi } from "./supabase.js";
 import { runBillingReadinessTick } from "./leadCharge.js";
 import { runSubscriptionPeriodTick } from "./subscriptions.js";
+import { runScheduledChanges } from "./changeSchedule.js";
 import { isKnownCountry } from "@complihub/compliance-engine";
 import { sendMagicLinkMail, sendReviewMail, sendMarketCoveredMail } from "./mailer.js";
 import { notify } from "./notifications.js";
@@ -83,6 +84,8 @@ export interface TickSummary {
     marketCoveredNotices: number;
     billingSynced: number;
     subscriptionPeriodsRolled: number;
+    scheduledChangesApplied: number;
+    scheduledChangesStale: number;
     billingChanged: number;
 }
 
@@ -174,7 +177,7 @@ async function mark(base: string, shadow: boolean, payload: Record<string, unkno
 export async function runWatcherTick(): Promise<TickSummary> {
     const shadow = watcherConfig.shadow;
     const now = Date.now();
-    const summary: TickSummary = { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0, reviewRequests: 0, reviewWarnings: 0, reviewDowngrades: 0, evidenceExpiringNotices: 0, evidenceExpired: 0, reverificationDue: 0, marketCoveredNotices: 0, billingSynced: 0, billingChanged: 0, subscriptionPeriodsRolled: 0 };
+    const summary: TickSummary = { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0, reviewRequests: 0, reviewWarnings: 0, reviewDowngrades: 0, evidenceExpiringNotices: 0, evidenceExpired: 0, reverificationDue: 0, marketCoveredNotices: 0, billingSynced: 0, billingChanged: 0, subscriptionPeriodsRolled: 0, scheduledChangesApplied: 0, scheduledChangesStale: 0 };
 
     let engagements: Engagement[];
     try {
@@ -328,6 +331,15 @@ export async function runWatcherTick(): Promise<TickSummary> {
     try {
         const sp = await runSubscriptionPeriodTick(shadow);
         summary.subscriptionPeriodsRolled = sp.rolled;
+    } catch { summary.errors++; }
+
+    // "Gilt ab": faellige geplante Konditionsaenderungen uebernehmen
+    // (changeSchedule.ts). Shadow zaehlt die faelligen, schreibt nichts.
+    try {
+        const sc = await runScheduledChanges(shadow);
+        summary.scheduledChangesApplied = shadow ? sc.due : sc.applied;
+        summary.scheduledChangesStale = sc.stale;
+        summary.errors += sc.errors;
     } catch { summary.errors++; }
 
     // Markt-Update: angefragte Maerkte, die die Engine inzwischen prueft.

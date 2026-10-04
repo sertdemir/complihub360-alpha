@@ -740,14 +740,31 @@ paths:
         (§18–20): Preis, Umfang, Lieferzeit und Subunternehmer warten auf Freigabe; nach der aktuellen Policy
         (`direction`) gilt eine Senkung von Preis oder Lieferzeit sofort, mit Pruefvorgang. Antwort und
         `dry_run` wie bei PATCH /application.
+
+        „Gilt ab" (`effective_at`, YYYY-MM-DD, ab morgen, hoechstens ein Jahr voraus): das Datum gilt fuer alle
+        Konditionen des Speicherns (Felder mit der Frist before_effective_date), in beide Richtungen. Was warten
+        muss, wartet mit Datum; was die Policy sofort uebernehmen wuerde, wird ohne Pruefung eingeplant
+        (`scheduled`) und am Datum vom Waechter uebernommen. Ein neues Speichern ersetzt das Datum, ohne
+        `effective_at` heisst ab sofort. Das letzte Speichern eines Feldes gewinnt: ein offener Vorgang
+        desselben Ziels verliert das Feld (leer → withdrawn).
       security: [ { bearerAuth: [] } ]
       parameters:
         - { name: key, in: path, required: true, schema: { type: string } }
         - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                effective_at: { type: string, format: date, description: "Gilt ab — leer oder fehlend heisst ab sofort" }
+                dry_run: { type: boolean, description: "Antwort zusaetzlich mit `scheduled[]` und `effective_at`" }
       responses:
-        '200': { description: Aktualisiert }
+        '200': { description: "`{ updated[], held[], scheduled[], effective_at, change_request_ids[] }`" }
+        '400': { description: "EFFECTIVE_DATE_INVALID mit reason format | past | too_far" }
         '404': { description: Unbekannt }
         '409': { description: Stillgelegt (SERVICE_RETIRED) }
+        '422': { description: "EFFECTIVE_DATE_NOT_APPLICABLE — ohne Change-Control gibt es keinen Vorgang, der ein Datum traegt" }
     delete:
       summary: Leistung entfernen oder stilllegen
       description: Nie freigegeben → Zeile weg (Coverage kaskadiert). Einmal freigegeben → status retired, die Zeile bleibt (Buchungen zeigen darauf).
@@ -894,8 +911,10 @@ paths:
 
   /provider/{key}/changes/{id}:
     delete:
-      summary: Wartende Aenderung zurueckziehen
-      description: Nur effect = held mit status submitted oder under_review. Sonst 409 CHANGE_NOT_WITHDRAWABLE.
+      summary: Wartende oder geplante Aenderung zurueckziehen
+      description: >-
+        effect = held mit status submitted oder under_review — oder eingeplant (approved, applied_at leer), bis
+        der Waechter sie am Datum uebernimmt. Sonst 409 CHANGE_NOT_WITHDRAWABLE.
       security: [ { bearerAuth: [] } ]
       parameters:
         - { name: key, in: path, required: true, schema: { type: string } }
@@ -1200,6 +1219,10 @@ paths:
         require_reverification · pause: resume (stellt den vorherigen Status jeder Leistung wieder her),
         keep_paused. reject, require_reverification und keep_paused brauchen eine note, die der Partner liest.
         Jede Entscheidung, die fuer den Partner etwas aendert, geht ihm per Mail zu (§26), mit der note.
+        Liegt `effective_at` eines wartenden Vorgangs in der Zukunft, plant approve ihn nur ein (status approved,
+        applied_at leer; Antwort `scheduled_for`, Mail nennt das Datum) — der Waechter uebernimmt am Datum, mit
+        derselben STALE-Pruefung (ueberholt → under_review). Liegt es zurueck, gilt die Aenderung ab der Freigabe.
+        In der Queue ist `effective_at` die Frist (`due_at`).
       security: [ { bearerAuth: [] } ]
       parameters:
         - { name: key, in: path, required: true, schema: { type: string } }
@@ -1215,7 +1238,7 @@ paths:
                 decision: { type: string, enum: [approve, reject, require_reverification, resume, keep_paused] }
                 note: { type: string, maxLength: 1000 }
       responses:
-        '200': { description: Entschieden }
+        '200': { description: "`{ decision, scheduled_for? }`" }
         '400': { description: Entscheidung passt nicht zum effect, oder note fehlt }
         '409': { description: ALREADY_DECIDED oder STALE_CHANGE }
 
@@ -1282,6 +1305,19 @@ components:
         - $ref: '#/components/schemas/AnonProviderCard'
         - type: object
           properties:
+            planned_prices:
+              type: array
+              description: >-
+                Freigegebene, eingeplante Preisaenderungen an matchbaren Leistungen („gilt ab", Canvas D V2) — neutral,
+                in beide Richtungen. Was noch in Pruefung ist, steht nicht darin.
+              items:
+                type: object
+                properties:
+                  service_name: { type: string }
+                  effective_at: { type: string, format: date-time }
+                  currency: { type: string, nullable: true }
+                  price_min: { type: number, nullable: true }
+                  price_max: { type: number, nullable: true }
             markets: { type: array, items: { type: string } }
             services: { type: array, items: { type: string }, nullable: true }
             credentials: { type: array, items: { type: string }, nullable: true }

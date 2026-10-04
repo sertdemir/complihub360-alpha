@@ -1094,13 +1094,14 @@ export async function sendMarketCoveredMail(p: {
 // Nutzer — der Grund gehoert dem Partner und dem Pruefteam. Ein Mensch ist
 // immer erreichbar.
 
-export type ChangeDecisionMailKind = 'approved' | 'rejected' | 'reverification' | 'resumed' | 'kept_paused';
+export type ChangeDecisionMailKind = 'approved' | 'approved_scheduled' | 'rejected' | 'reverification' | 'resumed' | 'kept_paused';
 
 const CHANGE_DECISION_STRINGS: Record<MailLocale, Record<ChangeDecisionMailKind, { subject: string; body: string }> & { noteLabel: string; human: string }> = {
     en: {
         noteLabel: 'Note from our review team',
         human: 'If anything is unclear, reply to this email — a person will answer.',
         approved: { subject: 'Your change is live', body: 'Our review team has approved your change from {date}. It is now visible to businesses.\n\n→ Partner dashboard → Application' },
+        approved_scheduled: { subject: 'Your change takes effect on {from}', body: 'Our review team has approved your change from {date}. It takes effect on {from}; until then businesses see your current details.\n\nYou can withdraw it in your partner dashboard until that date.\n\n→ Partner dashboard → Application' },
         rejected: { subject: 'Your change was not applied', body: 'Our review team did not apply your change from {date}. Your previous details stay in place.\n\nYou can adjust the details and send them again.' },
         reverification: { subject: 'One document for your change', body: 'For your change from {date}, our review team needs a current document.\n\nYou can upload it in your partner dashboard under Application → Evidence.' },
         resumed: { subject: 'Your services can be booked again', body: 'We have reviewed your report. The paused services are visible and bookable again.\n\nThank you for reporting the change right away.' },
@@ -1110,6 +1111,7 @@ const CHANGE_DECISION_STRINGS: Record<MailLocale, Record<ChangeDecisionMailKind,
         noteLabel: 'Hinweis unseres Prüfteams',
         human: 'Wenn etwas unklar ist, antworten Sie einfach auf diese E-Mail — ein Mensch antwortet Ihnen.',
         approved: { subject: 'Ihre Änderung ist übernommen', body: 'Unser Prüfteam hat Ihre Änderung vom {date} freigegeben. Sie ist ab jetzt für Unternehmen sichtbar.\n\n→ Partner-Dashboard → Bewerbung' },
+        approved_scheduled: { subject: 'Ihre Änderung gilt ab {from}', body: 'Unser Prüfteam hat Ihre Änderung vom {date} freigegeben. Sie wird am {from} wirksam; bis dahin sehen Unternehmen die bisherigen Angaben.\n\nBis zu diesem Datum können Sie die Änderung im Partner-Dashboard zurückziehen.\n\n→ Partner-Dashboard → Bewerbung' },
         rejected: { subject: 'Ihre Änderung wurde nicht übernommen', body: 'Unser Prüfteam hat Ihre Änderung vom {date} nicht übernommen. Es gilt weiter der bisherige Stand.\n\nSie können die Angaben anpassen und erneut senden.' },
         reverification: { subject: 'Ein Nachweis zu Ihrer Änderung', body: 'Zu Ihrer Änderung vom {date} braucht unser Prüfteam einen aktuellen Nachweis.\n\nSie laden ihn im Partner-Dashboard unter Bewerbung → Nachweise hoch.' },
         resumed: { subject: 'Ihre Leistungen sind wieder buchbar', body: 'Wir haben Ihre Meldung geprüft. Die pausierten Leistungen sind wieder sichtbar und buchbar.\n\nDanke, dass Sie die Änderung gleich gemeldet haben.' },
@@ -1119,6 +1121,7 @@ const CHANGE_DECISION_STRINGS: Record<MailLocale, Record<ChangeDecisionMailKind,
         noteLabel: 'Nota de nuestro equipo de revisión',
         human: 'Si algo no está claro, responda a este correo — le contestará una persona.',
         approved: { subject: 'Su cambio ya está publicado', body: 'Nuestro equipo de revisión ha aprobado su cambio del {date}. Ya es visible para las empresas.\n\n→ Panel de socio → Solicitud' },
+        approved_scheduled: { subject: 'Su cambio se aplica a partir del {from}', body: 'Nuestro equipo de revisión ha aprobado su cambio del {date}. Se aplica a partir del {from}; hasta entonces, las empresas ven sus datos actuales.\n\nPuede retirarlo en su panel de socio hasta esa fecha.\n\n→ Panel de socio → Solicitud' },
         rejected: { subject: 'Su cambio no se ha aplicado', body: 'Nuestro equipo de revisión no ha aplicado su cambio del {date}. Siguen vigentes sus datos anteriores.\n\nPuede ajustar los datos y enviarlos de nuevo.' },
         reverification: { subject: 'Un documento para su cambio', body: 'Para su cambio del {date}, nuestro equipo de revisión necesita un documento actual.\n\nPuede subirlo en su panel de socio en Solicitud → Justificantes.' },
         resumed: { subject: 'Sus servicios vuelven a poder reservarse', body: 'Hemos revisado su aviso. Los servicios en pausa vuelven a ser visibles y reservables.\n\nGracias por avisar del cambio enseguida.' },
@@ -1128,6 +1131,7 @@ const CHANGE_DECISION_STRINGS: Record<MailLocale, Record<ChangeDecisionMailKind,
         noteLabel: 'İnceleme ekibimizin notu',
         human: 'Bir şey net değilse bu e-postayı yanıtlayın — size bir insan cevap verir.',
         approved: { subject: 'Değişikliğiniz yayında', body: 'İnceleme ekibimiz {date} tarihli değişikliğinizi onayladı. Artık işletmeler tarafından görülebilir.\n\n→ Partner paneli → Başvuru' },
+        approved_scheduled: { subject: 'Değişikliğiniz {from} tarihinde geçerli olacak', body: 'İnceleme ekibimiz {date} tarihli değişikliğinizi onayladı. Değişiklik {from} tarihinde geçerli olacak; o zamana kadar işletmeler mevcut bilgilerinizi görür.\n\nBu tarihe kadar değişikliği partner panelinden geri çekebilirsiniz.\n\n→ Partner paneli → Başvuru' },
         rejected: { subject: 'Değişikliğiniz uygulanmadı', body: 'İnceleme ekibimiz {date} tarihli değişikliğinizi uygulamadı. Önceki bilgileriniz geçerli kalır.\n\nBilgileri düzenleyip yeniden gönderebilirsiniz.' },
         reverification: { subject: 'Değişikliğiniz için bir belge', body: '{date} tarihli değişikliğiniz için inceleme ekibimizin güncel bir belgeye ihtiyacı var.\n\nBelgeyi partner panelinde Başvuru → Belgeler bölümünden yükleyebilirsiniz.' },
         resumed: { subject: 'Hizmetleriniz yeniden rezerve edilebilir', body: 'Bildiriminizi inceledik. Duraklatılan hizmetler yeniden görünür ve rezerve edilebilir.\n\nDeğişikliği hemen bildirdiğiniz için teşekkür ederiz.' },
@@ -1136,19 +1140,22 @@ const CHANGE_DECISION_STRINGS: Record<MailLocale, Record<ChangeDecisionMailKind,
 };
 
 /** Betreff und Text der Entscheidungs-Mail. Exportiert fuer die Tests. */
-export function renderChangeDecisionMail(kind: ChangeDecisionMailKind, submittedAt: string, note: string | null, locale?: string | null): { subject: string; text: string } {
+export function renderChangeDecisionMail(kind: ChangeDecisionMailKind, submittedAt: string, note: string | null, locale?: string | null, effectiveAt?: string | null): { subject: string; text: string } {
     const loc = resolveLocale(locale ?? undefined);
     const s = CHANGE_DECISION_STRINGS[loc];
-    let date = submittedAt.slice(0, 10);
-    try { date = new Intl.DateTimeFormat(loc, { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(submittedAt)); } catch { /* ISO-Datum */ }
-    const parts = [s[kind].body.split('{date}').join(date)];
+    const fmt = (iso: string) => {
+        try { return new Intl.DateTimeFormat(loc, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(iso)); } catch { return iso.slice(0, 10); }
+    };
+    // {from}: das "gilt ab"-Datum — ein Tagesbeginn in UTC, deshalb auch in UTC formatiert.
+    const fill = (x: string) => x.split('{date}').join(fmt(submittedAt)).split('{from}').join(effectiveAt ? fmt(effectiveAt) : '');
+    const parts = [fill(s[kind].body)];
     if (note) parts.push(`${s.noteLabel}: ${note}`);
     parts.push(s.human);
-    return { subject: s[kind].subject, text: parts.join('\n\n') };
+    return { subject: fill(s[kind].subject), text: parts.join('\n\n') };
 }
 
-export async function sendChangeDecisionMail(p: { to: string | null; providerKey: string; changeId: string; kind: ChangeDecisionMailKind; submittedAt: string; note: string | null; locale?: string | null; correlationId?: string }): Promise<void> {
-    const { subject, text } = renderChangeDecisionMail(p.kind, p.submittedAt, p.note, p.locale);
+export async function sendChangeDecisionMail(p: { to: string | null; providerKey: string; changeId: string; kind: ChangeDecisionMailKind; submittedAt: string; effectiveAt?: string | null; note: string | null; locale?: string | null; correlationId?: string }): Promise<void> {
+    const { subject, text } = renderChangeDecisionMail(p.kind, p.submittedAt, p.note, p.locale, p.effectiveAt);
     await deliverProviderMail({ to: p.to, kind: `change_${p.kind}`, ref: { providerKey: p.providerKey, changeId: p.changeId }, subject, text, correlationId: p.correlationId });
 }
 
