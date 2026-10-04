@@ -861,6 +861,18 @@ describe('Anbieterseite: Lead-Karte, Selbstauskunft, Zahlungsbereitschaft (Phase
         expect(r2.body.readiness).toMatchObject({ ready: true, reasons: [] });
     });
 
+    it('protokolliert, wenn der Sync eine angehaengte Karte zum Standard gemacht hat', async () => {
+        seedProvider({ stripe_customer_id: 'cus_test', billing_ready: false, billing_block_reasons: [] });
+        seedPricing(); seedSubscription('test-kanzlei', 'growth');
+        (db.provider_agreement_acceptance ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', agreement_type: 'billing_authorization', version: '2026-09', superseded_at: null });
+        stripeMock.getCustomerBilling.mockResolvedValue({ defaultPaymentMethodId: 'pm_attached', paymentMethodLabel: 'visa ····4242', email: null, billingInfoComplete: true, delinquent: false, promotedDefault: true });
+        const r = await api('/api/v1/provider/test-kanzlei/billing/sync', { method: 'POST', auth: 'key', body: '{}' });
+        expect(r.status).toBe(200);
+        expect(r.body.readiness).toMatchObject({ ready: true, reasons: [] });
+        const ev = (db.event_log ?? []).find((e: any) => e.type === 'stripe_default_payment_method_set');
+        expect(ev?.payload).toMatchObject({ providerKey: 'test-kanzlei', customerId: 'cus_test', paymentMethodId: 'pm_attached' });
+    });
+
     it('kennt Stripe den gespeicherten Kunden nicht, raeumt der Sync die Kennung weg statt 502 zu antworten', async () => {
         seedProvider({ stripe_customer_id: 'cus_veraltet', billing_ready: false, billing_block_reasons: [] });
         seedPricing(); seedSubscription('test-kanzlei', 'growth');

@@ -289,6 +289,10 @@ export async function syncBillingReadiness(providerKey: string): Promise<Readine
             hasPm = !!pmId;
             infoComplete = c.billingInfoComplete;
             pmLabel = c.paymentMethodLabel;
+            if (c.promotedDefault) {
+                structuredLog('info', 'Stripe default payment method set from attached card', { providerKey, customerId: String(p.stripe_customer_id), paymentMethodId: pmId });
+                await supabaseApi.insert('event_log', { type: 'stripe_default_payment_method_set', payload: { providerKey, customerId: String(p.stripe_customer_id), paymentMethodId: pmId } }).catch(() => {});
+            }
         } catch (err) {
             // Stripe kennt den gespeicherten Kunden nicht (anderer Account oder
             // andere Sandbox als beim Anlegen, oder dort geloescht). Das ist kein
