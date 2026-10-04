@@ -733,3 +733,20 @@ describe('ResultsRiskMap guest top bar on small screens', () => {
     expect(screen.getByTestId('back-home-mobile')).toBeInTheDocument();
   });
 });
+
+// ─── Risk map · header subtitle counts its areas ──────────────────────────────
+
+describe('ResultsRiskMap header subtitle', () => {
+  afterEach(() => {
+    localStorage.removeItem('ch360_last_profile');
+  });
+
+  it('passes the number of areas as count, so one area reads singular', async () => {
+    localStorage.setItem('ch360_last_profile', JSON.stringify({ country: 'DE', categories: ['tax-vat'] }));
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10) })] });
+    renderPage();
+
+    // The mocked t appends `#count` — `total` would leave it off.
+    expect(await screen.findByText('header.subtitleProfile#1')).toBeInTheDocument();
+  });
+});
