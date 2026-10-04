@@ -752,7 +752,22 @@
         "uses_subcontractors": "Subcontratistas",
         "service_name": "Nombre del servicio",
         "description": "Descripción"
-      }
+      },
+      "whenLabel": "¿Cuándo se aplica el cambio?",
+      "whenNow": "De inmediato",
+      "whenDate": "A partir de una fecha",
+      "dateLabel": "Se aplica a partir del",
+      "dateHint": "A partir de mañana, como máximo con un año de antelación. Si lo aprobamos después de esa fecha, se aplica desde la aprobación.",
+      "dateInvalid": "Elija una fecha a partir de mañana, como máximo con un año de antelación.",
+      "groupHeldDated": "Visible tras la revisión, a partir del {{date}}",
+      "groupScheduled": "Visible sin revisión, a partir del {{date}}",
+      "summaryNoteDated": "Hasta el {{date}}, las empresas ven sus condiciones actuales. Las citas reservadas mantienen su precio.",
+      "sentDated": "Enviado. El cambio se aplica a partir del {{date}}, tras nuestra revisión cuando sea necesaria.",
+      "pendingFrom": "en revisión · a partir del {{date}}",
+      "approvedFrom": "aprobado, a partir del {{date}}",
+      "plannedFrom": "programado a partir del {{date}}",
+      "plannedShort": "Cambio programado",
+      "withdrawFields": "Retirar: {{fields}}"
     }
   },
   "verification": {

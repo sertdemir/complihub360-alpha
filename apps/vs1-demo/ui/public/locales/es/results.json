@@ -161,7 +161,8 @@
     "toAppointments": "Ir a sus citas",
     "bookAnother": "Reservar otra cita",
     "revealedTitle": "Nombre y contacto ya están visibles.",
-    "revealedBody": "Desde su reserva puede ver quién es este proveedor."
+    "revealedBody": "Desde su reserva puede ver quién es este proveedor.",
+    "plannedPrice": "A partir del {{date}}: {{service}} {{price}}. Las reservas anteriores mantienen el precio actual."
   },
   "schedule": {
     "back": "Volver al perfil",

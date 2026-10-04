@@ -233,8 +233,11 @@ export async function fetchVerification(providerKey?: string): Promise<Verificat
 // (B V2) und zeigt offene Vorgaenge am Feld (C V1).
 
 export interface ChangeField { field: string; old: unknown; new: unknown; change_type: string }
-export interface ChangePreview { instant: string[]; review: ChangeField[]; held: ChangeField[] }
-export interface SaveResult { updated: string[]; held: string[] }
+export interface ChangePreview { instant: string[]; review: ChangeField[]; held: ChangeField[]; scheduled?: ChangeField[]; effective_at?: string | null }
+export interface SaveResult { updated: string[]; held: string[]; scheduled?: string[]; effective_at?: string | null }
+
+/** „Gilt ab" (Canvas 04.10.2026): ein Datum YYYY-MM-DD, ab morgen. Leer = ab sofort. */
+export type EffectiveDate = string | null;
 
 export type ChangeEffect = 'held' | 'applied' | 'pause';
 export type ChangeStatus = 'submitted' | 'under_review' | 'approved' | 'rejected' | 'applied' | 'withdrawn';
@@ -250,18 +253,25 @@ export interface ProviderChange {
   submitted_at: string;
   reviewed_at: string | null;
   reviewer_note: string | null;
+  /** Geplant ab (Tagesbeginn UTC); bei held + approved + applied_at leer: eingeplant. */
+  effective_at?: string | null;
+  applied_at?: string | null;
   requires_reverification?: boolean;
   event_type?: string | null;
   affected_service_ids?: string[];
 }
 
-export async function previewService(serviceId: string, patch: Partial<ServiceInput>, providerKey?: string): Promise<ChangePreview> {
-  return apiFetch<ChangePreview>(`/api/v1/provider/${await key(providerKey)}/services/${serviceId}`, { method: 'PATCH', body: JSON.stringify({ ...patch, dry_run: true }) });
+export async function previewService(serviceId: string, patch: Partial<ServiceInput>, providerKey?: string, effectiveAt: EffectiveDate = null): Promise<ChangePreview> {
+  return apiFetch<ChangePreview>(`/api/v1/provider/${await key(providerKey)}/services/${serviceId}`, { method: 'PATCH', body: JSON.stringify({ ...patch, ...(effectiveAt ? { effective_at: effectiveAt } : {}), dry_run: true }) });
 }
 
-export async function saveService(serviceId: string, patch: Partial<ServiceInput>, providerKey?: string): Promise<SaveResult> {
-  return apiFetch<SaveResult>(`/api/v1/provider/${await key(providerKey)}/services/${serviceId}`, { method: 'PATCH', body: JSON.stringify(patch) });
+export async function saveService(serviceId: string, patch: Partial<ServiceInput>, providerKey?: string, effectiveAt: EffectiveDate = null): Promise<SaveResult> {
+  return apiFetch<SaveResult>(`/api/v1/provider/${await key(providerKey)}/services/${serviceId}`, { method: 'PATCH', body: JSON.stringify({ ...patch, ...(effectiveAt ? { effective_at: effectiveAt } : {}) }) });
 }
+
+/** Wartet oder ist eingeplant — beides steht am Feld und laesst sich zurueckziehen. */
+export const isPendingChange = (c: ProviderChange): boolean =>
+  c.effect === 'held' && (c.status === 'submitted' || c.status === 'under_review' || (c.status === 'approved' && !c.applied_at));
 
 export async function fetchChanges(providerKey?: string): Promise<ProviderChange[]> {
   const res = await apiFetch<{ ok: boolean; changes: ProviderChange[] }>(`/api/v1/provider/${await key(providerKey)}/changes`);

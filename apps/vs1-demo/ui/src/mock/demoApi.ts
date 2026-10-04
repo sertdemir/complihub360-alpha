@@ -29,6 +29,10 @@ const iso = (days: number, hour = 10, minute = 0) => {
   const d = new Date(); d.setDate(d.getDate() + days); d.setHours(hour, minute, 0, 0); return d.toISOString();
 };
 const plus = (ms: number) => new Date(Date.now() + ms).toISOString();
+/** Tagesbeginn in UTC, n Tage voraus — so speichert der Server ein "gilt ab"-Datum. */
+const dayStart = (n: number) => { const d = new Date(); return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + n)).toISOString(); };
+/** Der naechste Jahreswechsel — der typische Termin fuer neue Konditionen. */
+const NEW_YEAR = `${new Date().getUTCFullYear() + 1}-01-01T00:00:00.000Z`;
 const uuid = (n: number, block = 2) => `5eed000${block}-0000-4000-8000-${String(n).padStart(12, '0')}`;
 
 const USER_ID = 'fa49d5ab-4dc9-4bb4-a84d-fe624e2eea2e';
@@ -439,7 +443,9 @@ function providerDetail(ref: string) {
   // Wer den Fall "kein Buchen-Knopf" lokal sehen will, setzt hier einmal
   // `false` — abgesichert ist er durch die Waechter in
   // ProviderDetailPage.guard.test.ts.
-  return { ok: true, detail: { ...anon, descriptor: DESCRIPTOR[key], area_codes: AREAS[key] ?? [], descriptor_region: REGION[key] ?? null, ...d, availability: 'available', bookable_chargeable: true }, detail_open_charged: false };
+  // D V2: nur Freigegebenes wird angekuendigt — die EPR-Anpassung zum Jahreswechsel.
+  const planned_prices = key === PARTNER_KEY ? [{ service_name: 'EPR & Verpackung', effective_at: NEW_YEAR, currency: 'EUR', price_min: 600, price_max: 950 }] : [];
+  return { ok: true, detail: { ...anon, descriptor: DESCRIPTOR[key], area_codes: AREAS[key] ?? [], descriptor_region: REGION[key] ?? null, ...d, planned_prices, availability: 'available', bookable_chargeable: true }, detail_open_charged: false };
 }
 
 // Bewertungen: nur, was an einer Buchung haengt (so wie der Server filtert).
@@ -782,10 +788,18 @@ function p2Gate() {
 // Schmidt & Partner hat eine Preiserhoehung beim Datenschutz-Paket in Pruefung
 // (C V1) und eine abgelehnte Aenderung der Ausschluesse bei EPR. Studio
 // Bianchi hat eine eingeschraenkte Zulassung gemeldet (Pause, E V1).
-const CC = { held: uuid(53, 7), rejected: uuid(54, 7), event: uuid(51, 7) };
+//
+// Gilt ab (Canvas 04.10.2026): die Preiserhoehung beim Datenschutz-Paket soll
+// in zwei Tagen gelten — das Pruefteam sieht die Warnung (E V2). Bei EPR ist
+// zum Jahreswechsel eine freigegebene Preisanpassung eingeplant und eine
+// kuerzere Lieferzeit ohne Pruefung geplant (C V1); Nutzer sehen den
+// geplanten Preis neutral auf der Detailseite (D V2).
+const CC = { held: uuid(53, 7), rejected: uuid(54, 7), event: uuid(51, 7), planned: uuid(55, 7), plannedFree: uuid(56, 7) };
 function spChanges() {
   return [
-    { id: CC.held, service_id: SP.priv, change_type: 'pricing', field_path: 'price_max', old_value: { price_max: 2400 }, new_value: { price_max: 2600 }, effect: 'held', status: 'submitted', deadline_class: 'before_effective_date', submitted_at: iso(-1, 9, 12), reviewed_at: null, reviewer_note: null, provider_note: null },
+    { id: CC.held, service_id: SP.priv, change_type: 'pricing', field_path: 'price_max', old_value: { price_max: 2400 }, new_value: { price_max: 2600 }, effect: 'held', status: 'submitted', deadline_class: 'before_effective_date', submitted_at: iso(-1, 9, 12), reviewed_at: null, reviewer_note: null, provider_note: null, effective_at: dayStart(2), applied_at: null },
+    { id: CC.planned, service_id: SP.epr, change_type: 'pricing', field_path: 'price_max', old_value: { price_max: 900 }, new_value: { price_max: 950 }, effect: 'held', status: 'approved', deadline_class: 'before_effective_date', submitted_at: iso(-4, 14, 0), reviewed_at: iso(-3, 10, 30), reviewer_note: null, provider_note: null, effective_at: NEW_YEAR, applied_at: null },
+    { id: CC.plannedFree, service_id: SP.epr, change_type: 'timeline', field_path: 'completion_days_estimate', old_value: { completion_days_estimate: 14 }, new_value: { completion_days_estimate: 10 }, effect: 'held', status: 'approved', deadline_class: 'before_effective_date', submitted_at: iso(-4, 14, 0), reviewed_at: null, reviewer_note: null, provider_note: null, effective_at: NEW_YEAR, applied_at: null },
     { id: CC.rejected, service_id: SP.epr, change_type: 'scope', field_path: 'exclusions', old_value: { exclusions: [] }, new_value: { exclusions: ['Buchhaltung'] }, effect: 'held', status: 'rejected', deadline_class: 'before_effective_date', submitted_at: iso(-6, 10, 0), reviewed_at: iso(-5, 15, 0), reviewer_note: 'Bitte nennen Sie, welche Buchhaltungsleistungen genau entfallen.', provider_note: null },
   ];
 }
@@ -793,17 +807,22 @@ function spChanges() {
 // Felder, die "Konditionen ändern" anbietet.
 function serviceChange(serviceId: string, body: Record<string, unknown>) {
   const svc = spServices().find((x) => x.id === serviceId) as Record<string, unknown> | undefined;
-  const instant: string[] = []; const review: unknown[] = []; const held: unknown[] = [];
+  const instant: string[] = []; const review: unknown[] = []; const held: unknown[] = []; const scheduled: unknown[] = [];
+  const at = typeof body.effective_at === 'string' && body.effective_at ? `${body.effective_at}T00:00:00.000Z` : null;
   for (const k of ['price_min', 'price_max', 'completion_days_estimate', 'response_time_hours']) {
     if (!(k in body)) continue;
     const old = svc?.[k] ?? null; const nw = body[k] ?? null;
     if (old === nw) continue;
     const f = { field: k, old, new: nw, change_type: k.startsWith('price') ? 'pricing' : k === 'response_time_hours' ? 'support' : 'timeline' };
     const lower = typeof old === 'number' && typeof nw === 'number' && nw <= old;
-    (lower ? review : held).push(f);
+    // Mit Datum wird eine guenstigere Kondition eingeplant statt geschrieben;
+    // die Antwortzeit ist keine Kondition im Sinne von §18 und gilt sofort.
+    if (lower) (at && k !== 'response_time_hours' ? scheduled : review).push(f);
+    else held.push(f);
   }
-  if (body.dry_run === true) return { ok: true, dry_run: true, instant, review, held };
-  return { ok: true, updated: (review as Array<{ field: string }>).map((f) => f.field), held: (held as Array<{ field: string }>).map((f) => f.field), change_request_ids: [] };
+  const names = (xs: unknown[]) => (xs as Array<{ field: string }>).map((f) => f.field);
+  if (body.dry_run === true) return { ok: true, dry_run: true, instant, review, held, scheduled, effective_at: at };
+  return { ok: true, updated: names(review), held: names(held), scheduled: names(scheduled), effective_at: at, change_request_ids: [] };
 }
 function changeDetail(id: string) {
   if (id === CC.event) return { ok: true, change: { id, service_id: null, change_type: 'material_event', field_path: null, old_value: { services: [] }, new_value: { services: [] }, effect: 'pause', status: 'submitted', deadline_class: 'immediate_24h', event_type: 'licence_restricted', occurred_on: iso(-1, 0, 0).slice(0, 10), affected_service_ids: [uuid(91, 7)], submitted_at: iso(0, 8, 0), reviewed_at: null, reviewer_note: null, provider_note: 'Die Kammer hat die Zulassung für Steuerberatung in Italien bis zur Klärung eingeschränkt.' }, live: null, stale: false, service: null, upcoming_bookings: 1 };
@@ -816,7 +835,7 @@ function p2Queue() {
     { kind: 'application', provider_key: 'dahlmann-cpa', provider_name: 'Neue Kanzlei GmbH', lifecycle_status: 'more_info_required', since: iso(-3, 9, 40), due_at: null, risk: 'high', detail: 'tax-vat, data-privacy', ref_id: null },
     { kind: 'application', provider_key: 'lex-iberia', provider_name: 'Lex Iberia Abogados', lifecycle_status: 'submitted', since: iso(-1, 11, 0), due_at: null, risk: 'high', detail: 'legal-advisory', ref_id: null },
     { kind: 'change_request', provider_key: 'studio-bianchi', provider_name: 'Studio Bianchi', lifecycle_status: 'active', since: iso(0, 8, 0), due_at: plus(9 * H), risk: 'high', detail: 'licence_restricted', ref_id: CC.event },
-    { kind: 'change_request', provider_key: 'schmidt-partner', provider_name: 'Schmidt & Partner', lifecycle_status: 'active', since: iso(-1, 9, 12), due_at: null, risk: 'medium', detail: 'pricing', ref_id: CC.held },
+    { kind: 'change_request', provider_key: 'schmidt-partner', provider_name: 'Schmidt & Partner', lifecycle_status: 'active', since: iso(-1, 9, 12), due_at: dayStart(2), risk: 'medium', detail: 'pricing', ref_id: CC.held },
     { kind: 'application', provider_key: 'packwise', provider_name: 'Packwise Compliance', lifecycle_status: 'under_verification', since: iso(-2, 10, 0), due_at: null, risk: 'medium', detail: 'product-packaging', ref_id: null },
     { kind: 'application', provider_key: 'nordic-privacy', provider_name: 'Nordic Privacy Partners', lifecycle_status: 'submitted', since: plus(-5 * H), due_at: null, risk: 'medium', detail: 'data-privacy', ref_id: null },
     { kind: 'reverification', provider_key: 'schmidt-partner', provider_name: 'Schmidt & Partner', lifecycle_status: 'reverification_due', since: iso(-4, 6, 0), due_at: iso(10, 6, 0), risk: 'low', detail: 'tax-vat', ref_id: null },

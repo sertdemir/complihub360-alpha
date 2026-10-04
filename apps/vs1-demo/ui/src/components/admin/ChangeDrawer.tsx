@@ -8,7 +8,7 @@ import { Skeleton } from '../ui/Skeleton';
 import { ApiError } from '../../api/client';
 import { decideChange, fetchChangeDetail, type ChangeDecision, type ChangeDetail } from '../../api/review';
 
-// ─── Change request entscheiden (Canvas E V1, 2026-10-01) ────────────────────
+// ─── Change request entscheiden (Canvas E V1, 2026-10-01; gilt ab: E V2) ────
 // Drawer aus der Queue: vorher/nachher, Fristklasse, wen es betrifft, dann
 // entscheiden. Welche Entscheidung erlaubt ist, haengt an der Wirkung — die
 // Regel liegt beim Server (providerReview.ts DECISIONS), hier nur gespiegelt.
@@ -48,6 +48,16 @@ const show = (v: unknown, field = '') => {
   if (field === 'response_time_hours' && typeof v === 'number') return `${v} h`;
   return Array.isArray(v) ? (v.length ? v.join(', ') : '—') : String(v);
 };
+const day = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' });
+/** Werktage (Mo–Fr) von heute bis zum Datum, ohne heute. Feiertage kennt die Rechnung nicht. */
+function businessDaysUntil(iso: string, now = new Date()): number {
+  const end = new Date(iso).getTime();
+  let n = 0;
+  for (let d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1)); d.getTime() < end; d.setUTCDate(d.getUTCDate() + 1)) {
+    if (d.getUTCDay() !== 0 && d.getUTCDay() !== 6) n++;
+  }
+  return n;
+}
 const label = (k: string) => k.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase());
 
 export function ChangeDrawer({ providerKey, providerName, changeId, onClose, onDecided }: { providerKey: string; providerName: string; changeId: string | null; onClose: () => void; onDecided: () => void }) {
@@ -76,12 +86,20 @@ export function ChangeDrawer({ providerKey, providerName, changeId, onClose, onD
   const c = detail?.change;
   const dl = c ? DEADLINE[c.deadline_class] : null;
   const fields = c && c.effect !== 'pause' ? Object.keys(c.old_value ?? {}) : [];
+  // E V2 (04.10.2026): das "gilt ab"-Datum ist die Frist. Unter drei
+  // Werktagen warnt der Drawer; eine Freigabe davor plant die Aenderung ein.
+  const open = !!c && ['submitted', 'under_review'].includes(c.status);
+  const dated = c && c.effect === 'held' && c.effective_at ? c.effective_at : null;
+  const future = !!dated && new Date(dated).getTime() > Date.now();
+  const left = future ? businessDaysUntil(dated!) : 0;
+  const days = future ? Math.ceil((new Date(dated!).getTime() - Date.now()) / 86400_000) : 0;
+  const due = dated && open ? { label: future ? `due in ${days} day${days === 1 ? '' : 's'}` : 'effective date passed', tone: (future && left >= 3 ? 'neutral' : 'warning') as BadgeTone } : null;
   return (
     <Drawer open={!!changeId} onClose={onClose} size="lg" eyebrow="Change request" title={`${providerName} · ${c ? label(c.event_type ?? c.change_type.split(',')[0]) : '…'}`}
-      headerExtra={dl ? <Badge tone={dl.tone} size="sm">{dl.label}</Badge> : null}
+      headerExtra={due ? <Badge tone={due.tone} size="sm">{due.label}</Badge> : dl ? <Badge tone={dl.tone} size="sm">{dl.label}</Badge> : null}
       footer={c && ['submitted', 'under_review'].includes(c.status) ? (
         <div className="flex flex-wrap gap-2">
-          {(ACTIONS[c.effect] ?? []).map((a) => <Button key={a.decision} size="sm" variant={a.variant} disabled={busy || (a.decision === 'approve' && c.effect === 'held' && detail?.stale)} onClick={() => decide(a.decision, a.needsNote)}>{a.label}</Button>)}
+          {(ACTIONS[c.effect] ?? []).map((a) => <Button key={a.decision} size="sm" variant={a.variant} disabled={busy || (a.decision === 'approve' && c.effect === 'held' && detail?.stale)} onClick={() => decide(a.decision, a.needsNote)}>{a.decision === 'approve' && c.effect === 'held' && future ? `Approve · schedules for ${day(dated!)}` : a.label}</Button>)}
         </div>
       ) : null}>
       {!detail && !err && <Skeleton variant="rect" height={220} />}
@@ -90,8 +108,14 @@ export function ChangeDrawer({ providerKey, providerName, changeId, onClose, onD
         <div className="space-y-5 text-[13px]">
           <p className="text-fg-tertiary">
             {detail.service ? `${detail.service.service_name} · ` : ''}submitted {new Date(c.submitted_at).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+            {dated ? ` · effective from ${day(dated)}` : ''}
             {c.status === 'under_review' ? ' · under review' : ''}
           </p>
+          {open && dated && (future ? left < 3 : true) && (
+            <Banner status="warning" title={future
+              ? `Less than 3 business days left. Approved after ${day(dated)}, the change applies from your approval, never backdated.`
+              : `The effective date has passed. Approved now, the change applies from your approval, never backdated.`} />
+          )}
           <p className="text-fg-secondary">{EFFECT_INFO[c.effect]}</p>
           {detail.stale && <Banner status="warning" title="The live value changed since this was submitted — approving would overwrite it. Reject with a note instead." />}
           {c.effect !== 'pause' ? (
@@ -115,7 +139,9 @@ export function ChangeDrawer({ providerKey, providerName, changeId, onClose, onD
             <p className="mt-1 text-fg-secondary">
               {c.effect === 'pause'
                 ? `${detail.upcoming_bookings} upcoming booking(s) with this provider. Affected users were told by email and see a notice on their appointment.`
-                : `${detail.upcoming_bookings} upcoming booking(s) keep their booked price (price snapshot). New users see the new value after approval.`}
+                : future && c.effect === 'held'
+                  ? `${detail.upcoming_bookings} upcoming booking(s) keep their booked price (price snapshot). Approved now, the new value is scheduled for ${day(dated!)}; until then users see the current value.`
+                  : `${detail.upcoming_bookings} upcoming booking(s) keep their booked price (price snapshot). New users see the new value after approval.`}
             </p>
           </div>
           {['submitted', 'under_review'].includes(c.status) && (

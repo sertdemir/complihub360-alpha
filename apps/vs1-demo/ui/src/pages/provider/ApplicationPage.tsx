@@ -7,6 +7,7 @@ import { Badge, type BadgeTone } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Checkbox } from '../../components/ui/Checkbox';
+import { Radio } from '../../components/ui/Radio';
 import { Banner } from '../../components/ui/Banner';
 import { Modal } from '../../components/ui/Modal';
 import { Tag } from '../../components/ui/Tag';
@@ -15,7 +16,7 @@ import { EmptyState } from '../../components/ui/EmptyState';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { ApiError, identityHintFrom } from '../../api/client';
 import {
-  acceptAgreement, checkVatRegistry, createService, fetchApplication, fetchChanges, patchApplication, previewService, putCoverage, removeService, saveService, submitApplication, uploadEvidence, withdrawChange,
+  acceptAgreement, checkVatRegistry, createService, fetchApplication, fetchChanges, isPendingChange, patchApplication, previewService, putCoverage, removeService, saveService, submitApplication, uploadEvidence, withdrawChange,
   type AgreementType, type Application, type ApplicationPatch, type ChangePreview, type ChecklistItem, type Evidence, type EvidenceType, type ProviderChange, type Service, type ServiceInput,
 } from '../../api/application';
 import { cn } from '../../lib/utils';
@@ -354,6 +355,17 @@ function useTermFormat() {
   };
 }
 
+/** Das "gilt ab"-Datum ist ein Tagesbeginn in UTC — in UTC lesen, sonst
+ *  rutscht es westlich von Greenwich auf den Vortag. */
+function effectiveDay(iso: string, locale: string): string {
+  if (!iso) return '';
+  return new Date(iso).toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' });
+}
+function effectiveLong(isoDay: string, locale: string): string {
+  return new Date(`${isoDay}T00:00:00Z`).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+}
+const isoDay = (d: Date) => d.toISOString().slice(0, 10);
+
 function ServiceCard({ service: s, changes, expanded, onToggle, onChanged }: { service: Service; changes: ProviderChange[]; expanded: boolean; onToggle: () => void; onChanged: () => Promise<void> | void }) {
   const { t, i18n } = useTranslation('providerws');
   const locale = i18n.resolvedLanguage || 'en';
@@ -367,34 +379,48 @@ function ServiceCard({ service: s, changes, expanded, onToggle, onChanged }: { s
   const remove = async () => { setBusy(true); try { await removeService(s.id); await onChanged(); } finally { setBusy(false); } };
   const Chevron = expanded ? ChevronDown : ChevronRight;
 
-  const pending = changes.find((c) => c.effect === 'held' && OPEN.has(c.status)) ?? null;
-  const pendingValue = (k: string) => (pending?.new_value && k in pending.new_value ? pending.new_value[k] : undefined);
+  // Offen am Feld (C V1): wartend, ggf. mit "gilt ab"-Datum, und eingeplant.
+  // Das letzte Speichern eines Feldes gewinnt auf dem Server — hoechstens
+  // ein offener Vorgang traegt ein Feld.
+  const pendingRows = changes.filter(isPendingChange);
+  const rowFor = (k: string) => pendingRows.find((c) => c.new_value && k in c.new_value) ?? null;
+  const waiting = pendingRows.find((c) => OPEN.has(c.status)) ?? null;
   // Die letzte Entscheidung, die der Partner lesen soll: abgelehnt oder Nachweis verlangt.
   const lastWord = changes.filter((c) => (c.status === 'rejected' || (c.status === 'under_review' && c.requires_reverification)) && c.reviewer_note)
     .sort((a, b) => String(b.reviewed_at ?? '').localeCompare(String(a.reviewed_at ?? '')))[0] ?? null;
   const fieldList = (c: ProviderChange) => (c.field_path ?? '').split(',').filter(Boolean).map((f) => t(`application.change.field.${f}`, { defaultValue: f })).join(', ');
-  const since = pending ? new Date(pending.submitted_at).toLocaleDateString(locale, { day: '2-digit', month: '2-digit' }) : '';
+  const pillOf = (c: ProviderChange): { tone: BadgeTone; text: string } => {
+    if (OPEN.has(c.status)) {
+      return { tone: 'warning', text: c.effective_at
+        ? t('application.change.pendingFrom', { date: effectiveDay(c.effective_at, locale) })
+        : t('application.change.pendingSince', { date: new Date(c.submitted_at).toLocaleDateString(locale, { day: '2-digit', month: '2-digit' }) }) };
+    }
+    // Eingeplant: vom Pruefteam freigegeben — oder ohne Pruefung, weil guenstiger.
+    return { tone: c.reviewed_at ? 'success' : 'info', text: t(c.reviewed_at ? 'application.change.approvedFrom' : 'application.change.plannedFrom', { date: effectiveDay(c.effective_at ?? '', locale) }) };
+  };
 
-  const withdraw = async () => {
-    if (!pending) return;
+  const withdraw = async (c: ProviderChange) => {
     setBusy(true);
-    try { await withdrawChange(pending.id); await onChanged(); } finally { setBusy(false); }
+    try { await withdrawChange(c.id); await onChanged(); } finally { setBusy(false); }
   };
 
   const priceLive = s.price_min != null || s.price_max != null ? `${fmt('price_min', s.price_min, s.currency)} – ${fmt('price_max', s.price_max, s.currency)}` : '—';
-  const pricePending = pendingValue('price_min') !== undefined || pendingValue('price_max') !== undefined
-    ? `${fmt('price_min', pendingValue('price_min') ?? s.price_min, s.currency)} – ${fmt('price_max', pendingValue('price_max') ?? s.price_max, s.currency)}` : null;
-  const otherPending = pending ? Object.keys(pending.new_value ?? {}).filter((k) => !TERMS.includes(k as TermKey)) : [];
+  const priceRows = pendingRows.filter((c) => c.new_value && ('price_min' in c.new_value || 'price_max' in c.new_value));
+  const rangeOf = (c: ProviderChange) => {
+    const nv = c.new_value ?? {};
+    return `${fmt('price_min', 'price_min' in nv ? nv.price_min : s.price_min, s.currency)} – ${fmt('price_max', 'price_max' in nv ? nv.price_max : s.price_max, s.currency)}`;
+  };
+  const otherPending = Array.from(new Set(pendingRows.flatMap((c) => Object.keys(c.new_value ?? {})).filter((k) => !TERMS.includes(k as TermKey))));
 
-  const Pending = ({ value }: { value: string | null }) => value == null ? null : (
+  const Pending = ({ row, value }: { row: ProviderChange | null; value: string | null }) => row == null || value == null ? null : (
     <span className="mt-1 flex flex-wrap items-center gap-2">
       <span className="font-semibold text-fg-brand">{value}</span>
-      <Badge tone="warning" size="sm">{t('application.change.pendingSince', { date: since })}</Badge>
+      <Badge tone={pillOf(row).tone} size="sm">{pillOf(row).text}</Badge>
     </span>
   );
   const term = (k: TermKey) => {
-    const p = pendingValue(k);
-    return { live: fmt(k, s[k], s.currency), pending: p === undefined ? null : fmt(k, p, s.currency) };
+    const row = rowFor(k);
+    return { live: fmt(k, s[k], s.currency), row, pending: row ? fmt(k, row.new_value![k], s.currency) : null };
   };
   const days = term('completion_days_estimate');
   const hours = term('response_time_hours');
@@ -406,7 +432,8 @@ function ServiceCard({ service: s, changes, expanded, onToggle, onChanged }: { s
         <span className="text-[14px] font-medium text-fg">{s.service_name}</span>
         <Tag tone="neutral">{s.service_code}</Tag>
         <span className="ml-auto flex items-center gap-3">
-          {pending && <Badge tone="warning" size="sm">{t('application.change.pendingShort')}</Badge>}
+          {waiting ? <Badge tone="warning" size="sm">{t('application.change.pendingShort')}</Badge>
+            : pendingRows.length > 0 && <Badge tone="info" size="sm">{t('application.change.plannedShort')}</Badge>}
           <Badge tone={SERVICE_TONE[s.status]} size="sm">{t(`application.services.status.${s.status}`)}</Badge>
           <span className="text-[12px] text-fg-tertiary">{t('application.services.countries', { count: s.coverage.length })}</span>
         </span>
@@ -414,24 +441,32 @@ function ServiceCard({ service: s, changes, expanded, onToggle, onChanged }: { s
       {expanded && (
         <div className="space-y-3 border-t border-stroke-subtle px-4 pb-4 pt-3">
           {editing ? (
-            <TermsEditor service={s} pending={pending} onDone={async (msg) => { setEditing(false); setNotice(msg); await onChanged(); }} onCancel={() => setEditing(false)} />
+            <TermsEditor service={s} pendingRows={pendingRows} onDone={async (msg) => { setEditing(false); setNotice(msg); await onChanged(); }} onCancel={() => setEditing(false)} />
           ) : (
             <>
               <div className="flex items-start gap-3">
                 <div className="grid flex-1 gap-3 text-[12px] text-fg-secondary md:grid-cols-[1.6fr_1fr_1fr_1fr]">
                   <div>
                     <span className="block text-fg-tertiary">{t('application.services.priceRange')}</span>
-                    <span>{priceLive}{pricePending && <span className="text-fg-tertiary"> · {t('application.change.live')}</span>}</span>
-                    <Pending value={pricePending} />
+                    <span>{priceLive}{priceRows.length > 0 && <span className="text-fg-tertiary"> · {t('application.change.live')}</span>}</span>
+                    {priceRows.map((c) => <Pending key={c.id} row={c} value={rangeOf(c)} />)}
                   </div>
-                  <div><span className="block text-fg-tertiary">{t('application.change.field.completion_days_estimate')}</span>{days.live}<Pending value={days.pending} /></div>
-                  <div><span className="block text-fg-tertiary">{t('application.services.responseTime')}</span>{hours.live}<Pending value={hours.pending} /></div>
+                  <div><span className="block text-fg-tertiary">{t('application.change.field.completion_days_estimate')}</span>{days.live}<Pending row={days.row} value={days.pending} /></div>
+                  <div><span className="block text-fg-tertiary">{t('application.services.responseTime')}</span>{hours.live}<Pending row={hours.row} value={hours.pending} /></div>
                   <div><span className="block text-fg-tertiary">{t('application.services.capacity')}</span>{s.capacity_status}</div>
                 </div>
                 {s.status !== 'retired' && <Button size="sm" variant="secondary" onClick={() => { setNotice(null); setEditing(true); }}>{t('application.change.edit')}</Button>}
               </div>
               {otherPending.length > 0 && <p className="text-[12px] text-fg-tertiary">{t('application.change.morePending', { fields: otherPending.map((f) => t(`application.change.field.${f}`, { defaultValue: f })).join(', ') })}</p>}
-              {pending && <button type="button" disabled={busy} onClick={withdraw} className="text-[12px] font-medium text-fg-brand underline underline-offset-2 hover:no-underline">{t('application.change.withdraw')}</button>}
+              {pendingRows.length > 0 && (
+                <div className="flex flex-wrap gap-x-4 gap-y-1">
+                  {pendingRows.map((c) => (
+                    <button key={c.id} type="button" disabled={busy} onClick={() => withdraw(c)} className="text-[12px] font-medium text-fg-brand underline underline-offset-2 hover:no-underline">
+                      {pendingRows.length === 1 ? t('application.change.withdraw') : t('application.change.withdrawFields', { fields: fieldList(c) })}
+                    </button>
+                  ))}
+                </div>
+              )}
               {notice && <p className="text-[12px] text-fg-secondary">{notice}</p>}
               {lastWord && (
                 <div className="rounded-md bg-surface-secondary px-3 py-2 text-[12.5px] text-fg-secondary">
@@ -468,33 +503,50 @@ function ServiceCard({ service: s, changes, expanded, onToggle, onChanged }: { s
   );
 }
 
-function TermsEditor({ service: s, pending, onDone, onCancel }: { service: Service; pending: ProviderChange | null; onDone: (notice: string) => void | Promise<void>; onCancel: () => void }) {
-  const { t } = useTranslation('providerws');
+function TermsEditor({ service: s, pendingRows, onDone, onCancel }: { service: Service; pendingRows: ProviderChange[]; onDone: (notice: string) => void | Promise<void>; onCancel: () => void }) {
+  const { t, i18n } = useTranslation('providerws');
+  const locale = i18n.resolvedLanguage || 'en';
   const fmt = useTermFormat();
+  const rowFor = (k: string) => pendingRows.find((c) => c.new_value && k in c.new_value) ?? null;
   const start = (k: TermKey) => {
-    const p = pending?.new_value && k in pending.new_value ? pending.new_value[k] : s[k];
+    const r = rowFor(k);
+    const p = r ? r.new_value![k] : s[k];
     return p == null ? '' : String(p);
   };
   const [form, setForm] = useState<Record<TermKey, string>>(() => Object.fromEntries(TERMS.map((k) => [k, start(k)])) as Record<TermKey, string>);
-  const [preview, setPreview] = useState<{ patch: Partial<ServiceInput>; result: ChangePreview } | null>(null);
+  // B V1: "Ab sofort" ist der Normalfall; ein offenes Datum ist vorbelegt.
+  const startDate = pendingRows.find((c) => c.effective_at)?.effective_at?.slice(0, 10) ?? '';
+  const [mode, setMode] = useState<'now' | 'date'>(startDate ? 'date' : 'now');
+  const [date, setDate] = useState(startDate);
+  const [preview, setPreview] = useState<{ patch: Partial<ServiceInput>; at: string | null; result: ChangePreview } | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const tomorrow = isoDay(new Date(Date.now() + 86400_000));
+  const lastDay = isoDay(new Date(Date.now() + 365 * 86400_000));
+  const at = mode === 'date' ? date : null;
+  const dateInvalid = mode === 'date' && !(date >= tomorrow && date <= lastDay);
 
-  // Nur geaenderte Felder — gemessen am vorbelegten Wert, nicht am Live-Wert.
+  // Nur geaenderte Felder — gemessen am vorbelegten Wert. Aendert sich nur
+  // der Zeitpunkt, gehen die offenen Werte mit dem neuen Datum erneut hinaus.
   const dirty = (): Partial<ServiceInput> => {
     const out: Record<string, number | null> = {};
-    for (const k of TERMS) if (form[k] !== start(k)) out[k] = form[k].trim() === '' ? null : Number(form[k]);
+    const timing = (at ?? '') !== startDate;
+    for (const k of TERMS) {
+      const changed = form[k] !== start(k) || (timing && rowFor(k) != null);
+      if (changed) out[k] = form[k].trim() === '' ? null : Number(form[k]);
+    }
     return out as Partial<ServiceInput>;
   };
-  const invalid = TERMS.some((k) => form[k].trim() !== '' && !(Number(form[k]) >= 0));
+  const invalid = TERMS.some((k) => form[k].trim() !== '' && !(Number(form[k]) >= 0)) || dateInvalid;
 
   const next = async () => {
     const patch = dirty();
     if (!Object.keys(patch).length) { onCancel(); return; }
     setBusy(true); setErr(null);
     try {
-      const result = await previewService(s.id, patch);
-      if (result.held.length) setPreview({ patch, result });
+      const result = await previewService(s.id, patch, undefined, at);
+      // Mit Datum immer die Zusammenfassung: sie nennt, was ab wann gilt.
+      if (result.held.length || at) setPreview({ patch, at, result });
       else { await saveService(s.id, patch); await onDone(t('application.change.saved')); }
     } catch (e) { setErr(identityHintFrom(e, t) ?? (e instanceof Error ? e.message : t('application.saveError'))); }
     finally { setBusy(false); }
@@ -502,13 +554,18 @@ function TermsEditor({ service: s, pending, onDone, onCancel }: { service: Servi
   const send = async () => {
     if (!preview) return;
     setBusy(true); setErr(null);
-    try { await saveService(s.id, preview.patch); await onDone(t('application.change.sent')); }
+    try {
+      await saveService(s.id, preview.patch, undefined, preview.at);
+      await onDone(preview.at ? t('application.change.sentDated', { date: effectiveLong(preview.at, locale) }) : t('application.change.sent'));
+    }
     catch (e) { setErr(e instanceof Error ? e.message : t('application.saveError')); }
     finally { setBusy(false); }
   };
 
   if (preview) {
     const { held, review, instant } = preview.result;
+    const scheduled = preview.result.scheduled ?? [];
+    const when = preview.at ? effectiveLong(preview.at, locale) : null;
     const now = [...review, ...instant.filter((k) => !review.some((f) => f.field === k)).map((k) => ({ field: k, old: (s as unknown as Record<string, unknown>)[k], new: (preview.patch as Record<string, unknown>)[k], change_type: '' }))];
     const Line = ({ f }: { f: { field: string; old: unknown; new: unknown } }) => (
       <div className="grid grid-cols-[120px_1fr] items-baseline gap-2 text-[13px]">
@@ -516,20 +573,19 @@ function TermsEditor({ service: s, pending, onDone, onCancel }: { service: Servi
         <span><span className="text-fg-tertiary line-through">{fmt(f.field, f.old, s.currency)}</span> → <span className="font-semibold text-fg-brand">{fmt(f.field, f.new, s.currency)}</span></span>
       </div>
     );
+    const Group = ({ title, rows }: { title: string; rows: Array<{ field: string; old: unknown; new: unknown }> }) => rows.length === 0 ? null : (
+      <div className="space-y-1.5 rounded-md bg-surface-secondary px-3 py-2.5">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{title}</p>
+        {rows.map((f) => <Line key={f.field} f={f} />)}
+      </div>
+    );
     return (
       <div className="space-y-3 rounded-lg border border-stroke-brand p-4" role="region" aria-label={t('application.change.summaryTitle')}>
         <p className="text-[15px] font-semibold text-fg">{t('application.change.summaryTitle')}</p>
-        <div className="space-y-1.5 rounded-md bg-surface-secondary px-3 py-2.5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{t('application.change.groupHeld')}</p>
-          {held.map((f) => <Line key={f.field} f={f} />)}
-        </div>
-        {now.length > 0 && (
-          <div className="space-y-1.5 rounded-md bg-surface-secondary px-3 py-2.5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{t('application.change.groupInstant')}</p>
-            {now.map((f) => <Line key={f.field} f={f} />)}
-          </div>
-        )}
-        <p className="text-[12.5px] text-fg-secondary">{t('application.change.summaryNote')}</p>
+        <Group title={when ? t('application.change.groupHeldDated', { date: when }) : t('application.change.groupHeld')} rows={held} />
+        {when && <Group title={t('application.change.groupScheduled', { date: when })} rows={scheduled} />}
+        <Group title={t('application.change.groupInstant')} rows={now} />
+        <p className="text-[12.5px] text-fg-secondary">{when ? t('application.change.summaryNoteDated', { date: when }) : t('application.change.summaryNote')}</p>
         {err && <p className="text-[12px] text-error-500">{err}</p>}
         <div className="flex gap-2">
           <Button size="sm" disabled={busy} onClick={send}>{t('application.change.send')}</Button>
@@ -544,6 +600,23 @@ function TermsEditor({ service: s, pending, onDone, onCancel }: { service: Servi
   return (
     <div className="space-y-3 rounded-lg border border-stroke p-4">
       <p className="text-[13px] font-semibold text-fg">{t('application.change.edit')}</p>
+      <fieldset className="space-y-2">
+        <legend className="text-[12px] font-medium text-fg-secondary">{t('application.change.whenLabel')}</legend>
+        <div className="flex flex-wrap gap-5">
+          {(['now', 'date'] as const).map((m) => (
+            <Radio key={m} size="sm" name={`when-${s.id}`} checked={mode === m} onChange={() => setMode(m)}
+              label={t(m === 'now' ? 'application.change.whenNow' : 'application.change.whenDate')} />
+          ))}
+        </div>
+        {mode === 'date' && (
+          <div className="space-y-1">
+            <FormField label={t('application.change.dateLabel')}>
+              <Input inputSize="sm" type="date" min={tomorrow} max={lastDay} value={date} onChange={(e) => setDate(e.target.value)} className="w-[200px]" />
+            </FormField>
+            <p className={`text-[11.5px] ${dateInvalid && date ? 'text-error-500' : 'text-fg-tertiary'}`}>{dateInvalid && date ? t('application.change.dateInvalid') : t('application.change.dateHint')}</p>
+          </div>
+        )}
+      </fieldset>
       <div className="grid gap-3 md:grid-cols-4">
         {TERMS.map((k) => (
           <FormField key={k} label={label(k)}>

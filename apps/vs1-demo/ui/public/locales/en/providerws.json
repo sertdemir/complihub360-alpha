@@ -752,7 +752,22 @@
         "uses_subcontractors": "Subcontractors",
         "service_name": "Service name",
         "description": "Description"
-      }
+      },
+      "whenLabel": "When does the change apply?",
+      "whenNow": "Right away",
+      "whenDate": "From a date",
+      "dateLabel": "Applies from",
+      "dateHint": "From tomorrow, at most one year ahead. If we approve it after that date, it applies from the approval.",
+      "dateInvalid": "Please choose a date from tomorrow, at most one year ahead.",
+      "groupHeldDated": "Visible after review, from {{date}}",
+      "groupScheduled": "Visible without review, from {{date}}",
+      "summaryNoteDated": "Until {{date}}, businesses see your current terms. Booked appointments keep their price.",
+      "sentDated": "Sent. The change applies from {{date}}, after our review where needed.",
+      "pendingFrom": "in review · from {{date}}",
+      "approvedFrom": "approved, from {{date}}",
+      "plannedFrom": "scheduled from {{date}}",
+      "plannedShort": "Change scheduled",
+      "withdrawFields": "Withdraw: {{fields}}"
     }
   },
   "verification": {

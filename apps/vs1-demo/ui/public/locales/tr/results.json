@@ -161,7 +161,8 @@
     "toAppointments": "Randevularınıza gidin",
     "bookAnother": "Başka bir randevu alın",
     "revealedTitle": "Ad ve iletişim bilgileri görünür.",
-    "revealedBody": "Rezervasyonunuzdan bu yana bu sağlayıcının kim olduğunu görebilirsiniz."
+    "revealedBody": "Rezervasyonunuzdan bu yana bu sağlayıcının kim olduğunu görebilirsiniz.",
+    "plannedPrice": "{{date}} tarihinden itibaren: {{service}} {{price}}. Bu tarihten önceki rezervasyonlarda bugünkü fiyat geçerlidir."
   },
   "schedule": {
     "back": "Profile dön",

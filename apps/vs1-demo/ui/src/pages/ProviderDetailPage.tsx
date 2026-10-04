@@ -586,8 +586,14 @@ function Dossier({ p, ctx, covered }: { p: ProviderDetail; ctx: ProviderContext 
 // welches Paket passt, ergibt sich aus dem Gespraech, nicht aus einer
 // Ableitung, die wir nicht belegen koennen.
 function Packages({ p }: { p: ProviderDetail }) {
-  const { t } = useTranslation('results');
+  const { t, i18n } = useTranslation('results');
+  const locale = i18n.resolvedLanguage || 'en';
   const rows = p.pricing_table ?? [];
+  // D V2 (04.10.2026): eine freigegebene, geplante Preisaenderung steht hier —
+  // klein, ohne Farbe, ohne Countdown, fuer Erhoehung und Senkung gleich.
+  // Information, keine Verkaufstaktik: kein "jetzt buchen".
+  const planned = p.planned_prices ?? [];
+  const money = (v: number | null, cur: string | null) => v == null ? '—' : new Intl.NumberFormat(locale, { style: 'currency', currency: cur || 'EUR', maximumFractionDigits: 0 }).format(v);
   return (
     <section>
       <h2 className="mb-1 text-body-md font-bold text-fg">{t('detail.pricingTitle')}</h2>
@@ -608,6 +614,15 @@ function Packages({ p }: { p: ProviderDetail }) {
           ))}
         </div>
       )}
+      {planned.map((x) => (
+        <p key={`${x.service_name}-${x.effective_at}`} className="mt-3 text-body-3xs text-fg-tertiary">
+          {t('detail.plannedPrice', {
+            date: new Date(x.effective_at).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }),
+            service: x.service_name,
+            price: x.price_min != null && x.price_max != null ? `${money(x.price_min, x.currency)}–${money(x.price_max, x.currency)}` : money(x.price_min ?? x.price_max, x.currency),
+          })}
+        </p>
+      ))}
     </section>
   );
 }

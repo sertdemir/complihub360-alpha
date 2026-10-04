@@ -2669,6 +2669,161 @@ describe('Change-Control fuer aktive Partner (§18–20)', () => {
         expect((await api(`/api/v1/admin/review/neue-kanzlei/change/${id}`, { auth: 'jwt' })).status).toBe(403);
         expect((await api(`/api/v1/admin/review/neue-kanzlei/change/${id}`, { method: 'POST', auth: 'jwt', body: JSON.stringify({ decision: 'approve' }) })).status).toBe(403);
     });
+
+    describe('„Gilt ab": geplante Konditionen (A V2, E V2, D V2)', () => {
+        const inDays = (n: number) => new Date(Date.now() + n * 86400_000).toISOString().slice(0, 10);
+        const ab = inDays(30);
+        const decide = (id: string, body: Record<string, unknown>) =>
+            adminApi(`/api/v1/admin/review/neue-kanzlei/change/${id}`, { method: 'POST', body: JSON.stringify(body) });
+        const tick = async (shadow = false) => {
+            process.env.WATCHERS_SHADOW = shadow ? 'true' : 'false';
+            try { return await api('/api/v1/admin/watchers/tick', { method: 'POST', body: '{}' }); } finally { delete process.env.WATCHERS_SHADOW; }
+        };
+
+        it('weist ein Datum heute, in der Vergangenheit, zu weit voraus oder ohne Change-Control ab', async () => {
+            const svc = seedActivePartner();
+            for (const [d, reason] of [[inDays(0), 'past'], [inDays(-3), 'past'], ['01.01.2027', 'format'], [inDays(400), 'too_far']] as const) {
+                const r = await own(`/services/${svc.id}`, { method: 'PATCH', body: JSON.stringify({ price_max: 2600, effective_at: d }) });
+                expect(r.status).toBe(400);
+                expect(r.body).toMatchObject({ errorCode: 'EFFECTIVE_DATE_INVALID', reason });
+            }
+            svc.status = 'pending_verification';
+            const offen = await own(`/services/${svc.id}`, { method: 'PATCH', body: JSON.stringify({ price_max: 2600, effective_at: ab }) });
+            expect(offen.status).toBe(422);
+            expect(changes()).toHaveLength(0);
+        });
+
+        it('in beide Richtungen: Erhoehung wartet mit Datum, Senkung ist ohne Pruefung geplant — nichts geht sofort live', async () => {
+            const svc = seedActivePartner();
+            const probe = await own(`/services/${svc.id}`, { method: 'PATCH', body: JSON.stringify({ price_min: 1000, price_max: 2600, effective_at: ab, dry_run: true }) });
+            expect(probe.body).toMatchObject({ instant: [], held: [{ field: 'price_max' }], scheduled: [{ field: 'price_min' }], effective_at: `${ab}T00:00:00.000Z` });
+            expect(changes()).toHaveLength(0);
+
+            const r = await own(`/services/${svc.id}`, { method: 'PATCH', body: JSON.stringify({ price_min: 1000, price_max: 2600, effective_at: ab }) });
+            expect(r.status).toBe(200);
+            expect(r.body).toMatchObject({ updated: [], held: ['price_max'], scheduled: ['price_min'] });
+            expect(svc).toMatchObject({ price_min: 1200, price_max: 2400 });
+            const held = changes().find((c) => c.status === 'submitted');
+            const plan = changes().find((c) => c.status === 'approved');
+            expect(held).toMatchObject({ effect: 'held', field_path: 'price_max', effective_at: `${ab}T00:00:00.000Z` });
+            expect(plan).toMatchObject({ effect: 'held', field_path: 'price_min', applied_at: null, effective_at: `${ab}T00:00:00.000Z` });
+            expect(plan.reviewed_at ?? null).toBeNull();
+            // Queue: das Datum ist die Frist; das ungepruefte Geplante steht nicht darin.
+            const q = await adminApi('/api/v1/admin/review/queue');
+            const rows = q.body.rows.filter((x: any) => x.kind === 'change_request');
+            expect(rows.map((x: any) => [x.ref_id, x.due_at])).toEqual([[held.id, held.effective_at]]);
+        });
+
+        it('Freigabe vor dem Datum plant ein und nennt das Datum in der Mail; der Waechter uebernimmt am Datum', async () => {
+            const svc = seedActivePartner();
+            await own(`/services/${svc.id}`, { method: 'PATCH', body: JSON.stringify({ price_max: 2600, effective_at: ab }) });
+            const c = changes()[0];
+            const ok = await decide(c.id, { decision: 'approve' });
+            expect(ok.status).toBe(200);
+            expect(ok.body.scheduled_for).toBe(c.effective_at);
+            expect(c).toMatchObject({ status: 'approved', applied_at: null });
+            expect(svc.price_max).toBe(2400);
+            const mail = db.event_log.find((e) => e.type === 'email_outbox' && e.payload.kind === 'change_approved_scheduled');
+            expect(mail.payload.subject).toContain(ab.slice(0, 4));
+
+            // Noch nicht faellig: der Lauf laesst den Vorgang stehen.
+            expect((await tick()).body.summary.scheduledChangesApplied).toBe(0);
+            // Faellig — Shadow zaehlt nur.
+            c.effective_at = new Date(Date.now() - 60_000).toISOString();
+            expect((await tick(true)).body.summary.scheduledChangesApplied).toBe(1);
+            expect(svc.price_max).toBe(2400);
+            const live = await tick();
+            expect(live.body.summary).toMatchObject({ scheduledChangesApplied: 1, scheduledChangesStale: 0 });
+            expect(svc.price_max).toBe(2600);
+            expect(c).toMatchObject({ status: 'applied', applied_at: expect.any(String) });
+            // Geprueft war er schon — kein Folgevorgang.
+            expect(changes()).toHaveLength(1);
+        });
+
+        it('eine geplante Senkung wird am Datum uebernommen und dann wie jede Senkung nachgeprueft', async () => {
+            const svc = seedActivePartner();
+            await own(`/services/${svc.id}`, { method: 'PATCH', body: JSON.stringify({ price_min: 1000, effective_at: ab }) });
+            const plan = changes()[0];
+            plan.effective_at = new Date(Date.now() - 60_000).toISOString();
+            await tick();
+            expect(svc.price_min).toBe(1000);
+            expect(plan.status).toBe('applied');
+            expect(changes().find((c) => c.effect === 'applied')).toMatchObject({ status: 'submitted', field_path: 'price_min', old_value: { price_min: 1200 }, new_value: { price_min: 1000 } });
+        });
+
+        it('ueberholt am Datum: nichts wird ueberschrieben, der Vorgang geht zurueck in die Pruefung', async () => {
+            const svc = seedActivePartner();
+            await own(`/services/${svc.id}`, { method: 'PATCH', body: JSON.stringify({ price_max: 2600, effective_at: ab }) });
+            const c = changes()[0];
+            await decide(c.id, { decision: 'approve' });
+            svc.price_max = 2500;
+            c.effective_at = new Date(Date.now() - 60_000).toISOString();
+            expect((await tick()).body.summary.scheduledChangesStale).toBe(1);
+            expect(svc.price_max).toBe(2500);
+            expect(c.status).toBe('under_review');
+        });
+
+        it('Freigabe nach dem Datum gilt ab der Freigabe, nie rueckwirkend', async () => {
+            const svc = seedActivePartner();
+            await own(`/services/${svc.id}`, { method: 'PATCH', body: JSON.stringify({ price_max: 2600, effective_at: ab }) });
+            const c = changes()[0];
+            c.effective_at = new Date(Date.now() - 86400_000).toISOString();
+            const before = Date.now();
+            await decide(c.id, { decision: 'approve' });
+            expect(svc.price_max).toBe(2600);
+            expect(c.status).toBe('applied');
+            expect(new Date(c.effective_at).getTime()).toBeGreaterThanOrEqual(before - 1000);
+            expect(db.event_log.some((e) => e.payload?.kind === 'change_approved')).toBe(true);
+        });
+
+        it('der Partner zieht eine geplante Aenderung bis zum Datum zurueck', async () => {
+            const svc = seedActivePartner();
+            await own(`/services/${svc.id}`, { method: 'PATCH', body: JSON.stringify({ price_max: 2600, effective_at: ab }) });
+            const c = changes()[0];
+            await decide(c.id, { decision: 'approve' });
+            expect((await own(`/changes/${c.id}`, { method: 'DELETE' })).status).toBe(200);
+            expect(c.status).toBe('withdrawn');
+            await tick();
+            expect(svc.price_max).toBe(2400);
+        });
+
+        it('das letzte Speichern eines Feldes gewinnt — ein ueberholter geplanter Wert faellt heraus', async () => {
+            const svc = seedActivePartner();
+            await own(`/services/${svc.id}`, { method: 'PATCH', body: JSON.stringify({ price_min: 1000, completion_days_estimate: 10, effective_at: ab }) });
+            const plan = changes()[0];
+            // Jetzt sofort: 1100 statt 1000 ab Datum.
+            await own(`/services/${svc.id}`, { method: 'PATCH', body: JSON.stringify({ price_min: 1100 }) });
+            expect(svc.price_min).toBe(1100);
+            expect(plan).toMatchObject({ status: 'approved', field_path: 'completion_days_estimate', new_value: { completion_days_estimate: 10 } });
+            await own(`/services/${svc.id}`, { method: 'PATCH', body: JSON.stringify({ completion_days_estimate: 12 }) });
+            expect(plan.status).toBe('withdrawn');
+        });
+
+        it('ein neues Datum ersetzt das alte; „ab sofort" nimmt es weg', async () => {
+            const svc = seedActivePartner();
+            await own(`/services/${svc.id}`, { method: 'PATCH', body: JSON.stringify({ price_max: 2600, effective_at: ab }) });
+            await own(`/services/${svc.id}`, { method: 'PATCH', body: JSON.stringify({ price_max: 2700, effective_at: inDays(60) }) });
+            const held = changes().filter((c) => c.status === 'submitted');
+            expect(held).toHaveLength(1);
+            expect(held[0]).toMatchObject({ new_value: { price_max: 2700 }, effective_at: `${inDays(60)}T00:00:00.000Z` });
+            await own(`/services/${svc.id}`, { method: 'PATCH', body: JSON.stringify({ price_max: 2700 }) });
+            await own(`/services/${svc.id}`, { method: 'PATCH', body: JSON.stringify({ price_max: 2650 }) });
+            expect(held[0]).toMatchObject({ new_value: { price_max: 2650 }, effective_at: null });
+        });
+
+        it('Nutzer sehen nur Freigegebenes, neutral in der Detailansicht', async () => {
+            const svc = seedActivePartner();
+            db.providers[0].countries_supported = ['DE'];
+            (db.matchable_provider_services ??= []).push({ service_id: svc.id, provider_key: 'neue-kanzlei', service_code: 'tax-vat', service_name: 'USt-Registrierung', area_code: 'tax-vat', country_code: 'DE', price_min: 1200, price_max: 2400, currency: 'EUR', provider_availability: 'available', bookable_chargeable: true, provider_lifecycle_status: 'active' });
+            await own(`/services/${svc.id}`, { method: 'PATCH', body: JSON.stringify({ price_max: 2600, effective_at: ab }) });
+            const vorher = await api(`/api/v1/p/${refOf('neue-kanzlei')}/detail`, { auth: 'jwt' });
+            expect(vorher.status).toBe(200);
+            expect(vorher.body.detail.planned_prices).toEqual([]);
+            await decide(changes()[0].id, { decision: 'approve' });
+            const nachher = await api(`/api/v1/p/${refOf('neue-kanzlei')}/detail`, { auth: 'jwt' });
+            expect(nachher.body.detail.planned_prices).toEqual([{ service_name: 'USt-Registrierung', effective_at: `${ab}T00:00:00.000Z`, currency: 'EUR', price_min: 1200, price_max: 2600 }]);
+        });
+    });
 });
 
 describe('Watcher: Nachweis-Ablauf', () => {

@@ -26,6 +26,7 @@ import { handleProviderApplication } from "./providerApplication.js";
 import { handleSubscriptionGet, handleSubscriptionSelect, handleAdminSubscription } from "./subscriptions.js";
 import { handleProviderReview } from "./providerReview.js";
 import { bookingAffected, pausedAreasByProvider, requestOf } from "./changeImpact.js";
+import { plannedPrices } from "./changeSchedule.js";
 import { redactText } from "@complihub360/redaction";
 import {
     loadVisibility, maskIdentity, publicTitle, rankBasis, requiredFor, scanFields, serializeProvider, verificationDepth,
@@ -938,6 +939,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                             avg_response_hours: p.avg_response_hours, confirmation_rate: p.confirmation_rate,
                             rating: ratingFromBookings, reviews_count: usableReviews.length,
                         }),
+                        // "Gilt ab" (D V2): freigegebene, geplante Preise —
+                        // neutral angezeigt, in beide Richtungen.
+                        planned_prices: await plannedPrices(providerKey, view),
                     },
                     detail_open_charged: charged,
                     correlationId,

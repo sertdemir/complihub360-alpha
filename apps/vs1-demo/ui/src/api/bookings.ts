@@ -189,6 +189,8 @@ export interface ProviderDetail {
   avg_response_hours: number | null;
   billing_model: 'abo' | 'hourly' | 'project' | 'mixed';
   pricing_table: Array<{ service: string; price: string }> | null;
+  /** Freigegebene, geplante Preise („gilt ab", D V2) — neutral, in beide Richtungen. */
+  planned_prices?: Array<{ service_name: string; effective_at: string; currency: string | null; price_min: number | null; price_max: number | null }>;
   is_verified: boolean;
   availability: 'available' | 'ooo';
   /** false = es kann nicht gebucht werden; die Seite zeigt dann keinen Knopf
