@@ -861,6 +861,28 @@ describe('Anbieterseite: Lead-Karte, Selbstauskunft, Zahlungsbereitschaft (Phase
         expect(r2.body.readiness).toMatchObject({ ready: true, reasons: [] });
     });
 
+    it('kennt Stripe den gespeicherten Kunden nicht, raeumt der Sync die Kennung weg statt 502 zu antworten', async () => {
+        seedProvider({ stripe_customer_id: 'cus_veraltet', billing_ready: false, billing_block_reasons: [] });
+        seedPricing(); seedSubscription('test-kanzlei', 'growth');
+        const { StripeError } = await import('../stripe.js');
+        stripeMock.getCustomerBilling.mockRejectedValue(new StripeError('customers/cus_veraltet', 404, { error: { message: "No such customer: 'cus_veraltet'", code: 'resource_missing', type: 'invalid_request_error' } }));
+        const r = await api('/api/v1/provider/test-kanzlei/billing/sync', { method: 'POST', auth: 'key', body: '{}' });
+        expect(r.status).toBe(200);
+        expect(r.body.readiness.ready).toBe(false);
+        expect(r.body.readiness.reasons).toContain('no_payment_method');
+        expect(db.providers[0].stripe_customer_id).toBeNull();
+        expect(db.event_log.map((e) => e.type)).toContain('stripe_customer_missing');
+    });
+
+    it('andere Stripe-Fehler bleiben 502 — ein Netzfehler loescht keine Kundenkennung', async () => {
+        seedProvider({ stripe_customer_id: 'cus_test' });
+        const { StripeError } = await import('../stripe.js');
+        stripeMock.getCustomerBilling.mockRejectedValue(new StripeError('customers/cus_test', 500, { error: { message: 'boom', type: 'api_error' } }));
+        const r = await api('/api/v1/provider/test-kanzlei/billing/sync', { method: 'POST', auth: 'key', body: '{}' });
+        expect(r.status).toBe(502);
+        expect(db.providers[0].stripe_customer_id).toBe('cus_test');
+    });
+
     it('ohne Stripe-Schluessel antwortet der Sync 503, und der Watcher ueberspringt ihn', async () => {
         seedProvider({ stripe_customer_id: 'cus_test' });
         stripeMock.configured = false;
