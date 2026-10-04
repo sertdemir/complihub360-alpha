@@ -17,7 +17,7 @@ import { checkMarketRequest } from "./marketRequests.js";
 import { notify, handleNotificationsList, handleNotificationsRead } from "./notifications.js";
 import { handleBillingRun, handleBillingPreview, syncOpenInvoices, loadPricingConfig, getActiveSubscription, getDiscountCounter, cycleStartFor, quoteLeadFee, resolveLedgerStatus } from "./billing.js";
 import { SHARED_FIELDS_V1, currentAcknowledgement, deriveOpportunity, priceSnapshotFrom, chargeLeadFee, recordPaymentFailure, syncBillingReadiness } from "./leadCharge.js";
-import { ensureStripeCustomer, isStripeConfigured, stripeRequest, getCustomerBilling, refundPaymentIntent } from "./stripe.js";
+import { ensureStripeCustomer, isStripeConfigured, stripeRequest, getCustomerBilling, refundPaymentIntent, StripeError } from "./stripe.js";
 import { checkVatId } from "./vies.js";
 import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
 import { buildCockpit } from "./cockpit.js";
@@ -1203,8 +1203,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             }
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, readiness: { ready: r.ready, reasons: r.reasons, synced_at: r.syncedAt, payment_method: r.paymentMethodLabel, changed: r.changed }, correlationId }));
-        } catch {
-            structuredLog('error', 'Billing sync failed', { correlationId, errorCode: 'ERR_BILLING_SYNC', severity: 'error', route: req.url });
+        } catch (err) {
+            // Die Stripe-Meldung gehoert ins Log, nicht auf den Draht: ein
+            // fehlendes Recht am Restricted Key (permission_error) ist sonst
+            // von einem Netzfehler nicht zu unterscheiden (Befund 2026-10-04).
+            const detail = err instanceof StripeError ? { stripeStatus: err.status, stripeCode: err.code, stripeType: err.type, detail: err.message } : { detail: err instanceof Error ? err.message : String(err) };
+            structuredLog('error', 'Billing sync failed', { correlationId, errorCode: 'ERR_BILLING_SYNC', severity: 'error', route: req.url, ...detail });
             res.writeHead(502, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'STRIPE_ERROR', message: 'Stripe request failed', correlationId }));
         }
