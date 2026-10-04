@@ -1,7 +1,7 @@
 ---
 title: "Change-Control für aktive Partner (Spec A §18–20, §28)"
 assignee: "Claude"
-status: "doing"
+status: "done"
 ---
 
 # Change-Control für aktive Partner
@@ -12,8 +12,11 @@ Partners sofort live, auch Preise. Rechtsform und Vertretung landeten nur im
 Protokoll (`legal_fields_changed`).
 
 Canvas mit Regelwerk (A) und den Flächen B–F, je drei Varianten:
-https://claude.ai/artifact/RkuJJ8vdULp8EBHEyRKkhd. Die Wahl des Nutzers steht
-noch aus.
+https://claude.ai/artifact/RkuJJ8vdULp8EBHEyRKkhd. Wahl des Nutzers
+(2026-10-01): A V3 · B V2 · C V1 · D V2 · E V1 · F V1.
+
+> Nummer: zuerst als TKT-PROV-07 angelegt, parallel zu
+> `TKT-PROV-07-ein-abo-kann-entstehen` (#240). Umbenannt in TKT-PROV-08.
 
 ## Teil 1: Backend (in diesem Ticket, unabhängig von der Wahl)
 
@@ -68,3 +71,10 @@ Antworttexte.
 - `compliance-api`: 343 Tests, davon 13 Unit-Tests `changeControl.test.ts` und 10 Ablauf-Tests plus 3 Ownership-Fälle in `api.test.ts`.
 - `npm run db:test`: 11 Dateien, 176 Tests, davon 12 neu in `10_change_control_test.sql`.
 - `tsc` compliance-api grün.
+
+## Abschluss
+
+- Gemergt mit PR #242 (Squash `4b7f8983`), nach dem Review der lokalen Screenshots.
+- Migration `20261002000000_change_control.sql` am 2026-10-04 per Supabase-MCP auf Staging eingespielt (Ledger-Name `change_control`). Die Tabelle war leer, also gab es keine Bestandsdaten.
+- Die Oberflächen B–F sind gebaut, ebenso die Mails an Partner und Nutzer. Die Figma-Sektion „Change-Control · Canvas-Wahl 01.10.2026“ liegt im Screens-File.
+- Weiter offen: ein „gilt ab“-Datum für geplante Änderungen, der Kontinuitätsprozess mit Alternativ-Anbieter (§19) und das Compass-Label von Radio und Checkbox, das fest auf 70 px gekürzt wird.

@@ -778,7 +778,7 @@ function p2Gate() {
   return { ok: false, missing: ['evidence.insurance', 'evidence.representative_identity'], target: 'limited', approved_cells: 1, total_cells: 4, allowance: null,
     billing: { ready: false, blocks_chargeable_booking: ['not_ready', 'no_payment_method'] } };
 }
-// ─── Change-Control (TKT-PROV-07, Canvas-Wahl 01.10.2026) ────────────────────
+// ─── Change-Control (TKT-PROV-08, Canvas-Wahl 01.10.2026) ────────────────────
 // Schmidt & Partner hat eine Preiserhoehung beim Datenschutz-Paket in Pruefung
 // (C V1) und eine abgelehnte Aenderung der Ausschluesse bei EPR. Studio
 // Bianchi hat eine eingeschraenkte Zulassung gemeldet (Pause, E V1).
