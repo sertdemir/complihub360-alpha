@@ -15,11 +15,12 @@ import {
   ChevronRight,
   ArrowRight,
   Leaf,
+  type LucideIcon,
 } from 'lucide-react';
 import { Container } from '../ui/Container';
 import { Button } from '../ui/Button';
 import { SectionEyebrow, GoldWord, Reveal } from '../providers/SectionHeading';
-import { DOMAINS } from '../../lib/domains';
+import { DOMAINS, type DomainSlug } from '../../lib/domains';
 import { useInViewOnce } from '../../lib/useInViewOnce';
 
 // ─── S4 — The domain atlas (canvas "Was wir wissen" · Atlas, 2026-08-25) ─────
@@ -40,18 +41,21 @@ import { useInViewOnce } from '../../lib/useInViewOnce';
 // All copy lives in the 'home' namespace under domains.* — same keys as
 // DomainsKnows, nothing moved.
 
-// One icon per canonical domain, order = lib/domains.ts (drives the rail).
-const DOMAIN_ICONS = [
-  BarChart3,     // Tax & VAT
-  Package,       // EPR & Packaging
-  Lock,          // Data & Privacy
-  MessageSquare, // Marketing Compliance
-  Building2,     // Corporate & Structure
-  ShieldCheck,   // Product Compliance
-  Truck,         // Logistics & Customs
-  Scale,         // Legal Advisory
-  Leaf,          // Environmental Compliance (neunte Domaene seit 2026-09-18)
-] as const;
+// One icon per canonical domain. Keyed by slug and typed as a complete
+// Record<DomainSlug, …>: adding a domain to lib/domains.ts makes this fail to
+// compile until its icon is here. Am 18.09. blieb die frühere Array-Fassung
+// stumm bei acht, als die neunte Domäne dazukam (PR #252).
+const DOMAIN_ICONS: Record<DomainSlug, LucideIcon> = {
+  'tax-vat': BarChart3,
+  'product-packaging': Package,
+  'data-privacy': Lock,
+  'marketing-seo': MessageSquare,
+  'corporate-structure': Building2,
+  'product-compliance': ShieldCheck,
+  'logistics-customs': Truck,
+  'legal-advisory': Scale,
+  'environment': Leaf,
+};
 const COVER_COUNT = 6;
 const CYCLE_MS = 6000;
 
@@ -93,11 +97,12 @@ export function DomainsAtlas() {
             whileInView="show"
             viewport={{ once: true, margin: '-80px' }}
           >
-            {DOMAIN_ICONS.map((Icon, i) => {
+            {DOMAINS.map((domain, i) => {
+              const Icon = DOMAIN_ICONS[domain.slug];
               const isActive = i === active;
               return (
                 <motion.button
-                  key={i}
+                  key={domain.slug}
                   type="button"
                   layout
                   onClick={() => {
@@ -154,7 +159,7 @@ export function DomainsAtlas() {
                     </p>
                   </div>
                   {(() => {
-                    const ActiveIcon = DOMAIN_ICONS[active];
+                    const ActiveIcon = DOMAIN_ICONS[DOMAINS[active].slug];
                     return <ActiveIcon size={52} strokeWidth={1.5} className="shrink-0 text-fg-brand" />;
                   })()}
                 </div>
