@@ -297,8 +297,8 @@ describe('ResultsRiskMap while loading and on failure', () => {
 
     expect(await screen.findByText('VAT return')).toBeInTheDocument();
     expect(screen.queryByText('common:states.riskMapFailed.heading')).not.toBeInTheDocument();
-    // With a result the map can be saved again.
-    expect(screen.getByText('topbar.saveMap')).toBeInTheDocument();
+    // With a result the map can be saved again — top bar from md, bottom bar below.
+    expect(screen.getAllByText('topbar.saveMap')).toHaveLength(2);
     expect(screen.getByText('header.title')).toBeInTheDocument();
     expect(runSearch).toHaveBeenCalledTimes(2);
   });
@@ -390,8 +390,9 @@ describe('ResultsRiskMap states as designed', () => {
     expect(screen.queryAllByTestId('teaser-card')).toHaveLength(0);
     expect(screen.queryByText('partners.none')).not.toBeInTheDocument();
     expect(screen.queryByText('cta.title')).not.toBeInTheDocument();
-    // The map exists and can still be saved from the top bar.
-    expect(screen.getByText('topbar.saveMap')).toBeInTheDocument();
+    // The map exists and can still be saved — top bar from md, bottom bar below.
+    expect(screen.getAllByText('topbar.saveMap')).toHaveLength(2);
+    expect(screen.getByTestId('guest-expiry-mobile')).toHaveTextContent('topbar.guestBadge');
   });
 
   it('shows no scope box for a guest without a wizard profile', async () => {
@@ -678,5 +679,57 @@ describe('ResultsRiskMap obligations on small screens', () => {
     expect(penalty.textContent).toBe('detail.penalty');
     expect(penalty.className.split(/\s+/)).toEqual(expect.arrayContaining(['block', 'lg:inline']));
     expect(penalty.parentElement!.textContent!.indexOf('UStG §18')).toBe(0);
+  });
+});
+
+// ─── Risk map · guest top bar on a phone (Canvas T3 · U3, Figma 3577:2831) ────
+// Below md the save button covered the logo (DE 27 px, TR 18, ES 9), and the
+// way back and the expiry note were not shown at all. Now: full logo with an
+// arrow back, the save button fixed at the bottom, the expiry note in the page
+// head — not next to the button.
+
+describe('ResultsRiskMap guest top bar on small screens', () => {
+  const cls = (el: HTMLElement) => el.className.split(/\s+/);
+
+  it('moves saving to a bottom bar below md and keeps the top bar button from md', async () => {
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10) })] });
+    renderPage();
+
+    await screen.findByText('VAT return');
+    const bar = screen.getByTestId('save-bar-mobile');
+    expect(cls(bar)).toEqual(expect.arrayContaining(['fixed', 'bottom-0', 'md:hidden']));
+    // The top bar group (badge + button) only from md.
+    const topButton = screen.getAllByRole('button', { name: /topbar\.saveMap/ }).find((b) => !bar.contains(b))!;
+    expect(cls(topButton.parentElement!)).toEqual(expect.arrayContaining(['hidden', 'md:flex']));
+    // The bottom bar saves like the top bar does: it opens the sign-up drawer.
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    fireEvent.click(within(bar).getByRole('button', { name: /topbar\.saveMap/ }));
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+  });
+
+  it('gives phones a way back and the expiry note, kept away from the save button', async () => {
+    runSearch.mockResolvedValue({ providers: [], laws: [law({ id: 'vat', title: 'VAT return', due: inDays(10) })] });
+    renderPage();
+
+    await screen.findByText('VAT return');
+    const back = screen.getByTestId('back-home-mobile');
+    expect(back).toHaveAttribute('aria-label', 'topbar.backHome');
+    expect(back).toHaveAttribute('href', '/en');
+    expect(cls(back)).toContain('md:hidden');
+    const note = screen.getByTestId('guest-expiry-mobile');
+    expect(note).toHaveTextContent('topbar.guestBadge');
+    // DNA: the expiry note is information, not pressure — never inside the save bar.
+    expect(screen.getByTestId('save-bar-mobile')).not.toContainElement(note);
+  });
+
+  it('shows neither the bottom bar nor the expiry note while there is no map', async () => {
+    runSearch.mockReturnValue(new Promise(() => {}));
+    renderPage();
+
+    await screen.findByRole('heading', { level: 1, name: 'common:states.riskMapLoading.heading' });
+    expect(screen.queryByTestId('save-bar-mobile')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('guest-expiry-mobile')).not.toBeInTheDocument();
+    // The way back is there in every state.
+    expect(screen.getByTestId('back-home-mobile')).toBeInTheDocument();
   });
 });
