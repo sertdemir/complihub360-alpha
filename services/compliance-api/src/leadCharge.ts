@@ -5,7 +5,7 @@ import {
     billingReadiness, getActiveSubscription, type BillingBlockReason, type LeadFeeQuote, type LeadOpportunity,
 } from "./billing.js";
 import {
-    createPaymentIntent, getCustomerBilling, isStripeConfigured, type ChargeResult,
+    createPaymentIntent, getCustomerBilling, isStripeConfigured, StripeError, type ChargeResult,
 } from "./stripe.js";
 import { notify } from "./notifications.js";
 import { sendPaymentFailedMail } from "./mailer.js";
@@ -283,11 +283,27 @@ export async function syncBillingReadiness(providerKey: string): Promise<Readine
 
     let hasPm = false, infoComplete = false, pmId: string | null = null, pmLabel: string | null = null;
     if (p.stripe_customer_id && isStripeConfigured()) {
-        const c = await getCustomerBilling(String(p.stripe_customer_id));
-        pmId = c.defaultPaymentMethodId;
-        hasPm = !!pmId;
-        infoComplete = c.billingInfoComplete;
-        pmLabel = c.paymentMethodLabel;
+        try {
+            const c = await getCustomerBilling(String(p.stripe_customer_id));
+            pmId = c.defaultPaymentMethodId;
+            hasPm = !!pmId;
+            infoComplete = c.billingInfoComplete;
+            pmLabel = c.paymentMethodLabel;
+        } catch (err) {
+            // Stripe kennt den gespeicherten Kunden nicht (anderer Account oder
+            // andere Sandbox als beim Anlegen, oder dort geloescht). Das ist kein
+            // Grund fuer 502: der Anbieter ist dann schlicht ohne Zahlungsmittel.
+            // Die Kennung kommt weg, damit der naechste Portal-Aufruf einen
+            // neuen Kunden anlegt; die alte bleibt im Ereignisprotokoll
+            // (Befund Staging 2026-10-04: cus_… aus der Sandbox vor dem Claim).
+            if (!(err instanceof StripeError && err.status === 404 && err.code === 'resource_missing')) throw err;
+            structuredLog('warn', 'Stripe customer missing — clearing stale id', { providerKey, customerId: String(p.stripe_customer_id), errorCode: 'STRIPE_CUSTOMER_MISSING', severity: 'warning' });
+            await supabaseApi.update('providers', { provider_key: providerKey }, { stripe_customer_id: null });
+            await supabaseApi.insert('event_log', {
+                type: 'stripe_customer_missing',
+                payload: { providerKey, customerId: String(p.stripe_customer_id), detail: err.message },
+            }).catch(() => { /* non-blocking */ });
+        }
     }
     const [sub, agreements, openInvoices] = await Promise.all([
         getActiveSubscription(providerKey),
