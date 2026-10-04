@@ -1,7 +1,7 @@
 ---
 title: "Ein Abo kann entstehen — provider_subscriptions bekommt einen Schreiber"
 assignee: "Claude"
-status: "review"
+status: "done"
 ---
 
 # Ein Abo kann entstehen
@@ -222,3 +222,12 @@ Nicht berührt: Risk Map, Wizard, Ranking, AI-Verhalten, Provider-Policies.
    null.
 3. **Tarifwechsel und Kündigung durch den Anbieter selbst** — erst nach den
    Entscheidungen, die Spec B reserviert.
+
+---
+
+Gemergt am 2026-10-01 mit PR #240 (Squash `3a371452`).
+
+Die drei offenen Punkte oben sind **nicht** Teil dieses Tickets und bleiben
+offen: der Tarifwahl-Screen wartet auf den UI-Workflow, die Kulanzfrist ist
+eine Entscheidung des Nutzers, und Tarifwechsel/Kündigung warten auf die
+Regeln, die Spec B reserviert.
