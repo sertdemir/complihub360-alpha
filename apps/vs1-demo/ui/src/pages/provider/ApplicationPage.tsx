@@ -34,7 +34,7 @@ type ChapterKey = (typeof CHAPTERS)[number];
 // Canvas-Wahl 5 V1 (2026-10-01): nach der Pruefung ist die Bewerbung
 // abgeschlossen. Dann gibt es kein "Einreichen" mehr, Konto und Rechtsform
 // stehen im Lesemodus und oeffnen sich erst ueber "Ändern". Der Hinweis sagt,
-// was beim Speichern wirklich passiert — seit dem Change-Control (TKT-PROV-07,
+// was beim Speichern wirklich passiert — seit dem Change-Control (TKT-PROV-08,
 // Canvas A V3): was fuer Nutzer ungünstiger wird, erscheint erst nach der
 // Pruefung; alles andere gilt sofort, Rechtsform & Co. prueft das Team danach.
 const SETTLED = new Set(['approved_pending_activation', 'active', 'limited', 'reverification_due']);

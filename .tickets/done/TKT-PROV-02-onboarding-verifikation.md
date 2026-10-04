@@ -121,7 +121,7 @@ Kandidat für dieselbe Überarbeitung.
 - Staging-Rollout der UI → nach dem lokalen Review des Nutzers (Stufe 4).
 - `PartnerApplyPage` als öffentlicher Einstieg (Konto anlegen → Intake mit
   JWT → Dossier): braucht einen Intake ohne Einladungs-Token — eigener Schritt.
-- Change Control mit Fristen (Spec §18) → Phase 6, umgesetzt in TKT-PROV-07; Änderungen an
+- Change Control mit Fristen (Spec §18) → Phase 6, umgesetzt in TKT-PROV-08; Änderungen an
   Rechtsform werden bis dahin nur protokolliert.
 - Prüfdienst für die Identität der vertretungsberechtigten Person.
 - Storage-Policies für Browser — bewusst keine; Zugang nur über signierte
