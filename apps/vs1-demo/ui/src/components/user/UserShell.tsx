@@ -385,10 +385,10 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
           logo={<Logo lockup="symbol" href={null} />}
           actions={
             <>
-              {/* Mobil nur das Plus im Kreis, beschriftet fuer Screenreader. */}
+              {/* Mobil nur das Plus, beschriftet fuer Screenreader. */}
               <button type="button" aria-label={t('shell.newAssessment')} title={t('shell.newAssessment')} onClick={() => openWizard()} className="grid h-11 w-11 place-items-center rounded-lg">
-                <span aria-hidden="true" className="grid h-7 w-7 place-items-center rounded-full border border-stroke-brand bg-brand-light text-fg-brand">
-                  <Plus size={15} strokeWidth={2.4} />
+                <span aria-hidden="true" className="grid h-7 w-7 place-items-center text-fg-brand">
+                  <Plus size={18} strokeWidth={2.2} />
                 </span>
               </button>
               <button type="button" aria-label={t('shell.search')} onClick={() => setSearchOpen(true)} className="grid h-11 w-11 place-items-center rounded-lg text-fg-secondary transition-colors hover:text-fg">
@@ -426,11 +426,13 @@ export function UserShell({ activeDomain, children }: { activeDomain?: string; c
               Seite des Arbeitsbereichs an derselben Stelle, statt in drei
               Seitenkoepfen (Dashboard, Sitzungen, Bereich) je eigen. */}
           {/* Zurueckgenommen (Nutzer 2026-09-22): kein gefuellter Primaer-Knopf,
-              sondern Plus im Kreis und die kurze Beschriftung — praesent, aber
-              nicht das Lauteste der Leiste. */}
+              sondern Plus und die kurze Beschriftung — praesent, aber nicht das
+              Lauteste der Leiste. Der Kreis um das Plus ist am 2026-10-04 auf
+              Nutzer-Wunsch gefallen (Ring und Flaeche weg); die 28er-Box bleibt,
+              damit die Zeile nicht springt. */}
           <button type="button" onClick={() => openWizard()} className="group mr-auto inline-flex items-center gap-2 rounded-full py-1 pl-1 pr-2 text-[13px] font-semibold text-fg-secondary transition-colors hover:text-fg">
-            <span aria-hidden="true" className="grid h-7 w-7 place-items-center rounded-full border border-stroke-brand bg-brand-light text-fg-brand transition-colors group-hover:bg-brand group-hover:text-fg-on-brand">
-              <Plus size={15} strokeWidth={2.4} />
+            <span aria-hidden="true" className="grid h-7 w-7 place-items-center text-fg-brand transition-colors group-hover:text-fg">
+              <Plus size={18} strokeWidth={2.2} />
             </span>
             {t('shell.newAssessment')}
           </button>
