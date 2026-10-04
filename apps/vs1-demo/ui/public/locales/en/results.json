@@ -266,7 +266,8 @@
     "corporateStructure": "Company Setup & Filings",
     "productCompliance": "Product Compliance",
     "logisticsCustoms": "Logistics & Customs",
-    "legalAdvisory": "Legal Support"
+    "legalAdvisory": "Legal Support",
+    "environment": "Environmental Compliance"
   },
   "matchBasis": {
     "market": "Covers your market ({{country}})",

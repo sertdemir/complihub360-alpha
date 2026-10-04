@@ -1014,6 +1014,25 @@
           "Bir uyuşmazlık başka ülkedeki bir müşteriyi ilgilendiriyor",
           "Resmi bir şikâyet ya da bir kurumdan sorgu alıyorsunuz"
         ]
+      },
+      {
+        "title": "Çevresel Uyum",
+        "markets": "AB GENELİ · BİRLEŞİK KRALLIK",
+        "desc": "Cihaz ve pil kayıtları, ömrün sonunda geri alma ve maddeler hakkında bildirmeniz gerekenler.",
+        "intro": "Ambalajın ötesindeki çevresel yükümlülükler: elektrikli cihazlar ve piller için ulusal kayıtlar, ömrünün sonunda geri alma ve sattığınız eşyalardaki maddelere ilişkin bilgilendirme yükümlülükleri.",
+        "cover": [
+          "İlk cihaz piyasaya sürülmeden önce WEEE kaydı",
+          "Piller için üretici sorumluluğu ve geri alma",
+          "Eşyalardaki maddeler için bilgilendirme yükümlülükleri",
+          "Birbirine benzeyen kayıtlar: ambalaj, WEEE ve piller",
+          "Yerel tüzel kişilik olmadan kayıt yükümlülükleri",
+          "Otoriteler: stiftung ear, ADEME, ECHA"
+        ],
+        "matters": [
+          "Ürünleriniz elektronik, fiş veya pil içeriyor",
+          "AB'ye veya Birleşik Krallık'a malı kendiniz ithal ediyorsunuz",
+          "Kimyasal işlem görmüş veya kaplanmış eşya satıyorsunuz"
+        ]
       }
     ],
     "learnMore": "Daha fazla bilgi"

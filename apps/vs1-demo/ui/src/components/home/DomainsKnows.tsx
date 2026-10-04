@@ -14,6 +14,7 @@ import {
   X,
   ArrowRight,
   ChevronRight,
+  Leaf,
 } from 'lucide-react';
 import { Container } from '../ui/Container';
 import { Button } from '../ui/Button';
@@ -39,6 +40,7 @@ const DOMAIN_ICONS = [
   ShieldCheck,   // Product Compliance
   Truck,         // Logistics & Customs
   Scale,         // Legal Advisory
+  Leaf,          // Environmental Compliance (neunte Domaene seit 2026-09-18)
 ] as const;
 const COVER_COUNT = 6;
 const MATTERS_COUNT = 3;

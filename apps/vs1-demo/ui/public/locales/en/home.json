@@ -1014,6 +1014,25 @@
           "A dispute involves a customer in another country",
           "You receive a formal complaint or an enquiry from an authority"
         ]
+      },
+      {
+        "title": "Environmental Compliance",
+        "markets": "EU-WIDE · UK",
+        "desc": "Registers for devices and batteries, take-back at end of life, and what you must disclose about substances.",
+        "intro": "Environmental duties beyond packaging: national registers for electrical equipment and batteries, take-back at end of life, and the information duties that attach to substances in the articles you sell.",
+        "cover": [
+          "WEEE registration before the first device is placed",
+          "Battery producer responsibility and take-back",
+          "Information duties for substances in articles",
+          "Registers that look alike: packaging, WEEE and batteries",
+          "Registration duties without a local entity",
+          "Authorities: stiftung ear, ADEME, ECHA"
+        ],
+        "matters": [
+          "Your products contain electronics, a plug or a battery",
+          "You import goods into the EU or the UK yourself",
+          "You sell articles that are chemically treated or coated"
+        ]
       }
     ],
     "learnMore": "Learn more"

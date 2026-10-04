@@ -266,7 +266,8 @@
     "corporateStructure": "Gründung & Meldungen",
     "productCompliance": "Produkt-Compliance",
     "logisticsCustoms": "Logistik & Zoll",
-    "legalAdvisory": "Rechtliche Unterstützung"
+    "legalAdvisory": "Rechtliche Unterstützung",
+    "environment": "Umwelt-Compliance"
   },
   "matchBasis": {
     "market": "Deckt Ihren Markt ab ({{country}})",

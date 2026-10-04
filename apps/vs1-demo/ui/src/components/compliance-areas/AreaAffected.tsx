@@ -55,6 +55,9 @@ const ROLE_ICONS: Record<string, LucideIcon[]> = {
   'product-compliance': [Factory, Ship, Tag, Store],
   'logistics-customs': [Truck, Ship, Globe],
   'legal-advisory': [Store, Handshake, Globe],
+  // Elektronik-Verkaeufer, Importeure, Marktplatz-Verkaeufer, Markeninhaber
+  // (Rollen aus compliance.environment.affectedRoles).
+  'environment': [Laptop, Ship, Store, Tag],
 };
 
 interface Role {

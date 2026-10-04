@@ -1014,6 +1014,25 @@
           "Ein Streitfall betrifft eine Kundin in einem anderen Land",
           "Sie erhalten eine förmliche Beschwerde oder eine behördliche Anfrage"
         ]
+      },
+      {
+        "title": "Umwelt-Compliance",
+        "markets": "EU-WEIT · UK",
+        "desc": "Register für Geräte und Batterien, Rücknahme am Lebensende, und was Sie über Stoffe offenlegen müssen.",
+        "intro": "Umweltpflichten jenseits der Verpackung: nationale Register für Elektrogeräte und Batterien, Rücknahme am Lebensende, und die Informationspflichten für Stoffe in den Erzeugnissen, die Sie verkaufen.",
+        "cover": [
+          "WEEE-Registrierung, bevor das erste Gerät in Verkehr geht",
+          "Herstellerverantwortung und Rücknahme bei Batterien",
+          "Informationspflichten für Stoffe in Erzeugnissen",
+          "Register, die sich ähneln: Verpackung, WEEE und Batterien",
+          "Registrierungspflichten ohne eigene Niederlassung",
+          "Behörden: stiftung ear, ADEME, ECHA"
+        ],
+        "matters": [
+          "Ihre Produkte enthalten Elektronik, einen Stecker oder eine Batterie",
+          "Sie führen Waren selbst in die EU oder nach Großbritannien ein",
+          "Sie verkaufen Erzeugnisse, die chemisch behandelt oder beschichtet sind"
+        ]
       }
     ],
     "learnMore": "Mehr erfahren"
