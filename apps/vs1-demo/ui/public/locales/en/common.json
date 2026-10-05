@@ -778,7 +778,8 @@
       "AGENCY": "Agency / services"
     },
     "card": {
-      "obligations": "{{count}} obligations",
+      "obligations_one": "{{count}} obligation",
+      "obligations_other": "{{count}} obligations",
       "marketSpecific": "{{count}} specific to {{market}}",
       "open": "Open area"
     },
@@ -789,11 +790,12 @@
       "obligationsLead": "Every duty below traces to a named statute. Switch market to see the source that applies there.",
       "euWideSource": "EU-wide source",
       "appliesFrom": "Applies from {{date}}",
-      "coverageNote": "{{specific}} of {{count}} duties have a source specific to {{market}}. The rest are EU Regulations — they apply here directly, so there is no national text to hold.",
       "enforcementTitle": "Who checks, and what it costs",
-      "enforcementLead": "The figures come from the sources the engine holds for {{market}} — {{count}} duties with a stated penalty range. Upper bounds as written, not an expected cost.",
+      "enforcementLead_one": "The figures come from the sources the engine holds for {{market}} — {{count}} duty with a stated penalty range. The upper bound as written, not an expected cost.",
+      "enforcementLead_other": "The figures come from the sources the engine holds for {{market}} — {{count}} duties with a stated penalty range. Upper bounds as written, not an expected cost.",
       "timelineTitle": "What comes next",
-      "timelineLead": "One thread, in time order: first the filings that day-to-day operation demands, then the day new law lands. {{deferred}} of the {{total}} duties are settled law but not yet applicable.",
+      "timelineLead_one": "One thread, in time order: first the filings that day-to-day operation demands, then the day new law lands. {{deferred}} of the {{total}} duties is settled law but not yet applicable.",
+      "timelineLead_other": "One thread, in time order: first the filings that day-to-day operation demands, then the day new law lands. {{deferred}} of the {{total}} duties are settled law but not yet applicable.",
       "marketsTitle": "The same area, eight weights",
       "marketsLead": "{{top}} weights this area most heavily — {{topWeight}} out of 10, against {{second}} at {{secondWeight}}. Whoever serves both plans to {{top}}.",
       "coversTitle": "How CompliHub360 gets there",
@@ -806,7 +808,8 @@
         "obligationsNote": "{{count}} with a source specific to this market",
         "exposure": "Maximum penalty exposure",
         "exposureNote": "Sum of the upper bounds, not the expected value",
-        "days": "{{count}} days",
+        "days_one": "{{count}} day",
+        "days_other": "{{count}} days",
         "lead": "Shortest lead time",
         "leadNote": "The duty that catches teams out first",
         "later": "Not live yet",
@@ -818,8 +821,10 @@
         "fromDate": "{{count}} from {{date}}",
         "nationalIn": "{{count}} on a legal basis in {{market}}",
         "exposureProven": "Proven penalty exposure",
-        "exposureNoneProven": "None of the {{total}} duties here names an amount in law — the penalties are proportional, per unit or left to member states.",
-        "exposureProvenNote": "{{proven}} of {{total}} duties name an amount in law. The others are counted at zero, not estimated."
+        "exposureNoneProven_one": "The one duty here names no amount in law — the penalty is proportional, per unit or left to member states.",
+        "exposureNoneProven_other": "None of the {{total}} duties here names an amount in law — the penalties are proportional, per unit or left to member states.",
+        "exposureProvenNote_one": "{{proven}} of {{total}} duties names an amount in law. The others are counted at zero, not estimated.",
+        "exposureProvenNote_other": "{{proven}} of {{total}} duties name an amount in law. The others are counted at zero, not estimated."
       },
       "risk": {
         "title": "Risk profile",
@@ -830,15 +835,18 @@
         "strictness": "Regulatory density",
         "strictnessNote": "A property of the market, not of this area",
         "outOfTen": "out of 10 · domain weight",
-        "marketsCompared": "{{count}} markets compared"
+        "marketsCompared_one": "{{count}} market compared",
+        "marketsCompared_other": "{{count}} markets compared"
       },
       "timeline": {
         "liveNow": "Applies today",
         "togetherCount": "{{count}} duties land on one day",
         "aheadOne": "{{source}} becomes applicable.",
         "aheadMany": "{{names}} all land on the same day.",
-        "inDays": "In {{count}} days",
-        "dueBody": "Cadence: {{cadence}} — {{days}} days of lead time.",
+        "inDays_one": "In {{count}} day",
+        "inDays_other": "In {{count}} days",
+        "dueBody_one": "Cadence: {{cadence}} — {{days}} day of lead time.",
+        "dueBody_other": "Cadence: {{cadence}} — {{days}} days of lead time.",
         "ongoingBody": "An ongoing duty with no fixed filing date.",
         "ongoingMany": "{{count}} duties apply on an ongoing basis",
         "sinceTag": "in force since {{date}}",
@@ -863,14 +871,17 @@
       "sharedTriggers_one": "{{count}} shared trigger",
       "sharedTriggers_other": "{{count}} shared triggers",
       "allAreasLink": "All eight areas at a glance",
-      "coverageNoteEu": "The engine carries {{count}} duties for this area, all of them on an EU-level source. Pick a market to see where a national source adds to them.",
+      "coverageNoteEu_one": "The engine carries {{count}} duty for this area, on an EU-level source. Pick a market to see where a national source adds to it.",
+      "coverageNoteEu_other": "The engine carries {{count}} duties for this area, all of them on an EU-level source. Pick a market to see where a national source adds to them.",
       "startShort": "Start the assessment",
       "sourcePromise": "Every duty traces back to a named legal basis — no assessment without a source.",
       "facts": {
-        "duties": "{{count}} duties",
+        "duties_one": "{{count}} duty",
+        "duties_other": "{{count}} duties",
         "allEu": "all on an EU-level source",
         "national": "{{count}} on a national legal basis",
-        "later": "{{count}} apply only from a later date"
+        "later_one": "{{count}} applies only from a later date",
+        "later_other": "{{count}} apply only from a later date"
       },
       "eyebrow": {
         "affected": "Applicability",
@@ -895,11 +906,14 @@
       "appliesToModels": "Applies to:",
       "noneForMarket": "The engine carries no duty for this area in {{market}} yet. That is a genuine gap in coverage, not a clean bill of health.",
       "heaviestPenalty": "Highest single penalty",
-      "enforcementTop": "the highest of all {{total}} markets",
+      "enforcementTop_one": "the only market compared",
+      "enforcementTop_other": "the highest of all {{total}} markets",
       "enforcementRank": "rank {{rank}} of {{total}} markets",
-      "enforcementAvg": "average across {{total}} markets",
+      "enforcementAvg_one": "average across {{total}} market",
+      "enforcementAvg_other": "average across {{total}} markets",
       "authorities": "Competent authorities",
-      "enforcementLeadEu": "The figures come from the sources the engine holds at EU level — {{count}} duties with a stated penalty range. Upper bounds as written, not an expected cost.",
+      "enforcementLeadEu_one": "The figures come from the sources the engine holds at EU level — {{count}} duty with a stated penalty range. The upper bound as written, not an expected cost.",
+      "enforcementLeadEu_other": "The figures come from the sources the engine holds at EU level — {{count}} duties with a stated penalty range. Upper bounds as written, not an expected cost.",
       "enforcementScaleSub": "All eight markets on one scale — the gold marker is the value the engine uses here.",
       "timelineLeadAllLive": "Every duty here already applies — the thread shows the cadence each one returns on and the lead time it needs. The market switch above recalculates the lead times.",
       "marketsLeadTied": "{{count}} markets weight this area equally heavily ({{weight}} out of 10). Serving more than one means planning to the strictest of them.",
@@ -910,7 +924,6 @@
       "askQuestion": "Ask a question",
       "askEyebrow": "Your question",
       "askPlaceholder": "Ask your question in your own words",
-      "coverageNoteGaps": "{{specific}} of {{count}} duties have a source specific to {{market}}. Of the rest, {{gaps}} have a national text we do not carry yet — the others are EU Regulations, which apply here directly.",
       "checkTitle": "Does this apply to you?",
       "checkFoot": "If one applies, this area carries duties for you — the assessment narrows them to your case.",
       "ceiling": {
@@ -978,7 +991,12 @@
           "statesWithPrivacyActs": "the states with their own privacy act (California and some twenty others)",
           "states50AndDc": "all 50 states and the District of Columbia"
         }
-      }
+      },
+      "coverageNoteSpecific_one": "{{count}} of {{total}} duties has a source specific to {{market}}.",
+      "coverageNoteSpecific_other": "{{count}} of {{total}} duties have a source specific to {{market}}.",
+      "coverageNoteEuRest": "The rest are EU Regulations — they apply here directly, so there is no national text to hold.",
+      "coverageNoteGapsRest_one": "Of the rest, {{count}} has a national text we do not carry yet — the others are EU Regulations, which apply here directly.",
+      "coverageNoteGapsRest_other": "Of the rest, {{count}} have a national text we do not carry yet — the others are EU Regulations, which apply here directly."
     },
     "riskBadge": "{{level}} Risk"
   },
@@ -1100,13 +1118,13 @@
       "marketsPanelTitle": "Choose a market",
       "allMarkets": "All markets",
       "marketsAsideBody": "Every market lists what falls due there and how often, which areas weigh heaviest, and where we hold no local source yet.",
-      "marketFact": "{{count}} duties in {{areas}} areas",
       "openMenu": "Open menu",
       "closeMenu": "Close menu",
       "back": "Back",
       "menuLabel": "Main navigation",
       "areasCount": "{{count}} areas",
-      "marketsCount": "{{count}} markets"
+      "marketsCount": "{{count}} markets",
+      "marketFact": "{{duties}} in {{areas}}"
     },
     "login": "Log in",
     "language": "Language"
@@ -1303,14 +1321,14 @@
     "country": {
       "eyebrow": "Market",
       "title": "Operating in {{country}}.",
-      "lead": "{{count}} duties across {{areas}} areas, with a national legal basis. This page shows what comes together here and when — what a single duty requires is set out in its area.",
       "weightsTitle": "What weighs heaviest here",
       "weightsLead": "{{top}} weighs heaviest here — {{topWeight}} out of 10, against {{second}} at {{secondWeight}}. Each area leads to its own page; that is where what a single duty requires is set out.",
       "obligationsTitle": "Obligations we hold a source for",
       "obligationsLead": "Each entry names the statute it comes from. Where the duty rests on EU law, the official text is one click away.",
       "sourceLabel": "Source",
       "dueLabel": "Cadence",
-      "leadTime": "{{days}} days lead time",
+      "leadTime_one": "{{days}} day lead time",
+      "leadTime_other": "{{days}} days lead time",
       "backToMarkets": "All markets",
       "notFound": "We do not hold a market profile for this code yet.",
       "profileTitle": "Market profile",
@@ -1322,8 +1340,8 @@
       "sourcePromise": "Every duty here names its national legal basis. Where we hold none, the EU instrument stands — and it says so.",
       "weightsLeadTied": "{{count}} areas weigh equally heavily here ({{weight}} out of 10). Each one leads to its own page.",
       "calendarTitle": "What comes together here, and how often",
-      "calendarLead": "{{count}} duties from {{areas}} areas in one view — by cadence, not by area. Nobody plans a market area by area; they plan it against a calendar.",
-      "leadDays": "{{count}} days lead time",
+      "leadDays_one": "{{count}} day lead time",
+      "leadDays_other": "{{count}} days lead time",
       "exposureNote": "Highest single penalty in this market: {{max}} on {{duty}}. The stated upper bounds add up to {{total}} — a ceiling if everything went wrong at once, not a forecast.",
       "ctaBody": "The assessment narrows this market to your business, your product and your areas — in under five minutes.",
       "allAreas": "All areas",
@@ -1347,9 +1365,13 @@
       "weightsFootPending": "For {{list}} a national text exists that we do not carry yet — the named EU instrument stands in.",
       "weightsFootNone": "For {{list}} we hold no named source yet.",
       "exposureCaveat": "A caveat on those figures: {{what}}.",
-      "exposureConverted": "{{count}} of them are converted from another currency",
-      "exposureUnbacked": "{{count}} of {{total}} duties carry no amount stated in law",
-      "exposureAnd": ", and "
+      "exposureConverted_one": "{{count}} of them is converted from another currency",
+      "exposureConverted_other": "{{count}} of them are converted from another currency",
+      "exposureUnbacked_one": "{{count}} of {{total}} duties carries no amount stated in law",
+      "exposureUnbacked_other": "{{count}} of {{total}} duties carry no amount stated in law",
+      "exposureAnd": ", and ",
+      "lead": "{{duties}} across {{areas}}, with a national legal basis. This page shows what comes together here and when — what a single duty requires is set out in its area.",
+      "calendarLead": "{{duties}} from {{areas}} in one view — by cadence, not by area. Nobody plans a market area by area; they plan it against a calendar."
     },
     "cta": {
       "title": "See which of these apply to you.",
@@ -2011,5 +2033,13 @@
     "reload": "Reload",
     "home": "Go to home page",
     "details": "Technical detail"
+  },
+  "counts": {
+    "duties_one": "{{count}} duty",
+    "duties_other": "{{count}} duties",
+    "areasIn_one": "{{count}} area",
+    "areasIn_other": "{{count}} areas",
+    "areasFrom_one": "{{count}} area",
+    "areasFrom_other": "{{count}} areas"
   }
 }

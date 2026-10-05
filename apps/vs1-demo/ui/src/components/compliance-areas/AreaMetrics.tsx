@@ -117,11 +117,13 @@ export function AreaMetrics({ slug, selectedCountry }: Props) {
                     defaultValue:
                       'None of the {{total}} duties here names an amount in law — the penalties are proportional, per unit or left to member states.',
                     total: lage.gesamt,
+                    count: lage.gesamt,
                   })
                 : t('compliance.area.metrics.exposureProvenNote', {
                     defaultValue:
                       '{{proven}} of {{total}} duties name an amount in law. The others are counted at zero, not estimated.',
                     proven: lage.gesetzlich + lage.umgerechnet,
+                    count: lage.gesetzlich + lage.umgerechnet,
                     total: lage.gesamt,
                   }),
             tone: exposure > 0 ? 'text-risk-on-critical' : 'text-fg-tertiary',

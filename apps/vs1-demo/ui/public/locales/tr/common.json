@@ -778,7 +778,8 @@
       "AGENCY": "Ajans / hizmet"
     },
     "card": {
-      "obligations": "{{count}} yükümlülük",
+      "obligations_one": "{{count}} yükümlülük",
+      "obligations_other": "{{count}} yükümlülük",
       "marketSpecific": "{{market}} için {{count}} özel",
       "open": "Alanı aç"
     },
@@ -789,11 +790,12 @@
       "obligationsLead": "Aşağıdaki her yükümlülük adı geçen bir mevzuata dayanır. Orada geçerli kaynağı görmek için pazarı değiştirin.",
       "euWideSource": "AB genelinde kaynak",
       "appliesFrom": "{{date}} tarihinden itibaren geçerli",
-      "coverageNote": "{{count}} yükümlülüğün {{specific}} tanesinin {{market}} için özel bir kaynağı var. Geri kalanı AB Tüzüğü — burada doğrudan uygulanır, dolayısıyla taşınacak ulusal bir metin yok.",
       "enforcementTitle": "Kim denetler ve maliyeti nedir",
-      "enforcementLead": "Rakamlar motorun {{market}} için tuttuğu kaynaklardan geliyor — ceza aralığı belirtilmiş {{count}} yükümlülük. Yazıldığı haliyle üst sınırlar, beklenen maliyet değil.",
+      "enforcementLead_one": "Rakamlar motorun {{market}} için tuttuğu kaynaklardan geliyor — ceza aralığı belirtilmiş {{count}} yükümlülük. Yazıldığı haliyle üst sınırlar, beklenen maliyet değil.",
+      "enforcementLead_other": "Rakamlar motorun {{market}} için tuttuğu kaynaklardan geliyor — ceza aralığı belirtilmiş {{count}} yükümlülük. Yazıldığı haliyle üst sınırlar, beklenen maliyet değil.",
       "timelineTitle": "Sırada ne var",
-      "timelineLead": "Zaman sırasına göre tek bir hat: önce günlük işleyişin gerektirdiği bildirimler, sonra yeni yasanın devreye girdiği gün. {{total}} yükümlülükten {{deferred}} tanesi kesinleşmiş ancak henüz geçerli değil.",
+      "timelineLead_one": "Zaman sırasına göre tek bir hat: önce günlük işleyişin gerektirdiği bildirimler, sonra yeni yasanın devreye girdiği gün. {{total}} yükümlülükten {{deferred}} tanesi kesinleşmiş ancak henüz geçerli değil.",
+      "timelineLead_other": "Zaman sırasına göre tek bir hat: önce günlük işleyişin gerektirdiği bildirimler, sonra yeni yasanın devreye girdiği gün. {{total}} yükümlülükten {{deferred}} tanesi kesinleşmiş ancak henüz geçerli değil.",
       "marketsTitle": "Aynı alan, sekiz farklı ağırlık",
       "marketsLead": "Bu alana en çok ağırlığı {{top}} veriyor — 10 üzerinden {{topWeight}}, {{second}} ise {{secondWeight}}. İkisine birden satış yapan {{top}} pazarına göre planlar.",
       "coversTitle": "CompliHub360 oraya nasıl varıyor",
@@ -806,7 +808,8 @@
         "obligationsNote": "{{count}} tanesi bu pazara özgü bir kaynakla",
         "exposure": "Azami ceza maruziyeti",
         "exposureNote": "Üst sınırların toplamı, beklenen değer değil",
-        "days": "{{count}} gün",
+        "days_one": "{{count}} gün",
+        "days_other": "{{count}} gün",
         "lead": "En kısa hazırlık süresi",
         "leadNote": "Ekipleri ilk yakalayan yükümlülük",
         "later": "Henüz yürürlükte değil",
@@ -818,8 +821,10 @@
         "fromDate": "{{date}} tarihinden itibaren {{count}}",
         "nationalIn": "{{market}} yasal dayanağıyla {{count}}",
         "exposureProven": "Belgelenmiş ceza tutarı",
-        "exposureNoneProven": "Buradaki {{total}} yükümlülükten hiçbiri kanunda bir tutar belirtmiyor — yaptırımlar oransal, birim başına ya da üye devletlere bırakılmış.",
-        "exposureProvenNote": "{{total}} yükümlülükten {{proven}} tanesi kanunda bir tutar belirtiyor. Diğerleri sıfır sayılıyor, tahmin edilmiyor."
+        "exposureNoneProven_one": "Buradaki tek yükümlülük kanunda bir tutar belirtmiyor — yaptırım oransal, birim başına ya da üye devletlere bırakılmış.",
+        "exposureNoneProven_other": "Buradaki {{total}} yükümlülükten hiçbiri kanunda bir tutar belirtmiyor — yaptırımlar oransal, birim başına ya da üye devletlere bırakılmış.",
+        "exposureProvenNote_one": "{{total}} yükümlülükten {{proven}} tanesi kanunda bir tutar belirtiyor. Diğerleri sıfır sayılıyor, tahmin edilmiyor.",
+        "exposureProvenNote_other": "{{total}} yükümlülükten {{proven}} tanesi kanunda bir tutar belirtiyor. Diğerleri sıfır sayılıyor, tahmin edilmiyor."
       },
       "risk": {
         "title": "Risk profili",
@@ -830,15 +835,18 @@
         "strictness": "Düzenleme yoğunluğu",
         "strictnessNote": "Pazarın bir özelliği, bu alanın değil",
         "outOfTen": "10 üzerinden · alan ağırlığı",
-        "marketsCompared": "{{count}} pazar karşılaştırıldı"
+        "marketsCompared_one": "{{count}} pazar karşılaştırıldı",
+        "marketsCompared_other": "{{count}} pazar karşılaştırıldı"
       },
       "timeline": {
         "liveNow": "Bugün geçerli",
         "togetherCount": "{{count}} yükümlülük aynı gün devreye giriyor",
         "aheadOne": "{{source}} uygulanabilir hale geliyor.",
         "aheadMany": "{{names}} aynı gün yürürlüğe giriyor.",
-        "inDays": "{{count}} gün içinde",
-        "dueBody": "Ritim: {{cadence}} — {{days}} gün hazırlık süresi.",
+        "inDays_one": "{{count}} gün içinde",
+        "inDays_other": "{{count}} gün içinde",
+        "dueBody_one": "Ritim: {{cadence}} — {{days}} gün hazırlık süresi.",
+        "dueBody_other": "Ritim: {{cadence}} — {{days}} gün hazırlık süresi.",
         "ongoingBody": "Sabit bildirim tarihi olmayan sürekli bir yükümlülük.",
         "ongoingMany": "{{count}} yükümlülük sürekli geçerli",
         "sinceTag": "{{date}} itibarıyla yürürlükte",
@@ -863,14 +871,17 @@
       "sharedTriggers_one": "{{count}} ortak tetikleyici",
       "sharedTriggers_other": "{{count}} ortak tetikleyici",
       "allAreasLink": "Sekiz alanın tümüne genel bakış",
-      "coverageNoteEu": "Motor bu alan için {{count}} yükümlülük taşıyor, hepsi AB düzeyinde bir kaynağa dayanıyor. Ulusal bir kaynağın nerede eklendiğini görmek için bir pazar seç.",
+      "coverageNoteEu_one": "Motor bu alan için {{count}} yükümlülük taşıyor, AB düzeyinde bir kaynağa dayanıyor. Ulusal bir kaynağın nerede eklendiğini görmek için bir pazar seç.",
+      "coverageNoteEu_other": "Motor bu alan için {{count}} yükümlülük taşıyor, hepsi AB düzeyinde bir kaynağa dayanıyor. Ulusal bir kaynağın nerede eklendiğini görmek için bir pazar seç.",
       "startShort": "Değerlendirmeyi başlat",
       "sourcePromise": "Her yükümlülük adı geçen bir yasal dayanağa dayanır — kaynaksız değerlendirme yok.",
       "facts": {
-        "duties": "{{count}} yükümlülük",
+        "duties_one": "{{count}} yükümlülük",
+        "duties_other": "{{count}} yükümlülük",
         "allEu": "tümü AB düzeyinde kaynakla",
         "national": "{{count}} ulusal yasal dayanakla",
-        "later": "{{count}} ileri bir tarihten itibaren geçerli"
+        "later_one": "{{count}} ileri bir tarihten itibaren geçerli",
+        "later_other": "{{count}} ileri bir tarihten itibaren geçerli"
       },
       "eyebrow": {
         "affected": "Kapsam",
@@ -895,11 +906,14 @@
       "appliesToModels": "Şunlar için geçerli:",
       "noneForMarket": "Motor bu alan için {{market}} kapsamında henüz bir yükümlülük taşımıyor. Bu gerçek bir kapsam boşluğudur, temiz kâğıt değil.",
       "heaviestPenalty": "En yüksek tekil ceza",
-      "enforcementTop": "{{total}} pazarın en yüksek değeri",
+      "enforcementTop_one": "karşılaştırılan tek pazar",
+      "enforcementTop_other": "{{total}} pazarın en yüksek değeri",
       "enforcementRank": "{{total}} pazar içinde {{rank}}. sıra",
-      "enforcementAvg": "{{total}} pazarın ortalaması",
+      "enforcementAvg_one": "{{total}} pazarın ortalaması",
+      "enforcementAvg_other": "{{total}} pazarın ortalaması",
       "authorities": "Yetkili makamlar",
-      "enforcementLeadEu": "Rakamlar motorun AB düzeyinde tuttuğu kaynaklardan geliyor — ceza aralığı belirtilmiş {{count}} yükümlülük. Yazıldığı haliyle üst sınırlar, beklenen maliyet değil.",
+      "enforcementLeadEu_one": "Rakamlar motorun AB düzeyinde tuttuğu kaynaklardan geliyor — ceza aralığı belirtilmiş {{count}} yükümlülük. Yazıldığı haliyle üst sınırlar, beklenen maliyet değil.",
+      "enforcementLeadEu_other": "Rakamlar motorun AB düzeyinde tuttuğu kaynaklardan geliyor — ceza aralığı belirtilmiş {{count}} yükümlülük. Yazıldığı haliyle üst sınırlar, beklenen maliyet değil.",
       "enforcementScaleSub": "Sekiz pazarın tümü tek ölçekte — altın işaret, motorun burada kullandığı değerdir.",
       "timelineLeadAllLive": "Buradaki her yükümlülük zaten geçerli — hat, her birinin hangi ritimle döndüğünü ve ne kadar hazırlık süresi gerektirdiğini gösterir. Üstteki pazar seçimi hazırlık sürelerini yeniden hesaplar.",
       "marketsLeadTied": "{{count}} pazar bu alana eşit ağırlık veriyor (10 üzerinden {{weight}}). Birden fazlasına satış yapmak, en katısına göre planlamak demektir.",
@@ -910,7 +924,6 @@
       "askQuestion": "Soru sor",
       "askEyebrow": "Sorunuz",
       "askPlaceholder": "Sorunuzu kendi sözcüklerinizle sorun",
-      "coverageNoteGaps": "{{count}} yükümlülüğün {{specific}} tanesinin {{market}} için özel bir kaynağı var. Geri kalanların {{gaps}} tanesinin henüz taşımadığımız ulusal bir metni var; diğerleri burada doğrudan uygulanan AB Tüzükleri.",
       "checkTitle": "Bu size uyuyor mu?",
       "checkFoot": "Biri geçerliyse bu alan sizin için yükümlülükler taşır — değerlendirme bunları durumunuza daraltır.",
       "ceiling": {
@@ -978,7 +991,12 @@
           "statesWithPrivacyActs": "kendi veri koruma kanunu olan eyaletler (Kaliforniya ve yaklaşık yirmi eyalet daha)",
           "states50AndDc": "50 eyaletin tamamı ve Columbia Bölgesi"
         }
-      }
+      },
+      "coverageNoteSpecific_one": "{{total}} yükümlülüğün {{count}} tanesinin {{market}} için özel bir kaynağı var.",
+      "coverageNoteSpecific_other": "{{total}} yükümlülüğün {{count}} tanesinin {{market}} için özel bir kaynağı var.",
+      "coverageNoteEuRest": "Geri kalanı AB Tüzüğü — burada doğrudan uygulanır, dolayısıyla taşınacak ulusal bir metin yok.",
+      "coverageNoteGapsRest_one": "Geri kalanların {{count}} tanesinin henüz taşımadığımız ulusal bir metni var; diğerleri burada doğrudan uygulanan AB Tüzükleri.",
+      "coverageNoteGapsRest_other": "Geri kalanların {{count}} tanesinin henüz taşımadığımız ulusal bir metni var; diğerleri burada doğrudan uygulanan AB Tüzükleri."
     },
     "riskBadge": "Risk: {{level}}"
   },
@@ -1100,13 +1118,13 @@
       "marketsPanelTitle": "Pazar seçin",
       "allMarkets": "Tüm pazarlar",
       "marketsAsideBody": "Her pazar orada neyin ne zaman gerektiğini, hangi alanların en ağır bastığını ve nerede henüz yerel kaynak taşımadığımızı gösterir.",
-      "marketFact": "{{areas}} alanda {{count}} yükümlülük",
       "openMenu": "Menüyü aç",
       "closeMenu": "Menüyü kapat",
       "back": "Geri",
       "menuLabel": "Ana gezinme",
       "areasCount": "{{count}} alan",
-      "marketsCount": "{{count}} pazar"
+      "marketsCount": "{{count}} pazar",
+      "marketFact": "{{areas}} {{duties}}"
     },
     "login": "Giriş yap",
     "language": "Dil"
@@ -1303,14 +1321,14 @@
     "country": {
       "eyebrow": "Pazar",
       "title": "{{country}} pazarında faaliyet.",
-      "lead": "{{areas}} alanda {{count}} yükümlülük, ulusal hukuki dayanağıyla. Bu sayfa burada nelerin bir araya geldiğini ve ne zaman olduğunu gösterir; tek bir yükümlülüğün ne istediği kendi alanında yazar.",
       "weightsTitle": "Burada en ağır basan ne",
       "weightsLead": "Burada en ağır basan {{top}} — 10 üzerinden {{topWeight}}, {{second}} ise {{secondWeight}}. Her alan kendi sayfasına götürür; tek bir yükümlülüğün ne istediği orada yazar.",
       "obligationsTitle": "Kaynağını tuttuğumuz yükümlülükler",
       "obligationsLead": "Her kayıt, dayandığı mevzuatı adıyla belirtir. Yükümlülük AB hukukuna dayanıyorsa resmî metin bir tık uzakta.",
       "sourceLabel": "Kaynak",
       "dueLabel": "Sıklık",
-      "leadTime": "{{days}} gün süre",
+      "leadTime_one": "{{days}} gün süre",
+      "leadTime_other": "{{days}} gün süre",
       "backToMarkets": "Tüm pazarlar",
       "notFound": "Bu kod için henüz bir pazar profilimiz yok.",
       "profileTitle": "Pazar profili",
@@ -1322,8 +1340,8 @@
       "sourcePromise": "Buradaki her yükümlülük ulusal hukuki dayanağını adıyla belirtir. Elimizde yoksa AB aracı geçerlidir — ve bu yazılıdır.",
       "weightsLeadTied": "{{count}} alan burada eşit ağırlıkta (10 üzerinden {{weight}}). Her biri kendi sayfasına götürür.",
       "calendarTitle": "Burada neler bir araya geliyor, ne sıklıkla",
-      "calendarLead": "{{areas}} alandan {{count}} yükümlülük tek bir görünümde — alana göre değil, döngüye göre. Kimse bir pazarı alan alan planlamaz; takvime göre planlar.",
-      "leadDays": "{{count}} gün hazırlık süresi",
+      "leadDays_one": "{{count}} gün hazırlık süresi",
+      "leadDays_other": "{{count}} gün hazırlık süresi",
       "exposureNote": "Bu pazardaki en yüksek tekil ceza: {{duty}} için {{max}}. Belirtilen üst sınırların toplamı {{total}} — her şey aynı anda ters gitseydi diye bir tavan, tahmin değil.",
       "ctaBody": "Değerlendirme bu pazarı şirketinize, ürününüze ve alanlarınıza göre daraltır — beş dakikadan kısa sürede.",
       "allAreas": "Tüm alanlar",
@@ -1347,9 +1365,13 @@
       "weightsFootPending": "{{list}} için henüz taşımadığımız bir ulusal metin mevcut — yerinde belirtilen AB aracı duruyor.",
       "weightsFootNone": "{{list}} için henüz adlandırılmış bir kaynağımız yok.",
       "exposureCaveat": "Bu rakamlara ilişkin bir çekince: {{what}}.",
-      "exposureConverted": "bunlardan {{count}} tanesi başka bir para biriminden çevrilmiştir",
-      "exposureUnbacked": "{{total}} yükümlülükten {{count}} tanesi kanunda belirtilmiş bir tutar taşımıyor",
-      "exposureAnd": " ve "
+      "exposureConverted_one": "bunlardan {{count}} tanesi başka bir para biriminden çevrilmiştir",
+      "exposureConverted_other": "bunlardan {{count}} tanesi başka bir para biriminden çevrilmiştir",
+      "exposureUnbacked_one": "{{total}} yükümlülükten {{count}} tanesi kanunda belirtilmiş bir tutar taşımıyor",
+      "exposureUnbacked_other": "{{total}} yükümlülükten {{count}} tanesi kanunda belirtilmiş bir tutar taşımıyor",
+      "exposureAnd": " ve ",
+      "lead": "{{areas}} {{duties}}, ulusal hukuki dayanağıyla. Bu sayfa burada nelerin bir araya geldiğini ve ne zaman olduğunu gösterir; tek bir yükümlülüğün ne istediği kendi alanında yazar.",
+      "calendarLead": "{{areas}} {{duties}} tek bir görünümde — alana göre değil, döngüye göre. Kimse bir pazarı alan alan planlamaz; takvime göre planlar."
     },
     "cta": {
       "title": "Bunlardan hangilerinin size uyduğunu görün.",
@@ -2011,5 +2033,13 @@
     "reload": "Yeniden yükle",
     "home": "Ana sayfaya git",
     "details": "Teknik bilgi"
+  },
+  "counts": {
+    "duties_one": "{{count}} yükümlülük",
+    "duties_other": "{{count}} yükümlülük",
+    "areasIn_one": "{{count}} alanda",
+    "areasIn_other": "{{count}} alanda",
+    "areasFrom_one": "{{count}} alandan",
+    "areasFrom_other": "{{count}} alandan"
   }
 }

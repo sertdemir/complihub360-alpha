@@ -61,9 +61,9 @@ export function MarketsMenuPanel({ label, lang, isActive = false, triggerClassNa
               href={to}
               icon={<Globe size={18} />}
               description={t('header.nav.marketFact', {
-                defaultValue: '{{count}} duties in {{areas}} areas',
-                count: p.obligations.length,
-                areas: p.byDomain.length,
+                defaultValue: '{{duties}} in {{areas}}',
+                duties: t('counts.duties', { defaultValue: '{{count}} duties', count: p.obligations.length }),
+                areas: t('counts.areasIn', { defaultValue: '{{count}} areas', count: p.byDomain.length }),
               })}
               isCurrent={pathname === to}
             >

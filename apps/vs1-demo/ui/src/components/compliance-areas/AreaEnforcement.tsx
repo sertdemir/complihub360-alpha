@@ -112,10 +112,12 @@ export function AreaEnforcement({ slug, selectedCountry }: Props) {
     marker.rank === null
       ? t('compliance.area.enforcementAvg', 'average across {{total}} markets', {
           total: marker.total,
+          count: marker.total,
         })
       : marker.rank === 1
         ? t('compliance.area.enforcementTop', 'the highest of all {{total}} markets', {
             total: marker.total,
+            count: marker.total,
           })
         : t('compliance.area.enforcementRank', 'rank {{rank}} of {{total}} markets', {
             rank: marker.rank,
