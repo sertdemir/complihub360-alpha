@@ -38,6 +38,7 @@ const LeadsPage = lazy(() => import("./pages/provider/LeadsPage").then((m) => ({
 const PerformancePage = lazy(() => import("./pages/provider/PerformancePage").then((m) => ({ default: m.PerformancePage })));
 const CoveragePage = lazy(() => import("./pages/provider/CoveragePage").then((m) => ({ default: m.CoveragePage })));
 const BillingPage = lazy(() => import("./pages/provider/BillingPage").then((m) => ({ default: m.BillingPage })));
+const SubscriptionPage = lazy(() => import("./pages/provider/SubscriptionPage").then((m) => ({ default: m.SubscriptionPage })));
 const SettingsPage = lazy(() => import("./pages/provider/SettingsPage").then((m) => ({ default: m.SettingsPage })));
 const NotificationsPage = lazy(() => import("./pages/provider/NotificationsPage").then((m) => ({ default: m.NotificationsPage })));
 const ApplicationPage = lazy(() => import("./pages/provider/ApplicationPage").then((m) => ({ default: m.ApplicationPage })));
@@ -250,6 +251,7 @@ function AppContent() {
                         <Route path="partner-dashboard/performance" element={<PerformancePage />} />
                         <Route path="partner-dashboard/coverage" element={<CoveragePage />} />
                         <Route path="partner-dashboard/billing" element={<BillingPage />} />
+                        <Route path="partner-dashboard/subscription" element={<SubscriptionPage />} />
                         <Route path="partner-dashboard/settings" element={<SettingsPage />} />
                         <Route path="partner-dashboard/notifications" element={<NotificationsPage />} />
                         {/* Phase 2 Onboarding: Dossier + Verification Center */}

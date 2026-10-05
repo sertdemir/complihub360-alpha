@@ -31,7 +31,8 @@
         "application": "To the dossier",
         "verification": "Verification Center"
       }
-    }
+    },
+    "navSubscription": "Plan"
   },
   "bell": {
     "aria": "Notifications",
@@ -914,5 +915,78 @@
       "registry": "a registration number",
       "own_name": "your company name"
     }
+  },
+  "subscription": {
+    "eyebrow": "Plan",
+    "title": "Which plan fits what you offer?",
+    "subtitle": "Only the number of main categories is limited. Sub-categories, services and countries follow your verification, not your plan.",
+    "releasedLeadOne": "You are approved for {{n}} main category today:",
+    "releasedLeadMany": "You are approved for {{n}} main categories today:",
+    "cadenceLabel": "Billing cadence",
+    "cadenceMonthly": "Monthly",
+    "cadenceAnnual": "Annual",
+    "cadenceMonthlyLower": "monthly payment",
+    "cadenceAnnualLower": "annual payment",
+    "annualRule": "Annual is charged once for twelve months — at the price of ten.",
+    "perMonth": "/ month",
+    "perYear": "/ year",
+    "orAnnual": "or {{price}} per year",
+    "orMonthly": "or {{price}} per month",
+    "featCategories": "Categories",
+    "featDiscount": "Lead discount",
+    "allowanceAll": "all of your approved ones",
+    "allowanceOne": "1 main category",
+    "allowanceMany": "up to {{n}} main categories",
+    "discountNone": "none",
+    "discountValue": "{{pct}} % on the first {{n}} charged leads each month",
+    "choose": "Choose {{plan}}",
+    "promiseTitle": "What a plan does not change",
+    "promiseLead": "Matching uses verified suitability and service data only.",
+    "promise": {
+      "rank": "Your position in search results",
+      "match": "Which requests you are matched with",
+      "reviews": "Your reviews and your performance score",
+      "profile": "How your public profile looks"
+    },
+    "confirmTitle": "Start {{plan}}, {{cadence}}",
+    "factPrice": "Price",
+    "factStart": "Start",
+    "factStartValue": "today, {{date}}",
+    "factInvoice": "First invoice",
+    "factInvoiceValue": "with this period, payable within 14 days",
+    "factRenewal": "Renewal",
+    "notBookableTitle": "This does not make you bookable yet.",
+    "notBookableBody": "Bookings also require a payment method on file — you add one under Billing.",
+    "confirmStart": "Start {{plan}}",
+    "back": "Back",
+    "failExists": "A plan is already running. Changing plans is not available here yet.",
+    "failGeneric": "That did not work just now. Please try again, or write to {{mail}}.",
+    "startedNote": "Your plan is running. Bookings also require a payment method on file.",
+    "contact": "Get in touch",
+    "running": {
+      "title": "Your plan",
+      "badge": "Running",
+      "price": "Price",
+      "perMonth": "{{price}} per month",
+      "perYear": "{{price}} per year",
+      "renewal": "Renewal",
+      "categories": "Categories",
+      "categoriesUsed": "up to {{allowance}} — you use {{used}}",
+      "discount": "Lead discount",
+      "discountValue": "{{pct}} % on the first {{n}} charged leads each month",
+      "noChangeReason": "We do not offer a plan change here yet. The rules for proration and cancellation notice are not settled; until they are, we do it by hand, so nothing is charged that you have not agreed to. Write to {{mail}}."
+    },
+    "blocked": {
+      "suspended": {
+        "title": "Your account is paused while we look into a report",
+        "body": "Once that is done, you can start a plan. Your profile and your invoices are not affected. If you would like to talk about it, write to {{mail}}."
+      },
+      "terminated": {
+        "title": "This account is closed",
+        "body": "A plan can no longer be started for it. Your invoices and your billing history stay available. If you would like to discuss it, write to {{mail}}."
+      }
+    },
+    "cadenceMonthlyAdj": "monthly",
+    "cadenceAnnualAdj": "annual"
   }
 }

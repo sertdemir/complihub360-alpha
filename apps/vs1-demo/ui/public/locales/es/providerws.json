@@ -31,7 +31,8 @@
         "application": "Al expediente",
         "verification": "Verification Center"
       }
-    }
+    },
+    "navSubscription": "Plan"
   },
   "bell": {
     "aria": "Notificaciones",
@@ -914,5 +915,78 @@
       "registry": "número de registro",
       "own_name": "el nombre de su empresa"
     }
+  },
+  "subscription": {
+    "eyebrow": "Plan",
+    "title": "¿Qué plan se ajusta a lo que ofrece?",
+    "subtitle": "Solo se limita el número de categorías principales. Las subcategorías, los servicios y los países siguen su verificación, no su plan.",
+    "releasedLeadOne": "Hoy está aprobado para {{n}} categoría principal:",
+    "releasedLeadMany": "Hoy está aprobado para {{n}} categorías principales:",
+    "cadenceLabel": "Forma de pago",
+    "cadenceMonthly": "Mensual",
+    "cadenceAnnual": "Anual",
+    "cadenceMonthlyLower": "pago mensual",
+    "cadenceAnnualLower": "pago anual",
+    "annualRule": "El plan anual se cobra una vez por doce meses — al precio de diez.",
+    "perMonth": "/ mes",
+    "perYear": "/ año",
+    "orAnnual": "o {{price}} al año",
+    "orMonthly": "o {{price}} al mes",
+    "featCategories": "Categorías",
+    "featDiscount": "Descuento por lead",
+    "allowanceAll": "todas las que tiene aprobadas",
+    "allowanceOne": "1 categoría principal",
+    "allowanceMany": "hasta {{n}} categorías principales",
+    "discountNone": "ninguno",
+    "discountValue": "{{pct}} % en los primeros {{n}} leads cobrados cada mes",
+    "choose": "Elegir {{plan}}",
+    "promiseTitle": "Lo que un plan no cambia",
+    "promiseLead": "El matching utiliza únicamente idoneidad verificada y datos de servicio.",
+    "promise": {
+      "rank": "Su posición en los resultados de búsqueda",
+      "match": "A qué solicitudes se le asigna",
+      "reviews": "Sus reseñas y su puntuación de desempeño",
+      "profile": "El aspecto de su perfil público"
+    },
+    "confirmTitle": "Iniciar {{plan}}, {{cadence}}",
+    "factPrice": "Precio",
+    "factStart": "Inicio",
+    "factStartValue": "hoy, {{date}}",
+    "factInvoice": "Primera factura",
+    "factInvoiceValue": "con este periodo, pagadera en 14 días",
+    "factRenewal": "Renovación",
+    "notBookableTitle": "Con esto todavía no puede recibir reservas.",
+    "notBookableBody": "Las reservas requieren además un método de pago registrado — lo añade en Facturación.",
+    "confirmStart": "Iniciar {{plan}}",
+    "back": "Volver",
+    "failExists": "Ya hay un plan en curso. Aquí todavía no ofrecemos el cambio de plan.",
+    "failGeneric": "Ahora mismo no ha funcionado. Inténtelo de nuevo o escriba a {{mail}}.",
+    "startedNote": "Su plan está en curso. Las reservas requieren además un método de pago registrado.",
+    "contact": "Ponerse en contacto",
+    "running": {
+      "title": "Su plan",
+      "badge": "En curso",
+      "price": "Precio",
+      "perMonth": "{{price}} al mes",
+      "perYear": "{{price}} al año",
+      "renewal": "Renovación",
+      "categories": "Categorías",
+      "categoriesUsed": "hasta {{allowance}} — usa {{used}}",
+      "discount": "Descuento por lead",
+      "discountValue": "{{pct}} % en los primeros {{n}} leads cobrados cada mes",
+      "noChangeReason": "Aquí todavía no ofrecemos el cambio de plan. Las reglas de prorrateo y de preaviso de cancelación aún no están fijadas; hasta entonces lo hacemos a mano, para que no se cobre nada que usted no haya aceptado. Escriba a {{mail}}."
+    },
+    "blocked": {
+      "suspended": {
+        "title": "Su cuenta está en pausa mientras revisamos un aviso",
+        "body": "En cuanto esté resuelto, podrá iniciar un plan. Su perfil y sus facturas no se ven afectados. Si quiere hablarlo, escriba a {{mail}}."
+      },
+      "terminated": {
+        "title": "Esta cuenta está cerrada",
+        "body": "Ya no se puede iniciar un plan para ella. Sus facturas y su historial de facturación siguen disponibles. Si quiere comentarlo, escriba a {{mail}}."
+      }
+    },
+    "cadenceMonthlyAdj": "mensual",
+    "cadenceAnnualAdj": "anual"
   }
 }

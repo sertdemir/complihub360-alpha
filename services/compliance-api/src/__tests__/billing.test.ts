@@ -42,6 +42,7 @@ const CFG: PricingConfig = {
 const sub = (over: Partial<Subscription>): Subscription => ({
     id: 's1', providerKey: 'p1', planCode: 'growth', planVersion: 1, cadence: 'monthly', status: 'active',
     currentPeriodStart: '2026-09-15', currentPeriodEnd: '2026-10-15', startedAt: '2026-09-15T10:00:00Z',
+    renewalDate: '2026-10-15',
     ...over,
 });
 

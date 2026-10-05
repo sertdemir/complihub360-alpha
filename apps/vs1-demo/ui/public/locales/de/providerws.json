@@ -31,7 +31,8 @@
         "application": "Zum Dossier",
         "verification": "Verification Center"
       }
-    }
+    },
+    "navSubscription": "Tarif"
   },
   "bell": {
     "aria": "Benachrichtigungen",
@@ -914,5 +915,78 @@
       "registry": "Registernummer",
       "own_name": "Ihren Firmennamen"
     }
+  },
+  "subscription": {
+    "eyebrow": "Tarif",
+    "title": "Welcher Tarif passt zu Ihrem Angebot?",
+    "subtitle": "Begrenzt wird nur die Zahl der Hauptkategorien. Unterkategorien, Leistungen und Länder folgen Ihrer Verifikation, nicht Ihrem Tarif.",
+    "releasedLeadOne": "Sie sind heute für {{n}} Hauptkategorie freigegeben:",
+    "releasedLeadMany": "Sie sind heute für {{n}} Hauptkategorien freigegeben:",
+    "cadenceLabel": "Zahlweise",
+    "cadenceMonthly": "Monatlich",
+    "cadenceAnnual": "Jährlich",
+    "cadenceMonthlyLower": "monatliche Zahlung",
+    "cadenceAnnualLower": "jährliche Zahlung",
+    "annualRule": "Jährlich wird einmal für zwölf Monate berechnet — zum Preis von zehn.",
+    "perMonth": "/ Monat",
+    "perYear": "/ Jahr",
+    "orAnnual": "oder {{price}} pro Jahr",
+    "orMonthly": "oder {{price}} pro Monat",
+    "featCategories": "Kategorien",
+    "featDiscount": "Lead-Rabatt",
+    "allowanceAll": "alle Ihre freigegebenen",
+    "allowanceOne": "1 Hauptkategorie",
+    "allowanceMany": "bis zu {{n}} Hauptkategorien",
+    "discountNone": "keiner",
+    "discountValue": "{{pct}} % auf die ersten {{n}} belasteten Leads je Monat",
+    "choose": "{{plan}} wählen",
+    "promiseTitle": "Was ein Tarif nicht ändert",
+    "promiseLead": "Das Matching nutzt ausschließlich geprüfte Eignung und Leistungsdaten.",
+    "promise": {
+      "rank": "Ihre Position in den Suchergebnissen",
+      "match": "Welchen Anfragen Sie zugeordnet werden",
+      "reviews": "Ihre Bewertungen und Ihren Leistungswert",
+      "profile": "Das Aussehen Ihres öffentlichen Profils"
+    },
+    "confirmTitle": "{{plan}} starten, {{cadence}}",
+    "factPrice": "Preis",
+    "factStart": "Beginn",
+    "factStartValue": "heute, {{date}}",
+    "factInvoice": "Erste Rechnung",
+    "factInvoiceValue": "mit dieser Periode, zahlbar in 14 Tagen",
+    "factRenewal": "Verlängerung",
+    "notBookableTitle": "Damit sind Sie noch nicht buchbar.",
+    "notBookableBody": "Für Buchungen braucht es zusätzlich ein hinterlegtes Zahlungsmittel — das hinterlegen Sie unter Abrechnung.",
+    "confirmStart": "{{plan}} starten",
+    "back": "Zurück",
+    "failExists": "Es läuft bereits ein Tarif. Einen Wechsel bieten wir hier noch nicht an.",
+    "failGeneric": "Das hat gerade nicht geklappt. Versuchen Sie es noch einmal, oder schreiben Sie an {{mail}}.",
+    "startedNote": "Ihr Tarif läuft. Für Buchungen braucht es zusätzlich ein hinterlegtes Zahlungsmittel.",
+    "contact": "Kontakt aufnehmen",
+    "running": {
+      "title": "Ihr Tarif",
+      "badge": "Läuft",
+      "price": "Preis",
+      "perMonth": "{{price}} pro Monat",
+      "perYear": "{{price}} pro Jahr",
+      "renewal": "Verlängerung",
+      "categories": "Kategorien",
+      "categoriesUsed": "bis zu {{allowance}} — Sie nutzen {{used}}",
+      "discount": "Lead-Rabatt",
+      "discountValue": "{{pct}} % auf die ersten {{n}} belasteten Leads je Monat",
+      "noChangeReason": "Einen Tarifwechsel bieten wir hier noch nicht an. Die Regeln für anteilige Abrechnung und Kündigungsfristen stehen noch nicht fest; bis dahin machen wir es von Hand, damit nichts berechnet wird, dem Sie nicht zugestimmt haben. Schreiben Sie an {{mail}}."
+    },
+    "blocked": {
+      "suspended": {
+        "title": "Ihr Konto ist pausiert, solange wir einen Hinweis prüfen",
+        "body": "Sobald das erledigt ist, können Sie einen Tarif starten. Ihr Profil und Ihre Rechnungen sind davon nicht betroffen. Wenn Sie darüber sprechen möchten, schreiben Sie an {{mail}}."
+      },
+      "terminated": {
+        "title": "Dieses Konto ist beendet",
+        "body": "Ein Tarif lässt sich dafür nicht mehr starten. Ihre Rechnungen und Ihre Abrechnungshistorie bleiben verfügbar. Wenn Sie das besprechen möchten, schreiben Sie an {{mail}}."
+      }
+    },
+    "cadenceMonthlyAdj": "monatlich",
+    "cadenceAnnualAdj": "jährlich"
   }
 }
