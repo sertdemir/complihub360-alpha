@@ -59,7 +59,9 @@ Verworfen und warum — damit niemand es später „verbessert":
       in `C360 - Design System` (`a4BeKbsBGoHkcudhKXUJTl`).
 - [x] **Stufe 3 lokal** — gebaut 2026-10-04, `npm run dev:ui`, alle vier
       Zustaende als Screenshot aufgenommen. Review durch den Nutzer steht aus.
-- [ ] **Stufe 4 Staging** — offen, siehe „Was dieses Ticket nicht erledigt".
+- [x] **Stufe 4 Staging** — mit dem Merge automatisch ausgerollt
+      (Workflow `deploy-staging`, Lauf `37374139131`, alle fünf Jobs grün:
+      `build-ui`, `build-api`, `deploy-api`, `deploy-ui`, `verify`).
 
 ## Abgeschlossen
 
@@ -77,8 +79,10 @@ Geprüft vor dem Merge: `typecheck`, `build`, `tsc --noEmit` (UI), `i18n:check`,
 Das Ticket geht nach `done`, weil der Code auf `main` ist — nicht, weil alles
 entschieden wäre. Drei Dinge bleiben offen und brauchen je einen eigenen Schritt:
 
-1. **Stufe 4 Staging.** Die Fläche ist lokal gelaufen und per Screenshot
-   abgenommen, aber nie auf Staging gewesen.
+1. **Der Blick auf Staging.** Ausgerollt ist die Fläche (siehe oben) — der
+   Deploy hängt an `paths: apps/vs1-demo/ui/**`, und der Merge hat ihn
+   ausgelöst. Angesehen hat sie dort noch niemand; Claude kann die
+   Staging-Domain nicht abrufen (Proxy 403), das ist Sache des Nutzers.
 2. **Die Copy ist nicht abgenommen.** Besonders die Überschrift „Ihr Tarif" im
    laufenden Zustand ist neue Microcopy, die im Canvas nicht vorkam. Vier
    Sprachen stehen, geprüft ist nur die Schlüssel-Parität.
