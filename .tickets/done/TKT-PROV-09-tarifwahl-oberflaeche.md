@@ -83,13 +83,17 @@ entschieden wäre. Drei Dinge bleiben offen und brauchen je einen eigenen Schrit
    Deploy hängt an `paths: apps/vs1-demo/ui/**`, und der Merge hat ihn
    ausgelöst. Angesehen hat sie dort noch niemand; Claude kann die
    Staging-Domain nicht abrufen (Proxy 403), das ist Sache des Nutzers.
-2. **Die Copy ist nicht abgenommen.** Besonders die Überschrift „Ihr Tarif" im
-   laufenden Zustand ist neue Microcopy, die im Canvas nicht vorkam. Vier
-   Sprachen stehen, geprüft ist nur die Schlüssel-Parität.
-3. **Kulanzfrist, Tarifwechsel und Kündigung** bleiben geparkt — Spec B hat die
+2. ~~Die Copy ist nicht abgenommen.~~ **Abgenommen vom Nutzer am 2026-10-06**,
+   einschließlich der Überschrift „Ihr Tarif" im laufenden Zustand. Die war
+   neue Microcopy — das F2-Board im Canvas zeigte nur die Karte, keine
+   Überschrift —, und sie bleibt wie sie ist. Das gilt für alle vier Sprachen.
+3. **Kulanzfrist, Tarifwechsel und Kündigung** bleiben offen — Spec B hat die
    Regeln unter „Configurable items requiring final decision" reserviert, und
    eine still erfundene Regel wäre genau die Entscheidung, die nicht im Code
-   fallen darf.
+   fallen darf. Als Entscheidungsvorlage aufbereitet in
+   [`ADR-0006`](../../docs/decisions/ADR-0006-abo-kulanz-wechsel-kuendigung.md)
+   (Status `PROPOSED`): was heute faktisch gilt, je drei Optionen, und die drei
+   Kopplungen zwischen ihnen. **Entschieden ist dort nichts.**
 
 Dazu eine Nebenwirkung, die über diese Fläche hinausreicht: der Sidebar-Eintrag
 `Tarif` sitzt in `AppShell / Sidebar — Provider v2` bzw. im `NAV` der
