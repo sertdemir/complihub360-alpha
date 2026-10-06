@@ -1,7 +1,7 @@
 ---
 title: "Tarifwahl im Anbieterportal — Oberfläche zu #240"
 assignee: "Claude"
-status: "doing"
+status: "done"
 ---
 
 # Tarifwahl im Anbieterportal
@@ -59,7 +59,37 @@ Verworfen und warum — damit niemand es später „verbessert":
       in `C360 - Design System` (`a4BeKbsBGoHkcudhKXUJTl`).
 - [x] **Stufe 3 lokal** — gebaut 2026-10-04, `npm run dev:ui`, alle vier
       Zustaende als Screenshot aufgenommen. Review durch den Nutzer steht aus.
-- [ ] **Stufe 4 Staging**.
+- [ ] **Stufe 4 Staging** — offen, siehe „Was dieses Ticket nicht erledigt".
+
+## Abgeschlossen
+
+Gemergt als **PR #251**, Squash `7d40787e` (2026-10-05). Die Fläche gibt es im
+Produkt: ein Anbieter kann einen Tarif wählen, und damit ist die Bedingung
+erfüllt, an der `billingReadiness` bisher ohne Weg scheiterte. Offener Punkt 1
+aus `TKT-PROV-07` ist zu.
+
+Geprüft vor dem Merge: `typecheck`, `build`, `tsc --noEmit` (UI), `i18n:check`,
+`terminology:check`, `copy:check`, Tests der API und der UI (35 Dateien /
+280 Tests, vorher 33/277), `quality-gates` grün.
+
+### Was dieses Ticket NICHT erledigt
+
+Das Ticket geht nach `done`, weil der Code auf `main` ist — nicht, weil alles
+entschieden wäre. Drei Dinge bleiben offen und brauchen je einen eigenen Schritt:
+
+1. **Stufe 4 Staging.** Die Fläche ist lokal gelaufen und per Screenshot
+   abgenommen, aber nie auf Staging gewesen.
+2. **Die Copy ist nicht abgenommen.** Besonders die Überschrift „Ihr Tarif" im
+   laufenden Zustand ist neue Microcopy, die im Canvas nicht vorkam. Vier
+   Sprachen stehen, geprüft ist nur die Schlüssel-Parität.
+3. **Kulanzfrist, Tarifwechsel und Kündigung** bleiben geparkt — Spec B hat die
+   Regeln unter „Configurable items requiring final decision" reserviert, und
+   eine still erfundene Regel wäre genau die Entscheidung, die nicht im Code
+   fallen darf.
+
+Dazu eine Nebenwirkung, die über diese Fläche hinausreicht: der Sidebar-Eintrag
+`Tarif` sitzt in `AppShell / Sidebar — Provider v2` bzw. im `NAV` der
+`ProviderShell` und erscheint damit auf **jeder** Anbieterfläche.
 
 ### Was Stufe 3 gebaut hat
 
