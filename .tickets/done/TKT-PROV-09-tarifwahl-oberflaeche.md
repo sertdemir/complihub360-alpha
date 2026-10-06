@@ -1,7 +1,7 @@
 ---
 title: "Tarifwahl im Anbieterportal — Oberfläche zu #240"
 assignee: "Claude"
-status: "doing"
+status: "done"
 ---
 
 # Tarifwahl im Anbieterportal
@@ -59,7 +59,45 @@ Verworfen und warum — damit niemand es später „verbessert":
       in `C360 - Design System` (`a4BeKbsBGoHkcudhKXUJTl`).
 - [x] **Stufe 3 lokal** — gebaut 2026-10-04, `npm run dev:ui`, alle vier
       Zustaende als Screenshot aufgenommen. Review durch den Nutzer steht aus.
-- [ ] **Stufe 4 Staging**.
+- [x] **Stufe 4 Staging** — mit dem Merge automatisch ausgerollt
+      (Workflow `deploy-staging`, Lauf `37374139131`, alle fünf Jobs grün:
+      `build-ui`, `build-api`, `deploy-api`, `deploy-ui`, `verify`).
+
+## Abgeschlossen
+
+Gemergt als **PR #251**, Squash `7d40787e` (2026-10-05). Die Fläche gibt es im
+Produkt: ein Anbieter kann einen Tarif wählen, und damit ist die Bedingung
+erfüllt, an der `billingReadiness` bisher ohne Weg scheiterte. Offener Punkt 1
+aus `TKT-PROV-07` ist zu.
+
+Geprüft vor dem Merge: `typecheck`, `build`, `tsc --noEmit` (UI), `i18n:check`,
+`terminology:check`, `copy:check`, Tests der API und der UI (35 Dateien /
+280 Tests, vorher 33/277), `quality-gates` grün.
+
+### Was dieses Ticket NICHT erledigt
+
+Das Ticket geht nach `done`, weil der Code auf `main` ist — nicht, weil alles
+entschieden wäre. Drei Dinge bleiben offen und brauchen je einen eigenen Schritt:
+
+1. **Der Blick auf Staging.** Ausgerollt ist die Fläche (siehe oben) — der
+   Deploy hängt an `paths: apps/vs1-demo/ui/**`, und der Merge hat ihn
+   ausgelöst. Angesehen hat sie dort noch niemand; Claude kann die
+   Staging-Domain nicht abrufen (Proxy 403), das ist Sache des Nutzers.
+2. ~~Die Copy ist nicht abgenommen.~~ **Abgenommen vom Nutzer am 2026-10-06**,
+   einschließlich der Überschrift „Ihr Tarif" im laufenden Zustand. Die war
+   neue Microcopy — das F2-Board im Canvas zeigte nur die Karte, keine
+   Überschrift —, und sie bleibt wie sie ist. Das gilt für alle vier Sprachen.
+3. **Kulanzfrist, Tarifwechsel und Kündigung** bleiben offen — Spec B hat die
+   Regeln unter „Configurable items requiring final decision" reserviert, und
+   eine still erfundene Regel wäre genau die Entscheidung, die nicht im Code
+   fallen darf. Als Entscheidungsvorlage aufbereitet in
+   [`ADR-0006`](../../docs/decisions/ADR-0006-abo-kulanz-wechsel-kuendigung.md)
+   (Status `PROPOSED`): was heute faktisch gilt, je drei Optionen, und die drei
+   Kopplungen zwischen ihnen. **Entschieden ist dort nichts.**
+
+Dazu eine Nebenwirkung, die über diese Fläche hinausreicht: der Sidebar-Eintrag
+`Tarif` sitzt in `AppShell / Sidebar — Provider v2` bzw. im `NAV` der
+`ProviderShell` und erscheint damit auf **jeder** Anbieterfläche.
 
 ### Was Stufe 3 gebaut hat
 
