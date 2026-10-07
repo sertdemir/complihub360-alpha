@@ -1348,7 +1348,13 @@ describe('GET /api/v1/provider/:key/billing/preview — Pricing v2', () => {
         expect(r.body.subscription).toMatchObject({ plan_code: 'growth', label: 'Growth', cadence: 'monthly', category_allowance: 5 });
         expect(r.body.discount).toMatchObject({ pct: 10, count: 3, used: 2, remaining: 1 });
         expect(r.body.leads).toEqual({ count: 2, standard_cents: 24800, discount_cents: 2480, final_cents: 22320 });
-        expect(r.body.readiness).toEqual({ ready: false, reasons: [], synced_at: null });
+        // Seit ADR-0006 traegt readiness auch die Kulanzfrist. Hier liegt keine
+        // Rechnung vor, also ist nichts in der Frist — die Frist selbst steht
+        // trotzdem da, damit die Oberflaeche sie nennen kann, bevor etwas faellig ist.
+        expect(r.body.readiness).toEqual({
+            ready: false, reasons: [], synced_at: null,
+            cure_period_days: 7, invoices_in_grace: 0, blocks_at: null, overdue_since: null,
+        });
         expect(r.body.credit_balance_cents).toBe(2673);
         // Abo-Zeile des laufenden Monats + Leads des Zyklus
         expect(r.body.lines).toHaveLength(1);

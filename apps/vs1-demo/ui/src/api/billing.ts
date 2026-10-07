@@ -87,6 +87,18 @@ export interface BillingReadiness {
   synced_at: string | null;
   /** „Visa ····4242" — nur der Sync aus Stripe kennt es. */
   payment_method?: string | null;
+  // ─── Kulanzfrist (ADR-0006, A2) ────────────────────────────────────────────
+  // Eine faellige Rechnung sperrt die Buchung erst nach dieser Frist. Die
+  // Oberflaeche zeigt den Fall AB TAG 1 — eine Sperre, die unangekuendigt
+  // eintritt, ist der Teil, den die DNA ausschliesst.
+  /** Beschlossene Frist in Tagen; aus `billing_policy`. */
+  cure_period_days?: number;
+  /** Faellige Rechnungen, die noch in der Frist sind. */
+  invoices_in_grace?: number;
+  /** 'YYYY-MM-DD' — ab diesem Tag sperrt die aelteste davon. */
+  blocks_at?: string | null;
+  /** 'YYYY-MM-DD' — seit wann die aelteste faellige Rechnung offen ist. */
+  overdue_since?: string | null;
 }
 
 /** Neu berechnen aus Stripe und Datenbank: beim Rueckweg aus dem Portal

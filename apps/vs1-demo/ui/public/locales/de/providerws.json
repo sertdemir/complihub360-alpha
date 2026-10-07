@@ -198,7 +198,12 @@
       "overdue_invoice": "Eine Rechnung ist überfällig. Bezahlen Sie sie im Portal.",
       "account_paused": "Ihr Konto ist pausiert.",
       "payment_failed": "Die letzte Lead-Belastung ist gescheitert. Ein anderes Zahlungsmittel hebt die Sperre auf — dieselbe Karte nicht."
-    }
+    },
+    "graceTitleOne": "Eine Rechnung ist offen",
+    "graceTitleMany": "{{n}} Rechnungen sind offen",
+    "graceBody": "Fällig seit {{since}}. Ab {{until}} pausiert die Buchung, bis die Rechnung bezahlt ist.",
+    "graceStillVisible": "Ihre Sichtbarkeit in den Ergebnissen ändert sich dadurch nicht.",
+    "graceOpenPortal": "Rechnung im Portal öffnen"
   },
   "confirmEmail": {
     "working": "Ihre neue Adresse wird bestätigt…",

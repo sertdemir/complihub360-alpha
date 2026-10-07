@@ -75,7 +75,20 @@ export interface PricingConfig {
     bands: BandConfig[];
     rules: BandRule[];
     feeExceptions: FeeEligibilityException[];
+    /** Spec A §21.1 "configured cure period", aus `billing_policy` (ADR-0006, A2). */
+    curePeriodDays: number;
 }
+
+/**
+ * Was gilt, wenn `billing_policy` leer oder unlesbar ist.
+ *
+ * Bewusst 7 und nicht 0: eine unlesbare Konfiguration darf eine Regel nie
+ * STILL ZULASTEN des Anbieters verschaerfen. Faellt die Tabelle aus, bleibt die
+ * beschlossene Frist stehen, statt in den alten Zustand ohne Kulanz
+ * zurueckzufallen. Die massgebliche Zahl steht in der Tabelle; diese hier ist
+ * das Netz darunter.
+ */
+export const CURE_PERIOD_FALLBACK_DAYS = 7;
 
 export interface Subscription {
     id: string;
@@ -265,10 +278,84 @@ export interface ReadinessInput {
     billingInfoComplete: boolean;
     subscriptionStatus: Subscription['status'] | null;
     authorizationAccepted: boolean;
+    /** NUR die, deren Kulanzfrist abgelaufen ist — siehe `overdueState`. */
     overdueInvoices: number;
     paused: boolean;
     /** Die letzte Belastung scheiterte UND das Zahlungsmittel ist noch dasselbe. */
     lastPaymentFailed: boolean;
+}
+
+/**
+ * Wie eine offene Rechnung auf die Buchbarkeit wirkt — mit Kulanzfrist.
+ *
+ * Bis zum 2026-10-07 sperrte eine Rechnung in der Sekunde, in der `due_at`
+ * verstrich. Das war nie beschlossen, es war der Wert, der herauskommt, wenn
+ * niemand eine Frist eintraegt (Spec A §21.1 nennt eine "configured cure
+ * period"). ADR-0006, Wahl A2: sieben Tage.
+ *
+ * Die Funktion bleibt rein — die Frist und "jetzt" kommen von aussen, damit
+ * jeder Tag ohne Netz pruefbar ist.
+ *
+ * Drei Groessen, weil die Oberflaeche sie braucht: `blocking` entscheidet die
+ * Sperre, `nextBlockAt` sagt dem Anbieter, AB WANN gesperrt wird (ohne das ist
+ * die Frist nur eine stillere Sperre), `oldestDueAt` sagt, seit wann.
+ */
+export interface OverdueState {
+    /** Rechnungen, deren Frist abgelaufen ist — nur die sperren. */
+    blocking: number;
+    /** Faellig, aber noch in der Frist: Zahl und der fruehste Sperrtermin. */
+    inGrace: number;
+    /** 'YYYY-MM-DD', ab wann die erste noch kulante Rechnung sperrt. */
+    nextBlockAt: string | null;
+    /** 'YYYY-MM-DD' der aeltesten faelligen offenen Rechnung. */
+    oldestDueAt: string | null;
+}
+
+export function overdueState(
+    openInvoices: Array<{ due_at?: string | null }>,
+    curePeriodDays: number,
+    now: Date = new Date(),
+): OverdueState {
+    // In KALENDERTAGEN rechnen, nicht in Zeitstempeln. `invoices.due_at` ist ein
+    // date; `now` hat eine Uhrzeit. Wer beides als Millisekunden vergleicht,
+    // sperrt schon mittags am letzten kulanten Tag — ein ganzer Tag, den der
+    // Anbieter haette haben sollen, und niemand sieht es im Code.
+    const DAY = 86_400_000;
+    const asDay = (v: string) => Date.parse(`${String(v).slice(0, 10)}T00:00:00Z`);
+    const fmt = (ms: number) => new Date(ms).toISOString().slice(0, 10);
+
+    const heute = asDay(now.toISOString());
+    const frist = Math.max(0, curePeriodDays);
+
+    let blocking = 0;
+    let inGrace = 0;
+    let nextBlockMs: number | null = null;
+    let oldestDueMs: number | null = null;
+
+    for (const inv of openInvoices) {
+        if (!inv.due_at) continue;
+        const due = asDay(inv.due_at);
+        if (Number.isNaN(due) || due >= heute) continue;   // heute faellig ist noch nicht ueberfaellig
+
+        if (oldestDueMs === null || due < oldestDueMs) oldestDueMs = due;
+
+        // Kulanz deckt die Tage `due + 1` bis `due + frist`. Gesperrt wird ab
+        // dem Tag danach — bei frist = 0 also ab dem Tag nach der Faelligkeit.
+        const sperrtAb = due + (frist + 1) * DAY;
+        if (heute >= sperrtAb) {
+            blocking += 1;
+        } else {
+            inGrace += 1;
+            if (nextBlockMs === null || sperrtAb < nextBlockMs) nextBlockMs = sperrtAb;
+        }
+    }
+
+    return {
+        blocking,
+        inGrace,
+        nextBlockAt: nextBlockMs === null ? null : fmt(nextBlockMs),
+        oldestDueAt: oldestDueMs === null ? null : fmt(oldestDueMs),
+    };
 }
 
 export function billingReadiness(i: ReadinessInput): { ready: boolean; reasons: BillingBlockReason[] } {
@@ -341,11 +428,12 @@ export function quoteLeadFee(
 const today = () => new Date().toISOString().slice(0, 10);
 
 export async function loadPricingConfig(): Promise<PricingConfig> {
-    const [plans, bands, rules, exc] = await Promise.all([
+    const [plans, bands, rules, exc, policy] = await Promise.all([
         supabaseApi.select('plan_catalog', {}, { limit: 100 }) as Promise<any[]>,
         supabaseApi.select('lead_band_config', {}, { limit: 100 }) as Promise<any[]>,
         supabaseApi.select('lead_band_rules', {}, { limit: 1000 }) as Promise<any[]>,
         supabaseApi.select('lead_fee_eligibility', {}, { limit: 1000 }) as Promise<any[]>,
+        (supabaseApi.select('billing_policy', {}, { limit: 50 }) as Promise<any[]>).catch(() => []),
     ]);
     const now = today();
     // Je Code die juengste Version, die schon gilt.
@@ -375,6 +463,13 @@ export async function loadPricingConfig(): Promise<PricingConfig> {
                 minCountries: r.min_countries ?? 1, minServices: r.min_services ?? 1, recurring: r.recurring ?? null,
                 band: r.band, priority: r.priority ?? 0,
             })),
+        // Juengste bereits geltende Fassung; fehlt sie, greift das Netz oben.
+        curePeriodDays: (() => {
+            const live = policy.filter((r: any) => !r.effective_from || String(r.effective_from) <= now);
+            if (!live.length) return CURE_PERIOD_FALLBACK_DAYS;
+            const latest = live.reduce((a: any, b: any) => (b.version > a.version ? b : a));
+            return typeof latest.cure_period_days === 'number' ? latest.cure_period_days : CURE_PERIOD_FALLBACK_DAYS;
+        })(),
         feeExceptions: exc.map((e) => ({ areaCode: e.area_code, countryCode: e.country_code ?? '*', enabled: !!e.enabled })),
     };
 }
@@ -519,7 +614,14 @@ export async function handleBillingPreview(res: ServerResponse, correlationId: s
         }
         const now = new Date();
         const period = now.toISOString().slice(0, 7);
-        const [cfg, sub] = await Promise.all([loadPricingConfig(), getActiveSubscription(providerKey)]);
+        const [cfg, sub, openInvoices] = await Promise.all([
+            loadPricingConfig(),
+            getActiveSubscription(providerKey),
+            supabaseApi.select('invoices', { provider_key: providerKey, status: 'open' }, { limit: 50 }) as Promise<any[]>,
+        ]);
+        // Die Kulanzfrist gehoert in die Antwort, nicht nur in die Sperre: der
+        // Anbieter soll das Sperrdatum sehen, BEVOR es eintritt (ADR-0006, A2).
+        const overdue = overdueState(openInvoices, cfg.curePeriodDays, now);
         const plan = sub ? cfg.plans.find((p) => p.code === sub.planCode) ?? null : null;
         const cycleStart = cycleStartFor(sub, now);
         const used = await getDiscountCounter(providerKey, cycleStart);
@@ -566,6 +668,13 @@ export async function handleBillingPreview(res: ServerResponse, correlationId: s
                 ready: !!providers[0].billing_ready,
                 reasons: Array.isArray(providers[0].billing_block_reasons) ? providers[0].billing_block_reasons : [],
                 synced_at: providers[0].billing_synced_at ?? null,
+                cure_period_days: cfg.curePeriodDays,
+                /** Faellig, aber noch in der Frist — der Fall, der angekuendigt gehoert. */
+                invoices_in_grace: overdue.inGrace,
+                /** Ab diesem Tag sperrt die aelteste noch kulante Rechnung. */
+                blocks_at: overdue.nextBlockAt,
+                /** Seit wann die aelteste faellige Rechnung offen ist. */
+                overdue_since: overdue.oldestDueAt,
             },
             credit_balance_cents: creditBalance,
             lines: subLine ? [subLine] : [],

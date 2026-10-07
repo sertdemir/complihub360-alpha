@@ -1,9 +1,10 @@
 # ADR-0006: Kulanzfrist, Tarifwechsel und Kündigung
 
-**Status:** PROPOSED — **hier ist nichts entschieden.** Diese Vorlage legt offen, was heute faktisch gilt, welche Optionen es gibt und was jede kostet. Die Wahl liegt beim Nutzer.
-**Date:** 2026-10-06
+**Status:** ACCEPTED
+**Date:** 2026-10-06 (Vorlage) · **2026-10-07 (Entscheidung)**
+**Entscheidung des Nutzers (2026-10-07):** **A2** Kulanzfrist 7 Tage · **B2** Tarifwechsel zum Periodenende · **C2** Kündigung zum Periodenende
 **Bezug:** *Provider Dashboard Pricing & Operations Implementation Specification* v1.0 („Spec B") — „Configurable items requiring final decision": *„Subscription proration, cancellation notice, grace period, failed-payment retry, and reactivation rules."* · *Spec A* §21 (Billing Readiness), §21.1 (Legal configuration) · [`KN-BRAND-001`](../../.knowledge/memory/nodes/KN-BRAND-001-complihub360-dna.md) · ADR-0003 (Pricing v2) · ADR-0005 (Buchung → Belastung) · `TKT-PROV-09`
-**Warum eine Vorlage und keine Entscheidung:** Spec B führt diese Regeln ausdrücklich als offen. [`CLAUDE.md`](../../CLAUDE.md) verbietet, einen solchen Punkt im Code aufzulösen — eine still erfundene Pro-rata-Regel wäre genau die Entscheidung, die nicht beim Agenten liegt. Sie haben Geldfolge für den Anbieter.
+**Warum erst eine Vorlage:** Spec B führt diese Regeln ausdrücklich als offen. [`CLAUDE.md`](../../CLAUDE.md) verbietet, einen solchen Punkt im Code aufzulösen — eine still erfundene Pro-rata-Regel wäre genau die Entscheidung, die nicht beim Agenten liegt. Sie haben Geldfolge für den Anbieter. Die Abschnitte *Context* und *Optionen* bleiben unverändert stehen: sie sind der Beleg, was abgewogen wurde.
 
 ## Context — was heute gilt
 
@@ -87,6 +88,40 @@ Keine Frist, keine Erstattung, kein Periodenende. Die Periode, die schon in Rech
 
 **Hinweis:** C2 wirft keine der Fragen auf, die Spec B reserviert — keine anteilige Abrechnung, keine Erstattung, keine Reaktivierungsregel. Es ist die Option, die am wenigsten neu entscheidet.
 
+## Decision
+
+Der Nutzer hat am 2026-10-07 **A2 · B2 · C2** gewählt. Damit ist jede der drei Regeln beschlossen; was unten steht, präzisiert sie so weit, wie die Umsetzung es braucht — und benennt die Stellen, an denen die Wahl allein noch nicht reicht.
+
+### 1 · Kulanzfrist: 7 Tage (A2)
+
+Eine offene Rechnung sperrt die Buchung **erst 7 Tage nach `due_at`**, nicht mehr in der Sekunde des Verstreichens. Zusammen mit den 14 Tagen Zahlungsziel sind das 21 Tage ab Rechnungsstellung.
+
+Drei Festlegungen, die zur Wahl gehören:
+
+- **Konfiguriert, nicht einprogrammiert.** Spec A §21.1 spricht von einer *„configured cure period"*; eine `7` im Quelltext wäre genau das, was die Spec nicht will. Der Wert gehört in dieselbe Konfiguration wie die übrigen Abrechnungsgrößen, mit 7 als Vorgabe.
+- **Ab Tag 1 sichtbar, ab Tag 8 sperrend.** Der Anbieter sieht die offene Rechnung und das Datum, ab dem gesperrt wird, von der ersten Stunde an auf `/billing` — als Hinweis, nicht als Sperre. Eine Sperre, die unangekündigt eintritt, ist der Teil, den die DNA ausschließt; die Frist allein behebt das nicht.
+- **Die Sichtbarkeit bleibt unberührt.** Spec A §14; der pgTAP-Wächter hält `billing_ready` aus `matchable_provider_services` heraus. Gesperrt ist die Buchung, nie das Erscheinen.
+
+### 2 · Tarifwechsel zum Periodenende (B2)
+
+Ein Wechsel wird **vorgemerkt** und tritt zum Ende der laufenden Periode in Kraft. Keine anteilige Abrechnung, keine Gutschrift, keine Rückabwicklung — damit bleibt die Pro-rata-Frage, die Spec B reserviert, auch weiterhin unbeantwortet, und das ist Absicht.
+
+- **„Periodenende" heißt `renewal_date`, nicht `current_period_end`.** Die beiden sind nur bei monatlicher Zahlweise dasselbe. Ein Jahreskunde hat zwölf Monate bezahlt; sein Wechsel wird zur Verlängerung wirksam, nicht zum Ende des nächsten Rabattmonats. Wer das verwechselt, beendet ein bezahltes Jahresabo nach vier Wochen.
+- **Der Rabattzähler braucht keine neue Regel.** Er hängt am Monatszyklus (ADR-0003); ein Wechsel, der auf eine Periodengrenze fällt, trifft ihn nicht mitten im Zählen.
+- **Ein Downgrade unter die genutzten Hauptkategorien wird abgelehnt, nicht vorgemerkt.** `categoryAllowanceCheck` ist kein Anzeigewert: `verificationRules` nimmt `plan.category_allowance` in `missing` auf, und ein Anbieter, der darüber liegt, ist nicht mehr aktivierbar. Ein vorgemerkter Downgrade würde den Anbieter zum Stichtag still deaktivieren. Die Wahl wird deshalb beim Vormerken geprüft und mit dem konkreten Grund abgelehnt („Essential deckt 1 Hauptkategorie ab, Sie nutzen 3"). Das ist keine neue Geldregel, sondern die Weigerung, jemanden in eine Wand laufen zu lassen.
+
+### 3 · Kündigung zum Periodenende (C2)
+
+Der Anbieter kann **selbst kündigen**; das Abo läuft bis `renewal_date` und endet dann. Keine Erstattung — die Periode ist bezahlt und wird geliefert. Bis zum Stichtag ist die Kündigung **rücknehmbar**.
+
+- **Eine offene Rechnung darf die Kündigung nicht blockieren.** Sonst entstünde die Schleife, in der die Sperre den Ausgang verstellt. Kündigen ist kein Vorgang, der `billing_ready` verlangt.
+- **Die Pflicht aus der laufenden Periode bleibt.** Die Rechnung, die schon gestellt ist, bleibt fällig; Kündigung beendet das Abo, nicht die Schuld.
+- **Nach dem Stichtag ist der Platz frei** — der Anbieter kann ein neues Abo beginnen. Eine eigene *Reaktivierungs*-Regel im Sinne von Spec B entsteht dadurch nicht: es ist derselbe Weg wie beim ersten Mal.
+
+### Was weiterhin offen bleibt
+
+Spec B nennt in derselben Liste **`failed-payment retry`** und **`reactivation rules`**. Beide sind mit A2/B2/C2 **nicht** mitentschieden und brauchen je eine eigene Vorlage.
+
 ## Was zusammenhängt
 
 Drei Kopplungen, die man nicht einzeln beschließen kann:
@@ -99,8 +134,14 @@ Drei Kopplungen, die man nicht einzeln beschließen kann:
 
 Spec B nennt in derselben Liste noch **`failed-payment retry`** und **`reactivation rules`**. Beide berühren dieselben Tabellen, sind aber eigene Entscheidungen; wer A–C beschließt, hat sie nicht mitbeschlossen.
 
-## Consequences — was passiert, wenn nichts entschieden wird
+## Consequences
 
-Nicht nichts. Die Defaults bleiben wirksam: null Kulanz, kein Wechsel, keine Selbstkündigung. Dieses Dokument macht aus einer unbemerkten Lage eine bewusste — mehr nicht.
+Was die drei Regeln nach sich ziehen:
 
-Sobald eine Zeile gewählt ist, wird aus dieser Vorlage ein ADR mit `Status: ACCEPTED`, und die Umsetzung bekommt ein eigenes Ticket.
+- **`provider_subscriptions` bekommt den vorgemerkten Zustand.** Ein Feld für den Stichtag und eines für den Zieltarif; ohne sie gäbe es keinen Ort, an dem „zum Periodenende" steht. Ein Lauf führt sie zum Stichtag aus — derselbe, der die Perioden weiterrollt (`runSubscriptionPeriodTick`), weil beides an derselben Grenze passiert.
+- **Die Kulanzfrist macht `billingReadiness` zeitabhängig.** Die Funktion ist heute rein und bekommt `overdueInvoices` als Zahl. Sie braucht künftig das Datum, ab dem gesperrt wird — die Frist gehört in die Eingabe, nicht in die Funktion, damit sie rein und prüfbar bleibt.
+- **Die Oberfläche bekommt zwei Flächen**, die `TKT-PROV-09` bewusst ausgelassen hat: den Hinweis auf die laufende Kulanzfrist (`/billing`) und Wechsel/Kündigung mit Stichtag (`/subscription`, Zustand F). Der Text in F2, der heute sagt, dass es beides nicht gibt, wird damit falsch und muss weg.
+- **Drei Sätze Copy in vier Sprachen** und je eine Benachrichtigung für: Kulanzfrist läuft, Wechsel vorgemerkt, Kündigung vorgemerkt.
+- **Der Wert der Kulanzfrist ist Konfiguration**, kein Literal — und gehört damit in dieselbe versionierte Ablage wie die übrigen Abrechnungsgrößen.
+
+Umsetzung in einem eigenen Ticket; dieses ADR entscheidet, es baut nicht.

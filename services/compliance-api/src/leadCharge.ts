@@ -2,7 +2,8 @@ import { supabaseApi } from "./supabase.js";
 import { structuredLog } from "@complihub360/types";
 import type { BookingPriceSnapshot } from "@complihub360/types";
 import {
-    billingReadiness, getActiveSubscription, type BillingBlockReason, type LeadFeeQuote, type LeadOpportunity,
+    billingReadiness, getActiveSubscription, loadPricingConfig, overdueState,
+    type BillingBlockReason, type LeadFeeQuote, type LeadOpportunity,
 } from "./billing.js";
 import {
     createPaymentIntent, getCustomerBilling, isStripeConfigured, StripeError, type ChargeResult,
@@ -309,13 +310,16 @@ export async function syncBillingReadiness(providerKey: string): Promise<Readine
             }).catch(() => { /* non-blocking */ });
         }
     }
-    const [sub, agreements, openInvoices] = await Promise.all([
+    const [sub, agreements, openInvoices, cfg] = await Promise.all([
         getActiveSubscription(providerKey),
         supabaseApi.select('provider_agreement_acceptance', { provider_key: providerKey, agreement_type: 'billing_authorization' }, { limit: 20 }) as Promise<any[]>,
         supabaseApi.select('invoices', { provider_key: providerKey, status: 'open' }, { limit: 50 }) as Promise<any[]>,
+        loadPricingConfig(),
     ]);
-    const now = Date.now();
-    const overdue = openInvoices.filter((i) => i.due_at && Date.parse(String(i.due_at)) < now).length;
+    // Seit ADR-0006 (A2) sperrt eine faellige Rechnung erst nach der
+    // Kulanzfrist. Vorher zaehlte hier jede Rechnung mit `due_at < now`, und
+    // der Anbieter war in derselben Sekunde nicht mehr buchbar.
+    const overdue = overdueState(openInvoices, cfg.curePeriodDays).blocking;
     const failure = p.last_payment_failure as { payment_method_id?: string | null } | null;
     const { ready, reasons } = billingReadiness({
         hasDefaultPaymentMethod: hasPm,
