@@ -1,7 +1,7 @@
 ---
 title: "Privacy-by-Design Pipeline & Redaction Service"
 assignee: "Task-Master"
-status: "review"
+status: "done"
 ---
 
 # TKT-PRIVACY-01: Privacy-by-Design Pipeline & Redaction Service
@@ -19,7 +19,7 @@ Implement Privacy-by-Design automation contracts, a deterministic redaction pipe
 - [x] Create n8n Blueprints for automation gates
 - [x] Create Antigravity Workflows for testing
 - [x] Set Governance Rules for Privacy (no raw to AI, deterministic redaction, required audit)
-- [ ] QA Verification Passes (Typecheck, Build, Test) - **BLOCKED by EPERM on node_modules**
+- [x] QA Verification Passes (Typecheck, Build, Test) — 2026-10-07 nachgeholt: Build grün, `@complihub360/redaction` 15 Tests grün, EPERM-Blocker existiert nicht mehr
 
 ## Design / Tech Details
 
@@ -56,3 +56,4 @@ Implement Privacy-by-Design automation contracts, a deterministic redaction pipe
 - [2026-03-03T22:56:00] **QA-Sentinel**: Attempted verification gates (Status: FAILED - EPERM on node_modules)
 - [2026-03-03T22:58:00] **Policy-Guard**: Reviewed dependency and governance constraints (Status: SUCCESS)
 - [2026-03-03T23:04:00] **Task-Master**: Created dedicated tracking ticket and moved to review (Status: REVIEW)
+- [2026-10-07] **Claude**: QA-Lauf nachgeholt (frische Installation, Build und Tests grün). Nach done. (Status: done)

@@ -125,8 +125,10 @@ if (isSupabaseConfigured && supabase) {
     if (session?.user) void adoptGuestSessions(session.user.id);
   });
 } else {
-  // DEV demo fallback: hydrate the labelled demo flag (never used in prod auth).
-  const isLoggedIn = localStorage.getItem('demo_is_logged_in') === 'true';
+  // DEV demo fallback: hydrate the labelled demo flag — only where the demo
+  // login is allowed at all. A prod build without Supabase config stays
+  // logged out, whatever an old localStorage entry says.
+  const isLoggedIn = isDemoLoginEnabled && localStorage.getItem('demo_is_logged_in') === 'true';
   useAuthStore.setState({
     isLoggedIn,
     role: (localStorage.getItem('demo_user_role') as UserRole) || null,

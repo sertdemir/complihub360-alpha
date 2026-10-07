@@ -1,7 +1,7 @@
 ---
 title: "Refactor Existing Wizard to Design System"
 assignee: "UI-Builder"
-status: "todo"
+status: "done"
 ---
 
 # TKT-UI-26: Refactor Existing UI
@@ -24,3 +24,4 @@ No standard styling should leak. Everything must funnel through the unified sema
 
 ## Agent Audit Log
 - [2026-03-13T14:50:00] **[Task-Master]**: Ticket created. (Status: todo)
+- [2026-10-07] **Claude**: Überholt geschlossen. Der damalige Onboarding-Wizard ist seit 2026-08-07 gelöscht (pages/wizard/*); der heutige Wizard (components/wizard-screens/*) nutzt OptionCard, ProgressSidebar, ProTipCard und Button bereits. (Status: done)

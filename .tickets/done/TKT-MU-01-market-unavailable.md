@@ -1,7 +1,7 @@
 ---
 title: "marketUnavailable statt C3, wenn die Engine keinen Markt prüfen kann"
 assignee: "Claude"
-status: "review"
+status: "done"
 ---
 
 # marketUnavailable statt C3
@@ -59,3 +59,4 @@ Betroffen sind **Risk Map** (Darstellung), **Registrierung und Gating** (Update 
 - ~~Versand des Updates fehlt~~ gebaut 01.10.
 - ~~Hero-Copy für Gäste~~ Canvas-Wahl G2 (01.10.): eigener Gast-Satz ohne Update-Wahl (`common:states.marketRequest.guestMessage`), eingeloggt bleibt der abgenommene.
 - ~~Anbieter-Spalte eingeloggt~~ Canvas-Wahl H3 (01.10.): bei marketUnavailable keine Anbieter-Karten, sondern der abgenommene Zustand `noProviderMatch`.
+- [2026-10-07] **Claude**: Beta-Durchgang: alle Kriterien erfüllt, PR gemergt (= Review des Nutzers), auf Staging. Nach done. (Status: done)
