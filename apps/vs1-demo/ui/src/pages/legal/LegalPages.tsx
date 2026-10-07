@@ -202,7 +202,7 @@ export function ImprintPage() {
           </p>
         </Section>
         <Section heading={t('imprint.headings.representedBy')}>
-          <p>{PLACEHOLDER('Geschäftsführer:in')}</p>
+          <p>{PLACEHOLDER('Geschäftsführer')}</p>
         </Section>
         <Section heading={t('imprint.headings.contact')}>
           <p>
