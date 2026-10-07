@@ -3194,6 +3194,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         celex: r.celex ?? null,
                         source_url: r.sourceUrl ?? null,
                         penalty: r.penalty ?? null,
+                        // Der Schluessel, unter dem die UI `penalty` in der
+                        // Sprache des Lesers zeigt (compliance.penaltyText.*).
+                        // `penalty` selbst ist nur noch die englische Fassung.
+                        penalty_key: r.penaltyKey ?? null,
                         penalty_max_eur: r.penaltyMaxEur ?? null,
                         // Die belegte Obergrenze mit Fundstelle und Stand.
                         // `penalty` bleibt daneben stehen, solange Flaechen

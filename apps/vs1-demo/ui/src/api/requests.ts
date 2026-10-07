@@ -122,17 +122,32 @@ const USER_VIEW: Record<string, Pick<UserRequestRow, 'status' | 'statusLabel' | 
 // v2 §5 anonymity: pre-booking the user only ever sees an anonymous
 // "Verified <type> · <region>" label — the provider identity reveals only
 // after a booking (post-booking views may show clear names).
-const PROVIDER_NAMES: Record<string, string> = {
-  'studio-bianchi': 'Verifizierte Steuerkanzlei · Norditalien',
-  'schmidt-partner': 'Verifizierte Steuerberatung · Norddeutschland',
-  'madrid-tax': 'Verifizierter Tax-Spezialist · Spanien',
-  'dahlmann-cpa': 'Verifizierter Steuerexperte · USA',
-  'thames-vat': 'Verifizierter VAT-Spezialist · Vereinigtes Königreich',
-  'costa-legal': 'Verifizierte Kanzlei · Spanien',
-  'datenschutz-nord': 'Verifizierte Datenschutzkanzlei · Norddeutschland',
-  'oss-experts': 'Verifizierte Steuerberatung · Berlin',
-  'lucid-reg': 'Verifizierter EPR-Dienstleister · Hamburg',
+//
+// The English label is the canonical value (search, fallback); the screen
+// shows userws:requests.anonProvider.<key> via anonProviderLabel(). Until
+// 2026-10-07 these were German literals and read German in every language.
+export const PROVIDER_NAMES: Record<string, string> = {
+  'studio-bianchi': 'Verified tax firm · Northern Italy',
+  'schmidt-partner': 'Verified tax advisory · Northern Germany',
+  'madrid-tax': 'Verified tax specialist · Spain',
+  'dahlmann-cpa': 'Verified tax expert · USA',
+  'thames-vat': 'Verified VAT specialist · United Kingdom',
+  'costa-legal': 'Verified law firm · Spain',
+  'datenschutz-nord': 'Verified data protection firm · Northern Germany',
+  'oss-experts': 'Verified tax advisory · Berlin',
+  'lucid-reg': 'Verified EPR service provider · Hamburg',
 };
+
+/** The anonymous provider label in the reader's language. `t` must be bound
+ *  to the userws namespace. Unknown keys fall back to the canonical label. */
+export function anonProviderLabel(
+  t: (key: string, opts: { defaultValue: string }) => string,
+  r: { providerKey?: string; company: string },
+): string {
+  return r.providerKey && PROVIDER_NAMES[r.providerKey]
+    ? t(`requests.anonProvider.${r.providerKey}`, { defaultValue: r.company })
+    : r.company;
+}
 
 export async function fetchUserRequests(): Promise<UserRequestRow[]> {
   const { requests } = await apiFetch<{ ok: boolean; requests: EngagementRow[] }>('/api/v1/requests');

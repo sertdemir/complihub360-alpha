@@ -76,6 +76,9 @@ export interface SearchLaw {
   /** Deep link to the authoritative text — makes the source citable. */
   source_url?: string | null;
   penalty?: string | null;
+  /** `<subdomainId>.<Land|default>` — unter diesem Schluessel steht `penalty`
+   *  in vier Sprachen (common:compliance.penaltyText.*). */
+  penalty_key?: string | null;
   penalty_max_eur?: number | null;
   /** Die belegte Obergrenze mit Fundstelle und Stand. Seit dem 19.09. die
    *  Quelle fuer die Bussgeldzeile der Karte; `penalty` bleibt nur noch der

@@ -82,8 +82,11 @@ export interface AreaSubdomain {
 export interface AreaObligation extends AreaSubdomain {
   /** The statute or instrument. A proper noun: never translated. */
   source: string;
-  /** Human penalty phrasing, e.g. 'up to €50,000'. */
+  /** Human penalty phrasing, e.g. 'up to €50,000'. English and canonical —
+   *  show it through penaltyText(t, penaltyKey, penalty). */
   penalty: string;
+  /** `<subdomainId>.<Land|default>`: the entry `penalty` came from. */
+  penaltyKey: string;
   penaltyMaxEur?: number;
   /** Die belegte Obergrenze: Betrag in SEINER Waehrung mit Vorschrift und
    *  Stand, oder `delegated`, wenn der Rechtsakt keinen Betrag nennt. Fehlt
@@ -211,6 +214,7 @@ export function getAreaObligations(slug: DomainSlug, code: CountryCode | 'EU'): 
       ...sub,
       source: entry.source,
       penalty: entry.penalty,
+      penaltyKey: `${sub.id}.${national ? code : 'default'}`,
       penaltyMaxEur: entry.penaltyMaxEur,
       penaltyCeiling: entry.penaltyCeiling,
       states: entry.states,

@@ -69,6 +69,8 @@ export interface DomainObligation {
     source?: string;
     sourceUrl?: string;
     penalty?: string;
+    /** Schluessel fuer compliance.penaltyText.* — `penalty` ist nur die englische Fassung. */
+    penaltyKey?: string;
     due?: string;
     dueDays?: number;
     status: ObligationStatus;
@@ -148,7 +150,7 @@ export async function loadDomainSessions(userId: string, slug: string, sessionId
             obligations: alle
                 .map((o) => ({
                     id: o.id, label: o.label, severity: String(o.severity), markets: o.markets ?? [],
-                    source: o.source, sourceUrl: o.sourceUrl, penalty: o.penalty, due: o.due, dueDays: o.dueDays,
+                    source: o.source, sourceUrl: o.sourceUrl, penalty: o.penalty, penaltyKey: o.penaltyKey, due: o.due, dueDays: o.dueDays,
                     status: (statusOf.get(`${row.id}:${o.id}`) ?? 'open') as ObligationStatus,
                 }))
                 .sort((a, b) => (RANG[b.severity] ?? 0) - (RANG[a.severity] ?? 0) || (a.dueDays ?? 9999) - (b.dueDays ?? 9999)),

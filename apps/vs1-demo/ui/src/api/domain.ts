@@ -17,6 +17,8 @@ export interface DomainObligation {
   source?: string;
   sourceUrl?: string | null;
   penalty?: string;
+  /** Schluessel fuer common:compliance.penaltyText.* (siehe penaltyText()). */
+  penaltyKey?: string;
   due?: string;
   dueDays?: number | null;
   status: DomainObligationStatus;

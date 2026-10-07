@@ -1,7 +1,7 @@
 import { ComplianceDomain, DomainTemplateLibrary, ObligationSeverity, severityFromRiskWeight } from './domain-schema.js';
 import { CountryCode, CountryRiskProfile, getCountryRiskProfile } from './country-profile.js';
 import { calculateBusinessModifier, IndustryType, BusinessModel } from './business-modifier.js';
-import { resolveEnrichment, type PenaltyCeiling } from './obligation-enrichment.js';
+import { resolveEnrichment, resolveEnrichmentKey, type PenaltyCeiling } from './obligation-enrichment.js';
 
 export interface GeneratorContext {
     countries: CountryCode[];
@@ -25,6 +25,9 @@ export interface EnrichedSubdomain {
     focus: boolean;
     source?: string;
     penalty?: string;
+    /** `<subdomainId>.<country|default>` — the key the UI translates `penalty`
+     *  by (common:compliance.penaltyText.*). Absent when there is no entry. */
+    penaltyKey?: string;
     penaltyMaxEur?: number;
     /** Die belegte Obergrenze, so wie das Gesetz sie fuehrt. Reist seit dem
      *  19.09. mit, damit die Risikokarte dieselbe Quelle liest wie die
@@ -135,6 +138,7 @@ export function generateRelevantSubdomains(context: GeneratorContext): EnrichedS
                 continue;
             }
             const enrichment = resolveEnrichment(template.id, context.countries);
+            const enrichmentKey = resolveEnrichmentKey(template.id, context.countries);
             results.push({
                 id: template.id,
                 label: template.label,
@@ -146,6 +150,7 @@ export function generateRelevantSubdomains(context: GeneratorContext): EnrichedS
                 focus: focus.has(domain),
                 source: enrichment?.source,
                 penalty: enrichment?.penalty,
+                penaltyKey: enrichmentKey ? `${template.id}.${enrichmentKey}` : undefined,
                 penaltyMaxEur: enrichment?.penaltyMaxEur,
                 penaltyCeiling: enrichment?.penaltyCeiling,
                 due: enrichment?.due,

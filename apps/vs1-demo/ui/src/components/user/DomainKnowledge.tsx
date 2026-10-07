@@ -6,6 +6,7 @@ import { SEVERITY_STYLE } from '../compliance-areas/severity';
 import { getAreaObligations, getAreaProfile, type AreaObligation } from '../../lib/areaProfiles';
 import { useObligationText } from '../../lib/obligationText';
 import { MARKET_CODES } from '../../lib/marketProfiles';
+import { penaltyText } from '../../lib/penaltyCeiling';
 import type { CountryCode } from '../compliance-areas/types';
 import type { DomainSlug } from '../../lib/domains';
 import type { DomainSession } from '../../api/domain';
@@ -132,7 +133,7 @@ export function DomainKnowledge({ slug, markets, sessions }: {
               </div>
               <div>
                 <dt className="text-body-4xs font-extrabold uppercase tracking-[0.06em] text-fg-tertiary">{t('domainPage.dossierPenalty')}</dt>
-                <dd className="mt-0.5 font-semibold text-fg">{e.primary.penalty}</dd>
+                <dd className="mt-0.5 font-semibold text-fg">{penaltyText(tc, e.primary.penaltyKey, e.primary.penalty)}</dd>
               </div>
               <div className="col-span-2">
                 <dt className="text-body-4xs font-extrabold uppercase tracking-[0.06em] text-fg-tertiary">{t('domainPage.dossierScope')}</dt>

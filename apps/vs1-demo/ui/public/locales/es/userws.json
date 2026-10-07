@@ -255,7 +255,18 @@
     "inboxTitle": "Solicitudes a proveedores",
     "inboxCounts": "{{you}} esperan su respuesta · {{provider}} con el proveedor · {{done}} cerradas",
     "slaLabelProvider": "Plazo · proveedor",
-    "slaMissed": "incumplido"
+    "slaMissed": "incumplido",
+    "anonProvider": {
+      "studio-bianchi": "Despacho fiscal verificado · Norte de Italia",
+      "schmidt-partner": "Asesoría fiscal verificada · Norte de Alemania",
+      "madrid-tax": "Especialista fiscal verificado · España",
+      "dahlmann-cpa": "Experto fiscal verificado · EE. UU.",
+      "thames-vat": "Especialista en IVA verificado · Reino Unido",
+      "costa-legal": "Despacho jurídico verificado · España",
+      "datenschutz-nord": "Despacho de protección de datos verificado · Norte de Alemania",
+      "oss-experts": "Asesoría fiscal verificada · Berlín",
+      "lucid-reg": "Proveedor EPR verificado · Hamburgo"
+    }
   },
   "notifications": {
     "title": "Notificaciones",
