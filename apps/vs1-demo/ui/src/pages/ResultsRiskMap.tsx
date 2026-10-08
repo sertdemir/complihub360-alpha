@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-do
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import type { PenaltyCeiling } from '@complihub/compliance-engine';
-import { describeCeiling } from '../lib/penaltyCeiling';
+import { describeCeiling, penaltyText } from '../lib/penaltyCeiling';
 import { saveWizardSession, fetchSessions, type SessionRowData } from '../api/sessions';
 import { runSearch, type AnonProvider, type SearchLaw } from '../api/search';
 import { useApiData } from '../lib/useApiData';
@@ -939,12 +939,12 @@ export function ResultsRiskMap() {
  *  Die Markenregel bleibt gewahrt: kein Geld in den Kopfzahlen, keine neue
  *  Stelle fuer Betraege. Es ist dieselbe Zeile wie bisher, nur belegt. */
 function bussgeldZeile(
-  l: { penalty?: string | null; penalty_ceiling?: PenaltyCeiling | null },
+  l: { penalty?: string | null; penalty_key?: string | null; penalty_ceiling?: PenaltyCeiling | null },
   t: TFunction<['results', 'common']>,
   locale: string,
 ): string | null {
   const c = l.penalty_ceiling;
-  if (!c) return l.penalty ? t('detail.penalty', { value: l.penalty }) : null;
+  if (!c) return l.penalty ? t('detail.penalty', { value: penaltyText(t, l.penalty_key, l.penalty) }) : null;
 
   const d = describeCeiling(c, locale);
   const wert =

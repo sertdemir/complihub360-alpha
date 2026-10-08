@@ -998,7 +998,142 @@
       "coverageNoteGapsRest_one": "Of the rest, {{count}} has a national text we do not carry yet — the others are EU Regulations, which apply here directly.",
       "coverageNoteGapsRest_other": "Of the rest, {{count}} have a national text we do not carry yet — the others are EU Regulations, which apply here directly."
     },
-    "riskBadge": "{{level}} Risk"
+    "riskBadge": "{{level}} Risk",
+    "penaltyText": {
+      "tax-vat-registration": {
+        "DE": "late-filing surcharge up to 10%, max €25,000",
+        "UK": "up to 100% of the tax lost",
+        "FR": "10–40% surcharge on VAT due (80% if undeclared activity)",
+        "IT": "120% of the tax due, at least €250",
+        "ES": "50–150% of unpaid VAT",
+        "NL": "up to €6,709 per late payment",
+        "TR": "tax-loss fine: 1× the unpaid KDV",
+        "US": "per-state assessments + interest",
+        "default": "national surcharges + interest"
+      },
+      "tax-corporate": {
+        "DE": "late surcharge 0.25%/month of assessed tax",
+        "UK": "£200–£2,000 fixed + up to 20% of the unpaid tax",
+        "FR": "10–40% surcharge + late-payment interest",
+        "IT": "120% for an omitted return, 70% for an inaccurate one",
+        "ES": "50–150% of the tax due + surcharges",
+        "NL": "default or offence penalty up to 100%",
+        "US": "5%/month of unpaid tax, max 25%",
+        "default": "late surcharges + interest"
+      },
+      "prod-epr": {
+        "DE": "up to €200,000 + distribution ban",
+        "FR": "€7,500 per unit or tonne placed on the market (legal persons)",
+        "UK": "unlimited fine; fixed penalty £1,000",
+        "ES": "up to €3,500,000 (very serious infringement)",
+        "IT": "€15,500 to €46,500",
+        "NL": "recovery + administrative fines",
+        "default": "national EPR fines + sales ban"
+      },
+      "prod-packaging-conformity": {
+        "DE": "VerpackDG §66: up to €10,000 (conformity assessment)",
+        "default": "national penalties under Art. 68 + withdrawal from the market"
+      },
+      "prod-packaging-recycled-content": {
+        "DE": "VerpackDG §66: up to €10,000 + withdrawal from the market",
+        "default": "national penalties under Art. 68 + withdrawal from the market"
+      },
+      "prod-packaging-recyclability": {
+        "DE": "VerpackDG §66: up to €10,000 + withdrawal from the market",
+        "default": "national penalties under Art. 68 + withdrawal from the market"
+      },
+      "prod-packaging-empty-space": {
+        "DE": "VerpackDG §66: up to €10,000",
+        "default": "national penalties under Art. 68 + withdrawal from the market"
+      },
+      "prod-packaging-format-bans": {
+        "DE": "VerpackDG §66: up to €10,000; the format may no longer be placed on the market",
+        "default": "format may no longer be placed on the market"
+      },
+      "prod-packaging-reuse-targets": {
+        "DE": "VerpackDG §66: up to €200,000 — highest tier",
+        "default": "national penalties under Art. 68"
+      },
+      "prod-safety": {
+        "UK": "up to £20,000 + 12 months imprisonment",
+        "US": "$120,000 per violation, $17,150,000 per related series of violations",
+        "default": "up to 4% of annual turnover"
+      },
+      "mktg-consent": {
+        "DE": "up to €300,000 per campaign (UWG)",
+        "TR": "up to ₺1,000,000",
+        "US": "up to $53,088 per email; $1,500 per call/text",
+        "default": "up to €20M or 4% of turnover"
+      },
+      "mktg-health-claims": {
+        "default": "national fines + mandatory withdrawal",
+        "US": "up to $53,088 per violation + consumer redress"
+      },
+      "data-privacy": {
+        "UK": "up to £17.5M or 4% of turnover",
+        "US": "$2,500–$7,500 per violation",
+        "TR": "up to ₺13,000,000",
+        "default": "up to €20M or 4% of turnover"
+      },
+      "data-hosting": {
+        "default": "transfer suspension + GDPR fines",
+        "US": "removal from the list; the basis for the transfer falls away"
+      },
+      "corp-registration": {
+        "DE": "coercive fines up to €5,000",
+        "UK": "late-filing penalties up to £15,000",
+        "FR": "criminal fine (false declarations) + injunction backed by a daily penalty",
+        "IT": "fines of €103 to €1,032",
+        "ES": "fines + closure of the registry sheet",
+        "NL": "fine + non-registration",
+        "US": "loss of good standing + back fees",
+        "default": "administrative fines"
+      },
+      "monitor-kyb": {
+        "DE": "€1,000–€5,000, serious cases up to €1M",
+        "FR": "criminal fine of €200,000 (natural persons), ×5 for legal persons",
+        "IT": "fines of €103 to €1,032",
+        "default": "national AML fines"
+      },
+      "log-eori": {
+        "UK": "goods held at border; storage costs",
+        "TR": "clearance refusal + customs fines",
+        "default": "customs clearance blocked"
+      },
+      "log-customs-classification": {
+        "US": "up to the domestic value of the goods",
+        "default": "back duties + up to 3× duty difference"
+      },
+      "log-intrastat": {
+        "DE": "up to €5,000 per missed report",
+        "IT": "fines of €500 to €1,000 per list",
+        "ES": "statistical fines up to €30,000",
+        "NL": "administrative fines (CBS)",
+        "default": "national statistical fines"
+      },
+      "env-weee-registration": {
+        "DE": "up to €100,000 + distribution ban",
+        "default": "national penalties; registration is a market-access condition"
+      },
+      "env-batteries-epr": {
+        "default": "national penalties; registration is a market-access condition"
+      },
+      "env-reach-substances": {
+        "default": "national penalties up to a market ban"
+      },
+      "legal-consumer-terms": {
+        "DE": "competitor warnings (Abmahnung) + injunctions",
+        "UK": "CMA: £300k or 10% of turnover",
+        "FR": "administrative fine up to €75,000 (legal persons)",
+        "IT": "AGCM: €5,000 to €10,000,000; clauses void",
+        "ES": "consumer-law sanctions + void clauses",
+        "default": "national enforcement + void clauses"
+      },
+      "legal-commercial-contracts": {
+        "DE": "unenforceable clauses; litigation risk",
+        "default": "unenforceable clauses; dispute exposure"
+      }
+    }
   },
   "resources": {
     "meta": {

@@ -255,7 +255,18 @@
     "inboxTitle": "Provider requests",
     "inboxCounts": "{{you}} waiting for you · {{provider}} with the provider · {{done}} closed",
     "slaLabelProvider": "Deadline · provider",
-    "slaMissed": "missed"
+    "slaMissed": "missed",
+    "anonProvider": {
+      "studio-bianchi": "Verified tax firm · Northern Italy",
+      "schmidt-partner": "Verified tax advisory · Northern Germany",
+      "madrid-tax": "Verified tax specialist · Spain",
+      "dahlmann-cpa": "Verified tax expert · USA",
+      "thames-vat": "Verified VAT specialist · United Kingdom",
+      "costa-legal": "Verified law firm · Spain",
+      "datenschutz-nord": "Verified data protection firm · Northern Germany",
+      "oss-experts": "Verified tax advisory · Berlin",
+      "lucid-reg": "Verified EPR service provider · Hamburg"
+    }
   },
   "notifications": {
     "title": "Notifications",

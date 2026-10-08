@@ -998,7 +998,142 @@
       "coverageNoteGapsRest_one": "Del resto, {{count}} tiene un texto nacional que aún no incluimos; las demás son Reglamentos de la UE, de aplicación directa aquí.",
       "coverageNoteGapsRest_other": "Del resto, {{count}} tienen un texto nacional que aún no incluimos; las demás son Reglamentos de la UE, de aplicación directa aquí."
     },
-    "riskBadge": "Riesgo: {{level}}"
+    "riskBadge": "Riesgo: {{level}}",
+    "penaltyText": {
+      "tax-vat-registration": {
+        "DE": "recargo por presentación tardía de hasta el 10 %, máximo 25.000 €",
+        "UK": "hasta el 100 % del impuesto dejado de ingresar",
+        "FR": "recargo del 10–40 % sobre el IVA adeudado (80 % en caso de actividad no declarada)",
+        "IT": "120 % del impuesto adeudado, como mínimo 250 €",
+        "ES": "50–150 % del IVA no ingresado",
+        "NL": "hasta 6.709 € por pago tardío",
+        "TR": "multa por pérdida fiscal: 1 vez el KDV no ingresado",
+        "US": "liquidaciones de cada estado + intereses",
+        "default": "recargos nacionales + intereses"
+      },
+      "tax-corporate": {
+        "DE": "recargo por demora del 0,25 % mensual del impuesto liquidado",
+        "UK": "200–2.000 £ fijos + hasta el 20 % del impuesto pendiente",
+        "FR": "recargo del 10–40 % + intereses de demora",
+        "IT": "120 % por declaración omitida, 70 % por declaración inexacta",
+        "ES": "50–150 % de la cuota + recargos",
+        "NL": "sanción por incumplimiento o por infracción de hasta el 100 %",
+        "US": "5 % mensual del impuesto impagado, máximo 25 %",
+        "default": "recargos por demora + intereses"
+      },
+      "prod-epr": {
+        "DE": "hasta 200.000 € + prohibición de comercialización",
+        "FR": "7.500 € por unidad o tonelada comercializada (personas jurídicas)",
+        "UK": "multa sin límite; sanción fija de 1.000 £",
+        "ES": "hasta 3.500.000 € (infracción muy grave)",
+        "IT": "de 15.500 a 46.500 €",
+        "NL": "recuperación + multas administrativas",
+        "default": "multas EPR nacionales + prohibición de venta"
+      },
+      "prod-packaging-conformity": {
+        "DE": "VerpackDG §66: hasta 10.000 € (evaluación de la conformidad)",
+        "default": "sanciones nacionales según el art. 68 + retirada del mercado"
+      },
+      "prod-packaging-recycled-content": {
+        "DE": "VerpackDG §66: hasta 10.000 € + retirada del mercado",
+        "default": "sanciones nacionales según el art. 68 + retirada del mercado"
+      },
+      "prod-packaging-recyclability": {
+        "DE": "VerpackDG §66: hasta 10.000 € + retirada del mercado",
+        "default": "sanciones nacionales según el art. 68 + retirada del mercado"
+      },
+      "prod-packaging-empty-space": {
+        "DE": "VerpackDG §66: hasta 10.000 €",
+        "default": "sanciones nacionales según el art. 68 + retirada del mercado"
+      },
+      "prod-packaging-format-bans": {
+        "DE": "VerpackDG §66: hasta 10.000 €; el formato ya no puede comercializarse",
+        "default": "el formato ya no puede comercializarse"
+      },
+      "prod-packaging-reuse-targets": {
+        "DE": "VerpackDG §66: hasta 200.000 € — tramo más alto",
+        "default": "sanciones nacionales según el art. 68"
+      },
+      "prod-safety": {
+        "UK": "hasta 20.000 £ + 12 meses de prisión",
+        "US": "120.000 $ por infracción, 17.150.000 $ por serie de infracciones",
+        "default": "hasta el 4 % del volumen de negocios anual"
+      },
+      "mktg-consent": {
+        "DE": "hasta 300.000 € por campaña (UWG)",
+        "TR": "hasta 1.000.000 ₺",
+        "US": "hasta 53.088 $ por correo electrónico; 1.500 $ por llamada o SMS",
+        "default": "hasta 20 M€ o el 4 % del volumen de negocios"
+      },
+      "mktg-health-claims": {
+        "default": "multas nacionales + retirada obligatoria",
+        "US": "hasta 53.088 $ por infracción + resarcimiento a los consumidores"
+      },
+      "data-privacy": {
+        "UK": "hasta 17,5 M£ o el 4 % del volumen de negocios",
+        "US": "2.500–7.500 $ por infracción",
+        "TR": "hasta 13.000.000 ₺",
+        "default": "hasta 20 M€ o el 4 % del volumen de negocios"
+      },
+      "data-hosting": {
+        "default": "suspensión de las transferencias + multas del RGPD",
+        "US": "exclusión de la lista; desaparece la base para la transferencia"
+      },
+      "corp-registration": {
+        "DE": "multas coercitivas de hasta 5.000 €",
+        "UK": "sanciones por presentación tardía de hasta 15.000 £",
+        "FR": "multa penal (declaraciones falsas) + requerimiento bajo multa coercitiva",
+        "IT": "sanciones de 103 a 1.032 €",
+        "ES": "multas + cierre registral",
+        "NL": "multa + no inscripción",
+        "US": "pérdida del good standing + tasas atrasadas",
+        "default": "multas administrativas"
+      },
+      "monitor-kyb": {
+        "DE": "1.000–5.000 €; en casos graves, hasta 1 M€",
+        "FR": "multa penal de 200.000 € (personas físicas), ×5 para personas jurídicas",
+        "IT": "sanciones de 103 a 1.032 €",
+        "default": "multas nacionales en materia de blanqueo de capitales"
+      },
+      "log-eori": {
+        "UK": "mercancía retenida en frontera; costes de almacenamiento",
+        "TR": "denegación del despacho + multas aduaneras",
+        "default": "despacho aduanero bloqueado"
+      },
+      "log-customs-classification": {
+        "US": "hasta el valor interno de la mercancía",
+        "default": "derechos atrasados + hasta 3 veces la diferencia de derechos"
+      },
+      "log-intrastat": {
+        "DE": "hasta 5.000 € por declaración omitida",
+        "IT": "sanciones de 500 a 1.000 € por lista",
+        "ES": "multas estadísticas de hasta 30.000 €",
+        "NL": "multas administrativas (CBS)",
+        "default": "multas estadísticas nacionales"
+      },
+      "env-weee-registration": {
+        "DE": "hasta 100.000 € + prohibición de comercialización",
+        "default": "sanciones nacionales; el registro es condición de acceso al mercado"
+      },
+      "env-batteries-epr": {
+        "default": "sanciones nacionales; el registro es condición de acceso al mercado"
+      },
+      "env-reach-substances": {
+        "default": "sanciones nacionales que pueden llegar a la prohibición de comercialización"
+      },
+      "legal-consumer-terms": {
+        "DE": "requerimientos de competidores (Abmahnung) + órdenes de cesación",
+        "UK": "CMA: 300.000 £ o el 10 % del volumen de negocios",
+        "FR": "multa administrativa de hasta 75.000 € (personas jurídicas)",
+        "IT": "AGCM: de 5.000 a 10.000.000 €; cláusulas nulas",
+        "ES": "sanciones de consumo + cláusulas nulas",
+        "default": "aplicación nacional + cláusulas nulas"
+      },
+      "legal-commercial-contracts": {
+        "DE": "cláusulas ineficaces; riesgo de litigio",
+        "default": "cláusulas inaplicables; riesgo de litigio"
+      }
+    }
   },
   "resources": {
     "meta": {

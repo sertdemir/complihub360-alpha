@@ -9,7 +9,7 @@ import { RequestCard, type RequestStatus } from '../../components/ui/RequestCard
 import { ThreadDrawer } from '../../components/shared/ThreadDrawer';
 import { RequestActionsDrawer, type RequestActionsTarget } from '../../components/user/RequestActionsDrawer';
 import { useRequestContext } from '../../lib/requestContext';
-import type { UserRequestRow } from '../../api/requests';
+import { anonProviderLabel, type UserRequestRow } from '../../api/requests';
 
 // ─── Anfragen — der Reiter in der Termine-Seite ──────────────────────────────
 // Canvas "Anfragen · Varianten" (Nutzer-Wahl 2026-09-01): 1C — Anfragen ist
@@ -100,7 +100,7 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
         context={kontext({ category: r.category, country: r.country, createdAt: r.createdAt, ref: r.id }) || r.meta}
         status={r.status}
         statusLabel={r.statusLabel ? t(`status.${STATUS_KEY[r.statusLabel] ?? ''}`, r.statusLabel) : r.statusLabel}
-        company={r.company}
+        company={anonProviderLabel(t, r)}
         tag={r.partner ? 'PARTNER' : undefined}
         slaLabel={t('requests.slaLabelProvider')}
         slaValue={f ? (
@@ -117,7 +117,7 @@ export function AnfragenTab({ rows }: { rows: UserRequestRow[] | null }) {
             <button
               type="button"
               aria-label={t('requests.requestActionsAria')}
-              onClick={() => setActionsFor({ uuid: r.uuid, idLine: r.id, company: r.company, statusLabel: String(r.statusLabel), rawStatus: r.rawStatus })}
+              onClick={() => setActionsFor({ uuid: r.uuid, idLine: r.id, company: anonProviderLabel(t, r), statusLabel: String(r.statusLabel), rawStatus: r.rawStatus })}
               className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-elevate/10 text-fg-tertiary transition-colors hover:border-elevate/25 hover:text-fg"
             >
               <MoreHorizontal size={15} />

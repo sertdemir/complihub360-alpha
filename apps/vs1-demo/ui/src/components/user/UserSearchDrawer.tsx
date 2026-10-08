@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Search } from 'lucide-react';
 import { Drawer } from '../ui/Drawer';
 import { Tag } from '../ui/Tag';
-import { fetchUserRequests, type UserRequestRow } from '../../api/requests';
+import { anonProviderLabel, fetchUserRequests, type UserRequestRow } from '../../api/requests';
 import { fetchSessions, type SessionRowData } from '../../api/sessions';
 
 // ─── User search drawer (Figma 2654:176 · wiring map B16) ────────────────────
@@ -36,7 +36,7 @@ export function UserSearchDrawer({ open, onClose }: { open: boolean; onClose: ()
   const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
   const hit = (hay: string) => q.trim().length >= 2 && terms.every((term) => hay.toLowerCase().includes(term));
 
-  const requestHits = (requests ?? []).filter((r) => hit(`${r.id} ${r.company} ${r.meta} ${r.statusLabel}`)).slice(0, 6);
+  const requestHits = (requests ?? []).filter((r) => hit(`${r.id} ${r.company} ${anonProviderLabel(t, r)} ${r.meta} ${r.statusLabel}`)).slice(0, 6);
   const sessionHits = (sessions ?? [])
     .filter((s) => s.status === 'active')
     .filter((s) => hit(`${s.label ?? ''} ${s.country ?? ''} ${(s.categories ?? []).join(' ')} ${(s.markets ?? []).join(' ')}`))
@@ -76,7 +76,7 @@ export function UserSearchDrawer({ open, onClose }: { open: boolean; onClose: ()
                 className="flex w-full items-center justify-between gap-3 rounded-lg border border-elevate/10 bg-elevate/[0.03] px-3.5 py-3 text-left transition-colors hover:border-fg-brand/50"
               >
                 <span className="min-w-0">
-                  <span className="block truncate text-[13px] font-semibold text-fg">{r.company}</span>
+                  <span className="block truncate text-[13px] font-semibold text-fg">{anonProviderLabel(t, r)}</span>
                   <span className="block truncate text-[11px] text-fg-tertiary">{r.id} · {r.meta}</span>
                 </span>
                 <Tag tone={r.bucket === 'replied' ? 'success' : r.bucket === 'confirm' ? 'warning' : 'brand'}>{tStatus(r.statusLabel)}</Tag>

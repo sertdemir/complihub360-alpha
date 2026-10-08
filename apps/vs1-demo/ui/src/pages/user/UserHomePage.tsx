@@ -10,7 +10,7 @@ import { Segment } from '../../components/compliance-areas';
 import { UnitGrid, unitsPer, useCountUp, useEntered, EASE } from '../../components/ui/Stats';
 import { EmptyState } from '../../components/user/EmptyState';
 import { fetchDashboard, EMPTY_DASHBOARD, type DashboardData, type DashboardSession } from '../../api/dashboard';
-import { fetchUserRequests, type UserRequestRow } from '../../api/requests';
+import { anonProviderLabel, fetchUserRequests, type UserRequestRow } from '../../api/requests';
 import { fetchUserBookings, markOutcome, type UserBooking } from '../../api/bookings';
 import { SLUG_TO_I18N, relZeit } from './AnfragenTab';
 import { useRequestContext } from '../../lib/requestContext';
@@ -503,7 +503,7 @@ export function UserHomePage() {
                       return (
                         <div key={r.uuid} className={'grid grid-cols-1 items-center gap-x-3 gap-y-2 py-3 sm:grid-cols-[34%_1fr_150px] ' + (i < arr.length - 1 ? 'border-b border-stroke-subtle' : '')}>
                           <div className="min-w-0">
-                            <button type="button" title={r.company} onClick={() => oeffneVerlauf(r.uuid)} className="block max-w-full truncate text-left text-body-xs font-bold text-fg hover:underline">{r.company}</button>
+                            <button type="button" title={anonProviderLabel(t, r)} onClick={() => oeffneVerlauf(r.uuid)} className="block max-w-full truncate text-left text-body-xs font-bold text-fg hover:underline">{anonProviderLabel(t, r)}</button>
                             <p className="mt-0.5 truncate text-[10.5px] text-fg-tertiary">
                               {[bereich(r.category), markt(r.country), relZeit(r.createdAt, locale)].filter(Boolean).join(' · ')}
                             </p>

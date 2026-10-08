@@ -998,7 +998,142 @@
       "coverageNoteGapsRest_one": "Von den übrigen hat {{count}} eine nationale Fassung, die wir noch nicht führen — der Rest sind EU-Verordnungen, die hier unmittelbar gelten.",
       "coverageNoteGapsRest_other": "Von den übrigen haben {{count}} eine nationale Fassung, die wir noch nicht führen — der Rest sind EU-Verordnungen, die hier unmittelbar gelten."
     },
-    "riskBadge": "Risiko: {{level}}"
+    "riskBadge": "Risiko: {{level}}",
+    "penaltyText": {
+      "tax-vat-registration": {
+        "DE": "Verspätungszuschlag bis zu 10 %, höchstens 25.000 €",
+        "UK": "bis zu 100 % der entgangenen Steuer",
+        "FR": "10–40 % Zuschlag auf die geschuldete USt (80 % bei verdeckter Tätigkeit)",
+        "IT": "120 % der geschuldeten Steuer, mindestens 250 €",
+        "ES": "50–150 % der nicht entrichteten USt",
+        "NL": "bis zu 6.709 € je verspäteter Zahlung",
+        "TR": "Steuerverlustbuße: das Einfache der nicht entrichteten KDV",
+        "US": "Festsetzungen je Bundesstaat + Zinsen",
+        "default": "nationale Zuschläge + Zinsen"
+      },
+      "tax-corporate": {
+        "DE": "Verspätungszuschlag 0,25 % der festgesetzten Steuer je Monat",
+        "UK": "200–2.000 £ fest + bis zu 20 % der offenen Steuer",
+        "FR": "10–40 % Zuschlag + Verzugszinsen",
+        "IT": "120 % bei unterlassener, 70 % bei unrichtiger Erklärung",
+        "ES": "50–150 % der Steuerschuld + Zuschläge",
+        "NL": "Versäumnis- oder Vergehensbuße bis zu 100 %",
+        "US": "5 % der unbezahlten Steuer je Monat, höchstens 25 %",
+        "default": "Verspätungszuschläge + Zinsen"
+      },
+      "prod-epr": {
+        "DE": "bis zu 200.000 € + Vertriebsverbot",
+        "FR": "7.500 € je in Verkehr gebrachter Einheit oder Tonne (juristische Personen)",
+        "UK": "unbegrenzte Geldstrafe; Festbetragsstrafe 1.000 £",
+        "ES": "bis zu 3.500.000 € (sehr schwerer Verstoß)",
+        "IT": "15.500 bis 46.500 €",
+        "NL": "Rückforderung + Verwaltungsbußgelder",
+        "default": "nationale EPR-Bußgelder + Verkaufsverbot"
+      },
+      "prod-packaging-conformity": {
+        "DE": "VerpackDG §66: bis zu 10.000 € (Konformitätsbewertung)",
+        "default": "nationale Sanktionen nach Art. 68 + Rücknahme vom Markt"
+      },
+      "prod-packaging-recycled-content": {
+        "DE": "VerpackDG §66: bis zu 10.000 € + Marktrücknahme",
+        "default": "nationale Sanktionen nach Art. 68 + Rücknahme vom Markt"
+      },
+      "prod-packaging-recyclability": {
+        "DE": "VerpackDG §66: bis zu 10.000 € + Marktrücknahme",
+        "default": "nationale Sanktionen nach Art. 68 + Rücknahme vom Markt"
+      },
+      "prod-packaging-empty-space": {
+        "DE": "VerpackDG §66: bis zu 10.000 €",
+        "default": "nationale Sanktionen nach Art. 68 + Rücknahme vom Markt"
+      },
+      "prod-packaging-format-bans": {
+        "DE": "VerpackDG §66: bis zu 10.000 €; Format nicht mehr verkehrsfähig",
+        "default": "Format darf nicht mehr in Verkehr gebracht werden"
+      },
+      "prod-packaging-reuse-targets": {
+        "DE": "VerpackDG §66: bis zu 200.000 € — höchste Stufe",
+        "default": "nationale Sanktionen nach Art. 68"
+      },
+      "prod-safety": {
+        "UK": "bis zu 20.000 £ + 12 Monate Freiheitsstrafe",
+        "US": "120.000 $ je Verstoß, 17.150.000 $ je Verstoßreihe",
+        "default": "bis zu 4 % des Jahresumsatzes"
+      },
+      "mktg-consent": {
+        "DE": "bis zu 300.000 € je Kampagne (UWG)",
+        "TR": "bis zu 1.000.000 ₺",
+        "US": "bis zu 53.088 $ je E-Mail; 1.500 $ je Anruf/SMS",
+        "default": "bis zu 20 Mio. € oder 4 % des Umsatzes"
+      },
+      "mktg-health-claims": {
+        "default": "nationale Bußgelder + verpflichtende Rücknahme",
+        "US": "bis zu 53.088 $ je Verstoß + Entschädigung der Verbraucher"
+      },
+      "data-privacy": {
+        "UK": "bis zu 17,5 Mio. £ oder 4 % des Umsatzes",
+        "US": "2.500–7.500 $ je Verstoß",
+        "TR": "bis zu 13.000.000 ₺",
+        "default": "bis zu 20 Mio. € oder 4 % des Umsatzes"
+      },
+      "data-hosting": {
+        "default": "Aussetzung der Übermittlung + DSGVO-Bußgelder",
+        "US": "Streichung von der Liste; Wegfall der Übermittlungsgrundlage"
+      },
+      "corp-registration": {
+        "DE": "Zwangsgelder bis zu 5.000 €",
+        "UK": "Verspätungsstrafen bis zu 15.000 £",
+        "FR": "Geldstrafe (falsche Angaben) + gerichtliche Anordnung unter Zwangsgeld",
+        "IT": "Sanktionen von 103 bis 1.032 €",
+        "ES": "Bußgelder + Registersperre",
+        "NL": "Bußgeld + Nichteintragung",
+        "US": "Verlust des Good Standing + nachzuzahlende Gebühren",
+        "default": "Verwaltungsbußgelder"
+      },
+      "monitor-kyb": {
+        "DE": "1.000–5.000 €, in schweren Fällen bis zu 1 Mio. €",
+        "FR": "Geldstrafe von 200.000 € (natürliche Personen), das Fünffache für juristische Personen",
+        "IT": "Sanktionen von 103 bis 1.032 €",
+        "default": "nationale Bußgelder wegen Geldwäsche-Verstößen"
+      },
+      "log-eori": {
+        "UK": "Ware wird an der Grenze festgehalten; Lagerkosten",
+        "TR": "Verweigerung der Abfertigung + Zollbußgelder",
+        "default": "Zollabfertigung blockiert"
+      },
+      "log-customs-classification": {
+        "US": "bis zur Höhe des Inlandswerts der Ware",
+        "default": "Zollnachforderung + bis zum Dreifachen der Zolldifferenz"
+      },
+      "log-intrastat": {
+        "DE": "bis zu 5.000 € je versäumter Meldung",
+        "IT": "Sanktionen von 500 bis 1.000 € je Liste",
+        "ES": "Statistik-Bußgelder bis zu 30.000 €",
+        "NL": "Verwaltungsbußgelder (CBS)",
+        "default": "nationale Statistik-Bußgelder"
+      },
+      "env-weee-registration": {
+        "DE": "bis zu 100.000 € + Vertriebsverbot",
+        "default": "nationale Sanktionen; die Registrierung ist Voraussetzung für den Marktzugang"
+      },
+      "env-batteries-epr": {
+        "default": "nationale Sanktionen; die Registrierung ist Voraussetzung für den Marktzugang"
+      },
+      "env-reach-substances": {
+        "default": "nationale Sanktionen bis hin zum Marktverbot"
+      },
+      "legal-consumer-terms": {
+        "DE": "Abmahnungen durch Wettbewerber + Unterlassungsverfügungen",
+        "UK": "CMA: 300.000 £ oder 10 % des Umsatzes",
+        "FR": "Verwaltungsbußgeld bis zu 75.000 € (juristische Personen)",
+        "IT": "AGCM: 5.000 bis 10.000.000 €; Klauseln nichtig",
+        "ES": "verbraucherrechtliche Sanktionen + nichtige Klauseln",
+        "default": "nationale Durchsetzung + nichtige Klauseln"
+      },
+      "legal-commercial-contracts": {
+        "DE": "unwirksame Klauseln; Prozessrisiko",
+        "default": "nicht durchsetzbare Klauseln; Streitrisiko"
+      }
+    }
   },
   "resources": {
     "meta": {

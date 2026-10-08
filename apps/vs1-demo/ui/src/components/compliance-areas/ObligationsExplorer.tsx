@@ -5,7 +5,7 @@ import { FileText } from 'lucide-react';
 import { Typography } from '../ui/Typography';
 import { RiskBadge } from '../ui/RiskBadge';
 import { getAreaObligations, type AreaObligation } from '../../lib/areaProfiles';
-import { ceilingBasis, describeCeiling, provenance } from '../../lib/penaltyCeiling';
+import { ceilingBasis, describeCeiling, penaltyText, provenance } from '../../lib/penaltyCeiling';
 import { RailDossier } from './RailDossier';
 import { Segment } from './Segment';
 import { AREA_BY_SLUG } from './areas';
@@ -367,7 +367,7 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                         />
                         <Fact
                           label={t('compliance.area.fact.penalty', 'Penalty range')}
-                          value={o.penalty}
+                          value={penaltyText(t, o.penaltyKey, o.penalty)}
                           emphasis
                         />
                         {/* Die belegte Obergrenze steht NEBEN dem Rahmen, nicht

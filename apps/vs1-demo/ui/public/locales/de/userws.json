@@ -255,7 +255,18 @@
     "inboxTitle": "Anbieter-Anfragen",
     "inboxCounts": "{{you}} warten auf Sie · {{provider}} beim Anbieter · {{done}} abgeschlossen",
     "slaLabelProvider": "Frist · Anbieter",
-    "slaMissed": "verpasst"
+    "slaMissed": "verpasst",
+    "anonProvider": {
+      "studio-bianchi": "Verifizierte Steuerkanzlei · Norditalien",
+      "schmidt-partner": "Verifizierte Steuerberatung · Norddeutschland",
+      "madrid-tax": "Verifizierter Tax-Spezialist · Spanien",
+      "dahlmann-cpa": "Verifizierter Steuerexperte · USA",
+      "thames-vat": "Verifizierter VAT-Spezialist · Vereinigtes Königreich",
+      "costa-legal": "Verifizierte Kanzlei · Spanien",
+      "datenschutz-nord": "Verifizierte Datenschutzkanzlei · Norddeutschland",
+      "oss-experts": "Verifizierte Steuerberatung · Berlin",
+      "lucid-reg": "Verifizierter EPR-Dienstleister · Hamburg"
+    }
   },
   "notifications": {
     "title": "Benachrichtigungen",

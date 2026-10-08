@@ -100,10 +100,13 @@ describe('Obligations enrichment (final-8 coverage)', () => {
         expect(vat?.severity).toBe('high');
         expect(vat?.source).toContain('UStG');
         expect(vat?.penalty).toBeTruthy();
+        // The key the UI translates `penalty` by: subdomain + the entry that won.
+        expect(vat?.penaltyKey).toBe('tax-vat-registration.DE');
         expect(vat?.due).toBe('Quarterly');
         // EU-scoped obligations report an empty markets list (= EU-wide).
         const privacy = results.find(r => r.id === 'data-privacy');
         expect(privacy?.markets).toEqual([]);
+        expect(privacy?.penaltyKey).toBe('data-privacy.default');
     });
 });
 

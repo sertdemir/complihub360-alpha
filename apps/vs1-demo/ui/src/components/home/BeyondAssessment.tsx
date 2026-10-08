@@ -11,8 +11,9 @@ import { Badge } from '../ui/Badge';
 // panel, active requests with status pills, saved sessions with the risk
 // traffic light), the notifications feed, and the knowledge library. The
 // window chrome speaks through the same userws keys the live app uses; the
-// row content mirrors the UserHomePage / Notifications / Library fixtures
-// verbatim, which are code-side in the app too.
+// row content mirrors the UserHomePage / Notifications / Library fixtures and
+// lives in home:beyond.mock.* — it used to be literal strings here, half of
+// them German, on an English page.
 //
 // The windows are theme-FIXED to the workspace dark tokens (slate #1f2937 on
 // #0f172a, teal #14a89a, gold #D4AF37 — see the .dark block in index.css):
@@ -76,6 +77,7 @@ function StatusPill({ children, tone }: { children: React.ReactNode; tone: 'ambe
 
 function DashboardWindow() {
   const { t } = useTranslation('userws');
+  const { t: th } = useTranslation('home');
   return (
     <motion.div aria-hidden variants={winShell} className="w-full max-w-[620px] overflow-hidden rounded-xl bg-[#0f172a] text-left shadow-[0_40px_90px_-30px_rgba(2,22,17,0.45)]">
       <motion.div variants={winItem} className="flex items-center justify-between gap-3 px-5 pb-3 pt-4">
@@ -92,7 +94,7 @@ function DashboardWindow() {
         </span>
         <div className="min-w-0">
           <p className="truncate text-body-4xs font-bold uppercase tracking-[0.08em] text-accent-500">{t('home.resumeEyebrow')}</p>
-          <p className="text-body-2xs font-semibold text-[#f5f6f8]">VAT registration · Italy</p>
+          <p className="text-body-2xs font-semibold text-[#f5f6f8]">{th('beyond.mock.vatItaly')}</p>
         </div>
         <span className="ml-auto shrink-0 rounded-[7px] bg-accent-500 px-2.5 py-1 text-body-4xs font-semibold text-[#1f2937]">
           {t('home.resume')} →
@@ -104,13 +106,13 @@ function DashboardWindow() {
         </motion.p>
         <motion.div variants={winItem} className="flex items-center gap-2.5 rounded-[9px] border border-white/10 bg-[#1f2937] px-3 py-2">
           <StatusPill tone="amber">{t('status.awaitingConfirmation')}</StatusPill>
-          <span className="truncate text-body-3xs font-semibold text-[#f5f6f8]">Verifizierte Steuerkanzlei · Norditalien</span>
-          <span className="ml-auto shrink-0 text-body-4xs text-[#8c9aa1]">VAT · Italy · 14h</span>
+          <span className="truncate text-body-3xs font-semibold text-[#f5f6f8]">{th('beyond.mock.reqTaxFirm')}</span>
+          <span className="ml-auto shrink-0 text-body-4xs text-[#8c9aa1]">{th('beyond.mock.reqTaxFirmMeta')}</span>
         </motion.div>
         <motion.div variants={winItem} className="mt-1.5 flex items-center gap-2.5 rounded-[9px] border border-white/10 bg-[#1f2937] px-3 py-2">
           <StatusPill tone="green">{t('status.active')}</StatusPill>
-          <span className="truncate text-body-3xs font-semibold text-[#f5f6f8]">Verifizierter EPR-Spezialist · Deutschland</span>
-          <span className="ml-auto shrink-0 text-body-4xs text-[#8c9aa1]">EPR · France</span>
+          <span className="truncate text-body-3xs font-semibold text-[#f5f6f8]">{th('beyond.mock.reqEpr')}</span>
+          <span className="ml-auto shrink-0 text-body-4xs text-[#8c9aa1]">{th('beyond.mock.reqEprMeta')}</span>
         </motion.div>
       </div>
       <div className="px-5 pb-5 pt-2">
@@ -119,14 +121,14 @@ function DashboardWindow() {
         </motion.p>
         <motion.div variants={winItem} className="grid gap-1.5 sm:grid-cols-2">
           <div className="rounded-[9px] border border-white/10 bg-[#1f2937] px-3 py-2">
-            <p className="text-body-4xs font-bold tracking-[0.07em] text-[#8c9aa1]">TAX &amp; VAT · IT</p>
-            <p className="mt-0.5 text-body-3xs font-semibold text-[#f5f6f8]">VAT registration · Italy</p>
-            <p className="mt-0.5 text-body-4xs text-[#fb923c]">● High risk · threshold reached</p>
+            <p className="text-body-4xs font-bold tracking-[0.07em] text-[#8c9aa1]">{th('beyond.mock.chipTaxIt')}</p>
+            <p className="mt-0.5 text-body-3xs font-semibold text-[#f5f6f8]">{th('beyond.mock.vatItaly')}</p>
+            <p className="mt-0.5 text-body-4xs text-[#fb923c]">{th('beyond.mock.riskHigh')}</p>
           </div>
           <div className="rounded-[9px] border border-white/10 bg-[#1f2937] px-3 py-2">
-            <p className="text-body-4xs font-bold tracking-[0.07em] text-[#8c9aa1]">PACKAGING · FR</p>
-            <p className="mt-0.5 text-body-3xs font-semibold text-[#f5f6f8]">EPR registration · France</p>
-            <p className="mt-0.5 text-body-4xs text-[#fbbf24]">● Medium risk · deadline Q3</p>
+            <p className="text-body-4xs font-bold tracking-[0.07em] text-[#8c9aa1]">{th('beyond.mock.chipPackFr')}</p>
+            <p className="mt-0.5 text-body-3xs font-semibold text-[#f5f6f8]">{th('beyond.mock.eprFrance')}</p>
+            <p className="mt-0.5 text-body-4xs text-[#fbbf24]">{th('beyond.mock.riskMedium')}</p>
           </div>
         </motion.div>
       </div>
@@ -134,22 +136,25 @@ function DashboardWindow() {
   );
 }
 
+// Keys in the 'home' namespace (beyond.mock.*): the rows are showcase content,
+// not app copy, but every language has to read them in its own words.
 const FEED = [
-  { chip: 'MONITORING', title: 'Risk threshold reached · Italy VAT', time: '6h', unread: true },
-  { chip: 'REQUEST', title: 'Provider replied · Verifizierte Steuerkanzlei', time: '12 min', unread: true },
-  { chip: 'SLA', title: 'SLA reminder · Datenschutz-Kanzlei · UK', time: '4h', unread: false },
+  { chip: 'chipMonitoring', title: 'feedThreshold', time: 'time6h', unread: true },
+  { chip: 'chipRequest', title: 'feedReplied', time: 'time12m', unread: true },
+  { chip: 'chipSla', title: 'feedSla', time: 'time4h', unread: false },
 ] as const;
 
 function NewsWindow() {
   const { t } = useTranslation('userws');
+  const { t: th } = useTranslation('home');
   return (
     <motion.div aria-hidden variants={winShell} className="w-full overflow-hidden rounded-xl bg-[#0f172a] text-left shadow-[0_30px_70px_-30px_rgba(2,22,17,0.4)]">
       <motion.p variants={winItem} className="px-3.5 pb-2 pt-3 font-serif text-body-md font-bold text-[#f5f6f8]">{t('notifications.title')}</motion.p>
       {FEED.map((f) => (
         <motion.div key={f.title} variants={winItem} className="flex items-center gap-2.5 border-t border-white/[0.08] px-3.5 py-2.5">
-          <DarkChip>{f.chip}</DarkChip>
-          <span className="min-w-0 flex-1 truncate text-body-3xs font-semibold text-[#f5f6f8]">{f.title}</span>
-          <span className="shrink-0 text-body-4xs text-[#8c9aa1]">{f.time}</span>
+          <DarkChip>{th(`beyond.mock.${f.chip}`)}</DarkChip>
+          <span className="min-w-0 flex-1 truncate text-body-3xs font-semibold text-[#f5f6f8]">{th(`beyond.mock.${f.title}`)}</span>
+          <span className="shrink-0 text-body-4xs text-[#8c9aa1]">{th(`beyond.mock.${f.time}`)}</span>
           {f.unread && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent-500" />}
         </motion.div>
       ))}
@@ -158,12 +163,13 @@ function NewsWindow() {
 }
 
 const LIBRARY = [
-  { type: 'WEBINAR', title: 'OSS vs IOSS: live Q&A mit verifizierten Steuerexperten', source: 'CompliHub360 Live · 90 Min.' },
-  { type: 'VIDEO', title: 'Italian VAT registration: step-by-step', source: 'CompliHub360 Editorial · 8 Min.' },
+  { type: 'chipWebinar', title: 'libOss', source: 'libOssSource' },
+  { type: 'chipVideo', title: 'libItVat', source: 'libItVatSource' },
 ] as const;
 
 function LearnWindow() {
   const { t } = useTranslation('userws');
+  const { t: th } = useTranslation('home');
   return (
     <motion.div aria-hidden variants={winShell} className="w-full rounded-xl bg-[#0f172a] px-3.5 py-3 text-left shadow-[0_30px_70px_-30px_rgba(2,22,17,0.4)]">
       {/* library.title carries <accent> markup — rendered plain: window
@@ -175,11 +181,11 @@ function LearnWindow() {
         {LIBRARY.map((it) => (
           <motion.div key={it.title} variants={winItem} className="rounded-[9px] border border-white/10 bg-[#1f2937] px-3 py-2.5">
             <div className="flex gap-1.5">
-              <DarkChip>{it.type}</DarkChip>
-              <DarkChip>TAX &amp; VAT</DarkChip>
+              <DarkChip>{th(`beyond.mock.${it.type}`)}</DarkChip>
+              <DarkChip>{th('beyond.mock.chipTax')}</DarkChip>
             </div>
-            <p className="mt-1.5 text-body-3xs font-semibold text-[#f5f6f8]">{it.title}</p>
-            <p className="mt-0.5 text-body-4xs text-[#8c9aa1]">{it.source}</p>
+            <p className="mt-1.5 text-body-3xs font-semibold text-[#f5f6f8]">{th(`beyond.mock.${it.title}`)}</p>
+            <p className="mt-0.5 text-body-4xs text-[#8c9aa1]">{th(`beyond.mock.${it.source}`)}</p>
           </motion.div>
         ))}
       </div>

@@ -255,7 +255,18 @@
     "inboxTitle": "Sağlayıcı talepleri",
     "inboxCounts": "{{you}} sizi bekliyor · {{provider}} sağlayıcıda · {{done}} kapandı",
     "slaLabelProvider": "Süre · sağlayıcı",
-    "slaMissed": "kaçırıldı"
+    "slaMissed": "kaçırıldı",
+    "anonProvider": {
+      "studio-bianchi": "Doğrulanmış vergi bürosu · Kuzey İtalya",
+      "schmidt-partner": "Doğrulanmış vergi danışmanlığı · Kuzey Almanya",
+      "madrid-tax": "Doğrulanmış vergi uzmanı · İspanya",
+      "dahlmann-cpa": "Doğrulanmış vergi uzmanı · ABD",
+      "thames-vat": "Doğrulanmış KDV uzmanı · Birleşik Krallık",
+      "costa-legal": "Doğrulanmış hukuk bürosu · İspanya",
+      "datenschutz-nord": "Doğrulanmış veri koruma bürosu · Kuzey Almanya",
+      "oss-experts": "Doğrulanmış vergi danışmanlığı · Berlin",
+      "lucid-reg": "Doğrulanmış EPR hizmet sağlayıcısı · Hamburg"
+    }
   },
   "notifications": {
     "title": "Bildirimler",

@@ -1176,7 +1176,35 @@
       "meta": "Webinar · 24 Min.",
       "video": "Grenzüberschreitende USt für D2C",
       "title": "Lernen Sie von Profis.",
-      "desc": "Webinare mit Behördenvertretern. Tutorials von Spezialisten. Expertinnen und Experten, die Sie von YouTube kennen."
+      "desc": "Webinare mit Behördenvertretern. Tutorials von Spezialisten. Experten, die Sie von YouTube kennen."
+    },
+    "mock": {
+      "vatItaly": "USt-Registrierung · Italien",
+      "eprFrance": "EPR-Registrierung · Frankreich",
+      "reqTaxFirm": "Verifizierte Steuerkanzlei · Norditalien",
+      "reqTaxFirmMeta": "USt · Italien · 14 Std.",
+      "reqEpr": "Verifizierter EPR-Spezialist · Deutschland",
+      "reqEprMeta": "EPR · Frankreich",
+      "chipTaxIt": "STEUERN & UST · IT",
+      "chipPackFr": "VERPACKUNG · FR",
+      "riskHigh": "● Hohes Risiko · Schwelle erreicht",
+      "riskMedium": "● Mittleres Risiko · Frist Q3",
+      "chipMonitoring": "MONITORING",
+      "chipRequest": "ANFRAGE",
+      "chipSla": "SLA",
+      "feedThreshold": "Risikoschwelle erreicht · USt Italien",
+      "feedReplied": "Anbieter hat geantwortet · Verifizierte Steuerkanzlei",
+      "feedSla": "SLA-Erinnerung · Datenschutzkanzlei · UK",
+      "time6h": "6 Std.",
+      "time12m": "12 Min.",
+      "time4h": "4 Std.",
+      "chipWebinar": "WEBINAR",
+      "chipVideo": "VIDEO",
+      "chipTax": "STEUERN & UST",
+      "libOss": "OSS oder IOSS: Live-Fragerunde mit verifizierten Steuerexperten",
+      "libOssSource": "CompliHub360 Live · 90 Min.",
+      "libItVat": "USt-Registrierung in Italien: Schritt für Schritt",
+      "libItVatSource": "CompliHub360 Redaktion · 8 Min."
     }
   },
   "faq": {

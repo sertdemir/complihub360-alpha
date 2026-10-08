@@ -568,12 +568,12 @@ function notifications() {
   const n = (i: number, type: string, subject: string, subjectId: string, payload: Record<string, unknown>, hoursAgo: number, read: boolean) =>
     ({ id: uuid(i, 4), type, subject, subject_id: subjectId, payload, created_at: plus(-hoursAgo * H), read_at: read ? plus(-(hoursAgo - 1) * H) : null });
   return [
-    n(1, 'provider_replied', 'engagement', rid(2), { providerRef: REF['thames-vat'], providerName: 'Verifizierter VAT-Spezialist · Vereinigtes Königreich' }, 2, false),
-    n(2, 'provider_confirmed', 'engagement', rid(8), { providerRef: REF['studio-bianchi'], providerName: 'Verifizierte Steuerkanzlei · Norditalien' }, 5, false),
+    n(1, 'provider_replied', 'engagement', rid(2), { providerRef: REF['thames-vat'], providerName: 'Verified VAT specialist · United Kingdom' }, 2, false),
+    n(2, 'provider_confirmed', 'engagement', rid(8), { providerRef: REF['studio-bianchi'], providerName: 'Verified tax firm · Northern Italy' }, 5, false),
     n(3, 'booking_rescheduled', 'booking', 'm0ck-b02', { providerName: 'Schmidt & Partner Steuerberatungsgesellschaft mbH', from: iso(1, 11), to: iso(1, 9) }, 9, false),
-    n(4, 'provider_declined', 'engagement', rid(10), { providerRef: REF['madrid-tax'], providerName: 'Verifizierter Tax-Spezialist · Spanien' }, 30, true),
+    n(4, 'provider_declined', 'engagement', rid(10), { providerRef: REF['madrid-tax'], providerName: 'Verified tax specialist · Spain' }, 30, true),
     n(5, 'booking_cancelled', 'booking', 'm0ck-b10', { providerName: 'Thames VAT Partners LLP', from: iso(-17, 16) }, 60, true),
-    n(6, 'provider_replied', 'engagement', rid(1), { providerRef: REF['schmidt-partner'], providerName: 'Verifizierte Steuerberatung · Norddeutschland' }, 70, true),
+    n(6, 'provider_replied', 'engagement', rid(1), { providerRef: REF['schmidt-partner'], providerName: 'Verified tax advisory · Northern Germany' }, 70, true),
   ];
 }
 

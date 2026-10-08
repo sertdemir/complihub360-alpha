@@ -109,6 +109,22 @@ export function describeCeiling(
 const betragVon = (e: SubnationalCeiling): number =>
   e.penaltyCeiling.kind === 'amount' ? e.penaltyCeiling.value : 0;
 
+/** Die Strafangabe einer Pflicht in der Sprache des Lesers.
+ *
+ *  `key` ist `<subdomainId>.<Land|default>` (Engine: resolveEnrichmentKey).
+ *  `text` ist die englische Fassung aus der Engine — kanonisch, und der
+ *  Rueckfall, wo kein Schluessel mitreist. Bis 2026-10-07 war `penalty` der
+ *  einzige Text und stand in der Sprache, die der Redaktion gerade zur Hand
+ *  war: "unbegrenzte Geldstrafe" auf der englischen Seite, "amende penale"
+ *  auf der deutschen. Der Waechter dazu: penaltyText.test.ts. */
+export function penaltyText(
+  t: (key: string, opts: { defaultValue: string }) => string,
+  key: string | null | undefined,
+  text: string,
+): string {
+  return key ? t(`common:compliance.penaltyText.${key}`, { defaultValue: text }) : text;
+}
+
 /** Die Fundstelle mit Stand, wie sie unter der Zahl steht. `asOf` fehlt bei
  *  den Formen, die keinen Betrag nennen — dort gibt es nichts zu datieren. */
 export function ceilingBasis(

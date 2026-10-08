@@ -254,7 +254,7 @@ export async function fetchEventLogFeed(viewer: string = NOTIFICATIONS_VIEWER): 
       unread: isUnread(row.created_at, lastSeen),
       kind: EVENT_KIND[row.type] ?? 'system',
       action: row.payload?.bookingId
-        ? 'Open Termine →'
+        ? 'Open appointments →'
         : row.payload?.engagementId ? `Open ${String(row.payload.engagementId).slice(0, 8)} →` : undefined,
       engagementId: row.payload?.engagementId ? String(row.payload.engagementId) : undefined,
       bookingId: row.payload?.bookingId ? String(row.payload.bookingId) : undefined,
