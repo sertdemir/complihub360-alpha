@@ -119,7 +119,13 @@ export function DomainKnowledge({ slug, markets, sessions }: {
               <span className={`mt-[5px] h-2 w-2 shrink-0 rounded-full ${SEVERITY_STYLE[e.primary.severity].bar}`} />
               <div className="min-w-0 flex-1">
                 <h3 className="font-serif text-[16px] font-bold leading-tight text-fg">{ob.label(e.id, e.primary.label)}</h3>
-                <p className="mt-0.5 text-body-4xs text-fg-tertiary">{e.primary.source}</p>
+                <p className="mt-0.5 text-body-4xs text-fg-tertiary">
+                  {e.primary.scope === 'placeholder' ? (
+                    <span className="italic">{tc('compliance.area.fact.noNamedSource', 'No named source yet')}</span>
+                  ) : (
+                    e.primary.source
+                  )}
+                </p>
               </div>
               {e.own.length > 0 && <span className={TAG}>{t('domainPage.knowledgeInSession')}</span>}
             </div>

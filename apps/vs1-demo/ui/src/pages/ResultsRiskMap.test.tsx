@@ -680,6 +680,22 @@ describe('ResultsRiskMap obligations on small screens', () => {
     expect(penalty.className.split(/\s+/)).toEqual(expect.arrayContaining(['block', 'lg:inline']));
     expect(penalty.parentElement!.textContent!.indexOf('UStG §18')).toBe(0);
   });
+
+  it('never prints a placeholder as the legal basis — it says there is none', async () => {
+    // scope 'placeholder': the engine carries no statute here. Older API
+    // states still sent the citation-shaped string as `source`, so the row
+    // must go by the scope, not by an empty source.
+    runSearch.mockResolvedValue({
+      providers: [],
+      laws: [law({ id: 'tax-corporate', title: 'Corporate Income Tax', source: 'National corporate income tax act', source_scope: 'placeholder', due: inDays(40) })],
+    });
+    renderPage();
+
+    await screen.findByText('Corporate Income Tax');
+    expect(screen.queryByText(/National corporate income tax act/)).toBeNull();
+    const gap = screen.getByText('No named source yet');
+    expect(gap.className.split(/\s+/)).toEqual(expect.arrayContaining(['italic', 'text-fg-tertiary']));
+  });
 });
 
 // ─── Risk map · guest top bar on a phone (Canvas T3 · U3, Figma 3577:2831) ────

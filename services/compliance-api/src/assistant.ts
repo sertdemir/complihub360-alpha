@@ -218,7 +218,7 @@ export function handleAssistantChat(req: IncomingMessage, res: ServerResponse, c
                 if (wissen.length) contextParts.push(`AREA KNOWLEDGE · ${DOMAIN_LABEL[domain]} (engine entries; EU-level where marked):\n${wissen.join('\n')}`);
                 const eigene = (scoped?.active ?? []).flatMap((s) =>
                     s.obligations.map((o) =>
-                        `- [session "${s.label || s.id.slice(0, 8)}" · markets ${[s.country, ...s.markets].filter(Boolean).join(', ') || '—'}] ${o.label}: severity ${o.severity}; status ${o.status}${o.due ? `; cadence/due ${o.due}` : ''}${typeof o.dueDays === 'number' ? ` (in ${o.dueDays} days)` : ''}; markets ${o.markets.length ? o.markets.join(', ') : 'EU-wide'}${o.source ? `; source ${o.source}` : ''}`));
+                        `- [session "${s.label || s.id.slice(0, 8)}" · markets ${[s.country, ...s.markets].filter(Boolean).join(', ') || '—'}] ${o.label}: severity ${o.severity}; status ${o.status}${o.due ? `; cadence/due ${o.due}` : ''}${typeof o.dueDays === 'number' ? ` (in ${o.dueDays} days)` : ''}; markets ${o.markets.length ? o.markets.join(', ') : 'EU-wide'}${o.source ? `; source ${o.source}` : o.sourceScope === 'placeholder' ? '; source: no named statute on file (coverage gap — do not name one)' : ''}`));
                 contextParts.push(eigene.length
                     ? `OWN OBLIGATIONS (from the user's saved sessions, this area only):\n${eigene.join('\n')}`
                     : 'OWN OBLIGATIONS: the user has no saved session covering this area yet.');

@@ -147,7 +147,10 @@ export function AreaTimeline({ slug, selectedCountry }: Props) {
           duties.length === 1
             ? t('compliance.area.timeline.aheadOne', {
                 defaultValue: '{{source}} becomes applicable.',
-                source: duties[0].source,
+                source:
+                  duties[0].scope === 'placeholder'
+                    ? t('compliance.area.fact.noNamedSource', 'No named source yet')
+                    : duties[0].source,
               })
             : t('compliance.area.timeline.aheadMany', {
                 defaultValue: '{{names}} all land on the same day.',

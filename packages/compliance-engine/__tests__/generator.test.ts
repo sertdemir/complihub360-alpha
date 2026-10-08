@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { generateRelevantSubdomains, aggregateCountryRiskProfiles } from '../generator';
+import { ObligationEnrichmentMap } from '../obligation-enrichment';
+import type { CountryCode } from '../country-profile';
 import { IndustryType, BusinessModel } from '../business-modifier';
 import { ComplianceDomain } from '../domain-schema';
 
@@ -107,6 +109,31 @@ describe('Obligations enrichment (final-8 coverage)', () => {
         const privacy = results.find(r => r.id === 'data-privacy');
         expect(privacy?.markets).toEqual([]);
         expect(privacy?.penaltyKey).toBe('data-privacy.default');
+    });
+
+    it('9) a placeholder is never handed out as a source', () => {
+        // ObligationEnrichment.scope 'placeholder': a citation-shaped string
+        // that cites nothing. It must not reach any surface as a legal basis.
+        const placeholders = new Set<string>();
+        for (const byCountry of Object.values(ObligationEnrichmentMap)) {
+            const d = byCountry.default;
+            if (d?.scope === 'placeholder') placeholders.add(d.source);
+        }
+        expect(placeholders.size).toBeGreaterThan(0);
+        const markets: CountryCode[][] = [['TR'], ['US'], ['NL'], ['DE'], ['UK', 'TR']];
+        let gesehen = 0;
+        for (const countries of markets) {
+            for (const r of generateRelevantSubdomains({ countries, industry: IndustryType.GENERIC_ECOMMERCE, businessModel: BusinessModel.DTC, focusDomains: Object.values(ComplianceDomain) })) {
+                expect(r.source && placeholders.has(r.source), `${r.id} in ${countries.join('+')}`).toBeFalsy();
+                if (r.scope === 'placeholder') { gesehen++; expect(r.source).toBeUndefined(); }
+            }
+        }
+        // Without a single placeholder row the test would pass by having nothing to look at.
+        expect(gesehen).toBeGreaterThan(0);
+        // A national entry carries no scope and keeps its statute.
+        const de = generateRelevantSubdomains({ countries: ['DE'], industry: IndustryType.GENERIC_ECOMMERCE, businessModel: BusinessModel.DTC })
+            .find((r) => r.id === 'tax-corporate');
+        if (de) { expect(de.scope).toBeUndefined(); expect(de.source).toBeTruthy(); }
     });
 });
 
