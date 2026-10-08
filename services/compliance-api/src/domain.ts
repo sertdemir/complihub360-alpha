@@ -71,6 +71,8 @@ export interface DomainObligation {
     penalty?: string;
     /** Schluessel fuer compliance.penaltyText.* — `penalty` ist nur die englische Fassung. */
     penaltyKey?: string;
+    /** 'placeholder': keine Norm gefuehrt, `source` fehlt deshalb absichtlich. */
+    sourceScope?: 'eu' | 'national-pending' | 'placeholder';
     due?: string;
     dueDays?: number;
     status: ObligationStatus;
@@ -103,14 +105,20 @@ export function domainKnowledge(slug: string, markets: string[]): string[] {
     for (const [domain, subs] of Object.entries(DomainTemplateLibrary)) {
         for (const sub of subs) {
             if (slugForObligation({ id: sub.id, domain: domain as ComplianceDomain }) !== slug) continue;
-            const byCountry = (ObligationEnrichmentMap[sub.id] ?? {}) as Record<string, { source: string; penalty: string; due: string } | undefined>;
+            const byCountry = (ObligationEnrichmentMap[sub.id] ?? {}) as Record<string, { source: string; penalty: string; due: string; scope?: string } | undefined>;
             const seen = markets.length ? markets : ['EU'];
             const perMarket = seen.map((m) => {
                 const national = byCountry[m];
                 const e = national ?? byCountry.default;
                 if (!e) return null;
                 const tag = national ? m : `${m} (EU-level entry, no national source on file)`;
-                return `${tag}: ${e.source}; penalty ${e.penalty}; cadence ${e.due}`;
+                // Ein Platzhalter ist keine Quelle. Dem Assistenten das sagen,
+                // statt ihm einen zitatfoermigen String zu geben, den er als
+                // Rechtsgrundlage weiterreichen wuerde.
+                const source = !national && e.scope === 'placeholder'
+                    ? 'no named statute on file (a gap in our coverage, not in the law — do not name one)'
+                    : e.source;
+                return `${tag}: ${source}; penalty ${e.penalty}; cadence ${e.due}`;
             }).filter(Boolean);
             lines.push(`- ${sub.label}: ${sub.description}${perMarket.length ? '\n  ' + perMarket.join('\n  ') : ''}`);
         }
@@ -150,7 +158,7 @@ export async function loadDomainSessions(userId: string, slug: string, sessionId
             obligations: alle
                 .map((o) => ({
                     id: o.id, label: o.label, severity: String(o.severity), markets: o.markets ?? [],
-                    source: o.source, sourceUrl: o.sourceUrl, penalty: o.penalty, penaltyKey: o.penaltyKey, due: o.due, dueDays: o.dueDays,
+                    source: o.source, sourceUrl: o.sourceUrl, sourceScope: o.scope, penalty: o.penalty, penaltyKey: o.penaltyKey, due: o.due, dueDays: o.dueDays,
                     status: (statusOf.get(`${row.id}:${o.id}`) ?? 'open') as ObligationStatus,
                 }))
                 .sort((a, b) => (RANG[b.severity] ?? 0) - (RANG[a.severity] ?? 0) || (a.dueDays ?? 9999) - (b.dueDays ?? 9999)),

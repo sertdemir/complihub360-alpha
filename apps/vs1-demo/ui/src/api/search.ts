@@ -75,6 +75,9 @@ export interface SearchLaw {
   celex?: string | null;
   /** Deep link to the authoritative text — makes the source citable. */
   source_url?: string | null;
+  /** 'placeholder': die Engine fuehrt hier KEINE Norm, `source` ist null.
+   *  Die Karte sagt dann "Noch keine benannte Quelle" statt zu schweigen. */
+  source_scope?: 'eu' | 'national-pending' | 'placeholder' | null;
   penalty?: string | null;
   /** `<subdomainId>.<Land|default>` — unter diesem Schluessel steht `penalty`
    *  in vier Sprachen (common:compliance.penaltyText.*). */

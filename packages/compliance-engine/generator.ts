@@ -25,6 +25,12 @@ export interface EnrichedSubdomain {
     focus: boolean;
     source?: string;
     penalty?: string;
+    /** How the entry stands to national law, set only where it came from the
+     *  'default' entry (see ObligationEnrichment.scope). On 'placeholder'
+     *  `source` is left out ON PURPOSE: the string there is shaped like a
+     *  citation and cites nothing. Every surface — Risk Map, PDF, dossier,
+     *  assistant context — reads this instead of printing it as a legal basis. */
+    scope?: 'eu' | 'national-pending' | 'placeholder';
     /** `<subdomainId>.<country|default>` — the key the UI translates `penalty`
      *  by (common:compliance.penaltyText.*). Absent when there is no entry. */
     penaltyKey?: string;
@@ -139,6 +145,9 @@ export function generateRelevantSubdomains(context: GeneratorContext): EnrichedS
             }
             const enrichment = resolveEnrichment(template.id, context.countries);
             const enrichmentKey = resolveEnrichmentKey(template.id, context.countries);
+            // Absent on a default entry is read as 'eu' (back-compatibility,
+            // see ObligationEnrichment.scope); a country override has none.
+            const scope = enrichmentKey === 'default' ? enrichment?.scope ?? 'eu' : undefined;
             results.push({
                 id: template.id,
                 label: template.label,
@@ -148,7 +157,8 @@ export function generateRelevantSubdomains(context: GeneratorContext): EnrichedS
                 riskWeight: template.riskWeight,
                 markets: enrichment?.scope === 'eu' ? [] : context.countries,
                 focus: focus.has(domain),
-                source: enrichment?.source,
+                source: scope === 'placeholder' ? undefined : enrichment?.source,
+                scope,
                 penalty: enrichment?.penalty,
                 penaltyKey: enrichmentKey ? `${template.id}.${enrichmentKey}` : undefined,
                 penaltyMaxEur: enrichment?.penaltyMaxEur,

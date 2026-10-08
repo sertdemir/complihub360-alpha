@@ -3188,6 +3188,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         severity: r.severity,
                         markets: r.markets,          // [] = EU-wide
                         source: r.source ?? null,
+                        // 'placeholder' = die Engine fuehrt hier KEINE Norm;
+                        // `source` ist dann null, und die Karte sagt das, statt
+                        // einen zitatfoermigen Platzhalter als Rechtsgrundlage
+                        // zu drucken.
+                        source_scope: r.scope ?? null,
                         // Verified EU legal basis — lets the risk map link the
                         // authoritative, always-current text instead of a plain
                         // paragraph string (EUR-Lex, work package B).

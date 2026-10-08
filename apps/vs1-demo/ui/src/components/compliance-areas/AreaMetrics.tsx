@@ -142,7 +142,10 @@ export function AreaMetrics({ slug, selectedCountry }: Props) {
             // for the French EPR entry — and pushed its own note onto three
             // lines. The source alone still says which filing the number
             // belongs to, and it is what the canvas puts here.
-            note: soonest.source,
+            // A placeholder is not a statute (scope 'placeholder') — say so.
+            note: soonest.scope === 'placeholder'
+              ? t('compliance.area.fact.noNamedSource', 'No named source yet')
+              : soonest.source,
             tone: 'text-fg',
           }
         : null,

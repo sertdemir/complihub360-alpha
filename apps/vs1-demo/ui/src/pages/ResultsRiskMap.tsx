@@ -83,6 +83,10 @@ type Obligation = {
    *  Ende, mal in der Mitte). Statutennamen sind sprachneutral, deshalb
    *  keine eigene i18n-Zeile. */
   law?: string;
+  /** Die Engine fuehrt fuer diese Pflicht KEINE Norm (scope 'placeholder').
+   *  `law` traegt dann "Noch keine benannte Quelle", gedaempft und kursiv
+   *  wie auf den Bereichsseiten — nie den zitatfoermigen Platzhalter. */
+  noSource?: boolean;
   /** Die Bussgeld-Zeile allein. Mobil steht sie unter der Quelle (Canvas
    *  N1); `detail` bleibt fuer das PDF die zusammengesetzte Zeile. */
   penalty?: string;
@@ -125,8 +129,12 @@ type RiskT = TFunction<['results', 'common']>;
 /** Engine-Pflichten → Tabellenzeilen. Nur Pflichten mit `severity` zaehlen;
  *  die uebrigen sind Knowledge-Treffer ohne Bewertung. */
 export function liveObligations(laws: SearchLaw[], t: RiskT, lang: string, locale: string): Obligation[] {
+  // Fruehere API-Staende lieferten den Platzhalter noch als `source`; die
+  // Pruefung haengt deshalb am Scope, nicht daran, dass `source` leer ist.
+  const keineNorm = t('common:compliance.area.fact.noNamedSource', { defaultValue: 'No named source yet' });
   return laws.filter((l) => l.severity).map((l) => ({
     id: l.id,
+    noSource: l.source_scope === 'placeholder' || undefined,
     severity: l.severity as Severity,
     title: l.title,
     // Rechtsgrundlage zuerst, Bußgeld danach. Das DNA-Addendum V2 verlangt,
@@ -138,7 +146,7 @@ export function liveObligations(laws: SearchLaw[], t: RiskT, lang: string, local
     // etwas sie zusammenhielt: hier stand "up to EUR 30,000 per year",
     // waehrend die Obergrenze zu derselben Pflicht 7.500 EUR JE EINHEIT
     // lautete und keinen Deckel hat. Eine Quelle, ein Satz.
-    detail: [l.source_url ? null : l.source, bussgeldZeile(l, t, lang)]
+    detail: [l.source_url ? null : l.source_scope === 'placeholder' ? keineNorm : l.source, bussgeldZeile(l, t, lang)]
       .filter(Boolean)
       .join(' · '),
     sourceLabel: l.source_url ? (l.source ?? l.celex ?? undefined) : undefined,
@@ -146,7 +154,7 @@ export function liveObligations(laws: SearchLaw[], t: RiskT, lang: string, local
     market: l.markets && l.markets.length ? l.markets.join(' · ') : t('euWide'),
     // Die Norm im Klartext, wenn es keine verlinkbare Fundstelle gibt —
     // sonst stuende unter dem Titel nur der Markt (Befund 2026-09-05).
-    law: l.source_url ? undefined : (l.source ?? undefined),
+    law: l.source_url ? undefined : l.source_scope === 'placeholder' ? keineNorm : (l.source ?? undefined),
     penalty: bussgeldZeile(l, t, lang) ?? undefined,
     // A duty that has not started yet must not read "Ongoing · Live" — that
     // would tell the user they are already in breach. Until its start date
@@ -811,7 +819,7 @@ export function ResultsRiskMap() {
                       >
                         {o.sourceLabel} ↗
                       </a>
-                    ) : o.law}
+                    ) : o.noSource ? <span className="italic text-fg-tertiary">{o.law}</span> : o.law}
                     {(o.sourceUrl || o.law) && o.penalty && <span className="hidden lg:inline"> · </span>}
                     {o.penalty && <span className="mt-0.5 block text-fg-tertiary lg:mt-0 lg:inline">{o.penalty}</span>}
                   </span>
