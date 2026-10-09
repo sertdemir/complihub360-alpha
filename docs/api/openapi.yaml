@@ -381,6 +381,36 @@ paths:
                       current_period_start: { type: string, format: date }
                       current_period_end: { type: string, format: date }
                       started_at: { type: string, format: date-time }
+                      renewal_date:
+                        type: string
+                        format: date
+                        nullable: true
+                        description: >
+                          Der Verlaengerungstermin — getrennt vom
+                          `current_period_end`. Der Zyklus ist IMMER ein Monat
+                          (daran haengt der Rabattzaehler), die Verlaengerung
+                          folgt der Zahlweise. Bei jaehrlicher Zahlweise liegen
+                          die beiden bis zu elf Monatszyklen auseinander.
+                  released_categories:
+                    type: array
+                    description: >
+                      Die freigegebenen Hauptkategorien des Anbieters — die
+                      Zahl, an der die Tarifwahl haengt. Aus SEINEN Daten, nicht
+                      aus einer Empfehlung ("we do not create needs").
+                    items:
+                      type: object
+                      properties:
+                        code: { type: string }
+                        label: { type: string }
+                  eligibility:
+                    type: object
+                    description: >
+                      Ob dieses Konto ueberhaupt ein Abo beginnen kann — und
+                      warum nicht. Steht hier, damit der Anbieter die Grenze vor
+                      dem Klick sieht und nicht erst als 409 danach.
+                    properties:
+                      can_start: { type: boolean }
+                      reason: { type: string, nullable: true, enum: [terminated, suspended, null] }
                   plans:
                     type: array
                     items:
@@ -394,6 +424,27 @@ paths:
                         category_allowance: { type: integer, nullable: true }
                         lead_discount_pct: { type: integer }
                         lead_discount_count: { type: integer }
+                        fits_released:
+                          type: boolean
+                          description: >
+                            Ob das Kontingent dieses Tarifs fuer die bereits
+                            freigegebenen Hauptkategorien reicht. `false` heisst:
+                            ein Wechsel darauf wird abgelehnt
+                            (ALLOWANCE_TOO_SMALL) — die Grenze steht damit VOR
+                            dem Klick, nicht erst danach als 409.
+                  scheduled:
+                    type: object
+                    nullable: true
+                    description: >
+                      Was zum Stichtag passiert, falls etwas vorgemerkt ist
+                      (ADR-0006 B2/C2). Steht NEBEN dem laufenden Abo und
+                      ersetzt es nicht: bis dahin aendert sich nichts.
+                    properties:
+                      action: { type: string, enum: [plan_change, cancellation] }
+                      plan_code: { type: string, nullable: true }
+                      cadence: { type: string, enum: [monthly, annual], nullable: true }
+                      effective_on: { type: string, format: date }
+                      requested_at: { type: string, format: date-time }
         '404': { description: Kein Zugriff auf diesen Anbieter }
     post:
       summary: Tarif waehlen (erstes Abo)
@@ -409,9 +460,10 @@ paths:
 
 
         Laeuft schon ein Abo, antwortet die Route mit 409
-        `SUBSCRIPTION_EXISTS`. Ein Wechsel ist bewusst nicht moeglich: Spec B
-        laesst "proration, cancellation notice, grace period, failed-payment
-        retry, and reactivation rules" ausdruecklich offen.
+        `SUBSCRIPTION_EXISTS`. Diese Route bleibt der EINTRITT; ein Wechsel
+        laeuft seit ADR-0006 (B2) ueber `POST .../subscription/schedule` und
+        wirkt zum Verlaengerungstermin. Weiterhin unentschieden und deshalb
+        nirgends umgesetzt: `failed-payment retry` und `reactivation rules`.
       security:
         - bearerAuth: []
       parameters:
@@ -448,7 +500,71 @@ paths:
                       current_period_end: { type: string, format: date }
         '400': { description: VALIDATION_ERROR oder UNKNOWN_PLAN }
         '404': { description: Kein Zugriff auf diesen Anbieter }
-        '409': { description: 'SUBSCRIPTION_EXISTS (es laeuft schon ein Abo) oder PROVIDER_NOT_ELIGIBLE (Konto gesperrt oder beendet)' }
+        '409': { description: 'SUBSCRIPTION_EXISTS (es laeuft schon ein Abo; ein Wechsel laeuft ueber /subscription/schedule) oder PROVIDER_NOT_ELIGIBLE (Konto gesperrt oder beendet)' }
+
+  /provider/{key}/subscription/schedule:
+    post:
+      summary: Tarifwechsel oder Kuendigung zum Verlaengerungstermin vormerken
+      description: >
+        ADR-0006 (Wahl B2/C2, 2026-10-07). Beides wirkt zum `renewal_date` —
+        NICHT zum `current_period_end`: der Zyklus ist immer ein Monat
+        (Rabattzaehler), die Verlaengerung folgt der Zahlweise. Bis zum Stichtag
+        laeuft das Abo unveraendert weiter: Buchbarkeit, Abrechnung, alles.
+        `status` bleibt dabei `active`.
+
+
+        Es gibt hoechstens EINE Vormerkung. `withdraw` nimmt sie zurueck —
+        jederzeit bis zum Stichtag, ohne Begruendung.
+
+
+        Eine offene Rechnung blockiert die Kuendigung ausdruecklich NICHT: die
+        Zahlungssperre gilt der Buchung, nicht dem Ausgang.
+
+
+        Ein Downgrade unter die bereits freigegebenen Hauptkategorien wird
+        abgelehnt (`ALLOWANCE_TOO_SMALL`), nicht vorgemerkt — er wuerde den
+        Anbieter zum Stichtag still deaktivieren.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action: { type: string, enum: [plan_change, cancellation, withdraw] }
+                plan_code: { type: string, enum: [essential, growth, global], description: 'nur bei plan_change' }
+                cadence: { type: string, enum: [monthly, annual], description: 'nur bei plan_change' }
+                reason: { type: string, maxLength: 500, description: 'optional, nur bei cancellation' }
+      responses:
+        '200':
+          description: Vorgemerkt oder zurueckgenommen
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  withdrew: { type: string, enum: [plan_change, cancellation], description: 'nur bei action=withdraw' }
+                  scheduled:
+                    type: object
+                    nullable: true
+                    properties:
+                      action: { type: string, enum: [plan_change, cancellation] }
+                      plan_code: { type: string, nullable: true }
+                      cadence: { type: string, enum: [monthly, annual], nullable: true }
+                      effective_on: { type: string, format: date }
+                      requested_at: { type: string, format: date-time }
+        '400': { description: 'VALIDATION_ERROR (unbekannte Aktion, fehlender Tarif) oder UNKNOWN_PLAN' }
+        '404': { description: 'Kein Zugriff auf diesen Anbieter oder NO_SUBSCRIPTION' }
+        '409': { description: 'ALREADY_SCHEDULED, SAME_PLAN, NOTHING_SCHEDULED oder ALLOWANCE_TOO_SMALL (Antwort nennt allowance und used)' }
 
   /admin/provider-subscriptions:
     post:

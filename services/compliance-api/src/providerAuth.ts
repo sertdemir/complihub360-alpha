@@ -24,8 +24,15 @@ import type { IncomingMessage, ServerResponse } from "http";
 // Phase 2 (Onboarding): application, services[/:id[/coverage]],
 // evidence/(upload-url|registry|:id/confirm), agreements, submit, verification.
 // Change-Control (§18): changes[/:id], material-event.
+// ADR-0006 (B2/C2): subscription/schedule — Wechsel und Kuendigung vormerken.
+//   Ohne das zusaetzliche Segment faellt die Route aus dem Guard, und jeder
+//   Eingeloggte koennte fremde Abos kuendigen — genau das war der erste
+//   Entwurf. Woertlich ausgeschrieben und NICHT als `subscription(?:\/schedule)?`,
+//   weil der Waechter-Test (ownershipRoutes.guard.test.ts) die Segmente
+//   textlich vergleicht und eine optionale Gruppe nicht als Abdeckung lesen
+//   kann. Die laengere Alternative steht zuerst.
 const OWN_PROVIDER_ROUTE =
-    /^\/api\/v1\/provider\/([a-z0-9-]+)\/(bookings(?:\/[0-9a-f-]+\/proposal)?|coverage|profile|invoices|availability|billing-portal|change-email|billing\/preview|billing\/sync|subscription|application|services(?:\/[^/?]+(?:\/coverage)?)?|evidence\/(?:upload-url|registry|[^/?]+\/confirm)|agreements|submit|verification|changes(?:\/[0-9a-f-]+)?|material-event)(\?.*)?$/;
+    /^\/api\/v1\/provider\/([a-z0-9-]+)\/(bookings(?:\/[0-9a-f-]+\/proposal)?|coverage|profile|invoices|availability|billing-portal|change-email|billing\/preview|billing\/sync|subscription\/schedule|subscription|application|services(?:\/[^/?]+(?:\/coverage)?)?|evidence\/(?:upload-url|registry|[^/?]+\/confirm)|agreements|submit|verification|changes(?:\/[0-9a-f-]+)?|material-event)(\?.*)?$/;
 
 /** Liefert den provider_key, wenn die URL eine Anbieter-eigene Route ist. */
 export function ownProviderRouteKey(url: string | undefined): string | null {

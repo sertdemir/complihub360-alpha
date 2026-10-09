@@ -24,7 +24,7 @@ import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
 import { buildCockpit } from "./cockpit.js";
 import { ownProviderRouteKey, canAccessProvider, handleMeProvider, handleAdminLinkMember } from "./providerAuth.js";
 import { handleProviderApplication } from "./providerApplication.js";
-import { handleSubscriptionGet, handleSubscriptionSelect, handleAdminSubscription } from "./subscriptions.js";
+import { handleSubscriptionGet, handleSubscriptionSelect, handleSubscriptionSchedule, handleAdminSubscription } from "./subscriptions.js";
 import { handleProviderReview } from "./providerReview.js";
 import { bookingAffected, pausedAreasByProvider, requestOf } from "./changeImpact.js";
 import { plannedPrices } from "./changeSchedule.js";
@@ -3260,6 +3260,10 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         // Monatslauf (/admin/billing/run) — es gibt kein Stripe-Abo, sonst
         // wuerde zweimal abgerechnet.
         await handleSubscriptionSelect(req, res, correlationId, caller, (req.url || '').split('/')[4]);
+    } else if (req.method === 'POST' && /^\/api\/v1\/provider\/[a-z0-9-]+\/subscription\/schedule$/.test(req.url || '')) {
+        // Wechsel und Kuendigung zum Verlaengerungstermin (ADR-0006 B2/C2):
+        // vormerken oder zuruecknehmen. Derselbe Ownership-Guard wie oben.
+        await handleSubscriptionSchedule(req, res, correlationId, caller, (req.url || '').split('/')[4]);
     } else if (req.method === 'POST' && req.url === '/api/v1/admin/provider-subscriptions') {
         // Admin-Zuweisung: {provider_key, action: 'start'|'end', ...}.
         await handleAdminSubscription(req, res, correlationId, caller);

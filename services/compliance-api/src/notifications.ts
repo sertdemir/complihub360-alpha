@@ -35,7 +35,14 @@ export type NotificationType =
     | 'verification_info_requested'  // Der Reviewer braucht einen weiteren Nachweis
     | 'verification_decided'         // Eine Zelle Leistung x Land wurde entschieden
     | 'verification_activated'       // Das Konto ist aktiv oder eingeschraenkt aktiv
-    | 'evidence_expiring';           // Ein Nachweis laeuft in den naechsten 30 Tagen ab
+    | 'evidence_expiring'            // Ein Nachweis laeuft in den naechsten 30 Tagen ab
+    // Abo: Wechsel und Kuendigung zum Verlaengerungstermin (ADR-0006 B2/C2).
+    // Zwei Zeitpunkte, zwei Nachrichten — die Vormerkung ist eine Zusage auf
+    // spaeter, die Ausfuehrung ein Vorgang von heute. Eine Nachricht fuer
+    // beides hiesse: entweder der Anbieter erfaehrt am Stichtag nichts, oder
+    // er bekommt sofort eine Nachricht ueber etwas, das noch Wochen weg ist.
+    | 'subscription_scheduled'       // Wechsel oder Kuendigung ist vorgemerkt
+    | 'subscription_schedule_done';  // Der Stichtag ist erreicht, es ist geschehen
 
 /**
  * Die erlaubten Nutzlast-Felder. Bewusst eine geschlossene Liste: alles, was
@@ -54,13 +61,19 @@ export interface PayloadFelder {
     from?: string;
     /** Neuer Termin bei einer Verschiebung (ISO). */
     to?: string;
-    /** Selbstvergebener Titel einer Sitzung. */
+    /** Selbstvergebener Titel einer Sitzung — und der Tarif-Bezeichner bei Abo-Nachrichten. */
     label?: string;
+    /**
+     * Der Stichtag einer Abo-Vormerkung (ISO-Datum). Eigenes Feld, weil `to`
+     * bei Terminen schon einen Zeitpunkt traegt und zwei Bedeutungen in einem
+     * Feld frueher oder spaeter falsch angezeigt werden.
+     */
+    effectiveOn?: string;
     /** Gebuchter Termin (ISO) — Phase 4, an den Anbieter. */
     slot?: string;
 }
 
-const PAYLOAD_KEYS: Array<keyof PayloadFelder> = ['providerRef', 'providerKey', 'providerName', 'from', 'to', 'label', 'slot'];
+const PAYLOAD_KEYS: Array<keyof PayloadFelder> = ['providerRef', 'providerKey', 'providerName', 'from', 'to', 'label', 'slot', 'effectiveOn'];
 
 function nutzlast(roh: PayloadFelder): Record<string, string> {
     const out: Record<string, string> = {};
