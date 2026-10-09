@@ -103,7 +103,6 @@ export function SettingsPage() {
               </div>
               <Card styleVariant="filled" className="flex items-center gap-3 p-4">
                 <p className="text-[13px] font-medium text-fg">{contactEmail || '—'}</p>
-                <Tag tone="success">{t('settings.verifiedTag')}</Tag>
                 <div className="ml-auto">
                   <Button size="sm" variant="secondary" onClick={() => setEmailOpen(true)}>{t('settings.changeEmail')}</Button>
                 </div>
@@ -180,18 +179,23 @@ export function MatchmakingPanel() {
   // Speichern erst, wenn der gespeicherte Stand geladen ist — sonst ueberschreibt
   // ein Klick das Profil mit leeren Feldern.
   const [loaded, setLoaded] = useState(false);
+  // E2 (TKT-PROV-12): scheitert der Abruf, sagt ein Satz am Knopf, warum er
+  // gesperrt ist — vorher stand er grau da, ohne Grund.
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const [saved, setSaved] = useState<'idle' | 'saving' | 'done' | 'error'>('idle');
   const [identityHint, setIdentityHint] = useState<string | null>(null);
 
   useEffect(() => {
+    setLoadFailed(false);
     fetchCoverage().then((c) => {
       if (c.billing_model) setBilling(c.billing_model);
       setRegion(c.region ?? '');
       setActiveSince(c.active_since != null ? String(c.active_since) : '');
       setRows(Array.isArray(c.pricing_table) ? c.pricing_table : []);
       setLoaded(true);
-    }).catch(() => { /* bleibt gesperrt: ohne gespeicherten Stand kein Ueberschreiben */ });
-  }, []);
+    }).catch(() => setLoadFailed(true)); // bleibt gesperrt: ohne gespeicherten Stand kein Ueberschreiben
+  }, [attempt]);
 
   const save = async () => {
     setSaved('saving');
@@ -282,6 +286,12 @@ export function MatchmakingPanel() {
         <Button size="sm" onClick={save} disabled={!loaded || saved === 'saving'}>{t('settings.matchmakingSave')}</Button>
         {saved === 'done' && <span className="text-[12px] text-fg-brand">{t('settings.matchmakingSaved')}</span>}
         {saved === 'error' && <span className="text-[12px] text-error-500">{t('application.saveError')}</span>}
+        {loadFailed && (
+          <>
+            <span className="min-w-0 flex-1 text-[12px] text-fg-secondary">{t('common:states.partner.profileUnavailable')}</span>
+            <Button size="sm" variant="ghost" onClick={() => setAttempt((n) => n + 1)}>{t('common:states.actions.tryAgain')}</Button>
+          </>
+        )}
       </div>
     </Card>
   );

@@ -53,6 +53,8 @@ describe('MatchmakingPanel', () => {
     await waitFor(() => expect(fetchCoverage).toHaveBeenCalled());
     expect(saveButton()).toBeDisabled();
     expect(screen.queryByDisplayValue('Norditalien')).not.toBeInTheDocument();
+    // E2 (TKT-PROV-12): der gesperrte Knopf sagt, warum.
+    expect(await screen.findByText('common:states.partner.profileUnavailable')).toBeInTheDocument();
   });
 
   it('meldet einen gescheiterten Speichervorgang statt „Gespeichert"', async () => {

@@ -361,7 +361,6 @@
     "newBannerTitle_one": "Son ziyaretinizden bu yana {{count}} yeni talep",
     "newBannerTitle_other": "Son ziyaretinizden bu yana {{count}} yeni talep",
     "newBannerBody": "Magic-Link e-postaları gönderildi · burada da görünecekler",
-    "fixtureBannerTitle": "Son ziyaretinizden bu yana 2 yeni talep · 12 dk önce",
     "markAllSeen": "Tümünü görüldü işaretle",
     "filterAwaitingConfirmation": "Onay bekleyen",
     "filterAwaitingReply": "Yanıt bekleyen",
@@ -374,8 +373,6 @@
     "actionView": "Görüntüle",
     "sortSla": "Sıralama: SLA aciliyeti",
     "emptyTitle": "Henüz talep yok",
-    "emptyDescription": "Profiliniz yayında. Yeni talepler buraya + gelen kutunuza Magic-Link olarak düşer — çoğu partner ilk talebini 5 gün içinde alır.",
-    "previewProfile": "Herkese açık profili önizle",
     "companyAnonymized": "🔒 Anonim talep"
   },
   "settings": {
@@ -404,7 +401,6 @@
     "bioLabel": "Tanıtım · en fazla 280 karakter · arama sonuçlarında kullanılır",
     "contactEmailTitle": "İletişim e-postası · yönlendirme açısından kritik",
     "contactEmailBody": "Yeni talep Magic-Link'leri buraya gelir. Bu e-posta geri dönerse, sorun giderilene kadar görünürlüğünüz duraklatılır (§11.2).",
-    "verifiedTag": "✓ doğrulandı · 90 gündür geri dönme yok",
     "changeEmail": "E-postayı değiştir",
     "workspaceTitle": "Çalışma alanı",
     "workspaceSub": "Yıkıcı işlemler — her biri açık onay ister",
