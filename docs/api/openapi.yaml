@@ -72,6 +72,67 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /contact:
+    post:
+      summary: Send a message from the contact page or a partner application
+      description: >-
+        Oeffentlich. Ein Postfach fuer alle Wege (`CONTACT_INBOX`), Versand ueber
+        Resend (`RESEND_API_KEY`); das Anliegen steht im Betreff, Reply-To ist der
+        Absender. Danach eine Eingangsbestaetigung an den Absender, die weder Name
+        noch Nachricht wiederholt. Die Nachricht wird nicht gespeichert; das
+        event_log traegt nur Weg, Sprache und Ausgang. Eigenes Limit: fuenf
+        Nachrichten je IP in 15 Minuten. Ein gefuelltes Honeypot-Feld `hp` wird
+        wie ein Erfolg beantwortet, es geht aber nichts hinaus.
+      parameters:
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [lane, name, email]
+              properties:
+                lane:
+                  type: string
+                  enum: [support, sales, partner, privacy, application]
+                locale:
+                  type: string
+                  description: en, de, es oder tr — Sprache der Bestaetigung; sonst en
+                name: { type: string, maxLength: 120 }
+                email: { type: string, maxLength: 254 }
+                message:
+                  type: string
+                  maxLength: 5000
+                  description: Pflicht ausser bei `application`
+                firm: { type: string, maxLength: 160, description: Pflicht bei `application` }
+                website: { type: string, maxLength: 300 }
+                credentials: { type: string, maxLength: 500, description: Pflicht bei `application` }
+                areas:
+                  type: array
+                  items: { type: string }
+                  description: Bereichs-Slugs; Pflicht bei `application`, unbekannte werden verworfen
+                markets:
+                  type: array
+                  items: { type: string }
+                  description: ISO-Codes; Pflicht bei `application`
+                hp: { type: string, description: Honeypot, bleibt leer }
+      responses:
+        '200':
+          description: Im Postfach angekommen. `acknowledged` sagt, ob die Bestaetigung an den Absender ging.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  acknowledged: { type: boolean }
+                  correlationId: { type: string }
+        '400': { description: Eingabe ungueltig (`field` nennt das Feld) }
+        '413': { description: Nachricht zu gross }
+        '429': { description: Zu viele Nachrichten }
+        '502': { description: Das Postfach war nicht erreichbar — nichts angekommen }
+        '503': { description: Postfach oder Versand nicht konfiguriert — nichts angekommen }
   /market-requests:
     post:
       summary: Request a market the engine does not cover yet

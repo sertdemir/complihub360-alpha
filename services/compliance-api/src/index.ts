@@ -15,6 +15,7 @@ import { handleDomain } from "./domain.js";
 import { handleAuthAdopt } from "./adoption.js";
 import { handleDashboard, SLUG_TO_ENGINE } from "./dashboard.js";
 import { checkMarketRequest } from "./marketRequests.js";
+import { handleContact, resendSender, contactRateLimited } from "./contact.js";
 import { notify, handleNotificationsList, handleNotificationsRead } from "./notifications.js";
 import { handleBillingRun, handleBillingPreview, syncOpenInvoices, loadPricingConfig, getActiveSubscription, getDiscountCounter, cycleStartFor, quoteLeadFee, resolveLedgerStatus } from "./billing.js";
 import { SHARED_FIELDS_V1, currentAcknowledgement, deriveOpportunity, priceSnapshotFrom, chargeLeadFee, recordPaymentFailure, syncBillingReadiness } from "./leadCharge.js";
@@ -231,6 +232,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         ['POST', /^\/api\/v1\/search$/],                   // guest risk map
         ['POST', /^\/api\/v1\/session$/],                  // guest wizard-session save (guest_key)
         ['POST', /^\/api\/v1\/market-requests$/],          // „Request This Market“ (guest_key or JWT)
+        ['POST', /^\/api\/v1\/contact$/],                  // Kontaktseite + Partner-Bewerbung (eigenes Limit)
         ['GET', /^\/api\/v1\/acknowledgement(\?|$)/],       // booking acknowledgement text (public legal copy)
         ['GET', /^\/api\/v1\/sessions(\?|$)/],             // guest session list (guest_key = bearer)
         ['POST', /^\/api\/v1\/provider\/intake$/],         // intake token checked in-handler
@@ -2196,6 +2198,44 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Alert prefs save failed', correlationId }));
             }
+        });
+    } else if (req.method === 'POST' && req.url === '/api/v1/contact') {
+        // Kontaktseite und /partner-apply (contact.ts). Ein Postfach, die
+        // Nachricht geht dorthin und nicht in die Datenbank.
+        res.setHeader('x-correlation-id', correlationId);
+        if (contactRateLimited(ip)) {
+            res.writeHead(429, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'RATE_LIMIT_EXCEEDED', message: 'Too many messages, please try again later', correlationId }));
+            return;
+        }
+        let body = '';
+        let tooLarge = false;
+        req.on('data', (chunk: any) => {
+            body += chunk.toString();
+            if (body.length > 32_000) tooLarge = true;
+        });
+        req.on('end', async () => {
+            if (tooLarge) {
+                res.writeHead(413, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'PAYLOAD_TOO_LARGE', message: 'Message too large', correlationId }));
+                return;
+            }
+            let input: Record<string, unknown>;
+            try {
+                input = JSON.parse(body || '{}');
+            } catch {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'INVALID_JSON', message: 'Invalid JSON payload', correlationId }));
+                return;
+            }
+            const outcome = await handleContact(input, {
+                inbox: process.env.CONTACT_INBOX?.trim() || null,
+                mailFrom: process.env.MAIL_FROM || 'CompliHub360 <onboarding@resend.dev>',
+                send: resendSender(process.env.RESEND_API_KEY),
+                log: async (type, payload) => { await supabaseApi.insert('event_log', { type, payload: { ...payload, correlationId } }); },
+            }, correlationId);
+            res.writeHead(outcome.status, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ...outcome.body, correlationId }));
         });
     } else if (req.method === 'POST' && req.url === '/api/v1/market-requests') {
         // „Request This Market“ (Zustand marketUnavailable). Pruefung und Zeile
