@@ -51,6 +51,13 @@ export interface ProviderCoverage {
   availability?: 'available' | 'ooo';
   ooo_until?: string | null;
   partner_status?: 'active' | 'inactive' | 'downgraded'; // vetting state (v2 §10)
+  // Die Route liefert die ganze Anbieter-Zeile; Settings liest daraus den
+  // gespeicherten Stand, statt mit Platzhaltern zu starten.
+  contact_email?: string | null;
+  billing_model?: BillingModel | null;
+  pricing_table?: PricingRow[] | null;
+  region?: string | null;
+  active_since?: number | null;
 }
 
 // C2: cross-component sync — the shell pill and the requests banner both

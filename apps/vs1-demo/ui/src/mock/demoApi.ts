@@ -186,7 +186,7 @@ function syncReadiness() {
   return { ok: true, readiness: { ...READINESS, changed: true } };
 }
 function partnerCoverage() {
-  return { ok: true, coverage: { provider_key: PARTNER_KEY, name: 'Schmidt & Partner Steuerberatungsgesellschaft mbH', countries_supported: ['DE', 'AT'], languages: ['DE', 'EN'], sla_target_confirm_hours: 24, availability: 'available', ooo_until: null, partner_status: 'active' } };
+  return { ok: true, coverage: { provider_key: PARTNER_KEY, name: 'Schmidt & Partner Steuerberatungsgesellschaft mbH', countries_supported: ['DE', 'AT'], languages: ['DE', 'EN'], sla_target_confirm_hours: 24, availability: 'available', ooo_until: null, partner_status: 'active', contact_email: 'kanzlei@schmidt-partner.example', billing_model: 'mixed', region: 'Norddeutschland', active_since: 2009, pricing_table: [{ service: 'USt-Voranmeldung (monatlich)', price: 'ab 180 € / Monat' }, { service: 'OSS-Registrierung', price: 'ab 450 € einmalig' }] } };
 }
 const monat = (offset: number) => { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() + offset); return d.toISOString().slice(0, 7); };
 // Pricing v2 (ADR-0003): Tarif + Leads nach Band, Rabatt auf die ersten Leads
