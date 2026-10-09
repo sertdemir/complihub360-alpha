@@ -17,7 +17,9 @@ import { handleDashboard, SLUG_TO_ENGINE } from "./dashboard.js";
 import { checkMarketRequest } from "./marketRequests.js";
 import { notify, handleNotificationsList, handleNotificationsRead } from "./notifications.js";
 import { handleBillingRun, handleBillingPreview, syncOpenInvoices, loadPricingConfig, getActiveSubscription, getDiscountCounter, cycleStartFor, quoteLeadFee, resolveLedgerStatus } from "./billing.js";
-import { SHARED_FIELDS_V1, currentAcknowledgement, deriveOpportunity, priceSnapshotFrom, chargeLeadFee, recordPaymentFailure, syncBillingReadiness } from "./leadCharge.js";
+import { SHARED_FIELDS_V1, currentAcknowledgement, deriveOpportunity, priceSnapshotFrom, chargeLeadFee, recordPaymentFailure, syncBillingReadiness, type ChargeOutcome } from "./leadCharge.js";
+import { loadAttendancePolicy, findRecentLead } from "./attendance.js";
+import { handleProviderAttendance, handleAdminDispute, recordProviderNoShow, openDispute, rebookWithoutFee, rescheduleAllowed, attendanceFields } from "./attendanceRoutes.js";
 import { ensureStripeCustomer, isStripeConfigured, stripeRequest, getCustomerBilling, refundPaymentIntent, StripeError } from "./stripe.js";
 import { checkVatId } from "./vies.js";
 import { startSlaWatchers, runWatcherTick, issueReminder } from "./watchers.js";
@@ -1066,6 +1068,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         } else {
             try {
                 const rows = (await supabaseApi.select('scheduling', { user_id: authUserId }, { order: 'slot_start.desc', limit: 100 })) as any[];
+                const attPolicy = await loadAttendancePolicy();
+                const attNow = new Date().toISOString();
                 const provs = (await supabaseApi.select('providers', {})) as any[];
                 const byKey: Record<string, any> = {};
                 provs.forEach((p: any) => { byKey[p.provider_key] = p; });
@@ -1107,6 +1111,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         status: b.status,
                         message: b.message ?? null,
                         provider_paused: !!pausedFlag[b.id],
+                        ...attendanceFields(b, attPolicy, attNow),
                     };
                 });
                 res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -1157,6 +1162,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Website outclick failed', correlationId }));
             }
         }
+    } else if (req.method === 'PATCH' && /^\/api\/v1\/provider\/[a-z0-9-]+\/bookings\/[0-9a-f-]+\/attendance$/.test(req.url || '')) {
+        // Phase 5 (Spec B "Booking attendance", ADR-0007): der Anbieter meldet,
+        // ob das Gespraech stattfand, der Nutzer fehlte oder die Plattform
+        // versagte. Geld fliesst hier nie — attendanceRoutes.ts.
+        const parts = (req.url || '').split('/');
+        await handleProviderAttendance(req, res, correlationId, authUserId, parts[4], parts[6]);
     } else if (req.method === 'PATCH' && /^\/api\/v1\/provider\/[a-z0-9-]+\/bookings\/[0-9a-f-]+\/proposal$/.test(req.url || '')) {
         // Phase 4 (Spec B "Mandatory user discount"): der Anbieter bestaetigt je
         // Lead, ob ein Angebot erstellt und der 10 %-Rabatt ausgewiesen wurde.
@@ -1239,6 +1250,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         res.setHeader('x-correlation-id', correlationId);
         try {
             const rows = (await supabaseApi.select('scheduling', { provider_key: providerKey }, { order: 'slot_start.desc', limit: 100 })) as any[];
+            const attPolicy = await loadAttendancePolicy();
+            const nowIso = new Date().toISOString();
             const users = (await supabaseApi.select('users', {})) as any[];
             const byId: Record<string, any> = {};
             users.forEach((u: any) => { byId[u.id] = u; });
@@ -1292,6 +1305,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     } : null,
                     user_discount_pct: b.user_discount_pct ?? null,
                     proposal: rep ? { proposal_issued: !!rep.proposal_issued, discount_shown: !!rep.discount_shown, reported_at: rep.reported_at } : null,
+                    ...attendanceFields(b, attPolicy, nowIso),
                 };
             });
             res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -1313,7 +1327,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 const d = JSON.parse(patchBody || '{}');
                 const status = typeof d.status === 'string' ? d.status : '';
                 const newSlot = typeof d.slot_start === 'string' ? d.slot_start : '';
-                if (!newSlot && !['cancelled', 'completed', 'no_show'].includes(status)) {
+                const action = d.action === 'dispute' ? 'dispute' : '';
+                if (!action && !newSlot && !['cancelled', 'completed', 'no_show'].includes(status)) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ errorCode: 'VALIDATION_ERROR', message: 'status must be cancelled|completed|no_show, or slot_start for a reschedule', correlationId }));
                     return;
@@ -1330,12 +1345,37 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     res.end(JSON.stringify({ errorCode: 'FORBIDDEN', message: 'Not your booking', correlationId }));
                     return;
                 }
+                // Phase 5: Widerspruch gegen einen gemeldeten Nutzer-No-Show,
+                // binnen attendance_policy.dispute_hours. Entscheidet der Admin.
+                if (action === 'dispute') {
+                    const r = await openDispute(b, typeof d.note === 'string' ? d.note.slice(0, 500) : null, authUserId, correlationId);
+                    if (!r.ok) {
+                        res.writeHead(r.status, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ errorCode: r.code, message: r.message, correlationId }));
+                        return;
+                    }
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ ok: true, id: bookingId, dispute_status: 'open', dispute_open_until: r.until, correlationId }));
+                    return;
+                }
                 // Reschedule path: move a confirmed booking to a new slot. Same
                 // lead — the fee was charged at booking and is NOT charged again.
+                // Phase 5: nach No-Show oder Plattformfehler ist dasselbe eine
+                // NEUBUCHUNG in der Frist (neue Zeile am selben Lead, Spec B 4);
+                // ein bestaetigter Termin laesst sich hoechstens
+                // attendance_policy.reschedule_limit mal verschieben.
                 if (newSlot) {
-                    if (b.status !== 'confirmed') {
+                    const attPolicy = await loadAttendancePolicy();
+                    const rebookOpen = (b.status === 'no_show' || b.status === 'cancelled') && !!b.rebook_deadline && !b.credit_decided_at
+                        && new Date().toISOString().slice(0, 10) <= String(b.rebook_deadline);
+                    if (b.status !== 'confirmed' && !rebookOpen) {
                         res.writeHead(409, { 'Content-Type': 'application/json' });
                         res.end(JSON.stringify({ errorCode: 'CONFLICT', message: 'Only confirmed bookings can be rescheduled', correlationId }));
+                        return;
+                    }
+                    if (!rebookOpen && !rescheduleAllowed(b, attPolicy)) {
+                        res.writeHead(409, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ errorCode: 'RESCHEDULE_LIMIT', message: 'This appointment has been moved as often as possible — please cancel and book again', limit: attPolicy.rescheduleLimit, correlationId }));
                         return;
                     }
                     const start = new Date(newSlot);
@@ -1351,7 +1391,22 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         return;
                     }
                     const end = new Date(start.getTime() + 30 * 60 * 1000);
-                    await supabaseApi.update('scheduling', { id: bookingId }, { slot_start: start.toISOString(), slot_end: end.toISOString(), updated_at: new Date().toISOString() });
+                    if (rebookOpen) {
+                        const row = await rebookWithoutFee(b, start.toISOString(), authUserId);
+                        (async () => {
+                            const members = (await supabaseApi.select('provider_members', { provider_key: b.provider_key }, { limit: 20 })) as Array<{ user_id: string }>;
+                            for (const m of members) {
+                                await notify({ to: m.user_id, actor: authUserId, type: 'booking_created', subject: 'booking', subjectId: String(row?.id),
+                                    payload: { providerKey: b.provider_key, slot: start.toISOString() }, dedupeKey: `booking_created:${String(row?.id)}:${m.user_id}` });
+                            }
+                            const provs = (await supabaseApi.select('providers', { provider_key: b.provider_key }, { limit: 1 })) as any[];
+                            await sendBookingMail({ to: provs[0]?.contact_email ?? null, bookingId: String(row?.id), providerKey: b.provider_key, slotIso: start.toISOString(), locale: provs[0]?.languages?.[0], correlationId });
+                        })().catch(() => { /* im Mailer protokolliert */ });
+                        res.writeHead(201, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ ok: true, id: row?.id, status: 'confirmed', slot_start: start.toISOString(), slot_end: end.toISOString(), rebooked_from: bookingId, correlationId }));
+                        return;
+                    }
+                    await supabaseApi.update('scheduling', { id: bookingId }, { slot_start: start.toISOString(), slot_end: end.toISOString(), reschedule_count: Number(b.reschedule_count ?? 0) + 1, updated_at: new Date().toISOString() });
                     await supabaseApi.insert('event_log', { type: 'booking_rescheduled', payload: { bookingId, providerKey: b.provider_key, userId: b.user_id, from: b.slot_start, to: start.toISOString() } });
                     // Der Kalendereintrag muss mitwandern. Sonst steht beim
                     // Anbieter weiter die alte Uhrzeit, und die Mail unten
@@ -1406,6 +1461,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 });
                 const evType = status === 'cancelled' ? 'user_cancelled' : status === 'no_show' ? 'no_show' : 'outcome_check';
                 await supabaseApi.insert('event_log', { type: evType, payload: { bookingId, providerKey: b.provider_key, userId: b.user_id, status } });
+                // Phase 5: no_show aus dieser Route heisst "der Anbieter kam nicht"
+                // — Vorfall statt Guthaben (Spec B "provider no-show").
+                if (status === 'no_show') await recordProviderNoShow({ ...b, id: bookingId }, authUserId, correlationId).catch(() => {});
                 if (status === 'cancelled') {
                     // Bis hierher blieb der Termin im Anbieterkalender stehen:
                     // abgesagt im System, gebucht im Kalender. Derselbe Fehler
@@ -1539,6 +1597,14 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     const clash = (await supabaseApi.select('scheduling', { provider_key: providerKey, status: 'confirmed', slot_start: slotStart }, { limit: 1 })) as any[];
                     if (clash.length) { fail(409, 'SLOT_TAKEN', 'This slot has just been taken'); return; }
 
+                    // Phase 5 (Entscheidung 5, Spec B Schritt 4): derselbe Nutzer beim
+                    // selben Anbieter binnen 30 Tagen oder in einer offenen
+                    // Neubuchungsfrist → die Buchung haengt am bestehenden Lead,
+                    // kein zweites Ledger, keine zweite Gebuehr.
+                    const attPolicy = await loadAttendancePolicy();
+                    const ownBookings = (await supabaseApi.select('scheduling', { user_id: authUserId, provider_key: providerKey }, { limit: 200 })) as any[];
+                    const linkedRoot = findRecentLead({ bookings: ownBookings, userId: authUserId, providerKey, nowIso: new Date().toISOString(), windowDays: attPolicy.sameUserWindowDays }) as any;
+
                     // Opportunity aus der Sitzung des Nutzers, begrenzt auf das Angebot.
                     let session: { country?: string | null; categories?: string[] | null; markets?: string[] | null } | null = null;
                     if (typeof d.session_id === 'string' && d.session_id) {
@@ -1566,7 +1632,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     // Zahlungsmittel: ohne Karte wird nichts versucht und nichts geschrieben.
                     const chargeable = quote.enabled && quote.finalFeeCents > 0;
                     let paymentMethodId: string | null = null;
-                    if (chargeable) {
+                    if (chargeable && !linkedRoot) {
                         const customerId = p.stripe_customer_id ? String(p.stripe_customer_id) : null;
                         if (customerId && isStripeConfigured()) {
                             try { paymentMethodId = (await getCustomerBilling(customerId)).defaultPaymentMethodId; } catch { paymentMethodId = null; }
@@ -1578,11 +1644,13 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     }
 
                     // ── Ab hier wird geschrieben: Ledger → Stripe → Buchung ──
-                    const charge = await chargeLeadFee({
-                        providerKey, userId: authUserId, quote, opp: opp.opp,
-                        customerId: p.stripe_customer_id ? String(p.stripe_customer_id) : null, paymentMethodId,
-                        receiptEmail: p.contact_email ?? null, correlationId,
-                    });
+                    const charge: ChargeOutcome | { ledgerId: string; outcome: 'linked' } = linkedRoot
+                        ? { ledgerId: String(linkedRoot.lead_ledger_id), outcome: 'linked' }
+                        : await chargeLeadFee({
+                            providerKey, userId: authUserId, quote, opp: opp.opp,
+                            customerId: p.stripe_customer_id ? String(p.stripe_customer_id) : null, paymentMethodId,
+                            receiptEmail: p.contact_email ?? null, correlationId,
+                        });
                     if (charge.outcome === 'failed') {
                         if (charge.result.kind === 'card') {
                             await recordPaymentFailure({ providerKey, ledgerId: charge.ledgerId, result: charge.result, paymentMethodId, correlationId });
@@ -1607,8 +1675,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                             slot_end: slotEnd,
                             status: 'confirmed',
                             message: typeof d.message === 'string' ? d.message.slice(0, 2000) : null,
-                            lead_charged: charge.outcome === 'captured',
+                            lead_charged: charge.outcome === 'captured' || (charge.outcome === 'linked' && !!linkedRoot?.lead_charged),
                             identity_revealed: true,
+                            rebooked_from: linkedRoot?.id ?? null,
                             service_id: opp.serviceRow.service_id ?? null,
                             price_snapshot: snapshot,
                             shared_fields: [...SHARED_FIELDS_V1],
@@ -1637,7 +1706,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         return;
                     }
 
-                    if (quote.enabled) {
+                    if (quote.enabled && !linkedRoot) {
                         await supabaseApi.upsert('provider_discount_counter', 'provider_key,cycle_start', {
                             provider_key: providerKey, cycle_start: cycleStart, used: quote.counterUsedAfter, updated_at: sharingAt,
                         }).catch(() => {});
@@ -1664,7 +1733,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                         }
                     }
                     await supabaseApi.insert('event_log', { type: 'scheduling_confirmed', payload: { bookingId: booking.id, providerKey, userId: authUserId, slotStart, ledgerId: charge.ledgerId } });
-                    await supabaseApi.insert('event_log', { type: 'provider_lead_charged', payload: {
+                    if (linkedRoot) {
+                        await supabaseApi.insert('event_log', { type: 'booking_linked_to_lead', payload: { bookingId: booking.id, providerKey, userId: authUserId, ledgerId: charge.ledgerId, rootBookingId: linkedRoot.id } });
+                        // Eine offene Frist ist damit erfuellt — ohne Guthaben.
+                        if (linkedRoot.rebook_deadline && !linkedRoot.credit_decided_at) await supabaseApi.update('scheduling', { id: linkedRoot.id }, { credit_decided_at: sharingAt }).catch(() => {});
+                    } else await supabaseApi.insert('event_log', { type: 'provider_lead_charged', payload: {
                         bookingId: booking.id, providerKey, userId: authUserId, ledgerId: charge.ledgerId,
                         band: quote.band, finalFeeCents: quote.finalFeeCents, currency: quote.currency,
                         paymentIntentId: charge.outcome === 'captured' ? charge.paymentIntentId : null, feeEnabled: quote.enabled,
@@ -1690,6 +1763,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                             id: booking.id, public_ref: ref, slot_start: slotStart, slot_end: slotEnd, status: 'confirmed',
                             acknowledgement_version: ack.version, shared_fields: [...SHARED_FIELDS_V1],
                             user_discount: policy ? { pct: policy.pct, policy_version: policy.version } : null,
+                            rebooked_from: linkedRoot?.id ?? null,
                         },
                         // Offenlegung erst jetzt (Spec B Schritt 5): Name und Kontakt nach der Belastung.
                         provider_identity: { name: p.name, website_url: p.website_url ?? null, contact_email: p.contact_email ?? null },
@@ -3260,6 +3334,15 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         // Monatslauf (/admin/billing/run) — es gibt kein Stripe-Abo, sonst
         // wuerde zweimal abgerechnet.
         await handleSubscriptionSelect(req, res, correlationId, caller, (req.url || '').split('/')[4]);
+    } else if (req.method === 'PATCH' && /^\/api\/v1\/admin\/bookings\/[0-9a-f-]+\/dispute$/.test(req.url || '')) {
+        // Phase 5: der Admin entscheidet einen Widerspruch (upheld | dismissed). Server-Key only.
+        res.setHeader('x-correlation-id', correlationId);
+        if (!authViaApiKey) {
+            res.writeHead(403, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'FORBIDDEN', message: 'Dispute decisions are admin-only', correlationId }));
+        } else {
+            await handleAdminDispute(req, res, correlationId, (req.url || '').split('/')[5]);
+        }
     } else if (req.method === 'POST' && req.url === '/api/v1/admin/provider-subscriptions') {
         // Admin-Zuweisung: {provider_key, action: 'start'|'end', ...}.
         await handleAdminSubscription(req, res, correlationId, caller);

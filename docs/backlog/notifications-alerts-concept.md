@@ -63,6 +63,15 @@
 **User-No-Show** (Provider meldet):
 - Kein Refund (Mehrwert-Prinzip). Intern **Lead-Quality-Minus** für den User; Serien-No-Show-User → Gate/Prüfung.
 
+> **Korrekturnotiz 2026-10-10 (Phase 5, ADR-0007):** Spec B „Booking attendance,
+> cancellation and credits" ersetzt den Satz „Kein Refund" so: die Gebühr bleibt,
+> der Nutzer hat **14 Tage** zur Neubuchung ohne zweite Gebühr (drei Erinnerungen),
+> und bucht er nicht, bekommt der Anbieter **30 % der Gebühr als Plattform-Guthaben**
+> — nie Bargeld. Der Nutzer kann der Meldung binnen 48 h widersprechen. Der
+> Provider-No-Show bleibt wie hier beschrieben: Vorfall, kein Guthaben. Die
+> Terminerinnerungen T−24h/T−1h aus §2 sind damit entschieden (Nutzer 2026-10-10),
+> das Reschedule-Limit ebenfalls: zwei Umbuchungen je Buchung.
+
 **Provider-Storno vor Termin:** User wird aktiv aufgefangen (Re-Match), Provider-Quality-Hinweis.
 **User-Storno/Reschedule:** Slot zurück in den Kalender, Provider informiert.
 
