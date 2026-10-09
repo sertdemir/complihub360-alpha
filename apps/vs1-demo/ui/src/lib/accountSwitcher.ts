@@ -89,6 +89,24 @@ export function forgetAccount(userId: string, storage: Pick<Storage, 'getItem' |
   return next;
 }
 
+/**
+ * Entfernt NUR die lokal gespeicherte Supabase-Sitzung, ohne den Server zu
+ * fragen. Fuer „Weiteres Konto anmelden": `auth.signOut({ scope: 'local' })`
+ * schickt trotz des Namens einen Logout an den Server, und der widerruft die
+ * Sitzung — die gemerkte war danach wertlos (Befund Staging 2026-10-09,
+ * auth-js `_signOut` ruft `admin.signOut(token, scope)` fuer jede Scope).
+ * Danach muss die Seite neu laden, damit der Client ohne Sitzung startet.
+ */
+export function clearLocalAuth(storage: Pick<Storage, 'length' | 'key' | 'removeItem'> = localStorage): string[] {
+  const keys: string[] = [];
+  for (let i = 0; i < storage.length; i++) {
+    const k = storage.key(i);
+    if (k && k.startsWith('sb-') && k.includes('-auth-token')) keys.push(k);
+  }
+  for (const k of keys) storage.removeItem(k);
+  return keys;
+}
+
 /** Wohin nach dem Wechsel: die Startseite der Rolle. */
 export function homeFor(role: SavedAccount['role'], lang: string): string {
   return role === 'partner' ? `/${lang}/partner-dashboard` : role === 'admin' ? `/${lang}/admin` : `/${lang}/dashboard`;
