@@ -10,7 +10,8 @@ import { fileURLToPath } from 'node:url';
 // mocks i18n (as the page tests in this repo do).
 //
 // So this asserts against the JSON directly: every `pricing.*` key the component
-// asks for must resolve in ALL four locales. It reads the component source rather
+// asks for must resolve in English, and in the other locales either to their own
+// string or — English first — to the English fallback. It reads the component source rather
 // than a hand-maintained list, so adding a key to the page without translating it
 // fails here instead of shipping.
 
@@ -61,9 +62,16 @@ describe('/pricing copy', () => {
     expect(used.length).toBeGreaterThanOrEqual(12);
   });
 
+  // English first (decision 2026-10-09): a key may be missing in de/es/tr —
+  // i18next then falls back to English. What must never happen is a key that
+  // resolves nowhere, because that renders the raw key path. So: every key in
+  // English, and in the other locales either a string or nothing at all.
   it.each(LOCALES)('resolves every key the page uses in %s', (lng) => {
     const dict = loadCommon(lng);
-    const missing = used.filter((k) => typeof get(dict, k) !== 'string');
+    const en = loadCommon('en');
+    const missing = used.filter((k) =>
+      lng === 'en' ? typeof get(dict, k) !== 'string' : get(dict, k) !== undefined ? typeof get(dict, k) !== 'string' : typeof get(en, k) !== 'string',
+    );
     expect(missing, `missing in ${lng}: ${missing.join(', ')}`).toEqual([]);
   });
 

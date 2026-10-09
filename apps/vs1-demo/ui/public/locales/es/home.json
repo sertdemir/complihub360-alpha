@@ -80,7 +80,6 @@
   },
   "heroWorld": {
     "title": {
-      "line1": "Compliance global.",
       "line2": "Simplificado."
     },
     "lead": "Entienda sus obligaciones. Encuentre a los especialistas adecuados. Manténgase conforme — allí donde venda.",
@@ -103,8 +102,7 @@
         "desc": "Conectar, colaborar, completar."
       },
       {
-        "title": "Always on your side",
-        "desc": "Soporte humano y ayuda de IA — a cualquier hora."
+        "title": "Always on your side"
       }
     ],
     "proofs": [
@@ -744,7 +742,6 @@
       "gold": "conectamos",
       "post": " con quien lo resuelve."
     },
-    "subtitle": "Las risk maps son públicas: cualquier dashboard de compliance ofrece una. Lo que distingue a CompliHub360 es lo que viene después: proveedores verificados en varios países y áreas, preseleccionados, con tiempos de respuesta medidos y traspasos estructurados. Usted no busca. Nosotros hacemos el match.",
     "matches": [
       {
         "place": "Múnich, DE",
@@ -819,21 +816,15 @@
       "title": "La red que nadie cura.",
       "label": "La brecha, conectada"
     },
-    "row1Lead": "Todos los dashboards públicos le dicen lo que dicen las normas. Ninguno le dice lo que está en juego para su operación, por orden de prioridad y con la fuente adjunta.",
-    "row2Lead": "Los directorios listan a todos. No verifican a nadie. Nosotros verificamos cobertura, respuesta y resultados — y vinculamos cada encargo a una responsabilidad compartida.",
     "row1": [
       {
         "title": "Priorizado por riesgo, no exhaustivo",
         "desc": "De crítico a bajo. Entre cuatro y doce elementos en cada momento. Sin checklists de 200 páginas."
       },
       {
-        "title": "Con origen en los propios reguladores",
-        "desc": "Cada entrada enlaza al aviso oficial, la página del registro o la jurisprudencia de la que procede."
+        "title": "Con origen en los propios reguladores"
       },
-      {
-        "title": "Actualizado frente a la deriva",
-        "desc": "Las normas cambian. El mapa se actualiza cuando se mueve un plazo, un regulador aclara o se abre un registro."
-      },
+      {},
       {
         "title": "Lenguaje claro por defecto",
         "desc": "Si una cláusula necesita un párrafo para explicarse, usted ve el párrafo — no la cláusula."
@@ -841,13 +832,9 @@
     ],
     "row2": [
       {
-        "title": "Verificados por nosotros, no autoinscritos",
-        "desc": "Cada Verified Provider se evalúa por cobertura, tiempo de respuesta y resultados reales acreditados — no es un directorio."
+        "title": "Verificados por nosotros, no autoinscritos"
       },
-      {
-        "title": "Responsabilidad compartida de serie",
-        "desc": "Cada encargo es contractual. Los partners asumen la responsabilidad del asunto, no solo del consejo."
-      }
+      {}
     ]
   },
   "domains": {
@@ -1044,32 +1031,22 @@
       "gold": "entre",
       "post": " el match y la resolución."
     },
-    "subtitle": "En cuanto tiene un match, tres cosas dejan de ser suposiciones: cuánto cuesta, cuándo recibirá respuesta y qué se lleva usted. Todo queda fijado antes del primer correo.",
     "cards": [
+      {},
       {
-        "title": "El coste, antes de comprometerse.",
-        "desc": "Cada Verified Provider publica una estimación fija antes de que usted acepte el encargo. Sin discovery calls solo para saber cuánto cuesta algo."
+        "title": "La respuesta, con el reloj en marcha."
       },
       {
-        "title": "La respuesta, con el reloj en marcha.",
-        "desc": "24–48h hasta la primera respuesta, o derivamos automáticamente al siguiente partner disponible. El reloj forma parte del contrato, no es una promesa."
-      },
-      {
-        "title": "Un historial que usted conserva.",
-        "desc": "Cada paso se registra en una cronología privada: solicitud, respuesta, alcance acordado, entregables. Suyo, exportable en cualquier momento, en el formato que necesite su auditor."
+        "title": "Un historial que usted conserva."
       }
     ],
     "panel1": {
-      "estCost": "Coste estimado",
-      "estValue": "€2,400 — €3,800",
       "scope": "Alcance",
       "scopeValue": "Declaraciones trimestrales OSS · DE + NL + FR",
-      "approval": "Aprobación",
-      "approvalValue": "Fijada antes de empezar cualquier trabajo"
+      "approval": "Aprobación"
     },
     "panel2": {
-      "label": "SLA de primera respuesta",
-      "note": "Derivación automática al siguiente partner si se incumple. Acordado por contrato."
+      "label": "SLA de primera respuesta"
     },
     "panel3": {
       "timeline": [
@@ -1078,8 +1055,7 @@
           "label": "Solicitud enviada"
         },
         {
-          "date": "25 abr",
-          "label": "Partner aceptó · 21h"
+          "date": "25 abr"
         },
         {
           "date": "28 abr",
@@ -1175,8 +1151,7 @@
     "learn": {
       "meta": "Webinar · 24 min",
       "video": "IVA transfronterizo para D2C",
-      "title": "Aprenda de los profesionales.",
-      "desc": "Webinars con reguladores. Tutoriales de especialistas. Expertos que reconocería de YouTube."
+      "title": "Aprenda de los profesionales."
     },
     "mock": {
       "vatItaly": "Registro de IVA · Italia",
@@ -1223,20 +1198,17 @@
             "a": "Sí. Sin cuenta y sin tarjeta de crédito. Al final obtiene una Risk Map estructurada. Registrarse después — para conservarla, hacer match con proveedores y recibir avisos — es el siguiente paso opcional."
           },
           {
-            "q": "¿De dónde provienen los datos de la Risk Map?",
-            "a": "Cada entrada enlaza con el anuncio oficial, la página del registro o la jurisprudencia de la que procede — y se actualiza cuando se aplaza un plazo, una autoridad precisa o se abre un registro."
+            "q": "¿De dónde provienen los datos de la Risk Map?"
           },
           {
-            "q": "¿Puedo exportar mi Risk Map?",
-            "a": "Sí. Como PDF para sus archivos o su auditor — y en su workspace, todo su historial puede exportarse en cualquier momento como PDF, CSV o vía API."
+            "q": "¿Puedo exportar mi Risk Map?"
           },
           {
             "q": "¿Puedo comprobar varios mercados y áreas a la vez?",
             "a": "Sí. La evaluación cubre todos los mercados y áreas en los que opera y reúne las obligaciones en un mapa coherente — priorizado en conjunto."
           },
           {
-            "q": "¿Y si mi mercado aún no está cubierto?",
-            "a": "Díganos dónde opera. Añadimos mercados continuamente, y los primeros registros ayudan a fijar la prioridad — le avisaremos en cuanto su mercado esté disponible."
+            "q": "¿Y si mi mercado aún no está cubierto?"
           }
         ]
       },
@@ -1248,19 +1220,13 @@
             "a": "No. CompliHub360 mapea obligaciones y muestra lo que probablemente aplica a su operación — no es asesoramiento jurídico. Cuando un asunto requiere una opinión vinculante, le conectamos con un Verified Provider que puede darla."
           },
           {
-            "q": "¿Cómo se verifica a los Verified Providers?",
-            "a": "Nosotros evaluamos a cada partner por cobertura de áreas, tiempo de respuesta y resultados reales acreditados — no es un directorio de autoinscripción. Cada encargo es contractual, con responsabilidad compartida por el asunto."
+            "q": "¿Cómo se verifica a los Verified Providers?"
           },
           {
-            "q": "¿Cuánto cuesta un encargo?",
-            "a": "Cada Verified Provider publica una estimación fija antes de que usted acepte — sin discovery calls solo para conocer el precio. Ve el rango y el alcance por adelantado y los aprueba antes de que empiece cualquier trabajo."
+            "q": "¿Cuánto cuesta un encargo?"
           },
+          {},
           {
-            "q": "¿Con qué rapidez responde un partner?",
-            "a": "24–48 horas hasta la primera respuesta, acordado por contrato. Si se retrasa, derivamos su solicitud automáticamente al siguiente Verified Provider disponible."
-          },
-          {
-            "q": "¿Estoy vinculado a un partner?",
             "a": "No. Cada encargo se contrata individualmente. Puede solicitar más matches o cambiar en cualquier momento — su historial y su Risk Map siguen siendo suyos."
           }
         ]

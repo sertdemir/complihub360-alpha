@@ -73,7 +73,6 @@
       "experts": {
         "seg1": "La Vía Más Rápida Hacia ",
         "seg2": "Expertos Locales en Cumplimiento",
-        "text": "Obtén una evaluación personalizada y conéctate de inmediato con la firma asociada ideal.",
         "cta": "Conecta con un experto ahora",
         "usp1": "Matching instantáneo",
         "usp2": "Expertos precalificados",
@@ -124,7 +123,6 @@
       "pain2Title": "La trampa del experto poco fiable",
       "pain2Desc": "Enviar correos fríos a proveedores de cumplimiento y esperar semanas para respuestas vagas no es una estrategia. Es una responsabilidad.",
       "pain3Title": "Nosotros lo solucionamos",
-      "pain3Desc": "Nuestro Asistente de IA captura tu contexto en 4–5 pasos, mapea los riesgos por jurisdicción y te conecta con especialistas con SLA garantizado en 24–48h.",
       "diagramTitle": "Del contexto al especialista adecuado",
       "node1Label": "Puerta de País",
       "node1Desc": "Seleccionar mercado objetivo",
@@ -343,7 +341,6 @@
     "heroOverline": "Áreas de Cumplimiento",
     "heroTitlePre": "Encuentra tu desafío regulatorio.",
     "heroTitleGold": "Empieza aquí.",
-    "heroBody": "Cada área de cumplimiento es una puerta de entrada a tu evaluación específica. Identifica tu tema, entiende los riesgos y emparéjate con un especialista verificado — todo en menos de 5 minutos.",
     "whoAffected": "A quién afecta",
     "startAssessment": "Iniciar evaluación de {{title}}",
     "riskPanel": {
@@ -403,8 +400,7 @@
         "body": "4–5 preguntas precisas traducen su situación en un perfil de búsqueda estructurado."
       },
       "match": {
-        "title": "Emparejar",
-        "body": "Los especialistas verificados se clasifican por relevancia, velocidad de respuesta y puntuación de calidad."
+        "title": "Emparejar"
       },
       "engage": {
         "title": "Contratar",
@@ -1179,9 +1175,7 @@
   "aiGov": {
     "trustCenter": "CompliHub360 Trust Center",
     "dimTitle": "Las 6 Dimensiones de la Gobernanza de IA",
-    "dimDesc": "Un enfoque integral para construir sistemas de IA confiables para el cumplimiento empresarial.",
     "dimEthicsTitle": "Pautas Éticas",
-    "dimEthicsDesc": "Nuestras características de IA respetan la autonomía humana y están diseñadas para aumentar a los profesionales, no para reemplazarlos. Prevenimos el sesgo sistémico mediante monitoreo continuo.",
     "dimTranspTitle": "Transparencia y Explicabilidad",
     "dimTranspDesc": "Los usuarios merecen saber cuándo interactúan con IA. Cada resultado generado por IA está claramente marcado y sus fuentes de datos son rastreables.",
     "dimOrgTitle": "Responsabilidad Organizacional",
@@ -1195,7 +1189,6 @@
     "featTitle": "Características activas de IA en CompliHub360",
     "featDesc": "Cómo aprovechamos la IA hoy, envuelta en nuestro estricto marco de gobernanza.",
     "featPrivacyTitle": "Pipeline de Redacción de Privacidad",
-    "featPrivacyDesc": "Antes de analizar cualquier contexto comercial, nuestros modelos eliminan toda la Información de Identificación Personal (PII). Los correos electrónicos, nombres y números de teléfono nunca salen de nuestros servidores europeos seguros.",
     "featIntentTitle": "Motor de Análisis de Intenciones",
     "featIntentDesc": "Transforma la entrada no estructurada del cliente en un perfil de riesgo estructurado. La IA está restringida y no puede tomar decisiones legales vinculantes por sí sola.",
     "featGateTitle": "Validador Triple de Puertas de IA",
@@ -1584,50 +1577,12 @@
     "regions": {
       "eyebrow": "Regiones",
       "title": "Dónde estamos — y hacia dónde vamos",
-      "lead": "Cada búsqueda y cada análisis se apoyan en las leyes concretas del país de destino, para evitar vuelos a ciegas en materia legal.",
-      "note": "La UE y el Reino Unido están totalmente cubiertos; Norteamérica está en construcción y APAC arranca con cobertura básica. Más países se sumarán a lo largo de 2026.",
-      "tiers": {
-        "full": "Cobertura completa",
-        "expanding": "En expansión",
-        "core": "Cobertura básica"
-      },
       "items": {
         "eu": {
-          "name": "Unión Europea",
-          "focus": [
-            "Cumplimiento del RGPD",
-            "Normativa EPR de envases",
-            "IVA en toda la UE",
-            "Ley de Servicios Digitales"
-          ]
+          "name": "Unión Europea"
         },
-        "uk": {
-          "name": "Reino Unido",
-          "focus": [
-            "RGPD del Reino Unido",
-            "Cumplimiento de IVA (HMRC)",
-            "Seguridad del producto (UKCA)",
-            "Derecho laboral"
-          ]
-        },
-        "us": {
-          "name": "EE. UU. y Canadá",
-          "focus": [
-            "Nexus e impuesto sobre ventas",
-            "Privacidad CCPA/CPRA",
-            "Normas publicitarias de la FTC",
-            "Cumplimiento comercial"
-          ]
-        },
-        "au": {
-          "name": "Australia (APAC)",
-          "focus": [
-            "Cumplimiento del GST",
-            "Privacy Act 1988",
-            "Responsabilidad de producto",
-            "Importación/Exportación"
-          ]
-        }
+        "uk": {},
+        "us": {}
       }
     }
   },
@@ -1674,9 +1629,7 @@
       "body": "La posición en la lista nunca está a la venta. Un puesto pagado dejaría el match sin valor para ambas partes: usted conocería a quien más hubiera pagado, y el especialista conocería a alguien cuyo caso no podría atender. La idoneidad es el único criterio."
     },
     "specialist": {
-      "kicker": "Lo que cuesta el especialista",
-      "title": "Los honorarios del especialista — presupuestados antes de que usted se comprometa.",
-      "body": "El asesoramiento en sí no es gratuito, y no vamos a fingir lo contrario. Cada Verified Provider publica una estimación fija antes de que usted acepte el encargo, de modo que nunca tendrá que aguantar una llamada exploratoria solo para conocer el precio."
+      "kicker": "Lo que cuesta el especialista"
     },
     "cta": {
       "title": "Empiece donde tenga sentido para usted.",
@@ -1723,8 +1676,7 @@
           "a": "No. Los puestos no están en venta: una posición pagada haría que el match perdiera su valor para ambas partes. La idoneidad es el único criterio."
         },
         {
-          "q": "¿Cuánto cuesta el asesoramiento del especialista?",
-          "a": "Los honorarios los fija el especialista: cada Verified Provider publica una estimación fija antes de que usted acepte el encargo — sin una primera llamada solo para conocer el precio."
+          "q": "¿Cuánto cuesta el asesoramiento del especialista?"
         },
         {
           "q": "¿Ve el especialista mis datos antes de la reserva?",

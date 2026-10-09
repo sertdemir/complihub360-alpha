@@ -73,7 +73,6 @@
       "experts": {
         "seg1": "Yerel Uyumluluk Uzmanlarına ",
         "seg2": "Ulaşmanın En Hızlı Yolu",
-        "text": "Tahmin etmeyi bırakın. Özelleştirilmiş değerlendirmenizi alın ve doğru partner firmayla hemen iletişime geçin.",
         "cta": "Şimdi bir uzmanla bağlan",
         "usp1": "Anında eşleştirme",
         "usp2": "Ön elemeye tabi tutulmuş uzmanlar",
@@ -124,7 +123,6 @@
       "pain2Title": "Güvenilmez uzman tuzağı",
       "pain2Desc": "Uyumluluk sağlayıcılarına soğuk e-posta göndermek ve haftalarca belirsiz yanıtlar beklemek bir strateji değildir. Bu bir sorumluluktur.",
       "pain3Title": "Biz bunu çözüyoruz",
-      "pain3Desc": "Yapay zeka Asistanımız bağlamınızı 4-5 adımda yakalar, yargı bölgesine özgü riskleri haritalandırır ve sizi 24-48 saat içinde SLA güvenceli uzmanlarla buluşturur.",
       "diagramTitle": "Bağlamdan doğru uzmana",
       "node1Label": "Ülke Kapısı",
       "node1Desc": "Hedef pazar seçin",
@@ -343,7 +341,6 @@
     "heroOverline": "Uyumluluk Alanları",
     "heroTitlePre": "Mevzuat zorluğunuzu bulun.",
     "heroTitleGold": "Buradan başlayın.",
-    "heroBody": "Her uyumluluk alanı, spesifik değerlendirmenize açılan bir kapıdır. Konunuzu belirleyin, riskleri anlayın ve doğrulanmış bir uzmanla eşleşin — hepsi 5 dakikadan az sürede.",
     "whoAffected": "Kimler etkilenir",
     "startAssessment": "{{title}} Değerlendirmesini Başlatın",
     "riskPanel": {
@@ -403,8 +400,7 @@
         "body": "4–5 net soru, durumunuzu yapılandırılmış bir arama profiline dönüştürür."
       },
       "match": {
-        "title": "Eşleşin",
-        "body": "Doğrulanmış uzmanlar; ilgililik, yanıt hızı ve kalite puanına göre sıralanır."
+        "title": "Eşleşin"
       },
       "engage": {
         "title": "Harekete Geçin",
@@ -1179,9 +1175,7 @@
   "aiGov": {
     "trustCenter": "CompliHub360 Trust Center",
     "dimTitle": "Yapay Zeka Yönetişiminin 6 Boyutu",
-    "dimDesc": "Kurumsal uyumluluk için güvenilir yapay zeka sistemleri oluşturmaya yönelik kapsamlı bir yaklaşım.",
     "dimEthicsTitle": "Etik Kurallar",
-    "dimEthicsDesc": "Yapay zeka özelliklerimiz insan özerkliğine saygı duyar ve profesyonellerin yerini almak değil, onları desteklemek için tasarlanmıştır. Sürekli izleme ile sistemik önyargıları önleriz.",
     "dimTranspTitle": "Şeffaflık ve Açıklanabilirlik",
     "dimTranspDesc": "Kullanıcılar bir yapay zeka ile etkileşime girdiklerinde bunu bilmeyi hak ederler. Üretilen her sonuç açıkça işaretlenir ve veri kaynakları izlenebilir.",
     "dimOrgTitle": "Kurumsal Hesap Verebilirlik",
@@ -1195,7 +1189,6 @@
     "featTitle": "CompliHub360'taki Aktif Yapay Zeka Özellikleri",
     "featDesc": "Bugün yapay zekadan nasıl yararlandığımız, sıkı yönetişim çerçevemizle sarmalanmış durumda.",
     "featPrivacyTitle": "Gizlilik Redaksiyon Hattı",
-    "featPrivacyDesc": "Herhangi bir iş bağlamı analiz edilmeden önce, yerel NLP modellerimiz tüm Kişisel Olarak Tanımlanabilir Bilgileri (PII) çıkarır. E-postalar, isimler ve telefon numaraları güvenli Avrupa sunucularımızdan asla çıkmaz.",
     "featIntentTitle": "Niyet Analizi Motoru",
     "featIntentDesc": "Yapılandırılmamış müşteri girdisini yapılandırılmış bir risk profiline dönüştürür. Yapay zeka yalnızca uyumluluk bağlamını analiz etmekle sınırlıdır ve yasal olarak bağlayıcı kararlar alamaz.",
     "featGateTitle": "Üçlü Yapay Zeka Kapısı Doğrulayıcı",
@@ -1584,50 +1577,12 @@
     "regions": {
       "eyebrow": "Bölgeler",
       "title": "Neredeyiz — ve yol nereye gidiyor",
-      "lead": "Her arama ve analiz, hedef ülkenin somut mevzuatına dayanır — hukuki körlemesine adımları önlemek için.",
-      "note": "AB ve Birleşik Krallık tam kapsamda; Kuzey Amerika yapım aşamasında, APAC temel kapsamla başlıyor. 2026 boyunca yeni ülkeler eklenecek.",
-      "tiers": {
-        "full": "Tam Kapsam",
-        "expanding": "Genişliyor",
-        "core": "Temel Kapsam"
-      },
       "items": {
         "eu": {
-          "name": "Avrupa Birliği",
-          "focus": [
-            "GDPR Uyumu",
-            "EPR Ambalaj Mevzuatı",
-            "AB Geneli KDV",
-            "Dijital Hizmetler Yasası"
-          ]
+          "name": "Avrupa Birliği"
         },
-        "uk": {
-          "name": "Birleşik Krallık",
-          "focus": [
-            "UK GDPR",
-            "HMRC KDV Uyumu",
-            "Ürün Güvenliği (UKCA)",
-            "İş Hukuku"
-          ]
-        },
-        "us": {
-          "name": "ABD ve Kanada",
-          "focus": [
-            "Nexus ve Satış Vergisi",
-            "CCPA/CPRA Gizliliği",
-            "FTC Reklam Kuralları",
-            "Dış Ticaret Uyumu"
-          ]
-        },
-        "au": {
-          "name": "Avustralya (APAC)",
-          "focus": [
-            "GST Uyumu",
-            "Privacy Act 1988",
-            "Ürün Sorumluluğu",
-            "İthalat/İhracat"
-          ]
-        }
+        "uk": {},
+        "us": {}
       }
     }
   },
@@ -1674,9 +1629,7 @@
       "body": "Sıralamadaki yerler hiçbir zaman satılık değildir. Ücretli bir yer, eşleşmeyi her iki taraf için de değersiz kılardı: siz en çok ödeyenle tanışırdınız, uzman ise vakasıyla ilgilenemeyeceği biriyle tanışırdı. Tek ölçüt uygunluktur."
     },
     "specialist": {
-      "kicker": "Uzmanın ücreti",
-      "title": "Kendi ücreti — siz karar vermeden önce belirtilir.",
-      "body": "Danışmanlığın kendisi ücretsiz değildir; bunun aksini de iddia etmeyeceğiz. Her Verified Provider, işi kabul etmenizden önce sabit bir fiyat tahmini yayımlar; böylece yalnızca fiyatı öğrenmek için bir ön görüşmeye katlanmak zorunda kalmazsınız."
+      "kicker": "Uzmanın ücreti"
     },
     "cta": {
       "title": "Sizin için anlamlı olan yerden başlayın.",
@@ -1723,8 +1676,7 @@
           "a": "Hayır. Sıralar satılık değildir — parayla alınmış bir sıra eşleşmeyi iki taraf için de değersiz kılardı. Uygunluk tek ölçüttür."
         },
         {
-          "q": "Uzmanın danışmanlığı ne kadar tutar?",
-          "a": "Ücreti uzman belirler: Her Verified Provider, siz görevi kabul etmeden önce sabit bir tahmin yayımlar — fiyatı öğrenmek için bir ilk görüşmeye katlanmazsınız."
+          "q": "Uzmanın danışmanlığı ne kadar tutar?"
         },
         {
           "q": "Uzman, rezervasyondan önce bilgilerimi görür mü?",
