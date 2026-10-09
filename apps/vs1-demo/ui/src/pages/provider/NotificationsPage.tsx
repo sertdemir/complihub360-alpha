@@ -6,7 +6,9 @@ import { Button } from '../../components/ui/Button';
 import { FilterChip } from '../../components/ui/Badge';
 import { Tag } from '../../components/ui/Tag';
 import { Card } from '../../components/ui/Card';
-import { useApiData } from '../../lib/useApiData';
+import { useWorkspaceData } from '../../lib/useWorkspaceData';
+import { LoadFailedState } from '../../components/provider/WorkspaceStates';
+import { ApiError } from '../../api/client';
 import { fetchEventLogFeed, NOTIFICATIONS_VIEWER, type FeedItem } from '../../api/notifications';
 import { markSeen } from '../../api/reads';
 
@@ -15,41 +17,11 @@ import { markSeen } from '../../api/reads';
 // feed grouped by day, filter chips, per-event type tag + action link.
 // C1: unread comes from the read-state watermark; chips carry live counts and
 // actually filter; "Mark all read" persists the watermark.
-
-type Feed = {
-  day: string;
-  items: {
-    title: string; event: string; time: string; desc: string;
-    action?: string; unread?: boolean; kind: 'request' | 'sla' | 'billing' | 'system' | 'review';
-  }[];
-};
-
-// Design fixture: company names, RQ-IDs, amounts and the client quote are data
-// and stay verbatim; all surrounding labels come from the providerws namespace.
-function buildFeedFixture(t: (k: string, o?: Record<string, unknown>) => string): Feed[] {
-  return [
-    {
-      day: t('notifications.dayToday'),
-      items: [
-        { title: `${t('notifications.itemNewRequest')} · EPR & Verpackung · DE`, event: 'request_routed', time: t('notifications.timeMinAgo', { count: 12 }), unread: true, kind: 'request',
-          desc: t('notifications.descRq0234'), action: t('notifications.actionOpenRq', { id: 'RQ-7C41' }) },
-        { title: `${t('notifications.itemNewRequest')} · USt · DE + AT`, event: 'request_routed', time: t('notifications.timeHoursAgo', { count: 2 }), unread: true, kind: 'request',
-          desc: t('notifications.descRq0233'), action: t('notifications.actionOpenRq', { id: 'RQ-7B3E' }) },
-        { title: `${t('notifications.itemSlaReminder')} · RQ-7A92 · Datenschutz · DE`, event: 'sla_reminder_sent', time: t('notifications.timeHoursAgo', { count: 4 }), kind: 'sla',
-          desc: t('notifications.descRq0232'), action: t('notifications.actionOpenRq', { id: 'RQ-7A92' }) },
-      ],
-    },
-    {
-      day: t('notifications.dayYesterday'),
-      items: [
-        { title: `${t('notifications.itemEngagementClosed')} · Möbelwerk Süd GmbH · EPR-Registrierung`, event: 'engagement_completed', time: `${t('notifications.dayYesterday')} · 18:34`, kind: 'system',
-          desc: t('notifications.descEngagementClosed') },
-        { title: `${t('notifications.itemNewReview')} · Möbelwerk Süd GmbH`, event: 'client_review_posted', time: `${t('notifications.dayYesterday')} · 18:34`, kind: 'review',
-          desc: '"Schneller Turnaround, präzise Kommunikation. Hat exakt unsere Lücke geschlossen." — Geschäftsführung, Möbelwerk Süd' },
-      ],
-    },
-  ];
-}
+//
+// TKT-PROV-12: keine Fixture mehr. Die Quelle ist das Betriebsprotokoll, und
+// das antwortet einem Anbieter mit 403 — eine eigene Quelle fuer Anbieter gibt
+// es noch nicht. Ein 403 ist kein voruebergehender Fehler, also kein A2,
+// sondern „Noch keine Benachrichtigungen" (bell.empty).
 
 const KIND_CHIPS: { key: FeedItem['kind']; labelKey: string }[] = [
   { key: 'request', labelKey: 'notifications.chipRequests' },
@@ -73,8 +45,9 @@ export function NotificationsPage() {
   // C1: once "Mark all read" ran, everything renders as read without a refetch.
   const [allSeen, setAllSeen] = useState(false);
   const [marking, setMarking] = useState(false);
-  // Live event feed when the compliance-api answers; the design fixture otherwise.
-  const { data } = useApiData(fetchEventLogFeed, { groups: buildFeedFixture(t), lastSeen: null });
+  const feed = useWorkspaceData(fetchEventLogFeed);
+  const noFeedForAccount = feed.state === 'error' && feed.error instanceof ApiError && feed.error.status === 403;
+  const data = feed.data ?? { groups: [], lastSeen: null };
 
   const withReadState = data.groups.map((g) => ({
     ...g,
@@ -92,7 +65,7 @@ export function NotificationsPage() {
     setMarking(true);
     try {
       await markSeen(NOTIFICATIONS_VIEWER);
-    } catch { /* fixture mode: still clear locally */ }
+    } catch { /* der Server hat nicht gespeichert; lokal trotzdem gelesen */ }
     setAllSeen(true);
     setMarking(false);
   };
@@ -127,7 +100,12 @@ export function NotificationsPage() {
           ))}
         </div>
 
-        {visible.length === 0 && (
+        {feed.state === 'loading' && <div aria-busy="true" className="h-24 animate-pulse rounded-xl bg-surface-secondary/60 motion-reduce:animate-none" />}
+        {feed.state === 'error' && !noFeedForAccount && <LoadFailedState surface="notifications" error={feed.error} onRetry={feed.reload} section />}
+        {(noFeedForAccount || (feed.state === 'ready' && flat.length === 0)) && (
+          <p className="text-[13px] text-fg-tertiary">{t('bell.empty')}</p>
+        )}
+        {feed.state === 'ready' && flat.length > 0 && visible.length === 0 && (
           <p className="text-[13px] text-fg-tertiary">{t('notifications.emptyFilter')}</p>
         )}
         {visible.map((group) => (

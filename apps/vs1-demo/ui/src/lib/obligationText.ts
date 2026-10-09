@@ -20,19 +20,31 @@ import { useTranslation } from 'react-i18next';
 // Inhalt verschiebt.
 //
 // Ohne Eintrag bleibt es beim Text der Engine — lieber der englische
-// Vorlagenname als ein erfundener deutscher. Das Bussgeld bleibt deshalb
-// unangetastet: dafuer fuehrt das Produkt keine Uebersetzung, und viele
-// Angaben stehen bewusst in der Sprache der jeweiligen Rechtsordnung
-// ("sanzioni AGCM", "amendes DGCCRF").
+// Vorlagenname als ein erfundener deutscher. Die Strafangaben haben seit
+// 2026-10-07 einen eigenen Anschluss (penaltyText in penaltyCeiling.ts).
+//
+// Seit 2026-10-09 haengen auch Risk Map, Bereichs- und Marktseiten hier dran:
+// bis dahin las nur die Arbeitsflaeche die Uebersetzung, und die deutsche
+// Risk Map nannte "VAT Registration & Filing · Annual". Die Funktionen ohne
+// Hook sind fuer Abbildungen ausserhalb einer Komponente (liveObligations,
+// PDF-Export); jede Sprachdatei-Abdeckung prueft obligationText.test.ts.
+
+type T = (key: string, opts: { defaultValue: string }) => string;
+
+/** Der Name der Pflicht in der Sprache des Lesers; sonst der Engine-Titel. */
+export const obligationLabel = (t: T, id: string, fallback: string) =>
+  t(`common:markets.obligations.${id}`, { defaultValue: fallback });
+/** "Quarterly" → "Vierteljährlich"; unbekannte Kadenz bleibt, wie sie kam. */
+export const cadenceLabel = (t: T, due: string) => t(`common:markets.cadence.${due}`, { defaultValue: due });
+/** Der Beschreibungssatz der Vorlage; sonst der Satz der Engine. */
+export const obligationDescription = (t: T, id: string, fallback: string) =>
+  t(`common:markets.obligationDesc.${id}`, { defaultValue: fallback });
 
 export function useObligationText() {
   const { t } = useTranslation('common');
   return {
-    /** Der Name der Pflicht in der Sprache des Nutzers; sonst der Engine-Titel. */
-    label: (id: string, fallback: string) => t(`markets.obligations.${id}`, { defaultValue: fallback }),
-    /** "Quarterly" → "Vierteljährlich"; unbekannte Kadenz bleibt, wie sie kam. */
-    cadence: (due: string) => t(`markets.cadence.${due}`, { defaultValue: due }),
-    /** Der Beschreibungssatz der Vorlage; sonst der Satz der Engine. */
-    description: (id: string, fallback: string) => t(`markets.obligationDesc.${id}`, { defaultValue: fallback }),
+    label: (id: string, fallback: string) => obligationLabel(t, id, fallback),
+    cadence: (due: string) => cadenceLabel(t, due),
+    description: (id: string, fallback: string) => obligationDescription(t, id, fallback),
   };
 }

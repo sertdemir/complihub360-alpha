@@ -1,7 +1,7 @@
 ---
 title: "Abgenommene Zustands-Copy aus der Acceptance-Checklist, Teil 1"
 assignee: "Claude"
-status: "review"
+status: "done"
 ---
 
 # Abgenommene Zustands-Copy aus der Acceptance-Checklist, Teil 1
@@ -165,3 +165,4 @@ der Teaser, aber eine andere Fläche mit eigenem Datenweg: eigener Schritt.
 
 - [2026-09-22] **Claude**: Copy angelegt, Wahrheitstabelle erstellt, Booking processing verdrahtet, Wächter-Loch geschlossen, DNA-Konflikt eskaliert. (Status: review)
 - [2026-09-22] **Claude**: Teaser nach Nutzerentscheidung "echte Zahl" umgebaut; Fixture-Export der Sitzungsseite gemeldet. (Status: review)
+- [2026-10-07] **Claude**: Beta-Durchgang: alle Kriterien erfüllt, PR gemergt (= Review des Nutzers), auf Staging. Nach done. (Status: done)

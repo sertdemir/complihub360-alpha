@@ -1,7 +1,7 @@
 ---
 title: "Provider Phase 1 — Pricing v2 (Pläne, Lead-Bänder, Ledger, Neutralität)"
 assignee: "Claude"
-status: "review"
+status: "done"
 ---
 
 # Provider Phase 1 — Pricing v2
@@ -71,3 +71,7 @@ zur eigenen Klärung.
 - `npm run db:test` → 5 Dateien, 98 Tests.
 - `compliance-api`: 150 Tests (28 Billing, 2 Neutralität).
 - `typecheck`, `build`, `i18n:check`, `terminology:check`, `tokens:check`, UI-Tests, E2E.
+
+## Agent Audit Log
+
+- [2026-10-07] **Claude**: Beta-Durchgang: alle Kriterien erfüllt, PR gemergt (= Review des Nutzers), auf Staging. Nach done. (Status: done)

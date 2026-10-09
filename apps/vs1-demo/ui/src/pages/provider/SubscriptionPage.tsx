@@ -4,11 +4,12 @@ import { ProviderShell } from '../../components/provider/ProviderShell';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
 import { Tag } from '../../components/ui/Tag';
-import { useApiData } from '../../lib/useApiData';
+import { useWorkspaceData } from '../../lib/useWorkspaceData';
+import { LoadFailedState } from '../../components/provider/WorkspaceStates';
 import { money, type PlanCode } from '../../api/billing';
 import {
   fetchSubscription, selectPlan, scheduleChange, scheduleCancellation, withdrawScheduled,
-  type Cadence, type SubscriptionPlan, type SubscriptionView, type RunningSubscription,
+  type Cadence, type SubscriptionPlan, type RunningSubscription,
   type SelectFailure, type ScheduledChange, type ScheduleOutcome,
 } from '../../api/subscription';
 
@@ -50,34 +51,6 @@ import {
 
 const PARTNER_MAIL = 'partners@complihub360.com';
 
-// Entwurfsdaten fuer den lokalen Lauf: kein Abo, zwei freigegebene Bereiche,
-// Preise wie in `plan_catalog`. Dieselbe Rolle wie die Fixtures auf /billing.
-const FIXTURE: SubscriptionView = {
-  // Der laufende Tarif ist der Zustand, in dem ein Anbieter die meiste Zeit
-  // ist — und seit ADR-0006 der mit den meisten Flaechen. Der Eintritt
-  // (subscription: null) bleibt ueber die Tarifwahl erreichbar.
-  subscription: {
-    plan_code: 'growth', cadence: 'monthly', status: 'active',
-    current_period_start: '2026-10-01', current_period_end: '2026-11-01',
-    started_at: '2026-06-01T00:00:00Z', renewal_date: '2026-11-01',
-  },
-  plans: [
-    // `fits_released` spiegelt, was der Server zu DIESEM Konto sagt: zwei
-    // freigegebene Hauptkategorien, also traegt Essential (1) sie nicht. Ohne
-    // das Feld boete die Oberflaeche eine Wahl an, die der Server mit
-    // ALLOWANCE_TOO_SMALL ablehnt.
-    { code: 'essential', label: 'Essential', currency: 'USD', monthly_cents: 5900, annual_cents: 59000, category_allowance: 1, lead_discount_pct: 0, lead_discount_count: 0, fits_released: false },
-    { code: 'growth', label: 'Growth', currency: 'USD', monthly_cents: 9900, annual_cents: 99000, category_allowance: 5, lead_discount_pct: 10, lead_discount_count: 3, fits_released: true },
-    { code: 'global', label: 'Global', currency: 'USD', monthly_cents: 18900, annual_cents: 189000, category_allowance: null, lead_discount_pct: 15, lead_discount_count: 6, fits_released: true },
-  ],
-  released_categories: [
-    { code: 'tax-vat', label: 'Tax & VAT' },
-    { code: 'customs', label: 'Customs' },
-  ],
-  eligibility: { can_start: true, reason: null },
-  scheduled: null,
-};
-
 function formatDate(iso: string | null | undefined, locale: string): string {
   if (!iso) return '—';
   const d = new Date(iso.length <= 10 ? `${iso}T00:00:00Z` : iso);
@@ -98,7 +71,7 @@ function addOneMonth(iso: string): string {
 export function SubscriptionPage() {
   const { t, i18n } = useTranslation('providerws');
   const locale = i18n.resolvedLanguage || 'en';
-  const { data } = useApiData(fetchSubscription, FIXTURE);
+  const ws = useWorkspaceData(fetchSubscription);
 
   const [cadence, setCadence] = useState<Cadence>('monthly');
   const [pending, setPending] = useState<SubscriptionPlan | null>(null);
@@ -112,6 +85,9 @@ export function SubscriptionPage() {
   // `undefined` heisst "noch nichts getan", `null` heisst "zurueckgenommen" —
   // ein blosses `null` koennte sonst nicht von "nie etwas da gewesen"
   // unterschieden werden.
+  //
+  // Diese Hooks stehen VOR dem Lade-Abbruch unten: ein Hook nach einem
+  // bedingten `return` laeuft nicht bei jedem Render, und React bricht.
   const [lokalVorgemerkt, setLokalVorgemerkt] = useState<ScheduledChange | null | undefined>(undefined);
   const [dialog, setDialog] = useState<'change' | 'cancel' | null>(null);
   const [zielTarif, setZielTarif] = useState<SubscriptionPlan | null>(null);
@@ -119,6 +95,21 @@ export function SubscriptionPage() {
   const [grund, setGrund] = useState('');
   const [planFehler, setPlanFehler] = useState<Extract<ScheduleOutcome, { ok: false }> | null>(null);
 
+  // TKT-PROV-12 (A2): ohne geladenen Tarif keine Tarifkarten — vorher stand
+  // hier die Entwurfsfassung „kein Abo, zwei Bereiche", auch fuer ein Konto
+  // mit laufendem Abo, dessen Abruf scheiterte.
+  if (!ws.data) {
+    return (
+      <ProviderShell>
+        <div className="mx-auto max-w-[1140px] space-y-6">
+          {ws.state === 'error'
+            ? <LoadFailedState surface="plan" error={ws.error} onRetry={ws.reload} />
+            : <div aria-busy="true" className="h-40 animate-pulse rounded-xl bg-surface-secondary/60 motion-reduce:animate-none" />}
+        </div>
+      </ProviderShell>
+    );
+  }
+  const data = ws.data;
   const running = started ?? data.subscription;
   const plans = data.plans;
   const released = data.released_categories;

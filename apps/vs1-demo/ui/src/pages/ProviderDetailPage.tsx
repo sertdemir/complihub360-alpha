@@ -140,8 +140,18 @@ export function ProviderDetailPage() {
     : null;
   const activeDomain = ctx?.areaSlug ? DOMAINS.find((d) => d.slug === ctx.areaSlug)?.label : undefined;
 
-  const book = (slot?: string) =>
-    navigate(`/${locale}/p/${key}/schedule${slot ? `?slot=${encodeURIComponent(slot)}` : ''}`);
+  // Die Sitzung reist mit zur Terminseite: aus ihr nimmt der Server Bereich
+  // und Maerkte der Buchung. Ohne sie rechnete er mit ALLEN Maerkten des
+  // Anbieters — bei drei und mehr ein hoeheres Band (Befund Testlauf
+  // Phase 4, 2026-10-09). Die Schublade (PartnerDrawer) gab sie schon mit.
+  const book = (slot?: string) => {
+    const q = new URLSearchParams();
+    if (slot) q.set('slot', slot);
+    const session = params.get('session');
+    if (session) q.set('session', session);
+    const qs = q.toString();
+    navigate(`/${locale}/p/${key}/schedule${qs ? `?${qs}` : ''}`);
+  };
 
   return (
     <UserShell activeDomain={activeDomain}>

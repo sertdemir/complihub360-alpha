@@ -110,7 +110,7 @@ export function HowItActs() {
                   ))}
                 </ul>
                 <p className="mt-4 flex items-center gap-1.5 border-t border-stroke pt-3 text-body-3xs font-semibold uppercase tracking-[0.08em] text-fg-brand">
-                  {t('howItActs.panel3.export')} <Download size={12} /> <span className="text-fg-tertiary">PDF · CSV · API</span>
+                  {t('howItActs.panel3.export')} <Download size={12} /> <span className="text-fg-tertiary">PDF</span>
                 </p>
               </div>
             }

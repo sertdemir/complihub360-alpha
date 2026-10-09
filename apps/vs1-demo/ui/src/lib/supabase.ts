@@ -8,16 +8,30 @@ const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 /** True only when real Supabase Auth is configured. Drives the auth strategy. */
 export const isSupabaseConfigured = Boolean(url && anonKey);
 
-/**
- * Demo login availability. Defaults to "only when real auth is absent";
- * staging sets VITE_DEMO_LOGIN=1 to keep the one-click stakeholder logins
- * alongside real auth. Never set the flag in production builds.
- */
 // Mock-API-Modus (VITE_MOCK_API=1, nur `vite dev`): die Daten kommen aus dem
 // eingebauten Datensatz, ein echter Login waere ein Magic-Link ins Leere —
 // deshalb schaltet der Mock-Schalter den Demo-Login gleich mit frei.
 export const isMockApi = import.meta.env.DEV && import.meta.env.VITE_MOCK_API === '1';
-export const isDemoLoginEnabled = !isSupabaseConfigured || import.meta.env.VITE_DEMO_LOGIN === '1' || isMockApi;
+
+/**
+ * Demo login availability — fail-closed. Erlaubt nur:
+ *  - mit ausdruecklichem Schalter VITE_DEMO_LOGIN=1 (allein deploy-staging.yml),
+ *  - im lokalen Mock,
+ *  - im Dev-Server (`vite dev`), solange Supabase nicht konfiguriert ist.
+ * Bis 07.10.2026 reichte fehlende Supabase-Konfiguration allein — ein
+ * Produktions-Build mit vergessenen VITE_SUPABASE_* zeigte dann den
+ * Demo-Login samt `?as=admin`. Jetzt hat ein solcher Build gar keinen Login.
+ */
+export const isDemoLoginEnabled = resolveDemoLogin({
+  dev: Boolean(import.meta.env.DEV),
+  supabaseConfigured: isSupabaseConfigured,
+  demoFlag: import.meta.env.VITE_DEMO_LOGIN === '1',
+  mockApi: isMockApi,
+});
+
+export function resolveDemoLogin(o: { dev: boolean; supabaseConfigured: boolean; demoFlag: boolean; mockApi: boolean }): boolean {
+  return o.demoFlag || o.mockApi || (o.dev && !o.supabaseConfigured);
+}
 
 /**
  * The Supabase client, or null when env is not configured.

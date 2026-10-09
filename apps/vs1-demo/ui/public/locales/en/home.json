@@ -80,7 +80,7 @@
   },
   "heroWorld": {
     "title": {
-      "line1": "Global Compliance.",
+      "line1": "Cross-border compliance.",
       "line2": "Simplified."
     },
     "lead": "Understand your obligations. Find the right specialists. Stay compliant — everywhere you sell.",
@@ -104,7 +104,7 @@
       },
       {
         "title": "Always on your side",
-        "desc": "Human support and AI help — around the clock."
+        "desc": "Human support and AI help, with the source behind every answer."
       }
     ],
     "proofs": [
@@ -744,7 +744,7 @@
       "gold": "connect",
       "post": " you with who fixes it."
     },
-    "subtitle": "Risk maps are public — every compliance dashboard offers one. What makes CompliHub360 different is what comes after: verified providers across countries and domains, pre-vetted, response-tracked, with structured handovers. You don't search. We match.",
+    "subtitle": "A risk map is where it starts. What makes CompliHub360 different is what comes after: Verified Providers across countries and areas, checked against evidence, response-tracked, with structured handovers. You don’t search. We match.",
     "matches": [
       {
         "place": "Munich, DE",
@@ -819,8 +819,8 @@
       "title": "The network nobody curates.",
       "label": "The gap, networked"
     },
-    "row1Lead": "Every public dashboard tells you what the rules say. None of them tell you what's at stake for your operation, in priority order, with the source still attached.",
-    "row2Lead": "Directories list everyone. They vet no one. We vet on coverage, response, and outcomes — and bind each engagement to shared responsibility.",
+    "row1Lead": "Most overviews tell you what the rules say. The Risk Map shows what is at stake for your operation, in priority order, with the source still attached.",
+    "row2Lead": "Directories list everyone. We check every Verified Provider against documented evidence before they can be matched.",
     "row1": [
       {
         "title": "Risk-prioritized, not exhaustive",
@@ -828,11 +828,11 @@
       },
       {
         "title": "Sourced from the regulators themselves",
-        "desc": "Every entry links to the official notice, registry page, or case law it draws from."
+        "desc": "Every entry names its legal basis — or says plainly that we don’t carry it yet."
       },
       {
-        "title": "Updated against drift",
-        "desc": "Rules change. The map updates when a deadline moves, a regulator clarifies, or a registry opens."
+        "title": "Reviewed and dated",
+        "desc": "Rules change. We review our entries and date every source, so you can see how current it is."
       },
       {
         "title": "Plain language by default",
@@ -842,11 +842,11 @@
     "row2": [
       {
         "title": "Verified by us, not self-listed",
-        "desc": "Each Verified Provider is vetted on coverage, response time, and named real outcomes — not a directory."
+        "desc": "Each Verified Provider is checked against documented evidence for every service and market before they can be matched."
       },
       {
-        "title": "Shared accountability built-in",
-        "desc": "Every engagement is contractual. Partners accept responsibility for the matter, not just the advice."
+        "title": "Independent professionals",
+        "desc": "Verified Providers deliver their services independently, under their own professional responsibility."
       }
     ]
   },
@@ -1044,32 +1044,32 @@
       "gold": "between",
       "post": " the match and the resolution."
     },
-    "subtitle": "Once you're matched, three things stop being assumptions: what it costs, when you'll hear back, and what you take with you. Each is set before the first email.",
+    "subtitle": "Once you’re matched, three things are clear from the start: how the fee is settled, when you’ll hear back, and what you take with you.",
     "cards": [
       {
-        "title": "Cost, before you commit.",
-        "desc": "Every Verified Provider publishes a fixed estimate before you accept the engagement. No discovery calls just to find out what something costs."
+        "title": "Cost, discussed up front.",
+        "desc": "Each Verified Provider sets their own fee. You discuss scope and price in the consultation, before you commit to anything. CompliHub360 never charges you."
       },
       {
         "title": "Response, on the clock.",
-        "desc": "24–48h to first response, or we route to the next available partner — automatically. The clock is part of the contract, not a promise."
+        "desc": "If a provider misses the agreed response time, we tell you and can show you another match. Nothing is shared with a new provider until you choose and book them."
       },
       {
         "title": "A trail you keep.",
-        "desc": "Every step is logged on a private timeline — request, reply, agreed scope, deliverables. Yours to keep, exportable any time, in any format your auditor needs."
+        "desc": "Every step is logged on a private timeline — request, reply, agreed scope, deliverables. Yours to keep."
       }
     ],
     "panel1": {
-      "estCost": "Estimated cost",
-      "estValue": "€2,400 — €3,800",
+      "estCost": "Fee",
+      "estValue": "Set by the provider",
       "scope": "Scope",
       "scopeValue": "OSS quarterly returns · DE + NL + FR",
       "approval": "Approval",
-      "approvalValue": "Set before any work begins"
+      "approvalValue": "Yours, before any work begins"
     },
     "panel2": {
       "label": "Initial response SLA",
-      "note": "Auto-routed to the next partner if missed. Contractually agreed."
+      "note": "If missed, we tell you and can show you another match."
     },
     "panel3": {
       "timeline": [
@@ -1079,7 +1079,7 @@
         },
         {
           "date": "Apr 25",
-          "label": "Partner accepted · 21h"
+          "label": "Provider accepted · 21h"
         },
         {
           "date": "Apr 28",
@@ -1176,7 +1176,7 @@
       "meta": "Webinar · 24 min",
       "video": "Cross-border VAT for D2C",
       "title": "Learn from the pros.",
-      "desc": "Webinars with regulators. Tutorials from specialists. Experts you'd recognize from YouTube."
+      "desc": "Webinars and tutorials from specialists."
     },
     "mock": {
       "vatItaly": "VAT registration · Italy",
@@ -1224,11 +1224,11 @@
           },
           {
             "q": "Where does the Risk Map's data come from?",
-            "a": "Every entry links to the official announcement, register page or case law it derives from — and is updated whenever a deadline moves, an authority clarifies or a register opens."
+            "a": "Every entry names its legal basis — the statute, regulation or official register it comes from, linked where the official text is online. Where we don’t carry a national text yet, the entry says so. We review the entries and date every source."
           },
           {
             "q": "Can I export my Risk Map?",
-            "a": "Yes. As a PDF for your records or your auditor — and in your workspace, your full trail is exportable at any time as PDF, CSV or via the API."
+            "a": "Yes. As a PDF, for your records or your auditor."
           },
           {
             "q": "Can I check several markets and areas at once?",
@@ -1236,7 +1236,7 @@
           },
           {
             "q": "What if my market isn't covered yet?",
-            "a": "Tell us where you operate. We add markets continuously, and early registrants help set the priority — we will alert you the moment your market goes live."
+            "a": "Tell us where you operate. We add markets step by step, and requests help set the priority — if you choose to be notified, we let you know when your market goes live."
           }
         ]
       },
@@ -1249,18 +1249,18 @@
           },
           {
             "q": "How are Verified Providers vetted?",
-            "a": "Every partner is reviewed by us on domain coverage, response time, and named real-world outcomes — not a self-listed directory. Each engagement is contractual, with shared accountability for the matter."
+            "a": "We check every Verified Provider against documented evidence for each service and market before they can be matched — not a self-listed directory. Providers deliver their services independently, under their own professional responsibility."
           },
           {
             "q": "What does an engagement cost?",
-            "a": "Each Verified Provider publishes a fixed estimate before you accept — no discovery calls just to learn the price. You see the range and scope up front, and approve it before any work begins."
+            "a": "Each Verified Provider sets their own fee. You discuss scope and price in the consultation, before you commit to anything. CompliHub360 never charges you."
           },
           {
-            "q": "How fast does a partner respond?",
-            "a": "24–48 hours to the first response, contractually agreed. If it slips, we automatically route your request to the next available Verified Provider."
+            "q": "How fast does a provider respond?",
+            "a": "Providers confirm within 24 hours and reply within 48. If a provider misses that, we tell you and can show you another match — nothing is shared with a new provider until you choose and book them."
           },
           {
-            "q": "Am I tied to one partner?",
+            "q": "Am I tied to one provider?",
             "a": "No. Every engagement is contracted individually. You can request further matches or switch at any time — your trail and your Risk Map remain yours."
           }
         ]

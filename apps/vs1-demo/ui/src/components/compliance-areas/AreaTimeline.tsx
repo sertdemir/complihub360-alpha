@@ -8,6 +8,7 @@ import type { ObligationSeverity } from '@complihub/compliance-engine';
 import type { DomainSlug } from '../../lib/domains';
 import type { CountryCode } from './types';
 import { AreaSectionHeading, useAreaEyebrows } from './AreaSectionHeading';
+import { obligationLabel } from '../../lib/obligationText';
 
 interface Props {
   slug: DomainSlug;
@@ -92,7 +93,7 @@ export function AreaTimeline({ slug, selectedCountry }: Props) {
         key: `ongoing-${o.id}`,
         when: t('markets.cadence.Ongoing', 'Ongoing'),
         kind: 'ongoing',
-        title: o.label,
+        title: obligationLabel(t, o.id, o.label),
         body: t('compliance.area.timeline.ongoingBody', 'An ongoing duty with no fixed filing date.'),
         tag:
           o.appliesFrom && new Date(o.appliesFrom) <= today
@@ -109,7 +110,7 @@ export function AreaTimeline({ slug, selectedCountry }: Props) {
         title: t('compliance.area.timeline.ongoingMany', '{{count}} duties apply on an ongoing basis', {
           count: ongoing.length,
         }),
-        body: ongoing.map((o) => o.label).join(' · '),
+        body: ongoing.map((o) => obligationLabel(t, o.id, o.label)).join(' · '),
       });
     }
 
@@ -120,7 +121,7 @@ export function AreaTimeline({ slug, selectedCountry }: Props) {
         key: `due-${o.id}`,
         when: t('compliance.area.timeline.inDays', 'In {{count}} days', { count: o.dueDays }),
         kind: 'due',
-        title: o.label,
+        title: obligationLabel(t, o.id, o.label),
         body: t('compliance.area.timeline.dueBody', 'Cadence: {{cadence}} — {{days}} days of lead time.', {
           cadence: t(`markets.cadence.${o.due}`, { defaultValue: o.due }),
           days: o.dueDays,
@@ -139,7 +140,7 @@ export function AreaTimeline({ slug, selectedCountry }: Props) {
         severity: heaviest(duties),
         title:
           duties.length === 1
-            ? duties[0].label
+            ? obligationLabel(t, duties[0].id, duties[0].label)
             : t('compliance.area.timeline.togetherCount', '{{count}} duties land on one day', {
                 count: duties.length,
               }),
@@ -154,7 +155,7 @@ export function AreaTimeline({ slug, selectedCountry }: Props) {
               })
             : t('compliance.area.timeline.aheadMany', {
                 defaultValue: '{{names}} all land on the same day.',
-                names: duties.map((o) => o.label).join(', '),
+                names: duties.map((o) => obligationLabel(t, o.id, o.label)).join(', '),
               }),
       });
     }

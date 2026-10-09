@@ -45,6 +45,8 @@ export function ProviderSchedulePage() {
   // `?slot=` kommt von einem Termin-Chip: wer dort einen Termin angetippt hat,
   // soll ihn hier nicht noch einmal suchen muessen.
   const [selected, setSelected] = useState<string | null>(params.get('slot'));
+  // `?session=` kommt von der Detailseite: die Sitzung, aus der die Suche kam.
+  const sessionId = params.get('session');
   const [message, setMessage] = useState('');
   const [state, setState] = useState<'idle' | 'sending' | 'done'>('idle');
   const [failure, setFailure] = useState<BookingFailure | null>(null);
@@ -73,7 +75,7 @@ export function ProviderSchedulePage() {
     setState('sending');
     setFailure(null);
     try {
-      setConfirmation(await createBooking(key, selected, { message: message.trim() || undefined, acknowledgementVersion: ack.version, language: locale }));
+      setConfirmation(await createBooking(key, selected, { message: message.trim() || undefined, acknowledgementVersion: ack.version, language: locale, sessionId: sessionId ?? undefined }));
       setState('done');
     } catch (err) {
       // Frueher stand hier eine Fixture-Identitaet („Studio Bianchi SRL") fuer

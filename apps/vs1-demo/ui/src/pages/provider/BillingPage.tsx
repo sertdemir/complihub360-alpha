@@ -8,8 +8,9 @@ import { KPICard } from '../../components/ui/Cards';
 import { Table, THead, TBody, TR, TH, TD } from '../../components/ui/Table';
 import { Tag } from '../../components/ui/Tag';
 import { InvoiceDetailDrawer } from '../../components/provider/InvoiceDetailDrawer';
-import { useApiData } from '../../lib/useApiData';
-import { fetchInvoices, fetchBillingPreview, openBillingPortal, syncBillingReadiness, money, type Invoice, type BillingPreview, type BillingReadiness } from '../../api/billing';
+import { useWorkspaceData } from '../../lib/useWorkspaceData';
+import { LoadFailedState } from '../../components/provider/WorkspaceStates';
+import { fetchInvoices, fetchBillingPreview, openBillingPortal, syncBillingReadiness, money, type Invoice, type BillingReadiness } from '../../api/billing';
 
 // ─── Provider /billing ────────────────────────────────────────────────────────
 // Mirrors "Provider Dashboard v1 · /billing (Desktop · payment-failed)"
@@ -23,71 +24,6 @@ import { fetchInvoices, fetchBillingPreview, openBillingPortal, syncBillingReadi
 // Spec A §14 ohnehin ausschliesst. Beim Rueckweg aus dem Portal (`?from=portal`)
 // stoesst die Seite den Sync an — nie im Buchungspfad.
 
-const FIXTURE: Invoice[] = [
-  { id: 'f-026', invoice_number: 'INV-026', period: '2026-05', amount_cents: 216400, currency: 'EUR', status: 'failed',
-    issued_at: '2026-06-01', due_at: '2026-06-15', paid_at: null,
-    line_items: [
-      { label: 'Booking leads', qty: 22, unit_cents: 9200, amount_cents: 202400 },
-      { label: 'Profile detail opens', qty: 70, unit_cents: 200, amount_cents: 14000 },
-    ] },
-  { id: 'f-025', invoice_number: 'INV-025', period: '2026-04', amount_cents: 189200, currency: 'EUR', status: 'paid',
-    issued_at: '2026-05-01', due_at: '2026-05-15', paid_at: '2026-05-03',
-    line_items: [
-      { label: 'Booking leads', qty: 19, unit_cents: 9200, amount_cents: 174800 },
-      { label: 'Profile detail opens', qty: 72, unit_cents: 200, amount_cents: 14400 },
-    ] },
-  { id: 'f-024', invoice_number: 'INV-024', period: '2026-03', amount_cents: 152400, currency: 'EUR', status: 'paid',
-    issued_at: '2026-04-01', due_at: '2026-04-15', paid_at: '2026-04-02',
-    line_items: [
-      { label: 'Booking leads', qty: 16, unit_cents: 9200, amount_cents: 147200 },
-      { label: 'Profile detail opens', qty: 26, unit_cents: 200, amount_cents: 5200 },
-    ] },
-  { id: 'f-023', invoice_number: 'INV-023', period: '2026-02', amount_cents: 173200, currency: 'EUR', status: 'paid',
-    issued_at: '2026-03-01', due_at: '2026-03-15', paid_at: '2026-03-02',
-    line_items: [
-      { label: 'Booking leads', qty: 18, unit_cents: 9200, amount_cents: 165600 },
-      { label: 'Profile detail opens', qty: 38, unit_cents: 200, amount_cents: 7600 },
-    ] },
-  { id: 'f-022', invoice_number: 'INV-022', period: '2026-01', amount_cents: 160800, currency: 'EUR', status: 'paid',
-    issued_at: '2026-02-01', due_at: '2026-02-15', paid_at: '2026-02-01',
-    line_items: [
-      { label: 'Booking leads', qty: 17, unit_cents: 9200, amount_cents: 156400 },
-      { label: 'Profile detail opens', qty: 22, unit_cents: 200, amount_cents: 4400 },
-    ] },
-];
-
-// Design fixture for the current-cycle preview (Pricing v2, ADR-0003):
-// Growth, zwei rabattierte Leads verbraucht, einer offen.
-const PREVIEW_FIXTURE: BillingPreview = {
-  period: '2026-09',
-  currency: 'USD',
-  subscription: {
-    plan_code: 'growth', label: 'Growth', cadence: 'monthly', status: 'active',
-    current_period_start: '2026-09-01', current_period_end: '2026-10-01',
-    monthly_cents: 9900, annual_cents: 99000, category_allowance: 5, analytics_level: 'enhanced', api_eligible: false,
-  },
-  discount: { pct: 10, count: 3, used: 2, remaining: 1, cycle_start: '2026-09-01' },
-  leads: { count: 2, standard_cents: 24800, discount_cents: 2480, final_cents: 22320 },
-  readiness: { ready: false, reasons: ['payment_failed'], synced_at: '2026-10-01T08:42:00Z', payment_method: 'Visa ····4242',
-    cure_period_days: 7, invoices_in_grace: 1, blocks_at: '2026-10-24', overdue_since: '2026-10-16' },
-  credit_balance_cents: 0,
-  lines: [{ label: 'Growth · monthly · 2026-09', qty: 1, unit_cents: 9900, amount_cents: 9900 }],
-  total_cents: 32220,
-  pricing: {
-    plans: [
-      { code: 'essential', label: 'Essential', monthly_cents: 5900, annual_cents: 59000, currency: 'USD', category_allowance: 1, lead_discount_pct: 0, lead_discount_count: 0 },
-      { code: 'growth', label: 'Growth', monthly_cents: 9900, annual_cents: 99000, currency: 'USD', category_allowance: 5, lead_discount_pct: 10, lead_discount_count: 3 },
-      { code: 'global', label: 'Global', monthly_cents: 18900, annual_cents: 189000, currency: 'USD', category_allowance: null, lead_discount_pct: 15, lead_discount_count: 6 },
-    ],
-    bands: [
-      { band: 1, label: 'Focused', fee_cents: 9900, currency: 'USD' },
-      { band: 2, label: 'Core', fee_cents: 14900, currency: 'USD' },
-      { band: 3, label: 'Advanced', fee_cents: 29900, currency: 'USD' },
-      { band: 4, label: 'Strategic', fee_cents: 49900, currency: 'USD' },
-    ],
-  },
-};
-
 const STATUS_META: Record<Invoice['status'], { labelKey: string; tone: 'success' | 'error' | 'warning' | 'neutral' }> = {
   paid: { labelKey: 'billing.statusPaid', tone: 'success' },
   failed: { labelKey: 'billing.statusFailedGrace', tone: 'error' },
@@ -98,14 +34,18 @@ const STATUS_META: Record<Invoice['status'], { labelKey: string; tone: 'success'
 export function BillingPage() {
   const { t, i18n } = useTranslation('providerws');
   const locale = i18n.resolvedLanguage || 'en';
-  const { data: invoices } = useApiData(fetchInvoices, FIXTURE);
-  const { data: preview } = useApiData(fetchBillingPreview, PREVIEW_FIXTURE);
+  // TKT-PROV-12 (A2 je Abschnitt): zwei Abrufe, zwei Zustaende. Scheitert
+  // einer, steht dort der Fehler — nicht eine erfundene Rechnung.
+  const inv = useWorkspaceData(fetchInvoices);
+  const pv = useWorkspaceData(fetchBillingPreview);
+  const invoices = inv.data ?? [];
+  const preview = pv.data;
   const [detail, setDetail] = useState<Invoice | null>(null);
 
   // Zahlungsbereitschaft: aus der Vorschau, bis ein Sync etwas Neueres weiss.
   const [synced, setSynced] = useState<BillingReadiness | null>(null);
   const [syncState, setSyncState] = useState<'idle' | 'busy' | 'not-configured' | 'failed'>('idle');
-  const readiness: BillingReadiness | null = synced ?? preview.readiness ?? null;
+  const readiness: BillingReadiness | null = synced ?? preview?.readiness ?? null;
   const sync = async () => {
     setSyncState('busy');
     try {
@@ -146,12 +86,14 @@ export function BillingPage() {
 
   const latest = invoices[0];
   const failed = invoices.find((i) => i.status === 'failed');
-  const ytd = invoices.filter((i) => i.period.startsWith('2026')).reduce((n, i) => n + i.amount_cents, 0);
-  const cur = preview.currency;
-  const planLabel = preview.subscription
+  // Laufendes Jahr statt der festen „2026" von vorher.
+  const year = String(new Date().getUTCFullYear());
+  const ytd = invoices.filter((i) => i.period.startsWith(year)).reduce((n, i) => n + i.amount_cents, 0);
+  const cur = preview?.currency ?? 'USD';
+  const planLabel = preview?.subscription
     ? `${preview.subscription.label} · ${t(preview.subscription.cadence === 'annual' ? 'billing.planCadenceAnnual' : 'billing.planCadenceMonthly')}`
     : t('billing.planNone');
-  const kpis = [
+  const kpis = !preview ? [] : [
     { label: t('billing.kpiThisMonth'), value: money(preview.total_cents, cur),
       trend: { value: '—', direction: 'neutral' as const, label: t('billing.kpiThisMonthUsage', { leads: preview.leads.count, remaining: preview.discount.remaining }) } },
     { label: t('billing.kpiLastInvoice'), value: latest ? money(latest.amount_cents, latest.currency) : '—',
@@ -160,7 +102,7 @@ export function BillingPage() {
         : { value: '—', direction: 'neutral' as const, label: latest ? `${latest.invoice_number} · ${latest.status}` : '' } },
     // Naechste Rechnung = Ende des laufenden Zyklus (vorher fest '2026-08-01').
     { label: t('billing.kpiNextInvoice'), value: preview.subscription?.current_period_end ?? '—', trend: { value: '—', direction: 'neutral' as const, label: t('billing.kpiMonthlyFirst') } },
-    { label: t('billing.kpiYtd'), value: money(ytd, latest?.currency ?? cur), trend: { value: '↗', direction: 'up' as const, label: t('billing.kpiAcrossMonths', { count: invoices.length }) } },
+    { label: t('billing.kpiYtd'), value: inv.state === 'ready' ? money(ytd, latest?.currency ?? cur) : '—', trend: { value: '↗', direction: 'up' as const, label: t('billing.kpiAcrossMonths', { count: invoices.length }) } },
   ];
 
   return (
@@ -211,7 +153,13 @@ export function BillingPage() {
                   {[readiness.payment_method, planLabel, readiness.synced_at ? t('billing.readinessChecked', { when: new Date(readiness.synced_at).toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' }) }) : null].filter(Boolean).join(' · ')}
                 </p>
               </div>
-              <Button size="sm" variant="ghost" onClick={sync} disabled={syncState === 'busy'}>{syncState === 'busy' ? '…' : t('billing.checkNow')}</Button>
+              {/* Auch im gruenen Zustand braucht der Anbieter einen Weg ins Portal —
+                  Karte laeuft ab, Karte wechseln (Staging-Befund 2026-10-09: der
+                  einzige Weg war der rote Fixture-Banner). */}
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="ghost" onClick={updatePayment} disabled={portalBusy}>{portalBusy ? '…' : t('billing.changePaymentMethod')}</Button>
+                <Button size="sm" variant="ghost" onClick={sync} disabled={syncState === 'busy'}>{syncState === 'busy' ? '…' : t('billing.checkNow')}</Button>
+              </div>
             </div>
           ) : (
             <section className="rounded-xl border border-warning-500/50 bg-warning-50 px-5 py-4 dark:bg-warning-950/30" aria-labelledby="billing-readiness">
@@ -257,15 +205,20 @@ export function BillingPage() {
           <p className="rounded-lg border border-elevate/10 bg-elevate/[0.04] px-4 py-3 text-[12px] text-fg-secondary">{portalNote}</p>
         )}
 
-        <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-          {kpis.map((k) => (
-            <KPICard key={k.label} label={k.label} value={k.value} trend={k.trend} />
-          ))}
-        </div>
+        {kpis.length > 0 && (
+          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+            {kpis.map((k) => (
+              <KPICard key={k.label} label={k.label} value={k.value} trend={k.trend} />
+            ))}
+          </div>
+        )}
 
         {/* Laufender Zyklus (Pricing v2, ADR-0003): Abo-Zeile des Monats plus
             die Lead-Belastungen des Zyklus aus dem Ledger — Standard, Rabatt,
             Endbetrag, wie Spec B es verlangt. */}
+        {pv.state === 'loading' && <div aria-busy="true" className="h-32 animate-pulse rounded-xl bg-surface-secondary/60 motion-reduce:animate-none" />}
+        {pv.state === 'error' && <LoadFailedState surface="currentPeriod" error={pv.error} onRetry={pv.reload} section />}
+        {preview && (
         <section className="space-y-3">
           <div className="flex items-end justify-between">
             <div>
@@ -300,12 +253,22 @@ export function BillingPage() {
             </div>
           </div>
         </section>
+        )}
 
         <section className="space-y-3">
           <div>
             <h2 className="text-[15px] font-semibold text-fg">{t('billing.historyTitle')}</h2>
             <p className="mt-0.5 text-[12px] text-fg-tertiary">{t('billing.historyHint')}</p>
           </div>
+          {inv.state === 'loading' && <div aria-busy="true" className="h-24 animate-pulse rounded-xl bg-surface-secondary/60 motion-reduce:animate-none" />}
+          {inv.state === 'error' && <LoadFailedState surface="invoices" error={inv.error} onRetry={inv.reload} section />}
+          {inv.state === 'ready' && invoices.length === 0 && (
+            <div className="rounded-xl border border-dashed border-stroke bg-surface-secondary/60 px-6 py-5">
+              <p className="text-[15px] font-semibold text-fg">{t('common:states.partner.empty.invoicesHeading')}</p>
+              <p className="mt-1 text-body-sm text-fg-secondary">{t('common:states.partner.empty.invoicesMessage')}</p>
+            </div>
+          )}
+          {invoices.length > 0 && (
           <Table>
             <THead>
               <TR>
@@ -331,6 +294,7 @@ export function BillingPage() {
               })}
             </TBody>
           </Table>
+          )}
         </section>
       </div>
       <InvoiceDetailDrawer invoice={detail} onClose={() => setDetail(null)} />

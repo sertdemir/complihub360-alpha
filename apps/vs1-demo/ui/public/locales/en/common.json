@@ -73,7 +73,7 @@
       "experts": {
         "seg1": "The Fastest Way to ",
         "seg2": "Local Compliance Experts",
-        "text": "Stop guessing. Get your customized assessment and connect with the right partner firm immediately.",
+        "text": "Stop guessing. Get your assessment and see the Verified Providers who fit your case.",
         "cta": "Connect with an expert now",
         "usp1": "Match instantly",
         "usp2": "Pre-qualified experts",
@@ -124,7 +124,7 @@
       "pain2Title": "The Unreliable Expert Trap",
       "pain2Desc": "Cold-emailing compliance providers and waiting weeks for vague replies is not a strategy. It's a liability.",
       "pain3Title": "We Fix This",
-      "pain3Desc": "Our AI Wizard captures your context in 4–5 steps, maps jurisdiction-bound risks, and connects you to SLA-enforced specialists within 24–48h.",
+      "pain3Desc": "The assessment captures your context in four steps, maps the risks that apply in your markets, and connects you with Verified Providers who confirm within 24 hours and reply within 48.",
       "diagramTitle": "From context to the right specialist",
       "node1Label": "Country Gate",
       "node1Desc": "Select target market",
@@ -343,7 +343,7 @@
     "heroOverline": "Compliance Areas",
     "heroTitlePre": "Find Your Regulatory Challenge.",
     "heroTitleGold": "Start Here.",
-    "heroBody": "Each compliance area is a gateway to your specific assessment. Identify your topic, understand the risks, and get matched with a verified specialist — all in under 5 minutes.",
+    "heroBody": "Each compliance area is a gateway to your specific assessment. Identify your topic, understand your risks in under five minutes, then see your matched specialists.",
     "whoAffected": "Who is affected",
     "startAssessment": "Start {{title}} Assessment",
     "riskPanel": {
@@ -404,7 +404,7 @@
       },
       "match": {
         "title": "Match",
-        "body": "Verified specialists are ranked by relevance, response speed, and quality score."
+        "body": "Verified Providers are ranked by fit, verified expertise and service quality — never by what they pay."
       },
       "engage": {
         "title": "Engage",
@@ -1179,9 +1179,8 @@
   "aiGov": {
     "trustCenter": "CompliHub360 Trust Center",
     "dimTitle": "The 6 Dimensions of AI Governance",
-    "dimDesc": "A comprehensive approach to building trustworthy AI systems for enterprise compliance.",
     "dimEthicsTitle": "Ethical Guidelines",
-    "dimEthicsDesc": "Our AI features respect human autonomy and are designed to augment professionals, not replace them. We prevent systemic bias through continuous monitoring.",
+    "dimEthicsDesc": "Our AI features respect human autonomy and are designed to augment professionals, not replace them.",
     "dimTranspTitle": "Transparency & Explainability",
     "dimTranspDesc": "Users deserve to know when they are interacting with AI. Every AI-generated output on CompliHub360 is clearly marked, and its data sources are traceable.",
     "dimOrgTitle": "Organizational Accountability",
@@ -1195,7 +1194,7 @@
     "featTitle": "Active AI Features on CompliHub360",
     "featDesc": "How we leverage AI today, wrapped in our strict governance framework.",
     "featPrivacyTitle": "Privacy Redaction Pipeline",
-    "featPrivacyDesc": "Before any business context is analyzed, our local NLP models strip out all Personally Identifiable Information (PII). Emails, names, and phone numbers never leave our secure European servers.",
+    "featPrivacyDesc": "Before any business context reaches an AI model, fixed pattern rules mask e-mail addresses, phone numbers and other identifiers. They don’t catch every name, so please leave personal details out of free text.",
     "featIntentTitle": "Intent Analysis Engine",
     "featIntentDesc": "Transforms unstructured client input into a structured risk profile. The AI is restricted to analyzing compliance context and cannot make binding legal decisions on its own.",
     "featGateTitle": "Triple AI Gate Validator",
@@ -1550,7 +1549,10 @@
       "prod-packaging-reuse-targets": "Reusable Transport Packaging (PPWR)",
       "prod-safety": "Product Safety & Labeling",
       "tax-corporate": "Corporate Income Tax",
-      "tax-vat-registration": "VAT Registration & Filing"
+      "tax-vat-registration": "VAT Registration & Filing",
+      "env-weee-registration": "WEEE Producer Registration",
+      "env-batteries-epr": "Batteries — Producer Responsibility",
+      "env-reach-substances": "REACH — Substances in Articles"
     },
     "obligationDesc": {
       "corp-registration": "Mandatory filing in the local commercial register.",
@@ -1573,55 +1575,59 @@
       "prod-packaging-reuse-targets": "40% of transport packaging (pallets, crates, pallet wrap, straps) must run inside a reuse system, 10% for grouped packaging. Cardboard boxes are exempt, which leaves ordinary parcel shipping outside the target — this bites on pallets and B2B transport, not on the mailer.",
       "prod-safety": "Consumer safety standards and mandatory labeling requirements.",
       "tax-corporate": "Standard corporate tax obligations for established entities.",
-      "tax-vat-registration": "Requirements for registering and filing Value Added Tax based on sales thresholds."
+      "tax-vat-registration": "Requirements for registering and filing Value Added Tax based on sales thresholds.",
+      "env-weee-registration": "Registration in the national register for electrical and electronic equipment before placing devices on the market, plus reporting and take-back duties at end of life.",
+      "env-batteries-epr": "Producer registration and extended producer responsibility for batteries, including devices with built-in cells. Separate from packaging EPR and from WEEE.",
+      "env-reach-substances": "Duties for substances in goods placed on the EU market: registration or notification where thresholds are met, and the information duty towards recipients for substances of very high concern."
     },
     "regions": {
       "eyebrow": "Regions",
       "title": "Where we stand — and where it goes next",
-      "lead": "Every search and analysis is deeply rooted in the specific laws of the target country to avoid legal blind flights.",
-      "note": "The EU and the UK are fully covered; North America is expanding and APAC starts with core coverage. More countries follow over the course of 2026.",
-      "tiers": {
-        "full": "Full Coverage",
-        "expanding": "Expanding",
-        "core": "Core Support"
-      },
+      "lead": "Every entry names the law it comes from: national where we carry it, EU-level where that is the law.",
+      "note": "Eight markets today: Germany, France, Italy, Spain, the Netherlands, the United Kingdom, the United States and Türkiye. Where we don’t carry a national text yet, the market page says so.",
       "items": {
         "eu": {
           "name": "European Union",
           "focus": [
-            "GDPR Compliance",
-            "EPR Packaging Laws",
+            "GDPR",
+            "EPR & Packaging (PPWR)",
             "EU-wide VAT",
-            "Digital Services Act"
+            "Product Safety (GPSR)"
           ]
         },
         "uk": {
           "name": "United Kingdom",
           "focus": [
             "UK GDPR",
-            "HMRC VAT Compliance",
-            "Product Safety (UKCA)",
-            "Employment Law"
+            "HMRC VAT",
+            "Packaging EPR (PackUK)",
+            "Product Safety"
           ]
         },
         "us": {
-          "name": "USA & Canada",
+          "name": "United States",
           "focus": [
-            "Nexus & Sales Tax",
-            "CCPA/CPRA Privacy",
+            "State Sales Tax",
+            "CCPA/CPRA & State Privacy",
             "FTC Advertising Rules",
-            "Trade Compliance"
+            "Customs Classification"
           ]
         },
-        "au": {
-          "name": "Australia (APAC)",
+        "tr": {
+          "name": "Türkiye",
           "focus": [
-            "GST Compliance",
-            "Privacy Act 1988",
-            "Product Liability",
-            "Import/Export"
+            "KDV (VAT)",
+            "KVKK Privacy",
+            "E-commerce Consent (ETK)",
+            "Customs & EORI"
           ]
         }
+      },
+      "scope": {
+        "eu": "Germany · France · Italy · Spain · Netherlands + EU law",
+        "uk": "National law",
+        "us": "Federal + CA, TX, NY, FL",
+        "tr": "National law"
       }
     }
   },
@@ -1669,8 +1675,8 @@
     },
     "specialist": {
       "kicker": "What the specialist costs",
-      "title": "Their fee — quoted before you commit.",
-      "body": "The advice itself is not free, and we will not pretend otherwise. Every Verified Provider publishes a fixed estimate before you accept the engagement, so you never sit through a discovery call just to learn the price."
+      "title": "Their fee — discussed before you commit.",
+      "body": "The advice itself is not free, and we will not pretend otherwise. Each Verified Provider sets their own fee; you discuss scope and price in the consultation, before you commit to anything."
     },
     "cta": {
       "title": "Start where it makes sense for you.",
@@ -1718,7 +1724,7 @@
         },
         {
           "q": "What does the specialist's advice cost?",
-          "a": "The specialist sets the fee: every Verified Provider publishes a fixed estimate before you accept the engagement — you never sit through a first call just to learn the price."
+          "a": "The specialist sets the fee. You discuss scope and price in the consultation, before you commit to anything."
         },
         {
           "q": "Does the specialist see my details before I book?",
@@ -2160,6 +2166,60 @@
       "message": "We don’t cover {{market}} yet, so these obligations don’t include it.",
       "notChecked": "Not checked",
       "notIncluded": "Not covered yet · not included in this map"
+    },
+    "partner": {
+      "loadFailed": {
+        "requests": "Your requests couldn’t be loaded",
+        "appointments": "Your appointments couldn’t be loaded",
+        "invoices": "Your invoices couldn’t be loaded",
+        "currentPeriod": "This month’s billing couldn’t be loaded",
+        "plan": "Your plan couldn’t be loaded",
+        "performance": "Your performance data couldn’t be loaded",
+        "notifications": "Your notifications couldn’t be loaded",
+        "coverage": "Your coverage couldn’t be loaded",
+        "message": "Nothing in your account has changed. We just can’t show it right now. Please try again. If this keeps happening, contact support."
+      },
+      "empty": {
+        "appointments": "No appointments yet",
+        "requests": "No requests yet",
+        "howBookingWorks": "An appointment is created when a business selects you in the results and books one of your available times. For that to be possible:",
+        "closing": "How often you’re booked depends on demand in your areas. Your plan doesn’t change that.",
+        "invoicesHeading": "No invoices yet",
+        "invoicesMessage": "Your invoices appear here once a plan has been billed."
+      },
+      "readiness": {
+        "verified": "Verification completed",
+        "verifiedSub": "Approved for {{areas}} in {{markets}}",
+        "verifying": "Verification in progress",
+        "verifyingSub": "Our review team is checking your documents.",
+        "plan": "Plan active",
+        "planSub": "{{plan}} · {{cycle}}",
+        "noPlan": "No plan yet",
+        "noPlanAction": "Choose a plan",
+        "payment": "Payment method on file",
+        "paymentSub": "{{method}}",
+        "noPayment": "No payment method yet",
+        "noPaymentSub": "Without one, you appear in the results but can’t be booked.",
+        "noPaymentAction": "Add payment method"
+      },
+      "performance": {
+        "requestsSoFar": "Requests so far",
+        "sinceApproval": "since approval on {{date}}",
+        "belowThreshold": "from 5 requests",
+        "thresholdNote": "A rate based on one or two requests says little about you. That’s why we show it from five requests."
+      },
+      "coverage": {
+        "heading": "Where you appear",
+        "message": "As approved by our review team. To change it, submit the change under Services. It applies after review.",
+        "approved": "approved",
+        "underReview": "under review",
+        "notRequested": "not requested",
+        "languages": "Languages",
+        "responseTime": "Response time",
+        "hours": "{{hours}} hours",
+        "submitChange": "Submit a change"
+      },
+      "profileUnavailable": "Your saved profile can’t be reached right now. Saving works again once it has loaded."
     }
   },
   "errorBoundary": {

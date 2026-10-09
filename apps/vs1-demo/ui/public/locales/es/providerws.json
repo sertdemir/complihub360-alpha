@@ -32,7 +32,8 @@
         "verification": "Verification Center"
       }
     },
-    "navSubscription": "Plan"
+    "navSubscription": "Plan",
+    "signOut": "Cerrar sesión"
   },
   "bell": {
     "aria": "Notificaciones",
@@ -203,7 +204,8 @@
     "graceTitleMany": "Hay {{n}} facturas pendientes",
     "graceBody": "Vencida desde el {{since}}. A partir del {{until}}, las reservas se pausan hasta que la factura esté pagada.",
     "graceStillVisible": "Su visibilidad en los resultados de búsqueda no se ve afectada.",
-    "graceOpenPortal": "Abrir la factura en el portal"
+    "graceOpenPortal": "Abrir la factura en el portal",
+    "changePaymentMethod": "Cambiar el método de pago"
   },
   "confirmEmail": {
     "working": "Confirmando su nueva dirección…",
@@ -359,7 +361,6 @@
     "newBannerTitle_one": "{{count}} solicitud nueva desde su última visita",
     "newBannerTitle_other": "{{count}} solicitudes nuevas desde su última visita",
     "newBannerBody": "Correos con Magic-Link enviados · también aparecerán aquí",
-    "fixtureBannerTitle": "2 solicitudes nuevas desde su última visita · hace 12 min",
     "markAllSeen": "Marcar todo como visto",
     "filterAwaitingConfirmation": "Pendiente de confirmación",
     "filterAwaitingReply": "Pendiente de respuesta",
@@ -372,8 +373,6 @@
     "actionView": "Ver",
     "sortSla": "Orden: urgencia de SLA",
     "emptyTitle": "Aún no hay solicitudes",
-    "emptyDescription": "Su perfil está publicado. Las nuevas solicitudes llegan aquí + a su bandeja como Magic-Links — la mayoría de los partners reciben su primera solicitud en 5 días.",
-    "previewProfile": "Ver perfil público",
     "companyAnonymized": "🔒 Solicitud anonimizada"
   },
   "settings": {
@@ -402,7 +401,6 @@
     "bioLabel": "Bio · máx. 280 caracteres · se usa en los resultados de búsqueda",
     "contactEmailTitle": "Correo de contacto · crítico para el enrutamiento",
     "contactEmailBody": "Aquí llegan los Magic-Links de nuevas solicitudes. Si este correo rebota, su visibilidad se pausa hasta corregirlo (§11.2).",
-    "verifiedTag": "✓ verificado · sin rebotes en 90 d",
     "changeEmail": "Cambiar correo",
     "workspaceTitle": "Workspace",
     "workspaceSub": "Acciones destructivas — cada una pide confirmación explícita",

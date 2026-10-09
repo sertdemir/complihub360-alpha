@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, usePa
 import { useTranslation } from "react-i18next";
 import { supportedLngs } from "./i18n/config";
 import { SiteHeader } from "./components/layout/SiteHeader";
+import { AccountSwitcher } from "./components/shared/AccountSwitcher";
 import { HomePage } from "./pages/HomePage";
 import { PlatformPage } from "./pages/PlatformPage";
 import { SolutionsPage } from "./pages/SolutionsPage";
@@ -298,7 +299,8 @@ function AppContent() {
                 <Route path="*" element={<RootRedirect />} />
             </Routes>
             </div>
-
+            {/* Staging-Werkzeug: rendert ausserhalb von Staging nichts. */}
+            <AccountSwitcher />
         </>
     );
 }

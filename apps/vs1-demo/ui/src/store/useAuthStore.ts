@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { Session, User } from '@supabase/supabase-js';
 import { getSupabase, isSupabaseConfigured, isDemoLoginEnabled } from '../lib/supabase';
 import { adoptGuestSessions } from '../api/adoption';
+import { forgetAccount, isAccountSwitcherEnabled, rememberSession } from '../lib/accountSwitcher';
 
 export type UserRole = 'user' | 'partner' | 'admin';
 
@@ -86,6 +87,10 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: async () => {
     const sb = await getSupabase();
     if (sb) {
+      // Abmelden widerruft die Sitzung — der Umschalter darf sie dann nicht
+      // mehr anbieten (Staging, lib/accountSwitcher).
+      const current = useAuthStore.getState().user?.id;
+      if (isAccountSwitcherEnabled && current) forgetAccount(current);
       await sb.auth.signOut();
     }
     localStorage.removeItem('demo_is_logged_in');
@@ -115,18 +120,24 @@ if (isSupabaseConfigured && supabase) {
     });
   supabase.auth.getSession().then(({ data }: { data: { session: Session | null } }) => {
     if (!data.session && demoActive()) { hydrateDemo(); return; }
+    if (data.session && isAccountSwitcherEnabled) rememberSession(data.session);
     useAuthStore.getState().setSession(data.session);
     // Signup adoption (Wave A3): claim guest sessions once per account.
     if (data.session?.user) void adoptGuestSessions(data.session.user.id);
   });
   supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
+    // Staging-Umschalter: jede neue oder erneuerte Sitzung merken — Supabase
+    // rotiert den Refresh-Token, nur der juengste traegt den Rueckweg.
+    if (session && isAccountSwitcherEnabled) rememberSession(session);
     if (!session && demoActive()) { hydrateDemo(); return; }
     useAuthStore.getState().setSession(session);
     if (session?.user) void adoptGuestSessions(session.user.id);
   });
 } else {
-  // DEV demo fallback: hydrate the labelled demo flag (never used in prod auth).
-  const isLoggedIn = localStorage.getItem('demo_is_logged_in') === 'true';
+  // DEV demo fallback: hydrate the labelled demo flag — only where the demo
+  // login is allowed at all. A prod build without Supabase config stays
+  // logged out, whatever an old localStorage entry says.
+  const isLoggedIn = isDemoLoginEnabled && localStorage.getItem('demo_is_logged_in') === 'true';
   useAuthStore.setState({
     isLoggedIn,
     role: (localStorage.getItem('demo_user_role') as UserRole) || null,

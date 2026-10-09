@@ -53,8 +53,17 @@ method"). Der Rückweg trägt `?from=portal`; die Abrechnungsseite ruft dann
 `POST /provider/:key/billing/sync`, der die Zahlungsbereitschaft aus Stripe
 und Datenbank setzt. Kein Webhook nötig. Hinweis: Karten aus dem Portal tragen
 nicht zwingend ein off-session-Mandat; verlangt Stripe eine Authentifizierung,
-zählt das als gescheiterte Belastung (`payment_failed`) — Testkarte 4242
-funktioniert, `4000 0025 0000 3155` erzwingt den Fall.
+zählt das als gescheiterte Belastung (`payment_failed`).
+
+**Testkarten für den Buchungspfad** (Sandbox; Ablauf beliebig in der Zukunft,
+Prüfziffer beliebig):
+
+| Karte | Verhalten |
+|---|---|
+| `4242 4242 4242 4242` | anhängen und belasten klappt — der Erfolgsfall |
+| `4000 0000 0000 0341` | anhängen klappt, die Belastung scheitert mit `card_declined` → 409 `BOOKING_NOT_COMPLETED`, Anbieter bekommt `payment_failed` |
+| `4000 0025 0000 3155` | anhängen klappt, die Belastung verlangt eine Authentifizierung → off-session `authentication_required`, gleiche Folge |
+| `4000 0000 0000 0002` | lehnt schon das **Portal** beim Anhängen ab (SetupIntent) — taugt nicht für den Buchungs-Fehlerfall (Befund Staging 2026-10-09) |
 
 ## Invoicing (seit 2026-07-15 live)
 

@@ -1,7 +1,7 @@
 ---
 title: "Keine Fixture als Inhalt: Sitzungs-PDF und Risk Map ohne Pflichten"
 assignee: "Claude"
-status: "review"
+status: "done"
 ---
 
 # PDF-Export der Sitzungsseite exportiert die echte Risk Map
@@ -99,7 +99,7 @@ Sabotage B (Review-Knopf auch für Gäste) → der Gast-Test fällt.
 
 ## Weiter offen
 
-**Laden und API-Fehler zeigen auf der Risk Map weiterhin die Fixture.** Das
+~~**Laden und API-Fehler zeigen auf der Risk Map weiterhin die Fixture.**~~ Erledigt mit TKT-RM-STATES-03 (A3 Laden, B3 Fehler als ganze Seite). Das
 sind die Zustände *Risk Map loading* und *Risk Map failed* aus der
 Wahrheitstabelle von TKT-COPY-01. Beide Copy-Aussagen wären wahr; es fehlt die
 Fläche. Nicht Teil dieses Auftrags, aber derselbe Fehlertyp und der letzte
@@ -125,3 +125,4 @@ Betroffen: **Copy und Microcopy** (drei abgenommene Zustände verdrahtet),
 
 - [2026-09-22] **Claude**: Abbildung extrahiert, Export auf die Sitzung umgestellt, drei Zustände verdrahtet, vier Tests, zwei Sabotagen. (Status: review)
 - [2026-09-22] **Claude**: Risk Map bei null Pflichten: Zustand statt Fixture in Gast- und eingeloggter Ansicht, drei Tests, zwei Sabotagen. (Status: review)
+- [2026-10-07] **Claude**: Beta-Durchgang: alle Kriterien erfüllt, PR gemergt (= Review des Nutzers), auf Staging. Nach done. (Status: done)

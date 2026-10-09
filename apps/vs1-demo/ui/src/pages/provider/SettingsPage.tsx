@@ -33,9 +33,11 @@ export function SettingsPage() {
   const [paused, setPaused] = useState(false);
   // B8: live contact address + change drawer (verify-first).
   const [emailOpen, setEmailOpen] = useState(false);
-  const [contactEmail, setContactEmail] = useState('g.dahlmann@dahlmann-cpa.de');
+  // Kein Platzhalter: bis die API antwortet, steht hier ein Strich — nie die
+  // Adresse eines anderen Anbieters (bis 09.10.2026 die Fixture-Adresse).
+  const [contactEmail, setContactEmail] = useState('');
   useEffect(() => {
-    fetchCoverage().then((c) => { if ((c as { contact_email?: string }).contact_email) setContactEmail((c as { contact_email?: string }).contact_email!); }).catch(() => {});
+    fetchCoverage().then((c) => { if (c.contact_email) setContactEmail(c.contact_email); }).catch(() => {});
   }, []);
   return (
     <ProviderShell>
@@ -100,8 +102,7 @@ export function SettingsPage() {
                 </p>
               </div>
               <Card styleVariant="filled" className="flex items-center gap-3 p-4">
-                <p className="text-[13px] font-medium text-fg">{contactEmail}</p>
-                <Tag tone="success">{t('settings.verifiedTag')}</Tag>
+                <p className="text-[13px] font-medium text-fg">{contactEmail || '—'}</p>
                 <div className="ml-auto">
                   <Button size="sm" variant="secondary" onClick={() => setEmailOpen(true)}>{t('settings.changeEmail')}</Button>
                 </div>
@@ -166,18 +167,35 @@ export function SettingsPage() {
 // Provider self-service for the anonymous listing card + detail page: billing
 // model (shown on the card instead of a price), full pricing table (revealed
 // only on the monetised detail page) and the anonymized identity fields.
-function MatchmakingPanel() {
+export function MatchmakingPanel() {
   const { t } = useTranslation('providerws');
+  // Startet leer und fuellt sich aus dem gespeicherten Profil. Bis 09.10.2026
+  // standen hier Beispielwerte (Norditalien, 2015, drei Preiszeilen) — wer
+  // speicherte, schrieb sie in sein oeffentliches Profil.
   const [billing, setBilling] = useState<BillingModel>('project');
-  const [region, setRegion] = useState('Norditalien');
-  const [activeSince, setActiveSince] = useState('2015');
-  const [rows, setRows] = useState<PricingRow[]>([
-    { service: 'VAT-Erstregistrierung Italien', price: 'ab €450 · einmalig' },
-    { service: 'Laufende OSS-Betreuung', price: '€180 / Quartal' },
-    { service: 'Fachberatung (Stundensatz)', price: '€140 / Std.' },
-  ]);
-  const [saved, setSaved] = useState<'idle' | 'saving' | 'done'>('idle');
+  const [region, setRegion] = useState('');
+  const [activeSince, setActiveSince] = useState('');
+  const [rows, setRows] = useState<PricingRow[]>([]);
+  // Speichern erst, wenn der gespeicherte Stand geladen ist — sonst ueberschreibt
+  // ein Klick das Profil mit leeren Feldern.
+  const [loaded, setLoaded] = useState(false);
+  // E2 (TKT-PROV-12): scheitert der Abruf, sagt ein Satz am Knopf, warum er
+  // gesperrt ist — vorher stand er grau da, ohne Grund.
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+  const [saved, setSaved] = useState<'idle' | 'saving' | 'done' | 'error'>('idle');
   const [identityHint, setIdentityHint] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLoadFailed(false);
+    fetchCoverage().then((c) => {
+      if (c.billing_model) setBilling(c.billing_model);
+      setRegion(c.region ?? '');
+      setActiveSince(c.active_since != null ? String(c.active_since) : '');
+      setRows(Array.isArray(c.pricing_table) ? c.pricing_table : []);
+      setLoaded(true);
+    }).catch(() => setLoadFailed(true)); // bleibt gesperrt: ohne gespeicherten Stand kein Ueberschreiben
+  }, [attempt]);
 
   const save = async () => {
     setSaved('saving');
@@ -195,7 +213,9 @@ function MatchmakingPanel() {
       // aendern muss, nicht, dass er etwas falsch gemacht haette.
       const hint = identityHintFrom(e, t);
       if (hint) { setIdentityHint(hint); setSaved('idle'); return; }
-      /* fixture mode: keep local state */
+      // Kein „Gespeichert", wenn nichts gespeichert wurde.
+      setSaved('error');
+      return;
     }
     setSaved('done');
     setTimeout(() => setSaved('idle'), 2000);
@@ -263,8 +283,15 @@ function MatchmakingPanel() {
       </div>
       {identityHint && <Banner status="warning" title={identityHint} />}
       <div className="flex items-center gap-3">
-        <Button size="sm" onClick={save} disabled={saved === 'saving'}>{t('settings.matchmakingSave')}</Button>
+        <Button size="sm" onClick={save} disabled={!loaded || saved === 'saving'}>{t('settings.matchmakingSave')}</Button>
         {saved === 'done' && <span className="text-[12px] text-fg-brand">{t('settings.matchmakingSaved')}</span>}
+        {saved === 'error' && <span className="text-[12px] text-error-500">{t('application.saveError')}</span>}
+        {loadFailed && (
+          <>
+            <span className="min-w-0 flex-1 text-[12px] text-fg-secondary">{t('common:states.partner.profileUnavailable')}</span>
+            <Button size="sm" variant="ghost" onClick={() => setAttempt((n) => n + 1)}>{t('common:states.actions.tryAgain')}</Button>
+          </>
+        )}
       </div>
     </Card>
   );

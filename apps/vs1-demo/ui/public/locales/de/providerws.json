@@ -32,7 +32,8 @@
         "verification": "Verification Center"
       }
     },
-    "navSubscription": "Tarif"
+    "navSubscription": "Tarif",
+    "signOut": "Abmelden"
   },
   "bell": {
     "aria": "Benachrichtigungen",
@@ -203,7 +204,8 @@
     "graceTitleMany": "{{n}} Rechnungen sind offen",
     "graceBody": "Fällig seit {{since}}. Ab {{until}} pausiert die Buchung, bis die Rechnung bezahlt ist.",
     "graceStillVisible": "Ihre Sichtbarkeit in den Ergebnissen ändert sich dadurch nicht.",
-    "graceOpenPortal": "Rechnung im Portal öffnen"
+    "graceOpenPortal": "Rechnung im Portal öffnen",
+    "changePaymentMethod": "Zahlungsmittel ändern"
   },
   "confirmEmail": {
     "working": "Ihre neue Adresse wird bestätigt…",
@@ -359,7 +361,6 @@
     "newBannerTitle_one": "{{count}} neue Anfrage seit Ihrem letzten Besuch",
     "newBannerTitle_other": "{{count}} neue Anfragen seit Ihrem letzten Besuch",
     "newBannerBody": "Magic-Link-E-Mails versendet · sie erscheinen auch hier",
-    "fixtureBannerTitle": "2 neue Anfragen seit Ihrem letzten Besuch · vor 12 Min.",
     "markAllSeen": "Alle als gesehen markieren",
     "filterAwaitingConfirmation": "Bestätigung ausstehend",
     "filterAwaitingReply": "Antwort ausstehend",
@@ -372,8 +373,6 @@
     "actionView": "Anzeigen",
     "sortSla": "Sortierung: SLA-Dringlichkeit",
     "emptyTitle": "Noch keine Anfragen",
-    "emptyDescription": "Ihr Profil ist live. Neue Anfragen landen hier + als Magic-Links in Ihrem Posteingang — die meisten Partner erhalten ihre erste Anfrage innerhalb von 5 Tagen.",
-    "previewProfile": "Öffentliches Profil ansehen",
     "companyAnonymized": "🔒 Anonymisierte Anfrage"
   },
   "settings": {
@@ -402,7 +401,6 @@
     "bioLabel": "Bio · max. 280 Zeichen · wird in Suchergebnissen verwendet",
     "contactEmailTitle": "Kontakt-E-Mail · routing-kritisch",
     "contactEmailBody": "Hier kommen die Magic-Links neuer Anfragen an. Wenn diese E-Mail bounct, pausiert Ihre Sichtbarkeit bis zur Behebung (§11.2).",
-    "verifiedTag": "✓ verifiziert · keine Bounces in 90 T",
     "changeEmail": "E-Mail ändern",
     "workspaceTitle": "Workspace",
     "workspaceSub": "Destruktive Aktionen — jede erfordert eine explizite Bestätigung",

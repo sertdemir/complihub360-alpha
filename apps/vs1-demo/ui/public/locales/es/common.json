@@ -73,7 +73,6 @@
       "experts": {
         "seg1": "La Vía Más Rápida Hacia ",
         "seg2": "Expertos Locales en Cumplimiento",
-        "text": "Obtén una evaluación personalizada y conéctate de inmediato con la firma asociada ideal.",
         "cta": "Conecta con un experto ahora",
         "usp1": "Matching instantáneo",
         "usp2": "Expertos precalificados",
@@ -124,7 +123,6 @@
       "pain2Title": "La trampa del experto poco fiable",
       "pain2Desc": "Enviar correos fríos a proveedores de cumplimiento y esperar semanas para respuestas vagas no es una estrategia. Es una responsabilidad.",
       "pain3Title": "Nosotros lo solucionamos",
-      "pain3Desc": "Nuestro Asistente de IA captura tu contexto en 4–5 pasos, mapea los riesgos por jurisdicción y te conecta con especialistas con SLA garantizado en 24–48h.",
       "diagramTitle": "Del contexto al especialista adecuado",
       "node1Label": "Puerta de País",
       "node1Desc": "Seleccionar mercado objetivo",
@@ -343,7 +341,6 @@
     "heroOverline": "Áreas de Cumplimiento",
     "heroTitlePre": "Encuentra tu desafío regulatorio.",
     "heroTitleGold": "Empieza aquí.",
-    "heroBody": "Cada área de cumplimiento es una puerta de entrada a tu evaluación específica. Identifica tu tema, entiende los riesgos y emparéjate con un especialista verificado — todo en menos de 5 minutos.",
     "whoAffected": "A quién afecta",
     "startAssessment": "Iniciar evaluación de {{title}}",
     "riskPanel": {
@@ -403,8 +400,7 @@
         "body": "4–5 preguntas precisas traducen su situación en un perfil de búsqueda estructurado."
       },
       "match": {
-        "title": "Emparejar",
-        "body": "Los especialistas verificados se clasifican por relevancia, velocidad de respuesta y puntuación de calidad."
+        "title": "Emparejar"
       },
       "engage": {
         "title": "Contratar",
@@ -1179,9 +1175,7 @@
   "aiGov": {
     "trustCenter": "CompliHub360 Trust Center",
     "dimTitle": "Las 6 Dimensiones de la Gobernanza de IA",
-    "dimDesc": "Un enfoque integral para construir sistemas de IA confiables para el cumplimiento empresarial.",
     "dimEthicsTitle": "Pautas Éticas",
-    "dimEthicsDesc": "Nuestras características de IA respetan la autonomía humana y están diseñadas para aumentar a los profesionales, no para reemplazarlos. Prevenimos el sesgo sistémico mediante monitoreo continuo.",
     "dimTranspTitle": "Transparencia y Explicabilidad",
     "dimTranspDesc": "Los usuarios merecen saber cuándo interactúan con IA. Cada resultado generado por IA está claramente marcado y sus fuentes de datos son rastreables.",
     "dimOrgTitle": "Responsabilidad Organizacional",
@@ -1195,7 +1189,6 @@
     "featTitle": "Características activas de IA en CompliHub360",
     "featDesc": "Cómo aprovechamos la IA hoy, envuelta en nuestro estricto marco de gobernanza.",
     "featPrivacyTitle": "Pipeline de Redacción de Privacidad",
-    "featPrivacyDesc": "Antes de analizar cualquier contexto comercial, nuestros modelos eliminan toda la Información de Identificación Personal (PII). Los correos electrónicos, nombres y números de teléfono nunca salen de nuestros servidores europeos seguros.",
     "featIntentTitle": "Motor de Análisis de Intenciones",
     "featIntentDesc": "Transforma la entrada no estructurada del cliente en un perfil de riesgo estructurado. La IA está restringida y no puede tomar decisiones legales vinculantes por sí sola.",
     "featGateTitle": "Validador Triple de Puertas de IA",
@@ -1550,7 +1543,10 @@
       "prod-packaging-reuse-targets": "Envases de transporte reutilizables (PPWR)",
       "prod-safety": "Seguridad y etiquetado del producto",
       "tax-corporate": "Impuesto de sociedades",
-      "tax-vat-registration": "Registro y presentación del IVA"
+      "tax-vat-registration": "Registro y presentación del IVA",
+      "env-weee-registration": "Registro de productores RAEE",
+      "env-batteries-epr": "Pilas y baterías: responsabilidad del productor",
+      "env-reach-substances": "REACH: sustancias en artículos"
     },
     "obligationDesc": {
       "corp-registration": "Inscripción obligatoria en el registro mercantil local.",
@@ -1573,55 +1569,20 @@
       "prod-packaging-reuse-targets": "El 40 % de los envases de transporte (palés, cajas, film para palés, flejes) debe circular en un sistema de reutilización; el 10 % en los envases colectivos. Las cajas de cartón están exentas, por lo que el envío de paquetes queda fuera del objetivo: afecta a palés y transporte B2B, no al paquete.",
       "prod-safety": "Normas de seguridad de los productos de consumo y etiquetado obligatorio.",
       "tax-corporate": "Obligaciones habituales del impuesto de sociedades para entidades establecidas.",
-      "tax-vat-registration": "Obligaciones de registro y declaración del IVA en función de los umbrales de ventas."
+      "tax-vat-registration": "Obligaciones de registro y declaración del IVA en función de los umbrales de ventas.",
+      "env-weee-registration": "Inscripción en el registro nacional de aparatos eléctricos y electrónicos antes de su comercialización, además de las obligaciones de información y recogida al final de su vida útil.",
+      "env-batteries-epr": "Registro de productores y responsabilidad ampliada del productor para pilas y baterías, incluidos los aparatos con celdas integradas. Independiente de la RAP de envases y de RAEE.",
+      "env-reach-substances": "Obligaciones sobre sustancias en productos comercializados en el mercado de la UE: registro o notificación cuando se superan los umbrales, y el deber de informar a los destinatarios sobre las sustancias extremadamente preocupantes."
     },
     "regions": {
       "eyebrow": "Regiones",
       "title": "Dónde estamos — y hacia dónde vamos",
-      "lead": "Cada búsqueda y cada análisis se apoyan en las leyes concretas del país de destino, para evitar vuelos a ciegas en materia legal.",
-      "note": "La UE y el Reino Unido están totalmente cubiertos; Norteamérica está en construcción y APAC arranca con cobertura básica. Más países se sumarán a lo largo de 2026.",
-      "tiers": {
-        "full": "Cobertura completa",
-        "expanding": "En expansión",
-        "core": "Cobertura básica"
-      },
       "items": {
         "eu": {
-          "name": "Unión Europea",
-          "focus": [
-            "Cumplimiento del RGPD",
-            "Normativa EPR de envases",
-            "IVA en toda la UE",
-            "Ley de Servicios Digitales"
-          ]
+          "name": "Unión Europea"
         },
-        "uk": {
-          "name": "Reino Unido",
-          "focus": [
-            "RGPD del Reino Unido",
-            "Cumplimiento de IVA (HMRC)",
-            "Seguridad del producto (UKCA)",
-            "Derecho laboral"
-          ]
-        },
-        "us": {
-          "name": "EE. UU. y Canadá",
-          "focus": [
-            "Nexus e impuesto sobre ventas",
-            "Privacidad CCPA/CPRA",
-            "Normas publicitarias de la FTC",
-            "Cumplimiento comercial"
-          ]
-        },
-        "au": {
-          "name": "Australia (APAC)",
-          "focus": [
-            "Cumplimiento del GST",
-            "Privacy Act 1988",
-            "Responsabilidad de producto",
-            "Importación/Exportación"
-          ]
-        }
+        "uk": {},
+        "us": {}
       }
     }
   },
@@ -1668,9 +1629,7 @@
       "body": "La posición en la lista nunca está a la venta. Un puesto pagado dejaría el match sin valor para ambas partes: usted conocería a quien más hubiera pagado, y el especialista conocería a alguien cuyo caso no podría atender. La idoneidad es el único criterio."
     },
     "specialist": {
-      "kicker": "Lo que cuesta el especialista",
-      "title": "Los honorarios del especialista — presupuestados antes de que usted se comprometa.",
-      "body": "El asesoramiento en sí no es gratuito, y no vamos a fingir lo contrario. Cada Verified Provider publica una estimación fija antes de que usted acepte el encargo, de modo que nunca tendrá que aguantar una llamada exploratoria solo para conocer el precio."
+      "kicker": "Lo que cuesta el especialista"
     },
     "cta": {
       "title": "Empiece donde tenga sentido para usted.",
@@ -1717,8 +1676,7 @@
           "a": "No. Los puestos no están en venta: una posición pagada haría que el match perdiera su valor para ambas partes. La idoneidad es el único criterio."
         },
         {
-          "q": "¿Cuánto cuesta el asesoramiento del especialista?",
-          "a": "Los honorarios los fija el especialista: cada Verified Provider publica una estimación fija antes de que usted acepte el encargo — sin una primera llamada solo para conocer el precio."
+          "q": "¿Cuánto cuesta el asesoramiento del especialista?"
         },
         {
           "q": "¿Ve el especialista mis datos antes de la reserva?",
@@ -2160,6 +2118,60 @@
       "message": "Aún no cubrimos {{market}}, por lo que estas obligaciones no lo incluyen.",
       "notChecked": "No revisado",
       "notIncluded": "Aún sin cobertura · no incluido en este Risk Map"
+    },
+    "partner": {
+      "loadFailed": {
+        "requests": "No se han podido cargar sus solicitudes",
+        "appointments": "No se han podido cargar sus citas",
+        "invoices": "No se han podido cargar sus facturas",
+        "currentPeriod": "No se ha podido cargar la facturación de este mes",
+        "plan": "No se ha podido cargar su plan",
+        "performance": "No se han podido cargar sus datos de rendimiento",
+        "notifications": "No se han podido cargar sus notificaciones",
+        "coverage": "No se ha podido cargar su cobertura",
+        "message": "No ha cambiado nada en su cuenta. Simplemente no podemos mostrarlo en este momento. Inténtelo de nuevo. Si el problema continúa, contacte con soporte."
+      },
+      "empty": {
+        "appointments": "Todavía no hay citas",
+        "requests": "Todavía no hay solicitudes",
+        "howBookingWorks": "Se crea una cita cuando una empresa le selecciona en los resultados y reserva uno de sus horarios disponibles. Para que eso sea posible:",
+        "closing": "La frecuencia de las reservas depende de la demanda en sus áreas. Su plan no influye en ello.",
+        "invoicesHeading": "Todavía no hay facturas",
+        "invoicesMessage": "Sus facturas aparecerán aquí cuando se haya facturado un plan."
+      },
+      "readiness": {
+        "verified": "Verificación completada",
+        "verifiedSub": "Aprobado para {{areas}} en {{markets}}",
+        "verifying": "Verificación en curso",
+        "verifyingSub": "Nuestro equipo de revisión está comprobando sus documentos.",
+        "plan": "Plan activo",
+        "planSub": "{{plan}} · {{cycle}}",
+        "noPlan": "Todavía sin plan",
+        "noPlanAction": "Elegir un plan",
+        "payment": "Método de pago registrado",
+        "paymentSub": "{{method}}",
+        "noPayment": "Todavía sin método de pago",
+        "noPaymentSub": "Sin un método de pago aparece en los resultados, pero no se le puede reservar.",
+        "noPaymentAction": "Añadir método de pago"
+      },
+      "performance": {
+        "requestsSoFar": "Solicitudes hasta ahora",
+        "sinceApproval": "desde la aprobación el {{date}}",
+        "belowThreshold": "a partir de 5 solicitudes",
+        "thresholdNote": "Una tasa basada en una o dos solicitudes dice poco de usted. Por eso la mostramos a partir de cinco solicitudes."
+      },
+      "coverage": {
+        "heading": "Dónde aparece",
+        "message": "Según lo aprobado por nuestro equipo de revisión. Para cambiarlo, envíe el cambio en Servicios. Se aplica tras la revisión.",
+        "approved": "aprobado",
+        "underReview": "en revisión",
+        "notRequested": "no solicitado",
+        "languages": "Idiomas",
+        "responseTime": "Tiempo de respuesta",
+        "hours": "{{hours}} horas",
+        "submitChange": "Enviar un cambio"
+      },
+      "profileUnavailable": "No se puede acceder a su perfil guardado en este momento. Podrá volver a guardar cuando se haya cargado."
     }
   },
   "errorBoundary": {

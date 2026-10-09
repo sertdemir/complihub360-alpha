@@ -22,6 +22,7 @@ import {
 } from '../components/compliance-areas';
 import { getMarketProfile, isMarketCode, listMarkets } from '../lib/marketProfiles';
 import { useInViewOnce } from '../lib/useInViewOnce';
+import { obligationLabel } from '../lib/obligationText';
 
 // ─── /markets and /markets/:code · Brand Map Stufe 6b ────────────────────────
 // The country knowledge base. Every fact on these pages is derived in
@@ -38,13 +39,12 @@ import { useInViewOnce } from '../lib/useInViewOnce';
 // The visible consequence is uneven coverage — DE carries nine market-specific
 // duties, TR four. The coverage note says so instead of padding it.
 
-// Region rows merged in from /countries. The tier is a key, not a label — it
-// also drives which color the kicker takes, and comparing translated text
-// would break in every non-English locale.
-const REGION_KEYS = ['eu', 'uk', 'us', 'au'] as const;
-const REGION_TIER: Record<(typeof REGION_KEYS)[number], 'full' | 'expanding' | 'core'> = {
-  eu: 'full', uk: 'full', us: 'expanding', au: 'core',
-};
+// Region rows merged in from /countries.
+// The regions the engine actually carries (Launch Scope, 2026-10-09). Until
+// then the block listed "USA & Canada" and "Australia (APAC)" with tiers like
+// "Expanding" and "Core Support" — neither market had a single entry. Each row
+// now says what it covers instead of a tier it cannot back.
+const REGION_KEYS = ['eu', 'uk', 'us', 'tr'] as const;
 
 // Flags are presentation, sourced from the market picker's own list — the one
 // sanctioned emoji exception, so the cards and the picker can never disagree.
@@ -273,7 +273,7 @@ export function MarketsIndexPage() {
               >
                 {t('markets.regions.note', {
                   defaultValue:
-                    'The EU and the UK are fully covered; North America is expanding and APAC starts with core coverage. More countries follow over the course of 2026.',
+                    'Eight markets today: Germany, France, Italy, Spain, the Netherlands, the United Kingdom, the United States and Türkiye. Where we don’t carry a national text yet, the market page says so.',
                 })}
               </Typography>
             </Reveal>
@@ -290,14 +290,8 @@ export function MarketsIndexPage() {
                         <span className="block font-serif text-body font-bold leading-snug text-fg">
                           {t(`markets.regions.items.${key}.name`)}
                         </span>
-                        <span
-                          className={`mt-1 block text-[0.5625rem] font-extrabold uppercase tracking-[0.1em] ${
-                            REGION_TIER[key] === 'full'
-                              ? 'text-fg-brand'
-                              : 'text-accent-700 dark:text-fg-accent-strong'
-                          }`}
-                        >
-                          {t(`markets.regions.tiers.${REGION_TIER[key]}`)}
+                        <span className="mt-1 block text-[0.5625rem] font-extrabold uppercase tracking-[0.1em] text-fg-brand">
+                          {t(`markets.regions.scope.${key}`)}
                         </span>
                       </span>
                       <span className="min-w-0 flex-1 text-body-xs leading-relaxed text-fg-tertiary">
@@ -438,7 +432,7 @@ export function MarketPage() {
           }),
           label: t('markets.country.facts.lead', 'to the next deadline'),
           // The duty's canonical engine label, as everywhere on the surface.
-          note: profile.soonest.label,
+          note: obligationLabel(t, profile.soonest.subdomainId, profile.soonest.label),
           tone: 'text-fg',
         }
       : null,

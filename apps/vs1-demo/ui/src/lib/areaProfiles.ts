@@ -65,7 +65,8 @@ const SLUG_TO_DOMAINS: Record<DomainSlug, ComplianceDomain[]> = (() => {
 
 export interface AreaSubdomain {
   id: string;
-  /** Canonical English label from the engine. A statute name, never translated. */
+  /** Canonical English label from the engine. Shown through obligationLabel()
+   *  (lib/obligationText) — the locale files carry it for every template. */
   label: string;
   description: string;
   /** Baseline weight 1–10, before any market or business-model modifier. */
