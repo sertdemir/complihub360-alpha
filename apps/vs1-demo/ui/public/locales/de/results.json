@@ -395,5 +395,6 @@
   "reveal": {
     "was": "war {{title}}",
     "wasInSession": "war {{title}} in Ihrer Sitzung „{{session}}“"
-  }
+  },
+  "dueLive": "Gilt jetzt"
 }

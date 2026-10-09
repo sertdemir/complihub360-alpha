@@ -9,6 +9,7 @@ import { getMarketProfile, MARKET_CODES } from '../../lib/marketProfiles';
 import type { DomainSlug } from '../../lib/domains';
 import type { CountryCode } from './types';
 import { AreaSectionHeading, useAreaEyebrows } from './AreaSectionHeading';
+import { obligationLabel } from '../../lib/obligationText';
 
 interface Props {
   slug: DomainSlug;
@@ -164,7 +165,7 @@ export function AreaEnforcement({ slug, selectedCountry }: Props) {
             <p className="mt-2.5 text-body-sm font-semibold text-fg">
               {t('compliance.area.heaviestPenalty', 'Highest single penalty')}
             </p>
-            <p className="mt-1 text-body-xs text-fg-secondary">{heaviest.label}</p>
+            <p className="mt-1 text-body-xs text-fg-secondary">{obligationLabel(t, heaviest.id, heaviest.label)}</p>
             {/* Woher die Eurozahl stammt. Ohne diese Zeile sah die groesste
                 Zahl der Seite bei einer Umrechnung genauso aus wie bei einem
                 Betrag, der so im Gesetz steht — und genauso wie bei einem, den

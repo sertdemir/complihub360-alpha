@@ -395,5 +395,6 @@
   "reveal": {
     "was": "was {{title}}",
     "wasInSession": "was {{title}} in your session “{{session}}”"
-  }
+  },
+  "dueLive": "Live"
 }

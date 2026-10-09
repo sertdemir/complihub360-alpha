@@ -109,7 +109,7 @@ function DomainView({ slug }: { slug: DomainSlug }) {
   const dueLabel = (o: DomainObligation) =>
     o.status === 'in_progress' ? t('domainPage.inProgress')
     : typeof o.dueDays === 'number' ? t('domainPage.dueInDays', { count: o.dueDays })
-    : (o.due || t('domainPage.noDue'));
+    : (o.due ? obText.cadence(o.due) : t('domainPage.noDue'));
   const scrollProviders = () => providersRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   // Titel: das letzte Wort in Gold, wie "Ihre Compliance-Sitzungen."

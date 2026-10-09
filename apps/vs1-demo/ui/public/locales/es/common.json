@@ -1550,7 +1550,10 @@
       "prod-packaging-reuse-targets": "Envases de transporte reutilizables (PPWR)",
       "prod-safety": "Seguridad y etiquetado del producto",
       "tax-corporate": "Impuesto de sociedades",
-      "tax-vat-registration": "Registro y presentación del IVA"
+      "tax-vat-registration": "Registro y presentación del IVA",
+      "env-weee-registration": "Registro de productores RAEE",
+      "env-batteries-epr": "Pilas y baterías: responsabilidad del productor",
+      "env-reach-substances": "REACH: sustancias en artículos"
     },
     "obligationDesc": {
       "corp-registration": "Inscripción obligatoria en el registro mercantil local.",
@@ -1573,7 +1576,10 @@
       "prod-packaging-reuse-targets": "El 40 % de los envases de transporte (palés, cajas, film para palés, flejes) debe circular en un sistema de reutilización; el 10 % en los envases colectivos. Las cajas de cartón están exentas, por lo que el envío de paquetes queda fuera del objetivo: afecta a palés y transporte B2B, no al paquete.",
       "prod-safety": "Normas de seguridad de los productos de consumo y etiquetado obligatorio.",
       "tax-corporate": "Obligaciones habituales del impuesto de sociedades para entidades establecidas.",
-      "tax-vat-registration": "Obligaciones de registro y declaración del IVA en función de los umbrales de ventas."
+      "tax-vat-registration": "Obligaciones de registro y declaración del IVA en función de los umbrales de ventas.",
+      "env-weee-registration": "Inscripción en el registro nacional de aparatos eléctricos y electrónicos antes de su comercialización, además de las obligaciones de información y recogida al final de su vida útil.",
+      "env-batteries-epr": "Registro de productores y responsabilidad ampliada del productor para pilas y baterías, incluidos los aparatos con celdas integradas. Independiente de la RAP de envases y de RAEE.",
+      "env-reach-substances": "Obligaciones sobre sustancias en productos comercializados en el mercado de la UE: registro o notificación cuando se superan los umbrales, y el deber de informar a los destinatarios sobre las sustancias extremadamente preocupantes."
     },
     "regions": {
       "eyebrow": "Regiones",

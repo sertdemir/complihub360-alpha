@@ -1550,7 +1550,10 @@
       "prod-packaging-reuse-targets": "Reusable Transport Packaging (PPWR)",
       "prod-safety": "Product Safety & Labeling",
       "tax-corporate": "Corporate Income Tax",
-      "tax-vat-registration": "VAT Registration & Filing"
+      "tax-vat-registration": "VAT Registration & Filing",
+      "env-weee-registration": "WEEE Producer Registration",
+      "env-batteries-epr": "Batteries — Producer Responsibility",
+      "env-reach-substances": "REACH — Substances in Articles"
     },
     "obligationDesc": {
       "corp-registration": "Mandatory filing in the local commercial register.",
@@ -1573,7 +1576,10 @@
       "prod-packaging-reuse-targets": "40% of transport packaging (pallets, crates, pallet wrap, straps) must run inside a reuse system, 10% for grouped packaging. Cardboard boxes are exempt, which leaves ordinary parcel shipping outside the target — this bites on pallets and B2B transport, not on the mailer.",
       "prod-safety": "Consumer safety standards and mandatory labeling requirements.",
       "tax-corporate": "Standard corporate tax obligations for established entities.",
-      "tax-vat-registration": "Requirements for registering and filing Value Added Tax based on sales thresholds."
+      "tax-vat-registration": "Requirements for registering and filing Value Added Tax based on sales thresholds.",
+      "env-weee-registration": "Registration in the national register for electrical and electronic equipment before placing devices on the market, plus reporting and take-back duties at end of life.",
+      "env-batteries-epr": "Producer registration and extended producer responsibility for batteries, including devices with built-in cells. Separate from packaging EPR and from WEEE.",
+      "env-reach-substances": "Duties for substances in goods placed on the EU market: registration or notification where thresholds are met, and the information duty towards recipients for substances of very high concern."
     },
     "regions": {
       "eyebrow": "Regions",
