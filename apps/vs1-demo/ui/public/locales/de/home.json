@@ -80,7 +80,6 @@
   },
   "heroWorld": {
     "title": {
-      "line1": "Globale Compliance.",
       "line2": "Vereinfacht."
     },
     "lead": "Verstehen Sie Ihre Pflichten. Finden Sie die richtigen Fachleute. Bleiben Sie konform — überall, wo Sie verkaufen.",
@@ -103,8 +102,7 @@
         "desc": "Verbinden, zusammenarbeiten, erledigen."
       },
       {
-        "title": "Always on your side",
-        "desc": "Menschlicher Support und KI-Hilfe — rund um die Uhr."
+        "title": "Always on your side"
       }
     ],
     "proofs": [
@@ -744,7 +742,6 @@
       "gold": "verbinden",
       "post": " Sie mit denen, die es lösen."
     },
-    "subtitle": "Risk Maps sind überall verfügbar — jedes Compliance-Dashboard bietet eine. Was CompliHub360 unterscheidet, ist das, was danach kommt: verifizierte Anbieter über Länder und Bereiche hinweg, vorgeprüft, mit gemessenen Reaktionszeiten und strukturierten Übergaben. Sie suchen nicht. Wir matchen.",
     "matches": [
       {
         "place": "München, DE",
@@ -819,21 +816,15 @@
       "title": "Das Netzwerk, das niemand kuratiert.",
       "label": "Die Lücke, vernetzt"
     },
-    "row1Lead": "Jedes öffentliche Dashboard sagt Ihnen, was die Regeln besagen. Keines sagt Ihnen, was für Ihren Betrieb auf dem Spiel steht — in Prioritätsreihenfolge, mit der Quelle direkt dabei.",
-    "row2Lead": "Verzeichnisse listen alle. Sie prüfen niemanden. Wir prüfen auf Abdeckung, Reaktionszeit und Ergebnisse — und binden jedes Mandat an gemeinsame Verantwortung.",
     "row1": [
       {
         "title": "Nach Risiko priorisiert, nicht erschöpfend",
         "desc": "Von Kritisch bis Niedrig. Vier bis zwölf Punkte zu jedem Zeitpunkt. Keine 200-Seiten-Checklisten."
       },
       {
-        "title": "Direkt von den Regulierungsbehörden bezogen",
-        "desc": "Jeder Eintrag verlinkt auf die offizielle Bekanntmachung, Registerseite oder Rechtsprechung, aus der er stammt."
+        "title": "Direkt von den Regulierungsbehörden bezogen"
       },
-      {
-        "title": "Gegen Veralten aktualisiert",
-        "desc": "Regeln ändern sich. Die Karte wird aktualisiert, wenn eine Frist verschoben wird, eine Behörde präzisiert oder ein Register öffnet."
-      },
+      {},
       {
         "title": "Klare Sprache als Standard",
         "desc": "Wenn eine Klausel einen Absatz zur Erklärung braucht, sehen Sie den Absatz — nicht die Klausel."
@@ -841,13 +832,9 @@
     ],
     "row2": [
       {
-        "title": "Von uns verifiziert, nicht selbst eingetragen",
-        "desc": "Jeder Verified Provider wird auf Abdeckung, Reaktionszeit und belegte Ergebnisse geprüft — kein Verzeichnis."
+        "title": "Von uns verifiziert, nicht selbst eingetragen"
       },
-      {
-        "title": "Gemeinsame Verantwortung eingebaut",
-        "desc": "Jedes Mandat ist vertraglich geregelt. Partner übernehmen Verantwortung für die Sache, nicht nur für den Rat."
-      }
+      {}
     ]
   },
   "domains": {
@@ -1044,32 +1031,22 @@
       "gold": "zwischen",
       "post": " Match und Lösung passiert."
     },
-    "subtitle": "Sobald Sie gematcht sind, hören drei Dinge auf, Annahmen zu sein: was es kostet, wann Sie Antwort erhalten und was Sie mitnehmen. Alles steht fest, bevor die erste E-Mail geschrieben wird.",
     "cards": [
+      {},
       {
-        "title": "Kosten, bevor Sie sich binden.",
-        "desc": "Jeder Verified Provider veröffentlicht eine feste Schätzung, bevor Sie das Mandat annehmen. Keine Discovery-Calls, nur um den Preis zu erfahren."
+        "title": "Antwort, mit laufender Uhr."
       },
       {
-        "title": "Antwort, mit laufender Uhr.",
-        "desc": "24–48h bis zur ersten Antwort, sonst leiten wir automatisch an den nächsten verfügbaren Partner weiter. Die Uhr ist Teil des Vertrags, kein Versprechen."
-      },
-      {
-        "title": "Ein Verlauf, der Ihnen gehört.",
-        "desc": "Jeder Schritt wird in einer privaten Chronik protokolliert — Anfrage, Antwort, vereinbarter Umfang, Ergebnisse. Ihres, jederzeit exportierbar, in jedem Format, das Ihr Prüfer braucht."
+        "title": "Ein Verlauf, der Ihnen gehört."
       }
     ],
     "panel1": {
-      "estCost": "Geschätzte Kosten",
-      "estValue": "€2,400 — €3,800",
       "scope": "Umfang",
       "scopeValue": "OSS-Quartalsmeldungen · DE + NL + FR",
-      "approval": "Freigabe",
-      "approvalValue": "Steht fest, bevor Arbeit beginnt"
+      "approval": "Freigabe"
     },
     "panel2": {
-      "label": "SLA für die Erstantwort",
-      "note": "Bei Verzug automatische Weiterleitung an den nächsten Partner. Vertraglich vereinbart."
+      "label": "SLA für die Erstantwort"
     },
     "panel3": {
       "timeline": [
@@ -1078,8 +1055,7 @@
           "label": "Anfrage gesendet"
         },
         {
-          "date": "25. Apr",
-          "label": "Partner hat angenommen · 21h"
+          "date": "25. Apr"
         },
         {
           "date": "28. Apr",
@@ -1175,8 +1151,7 @@
     "learn": {
       "meta": "Webinar · 24 Min.",
       "video": "Grenzüberschreitende USt für D2C",
-      "title": "Lernen Sie von Profis.",
-      "desc": "Webinare mit Behördenvertretern. Tutorials von Spezialisten. Experten, die Sie von YouTube kennen."
+      "title": "Lernen Sie von Profis."
     },
     "mock": {
       "vatItaly": "USt-Registrierung · Italien",
@@ -1223,20 +1198,17 @@
             "a": "Ja. Kein Konto, keine Kreditkarte. Am Ende erhalten Sie eine strukturierte Risk Map. Die anschließende Registrierung — um sie zu behalten, sich mit Anbietern matchen zu lassen und Hinweise zu erhalten — ist der optionale nächste Schritt."
           },
           {
-            "q": "Woher stammen die Angaben in der Risk Map?",
-            "a": "Jeder Eintrag verlinkt auf die offizielle Bekanntmachung, Registerseite oder Rechtsprechung, aus der er stammt — und wird aktualisiert, wenn eine Frist verschoben wird, eine Behörde präzisiert oder ein Register öffnet."
+            "q": "Woher stammen die Angaben in der Risk Map?"
           },
           {
-            "q": "Kann ich meine Risk Map exportieren?",
-            "a": "Ja. Als PDF für Ihre Unterlagen oder Ihren Prüfer — und im Workspace ist Ihr kompletter Verlauf jederzeit als PDF, CSV oder über die API exportierbar."
+            "q": "Kann ich meine Risk Map exportieren?"
           },
           {
             "q": "Kann ich mehrere Märkte und Bereiche gleichzeitig prüfen?",
             "a": "Ja. Das Assessment fragt alle Märkte und Bereiche ab, in denen Sie tätig sind, und führt die Pflichten in einer zusammenhängenden Karte zusammen — priorisiert über alles hinweg."
           },
           {
-            "q": "Was, wenn mein Markt noch nicht abgedeckt ist?",
-            "a": "Sagen Sie uns, wo Sie tätig sind. Wir ergänzen laufend Märkte, und frühe Registrierungen setzen die Priorität mit — wir benachrichtigen Sie, sobald Ihr Markt live geht."
+            "q": "Was, wenn mein Markt noch nicht abgedeckt ist?"
           }
         ]
       },
@@ -1248,19 +1220,13 @@
             "a": "Nein. CompliHub360 kartiert Pflichten und zeigt auf, was wahrscheinlich für Ihren Betrieb gilt — das ist keine Rechtsberatung. Wenn eine Sache eine verbindliche Einschätzung braucht, verbinden wir Sie mit einem Verified Provider, der sie geben kann."
           },
           {
-            "q": "Wie werden Verified Provider geprüft?",
-            "a": "Jeder Partner wird von uns auf Bereichsabdeckung, Reaktionszeit und belegte Ergebnisse geprüft — kein Selbsteintrags-Verzeichnis. Jedes Mandat ist vertraglich geregelt, mit gemeinsamer Verantwortung für die Sache."
+            "q": "Wie werden Verified Provider geprüft?"
           },
           {
-            "q": "Was kostet ein Mandat?",
-            "a": "Jeder Verified Provider veröffentlicht eine feste Schätzung, bevor Sie annehmen — keine Discovery-Calls, nur um den Preis zu erfahren. Sie sehen Spanne und Umfang vorab und geben sie frei, bevor Arbeit beginnt."
+            "q": "Was kostet ein Mandat?"
           },
+          {},
           {
-            "q": "Wie schnell antwortet ein Partner?",
-            "a": "24–48 Stunden bis zur ersten Antwort, vertraglich vereinbart. Bei Verzug leiten wir Ihre Anfrage automatisch an den nächsten verfügbaren Verified Provider weiter."
-          },
-          {
-            "q": "Bin ich an einen Partner gebunden?",
             "a": "Nein. Jedes Mandat ist einzeln vertraglich geregelt. Sie können jederzeit weitere Matches anfragen oder wechseln — Ihr Verlauf und Ihre Risk Map gehören Ihnen."
           }
         ]

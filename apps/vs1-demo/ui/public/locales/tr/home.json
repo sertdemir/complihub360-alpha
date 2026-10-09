@@ -80,7 +80,6 @@
   },
   "heroWorld": {
     "title": {
-      "line1": "Küresel uyum.",
       "line2": "Basitleştirildi."
     },
     "lead": "Yükümlülüklerinizi anlayın. Doğru uzmanları bulun. Sattığınız her yerde uyumlu kalın.",
@@ -103,8 +102,7 @@
         "desc": "Bağlanın, birlikte çalışın, tamamlayın."
       },
       {
-        "title": "Always on your side",
-        "desc": "İnsan desteği ve yapay zekâ yardımı — günün her saati."
+        "title": "Always on your side"
       }
     ],
     "proofs": [
@@ -744,7 +742,6 @@
       "gold": "buluştururuz",
       "post": "."
     },
-    "subtitle": "Risk haritaları herkese açık — her uyum panosu bir tane sunar. CompliHub360'ı farklı kılan sonrasıdır: ülkeler ve alanlar genelinde doğrulanmış, önceden incelenmiş, yanıt süreleri izlenen ve yapılandırılmış devirlerle çalışan sağlayıcılar. Siz aramazsınız. Biz eşleştiririz.",
     "matches": [
       {
         "place": "Münih, DE",
@@ -819,21 +816,15 @@
       "title": "Kimsenin derlemediği ağ.",
       "label": "Boşluk, ağa bağlandı"
     },
-    "row1Lead": "Her açık pano size kuralların ne dediğini söyler. Hiçbiri, operasyonunuz için nelerin risk altında olduğunu öncelik sırasıyla ve kaynağı ekli hâlde söylemez.",
-    "row2Lead": "Dizinler herkesi listeler. Kimseyi denetlemez. Biz kapsamı, yanıt süresini ve sonuçları denetleriz — ve her işi ortak sorumluluğa bağlarız.",
     "row1": [
       {
         "title": "Riske göre önceliklendirilmiş, kapsamlı değil",
         "desc": "Kritikten düşüğe. Her an dört ila on iki madde. 200 sayfalık kontrol listeleri yok."
       },
       {
-        "title": "Kaynağı doğrudan düzenleyiciler",
-        "desc": "Her kayıt, dayandığı resmî duyuruya, sicil sayfasına veya içtihada bağlanır."
+        "title": "Kaynağı doğrudan düzenleyiciler"
       },
-      {
-        "title": "Eskimeye karşı güncel",
-        "desc": "Kurallar değişir. Bir vade kaydığında, bir düzenleyici açıklama yaptığında veya bir sicil açıldığında harita güncellenir."
-      },
+      {},
       {
         "title": "Varsayılan olarak yalın dil",
         "desc": "Bir madde açıklanmak için bir paragraf gerektiriyorsa, gördüğünüz paragraftır — madde değil."
@@ -841,13 +832,9 @@
     ],
     "row2": [
       {
-        "title": "Kendi kaydıyla değil, bizim doğrulamamızla",
-        "desc": "Her Verified Provider kapsam, yanıt süresi ve belgelenmiş gerçek sonuçlar üzerinden denetlenir — bir dizin değildir."
+        "title": "Kendi kaydıyla değil, bizim doğrulamamızla"
       },
-      {
-        "title": "Ortak sorumluluk baştan kurulu",
-        "desc": "Her iş sözleşmeyle bağlanır. Partner'lar yalnızca tavsiyenin değil, işin sorumluluğunu üstlenir."
-      }
+      {}
     ]
   },
   "domains": {
@@ -1044,32 +1031,22 @@
       "gold": "arasında",
       "post": " neler olur."
     },
-    "subtitle": "Eşleştiğiniz anda üç şey varsayım olmaktan çıkar: maliyeti, ne zaman yanıt alacağınız ve elinizde ne kalacağı. Hepsi ilk e-postadan önce belirlenir.",
     "cards": [
+      {},
       {
-        "title": "Taahhütten önce maliyet.",
-        "desc": "Her Verified Provider, işi kabul etmenizden önce sabit bir tahmin yayımlar. Yalnızca fiyatı öğrenmek için discovery call yok."
+        "title": "Yanıt, saat işlerken."
       },
       {
-        "title": "Yanıt, saat işlerken.",
-        "desc": "İlk yanıt için 24–48 saat; aşılırsa bir sonraki uygun partner'a otomatik yönlendiririz. Saat sözleşmenin parçasıdır, bir vaat değil."
-      },
-      {
-        "title": "Sizde kalan bir kayıt.",
-        "desc": "Her adım özel bir zaman çizelgesine işlenir — talep, yanıt, mutabık kalınan kapsam, teslimatlar. Sizindir; her an, denetçinizin istediği her biçimde dışa aktarılabilir."
+        "title": "Sizde kalan bir kayıt."
       }
     ],
     "panel1": {
-      "estCost": "Tahmini maliyet",
-      "estValue": "€2,400 — €3,800",
       "scope": "Kapsam",
       "scopeValue": "OSS üç aylık beyanları · DE + NL + FR",
-      "approval": "Onay",
-      "approvalValue": "Herhangi bir çalışma başlamadan önce belirlenir"
+      "approval": "Onay"
     },
     "panel2": {
-      "label": "İlk yanıt SLA'sı",
-      "note": "Aşılırsa bir sonraki partner'a otomatik yönlendirme. Sözleşmeyle güvence altında."
+      "label": "İlk yanıt SLA'sı"
     },
     "panel3": {
       "timeline": [
@@ -1078,8 +1055,7 @@
           "label": "Talep gönderildi"
         },
         {
-          "date": "25 Nis",
-          "label": "Partner kabul etti · 21s"
+          "date": "25 Nis"
         },
         {
           "date": "28 Nis",
@@ -1175,8 +1151,7 @@
     "learn": {
       "meta": "Web semineri · 24 dk",
       "video": "D2C için sınır ötesi KDV",
-      "title": "İşin uzmanlarından öğrenin.",
-      "desc": "Düzenleyicilerle web seminerleri. Uzmanlardan eğitimler. YouTube'dan tanıyacağınız isimler."
+      "title": "İşin uzmanlarından öğrenin."
     },
     "mock": {
       "vatItaly": "KDV kaydı · İtalya",
@@ -1223,20 +1198,17 @@
             "a": "Evet. Hesap yok, kredi kartı yok. Sonunda yapılandırılmış bir Risk Map alırsınız. Sonrasında kaydolmak — haritayı saklamak, sağlayıcılarla eşleşmek, bildirim almak için — isteğe bağlı bir sonraki adımdır."
           },
           {
-            "q": "Risk Map'teki bilgiler nereden geliyor?",
-            "a": "Her kayıt, kaynaklandığı resmî duyuruya, kayıt sayfasına veya içtihada bağlanır — ve bir süre ertelendiğinde, bir kurum netleştirdiğinde veya bir kayıt açıldığında güncellenir."
+            "q": "Risk Map'teki bilgiler nereden geliyor?"
           },
           {
-            "q": "Risk Map'imi dışa aktarabilir miyim?",
-            "a": "Evet. Kayıtlarınız veya denetçiniz için PDF olarak — ve workspace içinde tüm geçmişiniz her zaman PDF, CSV veya API üzerinden dışa aktarılabilir."
+            "q": "Risk Map'imi dışa aktarabilir miyim?"
           },
           {
             "q": "Birden fazla pazarı ve alanı aynı anda kontrol edebilir miyim?",
             "a": "Evet. Değerlendirme, faaliyet gösterdiğiniz tüm pazarları ve alanları kapsar ve yükümlülükleri tek bir bütünlüklü haritada birleştirir — hepsi birlikte önceliklendirilir."
           },
           {
-            "q": "Pazarım henüz kapsanmıyorsa ne olur?",
-            "a": "Nerede faaliyet gösterdiğinizi bize bildirin. Pazarları sürekli ekliyoruz ve erken kaydolanlar önceliğin belirlenmesine katkıda bulunuyor — pazarınız yayına girdiği anda size haber veririz."
+            "q": "Pazarım henüz kapsanmıyorsa ne olur?"
           }
         ]
       },
@@ -1248,19 +1220,13 @@
             "a": "Hayır. CompliHub360 yükümlülükleri haritalar ve operasyonunuza muhtemelen neyin uygulanacağını gösterir — bu hukuki danışmanlık değildir. Bir konu bağlayıcı görüş gerektirdiğinde, sizi bunu verebilecek bir Verified Provider ile buluştururuz."
           },
           {
-            "q": "Verified Provider'lar nasıl denetleniyor?",
-            "a": "Her partner; alan kapsamı, yanıt süresi ve belgelenmiş gerçek sonuçlar üzerinden bizim tarafımızdan incelenir — kendi kaydını oluşturan bir dizin değildir. Her iş sözleşmeye bağlıdır ve dosya için ortak sorumluluk içerir."
+            "q": "Verified Provider'lar nasıl denetleniyor?"
           },
           {
-            "q": "Bir iş ne kadara mal olur?",
-            "a": "Her Verified Provider, siz kabul etmeden önce sabit bir tahmin yayımlar — yalnızca fiyatı öğrenmek için discovery call yok. Aralığı ve kapsamı önceden görür, herhangi bir çalışma başlamadan onaylarsınız."
+            "q": "Bir iş ne kadara mal olur?"
           },
+          {},
           {
-            "q": "Bir partner ne kadar hızlı yanıt verir?",
-            "a": "İlk yanıta kadar 24–48 saat, sözleşmeyle güvence altında. Gecikme olursa talebinizi otomatik olarak bir sonraki uygun Verified Provider'a yönlendiririz."
-          },
-          {
-            "q": "Tek bir partnere bağlı mıyım?",
             "a": "Hayır. Her iş ayrı ayrı sözleşmeye bağlanır. İstediğiniz zaman yeni eşleşmeler talep edebilir veya değiştirebilirsiniz — geçmişiniz ve Risk Map'iniz size aittir."
           }
         ]

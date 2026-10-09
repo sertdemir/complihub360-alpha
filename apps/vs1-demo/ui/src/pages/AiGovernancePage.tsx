@@ -146,7 +146,6 @@ export function AiGovernancePage() {
           <h2 className="mt-2.5 font-serif text-[1.75rem] font-bold leading-tight tracking-tight text-fg lg:text-[2rem]">
             {t('aiGov.dimTitle')}
           </h2>
-          <p className="mt-3 text-body leading-relaxed text-fg-secondary">{t('aiGov.dimDesc')}</p>
         </Reveal>
         <RailDossier
           items={items}

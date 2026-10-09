@@ -73,7 +73,6 @@
       "experts": {
         "seg1": "Der schnellste Weg zu ",
         "seg2": "lokalen Compliance-Experten",
-        "text": "Kein Raten mehr. Holen Sie sich eine maßgeschneiderte Einschätzung und vernetzen Sie sich sofort.",
         "cta": "Jetzt mit Experten vernetzen",
         "usp1": "Sofortiges Matching",
         "usp2": "Geprüfte Experten",
@@ -124,7 +123,6 @@
       "pain2Title": "Die unzuverlässige Expertenfalle",
       "pain2Desc": "Compliance-Anbieter kalt anzuschreiben und wochenlang auf vage Antworten zu warten ist keine Strategie. Es ist ein Haftungsrisiko.",
       "pain3Title": "Wir lösen das",
-      "pain3Desc": "Unser KI-Assistent erfasst Ihren Kontext in 4–5 Schritten, kartiert jurisdiktionsgebundene Risiken und verbindet Sie mit SLA-gesicherten Spezialisten innerhalb von 24–48 Stunden.",
       "diagramTitle": "Vom Kontext zur richtigen Fachperson",
       "node1Label": "Länder-Gate",
       "node1Desc": "Zielmarkt auswählen",
@@ -343,7 +341,6 @@
     "heroOverline": "Compliance-Bereiche",
     "heroTitlePre": "Finden Sie Ihre regulatorische Herausforderung.",
     "heroTitleGold": "Starten Sie hier.",
-    "heroBody": "Jeder Compliance-Bereich ist ein Einstieg zu Ihrem spezifischen Assessment. Identifizieren Sie Ihr Thema, verstehen Sie die Risiken und werden Sie mit einem verifizierten Spezialisten gematcht – alles in unter 5 Minuten.",
     "whoAffected": "Wer ist betroffen",
     "startAssessment": "{{title}}-Assessment starten",
     "riskPanel": {
@@ -403,8 +400,7 @@
         "body": "4–5 präzise Fragen übersetzen Ihre Situation in ein strukturiertes Suchprofil."
       },
       "match": {
-        "title": "Matchen",
-        "body": "Verifizierte Spezialisten werden nach Relevanz, Reaktionszeit und Qualität gerankt."
+        "title": "Matchen"
       },
       "engage": {
         "title": "Anfragen",
@@ -1179,9 +1175,7 @@
   "aiGov": {
     "trustCenter": "CompliHub360 Trust Center",
     "dimTitle": "Die 6 Dimensionen der KI Governance",
-    "dimDesc": "Ein umfassender Ansatz zum Aufbau vertrauenswürdiger KI-Systeme für Unternehmens-Compliance.",
     "dimEthicsTitle": "Ethische Richtlinien",
-    "dimEthicsDesc": "Unsere KI-Funktionen respektieren die menschliche Autonomie und sollen Experten ergänzen, nicht ersetzen. Wir verhindern systemische Vorurteile durch kontinuierliche Überwachung.",
     "dimTranspTitle": "Transparenz & Erklärbarkeit",
     "dimTranspDesc": "Nutzer haben das Recht zu wissen, wann sie mit einer KI interagieren. Jedes KS-generierte Ergebnis auf CompliHub360 ist klar gekennzeichnet und seine Datenquellen sind nachvollziehbar.",
     "dimOrgTitle": "Organisatorische Verantwortung",
@@ -1195,7 +1189,6 @@
     "featTitle": "Aktive KI-Funktionen auf CompliHub360",
     "featDesc": "Wie wir KI heute nutzen, eingebettet in unser strenges Governance-Framework.",
     "featPrivacyTitle": "Privacy Redaction Pipeline",
-    "featPrivacyDesc": "Bevor jeglicher Geschäftskontext analysiert wird, entfernen unsere lokalen NLP-Modelle alle personenbezogenen Daten (PII). E-Mails, Namen und Telefonnummern verlassen niemals unsere sicheren europäischen Server.",
     "featIntentTitle": "Intent Analysis Engine",
     "featIntentDesc": "Wandelt unstrukturierte Kundeneingaben in ein strukturiertes Risikoprofil um. Die KI ist auf die Analyse des Compliance-Kontexts beschränkt und kann keine rechtsverbindlichen Entscheidungen treffen.",
     "featGateTitle": "Dreifacher KI-Gate-Validator",
@@ -1584,50 +1577,12 @@
     "regions": {
       "eyebrow": "Regionen",
       "title": "Wo wir stehen — und wo es hingeht",
-      "lead": "Jede Suche und jede Analyse ist fest in den konkreten Gesetzen des Zielmarkts verankert — damit es keine rechtlichen Blindflüge gibt.",
-      "note": "EU und UK sind voll abgedeckt; Nordamerika ist im Aufbau, APAC startet mit Grundabdeckung. Weitere Länder folgen im Lauf des Jahres 2026.",
-      "tiers": {
-        "full": "Vollständige Abdeckung",
-        "expanding": "Im Aufbau",
-        "core": "Grundabdeckung"
-      },
       "items": {
         "eu": {
-          "name": "Europäische Union",
-          "focus": [
-            "DSGVO-Compliance",
-            "EPR-Verpackungsrecht",
-            "EU-weite USt",
-            "Digital Services Act"
-          ]
+          "name": "Europäische Union"
         },
-        "uk": {
-          "name": "Vereinigtes Königreich",
-          "focus": [
-            "UK-DSGVO",
-            "HMRC-USt-Compliance",
-            "Produktsicherheit (UKCA)",
-            "Arbeitsrecht"
-          ]
-        },
-        "us": {
-          "name": "USA & Kanada",
-          "focus": [
-            "Nexus & Sales Tax",
-            "CCPA/CPRA-Datenschutz",
-            "FTC-Werberegeln",
-            "Außenhandels-Compliance"
-          ]
-        },
-        "au": {
-          "name": "Australien (APAC)",
-          "focus": [
-            "GST-Compliance",
-            "Privacy Act 1988",
-            "Produkthaftung",
-            "Import/Export"
-          ]
-        }
+        "uk": {},
+        "us": {}
       }
     }
   },
@@ -1674,9 +1629,7 @@
       "body": "Plätze sind nicht verkäuflich. Ein bezahlter Platz würde das Match für beide Seiten wertlos machen: Sie träfen den, der am meisten gezahlt hat, und die Fachperson träfe jemanden, dessen Fall sie nicht bedienen kann. Die Eignung ist das einzige Kriterium."
     },
     "specialist": {
-      "kicker": "Was die Fachperson kostet",
-      "title": "Ihr Honorar — beziffert, bevor Sie sich binden.",
-      "body": "Die Beratung selbst ist nicht kostenlos, und wir tun nicht so. Jeder Verified Provider veröffentlicht eine feste Schätzung, bevor Sie das Mandat annehmen — Sie sitzen also kein Erstgespräch ab, nur um den Preis zu erfahren."
+      "kicker": "Was die Fachperson kostet"
     },
     "cta": {
       "title": "Fangen Sie dort an, wo es für Sie Sinn ergibt.",
@@ -1723,8 +1676,7 @@
           "a": "Nein. Plätze sind nicht verkäuflich — ein bezahlter Platz würde das Match für beide Seiten wertlos machen. Die Eignung ist das einzige Kriterium."
         },
         {
-          "q": "Was kostet die Beratung bei der Fachperson?",
-          "a": "Das Honorar legt die Fachperson fest: Jeder Verified Provider veröffentlicht eine feste Schätzung, bevor Sie das Mandat annehmen — Sie sitzen kein Erstgespräch ab, nur um den Preis zu erfahren."
+          "q": "Was kostet die Beratung bei der Fachperson?"
         },
         {
           "q": "Sieht die Fachperson meine Daten vor der Buchung?",

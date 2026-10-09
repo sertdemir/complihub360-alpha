@@ -3,7 +3,8 @@
  * Keeps de/es/tr in key-parity with en by translating only the missing keys
  * through the DeepL API.
  *
- *   node scripts/i18n-translate.mjs --check      # CI gate: fail on any gap
+ *   node scripts/i18n-translate.mjs --check      # CI: list gaps (English first, 2026-10-09)
+ *   node scripts/i18n-translate.mjs --check --strict  # fail on any gap
  *   node scripts/i18n-translate.mjs --dry-run    # list what would be sent
  *   node scripts/i18n-translate.mjs              # translate + write
  *   node scripts/i18n-translate.mjs --lang de --ns home
@@ -337,6 +338,16 @@ if (touched.length) {
 if (check) {
   if (gaps === 0) {
     console.log(`✓ key parity — ${langs.join(", ")} match ${SOURCE}`);
+    process.exit(0);
+  }
+  // English first (decision 2026-10-09, vault: "Erst Englisch fertig, andere
+  // Sprachen pausiert"): new copy is written in English only, and de/es/tr
+  // fall back to it through i18next's fallbackLng. A gap is listed, not a
+  // failure. `--strict` restores the old gate for the localization pass.
+  if (!has("--strict")) {
+    console.log(
+      `\n⚠ ${gaps} key(s) fall back to ${SOURCE} (English first). Run: node scripts/i18n-translate.mjs`,
+    );
     process.exit(0);
   }
   console.error(

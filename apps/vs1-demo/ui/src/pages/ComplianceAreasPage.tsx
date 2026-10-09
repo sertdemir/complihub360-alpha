@@ -150,7 +150,7 @@ export function ComplianceAreasPage() {
             <p className="mt-5 max-w-[56ch] text-body-lg leading-relaxed text-fg-secondary">
               {t(
                 'compliance.heroBody',
-                'Each compliance area is a gateway to your specific assessment. Identify your topic, understand the risks, and get matched with a verified specialist — all in under 5 minutes.',
+                'Each compliance area is a gateway to your specific assessment. Identify your topic, understand your risks in under five minutes, then see your matched specialists.',
               )}
             </p>
           </Reveal>

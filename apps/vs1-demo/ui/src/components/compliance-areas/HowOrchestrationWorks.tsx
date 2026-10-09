@@ -21,7 +21,7 @@ const STEPS = [
     id: 'match',
     icon: Users,
     titleDefault: 'Match',
-    bodyDefault: 'Verified specialists are ranked by relevance, response speed, and quality score.',
+    bodyDefault: 'Verified Providers are ranked by fit, verified expertise and service quality — never by what they pay.',
   },
   {
     id: 'engage',
