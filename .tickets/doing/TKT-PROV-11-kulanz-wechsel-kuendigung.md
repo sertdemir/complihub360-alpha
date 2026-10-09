@@ -122,6 +122,26 @@ wirklich passiert („Zahlung fehlgeschlagen · ein anderes Zahlungsmittel hebt 
 Sperre auf"), ohne eine Frist zu behaupten. Oder `failed-payment retry` wird
 entschieden, dann darf das Wort bleiben.
 
+## Staging — Stand 2026-10-09
+
+Beide Migrationen sind auf `kqylqwogxbiwpnomkzsn` (Staging) eingespielt und
+nachgemessen:
+
+| Repo-Datei | Fassung auf Staging |
+| --- | --- |
+| `20261007000000_billing_cure_period.sql` | `20261009223804 billing_cure_period` — `billing_policy` Fassung 1, 7 Tage, gültig ab 2026-10-07 |
+| `20261009000000_subscription_scheduled_change.sql` | `20261009234815 subscription_scheduled_change` — sechs `scheduled_*`-Spalten, CHECK, FK, Partial Index |
+
+**Der CHECK wurde funktional geprüft**, nicht nur auf Existenz: ein halber
+Zustand (Aktion ohne Stichtag) wird abgewiesen. Die Probe lief in einem Block,
+der sich selbst zurückrollt — danach unverändert 3 Abos, keines vorgemerkt.
+
+**Die Versionsnummern laufen zwischen Repo und Staging auseinander** — der
+Auto-Deploy migriert nicht, also bekommt jede Migration beim Einspielen einen
+neuen Zeitstempel. Das ist nicht neu (`20261004223829` heißt dort
+`20261005000000_nylas_calendar`), aber es heißt: die Reihenfolge im Repo ist
+die Wahrheit, die Nummern auf Staging sind es nicht.
+
 ## Offen, nicht Teil dieses Tickets
 
 `failed-payment retry` und `reactivation rules` aus derselben Spec-B-Liste.
