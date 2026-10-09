@@ -2166,6 +2166,60 @@
       "message": "Aún no cubrimos {{market}}, por lo que estas obligaciones no lo incluyen.",
       "notChecked": "No revisado",
       "notIncluded": "Aún sin cobertura · no incluido en este Risk Map"
+    },
+    "partner": {
+      "loadFailed": {
+        "requests": "No se han podido cargar sus solicitudes",
+        "appointments": "No se han podido cargar sus citas",
+        "invoices": "No se han podido cargar sus facturas",
+        "currentPeriod": "No se ha podido cargar la facturación de este mes",
+        "plan": "No se ha podido cargar su plan",
+        "performance": "No se han podido cargar sus datos de rendimiento",
+        "notifications": "No se han podido cargar sus notificaciones",
+        "coverage": "No se ha podido cargar su cobertura",
+        "message": "No ha cambiado nada en su cuenta. Simplemente no podemos mostrarlo en este momento. Inténtelo de nuevo. Si el problema continúa, contacte con soporte."
+      },
+      "empty": {
+        "appointments": "Todavía no hay citas",
+        "requests": "Todavía no hay solicitudes",
+        "howBookingWorks": "Se crea una cita cuando una empresa le selecciona en los resultados y reserva uno de sus horarios disponibles. Para que eso sea posible:",
+        "closing": "La frecuencia de las reservas depende de la demanda en sus áreas. Su plan no influye en ello.",
+        "invoicesHeading": "Todavía no hay facturas",
+        "invoicesMessage": "Sus facturas aparecerán aquí cuando se haya facturado un plan."
+      },
+      "readiness": {
+        "verified": "Verificación completada",
+        "verifiedSub": "Aprobado para {{areas}} en {{markets}}",
+        "verifying": "Verificación en curso",
+        "verifyingSub": "Nuestro equipo de revisión está comprobando sus documentos.",
+        "plan": "Plan activo",
+        "planSub": "{{plan}} · {{cycle}}",
+        "noPlan": "Todavía sin plan",
+        "noPlanAction": "Elegir un plan",
+        "payment": "Método de pago registrado",
+        "paymentSub": "{{method}}",
+        "noPayment": "Todavía sin método de pago",
+        "noPaymentSub": "Sin un método de pago aparece en los resultados, pero no se le puede reservar.",
+        "noPaymentAction": "Añadir método de pago"
+      },
+      "performance": {
+        "requestsSoFar": "Solicitudes hasta ahora",
+        "sinceApproval": "desde la aprobación el {{date}}",
+        "belowThreshold": "a partir de 5 solicitudes",
+        "thresholdNote": "Una tasa basada en una o dos solicitudes dice poco de usted. Por eso la mostramos a partir de cinco solicitudes."
+      },
+      "coverage": {
+        "heading": "Dónde aparece",
+        "message": "Según lo aprobado por nuestro equipo de revisión. Para cambiarlo, envíe el cambio en Servicios. Se aplica tras la revisión.",
+        "approved": "aprobado",
+        "underReview": "en revisión",
+        "notRequested": "no solicitado",
+        "languages": "Idiomas",
+        "responseTime": "Tiempo de respuesta",
+        "hours": "{{hours}} horas",
+        "submitChange": "Enviar un cambio"
+      },
+      "profileUnavailable": "No se puede acceder a su perfil guardado en este momento. Podrá volver a guardar cuando se haya cargado."
     }
   },
   "errorBoundary": {

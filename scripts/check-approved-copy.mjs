@@ -171,6 +171,65 @@ const VORLAGE = {
     "message": "We don’t cover {{market}} yet, so these obligations don’t include it.",
     "notChecked": "Not checked",
     "notIncluded": "Not covered yet · not included in this map"
+  },
+  // ── Fünfte Abnahme: Partner-Dashboard ohne Fixtures, Canvas-Wahl
+  // A2 · B3 · C3 · D1 · E2 (09.10.2026, „deine Canvas-Empfehlung"), Copy
+  // abgenommen 09.10.2026 („copy ok"). Laden fehlgeschlagen, noch nichts da,
+  // Leistung unter der Schwelle (5 Anfragen), Abdeckung als Spiegel der
+  // Freigabe, Profil nicht geladen. Aktionen: tryAgain + contactSupport.
+  "partner": {
+    "loadFailed": {
+      "requests": "Your requests couldn’t be loaded",
+      "appointments": "Your appointments couldn’t be loaded",
+      "invoices": "Your invoices couldn’t be loaded",
+      "currentPeriod": "This month’s billing couldn’t be loaded",
+      "plan": "Your plan couldn’t be loaded",
+      "performance": "Your performance data couldn’t be loaded",
+      "notifications": "Your notifications couldn’t be loaded",
+      "coverage": "Your coverage couldn’t be loaded",
+      "message": "Nothing in your account has changed. We just can’t show it right now. Please try again. If this keeps happening, contact support."
+    },
+    "empty": {
+      "appointments": "No appointments yet",
+      "requests": "No requests yet",
+      "howBookingWorks": "An appointment is created when a business selects you in the results and books one of your available times. For that to be possible:",
+      "closing": "How often you’re booked depends on demand in your areas. Your plan doesn’t change that.",
+      "invoicesHeading": "No invoices yet",
+      "invoicesMessage": "Your invoices appear here once a plan has been billed."
+    },
+    "readiness": {
+      "verified": "Verification completed",
+      "verifiedSub": "Approved for {{areas}} in {{markets}}",
+      "verifying": "Verification in progress",
+      "verifyingSub": "Our review team is checking your documents.",
+      "plan": "Plan active",
+      "planSub": "{{plan}} · {{cycle}}",
+      "noPlan": "No plan yet",
+      "noPlanAction": "Choose a plan",
+      "payment": "Payment method on file",
+      "paymentSub": "{{method}}",
+      "noPayment": "No payment method yet",
+      "noPaymentSub": "Without one, you appear in the results but can’t be booked.",
+      "noPaymentAction": "Add payment method"
+    },
+    "performance": {
+      "requestsSoFar": "Requests so far",
+      "sinceApproval": "since approval on {{date}}",
+      "belowThreshold": "from 5 requests",
+      "thresholdNote": "A rate based on one or two requests says little about you. That’s why we show it from five requests."
+    },
+    "coverage": {
+      "heading": "Where you appear",
+      "message": "As approved by our review team. To change it, submit the change under Services. It applies after review.",
+      "approved": "approved",
+      "underReview": "under review",
+      "notRequested": "not requested",
+      "languages": "Languages",
+      "responseTime": "Response time",
+      "hours": "{{hours}} hours",
+      "submitChange": "Submit a change"
+    },
+    "profileUnavailable": "Your saved profile can’t be reached right now. Saving works again once it has loaded."
   }
 };
 
