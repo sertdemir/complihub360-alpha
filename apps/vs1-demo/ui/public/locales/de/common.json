@@ -2166,6 +2166,60 @@
       "message": "Wir decken {{market}} noch nicht ab, deshalb enthalten diese Pflichten den Markt nicht.",
       "notChecked": "Nicht geprüft",
       "notIncluded": "Noch nicht abgedeckt · nicht in dieser Risk Map enthalten"
+    },
+    "partner": {
+      "loadFailed": {
+        "requests": "Ihre Anfragen konnten nicht geladen werden",
+        "appointments": "Ihre Termine konnten nicht geladen werden",
+        "invoices": "Ihre Rechnungen konnten nicht geladen werden",
+        "currentPeriod": "Die Abrechnung dieses Monats konnte nicht geladen werden",
+        "plan": "Ihr Tarif konnte nicht geladen werden",
+        "performance": "Ihre Leistungswerte konnten nicht geladen werden",
+        "notifications": "Ihre Benachrichtigungen konnten nicht geladen werden",
+        "coverage": "Ihre Abdeckung konnte nicht geladen werden",
+        "message": "An Ihrem Konto hat sich nichts geändert. Wir können es gerade nur nicht anzeigen. Bitte versuchen Sie es erneut. Wenn es so bleibt, wenden Sie sich an den Support."
+      },
+      "empty": {
+        "appointments": "Noch keine Termine",
+        "requests": "Noch keine Anfragen",
+        "howBookingWorks": "Ein Termin entsteht, wenn ein Unternehmen Sie in den Ergebnissen auswählt und einen Ihrer freien Zeitpunkte bucht. Damit das möglich ist, muss Folgendes erfüllt sein:",
+        "closing": "Wie oft gebucht wird, hängt von der Nachfrage in Ihren Bereichen ab. Ihr Tarif hat darauf keinen Einfluss.",
+        "invoicesHeading": "Noch keine Rechnungen",
+        "invoicesMessage": "Ihre Rechnungen erscheinen hier, sobald ein Tarif abgerechnet wurde."
+      },
+      "readiness": {
+        "verified": "Verifizierung abgeschlossen",
+        "verifiedSub": "Freigegeben für {{areas}} in {{markets}}",
+        "verifying": "Verifizierung läuft",
+        "verifyingSub": "Unser Review-Team prüft Ihre Unterlagen.",
+        "plan": "Tarif läuft",
+        "planSub": "{{plan}} · {{cycle}}",
+        "noPlan": "Noch kein Tarif",
+        "noPlanAction": "Tarif wählen",
+        "payment": "Zahlungsmittel hinterlegt",
+        "paymentSub": "{{method}}",
+        "noPayment": "Noch kein Zahlungsmittel",
+        "noPaymentSub": "Ohne Zahlungsmittel erscheinen Sie in den Ergebnissen, können aber nicht gebucht werden.",
+        "noPaymentAction": "Hinterlegen"
+      },
+      "performance": {
+        "requestsSoFar": "Anfragen bisher",
+        "sinceApproval": "seit Freigabe am {{date}}",
+        "belowThreshold": "ab 5 Anfragen",
+        "thresholdNote": "Eine Quote aus ein oder zwei Anfragen sagt wenig über Sie aus. Deshalb zeigen wir sie erst ab fünf."
+      },
+      "coverage": {
+        "heading": "Wo Sie erscheinen",
+        "message": "So, wie unser Review-Team Ihre Leistungen freigegeben hat. Für eine Änderung reichen Sie sie unter Leistungen ein; sie gilt nach der Prüfung.",
+        "approved": "freigegeben",
+        "underReview": "in Prüfung",
+        "notRequested": "nicht beantragt",
+        "languages": "Sprachen",
+        "responseTime": "Reaktionszeit",
+        "hours": "{{hours}} Stunden",
+        "submitChange": "Änderung einreichen"
+      },
+      "profileUnavailable": "Ihr gespeichertes Profil ist gerade nicht erreichbar. Speichern geht wieder, sobald es geladen ist."
     }
   },
   "errorBoundary": {
