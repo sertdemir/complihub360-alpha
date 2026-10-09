@@ -978,8 +978,7 @@
       "categories": "Kategorien",
       "categoriesUsed": "bis zu {{allowance}} — Sie nutzen {{used}}",
       "discount": "Lead-Rabatt",
-      "discountValue": "{{pct}} % auf die ersten {{n}} belasteten Leads je Monat",
-      "noChangeReason": "Einen Tarifwechsel bieten wir hier noch nicht an. Die Regeln für anteilige Abrechnung und Kündigungsfristen stehen noch nicht fest; bis dahin machen wir es von Hand, damit nichts berechnet wird, dem Sie nicht zugestimmt haben. Schreiben Sie an {{mail}}."
+      "discountValue": "{{pct}} % auf die ersten {{n}} belasteten Leads je Monat"
     },
     "blocked": {
       "suspended": {
@@ -992,6 +991,38 @@
       }
     },
     "cadenceMonthlyAdj": "monatlich",
-    "cadenceAnnualAdj": "jährlich"
+    "cadenceAnnualAdj": "jährlich",
+    "manage": {
+      "change": "Tarif wechseln",
+      "cancel": "Abo kündigen",
+      "dismiss": "Abbrechen",
+      "bothTakeEffect": "Beides wirkt zum {{date}} — bis dahin ändert sich nichts.",
+      "changeTitle": "Auf {{plan}} wechseln?",
+      "changeIntro": "Der Wechsel wird vorgemerkt. Bis zum Stichtag läuft alles unverändert weiter.",
+      "scheduleFor": "Zum {{date}} vormerken",
+      "pickTarget": "Neuer Tarif",
+      "current": "Ihr Tarif",
+      "someTooSmall": "Tarife, die weniger als Ihre {{used}} freigegebenen Hauptkategorien tragen, sind nicht wählbar — sie würden Sie zum Stichtag deaktivieren.",
+      "untilDate": "Bis {{date}}",
+      "fromDate": "Ab {{date}}",
+      "factProrata": "Anteilig wird nichts berechnet und nichts erstattet.",
+      "factWithdraw": "Zurücknehmen können Sie den Wechsel bis zum {{date}}.",
+      "factRanking": "An Ihrer Sichtbarkeit in den Ergebnissen ändert ein Tarif nichts.",
+      "cancelTitle": "Abo zum {{date}} kündigen?",
+      "cancelIntro": "{{plan}} läuft bis dahin vollständig weiter: Sie nehmen Buchungen an, Ihr Lead-Rabatt gilt, und zurücknehmen können Sie die Kündigung jederzeit. Erstattet wird nichts, berechnet aber auch nichts darüber hinaus.",
+      "cancelFor": "Zum {{date}} kündigen",
+      "cancelKeeps": "Ihr Konto, Ihre Nachweise und Ihre freigegebenen Leistungen bleiben bestehen. Ohne Tarif nehmen Sie ab dem Stichtag keine kostenpflichtigen Buchungen mehr an.",
+      "reasonLabel": "Woran lag es?",
+      "optional": "Freiwillig",
+      "reasonHint": "Hilft uns beim Nachbessern. Ihre Kündigung gilt auch ohne Antwort, und niemand meldet sich deswegen bei Ihnen.",
+      "bandChange": "Ab {{date}}: {{plan}}",
+      "bandCancel": "Ihr Abo endet am {{date}}",
+      "bandBody": "Vorgemerkt am {{requested}}. Bis zum Stichtag läuft {{plan}} unverändert weiter — Buchungen, Abrechnung und Rabatt bleiben, wie sie sind.",
+      "withdraw": "Zurücknehmen",
+      "errAllowance": "Dieser Tarif trägt {{allowance}} Hauptkategorien, für Ihr Konto sind {{used}} freigegeben.",
+      "errAlready": "Es ist bereits etwas vorgemerkt. Nehmen Sie das zuerst zurück.",
+      "errSame": "Das ist bereits Ihr laufender Tarif.",
+      "errFailed": "Das hat gerade nicht geklappt. Bitte noch einmal versuchen."
+    }
   }
 }

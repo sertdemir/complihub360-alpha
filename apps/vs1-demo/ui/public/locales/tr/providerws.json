@@ -978,8 +978,7 @@
       "categories": "Kategoriler",
       "categoriesUsed": "en fazla {{allowance}} — {{used}} tanesini kullanıyorsunuz",
       "discount": "Lead indirimi",
-      "discountValue": "Her ay ücretlendirilen ilk {{n}} lead için %{{pct}}",
-      "noChangeReason": "Tarife değişikliğini burada henüz sunmuyoruz. Oransal ücretlendirme ve fesih bildirim süresi kuralları henüz belirlenmedi; o zamana kadar bunu elle yapıyoruz, böylece onaylamadığınız hiçbir şey tahsil edilmez. {{mail}} adresine yazın."
+      "discountValue": "Her ay ücretlendirilen ilk {{n}} lead için %{{pct}}"
     },
     "blocked": {
       "suspended": {
@@ -992,6 +991,38 @@
       }
     },
     "cadenceMonthlyAdj": "aylık",
-    "cadenceAnnualAdj": "yıllık"
+    "cadenceAnnualAdj": "yıllık",
+    "manage": {
+      "change": "Planı değiştir",
+      "cancel": "Aboneliği iptal et",
+      "dismiss": "Vazgeç",
+      "bothTakeEffect": "Her ikisi de {{date}} tarihinde geçerli olur; o güne kadar hiçbir şey değişmez.",
+      "changeTitle": "{{plan}} planına geçilsin mi?",
+      "changeIntro": "Değişiklik planlanır. Yürürlük tarihine kadar her şey aynı kalır.",
+      "scheduleFor": "{{date}} için planla",
+      "pickTarget": "Yeni plan",
+      "current": "mevcut planınız",
+      "someTooSmall": "Yayına alınmış {{used}} ana kategorinizden azını kapsayan planlar seçilemez; yürürlük tarihinde hesabınızı devre dışı bırakırlardı.",
+      "untilDate": "{{date}} tarihine kadar",
+      "fromDate": "{{date}} tarihinden itibaren",
+      "factProrata": "Oransal bir hesaplama yapılmaz, iade de edilmez.",
+      "factWithdraw": "Değişikliği {{date}} tarihine kadar geri alabilirsiniz.",
+      "factRanking": "Planınız arama sonuçlarındaki görünürlüğünüzü hiçbir zaman etkilemez.",
+      "cancelTitle": "Abonelik {{date}} tarihinde iptal edilsin mi?",
+      "cancelIntro": "{{plan}} o güne kadar tam olarak devam eder: rezervasyon almaya devam edersiniz, lead indiriminiz geçerlidir ve iptali istediğiniz zaman geri alabilirsiniz. İade yapılmaz, o tarihten sonrası için de ücret alınmaz.",
+      "cancelFor": "{{date}} itibarıyla iptal et",
+      "cancelKeeps": "Hesabınız, belgeleriniz ve yayına alınmış hizmetleriniz kalır. Plan olmadan, yürürlük tarihinden itibaren ücretli rezervasyon almazsınız.",
+      "reasonLabel": "Sebebi neydi?",
+      "optional": "İsteğe bağlı",
+      "reasonHint": "Gelişmemize yardımcı olur. İptaliniz yanıt olmadan da geçerlidir ve kimse bu yüzden sizinle iletişime geçmez.",
+      "bandChange": "{{date}} tarihinden itibaren: {{plan}}",
+      "bandCancel": "Aboneliğiniz {{date}} tarihinde sona eriyor",
+      "bandBody": "{{requested}} tarihinde planlandı. Yürürlük tarihine kadar {{plan}} değişmeden devam eder; rezervasyonlar, faturalama ve indirim aynı kalır.",
+      "withdraw": "Geri al",
+      "errAllowance": "Bu plan {{allowance}} ana kategori kapsar, hesabınızda ise {{used}} kategori yayına alınmış.",
+      "errAlready": "Hâlihazırda planlanmış bir işlem var. Önce onu geri alın.",
+      "errSame": "Bu zaten mevcut planınız.",
+      "errFailed": "Bu şu anda işe yaramadı. Lütfen tekrar deneyin."
+    }
   }
 }

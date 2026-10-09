@@ -200,6 +200,20 @@ Wizard, Empty State, Table, AppShell.
 Each Compass component manual (per Getting Started §07) documents: ① Anatomie · ② Variants & States ·
 ③ Props & API · ④ A11y · ⑤ Do/Don't · ⑥ Code-Snippet.
 
+**Added 2026-10-09 (TKT-PROV-11):** page `🧾 Provider · Tarifwahl` gained four frames for the
+scheduled change and cancellation (ADR-0006 B2/C2) — `Tarif läuft — Wechsel & Kündigung (1·V2)`,
+`… etwas ist vorgemerkt (3·V1)`, `Wechsel — Dialog mit Vorher/Nachher (2·V3)` and
+`Kündigen — Dialog mit freiwilligem Grund (4·V3)`, plus a second reading guide. Two rules came out
+of building them:
+
+- **A scheduled change is `info`, never Accent-Gold.** The canvas draft used a gold band; gold is
+  reserved for Verified Partner. Notices that carry no monetization signal use `bg/info-light` +
+  `border/info`, with `text/brand` on the date line.
+- **A 6 % tint is not a token.** `bg-brand/[0.06]` in code became `bg/brand-light` (#EBF1F0,
+  `--color-bg-brand-light`) on both sides. Figma also drops a paint's `opacity` when the colour is
+  bound to a variable in the same assignment — the fill renders solid. Bind the tint token, don't
+  tint the base token.
+
 **Added 2026-10-04 (TKT-PROV-09):** `Card / Plan` on the Cards page — the plan card for
 `/subscription`: plan name, amount, unit, optional annual alternative, five individually optional
 feature rows, CTA as an exposed Button instance. No highlight state and no seal: a "most popular

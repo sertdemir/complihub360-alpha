@@ -44,7 +44,7 @@ Migration auskommt.
 - [x] Tests samt Gegenproben: Tag 0, Tag 7, Tag 8; und dass die **Sichtbarkeit**
       unberührt bleibt (Spec A §14).
 
-### Stufe 2 — Wechsel und Kündigung  🔄 Backend fertig, Oberfläche im Canvas
+### Stufe 2 — Wechsel und Kündigung  ✅ Backend, Figma und Oberfläche fertig
 
 - [x] Migration: `provider_subscriptions` bekommt den vorgemerkten Zustand
       (Stichtag + Zieltarif). Versionsnummer **nach** allem, was auf Staging
@@ -58,11 +58,11 @@ Migration auskommt.
       still deaktivieren. Ablehnung mit konkretem Grund.
 - [x] **Eine offene Rechnung darf die Kündigung nicht blockieren** — sonst
       verstellt die Sperre den Ausgang.
-- [ ] Oberfläche: Zustand F in `/subscription` bekommt Wechsel und Kündigung
+- [x] Oberfläche: Zustand F in `/subscription` bekommt Wechsel und Kündigung
       mit Stichtag. **Der heutige Text dort wird falsch** und muss weg — er
       sagt, dass es beides nicht gibt.
-- [~] Benachrichtigungen stehen (`subscription_scheduled`,
-      `subscription_schedule_done`). Copy folgt mit der Oberfläche.
+- [x] Benachrichtigungen (`subscription_scheduled`, `subscription_schedule_done`)
+      und Copy in vier Sprachen (`subscription.manage.*`, 30 Schlüssel).
 - [x] Tests samt Gegenproben, besonders: Jahresabo kündigen endet zur
       Verlängerung, nicht zum Monatsende. 23 + 5 Tests.
 

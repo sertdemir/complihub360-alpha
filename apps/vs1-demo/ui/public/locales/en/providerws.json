@@ -978,8 +978,7 @@
       "categories": "Categories",
       "categoriesUsed": "up to {{allowance}} — you use {{used}}",
       "discount": "Lead discount",
-      "discountValue": "{{pct}} % on the first {{n}} charged leads each month",
-      "noChangeReason": "We do not offer a plan change here yet. The rules for proration and cancellation notice are not settled; until they are, we do it by hand, so nothing is charged that you have not agreed to. Write to {{mail}}."
+      "discountValue": "{{pct}} % on the first {{n}} charged leads each month"
     },
     "blocked": {
       "suspended": {
@@ -992,6 +991,38 @@
       }
     },
     "cadenceMonthlyAdj": "monthly",
-    "cadenceAnnualAdj": "annual"
+    "cadenceAnnualAdj": "annual",
+    "manage": {
+      "change": "Change plan",
+      "cancel": "Cancel subscription",
+      "dismiss": "Cancel",
+      "bothTakeEffect": "Both take effect on {{date}} — nothing changes before then.",
+      "changeTitle": "Switch to {{plan}}?",
+      "changeIntro": "The change is scheduled. Everything runs unchanged until the effective date.",
+      "scheduleFor": "Schedule for {{date}}",
+      "pickTarget": "New plan",
+      "current": "your plan",
+      "someTooSmall": "Plans covering fewer than your {{used}} released main categories cannot be selected — they would deactivate you on the effective date.",
+      "untilDate": "Until {{date}}",
+      "fromDate": "From {{date}}",
+      "factProrata": "Nothing is prorated and nothing is refunded.",
+      "factWithdraw": "You can withdraw the change until {{date}}.",
+      "factRanking": "Your plan never affects your visibility in search results.",
+      "cancelTitle": "Cancel your subscription on {{date}}?",
+      "cancelIntro": "{{plan}} runs in full until then: you keep accepting bookings, your lead discount applies, and you can withdraw the cancellation at any time. Nothing is refunded, and nothing is charged beyond that date.",
+      "cancelFor": "Cancel as of {{date}}",
+      "cancelKeeps": "Your account, your evidence and your released services remain. Without a plan you stop accepting chargeable bookings from the effective date.",
+      "reasonLabel": "What led to this?",
+      "optional": "Optional",
+      "reasonHint": "Helps us improve. Your cancellation applies without an answer, and nobody will contact you about it.",
+      "bandChange": "From {{date}}: {{plan}}",
+      "bandCancel": "Your subscription ends on {{date}}",
+      "bandBody": "Scheduled on {{requested}}. Until the effective date {{plan}} runs unchanged — bookings, billing and discount stay as they are.",
+      "withdraw": "Withdraw",
+      "errAllowance": "This plan covers {{allowance}} main categories, but {{used}} are released for your account.",
+      "errAlready": "Something is already scheduled. Withdraw that first.",
+      "errSame": "That is already your running plan.",
+      "errFailed": "That did not work just now. Please try again."
+    }
   }
 }
