@@ -27,9 +27,9 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key, i18n: { resolvedLanguage: 'en' } }),
 }));
 
-function renderPage() {
+function renderPage(extra = '') {
   return render(
-    <MemoryRouter initialEntries={[`/en/p/a1b2c3d4e5f6/book?slot=${encodeURIComponent(SLOT)}`]}>
+    <MemoryRouter initialEntries={[`/en/p/a1b2c3d4e5f6/book?slot=${encodeURIComponent(SLOT)}${extra}`]}>
       <Routes>
         <Route path="/:locale/p/:ref/book" element={<ProviderSchedulePage />} />
       </Routes>
@@ -77,5 +77,29 @@ describe('ProviderSchedulePage · Booking processing', () => {
 
     await waitFor(() => expect(screen.getByText('schedule.failed')).toBeInTheDocument());
     expect(screen.queryByText(HEADING)).not.toBeInTheDocument();
+  });
+});
+
+// Befund Testlauf Phase 4 (2026-10-09): ohne Sitzung rechnet der Server mit
+// allen Maerkten des Anbieters. Die Terminseite muss sie mitschicken.
+describe('ProviderSchedulePage · Sitzung', () => {
+  beforeEach(() => { createBooking.mockReset(); createBooking.mockReturnValue(new Promise(() => {})); });
+
+  it('schickt die Sitzung aus ?session= mit', async () => {
+    renderPage('&session=s-123');
+    const knopf = screen.getByRole('button', { name: 'schedule.confirmCta' });
+    await waitFor(() => expect(knopf).toBeEnabled());
+    fireEvent.click(knopf);
+    await waitFor(() => expect(createBooking).toHaveBeenCalled());
+    expect(createBooking.mock.calls[0][2]).toMatchObject({ sessionId: 's-123', acknowledgementVersion: 'booking-ack-v1' });
+  });
+
+  it('erfindet keine Sitzung, wenn keine da ist', async () => {
+    renderPage();
+    const knopf = screen.getByRole('button', { name: 'schedule.confirmCta' });
+    await waitFor(() => expect(knopf).toBeEnabled());
+    fireEvent.click(knopf);
+    await waitFor(() => expect(createBooking).toHaveBeenCalled());
+    expect(createBooking.mock.calls[0][2].sessionId).toBeUndefined();
   });
 });
