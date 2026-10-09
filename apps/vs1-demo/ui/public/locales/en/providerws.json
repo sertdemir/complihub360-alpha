@@ -359,7 +359,6 @@
     "newBannerTitle_one": "{{count}} new request since you last checked",
     "newBannerTitle_other": "{{count}} new requests since you last checked",
     "newBannerBody": "Magic-link emails sent · they'll appear here too",
-    "fixtureBannerTitle": "2 new requests since you last checked · 12 min ago",
     "markAllSeen": "Mark all seen",
     "filterAwaitingConfirmation": "Awaiting confirmation",
     "filterAwaitingReply": "Awaiting reply",
@@ -372,8 +371,6 @@
     "actionView": "View",
     "sortSla": "Sort: SLA urgency",
     "emptyTitle": "No requests yet",
-    "emptyDescription": "Your profile is live. New requests land here + in your inbox as magic-links — most partners receive their first request within 5 days.",
-    "previewProfile": "Preview public profile",
     "companyAnonymized": "🔒 Anonymized request"
   },
   "settings": {
@@ -402,7 +399,6 @@
     "bioLabel": "Bio · 280 chars max · used in search results",
     "contactEmailTitle": "Contact email · routing-critical",
     "contactEmailBody": "This is where new request magic-links arrive. If this email bounces, your visibility pauses until fixed (§11.2).",
-    "verifiedTag": "✓ verified · no bounces 90d",
     "changeEmail": "Change email",
     "workspaceTitle": "Workspace",
     "workspaceSub": "Destructive actions — each asks for explicit confirmation",

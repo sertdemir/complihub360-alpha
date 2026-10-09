@@ -1,155 +1,118 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ProviderShell } from '../../components/provider/ProviderShell';
-import { RankingImpactDrawer } from '../../components/provider/ProviderDrawers';
-import { AddMarketDrawer } from '../../components/provider/AddMarketDrawer';
-import { Banner } from '../../components/ui/Banner';
+import { LoadFailedState } from '../../components/provider/WorkspaceStates';
 import { Button } from '../../components/ui/Button';
-import { FilterChip } from '../../components/ui/Badge';
-import { DomainCard } from '../../components/ui/DomainCard';
-import { Card } from '../../components/ui/Card';
+import { Tag } from '../../components/ui/Tag';
+import { useWorkspaceData } from '../../lib/useWorkspaceData';
+import { useRequestContext } from '../../lib/requestContext';
+import { fetchVerification, type CoverageStatus, type MatrixRow } from '../../api/application';
+import { fetchCoverage } from '../../api/provider';
 
 // ─── Provider /coverage ───────────────────────────────────────────────────────
-// Mirrors "Provider · /coverage · + Languages & SLA" (2694:2): rank banner ·
-// public identity · markets + languages chips · domain cards · gold expansion
-// banner · SLA target picker. Design fixture data until the profile API lands.
+// TKT-PROV-12, Canvas-Wahl D1 (09.10.2026); Figma: Screens-Datei, Seite
+// „Partner ohne Fixtures", 3628:1015.
+//
+// Ein lesender Spiegel der Freigabe: dieselbe Matrix Leistung × Land, die das
+// Matching liest. Aenderungen laufen ueber Verifizierung → Leistungen & Laender
+// (Change-Control). Bis TKT-PROV-12 war die ganze Seite Fixture (Maerkte
+// DE/AT/NL/CH, Bereiche VAT/EPR/DAT, ein Rang-Banner), und „Markt hinzufuegen"
+// schrieb an der Verifizierung vorbei direkt in `countries_supported`.
 
-function SectionHeader({ title, sub, editLabel }: { title: string; sub: string; editLabel: string }) {
-  // v2 polish: edit links point at the real self-service surface (Settings →
-  // Matchmaking panel) instead of a dead anchor.
-  const { i18n } = useTranslation('providerws');
-  const base = `/${i18n.resolvedLanguage || 'en'}/partner-dashboard/settings`;
-  return (
-    <div className="flex items-start justify-between gap-4">
-      <div>
-        <h2 className="text-[15px] font-semibold text-fg">{title}</h2>
-        <p className="mt-0.5 text-[12px] text-fg-tertiary">{sub}</p>
-      </div>
-      <Link to={base} className="shrink-0 text-[12px] font-medium text-fg-brand underline-offset-2 hover:underline">{editLabel}</Link>
-    </div>
-  );
+type CellView = { tone: 'success' | 'warning' | 'neutral'; key: 'approved' | 'underReview' | 'notRequested' } | null;
+
+/** Abgelehnt, ausgesetzt oder abgelaufen steht als Strich — „nicht beantragt"
+ *  waere dort falsch, und eine eigene Copy dafuer ist nicht abgenommen. */
+export function cellView(status: CoverageStatus | undefined): CellView {
+  if (!status) return { tone: 'neutral', key: 'notRequested' };
+  if (status === 'approved' || status === 'limited') return { tone: 'success', key: 'approved' };
+  if (status === 'pending') return { tone: 'warning', key: 'underReview' };
+  return null;
 }
-
-// Rank figures are design-fixture data; the visible labels come from providerws.
-const MARKETS = [
-  { labelKey: 'coverage.marketGermany', selected: true },
-  { labelKey: 'coverage.marketAustria', selected: true },
-  { labelKey: 'coverage.marketNetherlands', selected: false },
-  { labelKey: 'coverage.marketSwitzerland', selected: false },
-];
-
-const DOMAINS = [
-  { eyebrow: 'VAT', titleKey: 'coverage.domainVatTitle', metaKey: 'coverage.domainVatMeta' },
-  { eyebrow: 'EPR', titleKey: 'coverage.domainEprTitle', metaKey: 'coverage.domainEprMeta' },
-  { eyebrow: 'DAT', titleKey: 'coverage.domainDatTitle', metaKey: 'coverage.domainDatMeta' },
-];
-
-// Language names stay endonyms (Deutsch, English, …) — they are not translated.
-const LANGUAGES = [
-  { label: '✓ Deutsch', selected: true }, { label: '✓ English', selected: true }, { label: '✓ Italiano', selected: true },
-  { label: 'Français', selected: false }, { label: 'Español', selected: false }, { label: 'Nederlands', selected: false }, { label: 'Polski', selected: false },
-];
-
-const SLA = [
-  { titleKey: 'coverage.sla6hTitle', subKey: 'coverage.sla6hSub', selected: false },
-  { titleKey: 'coverage.sla12hTitle', subKey: 'coverage.sla12hSub', selected: true },
-  { titleKey: 'coverage.sla24hTitle', subKey: 'coverage.sla24hSub', selected: false },
-];
 
 export function CoveragePage() {
   const { t, i18n } = useTranslation('providerws');
-  const [rankingOpen, setRankingOpen] = useState(false);
-  // B5: "+ Add market" → drawer; freshly added markets show as pending chips.
-  const [addOpen, setAddOpen] = useState(false);
-  const [pending, setPending] = useState<string[]>([]);
+  const locale = i18n.resolvedLanguage || 'en';
+  const navigate = useNavigate();
+  const { markt } = useRequestContext();
+  const ver = useWorkspaceData(fetchVerification);
+  const profile = useWorkspaceData(fetchCoverage);
+
+  const rows: MatrixRow[] = ver.data?.matrix ?? [];
+  const countries = useMemo(
+    () => [...new Set(rows.flatMap((r) => r.cells.map((c) => c.country_code)))].sort(),
+    [rows],
+  );
+  const languageName = useMemo(() => {
+    try { return new Intl.DisplayNames([locale], { type: 'language' }); } catch { return null; }
+  }, [locale]);
+  const languages = (profile.data?.languages ?? [])
+    .map((l) => { try { return languageName?.of(l.toLowerCase()) ?? l; } catch { return l; } })
+    .join(', ');
+
   return (
     <ProviderShell>
-      <div className="mx-auto max-w-[1140px] space-y-6">
-        <div className="flex items-start justify-between gap-4">
-          <h1 className="font-serif text-[30px] font-bold leading-tight text-fg">{t('coverage.title')}</h1>
-          <div className="mt-1 flex shrink-0 items-center gap-4">
-            <Link to={`/${i18n.resolvedLanguage || 'en'}/partner-dashboard/settings`} className="text-[12px] font-medium text-fg underline underline-offset-2">{t('coverage.previewProfile')}</Link>
-            <Button size="sm" onClick={() => setRankingOpen(true)}>{t('coverage.viewRankingImpact')}</Button>
-          </div>
-        </div>
-        <p className="-mt-4 max-w-4xl text-body-sm leading-relaxed text-fg-secondary">
-          {t('coverage.subtitle')}
-        </p>
-
-        <Banner status="brand" title={t('coverage.rankBannerTitle')}>
-          {t('coverage.rankBannerBody')}
-        </Banner>
-
-        <section className="space-y-3">
-          <SectionHeader title={t('coverage.publicIdentityTitle')} sub={t('coverage.publicIdentitySub')} editLabel={t('coverage.edit')} />
-          <Card styleVariant="outlined" className="flex items-center gap-4 p-4">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-accent text-[13px] font-bold text-fg-on-accent">SP</span>
-            <div className="min-w-0">
-              <p className="font-serif text-[17px] font-semibold text-fg">Schmidt & Partner Steuerberatungsgesellschaft mbH</p>
-              <p className="mt-0.5 truncate text-[12px] text-fg-secondary">
-                Steuerberatungskanzlei · Hamburg · 6 Partner, 18 Mitarbeitende · grenzüberschreitende USt und OSS, EPR & Verpackung, Datenschutz für Online-Händler und Marktplatz-Verkäufer.
-              </p>
+      <div className="mx-auto max-w-[1140px] space-y-5">
+        {ver.state === 'loading' && <div aria-busy="true" className="h-40 animate-pulse rounded-xl bg-surface-secondary/60 motion-reduce:animate-none" />}
+        {ver.state === 'error' && <LoadFailedState surface="coverage" error={ver.error} onRetry={ver.reload} />}
+        {ver.state === 'ready' && (
+          <>
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.09em] text-fg-brand">{t('shell.navCoverage')}</p>
+              <h1 className="mt-1 font-serif text-[30px] font-bold leading-tight text-fg">{t('common:states.partner.coverage.heading')}</h1>
+              <p className="mt-2 max-w-3xl text-body-sm leading-relaxed text-fg-secondary">{t('common:states.partner.coverage.message')}</p>
             </div>
-          </Card>
-        </section>
 
-        <section className="space-y-3">
-          <SectionHeader title={t('coverage.marketsTitle')} sub={t('coverage.marketsSub')} editLabel={t('coverage.edit')} />
-          <div className="flex flex-wrap items-center gap-2.5">
-            {MARKETS.map((m) => (
-              <FilterChip key={m.labelKey} selected={m.selected}>{t(m.labelKey)}</FilterChip>
-            ))}
-            {pending.map((c) => (
-              <FilterChip key={c} selected>{t('coverage.pendingMarketChip', { code: c })}</FilterChip>
-            ))}
-            <FilterChip selected={false} onClick={() => setAddOpen(true)}>{t('coverage.addMarketChip')}</FilterChip>
-          </div>
-        </section>
+            {rows.length > 0 && (
+              <div className="overflow-x-auto rounded-xl border border-stroke">
+                <table className="w-full min-w-[560px] border-collapse text-left">
+                  <thead className="bg-surface-secondary/60">
+                    <tr>
+                      <th scope="col" className="px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{t('application.chapter.services')}</th>
+                      {countries.map((c) => (
+                        <th key={c} scope="col" className="px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{markt(c)}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((r) => (
+                      <tr key={r.service_id} className="border-t border-stroke-subtle">
+                        <th scope="row" className="px-5 py-3.5 text-[13px] font-normal text-fg">{r.service_name}</th>
+                        {countries.map((c) => {
+                          const v = cellView(r.cells.find((x) => x.country_code === c)?.status);
+                          return (
+                            <td key={c} className="px-5 py-3.5" data-cell={`${r.service_code}:${c}`}>
+                              {v ? <Tag tone={v.tone}>{t(`common:states.partner.coverage.${v.key}`)}</Tag> : <span className="text-fg-tertiary">—</span>}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
 
-        <section className="space-y-3">
-          <SectionHeader title={t('coverage.domainsTitle')} sub={t('coverage.domainsSub')} editLabel={t('coverage.edit')} />
-          <div className="grid gap-3 lg:grid-cols-3">
-            {DOMAINS.map((d) => (
-              <DomainCard key={d.eyebrow} eyebrow={d.eyebrow} title={t(d.titleKey)} meta={t(d.metaKey)} interactive />
-            ))}
-          </div>
-        </section>
-
-        <Banner
-          status="accent"
-          title={t('coverage.expansionBannerTitle')}
-          action={<Button size="sm" variant="primary">{t('coverage.exploreExpansion')}</Button>}
-        >
-          {t('coverage.expansionBannerBody')}
-        </Banner>
-
-        <section className="space-y-3">
-          <SectionHeader title={t('coverage.languagesTitle')} sub={t('coverage.languagesSub')} editLabel={t('coverage.edit')} />
-          <div className="flex flex-wrap items-center gap-2">
-            {LANGUAGES.map((l) => (
-              <FilterChip key={l.label} size="sm" selected={l.selected}>{l.label}</FilterChip>
-            ))}
-          </div>
-        </section>
-
-        <section className="space-y-3">
-          <SectionHeader title={t('coverage.slaTitle')} sub={t('coverage.slaSub')} editLabel={t('coverage.edit')} />
-          <div className="grid gap-3 lg:grid-cols-3">
-            {SLA.map((s) => (
-              <Card key={s.titleKey} styleVariant="outlined" interactive selected={s.selected} className="p-4">
-                <p className={s.selected ? 'text-[14px] font-semibold text-fg-brand' : 'text-[14px] font-semibold text-fg'}>{t(s.titleKey)}</p>
-                <p className="mt-0.5 text-[11px] text-fg-tertiary">{t(s.subKey)}</p>
-              </Card>
-            ))}
-          </div>
-          <p className="text-[11px] text-fg-tertiary">
-            {t('coverage.slaNote')}
-          </p>
-        </section>
+            <div className="flex flex-wrap items-center gap-x-7 gap-y-3">
+              {languages && (
+                <p className="text-[13px] text-fg-secondary">
+                  <span className="mr-2 font-medium text-fg">{t('common:states.partner.coverage.languages')}</span>{languages}
+                </p>
+              )}
+              {profile.data?.sla_target_confirm_hours != null && (
+                <p className="text-[13px] text-fg-secondary">
+                  <span className="mr-2 font-medium text-fg">{t('common:states.partner.coverage.responseTime')}</span>
+                  {t('common:states.partner.coverage.hours', { hours: profile.data.sla_target_confirm_hours })}
+                </p>
+              )}
+              <Button size="sm" variant="secondary" className="ml-auto" onClick={() => navigate(`/${locale}/partner-dashboard/application`)}>
+                {t('common:states.partner.coverage.submitChange')}
+              </Button>
+            </div>
+          </>
+        )}
       </div>
-      <RankingImpactDrawer open={rankingOpen} onClose={() => setRankingOpen(false)} />
-      <AddMarketDrawer open={addOpen} onClose={() => setAddOpen(false)} onAdded={(c) => setPending((p) => (p.includes(c) ? p : [...p, c]))} />
     </ProviderShell>
   );
 }

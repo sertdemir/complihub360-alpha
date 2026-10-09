@@ -4,7 +4,8 @@ import { ProviderShell } from '../../components/provider/ProviderShell';
 import { Tag } from '../../components/ui/Tag';
 import { Button } from '../../components/ui/Button';
 import { Drawer } from '../../components/ui/Drawer';
-import { useApiData } from '../../lib/useApiData';
+import { useWorkspaceData } from '../../lib/useWorkspaceData';
+import { LoadFailedState, ReadinessEmpty, useReadiness } from '../../components/provider/WorkspaceStates';
 import { money } from '../../api/billing';
 import {
   fetchProviderBookings, reportProposal, submitReview,
@@ -46,19 +47,6 @@ interface Row {
   proposal: LeadProposal | null;
 }
 
-const lead = (band: 1 | 2 | 3 | 4, standard: number, pct: number, seq: number | null, status: ProviderBookingLead['paymentStatus'] = 'captured'): ProviderBookingLead =>
-  ({ band, standardFeeCents: standard, discountPct: pct, discountSequence: seq, finalFeeCents: Math.round(standard * (100 - pct) / 100), currency: 'USD', paymentStatus: status, feeEnabled: true });
-
-// Kein "Video-Call" mehr: das Format kennen wir nicht, nur die Dauer.
-const FIXTURE: Row[] = [
-  { id: 'fx-1', start: '2026-08-12T10:00:00', dateLine: 'Mo., 12. Aug. 2026', timeLine: '10:00–10:30', minutes: 30, company: 'Acme GmbH', email: 'alex.weber@acme.example', category: 'tax-vat', country: 'IT', meta: 'VAT-Registrierung Italien · D2C + Amazon · €145k IT-Umsatz', status: 'confirmed', leadCharged: true,
-    lead: lead(2, 14900, 10, 2), userDiscountPct: 10, proposal: { proposalIssued: true, discountShown: true, reportedAt: '2026-08-02T09:00:00Z' } },
-  { id: 'fx-2', start: '2026-08-14T09:30:00', dateLine: 'Mi., 14. Aug. 2026', timeLine: '09:30–10:00', minutes: 30, company: 'Brunnen Living Ltd.', email: 'ops@brunnen.example', category: 'tax-vat', country: 'GB', meta: 'OSS-Meldung + Fiskalvertretung · Marketplace EU-weit', status: 'confirmed', leadCharged: true,
-    lead: lead(4, 49900, 0, null), userDiscountPct: 10, proposal: null },
-  { id: 'fx-3', start: '2026-07-29T11:00:00', dateLine: 'Di., 29. Juli 2026', timeLine: '11:00–11:30', minutes: 30, company: null, email: 'alex.weber@acme.example', category: 'tax-vat', country: 'IT', meta: 'VAT-Registrierung Italien · stattgefunden', status: 'completed', leadCharged: true,
-    lead: lead(2, 14900, 10, 1), userDiscountPct: 10, proposal: { proposalIssued: true, discountShown: false, reportedAt: '2026-07-30T14:00:00Z' } },
-];
-
 const STATUS_TONE: Record<BookingStatus, 'success' | 'neutral' | 'error' | 'warning'> = {
   confirmed: 'success', completed: 'neutral', cancelled: 'error', no_show: 'warning',
 };
@@ -69,7 +57,7 @@ export function LeadsPage() {
   const { t, i18n } = useTranslation('providerws');
   const locale = i18n.resolvedLanguage || 'en';
   const { bereich, markt } = useRequestContext();
-  const { data: rows } = useApiData<Row[]>(async () => {
+  const { data, state, error, reload } = useWorkspaceData<Row[]>(async () => {
     const df = new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
     const tf = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' });
     return (await fetchProviderBookings()).map((b) => {
@@ -92,7 +80,10 @@ export function LeadsPage() {
         proposal: b.proposal,
       };
     });
-  }, FIXTURE);
+  }, [locale]);
+  const rows = data ?? [];
+  // B3: die Bereitschafts-Liste nur laden, wenn wirklich nichts da ist.
+  const readiness = useReadiness(state === 'ready' && rows.length === 0);
   const [dossierFor, setDossierFor] = useState<Row | null>(null);
   // Two-sided reviews (alerts concept §2): provider rates the lead after the
   // appointment — feeds the internal lead-quality signal.
@@ -216,10 +207,21 @@ export function LeadsPage() {
           </h1>
           <p className="mt-1 text-body-sm text-fg-secondary">{t('termine.sub')}</p>
         </div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.05em] text-fg-tertiary">{t('termine.upcoming')}</p>
-        <div className="space-y-2.5">{upcoming.length ? upcoming.map(card) : <p className="text-body-sm text-fg-tertiary">{t('termine.emptyUpcoming')}</p>}</div>
-        <p className="pt-2 text-[11px] font-semibold uppercase tracking-[0.05em] text-fg-tertiary">{t('termine.past')}</p>
-        <div className="space-y-2.5">{past.length ? past.map(card) : <p className="text-body-sm text-fg-tertiary">{t('termine.emptyPast')}</p>}</div>
+        {state === 'loading' && <div aria-busy="true" className="h-24 animate-pulse rounded-xl bg-surface-secondary/60 motion-reduce:animate-none" />}
+        {state === 'error' && <LoadFailedState surface="appointments" error={error} onRetry={reload} section />}
+        {state === 'ready' && (
+          <>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.05em] text-fg-tertiary">{t('termine.upcoming')}</p>
+            {/* B3: noch nie ein Termin — der leere Zustand erklaert, wie einer
+                entsteht, und was dafuer fehlt. Gibt es vergangene, aber keine
+                kommenden, reicht die ruhige Zeile. */}
+            <div className="space-y-2.5">{upcoming.length ? upcoming.map(card)
+              : rows.length === 0 ? <ReadinessEmpty kind="appointments" items={readiness} />
+              : <p className="text-body-sm text-fg-tertiary">{t('termine.emptyUpcoming')}</p>}</div>
+            <p className="pt-2 text-[11px] font-semibold uppercase tracking-[0.05em] text-fg-tertiary">{t('termine.past')}</p>
+            <div className="space-y-2.5">{past.length ? past.map(card) : <p className="text-body-sm text-fg-tertiary">{t('termine.emptyPast')}</p>}</div>
+          </>
+        )}
       </div>
 
       <Drawer

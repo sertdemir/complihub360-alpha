@@ -205,6 +205,16 @@ function partnerInvoices() {
   };
   return { ok: true, invoices: [inv(8, -1, 4), inv(7, -2, 3), inv(6, -3, 5), inv(5, -4, 2)] };
 }
+function partnerSubscription() {
+  const pre = partnerBillingPreview();
+  return {
+    ok: true,
+    subscription: { plan_code: 'growth', cadence: 'monthly', status: 'active', current_period_start: `${monat(0)}-01`, current_period_end: `${monat(1)}-01`, started_at: `${monat(-3)}-01`, renewal_date: `${monat(1)}-01` },
+    plans: pre.pricing.plans,
+    released_categories: [{ code: 'tax-vat', label: 'Tax & VAT' }, { code: 'product-packaging', label: 'EPR & Packaging' }],
+    eligibility: { can_start: true, reason: null },
+  };
+}
 function partnerBillingPreview() {
   const leads = 3; const standard = leads * 14900; const discount = Math.round(standard * 0.1);
   return {
@@ -702,7 +712,10 @@ function p2Confidential() {
 // Admin-Queue als "reverification_due" fuehrt.
 const SP = { vat: uuid(61, 8), epr: uuid(62, 8), priv: uuid(63, 8), ev1: uuid(71, 8), ev2: uuid(72, 8), ev3: uuid(73, 8), ev4: uuid(74, 8), ev5: uuid(75, 8) };
 function spProvider() {
-  return { provider_key: PARTNER_KEY, name: 'Schmidt & Partner Steuerberatungsgesellschaft mbH', website_url: 'https://schmidt-partner.example', contact_email: 'kanzlei@schmidt-partner.example', languages: ['de', 'en'], region: 'Hamburg', active_since: 2013, vat_id: 'DE287654321', vat_id_status: 'valid', vat_id_checked_at: iso(-60, 9, 0), billing_country: 'DE', work_mode: 'remote · Portal', lifecycle_status: 'active', lifecycle_status_since: iso(-355, 10, 0), lifecycle_status_reason: null, billing_ready: true, billing_block_reasons: [] };
+  return { provider_key: PARTNER_KEY, name: 'Schmidt & Partner Steuerberatungsgesellschaft mbH', website_url: 'https://schmidt-partner.example', contact_email: 'kanzlei@schmidt-partner.example', languages: ['de', 'en'], region: 'Hamburg', active_since: 2013, vat_id: 'DE287654321', vat_id_status: 'valid', vat_id_checked_at: iso(-60, 9, 0), billing_country: 'DE', work_mode: 'remote · Portal', lifecycle_status: 'active', lifecycle_status_since: iso(-355, 10, 0), lifecycle_status_reason: null,
+    // Dieselbe Zahlungsbereitschaft wie die Abrechnungsvorschau — sonst meldet
+    // die Bereitschafts-Liste (B3) ein Zahlungsmittel, das /billing sperrt.
+    billing_ready: READINESS.ready, billing_block_reasons: [...READINESS.reasons] };
 }
 function spServices() {
   const cov = (id: string, svc: string, cc: string, status: string, days: number | null) => ({ id, service_id: svc, country_code: cc, jurisdiction_code: null, status, limitations: null, approved_at: days === null ? null : iso(days, 11, 0), expires_at: null });
@@ -868,6 +881,10 @@ export function route(method: string, path: string, body: Record<string, unknown
     if (p[0] === 'provider' && p[2] === 'coverage') return partnerCoverage();
     if (p[0] === 'provider' && p[2] === 'invoices') return partnerInvoices();
     if (p[0] === 'provider' && p[2] === 'billing' && p[3] === 'preview') return partnerBillingPreview();
+    // Tarif wie der Server (GET /provider/:key/subscription): laufendes Growth,
+    // dieselben Werte wie die Abrechnungsvorschau. Bis TKT-PROV-12 fiel die
+    // Seite im Mock auf ihre Fixture zurueck.
+    if (p[0] === 'provider' && p[2] === 'subscription') return partnerSubscription();
     if (p[0] === 'reads') return { ok: true, last_seen_at: plus(-30 * H) };
     // Das Betriebsprotokoll ist admin-pflichtig (echter Server: 403) — der
     // Partner-Feed faellt dann wie in echt auf seine eigene Darstellung zurueck.
