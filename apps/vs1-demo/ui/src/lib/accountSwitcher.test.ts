@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ACCOUNT_SWITCHER_KEY, forgetAccount, homeFor, loadAccounts, rememberSession, resolveAccountSwitcher, type SessionLike } from './accountSwitcher';
+import { ACCOUNT_SWITCHER_KEY, clearLocalAuth, forgetAccount, homeFor, loadAccounts, rememberSession, resolveAccountSwitcher, type SessionLike } from './accountSwitcher';
 
 function mem() {
   const m = new Map<string, string>();
@@ -55,5 +55,21 @@ describe('homeFor', () => {
     expect(homeFor('partner', 'de')).toBe('/de/partner-dashboard');
     expect(homeFor('user', 'de')).toBe('/de/dashboard');
     expect(homeFor('admin', 'en')).toBe('/en/admin');
+  });
+});
+
+describe('clearLocalAuth', () => {
+  it('entfernt nur die lokale Supabase-Sitzung, nichts anderes', () => {
+    const m = new Map<string, string>([
+      ['sb-kqyl-auth-token', '{}'], ['sb-kqyl-auth-token-code-verifier', 'x'],
+      [ACCOUNT_SWITCHER_KEY, '[]'], ['i18nextLng', 'de'],
+    ]);
+    const storage = {
+      get length() { return m.size; },
+      key: (i: number) => [...m.keys()][i] ?? null,
+      removeItem: (k: string) => { m.delete(k); },
+    };
+    expect(clearLocalAuth(storage).sort()).toEqual(['sb-kqyl-auth-token', 'sb-kqyl-auth-token-code-verifier']);
+    expect([...m.keys()].sort()).toEqual([ACCOUNT_SWITCHER_KEY, 'i18nextLng'].sort());
   });
 });

@@ -4,7 +4,7 @@ import { ArrowLeftRight, Check, Plus, X } from 'lucide-react';
 import { getSupabase } from '../../lib/supabase';
 import { useAuthStore } from '../../store/useAuthStore';
 import {
-  forgetAccount, homeFor, isAccountSwitcherEnabled, loadAccounts, ROLE_LABEL, type SavedAccount,
+  clearLocalAuth, forgetAccount, homeFor, isAccountSwitcherEnabled, loadAccounts, ROLE_LABEL, type SavedAccount,
 } from '../../lib/accountSwitcher';
 
 // ─── Konto-Umschalter, nur Staging ───────────────────────────────────────────
@@ -59,12 +59,14 @@ function Switcher() {
     navigate(homeFor(a.role, lang));
   };
 
-  // Weiteres Konto: nur lokal abmelden — die gemerkte Sitzung bleibt gueltig.
+  // Weiteres Konto: die Sitzung nur im Browser vergessen, NICHT abmelden —
+  // jeder signOut widerruft sie auf dem Server (lib/accountSwitcher,
+  // clearLocalAuth). Neu laden, damit der Client ohne Sitzung startet.
   const addAccount = async () => {
     const sb = await getSupabase();
-    if (sb) await sb.auth.signOut({ scope: 'local' });
-    setOpen(false);
-    navigate(`/${lang}/login`);
+    if (sb) await sb.auth.stopAutoRefresh();
+    clearLocalAuth();
+    window.location.assign(`/${lang}/login`);
   };
 
   const label = (a: SavedAccount) => a.email ?? a.userId.slice(0, 8);
@@ -100,7 +102,7 @@ function Switcher() {
           <button type="button" onClick={addAccount} className="mt-1 flex w-full items-center gap-2 rounded-lg px-2 py-2 text-fg-brand hover:bg-surface-secondary">
             <Plus size={14} /> Weiteres Konto anmelden
           </button>
-          <p className="px-2 pb-1 pt-1 text-[11px] leading-snug text-fg-tertiary">Gemerkt werden nur Konten, mit denen du dich in diesem Browser angemeldet hast. Abmelden entfernt ein Konto aus der Liste.</p>
+          <p className="px-2 pb-1 pt-1 text-[11px] leading-snug text-fg-tertiary">Gemerkt werden nur Konten, mit denen du dich in diesem Browser angemeldet hast. Zum Wechseln nicht abmelden: Abmelden widerruft die Sitzung und entfernt das Konto aus der Liste.</p>
         </div>
       )}
       <button
