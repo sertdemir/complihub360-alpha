@@ -68,7 +68,8 @@ const PREVIEW_FIXTURE: BillingPreview = {
   },
   discount: { pct: 10, count: 3, used: 2, remaining: 1, cycle_start: '2026-09-01' },
   leads: { count: 2, standard_cents: 24800, discount_cents: 2480, final_cents: 22320 },
-  readiness: { ready: false, reasons: ['payment_failed', 'overdue_invoice'], synced_at: '2026-10-01T08:42:00Z', payment_method: 'Visa ····4242' },
+  readiness: { ready: false, reasons: ['payment_failed'], synced_at: '2026-10-01T08:42:00Z', payment_method: 'Visa ····4242',
+    cure_period_days: 7, invoices_in_grace: 1, blocks_at: '2026-10-24', overdue_since: '2026-10-16' },
   credit_balance_cents: 0,
   lines: [{ label: 'Growth · monthly · 2026-09', qty: 1, unit_cents: 9900, amount_cents: 9900 }],
   total_cents: 32220,
@@ -171,6 +172,32 @@ export function BillingPage() {
             {t('billing.subtitle')}
           </p>
         </div>
+
+        {/* Kulanzfrist (ADR-0006, A2): eine faellige Rechnung sperrt erst nach
+            sieben Tagen. Der Hinweis steht AB TAG 1 und VOR dem Status-Kasten —
+            der eigentliche Fehler am alten Zustand war nicht die Sperre,
+            sondern dass sie unangekuendigt eintrat. Letzter Satz nimmt die
+            Angst, die Spec A §14 ohnehin ausschliesst: die Sichtbarkeit
+            bleibt unberuehrt. */}
+        {!!readiness?.invoices_in_grace && readiness.blocks_at && (
+          <section className="rounded-xl border border-warning-500/50 bg-warning-50 px-5 py-4 dark:bg-warning-950/30" aria-labelledby="billing-grace">
+            <h2 id="billing-grace" className="text-[15px] font-semibold text-fg">
+              {t(readiness.invoices_in_grace === 1 ? 'billing.graceTitleOne' : 'billing.graceTitleMany', { n: readiness.invoices_in_grace })}
+            </h2>
+            <p className="mt-1 max-w-3xl text-[13px] leading-relaxed text-fg-secondary">
+              {t('billing.graceBody', {
+                since: readiness.overdue_since ? new Date(`${readiness.overdue_since}T00:00:00Z`).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' }) : '—',
+                until: new Date(`${readiness.blocks_at}T00:00:00Z`).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' }),
+              })}
+            </p>
+            <p className="mt-2 text-[12px] text-fg-tertiary">{t('billing.graceStillVisible')}</p>
+            <div className="mt-3">
+              <Button size="sm" onClick={updatePayment} disabled={portalBusy}>
+                {portalBusy ? '…' : t('billing.graceOpenPortal')}
+              </Button>
+            </div>
+          </section>
+        )}
 
         {/* Canvas 4A: der Status-Kasten. Gesperrt nennt jeden Grund mit dem
             Weg zur Behebung; bereit ist eine Zeile. */}

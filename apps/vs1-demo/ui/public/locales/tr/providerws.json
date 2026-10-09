@@ -198,7 +198,12 @@
       "overdue_invoice": "Vadesi geçmiş bir fatura var. Portalda ödeyin.",
       "account_paused": "Hesabınız duraklatıldı.",
       "payment_failed": "Son lead tahsilatı başarısız oldu. Farklı bir ödeme yöntemi engeli kaldırır — aynı kart kaldırmaz."
-    }
+    },
+    "graceTitleOne": "Bir fatura açık",
+    "graceTitleMany": "{{n}} fatura açık",
+    "graceBody": "{{since}} tarihinden beri vadesi geçti. {{until}} tarihinden itibaren rezervasyonlar, fatura ödenene kadar duraklatılır.",
+    "graceStillVisible": "Arama sonuçlarındaki görünürlüğünüz bundan etkilenmez.",
+    "graceOpenPortal": "Faturayı portalda aç"
   },
   "confirmEmail": {
     "working": "Yeni adresiniz doğrulanıyor…",

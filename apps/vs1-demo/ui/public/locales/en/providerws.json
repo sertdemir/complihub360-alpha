@@ -198,7 +198,12 @@
       "overdue_invoice": "An invoice is overdue. Pay it in the portal.",
       "account_paused": "Your account is paused.",
       "payment_failed": "The last lead charge failed. A different payment method lifts this — the same card does not."
-    }
+    },
+    "graceTitleOne": "One invoice is open",
+    "graceTitleMany": "{{n}} invoices are open",
+    "graceBody": "Due since {{since}}. From {{until}}, bookings pause until the invoice is paid.",
+    "graceStillVisible": "Your visibility in search results is not affected by this.",
+    "graceOpenPortal": "Open the invoice in the portal"
   },
   "confirmEmail": {
     "working": "Confirming your new address…",
