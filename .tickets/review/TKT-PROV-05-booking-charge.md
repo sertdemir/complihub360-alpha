@@ -143,3 +143,4 @@ im ADR-0005; hier die Punkte, die im Code sichtbar sind:
 - **Ein Kleinunternehmen bekommt denselben Respekt:** Der 10 %-Rabatt gilt
   für jeden Nutzer, der über CompliHub360 gebucht hat, unabhängig vom Plan
   des Anbieters.
+- [2026-10-07] **Claude**: Bleibt in review. Stufe 4 wartet auf einen Nutzer-Schritt: Restricted Stripe Key um payment_intents:write, customers:read, refunds:write erweitern. Im Beta-Plan eingeplant. (Status: review)

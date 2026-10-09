@@ -1,7 +1,7 @@
 ---
 title: "Gemischte Märkte: die Risk Map nennt, was sie nicht geprüft hat"
 assignee: "Claude"
-status: "review"
+status: "done"
 ---
 
 # Gemischte Märkte (DE + BR)
@@ -32,3 +32,7 @@ bietet die bestehende Anfrage an (`POST /api/v1/market-requests`).
   - [x] I1 live geprüft auf Englisch, Deutsch und 390 px. Die Anfrage lieferte 200, danach stand die Bestätigung an der Stelle. Die Kontrolle mit nur DE zeigte nichts davon. Die Testzeile ist entfernt.
   - [ ] J1 auf Staging nicht erreichbar: Die echte Engine findet für jeden bekannten Markt in jedem Bereich Pflichten. Abgesichert lokal im Mock und durch Tests.
   - [ ] K3 nicht live geprüft: Dafür ist ein echtes Login nötig. Abgesichert lokal und durch Tests, wie H3.
+
+## Agent Audit Log
+
+- [2026-10-07] **Claude**: Nach done. J1 und K3 bleiben live ungeprüft (J1 auf Staging nicht erreichbar, K3 braucht echtes Login) und gehen in den Beta-Volltest am 26.10. (Status: done)
