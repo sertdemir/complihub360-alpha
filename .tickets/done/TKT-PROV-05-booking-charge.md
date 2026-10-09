@@ -1,7 +1,7 @@
 ---
 title: "Provider Phase 4 — Buchung, Bestätigung, Belastung, Offenlegung"
 assignee: "Claude"
-status: "review"
+status: "done"
 ---
 
 # Provider Phase 4 — Buchung, Bestätigung, Belastung, Offenlegung
@@ -106,10 +106,32 @@ das Review erfolgt; Staging deployt automatisch (Stufe 4 läuft).
   `BOOKING_NOT_COMPLETED`, Leads mit Ledger, Proposal-PATCH, `billing/sync`
   mit Zustandswechsel), Locales en/de/es/tr, Screenshots im PR.
 - [x] Review des Nutzers (Merge von #243 am 2026-10-02).
-- [ ] Stufe 4 auf Staging prüfen: Buchung mit Bestätigung, Fehlerkasten,
-  Leads-Zeile, Abrechnungs-Kasten. Vorher extern: Restricted Stripe Key um
-  `payment_intents: write`, `customers: read`, `refunds: write` erweitern;
-  dann Shadow-Tick und `billing/sync` je Staging-Anbieter.
+- [x] Stufe 4 auf Staging geprüft (2026-10-04 bis 2026-10-09): Readiness-Pfad
+  für `dahlmann-cpa` komplett durchlaufen — Rolle `partner` an den Konten
+  nachgesetzt, Restricted Key um Payment Methods read erweitert, veraltete
+  Stripe-Kennung weggeräumt (#253), angehängte Karte ohne Standard zum
+  Standard gemacht (#262), Growth-Abo per SQL (kein Self-Serve-UI), Adresse
+  und Vollmacht nachgetragen → `billing_ready = true`. Erste echte Buchung
+  2026-10-09: Bestätigung `booking-ack-v1`, Ledger Band 2 (149 → 134,10 USD,
+  Growth-Rabatt Folge 1), PaymentIntent `captured`, Offenlegung mit
+  `shared_fields`, Nutzerrabatt 10 % (v1), Zähler 1, Events in der richtigen
+  Reihenfolge, Notification `booking_created`.
+
+## Staging-Befunde (Nachträge für Folge-Tickets)
+
+- Fehlerfall mit Decline-Karte auf Staging nicht gelaufen (Karte `…0341`:
+  anhängen klappt, Belasten scheitert); lokal und in der API-Suite abgedeckt.
+- Grüner Readiness-Kasten hat keinen Weg ins Portal (Kartenwechsel vor
+  Ablauf). Abmelden-Button fehlt in der Anbieter-Shell. Seitenleiste zeigt fest
+  „K. Schmidt · Schmidt & Partner". Rechnungstabelle und roter Banner der
+  Billing-Seite sind Fixture-Material.
+- `price_snapshot` bleibt leer, solange die Staging-Services keine
+  Preisangaben haben (Stammdaten).
+- Derselbe Nutzer kann denselben Anbieter in einer neuen Sitzung erneut buchen,
+  jede Buchung kostet die Lead-Gebühr — Regel gehört zu Phase 5.
+- Stripe-Kundenportal setzt eine neu angehängte Karte nicht als Standard; seit
+  #262 übernimmt das der Abgleich. Eine Karte war zwischendurch vom Kunden
+  gelöst worden, Ursache unklar (Stripe-Kundenlog prüfen).
 
 ## Nicht in diesem Ticket
 
