@@ -31,40 +31,54 @@ Rabatt-Leads von Monat auf Jahr gestreckt (`TKT-PROV-07`, #240).
 Bewusst getrennt, weil Stufe 1 heute schon Schaden verhindert und ohne
 Migration auskommt.
 
-### Stufe 1 — Kulanzfrist
+### Stufe 1 — Kulanzfrist  ✅ gemergt (PR #268, `4cc2dd29`)
 
-- [ ] `billingReadiness` wird zeitabhängig: die Frist kommt als Eingabe, die
+- [x] `billingReadiness` wird zeitabhängig: die Frist kommt als Eingabe, die
       Funktion bleibt rein. Heute zählt `syncBillingReadiness` nur
       `due_at < now`; künftig `due_at + Frist < now`.
-- [ ] Der Wert als Konfiguration mit Vorgabe 7, nicht als Literal.
-- [ ] `/billing` zeigt ab Tag 1 die offene Rechnung **und das Datum, ab dem
+- [x] Der Wert als Konfiguration mit Vorgabe 7, nicht als Literal.
+- [x] `/billing` zeigt ab Tag 1 die offene Rechnung **und das Datum, ab dem
       gesperrt wird** — als Hinweis, nicht als Sperre. Ohne diesen Teil ist die
       Frist nur eine stillere Sperre.
-- [ ] Copy in en, de, es, tr.
-- [ ] Tests samt Gegenproben: Tag 0, Tag 7, Tag 8; und dass die **Sichtbarkeit**
+- [x] Copy in en, de, es, tr.
+- [x] Tests samt Gegenproben: Tag 0, Tag 7, Tag 8; und dass die **Sichtbarkeit**
       unberührt bleibt (Spec A §14).
 
-### Stufe 2 — Wechsel und Kündigung
+### Stufe 2 — Wechsel und Kündigung  🔄 Backend fertig, Oberfläche im Canvas
 
-- [ ] Migration: `provider_subscriptions` bekommt den vorgemerkten Zustand
+- [x] Migration: `provider_subscriptions` bekommt den vorgemerkten Zustand
       (Stichtag + Zieltarif). Versionsnummer **nach** allem, was auf Staging
       liegt — sonst sortiert sie davor (vgl. #241).
-- [ ] Vormerken, zurücknehmen, ausführen. Ausgeführt wird im selben Lauf, der
+- [x] Vormerken, zurücknehmen, ausführen. Ausgeführt wird im selben Lauf, der
       die Perioden weiterrollt (`runSubscriptionPeriodTick`) — beides passiert
       an derselben Grenze.
-- [ ] **Downgrade unter die genutzten Hauptkategorien wird abgelehnt**, nicht
+- [x] **Downgrade unter die genutzten Hauptkategorien wird abgelehnt**, nicht
       vorgemerkt. `categoryAllowanceCheck` fließt über `verificationRules` in
       `missing` ein; ein vorgemerkter Downgrade würde den Anbieter zum Stichtag
       still deaktivieren. Ablehnung mit konkretem Grund.
-- [ ] **Eine offene Rechnung darf die Kündigung nicht blockieren** — sonst
+- [x] **Eine offene Rechnung darf die Kündigung nicht blockieren** — sonst
       verstellt die Sperre den Ausgang.
 - [ ] Oberfläche: Zustand F in `/subscription` bekommt Wechsel und Kündigung
       mit Stichtag. **Der heutige Text dort wird falsch** und muss weg — er
       sagt, dass es beides nicht gibt.
-- [ ] Copy in vier Sprachen, je eine Benachrichtigung für vorgemerkt und
-      ausgeführt.
-- [ ] Tests samt Gegenproben, besonders: Jahresabo kündigen endet zur
-      Verlängerung, nicht zum Monatsende.
+- [~] Benachrichtigungen stehen (`subscription_scheduled`,
+      `subscription_schedule_done`). Copy folgt mit der Oberfläche.
+- [x] Tests samt Gegenproben, besonders: Jahresabo kündigen endet zur
+      Verlängerung, nicht zum Monatsende. 23 + 5 Tests.
+
+## Zwei Funde aus Stufe 2
+
+**`status = 'cancelled'` heißt im Code „jetzt inaktiv", nicht „gekündigt".**
+`billingReadiness` setzt daraufhin `inactive_subscription`,
+`subscriptionChargeForPeriod` liefert keine Abo-Zeile mehr. Eine vorgemerkte
+Kündigung über den Status abzubilden hätte dem Anbieter Buchbarkeit und
+Abrechnung in der Sekunde genommen, in der er kündigt — für eine Periode, die
+er bezahlt hat. Der Zustand liegt deshalb in eigenen Spalten.
+
+**Der Ownership-Guard deckte `/subscription/schedule` nicht ab.** Der Regex in
+`providerAuth.ts` endete bei `subscription`; jeder Eingeloggte hätte fremde
+Abos kündigen können. Nachgetragen und gegengeprobt (ohne den Eintrag fallen
+zwei Tests, und der fremde Login kommt bis in den Handler).
 
 ## DNA-Check
 
