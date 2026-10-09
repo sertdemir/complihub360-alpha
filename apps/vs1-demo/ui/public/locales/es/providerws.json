@@ -32,7 +32,8 @@
         "verification": "Verification Center"
       }
     },
-    "navSubscription": "Plan"
+    "navSubscription": "Plan",
+    "signOut": "Cerrar sesión"
   },
   "bell": {
     "aria": "Notificaciones",
@@ -203,7 +204,8 @@
     "graceTitleMany": "Hay {{n}} facturas pendientes",
     "graceBody": "Vencida desde el {{since}}. A partir del {{until}}, las reservas se pausan hasta que la factura esté pagada.",
     "graceStillVisible": "Su visibilidad en los resultados de búsqueda no se ve afectada.",
-    "graceOpenPortal": "Abrir la factura en el portal"
+    "graceOpenPortal": "Abrir la factura en el portal",
+    "changePaymentMethod": "Cambiar el método de pago"
   },
   "confirmEmail": {
     "working": "Confirmando su nueva dirección…",
