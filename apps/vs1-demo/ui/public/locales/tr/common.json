@@ -1550,7 +1550,10 @@
       "prod-packaging-reuse-targets": "Yeniden kullanılabilir taşıma ambalajı (PPWR)",
       "prod-safety": "Ürün güvenliği ve etiketleme",
       "tax-corporate": "Kurumlar vergisi",
-      "tax-vat-registration": "KDV kaydı ve beyanı"
+      "tax-vat-registration": "KDV kaydı ve beyanı",
+      "env-weee-registration": "AEEE üretici kaydı",
+      "env-batteries-epr": "Piller — üretici sorumluluğu",
+      "env-reach-substances": "REACH — eşyalardaki maddeler"
     },
     "obligationDesc": {
       "corp-registration": "Yerel ticaret siciline zorunlu kayıt.",
@@ -1573,7 +1576,10 @@
       "prod-packaging-reuse-targets": "Taşıma ambalajlarının %40’ı (palet, kasa, palet streci, çemberleme) yeniden kullanım sisteminde dolaşmalı; toplu ambalajlarda bu oran %10. Karton kutular muaf olduğundan olağan paket gönderimi hedefin dışında kalır — bu kural paletleri ve B2B taşımayı ilgilendirir, kargo kolisini değil.",
       "prod-safety": "Tüketici ürünleri için güvenlik standartları ve zorunlu etiketleme.",
       "tax-corporate": "Yerleşik şirketler için olağan kurumlar vergisi yükümlülükleri.",
-      "tax-vat-registration": "Satış eşiklerine bağlı KDV kaydı ve beyan yükümlülükleri."
+      "tax-vat-registration": "Satış eşiklerine bağlı KDV kaydı ve beyan yükümlülükleri.",
+      "env-weee-registration": "Cihazlar piyasaya sürülmeden önce ulusal elektrikli ve elektronik eşya siciline kayıt; ayrıca kullanım ömrü sonunda bildirim ve geri alma yükümlülükleri.",
+      "env-batteries-epr": "Piller için üretici kaydı ve genişletilmiş üretici sorumluluğu; yerleşik hücreli cihazlar dahil. Ambalaj EPR’sinden ve AEEE’den ayrıdır.",
+      "env-reach-substances": "AB pazarına sürülen ürünlerdeki maddelere ilişkin yükümlülükler: eşikler aşıldığında kayıt veya bildirim ve çok yüksek önem arz eden maddeler için alıcılara bilgi verme yükümlülüğü."
     },
     "regions": {
       "eyebrow": "Bölgeler",

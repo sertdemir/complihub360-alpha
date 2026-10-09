@@ -22,6 +22,7 @@ import {
 } from '../components/compliance-areas';
 import { getMarketProfile, isMarketCode, listMarkets } from '../lib/marketProfiles';
 import { useInViewOnce } from '../lib/useInViewOnce';
+import { obligationLabel } from '../lib/obligationText';
 
 // ─── /markets and /markets/:code · Brand Map Stufe 6b ────────────────────────
 // The country knowledge base. Every fact on these pages is derived in
@@ -438,7 +439,7 @@ export function MarketPage() {
           }),
           label: t('markets.country.facts.lead', 'to the next deadline'),
           // The duty's canonical engine label, as everywhere on the surface.
-          note: profile.soonest.label,
+          note: obligationLabel(t, profile.soonest.subdomainId, profile.soonest.label),
           tone: 'text-fg',
         }
       : null,

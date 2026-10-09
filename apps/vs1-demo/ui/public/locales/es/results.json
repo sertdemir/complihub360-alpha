@@ -395,5 +395,6 @@
   "reveal": {
     "was": "era {{title}}",
     "wasInSession": "era {{title}} en su sesión «{{session}}»"
-  }
+  },
+  "dueLive": "Vigente"
 }

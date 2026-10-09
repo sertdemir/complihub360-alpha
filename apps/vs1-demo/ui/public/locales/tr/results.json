@@ -395,5 +395,6 @@
   "reveal": {
     "was": "{{title}} idi",
     "wasInSession": "„{{session}}“ oturumunuzda {{title}} idi"
-  }
+  },
+  "dueLive": "Yürürlükte"
 }

@@ -1550,7 +1550,10 @@
       "prod-packaging-reuse-targets": "Wiederverwendbare Transportverpackung (PPWR)",
       "prod-safety": "Produktsicherheit & Kennzeichnung",
       "tax-corporate": "Körperschaftsteuer",
-      "tax-vat-registration": "USt-Registrierung & -Meldung"
+      "tax-vat-registration": "USt-Registrierung & -Meldung",
+      "env-weee-registration": "WEEE-Herstellerregistrierung",
+      "env-batteries-epr": "Batterien — Herstellerverantwortung",
+      "env-reach-substances": "REACH — Stoffe in Erzeugnissen"
     },
     "obligationDesc": {
       "corp-registration": "Pflichteintragung im örtlichen Handelsregister.",
@@ -1573,7 +1576,10 @@
       "prod-packaging-reuse-targets": "40 % der Transportverpackungen (Paletten, Kisten, Palettenfolie, Umreifungsbänder) müssen in einem Mehrwegsystem laufen, 10 % bei Umverpackungen. Kartonagen sind ausgenommen, womit der gewöhnliche Paketversand außerhalb der Quote bleibt — betroffen sind Paletten und B2B-Transporte, nicht der Versandkarton.",
       "prod-safety": "Sicherheitsanforderungen für Verbraucherprodukte und verpflichtende Kennzeichnung.",
       "tax-corporate": "Übliche Körperschaftsteuerpflichten für ansässige Gesellschaften.",
-      "tax-vat-registration": "Pflichten zur Registrierung und Meldung der Umsatzsteuer, abhängig von den Umsatzschwellen."
+      "tax-vat-registration": "Pflichten zur Registrierung und Meldung der Umsatzsteuer, abhängig von den Umsatzschwellen.",
+      "env-weee-registration": "Eintragung in das nationale Register für Elektro- und Elektronikgeräte vor dem Inverkehrbringen, dazu Melde- und Rücknahmepflichten am Ende der Lebensdauer.",
+      "env-batteries-epr": "Herstellerregistrierung und erweiterte Herstellerverantwortung für Batterien, auch für Geräte mit eingebauten Zellen. Getrennt von der Verpackungs-EPR und von WEEE.",
+      "env-reach-substances": "Pflichten für Stoffe in Waren, die auf den EU-Markt gebracht werden: Registrierung oder Anmeldung ab den Mengenschwellen und die Informationspflicht gegenüber Abnehmern bei besonders besorgniserregenden Stoffen."
     },
     "regions": {
       "eyebrow": "Regionen",

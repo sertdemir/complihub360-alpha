@@ -6,6 +6,7 @@ import { useInViewOnce } from '../../lib/useInViewOnce';
 import { AreaSectionHeading, useAreaEyebrows } from './AreaSectionHeading';
 import type { MarketProfile } from '../../lib/marketProfiles';
 import { belegLage } from '../../lib/penaltyCeiling';
+import { obligationLabel } from '../../lib/obligationText';
 
 interface Props {
   profile: MarketProfile;
@@ -70,7 +71,7 @@ export function MarketCalendar({ profile }: Props) {
               defaultValue:
                 'Highest single penalty in this market: {{max}} on {{duty}}. The stated upper bounds add up to {{total}} — a ceiling if everything went wrong at once, not a forecast.',
               max: money.format(profile.heaviest.penaltyMaxEur ?? 0),
-              duty: profile.heaviest.label,
+              duty: obligationLabel(t, profile.heaviest.subdomainId, profile.heaviest.label),
               total: money.format(profile.exposureEur),
             })}
           </Typography>
@@ -146,7 +147,7 @@ export function MarketCalendar({ profile }: Props) {
                         /de/markets/de bei 1024 um 14 px ins Scrollen, ohne das
                         nowrap-Gate bei 390 um 26 px. */}
                     <span className="text-body-sm font-bold leading-snug text-fg tablet:whitespace-nowrap desktop-s:whitespace-normal desktop-m:whitespace-nowrap">
-                      {o.label}
+                      {obligationLabel(t, o.subdomainId, o.label)}
                     </span>
                     <span className="min-w-0 flex-1 text-body-2xs leading-snug text-fg-tertiary">
                       {o.source} · {areaName(o.domainSlug)}

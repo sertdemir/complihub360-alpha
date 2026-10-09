@@ -13,6 +13,7 @@ import type { DomainSlug } from '../../lib/domains';
 import { SEVERITY_FALLBACK, SEVERITY_STYLE, severityKey } from './severity';
 import type { CountryCode } from './types';
 import { AreaSectionHeading, useAreaEyebrows } from './AreaSectionHeading';
+import { obligationDescription, obligationLabel } from '../../lib/obligationText';
 
 interface Props {
   slug: DomainSlug;
@@ -147,7 +148,7 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
           autoAdvanceMs={picked ? 0 : 6000}
           items={shown.map((o) => ({
             id: o.id,
-            label: o.label,
+            label: obligationLabel(t, o.id, o.label),
             markerClass: SEVERITY_STYLE[o.severity].bar,
             // Statute AND cadence; a placeholder must not appear here — the
             // row is the first place a reader meets the source.
@@ -278,10 +279,10 @@ export function ObligationsExplorer({ slug, selectedCountry }: Props) {
                             })}
                           </RiskBadge>
                           <h3 className="mt-3.5 font-serif text-[1.5rem] font-semibold leading-tight text-fg">
-                            {o.label}
+                            {obligationLabel(t, o.id, o.label)}
                           </h3>
                           <p className="mt-3 max-w-xl text-body-sm leading-relaxed text-fg-secondary">
-                            {o.description}
+                            {obligationDescription(t, o.id, o.description)}
                           </p>
                           {/* Which business models the engine puts this duty
                               on. It used to be a filter bar over the whole

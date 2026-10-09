@@ -90,7 +90,7 @@ export function DomainKnowledge({ slug, markets, sessions }: {
     : o.status === 'done' ? t('domainPage.statusDone')
     : o.status === 'not_applicable' ? t('domainPage.statusNotApplicable')
     : typeof o.dueDays === 'number' ? t('domainPage.dueInDays', { count: o.dueDays })
-    : (o.due || t('domainPage.noDue'));
+    : (o.due ? ob.cadence(o.due) : t('domainPage.noDue'));
 
   if (!entries.length) return null;
 

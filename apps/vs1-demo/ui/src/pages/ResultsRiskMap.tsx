@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import type { PenaltyCeiling } from '@complihub/compliance-engine';
 import { describeCeiling, penaltyText } from '../lib/penaltyCeiling';
+import { cadenceLabel, obligationLabel } from '../lib/obligationText';
 import { saveWizardSession, fetchSessions, type SessionRowData } from '../api/sessions';
 import { runSearch, type AnonProvider, type SearchLaw } from '../api/search';
 import { useApiData } from '../lib/useApiData';
@@ -136,7 +137,9 @@ export function liveObligations(laws: SearchLaw[], t: RiskT, lang: string, local
     id: l.id,
     noSource: l.source_scope === 'placeholder' || undefined,
     severity: l.severity as Severity,
-    title: l.title,
+    // Der Engine-Titel ist englisch; die Sprachdateien fuehren ihn fuer alle
+    // Pflichten (markets.obligations.<id>, Waechter: obligationText.test.ts).
+    title: obligationLabel(t, l.id, l.title),
     // Rechtsgrundlage zuerst, Bußgeld danach. Das DNA-Addendum V2 verlangt,
     // dass Strafhöhen nicht der primäre Untertitel jeder Pflicht sind —
     // zugänglich bleiben sie, führend sind sie nicht mehr. Der Präfix war
@@ -163,11 +166,11 @@ export function liveObligations(laws: SearchLaw[], t: RiskT, lang: string, local
     due: daysUntil(l.applies_from) != null
       ? new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' })
           .format(new Date(`${l.applies_from}T00:00:00`))
-      : l.due === 'Ongoing' ? t('ongoing') : l.due ?? '—',
+      : l.due === 'Ongoing' ? t('ongoing') : l.due ? cadenceLabel(t, l.due) : '—',
     dueSub: withinHorizon(l.applies_from) != null
       ? t('appliesIn', { count: withinHorizon(l.applies_from) as number, defaultValue: `applies in ${withinHorizon(l.applies_from)} days` })
       : daysUntil(l.applies_from) != null ? ''   // far future: the date says enough
-      : l.due_days != null ? t('days', { count: l.due_days }) : l.due === 'Ongoing' ? 'Live' : '',
+      : l.due_days != null ? t('days', { count: l.due_days }) : l.due === 'Ongoing' ? t('dueLive', { defaultValue: 'Live' }) : '',
     dueDays: l.due_days ?? undefined,
     state: { kind: l.state === 'confirmed' ? 'confirmed' : 'likely' },
     // Same horizon as the stats: a duty landing in days is "now" even

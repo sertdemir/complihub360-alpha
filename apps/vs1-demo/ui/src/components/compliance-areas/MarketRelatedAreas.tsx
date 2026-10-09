@@ -7,6 +7,7 @@ import { AREA_BY_SLUG } from './areas';
 import { AreaSectionHeading, useAreaEyebrows } from './AreaSectionHeading';
 import { RelatedAccordion, type RelatedEntry } from './RelatedAreas';
 import type { MarketProfile } from '../../lib/marketProfiles';
+import { obligationLabel } from '../../lib/obligationText';
 
 interface Props {
   profile: MarketProfile;
@@ -49,7 +50,7 @@ export function MarketRelatedAreas({ profile }: Props) {
         }),
         // The duties themselves, statute attached — the engine's canonical
         // labels and sources, as everywhere on the surface.
-        headline: g.items.map((o) => `${o.label} — ${o.source}`).join(' · '),
+        headline: g.items.map((o) => `${obligationLabel(t, o.subdomainId, o.label)} — ${o.source}`).join(' · '),
       }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile, t, localePrefix]);
