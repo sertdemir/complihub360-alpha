@@ -32,7 +32,8 @@
         "verification": "Verification Center"
       }
     },
-    "navSubscription": "Tarif"
+    "navSubscription": "Tarif",
+    "signOut": "Abmelden"
   },
   "bell": {
     "aria": "Benachrichtigungen",
@@ -203,7 +204,8 @@
     "graceTitleMany": "{{n}} Rechnungen sind offen",
     "graceBody": "Fällig seit {{since}}. Ab {{until}} pausiert die Buchung, bis die Rechnung bezahlt ist.",
     "graceStillVisible": "Ihre Sichtbarkeit in den Ergebnissen ändert sich dadurch nicht.",
-    "graceOpenPortal": "Rechnung im Portal öffnen"
+    "graceOpenPortal": "Rechnung im Portal öffnen",
+    "changePaymentMethod": "Zahlungsmittel ändern"
   },
   "confirmEmail": {
     "working": "Ihre neue Adresse wird bestätigt…",

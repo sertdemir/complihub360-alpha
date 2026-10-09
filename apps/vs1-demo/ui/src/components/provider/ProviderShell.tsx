@@ -12,7 +12,8 @@ import { ConfirmDrawer, type ConfirmSpec } from './ConfirmDrawer';
 import { ApplicationStatusBanner } from './ApplicationStatusBanner';
 import { fetchProviderBookings } from '../../api/bookings';
 import { fetchEventLogFeed } from '../../api/notifications';
-import { fetchCoverage, setAvailability, AVAILABILITY_EVENT } from '../../api/provider';
+import { fetchCoverage, setAvailability, AVAILABILITY_EVENT, fetchMyProvider } from '../../api/provider';
+import { useAuthStore } from '../../store/useAuthStore';
 import { cn } from '../../lib/utils';
 import { Avatar } from '../ui/Avatar';
 
@@ -61,6 +62,26 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const base = `/${locale}/partner-dashboard`;
   const [searchOpen, setSearchOpen] = useState(false);
+  // Konto in der Sidebar (Staging-Befund 2026-10-09: hier stand fest
+  // „K. Schmidt · Schmidt & Partner", egal wer angemeldet war). Der Name des
+  // Anbieters kommt aus /me/provider, die Person aus der Sitzung; ohne echte
+  // Sitzung (Demo-Login) steht der Design-Platzhalter, mit Sitzung aber ohne
+  // Antwort steht nichts statt einer erfundenen Firma — wie in der UserShell.
+  // Abmelden fehlte in dieser Shell ganz; der Nutzer musste ueber die Startseite.
+  const { user, session, logout } = useAuthStore();
+  const [providerName, setProviderName] = useState<string | null>(session ? null : 'Schmidt & Partner');
+  useEffect(() => {
+    let alive = true;
+    fetchMyProvider().then((p) => { if (alive && p.name) setProviderName(p.name); }).catch(() => {});
+    return () => { alive = false; };
+  }, []);
+  const personName = session
+    ? ((user?.user_metadata?.full_name as string | undefined)?.trim() || user?.email || null)
+    : 'K. Schmidt';
+  const initials = (providerName ?? personName ?? '').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]!.toUpperCase()).join('') || '·';
+  const signOut = async () => { await logout(); window.location.href = `/${locale}/login`; };
+  const SIGN_OUT = 'rounded-lg font-medium text-fg-secondary transition-colors hover:text-fg';
+
   const [helpOpen, setHelpOpen] = useState(false);
   // C1: live sidebar badges — open confirms + unread notifications. Badge stays
   // hidden until the API answers (fixture mode shows no counts).
@@ -163,15 +184,17 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
           </NavLink>
         }
         footer={
-          <div className="flex items-center justify-between px-1">
-            <div className="flex items-center gap-2.5">
-              <Avatar size="md" initials="KS" tone="accent" />
-              <div className="leading-tight">
-                <p className="text-[12px] font-semibold text-fg">K. Schmidt</p>
-                <p className="text-[10px] text-fg-tertiary">Schmidt & Partner</p>
+          <div className="flex items-center justify-between gap-2 px-1">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <Avatar size="md" initials={initials} tone="accent" />
+              <div className="min-w-0 leading-tight">
+                <p className="truncate text-[12px] font-semibold text-fg" title={providerName ?? undefined}>{providerName}</p>
+                {personName && <p className="truncate text-[10px] text-fg-tertiary" title={personName}>{personName}</p>}
               </div>
             </div>
-            <Settings size={15} className="text-fg-tertiary" />
+            <button type="button" onClick={signOut} className={SIGN_OUT + ' shrink-0 px-1.5 py-1 text-[11px]'}>
+              {t('shell.signOut')}
+            </button>
           </div>
         }
       >
@@ -226,16 +249,21 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
           footer={
             <div className="flex flex-col gap-3 px-4 py-3">
               <div className="flex items-center gap-2.5">
-                <Avatar size="md" initials="KS" tone="accent" className="shrink-0" />
+                <Avatar size="md" initials={initials} tone="accent" className="shrink-0" />
                 <div className="min-w-0 flex-1 leading-tight">
-                  <p className="text-body-sm font-semibold text-fg">K. Schmidt</p>
-                  <p className="text-body-2xs text-fg-tertiary">Schmidt & Partner</p>
+                  <p className="truncate text-body-sm font-semibold text-fg">{providerName}</p>
+                  {personName && <p className="truncate text-body-2xs text-fg-tertiary">{personName}</p>}
                 </div>
                 {statusBadge}
               </div>
               {/* self-start: der Knopf ist blockbreit, die Pille darin zentriert
                   sich sonst mitten im Panel und liest sich als Überschrift. */}
-              <div className="self-start">{availabilityButton}</div>
+              <div className="flex items-center justify-between gap-2">
+                <div className="self-start">{availabilityButton}</div>
+                <button type="button" onClick={signOut} className={SIGN_OUT + ' h-11 px-2 text-[13px]'}>
+                  {t('shell.signOut')}
+                </button>
+              </div>
             </div>
           }
         />

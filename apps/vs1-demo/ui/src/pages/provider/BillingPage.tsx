@@ -211,7 +211,13 @@ export function BillingPage() {
                   {[readiness.payment_method, planLabel, readiness.synced_at ? t('billing.readinessChecked', { when: new Date(readiness.synced_at).toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' }) }) : null].filter(Boolean).join(' · ')}
                 </p>
               </div>
-              <Button size="sm" variant="ghost" onClick={sync} disabled={syncState === 'busy'}>{syncState === 'busy' ? '…' : t('billing.checkNow')}</Button>
+              {/* Auch im gruenen Zustand braucht der Anbieter einen Weg ins Portal —
+                  Karte laeuft ab, Karte wechseln (Staging-Befund 2026-10-09: der
+                  einzige Weg war der rote Fixture-Banner). */}
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="ghost" onClick={updatePayment} disabled={portalBusy}>{portalBusy ? '…' : t('billing.changePaymentMethod')}</Button>
+                <Button size="sm" variant="ghost" onClick={sync} disabled={syncState === 'busy'}>{syncState === 'busy' ? '…' : t('billing.checkNow')}</Button>
+              </div>
             </div>
           ) : (
             <section className="rounded-xl border border-warning-500/50 bg-warning-50 px-5 py-4 dark:bg-warning-950/30" aria-labelledby="billing-readiness">

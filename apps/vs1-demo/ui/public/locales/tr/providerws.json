@@ -32,7 +32,8 @@
         "verification": "Verification Center"
       }
     },
-    "navSubscription": "Tarife"
+    "navSubscription": "Tarife",
+    "signOut": "Oturumu kapat"
   },
   "bell": {
     "aria": "Bildirimler",
@@ -203,7 +204,8 @@
     "graceTitleMany": "{{n}} fatura açık",
     "graceBody": "{{since}} tarihinden beri vadesi geçti. {{until}} tarihinden itibaren rezervasyonlar, fatura ödenene kadar duraklatılır.",
     "graceStillVisible": "Arama sonuçlarındaki görünürlüğünüz bundan etkilenmez.",
-    "graceOpenPortal": "Faturayı portalda aç"
+    "graceOpenPortal": "Faturayı portalda aç",
+    "changePaymentMethod": "Ödeme yöntemini değiştir"
   },
   "confirmEmail": {
     "working": "Yeni adresiniz doğrulanıyor…",
