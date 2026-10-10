@@ -920,7 +920,7 @@
       "localSourcesNote": "The engine holds at least one local source for this area in {{count}} of the {{total}} markets. Elsewhere the EU-level instrument is what applies, and it is shown as such.",
       "marketsRowsNote": "Every row leads to the market page.",
       "askTitle": "A specific question about {{area}}?",
-      "askLead": "Ask it in your own words and get an answer with its sources named. The assessment below is the longer way round — it maps the whole area to your business instead of answering one question.",
+      "askLead": "Ask it in your own words — we show you where to go next, or you ask a person directly. The assessment below maps the whole area to your business.",
       "askQuestion": "Ask a question",
       "askEyebrow": "Your question",
       "askPlaceholder": "Ask your question in your own words",
@@ -1287,8 +1287,8 @@
       {
         "kicker": "Understand",
         "title": "Ask in your own words.",
-        "body": "Describe your situation the way you would to a colleague. You get an answer with the source behind every point — the statute itself, not a summary of a summary. No account, no sales call, no obligation to go further.",
-        "short": "Ask in the free-text field — the answer carries the source behind every point. No account."
+        "body": "Describe your situation the way you would explain it to a colleague. Direct answers to freely worded questions are not available in the beta yet; the example shows where this is heading. Until then, your question leads to the right area and into the assessment. No account, no sales call, no obligation to continue.",
+        "short": "Ask your question in your own words — in the beta it leads to the right area and into the assessment. No account."
       },
       {
         "kicker": "Assess",
@@ -1332,7 +1332,8 @@
             "text": "For very small volumes a simplified flat fee exists, which…",
             "chip": ""
           }
-        ]
+        ],
+        "example": "Example"
       },
       "map": {
         "stats": [
