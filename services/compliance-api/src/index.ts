@@ -103,6 +103,11 @@ const visibilityRegister = () => loadVisibility(
     async () => (await supabaseApi.select('provider_field_visibility', {}, { limit: 500 })) as RegisterRow[],
 );
 
+/** Pausiert der Anbieter neue Anfragen (Schalter in der Kopfzeile oder in den Einstellungen)? */
+function isPaused(p: { availability?: string | null } | null | undefined): boolean {
+    return p?.availability === 'ooo';
+}
+
 /** Ist der Anbieter matchbar (mindestens eine Zeile in der View)? Sichtbarkeit entscheidet die UND-Kette, nie partner_status. */
 async function matchableRows(providerKey: string): Promise<any[]> {
     return (await supabaseApi.select('matchable_provider_services', { provider_key: providerKey }, { limit: 500 })) as any[];
@@ -973,6 +978,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId }));
                 return;
             }
+            // Pausiert: keine freien Zeiten. Die Seite zeigt ihren Leerzustand.
+            if (isPaused(prov)) {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true, public_ref: ref, slots: [], paused: true, calendar_checked: false, correlationId }));
+                return;
+            }
             const providerKey = prov.provider_key as string;
             const booked = (await supabaseApi.select('scheduling', { provider_key: providerKey, status: 'confirmed' }, { limit: 200 })) as any[];
             const bookedSet = new Set(booked.map((b: any) => new Date(b.slot_start).toISOString()));
@@ -1613,6 +1624,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     if (!view.some((r: any) => r.bookable_chargeable)) {
                         fail(409, 'BILLING_NOT_READY', 'This provider cannot take bookings yet'); return;
                     }
+                    // Pausiert (C2): etwa aus einem alten Tab. Fuer den Nutzer dieselbe
+                    // neutrale Lage wie BILLING_NOT_READY — mit anderen Anbietern.
+                    if (isPaused(p)) { fail(409, 'PROVIDER_PAUSED', 'This provider is not taking new bookings right now'); return; }
                     const providerKey = p.provider_key as string;
 
                     // Die Fassung, die der Nutzer gesehen hat, muss die gueltige sein.
@@ -2102,7 +2116,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Invoices fetch failed', correlationId }));
         }
     } else if (req.method === 'PATCH' && /^\/api\/v1\/provider\/[a-z0-9-]+\/availability$/.test(req.url || '')) {
-        // C2: availability toggle. 'ooo' re-routes new requests + freezes rank.
+        // C2: availability toggle. 'ooo' = pausiert: nicht in /search, keine
+        // Slots, Buchung 409 PROVIDER_PAUSED. Rang bleibt unberuehrt.
         const providerKey = (req.url || '').split('/')[4];
         let availBody = '';
         req.on('data', (chunk: any) => availBody += chunk.toString());
@@ -3275,8 +3290,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 
                 // Bewertung, Reaktionszeit und Region haengen weiter am Anbieter,
                 // nicht an der Leistung — die View traegt sie bewusst nicht.
+                // Pausiert (availability = 'ooo', Canvas C2 10.10.2026): nicht in
+                // neuen Ergebnissen. Kein Abzug am Rang — wer pausiert, faellt
+                // heraus und kommt mit demselben Rang zurueck.
                 const eligible = ((await supabaseApi.select('providers', {})) as any[])
-                    .filter((p: any) => approvedAreas.has(p.provider_key));
+                    .filter((p: any) => approvedAreas.has(p.provider_key) && !isPaused(p));
 
                 // Phase 3 (ADR-0004): der Prioritaetsanteil haengt an der
                 // Verifikationstiefe — Anteil unabhaengig geprueft er Pflichtnach-
@@ -3330,8 +3348,7 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     const rows = viewByKey.get(p.provider_key) ?? [];
                     const { required, usable, depth } = depthFor(rows, evidenceAll.filter((e: any) => e.provider_key === p.provider_key));
                     const priority = depth;
-                    let total = 0.6 * relevance + 0.3 * quality + 0.1 * priority;
-                    if (p.availability === 'ooo') total *= 0.5; // out-of-office → rank frozen/low
+                    const total = 0.6 * relevance + 0.3 * quality + 0.1 * priority;
                     const basis = rankBasis({
                         required, evidence: usable,
                         avg_response_hours: p.avg_response_hours, confirmation_rate: p.confirmation_rate,

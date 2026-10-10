@@ -103,7 +103,8 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
     return n ? String(n) : undefined;
   };
 
-  // C2: live availability — the pill toggles OOO via a confirm step.
+  // C2: live availability — the pill toggles OOO via a confirm step. 'ooo'
+  // heisst pausiert: nicht in neuen Ergebnissen, nicht buchbar (Server).
   const [availability, setAvail] = useState<'available' | 'ooo'>('available');
   const [confirm, setConfirm] = useState<ConfirmSpec | null>(null);
   // v2 vetting (§10): the badge reflects partner_status instead of a hardcoded
@@ -124,14 +125,18 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
         title: t('shell.oooStartTitle'),
         consequence: t('shell.oooStartConsequence'),
         confirmLabel: t('shell.oooStartConfirm'),
-        onConfirm: async () => { await setAvailability('ooo').catch(() => {}); },
+        // Scheitert das Speichern, bleibt der Drawer offen und sagt es (C2) —
+        // vorher schloss er sich still, und der Schalter stand wie vorher.
+        onConfirm: () => setAvailability('ooo'),
+        failure: t('shell.oooFailed'),
       });
     } else {
       setConfirm({
         title: t('shell.oooEndTitle'),
         consequence: t('shell.oooEndConsequence'),
         confirmLabel: t('shell.oooEndConfirm'),
-        onConfirm: async () => { await setAvailability('available').catch(() => {}); },
+        onConfirm: () => setAvailability('available'),
+        failure: t('shell.oooFailed'),
       });
     }
   };

@@ -3954,3 +3954,53 @@ describe('Kalender: Nylas Hosted Auth', () => {
         expect(db.providers[0]).toMatchObject({ nylas_grant_id: null, nylas_calendar_id: null });
     });
 });
+
+// ─── Pausiert = nicht in neuen Ergebnissen, nicht buchbar (Canvas C2, 10.10.2026)
+// Bis hierher versprach die Oberflaeche „umgeleitet, Ranking eingefroren",
+// der Server liess den Anbieter sichtbar und buchbar und halbierte seinen Rang.
+// Jetzt gilt das Versprechen: raus aus Suche, Slots und Buchung — ohne Abzug.
+describe('availability = ooo — pausiert', () => {
+    const suche = () => api('/api/v1/search', {
+        method: 'POST',
+        body: JSON.stringify({ country: 'DE', structured_answers: { markets: ['DE'], domains: ['tax-vat'] } }),
+    });
+
+    it('fehlt in /search; die Gegenprobe ohne Pause erscheint', async () => {
+        seedProvider({ provider_key: 'pausiert', availability: 'ooo' });
+        seedProvider({ provider_key: 'da', availability: 'available' });
+        const r = await suche();
+        expect(r.status).toBe(200);
+        expect(r.body.providers.map((p: any) => p.public_ref)).toEqual([refOf('da')]);
+    });
+
+    it('kommt nach dem Fortsetzen mit unveraendertem Rang zurueck — kein Abzug', async () => {
+        seedProvider({ provider_key: 'schwaecher', rating: 3.5 });
+        const staerker = seedProvider({ provider_key: 'staerker', rating: 5, availability: 'ooo' });
+        expect((await suche()).body.providers).toHaveLength(1);
+        staerker.availability = 'available';
+        const r = await suche();
+        expect(r.body.providers.map((p: any) => p.public_ref)).toEqual([refOf('staerker'), refOf('schwaecher')]);
+    });
+
+    it('liefert keine Slots, die Gegenprobe ohne Pause schon', async () => {
+        seedProvider({ availability: 'ooo' });
+        const r = await api(`/api/v1/p/${refOf('test-kanzlei')}/slots`, { auth: 'jwt' });
+        expect(r.status).toBe(200);
+        expect(r.body).toMatchObject({ slots: [], paused: true });
+        db.providers[0].availability = 'available';
+        const frei = await api(`/api/v1/p/${refOf('test-kanzlei')}/slots`, { auth: 'jwt' });
+        expect(frei.body.slots.length).toBeGreaterThan(0);
+        expect(frei.body.paused).toBeUndefined();
+    });
+
+    it('Buchung: 409 PROVIDER_PAUSED, keine Belastung, keine Buchung', async () => {
+        const { session } = seedBookable({ availability: 'ooo' });
+        const r = await book(standardBody(session));
+        expect(r.status).toBe(409);
+        expect(r.body.errorCode).toBe('PROVIDER_PAUSED');
+        expect(JSON.stringify(r.body)).not.toMatch(/Testkanzlei|provider_key/);
+        expect(stripeMock.createPaymentIntent).not.toHaveBeenCalled();
+        expect(db.provider_lead_ledger ?? []).toHaveLength(0);
+        expect(db.scheduling ?? []).toHaveLength(0);
+    });
+});
