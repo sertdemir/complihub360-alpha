@@ -11,7 +11,7 @@ import { BellPopover } from './BellPopover';
 import { ConfirmDrawer, type ConfirmSpec } from './ConfirmDrawer';
 import { ApplicationStatusBanner } from './ApplicationStatusBanner';
 import { fetchProviderBookings } from '../../api/bookings';
-import { fetchEventLogFeed } from '../../api/notifications';
+import { fetchPartnerNotifications } from '../../api/partnerNotifications';
 import { fetchCoverage, setAvailability, AVAILABILITY_EVENT, fetchMyProvider } from '../../api/provider';
 import { useAuthStore } from '../../store/useAuthStore';
 import { cn } from '../../lib/utils';
@@ -90,12 +90,10 @@ export function ProviderShell({ children }: { children: React.ReactNode }) {
     fetchProviderBookings()
       .then((bs) => setCounts((c) => ({ ...c, requests: bs.filter((b) => b.status === 'confirmed').length })))
       .catch(() => {});
-    // Der Anbieter-Bereich haengt noch am Betriebsprotokoll: eine eigene
-    // Quelle fuer Anbieter gibt es nicht, weil `providers` keine Spalte hat,
-    // die auf ein Konto zeigt. Die Route ist admin-pflichtig, der Zaehler
-    // bleibt fuer Partner also aus — besser als eine erfundene Zahl.
-    fetchEventLogFeed()
-      .then((f) => setCounts((c) => ({ ...c, unread: f.groups.reduce((n, g) => n + g.items.filter((i) => i.unread).length, 0) })))
+    // Die eigene Post des Partners (provider_members → public.notifications).
+    // Vorher das Betriebsprotokoll, das Partnern mit 403 antwortet.
+    fetchPartnerNotifications()
+      .then((ns) => setCounts((c) => ({ ...c, unread: ns.filter((n) => n.unread).length })))
       .catch(() => {});
   }, []);
   const badgeFor = (to: string): string | undefined => {

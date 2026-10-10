@@ -2146,6 +2146,26 @@ describe('GET /api/v1/notifications', () => {
         expect(r.body.unread).toBe(1);
     });
 
+    it('Partner-Glocke: needs_action folgt der Lage, nicht dem Lesen', async () => {
+        seedProvider({ billing_block_reasons: ['payment_failed'], lifecycle_status: 'active' });
+        (db.invoices ??= []).push({ id: 'inv-x', provider_key: 'test-kanzlei', invoice_number: 'INV-0012', status: 'open' });
+        const pf = seedNotification({ type: 'payment_failed', subject: 'provider', subject_id: 'test-kanzlei', payload: { providerKey: 'test-kanzlei' }, read_at: new Date().toISOString() });
+        const ir = seedNotification({ type: 'invoice_retry_scheduled', subject: 'provider', subject_id: 'test-kanzlei', payload: { providerKey: 'test-kanzlei', label: 'INV-0012' } });
+        const vi = seedNotification({ type: 'verification_info_requested', subject: 'provider', subject_id: 'test-kanzlei', payload: { providerKey: 'test-kanzlei' } });
+        const bc = seedNotification({ type: 'booking_created', subject: 'booking', payload: { providerKey: 'test-kanzlei' } });
+        const byId = async () => Object.fromEntries((await api('/api/v1/notifications', { auth: 'jwt' })).body.notifications.map((n: any) => [n.id, n.needs_action]));
+        let m = await byId();
+        expect(m[pf.id]).toBe(true);           // gelesen, aber die Sperre steht noch
+        expect(m[ir.id]).toBe(true);
+        expect(m[vi.id]).toBe(false);          // Status ist nicht more_info_required
+        expect(m[bc.id]).toBe(false);          // Information, nie handlungsbeduerftig
+        db.providers[0].billing_block_reasons = [];
+        db.invoices.find((i: any) => i.id === 'inv-x').status = 'paid';
+        m = await byId();
+        expect(m[pf.id]).toBe(false);
+        expect(m[ir.id]).toBe(false);
+    });
+
     it('gibt ohne Anmeldung nichts heraus — auch nicht dem Server-Key', async () => {
         seedNotification();
         const r = await api('/api/v1/notifications', { auth: 'key' });
