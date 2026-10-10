@@ -1,7 +1,7 @@
 ---
 title: "Provider Phase 6 — Performance aus Buchungen, Ranking ohne Annahmen, Serien-No-Shows, Analytics-Tiefe, Übersicht, Verfügbarkeit"
 assignee: "Claude"
-status: "doing"
+status: "done"
 ---
 
 # Provider Phase 6 — Performance, Ranking, Dashboard, Kalender
@@ -73,7 +73,11 @@ nur Erinnerung, keine Herabstufung (Spec A §17).
   (Profil echt, Verfügbarkeit), HelpDrawer neu, RankingImpactDrawer raus,
   NotificationsPage + Glocke auf eigenen Feed, RequestsPage abgehängt, Nav
   mit Übersicht, Locales (4), Mock, Screenshots.
-- [ ] Review des Nutzers → Staging (Migration per Supabase-MCP, Testlauf).
+- [x] Review des Nutzers → Merge (#299, Squash `4b35b897`, 2026-10-10) → Staging:
+  Migration `20261011010000_performance_availability` per Supabase-MCP in vier
+  Stücken eingespielt (performance_policy v1, providers +3 Spalten,
+  provider_enforcement_actions, RLS/REVOKE) plus Zeile in
+  `supabase_migrations.schema_migrations`.
 
 ## DNA-Check
 
