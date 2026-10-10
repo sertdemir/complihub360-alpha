@@ -45,7 +45,7 @@ const SIDEBAR: { group: string; groupKey: string; badgeKey?: string; items: Side
     groupKey: 'groupWorkspace',
     items: [
       { to: 'dashboard', labelKey: 'navDashboard', icon: LayoutGrid, exact: true },
-      { to: 'dashboard/sessions', labelKey: 'navSessions', icon: FolderClosed },
+      { to: 'dashboard/sessions', labelKey: 'navRiskMaps', icon: FolderClosed },
       // v2: Termine (bookings) replace the retired engagement-request center.
       { to: 'dashboard/termine', labelKey: 'navTermine', icon: CalendarCheck },
       { to: 'dashboard/notifications', labelKey: 'navNotifications', icon: Bell },

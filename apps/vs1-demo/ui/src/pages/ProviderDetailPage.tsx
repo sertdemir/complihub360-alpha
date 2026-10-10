@@ -171,7 +171,7 @@ export function ProviderDetailPage() {
                   „zurueck" allein landet sonst wieder auf dieser Seite, wenn
                   sie aus einer Benachrichtigung heraus geoeffnet wurde. */}
               <Button className="mt-5" type="button" onClick={() => (ctx ? navigate(ctx.backTo) : navigate(-1))}>
-                {ctx ? (ctx.kind === 'area' ? t('detail.backToArea') : t('detail.backToSession')) : t('detail.back')}
+                {ctx ? (ctx.kind === 'area' ? t('detail.backToArea') : t('detail.backToRiskMap')) : t('detail.back')}
               </Button>
             </section>
           )}
@@ -247,7 +247,7 @@ function Detail({ p, ctx, areaLabel, reviews, slots, booking, entered, locale, o
           {one
             ? t(domainsMatched === 1 ? 'detail.lageAreaYes' : 'detail.lageAreaNo', { area: areaLabel ?? ctx.label })
             : ctx.kind === 'session'
-              ? t('detail.lageAreasSession', { matched: domainsMatched, total: domainsRequested, session: ctx.label })
+              ? t('detail.lageAreasRiskMap', { matched: domainsMatched, total: domainsRequested, riskMap: ctx.label })
               : t('detail.lageAreasArea', { matched: domainsMatched, total: domainsRequested, area: areaLabel ?? '' })}
         </span>,
       );
@@ -331,7 +331,7 @@ function Detail({ p, ctx, areaLabel, reviews, slots, booking, entered, locale, o
         {ctx && (
           <div className="mt-0.5 flex shrink-0 items-center">
             <Button variant="secondary" onClick={onBack}>
-              {ctx.kind === 'area' ? t('detail.backToArea') : t('detail.backToSession')}
+              {ctx.kind === 'area' ? t('detail.backToArea') : t('detail.backToRiskMap')}
             </Button>
           </div>
         )}
@@ -441,7 +441,7 @@ function Matrix({ ctx, covered }: { ctx: ProviderContext | null; covered: Set<st
                 {m}
               </span>
             ))}
-            <span className="text-body-4xs font-extrabold text-fg-secondary">{t('detail.matrixSession')}</span>
+            <span className="text-body-4xs font-extrabold text-fg-secondary">{t('detail.matrixRiskMap')}</span>
           </div>
           {duties.length === 0 && <p className="py-4 text-body-xs text-fg-tertiary">{t('detail.matrixNone')}</p>}
           {duties.map((d, i) => (
@@ -785,7 +785,7 @@ function BookingRail({ p, slots, locale, onBook, ctx }: {
       {ctx && (
         <div className="mt-3 border-t border-stroke-subtle pt-3">
           <Link to={ctx.backTo} className="text-body-3xs font-bold text-brand underline underline-offset-2 hover:text-brand-700">
-            {ctx.kind === 'area' ? t('detail.backToArea') : t('detail.backToSession')}
+            {ctx.kind === 'area' ? t('detail.backToArea') : t('detail.backToRiskMap')}
           </Link>
         </div>
       )}

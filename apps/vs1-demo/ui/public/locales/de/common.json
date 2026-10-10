@@ -761,8 +761,8 @@
     "areasEyebrow": "Neun Bereiche, ein Einstieg",
     "areasTitle": "Die neun Compliance-Bereiche",
     "areasLead": "Jeder öffnet eine Seite mit den Pflichten, die er trägt, der Rechtsgrundlage dahinter und dem, was ein Fehler kostet.",
-    "severity": {
-      "critical": "Kritisch",
+    "priority": {
+      "immediate": "Sofort",
       "high": "Hoch",
       "medium": "Mittel",
       "low": "Niedrig"
@@ -1342,7 +1342,7 @@
         ],
         "rows": [
           {
-            "level": "critical",
+            "level": "immediate",
             "title": "OSS-Quartalsmeldung",
             "meta": "DE · NL · Fällig 30. Apr"
           },

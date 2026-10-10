@@ -52,10 +52,10 @@ function RiskScaleDemo() {
   const { t } = useTranslation('home');
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <RiskBadge level="low" styleVariant="soft" size="sm">{t('risk.severity.low')}</RiskBadge>
-      <RiskBadge level="medium" styleVariant="soft" size="sm">{t('risk.severity.medium')}</RiskBadge>
-      <RiskBadge level="high" styleVariant="soft" size="sm">{t('risk.severity.high')}</RiskBadge>
-      <RiskBadge level="critical" styleVariant="soft" size="sm">{t('risk.severity.critical')}</RiskBadge>
+      <RiskBadge level="low" styleVariant="soft" size="sm">{t('risk.priority.low')}</RiskBadge>
+      <RiskBadge level="medium" styleVariant="soft" size="sm">{t('risk.priority.medium')}</RiskBadge>
+      <RiskBadge level="high" styleVariant="soft" size="sm">{t('risk.priority.high')}</RiskBadge>
+      <RiskBadge level="critical" styleVariant="soft" size="sm">{t('risk.priority.immediate')}</RiskBadge>
     </div>
   );
 }

@@ -3,11 +3,11 @@
     "verified": "Verified"
   },
   "risk": {
-    "severity": {
+    "priority": {
       "low": "Low",
       "medium": "Medium",
       "high": "High",
-      "critical": "Immediate"
+      "immediate": "Immediate"
     },
     "state": {
       "confirmed": "Confirmed",
@@ -15,7 +15,7 @@
       "action": "Answer 2 questions"
     },
     "table": {
-      "severity": "Severity",
+      "priority": "Priority",
       "obligation": "Obligation",
       "market": "Market",
       "due": "Due",
@@ -753,7 +753,7 @@
           "UStG §18i (OSS)",
           "DE · NL · FR"
         ],
-        "covers": "covers your 2 Critical priorities",
+        "covers": "covers your 2 Immediate priorities",
         "response": "24h response",
         "engagements": "142 prior engagements"
       },
@@ -824,7 +824,7 @@
     "row1": [
       {
         "title": "Risk-prioritized, not exhaustive",
-        "desc": "Critical to Low. Four to twelve items at any time. Not 200-page checklists."
+        "desc": "Immediate to Low. Four to twelve items at any time. Not 200-page checklists."
       },
       {
         "title": "Sourced from the regulators themselves",

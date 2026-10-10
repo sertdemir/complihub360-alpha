@@ -121,7 +121,7 @@ function DomainView({ slug }: { slug: DomainSlug }) {
   // 1B: der Lage-Satz — nur Teile, die es gibt.
   const lage: ReactNode[] = [];
   if (data && !empty) {
-    lage.push(<span key="o">{t('domainPage.lageOpen', { count: open.length })} {t('domainPage.lageSessions', { count: sessions.length })}</span>);
+    lage.push(<span key="o">{t('domainPage.lageOpen', { count: open.length })} {t('domainPage.lageRiskMaps', { count: sessions.length })}</span>);
     if (high > 0) lage.push(<strong key="h" className="text-risk-high">{t('domainPage.lageHigh', { count: high })}</strong>);
     if (markets.length) lage.push(<span key="m">{markets.join(' · ')}</span>);
     if (nextDue !== null) lage.push(<strong key="d" className="text-fg-accent-strong">{nextDue <= 0 ? t('domainPage.lageNextDueToday') : t('domainPage.lageNextDue', { count: nextDue })}</strong>);
@@ -176,7 +176,7 @@ function DomainView({ slug }: { slug: DomainSlug }) {
                 on={entered}
                 title={t('domainPage.kpiHigh')}
                 value={high}
-                sub={t('domainPage.kpiHighSub', { critical: bySev.critical, high: bySev.high })}
+                sub={t('domainPage.kpiHighSub', { immediate: bySev.critical, high: bySev.high })}
                 segs={open.length ? [{ frac: high / open.length, cls: 'text-risk-high' }] : []}
               />
               <KpiRing
@@ -231,7 +231,7 @@ function DomainView({ slug }: { slug: DomainSlug }) {
                       >
                         <span />
                         {markets.map((m) => <span key={m} className="text-center text-[10px] font-extrabold text-fg-secondary">{m}</span>)}
-                        <span className="text-[10px] font-extrabold text-fg-secondary">{t('domainPage.matrixSession')}</span>
+                        <span className="text-[10px] font-extrabold text-fg-secondary">{t('domainPage.matrixRiskMap')}</span>
                       </div>
                       {open.length === 0 && (
                         <p className="py-4 text-body-xs text-fg-tertiary">{t('domainPage.matrixNone')}</p>
@@ -240,7 +240,7 @@ function DomainView({ slug }: { slug: DomainSlug }) {
                         const own = sessionMarkets(session);
                         const euWide = o.markets.length === 0;
                         const applies = (m: string) => (euWide ? own.includes(m) : o.markets.map((x) => x.toUpperCase()).includes(m));
-                        const tip = t('domainPage.matrixTooltip', { session: sessionTitle(session), due: dueLabel(o) });
+                        const tip = t('domainPage.matrixTooltip', { riskMap: sessionTitle(session), due: dueLabel(o) });
                         return (
                           <div
                             key={`${session.id}:${o.id}`}

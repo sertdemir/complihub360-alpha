@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Check, Lock, ArrowRight } from 'lucide-react';
-import { RiskBadge, type RiskLevel } from '../ui/RiskBadge';
+import { RiskBadge } from '../ui/RiskBadge';
 import { Badge } from '../ui/Badge';
 import { Reveal } from '../providers/SectionHeading';
 import { useInViewOnce } from '../../lib/useInViewOnce';
+import { severityOf, type Priority } from '../../lib/priority';
 
 // ─── /how-it-works — the five stages as a showcase route ─────────────────────
 // (canvas "Die fünf Etappen · Showcase" · Variante A "Wechselspiel", 2026-08-26)
@@ -169,10 +170,10 @@ function MapDemo({ inView }: { inView: boolean }) {
           <motion.div
             key={i}
             variants={item}
-            className={`grid grid-cols-[64px_1fr] items-center gap-3 py-2.5 ${i < 2 ? 'border-b border-stroke-subtle' : ''}`}
+            className={`grid grid-cols-[80px_1fr] items-center gap-3 py-2.5 ${i < 2 ? 'border-b border-stroke-subtle' : ''}`}
           >
-            <RiskBadge level={t(`howItWorks.demos.map.rows.${i}.level`) as RiskLevel} size="sm">
-              {t(`risk.severity.${t(`howItWorks.demos.map.rows.${i}.level`)}`, { ns: 'home' })}
+            <RiskBadge level={severityOf(t(`howItWorks.demos.map.rows.${i}.level`) as Priority)} size="sm">
+              {t(`risk.priority.${t(`howItWorks.demos.map.rows.${i}.level`)}`, { ns: 'home' })}
             </RiskBadge>
             <span className="min-w-0">
               <span className="block truncate text-body-2xs font-bold text-fg">{t(`howItWorks.demos.map.rows.${i}.title`)}</span>

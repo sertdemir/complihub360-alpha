@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EASE } from '../ui/Stats';
+import { priorityOf } from '../../lib/priority';
 
 // ─── Sitzungs-Kachel ─────────────────────────────────────────────────────────
 // EINE Kachel-Form fuer Dashboard (Canvas 6B, 2026-09-05) und Sitzungen-Seite
@@ -70,10 +71,10 @@ export function SessionTile({
       <div className="flex items-start justify-between gap-2">
         <p className="min-w-0 text-body-xs font-bold text-fg">{title}</p>
         {archived ? (
-          <span className={TAG_MUTED}>{t('sessions.archivedTag')}</span>
+          <span className={TAG_MUTED}>{t('riskMaps.archivedTag')}</span>
         ) : (
           <span className={'inline-flex shrink-0 whitespace-nowrap rounded border px-[7px] py-[2px] text-[9.5px] font-bold uppercase tracking-[0.06em] ' + RISK_TAG[severity]}>
-            {t(`home.riskTag.${severity}`)}
+            {t(`home.priorityTag.${priorityOf(severity)}`)}
           </span>
         )}
       </div>
@@ -95,13 +96,13 @@ export function SessionTile({
         <p className={`flex flex-wrap items-center gap-x-1 gap-y-1 text-[10px] text-fg-tertiary ${hasCounts ? 'mt-1.5' : ''}`}>
           {hasCounts && (
             <>
-              <b className={RISK_TEXT[severity]}>{t('home.sessionOpen', { count: open })}</b>
-              <span>· {t('home.sessionOf', { count: total })}</span>
+              <b className={RISK_TEXT[severity]}>{t('home.riskMapOpen', { count: open })}</b>
+              <span>· {t('home.riskMapOf', { count: total })}</span>
               <span>·</span>
             </>
           )}
           <span>{updatedLabel}</span>
-          {stale && <span className={TAG_STALE + ' ml-1'}>{t('sessions.needsRefresh')}</span>}
+          {stale && <span className={TAG_STALE + ' ml-1'}>{t('riskMaps.needsRefresh')}</span>}
         </p>
       </div>
       {/* Fuss ans Kachelende: in einer Reihe liegen alle "Oeffnen" auf einer Hoehe. */}
