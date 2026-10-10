@@ -928,22 +928,22 @@ const PAYMENT_FAILED_STRINGS: Record<MailLocale, { subject: string; intro: strin
     en: {
         subject: 'Action needed: a lead charge did not go through',
         intro: 'A client wanted to book an intro call with you, but the lead fee could not be charged to your card on file. The booking did not take place and no data was shared.',
-        note: 'Bookings stay paused until a different payment method is on file. Open your partner dashboard under Billing to update it; the check runs again right after. You remain visible in search results.',
+        note: 'Bookings stay paused until a different payment method is on file, or until the same card has been checked again. Both are under Billing in your partner dashboard; nothing is charged by the check. You remain visible in search results.',
     },
     de: {
         subject: 'Handlung nötig: eine Lead-Belastung ist nicht durchgegangen',
         intro: 'Ein Mandant wollte ein Erstgespräch mit Ihnen buchen, aber die Lead-Gebühr konnte Ihrer hinterlegten Karte nicht belastet werden. Die Buchung ist nicht zustande gekommen, es wurden keine Daten geteilt.',
-        note: 'Buchungen bleiben ausgesetzt, bis ein anderes Zahlungsmittel hinterlegt ist. Öffnen Sie im Partner-Dashboard den Bereich Abrechnung, um es zu ändern; die Prüfung läuft direkt danach erneut. In den Suchergebnissen bleiben Sie sichtbar.',
+        note: 'Buchungen bleiben ausgesetzt, bis ein anderes Zahlungsmittel hinterlegt oder dieselbe Karte erneut geprüft ist. Beides finden Sie im Partner-Dashboard unter Abrechnung; die Prüfung belastet nichts. In den Suchergebnissen bleiben Sie sichtbar.',
     },
     es: {
         subject: 'Acción necesaria: un cargo de lead no se ha realizado',
         intro: 'Un cliente quería reservar una llamada inicial con usted, pero la tarifa de lead no se pudo cargar a su tarjeta registrada. La reserva no se realizó y no se compartió ningún dato.',
-        note: 'Las reservas quedan en pausa hasta que haya otro método de pago registrado. Abra Facturación en su panel de partner para cambiarlo; la comprobación se repite justo después. Sigue siendo visible en los resultados de búsqueda.',
+        note: 'Las reservas quedan en pausa hasta que haya otro método de pago registrado o se haya vuelto a comprobar la misma tarjeta. Ambas opciones están en Facturación de su panel de partner; la comprobación no cobra nada. Sigue siendo visible en los resultados de búsqueda.',
     },
     tr: {
         subject: 'İşlem gerekli: bir lead ücreti tahsil edilemedi',
         intro: 'Bir müşteri sizinle ilk görüşme rezerve etmek istedi, ancak lead ücreti kayıtlı kartınızdan tahsil edilemedi. Rezervasyon gerçekleşmedi ve hiçbir veri paylaşılmadı.',
-        note: 'Farklı bir ödeme yöntemi kaydedilene kadar rezervasyonlar duraklatılır. Değiştirmek için partner panelinde Faturalandırma bölümünü açın; kontrol hemen ardından yeniden çalışır. Arama sonuçlarında görünür kalırsınız.',
+        note: 'Farklı bir ödeme yöntemi kaydedilene veya aynı kart yeniden kontrol edilene kadar rezervasyonlar duraklatılır. İkisi de partner panelinde Faturalandırma bölümünde; kontrol hiçbir ücret almaz. Arama sonuçlarında görünür kalırsınız.',
     },
 };
 
@@ -996,6 +996,56 @@ export async function sendPaymentFailedMail(p: { to: string | null; providerKey:
     await deliverProviderMail({ to: p.to, kind: 'payment_failed_provider', ref: { providerKey: p.providerKey }, subject: t.subject, text, correlationId: p.correlationId });
 }
 
+
+// ─── ADR-0008 B2a: Abo-Rechnung faellig, Einzug in der Kulanzfrist ────────────
+// Eine Information, keine Mahnung: wann wir die Karte versuchen, dass die
+// Frist bleibt, dass die Sichtbarkeit bleibt, und dass man selbst zahlen kann.
+// Kein „dringend", keine Drohung — es steht nur, was passiert.
+
+const INVOICE_RETRY_STRINGS: Record<MailLocale, { subject: string; intro: string; tries: string; frist: string; self: string }> = {
+    en: {
+        subject: 'Invoice {invoice} is due',
+        intro: 'Invoice {invoice} for {amount} is due today and still open.',
+        tries: 'If it is still open tomorrow, we will try to collect it from your card on file on {dates}. Once the invoice is paid, we stop.',
+        frist: 'The deadline stays the same: if the invoice is still open on {block}, new bookings pause from then until it is paid. You remain visible in search results.',
+        self: 'You can pay the invoice yourself at any time under Billing in your partner dashboard.',
+    },
+    de: {
+        subject: 'Ihre Rechnung {invoice} ist fällig',
+        intro: 'Die Rechnung {invoice} über {amount} ist heute fällig und noch offen.',
+        tries: 'Ist sie morgen noch offen, versuchen wir, den Betrag am {dates} von Ihrer hinterlegten Karte einzuziehen. Sobald die Rechnung bezahlt ist, versuchen wir nichts mehr.',
+        frist: 'Die Frist bleibt dabei unverändert: Ist die Rechnung am {block} noch offen, pausieren ab dann neue Buchungen, bis sie bezahlt ist. In den Suchergebnissen bleiben Sie sichtbar.',
+        self: 'Sie können die Rechnung jederzeit selbst im Partner-Dashboard unter Abrechnung bezahlen.',
+    },
+    es: {
+        subject: 'La factura {invoice} vence hoy',
+        intro: 'La factura {invoice} por {amount} vence hoy y sigue abierta.',
+        tries: 'Si mañana sigue abierta, intentaremos cobrarla de su tarjeta registrada el {dates}. En cuanto la factura esté pagada, dejamos de intentarlo.',
+        frist: 'El plazo no cambia: si la factura sigue abierta el {block}, las nuevas reservas se pausan desde entonces hasta que esté pagada. Sigue siendo visible en los resultados de búsqueda.',
+        self: 'Puede pagar la factura usted mismo en cualquier momento en Facturación de su panel de partner.',
+    },
+    tr: {
+        subject: '{invoice} faturasının vadesi geldi',
+        intro: '{amount} tutarındaki {invoice} faturasının vadesi bugün ve fatura hâlâ açık.',
+        tries: 'Yarın hâlâ açıksa, tutarı {dates} tarihlerinde kayıtlı kartınızdan tahsil etmeyi deneyeceğiz. Fatura ödendiği anda denemeyi bırakırız.',
+        frist: 'Süre değişmez: fatura {block} tarihinde hâlâ açıksa, ödenene kadar o tarihten itibaren yeni rezervasyonlar duraklatılır. Arama sonuçlarında görünür kalırsınız.',
+        self: 'Faturayı istediğiniz zaman partner panelinde Faturalandırma bölümünden kendiniz ödeyebilirsiniz.',
+    },
+};
+
+export async function sendInvoiceRetryNoticeMail(p: {
+    to: string | null; providerKey: string; invoice: string; amountCents: number | null; currency: string;
+    dates: string[]; blocksAt: string; locale?: string; correlationId?: string;
+}): Promise<void> {
+    const loc = resolveLocale(p.locale);
+    const t = INVOICE_RETRY_STRINGS[loc];
+    const tag = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString(loc, { day: 'numeric', month: 'long', timeZone: 'UTC' });
+    const list = new Intl.ListFormat(loc, { style: 'long', type: 'conjunction' }).format(p.dates.map(tag));
+    const amount = p.amountCents === null ? '—' : (p.amountCents / 100).toLocaleString(loc, { style: 'currency', currency: p.currency });
+    const fill = (x: string) => x.replace('{invoice}', p.invoice).replace('{amount}', amount).replace('{dates}', list).replace('{block}', tag(p.blocksAt));
+    const text = [fill(t.intro), '', fill(t.tries), '', fill(t.frist), '', t.self].join('\n');
+    await deliverProviderMail({ to: p.to, kind: 'invoice_retry_notice', ref: { providerKey: p.providerKey, invoice: p.invoice }, subject: fill(t.subject), text, correlationId: p.correlationId });
+}
 
 // ─── Markt-Update (market_requests.notify) ────────────────────────────────────
 // "Email me when <market> is covered" (Risk Map F3). Genau eine Mail je

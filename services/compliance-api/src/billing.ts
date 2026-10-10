@@ -195,7 +195,10 @@ export interface DiscountResult {
  * belasteten Leads je Abrechnungsmonat; Essential keinen. Der Zaehler
  * haengt am Anbieter und am Zyklus (provider_discount_counter), nicht am
  * Abo — ein Planwechsel im Zyklus findet ihn vor und kann das Kontingent
- * nur bis zur eigenen Grenze ausschoepfen, nie von vorn.
+ * nur bis zur eigenen Grenze ausschoepfen, nie von vorn. Fuer Ende plus
+ * Neuanfang galt das bis ADR-0008 nicht (neuer Zyklus = neuer Schluessel);
+ * seit C2 traegt `startSubscription` den Stand des laufenden Zyklus in den
+ * neuen hinueber (`carriedDiscountCount`).
  */
 export function applyMonthlyDiscount(plan: PlanConfig | null, counterUsed: number, standardFeeCents: number): DiscountResult {
     if (!plan || plan.leadDiscountCount <= 0 || plan.leadDiscountPct <= 0 || counterUsed >= plan.leadDiscountCount) {

@@ -274,6 +274,17 @@ function syncReadiness() {
   READINESS = { ready: true, reasons: [], synced_at: plus(0), payment_method: 'Visa ····1881' };
   return { ok: true, readiness: { ...READINESS, changed: true } };
 }
+// ADR-0008 A2: „Karte erneut pruefen" — der erste Versuch wird abgelehnt, der
+// zweite bestaetigt die Karte. So zeigt die Demo beide Ausgaenge.
+let RECHECKS = 0;
+function recheckReadiness() {
+  RECHECKS += 1;
+  if (!READINESS.reasons.includes('payment_failed')) return { ok: true, result: 'not_blocked', readiness: { ...READINESS } };
+  if (RECHECKS === 1) return { ok: true, result: 'declined', reason: 'card_declined' };
+  const reasons = READINESS.reasons.filter((r) => r !== 'payment_failed');
+  READINESS = { ...READINESS, reasons, ready: reasons.length === 0, synced_at: plus(0) };
+  return { ok: true, result: 'cleared', readiness: { ...READINESS } };
+}
 function partnerCoverage() {
   return { ok: true, coverage: { provider_key: PARTNER_KEY, name: 'Schmidt & Partner Steuerberatungsgesellschaft mbH', countries_supported: ['DE', 'AT'], languages: ['DE', 'EN'], sla_target_confirm_hours: 24, availability: 'available', ooo_until: null, partner_status: 'active', contact_email: 'kanzlei@schmidt-partner.example', billing_model: 'mixed', region: 'Norddeutschland', active_since: 2009, pricing_table: [{ service: 'USt-Voranmeldung (monatlich)', price: 'ab 180 € / Monat' }, { service: 'OSS-Registrierung', price: 'ab 450 € einmalig' }] } };
 }
@@ -1023,6 +1034,7 @@ export function route(method: string, path: string, body: Record<string, unknown
   if (p[0] === 'provider' && p[2] === 'bookings' && p[4] === 'attendance' && method === 'PATCH') return reportAttendance(p[3], body);
   if (p[0] === 'scheduling' && p.length === 2 && method === 'PATCH') return patchBooking(p[1], body);
   if (p[0] === 'provider' && p[2] === 'billing' && p[3] === 'sync' && method === 'POST') return syncReadiness();
+  if (p[0] === 'provider' && p[2] === 'billing' && p[3] === 'recheck' && method === 'POST') return recheckReadiness();
   if (p[0] === 'assistant' && p[1] === 'chat') return assistantChat(body);
   if (p[0] === 'session' && p.length === 1) return { ok: true, id: uuid(9, 1) };
   if (p[0] === 'session' && p[2] === 'duplicate') return duplicateSession(p[1], body);

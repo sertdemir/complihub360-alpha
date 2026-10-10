@@ -211,7 +211,24 @@
     "creditOrigin": "Lead ücretinin {{pct}} %'i · müşteri gelmedi ve süre içinde yeniden randevu almadı · {{date}}",
     "creditRemainder": "Bir sonraki fatura için {{amount}} kredi kalıyor",
     "creditNote": "Kredi bir sonraki abonelik faturanızdan düşülür, ödenmez.",
-    "currentPeriodTotalAfterCredit": "Krediden sonraki ara toplam"
+    "currentPeriodTotalAfterCredit": "Krediden sonraki ara toplam",
+    "recheck": {
+      "failedLine": "Son lead ücreti tahsil edilemedi.",
+      "sameTitle": "Kartta yalnızca kısa süreli bakiye yetersizliği vardı",
+      "sameBody": "Aynı kartı kontrol ettirin. Bankanız onaylarsa rezervasyonlar hemen yeniden mümkün olur.",
+      "sameCta": "Kartı yeniden kontrol et",
+      "otherTitle": "Başka bir kart kullanın",
+      "otherBody": "Yeni bir ödeme yöntemi duraklatmayı her zaman kaldırır.",
+      "otherCta": "Portalda ekleyin",
+      "note": "Hiçbir ücret alınmaz. Kontrol, kartın geçerli olup olmadığını gösterir; sonraki bir tahsilat yine de başarısız olabilir. Arama sonuçlarında görünür kalırsınız.",
+      "cleared": "Kartınız onaylandı. Rezervasyonlar yeniden mümkün.",
+      "declined": "Bankanız kartı onaylamadı. Portalda başka bir ödeme yöntemi ekleyin.",
+      "needsAction": "Bankanız burada mümkün olmayan bir onay istiyor. Kartı portalda yeniden ekleyin; bankanız size orada doğrudan sorar.",
+      "rateLimited": "24 saat içinde üç kontrol kullanıldı. Bir sonraki {{when}} itibarıyla mümkün.",
+      "rateLimitedNoTime": "24 saat içinde üç kontrol kullanıldı. Lütfen daha sonra tekrar deneyin.",
+      "failed": "Kontrol tamamlanamadı. Lütfen birazdan tekrar deneyin.",
+      "clearedStillBlocked": "Kartınız onaylandı. Yukarıdaki maddeler hâlâ açık."
+    }
   },
   "confirmEmail": {
     "working": "Yeni adresiniz doğrulanıyor…",

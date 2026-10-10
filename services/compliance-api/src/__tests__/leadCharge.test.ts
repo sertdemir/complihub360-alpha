@@ -7,7 +7,7 @@ vi.mock('../stripe.js', () => ({ isStripeConfigured: () => false, getCustomerBil
 vi.mock('../notifications.js', () => ({ notify: vi.fn() }));
 vi.mock('../mailer.js', () => ({ sendPaymentFailedMail: vi.fn() }));
 
-import { deriveOpportunity, priceSnapshotFrom, currentAcknowledgement, SHARED_FIELDS_V1, type MatchableRow } from '../leadCharge.js';
+import { deriveOpportunity, recheckBudget, priceSnapshotFrom, currentAcknowledgement, SHARED_FIELDS_V1, type MatchableRow } from '../leadCharge.js';
 
 // ─── Phase 4: Opportunity, Snapshot, Bestaetigungstext ───────────────────────
 
@@ -106,5 +106,17 @@ describe('currentAcknowledgement — die gueltige Fassung in der Sprache des Nut
     });
     it('die geteilten Felder des Codes sind die der Fassung v1', () => {
         expect([...SHARED_FIELDS_V1]).toEqual(['email', 'company_name', 'message']);
+    });
+});
+
+// ─── ADR-0008 A2: Pruefbudget ────────────────────────────────────────────────
+describe('recheckBudget', () => {
+    const now = new Date('2026-10-10T12:00:00Z');
+    it('zaehlt nur die letzten 24 Stunden', () => {
+        expect(recheckBudget(['2026-10-09T11:00:00Z', '2026-10-10T08:00:00Z'], now)).toEqual({ left: 2, nextAt: null });
+    });
+    it('ist das Budget aufgebraucht, nennt es den naechsten moeglichen Zeitpunkt', () => {
+        const r = recheckBudget(['2026-10-10T01:00:00Z', '2026-10-10T02:00:00Z', '2026-10-10T03:00:00Z'], now);
+        expect(r).toEqual({ left: 0, nextAt: '2026-10-11T01:00:00.000Z' });
     });
 });

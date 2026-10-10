@@ -2,6 +2,7 @@ import * as crypto from "node:crypto";
 import { structuredLog } from "@complihub360/types";
 import { supabaseApi } from "./supabase.js";
 import { runBillingReadinessTick } from "./leadCharge.js";
+import { runInvoiceRetryTick } from "./invoiceRetry.js";
 import { runSubscriptionPeriodTick } from "./subscriptions.js";
 import { runScheduledChanges } from "./changeSchedule.js";
 import { runAppointmentReminderTick, runRebookTick } from "./attendanceWatch.js";
@@ -92,6 +93,9 @@ export interface TickSummary {
     rebookReminders: number;
     creditsIssued: number;
     rebookDeadlinesClosed: number;
+    invoiceRetryNotices: number;
+    invoiceRetryAttempts: number;
+    invoiceRetryPaid: number;
 }
 
 // ─── Shared reminder core ─────────────────────────────────────────────────────
@@ -182,7 +186,7 @@ async function mark(base: string, shadow: boolean, payload: Record<string, unkno
 export async function runWatcherTick(): Promise<TickSummary> {
     const shadow = watcherConfig.shadow;
     const now = Date.now();
-    const summary: TickSummary = { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0, reviewRequests: 0, reviewWarnings: 0, reviewDowngrades: 0, evidenceExpiringNotices: 0, evidenceExpired: 0, reverificationDue: 0, marketCoveredNotices: 0, billingSynced: 0, billingChanged: 0, subscriptionPeriodsRolled: 0, scheduledChangesApplied: 0, scheduledChangesStale: 0, appointmentReminders: 0, rebookReminders: 0, creditsIssued: 0, rebookDeadlinesClosed: 0 };
+    const summary: TickSummary = { shadow, scanned: 0, reminders: 0, breaches: 0, downgrades: 0, expiries: 0, errors: 0, reviewRequests: 0, reviewWarnings: 0, reviewDowngrades: 0, evidenceExpiringNotices: 0, evidenceExpired: 0, reverificationDue: 0, marketCoveredNotices: 0, billingSynced: 0, billingChanged: 0, subscriptionPeriodsRolled: 0, scheduledChangesApplied: 0, scheduledChangesStale: 0, appointmentReminders: 0, rebookReminders: 0, creditsIssued: 0, rebookDeadlinesClosed: 0, invoiceRetryNotices: 0, invoiceRetryAttempts: 0, invoiceRetryPaid: 0 };
 
     let engagements: Engagement[];
     try {
@@ -360,6 +364,16 @@ export async function runWatcherTick(): Promise<TickSummary> {
         summary.creditsIssued = rb.creditsIssued;
         summary.rebookDeadlinesClosed = rb.deadlinesClosed;
         summary.errors += rb.errors;
+    } catch { summary.errors++; }
+
+    // ADR-0008 B2a: offene Abo-Rechnungen in der Kulanzfrist (Tag 1/3/6)
+    // einziehen; der Stichtag bleibt. Nur mit INVOICE_RETRY_ENABLED=1.
+    try {
+        const ir = await runInvoiceRetryTick(shadow);
+        summary.invoiceRetryNotices = ir.notices;
+        summary.invoiceRetryAttempts = ir.attempts;
+        summary.invoiceRetryPaid = ir.paid;
+        summary.errors += ir.errors;
     } catch { summary.errors++; }
 
     // Markt-Update: angefragte Maerkte, die die Engine inzwischen prueft.

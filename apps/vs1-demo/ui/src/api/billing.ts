@@ -137,6 +137,36 @@ export async function syncBillingReadiness(providerKey?: string): Promise<Billin
   }
 }
 
+// ─── ADR-0008 A2: dieselbe Karte erneut pruefen ──────────────────────────────
+// Nach einer gescheiterten Lead-Belastung prueft Stripe das Standard-
+// Zahlungsmittel, ohne etwas zu belasten. `cleared` hebt die Sperre auf,
+// `not_blocked` heisst: es gab keine (mehr) — dann zaehlt nur die neue Lage.
+
+export type RecheckResult =
+  | { kind: 'cleared' | 'not_blocked'; readiness: BillingReadiness | null }
+  | { kind: 'declined' | 'needs_action' }
+  | { kind: 'rate_limited'; retryAfter: string | null }
+  | { kind: 'not_configured' };
+
+export async function recheckPaymentMethod(providerKey?: string): Promise<RecheckResult> {
+  try {
+    const res = await apiFetch<{ ok: boolean; result: string; readiness?: BillingReadiness | null }>(`/api/v1/provider/${providerKey ?? await myProviderKey()}/billing/recheck`, {
+      method: 'POST',
+      body: '{}',
+    });
+    if (res.result === 'declined' || res.result === 'needs_action') return { kind: res.result };
+    return { kind: res.result === 'cleared' ? 'cleared' : 'not_blocked', readiness: res.readiness ?? null };
+  } catch (e) {
+    const status = e && typeof e === 'object' && 'status' in e ? (e as { status: number }).status : 0;
+    if (status === 503) return { kind: 'not_configured' };
+    if (status === 429) {
+      const body = (e as { body?: { retry_after?: string } }).body;
+      return { kind: 'rate_limited', retryAfter: body?.retry_after ?? null };
+    }
+    throw e;
+  }
+}
+
 // ─── Stripe billing portal (wiring map C3) ───────────────────────────────────
 // Resolves to the portal URL, or 'not-configured' while STRIPE_SECRET_KEY is
 // missing on the API (503) — the page shows an honest note instead of a dead end.

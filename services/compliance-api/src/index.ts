@@ -18,7 +18,7 @@ import { checkMarketRequest } from "./marketRequests.js";
 import { handleContact, resendSender, contactRateLimited } from "./contact.js";
 import { notify, handleNotificationsList, handleNotificationsRead } from "./notifications.js";
 import { handleBillingRun, handleBillingPreview, syncOpenInvoices, loadPricingConfig, getActiveSubscription, getDiscountCounter, cycleStartFor, quoteLeadFee, resolveLedgerStatus } from "./billing.js";
-import { SHARED_FIELDS_V1, currentAcknowledgement, deriveOpportunity, priceSnapshotFrom, chargeLeadFee, recordPaymentFailure, syncBillingReadiness, type ChargeOutcome } from "./leadCharge.js";
+import { SHARED_FIELDS_V1, currentAcknowledgement, deriveOpportunity, priceSnapshotFrom, chargeLeadFee, recordPaymentFailure, recheckPaymentMethod, syncBillingReadiness, type ChargeOutcome } from "./leadCharge.js";
 import { loadAttendancePolicy, findRecentLead } from "./attendance.js";
 import { handleProviderAttendance, handleAdminDispute, recordProviderNoShow, openDispute, rebookWithoutFee, rescheduleAllowed, attendanceFields } from "./attendanceRoutes.js";
 import { ensureStripeCustomer, isStripeConfigured, stripeRequest, getCustomerBilling, refundPaymentIntent, StripeError } from "./stripe.js";
@@ -1216,6 +1216,28 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 res.end(JSON.stringify({ errorCode: 'INTERNAL', message: 'Proposal report failed', correlationId }));
             }
         });
+    } else if (req.method === 'POST' && /^\/api\/v1\/provider\/[a-z0-9-]+\/billing\/recheck$/.test(req.url || '')) {
+        // ADR-0008 A2: das gescheiterte Zahlungsmittel auf Anstoss des Anbieters
+        // pruefen (SetupIntent, kein Geld). Bestaetigt Stripe es, faellt
+        // `payment_failed` weg. Hoechstens drei Pruefungen in 24 h.
+        const providerKey = (req.url || '').split('/')[4];
+        res.setHeader('x-correlation-id', correlationId);
+        const send = (status: number, body: Record<string, unknown>) => { res.writeHead(status, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ ...body, correlationId })); };
+        try {
+            if (!isStripeConfigured()) { send(503, { errorCode: 'STRIPE_NOT_CONFIGURED', message: 'Stripe is not connected yet' }); return; }
+            const r = await recheckPaymentMethod(providerKey, authUserId);
+            const readiness = (x: any) => x ? { ready: x.ready, reasons: x.reasons, synced_at: x.syncedAt, payment_method: x.paymentMethodLabel } : null;
+            switch (r.result) {
+                case 'not_found': send(404, { errorCode: 'NOT_FOUND', message: 'Provider not found' }); return;
+                case 'rate_limited': send(429, { errorCode: 'RECHECK_LIMIT', message: 'Too many checks — try again later', retry_after: r.retryAfter }); return;
+                case 'stripe_error': send(502, { errorCode: 'STRIPE_ERROR', message: 'Stripe request failed' }); return;
+                case 'declined': case 'needs_action': send(200, { ok: true, result: r.result, reason: r.reason }); return;
+                default: send(200, { ok: true, result: r.result, readiness: readiness(r.readiness) });
+            }
+        } catch (err) {
+            structuredLog('error', 'Payment method recheck failed', { correlationId, errorCode: 'ERR_RECHECK', severity: 'error', route: req.url, detail: err instanceof Error ? err.message : String(err) } as any);
+            send(500, { errorCode: 'INTERNAL', message: 'Recheck failed' });
+        }
     } else if (req.method === 'POST' && /^\/api\/v1\/provider\/[a-z0-9-]+\/billing\/sync$/.test(req.url || '')) {
         // Phase 4: Zahlungsbereitschaft aus Stripe und Datenbank neu berechnen —
         // beim Rueckweg aus dem Portal und auf Knopfdruck. Nie im Buchungspfad.
