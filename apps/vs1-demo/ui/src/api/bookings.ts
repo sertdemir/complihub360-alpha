@@ -160,6 +160,8 @@ export interface ProviderBooking {
   /** Thema der Anfrage, roh (das UI uebersetzt). */
   category: string | null;
   country: string | null;
+  /** Maerkte des Leads aus dem Ledger (null: kein Ledger, dann gilt `country`). */
+  countries: string[] | null;
   message: string | null;
   /** null = Buchung aus der Zeit vor Phase 4, ohne Ledger. */
   lead: ProviderBookingLead | null;
@@ -172,7 +174,7 @@ export interface ProviderBooking {
 
 interface ApiProviderBookingRow extends ApiAttendanceFields {
   id: string; slot_start: string; slot_end: string | null; status: BookingStatus; lead_charged: boolean; user_email: string | null;
-  user_company?: string | null; category?: string | null; country?: string | null; message: string | null;
+  user_company?: string | null; category?: string | null; country?: string | null; countries?: string[] | null; message: string | null;
   lead?: { band: 1 | 2 | 3 | 4; standard_fee_cents: number; discount_pct: number; discount_sequence: number | null; final_fee_cents: number; currency: string; payment_status: LeadPaymentStatus; fee_enabled: boolean } | null;
   user_discount_pct?: number | null;
   proposal?: { proposal_issued: boolean; discount_shown: boolean; reported_at: string } | null;
@@ -192,6 +194,7 @@ export async function fetchProviderBookings(providerKey?: string): Promise<Provi
     userCompany: b.user_company ?? null,
     category: b.category ?? null,
     country: b.country ?? null,
+    countries: b.countries ?? null,
     message: b.message,
     lead: b.lead ? {
       band: b.lead.band, standardFeeCents: b.lead.standard_fee_cents, discountPct: b.lead.discount_pct, discountSequence: b.lead.discount_sequence,
@@ -348,6 +351,11 @@ export interface CreateBookingOptions {
   language?: string;
   /** Die Sitzung, aus der die Suche kam: Bereich und Maerkte der Opportunity. */
   sessionId?: string;
+  /** Ohne Sitzung (Bereichsseite): Bereich und Markt der Suche. Sonst nimmt
+   *  der Server ALLE Maerkte des Angebots als Opportunity (Testlauf Phase 4,
+   *  2026-10-09: USt-Buchung von der Bereichsseite als DE+NL berechnet). */
+  areaCode?: string;
+  countries?: string[];
 }
 
 export async function createBooking(publicRef: string, slotStart: string, opts: CreateBookingOptions): Promise<BookingConfirmation> {
@@ -357,6 +365,7 @@ export async function createBooking(publicRef: string, slotStart: string, opts: 
     body: JSON.stringify({
       public_ref: publicRef, slot_start: slotStart, message: opts.message || undefined,
       acknowledgement_version: opts.acknowledgementVersion, language: opts.language || undefined, session_id: opts.sessionId || undefined,
+      area_code: opts.areaCode || undefined, countries: opts.countries?.length ? opts.countries : undefined,
     }),
   });
 }

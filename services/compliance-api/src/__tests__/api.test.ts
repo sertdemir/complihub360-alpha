@@ -813,6 +813,18 @@ describe('Anbieterseite: Lead-Karte, Selbstauskunft, Zahlungsbereitschaft (Phase
         expect(b.price_snapshot).toBeTruthy();
     });
 
+    it('das Thema der Lead-Karte kommt aus dem Ledger, nicht aus einer aelteren Anfrage', async () => {
+        const bookingId = await gebucht();
+        // Eine fruehere Anfrage desselben Nutzers an diesen Anbieter, anderes Thema.
+        (db.engagement_requests ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', user_id: USER_ID, category: 'corporate-structure', country: 'US', structured_answers: {}, created_at: new Date().toISOString() });
+        const lead = db.provider_lead_ledger.find((l: any) => l.provider_key === 'test-kanzlei');
+        const r = await api('/api/v1/provider/test-kanzlei/bookings', { auth: 'key' });
+        const b = r.body.bookings.find((x: any) => x.id === bookingId);
+        expect(b.category).toBe(lead.area_code);
+        expect(b.countries).toEqual(lead.countries);
+        expect(b.country).toBe(lead.countries[0]);
+    });
+
     it('PATCH …/proposal: Upsert, Validierung, nur die eigene Buchung', async () => {
         const bookingId = await gebucht();
         const r0 = await api(`/api/v1/provider/test-kanzlei/bookings/${bookingId}/proposal`, { method: 'PATCH', auth: 'key', body: JSON.stringify({ proposal_issued: false, discount_shown: true }) });
@@ -1139,7 +1151,7 @@ describe('Ownership: Anbieter-eigene Routen gehoeren ihren Mitgliedern', () => {
         ['GET', '/bookings'], ['GET', '/coverage'], ['PATCH', '/coverage'], ['PATCH', '/profile'],
         ['GET', '/invoices'], ['PATCH', '/availability'], ['POST', '/billing-portal'],
         ['POST', '/change-email'], ['GET', '/billing/preview'],
-        ['GET', '/subscription'], ['POST', '/subscription'],
+        ['GET', '/subscription'], ['POST', '/subscription'], ['POST', '/subscription/schedule'],
         // Phase 2 Onboarding
         ['GET', '/application'], ['PATCH', '/application'], ['POST', '/services'],
         ['PATCH', '/services/00000000-0000-0000-0000-000000000001'], ['DELETE', '/services/00000000-0000-0000-0000-000000000001'],
@@ -3162,10 +3174,11 @@ describe('Abo-Schreiber — Tarifwahl, Admin-Zuweisung, Periode', () => {
         expect(ren).not.toBe(e);
     });
 
-    it('ein zweites Abo wird abgelehnt — ein Tarifwechsel ist hier bewusst nicht moeglich', async () => {
-        // Spec B laesst "proration, cancellation notice, grace period,
-        // failed-payment retry, and reactivation rules" ausdruecklich offen.
-        // Ein Wechsel per Tarifwahl wuerde eine Pro-rata-Regel erfinden.
+    it('ein zweites Abo wird abgelehnt — ein Wechsel laeuft ueber die Vormerkung', async () => {
+        // Die Tarifwahl bleibt der EINTRITT. Ein Wechsel geht seit ADR-0006
+        // (B2) ueber `/subscription/schedule` und wirkt zum
+        // Verlaengerungstermin — nicht ueber ein zweites Abo, das sofort
+        // gaelte und eine Pro-rata-Regel erfinden muesste.
         seedProvider();
         seedPricing();
         await api('/api/v1/provider/test-kanzlei/subscription', {
@@ -3193,6 +3206,96 @@ describe('Abo-Schreiber — Tarifwahl, Admin-Zuweisung, Periode', () => {
         });
         expect(b.status).toBe(400);
         expect(db.provider_subscriptions ?? []).toHaveLength(0);
+    });
+
+    // ─── Vormerken ueber die Route (ADR-0006 B2/C2) ─────────────────────────
+
+    it('eine offene Rechnung darf die Kuendigung NICHT blockieren', async () => {
+        // Der Punkt, an dem eine Sperre zur Falle wuerde: Wer nicht kuendigen
+        // kann, solange er im Zahlungsrueckstand ist, zahlt weiter fuer etwas,
+        // das er verlassen will. Die Sperre gilt der BUCHUNG, nicht dem
+        // Ausgang. Deshalb hier bewusst der haerteste Zustand: nicht buchbar,
+        // Rechnung ueberfaellig, letzte Belastung gescheitert.
+        seedProvider({
+            billing_ready: false,
+            billing_block_reasons: ['overdue_invoice', 'payment_failed'],
+        });
+        seedPricing();
+        seedSubscription('test-kanzlei', 'growth', { current_period_start: '2026-10-01', started_at: '2026-10-01T00:00:00Z' });
+        (db.provider_invoices ??= []).push({
+            id: randomUUID(), provider_key: 'test-kanzlei', status: 'open',
+            due_at: '2026-01-01', total_cents: 9900,
+        });
+
+        const r = await api('/api/v1/provider/test-kanzlei/subscription/schedule', {
+            method: 'POST', body: JSON.stringify({ action: 'cancellation' }),
+        });
+        expect(r.status).toBe(200);
+        expect(r.body.scheduled.action).toBe('cancellation');
+
+        const row = db.provider_subscriptions[0];
+        expect(row.scheduled_action).toBe('cancellation');
+        // Und das Abo laeuft bis zum Stichtag weiter — Status unveraendert.
+        expect(row.status).toBe('active');
+        expect(row.ended_at ?? null).toBeNull();
+    });
+
+    it('merkt einen Wechsel zum Stichtag vor und nimmt ihn wieder zurueck', async () => {
+        seedProvider();
+        seedPricing();
+        seedSubscription('test-kanzlei', 'essential', { current_period_start: '2026-10-01', started_at: '2026-10-01T00:00:00Z' });
+
+        const vor = await api('/api/v1/provider/test-kanzlei/subscription/schedule', {
+            method: 'POST', body: JSON.stringify({ action: 'plan_change', plan_code: 'global', cadence: 'annual' }),
+        });
+        expect(vor.status).toBe(200);
+        expect(vor.body.scheduled).toMatchObject({ action: 'plan_change', plan_code: 'global', cadence: 'annual' });
+
+        // Der laufende Tarif ist unangetastet — und der GET zeigt beides.
+        const sicht = await api('/api/v1/provider/test-kanzlei/subscription');
+        expect(sicht.body.subscription.plan_code).toBe('essential');
+        expect(sicht.body.scheduled).toMatchObject({ action: 'plan_change', plan_code: 'global' });
+
+        const zurueck = await api('/api/v1/provider/test-kanzlei/subscription/schedule', {
+            method: 'POST', body: JSON.stringify({ action: 'withdraw' }),
+        });
+        expect(zurueck.status).toBe(200);
+        expect((await api('/api/v1/provider/test-kanzlei/subscription')).body.scheduled).toBeNull();
+    });
+
+    it('lehnt ein Downgrade unter die genutzten Hauptkategorien ab — mit Zahlen', async () => {
+        seedProvider();
+        seedPricing();
+        seedSubscription('test-kanzlei', 'growth', { current_period_start: '2026-10-01', started_at: '2026-10-01T00:00:00Z' });
+        // Zwei freigegebene Hauptkategorien; Essential traegt eine.
+        (db.provider_services ??= []).push(
+            { id: randomUUID(), provider_key: 'test-kanzlei', service_code: 'vat-reg', status: 'approved' },
+            { id: randomUUID(), provider_key: 'test-kanzlei', service_code: 'customs-decl', status: 'approved' },
+        );
+        (db.service_categories ??= []).push(
+            { code: 'vat-reg', parent_code: 'tax-vat', label_en: 'VAT registration' },
+            { code: 'customs-decl', parent_code: 'customs', label_en: 'Customs declaration' },
+            { code: 'tax-vat', parent_code: null, label_en: 'Tax & VAT' },
+            { code: 'customs', parent_code: null, label_en: 'Customs' },
+        );
+
+        const r = await api('/api/v1/provider/test-kanzlei/subscription/schedule', {
+            method: 'POST', body: JSON.stringify({ action: 'plan_change', plan_code: 'essential', cadence: 'monthly' }),
+        });
+        expect(r.status).toBe(409);
+        expect(r.body).toMatchObject({ errorCode: 'ALLOWANCE_TOO_SMALL', allowance: 1, used: 2 });
+        // Nichts vorgemerkt — eine Absage hinterlaesst keinen halben Zustand.
+        expect(db.provider_subscriptions[0].scheduled_action ?? null).toBeNull();
+    });
+
+    it('weist eine unbekannte Aktion ab', async () => {
+        seedProvider(); seedPricing();
+        seedSubscription('test-kanzlei', 'growth', { current_period_start: '2026-10-01' });
+        const r = await api('/api/v1/provider/test-kanzlei/subscription/schedule', {
+            method: 'POST', body: JSON.stringify({ action: 'kuendige_sofort' }),
+        });
+        expect(r.status).toBe(400);
+        expect(db.provider_subscriptions[0].scheduled_action ?? null).toBeNull();
     });
 
     it('ein Tarif allein macht noch nicht buchbar — die Zahlungsmethode fehlt weiter', async () => {
@@ -3348,6 +3451,35 @@ describe('Abo-Schreiber — Tarifwahl, Admin-Zuweisung, Periode', () => {
         const r = await runSubscriptionPeriodTick(true, new Date('2026-03-15T00:00:00Z'));
         expect(r.rolled).toBe(1);
         expect(db.provider_subscriptions[0].current_period_end).toBe('2026-02-01');
+    });
+});
+
+// ─── Kontakt (contact.ts) ────────────────────────────────────────────────────
+// Oeffentlich, eigenes Limit, und ohne CONTACT_INBOX/RESEND_API_KEY ehrlich 503.
+
+describe('POST /api/v1/contact', () => {
+    beforeEach(async () => { (await import('../contact.js')).resetContactLimit(); });
+    const msg = { lane: 'support', locale: 'en', name: 'Jana', email: 'jana@example.com', message: 'Hallo' };
+
+    it('ist ohne Anmeldung erreichbar und sagt 503, solange kein Postfach konfiguriert ist', async () => {
+        const res = await api('/api/v1/contact', { method: 'POST', auth: 'none', body: JSON.stringify(msg) });
+        expect(res.status).toBe(503);
+        expect(res.body.errorCode).toBe('CONTACT_UNAVAILABLE');
+        expect(typeof res.body.correlationId).toBe('string');
+        const ev = (db.event_log ?? []).find((e) => e.type === 'contact_unavailable');
+        expect(JSON.stringify(ev?.payload)).not.toContain('jana');
+    });
+
+    it('prueft vor allem anderen die Eingabe', async () => {
+        const res = await api('/api/v1/contact', { method: 'POST', auth: 'none', body: JSON.stringify({ ...msg, email: 'x' }) });
+        expect(res.status).toBe(400);
+        expect(res.body.field).toBe('email');
+    });
+
+    it('bremst nach fuenf Nachrichten', async () => {
+        for (let i = 0; i < 5; i++) await api('/api/v1/contact', { method: 'POST', auth: 'none', body: JSON.stringify(msg) });
+        const res = await api('/api/v1/contact', { method: 'POST', auth: 'none', body: JSON.stringify(msg) });
+        expect(res.status).toBe(429);
     });
 });
 

@@ -228,43 +228,27 @@
   "search": {
     "navGuided": "Assess My Needs",
     "placeholder": "Describe your situation in your own words…",
-    "submit": "Ask a Compliance Question",
-    "answerEyebrow": "AI answer",
+    "submit": "Ask",
     "answerTitleFor": "On “{{query}}”",
-    "answerTitleDefault": "Ask anything about your compliance obligations",
-    "answerBody1": "This is what likely applies to a situation like yours, with the source behind each point. The answer comes from our AI: general information, not individual legal advice.",
-    "answerBody2": "Your business may differ — thresholds, registers and deadlines depend on your markets, your business model and your volume. Which of them apply to you is what the assessment below works out.",
-    "sources": "Sources",
-    "obligationsTitle": "Relevant obligations",
-    "sev": {
-      "high": "High",
-      "medium": "Medium"
-    },
-    "obligations": {
-      "o1": {
-        "title": "VAT / OSS registration",
-        "detail": "Cross-border distance sales above the EU threshold trigger OSS registration and quarterly returns."
-      },
-      "o2": {
-        "title": "EPR / packaging registration",
-        "detail": "Placing packaged goods on the market requires producer registration before the first shipment."
-      },
-      "o3": {
-        "title": "Cookie consent & privacy notice",
-        "detail": "Consumer-facing tracking requires prior consent and a GDPR-compliant privacy notice."
-      }
-    },
     "guidesTitle": "Where to read on",
     "guideRead": "Open",
     "bridgeTitle": "Want to see what applies to your business?",
     "bridgeBody": "Your risk map is matched to your markets and your business model, and shows the Verified Providers who fit what you actually need.",
     "bridgeCta": "Assess My Needs",
-    "previewBadge": "Preview · answer engine not connected yet",
     "entries": {
       "markets": "Markets and what applies there",
       "compliance": "The eight compliance areas",
       "howItWorks": "How you reach a specialist"
-    }
+    },
+    "noAnswerTitle": "There is no direct answer to freely worded questions yet.",
+    "noAnswerBody": "What applies to your business depends on your markets, your business model and your volume. The assessment asks exactly that. Your Risk Map then shows the obligations, with the source behind every point.",
+    "humanPre": "Rather ask a person directly?",
+    "humanLink": "Write to us.",
+    "humanPost": "We reply the next business day.",
+    "areasTitleOne": "Sounds like this area",
+    "areasTitleMany": "Sounds like these areas",
+    "areasNote": "Matched by keywords in your question — not a review of your case.",
+    "areaOpen": "View area"
   },
   "days_one": "{{count}} day",
   "days_other": "{{count}} days",

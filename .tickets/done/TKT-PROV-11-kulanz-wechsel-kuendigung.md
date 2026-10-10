@@ -1,7 +1,7 @@
 ---
 title: "Kulanzfrist, Tarifwechsel und Kündigung umsetzen (ADR-0006)"
 assignee: "Claude"
-status: "doing"
+status: "done"
 ---
 
 # Kulanzfrist, Tarifwechsel und Kündigung
@@ -12,6 +12,20 @@ Entscheidung des Nutzers vom 2026-10-07: **A2 · B2 · C2**.
 Spec B führte die drei unter „Configurable items requiring final decision". Sie
 waren nie Lücken, sondern wirksame Defaults, die niemand beschlossen hatte —
 null Kulanz, kein Wechsel, keine Selbstkündigung. Jetzt sind sie beschlossen.
+
+## Erledigt
+
+| Stufe | PR | Squash |
+| --- | --- | --- |
+| 1 · Kulanzfrist | #268 | `4cc2dd29` |
+| 2 · Wechsel und Kündigung | #273 | `8a786a2d` |
+
+Beide Migrationen liegen auf Staging und sind nachgemessen; der Auto-Deploy ist
+auf beiden Merges grün gelaufen. Die Oberfläche hat der Nutzer über den Canvas
+abgenommen (1·V2 · 2·V3 · 3·V1 · 4·V3) und in Figma gesehen.
+
+**Offen bleibt, was A2/B2/C2 nicht mitentscheiden:** `failed-payment retry` und
+`reactivation rules` — und daran hängt der Copy-Befund weiter unten.
 
 ## Die drei Regeln
 
@@ -31,40 +45,54 @@ Rabatt-Leads von Monat auf Jahr gestreckt (`TKT-PROV-07`, #240).
 Bewusst getrennt, weil Stufe 1 heute schon Schaden verhindert und ohne
 Migration auskommt.
 
-### Stufe 1 — Kulanzfrist
+### Stufe 1 — Kulanzfrist  ✅ gemergt (PR #268, `4cc2dd29`)
 
-- [ ] `billingReadiness` wird zeitabhängig: die Frist kommt als Eingabe, die
+- [x] `billingReadiness` wird zeitabhängig: die Frist kommt als Eingabe, die
       Funktion bleibt rein. Heute zählt `syncBillingReadiness` nur
       `due_at < now`; künftig `due_at + Frist < now`.
-- [ ] Der Wert als Konfiguration mit Vorgabe 7, nicht als Literal.
-- [ ] `/billing` zeigt ab Tag 1 die offene Rechnung **und das Datum, ab dem
+- [x] Der Wert als Konfiguration mit Vorgabe 7, nicht als Literal.
+- [x] `/billing` zeigt ab Tag 1 die offene Rechnung **und das Datum, ab dem
       gesperrt wird** — als Hinweis, nicht als Sperre. Ohne diesen Teil ist die
       Frist nur eine stillere Sperre.
-- [ ] Copy in en, de, es, tr.
-- [ ] Tests samt Gegenproben: Tag 0, Tag 7, Tag 8; und dass die **Sichtbarkeit**
+- [x] Copy in en, de, es, tr.
+- [x] Tests samt Gegenproben: Tag 0, Tag 7, Tag 8; und dass die **Sichtbarkeit**
       unberührt bleibt (Spec A §14).
 
-### Stufe 2 — Wechsel und Kündigung
+### Stufe 2 — Wechsel und Kündigung  ✅ Backend, Figma und Oberfläche fertig
 
-- [ ] Migration: `provider_subscriptions` bekommt den vorgemerkten Zustand
+- [x] Migration: `provider_subscriptions` bekommt den vorgemerkten Zustand
       (Stichtag + Zieltarif). Versionsnummer **nach** allem, was auf Staging
       liegt — sonst sortiert sie davor (vgl. #241).
-- [ ] Vormerken, zurücknehmen, ausführen. Ausgeführt wird im selben Lauf, der
+- [x] Vormerken, zurücknehmen, ausführen. Ausgeführt wird im selben Lauf, der
       die Perioden weiterrollt (`runSubscriptionPeriodTick`) — beides passiert
       an derselben Grenze.
-- [ ] **Downgrade unter die genutzten Hauptkategorien wird abgelehnt**, nicht
+- [x] **Downgrade unter die genutzten Hauptkategorien wird abgelehnt**, nicht
       vorgemerkt. `categoryAllowanceCheck` fließt über `verificationRules` in
       `missing` ein; ein vorgemerkter Downgrade würde den Anbieter zum Stichtag
       still deaktivieren. Ablehnung mit konkretem Grund.
-- [ ] **Eine offene Rechnung darf die Kündigung nicht blockieren** — sonst
+- [x] **Eine offene Rechnung darf die Kündigung nicht blockieren** — sonst
       verstellt die Sperre den Ausgang.
-- [ ] Oberfläche: Zustand F in `/subscription` bekommt Wechsel und Kündigung
+- [x] Oberfläche: Zustand F in `/subscription` bekommt Wechsel und Kündigung
       mit Stichtag. **Der heutige Text dort wird falsch** und muss weg — er
       sagt, dass es beides nicht gibt.
-- [ ] Copy in vier Sprachen, je eine Benachrichtigung für vorgemerkt und
-      ausgeführt.
-- [ ] Tests samt Gegenproben, besonders: Jahresabo kündigen endet zur
-      Verlängerung, nicht zum Monatsende.
+- [x] Benachrichtigungen (`subscription_scheduled`, `subscription_schedule_done`)
+      und Copy in vier Sprachen (`subscription.manage.*`, 30 Schlüssel).
+- [x] Tests samt Gegenproben, besonders: Jahresabo kündigen endet zur
+      Verlängerung, nicht zum Monatsende. 23 + 5 Tests.
+
+## Zwei Funde aus Stufe 2
+
+**`status = 'cancelled'` heißt im Code „jetzt inaktiv", nicht „gekündigt".**
+`billingReadiness` setzt daraufhin `inactive_subscription`,
+`subscriptionChargeForPeriod` liefert keine Abo-Zeile mehr. Eine vorgemerkte
+Kündigung über den Status abzubilden hätte dem Anbieter Buchbarkeit und
+Abrechnung in der Sekunde genommen, in der er kündigt — für eine Periode, die
+er bezahlt hat. Der Zustand liegt deshalb in eigenen Spalten.
+
+**Der Ownership-Guard deckte `/subscription/schedule` nicht ab.** Der Regex in
+`providerAuth.ts` endete bei `subscription`; jeder Eingeloggte hätte fremde
+Abos kündigen können. Nachgetragen und gegengeprobt (ohne den Eintrag fallen
+zwei Tests, und der fremde Login kommt bis in den Handler).
 
 ## DNA-Check
 
@@ -107,6 +135,26 @@ Spec-B-Punkt. Vorschlag zur Entscheidung — die beiden Texte sagen künftig, wa
 wirklich passiert („Zahlung fehlgeschlagen · ein anderes Zahlungsmittel hebt die
 Sperre auf"), ohne eine Frist zu behaupten. Oder `failed-payment retry` wird
 entschieden, dann darf das Wort bleiben.
+
+## Staging — Stand 2026-10-09
+
+Beide Migrationen sind auf `kqylqwogxbiwpnomkzsn` (Staging) eingespielt und
+nachgemessen:
+
+| Repo-Datei | Fassung auf Staging |
+| --- | --- |
+| `20261007000000_billing_cure_period.sql` | `20261009223804 billing_cure_period` — `billing_policy` Fassung 1, 7 Tage, gültig ab 2026-10-07 |
+| `20261009000000_subscription_scheduled_change.sql` | `20261009234815 subscription_scheduled_change` — sechs `scheduled_*`-Spalten, CHECK, FK, Partial Index |
+
+**Der CHECK wurde funktional geprüft**, nicht nur auf Existenz: ein halber
+Zustand (Aktion ohne Stichtag) wird abgewiesen. Die Probe lief in einem Block,
+der sich selbst zurückrollt — danach unverändert 3 Abos, keines vorgemerkt.
+
+**Die Versionsnummern laufen zwischen Repo und Staging auseinander** — der
+Auto-Deploy migriert nicht, also bekommt jede Migration beim Einspielen einen
+neuen Zeitstempel. Das ist nicht neu (`20261004223829` heißt dort
+`20261005000000_nylas_calendar`), aber es heißt: die Reihenfolge im Repo ist
+die Wahrheit, die Nummern auf Staging sind es nicht.
 
 ## Offen, nicht Teil dieses Tickets
 

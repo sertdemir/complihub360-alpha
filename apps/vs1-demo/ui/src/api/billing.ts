@@ -30,8 +30,11 @@ export interface Invoice {
 
 // Betraege tragen ihre Waehrung mit: Abo und Leads laufen seit Pricing v2 in
 // USD, Alt-Rechnungen aus Phase 1 stehen in EUR.
+/** Glatte Betraege ohne Nachkommastellen ($149), sonst immer zwei ($134.10 —
+ *  nicht $134.1, Befund Testlauf Phase 4, 2026-10-09). */
 export function money(cents: number, currency: string = 'USD'): string {
-  return (cents / 100).toLocaleString('en-US', { style: 'currency', currency, minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  const digits = cents % 100 === 0 ? 0 : 2;
+  return (cents / 100).toLocaleString('en-US', { style: 'currency', currency, minimumFractionDigits: digits, maximumFractionDigits: digits });
 }
 
 export async function fetchInvoices(providerKey?: string): Promise<Invoice[]> {

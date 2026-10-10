@@ -916,7 +916,7 @@
       "localSourcesNote": "In {{count}} der {{total}} Märkte führt die Engine mindestens eine lokale Quelle für diesen Bereich. Sonst gilt das EU-Instrument — und wird auch so ausgewiesen.",
       "marketsRowsNote": "Jede Zeile führt zur Marktseite.",
       "askTitle": "Eine konkrete Frage zu {{area}}?",
-      "askLead": "Stellen Sie sie in eigenen Worten und bekommen Sie eine Antwort mit benannten Quellen. Das Assessment weiter unten ist der längere Weg — es bildet den ganzen Bereich auf Ihr Unternehmen ab, statt eine Frage zu beantworten.",
+      "askLead": "Stellen Sie sie in eigenen Worten — wir zeigen Ihnen, wo es weitergeht, oder Sie fragen direkt einen Menschen. Das Assessment weiter unten bildet den ganzen Bereich auf Ihr Unternehmen ab.",
       "askQuestion": "Frage stellen",
       "askEyebrow": "Ihre Frage",
       "askPlaceholder": "Stellen Sie Ihre Frage in eigenen Worten",
@@ -1281,8 +1281,8 @@
       {
         "kicker": "Verstehen",
         "title": "Fragen Sie in eigenen Worten.",
-        "body": "Beschreiben Sie Ihre Lage so, wie Sie es einer Kollegin erklären würden. Sie bekommen eine Antwort mit der Quelle hinter jedem Punkt — dem Gesetzestext selbst, nicht der Zusammenfassung einer Zusammenfassung. Kein Konto, kein Verkaufsgespräch, keine Verpflichtung weiterzumachen.",
-        "short": "Stellen Sie Ihre Frage im Freitextfeld — die Antwort trägt die Quelle hinter jedem Punkt. Ohne Konto."
+        "body": "Beschreiben Sie Ihre Lage so, wie Sie es einer Kollegin erklären würden. Direkte Antworten auf frei formulierte Fragen gibt es in der Beta noch nicht; das Beispiel zeigt, wohin es geht. Bis dahin führt Ihre Frage zum passenden Bereich und ins Assessment. Kein Konto, kein Verkaufsgespräch, keine Verpflichtung weiterzumachen.",
+        "short": "Stellen Sie Ihre Frage in eigenen Worten — in der Beta führt sie zum passenden Bereich und ins Assessment. Ohne Konto."
       },
       {
         "kicker": "Einschätzen",
@@ -1326,7 +1326,8 @@
             "text": "Für Kleinstmengen existiert eine vereinfachte Pauschale, die…",
             "chip": ""
           }
-        ]
+        ],
+        "example": "Beispiel"
       },
       "map": {
         "stats": [
@@ -1825,7 +1826,7 @@
     },
     "facts": {
       "confirm": {
-        "value": "24 h",
+        "value": "sofort",
         "label": "Eingang bestätigt"
       },
       "answer": {
@@ -1839,7 +1840,6 @@
     },
     "formTitle": "Ihre Bewerbung",
     "formLead": "Das Minimum, mit dem die Prüfung starten kann. Alles Weitere klären wir im Gespräch.",
-    "draftNote": "Vorschau: Der Versandweg für Bewerbungen ist noch nicht angebunden. Bis dahin geht hier nichts hinaus.",
     "firm": "Kanzlei / Firma",
     "contact": "Ansprechperson",
     "email": "E-Mail",
@@ -1855,9 +1855,12 @@
     "submit": "Bewerbung senden",
     "questions": "Lieber erst formlos fragen?",
     "questionsLink": "Zum Kontakt für Anbieter",
-    "notWiredTitle": "Noch nicht abgeschickt",
-    "notWiredBody": "Der Versandweg für Bewerbungen steht noch aus. Bis dahin erreichen Sie uns unter",
-    "backToForm": "Zurück zum Formular"
+    "sent": {
+      "title": "Ihre Bewerbung ist angekommen.",
+      "body": "Eine Bestätigung ist an {{email}} unterwegs. Wir prüfen Ihre Angaben von Hand und melden uns innerhalb von 3 Werktagen.",
+      "progress": "läuft · Rückmeldung in 3 Werktagen",
+      "home": "Zur Startseite"
+    }
   },
   "contact": {
     "hero": {
@@ -1865,7 +1868,7 @@
       "titlePre": "Sagen Sie uns, ",
       "titleGold": "worum es geht",
       "titlePost": ".",
-      "lead": "Ein Weg für alles wäre bequem für uns und langsam für Sie. Wählen Sie Ihr Anliegen — es landet bei den Menschen, die es beantworten können.",
+      "lead": "Wählen Sie Ihr Anliegen — dann weiß, wer Ihre Nachricht liest, sofort, worum es geht. Eine Adresse müssen Sie nicht suchen.",
       "facts": {
         "ways": {
           "value": "4 Wege",
@@ -1892,35 +1895,31 @@
         "short": "Assessment",
         "title": "Hilfe beim Assessment",
         "desc": "Eine Frage hängt, ein Ergebnis wirkt falsch, das Konto klemmt.",
-        "sla": "Antwort am nächsten Werktag",
-        "mailbox": "support@…"
+        "sla": "Antwort am nächsten Werktag"
       },
       "sales": {
         "short": "Preise",
         "title": "Preise und Pläne",
         "desc": "Welcher Plan passt, was ein Team kostet, wie Rechnungen laufen.",
-        "sla": "Antwort am nächsten Werktag",
-        "mailbox": "sales@…"
+        "sla": "Antwort am nächsten Werktag"
       },
       "partner": {
         "short": "Anbieter",
         "title": "Als Anbieter gelistet werden",
         "desc": "Kanzlei, Steuerberatung oder Beratung, die in unser Netzwerk möchte.",
-        "sla": "Rückmeldung in 3 Werktagen",
-        "mailbox": "partner@…"
+        "sla": "Rückmeldung in 3 Werktagen"
       },
       "privacy": {
         "short": "Datenschutz",
         "title": "Datenschutz und Sicherheit",
         "desc": "Auskunft, Löschung, Auftragsverarbeitung oder die Meldung einer Lücke.",
-        "sla": "Frist nach Art. 12 DSGVO",
-        "mailbox": "datenschutz@…"
+        "sla": "Frist nach Art. 12 DSGVO"
       }
     },
     "form": {
       "eyebrow": "Nachricht",
       "title": "Schreiben Sie uns",
-      "lead": "Ein Formular für alle vier Wege. Die Auswahl entscheidet, wo Ihre Nachricht landet — Sie müssen keine Adresse suchen.",
+      "lead": "Ein Formular für alle vier Wege. Mit Ihrer Auswahl ordnen wir die Nachricht gleich richtig ein.",
       "lane": "Ihr Anliegen",
       "name": "Name",
       "namePlaceholder": "Ihr Name",
@@ -1931,8 +1930,7 @@
       "messageHelper": "Markt, Produkt und was Sie erwartet hätten — das spart eine Rückfrage.",
       "privacy": "Wir nutzen Ihre Angaben nur zur Beantwortung. Kein Newsletter ohne Ihr Zutun.",
       "submit": "Nachricht senden",
-      "draftNote": "Vorschau: Der Versandweg und die Postfächer dieser Seite sind noch nicht angebunden. Bis dahin geht hier nichts hinaus.",
-      "notWired": "Noch nicht abgeschickt — der Versandweg steht noch aus. Bis dahin erreichen Sie uns unter"
+      "direct": "Lieber direkt per E-Mail?"
     },
     "faster": {
       "eyebrow": "Vielleicht schneller",
@@ -1996,6 +1994,36 @@
       "address": "Anschrift",
       "phone": "Telefonnummer",
       "hours": "Servicezeiten"
+    },
+    "sent": {
+      "title": "Ihre Nachricht ist angekommen.",
+      "body": "Eine Bestätigung ist an {{email}} unterwegs.",
+      "done": "erledigt",
+      "again": "Weitere Nachricht schreiben"
+    }
+  },
+  "contactSend": {
+    "sending": "Wird gesendet …",
+    "retry": "Erneut senden",
+    "failedTitle": "Ihre Nachricht ist nicht abgeschickt.",
+    "failedTitleApplication": "Ihre Bewerbung ist nicht abgeschickt.",
+    "failed": {
+      "unavailable": "Der Versand ist gerade nicht verfügbar. Ihr Text bleibt hier stehen.",
+      "network": "Die Verbindung zu unserem Postfach ist fehlgeschlagen. Ihr Text bleibt hier stehen.",
+      "rateLimit": "Von Ihrem Anschluss kamen in kurzer Zeit mehrere Nachrichten. Bitte warten Sie 15 Minuten. Ihr Text bleibt hier stehen."
+    },
+    "direct": "Versuchen Sie es erneut oder schreiben Sie uns direkt:",
+    "copy": "Kopieren",
+    "ackFailed": "Die Bestätigung an {{email}} ließ sich nicht zustellen. Unsere Antwort geht an genau diese Adresse. Stimmt sie nicht, schreiben Sie uns bitte noch einmal.",
+    "field": {
+      "name": "Bitte geben Sie Ihren Namen an.",
+      "email": "Bitte prüfen Sie die E-Mail-Adresse.",
+      "message": "Bitte schreiben Sie kurz, worum es geht.",
+      "firm": "Bitte nennen Sie Ihre Firma.",
+      "credentials": "Bitte nennen Sie Ihre Zulassung oder Qualifikation.",
+      "areas": "Bitte wählen Sie mindestens einen Bereich.",
+      "markets": "Bitte wählen Sie mindestens einen Markt.",
+      "website": "Bitte prüfen Sie die Website-Adresse."
     }
   },
   "states": {

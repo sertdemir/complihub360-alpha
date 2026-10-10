@@ -51,12 +51,15 @@ import type { AnonProvider } from '../../api/search';
 type Detail = { kind: 'loading' } | { kind: 'ready'; d: ProviderDetail } | { kind: 'missing' } | { kind: 'error' };
 type Step = 'profil' | 'termin' | 'fertig';
 
-export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessage, sessionId, booking, onBooked }: {
+export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessage, sessionId, opportunity, booking, onBooked }: {
   open: boolean;
   onClose: () => void;
   /** Die Sitzung hinter der Suche — Bereich und Maerkte der Opportunity
    *  kommen daraus; ohne Sitzung leitet der Server sie aus dem Angebot ab. */
   sessionId?: string | null;
+  /** Ohne Sitzung: Bereich und Markt der Suche (Bereichsseite), damit die
+   *  Buchung nicht alle Maerkte des Angebots berechnet. */
+  opportunity?: { areaCode: string; countries: string[] } | null;
   /** Der Anbieter aus der Suche — traegt Match-Zahl und Pseudonym schon; die
    *  Schublade muss dafuer nichts nachladen. */
   provider: AnonProvider | null;
@@ -161,6 +164,8 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
         acknowledgementVersion: ack.version,
         language: locale,
         sessionId: sessionId ?? undefined,
+        areaCode: opportunity?.areaCode,
+        countries: opportunity?.countries,
       });
       setConfirmation(res);
       // Die Liste dahinter erfaehrt es sofort — ohne Neuladen, ohne dass der
@@ -240,7 +245,16 @@ export function PartnerDrawer({ open, onClose, provider, basisNode, sessionMessa
         ) : undefined
       }
       footer={
-        step === 'profil' ? (
+        step === 'profil' && d?.bookable_chargeable === false ? (
+          // Wie die Detailseite (Nutzer-Entscheidung 2026-10-01): kein Knopf
+          // und keine Termine, wenn nicht gebucht werden kann. Vorher fuehrte
+          // die Schublade bis zur Terminwahl und dann in die 409 (Testlauf
+          // Phase 4, 2026-10-09). Der Grund bleibt Sache des Anbieters.
+          <div>
+            <p className="text-body-sm font-bold text-fg">{t('detail.notBookableTitle')}</p>
+            <p className="mt-1.5 text-body-3xs leading-relaxed text-fg-tertiary">{t('detail.notBookableNote')}</p>
+          </div>
+        ) : step === 'profil' ? (
           <>
             <Button size="lg" shape="soft" fullWidth type="button" onClick={() => setStep('termin')}>
               {t('detail.bookCta')} <ArrowRight size={15} />

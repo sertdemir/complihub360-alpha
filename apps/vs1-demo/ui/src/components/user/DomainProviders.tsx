@@ -109,6 +109,7 @@ export const DomainProviders = forwardRef<HTMLElement, {
         open={open !== null}
         onClose={() => setOpen(null)}
         provider={open}
+        opportunity={{ areaCode: slug, countries: [country] }}
         basisNode={open?.match_basis ? <MatchBasis basis={open.match_basis} /> : undefined}
         booking={open ? booked[open.public_ref] ?? null : null}
         onBooked={(key, b) => setBooked((prev) => ({ ...prev, [key]: b }))}

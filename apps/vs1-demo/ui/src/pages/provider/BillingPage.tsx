@@ -192,11 +192,19 @@ export function BillingPage() {
           <p className="rounded-lg border border-elevate/10 bg-elevate/[0.04] px-4 py-3 text-[12px] text-fg-secondary">{t('billing.syncFailed')}</p>
         )}
 
+        {/* D1 (ADR-0008): Der Banner haengt an `invoices.status = 'failed'`,
+            und den setzt nur Stripes `uncollectible` — der Einzug wurde
+            beendet. Readiness zaehlt ausschliesslich offene Rechnungen, diese
+            hier sperrt also nichts. Deshalb `warning` statt `error` und der Weg
+            ins Portal statt „Zahlungsmethode aktualisieren": ein roter Alarm
+            neben dem Satz „sperrt Ihre Buchungen nicht" widerspraeche sich
+            selbst, und eine Zahlungsmethode behebt eine beendete Einziehung
+            nicht. Derselbe Handler, nur ehrlich beschriftet. */}
         {failed && (
           <Banner
-            status="error"
+            status="warning"
             title={t('billing.paymentFailedBanner', { invoice: failed.invoice_number })}
-            action={<Button size="sm" variant="danger" onClick={updatePayment} disabled={portalBusy}>{portalBusy ? '…' : t('billing.updatePaymentMethod')}</Button>}
+            action={<Button size="sm" variant="outline" onClick={updatePayment} disabled={portalBusy}>{portalBusy ? '…' : t('billing.graceOpenPortal')}</Button>}
           >
             {t('billing.paymentFailedBody')}
           </Banner>

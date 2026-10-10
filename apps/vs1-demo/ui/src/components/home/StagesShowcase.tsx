@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Check, Lock, ArrowRight } from 'lucide-react';
 import { RiskBadge, type RiskLevel } from '../ui/RiskBadge';
+import { Badge } from '../ui/Badge';
 import { Reveal } from '../providers/SectionHeading';
 import { useInViewOnce } from '../../lib/useInViewOnce';
 
@@ -95,6 +96,11 @@ function AskDemo({ inView }: { inView: boolean }) {
   const answered = phase === 'answers';
   return (
     <DemoCard>
+      {/* Board E V1 (10.10.2026): Direktantworten auf Freitext gibt es in der
+          Beta nicht — die Karte zeigt, wohin es geht, und sagt das. */}
+      <Badge tone="warning" appearance="soft" size="sm" className="mb-3">
+        {t('howItWorks.demos.ask.example')}
+      </Badge>
       {/* The field starts vertically centred; when the answers mount, the
           collapsing padding slides it to the top and the list pulls up. */}
       <motion.div

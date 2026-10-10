@@ -146,7 +146,7 @@
     "title": "Facturación",
     "subtitle": "Su plan (Essential, Growth o Global) se factura mensual o anualmente — un año cuesta diez meses. Cada lead reservado se cobra según su banda de oportunidad ($99 a $499); Growth y Global reciben un descuento en los primeros leads de cada ciclo. Su plan nunca influye en su posición.",
     "statusPaid": "pagada",
-    "statusFailedGrace": "fallida · gracia",
+    "statusFailedGrace": "no cobrada",
     "statusOpen": "abierta",
     "statusVoid": "anulada",
     "portalNotConfigured": "Stripe se está conectando — podrá gestionar los métodos de pago en cuanto el Billing Portal esté activo.",
@@ -154,14 +154,14 @@
     "kpiThisMonth": "ESTE MES (EN CURSO)",
     "kpiThisMonthTrend": "14 confirmaciones + 17 clics",
     "kpiLastInvoice": "ÚLTIMA FACTURA",
-    "kpiPaymentFailed": "pago FALLIDO",
+    "kpiPaymentFailed": "no cobrada",
     "kpiNextInvoice": "PRÓXIMA FACTURA",
     "kpiMonthlyFirst": "mensualmente el día 1",
     "kpiYtd": "YTD",
     "kpiAcrossMonths_one": "en {{count}} mes",
     "kpiAcrossMonths_other": "en {{count}} meses",
-    "paymentFailedBanner": "Pago fallido en {{invoice}} · período de gracia en curso",
-    "paymentFailedBody": "Reintente o actualice su método de pago para evitar el bloqueo del workspace. Haga clic en la fila de la factura para ver el desglose completo.",
+    "paymentFailedBanner": "La factura {{invoice}} no se cobró",
+    "paymentFailedBody": "El cobro de esta factura ha finalizado. No bloquea sus reservas ni afecta a su visibilidad. En el portal puede ver la factura con sus conceptos y liquidarla.",
     "updatePaymentMethod": "Actualizar método de pago",
     "historyTitle": "Historial de facturas",
     "historyHint": "Haga clic en cualquier fila para ver conceptos + totales",
@@ -170,7 +170,7 @@
     "colTotal": "Total",
     "colStatus": "Estado",
     "colActions": "Acciones",
-    "rowActionFailed": "Actualizar pago · Reintentar",
+    "rowActionFailed": "Ver en el portal",
     "rowActionView": "Ver detalles",
     "currentPeriodTitle": "Mes en curso · {{period}}",
     "currentPeriodHint": "Vista previa en vivo — exactamente las posiciones de la factura mensual.",
@@ -516,7 +516,8 @@
     "attLineProvider": "Informado como no asistencia · registrado como incidente",
     "attLinePlatform": "Fallo de la plataforma · el cliente puede volver a reservar hasta el {{deadline}}",
     "attRebookedFrom": "Nueva reserva de una cita anterior · sin segunda tarifa de lead",
-    "reportOpen": "Pendiente de su informe"
+    "reportOpen": "Pendiente de su informe",
+    "proposalSaveFailed": "No se ha guardado. Inténtelo de nuevo."
   },
   "intake": {
     "inviteOnlyTitle": "El alta de partners es solo por invitación.",
@@ -1005,8 +1006,7 @@
       "categories": "Categorías",
       "categoriesUsed": "hasta {{allowance}} — usa {{used}}",
       "discount": "Descuento por lead",
-      "discountValue": "{{pct}} % en los primeros {{n}} leads cobrados cada mes",
-      "noChangeReason": "Aquí todavía no ofrecemos el cambio de plan. Las reglas de prorrateo y de preaviso de cancelación aún no están fijadas; hasta entonces lo hacemos a mano, para que no se cobre nada que usted no haya aceptado. Escriba a {{mail}}."
+      "discountValue": "{{pct}} % en los primeros {{n}} leads cobrados cada mes"
     },
     "blocked": {
       "suspended": {
@@ -1019,6 +1019,38 @@
       }
     },
     "cadenceMonthlyAdj": "mensual",
-    "cadenceAnnualAdj": "anual"
+    "cadenceAnnualAdj": "anual",
+    "manage": {
+      "change": "Cambiar de plan",
+      "cancel": "Cancelar la suscripción",
+      "dismiss": "Cancelar",
+      "bothTakeEffect": "Ambos surten efecto el {{date}}; hasta entonces nada cambia.",
+      "changeTitle": "¿Cambiar a {{plan}}?",
+      "changeIntro": "El cambio queda programado. Hasta la fecha efectiva todo sigue igual.",
+      "scheduleFor": "Programar para el {{date}}",
+      "pickTarget": "Nuevo plan",
+      "current": "su plan",
+      "someTooSmall": "Los planes que cubren menos de sus {{used}} categorías principales liberadas no pueden elegirse: le desactivarían en la fecha efectiva.",
+      "untilDate": "Hasta el {{date}}",
+      "fromDate": "A partir del {{date}}",
+      "factProrata": "No se prorratea nada ni se reembolsa nada.",
+      "factWithdraw": "Puede retirar el cambio hasta el {{date}}.",
+      "factRanking": "Su plan nunca afecta a su visibilidad en los resultados.",
+      "cancelTitle": "¿Cancelar la suscripción el {{date}}?",
+      "cancelIntro": "{{plan}} sigue plenamente activo hasta entonces: sigue aceptando reservas, su descuento por lead se aplica y puede retirar la cancelación en cualquier momento. No se reembolsa nada ni se cobra nada más allá de esa fecha.",
+      "cancelFor": "Cancelar a partir del {{date}}",
+      "cancelKeeps": "Su cuenta, sus pruebas y sus servicios liberados se mantienen. Sin plan dejará de aceptar reservas de pago desde la fecha efectiva.",
+      "reasonLabel": "¿A qué se debió?",
+      "optional": "Opcional",
+      "reasonHint": "Nos ayuda a mejorar. Su cancelación es válida sin respuesta y nadie le contactará por ello.",
+      "bandChange": "A partir del {{date}}: {{plan}}",
+      "bandCancel": "Su suscripción finaliza el {{date}}",
+      "bandBody": "Programado el {{requested}}. Hasta la fecha efectiva {{plan}} sigue igual: reservas, facturación y descuento se mantienen.",
+      "withdraw": "Retirar",
+      "errAllowance": "Este plan cubre {{allowance}} categorías principales, pero su cuenta tiene {{used}} liberadas.",
+      "errAlready": "Ya hay algo programado. Retírelo primero.",
+      "errSame": "Ese ya es su plan actual.",
+      "errFailed": "Esto no ha funcionado ahora mismo. Inténtelo de nuevo."
+    }
   }
 }

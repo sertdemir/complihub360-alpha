@@ -228,43 +228,27 @@
   "search": {
     "navGuided": "Evaluar mis necesidades",
     "placeholder": "Describa su situación con sus propias palabras…",
-    "submit": "Hacer una pregunta de compliance",
-    "answerEyebrow": "Respuesta de IA",
+    "submit": "Preguntar",
     "answerTitleFor": "Sobre «{{query}}»",
-    "answerTitleDefault": "Pregunte lo que quiera sobre sus obligaciones de compliance",
-    "answerBody1": "Esto es lo que probablemente se aplica a una situación como la suya, con la fuente detrás de cada punto. La respuesta procede de nuestra IA: información general, no asesoramiento jurídico individual.",
-    "answerBody2": "Su empresa puede diferir: los umbrales, registros y plazos dependen de sus mercados, su modelo de negocio y su volumen. Cuáles le afectan es lo que determina el análisis de abajo.",
-    "sources": "Fuentes",
-    "obligationsTitle": "Obligaciones relevantes",
-    "sev": {
-      "high": "Alta",
-      "medium": "Media"
-    },
-    "obligations": {
-      "o1": {
-        "title": "Registro de IVA / OSS",
-        "detail": "Las ventas a distancia transfronterizas por encima del umbral de la UE exigen el registro OSS y declaraciones trimestrales."
-      },
-      "o2": {
-        "title": "Registro EPR / envases",
-        "detail": "Poner en el mercado productos envasados requiere el registro del productor antes del primer envío."
-      },
-      "o3": {
-        "title": "Consentimiento de cookies y aviso de privacidad",
-        "detail": "El seguimiento al consumidor requiere consentimiento previo y un aviso de privacidad conforme al RGPD."
-      }
-    },
     "guidesTitle": "Dónde seguir leyendo",
     "guideRead": "Abrir",
     "bridgeTitle": "¿Quiere ver qué se aplica a su empresa?",
     "bridgeBody": "Su risk map se ajusta a sus mercados y a su modelo de negocio, y muestra los Verified Providers que encajan con lo que realmente necesita.",
     "bridgeCta": "Evaluar mis necesidades",
-    "previewBadge": "Vista previa · el motor de respuestas aún no está conectado",
     "entries": {
       "markets": "Mercados y qué se aplica en ellos",
       "compliance": "Las ocho áreas de compliance",
       "howItWorks": "Cómo llega hasta un especialista"
-    }
+    },
+    "noAnswerTitle": "Todavía no hay respuesta directa a preguntas formuladas libremente.",
+    "noAnswerBody": "Lo que se aplica a su empresa depende de sus mercados, su modelo de negocio y su volumen. La evaluación pregunta justo eso. Después, su Risk Map muestra las obligaciones con la fuente detrás de cada punto.",
+    "humanPre": "¿Prefiere preguntar directamente a una persona?",
+    "humanLink": "Escríbanos.",
+    "humanPost": "Respondemos el siguiente día hábil.",
+    "areasTitleOne": "Parece de este ámbito",
+    "areasTitleMany": "Parece de estos ámbitos",
+    "areasNote": "Asignado por palabras clave de su pregunta, sin revisar su caso.",
+    "areaOpen": "Ver ámbito"
   },
   "days_one": "{{count}} día",
   "days_other": "{{count}} días",

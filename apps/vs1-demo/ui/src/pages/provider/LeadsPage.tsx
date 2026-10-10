@@ -52,7 +52,8 @@ interface Row {
   company: string | null;
   email: string;
   category?: string;
-  country?: string;
+  /** Maerkte des Leads — aus dem Ledger, sonst das Land der Anfrage. */
+  countries: string[];
   meta: string;
   status: BookingStatus;
   leadCharged: boolean;
@@ -87,7 +88,7 @@ export function LeadsPage() {
         company: b.userCompany,
         email: b.userEmail ?? '—',
         category: b.category ?? undefined,
-        country: b.country ?? undefined,
+        countries: b.countries?.length ? b.countries : b.country ? [b.country] : [],
         meta: b.message ?? '—',
         status: b.status,
         leadCharged: b.leadCharged,
@@ -116,14 +117,20 @@ export function LeadsPage() {
   // nicht, bleibt der alte Stand stehen — kein erfundenes „gemeldet".
   const [proposals, setProposals] = useState<Record<string, LeadProposal | null>>({});
   const [proposalBusy, setProposalBusy] = useState<string | null>(null);
+  // Scheitert die Meldung, steht das am Lead — vorher blieb der Umschalter
+  // still auf dem alten Stand, und der Partner hielt sie fuer gesendet
+  // (Testlauf Phase 4, 2026-10-09).
+  const [proposalFailed, setProposalFailed] = useState<string | null>(null);
   const proposalOf = (r: Row) => (r.id in proposals ? proposals[r.id] : r.proposal);
   const report = async (r: Row, next: { proposalIssued: boolean; discountShown: boolean }) => {
     setProposalBusy(r.id);
+    setProposalFailed(null);
     try {
       const saved = await reportProposal(r.id, next);
       setProposals((p) => ({ ...p, [r.id]: saved }));
     } catch {
       // Der Server hat nicht gespeichert; der Umschalter zeigt weiter den alten Stand.
+      setProposalFailed(r.id);
     }
     setProposalBusy(null);
   };
@@ -207,6 +214,9 @@ export function LeadsPage() {
           {toggle(t('termine.yes'), shown, () => report(r, { proposalIssued: true, discountShown: true }), busy || !issued)}
           {toggle(t('termine.no'), issued && !shown, () => report(r, { proposalIssued: true, discountShown: false }), busy || !issued)}
         </div>
+        {proposalFailed === r.id && (
+          <p role="alert" className="w-full text-right text-[11px] text-error-500">{t('termine.proposalSaveFailed')}</p>
+        )}
       </div>
     );
   };
@@ -289,7 +299,7 @@ export function LeadsPage() {
 
   // 2 V1 (2026-10-01): Datumsmarke · Firma · Kontakt · Zeit, Dauer und Thema.
   const minuten = (r: Row) => (r.minutes ? t('termine.minutes', { count: r.minutes }) : '');
-  const thema = (r: Row) => [bereich(r.category), markt(r.country)].filter(Boolean).join(' · ');
+  const thema = (r: Row) => [bereich(r.category), r.countries.map(markt).join(', ')].filter(Boolean).join(' · ');
   const card = (r: Row) => (
     <div key={r.id} className="overflow-hidden rounded-xl border border-stroke bg-surface-secondary/40">
       <div className="flex items-center gap-4 px-5 py-4">
