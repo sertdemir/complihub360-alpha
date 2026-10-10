@@ -1180,3 +1180,74 @@ export async function sendServicePausedMail(p: { to: string | null; bookingId: s
     const { subject, text } = renderServicePausedMail(p.slotIso, p.locale);
     await deliverProviderMail({ to: p.to, kind: 'booking_provider_paused', ref: { bookingId: p.bookingId }, subject, text, correlationId: p.correlationId });
 }
+
+// ─── Phase 5: Anwesenheit, Neubuchung, Guthaben (Spec B, ADR-0007) ───────────
+//
+// Vier Mails, alle nach dem Outbox-Muster von deliverProviderMail. Ton nach
+// KN-BRAND-001: kein Vorwurf, keine Dringlichkeit als Druckmittel, die Frist
+// als Angebot. In der Mail an den Nutzer steht nie, was der Anbieter zahlt.
+
+const APPOINTMENT_REMINDER_STRINGS: Record<MailLocale, { subject24: string; subject1: string; intro: string; whenLabel: string; note: string }> = {
+    en: { subject24: 'Reminder: your consultation is tomorrow', subject1: 'Reminder: your consultation starts in an hour', intro: 'A short reminder of your consultation booked through CompliHub360.', whenLabel: 'When', note: 'If the time no longer works, you can move or cancel the appointment in your dashboard. The other side is informed automatically.' },
+    de: { subject24: 'Erinnerung: Ihr Beratungstermin ist morgen', subject1: 'Erinnerung: Ihr Beratungstermin beginnt in einer Stunde', intro: 'Eine kurze Erinnerung an Ihren über CompliHub360 gebuchten Beratungstermin.', whenLabel: 'Wann', note: 'Passt der Termin nicht mehr, können Sie ihn in Ihrem Dashboard verschieben oder absagen. Die andere Seite wird automatisch informiert.' },
+    es: { subject24: 'Recordatorio: su consulta es mañana', subject1: 'Recordatorio: su consulta empieza en una hora', intro: 'Un breve recordatorio de su consulta reservada a través de CompliHub360.', whenLabel: 'Cuándo', note: 'Si la hora ya no le conviene, puede mover o cancelar la cita en su panel. La otra parte recibe aviso automáticamente.' },
+    tr: { subject24: 'Hatırlatma: danışmanlık görüşmeniz yarın', subject1: 'Hatırlatma: danışmanlık görüşmeniz bir saat içinde başlıyor', intro: 'CompliHub360 üzerinden rezerve ettiğiniz danışmanlık görüşmesi için kısa bir hatırlatma.', whenLabel: 'Ne zaman', note: 'Saat artık uygun değilse randevuyu panelinizden taşıyabilir veya iptal edebilirsiniz. Karşı taraf otomatik olarak bilgilendirilir.' },
+};
+
+/** Terminerinnerung — an Nutzer oder Anbieter, gleicher Text, nur die Stufe entscheidet den Betreff. */
+export async function sendAppointmentReminderMail(p: { to: string | null; side: 'user' | 'provider'; bookingId: string; providerKey: string; slotIso: string; offsetMin: number; locale?: string; correlationId?: string }): Promise<void> {
+    const loc = resolveLocale(p.locale);
+    const t = APPOINTMENT_REMINDER_STRINGS[loc];
+    const fmt = new Intl.DateTimeFormat(loc, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin', timeZoneName: 'short' });
+    const subject = p.offsetMin <= 60 ? t.subject1 : t.subject24;
+    const text = [t.intro, ``, `${t.whenLabel}: ${fmt.format(new Date(p.slotIso))}`, ``, t.note].join('\n');
+    await deliverProviderMail({ to: p.to, kind: `appointment_reminder_${p.side}`, ref: { bookingId: p.bookingId, providerKey: p.providerKey, offsetMin: p.offsetMin }, subject, text, correlationId: p.correlationId });
+}
+
+const NO_SHOW_USER_STRINGS: Record<MailLocale, { subject: string; intro: string; rebook: string; dispute: string; note: string }> = {
+    en: { subject: 'Your consultation did not take place — you can rebook', intro: 'The provider has reported that your consultation booked through CompliHub360 did not take place.', rebook: 'You can book a new slot with the same provider at no cost until {deadline}. Your request stays open with them.', dispute: 'If this does not match what happened, you can object in your dashboard within {hours} hours; we will look at it.', note: 'Nothing is charged to you. If you would rather talk to another provider, your results page is still there.' },
+    de: { subject: 'Ihr Beratungstermin hat nicht stattgefunden — Sie können neu buchen', intro: 'Der Anbieter hat gemeldet, dass Ihr über CompliHub360 gebuchter Beratungstermin nicht stattgefunden hat.', rebook: 'Bis {deadline} können Sie beim selben Anbieter kostenlos einen neuen Termin buchen. Ihre Anfrage bleibt dort offen.', dispute: 'Stimmt das nicht mit Ihrem Eindruck überein, können Sie innerhalb von {hours} Stunden in Ihrem Dashboard widersprechen; wir sehen uns den Fall an.', note: 'Ihnen wird nichts berechnet. Möchten Sie lieber mit einem anderen Anbieter sprechen, finden Sie Ihre Ergebnisseite weiterhin vor.' },
+    es: { subject: 'Su consulta no tuvo lugar — puede reservar de nuevo', intro: 'El proveedor ha informado de que su consulta reservada a través de CompliHub360 no tuvo lugar.', rebook: 'Hasta el {deadline} puede reservar una nueva cita con el mismo proveedor sin coste. Su solicitud sigue abierta con él.', dispute: 'Si esto no coincide con lo ocurrido, puede objetar en su panel en un plazo de {hours} horas; lo revisaremos.', note: 'No se le cobra nada. Si prefiere hablar con otro proveedor, su página de resultados sigue disponible.' },
+    tr: { subject: 'Danışmanlık görüşmeniz gerçekleşmedi — yeniden rezervasyon yapabilirsiniz', intro: 'Sağlayıcı, CompliHub360 üzerinden rezerve ettiğiniz danışmanlık görüşmesinin gerçekleşmediğini bildirdi.', rebook: '{deadline} tarihine kadar aynı sağlayıcıyla ücretsiz yeni bir randevu alabilirsiniz. Talebiniz orada açık kalır.', dispute: 'Bu durum yaşadıklarınızla örtüşmüyorsa {hours} saat içinde panelinizden itiraz edebilirsiniz; inceleyeceğiz.', note: 'Sizden hiçbir ücret alınmaz. Başka bir sağlayıcıyla görüşmeyi tercih ederseniz sonuç sayfanız hâlâ yerinde.' },
+};
+
+/** An den Nutzer, wenn der Anbieter einen No-Show gemeldet hat. Neutral: Frist als Angebot, Widerspruch sichtbar, keine Gebuehr erwaehnt. */
+export async function sendNoShowMail(p: { to: string | null; bookingId: string; providerKey: string; deadline: string; disputeHours: number; locale?: string; correlationId?: string }): Promise<void> {
+    const loc = resolveLocale(p.locale);
+    const t = NO_SHOW_USER_STRINGS[loc];
+    const deadline = new Intl.DateTimeFormat(loc, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${p.deadline}T00:00:00Z`));
+    const text = [t.intro, ``, t.rebook.replace('{deadline}', deadline), ``, t.dispute.replace('{hours}', String(p.disputeHours)), ``, t.note].join('\n');
+    await deliverProviderMail({ to: p.to, kind: 'no_show_user', ref: { bookingId: p.bookingId, providerKey: p.providerKey }, subject: t.subject, text, correlationId: p.correlationId });
+}
+
+const REBOOK_REMINDER_STRINGS: Record<MailLocale, { subject: string; intro: string; note: string }> = {
+    en: { subject: 'You can still rebook your consultation', intro: 'Your consultation booked through CompliHub360 did not take place. A new slot with the same provider is still available to you at no cost until {deadline}.', note: 'If you no longer need the consultation, you can simply let this pass. Nothing is charged to you either way.' },
+    de: { subject: 'Sie können Ihren Beratungstermin noch neu buchen', intro: 'Ihr über CompliHub360 gebuchter Beratungstermin hat nicht stattgefunden. Bis {deadline} können Sie beim selben Anbieter kostenlos einen neuen Termin buchen.', note: 'Brauchen Sie die Beratung nicht mehr, können Sie die Frist einfach verstreichen lassen. Ihnen wird in keinem Fall etwas berechnet.' },
+    es: { subject: 'Todavía puede reservar de nuevo su consulta', intro: 'Su consulta reservada a través de CompliHub360 no tuvo lugar. Hasta el {deadline} puede reservar una nueva cita con el mismo proveedor sin coste.', note: 'Si ya no necesita la consulta, puede dejar pasar el plazo. En ningún caso se le cobra nada.' },
+    tr: { subject: 'Danışmanlık görüşmenizi hâlâ yeniden rezerve edebilirsiniz', intro: 'CompliHub360 üzerinden rezerve ettiğiniz danışmanlık görüşmesi gerçekleşmedi. {deadline} tarihine kadar aynı sağlayıcıyla ücretsiz yeni bir randevu alabilirsiniz.', note: 'Danışmanlığa artık ihtiyacınız yoksa süreyi geçmesine bırakabilirsiniz. Her durumda sizden ücret alınmaz.' },
+};
+
+/** Neubuchungs-Erinnerung an den Nutzer (Tag 1, 5, 10 der Frist). */
+export async function sendRebookReminderMail(p: { to: string | null; bookingId: string; providerKey: string; deadline: string; day: number; locale?: string; correlationId?: string }): Promise<void> {
+    const loc = resolveLocale(p.locale);
+    const t = REBOOK_REMINDER_STRINGS[loc];
+    const deadline = new Intl.DateTimeFormat(loc, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${p.deadline}T00:00:00Z`));
+    const text = [t.intro.replace('{deadline}', deadline), ``, t.note].join('\n');
+    await deliverProviderMail({ to: p.to, kind: 'rebook_reminder_user', ref: { bookingId: p.bookingId, providerKey: p.providerKey, day: p.day }, subject: t.subject, text, correlationId: p.correlationId });
+}
+
+const CREDIT_ISSUED_STRINGS: Record<MailLocale, { subject: string; intro: string; note: string }> = {
+    en: { subject: 'A platform credit has been added to your account', intro: 'The user of a booked lead did not attend and did not rebook within the rebooking period. As set out in the lead fee policy, {amount} ({pct} % of the lead fee paid) has been credited to your CompliHub360 account.', note: 'The credit is applied to your next invoice automatically; it is not paid out. Your lead information and the service-related follow-up right remain with you.' },
+    de: { subject: 'Ihrem Konto wurde ein Plattform-Guthaben gutgeschrieben', intro: 'Der Nutzer eines gebuchten Leads ist nicht erschienen und hat innerhalb der Neubuchungsfrist nicht neu gebucht. Wie in der Lead-Gebührenregelung vorgesehen, wurden Ihrem CompliHub360-Konto {amount} ({pct} % der gezahlten Lead-Gebühr) gutgeschrieben.', note: 'Das Guthaben wird automatisch mit Ihrer nächsten Rechnung verrechnet; eine Auszahlung erfolgt nicht. Die Lead-Informationen und das Nachfassrecht zur angefragten Leistung bleiben bei Ihnen.' },
+    es: { subject: 'Se ha añadido un crédito de plataforma a su cuenta', intro: 'El usuario de un lead reservado no asistió y no reservó de nuevo dentro del plazo. Según la política de tarifas de lead, se han abonado {amount} ({pct} % de la tarifa pagada) a su cuenta de CompliHub360.', note: 'El crédito se aplica automáticamente a su próxima factura; no se paga en efectivo. La información del lead y el derecho de seguimiento sobre el servicio solicitado siguen siendo suyos.' },
+    tr: { subject: 'Hesabınıza bir platform kredisi eklendi', intro: 'Rezerve edilen bir lead\'in kullanıcısı görüşmeye katılmadı ve yeniden rezervasyon süresi içinde yeni randevu almadı. Lead ücreti politikası gereği CompliHub360 hesabınıza {amount} ({pct} % ödenen lead ücreti) kredi olarak eklendi.', note: 'Kredi bir sonraki faturanıza otomatik olarak uygulanır; nakit ödeme yapılmaz. Lead bilgileri ve talep edilen hizmetle ilgili takip hakkı sizde kalır.' },
+};
+
+/** Guthaben an den Anbieter: offen genannt, nie als Gewinn verkauft. */
+export async function sendCreditIssuedMail(p: { to: string | null; providerKey: string; bookingId: string; amountCents: number; currency: string; pct: number; locale?: string; correlationId?: string }): Promise<void> {
+    const loc = resolveLocale(p.locale);
+    const t = CREDIT_ISSUED_STRINGS[loc];
+    const amount = new Intl.NumberFormat(loc, { style: 'currency', currency: p.currency }).format(p.amountCents / 100);
+    const text = [t.intro.replace('{amount}', amount).replace('{pct}', String(p.pct)), ``, t.note].join('\n');
+    await deliverProviderMail({ to: p.to, kind: 'credit_issued_provider', ref: { bookingId: p.bookingId, providerKey: p.providerKey, amountCents: p.amountCents }, subject: t.subject, text, correlationId: p.correlationId });
+}

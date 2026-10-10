@@ -538,8 +538,19 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
                     results.push({ provider: providerKey, skipped: 'already invoiced' });
                     continue;
                 }
+                // Phase 5 (Spec B: Plattform-Guthaben statt Barerstattung): offenes
+                // Guthaben wird mit dieser Rechnung verrechnet, hoechstens bis zur
+                // Rechnungssumme; der Rest bleibt stehen.
+                const creditRows = (await supabaseApi.select('provider_credits', { provider_key: providerKey }, { limit: 1000 })) as Array<{ amount_cents?: number }>;
+                const creditBalance = creditRows.reduce((sum, c) => sum + (c.amount_cents || 0), 0);
+                const creditApplied = Math.max(0, Math.min(creditBalance, line.amount_cents));
+                const creditLine: ChargeLine | null = creditApplied > 0
+                    ? { label: `Platform credit applied · ${period}`, qty: 1, unit_cents: -creditApplied, amount_cents: -creditApplied }
+                    : null;
+                const lines = creditLine ? [line, creditLine] : [line];
+                const totalCents = line.amount_cents - creditApplied;
                 if (dryRun) {
-                    results.push({ provider: providerKey, dry_run: true, total_cents: line.amount_cents, currency: plan.currency, lines: [line] });
+                    results.push({ provider: providerKey, dry_run: true, total_cents: totalCents, currency: plan.currency, lines, credit_applied_cents: creditApplied });
                     continue;
                 }
                 const currency = plan.currency.toLowerCase();
@@ -559,6 +570,12 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
                     customer: customerId, invoice: invoiceId,
                     amount: String(line.amount_cents), currency, description: line.label,
                 });
+                if (creditLine) {
+                    await stripeRequest('POST', 'invoiceitems', {
+                        customer: customerId, invoice: invoiceId,
+                        amount: String(creditLine.amount_cents), currency, description: creditLine.label,
+                    });
+                }
                 const finalized = await stripeRequest('POST', `invoices/${invoiceId}/finalize`) as {
                     id: string; number?: string; status?: string; total?: number;
                     hosted_invoice_url?: string; invoice_pdf?: string; due_date?: number;
@@ -574,20 +591,27 @@ export function handleBillingRun(req: IncomingMessage, res: ServerResponse, corr
                     provider_key: providerKey,
                     invoice_number: finalized.number || invoiceId,
                     period,
-                    amount_cents: finalized.total ?? line.amount_cents,
+                    amount_cents: finalized.total ?? totalCents,
                     currency: plan.currency,
                     status: 'open',
-                    line_items: [line],
+                    line_items: lines,
                     due_at: finalized.due_date ? new Date(finalized.due_date * 1000).toISOString() : null,
                     stripe_invoice_id: finalized.id,
                     hosted_invoice_url: finalized.hosted_invoice_url ?? null,
                     invoice_pdf: finalized.invoice_pdf ?? null,
                 });
+                if (creditApplied > 0) {
+                    // Verbrauch als negative Zeile — die Summe ueber provider_credits bleibt die Wahrheit.
+                    await supabaseApi.insert('provider_credits', {
+                        provider_key: providerKey, amount_cents: -creditApplied, currency: plan.currency, reason: 'consumed',
+                        note: `Applied to invoice ${finalized.number || invoiceId} · ${period}`,
+                    }).catch(() => { /* non-blocking: steht im invoice_issued-Event */ });
+                }
                 await supabaseApi.insert('event_log', {
                     type: 'invoice_issued',
-                    payload: { providerKey, period, plan: plan.code, total_cents: finalized.total ?? line.amount_cents },
+                    payload: { providerKey, period, plan: plan.code, total_cents: finalized.total ?? totalCents, credit_applied_cents: creditApplied },
                 }).catch(() => { /* non-blocking */ });
-                results.push({ provider: providerKey, invoice: finalized.number || invoiceId, total_cents: finalized.total ?? line.amount_cents });
+                results.push({ provider: providerKey, invoice: finalized.number || invoiceId, total_cents: finalized.total ?? totalCents, credit_applied_cents: creditApplied });
             }
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ ok: true, period, providers: results.length, results, correlationId }));
@@ -677,8 +701,12 @@ export async function handleBillingPreview(res: ServerResponse, correlationId: s
                 overdue_since: overdue.oldestDueAt,
             },
             credit_balance_cents: creditBalance,
+            // Phase 5: was die naechste Abo-Rechnung an Guthaben verrechnet und was danach bleibt.
+            credit_applied_cents: Math.max(0, Math.min(creditBalance, subLine?.amount_cents ?? 0)),
+            credits: credits.filter((c) => (c.amount_cents || 0) > 0).slice(0, 20).map((c) => ({ id: c.id, amount_cents: c.amount_cents, currency: c.currency ?? currency, reason: c.reason, booking_id: c.booking_id ?? null, created_at: c.created_at })),
             lines: subLine ? [subLine] : [],
             total_cents: (subLine?.amount_cents ?? 0) + leads.final_cents,
+            total_after_credit_cents: (subLine?.amount_cents ?? 0) + leads.final_cents - Math.max(0, Math.min(creditBalance, subLine?.amount_cents ?? 0)),
             pricing: {
                 plans: cfg.plans.map((p) => ({ code: p.code, label: p.label, monthly_cents: p.monthlyCents, annual_cents: p.annualCents, currency: p.currency, category_allowance: p.categoryAllowance, lead_discount_pct: p.leadDiscountPct, lead_discount_count: p.leadDiscountCount })),
                 bands: cfg.bands.map((b) => ({ band: b.band, label: b.label, fee_cents: b.feeCents, currency: b.currency })),
