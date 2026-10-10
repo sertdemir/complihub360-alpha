@@ -285,8 +285,10 @@ function recheckReadiness() {
   READINESS = { ...READINESS, reasons, ready: reasons.length === 0, synced_at: plus(0) };
   return { ok: true, result: 'cleared', readiness: { ...READINESS } };
 }
+// Pausieren (Canvas C2): Kopfzeile und Einstellungen schalten denselben Wert.
+let MOCK_AVAILABILITY: 'available' | 'ooo' = 'available';
 function partnerCoverage() {
-  return { ok: true, coverage: { provider_key: PARTNER_KEY, name: 'Schmidt & Partner Steuerberatungsgesellschaft mbH', countries_supported: ['DE', 'AT'], languages: ['DE', 'EN'], sla_target_confirm_hours: 24, availability: 'available', ooo_until: null, partner_status: 'active', contact_email: 'kanzlei@schmidt-partner.example', billing_model: 'mixed', region: 'Norddeutschland', active_since: 2009, pricing_table: [{ service: 'USt-Voranmeldung (monatlich)', price: 'ab 180 € / Monat' }, { service: 'OSS-Registrierung', price: 'ab 450 € einmalig' }] } };
+  return { ok: true, coverage: { provider_key: PARTNER_KEY, name: 'Schmidt & Partner Steuerberatungsgesellschaft mbH', countries_supported: ['DE', 'AT'], languages: ['DE', 'EN'], sla_target_confirm_hours: 24, availability: MOCK_AVAILABILITY, ooo_until: null, partner_status: 'active', contact_email: 'kanzlei@schmidt-partner.example', billing_model: 'mixed', region: 'Norddeutschland', active_since: 2009, pricing_table: [{ service: 'USt-Voranmeldung (monatlich)', price: 'ab 180 € / Monat' }, { service: 'OSS-Registrierung', price: 'ab 450 € einmalig' }] } };
 }
 const monat = (offset: number) => { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() + offset); return d.toISOString().slice(0, 7); };
 // Pricing v2 (ADR-0003): Tarif + Leads nach Band, Rabatt auf die ersten Leads
@@ -1082,6 +1084,10 @@ export function route(method: string, path: string, body: Record<string, unknown
   // der Demo-Login diesen Zweig nicht — api/contact.ts geht am Demo-Datensatz
   // vorbei, damit dort kein Versand vorgetaeuscht wird.
   if (p[0] === 'contact' && method === 'POST') return { ok: true, acknowledged: true };
+  if (p[0] === 'provider' && p[2] === 'availability' && method === 'PATCH') {
+    MOCK_AVAILABILITY = body.status === 'ooo' ? 'ooo' : 'available';
+    return { ok: true, providerKey: p[1], availability: MOCK_AVAILABILITY, ooo_until: null };
+  }
   if (p[0] === 'market-requests' && method === 'POST') {
     const market = String(body.market ?? '').toUpperCase();
     // Wie der Server (marketRequests.ts): ein bekannter Markt nur als Anfrage

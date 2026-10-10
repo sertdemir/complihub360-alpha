@@ -375,7 +375,8 @@ export async function createBooking(publicRef: string, slotStart: string, opts: 
 /** Die Faelle, die eine Oberflaeche unterscheiden muss — alles andere ist
  *  „nicht gebucht, bitte spaeter erneut". `not_completed` ist die Belastung
  *  des Anbieters, die scheiterte (409 BOOKING_NOT_COMPLETED) oder ein
- *  Anbieter, der gerade keine Buchung annehmen kann (409 BILLING_NOT_READY):
+ *  Anbieter, der gerade keine Buchung annehmen kann (409 BILLING_NOT_READY,
+ *  409 PROVIDER_PAUSED — pausiert, etwa aus einem alten Tab):
  *  fuer den Nutzer dieselbe Lage, dieselbe neutrale Antwort, kein Grund. */
 export type BookingFailure =
   | { kind: 'not_completed' }
@@ -386,7 +387,7 @@ export type BookingFailure =
 export function bookingFailureFrom(err: unknown): BookingFailure {
   if (!(err instanceof ApiError)) return { kind: 'generic' };
   const code = String(err.body.errorCode ?? '');
-  if (code === 'BOOKING_NOT_COMPLETED' || code === 'BILLING_NOT_READY') return { kind: 'not_completed' };
+  if (code === 'BOOKING_NOT_COMPLETED' || code === 'BILLING_NOT_READY' || code === 'PROVIDER_PAUSED') return { kind: 'not_completed' };
   if (code === 'SLOT_TAKEN') return { kind: 'slot_taken' };
   if (code === 'ACKNOWLEDGEMENT_OUTDATED') return { kind: 'acknowledgement_outdated', currentVersion: typeof err.body.current_version === 'string' ? err.body.current_version : null };
   return { kind: 'generic' };

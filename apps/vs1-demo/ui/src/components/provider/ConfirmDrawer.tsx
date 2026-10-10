@@ -15,6 +15,9 @@ export interface ConfirmSpec {
   /** When set, the user must type this word to enable the confirm button. */
   keyword?: string;
   onConfirm: () => void | Promise<void>;
+  /** Satz, wenn onConfirm wirft. Dann bleibt der Drawer offen und sagt es —
+   *  statt sich zu schliessen, als waere es geschehen. */
+  failure?: string;
 }
 
 /** Rahmentexte des Drawers. Vorgabe ist der providerws-Namensraum (der
@@ -37,15 +40,23 @@ export function ConfirmDrawer({ spec, onClose, labels }: { spec: ConfirmSpec | n
   };
   const [typed, setTyped] = useState('');
   const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
 
-  useEffect(() => { setTyped(''); setBusy(false); }, [spec?.title]);
+  useEffect(() => { setTyped(''); setBusy(false); setFailed(false); }, [spec?.title]);
 
   const armed = !spec?.keyword || typed.trim().toUpperCase() === spec.keyword.toUpperCase();
 
   const run = async () => {
     if (!spec) return;
     setBusy(true);
-    await spec.onConfirm();
+    setFailed(false);
+    try {
+      await spec.onConfirm();
+    } catch (err) {
+      setBusy(false);
+      if (spec.failure) { setFailed(true); return; }
+      throw err;
+    }
     setBusy(false);
     onClose();
   };
@@ -73,6 +84,9 @@ export function ConfirmDrawer({ spec, onClose, labels }: { spec: ConfirmSpec | n
             <TriangleAlert size={16} className="mt-0.5 shrink-0 text-error-500" />
             <p className="text-[12px] leading-relaxed text-fg-secondary">{spec.consequence}</p>
           </div>
+          {failed && spec.failure && (
+            <p role="alert" className="text-[12px] leading-relaxed text-error-700 dark:text-red-300">{spec.failure}</p>
+          )}
           {spec.keyword && (
             <div>
               <p className="mb-1.5 text-[11px] text-fg-tertiary">
