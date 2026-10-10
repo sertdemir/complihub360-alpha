@@ -40,6 +40,11 @@ describe('providerSharedView — der Anbieter liest nur den Schnappschuss', () =
         expect(v).toEqual({ user_email: 'a@b.example', user_company: 'Acme', message: 'm' });
     });
 
+    it('Buchung mit Pruefdialog, aber ohne Schnappschuss: nie die Firma aus der Anfrage (Pruefung H1)', () => {
+        const v = providerSharedView({ shared_fields: FIELDS, acknowledgement_version: 'booking-ack-v1', message: 'm' }, { email: 'a@b.example', company: 'Anfragefirma KG' });
+        expect(v).toEqual({ user_email: 'a@b.example', user_company: null, message: 'm' });
+    });
+
     it('ohne Schnappschuss (aeltere Buchung): nur die freigegebenen Felder', () => {
         const v = providerSharedView({ shared_fields: ['email'], message: 'm' }, { email: 'a@b.example', company: 'Acme' });
         expect(v).toEqual({ user_email: 'a@b.example', user_company: null, message: null });

@@ -3806,12 +3806,15 @@ describe('Phase 5 — Anwesenheit, Widerspruch, Neubuchung, Guthaben', () => {
     it('Neubuchung in der Frist: neue Zeile am selben Lead, keine zweite Gebuehr, Frist erledigt', async () => {
         seedProvider(); seedMember();
         const ledger = seedLedger();
-        const b = seedBooking({ status: 'no_show', no_show_by: 'user', no_show_reported_at: past(10), rebook_deadline: dayStr(13), lead_ledger_id: ledger.id, acknowledgement_version: 'booking-ack-v1', shared_fields: ['email', 'company_name', 'message'] });
+        const snap = { email: 'test@complihub.test', company_name: 'Profilfirma GmbH', message: null, topic: { area_code: 'tax-vat', countries: ['DE'] } };
+        const b = seedBooking({ status: 'no_show', no_show_by: 'user', no_show_reported_at: past(10), rebook_deadline: dayStr(13), lead_ledger_id: ledger.id, acknowledgement_version: 'booking-ack-v1', shared_fields: ['email', 'company_name', 'message'], shared_snapshot: snap });
         const target = future(3);
         const r = await api(`/api/v1/scheduling/${b.id}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ slot_start: target }) });
         expect(r.status).toBe(201);
         expect(r.body).toMatchObject({ status: 'confirmed', slot_start: target, rebooked_from: b.id });
         const neu = db.scheduling.find((x) => x.id === r.body.id);
+        // Schritt 4 (Pruefung H1): die Neubuchung teilt dasselbe, was bestaetigt wurde.
+        expect(neu.shared_snapshot).toEqual(snap);
         expect(neu).toMatchObject({ status: 'confirmed', lead_ledger_id: ledger.id, rebooked_from: b.id, lead_charged: false, acknowledgement_version: 'booking-ack-v1' });
         expect(db.scheduling[0].credit_decided_at).toBeTruthy();
         expect(db.provider_lead_ledger).toHaveLength(1);
@@ -4193,6 +4196,41 @@ describe('Privacy Critical Tests (Checklist v1.0)', () => {
         expect(p.status).toBe(200);
         expect(p.body.bookings[0]).toMatchObject({ user_email: 'test@complihub.test', user_company: 'Profilfirma GmbH', message: 'Erstgespräch' });
         expect(JSON.stringify(p.body.bookings[0])).not.toContain('Anfragefirma');
+    });
+
+    it('#8 Anfrage-Thread: nur Ersteller und Anbieter-Mitglieder, und jeder nur als die eigene Seite', async () => {
+        seedProvider(); seedMember();
+        const engId = randomUUID();
+        (db.engagement_requests ??= []).push({ id: engId, provider_key: 'test-kanzlei', user_id: randomUUID(), category: 'tax-vat', country: 'DE', structured_answers: { company: 'Fremde Firma' }, created_at: '2026-10-01T08:00:00Z' });
+        // Ein fremder Nutzer liest nicht und schreibt nicht — auch nicht als "provider".
+        const lesen = await api(`/api/v1/engagement/${engId}`, { auth: 'jwt' });
+        expect(lesen.status).toBe(404);
+        expect(JSON.stringify(lesen.body)).not.toContain('Fremde Firma');
+        const schreiben = await api(`/api/v1/engagement/${engId}/message`, { method: 'POST', auth: 'jwt', body: JSON.stringify({ author: 'provider', body: 'Hallo' }) });
+        expect(schreiben.status).toBe(404);
+        expect(db.engagement_messages ?? []).toHaveLength(0);
+        // Das Mitglied des Anbieters liest und schreibt als Anbieter, nicht als Nutzer.
+        const memberJwt = signJwt({ sub: MEMBER_ID, email: 'member@kanzlei.example' });
+        expect((await asUser(memberJwt, `/api/v1/engagement/${engId}`)).status).toBe(200);
+        expect((await asUser(memberJwt, `/api/v1/engagement/${engId}/message`, { method: 'POST', body: JSON.stringify({ author: 'user', body: 'x' }) })).status).toBe(404);
+        expect((await asUser(memberJwt, `/api/v1/engagement/${engId}/message`, { method: 'POST', body: JSON.stringify({ author: 'provider', body: 'Antwort' }) })).status).toBe(201);
+        await settle();
+        expect(denied().map((e) => e.payload.resource)).toEqual(['engagement', 'engagement', 'engagement']);
+    });
+
+    it('#8 Anbieter-Bereich: protokolliert nur, wenn es den Anbieter gibt', async () => {
+        seedProvider();
+        expect((await api('/api/v1/provider/test-kanzlei/bookings', { auth: 'jwt' })).status).toBe(404);
+        expect((await api('/api/v1/provider/gibt-es-nicht/bookings', { auth: 'jwt' })).status).toBe(404);
+        await settle();
+        expect(denied().map((e) => e.payload.target)).toEqual(['test-kanzlei']);
+    });
+
+    it('#3 Detail mit Server-Key ohne Nutzer: anonym, kein Fehler (Pruefung M1)', async () => {
+        seedProvider();
+        const r = await api(`/api/v1/p/${refOf('test-kanzlei')}/detail`, { auth: 'key' });
+        expect(r.status).toBe(200);
+        expect(r.body.detail.revealed).toBe(false);
     });
 
     it('#10 Nachweis: Nutzer, Anbieter, Felder, Bestaetigung und Zeit stehen an der Buchung und im Ereignis', async () => {

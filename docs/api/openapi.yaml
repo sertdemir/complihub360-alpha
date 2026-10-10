@@ -338,6 +338,12 @@ paths:
   /engagement/{id}:
     get:
       summary: Get engagement status
+      description: >-
+        Nur fuer den Ersteller, Mitglieder des angefragten Anbieters oder den
+        Server-Key (Schritt 4, Checklist "Authorization"); allen anderen 404,
+        und der Versuch steht als `access_denied` im Ereignislog.
+        `POST /engagement/{id}/message` gilt dasselbe, und jeder schreibt nur
+        als die eigene Seite (`author`).
       parameters:
         - in: path
           name: id

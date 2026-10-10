@@ -61,7 +61,7 @@ export function buildSharedSnapshot(fields: readonly string[], src: SharedSource
  *  aeltere Buchungen ohne Schnappschuss nur die Felder aus `shared_fields`,
  *  Buchungen von vor Phase 4 (ohne Feldliste) unveraendert. */
 export function providerSharedView(
-    booking: { shared_snapshot?: SharedSnapshot | null; shared_fields?: string[] | null; message?: string | null },
+    booking: { shared_snapshot?: SharedSnapshot | null; shared_fields?: string[] | null; message?: string | null; acknowledgement_version?: string | null },
     legacy: { email: string | null; company: string | null },
 ): { user_email: string | null; user_company: string | null; message: string | null } {
     const snap = booking.shared_snapshot;
@@ -69,6 +69,16 @@ export function providerSharedView(
         return { user_email: snap.email ?? null, user_company: snap.company_name ?? null, message: snap.message ?? null };
     }
     const fields = Array.isArray(booking.shared_fields) ? booking.shared_fields : [];
+    // Eine Buchung mit Pruefdialog (Fassung gesetzt), aber ohne Schnappschuss —
+    // etwa eine Neubuchung aus einer Zeit vor B1: der Nutzer hat die Firma
+    // nirgends bestaetigt, also geht keine. Nie zurueck auf die Anfrage.
+    if (fields.length > 0 && booking.acknowledgement_version) {
+        return {
+            user_email: fields.includes('email') ? legacy.email : null,
+            user_company: null,
+            message: fields.includes('message') ? booking.message ?? null : null,
+        };
+    }
     // Buchungen von vor Phase 4 (2026-10-01) tragen gar keine Feldliste
     // (Spaltenvorgabe '{}'): Damals gab es keinen Pruefdialog. Sie behalten,
     // was sie hatten, damit ein laufender Termin seinen Kontakt nicht verliert.

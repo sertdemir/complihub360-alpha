@@ -8,7 +8,7 @@ import { Badge } from '../components/ui/Badge';
 import { KpiRing, useEntered } from '../components/ui/Stats';
 import { SEVERITY_STYLE } from '../components/compliance-areas/severity';
 import { ApiError } from '../api/client';
-import { fetchProviderDetail, fetchProviderReviews, fetchSlots, fetchUserBookings, providerWebsiteHref, type ProviderDetail, type ProviderReview, type UserBooking } from '../api/bookings';
+import { fetchProviderDetail, fetchProviderReviews, fetchSlots, fetchUserBookings, type ProviderDetail, type ProviderReview, type UserBooking } from '../api/bookings';
 import { DateMark } from '../components/ui/DateMark';
 import { useRequestContext } from '../lib/requestContext';
 import { AnonNotice, RankBasis } from '../components/user/PartnerCard';
@@ -335,7 +335,10 @@ function Detail({ p, ctx, areaLabel, reviews, slots, booking, entered, locale, o
               <p className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-body-sm text-fg-secondary">
                 {p.contact_email && <span>{p.contact_email}</span>}
                 {p.website_url && (
-                  <a href={providerWebsiteHref(p.public_ref)} target="_blank" rel="noreferrer" className="font-semibold text-fg-brand underline underline-offset-2">
+                  // Direkt, nicht ueber /p/:ref/website: ein Link im neuen Tab
+                  // traegt kein Bearer-Token, die gezaehlte Weiterleitung
+                  // antwortet ihm mit 401 (Pruefung Schritt 4, M6).
+                  <a href={p.website_url} target="_blank" rel="noreferrer" className="font-semibold text-fg-brand underline underline-offset-2">
                     {p.website_url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
                   </a>
                 )}

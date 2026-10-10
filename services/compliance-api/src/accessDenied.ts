@@ -42,9 +42,12 @@ export function deniedPayload(e: AccessDenied): Record<string, unknown> {
 export async function logAccessDenied(e: AccessDenied): Promise<void> {
     try {
         await supabaseApi.insert('event_log', { type: 'access_denied', payload: deniedPayload(e) });
-    } catch {
+    } catch (err) {
+        // Der Ersatz traegt dasselbe wie das Ereignis (nur IDs), damit es sich
+        // rekonstruieren laesst.
         structuredLog('error', 'access_denied could not be logged', {
             correlationId: e.correlationId, errorCode: 'ERR_ACCESS_LOG', severity: 'error', route: e.route.split('?')[0],
+            ...deniedPayload(e), error: String(err).slice(0, 200),
         });
     }
 }
