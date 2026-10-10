@@ -15,6 +15,9 @@ export async function requestMarket(input: {
   asGuest: boolean;
   /** Sprache der Seite — darin schreibt der Server spaeter das Update. */
   locale?: string;
+  /** 'provider_coverage' (Canvas C2): der Markt ist geprueft, es fehlen
+   *  Anbieter fuer die genannten Bereiche. Ohne Update-Mail. */
+  reason?: 'provider_coverage';
 }): Promise<void> {
   await apiFetch('/api/v1/market-requests', {
     method: 'POST',
@@ -23,6 +26,7 @@ export async function requestMarket(input: {
       domains: input.domains,
       notify: input.notify === true,
       ...(input.locale ? { locale: input.locale } : {}),
+      ...(input.reason ? { reason: input.reason } : {}),
       ...(input.asGuest ? { guest_key: ensureGuestKey() } : {}),
     }),
   });

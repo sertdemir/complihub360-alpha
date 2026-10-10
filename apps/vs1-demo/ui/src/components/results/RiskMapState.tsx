@@ -4,6 +4,8 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { isKnownCountry } from '@complihub/compliance-engine';
 import { DOMAIN_BY_SLUG } from '../../lib/domains';
 import { Accordion, AccordionItem } from '../ui/Accordion';
+import { Button, outlineBrandClass } from '../ui/Button';
+import { Check } from 'lucide-react';
 
 // ─── Risk Map · leere Zustaende (Canvas-Wahl A3 · B3 · C3) ───────────────────
 // Figma: Screens-Datei, Seite Landingpages, Section 3390:14594 — Loading
@@ -48,10 +50,10 @@ export function RiskMapStateHero({
 
 /** Fortschritt ohne Prozentzahl — die Engine meldet keinen. Bei
  *  prefers-reduced-motion steht der Balken still. */
-export function IndeterminateProgress() {
+export function IndeterminateProgress({ className = 'w-[240px] rounded-full' }: { className?: string } = {}) {
   const reduce = useReducedMotion();
   return (
-    <div aria-hidden className="relative h-[3px] w-[240px] overflow-hidden rounded-full bg-brand-light">
+    <div aria-hidden className={`relative h-[3px] overflow-hidden bg-brand-light ${className}`}>
       <motion.div
         className="absolute top-0 h-[3px] w-[96px] rounded-full bg-brand"
         initial={{ left: reduce ? 48 : -96 }}
@@ -122,11 +124,14 @@ export function scopeOf(
  *  Wizard-Profil gibt es nichts, was wir benennen koennten. */
 export function RiskMapScopePanel({
   label,
+  labelExtra,
   markets,
   areas,
   children,
 }: {
   label: string;
+  /** Rechts neben dem Label — J3: "Saved", erst nach bestaetigtem Speichern. */
+  labelExtra?: ReactNode;
   markets: string[];
   areas: string[];
   /** Zeilen unter einer Trennlinie — J1: was NICHT geprueft wurde. */
@@ -165,7 +170,10 @@ export function RiskMapScopePanel({
       aria-label={label}
       className="flex w-full max-w-[720px] flex-col gap-3 rounded-2xl border border-stroke-subtle bg-surface-secondary px-7 py-6"
     >
-      <span className="text-body-2xs font-semibold uppercase tracking-[0.16em] text-fg-tertiary">{label}</span>
+      <span className="flex items-center justify-between gap-3">
+        <span className="text-body-2xs font-semibold uppercase tracking-[0.16em] text-fg-tertiary">{label}</span>
+        {labelExtra}
+      </span>
       {markets.length > 0 && <Row title={t('common:states.scope.markets')} items={markets.map(marketName)} />}
       {areas.length > 0 && <Row title={t('common:states.scope.areas')} items={areas.map(areaName)} />}
       {children && <div className="flex flex-col gap-3 border-t border-stroke-subtle pt-3">{children}</div>}
@@ -191,5 +199,49 @@ export function TechnicalDetails({ reference }: { reference: { id: string; at: s
         <time dateTime={reference.at}>{when}</time>
       </AccordionItem>
     </Accordion>
+  );
+}
+
+/** J3 — "This is taking a little longer than expected" (Figma 3634:3688,
+ *  Canvas-Wahl J3, 09.10.2026). Erscheint erst nach ~8 s UND nur, wenn das
+ *  Speichern der Antworten bestaetigt ist: der abgenommene Satz beginnt mit
+ *  "Your answers are saved". Der Balken laeuft weiter — es wird noch gerechnet. */
+export function RiskMapDelayedCard({ markets, areas, onTryAgain, onReturn }: {
+  markets: string[];
+  areas: string[];
+  onTryAgain: () => void;
+  onReturn: () => void;
+}) {
+  const { t } = useTranslation(['common', 'results']);
+  return (
+    <section
+      role="status"
+      aria-labelledby="delayed-heading"
+      className="w-full max-w-[640px] overflow-hidden rounded-2xl border border-stroke bg-surface shadow-[0_18px_44px_-32px_rgba(2,22,17,0.3)]"
+    >
+      <IndeterminateProgress className="w-full" />
+      <div className="flex flex-col gap-[18px] px-6 pb-8 pt-7 sm:px-9">
+        <div className="flex flex-col gap-2">
+          <h1 id="delayed-heading" className="font-serif text-[1.75rem] font-bold leading-[1.15] text-fg">
+            {t('common:states.riskMapDelayed.heading')}
+          </h1>
+          <p className="text-body-md leading-relaxed text-fg-secondary">{t('common:states.riskMapDelayed.message')}</p>
+        </div>
+        <RiskMapScopePanel
+          label={t('results:delayed.yourAnswers')}
+          labelExtra={(
+            <span className="inline-flex items-center gap-1 text-[11.5px] font-bold text-fg-brand">
+              <Check size={13} strokeWidth={2.6} aria-hidden /> {t('results:delayed.saved')}
+            </span>
+          )}
+          markets={markets}
+          areas={areas}
+        />
+        <div className="flex flex-wrap gap-2.5">
+          <Button size="md" variant="outline" className={outlineBrandClass} onClick={onTryAgain}>{t('common:states.actions.tryAgain')}</Button>
+          <Button size="md" variant="ghost" onClick={onReturn} className="text-fg-brand">{t('common:states.actions.returnToAssessment')}</Button>
+        </div>
+      </div>
+    </section>
   );
 }

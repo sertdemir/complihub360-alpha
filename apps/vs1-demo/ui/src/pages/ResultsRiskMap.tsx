@@ -6,7 +6,9 @@ import type { PenaltyCeiling } from '@complihub/compliance-engine';
 import { describeCeiling, penaltyText } from '../lib/penaltyCeiling';
 import { cadenceLabel, obligationLabel } from '../lib/obligationText';
 import { saveWizardSession, fetchSessions, type SessionRowData } from '../api/sessions';
-import { runSearch, type AnonProvider, type SearchLaw } from '../api/search';
+import { runSearch, type AnonProvider, type SearchCoverage, type SearchLaw } from '../api/search';
+import { isLimitedCoverage } from '../lib/matchState';
+import { LimitedCoverageCard, OneMatchGuest, ProviderStateHead } from '../components/results/ProviderStates';
 import { useApiData } from '../lib/useApiData';
 import { referenceOf } from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
@@ -26,6 +28,7 @@ import { loadBookingsByKey, type BookingByKey } from '../components/user/DomainP
 import { generateRiskMapPdf, type PdfObligation } from '../lib/riskMapPdf';
 import {
   RiskMapStateHero,
+  RiskMapDelayedCard,
   IndeterminateProgress,
   RiskMapTableSkeleton,
   RiskMapScopePanel,
@@ -46,6 +49,9 @@ import {
   unavailableMarketsOf,
   useMarketRequests,
 } from '../components/results/MarketRequest';
+
+/** J3: ab hier gilt das Laden als "laenger als erwartet" (Entscheidung 2026-10-09). */
+const DELAYED_AFTER_MS = 8000;
 
 // ─── Results · Risk Map · Figma 1667:215 ────────────────────────────────────
 // The generated risk map shown after the wizard. A guest "map" — obligations
@@ -312,17 +318,21 @@ export function ResultsRiskMap() {
   // `query` haelt fest, womit tatsaechlich gesucht wurde — der Umfang der
   // leeren Zustaende (welche Maerkte geprueft wurden) muss dieselbe Frage
   // beschreiben, nicht das lokale Profil, wenn eine Sitzung es ersetzt hat.
-  const { data: searchData, source: searchSource, loading: searchLoading, error: searchError } = useApiData<{ providers: AnonProvider[]; laws: SearchLaw[]; session: SessionRowData | null; query: Parameters<typeof runSearch>[0] | null }>(async () => {
+  const { data: searchData, source: searchSource, loading: searchLoading, error: searchError } = useApiData<{ providers: AnonProvider[]; laws: SearchLaw[]; coverage?: SearchCoverage; session: SessionRowData | null; query: Parameters<typeof runSearch>[0] | null }>(async () => {
     let query: Parameters<typeof runSearch>[0] = profile ?? {};
     let session: SessionRowData | null = null;
     if (sessionId) {
       try {
         const s = (await fetchSessions()).find((x) => x.id === sessionId);
-        if (s) { session = s; query = { country: s.country ?? 'DE', categories: s.categories as SearchProfile['categories'] }; }
+        // Mit den Zielmaerkten: bis 2026-10-10 suchte eine gespeicherte
+        // Sitzung nur im Heimatmarkt — die Matrix "Limited coverage" (C2)
+        // haette dann nur eine Spalte gekannt, und Pflichten der Zielmaerkte
+        // fehlten, obwohl der Gast sie fuer dasselbe Profil sieht.
+        if (s) { session = s; query = { country: s.country ?? 'DE', markets: s.markets ?? [], categories: s.categories as SearchProfile['categories'] }; }
       } catch { /* fall back to the local profile */ }
     }
     const res = await runSearch(query);
-    return { providers: res.providers, laws: res.laws ?? [], session, query };
+    return { providers: res.providers, laws: res.laws ?? [], coverage: res.coverage, session, query };
   }, { providers: [], laws: [], session: null, query: null }, [sessionId, reloadKey]);
   // Anbieter zaehlen nur, wenn die Engine sie geliefert hat. Bis 2026-09-22
   // stand hier beim Laden und bei einem API-Fehler eine Design-Fixture mit drei
@@ -352,6 +362,40 @@ export function ResultsRiskMap() {
     : searchSource === 'api' ? 'none'
     : searchLoading ? 'loading' : 'failed';
   const noRequirements = pageState === 'none';
+  // J3: nach ~8 s ohne Ergebnis wechselt der Ladezustand — aber nur, wenn die
+  // Antworten nachweislich gespeichert sind. Sonst bleibt es beim Laden; ein
+  // gescheitertes Laden zeigt riskMapFailed.
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    setSlow(false);
+    if (pageState !== 'loading') return;
+    const timer = setTimeout(() => setSlow(true), DELAYED_AFTER_MS);
+    return () => clearTimeout(timer);
+  }, [pageState, reloadKey]);
+
+  // Wave A1: arriving from the wizard persists the session (the editable
+  // dossier). Guest-anchored via guest_key; fire-and-forget — the page renders
+  // regardless, and a failed save just means no resume anchor.
+  //
+  // J3 (Canvas 09.10.2026): seit 2026-10-10 wird das Speichern abgewartet und
+  // sein Ausgang gemerkt — "Your answers are saved" im Zustand riskMapDelayed
+  // darf nur stehen, wenn es stimmt. Die Seite rendert weiter sofort.
+  const savedRef = useRef(false);
+  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'failed'>('idle');
+  useEffect(() => {
+    if (!profile || savedRef.current) return;
+    savedRef.current = true;
+    localStorage.setItem('ch360_last_profile', JSON.stringify(profile));
+    setSaveState('saving');
+    saveWizardSession(profile)
+      .then(() => setSaveState('saved'))
+      .catch(() => setSaveState('failed')); /* offline/demo — kein Anker, kein "saved" */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  // Antworten gelten als gespeichert, wenn das Speichern bestaetigt ist oder
+  // die Suche aus einer gespeicherten Sitzung kommt.
+  const answersSaved = saveState === 'saved' || (!!sessionId && !profile);
+  const delayed = pageState === 'loading' && slow && answersSaved;
 
   // marketUnavailable (Canvas D3 · E3 · F3, Figma 3470:2011/2129/2221): die
   // Engine hat geantwortet, aber keinen der angefragten Maerkte pruefen
@@ -404,6 +448,13 @@ export function ResultsRiskMap() {
   // Behauptung ueber ein Ergebnis, das es nicht gibt.
   // Auch nicht bei marketUnavailable: die Engine hat nichts geprueft, "0"
   // waere ein Ergebnis, das es nicht gibt.
+  // Checklist v1.0: "one … returns the singular" — auch in der Leiste: bis
+  // 2026-10-10 stand hier "1 Verified Providers ready". Zahlwerte zaehlen,
+  // "21 days" nicht.
+  const statLabel = (i: number, s: { value: string | number; label: string }) => {
+    const n = /^\d+$/.test(String(s.value)) ? Number(s.value) : undefined;
+    return t(`stats.${i}.label`, n === undefined ? { defaultValue: s.label } : { defaultValue: s.label, count: n });
+  };
   const stats = isLive || (noRequirements && !marketUnavailable)
     ? riskMapStats(liveLaws, rows.length, providersLive ? anonProviders.length : null)
     : null;
@@ -432,7 +483,7 @@ export function ResultsRiskMap() {
 
   const stateKey = marketUnavailable ? 'marketUnavailable'
     : pageState === 'none' ? 'noRequirements'
-    : pageState === 'loading' ? 'riskMapLoading'
+    : pageState === 'loading' ? (delayed ? 'riskMapDelayed' : 'riskMapLoading')
     : pageState === 'failed' ? 'riskMapFailed' : null;
   const stateBanner = stateKey && (
     <Banner
@@ -446,6 +497,15 @@ export function ResultsRiskMap() {
             </Button>
             <Button size="sm" variant="ghost" onClick={() => navigate(`/${locale}/contact`)}>
               {t('common:states.actions.contactSupport')}
+            </Button>
+          </span>
+        ) : delayed ? (
+          <span className="flex flex-wrap gap-2">
+            <Button size="sm" variant="secondary" onClick={() => setReloadKey((k) => k + 1)}>
+              {t('common:states.actions.tryAgain')}
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => (canReviewAnswers ? setAnswersOpen(true) : navigate(`/${locale}/wizard`))}>
+              {t('common:states.actions.returnToAssessment')}
             </Button>
           </span>
         ) : pageState === 'none' && canReviewAnswers ? (
@@ -477,17 +537,6 @@ export function ResultsRiskMap() {
     </div>
   ) : stateBanner;
 
-  // Wave A1: arriving from the wizard persists the session (the editable
-  // dossier). Guest-anchored via guest_key; fire-and-forget — the page renders
-  // regardless, and a failed save just means no resume anchor.
-  const savedRef = useRef(false);
-  useEffect(() => {
-    if (!profile || savedRef.current) return;
-    savedRef.current = true;
-    localStorage.setItem('ch360_last_profile', JSON.stringify(profile));
-    saveWizardSession(profile).catch(() => { /* offline/demo — non-fatal */ });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // ─── Eingeloggt: der Sitzungs-Snapshot ────────────────────────────────────
   // Dieselben Daten, andere Flaeche. Das Gast-Chrome darunter (30-Minuten-
@@ -512,10 +561,24 @@ export function ResultsRiskMap() {
     await generateRiskMapPdf({
       profile: profile ?? null,
       t,
-      stats: stats.map((s2, i) => ({ value: s2.value, label: t(`stats.${i}.label`, { defaultValue: s2.label }) })),
+      stats: stats.map((s2, i) => ({ value: s2.value, label: statLabel(i, s2) })),
       obligations: pdfObligations(rows, t),
     });
   };
+
+  // A1 · C2 (Canvas 09.10.2026, Figma 3634:2867 / 3634:2989): ueber den
+  // Anbieter-Karten mit Konto. Begrenzt geht vor — dann sagt die Matrix, wo
+  // es fehlt; sonst der Kopf im Singular oder Plural. Ohne Treffer nichts
+  // (dort steht noProviderMatch bzw. partners.none).
+  const shownProviders = marketUnavailable ? [] : anonProviders;
+  const providerHead = !providersLive || shownProviders.length === 0 ? null
+    : searchData.coverage && isLimitedCoverage(shownProviders.length, searchData.coverage) ? (
+      <LimitedCoverageCard
+        coverage={searchData.coverage}
+        asGuest={!user}
+        onReviewMatch={() => setPartnerOpen(shownProviders[0])}
+      />
+    ) : <ProviderStateHead count={shownProviders.length} />;
 
   if (isLoggedIn) {
     const notAnswer = (o: Obligation) => o.state.kind !== 'answer';
@@ -536,7 +599,7 @@ export function ResultsRiskMap() {
         providersEmptyState={marketUnavailable ? <NoVerifiedProvider /> : undefined}
         // K3 (01.10.2026): der ungepruefte Markt steht oben in der Spalte,
         // die Anbieter fuer die geprueften Maerkte bleiben darunter.
-        providersTop={partial.length > 0 ? (
+        providersTop={partial.length > 0 || providerHead ? (
           <>
             {partial.map((m) => (
               <NotCheckedCard
@@ -547,6 +610,7 @@ export function ResultsRiskMap() {
                 onRequest={(notify) => sendRequest(m, notify)}
               />
             ))}
+            {providerHead}
           </>
         ) : undefined}
         sessionId={sessionId}
@@ -576,6 +640,8 @@ export function ResultsRiskMap() {
             basisNode={partnerOpen?.match_basis ? <MatchBasis basis={partnerOpen.match_basis} /> : undefined}
             sessionId={sessionId}
             sessionMessage={session?.label ? t('schedule.messageFromSession', { session: session.label }) : undefined}
+            sessionLabel={session?.label ?? null}
+            requestScope={scopeProfile ? scopeOf(scopeProfile, 'checked') : null}
             booking={partnerOpen ? booked[partnerOpen.public_ref] ?? null : null}
             onBooked={(key, b) => setBooked((prev) => ({ ...prev, [key]: b }))}
           />
@@ -663,7 +729,17 @@ export function ResultsRiskMap() {
           Keine Kennzahlen, keine Anbieter, kein Schluss-Band — "0 obligations
           identified" oder Partner-Karten unter "No immediate requirements"
           wuerden einen Bedarf anbieten, den wir nicht festgestellt haben. */}
-      {!isLive && stateKey && (
+      {!isLive && delayed && (
+        <main className="mx-auto flex w-full max-w-container-3xl flex-col items-center px-4 pb-20 pt-12 md:px-8 lg:px-16">
+          <RiskMapDelayedCard
+            markets={scopeProfile ? scopeOf(scopeProfile, 'requested').markets : []}
+            areas={requestAreas}
+            onTryAgain={() => setReloadKey((k) => k + 1)}
+            onReturn={() => navigate(`/${locale}/wizard`)}
+          />
+        </main>
+      )}
+      {!isLive && stateKey && !delayed && (
         <main className="mx-auto flex w-full max-w-container-3xl flex-col items-center gap-8 px-4 pb-20 pt-16 md:px-8 lg:px-16">
           <RiskMapStateHero
             heading={t(`common:states.${stateKey}.heading`)}
@@ -752,7 +828,7 @@ export function ResultsRiskMap() {
                 <span className="text-[1.5rem] font-bold text-fg">
                   {s.days != null ? t('days', { count: s.days }) : s.value || t('ongoing')}
                 </span>
-                <span className="ml-2 text-body-sm text-fg-secondary">{t(`stats.${i}.label`, { defaultValue: s.label })}</span>
+                <span className="ml-2 text-body-sm text-fg-secondary">{statLabel(i, s)}</span>
               </div>
             ))}
           </div>
@@ -853,16 +929,30 @@ export function ResultsRiskMap() {
           <div className="mt-16">
             {anonProviders.length === 0 ? (
               <p className="text-body-sm text-fg-secondary">{t('partners.none')}</p>
+            ) : anonProviders.length === 1 ? (
+              // B3 (Canvas 09.10.2026, Figma 3634:2931): ein Treffer im
+              // Singular, die Fakten offen, Name und Kontakt nicht.
+              <OneMatchGuest
+                provider={anonProviders[0]}
+                requestedMarkets={searchData.coverage?.markets ?? (scopeProfile ? scopeOf(scopeProfile, 'checked').markets : [])}
+                onReview={() => setSaveOpen(true)}
+              />
             ) : (
               <>
                 <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-                  <div>
+                  <div className="max-w-[720px]">
                     <span className="text-body-2xs font-semibold uppercase tracking-[0.14em] text-fg-brand">
                       {t('partners.eyebrow', { count: anonProviders.length })}
                     </span>
+                    {/* A1 fuer Gaeste: der abgenommene Kopf ueber den gesperrten
+                        Karten. Der Knopf rechts bleibt "… with a free account" —
+                        er sagt ehrlich, dass ein Konto noetig ist. */}
                     <h2 className="mt-2 font-serif text-[1.75rem] font-bold leading-tight text-fg">
-                      {t('partners.title')}
+                      {t('common:states.multipleProviderMatches.heading')}
                     </h2>
+                    <p className="mt-1.5 text-body-sm leading-relaxed text-fg-secondary">
+                      {t('common:states.multipleProviderMatches.message')}
+                    </p>
                   </div>
                   <button
                     type="button"

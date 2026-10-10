@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import type { Session } from "@supabase/supabase-js";
 import { Loader2 } from "lucide-react";
 import { getSupabase, isSupabaseConfigured } from "../../lib/supabase";
+import { clearExpired, takeReturnTo } from "../../lib/sessionExpiry";
 
 // Landing target for magic-link and OAuth redirects. The Supabase client is
 // configured with detectSessionInUrl, so it consumes the token from the URL and
@@ -28,7 +29,9 @@ export function AuthCallbackPage() {
                 (session.user?.app_metadata?.role as string | undefined) ??
                 (session.user?.user_metadata?.role as string | undefined);
             const target = claimed === "partner" ? "partner-dashboard" : "dashboard";
-            navigate(`/${lang}/${target}`, { replace: true });
+            // G2: nach einem Ablauf zurueck auf die Seite, auf der es passierte.
+            clearExpired();
+            navigate(takeReturnTo() ?? `/${lang}/${target}`, { replace: true });
         };
         void (async () => {
             const client = isSupabaseConfigured ? await getSupabase() : null;

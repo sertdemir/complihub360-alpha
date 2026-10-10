@@ -3,6 +3,7 @@ import type { Session, User } from '@supabase/supabase-js';
 import { getSupabase, isSupabaseConfigured, isDemoLoginEnabled } from '../lib/supabase';
 import { adoptGuestSessions } from '../api/adoption';
 import { forgetAccount, isAccountSwitcherEnabled, rememberSession } from '../lib/accountSwitcher';
+import { markIntentionalLogout, noteSessionExpired, resetIntentionalLogout } from '../lib/sessionExpiry';
 
 export type UserRole = 'user' | 'partner' | 'admin';
 
@@ -91,6 +92,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       // mehr anbieten (Staging, lib/accountSwitcher).
       const current = useAuthStore.getState().user?.id;
       if (isAccountSwitcherEnabled && current) forgetAccount(current);
+      // Gewollt — der Listener darf das nicht als abgelaufene Sitzung lesen (G2).
+      markIntentionalLogout();
       await sb.auth.signOut();
     }
     localStorage.removeItem('demo_is_logged_in');
@@ -125,10 +128,17 @@ if (isSupabaseConfigured && supabase) {
     // Signup adoption (Wave A3): claim guest sessions once per account.
     if (data.session?.user) void adoptGuestSessions(data.session.user.id);
   });
-  supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
+  supabase.auth.onAuthStateChange((event: string, session: Session | null) => {
     // Staging-Umschalter: jede neue oder erneuerte Sitzung merken — Supabase
     // rotiert den Refresh-Token, nur der juengste traegt den Rueckweg.
     if (session && isAccountSwitcherEnabled) rememberSession(session);
+    if (session) resetIntentionalLogout();
+    // G2: SIGNED_OUT ohne eigenes Abmelden ist ein Ablauf (Refresh-Token
+    // abgelaufen oder widerrufen). Die Anmeldeseite sagt es dann.
+    const before = useAuthStore.getState().user;
+    if (event === 'SIGNED_OUT' && before) {
+      noteSessionExpired(before.email ?? null, window.location.pathname + window.location.search);
+    }
     if (!session && demoActive()) { hydrateDemo(); return; }
     useAuthStore.getState().setSession(session);
     if (session?.user) void adoptGuestSessions(session.user.id);

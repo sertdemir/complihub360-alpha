@@ -1,3 +1,4 @@
+import { FormErrorSummary, focusField } from '../components/ui/FormErrorSummary';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -96,7 +97,9 @@ export function ContactPage() {
     if (!EMAIL_RE.test(email.trim())) errs.email = t('contactSend.field.email');
     if (!message.trim()) errs.message = t('contactSend.field.message');
     setFieldErrors(errs);
-    if (Object.keys(errs).length) return;
+    // H2: Fokus aufs erste fehlerhafte Feld; die Zusammenfassung steht am Knopf.
+    const first = (['name', 'email', 'message'] as const).find((k) => errs[k]);
+    if (first) { focusField(`contact-${first}`); return; }
     setStatus('sending');
     setFailure(null);
     try {
@@ -314,6 +317,12 @@ export function ContactPage() {
                       </div>
                     )}
 
+                    <FormErrorSummary
+                      className="mt-6"
+                      errors={(['name', 'email', 'message'] as const).filter((k) => fieldErrors[k]).map((k) => ({
+                        id: `contact-${k}`, label: t(`contact.form.${k}`), message: fieldErrors[k] as string,
+                      }))}
+                    />
                     <div className="mt-7 flex flex-col gap-4 border-t border-stroke-subtle pt-6 sm:flex-row sm:items-center sm:justify-between">
                       <p className="max-w-[400px] text-body-2xs leading-relaxed text-fg-tertiary">
                         {t('contact.form.privacy')}

@@ -1,3 +1,4 @@
+import { searchCoverage, priceRangeOf } from './searchCoverage.js';
 import { createServer, IncomingMessage, ServerResponse } from "http";
 import * as crypto from "node:crypto";
 import { Orchestrator } from "@complihub/task-orchestrator";
@@ -1795,6 +1796,13 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                             acknowledgement_version: ack.version, shared_fields: [...SHARED_FIELDS_V1],
                             user_discount: policy ? { pct: policy.pct, policy_version: policy.version } : null,
                             rebooked_from: linkedRoot?.id ?? null,
+                            // Das Thema, das der Anbieter mit der Buchung sieht
+                            // (Bereich und Maerkte des Leads). Die Bestaetigung
+                            // nennt es neben den shared_fields — "We have shared
+                            // only the information shown in your booking
+                            // confirmation" (Checklist v1.0) gilt nur, wenn es
+                            // dort steht.
+                            topic: { area_code: opp.opp.areaCode, countries: opp.opp.countries },
                         },
                         // Offenlegung erst jetzt (Spec B Schritt 5): Name und Kontakt nach der Belastung.
                         provider_identity: { name: p.name, website_url: p.website_url ?? null, contact_email: p.contact_email ?? null },
@@ -3341,6 +3349,19 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                 };
                 const tierOf = (pct: number) => pct >= 90 ? 'high' : pct >= 75 ? 'strong' : 'moderate';
 
+                // EN-Launch Schritt 2 (Canvas B3 · C2, 2026-10-09). Die Liste oben
+                // kennt nur den ersten Markt. "Limited coverage" fragt aber: deckt
+                // irgendein freigegebener Anbieter jeden gewaehlten Bereich in
+                // jedem gewaehlten Markt ab? Das beantwortet dieselbe View, nur
+                // ueber alle Maerkte, die die Engine kennt — Unbekannte (BR) haben
+                // ihre eigene Flaeche (I1 · J1 · K3).
+                const coverageMarkets = engineCountries.map(String);
+                const allMatchable = coverageMarkets.length > 1
+                    ? ((await supabaseApi.select('matchable_provider_services', {})) as any[])
+                        .filter((r: any) => coverageMarkets.includes(r.country_code))
+                    : matchable;
+                const coverage = searchCoverage(allMatchable, coverageMarkets, rawCats);
+
                 const anonProviders = eligible
                     .map((p: any) => {
                         const { relevance, total, countryMatch, coveredIdx, basis } = scoreOf(p);
@@ -3378,6 +3399,11 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                             // Antwortzeit, Bestaetigungsrate, Bewertungen aus Buchungen.
                             // Fakten, keine Gewichte (Canvas Sektion 2).
                             rank_basis: basis,
+                            // Spec A §27: Preisangaben sind Klasse anonymous. Die
+                            // Spanne ueber die Leistungen in den angefragten
+                            // Bereichen, nur bei einer Waehrung — sonst keine.
+                            price_range: priceRangeOf(viewByKey.get(p.provider_key) ?? [], rawCats),
+                            markets_covered: coverage.marketsOf(p.provider_key),
                             _rank: total,
                             _areas: Array.from(approvedAreas.get(p.provider_key) ?? []),
                             _region: p.region ?? null,
@@ -3400,6 +3426,9 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     // below `laws` comes out of the deterministic engine.
                     overview_summary: "Obligations identified by the compliance engine for the requested markets and domains.",
                     providers: anonProviders,
+                    // Bereich × Markt: deckt ein freigegebener Anbieter das ab?
+                    // Nur Booleans je Zelle — kein Anbieter, keine Anzahl.
+                    coverage: coverage.public,
                     // Enriched obligations payload: severity + statute + penalty +
                     // cadence from the engine's editorial map. `state` mirrors the
                     // wizard: explicitly selected domains are 'confirmed', the

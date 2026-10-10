@@ -1,15 +1,19 @@
 import { useTranslation } from 'react-i18next';
-import { Check } from 'lucide-react';
-import { Button } from '../ui/Button';
+import { useNavigate } from 'react-router-dom';
+import { Check, Info } from 'lucide-react';
+import { Button, outlineBrandClass } from '../ui/Button';
 import type { BookingAcknowledgement, BookingFailure } from '../../api/bookings';
 
 // ─── Bestaetigung vor der Buchung (Phase 4, Canvas-Wahl 1B) ──────────────────
-// Die Bestaetigung IST der Text: je Absatz der Fassung eine Zeile mit Haken,
-// immer sichtbar, direkt ueber dem Button. Keine Checkbox — der Klick auf
-// „Verbindlich buchen" ist die Bestaetigung, die Zeile unter dem Button sagt
-// das und nennt die Fassung. DNA: „offen genannt" woertlich — was fliesst,
-// dass der Anbieter nachfassen darf (auch wenn der Nutzer schweigt), dass die
-// Buchung nichts kostet. Lesbar, bevor die Hand zum Button geht.
+// Je Absatz der Fassung eine Zeile mit Haken, sichtbar, bevor die Hand zum
+// Knopf geht. DNA: „offen genannt" woertlich — was fliesst, dass der Anbieter
+// nachfassen darf (auch wenn der Nutzer schweigt), dass die Buchung nichts
+// kostet.
+//
+// Seit 2026-10-10 (Canvas-Wahl I2, Checklist v1.0) ist der Klick NICHT mehr
+// die Bestaetigung: der Knopf oeffnet die Pruefung "Review what will be
+// shared" mit einem eigenen Haekchen (SharingReview.tsx). 1B galt bis dahin
+// bewusst ohne Checkbox; die Checkliste verlangt eine.
 
 export function AcknowledgementList({ ack, className = '' }: { ack: BookingAcknowledgement | null; className?: string }) {
   const { t } = useTranslation('results');
@@ -28,27 +32,19 @@ export function AcknowledgementList({ ack, className = '' }: { ack: BookingAckno
   );
 }
 
-/** Die Zeile unter dem Button: Fassung und gewaehlter Termin. */
-export function AcknowledgementFooterLine({ ack, slotLine, className = '' }: { ack: BookingAcknowledgement | null; slotLine: string | null; className?: string }) {
-  const { t } = useTranslation('results');
-  // „booking-ack-v1" ist die Kennung des Servers; der Nutzer liest „v1".
-  const parts = [
-    ack ? t('schedule.ackConfirmLine', { count: ack.lines.length, version: ack.version.replace(/^booking-ack-/, '') }) : null,
-    slotLine,
-  ].filter(Boolean);
-  return <p className={`text-center text-body-3xs text-fg-tertiary ${className}`}>{parts.join(' · ')}</p>;
-}
-
-// ─── Nicht gebucht (Phase 4, Canvas-Wahl 2A) ─────────────────────────────────
-// Der Button weicht einem neutralen grauen Kasten — kein Rot, denn dem Nutzer
-// ist nichts passiert. Drei Saetze: was, warum nicht er, was jetzt gilt. Zwei
-// Wege: zurueck in die Liste oder bleiben. Slot-Chips und Nachricht bleiben
-// stehen. Dasselbe Muster fuer SLOT_TAKEN und ACKNOWLEDGEMENT_OUTDATED, mit
-// anderem Satz. Kein Decline-Code, keine Schuld auf keiner Seite (DNA).
+// ─── Nicht gebucht (F3, EN-Launch Schritt 2) ─────────────────────────────────
+// Figma 3634:3181, abgenommen 09.10.2026; loest Canvas-Wahl 2A ab. Der
+// abgenommene Zustand (Checklist v1.0 "Booking failed") gilt fuer jeden Grund:
+// jeder Fehler der Buchungs-API liegt vor dem Insert, und der Insert ist das
+// Teilen. Darunter als Liste, was NICHT passiert ist — das ist die Nachricht,
+// die zaehlt. Der Grund steht als eine Zeile, wo er dem Nutzer etwas sagt
+// (Termin weg, Fassung neu, Anbieter-Seite); die Aktion folgt dem Grund.
+// Neutraler Kasten, kein Rot: dem Nutzer ist nichts passiert. Keine Schuld
+// auf keiner Seite (DNA).
 
 export function BookingFailureCard({ failure, onOtherProvider, onRetry, onReread, onPickSlot }: {
   failure: BookingFailure;
-  /** Schliesst die Schublade und laesst die Liste stehen; fehlt er (eigene Seite), bleibt nur „spaeter erneut". */
+  /** Schliesst die Schublade und laesst die Liste stehen; fehlt er (eigene Seite), bleibt nur „erneut". */
   onOtherProvider?: () => void;
   onRetry: () => void;
   /** Fassung veraltet: Text neu laden, Zustand zuruecknehmen. */
@@ -56,32 +52,40 @@ export function BookingFailureCard({ failure, onOtherProvider, onRetry, onReread
   /** Slot vergeben: Termine neu laden, Auswahl loeschen. */
   onPickSlot: () => void;
 }) {
-  const { t } = useTranslation('results');
+  const { t, i18n } = useTranslation(['results', 'common']);
+  const navigate = useNavigate();
+  const locale = i18n.resolvedLanguage || 'en';
   const k = failure.kind;
-  const title = t(`schedule.fail.${k}.title`);
-  const body = t(`schedule.fail.${k}.body`);
+  const reason = k === 'slot_taken' ? t('schedule.fail.slot_taken.title')
+    : k === 'acknowledgement_outdated' ? t('schedule.fail.acknowledgement_outdated.title')
+    : k === 'not_completed' ? t('schedule.fail.reasonProvider')
+    : null;
+  const primary = k === 'slot_taken' ? { label: t('schedule.fail.pickOtherSlot'), onClick: onPickSlot }
+    : k === 'acknowledgement_outdated' ? { label: t('schedule.fail.reread'), onClick: onReread }
+    : k === 'not_completed' && onOtherProvider ? { label: t('schedule.fail.otherProvider'), onClick: onOtherProvider }
+    : { label: t('common:states.actions.tryAgain'), onClick: onRetry };
   return (
-    <div role="status" className="rounded-xl border border-stroke bg-surface-secondary px-4 py-3.5">
-      <p className="text-body-xs font-bold text-fg">{title}</p>
-      <p className="mt-1.5 text-body-3xs leading-relaxed text-fg-secondary">{body}</p>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {k === 'not_completed' && onOtherProvider && (
-          <Button size="sm" variant="secondary" type="button" onClick={onOtherProvider}>{t('schedule.fail.otherProvider')}</Button>
-        )}
-        {k === 'not_completed' && (
-          <Button size="sm" variant={onOtherProvider ? 'ghost' : 'secondary'} type="button" onClick={onRetry}>{t('schedule.fail.retryLater')}</Button>
-        )}
-        {k === 'slot_taken' && (
-          <Button size="sm" variant="secondary" type="button" onClick={onPickSlot}>{t('schedule.fail.pickOtherSlot')}</Button>
-        )}
-        {k === 'acknowledgement_outdated' && (
-          <Button size="sm" variant="secondary" type="button" onClick={onReread}>{t('schedule.fail.reread')}</Button>
-        )}
-        {k === 'generic' && (
-          <Button size="sm" variant="secondary" type="button" onClick={onRetry}>{t('schedule.fail.retryNow')}</Button>
-        )}
+    <div role="status" className="rounded-xl border border-stroke bg-surface px-[18px] py-4">
+      <p className="flex items-center gap-2.5 text-body-sm font-bold text-fg">
+        <Info size={16} className="shrink-0 text-fg-secondary" aria-hidden />
+        {t('common:states.bookingFailed.heading')}
+      </p>
+      {reason && <p className="mt-1.5 text-body-3xs font-semibold leading-relaxed text-fg">{reason}</p>}
+      <p className="mt-1.5 text-body-3xs leading-relaxed text-fg-secondary">{t('common:states.bookingFailed.message')}</p>
+      <ul className="mt-3 flex flex-col gap-1.5 rounded-lg bg-brand-light px-3.5 py-3">
+        {(['noBooking', 'nothingShared', 'kept'] as const).map((x) => (
+          <li key={x} className="flex items-center gap-2 text-body-3xs text-fg">
+            <Check size={14} strokeWidth={2.4} className="shrink-0 text-fg-brand" aria-hidden />
+            {t(`schedule.fail.list.${x}`)}
+          </li>
+        ))}
+      </ul>
+      <div className="mt-3.5 flex flex-wrap gap-2">
+        <Button size="sm" type="button" onClick={primary.onClick}>{primary.label}</Button>
+        <Button size="sm" variant="outline" className={outlineBrandClass} type="button" onClick={() => navigate(`/${locale}/contact`)}>
+          {t('common:states.actions.contactSupport')}
+        </Button>
       </div>
-      <p className="mt-2.5 text-body-3xs text-fg-tertiary">{t('schedule.fail.keepNote')}</p>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { FormErrorSummary, focusField, type FormError } from '../components/ui/FormErrorSummary';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight } from 'lucide-react';
@@ -57,12 +58,30 @@ export function PartnerApplyPage() {
     const [fieldError, setFieldError] = useState<string | null>(null);
     const sent = status === 'sent';
 
-    const canSubmit =
-        firm.trim() && contact.trim() && EMAIL_RE.test(email.trim()) && credentials.trim() && areas.length > 0 && markets.length > 0;
+    // H2 (Canvas 09.10.2026): der Knopf bleibt aktiv. Bis 2026-10-10 blieb er
+    // grau, bis alles stimmte — ohne zu sagen, was fehlt. Jetzt prueft das
+    // Absenden, die Fehler stehen am Feld und gesammelt am Knopf, und der
+    // Fokus geht aufs erste Feld. Nach dem ersten Versuch laufen sie mit.
+    const [tried, setTried] = useState(false);
+    const errorsOf = (): FormError[] => {
+        const errs: FormError[] = [];
+        if (!firm.trim()) errs.push({ id: 'pa-firm', label: t('partnerApply.firm'), message: t('contactSend.field.firm') });
+        if (!contact.trim()) errs.push({ id: 'pa-contact', label: t('partnerApply.contact'), message: t('contactSend.field.name') });
+        if (!EMAIL_RE.test(email.trim())) errs.push({ id: 'pa-email', label: t('partnerApply.email'), message: t('contactSend.field.email') });
+        if (!credentials.trim()) errs.push({ id: 'pa-cred', label: t('partnerApply.credentials'), message: t('contactSend.field.credentials') });
+        if (!areas.length) errs.push({ id: 'pa-areas', label: t('partnerApply.areas'), message: t('contactSend.field.areas') });
+        if (!markets.length) errs.push({ id: 'pa-markets', label: t('partnerApply.markets'), message: t('contactSend.field.markets') });
+        return errs;
+    };
+    const errors = tried ? errorsOf() : [];
+    const errFor = (id: string) => errors.find((x) => x.id === id);
 
     const onSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        if (!canSubmit || status === 'sending') return;
+        if (status === 'sending') return;
+        setTried(true);
+        const now = errorsOf();
+        if (now.length) { focusField(now[0].id); return; }
         setStatus('sending');
         setFailure(null);
         setFieldError(null);
@@ -86,6 +105,9 @@ export function PartnerApplyPage() {
             setStatus('failed');
         }
     };
+
+    const fieldClass = (id: string) => FIELD + (errFor(id) ? ' border-error-500 bg-error-bg dark:bg-red-500/10' : '');
+    const aria = (id: string) => (errFor(id) ? { 'aria-invalid': true as const, 'aria-describedby': `${id}-error` } : {});
 
     const toggle = (list: string[], set: (v: string[]) => void) => (v: string) =>
         set(list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
@@ -166,7 +188,7 @@ export function PartnerApplyPage() {
                             </div>
                         </div>
                     ) : (
-                        <form onSubmit={onSubmit}>
+                        <form onSubmit={onSubmit} noValidate>
                             <h2 className="font-serif text-[1.5rem] font-bold leading-tight text-fg">{t('partnerApply.formTitle')}</h2>
                             <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">{t('partnerApply.formLead')}</p>
 
@@ -174,17 +196,20 @@ export function PartnerApplyPage() {
                             <div className="mt-2 flex flex-col gap-0 sm:flex-row sm:gap-4">
                                 <div className="flex-1">
                                     <label htmlFor="pa-firm" className={'mt-4 ' + LABEL}>{t('partnerApply.firm')}</label>
-                                    <input id="pa-firm" value={firm} onChange={(e) => setFirm(e.target.value)} className={FIELD} />
+                                    <input id="pa-firm" value={firm} onChange={(e) => setFirm(e.target.value)} className={fieldClass('pa-firm')} {...aria('pa-firm')} />
+                                    <FieldError e={errFor('pa-firm')} />
                                 </div>
                                 <div className="flex-1">
                                     <label htmlFor="pa-contact" className={'mt-4 ' + LABEL}>{t('partnerApply.contact')}</label>
-                                    <input id="pa-contact" value={contact} onChange={(e) => setContact(e.target.value)} className={FIELD} />
+                                    <input id="pa-contact" value={contact} onChange={(e) => setContact(e.target.value)} className={fieldClass('pa-contact')} {...aria('pa-contact')} />
+                                    <FieldError e={errFor('pa-contact')} />
                                 </div>
                             </div>
                             <div className="flex flex-col gap-0 sm:flex-row sm:gap-4">
                                 <div className="flex-1">
                                     <label htmlFor="pa-email" className={'mt-4 ' + LABEL}>{t('partnerApply.email')}</label>
-                                    <input id="pa-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('partnerApply.emailPh')} className={FIELD} />
+                                    <input id="pa-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('partnerApply.emailPh')} className={fieldClass('pa-email')} {...aria('pa-email')} />
+                                    <FieldError e={errFor('pa-email')} />
                                 </div>
                                 <div className="flex-1">
                                     <label htmlFor="pa-web" className={'mt-4 ' + LABEL}>{t('partnerApply.website')}</label>
@@ -192,10 +217,11 @@ export function PartnerApplyPage() {
                                 </div>
                             </div>
                             <label htmlFor="pa-cred" className={'mt-4 ' + LABEL}>{t('partnerApply.credentials')}</label>
-                            <input id="pa-cred" value={credentials} onChange={(e) => setCredentials(e.target.value)} placeholder={t('partnerApply.credentialsPh')} className={FIELD} />
+                            <input id="pa-cred" value={credentials} onChange={(e) => setCredentials(e.target.value)} placeholder={t('partnerApply.credentialsPh')} className={fieldClass('pa-cred')} {...aria('pa-cred')} />
+                            <FieldError e={errFor('pa-cred')} />
 
-                            <span className={'mt-5 ' + LABEL}>{t('partnerApply.areas')}</span>
-                            <div className="mt-2 flex flex-wrap gap-1.5">
+                            <span id="pa-areas-label" className={'mt-5 ' + LABEL}>{t('partnerApply.areas')}</span>
+                            <div id="pa-areas" role="group" aria-labelledby="pa-areas-label" {...aria('pa-areas')} className="mt-2 flex flex-wrap gap-1.5">
                                 {DOMAINS.map((d) => (
                                     <Segment key={d.slug} selected={areas.includes(d.slug)} onClick={() => toggle(areas, setAreas)(d.slug)}>
                                         {t(`register.domains.${d.i18nKey}`, { ns: 'auth', defaultValue: d.label })}
@@ -203,14 +229,18 @@ export function PartnerApplyPage() {
                                 ))}
                             </div>
 
-                            <span className={'mt-5 ' + LABEL}>{t('partnerApply.markets')}</span>
-                            <div className="mt-2 flex flex-wrap gap-1.5">
+                            <FieldError e={errFor('pa-areas')} />
+
+                            <span id="pa-markets-label" className={'mt-5 ' + LABEL}>{t('partnerApply.markets')}</span>
+                            <div id="pa-markets" role="group" aria-labelledby="pa-markets-label" {...aria('pa-markets')} className="mt-2 flex flex-wrap gap-1.5">
                                 {MARKET_CODES.map((c) => (
                                     <Segment key={c} selected={markets.includes(c)} onClick={() => toggle(markets, setMarkets)(c)}>
                                         {c}
                                     </Segment>
                                 ))}
                             </div>
+
+                            <FieldError e={errFor('pa-markets')} />
 
                             <label htmlFor="pa-msg" className={'mt-5 ' + LABEL}>{t('partnerApply.message')}</label>
                             <textarea id="pa-msg" rows={3} value={message} onChange={(e) => setMessage(e.target.value)} placeholder={t('partnerApply.messagePh')} className={FIELD + ' resize-none'} />
@@ -226,9 +256,10 @@ export function PartnerApplyPage() {
                                 <div className="mt-5"><SendFailed kind="application" failure={failure.kind} error={failure.error} /></div>
                             )}
 
+                            <FormErrorSummary errors={errors} className="mt-6" />
                             <div className="mt-6 flex items-center justify-between gap-4 border-t border-stroke-subtle pt-5">
                                 <p className="max-w-[220px] text-body-3xs leading-relaxed text-fg-tertiary">{t('partnerApply.privacy')}</p>
-                                <Button type="submit" variant="primary" shape="soft" size="lg" disabled={!canSubmit} loading={status === 'sending'} className="shrink-0">
+                                <Button type="submit" variant="primary" shape="soft" size="lg" loading={status === 'sending'} className="shrink-0">
                                     {status === 'sending' ? t('contactSend.sending') : status === 'failed' ? t('contactSend.retry') : t('partnerApply.submit')}
                                     {status !== 'sending' && <ArrowRight size={16} />}
                                 </Button>
@@ -246,4 +277,10 @@ export function PartnerApplyPage() {
             </div>
         </div>
     );
+}
+
+/** Der Satz am Feld — dieselbe Meldung wie in der Zusammenfassung. */
+function FieldError({ e }: { e: FormError | undefined }) {
+    if (!e) return null;
+    return <p id={`${e.id}-error`} className="mt-1.5 text-body-3xs leading-snug text-error-700 dark:text-red-300">{e.message}</p>;
 }

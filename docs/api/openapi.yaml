@@ -51,6 +51,13 @@ paths:
             application/json:
               schema:
                 type: object
+                properties:
+                  overview_summary: { type: string }
+                  providers:
+                    type: array
+                    items: { $ref: '#/components/schemas/AnonProviderCard' }
+                  laws: { type: array, items: { type: object } }
+                  coverage: { $ref: '#/components/schemas/SearchCoverage' }
         '400':
           description: Body ist kein JSON (`INVALID_JSON`)
           headers:
@@ -250,6 +257,16 @@ paths:
                     Sprache des Updates (Seiten-Sprache). Regionale Tags wie
                     `de-DE` werden gekuerzt, andere Sprachen verworfen — der
                     Mailer schreibt dann Englisch.
+                reason:
+                  type: string
+                  enum: [provider_coverage]
+                  description: >-
+                    "Request More Coverage" (Limited coverage, Canvas C2): der
+                    Markt ist geprueft, aber kein freigegebener Anbieter deckt
+                    die genannten `domains` dort ab. Erlaubt dann auch einen
+                    bekannten Markt (sonst 409 `MARKET_COVERED`); `domains` ist
+                    Pflicht, `notify` wird ignoriert — ein Update dafuer gibt es
+                    nicht.
       responses:
         '200':
           description: Anfrage gespeichert (neu oder aktualisiert)
@@ -1379,7 +1396,7 @@ paths:
                 countries: { type: array, items: { type: string } }
                 service_id: { type: string, format: uuid }
       responses:
-        '201': { description: "`{ booking: { id, public_ref, slot_start, slot_end, status, acknowledgement_version, shared_fields[], user_discount: { pct, policy_version } | null }, provider_identity: { name, website_url, contact_email } }`" }
+        '201': { description: "`{ booking: { id, public_ref, slot_start, slot_end, status, acknowledgement_version, shared_fields[], user_discount: { pct, policy_version } | null, rebooked_from, topic: { area_code, countries[] } }, provider_identity: { name, website_url, contact_email } }` — `topic` ist das Thema, das der Anbieter mit dem Lead sieht; die Bestaetigung nennt es neben den shared_fields." }
         '400': { description: "Eingabe (`VALIDATION_ERROR`) oder Opportunity fehlt (`OPPORTUNITY_REQUIRED`, `AREA_NOT_OFFERED`, `SERVICE_NOT_FOUND`)" }
         '404': { description: Unbekannter Ref, nicht matchbar oder fremde Sitzung }
         '409': { description: "`BILLING_NOT_READY` (nicht zahlungsbereit, nichts versucht) · `ACKNOWLEDGEMENT_OUTDATED` (mit `current_version`) · `SLOT_TAKEN` · `BOOKING_NOT_COMPLETED` (Belastung gescheitert, Grund `provider_billing`, keine Buchung)" }
@@ -1626,6 +1643,36 @@ components:
         match_tier: { type: string, enum: [high, strong, moderate] }
         match_basis: { type: object }
         rank_basis: { $ref: '#/components/schemas/RankBasis' }
+        price_range:
+          type: object
+          nullable: true
+          description: >-
+            Spanne ueber die freigegebenen Leistungen in den angefragten
+            Bereichen (Spec A §27, Klasse anonymous). null ohne Preis oder bei
+            mehreren Waehrungen — die UI sagt dann "Pricing on request".
+          properties:
+            min: { type: number, nullable: true }
+            max: { type: number, nullable: true }
+            currency: { type: string, example: EUR }
+        markets_covered:
+          type: array
+          items: { type: string }
+          example: [DE, NL]
+          description: Die angefragten Maerkte, in denen dieser Anbieter freigegeben ist.
+    SearchCoverage:
+      type: object
+      description: >-
+        Bereich × Markt: deckt mindestens ein freigegebener Anbieter das ab?
+        Grundlage fuer "Limited coverage" (Checklist v1.0). Nur Booleans je
+        Zelle — kein Anbieter, keine Anzahl. Maerkte, die die Engine nicht
+        kennt, fehlen hier; sie haben eigene Zustaende.
+      properties:
+        markets: { type: array, items: { type: string }, example: [DE, NL] }
+        areas: { type: array, items: { type: string }, example: [tax-vat, product-packaging] }
+        covered:
+          type: object
+          additionalProperties: { type: array, items: { type: string } }
+          example: { DE: [tax-vat, product-packaging], NL: [tax-vat] }
     AnonProviderDetail:
       allOf:
         - $ref: '#/components/schemas/AnonProviderCard'

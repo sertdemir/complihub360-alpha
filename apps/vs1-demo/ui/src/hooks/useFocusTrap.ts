@@ -34,6 +34,12 @@ function focusableWithin(node: HTMLElement): HTMLElement[] {
   });
 }
 
+// Gestapelte Flaechen (2026-10-10, I2): ein Dialog ueber einer offenen
+// Schublade. Ohne Stapel hielten beide Fallen den Fokus fest, und die der
+// Schublade zog ihn bei jedem Tab aus dem Dialog zurueck. Es zaehlt nur die
+// zuletzt geoeffnete Flaeche.
+const stack: HTMLElement[] = [];
+
 /**
  * Attach the returned ref to the modal surface. Pass `active` = whether it is open.
  *
@@ -53,9 +59,11 @@ export function useFocusTrap<T extends HTMLElement = HTMLElement>(active: boolea
 
     const items = focusableWithin(node);
     (items[0] ?? node).focus();
+    stack.push(node);
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key !== 'Tab') return;
+      if (stack[stack.length - 1] !== node) return;
       const current = focusableWithin(node);
       if (current.length === 0) {
         // Nothing to move to — hold focus on the surface rather than letting it
@@ -84,6 +92,8 @@ export function useFocusTrap<T extends HTMLElement = HTMLElement>(active: boolea
 
     return () => {
       document.removeEventListener('keydown', onKeyDown, true);
+      const at = stack.lastIndexOf(node);
+      if (at >= 0) stack.splice(at, 1);
       // Only restore if the trigger is still in the document — a drawer that
       // removed its own opener would otherwise throw focus at a detached node.
       if (previous && document.contains(previous)) previous.focus();

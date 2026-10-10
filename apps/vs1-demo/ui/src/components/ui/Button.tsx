@@ -193,3 +193,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   },
 );
 Button.displayName = 'Button';
+
+/** Compass "Secondary" (Figma): Kontur in Markenfarbe — mit variant="outline".
+ *  Der Code-Variant `secondary` ist grau-neutral; Flaechen nach Figma, die die
+ *  Petrol-Kontur zeigen, setzen diese Klassen dazu (wie MarketRequest). */
+export const outlineBrandClass = 'border-stroke-brand bg-surface text-fg-brand hover:bg-brand-light dark:border-stroke-brand dark:text-fg-brand';
