@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Drawer } from '../ui/Drawer';
 import { Button } from '../ui/Button';
-import { fetchSlots, rescheduleBooking } from '../../api/bookings';
+import { fetchSlots, rescheduleBooking, rescheduleFailureFrom, type RescheduleFailure } from '../../api/bookings';
 
 // ─── RescheduleDrawer ────────────────────────────────────────────────────────
 // "Verschieben" on the Termine page: pick a new slot from the provider's free
@@ -16,6 +16,10 @@ export interface RescheduleTarget {
   publicRef: string;
   providerName: string;
   currentLine: string;   // "Mo, 12. Aug 2026 · 10:00" — shown as context
+  /** Phase 5: Neubuchung in der Frist nach No-Show oder Plattformfehler —
+   *  derselbe Aufruf, aber der Server legt eine NEUE Buchung am alten Lead an.
+   *  Die Schublade spricht dann von "neu buchen", nicht von "verschieben". */
+  rebook?: boolean;
 }
 
 // Deterministic fixture (demo mode): next 3 business days, 4 slots each.
@@ -37,17 +41,21 @@ function fixtureSlots(): string[] {
 export function RescheduleDrawer({ target, onClose, onRescheduled }: {
   target: RescheduleTarget | null;
   onClose: () => void;
-  onRescheduled?: (bookingId: string, newSlotIso: string) => void;
+  /** Bei einer Neubuchung (Phase 5) ist `newBookingId` die neue Zeile. */
+  onRescheduled?: (bookingId: string, newSlotIso: string, newBookingId?: string) => void;
 }) {
   const { t, i18n } = useTranslation('userws');
   const locale = i18n.resolvedLanguage || 'en';
   const [slots, setSlots] = useState<string[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
+  // Phase 5: ein Umbuchungslimit (409 RESCHEDULE_LIMIT) oder ein inzwischen
+  // vergebener Slot ist eine Antwort, kein stilles "Verschoben ✓".
+  const [failure, setFailure] = useState<RescheduleFailure | null>(null);
 
   useEffect(() => {
     if (!target) return;
-    setSelected(null); setState('idle');
+    setSelected(null); setState('idle'); setFailure(null);
     fetchSlots(target.publicRef).then(setSlots).catch(() => setSlots(fixtureSlots()));
   }, [target]);
 
@@ -64,23 +72,28 @@ export function RescheduleDrawer({ target, onClose, onRescheduled }: {
 
   const confirm = async () => {
     if (!target || !selected) return;
-    setState('sending');
+    setState('sending'); setFailure(null);
+    let newId: string | undefined;
     try {
-      await rescheduleBooking(target.bookingId, selected);
-    } catch {
-      // demo/fixture mode: the optimistic row update still demonstrates the flow
+      const r = await rescheduleBooking(target.bookingId, selected);
+      if (r.rebooked_from && r.id) newId = r.id;
+    } catch (err) {
+      setFailure(rescheduleFailureFrom(err));
+      setState('idle');
+      return;
     }
     setState('done');
-    setTimeout(() => { onRescheduled?.(target.bookingId, selected); onClose(); }, 900);
+    setTimeout(() => { onRescheduled?.(target.bookingId, selected, newId); onClose(); }, 900);
   };
+  const rebook = !!target?.rebook;
 
   return (
-    <Drawer open={!!target} onClose={onClose} eyebrow={t('reschedule.eyebrow')} title={target?.providerName ?? ''}
+    <Drawer open={!!target} onClose={onClose} eyebrow={t(rebook ? 'reschedule.rebookEyebrow' : 'reschedule.eyebrow')} title={target?.providerName ?? ''}
       footer={
         <div className="flex items-center justify-end gap-2.5">
           <Button size="sm" variant="ghost" onClick={onClose}>{t('reschedule.cancel')}</Button>
           <Button size="sm" onClick={confirm} disabled={!selected || state === 'sending' || state === 'done'}>
-            {state === 'done' ? t('reschedule.done') : t('reschedule.confirm')}
+            {state === 'done' ? t(rebook ? 'reschedule.rebookDone' : 'reschedule.done') : t(rebook ? 'reschedule.rebookConfirm' : 'reschedule.confirm')}
           </Button>
         </div>
       }
@@ -111,7 +124,12 @@ export function RescheduleDrawer({ target, onClose, onRescheduled }: {
             </div>
           ))}
         </div>
-        <p className="text-[11px] leading-relaxed text-fg-tertiary">{t('reschedule.note')}</p>
+        {failure && (
+          <p role="alert" className="rounded-lg border border-stroke bg-surface-secondary px-3.5 py-2.5 text-[12.5px] leading-relaxed text-fg">
+            {t(failure === 'limit' ? 'reschedule.limit' : failure === 'slot_taken' ? 'reschedule.slotTaken' : 'reschedule.failed')}
+          </p>
+        )}
+        <p className="text-[11px] leading-relaxed text-fg-tertiary">{t(rebook ? 'reschedule.rebookNote' : 'reschedule.note')}</p>
       </div>
     </Drawer>
   );

@@ -8,8 +8,8 @@ import { useWorkspaceData } from '../../lib/useWorkspaceData';
 import { LoadFailedState, ReadinessEmpty, useReadiness } from '../../components/provider/WorkspaceStates';
 import { money } from '../../api/billing';
 import {
-  fetchProviderBookings, reportProposal, submitReview,
-  type BookingStatus, type LeadProposal, type ProviderBookingLead,
+  fetchProviderBookings, reportProposal, reportAttendance, submitReview,
+  type AttendanceOutcome, type BookingAttendance, type BookingStatus, type LeadProposal, type ProviderBookingLead,
 } from '../../api/bookings';
 import { DateMark } from '../../components/ui/DateMark';
 import { useRequestContext } from '../../lib/requestContext';
@@ -25,6 +25,21 @@ import { useRequestContext } from '../../lib/requestContext';
 // erstellt?", „10 % ausgewiesen?"). Spec B sagt „auf jedem Lead", nicht
 // „irgendwo": der Anbieter sieht im selben Blick, was er zahlt und was er
 // schuldet. Zaehler statt Prozentgewirr.
+//
+// Phase 5 (ADR-0007, Canvas-Wahl 1B): ist der Slot vorbei, fragt die Karte
+// „Wie ist der Termin verlaufen?" mit drei Auswahlkarten, jede mit ihrem
+// Folge-Satz (Gebuehr, Frist, Guthaben). Bei „nicht erschienen" steht die
+// Zehn-Minuten-Bedingung als Frage, die der Anbieter mit „Ja, so melden"
+// bejaht — Teil der Meldung, kein Kleingedrucktes. Danach eine Zeile unter
+// der Karte: wer fehlte, bis wann der Nutzer neu buchen kann, ob er
+// widersprochen hat.
+
+// Regel-Fassung 1 (attendance_policy v1): 14 Tage Frist, 30 % Guthaben. Die
+// Folge-Saetze nennen sie, bevor der Server geantwortet hat; die Antwort
+// traegt dann die echte Frist. Aendert sich die Fassung, aendert sich hier
+// die Zahl — nicht still im Text.
+const REBOOK_DAYS = 14;
+const CREDIT_PCT = 30;
 
 interface Row {
   id: string;
@@ -46,6 +61,7 @@ interface Row {
   /** Der Rabatt, den der Nutzer von diesem Anbieter erwartet (eingefroren zur Buchung). */
   userDiscountPct: number | null;
   proposal: LeadProposal | null;
+  att: BookingAttendance;
 }
 
 const STATUS_TONE: Record<BookingStatus, 'success' | 'neutral' | 'error' | 'warning'> = {
@@ -79,6 +95,7 @@ export function LeadsPage() {
         lead: b.lead,
         userDiscountPct: b.userDiscountPct,
         proposal: b.proposal,
+        att: b.attendance,
       };
     });
   }, [locale]);
@@ -118,8 +135,29 @@ export function LeadsPage() {
     setProposalBusy(null);
   };
 
-  const upcoming = rows.filter((r) => r.status === 'confirmed');
-  const past = rows.filter((r) => r.status !== 'confirmed');
+  // Phase 5: die Anwesenheits-Meldung — lokal sofort, dann an den Server.
+  // Antwortet er nicht, bleibt die Frage stehen (kein erfundenes „gemeldet").
+  const [reported, setReported] = useState<Record<string, { status: BookingStatus; att: BookingAttendance }>>({});
+  const [attChoice, setAttChoice] = useState<Record<string, AttendanceOutcome | null>>({});
+  const [attBusy, setAttBusy] = useState<string | null>(null);
+  const [attFailed, setAttFailed] = useState<string | null>(null);
+  const sendAttendance = async (r: Row) => {
+    const outcome = attChoice[r.id];
+    if (!outcome) return;
+    setAttBusy(r.id); setAttFailed(null);
+    try {
+      const res = await reportAttendance(r.id, outcome);
+      setReported((m) => ({ ...m, [r.id]: { status: res.status, att: { ...r.att, attendanceReportable: false, noShowBy: res.noShowBy, noShowReportedAt: new Date().toISOString(), rebookDeadline: res.rebookDeadline, rebookOpen: !!res.rebookDeadline } } }));
+    } catch {
+      setAttFailed(r.id);
+    }
+    setAttBusy(null);
+  };
+  const effective = rows.map((r) => (reported[r.id] ? { ...r, status: reported[r.id].status, att: reported[r.id].att } : r));
+  // Rueckmeldung offen zuoberst: das Einzige auf der Seite, das eine Handlung verlangt.
+  const reportOpen = effective.filter((r) => r.att.attendanceReportable);
+  const upcoming = effective.filter((r) => r.status === 'confirmed' && !r.att.attendanceReportable);
+  const past = effective.filter((r) => r.status !== 'confirmed');
 
   const toggle = (label: string, on: boolean, onClick: () => void, disabled: boolean) => (
     <button
@@ -183,6 +221,82 @@ export function LeadsPage() {
     );
   };
 
+  // ── Phase 5: Anwesenheit melden (1B) ───────────────────────────────────────
+  const dateOnly = (iso: string) => new Date(`${iso.slice(0, 10)}T00:00:00Z`).toLocaleDateString(locale, { day: 'numeric', month: 'long' });
+  const plusDays = (n: number) => { const d = new Date(); d.setUTCDate(d.getUTCDate() + n); return d.toISOString(); };
+  const tf = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' });
+  const attendanceBlock = (r: Row) => {
+    const choice = attChoice[r.id] ?? null;
+    const busy = attBusy === r.id;
+    const deadline = dateOnly(plusDays(REBOOK_DAYS));
+    const fee = r.lead && r.lead.feeEnabled && r.lead.paymentStatus === 'captured' ? r.lead : null;
+    const start = new Date(r.start);
+    const options: Array<{ key: AttendanceOutcome; title: string; body: string }> = [
+      { key: 'attended', title: t('termine.attAttended'), body: t('termine.attAttendedBody') },
+      { key: 'user_no_show', title: t('termine.attUserNoShow'), body: fee
+        ? t('termine.attUserNoShowBody', { deadline, pct: CREDIT_PCT, amount: money(Math.round(fee.finalFeeCents * CREDIT_PCT / 100), fee.currency) })
+        : t('termine.attUserNoShowBodyNoFee', { deadline }) },
+      { key: 'platform_failure', title: t('termine.attPlatform'), body: t('termine.attPlatformBody') },
+    ];
+    return (
+      <div className="space-y-3 border-t border-stroke bg-surface-secondary/60 px-5 py-4">
+        <p className="text-[13px] font-semibold text-fg">{t('termine.attQuestion')}</p>
+        <div role="radiogroup" aria-label={t('termine.attQuestion')} className="space-y-2">
+          {options.map((o) => {
+            const on = choice === o.key;
+            return (
+              <button
+                key={o.key} type="button" role="radio" aria-checked={on} disabled={busy}
+                onClick={() => setAttChoice((m) => ({ ...m, [r.id]: o.key }))}
+                className={'flex w-full items-start gap-3 rounded-lg border px-3.5 py-3 text-left transition-colors disabled:opacity-60 '
+                  + (on ? 'border-brand bg-brand-light' : 'border-stroke bg-surface hover:border-brand/50')}
+              >
+                <span aria-hidden className={'mt-[2px] inline-block h-4 w-4 shrink-0 rounded-full border ' + (on ? 'border-[5px] border-brand bg-surface' : 'border-stroke-strong bg-surface')} />
+                <span className="min-w-0">
+                  <span className="block text-[13px] font-semibold text-fg">{o.title}</span>
+                  <span className="block text-[12px] leading-relaxed text-fg-secondary">{o.body}</span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+        {choice === 'user_no_show' && (
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-lg border border-stroke bg-surface px-3.5 py-2.5">
+            <span className="text-[13px] text-fg">{t('termine.attTenMinute', { start: tf.format(start), until: tf.format(new Date(start.getTime() + 10 * 60_000)) })}</span>
+            <span className="text-[11.5px] text-fg-tertiary">{t('termine.attTenMinuteHint')}</span>
+          </div>
+        )}
+        {attFailed === r.id && <p role="alert" className="text-[12px] text-fg-secondary">{t('termine.attFailed')}</p>}
+        <div className="flex justify-end gap-2">
+          <Button size="sm" variant="ghost" disabled={busy || !choice} onClick={() => setAttChoice((m) => ({ ...m, [r.id]: null }))}>{t('termine.attCancel')}</Button>
+          <Button size="sm" disabled={busy || !choice} onClick={() => sendAttendance(r)}>
+            {busy ? '…' : t(choice === 'user_no_show' ? 'termine.attReportNoShow' : 'termine.attReport')}
+          </Button>
+        </div>
+      </div>
+    );
+  };
+  // Nach der Meldung: eine Zeile, die sagt, wer fehlte und was daraus folgt.
+  const attendanceLine = (r: Row) => {
+    const a = r.att;
+    let key: string | null = null;
+    if (a.rebookedFrom) key = 'termine.attRebookedFrom';
+    else if (a.noShowBy === 'user') key = a.disputeStatus === 'open' ? 'termine.attLineDispute' : a.rebookOpen ? 'termine.attLineUser' : 'termine.attLineUserClosed';
+    else if (a.noShowBy === 'provider') key = 'termine.attLineProvider';
+    else if (a.noShowBy === 'platform') key = 'termine.attLinePlatform';
+    if (!key) return null;
+    return (
+      <p className="border-t border-stroke px-5 py-2 text-[12px] text-fg-secondary">
+        {t(key, { deadline: a.rebookDeadline ? dateOnly(a.rebookDeadline) : '' })}
+      </p>
+    );
+  };
+  const statusTag = (r: Row) => r.att.attendanceReportable
+    ? <Tag tone="warning">{t('termine.status.report_open')}</Tag>
+    : r.att.disputeStatus === 'open'
+      ? <Tag tone="warning">{t('termine.status.dispute_open')}</Tag>
+      : <Tag tone={STATUS_TONE[r.status]}>{t(`termine.status.${r.status}`)}</Tag>;
+
   // 2 V1 (2026-10-01): Datumsmarke · Firma · Kontakt · Zeit, Dauer und Thema.
   const minuten = (r: Row) => (r.minutes ? t('termine.minutes', { count: r.minutes }) : '');
   const thema = (r: Row) => [bereich(r.category), r.countries.map(markt).join(', ')].filter(Boolean).join(' · ');
@@ -198,11 +312,12 @@ export function LeadsPage() {
       <div className="flex shrink-0 flex-col items-end gap-2">
         <div className="flex items-center gap-2">
           {r.leadCharged && !r.lead && <span className="text-[11px] text-fg-tertiary">{t('termine.leadCharged')}</span>}
-          <Tag tone={STATUS_TONE[r.status]}>{t(`termine.status.${r.status}`)}</Tag>
+          {statusTag(r)}
         </div>
         <Button size="sm" onClick={() => setDossierFor(r)}>{t('termine.openDossier')}</Button>
       </div>
       </div>
+      {r.att.attendanceReportable ? attendanceBlock(r) : attendanceLine(r)}
       {leadLine(r)}
       {discountBlock(r)}
     </div>
@@ -221,7 +336,13 @@ export function LeadsPage() {
         {state === 'error' && <LoadFailedState surface="appointments" error={error} onRetry={reload} section />}
         {state === 'ready' && (
           <>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.05em] text-fg-tertiary">{t('termine.upcoming')}</p>
+            {reportOpen.length > 0 && (
+              <>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.05em] text-warning-800 dark:text-amber-300">{t('termine.reportOpen')} · {reportOpen.length}</p>
+                <div className="space-y-2.5">{reportOpen.map(card)}</div>
+              </>
+            )}
+            <p className={`text-[11px] font-semibold uppercase tracking-[0.05em] text-fg-tertiary ${reportOpen.length ? 'pt-2' : ''}`}>{t('termine.upcoming')}</p>
             {/* B3: noch nie ein Termin — der leere Zustand erklaert, wie einer
                 entsteht, und was dafuer fehlt. Gibt es vergangene, aber keine
                 kommenden, reicht die ruhige Zeile. */}

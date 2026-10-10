@@ -49,6 +49,17 @@ export async function fetchInvoices(providerKey?: string): Promise<Invoice[]> {
 // Pure computation server-side; nothing here is a ranking input.
 export type PlanCode = 'essential' | 'growth' | 'global';
 
+/** Ein Guthaben an einer Buchung: der Nutzer kam nicht und hat in der Frist
+ *  nicht neu gebucht — 30 % der gezahlten Lead-Gebuehr, nie Bargeld. */
+export interface ProviderCredit {
+  id: string;
+  amount_cents: number;
+  currency: string;
+  reason: 'user_no_rebook_30pct' | string;
+  booking_id: string | null;
+  created_at: string;
+}
+
 export interface BillingPreview {
   period: string;
   currency: string;
@@ -64,6 +75,12 @@ export interface BillingPreview {
    *  Optional, weil aeltere Antworten (und Fixtures) das Feld nicht tragen. */
   readiness?: BillingReadiness;
   credit_balance_cents: number;
+  /** Phase 5 (ADR-0007): was vom Guthaben mit dieser Rechnung verrechnet wird
+   *  (bis zur Abo-Summe), die offenen Guthaben einzeln, und die Summe danach.
+   *  Optional, weil aeltere Antworten die Felder nicht tragen. */
+  credit_applied_cents?: number;
+  credits?: ProviderCredit[];
+  total_after_credit_cents?: number;
   lines: InvoiceLineItem[];
   total_cents: number;
   pricing: {

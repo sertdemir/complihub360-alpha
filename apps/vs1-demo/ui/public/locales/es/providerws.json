@@ -205,7 +205,13 @@
     "graceBody": "Vencida desde el {{since}}. A partir del {{until}}, las reservas se pausan hasta que la factura esté pagada.",
     "graceStillVisible": "Su visibilidad en los resultados de búsqueda no se ve afectada.",
     "graceOpenPortal": "Abrir la factura en el portal",
-    "changePaymentMethod": "Cambiar el método de pago"
+    "changePaymentMethod": "Cambiar el método de pago",
+    "creditLine": "Crédito aplicado · {{count}} cita sin nueva reserva",
+    "creditLine_other": "Crédito aplicado · {{count}} citas sin nueva reserva",
+    "creditOrigin": "{{pct}} % de la tarifa de lead · el cliente no se presentó ni volvió a reservar en el plazo · {{date}}",
+    "creditRemainder": "Quedan {{amount}} de crédito para la próxima factura",
+    "creditNote": "El crédito se aplica a su próxima factura de suscripción, no se abona.",
+    "currentPeriodTotalAfterCredit": "Total acumulado tras el crédito"
   },
   "confirmEmail": {
     "working": "Confirmando su nueva dirección…",
@@ -464,7 +470,9 @@
       "confirmed": "CONFIRMADA",
       "completed": "COMPLETADA",
       "cancelled": "CANCELADA",
-      "no_show": "NO ASISTIÓ"
+      "no_show": "NO ASISTIÓ",
+      "report_open": "CITA PASADA",
+      "dispute_open": "IMPUGNACIÓN ABIERTA"
     },
     "rateLead": "Valorar este lead",
     "rated": "✓ Lead valorado",
@@ -488,6 +496,27 @@
     "yes": "Sí",
     "no": "No",
     "notYet": "Todavía no",
+    "attQuestion": "¿Cómo fue la cita?",
+    "attAttended": "La conversación tuvo lugar",
+    "attAttendedBody": "La cita cuenta como completada.",
+    "attUserNoShow": "El cliente no se presentó",
+    "attUserNoShowBody": "La tarifa de lead se mantiene. El cliente puede volver a reservar con usted hasta el {{deadline}} sin segunda tarifa; si no lo hace, recibe {{pct}} % ({{amount}}) como crédito en su próxima factura.",
+    "attUserNoShowBodyNoFee": "El cliente puede volver a reservar con usted hasta el {{deadline}}. No se cobró tarifa de lead por esta cita, así que no se genera crédito.",
+    "attPlatform": "Fallo técnico de la plataforma",
+    "attPlatformBody": "Nueva cita para el cliente sin segunda tarifa. Revisaremos el caso; no se le registra ningún incidente.",
+    "attTenMinute": "¿Estuvo a las {{start}} y esperó hasta las {{until}}?",
+    "attTenMinuteHint": "Sin los diez minutos, la cita no cuenta como no asistencia del cliente.",
+    "attCancel": "Cancelar",
+    "attReport": "Informar",
+    "attReportNoShow": "Sí, informar así",
+    "attFailed": "No se pudo guardar el informe. Inténtelo de nuevo.",
+    "attLineUser": "El cliente no se presentó · puede volver a reservar hasta el {{deadline}}",
+    "attLineUserClosed": "El cliente no se presentó · plazo de nueva reserva vencido",
+    "attLineDispute": "El cliente no se presentó · el cliente impugnó el informe, estamos revisando el caso",
+    "attLineProvider": "Informado como no asistencia · registrado como incidente",
+    "attLinePlatform": "Fallo de la plataforma · el cliente puede volver a reservar hasta el {{deadline}}",
+    "attRebookedFrom": "Nueva reserva de una cita anterior · sin segunda tarifa de lead",
+    "reportOpen": "Pendiente de su informe",
     "proposalSaveFailed": "No se ha guardado. Inténtelo de nuevo."
   },
   "intake": {
