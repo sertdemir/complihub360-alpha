@@ -692,6 +692,23 @@ function notifications() {
   ];
 }
 
+// Partner-Post (Canvas A V2 · B V1): was der Server an `provider_members`
+// schreibt. `needs_action` folgt der Demo-Lage — die Lead-Belastung ist
+// gescheitert (READINESS), die Rechnung offen.
+function partnerNotifications() {
+  const n = (i: number, type: string, payload: Record<string, unknown>, hoursAgo: number, read: boolean, needs = false) =>
+    ({ id: uuid(i, 5), type, subject: type.startsWith('booking') || type === 'appointment_reminder' ? 'booking' : 'provider', subject_id: PARTNER_KEY, payload, created_at: plus(-hoursAgo * H), read_at: read ? plus(-(hoursAgo - 1) * H) : null, needs_action: needs });
+  return [
+    n(1, 'booking_created', { providerKey: PARTNER_KEY, slot: iso(2, 11) }, 0.05, false),
+    n(2, 'payment_failed', { providerKey: PARTNER_KEY }, 1, false, READINESS.reasons.includes('payment_failed')),
+    n(3, 'invoice_retry_scheduled', { providerKey: PARTNER_KEY, label: 'INV-2026-009', deadline: iso(7).slice(0, 10) }, 2, false, true),
+    n(4, 'appointment_reminder', { providerKey: PARTNER_KEY, slot: iso(1, 12), offset: '1440' }, 26, true),
+    n(5, 'evidence_expiring', { providerKey: PARTNER_KEY, label: 'insurance', to: iso(23).slice(0, 10) }, 30, true),
+    n(6, 'subscription_scheduled', { providerKey: PARTNER_KEY, effectiveOn: iso(25).slice(0, 10) }, 31, true),
+    n(7, 'credit_issued', { providerKey: PARTNER_KEY, amount: '4470' }, 75, true),
+  ];
+}
+
 function obligations(sessionId: string) {
   if (sessionId !== uuid(1, 1)) return { items: [] };
   return { items: [
@@ -1000,7 +1017,7 @@ export function route(method: string, path: string, body: Record<string, unknown
     // Das Betriebsprotokoll ist admin-pflichtig (echter Server: 403) — der
     // Partner-Feed faellt dann wie in echt auf seine eigene Darstellung zurueck.
     if (p[0] === 'admin' && p[1] === 'events' && role !== 'admin') return { __status: 403, errorCode: 'FORBIDDEN', message: 'Admin only' };
-    if (p[0] === 'notifications') { const rows = notifications(); return { ok: true, notifications: rows, unread: rows.filter((r) => !r.read_at).length }; }
+    if (p[0] === 'notifications') { const rows = role === 'partner' ? partnerNotifications() : notifications(); return { ok: true, notifications: rows, unread: rows.filter((r) => !r.read_at).length }; }
     if (p[0] === 'sessions') return { ok: true, sessions: SESSIONS.map(({ open: _open, total: _total, severity: _severity, by_severity: _bySeverity, ...s }) => s) };
     if (p[0] === 'session' && p[2] === 'obligations') return obligations(p[1]);
     if (p[0] === 'engagement' && p.length === 2) return engagement(p[1]);

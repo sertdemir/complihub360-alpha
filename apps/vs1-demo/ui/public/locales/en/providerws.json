@@ -1089,5 +1089,76 @@
       "errSame": "That is already your running plan.",
       "errFailed": "That did not work just now. Please try again."
     }
+  },
+  "partnerNotif": {
+    "hours_one": "{{count}} hour",
+    "hours_other": "{{count}} hours",
+    "minutes_one": "{{count}} minute",
+    "minutes_other": "{{count}} minutes",
+    "needsYou": "Needs you",
+    "forInfo": "For your information",
+    "seeAll": "See all notifications",
+    "empty": "No notifications yet. Bookings, billing and verification updates appear here.",
+    "pageSubtitle": "Everything CompliHub360 has sent you: bookings, billing, verification and your plan.",
+    "chipAppointments": "Appointments",
+    "chipVerification": "Verification",
+    "chipPlan": "Plan",
+    "goTo": "Open",
+    "booking_created": {
+      "title": "New booking",
+      "body": "A client booked an intro call for {{slot}}. The dossier is ready."
+    },
+    "appointment_reminder": {
+      "title": "Appointment in {{offset}}",
+      "body": "Intro call on {{slot}}."
+    },
+    "dispute_opened": {
+      "title": "A client disagrees with your report",
+      "body": "About the appointment on {{slot}}. CompliHub360 will review it and let you know."
+    },
+    "dispute_resolved": {
+      "title": "Decision on a disputed appointment",
+      "body": "The appointment on {{slot}}: {{label}}."
+    },
+    "performance_incident": {
+      "title": "Missed appointment recorded",
+      "body": "You were recorded as absent for {{slot}}. This is part of your performance figures."
+    },
+    "credit_issued": {
+      "title": "Credit added",
+      "body": "{{amount}} from a missed appointment. It is applied to your next subscription invoice."
+    },
+    "payment_failed": {
+      "title": "Lead charge did not go through",
+      "body": "Bookings are paused until you check the card again or add another one. You stay visible."
+    },
+    "invoice_retry_scheduled": {
+      "title": "Invoice {{label}} is due",
+      "body": "If it is still open tomorrow, we will try your card on file. From {{deadline}}, new bookings pause while it stays open."
+    },
+    "subscription_scheduled": {
+      "title": "Plan change scheduled",
+      "body": "Takes effect on {{effectiveOn}}. You can withdraw it until then."
+    },
+    "subscription_schedule_done": {
+      "title": "Plan change in effect",
+      "body": "Your plan changed today as scheduled."
+    },
+    "verification_info_requested": {
+      "title": "One more document needed",
+      "body": "Our review needs one more piece of evidence."
+    },
+    "verification_decided": {
+      "title": "Review decided",
+      "body": "A review decision was made. Open Verification to see the result."
+    },
+    "verification_activated": {
+      "title": "Your account is active",
+      "body": "Companies can now find and book you for the approved services."
+    },
+    "evidence_expiring": {
+      "title": "Evidence expires soon",
+      "body": "{{label}} expires on {{deadline}}."
+    }
   }
 }
