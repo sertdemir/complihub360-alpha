@@ -83,12 +83,16 @@ Nicht berührt: Risk Map, Wizard, Ranking, AI-Verhalten.
 - [x] **A2 Backend** — `POST /provider/:key/billing/recheck`
   (`verifyPaymentMethod` per SetupIntent, `recheckPaymentMethod`, drei
   Prüfungen in 24 h); fünf Routentests, OpenAPI.
-- [ ] **A2 Oberfläche** — Canvas mit je drei Varianten für Knopf-Ort und
-  Ergebnisanzeige liegt beim Nutzer; danach Figma → lokal → Review.
-- [ ] **B2** — so nicht baubar: Smart Retries gelten nur für
-  `charge_automatically`, die Abo-Rechnungen laufen als `send_invoice`.
-  Umsetzungsweg liegt beim Nutzer; bis dahin gilt B1. Vorher zu prüfen: ob
-  das Zahlungsmandat (`billing_authorization`, Fassung 2026-09) auch die
-  Belastung von Abo-Rechnungen abdeckt — der Text liegt nicht im Repo.
+- [ ] **A2 Oberfläche** — Canvas-Wahl **A V2** (zwei Wege zur Wahl) ·
+  **B V1** (Zeile unter dem Knopf); Figma → lokal → Review.
+- [x] **B2a** (Nachwahl: B2 war mit `send_invoice` nicht baubar) —
+  `invoiceRetry.ts`: Bescheid am Fälligkeitstag (Mail + Benachrichtigung),
+  Versuche an Tag 1/3/6, `due_at` unberührt; sechs Routentests, vier
+  Unit-Tests. Hinter `INVOICE_RETRY_ENABLED=1`.
+- [ ] **Mandat prüfen**, bevor `INVOICE_RETRY_ENABLED=1` gesetzt wird: deckt
+  `billing_authorization` (Fassung 2026-09) die Belastung von
+  Abo-Rechnungen? Der Text liegt nicht im Repo.
+- [ ] Die Benachrichtigung `invoice_retry_scheduled` hat noch keine Darstellung
+  in der Glocke (wie die Phase-5-Typen); die Mail trägt die Nachricht.
 - [ ] Auf Staging prüfen, ob der Stripe-Key SetupIntents anlegen darf
   (Restricted Key, vgl. Befund 2026-10-04).

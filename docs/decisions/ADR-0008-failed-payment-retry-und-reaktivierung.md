@@ -234,12 +234,24 @@ bleiben unverändert stehen.
   (nur offene Rechnungen zählen in `overdueState`). Die neue Copy sagt genau
   das. `copy:check` hält „Kulanzfrist"/„grace" (und „Workspace-Sperre") auf
   `providerws.billing.*` ausschließlich in `grace*`-Schlüsseln.
-- **B2 — offen in der Umsetzung, nicht in der Richtung.** Stripes
-  Wiederholungen (Smart Retries) greifen nur bei
-  `collection_method = charge_automatically`. Abo-Rechnungen laufen als
-  `send_invoice`: Stripe versucht dort nie selbst, die Karte zu belasten — es
-  gibt also keinen gescheiterten Versuch, den Stripe wiederholen könnte. Die
-  Option, wie sie oben steht, ist so nicht baubar. Die Richtung bleibt: der
-  häufige Fall soll sich innerhalb der sieben Tage von selbst lösen, und
-  **eine Wiederholung verschiebt den Stichtag nie**. Wie, entscheidet der
-  Nutzer (TKT-PROV-13); bis dahin gilt B1.
+- **B2 — umgesetzt als B2a (Nachwahl 2026-10-10).** Stripes Wiederholungen
+  (Smart Retries) greifen nur bei `collection_method = charge_automatically`;
+  die Abo-Rechnungen laufen als `send_invoice`, dort belastet Stripe nie
+  selbst eine Karte. Die Option, wie sie oben steht, war so nicht baubar.
+  Zur Wahl standen B2a (wir ziehen in der Kulanzfrist selbst ein), B2b
+  (Umstellung auf automatischen Einzug, ohne 14 Tage Zahlungsziel) und B1.
+  Gewählt: **B2a**.
+  - Am Fälligkeitstag erfährt der Anbieter per Mail und Benachrichtigung
+    (`invoice_retry_scheduled`), an welchen Tagen wir die hinterlegte Karte
+    versuchen, dass die Frist bleibt und dass er selbst zahlen kann.
+  - An **Tag 1, 3 und 6** nach Fälligkeit je ein Versuch
+    (`invoices/:id/pay`, off-session, Standard-Zahlungsmittel), je Rechnung
+    und Tag höchstens einmal; versäumte Tage werden nicht nachgeholt. Nur
+    Versuchstage innerhalb der Kulanzfrist zählen.
+  - **`due_at` wird nie angefasst.** Der Stichtag aus ADR-0006 bleibt.
+  - Eingeschaltet erst mit `INVOICE_RETRY_ENABLED=1`: Vorher ist zu prüfen,
+    ob das Zahlungsmandat (`billing_authorization`, Fassung 2026-09) die
+    Belastung von Abo-Rechnungen deckt — der Text liegt nicht im Repo.
+    Ohne den Schalter gilt faktisch B1.
+  - Code: `invoiceRetry.ts` (`retryStage`, `runInvoiceRetryTick`),
+    Watcher-Pass mit Shadow-Markern `invoice_retry_shadow`.

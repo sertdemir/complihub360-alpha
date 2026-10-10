@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vitest';
 import { LEAD_FEE_POLICY_VERSION } from '../billing.js';
 import { createHash, createHmac, randomUUID, generateKeyPairSync, sign as cryptoSign } from 'node:crypto';
 import { createServer as createHttpServer } from 'node:http';
@@ -984,6 +984,77 @@ describe('Anbieterseite: Lead-Karte, Selbstauskunft, Zahlungsbereitschaft (Phase
         expect(db.event_log.map((e) => e.type)).toContain('billing_readiness_sync_shadow');
         expect(await runBillingReadinessTick(false)).toEqual({ synced: 1, changed: 1, errors: 0 });
         expect(db.providers[0].billing_ready).toBe(true);
+    });
+});
+
+// ─── ADR-0008 B2a: Einzug in der Kulanzfrist ─────────────────────────────────
+describe('Einzug offener Abo-Rechnungen in der Kulanzfrist (B2a)', () => {
+    const tag = (offset: number) => new Date(Date.now() + offset * 86_400_000).toISOString().slice(0, 10);
+    function offen(dueOffset: number) {
+        seedProvider({ stripe_customer_id: 'cus_test', contact_email: 'kanzlei@test.example' });
+        seedPricing(); seedSubscription('test-kanzlei', 'growth');
+        (db.provider_members ??= []).push({ provider_key: 'test-kanzlei', user_id: 'member-1' });
+        (db.invoices ??= []).push({ id: 'inv-1', provider_key: 'test-kanzlei', invoice_number: 'INV-0012', amount_cents: 9900, currency: 'USD', status: 'open', due_at: tag(dueOffset), stripe_invoice_id: 'in_test_1' });
+    }
+    const run = async (shadow = false) => (await import('../invoiceRetry.js')).runInvoiceRetryTick(shadow);
+    afterEach(() => { delete process.env.INVOICE_RETRY_ENABLED; });
+
+    it('ohne INVOICE_RETRY_ENABLED passiert nichts — das Mandat ist erst zu pruefen', async () => {
+        offen(-1);
+        expect(await run()).toEqual({ notices: 0, attempts: 0, paid: 0, errors: 0 });
+        expect(stripeMock.stripeRequest).not.toHaveBeenCalled();
+    });
+
+    it('Tag 0: Bescheid an Partner und Mitglieder, noch kein Versuch', async () => {
+        process.env.INVOICE_RETRY_ENABLED = '1';
+        offen(0);
+        expect(await run()).toEqual({ notices: 1, attempts: 0, paid: 0, errors: 0 });
+        expect((db.notifications ?? []).map((n: any) => n.type)).toContain('invoice_retry_scheduled');
+        const mail = (db.event_log ?? []).find((e: any) => e.payload?.kind === 'invoice_retry_notice');
+        expect(mail?.payload?.subject).toContain('INV-0012');
+        // Ein zweiter Lauf am selben Tag sagt nichts noch einmal.
+        expect(await run()).toEqual({ notices: 0, attempts: 0, paid: 0, errors: 0 });
+    });
+
+    it('Tag 1: ein Versuch mit der hinterlegten Karte; bezahlt → Rechnung paid, Stichtag unberuehrt', async () => {
+        process.env.INVOICE_RETRY_ENABLED = '1';
+        offen(-1);
+        const dueBefore = db.invoices[0].due_at;
+        stripeMock.stripeRequest.mockImplementation(async (_m: string, path: string, params: any) => {
+            expect(path).toBe('invoices/in_test_1/pay');
+            expect(params).toMatchObject({ payment_method: 'pm_test_1', off_session: 'true' });
+            return { status: 'paid', status_transitions: { paid_at: 1791600000 } };
+        });
+        expect(await run()).toEqual({ notices: 1, attempts: 1, paid: 1, errors: 0 });
+        expect(db.invoices[0]).toMatchObject({ status: 'paid', due_at: dueBefore });
+        expect(db.event_log.map((e: any) => e.type)).toContain('invoice_retry_paid');
+        expect(await run()).toEqual({ notices: 0, attempts: 0, paid: 0, errors: 0 });
+    });
+
+    it('abgelehnt: kein Fehler des Laufs, Rechnung bleibt offen, Tag 1 wird nicht wiederholt', async () => {
+        process.env.INVOICE_RETRY_ENABLED = '1';
+        offen(-1);
+        const { StripeError } = await import('../stripe.js');
+        stripeMock.stripeRequest.mockRejectedValue(new StripeError('invoices/in_test_1/pay', 402, { error: { type: 'card_error', code: 'card_declined', decline_code: 'insufficient_funds', message: 'declined' } }));
+        expect(await run()).toEqual({ notices: 1, attempts: 1, paid: 0, errors: 0 });
+        expect(db.invoices[0].status).toBe('open');
+        expect(db.event_log.find((e: any) => e.type === 'invoice_retry_failed')?.payload).toMatchObject({ stage: 1, reason: 'insufficient_funds' });
+        expect((await run()).attempts).toBe(0);
+    });
+
+    it('nach der Frist wird nicht mehr versucht', async () => {
+        process.env.INVOICE_RETRY_ENABLED = '1';
+        offen(-9);
+        expect(await run()).toEqual({ notices: 0, attempts: 0, paid: 0, errors: 0 });
+    });
+
+    it('Shadow schreibt nur Marker, belastet nichts und schickt nichts', async () => {
+        process.env.INVOICE_RETRY_ENABLED = '1';
+        offen(-3);
+        expect(await run(true)).toEqual({ notices: 1, attempts: 1, paid: 0, errors: 0 });
+        expect(stripeMock.stripeRequest).not.toHaveBeenCalled();
+        expect((db.notifications ?? []).length).toBe(0);
+        expect(db.event_log.map((e: any) => e.type)).toContain('invoice_retry_shadow');
     });
 });
 
