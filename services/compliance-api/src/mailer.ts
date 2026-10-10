@@ -13,6 +13,10 @@ import { redactText } from '@complihub360/redaction';
 
 const PUBLIC_APP_URL = (process.env.PUBLIC_APP_URL || 'https://staging.complihub360.com').replace(/\/$/, '');
 const MAIL_FROM = process.env.MAIL_FROM || 'CompliHub360 <onboarding@resend.dev>';
+// Das Logo liegt im oeffentlichen Bucket `assets` DESSELBEN Projekts, mit dem
+// die API spricht — Beta-Mails haengen so nicht an Staging. Ohne SUPABASE_URL
+// (lokal, Tests) bleibt die Staging-Adresse.
+const MAIL_LOGO_URL = `${(process.env.SUPABASE_URL || 'https://kqylqwogxbiwpnomkzsn.supabase.co').replace(/\/$/, '')}/storage/v1/object/public/assets/logo-lockup-email.png`;
 
 // ─── i18n ─────────────────────────────────────────────────────────────────────
 // Transactional-mail copy in the four product languages (EN/DE/ES/TR), mirroring
@@ -361,7 +365,7 @@ function renderHtml(m: MagicLinkMail, t: MailStrings['magic']): string {
     // URL das alte Logo aus. Danach sind hier keine Aenderungen noetig.
     return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0b1620;padding:40px 16px;"><tr><td align="center">
 <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;">
-<tr><td style="padding:0 8px 24px 8px;"><img src="https://kqylqwogxbiwpnomkzsn.supabase.co/storage/v1/object/public/assets/logo-lockup-email.png" width="207" height="54" alt="CompliHub360 — Always on your side" style="display:block;border:0;"/></td></tr>
+<tr><td style="padding:0 8px 24px 8px;"><img src="${MAIL_LOGO_URL}" width="207" height="54" alt="CompliHub360 — Always on your side" style="display:block;border:0;"/></td></tr>
 <tr><td style="background-color:#1f2937;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:36px 32px;">
 <div style="font-family:Georgia,serif;font-size:26px;line-height:1.25;font-weight:bold;color:#ffffff;">${esc(t.headlinePre)}<span style="color:#C5913B;">${esc(t.headlineGold)}</span>${esc(t.headlinePost)}</div>
 <div style="padding-top:12px;font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#aeb8c4;">${esc(t.introPre)}<strong style="color:#ffffff;">${esc(t.introStrong)}</strong>${esc(t.introPost)}</div>
@@ -456,7 +460,7 @@ export async function sendEmailChangeMail(p: {
     const escE = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const html = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0b1620;padding:40px 16px;"><tr><td align="center">
 <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;">
-<tr><td style="padding:0 8px 24px 8px;"><img src="https://kqylqwogxbiwpnomkzsn.supabase.co/storage/v1/object/public/assets/logo-lockup-email.png" width="207" height="54" alt="CompliHub360" style="display:block;border:0;"/></td></tr>
+<tr><td style="padding:0 8px 24px 8px;"><img src="${MAIL_LOGO_URL}" width="207" height="54" alt="CompliHub360" style="display:block;border:0;"/></td></tr>
 <tr><td style="background-color:#1f2937;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:36px 32px;">
 <div style="font-family:Georgia,serif;font-size:26px;line-height:1.25;font-weight:bold;color:#ffffff;">${escE(t.headlinePre)}<span style="color:#C5913B;">${escE(t.headlineGold)}</span>${escE(t.headlinePost)}</div>
 <div style="padding-top:12px;font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#aeb8c4;">${escE(t.bodyPre)}<strong style="color:#ffffff;">${escE(p.providerName)}</strong>${escE(t.bodyPost)}</div>
