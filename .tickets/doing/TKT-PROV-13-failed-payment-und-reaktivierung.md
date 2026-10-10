@@ -21,7 +21,24 @@ mit ADR-0006 (A2 · B2 · C2) entschieden und gebaut.
 | **A** | Was hebt die Sperre nach einer gescheiterten **Lead-Belastung** auf? | A1 bleibt wie es ist · A2 Prüfung auf Anstoß · A3 automatischer Plan |
 | **B** | Wird eine offene **Abo-Rechnung** erneut eingezogen? | B1 nein · B2 Stripes Wiederholung in der Kulanzfrist · B3 eigener Plan |
 | **C** | Was gilt bei einem **Neustart** nach dem Ende? | C1 bleibt wie es ist · C2 Rabattzähler des Monats wird mitgenommen · C3 Sperrfrist |
-| **D** | Die **Copy** auf `/billing` | D1 begradigen · D2 begradigen und das Wort reservieren · D3 warten |
+| **D** | Die **Copy** auf `/billing` | ✅ **D1 entschieden und umgesetzt** (Nutzer, 2026-10-10) |
+
+## D1 ist erledigt
+
+Fünf Stellen statt der gemeldeten drei — beim Umsetzen kamen `kpiPaymentFailed`
+und `rowActionFailed` dazu, die dieselbe Behauptung an anderer Stelle
+wiederholten. Dazu zwei Anpassungen, ohne die die Fläche sich selbst
+widersprochen hätte: der Banner steht auf `warning` statt `error`, und der
+Knopf heißt „Rechnung im Portal öffnen" statt „Zahlungsmethode aktualisieren"
+(derselbe Handler — er öffnet ohnehin das Portal).
+
+**Eine Korrektur an ADR-0008 selbst:** Die erste Fassung erklärte die Texte mit
+der Regel für die Lead-Belastung. Falsch zugeordnet — sie hängen an
+`invoices.status = 'failed'`, und den setzt nur Stripes `uncollectible`. Das
+macht sie nicht richtiger, sondern falscher: Readiness zählt ausschließlich
+offene Rechnungen, eine solche Rechnung kann also **gar nichts sperren**. Der
+Satz „um eine Workspace-Sperre zu vermeiden" warnte vor einer Folge, die dieser
+Zustand nicht auslösen kann.
 
 ## Der Teil, der nicht warten sollte
 
