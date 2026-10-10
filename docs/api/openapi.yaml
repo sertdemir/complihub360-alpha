@@ -978,9 +978,12 @@ paths:
               properties:
                 period: { type: string, pattern: '^\\d{4}-\\d{2}$' }
                 dry_run: { type: boolean }
+                provider: { type: string, description: 'Optional ein Anbieter-Schluessel — nur dessen Abo wird abgerechnet (gezielte Tests, Workflow billing-run.yml)' }
       responses:
         '200':
-          description: Ergebnis je Anbieter
+          description: "Ergebnis je Anbieter, dazu `only_provider`"
+        '400':
+          description: provider ist kein Anbieter-Schluessel
         '403':
           description: Kein Server-Key
         '503':
