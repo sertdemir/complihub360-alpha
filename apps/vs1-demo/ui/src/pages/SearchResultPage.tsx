@@ -1,51 +1,32 @@
 import { useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Search, ArrowRight, ShieldCheck, FileText, BookOpen } from 'lucide-react';
+import { Search, ArrowRight, BookOpen } from 'lucide-react';
 import { Logo } from '../components/ui/Logo';
 import { Button } from '../components/ui/Button';
-import { SectionEyebrow } from '../components/providers/SectionHeading';
-import { Badge } from '../components/ui/Badge';
+import { DOMAINS } from '../lib/domains';
+import { areasForQuery } from '../lib/searchAreas';
 
-// ─── Search-Result page · Figma 3257:1490 (L) / 3262:1518 (D) ────────────────
-// Journey Station 1A "der schnelle Weg": a prose query gets a direct, sourced
-// answer + relevant obligations + follow-up guides — NO risk map, NO provider
-// gating. A bridge CTA hands the user into the wizard for the personalised map.
-// Structure per the marketing journey; copy is placeholder (marketing report
-// fills the final wording) via the 'results' namespace search.* keys.
+// ─── /search · die ehrliche Bruecke (Beta-Plan Mi 14.10.) ────────────────────
+// Canvas „Suche als ehrliche Brücke", Wahl 10.10.2026: A1 · B3 · C2 · D2;
+// Figma: Screens-Datei, Seite „Suche als ehrliche Brücke (Mi 14.10.)", 3648:14.
+//
+// Bis zum 10.10. stand hier zu JEDER Frage dieselbe „KI-Antwort" mit drei
+// festen Quellen und drei festen Pflichten samt Risikostufe — wer nach Cookies
+// fragte, sah OSS mit „Hoch". Eine Antwort-Engine fuer Freitext gibt es in der
+// Beta nicht. Die Seite sagt das jetzt, nimmt die Frage auf und zeigt die
+// echten Wege: das Assessment, einen Menschen, den passenden Bereich (feste
+// Stichwortliste, lib/searchAreas.ts — keine KI) und die Einstiege.
 
-// Placeholder answer scaffold — the real answer will come from the RAG endpoint
-// once the assistant is wired here. Kept as fixtures so the page is demoable.
-// The surrounding copy is now the report's final wording (Brand Map §10/§11);
-// only these fixtures and the preview badge remain to be replaced.
-const SOURCE_FIXTURE = ['UStG §18i (OSS)', 'EU VAT Directive 2006/112/EC', 'VerpackG §9'];
-const OBLIGATION_FIXTURE = [
-  { key: 'o1', severity: 'high' as const },
-  { key: 'o2', severity: 'medium' as const },
-  { key: 'o3', severity: 'medium' as const },
-];
-// Bis 20.08. standen hier drei erfundene Guide-Titel ("Das EU-OSS-Verfahren
-// erklärt" …), die auf /resources verlinkten — eine Seite, die genau solche
-// erfundenen Guides beim Neubau am 18.08. entfernt hatte. Wer klickte, landete
-// bei drei völlig anderen Inhalten. Jetzt zeigen die Karten auf das, was es
-// tatsächlich gibt, jeweils an seinem eigenen Ziel.
+// Die Einstiege zeigen auf das, was es gibt, jeweils an seinem eigenen Ziel.
 const ENTRIES = [
   { key: 'markets', path: 'markets' },
   { key: 'compliance', path: 'compliance' },
   { key: 'howItWorks', path: 'how-it-works' },
 ] as const;
 
-// Severity here never joined the traffic light. It carried #c0392b, a red in no
-// scale (2.52:1 in dark), and gold for medium — which now says the wrong thing
-// twice over: gold is brand-only, and medium is yellow. These are the RiskBadge
-// soft pairings, so they read 6.92/5.56 (high) and 7.45/6.96 (medium).
-const SEV_TINT: Record<'high' | 'medium', string> = {
-  high: 'bg-risk-high-bg text-risk-on-high',
-  medium: 'bg-risk-medium-bg text-risk-on-medium',
-};
-
 export function SearchResultPage() {
-  const { t } = useTranslation('results');
+  const { t } = useTranslation(['results', 'auth']);
   const navigate = useNavigate();
   const { locale = 'en' } = useParams();
   const [params] = useSearchParams();
@@ -57,6 +38,9 @@ export function SearchResultPage() {
     navigate(`/${locale}/search${q ? `?q=${encodeURIComponent(q)}` : ''}`);
   };
   const startGuided = () => navigate(`/${locale}/wizard`);
+  // Ohne Frage gibt es keine Frage-Ueberschrift; dann ist der Hinweis die h1.
+  const HintTitle = initialQuery ? 'h2' : 'h1';
+  const areas = areasForQuery(initialQuery).map((slug) => DOMAINS.find((d) => d.slug === slug)!).filter(Boolean);
 
   return (
     <div className="min-h-screen bg-surface text-fg">
@@ -87,54 +71,63 @@ export function SearchResultPage() {
           <Button type="submit" size="md" className="shrink-0">{t('search.submit')}</Button>
         </form>
 
-        {/* Answer */}
-        <section className="mt-10">
-          <div className="flex flex-wrap items-center gap-3">
-            <SectionEyebrow tone="brand">{t('search.answerEyebrow')}</SectionEyebrow>
-            {/* The answer prose is final report copy, but the RAG endpoint is not
-                wired up yet — so the page has to say so. This used to be a
-                "[Placeholder answer]" prefix inside the prose itself; as a badge
-                the admission stays visible without living in shippable copy. */}
-            <Badge shape="pill" tone="neutral" appearance="outline" size="sm" className="uppercase tracking-[0.08em]">
-              {t('search.previewBadge')}
-            </Badge>
-          </div>
-          <h1 className="mt-3 font-serif text-[1.9rem] font-bold leading-tight text-fg">
-            {initialQuery ? t('search.answerTitleFor', { query: initialQuery }) : t('search.answerTitleDefault')}
+        {/* A1 · die Frage als Ueberschrift (ohne Frage: der Hinweis traegt sie) */}
+        {initialQuery && (
+          <h1 className="mt-10 font-serif text-[1.9rem] font-bold leading-tight text-fg">
+            {t('search.answerTitleFor', { query: initialQuery })}
           </h1>
-          <p className="mt-4 text-body leading-relaxed text-fg-secondary">{t('search.answerBody1')}</p>
-          <p className="mt-3 text-body leading-relaxed text-fg-secondary">{t('search.answerBody2')}</p>
-          {/* Sources */}
-          <div className="mt-5 flex flex-wrap items-center gap-2">
-            <span className="text-body-2xs font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{t('search.sources')}:</span>
-            {SOURCE_FIXTURE.map((s) => (
-              <Badge shape="pill" tone="neutral" appearance="outline" size="md" key={s} >
-                <FileText size={12} /> {s}
-              </Badge>
-            ))}
-          </div>
+        )}
+
+        {/* B3 · die Grenze benennen, zwei echte Wege */}
+        <section className="mt-6 rounded-xl border border-stroke-subtle bg-surface-secondary px-6 py-5">
+          <HintTitle className="text-body-md font-bold text-fg">{t('search.noAnswerTitle')}</HintTitle>
+          <p className="mt-2 text-body leading-relaxed text-fg-secondary">{t('search.noAnswerBody')}</p>
+          <p className="mt-3 text-body leading-relaxed text-fg-secondary">
+            {t('search.humanPre')}{' '}
+            <Link to={`/${locale}/contact?lane=support`} className="font-semibold text-fg-brand underline-offset-2 hover:underline">
+              {t('search.humanLink')}
+            </Link>{' '}
+            {t('search.humanPost')}
+          </p>
         </section>
 
-        {/* Relevant obligations */}
-        <section className="mt-12">
-          <h2 className="text-body-md font-semibold text-fg">{t('search.obligationsTitle')}</h2>
-          <div className="mt-4 space-y-2.5">
-            {OBLIGATION_FIXTURE.map((o) => (
-              <div key={o.key} className="flex items-start gap-4 rounded-xl border border-stroke bg-surface-secondary/40 px-5 py-4">
-                <span className={`mt-0.5 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-body-3xs font-semibold ${SEV_TINT[o.severity]}`}>
-                  <ShieldCheck size={12} /> {t(`search.sev.${o.severity}`)}
-                </span>
-                <div className="min-w-0">
-                  <p className="text-body-md font-semibold text-fg">{t(`search.obligations.${o.key}.title`)}</p>
-                  <p className="mt-0.5 text-body-xs leading-relaxed text-fg-secondary">{t(`search.obligations.${o.key}.detail`)}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+        {/* D2 · die Bruecke ins Assessment direkt unter dem Hinweis */}
+        <section className="mt-6 rounded-xl border border-brand/40 bg-brand-light/40 px-7 py-8 text-center">
+          <h2 className="font-serif text-[1.5rem] font-bold text-fg">{t('search.bridgeTitle')}</h2>
+          <p className="mx-auto mt-2 max-w-xl text-body text-fg-secondary">{t('search.bridgeBody')}</p>
+          <Button size="lg" className="mt-6" onClick={startGuided}>
+            {t('search.bridgeCta')} <ArrowRight size={16} />
+          </Button>
         </section>
+
+        {/* C2 · passende Bereiche nach Stichwort — ohne Treffer kein Block */}
+        {areas.length > 0 && (
+          <section className="mt-10" data-testid="search-areas">
+            <h2 className="text-body-3xs font-bold uppercase tracking-[0.1em] text-fg-tertiary">
+              {t(areas.length === 1 ? 'search.areasTitleOne' : 'search.areasTitleMany')}
+            </h2>
+            <div className="mt-3 flex flex-col gap-2">
+              {areas.map((d) => (
+                <Link
+                  key={d.slug}
+                  to={`/${locale}/compliance/${d.slug}`}
+                  className="flex items-center justify-between gap-4 rounded-xl border border-stroke bg-surface px-5 py-3.5 transition-colors hover:border-fg-brand"
+                >
+                  <span className="text-body-sm font-semibold text-fg">
+                    {t(`register.domains.${d.i18nKey}`, { ns: 'auth', defaultValue: d.label })}
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-body-2xs font-semibold text-fg-brand">
+                    {t('search.areaOpen')} <ArrowRight size={13} />
+                  </span>
+                </Link>
+              ))}
+            </div>
+            <p className="mt-2 text-body-2xs text-fg-tertiary">{t('search.areasNote')}</p>
+          </section>
+        )}
 
         {/* Follow-up guides */}
-        <section className="mt-12">
+        <section className="mt-10">
           <h2 className="text-body-md font-semibold text-fg">{t('search.guidesTitle')}</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             {ENTRIES.map((g) => (
@@ -149,14 +142,6 @@ export function SearchResultPage() {
           </div>
         </section>
 
-        {/* Bridge CTA → wizard */}
-        <section className="mt-14 rounded-xl border border-brand/40 bg-brand-light/40 px-7 py-8 text-center">
-          <h2 className="font-serif text-[1.5rem] font-bold text-fg">{t('search.bridgeTitle')}</h2>
-          <p className="mx-auto mt-2 max-w-xl text-body text-fg-secondary">{t('search.bridgeBody')}</p>
-          <Button size="lg" className="mt-6" onClick={startGuided}>
-            {t('search.bridgeCta')} <ArrowRight size={16} />
-          </Button>
-        </section>
       </main>
     </div>
   );

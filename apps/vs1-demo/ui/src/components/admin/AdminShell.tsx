@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LayoutGrid, Bell, Users, Shield, Lock, Activity, Search, ScrollText, Gauge } from 'lucide-react';
+import { LayoutGrid, Users, Search, ScrollText, Gauge } from 'lucide-react';
 import { Sidebar, SidebarGroup, NavItem } from '../ui/AppShell';
 import { WorkspaceMobileBar, type WorkspaceNavGroup } from '../ui/WorkspaceMobileBar';
 import { Logo } from '../ui/Logo';
@@ -14,7 +14,7 @@ import { Avatar } from '../ui/Avatar';
 // AppShell with MONITOR / PLATFORM / COMPLIANCE nav and an "All systems up"
 // pill instead of the provider badges. Admin-only surface — never public nav.
 
-const NAV = [
+const NAV: { group: string; items: { to: string; label: string; icon: typeof LayoutGrid; count?: string }[] }[] = [
   {
     group: 'Monitor',
     items: [
@@ -27,17 +27,11 @@ const NAV = [
     group: 'Platform',
     items: [
       { to: 'providers', label: 'Providers', icon: Users },
-      { to: 'security', label: 'Security', icon: Shield },
     ],
   },
-  {
-    group: 'Compliance',
-    items: [
-      { to: 'privacy', label: 'Privacy & AI Gate', icon: Lock },
-      { to: 'alerts', label: 'Alerts', icon: Bell, count: '1' },
-      { to: 'status', label: 'System status', icon: Activity },
-    ],
-  },
+  // Security, Privacy & AI Gate, Alerts (mit festem Zaehler „1") und System
+  // status liefen auf AdminComingSoonPage — raus aus der Navigation der Beta
+  // (Beta-Plan Mi 14.10.). Die Routen bleiben.
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
