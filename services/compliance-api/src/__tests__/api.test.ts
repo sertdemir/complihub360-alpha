@@ -18,7 +18,14 @@ const { db, resetDb } = vi.hoisted(() => {
 vi.mock('../supabase.js', () => ({
     supabaseApi: {
         async select(table: string, match: Record<string, any> = {}, opts: { order?: string; limit?: number } = {}) {
-            let rows = (db[table] ?? []).filter((r) => Object.entries(match).every(([k, v]) => r[k] === v));
+            // `spalte->>schluessel` ist der PostgREST-Weg in ein jsonb-Feld.
+            // Ohne das hier haette der Test den Filter still ignoriert — die
+            // Abfrage haette alles geliefert und die Pruefung nichts bewiesen.
+            let rows = (db[table] ?? []).filter((r) => Object.entries(match).every(([k, v]) => {
+                const json = /^([a-z_]+)->>(.+)$/.exec(k);
+                if (json) return (r[json[1]] ?? {})[json[2]] === v;
+                return r[k] === v;
+            }));
             if (opts.order) {
                 const [col, dir] = opts.order.split('.');
                 rows = [...rows].sort((a, b) => (a[col] < b[col] ? -1 : 1) * (dir === 'desc' ? -1 : 1));
@@ -914,6 +921,48 @@ describe('Anbieterseite: Lead-Karte, Selbstauskunft, Zahlungsbereitschaft (Phase
         expect(r.body.errorCode).toBe('RECHECK_LIMIT');
         expect(r.body.retry_after).toBeTruthy();
         expect(stripeMock.verifyPaymentMethod).toHaveBeenCalledTimes(3);
+    });
+
+    it('A2: eine Stripe-Stoerung verbraucht keine der drei Pruefungen', async () => {
+        // Nicht die Bank hat geantwortet, sondern unsere Seite ist ausgefallen
+        // (Netz, oder `setup_intents: write` fehlt am Restricted Key). Wer das
+        // mitzaehlt, laesst den Anbieter fuer einen Ausfall bezahlen, fuer den
+        // er nichts kann — und im schlimmsten Fall mit allen drei auf einmal.
+        gesperrt();
+        stripeMock.verifyPaymentMethod.mockResolvedValue({ ok: false, kind: 'stripe', reason: 'stripe_error', detail: 'network down' });
+        for (let i = 0; i < 3; i++) expect((await recheck()).status).toBe(502);
+        expect((db.event_log ?? []).filter((e: any) => e.type === 'payment_method_recheck')).toHaveLength(0);
+        expect(db.providers[0].last_payment_failure).toBeTruthy();
+
+        // Und danach stehen alle drei noch zur Verfuegung.
+        stripeMock.verifyPaymentMethod.mockResolvedValue({ ok: false, kind: 'card', reason: 'card_declined', detail: 'x' });
+        for (let i = 0; i < 3; i++) expect((await recheck()).status).toBe(200);
+        expect((await recheck()).status).toBe(429);
+    });
+
+    it('A2: die Pruefungen FREMDER Anbieter zaehlen nicht auf das eigene Kontingent', async () => {
+        // Gezaehlt wurde ueber die juengsten 200 Zeilen dieses Typs — ueber ALLE
+        // Anbieter. Liegen mehr als 200 neuere im Fenster, fallen die eigenen aus
+        // der Sicht und die Grenze greift nicht mehr. Der Fehler zeigt nach OBEN,
+        // also ins Offene: genau die Richtung, die man nie bemerkt.
+        gesperrt();
+        const vorStunden = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString();
+        db.event_log ??= [];
+        // Die drei eigenen Versuche: im Fenster, aber AELTER als alles andere.
+        for (let i = 0; i < 3; i++) {
+            const t = vorStunden(5 + i);
+            db.event_log.push({ id: randomUUID(), type: 'payment_method_recheck', timestamp: t, payload: { providerKey: 'test-kanzlei', at: t, ok: false, reason: 'card_declined' } });
+        }
+        // 250 fremde, alle juenger — sie schieben die eigenen aus den ersten 200.
+        for (let i = 0; i < 250; i++) {
+            const t = vorStunden(1 + i / 3600);
+            db.event_log.push({ id: randomUUID(), type: 'payment_method_recheck', timestamp: t, payload: { providerKey: `fremde-kanzlei-${i}`, at: t, ok: false, reason: 'card_declined' } });
+        }
+        const r = await recheck();
+        expect(r.status).toBe(429);
+        expect(r.body.errorCode).toBe('RECHECK_LIMIT');
+        // Nichts gefragt: das Kontingent war aufgebraucht, bevor Stripe drankam.
+        expect(stripeMock.verifyPaymentMethod).not.toHaveBeenCalled();
     });
 
     it('A2: ohne Sperre oder mit anderem Mittel wird nichts geprueft, nur neu berechnet', async () => {

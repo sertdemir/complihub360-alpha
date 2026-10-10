@@ -373,6 +373,43 @@ export function recheckBudget(timestamps: string[], now: Date, limit = RECHECK_L
     return { left, nextAt: left > 0 ? null : new Date(recent[recent.length - limit] + 86_400_000).toISOString() };
 }
 
+/**
+ * Die Zeitpunkte der EIGENEN Pruefungen dieses Anbieters.
+ *
+ * Vorher las die Abfrage die juengsten 200 `payment_method_recheck`-Zeilen
+ * ueber ALLE Anbieter und filterte erst danach im Code. Liegen plattformweit
+ * mehr als 200 solcher Ereignisse im Fenster, fallen die eigenen Versuche aus
+ * der Sicht — und die Grenze greift nicht mehr. Der Fehler zeigte damit nach
+ * OBEN: still mehr erlaubt, nicht weniger.
+ *
+ * PostgREST filtert jsonb direkt (`payload->>providerKey=eq.…`). Das Muster
+ * ist in diesem Dienst sonst nirgends in Gebrauch, deshalb zwei Sicherungen:
+ *
+ *   * Der Code-Filter bleibt in BEIDEN Zweigen. Wuerde der jsonb-Filter
+ *     stillschweigend ignoriert, zaehlt die Funktion damit genau wie vorher —
+ *     nie schlechter. Deshalb bleibt auch das Limit bei 200.
+ *   * Antwortet die Abfrage gar nicht (alte PostgREST-Fassung, abgelehnter
+ *     Ausdruck), faellt sie auf die bisherige zurueck und sagt es im Log. Ein
+ *     Nachtrag an der ZAEHLUNG darf den Weg zurueck nicht zusperren.
+ */
+async function eigeneRechecks(providerKey: string): Promise<string[]> {
+    // Die Zeit steht auch im Ereignis selbst: `timestamp` setzt erst die Datenbank.
+    const zeiten = (rows: any[]) => rows
+        .filter((e) => e.payload?.providerKey === providerKey)
+        .map((e) => String(e.payload?.at ?? e.timestamp));
+    try {
+        return zeiten((await supabaseApi.select('event_log',
+            { type: 'payment_method_recheck', 'payload->>providerKey': providerKey },
+            { order: 'timestamp.desc', limit: 200 })) as any[]);
+    } catch (err) {
+        structuredLog('warn', 'Recheck budget: provider-scoped event query refused — counting from the shared page', {
+            correlationId: 'billing', route: 'billing/recheck', severity: 'warning', errorCode: 'ERR_RECHECK_SCOPE',
+            providerKey, detail: String(err).slice(0, 200),
+        } as any);
+        return zeiten((await supabaseApi.select('event_log', { type: 'payment_method_recheck' }, { order: 'timestamp.desc', limit: 200 })) as any[]);
+    }
+}
+
 export async function recheckPaymentMethod(providerKey: string, actorId: string | null, now = new Date()): Promise<RecheckOutcome> {
     const rows = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[];
     const p = rows[0];
@@ -387,21 +424,20 @@ export async function recheckPaymentMethod(providerKey: string, actorId: string 
     // nichts zu pruefen, nur neu zu berechnen.
     if (!pmId || pmId !== failure.payment_method_id) return { result: 'not_blocked', readiness: await syncBillingReadiness(providerKey) };
 
-    const log = (await supabaseApi.select('event_log', { type: 'payment_method_recheck' }, { order: 'timestamp.desc', limit: 200 })) as any[];
-    // Die Zeit steht auch im Ereignis selbst: `timestamp` setzt erst die Datenbank.
-    const mine = log.filter((e) => e.payload?.providerKey === providerKey).map((e) => String(e.payload?.at ?? e.timestamp));
-    const budget = recheckBudget(mine, now);
+    const budget = recheckBudget(await eigeneRechecks(providerKey), now);
     if (budget.left === 0) return { result: 'rate_limited', retryAfter: budget.nextAt! };
 
     const v = await verifyPaymentMethod({ customerId, paymentMethodId: pmId, idempotencyKey: `recheck:${providerKey}:${now.getTime()}` });
+    // Eine Stoerung auf UNSERER Seite — Stripe nicht erreichbar, ein fehlendes
+    // Recht am Restricted Key — ist keine Antwort der Bank. Sie wird deshalb
+    // VOR der Zeile abgefangen: sonst kostet ein Ausfall, fuer den der
+    // Anbieter nichts kann, eine seiner drei Pruefungen.
+    if (!v.ok && v.kind === 'stripe') return { result: 'stripe_error' };
     await supabaseApi.insert('event_log', {
         type: 'payment_method_recheck',
         payload: { providerKey, by: actorId, at: now.toISOString(), ok: v.ok, reason: v.ok ? null : v.reason },
     }).catch(() => { /* das Limit zaehlt dann eine Pruefung zu wenig — lieber das als eine verlorene Antwort */ });
-    if (!v.ok) {
-        if (v.kind === 'stripe') return { result: 'stripe_error' };
-        return { result: v.reason === 'authentication_required' ? 'needs_action' : 'declined', reason: v.reason };
-    }
+    if (!v.ok) return { result: v.reason === 'authentication_required' ? 'needs_action' : 'declined', reason: v.reason };
     await supabaseApi.update('providers', { provider_key: providerKey }, { last_payment_failure: null });
     await supabaseApi.insert('event_log', { type: 'payment_failure_cleared', payload: { providerKey, by: actorId, via: 'recheck', setupIntentId: v.setupIntentId } }).catch(() => {});
     return { result: 'cleared', readiness: await syncBillingReadiness(providerKey) };
