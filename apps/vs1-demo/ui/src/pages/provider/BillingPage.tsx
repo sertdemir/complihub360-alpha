@@ -146,7 +146,7 @@ export function BillingPage() {
         {readiness && (
           readiness.ready ? (
             <div className="flex flex-wrap items-center gap-3 rounded-xl border border-success-500/40 bg-success-50 px-5 py-3.5 dark:bg-success-950/30">
-              <span className="text-[16px] font-bold text-success-700 dark:text-success-300" aria-hidden>✓</span>
+              <span className="text-[16px] font-bold text-success-700 dark:text-emerald-300" aria-hidden>✓</span>
               <div className="min-w-0 flex-1">
                 <p className="text-[13px] font-semibold text-fg">{t('billing.readyTitle')}</p>
                 <p className="text-[12px] text-fg-secondary">
@@ -247,11 +247,33 @@ export function BillingPage() {
                 <span className="ml-4 shrink-0 tabular-nums text-fg"><s className="text-fg-tertiary">{money(preview.leads.standard_cents, cur)}</s> <span className="font-semibold">{money(preview.leads.final_cents, cur)}</span></span>
               </div>
             )}
+            {/* Phase 5 (ADR-0007, Canvas-Wahl 3A): das Guthaben steht als gruene
+                Minus-Zeile genau dort, wo es auf der Rechnung landet, mit einer
+                Unterzeile je Guthaben (Herkunft, Prozentsatz, Datum). Bleibt ein
+                Rest ueber die Abo-Summe hinaus, sagt eine zweite Unterzeile das.
+                Nie "ausgezahlt": der Satz unter dem Kasten schliesst es aus. */}
+            {(preview.credit_applied_cents ?? 0) > 0 && (
+              <div className="border-b border-stroke px-5 py-3 text-[13px]">
+                <div className="flex items-center justify-between">
+                  <span className="min-w-0 truncate font-semibold text-success-700 dark:text-emerald-300">{t('billing.creditLine', { count: preview.credits?.length ?? 1 })}</span>
+                  <span className="ml-4 shrink-0 font-semibold tabular-nums text-success-700 dark:text-emerald-300">− {money(preview.credit_applied_cents ?? 0, cur)}</span>
+                </div>
+                {(preview.credits ?? []).map((c) => (
+                  <p key={c.id} className="mt-1 pl-4 text-[11.5px] text-fg-tertiary">
+                    ↳ {t('billing.creditOrigin', { pct: 30, date: new Date(c.created_at).toLocaleDateString(locale, { day: 'numeric', month: 'short' }) })} · {money(c.amount_cents, c.currency ?? cur)}
+                  </p>
+                ))}
+                {preview.credit_balance_cents > (preview.credit_applied_cents ?? 0) && (
+                  <p className="mt-1 pl-4 text-[11.5px] text-fg-tertiary">↳ {t('billing.creditRemainder', { amount: money(preview.credit_balance_cents - (preview.credit_applied_cents ?? 0), cur) })}</p>
+                )}
+              </div>
+            )}
             <div className="flex items-center justify-between px-5 py-3 text-[13px]">
-              <span className="font-semibold text-fg">{t('billing.currentPeriodTotal')}</span>
-              <span className="font-bold tabular-nums text-fg-accent">{money(preview.total_cents, cur)}</span>
+              <span className="font-semibold text-fg">{t((preview.credit_applied_cents ?? 0) > 0 ? 'billing.currentPeriodTotalAfterCredit' : 'billing.currentPeriodTotal')}</span>
+              <span className="font-bold tabular-nums text-fg-accent">{money(preview.total_after_credit_cents ?? preview.total_cents, cur)}</span>
             </div>
           </div>
+          {(preview.credit_applied_cents ?? 0) > 0 && <p className="text-[12px] text-fg-tertiary">{t('billing.creditNote')}</p>}
         </section>
         )}
 

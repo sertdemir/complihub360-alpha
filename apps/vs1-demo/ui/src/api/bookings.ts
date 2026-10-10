@@ -9,6 +9,56 @@ import type { RankBasis } from './search';
 
 export type BookingStatus = 'confirmed' | 'cancelled' | 'completed' | 'no_show';
 
+// ─── Phase 5 (ADR-0007): Anwesenheit, Widerspruch, Neubuchung ───────────────
+// Beide Buchungslisten tragen dieselben Felder. Sie sagen, WER fehlte, ob ein
+// Widerspruch laeuft, bis wann ohne zweite Gebuehr neu gebucht werden kann
+// und wie oft noch verschoben werden darf. Nie Geld: Gebuehr, Band und
+// Guthaben stehen nur auf dem Anbieter-Draht (`lead`) und in der Abrechnung.
+export type NoShowBy = 'user' | 'provider' | 'platform';
+export type DisputeStatus = 'none' | 'open' | 'upheld' | 'dismissed';
+/** Was der Anbieter nach dem Termin meldet. */
+export type AttendanceOutcome = 'attended' | 'user_no_show' | 'platform_failure';
+
+export interface BookingAttendance {
+  noShowBy: NoShowBy | null;
+  noShowReportedAt: string | null;
+  disputeStatus: DisputeStatus;
+  /** YYYY-MM-DD — bis dahin ohne zweite Gebuehr neu buchen; null ohne Frist. */
+  rebookDeadline: string | null;
+  /** Die Buchung, an deren Lead diese haengt (Neubuchung oder 30-Tage-Fenster). */
+  rebookedFrom: string | null;
+  rescheduleCount: number;
+  rescheduleLimit: number;
+  /** Bestaetigt und Slot vorbei: der Anbieter kann melden, wie es lief. */
+  attendanceReportable: boolean;
+  /** ISO — solange kann der Nutzer einem gemeldeten No-Show widersprechen. */
+  disputeOpenUntil: string | null;
+  /** Frist laeuft noch und ist nicht entschieden. */
+  rebookOpen: boolean;
+}
+
+interface ApiAttendanceFields {
+  no_show_by?: NoShowBy | null; no_show_reported_at?: string | null; dispute_status?: DisputeStatus;
+  rebook_deadline?: string | null; rebooked_from?: string | null; reschedule_count?: number; reschedule_limit?: number;
+  attendance_reportable?: boolean; dispute_open_until?: string | null; rebook_open?: boolean;
+}
+
+/** Aeltere Antworten (und Fixtures) tragen die Felder nicht — dann gilt: nichts gemeldet. */
+export function attendanceFrom(r: ApiAttendanceFields): BookingAttendance {
+  return {
+    noShowBy: r.no_show_by ?? null,
+    noShowReportedAt: r.no_show_reported_at ?? null,
+    disputeStatus: r.dispute_status ?? 'none',
+    rebookDeadline: r.rebook_deadline ?? null,
+    rebookedFrom: r.rebooked_from ?? null,
+    rescheduleCount: r.reschedule_count ?? 0,
+    rescheduleLimit: r.reschedule_limit ?? 2,
+    attendanceReportable: !!r.attendance_reportable,
+    disputeOpenUntil: r.dispute_open_until ?? null,
+    rebookOpen: !!r.rebook_open,
+  };
+}
+
 export interface UserBooking {
   id: string;
   /** Opaker Anbieter-Bezeichner (Phase 3) — nie der Schluessel. */
@@ -28,9 +78,10 @@ export interface UserBooking {
   message: string | null;
   /** Canvas F V1: der Anbieter hat die Leistung dieses Termins nach einem wesentlichen Ereignis pausiert. */
   providerPaused: boolean;
+  attendance: BookingAttendance;
 }
 
-interface ApiBookingRow {
+interface ApiBookingRow extends ApiAttendanceFields {
   id: string;
   public_ref: string | null;
   provider_name: string;
@@ -70,6 +121,7 @@ export async function fetchUserBookings(): Promise<UserBooking[]> {
     slotEnd: b.slot_end,
     status: b.status,
     message: b.message,
+    attendance: attendanceFrom(b),
   }));
 }
 
@@ -115,9 +167,10 @@ export interface ProviderBooking {
   userDiscountPct: number | null;
   proposal: LeadProposal | null;
   acknowledgementVersion: string | null;
+  attendance: BookingAttendance;
 }
 
-interface ApiProviderBookingRow {
+interface ApiProviderBookingRow extends ApiAttendanceFields {
   id: string; slot_start: string; slot_end: string | null; status: BookingStatus; lead_charged: boolean; user_email: string | null;
   user_company?: string | null; category?: string | null; country?: string | null; message: string | null;
   lead?: { band: 1 | 2 | 3 | 4; standard_fee_cents: number; discount_pct: number; discount_sequence: number | null; final_fee_cents: number; currency: string; payment_status: LeadPaymentStatus; fee_enabled: boolean } | null;
@@ -147,7 +200,28 @@ export async function fetchProviderBookings(providerKey?: string): Promise<Provi
     userDiscountPct: b.user_discount_pct ?? null,
     proposal: b.proposal ? { proposalIssued: b.proposal.proposal_issued, discountShown: b.proposal.discount_shown, reportedAt: b.proposal.reported_at } : null,
     acknowledgementVersion: b.acknowledgement_version ?? null,
+    attendance: attendanceFrom(b),
   }));
+}
+
+/** Phase 5: der Anbieter meldet nach dem Termin, wie er verlaufen ist.
+ *  `attended` schliesst ab; `user_no_show` startet die Neubuchungsfrist des
+ *  Nutzers (und spaeter das Guthaben); `platform_failure` sagt die Buchung ab,
+ *  ohne Vorfall und ohne Guthaben. 409 NOT_REPORTABLE vor dem Slot-Ende. */
+export interface AttendanceReportResult {
+  status: BookingStatus;
+  noShowBy: NoShowBy | null;
+  rebookDeadline: string | null;
+}
+
+export async function reportAttendance(bookingId: string, outcome: AttendanceOutcome, note?: string, providerKey?: string): Promise<AttendanceReportResult> {
+  const key = providerKey ?? await myProviderKey();
+  const res = await apiFetch<{ ok: boolean; status: BookingStatus; no_show_by?: NoShowBy; rebook_deadline?: string }>(`/api/v1/provider/${key}/bookings/${bookingId}/attendance`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ outcome, note: note || undefined }),
+  });
+  return { status: res.status, noShowBy: res.no_show_by ?? null, rebookDeadline: res.rebook_deadline ?? null };
 }
 
 /** Selbstauskunft des Anbieters je Lead (Spec B „Mandatory user discount"):
@@ -341,14 +415,40 @@ export async function markOutcome(id: string, status: 'completed' | 'no_show'): 
   });
 }
 
+/** Phase 5: Widerspruch gegen einen gemeldeten Nutzer-No-Show, binnen der
+ *  Widerspruchsfrist. Der Admin entscheidet; bis dahin ruht das Guthaben. */
+export async function disputeNoShow(id: string, note?: string): Promise<{ disputeOpenUntil: string | null }> {
+  const res = await apiFetch<{ ok: boolean; dispute_open_until?: string | null }>(`/api/v1/scheduling/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'dispute', note: note || undefined }),
+  });
+  return { disputeOpenUntil: res.dispute_open_until ?? null };
+}
+
 // Reschedule = move the SAME lead to a new slot (no second lead fee). The
 // server validates the slot is free and in the future; 409 = slot taken.
-export async function rescheduleBooking(id: string, slotStart: string): Promise<{ slot_start: string; slot_end: string }> {
-  return apiFetch<{ ok: boolean; slot_start: string; slot_end: string }>(`/api/v1/scheduling/${id}`, {
+// Phase 5: nach einem No-Show oder Plattformfehler ist derselbe Aufruf in der
+// Frist eine NEUBUCHUNG — der Server antwortet 201 mit einer neuen Buchung,
+// die am alten Lead haengt (`rebooked_from`). 409 RESCHEDULE_LIMIT, wenn ein
+// bestaetigter Termin schon so oft verschoben wurde, wie die Regel erlaubt.
+export interface RescheduleResult { id?: string; slot_start: string; slot_end: string; rebooked_from?: string | null }
+
+export async function rescheduleBooking(id: string, slotStart: string): Promise<RescheduleResult> {
+  return apiFetch<RescheduleResult & { ok: boolean }>(`/api/v1/scheduling/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ slot_start: slotStart }),
   });
+}
+
+export type RescheduleFailure = 'limit' | 'slot_taken' | 'generic';
+export function rescheduleFailureFrom(err: unknown): RescheduleFailure {
+  if (!(err instanceof ApiError)) return 'generic';
+  const code = String(err.body.errorCode ?? '');
+  if (code === 'RESCHEDULE_LIMIT') return 'limit';
+  if (code === 'SLOT_TAKEN') return 'slot_taken';
+  return 'generic';
 }
 
 export async function cancelBooking(id: string): Promise<void> {

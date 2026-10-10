@@ -205,7 +205,13 @@
     "graceBody": "{{since}} tarihinden beri vadesi geçti. {{until}} tarihinden itibaren rezervasyonlar, fatura ödenene kadar duraklatılır.",
     "graceStillVisible": "Arama sonuçlarındaki görünürlüğünüz bundan etkilenmez.",
     "graceOpenPortal": "Faturayı portalda aç",
-    "changePaymentMethod": "Ödeme yöntemini değiştir"
+    "changePaymentMethod": "Ödeme yöntemini değiştir",
+    "creditLine": "Kredi uygulandı · yeniden randevusuz {{count}} randevu",
+    "creditLine_other": "Kredi uygulandı · yeniden randevusuz {{count}} randevu",
+    "creditOrigin": "Lead ücretinin {{pct}} %'i · müşteri gelmedi ve süre içinde yeniden randevu almadı · {{date}}",
+    "creditRemainder": "Bir sonraki fatura için {{amount}} kredi kalıyor",
+    "creditNote": "Kredi bir sonraki abonelik faturanızdan düşülür, ödenmez.",
+    "currentPeriodTotalAfterCredit": "Krediden sonraki ara toplam"
   },
   "confirmEmail": {
     "working": "Yeni adresiniz doğrulanıyor…",
@@ -464,7 +470,9 @@
       "confirmed": "ONAYLANDI",
       "completed": "TAMAMLANDI",
       "cancelled": "İPTAL EDİLDİ",
-      "no_show": "KATILMADI"
+      "no_show": "KATILMADI",
+      "report_open": "RANDEVU GEÇTİ",
+      "dispute_open": "İTİRAZ AÇIK"
     },
     "rateLead": "Bu lead'i değerlendir",
     "rated": "✓ Lead değerlendirildi",
@@ -487,7 +495,28 @@
     "discountShown": "% {{pct}} gösterildi mi?",
     "yes": "Evet",
     "no": "Hayır",
-    "notYet": "Henüz değil"
+    "notYet": "Henüz değil",
+    "attQuestion": "Randevu nasıl geçti?",
+    "attAttended": "Görüşme gerçekleşti",
+    "attAttendedBody": "Randevu tamamlanmış sayılır.",
+    "attUserNoShow": "Müşteri gelmedi",
+    "attUserNoShowBody": "Lead ücreti kalır. Müşteri {{deadline}} tarihine kadar ikinci ücret olmadan sizinle yeniden randevu alabilir; almazsa bir sonraki faturanıza {{pct}} % ({{amount}}) kredi olarak yansır.",
+    "attUserNoShowBodyNoFee": "Müşteri {{deadline}} tarihine kadar sizinle yeniden randevu alabilir. Bu randevu için lead ücreti alınmadı, bu yüzden kredi oluşmaz.",
+    "attPlatform": "Platformda teknik hata",
+    "attPlatformBody": "Müşteri için ikinci ücret olmadan yeni randevu. Durumu inceleriz; sizin için olay kaydı oluşmaz.",
+    "attTenMinute": "{{start}} saatinde oradaydınız ve {{until}} saatine kadar beklediniz mi?",
+    "attTenMinuteHint": "On dakika olmadan randevu müşteri katılmaması sayılmaz.",
+    "attCancel": "Vazgeç",
+    "attReport": "Bildir",
+    "attReportNoShow": "Evet, böyle bildir",
+    "attFailed": "Bildirim kaydedilemedi. Lütfen tekrar deneyin.",
+    "attLineUser": "Müşteri gelmedi · {{deadline}} tarihine kadar yeniden randevu mümkün",
+    "attLineUserClosed": "Müşteri gelmedi · yeniden randevu süresi doldu",
+    "attLineDispute": "Müşteri gelmedi · müşteri bildirime itiraz etti, durumu inceliyoruz",
+    "attLineProvider": "Gelmedi olarak bildirildi · olay olarak kaydedildi",
+    "attLinePlatform": "Platform hatası · müşteri {{deadline}} tarihine kadar yeniden randevu alabilir",
+    "attRebookedFrom": "Önceki bir randevunun yeniden ayırtılması · ikinci lead ücreti yok",
+    "reportOpen": "Bildiriminiz bekleniyor"
   },
   "intake": {
     "inviteOnlyTitle": "Partner kaydı yalnızca davetle.",

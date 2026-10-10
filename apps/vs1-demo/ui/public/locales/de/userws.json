@@ -631,14 +631,13 @@
       "confirmed": "BESTÄTIGT",
       "completed": "ABGESCHLOSSEN",
       "cancelled": "STORNIERT",
-      "no_show": "NICHT ERSCHIENEN",
+      "no_show": "NICHT STATTGEFUNDEN",
       "outcome_open": "ERGEBNIS OFFEN"
     },
     "outcomeQuestion": "Hat dieser Termin stattgefunden?",
     "outcomeYes": "Ja, hat stattgefunden",
     "outcomeNo": "Anbieter war nicht da",
     "reviewed": "✓ Bewertung abgegeben",
-    "noShowNote": "Keine Rückerstattung — der Anbieter erhielt das Dossier bei der Buchung. Auf Wunsch vermitteln wir Sie neu.",
     "website": "Anbieter-Website",
     "emptyTitle": "Keine Termine",
     "emptyBody": "Termine entstehen aus einer Anfrage: Sobald ein Anbieter bestätigt, steht der Gesprächstermin hier und lässt sich in Ihren Kalender übernehmen.",
@@ -669,6 +668,30 @@
       "short": "Der Anbieter kann diese Leistung gerade nicht anbieten. Details unten.",
       "cancel": "Termin kostenfrei absagen",
       "talk": "Mit uns sprechen"
+    },
+    "after": {
+      "afterTitleUser": "Der Termin hat laut Anbieter nicht stattgefunden",
+      "afterBodyUser": "Sie können bis {{deadline}} einen neuen Termin bei {{provider}} wählen. Ihre Anfrage bleibt dort offen, es entstehen Ihnen keine Kosten.",
+      "afterTitleProvider": "Der Anbieter ist nicht erschienen. Wir haben das vermerkt.",
+      "afterBodyProvider": "Sie können bis {{deadline}} einen neuen Termin bei {{provider}} wählen oder sich einen anderen Anbieter ansehen. Es entstehen Ihnen keine Kosten.",
+      "afterBodyProviderClosed": "Sie können sich jederzeit einen anderen Anbieter ansehen. Es entstehen Ihnen keine Kosten.",
+      "afterNoteProvider": "Der Vorfall fließt in die Leistungsbewertung des Anbieters ein, nicht in Ihre Anfrage.",
+      "afterTitlePlatform": "Ein technisches Problem auf unserer Seite hat diesen Termin abgesagt",
+      "afterBodyPlatform": "Das war unser Fehler, nicht Ihrer. Sie können bis {{deadline}} einen neuen Termin bei {{provider}} wählen; es entstehen Ihnen keine Kosten.",
+      "afterBodyClosed": "Die Frist für einen neuen Termin bei {{provider}} ist abgelaufen. Sie können sich jederzeit einen anderen Anbieter ansehen; es entstehen Ihnen keine Kosten.",
+      "rebook": "Neuen Termin wählen",
+      "otherProvider": "Anderen Anbieter ansehen",
+      "disputeHint": "Stimmt das nicht mit Ihrem Eindruck überein? <dispute>Widersprechen</dispute> bis {{until}} — wir sehen uns den Fall an.",
+      "disputeOpenTitle": "Ihr Widerspruch ist eingegangen",
+      "disputeOpenBody": "Wir sehen uns den Fall an und melden uns bei Ihnen. Bis dahin bleibt die Frist für einen neuen Termin bei {{provider}} offen.",
+      "disputeDismissedNote": "Wir haben Ihren Widerspruch geprüft; die Meldung bleibt bestehen. Die Frist für einen neuen Termin läuft weiter.",
+      "disputeConfirmEyebrow": "Meldung widersprechen",
+      "disputeConfirmTitle": "Der No-Show-Meldung von {{provider}} widersprechen?",
+      "disputeConfirmBody": "Wir sehen uns den Fall an. Bis zur Entscheidung bleibt die Frist für einen neuen Termin offen. Kosten entstehen Ihnen in keinem Fall.",
+      "disputeConfirmCta": "Widerspruch senden",
+      "disputeConfirmBack": "Zurück",
+      "disputeFailed": "Der Widerspruch konnte nicht gesendet werden. Bitte versuchen Sie es erneut oder sprechen Sie mit uns.",
+      "rebookedFrom": "Neuer Termin zu einer früheren Buchung"
     }
   },
   "review": {
@@ -695,7 +718,14 @@
     "confirm": "Termin verschieben",
     "cancel": "Abbrechen",
     "done": "Verschoben ✓",
-    "note": "Beim Verschieben bleiben Buchung und geteiltes Dossier bestehen — es fällt keine neue Lead-Gebühr an. Der Provider wird über die neue Zeit informiert."
+    "note": "Buchung und geteiltes Dossier bleiben bestehen. Der Anbieter wird über die neue Zeit informiert.",
+    "rebookEyebrow": "Neuen Termin wählen",
+    "rebookConfirm": "Neuen Termin buchen",
+    "rebookDone": "Gebucht ✓",
+    "rebookNote": "Der neue Termin führt Ihre frühere Buchung fort. Ihre Anfrage bleibt bei diesem Anbieter, es entstehen Ihnen keine Kosten.",
+    "limit": "Dieser Termin wurde so oft verschoben, wie es möglich ist. Passt die Zeit nicht mehr, sagen Sie ihn bitte ab und buchen neu.",
+    "slotTaken": "Dieser Slot ist gerade vergeben worden. Bitte wählen Sie einen anderen.",
+    "failed": "Der Termin konnte nicht verschoben werden. Bitte versuchen Sie es erneut."
   },
   "wizardDrawer": {
     "eyebrow": "Neue Suche",
