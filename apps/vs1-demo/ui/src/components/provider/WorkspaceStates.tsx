@@ -16,7 +16,7 @@ import { useRequestContext } from '../../lib/requestContext';
 
 export type LoadFailedSurface =
   | 'requests' | 'appointments' | 'invoices' | 'currentPeriod'
-  | 'plan' | 'performance' | 'notifications' | 'coverage';
+  | 'plan' | 'performance' | 'notifications' | 'coverage' | 'overview';
 
 /** A2 · Laden fehlgeschlagen. Der Zustand IST die Flaeche: Ueberschrift je
  *  Flaeche, ein Satz, „Erneut versuchen" und der Weg zum Support, dazu die

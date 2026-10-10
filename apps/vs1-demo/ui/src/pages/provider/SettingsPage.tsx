@@ -8,6 +8,7 @@ import { Banner } from '../../components/ui/Banner';
 import { ConfirmDrawer, type ConfirmSpec } from '../../components/provider/ConfirmDrawer';
 import { ChangeEmailDrawer } from '../../components/provider/ChangeEmailDrawer';
 import { CalendarPanel } from '../../components/provider/CalendarPanel';
+import { AvailabilityPanel } from '../../components/provider/AvailabilityPanel';
 import { fetchCoverage, updateMatchmakingProfile, type BillingModel, type PricingRow } from '../../api/provider';
 import { identityHintFrom } from '../../api/client';
 import { Input } from '../../components/ui/Input';
@@ -37,9 +38,18 @@ export function SettingsPage() {
   // Kein Platzhalter: bis die API antwortet, steht hier ein Strich — nie die
   // Adresse eines anderen Anbieters (bis 09.10.2026 die Fixture-Adresse).
   const [contactEmail, setContactEmail] = useState('');
+  // Phase 6: der Name und die Profilzeile kommen aus der Anbieter-Zeile — bis
+  // 10.10.2026 stand hier fest „Schmidt & Partner" mit erfundener Kurzbeschreibung,
+  // egal wer angemeldet war. Ohne Antwort steht ein Strich, nie ein fremder Name.
+  const [profile, setProfile] = useState<{ name: string | null; region: string | null; activeSince: number | null; languages: string[] }>({ name: null, region: null, activeSince: null, languages: [] });
   useEffect(() => {
-    fetchCoverage().then((c) => { if (c.contact_email) setContactEmail(c.contact_email); }).catch(() => {});
+    fetchCoverage().then((c) => {
+      if (c.contact_email) setContactEmail(c.contact_email);
+      setProfile({ name: c.name ?? null, region: c.region ?? null, activeSince: c.active_since ?? null, languages: c.languages ?? [] });
+    }).catch(() => {});
   }, []);
+  const initials = (profile.name ?? '').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]!.toUpperCase()).join('') || '·';
+  const profileLine = [profile.region, profile.activeSince ? t('settings.activeSinceLine', { year: profile.activeSince }) : null, profile.languages.length ? profile.languages.map((l) => l.toUpperCase()).join(', ') : null].filter(Boolean).join(' · ');
   return (
     <ProviderShell>
       <div className="mx-auto max-w-[1140px] space-y-6">
@@ -63,6 +73,8 @@ export function SettingsPage() {
           <div className="space-y-5">
             {/* Kalender (Canvas A1): eigene Karte oben — der Rueckweg von Nylas landet hier. */}
             <CalendarPanel onConfirm={setConfirm} />
+            {/* Phase 6 (Canvas 3B): buchbare Fenster je Wochentag, Zeitzone. */}
+            <AvailabilityPanel />
             <MatchmakingPanel />
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -72,7 +84,7 @@ export function SettingsPage() {
             </div>
 
             <Card styleVariant="filled" className="flex items-center gap-4 p-4">
-              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-brand-accent text-[13px] font-bold text-fg-on-accent">DC</span>
+              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-brand-accent text-[13px] font-bold text-fg-on-accent">{initials}</span>
               <div className="min-w-0 flex-1">
                 <p className="text-[13px] font-medium text-fg">{t('settings.avatarTitle')}</p>
                 <p className="mt-0.5 text-[11px] text-fg-tertiary">{t('settings.avatarSpec')}</p>
@@ -83,7 +95,7 @@ export function SettingsPage() {
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{t('settings.legalName')}</p>
               <div className="mt-1.5 flex items-center gap-2.5">
-                <p className="text-[14px] font-medium text-fg">Schmidt & Partner Steuerberatungsgesellschaft mbH</p>
+                <p className="text-[14px] font-medium text-fg" data-testid="legal-name">{profile.name ?? '—'}</p>
                 <Tag tone="neutral">{t('settings.lockedTag')}</Tag>
               </div>
             </div>
@@ -91,9 +103,7 @@ export function SettingsPage() {
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-fg-tertiary">{t('settings.bioLabel')}</p>
               <Card styleVariant="filled" className="mt-1.5 p-4">
-                <p className="text-[13px] leading-relaxed text-fg-secondary">
-                  Steuerberatungskanzlei · Hamburg · 6 Partner, 18 Mitarbeitende · grenzüberschreitende USt und OSS, EPR & Verpackung, Datenschutz für Online-Händler und Marktplatz-Verkäufer.
-                </p>
+                <p className="text-[13px] leading-relaxed text-fg-secondary">{profileLine || t('settings.bioEmpty')}</p>
               </Card>
             </div>
 

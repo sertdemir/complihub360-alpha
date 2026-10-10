@@ -2157,7 +2157,8 @@
         "performance": "No se han podido cargar sus datos de rendimiento",
         "notifications": "No se han podido cargar sus notificaciones",
         "coverage": "No se ha podido cargar su cobertura",
-        "message": "No ha cambiado nada en su cuenta. Simplemente no podemos mostrarlo en este momento. Inténtelo de nuevo. Si el problema continúa, contacte con soporte."
+        "message": "No ha cambiado nada en su cuenta. Simplemente no podemos mostrarlo en este momento. Inténtelo de nuevo. Si el problema continúa, contacte con soporte.",
+        "overview": "No se pudo cargar su resumen"
       },
       "empty": {
         "appointments": "Todavía no hay citas",

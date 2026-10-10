@@ -2205,7 +2205,8 @@
         "performance": "Your performance data couldn’t be loaded",
         "notifications": "Your notifications couldn’t be loaded",
         "coverage": "Your coverage couldn’t be loaded",
-        "message": "Nothing in your account has changed. We just can’t show it right now. Please try again. If this keeps happening, contact support."
+        "message": "Nothing in your account has changed. We just can’t show it right now. Please try again. If this keeps happening, contact support.",
+        "overview": "Your overview could not be loaded"
       },
       "empty": {
         "appointments": "No appointments yet",

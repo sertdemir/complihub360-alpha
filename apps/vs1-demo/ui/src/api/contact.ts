@@ -34,7 +34,7 @@ export const CONTACT_INBOX: string | null = (import.meta.env.VITE_CONTACT_INBOX 
 
 /** Schickt die Nachricht. `acknowledged` sagt, ob die Bestaetigung an den
  *  Absender rausging. Wirft ApiError (Status 0 = keine Antwort). */
-export async function sendContact(payload: ContactPayload): Promise<{ acknowledged: boolean }> {
+export async function sendContact(payload: ContactPayload): Promise<{ acknowledged: boolean; reference: string }> {
   const correlationId = generateCorrelationId();
   const baseUrl = isMockApi ? '' : (import.meta.env.VITE_API_URL || '');
   let res: Response;
@@ -52,7 +52,9 @@ export async function sendContact(payload: ContactPayload): Promise<{ acknowledg
   if (!res.ok) {
     throw new ApiError(String(data.message ?? `HTTP ${res.status}`), res.status, String(data.correlationId ?? loggedAs), undefined, data);
   }
-  return { acknowledged: data.acknowledged === true };
+  // Die Referenz ist die Korrelations-ID der Anfrage — dieselbe, die in der
+  // Bestaetigungsmail steht. Der Anbieter nennt sie bei Rueckfragen.
+  return { acknowledged: data.acknowledged === true, reference: String(data.correlationId ?? loggedAs) };
 }
 
 /** Welcher der drei Saetze (Canvas B): 503 → nicht eingerichtet, 429 → zu

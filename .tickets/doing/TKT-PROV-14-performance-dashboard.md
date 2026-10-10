@@ -58,18 +58,21 @@ nur Erinnerung, keine Herabstufung (Spec A §17).
   Behandlung ohne Daten; `rank_basis` ergänzt.
 - [x] Serien-No-Shows direkt beim Vorfall ausgewertet (Anbieter: Hinweis,
   Pause; Nutzer: Hinweis). Notifications, Mails (4 Sprachen).
-- [ ] `/api/v1/metrics` nicht mehr vom Partner-Dashboard genutzt.
+- [x] `/api/v1/metrics` nicht mehr vom Partner-Dashboard genutzt (PerformancePage liest `/performance`).
 - [x] Typen, OpenAPI, ADR-0009, API-Tests (8 Blöcke: Performance je Tarif, CSV, Übersicht, Serien-No-Shows mit Pause, Einspruch und Aufhebung, Buchung in der Pause, Nutzer-Serie, Verfügbarkeit, Ranking ohne Annahmen).
 
 ### UI
 
-- [ ] Canvas (vier Sektionen × drei Varianten): Übersicht · Performance mit
-  Analytics-Tiefe · Verfügbarkeit · Hilfe und Support.
-- [ ] Figma-Seite nach der Wahl des Nutzers.
-- [ ] Lokal: OverviewPage (Landing), PerformancePage neu, SettingsPage
+- [x] Canvas (vier Sektionen × drei Varianten): Übersicht · Performance mit
+  Analytics-Tiefe · Verfügbarkeit · Hilfe und Support — Wahl des Nutzers
+  2026-10-10: **1B · 2A · 3B · 4A**.
+- [x] Figma-Seite „Performance & Übersicht (Phase 6)“ (3667:2) mit vier Frames
+  (Übersicht 3667:3, Performance 3668:138, Buchbare Zeiten 3669:219,
+  Hilfe-Drawer 3670:324) und Uptake-Notiz.
+- [x] Lokal: OverviewPage (Landing), PerformancePage neu, SettingsPage
   (Profil echt, Verfügbarkeit), HelpDrawer neu, RankingImpactDrawer raus,
-  NotificationsPage auf eigenen Feed, RequestsPage abgehängt, Nav nach
-  Spec B, Locales, Mock, Screenshots.
+  NotificationsPage + Glocke auf eigenen Feed, RequestsPage abgehängt, Nav
+  mit Übersicht, Locales (4), Mock, Screenshots.
 - [ ] Review des Nutzers → Staging (Migration per Supabase-MCP, Testlauf).
 
 ## DNA-Check

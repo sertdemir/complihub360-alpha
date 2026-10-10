@@ -10,7 +10,7 @@ import type { ReactNode } from 'react';
 
 const api = vi.hoisted(() => ({
   fetchProviderBookings: vi.fn(),
-  fetchMetrics: vi.fn(),
+  fetchPerformance: vi.fn(),
   fetchApplication: vi.fn(),
   fetchSubscription: vi.fn(),
   fetchVerification: vi.fn(),
@@ -22,7 +22,7 @@ vi.mock('../../api/bookings', () => ({
   fetchProviderBookings: () => api.fetchProviderBookings(),
   reportProposal: vi.fn(), submitReview: vi.fn(),
 }));
-vi.mock('../../api/metrics', async (orig) => ({ ...(await orig<typeof import('../../api/metrics')>()), fetchMetrics: () => api.fetchMetrics() }));
+vi.mock('../../api/performance', async (orig) => ({ ...(await orig<typeof import('../../api/performance')>()), fetchPerformance: () => api.fetchPerformance() }));
 vi.mock('../../api/application', () => ({ fetchApplication: () => api.fetchApplication(), fetchVerification: () => api.fetchVerification() }));
 vi.mock('../../api/subscription', () => ({ fetchSubscription: () => api.fetchSubscription() }));
 vi.mock('../../api/provider', () => ({ fetchCoverage: () => api.fetchCoverage() }));
@@ -63,28 +63,50 @@ describe('Termine (LeadsPage)', () => {
   });
 });
 
-describe('Performance (C3)', () => {
-  const m = (total: number) => ({ total, confirm_rate: 0.5, reply_rate: 0.5, sla_breach_rate: 0.5, avg_confirm_ms: 3_600_000, avg_reply_ms: 3_600_000 });
+describe('Performance (Phase 6, 2A)', () => {
+  // Buchungs-Fakten statt Pipeline-Quoten: unter fuenf Buchungen keine Quote,
+  // ab fuenf steht sie — und nie ein Score, nie ein Rang.
+  const counted = (count: number, of: number) => ({ count, of, rate: of >= 5 ? count / of : null });
+  const perf = (bookings: number) => ({
+    ok: true, providerKey: 'k',
+    performance: {
+      policy_version: 1, window_days: 90, from: '', to: '', bookings, rate_min_bookings: 5, rates_shown: bookings >= 5,
+      attended: counted(Math.max(0, bookings - 1), bookings), user_no_show: counted(1, bookings), provider_no_show: counted(0, bookings),
+      cancelled_by_provider: counted(0, bookings), cancelled_by_user: counted(0, bookings), disputes_open: 0,
+      incidents: { count: 0, window_days: 90, alert_at: 2, pause_at: 3 }, rating: { average: null, count: 1, min_count: 5 },
+      would_use_again: counted(1, 1), upcoming: 0,
+    },
+    analytics: { level: 'basic', trends: false, export: false }, enforcement: null,
+  });
 
-  it('unter fuenf Anfragen: echte Zahl, Quoten als Strich', async () => {
-    api.fetchMetrics.mockResolvedValue(m(2));
+  it('unter fuenf Buchungen: Zaehler stehen, Quoten als Strich mit Stichprobe', async () => {
+    api.fetchPerformance.mockResolvedValue(perf(2));
     const { container } = page(<PerformancePage />);
-    expect(await screen.findByText('2')).toBeInTheDocument();
-    expect(container.querySelectorAll('[data-pending="true"]')).toHaveLength(5);
-    expect(screen.queryByText('50%')).not.toBeInTheDocument();
-    expect(screen.getByText('common:states.partner.performance.thresholdNote')).toBeInTheDocument();
+    expect(await screen.findByText('1 performance.of 2')).toBeInTheDocument();
+    // Stattgefunden, Bewertung, Wieder buchen — drei Karten ohne Quote.
+    expect(container.querySelectorAll('[data-pending="true"]')).toHaveLength(3);
+    expect(screen.queryByText(/50 %/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/score/i)).not.toBeInTheDocument();
     noFixture();
   });
 
-  it('ab fuenf Anfragen: die Quoten stehen da', async () => {
-    api.fetchMetrics.mockResolvedValue(m(5));
+  it('ab fuenf Buchungen: die Quote steht an der Zahl', async () => {
+    api.fetchPerformance.mockResolvedValue(perf(5));
     const { container } = page(<PerformancePage />);
-    await waitFor(() => expect(screen.getAllByText('50%').length).toBeGreaterThan(0));
-    expect(container.querySelectorAll('[data-pending="true"]')).toHaveLength(0);
+    await waitFor(() => expect(screen.getByText(/80 %/)).toBeInTheDocument());
+    expect(container.querySelector('[data-fact="performance.fact.attended"][data-pending="true"]')).toBeNull();
+  });
+
+  it('Essential: Verlauf gesperrt heisst erklaert, nicht leer; kein CSV', async () => {
+    api.fetchPerformance.mockResolvedValue(perf(5));
+    page(<PerformancePage />);
+    expect(await screen.findByText('performance.trendsLocked')).toBeInTheDocument();
+    expect(screen.getByText('performance.csvLocked')).toBeInTheDocument();
+    expect(screen.getByText('performance.rankingNote')).toBeInTheDocument();
   });
 
   it('Abruf scheitert: A2', async () => {
-    api.fetchMetrics.mockRejectedValue(new Error('down'));
+    api.fetchPerformance.mockRejectedValue(new Error('down'));
     page(<PerformancePage />);
     expect(await screen.findByText('states.partner.loadFailed.performance')).toBeInTheDocument();
     noFixture();
