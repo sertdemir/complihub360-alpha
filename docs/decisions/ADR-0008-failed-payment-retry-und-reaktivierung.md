@@ -1,6 +1,6 @@
 # ADR-0008: Gescheiterte Zahlung und Reaktivierung
 
-**Status:** PROPOSED — Entscheidungsvorlage, nichts davon ist umgesetzt
+**Status:** TEILWEISE ENTSCHIEDEN — **D1 beschlossen und umgesetzt (Nutzer, 2026-10-10)**; A, B und C stehen weiter zur Wahl
 **Date:** 2026-10-10
 **Bezug:** *Provider Dashboard Pricing & Operations Implementation Specification* v1.0 („Spec B") — „Configurable items requiring final decision": *„Subscription proration, cancellation notice, grace period, failed-payment retry, and reactivation rules."* · *Spec A* §21.1 (Billing Readiness) · [`KN-BRAND-001`](../../.knowledge/memory/nodes/KN-BRAND-001-complihub360-dna.md) · ADR-0003 (Pricing v2) · ADR-0005 (Buchung → Belastung) · ADR-0006 (Kulanzfrist, Wechsel, Kündigung) · `TKT-PROV-11`
 **Was ADR-0006 offen gelassen hat:** Dort wurden drei der fünf Spec-B-Punkte entschieden (A2 · B2 · C2). Die beiden letzten — `failed-payment retry` und `reactivation rules` — blieben ausdrücklich liegen. Diese Vorlage holt sie nach.
@@ -87,22 +87,49 @@ Für **Ende plus Neuanfang** nicht, weil dabei der Zyklus selbst neu beginnt.
 
 ### 3. Die Oberfläche behauptet heute drei Dinge, die nicht stimmen
 
-Auf `/billing` stehen diese Texte (`providerws.billing.*`):
+> **Korrektur vom 2026-10-10, bei der Umsetzung von D1.** Die erste Fassung
+> dieses Abschnitts erklärte die drei Texte mit der Regel für die
+> **Lead-Belastung** („dieselbe Karte bleibt gesperrt"). Das war falsch
+> zugeordnet. Die Texte hängen an **`invoices.status = 'failed'`** — und das
+> macht sie nicht richtiger, sondern falscher. Der Befund unten ist die
+> nachgeprüfte Fassung.
+
+Die drei Texte erscheinen alle am selben Zustand: einer Rechnung mit
+`status = 'failed'`. Diesen Status setzt genau eine Stelle im Code —
+`syncOpenInvoices` (`billing.ts`), und zwar **nur**, wenn Stripe die Rechnung
+als `uncollectible` meldet:
+
+```ts
+const mapped = inv.status === 'paid' ? 'paid'
+    : inv.status === 'void' ? 'void'
+    : inv.status === 'uncollectible' ? 'failed'
+    : null;
+```
+
+`uncollectible` heißt in Stripe nicht „der Einzug ist gerade schiefgegangen",
+sondern „der Einzug wurde aufgegeben". Es ist das Ende einer Einziehung, nicht
+ihre Mitte.
+
+**Und eine solche Rechnung kann gar nichts sperren.** Sowohl
+`syncBillingReadiness` als auch `handleBillingPreview` laden ausschließlich
+`{ status: 'open' }`. Eine Rechnung mit `failed` fällt aus der Zählung heraus
+und kann den Grund `overdue_invoice` nicht auslösen.
 
 | Schlüssel | Text | Warum er falsch ist |
 |---|---|---|
-| `statusFailedGrace` | „fehlgeschlagen · **Kulanzfrist**" | Es gibt keine Kulanzfrist nach gescheiterter Zahlung. Seit ADR-0006 bezeichnet dasselbe Wort auf derselben Seite eine Frist, die es wirklich gibt — für offene Rechnungen. |
-| `paymentFailedBanner` | „… fehlgeschlagen · **Kulanzfrist läuft**" | Dieselbe erfundene Frist, als laufende Uhr formuliert. |
-| `paymentFailedBody` | „Bitte **erneut versuchen** oder die Zahlungsmethode aktualisieren, um eine **Workspace-Sperre** zu vermeiden." | Zwei Fehler: Es gibt **kein** erneutes Versuchen (dieselbe Karte bleibt gesperrt), und es droht **keine Workspace-Sperre** — der Anbieter behält vollen Zugang, nur die kostenpflichtige Buchung ist gesperrt, und die Sichtbarkeit bleibt unberührt (Spec A §14). |
-
-Die Readiness-Box auf derselben Seite sagt es bereits richtig: *„Die letzte
-Lead-Belastung ist gescheitert. Ein anderes Zahlungsmittel hebt die Sperre auf
-— dieselbe Karte nicht."* Die drei Texte oben widersprechen ihr.
+| `statusFailedGrace` | „fehlgeschlagen · **Kulanzfrist**" | Es gibt keine Kulanzfrist nach gescheiterter Zahlung. Seit ADR-0006 bezeichnet dasselbe Wort auf derselben Seite eine Frist, die es wirklich gibt — für **offene** Rechnungen. Diese hier ist nicht offen. |
+| `paymentFailedBanner` | „… fehlgeschlagen · **Kulanzfrist läuft**" | Dieselbe erfundene Frist, als laufende Uhr formuliert. Bei `uncollectible` läuft erst recht nichts mehr. |
+| `paymentFailedBody` | „Bitte **erneut versuchen** oder die Zahlungsmethode aktualisieren, um eine **Workspace-Sperre** zu vermeiden." | Es droht **keine Workspace-Sperre** — der Anbieter behält vollen Zugang, und die Sichtbarkeit bleibt unberührt (Spec A §14). Schärfer noch: **diese Rechnung kann überhaupt nichts sperren**, weil die Readiness nur offene Rechnungen zählt. Der Satz warnt vor einer Folge, die dieser Zustand nicht auslösen kann. |
 
 **Nach dem DNA-Filter sind zwei davon nicht nur ungenau, sondern Verstöße:**
-„Workspace-Sperre" ist eine Drohung mit einer Folge, die nicht eintritt —
-Angst als Antrieb. Und „Kulanzfrist läuft" versteckt Unsicherheit hinter
+„Workspace-Sperre" ist eine Drohung mit einer Folge, die hier nicht eintreten
+kann — Angst als Antrieb. Und „Kulanzfrist läuft" versteckt Unsicherheit hinter
 selbstsicherer Sprache: Es läuft nichts.
+
+**Was die Texte nicht sind:** die Fläche für eine gescheiterte
+**Lead-Belastung**. Die hat ihren eigenen Platz — die Readiness-Box, und die
+sagt es bereits richtig: *„Die letzte Lead-Belastung ist gescheitert. Ein
+anderes Zahlungsmittel hebt die Sperre auf — dieselbe Karte nicht."*
 
 ---
 
@@ -163,6 +190,42 @@ verlängert, und der heutige Zustand verstößt gegen die DNA. D1 ist sofort
 möglich und unabhängig von allem anderen.
 
 ---
+
+## Decision
+
+### D1 · Die Copy wird begradigt (Nutzer, 2026-10-10)
+
+Die Texte sagen, was wirklich passiert. „Kulanzfrist" und „Workspace-Sperre"
+verschwinden; nichts Neues wird versprochen.
+
+**Fünf Stellen, nicht drei.** Beim Umsetzen kamen zwei weitere zum Vorschein,
+die dieselbe Behauptung an anderer Stelle wiederholten:
+
+| Schlüssel | vorher | nachher |
+|---|---|---|
+| `statusFailedGrace` | „fehlgeschlagen · Kulanzfrist" | „nicht eingezogen" |
+| `paymentFailedBanner` | „Zahlung zu {{invoice}} fehlgeschlagen · Kulanzfrist läuft" | „Rechnung {{invoice}} wurde nicht eingezogen" |
+| `paymentFailedBody` | „Bitte erneut versuchen … um eine Workspace-Sperre zu vermeiden." | „Der Einzug dieser Rechnung wurde beendet. Ihre Buchungen sperrt sie nicht, und an Ihrer Sichtbarkeit ändert sie nichts. Im Portal sehen Sie die Rechnung samt Positionen und können sie begleichen." |
+| `kpiPaymentFailed` | „Zahlung FEHLGESCHLAGEN" | „nicht eingezogen" |
+| `rowActionFailed` | „Zahlung aktualisieren · Erneut versuchen" | „Im Portal ansehen" |
+
+**Zwei Dinge daneben, die ohne die Copy widersprüchlich geworden wären:**
+
+- Der Banner stand auf `status="error"` mit einem roten Knopf. Ein roter Alarm
+  neben dem Satz „sperrt Ihre Buchungen nicht" widerspricht sich selbst — jetzt
+  `warning` mit `outline`.
+- Der Knopf hieß „Zahlungsmethode aktualisieren". Eine Zahlungsmethode behebt
+  eine beendete Einziehung nicht. Er trägt jetzt `graceOpenPortal`
+  („Rechnung im Portal öffnen") — **derselbe Handler**, nur ehrlich
+  beschriftet; er öffnet ohnehin das Billing-Portal.
+
+`billing.updatePaymentMethod` bleibt als Schlüssel bestehen, auch wenn ihn
+gerade nichts nutzt: Wird **A2** gewählt, ist er der Text für den Weg zurück.
+
+**Was D1 ausdrücklich NICHT entscheidet:** ob es einen Wiederholungsversuch
+geben soll (A, B) und was ein Neustart mitnimmt (C). Die Texte beschreiben den
+Ist-Zustand und versprechen nichts darüber hinaus — genau deshalb müssen sie
+nach einer Entscheidung zu A oder B noch einmal angefasst werden.
 
 ## Was zusammenhängt
 
