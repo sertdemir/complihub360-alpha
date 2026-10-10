@@ -1,6 +1,6 @@
 # ADR-0008: Gescheiterte Zahlung und Reaktivierung
 
-**Status:** PROPOSED — Entscheidungsvorlage, nichts davon ist umgesetzt
+**Status:** ACCEPTED (2026-10-10) — **A2 · B2 · C2 · D2**; B2 mit offener Umsetzungsfrage, siehe *Decision*
 **Date:** 2026-10-10
 **Bezug:** *Provider Dashboard Pricing & Operations Implementation Specification* v1.0 („Spec B") — „Configurable items requiring final decision": *„Subscription proration, cancellation notice, grace period, failed-payment retry, and reactivation rules."* · *Spec A* §21.1 (Billing Readiness) · [`KN-BRAND-001`](../../.knowledge/memory/nodes/KN-BRAND-001-complihub360-dna.md) · ADR-0003 (Pricing v2) · ADR-0005 (Buchung → Belastung) · ADR-0006 (Kulanzfrist, Wechsel, Kündigung) · `TKT-PROV-11`
 **Was ADR-0006 offen gelassen hat:** Dort wurden drei der fünf Spec-B-Punkte entschieden (A2 · B2 · C2). Die beiden letzten — `failed-payment retry` und `reactivation rules` — blieben ausdrücklich liegen. Diese Vorlage holt sie nach.
@@ -204,3 +204,42 @@ Was in jedem Fall bleibt: Solange hier nichts entschieden ist, darf keiner
 dieser Punkte im Code beantwortet werden. Das gilt besonders für Texte — ein
 Satz, der eine Frist behauptet, ist eine Regel, auch wenn er nur in einer
 Sprachdatei steht. Genau so ist der heutige Zustand entstanden.
+
+---
+
+## Decision (2026-10-10)
+
+Der Nutzer hat gewählt: **A2 · B2 · C2 · D2**. *Context* und *Optionen* oben
+bleiben unverändert stehen.
+
+- **A2 — Prüfung auf Anstoß des Anbieters.** `POST /provider/:key/billing/recheck`
+  legt einen SetupIntent über das gescheiterte Standard-Zahlungsmittel an
+  (`verifyPaymentMethod`, kein Geld). Bestätigt Stripe es, wird
+  `last_payment_failure` geleert und die Bereitschaft neu berechnet
+  (`recheckPaymentMethod`, Ereignisse `payment_method_recheck` und
+  `payment_failure_cleared`). Die offene Frage aus den Optionen („wie oft")
+  ist beantwortet mit **höchstens drei Prüfungen je Anbieter in 24 Stunden**
+  (`RECHECK_LIMIT_PER_DAY`, 429 `RECHECK_LIMIT` mit `retry_after`). Die
+  Oberfläche folgt nach der Canvas-Wahl.
+- **C2 — Rabattzähler wird mitgenommen.** `startSubscription` übernimmt den
+  höchsten Zählerstand eines Zyklus, der heute noch läuft
+  (`carriedDiscountCount`, Ereignis `discount_counter_carried`). Der Zähler
+  ist damit nicht mehr rein am Abo-Zyklus geschlüsselt; vermerkt an
+  `applyMonthlyDiscount` und in `subscriptions.ts`.
+- **D2 — Copy begradigt, Wort reserviert.** `statusFailed` („nicht
+  eingezogen"), `paymentFailedBanner`, `paymentFailedBody` in vier Sprachen;
+  der Hinweis ist jetzt eine Warnung mit dem Weg ins Portal statt eines
+  roten Kartenwechsel-Knopfs. Beim Umsetzen zeigte sich: `failed` ist eine
+  Abo-Rechnung, die Stripe als `uncollectible` führt — sie sperrt nichts
+  (nur offene Rechnungen zählen in `overdueState`). Die neue Copy sagt genau
+  das. `copy:check` hält „Kulanzfrist"/„grace" (und „Workspace-Sperre") auf
+  `providerws.billing.*` ausschließlich in `grace*`-Schlüsseln.
+- **B2 — offen in der Umsetzung, nicht in der Richtung.** Stripes
+  Wiederholungen (Smart Retries) greifen nur bei
+  `collection_method = charge_automatically`. Abo-Rechnungen laufen als
+  `send_invoice`: Stripe versucht dort nie selbst, die Karte zu belasten — es
+  gibt also keinen gescheiterten Versuch, den Stripe wiederholen könnte. Die
+  Option, wie sie oben steht, ist so nicht baubar. Die Richtung bleibt: der
+  häufige Fall soll sich innerhalb der sieben Tage von selbst lösen, und
+  **eine Wiederholung verschiebt den Stichtag nie**. Wie, entscheidet der
+  Nutzer (TKT-PROV-13); bis dahin gilt B1.

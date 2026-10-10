@@ -325,9 +325,31 @@ for (const [zustand, aktionen] of Object.entries(AKTIONEN_JE_ZUSTAND)) {
   for (const a of aktionen) if (!VORLAGE.actions[a]) fehler.push(`${zustand}: Aktion ${a} fehlt`);
 }
 
+// 4. Reserviertes Wort (ADR-0008, Wahl D2): Auf /billing (`providerws.billing.*`)
+//    bezeichnet „Kulanzfrist" ausschliesslich die beschlossene Frist fuer
+//    offene Rechnungen (ADR-0006 A2) — also nur Schluessel `grace*`. Vorher
+//    nannte dieselbe Seite eine Kulanzfrist nach gescheiterter Zahlung, die es
+//    nie gab, und drohte mit einer Workspace-Sperre, die nicht eintritt.
+const RESERVIERT = {
+  de: [/kulanz/i, /workspace-sperre/i],
+  en: [/\bgrace\b/i, /workspace lock/i],
+  es: [/gracia/i, /bloqueo del workspace/i],
+  tr: [/ek süre/i, /çalışma alanı kilidi/i],
+};
+for (const [sprache, muster] of Object.entries(RESERVIERT)) {
+  const datei = resolve(ROOT, `apps/vs1-demo/ui/public/locales/${sprache}/providerws.json`);
+  const billing = JSON.parse(readFileSync(datei, 'utf8')).billing ?? {};
+  for (const [pfad, wert] of blaetter(billing)) {
+    if (pfad.startsWith('grace') || typeof wert !== 'string') continue;
+    for (const m of muster) {
+      if (m.test(wert)) fehler.push(`reserviert ${sprache}/providerws billing.${pfad}: „${wert}" — ${m} steht auf /billing nur in grace*-Schluesseln (ADR-0008 D2)`);
+    }
+  }
+}
+
 if (fehler.length === 0) {
   const n = Object.keys(AKTIONEN_JE_ZUSTAND).length;
-  console.log(`Abgenommene Zustands-Copy wortgleich (${n} Zustaende, ${Object.keys(VORLAGE.actions).length} Aktionen, Sharing-Dialog, Umfang und Technical details).`);
+  console.log(`Abgenommene Zustands-Copy wortgleich (${n} Zustaende, ${Object.keys(VORLAGE.actions).length} Aktionen, Sharing-Dialog, Umfang und Technical details; reserviertes Wort auf /billing).`);
   process.exit(0);
 }
 

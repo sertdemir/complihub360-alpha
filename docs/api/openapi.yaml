@@ -753,6 +753,26 @@ paths:
       responses:
         '200': { description: "`{ readiness: { ready, reasons[], synced_at, payment_method, changed } }`" }
         '503': { description: Stripe nicht konfiguriert }
+  /provider/{key}/billing/recheck:
+    post:
+      summary: Gescheitertes Zahlungsmittel erneut pruefen (ADR-0008 A2)
+      description: >-
+        Nach einer gescheiterten Lead-Belastung prueft Stripe dasselbe
+        Standard-Zahlungsmittel per SetupIntent — es wird nichts belastet und
+        nichts nachbelastet. Bestaetigt Stripe das Mittel, faellt
+        `payment_failed` weg und die Bereitschaft wird neu berechnet.
+        Ergebnis `cleared`, `declined`, `needs_action` (Bestaetigung durch
+        den Karteninhaber noetig, off-session nicht moeglich) oder
+        `not_blocked` (keine Sperre bzw. ein anderes Mittel, das sie ohnehin
+        aufhebt). Hoechstens drei Pruefungen je Anbieter in 24 Stunden.
+        Nur fuer Mitglieder des Anbieters, Admin oder Server-Key.
+      security: [ { bearerAuth: [] } ]
+      parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
+      responses:
+        '200': { description: "`{ ok, result, reason? , readiness? }`" }
+        '429': { description: "`RECHECK_LIMIT` mit `retry_after`" }
+        '502': { description: Stripe-Fehler }
+        '503': { description: Stripe nicht konfiguriert }
 
   /provider/{key}/bookings:
     get:

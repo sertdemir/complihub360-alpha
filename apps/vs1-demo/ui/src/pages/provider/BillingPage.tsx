@@ -26,7 +26,7 @@ import { fetchInvoices, fetchBillingPreview, openBillingPortal, syncBillingReadi
 
 const STATUS_META: Record<Invoice['status'], { labelKey: string; tone: 'success' | 'error' | 'warning' | 'neutral' }> = {
   paid: { labelKey: 'billing.statusPaid', tone: 'success' },
-  failed: { labelKey: 'billing.statusFailedGrace', tone: 'error' },
+  failed: { labelKey: 'billing.statusFailed', tone: 'error' },
   open: { labelKey: 'billing.statusOpen', tone: 'warning' },
   void: { labelKey: 'billing.statusVoid', tone: 'neutral' },
 };
@@ -192,11 +192,16 @@ export function BillingPage() {
           <p className="rounded-lg border border-elevate/10 bg-elevate/[0.04] px-4 py-3 text-[12px] text-fg-secondary">{t('billing.syncFailed')}</p>
         )}
 
+        {/* ADR-0008 D2: „failed" ist eine Rechnung, die Stripe als nicht
+            einziehbar fuehrt (`uncollectible`). Sie sperrt nichts — nur offene
+            Rechnungen zaehlen (overdueState). Vorher stand hier eine laufende
+            Kulanzfrist und eine Workspace-Sperre: beides gab es nicht. Der Weg
+            ins Portal bleibt, dort ist die Rechnung weiter bezahlbar. */}
         {failed && (
           <Banner
-            status="error"
+            status="warning"
             title={t('billing.paymentFailedBanner', { invoice: failed.invoice_number })}
-            action={<Button size="sm" variant="danger" onClick={updatePayment} disabled={portalBusy}>{portalBusy ? '…' : t('billing.updatePaymentMethod')}</Button>}
+            action={<Button size="sm" variant="secondary" onClick={updatePayment} disabled={portalBusy}>{portalBusy ? '…' : t('billing.graceOpenPortal')}</Button>}
           >
             {t('billing.paymentFailedBody')}
           </Banner>

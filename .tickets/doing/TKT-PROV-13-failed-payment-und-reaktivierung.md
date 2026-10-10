@@ -7,8 +7,8 @@ status: "doing"
 # Gescheiterte Zahlung und Reaktivierung
 
 [`ADR-0008`](../../docs/decisions/ADR-0008-failed-payment-retry-und-reaktivierung.md)
-liegt als Entscheidungsvorlage vor. **Es ist nichts umgesetzt** — und es darf
-auch nichts umgesetzt werden, bevor der Nutzer gewählt hat.
+ist entschieden (2026-10-10): **A2 · B2 · C2 · D2**. Stand der Umsetzung
+unten unter *Fortschritt*.
 
 Damit sind die letzten beiden der fünf Spec-B-Punkte aufbereitet, die unter
 „Configurable items requiring final decision" standen. Die ersten drei sind
@@ -72,3 +72,23 @@ Auslöser: **Monetarisierung**, **Copy/Microcopy**. `KN-BRAND-001` gelesen.
   Zustand entstanden.
 
 Nicht berührt: Risk Map, Wizard, Ranking, AI-Verhalten.
+
+## Fortschritt (2026-10-10)
+
+- [x] **D2** — drei Texte in vier Sprachen wahr gemacht, Hinweis als Warnung
+  mit Weg ins Portal; `copy:check` reserviert „Kulanzfrist"/„grace" auf
+  `providerws.billing.*` für `grace*`-Schlüssel.
+- [x] **C2** — `carriedDiscountCount` + Übernahme in `startSubscription`;
+  Unit- und Routentest.
+- [x] **A2 Backend** — `POST /provider/:key/billing/recheck`
+  (`verifyPaymentMethod` per SetupIntent, `recheckPaymentMethod`, drei
+  Prüfungen in 24 h); fünf Routentests, OpenAPI.
+- [ ] **A2 Oberfläche** — Canvas mit je drei Varianten für Knopf-Ort und
+  Ergebnisanzeige liegt beim Nutzer; danach Figma → lokal → Review.
+- [ ] **B2** — so nicht baubar: Smart Retries gelten nur für
+  `charge_automatically`, die Abo-Rechnungen laufen als `send_invoice`.
+  Umsetzungsweg liegt beim Nutzer; bis dahin gilt B1. Vorher zu prüfen: ob
+  das Zahlungsmandat (`billing_authorization`, Fassung 2026-09) auch die
+  Belastung von Abo-Rechnungen abdeckt — der Text liegt nicht im Repo.
+- [ ] Auf Staging prüfen, ob der Stripe-Key SetupIntents anlegen darf
+  (Restricted Key, vgl. Befund 2026-10-04).

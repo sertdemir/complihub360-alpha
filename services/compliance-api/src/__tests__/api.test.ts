@@ -104,6 +104,7 @@ const { stripeMock } = vi.hoisted(() => ({
         getCustomerBilling: vi.fn(),
         createPaymentIntent: vi.fn(),
         refundPaymentIntent: vi.fn(),
+        verifyPaymentMethod: vi.fn(),
         stripeRequest: vi.fn(),
     },
 }));
@@ -115,6 +116,7 @@ vi.mock('../stripe.js', async (importOriginal) => {
         getCustomerBilling: (...a: any[]) => stripeMock.getCustomerBilling(...a),
         createPaymentIntent: (...a: any[]) => stripeMock.createPaymentIntent(...a),
         refundPaymentIntent: (...a: any[]) => stripeMock.refundPaymentIntent(...a),
+        verifyPaymentMethod: (...a: any[]) => stripeMock.verifyPaymentMethod(...a),
         stripeRequest: (...a: any[]) => stripeMock.stripeRequest(...a),
         ensureStripeCustomer: async (key: string) => `cus_${key}`,
     };
@@ -124,6 +126,7 @@ function resetStripe() {
     stripeMock.getCustomerBilling.mockReset().mockResolvedValue({ defaultPaymentMethodId: 'pm_test_1', paymentMethodLabel: 'visa ····4242', email: 'geheim@testkanzlei.example', billingInfoComplete: true, delinquent: false });
     stripeMock.createPaymentIntent.mockReset().mockResolvedValue({ ok: true, paymentIntentId: 'pi_test_1', status: 'succeeded' });
     stripeMock.refundPaymentIntent.mockReset().mockResolvedValue({ refundId: 're_test_1' });
+    stripeMock.verifyPaymentMethod.mockReset().mockResolvedValue({ ok: true, setupIntentId: 'seti_test_1' });
     stripeMock.stripeRequest.mockReset().mockImplementation(async (_m: string, path: string) => { throw new Error(`unmocked stripe call: ${path}`); });
 }
 vi.mock('../storage.js', async (importOriginal) => {
@@ -871,6 +874,61 @@ describe('Anbieterseite: Lead-Karte, Selbstauskunft, Zahlungsbereitschaft (Phase
         stripeMock.getCustomerBilling.mockResolvedValue({ defaultPaymentMethodId: 'pm_test_2', paymentMethodLabel: 'mastercard ····4444', email: null, billingInfoComplete: true, delinquent: false });
         const r2 = await api('/api/v1/provider/test-kanzlei/billing/sync', { method: 'POST', auth: 'key', body: '{}' });
         expect(r2.body.readiness).toMatchObject({ ready: true, reasons: [] });
+    });
+
+    // ─── ADR-0008 A2: Zahlungsmittel erneut pruefen ──────────────────────────
+    function gesperrt() {
+        seedProvider({ stripe_customer_id: 'cus_test', billing_ready: false, billing_block_reasons: ['payment_failed'], last_payment_failure: { at: '2026-10-01T10:00:00Z', payment_method_id: 'pm_test_1', reason: 'insufficient_funds' } });
+        seedPricing(); seedSubscription('test-kanzlei', 'growth');
+        (db.provider_agreement_acceptance ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', agreement_type: 'billing_authorization', version: '2026-09', superseded_at: null });
+    }
+    const recheck = () => api('/api/v1/provider/test-kanzlei/billing/recheck', { method: 'POST', auth: 'key', body: '{}' });
+
+    it('A2: bestaetigt Stripe dieselbe Karte, faellt payment_failed weg — ohne Belastung', async () => {
+        gesperrt();
+        const r = await recheck();
+        expect(r.status).toBe(200);
+        expect(r.body).toMatchObject({ ok: true, result: 'cleared', readiness: { ready: true, reasons: [] } });
+        expect(stripeMock.verifyPaymentMethod).toHaveBeenCalledWith(expect.objectContaining({ customerId: 'cus_test', paymentMethodId: 'pm_test_1' }));
+        expect(stripeMock.createPaymentIntent).not.toHaveBeenCalled();
+        expect(db.providers[0].last_payment_failure).toBeNull();
+        expect(db.event_log.map((e: any) => e.type)).toEqual(expect.arrayContaining(['payment_method_recheck', 'payment_failure_cleared']));
+    });
+
+    it('A2: lehnt Stripe ab, bleibt die Sperre — mit Grund, ohne Fehlerstatus', async () => {
+        gesperrt();
+        stripeMock.verifyPaymentMethod.mockResolvedValue({ ok: false, kind: 'card', reason: 'card_declined', detail: 'do_not_honor' });
+        const r = await recheck();
+        expect(r.body).toMatchObject({ ok: true, result: 'declined', reason: 'card_declined' });
+        expect(db.providers[0].last_payment_failure).toBeTruthy();
+        stripeMock.verifyPaymentMethod.mockResolvedValue({ ok: false, kind: 'card', reason: 'authentication_required', detail: 'requires_action' });
+        expect((await recheck()).body.result).toBe('needs_action');
+    });
+
+    it('A2: hoechstens drei Pruefungen in 24 Stunden', async () => {
+        gesperrt();
+        stripeMock.verifyPaymentMethod.mockResolvedValue({ ok: false, kind: 'card', reason: 'card_declined', detail: 'x' });
+        for (let i = 0; i < 3; i++) expect((await recheck()).status).toBe(200);
+        const r = await recheck();
+        expect(r.status).toBe(429);
+        expect(r.body.errorCode).toBe('RECHECK_LIMIT');
+        expect(r.body.retry_after).toBeTruthy();
+        expect(stripeMock.verifyPaymentMethod).toHaveBeenCalledTimes(3);
+    });
+
+    it('A2: ohne Sperre oder mit anderem Mittel wird nichts geprueft, nur neu berechnet', async () => {
+        gesperrt();
+        stripeMock.getCustomerBilling.mockResolvedValue({ defaultPaymentMethodId: 'pm_test_2', paymentMethodLabel: 'mastercard ····4444', email: null, billingInfoComplete: true, delinquent: false });
+        const r = await recheck();
+        expect(r.body).toMatchObject({ result: 'not_blocked', readiness: { ready: true } });
+        expect(stripeMock.verifyPaymentMethod).not.toHaveBeenCalled();
+    });
+
+    it('A2: ein fremder Login bekommt 404 vom Guard', async () => {
+        gesperrt();
+        const r = await api('/api/v1/provider/test-kanzlei/billing/recheck', { method: 'POST', auth: 'jwt', body: '{}' });
+        expect(r.status).toBe(404);
+        expect(stripeMock.verifyPaymentMethod).not.toHaveBeenCalled();
     });
 
     it('protokolliert, wenn der Sync eine angehaengte Karte zum Standard gemacht hat', async () => {
@@ -3150,6 +3208,22 @@ describe('Abo-Schreiber — Tarifwahl, Admin-Zuweisung, Periode', () => {
         expect(db.provider_review_log.map((l: any) => [l.subject, l.action, l.to_value]))
             .toContainEqual(['subscription', 'subscription_started', 'growth/monthly']);
         expect(db.event_log.map((e: any) => e.type)).toContain('provider_subscription_started');
+    });
+
+    it('ADR-0008 C2: ein Neustart mitten im Zyklus nimmt den Rabattzaehler mit', async () => {
+        seedProvider();
+        seedPricing();
+        const heute = new Date().toISOString().slice(0, 10);
+        const vor5 = new Date(Date.now() - 5 * 86_400_000).toISOString().slice(0, 10);
+        // Das vorige Abo: sofort beendet (Admin-Weg), drei rabattierte Leads verbraucht.
+        (db.provider_subscriptions ??= []).push({ id: 'old', provider_key: 'test-kanzlei', plan_code: 'growth', cadence: 'monthly', status: 'ended', ended_at: new Date().toISOString(), current_period_start: vor5, current_period_end: addMonthsIso(vor5, 1), started_at: vor5 });
+        (db.provider_discount_counter ??= []).push({ provider_key: 'test-kanzlei', cycle_start: vor5, used: 3 });
+        const r = await api('/api/v1/provider/test-kanzlei/subscription', {
+            method: 'POST', body: JSON.stringify({ plan_code: 'growth', cadence: 'monthly' }),
+        });
+        expect(r.status).toBe(201);
+        expect(db.provider_discount_counter.find((c: any) => c.cycle_start === heute)).toMatchObject({ provider_key: 'test-kanzlei', used: 3 });
+        expect(db.event_log.map((e: any) => e.type)).toContain('discount_counter_carried');
     });
 
     it('Jahresabo: der Zyklus bleibt ein MONAT, nur die Verlaengerung liegt ein Jahr weiter', async () => {

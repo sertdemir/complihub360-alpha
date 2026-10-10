@@ -4,7 +4,7 @@ import { describe, it, expect, vi } from 'vitest';
 // Datums-Mathematik hier beruehrt ihn nie.
 vi.mock('../supabase.js', () => ({ supabaseApi: {} }));
 
-import { addMonths, cycleEndFor, renewalAfter, rollCycle } from '../subscriptions.js';
+import { addMonths, carriedDiscountCount, cycleEndFor, renewalAfter, rollCycle } from '../subscriptions.js';
 
 // ─── Zwei Termine, nicht einer ───────────────────────────────────────────────
 //
@@ -110,5 +110,30 @@ describe('rollCycle', () => {
         // 400 Monatsschritte sind ueber 33 Jahre. Eine Zeile, die so alt ist,
         // ist ein Datenfehler; dann lieber nichts anfassen.
         expect(rollCycle('1900-01-01', '1900-02-01', '2026-10-15')).toBeNull();
+    });
+});
+
+// ─── ADR-0008 C2: der Neustart nimmt den Zaehler des laufenden Zyklus mit ───
+describe('carriedDiscountCount', () => {
+    it('nimmt den Stand eines Zyklus, der heute noch laeuft', () => {
+        expect(carriedDiscountCount([{ cycle_start: '2026-10-01', used: 3 }], '2026-10-15')).toBe(3);
+    });
+
+    it('nimmt nichts aus einem abgelaufenen Zyklus', () => {
+        expect(carriedDiscountCount([{ cycle_start: '2026-09-01', used: 3 }], '2026-10-01')).toBe(0);
+        expect(carriedDiscountCount([{ cycle_start: '2026-09-01', used: 3 }], '2026-10-15')).toBe(0);
+    });
+
+    it('ein Zyklus, der heute beginnt, ist derselbe Schluessel — keine Uebernahme', () => {
+        expect(carriedDiscountCount([{ cycle_start: '2026-10-15', used: 2 }], '2026-10-15')).toBe(0);
+    });
+
+    it('bei mehreren laufenden Zyklen gewinnt der hoechste Stand', () => {
+        expect(carriedDiscountCount([{ cycle_start: '2026-10-01', used: 1 }, { cycle_start: '2026-10-10', used: 2 }], '2026-10-20')).toBe(2);
+    });
+
+    it('fehlende oder leere Zaehler ergeben null', () => {
+        expect(carriedDiscountCount([], '2026-10-20')).toBe(0);
+        expect(carriedDiscountCount([{ cycle_start: '2026-10-01', used: null }], '2026-10-20')).toBe(0);
     });
 });
