@@ -198,14 +198,33 @@
       "withdrawn_authorization": "The billing authorisation has been withdrawn. Accept the current version to continue.",
       "overdue_invoice": "An invoice is overdue. Pay it in the portal.",
       "account_paused": "Your account is paused.",
-      "payment_failed": "The last lead charge failed. A different payment method lifts this — the same card does not."
+      "payment_failed": "The last lead charge failed. You can have the same payment method checked again, or add a different one in the portal."
     },
     "graceTitleOne": "One invoice is open",
     "graceTitleMany": "{{n}} invoices are open",
     "graceBody": "Due since {{since}}. From {{until}}, bookings pause until the invoice is paid.",
     "graceStillVisible": "Your visibility in search results is not affected by this.",
     "graceOpenPortal": "Open the invoice in the portal",
-    "changePaymentMethod": "Change payment method"
+    "changePaymentMethod": "Change payment method",
+    "recheckButton": "Ask your bank",
+    "recheckHint": "We ask your bank whether the payment method on file can be charged again. No amount is debited.",
+    "recheckConfirmed": "Your bank confirmed the payment method — bookings are open again. The confirmation holds for now; it makes no promise about future charges.",
+    "recheckDeclined": "Your bank did not confirm the payment method: {{reason}} Bookings stay paused; your visibility in results does not. A different payment method in the portal takes effect immediately.",
+    "recheckNothing": "There was nothing to check — there is no block from a failed payment method.",
+    "recheckAlreadyCleared": "A different payment method is already on file. That lifted the block, with no need to ask your bank.",
+    "recheckNoPaymentMethod": "There is no payment method on file to check. You can add one in the portal.",
+    "recheckRateLimited": "{{used}} of {{max}} checks within 24 hours have been used. The next one is possible from {{when}}. A different payment method in the portal takes effect immediately and does not count here.",
+    "recheckRateLimitedNoTime": "No further check is possible in this window. A different payment method in the portal takes effect immediately and does not count here.",
+    "recheckRemaining": "{{remaining}} of {{max}} checks left over the next 24 hours.",
+    "recheckUnreachable": "We could not reach your bank just now. That is not a refusal, and this attempt does not count — please try again in a moment.",
+    "recheckReason": {
+      "insufficient_funds": "The account did not have sufficient funds.",
+      "expired_card": "The card has expired.",
+      "card_declined": "The bank declined the charge without giving a reason.",
+      "authentication_required": "The bank wants you to confirm, and that can only be done in the portal.",
+      "no_payment_method": "The payment method no longer exists at our payment provider.",
+      "stripe_error": "The reason was not passed on to us."
+    }
   },
   "confirmEmail": {
     "working": "Confirming your new address…",

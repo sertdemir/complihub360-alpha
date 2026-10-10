@@ -78,8 +78,10 @@ export async function fetchBillingPreview(providerKey?: string): Promise<Billing
 
 // ─── Zahlungsbereitschaft (Phase 4, Spec A §21.1) ────────────────────────────
 // Sechs Gruende aus der Spec plus `payment_failed` (letzte Lead-Belastung
-// gescheitert; verschwindet nur mit einem anderen Zahlungsmittel). Der Zustand
-// sperrt die Buchung, nie die Sichtbarkeit (§14).
+// gescheitert). Seit ADR-0008 (A2) gibt es dagegen ZWEI Wege: ein anderes
+// Zahlungsmittel hinterlegen, oder dasselbe von der Bank bestaetigen lassen
+// (`recheckPaymentMethod`). Der Zustand sperrt die Buchung, nie die
+// Sichtbarkeit (§14).
 export type BillingBlockReason =
   | 'no_payment_method' | 'incomplete_billing_info' | 'inactive_subscription'
   | 'withdrawn_authorization' | 'overdue_invoice' | 'account_paused' | 'payment_failed';
@@ -133,5 +135,53 @@ export async function openBillingPortal(providerKey?: string): Promise<string | 
   } catch (e) {
     if (e && typeof e === 'object' && 'status' in e && (e as { status: number }).status === 503) return 'not-configured';
     throw e;
+  }
+}
+
+// ─── Zahlungsmittel erneut pruefen (ADR-0008, A2) ────────────────────────────
+// Der Anbieter stoesst selbst eine Anfrage an seine Bank an: taugt das
+// hinterlegte Mittel wieder, faellt `payment_failed`. Kein Automatiklauf —
+// bei einer Lead-Belastung ist nichts nachzuholen, nur freizugeben.
+
+/** Was im 24-Stunden-Fenster noch frei ist. `next_at` nur, wenn es voll ist. */
+export interface RecheckAllowance {
+  used: number;
+  max: number;
+  next_at: string | null;
+}
+
+export type RecheckResult =
+  /** Die Bank hat bestaetigt — die Sperre ist gefallen. */
+  | { outcome: 'confirmed'; readiness: BillingReadiness | null; allowance: RecheckAllowance | null }
+  /** Sie hat nicht bestaetigt. `reason` ist der Grund, nicht eine Vermutung. */
+  | { outcome: 'declined'; reason: string; allowance: RecheckAllowance | null }
+  /** Es war nichts zu pruefen (kein Vermerk) bzw. die Sperre war schon weg. */
+  | { outcome: 'nothing_to_clear' }
+  | { outcome: 'already_cleared'; readiness: BillingReadiness | null }
+  | { outcome: 'no_payment_method' }
+  /** Das Kontingent ist aufgebraucht; `next_at` sagt, ab wann wieder. */
+  | { outcome: 'rate_limited'; allowance: RecheckAllowance | null }
+  /** Stripe ist noch nicht angebunden. */
+  | { outcome: 'not-configured' }
+  /** Wir konnten nicht fragen. Ausdruecklich NICHT dasselbe wie „abgelehnt". */
+  | { outcome: 'unreachable' };
+
+export async function recheckPaymentMethod(providerKey?: string): Promise<RecheckResult> {
+  try {
+    const res = await apiFetch<{ ok: boolean; outcome: string; reason?: string; readiness: BillingReadiness | null; allowance: RecheckAllowance | null }>(
+      `/api/v1/provider/${providerKey ?? await myProviderKey()}/billing/recheck`,
+      { method: 'POST', body: '{}' },
+    );
+    return { ...res, outcome: res.outcome } as RecheckResult;
+  } catch (e) {
+    const status = e && typeof e === 'object' && 'status' in e ? (e as { status: number }).status : 0;
+    if (status === 503) return { outcome: 'not-configured' };
+    // 429 traegt das Kontingent im Fehlerkoerper — ohne das koennte die Seite
+    // nicht sagen, ab wann wieder, und „spaeter nochmal" waere keine Antwort.
+    if (status === 429) {
+      const body = e as { body?: { allowance?: RecheckAllowance | null } };
+      return { outcome: 'rate_limited', allowance: body.body?.allowance ?? null };
+    }
+    return { outcome: 'unreachable' };
   }
 }

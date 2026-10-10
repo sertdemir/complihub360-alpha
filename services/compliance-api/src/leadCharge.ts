@@ -2,11 +2,12 @@ import { supabaseApi } from "./supabase.js";
 import { structuredLog } from "@complihub360/types";
 import type { BookingPriceSnapshot } from "@complihub360/types";
 import {
-    billingReadiness, getActiveSubscription, loadPricingConfig, overdueState,
-    type BillingBlockReason, type LeadFeeQuote, type LeadOpportunity,
+    billingReadiness, getActiveSubscription, loadPricingConfig, overdueState, recheckAllowance,
+    type BillingBlockReason, type LeadFeeQuote, type LeadOpportunity, type RecheckAllowance,
 } from "./billing.js";
 import {
-    createPaymentIntent, getCustomerBilling, isStripeConfigured, StripeError, type ChargeResult,
+    createPaymentIntent, getCustomerBilling, isStripeConfigured, StripeError, verifyPaymentMethod,
+    type ChargeFailureReason, type ChargeResult,
 } from "./stripe.js";
 import { notify } from "./notifications.js";
 import { sendPaymentFailedMail } from "./mailer.js";
@@ -231,7 +232,17 @@ export async function chargeLeadFee(input: {
     return { ledgerId, outcome: 'failed', result };
 }
 
-/** Die Karte hat nicht gezahlt: der Anbieter erfaehrt es, und die Buchung bleibt gesperrt, bis das Zahlungsmittel wechselt. */
+/**
+ * Die Karte hat nicht gezahlt: der Anbieter erfaehrt es, und die Buchung bleibt
+ * gesperrt.
+ *
+ * Bis ADR-0008 (A2) endete dieser Satz mit „bis das Zahlungsmittel wechselt" —
+ * das war der einzige Ausgang. Seit A2 gibt es einen zweiten:
+ * `recheckPaymentMethod` fragt die Bank, ob dasselbe Mittel inzwischen wieder
+ * taugt. Was `last_payment_failure` hier festhaelt, ist deshalb nicht mehr ein
+ * Endzustand, sondern der Ausgangspunkt fuer diese Pruefung — die Zeile wird
+ * geloescht, sobald die Bank bestaetigt.
+ */
 export async function recordPaymentFailure(args: {
     providerKey: string;
     ledgerId: string;
@@ -343,6 +354,130 @@ export async function syncBillingReadiness(providerKey: string): Promise<Readine
         }).catch(() => { /* non-blocking */ });
     }
     return { ready, reasons, changed, paymentMethodLabel: pmLabel, syncedAt };
+}
+
+// ─── Der Weg zurueck: Pruefung auf Anstoss des Anbieters (ADR-0008, A2) ──────
+
+export type RecheckOutcome =
+    /** Die Bank hat bestaetigt; `payment_failed` ist gefallen. */
+    | { outcome: 'confirmed'; readiness: ReadinessSync | null; allowance: RecheckAllowance }
+    /** Die Bank hat nicht bestaetigt. Die Sperre bleibt, der Grund steht dabei. */
+    | { outcome: 'declined'; reason: ChargeFailureReason; allowance: RecheckAllowance }
+    /** Es ist nichts zu pruefen: kein `payment_failed` vermerkt. */
+    | { outcome: 'nothing_to_clear' }
+    /** Das Standard-Zahlungsmittel ist schon ein anderes — die Sperre war ohnehin weg. */
+    | { outcome: 'already_cleared'; readiness: ReadinessSync | null }
+    /** Es gibt gar kein Standard-Zahlungsmittel, das man pruefen koennte. */
+    | { outcome: 'no_payment_method' }
+    /** Das Kontingent im 24-Stunden-Fenster ist aufgebraucht. */
+    | { outcome: 'rate_limited'; allowance: RecheckAllowance };
+
+/**
+ * Fragt auf Anstoss des Anbieters bei der Bank nach, ob das hinterlegte
+ * Zahlungsmittel wieder taugt — und hebt `payment_failed` auf, wenn sie
+ * bestaetigt.
+ *
+ * ADR-0008, Wahl A2. Warum das kein Automatiklauf ist (A3): bei einer
+ * Lead-Belastung ist nichts nachzuholen. Die Buchung kam nicht zustande, der
+ * Nutzer ist weitergezogen; es geht einzig darum, die NAECHSTE Buchung wieder
+ * moeglich zu machen. Diesen Zeitpunkt bestimmt der Anbieter.
+ *
+ * Die Reihenfolge ist nicht beliebig. Jeder Schritt vor dem Stripe-Aufruf
+ * beantwortet die Frage, ob dieser Aufruf ueberhaupt etwas aendern koennte —
+ * und verbraucht deshalb kein Kontingent:
+ *
+ *   1. Ist `payment_failed` ueberhaupt vermerkt? Sonst gibt es nichts zu loesen.
+ *   2. Ist das gescheiterte Mittel noch Standard? Sonst ist die Sperre schon
+ *      gefallen und ein Abgleich genuegt.
+ *   3. Ist noch ein Versuch im Fenster frei?
+ *
+ * Erst dann faellt eine Zeile in `provider_payment_recheck` — und nur, wenn
+ * Stripe geantwortet hat. Eine Stoerung auf unserer Seite darf das Kontingent
+ * des Anbieters nicht verbrauchen; sie wirft, und der Aufrufer meldet 502.
+ */
+export async function recheckPaymentMethod(providerKey: string, correlationId: string): Promise<RecheckOutcome | null> {
+    const rows = (await supabaseApi.select('providers', { provider_key: providerKey }, { limit: 1 })) as any[];
+    const p = rows[0];
+    if (!p) return null;
+
+    const failure = p.last_payment_failure as { payment_method_id?: string | null; reason?: string | null; ledger_id?: string | null } | null;
+    const reasons: string[] = Array.isArray(p.billing_block_reasons) ? p.billing_block_reasons : [];
+    // Schritt 1: ohne Vermerk ist nichts zu pruefen. Das ist kein Fehler —
+    // zwei Mitglieder koennen denselben Knopf druecken.
+    if (!failure || !failure.payment_method_id) return { outcome: 'nothing_to_clear' };
+    if (!reasons.includes('payment_failed')) return { outcome: 'nothing_to_clear' };
+
+    if (!p.stripe_customer_id) return { outcome: 'no_payment_method' };
+    const kunde = await getCustomerBilling(String(p.stripe_customer_id));
+    if (!kunde.defaultPaymentMethodId) return { outcome: 'no_payment_method' };
+
+    // Schritt 2: ein anderes Mittel ist schon Standard. Dann hat der Abgleich
+    // den Grund ohnehin fallen lassen — pruefen waere eine Frage an die Bank,
+    // deren Antwort nichts aendert.
+    if (kunde.defaultPaymentMethodId !== failure.payment_method_id) {
+        return { outcome: 'already_cleared', readiness: await syncBillingReadiness(providerKey) };
+    }
+
+    // Schritt 3: das Fenster.
+    const [cfg, versuche] = await Promise.all([
+        loadPricingConfig(),
+        supabaseApi.select('provider_payment_recheck', { provider_key: providerKey }, { order: 'created_at.desc', limit: 50 }) as Promise<any[]>,
+    ]);
+    const vorher = recheckAllowance(versuche, cfg.recheckMaxPer24h);
+    if (!vorher.allowed) return { outcome: 'rate_limited', allowance: vorher };
+
+    const ergebnis = await verifyPaymentMethod({
+        customerId: String(p.stripe_customer_id),
+        paymentMethodId: kunde.defaultPaymentMethodId,
+        // Kein fester Schluessel: jede Pruefung ist eine neue Frage an die Bank.
+        // Mit einem stabilen Key bekaeme der zweite Versuch die Antwort des
+        // ersten zurueck — eine Ablehnung von gestern wuerde die Karte von
+        // heute fuer immer ablehnen.
+        idempotencyKey: `recheck:${providerKey}:${Date.now()}`,
+    });
+
+    if (!ergebnis.ok && ergebnis.kind === 'stripe') {
+        // Nicht die Karte, sondern wir oder das Netz. Keine Zeile, kein
+        // verbrauchter Versuch — der Aufrufer macht daraus 502.
+        structuredLog('error', 'Payment method recheck could not reach Stripe', { correlationId, providerKey, errorCode: 'ERR_PAYMENT_RECHECK', severity: 'error', detail: ergebnis.detail.slice(0, 200) } as any);
+        throw new Error(`recheck unreachable: ${ergebnis.detail}`);
+    }
+
+    await supabaseApi.insert('provider_payment_recheck', {
+        provider_key: providerKey,
+        payment_method_id: kunde.defaultPaymentMethodId,
+        result: ergebnis.ok ? 'confirmed' : 'declined',
+        reason: ergebnis.ok ? null : ergebnis.reason,
+        stripe_ref: ergebnis.ok ? ergebnis.setupIntentId : ergebnis.stripeRef,
+    });
+    const nachher = recheckAllowance(
+        [{ created_at: new Date().toISOString() }, ...versuche],
+        cfg.recheckMaxPer24h,
+    );
+
+    if (!ergebnis.ok) {
+        // Die Ablehnung ist die neue Wahrheit: Grund und Zeitpunkt wandern in
+        // `last_payment_failure`, das Mittel bleibt dasselbe. Die Sperre haelt.
+        await supabaseApi.update('providers', { provider_key: providerKey }, {
+            last_payment_failure: { ...failure, at: new Date().toISOString(), reason: ergebnis.reason, rechecked: true },
+        });
+        await supabaseApi.insert('event_log', {
+            type: 'payment_method_recheck',
+            payload: { providerKey, result: 'declined', reason: ergebnis.reason, paymentMethodId: kunde.defaultPaymentMethodId },
+        }).catch(() => { /* non-blocking */ });
+        return { outcome: 'declined', reason: ergebnis.reason, allowance: nachher };
+    }
+
+    // Bestaetigt. `last_payment_failure` kommt weg — damit liest
+    // `billingReadiness` den Grund nicht mehr. Der Beleg geht nicht verloren:
+    // er steht in `provider_payment_recheck`, im Ereignisprotokoll und als
+    // Zahlungsereignis am Ledger, und die sind alle drei append-only.
+    await supabaseApi.update('providers', { provider_key: providerKey }, { last_payment_failure: null });
+    await supabaseApi.insert('event_log', {
+        type: 'payment_method_recheck',
+        payload: { providerKey, result: 'confirmed', paymentMethodId: kunde.defaultPaymentMethodId, setupIntentId: ergebnis.setupIntentId, clearedLedgerId: failure.ledger_id ?? null },
+    }).catch(() => { /* non-blocking */ });
+    return { outcome: 'confirmed', readiness: await syncBillingReadiness(providerKey), allowance: nachher };
 }
 
 /** Ein Durchlauf des Watchers: die aeltesten Pruefungen zuerst. */

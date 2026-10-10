@@ -198,14 +198,33 @@
       "withdrawn_authorization": "Das Zahlungsmandat wurde widerrufen. Bestätigen Sie die aktuelle Fassung, um weiterzumachen.",
       "overdue_invoice": "Eine Rechnung ist überfällig. Bezahlen Sie sie im Portal.",
       "account_paused": "Ihr Konto ist pausiert.",
-      "payment_failed": "Die letzte Lead-Belastung ist gescheitert. Ein anderes Zahlungsmittel hebt die Sperre auf — dieselbe Karte nicht."
+      "payment_failed": "Die letzte Lead-Belastung ist gescheitert. Sie können dasselbe Zahlungsmittel erneut prüfen lassen oder im Portal ein anderes hinterlegen."
     },
     "graceTitleOne": "Eine Rechnung ist offen",
     "graceTitleMany": "{{n}} Rechnungen sind offen",
     "graceBody": "Fällig seit {{since}}. Ab {{until}} pausiert die Buchung, bis die Rechnung bezahlt ist.",
     "graceStillVisible": "Ihre Sichtbarkeit in den Ergebnissen ändert sich dadurch nicht.",
     "graceOpenPortal": "Rechnung im Portal öffnen",
-    "changePaymentMethod": "Zahlungsmittel ändern"
+    "changePaymentMethod": "Zahlungsmittel ändern",
+    "recheckButton": "Bei der Bank nachfragen",
+    "recheckHint": "Wir fragen bei Ihrer Bank nach, ob das hinterlegte Zahlungsmittel wieder belastbar ist. Es wird dabei kein Betrag abgebucht.",
+    "recheckConfirmed": "Ihre Bank hat das Zahlungsmittel bestätigt — Buchungen sind wieder freigegeben. Die Bestätigung gilt für jetzt; über künftige Belastungen sagt sie nichts zu.",
+    "recheckDeclined": "Ihre Bank hat das Zahlungsmittel nicht bestätigt: {{reason}} Die Buchung bleibt gesperrt, Ihre Sichtbarkeit in den Ergebnissen nicht. Ein anderes Zahlungsmittel im Portal wirkt sofort.",
+    "recheckNothing": "Es war nichts zu prüfen — eine Sperre wegen eines gescheiterten Zahlungsmittels besteht nicht.",
+    "recheckAlreadyCleared": "Es ist bereits ein anderes Zahlungsmittel hinterlegt. Damit ist die Sperre gefallen, ohne Nachfrage bei der Bank.",
+    "recheckNoPaymentMethod": "Es ist kein Zahlungsmittel hinterlegt, das sich prüfen ließe. Im Portal hinterlegen Sie eines.",
+    "recheckRateLimited": "{{used}} von {{max}} Prüfungen in 24 Stunden sind angestoßen. Die nächste ist ab {{when}} möglich. Ein anderes Zahlungsmittel im Portal wirkt sofort und zählt hier nicht mit.",
+    "recheckRateLimitedNoTime": "In diesem Zeitfenster ist keine weitere Prüfung möglich. Ein anderes Zahlungsmittel im Portal wirkt sofort und zählt hier nicht mit.",
+    "recheckRemaining": "Noch {{remaining}} von {{max}} Prüfungen in den nächsten 24 Stunden.",
+    "recheckUnreachable": "Wir konnten Ihre Bank gerade nicht fragen. Das ist keine Ablehnung, und dieser Versuch zählt nicht mit — bitte in einem Moment erneut.",
+    "recheckReason": {
+      "insufficient_funds": "Das Konto war nicht ausreichend gedeckt.",
+      "expired_card": "Die Karte ist abgelaufen.",
+      "card_declined": "Die Bank hat die Belastung abgelehnt, ohne näheren Grund.",
+      "authentication_required": "Die Bank verlangt eine Bestätigung durch Sie, die sich nur im Portal geben lässt.",
+      "no_payment_method": "Das Zahlungsmittel ist bei unserem Zahlungsdienstleister nicht mehr vorhanden.",
+      "stripe_error": "Der Grund ist uns nicht übermittelt worden."
+    }
   },
   "confirmEmail": {
     "working": "Ihre neue Adresse wird bestätigt…",

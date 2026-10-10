@@ -185,6 +185,21 @@ function syncReadiness() {
   READINESS = { ready: true, reasons: [], synced_at: plus(0), payment_method: 'Visa ····1881' };
   return { ok: true, readiness: { ...READINESS, changed: true } };
 }
+// ADR-0008 A2: der Weg zurueck ohne Kartenwechsel. In der Demo lehnt die Bank
+// beim ERSTEN Mal ab und bestaetigt beim zweiten — so zeigt die Demo beide
+// Ausgaenge, und der abgelehnte ist der, den man sonst nie sieht. `Visa
+// ····4242` bleibt dabei dasselbe Mittel; genau das ist der Punkt von A2.
+let RECHECKS = 0;
+function recheckPayment() {
+  if (!READINESS.reasons.includes('payment_failed')) return { ok: true, outcome: 'nothing_to_clear', readiness: null, allowance: null };
+  RECHECKS += 1;
+  const allowance = { used: RECHECKS, max: 3, next_at: RECHECKS >= 3 ? plus(20 * H) : null };
+  if (RECHECKS === 1) return { ok: true, outcome: 'declined', reason: 'insufficient_funds', readiness: null, allowance };
+  if (RECHECKS > 3) return { __status: 429, errorCode: 'RECHECK_RATE_LIMITED', message: 'No check left in the current window', allowance };
+  READINESS = { ...READINESS, reasons: READINESS.reasons.filter((r) => r !== 'payment_failed') };
+  READINESS = { ...READINESS, ready: READINESS.reasons.length === 0, synced_at: plus(0) };
+  return { ok: true, outcome: 'confirmed', readiness: { ...READINESS }, allowance };
+}
 function partnerCoverage() {
   return { ok: true, coverage: { provider_key: PARTNER_KEY, name: 'Schmidt & Partner Steuerberatungsgesellschaft mbH', countries_supported: ['DE', 'AT'], languages: ['DE', 'EN'], sla_target_confirm_hours: 24, availability: 'available', ooo_until: null, partner_status: 'active', contact_email: 'kanzlei@schmidt-partner.example', billing_model: 'mixed', region: 'Norddeutschland', active_since: 2009, pricing_table: [{ service: 'USt-Voranmeldung (monatlich)', price: 'ab 180 € / Monat' }, { service: 'OSS-Registrierung', price: 'ab 450 € einmalig' }] } };
 }
@@ -927,6 +942,7 @@ export function route(method: string, path: string, body: Record<string, unknown
   if (p[0] === 'scheduling' && p.length === 1 && method === 'POST') return createBooking(body);
   if (p[0] === 'provider' && p[2] === 'bookings' && p[4] === 'proposal' && method === 'PATCH') return reportProposal(p[3], body);
   if (p[0] === 'provider' && p[2] === 'billing' && p[3] === 'sync' && method === 'POST') return syncReadiness();
+  if (p[0] === 'provider' && p[2] === 'billing' && p[3] === 'recheck' && method === 'POST') return recheckPayment();
   if (p[0] === 'assistant' && p[1] === 'chat') return assistantChat(body);
   if (p[0] === 'session' && p.length === 1) return { ok: true, id: uuid(9, 1) };
   if (p[0] === 'session' && p[2] === 'duplicate') return duplicateSession(p[1], body);

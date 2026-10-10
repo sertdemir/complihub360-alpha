@@ -10,7 +10,7 @@ import { Tag } from '../../components/ui/Tag';
 import { InvoiceDetailDrawer } from '../../components/provider/InvoiceDetailDrawer';
 import { useWorkspaceData } from '../../lib/useWorkspaceData';
 import { LoadFailedState } from '../../components/provider/WorkspaceStates';
-import { fetchInvoices, fetchBillingPreview, openBillingPortal, syncBillingReadiness, money, type Invoice, type BillingReadiness } from '../../api/billing';
+import { fetchInvoices, fetchBillingPreview, openBillingPortal, syncBillingReadiness, recheckPaymentMethod, money, type Invoice, type BillingReadiness } from '../../api/billing';
 
 // ─── Provider /billing ────────────────────────────────────────────────────────
 // Mirrors "Provider Dashboard v1 · /billing (Desktop · payment-failed)"
@@ -23,6 +23,13 @@ import { fetchInvoices, fetchBillingPreview, openBillingPortal, syncBillingReadi
 // Mandat, Pruefzeit. Der Satz „Sie bleiben sichtbar" nimmt die Angst, die
 // Spec A §14 ohnehin ausschliesst. Beim Rueckweg aus dem Portal (`?from=portal`)
 // stoesst die Seite den Sync an — nie im Buchungspfad.
+//
+// ADR-0008 (A2, 2026-10-10): Steht `payment_failed` unter den Gruenden, kommt
+// ein dritter Knopf dazu — „Zahlungsmittel erneut pruefen". Er fragt die Bank,
+// ob dasselbe Mittel wieder taugt. Bewusst KEIN neues Darstellungsmuster: er
+// sitzt in derselben Knopfzeile wie „Jetzt pruefen", und das Ergebnis steht in
+// derselben Hinweiszeile wie `syncFailed`. Was er aendert, ist nicht die
+// Oberflaeche, sondern dass es den Weg zurueck ueberhaupt gibt.
 
 const STATUS_META: Record<Invoice['status'], { labelKey: string; tone: 'success' | 'error' | 'warning' | 'neutral' }> = {
   paid: { labelKey: 'billing.statusPaid', tone: 'success' },
@@ -56,6 +63,47 @@ export function BillingPage() {
     } catch {
       setSyncState('failed');
     }
+  };
+  // ADR-0008 A2: die vom Anbieter angestossene Nachfrage bei seiner Bank.
+  // `recheckNote` traegt genau EINEN Satz — den letzten Ausgang. Mehrere
+  // Meldungen uebereinander wuerden widerspruechlich stehen bleiben.
+  const [recheckBusy, setRecheckBusy] = useState(false);
+  const [recheckNote, setRecheckNote] = useState('');
+  const recheck = async () => {
+    setRecheckBusy(true); setRecheckNote('');
+    const r = await recheckPaymentMethod();
+    // Das Kontingent, soweit die Antwort es kennt — bei 'confirmed' und
+    // 'declined' immer, sonst nicht (dort wurde keiner verbraucht).
+    const rest = 'allowance' in r && r.allowance
+      ? ` ${t('billing.recheckRemaining', { remaining: Math.max(0, r.allowance.max - r.allowance.used), max: r.allowance.max })}`
+      : '';
+    if (r.outcome === 'confirmed') {
+      if (r.readiness) setSynced(r.readiness);
+      setRecheckNote(t('billing.recheckConfirmed') + rest);
+    } else if (r.outcome === 'declined') {
+      setRecheckNote(t('billing.recheckDeclined', { reason: t(`billing.recheckReason.${r.reason}`, { defaultValue: t('billing.recheckReason.stripe_error') }) }) + rest);
+    } else if (r.outcome === 'already_cleared') {
+      if (r.readiness) setSynced(r.readiness);
+      setRecheckNote(t('billing.recheckAlreadyCleared'));
+    } else if (r.outcome === 'rate_limited') {
+      setRecheckNote(r.allowance?.next_at
+        ? t('billing.recheckRateLimited', {
+            used: r.allowance.used, max: r.allowance.max,
+            when: new Date(r.allowance.next_at).toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' }),
+          })
+        : t('billing.recheckRateLimitedNoTime'));
+    } else if (r.outcome === 'nothing_to_clear') {
+      setRecheckNote(t('billing.recheckNothing'));
+    } else if (r.outcome === 'no_payment_method') {
+      setRecheckNote(t('billing.recheckNoPaymentMethod'));
+    } else if (r.outcome === 'not-configured') {
+      setRecheckNote(t('billing.portalNotConfigured'));
+    } else {
+      // 'unreachable'. Ausdruecklich eine eigene Meldung: „wir konnten nicht
+      // fragen" ist nicht „die Bank hat abgelehnt".
+      setRecheckNote(t('billing.recheckUnreachable'));
+    }
+    setRecheckBusy(false);
   };
   // `?from=portal`: der Anbieter kommt aus dem Stripe-Portal zurueck — jetzt
   // kann sich etwas geaendert haben (neue Karte, Rechnung bezahlt).
@@ -179,8 +227,20 @@ export function BillingPage() {
               </ul>
               <div className="mt-3 flex flex-wrap gap-2">
                 <Button size="sm" onClick={updatePayment} disabled={portalBusy}>{portalBusy ? '…' : t('billing.changePaymentInPortal')}</Button>
+                {/* ADR-0008 A2: nur bei `payment_failed`. Fuer jeden anderen
+                    Grund — offene Rechnung, widerrufenes Mandat, pausiertes
+                    Konto — aendert eine Nachfrage bei der Bank nichts, und ein
+                    Knopf, der nichts tut, waere eine Zumutung. */}
+                {readiness.reasons.includes('payment_failed') && (
+                  <Button size="sm" variant="secondary" onClick={recheck} disabled={recheckBusy}>{recheckBusy ? '…' : t('billing.recheckButton')}</Button>
+                )}
                 <Button size="sm" variant="secondary" onClick={sync} disabled={syncState === 'busy'}>{syncState === 'busy' ? '…' : t('billing.checkNow')}</Button>
               </div>
+              {/* Was der Knopf tut, steht VOR dem Druck — „es wird kein Betrag
+                  abgebucht" ist die Angabe, die man vorher wissen will. */}
+              {readiness.reasons.includes('payment_failed') && (
+                <p className="mt-2 text-[12px] text-fg-tertiary">{t('billing.recheckHint')}</p>
+              )}
               <p className="mt-3 text-[12px] text-fg-tertiary">{t('billing.stillVisibleNote')}</p>
             </section>
           )
@@ -190,6 +250,12 @@ export function BillingPage() {
         )}
         {syncState === 'failed' && (
           <p className="rounded-lg border border-elevate/10 bg-elevate/[0.04] px-4 py-3 text-[12px] text-fg-secondary">{t('billing.syncFailed')}</p>
+        )}
+        {/* Steht AUSSERHALB des Status-Kastens: bestaetigt die Bank, wird der
+            Kasten gruen und wuerde den Satz sonst mitnehmen — der Anbieter
+            saehe nie, was gerade passiert ist. */}
+        {recheckNote && (
+          <p role="status" className="rounded-lg border border-elevate/10 bg-elevate/[0.04] px-4 py-3 text-[12px] text-fg-secondary">{recheckNote}</p>
         )}
 
         {/* D1 (ADR-0008): Der Banner haengt an `invoices.status = 'failed'`,

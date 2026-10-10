@@ -21,6 +21,9 @@ import type { IncomingMessage, ServerResponse } from "http";
 //     ein Einmal-Token bzw. das Intake-Secret der Ausweis.
 //
 // Phase 4 (Buchung): bookings/:id/proposal, billing/sync.
+// ADR-0008 (A2): billing/recheck — die Pruefung des eigenen Zahlungsmittels.
+//   Ohne Guard koennte jeder Eingeloggte fuer einen fremden Anbieter
+//   Pruefungen bei dessen Bank anstossen und dessen Kontingent verbrauchen.
 // Phase 2 (Onboarding): application, services[/:id[/coverage]],
 // evidence/(upload-url|registry|:id/confirm), agreements, submit, verification.
 // Change-Control (§18): changes[/:id], material-event.
@@ -32,7 +35,7 @@ import type { IncomingMessage, ServerResponse } from "http";
 //   textlich vergleicht und eine optionale Gruppe nicht als Abdeckung lesen
 //   kann. Die laengere Alternative steht zuerst.
 const OWN_PROVIDER_ROUTE =
-    /^\/api\/v1\/provider\/([a-z0-9-]+)\/(bookings(?:\/[0-9a-f-]+\/(?:proposal|attendance))?|coverage|profile|invoices|availability|billing-portal|change-email|billing\/preview|billing\/sync|subscription\/schedule|subscription|application|services(?:\/[^/?]+(?:\/coverage)?)?|evidence\/(?:upload-url|registry|[^/?]+\/confirm)|agreements|submit|verification|changes(?:\/[0-9a-f-]+)?|material-event)(\?.*)?$/;
+    /^\/api\/v1\/provider\/([a-z0-9-]+)\/(bookings(?:\/[0-9a-f-]+\/(?:proposal|attendance))?|coverage|profile|invoices|availability|billing-portal|change-email|billing\/preview|billing\/sync|billing\/recheck|subscription\/schedule|subscription|application|services(?:\/[^/?]+(?:\/coverage)?)?|evidence\/(?:upload-url|registry|[^/?]+\/confirm)|agreements|submit|verification|changes(?:\/[0-9a-f-]+)?|material-event)(\?.*)?$/;
 
 /** Liefert den provider_key, wenn die URL eine Anbieter-eigene Route ist. */
 export function ownProviderRouteKey(url: string | undefined): string | null {

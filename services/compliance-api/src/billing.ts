@@ -77,6 +77,8 @@ export interface PricingConfig {
     feeExceptions: FeeEligibilityException[];
     /** Spec A §21.1 "configured cure period", aus `billing_policy` (ADR-0006, A2). */
     curePeriodDays: number;
+    /** Wie oft ein Anbieter die Pruefung seines Zahlungsmittels binnen 24 rollender Stunden selbst anstossen darf (ADR-0008, A2). */
+    recheckMaxPer24h: number;
 }
 
 /**
@@ -89,6 +91,16 @@ export interface PricingConfig {
  * das Netz darunter.
  */
 export const CURE_PERIOD_FALLBACK_DAYS = 7;
+
+/**
+ * Was gilt, wenn `billing_policy.recheck_max_per_24h` fehlt.
+ *
+ * Dieselbe Richtung wie oben: eine unlesbare Konfiguration darf dem Anbieter
+ * den Weg zurueck nie STILL nehmen. Faellt die Spalte aus, bleiben die
+ * beschlossenen drei Versuche stehen, statt auf null zu fallen — null waere
+ * eine Sackgasse, die niemand beschlossen hat.
+ */
+export const RECHECK_MAX_FALLBACK_PER_24H = 3;
 
 export interface Subscription {
     id: string;
@@ -370,6 +382,59 @@ export function billingReadiness(i: ReadinessInput): { ready: boolean; reasons: 
     return { ready: reasons.length === 0, reasons };
 }
 
+// ─── Wie oft darf der Anbieter pruefen lassen? (ADR-0008, A2) ────────────────
+
+export interface RecheckAllowance {
+    /** Ob jetzt noch ein Versuch moeglich ist. */
+    allowed: boolean;
+    /** Versuche im Fenster — nur die, die eine Antwort von Stripe bekamen. */
+    used: number;
+    /** Die beschlossene Obergrenze, damit die Oberflaeche beides nennen kann. */
+    max: number;
+    /** ISO-Zeitpunkt, ab dem wieder einer frei ist; null, solange welche frei sind. */
+    nextAt: string | null;
+}
+
+/**
+ * Das rollende 24-Stunden-Fenster. Rein, damit jede Grenze ohne Netz pruefbar
+ * ist — „jetzt" und die Obergrenze kommen von aussen.
+ *
+ * ROLLEND und nicht kalendertaeglich, aus demselben Grund, aus dem
+ * `overdueState` umgekehrt in Kalendertagen rechnet: beide Male entscheidet
+ * die Frage, was der Anbieter zu sehen bekommt. Bei der Kulanzfrist ist das
+ * ein Datum, hier ein Zeitpunkt — ein Kalendertag haette um 23:50 drei
+ * Versuche gegeben und um 00:10 drei weitere, und „morgen wieder" waere je
+ * nach Zeitzone falsch gewesen.
+ *
+ * `nextAt` ist der aelteste gezaehlte Versuch plus 24 Stunden: dann faellt er
+ * aus dem Fenster und macht einen Platz frei. Das ist die Zahl, die der
+ * Anbieter braucht — „in Kuerze" waere keine Antwort.
+ */
+export function recheckAllowance(
+    attempts: Array<{ created_at?: string | null }>,
+    max: number,
+    now: Date = new Date(),
+): RecheckAllowance {
+    const FENSTER = 24 * 60 * 60 * 1000;
+    const grenze = Math.max(0, max);
+    const jetzt = now.getTime();
+    const imFenster = attempts
+        .map((a) => (a.created_at ? Date.parse(a.created_at) : NaN))
+        .filter((t) => Number.isFinite(t) && jetzt - t < FENSTER)
+        .sort((a, b) => a - b);
+    const used = imFenster.length;
+    if (used < grenze) return { allowed: true, used, max: grenze, nextAt: null };
+    // Voll. Frei wird ein Platz, sobald so viele Versuche aus dem Fenster
+    // gefallen sind, dass `used` unter die Grenze rutscht. Bei used == grenze
+    // ist das der aelteste; wurde die Grenze nachtraeglich GESENKT (used >
+    // grenze), ist es erst der mit Index used - grenze. Wer hier immer den
+    // aeltesten nimmt, nennt einen Zeitpunkt, an dem noch gar nichts frei ist.
+    // Bei grenze = 0 wird nie etwas frei — dann gibt es keinen Zeitpunkt zu
+    // nennen, und null ist die ehrliche Antwort.
+    const naechster = grenze === 0 ? null : imFenster[used - grenze] ?? null;
+    return { allowed: false, used, max: grenze, nextAt: naechster === null ? null : new Date(naechster + FENSTER).toISOString() };
+}
+
 /** Der wirksame Zahlungsstatus einer Ledger-Zeile: das juengste Ereignis, sonst der Stand beim Schreiben. */
 export function resolveLedgerStatus(
     row: { payment_status?: string | null },
@@ -469,6 +534,13 @@ export async function loadPricingConfig(): Promise<PricingConfig> {
             if (!live.length) return CURE_PERIOD_FALLBACK_DAYS;
             const latest = live.reduce((a: any, b: any) => (b.version > a.version ? b : a));
             return typeof latest.cure_period_days === 'number' ? latest.cure_period_days : CURE_PERIOD_FALLBACK_DAYS;
+        })(),
+        // Dieselbe Fassung wie oben, zweiter Wert (ADR-0008, A2).
+        recheckMaxPer24h: (() => {
+            const live = policy.filter((r: any) => !r.effective_from || String(r.effective_from) <= now);
+            if (!live.length) return RECHECK_MAX_FALLBACK_PER_24H;
+            const latest = live.reduce((a: any, b: any) => (b.version > a.version ? b : a));
+            return typeof latest.recheck_max_per_24h === 'number' ? latest.recheck_max_per_24h : RECHECK_MAX_FALLBACK_PER_24H;
         })(),
         feeExceptions: exc.map((e) => ({ areaCode: e.area_code, countryCode: e.country_code ?? '*', enabled: !!e.enabled })),
     };

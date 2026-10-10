@@ -198,14 +198,33 @@
       "withdrawn_authorization": "La autorización de cobro ha sido retirada. Acepte la versión actual para continuar.",
       "overdue_invoice": "Hay una factura vencida. Páguela en el portal.",
       "account_paused": "Su cuenta está en pausa.",
-      "payment_failed": "El último cobro de lead falló. Otro método de pago levanta el bloqueo — la misma tarjeta no."
+      "payment_failed": "El último cargo por lead ha fallado. Puede hacer que se compruebe de nuevo el mismo medio de pago o registrar otro en el portal."
     },
     "graceTitleOne": "Hay una factura pendiente",
     "graceTitleMany": "Hay {{n}} facturas pendientes",
     "graceBody": "Vencida desde el {{since}}. A partir del {{until}}, las reservas se pausan hasta que la factura esté pagada.",
     "graceStillVisible": "Su visibilidad en los resultados de búsqueda no se ve afectada.",
     "graceOpenPortal": "Abrir la factura en el portal",
-    "changePaymentMethod": "Cambiar el método de pago"
+    "changePaymentMethod": "Cambiar el método de pago",
+    "recheckButton": "Consultar a su banco",
+    "recheckHint": "Preguntamos a su banco si el medio de pago registrado vuelve a admitir cargos. No se adeuda ningún importe.",
+    "recheckConfirmed": "Su banco ha confirmado el medio de pago: las reservas están disponibles de nuevo. La confirmación vale para ahora; no garantiza los cargos futuros.",
+    "recheckDeclined": "Su banco no ha confirmado el medio de pago: {{reason}} Las reservas siguen bloqueadas; su visibilidad en los resultados, no. Otro medio de pago en el portal surte efecto de inmediato.",
+    "recheckNothing": "No había nada que comprobar: no existe un bloqueo por un medio de pago rechazado.",
+    "recheckAlreadyCleared": "Ya hay registrado otro medio de pago. Con eso el bloqueo ha desaparecido, sin necesidad de preguntar al banco.",
+    "recheckNoPaymentMethod": "No hay ningún medio de pago registrado que se pueda comprobar. Puede añadir uno en el portal.",
+    "recheckRateLimited": "Se han usado {{used}} de {{max}} comprobaciones en 24 horas. La siguiente será posible a partir de {{when}}. Otro medio de pago en el portal surte efecto de inmediato y no cuenta aquí.",
+    "recheckRateLimitedNoTime": "En esta ventana no es posible otra comprobación. Otro medio de pago en el portal surte efecto de inmediato y no cuenta aquí.",
+    "recheckRemaining": "Quedan {{remaining}} de {{max}} comprobaciones para las próximas 24 horas.",
+    "recheckUnreachable": "Ahora mismo no hemos podido preguntar a su banco. No es un rechazo y este intento no cuenta; inténtelo de nuevo en un momento.",
+    "recheckReason": {
+      "insufficient_funds": "La cuenta no tenía fondos suficientes.",
+      "expired_card": "La tarjeta ha caducado.",
+      "card_declined": "El banco ha rechazado el cargo sin indicar el motivo.",
+      "authentication_required": "El banco pide una confirmación suya, y solo se puede dar en el portal.",
+      "no_payment_method": "El medio de pago ya no existe en nuestro proveedor de pagos.",
+      "stripe_error": "No se nos ha comunicado el motivo."
+    }
   },
   "confirmEmail": {
     "working": "Confirmando su nueva dirección…",

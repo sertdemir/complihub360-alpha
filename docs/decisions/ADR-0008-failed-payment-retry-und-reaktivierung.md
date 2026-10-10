@@ -1,6 +1,6 @@
 # ADR-0008: Gescheiterte Zahlung und Reaktivierung
 
-**Status:** TEILWEISE ENTSCHIEDEN — **D1 beschlossen und umgesetzt (Nutzer, 2026-10-10)**; A, B und C stehen weiter zur Wahl
+**Status:** TEILWEISE ENTSCHIEDEN — **A2 und D1 beschlossen und umgesetzt (Nutzer, 2026-10-10)**; B und C stehen weiter zur Wahl
 **Date:** 2026-10-10
 **Bezug:** *Provider Dashboard Pricing & Operations Implementation Specification* v1.0 („Spec B") — „Configurable items requiring final decision": *„Subscription proration, cancellation notice, grace period, failed-payment retry, and reactivation rules."* · *Spec A* §21.1 (Billing Readiness) · [`KN-BRAND-001`](../../.knowledge/memory/nodes/KN-BRAND-001-complihub360-dna.md) · ADR-0003 (Pricing v2) · ADR-0005 (Buchung → Belastung) · ADR-0006 (Kulanzfrist, Wechsel, Kündigung) · `TKT-PROV-11`
 **Was ADR-0006 offen gelassen hat:** Dort wurden drei der fünf Spec-B-Punkte entschieden (A2 · B2 · C2). Die beiden letzten — `failed-payment retry` und `reactivation rules` — blieben ausdrücklich liegen. Diese Vorlage holt sie nach.
@@ -193,6 +193,71 @@ möglich und unabhängig von allem anderen.
 
 ## Decision
 
+### A2 · Prüfung auf Anstoß des Anbieters (Nutzer, 2026-10-10)
+
+Der Anbieter kann selbst nachfragen lassen, ob sein hinterlegtes
+Zahlungsmittel wieder taugt. Bestätigt die Bank es, fällt `payment_failed` —
+**ohne Kartenwechsel**. Damit hat der Fall *Karte war an einem Tag nicht
+gedeckt* erstmals einen Ausgang.
+
+**Technisch ein SetupIntent, kein PaymentIntent.** `POST setup_intents` mit
+`usage=off_session` und `confirm=true`, ohne Betrag. Stripe nimmt den Betrag 0
+nicht an, und ein Cent-Betrag wäre eine echte Belastung ohne Gegenleistung.
+Der Restricted Key braucht dafür `setup_intents: write` (`docs/stripe-setup.md`).
+
+**`requires_action` zählt als Ablehnung.** Verlangt die Karte eine Bestätigung
+durch den Karteninhaber, kann die niemand abgeben, wenn der Aufruf vom Server
+kommt. Wer diesen Status als Erfolg liest, hebt eine Sperre auf, ohne dass die
+Bank je zugestimmt hat. Der Anbieter bekommt stattdessen den Satz, dass seine
+Bank eine Bestätigung verlangt, die nur im Portal möglich ist.
+
+**Die offene Frage aus der Option — „wie oft darf das versucht werden" — ist
+entschieden und konfiguriert:** `billing_policy.recheck_max_per_24h`,
+Fassung 2, **3 Versuche je rollende 24 Stunden**. Nicht als Konstante im
+Quelltext, aus demselben Grund wie bei der Kulanzfrist (ADR-0006): ein Wert,
+den der Anbieter spürt, gehört versioniert und mit Begründung abgelegt. Die
+Vorgänger-Migration hatte die Spalte bewusst weggelassen, solange A offen war.
+
+Drei Entscheidungen dabei, die alle in dieselbe Richtung zeigen:
+
+- **Rollende 24 Stunden, kein Kalendertag.** Ein Kalendertag hätte um 23:50
+  drei Versuche gegeben und um 00:10 drei weitere, und „morgen wieder" wäre je
+  nach Zeitzone falsch gewesen. Der Anbieter bekommt stattdessen einen echten
+  Zeitpunkt genannt.
+- **Eine Stripe-Störung verbraucht keinen Versuch.** Antwortet Stripe nicht
+  oder fehlt ein Recht am Schlüssel, gibt es 502 und **keine** Zeile in
+  `provider_payment_recheck`. Ein Ausfall auf unserer Seite darf nicht auf das
+  Kontingent des Anbieters gehen.
+- **Die Grenze ist nie der einzige Weg.** Jede Meldung, die eine Sperre oder
+  ein erschöpftes Kontingent nennt, nennt auch das andere Zahlungsmittel im
+  Portal — das wirkt weiter sofort und zählt hier nicht mit. Reibung zu
+  erzeugen, die den Weg zu einer Lösung verengt, ist genau das, was der
+  Decision Filter ausschließt.
+
+**Der Knopf heißt nicht wie in der Option.** Dort stand „Zahlungsmittel erneut
+prüfen". Am Bildschirm steht dieser Knopf direkt neben „Jetzt prüfen" — dem
+Readiness-Abgleich, den es schon gab. Zwei Knöpfe nebeneinander, beide
+„prüfen": daran kann niemand erkennen, welcher was tut. Er heißt jetzt **„Bei
+der Bank nachfragen"** und sagt damit, WEN wir fragen; was dabei passiert
+(„Es wird kein Betrag abgebucht"), steht in der Zeile darunter. Die Wortwahl
+der Option bleibt oben stehen — sie beschrieb die Option, nicht die Microcopy.
+
+**Was A2 ausdrücklich nicht verspricht.** Eine Bestätigung gilt für jetzt. Dass
+die nächste echte Belastung durchgeht, sagt sie nicht zu, und die Copy sagt das
+auch so („Die Bestätigung gilt für jetzt; über künftige Belastungen sagt sie
+nichts zu"). Eine Bestätigung als Garantie zu verkaufen wäre falsche Beruhigung.
+
+**Kein A3.** Ein Automatiklauf löst bei einer Lead-Belastung nichts: die
+Buchung kam nicht zustande, der Nutzer ist weitergezogen, es gibt nichts
+nachzuholen. Die einzige Frage ist, wann wieder freigegeben wird — und diesen
+Zeitpunkt bestimmt der Anbieter besser als ein Zeitplan.
+
+**Eine Copy-Korrektur gehört dazu.** `billing.reason.payment_failed` sagte: „Ein
+anderes Zahlungsmittel hebt die Sperre auf — dieselbe Karte nicht." Mit A2 ist
+der zweite Halbsatz falsch. Er nennt jetzt beide Wege. Das ist derselbe
+Mechanismus wie bei D1, nur in die andere Richtung: dort beschrieb die Copy
+etwas, das es nicht gab, hier verschwieg sie etwas, das es jetzt gibt.
+
 ### D1 · Die Copy wird begradigt (Nutzer, 2026-10-10)
 
 Die Texte sagen, was wirklich passiert. „Kulanzfrist" und „Workspace-Sperre"
@@ -229,10 +294,11 @@ nach einer Entscheidung zu A oder B noch einmal angefasst werden.
 
 ## Was zusammenhängt
 
-- **A und D hängen zusammen, aber nicht voneinander ab.** Gibt es A2, bekommt
-  die Fläche einen Knopf; gibt es ihn nicht, bleibt der Satz „ein anderes
-  Zahlungsmittel hebt die Sperre auf". Beides ist wahr — die heutige Copy ist
-  es in keiner der beiden Welten.
+- **A und D hingen zusammen, aber nicht voneinander ab** — beide sind
+  entschieden. D1 hat die Copy auf den Ist-Zustand gebracht, A2 hat diesen
+  Zustand dann verändert, und die Fläche trägt beides: den Knopf und den
+  korrigierten Satz zu `payment_failed`. Die Reihenfolge war kein Umweg: ohne
+  D1 hätte A2 auf Texten aufgesetzt, die etwas anderes behaupteten.
 - **B und ADR-0006 A2 hängen zusammen.** Die sieben Tage sind der Rahmen, in
   dem eine Wiederholung stattfinden kann. Sie dürfen durch eine Wiederholung
   nicht wandern.
@@ -254,8 +320,11 @@ nach einer Entscheidung zu A oder B noch einmal angefasst werden.
 
 Nach der Entscheidung:
 
-- **A2 oder A3** brauchen eine Stripe-Route und einen Zustand mehr auf
-  `/billing`; **A1** braucht nur D.
+- **A2 ist umgesetzt** (PR zu diesem ADR): `POST /provider/:key/billing/recheck`,
+  `setup_intents: write` am Restricted Key, `billing_policy.recheck_max_per_24h`,
+  `provider_payment_recheck` als append-only Beleg, ein dritter Knopf im
+  Status-Kasten. Die Migration muss auf Staging eingespielt werden — der
+  Auto-Deploy migriert nicht.
 - **B2** braucht Webhook-Behandlung und einen Test, der belegt, dass der
   Kulanz-Stichtag unverändert bleibt.
 - **C2** braucht eine Regel beim Anlegen und einen Test auf den Fall

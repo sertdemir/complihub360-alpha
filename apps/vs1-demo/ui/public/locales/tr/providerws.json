@@ -198,14 +198,33 @@
       "withdrawn_authorization": "Ödeme yetkisi geri çekildi. Devam etmek için güncel sürümü onaylayın.",
       "overdue_invoice": "Vadesi geçmiş bir fatura var. Portalda ödeyin.",
       "account_paused": "Hesabınız duraklatıldı.",
-      "payment_failed": "Son lead tahsilatı başarısız oldu. Farklı bir ödeme yöntemi engeli kaldırır — aynı kart kaldırmaz."
+      "payment_failed": "Son lead tahsilatı başarısız oldu. Aynı ödeme yöntemini yeniden denetletebilir veya portalda başka bir yöntem ekleyebilirsiniz."
     },
     "graceTitleOne": "Bir fatura açık",
     "graceTitleMany": "{{n}} fatura açık",
     "graceBody": "{{since}} tarihinden beri vadesi geçti. {{until}} tarihinden itibaren rezervasyonlar, fatura ödenene kadar duraklatılır.",
     "graceStillVisible": "Arama sonuçlarındaki görünürlüğünüz bundan etkilenmez.",
     "graceOpenPortal": "Faturayı portalda aç",
-    "changePaymentMethod": "Ödeme yöntemini değiştir"
+    "changePaymentMethod": "Ödeme yöntemini değiştir",
+    "recheckButton": "Bankanıza soralım",
+    "recheckHint": "Kayıtlı ödeme yönteminin yeniden tahsil edilebilir olup olmadığını bankanıza soruyoruz. Bu sırada hiçbir tutar tahsil edilmez.",
+    "recheckConfirmed": "Bankanız ödeme yöntemini onayladı — rezervasyonlar yeniden açık. Onay şimdiki durum için geçerlidir; gelecekteki tahsilatlar için bir taahhüt vermez.",
+    "recheckDeclined": "Bankanız ödeme yöntemini onaylamadı: {{reason}} Rezervasyon kapalı kalır; sonuçlardaki görünürlüğünüz kalmaz. Portalda başka bir ödeme yöntemi hemen etkili olur.",
+    "recheckNothing": "Denetlenecek bir şey yoktu — başarısız bir ödeme yönteminden kaynaklanan bir engel bulunmuyor.",
+    "recheckAlreadyCleared": "Kayıtlı başka bir ödeme yöntemi zaten var. Engel bununla kalktı, bankaya sormak gerekmedi.",
+    "recheckNoPaymentMethod": "Denetlenebilecek kayıtlı bir ödeme yöntemi yok. Portalda bir tane ekleyebilirsiniz.",
+    "recheckRateLimited": "24 saat içinde {{max}} denetlemeden {{used}} tanesi kullanıldı. Sonraki {{when}} tarihinden itibaren mümkün. Portalda başka bir ödeme yöntemi hemen etkili olur ve burada sayılmaz.",
+    "recheckRateLimitedNoTime": "Bu zaman aralığında başka denetleme mümkün değil. Portalda başka bir ödeme yöntemi hemen etkili olur ve burada sayılmaz.",
+    "recheckRemaining": "Önümüzdeki 24 saat için {{max}} denetlemeden {{remaining}} tanesi kaldı.",
+    "recheckUnreachable": "Bankanıza şu anda soramadık. Bu bir ret değil ve bu deneme sayılmaz — lütfen biraz sonra yeniden deneyin.",
+    "recheckReason": {
+      "insufficient_funds": "Hesapta yeterli bakiye yoktu.",
+      "expired_card": "Kartın süresi doldu.",
+      "card_declined": "Banka, gerekçe belirtmeden tahsilatı reddetti.",
+      "authentication_required": "Banka sizden bir onay istiyor; bu yalnızca portalda verilebilir.",
+      "no_payment_method": "Ödeme yöntemi, ödeme sağlayıcımızda artık mevcut değil.",
+      "stripe_error": "Gerekçe bize iletilmedi."
+    }
   },
   "confirmEmail": {
     "working": "Yeni adresiniz doğrulanıyor…",

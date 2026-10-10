@@ -42,6 +42,25 @@ Billing Portal write, Checkout Sessions write):
 | Refunds | **write** | Kompensation, wenn der Buchungs-Insert nach dem Capture scheitert |
 | Payment Methods | **read** | der Kunden-Aufruf expandiert `invoice_settings.default_payment_method`, und `billing/sync` listet die angehängten Karten (`GET payment_methods?customer=…`), weil das Portal eine neue Karte anhängt, aber nicht als Standard setzt — der Sync macht sie dann dazu (`POST customers/:id`, Customers write; Befund Staging 2026-10-05); ein Restricted Key darf nur expandieren, worauf er selbst Leserecht hat — ohne dieses Recht antwortet Stripe `permission_error`, und `billing/sync` meldet 502 (Befund Staging 2026-10-04) |
 
+## ADR-0008 A2 (2026-10-10): „Zahlungsmittel erneut prüfen" — ein Recht mehr
+
+`POST /provider/:key/billing/recheck` fragt bei der Bank nach, ob das
+hinterlegte Mittel wieder taugt. Das geht über einen **SetupIntent** (ohne
+Betrag, `usage=off_session`, `confirm=true`), nicht über einen PaymentIntent:
+Stripe nimmt den Betrag 0 nicht an, und ein Cent-Betrag wäre eine echte
+Belastung ohne Gegenleistung.
+
+| Ressource | Recht | Wofür |
+|---|---|---|
+| SetupIntents | **write** | die Nachfrage bei der Bank (`POST setup_intents`, `confirm=true`) |
+
+Fehlt es, antwortet Stripe `permission_error`. Die Route macht daraus **502
+`STRIPE_ERROR`** und schreibt **keine** Zeile in `provider_payment_recheck` —
+der Versuch zählt also nicht gegen das Kontingent des Anbieters. Wichtig ist
+genau diese Unterscheidung: ein fehlendes Recht darf nie als „die Bank hat
+abgelehnt" bei ihm ankommen, sonst wechselt er eine Karte, mit der nichts ist
+(dasselbe Fehlermuster wie bei `billing/sync`, Befund Staging 2026-10-04).
+
 Ohne diese Rechte antwortet die erste Buchung 502 `BILLING_ERROR` (ehrlich,
 aber rot) und `billing/sync` 502 `STRIPE_ERROR`. Der Schlüssel bleibt in der
 VPS-`.env`; Änderung über das Stripe-Dashboard (Sandbox → Developers → API

@@ -12,10 +12,11 @@ import { supabaseApi } from "./supabase.js";
 // anzufassen (die Testsuite spricht den eigenen Server darueber).
 //
 // Kein SDK, weiter form-encoded `fetch`: die Oberflaeche, die wir brauchen,
-// sind sechs Pfade. Der Schluessel kommt aus STRIPE_SECRET_KEY (auf Staging
+// sind sieben Pfade. Der Schluessel kommt aus STRIPE_SECRET_KEY (auf Staging
 // ein Restricted Key in der VPS-.env, nie im Repo). Fuer Phase 4 braucht er
 // zusaetzlich `payment_intents: write`, `customers: write`, `refunds: write`,
-// `payment_methods: read` (docs/stripe-setup.md).
+// `payment_methods: read`; seit ADR-0008 (A2) auch `setup_intents: write`
+// fuer die vom Anbieter angestossene Pruefung (docs/stripe-setup.md).
 
 export function isStripeConfigured(): boolean {
     return !!process.env.STRIPE_SECRET_KEY;
@@ -187,6 +188,60 @@ function mapDecline(code: string | null, declineCode: string | null): ChargeFail
     if (code === 'expired_card' || declineCode === 'expired_card') return 'expired_card';
     if (declineCode === 'insufficient_funds') return 'insufficient_funds';
     return 'card_declined';
+}
+
+export type VerifyResult =
+    | { ok: true; setupIntentId: string }
+    | { ok: false; kind: 'card' | 'stripe'; reason: ChargeFailureReason; stripeRef: string | null; detail: string };
+
+/**
+ * Fragt die Bank, ob ein hinterlegtes Zahlungsmittel noch taugt — ohne Betrag.
+ *
+ * ADR-0008, Wahl A2: Nach einer gescheiterten Lead-Belastung bleibt der Grund
+ * `payment_failed` stehen, solange dasselbe Mittel Standard ist. Das ist fuer
+ * eine dauerhaft ungueltige Karte richtig und fuer eine, die an einem Tag
+ * nicht gedeckt war, eine Sackgasse. Diese Funktion ist der Ausgang: ein
+ * SetupIntent mit `usage=off_session`, also genau die Nutzung, um die es
+ * spaeter wirklich geht.
+ *
+ * Warum kein PaymentIntent ueber 0: Stripe nimmt den Betrag 0 nicht an, und
+ * ein Cent-Betrag waere eine echte Belastung ohne Gegenleistung.
+ *
+ * `requires_action` ist der Fall, der hier am leichtesten still schiefgeht.
+ * Die Karte verlangt dann eine Bestaetigung durch den Karteninhaber, und die
+ * kann niemand abgeben, wenn der Aufruf vom Server kommt. Das zaehlt als
+ * Ablehnung mit dem Grund `authentication_required` — NICHT als Bestaetigung.
+ * Wer `requires_action` als Erfolg liest, hebt eine Sperre auf, ohne dass die
+ * Bank je zugestimmt hat.
+ */
+export async function verifyPaymentMethod(args: {
+    customerId: string;
+    paymentMethodId: string;
+    idempotencyKey: string;
+}): Promise<VerifyResult> {
+    try {
+        const si = await stripeRequest('POST', 'setup_intents', {
+            customer: args.customerId,
+            payment_method: args.paymentMethodId,
+            'payment_method_types[]': 'card',
+            usage: 'off_session',
+            confirm: 'true',
+        }, { idempotencyKey: args.idempotencyKey });
+        const status = String(si.status || '');
+        if (status === 'succeeded') return { ok: true, setupIntentId: String(si.id) };
+        if (status === 'requires_action' || status === 'requires_confirmation') {
+            return { ok: false, kind: 'card', reason: 'authentication_required', stripeRef: String(si.id), detail: status };
+        }
+        return { ok: false, kind: 'card', reason: 'card_declined', stripeRef: String(si.id ?? '') || null, detail: status || 'unknown_status' };
+    } catch (err) {
+        if (err instanceof StripeError && err.isCardError) {
+            return { ok: false, kind: 'card', reason: mapDecline(err.code, err.declineCode), stripeRef: null, detail: err.declineCode || err.code || err.message };
+        }
+        if (err instanceof StripeError && err.code === 'resource_missing' && /payment_method/.test(err.message)) {
+            return { ok: false, kind: 'card', reason: 'no_payment_method', stripeRef: null, detail: err.message };
+        }
+        return { ok: false, kind: 'stripe', reason: 'stripe_error', stripeRef: null, detail: err instanceof Error ? err.message : String(err) };
+    }
 }
 
 /** Erstattung einer Belastung, deren Buchung nach dem Capture nicht zustande kam. */

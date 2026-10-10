@@ -18,7 +18,7 @@ import { checkMarketRequest } from "./marketRequests.js";
 import { handleContact, resendSender, contactRateLimited } from "./contact.js";
 import { notify, handleNotificationsList, handleNotificationsRead } from "./notifications.js";
 import { handleBillingRun, handleBillingPreview, syncOpenInvoices, loadPricingConfig, getActiveSubscription, getDiscountCounter, cycleStartFor, quoteLeadFee, resolveLedgerStatus } from "./billing.js";
-import { SHARED_FIELDS_V1, currentAcknowledgement, deriveOpportunity, priceSnapshotFrom, chargeLeadFee, recordPaymentFailure, syncBillingReadiness, type ChargeOutcome } from "./leadCharge.js";
+import { SHARED_FIELDS_V1, currentAcknowledgement, deriveOpportunity, priceSnapshotFrom, chargeLeadFee, recordPaymentFailure, syncBillingReadiness, recheckPaymentMethod, type ChargeOutcome } from "./leadCharge.js";
 import { loadAttendancePolicy, findRecentLead } from "./attendance.js";
 import { handleProviderAttendance, handleAdminDispute, recordProviderNoShow, openDispute, rebookWithoutFee, rescheduleAllowed, attendanceFields } from "./attendanceRoutes.js";
 import { ensureStripeCustomer, isStripeConfigured, stripeRequest, getCustomerBilling, refundPaymentIntent, StripeError } from "./stripe.js";
@@ -1241,6 +1241,60 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
             // von einem Netzfehler nicht zu unterscheiden (Befund 2026-10-04).
             const detail = err instanceof StripeError ? { stripeStatus: err.status, stripeCode: err.code, stripeType: err.type, detail: err.message } : { detail: err instanceof Error ? err.message : String(err) };
             structuredLog('error', 'Billing sync failed', { correlationId, errorCode: 'ERR_BILLING_SYNC', severity: 'error', route: req.url, ...detail });
+            res.writeHead(502, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ errorCode: 'STRIPE_ERROR', message: 'Stripe request failed', correlationId }));
+        }
+    } else if (req.method === 'POST' && /^\/api\/v1\/provider\/[a-z0-9-]+\/billing\/recheck$/.test(req.url || '')) {
+        // ADR-0008, Wahl A2: der Anbieter laesst sein hinterlegtes
+        // Zahlungsmittel bei der Bank pruefen. Bestaetigt sie es, faellt der
+        // Grund `payment_failed` weg — ohne Kartenwechsel.
+        //
+        // `declined` ist hier KEIN Fehler, sondern die Antwort: 200 mit dem
+        // Grund. Als 4xx waere es ein Fehlschlag des Aufrufs, und die
+        // Oberflaeche koennte „die Bank hat nicht bestaetigt" nicht von
+        // „wir konnten nicht fragen" unterscheiden. Nur das aufgebrauchte
+        // Kontingent ist ein 429 — dort ist der Aufruf wirklich abgewiesen.
+        const providerKey = (req.url || '').split('/')[4];
+        res.setHeader('x-correlation-id', correlationId);
+        try {
+            if (!isStripeConfigured()) {
+                res.writeHead(503, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'STRIPE_NOT_CONFIGURED', message: 'Stripe is not connected yet', correlationId }));
+                return;
+            }
+            const r = await recheckPaymentMethod(providerKey, correlationId);
+            if (!r) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'NOT_FOUND', message: 'Provider not found', correlationId }));
+                return;
+            }
+            const kontingent = 'allowance' in r && r.allowance
+                ? { used: r.allowance.used, max: r.allowance.max, next_at: r.allowance.nextAt }
+                : null;
+            if (r.outcome === 'rate_limited') {
+                res.writeHead(429, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ errorCode: 'RECHECK_RATE_LIMITED', message: 'No check left in the current window', allowance: kontingent, correlationId }));
+                return;
+            }
+            const readiness = 'readiness' in r && r.readiness
+                ? { ready: r.readiness.ready, reasons: r.readiness.reasons, synced_at: r.readiness.syncedAt, payment_method: r.readiness.paymentMethodLabel }
+                : null;
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+                ok: true,
+                outcome: r.outcome,
+                ...(r.outcome === 'declined' ? { reason: r.reason } : {}),
+                readiness,
+                allowance: kontingent,
+                correlationId,
+            }));
+        } catch (err) {
+            // Wie bei billing/sync: die Stripe-Meldung gehoert ins Log, nicht
+            // auf den Draht. Ein fehlendes `setup_intents: write` am
+            // Restricted Key ist sonst von einem Netzfehler nicht zu
+            // unterscheiden.
+            const detail = err instanceof StripeError ? { stripeStatus: err.status, stripeCode: err.code, stripeType: err.type, detail: err.message } : { detail: err instanceof Error ? err.message : String(err) };
+            structuredLog('error', 'Payment method recheck failed', { correlationId, errorCode: 'ERR_PAYMENT_RECHECK', severity: 'error', route: req.url, ...detail });
             res.writeHead(502, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ errorCode: 'STRIPE_ERROR', message: 'Stripe request failed', correlationId }));
         }

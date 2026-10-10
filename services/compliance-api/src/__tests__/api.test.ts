@@ -104,6 +104,7 @@ const { stripeMock } = vi.hoisted(() => ({
         getCustomerBilling: vi.fn(),
         createPaymentIntent: vi.fn(),
         refundPaymentIntent: vi.fn(),
+        verifyPaymentMethod: vi.fn(),
         stripeRequest: vi.fn(),
     },
 }));
@@ -115,6 +116,11 @@ vi.mock('../stripe.js', async (importOriginal) => {
         getCustomerBilling: (...a: any[]) => stripeMock.getCustomerBilling(...a),
         createPaymentIntent: (...a: any[]) => stripeMock.createPaymentIntent(...a),
         refundPaymentIntent: (...a: any[]) => stripeMock.refundPaymentIntent(...a),
+        // ADR-0008 A2. Muss hier stehen, nicht nur ueber `stripeRequest`:
+        // verifyPaymentMethod ruft `stripeRequest` modul-intern auf, und ein
+        // gemockter EXPORT faengt einen lexikalischen Aufruf nicht ab — der
+        // Test waere sonst gegen api.stripe.com gelaufen.
+        verifyPaymentMethod: (...a: any[]) => stripeMock.verifyPaymentMethod(...a),
         stripeRequest: (...a: any[]) => stripeMock.stripeRequest(...a),
         ensureStripeCustomer: async (key: string) => `cus_${key}`,
     };
@@ -124,6 +130,7 @@ function resetStripe() {
     stripeMock.getCustomerBilling.mockReset().mockResolvedValue({ defaultPaymentMethodId: 'pm_test_1', paymentMethodLabel: 'visa ····4242', email: 'geheim@testkanzlei.example', billingInfoComplete: true, delinquent: false });
     stripeMock.createPaymentIntent.mockReset().mockResolvedValue({ ok: true, paymentIntentId: 'pi_test_1', status: 'succeeded' });
     stripeMock.refundPaymentIntent.mockReset().mockResolvedValue({ refundId: 're_test_1' });
+    stripeMock.verifyPaymentMethod.mockReset().mockResolvedValue({ ok: true, setupIntentId: 'seti_test_1' });
     stripeMock.stripeRequest.mockReset().mockImplementation(async (_m: string, path: string) => { throw new Error(`unmocked stripe call: ${path}`); });
 }
 vi.mock('../storage.js', async (importOriginal) => {
@@ -862,7 +869,10 @@ describe('Anbieterseite: Lead-Karte, Selbstauskunft, Zahlungsbereitschaft (Phase
         expect(db.event_log.map((e) => e.type)).toContain('billing_readiness_changed');
     });
 
-    it('payment_failed verschwindet nur mit einem anderen Zahlungsmittel', async () => {
+    // Titel praezisiert mit ADR-0008 A2: der SYNC allein reagiert weiter nur
+    // auf ein anderes Zahlungsmittel. Der zweite Ausgang ist billing/recheck —
+    // dort fragt der Anbieter selbst bei der Bank nach (Tests weiter unten).
+    it('der Sync allein hebt payment_failed nur mit einem anderen Zahlungsmittel auf', async () => {
         seedProvider({ stripe_customer_id: 'cus_test', billing_ready: false, billing_block_reasons: ['payment_failed'], last_payment_failure: { at: '2026-10-01T10:00:00Z', payment_method_id: 'pm_test_1', reason: 'card_declined' } });
         seedPricing(); seedSubscription('test-kanzlei', 'growth');
         (db.provider_agreement_acceptance ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', agreement_type: 'billing_authorization', version: '2026-09', superseded_at: null });
@@ -871,6 +881,132 @@ describe('Anbieterseite: Lead-Karte, Selbstauskunft, Zahlungsbereitschaft (Phase
         stripeMock.getCustomerBilling.mockResolvedValue({ defaultPaymentMethodId: 'pm_test_2', paymentMethodLabel: 'mastercard ····4444', email: null, billingInfoComplete: true, delinquent: false });
         const r2 = await api('/api/v1/provider/test-kanzlei/billing/sync', { method: 'POST', auth: 'key', body: '{}' });
         expect(r2.body.readiness).toMatchObject({ ready: true, reasons: [] });
+    });
+
+    // ─── ADR-0008 A2: der Weg zurueck ohne Kartenwechsel ─────────────────────
+
+    /** Ein Anbieter, dessen letzte Lead-Belastung mit dem heutigen Standard-Mittel scheiterte. */
+    const gesperrtWegenKarte = () => {
+        seedProvider({
+            stripe_customer_id: 'cus_test', billing_ready: false, billing_block_reasons: ['payment_failed'],
+            last_payment_failure: { at: '2026-10-09T10:00:00Z', payment_method_id: 'pm_test_1', reason: 'insufficient_funds', ledger_id: 'led-1' },
+        });
+        seedPricing(); seedSubscription('test-kanzlei', 'growth');
+        (db.provider_agreement_acceptance ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', agreement_type: 'billing_authorization', version: '2026-09', superseded_at: null });
+    };
+    const recheck = () => api('/api/v1/provider/test-kanzlei/billing/recheck', { method: 'POST', auth: 'key', body: '{}' });
+
+    it('bestaetigt die Bank, faellt payment_failed — ohne dass die Karte wechselt', async () => {
+        gesperrtWegenKarte();
+        const r = await recheck();
+        expect(r.status).toBe(200);
+        expect(r.body.outcome).toBe('confirmed');
+        expect(r.body.readiness).toMatchObject({ ready: true, reasons: [] });
+        // Dasselbe Mittel wie vorher — genau das war vorher die Sackgasse.
+        expect(stripeMock.verifyPaymentMethod.mock.calls[0][0]).toMatchObject({ customerId: 'cus_test', paymentMethodId: 'pm_test_1' });
+        expect(db.providers[0].last_payment_failure).toBeNull();
+        expect(db.providers[0]).toMatchObject({ billing_ready: true, billing_block_reasons: [] });
+        // Der Beleg bleibt, obwohl die Vermerkzeile weg ist.
+        expect(db.provider_payment_recheck).toHaveLength(1);
+        expect(db.provider_payment_recheck[0]).toMatchObject({ provider_key: 'test-kanzlei', result: 'confirmed', payment_method_id: 'pm_test_1', stripe_ref: 'seti_test_1' });
+        const ev = (db.event_log ?? []).find((e: any) => e.type === 'payment_method_recheck');
+        expect(ev?.payload).toMatchObject({ result: 'confirmed', clearedLedgerId: 'led-1' });
+    });
+
+    it('bestaetigt sie nicht, bleibt die Sperre — mit dem Grund, nicht mit einer Vermutung', async () => {
+        gesperrtWegenKarte();
+        stripeMock.verifyPaymentMethod.mockResolvedValue({ ok: false, kind: 'card', reason: 'expired_card', stripeRef: 'seti_x', detail: 'expired_card' });
+        const r = await recheck();
+        expect(r.status).toBe(200);                                   // die Antwort der Bank ist kein Fehler des Aufrufs
+        expect(r.body.outcome).toBe('declined');
+        expect(r.body.reason).toBe('expired_card');
+        expect(db.providers[0].billing_block_reasons).toContain('payment_failed');
+        expect(db.providers[0].last_payment_failure).toMatchObject({ payment_method_id: 'pm_test_1', reason: 'expired_card', rechecked: true });
+        expect(db.provider_payment_recheck[0]).toMatchObject({ result: 'declined', reason: 'expired_card' });
+    });
+
+    it('`authentication_required` zaehlt als Ablehnung — die Sperre haelt', async () => {
+        gesperrtWegenKarte();
+        stripeMock.verifyPaymentMethod.mockResolvedValue({ ok: false, kind: 'card', reason: 'authentication_required', stripeRef: 'seti_y', detail: 'requires_action' });
+        const r = await recheck();
+        expect(r.body).toMatchObject({ outcome: 'declined', reason: 'authentication_required' });
+        expect(db.providers[0].billing_block_reasons).toContain('payment_failed');
+    });
+
+    it('ohne Vermerk ist nichts zu pruefen — und es wird auch nicht gefragt', async () => {
+        seedProvider({ stripe_customer_id: 'cus_test', billing_ready: true, billing_block_reasons: [] });
+        const r = await recheck();
+        expect(r.body.outcome).toBe('nothing_to_clear');
+        expect(stripeMock.verifyPaymentMethod).not.toHaveBeenCalled();
+        expect(db.provider_payment_recheck ?? []).toHaveLength(0);
+    });
+
+    it('ist schon ein anderes Mittel Standard, wird abgeglichen statt gefragt', async () => {
+        gesperrtWegenKarte();
+        stripeMock.getCustomerBilling.mockResolvedValue({ defaultPaymentMethodId: 'pm_test_2', paymentMethodLabel: 'mastercard ····4444', email: null, billingInfoComplete: true, delinquent: false });
+        const r = await recheck();
+        expect(r.body.outcome).toBe('already_cleared');
+        expect(r.body.readiness).toMatchObject({ ready: true, reasons: [] });
+        expect(stripeMock.verifyPaymentMethod).not.toHaveBeenCalled();
+        expect(db.provider_payment_recheck ?? []).toHaveLength(0);     // kostet kein Kontingent
+    });
+
+    it('ohne Standard-Zahlungsmittel gibt es nichts zu pruefen', async () => {
+        gesperrtWegenKarte();
+        stripeMock.getCustomerBilling.mockResolvedValue({ defaultPaymentMethodId: null, paymentMethodLabel: null, email: null, billingInfoComplete: true, delinquent: false });
+        const r = await recheck();
+        expect(r.body.outcome).toBe('no_payment_method');
+        expect(stripeMock.verifyPaymentMethod).not.toHaveBeenCalled();
+    });
+
+    it('nach drei Versuchen im Fenster antwortet die Route 429 und nennt den Zeitpunkt', async () => {
+        gesperrtWegenKarte();
+        const vorStunden = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString();
+        (db.provider_payment_recheck ??= []).push(
+            { id: randomUUID(), provider_key: 'test-kanzlei', result: 'declined', reason: 'insufficient_funds', created_at: vorStunden(20) },
+            { id: randomUUID(), provider_key: 'test-kanzlei', result: 'declined', reason: 'insufficient_funds', created_at: vorStunden(5) },
+            { id: randomUUID(), provider_key: 'test-kanzlei', result: 'declined', reason: 'insufficient_funds', created_at: vorStunden(1) },
+        );
+        const r = await recheck();
+        expect(r.status).toBe(429);
+        expect(r.body.errorCode).toBe('RECHECK_RATE_LIMITED');
+        expect(r.body.allowance).toMatchObject({ used: 3, max: 3 });
+        expect(r.body.allowance.next_at).toBeTruthy();
+        expect(stripeMock.verifyPaymentMethod).not.toHaveBeenCalled();
+        // Die Grenze ist kein Ausgang: ein anderes Mittel wirkt weiter sofort.
+        stripeMock.getCustomerBilling.mockResolvedValue({ defaultPaymentMethodId: 'pm_test_2', paymentMethodLabel: 'mastercard ····4444', email: null, billingInfoComplete: true, delinquent: false });
+        const sync = await api('/api/v1/provider/test-kanzlei/billing/sync', { method: 'POST', auth: 'key', body: '{}' });
+        expect(sync.body.readiness).toMatchObject({ ready: true, reasons: [] });
+    });
+
+    it('ein Versuch eines FREMDEN Anbieters zaehlt nicht auf das eigene Kontingent', async () => {
+        gesperrtWegenKarte();
+        const vorStunden = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString();
+        (db.provider_payment_recheck ??= []).push(
+            { id: randomUUID(), provider_key: 'andere-kanzlei', result: 'declined', created_at: vorStunden(1) },
+            { id: randomUUID(), provider_key: 'andere-kanzlei', result: 'declined', created_at: vorStunden(2) },
+            { id: randomUUID(), provider_key: 'andere-kanzlei', result: 'declined', created_at: vorStunden(3) },
+        );
+        const r = await recheck();
+        expect(r.status).toBe(200);
+        expect(r.body.outcome).toBe('confirmed');
+    });
+
+    it('ist Stripe nicht erreichbar, antwortet die Route 502 — und verbraucht keinen Versuch', async () => {
+        gesperrtWegenKarte();
+        stripeMock.verifyPaymentMethod.mockResolvedValue({ ok: false, kind: 'stripe', reason: 'stripe_error', stripeRef: null, detail: 'network down' });
+        const r = await recheck();
+        expect(r.status).toBe(502);
+        expect(db.provider_payment_recheck ?? []).toHaveLength(0);
+        expect(db.providers[0].billing_block_reasons).toContain('payment_failed');
+        // Und der Vermerk bleibt unberuehrt: keine erfundene Ablehnung.
+        expect(db.providers[0].last_payment_failure).toMatchObject({ reason: 'insufficient_funds' });
+    });
+
+    it('ohne Stripe-Schluessel antwortet die Pruefung 503', async () => {
+        gesperrtWegenKarte();
+        stripeMock.configured = false;
+        expect((await recheck()).status).toBe(503);
     });
 
     it('protokolliert, wenn der Sync eine angehaengte Karte zum Standard gemacht hat', async () => {
@@ -1150,7 +1286,7 @@ describe('Ownership: Anbieter-eigene Routen gehoeren ihren Mitgliedern', () => {
     const EIGENE_ROUTEN: Array<[string, string]> = [
         ['GET', '/bookings'], ['GET', '/coverage'], ['PATCH', '/coverage'], ['PATCH', '/profile'],
         ['GET', '/invoices'], ['PATCH', '/availability'], ['POST', '/billing-portal'],
-        ['POST', '/change-email'], ['GET', '/billing/preview'],
+        ['POST', '/change-email'], ['GET', '/billing/preview'], ['POST', '/billing/recheck'],
         ['GET', '/subscription'], ['POST', '/subscription'], ['POST', '/subscription/schedule'],
         // Phase 2 Onboarding
         ['GET', '/application'], ['PATCH', '/application'], ['POST', '/services'],

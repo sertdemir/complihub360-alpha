@@ -315,7 +315,7 @@ paths:
   # ─── Anbieter-Identitaet und Ownership (Phase 0, 2026-09-22) ───────────────
   # Alle Anbieter-eigenen Routen /provider/{key}/(bookings|coverage|profile|
   # invoices|availability|billing-portal|change-email|billing/preview|
-  # subscription) sind nur
+  # billing/sync|billing/recheck|subscription|subscription/schedule) sind nur
   # fuer Mitglieder des Anbieters (provider_members), Admins und den
   # Server-Key erreichbar. Fremde bekommen 404, damit die Antwort nicht
   # verraet, welche Anbieter-Schluessel existieren.
@@ -752,6 +752,46 @@ paths:
       parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
       responses:
         '200': { description: "`{ readiness: { ready, reasons[], synced_at, payment_method, changed } }`" }
+        '503': { description: Stripe nicht konfiguriert }
+
+  /provider/{key}/billing/recheck:
+    post:
+      summary: Zahlungsmittel erneut pruefen lassen (ADR-0008, A2)
+      description: >-
+        Fragt bei der Bank nach, ob das hinterlegte Standard-Zahlungsmittel
+        wieder belastbar ist — ein SetupIntent mit `usage=off_session`, ohne
+        Betrag. Bestaetigt sie es, wird `last_payment_failure` geloescht und
+        die Bereitschaft neu berechnet; der Grund `payment_failed` faellt
+        damit weg, OHNE dass der Anbieter die Karte wechseln muss. Das war
+        bis ADR-0008 der einzige Ausgang.
+
+        `outcome` sagt, was geschah: `confirmed` (Sperre gefallen),
+        `declined` (Bank hat nicht bestaetigt, `reason` traegt den
+        normalisierten Grund — `authentication_required` zaehlt hierzu, weil
+        die verlangte Bestaetigung off-session niemand geben kann),
+        `nothing_to_clear` (kein `payment_failed` vermerkt),
+        `already_cleared` (ein anderes Mittel ist schon Standard, die Sperre
+        war ohnehin weg), `no_payment_method`.
+
+        Eine Ablehnung der Bank ist ausdruecklich 200 und kein 4xx: der
+        Aufruf ist gelungen, die Antwort lautet nein. Nur das aufgebrauchte
+        Kontingent ist 429 (`RECHECK_RATE_LIMITED`), und nur dort traegt auch
+        der Fehlerkoerper `allowance`.
+
+        Begrenzt auf `billing_policy.recheck_max_per_24h` Versuche je
+        ROLLENDE 24 Stunden (Fassung 2: 3). Gezaehlt werden nur Versuche, die
+        eine Antwort von Stripe bekamen (`provider_payment_recheck`) — ist
+        Stripe nicht erreichbar, antwortet die Route 502 und verbraucht
+        keinen Versuch. Ein anderes Zahlungsmittel im Portal wirkt weiter
+        sofort und zaehlt hier nicht mit; die Grenze ist nie der einzige Weg.
+        Nur fuer Mitglieder des Anbieters, Admin oder Server-Key.
+      security: [ { bearerAuth: [] } ]
+      parameters: [ { name: key, in: path, required: true, schema: { type: string } } ]
+      responses:
+        '200': { description: "`{ ok, outcome, reason?, readiness: { ready, reasons[], synced_at, payment_method } | null, allowance: { used, max, next_at } | null }`" }
+        '404': { description: Kein Mitglied dieses Anbieters }
+        '429': { description: "`RECHECK_RATE_LIMITED` — `{ allowance: { used, max, next_at } }`" }
+        '502': { description: Stripe nicht erreichbar; kein Versuch verbraucht }
         '503': { description: Stripe nicht konfiguriert }
 
   /provider/{key}/bookings:
