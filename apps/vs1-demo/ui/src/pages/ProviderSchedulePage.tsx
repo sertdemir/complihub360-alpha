@@ -184,7 +184,7 @@ export function ProviderSchedulePage() {
               onConfirm={book}
               sending={state === 'sending'}
               ack={ack}
-              rows={sharedRows(ack?.sharedFields ?? ['email', 'company_name', 'message'], { message, topic: 'unspecified' })}
+              rows={sharedRows(ack?.sharedFields ?? ['email', 'company_name', 'message'], { message, topic: 'unspecified', preview: ack?.sharedPreview })}
             />
           </aside>
         </div>

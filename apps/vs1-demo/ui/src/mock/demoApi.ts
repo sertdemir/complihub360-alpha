@@ -583,7 +583,11 @@ function providerDetail(ref: string) {
   // ProviderDetailPage.guard.test.ts.
   // D V2: nur Freigegebenes wird angekuendigt — die EPR-Anpassung zum Jahreswechsel.
   const planned_prices = key === PARTNER_KEY ? [{ service_name: 'EPR & Verpackung', effective_at: NEW_YEAR, currency: 'EUR', price_min: 600, price_max: 950 }] : [];
-  return { ok: true, detail: { ...anon, descriptor: DESCRIPTOR[key], area_codes: AREAS[key] ?? [], descriptor_region: REGION[key] ?? null, ...d, planned_prices, availability: 'available', bookable_chargeable: true }, detail_open_charged: false };
+  // A1 (Schritt 4): wer gebucht hat, sieht den Anbieter offen — wie der Server.
+  const revealed = bookings().some((b) => b.public_ref === ref && b.identity_revealed);
+  const id = revealed ? PROVIDER_IDENTITY[key] : undefined;
+  const open = id ? { revealed: true, name: id.name, website_url: id.website_url, contact_email: id.contact_email } : { revealed: false };
+  return { ok: true, detail: { ...anon, descriptor: DESCRIPTOR[key], area_codes: AREAS[key] ?? [], descriptor_region: REGION[key] ?? null, ...d, planned_prices, availability: 'available', bookable_chargeable: true, ...open }, detail_open_charged: false };
 }
 
 // Bewertungen: nur, was an einer Buchung haengt (so wie der Server filtert).
@@ -634,9 +638,14 @@ const ACK_BODY: Record<string, string> = {
   es: 'Con esta reserva, el nombre y los datos de contacto del proveedor pasan a ser visibles para usted, y el proveedor recibe el nombre de su empresa, su dirección de correo electrónico y su mensaje.\n\nEl proveedor puede contactarle sobre esta solicitud — citas, una propuesta y consultas razonables — aunque usted cancele, no asista o deje de responder. La publicidad sobre otros temas requiere su permiso por separado.\n\nUsted recibe un 10 % de descuento sobre los honorarios del proveedor para esta solicitud porque reserva a través de CompliHub360. La reserva en sí no le cuesta nada.',
   tr: 'Bu rezervasyonla sağlayıcının adı ve iletişim bilgileri sizin için görünür olur; sağlayıcı şirket adınızı, e-posta adresinizi ve mesajınızı alır.\n\nSağlayıcı bu talep hakkında sizinle iletişime geçebilir — randevular, bir teklif ve makul takip soruları dahil — iptal etseniz, katılmasanız veya yanıt vermeyi kesseniz bile. Başka konulardaki reklamlar için ayrı izniniz gerekir.\n\nCompliHub360 üzerinden rezervasyon yaptığınız için bu talep için sağlayıcının ücretlerinde % 10 indirim alırsınız. Rezervasyonun kendisi size hiçbir şey maliyet getirmez.',
 };
+/** Die Demo-Firma wie in der Shell; die Adresse ist eine Beispieladresse. */
+const DEMO_SHARED_PREVIEW = { email: 'alex.weber@acme.example', company_name: 'Acme GmbH' };
+
 function acknowledgement(lang: string) {
   const l = ACK_BODY[lang] ? lang : 'en';
-  return { ok: true, version: ACK_VERSION, language: l, body: ACK_BODY[l], shared_fields: ['email', 'company_name', 'message'], user_discount: { pct: 10, policy_version: 1, recurring_treatment: 'undecided' } };
+  return { ok: true, version: ACK_VERSION, language: l, body: ACK_BODY[l], shared_fields: ['email', 'company_name', 'message'], user_discount: { pct: 10, policy_version: 1, recurring_treatment: 'undecided' },
+    // B1 (Schritt 4): wie der Server mit Login — die Werte, die die Buchung festhaelt.
+    shared_preview: DEMO_SHARED_PREVIEW };
 }
 
 // POST /scheduling — die Buchung ist der bezahlte Lead UND der Moment, in dem
@@ -663,11 +672,14 @@ function createBooking(body: unknown) {
     return { __status: 409, errorCode: 'BOOKING_NOT_COMPLETED', message: 'The booking could not be completed. This is not on your side — the provider has been informed.', reason: 'provider_billing' };
   }
   const end = new Date(at.getTime() + 30 * 60 * 1000).toISOString();
+  const mockTopic = { area_code: typeof d.area_code === 'string' && d.area_code ? d.area_code : 'tax-vat', countries: Array.isArray(d.countries) && d.countries.length ? (d.countries as string[]) : ['DE'] };
   return {
     ok: true,
     booking: { id: `m0ck-new-${ref}`, public_ref: ref, slot_start: slot, slot_end: end, status: 'confirmed', acknowledgement_version: ACK_VERSION, shared_fields: ['email', 'company_name', 'message'], user_discount: { pct: 10, policy_version: 1 },
       // Wie der Server: das Thema des Leads (deriveOpportunity, vereinfacht).
-      topic: { area_code: typeof d.area_code === 'string' && d.area_code ? d.area_code : 'tax-vat', countries: Array.isArray(d.countries) && d.countries.length ? (d.countries as string[]) : ['DE'] } },
+      topic: mockTopic,
+      // B1: was geteilt wurde, Wert fuer Wert.
+      shared_snapshot: { ...DEMO_SHARED_PREVIEW, message: typeof d.message === 'string' && d.message.trim() ? d.message.trim() : null, topic: mockTopic } },
     provider_identity: identity,
   };
 }

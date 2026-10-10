@@ -8,7 +8,7 @@ import { Badge } from '../components/ui/Badge';
 import { KpiRing, useEntered } from '../components/ui/Stats';
 import { SEVERITY_STYLE } from '../components/compliance-areas/severity';
 import { ApiError } from '../api/client';
-import { fetchProviderDetail, fetchProviderReviews, fetchSlots, fetchUserBookings, type ProviderDetail, type ProviderReview, type UserBooking } from '../api/bookings';
+import { fetchProviderDetail, fetchProviderReviews, fetchSlots, fetchUserBookings, providerWebsiteHref, type ProviderDetail, type ProviderReview, type UserBooking } from '../api/bookings';
 import { DateMark } from '../components/ui/DateMark';
 import { useRequestContext } from '../lib/requestContext';
 import { AnonNotice, RankBasis } from '../components/user/PartnerCard';
@@ -228,8 +228,12 @@ function Detail({ p, ctx, areaLabel, reviews, slots, booking, entered, locale, o
   // Marken unter der Ueberschrift, statt als englische Goldzeile in ihr.
   // 4 V1: nach der Offenlegung der Klarname aus der Buchung.
   const { bereich } = useRequestContext();
-  const revealed = !!booking?.identityRevealed;
-  const title = revealed ? booking!.providerName : (ctx?.self?.title ?? t('snapshot.verifiedPartner'));
+  // A1 (Schritt 4): das Profil selbst sagt, ob es offen ist; die Buchungsliste
+  // bleibt der Rueckweg fuer einen aelteren Server.
+  const revealed = !!p.revealed || !!booking?.identityRevealed;
+  const title = revealed
+    ? (p.name || booking?.providerName || t('snapshot.verifiedPartner'))
+    : (ctx?.self?.title ?? t('snapshot.verifiedPartner'));
   const areaCodes = p.area_codes ?? ctx?.self?.area_codes ?? [];
   const areaNames = areaCodes.map((c) => bereich(c)).filter(Boolean);
   const region = p.descriptor_region ?? p.region ?? null;
@@ -326,6 +330,17 @@ function Detail({ p, ctx, areaLabel, reviews, slots, booking, entered, locale, o
                 ))}
               </p>
             )}
+            {/* A1: "Name and contact are now visible" — dann steht der Kontakt auch da. */}
+            {revealed && (p.contact_email || p.website_url) && (
+              <p className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-body-sm text-fg-secondary">
+                {p.contact_email && <span>{p.contact_email}</span>}
+                {p.website_url && (
+                  <a href={providerWebsiteHref(p.public_ref)} target="_blank" rel="noreferrer" className="font-semibold text-fg-brand underline underline-offset-2">
+                    {p.website_url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                  </a>
+                )}
+              </p>
+            )}
           </div>
         </div>
         {ctx && (
@@ -395,7 +410,7 @@ function Detail({ p, ctx, areaLabel, reviews, slots, booking, entered, locale, o
           <Packages p={p} />
           <Reviews data={reviews} p={p} confirm={confirm} locale={locale} />
         </div>
-        {booking ? <AppointmentRail booking={booking} locale={locale} onBook={onBook} /> : <BookingRail p={p} slots={slots} locale={locale} onBook={onBook} ctx={ctx} />}
+        {booking ? <AppointmentRail booking={booking} locale={locale} onBook={onBook} /> : <BookingRail p={p} slots={slots} locale={locale} onBook={onBook} ctx={ctx} revealed={revealed} />}
       </div>
     </>
   );
@@ -706,8 +721,10 @@ function Reviews({ data, p, confirm, locale }: {
 // Verfuegbarkeit begruendet ihn, sie fuehrt ihn nicht ein. Ein Klick auf einen
 // Termin belegt den Slot auf der Buchungsseite vor, sonst waehlt der Nutzer
 // zweimal.
-function BookingRail({ p, slots, locale, onBook, ctx }: {
+function BookingRail({ p, slots, locale, onBook, ctx, revealed = false }: {
   p: ProviderDetail;
+  /** A1: schon offen — dann stimmt "Identity becomes visible after booking" nicht mehr. */
+  revealed?: boolean;
   slots: string[] | null;
   locale: string;
   onBook: (slot?: string) => void;
@@ -744,7 +761,7 @@ function BookingRail({ p, slots, locale, onBook, ctx }: {
       <Button size="lg" shape="soft" fullWidth type="button" onClick={() => onBook()} className="mt-4">
         {t('detail.bookCta')} <ArrowRight size={15} />
       </Button>
-      <p className="mt-2 text-center text-body-3xs text-fg-tertiary">{t('detail.revealNote')}</p>
+      {!revealed && <p className="mt-2 text-center text-body-3xs text-fg-tertiary">{t('detail.revealNote')}</p>}
 
       <div className="mt-4 border-t border-stroke-subtle pt-4">
         <p className="text-body-4xs font-extrabold uppercase tracking-[0.09em] text-fg-brand">{t('detail.slotsTitle')}</p>

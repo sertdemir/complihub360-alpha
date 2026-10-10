@@ -4087,3 +4087,123 @@ describe('availability = ooo — pausiert', () => {
         expect(db.scheduling ?? []).toHaveLength(0);
     });
 });
+
+// ─── Privacy Critical Acceptance Tests (Checklist v1.0, EN-Launch Schritt 4) ─
+// Je Test die Nummer der Checkliste. #1 und #7 belegt "Anonymitaet auf dem
+// Draht" oben, #6 die Fehlerzweige der Buchung, #5 gibt es erst mit dem
+// Feature "Alternative available". Hier: was am 10.10.2026 fehlte.
+describe('Privacy Critical Tests (Checklist v1.0)', () => {
+    const asUser = (jwt: string, path: string, init: RequestInit = {}) =>
+        api(path, { ...init, auth: 'none', headers: { authorization: `Bearer ${jwt}`, ...(init.headers as any) } });
+    const PROFILE_JWT = signJwt({ sub: USER_ID, email: 'test@complihub.test', user_metadata: { company_name: 'Profilfirma GmbH' } });
+    const settle = () => new Promise((r) => setTimeout(r, 20));
+    const denied = () => (db.event_log ?? []).filter((e) => e.type === 'access_denied');
+
+    it('#2 vor der Buchung: Website-Link 403, das Detail anonym — und der Versuch steht im Log', async () => {
+        seedProvider();
+        const r = await api(`/api/v1/p/${refOf('test-kanzlei')}/website`, { auth: 'jwt' });
+        expect(r.status).toBe(403);
+        const d = await api(`/api/v1/p/${refOf('test-kanzlei')}/detail`, { auth: 'jwt' });
+        expect(d.body.detail.revealed).toBe(false);
+        expect(JSON.stringify(d.body)).not.toMatch(/Testkanzlei|testkanzlei-schmidt|geheim@/);
+        await settle();
+        expect(denied()).toEqual([expect.objectContaining({ payload: expect.objectContaining({ resource: 'provider_reveal', userId: USER_ID, status: 403 }) })]);
+    });
+
+    it('#3 nach der Buchung: der Buchende sieht das Profil offen, ein anderer weiter anonym (A1)', async () => {
+        const { invalidateVisibility } = await import('../anonymity.js');
+        invalidateVisibility();
+        (db.provider_field_visibility ??= []).push(
+            { field_path: 'providers.name', visibility_class: 'revealed' },
+            { field_path: 'providers.website_url', visibility_class: 'revealed' },
+            { field_path: 'providers.contact_email', visibility_class: 'revealed' },
+        );
+        seedProvider({ work_mode: 'Remote, Kontakt: geheim@testkanzlei.example' });
+        (db.scheduling ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', user_id: USER_ID, slot_start: inAWeek(), slot_end: inAWeek(), status: 'confirmed', identity_revealed: true });
+        const own = await api(`/api/v1/p/${refOf('test-kanzlei')}/detail`, { auth: 'jwt' });
+        expect(own.body.detail).toMatchObject({ revealed: true, name: 'Testkanzlei Schmidt GmbH', website_url: 'https://testkanzlei-schmidt.example', contact_email: 'geheim@testkanzlei.example', work_mode: 'Remote, Kontakt: geheim@testkanzlei.example' });
+        const fremd = await asUser(signJwt({ sub: randomUUID(), email: 'x@y.example' }), `/api/v1/p/${refOf('test-kanzlei')}/detail`);
+        expect(fremd.body.detail.revealed).toBe(false);
+        expect(JSON.stringify(fremd.body)).not.toMatch(/Testkanzlei|testkanzlei-schmidt|geheim@/);
+        invalidateVisibility();
+    });
+
+    it('#4 mehrere Treffer, eine Buchung: nur der gebuchte Anbieter erfaehrt davon', async () => {
+        const { session } = seedBookable();
+        const OTHER_MEMBER = randomUUID();
+        seedProvider({ provider_key: 'andere-kanzlei', name: 'Andere Kanzlei AG', contact_email: 'andere@kanzlei.example' });
+        seedMember('andere-kanzlei', OTHER_MEMBER);
+        const r = await book(standardBody(session));
+        expect(r.status).toBe(201);
+        await settle();
+        expect(db.scheduling.map((b) => b.provider_key)).toEqual(['test-kanzlei']);
+        expect((db.notifications ?? []).every((n) => n.user_id === MEMBER_ID)).toBe(true);
+        const mails = (db.event_log ?? []).filter((e) => e.type === 'email_outbox');
+        expect(mails.length).toBeGreaterThan(0);
+        expect(JSON.stringify(mails)).not.toMatch(/andere-kanzlei|andere@kanzlei/);
+        expect(JSON.stringify(db.notifications ?? [])).not.toContain(OTHER_MEMBER);
+    });
+
+    it('#6 Belastung abgelehnt: keine Nutzerdaten in Mitteilung, Mail oder Ereignis', async () => {
+        const { session } = seedBookable();
+        stripeMock.createPaymentIntent.mockResolvedValue({ ok: false, kind: 'card', reason: 'card_declined', stripeRef: 'pi_fail', detail: 'generic_decline' });
+        const r = await asUser(PROFILE_JWT, '/api/v1/scheduling', { method: 'POST', body: JSON.stringify(standardBody(session, { message: 'Geheime Nachricht' })) });
+        expect(r.status).toBe(409);
+        await settle();
+        const spur = JSON.stringify({ n: db.notifications ?? [], e: db.event_log ?? [] });
+        expect(spur).not.toMatch(/test@complihub\.test|Profilfirma|Geheime Nachricht/);
+        expect(db.scheduling ?? []).toHaveLength(0);
+    });
+
+    it('#8 fremde Buchung und fremde Sitzung: abgewiesen und protokolliert; eine unbekannte ID nicht', async () => {
+        seedProvider();
+        const fremdeBuchung = randomUUID();
+        (db.scheduling ??= []).push({ id: fremdeBuchung, provider_key: 'test-kanzlei', user_id: randomUUID(), slot_start: inAWeek(), slot_end: inAWeek(), status: 'confirmed', identity_revealed: true });
+        const b = await api(`/api/v1/scheduling/${fremdeBuchung}`, { method: 'PATCH', auth: 'jwt', body: JSON.stringify({ status: 'cancelled' }) });
+        expect(b.status).toBe(403);
+        const fremdeSitzung = seedSession({ user_id: randomUUID() });
+        const s = await api(`/api/v1/session/${fremdeSitzung.id}/obligations`, { auth: 'jwt' });
+        expect(s.status).toBe(404);
+        const unbekannt = await api(`/api/v1/session/${randomUUID()}/obligations`, { auth: 'jwt' });
+        expect(unbekannt.status).toBe(404);
+        await settle();
+        const log = denied().map((e) => e.payload);
+        expect(log).toEqual([
+            expect.objectContaining({ resource: 'booking', target: fremdeBuchung, status: 403, userId: USER_ID }),
+            expect.objectContaining({ resource: 'session', target: fremdeSitzung.id, status: 404, userId: USER_ID }),
+        ]);
+        // Keine E-Mail, kein Name im Protokoll.
+        expect(JSON.stringify(log)).not.toMatch(/@|Testkanzlei/);
+    });
+
+    it('#9 Datenminimierung: der Dialog zeigt, die Buchung haelt fest, der Anbieter liest dieselben Werte (B1)', async () => {
+        const { session } = seedBookable();
+        // Eine aeltere Anfrage nennt eine ANDERE Firma — bis B1 hat der Anbieter diese gesehen.
+        (db.engagement_requests ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', user_id: USER_ID, category: 'tax-vat', country: 'DE', structured_answers: { company: 'Anfragefirma KG' }, created_at: '2026-09-30T08:00:00Z' });
+        const ack = await asUser(PROFILE_JWT, '/api/v1/acknowledgement?lang=en');
+        expect(ack.body.shared_preview).toEqual({ email: 'test@complihub.test', company_name: 'Profilfirma GmbH' });
+        const r = await asUser(PROFILE_JWT, '/api/v1/scheduling', { method: 'POST', body: JSON.stringify(standardBody(session)) });
+        expect(r.status).toBe(201);
+        const snap = { email: 'test@complihub.test', company_name: 'Profilfirma GmbH', message: 'Erstgespräch', topic: { area_code: 'tax-vat', countries: ['DE'] } };
+        expect(r.body.booking.shared_snapshot).toEqual(snap);
+        expect(db.scheduling[0].shared_snapshot).toEqual(snap);
+        (db.users ??= []).push({ id: USER_ID, email: 'test@complihub.test' });
+        const memberJwt = signJwt({ sub: MEMBER_ID, email: 'member@kanzlei.example' });
+        const p = await asUser(memberJwt, '/api/v1/provider/test-kanzlei/bookings');
+        expect(p.status).toBe(200);
+        expect(p.body.bookings[0]).toMatchObject({ user_email: 'test@complihub.test', user_company: 'Profilfirma GmbH', message: 'Erstgespräch' });
+        expect(JSON.stringify(p.body.bookings[0])).not.toContain('Anfragefirma');
+    });
+
+    it('#10 Nachweis: Nutzer, Anbieter, Felder, Bestaetigung und Zeit stehen an der Buchung und im Ereignis', async () => {
+        const { session } = seedBookable();
+        const r = await asUser(PROFILE_JWT, '/api/v1/scheduling', { method: 'POST', body: JSON.stringify(standardBody(session)) });
+        expect(r.status).toBe(201);
+        const row = db.scheduling[0];
+        expect(row).toMatchObject({ user_id: USER_ID, provider_key: 'test-kanzlei', shared_fields: ['email', 'company_name', 'message'], acknowledgement_version: 'booking-ack-v1' });
+        expect(Date.parse(row.sharing_confirmed_at)).not.toBeNaN();
+        expect(row.shared_snapshot).toBeTruthy();
+        const ev = db.event_log.find((e) => e.type === 'lead.revealed');
+        expect(ev.payload).toMatchObject({ bookingId: row.id, sharedFields: ['email', 'company_name', 'message'] });
+    });
+});
