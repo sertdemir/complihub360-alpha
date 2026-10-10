@@ -487,7 +487,8 @@
     "discountShown": "% {{pct}} gösterildi mi?",
     "yes": "Evet",
     "no": "Hayır",
-    "notYet": "Henüz değil"
+    "notYet": "Henüz değil",
+    "proposalSaveFailed": "Kaydedilmedi. Lütfen tekrar deneyin."
   },
   "intake": {
     "inviteOnlyTitle": "Partner kaydı yalnızca davetle.",

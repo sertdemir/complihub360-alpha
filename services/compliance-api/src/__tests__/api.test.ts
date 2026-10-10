@@ -813,6 +813,18 @@ describe('Anbieterseite: Lead-Karte, Selbstauskunft, Zahlungsbereitschaft (Phase
         expect(b.price_snapshot).toBeTruthy();
     });
 
+    it('das Thema der Lead-Karte kommt aus dem Ledger, nicht aus einer aelteren Anfrage', async () => {
+        const bookingId = await gebucht();
+        // Eine fruehere Anfrage desselben Nutzers an diesen Anbieter, anderes Thema.
+        (db.engagement_requests ??= []).push({ id: randomUUID(), provider_key: 'test-kanzlei', user_id: USER_ID, category: 'corporate-structure', country: 'US', structured_answers: {}, created_at: new Date().toISOString() });
+        const lead = db.provider_lead_ledger.find((l: any) => l.provider_key === 'test-kanzlei');
+        const r = await api('/api/v1/provider/test-kanzlei/bookings', { auth: 'key' });
+        const b = r.body.bookings.find((x: any) => x.id === bookingId);
+        expect(b.category).toBe(lead.area_code);
+        expect(b.countries).toEqual(lead.countries);
+        expect(b.country).toBe(lead.countries[0]);
+    });
+
     it('PATCH …/proposal: Upsert, Validierung, nur die eigene Buchung', async () => {
         const bookingId = await gebucht();
         const r0 = await api(`/api/v1/provider/test-kanzlei/bookings/${bookingId}/proposal`, { method: 'PATCH', auth: 'key', body: JSON.stringify({ proposal_issued: false, discount_shown: true }) });
