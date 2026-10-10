@@ -487,7 +487,8 @@
     "discountShown": "{{pct}} % shown?",
     "yes": "Yes",
     "no": "No",
-    "notYet": "Not yet"
+    "notYet": "Not yet",
+    "proposalSaveFailed": "Not saved. Please try again."
   },
   "intake": {
     "inviteOnlyTitle": "Partner intake is invite-only.",

@@ -1292,8 +1292,13 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
                     lead_charged: !!b.lead_charged,
                     user_email: b.user_id && byId[b.user_id] ? byId[b.user_id].email : null,
                     user_company: company || null,
-                    category: anfrage?.category ?? null,
-                    country: anfrage?.country ?? null,
+                    // Thema des Leads: was gebucht und berechnet wurde (Ledger), nicht
+                    // die juengste Anfrage des Nutzers an diesen Anbieter — die kann
+                    // ein ganz anderes Thema sein (Testlauf Phase 4, 2026-10-09:
+                    // USt DE/NL gebucht, Karte zeigte „Company Setup · United States").
+                    category: l?.area_code ?? anfrage?.category ?? null,
+                    country: (Array.isArray(l?.countries) && l.countries[0]) || anfrage?.country || null,
+                    countries: Array.isArray(l?.countries) && l.countries.length ? l.countries : null,
                     message: b.message ?? null,
                     acknowledgement_version: b.acknowledgement_version ?? null,
                     price_snapshot: b.price_snapshot ?? null,

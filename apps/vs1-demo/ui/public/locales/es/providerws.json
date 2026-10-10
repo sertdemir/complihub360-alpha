@@ -487,7 +487,8 @@
     "discountShown": "¿{{pct}} % indicado?",
     "yes": "Sí",
     "no": "No",
-    "notYet": "Todavía no"
+    "notYet": "Todavía no",
+    "proposalSaveFailed": "No se ha guardado. Inténtelo de nuevo."
   },
   "intake": {
     "inviteOnlyTitle": "El alta de partners es solo por invitación.",
